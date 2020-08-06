@@ -19,16 +19,16 @@
     ]
   },
   "dependencies": {
-    "@sentry/browser": "5.19.1",
-    "@sentry/integrations": "5.19.2",
-    "@testing-library/jest-dom": "5.11.0",
-    "@testing-library/react": "10.4.6",
-    "@types/jest": "26.0.4",
+    "@sentry/browser": "5.20.1",
+    "@sentry/integrations": "5.20.1",
+    "@testing-library/jest-dom": "5.11.2",
+    "@testing-library/react": "10.4.7",
+    "@types/jest": "26.0.8",
     "@types/nanoid": "2.1.0",
-    "@types/react": "16.9.43",
+    "@types/react": "16.9.44",
     "@types/react-dom": "16.9.8",
     "@types/socket.io-client": "1.4.33",
-    "browser-nativefs": "0.9.1",
+    "browser-nativefs": "0.10.2",
     "i18next-browser-languagedetector": "5.0.0",
     "lodash.throttle": "4.1.1",
     "nanoid": "2.1.11",
@@ -41,7 +41,7 @@
     "react-scripts": "3.4.1",
     "roughjs": "4.3.1",
     "socket.io-client": "2.3.0",
-    "typescript": "3.9.6"
+    "typescript": "3.9.7"
   },
   "devDependencies": {
     "@types/lodash.throttle": "4.1.6",
@@ -70,6 +70,7 @@
       "node_modules/(?!(roughjs|points-on-curve|path-data-parser|points-on-path|browser-nativefs)/)"
     ]
   },
+  "name": "excalidraw",
   "private": true,
   "scripts": {
     "build-node": "node ./scripts/build-node.js",

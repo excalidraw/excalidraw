@@ -36,6 +36,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -413,7 +415,7 @@ Object {
 
 exports[`regression tests adjusts z order when grouping: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests adjusts z order when grouping: [end of test] number of renders 1`] = `19`;
+exports[`regression tests adjusts z order when grouping: [end of test] number of renders 1`] = `20`;
 
 exports[`regression tests alt-drag duplicates an element: [end of test] appState 1`] = `
 Object {
@@ -451,6 +453,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -630,7 +634,7 @@ Object {
 
 exports[`regression tests alt-drag duplicates an element: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests alt-drag duplicates an element: [end of test] number of renders 1`] = `9`;
+exports[`regression tests alt-drag duplicates an element: [end of test] number of renders 1`] = `10`;
 
 exports[`regression tests arrow keys: [end of test] appState 1`] = `
 Object {
@@ -668,6 +672,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -761,7 +767,7 @@ Object {
 
 exports[`regression tests arrow keys: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests arrow keys: [end of test] number of renders 1`] = `12`;
+exports[`regression tests arrow keys: [end of test] number of renders 1`] = `13`;
 
 exports[`regression tests change the properties of a shape: [end of test] appState 1`] = `
 Object {
@@ -799,6 +805,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -1032,7 +1040,7 @@ Object {
 
 exports[`regression tests change the properties of a shape: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests change the properties of a shape: [end of test] number of renders 1`] = `10`;
+exports[`regression tests change the properties of a shape: [end of test] number of renders 1`] = `11`;
 
 exports[`regression tests click on an element and drag it: [dragged] appState 1`] = `
 Object {
@@ -1070,6 +1078,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -1202,7 +1212,7 @@ Object {
 
 exports[`regression tests click on an element and drag it: [dragged] number of elements 1`] = `1`;
 
-exports[`regression tests click on an element and drag it: [dragged] number of renders 1`] = `9`;
+exports[`regression tests click on an element and drag it: [dragged] number of renders 1`] = `10`;
 
 exports[`regression tests click on an element and drag it: [end of test] appState 1`] = `
 Object {
@@ -1240,6 +1250,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -1411,7 +1423,7 @@ Object {
 
 exports[`regression tests click on an element and drag it: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests click on an element and drag it: [end of test] number of renders 1`] = `12`;
+exports[`regression tests click on an element and drag it: [end of test] number of renders 1`] = `13`;
 
 exports[`regression tests click to select a shape: [end of test] appState 1`] = `
 Object {
@@ -1449,6 +1461,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {
     "id1": true,
@@ -1627,7 +1641,7 @@ Object {
 
 exports[`regression tests click to select a shape: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests click to select a shape: [end of test] number of renders 1`] = `12`;
+exports[`regression tests click to select a shape: [end of test] number of renders 1`] = `13`;
 
 exports[`regression tests click-drag to select a group: [end of test] appState 1`] = `
 Object {
@@ -1665,6 +1679,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {
     "id2": true,
@@ -1948,7 +1964,7 @@ Object {
 
 exports[`regression tests click-drag to select a group: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests click-drag to select a group: [end of test] number of renders 1`] = `18`;
+exports[`regression tests click-drag to select a group: [end of test] number of renders 1`] = `19`;
 
 exports[`regression tests double click to edit a group: [end of test] appState 1`] = `
 Object {
@@ -1986,6 +2002,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -2358,7 +2376,7 @@ Object {
 
 exports[`regression tests double click to edit a group: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests double click to edit a group: [end of test] number of renders 1`] = `17`;
+exports[`regression tests double click to edit a group: [end of test] number of renders 1`] = `18`;
 
 exports[`regression tests draw every type of shape: [end of test] appState 1`] = `
 Object {
@@ -2396,6 +2414,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -4206,7 +4226,7 @@ Object {
 
 exports[`regression tests draw every type of shape: [end of test] number of elements 1`] = `8`;
 
-exports[`regression tests draw every type of shape: [end of test] number of renders 1`] = `46`;
+exports[`regression tests draw every type of shape: [end of test] number of renders 1`] = `47`;
 
 exports[`regression tests hotkey 2 selects rectangle tool: [end of test] appState 1`] = `
 Object {
@@ -4244,6 +4264,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -4337,7 +4359,7 @@ Object {
 
 exports[`regression tests hotkey 2 selects rectangle tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey 2 selects rectangle tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests hotkey 2 selects rectangle tool: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests hotkey 3 selects diamond tool: [end of test] appState 1`] = `
 Object {
@@ -4375,6 +4397,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -4468,7 +4492,7 @@ Object {
 
 exports[`regression tests hotkey 3 selects diamond tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey 3 selects diamond tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests hotkey 3 selects diamond tool: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests hotkey 4 selects ellipse tool: [end of test] appState 1`] = `
 Object {
@@ -4506,6 +4530,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -4599,7 +4625,7 @@ Object {
 
 exports[`regression tests hotkey 4 selects ellipse tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey 4 selects ellipse tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests hotkey 4 selects ellipse tool: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests hotkey 5 selects arrow tool: [end of test] appState 1`] = `
 Object {
@@ -4637,6 +4663,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -4752,7 +4780,7 @@ Object {
 
 exports[`regression tests hotkey 5 selects arrow tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey 5 selects arrow tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests hotkey 5 selects arrow tool: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests hotkey 6 selects line tool: [end of test] appState 1`] = `
 Object {
@@ -4790,6 +4818,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -4905,7 +4935,7 @@ Object {
 
 exports[`regression tests hotkey 6 selects line tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey 6 selects line tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests hotkey 6 selects line tool: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests hotkey 7 selects draw tool: [end of test] appState 1`] = `
 Object {
@@ -4943,6 +4973,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -5058,7 +5090,7 @@ Object {
 
 exports[`regression tests hotkey 7 selects draw tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey 7 selects draw tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests hotkey 7 selects draw tool: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests hotkey a selects arrow tool: [end of test] appState 1`] = `
 Object {
@@ -5096,6 +5128,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -5211,7 +5245,7 @@ Object {
 
 exports[`regression tests hotkey a selects arrow tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey a selects arrow tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests hotkey a selects arrow tool: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests hotkey d selects diamond tool: [end of test] appState 1`] = `
 Object {
@@ -5249,6 +5283,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -5342,7 +5378,7 @@ Object {
 
 exports[`regression tests hotkey d selects diamond tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey d selects diamond tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests hotkey d selects diamond tool: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests hotkey e selects ellipse tool: [end of test] appState 1`] = `
 Object {
@@ -5380,6 +5416,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -5473,7 +5511,7 @@ Object {
 
 exports[`regression tests hotkey e selects ellipse tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey e selects ellipse tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests hotkey e selects ellipse tool: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests hotkey l selects line tool: [end of test] appState 1`] = `
 Object {
@@ -5511,6 +5549,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -5626,7 +5666,7 @@ Object {
 
 exports[`regression tests hotkey l selects line tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey l selects line tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests hotkey l selects line tool: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests hotkey r selects rectangle tool: [end of test] appState 1`] = `
 Object {
@@ -5664,6 +5704,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -5757,7 +5799,7 @@ Object {
 
 exports[`regression tests hotkey r selects rectangle tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey r selects rectangle tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests hotkey r selects rectangle tool: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests hotkey x selects draw tool: [end of test] appState 1`] = `
 Object {
@@ -5795,6 +5837,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -5910,7 +5954,7 @@ Object {
 
 exports[`regression tests hotkey x selects draw tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey x selects draw tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests hotkey x selects draw tool: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests make a group and duplicate it: [end of test] appState 1`] = `
 Object {
@@ -5948,6 +5992,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -6574,7 +6620,7 @@ Object {
 
 exports[`regression tests make a group and duplicate it: [end of test] number of elements 1`] = `6`;
 
-exports[`regression tests make a group and duplicate it: [end of test] number of renders 1`] = `21`;
+exports[`regression tests make a group and duplicate it: [end of test] number of renders 1`] = `22`;
 
 exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] appState 1`] = `
 Object {
@@ -6612,6 +6658,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -6791,7 +6839,7 @@ Object {
 
 exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] number of renders 1`] = `18`;
+exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] number of renders 1`] = `19`;
 
 exports[`regression tests pinch-to-zoom works: [end of test] appState 1`] = `
 Object {
@@ -6829,6 +6877,8 @@ Object {
   "lastPointerDownWith": "touch",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -6861,7 +6911,7 @@ Object {
 
 exports[`regression tests pinch-to-zoom works: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests pinch-to-zoom works: [end of test] number of renders 1`] = `8`;
+exports[`regression tests pinch-to-zoom works: [end of test] number of renders 1`] = `9`;
 
 exports[`regression tests rerenders UI on language change: [end of test] appState 1`] = `
 Object {
@@ -6899,6 +6949,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -6929,7 +6981,7 @@ Object {
 
 exports[`regression tests rerenders UI on language change: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests rerenders UI on language change: [end of test] number of renders 1`] = `5`;
+exports[`regression tests rerenders UI on language change: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests resize an element, trying every resize handle: [end of test] appState 1`] = `
 Object {
@@ -6967,6 +7019,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -7772,7 +7826,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [end of test] number of renders 1`] = `54`;
+exports[`regression tests resize an element, trying every resize handle: [end of test] number of renders 1`] = `55`;
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle ne (+5, +5)] appState 1`] = `
 Object {
@@ -7810,6 +7864,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -8183,7 +8239,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle ne (+5, +5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [resize handle ne (+5, +5)] number of renders 1`] = `27`;
+exports[`regression tests resize an element, trying every resize handle: [resize handle ne (+5, +5)] number of renders 1`] = `28`;
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle ne (-5, -5)] appState 1`] = `
 Object {
@@ -8221,6 +8277,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -8509,7 +8567,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle ne (-5, -5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [resize handle ne (-5, -5)] number of renders 1`] = `21`;
+exports[`regression tests resize an element, trying every resize handle: [resize handle ne (-5, -5)] number of renders 1`] = `22`;
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle nw (+5, +5)] appState 1`] = `
 Object {
@@ -8547,6 +8605,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -8754,7 +8814,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle nw (+5, +5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [resize handle nw (+5, +5)] number of renders 1`] = `15`;
+exports[`regression tests resize an element, trying every resize handle: [resize handle nw (+5, +5)] number of renders 1`] = `16`;
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle nw (-5, -5)] appState 1`] = `
 Object {
@@ -8792,6 +8852,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -8922,7 +8984,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle nw (-5, -5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [resize handle nw (-5, -5)] number of renders 1`] = `9`;
+exports[`regression tests resize an element, trying every resize handle: [resize handle nw (-5, -5)] number of renders 1`] = `10`;
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle se (+5, +5)] appState 1`] = `
 Object {
@@ -8960,6 +9022,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -9713,7 +9777,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle se (+5, +5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [resize handle se (+5, +5)] number of renders 1`] = `51`;
+exports[`regression tests resize an element, trying every resize handle: [resize handle se (+5, +5)] number of renders 1`] = `52`;
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle se (-5, -5)] appState 1`] = `
 Object {
@@ -9751,6 +9815,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -10403,7 +10469,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle se (-5, -5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [resize handle se (-5, -5)] number of renders 1`] = `45`;
+exports[`regression tests resize an element, trying every resize handle: [resize handle se (-5, -5)] number of renders 1`] = `46`;
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle sw (+5, +5)] appState 1`] = `
 Object {
@@ -10441,6 +10507,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -10996,7 +11064,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle sw (+5, +5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [resize handle sw (+5, +5)] number of renders 1`] = `39`;
+exports[`regression tests resize an element, trying every resize handle: [resize handle sw (+5, +5)] number of renders 1`] = `40`;
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle sw (-5, -5)] appState 1`] = `
 Object {
@@ -11034,6 +11102,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -11496,7 +11566,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle sw (-5, -5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [resize handle sw (-5, -5)] number of renders 1`] = `33`;
+exports[`regression tests resize an element, trying every resize handle: [resize handle sw (-5, -5)] number of renders 1`] = `34`;
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle ne (+5, +5)] appState 1`] = `
 Object {
@@ -11534,6 +11604,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -11951,7 +12023,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle ne (+5, +5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [unresize handle ne (+5, +5)] number of renders 1`] = `30`;
+exports[`regression tests resize an element, trying every resize handle: [unresize handle ne (+5, +5)] number of renders 1`] = `31`;
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle ne (-5, -5)] appState 1`] = `
 Object {
@@ -11989,6 +12061,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -12319,7 +12393,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle ne (-5, -5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [unresize handle ne (-5, -5)] number of renders 1`] = `24`;
+exports[`regression tests resize an element, trying every resize handle: [unresize handle ne (-5, -5)] number of renders 1`] = `25`;
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle nw (+5, +5)] appState 1`] = `
 Object {
@@ -12357,6 +12431,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -12604,7 +12680,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle nw (+5, +5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [unresize handle nw (+5, +5)] number of renders 1`] = `18`;
+exports[`regression tests resize an element, trying every resize handle: [unresize handle nw (+5, +5)] number of renders 1`] = `19`;
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle nw (-5, -5)] appState 1`] = `
 Object {
@@ -12642,6 +12718,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -12810,7 +12888,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle nw (-5, -5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [unresize handle nw (-5, -5)] number of renders 1`] = `12`;
+exports[`regression tests resize an element, trying every resize handle: [unresize handle nw (-5, -5)] number of renders 1`] = `13`;
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle se (+5, +5)] appState 1`] = `
 Object {
@@ -12848,6 +12926,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -13653,7 +13733,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle se (+5, +5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [unresize handle se (+5, +5)] number of renders 1`] = `54`;
+exports[`regression tests resize an element, trying every resize handle: [unresize handle se (+5, +5)] number of renders 1`] = `55`;
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle se (-5, -5)] appState 1`] = `
 Object {
@@ -13691,6 +13771,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -14393,7 +14475,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle se (-5, -5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [unresize handle se (-5, -5)] number of renders 1`] = `48`;
+exports[`regression tests resize an element, trying every resize handle: [unresize handle se (-5, -5)] number of renders 1`] = `49`;
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle sw (+5, +5)] appState 1`] = `
 Object {
@@ -14431,6 +14513,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -15034,7 +15118,7 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle sw (+5, +5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [unresize handle sw (+5, +5)] number of renders 1`] = `42`;
+exports[`regression tests resize an element, trying every resize handle: [unresize handle sw (+5, +5)] number of renders 1`] = `43`;
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle sw (-5, -5)] appState 1`] = `
 Object {
@@ -15072,6 +15156,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -15580,7 +15666,3051 @@ Object {
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle sw (-5, -5)] number of elements 1`] = `1`;
 
-exports[`regression tests resize an element, trying every resize handle: [unresize handle sw (-5, -5)] number of renders 1`] = `36`;
+exports[`regression tests resize an element, trying every resize handle: [unresize handle sw (-5, -5)] number of renders 1`] = `37`;
+
+exports[`regression tests selecting 'Add to library' in context menu adds element to library: [end of test] appState 1`] = `
+Object {
+  "collaborators": Map {},
+  "currentItemBackgroundColor": "transparent",
+  "currentItemFillStyle": "hachure",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemStrokeColor": "#000000",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "cursorX": 0,
+  "cursorY": 0,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementLocked": false,
+  "elementType": "selection",
+  "errorMessage": null,
+  "exportBackground": true,
+  "gridSize": null,
+  "height": 768,
+  "isCollaborating": false,
+  "isLibraryOpen": false,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openMenu": null,
+  "previousSelectedElementIds": Object {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": Object {
+    "id0": true,
+  },
+  "selectedGroupIds": Object {},
+  "selectionElement": null,
+  "shouldAddWatermark": false,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
+  "viewBackgroundColor": "#ffffff",
+  "width": 1024,
+  "zenModeEnabled": false,
+  "zoom": 1,
+}
+`;
+
+exports[`regression tests selecting 'Add to library' in context menu adds element to library: [end of test] element 0 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 20,
+  "id": "id0",
+  "isDeleted": false,
+  "opacity": 100,
+  "roughness": 1,
+  "seed": 337897,
+  "strokeColor": "#000000",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "rectangle",
+  "version": 2,
+  "versionNonce": 1278240551,
+  "width": 20,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`regression tests selecting 'Add to library' in context menu adds element to library: [end of test] history 1`] = `
+Object {
+  "recording": false,
+  "redoStack": Array [],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`regression tests selecting 'Add to library' in context menu adds element to library: [end of test] number of elements 1`] = `1`;
+
+exports[`regression tests selecting 'Add to library' in context menu adds element to library: [end of test] number of renders 1`] = `7`;
+
+exports[`regression tests selecting 'Bring forward' in context menu brings element forward: [end of test] appState 1`] = `
+Object {
+  "collaborators": Map {},
+  "currentItemBackgroundColor": "transparent",
+  "currentItemFillStyle": "hachure",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemStrokeColor": "#000000",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "cursorX": 0,
+  "cursorY": 0,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementLocked": false,
+  "elementType": "selection",
+  "errorMessage": null,
+  "exportBackground": true,
+  "gridSize": null,
+  "height": 768,
+  "isCollaborating": false,
+  "isLibraryOpen": false,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openMenu": null,
+  "previousSelectedElementIds": Object {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": Object {
+    "id0": true,
+  },
+  "selectedGroupIds": Object {},
+  "selectionElement": null,
+  "shouldAddWatermark": false,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
+  "viewBackgroundColor": "#ffffff",
+  "width": 1024,
+  "zenModeEnabled": false,
+  "zoom": 1,
+}
+`;
+
+exports[`regression tests selecting 'Bring forward' in context menu brings element forward: [end of test] element 0 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 20,
+  "id": "id1",
+  "isDeleted": false,
+  "opacity": 100,
+  "roughness": 1,
+  "seed": 449462985,
+  "strokeColor": "#000000",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "rectangle",
+  "version": 2,
+  "versionNonce": 453191,
+  "width": 20,
+  "x": 40,
+  "y": 40,
+}
+`;
+
+exports[`regression tests selecting 'Bring forward' in context menu brings element forward: [end of test] element 1 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 20,
+  "id": "id0",
+  "isDeleted": false,
+  "opacity": 100,
+  "roughness": 1,
+  "seed": 337897,
+  "strokeColor": "#000000",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "rectangle",
+  "version": 2,
+  "versionNonce": 1278240551,
+  "width": 20,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`regression tests selecting 'Bring forward' in context menu brings element forward: [end of test] history 1`] = `
+Object {
+  "recording": false,
+  "redoStack": Array [],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 449462985,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 453191,
+          "width": 20,
+          "x": 40,
+          "y": 40,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 449462985,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 453191,
+          "width": 20,
+          "x": 40,
+          "y": 40,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`regression tests selecting 'Bring forward' in context menu brings element forward: [end of test] number of elements 1`] = `2`;
+
+exports[`regression tests selecting 'Bring forward' in context menu brings element forward: [end of test] number of renders 1`] = `13`;
+
+exports[`regression tests selecting 'Bring to front' in context menu brings element to front: [end of test] appState 1`] = `
+Object {
+  "collaborators": Map {},
+  "currentItemBackgroundColor": "transparent",
+  "currentItemFillStyle": "hachure",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemStrokeColor": "#000000",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "cursorX": 0,
+  "cursorY": 0,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementLocked": false,
+  "elementType": "selection",
+  "errorMessage": null,
+  "exportBackground": true,
+  "gridSize": null,
+  "height": 768,
+  "isCollaborating": false,
+  "isLibraryOpen": false,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openMenu": null,
+  "previousSelectedElementIds": Object {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": Object {
+    "id0": true,
+  },
+  "selectedGroupIds": Object {},
+  "selectionElement": null,
+  "shouldAddWatermark": false,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
+  "viewBackgroundColor": "#ffffff",
+  "width": 1024,
+  "zenModeEnabled": false,
+  "zoom": 1,
+}
+`;
+
+exports[`regression tests selecting 'Bring to front' in context menu brings element to front: [end of test] element 0 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 20,
+  "id": "id1",
+  "isDeleted": false,
+  "opacity": 100,
+  "roughness": 1,
+  "seed": 449462985,
+  "strokeColor": "#000000",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "rectangle",
+  "version": 2,
+  "versionNonce": 453191,
+  "width": 20,
+  "x": 40,
+  "y": 40,
+}
+`;
+
+exports[`regression tests selecting 'Bring to front' in context menu brings element to front: [end of test] element 1 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 20,
+  "id": "id0",
+  "isDeleted": false,
+  "opacity": 100,
+  "roughness": 1,
+  "seed": 337897,
+  "strokeColor": "#000000",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "rectangle",
+  "version": 2,
+  "versionNonce": 1278240551,
+  "width": 20,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`regression tests selecting 'Bring to front' in context menu brings element to front: [end of test] history 1`] = `
+Object {
+  "recording": false,
+  "redoStack": Array [],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 449462985,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 453191,
+          "width": 20,
+          "x": 40,
+          "y": 40,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 449462985,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 453191,
+          "width": 20,
+          "x": 40,
+          "y": 40,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`regression tests selecting 'Bring to front' in context menu brings element to front: [end of test] number of elements 1`] = `2`;
+
+exports[`regression tests selecting 'Bring to front' in context menu brings element to front: [end of test] number of renders 1`] = `13`;
+
+exports[`regression tests selecting 'Copy styles' in context menu copies styles: [end of test] appState 1`] = `
+Object {
+  "collaborators": Map {},
+  "currentItemBackgroundColor": "transparent",
+  "currentItemFillStyle": "hachure",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemStrokeColor": "#000000",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "cursorX": 0,
+  "cursorY": 0,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementLocked": false,
+  "elementType": "selection",
+  "errorMessage": null,
+  "exportBackground": true,
+  "gridSize": null,
+  "height": 768,
+  "isCollaborating": false,
+  "isLibraryOpen": false,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openMenu": null,
+  "previousSelectedElementIds": Object {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": Object {
+    "id0": true,
+  },
+  "selectedGroupIds": Object {},
+  "selectionElement": null,
+  "shouldAddWatermark": false,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
+  "viewBackgroundColor": "#ffffff",
+  "width": 1024,
+  "zenModeEnabled": false,
+  "zoom": 1,
+}
+`;
+
+exports[`regression tests selecting 'Copy styles' in context menu copies styles: [end of test] element 0 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 20,
+  "id": "id0",
+  "isDeleted": false,
+  "opacity": 100,
+  "roughness": 1,
+  "seed": 337897,
+  "strokeColor": "#000000",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "rectangle",
+  "version": 2,
+  "versionNonce": 1278240551,
+  "width": 20,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`regression tests selecting 'Copy styles' in context menu copies styles: [end of test] history 1`] = `
+Object {
+  "recording": false,
+  "redoStack": Array [],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`regression tests selecting 'Copy styles' in context menu copies styles: [end of test] number of elements 1`] = `1`;
+
+exports[`regression tests selecting 'Copy styles' in context menu copies styles: [end of test] number of renders 1`] = `7`;
+
+exports[`regression tests selecting 'Delete' in context menu deletes element: [end of test] appState 1`] = `
+Object {
+  "collaborators": Map {},
+  "currentItemBackgroundColor": "transparent",
+  "currentItemFillStyle": "hachure",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemStrokeColor": "#000000",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "cursorX": 0,
+  "cursorY": 0,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementLocked": false,
+  "elementType": "selection",
+  "errorMessage": null,
+  "exportBackground": true,
+  "gridSize": null,
+  "height": 768,
+  "isCollaborating": false,
+  "isLibraryOpen": false,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openMenu": null,
+  "previousSelectedElementIds": Object {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": Object {},
+  "selectedGroupIds": Object {},
+  "selectionElement": null,
+  "shouldAddWatermark": false,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
+  "viewBackgroundColor": "#ffffff",
+  "width": 1024,
+  "zenModeEnabled": false,
+  "zoom": 1,
+}
+`;
+
+exports[`regression tests selecting 'Delete' in context menu deletes element: [end of test] element 0 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 20,
+  "id": "id0",
+  "isDeleted": true,
+  "opacity": 100,
+  "roughness": 1,
+  "seed": 337897,
+  "strokeColor": "#000000",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "rectangle",
+  "version": 3,
+  "versionNonce": 449462985,
+  "width": 20,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`regression tests selecting 'Delete' in context menu deletes element: [end of test] history 1`] = `
+Object {
+  "recording": false,
+  "redoStack": Array [],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": true,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 449462985,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`regression tests selecting 'Delete' in context menu deletes element: [end of test] number of elements 1`] = `1`;
+
+exports[`regression tests selecting 'Delete' in context menu deletes element: [end of test] number of renders 1`] = `8`;
+
+exports[`regression tests selecting 'Duplicate' in context menu duplicates element: [end of test] appState 1`] = `
+Object {
+  "collaborators": Map {},
+  "currentItemBackgroundColor": "transparent",
+  "currentItemFillStyle": "hachure",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemStrokeColor": "#000000",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "cursorX": 0,
+  "cursorY": 0,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementLocked": false,
+  "elementType": "selection",
+  "errorMessage": null,
+  "exportBackground": true,
+  "gridSize": null,
+  "height": 768,
+  "isCollaborating": false,
+  "isLibraryOpen": false,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openMenu": null,
+  "previousSelectedElementIds": Object {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": Object {
+    "id1": true,
+  },
+  "selectedGroupIds": Object {},
+  "selectionElement": null,
+  "shouldAddWatermark": false,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
+  "viewBackgroundColor": "#ffffff",
+  "width": 1024,
+  "zenModeEnabled": false,
+  "zoom": 1,
+}
+`;
+
+exports[`regression tests selecting 'Duplicate' in context menu duplicates element: [end of test] element 0 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 20,
+  "id": "id0",
+  "isDeleted": false,
+  "opacity": 100,
+  "roughness": 1,
+  "seed": 337897,
+  "strokeColor": "#000000",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "rectangle",
+  "version": 2,
+  "versionNonce": 1278240551,
+  "width": 20,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`regression tests selecting 'Duplicate' in context menu duplicates element: [end of test] element 1 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 20,
+  "id": "id1",
+  "isDeleted": false,
+  "opacity": 100,
+  "roughness": 1,
+  "seed": 449462985,
+  "strokeColor": "#000000",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "rectangle",
+  "version": 2,
+  "versionNonce": 1278240551,
+  "width": 20,
+  "x": 20,
+  "y": 20,
+}
+`;
+
+exports[`regression tests selecting 'Duplicate' in context menu duplicates element: [end of test] history 1`] = `
+Object {
+  "recording": false,
+  "redoStack": Array [],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 449462985,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 20,
+          "y": 20,
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`regression tests selecting 'Duplicate' in context menu duplicates element: [end of test] number of elements 1`] = `2`;
+
+exports[`regression tests selecting 'Duplicate' in context menu duplicates element: [end of test] number of renders 1`] = `8`;
+
+exports[`regression tests selecting 'Group selection' in context menu groups selected elements: [end of test] appState 1`] = `
+Object {
+  "collaborators": Map {},
+  "currentItemBackgroundColor": "transparent",
+  "currentItemFillStyle": "hachure",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemStrokeColor": "#000000",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "cursorX": 0,
+  "cursorY": 0,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementLocked": false,
+  "elementType": "selection",
+  "errorMessage": null,
+  "exportBackground": true,
+  "gridSize": null,
+  "height": 768,
+  "isCollaborating": false,
+  "isLibraryOpen": false,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openMenu": null,
+  "previousSelectedElementIds": Object {
+    "id1": true,
+  },
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": Object {
+    "id0": true,
+    "id1": true,
+    "id2": true,
+  },
+  "selectedGroupIds": Object {
+    "id3": true,
+  },
+  "selectionElement": null,
+  "shouldAddWatermark": false,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
+  "viewBackgroundColor": "#ffffff",
+  "width": 1024,
+  "zenModeEnabled": false,
+  "zoom": 1,
+}
+`;
+
+exports[`regression tests selecting 'Group selection' in context menu groups selected elements: [end of test] element 0 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "fillStyle": "hachure",
+  "groupIds": Array [
+    "id3",
+  ],
+  "height": 20,
+  "id": "id0",
+  "isDeleted": false,
+  "opacity": 100,
+  "roughness": 1,
+  "seed": 337897,
+  "strokeColor": "#000000",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "rectangle",
+  "version": 3,
+  "versionNonce": 2019559783,
+  "width": 20,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`regression tests selecting 'Group selection' in context menu groups selected elements: [end of test] element 1 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "fillStyle": "hachure",
+  "groupIds": Array [
+    "id3",
+  ],
+  "height": 20,
+  "id": "id1",
+  "isDeleted": false,
+  "opacity": 100,
+  "roughness": 1,
+  "seed": 449462985,
+  "strokeColor": "#000000",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "rectangle",
+  "version": 3,
+  "versionNonce": 1150084233,
+  "width": 20,
+  "x": 40,
+  "y": 40,
+}
+`;
+
+exports[`regression tests selecting 'Group selection' in context menu groups selected elements: [end of test] history 1`] = `
+Object {
+  "recording": false,
+  "redoStack": Array [],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 449462985,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 453191,
+          "width": 20,
+          "x": 40,
+          "y": 40,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [
+            "id3",
+          ],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 2019559783,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [
+            "id3",
+          ],
+          "height": 20,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 449462985,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 1150084233,
+          "width": 20,
+          "x": 40,
+          "y": 40,
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`regression tests selecting 'Group selection' in context menu groups selected elements: [end of test] number of elements 1`] = `2`;
+
+exports[`regression tests selecting 'Group selection' in context menu groups selected elements: [end of test] number of renders 1`] = `14`;
+
+exports[`regression tests selecting 'Paste styles' in context menu pastes styles: [end of test] appState 1`] = `
+Object {
+  "collaborators": Map {},
+  "currentItemBackgroundColor": "#e64980",
+  "currentItemFillStyle": "cross-hatch",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 60,
+  "currentItemRoughness": 2,
+  "currentItemStrokeColor": "#c92a2a",
+  "currentItemStrokeStyle": "dotted",
+  "currentItemStrokeWidth": 2,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "cursorX": 0,
+  "cursorY": 0,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementLocked": false,
+  "elementType": "selection",
+  "errorMessage": null,
+  "exportBackground": true,
+  "gridSize": null,
+  "height": 768,
+  "isCollaborating": false,
+  "isLibraryOpen": false,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openMenu": null,
+  "previousSelectedElementIds": Object {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": Object {
+    "id0": true,
+  },
+  "selectedGroupIds": Object {},
+  "selectionElement": null,
+  "shouldAddWatermark": false,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
+  "viewBackgroundColor": "#ffffff",
+  "width": 1024,
+  "zenModeEnabled": false,
+  "zoom": 1,
+}
+`;
+
+exports[`regression tests selecting 'Paste styles' in context menu pastes styles: [end of test] element 0 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "#e64980",
+  "fillStyle": "cross-hatch",
+  "groupIds": Array [],
+  "height": 20,
+  "id": "id0",
+  "isDeleted": false,
+  "opacity": 60,
+  "roughness": 2,
+  "seed": 337897,
+  "strokeColor": "#c92a2a",
+  "strokeStyle": "dotted",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "version": 3,
+  "versionNonce": 81784553,
+  "width": 20,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`regression tests selecting 'Paste styles' in context menu pastes styles: [end of test] element 1 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "#e64980",
+  "fillStyle": "cross-hatch",
+  "groupIds": Array [],
+  "height": 20,
+  "id": "id1",
+  "isDeleted": false,
+  "opacity": 60,
+  "roughness": 2,
+  "seed": 23633383,
+  "strokeColor": "#c92a2a",
+  "strokeStyle": "dotted",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "version": 13,
+  "versionNonce": 915032327,
+  "width": 20,
+  "x": 40,
+  "y": 40,
+}
+`;
+
+exports[`regression tests selecting 'Paste styles' in context menu pastes styles: [end of test] history 1`] = `
+Object {
+  "recording": false,
+  "redoStack": Array [],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 449462985,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 453191,
+          "width": 20,
+          "x": 40,
+          "y": 40,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 449462985,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 401146281,
+          "width": 20,
+          "x": 40,
+          "y": 40,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 449462985,
+          "strokeColor": "#c92a2a",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 5,
+          "versionNonce": 1150084233,
+          "width": 20,
+          "x": 40,
+          "y": 40,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 449462985,
+          "strokeColor": "#c92a2a",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 6,
+          "versionNonce": 1116226695,
+          "width": 20,
+          "x": 40,
+          "y": 40,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "#e64980",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 449462985,
+          "strokeColor": "#c92a2a",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 8,
+          "versionNonce": 238820263,
+          "width": 20,
+          "x": 40,
+          "y": 40,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "#e64980",
+          "fillStyle": "cross-hatch",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 449462985,
+          "strokeColor": "#c92a2a",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 9,
+          "versionNonce": 400692809,
+          "width": 20,
+          "x": 40,
+          "y": 40,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "#e64980",
+          "fillStyle": "cross-hatch",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 449462985,
+          "strokeColor": "#c92a2a",
+          "strokeStyle": "solid",
+          "strokeWidth": 2,
+          "type": "rectangle",
+          "version": 10,
+          "versionNonce": 1604849351,
+          "width": 20,
+          "x": 40,
+          "y": 40,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "#e64980",
+          "fillStyle": "cross-hatch",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 449462985,
+          "strokeColor": "#c92a2a",
+          "strokeStyle": "dotted",
+          "strokeWidth": 2,
+          "type": "rectangle",
+          "version": 11,
+          "versionNonce": 1505387817,
+          "width": 20,
+          "x": 40,
+          "y": 40,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "#e64980",
+          "fillStyle": "cross-hatch",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 2,
+          "seed": 23633383,
+          "strokeColor": "#c92a2a",
+          "strokeStyle": "dotted",
+          "strokeWidth": 2,
+          "type": "rectangle",
+          "version": 12,
+          "versionNonce": 493213705,
+          "width": 20,
+          "x": 40,
+          "y": 40,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "#e64980",
+          "fillStyle": "cross-hatch",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 60,
+          "roughness": 2,
+          "seed": 23633383,
+          "strokeColor": "#c92a2a",
+          "strokeStyle": "dotted",
+          "strokeWidth": 2,
+          "type": "rectangle",
+          "version": 13,
+          "versionNonce": 915032327,
+          "width": 20,
+          "x": 40,
+          "y": 40,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "#e64980",
+          "fillStyle": "cross-hatch",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 60,
+          "roughness": 2,
+          "seed": 337897,
+          "strokeColor": "#c92a2a",
+          "strokeStyle": "dotted",
+          "strokeWidth": 2,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 81784553,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "#e64980",
+          "fillStyle": "cross-hatch",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 60,
+          "roughness": 2,
+          "seed": 23633383,
+          "strokeColor": "#c92a2a",
+          "strokeStyle": "dotted",
+          "strokeWidth": 2,
+          "type": "rectangle",
+          "version": 13,
+          "versionNonce": 915032327,
+          "width": 20,
+          "x": 40,
+          "y": 40,
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`regression tests selecting 'Paste styles' in context menu pastes styles: [end of test] number of elements 1`] = `2`;
+
+exports[`regression tests selecting 'Paste styles' in context menu pastes styles: [end of test] number of renders 1`] = `22`;
+
+exports[`regression tests selecting 'Send backward' in context menu sends element backward: [end of test] appState 1`] = `
+Object {
+  "collaborators": Map {},
+  "currentItemBackgroundColor": "transparent",
+  "currentItemFillStyle": "hachure",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemStrokeColor": "#000000",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "cursorX": 0,
+  "cursorY": 0,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementLocked": false,
+  "elementType": "selection",
+  "errorMessage": null,
+  "exportBackground": true,
+  "gridSize": null,
+  "height": 768,
+  "isCollaborating": false,
+  "isLibraryOpen": false,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openMenu": null,
+  "previousSelectedElementIds": Object {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": Object {
+    "id1": true,
+  },
+  "selectedGroupIds": Object {},
+  "selectionElement": null,
+  "shouldAddWatermark": false,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
+  "viewBackgroundColor": "#ffffff",
+  "width": 1024,
+  "zenModeEnabled": false,
+  "zoom": 1,
+}
+`;
+
+exports[`regression tests selecting 'Send backward' in context menu sends element backward: [end of test] element 0 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 20,
+  "id": "id1",
+  "isDeleted": false,
+  "opacity": 100,
+  "roughness": 1,
+  "seed": 449462985,
+  "strokeColor": "#000000",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "rectangle",
+  "version": 2,
+  "versionNonce": 453191,
+  "width": 20,
+  "x": 40,
+  "y": 40,
+}
+`;
+
+exports[`regression tests selecting 'Send backward' in context menu sends element backward: [end of test] element 1 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 20,
+  "id": "id0",
+  "isDeleted": false,
+  "opacity": 100,
+  "roughness": 1,
+  "seed": 337897,
+  "strokeColor": "#000000",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "rectangle",
+  "version": 2,
+  "versionNonce": 1278240551,
+  "width": 20,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`regression tests selecting 'Send backward' in context menu sends element backward: [end of test] history 1`] = `
+Object {
+  "recording": false,
+  "redoStack": Array [],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 449462985,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 453191,
+          "width": 20,
+          "x": 40,
+          "y": 40,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 449462985,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 453191,
+          "width": 20,
+          "x": 40,
+          "y": 40,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`regression tests selecting 'Send backward' in context menu sends element backward: [end of test] number of elements 1`] = `2`;
+
+exports[`regression tests selecting 'Send backward' in context menu sends element backward: [end of test] number of renders 1`] = `12`;
+
+exports[`regression tests selecting 'Send to back' in context menu sends element to back: [end of test] appState 1`] = `
+Object {
+  "collaborators": Map {},
+  "currentItemBackgroundColor": "transparent",
+  "currentItemFillStyle": "hachure",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemStrokeColor": "#000000",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "cursorX": 0,
+  "cursorY": 0,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementLocked": false,
+  "elementType": "selection",
+  "errorMessage": null,
+  "exportBackground": true,
+  "gridSize": null,
+  "height": 768,
+  "isCollaborating": false,
+  "isLibraryOpen": false,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openMenu": null,
+  "previousSelectedElementIds": Object {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": Object {
+    "id1": true,
+  },
+  "selectedGroupIds": Object {},
+  "selectionElement": null,
+  "shouldAddWatermark": false,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
+  "viewBackgroundColor": "#ffffff",
+  "width": 1024,
+  "zenModeEnabled": false,
+  "zoom": 1,
+}
+`;
+
+exports[`regression tests selecting 'Send to back' in context menu sends element to back: [end of test] element 0 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 20,
+  "id": "id1",
+  "isDeleted": false,
+  "opacity": 100,
+  "roughness": 1,
+  "seed": 449462985,
+  "strokeColor": "#000000",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "rectangle",
+  "version": 2,
+  "versionNonce": 453191,
+  "width": 20,
+  "x": 40,
+  "y": 40,
+}
+`;
+
+exports[`regression tests selecting 'Send to back' in context menu sends element to back: [end of test] element 1 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 20,
+  "id": "id0",
+  "isDeleted": false,
+  "opacity": 100,
+  "roughness": 1,
+  "seed": 337897,
+  "strokeColor": "#000000",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "rectangle",
+  "version": 2,
+  "versionNonce": 1278240551,
+  "width": 20,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`regression tests selecting 'Send to back' in context menu sends element to back: [end of test] history 1`] = `
+Object {
+  "recording": false,
+  "redoStack": Array [],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 449462985,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 453191,
+          "width": 20,
+          "x": 40,
+          "y": 40,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 449462985,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 453191,
+          "width": 20,
+          "x": 40,
+          "y": 40,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`regression tests selecting 'Send to back' in context menu sends element to back: [end of test] number of elements 1`] = `2`;
+
+exports[`regression tests selecting 'Send to back' in context menu sends element to back: [end of test] number of renders 1`] = `12`;
+
+exports[`regression tests selecting 'Ungroup selection' in context menu ungroups selected group: [end of test] appState 1`] = `
+Object {
+  "collaborators": Map {},
+  "currentItemBackgroundColor": "transparent",
+  "currentItemFillStyle": "hachure",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemStrokeColor": "#000000",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "cursorX": 0,
+  "cursorY": 0,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementLocked": false,
+  "elementType": "selection",
+  "errorMessage": null,
+  "exportBackground": true,
+  "gridSize": null,
+  "height": 768,
+  "isCollaborating": false,
+  "isLibraryOpen": false,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openMenu": null,
+  "previousSelectedElementIds": Object {
+    "id1": true,
+  },
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": Object {
+    "id0": true,
+    "id1": true,
+    "id2": true,
+  },
+  "selectedGroupIds": Object {},
+  "selectionElement": null,
+  "shouldAddWatermark": false,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "username": "",
+  "viewBackgroundColor": "#ffffff",
+  "width": 1024,
+  "zenModeEnabled": false,
+  "zoom": 1,
+}
+`;
+
+exports[`regression tests selecting 'Ungroup selection' in context menu ungroups selected group: [end of test] element 0 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 20,
+  "id": "id0",
+  "isDeleted": false,
+  "opacity": 100,
+  "roughness": 1,
+  "seed": 337897,
+  "strokeColor": "#000000",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "rectangle",
+  "version": 4,
+  "versionNonce": 1116226695,
+  "width": 20,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`regression tests selecting 'Ungroup selection' in context menu ungroups selected group: [end of test] element 1 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 20,
+  "id": "id1",
+  "isDeleted": false,
+  "opacity": 100,
+  "roughness": 1,
+  "seed": 449462985,
+  "strokeColor": "#000000",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "rectangle",
+  "version": 4,
+  "versionNonce": 1014066025,
+  "width": 20,
+  "x": 40,
+  "y": 40,
+}
+`;
+
+exports[`regression tests selecting 'Ungroup selection' in context menu ungroups selected group: [end of test] history 1`] = `
+Object {
+  "recording": false,
+  "redoStack": Array [],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 449462985,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 453191,
+          "width": 20,
+          "x": 40,
+          "y": 40,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [
+            "id3",
+          ],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 2019559783,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [
+            "id3",
+          ],
+          "height": 20,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 449462985,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 1150084233,
+          "width": 20,
+          "x": 40,
+          "y": 40,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id1": true,
+          "id2": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 4,
+          "versionNonce": 1116226695,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 449462985,
+          "strokeColor": "#000000",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 4,
+          "versionNonce": 1014066025,
+          "width": 20,
+          "x": 40,
+          "y": 40,
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`regression tests selecting 'Ungroup selection' in context menu ungroups selected group: [end of test] number of elements 1`] = `2`;
+
+exports[`regression tests selecting 'Ungroup selection' in context menu ungroups selected group: [end of test] number of renders 1`] = `15`;
 
 exports[`regression tests shift-click to multiselect, then drag: [end of test] appState 1`] = `
 Object {
@@ -15618,6 +18748,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -15863,7 +18995,7 @@ Object {
 
 exports[`regression tests shift-click to multiselect, then drag: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests shift-click to multiselect, then drag: [end of test] number of renders 1`] = `17`;
+exports[`regression tests shift-click to multiselect, then drag: [end of test] number of renders 1`] = `18`;
 
 exports[`regression tests shows 'Group selection' in context menu for multiple selected elements: [end of test] appState 1`] = `
 Object {
@@ -15901,6 +19033,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -16120,6 +19254,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {
     "id0": true,
@@ -16409,6 +19545,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -16477,6 +19615,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -16608,6 +19748,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -16638,7 +19780,7 @@ Object {
 
 exports[`regression tests spacebar + drag scrolls the canvas: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests spacebar + drag scrolls the canvas: [end of test] number of renders 1`] = `5`;
+exports[`regression tests spacebar + drag scrolls the canvas: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests supports nested groups: [end of test] appState 1`] = `
 Object {
@@ -16676,6 +19818,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -17316,7 +20460,7 @@ Object {
 
 exports[`regression tests supports nested groups: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests supports nested groups: [end of test] number of renders 1`] = `30`;
+exports[`regression tests supports nested groups: [end of test] number of renders 1`] = `31`;
 
 exports[`regression tests two-finger scroll works: [end of test] appState 1`] = `
 Object {
@@ -17354,6 +20498,8 @@ Object {
   "lastPointerDownWith": "touch",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -17386,7 +20532,7 @@ Object {
 
 exports[`regression tests two-finger scroll works: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests two-finger scroll works: [end of test] number of renders 1`] = `10`;
+exports[`regression tests two-finger scroll works: [end of test] number of renders 1`] = `11`;
 
 exports[`regression tests undo/redo drawing an element: [end of test] appState 1`] = `
 Object {
@@ -17424,6 +20570,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -17829,7 +20977,7 @@ Object {
 
 exports[`regression tests undo/redo drawing an element: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests undo/redo drawing an element: [end of test] number of renders 1`] = `24`;
+exports[`regression tests undo/redo drawing an element: [end of test] number of renders 1`] = `25`;
 
 exports[`regression tests updates fontSize & fontFamily appState: [end of test] appState 1`] = `
 Object {
@@ -17867,6 +21015,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -17908,7 +21058,7 @@ Object {
 
 exports[`regression tests updates fontSize & fontFamily appState: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests updates fontSize & fontFamily appState: [end of test] number of renders 1`] = `4`;
+exports[`regression tests updates fontSize & fontFamily appState: [end of test] number of renders 1`] = `5`;
 
 exports[`regression tests zoom hotkeys: [end of test] appState 1`] = `
 Object {
@@ -17946,6 +21096,8 @@ Object {
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
@@ -17976,4 +21128,4 @@ Object {
 
 exports[`regression tests zoom hotkeys: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests zoom hotkeys: [end of test] number of renders 1`] = `4`;
+exports[`regression tests zoom hotkeys: [end of test] number of renders 1`] = `5`;

@@ -30,7 +30,6 @@ import { getSelectedElements } from "../scene/selection";
 
 import { renderElement, renderElementToSvg } from "./renderElement";
 import { getClientColors } from "../clients";
-import { isLinearElement } from "../element/typeChecks";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
   isSelectedViaGroup,
@@ -220,14 +219,16 @@ export const renderScene = (
 
   visibleElements.forEach((element) => {
     renderElement(element, rc, context, renderOptimizations, sceneState);
-    if (
-      isLinearElement(element) &&
-      appState.editingLinearElement &&
-      appState.editingLinearElement.elementId === element.id
-    ) {
+  });
+
+  if (appState.editingLinearElement) {
+    const element = LinearElementEditor.getElement(
+      appState.editingLinearElement.elementId,
+    );
+    if (element) {
       renderLinearPointHandles(context, appState, sceneState, element);
     }
-  });
+  }
 
   // Paint selection element
   if (selectionElement) {
@@ -399,7 +400,7 @@ export const renderScene = (
         }
       });
       context.translate(-sceneState.scrollX, -sceneState.scrollY);
-    } else if (locallySelectedElements.length > 1) {
+    } else if (locallySelectedElements.length > 1 && !appState.isRotating) {
       const dashedLinePadding = 4 / sceneState.zoom;
       context.translate(sceneState.scrollX, sceneState.scrollY);
       context.fillStyle = oc.white;
@@ -432,17 +433,27 @@ export const renderScene = (
         if (handler !== undefined) {
           const lineWidth = context.lineWidth;
           context.lineWidth = 1 / sceneState.zoom;
-          strokeRectWithRotation(
-            context,
-            handler[0],
-            handler[1],
-            handler[2],
-            handler[3],
-            handler[0] + handler[2] / 2,
-            handler[1] + handler[3] / 2,
-            0,
-            true, // fill before stroke
-          );
+          if (key === "rotation") {
+            strokeCircle(
+              context,
+              handler[0],
+              handler[1],
+              handler[2],
+              handler[3],
+            );
+          } else {
+            strokeRectWithRotation(
+              context,
+              handler[0],
+              handler[1],
+              handler[2],
+              handler[3],
+              handler[0] + handler[2] / 2,
+              handler[1] + handler[3] / 2,
+              0,
+              true, // fill before stroke
+            );
+          }
           context.lineWidth = lineWidth;
         }
       });

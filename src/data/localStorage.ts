@@ -21,7 +21,7 @@ export const loadLibrary = (): Promise<LibraryItems> => {
         return resolve([]);
       }
 
-      const items = (JSON.parse(data) as ExcalidrawElement[][]).map(
+      const items = (JSON.parse(data) as LibraryItems).map(
         (elements) => restore(elements, null).elements,
       ) as Mutable<LibraryItems>;
 

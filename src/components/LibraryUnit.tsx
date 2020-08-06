@@ -1,10 +1,11 @@
 import React, { useRef, useEffect, useState } from "react";
 import { exportToSvg } from "../scene/export";
-import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { close } from "../components/icons";
 
 import "./LibraryUnit.scss";
 import { t } from "../i18n";
+import useIsMobile from "../is-mobile";
+import { LibraryItem } from "../types";
 
 // fa-plus
 const PLUS_ICON = (
@@ -19,8 +20,8 @@ export const LibraryUnit = ({
   onRemoveFromLibrary,
   onClick,
 }: {
-  elements?: NonDeleted<ExcalidrawElement>[];
-  pendingElements?: NonDeleted<ExcalidrawElement>[];
+  elements?: LibraryItem;
+  pendingElements?: LibraryItem;
   onRemoveFromLibrary: () => void;
   onClick: () => void;
 }) => {
@@ -50,8 +51,9 @@ export const LibraryUnit = ({
   }, [elements, pendingElements]);
 
   const [isHovered, setIsHovered] = useState(false);
+  const isMobile = useIsMobile();
 
-  const adder = isHovered && pendingElements && (
+  const adder = (isHovered || isMobile) && pendingElements && (
     <div className="library-unit__adder">{PLUS_ICON}</div>
   );
 
@@ -73,13 +75,13 @@ export const LibraryUnit = ({
         onDragStart={(event) => {
           setIsHovered(false);
           event.dataTransfer.setData(
-            "application/vnd.excalidraw.json",
+            "application/vnd.excalidrawlib+json",
             JSON.stringify(elements),
           );
         }}
       />
       {adder}
-      {elements && isHovered && (
+      {elements && (isHovered || isMobile) && (
         <button
           className="library-unit__removeFromLibrary"
           aria-label={t("labels.removeFromLibrary")}

@@ -6,7 +6,7 @@ import { AppState } from "../types";
 export type ActionResult =
   | {
       elements?: readonly ExcalidrawElement[] | null;
-      appState?: AppState | null;
+      appState?: MarkOptional<AppState, "offsetTop" | "offsetLeft"> | null;
       commitToHistory: boolean;
       syncHistory?: boolean;
     }

@@ -7,7 +7,6 @@ import { AppState } from "../types";
 import { DataState } from "./types";
 import { isInvisiblySmallElement, getNormalizedDimensions } from "../element";
 import { isLinearElement } from "../element/typeChecks";
-import { calculateScrollCenter } from "../scene";
 import { randomId } from "../random";
 import {
   FONT_FAMILY,
@@ -26,8 +25,8 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamily => {
 };
 
 function migrateElementWithProperties<T extends ExcalidrawElement>(
-  element: T,
-  extra: Omit<T, keyof ExcalidrawElement>,
+  element: Required<T>,
+  extra: Omit<Required<T>, keyof ExcalidrawElement>,
 ): T {
   const base: Pick<T, keyof ExcalidrawElement> = {
     type: element.type,
@@ -52,7 +51,8 @@ function migrateElementWithProperties<T extends ExcalidrawElement>(
     seed: element.seed ?? 1,
     groupIds: element.groupIds || [],
     strokeSharpness:
-      element.strokeSharpness ?? (isLinearElement(element) ? "round" : "sharp"),
+      element.strokeSharpness ??
+      (isLinearElement(element as ExcalidrawElement) ? "round" : "sharp"),
   };
 
   return {
@@ -97,6 +97,7 @@ const migrateElement = (
                 [element.width, element.height],
               ]
             : element.points,
+        lastCommittedPoint: null,
       });
     }
     // generic elements
@@ -113,8 +114,7 @@ const migrateElement = (
 
 export const restore = (
   savedElements: readonly ExcalidrawElement[],
-  savedState: AppState | null,
-  opts?: { scrollToContent: boolean },
+  savedState: MarkOptional<AppState, "offsetTop" | "offsetLeft"> | null,
 ): DataState => {
   const elements = savedElements.reduce((elements, element) => {
     // filtering out selection, which is legacy, no longer kept in elements,
@@ -127,13 +127,6 @@ export const restore = (
     }
     return elements;
   }, [] as ExcalidrawElement[]);
-
-  if (opts?.scrollToContent && savedState) {
-    savedState = {
-      ...savedState,
-      ...calculateScrollCenter(elements, savedState, null),
-    };
-  }
 
   return {
     elements: elements,

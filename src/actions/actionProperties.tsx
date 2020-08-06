@@ -25,6 +25,7 @@ import { t } from "../i18n";
 import { register } from "./register";
 import { newElementWith } from "../element/mutateElement";
 import { DEFAULT_FONT_SIZE, DEFAULT_FONT_FAMILY } from "../constants";
+import { randomInteger } from "../random";
 
 const changeProperty = (
   elements: readonly ExcalidrawElement[],
@@ -203,6 +204,7 @@ export const actionChangeSloppiness = register({
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
+          seed: randomInteger(),
           roughness: value,
         }),
       ),
