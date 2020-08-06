@@ -302,6 +302,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   public render() {
     const {
+      appearance,
       zenModeEnabled,
       width: canvasDOMWidth,
       height: canvasDOMHeight,
@@ -316,7 +317,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     return (
       <div
-        className="excalidraw"
+        className={`excalidraw Appearance_${appearance}`}
         ref={this.excalidrawRef}
         style={{
           width: canvasDOMWidth,

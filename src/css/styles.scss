@@ -49,6 +49,10 @@ canvas {
   image-rendering: pixelated; // chromium
   // NOTE: must be declared *after* the above
   image-rendering: -moz-crisp-edges; // FF
+
+  .Appearance_dark & {
+    filter: invert(100%) hue-rotate(180deg);
+  }
 }
 
 .excalidraw {
