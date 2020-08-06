@@ -77,6 +77,7 @@ export type AppState = {
   shouldCacheIgnoreZoom: boolean;
   showShortcutsDialog: boolean;
   zenModeEnabled: boolean;
+  appearance: "light" | "dark";
   gridSize: number | null;
 
   /** top-most selected groups (i.e. does not include nested groups) */

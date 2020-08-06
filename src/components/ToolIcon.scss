@@ -86,7 +86,7 @@
   opacity: 0;
   pointer-events: none;
 
-  &:checked + .ToolIcon__icon {
+  &:not(.ToolIcon_toggle_opaque):checked + .ToolIcon__icon {
     background-color: var(--button-gray-2);
   }
   &:focus + .ToolIcon__icon {

@@ -43,6 +43,7 @@ import { loadLibrary, saveLibrary } from "../data/localStorage";
 import { ToolButton } from "./ToolButton";
 import { saveLibraryAsJSON, importLibraryFromJSON } from "../data/json";
 import { muteFSAbortError } from "../utils";
+import { DarkModeToggle } from "./DarkModeToggle";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -372,7 +373,15 @@ const LayerUI = ({
               onRoomDestroy={onRoomDestroy}
             />
           </Stack.Row>
-          {actionManager.renderAction("changeViewBackgroundColor")}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr auto" }}>
+            {actionManager.renderAction("changeViewBackgroundColor")}
+            <DarkModeToggle
+              value={appState.appearance}
+              onChange={(appearance) => {
+                setAppState({ appearance });
+              }}
+            />
+          </div>
         </Stack.Col>
       </Island>
     </Section>
