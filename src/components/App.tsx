@@ -302,7 +302,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   public render() {
     const {
-      appearance,
       zenModeEnabled,
       width: canvasDOMWidth,
       height: canvasDOMHeight,
@@ -317,7 +316,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     return (
       <div
-        className={`excalidraw Appearance_${appearance}`}
+        className="excalidraw"
         ref={this.excalidrawRef}
         style={{
           width: canvasDOMWidth,
@@ -724,6 +723,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         ...this.getCanvasOffsets(),
       });
     }
+
+    document.body.classList.toggle(
+      "Appearance_dark",
+      this.state.appearance === "dark",
+    );
 
     if (this.state.isCollaborating && !this.portal.socket) {
       this.initializeSocketClient({ showLoadingState: true });

@@ -1,12 +1,5 @@
 @import "open-color/open-color.scss";
 
-:root {
-  --button-gray-1: #{$oc-gray-2};
-  --button-gray-2: #{$oc-gray-4};
-  --button-gray-3: #{$oc-gray-5};
-  --button-blue: #{$oc-blue-2};
-}
-
 .ToolIcon {
   display: inline-flex;
   align-items: center;
@@ -31,6 +24,8 @@
   svg {
     position: relative;
     height: 1em;
+    fill: var(--icon-fill-color);
+    color: var(--icon-fill-color);
   }
 
   & + .ToolIcon__label {
@@ -63,7 +58,7 @@
     background-color: var(--button-gray-2);
   }
   &:focus {
-    box-shadow: 0 0 0 2px var(--button-blue);
+    box-shadow: 0 0 0 2px var(--focus-highlight-color);
   }
   &.ToolIcon--selected {
     background-color: var(--button-gray-2);
@@ -90,7 +85,7 @@
     background-color: var(--button-gray-2);
   }
   &:focus + .ToolIcon__icon {
-    box-shadow: 0 0 0 2px var(--button-blue);
+    box-shadow: 0 0 0 2px var(--focus-highlight-color);
   }
   &:active + .ToolIcon__icon {
     background-color: var(--button-gray-3);
