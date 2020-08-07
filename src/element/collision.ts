@@ -52,13 +52,13 @@ export const hitTest = (
   // reverse rotate the pointer
   [x, y] = rotate(x, y, cx, cy, -element.angle);
 
-  if (appState.selectedElementIds[element.id]) {
-    return (
+  if (isElementSelected(element, appState)) {
+    const doCoordinatesHitElementBoundingBox =
       x > x1 - lineThreshold &&
       x < x2 + lineThreshold &&
       y > y1 - lineThreshold &&
-      y < y2 + lineThreshold
-    );
+      y < y2 + lineThreshold;
+    return doCoordinatesHitElementBoundingBox;
   }
 
   if (element.type === "ellipse") {
@@ -341,3 +341,10 @@ const hitTestRoughShape = (
     return false;
   });
 };
+
+function isElementSelected(
+  element: NonDeletedExcalidrawElement,
+  appState: AppState,
+) {
+  return appState.selectedElementIds[element.id];
+}
