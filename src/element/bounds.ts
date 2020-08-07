@@ -155,6 +155,9 @@ export const getArrowPoints = (
   shape: Drawable[],
 ) => {
   const ops = getCurvePathOps(shape[0]);
+  if (ops.length < 1) {
+    return null;
+  }
 
   const data = ops[ops.length - 1].data;
   const p3 = [data[4], data[5]] as Point;
