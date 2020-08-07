@@ -26,13 +26,11 @@ const isElementDraggableFromInside = (
   if (element.type === "arrow") {
     return false;
   }
-  const dragFromInside =
-    element.backgroundColor !== "transparent" ||
-    appState.selectedElementIds[element.id];
+  const isElementTransparent = element.backgroundColor === "transparent";
   if (element.type === "line" || element.type === "draw") {
-    return dragFromInside && isPathALoop(element.points);
+    return !isElementTransparent && isPathALoop(element.points);
   }
-  return dragFromInside;
+  return !isElementTransparent;
 };
 
 export const hitTest = (
