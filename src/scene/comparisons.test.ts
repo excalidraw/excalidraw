@@ -193,34 +193,6 @@ describe("getElementAtPosition", function () {
       expect(detectedElement).toBe(null);
     });
 
-    it("detects transparent rectangle when given coordinates hit rectangle's inside and rectangle is selected", function () {
-      const rectangle = makeRectangle({
-        x: 300,
-        y: 100,
-        angle: 0,
-        width: 100,
-        height: 115,
-        backgroundColor: "transparent",
-      });
-      const elements = [rectangle];
-      const appState = makeAppState({
-        selectedElementIds: [rectangle.id],
-      });
-      const x = 350;
-      const y = 150;
-      const zoom = 1;
-
-      const detectedElement = getElementAtPosition(
-        elements,
-        appState,
-        x,
-        y,
-        zoom,
-      );
-
-      expect(detectedElement).toBe(rectangle);
-    });
-
     it("detects transparent rectangle when given coordinates hit rectangle's line", function () {
       const rectangle = makeRectangle({
         angle: 0,
@@ -297,34 +269,6 @@ describe("getElementAtPosition", function () {
       );
 
       expect(detectedElement).toBe(null);
-    });
-
-    it("detects transparent ellipse when given coordinates hit ellipse's inside and ellipse is selected", function () {
-      const ellipse = makeEllipse({
-        x: 100,
-        y: 100,
-        angle: 0,
-        width: 200,
-        height: 200,
-        backgroundColor: "transparent",
-      });
-      const elements = [ellipse];
-      const appState = makeAppState({
-        selectedElementIds: [ellipse.id],
-      });
-      const x = 200;
-      const y = 150;
-      const zoom = 1;
-
-      const detectedElement = getElementAtPosition(
-        elements,
-        appState,
-        x,
-        y,
-        zoom,
-      );
-
-      expect(detectedElement).toBe(ellipse);
     });
 
     it("detects transparent ellipse when given coordinates hit ellipse's line", function () {
@@ -405,34 +349,6 @@ describe("getElementAtPosition", function () {
       );
 
       expect(detectedElement).toBe(null);
-    });
-
-    it("detects transparent diamond when given coordinates hit diamond's inside and diamond is selected", function () {
-      const diamond = makeDiamond({
-        x: 100,
-        y: 100,
-        angle: 0,
-        width: 200,
-        height: 200,
-        backgroundColor: "transparent",
-      });
-      const elements = [diamond];
-      const appState = makeAppState({
-        selectedElementIds: [diamond.id],
-      });
-      const x = 200;
-      const y = 150;
-      const zoom = 1;
-
-      const detectedElement = getElementAtPosition(
-        elements,
-        appState,
-        x,
-        y,
-        zoom,
-      );
-
-      expect(detectedElement).toBe(diamond);
     });
 
     it("detects transparent diamond when given coordinates hit diamond's line", function () {
@@ -613,37 +529,6 @@ describe("getElementAtPosition", function () {
       mockedGetShapeForElement.mockRestore();
     });
 
-    it("Detects line with loop given background is transparent and line is selected", function () {
-      const {
-        lineWithLoop,
-        lineAsShape,
-        coordinatesInsideLoop,
-        zoom,
-      } = getTupleWithLineWithLoopShapeZoomAndCoordinates({
-        lineBackgroundColor: "transparent",
-      });
-      const appState = makeAppState({ selectedElementIds: [lineWithLoop.id] });
-      const elements = [lineWithLoop];
-      const mockedGetShapeForElement = RenderElement.getShapeForElement as jest.Mock<
-        any,
-        any
-      >;
-      mockedGetShapeForElement.mockImplementation(() => lineAsShape);
-
-      const detectedElement = getElementAtPosition(
-        elements,
-        appState,
-        coordinatesInsideLoop.x,
-        coordinatesInsideLoop.y,
-        zoom,
-      );
-
-      expect(mockedGetShapeForElement).toHaveBeenCalledWith(lineWithLoop);
-      expect(detectedElement).toBe(lineWithLoop);
-
-      mockedGetShapeForElement.mockRestore();
-    });
-
     it("Detects line with loop given background is transparent, line is not selected and coordinates hit line outline", function () {
       const {
         lineWithLoop,
@@ -764,37 +649,6 @@ describe("getElementAtPosition", function () {
 
       expect(mockedGetShapeForElement).toHaveBeenCalledWith(drawWithLoop);
       expect(detectedElement).toBe(null);
-
-      mockedGetShapeForElement.mockRestore();
-    });
-
-    it("detect draw with loop given background is transparent and draw is selected", function () {
-      const {
-        drawWithLoop,
-        drawAsShape,
-        coordinatesInsideLoop,
-        zoom,
-      } = getTupleWithDrawWithLoopShapeZoomAndCoordinates({
-        drawBackgroundColor: "transparent",
-      });
-      const appState = makeAppState({ selectedElementIds: [drawWithLoop.id] });
-      const elements = [drawWithLoop];
-      const mockedGetShapeForElement = RenderElement.getShapeForElement as jest.Mock<
-        any,
-        any
-      >;
-      mockedGetShapeForElement.mockImplementation(() => drawAsShape);
-
-      const detectedElement = getElementAtPosition(
-        elements,
-        appState,
-        coordinatesInsideLoop.x,
-        coordinatesInsideLoop.y,
-        zoom,
-      );
-
-      expect(mockedGetShapeForElement).toHaveBeenCalledWith(drawWithLoop);
-      expect(detectedElement).toBe(drawWithLoop);
 
       mockedGetShapeForElement.mockRestore();
     });
