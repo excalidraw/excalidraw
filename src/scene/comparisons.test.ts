@@ -7,40 +7,6 @@ import { Random } from "roughjs/bin/math";
 
 jest.mock("../renderer/renderElement");
 
-/*
-Refactors that come to mind:
--Change appState to selectedElementIds
--Group zoom with appState as zoom relates to app state
--group {x,y} as point coordinate
-
-
-Notes: Zoom in appState seems to always be equal to zoom given as a parameter.
-
-Missing:
-Takes rotation into account
-takes line trashold into acount
-Linear elements
-  line and draw closed and open
-  arrow
-*/
-
-/*
-const ellipse = makeEllipse({
-        x: 0,
-        y: 0,
-        angle: 0,
-        width: 100,
-        height: 100,
-        backgroundColor: "#000000",
-      });
-      const elements = [ellipse];
-      const appState = makeAppState();
-      const x = 50;
-      const y = 50;
-      const zoom = 1;
-For some reasons, this doesn't work. but 51 or 49 in x,y does work.
-*/
-
 describe("getElementAtPosition", function () {
   describe("non element type specific behavior", function () {
     it("returns null when there aren't elements on the scene", function () {
@@ -103,6 +69,32 @@ describe("getElementAtPosition", function () {
       );
 
       expect(detectedElement).toBe(elementAtTheFront);
+    });
+
+    it("Detects selected elements when given coordinates hits the bounding box of an element", function () {
+      const element = makeEllipse({
+        x: 200,
+        y: 200,
+        width: 200,
+        height: 200,
+        angle: 0,
+      });
+      const coordinatesThatHitElementsBoundingBoxButNotElementsInside = {
+        x: 210,
+        y: 210,
+      };
+      const zoom = 1;
+      const appState = makeAppState({ selectedElementIds: [element.id] });
+
+      const detectedElement = getElementAtPosition(
+        [element],
+        appState,
+        coordinatesThatHitElementsBoundingBoxButNotElementsInside.x,
+        coordinatesThatHitElementsBoundingBoxButNotElementsInside.y,
+        zoom,
+      );
+
+      expect(detectedElement).toEqual(element);
     });
 
     it("Takes into account angles when detecting collisions", function () {
@@ -1066,6 +1058,7 @@ function getTupleWithArrowShapeZoomAndCoordinatesThatHitArrow() {
       [0, 0],
       [45.33333333333337, -66.66666666666669],
     ],
+    lastCommittedPoint: null,
   } as NonDeletedExcalidrawElement;
   const arrowAsShape = [
     {
@@ -1267,6 +1260,7 @@ function getTupleWithLineWithoutLoopShapeZoomAndCoordinatesThatHitLine() {
       [0, 0],
       [50.4000244140625, -113.60000610351562],
     ],
+    lastCommittedPoint: null,
   } as NonDeletedExcalidrawElement;
   const lineAsShape = [
     {
@@ -1965,6 +1959,7 @@ function getTupleWithDrawWithLoopShapeZoomAndCoordinates({
       [-10.4000244140625, 9.5999755859375],
       [0, 0],
     ],
+    lastCommittedPoint: null,
   } as NonDeletedExcalidrawElement;
   const drawAsShape = [
     {

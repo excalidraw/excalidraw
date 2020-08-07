@@ -52,6 +52,15 @@ export const hitTest = (
   // reverse rotate the pointer
   [x, y] = rotate(x, y, cx, cy, -element.angle);
 
+  if (appState.selectedElementIds[element.id]) {
+    return (
+      x > x1 - lineThreshold &&
+      x < x2 + lineThreshold &&
+      y > y1 - lineThreshold &&
+      y < y2 + lineThreshold
+    );
+  }
+
   if (element.type === "ellipse") {
     // https://stackoverflow.com/a/46007540/232122
     const px = Math.abs(x - element.x - element.width / 2);
