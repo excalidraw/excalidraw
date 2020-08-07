@@ -32,6 +32,11 @@ const isElementDraggableFromInside = (
   return !isElementTransparent;
 };
 
+const isElementSelected = (
+  element: NonDeletedExcalidrawElement,
+  appState: AppState,
+) => appState.selectedElementIds[element.id];
+
 export const hitTest = (
   element: NonDeletedExcalidrawElement,
   appState: AppState,
@@ -333,10 +338,3 @@ const hitTestRoughShape = (
     return false;
   });
 };
-
-function isElementSelected(
-  element: NonDeletedExcalidrawElement,
-  appState: AppState,
-) {
-  return appState.selectedElementIds[element.id];
-}
