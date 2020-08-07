@@ -21,7 +21,6 @@ import { isLinearElement } from "./typeChecks";
 
 const isElementDraggableFromInside = (
   element: NonDeletedExcalidrawElement,
-  appState: AppState,
 ): boolean => {
   if (element.type === "arrow") {
     return false;
@@ -93,14 +92,14 @@ export const hitTest = (
       ty /= t;
     });
 
-    if (isElementDraggableFromInside(element, appState)) {
+    if (isElementDraggableFromInside(element)) {
       return (
         a * tx - (px - lineThreshold) >= 0 && b * ty - (py - lineThreshold) >= 0
       );
     }
     return Math.hypot(a * tx - px, b * ty - py) < lineThreshold;
   } else if (element.type === "rectangle") {
-    if (isElementDraggableFromInside(element, appState)) {
+    if (isElementDraggableFromInside(element)) {
       return (
         x > x1 - lineThreshold &&
         x < x2 + lineThreshold &&
@@ -132,7 +131,7 @@ export const hitTest = (
       leftY,
     ] = getDiamondPoints(element);
 
-    if (isElementDraggableFromInside(element, appState)) {
+    if (isElementDraggableFromInside(element)) {
       // TODO: remove this when we normalize coordinates globally
       if (topY > bottomY) {
         [bottomY, topY] = [topY, bottomY];
@@ -200,9 +199,9 @@ export const hitTest = (
     const relX = x - element.x;
     const relY = y - element.y;
 
-    if (isElementDraggableFromInside(element, appState)) {
+    if (isElementDraggableFromInside(element)) {
       const hit = shape.some((subshape) =>
-        hitTestCurveInside(subshape, relX, relY, lineThreshold),
+        hitTestCurveInside(subshape, relX, relY),
       );
       if (hit) {
         return true;
@@ -255,12 +254,7 @@ const pointInBezierEquation = (
   return false;
 };
 
-const hitTestCurveInside = (
-  drawable: Drawable,
-  x: number,
-  y: number,
-  lineThreshold: number,
-) => {
+const hitTestCurveInside = (drawable: Drawable, x: number, y: number) => {
   const ops = getCurvePathOps(drawable);
   const points: Point[] = [];
   for (const operation of ops) {
