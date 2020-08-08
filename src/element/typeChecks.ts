@@ -34,7 +34,7 @@ export const isBindingElement = (
 export const isBindingElementType = (
   elementType: ExcalidrawElement["type"],
 ): boolean => {
-  return elementType === "arrow" || elementType === "line";
+  return elementType === "arrow";
 };
 
 export const isBindableElement = (
