@@ -38,7 +38,11 @@ import {
   getElementsInGroup,
 } from "../groups";
 import { maxBindingGap } from "../element/collision";
-import { SuggestedBinding, SuggestedPointBinding } from "../element/binding";
+import {
+  SuggestedBinding,
+  SuggestedPointBinding,
+  isBindingEnabled,
+} from "../element/binding";
 import { Handlers } from "../element/handlerRectangles";
 
 type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
@@ -277,11 +281,13 @@ export const renderScene = (
     );
   }
 
-  appState.suggestedBindings
-    .filter((binding) => binding != null)
-    .forEach((suggestedBinding) => {
-      renderBindingHighlight(context, sceneState, suggestedBinding!);
-    });
+  if (isBindingEnabled(appState)) {
+    appState.suggestedBindings
+      .filter((binding) => binding != null)
+      .forEach((suggestedBinding) => {
+        renderBindingHighlight(context, sceneState, suggestedBinding!);
+      });
+  }
 
   // Paint selected elements
   if (

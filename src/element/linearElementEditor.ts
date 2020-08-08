@@ -116,6 +116,7 @@ export class LinearElementEditor {
   static handlePointerUp(
     event: PointerEvent,
     editingLinearElement: LinearElementEditor,
+    appState: AppState,
   ): LinearElementEditor {
     const { elementId, activePointIndex, isDragging } = editingLinearElement;
     const element = LinearElementEditor.getElement(elementId);
@@ -137,7 +138,7 @@ export class LinearElementEditor {
             : element.points[0],
         );
       }
-      const bindingElement = isBindingEnabled(event)
+      const bindingElement = isBindingEnabled(appState)
         ? getHoveredElementForBinding(
             tupleToCoors(
               LinearElementEditor.getPointAtIndexGlobalCoordinates(
@@ -239,7 +240,7 @@ export class LinearElementEditor {
         startBindingElement,
         endBindingElement,
       } = appState.editingLinearElement;
-      if (isBindingEnabled(event)) {
+      if (isBindingEnabled(appState)) {
         bindOrUnbindLinearElement(
           element,
           startBindingElement,

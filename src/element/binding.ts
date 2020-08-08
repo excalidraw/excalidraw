@@ -25,7 +25,6 @@ import { mutateElement } from "./mutateElement";
 import Scene from "../scene/Scene";
 import { LinearElementEditor } from "./linearElementEditor";
 import { tupleToCoors } from "../utils";
-import { KEYS } from "../keys";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -37,10 +36,8 @@ export type SuggestedPointBinding = [
   NonDeleted<ExcalidrawBindableElement>,
 ];
 
-export const isBindingEnabled = (
-  event: React.PointerEvent | PointerEvent,
-): boolean => {
-  return !(event as any)[KEYS.CTRL_OR_CMD];
+export const isBindingEnabled = (appState: AppState): boolean => {
+  return appState.isBindingEnabled;
 };
 
 export const bindOrUnbindLinearElement = (
