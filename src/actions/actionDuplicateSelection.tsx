@@ -10,7 +10,7 @@ import { t } from "../i18n";
 import { getShortcutKey } from "../utils";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { mutateElement } from "../element/mutateElement";
-import { getGroupIdsFromElements } from "../groups";
+import { selectGroupsForSelectedElements } from "../groups";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
@@ -65,23 +65,24 @@ export const actionDuplicateSelection = register({
             },
           );
           newElements.push(newElement);
-          appState.selectedElementIds[newElement.id] = true;
-          delete appState.selectedElementIds[element.id];
           return acc.concat([element, newElement]);
         }
         return acc.concat(element);
       },
       [],
     );
-    appState.selectedGroupIds = getGroupIdsFromElements(newElements).reduce(
-      (acc, groupId) => {
-        acc[groupId] = true;
-        return acc;
-      },
-      {} as any,
-    );
     return {
-      appState,
+      appState: selectGroupsForSelectedElements(
+        {
+          ...appState,
+          selectedGroupIds: {},
+          selectedElementIds: newElements.reduce((acc, element) => {
+            acc[element.id] = true;
+            return acc;
+          }, {} as any),
+        },
+        getNonDeletedElements(finalElements),
+      ),
       elements: finalElements,
       commitToHistory: true,
     };

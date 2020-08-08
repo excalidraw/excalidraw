@@ -151,7 +151,6 @@ import {
   selectGroupsForSelectedElements,
   isElementInGroup,
   getSelectedGroupIdForElement,
-  getGroupIdsFromElements,
 } from "../groups";
 import { Library } from "../data/library";
 import Scene from "../scene/Scene";
@@ -957,26 +956,25 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         y: element.y + dy - minY,
       });
     });
-    const selectedGroupIds = getGroupIdsFromElements(newElements).reduce(
-      (acc, groupId) => {
-        acc[groupId] = true;
-        return acc;
-      },
-      {} as any,
-    );
     this.scene.replaceAllElements([
       ...this.scene.getElementsIncludingDeleted(),
       ...newElements,
     ]);
     history.resumeRecording();
-    this.setState({
-      isLibraryOpen: false,
-      selectedElementIds: newElements.reduce((map, element) => {
-        map[element.id] = true;
-        return map;
-      }, {} as any),
-      selectedGroupIds: selectedGroupIds,
-    });
+    this.setState(
+      selectGroupsForSelectedElements(
+        {
+          ...this.state,
+          isLibraryOpen: false,
+          selectedElementIds: newElements.reduce((map, element) => {
+            map[element.id] = true;
+            return map;
+          }, {} as any),
+          selectedGroupIds: {},
+        },
+        this.scene.getElements(),
+      ),
+    );
   };
 
   private addTextFromPaste(text: any) {
