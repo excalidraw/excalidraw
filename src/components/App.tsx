@@ -956,19 +956,25 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         y: element.y + dy - minY,
       });
     });
-
     this.scene.replaceAllElements([
       ...this.scene.getElementsIncludingDeleted(),
       ...newElements,
     ]);
     history.resumeRecording();
-    this.setState({
-      isLibraryOpen: false,
-      selectedElementIds: newElements.reduce((map, element) => {
-        map[element.id] = true;
-        return map;
-      }, {} as any),
-    });
+    this.setState(
+      selectGroupsForSelectedElements(
+        {
+          ...this.state,
+          isLibraryOpen: false,
+          selectedElementIds: newElements.reduce((map, element) => {
+            map[element.id] = true;
+            return map;
+          }, {} as any),
+          selectedGroupIds: {},
+        },
+        this.scene.getElements(),
+      ),
+    );
   };
 
   private addTextFromPaste(text: any) {
