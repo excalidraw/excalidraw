@@ -9,7 +9,7 @@ import { ToolName } from "./queries/toolQueries";
 import { KEYS, Key } from "../keys";
 import { setDateTimeForTests } from "../utils";
 import { ExcalidrawElement } from "../element/types";
-import { handlerRectangles } from "../element";
+import { getResizeHandles as _getResizeHandles } from "../element";
 import { queryByText } from "@testing-library/react";
 import { copiedStyles } from "../actions/actionStyles";
 
@@ -192,9 +192,9 @@ function getStateHistory() {
   return h.history.stateHistory;
 }
 
-type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
+type HandlerRectanglesRet = keyof ReturnType<typeof _getResizeHandles>;
 const getResizeHandles = (pointerType: "mouse" | "touch" | "pen") => {
-  const rects = handlerRectangles(
+  const rects = _getResizeHandles(
     getSelectedElement(),
     h.state.zoom,
     pointerType,
