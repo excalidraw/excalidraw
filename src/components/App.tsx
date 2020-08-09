@@ -2892,7 +2892,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         } else if (points.length > 1) {
           if (draggingElement.type === "draw") {
             mutateElement(draggingElement, {
-              points: simplify([...(points as Point[]), [dx, dy]], 0.7),
+              points: simplify(
+                [...(points as Point[]), [dx, dy]],
+                0.7 / this.state.zoom,
+              ),
             });
           } else {
             mutateElement(draggingElement, {
