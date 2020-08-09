@@ -67,5 +67,8 @@
 
 .RoomDialog-stopSession {
   background-color: var(--button-destructive-background-color);
-  color: var(--button-destructive-color);
+
+  .ToolIcon__label {
+    color: var(--button-destructive-color);
+  }
 }

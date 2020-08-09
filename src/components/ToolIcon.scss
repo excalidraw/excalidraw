@@ -14,6 +14,7 @@
 .ToolIcon__icon {
   width: 2.5rem;
   height: 2.5rem;
+  color: var(--icon-fill-color);
 
   display: flex;
   justify-content: center;
@@ -34,6 +35,7 @@
 }
 
 .ToolIcon__label {
+  color: var(--icon-fill-color);
   font-family: var(--ui-font);
   margin: 0 0.8em;
   text-overflow: ellipsis;
