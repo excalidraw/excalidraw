@@ -177,7 +177,8 @@
     "github": "Намерихте проблем? Изпратете",
     "textNewLine": "Добавяне на нов ред (текст)",
     "textFinish": "Завършете редактиране (текст)",
-    "zoomToFit": ""
+    "zoomToFit": "",
+    "preventBinding": ""
   },
   "encrypted": {
     "tooltip": ""
