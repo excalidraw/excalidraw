@@ -178,7 +178,7 @@
     "textNewLine": "Legg til ny linje (tekst)",
     "textFinish": "Fullfør redigering (tekst)",
     "zoomToFit": "Zoom for å passe alle elementene",
-    "preventBinding": ""
+    "preventBinding": "Forhindre pilbinding"
   },
   "encrypted": {
     "tooltip": "Dine tegninger er ende-til-ende-krypterte slik at Excalidraw sine servere aldri vil se dem."
