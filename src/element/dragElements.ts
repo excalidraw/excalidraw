@@ -1,20 +1,25 @@
-import { NonDeletedExcalidrawElement } from "./types";
+import { SHAPES } from "../shapes";
+import { updateBoundElements } from "./binding";
 import { getCommonBounds } from "./bounds";
 import { mutateElement } from "./mutateElement";
-import { SHAPES } from "../shapes";
 import { getPerfectElementSize } from "./sizeHelpers";
+import Scene from "../scene/Scene";
+import { NonDeletedExcalidrawElement } from "./types";
 
 export const dragSelectedElements = (
   selectedElements: NonDeletedExcalidrawElement[],
   pointerX: number,
   pointerY: number,
+  scene: Scene,
 ) => {
   const [x1, y1] = getCommonBounds(selectedElements);
+  const offset = { x: pointerX - x1, y: pointerY - y1 };
   selectedElements.forEach((element) => {
     mutateElement(element, {
-      x: pointerX + element.x - x1,
-      y: pointerY + element.y - y1,
+      x: element.x + offset.x,
+      y: element.y + offset.y,
     });
+    updateBoundElements(element, { simultaneouslyUpdated: selectedElements });
   });
 };
 
