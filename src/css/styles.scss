@@ -42,7 +42,7 @@ canvas {
     // The percentage is inspired by
     // https://material.io/design/color/dark-theme.html#properties, which
     // recommends surface color of #121212, 93% yields #111111 for #FFF
-    filter: invert(93%) hue-rotate(180deg);
+    filter: var(--appearance-filter);
   }
 }
 
@@ -139,7 +139,7 @@ canvas {
 .buttonList label:focus-within,
 input:focus {
   outline: transparent;
-  box-shadow: 0 0 0 2px $oc-blue-2;
+  box-shadow: 0 0 0 2px var(--focus-highlight-color);
 }
 
 button,

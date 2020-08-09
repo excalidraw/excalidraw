@@ -589,7 +589,7 @@ const LayerUI = ({
             zenModeEnabled && "transition-right"
           }`}
         >
-          <GitHubCorner />
+          <GitHubCorner appearance={appState.appearance} />
         </aside>
       }
       {renderFooter()}
