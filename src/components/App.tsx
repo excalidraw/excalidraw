@@ -175,7 +175,7 @@ import {
   isLinearElementSimpleAndAlreadyBound,
   isBindingEnabled,
 } from "../element/binding";
-import { MaybeResizeHandleSide } from "../element/handlerRectangles";
+import { MaybeResizeHandleSide } from "../element/resizeHandles";
 
 /**
  * @param func handler taking at most single parameter (event).

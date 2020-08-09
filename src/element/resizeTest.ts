@@ -11,7 +11,7 @@ import {
   ResizeHandleSide,
   ResizeHandle,
   MaybeResizeHandleSide,
-} from "./handlerRectangles";
+} from "./resizeHandles";
 import { AppState } from "../types";
 
 const isInsideResizeHandle = (

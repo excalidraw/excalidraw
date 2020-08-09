@@ -22,7 +22,7 @@ import {
 } from "./resizeTest";
 import { measureText, getFontString } from "../utils";
 import { updateBoundElements } from "./binding";
-import { ResizeHandleSide, MaybeResizeHandleSide } from "./handlerRectangles";
+import { ResizeHandleSide, MaybeResizeHandleSide } from "./resizeHandles";
 
 const normalizeAngle = (angle: number): number => {
   if (angle >= 2 * Math.PI) {

@@ -25,7 +25,7 @@ export {
   OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
   getResizeHandlesFromCoords,
   getResizeHandles,
-} from "./handlerRectangles";
+} from "./resizeHandles";
 export { hitTest } from "./collision";
 export {
   resizeTest,

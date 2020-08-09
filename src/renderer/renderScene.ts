@@ -43,7 +43,7 @@ import {
   SuggestedPointBinding,
   isBindingEnabled,
 } from "../element/binding";
-import { ResizeHandles, ResizeHandleSide } from "../element/handlerRectangles";
+import { ResizeHandles, ResizeHandleSide } from "../element/resizeHandles";
 
 const strokeRectWithRotation = (
   context: CanvasRenderingContext2D,
