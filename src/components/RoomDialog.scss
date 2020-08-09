@@ -1,7 +1,7 @@
 @import "../css/_variables";
 
 .RoomDialog-modalButton.is-collaborating {
-  background-color: $oc-green-0;
+  background-color: var(--button-special-active-background-color);
   color: $oc-green-9;
 }
 
@@ -24,6 +24,7 @@
 }
 
 .RoomDialog-link {
+  color: var(--text-color-primary);
   min-width: 0;
   flex: 1 1 auto;
   margin-left: 1em;
@@ -47,6 +48,8 @@
 }
 
 .RoomDialog-username {
+  background-color: var(--input-background-color);
+  border-color: var(--input-border-color);
   appearance: none;
   min-width: 0;
   flex: 1 1 auto;
@@ -63,6 +66,6 @@
 }
 
 .RoomDialog-stopSession {
-  background-color: $oc-red-1;
-  color: $oc-red-9;
+  background-color: var(--button-destructive-background-color);
+  color: var(--button-destructive-color);
 }

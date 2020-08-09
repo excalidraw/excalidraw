@@ -10,8 +10,9 @@
   --button-gray-3: #{$oc-gray-5};
   --input-border-color: #{$oc-gray-3};
   --input-background-color: #{$oc-white};
+  --input-hover-background-color: #{$oc-gray-1};
   --input-label-color: #{$oc-gray-7};
-  --icon-fill-color: #000;
+  --icon-fill-color: #{$oc-black};
   --color-overlay-text-color: #ccc;
   --sat: env(safe-area-inset-top);
   --sab: env(safe-area-inset-bottom);
@@ -25,6 +26,9 @@
   --focus-highlight-color: #{$oc-blue-2};
   --select-highlight-color: #{$oc-blue-5};
   --appearance-filter: none;
+  --button-special-active-background-color: #{$oc-green-0};
+  --button-destructive-color: #{$oc-red-9};
+  --button-destructive-background-color: #{$oc-red-1};
 }
 
 .Appearance_dark {
@@ -36,6 +40,7 @@
   --button-gray-3: #222;
   --input-border-color: #2e2e2e;
   --input-background-color: #121212;
+  --input-hover-background-color: #181818;
   --input-label-color: #{$oc-gray-2};
   --icon-fill-color: #{$oc-gray-4};
   --color-overlay-text-color: #bbb;
@@ -45,4 +50,7 @@
   --focus-highlight-color: #{$oc-blue-6};
   --select-highlight-color: #{$oc-blue-4};
   --appearance-filter: invert(93%) hue-rotate(180deg);
+  --button-special-active-background-color: #204624;
+  --button-destructive-color: #{$oc-red-3};
+  --button-destructive-background-color: #5a0000;
 }

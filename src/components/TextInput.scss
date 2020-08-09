@@ -1,6 +1,7 @@
 @import "../css/_variables.scss";
 
 .TextInput {
+  color: var(--text-color-primary);
   display: inline-block;
   border: 1.5px solid $oc-gray-2;
   line-height: 1;
@@ -10,7 +11,7 @@
   background-color: $oc-white;
   &:not(:focus) {
     &:hover {
-      background-color: $oc-gray-1;
+      background-color: var(--input-hover-background-color);
     }
   }
   &:focus {
