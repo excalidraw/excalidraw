@@ -48,9 +48,12 @@ export const hitTest = (
 ): boolean => {
   // How many pixels off the shape boundary we still consider a hit
   const threshold = 10 / appState.zoom;
-  const check = isElementDraggableFromInside(element, appState)
-    ? isInsideCheck
-    : isNearCheck;
+  const check =
+    element.type === "text"
+      ? isStrictlyInside
+      : isElementDraggableFromInside(element, appState)
+      ? isInsideCheck
+      : isNearCheck;
   const point: Point = [x, y];
   return hitTestPointAgainstElement({ element, point, threshold, check });
 };
@@ -117,6 +120,10 @@ export const distanceToBindableElement = (
     case "ellipse":
       return distanceToEllipse(element, point);
   }
+};
+
+const isStrictlyInside = (distance: number, threshold: number): boolean => {
+  return distance < 0;
 };
 
 const isInsideCheck = (distance: number, threshold: number): boolean => {
