@@ -17,12 +17,12 @@ import { isLinearElement } from "./typeChecks";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
 import {
-  resizeTest,
   getCursorForResizingElement,
-  normalizeResizeHandle,
+  normalizeResizeHandleSide,
 } from "./resizeTest";
 import { measureText, getFontString } from "../utils";
 import { updateBoundElements } from "./binding";
+import { ResizeHandleSide, MaybeResizeHandleSide } from "./handlerRectangles";
 
 const normalizeAngle = (angle: number): number => {
   if (angle >= 2 * Math.PI) {
@@ -31,12 +31,10 @@ const normalizeAngle = (angle: number): number => {
   return angle;
 };
 
-type ResizeTestType = ReturnType<typeof resizeTest>;
-
 // Returns true when a resize (scaling/rotation) happened
 export const resizeElements = (
-  resizeHandle: ResizeTestType,
-  setResizeHandle: (nextResizeHandle: ResizeTestType) => void,
+  resizeHandleSide: MaybeResizeHandleSide,
+  setResizeHandle: (nextResizeHandle: MaybeResizeHandleSide) => void,
   selectedElements: readonly NonDeletedExcalidrawElement[],
   resizeArrowDirection: "origin" | "end",
   isRotateWithDiscreteAngle: boolean,
@@ -50,7 +48,7 @@ export const resizeElements = (
 ) => {
   if (selectedElements.length === 1) {
     const [element] = selectedElements;
-    if (resizeHandle === "rotation") {
+    if (resizeHandleSide === "rotation") {
       rotateSingleElement(
         element,
         pointerX,
@@ -61,10 +59,10 @@ export const resizeElements = (
     } else if (
       isLinearElement(element) &&
       element.points.length === 2 &&
-      (resizeHandle === "nw" ||
-        resizeHandle === "ne" ||
-        resizeHandle === "sw" ||
-        resizeHandle === "se")
+      (resizeHandleSide === "nw" ||
+        resizeHandleSide === "ne" ||
+        resizeHandleSide === "sw" ||
+        resizeHandleSide === "se")
     ) {
       resizeSingleTwoPointElement(
         element,
@@ -75,28 +73,28 @@ export const resizeElements = (
       );
     } else if (
       element.type === "text" &&
-      (resizeHandle === "nw" ||
-        resizeHandle === "ne" ||
-        resizeHandle === "sw" ||
-        resizeHandle === "se")
+      (resizeHandleSide === "nw" ||
+        resizeHandleSide === "ne" ||
+        resizeHandleSide === "sw" ||
+        resizeHandleSide === "se")
     ) {
       resizeSingleTextElement(
         element,
-        resizeHandle,
+        resizeHandleSide,
         isResizeCenterPoint,
         pointerX,
         pointerY,
       );
-    } else if (resizeHandle) {
+    } else if (resizeHandleSide) {
       resizeSingleElement(
         element,
-        resizeHandle,
+        resizeHandleSide,
         isResizeWithSidesSameLength,
         isResizeCenterPoint,
         pointerX,
         pointerY,
       );
-      setResizeHandle(normalizeResizeHandle(element, resizeHandle));
+      setResizeHandle(normalizeResizeHandleSide(element, resizeHandleSide));
       if (element.width < 0) {
         mutateElement(element, { width: -element.width });
       }
@@ -109,12 +107,12 @@ export const resizeElements = (
     // FIXME it is not very nice to have this here
     document.documentElement.style.cursor = getCursorForResizingElement({
       element,
-      resizeHandle,
+      resizeHandleSide,
     });
 
     return true;
   } else if (selectedElements.length > 1) {
-    if (resizeHandle === "rotation") {
+    if (resizeHandleSide === "rotation") {
       rotateMultipleElements(
         selectedElements,
         pointerX,
@@ -126,14 +124,14 @@ export const resizeElements = (
       );
       return true;
     } else if (
-      resizeHandle === "nw" ||
-      resizeHandle === "ne" ||
-      resizeHandle === "sw" ||
-      resizeHandle === "se"
+      resizeHandleSide === "nw" ||
+      resizeHandleSide === "ne" ||
+      resizeHandleSide === "sw" ||
+      resizeHandleSide === "se"
     ) {
       resizeMultipleElements(
         selectedElements,
-        resizeHandle,
+        resizeHandleSide,
         pointerX,
         pointerY,
       );
@@ -258,28 +256,28 @@ const measureFontSizeFromWH = (
 };
 
 const getSidesForResizeHandle = (
-  resizeHandle: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
+  resizeHandleSide: ResizeHandleSide,
   isResizeFromCenter: boolean,
 ) => {
   return {
     n:
-      /^(n|ne|nw)$/.test(resizeHandle) ||
-      (isResizeFromCenter && /^(s|se|sw)$/.test(resizeHandle)),
+      /^(n|ne|nw)$/.test(resizeHandleSide) ||
+      (isResizeFromCenter && /^(s|se|sw)$/.test(resizeHandleSide)),
     s:
-      /^(s|se|sw)$/.test(resizeHandle) ||
-      (isResizeFromCenter && /^(n|ne|nw)$/.test(resizeHandle)),
+      /^(s|se|sw)$/.test(resizeHandleSide) ||
+      (isResizeFromCenter && /^(n|ne|nw)$/.test(resizeHandleSide)),
     w:
-      /^(w|nw|sw)$/.test(resizeHandle) ||
-      (isResizeFromCenter && /^(e|ne|se)$/.test(resizeHandle)),
+      /^(w|nw|sw)$/.test(resizeHandleSide) ||
+      (isResizeFromCenter && /^(e|ne|se)$/.test(resizeHandleSide)),
     e:
-      /^(e|ne|se)$/.test(resizeHandle) ||
-      (isResizeFromCenter && /^(w|nw|sw)$/.test(resizeHandle)),
+      /^(e|ne|se)$/.test(resizeHandleSide) ||
+      (isResizeFromCenter && /^(w|nw|sw)$/.test(resizeHandleSide)),
   };
 };
 
 const resizeSingleTextElement = (
   element: NonDeleted<ExcalidrawTextElement>,
-  resizeHandle: "nw" | "ne" | "sw" | "se",
+  resizeHandleSide: "nw" | "ne" | "sw" | "se",
   isResizeFromCenter: boolean,
   pointerX: number,
   pointerY: number,
@@ -296,7 +294,7 @@ const resizeSingleTextElement = (
     -element.angle,
   );
   let scale;
-  switch (resizeHandle) {
+  switch (resizeHandleSide) {
     case "se":
       scale = Math.max(
         (rotatedX - x1) / (x2 - x1),
@@ -339,7 +337,7 @@ const resizeSingleTextElement = (
     const deltaX2 = (x2 - nextX2) / 2;
     const deltaY2 = (y2 - nextY2) / 2;
     const [nextElementX, nextElementY] = adjustXYWithRotation(
-      getSidesForResizeHandle(resizeHandle, isResizeFromCenter),
+      getSidesForResizeHandle(resizeHandleSide, isResizeFromCenter),
       element.x,
       element.y,
       element.angle,
@@ -361,7 +359,7 @@ const resizeSingleTextElement = (
 
 const resizeSingleElement = (
   element: NonDeletedExcalidrawElement,
-  resizeHandle: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
+  resizeHandleSide: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
   sidesWithSameLength: boolean,
   isResizeFromCenter: boolean,
   pointerX: number,
@@ -380,16 +378,32 @@ const resizeSingleElement = (
   );
   let scaleX = 1;
   let scaleY = 1;
-  if (resizeHandle === "e" || resizeHandle === "ne" || resizeHandle === "se") {
+  if (
+    resizeHandleSide === "e" ||
+    resizeHandleSide === "ne" ||
+    resizeHandleSide === "se"
+  ) {
     scaleX = (rotatedX - x1) / (x2 - x1);
   }
-  if (resizeHandle === "s" || resizeHandle === "sw" || resizeHandle === "se") {
+  if (
+    resizeHandleSide === "s" ||
+    resizeHandleSide === "sw" ||
+    resizeHandleSide === "se"
+  ) {
     scaleY = (rotatedY - y1) / (y2 - y1);
   }
-  if (resizeHandle === "w" || resizeHandle === "nw" || resizeHandle === "sw") {
+  if (
+    resizeHandleSide === "w" ||
+    resizeHandleSide === "nw" ||
+    resizeHandleSide === "sw"
+  ) {
     scaleX = (x2 - rotatedX) / (x2 - x1);
   }
-  if (resizeHandle === "n" || resizeHandle === "nw" || resizeHandle === "ne") {
+  if (
+    resizeHandleSide === "n" ||
+    resizeHandleSide === "nw" ||
+    resizeHandleSide === "ne"
+  ) {
     scaleY = (y2 - rotatedY) / (y2 - y1);
   }
   let nextWidth = element.width * scaleX;
@@ -419,7 +433,7 @@ const resizeSingleElement = (
     Math.abs(nextHeight),
   );
   const [flipDiffX, flipDiffY] = getFlipAdjustment(
-    resizeHandle,
+    resizeHandleSide,
     nextWidth,
     nextHeight,
     nextX1,
@@ -434,7 +448,7 @@ const resizeSingleElement = (
     element.angle,
   );
   const [nextElementX, nextElementY] = adjustXYWithRotation(
-    getSidesForResizeHandle(resizeHandle, isResizeFromCenter),
+    getSidesForResizeHandle(resizeHandleSide, isResizeFromCenter),
     element.x - flipDiffX,
     element.y - flipDiffY,
     element.angle,
@@ -461,7 +475,7 @@ const resizeSingleElement = (
 
 const resizeMultipleElements = (
   elements: readonly NonDeletedExcalidrawElement[],
-  resizeHandle: "nw" | "ne" | "sw" | "se",
+  resizeHandleSide: "nw" | "ne" | "sw" | "se",
   pointerX: number,
   pointerY: number,
 ) => {
@@ -472,7 +486,7 @@ const resizeMultipleElements = (
     origCoords: readonly [number, number, number, number],
     finalCoords: readonly [number, number, number, number],
   ) => { x: number; y: number };
-  switch (resizeHandle) {
+  switch (resizeHandleSide) {
     case "se":
       scale = Math.max(
         (pointerX - x1) / (x2 - x1),
@@ -651,7 +665,7 @@ const rotateMultipleElements = (
 };
 
 export const getResizeOffsetXY = (
-  resizeHandle: ResizeTestType,
+  resizeHandleSide: MaybeResizeHandleSide,
   selectedElements: NonDeletedExcalidrawElement[],
   x: number,
   y: number,
@@ -664,7 +678,7 @@ export const getResizeOffsetXY = (
   const cy = (y1 + y2) / 2;
   const angle = selectedElements.length === 1 ? selectedElements[0].angle : 0;
   [x, y] = rotate(x, y, cx, cy, -angle);
-  switch (resizeHandle) {
+  switch (resizeHandleSide) {
     case "n":
       return rotate(x - (x1 + x2) / 2, y - y1, 0, 0, angle);
     case "s":
@@ -687,14 +701,14 @@ export const getResizeOffsetXY = (
 };
 
 export const getResizeArrowDirection = (
-  resizeHandle: ResizeTestType,
+  resizeHandleSide: MaybeResizeHandleSide,
   element: NonDeleted<ExcalidrawLinearElement>,
 ): "origin" | "end" => {
   const [, [px, py]] = element.points;
   const isResizeEnd =
-    (resizeHandle === "nw" && (px < 0 || py < 0)) ||
-    (resizeHandle === "ne" && px >= 0) ||
-    (resizeHandle === "sw" && px <= 0) ||
-    (resizeHandle === "se" && (px > 0 || py > 0));
+    (resizeHandleSide === "nw" && (px < 0 || py < 0)) ||
+    (resizeHandleSide === "ne" && px >= 0) ||
+    (resizeHandleSide === "sw" && px <= 0) ||
+    (resizeHandleSide === "se" && (px > 0 || py > 0));
   return isResizeEnd ? "end" : "origin";
 };

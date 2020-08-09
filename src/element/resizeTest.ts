@@ -6,22 +6,23 @@ import {
 
 import {
   OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
-  handlerRectanglesFromCoords,
-  handlerRectangles,
+  getResizeHandlesFromCoords,
+  getResizeHandles,
+  ResizeHandleSide,
+  ResizeHandle,
+  MaybeResizeHandleSide,
 } from "./handlerRectangles";
 import { AppState } from "../types";
 
-type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
-
-const isInHandlerRect = (
-  handler: [number, number, number, number],
+const isInsideResizeHandle = (
+  resizeHandle: ResizeHandle,
   x: number,
   y: number,
 ) =>
-  x >= handler[0] &&
-  x <= handler[0] + handler[2] &&
-  y >= handler[1] &&
-  y <= handler[1] + handler[3];
+  x >= resizeHandle[0] &&
+  x <= resizeHandle[0] + resizeHandle[2] &&
+  y >= resizeHandle[1] &&
+  y <= resizeHandle[1] + resizeHandle[3];
 
 export const resizeTest = (
   element: NonDeletedExcalidrawElement,
@@ -30,37 +31,42 @@ export const resizeTest = (
   y: number,
   zoom: number,
   pointerType: PointerType,
-): HandlerRectanglesRet | false => {
+): MaybeResizeHandleSide => {
   if (!appState.selectedElementIds[element.id]) {
     return false;
   }
 
-  const { rotation: rotationHandler, ...handlers } = handlerRectangles(
+  const { rotation: rotationResizeHandle, ...resizeHandles } = getResizeHandles(
     element,
     zoom,
     pointerType,
   );
 
-  if (rotationHandler && isInHandlerRect(rotationHandler, x, y)) {
-    return "rotation" as HandlerRectanglesRet;
+  if (
+    rotationResizeHandle &&
+    isInsideResizeHandle(rotationResizeHandle, x, y)
+  ) {
+    return "rotation" as ResizeHandleSide;
   }
 
-  const filter = Object.keys(handlers).filter((key) => {
-    const handler = handlers[key as Exclude<HandlerRectanglesRet, "rotation">]!;
-    if (!handler) {
+  const filter = Object.keys(resizeHandles).filter((key) => {
+    const resizeHandle = resizeHandles[
+      key as Exclude<ResizeHandleSide, "rotation">
+    ]!;
+    if (!resizeHandle) {
       return false;
     }
-    return isInHandlerRect(handler, x, y);
+    return isInsideResizeHandle(resizeHandle, x, y);
   });
 
   if (filter.length > 0) {
-    return filter[0] as HandlerRectanglesRet;
+    return filter[0] as ResizeHandleSide;
   }
 
   return false;
 };
 
-export const getElementWithResizeHandler = (
+export const getElementWithResizeHandleSide = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
   scenePointerX: number,
@@ -72,7 +78,7 @@ export const getElementWithResizeHandler = (
     if (result) {
       return result;
     }
-    const resizeHandle = resizeTest(
+    const resizeHandleSide = resizeTest(
       element,
       appState,
       scenePointerX,
@@ -80,18 +86,18 @@ export const getElementWithResizeHandler = (
       zoom,
       pointerType,
     );
-    return resizeHandle ? { element, resizeHandle } : null;
-  }, null as { element: NonDeletedExcalidrawElement; resizeHandle: HandlerRectanglesRet } | null);
+    return resizeHandleSide ? { element, resizeHandleSide } : null;
+  }, null as { element: NonDeletedExcalidrawElement; resizeHandleSide: MaybeResizeHandleSide } | null);
 };
 
-export const getResizeHandlerFromCoords = (
+export const getResizeHandleSideFromCoords = (
   [x1, y1, x2, y2]: readonly [number, number, number, number],
   scenePointerX: number,
   scenePointerY: number,
   zoom: number,
   pointerType: PointerType,
-) => {
-  const handlers = handlerRectanglesFromCoords(
+): MaybeResizeHandleSide => {
+  const resizeHandles = getResizeHandlesFromCoords(
     [x1, y1, x2, y2],
     0,
     zoom,
@@ -99,11 +105,16 @@ export const getResizeHandlerFromCoords = (
     OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
   );
 
-  const found = Object.keys(handlers).find((key) => {
-    const handler = handlers[key as Exclude<HandlerRectanglesRet, "rotation">]!;
-    return handler && isInHandlerRect(handler, scenePointerX, scenePointerY);
+  const found = Object.keys(resizeHandles).find((key) => {
+    const resizeHandle = resizeHandles[
+      key as Exclude<ResizeHandleSide, "rotation">
+    ]!;
+    return (
+      resizeHandle &&
+      isInsideResizeHandle(resizeHandle, scenePointerX, scenePointerY)
+    );
   });
-  return (found || false) as HandlerRectanglesRet;
+  return (found || false) as MaybeResizeHandleSide;
 };
 
 const RESIZE_CURSORS = ["ns", "nesw", "ew", "nwse"];
@@ -121,14 +132,14 @@ const rotateResizeCursor = (cursor: string, angle: number) => {
  */
 export const getCursorForResizingElement = (resizingElement: {
   element?: ExcalidrawElement;
-  resizeHandle: ReturnType<typeof resizeTest>;
+  resizeHandleSide: MaybeResizeHandleSide;
 }): string => {
-  const { element, resizeHandle } = resizingElement;
+  const { element, resizeHandleSide } = resizingElement;
   const shouldSwapCursors =
     element && Math.sign(element.height) * Math.sign(element.width) === -1;
   let cursor = null;
 
-  switch (resizeHandle) {
+  switch (resizeHandleSide) {
     case "n":
     case "s":
       cursor = "ns";
@@ -164,16 +175,16 @@ export const getCursorForResizingElement = (resizingElement: {
   return cursor ? `${cursor}-resize` : "";
 };
 
-export const normalizeResizeHandle = (
+export const normalizeResizeHandleSide = (
   element: ExcalidrawElement,
-  resizeHandle: HandlerRectanglesRet,
-): HandlerRectanglesRet => {
+  resizeHandleSide: ResizeHandleSide,
+): ResizeHandleSide => {
   if (element.width >= 0 && element.height >= 0) {
-    return resizeHandle;
+    return resizeHandleSide;
   }
 
   if (element.width < 0 && element.height < 0) {
-    switch (resizeHandle) {
+    switch (resizeHandleSide) {
       case "nw":
         return "se";
       case "ne":
@@ -184,7 +195,7 @@ export const normalizeResizeHandle = (
         return "ne";
     }
   } else if (element.width < 0) {
-    switch (resizeHandle) {
+    switch (resizeHandleSide) {
       case "nw":
         return "ne";
       case "ne":
@@ -199,7 +210,7 @@ export const normalizeResizeHandle = (
         return "e";
     }
   } else {
-    switch (resizeHandle) {
+    switch (resizeHandleSide) {
       case "nw":
         return "sw";
       case "ne":
@@ -215,5 +226,5 @@ export const normalizeResizeHandle = (
     }
   }
 
-  return resizeHandle;
+  return resizeHandleSide;
 };

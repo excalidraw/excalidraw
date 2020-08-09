@@ -14,8 +14,8 @@ import {
 import {
   getElementAbsoluteCoords,
   OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
-  handlerRectanglesFromCoords,
-  handlerRectangles,
+  getResizeHandlesFromCoords,
+  getResizeHandles,
   getElementBounds,
   getCommonBounds,
 } from "../element";
@@ -43,9 +43,7 @@ import {
   SuggestedPointBinding,
   isBindingEnabled,
 } from "../element/binding";
-import { Handlers } from "../element/handlerRectangles";
-
-type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
+import { ResizeHandles, ResizeHandleSide } from "../element/handlerRectangles";
 
 const strokeRectWithRotation = (
   context: CanvasRenderingContext2D,
@@ -362,18 +360,18 @@ export const renderScene = (
 
     const locallySelectedElements = getSelectedElements(elements, appState);
 
-    // Paint resize handlers
+    // Paint resize resizeHandles
     context.translate(sceneState.scrollX, sceneState.scrollY);
     if (locallySelectedElements.length === 1) {
       context.fillStyle = oc.white;
-      const handlers = handlerRectangles(
+      const resizeHandles = getResizeHandles(
         locallySelectedElements[0],
         sceneState.zoom,
       );
-      renderHandlers(
+      renderResizeHandles(
         context,
         sceneState,
-        handlers,
+        resizeHandles,
         locallySelectedElements[0].angle,
       );
     } else if (locallySelectedElements.length > 1 && !appState.isRotating) {
@@ -396,14 +394,14 @@ export const renderScene = (
       );
       context.lineWidth = lineWidth;
       context.setLineDash(initialLineDash);
-      const handlers = handlerRectanglesFromCoords(
+      const resizeHandles = getResizeHandlesFromCoords(
         [x1, y1, x2, y2],
         0,
         sceneState.zoom,
         undefined,
         OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
       );
-      renderHandlers(context, sceneState, handlers, 0);
+      renderResizeHandles(context, sceneState, resizeHandles, 0);
     }
     context.translate(-sceneState.scrollX, -sceneState.scrollY);
   }
@@ -545,33 +543,33 @@ export const renderScene = (
   return { atLeastOneVisibleElement: visibleElements.length > 0, scrollBars };
 };
 
-const renderHandlers = (
+const renderResizeHandles = (
   context: CanvasRenderingContext2D,
   sceneState: SceneState,
-  handlers: Handlers,
+  resizeHandles: ResizeHandles,
   angle: number,
 ): void => {
-  Object.keys(handlers).forEach((key) => {
-    const handler = handlers[key as HandlerRectanglesRet];
-    if (handler !== undefined) {
+  Object.keys(resizeHandles).forEach((key) => {
+    const resizeHandle = resizeHandles[key as ResizeHandleSide];
+    if (resizeHandle !== undefined) {
       const lineWidth = context.lineWidth;
       context.lineWidth = 1 / sceneState.zoom;
       if (key === "rotation") {
         fillCircle(
           context,
-          handler[0] + handler[2] / 2,
-          handler[1] + handler[3] / 2,
-          handler[2] / 2,
+          resizeHandle[0] + resizeHandle[2] / 2,
+          resizeHandle[1] + resizeHandle[3] / 2,
+          resizeHandle[2] / 2,
         );
       } else {
         strokeRectWithRotation(
           context,
-          handler[0],
-          handler[1],
-          handler[2],
-          handler[3],
-          handler[0] + handler[2] / 2,
-          handler[1] + handler[3] / 2,
+          resizeHandle[0],
+          resizeHandle[1],
+          resizeHandle[2],
+          resizeHandle[3],
+          resizeHandle[0] + resizeHandle[2] / 2,
+          resizeHandle[1] + resizeHandle[3] / 2,
           angle,
           true, // fill before stroke
         );
