@@ -14,7 +14,7 @@ export type ActionResult =
 
 type ActionFn = (
   elements: readonly ExcalidrawElement[],
-  appState: AppState,
+  appState: Readonly<AppState>,
   formData: any,
 ) => ActionResult;
 

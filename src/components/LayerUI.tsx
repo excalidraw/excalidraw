@@ -590,7 +590,13 @@ const LayerUI = ({
 
 const areEqual = (prev: LayerUIProps, next: LayerUIProps) => {
   const getNecessaryObj = (appState: AppState): Partial<AppState> => {
-    const { cursorX, cursorY, ...ret } = appState;
+    const {
+      cursorX,
+      cursorY,
+      suggestedBindings,
+      startBoundElement: boundElement,
+      ...ret
+    } = appState;
     return ret;
   };
   const prevAppState = getNecessaryObj(prev.appState);

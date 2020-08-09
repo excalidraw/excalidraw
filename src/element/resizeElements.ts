@@ -22,6 +22,7 @@ import {
   normalizeResizeHandle,
 } from "./resizeTest";
 import { measureText, getFontString } from "../utils";
+import { updateBoundElements } from "./binding";
 
 const normalizeAngle = (angle: number): number => {
   if (angle >= 2 * Math.PI) {
@@ -32,6 +33,7 @@ const normalizeAngle = (angle: number): number => {
 
 type ResizeTestType = ReturnType<typeof resizeTest>;
 
+// Returns true when a resize (scaling/rotation) happened
 export const resizeElements = (
   resizeHandle: ResizeTestType,
   setResizeHandle: (nextResizeHandle: ResizeTestType) => void,
@@ -55,6 +57,7 @@ export const resizeElements = (
         pointerY,
         isRotateWithDiscreteAngle,
       );
+      updateBoundElements(element);
     } else if (
       isLinearElement(element) &&
       element.points.length === 2 &&
@@ -404,6 +407,9 @@ const resizeSingleElement = (
   const deltaX2 = (x2 - nextX2) / 2;
   const deltaY2 = (y2 - nextY2) / 2;
   const rescaledPoints = rescalePointsInElement(element, nextWidth, nextHeight);
+  updateBoundElements(element, {
+    newSize: { width: nextWidth, height: nextHeight },
+  });
   const [finalX1, finalY1, finalX2, finalY2] = getResizedElementAbsoluteCoords(
     {
       ...element,
@@ -530,6 +536,10 @@ const resizeMultipleElements = (
         }
         const origCoords = getElementAbsoluteCoords(element);
         const rescaledPoints = rescalePointsInElement(element, width, height);
+        updateBoundElements(element, {
+          newSize: { width, height },
+          simultaneouslyUpdated: elements,
+        });
         const finalCoords = getResizedElementAbsoluteCoords(
           {
             ...element,

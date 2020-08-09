@@ -4,6 +4,7 @@ exports[`resize element rectangle 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
+  "boundElementIds": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 50,
@@ -28,6 +29,7 @@ exports[`resize element with aspect ratio when SHIFT is clicked rectangle 1`] = 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
+  "boundElementIds": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 50,

@@ -1,9 +1,13 @@
 import { ExcalidrawElement, PointerType } from "./types";
 
-import { getElementAbsoluteCoords } from "./bounds";
+import { getElementAbsoluteCoords, Bounds } from "./bounds";
 import { rotate } from "../math";
 
 type Sides = "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se" | "rotation";
+
+export type Handlers = Partial<
+  { [T in Sides]: [number, number, number, number] }
+>;
 
 const handleSizes: { [k in PointerType]: number } = {
   mouse: 8,
@@ -61,12 +65,12 @@ const generateHandler = (
 };
 
 export const handlerRectanglesFromCoords = (
-  [x1, y1, x2, y2]: [number, number, number, number],
+  [x1, y1, x2, y2]: Bounds,
   angle: number,
   zoom: number,
   pointerType: PointerType = "mouse",
   omitSides: { [T in Sides]?: boolean } = {},
-): Partial<{ [T in Sides]: [number, number, number, number] }> => {
+): Handlers => {
   const size = handleSizes[pointerType];
   const handlerWidth = size / zoom;
   const handlerHeight = size / zoom;
