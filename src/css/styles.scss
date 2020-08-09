@@ -145,7 +145,7 @@ input:focus {
 button,
 .buttonList label {
   user-select: none;
-  background-color: $oc-gray-2;
+  background-color: var(--button-gray-1);
   border: 0;
   border-radius: 4px;
   margin: 0.125rem 0;
@@ -156,15 +156,15 @@ button,
 
   &:focus {
     outline: transparent;
-    box-shadow: 0 0 0 2px $oc-blue-2;
+    box-shadow: 0 0 0 2px var(--focus-highlight-color);
   }
 
   &:hover {
-    background-color: $oc-gray-4;
+    background-color: var(--button-gray-2);
   }
 
   &:active {
-    background-color: $oc-gray-5;
+    background-color: var(--button-gray-3);
   }
 
   &:disabled {
@@ -174,12 +174,12 @@ button,
 
 .active,
 .buttonList label.active {
-  background-color: $oc-gray-4;
+  background-color: var(--button-gray-2);
   &:hover {
-    background-color: $oc-gray-4;
+    background-color: var(--button-gray-2);
   }
   &:active {
-    background-color: $oc-gray-5;
+    background-color: var(--button-gray-3);
   }
 }
 
