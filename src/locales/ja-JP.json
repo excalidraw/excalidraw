@@ -177,7 +177,8 @@
     "github": "不具合報告はこちら",
     "textNewLine": "テキストの改行",
     "textFinish": "テキストの編集を終える",
-    "zoomToFit": "すべての図形が収まるよう拡大/縮小"
+    "zoomToFit": "すべての図形が収まるよう拡大/縮小",
+    "preventBinding": ""
   },
   "encrypted": {
     "tooltip": "描画内容はエンドツーエンド暗号化が施されており、Excalidrawサーバーが内容を見ることはできません。"
