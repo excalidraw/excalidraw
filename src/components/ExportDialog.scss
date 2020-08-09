@@ -26,6 +26,10 @@
 .ExportDialog__name {
   grid-column: project-name;
   margin: auto;
+
+  .TextInput {
+    height: calc(1rem - 3px);
+  }
 }
 
 @media (max-width: 550px) {
