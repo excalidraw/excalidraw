@@ -741,7 +741,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (
       prevState.elementType !== this.state.elementType &&
       multiElement != null &&
-      isBindingEnabled(this.state)
+      isBindingEnabled(this.state) &&
+      isBindingElement(multiElement)
     ) {
       maybeBindLinearElement(
         multiElement,
@@ -3153,7 +3154,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             editingElement: this.state.draggingElement,
           });
         } else if (pointerDownState.drag.hasOccurred && !multiElement) {
-          if (isBindingEnabled(this.state)) {
+          if (
+            isBindingEnabled(this.state) &&
+            isBindingElement(draggingElement)
+          ) {
             maybeBindLinearElement(
               draggingElement,
               this.state,

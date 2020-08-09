@@ -8,11 +8,7 @@ import {
 } from "./types";
 import { getElementAtPosition } from "../scene";
 import { AppState } from "../types";
-import {
-  isBindableElement,
-  isLinearElement,
-  isBindingElement,
-} from "./typeChecks";
+import { isBindableElement, isBindingElement } from "./typeChecks";
 import {
   bindingBorderTest,
   distanceToBindableElement,
@@ -102,7 +98,7 @@ export const bindOrUnbindSelectedElements = (
   elements: NonDeleted<ExcalidrawElement>[],
 ): void => {
   elements.forEach((element) => {
-    if (isLinearElement(element)) {
+    if (isBindingElement(element)) {
       bindOrUnbindLinearElement(
         element,
         getElligibleElementForBindingElement(element, "start"),
@@ -199,7 +195,7 @@ export const unbindLinearElements = (
   elements: NonDeleted<ExcalidrawElement>[],
 ): void => {
   elements.forEach((element) => {
-    if (isLinearElement(element)) {
+    if (isBindingElement(element)) {
       bindOrUnbindLinearElement(element, null, null);
     }
   });

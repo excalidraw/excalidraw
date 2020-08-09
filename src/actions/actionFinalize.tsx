@@ -14,6 +14,7 @@ import {
   maybeBindLinearElement,
   bindOrUnbindLinearElement,
 } from "../element/binding";
+import { isBindingElement } from "../element/typeChecks";
 
 export const actionFinalize = register({
   name: "finalize",
@@ -27,11 +28,13 @@ export const actionFinalize = register({
       const element = LinearElementEditor.getElement(elementId);
 
       if (element) {
-        bindOrUnbindLinearElement(
-          element,
-          startBindingElement,
-          endBindingElement,
-        );
+        if (isBindingElement(element)) {
+          bindOrUnbindLinearElement(
+            element,
+            startBindingElement,
+            endBindingElement,
+          );
+        }
         return {
           elements:
             element.points.length < 2 || isInvisiblySmallElement(element)
@@ -98,7 +101,11 @@ export const actionFinalize = register({
         }
       }
 
-      if (!isLoop && multiPointElement.points.length > 1) {
+      if (
+        isBindingElement(multiPointElement) &&
+        !isLoop &&
+        multiPointElement.points.length > 1
+      ) {
         const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
           multiPointElement,
           -1,

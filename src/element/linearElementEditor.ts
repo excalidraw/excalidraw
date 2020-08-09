@@ -240,7 +240,7 @@ export class LinearElementEditor {
         startBindingElement,
         endBindingElement,
       } = appState.editingLinearElement;
-      if (isBindingEnabled(appState)) {
+      if (isBindingEnabled(appState) && isBindingElement(element)) {
         bindOrUnbindLinearElement(
           element,
           startBindingElement,
