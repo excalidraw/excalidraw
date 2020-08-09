@@ -9,6 +9,7 @@ import { AppState } from "../types";
 import { KEYS } from "../keys";
 import { getElementMap } from "../element";
 import { newElementWith } from "../element/mutateElement";
+import { fixBindingsAfterDeletion } from "../element/binding";
 
 const writeData = (
   prevElements: readonly ExcalidrawElement[],
@@ -31,6 +32,9 @@ const writeData = (
     const nextElements = data.elements;
     const nextElementMap = getElementMap(nextElements);
 
+    const deletedElements = prevElements.filter(
+      (prevElement) => !nextElementMap.hasOwnProperty(prevElement.id),
+    );
     const elements = nextElements
       .map((nextElement) =>
         newElementWith(
@@ -39,14 +43,11 @@ const writeData = (
         ),
       )
       .concat(
-        prevElements
-          .filter(
-            (prevElement) => !nextElementMap.hasOwnProperty(prevElement.id),
-          )
-          .map((prevElement) =>
-            newElementWith(prevElement, { isDeleted: true }),
-          ),
+        deletedElements.map((prevElement) =>
+          newElementWith(prevElement, { isDeleted: true }),
+        ),
       );
+    fixBindingsAfterDeletion(elements, deletedElements);
 
     return {
       elements,

@@ -259,40 +259,40 @@ afterEach(() => {
 describe("regression tests", () => {
   it("draw every type of shape", () => {
     clickTool("rectangle");
-    mouse.down(10, 10);
-    mouse.up(10, 10);
+    mouse.down(10, -10);
+    mouse.up(20, 10);
 
     clickTool("diamond");
     mouse.down(10, -10);
-    mouse.up(10, 10);
+    mouse.up(20, 10);
 
     clickTool("ellipse");
     mouse.down(10, -10);
-    mouse.up(10, 10);
+    mouse.up(20, 10);
 
     clickTool("arrow");
-    mouse.down(10, -10);
-    mouse.up(10, 10);
+    mouse.down(40, -10);
+    mouse.up(50, 10);
 
     clickTool("line");
-    mouse.down(10, -10);
-    mouse.up(10, 10);
+    mouse.down(40, -10);
+    mouse.up(50, 10);
 
     clickTool("arrow");
-    mouse.click(10, -10);
-    mouse.click(10, 10);
-    mouse.click(-10, 10);
+    mouse.click(40, -10);
+    mouse.click(50, 10);
+    mouse.click(30, 10);
     hotkeyPress("ENTER");
 
     clickTool("line");
-    mouse.click(10, -20);
-    mouse.click(10, 10);
-    mouse.click(-10, 10);
+    mouse.click(40, -20);
+    mouse.click(50, 10);
+    mouse.click(30, 10);
     hotkeyPress("ENTER");
 
     clickTool("draw");
-    mouse.down(10, -20);
-    mouse.up(10, 10);
+    mouse.down(40, -20);
+    mouse.up(50, 10);
 
     expect(h.elements.map((element) => element.type)).toEqual([
       "rectangle",
@@ -569,17 +569,17 @@ describe("regression tests", () => {
 
   it("undo/redo drawing an element", () => {
     clickTool("rectangle");
-    mouse.down(10, 10);
-    mouse.up(10, 10);
+    mouse.down(10, -10);
+    mouse.up(20, 10);
 
     clickTool("rectangle");
-    mouse.down(10, -10);
-    mouse.up(10, 10);
+    mouse.down(10, 0);
+    mouse.up(30, 20);
 
     clickTool("arrow");
-    mouse.click(10, -10);
-    mouse.click(10, 10);
-    mouse.click(-10, 10);
+    mouse.click(60, -10);
+    mouse.click(60, 10);
+    mouse.click(40, 10);
     hotkeyPress("ENTER");
 
     expect(h.elements.filter((element) => !element.isDeleted).length).toBe(3);

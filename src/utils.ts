@@ -241,7 +241,7 @@ export const isRTL = (text: string) => {
 };
 
 export function tupleToCoors(
-  xyTuple: [number, number],
+  xyTuple: readonly [number, number],
 ): { x: number; y: number } {
   const [x, y] = xyTuple;
   return { x, y };
