@@ -177,7 +177,8 @@
     "github": "Bir hata mı buldun? Bildir",
     "textNewLine": "Yeni satır ekle (yazı)",
     "textFinish": "(Yazıyı) düzenlemeyi bitir",
-    "zoomToFit": "Tüm öğeleri sığdırmak için yakınlaştır"
+    "zoomToFit": "Tüm öğeleri sığdırmak için yakınlaştır",
+    "preventBinding": ""
   },
   "encrypted": {
     "tooltip": "Çizimleriniz uçtan-uca şifrelenmiştir, Excalidraw'ın sunucuları bile onları göremez."
