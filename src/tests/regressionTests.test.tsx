@@ -1212,4 +1212,17 @@ describe("regression tests", () => {
     expect(h.elements[0].groupIds).toHaveLength(0);
     expect(h.elements[1].groupIds).toHaveLength(0);
   });
+
+  it("keeps selected element selected when click hit's element bounding box but doesn't hit the element", () => {
+    clickTool("ellipse");
+    mouse.down(0, 0);
+    mouse.up(100, 100);
+
+    clickOnBoundingBoxButNotOnElement();
+    expect(getSelectedElements().length).toBe(1);
+
+    function clickOnBoundingBoxButNotOnElement() {
+      mouse.click(0, 0);
+    }
+  });
 });
