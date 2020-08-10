@@ -23,16 +23,16 @@ export {
 
 export {
   OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
-  getResizeHandlesFromCoords,
-  getResizeHandles,
-} from "./resizeHandles";
+  getTransformHandlesFromCoords,
+  getTransformHandles,
+} from "./transformHandles";
 export { hitTest } from "./collision";
 export {
   resizeTest,
   getCursorForResizingElement,
-  normalizeResizeHandleSide,
-  getElementWithResizeHandleSide,
-  getResizeHandleSideFromCoords,
+  normalizeTransformHandleSide,
+  getElementWithTransformHandleSide,
+  getTransformHandleSideFromCoords,
 } from "./resizeTest";
 export {
   resizeElements,

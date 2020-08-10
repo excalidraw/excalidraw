@@ -21,10 +21,10 @@ import {
   getSyncableElements,
   newLinearElement,
   resizeElements,
-  getElementWithResizeHandleSide,
+  getElementWithTransformHandleSide,
   getResizeOffsetXY,
   getResizeArrowDirection,
-  getResizeHandleSideFromCoords,
+  getTransformHandleSideFromCoords,
   isNonDeletedElement,
   updateTextElement,
   dragSelectedElements,
@@ -175,7 +175,7 @@ import {
   isLinearElementSimpleAndAlreadyBound,
   isBindingEnabled,
 } from "../element/binding";
-import { MaybeResizeHandleSide } from "../element/resizeHandles";
+import { MaybeTransformHandleSide } from "../element/transformHandles";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -221,7 +221,7 @@ type PointerDownState = Readonly<{
   lastCoords: { x: number; y: number };
   resize: {
     // Handle when resizing, might change during the pointer interaction
-    handleSide: MaybeResizeHandleSide;
+    handleSide: MaybeTransformHandleSide;
     // This is determined on the initial pointer down event
     isResizing: boolean;
     // This is determined on the initial pointer down event
@@ -2057,7 +2057,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       !isOverScrollBar &&
       !this.state.editingLinearElement
     ) {
-      const elementWithResizeHandleSide = getElementWithResizeHandleSide(
+      const elementWithTransformHandleSide = getElementWithTransformHandleSide(
         elements,
         this.state,
         scenePointerX,
@@ -2066,25 +2066,25 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         event.pointerType,
       );
       if (
-        elementWithResizeHandleSide &&
-        elementWithResizeHandleSide.resizeHandleSide
+        elementWithTransformHandleSide &&
+        elementWithTransformHandleSide.transformHandleSide
       ) {
         document.documentElement.style.cursor = getCursorForResizingElement(
-          elementWithResizeHandleSide,
+          elementWithTransformHandleSide,
         );
         return;
       }
     } else if (selectedElements.length > 1 && !isOverScrollBar) {
-      const resizeHandleSide = getResizeHandleSideFromCoords(
+      const transformHandleSide = getTransformHandleSideFromCoords(
         getCommonBounds(selectedElements),
         scenePointerX,
         scenePointerY,
         this.state.zoom,
         event.pointerType,
       );
-      if (resizeHandleSide) {
+      if (transformHandleSide) {
         document.documentElement.style.cursor = getCursorForResizingElement({
-          resizeHandleSide,
+          transformHandleSide,
         });
         return;
       }
@@ -2449,7 +2449,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       const elements = this.scene.getElements();
       const selectedElements = getSelectedElements(elements, this.state);
       if (selectedElements.length === 1 && !this.state.editingLinearElement) {
-        const elementWithResizeHandleSide = getElementWithResizeHandleSide(
+        const elementWithTransformHandleSide = getElementWithTransformHandleSide(
           elements,
           this.state,
           pointerDownState.origin.x,
@@ -2457,15 +2457,15 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           this.state.zoom,
           event.pointerType,
         );
-        if (elementWithResizeHandleSide != null) {
+        if (elementWithTransformHandleSide != null) {
           this.setState({
-            resizingElement: elementWithResizeHandleSide.element,
+            resizingElement: elementWithTransformHandleSide.element,
           });
           pointerDownState.resize.handleSide =
-            elementWithResizeHandleSide.resizeHandleSide;
+            elementWithTransformHandleSide.transformHandleSide;
         }
       } else if (selectedElements.length > 1) {
-        pointerDownState.resize.handleSide = getResizeHandleSideFromCoords(
+        pointerDownState.resize.handleSide = getTransformHandleSideFromCoords(
           getCommonBounds(selectedElements),
           pointerDownState.origin.x,
           pointerDownState.origin.y,
@@ -2475,7 +2475,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
       if (pointerDownState.resize.handleSide) {
         document.documentElement.style.cursor = getCursorForResizingElement({
-          resizeHandleSide: pointerDownState.resize.handleSide,
+          transformHandleSide: pointerDownState.resize.handleSide,
         });
         pointerDownState.resize.isResizing = true;
         pointerDownState.resize.offset = tupleToCoors(
@@ -2797,13 +2797,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           this.scene.getElements(),
           this.state,
         );
-        const resizeHandleSide = pointerDownState.resize.handleSide;
+        const transformHandleSide = pointerDownState.resize.handleSide;
         this.setState({
           // TODO: rename this state field to "isScaling" to distinguish
           // it from the generic "isResizing" which includes scaling and
           // rotating
-          isResizing: resizeHandleSide && resizeHandleSide !== "rotation",
-          isRotating: resizeHandleSide === "rotation",
+          isResizing: transformHandleSide && transformHandleSide !== "rotation",
+          isRotating: transformHandleSide === "rotation",
         });
         const [resizeX, resizeY] = getGridPoint(
           pointerCoords.x - pointerDownState.resize.offset.x,
@@ -2812,9 +2812,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         );
         if (
           resizeElements(
-            resizeHandleSide,
-            (newResizeHandle) => {
-              pointerDownState.resize.handleSide = newResizeHandle;
+            transformHandleSide,
+            (newTransformHandle) => {
+              pointerDownState.resize.handleSide = newTransformHandle;
             },
             selectedElements,
             pointerDownState.resize.arrowDirection,

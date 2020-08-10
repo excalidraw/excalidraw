@@ -3,7 +3,7 @@ import { ExcalidrawElement, PointerType } from "./types";
 import { getElementAbsoluteCoords, Bounds } from "./bounds";
 import { rotate } from "../math";
 
-export type ResizeHandleSide =
+export type TransformHandleSide =
   | "n"
   | "s"
   | "w"
@@ -14,11 +14,13 @@ export type ResizeHandleSide =
   | "se"
   | "rotation";
 
-export type ResizeHandle = [number, number, number, number];
-export type ResizeHandles = Partial<{ [T in ResizeHandleSide]: ResizeHandle }>;
-export type MaybeResizeHandleSide = ResizeHandleSide | false;
+export type TransformHandle = [number, number, number, number];
+export type TransformHandles = Partial<
+  { [T in TransformHandleSide]: TransformHandle }
+>;
+export type MaybeTransformHandleSide = TransformHandleSide | false;
 
-const resizeHandleSizes: { [k in PointerType]: number } = {
+const transformHandleSizes: { [k in PointerType]: number } = {
   mouse: 8,
   pen: 16,
   touch: 28,
@@ -60,7 +62,7 @@ const OMIT_SIDES_FOR_LINE_BACKSLASH = {
   rotation: true,
 };
 
-const generateResizeHandle = (
+const generateTransformHandle = (
   x: number,
   y: number,
   width: number,
@@ -68,19 +70,19 @@ const generateResizeHandle = (
   cx: number,
   cy: number,
   angle: number,
-): ResizeHandle => {
+): TransformHandle => {
   const [xx, yy] = rotate(x + width / 2, y + height / 2, cx, cy, angle);
   return [xx - width / 2, yy - height / 2, width, height];
 };
 
-export const getResizeHandlesFromCoords = (
+export const getTransformHandlesFromCoords = (
   [x1, y1, x2, y2]: Bounds,
   angle: number,
   zoom: number,
   pointerType: PointerType = "touch",
-  omitSides: { [T in ResizeHandleSide]?: boolean } = {},
-): ResizeHandles => {
-  const size = resizeHandleSizes[pointerType];
+  omitSides: { [T in TransformHandleSide]?: boolean } = {},
+): TransformHandles => {
+  const size = transformHandleSizes[pointerType];
   const handleWidth = size / zoom;
   const handleHeight = size / zoom;
 
@@ -96,10 +98,10 @@ export const getResizeHandlesFromCoords = (
 
   const centeringOffset = 0;
 
-  const resizeHandles: ResizeHandles = {
+  const transformHandles: TransformHandles = {
     nw: omitSides["nw"]
       ? undefined
-      : generateResizeHandle(
+      : generateTransformHandle(
           x1 - dashedLineMargin - handleMarginX + centeringOffset,
           y1 - dashedLineMargin - handleMarginY + centeringOffset,
           handleWidth,
@@ -110,7 +112,7 @@ export const getResizeHandlesFromCoords = (
         ),
     ne: omitSides["ne"]
       ? undefined
-      : generateResizeHandle(
+      : generateTransformHandle(
           x2 + dashedLineMargin - centeringOffset,
           y1 - dashedLineMargin - handleMarginY + centeringOffset,
           handleWidth,
@@ -121,7 +123,7 @@ export const getResizeHandlesFromCoords = (
         ),
     sw: omitSides["sw"]
       ? undefined
-      : generateResizeHandle(
+      : generateTransformHandle(
           x1 - dashedLineMargin - handleMarginX + centeringOffset,
           y2 + dashedLineMargin - centeringOffset,
           handleWidth,
@@ -132,7 +134,7 @@ export const getResizeHandlesFromCoords = (
         ),
     se: omitSides["se"]
       ? undefined
-      : generateResizeHandle(
+      : generateTransformHandle(
           x2 + dashedLineMargin - centeringOffset,
           y2 + dashedLineMargin - centeringOffset,
           handleWidth,
@@ -143,7 +145,7 @@ export const getResizeHandlesFromCoords = (
         ),
     rotation: omitSides["rotation"]
       ? undefined
-      : generateResizeHandle(
+      : generateTransformHandle(
           x1 + width / 2 - handleWidth / 2,
           y1 -
             dashedLineMargin -
@@ -162,7 +164,7 @@ export const getResizeHandlesFromCoords = (
   const minimumSizeForEightHandles = (5 * size) / zoom;
   if (Math.abs(width) > minimumSizeForEightHandles) {
     if (!omitSides["n"]) {
-      resizeHandles["n"] = generateResizeHandle(
+      transformHandles["n"] = generateTransformHandle(
         x1 + width / 2 - handleWidth / 2,
         y1 - dashedLineMargin - handleMarginY + centeringOffset,
         handleWidth,
@@ -173,7 +175,7 @@ export const getResizeHandlesFromCoords = (
       );
     }
     if (!omitSides["s"]) {
-      resizeHandles["s"] = generateResizeHandle(
+      transformHandles["s"] = generateTransformHandle(
         x1 + width / 2 - handleWidth / 2,
         y2 + dashedLineMargin - centeringOffset,
         handleWidth,
@@ -186,7 +188,7 @@ export const getResizeHandlesFromCoords = (
   }
   if (Math.abs(height) > minimumSizeForEightHandles) {
     if (!omitSides["w"]) {
-      resizeHandles["w"] = generateResizeHandle(
+      transformHandles["w"] = generateTransformHandle(
         x1 - dashedLineMargin - handleMarginX + centeringOffset,
         y1 + height / 2 - handleHeight / 2,
         handleWidth,
@@ -197,7 +199,7 @@ export const getResizeHandlesFromCoords = (
       );
     }
     if (!omitSides["e"]) {
-      resizeHandles["e"] = generateResizeHandle(
+      transformHandles["e"] = generateTransformHandle(
         x2 + dashedLineMargin - centeringOffset,
         y1 + height / 2 - handleHeight / 2,
         handleWidth,
@@ -209,15 +211,15 @@ export const getResizeHandlesFromCoords = (
     }
   }
 
-  return resizeHandles;
+  return transformHandles;
 };
 
-export const getResizeHandles = (
+export const getTransformHandles = (
   element: ExcalidrawElement,
   zoom: number,
   pointerType: PointerType = "touch",
-): ResizeHandles => {
-  let omitSides: { [T in ResizeHandleSide]?: boolean } = {};
+): TransformHandles => {
+  let omitSides: { [T in TransformHandleSide]?: boolean } = {};
   if (
     element.type === "arrow" ||
     element.type === "line" ||
@@ -242,7 +244,7 @@ export const getResizeHandles = (
     omitSides = OMIT_SIDES_FOR_TEXT_ELEMENT;
   }
 
-  return getResizeHandlesFromCoords(
+  return getTransformHandlesFromCoords(
     getElementAbsoluteCoords(element),
     element.angle,
     zoom,

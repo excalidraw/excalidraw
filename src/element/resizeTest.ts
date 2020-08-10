@@ -6,23 +6,23 @@ import {
 
 import {
   OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
-  getResizeHandlesFromCoords,
-  getResizeHandles,
-  ResizeHandleSide,
-  ResizeHandle,
-  MaybeResizeHandleSide,
-} from "./resizeHandles";
+  getTransformHandlesFromCoords,
+  getTransformHandles,
+  TransformHandleSide,
+  TransformHandle,
+  MaybeTransformHandleSide,
+} from "./transformHandles";
 import { AppState } from "../types";
 
-const isInsideResizeHandle = (
-  resizeHandle: ResizeHandle,
+const isInsideTransformHandle = (
+  transformHandle: TransformHandle,
   x: number,
   y: number,
 ) =>
-  x >= resizeHandle[0] &&
-  x <= resizeHandle[0] + resizeHandle[2] &&
-  y >= resizeHandle[1] &&
-  y <= resizeHandle[1] + resizeHandle[3];
+  x >= transformHandle[0] &&
+  x <= transformHandle[0] + transformHandle[2] &&
+  y >= transformHandle[1] &&
+  y <= transformHandle[1] + transformHandle[3];
 
 export const resizeTest = (
   element: NonDeletedExcalidrawElement,
@@ -31,42 +31,41 @@ export const resizeTest = (
   y: number,
   zoom: number,
   pointerType: PointerType,
-): MaybeResizeHandleSide => {
+): MaybeTransformHandleSide => {
   if (!appState.selectedElementIds[element.id]) {
     return false;
   }
 
-  const { rotation: rotationResizeHandle, ...resizeHandles } = getResizeHandles(
-    element,
-    zoom,
-    pointerType,
-  );
+  const {
+    rotation: rotationTransformHandle,
+    ...transformHandles
+  } = getTransformHandles(element, zoom, pointerType);
 
   if (
-    rotationResizeHandle &&
-    isInsideResizeHandle(rotationResizeHandle, x, y)
+    rotationTransformHandle &&
+    isInsideTransformHandle(rotationTransformHandle, x, y)
   ) {
-    return "rotation" as ResizeHandleSide;
+    return "rotation" as TransformHandleSide;
   }
 
-  const filter = Object.keys(resizeHandles).filter((key) => {
-    const resizeHandle = resizeHandles[
-      key as Exclude<ResizeHandleSide, "rotation">
+  const filter = Object.keys(transformHandles).filter((key) => {
+    const transformHandle = transformHandles[
+      key as Exclude<TransformHandleSide, "rotation">
     ]!;
-    if (!resizeHandle) {
+    if (!transformHandle) {
       return false;
     }
-    return isInsideResizeHandle(resizeHandle, x, y);
+    return isInsideTransformHandle(transformHandle, x, y);
   });
 
   if (filter.length > 0) {
-    return filter[0] as ResizeHandleSide;
+    return filter[0] as TransformHandleSide;
   }
 
   return false;
 };
 
-export const getElementWithResizeHandleSide = (
+export const getElementWithTransformHandleSide = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
   scenePointerX: number,
@@ -78,7 +77,7 @@ export const getElementWithResizeHandleSide = (
     if (result) {
       return result;
     }
-    const resizeHandleSide = resizeTest(
+    const transformHandleSide = resizeTest(
       element,
       appState,
       scenePointerX,
@@ -86,18 +85,18 @@ export const getElementWithResizeHandleSide = (
       zoom,
       pointerType,
     );
-    return resizeHandleSide ? { element, resizeHandleSide } : null;
-  }, null as { element: NonDeletedExcalidrawElement; resizeHandleSide: MaybeResizeHandleSide } | null);
+    return transformHandleSide ? { element, transformHandleSide } : null;
+  }, null as { element: NonDeletedExcalidrawElement; transformHandleSide: MaybeTransformHandleSide } | null);
 };
 
-export const getResizeHandleSideFromCoords = (
+export const getTransformHandleSideFromCoords = (
   [x1, y1, x2, y2]: readonly [number, number, number, number],
   scenePointerX: number,
   scenePointerY: number,
   zoom: number,
   pointerType: PointerType,
-): MaybeResizeHandleSide => {
-  const resizeHandles = getResizeHandlesFromCoords(
+): MaybeTransformHandleSide => {
+  const transformHandles = getTransformHandlesFromCoords(
     [x1, y1, x2, y2],
     0,
     zoom,
@@ -105,16 +104,16 @@ export const getResizeHandleSideFromCoords = (
     OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
   );
 
-  const found = Object.keys(resizeHandles).find((key) => {
-    const resizeHandle = resizeHandles[
-      key as Exclude<ResizeHandleSide, "rotation">
+  const found = Object.keys(transformHandles).find((key) => {
+    const transformHandle = transformHandles[
+      key as Exclude<TransformHandleSide, "rotation">
     ]!;
     return (
-      resizeHandle &&
-      isInsideResizeHandle(resizeHandle, scenePointerX, scenePointerY)
+      transformHandle &&
+      isInsideTransformHandle(transformHandle, scenePointerX, scenePointerY)
     );
   });
-  return (found || false) as MaybeResizeHandleSide;
+  return (found || false) as MaybeTransformHandleSide;
 };
 
 const RESIZE_CURSORS = ["ns", "nesw", "ew", "nwse"];
@@ -132,14 +131,14 @@ const rotateResizeCursor = (cursor: string, angle: number) => {
  */
 export const getCursorForResizingElement = (resizingElement: {
   element?: ExcalidrawElement;
-  resizeHandleSide: MaybeResizeHandleSide;
+  transformHandleSide: MaybeTransformHandleSide;
 }): string => {
-  const { element, resizeHandleSide } = resizingElement;
+  const { element, transformHandleSide } = resizingElement;
   const shouldSwapCursors =
     element && Math.sign(element.height) * Math.sign(element.width) === -1;
   let cursor = null;
 
-  switch (resizeHandleSide) {
+  switch (transformHandleSide) {
     case "n":
     case "s":
       cursor = "ns";
@@ -175,16 +174,16 @@ export const getCursorForResizingElement = (resizingElement: {
   return cursor ? `${cursor}-resize` : "";
 };
 
-export const normalizeResizeHandleSide = (
+export const normalizeTransformHandleSide = (
   element: ExcalidrawElement,
-  resizeHandleSide: ResizeHandleSide,
-): ResizeHandleSide => {
+  transformHandleSide: TransformHandleSide,
+): TransformHandleSide => {
   if (element.width >= 0 && element.height >= 0) {
-    return resizeHandleSide;
+    return transformHandleSide;
   }
 
   if (element.width < 0 && element.height < 0) {
-    switch (resizeHandleSide) {
+    switch (transformHandleSide) {
       case "nw":
         return "se";
       case "ne":
@@ -195,7 +194,7 @@ export const normalizeResizeHandleSide = (
         return "ne";
     }
   } else if (element.width < 0) {
-    switch (resizeHandleSide) {
+    switch (transformHandleSide) {
       case "nw":
         return "ne";
       case "ne":
@@ -210,7 +209,7 @@ export const normalizeResizeHandleSide = (
         return "e";
     }
   } else {
-    switch (resizeHandleSide) {
+    switch (transformHandleSide) {
       case "nw":
         return "sw";
       case "ne":
@@ -226,5 +225,5 @@ export const normalizeResizeHandleSide = (
     }
   }
 
-  return resizeHandleSide;
+  return transformHandleSide;
 };
