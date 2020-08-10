@@ -4,6 +4,8 @@ exports[`multi point mode in linear elements arrow 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
+  "boundElementIds": null,
+  "endBinding": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 110,
@@ -30,6 +32,7 @@ Object {
   ],
   "roughness": 1,
   "seed": 337897,
+  "startBinding": null,
   "strokeColor": "#000000",
   "strokeStyle": "solid",
   "strokeWidth": 1,
@@ -46,6 +49,8 @@ exports[`multi point mode in linear elements line 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
+  "boundElementIds": null,
+  "endBinding": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 110,
@@ -72,6 +77,7 @@ Object {
   ],
   "roughness": 1,
   "seed": 337897,
+  "startBinding": null,
   "strokeColor": "#000000",
   "strokeStyle": "solid",
   "strokeWidth": 1,
