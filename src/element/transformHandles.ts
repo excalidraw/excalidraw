@@ -3,7 +3,7 @@ import { ExcalidrawElement, PointerType } from "./types";
 import { getElementAbsoluteCoords, Bounds } from "./bounds";
 import { rotate } from "../math";
 
-export type TransformHandleSide =
+export type TransformHandleType =
   | "n"
   | "s"
   | "w"
@@ -16,9 +16,9 @@ export type TransformHandleSide =
 
 export type TransformHandle = [number, number, number, number];
 export type TransformHandles = Partial<
-  { [T in TransformHandleSide]: TransformHandle }
+  { [T in TransformHandleType]: TransformHandle }
 >;
-export type MaybeTransformHandleSide = TransformHandleSide | false;
+export type MaybeTransformHandleType = TransformHandleType | false;
 
 const transformHandleSizes: { [k in PointerType]: number } = {
   mouse: 8,
@@ -80,7 +80,7 @@ export const getTransformHandlesFromCoords = (
   angle: number,
   zoom: number,
   pointerType: PointerType = "touch",
-  omitSides: { [T in TransformHandleSide]?: boolean } = {},
+  omitSides: { [T in TransformHandleType]?: boolean } = {},
 ): TransformHandles => {
   const size = transformHandleSizes[pointerType];
   const handleWidth = size / zoom;
@@ -219,7 +219,7 @@ export const getTransformHandles = (
   zoom: number,
   pointerType: PointerType = "touch",
 ): TransformHandles => {
-  let omitSides: { [T in TransformHandleSide]?: boolean } = {};
+  let omitSides: { [T in TransformHandleType]?: boolean } = {};
   if (
     element.type === "arrow" ||
     element.type === "line" ||

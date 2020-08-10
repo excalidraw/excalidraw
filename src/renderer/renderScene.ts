@@ -45,7 +45,7 @@ import {
 } from "../element/binding";
 import {
   TransformHandles,
-  TransformHandleSide,
+  TransformHandleType,
 } from "../element/transformHandles";
 
 const strokeRectWithRotation = (
@@ -553,7 +553,7 @@ const renderTransformHandles = (
   angle: number,
 ): void => {
   Object.keys(transformHandles).forEach((key) => {
-    const transformHandle = transformHandles[key as TransformHandleSide];
+    const transformHandle = transformHandles[key as TransformHandleType];
     if (transformHandle !== undefined) {
       const lineWidth = context.lineWidth;
       context.lineWidth = 1 / sceneState.zoom;

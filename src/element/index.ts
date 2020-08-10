@@ -30,9 +30,9 @@ export { hitTest } from "./collision";
 export {
   resizeTest,
   getCursorForResizingElement,
-  normalizeTransformHandleSide,
-  getElementWithTransformHandleSide,
-  getTransformHandleSideFromCoords,
+  normalizeTransformHandleType,
+  getElementWithTransformHandleType,
+  getTransformHandleTypeFromCoords,
 } from "./resizeTest";
 export {
   resizeElements,
