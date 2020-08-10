@@ -79,7 +79,7 @@ export const getTransformHandlesFromCoords = (
   [x1, y1, x2, y2]: Bounds,
   angle: number,
   zoom: number,
-  pointerType: PointerType = "touch",
+  pointerType: PointerType = "mouse",
   omitSides: { [T in TransformHandleType]?: boolean } = {},
 ): TransformHandles => {
   const size = transformHandleSizes[pointerType];
@@ -96,7 +96,7 @@ export const getTransformHandlesFromCoords = (
 
   const dashedLineMargin = 4 / zoom;
 
-  const centeringOffset = 0;
+  const centeringOffset = (size - 8) / (2 * zoom);
 
   const transformHandles: TransformHandles = {
     nw: omitSides["nw"]
@@ -217,7 +217,7 @@ export const getTransformHandlesFromCoords = (
 export const getTransformHandles = (
   element: ExcalidrawElement,
   zoom: number,
-  pointerType: PointerType = "touch",
+  pointerType: PointerType = "mouse",
 ): TransformHandles => {
   let omitSides: { [T in TransformHandleType]?: boolean } = {};
   if (
