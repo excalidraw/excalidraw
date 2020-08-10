@@ -9,7 +9,7 @@ import { ToolName } from "./queries/toolQueries";
 import { KEYS, Key } from "../keys";
 import { setDateTimeForTests } from "../utils";
 import { ExcalidrawElement } from "../element/types";
-import { handlerRectangles } from "../element";
+import { getTransformHandles as _getTransformHandles } from "../element";
 import { queryByText } from "@testing-library/react";
 import { copiedStyles } from "../actions/actionStyles";
 
@@ -192,9 +192,9 @@ function getStateHistory() {
   return h.history.stateHistory;
 }
 
-type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
-const getResizeHandles = (pointerType: "mouse" | "touch" | "pen") => {
-  const rects = handlerRectangles(
+type HandlerRectanglesRet = keyof ReturnType<typeof _getTransformHandles>;
+const getTransformHandles = (pointerType: "mouse" | "touch" | "pen") => {
+  const rects = _getTransformHandles(
     getSelectedElement(),
     h.state.zoom,
     pointerType,
@@ -362,10 +362,12 @@ describe("regression tests", () => {
     mouse.down(10, 10);
     mouse.up(10, 10);
 
-    const resizeHandles = getResizeHandles("mouse");
-    delete resizeHandles.rotation; // exclude rotation handle
-    for (const handlePos in resizeHandles) {
-      const [x, y] = resizeHandles[handlePos as keyof typeof resizeHandles];
+    const transformHandles = getTransformHandles("mouse");
+    delete transformHandles.rotation; // exclude rotation handle
+    for (const handlePos in transformHandles) {
+      const [x, y] = transformHandles[
+        handlePos as keyof typeof transformHandles
+      ];
       const { width: prevWidth, height: prevHeight } = getSelectedElement();
       mouse.restorePosition(x, y);
       mouse.down();

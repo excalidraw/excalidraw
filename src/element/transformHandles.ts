@@ -3,19 +3,30 @@ import { ExcalidrawElement, PointerType } from "./types";
 import { getElementAbsoluteCoords, Bounds } from "./bounds";
 import { rotate } from "../math";
 
-type Sides = "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se" | "rotation";
+export type TransformHandleType =
+  | "n"
+  | "s"
+  | "w"
+  | "e"
+  | "nw"
+  | "ne"
+  | "sw"
+  | "se"
+  | "rotation";
 
-export type Handlers = Partial<
-  { [T in Sides]: [number, number, number, number] }
+export type TransformHandle = [number, number, number, number];
+export type TransformHandles = Partial<
+  { [T in TransformHandleType]: TransformHandle }
 >;
+export type MaybeTransformHandleType = TransformHandleType | false;
 
-const handleSizes: { [k in PointerType]: number } = {
+const transformHandleSizes: { [k in PointerType]: number } = {
   mouse: 8,
   pen: 16,
   touch: 28,
 };
 
-const ROTATION_HANDLER_GAP = 16;
+const ROTATION_RESIZE_HANDLE_GAP = 16;
 
 export const OMIT_SIDES_FOR_MULTIPLE_ELEMENTS = {
   e: true,
@@ -51,7 +62,7 @@ const OMIT_SIDES_FOR_LINE_BACKSLASH = {
   rotation: true,
 };
 
-const generateHandler = (
+const generateTransformHandle = (
   x: number,
   y: number,
   width: number,
@@ -59,24 +70,24 @@ const generateHandler = (
   cx: number,
   cy: number,
   angle: number,
-): [number, number, number, number] => {
+): TransformHandle => {
   const [xx, yy] = rotate(x + width / 2, y + height / 2, cx, cy, angle);
   return [xx - width / 2, yy - height / 2, width, height];
 };
 
-export const handlerRectanglesFromCoords = (
+export const getTransformHandlesFromCoords = (
   [x1, y1, x2, y2]: Bounds,
   angle: number,
   zoom: number,
-  pointerType: PointerType = "mouse",
-  omitSides: { [T in Sides]?: boolean } = {},
-): Handlers => {
-  const size = handleSizes[pointerType];
-  const handlerWidth = size / zoom;
-  const handlerHeight = size / zoom;
+  pointerType: PointerType = "touch",
+  omitSides: { [T in TransformHandleType]?: boolean } = {},
+): TransformHandles => {
+  const size = transformHandleSizes[pointerType];
+  const handleWidth = size / zoom;
+  const handleHeight = size / zoom;
 
-  const handlerMarginX = size / zoom;
-  const handlerMarginY = size / zoom;
+  const handleMarginX = size / zoom;
+  const handleMarginY = size / zoom;
 
   const width = x2 - x1;
   const height = y2 - y1;
@@ -85,116 +96,114 @@ export const handlerRectanglesFromCoords = (
 
   const dashedLineMargin = 4 / zoom;
 
-  const centeringOffset = (size - 8) / (2 * zoom);
+  const centeringOffset = 0;
 
-  const handlers: Partial<
-    { [T in Sides]: [number, number, number, number] }
-  > = {
+  const transformHandles: TransformHandles = {
     nw: omitSides["nw"]
       ? undefined
-      : generateHandler(
-          x1 - dashedLineMargin - handlerMarginX + centeringOffset,
-          y1 - dashedLineMargin - handlerMarginY + centeringOffset,
-          handlerWidth,
-          handlerHeight,
+      : generateTransformHandle(
+          x1 - dashedLineMargin - handleMarginX + centeringOffset,
+          y1 - dashedLineMargin - handleMarginY + centeringOffset,
+          handleWidth,
+          handleHeight,
           cx,
           cy,
           angle,
         ),
     ne: omitSides["ne"]
       ? undefined
-      : generateHandler(
+      : generateTransformHandle(
           x2 + dashedLineMargin - centeringOffset,
-          y1 - dashedLineMargin - handlerMarginY + centeringOffset,
-          handlerWidth,
-          handlerHeight,
+          y1 - dashedLineMargin - handleMarginY + centeringOffset,
+          handleWidth,
+          handleHeight,
           cx,
           cy,
           angle,
         ),
     sw: omitSides["sw"]
       ? undefined
-      : generateHandler(
-          x1 - dashedLineMargin - handlerMarginX + centeringOffset,
+      : generateTransformHandle(
+          x1 - dashedLineMargin - handleMarginX + centeringOffset,
           y2 + dashedLineMargin - centeringOffset,
-          handlerWidth,
-          handlerHeight,
+          handleWidth,
+          handleHeight,
           cx,
           cy,
           angle,
         ),
     se: omitSides["se"]
       ? undefined
-      : generateHandler(
+      : generateTransformHandle(
           x2 + dashedLineMargin - centeringOffset,
           y2 + dashedLineMargin - centeringOffset,
-          handlerWidth,
-          handlerHeight,
+          handleWidth,
+          handleHeight,
           cx,
           cy,
           angle,
         ),
     rotation: omitSides["rotation"]
       ? undefined
-      : generateHandler(
-          x1 + width / 2 - handlerWidth / 2,
+      : generateTransformHandle(
+          x1 + width / 2 - handleWidth / 2,
           y1 -
             dashedLineMargin -
-            handlerMarginY +
+            handleMarginY +
             centeringOffset -
-            ROTATION_HANDLER_GAP / zoom,
-          handlerWidth,
-          handlerHeight,
+            ROTATION_RESIZE_HANDLE_GAP / zoom,
+          handleWidth,
+          handleHeight,
           cx,
           cy,
           angle,
         ),
   };
 
-  // We only want to show height handlers (all cardinal directions)  above a certain size
-  const minimumSizeForEightHandlers = (5 * size) / zoom;
-  if (Math.abs(width) > minimumSizeForEightHandlers) {
+  // We only want to show height handles (all cardinal directions)  above a certain size
+  const minimumSizeForEightHandles = (5 * size) / zoom;
+  if (Math.abs(width) > minimumSizeForEightHandles) {
     if (!omitSides["n"]) {
-      handlers["n"] = generateHandler(
-        x1 + width / 2 - handlerWidth / 2,
-        y1 - dashedLineMargin - handlerMarginY + centeringOffset,
-        handlerWidth,
-        handlerHeight,
+      transformHandles["n"] = generateTransformHandle(
+        x1 + width / 2 - handleWidth / 2,
+        y1 - dashedLineMargin - handleMarginY + centeringOffset,
+        handleWidth,
+        handleHeight,
         cx,
         cy,
         angle,
       );
     }
     if (!omitSides["s"]) {
-      handlers["s"] = generateHandler(
-        x1 + width / 2 - handlerWidth / 2,
+      transformHandles["s"] = generateTransformHandle(
+        x1 + width / 2 - handleWidth / 2,
         y2 + dashedLineMargin - centeringOffset,
-        handlerWidth,
-        handlerHeight,
+        handleWidth,
+        handleHeight,
         cx,
         cy,
         angle,
       );
     }
   }
-  if (Math.abs(height) > minimumSizeForEightHandlers) {
+  if (Math.abs(height) > minimumSizeForEightHandles) {
     if (!omitSides["w"]) {
-      handlers["w"] = generateHandler(
-        x1 - dashedLineMargin - handlerMarginX + centeringOffset,
-        y1 + height / 2 - handlerHeight / 2,
-        handlerWidth,
-        handlerHeight,
+      transformHandles["w"] = generateTransformHandle(
+        x1 - dashedLineMargin - handleMarginX + centeringOffset,
+        y1 + height / 2 - handleHeight / 2,
+        handleWidth,
+        handleHeight,
         cx,
         cy,
         angle,
       );
     }
     if (!omitSides["e"]) {
-      handlers["e"] = generateHandler(
+      transformHandles["e"] = generateTransformHandle(
         x2 + dashedLineMargin - centeringOffset,
-        y1 + height / 2 - handlerHeight / 2,
-        handlerWidth,
-        handlerHeight,
+        y1 + height / 2 - handleHeight / 2,
+        handleWidth,
+        handleHeight,
         cx,
         cy,
         angle,
@@ -202,15 +211,15 @@ export const handlerRectanglesFromCoords = (
     }
   }
 
-  return handlers;
+  return transformHandles;
 };
 
-export const handlerRectangles = (
+export const getTransformHandles = (
   element: ExcalidrawElement,
   zoom: number,
-  pointerType: PointerType = "mouse",
-) => {
-  let omitSides: { [T in Sides]?: boolean } = {};
+  pointerType: PointerType = "touch",
+): TransformHandles => {
+  let omitSides: { [T in TransformHandleType]?: boolean } = {};
   if (
     element.type === "arrow" ||
     element.type === "line" ||
@@ -235,7 +244,7 @@ export const handlerRectangles = (
     omitSides = OMIT_SIDES_FOR_TEXT_ELEMENT;
   }
 
-  return handlerRectanglesFromCoords(
+  return getTransformHandlesFromCoords(
     getElementAbsoluteCoords(element),
     element.angle,
     zoom,

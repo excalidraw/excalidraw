@@ -9,7 +9,6 @@ import {
   newElement,
   newTextElement,
   duplicateElement,
-  resizeTest,
   isInvisiblySmallElement,
   isTextElement,
   textWysiwyg,
@@ -22,10 +21,10 @@ import {
   getSyncableElements,
   newLinearElement,
   resizeElements,
-  getElementWithResizeHandler,
+  getElementWithTransformHandleType,
   getResizeOffsetXY,
   getResizeArrowDirection,
-  getResizeHandlerFromCoords,
+  getTransformHandleTypeFromCoords,
   isNonDeletedElement,
   updateTextElement,
   dragSelectedElements,
@@ -176,6 +175,7 @@ import {
   isLinearElementSimpleAndAlreadyBound,
   isBindingEnabled,
 } from "../element/binding";
+import { MaybeTransformHandleType } from "../element/transformHandles";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -221,7 +221,7 @@ type PointerDownState = Readonly<{
   lastCoords: { x: number; y: number };
   resize: {
     // Handle when resizing, might change during the pointer interaction
-    handle: ReturnType<typeof resizeTest>;
+    handleType: MaybeTransformHandleType;
     // This is determined on the initial pointer down event
     isResizing: boolean;
     // This is determined on the initial pointer down event
@@ -2057,7 +2057,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       !isOverScrollBar &&
       !this.state.editingLinearElement
     ) {
-      const elementWithResizeHandler = getElementWithResizeHandler(
+      const elementWithTransformHandleType = getElementWithTransformHandleType(
         elements,
         this.state,
         scenePointerX,
@@ -2065,23 +2065,26 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         this.state.zoom,
         event.pointerType,
       );
-      if (elementWithResizeHandler && elementWithResizeHandler.resizeHandle) {
+      if (
+        elementWithTransformHandleType &&
+        elementWithTransformHandleType.transformHandleType
+      ) {
         document.documentElement.style.cursor = getCursorForResizingElement(
-          elementWithResizeHandler,
+          elementWithTransformHandleType,
         );
         return;
       }
     } else if (selectedElements.length > 1 && !isOverScrollBar) {
-      const resizeHandle = getResizeHandlerFromCoords(
+      const transformHandleType = getTransformHandleTypeFromCoords(
         getCommonBounds(selectedElements),
         scenePointerX,
         scenePointerY,
         this.state.zoom,
         event.pointerType,
       );
-      if (resizeHandle) {
+      if (transformHandleType) {
         document.documentElement.style.cursor = getCursorForResizingElement({
-          resizeHandle,
+          transformHandleType,
         });
         return;
       }
@@ -2363,7 +2366,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       // we need to duplicate because we'll be updating this state
       lastCoords: { ...origin },
       resize: {
-        handle: false as ReturnType<typeof resizeTest>,
+        handleType: false,
         isResizing: false,
         offset: { x: 0, y: 0 },
         arrowDirection: "origin",
@@ -2446,7 +2449,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       const elements = this.scene.getElements();
       const selectedElements = getSelectedElements(elements, this.state);
       if (selectedElements.length === 1 && !this.state.editingLinearElement) {
-        const elementWithResizeHandler = getElementWithResizeHandler(
+        const elementWithTransformHandleType = getElementWithTransformHandleType(
           elements,
           this.state,
           pointerDownState.origin.x,
@@ -2454,15 +2457,15 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           this.state.zoom,
           event.pointerType,
         );
-        if (elementWithResizeHandler != null) {
+        if (elementWithTransformHandleType != null) {
           this.setState({
-            resizingElement: elementWithResizeHandler.element,
+            resizingElement: elementWithTransformHandleType.element,
           });
-          pointerDownState.resize.handle =
-            elementWithResizeHandler.resizeHandle;
+          pointerDownState.resize.handleType =
+            elementWithTransformHandleType.transformHandleType;
         }
       } else if (selectedElements.length > 1) {
-        pointerDownState.resize.handle = getResizeHandlerFromCoords(
+        pointerDownState.resize.handleType = getTransformHandleTypeFromCoords(
           getCommonBounds(selectedElements),
           pointerDownState.origin.x,
           pointerDownState.origin.y,
@@ -2470,14 +2473,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           event.pointerType,
         );
       }
-      if (pointerDownState.resize.handle) {
+      if (pointerDownState.resize.handleType) {
         document.documentElement.style.cursor = getCursorForResizingElement({
-          resizeHandle: pointerDownState.resize.handle,
+          transformHandleType: pointerDownState.resize.handleType,
         });
         pointerDownState.resize.isResizing = true;
         pointerDownState.resize.offset = tupleToCoors(
           getResizeOffsetXY(
-            pointerDownState.resize.handle,
+            pointerDownState.resize.handleType,
             selectedElements,
             pointerDownState.origin.x,
             pointerDownState.origin.y,
@@ -2489,7 +2492,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           selectedElements[0].points.length === 2
         ) {
           pointerDownState.resize.arrowDirection = getResizeArrowDirection(
-            pointerDownState.resize.handle,
+            pointerDownState.resize.handleType,
             selectedElements[0],
           );
         }
@@ -2794,13 +2797,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           this.scene.getElements(),
           this.state,
         );
-        const resizeHandle = pointerDownState.resize.handle;
+        const transformHandleType = pointerDownState.resize.handleType;
         this.setState({
           // TODO: rename this state field to "isScaling" to distinguish
           // it from the generic "isResizing" which includes scaling and
           // rotating
-          isResizing: resizeHandle && resizeHandle !== "rotation",
-          isRotating: resizeHandle === "rotation",
+          isResizing: transformHandleType && transformHandleType !== "rotation",
+          isRotating: transformHandleType === "rotation",
         });
         const [resizeX, resizeY] = getGridPoint(
           pointerCoords.x - pointerDownState.resize.offset.x,
@@ -2809,9 +2812,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         );
         if (
           resizeElements(
-            resizeHandle,
-            (newResizeHandle) => {
-              pointerDownState.resize.handle = newResizeHandle;
+            transformHandleType,
+            (newTransformHandle) => {
+              pointerDownState.resize.handleType = newTransformHandle;
             },
             selectedElements,
             pointerDownState.resize.arrowDirection,
