@@ -22,19 +22,33 @@ type _ExcalidrawElementBase = Readonly<{
   versionNonce: number;
   isDeleted: boolean;
   groupIds: readonly GroupId[];
+  boundElementIds: readonly ExcalidrawLinearElement["id"][] | null;
 }>;
 
 export type ExcalidrawSelectionElement = _ExcalidrawElementBase & {
   type: "selection";
 };
+
+export type ExcalidrawRectangleElement = _ExcalidrawElementBase & {
+  type: "rectangle";
+};
+
+export type ExcalidrawDiamondElement = _ExcalidrawElementBase & {
+  type: "diamond";
+};
+
+export type ExcalidrawEllipseElement = _ExcalidrawElementBase & {
+  type: "ellipse";
+};
+
 /**
  * These are elements that don't have any additional properties.
  */
 export type ExcalidrawGenericElement =
   | ExcalidrawSelectionElement
-  | (_ExcalidrawElementBase & {
-      type: "rectangle" | "diamond" | "ellipse";
-    });
+  | ExcalidrawRectangleElement
+  | ExcalidrawDiamondElement
+  | ExcalidrawEllipseElement;
 
 /**
  * ExcalidrawElement should be JSON serializable and (eventually) contain
@@ -63,11 +77,25 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     verticalAlign: VerticalAlign;
   }>;
 
+export type ExcalidrawBindableElement =
+  | ExcalidrawRectangleElement
+  | ExcalidrawDiamondElement
+  | ExcalidrawEllipseElement
+  | ExcalidrawTextElement;
+
+export type PointBinding = {
+  elementId: ExcalidrawBindableElement["id"];
+  focus: number;
+  gap: number;
+};
+
 export type ExcalidrawLinearElement = _ExcalidrawElementBase &
   Readonly<{
     type: "arrow" | "line" | "draw";
     points: readonly Point[];
     lastCommittedPoint: Point | null;
+    startBinding: PointBinding | null;
+    endBinding: PointBinding | null;
   }>;
 
 export type PointerType = "mouse" | "pen" | "touch";

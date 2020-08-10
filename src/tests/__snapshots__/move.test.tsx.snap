@@ -4,6 +4,7 @@ exports[`duplicate element on move when ALT is clicked rectangle 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
+  "boundElementIds": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 50,
@@ -28,6 +29,7 @@ exports[`duplicate element on move when ALT is clicked rectangle 2`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
+  "boundElementIds": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 50,
@@ -52,6 +54,7 @@ exports[`move element rectangle 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
+  "boundElementIds": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 50,

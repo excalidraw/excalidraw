@@ -9,7 +9,6 @@ import {
   newElement,
   newTextElement,
   duplicateElement,
-  resizeTest,
   isInvisiblySmallElement,
   isTextElement,
   textWysiwyg,
@@ -22,15 +21,16 @@ import {
   getSyncableElements,
   newLinearElement,
   resizeElements,
-  getElementWithResizeHandler,
+  getElementWithTransformHandleType,
   getResizeOffsetXY,
   getResizeArrowDirection,
-  getResizeHandlerFromCoords,
+  getTransformHandleTypeFromCoords,
   isNonDeletedElement,
   updateTextElement,
   dragSelectedElements,
   getDragOffsetXY,
   dragNewElement,
+  hitTest,
 } from "../element";
 import {
   getElementsWithinSelection,
@@ -60,6 +60,8 @@ import {
   ExcalidrawTextElement,
   NonDeleted,
   ExcalidrawGenericElement,
+  ExcalidrawLinearElement,
+  ExcalidrawBindableElement,
 } from "../element/types";
 
 import { distance2d, isPathALoop, getGridPoint } from "../math";
@@ -136,7 +138,13 @@ import { generateCollaborationLink, getCollaborationLinkData } from "../data";
 import { mutateElement, newElementWith } from "../element/mutateElement";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import { unstable_batchedUpdates } from "react-dom";
-import { isLinearElement } from "../element/typeChecks";
+import {
+  isLinearElement,
+  isLinearElementType,
+  isBindingElement,
+  isBindingElementType,
+  isBindableElement,
+} from "../element/typeChecks";
 import { actionFinalize, actionDeleteSelected } from "../actions";
 import {
   restoreUsernameFromLocalStorage,
@@ -154,6 +162,20 @@ import {
 } from "../groups";
 import { Library } from "../data/library";
 import Scene from "../scene/Scene";
+import {
+  getHoveredElementForBinding,
+  maybeBindLinearElement,
+  getEligibleElementsForBinding,
+  bindOrUnbindSelectedElements,
+  unbindLinearElements,
+  fixBindingsAfterDuplication,
+  maybeBindBindableElement,
+  getElligibleElementForBindingElementAtCoors,
+  fixBindingsAfterDeletion,
+  isLinearElementSimpleAndAlreadyBound,
+  isBindingEnabled,
+} from "../element/binding";
+import { MaybeTransformHandleType } from "../element/transformHandles";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -199,7 +221,7 @@ type PointerDownState = Readonly<{
   lastCoords: { x: number; y: number };
   resize: {
     // Handle when resizing, might change during the pointer interaction
-    handle: ReturnType<typeof resizeTest>;
+    handleType: MaybeTransformHandleType;
     // This is determined on the initial pointer down event
     isResizing: boolean;
     // This is determined on the initial pointer down event
@@ -407,6 +429,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private onBlur = withBatchedUpdates(() => {
     isHoldingSpace = false;
+    this.setState({ isBindingEnabled: true });
     this.saveDebounced();
     this.saveDebounced.flush();
   });
@@ -690,7 +713,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.broadcastScene(SCENE.UPDATE, /* syncAll */ true);
   }, SYNC_FULL_SCENE_INTERVAL_MS);
 
-  componentDidUpdate(prevProps: ExcalidrawProps) {
+  componentDidUpdate(prevProps: ExcalidrawProps, prevState: AppState) {
     const { width: prevWidth, height: prevHeight } = prevProps;
     const { width: currentWidth, height: currentHeight } = this.props;
     if (prevWidth !== currentWidth || prevHeight !== currentHeight) {
@@ -713,6 +736,25 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       setTimeout(() => {
         this.actionManager.executeAction(actionFinalize);
       });
+    }
+    const { multiElement } = prevState;
+    if (
+      prevState.elementType !== this.state.elementType &&
+      multiElement != null &&
+      isBindingEnabled(this.state) &&
+      isBindingElement(multiElement)
+    ) {
+      maybeBindLinearElement(
+        multiElement,
+        this.state,
+        this.scene,
+        tupleToCoors(
+          LinearElementEditor.getPointAtIndexGlobalCoordinates(
+            multiElement,
+            -1,
+          ),
+        ),
+      );
     }
 
     const cursorButton: {
@@ -950,25 +992,46 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const dy = y - elementsCenterY;
     const groupIdMap = new Map();
 
+    const oldIdToDuplicatedId = new Map();
     const newElements = clipboardElements.map((element) => {
-      return duplicateElement(this.state.editingGroupId, groupIdMap, element, {
-        x: element.x + dx - minX,
-        y: element.y + dy - minY,
-      });
+      const newElement = duplicateElement(
+        this.state.editingGroupId,
+        groupIdMap,
+        element,
+        {
+          x: element.x + dx - minX,
+          y: element.y + dy - minY,
+        },
+      );
+      oldIdToDuplicatedId.set(element.id, newElement.id);
+      return newElement;
     });
-
-    this.scene.replaceAllElements([
+    const nextElements = [
       ...this.scene.getElementsIncludingDeleted(),
       ...newElements,
-    ]);
+    ];
+    fixBindingsAfterDuplication(
+      nextElements,
+      clipboardElements,
+      oldIdToDuplicatedId,
+    );
+
+    this.scene.replaceAllElements(nextElements);
     history.resumeRecording();
-    this.setState({
-      isLibraryOpen: false,
-      selectedElementIds: newElements.reduce((map, element) => {
-        map[element.id] = true;
-        return map;
-      }, {} as any),
-    });
+    this.setState(
+      selectGroupsForSelectedElements(
+        {
+          ...this.state,
+          isLibraryOpen: false,
+          selectedElementIds: newElements.reduce((map, element) => {
+            map[element.id] = true;
+            return map;
+          }, {} as any),
+          selectedGroupIds: {},
+        },
+        this.scene.getElements(),
+      ),
+    );
   };
 
   private addTextFromPaste(text: any) {
@@ -1397,6 +1460,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (event[KEYS.CTRL_OR_CMD] && event.keyCode === KEYS.GRID_KEY_CODE) {
       this.toggleGridMode();
     }
+    if (event[KEYS.CTRL_OR_CMD]) {
+      this.setState({ isBindingEnabled: false });
+    }
 
     if (event.code === "KeyC" && event.altKey && event.shiftKey) {
       this.copyToClipboardAsPng();
@@ -1505,6 +1571,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
       isHoldingSpace = false;
     }
+    if (!event[KEYS.CTRL_OR_CMD] && !this.state.isBindingEnabled) {
+      this.setState({ isBindingEnabled: true });
+    }
   });
 
   private selectShapeTool(elementType: AppState["elementType"]) {
@@ -1513,6 +1582,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
     if (isToolIcon(document.activeElement)) {
       document.activeElement.blur();
+    }
+    if (!isLinearElementType(elementType)) {
+      this.setState({ suggestedBindings: [] });
     }
     if (elementType !== "selection") {
       this.setState({
@@ -1551,10 +1623,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     });
     gesture.initialScale = null;
   });
-
-  private setElements = (elements: readonly ExcalidrawElement[]) => {
-    this.scene.replaceAllElements(elements);
-  };
 
   private handleTextWysiwyg(
     element: ExcalidrawTextElement,
@@ -1606,6 +1674,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               [element.id]: true,
             },
           }));
+        } else {
+          fixBindingsAfterDeletion(this.scene.getElements(), [element]);
         }
         if (!isDeleted || isExistingElement) {
           history.resumeRecording();
@@ -1637,18 +1707,21 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     x: number,
     y: number,
   ): NonDeleted<ExcalidrawTextElement> | null {
-    const element = getElementAtPosition(
-      this.scene.getElements(),
-      this.state,
-      x,
-      y,
-      this.state.zoom,
-    );
+    const element = this.getElementAtPosition(x, y);
 
     if (element && isTextElement(element) && !element.isDeleted) {
       return element;
     }
     return null;
+  }
+
+  private getElementAtPosition(
+    x: number,
+    y: number,
+  ): NonDeleted<ExcalidrawElement> | null {
+    return getElementAtPosition(this.scene.getElements(), (element) =>
+      hitTest(element, this.state, x, y),
+    );
   }
 
   private startTextEditing = ({
@@ -1780,14 +1853,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const selectedGroupIds = getSelectedGroupIds(this.state);
 
     if (selectedGroupIds.length > 0) {
-      const elements = this.scene.getElements();
-      const hitElement = getElementAtPosition(
-        elements,
-        this.state,
-        sceneX,
-        sceneY,
-        this.state.zoom,
-      );
+      const hitElement = this.getElementAtPosition(sceneX, sceneY);
 
       const selectedGroupId =
         hitElement &&
@@ -1867,25 +1933,48 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
     }
 
-    const { x: scenePointerX, y: scenePointerY } = viewportCoordsToSceneCoords(
+    const scenePointer = viewportCoordsToSceneCoords(
       event,
       this.state,
       this.canvas,
       window.devicePixelRatio,
     );
+    const { x: scenePointerX, y: scenePointerY } = scenePointer;
 
     if (
       this.state.editingLinearElement &&
-      this.state.editingLinearElement.draggingElementPointIndex === null
+      !this.state.editingLinearElement.isDragging
     ) {
       const editingLinearElement = LinearElementEditor.handlePointerMove(
         event,
         scenePointerX,
         scenePointerY,
         this.state.editingLinearElement,
+        this.state.gridSize,
       );
       if (editingLinearElement !== this.state.editingLinearElement) {
         this.setState({ editingLinearElement });
+      }
+      if (editingLinearElement.lastUncommittedPoint != null) {
+        this.maybeSuggestBindingAtCursor(scenePointer);
+      } else {
+        this.setState({ suggestedBindings: [] });
+      }
+    }
+
+    if (isBindingElementType(this.state.elementType)) {
+      // Hovering with a selected tool or creating new linear element via click
+      // and point
+      const { draggingElement } = this.state;
+      if (isBindingElement(draggingElement)) {
+        this.maybeSuggestBindingForLinearElementAtCursor(
+          draggingElement,
+          "end",
+          scenePointer,
+          this.state.startBoundElement,
+        );
+      } else {
+        this.maybeSuggestBindingAtCursor(scenePointer);
       }
     }
 
@@ -1947,6 +2036,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           });
         }
       }
+
       return;
     }
 
@@ -1967,7 +2057,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       !isOverScrollBar &&
       !this.state.editingLinearElement
     ) {
-      const elementWithResizeHandler = getElementWithResizeHandler(
+      const elementWithTransformHandleType = getElementWithTransformHandleType(
         elements,
         this.state,
         scenePointerX,
@@ -1975,34 +2065,31 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         this.state.zoom,
         event.pointerType,
       );
-      if (elementWithResizeHandler && elementWithResizeHandler.resizeHandle) {
+      if (
+        elementWithTransformHandleType &&
+        elementWithTransformHandleType.transformHandleType
+      ) {
         document.documentElement.style.cursor = getCursorForResizingElement(
-          elementWithResizeHandler,
+          elementWithTransformHandleType,
         );
         return;
       }
     } else if (selectedElements.length > 1 && !isOverScrollBar) {
-      const resizeHandle = getResizeHandlerFromCoords(
+      const transformHandleType = getTransformHandleTypeFromCoords(
         getCommonBounds(selectedElements),
         scenePointerX,
         scenePointerY,
         this.state.zoom,
         event.pointerType,
       );
-      if (resizeHandle) {
+      if (transformHandleType) {
         document.documentElement.style.cursor = getCursorForResizingElement({
-          resizeHandle,
+          transformHandleType,
         });
         return;
       }
     }
-    const hitElement = getElementAtPosition(
-      elements,
-      this.state,
-      scenePointerX,
-      scenePointerY,
-      this.state.zoom,
-    );
+    const hitElement = this.getElementAtPosition(scenePointerX, scenePointerY);
     if (this.state.elementType === "text") {
       document.documentElement.style.cursor = isTextElement(hitElement)
         ? CURSOR_TYPE.TEXT
@@ -2279,7 +2366,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       // we need to duplicate because we'll be updating this state
       lastCoords: { ...origin },
       resize: {
-        handle: false as ReturnType<typeof resizeTest>,
+        handleType: false,
         isResizing: false,
         offset: { x: 0, y: 0 },
         arrowDirection: "origin",
@@ -2321,24 +2408,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         return;
       }
 
-      if (pointerDownState.scrollbars.isOverHorizontal) {
-        const x = event.clientX;
-        const dx = x - pointerDownState.lastCoords.x;
-        this.setState({
-          scrollX: normalizeScroll(this.state.scrollX - dx / this.state.zoom),
-        });
-        pointerDownState.lastCoords.x = x;
-        return;
-      }
-
-      if (pointerDownState.scrollbars.isOverVertical) {
-        const y = event.clientY;
-        const dy = y - pointerDownState.lastCoords.y;
-        this.setState({
-          scrollY: normalizeScroll(this.state.scrollY - dy / this.state.zoom),
-        });
-        pointerDownState.lastCoords.y = y;
-      }
+      this.handlePointerMoveOverScrollbars(event, pointerDownState);
     });
 
     const onPointerUp = withBatchedUpdates(() => {
@@ -2379,7 +2449,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       const elements = this.scene.getElements();
       const selectedElements = getSelectedElements(elements, this.state);
       if (selectedElements.length === 1 && !this.state.editingLinearElement) {
-        const elementWithResizeHandler = getElementWithResizeHandler(
+        const elementWithTransformHandleType = getElementWithTransformHandleType(
           elements,
           this.state,
           pointerDownState.origin.x,
@@ -2387,15 +2457,15 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           this.state.zoom,
           event.pointerType,
         );
-        if (elementWithResizeHandler != null) {
+        if (elementWithTransformHandleType != null) {
           this.setState({
-            resizingElement: elementWithResizeHandler.element,
+            resizingElement: elementWithTransformHandleType.element,
           });
-          pointerDownState.resize.handle =
-            elementWithResizeHandler.resizeHandle;
+          pointerDownState.resize.handleType =
+            elementWithTransformHandleType.transformHandleType;
         }
       } else if (selectedElements.length > 1) {
-        pointerDownState.resize.handle = getResizeHandlerFromCoords(
+        pointerDownState.resize.handleType = getTransformHandleTypeFromCoords(
           getCommonBounds(selectedElements),
           pointerDownState.origin.x,
           pointerDownState.origin.y,
@@ -2403,14 +2473,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           event.pointerType,
         );
       }
-      if (pointerDownState.resize.handle) {
+      if (pointerDownState.resize.handleType) {
         document.documentElement.style.cursor = getCursorForResizingElement({
-          resizeHandle: pointerDownState.resize.handle,
+          transformHandleType: pointerDownState.resize.handleType,
         });
         pointerDownState.resize.isResizing = true;
         pointerDownState.resize.offset = tupleToCoors(
           getResizeOffsetXY(
-            pointerDownState.resize.handle,
+            pointerDownState.resize.handleType,
             selectedElements,
             pointerDownState.origin.x,
             pointerDownState.origin.y,
@@ -2422,7 +2492,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           selectedElements[0].points.length === 2
         ) {
           pointerDownState.resize.arrowDirection = getResizeArrowDirection(
-            pointerDownState.resize.handle,
+            pointerDownState.resize.handleType,
             selectedElements[0],
           );
         }
@@ -2433,8 +2503,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             this.state,
             (appState) => this.setState(appState),
             history,
-            pointerDownState.origin.x,
-            pointerDownState.origin.y,
+            pointerDownState.origin,
           );
           if (ret.hitElement) {
             pointerDownState.hit.element = ret.hitElement;
@@ -2447,12 +2516,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         // hitElement may already be set above, so check first
         pointerDownState.hit.element =
           pointerDownState.hit.element ??
-          getElementAtPosition(
-            elements,
-            this.state,
+          this.getElementAtPosition(
             pointerDownState.origin.x,
             pointerDownState.origin.y,
-            this.state.zoom,
           );
 
         this.maybeClearSelectionWhenHittingElement(
@@ -2537,7 +2603,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private handleLinearElementOnPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
-    elementType: "draw" | "line" | "arrow",
+    elementType: ExcalidrawLinearElement["type"],
     pointerDownState: PointerDownState,
   ): void => {
     if (this.state.multiElement) {
@@ -2609,6 +2675,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       mutateElement(element, {
         points: [...element.points, [0, 0]],
       });
+      const boundElement = getHoveredElementForBinding(
+        pointerDownState.origin,
+        this.scene,
+      );
       this.scene.replaceAllElements([
         ...this.scene.getElementsIncludingDeleted(),
         element,
@@ -2616,6 +2686,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.setState({
         draggingElement: element,
         editingElement: element,
+        startBoundElement: boundElement,
+        suggestedBindings: [],
       });
     }
   };
@@ -2683,33 +2755,21 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         return;
       }
 
-      if (pointerDownState.scrollbars.isOverHorizontal) {
-        const x = event.clientX;
-        const dx = x - pointerDownState.lastCoords.x;
-        this.setState({
-          scrollX: normalizeScroll(this.state.scrollX - dx / this.state.zoom),
-        });
-        pointerDownState.lastCoords.x = x;
+      if (this.handlePointerMoveOverScrollbars(event, pointerDownState)) {
         return;
       }
 
-      if (pointerDownState.scrollbars.isOverVertical) {
-        const y = event.clientY;
-        const dy = y - pointerDownState.lastCoords.y;
-        this.setState({
-          scrollY: normalizeScroll(this.state.scrollY - dy / this.state.zoom),
-        });
-        pointerDownState.lastCoords.y = y;
-        return;
-      }
-
-      const { x, y } = viewportCoordsToSceneCoords(
+      const pointerCoords = viewportCoordsToSceneCoords(
         event,
         this.state,
         this.canvas,
         window.devicePixelRatio,
       );
-      const [gridX, gridY] = getGridPoint(x, y, this.state.gridSize);
+      const [gridX, gridY] = getGridPoint(
+        pointerCoords.x,
+        pointerCoords.y,
+        this.state.gridSize,
+      );
 
       // for arrows/lines, don't start dragging until a given threshold
       //  to ensure we don't create a 2-point arrow by mistake when
@@ -2722,8 +2782,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       ) {
         if (
           distance2d(
-            x,
-            y,
+            pointerCoords.x,
+            pointerCoords.y,
             pointerDownState.origin.x,
             pointerDownState.origin.y,
           ) < DRAGGING_THRESHOLD
@@ -2737,24 +2797,24 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           this.scene.getElements(),
           this.state,
         );
-        const resizeHandle = pointerDownState.resize.handle;
+        const transformHandleType = pointerDownState.resize.handleType;
         this.setState({
           // TODO: rename this state field to "isScaling" to distinguish
           // it from the generic "isResizing" which includes scaling and
           // rotating
-          isResizing: resizeHandle && resizeHandle !== "rotation",
-          isRotating: resizeHandle === "rotation",
+          isResizing: transformHandleType && transformHandleType !== "rotation",
+          isRotating: transformHandleType === "rotation",
         });
         const [resizeX, resizeY] = getGridPoint(
-          x - pointerDownState.resize.offset.x,
-          y - pointerDownState.resize.offset.y,
+          pointerCoords.x - pointerDownState.resize.offset.x,
+          pointerCoords.y - pointerDownState.resize.offset.y,
           this.state.gridSize,
         );
         if (
           resizeElements(
-            resizeHandle,
-            (newResizeHandle) => {
-              pointerDownState.resize.handle = newResizeHandle;
+            transformHandleType,
+            (newTransformHandle) => {
+              pointerDownState.resize.handleType = newTransformHandle;
             },
             selectedElements,
             pointerDownState.resize.arrowDirection,
@@ -2768,6 +2828,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             pointerDownState.resize.originalElements,
           )
         ) {
+          this.maybeSuggestBindingForAll(selectedElements);
           return;
         }
       }
@@ -2776,15 +2837,20 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         const didDrag = LinearElementEditor.handlePointDragging(
           this.state,
           (appState) => this.setState(appState),
-          x,
-          y,
-          pointerDownState.lastCoords.x,
-          pointerDownState.lastCoords.y,
+          pointerCoords.x,
+          pointerCoords.y,
+          (element, startOrEnd) => {
+            this.maybeSuggestBindingForLinearElementAtCursor(
+              element,
+              startOrEnd,
+              pointerCoords,
+            );
+          },
         );
 
         if (didDrag) {
-          pointerDownState.lastCoords.x = x;
-          pointerDownState.lastCoords.y = y;
+          pointerDownState.lastCoords.x = pointerCoords.x;
+          pointerDownState.lastCoords.y = pointerCoords.y;
           return;
         }
       }
@@ -2800,11 +2866,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         );
         if (selectedElements.length > 0) {
           const [dragX, dragY] = getGridPoint(
-            x - pointerDownState.drag.offset.x,
-            y - pointerDownState.drag.offset.y,
+            pointerCoords.x - pointerDownState.drag.offset.x,
+            pointerCoords.y - pointerDownState.drag.offset.y,
             this.state.gridSize,
           );
-          dragSelectedElements(selectedElements, dragX, dragY);
+          dragSelectedElements(selectedElements, dragX, dragY, this.scene);
+          this.maybeSuggestBindingForAll(selectedElements);
 
           // We duplicate the selected element if alt is pressed on pointer move
           if (event.altKey && !pointerDownState.hit.hasBeenDuplicated) {
@@ -2817,6 +2884,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             const nextElements = [];
             const elementsToAppend = [];
             const groupIdMap = new Map();
+            const oldIdToDuplicatedId = new Map();
             for (const element of this.scene.getElementsIncludingDeleted()) {
               if (
                 this.state.selectedElementIds[element.id] ||
@@ -2841,14 +2909,19 @@ class App extends React.Component<ExcalidrawProps, AppState> {
                 });
                 nextElements.push(duplicatedElement);
                 elementsToAppend.push(element);
+                oldIdToDuplicatedId.set(element.id, duplicatedElement.id);
               } else {
                 nextElements.push(element);
               }
             }
-            this.scene.replaceAllElements([
-              ...nextElements,
-              ...elementsToAppend,
-            ]);
+            const nextSceneElements = [...nextElements, ...elementsToAppend];
+            fixBindingsAfterDuplication(
+              nextSceneElements,
+              elementsToAppend,
+              oldIdToDuplicatedId,
+              "duplicatesServeAsOld",
+            );
+            this.scene.replaceAllElements(nextSceneElements);
           }
           return;
         }
@@ -2867,8 +2940,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         let dx: number;
         let dy: number;
         if (draggingElement.type === "draw") {
-          dx = x - draggingElement.x;
-          dy = y - draggingElement.y;
+          dx = pointerCoords.x - draggingElement.x;
+          dy = pointerCoords.y - draggingElement.y;
         } else {
           dx = gridX - draggingElement.x;
           dy = gridY - draggingElement.y;
@@ -2887,7 +2960,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         } else if (points.length > 1) {
           if (draggingElement.type === "draw") {
             mutateElement(draggingElement, {
-              points: simplify([...(points as Point[]), [dx, dy]], 0.7),
+              points: simplify(
+                [...(points as Point[]), [dx, dy]],
+                0.7 / this.state.zoom,
+              ),
             });
           } else {
             mutateElement(draggingElement, {
@@ -2895,16 +2971,25 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             });
           }
         }
+        if (isBindingElement(draggingElement)) {
+          // When creating a linear element by dragging
+          this.maybeSuggestBindingForLinearElementAtCursor(
+            draggingElement,
+            "end",
+            pointerCoords,
+            this.state.startBoundElement,
+          );
+        }
       } else if (draggingElement.type === "selection") {
         dragNewElement(
           draggingElement,
           this.state.elementType,
           pointerDownState.origin.x,
           pointerDownState.origin.y,
-          x,
-          y,
-          distance(pointerDownState.origin.x, x),
-          distance(pointerDownState.origin.y, y),
+          pointerCoords.x,
+          pointerCoords.y,
+          distance(pointerDownState.origin.x, pointerCoords.x),
+          distance(pointerDownState.origin.y, pointerCoords.y),
           getResizeWithSidesSameLengthKey(event),
           getResizeCenterPointKey(event),
         );
@@ -2921,6 +3006,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           getResizeWithSidesSameLengthKey(event),
           getResizeCenterPointKey(event),
         );
+        this.maybeSuggestBindingForAll([draggingElement]);
       }
 
       if (this.state.elementType === "selection") {
@@ -2955,6 +3041,33 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     });
   }
 
+  // Returns whether the pointer move happened over either scrollbar
+  private handlePointerMoveOverScrollbars(
+    event: PointerEvent,
+    pointerDownState: PointerDownState,
+  ): boolean {
+    if (pointerDownState.scrollbars.isOverHorizontal) {
+      const x = event.clientX;
+      const dx = x - pointerDownState.lastCoords.x;
+      this.setState({
+        scrollX: normalizeScroll(this.state.scrollX - dx / this.state.zoom),
+      });
+      pointerDownState.lastCoords.x = x;
+      return true;
+    }
+
+    if (pointerDownState.scrollbars.isOverVertical) {
+      const y = event.clientY;
+      const dy = y - pointerDownState.lastCoords.y;
+      this.setState({
+        scrollY: normalizeScroll(this.state.scrollY - dy / this.state.zoom),
+      });
+      pointerDownState.lastCoords.y = y;
+      return true;
+    }
+    return false;
+  }
+
   private onPointerUpFromPointerDownHandler(
     pointerDownState: PointerDownState,
   ): (event: PointerEvent) => void {
@@ -2965,6 +3078,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         multiElement,
         elementType,
         elementLocked,
+        isResizing,
       } = this.state;
 
       this.setState({
@@ -2983,14 +3097,19 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
       this.savePointer(childEvent.clientX, childEvent.clientY, "up");
 
-      // if moving start/end point towards start/end point within threshold,
-      //  close the loop
+      // Handle end of dragging a point of a linear element, might close a loop
+      // and sets binding element
       if (this.state.editingLinearElement) {
         const editingLinearElement = LinearElementEditor.handlePointerUp(
+          childEvent,
           this.state.editingLinearElement,
+          this.state,
         );
         if (editingLinearElement !== this.state.editingLinearElement) {
-          this.setState({ editingLinearElement });
+          this.setState({
+            editingLinearElement,
+            suggestedBindings: [],
+          });
         }
       }
 
@@ -3013,21 +3132,24 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         if (draggingElement!.points.length > 1) {
           history.resumeRecording();
         }
+        const pointerCoords = viewportCoordsToSceneCoords(
+          childEvent,
+          this.state,
+          this.canvas,
+          window.devicePixelRatio,
+        );
         if (
           !pointerDownState.drag.hasOccurred &&
           draggingElement &&
           !multiElement
         ) {
-          const { x, y } = viewportCoordsToSceneCoords(
-            childEvent,
-            this.state,
-            this.canvas,
-            window.devicePixelRatio,
-          );
           mutateElement(draggingElement, {
             points: [
               ...draggingElement.points,
-              [x - draggingElement.x, y - draggingElement.y],
+              [
+                pointerCoords.x - draggingElement.x,
+                pointerCoords.y - draggingElement.y,
+              ],
             ],
           });
           this.setState({
@@ -3035,6 +3157,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             editingElement: this.state.draggingElement,
           });
         } else if (pointerDownState.drag.hasOccurred && !multiElement) {
+          if (
+            isBindingEnabled(this.state) &&
+            isBindingElement(draggingElement)
+          ) {
+            maybeBindLinearElement(
+              draggingElement,
+              this.state,
+              this.scene,
+              pointerCoords,
+            );
+          }
+          this.setState({ suggestedBindings: [], startBoundElement: null });
           if (!elementLocked) {
             resetCursor();
             this.setState((prevState) => ({
@@ -3078,6 +3212,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           draggingElement,
           getNormalizedDimensions(draggingElement),
         );
+
+        if (
+          isBindingEnabled(this.state) &&
+          isBindableElement(draggingElement)
+        ) {
+          maybeBindBindableElement(draggingElement);
+        }
       }
 
       if (resizingElement) {
@@ -3147,18 +3288,78 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         history.resumeRecording();
       }
 
+      if (pointerDownState.drag.hasOccurred || isResizing) {
+        (isBindingEnabled(this.state)
+          ? bindOrUnbindSelectedElements
+          : unbindLinearElements)(
+          getSelectedElements(this.scene.getElements(), this.state),
+        );
+      }
+
       if (!elementLocked) {
         resetCursor();
         this.setState({
           draggingElement: null,
+          suggestedBindings: [],
           elementType: "selection",
         });
       } else {
         this.setState({
           draggingElement: null,
+          suggestedBindings: [],
         });
       }
     });
+  }
+
+  private maybeSuggestBindingAtCursor = (pointerCoords: {
+    x: number;
+    y: number;
+  }): void => {
+    const hoveredBindableElement = getHoveredElementForBinding(
+      pointerCoords,
+      this.scene,
+    );
+    this.setState({
+      suggestedBindings:
+        hoveredBindableElement != null ? [hoveredBindableElement] : [],
+    });
+  };
+
+  private maybeSuggestBindingForLinearElementAtCursor = (
+    linearElement: NonDeleted<ExcalidrawLinearElement>,
+    startOrEnd: "start" | "end",
+    pointerCoords: {
+      x: number;
+      y: number;
+    },
+    // During line creation the start binding hasn't been written yet
+    // into `linearElement`
+    oppositeBindingBoundElement?: ExcalidrawBindableElement | null,
+  ): void => {
+    const hoveredBindableElement = getElligibleElementForBindingElementAtCoors(
+      linearElement,
+      startOrEnd,
+      pointerCoords,
+    );
+    this.setState({
+      suggestedBindings:
+        hoveredBindableElement != null &&
+        !isLinearElementSimpleAndAlreadyBound(
+          linearElement,
+          oppositeBindingBoundElement?.id,
+          hoveredBindableElement,
+        )
+          ? [hoveredBindableElement]
+          : [],
+    });
+  };
+
+  private maybeSuggestBindingForAll(
+    selectedElements: NonDeleted<ExcalidrawElement>[],
+  ): void {
+    const suggestedBindings = getEligibleElementsForBinding(selectedElements);
+    this.setState({ suggestedBindings });
   }
 
   private maybeClearSelectionWhenHittingElement(
@@ -3283,13 +3484,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     );
 
     const elements = this.scene.getElements();
-    const element = getElementAtPosition(
-      elements,
-      this.state,
-      x,
-      y,
-      this.state.zoom,
-    );
+    const element = this.getElementAtPosition(x, y);
     if (!element) {
       ContextMenu.push({
         options: [
