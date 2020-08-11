@@ -177,7 +177,8 @@
     "github": "Funne eit problem? Send inn",
     "textNewLine": "Legg til ny linje (tekst)",
     "textFinish": "Fullfør redigering (tekst)",
-    "zoomToFit": "Zoom for å sjå alle elementa"
+    "zoomToFit": "Zoom for å sjå alle elementa",
+    "preventBinding": "Hindre pilkobling"
   },
   "encrypted": {
     "tooltip": "Teikningane dine er ende-til-ende-krypterte slik at Excalidraw sine serverar aldri får sjå dei."
