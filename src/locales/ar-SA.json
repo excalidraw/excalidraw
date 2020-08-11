@@ -164,27 +164,27 @@
   },
   "shortcutsDialog": {
     "title": "اختصارات لوحة المفاتيح",
-    "shapes": "",
-    "or": "",
-    "click": "",
-    "drag": "",
-    "curvedArrow": "",
-    "curvedLine": "",
-    "editor": "",
-    "view": "",
-    "blog": "",
-    "howto": "",
-    "github": "",
-    "textNewLine": "",
-    "textFinish": "",
-    "zoomToFit": "",
-    "preventBinding": ""
+    "shapes": "الأشكال",
+    "or": "أو",
+    "click": "انقر فوق",
+    "drag": "اسحب",
+    "curvedArrow": "سهم منحنى",
+    "curvedLine": "خط منحنى",
+    "editor": "المحرر",
+    "view": "المشهد",
+    "blog": "إقرأ مدونتنا",
+    "howto": "اتبع دليلنا",
+    "github": "العثور على مشكلة؟ إرسال",
+    "textNewLine": "إضافة سطر جديد (نص)",
+    "textFinish": "الانتهاء من تحرير (النص)",
+    "zoomToFit": "تكبير لتلائم جميع العناصر",
+    "preventBinding": "منع ربط السهم"
   },
   "encrypted": {
-    "tooltip": ""
+    "tooltip": "رسوماتك مشفرة من النهاية إلى النهاية حتى أن خوادم Excalidraw لن تراها أبدا."
   },
   "charts": {
-    "noNumericColumn": "",
-    "tooManyColumns": ""
+    "noNumericColumn": "قمت بلصق جدول بيانات بدون عمود رقمي.",
+    "tooManyColumns": "قمت بلصق جدول بيانات بدون عمود رقمي."
   }
 }
