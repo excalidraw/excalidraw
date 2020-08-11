@@ -1218,11 +1218,8 @@ describe("regression tests", () => {
     mouse.down(0, 0);
     mouse.up(100, 100);
 
-    clickOnBoundingBoxButNotOnElement();
+    // click on bounding box but not on element
+    mouse.click(0, 0);
     expect(getSelectedElements().length).toBe(1);
-
-    function clickOnBoundingBoxButNotOnElement() {
-      mouse.click(0, 0);
-    }
   });
 });
