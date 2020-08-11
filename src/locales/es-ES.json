@@ -63,7 +63,7 @@
     "yourName": "Tu nombre",
     "madeWithExcalidraw": "Hecho con Excalidraw",
     "group": "Selección de grupo",
-    "ungroup": "Dividir selección",
+    "ungroup": "Desagrupar",
     "collaborators": "Colaboradores",
     "toggleGridMode": "Alternar modo cuadrícula",
     "addToLibrary": "Añadir a la biblioteca",
@@ -177,7 +177,8 @@
     "github": "¿Has encontrado un problema? Envíalo",
     "textNewLine": "Añadir nueva línea (texto)",
     "textFinish": "Finalizar edición (texto)",
-    "zoomToFit": "Ajustar para mostrar todos los elementos"
+    "zoomToFit": "Ajustar para mostrar todos los elementos",
+    "preventBinding": ""
   },
   "encrypted": {
     "tooltip": "Tus dibujos están cifrados de punto a punto, por lo que los servidores de Excalidraw nunca los verán."

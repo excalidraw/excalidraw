@@ -177,7 +177,8 @@
     "github": "发现问题？提交",
     "textNewLine": "文本换行",
     "textFinish": "完成编辑文本",
-    "zoomToFit": "缩放以适应所有元素"
+    "zoomToFit": "缩放以适应所有元素",
+    "preventBinding": ""
   },
   "encrypted": {
     "tooltip": "您的绘图采用的端到端加密，因此Excalidraw服务器永远不会收集。"
