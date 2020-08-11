@@ -45,20 +45,10 @@ export const hitTest = (
 ): boolean => {
   // How many pixels off the shape boundary we still consider a hit
   const threshold = 10 / appState.zoom;
+  const point: Point = [x, y];
 
-  if (appState.selectedElementIds[element.id]) {
-    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-    const cx = (x1 + x2) / 2;
-    const cy = (y1 + y2) / 2;
-    // reverse rotate the pointer
-    [x, y] = rotate(x, y, cx, cy, -element.angle);
-
-    const doCoordinatesHitElementBoundingBox =
-      x > x1 - threshold &&
-      x < x2 + threshold &&
-      y > y1 - threshold &&
-      y < y2 + threshold;
-    return doCoordinatesHitElementBoundingBox;
+  if (isElementSelected(appState, element)) {
+    return doesPointHitElementBoundingBox(element, point, threshold);
   }
 
   const check =
@@ -67,8 +57,37 @@ export const hitTest = (
       : isElementDraggableFromInside(element)
       ? isInsideCheck
       : isNearCheck;
-  const point: Point = [x, y];
   return hitTestPointAgainstElement({ element, point, threshold, check });
+};
+
+const isElementSelected = (
+  appState: AppState,
+  element: NonDeleted<ExcalidrawElement>,
+) => appState.selectedElementIds[element.id];
+
+const doesPointHitElementBoundingBox = (
+  element: NonDeleted<ExcalidrawElement>,
+  [x, y]: Point,
+  threshold: number,
+) => {
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const elementCenterX = (x1 + x2) / 2;
+  const elementCenterY = (y1 + y2) / 2;
+  // reverse rotate to take element's angle into account.
+  const [rotatedX, rotatedY] = rotate(
+    x,
+    y,
+    elementCenterX,
+    elementCenterY,
+    -element.angle,
+  );
+
+  return (
+    rotatedX > x1 - threshold &&
+    rotatedX < x2 + threshold &&
+    rotatedY > y1 - threshold &&
+    rotatedY < y2 + threshold
+  );
 };
 
 export const bindingBorderTest = (

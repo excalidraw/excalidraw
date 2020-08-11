@@ -6056,7 +6056,7 @@ exports[`regression tests hotkey x selects draw tool: [end of test] number of el
 
 exports[`regression tests hotkey x selects draw tool: [end of test] number of renders 1`] = `7`;
 
-exports[`regression tests keeps selected element selected when click hit's element bounding box but doesn't hit the element: [end of test] appState 1`] = `
+exports[`regression tests keeps selected element selected when click hits element bounding box but doesn't hit the element: [end of test] appState 1`] = `
 Object {
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
@@ -6120,7 +6120,7 @@ Object {
 }
 `;
 
-exports[`regression tests keeps selected element selected when click hit's element bounding box but doesn't hit the element: [end of test] element 0 1`] = `
+exports[`regression tests keeps selected element selected when click hits element bounding box but doesn't hit the element: [end of test] element 0 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -6145,7 +6145,7 @@ Object {
 }
 `;
 
-exports[`regression tests keeps selected element selected when click hit's element bounding box but doesn't hit the element: [end of test] history 1`] = `
+exports[`regression tests keeps selected element selected when click hits element bounding box but doesn't hit the element: [end of test] history 1`] = `
 Object {
   "recording": false,
   "redoStack": Array [],
@@ -6189,9 +6189,9 @@ Object {
 }
 `;
 
-exports[`regression tests keeps selected element selected when click hit's element bounding box but doesn't hit the element: [end of test] number of elements 1`] = `1`;
+exports[`regression tests keeps selected element selected when click hits element bounding box but doesn't hit the element: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests keeps selected element selected when click hit's element bounding box but doesn't hit the element: [end of test] number of renders 1`] = `9`;
+exports[`regression tests keeps selected element selected when click hits element bounding box but doesn't hit the element: [end of test] number of renders 1`] = `9`;
 
 exports[`regression tests make a group and duplicate it: [end of test] appState 1`] = `
 Object {
