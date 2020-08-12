@@ -2,7 +2,10 @@
 
 .RoomDialog-modalButton.is-collaborating {
   background-color: var(--button-special-active-background-color);
-  color: $oc-green-9;
+
+  .ToolIcon__icon svg {
+    color: var(--icon-green-fill-color);
+  }
 }
 
 .RoomDialog-modalButton-collaborators {
@@ -68,7 +71,8 @@
 .RoomDialog-stopSession {
   background-color: var(--button-destructive-background-color);
 
-  .ToolIcon__label {
+  .ToolIcon__label,
+  .ToolIcon__icon svg {
     color: var(--button-destructive-color);
   }
 }
