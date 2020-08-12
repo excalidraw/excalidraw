@@ -30,6 +30,9 @@
   --button-special-active-background-color: #{$oc-green-0};
   --button-destructive-color: #{$oc-red-9};
   --button-destructive-background-color: #{$oc-red-1};
+  --popup-secondary-background-color: #{$oc-gray-1};
+  --popup-text-color: #{$oc-black};
+  --popup-text-inverted-color: #{$oc-white};
 }
 
 .Appearance_dark {
@@ -55,4 +58,7 @@
   --button-special-active-background-color: #204624;
   --button-destructive-color: #{$oc-red-3};
   --button-destructive-background-color: #5a0000;
+  --popup-secondary-background-color: #222;
+  --popup-text-color: #{$oc-gray-4};
+  --popup-text-inverted-color: #2c2c2c;
 }
