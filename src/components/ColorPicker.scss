@@ -25,7 +25,7 @@
   height: 0px;
   border-style: solid;
   border-width: 0px 9px 10px;
-  border-color: transparent transparent $oc-white;
+  border-color: transparent transparent var(--popup-background-color);
   position: absolute;
   top: -10px;
   :root[dir="ltr"] & {
@@ -189,5 +189,25 @@
     left: 2px;
   }
   font-size: 0.7em;
-  color: var(--color-overlay-text-color);
+}
+
+.color-picker-type-canvasBackground .color-picker-keybinding {
+  color: #aaa;
+}
+
+.color-picker-type-elementBackground .color-picker-keybinding {
+  color: #fff;
+  .Appearance_dark & {
+    color: #000;
+  }
+}
+.color-picker-swatch[aria-label="transparent"] .color-picker-keybinding {
+  color: #aaa;
+  .Appearance_dark & {
+    color: #000;
+  }
+}
+
+.color-picker-type-elementStroke .color-picker-keybinding {
+  color: #d4d4d4;
 }
