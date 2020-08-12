@@ -29,6 +29,7 @@
     "fontFamily": "Font family",
     "onlySelected": "Only selected",
     "withBackground": "With Background",
+    "useDarkMode": "Dark",
     "addWatermark": "Add \"Made with Excalidraw\"",
     "handDrawn": "Hand-drawn",
     "normal": "Normal",

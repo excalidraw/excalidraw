@@ -43,6 +43,28 @@ export const actionChangeExportBackground = register({
   ),
 });
 
+export const actionChangeExportAppearance = register({
+  name: "changeExportAppearance",
+  perform: (_elements, appState, value) => {
+    return {
+      appState: { ...appState, exportAppearance: value },
+      commitToHistory: false,
+    };
+  },
+  PanelComponent: ({ appState, updateData }) => (
+    <label>
+      <input
+        type="checkbox"
+        checked={appState.exportAppearance === "match"}
+        onChange={(event) =>
+          updateData(event.target.checked ? "match" : "light")
+        }
+      />{" "}
+      {t("labels.useDarkMode")}
+    </label>
+  ),
+});
+
 export const actionChangeShouldAddWatermark = register({
   name: "changeShouldAddWatermark",
   perform: (_elements, appState, value) => {

@@ -44,6 +44,7 @@ export type AppState = {
   editingLinearElement: LinearElementEditor | null;
   elementType: typeof SHAPES[number]["value"];
   elementLocked: boolean;
+  exportAppearance: "match" | "light";
   exportBackground: boolean;
   shouldAddWatermark: boolean;
   currentItemStrokeColor: string;
