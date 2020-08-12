@@ -6102,6 +6102,7 @@ exports[`regression tests hotkey x selects draw tool: [end of test] number of re
 
 exports[`regression tests keeps selected element selected when click hits element bounding box but doesn't hit the element: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -6262,6 +6263,7 @@ Object {
   "elementLocked": false,
   "elementType": "selection",
   "errorMessage": null,
+  "exportAppearance": "match",
   "exportBackground": true,
   "gridSize": null,
   "height": 768,
