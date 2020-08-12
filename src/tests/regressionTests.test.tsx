@@ -1222,4 +1222,29 @@ describe("regression tests", () => {
     mouse.click(0, 0);
     expect(getSelectedElements().length).toBe(1);
   });
+
+  it("clicking on common bounding box of selected elements without click on an element deselects all elements", () => {
+    clickTool("rectangle");
+    mouse.down();
+    mouse.up(10, 10);
+
+    clickTool("ellipse");
+    mouse.down(100, 100);
+    mouse.up(10, 10);
+
+    // Selects first element without deselecting the second element
+    // Second created element is already selected because creating it was our last action
+    mouse.reset();
+    withModifierKeys({ shift: true }, () => {
+      mouse.click(5, 5);
+    });
+
+    expect(getSelectedElements().length).toBe(2);
+
+    // Click on selected elements' common bounding box without clicking on any of the elements
+    mouse.reset();
+    mouse.click(50, 50);
+
+    expect(getSelectedElements().length).toBe(0);
+  });
 });
