@@ -26,7 +26,7 @@ const ShortcutIsland = (props: {
   caption: string;
   children: React.ReactNode;
 }) => (
-  <div className="ShorcutsDialog-island">
+  <div className="ShortcutsDialog-island">
     <h3 className="ShortcutsDialog-island-title">{props.caption}</h3>
     {props.children}
   </div>
