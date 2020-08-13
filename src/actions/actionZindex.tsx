@@ -10,10 +10,10 @@ import { t } from "../i18n";
 import { getShortcutKey } from "../utils";
 import { register } from "./register";
 import {
-  sendBackward,
-  bringToFront,
-  sendToBack,
-  bringForward,
+  SendBackwardIcon,
+  BringToFrontIcon,
+  SendToBackIcon,
+  BringForwardIcon,
 } from "../components/icons";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
@@ -86,14 +86,14 @@ export const actionSendBackward = register({
   keyPriority: 40,
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] && !event.shiftKey && event.code === "BracketLeft",
-  PanelComponent: ({ updateData }) => (
+  PanelComponent: ({ updateData, appState }) => (
     <button
       type="button"
       className="zIndexButton"
       onClick={() => updateData(null)}
       title={`${t("labels.sendBackward")} — ${getShortcutKey("CtrlOrCmd+[")}`}
     >
-      {sendBackward}
+      <SendBackwardIcon appearance={appState.appearance} />
     </button>
   ),
 });
@@ -111,14 +111,14 @@ export const actionBringForward = register({
   keyPriority: 40,
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] && !event.shiftKey && event.code === "BracketRight",
-  PanelComponent: ({ updateData }) => (
+  PanelComponent: ({ updateData, appState }) => (
     <button
       type="button"
       className="zIndexButton"
       onClick={() => updateData(null)}
       title={`${t("labels.bringForward")} — ${getShortcutKey("CtrlOrCmd+]")}`}
     >
-      {bringForward}
+      <BringForwardIcon appearance={appState.appearance} />
     </button>
   ),
 });
@@ -140,7 +140,7 @@ export const actionSendToBack = register({
           event.shiftKey &&
           event.code === "BracketLeft";
   },
-  PanelComponent: ({ updateData }) => (
+  PanelComponent: ({ updateData, appState }) => (
     <button
       type="button"
       className="zIndexButton"
@@ -151,7 +151,7 @@ export const actionSendToBack = register({
           : getShortcutKey("CtrlOrCmd+Shift+[")
       }`}
     >
-      {sendToBack}
+      <SendToBackIcon appearance={appState.appearance} />
     </button>
   ),
 });
@@ -173,7 +173,7 @@ export const actionBringToFront = register({
           event.shiftKey &&
           event.code === "BracketRight";
   },
-  PanelComponent: ({ updateData }) => (
+  PanelComponent: ({ updateData, appState }) => (
     <button
       type="button"
       className="zIndexButton"
@@ -184,7 +184,7 @@ export const actionBringToFront = register({
           : getShortcutKey("CtrlOrCmd+Shift+]")
       }`}
     >
-      {bringToFront}
+      <BringToFrontIcon appearance={appState.appearance} />
     </button>
   ),
 });

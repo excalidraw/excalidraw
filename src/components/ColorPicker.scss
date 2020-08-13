@@ -1,7 +1,7 @@
 @import "open-color/open-color.scss";
 
 .color-picker {
-  background: $oc-white;
+  background: var(--popup-background-color);
   border: 0px solid transparentize($oc-white, 0.75);
   box-shadow: transparentize($oc-black, 0.75) 0px 1px 4px;
   border-radius: 4px;
@@ -25,7 +25,7 @@
   height: 0px;
   border-style: solid;
   border-width: 0px 9px 10px;
-  border-color: transparent transparent $oc-white;
+  border-color: transparent transparent var(--popup-background-color);
   position: absolute;
   top: -10px;
   :root[dir="ltr"] & {
@@ -62,12 +62,13 @@
   box-sizing: border-box;
   border: 1px solid #ddd;
   background-color: currentColor !important;
+  filter: var(--appearance-filter);
 }
 
 .color-picker-swatch:focus {
   /* TODO: only show the border when the color is too light to see as a shadow */
   box-shadow: 0 0 4px 1px currentColor;
-  border-color: $oc-blue-5;
+  border-color: var(--select-highlight-color);
 }
 
 .color-picker-transparent {
@@ -86,7 +87,7 @@
 }
 
 .color-picker-hash {
-  background: $oc-gray-3;
+  background: var(--input-border-color);
   height: 1.875rem;
   width: 1.875rem;
   :root[dir="ltr"] & {
@@ -95,14 +96,14 @@
   :root[dir="rtl"] & {
     border-radius: 0px 4px 4px 0px;
   }
-  color: $oc-gray-7;
+  color: var(--input-label-color);
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
 }
 .color-input-container:focus-within .color-picker-hash {
-  box-shadow: 0 0 0 2px $oc-blue-2;
+  box-shadow: 0 0 0 2px var(--focus-highlight-color);
 }
 .color-input-container:focus-within .color-picker-hash::before,
 .color-input-container:focus-within .color-picker-hash::after {
@@ -113,7 +114,7 @@
   top: 0;
 }
 .color-input-container:focus-within .color-picker-hash::before {
-  background: $oc-gray-3;
+  background: var(--input-border-color);
   :root[dir="ltr"] & {
     right: -1px;
   }
@@ -122,7 +123,7 @@
   }
 }
 .color-input-container:focus-within .color-picker-hash::after {
-  background: #fff;
+  background: var(--input-background-color);
   :root[dir="ltr"] & {
     right: -2px;
   }
@@ -139,11 +140,12 @@
   width: 12ch; /* length of `transparent` + 1 */
   margin: 0;
   font-size: 1rem;
-  color: $oc-gray-8;
+  background-color: var(--input-background-color);
+  color: var(--text-color-primary);
   border: 0px;
   outline: none;
   height: 1.75em;
-  box-shadow: $oc-gray-3 0px 0px 0px 1px inset;
+  box-shadow: var(--input-border-color) 0px 0px 0px 1px inset;
   :root[dir="ltr"] & {
     border-radius: 0px 4px 4px 0px;
   }
@@ -164,6 +166,7 @@
   position: relative;
   overflow: hidden;
   background-color: transparent !important;
+  filter: var(--appearance-filter);
 }
 
 .color-picker-label-swatch::after {
@@ -186,5 +189,25 @@
     left: 2px;
   }
   font-size: 0.7em;
-  color: #ccc;
+}
+
+.color-picker-type-canvasBackground .color-picker-keybinding {
+  color: #aaa;
+}
+
+.color-picker-type-elementBackground .color-picker-keybinding {
+  color: #fff;
+  .Appearance_dark & {
+    color: #000;
+  }
+}
+.color-picker-swatch[aria-label="transparent"] .color-picker-keybinding {
+  color: #aaa;
+  .Appearance_dark & {
+    color: #000;
+  }
+}
+
+.color-picker-type-elementStroke .color-picker-keybinding {
+  color: #d4d4d4;
 }

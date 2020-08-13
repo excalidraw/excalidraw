@@ -13,6 +13,7 @@ export const getDefaultAppState = (): Omit<
   "offsetTop" | "offsetLeft"
 > => {
   return {
+    appearance: "light",
     isLoading: false,
     errorMessage: null,
     draggingElement: null,
@@ -83,6 +84,7 @@ const APP_STATE_STORAGE_CONF = (<
 >(
   config: { [K in keyof T]: K extends keyof AppState ? T[K] : never },
 ) => config)({
+  appearance: { browser: true, export: false },
   collaborators: { browser: false, export: false },
   currentItemBackgroundColor: { browser: true, export: false },
   currentItemFillStyle: { browser: true, export: false },

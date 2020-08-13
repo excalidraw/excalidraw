@@ -13,6 +13,7 @@
 }
 
 .Dialog .Modal__close {
+  color: var(--icon-fill-color);
   margin: 0;
 }
 
@@ -34,11 +35,11 @@
     padding: calc(var(--space-factor) * 2);
     padding-left: var(--inset-left);
     padding-right: var(--inset-right);
-    background: white;
+    background: var(--bg-color-island);
     font-size: 1.25em;
 
     box-sizing: border-box;
-    border-bottom: 1px solid $oc-gray-4;
+    border-bottom: 1px solid var(--button-gray-2);
     z-index: 1;
   }
   .Dialog__titleContent {

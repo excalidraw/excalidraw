@@ -43,6 +43,7 @@ import { loadLibrary, saveLibrary } from "../data/localStorage";
 import { ToolButton } from "./ToolButton";
 import { saveLibraryAsJSON, importLibraryFromJSON } from "../data/json";
 import { muteFSAbortError } from "../utils";
+import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -372,7 +373,11 @@ const LayerUI = ({
               onRoomDestroy={onRoomDestroy}
             />
           </Stack.Row>
-          {actionManager.renderAction("changeViewBackgroundColor")}
+          <BackgroundPickerAndDarkModeToggle
+            actionManager={actionManager}
+            appState={appState}
+            setAppState={setAppState}
+          />
         </Stack.Col>
       </Island>
     </Section>
@@ -580,7 +585,7 @@ const LayerUI = ({
             zenModeEnabled && "transition-right"
           }`}
         >
-          <GitHubCorner />
+          <GitHubCorner appearance={appState.appearance} />
         </aside>
       }
       {renderFooter()}
