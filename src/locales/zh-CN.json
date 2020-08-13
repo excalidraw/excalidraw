@@ -95,6 +95,7 @@
     "roomDialog": "开始实时协作",
     "createNewRoom": "新建会议室",
     "toggleFullScreen": "切换全屏显示",
+    "toggleDarkMode": "",
     "toggleZenMode": "切换禅模式",
     "exitZenMode": "退出禅模式"
   },
