@@ -95,7 +95,7 @@
     "roomDialog": "Live-Kollaborationssitzung starten",
     "createNewRoom": "Neuen Raum erstellen",
     "toggleFullScreen": "Vollbild umschalten",
-    "toggleDarkMode": "",
+    "toggleDarkMode": "Dunkles Design umschalten",
     "toggleZenMode": "Zen-Modus umschalten",
     "exitZenMode": "Zen-Modus verlassen"
   },
