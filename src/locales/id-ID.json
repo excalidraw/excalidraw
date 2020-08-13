@@ -95,6 +95,7 @@
     "roomDialog": "Mulai kolaborasi secara langsung",
     "createNewRoom": "Buat ruang baru",
     "toggleFullScreen": "Aktif / Nonaktifkan layar penuh",
+    "toggleDarkMode": "",
     "toggleZenMode": "",
     "exitZenMode": ""
   },
