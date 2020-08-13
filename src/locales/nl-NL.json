@@ -95,6 +95,7 @@
     "roomDialog": "Live-samenwerkingssessie starten",
     "createNewRoom": "Creëer live-samenwerkingssessie",
     "toggleFullScreen": "Schermvullende weergave",
+    "toggleDarkMode": "",
     "toggleZenMode": "",
     "exitZenMode": ""
   },
