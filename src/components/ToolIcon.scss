@@ -13,9 +13,10 @@
   position: relative;
   font-family: Cascadia;
   cursor: pointer;
-  background-color: var(--button-gray-1);
+  background-color: var(--button-white);
   -webkit-tap-highlight-color: transparent;
   border-radius: var(--space-factor);
+  transition: background-color 0.2s ease;
 }
 
 .ToolIcon__icon {
@@ -30,7 +31,9 @@
 
   svg {
     position: relative;
-    height: 1em;
+    // height: 1em;
+    width: 24px;
+    height: 24px;
   }
 
   & + .ToolIcon__label {

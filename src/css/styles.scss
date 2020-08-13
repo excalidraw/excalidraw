@@ -8,7 +8,8 @@
   --sar: env(safe-area-inset-right);
   --text-color-primary: #{$oc-gray-8};
   --bg-color-main: #{$oc-white};
-  --shadow-island: 0 1px 5px #{transparentize($oc-black, 0.85)};
+  // --shadow-island: 0 1px 5px #{transparentize($oc-black, 0.85)};
+  --shadow-island: 0px 4px 16px #{transparentize($oc-black, 0.84)};
   --border-radius-m: 4px;
   --space-factor: 0.25rem;
 }

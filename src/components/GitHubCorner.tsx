@@ -30,4 +30,21 @@ export const GitHubCorner = React.memo(() => (
       />
     </a>
   </svg>
+  // <svg width={40} height={40} fill="none" xmlns="http://www.w3.org/2000/svg">
+  //   <a
+  //     href="https://github.com/excalidraw/excalidraw"
+  //     target="_blank"
+  //     rel="noopener noreferrer"
+  //     aria-label="GitHub repository"
+  //   >
+  //     <path d="M40 0H0l40 40V0z" fill={oc.gray[5]} />
+  //     <path
+  //       d="M21.97 22.071l1.954-1.955a2.407 2.407 0 00.844-1.793c1.762 1.41 4.03 2.475 6.788-.282a3.886 3.886 0 001.136-2.652 3.622 3.622 0 001.86-1.95s-.42-.772-2.723-1.227a9.558 9.558 0 00-3.536-3.536c-.454-2.303-1.227-2.722-1.227-2.722a3.622 3.622 0 00-1.95 1.859 3.886 3.886 0 00-2.667 1.151c-2.737 2.738-1.671 5.006-.282 6.789a2.405 2.405 0 00-1.778.828l-1.955 1.955m1.515-1.516c-3.283-1.767-1.262-3.788-2.02-5.05l2.02 5.05z"
+  //       stroke={oc.white}
+  //       strokeWidth={1.429}
+  //       strokeLinecap="round"
+  //       strokeLinejoin="round"
+  //     />
+  //   </a>
+  // </svg>
 ));

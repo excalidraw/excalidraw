@@ -1,13 +1,16 @@
 //
-// All icons are imported from https://fontawesome.com/icons?d=gallery
-// Icons are under the license https://fontawesome.com/license
+// All icons are imported from https://feathericons.com/ Made by @colebemis
+// github: https://github.com/feathericons/feather
+// Feather is a collection of simply beautiful open source icons.
+// Each icon is designed on a 24x24 grid with an emphasis on simplicity, consistency, and flexibility.
+// Icons are under the license https://github.com/feathericons/feather/blob/master/LICENSE
+// Small adjusments and additions by @tomfejer
 //
 
 import React from "react";
 
 import oc from "open-color";
 
-const ACTIVE_ELEMENT_COLOR = oc.orange[4];
 type Opts = { width?: number; height?: number; mirror?: true } & React.SVGProps<
   SVGSVGElement
 >;
@@ -30,310 +33,518 @@ const createIcon = (d: string | React.ReactNode, opts: number | Opts = 512) => {
 };
 
 export const link = createIcon(
-  "M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z",
-  { mirror: true },
+  <>
+    <path
+      d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"
+      stroke={oc.black}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+    />
+    <path
+      d="M14 11a5.002 5.002 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"
+      stroke={oc.black}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+    />
+  </>,
+  { width: 24 },
 );
 
+// export const save = createIcon(
+//   "M433.941 129.941l-83.882-83.882A48 48 0 0 0 316.118 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V163.882a48 48 0 0 0-14.059-33.941zM224 416c-35.346 0-64-28.654-64-64 0-35.346 28.654-64 64-64s64 28.654 64 64c0 35.346-28.654 64-64 64zm96-304.52V212c0 6.627-5.373 12-12 12H76c-6.627 0-12-5.373-12-12V108c0-6.627 5.373-12 12-12h228.52c3.183 0 6.235 1.264 8.485 3.515l3.48 3.48A11.996 11.996 0 0 1 320 111.48z",
+//   { width: 448, height: 512 },
+// );
+
 export const save = createIcon(
-  "M433.941 129.941l-83.882-83.882A48 48 0 0 0 316.118 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V163.882a48 48 0 0 0-14.059-33.941zM224 416c-35.346 0-64-28.654-64-64 0-35.346 28.654-64 64-64s64 28.654 64 64c0 35.346-28.654 64-64 64zm96-304.52V212c0 6.627-5.373 12-12 12H76c-6.627 0-12-5.373-12-12V108c0-6.627 5.373-12 12-12h228.52c3.183 0 6.235 1.264 8.485 3.515l3.48 3.48A11.996 11.996 0 0 1 320 111.48z",
-  { width: 448, height: 512 },
+  <>
+    <path
+      d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"
+      stroke={oc.black}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+    />
+    <path
+      d="M17 21v-8H7v8M7 3v5h8"
+      stroke={oc.black}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+    />
+  </>,
+  { width: 24 },
 );
 
 export const saveAs = createIcon(
-  "M252 54L203 8a28 27 0 00-20-8H28C12 0 0 12 0 27v195c0 15 12 26 28 26h204c15 0 28-11 28-26V73a28 27 0 00-8-19zM130 213c-21 0-37-16-37-36 0-19 16-35 37-35 20 0 37 16 37 35 0 20-17 36-37 36zm56-169v56c0 4-4 6-7 6H44c-4 0-7-2-7-6V42c0-4 3-7 7-7h133l4 2 3 2a7 7 0 012 5z M296 201l87 95-188 205-78 9c-10 1-19-8-18-20l9-84zm141-14l-41-44a31 31 0 00-46 0l-38 41 87 95 38-42c13-14 13-36 0-50z",
-  { width: 448, height: 512 },
+  <>
+    <path
+      d="M18 9h-7a2 2 0 00-2 2v9a2 2 0 002 2h9a2 2 0 002-2v-7l-4-4z"
+      stroke={oc.black}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+    />
+    <path
+      d="M19 21v-4h-7v4M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9l2 2v1M12 9v4h5"
+      stroke={oc.black}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+    />
+  </>,
+  { width: 24 },
 );
 
 export const load = createIcon(
-  "M572.694 292.093L500.27 416.248A63.997 63.997 0 0 1 444.989 448H45.025c-18.523 0-30.064-20.093-20.731-36.093l72.424-124.155A64 64 0 0 1 152 256h399.964c18.523 0 30.064 20.093 20.73 36.093zM152 224h328v-48c0-26.51-21.49-48-48-48H272l-64-64H48C21.49 64 0 85.49 0 112v278.046l69.077-118.418C86.214 242.25 117.989 224 152 224z",
-  { width: 576, height: 512, mirror: true },
+  <>
+    <path
+      d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2v11zM12 11v6M9 14h6"
+      stroke={oc.black}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+    />
+  </>,
+  { width: 24, height: 24 },
 );
 
 export const clipboard = createIcon(
-  "M384 112v352c0 26.51-21.49 48-48 48H48c-26.51 0-48-21.49-48-48V112c0-26.51 21.49-48 48-48h80c0-35.29 28.71-64 64-64s64 28.71 64 64h80c26.51 0 48 21.49 48 48zM192 40c-13.255 0-24 10.745-24 24s10.745 24 24 24 24-10.745 24-24-10.745-24-24-24m96 114v-20a6 6 0 0 0-6-6H102a6 6 0 0 0-6 6v20a6 6 0 0 0 6 6h180a6 6 0 0 0 6-6z",
-  { width: 384, height: 512 },
+  <>
+    <path
+      d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"
+      stroke={oc.black}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+    />
+    <path
+      d="M15 2H9a1 1 0 00-1 1v2a1 1 0 001 1h6a1 1 0 001-1V3a1 1 0 00-1-1z"
+      stroke={oc.black}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+    />
+  </>,
+  { width: 24, height: 24 },
 );
 
 export const trash = createIcon(
-  "M32 464a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zM432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z",
-  { width: 448, height: 512 },
+  <>
+    <path
+      d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14zM10 11v6M14 11v6"
+      stroke={oc.black}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+    />
+  </>,
+  { width: 24, height: 24 },
 );
 
 export const palette = createIcon(
-  "M204.3 5C104.9 24.4 24.8 104.3 5.2 203.4c-37 187 131.7 326.4 258.8 306.7 41.2-6.4 61.4-54.6 42.5-91.7-23.1-45.4 9.9-98.4 60.9-98.4h79.7c35.8 0 64.8-29.6 64.9-65.3C511.5 97.1 368.1-26.9 204.3 5zM96 320c-17.7 0-32-14.3-32-32s14.3-32 32-32 32 14.3 32 32-14.3 32-32 32zm32-128c-17.7 0-32-14.3-32-32s14.3-32 32-32 32 14.3 32 32-14.3 32-32 32zm128-64c-17.7 0-32-14.3-32-32s14.3-32 32-32 32 14.3 32 32-14.3 32-32 32zm128 64c-17.7 0-32-14.3-32-32s14.3-32 32-32 32 14.3 32 32-14.3 32-32 32z",
+  <>
+    <path
+      d="M17 3a2.827 2.827 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"
+      stroke={oc.black}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+    />
+  </>,
+  { width: 24, height: 24 },
 );
 
 export const exportFile = createIcon(
-  "M384 121.9c0-6.3-2.5-12.4-7-16.9L279.1 7c-4.5-4.5-10.6-7-17-7H256v128h128zM571 308l-95.7-96.4c-10.1-10.1-27.4-3-27.4 11.3V288h-64v64h64v65.2c0 14.3 17.3 21.4 27.4 11.3L571 332c6.6-6.6 6.6-17.4 0-24zm-379 28v-32c0-8.8 7.2-16 16-16h176V160H248c-13.2 0-24-10.8-24-24V0H24C10.7 0 0 10.7 0 24v464c0 13.3 10.7 24 24 24h336c13.3 0 24-10.7 24-24V352H208c-8.8 0-16-7.2-16-16z",
-  { width: 576, height: 512, mirror: true },
+  <>
+    <path
+      d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"
+      stroke={oc.black}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+    />
+  </>,
+  { width: 24, height: 24 },
 );
 
 export const zoomIn = createIcon(
-  "M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z",
-  { width: 448, height: 512 },
+  <>
+    <path
+      d="M11 19a8 8 0 100-16 8 8 0 000 16zM21 21l-4.35-4.35M11 8v6M8 11h6"
+      stroke={oc.black}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+    />
+  </>,
+  { width: 24, height: 24 },
 );
 
 export const zoomOut = createIcon(
-  "M416 208H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h384c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z",
-  { width: 448, height: 512 },
+  <>
+    <path
+      d="M11 19a8 8 0 100-16 8 8 0 000 16zM21 21l-4.35-4.35M8 11h6"
+      stroke={oc.black}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+    />
+  </>,
+  { width: 24, height: 24 },
 );
 
+//Where is the done icon?
 export const done = createIcon(
   "M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z",
   { mirror: true },
 );
 
 export const menu = createIcon(
-  "M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z",
+  <>
+    <path
+      d="M3 12h18M3 6h18M3 18h18"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      stroke={oc.black}
+      fill="none"
+    />
+  </>,
+  { width: 24, height: 24 },
 );
 
 export const undo = createIcon(
-  "M255.545 8c-66.269.119-126.438 26.233-170.86 68.685L48.971 40.971C33.851 25.851 8 36.559 8 57.941V192c0 13.255 10.745 24 24 24h134.059c21.382 0 32.09-25.851 16.971-40.971l-41.75-41.75c30.864-28.899 70.801-44.907 113.23-45.273 92.398-.798 170.283 73.977 169.484 169.442C423.236 348.009 349.816 424 256 424c-41.127 0-79.997-14.678-110.63-41.556-4.743-4.161-11.906-3.908-16.368.553L89.34 422.659c-4.872 4.872-4.631 12.815.482 17.433C133.798 479.813 192.074 504 256 504c136.966 0 247.999-111.033 248-247.998C504.001 119.193 392.354 7.755 255.545 8z",
-  { mirror: true },
+  <>
+    <path
+      d="M1 4v6h6"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      stroke={oc.black}
+      fill="none"
+    />
+    <path
+      d="M3.51 15a9 9 0 102.13-9.36L1 10"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      stroke={oc.black}
+      fill="none"
+    />
+  </>,
+  { width: 24, height: 24 },
 );
 
 export const redo = createIcon(
-  "M256.455 8c66.269.119 126.437 26.233 170.859 68.685l35.715-35.715C478.149 25.851 504 36.559 504 57.941V192c0 13.255-10.745 24-24 24H345.941c-21.382 0-32.09-25.851-16.971-40.971l41.75-41.75c-30.864-28.899-70.801-44.907-113.23-45.273-92.398-.798-170.283 73.977-169.484 169.442C88.764 348.009 162.184 424 256 424c41.127 0 79.997-14.678 110.629-41.556 4.743-4.161 11.906-3.908 16.368.553l39.662 39.662c4.872 4.872 4.631 12.815-.482 17.433C378.202 479.813 319.926 504 256 504 119.034 504 8.001 392.967 8 256.002 7.999 119.193 119.646 7.755 256.455 8z",
-  { mirror: true },
+  <>
+    <path
+      d="M23 4v6h-6"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      stroke={oc.black}
+      fill="none"
+    />
+    <path
+      d="M20.49 15a9 9 0 11-2.12-9.36L23 10"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      stroke={oc.black}
+      fill="none"
+    />
+  </>,
+  { width: 24, height: 24 },
 );
 
-// Icon imported form Storybook
-// Storybook is licensed under MIT https://github.com/storybookjs/storybook/blob/next/LICENSE
 export const resetZoom = createIcon(
-  <path
-    stroke="currentColor"
-    strokeWidth="40"
-    fill="currentColor"
-    d="M148 560a318 318 0 0 0 522 110 316 316 0 0 0 0-450 316 316 0 0 0-450 0c-11 11-21 22-30 34v4h47c25 0 46 21 46 46s-21 45-46 45H90c-13 0-25-6-33-14-9-9-14-20-14-33V156c0-25 20-45 45-45s45 20 45 45v32l1 1a401 401 0 0 1 623 509l212 212a42 42 0 0 1-59 59L698 757A401 401 0 0 1 65 570a42 42 0 0 1 83-10z"
-  />,
-  { width: 1024 },
+  <>
+    <path
+      d="M21 21l-4-4"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      stroke={oc.black}
+      fill="none"
+    />
+    <g
+      clipPath="url(#prefix__clip0)"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      stroke={oc.black}
+      fill="none"
+    >
+      <path d="M.917 3.667v5.5h5.5" />
+      <path d="M3.218 13.75A8.25 8.25 0 105.17 5.17L.917 9.167" />
+    </g>
+    <defs>
+      <clipPath id="prefix__clip0">
+        <path fill={oc.white} d="M0 0h22v22H0z" />
+      </clipPath>
+    </defs>
+  </>,
+  { width: 24, height: 24 },
 );
 
 export const bringForward = createIcon(
   <>
     <path
-      d="M22 9.556C22 8.696 21.303 8 20.444 8H16v8H8v4.444C8 21.304 8.697 22 9.556 22h10.888c.86 0 1.556-.697 1.556-1.556V9.556z"
+      d="M20 9h-9a2 2 0 00-2 2v9a2 2 0 002 2h9a2 2 0 002-2v-9a2 2 0 00-2-2z"
+      fill={oc.white}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
       stroke={oc.black}
-      strokeWidth="2"
     />
     <path
-      d="M16 3.556C16 2.696 15.303 2 14.444 2H3.556C2.696 2 2 2.697 2 3.556v10.888C2 15.304 2.697 16 3.556 16h10.888c.86 0 1.556-.697 1.556-1.556V3.556z"
-      fill={ACTIVE_ELEMENT_COLOR}
-      stroke={ACTIVE_ELEMENT_COLOR}
-      strokeWidth="2"
+      d="M13 2H4a2 2 0 00-2 2v9a2 2 0 002 2h9a2 2 0 002-2V4a2 2 0 00-2-2z"
+      fill={oc.gray[5]}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      stroke={oc.black}
     />
   </>,
-  { width: 24 },
+  { width: 24, height: 24 },
 );
 
 export const sendBackward = createIcon(
   <>
     <path
-      d="M16 3.556C16 2.696 15.303 2 14.444 2H3.556C2.696 2 2 2.697 2 3.556v10.888C2 15.304 2.697 16 3.556 16h10.888c.86 0 1.556-.697 1.556-1.556V3.556z"
-      fill={ACTIVE_ELEMENT_COLOR}
-      stroke={ACTIVE_ELEMENT_COLOR}
-      strokeWidth="2"
+      d="M13 2H4a2 2 0 00-2 2v9a2 2 0 002 2h9a2 2 0 002-2V4a2 2 0 00-2-2z"
+      fill={oc.gray[5]}
+      stroke={oc.black}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
     <path
-      d="M22 9.556C22 8.696 21.303 8 20.444 8H9.556C8.696 8 8 8.697 8 9.556v10.888C8 21.304 8.697 22 9.556 22h10.888c.86 0 1.556-.697 1.556-1.556V9.556z"
+      d="M20 9h-9a2 2 0 00-2 2v9a2 2 0 002 2h9a2 2 0 002-2v-9a2 2 0 00-2-2z"
+      fill={oc.white}
       stroke={oc.black}
-      strokeWidth="2"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
   </>,
-  { width: 24 },
+  { width: 24, height: 24 },
 );
 
 export const bringToFront = createIcon(
   <>
     <path
-      d="M13 21a1 1 0 001 1h7a1 1 0 001-1v-7a1 1 0 00-1-1h-3v5h-5v3zM11 3a1 1 0 00-1-1H3a1 1 0 00-1 1v7a1 1 0 001 1h3V6h5V3z"
+      d="M9.615 2h-6.23C2.62 2 2 2.62 2 3.385v6.23C2 10.38 2.62 11 3.385 11h6.23C10.38 11 11 10.38 11 9.615v-6.23C11 2.62 10.38 2 9.615 2zM20.615 13h-6.23C13.62 13 13 13.62 13 14.385v6.23c0 .765.62 1.385 1.385 1.385h6.23C21.38 22 22 21.38 22 20.615v-6.23C22 13.62 21.38 13 20.615 13z"
+      fill={oc.white}
       stroke={oc.black}
-      strokeWidth="2"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
     <path
-      d="M18 7.333C18 6.597 17.403 6 16.667 6H7.333C6.597 6 6 6.597 6 7.333v9.334C6 17.403 6.597 18 7.333 18h9.334c.736 0 1.333-.597 1.333-1.333V7.333z"
-      fill={ACTIVE_ELEMENT_COLOR}
-      stroke={ACTIVE_ELEMENT_COLOR}
-      strokeWidth="2"
+      d="M16.154 6H7.846C6.826 6 6 6.827 6 7.846v8.308C6 17.174 6.827 18 7.846 18h8.308c1.02 0 1.846-.827 1.846-1.846V7.846C18 6.826 17.173 6 16.154 6z"
+      fill={oc.gray[5]}
+      stroke={oc.black}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
   </>,
-  { width: 24 },
+  { width: 24, height: 24 },
 );
 
 export const sendToBack = createIcon(
   <>
     <path
-      d="M18 7.333C18 6.597 17.403 6 16.667 6H7.333C6.597 6 6 6.597 6 7.333v9.334C6 17.403 6.597 18 7.333 18h9.334c.736 0 1.333-.597 1.333-1.333V7.333z"
-      fill={ACTIVE_ELEMENT_COLOR}
-      stroke={ACTIVE_ELEMENT_COLOR}
+      d="M16.154 6H7.846C6.826 6 6 6.827 6 7.846v8.308C6 17.174 6.827 18 7.846 18h8.308c1.02 0 1.846-.827 1.846-1.846V7.846C18 6.826 17.173 6 16.154 6z"
+      fill={oc.gray[5]}
+      stroke={oc.black}
+      strokeWidth={2}
+      strokeLinecap="round"
       strokeLinejoin="round"
-      strokeWidth="2"
     />
     <path
-      d="M11 3a1 1 0 00-1-1H3a1 1 0 00-1 1v7a1 1 0 001 1h8V3zM22 14a1 1 0 00-1-1h-7a1 1 0 00-1 1v7a1 1 0 001 1h8v-8z"
+      d="M9.615 2h-6.23C2.62 2 2 2.62 2 3.385v6.23C2 10.38 2.62 11 3.385 11h6.23C10.38 11 11 10.38 11 9.615v-6.23C11 2.62 10.38 2 9.615 2zM20.615 13h-6.23C13.62 13 13 13.62 13 14.385v6.23c0 .765.62 1.385 1.385 1.385h6.23C21.38 22 22 21.38 22 20.615v-6.23C22 13.62 21.38 13 20.615 13z"
+      fill={oc.white}
       stroke={oc.black}
+      strokeWidth={2}
+      strokeLinecap="round"
       strokeLinejoin="round"
-      strokeWidth="2"
     />
   </>,
-  { width: 24 },
+  { width: 24, height: 24 },
 );
 
 export const users = createIcon(
-  "M192 256c61.9 0 112-50.1 112-112S253.9 32 192 32 80 82.1 80 144s50.1 112 112 112zm76.8 32h-8.3c-20.8 10-43.9 16-68.5 16s-47.6-6-68.5-16h-8.3C51.6 288 0 339.6 0 403.2V432c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48v-28.8c0-63.6-51.6-115.2-115.2-115.2zM480 256c53 0 96-43 96-96s-43-96-96-96-96 43-96 96 43 96 96 96zm48 32h-3.8c-13.9 4.8-28.6 8-44.2 8s-30.3-3.2-44.2-8H432c-20.4 0-39.2 5.9-55.7 15.4 24.4 26.3 39.7 61.2 39.7 99.8v38.4c0 2.2-.5 4.3-.6 6.4H592c26.5 0 48-21.5 48-48 0-61.9-50.1-112-112-112z",
-  { width: 640, height: 512, mirror: true },
+  <>
+    <path
+      d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"
+      stroke={oc.black}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+    />
+  </>,
+  { width: 24, height: 24 },
 );
 
 export const start = createIcon(
-  "M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm115.7 272l-176 101c-15.8 8.8-35.7-2.5-35.7-21V152c0-18.4 19.8-29.8 35.7-21l176 107c16.4 9.2 16.4 32.9 0 42z",
+  <>
+    <path
+      d="M5 3l14 9-14 9V3z"
+      stroke={oc.black}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+    />
+  </>,
+  { width: 24, height: 24 },
 );
 
 export const stop = createIcon(
-  "M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm96 328c0 8.8-7.2 16-16 16H176c-8.8 0-16-7.2-16-16V176c0-8.8 7.2-16 16-16h160c8.8 0 16 7.2 16 16v160z",
+  <>
+    <path
+      d="M7.86 2h8.28L22 7.86v8.28L16.14 22H7.86L2 16.14V7.86L7.86 2zM15 9l-6 6M9 9l6 6"
+      stroke={oc.black}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+    />
+  </>,
+  { width: 24, height: 24 },
 );
 
 export const close = createIcon(
-  "M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z",
-  { width: 352, height: 512 },
+  <>
+    <path
+      d="M18 6L6 18M6 6l12 12"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      stroke={oc.black}
+      fill="none"
+    />
+  </>,
+  { width: 24, height: 24 },
 );
 
 export const back = createIcon(
-  "M34.52 239.03L228.87 44.69c9.37-9.37 24.57-9.37 33.94 0l22.67 22.67c9.36 9.36 9.37 24.52.04 33.9L131.49 256l154.02 154.75c9.34 9.38 9.32 24.54-.04 33.9l-22.67 22.67c-9.37 9.37-24.57 9.37-33.94 0L34.52 272.97c-9.37-9.37-9.37-24.57 0-33.94z",
-  { width: 320, height: 512, style: { marginLeft: "-0.2rem" }, mirror: true },
+  <>
+    <path
+      d="M19 12H5M12 19l-7-7 7-7"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      stroke={oc.black}
+      fill="none"
+    />
+  </>,
+  { width: 24, height: 24 },
 );
 
 export const clone = createIcon(
-  "M464 0c26.51 0 48 21.49 48 48v288c0 26.51-21.49 48-48 48H176c-26.51 0-48-21.49-48-48V48c0-26.51 21.49-48 48-48h288M176 416c-44.112 0-80-35.888-80-80V128H48c-26.51 0-48 21.49-48 48v288c0 26.51 21.49 48 48 48h288c26.51 0 48-21.49 48-48v-48H176z",
-  { mirror: true },
+  <>
+    <path
+      d="M20 15h-9a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v9a2 2 0 01-2 2z"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      stroke={oc.black}
+      fill="none"
+    />
+    <path
+      d="M5 9H4a2 2 0 00-2 2v9a2 2 0 002 2h9a2 2 0 002-2v-1"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      stroke={oc.black}
+      fill="none"
+    />
+  </>,
+  { width: 24, height: 24 },
 );
 
-// modified https://feathericons.com/?query=shield
 export const shield = createIcon(
-  "M11.553 22.894a.998.998 0 00.894 0s3.037-1.516 5.465-4.097C19.616 16.987 21 14.663 21 12V5a1 1 0 00-.649-.936l-8-3a.998.998 0 00-.702 0l-8 3A1 1 0 003 5v7c0 2.663 1.384 4.987 3.088 6.797 2.428 2.581 5.465 4.097 5.465 4.097zm-1.303-8.481l6.644-6.644a.856.856 0 111.212 1.212l-7.25 7.25a.856.856 0 01-1.212 0l-3.75-3.75a.856.856 0 111.212-1.212l3.144 3.144z",
+  <>
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M12.351 1.064a1 1 0 00-.702 0l-8 3A1 1 0 003 5v7c0 3.446 2.282 6.2 4.341 8.003a22.686 22.686 0 004.104 2.836l.076.04.022.01.006.004.003.001c.282.14.614.141.895 0L12 22c.447.894.449.894.449.894l.002-.001.006-.004.022-.01a8.28 8.28 0 00.35-.188 22.684 22.684 0 003.83-2.689C18.718 18.2 21 15.447 21 12V5a1 1 0 00-.649-.936l-8-3zM12 22l-.448.894L12 22zm4.698-13.284a1 1 0 10-1.396-1.432l-5.456 5.32-1.148-1.12a1 1 0 10-1.396 1.432l1.846 1.8a1 1 0 001.396 0l6.154-6z"
+      fill={oc.green[8]}
+    />
+  </>,
   { width: 24 },
 );
 
 export const group = createIcon(
   <>
-    <path d="M25 26H111V111H25" fill={oc.black} />
     <path
-      d="M25 111C25 80.2068 25 49.4135 25 26M25 26C48.6174 26 72.2348 26 111 26H25ZM25 26C53.3671 26 81.7343 26 111 26H25ZM111 26C111 52.303 111 78.606 111 111V26ZM111 26C111 51.2947 111 76.5893 111 111V26ZM111 111C87.0792 111 63.1585 111 25 111H111ZM111 111C87.4646 111 63.9293 111 25 111H111ZM25 111C25 81.1514 25 51.3028 25 26V111Z"
+      d="M10.615 3h-6.23C3.62 3 3 3.62 3 4.385v6.23C3 11.38 3.62 12 4.385 12h6.23C11.38 12 12 11.38 12 10.615v-6.23C12 3.62 11.38 3 10.615 3z"
       stroke={oc.black}
-      strokeWidth="2"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
     />
-    <path d="M100 100H160V160H100" fill={oc.black} />
     <path
-      d="M100 160C100 144.106 100 128.211 100 100M100 100C117.706 100 135.412 100 160 100H100ZM100 100C114.214 100 128.428 100 160 100H100ZM160 100C160 120.184 160 140.369 160 160V100ZM160 100C160 113.219 160 126.437 160 160V100ZM160 160C145.534 160 131.068 160 100 160H160ZM160 160C143.467 160 126.934 160 100 160H160ZM100 160C100 143.661 100 127.321 100 100V160Z"
-      stroke={oc.black}
-      strokeWidth="2"
-    />
-    <rect
-      x="2.5"
-      y="2.5"
-      width="30"
-      height="30"
+      d="M19 8h-9a2 2 0 00-2 2v9a2 2 0 002 2h9a2 2 0 002-2v-9a2 2 0 00-2-2z"
       fill={oc.white}
       stroke={oc.black}
-      strokeWidth="6"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
-    <rect
-      x="2.5"
-      y="149.5"
-      width="30"
-      height="30"
-      fill={oc.white}
-      stroke={oc.black}
-      strokeWidth="6"
-    />
-    <rect
-      x="147.5"
-      y="149.5"
-      width="30"
-      height="30"
-      fill={oc.white}
-      stroke={oc.black}
-      strokeWidth="6"
-    />
-    <rect
-      x="147.5"
-      y="2.5"
-      width="30"
-      height="30"
-      fill={oc.white}
-      stroke={oc.black}
-      strokeWidth="6"
-    />
+    <circle cx={3} cy={3} r={1} stroke={oc.black} strokeWidth={2} />
+    <circle cx={3} cy={21} r={1} stroke={oc.black} strokeWidth={2} />
+    <circle cx={21} cy={21} r={1} stroke={oc.black} strokeWidth={2} />
+    <circle cx={21} cy={3} r={1} stroke={oc.black} strokeWidth={2} />
   </>,
-  { width: 182, height: 182 },
+  { width: 24, height: 24 },
 );
 export const ungroup = createIcon(
   <>
-    <path d="M25 26H111V111H25" fill={oc.black} />
     <path
-      d="M25 111C25 80.2068 25 49.4135 25 26M25 26C48.6174 26 72.2348 26 111 26H25ZM25 26C53.3671 26 81.7343 26 111 26H25ZM111 26C111 52.303 111 78.606 111 111V26ZM111 26C111 51.2947 111 76.5893 111 111V26ZM111 111C87.0792 111 63.1585 111 25 111H111ZM111 111C87.4646 111 63.9293 111 25 111H111ZM25 111C25 81.1514 25 51.3028 25 26V111Z"
+      d="M10.615 3h-6.23C3.62 3 3 3.62 3 4.385v6.23C3 11.38 3.62 12 4.385 12h6.23C11.38 12 12 11.38 12 10.615v-6.23C12 3.62 11.38 3 10.615 3z"
       stroke={oc.black}
-      strokeWidth="2"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
     />
-    <path d="M100 100H160V160H100" fill={oc.black} />
     <path
-      d="M100 160C100 144.106 100 128.211 100 100M100 100C117.706 100 135.412 100 160 100H100ZM100 100C114.214 100 128.428 100 160 100H100ZM160 100C160 120.184 160 140.369 160 160V100ZM160 100C160 113.219 160 126.437 160 160V100ZM160 160C145.534 160 131.068 160 100 160H160ZM160 160C143.467 160 126.934 160 100 160H160ZM100 160C100 143.661 100 127.321 100 100V160Z"
-      stroke={oc.black}
-      strokeWidth="2"
-    />
-    <rect
-      x="2.5"
-      y="2.5"
-      width="30"
-      height="30"
+      d="M19 8h-9a2 2 0 00-2 2v9a2 2 0 002 2h9a2 2 0 002-2v-9a2 2 0 00-2-2z"
       fill={oc.white}
       stroke={oc.black}
-      strokeWidth="6"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
-    <rect
-      x="78.5"
-      y="149.5"
-      width="30"
-      height="30"
-      fill={oc.white}
-      stroke={oc.black}
-      strokeWidth="6"
-    />
-    <rect
-      x="147.5"
-      y="149.5"
-      width="30"
-      height="30"
-      fill={oc.white}
-      stroke={oc.black}
-      strokeWidth="6"
-    />
-    <rect
-      x="147.5"
-      y="78.5"
-      width="30"
-      height="30"
-      fill={oc.white}
-      stroke={oc.black}
-      strokeWidth="6"
-    />
-    <rect
-      x="105.5"
-      y="2.5"
-      width="30"
-      height="30"
-      fill={oc.white}
-      stroke={oc.black}
-      strokeWidth="6"
-    />
-    <rect
-      x="2.5"
-      y="102.5"
-      width="30"
-      height="30"
-      fill={oc.white}
-      stroke={oc.black}
-      strokeWidth="6"
-    />
+    <circle cx={3} cy={3} r={1} stroke={oc.black} strokeWidth={2} />
+    <circle cx={3} cy={12} r={1} stroke={oc.black} strokeWidth={2} />
+    <circle cx={8} cy={8} r={1} stroke={oc.black} strokeWidth={2} />
+    <circle cx={21} cy={21} r={1} stroke={oc.black} strokeWidth={2} />
+    <circle cx={8} cy={21} r={1} stroke={oc.black} strokeWidth={2} />
+    <circle cx={21} cy={8} r={1} stroke={oc.black} strokeWidth={2} />
+    <circle cx={12} cy={3} r={1} stroke={oc.black} strokeWidth={2} />
   </>,
-  { width: 182, height: 182 },
+  { width: 24, height: 24 },
 );
