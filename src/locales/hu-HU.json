@@ -95,6 +95,7 @@
     "roomDialog": "Élő együttműködés indítása",
     "createNewRoom": "Új szoba létrehozása",
     "toggleFullScreen": "",
+    "toggleDarkMode": "",
     "toggleZenMode": "",
     "exitZenMode": ""
   },
