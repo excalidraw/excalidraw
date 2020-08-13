@@ -95,6 +95,7 @@
     "roomDialog": "Έναρξη ζωντανής συνεργασίας",
     "createNewRoom": "Δημιουργία νέου χώρου",
     "toggleFullScreen": "Εναλλαγή πλήρους οθόνης",
+    "toggleDarkMode": "",
     "toggleZenMode": "Εναλλαγή λειτουργίας Zen",
     "exitZenMode": "Έξοδος απο την λειτουργία Zen"
   },
