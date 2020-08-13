@@ -1299,6 +1299,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
                 username,
                 selectedElementIds,
               } = decryptedData.payload;
+              // NOTE purposefully mutating collaborators map in case of
+              //  pointer updates so as not to trigger LayerUI rerender
               this.setState((state) => {
                 if (!state.collaborators.has(socketID)) {
                   state.collaborators.set(socketID, {});
