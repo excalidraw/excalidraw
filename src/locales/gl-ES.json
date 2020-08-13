@@ -95,6 +95,7 @@
     "roomDialog": "",
     "createNewRoom": "",
     "toggleFullScreen": "Alternar a pantalla completa",
+    "toggleDarkMode": "",
     "toggleZenMode": "Alternar o modo zen",
     "exitZenMode": "Saír do modo zen"
   },
