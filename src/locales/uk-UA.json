@@ -95,6 +95,7 @@
     "roomDialog": "Відкрити сесію спільної роботи",
     "createNewRoom": "Створити нову кімнату",
     "toggleFullScreen": "Повноекранний режим",
+    "toggleDarkMode": "",
     "toggleZenMode": "Дзен-режим",
     "exitZenMode": "Вийти з дзен-режиму"
   },
