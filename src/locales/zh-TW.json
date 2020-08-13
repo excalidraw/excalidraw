@@ -95,7 +95,7 @@
     "roomDialog": "開始即時協作",
     "createNewRoom": "建立新協作會議室",
     "toggleFullScreen": "切換全螢幕",
-    "toggleDarkMode": "",
+    "toggleDarkMode": "切換深色模式",
     "toggleZenMode": "切換專注模式",
     "exitZenMode": "離開專注模式"
   },
