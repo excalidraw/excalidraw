@@ -95,6 +95,7 @@
     "roomDialog": "Start live collaboration",
     "createNewRoom": "Create new room",
     "toggleFullScreen": "Toggle full screen",
+    "toggleDarkMode": "Toggle dark mode",
     "toggleZenMode": "Toggle zen mode",
     "exitZenMode": "Exit zen mode"
   },

@@ -1,12 +1,5 @@
 @import "open-color/open-color.scss";
 
-:root {
-  --button-gray-1: #{$oc-gray-2};
-  --button-gray-2: #{$oc-gray-4};
-  --button-gray-3: #{$oc-gray-5};
-  --button-blue: #{$oc-blue-2};
-}
-
 .ToolIcon {
   display: inline-flex;
   align-items: center;
@@ -21,6 +14,7 @@
 .ToolIcon__icon {
   width: 2.5rem;
   height: 2.5rem;
+  color: var(--icon-fill-color);
 
   display: flex;
   justify-content: center;
@@ -31,6 +25,8 @@
   svg {
     position: relative;
     height: 1em;
+    fill: var(--icon-fill-color);
+    color: var(--icon-fill-color);
   }
 
   & + .ToolIcon__label {
@@ -39,6 +35,7 @@
 }
 
 .ToolIcon__label {
+  color: var(--icon-fill-color);
   font-family: var(--ui-font);
   margin: 0 0.8em;
   text-overflow: ellipsis;
@@ -63,7 +60,7 @@
     background-color: var(--button-gray-2);
   }
   &:focus {
-    box-shadow: 0 0 0 2px var(--button-blue);
+    box-shadow: 0 0 0 2px var(--focus-highlight-color);
   }
   &.ToolIcon--selected {
     background-color: var(--button-gray-2);
@@ -86,11 +83,11 @@
   opacity: 0;
   pointer-events: none;
 
-  &:checked + .ToolIcon__icon {
+  &:not(.ToolIcon_toggle_opaque):checked + .ToolIcon__icon {
     background-color: var(--button-gray-2);
   }
   &:focus + .ToolIcon__icon {
-    box-shadow: 0 0 0 2px var(--button-blue);
+    box-shadow: 0 0 0 2px var(--focus-highlight-color);
   }
   &:active + .ToolIcon__icon {
     background-color: var(--button-gray-3);
@@ -125,7 +122,7 @@
   bottom: 2px;
   right: 3px;
   font-size: 0.5em;
-  color: var(--button-gray-3);
+  color: var(--keybinding-color);
   font-family: var(--ui-font);
   user-select: none;
 }

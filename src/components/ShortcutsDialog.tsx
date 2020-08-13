@@ -1,9 +1,9 @@
 import React from "react";
-import oc from "open-color";
 import { t } from "../i18n";
 import { isDarwin } from "../keys";
 import { Dialog } from "./Dialog";
 import { getShortcutKey } from "../utils";
+import "./ShortcutsDialog.scss";
 
 const Columns = (props: { children: React.ReactNode }) => (
   <div
@@ -19,35 +19,15 @@ const Columns = (props: { children: React.ReactNode }) => (
 );
 
 const Column = (props: { children: React.ReactNode }) => (
-  <div
-    style={{
-      width: "49%",
-    }}
-  >
-    {props.children}
-  </div>
+  <div style={{ width: "49%" }}>{props.children}</div>
 );
 
 const ShortcutIsland = (props: {
   caption: string;
   children: React.ReactNode;
 }) => (
-  <div
-    style={{
-      border: `1px solid ${oc.gray[4]}`,
-      marginBottom: "16px",
-    }}
-  >
-    <h3
-      style={{
-        margin: "0",
-        padding: "4px",
-        backgroundColor: oc.gray[2],
-        textAlign: "center",
-      }}
-    >
-      {props.caption}
-    </h3>
+  <div className="ShortcutsDialog-island">
+    <h3 className="ShortcutsDialog-island-title">{props.caption}</h3>
     {props.children}
   </div>
 );
@@ -59,11 +39,7 @@ const Shortcut = (props: {
 }) => {
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
   return (
-    <div
-      style={{
-        borderTop: `1px solid ${oc.gray[4]}`,
-      }}
-    >
+    <div className="ShorcutsDialog-shortcut">
       <div
         style={{
           display: "flex",
@@ -108,35 +84,11 @@ Shortcut.defaultProps = {
 };
 
 const ShortcutKey = (props: { children: React.ReactNode }) => (
-  <span
-    style={{
-      wordBreak: "keep-all",
-      border: `1px solid ${oc.gray[4]}`,
-      padding: "2px 8px",
-      margin: "auto 4px",
-      backgroundColor: oc.gray[2],
-      borderRadius: "2px",
-      fontSize: "0.8em",
-      minHeight: "26px",
-      boxSizing: "border-box",
-      display: "flex",
-      alignItems: "center",
-    }}
-    {...props}
-  />
+  <span className="ShorcutsDialog-key" {...props} />
 );
 
 const Footer = () => (
-  <div
-    style={{
-      display: "flex",
-      flexDirection: "row",
-      justifyContent: "space-evenly",
-      borderTop: `1px solid ${oc.gray[4]}`,
-      marginTop: 8,
-      paddingTop: 16,
-    }}
-  >
+  <div className="ShortcutsDialog-footer">
     <a
       href="https://blog.excalidraw.com"
       target="_blank"

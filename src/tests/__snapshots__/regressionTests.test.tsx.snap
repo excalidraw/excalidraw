@@ -2,6 +2,7 @@
 
 exports[`regression tests adjusts z order when grouping: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -420,6 +421,7 @@ exports[`regression tests adjusts z order when grouping: [end of test] number of
 
 exports[`regression tests alt-drag duplicates an element: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -640,6 +642,7 @@ exports[`regression tests alt-drag duplicates an element: [end of test] number o
 
 exports[`regression tests arrow keys: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -774,6 +777,7 @@ exports[`regression tests arrow keys: [end of test] number of renders 1`] = `13`
 
 exports[`regression tests change the properties of a shape: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "#fa5252",
   "currentItemFillStyle": "hachure",
@@ -1048,6 +1052,7 @@ exports[`regression tests change the properties of a shape: [end of test] number
 
 exports[`regression tests click on an element and drag it: [dragged] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -1221,6 +1226,7 @@ exports[`regression tests click on an element and drag it: [dragged] number of r
 
 exports[`regression tests click on an element and drag it: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -1433,6 +1439,7 @@ exports[`regression tests click on an element and drag it: [end of test] number 
 
 exports[`regression tests click to select a shape: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -1652,6 +1659,7 @@ exports[`regression tests click to select a shape: [end of test] number of rende
 
 exports[`regression tests click-drag to select a group: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -1976,6 +1984,7 @@ exports[`regression tests click-drag to select a group: [end of test] number of 
 
 exports[`regression tests double click to edit a group: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -2389,6 +2398,7 @@ exports[`regression tests double click to edit a group: [end of test] number of 
 
 exports[`regression tests draw every type of shape: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -4294,6 +4304,7 @@ exports[`regression tests draw every type of shape: [end of test] number of rend
 
 exports[`regression tests hotkey 2 selects rectangle tool: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -4428,6 +4439,7 @@ exports[`regression tests hotkey 2 selects rectangle tool: [end of test] number 
 
 exports[`regression tests hotkey 3 selects diamond tool: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -4562,6 +4574,7 @@ exports[`regression tests hotkey 3 selects diamond tool: [end of test] number of
 
 exports[`regression tests hotkey 4 selects ellipse tool: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -4696,6 +4709,7 @@ exports[`regression tests hotkey 4 selects ellipse tool: [end of test] number of
 
 exports[`regression tests hotkey 5 selects arrow tool: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -4856,6 +4870,7 @@ exports[`regression tests hotkey 5 selects arrow tool: [end of test] number of r
 
 exports[`regression tests hotkey 6 selects line tool: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -5016,6 +5031,7 @@ exports[`regression tests hotkey 6 selects line tool: [end of test] number of re
 
 exports[`regression tests hotkey 7 selects draw tool: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -5176,6 +5192,7 @@ exports[`regression tests hotkey 7 selects draw tool: [end of test] number of re
 
 exports[`regression tests hotkey a selects arrow tool: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -5336,6 +5353,7 @@ exports[`regression tests hotkey a selects arrow tool: [end of test] number of r
 
 exports[`regression tests hotkey d selects diamond tool: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -5470,6 +5488,7 @@ exports[`regression tests hotkey d selects diamond tool: [end of test] number of
 
 exports[`regression tests hotkey e selects ellipse tool: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -5604,6 +5623,7 @@ exports[`regression tests hotkey e selects ellipse tool: [end of test] number of
 
 exports[`regression tests hotkey l selects line tool: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -5764,6 +5784,7 @@ exports[`regression tests hotkey l selects line tool: [end of test] number of re
 
 exports[`regression tests hotkey r selects rectangle tool: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -5898,6 +5919,7 @@ exports[`regression tests hotkey r selects rectangle tool: [end of test] number 
 
 exports[`regression tests hotkey x selects draw tool: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -6058,6 +6080,7 @@ exports[`regression tests hotkey x selects draw tool: [end of test] number of re
 
 exports[`regression tests keeps selected element selected when click hits element bounding box but doesn't hit the element: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -6195,6 +6218,7 @@ exports[`regression tests keeps selected element selected when click hits elemen
 
 exports[`regression tests make a group and duplicate it: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -6862,6 +6886,7 @@ exports[`regression tests make a group and duplicate it: [end of test] number of
 
 exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -7082,6 +7107,7 @@ exports[`regression tests noop interaction after undo shouldn't create history e
 
 exports[`regression tests pinch-to-zoom works: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -7155,6 +7181,7 @@ exports[`regression tests pinch-to-zoom works: [end of test] number of renders 1
 
 exports[`regression tests rerenders UI on language change: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -7226,6 +7253,7 @@ exports[`regression tests rerenders UI on language change: [end of test] number 
 
 exports[`regression tests resize an element, trying every resize handle: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -8072,6 +8100,7 @@ exports[`regression tests resize an element, trying every resize handle: [end of
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle ne (+5, +5)] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -8486,6 +8515,7 @@ exports[`regression tests resize an element, trying every resize handle: [resize
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle ne (-5, -5)] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -8815,6 +8845,7 @@ exports[`regression tests resize an element, trying every resize handle: [resize
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle nw (+5, +5)] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -9063,6 +9094,7 @@ exports[`regression tests resize an element, trying every resize handle: [resize
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle nw (-5, -5)] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -9234,6 +9266,7 @@ exports[`regression tests resize an element, trying every resize handle: [resize
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle se (+5, +5)] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -10028,6 +10061,7 @@ exports[`regression tests resize an element, trying every resize handle: [resize
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle se (-5, -5)] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -10721,6 +10755,7 @@ exports[`regression tests resize an element, trying every resize handle: [resize
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle sw (+5, +5)] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -11317,6 +11352,7 @@ exports[`regression tests resize an element, trying every resize handle: [resize
 
 exports[`regression tests resize an element, trying every resize handle: [resize handle sw (-5, -5)] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -11820,6 +11856,7 @@ exports[`regression tests resize an element, trying every resize handle: [resize
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle ne (+5, +5)] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -12278,6 +12315,7 @@ exports[`regression tests resize an element, trying every resize handle: [unresi
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle ne (-5, -5)] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -12649,6 +12687,7 @@ exports[`regression tests resize an element, trying every resize handle: [unresi
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle nw (+5, +5)] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -12937,6 +12976,7 @@ exports[`regression tests resize an element, trying every resize handle: [unresi
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle nw (-5, -5)] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -13146,6 +13186,7 @@ exports[`regression tests resize an element, trying every resize handle: [unresi
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle se (+5, +5)] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -13992,6 +14033,7 @@ exports[`regression tests resize an element, trying every resize handle: [unresi
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle se (-5, -5)] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -14735,6 +14777,7 @@ exports[`regression tests resize an element, trying every resize handle: [unresi
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle sw (+5, +5)] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -15379,6 +15422,7 @@ exports[`regression tests resize an element, trying every resize handle: [unresi
 
 exports[`regression tests resize an element, trying every resize handle: [unresize handle sw (-5, -5)] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -15928,6 +15972,7 @@ exports[`regression tests resize an element, trying every resize handle: [unresi
 
 exports[`regression tests selecting 'Add to library' in context menu adds element to library: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -16062,6 +16107,7 @@ exports[`regression tests selecting 'Add to library' in context menu adds elemen
 
 exports[`regression tests selecting 'Bring forward' in context menu brings element forward: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -16335,6 +16381,7 @@ exports[`regression tests selecting 'Bring forward' in context menu brings eleme
 
 exports[`regression tests selecting 'Bring to front' in context menu brings element to front: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -16608,6 +16655,7 @@ exports[`regression tests selecting 'Bring to front' in context menu brings elem
 
 exports[`regression tests selecting 'Copy styles' in context menu copies styles: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -16742,6 +16790,7 @@ exports[`regression tests selecting 'Copy styles' in context menu copies styles:
 
 exports[`regression tests selecting 'Delete' in context menu deletes element: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -16907,6 +16956,7 @@ exports[`regression tests selecting 'Delete' in context menu deletes element: [e
 
 exports[`regression tests selecting 'Duplicate' in context menu duplicates element: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -17123,6 +17173,7 @@ exports[`regression tests selecting 'Duplicate' in context menu duplicates eleme
 
 exports[`regression tests selecting 'Group selection' in context menu groups selected elements: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -17412,6 +17463,7 @@ exports[`regression tests selecting 'Group selection' in context menu groups sel
 
 exports[`regression tests selecting 'Paste styles' in context menu pastes styles: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "#e64980",
   "currentItemFillStyle": "cross-hatch",
@@ -18198,6 +18250,7 @@ exports[`regression tests selecting 'Paste styles' in context menu pastes styles
 
 exports[`regression tests selecting 'Send backward' in context menu sends element backward: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -18471,6 +18524,7 @@ exports[`regression tests selecting 'Send backward' in context menu sends elemen
 
 exports[`regression tests selecting 'Send to back' in context menu sends element to back: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -18744,6 +18798,7 @@ exports[`regression tests selecting 'Send to back' in context menu sends element
 
 exports[`regression tests selecting 'Ungroup selection' in context menu ungroups selected group: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -19086,6 +19141,7 @@ exports[`regression tests selecting 'Ungroup selection' in context menu ungroups
 
 exports[`regression tests shift-click to multiselect, then drag: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -19372,6 +19428,7 @@ exports[`regression tests shift-click to multiselect, then drag: [end of test] n
 
 exports[`regression tests shows 'Group selection' in context menu for multiple selected elements: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -19594,6 +19651,7 @@ exports[`regression tests shows 'Group selection' in context menu for multiple s
 
 exports[`regression tests shows 'Ungroup selection' in context menu for group inside selected elements: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -19886,6 +19944,7 @@ exports[`regression tests shows 'Ungroup selection' in context menu for group in
 
 exports[`regression tests shows context menu for canvas: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -19957,6 +20016,7 @@ exports[`regression tests shows context menu for canvas: [end of test] number of
 
 exports[`regression tests shows context menu for element: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -20091,6 +20151,7 @@ exports[`regression tests shows context menu for element: [end of test] number o
 
 exports[`regression tests spacebar + drag scrolls the canvas: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -20162,6 +20223,7 @@ exports[`regression tests spacebar + drag scrolls the canvas: [end of test] numb
 
 exports[`regression tests supports nested groups: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -20843,6 +20905,7 @@ exports[`regression tests supports nested groups: [end of test] number of render
 
 exports[`regression tests two-finger scroll works: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -20916,6 +20979,7 @@ exports[`regression tests two-finger scroll works: [end of test] number of rende
 
 exports[`regression tests undo/redo drawing an element: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -21368,6 +21432,7 @@ exports[`regression tests undo/redo drawing an element: [end of test] number of 
 
 exports[`regression tests updates fontSize & fontFamily appState: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
@@ -21450,6 +21515,7 @@ exports[`regression tests updates fontSize & fontFamily appState: [end of test] 
 
 exports[`regression tests zoom hotkeys: [end of test] appState 1`] = `
 Object {
+  "appearance": "light",
   "collaborators": Map {},
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
