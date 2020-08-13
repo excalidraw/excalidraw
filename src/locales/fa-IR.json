@@ -95,6 +95,7 @@
     "roomDialog": "همکاری آنلاین را شروع کنید",
     "createNewRoom": "ایجاد یک اتاق جدید",
     "toggleFullScreen": "تغییر به حالت تمام صفحه",
+    "toggleDarkMode": "",
     "toggleZenMode": "تغییر به حالت تمرکز",
     "exitZenMode": "خروج از حالت تمرکز"
   },
