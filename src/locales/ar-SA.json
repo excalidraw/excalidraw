@@ -95,6 +95,7 @@
     "roomDialog": "بدء المشاركة الحية",
     "createNewRoom": "إنشاء غرفة جديدة",
     "toggleFullScreen": "التبديل لوضع ملء الشاشة",
+    "toggleDarkMode": "",
     "toggleZenMode": "تبديل الوضع الليلي",
     "exitZenMode": "الغاء الوضع الليلى"
   },
