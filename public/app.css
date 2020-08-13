@@ -26,3 +26,7 @@
   padding: 0.8em 1.2em;
   font-size: 1.3em;
 }
+
+.Appearance_dark .LoadingMessage span {
+  color: #000;
+}
