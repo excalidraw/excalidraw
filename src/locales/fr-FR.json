@@ -95,6 +95,7 @@
     "roomDialog": "Démarrer la collaboration en temps réel",
     "createNewRoom": "Créer un nouveau salon",
     "toggleFullScreen": "Mode plein-écran",
+    "toggleDarkMode": "",
     "toggleZenMode": "Activer/désactiver le mode zen",
     "exitZenMode": "Quitter le mode zen"
   },
