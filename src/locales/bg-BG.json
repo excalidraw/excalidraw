@@ -95,6 +95,7 @@
     "roomDialog": "Започнете сътрудничество на живо",
     "createNewRoom": "Създай нова стая",
     "toggleFullScreen": "Превключване на цял екран",
+    "toggleDarkMode": "",
     "toggleZenMode": "",
     "exitZenMode": ""
   },
