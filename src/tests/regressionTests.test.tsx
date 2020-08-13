@@ -1223,28 +1223,48 @@ describe("regression tests", () => {
     expect(getSelectedElements().length).toBe(1);
   });
 
-  it("clicking on common bounding box of selected elements without click on an element deselects all elements", () => {
-    clickTool("rectangle");
-    mouse.down();
-    mouse.up(10, 10);
+  it(
+    "drags selected elements from point inside common bounding box that doesn't hit any element " +
+      "and keeps elements selected after dragging",
+    () => {
+      clickTool("rectangle");
+      mouse.down();
+      mouse.up(10, 10);
 
-    clickTool("ellipse");
-    mouse.down(100, 100);
-    mouse.up(10, 10);
+      clickTool("ellipse");
+      mouse.down(100, 100);
+      mouse.up(10, 10);
 
-    // Selects first element without deselecting the second element
-    // Second created element is already selected because creating it was our last action
-    mouse.reset();
-    withModifierKeys({ shift: true }, () => {
-      mouse.click(5, 5);
-    });
+      // Selects first element without deselecting the second element
+      // Second element is already selected because creating it was our last action
+      mouse.reset();
+      withModifierKeys({ shift: true }, () => {
+        mouse.click(5, 5);
+      });
 
-    expect(getSelectedElements().length).toBe(2);
+      expect(getSelectedElements().length).toBe(2);
 
-    // Click on selected elements' common bounding box without clicking on any of the elements
-    mouse.reset();
-    mouse.click(50, 50);
+      const {
+        x: firstElementPrevX,
+        y: firstElementPrevY,
+      } = getSelectedElements()[0];
+      const {
+        x: secondElementPrevX,
+        y: secondElementPrevY,
+      } = getSelectedElements()[1];
 
-    expect(getSelectedElements().length).toBe(0);
-  });
+      // drag elements from point on common bounding box that doesn't hit any of the elements
+      mouse.reset();
+      mouse.down(50, 50);
+      mouse.up(25, 25);
+
+      expect(getSelectedElements()[0].x).toEqual(firstElementPrevX + 25);
+      expect(getSelectedElements()[0].y).toEqual(firstElementPrevY + 25);
+
+      expect(getSelectedElements()[1].x).toEqual(secondElementPrevX + 25);
+      expect(getSelectedElements()[1].y).toEqual(secondElementPrevY + 25);
+
+      expect(getSelectedElements().length).toBe(2);
+    },
+  );
 });

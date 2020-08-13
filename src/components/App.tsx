@@ -240,8 +240,9 @@ type PointerDownState = Readonly<{
     // This is determined on the initial pointer down event
     wasAddedToSelection: boolean;
     // Whether selected element(s) were duplicated, might change during the
-    // pointer interation
+    // pointer interaction
     hasBeenDuplicated: boolean;
+    hasHitCommonBoundingBoxOfSelectedElements: boolean;
   };
   drag: {
     // Might change during the pointer interation
@@ -2089,16 +2090,40 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         return;
       }
     }
-    const hitElement = this.getElementAtPosition(scenePointerX, scenePointerY);
+    document.documentElement.style.cursor = this.getCursorStyleForCurrentPointer(
+      scenePointer,
+      isOverScrollBar,
+    );
+  };
+
+  private getCursorStyleForCurrentPointer(
+    pointer: Readonly<{ x: number; y: number }>,
+    isPointerOverScrollBar: boolean,
+  ): string {
+    const hitElement = this.getElementAtPosition(pointer.x, pointer.y);
+    const selectedElements = getSelectedElements(
+      this.scene.getElements(),
+      this.state,
+    );
     if (this.state.elementType === "text") {
-      document.documentElement.style.cursor = isTextElement(hitElement)
+      return isTextElement(hitElement)
         ? CURSOR_TYPE.TEXT
         : CURSOR_TYPE.CROSSHAIR;
-    } else {
-      document.documentElement.style.cursor =
-        hitElement && !isOverScrollBar ? "move" : "";
     }
-  };
+    if (isPointerOverScrollBar) {
+      return CURSOR_TYPE.AUTO;
+    }
+    if (
+      hitElement ||
+      this.isHittingCommonBoundingBoxOfSelectedElements(
+        pointer,
+        selectedElements,
+      )
+    ) {
+      return CURSOR_TYPE.MOVE;
+    }
+    return CURSOR_TYPE.AUTO;
+  }
 
   // set touch moving for mobile context menu
   private handleTouchMove = (event: React.TouchEvent<HTMLCanvasElement>) => {
@@ -2377,6 +2402,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         element: null,
         wasAddedToSelection: false,
         hasBeenDuplicated: false,
+        hasHitCommonBoundingBoxOfSelectedElements: false,
       },
       drag: {
         hasOccurred: false,
@@ -2521,13 +2547,20 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             pointerDownState.origin.y,
           );
 
-        this.maybeClearSelectionWhenHittingElement(
-          event,
-          pointerDownState.hit.element,
+        pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements = this.isHittingCommonBoundingBoxOfSelectedElements(
+          pointerDownState.origin,
+          selectedElements,
         );
+        const hitElement = pointerDownState.hit.element;
+        if (
+          !this.isHittingASelectedElement(hitElement) &&
+          !this.isShiftKeyPressed(event) &&
+          !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
+        ) {
+          this.clearSelection(hitElement);
+        }
 
         // If we click on something
-        const hitElement = pointerDownState.hit.element;
         if (hitElement != null) {
           // deselect if item is selected
           // if shift is not clicked, this will always return true
@@ -2575,6 +2608,26 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
     return false;
   };
+
+  private isHittingASelectedElement(
+    hitElement: ExcalidrawElement | null,
+  ): boolean {
+    return hitElement != null && this.state.selectedElementIds[hitElement.id];
+  }
+
+  private isShiftKeyPressed(
+    event: React.PointerEvent<HTMLCanvasElement>,
+  ): boolean {
+    return event.shiftKey;
+  }
+
+  private isHittingCommonBoundingBoxOfSelectedElements(
+    point: Readonly<{ x: number; y: number }>,
+    selectedElements: readonly ExcalidrawElement[],
+  ): boolean {
+    const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
+    return point.x > x1 && point.x < x2 && point.y > y1 && point.y < y2;
+  }
 
   private handleTextOnPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
@@ -2856,7 +2909,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
 
       const hitElement = pointerDownState.hit.element;
-      if (hitElement && this.state.selectedElementIds[hitElement.id]) {
+      if (
+        this.isHittingASelectedElement(hitElement) ||
+        pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
+      ) {
         // Marking that click was used for dragging to check
         // if elements should be deselected on pointerup
         pointerDownState.drag.hasOccurred = true;
@@ -2890,7 +2946,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
                 this.state.selectedElementIds[element.id] ||
                 // case: the state.selectedElementIds might not have been
                 //  updated yet by the time this mousemove event is fired
-                (element.id === hitElement.id &&
+                (element.id === hitElement?.id &&
                   pointerDownState.hit.wasAddedToSelection)
               ) {
                 const duplicatedElement = duplicateElement(
@@ -3362,17 +3418,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.setState({ suggestedBindings });
   }
 
-  private maybeClearSelectionWhenHittingElement(
-    event: React.PointerEvent<HTMLCanvasElement>,
-    hitElement: ExcalidrawElement | null,
-  ): void {
-    const isHittingASelectedElement =
-      hitElement != null && this.state.selectedElementIds[hitElement.id];
-
-    // clear selection if shift is not clicked
-    if (isHittingASelectedElement || event.shiftKey) {
-      return;
-    }
+  private clearSelection(hitElement: ExcalidrawElement | null): void {
     this.setState((prevState) => ({
       selectedElementIds: {},
       selectedGroupIds: {},
