@@ -95,6 +95,7 @@
     "roomDialog": "Ortak çalışma ortamı yarat",
     "createNewRoom": "Yeni oda oluştur",
     "toggleFullScreen": "Tam ekranı aç/kapa",
+    "toggleDarkMode": "",
     "toggleZenMode": "Zen modunu aç/kapa",
     "exitZenMode": "Zen modundan çık"
   },
