@@ -44,6 +44,7 @@ export const actionClearCanvas = register({
       ),
       appState: {
         ...getDefaultAppState(),
+        appearance: appState.appearance,
         username: appState.username,
       },
       commitToHistory: true,
