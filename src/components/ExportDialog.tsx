@@ -87,11 +87,7 @@ const ExportModal = ({
 
   return (
     <div className="ExportDialog">
-      <div
-        className={`ExportDialog__preview
-          ExportDialog__exportAppearance-${appState.exportAppearance}`}
-        ref={previewRef}
-      ></div>
+      <div className="ExportDialog__preview" ref={previewRef}></div>
       <Stack.Col gap={2} align="center">
         <div className="ExportDialog__actions">
           <Stack.Row gap={2}>
@@ -146,9 +142,6 @@ const ExportModal = ({
           </Stack.Row>
         </div>
         {actionManager.renderAction("changeExportBackground")}
-        {appState.appearance === "dark"
-          ? actionManager.renderAction("changeExportAppearance")
-          : null}
         {someElementIsSelected && (
           <div>
             <label>

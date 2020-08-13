@@ -44,7 +44,6 @@ export type ActionName =
   | "finalize"
   | "changeProjectName"
   | "changeExportBackground"
-  | "changeExportAppearance"
   | "changeShouldAddWatermark"
   | "saveScene"
   | "saveAsScene"
