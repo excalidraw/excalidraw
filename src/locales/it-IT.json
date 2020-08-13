@@ -95,6 +95,7 @@
     "roomDialog": "Inizia collaborazione in diretta",
     "createNewRoom": "Crea nuova stanza",
     "toggleFullScreen": "Attiva/Disattiva schermo intero",
+    "toggleDarkMode": "",
     "toggleZenMode": "Attiva/Disattiva modalità zen",
     "exitZenMode": "Uscire dalla modalità zen"
   },
