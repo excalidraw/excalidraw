@@ -95,6 +95,7 @@
     "roomDialog": "Aloita live-yhteistyö",
     "createNewRoom": "Luo huone",
     "toggleFullScreen": "Koko näytön tila päälle/pois",
+    "toggleDarkMode": "",
     "toggleZenMode": "Zen-tila päälle",
     "exitZenMode": "Poistu zen-tilasta"
   },
