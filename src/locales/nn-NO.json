@@ -95,6 +95,7 @@
     "roomDialog": "Start sanntids-samarbeid",
     "createNewRoom": "Lag nytt rom",
     "toggleFullScreen": "Slå på/av fullskjerm",
+    "toggleDarkMode": "",
     "toggleZenMode": "Slå på/av zen-modus",
     "exitZenMode": "Avslutt zen-modus"
   },
