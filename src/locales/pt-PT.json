@@ -69,7 +69,7 @@
     "addToLibrary": "Adicionar à biblioteca",
     "removeFromLibrary": "Remover da biblioteca",
     "libraryLoadingMessage": "Carregando biblioteca...",
-    "loadingScene": ""
+    "loadingScene": "Carregando cena..."
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
