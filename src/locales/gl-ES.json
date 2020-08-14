@@ -68,7 +68,8 @@
     "toggleGridMode": "",
     "addToLibrary": "Engadir á biblioteca",
     "removeFromLibrary": "Eliminar da biblioteca",
-    "libraryLoadingMessage": "Cargando biblioteca..."
+    "libraryLoadingMessage": "Cargando biblioteca...",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "Limpar o lenzo",
