@@ -262,8 +262,14 @@ button,
   align-items: flex-start;
   cursor: default;
   pointer-events: none !important;
-  left: 0.25rem;
   z-index: 100;
+
+  :root[dir="ltr"] & {
+    left: 0.25rem;
+  }
+  :root[dir="rtl"] & {
+    right: 0.25rem;
+  }
 
   &--transition-left {
     section {
