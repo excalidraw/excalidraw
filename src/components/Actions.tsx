@@ -2,7 +2,13 @@ import React from "react";
 import { AppState } from "../types";
 import { ExcalidrawElement } from "../element/types";
 import { ActionManager } from "../actions/manager";
-import { hasBackground, hasStroke, hasText, getTargetElement } from "../scene";
+import {
+  hasBackground,
+  hasStroke,
+  canChangeSharpness,
+  hasText,
+  getTargetElement,
+} from "../scene";
 import { t } from "../i18n";
 import { SHAPES } from "../shapes";
 import { ToolButton } from "./ToolButton";
@@ -48,6 +54,11 @@ export const SelectedShapeActions = ({
           {renderAction("changeStrokeStyle")}
           {renderAction("changeSloppiness")}
         </>
+      )}
+
+      {(canChangeSharpness(elementType) ||
+        targetElements.some((element) => canChangeSharpness(element.type))) && (
+        <>{renderAction("changeSharpness")}</>
       )}
 
       {(hasText(elementType) ||

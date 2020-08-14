@@ -165,6 +165,9 @@ export const getArrowPoints = (
   shape: Drawable[],
 ) => {
   const ops = getCurvePathOps(shape[0]);
+  if (ops.length < 1) {
+    return null;
+  }
 
   const data = ops[ops.length - 1].data;
   const p3 = [data[4], data[5]] as Point;
@@ -339,10 +342,13 @@ export const getResizedElementAbsoluteCoords = (
   );
 
   const gen = rough.generator();
-  const curve = gen.curve(
-    points as [number, number][],
-    generateRoughOptions(element),
-  );
+  const curve =
+    element.strokeSharpness === "sharp"
+      ? gen.linearPath(
+          points as [number, number][],
+          generateRoughOptions(element),
+        )
+      : gen.curve(points as [number, number][], generateRoughOptions(element));
   const ops = getCurvePathOps(curve);
   const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
   return [
@@ -356,13 +362,17 @@ export const getResizedElementAbsoluteCoords = (
 export const getElementPointsCoords = (
   element: ExcalidrawLinearElement,
   points: readonly (readonly [number, number])[],
+  sharpness: ExcalidrawElement["strokeSharpness"],
 ): [number, number, number, number] => {
   // This might be computationally heavey
   const gen = rough.generator();
-  const curve = gen.curve(
-    points as [number, number][],
-    generateRoughOptions(element),
-  );
+  const curve =
+    sharpness === "sharp"
+      ? gen.linearPath(
+          points as [number, number][],
+          generateRoughOptions(element),
+        )
+      : gen.curve(points as [number, number][], generateRoughOptions(element));
   const ops = getCurvePathOps(curve);
   const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
   return [
