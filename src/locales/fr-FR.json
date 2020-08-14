@@ -68,7 +68,8 @@
     "toggleGridMode": "Basculer le mode grille",
     "addToLibrary": "Ajouter à la bibliothèque",
     "removeFromLibrary": "Supprimer de la bibliothèque",
-    "libraryLoadingMessage": "Chargement de la bibliothèque..."
+    "libraryLoadingMessage": "Chargement de la bibliothèque...",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "Effacer le canvas & réinitialiser la couleur d'arrière-plan",
