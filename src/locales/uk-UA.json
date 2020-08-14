@@ -68,7 +68,8 @@
     "toggleGridMode": "Режим сітки",
     "addToLibrary": "Додати до бібліотеки",
     "removeFromLibrary": "Видалити з бібліотеки",
-    "libraryLoadingMessage": "Завантажити бібліотеку..."
+    "libraryLoadingMessage": "Завантажити бібліотеку...",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "Очистити полотно",
