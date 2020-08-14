@@ -68,7 +68,8 @@
     "toggleGridMode": "Ruudukko päälle/pois",
     "addToLibrary": "Lisää kirjastoon",
     "removeFromLibrary": "Poista kirjastosta",
-    "libraryLoadingMessage": "Ladataan kirjastoa..."
+    "libraryLoadingMessage": "Ladataan kirjastoa...",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
