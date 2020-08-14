@@ -25,9 +25,9 @@
     "sloppiness": "線條風格",
     "opacity": "透明度",
     "textAlign": "文字對齊",
-    "edges": "",
-    "sharp": "",
-    "round": "",
+    "edges": "邊緣",
+    "sharp": "尖銳",
+    "round": "平滑",
     "fontSize": "字型大小",
     "fontFamily": "字體",
     "onlySelected": "僅選取物件",
@@ -72,7 +72,7 @@
     "addToLibrary": "加入資料庫",
     "removeFromLibrary": "從資料庫中移除",
     "libraryLoadingMessage": "資料庫讀取中…",
-    "loadingScene": ""
+    "loadingScene": "場景讀取中…"
   },
   "buttons": {
     "clearReset": "重置 canvas",
