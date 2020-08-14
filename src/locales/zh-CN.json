@@ -68,7 +68,8 @@
     "toggleGridMode": "切换网格模式",
     "addToLibrary": "添加到库中",
     "removeFromLibrary": "从库中移除",
-    "libraryLoadingMessage": "正在加载库..."
+    "libraryLoadingMessage": "正在加载库...",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "重置画布",
