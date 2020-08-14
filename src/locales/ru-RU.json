@@ -68,7 +68,8 @@
     "toggleGridMode": "Переключить режим сетки",
     "addToLibrary": "Добавить в библиотеку",
     "removeFromLibrary": "Удалить из библиотеки",
-    "libraryLoadingMessage": "Загрузка библиотеки..."
+    "libraryLoadingMessage": "Загрузка библиотеки...",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",
