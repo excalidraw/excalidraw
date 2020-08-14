@@ -68,7 +68,8 @@
     "toggleGridMode": "Commutar línies de graella",
     "addToLibrary": "Afegir a la biblioteca",
     "removeFromLibrary": "Eliminar de la biblioteca",
-    "libraryLoadingMessage": "Carregant la biblioteca..."
+    "libraryLoadingMessage": "Carregant la biblioteca...",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "Netejar el llenç",
