@@ -68,7 +68,8 @@
     "toggleGridMode": "Slå av/på rutenett",
     "addToLibrary": "Legg til i bibliotek",
     "removeFromLibrary": "Fjern fra bibliotek",
-    "libraryLoadingMessage": "Laster bibliotek..."
+    "libraryLoadingMessage": "Laster bibliotek...",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
