@@ -4,7 +4,6 @@ import * as GADirection from "../gadirections";
 import * as GALine from "../galines";
 import * as GATransform from "../gatransforms";
 
-import { NonDeletedExcalidrawElement, ExcalidrawElement } from "./types";
 import { isPathALoop, isPointInPolygon, rotate } from "../math";
 import { pointsOnBezierCurves } from "points-on-curve";
 
@@ -268,7 +267,7 @@ const hitTestLinear = (args: HitTestArgs): boolean => {
 
   if (args.check === isInsideCheck) {
     const hit = shape.some((subshape) =>
-      hitTestCurveInside(subshape, relX, relY),
+      hitTestCurveInside(subshape, relX, relY, element.strokeSharpness),
     );
     if (hit) {
       return true;
