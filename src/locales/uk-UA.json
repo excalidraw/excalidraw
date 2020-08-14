@@ -95,7 +95,7 @@
     "roomDialog": "Відкрити сесію спільної роботи",
     "createNewRoom": "Створити нову кімнату",
     "toggleFullScreen": "Повноекранний режим",
-    "toggleDarkMode": "",
+    "toggleDarkMode": "Переключити темний режим",
     "toggleZenMode": "Дзен-режим",
     "exitZenMode": "Вийти з дзен-режиму"
   },
@@ -179,7 +179,7 @@
     "textNewLine": "Додати новий рядок (текст)",
     "textFinish": "Завершити редагування (текст)",
     "zoomToFit": "Збільшити щоб умістити все",
-    "preventBinding": ""
+    "preventBinding": "Запобігти зв'язування зі стрілками"
   },
   "encrypted": {
     "tooltip": "Ваші креслення захищені наскрізним шифруванням — сервери Excalidraw ніколи їх не побачать."
