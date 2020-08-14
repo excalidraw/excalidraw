@@ -25,9 +25,9 @@
     "sloppiness": "Охайність",
     "opacity": "Прозорість",
     "textAlign": "Вирівнювання тексту",
-    "edges": "",
-    "sharp": "",
-    "round": "",
+    "edges": "Краї",
+    "sharp": "Гострі",
+    "round": "Круглі",
     "fontSize": "Розмір шрифту",
     "fontFamily": "Шрифт",
     "onlySelected": "Тільки вибране",
@@ -72,7 +72,7 @@
     "addToLibrary": "Додати до бібліотеки",
     "removeFromLibrary": "Видалити з бібліотеки",
     "libraryLoadingMessage": "Завантажити бібліотеку...",
-    "loadingScene": ""
+    "loadingScene": "Завантаження сцени..."
   },
   "buttons": {
     "clearReset": "Очистити полотно",
