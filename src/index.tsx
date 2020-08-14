@@ -68,7 +68,7 @@ document.addEventListener(
   "touchmove",
   (event) => {
     // @ts-ignore
-    if (event.scale !== 1) {
+    if (typeof event.scale === "number" && event.scale !== 1) {
       event.preventDefault();
     }
   },

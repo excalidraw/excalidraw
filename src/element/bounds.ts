@@ -10,11 +10,14 @@ import {
 import { isLinearElement } from "./typeChecks";
 import { rescalePoints } from "../points";
 
+// x and y position of top left corner, x and y position of bottom right corner
+export type Bounds = readonly [number, number, number, number];
+
 // If the element is created from right to left, the width is going to be negative
 // This set of functions retrieves the absolute position of the 4 points.
 export const getElementAbsoluteCoords = (
   element: ExcalidrawElement,
-): [number, number, number, number] => {
+): Bounds => {
   if (isLinearElement(element)) {
     return getLinearElementAbsoluteCoords(element);
   }
@@ -26,6 +29,13 @@ export const getElementAbsoluteCoords = (
   ];
 };
 
+export const pointRelativeTo = (
+  element: ExcalidrawElement,
+  absoluteCoords: Point,
+): Point => {
+  return [absoluteCoords[0] - element.x, absoluteCoords[1] - element.y];
+};
+
 export const getDiamondPoints = (element: ExcalidrawElement) => {
   // Here we add +1 to avoid these numbers to be 0
   // otherwise rough.js will throw an error complaining about it
@@ -35,7 +45,7 @@ export const getDiamondPoints = (element: ExcalidrawElement) => {
   const rightY = Math.floor(element.height / 2) + 1;
   const bottomX = topX;
   const bottomY = element.height;
-  const leftX = topY;
+  const leftX = 0;
   const leftY = rightY;
 
   return [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY];

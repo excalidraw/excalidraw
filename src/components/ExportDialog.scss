@@ -15,6 +15,10 @@
   max-height: 25rem;
 }
 
+.Appearance_dark .ExportDialog__preview canvas {
+  filter: none;
+}
+
 .ExportDialog__actions {
   width: 100%;
   display: flex;
@@ -26,6 +30,10 @@
 .ExportDialog__name {
   grid-column: project-name;
   margin: auto;
+
+  .TextInput {
+    height: calc(1rem - 3px);
+  }
 }
 
 @media (max-width: 550px) {

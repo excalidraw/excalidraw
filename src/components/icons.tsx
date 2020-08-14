@@ -7,7 +7,13 @@ import React from "react";
 
 import oc from "open-color";
 
-const ACTIVE_ELEMENT_COLOR = oc.orange[4];
+const activeElementColor = (appearance: "light" | "dark") =>
+  appearance === "light" ? oc.orange[4] : oc.orange[9];
+const iconFillColor = (appearance: "light" | "dark") =>
+  appearance === "light" ? oc.black : oc.gray[4];
+const handlerColor = (appearance: "light" | "dark") =>
+  appearance === "light" ? oc.white : "#1e1e1e";
+
 type Opts = { width?: number; height?: number; mirror?: true } & React.SVGProps<
   SVGSVGElement
 >;
@@ -109,74 +115,90 @@ export const resetZoom = createIcon(
   { width: 1024 },
 );
 
-export const bringForward = createIcon(
-  <>
-    <path
-      d="M22 9.556C22 8.696 21.303 8 20.444 8H16v8H8v4.444C8 21.304 8.697 22 9.556 22h10.888c.86 0 1.556-.697 1.556-1.556V9.556z"
-      stroke={oc.black}
-      strokeWidth="2"
-    />
-    <path
-      d="M16 3.556C16 2.696 15.303 2 14.444 2H3.556C2.696 2 2 2.697 2 3.556v10.888C2 15.304 2.697 16 3.556 16h10.888c.86 0 1.556-.697 1.556-1.556V3.556z"
-      fill={ACTIVE_ELEMENT_COLOR}
-      stroke={ACTIVE_ELEMENT_COLOR}
-      strokeWidth="2"
-    />
-  </>,
-  { width: 24 },
+export const BringForwardIcon = React.memo(
+  ({ appearance }: { appearance: "light" | "dark" }) =>
+    createIcon(
+      <>
+        <path
+          d="M22 9.556C22 8.696 21.303 8 20.444 8H16v8H8v4.444C8 21.304 8.697 22 9.556 22h10.888c.86 0 1.556-.697 1.556-1.556V9.556z"
+          fill={iconFillColor(appearance)}
+          stroke={iconFillColor(appearance)}
+          strokeWidth="2"
+        />
+        <path
+          d="M16 3.556C16 2.696 15.303 2 14.444 2H3.556C2.696 2 2 2.697 2 3.556v10.888C2 15.304 2.697 16 3.556 16h10.888c.86 0 1.556-.697 1.556-1.556V3.556z"
+          fill={activeElementColor(appearance)}
+          stroke={activeElementColor(appearance)}
+          strokeWidth="2"
+        />
+      </>,
+      { width: 24 },
+    ),
 );
 
-export const sendBackward = createIcon(
-  <>
-    <path
-      d="M16 3.556C16 2.696 15.303 2 14.444 2H3.556C2.696 2 2 2.697 2 3.556v10.888C2 15.304 2.697 16 3.556 16h10.888c.86 0 1.556-.697 1.556-1.556V3.556z"
-      fill={ACTIVE_ELEMENT_COLOR}
-      stroke={ACTIVE_ELEMENT_COLOR}
-      strokeWidth="2"
-    />
-    <path
-      d="M22 9.556C22 8.696 21.303 8 20.444 8H9.556C8.696 8 8 8.697 8 9.556v10.888C8 21.304 8.697 22 9.556 22h10.888c.86 0 1.556-.697 1.556-1.556V9.556z"
-      stroke={oc.black}
-      strokeWidth="2"
-    />
-  </>,
-  { width: 24 },
+export const SendBackwardIcon = React.memo(
+  ({ appearance }: { appearance: "light" | "dark" }) =>
+    createIcon(
+      <>
+        <path
+          d="M16 3.556C16 2.696 15.303 2 14.444 2H3.556C2.696 2 2 2.697 2 3.556v10.888C2 15.304 2.697 16 3.556 16h10.888c.86 0 1.556-.697 1.556-1.556V3.556z"
+          fill={activeElementColor(appearance)}
+          stroke={activeElementColor(appearance)}
+          strokeWidth="2"
+        />
+        <path
+          d="M22 9.556C22 8.696 21.303 8 20.444 8H9.556C8.696 8 8 8.697 8 9.556v10.888C8 21.304 8.697 22 9.556 22h10.888c.86 0 1.556-.697 1.556-1.556V9.556z"
+          fill={iconFillColor(appearance)}
+          stroke={iconFillColor(appearance)}
+          strokeWidth="2"
+        />
+      </>,
+      { width: 24 },
+    ),
 );
 
-export const bringToFront = createIcon(
-  <>
-    <path
-      d="M13 21a1 1 0 001 1h7a1 1 0 001-1v-7a1 1 0 00-1-1h-3v5h-5v3zM11 3a1 1 0 00-1-1H3a1 1 0 00-1 1v7a1 1 0 001 1h3V6h5V3z"
-      stroke={oc.black}
-      strokeWidth="2"
-    />
-    <path
-      d="M18 7.333C18 6.597 17.403 6 16.667 6H7.333C6.597 6 6 6.597 6 7.333v9.334C6 17.403 6.597 18 7.333 18h9.334c.736 0 1.333-.597 1.333-1.333V7.333z"
-      fill={ACTIVE_ELEMENT_COLOR}
-      stroke={ACTIVE_ELEMENT_COLOR}
-      strokeWidth="2"
-    />
-  </>,
-  { width: 24 },
+export const BringToFrontIcon = React.memo(
+  ({ appearance }: { appearance: "light" | "dark" }) =>
+    createIcon(
+      <>
+        <path
+          d="M13 21a1 1 0 001 1h7a1 1 0 001-1v-7a1 1 0 00-1-1h-3v5h-5v3zM11 3a1 1 0 00-1-1H3a1 1 0 00-1 1v7a1 1 0 001 1h3V6h5V3z"
+          fill={iconFillColor(appearance)}
+          stroke={iconFillColor(appearance)}
+          strokeWidth="2"
+        />
+        <path
+          d="M18 7.333C18 6.597 17.403 6 16.667 6H7.333C6.597 6 6 6.597 6 7.333v9.334C6 17.403 6.597 18 7.333 18h9.334c.736 0 1.333-.597 1.333-1.333V7.333z"
+          fill={activeElementColor(appearance)}
+          stroke={activeElementColor(appearance)}
+          strokeWidth="2"
+        />
+      </>,
+      { width: 24 },
+    ),
 );
 
-export const sendToBack = createIcon(
-  <>
-    <path
-      d="M18 7.333C18 6.597 17.403 6 16.667 6H7.333C6.597 6 6 6.597 6 7.333v9.334C6 17.403 6.597 18 7.333 18h9.334c.736 0 1.333-.597 1.333-1.333V7.333z"
-      fill={ACTIVE_ELEMENT_COLOR}
-      stroke={ACTIVE_ELEMENT_COLOR}
-      strokeLinejoin="round"
-      strokeWidth="2"
-    />
-    <path
-      d="M11 3a1 1 0 00-1-1H3a1 1 0 00-1 1v7a1 1 0 001 1h8V3zM22 14a1 1 0 00-1-1h-7a1 1 0 00-1 1v7a1 1 0 001 1h8v-8z"
-      stroke={oc.black}
-      strokeLinejoin="round"
-      strokeWidth="2"
-    />
-  </>,
-  { width: 24 },
+export const SendToBackIcon = React.memo(
+  ({ appearance }: { appearance: "light" | "dark" }) =>
+    createIcon(
+      <>
+        <path
+          d="M18 7.333C18 6.597 17.403 6 16.667 6H7.333C6.597 6 6 6.597 6 7.333v9.334C6 17.403 6.597 18 7.333 18h9.334c.736 0 1.333-.597 1.333-1.333V7.333z"
+          fill={activeElementColor(appearance)}
+          stroke={activeElementColor(appearance)}
+          strokeLinejoin="round"
+          strokeWidth="2"
+        />
+        <path
+          d="M11 3a1 1 0 00-1-1H3a1 1 0 00-1 1v7a1 1 0 001 1h8V3zM22 14a1 1 0 00-1-1h-7a1 1 0 00-1 1v7a1 1 0 001 1h8v-8z"
+          fill={iconFillColor(appearance)}
+          stroke={iconFillColor(appearance)}
+          strokeLinejoin="round"
+          strokeWidth="2"
+        />
+      </>,
+      { width: 24 },
+    ),
 );
 
 export const users = createIcon(
@@ -213,127 +235,134 @@ export const shield = createIcon(
   { width: 24 },
 );
 
-export const group = createIcon(
-  <>
-    <path d="M25 26H111V111H25" fill={oc.black} />
-    <path
-      d="M25 111C25 80.2068 25 49.4135 25 26M25 26C48.6174 26 72.2348 26 111 26H25ZM25 26C53.3671 26 81.7343 26 111 26H25ZM111 26C111 52.303 111 78.606 111 111V26ZM111 26C111 51.2947 111 76.5893 111 111V26ZM111 111C87.0792 111 63.1585 111 25 111H111ZM111 111C87.4646 111 63.9293 111 25 111H111ZM25 111C25 81.1514 25 51.3028 25 26V111Z"
-      stroke={oc.black}
-      strokeWidth="2"
-    />
-    <path d="M100 100H160V160H100" fill={oc.black} />
-    <path
-      d="M100 160C100 144.106 100 128.211 100 100M100 100C117.706 100 135.412 100 160 100H100ZM100 100C114.214 100 128.428 100 160 100H100ZM160 100C160 120.184 160 140.369 160 160V100ZM160 100C160 113.219 160 126.437 160 160V100ZM160 160C145.534 160 131.068 160 100 160H160ZM160 160C143.467 160 126.934 160 100 160H160ZM100 160C100 143.661 100 127.321 100 100V160Z"
-      stroke={oc.black}
-      strokeWidth="2"
-    />
-    <rect
-      x="2.5"
-      y="2.5"
-      width="30"
-      height="30"
-      fill={oc.white}
-      stroke={oc.black}
-      strokeWidth="6"
-    />
-    <rect
-      x="2.5"
-      y="149.5"
-      width="30"
-      height="30"
-      fill={oc.white}
-      stroke={oc.black}
-      strokeWidth="6"
-    />
-    <rect
-      x="147.5"
-      y="149.5"
-      width="30"
-      height="30"
-      fill={oc.white}
-      stroke={oc.black}
-      strokeWidth="6"
-    />
-    <rect
-      x="147.5"
-      y="2.5"
-      width="30"
-      height="30"
-      fill={oc.white}
-      stroke={oc.black}
-      strokeWidth="6"
-    />
-  </>,
-  { width: 182, height: 182 },
+export const GroupIcon = React.memo(
+  ({ appearance }: { appearance: "light" | "dark" }) =>
+    createIcon(
+      <>
+        <path d="M25 26H111V111H25" fill={iconFillColor(appearance)} />
+        <path
+          d="M25 111C25 80.2068 25 49.4135 25 26M25 26C48.6174 26 72.2348 26 111 26H25ZM25 26C53.3671 26 81.7343 26 111 26H25ZM111 26C111 52.303 111 78.606 111 111V26ZM111 26C111 51.2947 111 76.5893 111 111V26ZM111 111C87.0792 111 63.1585 111 25 111H111ZM111 111C87.4646 111 63.9293 111 25 111H111ZM25 111C25 81.1514 25 51.3028 25 26V111Z"
+          stroke={iconFillColor(appearance)}
+          strokeWidth="2"
+        />
+        <path d="M100 100H160V160H100" fill={iconFillColor(appearance)} />
+        <path
+          d="M100 160C100 144.106 100 128.211 100 100M100 100C117.706 100 135.412 100 160 100H100ZM100 100C114.214 100 128.428 100 160 100H100ZM160 100C160 120.184 160 140.369 160 160V100ZM160 100C160 113.219 160 126.437 160 160V100ZM160 160C145.534 160 131.068 160 100 160H160ZM160 160C143.467 160 126.934 160 100 160H160ZM100 160C100 143.661 100 127.321 100 100V160Z"
+          stroke={iconFillColor(appearance)}
+          strokeWidth="2"
+        />
+        <rect
+          x="2.5"
+          y="2.5"
+          width="30"
+          height="30"
+          fill={handlerColor(appearance)}
+          stroke={iconFillColor(appearance)}
+          strokeWidth="6"
+        />
+        <rect
+          x="2.5"
+          y="149.5"
+          width="30"
+          height="30"
+          fill={handlerColor(appearance)}
+          stroke={iconFillColor(appearance)}
+          strokeWidth="6"
+        />
+        <rect
+          x="147.5"
+          y="149.5"
+          width="30"
+          height="30"
+          fill={handlerColor(appearance)}
+          stroke={iconFillColor(appearance)}
+          strokeWidth="6"
+        />
+        <rect
+          x="147.5"
+          y="2.5"
+          width="30"
+          height="30"
+          fill={handlerColor(appearance)}
+          stroke={iconFillColor(appearance)}
+          strokeWidth="6"
+        />
+      </>,
+      { width: 182, height: 182 },
+    ),
 );
-export const ungroup = createIcon(
-  <>
-    <path d="M25 26H111V111H25" fill={oc.black} />
-    <path
-      d="M25 111C25 80.2068 25 49.4135 25 26M25 26C48.6174 26 72.2348 26 111 26H25ZM25 26C53.3671 26 81.7343 26 111 26H25ZM111 26C111 52.303 111 78.606 111 111V26ZM111 26C111 51.2947 111 76.5893 111 111V26ZM111 111C87.0792 111 63.1585 111 25 111H111ZM111 111C87.4646 111 63.9293 111 25 111H111ZM25 111C25 81.1514 25 51.3028 25 26V111Z"
-      stroke={oc.black}
-      strokeWidth="2"
-    />
-    <path d="M100 100H160V160H100" fill={oc.black} />
-    <path
-      d="M100 160C100 144.106 100 128.211 100 100M100 100C117.706 100 135.412 100 160 100H100ZM100 100C114.214 100 128.428 100 160 100H100ZM160 100C160 120.184 160 140.369 160 160V100ZM160 100C160 113.219 160 126.437 160 160V100ZM160 160C145.534 160 131.068 160 100 160H160ZM160 160C143.467 160 126.934 160 100 160H160ZM100 160C100 143.661 100 127.321 100 100V160Z"
-      stroke={oc.black}
-      strokeWidth="2"
-    />
-    <rect
-      x="2.5"
-      y="2.5"
-      width="30"
-      height="30"
-      fill={oc.white}
-      stroke={oc.black}
-      strokeWidth="6"
-    />
-    <rect
-      x="78.5"
-      y="149.5"
-      width="30"
-      height="30"
-      fill={oc.white}
-      stroke={oc.black}
-      strokeWidth="6"
-    />
-    <rect
-      x="147.5"
-      y="149.5"
-      width="30"
-      height="30"
-      fill={oc.white}
-      stroke={oc.black}
-      strokeWidth="6"
-    />
-    <rect
-      x="147.5"
-      y="78.5"
-      width="30"
-      height="30"
-      fill={oc.white}
-      stroke={oc.black}
-      strokeWidth="6"
-    />
-    <rect
-      x="105.5"
-      y="2.5"
-      width="30"
-      height="30"
-      fill={oc.white}
-      stroke={oc.black}
-      strokeWidth="6"
-    />
-    <rect
-      x="2.5"
-      y="102.5"
-      width="30"
-      height="30"
-      fill={oc.white}
-      stroke={oc.black}
-      strokeWidth="6"
-    />
-  </>,
-  { width: 182, height: 182 },
+
+export const UngroupIcon = React.memo(
+  ({ appearance }: { appearance: "light" | "dark" }) =>
+    createIcon(
+      <>
+        <path d="M25 26H111V111H25" fill={iconFillColor(appearance)} />
+        <path
+          d="M25 111C25 80.2068 25 49.4135 25 26M25 26C48.6174 26 72.2348 26 111 26H25ZM25 26C53.3671 26 81.7343 26 111 26H25ZM111 26C111 52.303 111 78.606 111 111V26ZM111 26C111 51.2947 111 76.5893 111 111V26ZM111 111C87.0792 111 63.1585 111 25 111H111ZM111 111C87.4646 111 63.9293 111 25 111H111ZM25 111C25 81.1514 25 51.3028 25 26V111Z"
+          stroke={iconFillColor(appearance)}
+          strokeWidth="2"
+        />
+        <path d="M100 100H160V160H100" fill={iconFillColor(appearance)} />
+        <path
+          d="M100 160C100 144.106 100 128.211 100 100M100 100C117.706 100 135.412 100 160 100H100ZM100 100C114.214 100 128.428 100 160 100H100ZM160 100C160 120.184 160 140.369 160 160V100ZM160 100C160 113.219 160 126.437 160 160V100ZM160 160C145.534 160 131.068 160 100 160H160ZM160 160C143.467 160 126.934 160 100 160H160ZM100 160C100 143.661 100 127.321 100 100V160Z"
+          stroke={iconFillColor(appearance)}
+          strokeWidth="2"
+        />
+        <rect
+          x="2.5"
+          y="2.5"
+          width="30"
+          height="30"
+          fill={handlerColor(appearance)}
+          stroke={iconFillColor(appearance)}
+          strokeWidth="6"
+        />
+        <rect
+          x="78.5"
+          y="149.5"
+          width="30"
+          height="30"
+          fill={handlerColor(appearance)}
+          stroke={iconFillColor(appearance)}
+          strokeWidth="6"
+        />
+        <rect
+          x="147.5"
+          y="149.5"
+          width="30"
+          height="30"
+          fill={handlerColor(appearance)}
+          stroke={iconFillColor(appearance)}
+          strokeWidth="6"
+        />
+        <rect
+          x="147.5"
+          y="78.5"
+          width="30"
+          height="30"
+          fill={handlerColor(appearance)}
+          stroke={iconFillColor(appearance)}
+          strokeWidth="6"
+        />
+        <rect
+          x="105.5"
+          y="2.5"
+          width="30"
+          height="30"
+          fill={handlerColor(appearance)}
+          stroke={iconFillColor(appearance)}
+          strokeWidth="6"
+        />
+        <rect
+          x="2.5"
+          y="102.5"
+          width="30"
+          height="30"
+          fill={handlerColor(appearance)}
+          stroke={iconFillColor(appearance)}
+          strokeWidth="6"
+        />
+      </>,
+      { width: 182, height: 182 },
+    ),
 );

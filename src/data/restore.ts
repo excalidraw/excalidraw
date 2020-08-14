@@ -49,10 +49,11 @@ function migrateElementWithProperties<T extends ExcalidrawElement>(
     width: element.width || 0,
     height: element.height || 0,
     seed: element.seed ?? 1,
-    groupIds: element.groupIds || [],
+    groupIds: element.groupIds ?? [],
     strokeSharpness:
       element.strokeSharpness ??
       (isLinearElement(element as ExcalidrawElement) ? "round" : "sharp"),
+    boundElementIds: element.boundElementIds ?? [],
   };
 
   return {
@@ -89,6 +90,8 @@ const migrateElement = (
     case "line":
     case "arrow": {
       return migrateElementWithProperties(element, {
+        startBinding: element.startBinding,
+        endBinding: element.endBinding,
         points:
           // migrate old arrow model to new one
           !Array.isArray(element.points) || element.points.length < 2
@@ -102,7 +105,9 @@ const migrateElement = (
     }
     // generic elements
     case "ellipse":
+      return migrateElementWithProperties(element, {});
     case "rectangle":
+      return migrateElementWithProperties(element, {});
     case "diamond":
       return migrateElementWithProperties(element, {});
 

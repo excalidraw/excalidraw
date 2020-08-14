@@ -9,8 +9,12 @@
   user-select: none;
   margin: -0.25rem 0 0 0.125rem;
   padding: 0.25rem 0;
-  background-color: $oc-gray-1;
-  border: 1px solid $oc-gray-5;
+  background-color: var(--popup-secondary-background-color);
+  border: 1px solid var(--button-gray-3);
+}
+
+.context-menu button {
+  color: var(--popup-text-color);
 }
 
 .context-menu-option {
@@ -27,8 +31,8 @@
 }
 
 .context-menu-option:hover {
-  color: $oc-white;
-  background-color: $oc-blue-5;
+  color: var(--popup-background-color);
+  background-color: var(--select-highlight-color);
 }
 
 .context-menu-option:focus {

@@ -6,6 +6,8 @@ exports[`add element to the scene when pointer dragging long enough arrow 2`] = 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
+  "boundElementIds": null,
+  "endBinding": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 50,
@@ -25,6 +27,7 @@ Object {
   ],
   "roughness": 1,
   "seed": 337897,
+  "startBinding": null,
   "strokeColor": "#000000",
   "strokeSharpness": "round",
   "strokeStyle": "solid",
@@ -44,6 +47,7 @@ exports[`add element to the scene when pointer dragging long enough diamond 2`] 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
+  "boundElementIds": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 50,
@@ -71,6 +75,7 @@ exports[`add element to the scene when pointer dragging long enough ellipse 2`] 
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
+  "boundElementIds": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 50,
@@ -96,6 +101,8 @@ exports[`add element to the scene when pointer dragging long enough line 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
+  "boundElementIds": null,
+  "endBinding": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 50,
@@ -115,6 +122,7 @@ Object {
   ],
   "roughness": 1,
   "seed": 337897,
+  "startBinding": null,
   "strokeColor": "#000000",
   "strokeSharpness": "round",
   "strokeStyle": "solid",
@@ -134,6 +142,7 @@ exports[`add element to the scene when pointer dragging long enough rectangle 2`
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
+  "boundElementIds": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 50,

@@ -77,6 +77,7 @@ export const textWysiwyg = ({
         textAlign: textAlign,
         color: updatedElement.strokeColor,
         opacity: updatedElement.opacity / 100,
+        filter: "var(--appearance-filter)",
       });
     }
   }

@@ -177,7 +177,8 @@
     "github": "Probleem gevonden? Stuur een nieuwe issue",
     "textNewLine": "Nieuwe regel toevoegen (tekst)",
     "textFinish": "Voltooi bewerken (tekst)",
-    "zoomToFit": "Zoom in op alle elementen"
+    "zoomToFit": "Zoom in op alle elementen",
+    "preventBinding": ""
   },
   "encrypted": {
     "tooltip": ""

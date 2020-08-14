@@ -3,7 +3,7 @@ import { KEYS } from "../keys";
 import { t } from "../i18n";
 import { getShortcutKey } from "../utils";
 import { register } from "./register";
-import { group, ungroup } from "../components/icons";
+import { UngroupIcon, GroupIcon } from "../components/icons";
 import { newElementWith } from "../element/mutateElement";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import {
@@ -140,7 +140,7 @@ export const actionGroup = register({
     <ToolButton
       hidden={!enableActionGroup(elements, appState)}
       type="button"
-      icon={group}
+      icon={<GroupIcon appearance={appState.appearance} />}
       onClick={() => updateData(null)}
       title={`${t("labels.group")} — ${getShortcutKey("CtrlOrCmd+G")}`}
       aria-label={t("labels.group")}
@@ -193,7 +193,7 @@ export const actionUngroup = register({
     <ToolButton
       type="button"
       hidden={getSelectedGroupIds(appState).length === 0}
-      icon={ungroup}
+      icon={<UngroupIcon appearance={appState.appearance} />}
       onClick={() => updateData(null)}
       title={`${t("labels.ungroup")} — ${getShortcutKey("CtrlOrCmd+Shift+G")}`}
       aria-label={t("labels.ungroup")}

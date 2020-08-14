@@ -177,7 +177,8 @@
     "github": "Löysitkö ongelman? Kerro meille",
     "textNewLine": "Lisää uusi rivi (teksti)",
     "textFinish": "Lopeta muokkaus (teksti)",
-    "zoomToFit": "Zoomaa kaikki elementit näkyviin"
+    "zoomToFit": "Zoomaa kaikki elementit näkyviin",
+    "preventBinding": "Estä nuolten sitominen"
   },
   "encrypted": {
     "tooltip": "Piirroksesi ovat päästä päähän salattuja, joten Excalidrawin palvelimet eivät koskaan näe niitä."

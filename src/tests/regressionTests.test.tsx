@@ -9,7 +9,7 @@ import { ToolName } from "./queries/toolQueries";
 import { KEYS, Key } from "../keys";
 import { setDateTimeForTests } from "../utils";
 import { ExcalidrawElement } from "../element/types";
-import { handlerRectangles } from "../element";
+import { getTransformHandles as _getTransformHandles } from "../element";
 import { queryByText } from "@testing-library/react";
 import { copiedStyles } from "../actions/actionStyles";
 
@@ -192,9 +192,9 @@ function getStateHistory() {
   return h.history.stateHistory;
 }
 
-type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
-const getResizeHandles = (pointerType: "mouse" | "touch" | "pen") => {
-  const rects = handlerRectangles(
+type HandlerRectanglesRet = keyof ReturnType<typeof _getTransformHandles>;
+const getTransformHandles = (pointerType: "mouse" | "touch" | "pen") => {
+  const rects = _getTransformHandles(
     getSelectedElement(),
     h.state.zoom,
     pointerType,
@@ -259,40 +259,40 @@ afterEach(() => {
 describe("regression tests", () => {
   it("draw every type of shape", () => {
     clickTool("rectangle");
-    mouse.down(10, 10);
-    mouse.up(10, 10);
+    mouse.down(10, -10);
+    mouse.up(20, 10);
 
     clickTool("diamond");
     mouse.down(10, -10);
-    mouse.up(10, 10);
+    mouse.up(20, 10);
 
     clickTool("ellipse");
     mouse.down(10, -10);
-    mouse.up(10, 10);
+    mouse.up(20, 10);
 
     clickTool("arrow");
-    mouse.down(10, -10);
-    mouse.up(10, 10);
+    mouse.down(40, -10);
+    mouse.up(50, 10);
 
     clickTool("line");
-    mouse.down(10, -10);
-    mouse.up(10, 10);
+    mouse.down(40, -10);
+    mouse.up(50, 10);
 
     clickTool("arrow");
-    mouse.click(10, -10);
-    mouse.click(10, 10);
-    mouse.click(-10, 10);
+    mouse.click(40, -10);
+    mouse.click(50, 10);
+    mouse.click(30, 10);
     hotkeyPress("ENTER");
 
     clickTool("line");
-    mouse.click(10, -20);
-    mouse.click(10, 10);
-    mouse.click(-10, 10);
+    mouse.click(40, -20);
+    mouse.click(50, 10);
+    mouse.click(30, 10);
     hotkeyPress("ENTER");
 
     clickTool("draw");
-    mouse.down(10, -20);
-    mouse.up(10, 10);
+    mouse.down(40, -20);
+    mouse.up(50, 10);
 
     expect(h.elements.map((element) => element.type)).toEqual([
       "rectangle",
@@ -362,10 +362,12 @@ describe("regression tests", () => {
     mouse.down(10, 10);
     mouse.up(10, 10);
 
-    const resizeHandles = getResizeHandles("mouse");
-    delete resizeHandles.rotation; // exclude rotation handle
-    for (const handlePos in resizeHandles) {
-      const [x, y] = resizeHandles[handlePos as keyof typeof resizeHandles];
+    const transformHandles = getTransformHandles("mouse");
+    delete transformHandles.rotation; // exclude rotation handle
+    for (const handlePos in transformHandles) {
+      const [x, y] = transformHandles[
+        handlePos as keyof typeof transformHandles
+      ];
       const { width: prevWidth, height: prevHeight } = getSelectedElement();
       mouse.restorePosition(x, y);
       mouse.down();
@@ -569,17 +571,17 @@ describe("regression tests", () => {
 
   it("undo/redo drawing an element", () => {
     clickTool("rectangle");
-    mouse.down(10, 10);
-    mouse.up(10, 10);
+    mouse.down(10, -10);
+    mouse.up(20, 10);
 
     clickTool("rectangle");
-    mouse.down(10, -10);
-    mouse.up(10, 10);
+    mouse.down(10, 0);
+    mouse.up(30, 20);
 
     clickTool("arrow");
-    mouse.click(10, -10);
-    mouse.click(10, 10);
-    mouse.click(-10, 10);
+    mouse.click(60, -10);
+    mouse.click(60, 10);
+    mouse.click(40, 10);
     hotkeyPress("ENTER");
 
     expect(h.elements.filter((element) => !element.isDeleted).length).toBe(3);
@@ -1209,5 +1211,15 @@ describe("regression tests", () => {
     expect(selectedGroupIds).toHaveLength(0);
     expect(h.elements[0].groupIds).toHaveLength(0);
     expect(h.elements[1].groupIds).toHaveLength(0);
+  });
+
+  it("keeps selected element selected when click hits element bounding box but doesn't hit the element", () => {
+    clickTool("ellipse");
+    mouse.down(0, 0);
+    mouse.up(100, 100);
+
+    // click on bounding box but not on element
+    mouse.click(0, 0);
+    expect(getSelectedElements().length).toBe(1);
   });
 });

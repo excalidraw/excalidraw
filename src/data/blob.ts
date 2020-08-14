@@ -44,6 +44,7 @@ export const loadFromBlob = async (blob: any, appState?: AppState) => {
     elements = data.elements || [];
     _appState = {
       ...defaultAppState,
+      appearance: _appState.appearance,
       ...cleanAppStateForExport(data.appState as Partial<AppState>),
       ...(appState ? calculateScrollCenter(elements, appState, null) : {}),
     };

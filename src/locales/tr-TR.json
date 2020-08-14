@@ -2,7 +2,7 @@
   "labels": {
     "paste": "Yapıştır",
     "selectAll": "Tümünü seç",
-    "multiSelect": "Seçime öğe ekle",
+    "multiSelect": "Seçime öge ekle",
     "moveCanvas": "Tuvali taşı",
     "copy": "Kopyala",
     "copyAsPng": "Panoya PNG olarak kopyala",
@@ -146,16 +146,16 @@
     "trackedToSentry_post": " sistemimize yakalandı.",
     "openIssueMessage_pre": "",
     "openIssueMessage_button": "hata takibinde bir yardım bileti oluşturun.",
-    "openIssueMessage_post": " Lütfen aşağıya Github sorununa kopyalayarak ve yapıştırarak bilgi ekleyin.",
+    "openIssueMessage_post": " Lütfen aşağıya GitHub sorununa kopyalayarak ve yapıştırarak bilgi ekleyin.",
     "sceneContent": "Sahne içeriği:"
   },
   "roomDialog": {
     "desc_intro": "Çalışma alanınıza, sizinle birlikte çalışabilmeleri için başkalarını da ekleyebilirsiniz.",
     "desc_privacy": "Çalışma ortamında yaptıklarınız ve çizimleriniz uçtan uca şifrelemeyle saklanmaktadır. Sunucularımız dahi bu verileri şifrelenmemiş haliyle göremez.",
     "button_startSession": "Oturumu başlat",
-    "button_stopSession": "Oturumu durdur",
+    "button_stopSession": "Oturumu sonlandır",
     "desc_inProgressIntro": "Ortak çalışma ortamı oluşturuldu.",
-    "desc_persistenceWarning": "Çalışma ortamında yaptıklarınız sadece ortama katılmış diğer kişiler ile paylaşılmaktadır. Bundan dolayı, hepinizin bağlantısı kesilirse ve bir dosyaya veya paylaşılabilir link'e dışa aktarmamışsanız tüm verilerinizi kaybedebilirsiniz.",
+    "desc_persistenceWarning": "Çalışma ortamında yaptıklarınız sadece ortama katılmış diğer kişiler ile paylaşılmaktadır. Bundan dolayı, hepinizin bağlantısı kesilirse ve bir dosyaya veya paylaşılabilir bir bağlantıya dışa aktarmamışsanız tüm verilerinizi kaybedebilirsiniz.",
     "desc_shareLink": "Bu bağlantıyı birlikte çalışacağınız kişilerle paylaşabilirsiniz:",
     "desc_exitSession": "Çalışma ortamını kapattığınızda ortak çalışmadan ayrılmış olursunuz ancak kendi versiyonunuzda çalışmaya devam edebilirsiniz. Bu durumda ortak çalıştığınız diğer kişiler etkilenmeyecek, çalışma ortamındaki versiyon üzerinden çalışmaya devam edebilecekler."
   },
@@ -173,14 +173,15 @@
     "editor": "Düzenleyici",
     "view": "Görüntüle",
     "blog": "Blog'umuzu okuyun",
-    "howto": "Rehberimizi takip edin",
+    "howto": "Rehberlerimizi takip edin",
     "github": "Bir hata mı buldun? Bildir",
     "textNewLine": "Yeni satır ekle (yazı)",
     "textFinish": "(Yazıyı) düzenlemeyi bitir",
-    "zoomToFit": "Tüm öğeleri sığdırmak için yakınlaştır"
+    "zoomToFit": "Tüm öğeleri sığdırmak için yakınlaştır",
+    "preventBinding": "Ok bağlamayı önleyin"
   },
   "encrypted": {
-    "tooltip": "Çizimleriniz sonuna kadar şifrelenmiştir, Excalidraw'ın sunucuları bile onları göremez."
+    "tooltip": "Çizimleriniz uçtan-uca şifrelenmiştir, Excalidraw'ın sunucuları bile onları göremez."
   },
   "charts": {
     "noNumericColumn": "Sayısal sütunu olmayan bir tablo yapıştırdın.",

@@ -13,12 +13,14 @@ export const getDefaultAppState = (): Omit<
   "offsetTop" | "offsetLeft"
 > => {
   return {
+    appearance: "light",
     isLoading: false,
     errorMessage: null,
     draggingElement: null,
     resizingElement: null,
     multiElement: null,
     editingElement: null,
+    startBoundElement: null,
     editingLinearElement: null,
     elementType: "selection",
     elementLocked: false,
@@ -45,6 +47,7 @@ export const getDefaultAppState = (): Omit<
     scrolledOutside: false,
     name: `${t("labels.untitled")}-${getDateTime()}`,
     username: "",
+    isBindingEnabled: true,
     isCollaborating: false,
     isResizing: false,
     isRotating: false,
@@ -57,6 +60,7 @@ export const getDefaultAppState = (): Omit<
     collaborators: new Map(),
     shouldCacheIgnoreZoom: false,
     showShortcutsDialog: false,
+    suggestedBindings: [],
     zenModeEnabled: false,
     gridSize: null,
     editingGroupId: null,
@@ -82,6 +86,7 @@ const APP_STATE_STORAGE_CONF = (<
 >(
   config: { [K in keyof T]: K extends keyof AppState ? T[K] : never },
 ) => config)({
+  appearance: { browser: true, export: false },
   collaborators: { browser: false, export: false },
   currentItemBackgroundColor: { browser: true, export: false },
   currentItemFillStyle: { browser: true, export: false },
@@ -100,6 +105,7 @@ const APP_STATE_STORAGE_CONF = (<
   cursorY: { browser: true, export: false },
   draggingElement: { browser: false, export: false },
   editingElement: { browser: false, export: false },
+  startBoundElement: { browser: false, export: false },
   editingGroupId: { browser: true, export: false },
   editingLinearElement: { browser: false, export: false },
   elementLocked: { browser: true, export: false },
@@ -108,6 +114,7 @@ const APP_STATE_STORAGE_CONF = (<
   exportBackground: { browser: true, export: false },
   gridSize: { browser: true, export: true },
   height: { browser: false, export: false },
+  isBindingEnabled: { browser: false, export: false },
   isCollaborating: { browser: false, export: false },
   isLibraryOpen: { browser: false, export: false },
   isLoading: { browser: false, export: false },
@@ -128,6 +135,7 @@ const APP_STATE_STORAGE_CONF = (<
   shouldAddWatermark: { browser: true, export: false },
   shouldCacheIgnoreZoom: { browser: true, export: false },
   showShortcutsDialog: { browser: false, export: false },
+  suggestedBindings: { browser: false, export: false },
   username: { browser: true, export: false },
   viewBackgroundColor: { browser: true, export: true },
   width: { browser: false, export: false },

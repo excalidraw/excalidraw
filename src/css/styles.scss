@@ -1,18 +1,6 @@
 @import "./_variables";
 @import "./theme";
 
-:root {
-  --sat: env(safe-area-inset-top);
-  --sab: env(safe-area-inset-bottom);
-  --sal: env(safe-area-inset-left);
-  --sar: env(safe-area-inset-right);
-  --text-color-primary: #{$oc-gray-8};
-  --bg-color-main: #{$oc-white};
-  --shadow-island: 0 1px 5px #{transparentize($oc-black, 0.85)};
-  --border-radius-m: 4px;
-  --space-factor: 0.25rem;
-}
-
 body {
   margin: 0;
   --ui-font: system-ui, BlinkMacSystemFont, -apple-system, Segoe UI, Roboto,
@@ -49,6 +37,13 @@ canvas {
   image-rendering: pixelated; // chromium
   // NOTE: must be declared *after* the above
   image-rendering: -moz-crisp-edges; // FF
+
+  .Appearance_dark & {
+    // The percentage is inspired by
+    // https://material.io/design/color/dark-theme.html#properties, which
+    // recommends surface color of #121212, 93% yields #111111 for #FFF
+    filter: var(--appearance-filter);
+  }
 }
 
 .excalidraw {
@@ -144,13 +139,13 @@ canvas {
 .buttonList label:focus-within,
 input:focus {
   outline: transparent;
-  box-shadow: 0 0 0 2px $oc-blue-2;
+  box-shadow: 0 0 0 2px var(--focus-highlight-color);
 }
 
 button,
 .buttonList label {
   user-select: none;
-  background-color: $oc-gray-2;
+  background-color: var(--button-gray-1);
   border: 0;
   border-radius: 4px;
   margin: 0.125rem 0;
@@ -161,15 +156,15 @@ button,
 
   &:focus {
     outline: transparent;
-    box-shadow: 0 0 0 2px $oc-blue-2;
+    box-shadow: 0 0 0 2px var(--focus-highlight-color);
   }
 
   &:hover {
-    background-color: $oc-gray-4;
+    background-color: var(--button-gray-2);
   }
 
   &:active {
-    background-color: $oc-gray-5;
+    background-color: var(--button-gray-3);
   }
 
   &:disabled {
@@ -179,12 +174,12 @@ button,
 
 .active,
 .buttonList label.active {
-  background-color: $oc-gray-4;
+  background-color: var(--button-gray-2);
   &:hover {
-    background-color: $oc-gray-4;
+    background-color: var(--button-gray-2);
   }
   &:active {
-    background-color: $oc-gray-5;
+    background-color: var(--button-gray-3);
   }
 }
 
@@ -236,6 +231,7 @@ button,
 
 .App-menu {
   display: grid;
+  color: var(--icon-fill-color);
 }
 
 .App-menu_top {
@@ -267,6 +263,7 @@ button,
   cursor: default;
   pointer-events: none !important;
   left: 0.25rem;
+  z-index: 100;
 
   &--transition-left {
     section {
@@ -363,13 +360,14 @@ button,
   padding: 0;
   padding-inline-start: 0.5rem;
   padding-inline-end: 1.5rem;
-  background-color: $oc-gray-2;
+  color: var(--icon-fill-color);
+  background-color: var(--button-gray-1);
   border-radius: var(--space-factor);
-  border: 1px solid $oc-gray-4;
+  border: 1px solid var(--button-gray-2);
   font-size: 0.8rem;
   outline: none;
   appearance: none;
-  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="292.4" height="292.4" viewBox="0 0 292 292"><path d="M287 197L159 69c-4-3-8-5-13-5s-9 2-13 5L5 197c-3 4-5 8-5 13s2 9 5 13c4 4 8 5 13 5h256c5 0 9-1 13-5s5-8 5-13-1-9-5-13z"/></svg>');
+  background-image: var(--dropdown-icon);
   background-repeat: no-repeat;
   background-position: right 0.7rem top 50%, 0 0;
   :root[dir="rtl"] & {
@@ -378,15 +376,15 @@ button,
   background-size: 0.65em auto, 100%;
 
   &:focus {
-    box-shadow: 0 0 0 2px $oc-blue-2;
+    box-shadow: 0 0 0 2px var(--focus-highlight-color);
   }
 
   &:hover {
-    background-color: $oc-gray-4;
+    background-color: var(--button-gray-2);
   }
 
   &:active {
-    background-color: $oc-gray-4;
+    background-color: var(--button-gray-2);
   }
   &.dropdown-select--floating {
     position: absolute;
@@ -419,6 +417,7 @@ button,
 }
 
 .scroll-back-to-content {
+  color: var(--popup-text-color);
   position: fixed;
   left: 50%;
   bottom: 30px;

@@ -2,7 +2,7 @@
   "labels": {
     "paste": "Вставить",
     "selectAll": "Выбрать все",
-    "multiSelect": "",
+    "multiSelect": "Добавить элемент к выбору",
     "moveCanvas": "Переместить холст",
     "copy": "Копировать",
     "copyAsPng": "Скопировать в буфер обмена как PNG",
@@ -65,10 +65,10 @@
     "group": "Сгруппировать выделение",
     "ungroup": "Разделить выделение",
     "collaborators": "Сотрудники",
-    "toggleGridMode": "",
+    "toggleGridMode": "Переключить режим сетки",
     "addToLibrary": "Добавить в библиотеку",
     "removeFromLibrary": "Удалить из библиотеки",
-    "libraryLoadingMessage": ""
+    "libraryLoadingMessage": "Загрузка библиотеки..."
   },
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",
@@ -177,7 +177,8 @@
     "github": "Нашли проблему? Отправьте",
     "textNewLine": "Добавить новую строку (текст)",
     "textFinish": "Закончить редактирование (текст)",
-    "zoomToFit": ""
+    "zoomToFit": "",
+    "preventBinding": ""
   },
   "encrypted": {
     "tooltip": ""

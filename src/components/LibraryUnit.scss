@@ -1,6 +1,6 @@
 .library-unit {
   align-items: center;
-  border: 1px solid #ccc;
+  border: 1px solid var(--button-gray-2);
   display: flex;
   justify-content: center;
   position: relative;
@@ -15,6 +15,7 @@
 }
 
 .library-unit__dragger > svg {
+  filter: var(--appearance-filter);
   flex-grow: 1;
   max-height: 100%;
   max-width: 100%;
@@ -26,6 +27,7 @@
   align-items: center;
   background: none;
   border: none;
+  color: var(--icon-fill-color);
   display: flex;
   justify-content: center;
   margin: 0;
