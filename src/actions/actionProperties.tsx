@@ -10,7 +10,6 @@ import {
   isSomeElementSelected,
   getTargetElement,
   canChangeSharpness,
-  isLinearElementType,
 } from "../scene";
 import { ButtonSelect } from "../components/ButtonSelect";
 import {
@@ -18,7 +17,7 @@ import {
   redrawTextBoundingBox,
   getNonDeletedElements,
 } from "../element";
-import { isLinearElement } from "../element/typeChecks";
+import { isLinearElement, isLinearElementType } from "../element/typeChecks";
 import { ColorPicker } from "../components/ColorPicker";
 import { AppState } from "../../src/types";
 import { t } from "../i18n";

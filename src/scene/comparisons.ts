@@ -26,9 +26,6 @@ export const canChangeSharpness = (type: string) =>
   type === "draw" ||
   type === "line";
 
-export const isLinearElementType = (type: string) =>
-  type === "arrow" || type === "draw" || type === "line";
-
 export const hasText = (type: string) => type === "text";
 
 export const getElementAtPosition = (

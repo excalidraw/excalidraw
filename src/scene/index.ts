@@ -11,7 +11,6 @@ export {
   hasBackground,
   hasStroke,
   canChangeSharpness,
-  isLinearElementType,
   getElementAtPosition,
   getElementContainingPosition,
   hasText,
