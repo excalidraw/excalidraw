@@ -68,7 +68,8 @@
     "toggleGridMode": "Attiva/disattiva modalità quadrícula",
     "addToLibrary": "Aggiungi alla biblioteca",
     "removeFromLibrary": "Rimuovi dalla biblioteca",
-    "libraryLoadingMessage": "Caricamento della biblioteca..."
+    "libraryLoadingMessage": "Caricamento della biblioteca...",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "Ripristina la tela",
