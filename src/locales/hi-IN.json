@@ -68,7 +68,8 @@
     "toggleGridMode": "टॉगल ग्रिड मोड",
     "addToLibrary": "",
     "removeFromLibrary": "",
-    "libraryLoadingMessage": ""
+    "libraryLoadingMessage": "",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "कैनवास रीसेट करें",
