@@ -224,6 +224,10 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
                 isOr={false}
               />
               <Shortcut label={t("toolBar.lock")} shortcuts={["Q"]} />
+              <Shortcut
+                label={t("shortcutsDialog.preventBinding")}
+                shortcuts={[getShortcutKey("CtrlOrCmd")]}
+              />
             </ShortcutIsland>
             <ShortcutIsland caption={t("shortcutsDialog.view")}>
               <Shortcut

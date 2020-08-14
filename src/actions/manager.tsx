@@ -15,7 +15,7 @@ export class ActionManager implements ActionsManagerInterface {
 
   updater: UpdaterFn;
 
-  getAppState: () => AppState;
+  getAppState: () => Readonly<AppState>;
 
   getElementsIncludingDeleted: () => readonly ExcalidrawElement[];
 

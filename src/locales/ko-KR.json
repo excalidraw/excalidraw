@@ -177,7 +177,8 @@
     "github": "이슈 제보하기",
     "textNewLine": "줄바꾸기",
     "textFinish": "편집 완료",
-    "zoomToFit": ""
+    "zoomToFit": "",
+    "preventBinding": ""
   },
   "encrypted": {
     "tooltip": ""

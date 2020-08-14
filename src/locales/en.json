@@ -177,7 +177,8 @@
     "github": "Found an issue? Submit",
     "textNewLine": "Add new line (text)",
     "textFinish": "Finish editing (text)",
-    "zoomToFit": "Zoom to fit all elements"
+    "zoomToFit": "Zoom to fit all elements",
+    "preventBinding": "Prevent arrow binding"
   },
   "encrypted": {
     "tooltip": "Your drawings are end-to-end encrypted so Excalidraw's servers will never see them."

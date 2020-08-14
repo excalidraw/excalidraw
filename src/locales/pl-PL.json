@@ -177,7 +177,8 @@
     "github": "Znalazłeś problem? Zgłoś go",
     "textNewLine": "Dodaj nową linię (tekst)",
     "textFinish": "Zakończ edycję (tekst)",
-    "zoomToFit": "Powiększ, aby wyświetlić wszystkie elementy"
+    "zoomToFit": "Powiększ, aby wyświetlić wszystkie elementy",
+    "preventBinding": ""
   },
   "encrypted": {
     "tooltip": "Twoje rysunki są zabezpieczone szyfrowaniem end-to-end, tak więc nawet w Excalidraw nie jesteśmy w stanie zobaczyć tego co tworzysz."
