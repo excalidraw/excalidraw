@@ -68,7 +68,8 @@
     "toggleGridMode": "切換格線模式",
     "addToLibrary": "加入資料庫",
     "removeFromLibrary": "從資料庫中移除",
-    "libraryLoadingMessage": "資料庫讀取中…"
+    "libraryLoadingMessage": "資料庫讀取中…",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "重置 canvas",
