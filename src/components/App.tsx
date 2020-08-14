@@ -2090,40 +2090,29 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         return;
       }
     }
-    document.documentElement.style.cursor = this.getCursorStyleForCurrentPointer(
-      scenePointer,
-      isOverScrollBar,
-    );
-  };
 
-  private getCursorStyleForCurrentPointer(
-    pointer: Readonly<{ x: number; y: number }>,
-    isPointerOverScrollBar: boolean,
-  ): string {
-    const hitElement = this.getElementAtPosition(pointer.x, pointer.y);
-    const selectedElements = getSelectedElements(
-      this.scene.getElements(),
-      this.state,
+    const hitElement = this.getElementAtPosition(
+      scenePointer.x,
+      scenePointer.y,
     );
     if (this.state.elementType === "text") {
-      return isTextElement(hitElement)
+      document.documentElement.style.cursor = isTextElement(hitElement)
         ? CURSOR_TYPE.TEXT
         : CURSOR_TYPE.CROSSHAIR;
-    }
-    if (isPointerOverScrollBar) {
-      return CURSOR_TYPE.AUTO;
-    }
-    if (
+    } else if (isOverScrollBar) {
+      document.documentElement.style.cursor = CURSOR_TYPE.AUTO;
+    } else if (
       hitElement ||
       this.isHittingCommonBoundingBoxOfSelectedElements(
-        pointer,
+        scenePointer,
         selectedElements,
       )
     ) {
-      return CURSOR_TYPE.MOVE;
+      document.documentElement.style.cursor = CURSOR_TYPE.MOVE;
+    } else {
+      document.documentElement.style.cursor = CURSOR_TYPE.AUTO;
     }
-    return CURSOR_TYPE.AUTO;
-  }
+  };
 
   // set touch moving for mobile context menu
   private handleTouchMove = (event: React.TouchEvent<HTMLCanvasElement>) => {
@@ -2554,7 +2543,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         const hitElement = pointerDownState.hit.element;
         if (
           !this.isHittingASelectedElement(hitElement) &&
-          !this.isShiftKeyPressed(event) &&
+          !event.shiftKey &&
           !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
         ) {
           this.clearSelection(hitElement);
@@ -2615,18 +2604,19 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     return hitElement != null && this.state.selectedElementIds[hitElement.id];
   }
 
-  private isShiftKeyPressed(
-    event: React.PointerEvent<HTMLCanvasElement>,
-  ): boolean {
-    return event.shiftKey;
-  }
-
   private isHittingCommonBoundingBoxOfSelectedElements(
     point: Readonly<{ x: number; y: number }>,
     selectedElements: readonly ExcalidrawElement[],
   ): boolean {
+    // How many pixels off the shape boundary we still consider a hit
+    const threshold = 10 / this.state.zoom;
     const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
-    return point.x > x1 && point.x < x2 && point.y > y1 && point.y < y2;
+    return (
+      point.x > x1 - threshold &&
+      point.x < x2 + threshold &&
+      point.y > y1 - threshold &&
+      point.y < y2 + threshold
+    );
   }
 
   private handleTextOnPointerDown = (
