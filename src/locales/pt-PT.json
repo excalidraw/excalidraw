@@ -68,7 +68,8 @@
     "toggleGridMode": "Alternar modo de grade",
     "addToLibrary": "Adicionar à biblioteca",
     "removeFromLibrary": "Remover da biblioteca",
-    "libraryLoadingMessage": "Carregando biblioteca..."
+    "libraryLoadingMessage": "Carregando biblioteca...",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
