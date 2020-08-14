@@ -68,7 +68,8 @@
     "toggleGridMode": "Gitterlinien ein-/ausschalten",
     "addToLibrary": "Zur Bibliothek hinzufügen",
     "removeFromLibrary": "Aus Bibliothek entfernen",
-    "libraryLoadingMessage": "Lade Bibliothek..."
+    "libraryLoadingMessage": "Lade Bibliothek...",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
