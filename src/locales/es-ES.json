@@ -68,7 +68,8 @@
     "toggleGridMode": "Alternar modo cuadrícula",
     "addToLibrary": "Añadir a la biblioteca",
     "removeFromLibrary": "Eliminar de la biblioteca",
-    "libraryLoadingMessage": "Cargando biblioteca..."
+    "libraryLoadingMessage": "Cargando biblioteca...",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
