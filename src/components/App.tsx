@@ -725,6 +725,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
     }
 
+    document.body.classList.toggle(
+      "Appearance_dark",
+      this.state.appearance === "dark",
+    );
+
     if (this.state.isCollaborating && !this.portal.socket) {
       this.initializeSocketClient({ showLoadingState: true });
     }
@@ -764,22 +769,22 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const pointerViewportCoords: SceneState["remotePointerViewportCoords"] = {};
     const remoteSelectedElementIds: SceneState["remoteSelectedElementIds"] = {};
     const pointerUsernames: { [id: string]: string } = {};
-    this.state.collaborators.forEach((user, socketID) => {
+    this.state.collaborators.forEach((user, socketId) => {
       if (user.selectedElementIds) {
         for (const id of Object.keys(user.selectedElementIds)) {
           if (!(id in remoteSelectedElementIds)) {
             remoteSelectedElementIds[id] = [];
           }
-          remoteSelectedElementIds[id].push(socketID);
+          remoteSelectedElementIds[id].push(socketId);
         }
       }
       if (!user.pointer) {
         return;
       }
       if (user.username) {
-        pointerUsernames[socketID] = user.username;
+        pointerUsernames[socketId] = user.username;
       }
-      pointerViewportCoords[socketID] = sceneCoordsToViewportCoords(
+      pointerViewportCoords[socketId] = sceneCoordsToViewportCoords(
         {
           sceneX: user.pointer.x,
           sceneY: user.pointer.y,
@@ -788,7 +793,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         this.canvas,
         window.devicePixelRatio,
       );
-      cursorButton[socketID] = user.button;
+      cursorButton[socketId] = user.button;
     });
     const elements = this.scene.getElements();
     const { atLeastOneVisibleElement, scrollBars } = renderScene(
@@ -1053,6 +1058,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
+      strokeSharpness: this.state.currentItemStrokeSharpness,
       text: text,
       fontSize: this.state.currentItemFontSize,
       fontFamily: this.state.currentItemFontFamily,
@@ -1289,22 +1295,24 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               break;
             case "MOUSE_LOCATION": {
               const {
-                socketID,
-                pointerCoords,
+                socketId,
+                pointer,
                 button,
                 username,
                 selectedElementIds,
               } = decryptedData.payload;
+              // NOTE purposefully mutating collaborators map in case of
+              //  pointer updates so as not to trigger LayerUI rerender
               this.setState((state) => {
-                if (!state.collaborators.has(socketID)) {
-                  state.collaborators.set(socketID, {});
+                if (!state.collaborators.has(socketId)) {
+                  state.collaborators.set(socketId, {});
                 }
-                const user = state.collaborators.get(socketID)!;
-                user.pointer = pointerCoords;
+                const user = state.collaborators.get(socketId)!;
+                user.pointer = pointer;
                 user.button = button;
                 user.selectedElementIds = selectedElementIds;
                 user.username = username;
-                state.collaborators.set(socketID, user);
+                state.collaborators.set(socketId, user);
                 return state;
               });
               break;
@@ -1330,11 +1338,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   setCollaborators(sockets: string[]) {
     this.setState((state) => {
       const collaborators: typeof state.collaborators = new Map();
-      for (const socketID of sockets) {
-        if (state.collaborators.has(socketID)) {
-          collaborators.set(socketID, state.collaborators.get(socketID)!);
+      for (const socketId of sockets) {
+        if (state.collaborators.has(socketId)) {
+          collaborators.set(socketId, state.collaborators.get(socketId)!);
         } else {
-          collaborators.set(socketID, {});
+          collaborators.set(socketId, {});
         }
       }
       return {
@@ -1345,15 +1353,15 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   }
 
   private broadcastMouseLocation = (payload: {
-    pointerCoords: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointerCoords"];
+    pointer: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointer"];
     button: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["button"];
   }) => {
     if (this.portal.socket?.id) {
       const data: SocketUpdateDataSource["MOUSE_LOCATION"] = {
         type: "MOUSE_LOCATION",
         payload: {
-          socketID: this.portal.socket.id,
-          pointerCoords: payload.pointerCoords,
+          socketId: this.portal.socket.id,
+          pointer: payload.pointer,
           button: payload.button || "up",
           selectedElementIds: this.state.selectedElementIds,
           username: this.state.username,
@@ -1765,6 +1773,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           strokeStyle: this.state.currentItemStrokeStyle,
           roughness: this.state.currentItemRoughness,
           opacity: this.state.currentItemOpacity,
+          strokeSharpness: this.state.currentItemStrokeSharpness,
           text: "",
           fontSize: this.state.currentItemFontSize,
           fontFamily: this.state.currentItemFontFamily,
@@ -2708,6 +2717,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         strokeStyle: this.state.currentItemStrokeStyle,
         roughness: this.state.currentItemRoughness,
         opacity: this.state.currentItemOpacity,
+        strokeSharpness: this.state.currentItemLinearStrokeSharpness,
       });
       this.setState((prevState) => ({
         selectedElementIds: {
@@ -2755,6 +2765,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
+      strokeSharpness: this.state.currentItemStrokeSharpness,
     });
 
     if (element.type === "selection") {
@@ -3672,14 +3683,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (!x || !y) {
       return;
     }
-    const pointerCoords = viewportCoordsToSceneCoords(
+    const pointer = viewportCoordsToSceneCoords(
       { clientX: x, clientY: y },
       this.state,
       this.canvas,
       window.devicePixelRatio,
     );
 
-    if (isNaN(pointerCoords.x) || isNaN(pointerCoords.y)) {
+    if (isNaN(pointer.x) || isNaN(pointer.y)) {
       // sometimes the pointer goes off screen
       return;
     }
@@ -3687,7 +3698,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       // do not broadcast when more than 1 pointer since that shows flickering on the other side
       gesture.pointers.size < 2 &&
       this.broadcastMouseLocation({
-        pointerCoords,
+        pointer,
         button,
       });
   };

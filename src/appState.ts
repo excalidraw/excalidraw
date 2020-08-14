@@ -13,6 +13,7 @@ export const getDefaultAppState = (): Omit<
   "offsetTop" | "offsetLeft"
 > => {
   return {
+    appearance: "light",
     isLoading: false,
     errorMessage: null,
     draggingElement: null,
@@ -35,6 +36,8 @@ export const getDefaultAppState = (): Omit<
     currentItemFontSize: DEFAULT_FONT_SIZE,
     currentItemFontFamily: DEFAULT_FONT_FAMILY,
     currentItemTextAlign: DEFAULT_TEXT_ALIGN,
+    currentItemStrokeSharpness: "sharp",
+    currentItemLinearStrokeSharpness: "round",
     viewBackgroundColor: oc.white,
     scrollX: 0 as FlooredNumber,
     scrollY: 0 as FlooredNumber,
@@ -83,6 +86,7 @@ const APP_STATE_STORAGE_CONF = (<
 >(
   config: { [K in keyof T]: K extends keyof AppState ? T[K] : never },
 ) => config)({
+  appearance: { browser: true, export: false },
   collaborators: { browser: false, export: false },
   currentItemBackgroundColor: { browser: true, export: false },
   currentItemFillStyle: { browser: true, export: false },
@@ -94,6 +98,8 @@ const APP_STATE_STORAGE_CONF = (<
   currentItemStrokeStyle: { browser: true, export: false },
   currentItemStrokeWidth: { browser: true, export: false },
   currentItemTextAlign: { browser: true, export: false },
+  currentItemStrokeSharpness: { browser: true, export: false },
+  currentItemLinearStrokeSharpness: { browser: true, export: false },
   cursorButton: { browser: true, export: false },
   cursorX: { browser: true, export: false },
   cursorY: { browser: true, export: false },

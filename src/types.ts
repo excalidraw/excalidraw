@@ -56,6 +56,8 @@ export type AppState = {
   currentItemFontFamily: FontFamily;
   currentItemFontSize: number;
   currentItemTextAlign: TextAlign;
+  currentItemStrokeSharpness: ExcalidrawElement["strokeSharpness"];
+  currentItemLinearStrokeSharpness: ExcalidrawElement["strokeSharpness"];
   viewBackgroundColor: string;
   scrollX: FlooredNumber;
   scrollY: FlooredNumber;
@@ -77,6 +79,7 @@ export type AppState = {
   shouldCacheIgnoreZoom: boolean;
   showShortcutsDialog: boolean;
   zenModeEnabled: boolean;
+  appearance: "light" | "dark";
   gridSize: number | null;
 
   /** top-most selected groups (i.e. does not include nested groups) */

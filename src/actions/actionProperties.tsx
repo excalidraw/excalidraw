@@ -8,6 +8,8 @@ import {
 import {
   getCommonAttributeOfSelectedElements,
   isSomeElementSelected,
+  getTargetElement,
+  canChangeSharpness,
 } from "../scene";
 import { ButtonSelect } from "../components/ButtonSelect";
 import {
@@ -15,6 +17,7 @@ import {
   redrawTextBoundingBox,
   getNonDeletedElements,
 } from "../element";
+import { isLinearElement, isLinearElementType } from "../element/typeChecks";
 import { ColorPicker } from "../components/ColorPicker";
 import { AppState } from "../../src/types";
 import { t } from "../i18n";
@@ -444,6 +447,62 @@ export const actionChangeTextAlign = register({
           appState,
           (element) => isTextElement(element) && element.textAlign,
           appState.currentItemTextAlign,
+        )}
+        onChange={(value) => updateData(value)}
+      />
+    </fieldset>
+  ),
+});
+
+export const actionChangeSharpness = register({
+  name: "changeSharpness",
+  perform: (elements, appState, value) => {
+    const targetElements = getTargetElement(
+      getNonDeletedElements(elements),
+      appState,
+    );
+    const shouldUpdateForNonLinearElements = targetElements.length
+      ? targetElements.every((e) => !isLinearElement(e))
+      : !isLinearElementType(appState.elementType);
+    const shouldUpdateForLinearElements = targetElements.length
+      ? targetElements.every(isLinearElement)
+      : isLinearElementType(appState.elementType);
+    return {
+      elements: changeProperty(elements, appState, (el) =>
+        newElementWith(el, {
+          strokeSharpness: value,
+        }),
+      ),
+      appState: {
+        ...appState,
+        currentItemStrokeSharpness: shouldUpdateForNonLinearElements
+          ? value
+          : appState.currentItemStrokeSharpness,
+        currentItemLinearStrokeSharpness: shouldUpdateForLinearElements
+          ? value
+          : appState.currentItemLinearStrokeSharpness,
+      },
+      commitToHistory: true,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData }) => (
+    <fieldset>
+      <legend>{t("labels.edges")}</legend>
+      <ButtonSelect
+        group="edges"
+        options={[
+          { value: "sharp", text: t("labels.sharp") },
+          { value: "round", text: t("labels.round") },
+        ]}
+        value={getFormValue(
+          elements,
+          appState,
+          (element) => element.strokeSharpness,
+          (canChangeSharpness(appState.elementType) &&
+            (isLinearElementType(appState.elementType)
+              ? appState.currentItemLinearStrokeSharpness
+              : appState.currentItemStrokeSharpness)) ||
+            null,
         )}
         onChange={(value) => updateData(value)}
       />
