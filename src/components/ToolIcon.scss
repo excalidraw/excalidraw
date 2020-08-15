@@ -132,10 +132,10 @@
   .Shape .ToolIcon__icon {
     width: 2rem;
     height: 2rem;
+  }
 
-    svg {
-      height: 0.8em;
-    }
+  .ToolIcon__keybinding {
+    visibility: hidden;
   }
 }
 
