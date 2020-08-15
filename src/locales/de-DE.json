@@ -25,9 +25,9 @@
     "sloppiness": "Sauberkeit",
     "opacity": "Deckkraft",
     "textAlign": "Textausrichtung",
-    "edges": "",
-    "sharp": "",
-    "round": "",
+    "edges": "Kanten",
+    "sharp": "Eckig",
+    "round": "Rund",
     "fontSize": "Schriftgröße",
     "fontFamily": "Schriftfamilie",
     "onlySelected": "Nur ausgewählte",
@@ -72,7 +72,7 @@
     "addToLibrary": "Zur Bibliothek hinzufügen",
     "removeFromLibrary": "Aus Bibliothek entfernen",
     "libraryLoadingMessage": "Lade Bibliothek...",
-    "loadingScene": ""
+    "loadingScene": "Lade Zeichnung..."
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
