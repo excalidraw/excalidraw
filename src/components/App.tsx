@@ -278,12 +278,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     super(props);
     const defaultAppState = getDefaultAppState();
 
-    const { width, height } = props;
+    const { width, height, user } = props;
     this.state = {
       ...defaultAppState,
       isLoading: true,
       width,
       height,
+      username: user?.name || "",
       ...this.getCanvasOffsets(),
     };
 
@@ -334,6 +335,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           onRoomCreate={this.openPortal}
           onRoomDestroy={this.closePortal}
           onUsernameChange={(username) => {
+            if (this.props.onUsernameChange) {
+              this.props.onUsernameChange(username);
+            }
             saveUsernameToLocalStorage(username);
             this.setState({
               username,
@@ -501,12 +505,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.setState({ isLoading: true });
     }
 
-    let scene = await loadScene(null);
+    let scene = await loadScene(null, null, this.props.initialData);
 
     let isCollaborationScene = !!getCollaborationLinkData(window.location.href);
     const isExternalScene = !!(id || jsonMatch || isCollaborationScene);
 
-    if (isExternalScene) {
+    if (isExternalScene && !this.props.initialData) {
       if (
         this.shouldForceLoadScene(scene) ||
         window.confirm(t("alerts.loadSceneOverridePrompt"))
@@ -715,7 +719,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   componentDidUpdate(prevProps: ExcalidrawProps, prevState: AppState) {
     const { width: prevWidth, height: prevHeight } = prevProps;
-    const { width: currentWidth, height: currentHeight } = this.props;
+    const { width: currentWidth, height: currentHeight, onChange } = this.props;
     if (prevWidth !== currentWidth || prevHeight !== currentHeight) {
       this.setState({
         width: currentWidth,
@@ -847,6 +851,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     history.record(this.state, this.scene.getElementsIncludingDeleted());
+
+    if (onChange) {
+      onChange(this.scene.getElementsIncludingDeleted(), this.state);
+    }
   }
 
   // Copy/paste
