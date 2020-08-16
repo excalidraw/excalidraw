@@ -2,13 +2,16 @@ import { reseed } from "../random";
 import React from "react";
 import ReactDOM from "react-dom";
 import * as Renderer from "../renderer/renderScene";
-import { render, screen, fireEvent } from "./test-utils";
+import { waitFor, render, screen, fireEvent } from "./test-utils";
 import App from "../components/App";
+import { setLanguage } from "../i18n";
 import { ToolName } from "./queries/toolQueries";
 import { KEYS, Key } from "../keys";
 import { setDateTimeForTests } from "../utils";
 import { ExcalidrawElement } from "../element/types";
-import { handlerRectangles } from "../element";
+import { getTransformHandles as _getTransformHandles } from "../element";
+import { queryByText } from "@testing-library/react";
+import { copiedStyles } from "../actions/actionStyles";
 
 const { h } = window;
 
@@ -189,9 +192,9 @@ function getStateHistory() {
   return h.history.stateHistory;
 }
 
-type HandlerRectanglesRet = keyof ReturnType<typeof handlerRectangles>;
-const getResizeHandles = (pointerType: "mouse" | "touch" | "pen") => {
-  const rects = handlerRectangles(
+type HandlerRectanglesRet = keyof ReturnType<typeof _getTransformHandles>;
+const getTransformHandles = (pointerType: "mouse" | "touch" | "pen") => {
+  const rects = _getTransformHandles(
     getSelectedElement(),
     h.state.zoom,
     pointerType,
@@ -227,7 +230,7 @@ const checkpoint = (name: string) => {
   );
 };
 
-beforeEach(() => {
+beforeEach(async () => {
   // Unmount ReactDOM from root
   ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
@@ -242,6 +245,7 @@ beforeEach(() => {
   finger2.reset();
   altKey = ctrlKey = shiftKey = false;
 
+  await setLanguage("en.json");
   const renderResult = render(<App />);
 
   getByToolName = renderResult.getByToolName;
@@ -255,40 +259,40 @@ afterEach(() => {
 describe("regression tests", () => {
   it("draw every type of shape", () => {
     clickTool("rectangle");
-    mouse.down(10, 10);
-    mouse.up(10, 10);
+    mouse.down(10, -10);
+    mouse.up(20, 10);
 
     clickTool("diamond");
     mouse.down(10, -10);
-    mouse.up(10, 10);
+    mouse.up(20, 10);
 
     clickTool("ellipse");
     mouse.down(10, -10);
-    mouse.up(10, 10);
+    mouse.up(20, 10);
 
     clickTool("arrow");
-    mouse.down(10, -10);
-    mouse.up(10, 10);
+    mouse.down(40, -10);
+    mouse.up(50, 10);
 
     clickTool("line");
-    mouse.down(10, -10);
-    mouse.up(10, 10);
+    mouse.down(40, -10);
+    mouse.up(50, 10);
 
     clickTool("arrow");
-    mouse.click(10, -10);
-    mouse.click(10, 10);
-    mouse.click(-10, 10);
+    mouse.click(40, -10);
+    mouse.click(50, 10);
+    mouse.click(30, 10);
     hotkeyPress("ENTER");
 
     clickTool("line");
-    mouse.click(10, -20);
-    mouse.click(10, 10);
-    mouse.click(-10, 10);
+    mouse.click(40, -20);
+    mouse.click(50, 10);
+    mouse.click(30, 10);
     hotkeyPress("ENTER");
 
     clickTool("draw");
-    mouse.down(10, -20);
-    mouse.up(10, 10);
+    mouse.down(40, -20);
+    mouse.up(50, 10);
 
     expect(h.elements.map((element) => element.type)).toEqual([
       "rectangle",
@@ -358,10 +362,12 @@ describe("regression tests", () => {
     mouse.down(10, 10);
     mouse.up(10, 10);
 
-    const resizeHandles = getResizeHandles("mouse");
-    delete resizeHandles.rotation; // exclude rotation handle
-    for (const handlePos in resizeHandles) {
-      const [x, y] = resizeHandles[handlePos as keyof typeof resizeHandles];
+    const transformHandles = getTransformHandles("mouse");
+    delete transformHandles.rotation; // exclude rotation handle
+    for (const handlePos in transformHandles) {
+      const [x, y] = transformHandles[
+        handlePos as keyof typeof transformHandles
+      ];
       const { width: prevWidth, height: prevHeight } = getSelectedElement();
       mouse.restorePosition(x, y);
       mouse.down();
@@ -565,17 +571,17 @@ describe("regression tests", () => {
 
   it("undo/redo drawing an element", () => {
     clickTool("rectangle");
-    mouse.down(10, 10);
-    mouse.up(10, 10);
+    mouse.down(10, -10);
+    mouse.up(20, 10);
 
     clickTool("rectangle");
-    mouse.down(10, -10);
-    mouse.up(10, 10);
+    mouse.down(10, 0);
+    mouse.up(30, 20);
 
     clickTool("arrow");
-    mouse.click(10, -10);
-    mouse.click(10, 10);
-    mouse.click(-10, 10);
+    mouse.click(60, -10);
+    mouse.click(60, 10);
+    mouse.click(40, 10);
     hotkeyPress("ENTER");
 
     expect(h.elements.filter((element) => !element.isDeleted).length).toBe(3);
@@ -655,7 +661,7 @@ describe("regression tests", () => {
     expect(h.state.zoom).toBe(1);
   });
 
-  it("rerenders UI on language change", () => {
+  it("rerenders UI on language change", async () => {
     // select rectangle tool to show properties menu
     clickTool("rectangle");
     // english lang should display `hachure` label
@@ -664,11 +670,13 @@ describe("regression tests", () => {
       target: { value: "de-DE" },
     });
     // switching to german, `hachure` label should no longer exist
-    expect(screen.queryByText(/hachure/i)).toBeNull();
+    await waitFor(() => expect(screen.queryByText(/hachure/i)).toBeNull());
     // reset language
     fireEvent.change(document.querySelector(".dropdown-select__language")!, {
       target: { value: "en" },
     });
+    // switching back to English
+    await waitFor(() => expect(screen.queryByText(/hachure/i)).not.toBeNull());
   });
 
   it("make a group and duplicate it", () => {
@@ -853,9 +861,6 @@ describe("regression tests", () => {
   });
 
   it("shows context menu for canvas", () => {
-    fireEvent.change(document.querySelector(".dropdown-select__language")!, {
-      target: { value: "en" },
-    });
     fireEvent.contextMenu(canvas, { button: 2, clientX: 1, clientY: 1 });
     const contextMenu = document.querySelector(".context-menu");
     const options = contextMenu?.querySelectorAll(".context-menu-option");
@@ -867,12 +872,10 @@ describe("regression tests", () => {
   });
 
   it("shows context menu for element", () => {
-    fireEvent.change(document.querySelector(".dropdown-select__language")!, {
-      target: { value: "en" },
-    });
     clickTool("rectangle");
     mouse.down(10, 10);
     mouse.up(20, 20);
+
     fireEvent.contextMenu(canvas, { button: 2, clientX: 1, clientY: 1 });
     const contextMenu = document.querySelector(".context-menu");
     const options = contextMenu?.querySelectorAll(".context-menu-option");
@@ -880,8 +883,46 @@ describe("regression tests", () => {
       "Copy styles",
       "Paste styles",
       "Delete",
+      "Add to library",
+      "Send backward",
+      "Bring forward",
+      "Send to back",
+      "Bring to front",
+      "Duplicate",
+    ];
+
+    expect(contextMenu).not.toBeNull();
+    expect(contextMenu?.children.length).toBe(9);
+    options?.forEach((opt, i) => {
+      expect(opt.textContent).toBe(expectedOptions[i]);
+    });
+  });
+
+  it("shows 'Group selection' in context menu for multiple selected elements", () => {
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(10, 10);
+
+    clickTool("rectangle");
+    mouse.down(10, -10);
+    mouse.up(10, 10);
+
+    mouse.reset();
+    mouse.click(10, 10);
+    withModifierKeys({ shift: true }, () => {
+      mouse.click(20, 0);
+    });
+
+    fireEvent.contextMenu(canvas, { button: 2, clientX: 1, clientY: 1 });
+
+    const contextMenu = document.querySelector(".context-menu");
+    const options = contextMenu?.querySelectorAll(".context-menu-option");
+    const expectedOptions = [
+      "Copy styles",
+      "Paste styles",
+      "Delete",
       "Group selection",
-      "Ungroup selection",
+      "Add to library",
       "Send backward",
       "Bring forward",
       "Send to back",
@@ -894,5 +935,291 @@ describe("regression tests", () => {
     options?.forEach((opt, i) => {
       expect(opt.textContent).toBe(expectedOptions[i]);
     });
+  });
+
+  it("shows 'Ungroup selection' in context menu for group inside selected elements", () => {
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(10, 10);
+
+    clickTool("rectangle");
+    mouse.down(10, -10);
+    mouse.up(10, 10);
+
+    mouse.reset();
+    mouse.click(10, 10);
+    withModifierKeys({ shift: true }, () => {
+      mouse.click(20, 0);
+    });
+
+    withModifierKeys({ ctrl: true }, () => {
+      keyPress("g");
+    });
+
+    fireEvent.contextMenu(canvas, { button: 2, clientX: 1, clientY: 1 });
+
+    const contextMenu = document.querySelector(".context-menu");
+    const options = contextMenu?.querySelectorAll(".context-menu-option");
+    const expectedOptions = [
+      "Copy styles",
+      "Paste styles",
+      "Delete",
+      "Ungroup selection",
+      "Add to library",
+      "Send backward",
+      "Bring forward",
+      "Send to back",
+      "Bring to front",
+      "Duplicate",
+    ];
+
+    expect(contextMenu).not.toBeNull();
+    expect(contextMenu?.children.length).toBe(10);
+    options?.forEach((opt, i) => {
+      expect(opt.textContent).toBe(expectedOptions[i]);
+    });
+  });
+
+  it("selecting 'Copy styles' in context menu copies styles", () => {
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    fireEvent.contextMenu(canvas, { button: 2, clientX: 1, clientY: 1 });
+    const contextMenu = document.querySelector(".context-menu");
+    expect(copiedStyles).toBe("{}");
+    fireEvent.click(queryByText(contextMenu as HTMLElement, "Copy styles")!);
+    expect(copiedStyles).not.toBe("{}");
+    const element = JSON.parse(copiedStyles);
+    expect(element).toEqual(getSelectedElement());
+  });
+
+  it("selecting 'Paste styles' in context menu pastes styles", () => {
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    // Change some styles of second rectangle
+    clickLabeledElement("Stroke");
+    clickLabeledElement("#c92a2a");
+    clickLabeledElement("Background");
+    clickLabeledElement("#e64980");
+    // Fill style
+    fireEvent.click(screen.getByLabelText("Cross-hatch"));
+    // Stroke width
+    fireEvent.click(screen.getByLabelText("Bold"));
+    // Stroke style
+    fireEvent.click(screen.getByLabelText("Dotted"));
+    // Roughness
+    fireEvent.click(screen.getByLabelText("Cartoonist"));
+    // Opacity
+    fireEvent.change(screen.getByLabelText("Opacity"), {
+      target: { value: "60" },
+    });
+
+    mouse.reset();
+    // Copy styles of second rectangle
+    fireEvent.contextMenu(canvas, { button: 2, clientX: 40, clientY: 40 });
+    let contextMenu = document.querySelector(".context-menu");
+    fireEvent.click(queryByText(contextMenu as HTMLElement, "Copy styles")!);
+    const secondRect = JSON.parse(copiedStyles);
+    expect(secondRect.id).toBe(h.elements[1].id);
+
+    mouse.reset();
+    // Paste styles to first rectangle
+    fireEvent.contextMenu(canvas, { button: 2, clientX: 10, clientY: 10 });
+    contextMenu = document.querySelector(".context-menu");
+    fireEvent.click(queryByText(contextMenu as HTMLElement, "Paste styles")!);
+
+    const firstRect = getSelectedElement();
+    expect(firstRect.id).toBe(h.elements[0].id);
+    expect(firstRect.strokeColor).toBe("#c92a2a");
+    expect(firstRect.backgroundColor).toBe("#e64980");
+    expect(firstRect.fillStyle).toBe("cross-hatch");
+    expect(firstRect.strokeWidth).toBe(2); // Bold: 2
+    expect(firstRect.strokeStyle).toBe("dotted");
+    expect(firstRect.roughness).toBe(2); // Cartoonist: 2
+    expect(firstRect.opacity).toBe(60);
+  });
+
+  it("selecting 'Delete' in context menu deletes element", () => {
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    fireEvent.contextMenu(canvas, { button: 2, clientX: 1, clientY: 1 });
+    const contextMenu = document.querySelector(".context-menu");
+    fireEvent.click(queryByText(contextMenu as HTMLElement, "Delete")!);
+    expect(getSelectedElements()).toHaveLength(0);
+    expect(h.elements[0].isDeleted).toBe(true);
+  });
+
+  it("selecting 'Add to library' in context menu adds element to library", async () => {
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    fireEvent.contextMenu(canvas, { button: 2, clientX: 1, clientY: 1 });
+    const contextMenu = document.querySelector(".context-menu");
+    fireEvent.click(queryByText(contextMenu as HTMLElement, "Add to library")!);
+
+    await waitFor(() => {
+      const library = localStorage.getItem("excalidraw-library");
+      expect(library).not.toBeNull();
+      const addedElement = JSON.parse(library!)[0][0];
+      expect(addedElement).toEqual(h.elements[0]);
+    });
+  });
+
+  it("selecting 'Duplicate' in context menu duplicates element", () => {
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    fireEvent.contextMenu(canvas, { button: 2, clientX: 1, clientY: 1 });
+    const contextMenu = document.querySelector(".context-menu");
+    fireEvent.click(queryByText(contextMenu as HTMLElement, "Duplicate")!);
+    expect(h.elements).toHaveLength(2);
+    const { id: _id0, seed: _seed0, x: _x0, y: _y0, ...rect1 } = h.elements[0];
+    const { id: _id1, seed: _seed1, x: _x1, y: _y1, ...rect2 } = h.elements[1];
+    expect(rect1).toEqual(rect2);
+  });
+
+  it("selecting 'Send backward' in context menu sends element backward", () => {
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    mouse.reset();
+    fireEvent.contextMenu(canvas, { button: 2, clientX: 40, clientY: 40 });
+    const contextMenu = document.querySelector(".context-menu");
+    const elementsBefore = h.elements;
+    fireEvent.click(queryByText(contextMenu as HTMLElement, "Send backward")!);
+    expect(elementsBefore[0].id).toEqual(h.elements[1].id);
+    expect(elementsBefore[1].id).toEqual(h.elements[0].id);
+  });
+
+  it("selecting 'Bring forward' in context menu brings element forward", () => {
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    mouse.reset();
+    fireEvent.contextMenu(canvas, { button: 2, clientX: 10, clientY: 10 });
+    const contextMenu = document.querySelector(".context-menu");
+    const elementsBefore = h.elements;
+    fireEvent.click(queryByText(contextMenu as HTMLElement, "Bring forward")!);
+    expect(elementsBefore[0].id).toEqual(h.elements[1].id);
+    expect(elementsBefore[1].id).toEqual(h.elements[0].id);
+  });
+
+  it("selecting 'Send to back' in context menu sends element to back", () => {
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    mouse.reset();
+    fireEvent.contextMenu(canvas, { button: 2, clientX: 40, clientY: 40 });
+    const contextMenu = document.querySelector(".context-menu");
+    const elementsBefore = h.elements;
+    fireEvent.click(queryByText(contextMenu as HTMLElement, "Send to back")!);
+    expect(elementsBefore[1].id).toEqual(h.elements[0].id);
+  });
+
+  it("selecting 'Bring to front' in context menu brings element to front", () => {
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    mouse.reset();
+    fireEvent.contextMenu(canvas, { button: 2, clientX: 10, clientY: 10 });
+    const contextMenu = document.querySelector(".context-menu");
+    const elementsBefore = h.elements;
+    fireEvent.click(queryByText(contextMenu as HTMLElement, "Bring to front")!);
+    expect(elementsBefore[0].id).toEqual(h.elements[1].id);
+  });
+
+  it("selecting 'Group selection' in context menu groups selected elements", () => {
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    mouse.reset();
+    withModifierKeys({ shift: true }, () => {
+      mouse.click(10, 10);
+    });
+
+    fireEvent.contextMenu(canvas, { button: 2, clientX: 1, clientY: 1 });
+    const contextMenu = document.querySelector(".context-menu");
+    fireEvent.click(
+      queryByText(contextMenu as HTMLElement, "Group selection")!,
+    );
+    const selectedGroupIds = Object.keys(h.state.selectedGroupIds);
+    expect(h.elements[0].groupIds).toEqual(selectedGroupIds);
+    expect(h.elements[1].groupIds).toEqual(selectedGroupIds);
+  });
+
+  it("selecting 'Ungroup selection' in context menu ungroups selected group", () => {
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    mouse.reset();
+    withModifierKeys({ shift: true }, () => {
+      mouse.click(10, 10);
+    });
+
+    withModifierKeys({ ctrl: true }, () => {
+      keyPress("g");
+    });
+
+    fireEvent.contextMenu(canvas, { button: 2, clientX: 1, clientY: 1 });
+    const contextMenu = document.querySelector(".context-menu");
+    fireEvent.click(
+      queryByText(contextMenu as HTMLElement, "Ungroup selection")!,
+    );
+
+    const selectedGroupIds = Object.keys(h.state.selectedGroupIds);
+    expect(selectedGroupIds).toHaveLength(0);
+    expect(h.elements[0].groupIds).toHaveLength(0);
+    expect(h.elements[1].groupIds).toHaveLength(0);
+  });
+
+  it("keeps selected element selected when click hits element bounding box but doesn't hit the element", () => {
+    clickTool("ellipse");
+    mouse.down(0, 0);
+    mouse.up(100, 100);
+
+    // click on bounding box but not on element
+    mouse.click(0, 0);
+    expect(getSelectedElements().length).toBe(1);
   });
 });

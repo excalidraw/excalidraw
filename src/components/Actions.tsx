@@ -2,7 +2,13 @@ import React from "react";
 import { AppState } from "../types";
 import { ExcalidrawElement } from "../element/types";
 import { ActionManager } from "../actions/manager";
-import { hasBackground, hasStroke, hasText, getTargetElement } from "../scene";
+import {
+  hasBackground,
+  hasStroke,
+  canChangeSharpness,
+  hasText,
+  getTargetElement,
+} from "../scene";
 import { t } from "../i18n";
 import { SHAPES } from "../shapes";
 import { ToolButton } from "./ToolButton";
@@ -50,6 +56,11 @@ export const SelectedShapeActions = ({
         </>
       )}
 
+      {(canChangeSharpness(elementType) ||
+        targetElements.some((element) => canChangeSharpness(element.type))) && (
+        <>{renderAction("changeSharpness")}</>
+      )}
+
       {(hasText(elementType) ||
         targetElements.some((element) => hasText(element.type))) && (
         <>
@@ -78,6 +89,8 @@ export const SelectedShapeActions = ({
           <div className="buttonList">
             {renderAction("duplicateSelection")}
             {renderAction("deleteSelectedElements")}
+            {renderAction("group")}
+            {renderAction("ungroup")}
           </div>
         </fieldset>
       )}
@@ -85,21 +98,33 @@ export const SelectedShapeActions = ({
   );
 };
 
+const LIBRARY_ICON = (
+  // fa-th-large
+  <svg viewBox="0 0 512 512">
+    <path d="M296 32h192c13.255 0 24 10.745 24 24v160c0 13.255-10.745 24-24 24H296c-13.255 0-24-10.745-24-24V56c0-13.255 10.745-24 24-24zm-80 0H24C10.745 32 0 42.745 0 56v160c0 13.255 10.745 24 24 24h192c13.255 0 24-10.745 24-24V56c0-13.255-10.745-24-24-24zM0 296v160c0 13.255 10.745 24 24 24h192c13.255 0 24-10.745 24-24V296c0-13.255-10.745-24-24-24H24c-13.255 0-24 10.745-24 24zm296 184h192c13.255 0 24-10.745 24-24V296c0-13.255-10.745-24-24-24H296c-13.255 0-24 10.745-24 24v160c0 13.255 10.745 24 24 24z" />
+  </svg>
+);
+
 export const ShapesSwitcher = ({
   elementType,
   setAppState,
+  isLibraryOpen,
 }: {
   elementType: ExcalidrawElement["type"];
-  setAppState: any;
+  setAppState: (appState: Partial<AppState>) => void;
+  isLibraryOpen: boolean;
 }) => (
   <>
     {SHAPES.map(({ value, icon, key }, index) => {
       const label = t(`toolBar.${value}`);
-      const shortcut = `${capitalizeString(key)} ${t("shortcutsDialog.or")} ${
-        index + 1
-      }`;
+      const letter = typeof key === "string" ? key : key[0];
+      const letterShortcut = /[a-z]/.test(letter) ? letter : `Shift+${letter}`;
+      const shortcut = `${capitalizeString(letterShortcut)} ${t(
+        "shortcutsDialog.or",
+      )} ${index + 1}`;
       return (
         <ToolButton
+          className="Shape"
           key={value}
           type="radio"
           icon={icon}
@@ -119,9 +144,22 @@ export const ShapesSwitcher = ({
             setCursorForShape(value);
             setAppState({});
           }}
-        ></ToolButton>
+        />
       );
     })}
+    <ToolButton
+      className="Shape"
+      type="button"
+      icon={LIBRARY_ICON}
+      name="editor-library"
+      keyBindingLabel="9"
+      aria-keyshortcuts="9"
+      title={`${capitalizeString(t("toolBar.library"))} — 9`}
+      aria-label={capitalizeString(t("toolBar.library"))}
+      onClick={() => {
+        setAppState({ isLibraryOpen: !isLibraryOpen });
+      }}
+    />
   </>
 );
 

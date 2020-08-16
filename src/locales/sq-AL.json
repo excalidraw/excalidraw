@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Ngjit",
     "selectAll": "Përzgjidh të gjitha",
+    "multiSelect": "",
     "moveCanvas": "",
     "copy": "Kopjo",
     "copyAsPng": "Kopjo në clipboard si PNG",
@@ -64,7 +65,10 @@
     "group": "",
     "ungroup": "",
     "collaborators": "",
-    "toggleGridMode": ""
+    "toggleGridMode": "",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "",
@@ -92,8 +96,7 @@
     "createNewRoom": "",
     "toggleFullScreen": "",
     "toggleZenMode": "",
-    "exitZenMode": "",
-    "toggleGridMode": ""
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "",
@@ -103,7 +106,8 @@
     "cannotExportEmptyCanvas": "Nuk eksportohet telajo bosh.",
     "couldNotCopyToClipboard": "",
     "decryptFailed": "S'mund të deshifroj të dhënat.",
-    "uploadedSecurly": ""
+    "uploadedSecurly": "",
+    "loadSceneOverridePrompt": ""
   },
   "toolBar": {
     "selection": "Përzgjedhja",
@@ -114,6 +118,7 @@
     "arrow": "Shigjetë",
     "line": "Vijë",
     "text": "Tekst",
+    "library": "",
     "lock": ""
   },
   "headings": {
@@ -172,7 +177,8 @@
     "github": "",
     "textNewLine": "",
     "textFinish": "",
-    "zoomToFit": ""
+    "zoomToFit": "",
+    "preventBinding": ""
   },
   "encrypted": {
     "tooltip": ""

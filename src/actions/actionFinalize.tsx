@@ -9,15 +9,32 @@ import { register } from "./register";
 import { mutateElement } from "../element/mutateElement";
 import { isPathALoop } from "../math";
 import { LinearElementEditor } from "../element/linearElementEditor";
+import Scene from "../scene/Scene";
+import {
+  maybeBindLinearElement,
+  bindOrUnbindLinearElement,
+} from "../element/binding";
+import { isBindingElement } from "../element/typeChecks";
 
 export const actionFinalize = register({
   name: "finalize",
   perform: (elements, appState) => {
     if (appState.editingLinearElement) {
-      const { elementId } = appState.editingLinearElement;
+      const {
+        elementId,
+        startBindingElement,
+        endBindingElement,
+      } = appState.editingLinearElement;
       const element = LinearElementEditor.getElement(elementId);
 
       if (element) {
+        if (isBindingElement(element)) {
+          bindOrUnbindLinearElement(
+            element,
+            startBindingElement,
+            endBindingElement,
+          );
+        }
         return {
           elements:
             element.points.length < 2 || isInvisiblySmallElement(element)
@@ -66,11 +83,12 @@ export const actionFinalize = register({
       // If the multi point line closes the loop,
       // set the last point to first point.
       // This ensures that loop remains closed at different scales.
+      const isLoop = isPathALoop(multiPointElement.points);
       if (
         multiPointElement.type === "line" ||
         multiPointElement.type === "draw"
       ) {
-        if (isPathALoop(multiPointElement.points)) {
+        if (isLoop) {
           const linePoints = multiPointElement.points;
           const firstPoint = linePoints[0];
           mutateElement(multiPointElement, {
@@ -81,6 +99,23 @@ export const actionFinalize = register({
             ),
           });
         }
+      }
+
+      if (
+        isBindingElement(multiPointElement) &&
+        !isLoop &&
+        multiPointElement.points.length > 1
+      ) {
+        const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+          multiPointElement,
+          -1,
+        );
+        maybeBindLinearElement(
+          multiPointElement,
+          appState,
+          Scene.getScene(multiPointElement)!,
+          { x, y },
+        );
       }
 
       if (!appState.elementLocked) {
@@ -101,6 +136,8 @@ export const actionFinalize = register({
         draggingElement: null,
         multiElement: null,
         editingElement: null,
+        startBoundElement: null,
+        suggestedBindings: [],
         selectedElementIds:
           multiPointElement && !appState.elementLocked
             ? {

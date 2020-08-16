@@ -6,7 +6,7 @@ import {
 import { AppState } from "../types";
 import { DataState } from "./types";
 import { isInvisiblySmallElement, getNormalizedDimensions } from "../element";
-import { calculateScrollCenter } from "../scene";
+import { isLinearElementType } from "../element/typeChecks";
 import { randomId } from "../random";
 import {
   FONT_FAMILY,
@@ -25,8 +25,8 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamily => {
 };
 
 function migrateElementWithProperties<T extends ExcalidrawElement>(
-  element: T,
-  extra: Omit<T, keyof ExcalidrawElement>,
+  element: Required<T>,
+  extra: Omit<Required<T>, keyof ExcalidrawElement>,
 ): T {
   const base: Pick<T, keyof ExcalidrawElement> = {
     type: element.type,
@@ -49,7 +49,11 @@ function migrateElementWithProperties<T extends ExcalidrawElement>(
     width: element.width || 0,
     height: element.height || 0,
     seed: element.seed ?? 1,
-    groupIds: element.groupIds || [],
+    groupIds: element.groupIds ?? [],
+    strokeSharpness:
+      element.strokeSharpness ??
+      (isLinearElementType(element.type) ? "round" : "sharp"),
+    boundElementIds: element.boundElementIds ?? [],
   };
 
   return {
@@ -86,6 +90,8 @@ const migrateElement = (
     case "line":
     case "arrow": {
       return migrateElementWithProperties(element, {
+        startBinding: element.startBinding,
+        endBinding: element.endBinding,
         points:
           // migrate old arrow model to new one
           !Array.isArray(element.points) || element.points.length < 2
@@ -94,11 +100,14 @@ const migrateElement = (
                 [element.width, element.height],
               ]
             : element.points,
+        lastCommittedPoint: null,
       });
     }
     // generic elements
     case "ellipse":
+      return migrateElementWithProperties(element, {});
     case "rectangle":
+      return migrateElementWithProperties(element, {});
     case "diamond":
       return migrateElementWithProperties(element, {});
 
@@ -110,8 +119,7 @@ const migrateElement = (
 
 export const restore = (
   savedElements: readonly ExcalidrawElement[],
-  savedState: AppState | null,
-  opts?: { scrollToContent: boolean },
+  savedState: MarkOptional<AppState, "offsetTop" | "offsetLeft"> | null,
 ): DataState => {
   const elements = savedElements.reduce((elements, element) => {
     // filtering out selection, which is legacy, no longer kept in elements,
@@ -124,13 +132,6 @@ export const restore = (
     }
     return elements;
   }, [] as ExcalidrawElement[]);
-
-  if (opts?.scrollToContent && savedState) {
-    savedState = {
-      ...savedState,
-      ...calculateScrollCenter(elements, savedState, null),
-    };
-  }
 
   return {
     elements: elements,

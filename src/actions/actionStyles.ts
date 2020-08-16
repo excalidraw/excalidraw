@@ -12,7 +12,8 @@ import {
   DEFAULT_TEXT_ALIGN,
 } from "../constants";
 
-let copiedStyles: string = "{}";
+// `copiedStyles` is exported only for tests.
+export let copiedStyles: string = "{}";
 
 export const actionCopyStyles = register({
   name: "copyStyles",
@@ -27,7 +28,9 @@ export const actionCopyStyles = register({
   },
   contextItemLabel: "labels.copyStyles",
   keyTest: (event) =>
-    event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === "C",
+    event[KEYS.CTRL_OR_CMD] &&
+    event.altKey &&
+    event.keyCode === KEYS.C_KEY_CODE,
   contextMenuOrder: 0,
 });
 
@@ -67,6 +70,8 @@ export const actionPasteStyles = register({
   },
   contextItemLabel: "labels.pasteStyles",
   keyTest: (event) =>
-    event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === "V",
+    event[KEYS.CTRL_OR_CMD] &&
+    event.altKey &&
+    event.keyCode === KEYS.V_KEY_CODE,
   contextMenuOrder: 1,
 });

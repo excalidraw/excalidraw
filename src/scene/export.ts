@@ -164,5 +164,6 @@ const getWatermarkElement = (maxX: number, maxY: number) => {
     strokeStyle: "solid",
     roughness: 1,
     opacity: 100,
+    strokeSharpness: "sharp",
   });
 };

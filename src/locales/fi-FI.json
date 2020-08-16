@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Liitä",
     "selectAll": "Valitse kaikki",
+    "multiSelect": "Lisää kohde valintaan",
     "moveCanvas": "Siirrä piirtoaluetta",
     "copy": "Kopioi",
     "copyAsPng": "Kopioi leikepöydälle PNG-tiedostona",
@@ -64,7 +65,10 @@
     "group": "Ryhmitä valinta",
     "ungroup": "Pura valittu ryhmä",
     "collaborators": "Yhteistyökumppanit",
-    "toggleGridMode": "Ruudukko päälle/pois"
+    "toggleGridMode": "Ruudukko päälle/pois",
+    "addToLibrary": "Lisää kirjastoon",
+    "removeFromLibrary": "Poista kirjastosta",
+    "libraryLoadingMessage": "Ladataan kirjastoa..."
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
@@ -92,8 +96,7 @@
     "createNewRoom": "Luo huone",
     "toggleFullScreen": "Koko näytön tila päälle/pois",
     "toggleZenMode": "Zen-tila päälle",
-    "exitZenMode": "Poistu zen-tilasta",
-    "toggleGridMode": "Ruudukko päälle/pois"
+    "exitZenMode": "Poistu zen-tilasta"
   },
   "alerts": {
     "clearReset": "Tämä tyhjentää koko piirtoalueen. Jatketaanko?",
@@ -103,7 +106,8 @@
     "cannotExportEmptyCanvas": "Tyhjää piirtoaluetta ei voi viedä.",
     "couldNotCopyToClipboard": "Leikepöydälle kopiointi epäonnistui. Kokeile Chrome-selainta.",
     "decryptFailed": "Salauksen purkaminen epäonnistui.",
-    "uploadedSecurly": "Lähetys on turvattu päästä päähän salauksella. Excalidrawin palvelin ja kolmannet osapuolet eivät voi lukea sisältöä."
+    "uploadedSecurly": "Lähetys on turvattu päästä päähän salauksella. Excalidrawin palvelin ja kolmannet osapuolet eivät voi lukea sisältöä.",
+    "loadSceneOverridePrompt": "Ulkopuolisen piirroksen lataaminen korvaa nykyisen sisältösi. Haluatko jatkaa?"
   },
   "toolBar": {
     "selection": "Valinta",
@@ -114,6 +118,7 @@
     "arrow": "Nuoli",
     "line": "Viiva",
     "text": "Teksti",
+    "library": "Kirjasto",
     "lock": "Pidä valittu työkalu aktiivisena piirron jälkeen"
   },
   "headings": {
@@ -128,7 +133,7 @@
     "resize": "Voit rajoittaa mittasuhteet pitämällä SHIFT pohjassa kun muutat kokoa, pidä ALT pohjassa muuttaaksesi kokoa keskipisteen suhteen",
     "rotate": "Voit rajoittaa kulman pitämällä SHIFT pohjassa pyörittäessäsi",
     "lineEditor_info": "Kaksoisnapauta tai paina Enter muokataksesi pisteitä",
-    "lineEditor_pointSelected": "Paina Delete poistaaksesi pisteen tai vedä liikuttaaksesi pistettä",
+    "lineEditor_pointSelected": "Paina Delete poistaaksesi pisteen, CtrlOrCmd+D monistaaksesi, tai raahaa liikuttaaksesi",
     "lineEditor_nothingSelected": "Valitse liikutettava tai poistettava piste, tai pidä Alt pohjassa ja napauta lisätäksesi uusia pisteitä"
   },
   "errorSplash": {
@@ -172,7 +177,8 @@
     "github": "Löysitkö ongelman? Kerro meille",
     "textNewLine": "Lisää uusi rivi (teksti)",
     "textFinish": "Lopeta muokkaus (teksti)",
-    "zoomToFit": "Zoomaa kaikki elementit näkyviin"
+    "zoomToFit": "Zoomaa kaikki elementit näkyviin",
+    "preventBinding": "Estä nuolten sitominen"
   },
   "encrypted": {
     "tooltip": "Piirroksesi ovat päästä päähän salattuja, joten Excalidrawin palvelimet eivät koskaan näe niitä."

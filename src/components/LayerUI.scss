@@ -1,5 +1,22 @@
 @import "open-color/open-color";
 
+.layer-ui__library {
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.layer-ui__library-message {
+  padding: 10px 20px;
+  max-width: 200px;
+}
+
+.layer-ui__library-items {
+  max-height: 50vh;
+  overflow: auto;
+}
+
 .layer-ui__wrapper {
   .encrypted-icon {
     position: relative;
@@ -81,6 +98,7 @@
 
   &__footer {
     position: absolute;
+    z-index: 100;
     bottom: 0px;
     :root[dir="ltr"] & {
       right: 0;

@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Paste",
     "selectAll": "Select all",
+    "multiSelect": "Add element to selection",
     "moveCanvas": "Move canvas",
     "copy": "Copy",
     "copyAsPng": "Copy to clipboard as PNG",
@@ -24,6 +25,9 @@
     "sloppiness": "Sloppiness",
     "opacity": "Opacity",
     "textAlign": "Text align",
+    "edges": "Edges",
+    "sharp": "Sharp",
+    "round": "Round",
     "fontSize": "Font size",
     "fontFamily": "Font family",
     "onlySelected": "Only selected",
@@ -64,7 +68,11 @@
     "group": "Group selection",
     "ungroup": "Ungroup selection",
     "collaborators": "Collaborators",
-    "toggleGridMode": "Toggle grid mode"
+    "toggleGridMode": "Toggle grid mode",
+    "addToLibrary": "Add to library",
+    "removeFromLibrary": "Remove from library",
+    "libraryLoadingMessage": "Loading library...",
+    "loadingScene": "Loading scene..."
   },
   "buttons": {
     "clearReset": "Reset the canvas",
@@ -92,9 +100,9 @@
     "roomDialog": "Start live collaboration",
     "createNewRoom": "Create new room",
     "toggleFullScreen": "Toggle full screen",
+    "toggleDarkMode": "Toggle dark mode",
     "toggleZenMode": "Toggle zen mode",
-    "exitZenMode": "Exit zen mode",
-    "toggleGridMode": "Toggle grid mode"
+    "exitZenMode": "Exit zen mode"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",
@@ -104,7 +112,8 @@
     "cannotExportEmptyCanvas": "Cannot export empty canvas.",
     "couldNotCopyToClipboard": "Couldn't copy to clipboard. Try using Chrome browser.",
     "decryptFailed": "Couldn't decrypt data.",
-    "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content."
+    "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content.",
+    "loadSceneOverridePrompt": "Loading external drawing will replace your existing content. Do you wish to continue?"
   },
   "toolBar": {
     "selection": "Selection",
@@ -115,6 +124,7 @@
     "arrow": "Arrow",
     "line": "Line",
     "text": "Text",
+    "library": "Library",
     "lock": "Keep selected tool active after drawing"
   },
   "headings": {
@@ -129,7 +139,7 @@
     "resize": "You can constrain proportions by holding SHIFT while resizing,\nhold ALT to resize from the center",
     "rotate": "You can constrain angles by holding SHIFT while rotating",
     "lineEditor_info": "Double-click or press Enter to edit points",
-    "lineEditor_pointSelected": "Press Delete to remove point or drag to move",
+    "lineEditor_pointSelected": "Press Delete to remove point, CtrlOrCmd+D to duplicate, or drag to move",
     "lineEditor_nothingSelected": "Select a point to move or remove, or hold Alt and click to add new points"
   },
   "errorSplash": {
@@ -173,7 +183,8 @@
     "github": "Found an issue? Submit",
     "textNewLine": "Add new line (text)",
     "textFinish": "Finish editing (text)",
-    "zoomToFit": "Zoom to fit all elements"
+    "zoomToFit": "Zoom to fit all elements",
+    "preventBinding": "Prevent arrow binding"
   },
   "encrypted": {
     "tooltip": "Your drawings are end-to-end encrypted so Excalidraw's servers will never see them."

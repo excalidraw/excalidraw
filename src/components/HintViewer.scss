@@ -17,7 +17,7 @@
   }
 
   > span {
-    background-color: transparentize($oc-white, 0.12);
+    background-color: var(--overlay-background-color);
     padding: 0.2rem 0.4rem;
     border-radius: 3px;
   }

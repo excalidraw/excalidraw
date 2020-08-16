@@ -164,6 +164,7 @@ export function renderSpreadsheet(
     strokeStyle: appState.currentItemStrokeStyle,
     roughness: appState.currentItemRoughness,
     opacity: appState.currentItemOpacity,
+    strokeSharpness: appState.currentItemStrokeSharpness,
     text: min.toLocaleString(),
     fontSize: 16,
     fontFamily: appState.currentItemFontFamily,
@@ -181,6 +182,7 @@ export function renderSpreadsheet(
     strokeStyle: appState.currentItemStrokeStyle,
     roughness: appState.currentItemRoughness,
     opacity: appState.currentItemOpacity,
+    strokeSharpness: appState.currentItemStrokeSharpness,
     text: max.toLocaleString(),
     fontSize: 16,
     fontFamily: appState.currentItemFontFamily,
@@ -207,6 +209,7 @@ export function renderSpreadsheet(
       strokeStyle: appState.currentItemStrokeStyle,
       roughness: appState.currentItemRoughness,
       opacity: appState.currentItemOpacity,
+      strokeSharpness: appState.currentItemStrokeSharpness,
     });
   });
 
@@ -226,6 +229,7 @@ export function renderSpreadsheet(
         strokeStyle: appState.currentItemStrokeStyle,
         roughness: appState.currentItemRoughness,
         opacity: appState.currentItemOpacity,
+        strokeSharpness: appState.currentItemStrokeSharpness,
         fontSize: 16,
         fontFamily: appState.currentItemFontFamily,
         textAlign: "center",
@@ -247,6 +251,7 @@ export function renderSpreadsheet(
         strokeStyle: appState.currentItemStrokeStyle,
         roughness: appState.currentItemRoughness,
         opacity: appState.currentItemOpacity,
+        strokeSharpness: appState.currentItemStrokeSharpness,
         fontSize: 20,
         fontFamily: appState.currentItemFontFamily,
         textAlign: "center",

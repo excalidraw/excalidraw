@@ -1,6 +1,10 @@
-import { FlooredNumber } from "./types";
+import { AppState } from "./types";
 import { getZoomOrigin } from "./scene";
-import { CURSOR_TYPE, FONT_FAMILY } from "./constants";
+import {
+  CURSOR_TYPE,
+  FONT_FAMILY,
+  WINDOWS_EMOJI_FALLBACK_FONT,
+} from "./constants";
 import { FontFamily, FontString } from "./element/types";
 
 export const SVG_NS = "http://www.w3.org/2000/svg";
@@ -66,7 +70,7 @@ export const getFontFamilyString = ({
 }: {
   fontFamily: FontFamily;
 }) => {
-  return FONT_FAMILY[fontFamily];
+  return `${FONT_FAMILY[fontFamily]}, ${WINDOWS_EMOJI_FALLBACK_FONT}`;
 };
 
 /** returns fontSize+fontFamily string for assignment to DOM elements */
@@ -181,45 +185,39 @@ export const getShortcutKey = (shortcut: string): string => {
 };
 export const viewportCoordsToSceneCoords = (
   { clientX, clientY }: { clientX: number; clientY: number },
-  {
-    scrollX,
-    scrollY,
-    zoom,
-  }: {
-    scrollX: FlooredNumber;
-    scrollY: FlooredNumber;
-    zoom: number;
-  },
+  appState: AppState,
   canvas: HTMLCanvasElement | null,
   scale: number,
 ) => {
   const zoomOrigin = getZoomOrigin(canvas, scale);
-  const clientXWithZoom = zoomOrigin.x + (clientX - zoomOrigin.x) / zoom;
-  const clientYWithZoom = zoomOrigin.y + (clientY - zoomOrigin.y) / zoom;
+  const clientXWithZoom =
+    zoomOrigin.x +
+    (clientX - zoomOrigin.x - appState.offsetLeft) / appState.zoom;
+  const clientYWithZoom =
+    zoomOrigin.y +
+    (clientY - zoomOrigin.y - appState.offsetTop) / appState.zoom;
 
-  const x = clientXWithZoom - scrollX;
-  const y = clientYWithZoom - scrollY;
+  const x = clientXWithZoom - appState.scrollX;
+  const y = clientYWithZoom - appState.scrollY;
 
   return { x, y };
 };
 
 export const sceneCoordsToViewportCoords = (
   { sceneX, sceneY }: { sceneX: number; sceneY: number },
-  {
-    scrollX,
-    scrollY,
-    zoom,
-  }: {
-    scrollX: FlooredNumber;
-    scrollY: FlooredNumber;
-    zoom: number;
-  },
+  appState: AppState,
   canvas: HTMLCanvasElement | null,
   scale: number,
 ) => {
   const zoomOrigin = getZoomOrigin(canvas, scale);
-  const x = zoomOrigin.x - (zoomOrigin.x - sceneX - scrollX) * zoom;
-  const y = zoomOrigin.y - (zoomOrigin.y - sceneY - scrollY) * zoom;
+  const x =
+    zoomOrigin.x -
+    (zoomOrigin.x - sceneX - appState.scrollX - appState.offsetLeft) *
+      appState.zoom;
+  const y =
+    zoomOrigin.y -
+    (zoomOrigin.y - sceneY - appState.scrollY - appState.offsetTop) *
+      appState.zoom;
 
   return { x, y };
 };
@@ -240,4 +238,19 @@ const RE_RTL_CHECK = new RegExp(`^[^${RS_LTR_CHARS}]*[${RS_RTL_CHARS}]`);
  */
 export const isRTL = (text: string) => {
   return RE_RTL_CHECK.test(text);
+};
+
+export function tupleToCoors(
+  xyTuple: readonly [number, number],
+): { x: number; y: number } {
+  const [x, y] = xyTuple;
+  return { x, y };
+}
+
+/** use as a rejectionHandler to mute filesystem Abort errors */
+export const muteFSAbortError = (error?: Error) => {
+  if (error?.name === "AbortError") {
+    return;
+  }
+  throw error;
 };

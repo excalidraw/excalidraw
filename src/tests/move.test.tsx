@@ -30,7 +30,7 @@ describe("move element", () => {
       fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
       fireEvent.pointerUp(canvas);
 
-      expect(renderScene).toHaveBeenCalledTimes(4);
+      expect(renderScene).toHaveBeenCalledTimes(5);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(1);
       expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -65,7 +65,7 @@ describe("duplicate element on move when ALT is clicked", () => {
       fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
       fireEvent.pointerUp(canvas);
 
-      expect(renderScene).toHaveBeenCalledTimes(4);
+      expect(renderScene).toHaveBeenCalledTimes(5);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(1);
       expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -83,7 +83,9 @@ describe("duplicate element on move when ALT is clicked", () => {
     fireEvent.pointerMove(canvas, { clientX: 10, clientY: 60 });
     fireEvent.pointerUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(4);
+    // TODO: This used to be 4, but binding made it go up to 5. Do we need
+    // that additional render?
+    expect(renderScene).toHaveBeenCalledTimes(5);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(2);
 

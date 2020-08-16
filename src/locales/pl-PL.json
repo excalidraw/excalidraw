@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Wklej",
     "selectAll": "Zaznacz wszystko",
+    "multiSelect": "",
     "moveCanvas": "Przesuń obszar roboczy",
     "copy": "Kopiuj",
     "copyAsPng": "Skopiuj do schowka jako plik PNG",
@@ -64,7 +65,10 @@
     "group": "Zgrupuj wybrane",
     "ungroup": "Rozgrupuj wybrane",
     "collaborators": "Współtwórcy",
-    "toggleGridMode": ""
+    "toggleGridMode": "",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
@@ -92,8 +96,7 @@
     "createNewRoom": "Utwórz nowy pokój",
     "toggleFullScreen": "Włącz/wyłącz tryb pełnoekranowy",
     "toggleZenMode": "Włącz tryb Zen",
-    "exitZenMode": "Wyjdź z trybu Zen",
-    "toggleGridMode": ""
+    "exitZenMode": "Wyjdź z trybu Zen"
   },
   "alerts": {
     "clearReset": "To spowoduje usunięcie wszystkiego z dokumentu. Czy chcesz kontynuować?",
@@ -103,7 +106,8 @@
     "cannotExportEmptyCanvas": "Najpierw musisz coś narysować, aby zapisać dokument.",
     "couldNotCopyToClipboard": "Błąd podczas kopiowania. Spróbuj użyć Google Chrome.",
     "decryptFailed": "Nie udało się odszyfrować danych.",
-    "uploadedSecurly": "By zapewnić Ci prywatność, udostępnianie projektu jest zabezpieczone szyfrowaniem end-to-end, co oznacza, że poza tobą i osobą z którą podzielisz się linkiem, nikt nie ma dostępu do tego co udostępniasz."
+    "uploadedSecurly": "By zapewnić Ci prywatność, udostępnianie projektu jest zabezpieczone szyfrowaniem end-to-end, co oznacza, że poza tobą i osobą z którą podzielisz się linkiem, nikt nie ma dostępu do tego co udostępniasz.",
+    "loadSceneOverridePrompt": ""
   },
   "toolBar": {
     "selection": "Zaznaczenie",
@@ -114,6 +118,7 @@
     "arrow": "Strzałka",
     "line": "Linia",
     "text": "Tekst",
+    "library": "",
     "lock": "Zablokuj wybrane narzędzie"
   },
   "headings": {
@@ -128,7 +133,7 @@
     "resize": "Możesz zachować proporcję trzymająć wcisnięty SHIFT, przytrzymaj ALT by zmienić rozmiar względem środka",
     "rotate": "Możesz obracać element w równych odstępach trzymając wciśnięty SHIFT",
     "lineEditor_info": "Kliknij dwukrotnie lub naciśnij Enter, aby edytować punkty",
-    "lineEditor_pointSelected": "Naciśnij Delete by usunąć punkt albo przeciągnij by zmienić jego pozycje",
+    "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "Naciśnij w punkt by go edytować, przytrzymaj Alt i naciśnij by dodać nowy punkt"
   },
   "errorSplash": {
@@ -172,7 +177,8 @@
     "github": "Znalazłeś problem? Zgłoś go",
     "textNewLine": "Dodaj nową linię (tekst)",
     "textFinish": "Zakończ edycję (tekst)",
-    "zoomToFit": "Powiększ, aby wyświetlić wszystkie elementy"
+    "zoomToFit": "Powiększ, aby wyświetlić wszystkie elementy",
+    "preventBinding": ""
   },
   "encrypted": {
     "tooltip": "Twoje rysunki są zabezpieczone szyfrowaniem end-to-end, tak więc nawet w Excalidraw nie jesteśmy w stanie zobaczyć tego co tworzysz."

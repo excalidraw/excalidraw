@@ -9,23 +9,20 @@ import {
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 import { t } from "../i18n";
-import { globalSceneState } from "../scene";
 
 export class ActionManager implements ActionsManagerInterface {
   actions = {} as ActionsManagerInterface["actions"];
 
   updater: UpdaterFn;
 
-  getAppState: () => AppState;
+  getAppState: () => Readonly<AppState>;
 
   getElementsIncludingDeleted: () => readonly ExcalidrawElement[];
 
   constructor(
     updater: UpdaterFn,
     getAppState: () => AppState,
-    getElementsIncludingDeleted: () => ReturnType<
-      typeof globalSceneState["getElementsIncludingDeleted"]
-    >,
+    getElementsIncludingDeleted: () => readonly ExcalidrawElement[],
   ) {
     this.updater = updater;
     this.getAppState = getAppState;
@@ -82,6 +79,14 @@ export class ActionManager implements ActionsManagerInterface {
     return Object.values(this.actions)
       .filter(actionFilter)
       .filter((action) => "contextItemLabel" in action)
+      .filter((action) =>
+        action.contextItemPredicate
+          ? action.contextItemPredicate(
+              this.getElementsIncludingDeleted(),
+              this.getAppState(),
+            )
+          : true,
+      )
       .sort(
         (a, b) =>
           (a.contextMenuOrder !== undefined ? a.contextMenuOrder : 999) -

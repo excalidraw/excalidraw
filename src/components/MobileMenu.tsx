@@ -17,6 +17,7 @@ import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 import { LockIcon } from "./LockIcon";
 import { LoadingMessage } from "./LoadingMessage";
 import { UserList } from "./UserList";
+import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -24,6 +25,7 @@ type MobileMenuProps = {
   exportButton: React.ReactNode;
   setAppState: any;
   elements: readonly NonDeletedExcalidrawElement[];
+  libraryMenu: JSX.Element | null;
   onRoomCreate: () => void;
   onUsernameChange: (username: string) => void;
   onRoomDestroy: () => void;
@@ -34,6 +36,7 @@ type MobileMenuProps = {
 export const MobileMenu = ({
   appState,
   elements,
+  libraryMenu,
   actionManager,
   exportButton,
   setAppState,
@@ -56,6 +59,7 @@ export const MobileMenu = ({
                   <ShapesSwitcher
                     elementType={appState.elementType}
                     setAppState={setAppState}
+                    isLibraryOpen={appState.isLibraryOpen}
                   />
                 </Stack.Row>
               </Island>
@@ -65,6 +69,7 @@ export const MobileMenu = ({
                 title={t("toolBar.lock")}
               />
             </Stack.Row>
+            {libraryMenu}
           </Stack.Col>
         )}
       </Section>
@@ -96,12 +101,16 @@ export const MobileMenu = ({
                   onRoomCreate={onRoomCreate}
                   onRoomDestroy={onRoomDestroy}
                 />
-                {actionManager.renderAction("changeViewBackgroundColor")}
+                <BackgroundPickerAndDarkModeToggle
+                  actionManager={actionManager}
+                  appState={appState}
+                  setAppState={setAppState}
+                />
                 <fieldset>
                   <legend>{t("labels.language")}</legend>
                   <LanguageList
-                    onChange={(lng) => {
-                      setLanguage(lng);
+                    onChange={async (lng) => {
+                      await setLanguage(lng);
                       setAppState({});
                     }}
                   />

@@ -2,6 +2,7 @@
   "labels": {
     "paste": "הדבק",
     "selectAll": "בחר הכל",
+    "multiSelect": "",
     "moveCanvas": "",
     "copy": "העתק",
     "copyAsPng": "העתק ללוח כ PNG",
@@ -64,7 +65,10 @@
     "group": "אחד לקבוצה",
     "ungroup": "פרק קבוצה",
     "collaborators": "",
-    "toggleGridMode": ""
+    "toggleGridMode": "",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "אפס את הלוח",
@@ -92,8 +96,7 @@
     "createNewRoom": "צור חדר",
     "toggleFullScreen": "הפעל/הפסק מסך מלא",
     "toggleZenMode": "התחל/הפסק מצב תפריט מרחף",
-    "exitZenMode": "צא ממצב תפריט מרחף",
-    "toggleGridMode": ""
+    "exitZenMode": "צא ממצב תפריט מרחף"
   },
   "alerts": {
     "clearReset": "פעולה זו תנקה את כל הלוח. אתה בטוח?",
@@ -103,7 +106,8 @@
     "cannotExportEmptyCanvas": "לא ניתן לייצא לוח ריק.",
     "couldNotCopyToClipboard": "לא ניתן להעתיק ללוח. נסה להשתמש בדפדפן Chrome.",
     "decryptFailed": "לא ניתן לפענח מידע.",
-    "uploadedSecurly": "ההעלאה הוצפנה מקצה לקצה, ולכן שרת Excalidraw וצד שלישי לא יכולים לקרוא את התוכן."
+    "uploadedSecurly": "ההעלאה הוצפנה מקצה לקצה, ולכן שרת Excalidraw וצד שלישי לא יכולים לקרוא את התוכן.",
+    "loadSceneOverridePrompt": ""
   },
   "toolBar": {
     "selection": "בחירה",
@@ -114,6 +118,7 @@
     "arrow": "חץ",
     "line": "קו",
     "text": "טקסט",
+    "library": "",
     "lock": "השאר את הכלי הנבחר פעיל גם לאחר סיום הציור"
   },
   "headings": {
@@ -172,7 +177,8 @@
     "github": "מצאת בעיה? דווח",
     "textNewLine": "הוסף שורה חדשה (טקסט)",
     "textFinish": "סיים עריכה (טקסט)",
-    "zoomToFit": "זום להתאמת כל האלמנטים למסך"
+    "zoomToFit": "זום להתאמת כל האלמנטים למסך",
+    "preventBinding": ""
   },
   "encrypted": {
     "tooltip": "הרישומים שלך מוצפנים מקצה לקצה כך שהשרתים של Excalidraw לא יראו אותם לעולם."

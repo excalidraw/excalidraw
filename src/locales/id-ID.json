@@ -2,6 +2,7 @@
   "labels": {
     "paste": "Tempel",
     "selectAll": "Pilih semua",
+    "multiSelect": "",
     "moveCanvas": "",
     "copy": "Salin",
     "copyAsPng": "Salin ke Papan Klip Sebagai PNG",
@@ -64,7 +65,10 @@
     "group": "",
     "ungroup": "",
     "collaborators": "",
-    "toggleGridMode": ""
+    "toggleGridMode": "",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
@@ -92,8 +96,7 @@
     "createNewRoom": "Buat ruang baru",
     "toggleFullScreen": "Aktif / Nonaktifkan layar penuh",
     "toggleZenMode": "",
-    "exitZenMode": "",
-    "toggleGridMode": ""
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "Ini akan menghapus semua yang ada dikanvas. Apakah kamu yakin ?",
@@ -103,7 +106,8 @@
     "cannotExportEmptyCanvas": "Tidak bisa mengekspor kanvas kosong",
     "couldNotCopyToClipboard": "Tidak bisa menyalin ke papan klip. Coba gunakan Browser Chrome",
     "decryptFailed": "Tidak dapat mengdeskripsi data.",
-    "uploadedSecurly": "Pengunggahan ini telah diamankan menggunakan enkripsi end-to-end, artinya server Excalidraw dan pihak ketiga tidak data membaca nya"
+    "uploadedSecurly": "Pengunggahan ini telah diamankan menggunakan enkripsi end-to-end, artinya server Excalidraw dan pihak ketiga tidak data membaca nya",
+    "loadSceneOverridePrompt": ""
   },
   "toolBar": {
     "selection": "Pilihan",
@@ -114,6 +118,7 @@
     "arrow": "Panah",
     "line": "Garis",
     "text": "Teks",
+    "library": "",
     "lock": "Biarkan alat yang dipilih aktif setelah menggambar"
   },
   "headings": {
@@ -172,7 +177,8 @@
     "github": "",
     "textNewLine": "",
     "textFinish": "",
-    "zoomToFit": ""
+    "zoomToFit": "",
+    "preventBinding": ""
   },
   "encrypted": {
     "tooltip": ""

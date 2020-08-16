@@ -24,6 +24,7 @@ type ElementConstructorOpts = MarkOptional<
   | "height"
   | "angle"
   | "groupIds"
+  | "boundElementIds"
   | "seed"
   | "version"
   | "versionNonce"
@@ -45,6 +46,8 @@ const _newElementBase = <T extends ExcalidrawElement>(
     height = 0,
     angle = 0,
     groupIds = [],
+    strokeSharpness,
+    boundElementIds = null,
     ...rest
   }: ElementConstructorOpts & Omit<Partial<ExcalidrawGenericElement>, "type">,
 ) => ({
@@ -63,10 +66,12 @@ const _newElementBase = <T extends ExcalidrawElement>(
   roughness,
   opacity,
   groupIds,
+  strokeSharpness,
   seed: rest.seed ?? randomInteger(),
   version: rest.version || 1,
   versionNonce: rest.versionNonce ?? 0,
   isDeleted: false as false,
+  boundElementIds,
 });
 
 export const newElement = (
@@ -125,7 +130,6 @@ export const newTextElement = (
     },
     {},
   );
-
   return textElement;
 };
 
@@ -210,13 +214,14 @@ export const updateTextElement = (
 export const newLinearElement = (
   opts: {
     type: ExcalidrawLinearElement["type"];
-    lastCommittedPoint?: ExcalidrawLinearElement["lastCommittedPoint"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawLinearElement> => {
   return {
     ..._newElementBase<ExcalidrawLinearElement>(opts.type, opts),
     points: [],
-    lastCommittedPoint: opts.lastCommittedPoint || null,
+    lastCommittedPoint: null,
+    startBinding: null,
+    endBinding: null,
   };
 };
 

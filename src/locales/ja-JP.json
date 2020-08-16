@@ -2,6 +2,7 @@
   "labels": {
     "paste": "貼り付け",
     "selectAll": "すべて選択",
+    "multiSelect": "",
     "moveCanvas": "",
     "copy": "コピー",
     "copyAsPng": "PNGとしてクリップボードへコピー",
@@ -64,7 +65,10 @@
     "group": "",
     "ungroup": "",
     "collaborators": "",
-    "toggleGridMode": ""
+    "toggleGridMode": "",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",
@@ -92,8 +96,7 @@
     "createNewRoom": "新しい部屋を作成する",
     "toggleFullScreen": "全画面表示に切り替える",
     "toggleZenMode": "集中モードに切り替える",
-    "exitZenMode": "集中モードをやめる",
-    "toggleGridMode": ""
+    "exitZenMode": "集中モードをやめる"
   },
   "alerts": {
     "clearReset": "この操作によってキャンバス全体が消えます。よろしいですか？",
@@ -103,7 +106,8 @@
     "cannotExportEmptyCanvas": "空のキャンバスはエクスポートできません。",
     "couldNotCopyToClipboard": "クリップボードにコピーできません。Google Chromeでお試しください。",
     "decryptFailed": "データを復号できませんでした。",
-    "uploadedSecurly": "データのアップロードはエンドツーエンド暗号化によって保護されています。Excalidrawサーバーと第三者はデータの内容を見ることができません。"
+    "uploadedSecurly": "データのアップロードはエンドツーエンド暗号化によって保護されています。Excalidrawサーバーと第三者はデータの内容を見ることができません。",
+    "loadSceneOverridePrompt": ""
   },
   "toolBar": {
     "selection": "選択",
@@ -114,6 +118,7 @@
     "arrow": "矢印",
     "line": "直線",
     "text": "テキスト",
+    "library": "",
     "lock": "描画後も使用中のツールを選択したままにする"
   },
   "headings": {
@@ -172,7 +177,8 @@
     "github": "不具合報告はこちら",
     "textNewLine": "テキストの改行",
     "textFinish": "テキストの編集を終える",
-    "zoomToFit": "すべての図形が収まるよう拡大/縮小"
+    "zoomToFit": "すべての図形が収まるよう拡大/縮小",
+    "preventBinding": ""
   },
   "encrypted": {
     "tooltip": "描画内容はエンドツーエンド暗号化が施されており、Excalidrawサーバーが内容を見ることはできません。"

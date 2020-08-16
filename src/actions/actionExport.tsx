@@ -7,6 +7,7 @@ import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
 import { register } from "./register";
 import { KEYS } from "../keys";
+import { muteFSAbortError } from "../utils";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -65,9 +66,9 @@ export const actionChangeShouldAddWatermark = register({
 export const actionSaveScene = register({
   name: "saveScene",
   perform: (elements, appState, value) => {
-    saveAsJSON(elements, appState, (window as any).handle).catch((error) =>
-      console.error(error),
-    );
+    saveAsJSON(elements, appState, (window as any).handle)
+      .catch(muteFSAbortError)
+      .catch((error) => console.error(error));
     return { commitToHistory: false };
   },
   keyTest: (event) => {
@@ -88,7 +89,9 @@ export const actionSaveScene = register({
 export const actionSaveAsScene = register({
   name: "saveAsScene",
   perform: (elements, appState, value) => {
-    saveAsJSON(elements, appState, null).catch((error) => console.error(error));
+    saveAsJSON(elements, appState, null)
+      .catch(muteFSAbortError)
+      .catch((error) => console.error(error));
     return { commitToHistory: false };
   },
   keyTest: (event) => {
@@ -101,7 +104,9 @@ export const actionSaveAsScene = register({
       title={t("buttons.saveAs")}
       aria-label={t("buttons.saveAs")}
       showAriaLabel={useIsMobile()}
-      hidden={!("chooseFileSystemEntries" in window)}
+      hidden={
+        !("chooseFileSystemEntries" in window || "showOpenFilePicker" in window)
+      }
       onClick={() => updateData(null)}
     />
   ),
@@ -123,7 +128,7 @@ export const actionLoadScene = register({
       commitToHistory: false,
     };
   },
-  PanelComponent: ({ updateData }) => (
+  PanelComponent: ({ updateData, appState }) => (
     <ToolButton
       type="button"
       icon={load}
@@ -131,15 +136,12 @@ export const actionLoadScene = register({
       aria-label={t("buttons.load")}
       showAriaLabel={useIsMobile()}
       onClick={() => {
-        loadFromJSON()
+        loadFromJSON(appState)
           .then(({ elements, appState }) => {
             updateData({ elements: elements, appState: appState });
           })
+          .catch(muteFSAbortError)
           .catch((error) => {
-            // if user cancels, ignore the error
-            if (error.name === "AbortError") {
-              return;
-            }
             updateData({ error: error.message });
           });
       }}

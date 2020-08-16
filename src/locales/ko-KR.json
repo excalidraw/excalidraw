@@ -2,6 +2,7 @@
   "labels": {
     "paste": "붙여넣기",
     "selectAll": "전체 선택",
+    "multiSelect": "",
     "moveCanvas": "",
     "copy": "복사하기",
     "copyAsPng": "클립보드로 PNG 이미지 복사",
@@ -64,7 +65,10 @@
     "group": "",
     "ungroup": "",
     "collaborators": "",
-    "toggleGridMode": ""
+    "toggleGridMode": "",
+    "addToLibrary": "",
+    "removeFromLibrary": "",
+    "libraryLoadingMessage": ""
   },
   "buttons": {
     "clearReset": "캔버스 초기화",
@@ -92,8 +96,7 @@
     "createNewRoom": "",
     "toggleFullScreen": "전체화면",
     "toggleZenMode": "",
-    "exitZenMode": "",
-    "toggleGridMode": ""
+    "exitZenMode": ""
   },
   "alerts": {
     "clearReset": "모든 작업 내용을 초기화 합니다. 계속 진행할까요?",
@@ -103,7 +106,8 @@
     "cannotExportEmptyCanvas": "빈 캔버스를 내보낼 수 없습니다.",
     "couldNotCopyToClipboard": "클립 보드에 복사 할 수 없습니다. Chrome 브라우저에서 시도해 주세요.",
     "decryptFailed": "데이터를 복호화하지 못했습니다.",
-    "uploadedSecurly": "업로드는 종단 간 암호화로 보호되므로 Excalidraw 서버 및 타사가 콘텐츠를 읽을 수 없습니다."
+    "uploadedSecurly": "업로드는 종단 간 암호화로 보호되므로 Excalidraw 서버 및 타사가 콘텐츠를 읽을 수 없습니다.",
+    "loadSceneOverridePrompt": ""
   },
   "toolBar": {
     "selection": "선택",
@@ -114,6 +118,7 @@
     "arrow": "화살표",
     "line": "라인",
     "text": "텍스트",
+    "library": "",
     "lock": "선택된 도구 유지하기"
   },
   "headings": {
@@ -172,7 +177,8 @@
     "github": "이슈 제보하기",
     "textNewLine": "줄바꾸기",
     "textFinish": "편집 완료",
-    "zoomToFit": ""
+    "zoomToFit": "",
+    "preventBinding": ""
   },
   "encrypted": {
     "tooltip": ""
