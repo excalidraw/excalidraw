@@ -25,6 +25,9 @@
     "sloppiness": "बेढ़ंगापन",
     "opacity": "अपारदर्शिता",
     "textAlign": "टेक्स्ट संरेखन",
+    "edges": "",
+    "sharp": "",
+    "round": "",
     "fontSize": "फ़ॉन्ट का आकार",
     "fontFamily": "फ़ॉन्ट का परिवार",
     "onlySelected": "केवल चयनित",
@@ -68,7 +71,8 @@
     "toggleGridMode": "टॉगल ग्रिड मोड",
     "addToLibrary": "",
     "removeFromLibrary": "",
-    "libraryLoadingMessage": ""
+    "libraryLoadingMessage": "",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "कैनवास रीसेट करें",
@@ -95,6 +99,7 @@
     "roomDialog": "लाइव सहयोग शुरू करें",
     "createNewRoom": "एक नया कमरा बनाएं",
     "toggleFullScreen": "पूर्णस्क्रीन चालू करें",
+    "toggleDarkMode": "",
     "toggleZenMode": "टॉगल ज़ेन मोड",
     "exitZenMode": "जेन मोड से बाहर निकलें"
   },

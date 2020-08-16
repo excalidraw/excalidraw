@@ -25,6 +25,9 @@
     "sloppiness": "Viivan tarkkuus",
     "opacity": "Peittävyys",
     "textAlign": "Tekstin tasaus",
+    "edges": "Reunat",
+    "sharp": "Terävä",
+    "round": "Pyöreä",
     "fontSize": "Kirjasinkoko",
     "fontFamily": "Kirjasintyyppi",
     "onlySelected": "Vain valitut",
@@ -68,7 +71,8 @@
     "toggleGridMode": "Ruudukko päälle/pois",
     "addToLibrary": "Lisää kirjastoon",
     "removeFromLibrary": "Poista kirjastosta",
-    "libraryLoadingMessage": "Ladataan kirjastoa..."
+    "libraryLoadingMessage": "Ladataan kirjastoa...",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
@@ -95,6 +99,7 @@
     "roomDialog": "Aloita live-yhteistyö",
     "createNewRoom": "Luo huone",
     "toggleFullScreen": "Koko näytön tila päälle/pois",
+    "toggleDarkMode": "Pimeä tila päälle/pois",
     "toggleZenMode": "Zen-tila päälle",
     "exitZenMode": "Poistu zen-tilasta"
   },

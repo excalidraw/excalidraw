@@ -25,6 +25,9 @@
     "sloppiness": "Ujevnhet",
     "opacity": "Synlighet",
     "textAlign": "Tekstjustering",
+    "edges": "Kanter",
+    "sharp": "Skarp",
+    "round": "Rund",
     "fontSize": "Skriftstørrelse",
     "fontFamily": "Fontfamilie",
     "onlySelected": "Kun valgte",
@@ -68,7 +71,8 @@
     "toggleGridMode": "Slå av/på rutenett",
     "addToLibrary": "Legg til i bibliotek",
     "removeFromLibrary": "Fjern fra bibliotek",
-    "libraryLoadingMessage": "Laster bibliotek..."
+    "libraryLoadingMessage": "Laster bibliotek...",
+    "loadingScene": "Laster inn scene..."
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
@@ -95,6 +99,7 @@
     "roomDialog": "Start sanntids-samarbeid",
     "createNewRoom": "Opprett et nytt rom",
     "toggleFullScreen": "Skru fullskjerm av/på",
+    "toggleDarkMode": "Skru mørk modus av/på",
     "toggleZenMode": "Slå av/på zen-modus",
     "exitZenMode": "Avslutt zen-modus"
   },

@@ -25,6 +25,9 @@
     "sloppiness": "סגנון",
     "opacity": "אטימות",
     "textAlign": "יישור טקסט",
+    "edges": "",
+    "sharp": "",
+    "round": "",
     "fontSize": "גודל גופן",
     "fontFamily": "סוג הגופן",
     "onlySelected": "רק מה שנבחר",
@@ -68,7 +71,8 @@
     "toggleGridMode": "",
     "addToLibrary": "",
     "removeFromLibrary": "",
-    "libraryLoadingMessage": ""
+    "libraryLoadingMessage": "",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "אפס את הלוח",
@@ -95,6 +99,7 @@
     "roomDialog": "התחל שיתוף חי",
     "createNewRoom": "צור חדר",
     "toggleFullScreen": "הפעל/הפסק מסך מלא",
+    "toggleDarkMode": "",
     "toggleZenMode": "התחל/הפסק מצב תפריט מרחף",
     "exitZenMode": "צא ממצב תפריט מרחף"
   },

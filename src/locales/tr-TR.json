@@ -25,6 +25,9 @@
     "sloppiness": "Üstün körülük",
     "opacity": "Opaklık",
     "textAlign": "Metin hizala",
+    "edges": "",
+    "sharp": "",
+    "round": "",
     "fontSize": "Yazı tipi boyutu",
     "fontFamily": "Yazı tipi ailesi",
     "onlySelected": "Sadece seçilen",
@@ -68,7 +71,8 @@
     "toggleGridMode": "Izgara modunu aç",
     "addToLibrary": "Kütüphaneye ekle",
     "removeFromLibrary": "Kütüphaneden kaldır",
-    "libraryLoadingMessage": "Kütüphane yükleniyor..."
+    "libraryLoadingMessage": "Kütüphane yükleniyor...",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "Tuvali sıfırla",
@@ -95,6 +99,7 @@
     "roomDialog": "Ortak çalışma ortamı yarat",
     "createNewRoom": "Yeni oda oluştur",
     "toggleFullScreen": "Tam ekranı aç/kapa",
+    "toggleDarkMode": "",
     "toggleZenMode": "Zen modunu aç/kapa",
     "exitZenMode": "Zen modundan çık"
   },

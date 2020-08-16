@@ -25,6 +25,9 @@
     "sloppiness": "Sauberkeit",
     "opacity": "Deckkraft",
     "textAlign": "Textausrichtung",
+    "edges": "Kanten",
+    "sharp": "Eckig",
+    "round": "Rund",
     "fontSize": "Schriftgröße",
     "fontFamily": "Schriftfamilie",
     "onlySelected": "Nur ausgewählte",
@@ -68,7 +71,8 @@
     "toggleGridMode": "Gitterlinien ein-/ausschalten",
     "addToLibrary": "Zur Bibliothek hinzufügen",
     "removeFromLibrary": "Aus Bibliothek entfernen",
-    "libraryLoadingMessage": "Lade Bibliothek..."
+    "libraryLoadingMessage": "Lade Bibliothek...",
+    "loadingScene": "Lade Zeichnung..."
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
@@ -95,6 +99,7 @@
     "roomDialog": "Live-Kollaborationssitzung starten",
     "createNewRoom": "Neuen Raum erstellen",
     "toggleFullScreen": "Vollbild umschalten",
+    "toggleDarkMode": "Dunkles Design umschalten",
     "toggleZenMode": "Zen-Modus umschalten",
     "exitZenMode": "Zen-Modus verlassen"
   },
@@ -178,7 +183,7 @@
     "textNewLine": "Neue Zeile hinzufügen (Text)",
     "textFinish": "Bearbeiten beenden (Text)",
     "zoomToFit": "Zoomen um alle Elemente einzupassen",
-    "preventBinding": ""
+    "preventBinding": "Pfeil-Bindung verhindern"
   },
   "encrypted": {
     "tooltip": "Da deine Zeichnungen Ende-zu-Ende verschlüsselt werden, sehen auch unsere Excalidraw-Server sie niemals."

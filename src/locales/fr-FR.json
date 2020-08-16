@@ -25,6 +25,9 @@
     "sloppiness": "Style de tracé",
     "opacity": "Opacité",
     "textAlign": "Alignement du texte",
+    "edges": "Bords",
+    "sharp": "Aigu",
+    "round": "Rond",
     "fontSize": "Taille de la police",
     "fontFamily": "Police",
     "onlySelected": "Uniquement la sélection",
@@ -68,7 +71,8 @@
     "toggleGridMode": "Basculer le mode grille",
     "addToLibrary": "Ajouter à la bibliothèque",
     "removeFromLibrary": "Supprimer de la bibliothèque",
-    "libraryLoadingMessage": "Chargement de la bibliothèque..."
+    "libraryLoadingMessage": "Chargement de la bibliothèque...",
+    "loadingScene": "Chargement de la scène..."
   },
   "buttons": {
     "clearReset": "Effacer le canvas & réinitialiser la couleur d'arrière-plan",
@@ -95,6 +99,7 @@
     "roomDialog": "Démarrer la collaboration en temps réel",
     "createNewRoom": "Créer un nouveau salon",
     "toggleFullScreen": "Mode plein-écran",
+    "toggleDarkMode": "Activer/désactiver le mode sombre",
     "toggleZenMode": "Activer/désactiver le mode zen",
     "exitZenMode": "Quitter le mode zen"
   },
@@ -178,7 +183,7 @@
     "textNewLine": "Ajouter une nouvelle ligne (texte)",
     "textFinish": "Terminer l'édition (texte)",
     "zoomToFit": "Zoomer pour visualiser tous les éléments",
-    "preventBinding": ""
+    "preventBinding": "Empêcher la liaison de la flèche"
   },
   "encrypted": {
     "tooltip": "Vos dessins sont cryptés de bout en bout, les serveurs d'Excalidraw ne les verront jamais."

@@ -25,6 +25,9 @@
     "sloppiness": "الإمالة",
     "opacity": "الشفافية",
     "textAlign": "محاذاة النص",
+    "edges": "",
+    "sharp": "",
+    "round": "",
     "fontSize": "حجم الخط",
     "fontFamily": "نوع الخط",
     "onlySelected": "المحدد فقط",
@@ -68,7 +71,8 @@
     "toggleGridMode": "التبديل لوضع الشبكة",
     "addToLibrary": "أضف إلى المكتبة",
     "removeFromLibrary": "حذف من المكتبة",
-    "libraryLoadingMessage": "جارٍ تحميل المكتبة..."
+    "libraryLoadingMessage": "جارٍ تحميل المكتبة...",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
@@ -95,6 +99,7 @@
     "roomDialog": "بدء المشاركة الحية",
     "createNewRoom": "إنشاء غرفة جديدة",
     "toggleFullScreen": "التبديل لوضع ملء الشاشة",
+    "toggleDarkMode": "",
     "toggleZenMode": "تبديل الوضع الليلي",
     "exitZenMode": "الغاء الوضع الليلى"
   },
