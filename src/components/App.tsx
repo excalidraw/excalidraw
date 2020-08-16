@@ -525,6 +525,7 @@ class App extends React.Component<any, AppState> {
     document.body.appendChild(div);
   };
 
+  private beforePrint = (event: Event) => {
     const elements = globalSceneState.getElements();
     const selectedElements = getSelectedElements(elements, this.state);
     const tempSvg = exportToSvg(
@@ -542,11 +543,11 @@ class App extends React.Component<any, AppState> {
     printContainer.style.display = "none";
     printContainer.innerHTML = tempSvg.outerHTML;
     document.body.appendChild(printContainer);
-  });
+  };
 
-  private afterPrint = withBatchedUpdates((event: Event) => {
+  private afterPrint = (event: Event) => {
     document.querySelector("#printContainer")?.remove();
-  });
+  };
 
   private beforeUnload = withBatchedUpdates((event: BeforeUnloadEvent) => {
     if (
