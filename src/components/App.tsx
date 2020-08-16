@@ -404,6 +404,8 @@ class App extends React.Component<any, AppState> {
 
     this.addEventListeners();
     this.initializeScene();
+
+    this.initializePrintFonts();
   }
 
   public componentWillUnmount() {
@@ -500,7 +502,29 @@ class App extends React.Component<any, AppState> {
     window.addEventListener(EVENT.AFTER_PRINT, this.afterPrint);
   }
 
-  private beforePrint = withBatchedUpdates((event: Event) => {
+  private initializePrintFonts = () => {
+    const div = document.createElement("div");
+    div.style.width = "0px";
+    div.style.height = "0px";
+    div.innerHTML = `<svg style="z-index:999999">
+      <defs>
+        <style>
+          @font-face {
+            font-family: "Virgil";
+            src: url("FG_Virgil.woff2");
+          }
+          @font-face {
+            font-family: "Cascadia";
+            src: url("Cascadia.woff2");
+          }
+        </style>
+      </defs>
+      <text font-family="Virgil" font-size="0">x</text>
+      <text font-family="Cascadia" font-size="0">x</text>
+    </svg>`;
+    document.body.appendChild(div);
+  };
+
     const elements = globalSceneState.getElements();
     const selectedElements = getSelectedElements(elements, this.state);
     const tempSvg = exportToSvg(
