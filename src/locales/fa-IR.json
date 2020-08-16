@@ -25,6 +25,9 @@
     "sloppiness": "دقت",
     "opacity": "تاری",
     "textAlign": "چیدمان متن",
+    "edges": "",
+    "sharp": "",
+    "round": "",
     "fontSize": "اندازه قلم",
     "fontFamily": "نوع قلم",
     "onlySelected": "فقط انتخاب شده ها",
@@ -68,7 +71,8 @@
     "toggleGridMode": "سويچ خطوط راهنما",
     "addToLibrary": "",
     "removeFromLibrary": "",
-    "libraryLoadingMessage": ""
+    "libraryLoadingMessage": "",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "پاکسازی بوم نقاشی",
@@ -95,6 +99,7 @@
     "roomDialog": "همکاری آنلاین را شروع کنید",
     "createNewRoom": "ایجاد یک اتاق جدید",
     "toggleFullScreen": "تغییر به حالت تمام صفحه",
+    "toggleDarkMode": "",
     "toggleZenMode": "تغییر به حالت تمرکز",
     "exitZenMode": "خروج از حالت تمرکز"
   },

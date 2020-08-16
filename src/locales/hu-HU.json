@@ -25,6 +25,9 @@
     "sloppiness": "Stílus",
     "opacity": "Áttetszőség",
     "textAlign": "",
+    "edges": "",
+    "sharp": "",
+    "round": "",
     "fontSize": "",
     "fontFamily": "",
     "onlySelected": "Csak a kiválasztott",
@@ -68,7 +71,8 @@
     "toggleGridMode": "",
     "addToLibrary": "",
     "removeFromLibrary": "",
-    "libraryLoadingMessage": ""
+    "libraryLoadingMessage": "",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "Vászon törlése",
@@ -95,6 +99,7 @@
     "roomDialog": "Élő együttműködés indítása",
     "createNewRoom": "Új szoba létrehozása",
     "toggleFullScreen": "",
+    "toggleDarkMode": "",
     "toggleZenMode": "",
     "exitZenMode": ""
   },

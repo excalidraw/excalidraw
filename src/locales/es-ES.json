@@ -25,6 +25,9 @@
     "sloppiness": "Estilo de trazo",
     "opacity": "Opacidad",
     "textAlign": "Alineado de texto",
+    "edges": "",
+    "sharp": "",
+    "round": "",
     "fontSize": "Tamaño de la fuente",
     "fontFamily": "Tipo de fuente",
     "onlySelected": "Sólo seleccionados",
@@ -68,7 +71,8 @@
     "toggleGridMode": "Alternar modo cuadrícula",
     "addToLibrary": "Añadir a la biblioteca",
     "removeFromLibrary": "Eliminar de la biblioteca",
-    "libraryLoadingMessage": "Cargando biblioteca..."
+    "libraryLoadingMessage": "Cargando biblioteca...",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
@@ -95,6 +99,7 @@
     "roomDialog": "Iniciar colaboración en vivo",
     "createNewRoom": "Crear nueva sala",
     "toggleFullScreen": "Alternar pantalla completa",
+    "toggleDarkMode": "",
     "toggleZenMode": "Alternar modo zen",
     "exitZenMode": "Salir del modo Zen"
   },

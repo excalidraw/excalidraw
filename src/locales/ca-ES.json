@@ -25,6 +25,9 @@
     "sloppiness": "Estil del traç",
     "opacity": "Opacitat",
     "textAlign": "Alineació del text",
+    "edges": "",
+    "sharp": "",
+    "round": "",
     "fontSize": "Mida de lletra",
     "fontFamily": "Tipus de lletra",
     "onlySelected": "Només seleccionats",
@@ -68,7 +71,8 @@
     "toggleGridMode": "Commutar línies de graella",
     "addToLibrary": "Afegir a la biblioteca",
     "removeFromLibrary": "Eliminar de la biblioteca",
-    "libraryLoadingMessage": "Carregant la biblioteca..."
+    "libraryLoadingMessage": "Carregant la biblioteca...",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "Netejar el llenç",
@@ -95,6 +99,7 @@
     "roomDialog": "Començar col·laboració en directe",
     "createNewRoom": "Crear sala nova",
     "toggleFullScreen": "Commutar pantalla completa",
+    "toggleDarkMode": "",
     "toggleZenMode": "Commutar modo zen",
     "exitZenMode": "Sortir de modo zen"
   },

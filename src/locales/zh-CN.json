@@ -25,6 +25,9 @@
     "sloppiness": "边框",
     "opacity": "透明度",
     "textAlign": "文本对齐",
+    "edges": "",
+    "sharp": "",
+    "round": "",
     "fontSize": "字体大小",
     "fontFamily": "字体",
     "onlySelected": "仅被选中",
@@ -68,7 +71,8 @@
     "toggleGridMode": "切换网格模式",
     "addToLibrary": "添加到库中",
     "removeFromLibrary": "从库中移除",
-    "libraryLoadingMessage": "正在加载库..."
+    "libraryLoadingMessage": "正在加载库...",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "重置画布",
@@ -95,6 +99,7 @@
     "roomDialog": "开始实时协作",
     "createNewRoom": "新建会议室",
     "toggleFullScreen": "切换全屏显示",
+    "toggleDarkMode": "",
     "toggleZenMode": "切换禅模式",
     "exitZenMode": "退出禅模式"
   },

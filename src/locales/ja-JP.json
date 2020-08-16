@@ -25,6 +25,9 @@
     "sloppiness": "線のばらつき",
     "opacity": "透明度",
     "textAlign": "テキストの配置",
+    "edges": "",
+    "sharp": "",
+    "round": "",
     "fontSize": "フォントの大きさ",
     "fontFamily": "フォントの種類",
     "onlySelected": "選択中のみ",
@@ -68,7 +71,8 @@
     "toggleGridMode": "",
     "addToLibrary": "",
     "removeFromLibrary": "",
-    "libraryLoadingMessage": ""
+    "libraryLoadingMessage": "",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",
@@ -95,6 +99,7 @@
     "roomDialog": "共同編集を開始する",
     "createNewRoom": "新しい部屋を作成する",
     "toggleFullScreen": "全画面表示に切り替える",
+    "toggleDarkMode": "",
     "toggleZenMode": "集中モードに切り替える",
     "exitZenMode": "集中モードをやめる"
   },
