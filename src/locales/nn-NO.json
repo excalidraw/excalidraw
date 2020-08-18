@@ -25,6 +25,9 @@
     "sloppiness": "Ujamnheit",
     "opacity": "Synlegheit",
     "textAlign": "Tekstjustering",
+    "edges": "",
+    "sharp": "",
+    "round": "",
     "fontSize": "Skriftstorleik",
     "fontFamily": "Skrifttype",
     "onlySelected": "Kun valde",
@@ -68,7 +71,8 @@
     "toggleGridMode": "Sla på/av rutenett",
     "addToLibrary": "Legg til i bibliotek",
     "removeFromLibrary": "Fjern frå bibliotek",
-    "libraryLoadingMessage": "Laster bibliotek..."
+    "libraryLoadingMessage": "Laster bibliotek...",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "Tilbakestill lerretet",
@@ -95,6 +99,7 @@
     "roomDialog": "Start sanntids-samarbeid",
     "createNewRoom": "Lag nytt rom",
     "toggleFullScreen": "Slå på/av fullskjerm",
+    "toggleDarkMode": "Skru av/på skumringsmodus",
     "toggleZenMode": "Slå på/av zen-modus",
     "exitZenMode": "Avslutt zen-modus"
   },

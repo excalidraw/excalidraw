@@ -25,6 +25,9 @@
     "sloppiness": "Styl kreski",
     "opacity": "Przeźroczystość",
     "textAlign": "Wyrównanie tekstu",
+    "edges": "",
+    "sharp": "",
+    "round": "",
     "fontSize": "Rozmiar tekstu",
     "fontFamily": "Krój pisma",
     "onlySelected": "Tylko wybrane",
@@ -68,7 +71,8 @@
     "toggleGridMode": "",
     "addToLibrary": "",
     "removeFromLibrary": "",
-    "libraryLoadingMessage": ""
+    "libraryLoadingMessage": "",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
@@ -95,6 +99,7 @@
     "roomDialog": "Utwórz nową sesję współpracy na żywo",
     "createNewRoom": "Utwórz nowy pokój",
     "toggleFullScreen": "Włącz/wyłącz tryb pełnoekranowy",
+    "toggleDarkMode": "",
     "toggleZenMode": "Włącz tryb Zen",
     "exitZenMode": "Wyjdź z trybu Zen"
   },

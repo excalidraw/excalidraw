@@ -25,6 +25,9 @@
     "sloppiness": "Slordigheid",
     "opacity": "Doorzichtigheid",
     "textAlign": "Uitlijning",
+    "edges": "",
+    "sharp": "",
+    "round": "",
     "fontSize": "Tekstgrootte",
     "fontFamily": "Lettertype",
     "onlySelected": "Enkel geselecteerde",
@@ -68,7 +71,8 @@
     "toggleGridMode": "",
     "addToLibrary": "",
     "removeFromLibrary": "",
-    "libraryLoadingMessage": ""
+    "libraryLoadingMessage": "",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
@@ -95,6 +99,7 @@
     "roomDialog": "Live-samenwerkingssessie starten",
     "createNewRoom": "Creëer live-samenwerkingssessie",
     "toggleFullScreen": "Schermvullende weergave",
+    "toggleDarkMode": "",
     "toggleZenMode": "",
     "exitZenMode": ""
   },

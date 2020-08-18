@@ -25,6 +25,9 @@
     "sloppiness": "Стиль обводки",
     "opacity": "Непрозрачность",
     "textAlign": "Выравнивание текста",
+    "edges": "",
+    "sharp": "",
+    "round": "",
     "fontSize": "Размер шрифта",
     "fontFamily": "Семейство шрифтов",
     "onlySelected": "Только выбранные",
@@ -68,7 +71,8 @@
     "toggleGridMode": "Переключить режим сетки",
     "addToLibrary": "Добавить в библиотеку",
     "removeFromLibrary": "Удалить из библиотеки",
-    "libraryLoadingMessage": "Загрузка библиотеки..."
+    "libraryLoadingMessage": "Загрузка библиотеки...",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",
@@ -95,6 +99,7 @@
     "roomDialog": "Начать совместную работу",
     "createNewRoom": "Создать новую комнату",
     "toggleFullScreen": "Переключить полноэкранный режим",
+    "toggleDarkMode": "",
     "toggleZenMode": "Переключить режим концентрации внимания",
     "exitZenMode": "Выключить режим концентрации внимания"
   },

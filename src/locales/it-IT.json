@@ -25,6 +25,9 @@
     "sloppiness": "Imprecisione",
     "opacity": "Opacità",
     "textAlign": "Allineamento del testo",
+    "edges": "",
+    "sharp": "",
+    "round": "",
     "fontSize": "Dimensione carattere",
     "fontFamily": "Carattere",
     "onlySelected": "Solo selezionati",
@@ -68,7 +71,8 @@
     "toggleGridMode": "Attiva/disattiva modalità quadrícula",
     "addToLibrary": "Aggiungi alla biblioteca",
     "removeFromLibrary": "Rimuovi dalla biblioteca",
-    "libraryLoadingMessage": "Caricamento della biblioteca..."
+    "libraryLoadingMessage": "Caricamento della biblioteca...",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "Ripristina la tela",
@@ -95,6 +99,7 @@
     "roomDialog": "Inizia collaborazione in diretta",
     "createNewRoom": "Crea nuova stanza",
     "toggleFullScreen": "Attiva/Disattiva schermo intero",
+    "toggleDarkMode": "",
     "toggleZenMode": "Attiva/Disattiva modalità zen",
     "exitZenMode": "Uscire dalla modalità zen"
   },
