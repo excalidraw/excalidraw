@@ -1213,16 +1213,6 @@ describe("regression tests", () => {
     expect(h.elements[1].groupIds).toHaveLength(0);
   });
 
-  it("keeps selected element selected when click hits element bounding box but doesn't hit the element", () => {
-    clickTool("ellipse");
-    mouse.down(0, 0);
-    mouse.up(100, 100);
-
-    // click on bounding box but not on element
-    mouse.click(0, 0);
-    expect(getSelectedElements().length).toBe(1);
-  });
-
   it(
     "drags selected elements from point inside common bounding box that doesn't hit any element " +
       "and keeps elements selected after dragging",
@@ -1267,4 +1257,18 @@ describe("regression tests", () => {
       expect(getSelectedElements().length).toBe(2);
     },
   );
+
+  it("deselects selected element on pointer down that hits outside element bounding box", () => {
+    clickTool("ellipse");
+    mouse.down();
+    mouse.up(10, 10);
+
+    expect(getSelectedElements().length).toEqual(1);
+
+    // Pointer down outside element bounding box
+    mouse.reset();
+    mouse.down(50, 50);
+
+    expect(getSelectedElements().length).toEqual(0);
+  });
 });
