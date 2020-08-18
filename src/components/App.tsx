@@ -2400,7 +2400,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         element: null,
         wasAddedToSelection: false,
         hasBeenDuplicated: false,
-        hasHitCommonBoundingBoxOfSelectedElements: false,
+        hasHitCommonBoundingBoxOfSelectedElements: this.isHittingCommonBoundingBoxOfSelectedElements(
+          origin,
+          selectedElements,
+        ),
       },
       drag: {
         hasOccurred: false,
@@ -2545,10 +2548,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             pointerDownState.origin.y,
           );
 
-        pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements = this.isHittingCommonBoundingBoxOfSelectedElements(
-          pointerDownState.origin,
-          selectedElements,
-        );
         const hitElement = pointerDownState.hit.element;
         if (
           !this.isHittingASelectedElement(hitElement) &&
