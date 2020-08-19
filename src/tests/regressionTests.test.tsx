@@ -1213,7 +1213,139 @@ describe("regression tests", () => {
     expect(h.elements[1].groupIds).toHaveLength(0);
   });
 
+  it("deselects selected element, on pointer up, when click hits element bounding box but doesn't hit the element", () => {
+    clickTool("ellipse");
+    mouse.down();
+    mouse.up(100, 100);
+
+    // hits bounding box without hitting element
+    mouse.down();
+    expect(getSelectedElements().length).toBe(1);
+    mouse.up();
+    expect(getSelectedElements().length).toBe(0);
+  });
+
+  it("switches selected element on pointer down", () => {
+    clickTool("rectangle");
+    mouse.down();
+    mouse.up(10, 10);
+
+    clickTool("ellipse");
+    mouse.down(10, 10);
+    mouse.up(10, 10);
+
+    expect(getSelectedElement().type).toBe("ellipse");
+
+    // pointer down on rectangle
+    mouse.reset();
+    mouse.down();
+
+    expect(getSelectedElement().type).toBe("rectangle");
+  });
+
+  it("deselects selected element on pointer down when pointer doesn't hit any element", () => {
+    clickTool("rectangle");
+    mouse.down();
+    mouse.up(10, 10);
+
+    expect(getSelectedElements().length).toBe(1);
+
+    // pointer down on space without elements
+    mouse.down(100, 100);
+
+    expect(getSelectedElements().length).toBe(0);
+  });
+
+  it("Drags selected element when hitting only bounding box and keeps element selected", () => {
+    clickTool("ellipse");
+    mouse.down();
+    mouse.up(10, 10);
+
+    const { x: prevX, y: prevY } = getSelectedElement();
+
+    // drag element from point on bounding box that doesn't hit element
+    mouse.reset();
+    mouse.down();
+    mouse.up(25, 25);
+
+    expect(getSelectedElement().x).toEqual(prevX + 25);
+    expect(getSelectedElement().y).toEqual(prevY + 25);
+  });
+
   it(
+    "given selected element A with lower z-index than unselected element B and given B is partially over A " +
+      "when clicking intersection between A and B " +
+      "B should be selected on pointer up",
+    () => {
+      clickTool("rectangle");
+      // change background color since default is transparent
+      // and transparent elements can't be selected by clicking inside of them
+      clickLabeledElement("Background");
+      clickLabeledElement("#fa5252");
+      mouse.down();
+      mouse.up(1000, 1000);
+
+      // draw ellipse partially over rectangle.
+      // since ellipse was created after rectangle it has an higher z-index.
+      // we don't need to change background color again since change above
+      // affects next drawn elements.
+      clickTool("ellipse");
+      mouse.reset();
+      mouse.down(500, 500);
+      mouse.up(1000, 1000);
+
+      // select rectangle
+      mouse.reset();
+      mouse.click();
+
+      // pointer down on intersection between ellipse and rectangle
+      mouse.down(900, 900);
+      expect(getSelectedElement().type).toBe("rectangle");
+
+      mouse.up();
+      expect(getSelectedElement().type).toBe("ellipse");
+    },
+  );
+
+  it(
+    "given selected element A with lower z-index than unselected element B and given B is partially over A " +
+      "when dragging on intersection between A and B " +
+      "A should be dragged and keep being selected",
+    () => {
+      clickTool("rectangle");
+      // change background color since default is transparent
+      // and transparent elements can't be selected by clicking inside of them
+      clickLabeledElement("Background");
+      clickLabeledElement("#fa5252");
+      mouse.down();
+      mouse.up(1000, 1000);
+
+      // draw ellipse partially over rectangle.
+      // since ellipse was created after rectangle it has an higher z-index.
+      // we don't need to change background color again since change above
+      // affects next drawn elements.
+      clickTool("ellipse");
+      mouse.reset();
+      mouse.down(500, 500);
+      mouse.up(1000, 1000);
+
+      // select rectangle
+      mouse.reset();
+      mouse.click();
+
+      const { x: prevX, y: prevY } = getSelectedElement();
+
+      // pointer down on intersection between ellipse and rectangle
+      mouse.down(900, 900);
+      mouse.up(100, 100);
+
+      expect(getSelectedElement().type).toBe("rectangle");
+      expect(getSelectedElement().x).toEqual(prevX + 100);
+      expect(getSelectedElement().y).toEqual(prevY + 100);
+    },
+  );
+
+  it.skip(
     "drags selected elements from point inside common bounding box that doesn't hit any element " +
       "and keeps elements selected after dragging",
     () => {
@@ -1257,18 +1389,4 @@ describe("regression tests", () => {
       expect(getSelectedElements().length).toBe(2);
     },
   );
-
-  it("deselects selected element on pointer down that hits outside element bounding box", () => {
-    clickTool("ellipse");
-    mouse.down();
-    mouse.up(10, 10);
-
-    expect(getSelectedElements().length).toEqual(1);
-
-    // Pointer down outside element bounding box
-    mouse.reset();
-    mouse.down(50, 50);
-
-    expect(getSelectedElements().length).toEqual(0);
-  });
 });

@@ -31,11 +31,13 @@ import {
   getDragOffsetXY,
   dragNewElement,
   hitTest,
+  isHittingElementBoundingBoxWithoutHittingElement,
 } from "../element";
 import {
   getElementsWithinSelection,
   isOverScrollBars,
   getElementAtPosition,
+  getElementsAtPosition,
   getElementContainingPosition,
   getNormalizedZoom,
   getSelectedElements,
@@ -1733,6 +1735,15 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     );
   }
 
+  private getElementsAtPosition(
+    x: number,
+    y: number,
+  ): NonDeleted<ExcalidrawElement>[] {
+    return getElementsAtPosition(this.scene.getElements(), (element) =>
+      hitTest(element, this.state, x, y),
+    );
+  }
+
   private startTextEditing = ({
     sceneX,
     sceneY,
@@ -2548,11 +2559,21 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             pointerDownState.origin.y,
           );
 
+        // For overlapped elements one position may hit
+        // multiple elements
+        const allHitElements = this.getElementsAtPosition(
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
+        );
+
         const hitElement = pointerDownState.hit.element;
-        if (
+        const isHittingOnlyOneElementElementAndItIsNotSelected =
           !this.isHittingASelectedElement(hitElement) &&
-          !event.shiftKey &&
-          !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
+          allHitElements.length === 1;
+        if (
+          (hitElement === null ||
+            isHittingOnlyOneElementElementAndItIsNotSelected) &&
+          !event.shiftKey
         ) {
           this.clearSelection(hitElement);
         }
@@ -2577,23 +2598,27 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               });
               return true;
             }
-            this.setState((prevState) => {
-              return selectGroupsForSelectedElements(
-                {
-                  ...prevState,
-                  selectedElementIds: {
-                    ...prevState.selectedElementIds,
-                    [hitElement!.id]: true,
+
+            if (allHitElements.length === 1 || selectedElements.length === 0) {
+              // Adds hit element to selection
+              this.setState((prevState) => {
+                return selectGroupsForSelectedElements(
+                  {
+                    ...prevState,
+                    selectedElementIds: {
+                      ...prevState.selectedElementIds,
+                      [hitElement!.id]: true,
+                    },
                   },
-                },
-                this.scene.getElements(),
+                  this.scene.getElements(),
+                );
+              });
+              // TODO: this is strange...
+              this.scene.replaceAllElements(
+                this.scene.getElementsIncludingDeleted(),
               );
-            });
-            // TODO: this is strange...
-            this.scene.replaceAllElements(
-              this.scene.getElementsIncludingDeleted(),
-            );
-            pointerDownState.hit.wasAddedToSelection = true;
+              pointerDownState.hit.wasAddedToSelection = true;
+            }
           }
         }
 
@@ -3184,6 +3209,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         this.actionManager.executeAction(actionFinalize);
         return;
       }
+
       if (isLinearElement(draggingElement)) {
         if (draggingElement!.points.length > 1) {
           history.resumeRecording();
@@ -3194,6 +3220,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           this.canvas,
           window.devicePixelRatio,
         );
+
         if (
           !pointerDownState.drag.hasOccurred &&
           draggingElement &&
@@ -3245,6 +3272,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             }));
           }
         }
+
         return;
       }
 
@@ -3316,6 +3344,24 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             selectedElementIds: { [hitElement!.id]: true },
           }));
         }
+      }
+
+      if (
+        !this.state.editingLinearElement &&
+        !pointerDownState.drag.hasOccurred &&
+        hitElement != null &&
+        isHittingElementBoundingBoxWithoutHittingElement(
+          hitElement as any,
+          this.state,
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
+        )
+      ) {
+        // Deselect selected element
+        this.setState({
+          selectedElementIds: {},
+          selectedGroupIds: {},
+        });
       }
 
       if (draggingElement === null) {
