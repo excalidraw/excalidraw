@@ -23,6 +23,8 @@ import {
 } from "../utils";
 import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
+import { renderSloppySvgPath } from "./renderSloppySvgPath";
+import { curveToBezier } from "points-on-curve/lib/curve-to-bezier.js";
 
 const CANVAS_PADDING = 20;
 
@@ -230,6 +232,8 @@ export const generateRoughOptions = (element: ExcalidrawElement): Options => {
   }
 };
 
+const myRough = true;
+
 const generateElementShape = (
   element: NonDeletedExcalidrawElement,
   generator: RoughGenerator,
@@ -240,6 +244,37 @@ const generateElementShape = (
 
     switch (element.type) {
       case "rectangle":
+        if (myRough && element.strokeSharpness === "round") {
+          const w = element.width;
+          const h = element.height;
+          const r = Math.min(w, h) * 0.25;
+          const svgPath = `M ${r} 0 L ${w - r} 0 Q ${w} 0, ${w} ${r} L ${w} ${
+            h - r
+          } Q ${w} ${h}, ${w - r} ${h} L ${r} ${h} Q 0 ${h}, 0 ${
+            h - r
+          } L 0 ${r} Q 0 0, ${r} 0`;
+          const options = Object.assign(
+            {},
+            generator.defaultOptions,
+            generateRoughOptions(element),
+          );
+          const opSet = renderSloppySvgPath(svgPath, options);
+          shape = { shape: "path", sets: [opSet], options };
+          break;
+        }
+        if (myRough && element.strokeSharpness === "sharp") {
+          const w = element.width;
+          const h = element.height;
+          const svgPath = `M 0 0 L ${w} 0 L ${w} ${h} L 0 ${h} Z`;
+          const options = Object.assign(
+            {},
+            generator.defaultOptions,
+            generateRoughOptions(element),
+          );
+          const opSet = renderSloppySvgPath(svgPath, options);
+          shape = { shape: "path", sets: [opSet], options };
+          break;
+        }
         if (element.strokeSharpness === "round") {
           const w = element.width;
           const h = element.height;
@@ -263,6 +298,21 @@ const generateElementShape = (
         }
         break;
       case "diamond": {
+        if (myRough) {
+          const w = element.width;
+          const h = element.height;
+          const svgPath = `M ${w / 2} 0 L ${w} ${h / 2} L ${w / 2} ${h} L 0 ${
+            h / 2
+          } Z`;
+          const options = Object.assign(
+            {},
+            generator.defaultOptions,
+            generateRoughOptions(element),
+          );
+          const opSet = renderSloppySvgPath(svgPath, options);
+          shape = { shape: "path", sets: [opSet], options };
+          break;
+        }
         const [
           topX,
           topY,
@@ -285,6 +335,21 @@ const generateElementShape = (
         break;
       }
       case "ellipse":
+        if (myRough) {
+          const w = element.width;
+          const h = element.height;
+          const svgPath = `M ${w / 2} 0 A ${w / 2} ${h / 2} 1 1 1 ${
+            w / 2 - 0.001
+          } 0`;
+          const options = Object.assign(
+            {},
+            generator.defaultOptions,
+            generateRoughOptions(element),
+          );
+          const opSet = renderSloppySvgPath(svgPath, options);
+          shape = { shape: "path", sets: [opSet], options };
+          break;
+        }
         shape = generator.ellipse(
           element.width / 2,
           element.height / 2,
@@ -314,6 +379,39 @@ const generateElementShape = (
           }
         } else {
           shape = [generator.curve(points as [number, number][], options)];
+        }
+        if (
+          myRough &&
+          element.strokeSharpness === "round" &&
+          points.length >= 3
+        ) {
+          const bcurve = curveToBezier(points as [number, number][]);
+          let svgPath = "M 0 0";
+          for (let i = 1; i + 2 < bcurve.length; i += 3) {
+            svgPath += ` C ${bcurve[i][0]} ${bcurve[i][1]} ${
+              bcurve[i + 1][0]
+            } ${bcurve[i + 1][1]} ${bcurve[i + 2][0]} ${bcurve[i + 2][1]}`;
+          }
+          const options = Object.assign(
+            {},
+            generator.defaultOptions,
+            generateRoughOptions(element),
+          );
+          const opSet = renderSloppySvgPath(svgPath, options);
+          shape = [{ shape: "path", sets: [opSet], options }];
+        }
+        if (myRough && element.strokeSharpness === "sharp") {
+          let svgPath = "M 0 0";
+          for (let i = 1; i < points.length; i += 1) {
+            svgPath += ` L ${points[i][0]} ${points[i][1]}`;
+          }
+          const options = Object.assign(
+            {},
+            generator.defaultOptions,
+            generateRoughOptions(element),
+          );
+          const opSet = renderSloppySvgPath(svgPath, options);
+          shape = [{ shape: "path", sets: [opSet], options }];
         }
 
         // add lines only in arrow
