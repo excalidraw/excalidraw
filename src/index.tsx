@@ -10,7 +10,13 @@ import { register as registerServiceWorker } from "./serviceWorker";
 
 import { loadFromBlob, saveToLocalStorage } from "./data";
 import { debounce } from "./utils";
-import { restoreFromLocalStorage } from "./data/localStorage";
+import {
+  restoreFromLocalStorage,
+  restoreUsernameFromLocalStorage,
+  saveUsernameToLocalStorage,
+} from "./data/localStorage";
+
+import { SAVE_TO_LOCAL_STORAGE_TIMEOUT } from "./time_constants";
 
 // On Apple mobile devices add the proprietary app icon and splashscreen markup.
 // No one should have to do this manually, and eventually this annoyance will
@@ -70,7 +76,11 @@ function ExcalidrawApp() {
 
   const saveDebounced = debounce((elements, state) => {
     saveToLocalStorage(elements, state);
-  }, 300);
+  }, SAVE_TO_LOCAL_STORAGE_TIMEOUT);
+
+  const onUsernameChange = (username: string) => {
+    saveUsernameToLocalStorage(username);
+  };
 
   const onResize = () => {
     setDimensions({
@@ -87,6 +97,8 @@ function ExcalidrawApp() {
 
   const { width, height } = dimensions;
   const initialData = restoreFromLocalStorage();
+  const username = restoreUsernameFromLocalStorage();
+  const user = { name: username };
   return (
     <TopErrorBoundary>
       <Excalidraw
@@ -94,6 +106,8 @@ function ExcalidrawApp() {
         height={height}
         onChange={saveDebounced}
         initialData={initialData}
+        user={user}
+        onUsernameChange={onUsernameChange}
       />
     </TopErrorBoundary>
   );

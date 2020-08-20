@@ -145,11 +145,7 @@ import {
   isBindableElement,
 } from "../element/typeChecks";
 import { actionFinalize, actionDeleteSelected } from "../actions";
-import {
-  restoreUsernameFromLocalStorage,
-  saveUsernameToLocalStorage,
-  loadLibrary,
-} from "../data/localStorage";
+import { loadLibrary } from "../data/localStorage";
 
 import throttle from "lodash.throttle";
 import { LinearElementEditor } from "../element/linearElementEditor";
@@ -309,6 +305,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       offsetLeft,
     } = this.state;
 
+    const { onUsernameChange } = this.props;
     const canvasScale = window.devicePixelRatio;
 
     const canvasWidth = canvasDOMWidth * canvasScale;
@@ -334,13 +331,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           onRoomCreate={this.openPortal}
           onRoomDestroy={this.closePortal}
           onUsernameChange={(username) => {
-            if (this.props.onUsernameChange) {
-              this.props.onUsernameChange(username);
-            }
-            saveUsernameToLocalStorage(username);
-            this.setState({
-              username,
-            });
+            onUsernameChange && onUsernameChange(username);
+            this.setState({ username });
           }}
           onLockToggle={this.toggleLock}
           onInsertShape={(elements) =>
@@ -1429,16 +1421,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       cursorY = event.y;
     },
   );
-
-  restoreUserName() {
-    const username = restoreUsernameFromLocalStorage();
-
-    if (username !== null) {
-      this.setState({
-        username,
-      });
-    }
-  }
 
   // Input handling
 
