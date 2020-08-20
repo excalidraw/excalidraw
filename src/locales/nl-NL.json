@@ -134,6 +134,7 @@
   "hints": {
     "linearElement": "Klik om meerdere punten te starten, sleep voor één lijn",
     "freeDraw": "",
+    "text": "",
     "linearElementMulti": "Klik op het laatste punt of druk op Escape of Enter om te stoppen",
     "resize": "",
     "rotate": "Je kan hoeken beperken door SHIFT ingedrukt te houden wanneer je draait",
