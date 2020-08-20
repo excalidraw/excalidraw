@@ -37,6 +37,10 @@
   --popup-text-inverted-color: #{$oc-white};
 }
 
+:root.Appearance_dark {
+  background-color: #000;
+}
+
 .Appearance_dark {
   --text-color-primary: #{$oc-gray-4};
   --bg-color-island: #1e1e1e;
