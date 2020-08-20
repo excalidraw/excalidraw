@@ -51,13 +51,7 @@ export const hitTest = (
     return isPointHittingElementBoundingBox(element, point, threshold);
   }
 
-  const check =
-    element.type === "text"
-      ? isStrictlyInside
-      : isElementDraggableFromInside(element)
-      ? isInsideCheck
-      : isNearCheck;
-  return hitTestPointAgainstElement({ element, point, threshold, check });
+  return isHittingElementNotConsideringBoundingBox(element, appState, point);
 };
 
 export const isHittingElementBoundingBoxWithoutHittingElement = (
@@ -69,7 +63,7 @@ export const isHittingElementBoundingBoxWithoutHittingElement = (
   const threshold = 10 / appState.zoom;
 
   return (
-    !isHittingElementNotConsideringBoundingBox(element, appState, x, y) &&
+    !isHittingElementNotConsideringBoundingBox(element, appState, [x, y]) &&
     isPointHittingElementBoundingBox(element, [x, y], threshold)
   );
 };
@@ -77,11 +71,9 @@ export const isHittingElementBoundingBoxWithoutHittingElement = (
 const isHittingElementNotConsideringBoundingBox = (
   element: NonDeletedExcalidrawElement,
   appState: AppState,
-  x: number,
-  y: number,
+  point: Point,
 ): boolean => {
   const threshold = 10 / appState.zoom;
-  const point: Point = [x, y];
 
   const check =
     element.type === "text"

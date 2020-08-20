@@ -36,7 +36,6 @@ import {
 import {
   getElementsWithinSelection,
   isOverScrollBars,
-  getElementAtPosition,
   getElementsAtPosition,
   getElementContainingPosition,
   getNormalizedZoom,
@@ -1730,9 +1729,25 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     x: number,
     y: number,
   ): NonDeleted<ExcalidrawElement> | null {
-    return getElementAtPosition(this.scene.getElements(), (element) =>
-      hitTest(element, this.state, x, y),
-    );
+    const allHitElements = this.getElementsAtPosition(x, y);
+    if (allHitElements.length > 1) {
+      const elementWithHighestZIndex =
+        allHitElements[allHitElements.length - 1];
+      // If we're hitting element with highest z-index only on its bounding box
+      // while also hitting other element figure, the latter should be considered.
+      return isHittingElementBoundingBoxWithoutHittingElement(
+        elementWithHighestZIndex,
+        this.state,
+        x,
+        y,
+      )
+        ? allHitElements[allHitElements.length - 2]
+        : elementWithHighestZIndex;
+    }
+    if (allHitElements.length === 1) {
+      return allHitElements[0];
+    }
+    return null;
   }
 
   private getElementsAtPosition(
