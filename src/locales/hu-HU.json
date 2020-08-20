@@ -134,6 +134,7 @@
   "hints": {
     "linearElement": "Kattintson a több pont elindításához, húzza az egyenes vonalhoz",
     "freeDraw": "",
+    "text": "",
     "linearElementMulti": "Kattintson az utolsó pontra, vagy nyomja meg az Escape vagy az Enter billentyűt a befejezéshez",
     "resize": "",
     "rotate": "A SHIFT billentyű lenyomva tartásával korlátozhatja a szögek illesztését",
