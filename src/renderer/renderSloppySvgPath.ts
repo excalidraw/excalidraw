@@ -25,22 +25,24 @@ const getSloppyCurve = (
     ],
     1.0,
   );
-  const diff = Math.sqrt((x - x0) ** 2 + (y - y0) ** 2) * 0.03 * roughness;
+  const diff = 2 * roughness;
   points.forEach((point, index) => {
-    if (index > 0 && index < points.length - 1) {
+    if (index > 1 && index < points.length - 2) {
       point[0] += Math.random() * diff - diff / 2;
       point[1] += Math.random() * diff - diff / 2;
     }
   });
-  if (points.length < 7) {
+  const p25 = Math.round(points.length * 0.25);
+  if (p25 < 3) {
     return [[x1, y1, x2, y2, x, y]];
   }
-  const p25 = Math.round(points.length * 0.25);
   const bcurve = curveToBezier([
     points[0],
+    points[1],
     points[p25],
     points[p25 * 2],
     points[p25 * 3],
+    points[points.length - 2],
     points[points.length - 1],
   ]);
   const arr: number[][] = [];
@@ -73,7 +75,7 @@ export const renderSloppySvgPath = (
         first = [data[0], data[1]];
         break;
       }
-      case "L":
+      case "L": {
         const cx = (current[0] + data[0]) / 2;
         const cy = (current[1] + data[1]) / 2;
         const arr = getSloppyCurve(
@@ -95,6 +97,7 @@ export const renderSloppySvgPath = (
         });
         current = [data[0], data[1]];
         break;
+      }
       case "C": {
         const [x1, y1, x2, y2, x, y] = data;
         const arr = getSloppyCurve(
@@ -117,10 +120,29 @@ export const renderSloppySvgPath = (
         current = [x, y];
         break;
       }
-      case "Z":
-        ops.push({ op: "lineTo", data: [first[0], first[1]] });
+      case "Z": {
+        const cx = (current[0] + first[0]) / 2;
+        const cy = (current[1] + first[1]) / 2;
+        const arr = getSloppyCurve(
+          current[0],
+          current[1],
+          cx,
+          cy,
+          cx,
+          cy,
+          first[0],
+          first[1],
+          options.roughness,
+        );
+        arr.forEach((data) => {
+          ops.push({
+            op: "bcurveTo",
+            data,
+          });
+        });
         current = [first[0], first[1]];
         break;
+      }
     }
   }
   return { type: "path", ops };
