@@ -25,7 +25,7 @@ const getSloppyCurve = (
     ],
     1.0,
   );
-  const diff = 2 * roughness;
+  const diff = points.length * 0.1 * roughness;
   points.forEach((point, index) => {
     if (index > 1 && index < points.length - 2) {
       point[0] += Math.random() * diff - diff / 2;
