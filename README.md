@@ -7,10 +7,12 @@
     <a href="https://twitter.com/Excalidraw">
       <img alt="Follow Excalidraw on Twitter" src="https://img.shields.io/twitter/follow/excalidraw.svg?label=follow+excalidraw&style=social&logo=twitter">
     </a>
-    <a title="Crowdin" target="_blank" href="https://crowdin.com/project/excalidraw">
+    <a target="_blank" href="https://crowdin.com/project/excalidraw">
       <img src="https://badges.crowdin.net/excalidraw/localized.svg">
     </a>
-    <img src="https://img.shields.io/docker/pulls/excalidraw/excalidraw.svg">
+    <a target="_blank" href="https://hub.docker.com/r/excalidraw/excalidraw">
+      <img src="https://img.shields.io/docker/pulls/excalidraw/excalidraw.svg">
+    </a>
   </p>
 </div>
 
