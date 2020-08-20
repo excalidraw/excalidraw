@@ -134,6 +134,7 @@
   "hints": {
     "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
     "freeDraw": "Toque e arraste, solte quando terminar",
+    "text": "",
     "linearElementMulti": "Clique no último ponto ou pressione Escape ou Enter para terminar",
     "resize": "Você pode restringir proporções segurando SHIFT enquanto redimensiona,\nsegure ALT para redimensionar do centro",
     "rotate": "Você pode restringir os ângulos segurando SHIFT enquanto gira",
