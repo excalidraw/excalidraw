@@ -19,6 +19,7 @@ import { serializeAsJSON } from "./json";
 import { ExportType } from "../scene/types";
 import { restore } from "./restore";
 import { restoreFromLocalStorage } from "./localStorage";
+import { DataState } from "./types";
 
 export { loadFromBlob } from "./blob";
 export { saveAsJSON, loadFromJSON } from "./json";
@@ -234,7 +235,7 @@ export const exportToBackend = async (
 
 export const importFromBackend = async (
   id: string | null,
-  privateKey: string | undefined,
+  privateKey?: string | null,
 ) => {
   let elements: readonly ExcalidrawElement[] = [];
   let appState = getDefaultAppState();
@@ -364,14 +365,18 @@ export const exportCanvas = async (
   }
 };
 
-export const loadScene = async (id: string | null, privateKey?: string) => {
+export const loadScene = async (
+  id: string | null,
+  privateKey?: string | null,
+  initialData?: DataState,
+) => {
   let data;
   if (id != null) {
     // the private key is used to decrypt the content from the server, take
     // extra care not to leak it
     data = await importFromBackend(id, privateKey);
   } else {
-    data = restoreFromLocalStorage();
+    data = initialData || restoreFromLocalStorage();
   }
 
   return {
