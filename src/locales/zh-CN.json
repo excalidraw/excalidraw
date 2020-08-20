@@ -134,6 +134,7 @@
   "hints": {
     "linearElement": "点击创建多个点 拖动创建直线",
     "freeDraw": "点击并拖动，完成后发布",
+    "text": "",
     "linearElementMulti": "点击最后一个点或按下 Esc/Enter 来完成",
     "resize": "您可以按住SHIFT来限制比例大小，\n按住ALT来调整中心大小",
     "rotate": "旋转时可以按住 Shift 来约束角度",
