@@ -25,6 +25,9 @@
     "sloppiness": "Охайність",
     "opacity": "Прозорість",
     "textAlign": "Вирівнювання тексту",
+    "edges": "Краї",
+    "sharp": "Гострі",
+    "round": "Круглі",
     "fontSize": "Розмір шрифту",
     "fontFamily": "Шрифт",
     "onlySelected": "Тільки вибране",
@@ -68,7 +71,8 @@
     "toggleGridMode": "Режим сітки",
     "addToLibrary": "Додати до бібліотеки",
     "removeFromLibrary": "Видалити з бібліотеки",
-    "libraryLoadingMessage": "Завантажити бібліотеку..."
+    "libraryLoadingMessage": "Завантажити бібліотеку...",
+    "loadingScene": "Завантаження сцени..."
   },
   "buttons": {
     "clearReset": "Очистити полотно",
@@ -95,6 +99,7 @@
     "roomDialog": "Відкрити сесію спільної роботи",
     "createNewRoom": "Створити нову кімнату",
     "toggleFullScreen": "Повноекранний режим",
+    "toggleDarkMode": "Переключити темний режим",
     "toggleZenMode": "Дзен-режим",
     "exitZenMode": "Вийти з дзен-режиму"
   },
@@ -178,7 +183,7 @@
     "textNewLine": "Додати новий рядок (текст)",
     "textFinish": "Завершити редагування (текст)",
     "zoomToFit": "Збільшити щоб умістити все",
-    "preventBinding": ""
+    "preventBinding": "Запобігти зв'язування зі стрілками"
   },
   "encrypted": {
     "tooltip": "Ваші креслення захищені наскрізним шифруванням — сервери Excalidraw ніколи їх не побачать."

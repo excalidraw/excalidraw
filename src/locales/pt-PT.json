@@ -25,6 +25,9 @@
     "sloppiness": "Desleixo",
     "opacity": "Opacidade",
     "textAlign": "Alinhamento do texto",
+    "edges": "",
+    "sharp": "",
+    "round": "",
     "fontSize": "Tamanho da fonte",
     "fontFamily": "Família da fontes",
     "onlySelected": "Somente a seleção",
@@ -68,7 +71,8 @@
     "toggleGridMode": "Alternar modo de grade",
     "addToLibrary": "Adicionar à biblioteca",
     "removeFromLibrary": "Remover da biblioteca",
-    "libraryLoadingMessage": "Carregando biblioteca..."
+    "libraryLoadingMessage": "Carregando biblioteca...",
+    "loadingScene": "Carregando cena..."
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
@@ -95,6 +99,7 @@
     "roomDialog": "Iniciar colaboração ao vivo",
     "createNewRoom": "Criar nova sala",
     "toggleFullScreen": "Alternar tela cheia",
+    "toggleDarkMode": "Alternar modo escuro",
     "toggleZenMode": "Alternar modo zen",
     "exitZenMode": "Sair do modo zen"
   },

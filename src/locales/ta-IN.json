@@ -25,6 +25,9 @@
     "sloppiness": "",
     "opacity": "",
     "textAlign": "",
+    "edges": "",
+    "sharp": "",
+    "round": "",
     "fontSize": "",
     "fontFamily": "",
     "onlySelected": "",
@@ -68,7 +71,8 @@
     "toggleGridMode": "",
     "addToLibrary": "",
     "removeFromLibrary": "",
-    "libraryLoadingMessage": ""
+    "libraryLoadingMessage": "",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "",
@@ -95,6 +99,7 @@
     "roomDialog": "",
     "createNewRoom": "",
     "toggleFullScreen": "",
+    "toggleDarkMode": "",
     "toggleZenMode": "",
     "exitZenMode": ""
   },

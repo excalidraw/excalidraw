@@ -25,6 +25,9 @@
     "sloppiness": "선 스타일",
     "opacity": "불투명도",
     "textAlign": "텍스트 정렬",
+    "edges": "",
+    "sharp": "",
+    "round": "",
     "fontSize": "폰트 크기",
     "fontFamily": "폰트 스타일",
     "onlySelected": "선택한 항목만",
@@ -68,7 +71,8 @@
     "toggleGridMode": "",
     "addToLibrary": "",
     "removeFromLibrary": "",
-    "libraryLoadingMessage": ""
+    "libraryLoadingMessage": "",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "캔버스 초기화",
@@ -95,6 +99,7 @@
     "roomDialog": "실시간 협업 시작하기",
     "createNewRoom": "",
     "toggleFullScreen": "전체화면",
+    "toggleDarkMode": "",
     "toggleZenMode": "",
     "exitZenMode": ""
   },

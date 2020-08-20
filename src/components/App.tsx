@@ -728,7 +728,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
     }
 
-    document.body.classList.toggle(
+    document.documentElement.classList.toggle(
       "Appearance_dark",
       this.state.appearance === "dark",
     );

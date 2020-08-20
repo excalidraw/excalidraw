@@ -25,6 +25,9 @@
     "sloppiness": "Небрежност",
     "opacity": "Непрозрачност",
     "textAlign": "Подравняване на текста",
+    "edges": "",
+    "sharp": "",
+    "round": "",
     "fontSize": "Размер на шрифта",
     "fontFamily": "Семейство шрифтове",
     "onlySelected": "Само избраното",
@@ -68,7 +71,8 @@
     "toggleGridMode": "",
     "addToLibrary": "",
     "removeFromLibrary": "",
-    "libraryLoadingMessage": ""
+    "libraryLoadingMessage": "",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "Нулиране на платно",
@@ -95,6 +99,7 @@
     "roomDialog": "Започнете сътрудничество на живо",
     "createNewRoom": "Създай нова стая",
     "toggleFullScreen": "Превключване на цял екран",
+    "toggleDarkMode": "",
     "toggleZenMode": "",
     "exitZenMode": ""
   },

@@ -25,6 +25,9 @@
     "sloppiness": "Ακαταστασία",
     "opacity": "Διαφάνεια",
     "textAlign": "Στοίχιση κειμένου",
+    "edges": "",
+    "sharp": "",
+    "round": "",
     "fontSize": "Μέγεθος γραμματοσειράς",
     "fontFamily": "Γραμματοσειρά",
     "onlySelected": "Μόνο τα Επιλεγμένα",
@@ -68,7 +71,8 @@
     "toggleGridMode": "Εναλλαγή λειτουργίας πλέγματος",
     "addToLibrary": "Προσθήκη στη βιβλιοθήκη",
     "removeFromLibrary": "Αφαίρεση από τη βιβλιοθήκη",
-    "libraryLoadingMessage": ""
+    "libraryLoadingMessage": "",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "Επαναφορά του καμβά",
@@ -95,6 +99,7 @@
     "roomDialog": "Έναρξη ζωντανής συνεργασίας",
     "createNewRoom": "Δημιουργία νέου χώρου",
     "toggleFullScreen": "Εναλλαγή πλήρους οθόνης",
+    "toggleDarkMode": "",
     "toggleZenMode": "Εναλλαγή λειτουργίας Zen",
     "exitZenMode": "Έξοδος απο την λειτουργία Zen"
   },
