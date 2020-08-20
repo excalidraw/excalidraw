@@ -375,7 +375,8 @@ export const loadScene = async (
     // extra care not to leak it
     data = await importFromBackend(id, privateKey);
   } else if (initialData) {
-    data = initialData;
+    const { elements, appState } = initialData;
+    data = restore(elements, appState);
   }
 
   return {
