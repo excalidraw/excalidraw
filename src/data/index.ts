@@ -18,7 +18,6 @@ import { serializeAsJSON } from "./json";
 
 import { ExportType } from "../scene/types";
 import { restore } from "./restore";
-import { restoreFromLocalStorage } from "./localStorage";
 import { DataState } from "./types";
 
 export { loadFromBlob } from "./blob";
@@ -370,13 +369,13 @@ export const loadScene = async (
   privateKey?: string | null,
   initialData?: DataState,
 ) => {
-  let data;
+  let data: DataState = { elements: [], appState: getDefaultAppState() };
   if (id != null) {
     // the private key is used to decrypt the content from the server, take
     // extra care not to leak it
     data = await importFromBackend(id, privateKey);
-  } else {
-    data = initialData || restoreFromLocalStorage();
+  } else if (initialData) {
+    data = initialData;
   }
 
   return {

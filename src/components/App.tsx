@@ -44,7 +44,6 @@ import {
 } from "../scene";
 import {
   decryptAESGEM,
-  saveToLocalStorage,
   loadScene,
   loadFromBlob,
   SOCKET_SERVER,
@@ -434,8 +433,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   private onBlur = withBatchedUpdates(() => {
     isHoldingSpace = false;
     this.setState({ isBindingEnabled: true });
-    this.saveDebounced();
-    this.saveDebounced.flush();
   });
 
   private onUnload = () => {
@@ -505,12 +502,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.setState({ isLoading: true });
     }
 
-    let scene = await loadScene(null, null, this.props.initialData);
+    const { initialData } = this.props;
+    let scene = await loadScene(null, null, initialData);
 
     let isCollaborationScene = !!getCollaborationLinkData(window.location.href);
     const isExternalScene = !!(id || jsonMatch || isCollaborationScene);
 
-    if (isExternalScene && !this.props.initialData) {
+    if (isExternalScene && !initialData) {
       if (
         this.shouldForceLoadScene(scene) ||
         window.confirm(t("alerts.loadSceneOverridePrompt"))
@@ -840,7 +838,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (this.state.scrolledOutside !== scrolledOutside) {
       this.setState({ scrolledOutside: scrolledOutside });
     }
-    this.saveDebounced();
 
     if (
       getDrawingVersion(this.scene.getElementsIncludingDeleted()) >
@@ -3677,10 +3674,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private resetShouldCacheIgnoreZoomDebounced = debounce(() => {
     this.setState({ shouldCacheIgnoreZoom: false });
-  }, 300);
-
-  private saveDebounced = debounce(() => {
-    saveToLocalStorage(this.scene.getElementsIncludingDeleted(), this.state);
   }, 300);
 
   private getCanvasOffsets() {

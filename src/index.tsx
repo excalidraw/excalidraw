@@ -8,7 +8,9 @@ import { TopErrorBoundary } from "./components/TopErrorBoundary";
 import Excalidraw from "./excalidraw-embed/index";
 import { register as registerServiceWorker } from "./serviceWorker";
 
-import { loadFromBlob } from "./data";
+import { loadFromBlob, saveToLocalStorage } from "./data";
+import { debounce } from "./utils";
+import { restoreFromLocalStorage } from "./data/localStorage";
 
 // On Apple mobile devices add the proprietary app icon and splashscreen markup.
 // No one should have to do this manually, and eventually this annoyance will
@@ -66,6 +68,10 @@ function ExcalidrawApp() {
     height: window.innerHeight,
   });
 
+  const saveDebounced = debounce((elements, state) => {
+    saveToLocalStorage(elements, state);
+  }, 300);
+
   const onResize = () => {
     setDimensions({
       width: window.innerWidth,
@@ -80,9 +86,15 @@ function ExcalidrawApp() {
   }, []);
 
   const { width, height } = dimensions;
+  const initialData = restoreFromLocalStorage();
   return (
     <TopErrorBoundary>
-      <Excalidraw width={width} height={height} />
+      <Excalidraw
+        width={width}
+        height={height}
+        onChange={saveDebounced}
+        initialData={initialData}
+      />
     </TopErrorBoundary>
   );
 }
