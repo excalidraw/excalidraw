@@ -356,7 +356,7 @@ const LayerUI = ({
     >
       {/* the zIndex ensures this menu has higher stacking order,
          see https://github.com/excalidraw/excalidraw/pull/1445 */}
-      <Island padding={4} style={{ zIndex: 1 }}>
+      <Island padding={2} style={{ zIndex: 1 }}>
         <Stack.Col gap={4}>
           <Stack.Row gap={1} justifyContent="space-between">
             {actionManager.renderAction("loadScene")}
@@ -388,7 +388,7 @@ const LayerUI = ({
       heading="selectedShapeActions"
       className={`zen-mode-transition ${zenModeEnabled && "transition-left"}`}
     >
-      <Island className={CLASSES.SHAPE_ACTIONS_MENU} padding={4}>
+      <Island className={CLASSES.SHAPE_ACTIONS_MENU} padding={2}>
         <SelectedShapeActions
           appState={appState}
           elements={elements}
