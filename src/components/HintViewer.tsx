@@ -27,6 +27,10 @@ const getHints = ({ appState, elements }: Hint) => {
     return t("hints.freeDraw");
   }
 
+  if (elementType === "text") {
+    return t("hints.text");
+  }
+
   const selectedElements = getSelectedElements(elements, appState);
   if (
     isResizing &&
