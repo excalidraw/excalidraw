@@ -134,6 +134,7 @@
   "hints": {
     "linearElement": "Clicca per iniziare una linea in più punti, trascina per singola linea",
     "freeDraw": "Clicca e trascina, rilascia quando avrai finito",
+    "text": "",
     "linearElementMulti": "Clicca sull'ultimo punto o premi Esc o Invio per finire",
     "resize": "Per vincolare le proporzioni, tenir premuto MAIUSC durante il ridimensionamento;\nper ridimensionare dal centro, tenir premuto ALT",
     "rotate": "Puoi mantenere gli angoli tenendo premuto SHIFT durante la rotazione",
