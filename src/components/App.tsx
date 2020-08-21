@@ -2615,7 +2615,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               return true;
             }
 
-            if (allHitElements.length === 1 || selectedElements.length === 0) {
+            if (
+              (allHitElements.length === 1 || selectedElements.length === 0) &&
+              !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
+            ) {
               // Adds hit element to selection
               this.setState((prevState) => {
                 return selectGroupsForSelectedElements(

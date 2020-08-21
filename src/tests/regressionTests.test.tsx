@@ -1383,8 +1383,8 @@ describe("regression tests", () => {
     mouse.down(100, 100);
     mouse.up(100, 100);
 
-    // Selects ellipse without deselecting the second diamond
-    // Ellipse is already selected because creating it was our last action
+    // Selects ellipse without deselecting the diamond
+    // Diamond is already selected because creating it was our last action
     mouse.reset();
     withModifierKeys({ shift: true }, () => {
       mouse.click(110, 160);
@@ -1466,6 +1466,39 @@ describe("regression tests", () => {
       expect(getSelectedElements()[1].y).toEqual(secondElementPrevY + 25);
 
       expect(getSelectedElements().length).toBe(2);
+    },
+  );
+
+  it(
+    "given a group of selected elements with an element that is not selected inside the group common bounding box " +
+      "when element that is not selected is clicked " +
+      "should switch selection to not selected element on pointer up",
+    () => {
+      clickTool("rectangle");
+      mouse.down();
+      mouse.up(10, 10);
+
+      clickTool("ellipse");
+      mouse.down(100, 100);
+      mouse.up(100, 100);
+
+      clickTool("diamond");
+      mouse.down(100, 100);
+      mouse.up(100, 100);
+
+      // Selects rectangle without deselecting the diamond
+      // Diamond is already selected because creating it was our last action
+      mouse.reset();
+      withModifierKeys({ shift: true }, () => {
+        mouse.click();
+      });
+
+      // pointer down on ellipse
+      mouse.down(110, 160);
+      expect(getSelectedElements().length).toBe(2);
+
+      mouse.up();
+      expect(getSelectedElement().type).toBe("ellipse");
     },
   );
 });
