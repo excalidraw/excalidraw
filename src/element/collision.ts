@@ -63,7 +63,6 @@ export const isHittingElementBoundingBoxWithoutHittingElement = (
   const threshold = 10 / appState.zoom;
 
   return (
-    element != null &&
     !isHittingElementNotConsideringBoundingBox(element, appState, [x, y]) &&
     isPointHittingElementBoundingBox(element, [x, y], threshold)
   );

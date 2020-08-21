@@ -237,7 +237,7 @@ type PointerDownState = Readonly<{
   hit: {
     // The element the pointer is "hitting", is determined on the initial
     // pointer down event
-    element: ExcalidrawElement | null;
+    element: NonDeleted<ExcalidrawElement> | null;
     // This is determined on the initial pointer down event
     wasAddedToSelection: boolean;
     // Whether selected element(s) were duplicated, might change during the
@@ -3376,12 +3376,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       if (
         !this.state.editingLinearElement &&
         !pointerDownState.drag.hasOccurred &&
-        (isHittingElementBoundingBoxWithoutHittingElement(
-          hitElement as any,
-          this.state,
-          pointerDownState.origin.x,
-          pointerDownState.origin.y,
-        ) ||
+        ((hitElement &&
+          isHittingElementBoundingBoxWithoutHittingElement(
+            hitElement,
+            this.state,
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
+          )) ||
           (hitElement === null &&
             !this.state.isResizing &&
             pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements))
