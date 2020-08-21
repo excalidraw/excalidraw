@@ -1370,6 +1370,35 @@ describe("regression tests", () => {
     expect(getSelectedElements().length).toBe(0);
   });
 
+  it("switches from group of selected elements to another element on pointer down", () => {
+    clickTool("rectangle");
+    mouse.down();
+    mouse.up(10, 10);
+
+    clickTool("ellipse");
+    mouse.down(100, 100);
+    mouse.up(100, 100);
+
+    clickTool("diamond");
+    mouse.down(100, 100);
+    mouse.up(100, 100);
+
+    // Selects ellipse without deselecting the second diamond
+    // Ellipse is already selected because creating it was our last action
+    mouse.reset();
+    withModifierKeys({ shift: true }, () => {
+      mouse.click(110, 160);
+    });
+
+    expect(getSelectedElements().length).toBe(2);
+
+    // select rectangle
+    mouse.reset();
+    mouse.down();
+
+    expect(getSelectedElement().type).toBe("rectangle");
+  });
+
   it.skip(
     "drags selected elements from point inside common bounding box that doesn't hit any element " +
       "and keeps elements selected after dragging",
