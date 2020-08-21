@@ -14,10 +14,10 @@ const getSloppyLine = (
   y: number,
   roughness: number,
 ): number[][] => {
-  const diff = 0.015 * Math.sqrt((x - x0) ** 2 + (y - y0) ** 2) * roughness;
+  const delta = 0.015 * Math.sqrt((x - x0) ** 2 + (y - y0) ** 2) * roughness;
   const getRandomMiddlePoint = (fraction: number): [number, number] => [
-    x0 + (x - x0) * fraction + random() * diff - diff / 2,
-    y0 + (y - y0) * fraction + random() * diff - diff / 2,
+    x0 + (x - x0) * fraction + random() * delta - delta / 2,
+    y0 + (y - y0) * fraction + random() * delta - delta / 2,
   ];
   const bcurve = curveToBezier([
     [x0, y0],
@@ -86,30 +86,30 @@ const getSloppyCurve = (
   y: number,
   roughness: number,
 ): number[][] => {
-  const diff = 0.02 * Math.sqrt((x - x0) ** 2 + (y - y0) ** 2) * roughness;
+  const delta = 0.02 * Math.sqrt((x - x0) ** 2 + (y - y0) ** 2) * roughness;
   const [p01, pp09] = splitBezier([x0, y0, x1, y1, x2, y2, x, y], 0.1);
   const [p03, pp07] = splitBezier(pp09, 0.2 / 0.9);
   const [p05, pp05] = splitBezier(pp07, 0.2 / 0.7);
   const [p07, pp03] = splitBezier(pp05, 0.2 / 0.5);
   const [p09, pp01] = splitBezier(pp03, 0.2 / 0.3);
-  const rand03x = random() * diff - diff / 2;
-  const rand03y = random() * diff - diff / 2;
+  const rand03x = random() * delta - delta / 2;
+  const rand03y = random() * delta - delta / 2;
   p03[4] += rand03x;
   p03[5] += rand03y;
   p03[6] += rand03x;
   p03[7] += rand03y;
   p05[2] += rand03x;
   p05[3] += rand03y;
-  const rand05x = random() * diff - diff / 2;
-  const rand05y = random() * diff - diff / 2;
+  const rand05x = random() * delta - delta / 2;
+  const rand05y = random() * delta - delta / 2;
   p05[4] += rand05x;
   p05[5] += rand05y;
   p05[6] += rand05x;
   p05[7] += rand05y;
   p07[2] += rand05x;
   p07[3] += rand05y;
-  const rand07x = random() * diff - diff / 2;
-  const rand07y = random() * diff - diff / 2;
+  const rand07x = random() * delta - delta / 2;
+  const rand07y = random() * delta - delta / 2;
   p07[4] += rand07x;
   p07[5] += rand07y;
   p07[6] += rand07x;
