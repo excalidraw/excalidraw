@@ -1424,7 +1424,7 @@ describe("regression tests", () => {
     expect(getSelectedElements().length).toBe(0);
   });
 
-  it.skip(
+  it(
     "drags selected elements from point inside common bounding box that doesn't hit any element " +
       "and keeps elements selected after dragging",
     () => {
