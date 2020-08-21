@@ -5,12 +5,9 @@ import * as SentryIntegrations from "@sentry/integrations";
 
 import { EVENT } from "./constants";
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
-import { InitializeApp } from "./components/InitializeApp";
-import { IsMobileProvider } from "./is-mobile";
-import App from "./components/App";
+import Excalidraw from "./excalidraw-embed/index";
 import { register as registerServiceWorker } from "./serviceWorker";
 
-import "./css/styles.scss";
 import { loadFromBlob } from "./data";
 
 // On Apple mobile devices add the proprietary app icon and splashscreen markup.
@@ -63,18 +60,6 @@ Sentry.init({
 
 window.__EXCALIDRAW_SHA__ = REACT_APP_GIT_SHA;
 
-// Block pinch-zooming on iOS outside of the content area
-document.addEventListener(
-  "touchmove",
-  (event) => {
-    // @ts-ignore
-    if (typeof event.scale === "number" && event.scale !== 1) {
-      event.preventDefault();
-    }
-  },
-  { passive: false },
-);
-
 function ExcalidrawApp() {
   const [dimensions, setDimensions] = useState({
     width: window.innerWidth,
@@ -97,11 +82,7 @@ function ExcalidrawApp() {
   const { width, height } = dimensions;
   return (
     <TopErrorBoundary>
-      <IsMobileProvider>
-        <InitializeApp>
-          <App width={width} height={height} />
-        </InitializeApp>
-      </IsMobileProvider>
+      <Excalidraw width={width} height={height} />
     </TopErrorBoundary>
   );
 }

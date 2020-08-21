@@ -8,44 +8,41 @@ const COMPLETION_THRESHOLD_TO_EXCEED = 85;
 interface Language {
   lng: string;
   label: string;
-  data: string;
   rtl?: boolean;
 }
 
 const allLanguages: Language[] = [
-  { lng: "bg-BG", label: "Български", data: "bg-BG.json" },
-  { lng: "de-DE", label: "Deutsch", data: "de-DE.json" },
-  { lng: "es-ES", label: "Español", data: "es-ES.json" },
-  { lng: "ca-ES", label: "Catalan", data: "ca-ES.json" },
-  { lng: "el-GR", label: "Ελληνικά", data: "el-GR.json" },
-  { lng: "fr-FR", label: "Français", data: "fr-FR.json" },
-  { lng: "id-ID", label: "Bahasa Indonesia", data: "id-ID.json" },
-  { lng: "it-IT", label: "Italiano", data: "it-IT.json" },
-  { lng: "hu-HU", label: "Magyar", data: "hu-HU.json" },
-  { lng: "nl-NL", label: "Nederlands", data: "nl-NL.json" },
-  { lng: "nb-NO", label: "Norsk bokmål", data: "nb-NO.json" },
-  { lng: "nn-NO", label: "Norsk nynorsk", data: "nn-NO.json" },
-  { lng: "pl-PL", label: "Polski", data: "pl-PL.json" },
-  { lng: "pt-PT", label: "Português", data: "pt-PT.json" },
-  { lng: "ru-RU", label: "Русский", data: "ru-RU.json" },
-  { lng: "uk-UA", label: "Українська", data: "uk-UA.json" },
-  { lng: "fi-FI", label: "Suomi", data: "fi-FI.json" },
-  { lng: "tr-TR", label: "Türkçe", data: "tr-TR.json" },
-  { lng: "ja-JP", label: "日本語", data: "ja-JP.json" },
-  { lng: "ko-KR", label: "한국어", data: "ko-KR.json" },
-  { lng: "zh-TW", label: "繁體中文", data: "zh-TW.json" },
-  { lng: "zh-CN", label: "简体中文", data: "zh-CN.json" },
-  { lng: "ar-SA", label: "العربية", data: "ar-SA.json", rtl: true },
-  { lng: "he-IL", label: "עברית", data: "he-IL.json", rtl: true },
-  { lng: "hi-IN", label: "हिन्दी", data: "hi-IN.json" },
-  { lng: "ta-IN", label: "தமிழ்", data: "ta-IN.json" },
-  { lng: "gl-ES", label: "Galego", data: "gl-ES.json" },
-  { lng: "vi-VN", label: "Tiếng Việt", data: "vi-VN.json" },
+  { lng: "bg-BG", label: "Български" },
+  { lng: "de-DE", label: "Deutsch" },
+  { lng: "es-ES", label: "Español" },
+  { lng: "ca-ES", label: "Catalan" },
+  { lng: "el-GR", label: "Ελληνικά" },
+  { lng: "fr-FR", label: "Français" },
+  { lng: "id-ID", label: "Bahasa Indonesia" },
+  { lng: "it-IT", label: "Italiano" },
+  { lng: "hu-HU", label: "Magyar" },
+  { lng: "nl-NL", label: "Nederlands" },
+  { lng: "nb-NO", label: "Norsk bokmål" },
+  { lng: "nn-NO", label: "Norsk nynorsk" },
+  { lng: "pl-PL", label: "Polski" },
+  { lng: "pt-PT", label: "Português" },
+  { lng: "ru-RU", label: "Русский" },
+  { lng: "uk-UA", label: "Українська" },
+  { lng: "fi-FI", label: "Suomi" },
+  { lng: "tr-TR", label: "Türkçe" },
+  { lng: "ja-JP", label: "日本語" },
+  { lng: "ko-KR", label: "한국어" },
+  { lng: "zh-TW", label: "繁體中文" },
+  { lng: "zh-CN", label: "简体中文" },
+  { lng: "ar-SA", label: "العربية", rtl: true },
+  { lng: "he-IL", label: "עברית", rtl: true },
+  { lng: "hi-IN", label: "हिन्दी" },
+  { lng: "ta-IN", label: "தமிழ்" },
+  { lng: "gl-ES", label: "Galego" },
+  { lng: "vi-VN", label: "Tiếng Việt" },
 ];
 
-export const languages: Language[] = [
-  { lng: "en", label: "English", data: "en.json" },
-]
+export const languages: Language[] = [{ lng: "en", label: "English" }]
   .concat(
     allLanguages.sort((left, right) => (left.label > right.label ? 1 : -1)),
   )
@@ -65,7 +62,7 @@ export const setLanguage = async (newLng: string | undefined) => {
 
   document.documentElement.dir = currentLanguage.rtl ? "rtl" : "ltr";
 
-  currentLanguageData = await import(`./locales/${currentLanguage.data}`);
+  currentLanguageData = await import(`./locales/${currentLanguage.lng}.json`);
 
   languageDetector.cacheUserLanguage(currentLanguage.lng);
 };
@@ -78,7 +75,7 @@ export const setLanguageFirstTime = async () => {
 
   document.documentElement.dir = currentLanguage.rtl ? "rtl" : "ltr";
 
-  currentLanguageData = await import(`./locales/${currentLanguage.data}`);
+  currentLanguageData = await import(`./locales/${currentLanguage.lng}.json`);
 
   languageDetector.cacheUserLanguage(currentLanguage.lng);
 };
