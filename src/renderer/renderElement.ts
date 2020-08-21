@@ -383,7 +383,7 @@ const generateElementShape = (
         if (
           myRough &&
           element.strokeSharpness === "round" &&
-          points.length >= 3
+          points.length >= 4
         ) {
           const bcurve = curveToBezier(points as [number, number][]);
           let svgPath = "M 0 0";

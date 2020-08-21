@@ -1,5 +1,4 @@
 import { parsePath, normalize, absolutize } from "path-data-parser";
-import { pointsOnBezierCurves } from "points-on-curve";
 import { curveToBezier } from "points-on-curve/lib/curve-to-bezier.js";
 import { Op, OpSet, ResolvedOptions } from "roughjs/bin/core";
 
@@ -13,9 +12,9 @@ const getSloppyLine = (
   roughness: number,
 ): number[][] => {
   const diff = 0.015 * Math.sqrt((x - x0) ** 2 + (y - y0) ** 2) * roughness;
-  const getRandomMiddlePoint = (percentile: number): [number, number] => [
-    x0 + (x - x0) * percentile + Math.random() * diff - diff / 2,
-    y0 + (y - y0) * percentile + Math.random() * diff - diff / 2,
+  const getRandomMiddlePoint = (fraction: number): [number, number] => [
+    x0 + (x - x0) * fraction + Math.random() * diff - diff / 2,
+    y0 + (y - y0) * fraction + Math.random() * diff - diff / 2,
   ];
   const bcurve = curveToBezier([
     [x0, y0],
@@ -38,6 +37,41 @@ const getSloppyLine = (
   return arr;
 };
 
+const splitBezier = (
+  [x0, y0, x1, y1, x2, y2, x, y]: [
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+  ],
+  fraction: number,
+): [
+  [number, number, number, number, number, number, number, number],
+  [number, number, number, number, number, number, number, number],
+] => {
+  // https://stackoverflow.com/a/2614028
+  const xx01 = (1 - fraction) * x0 + fraction * x1;
+  const yy01 = (1 - fraction) * y0 + fraction * y1;
+  const xx12 = (1 - fraction) * x1 + fraction * x2;
+  const yy12 = (1 - fraction) * y1 + fraction * y2;
+  const xx23 = (1 - fraction) * x2 + fraction * x;
+  const yy23 = (1 - fraction) * y2 + fraction * y;
+  const xx0112 = (1 - fraction) * xx01 + fraction * xx12;
+  const yy0112 = (1 - fraction) * yy01 + fraction * yy12;
+  const xx1223 = (1 - fraction) * xx12 + fraction * xx23;
+  const yy1223 = (1 - fraction) * yy12 + fraction * yy23;
+  const xx = (1 - fraction) * xx0112 + fraction * xx1223;
+  const yy = (1 - fraction) * yy0112 + fraction * yy1223;
+  return [
+    [x0, y0, xx01, yy01, xx0112, yy0112, xx, yy],
+    [xx, yy, xx1223, yy1223, xx23, yy23, x, y],
+  ];
+};
+
 const getSloppyCurve = (
   x0: number,
   y0: number,
@@ -49,46 +83,44 @@ const getSloppyCurve = (
   y: number,
   roughness: number,
 ): number[][] => {
-  const points = pointsOnBezierCurves(
-    [
-      [x0, y0],
-      [x1, y1],
-      [x2, y2],
-      [x, y],
-    ],
-    1.0,
-  );
-  const diff = points.length * 0.2 * roughness;
-  points.forEach((point, index) => {
-    if (index > 1 && index < points.length - 2) {
-      point[0] += Math.random() * diff - diff / 2;
-      point[1] += Math.random() * diff - diff / 2;
-    }
-  });
-  const p25 = Math.round(points.length * 0.25);
-  if (p25 < 3) {
-    return [[x1, y1, x2, y2, x, y]];
-  }
-  const bcurve = curveToBezier([
-    points[0],
-    points[1],
-    points[p25],
-    points[p25 * 2],
-    points[p25 * 3],
-    points[points.length - 2],
-    points[points.length - 1],
-  ]);
-  const arr: number[][] = [];
-  for (let i = 1; i + 2 < bcurve.length; i += 3) {
-    arr.push([
-      bcurve[i][0],
-      bcurve[i][1],
-      bcurve[i + 1][0],
-      bcurve[i + 1][1],
-      bcurve[i + 2][0],
-      bcurve[i + 2][1],
-    ]);
-  }
+  const diff = 0.02 * Math.sqrt((x - x0) ** 2 + (y - y0) ** 2) * roughness;
+  const [p01, pp09] = splitBezier([x0, y0, x1, y1, x2, y2, x, y], 0.1);
+  const [p03, pp07] = splitBezier(pp09, 0.2 / 0.9);
+  const [p05, pp05] = splitBezier(pp07, 0.2 / 0.7);
+  const [p07, pp03] = splitBezier(pp05, 0.2 / 0.5);
+  const [p09, pp01] = splitBezier(pp03, 0.2 / 0.3);
+  const rand03x = Math.random() * diff - diff / 2;
+  const rand03y = Math.random() * diff - diff / 2;
+  p03[4] += rand03x;
+  p03[5] += rand03y;
+  p03[6] += rand03x;
+  p03[7] += rand03y;
+  p05[2] += rand03x;
+  p05[3] += rand03y;
+  const rand05x = Math.random() * diff - diff / 2;
+  const rand05y = Math.random() * diff - diff / 2;
+  p05[4] += rand05x;
+  p05[5] += rand05y;
+  p05[6] += rand05x;
+  p05[7] += rand05y;
+  p07[2] += rand05x;
+  p07[3] += rand05y;
+  const rand07x = Math.random() * diff - diff / 2;
+  const rand07y = Math.random() * diff - diff / 2;
+  p07[4] += rand07x;
+  p07[5] += rand07y;
+  p07[6] += rand07x;
+  p07[7] += rand07y;
+  p09[2] += rand07x;
+  p09[3] += rand07y;
+  const arr = [
+    p01.slice(2),
+    p03.slice(2),
+    p05.slice(2),
+    p07.slice(2),
+    p09.slice(2),
+    pp01.slice(2),
+  ];
   return arr;
 };
 
