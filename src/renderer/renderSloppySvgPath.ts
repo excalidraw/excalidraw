@@ -2,7 +2,10 @@ import { parsePath, normalize, absolutize } from "path-data-parser";
 import { curveToBezier } from "points-on-curve/lib/curve-to-bezier.js";
 import { Op, OpSet, ResolvedOptions } from "roughjs/bin/core";
 
+import { randomInteger, reseed } from "../random";
 import { Point } from "../types";
+
+const random = () => randomInteger() / 2 ** 31;
 
 const getSloppyLine = (
   x0: number,
@@ -13,8 +16,8 @@ const getSloppyLine = (
 ): number[][] => {
   const diff = 0.015 * Math.sqrt((x - x0) ** 2 + (y - y0) ** 2) * roughness;
   const getRandomMiddlePoint = (fraction: number): [number, number] => [
-    x0 + (x - x0) * fraction + Math.random() * diff - diff / 2,
-    y0 + (y - y0) * fraction + Math.random() * diff - diff / 2,
+    x0 + (x - x0) * fraction + random() * diff - diff / 2,
+    y0 + (y - y0) * fraction + random() * diff - diff / 2,
   ];
   const bcurve = curveToBezier([
     [x0, y0],
@@ -89,24 +92,24 @@ const getSloppyCurve = (
   const [p05, pp05] = splitBezier(pp07, 0.2 / 0.7);
   const [p07, pp03] = splitBezier(pp05, 0.2 / 0.5);
   const [p09, pp01] = splitBezier(pp03, 0.2 / 0.3);
-  const rand03x = Math.random() * diff - diff / 2;
-  const rand03y = Math.random() * diff - diff / 2;
+  const rand03x = random() * diff - diff / 2;
+  const rand03y = random() * diff - diff / 2;
   p03[4] += rand03x;
   p03[5] += rand03y;
   p03[6] += rand03x;
   p03[7] += rand03y;
   p05[2] += rand03x;
   p05[3] += rand03y;
-  const rand05x = Math.random() * diff - diff / 2;
-  const rand05y = Math.random() * diff - diff / 2;
+  const rand05x = random() * diff - diff / 2;
+  const rand05y = random() * diff - diff / 2;
   p05[4] += rand05x;
   p05[5] += rand05y;
   p05[6] += rand05x;
   p05[7] += rand05y;
   p07[2] += rand05x;
   p07[3] += rand05y;
-  const rand07x = Math.random() * diff - diff / 2;
-  const rand07y = Math.random() * diff - diff / 2;
+  const rand07x = random() * diff - diff / 2;
+  const rand07y = random() * diff - diff / 2;
   p07[4] += rand07x;
   p07[5] += rand07y;
   p07[6] += rand07x;
@@ -128,6 +131,7 @@ export const renderSloppySvgPath = (
   svgPath: string,
   options: ResolvedOptions,
 ): OpSet => {
+  reseed(options.seed);
   const segments = normalize(absolutize(parsePath(svgPath)));
   const ops: Op[] = [];
   let first: Point = [0, 0];
