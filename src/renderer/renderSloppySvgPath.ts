@@ -5,6 +5,39 @@ import { Op, OpSet, ResolvedOptions } from "roughjs/bin/core";
 
 import { Point } from "../types";
 
+const getSloppyLine = (
+  x0: number,
+  y0: number,
+  x: number,
+  y: number,
+  roughness: number,
+): number[][] => {
+  const diff = 0.015 * Math.sqrt((x - x0) ** 2 + (y - y0) ** 2) * roughness;
+  const getRandomMiddlePoint = (percentile: number): [number, number] => [
+    x0 + (x - x0) * percentile + Math.random() * diff - diff / 2,
+    y0 + (y - y0) * percentile + Math.random() * diff - diff / 2,
+  ];
+  const bcurve = curveToBezier([
+    [x0, y0],
+    getRandomMiddlePoint(0.25),
+    getRandomMiddlePoint(0.5),
+    getRandomMiddlePoint(0.75),
+    [x, y],
+  ]);
+  const arr: number[][] = [];
+  for (let i = 1; i + 2 < bcurve.length; i += 3) {
+    arr.push([
+      bcurve[i][0],
+      bcurve[i][1],
+      bcurve[i + 1][0],
+      bcurve[i + 1][1],
+      bcurve[i + 2][0],
+      bcurve[i + 2][1],
+    ]);
+  }
+  return arr;
+};
+
 const getSloppyCurve = (
   x0: number,
   y0: number,
@@ -25,7 +58,7 @@ const getSloppyCurve = (
     ],
     1.0,
   );
-  const diff = points.length * 0.1 * roughness;
+  const diff = points.length * 0.2 * roughness;
   points.forEach((point, index) => {
     if (index > 1 && index < points.length - 2) {
       point[0] += Math.random() * diff - diff / 2;
@@ -76,15 +109,9 @@ export const renderSloppySvgPath = (
         break;
       }
       case "L": {
-        const cx = (current[0] + data[0]) / 2;
-        const cy = (current[1] + data[1]) / 2;
-        const arr = getSloppyCurve(
+        const arr = getSloppyLine(
           current[0],
           current[1],
-          cx,
-          cy,
-          cx,
-          cy,
           data[0],
           data[1],
           options.roughness,
@@ -121,15 +148,9 @@ export const renderSloppySvgPath = (
         break;
       }
       case "Z": {
-        const cx = (current[0] + first[0]) / 2;
-        const cy = (current[1] + first[1]) / 2;
-        const arr = getSloppyCurve(
+        const arr = getSloppyLine(
           current[0],
           current[1],
-          cx,
-          cy,
-          cx,
-          cy,
           first[0],
           first[1],
           options.roughness,
