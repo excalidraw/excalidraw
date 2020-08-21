@@ -1399,6 +1399,31 @@ describe("regression tests", () => {
     expect(getSelectedElement().type).toBe("rectangle");
   });
 
+  it("deselects group of selected elements on pointer up when pointer hits common bounding box without hitting any element", () => {
+    clickTool("rectangle");
+    mouse.down();
+    mouse.up(10, 10);
+
+    clickTool("ellipse");
+    mouse.down(100, 100);
+    mouse.up(10, 10);
+
+    // Selects first element without deselecting the second element
+    // Second element is already selected because creating it was our last action
+    mouse.reset();
+    withModifierKeys({ shift: true }, () => {
+      mouse.click(5, 5);
+    });
+
+    // pointer down on common bounding box without hitting any of the elements
+    mouse.reset();
+    mouse.down(50, 50);
+    expect(getSelectedElements().length).toBe(2);
+
+    mouse.up();
+    expect(getSelectedElements().length).toBe(0);
+  });
+
   it.skip(
     "drags selected elements from point inside common bounding box that doesn't hit any element " +
       "and keeps elements selected after dragging",

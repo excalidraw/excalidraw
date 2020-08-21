@@ -2588,7 +2588,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         if (
           (hitElement === null ||
             isHittingOnlyOneElementElementAndItIsNotSelected) &&
-          !event.shiftKey
+          !event.shiftKey &&
+          !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
         ) {
           this.clearSelection(hitElement);
         }
@@ -3364,13 +3365,15 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       if (
         !this.state.editingLinearElement &&
         !pointerDownState.drag.hasOccurred &&
-        hitElement != null &&
-        isHittingElementBoundingBoxWithoutHittingElement(
+        (isHittingElementBoundingBoxWithoutHittingElement(
           hitElement as any,
           this.state,
           pointerDownState.origin.x,
           pointerDownState.origin.y,
-        )
+        ) ||
+          (hitElement === null &&
+            !this.state.isResizing &&
+            pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements))
       ) {
         // Deselect selected element
         this.setState({
