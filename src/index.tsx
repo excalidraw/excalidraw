@@ -79,6 +79,10 @@ const onUsernameChange = (username: string) => {
   saveUsernameToLocalStorage(username);
 };
 
+const onBlur = () => {
+  saveDebounced.flush();
+};
+
 function ExcalidrawApp() {
   // dimensions
   // ---------------------------------------------------------------------------
@@ -119,11 +123,23 @@ function ExcalidrawApp() {
     });
   }, []);
 
+  // blur/unload
+  // ---------------------------------------------------------------------------
+
+  useEffect(() => {
+    window.addEventListener(EVENT.UNLOAD, onBlur, false);
+    window.addEventListener(EVENT.BLUR, onBlur, false);
+    return () => {
+      window.removeEventListener(EVENT.UNLOAD, onBlur, false);
+      window.removeEventListener(EVENT.BLUR, onBlur, false);
+    };
+  }, []);
+
+  // ---------------------------------------------------------------------------
+
   if (!initialState) {
     return <LoadingMessage />;
   }
-
-  // ---------------------------------------------------------------------------
 
   return (
     <TopErrorBoundary>
