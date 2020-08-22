@@ -80,10 +80,29 @@ const onUsernameChange = (username: string) => {
 };
 
 function ExcalidrawApp() {
+  // dimensions
+  // ---------------------------------------------------------------------------
+
   const [dimensions, setDimensions] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
   });
+  useLayoutEffect(() => {
+    const onResize = () => {
+      setDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    window.addEventListener("resize", onResize);
+
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  // initial state
+  // ---------------------------------------------------------------------------
+
   const [initialState, setInitialState] = useState<{
     data: DataState;
     user: {
@@ -100,22 +119,11 @@ function ExcalidrawApp() {
     });
   }, []);
 
-  useLayoutEffect(() => {
-    const onResize = () => {
-      setDimensions({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    };
-
-    window.addEventListener("resize", onResize);
-
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
-
   if (!initialState) {
     return <LoadingMessage />;
   }
+
+  // ---------------------------------------------------------------------------
 
   return (
     <TopErrorBoundary>
