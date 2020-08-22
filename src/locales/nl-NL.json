@@ -66,13 +66,13 @@
     "yourName": "Jouw naam",
     "madeWithExcalidraw": "Gemaakt met Excalidraw",
     "group": "Groeperen",
-    "ungroup": "",
+    "ungroup": "Groep opheffen",
     "collaborators": "",
-    "toggleGridMode": "",
-    "addToLibrary": "",
-    "removeFromLibrary": "",
-    "libraryLoadingMessage": "",
-    "loadingScene": ""
+    "toggleGridMode": "Rasterlijnen in-/uitschakelen",
+    "addToLibrary": "Voeg toe aan bibliotheek",
+    "removeFromLibrary": "Verwijder uit bibliotheek",
+    "libraryLoadingMessage": "Bibliotheek laden...",
+    "loadingScene": "Scène laden..."
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
@@ -82,7 +82,7 @@
     "copyToClipboard": "Kopieer",
     "copyPngToClipboard": "Kopieer als PNG",
     "save": "Opslaan",
-    "saveAs": "",
+    "saveAs": "Opslaan als",
     "load": "Open",
     "getShareableLink": "Maak een deelbare link",
     "close": "Sluiten",
@@ -123,7 +123,7 @@
     "arrow": "Pijl",
     "line": "Lijn",
     "text": "Tekst",
-    "library": "",
+    "library": "Bibliotheek",
     "lock": "Geselecteerde tool actief houden na tekenen"
   },
   "headings": {
