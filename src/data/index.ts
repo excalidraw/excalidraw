@@ -22,7 +22,6 @@ import { DataState } from "./types";
 
 export { loadFromBlob } from "./blob";
 export { saveAsJSON, loadFromJSON } from "./json";
-export { saveToLocalStorage } from "./localStorage";
 
 const BACKEND_GET = process.env.REACT_APP_BACKEND_V1_GET_URL;
 

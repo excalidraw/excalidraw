@@ -8,12 +8,13 @@ import { TopErrorBoundary } from "./components/TopErrorBoundary";
 import Excalidraw from "./excalidraw-embed/index";
 import { register as registerServiceWorker } from "./serviceWorker";
 
-import { loadFromBlob, saveToLocalStorage } from "./data";
+import { loadFromBlob } from "./data";
 import { debounce } from "./utils";
 import {
   restoreFromLocalStorage,
   restoreUsernameFromLocalStorage,
   saveUsernameToLocalStorage,
+  saveToLocalStorage,
 } from "./data/localStorage";
 
 import { SAVE_TO_LOCAL_STORAGE_TIMEOUT } from "./time_constants";
