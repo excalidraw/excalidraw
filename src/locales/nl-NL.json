@@ -136,10 +136,10 @@
     "freeDraw": "Klik en sleep, laat los als je klaar bent",
     "text": "Tip: je kunt tekst toevoegen door ergens dubbel te klikken met de selectietool",
     "linearElementMulti": "Klik op het laatste punt of druk op Escape of Enter om te stoppen",
-    "resize": "",
+    "resize": "Houd tijdens het vergroten SHIFT ingedrukt om verhoudingen te behouden,\ngebruik ALT om vanuit het midden te vergroten/verkleinen",
     "rotate": "Je kan hoeken beperken door SHIFT ingedrukt te houden wanneer je draait",
-    "lineEditor_info": "",
-    "lineEditor_pointSelected": "",
+    "lineEditor_info": "Dubbelklik of druk op Enter om punten te bewerken",
+    "lineEditor_pointSelected": "Druk op Delete om een punt te verwijderen, op CtrlOrCmd+D om te kopiëren, of sleeg om te verplaatsen",
     "lineEditor_nothingSelected": ""
   },
   "errorSplash": {
@@ -187,7 +187,7 @@
     "preventBinding": ""
   },
   "encrypted": {
-    "tooltip": ""
+    "tooltip": "Je tekeningen zijn beveiligd met end-to-end encryptie, dus Excalidraw's servers zullen ze nooit zien."
   },
   "charts": {
     "noNumericColumn": "",
