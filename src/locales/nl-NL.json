@@ -112,11 +112,11 @@
     "couldNotCopyToClipboard": "Kan niet kopiëren. Probeer in de Chrome-browser.",
     "decryptFailed": "Kan gegevens niet decoderen.",
     "uploadedSecurly": "De upload is beveiligd met end-to-end encryptie, wat betekent dat de Excalidraw server en derden de inhoud niet kunnen lezen.",
-    "loadSceneOverridePrompt": ""
+    "loadSceneOverridePrompt": "Het laden van externe tekening zal uw bestaande inhoud vervangen. Wilt u doorgaan?"
   },
   "toolBar": {
     "selection": "Selectie",
-    "draw": "",
+    "draw": "Vrij tekenen",
     "rectangle": "Rechthoek",
     "diamond": "Ruit",
     "ellipse": "Ovaal",
@@ -133,8 +133,8 @@
   },
   "hints": {
     "linearElement": "Klik om meerdere punten te starten, sleep voor één lijn",
-    "freeDraw": "",
-    "text": "",
+    "freeDraw": "Klik en sleep, laat los als je klaar bent",
+    "text": "Tip: je kunt tekst toevoegen door ergens dubbel te klikken met de selectietool",
     "linearElementMulti": "Klik op het laatste punt of druk op Escape of Enter om te stoppen",
     "resize": "",
     "rotate": "Je kan hoeken beperken door SHIFT ingedrukt te houden wanneer je draait",
