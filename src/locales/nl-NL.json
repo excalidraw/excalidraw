@@ -104,7 +104,7 @@
     "exitZenMode": "Verlaat zen modus"
   },
   "alerts": {
-    "clearReset": "Dit zal het hele canvas verwijderen. Ben je zeker?",
+    "clearReset": "Dit zal het hele canvas verwijderen. Weet je het zeker?",
     "couldNotCreateShareableLink": "Kon geen deelbare link aanmaken.",
     "couldNotLoadInvalidFile": "Kan ongeldig bestand niet laden",
     "importBackendFailed": "Importeren vanuit backend mislukt.",
@@ -112,7 +112,7 @@
     "couldNotCopyToClipboard": "Kan niet kopiëren. Probeer in de Chrome-browser.",
     "decryptFailed": "Kan gegevens niet decoderen.",
     "uploadedSecurly": "De upload is beveiligd met end-to-end encryptie, wat betekent dat de Excalidraw server en derden de inhoud niet kunnen lezen.",
-    "loadSceneOverridePrompt": "Het laden van externe tekening zal uw bestaande inhoud vervangen. Wilt u doorgaan?"
+    "loadSceneOverridePrompt": "Het laden van externe tekening zal uw bestaande inhoud vervangen. Wil je doorgaan?"
   },
   "toolBar": {
     "selection": "Selectie",
@@ -140,7 +140,7 @@
     "rotate": "Je kan hoeken beperken door SHIFT ingedrukt te houden wanneer je draait",
     "lineEditor_info": "Dubbelklik of druk op Enter om punten te bewerken",
     "lineEditor_pointSelected": "Druk op Delete om een punt te verwijderen, op CtrlOrCmd+D om te kopiëren, of sleeg om te verplaatsen",
-    "lineEditor_nothingSelected": ""
+    "lineEditor_nothingSelected": "Selecteer een punt om te verplaatsen of te verwijderen, of houd Alt ingedrukt en klik om nieuwe punten toe te voegen"
   },
   "errorSplash": {
     "headingMain_pre": "Fout opgetreden. Probeer ",
@@ -187,10 +187,10 @@
     "preventBinding": ""
   },
   "encrypted": {
-    "tooltip": "Je tekeningen zijn beveiligd met end-to-end encryptie, dus Excalidraw's servers zullen ze nooit zien."
+    "tooltip": "Je tekeningen zijn beveiligd met end-to-end encryptie, dus Excalidraw's servers zullen nooit zien wat je tekent."
   },
   "charts": {
-    "noNumericColumn": "",
-    "tooManyColumns": ""
+    "noNumericColumn": "Je hebt een werkblad geplakt zonder een numerieke kolom.",
+    "tooManyColumns": "Je hebt een werkblad geplakt met meer dan twee kolommen."
   }
 }
