@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect } from "react";
+import React, { useState, useLayoutEffect, useEffect } from "react";
 import ReactDOM from "react-dom";
 import * as Sentry from "@sentry/browser";
 import * as SentryIntegrations from "@sentry/integrations";
@@ -18,6 +18,8 @@ import {
 } from "./data/localStorage";
 
 import { SAVE_TO_LOCAL_STORAGE_TIMEOUT } from "./time_constants";
+import { DataState } from "./data/types";
+import { LoadingMessage } from "./components/LoadingMessage";
 
 // On Apple mobile devices add the proprietary app icon and splashscreen markup.
 // No one should have to do this manually, and eventually this annoyance will
@@ -74,6 +76,21 @@ function ExcalidrawApp() {
     width: window.innerWidth,
     height: window.innerHeight,
   });
+  const [initialState, setInitialState] = useState<{
+    data: DataState;
+    user: {
+      name: string | null;
+    };
+  } | null>(null);
+
+  useEffect(() => {
+    setInitialState({
+      data: importFromLocalStorage(),
+      user: {
+        name: importUsernameFromLocalStorage(),
+      },
+    });
+  }, []);
 
   const saveDebounced = debounce((elements, state) => {
     saveToLocalStorage(elements, state);
@@ -96,18 +113,18 @@ function ExcalidrawApp() {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  const { width, height } = dimensions;
-  const initialData = importFromLocalStorage();
-  const username = importUsernameFromLocalStorage();
-  const user = { name: username };
+  if (!initialState) {
+    return <LoadingMessage />;
+  }
+
   return (
     <TopErrorBoundary>
       <Excalidraw
-        width={width}
-        height={height}
+        width={dimensions.width}
+        height={dimensions.height}
         onChange={saveDebounced}
-        initialData={initialData}
-        user={user}
+        initialData={initialState.data}
+        user={initialState.user}
         onUsernameChange={onUsernameChange}
       />
     </TopErrorBoundary>
