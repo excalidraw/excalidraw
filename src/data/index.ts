@@ -231,7 +231,7 @@ export const exportToBackend = async (
   }
 };
 
-export const importFromBackend = async (
+const importFromBackend = async (
   id: string | null,
   privateKey?: string | null,
 ) => {
@@ -244,7 +244,7 @@ export const importFromBackend = async (
     );
     if (!response.ok) {
       window.alert(t("alerts.importBackendFailed"));
-      return restore(elements, appState);
+      return { elements, appState };
     }
     let data;
     if (privateKey) {
@@ -275,7 +275,7 @@ export const importFromBackend = async (
     window.alert(t("alerts.importBackendFailed"));
     console.error(error);
   } finally {
-    return restore(elements, appState);
+    return { elements, appState };
   }
 };
 
@@ -372,9 +372,7 @@ export const loadScene = async (
   if (id != null) {
     // the private key is used to decrypt the content from the server, take
     // extra care not to leak it
-    data = await importFromBackend(id, privateKey);
-  } else if (initialData) {
-    const { elements, appState } = initialData;
+    const { elements, appState } = await importFromBackend(id, privateKey);
     data = restore(elements, appState);
   }
 

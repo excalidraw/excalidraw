@@ -11,8 +11,8 @@ import { register as registerServiceWorker } from "./serviceWorker";
 import { loadFromBlob } from "./data";
 import { debounce } from "./utils";
 import {
-  restoreFromLocalStorage,
-  restoreUsernameFromLocalStorage,
+  importFromLocalStorage,
+  importUsernameFromLocalStorage,
   saveUsernameToLocalStorage,
   saveToLocalStorage,
 } from "./data/localStorage";
@@ -97,8 +97,8 @@ function ExcalidrawApp() {
   }, []);
 
   const { width, height } = dimensions;
-  const initialData = restoreFromLocalStorage();
-  const username = restoreUsernameFromLocalStorage();
+  const initialData = importFromLocalStorage();
+  const username = importUsernameFromLocalStorage();
   const user = { name: username };
   return (
     <TopErrorBoundary>
