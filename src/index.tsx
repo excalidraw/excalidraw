@@ -71,6 +71,14 @@ Sentry.init({
 
 window.__EXCALIDRAW_SHA__ = REACT_APP_GIT_SHA;
 
+const saveDebounced = debounce((elements, state) => {
+  saveToLocalStorage(elements, state);
+}, SAVE_TO_LOCAL_STORAGE_TIMEOUT);
+
+const onUsernameChange = (username: string) => {
+  saveUsernameToLocalStorage(username);
+};
+
 function ExcalidrawApp() {
   const [dimensions, setDimensions] = useState({
     width: window.innerWidth,
@@ -92,22 +100,14 @@ function ExcalidrawApp() {
     });
   }, []);
 
-  const saveDebounced = debounce((elements, state) => {
-    saveToLocalStorage(elements, state);
-  }, SAVE_TO_LOCAL_STORAGE_TIMEOUT);
-
-  const onUsernameChange = (username: string) => {
-    saveUsernameToLocalStorage(username);
-  };
-
-  const onResize = () => {
-    setDimensions({
-      width: window.innerWidth,
-      height: window.innerHeight,
-    });
-  };
-
   useLayoutEffect(() => {
+    const onResize = () => {
+      setDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
     window.addEventListener("resize", onResize);
 
     return () => window.removeEventListener("resize", onResize);
