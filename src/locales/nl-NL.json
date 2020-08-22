@@ -152,7 +152,7 @@
     "trackedToSentry_post": " was gevolgd op ons systeem.",
     "openIssueMessage_pre": "We waren voorzichtig om je scène-informatie niet in de fout toe te voegen. Als je scène niet privé is, overweeg dan alstublieft het opvolgen op onze ",
     "openIssueMessage_button": "bug tracker.",
-    "openIssueMessage_post": " Kopieer de informatie hieronder toe in de GitHub issue.",
+    "openIssueMessage_post": " Kopieer de informatie hieronder naar de GitHub issue.",
     "sceneContent": "Scène-inhoud:"
   },
   "roomDialog": {
