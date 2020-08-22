@@ -99,9 +99,9 @@
     "roomDialog": "Live-samenwerkingssessie starten",
     "createNewRoom": "Creëer live-samenwerkingssessie",
     "toggleFullScreen": "Schermvullende weergave",
-    "toggleDarkMode": "",
-    "toggleZenMode": "",
-    "exitZenMode": ""
+    "toggleDarkMode": "Donkere modus in-/uitschakelen",
+    "toggleZenMode": "Zen modus in-/uitschakelen",
+    "exitZenMode": "Verlaat zen modus"
   },
   "alerts": {
     "clearReset": "Dit zal het hele canvas verwijderen. Ben je zeker?",
