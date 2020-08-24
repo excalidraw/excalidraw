@@ -157,9 +157,11 @@ import throttle from "lodash.throttle";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
   getSelectedGroupIds,
+  isSelectedViaGroup,
   selectGroupsForSelectedElements,
   isElementInGroup,
   getSelectedGroupIdForElement,
+  getElementsInGroup,
 } from "../groups";
 import { Library } from "../data/library";
 import Scene from "../scene/Scene";
@@ -238,6 +240,9 @@ type PointerDownState = Readonly<{
     // The element the pointer is "hitting", is determined on the initial
     // pointer down event
     element: NonDeleted<ExcalidrawElement> | null;
+    // The elements the pointer is "hitting", is determined on the initial
+    // pointer down event
+    allHitElements: NonDeleted<ExcalidrawElement>[];
     // This is determined on the initial pointer down event
     wasAddedToSelection: boolean;
     // Whether selected element(s) were duplicated, might change during the
@@ -2432,6 +2437,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       },
       hit: {
         element: null,
+        allHitElements: [],
         wasAddedToSelection: false,
         hasBeenDuplicated: false,
         hasHitCommonBoundingBoxOfSelectedElements: this.isHittingCommonBoundingBoxOfSelectedElements(
@@ -2584,18 +2590,17 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
         // For overlapped elements one position may hit
         // multiple elements
-        const allHitElements = this.getElementsAtPosition(
+        pointerDownState.hit.allHitElements = this.getElementsAtPosition(
           pointerDownState.origin.x,
           pointerDownState.origin.y,
         );
 
+        const allHitElements = pointerDownState.hit.allHitElements;
         const hitElement = pointerDownState.hit.element;
-        const isHittingOnlyOneElementElementAndItIsNotSelected =
-          !this.isHittingASelectedElement(hitElement) &&
-          allHitElements.length === 1;
+        const isHittingOnlyOneElementAndItIsNotSelected =
+          !this.isASelectedElement(hitElement) && allHitElements.length === 1;
         if (
-          (hitElement === null ||
-            isHittingOnlyOneElementElementAndItIsNotSelected) &&
+          (hitElement === null || isHittingOnlyOneElementAndItIsNotSelected) &&
           !event.shiftKey &&
           !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
         ) {
@@ -2623,8 +2628,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               return true;
             }
 
+            const isHittingIntersectionBetweenSelectedElementAndOtherElements =
+              allHitElements.filter((e) => this.isASelectedElement(e)).length >
+              0;
             if (
-              (allHitElements.length === 1 || selectedElements.length === 0) &&
+              (allHitElements.length === 1 ||
+                selectedElements.length === 0 ||
+                (event.shiftKey &&
+                  !isHittingIntersectionBetweenSelectedElementAndOtherElements)) &&
               !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
             ) {
               // Adds hit element to selection
@@ -2658,9 +2669,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     return false;
   };
 
-  private isHittingASelectedElement(
-    hitElement: ExcalidrawElement | null,
-  ): boolean {
+  private isASelectedElement(hitElement: ExcalidrawElement | null): boolean {
     return hitElement != null && this.state.selectedElementIds[hitElement.id];
   }
 
@@ -2668,6 +2677,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     point: Readonly<{ x: number; y: number }>,
     selectedElements: readonly ExcalidrawElement[],
   ): boolean {
+    if (selectedElements.length < 2) {
+      return false;
+    }
+
     // How many pixels off the shape boundary we still consider a hit
     const threshold = 10 / this.state.zoom;
     const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
@@ -2960,9 +2973,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         }
       }
 
-      const hitElement = pointerDownState.hit.element;
+      const hasHitASelectedElement =
+        pointerDownState.hit.allHitElements.filter((e) =>
+          this.isASelectedElement(e),
+        ).length > 0;
       if (
-        this.isHittingASelectedElement(hitElement) ||
+        hasHitASelectedElement ||
         pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
       ) {
         // Marking that click was used for dragging to check
@@ -2993,6 +3009,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             const elementsToAppend = [];
             const groupIdMap = new Map();
             const oldIdToDuplicatedId = new Map();
+            const hitElement = pointerDownState.hit.element;
             for (const element of this.scene.getElementsIncludingDeleted()) {
               if (
                 this.state.selectedElementIds[element.id] ||
@@ -3344,32 +3361,87 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         );
       }
 
-      // If click occurred on already selected element
-      // it is needed to remove selection from other elements
-      // or if SHIFT or META key pressed remove selection
-      // from hitted element
-      //
-      // If click occurred and elements were dragged or some element
-      // was added to selection (on pointerdown phase) we need to keep
-      // selection unchanged
+      // Code below handles selection when element(s) weren't
+      // drag or added to selection on pointer down phase.
       const hitElement = pointerDownState.hit.element;
       if (
-        getSelectedGroupIds(this.state).length === 0 &&
         hitElement &&
         !pointerDownState.drag.hasOccurred &&
         !pointerDownState.hit.wasAddedToSelection
       ) {
         if (childEvent.shiftKey) {
-          this.setState((prevState) => ({
-            selectedElementIds: {
-              ...prevState.selectedElementIds,
-              [hitElement!.id]: false,
-            },
-          }));
+          if (this.state.selectedElementIds[hitElement.id]) {
+            if (isSelectedViaGroup(this.state, hitElement)) {
+              // We want to unselect all groups hitElement is part of
+              //  as well as all elements that are part of the groups
+              //  hitElement is part of
+              const idsOfSelectedElementsThatAreInGroups = hitElement.groupIds
+                .flatMap((groupId) =>
+                  getElementsInGroup(this.scene.getElements(), groupId),
+                )
+                .map((element) => ({ [element.id]: false }))
+                .reduce((prevId, acc) => ({ ...prevId, ...acc }), {});
+
+              this.setState((_prevState) => ({
+                selectedGroupIds: {
+                  ..._prevState.selectedElementIds,
+                  ...hitElement.groupIds
+                    .map((gId) => ({ [gId]: false }))
+                    .reduce((prev, acc) => ({ ...prev, ...acc }), {}),
+                },
+                selectedElementIds: {
+                  ..._prevState.selectedElementIds,
+                  ...idsOfSelectedElementsThatAreInGroups,
+                },
+              }));
+            } else {
+              // remove element from selection while
+              // keeping prev elements selected
+              this.setState((prevState) => ({
+                selectedElementIds: {
+                  ...prevState.selectedElementIds,
+                  [hitElement!.id]: false,
+                },
+              }));
+            }
+          } else {
+            // add element to selection while
+            // keeping prev elements selected
+            this.setState((_prevState) => ({
+              selectedElementIds: {
+                ..._prevState.selectedElementIds,
+                [hitElement!.id]: true,
+              },
+            }));
+          }
         } else {
-          this.setState((_prevState) => ({
-            selectedElementIds: { [hitElement!.id]: true },
-          }));
+          if (isSelectedViaGroup(this.state, hitElement)) {
+            /*
+            We want to select the group(s) the hit element is in not the particular element.
+            That means we have to deselect elements that are not part of the groups of the
+             hit element, while keeping the elements that are.
+            */
+            const idsOfSelectedElementsThatAreInGroups = hitElement.groupIds
+              .flatMap((groupId) =>
+                getElementsInGroup(this.scene.getElements(), groupId),
+              )
+              .map((element) => ({ [element.id]: true }))
+              .reduce((prevId, acc) => ({ ...prevId, ...acc }), {});
+
+            this.setState((_prevState) => ({
+              selectedGroupIds: {
+                ...hitElement.groupIds
+                  .map((gId) => ({ [gId]: true }))
+                  .reduce((prevId, acc) => ({ ...prevId, ...acc }), {}),
+              },
+              selectedElementIds: { ...idsOfSelectedElementsThatAreInGroups },
+            }));
+          } else {
+            this.setState((_prevState) => ({
+              selectedGroupIds: {},
+              selectedElementIds: { [hitElement!.id]: true },
+            }));
+          }
         }
       }
 
@@ -3387,7 +3459,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             !this.state.isResizing &&
             pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements))
       ) {
-        // Deselect selected element
+        // Deselect selected elements
         this.setState({
           selectedElementIds: {},
           selectedGroupIds: {},
@@ -3842,5 +3914,4 @@ if (
     },
   });
 }
-
 export default App;

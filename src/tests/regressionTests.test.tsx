@@ -1501,4 +1501,165 @@ describe("regression tests", () => {
       expect(getSelectedElement().type).toBe("ellipse");
     },
   );
+
+  it(
+    "given a selected element A and a not selected element B with higher z-index than A " +
+      "and given B partialy overlaps A " +
+      "when there's a shift-click on the overlapped section B is added to the selection",
+    () => {
+      clickTool("rectangle");
+      // change background color since default is transparent
+      // and transparent elements can't be selected by clicking inside of them
+      clickLabeledElement("Background");
+      clickLabeledElement("#fa5252");
+      mouse.down();
+      mouse.up(1000, 1000);
+
+      // draw ellipse partially over rectangle.
+      // since ellipse was created after rectangle it has an higher z-index.
+      // we don't need to change background color again since change above
+      // affects next drawn elements.
+      clickTool("ellipse");
+      mouse.reset();
+      mouse.down(500, 500);
+      mouse.up(1000, 1000);
+
+      // select rectangle
+      mouse.reset();
+      mouse.click();
+
+      // click on intersection between ellipse and rectangle
+      withModifierKeys({ shift: true }, () => {
+        mouse.click(900, 900);
+      });
+
+      expect(getSelectedElements().length).toBe(2);
+    },
+  );
+
+  it("shift click on selected element should deselect it on pointer up", () => {
+    clickTool("rectangle");
+    mouse.down();
+    mouse.up(10, 10);
+
+    // Rectangle is already selected since creating
+    // it was our last action
+    withModifierKeys({ shift: true }, () => {
+      mouse.down();
+    });
+    expect(getSelectedElements().length).toBe(1);
+
+    withModifierKeys({ shift: true }, () => {
+      mouse.up();
+    });
+    expect(getSelectedElements().length).toBe(0);
+  });
 });
+
+it(
+  "given element A and group of elements B and given both are selected " +
+    "when user clicks on B, on pointer up " +
+    "only elements from B should be selected",
+  () => {
+    clickTool("rectangle");
+    mouse.down();
+    mouse.up(100, 100);
+
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(100, 100);
+
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(100, 100);
+
+    // Select first rectangle while keeping third one selected.
+    // Third rectangle is selected because it was the last element
+    //  to be created.
+    mouse.reset();
+    withModifierKeys({ shift: true }, () => {
+      mouse.click();
+    });
+
+    // Create group with first and third rectangle
+    withModifierKeys({ ctrl: true }, () => {
+      keyPress("g");
+    });
+
+    expect(getSelectedElements().length).toBe(2);
+    const selectedGroupIds = Object.keys(h.state.selectedGroupIds);
+    expect(selectedGroupIds.length).toBe(1);
+
+    // Select second rectangle without deselecting group
+    withModifierKeys({ shift: true }, () => {
+      mouse.click(110, 110);
+    });
+    expect(getSelectedElements().length).toBe(3);
+
+    // pointer down on first rectangle that is
+    // part of the group
+    mouse.reset();
+    mouse.down();
+    expect(getSelectedElements().length).toBe(3);
+
+    // should only deselect on pointer up
+    mouse.up();
+    expect(getSelectedElements().length).toBe(2);
+    const newSelectedGroupIds = Object.keys(h.state.selectedGroupIds);
+    expect(newSelectedGroupIds.length).toBe(1);
+  },
+);
+
+it(
+  "given element A and group of elements B and given both are selected " +
+    "when user shift-clicks on B, on pointer up " +
+    "only element A should be selected",
+  () => {
+    clickTool("rectangle");
+    mouse.down();
+    mouse.up(100, 100);
+
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(100, 100);
+
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(100, 100);
+
+    // Select first rectangle while keeping third one selected.
+    // Third rectangle is selected because it was the last element
+    //  to be created.
+    mouse.reset();
+    withModifierKeys({ shift: true }, () => {
+      mouse.click();
+    });
+
+    // Create group with first and third rectangle
+    withModifierKeys({ ctrl: true }, () => {
+      keyPress("g");
+    });
+
+    expect(getSelectedElements().length).toBe(2);
+    const selectedGroupIds = Object.keys(h.state.selectedGroupIds);
+    expect(selectedGroupIds.length).toBe(1);
+
+    // Select second rectangle without deselecting group
+    withModifierKeys({ shift: true }, () => {
+      mouse.click(110, 110);
+    });
+    expect(getSelectedElements().length).toBe(3);
+
+    // pointer down o first rectangle that is
+    // part of the group
+    mouse.reset();
+    withModifierKeys({ shift: true }, () => {
+      mouse.down();
+    });
+    expect(getSelectedElements().length).toBe(3);
+    withModifierKeys({ shift: true }, () => {
+      mouse.up();
+    });
+    expect(getSelectedElements().length).toBe(1);
+  },
+);
