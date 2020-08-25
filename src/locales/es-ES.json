@@ -134,6 +134,7 @@
   "hints": {
     "linearElement": "Haga clic para dibujar multiples puntos o arrastre para una sola línea",
     "freeDraw": "Haz clic y arrastra, suelta al terminar",
+    "text": "",
     "linearElementMulti": "Haga clic en el último punto o pulse Escape o Enter para finalizar",
     "resize": "Para mantener las proporciones mantén SHIFT presionado mientras modificas el tamaño, \nmantén presionado ALT para modificar el tamaño desde el centro",
     "rotate": "Puede restringir los ángulos manteniendo presionado SHIFT mientras gira",
