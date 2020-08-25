@@ -2597,10 +2597,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
         const allHitElements = pointerDownState.hit.allHitElements;
         const hitElement = pointerDownState.hit.element;
-        const isHittingOnlyOneElementAndItIsNotSelected =
-          !this.isASelectedElement(hitElement) && allHitElements.length === 1;
+        const someHitElementIsSelected = allHitElements.some((element) =>
+          this.isASelectedElement(element),
+        );
         if (
-          (hitElement === null || isHittingOnlyOneElementAndItIsNotSelected) &&
+          (hitElement === null || !someHitElementIsSelected) &&
           !event.shiftKey &&
           !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
         ) {
@@ -2628,14 +2629,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               return true;
             }
 
-            const isHittingIntersectionBetweenSelectedElementAndOtherElements =
-              allHitElements.filter((e) => this.isASelectedElement(e)).length >
-              0;
             if (
-              (allHitElements.length === 1 ||
-                selectedElements.length === 0 ||
-                (event.shiftKey &&
-                  !isHittingIntersectionBetweenSelectedElementAndOtherElements)) &&
+              !someHitElementIsSelected &&
               !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
             ) {
               // Adds hit element to selection
@@ -2973,10 +2968,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         }
       }
 
-      const hasHitASelectedElement =
-        pointerDownState.hit.allHitElements.filter((e) =>
-          this.isASelectedElement(e),
-        ).length > 0;
+      const hasHitASelectedElement = pointerDownState.hit.allHitElements.some(
+        (element) => this.isASelectedElement(element),
+      );
       if (
         hasHitASelectedElement ||
         pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements

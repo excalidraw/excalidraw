@@ -1243,6 +1243,31 @@ describe("regression tests", () => {
     expect(getSelectedElement().type).toBe("rectangle");
   });
 
+  it("can drag element that covers another element, while another elem is selected", () => {
+    clickTool("rectangle");
+    mouse.down(100, 100);
+    mouse.up(200, 200);
+
+    clickTool("rectangle");
+    mouse.reset();
+    mouse.down(100, 100);
+    mouse.up(200, 200);
+
+    clickTool("ellipse");
+    mouse.reset();
+    mouse.down(300, 300);
+    mouse.up(350, 350);
+
+    expect(getSelectedElement().type).toBe("ellipse");
+
+    // pointer down on rectangle
+    mouse.reset();
+    mouse.down(100, 100);
+    mouse.up(200, 200);
+
+    expect(getSelectedElement().type).toBe("rectangle");
+  });
+
   it("deselects selected element on pointer down when pointer doesn't hit any element", () => {
     clickTool("rectangle");
     mouse.down();
