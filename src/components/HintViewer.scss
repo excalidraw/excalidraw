@@ -8,17 +8,15 @@
   position: absolute;
   top: 54px;
   transform: translateX(calc(-50% - 16px)); /* 16px is half of lock icon */
+  padding: 0.2rem 0.4rem;
   white-space: pre;
   text-align: center;
+  background-color: var(--overlay-background-color);
+  border-radius: 4px;
+
   @media #{$media-query} {
     position: static;
     transform: none;
     margin-top: 0.5rem;
-  }
-
-  > span {
-    background-color: var(--overlay-background-color);
-    padding: 0.2rem 0.4rem;
-    border-radius: 3px;
   }
 }
