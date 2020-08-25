@@ -72,7 +72,7 @@
     "addToLibrary": "Lisää kirjastoon",
     "removeFromLibrary": "Poista kirjastosta",
     "libraryLoadingMessage": "Ladataan kirjastoa...",
-    "loadingScene": ""
+    "loadingScene": "Ladataan työtä..."
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
@@ -134,6 +134,7 @@
   "hints": {
     "linearElement": "Klikkaa piirtääksesi useampi piste, raahaa piirtääksesi yksittäinen viiva",
     "freeDraw": "Paina ja raahaa, päästä irti kun olet valmis",
+    "text": "Vinkki: voit myös lisätä tekstiä kaksoisnapsauttamalla mihin tahansa valintatyökalulla",
     "linearElementMulti": "Klikkaa viimeistä pistettä, paina Escape tai paina Enter lopettaaksesi",
     "resize": "Voit rajoittaa mittasuhteet pitämällä SHIFT pohjassa kun muutat kokoa, pidä ALT pohjassa muuttaaksesi kokoa keskipisteen suhteen",
     "rotate": "Voit rajoittaa kulman pitämällä SHIFT pohjassa pyörittäessäsi",

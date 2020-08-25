@@ -134,6 +134,7 @@
   "hints": {
     "linearElement": "Fer clic per dibuixar múltiples punts; arrossegar per una sola línea",
     "freeDraw": "Fer clic i arrosegar, deixar anar al punt final",
+    "text": "",
     "linearElementMulti": "Fer clic a l'ultim punt, o polsar Escape o Enter per acabar",
     "resize": "Per restringir les proporcions mentres es canvia la mida, mantenir premut el majúscul (SHIFT); per canviar la mida des del centre, mantenir premut ALT",
     "rotate": "Per restringir els angles mentre gira, mantenir premut el majúscul (SHIFT)",

@@ -26,8 +26,8 @@
     "opacity": "Opaklık",
     "textAlign": "Metin hizala",
     "edges": "",
-    "sharp": "",
-    "round": "",
+    "sharp": "Keskin",
+    "round": "Yuvarlak",
     "fontSize": "Yazı tipi boyutu",
     "fontFamily": "Yazı tipi ailesi",
     "onlySelected": "Sadece seçilen",
@@ -72,7 +72,7 @@
     "addToLibrary": "Kütüphaneye ekle",
     "removeFromLibrary": "Kütüphaneden kaldır",
     "libraryLoadingMessage": "Kütüphane yükleniyor...",
-    "loadingScene": ""
+    "loadingScene": "Çalışma alanı yükleniyor..."
   },
   "buttons": {
     "clearReset": "Tuvali sıfırla",
@@ -99,7 +99,7 @@
     "roomDialog": "Ortak çalışma ortamı yarat",
     "createNewRoom": "Yeni oda oluştur",
     "toggleFullScreen": "Tam ekranı aç/kapa",
-    "toggleDarkMode": "",
+    "toggleDarkMode": "Karanlık modu aç/kapa",
     "toggleZenMode": "Zen modunu aç/kapa",
     "exitZenMode": "Zen modundan çık"
   },
@@ -134,6 +134,7 @@
   "hints": {
     "linearElement": "Birden fazla nokta için tıklayın, tek çizgi için sürükleyin",
     "freeDraw": "Tıkla ve sürükle, bitirdiğinde serbest bırak",
+    "text": "",
     "linearElementMulti": "Tamamlamak için son noktayı seçin veya Escape ve Enter'dan birine basın",
     "resize": "Yeniden boyutlandırırken SHIFT'e basılı tutarak oranları kısıtlayabilirsiniz, merkezden yeniden boyutlandırmak için ALT'a basılı tutun",
     "rotate": "Döndürürken SHIFT tuşuna basılı tutarak açıları koruyabilirsiniz",

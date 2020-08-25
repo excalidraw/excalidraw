@@ -2,8 +2,8 @@
   "labels": {
     "paste": "Plakken",
     "selectAll": "Alles selecteren",
-    "multiSelect": "",
-    "moveCanvas": "",
+    "multiSelect": "Voeg element toe aan selectie",
+    "moveCanvas": "Canvas verplaatsen",
     "copy": "Kopiëren",
     "copyAsPng": "Kopieer als PNG",
     "copyAsSvg": "Kopieer als SVG",
@@ -12,22 +12,22 @@
     "bringToFront": "Breng naar voorgrond",
     "sendBackward": "Breng naar achter",
     "delete": "Verwijderen",
-    "copyStyles": "Stijl kopiëren",
-    "pasteStyles": "Stijl plakken",
+    "copyStyles": "Opmaak kopiëren",
+    "pasteStyles": "Opmaak plakken",
     "stroke": "Lijn",
     "background": "Achtergrond",
     "fill": "Invulling",
     "strokeWidth": "Lijnbreedte",
-    "strokeStyle": "",
-    "strokeStyle_solid": "",
-    "strokeStyle_dashed": "",
-    "strokeStyle_dotted": "",
+    "strokeStyle": "Lijnstijl",
+    "strokeStyle_solid": "Ononderbroken",
+    "strokeStyle_dashed": "Gestreept",
+    "strokeStyle_dotted": "Gestippeld",
     "sloppiness": "Slordigheid",
     "opacity": "Doorzichtigheid",
     "textAlign": "Uitlijning",
-    "edges": "",
+    "edges": "Randen",
     "sharp": "",
-    "round": "",
+    "round": "Rond",
     "fontSize": "Tekstgrootte",
     "fontFamily": "Lettertype",
     "onlySelected": "Enkel geselecteerde",
@@ -65,14 +65,14 @@
     "name": "Naam",
     "yourName": "Jouw naam",
     "madeWithExcalidraw": "Gemaakt met Excalidraw",
-    "group": "",
-    "ungroup": "",
+    "group": "Groeperen",
+    "ungroup": "Groep opheffen",
     "collaborators": "",
-    "toggleGridMode": "",
-    "addToLibrary": "",
-    "removeFromLibrary": "",
-    "libraryLoadingMessage": "",
-    "loadingScene": ""
+    "toggleGridMode": "Rasterlijnen in-/uitschakelen",
+    "addToLibrary": "Voeg toe aan bibliotheek",
+    "removeFromLibrary": "Verwijder uit bibliotheek",
+    "libraryLoadingMessage": "Bibliotheek laden...",
+    "loadingScene": "Scène laden..."
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
@@ -82,7 +82,7 @@
     "copyToClipboard": "Kopieer",
     "copyPngToClipboard": "Kopieer als PNG",
     "save": "Opslaan",
-    "saveAs": "",
+    "saveAs": "Opslaan als",
     "load": "Open",
     "getShareableLink": "Maak een deelbare link",
     "close": "Sluiten",
@@ -98,13 +98,13 @@
     "redo": "Herstel ongedaan maken",
     "roomDialog": "Live-samenwerkingssessie starten",
     "createNewRoom": "Creëer live-samenwerkingssessie",
-    "toggleFullScreen": "Schermvullende weergave",
-    "toggleDarkMode": "",
-    "toggleZenMode": "",
-    "exitZenMode": ""
+    "toggleFullScreen": "Volledig scherm in-/uitschakelen",
+    "toggleDarkMode": "Donkere modus in-/uitschakelen",
+    "toggleZenMode": "Zen modus in-/uitschakelen",
+    "exitZenMode": "Verlaat zen modus"
   },
   "alerts": {
-    "clearReset": "Dit zal het hele canvas verwijderen. Ben je zeker?",
+    "clearReset": "Dit zal het hele canvas verwijderen. Weet je het zeker?",
     "couldNotCreateShareableLink": "Kon geen deelbare link aanmaken.",
     "couldNotLoadInvalidFile": "Kan ongeldig bestand niet laden",
     "importBackendFailed": "Importeren vanuit backend mislukt.",
@@ -112,18 +112,18 @@
     "couldNotCopyToClipboard": "Kan niet kopiëren. Probeer in de Chrome-browser.",
     "decryptFailed": "Kan gegevens niet decoderen.",
     "uploadedSecurly": "De upload is beveiligd met end-to-end encryptie, wat betekent dat de Excalidraw server en derden de inhoud niet kunnen lezen.",
-    "loadSceneOverridePrompt": ""
+    "loadSceneOverridePrompt": "Het laden van externe tekening zal uw bestaande inhoud vervangen. Wil je doorgaan?"
   },
   "toolBar": {
     "selection": "Selectie",
-    "draw": "",
+    "draw": "Vrij tekenen",
     "rectangle": "Rechthoek",
     "diamond": "Ruit",
     "ellipse": "Ovaal",
     "arrow": "Pijl",
     "line": "Lijn",
     "text": "Tekst",
-    "library": "",
+    "library": "Bibliotheek",
     "lock": "Geselecteerde tool actief houden na tekenen"
   },
   "headings": {
@@ -133,13 +133,14 @@
   },
   "hints": {
     "linearElement": "Klik om meerdere punten te starten, sleep voor één lijn",
-    "freeDraw": "",
+    "freeDraw": "Klik en sleep, laat los als je klaar bent",
+    "text": "Tip: je kunt tekst toevoegen door ergens dubbel te klikken met de selectietool",
     "linearElementMulti": "Klik op het laatste punt of druk op Escape of Enter om te stoppen",
-    "resize": "",
+    "resize": "Houd tijdens het vergroten SHIFT ingedrukt om verhoudingen te behouden,\ngebruik ALT om vanuit het midden te vergroten/verkleinen",
     "rotate": "Je kan hoeken beperken door SHIFT ingedrukt te houden wanneer je draait",
-    "lineEditor_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": ""
+    "lineEditor_info": "Dubbelklik of druk op Enter om punten te bewerken",
+    "lineEditor_pointSelected": "Druk op Delete om een punt te verwijderen, op CtrlOrCmd+D om te kopiëren, of sleeg om te verplaatsen",
+    "lineEditor_nothingSelected": "Selecteer een punt om te verplaatsen of te verwijderen, of houd Alt ingedrukt en klik om nieuwe punten toe te voegen"
   },
   "errorSplash": {
     "headingMain_pre": "Fout opgetreden. Probeer ",
@@ -151,7 +152,7 @@
     "trackedToSentry_post": " was gevolgd op ons systeem.",
     "openIssueMessage_pre": "We waren voorzichtig om je scène-informatie niet in de fout toe te voegen. Als je scène niet privé is, overweeg dan alstublieft het opvolgen op onze ",
     "openIssueMessage_button": "bug tracker.",
-    "openIssueMessage_post": " Kopieer de informatie hieronder toe in de GitHub issue.",
+    "openIssueMessage_post": " Kopieer de informatie hieronder naar de GitHub issue.",
     "sceneContent": "Scène-inhoud:"
   },
   "roomDialog": {
@@ -186,10 +187,10 @@
     "preventBinding": ""
   },
   "encrypted": {
-    "tooltip": ""
+    "tooltip": "Je tekeningen zijn beveiligd met end-to-end encryptie, dus Excalidraw's servers zullen nooit zien wat je tekent."
   },
   "charts": {
-    "noNumericColumn": "",
-    "tooManyColumns": ""
+    "noNumericColumn": "Je hebt een werkblad geplakt zonder een numerieke kolom.",
+    "tooManyColumns": "Je hebt een werkblad geplakt met meer dan twee kolommen."
   }
 }
