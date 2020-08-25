@@ -2,6 +2,7 @@ import React, { useState, useLayoutEffect } from "react";
 import ReactDOM from "react-dom";
 import * as Sentry from "@sentry/browser";
 import * as SentryIntegrations from "@sentry/integrations";
+import ReactGA from "react-ga";
 
 import { EVENT } from "./constants";
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
@@ -86,6 +87,10 @@ function ExcalidrawApp() {
     </TopErrorBoundary>
   );
 }
+
+const trackingId = "UA-176402147-1"; // Google Analytics tracking ID - scribble.devs@gmail.com
+ReactGA.initialize(trackingId);
+ReactGA.pageview("/default");
 
 const rootElement = document.getElementById("root");
 
