@@ -102,6 +102,53 @@
       gtag("config", "UA-387204-13");
     </script>
     <% } %>
+
+    <!-- FIXME: remove this when we update CRA (fix SW caching) -->
+    <style>
+      /* http://www.eaglefonts.com/fg-virgil-ttf-131249.htm */
+      @font-face {
+        font-family: "Virgil";
+        src: url("/FG_Virgil.woff2");
+        font-display: swap;
+      }
+
+      /* https://github.com/microsoft/cascadia-code */
+      @font-face {
+        font-family: "Cascadia";
+        src: url("/Cascadia.woff2");
+        font-display: swap;
+      }
+
+      .visually-hidden {
+        position: absolute !important;
+        height: 1px;
+        width: 1px;
+        overflow: hidden;
+        clip: rect(1px, 1px, 1px, 1px);
+        white-space: nowrap; /* added line */
+      }
+
+      .LoadingMessage {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+      }
+
+      .LoadingMessage span {
+        background-color: var(--button-gray-1);
+        border-radius: 5px;
+        padding: 0.8em 1.2em;
+        color: var(--popup-text-color);
+        font-size: 1.3em;
+      }
+    </style>
   </head>
 
   <body>
