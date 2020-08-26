@@ -2595,10 +2595,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           pointerDownState.origin.y,
         );
 
-        const allHitElements = pointerDownState.hit.allHitElements;
         const hitElement = pointerDownState.hit.element;
-        const someHitElementIsSelected = allHitElements.some((element) =>
-          this.isASelectedElement(element),
+        const someHitElementIsSelected = pointerDownState.hit.allHitElements.some(
+          (element) => this.isASelectedElement(element),
         );
         if (
           (hitElement === null || !someHitElementIsSelected) &&
@@ -2629,11 +2628,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               return true;
             }
 
+            // Add hit element to selection. At this point if we're not holding
+            //  SHIFT the previously selected element(s) were deselected above
+            //  (make sure you use setState updater to use latest state)
             if (
               !someHitElementIsSelected &&
               !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
             ) {
-              // Adds hit element to selection
               this.setState((prevState) => {
                 return selectGroupsForSelectedElements(
                   {
@@ -2646,10 +2647,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
                   this.scene.getElements(),
                 );
               });
-              // TODO: this is strange...
-              this.scene.replaceAllElements(
-                this.scene.getElementsIncludingDeleted(),
-              );
               pointerDownState.hit.wasAddedToSelection = true;
             }
           }
@@ -3442,6 +3439,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       if (
         !this.state.editingLinearElement &&
         !pointerDownState.drag.hasOccurred &&
+        !this.state.isResizing &&
         ((hitElement &&
           isHittingElementBoundingBoxWithoutHittingElement(
             hitElement,
@@ -3449,8 +3447,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             pointerDownState.origin.x,
             pointerDownState.origin.y,
           )) ||
-          (hitElement === null &&
-            !this.state.isResizing &&
+          (!hitElement &&
             pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements))
       ) {
         // Deselect selected elements
