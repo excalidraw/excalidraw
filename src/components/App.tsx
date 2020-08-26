@@ -31,11 +31,12 @@ import {
   getDragOffsetXY,
   dragNewElement,
   hitTest,
+  isHittingElementBoundingBoxWithoutHittingElement,
 } from "../element";
 import {
   getElementsWithinSelection,
   isOverScrollBars,
-  getElementAtPosition,
+  getElementsAtPosition,
   getElementContainingPosition,
   getNormalizedZoom,
   getSelectedElements,
@@ -151,9 +152,11 @@ import throttle from "lodash.throttle";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
   getSelectedGroupIds,
+  isSelectedViaGroup,
   selectGroupsForSelectedElements,
   isElementInGroup,
   getSelectedGroupIdForElement,
+  getElementsInGroup,
 } from "../groups";
 import { Library } from "../data/library";
 import Scene from "../scene/Scene";
@@ -231,12 +234,16 @@ type PointerDownState = Readonly<{
   hit: {
     // The element the pointer is "hitting", is determined on the initial
     // pointer down event
-    element: ExcalidrawElement | null;
+    element: NonDeleted<ExcalidrawElement> | null;
+    // The elements the pointer is "hitting", is determined on the initial
+    // pointer down event
+    allHitElements: NonDeleted<ExcalidrawElement>[];
     // This is determined on the initial pointer down event
     wasAddedToSelection: boolean;
     // Whether selected element(s) were duplicated, might change during the
-    // pointer interation
+    // pointer interaction
     hasBeenDuplicated: boolean;
+    hasHitCommonBoundingBoxOfSelectedElements: boolean;
   };
   drag: {
     // Might change during the pointer interation
@@ -1713,7 +1720,32 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     x: number,
     y: number,
   ): NonDeleted<ExcalidrawElement> | null {
-    return getElementAtPosition(this.scene.getElements(), (element) =>
+    const allHitElements = this.getElementsAtPosition(x, y);
+    if (allHitElements.length > 1) {
+      const elementWithHighestZIndex =
+        allHitElements[allHitElements.length - 1];
+      // If we're hitting element with highest z-index only on its bounding box
+      // while also hitting other element figure, the latter should be considered.
+      return isHittingElementBoundingBoxWithoutHittingElement(
+        elementWithHighestZIndex,
+        this.state,
+        x,
+        y,
+      )
+        ? allHitElements[allHitElements.length - 2]
+        : elementWithHighestZIndex;
+    }
+    if (allHitElements.length === 1) {
+      return allHitElements[0];
+    }
+    return null;
+  }
+
+  private getElementsAtPosition(
+    x: number,
+    y: number,
+  ): NonDeleted<ExcalidrawElement>[] {
+    return getElementsAtPosition(this.scene.getElements(), (element) =>
       hitTest(element, this.state, x, y),
     );
   }
@@ -2084,14 +2116,27 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         return;
       }
     }
-    const hitElement = this.getElementAtPosition(scenePointerX, scenePointerY);
+
+    const hitElement = this.getElementAtPosition(
+      scenePointer.x,
+      scenePointer.y,
+    );
     if (this.state.elementType === "text") {
       document.documentElement.style.cursor = isTextElement(hitElement)
         ? CURSOR_TYPE.TEXT
         : CURSOR_TYPE.CROSSHAIR;
+    } else if (isOverScrollBar) {
+      document.documentElement.style.cursor = CURSOR_TYPE.AUTO;
+    } else if (
+      hitElement ||
+      this.isHittingCommonBoundingBoxOfSelectedElements(
+        scenePointer,
+        selectedElements,
+      )
+    ) {
+      document.documentElement.style.cursor = CURSOR_TYPE.MOVE;
     } else {
-      document.documentElement.style.cursor =
-        hitElement && !isOverScrollBar ? "move" : "";
+      document.documentElement.style.cursor = CURSOR_TYPE.AUTO;
     }
   };
 
@@ -2370,8 +2415,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       },
       hit: {
         element: null,
+        allHitElements: [],
         wasAddedToSelection: false,
         hasBeenDuplicated: false,
+        hasHitCommonBoundingBoxOfSelectedElements: this.isHittingCommonBoundingBoxOfSelectedElements(
+          origin,
+          selectedElements,
+        ),
       },
       drag: {
         hasOccurred: false,
@@ -2516,13 +2566,26 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             pointerDownState.origin.y,
           );
 
-        this.maybeClearSelectionWhenHittingElement(
-          event,
-          pointerDownState.hit.element,
+        // For overlapped elements one position may hit
+        // multiple elements
+        pointerDownState.hit.allHitElements = this.getElementsAtPosition(
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
         );
 
-        // If we click on something
         const hitElement = pointerDownState.hit.element;
+        const someHitElementIsSelected = pointerDownState.hit.allHitElements.some(
+          (element) => this.isASelectedElement(element),
+        );
+        if (
+          (hitElement === null || !someHitElementIsSelected) &&
+          !event.shiftKey &&
+          !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
+        ) {
+          this.clearSelection(hitElement);
+        }
+
+        // If we click on something
         if (hitElement != null) {
           // deselect if item is selected
           // if shift is not clicked, this will always return true
@@ -2542,23 +2605,28 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               });
               return true;
             }
-            this.setState((prevState) => {
-              return selectGroupsForSelectedElements(
-                {
-                  ...prevState,
-                  selectedElementIds: {
-                    ...prevState.selectedElementIds,
-                    [hitElement!.id]: true,
+
+            // Add hit element to selection. At this point if we're not holding
+            //  SHIFT the previously selected element(s) were deselected above
+            //  (make sure you use setState updater to use latest state)
+            if (
+              !someHitElementIsSelected &&
+              !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
+            ) {
+              this.setState((prevState) => {
+                return selectGroupsForSelectedElements(
+                  {
+                    ...prevState,
+                    selectedElementIds: {
+                      ...prevState.selectedElementIds,
+                      [hitElement!.id]: true,
+                    },
                   },
-                },
-                this.scene.getElements(),
-              );
-            });
-            // TODO: this is strange...
-            this.scene.replaceAllElements(
-              this.scene.getElementsIncludingDeleted(),
-            );
-            pointerDownState.hit.wasAddedToSelection = true;
+                  this.scene.getElements(),
+                );
+              });
+              pointerDownState.hit.wasAddedToSelection = true;
+            }
           }
         }
 
@@ -2570,6 +2638,29 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
     return false;
   };
+
+  private isASelectedElement(hitElement: ExcalidrawElement | null): boolean {
+    return hitElement != null && this.state.selectedElementIds[hitElement.id];
+  }
+
+  private isHittingCommonBoundingBoxOfSelectedElements(
+    point: Readonly<{ x: number; y: number }>,
+    selectedElements: readonly ExcalidrawElement[],
+  ): boolean {
+    if (selectedElements.length < 2) {
+      return false;
+    }
+
+    // How many pixels off the shape boundary we still consider a hit
+    const threshold = 10 / this.state.zoom;
+    const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
+    return (
+      point.x > x1 - threshold &&
+      point.x < x2 + threshold &&
+      point.y > y1 - threshold &&
+      point.y < y2 + threshold
+    );
+  }
 
   private handleTextOnPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
@@ -2852,8 +2943,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         }
       }
 
-      const hitElement = pointerDownState.hit.element;
-      if (hitElement && this.state.selectedElementIds[hitElement.id]) {
+      const hasHitASelectedElement = pointerDownState.hit.allHitElements.some(
+        (element) => this.isASelectedElement(element),
+      );
+      if (
+        hasHitASelectedElement ||
+        pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
+      ) {
         // Marking that click was used for dragging to check
         // if elements should be deselected on pointerup
         pointerDownState.drag.hasOccurred = true;
@@ -2882,12 +2978,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             const elementsToAppend = [];
             const groupIdMap = new Map();
             const oldIdToDuplicatedId = new Map();
+            const hitElement = pointerDownState.hit.element;
             for (const element of this.scene.getElementsIncludingDeleted()) {
               if (
                 this.state.selectedElementIds[element.id] ||
                 // case: the state.selectedElementIds might not have been
                 //  updated yet by the time this mousemove event is fired
-                (element.id === hitElement.id &&
+                (element.id === hitElement?.id &&
                   pointerDownState.hit.wasAddedToSelection)
               ) {
                 const duplicatedElement = duplicateElement(
@@ -3125,6 +3222,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         this.actionManager.executeAction(actionFinalize);
         return;
       }
+
       if (isLinearElement(draggingElement)) {
         if (draggingElement!.points.length > 1) {
           history.resumeRecording();
@@ -3135,6 +3233,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           this.canvas,
           window.devicePixelRatio,
         );
+
         if (
           !pointerDownState.drag.hasOccurred &&
           draggingElement &&
@@ -3186,6 +3285,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             }));
           }
         }
+
         return;
       }
 
@@ -3230,33 +3330,109 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         );
       }
 
-      // If click occurred on already selected element
-      // it is needed to remove selection from other elements
-      // or if SHIFT or META key pressed remove selection
-      // from hitted element
-      //
-      // If click occurred and elements were dragged or some element
-      // was added to selection (on pointerdown phase) we need to keep
-      // selection unchanged
+      // Code below handles selection when element(s) weren't
+      // drag or added to selection on pointer down phase.
       const hitElement = pointerDownState.hit.element;
       if (
-        getSelectedGroupIds(this.state).length === 0 &&
         hitElement &&
         !pointerDownState.drag.hasOccurred &&
         !pointerDownState.hit.wasAddedToSelection
       ) {
         if (childEvent.shiftKey) {
-          this.setState((prevState) => ({
-            selectedElementIds: {
-              ...prevState.selectedElementIds,
-              [hitElement!.id]: false,
-            },
-          }));
+          if (this.state.selectedElementIds[hitElement.id]) {
+            if (isSelectedViaGroup(this.state, hitElement)) {
+              // We want to unselect all groups hitElement is part of
+              //  as well as all elements that are part of the groups
+              //  hitElement is part of
+              const idsOfSelectedElementsThatAreInGroups = hitElement.groupIds
+                .flatMap((groupId) =>
+                  getElementsInGroup(this.scene.getElements(), groupId),
+                )
+                .map((element) => ({ [element.id]: false }))
+                .reduce((prevId, acc) => ({ ...prevId, ...acc }), {});
+
+              this.setState((_prevState) => ({
+                selectedGroupIds: {
+                  ..._prevState.selectedElementIds,
+                  ...hitElement.groupIds
+                    .map((gId) => ({ [gId]: false }))
+                    .reduce((prev, acc) => ({ ...prev, ...acc }), {}),
+                },
+                selectedElementIds: {
+                  ..._prevState.selectedElementIds,
+                  ...idsOfSelectedElementsThatAreInGroups,
+                },
+              }));
+            } else {
+              // remove element from selection while
+              // keeping prev elements selected
+              this.setState((prevState) => ({
+                selectedElementIds: {
+                  ...prevState.selectedElementIds,
+                  [hitElement!.id]: false,
+                },
+              }));
+            }
+          } else {
+            // add element to selection while
+            // keeping prev elements selected
+            this.setState((_prevState) => ({
+              selectedElementIds: {
+                ..._prevState.selectedElementIds,
+                [hitElement!.id]: true,
+              },
+            }));
+          }
         } else {
-          this.setState((_prevState) => ({
-            selectedElementIds: { [hitElement!.id]: true },
-          }));
+          if (isSelectedViaGroup(this.state, hitElement)) {
+            /*
+            We want to select the group(s) the hit element is in not the particular element.
+            That means we have to deselect elements that are not part of the groups of the
+             hit element, while keeping the elements that are.
+            */
+            const idsOfSelectedElementsThatAreInGroups = hitElement.groupIds
+              .flatMap((groupId) =>
+                getElementsInGroup(this.scene.getElements(), groupId),
+              )
+              .map((element) => ({ [element.id]: true }))
+              .reduce((prevId, acc) => ({ ...prevId, ...acc }), {});
+
+            this.setState((_prevState) => ({
+              selectedGroupIds: {
+                ...hitElement.groupIds
+                  .map((gId) => ({ [gId]: true }))
+                  .reduce((prevId, acc) => ({ ...prevId, ...acc }), {}),
+              },
+              selectedElementIds: { ...idsOfSelectedElementsThatAreInGroups },
+            }));
+          } else {
+            this.setState((_prevState) => ({
+              selectedGroupIds: {},
+              selectedElementIds: { [hitElement!.id]: true },
+            }));
+          }
         }
+      }
+
+      if (
+        !this.state.editingLinearElement &&
+        !pointerDownState.drag.hasOccurred &&
+        !this.state.isResizing &&
+        ((hitElement &&
+          isHittingElementBoundingBoxWithoutHittingElement(
+            hitElement,
+            this.state,
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
+          )) ||
+          (!hitElement &&
+            pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements))
+      ) {
+        // Deselect selected elements
+        this.setState({
+          selectedElementIds: {},
+          selectedGroupIds: {},
+        });
       }
 
       if (draggingElement === null) {
@@ -3359,17 +3535,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.setState({ suggestedBindings });
   }
 
-  private maybeClearSelectionWhenHittingElement(
-    event: React.PointerEvent<HTMLCanvasElement>,
-    hitElement: ExcalidrawElement | null,
-  ): void {
-    const isHittingASelectedElement =
-      hitElement != null && this.state.selectedElementIds[hitElement.id];
-
-    // clear selection if shift is not clicked
-    if (isHittingASelectedElement || event.shiftKey) {
-      return;
-    }
+  private clearSelection(hitElement: ExcalidrawElement | null): void {
     this.setState((prevState) => ({
       selectedElementIds: {},
       selectedGroupIds: {},
@@ -3713,5 +3879,4 @@ if (
     },
   });
 }
-
 export default App;

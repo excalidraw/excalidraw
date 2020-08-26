@@ -11,6 +11,8 @@ export const CURSOR_TYPE = {
   CROSSHAIR: "crosshair",
   GRABBING: "grabbing",
   POINTER: "pointer",
+  MOVE: "move",
+  AUTO: "",
 };
 export const POINTER_BUTTON = {
   MAIN: 0,

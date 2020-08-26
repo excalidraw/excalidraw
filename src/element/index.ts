@@ -26,7 +26,10 @@ export {
   getTransformHandlesFromCoords,
   getTransformHandles,
 } from "./transformHandles";
-export { hitTest } from "./collision";
+export {
+  hitTest,
+  isHittingElementBoundingBoxWithoutHittingElement,
+} from "./collision";
 export {
   resizeTest,
   getCursorForResizingElement,
