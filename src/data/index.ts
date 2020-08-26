@@ -18,12 +18,10 @@ import { serializeAsJSON } from "./json";
 
 import { ExportType } from "../scene/types";
 import { restore } from "./restore";
-import { restoreFromLocalStorage } from "./localStorage";
 import { DataState } from "./types";
 
 export { loadFromBlob } from "./blob";
 export { saveAsJSON, loadFromJSON } from "./json";
-export { saveToLocalStorage } from "./localStorage";
 
 const BACKEND_GET = process.env.REACT_APP_BACKEND_V1_GET_URL;
 
@@ -233,7 +231,7 @@ export const exportToBackend = async (
   }
 };
 
-export const importFromBackend = async (
+const importFromBackend = async (
   id: string | null,
   privateKey?: string | null,
 ) => {
@@ -246,7 +244,7 @@ export const importFromBackend = async (
     );
     if (!response.ok) {
       window.alert(t("alerts.importBackendFailed"));
-      return restore(elements, appState);
+      return { elements, appState };
     }
     let data;
     if (privateKey) {
@@ -277,7 +275,7 @@ export const importFromBackend = async (
     window.alert(t("alerts.importBackendFailed"));
     console.error(error);
   } finally {
-    return restore(elements, appState);
+    return { elements, appState };
   }
 };
 
@@ -374,9 +372,13 @@ export const loadScene = async (
   if (id != null) {
     // the private key is used to decrypt the content from the server, take
     // extra care not to leak it
-    data = await importFromBackend(id, privateKey);
+    const { elements, appState } = await importFromBackend(id, privateKey);
+    data = restore(elements, appState);
   } else {
-    data = initialData || restoreFromLocalStorage();
+    data = restore(
+      initialData?.elements ?? [],
+      initialData?.appState ?? getDefaultAppState(),
+    );
   }
 
   return {

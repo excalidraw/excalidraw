@@ -44,7 +44,6 @@ import {
 } from "../scene";
 import {
   decryptAESGEM,
-  saveToLocalStorage,
   loadScene,
   loadFromBlob,
   SOCKET_SERVER,
@@ -146,11 +145,7 @@ import {
   isBindableElement,
 } from "../element/typeChecks";
 import { actionFinalize, actionDeleteSelected } from "../actions";
-import {
-  restoreUsernameFromLocalStorage,
-  saveUsernameToLocalStorage,
-  loadLibrary,
-} from "../data/localStorage";
+import { loadLibrary } from "../data/localStorage";
 
 import throttle from "lodash.throttle";
 import { LinearElementEditor } from "../element/linearElementEditor";
@@ -310,6 +305,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       offsetLeft,
     } = this.state;
 
+    const { onUsernameChange } = this.props;
     const canvasScale = window.devicePixelRatio;
 
     const canvasWidth = canvasDOMWidth * canvasScale;
@@ -335,13 +331,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           onRoomCreate={this.openPortal}
           onRoomDestroy={this.closePortal}
           onUsernameChange={(username) => {
-            if (this.props.onUsernameChange) {
-              this.props.onUsernameChange(username);
-            }
-            saveUsernameToLocalStorage(username);
-            this.setState({
-              username,
-            });
+            onUsernameChange && onUsernameChange(username);
+            this.setState({ username });
           }}
           onLockToggle={this.toggleLock}
           onInsertShape={(elements) =>
@@ -434,8 +425,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   private onBlur = withBatchedUpdates(() => {
     isHoldingSpace = false;
     this.setState({ isBindingEnabled: true });
-    this.saveDebounced();
-    this.saveDebounced.flush();
   });
 
   private onUnload = () => {
@@ -510,7 +499,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     let isCollaborationScene = !!getCollaborationLinkData(window.location.href);
     const isExternalScene = !!(id || jsonMatch || isCollaborationScene);
 
-    if (isExternalScene && !this.props.initialData) {
+    if (isExternalScene) {
       if (
         this.shouldForceLoadScene(scene) ||
         window.confirm(t("alerts.loadSceneOverridePrompt"))
@@ -840,7 +829,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (this.state.scrolledOutside !== scrolledOutside) {
       this.setState({ scrolledOutside: scrolledOutside });
     }
-    this.saveDebounced();
 
     if (
       getDrawingVersion(this.scene.getElementsIncludingDeleted()) >
@@ -1432,16 +1420,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       cursorY = event.y;
     },
   );
-
-  restoreUserName() {
-    const username = restoreUsernameFromLocalStorage();
-
-    if (username !== null) {
-      this.setState({
-        username,
-      });
-    }
-  }
 
   // Input handling
 
@@ -3677,10 +3655,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private resetShouldCacheIgnoreZoomDebounced = debounce(() => {
     this.setState({ shouldCacheIgnoreZoom: false });
-  }, 300);
-
-  private saveDebounced = debounce(() => {
-    saveToLocalStorage(this.scene.getElementsIncludingDeleted(), this.state);
   }, 300);
 
   private getCanvasOffsets() {

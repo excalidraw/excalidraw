@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect } from "react";
+import React, { useState, useLayoutEffect, useEffect } from "react";
 import ReactDOM from "react-dom";
 import * as Sentry from "@sentry/browser";
 import * as SentryIntegrations from "@sentry/integrations";
@@ -9,6 +9,19 @@ import Excalidraw from "./excalidraw-embed/index";
 import { register as registerServiceWorker } from "./serviceWorker";
 
 import { loadFromBlob } from "./data";
+import { debounce } from "./utils";
+import {
+  importFromLocalStorage,
+  importUsernameFromLocalStorage,
+  saveUsernameToLocalStorage,
+  saveToLocalStorage,
+} from "./data/localStorage";
+
+import { SAVE_TO_LOCAL_STORAGE_TIMEOUT } from "./time_constants";
+import { DataState } from "./data/types";
+import { LoadingMessage } from "./components/LoadingMessage";
+import { ExcalidrawElement } from "./element/types";
+import { AppState } from "./types";
 
 // On Apple mobile devices add the proprietary app icon and splashscreen markup.
 // No one should have to do this manually, and eventually this annoyance will
@@ -60,29 +73,89 @@ Sentry.init({
 
 window.__EXCALIDRAW_SHA__ = REACT_APP_GIT_SHA;
 
+const saveDebounced = debounce(
+  (elements: readonly ExcalidrawElement[], state: AppState) => {
+    saveToLocalStorage(elements, state);
+  },
+  SAVE_TO_LOCAL_STORAGE_TIMEOUT,
+);
+
+const onUsernameChange = (username: string) => {
+  saveUsernameToLocalStorage(username);
+};
+
+const onBlur = () => {
+  saveDebounced.flush();
+};
+
 function ExcalidrawApp() {
+  // dimensions
+  // ---------------------------------------------------------------------------
+
   const [dimensions, setDimensions] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
   });
-
-  const onResize = () => {
-    setDimensions({
-      width: window.innerWidth,
-      height: window.innerHeight,
-    });
-  };
-
   useLayoutEffect(() => {
+    const onResize = () => {
+      setDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
     window.addEventListener("resize", onResize);
 
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  const { width, height } = dimensions;
+  // initial state
+  // ---------------------------------------------------------------------------
+
+  const [initialState, setInitialState] = useState<{
+    data: DataState;
+    user: {
+      name: string | null;
+    };
+  } | null>(null);
+
+  useEffect(() => {
+    setInitialState({
+      data: importFromLocalStorage(),
+      user: {
+        name: importUsernameFromLocalStorage(),
+      },
+    });
+  }, []);
+
+  // blur/unload
+  // ---------------------------------------------------------------------------
+
+  useEffect(() => {
+    window.addEventListener(EVENT.UNLOAD, onBlur, false);
+    window.addEventListener(EVENT.BLUR, onBlur, false);
+    return () => {
+      window.removeEventListener(EVENT.UNLOAD, onBlur, false);
+      window.removeEventListener(EVENT.BLUR, onBlur, false);
+    };
+  }, []);
+
+  // ---------------------------------------------------------------------------
+
+  if (!initialState) {
+    return <LoadingMessage />;
+  }
+
   return (
     <TopErrorBoundary>
-      <Excalidraw width={width} height={height} />
+      <Excalidraw
+        width={dimensions.width}
+        height={dimensions.height}
+        onChange={saveDebounced}
+        initialData={initialState.data}
+        user={initialState.user}
+        onUsernameChange={onUsernameChange}
+      />
     </TopErrorBoundary>
   );
 }
