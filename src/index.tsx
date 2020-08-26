@@ -20,6 +20,8 @@ import {
 import { SAVE_TO_LOCAL_STORAGE_TIMEOUT } from "./time_constants";
 import { DataState } from "./data/types";
 import { LoadingMessage } from "./components/LoadingMessage";
+import { ExcalidrawElement } from "./element/types";
+import { AppState } from "./types";
 
 // On Apple mobile devices add the proprietary app icon and splashscreen markup.
 // No one should have to do this manually, and eventually this annoyance will
@@ -71,9 +73,12 @@ Sentry.init({
 
 window.__EXCALIDRAW_SHA__ = REACT_APP_GIT_SHA;
 
-const saveDebounced = debounce((elements, state) => {
-  saveToLocalStorage(elements, state);
-}, SAVE_TO_LOCAL_STORAGE_TIMEOUT);
+const saveDebounced = debounce(
+  (elements: readonly ExcalidrawElement[], state: AppState) => {
+    saveToLocalStorage(elements, state);
+  },
+  SAVE_TO_LOCAL_STORAGE_TIMEOUT,
+);
 
 const onUsernameChange = (username: string) => {
   saveUsernameToLocalStorage(username);
