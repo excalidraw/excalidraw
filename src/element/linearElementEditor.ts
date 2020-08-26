@@ -171,7 +171,7 @@ export class LinearElementEditor {
     scenePointer: { x: number; y: number },
   ): {
     didAddPoint: boolean;
-    hitElement: ExcalidrawElement | null;
+    hitElement: NonDeleted<ExcalidrawElement> | null;
   } {
     const ret: ReturnType<typeof LinearElementEditor["handlePointerDown"]> = {
       didAddPoint: false,

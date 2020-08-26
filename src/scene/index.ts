@@ -14,5 +14,6 @@ export {
   getElementAtPosition,
   getElementContainingPosition,
   hasText,
+  getElementsAtPosition,
 } from "./comparisons";
 export { getZoomOrigin, getNormalizedZoom } from "./zoom";
