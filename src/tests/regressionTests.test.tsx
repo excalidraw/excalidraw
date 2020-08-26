@@ -1579,6 +1579,55 @@ describe("regression tests", () => {
     });
     expect(getSelectedElements().length).toBe(0);
   });
+
+  it("Cmd/Ctrl-click exclusively select element under pointer", () => {
+    clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    clickTool("rectangle");
+    mouse.reset();
+    mouse.down(30, 30);
+    mouse.up(40, 40);
+
+    withModifierKeys({ ctrl: true }, () => {
+      keyPress("a");
+      keyPress("g");
+    });
+
+    expect(getSelectedElements()).toEqual([
+      expect.objectContaining({
+        id: h.elements[0].id,
+      }),
+      expect.objectContaining({
+        id: h.elements[1].id,
+      }),
+    ]);
+
+    withModifierKeys({ ctrl: true }, () => {
+      mouse.reset();
+      mouse.click(30, 30);
+    });
+    expect(getSelectedElements()).toEqual([
+      expect.objectContaining({
+        id: h.elements[1].id,
+      }),
+    ]);
+
+    mouse.reset();
+    mouse.click(100, 100);
+    expect(getSelectedElements().length).toBe(0);
+
+    withModifierKeys({ ctrl: true }, () => {
+      mouse.reset();
+      mouse.click(30, 30);
+    });
+    expect(getSelectedElements()).toEqual([
+      expect.objectContaining({
+        id: h.elements[1].id,
+      }),
+    ]);
+  });
 });
 
 it(

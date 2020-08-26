@@ -1904,11 +1904,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     resetCursor();
 
-    this.startTextEditing({
-      sceneX,
-      sceneY,
-      insertAtParentCenter: !event.altKey,
-    });
+    if (!event[KEYS.CTRL_OR_CMD]) {
+      this.startTextEditing({
+        sceneX,
+        sceneY,
+        insertAtParentCenter: !event.altKey,
+      });
+    }
   };
 
   private handleCanvasPointerMove = (
@@ -2485,7 +2487,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
   };
 
-  // Returns whether the pointer event has been completely handled
+  /**
+   * @returns whether the pointer event has been completely handled
+   */
   private handleSelectionOnPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
     pointerDownState: PointerDownState,
@@ -2587,6 +2591,22 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
         // If we click on something
         if (hitElement != null) {
+          // on CMD/CTRL, drill down to hit element regardless of groups etc.
+          if (event[KEYS.CTRL_OR_CMD]) {
+            this.setState((prevState) => ({
+              ...prevState,
+              editingGroupId: hitElement.groupIds.length
+                ? hitElement.groupIds[0]
+                : null,
+              selectedGroupIds: {},
+              selectedElementIds: {
+                [hitElement.id]: true,
+              },
+            }));
+            // mark as not completely handled so as to allow dragging etc.
+            return false;
+          }
+
           // deselect if item is selected
           // if shift is not clicked, this will always return true
           // otherwise, it will trigger selection based on current
