@@ -499,7 +499,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     let isCollaborationScene = !!getCollaborationLinkData(window.location.href);
     const isExternalScene = !!(id || jsonMatch || isCollaborationScene);
 
-    if (isExternalScene && !this.props.initialData) {
+    if (isExternalScene) {
       if (
         this.shouldForceLoadScene(scene) ||
         window.confirm(t("alerts.loadSceneOverridePrompt"))
