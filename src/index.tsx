@@ -3,6 +3,8 @@ import ReactDOM from "react-dom";
 import * as Sentry from "@sentry/browser";
 import * as SentryIntegrations from "@sentry/integrations";
 import ReactGA from "react-ga";
+import * as firebase from "firebase/app";
+import "firebase/analytics";
 
 import { EVENT } from "./constants";
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
@@ -58,6 +60,20 @@ Sentry.init({
     return event;
   },
 });
+
+// Enable Firebase services
+const firebaseConfig = {
+  apiKey: "AIzaSyCp3kxwGhVjS-Rx6BLBT8R3ZBAULhKa1Jc",
+  authDomain: "scribble-prototype.firebaseapp.com",
+  databaseURL: "https://scribble-prototype.firebaseio.com",
+  projectId: "scribble-prototype",
+  storageBucket: "scribble-prototype.appspot.com",
+  messagingSenderId: "278663408522",
+  appId: "1:278663408522:web:c2ccb1b103f4d4f53cf673",
+  measurementId: "G-NTBBVQ8GPP",
+};
+firebase.initializeApp(firebaseConfig);
+firebase.analytics();
 
 window.__EXCALIDRAW_SHA__ = REACT_APP_GIT_SHA;
 
