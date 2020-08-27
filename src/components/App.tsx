@@ -157,6 +157,7 @@ import {
   isElementInGroup,
   getSelectedGroupIdForElement,
   getElementsInGroup,
+  editGroupForSelectedElement,
 } from "../groups";
 import { Library } from "../data/library";
 import Scene from "../scene/Scene";
@@ -939,10 +940,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   private onTapEnd = (event: TouchEvent) => {
     event.preventDefault();
     if (event.touches.length > 0) {
-      const { previousSelectedElementIds } = this.state;
       this.setState({
         previousSelectedElementIds: {},
-        selectedElementIds: previousSelectedElementIds,
+        selectedElementIds: this.state.previousSelectedElementIds,
       });
     }
   };
@@ -1617,10 +1617,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private onGestureEnd = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
-    const { previousSelectedElementIds } = this.state;
     this.setState({
       previousSelectedElementIds: {},
-      selectedElementIds: previousSelectedElementIds,
+      selectedElementIds: this.state.previousSelectedElementIds,
     });
     gesture.initialScale = null;
   });
@@ -1904,11 +1903,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     resetCursor();
 
-    this.startTextEditing({
-      sceneX,
-      sceneY,
-      insertAtParentCenter: !event.altKey,
-    });
+    if (!event[KEYS.CTRL_OR_CMD]) {
+      this.startTextEditing({
+        sceneX,
+        sceneY,
+        insertAtParentCenter: !event.altKey,
+      });
+    }
   };
 
   private handleCanvasPointerMove = (
@@ -2485,7 +2486,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
   };
 
-  // Returns whether the pointer event has been completely handled
+  /**
+   * @returns whether the pointer event has been completely handled
+   */
   private handleSelectionOnPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
     pointerDownState: PointerDownState,
@@ -2587,6 +2590,16 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
         // If we click on something
         if (hitElement != null) {
+          // on CMD/CTRL, drill down to hit element regardless of groups etc.
+          if (event[KEYS.CTRL_OR_CMD]) {
+            this.setState((prevState) => ({
+              ...editGroupForSelectedElement(prevState, hitElement),
+              previousSelectedElementIds: this.state.selectedElementIds,
+            }));
+            // mark as not completely handled so as to allow dragging etc.
+            return false;
+          }
+
           // deselect if item is selected
           // if shift is not clicked, this will always return true
           // otherwise, it will trigger selection based on current
@@ -2619,7 +2632,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
                     ...prevState,
                     selectedElementIds: {
                       ...prevState.selectedElementIds,
-                      [hitElement!.id]: true,
+                      [hitElement.id]: true,
                     },
                   },
                   this.scene.getElements(),
@@ -2630,9 +2643,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           }
         }
 
-        const { selectedElementIds } = this.state;
         this.setState({
-          previousSelectedElementIds: selectedElementIds,
+          previousSelectedElementIds: this.state.selectedElementIds,
         });
       }
     }
@@ -3530,10 +3542,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           ? prevState.editingGroupId
           : null,
     }));
-    const { selectedElementIds } = this.state;
     this.setState({
       selectedElementIds: {},
-      previousSelectedElementIds: selectedElementIds,
+      previousSelectedElementIds: this.state.selectedElementIds,
     });
   }
 
