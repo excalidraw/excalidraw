@@ -75,8 +75,6 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 firebase.analytics();
 
-firebase.analytics().logEvent("debug_event");
-
 window.__EXCALIDRAW_SHA__ = REACT_APP_GIT_SHA;
 
 function ExcalidrawApp() {
