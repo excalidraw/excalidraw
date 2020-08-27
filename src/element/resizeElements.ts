@@ -187,37 +187,6 @@ const reshapeSingleTwoPointElement = (
   pointerY: number,
 ) => {
   validateTwoPointElementNormalized(element);
-  if (isRotateWithDiscreteAngle && element.angle === 0) {
-    // FIXME shift locking only works for unrotated lines
-    if (resizeArrowDirection === "end") {
-      const { width, height } = getPerfectElementSize(
-        element.type,
-        pointerX - element.x,
-        pointerY - element.y,
-      );
-      mutateElement(element, {
-        points: [
-          [0, 0],
-          [width, height],
-        ],
-      });
-    } else {
-      const { width, height } = getPerfectElementSize(
-        element.type,
-        element.x + element.width - pointerX,
-        element.y + element.height - pointerY,
-      );
-      mutateElement(element, {
-        x: element.x + element.width - width,
-        y: element.y + element.height - height,
-        points: [
-          [0, 0],
-          [width, height],
-        ],
-      });
-    }
-    return;
-  }
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
@@ -229,13 +198,16 @@ const reshapeSingleTwoPointElement = (
     cy,
     -element.angle,
   );
-  const [width, height] =
+  let [width, height] =
     resizeArrowDirection === "end"
       ? [rotatedX - element.x, rotatedY - element.y]
       : [
           element.x + element.points[1][0] - rotatedX,
           element.y + element.points[1][1] - rotatedY,
         ];
+  if (isRotateWithDiscreteAngle) {
+    ({ width, height } = getPerfectElementSize(element.type, width, height));
+  }
   const [nextElementX, nextElementY] = adjustXYWithRotation(
     resizeArrowDirection === "end"
       ? { s: true, e: true }
