@@ -164,7 +164,7 @@ const rotateSingleElement = (
   mutateElement(element, { angle });
 };
 
-// XXX just to make sure while developing and testing
+// used in DEV only
 const validateTwoPointElementNormalized = (
   element: NonDeleted<ExcalidrawLinearElement>,
 ) => {
@@ -177,6 +177,19 @@ const validateTwoPointElementNormalized = (
   ) {
     throw new Error("Two-point element is not normalized");
   }
+};
+
+const getPerfectElementSizeWithRotation = (
+  elementType: string,
+  width: number,
+  height: number,
+  angle: number,
+): [number, number] => {
+  const size = getPerfectElementSize(
+    elementType,
+    ...rotate(width, height, 0, 0, angle),
+  );
+  return rotate(size.width, size.height, 0, 0, -angle);
 };
 
 const reshapeSingleTwoPointElement = (
@@ -208,7 +221,12 @@ const reshapeSingleTwoPointElement = (
           element.y + element.points[1][1] - rotatedY,
         ];
   if (isRotateWithDiscreteAngle) {
-    ({ width, height } = getPerfectElementSize(element.type, width, height));
+    [width, height] = getPerfectElementSizeWithRotation(
+      element.type,
+      width,
+      height,
+      element.angle,
+    );
   }
   const [nextElementX, nextElementY] = adjustXYWithRotation(
     resizeArrowDirection === "end"
