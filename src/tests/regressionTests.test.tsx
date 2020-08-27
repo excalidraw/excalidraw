@@ -50,6 +50,20 @@ const group = (elements: ExcalidrawElement[]) => {
   });
 };
 
+const assertSelectedElements = (...elements: ExcalidrawElement[]) => {
+  expect(
+    getSelectedElements().map((element) => {
+      return element.id;
+    }),
+  ).toEqual(expect.arrayContaining(elements.map((element) => element.id)));
+};
+
+const clearSelection = () => {
+  // @ts-ignore
+  h.app.clearSelection(null);
+  expect(getSelectedElements().length).toBe(0);
+};
+
 let altKey = false;
 let shiftKey = false;
 let ctrlKey = false;
@@ -191,8 +205,7 @@ class Pointer {
     /** if multiple elements supplied, they're shift-selected */
     elements: ExcalidrawElement | ExcalidrawElement[],
   ) {
-    // @ts-ignore
-    h.app.clearSelection(null);
+    clearSelection();
     withModifierKeys({ shift: true }, () => {
       elements = Array.isArray(elements) ? elements : [elements];
       elements.forEach((element) => {
@@ -1651,47 +1664,37 @@ describe("regression tests", () => {
   });
 
   it("Cmd/Ctrl-click exclusively select element under pointer", () => {
-    clickTool("rectangle");
-    mouse.down(10, 10);
-    mouse.up(20, 20);
+    const rect1 = createElement("rectangle", { x: 0 });
+    const rect2 = createElement("rectangle", { x: 30 });
 
-    clickTool("rectangle");
-    mouse.reset();
-    mouse.down(30, 30);
-    mouse.up(40, 40);
-
-    expect(getSelectedElements()).toEqual([
-      expect.objectContaining({
-        id: h.elements[0].id,
-      }),
-      expect.objectContaining({
-        id: h.elements[1].id,
-      }),
-    ]);
+    group([rect1, rect2]);
+    assertSelectedElements(rect1, rect2);
 
     withModifierKeys({ ctrl: true }, () => {
-      mouse.reset();
-      mouse.click(30, 30);
+      mouse.clickOn(rect1);
     });
-    expect(getSelectedElements()).toEqual([
-      expect.objectContaining({
-        id: h.elements[1].id,
-      }),
-    ]);
+    assertSelectedElements(rect1);
 
-    mouse.reset();
-    mouse.click(100, 100);
-    expect(getSelectedElements().length).toBe(0);
+    clearSelection();
+    withModifierKeys({ ctrl: true }, () => {
+      mouse.clickOn(rect1);
+    });
+    assertSelectedElements(rect1);
+
+    const rect3 = createElement("rectangle", { x: 60 });
+    group([rect1, rect3]);
+    assertSelectedElements(rect1, rect2, rect3);
 
     withModifierKeys({ ctrl: true }, () => {
-      mouse.reset();
-      mouse.click(30, 30);
+      mouse.clickOn(rect1);
     });
-    expect(getSelectedElements()).toEqual([
-      expect.objectContaining({
-        id: h.elements[1].id,
-      }),
-    ]);
+    assertSelectedElements(rect1);
+
+    clearSelection();
+    withModifierKeys({ ctrl: true }, () => {
+      mouse.clickOn(rect3);
+    });
+    assertSelectedElements(rect3);
   });
 });
 
