@@ -186,7 +186,9 @@ const reshapeSingleTwoPointElement = (
   pointerX: number,
   pointerY: number,
 ) => {
-  validateTwoPointElementNormalized(element);
+  if (process.env.NODE_ENV !== "production") {
+    validateTwoPointElementNormalized(element);
+  }
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
