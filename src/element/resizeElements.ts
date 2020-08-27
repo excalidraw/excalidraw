@@ -613,66 +613,21 @@ const rotateMultipleElements = (
     centerAngle -= centerAngle % SHIFT_LOCKING_ANGLE;
   }
   elements.forEach((element, index) => {
-    if (isLinearElement(element) && element.points.length === 2) {
-      // FIXME this is a bit tricky (how can we make this more readable?)
-      const originalElement = originalElements[index];
-      if (
-        !isLinearElement(originalElement) ||
-        originalElement.points.length !== 2
-      ) {
-        throw new Error("original element not compatible"); // should not happen
-      }
-      const [x1, y1, x2, y2] = getElementAbsoluteCoords(originalElement);
-      const cx = (x1 + x2) / 2;
-      const cy = (y1 + y2) / 2;
-      const [rotatedCX, rotatedCY] = rotate(
-        cx,
-        cy,
-        centerX,
-        centerY,
-        centerAngle,
-      );
-      const { points } = originalElement;
-      const [rotatedX, rotatedY] = rotate(
-        points[1][0],
-        points[1][1],
-        points[0][0],
-        points[0][1],
-        centerAngle,
-      );
-      mutateElement(element, {
-        x:
-          originalElement.x +
-          (rotatedCX - cx) +
-          ((originalElement.points[0][0] + originalElement.points[1][0]) / 2 -
-            (points[0][0] + rotatedX) / 2),
-        y:
-          originalElement.y +
-          (rotatedCY - cy) +
-          ((originalElement.points[0][1] + originalElement.points[1][1]) / 2 -
-            (points[0][1] + rotatedY) / 2),
-        points: [
-          [points[0][0], points[0][1]],
-          [rotatedX, rotatedY],
-        ],
-      });
-    } else {
-      const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-      const cx = (x1 + x2) / 2;
-      const cy = (y1 + y2) / 2;
-      const [rotatedCX, rotatedCY] = rotate(
-        cx,
-        cy,
-        centerX,
-        centerY,
-        centerAngle + originalElements[index].angle - element.angle,
-      );
-      mutateElement(element, {
-        x: element.x + (rotatedCX - cx),
-        y: element.y + (rotatedCY - cy),
-        angle: normalizeAngle(centerAngle + originalElements[index].angle),
-      });
-    }
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+    const cx = (x1 + x2) / 2;
+    const cy = (y1 + y2) / 2;
+    const [rotatedCX, rotatedCY] = rotate(
+      cx,
+      cy,
+      centerX,
+      centerY,
+      centerAngle + originalElements[index].angle - element.angle,
+    );
+    mutateElement(element, {
+      x: element.x + (rotatedCX - cx),
+      y: element.y + (rotatedCY - cy),
+      angle: normalizeAngle(centerAngle + originalElements[index].angle),
+    });
   });
 };
 
