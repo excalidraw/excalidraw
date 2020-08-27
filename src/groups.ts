@@ -86,6 +86,20 @@ export function selectGroupsForSelectedElements(
   return nextAppState;
 }
 
+export const editGroupForSelectedElement = (
+  appState: AppState,
+  element: NonDeleted<ExcalidrawElement>,
+): AppState => {
+  return {
+    ...appState,
+    editingGroupId: element.groupIds.length ? element.groupIds[0] : null,
+    selectedGroupIds: {},
+    selectedElementIds: {
+      [element.id]: true,
+    },
+  };
+};
+
 export function isElementInGroup(element: ExcalidrawElement, groupId: string) {
   return element.groupIds.includes(groupId);
 }

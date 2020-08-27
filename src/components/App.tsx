@@ -157,6 +157,7 @@ import {
   isElementInGroup,
   getSelectedGroupIdForElement,
   getElementsInGroup,
+  editGroupForSelectedElement,
 } from "../groups";
 import { Library } from "../data/library";
 import Scene from "../scene/Scene";
@@ -2594,14 +2595,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           // on CMD/CTRL, drill down to hit element regardless of groups etc.
           if (event[KEYS.CTRL_OR_CMD]) {
             this.setState((prevState) => ({
-              ...prevState,
-              editingGroupId: hitElement.groupIds.length
-                ? hitElement.groupIds[0]
-                : null,
-              selectedGroupIds: {},
-              selectedElementIds: {
-                [hitElement.id]: true,
-              },
+              ...editGroupForSelectedElement(prevState, hitElement),
             }));
             // mark as not completely handled so as to allow dragging etc.
             return false;
