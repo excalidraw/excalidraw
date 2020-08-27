@@ -67,7 +67,7 @@ export const transformElements = (
         transformHandleType === "sw" ||
         transformHandleType === "se")
     ) {
-      resizeSingleTwoPointElement(
+      reshapeSingleTwoPointElement(
         element,
         resizeArrowDirection,
         isRotateWithDiscreteAngle,
@@ -164,63 +164,98 @@ const rotateSingleElement = (
   mutateElement(element, { angle });
 };
 
-const resizeSingleTwoPointElement = (
+// XXX just to make sure while developing and testing
+const validateTwoPointElementNormalized = (
+  element: NonDeleted<ExcalidrawLinearElement>,
+) => {
+  if (
+    element.points.length !== 2 ||
+    element.points[0][0] !== 0 ||
+    element.points[0][1] !== 0 ||
+    Math.abs(element.points[1][0]) !== element.width ||
+    Math.abs(element.points[1][1]) !== element.height
+  ) {
+    throw new Error("Two-point element is not normalized");
+  }
+};
+
+const reshapeSingleTwoPointElement = (
   element: NonDeleted<ExcalidrawLinearElement>,
   resizeArrowDirection: "origin" | "end",
   isRotateWithDiscreteAngle: boolean,
   pointerX: number,
   pointerY: number,
 ) => {
-  const pointOrigin = element.points[0]; // can assume always [0, 0]?
-  const pointEnd = element.points[1];
-  if (resizeArrowDirection === "end") {
-    if (isRotateWithDiscreteAngle) {
+  validateTwoPointElementNormalized(element);
+  if (isRotateWithDiscreteAngle && element.angle === 0) {
+    // FIXME shift locking only works for unrotated lines
+    if (resizeArrowDirection === "end") {
       const { width, height } = getPerfectElementSize(
         element.type,
         pointerX - element.x,
         pointerY - element.y,
       );
       mutateElement(element, {
-        points: [pointOrigin, [width, height]],
-      });
-    } else {
-      mutateElement(element, {
         points: [
-          pointOrigin,
-          [
-            pointerX - pointOrigin[0] - element.x,
-            pointerY - pointOrigin[1] - element.y,
-          ],
+          [0, 0],
+          [width, height],
         ],
       });
-    }
-  } else {
-    // resizeArrowDirection === "origin"
-    if (isRotateWithDiscreteAngle) {
+    } else {
       const { width, height } = getPerfectElementSize(
         element.type,
-        element.x + pointEnd[0] - pointOrigin[0] - pointerX,
-        element.y + pointEnd[1] - pointOrigin[1] - pointerY,
+        element.x + element.width - pointerX,
+        element.y + element.height - pointerY,
       );
       mutateElement(element, {
-        x: element.x + pointEnd[0] - pointOrigin[0] - width,
-        y: element.y + pointEnd[1] - pointOrigin[1] - height,
-        points: [pointOrigin, [width, height]],
-      });
-    } else {
-      mutateElement(element, {
-        x: pointerX,
-        y: pointerY,
+        x: element.x + element.width - width,
+        y: element.y + element.height - height,
         points: [
-          pointOrigin,
-          [
-            pointEnd[0] - (pointerX - pointOrigin[0] - element.x),
-            pointEnd[1] - (pointerY - pointOrigin[1] - element.y),
-          ],
+          [0, 0],
+          [width, height],
         ],
       });
     }
+    return;
   }
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const cx = (x1 + x2) / 2;
+  const cy = (y1 + y2) / 2;
+  // rotation pointer with reverse angle
+  const [rotatedX, rotatedY] = rotate(
+    pointerX,
+    pointerY,
+    cx,
+    cy,
+    -element.angle,
+  );
+  const [width, height] =
+    resizeArrowDirection === "end"
+      ? [rotatedX - element.x, rotatedY - element.y]
+      : [
+          element.x + element.points[1][0] - rotatedX,
+          element.y + element.points[1][1] - rotatedY,
+        ];
+  const [nextElementX, nextElementY] = adjustXYWithRotation(
+    resizeArrowDirection === "end"
+      ? { s: true, e: true }
+      : { n: true, w: true },
+    element.x,
+    element.y,
+    element.angle,
+    0,
+    0,
+    (element.points[1][0] - width) / 2,
+    (element.points[1][1] - height) / 2,
+  );
+  mutateElement(element, {
+    x: nextElementX,
+    y: nextElementY,
+    points: [
+      [0, 0],
+      [width, height],
+    ],
+  });
 };
 
 const rescalePointsInElement = (
