@@ -3384,33 +3384,15 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             }));
           }
         } else {
-          if (isSelectedViaGroup(this.state, hitElement)) {
-            /*
-            We want to select the group(s) the hit element is in not the particular element.
-            That means we have to deselect elements that are not part of the groups of the
-             hit element, while keeping the elements that are.
-            */
-            const idsOfSelectedElementsThatAreInGroups = hitElement.groupIds
-              .flatMap((groupId) =>
-                getElementsInGroup(this.scene.getElements(), groupId),
-              )
-              .map((element) => ({ [element.id]: true }))
-              .reduce((prevId, acc) => ({ ...prevId, ...acc }), {});
-
-            this.setState((_prevState) => ({
-              selectedGroupIds: {
-                ...hitElement.groupIds
-                  .map((gId) => ({ [gId]: true }))
-                  .reduce((prevId, acc) => ({ ...prevId, ...acc }), {}),
+          this.setState((prevState) => ({
+            ...selectGroupsForSelectedElements(
+              {
+                ...prevState,
+                selectedElementIds: { [hitElement.id]: true },
               },
-              selectedElementIds: { ...idsOfSelectedElementsThatAreInGroups },
-            }));
-          } else {
-            this.setState((_prevState) => ({
-              selectedGroupIds: {},
-              selectedElementIds: { [hitElement!.id]: true },
-            }));
-          }
+              this.scene.getElements(),
+            ),
+          }));
         }
       }
 

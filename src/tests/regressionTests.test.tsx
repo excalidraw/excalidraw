@@ -23,6 +23,33 @@ const clickTool = (toolName: ToolName) => {
   fireEvent.click(getByToolName(toolName));
 };
 
+const createElement = (
+  type: ToolName,
+  {
+    x = 0,
+    y = x,
+    size = 10,
+  }: {
+    x?: number;
+    y?: number;
+    size?: number;
+  },
+) => {
+  clickTool(type);
+  mouse.reset();
+  mouse.down(x, y);
+  mouse.reset();
+  mouse.up(x + size, y + size);
+  return h.elements[h.elements.length - 1];
+};
+
+const group = (elements: ExcalidrawElement[]) => {
+  mouse.select(elements);
+  withModifierKeys({ ctrl: true }, () => {
+    keyPress("g");
+  });
+};
+
 let altKey = false;
 let shiftKey = false;
 let ctrlKey = false;
@@ -158,6 +185,28 @@ class Pointer {
   doubleClick(dx = 0, dy = 0) {
     this.move(dx, dy);
     fireEvent.doubleClick(canvas, this.getEvent());
+  }
+
+  select(
+    /** if multiple elements supplied, they're shift-selected */
+    elements: ExcalidrawElement | ExcalidrawElement[],
+  ) {
+    // @ts-ignore
+    h.app.clearSelection(null);
+    withModifierKeys({ shift: true }, () => {
+      elements = Array.isArray(elements) ? elements : [elements];
+      elements.forEach((element) => {
+        mouse.reset();
+        mouse.click(element.x, element.y);
+      });
+    });
+    mouse.reset();
+  }
+
+  clickOn(element: ExcalidrawElement) {
+    mouse.reset();
+    mouse.click(element.x, element.y);
+    mouse.reset();
   }
 }
 
@@ -1579,6 +1628,27 @@ describe("regression tests", () => {
     });
     expect(getSelectedElements().length).toBe(0);
   });
+
+  it("single-clicking on a subgroup of a selected group should not alter selection", () => {
+    const rect1 = createElement("rectangle", { x: 10 });
+    const rect2 = createElement("rectangle", { x: 50 });
+    group([rect1, rect2]);
+
+    const rect3 = createElement("rectangle", { x: 10, y: 50 });
+    const rect4 = createElement("rectangle", { x: 50, y: 50 });
+    group([rect3, rect4]);
+
+    withModifierKeys({ ctrl: true }, () => {
+      keyPress("a");
+      keyPress("g");
+    });
+
+    const selectedGroupIds_prev = h.state.selectedGroupIds;
+    const selectedElements_prev = getSelectedElements();
+    mouse.clickOn(rect3);
+    expect(h.state.selectedGroupIds).toEqual(selectedGroupIds_prev);
+    expect(getSelectedElements()).toEqual(selectedElements_prev);
+  });
 });
 
 it(
@@ -1586,52 +1656,26 @@ it(
     "when user clicks on B, on pointer up " +
     "only elements from B should be selected",
   () => {
-    clickTool("rectangle");
-    mouse.down();
-    mouse.up(100, 100);
+    const rect1 = createElement("rectangle", { y: 0 });
+    const rect2 = createElement("rectangle", { y: 30 });
+    const rect3 = createElement("rectangle", { y: 60 });
 
-    clickTool("rectangle");
-    mouse.down(10, 10);
-    mouse.up(100, 100);
-
-    clickTool("rectangle");
-    mouse.down(10, 10);
-    mouse.up(100, 100);
-
-    // Select first rectangle while keeping third one selected.
-    // Third rectangle is selected because it was the last element
-    //  to be created.
-    mouse.reset();
-    withModifierKeys({ shift: true }, () => {
-      mouse.click();
-    });
-
-    // Create group with first and third rectangle
-    withModifierKeys({ ctrl: true }, () => {
-      keyPress("g");
-    });
+    group([rect1, rect3]);
 
     expect(getSelectedElements().length).toBe(2);
-    const selectedGroupIds = Object.keys(h.state.selectedGroupIds);
-    expect(selectedGroupIds.length).toBe(1);
+    expect(Object.keys(h.state.selectedGroupIds).length).toBe(1);
 
     // Select second rectangle without deselecting group
     withModifierKeys({ shift: true }, () => {
-      mouse.click(110, 110);
+      mouse.clickOn(rect2);
     });
     expect(getSelectedElements().length).toBe(3);
 
-    // pointer down on first rectangle that is
-    // part of the group
-    mouse.reset();
-    mouse.down();
-    expect(getSelectedElements().length).toBe(3);
-
-    // should only deselect on pointer up
-    mouse.up();
+    // clicking on first rectangle that is part of the group should select
+    //  that group (exclusively)
+    mouse.clickOn(rect1);
     expect(getSelectedElements().length).toBe(2);
-    const newSelectedGroupIds = Object.keys(h.state.selectedGroupIds);
-    expect(newSelectedGroupIds.length).toBe(1);
+    expect(Object.keys(h.state.selectedGroupIds).length).toBe(1);
   },
 );
 
