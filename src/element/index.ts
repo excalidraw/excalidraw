@@ -38,7 +38,7 @@ export {
   getTransformHandleTypeFromCoords,
 } from "./resizeTest";
 export {
-  resizeElements,
+  transformElements,
   getResizeOffsetXY,
   getResizeArrowDirection,
 } from "./resizeElements";

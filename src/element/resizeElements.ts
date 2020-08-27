@@ -34,8 +34,8 @@ const normalizeAngle = (angle: number): number => {
   return angle;
 };
 
-// Returns true when a resize (scaling/rotation) happened
-export const resizeElements = (
+// Returns true when transform (resizing/rotation) happened
+export const transformElements = (
   transformHandleType: MaybeTransformHandleType,
   setTransformHandle: (nextTransformHandle: MaybeTransformHandleType) => void,
   selectedElements: readonly NonDeletedExcalidrawElement[],
