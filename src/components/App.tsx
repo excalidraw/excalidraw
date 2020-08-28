@@ -20,7 +20,7 @@ import {
   getDrawingVersion,
   getSyncableElements,
   newLinearElement,
-  resizeElements,
+  transformElements,
   getElementWithTransformHandleType,
   getResizeOffsetXY,
   getResizeArrowDirection,
@@ -2911,7 +2911,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           this.state.gridSize,
         );
         if (
-          resizeElements(
+          transformElements(
             transformHandleType,
             (newTransformHandle) => {
               pointerDownState.resize.handleType = newTransformHandle;

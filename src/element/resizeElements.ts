@@ -34,8 +34,8 @@ const normalizeAngle = (angle: number): number => {
   return angle;
 };
 
-// Returns true when a resize (scaling/rotation) happened
-export const resizeElements = (
+// Returns true when transform (resizing/rotation) happened
+export const transformElements = (
   transformHandleType: MaybeTransformHandleType,
   setTransformHandle: (nextTransformHandle: MaybeTransformHandleType) => void,
   selectedElements: readonly NonDeletedExcalidrawElement[],
@@ -67,7 +67,7 @@ export const resizeElements = (
         transformHandleType === "sw" ||
         transformHandleType === "se")
     ) {
-      resizeSingleTwoPointElement(
+      reshapeSingleTwoPointElement(
         element,
         resizeArrowDirection,
         isRotateWithDiscreteAngle,
@@ -164,63 +164,90 @@ const rotateSingleElement = (
   mutateElement(element, { angle });
 };
 
-const resizeSingleTwoPointElement = (
+// used in DEV only
+const validateTwoPointElementNormalized = (
+  element: NonDeleted<ExcalidrawLinearElement>,
+) => {
+  if (
+    element.points.length !== 2 ||
+    element.points[0][0] !== 0 ||
+    element.points[0][1] !== 0 ||
+    Math.abs(element.points[1][0]) !== element.width ||
+    Math.abs(element.points[1][1]) !== element.height
+  ) {
+    throw new Error("Two-point element is not normalized");
+  }
+};
+
+const getPerfectElementSizeWithRotation = (
+  elementType: string,
+  width: number,
+  height: number,
+  angle: number,
+): [number, number] => {
+  const size = getPerfectElementSize(
+    elementType,
+    ...rotate(width, height, 0, 0, angle),
+  );
+  return rotate(size.width, size.height, 0, 0, -angle);
+};
+
+const reshapeSingleTwoPointElement = (
   element: NonDeleted<ExcalidrawLinearElement>,
   resizeArrowDirection: "origin" | "end",
   isRotateWithDiscreteAngle: boolean,
   pointerX: number,
   pointerY: number,
 ) => {
-  const pointOrigin = element.points[0]; // can assume always [0, 0]?
-  const pointEnd = element.points[1];
-  if (resizeArrowDirection === "end") {
-    if (isRotateWithDiscreteAngle) {
-      const { width, height } = getPerfectElementSize(
-        element.type,
-        pointerX - element.x,
-        pointerY - element.y,
-      );
-      mutateElement(element, {
-        points: [pointOrigin, [width, height]],
-      });
-    } else {
-      mutateElement(element, {
-        points: [
-          pointOrigin,
-          [
-            pointerX - pointOrigin[0] - element.x,
-            pointerY - pointOrigin[1] - element.y,
-          ],
-        ],
-      });
-    }
-  } else {
-    // resizeArrowDirection === "origin"
-    if (isRotateWithDiscreteAngle) {
-      const { width, height } = getPerfectElementSize(
-        element.type,
-        element.x + pointEnd[0] - pointOrigin[0] - pointerX,
-        element.y + pointEnd[1] - pointOrigin[1] - pointerY,
-      );
-      mutateElement(element, {
-        x: element.x + pointEnd[0] - pointOrigin[0] - width,
-        y: element.y + pointEnd[1] - pointOrigin[1] - height,
-        points: [pointOrigin, [width, height]],
-      });
-    } else {
-      mutateElement(element, {
-        x: pointerX,
-        y: pointerY,
-        points: [
-          pointOrigin,
-          [
-            pointEnd[0] - (pointerX - pointOrigin[0] - element.x),
-            pointEnd[1] - (pointerY - pointOrigin[1] - element.y),
-          ],
-        ],
-      });
-    }
+  if (process.env.NODE_ENV !== "production") {
+    validateTwoPointElementNormalized(element);
   }
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const cx = (x1 + x2) / 2;
+  const cy = (y1 + y2) / 2;
+  // rotation pointer with reverse angle
+  const [rotatedX, rotatedY] = rotate(
+    pointerX,
+    pointerY,
+    cx,
+    cy,
+    -element.angle,
+  );
+  let [width, height] =
+    resizeArrowDirection === "end"
+      ? [rotatedX - element.x, rotatedY - element.y]
+      : [
+          element.x + element.points[1][0] - rotatedX,
+          element.y + element.points[1][1] - rotatedY,
+        ];
+  if (isRotateWithDiscreteAngle) {
+    [width, height] = getPerfectElementSizeWithRotation(
+      element.type,
+      width,
+      height,
+      element.angle,
+    );
+  }
+  const [nextElementX, nextElementY] = adjustXYWithRotation(
+    resizeArrowDirection === "end"
+      ? { s: true, e: true }
+      : { n: true, w: true },
+    element.x,
+    element.y,
+    element.angle,
+    0,
+    0,
+    (element.points[1][0] - width) / 2,
+    (element.points[1][1] - height) / 2,
+  );
+  mutateElement(element, {
+    x: nextElementX,
+    y: nextElementY,
+    points: [
+      [0, 0],
+      [width, height],
+    ],
+  });
 };
 
 const rescalePointsInElement = (
@@ -606,66 +633,21 @@ const rotateMultipleElements = (
     centerAngle -= centerAngle % SHIFT_LOCKING_ANGLE;
   }
   elements.forEach((element, index) => {
-    if (isLinearElement(element) && element.points.length === 2) {
-      // FIXME this is a bit tricky (how can we make this more readable?)
-      const originalElement = originalElements[index];
-      if (
-        !isLinearElement(originalElement) ||
-        originalElement.points.length !== 2
-      ) {
-        throw new Error("original element not compatible"); // should not happen
-      }
-      const [x1, y1, x2, y2] = getElementAbsoluteCoords(originalElement);
-      const cx = (x1 + x2) / 2;
-      const cy = (y1 + y2) / 2;
-      const [rotatedCX, rotatedCY] = rotate(
-        cx,
-        cy,
-        centerX,
-        centerY,
-        centerAngle,
-      );
-      const { points } = originalElement;
-      const [rotatedX, rotatedY] = rotate(
-        points[1][0],
-        points[1][1],
-        points[0][0],
-        points[0][1],
-        centerAngle,
-      );
-      mutateElement(element, {
-        x:
-          originalElement.x +
-          (rotatedCX - cx) +
-          ((originalElement.points[0][0] + originalElement.points[1][0]) / 2 -
-            (points[0][0] + rotatedX) / 2),
-        y:
-          originalElement.y +
-          (rotatedCY - cy) +
-          ((originalElement.points[0][1] + originalElement.points[1][1]) / 2 -
-            (points[0][1] + rotatedY) / 2),
-        points: [
-          [points[0][0], points[0][1]],
-          [rotatedX, rotatedY],
-        ],
-      });
-    } else {
-      const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-      const cx = (x1 + x2) / 2;
-      const cy = (y1 + y2) / 2;
-      const [rotatedCX, rotatedCY] = rotate(
-        cx,
-        cy,
-        centerX,
-        centerY,
-        centerAngle + originalElements[index].angle - element.angle,
-      );
-      mutateElement(element, {
-        x: element.x + (rotatedCX - cx),
-        y: element.y + (rotatedCY - cy),
-        angle: normalizeAngle(centerAngle + originalElements[index].angle),
-      });
-    }
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+    const cx = (x1 + x2) / 2;
+    const cy = (y1 + y2) / 2;
+    const [rotatedCX, rotatedCY] = rotate(
+      cx,
+      cy,
+      centerX,
+      centerY,
+      centerAngle + originalElements[index].angle - element.angle,
+    );
+    mutateElement(element, {
+      x: element.x + (rotatedCX - cx),
+      y: element.y + (rotatedCY - cy),
+      angle: normalizeAngle(centerAngle + originalElements[index].angle),
+    });
   });
 };
 

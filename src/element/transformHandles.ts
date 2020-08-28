@@ -49,7 +49,6 @@ const OMIT_SIDES_FOR_LINE_SLASH = {
   w: true,
   nw: true,
   se: true,
-  rotation: true,
 };
 
 const OMIT_SIDES_FOR_LINE_BACKSLASH = {
@@ -59,7 +58,6 @@ const OMIT_SIDES_FOR_LINE_BACKSLASH = {
   w: true,
   ne: true,
   sw: true,
-  rotation: true,
 };
 
 const generateTransformHandle = (
