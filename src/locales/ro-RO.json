@@ -68,7 +68,7 @@
     "group": "Grupare selecție",
     "ungroup": "Degrupare selecție",
     "collaborators": "Colaboratori",
-    "toggleGridMode": "Comutare mod grilă",
+    "toggleGridMode": "Comută modul grilă",
     "addToLibrary": "Adăugare la bibliotecă",
     "removeFromLibrary": "Eliminare din bibliotecă",
     "libraryLoadingMessage": "Se încarcă biblioteca...",
@@ -98,9 +98,9 @@
     "redo": "Refacere",
     "roomDialog": "Colaborare în direct",
     "createNewRoom": "Creare cameră nouă",
-    "toggleFullScreen": "",
-    "toggleDarkMode": "Comutare mod întunecat",
-    "toggleZenMode": "Comutare mod zen",
+    "toggleFullScreen": "Comută modul ecran complet",
+    "toggleDarkMode": "Comută modul întunecat",
+    "toggleZenMode": "Comută modul zen",
     "exitZenMode": "Ieșire din modul zen"
   },
   "alerts": {
@@ -110,7 +110,7 @@
     "importBackendFailed": "",
     "cannotExportEmptyCanvas": "",
     "couldNotCopyToClipboard": "",
-    "decryptFailed": "",
+    "decryptFailed": "Datele nu au putut fi decriptate.",
     "uploadedSecurly": "",
     "loadSceneOverridePrompt": ""
   },
