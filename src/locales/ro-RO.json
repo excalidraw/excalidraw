@@ -106,10 +106,10 @@
   "alerts": {
     "clearReset": "",
     "couldNotCreateShareableLink": "",
-    "couldNotLoadInvalidFile": "",
+    "couldNotLoadInvalidFile": "Fișierul invalid nu a putut fi încărcat",
     "importBackendFailed": "",
-    "cannotExportEmptyCanvas": "",
-    "couldNotCopyToClipboard": "",
+    "cannotExportEmptyCanvas": "Nu se poate exporta pânza goală.",
+    "couldNotCopyToClipboard": "Nu s-a putut copia în memoria temporară. Încearcă să utilizezi navigatorul Chrome.",
     "decryptFailed": "Datele nu au putut fi decriptate.",
     "uploadedSecurly": "Încărcarea a fost securizată prin criptare integrală, însemnând că serverul Excalidraw și terții nu pot citi conținutul.",
     "loadSceneOverridePrompt": "Încărcarea desenului extern va înlocui conținutul existent. Dorești să continui?"
@@ -157,7 +157,7 @@
   },
   "roomDialog": {
     "desc_intro": "Poți invita oameni la scena ta actuală în vederea colaborării.",
-    "desc_privacy": "",
+    "desc_privacy": "Nu te îngrijora. Sesiunea utilizează criptarea integrală, astfel încât orice desenezi va rămâne privat. Nici măcar serverul nostru nu va putea vedea pe ce ai lucrat.",
     "button_startSession": "Pornire sesiune",
     "button_stopSession": "Oprire sesiune",
     "desc_inProgressIntro": "Sesiunea de colaborare în direct este în curs de desfășurare.",
