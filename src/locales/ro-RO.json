@@ -149,7 +149,7 @@
     "clearCanvasMessage_button": "să golești pânza.",
     "clearCanvasCaveat": " Acest lucru va duce la pierderea progresului ",
     "trackedToSentry_pre": "Eroarea cu identificatorul ",
-    "trackedToSentry_post": "",
+    "trackedToSentry_post": " a fost urmărită în sistemul nostru.",
     "openIssueMessage_pre": "",
     "openIssueMessage_button": "",
     "openIssueMessage_post": "",
