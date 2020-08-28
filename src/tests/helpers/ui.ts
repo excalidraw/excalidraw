@@ -1,7 +1,11 @@
 import { ToolName } from "../queries/toolQueries";
 import { fireEvent, GlobalTestState } from "../test-utils";
 import { KEYS, Key } from "../../keys";
-import { ExcalidrawElement } from "../../element/types";
+import {
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  ExcalidrawTextElement,
+} from "../../element/types";
 import { API } from "./api";
 
 const { h } = window;
@@ -174,24 +178,32 @@ export class UI {
     fireEvent.click(GlobalTestState.renderResult.getByToolName(toolName));
   };
 
-  static createElement(
-    type: ToolName,
+  static createElement<T extends ToolName>(
+    type: T,
     {
       x = 0,
-      y = x,
+      y = 0,
       size = 10,
+      width = size,
+      height = width,
     }: {
       x?: number;
       y?: number;
       size?: number;
+      width?: number;
+      height?: number;
     },
-  ) {
+  ): T extends "arrow" | "line" | "draw"
+    ? ExcalidrawLinearElement
+    : T extends "text"
+    ? ExcalidrawTextElement
+    : ExcalidrawElement {
     UI.clickTool(type);
     mouse.reset();
     mouse.down(x, y);
     mouse.reset();
-    mouse.up(x + size, y + size);
-    return h.elements[h.elements.length - 1];
+    mouse.up(x + (width ?? height ?? size), y + (height ?? size));
+    return h.elements[h.elements.length - 1] as any;
   }
 
   static group(elements: ExcalidrawElement[]) {
