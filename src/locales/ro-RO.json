@@ -181,13 +181,13 @@
     "blog": "Citește blogul nostru",
     "howto": "Urmărește ghidurile noastre",
     "github": "Ai întâmpinat o problemă? Trimite un raport",
-    "textNewLine": "",
-    "textFinish": "",
+    "textNewLine": "Adaugă o linie nouă (text)",
+    "textFinish": "Finalizează editarea (text)",
     "zoomToFit": "",
     "preventBinding": ""
   },
   "encrypted": {
-    "tooltip": ""
+    "tooltip": "Desenele tale sunt criptate integral, astfel că serverele Excalidraw nu le vor vedea niciodată."
   },
   "charts": {
     "noNumericColumn": "Ai inserat o foaie de calcul fără o coloană numerică.",
