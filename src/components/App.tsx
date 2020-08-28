@@ -143,7 +143,6 @@ import {
   isLinearElementType,
   isBindingElement,
   isBindingElementType,
-  isBindableElement,
 } from "../element/typeChecks";
 import { actionFinalize, actionDeleteSelected } from "../actions";
 import { loadLibrary } from "../data/localStorage";
