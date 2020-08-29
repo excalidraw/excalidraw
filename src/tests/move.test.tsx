@@ -126,7 +126,7 @@ describe("move element", () => {
       Math.round(h.elements[2].height),
     ]).toEqual([81, 2]);
 
-    // h.elements.forEach((element) => expect(element).toMatchSnapshot());
+    h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
 });
 
