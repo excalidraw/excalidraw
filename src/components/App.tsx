@@ -1464,7 +1464,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (event[KEYS.CTRL_OR_CMD] && event.keyCode === KEYS.GRID_KEY_CODE) {
       this.toggleGridMode();
     }
-    if (event[KEYS.CTRL_OR_CMD] && !event.altKey && !event.shiftKey) {
+    if (event[KEYS.CTRL_OR_CMD]) {
       this.setState({ isBindingEnabled: false });
     }
 
@@ -1586,10 +1586,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
       isHoldingSpace = false;
     }
-    if (
-      (!event[KEYS.CTRL_OR_CMD] || event.shiftKey || event.altKey) &&
-      !this.state.isBindingEnabled
-    ) {
+    if (!event[KEYS.CTRL_OR_CMD] && !this.state.isBindingEnabled) {
       this.setState({ isBindingEnabled: true });
     }
   });

@@ -40,7 +40,8 @@ describe("element binding", () => {
     mouse.down(rotationHandleX, rotationHandleY);
     mouse.move(300, 400);
     mouse.up();
-    expect(arrow.angle).toBeGreaterThan(2);
+    expect(arrow.angle).toBeGreaterThan(0.7 * Math.PI);
+    expect(arrow.angle).toBeLessThan(1.3 * Math.PI);
     expect(arrow.startBinding?.elementId).toBe(rectRight.id);
     expect(arrow.endBinding?.elementId).toBe(rectLeft.id);
   });
