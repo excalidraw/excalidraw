@@ -13,37 +13,36 @@ describe("element binding", () => {
     render(<App />);
   });
 
-  // NOTE if this tests fails, skip it -- it was really flaky at one point
   it("rotation of arrow should rebind both ends", () => {
-    const rect1 = UI.createElement("rectangle", {
+    const rectLeft = UI.createElement("rectangle", {
       x: 0,
-      width: 100,
-      height: 1000,
+      width: 200,
+      height: 500,
     });
-    const rect2 = UI.createElement("rectangle", {
-      x: 200,
-      width: 100,
-      height: 1000,
+    const rectRight = UI.createElement("rectangle", {
+      x: 400,
+      width: 200,
+      height: 500,
     });
     const arrow = UI.createElement("arrow", {
-      x: 110,
-      y: 50,
-      width: 80,
+      x: 220,
+      y: 250,
+      width: 160,
       height: 1,
     });
-    expect(arrow.startBinding?.elementId).toBe(rect1.id);
-    expect(arrow.endBinding?.elementId).toBe(rect2.id);
+    expect(arrow.startBinding?.elementId).toBe(rectLeft.id);
+    expect(arrow.endBinding?.elementId).toBe(rectRight.id);
 
-    const { rotation } = getTransformHandles(arrow, h.state.zoom, "mouse");
-    if (rotation) {
-      const rotationHandleX = rotation[0] + rotation[2] / 2;
-      const rotationHandleY = rotation[1] + rotation[3] / 2;
-      mouse.down(rotationHandleX, rotationHandleY);
-      mouse.move(0, 1000);
-      mouse.up();
-    }
-    expect(arrow.angle).toBeGreaterThan(3);
-    expect(arrow.startBinding?.elementId).toBe(rect2.id);
-    expect(arrow.endBinding?.elementId).toBe(rect1.id);
+    const rotation = getTransformHandles(arrow, h.state.zoom, "mouse")
+      .rotation!;
+    const rotationHandleX = rotation[0] + rotation[2] / 2;
+    const rotationHandleY = rotation[1] + rotation[3] / 2;
+    mouse.down(rotationHandleX, rotationHandleY);
+    mouse.move(300, 400);
+    mouse.up();
+    expect(arrow.angle).toBeGreaterThan(0.7 * Math.PI);
+    expect(arrow.angle).toBeLessThan(1.3 * Math.PI);
+    expect(arrow.startBinding?.elementId).toBe(rectRight.id);
+    expect(arrow.endBinding?.elementId).toBe(rectLeft.id);
   });
 });

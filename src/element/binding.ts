@@ -46,6 +46,7 @@ export const bindOrUnbindLinearElement = (
   bindOrUnbindLinearElementEdge(
     linearElement,
     startBindingElement,
+    endBindingElement,
     "start",
     boundToElementIds,
     unboundFromElementIds,
@@ -53,6 +54,7 @@ export const bindOrUnbindLinearElement = (
   bindOrUnbindLinearElementEdge(
     linearElement,
     endBindingElement,
+    startBindingElement,
     "end",
     boundToElementIds,
     unboundFromElementIds,
@@ -75,6 +77,7 @@ export const bindOrUnbindLinearElement = (
 const bindOrUnbindLinearElementEdge = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   bindableElement: ExcalidrawBindableElement | null | "keep",
+  otherEdgeBindableElement: ExcalidrawBindableElement | null | "keep",
   startOrEnd: "start" | "end",
   // Is mutated
   boundToElementIds: Set<ExcalidrawBindableElement["id"]>,
@@ -83,8 +86,22 @@ const bindOrUnbindLinearElementEdge = (
 ): void => {
   if (bindableElement !== "keep") {
     if (bindableElement != null) {
-      bindLinearElement(linearElement, bindableElement, startOrEnd);
-      boundToElementIds.add(bindableElement.id);
+      // Don't bind if we're trying to bind or are already bound to the same
+      // element on the other edge already ("start" edge takes precedence).
+      if (
+        otherEdgeBindableElement == null ||
+        (otherEdgeBindableElement === "keep"
+          ? !isLinearElementSimpleAndAlreadyBoundOnOppositeEdge(
+              linearElement,
+              bindableElement,
+              startOrEnd,
+            )
+          : startOrEnd === "start" ||
+            otherEdgeBindableElement.id !== bindableElement.id)
+      ) {
+        bindLinearElement(linearElement, bindableElement, startOrEnd);
+        boundToElementIds.add(bindableElement.id);
+      }
     } else {
       const unbound = unbindLinearElement(linearElement, startOrEnd);
       if (unbound != null) {
@@ -110,7 +127,7 @@ export const bindOrUnbindSelectedElements = (
   });
 };
 
-export const maybeBindBindableElement = (
+const maybeBindBindableElement = (
   bindableElement: NonDeleted<ExcalidrawBindableElement>,
 ): void => {
   getElligibleElementsForBindableElementAndWhere(
@@ -134,7 +151,14 @@ export const maybeBindLinearElement = (
     bindLinearElement(linearElement, appState.startBoundElement, "start");
   }
   const hoveredElement = getHoveredElementForBinding(pointerCoords, scene);
-  if (hoveredElement != null) {
+  if (
+    hoveredElement != null &&
+    !isLinearElementSimpleAndAlreadyBoundOnOppositeEdge(
+      linearElement,
+      hoveredElement,
+      "end",
+    )
+  ) {
     bindLinearElement(linearElement, hoveredElement, "end");
   }
 };
@@ -144,15 +168,6 @@ const bindLinearElement = (
   hoveredElement: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
 ): void => {
-  if (
-    isLinearElementSimpleAndAlreadyBoundOnOppositeEdge(
-      linearElement,
-      hoveredElement,
-      startOrEnd,
-    )
-  ) {
-    return;
-  }
   mutateElement(linearElement, {
     [startOrEnd === "start" ? "startBinding" : "endBinding"]: {
       elementId: hoveredElement.id,
@@ -442,40 +457,10 @@ const getElligibleElementForBindingElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   startOrEnd: "start" | "end",
 ): NonDeleted<ExcalidrawBindableElement> | null => {
-  return getElligibleElementForBindingElementAtCoors(
-    linearElement,
-    startOrEnd,
+  return getHoveredElementForBinding(
     getLinearElementEdgeCoors(linearElement, startOrEnd),
-  );
-};
-
-export const getElligibleElementForBindingElementAtCoors = (
-  linearElement: NonDeleted<ExcalidrawLinearElement>,
-  startOrEnd: "start" | "end",
-  pointerCoords: {
-    x: number;
-    y: number;
-  },
-): NonDeleted<ExcalidrawBindableElement> | null => {
-  const bindableElement = getHoveredElementForBinding(
-    pointerCoords,
     Scene.getScene(linearElement)!,
   );
-  if (bindableElement == null) {
-    return null;
-  }
-  // Note: We could push this check inside a version of
-  // `getHoveredElementForBinding`, but it's unlikely this is needed.
-  if (
-    isLinearElementSimpleAndAlreadyBoundOnOppositeEdge(
-      linearElement,
-      bindableElement,
-      startOrEnd,
-    )
-  ) {
-    return null;
-  }
-  return bindableElement;
 };
 
 const getLinearElementEdgeCoors = (

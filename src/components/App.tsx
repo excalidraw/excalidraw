@@ -167,7 +167,6 @@ import {
   bindOrUnbindSelectedElements,
   unbindLinearElements,
   fixBindingsAfterDuplication,
-  getElligibleElementForBindingElementAtCoors,
   fixBindingsAfterDeletion,
   isLinearElementSimpleAndAlreadyBound,
   isBindingEnabled,
@@ -2944,7 +2943,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           )
         ) {
           this.maybeSuggestBindingForAll(selectedElements);
-          bindOrUnbindSelectedElements(selectedElements);
           return;
         }
       }
@@ -3201,6 +3199,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         elementType,
         elementLocked,
         isResizing,
+        isRotating,
       } = this.state;
 
       this.setState({
@@ -3313,7 +3312,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             }));
           }
         }
-
         return;
       }
 
@@ -3337,12 +3335,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           draggingElement,
           getNormalizedDimensions(draggingElement),
         );
-
-        if (isBindingEnabled(this.state)) {
-          bindOrUnbindSelectedElements(
-            getSelectedElements(this.scene.getElements(), this.state),
-          );
-        }
       }
 
       if (resizingElement) {
@@ -3470,7 +3462,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         history.resumeRecording();
       }
 
-      if (pointerDownState.drag.hasOccurred || isResizing) {
+      if (pointerDownState.drag.hasOccurred || isResizing || isRotating) {
         (isBindingEnabled(this.state)
           ? bindOrUnbindSelectedElements
           : unbindLinearElements)(
@@ -3519,10 +3511,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     // into `linearElement`
     oppositeBindingBoundElement?: ExcalidrawBindableElement | null,
   ): void => {
-    const hoveredBindableElement = getElligibleElementForBindingElementAtCoors(
-      linearElement,
-      startOrEnd,
+    const hoveredBindableElement = getHoveredElementForBinding(
       pointerCoords,
+      this.scene,
     );
     this.setState({
       suggestedBindings:
