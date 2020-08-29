@@ -1002,13 +1002,27 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     const oldIdToDuplicatedId = new Map();
     const newElements = clipboardElements.map((element) => {
+      const pastedPositionX = element.x + dx - minX;
+      const pastedPositionY = element.y + dy - minY;
       const newElement = duplicateElement(
         this.state.editingGroupId,
         groupIdMap,
         element,
         {
-          x: element.x + dx - minX,
-          y: element.y + dy - minY,
+          x: this.state.gridSize
+            ? getGridPoint(
+                pastedPositionX,
+                pastedPositionY,
+                this.state.gridSize,
+              )[0]
+            : pastedPositionX,
+          y: this.state.gridSize
+            ? getGridPoint(
+                pastedPositionX,
+                pastedPositionY,
+                this.state.gridSize,
+              )[1]
+            : pastedPositionY,
         },
       );
       oldIdToDuplicatedId.set(element.id, newElement.id);
