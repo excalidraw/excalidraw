@@ -9,6 +9,7 @@ import {
   actionBringForward,
   actionBringToFront,
   actionSendToBack,
+  actionDuplicateSelection,
 } from "../actions";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
@@ -854,5 +855,210 @@ describe("z-index manipulation", () => {
         [actionSendToBack, ["A", "D", "B", "C"]],
       ],
     });
+  });
+
+  it("duplicating elements should retain zindex integrity", () => {
+    populateElements([
+      { id: "A", isSelected: true },
+      { id: "B", isSelected: true },
+    ]);
+    h.app.actionManager.executeAction(actionDuplicateSelection);
+    expect(h.elements).toMatchObject([
+      { id: "A" },
+      { id: "A_copy" },
+      { id: "B" },
+      { id: "B_copy" },
+    ]);
+
+    populateElements([
+      { id: "A", groupIds: ["g1"], isSelected: true },
+      { id: "B", groupIds: ["g1"], isSelected: true },
+    ]);
+    h.setState({
+      selectedGroupIds: { g1: true },
+    });
+    h.app.actionManager.executeAction(actionDuplicateSelection);
+    expect(h.elements).toMatchObject([
+      { id: "A" },
+      { id: "B" },
+      {
+        id: "A_copy",
+
+        groupIds: [expect.stringMatching(/.{3,}/)],
+      },
+      {
+        id: "B_copy",
+
+        groupIds: [expect.stringMatching(/.{3,}/)],
+      },
+    ]);
+
+    populateElements([
+      { id: "A", groupIds: ["g1"], isSelected: true },
+      { id: "B", groupIds: ["g1"], isSelected: true },
+      { id: "C" },
+    ]);
+    h.setState({
+      selectedGroupIds: { g1: true },
+    });
+    h.app.actionManager.executeAction(actionDuplicateSelection);
+    expect(h.elements).toMatchObject([
+      { id: "A" },
+      { id: "B" },
+      {
+        id: "A_copy",
+
+        groupIds: [expect.stringMatching(/.{3,}/)],
+      },
+      {
+        id: "B_copy",
+
+        groupIds: [expect.stringMatching(/.{3,}/)],
+      },
+      { id: "C" },
+    ]);
+
+    populateElements([
+      { id: "A", groupIds: ["g1"], isSelected: true },
+      { id: "B", groupIds: ["g1"], isSelected: true },
+      { id: "C", isSelected: true },
+    ]);
+    h.setState({
+      selectedGroupIds: { g1: true },
+    });
+    h.app.actionManager.executeAction(actionDuplicateSelection);
+    expect(h.elements.map((element) => element.id)).toEqual([
+      "A",
+      "B",
+      "A_copy",
+      "B_copy",
+      "C",
+      "C_copy",
+    ]);
+
+    populateElements([
+      { id: "A", groupIds: ["g1"], isSelected: true },
+      { id: "B", groupIds: ["g1"], isSelected: true },
+      { id: "C", groupIds: ["g2"], isSelected: true },
+      { id: "D", groupIds: ["g2"], isSelected: true },
+    ]);
+    h.setState({
+      selectedGroupIds: { g1: true, g2: true },
+    });
+    h.app.actionManager.executeAction(actionDuplicateSelection);
+    expect(h.elements.map((element) => element.id)).toEqual([
+      "A",
+      "B",
+      "A_copy",
+      "B_copy",
+      "C",
+      "D",
+      "C_copy",
+      "D_copy",
+    ]);
+
+    populateElements([
+      { id: "A", groupIds: ["g1", "g2"], isSelected: true },
+      { id: "B", groupIds: ["g1", "g2"], isSelected: true },
+      { id: "C", groupIds: ["g2"], isSelected: true },
+    ]);
+    h.setState({
+      selectedGroupIds: { g1: true },
+    });
+    h.app.actionManager.executeAction(actionDuplicateSelection);
+    expect(h.elements.map((element) => element.id)).toEqual([
+      "A",
+      "B",
+      "A_copy",
+      "B_copy",
+      "C",
+      "C_copy",
+    ]);
+
+    populateElements([
+      { id: "A", groupIds: ["g1", "g2"], isSelected: true },
+      { id: "B", groupIds: ["g1", "g2"], isSelected: true },
+      { id: "C", groupIds: ["g2"], isSelected: true },
+    ]);
+    h.setState({
+      selectedGroupIds: { g2: true },
+    });
+    h.app.actionManager.executeAction(actionDuplicateSelection);
+    expect(h.elements.map((element) => element.id)).toEqual([
+      "A",
+      "B",
+      "C",
+      "A_copy",
+      "B_copy",
+      "C_copy",
+    ]);
+
+    populateElements([
+      { id: "A", groupIds: ["g1", "g2"], isSelected: true },
+      { id: "B", groupIds: ["g1", "g2"], isSelected: true },
+      { id: "C", groupIds: ["g2"], isSelected: true },
+      { id: "D", groupIds: ["g3", "g4"], isSelected: true },
+      { id: "E", groupIds: ["g3", "g4"], isSelected: true },
+      { id: "F", groupIds: ["g4"], isSelected: true },
+    ]);
+    h.setState({
+      selectedGroupIds: { g2: true, g4: true },
+    });
+    h.app.actionManager.executeAction(actionDuplicateSelection);
+    expect(h.elements.map((element) => element.id)).toEqual([
+      "A",
+      "B",
+      "C",
+      "A_copy",
+      "B_copy",
+      "C_copy",
+      "D",
+      "E",
+      "F",
+      "D_copy",
+      "E_copy",
+      "F_copy",
+    ]);
+
+    populateElements([
+      { id: "A", groupIds: ["g1", "g2"], isSelected: true },
+      { id: "B", groupIds: ["g1", "g2"] },
+      { id: "C", groupIds: ["g2"] },
+    ]);
+    h.app.actionManager.executeAction(actionDuplicateSelection);
+    expect(h.elements.map((element) => element.id)).toEqual([
+      "A",
+      "A_copy",
+      "B",
+      "C",
+    ]);
+
+    populateElements([
+      { id: "A", groupIds: ["g1", "g2"] },
+      { id: "B", groupIds: ["g1", "g2"], isSelected: true },
+      { id: "C", groupIds: ["g2"] },
+    ]);
+    h.app.actionManager.executeAction(actionDuplicateSelection);
+    expect(h.elements.map((element) => element.id)).toEqual([
+      "A",
+      "B",
+      "B_copy",
+      "C",
+    ]);
+
+    populateElements([
+      { id: "A", groupIds: ["g1", "g2"], isSelected: true },
+      { id: "B", groupIds: ["g1", "g2"], isSelected: true },
+      { id: "C", groupIds: ["g2"], isSelected: true },
+    ]);
+    h.app.actionManager.executeAction(actionDuplicateSelection);
+    expect(h.elements.map((element) => element.id)).toEqual([
+      "A",
+      "A_copy",
+      "B",
+      "B_copy",
+      "C",
+      "C_copy",
+    ]);
   });
 });
