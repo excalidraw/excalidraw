@@ -135,7 +135,7 @@ import {
 import LayerUI from "./LayerUI";
 import { ScrollBars, SceneState } from "../scene/types";
 import { generateCollaborationLink, getCollaborationLinkData } from "../data";
-import { mutateElement, newElementWith } from "../element/mutateElement";
+import { mutateElement } from "../element/mutateElement";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import { unstable_batchedUpdates } from "react-dom";
 import {
@@ -173,6 +173,7 @@ import {
   fixBindingsAfterDeletion,
   isLinearElementSimpleAndAlreadyBound,
   isBindingEnabled,
+  updateBoundElements,
 } from "../element/binding";
 import { MaybeTransformHandleType } from "../element/transformHandles";
 
@@ -608,7 +609,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.setState({});
   });
 
-  private onHashChange = (event: HashChangeEvent) => {
+  private onHashChange = (_: HashChangeEvent) => {
     if (window.location.hash.length > 1) {
       this.initializeScene();
     }
@@ -1486,24 +1487,35 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         (event.shiftKey
           ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
           : ELEMENT_TRANSLATE_AMOUNT);
-      this.scene.replaceAllElements(
-        this.scene.getElementsIncludingDeleted().map((el) => {
-          if (this.state.selectedElementIds[el.id]) {
-            const update: { x?: number; y?: number } = {};
-            if (event.key === KEYS.ARROW_LEFT) {
-              update.x = el.x - step;
-            } else if (event.key === KEYS.ARROW_RIGHT) {
-              update.x = el.x + step;
-            } else if (event.key === KEYS.ARROW_UP) {
-              update.y = el.y - step;
-            } else if (event.key === KEYS.ARROW_DOWN) {
-              update.y = el.y + step;
-            }
-            return newElementWith(el, update);
-          }
-          return el;
-        }),
-      );
+
+      const selectedElements = this.scene
+        .getElements()
+        .filter((element) => this.state.selectedElementIds[element.id]);
+
+      let offsetX = 0;
+      let offsetY = 0;
+
+      if (event.key === KEYS.ARROW_LEFT) {
+        offsetX = -step;
+      } else if (event.key === KEYS.ARROW_RIGHT) {
+        offsetX = step;
+      } else if (event.key === KEYS.ARROW_UP) {
+        offsetY = -step;
+      } else if (event.key === KEYS.ARROW_DOWN) {
+        offsetY = step;
+      }
+
+      selectedElements.forEach((element) => {
+        mutateElement(element, {
+          x: element.x + offsetX,
+          y: element.y + offsetY,
+        });
+
+        updateBoundElements(element, {
+          simultaneouslyUpdated: selectedElements,
+        });
+      });
+
       event.preventDefault();
     } else if (event.key === KEYS.ENTER) {
       const selectedElements = getSelectedElements(
