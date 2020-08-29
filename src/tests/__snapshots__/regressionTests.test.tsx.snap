@@ -997,7 +997,7 @@ Object {
   "versionNonce": 915032327,
   "width": 10,
   "x": 30,
-  "y": 30,
+  "y": 0,
 }
 `;
 
@@ -1025,7 +1025,7 @@ Object {
   "versionNonce": 81784553,
   "width": 10,
   "x": 60,
-  "y": 60,
+  "y": 0,
 }
 `;
 
@@ -1125,7 +1125,7 @@ Object {
           "versionNonce": 453191,
           "width": 10,
           "x": 30,
-          "y": 30,
+          "y": 0,
         },
       ],
     },
@@ -1191,7 +1191,7 @@ Object {
           "versionNonce": 1116226695,
           "width": 10,
           "x": 30,
-          "y": 30,
+          "y": 0,
         },
       ],
     },
@@ -1255,7 +1255,7 @@ Object {
           "versionNonce": 1116226695,
           "width": 10,
           "x": 30,
-          "y": 30,
+          "y": 0,
         },
       ],
     },
@@ -1318,7 +1318,7 @@ Object {
           "versionNonce": 1116226695,
           "width": 10,
           "x": 30,
-          "y": 30,
+          "y": 0,
         },
         Object {
           "angle": 0,
@@ -1341,7 +1341,7 @@ Object {
           "versionNonce": 1604849351,
           "width": 10,
           "x": 60,
-          "y": 60,
+          "y": 0,
         },
       ],
     },
@@ -1410,7 +1410,7 @@ Object {
           "versionNonce": 915032327,
           "width": 10,
           "x": 30,
-          "y": 30,
+          "y": 0,
         },
         Object {
           "angle": 0,
@@ -1435,7 +1435,7 @@ Object {
           "versionNonce": 81784553,
           "width": 10,
           "x": 60,
-          "y": 60,
+          "y": 0,
         },
       ],
     },
@@ -1501,7 +1501,7 @@ Object {
           "versionNonce": 915032327,
           "width": 10,
           "x": 30,
-          "y": 30,
+          "y": 0,
         },
         Object {
           "angle": 0,
@@ -1526,7 +1526,7 @@ Object {
           "versionNonce": 81784553,
           "width": 10,
           "x": 60,
-          "y": 60,
+          "y": 0,
         },
       ],
     },
@@ -1592,7 +1592,7 @@ Object {
           "versionNonce": 915032327,
           "width": 10,
           "x": 30,
-          "y": 30,
+          "y": 0,
         },
         Object {
           "angle": 0,
@@ -1617,7 +1617,7 @@ Object {
           "versionNonce": 81784553,
           "width": 10,
           "x": 60,
-          "y": 60,
+          "y": 0,
         },
       ],
     },
@@ -25348,7 +25348,7 @@ Object {
   "versionNonce": 81784553,
   "width": 10,
   "x": 10,
-  "y": 10,
+  "y": 0,
 }
 `;
 
@@ -25377,7 +25377,7 @@ Object {
   "versionNonce": 747212839,
   "width": 10,
   "x": 50,
-  "y": 50,
+  "y": 0,
 }
 `;
 
@@ -25476,7 +25476,7 @@ Object {
           "versionNonce": 1278240551,
           "width": 10,
           "x": 10,
-          "y": 10,
+          "y": 0,
         },
       ],
     },
@@ -25512,7 +25512,7 @@ Object {
           "versionNonce": 1278240551,
           "width": 10,
           "x": 10,
-          "y": 10,
+          "y": 0,
         },
         Object {
           "angle": 0,
@@ -25535,7 +25535,7 @@ Object {
           "versionNonce": 453191,
           "width": 10,
           "x": 50,
-          "y": 50,
+          "y": 0,
         },
       ],
     },
@@ -25576,7 +25576,7 @@ Object {
           "versionNonce": 1150084233,
           "width": 10,
           "x": 10,
-          "y": 10,
+          "y": 0,
         },
         Object {
           "angle": 0,
@@ -25601,7 +25601,7 @@ Object {
           "versionNonce": 1116226695,
           "width": 10,
           "x": 50,
-          "y": 50,
+          "y": 0,
         },
       ],
     },
@@ -25639,7 +25639,7 @@ Object {
           "versionNonce": 1150084233,
           "width": 10,
           "x": 10,
-          "y": 10,
+          "y": 0,
         },
         Object {
           "angle": 0,
@@ -25664,7 +25664,7 @@ Object {
           "versionNonce": 1116226695,
           "width": 10,
           "x": 50,
-          "y": 50,
+          "y": 0,
         },
         Object {
           "angle": 0,
@@ -25725,7 +25725,7 @@ Object {
           "versionNonce": 1150084233,
           "width": 10,
           "x": 10,
-          "y": 10,
+          "y": 0,
         },
         Object {
           "angle": 0,
@@ -25750,7 +25750,7 @@ Object {
           "versionNonce": 1116226695,
           "width": 10,
           "x": 50,
-          "y": 50,
+          "y": 0,
         },
         Object {
           "angle": 0,
@@ -25837,7 +25837,7 @@ Object {
           "versionNonce": 1150084233,
           "width": 10,
           "x": 10,
-          "y": 10,
+          "y": 0,
         },
         Object {
           "angle": 0,
@@ -25862,7 +25862,7 @@ Object {
           "versionNonce": 1116226695,
           "width": 10,
           "x": 50,
-          "y": 50,
+          "y": 0,
         },
         Object {
           "angle": 0,
@@ -25954,7 +25954,7 @@ Object {
           "versionNonce": 81784553,
           "width": 10,
           "x": 10,
-          "y": 10,
+          "y": 0,
         },
         Object {
           "angle": 0,
@@ -25980,7 +25980,7 @@ Object {
           "versionNonce": 747212839,
           "width": 10,
           "x": 50,
-          "y": 50,
+          "y": 0,
         },
         Object {
           "angle": 0,
