@@ -10,6 +10,7 @@ import {
   NonDeleted,
   ExcalidrawRectangleElement,
 } from "../element/types";
+import { UI, Pointer, Keyboard } from "./helpers/ui";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
@@ -58,73 +59,48 @@ describe("move element", () => {
   });
 
   it("rectangles with binding arrow", () => {
-    const { getByToolName, container } = render(<App />);
-    const canvas = container.querySelector("canvas")!;
+    render(<App />);
 
-    {
-      // create the first rectangle
-      const toolRect = getByToolName("rectangle");
-      fireEvent.click(toolRect);
-      fireEvent.pointerDown(canvas, { clientX: 0, clientY: 0 });
-      fireEvent.pointerMove(canvas, { clientX: 100, clientY: 1000 });
-      fireEvent.pointerUp(canvas);
+    // create elements
+    const rectA = UI.createElement("rectangle", { size: 100 });
+    const rectB = UI.createElement("rectangle", { x: 200, y: 0, size: 300 });
+    const line = UI.createElement("line", { x: 110, y: 50, size: 80 });
 
-      // create the second rectangle
-      fireEvent.click(toolRect);
-      fireEvent.pointerDown(canvas, { clientX: 200, clientY: 0 });
-      fireEvent.pointerMove(canvas, { clientX: 300, clientY: 1000 });
-      fireEvent.pointerUp(canvas);
+    // bind line to two rectangles
+    bindOrUnbindLinearElement(
+      line as NonDeleted<ExcalidrawLinearElement>,
+      rectA as ExcalidrawRectangleElement,
+      rectB as ExcalidrawRectangleElement,
+    );
 
-      // create a line
-      const toolLine = getByToolName("line");
-      fireEvent.click(toolLine);
-      fireEvent.pointerDown(canvas, { clientX: 110, clientY: 50 });
-      fireEvent.pointerMove(canvas, { clientX: 190, clientY: 51 });
-      fireEvent.pointerUp(canvas);
+    // select the second rectangles
+    new Pointer("mouse").clickOn(rectB);
 
-      // bind line to two rectangles
-      bindOrUnbindLinearElement(
-        h.elements[2] as NonDeleted<ExcalidrawLinearElement>,
-        h.elements[0] as ExcalidrawRectangleElement,
-        h.elements[1] as ExcalidrawRectangleElement,
-      );
+    expect(renderScene).toHaveBeenCalledTimes(19);
+    expect(h.state.selectionElement).toBeNull();
+    expect(h.elements.length).toEqual(3);
+    expect(h.state.selectedElementIds[rectB.id]).toBeTruthy();
+    expect([rectA.x, rectA.y]).toEqual([0, 0]);
+    expect([rectB.x, rectB.y]).toEqual([200, 0]);
+    expect([line.x, line.y]).toEqual([110, 50]);
+    expect([line.width, line.height]).toEqual([80, 80]);
 
-      // select the second rectangles
-      fireEvent.pointerDown(canvas, { clientX: 200, clientY: 0 });
-      fireEvent.pointerUp(canvas);
-
-      expect(renderScene).toHaveBeenCalledTimes(19);
-      expect(h.state.selectionElement).toBeNull();
-      expect(h.elements.length).toEqual(3);
-      expect(h.state.selectedElementIds[h.elements[1].id]).toBeTruthy();
-      expect([h.elements[0].x, h.elements[0].y]).toEqual([0, 0]);
-      expect([h.elements[1].x, h.elements[1].y]).toEqual([200, 0]);
-      expect([h.elements[2].x, h.elements[2].y]).toEqual([110, 50]);
-      expect([h.elements[2].width, h.elements[2].height]).toEqual([80, 1]);
-
-      renderScene.mockClear();
-    }
+    renderScene.mockClear();
 
     // Move selected rectangle
-    fireEvent.keyDown(canvas, { key: "ArrowRight", code: "ArrowRight" });
-    fireEvent.keyDown(canvas, { key: "ArrowDown", code: "ArrowDown" });
-    fireEvent.keyDown(canvas, { key: "ArrowDown", code: "ArrowDown" });
+    Keyboard.keyDown("ArrowRight");
+    Keyboard.keyDown("ArrowDown");
+    Keyboard.keyDown("ArrowDown");
 
     // Check that the arrow size has been changed according to moving the rectangle
     expect(renderScene).toHaveBeenCalledTimes(3);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(3);
-    expect(h.state.selectedElementIds[h.elements[1].id]).toBeTruthy();
-    expect([h.elements[0].x, h.elements[0].y]).toEqual([0, 0]);
-    expect([h.elements[1].x, h.elements[1].y]).toEqual([201, 2]);
-    expect([Math.round(h.elements[2].x), Math.round(h.elements[2].y)]).toEqual([
-      110,
-      50,
-    ]);
-    expect([
-      Math.round(h.elements[2].width),
-      Math.round(h.elements[2].height),
-    ]).toEqual([81, 2]);
+    expect(h.state.selectedElementIds[rectB.id]).toBeTruthy();
+    expect([rectA.x, rectA.y]).toEqual([0, 0]);
+    expect([rectB.x, rectB.y]).toEqual([201, 2]);
+    expect([Math.round(line.x), Math.round(line.y)]).toEqual([110, 50]);
+    expect([Math.round(line.width), Math.round(line.height)]).toEqual([81, 81]);
 
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
