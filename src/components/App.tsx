@@ -143,7 +143,6 @@ import {
   isLinearElementType,
   isBindingElement,
   isBindingElementType,
-  isBindableElement,
 } from "../element/typeChecks";
 import { actionFinalize, actionDeleteSelected } from "../actions";
 import { loadLibrary } from "../data/localStorage";
@@ -168,7 +167,6 @@ import {
   bindOrUnbindSelectedElements,
   unbindLinearElements,
   fixBindingsAfterDuplication,
-  maybeBindBindableElement,
   getElligibleElementForBindingElementAtCoors,
   fixBindingsAfterDeletion,
   isLinearElementSimpleAndAlreadyBound,
@@ -2946,6 +2944,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           )
         ) {
           this.maybeSuggestBindingForAll(selectedElements);
+          bindOrUnbindSelectedElements(selectedElements);
           return;
         }
       }
@@ -3339,11 +3338,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           getNormalizedDimensions(draggingElement),
         );
 
-        if (
-          isBindingEnabled(this.state) &&
-          isBindableElement(draggingElement)
-        ) {
-          maybeBindBindableElement(draggingElement);
+        if (isBindingEnabled(this.state)) {
+          bindOrUnbindSelectedElements(
+            getSelectedElements(this.scene.getElements(), this.state),
+          );
         }
       }
 
