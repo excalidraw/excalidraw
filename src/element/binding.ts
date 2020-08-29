@@ -110,7 +110,7 @@ export const bindOrUnbindSelectedElements = (
   });
 };
 
-export const maybeBindBindableElement = (
+const maybeBindBindableElement = (
   bindableElement: NonDeleted<ExcalidrawBindableElement>,
 ): void => {
   getElligibleElementsForBindableElementAndWhere(
