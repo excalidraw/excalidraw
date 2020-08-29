@@ -167,7 +167,6 @@ import {
   bindOrUnbindSelectedElements,
   unbindLinearElements,
   fixBindingsAfterDuplication,
-  getElligibleElementForBindingElementAtCoors,
   fixBindingsAfterDeletion,
   isLinearElementSimpleAndAlreadyBound,
   isBindingEnabled,
@@ -3515,10 +3514,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     // into `linearElement`
     oppositeBindingBoundElement?: ExcalidrawBindableElement | null,
   ): void => {
-    const hoveredBindableElement = getElligibleElementForBindingElementAtCoors(
-      linearElement,
-      startOrEnd,
+    const hoveredBindableElement = getHoveredElementForBinding(
       pointerCoords,
+      this.scene,
     );
     this.setState({
       suggestedBindings:
