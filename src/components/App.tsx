@@ -1298,12 +1298,17 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               break;
             case "MOUSE_LOCATION": {
               const {
-                socketId,
                 pointer,
                 button,
                 username,
                 selectedElementIds,
               } = decryptedData.payload;
+
+              const socketId: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["socketId"] =
+                decryptedData.payload.socketId ||
+                // @ts-ignore legacy, see #2094 (#2097)
+                decryptedData.payload.socketID;
+
               // NOTE purposefully mutating collaborators map in case of
               //  pointer updates so as not to trigger LayerUI rerender
               this.setState((state) => {
