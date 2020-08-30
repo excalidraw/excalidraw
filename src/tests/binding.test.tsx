@@ -3,6 +3,7 @@ import { render } from "./test-utils";
 import App from "../components/App";
 import { UI, Pointer } from "./helpers/ui";
 import { getTransformHandles } from "../element/transformHandles";
+import { API } from "./helpers/api";
 
 const { h } = window;
 
@@ -45,4 +46,37 @@ describe("element binding", () => {
     expect(arrow.startBinding?.elementId).toBe(rectRight.id);
     expect(arrow.endBinding?.elementId).toBe(rectLeft.id);
   });
+
+  it(
+    "editing arrow and moving its head to bind it to element A, finalizing the" +
+      "editing by clicking on element A should end up selecting A",
+    async () => {
+      UI.createElement("rectangle", {
+        y: 0,
+        size: 100,
+      });
+      // Create arrow bound to rectangle
+      UI.clickTool("arrow");
+      mouse.down(50, -100);
+      mouse.up(0, 80);
+
+      // Edit arrow with multi-point
+      mouse.doubleClick();
+      // move arrow head
+      mouse.down();
+      mouse.up(0, 10);
+      expect(API.getSelectedElement().type).toBe("arrow");
+
+      // NOTE this mouse down/up + await needs to be done in order to repro
+      //  the issue, due to https://github.com/excalidraw/excalidraw/blob/46bff3daceb602accf60c40a84610797260fca94/src/components/App.tsx#L740
+      mouse.reset();
+      expect(h.state.editingLinearElement).not.toBe(null);
+      mouse.down(0, 0);
+      await new Promise((r) => setTimeout(r, 100));
+      expect(h.state.editingLinearElement).toBe(null);
+      expect(API.getSelectedElement().type).toBe("rectangle");
+      mouse.up();
+      expect(API.getSelectedElement().type).toBe("rectangle");
+    },
+  );
 });
