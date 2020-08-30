@@ -132,8 +132,8 @@
     "shapes": "Forme"
   },
   "hints": {
-    "linearElement": "",
-    "freeDraw": "",
+    "linearElement": "Dă clic pentru a crea mai multe puncte, trage pentru a forma o singură linie",
+    "freeDraw": "Dă clic și trage, eliberează când ești gata",
     "text": "Sfat: poți adăuga text și dând dublu clic oriunde cu instrumentul de selectare",
     "linearElementMulti": "Dă clic pe ultimul punct sau apasă tasta Escape sau Enter pentru a termina",
     "resize": "",
@@ -183,8 +183,8 @@
     "github": "Ai întâmpinat o problemă? Trimite un raport",
     "textNewLine": "Adaugă o linie nouă (text)",
     "textFinish": "Finalizează editarea (text)",
-    "zoomToFit": "",
-    "preventBinding": ""
+    "zoomToFit": "Apropiere/depărtare pentru a cuprinde totul",
+    "preventBinding": "Împiedică legarea săgeții"
   },
   "encrypted": {
     "tooltip": "Desenele tale sunt criptate integral, astfel că serverele Excalidraw nu le vor vedea niciodată."
