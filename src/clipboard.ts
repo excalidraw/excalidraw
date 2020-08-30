@@ -7,8 +7,15 @@ import { AppState } from "./types";
 import { SVG_EXPORT_TAG } from "./scene/export";
 import { tryParseSpreadsheet, renderSpreadsheet } from "./charts";
 
+const TYPE_ELEMENTS = "excalidraw/elements";
+
+type ElementsClipboard = {
+  type: typeof TYPE_ELEMENTS;
+  created: number;
+  elements: ExcalidrawElement[];
+};
+
 let CLIPBOARD = "";
-let PREFER_APP_CLIPBOARD = false;
 
 export const probablySupportsClipboardReadText =
   "clipboard" in navigator && "readText" in navigator.clipboard;
@@ -22,47 +29,63 @@ export const probablySupportsClipboardBlob =
   "ClipboardItem" in window &&
   "toBlob" in HTMLCanvasElement.prototype;
 
+const isElementsClipboard = (contents: any): contents is ElementsClipboard => {
+  if (contents?.type === TYPE_ELEMENTS) {
+    return true;
+  }
+  return false;
+};
+
 export const copyToAppClipboard = async (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
 ) => {
-  CLIPBOARD = JSON.stringify(getSelectedElements(elements, appState));
+  const contents: ElementsClipboard = {
+    type: TYPE_ELEMENTS,
+    created: Date.now(),
+    elements: getSelectedElements(elements, appState),
+  };
+  const json = JSON.stringify(contents);
+  CLIPBOARD = json;
   try {
-    // when copying to in-app clipboard, clear system clipboard so that if
-    //  system clip contains text on paste we know it was copied *after* user
-    //  copied elements, and thus we should prefer the text content.
-    await copyTextToSystemClipboard(null);
-    PREFER_APP_CLIPBOARD = false;
-  } catch {
-    // if clearing system clipboard didn't work, we should prefer in-app
-    //  clipboard even if there's text in system clipboard on paste, because
-    //  we can't be sure of the order of copy operations
-    PREFER_APP_CLIPBOARD = true;
-  }
+    await copyTextToSystemClipboard(json);
+  } catch {}
 };
 
-export const getAppClipboard = (): {
-  elements?: readonly ExcalidrawElement[];
-} => {
+const getAppClipboard = (): Partial<ElementsClipboard> => {
   if (!CLIPBOARD) {
     return {};
   }
 
   try {
-    const clipboardElements = JSON.parse(CLIPBOARD);
-
-    if (
-      Array.isArray(clipboardElements) &&
-      clipboardElements.length > 0 &&
-      clipboardElements[0].type // need to implement a better check here...
-    ) {
-      return { elements: clipboardElements };
-    }
+    return JSON.parse(CLIPBOARD);
   } catch (error) {
     console.error(error);
   }
 
   return {};
+};
+
+const parsePotentialSpreadsheet = (
+  text: string,
+  appState: AppState,
+  cursorX: number,
+  cursorY: number,
+) => {
+  const result = tryParseSpreadsheet(text);
+  if (result.type === "spreadsheet") {
+    return {
+      elements: renderSpreadsheet(
+        appState,
+        result.spreadsheet,
+        cursorX,
+        cursorY,
+      ),
+    };
+  } else if (result.type === "malformed spreadsheet") {
+    return { error: result.error };
+  }
+  return null;
 };
 
 export const getClipboardContent = async (
@@ -81,21 +104,30 @@ export const getClipboardContent = async (
       : probablySupportsClipboardReadText &&
         (await navigator.clipboard.readText());
 
-    if (text && !PREFER_APP_CLIPBOARD && !text.includes(SVG_EXPORT_TAG)) {
-      const result = tryParseSpreadsheet(text);
-      if (result.type === "spreadsheet") {
-        return {
-          elements: renderSpreadsheet(
-            appState,
-            result.spreadsheet,
-            cursorX,
-            cursorY,
-          ),
-        };
-      } else if (result.type === "malformed spreadsheet") {
-        return { error: result.error };
+    if (text && !text.includes(SVG_EXPORT_TAG)) {
+      const spreadsheetResult = parsePotentialSpreadsheet(
+        text,
+        appState,
+        cursorX,
+        cursorX,
+      );
+      if (spreadsheetResult) {
+        return spreadsheetResult;
       }
-      return { text };
+      const inAppClipboard = getAppClipboard();
+      try {
+        const contents = JSON.parse(text);
+        if (
+          isElementsClipboard(contents) &&
+          (!inAppClipboard?.created ||
+            inAppClipboard.created < contents.created)
+        ) {
+          return { elements: contents.elements };
+        }
+        return inAppClipboard;
+      } catch {
+        return inAppClipboard.elements ? inAppClipboard : { text };
+      }
     }
   } catch (error) {
     console.error(error);
@@ -121,14 +153,6 @@ export const copyCanvasToClipboardAsPng = async (canvas: HTMLCanvasElement) =>
       reject(error);
     }
   });
-
-export const copyCanvasToClipboardAsSvg = async (svgroot: SVGSVGElement) => {
-  try {
-    await navigator.clipboard.writeText(svgroot.outerHTML);
-  } catch (error) {
-    console.error(error);
-  }
-};
 
 export const copyTextToSystemClipboard = async (text: string | null) => {
   let copied = false;
