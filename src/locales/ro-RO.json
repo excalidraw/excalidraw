@@ -105,9 +105,9 @@
   },
   "alerts": {
     "clearReset": "",
-    "couldNotCreateShareableLink": "",
+    "couldNotCreateShareableLink": "Legătura distribuibilă nu a putut fi creată.",
     "couldNotLoadInvalidFile": "Fișierul invalid nu a putut fi încărcat",
-    "importBackendFailed": "",
+    "importBackendFailed": "Importarea de la nivel de server a eșuat.",
     "cannotExportEmptyCanvas": "Nu se poate exporta pânza goală.",
     "couldNotCopyToClipboard": "Nu s-a putut copia în memoria temporară. Încearcă să utilizezi navigatorul Chrome.",
     "decryptFailed": "Datele nu au putut fi decriptate.",
