@@ -10,7 +10,7 @@ import { createUndoAction, createRedoAction } from "../actions/actionHistory";
 const { h } = window;
 
 describe("history", () => {
-  it.only("initializing scene should end up with single history entry", async () => {
+  it("initializing scene should end up with single history entry", async () => {
     render(
       <App
         initialData={{
