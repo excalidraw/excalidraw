@@ -371,6 +371,9 @@ const LayerUI = ({
               onUsernameChange={onUsernameChange}
               onRoomCreate={onRoomCreate}
               onRoomDestroy={onRoomDestroy}
+              setErrorMessage={(message: string) =>
+                setAppState({ errorMessage: message })
+              }
             />
           </Stack.Row>
           <BackgroundPickerAndDarkModeToggle
