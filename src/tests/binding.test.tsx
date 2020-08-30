@@ -47,7 +47,7 @@ describe("element binding", () => {
     expect(arrow.endBinding?.elementId).toBe(rectLeft.id);
   });
 
-  it.only(
+  it(
     "editing arrow and moving its head to bind it to element A, finalizing the" +
       "editing by clicking on element A should end up selecting A",
     async () => {
