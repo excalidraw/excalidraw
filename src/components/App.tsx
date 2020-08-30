@@ -135,7 +135,7 @@ import {
 import LayerUI from "./LayerUI";
 import { ScrollBars, SceneState } from "../scene/types";
 import { generateCollaborationLink, getCollaborationLinkData } from "../data";
-import { mutateElement, newElementWith } from "../element/mutateElement";
+import { mutateElement } from "../element/mutateElement";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import { unstable_batchedUpdates } from "react-dom";
 import {
@@ -143,7 +143,6 @@ import {
   isLinearElementType,
   isBindingElement,
   isBindingElementType,
-  isBindableElement,
 } from "../element/typeChecks";
 import { actionFinalize, actionDeleteSelected } from "../actions";
 import { loadLibrary } from "../data/localStorage";
@@ -168,11 +167,10 @@ import {
   bindOrUnbindSelectedElements,
   unbindLinearElements,
   fixBindingsAfterDuplication,
-  maybeBindBindableElement,
-  getElligibleElementForBindingElementAtCoors,
   fixBindingsAfterDeletion,
   isLinearElementSimpleAndAlreadyBound,
   isBindingEnabled,
+  updateBoundElements,
 } from "../element/binding";
 import { MaybeTransformHandleType } from "../element/transformHandles";
 
@@ -608,7 +606,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.setState({});
   });
 
-  private onHashChange = (event: HashChangeEvent) => {
+  private onHashChange = (_: HashChangeEvent) => {
     if (window.location.hash.length > 1) {
       this.initializeScene();
     }
@@ -1002,13 +1000,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     const oldIdToDuplicatedId = new Map();
     const newElements = clipboardElements.map((element) => {
+      const [pastedPositionX, pastedPositionY] = getGridPoint(
+        element.x + dx - minX,
+        element.y + dy - minY,
+        this.state.gridSize,
+      );
       const newElement = duplicateElement(
         this.state.editingGroupId,
         groupIdMap,
         element,
         {
-          x: element.x + dx - minX,
-          y: element.y + dy - minY,
+          x: pastedPositionX,
+          y: pastedPositionY,
         },
       );
       oldIdToDuplicatedId.set(element.id, newElement.id);
@@ -1297,12 +1300,17 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               break;
             case "MOUSE_LOCATION": {
               const {
-                socketId,
                 pointer,
                 button,
                 username,
                 selectedElementIds,
               } = decryptedData.payload;
+
+              const socketId: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["socketId"] =
+                decryptedData.payload.socketId ||
+                // @ts-ignore legacy, see #2094 (#2097)
+                decryptedData.payload.socketID;
+
               // NOTE purposefully mutating collaborators map in case of
               //  pointer updates so as not to trigger LayerUI rerender
               this.setState((state) => {
@@ -1486,24 +1494,35 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         (event.shiftKey
           ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
           : ELEMENT_TRANSLATE_AMOUNT);
-      this.scene.replaceAllElements(
-        this.scene.getElementsIncludingDeleted().map((el) => {
-          if (this.state.selectedElementIds[el.id]) {
-            const update: { x?: number; y?: number } = {};
-            if (event.key === KEYS.ARROW_LEFT) {
-              update.x = el.x - step;
-            } else if (event.key === KEYS.ARROW_RIGHT) {
-              update.x = el.x + step;
-            } else if (event.key === KEYS.ARROW_UP) {
-              update.y = el.y - step;
-            } else if (event.key === KEYS.ARROW_DOWN) {
-              update.y = el.y + step;
-            }
-            return newElementWith(el, update);
-          }
-          return el;
-        }),
-      );
+
+      const selectedElements = this.scene
+        .getElements()
+        .filter((element) => this.state.selectedElementIds[element.id]);
+
+      let offsetX = 0;
+      let offsetY = 0;
+
+      if (event.key === KEYS.ARROW_LEFT) {
+        offsetX = -step;
+      } else if (event.key === KEYS.ARROW_RIGHT) {
+        offsetX = step;
+      } else if (event.key === KEYS.ARROW_UP) {
+        offsetY = -step;
+      } else if (event.key === KEYS.ARROW_DOWN) {
+        offsetY = step;
+      }
+
+      selectedElements.forEach((element) => {
+        mutateElement(element, {
+          x: element.x + offsetX,
+          y: element.y + offsetY,
+        });
+
+        updateBoundElements(element, {
+          simultaneouslyUpdated: selectedElements,
+        });
+      });
+
       event.preventDefault();
     } else if (event.key === KEYS.ENTER) {
       const selectedElements = getSelectedElements(
@@ -3185,6 +3204,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         elementType,
         elementLocked,
         isResizing,
+        isRotating,
       } = this.state;
 
       this.setState({
@@ -3297,7 +3317,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             }));
           }
         }
-
         return;
       }
 
@@ -3321,13 +3340,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           draggingElement,
           getNormalizedDimensions(draggingElement),
         );
-
-        if (
-          isBindingEnabled(this.state) &&
-          isBindableElement(draggingElement)
-        ) {
-          maybeBindBindableElement(draggingElement);
-        }
       }
 
       if (resizingElement) {
@@ -3448,7 +3460,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         history.resumeRecording();
       }
 
-      if (pointerDownState.drag.hasOccurred || isResizing) {
+      if (pointerDownState.drag.hasOccurred || isResizing || isRotating) {
         (isBindingEnabled(this.state)
           ? bindOrUnbindSelectedElements
           : unbindLinearElements)(
@@ -3497,10 +3509,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     // into `linearElement`
     oppositeBindingBoundElement?: ExcalidrawBindableElement | null,
   ): void => {
-    const hoveredBindableElement = getElligibleElementForBindingElementAtCoors(
-      linearElement,
-      startOrEnd,
+    const hoveredBindableElement = getHoveredElementForBinding(
       pointerCoords,
+      this.scene,
     );
     this.setState({
       suggestedBindings:
