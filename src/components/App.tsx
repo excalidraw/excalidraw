@@ -3438,20 +3438,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         this.setState({
           selectedElementIds: {},
           selectedGroupIds: {},
-        });
-      }
-
-      if (draggingElement === null) {
-        // if no element is clicked, clear the selection and redraw
-        this.setState({
-          selectedElementIds: {},
-          selectedGroupIds: {},
           editingGroupId: null,
         });
+
         return;
       }
 
-      if (!elementLocked) {
+      if (!elementLocked && draggingElement) {
         this.setState((prevState) => ({
           selectedElementIds: {
             ...prevState.selectedElementIds,
