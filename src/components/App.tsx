@@ -554,7 +554,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           ),
         };
       }
-      this.syncActionResult(scene);
+      history.clear();
+      this.syncActionResult({
+        ...scene,
+        commitToHistory: true,
+      });
     }
   };
 
@@ -1162,11 +1166,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
       const updateScene = (
         decryptedData: SocketUpdateDataSource[SCENE.INIT | SCENE.UPDATE],
-        { scrollToContent = false }: { scrollToContent?: boolean } = {},
+        { init = false }: { init?: boolean } = {},
       ) => {
         const { elements: remoteElements } = decryptedData.payload;
 
-        if (scrollToContent) {
+        if (init) {
+          history.resumeRecording();
           this.setState({
             ...this.state,
             ...calculateScrollCenter(
@@ -1291,7 +1296,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               return;
             case SCENE.INIT: {
               if (!this.portal.socketInitialized) {
-                updateScene(decryptedData, { scrollToContent: true });
+                updateScene(decryptedData, { init: true });
               }
               break;
             }
