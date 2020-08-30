@@ -2075,9 +2075,19 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
           }
           // update last uncommitted point
+          const lastUncommittedPoint = () => {
+            if (!this.state.gridSize) {
+              return points.slice(0, -1);
+            }
+            return points
+              .slice(0, -1)
+              .map((point) =>
+                getGridPoint(point[0], point[1], this.state.gridSize),
+              );
+          };
           mutateElement(multiElement, {
             points: [
-              ...points.slice(0, -1),
+              ...lastUncommittedPoint(),
               [scenePointerX - rx, scenePointerY - ry],
             ],
           });
