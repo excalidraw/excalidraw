@@ -125,7 +125,7 @@ export const actionLoadScene = register({
         ...loadedAppState,
         errorMessage: error,
       },
-      commitToHistory: false,
+      commitToHistory: true,
     };
   },
   PanelComponent: ({ updateData, appState }) => (

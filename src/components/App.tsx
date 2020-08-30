@@ -3602,7 +3602,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               ...(appState || this.state),
               isLoading: false,
             },
-            commitToHistory: false,
+            commitToHistory: true,
           }),
         )
         .catch((error) => {
