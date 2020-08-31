@@ -3595,8 +3595,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         "chooseFileSystemEntries" in window ||
         "showOpenFilePicker" in window
       ) {
-        const item = event.dataTransfer.items[0];
-        (window as any).handle = await (item as any).getAsFileSystemHandle();
+        try {
+          // This will only work as of Chrome 86,
+          // but can be safely ignored on older releases.
+          const item = event.dataTransfer.items[0];
+          (window as any).handle = await (item as any).getAsFileSystemHandle();
+        } catch (err) {
+          console.warn(err.name, err.message);
+        }
       }
       loadFromBlob(file, this.state)
         .then(({ elements, appState }) =>
