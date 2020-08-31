@@ -3600,8 +3600,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           // but can be safely ignored on older releases.
           const item = event.dataTransfer.items[0];
           (window as any).handle = await (item as any).getAsFileSystemHandle();
-        } catch (err) {
-          console.warn(err.name, err.message);
+        } catch (error) {
+          console.warn(error.name, error.message);
         }
       }
       loadFromBlob(file, this.state)
