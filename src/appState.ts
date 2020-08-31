@@ -13,7 +13,11 @@ export const getDefaultAppState = (): Omit<
   "offsetTop" | "offsetLeft"
 > => {
   return {
-    appearance: "light",
+    appearance:
+      window.matchMedia("(prefers-color-scheme)").media !== "not all" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light",
     isLoading: false,
     errorMessage: null,
     draggingElement: null,
