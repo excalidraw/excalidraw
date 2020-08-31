@@ -55,7 +55,7 @@
     "fileTitle": "Denumirea fișierului",
     "colorPicker": "Selector de culoare",
     "canvasBackground": "Fundalul pânzei",
-    "drawingCanvas": "",
+    "drawingCanvas": "Pânză pentru desenat",
     "layers": "Straturi",
     "actions": "Acțiuni",
     "language": "Limbă",
@@ -104,10 +104,10 @@
     "exitZenMode": "Ieșire din modul zen"
   },
   "alerts": {
-    "clearReset": "",
-    "couldNotCreateShareableLink": "",
+    "clearReset": "Această opțiune va șterge întreaga pânză. Confirmi?",
+    "couldNotCreateShareableLink": "Legătura distribuibilă nu a putut fi creată.",
     "couldNotLoadInvalidFile": "Fișierul invalid nu a putut fi încărcat",
-    "importBackendFailed": "",
+    "importBackendFailed": "Importarea de la nivel de server a eșuat.",
     "cannotExportEmptyCanvas": "Nu se poate exporta pânza goală.",
     "couldNotCopyToClipboard": "Nu s-a putut copia în memoria temporară. Încearcă să utilizezi navigatorul Chrome.",
     "decryptFailed": "Datele nu au putut fi decriptate.",
@@ -132,14 +132,14 @@
     "shapes": "Forme"
   },
   "hints": {
-    "linearElement": "",
-    "freeDraw": "",
+    "linearElement": "Dă clic pentru a crea mai multe puncte, trage pentru a forma o singură linie",
+    "freeDraw": "Dă clic și trage, eliberează când ești gata",
     "text": "Sfat: poți adăuga text și dând dublu clic oriunde cu instrumentul de selectare",
     "linearElementMulti": "Dă clic pe ultimul punct sau apasă tasta Escape sau Enter pentru a termina",
-    "resize": "",
-    "rotate": "",
+    "resize": "Poți constrânge proporțiile, ținând apăsată tasta SHIFT în timp ce redimensionezi,\nține apăsată tasta ALT pentru a redimensiona de la centru",
+    "rotate": "Poți constrânge unghiurile, ținând apăsată tasta SHIFT în timp ce rotești",
     "lineEditor_info": "Dă dublu clic sau apasă pe tasta Enter pentru a edita punctele",
-    "lineEditor_pointSelected": "",
+    "lineEditor_pointSelected": "Apasă tasta Delete pentru a elimina punctul, combinația de taste Ctrl sau Cmd + D pentru a-l duplica sau trage-l pentru a-l muta",
     "lineEditor_nothingSelected": "Selectează un punct pentru a-l muta sau elimina sau ține apăsată tasta Alt și dă clic pentru a adăuga puncte noi"
   },
   "errorSplash": {
@@ -161,7 +161,7 @@
     "button_startSession": "Pornire sesiune",
     "button_stopSession": "Oprire sesiune",
     "desc_inProgressIntro": "Sesiunea de colaborare în direct este în curs de desfășurare.",
-    "desc_persistenceWarning": "",
+    "desc_persistenceWarning": "Reține că datele scenei sunt distribuite între colaboratori pe cale P2P și nu sunt stocate pe serverul nostru. Astfel, dacă vă deconectați cu toții, datele vor fi pierdute, cu excepția cazului în care sunt exportate într-un fișier sau într-o legătură distribuibilă.",
     "desc_shareLink": "Distribuie această legătură persoanelor cu care dorești să colaborezi:",
     "desc_exitSession": "Oprirea sesiunii te va deconecta de la cameră, însă vei putea lucra în continuare, pe plan local, cu scena. Reține că această opțiune nu va afecta alte persoane, iar acestea vor putea să colaboreze în continuare pe versiunea lor."
   },
@@ -169,11 +169,11 @@
     "title": "Eroare"
   },
   "shortcutsDialog": {
-    "title": "",
+    "title": "Comenzi rapide de la tastatură",
     "shapes": "Forme",
     "or": "sau",
-    "click": "",
-    "drag": "",
+    "click": "clic",
+    "drag": "trage",
     "curvedArrow": "Săgeată curbată",
     "curvedLine": "Linie curbată",
     "editor": "Editor",
@@ -183,8 +183,8 @@
     "github": "Ai întâmpinat o problemă? Trimite un raport",
     "textNewLine": "Adaugă o linie nouă (text)",
     "textFinish": "Finalizează editarea (text)",
-    "zoomToFit": "",
-    "preventBinding": ""
+    "zoomToFit": "Apropiere/depărtare pentru a cuprinde totul",
+    "preventBinding": "Împiedică legarea săgeții"
   },
   "encrypted": {
     "tooltip": "Desenele tale sunt criptate integral, astfel că serverele Excalidraw nu le vor vedea niciodată."
