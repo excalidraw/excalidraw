@@ -3570,7 +3570,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
   };
 
-  private handleCanvasOnDrop = (event: React.DragEvent<HTMLCanvasElement>) => {
+  private handleCanvasOnDrop = async (
+    event: React.DragEvent<HTMLCanvasElement>,
+  ) => {
     const libraryShapes = event.dataTransfer.getData(
       "application/vnd.excalidrawlib+json",
     );
@@ -3589,6 +3591,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       file?.name.endsWith(".excalidraw")
     ) {
       this.setState({ isLoading: true });
+      if (
+        "chooseFileSystemEntries" in window ||
+        "showOpenFilePicker" in window
+      ) {
+        const item = event.dataTransfer.items[0];
+        (window as any).handle = await (item as any).getAsFileSystemHandle();
+      }
       loadFromBlob(file, this.state)
         .then(({ elements, appState }) =>
           this.syncActionResult({
