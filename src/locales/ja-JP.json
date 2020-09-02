@@ -63,15 +63,15 @@
     "duplicateSelection": "複製",
     "untitled": "Untitled",
     "name": "名前",
-    "yourName": "",
+    "yourName": "あなたの名前",
     "madeWithExcalidraw": "Excalidrawで作成",
     "group": "図形のグループ化",
     "ungroup": "グループ化を解除",
-    "collaborators": "",
+    "collaborators": "共同編集者",
     "toggleGridMode": "",
-    "addToLibrary": "",
-    "removeFromLibrary": "",
-    "libraryLoadingMessage": "",
+    "addToLibrary": "ライブラリに追加",
+    "removeFromLibrary": "ライブラリから削除",
+    "libraryLoadingMessage": "ライブラリを読み込み中...",
     "loadingScene": ""
   },
   "buttons": {
@@ -99,7 +99,7 @@
     "roomDialog": "共同編集を開始する",
     "createNewRoom": "新しい部屋を作成する",
     "toggleFullScreen": "全画面表示に切り替える",
-    "toggleDarkMode": "ダークモードを切り替える",
+    "toggleDarkMode": "ダークモードに切り替える",
     "toggleZenMode": "集中モードに切り替える",
     "exitZenMode": "集中モードをやめる"
   },
@@ -123,7 +123,7 @@
     "arrow": "矢印",
     "line": "直線",
     "text": "テキスト",
-    "library": "",
+    "library": "ライブラリ",
     "lock": "描画後も使用中のツールを選択したままにする"
   },
   "headings": {
