@@ -25,14 +25,14 @@
     "sloppiness": "边框",
     "opacity": "透明度",
     "textAlign": "文本对齐",
-    "edges": "",
-    "sharp": "",
-    "round": "",
+    "edges": "边角",
+    "sharp": "尖锐",
+    "round": "圆润",
     "fontSize": "字体大小",
     "fontFamily": "字体",
     "onlySelected": "仅被选中",
     "withBackground": "添加背景",
-    "addWatermark": "添加“使用 Excalidraw 创建”",
+    "addWatermark": "添加 “使用 Excalidraw 创建” 水印",
     "handDrawn": "手写",
     "normal": "正常",
     "code": "代码",
@@ -72,7 +72,7 @@
     "addToLibrary": "添加到库中",
     "removeFromLibrary": "从库中移除",
     "libraryLoadingMessage": "正在加载库...",
-    "loadingScene": ""
+    "loadingScene": "正在加载绘图..."
   },
   "buttons": {
     "clearReset": "重置画布",
@@ -99,7 +99,7 @@
     "roomDialog": "开始实时协作",
     "createNewRoom": "新建会议室",
     "toggleFullScreen": "切换全屏显示",
-    "toggleDarkMode": "",
+    "toggleDarkMode": "切换暗黑模式",
     "toggleZenMode": "切换禅模式",
     "exitZenMode": "退出禅模式"
   },
@@ -111,7 +111,7 @@
     "cannotExportEmptyCanvas": "无法导出空画布。",
     "couldNotCopyToClipboard": "无法复制到剪贴板。请尝试使用 Chrome 浏览器。",
     "decryptFailed": "无法解密数据。",
-    "uploadedSecurly": "上传已被端到端加密保护，这意味着Excalidraw 的服务器和第三方都无法读取内容。",
+    "uploadedSecurly": "上传已被端到端加密保护，这意味着 Excalidraw 的服务器和第三方都无法读取内容。",
     "loadSceneOverridePrompt": "加载外部绘图将取代您现有的内容。您想要继续吗？"
   },
   "toolBar": {
@@ -134,26 +134,26 @@
   "hints": {
     "linearElement": "点击创建多个点 拖动创建直线",
     "freeDraw": "点击并拖动，完成后发布",
-    "text": "",
+    "text": "提示：您也可以使用选择工具双击任意位置来添加文字",
     "linearElementMulti": "点击最后一个点或按下 Esc/Enter 来完成",
     "resize": "您可以按住SHIFT来限制比例大小，\n按住ALT来调整中心大小",
     "rotate": "旋转时可以按住 Shift 来约束角度",
     "lineEditor_info": "双击或按回车键编辑",
-    "lineEditor_pointSelected": "按下 Delete 移除点，Ctrl或Cmd+D 以复制，或拖动以移动",
-    "lineEditor_nothingSelected": "选中要移动或移除的点，或按住Alt并点击添加新点"
+    "lineEditor_pointSelected": "按下 Delete 移除点，Ctrl 或 Cmd+D 以复制，或拖动以移动",
+    "lineEditor_nothingSelected": "选中要移动或移除的点，或按住 Alt 并点击添加新点"
   },
   "errorSplash": {
-    "headingMain_pre": "遇到异常。请尝试 ",
+    "headingMain_pre": "遇到异常。请尝试",
     "headingMain_button": "重新加载页面。",
-    "clearCanvasMessage": "如果重新加载页面无效, 请尝试 ",
+    "clearCanvasMessage": "如果重新加载页面无效, 请尝试",
     "clearCanvasMessage_button": "清除画布。",
-    "clearCanvasCaveat": " 这会造成当前工作丢失 ",
-    "trackedToSentry_pre": "带有标识符的错误 ",
-    "trackedToSentry_post": " 已在我们的系统中跟踪",
-    "openIssueMessage_pre": "我们非常谨慎地不将您的场景信息包含在错误信息中。如果您的场景不是私密的，请考虑跟进我们的 ",
+    "clearCanvasCaveat": "这会造成当前工作丢失",
+    "trackedToSentry_pre": "带有标识符的错误",
+    "trackedToSentry_post": "已在我们的系统中跟踪",
+    "openIssueMessage_pre": "我们非常谨慎地不将您的场景信息包含在错误信息中。如果您的场景不是私密的，请考虑跟进我们的",
     "openIssueMessage_button": "错误追踪器。",
     "openIssueMessage_post": " 请复制并粘贴以下信息到 GitHub Issue 中。",
-    "sceneContent": "画布 内容:"
+    "sceneContent": "画布内容:"
   },
   "roomDialog": {
     "desc_intro": "你可以邀请其他人到目前的画面中与你协作。",
@@ -184,7 +184,7 @@
     "textNewLine": "文本换行",
     "textFinish": "完成编辑文本",
     "zoomToFit": "缩放以适应所有元素",
-    "preventBinding": ""
+    "preventBinding": "防止箭头吸附"
   },
   "encrypted": {
     "tooltip": "您的绘图采用的端到端加密，因此Excalidraw服务器永远不会收集。"
