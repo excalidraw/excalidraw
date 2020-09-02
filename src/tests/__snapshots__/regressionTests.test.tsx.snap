@@ -907,7 +907,7 @@ Object {
   "exportBackground": true,
   "gridSize": null,
   "height": 768,
-  "isBindingEnabled": true,
+  "isBindingEnabled": false,
   "isCollaborating": false,
   "isLibraryOpen": false,
   "isLoading": false,
