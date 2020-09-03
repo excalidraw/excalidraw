@@ -64,7 +64,7 @@ export const saveLibraryAsJSON = async () => {
     null,
     2,
   );
-  const fileName = `library.excalidrawlib`;
+  const fileName = "library.excalidrawlib";
   const blob = new Blob([serialized], {
     type: "application/vnd.excalidrawlib+json",
   });
