@@ -171,6 +171,7 @@ import {
   isLinearElementSimpleAndAlreadyBound,
   isBindingEnabled,
   updateBoundElements,
+  shouldEnableBindingForPointerEvent,
 } from "../element/binding";
 import { MaybeTransformHandleType } from "../element/transformHandles";
 
@@ -2220,6 +2221,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     this.clearSelectionIfNotUsingSelection();
+    this.updateBindingEnabledOnPointerMove(event);
 
     if (this.handleSelectionOnPointerDown(event, pointerDownState)) {
       return;
@@ -3483,6 +3485,15 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
     });
   }
+
+  private updateBindingEnabledOnPointerMove = (
+    event: React.PointerEvent<HTMLCanvasElement>,
+  ) => {
+    const shouldEnableBinding = shouldEnableBindingForPointerEvent(event);
+    if (this.state.isBindingEnabled !== shouldEnableBinding) {
+      this.setState({ isBindingEnabled: shouldEnableBinding });
+    }
+  };
 
   private maybeSuggestBindingAtCursor = (pointerCoords: {
     x: number;
