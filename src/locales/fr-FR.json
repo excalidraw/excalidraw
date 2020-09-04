@@ -3,7 +3,7 @@
     "paste": "Coller",
     "selectAll": "Tout sélectionner",
     "multiSelect": "Ajouter l'élément à la sélection",
-    "moveCanvas": "Déplacer le canevas",
+    "moveCanvas": "Déplacer le canvas",
     "copy": "Copier",
     "copyAsPng": "Copier dans le presse-papier en PNG",
     "copyAsSvg": "Copier dans le presse-papier en SVG",
@@ -55,7 +55,7 @@
     "fileTitle": "Titre du fichier",
     "colorPicker": "Sélecteur de couleur",
     "canvasBackground": "Fond du canevas",
-    "drawingCanvas": "Canevas de dessin",
+    "drawingCanvas": "Canvas de dessin",
     "layers": "Calques",
     "actions": "Actions",
     "language": "Langue",
@@ -139,7 +139,7 @@
     "resize": "Vous pouvez conserver les proportions en maintenant la touche SHIFT pendant le redimensionnement,\nen maintenant la touche ALT pour redimensionner par rapport au centre",
     "rotate": "Vous pouvez contraindre les angles en maintenant MAJ enfoncé pendant la rotation",
     "lineEditor_info": "Double-cliquez ou appuyez sur Entrée pour éditer les points",
-    "lineEditor_pointSelected": "Appuyez sur Supprimer pour supprimer le point, CtrlOrCmd+D pour le dupliquer, ou faites-le glisser pour le déplacer",
+    "lineEditor_pointSelected": "Appuyez sur Supprimer pour supprimer le point, Ctrl ou Cmd+D pour le dupliquer, ou faites-le glisser pour le déplacer",
     "lineEditor_nothingSelected": "Sélectionnez un point à déplacer ou à supprimer, ou maintenez Alt enfoncé et cliquez pour ajouter de nouveaux points"
   },
   "errorSplash": {
