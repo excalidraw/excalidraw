@@ -100,6 +100,9 @@ export const MobileMenu = ({
                   onUsernameChange={onUsernameChange}
                   onRoomCreate={onRoomCreate}
                   onRoomDestroy={onRoomDestroy}
+                  setErrorMessage={(message: string) =>
+                    setAppState({ errorMessage: message })
+                  }
                 />
                 <BackgroundPickerAndDarkModeToggle
                   actionManager={actionManager}

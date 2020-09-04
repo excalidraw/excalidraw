@@ -12,7 +12,7 @@ import { fileSave } from "browser-nativefs";
 import { t } from "../i18n";
 import {
   copyCanvasToClipboardAsPng,
-  copyCanvasToClipboardAsSvg,
+  copyTextToSystemClipboard,
 } from "../clipboard";
 import { serializeAsJSON } from "./json";
 
@@ -317,7 +317,7 @@ export const exportCanvas = async (
       });
       return;
     } else if (type === "clipboard-svg") {
-      copyCanvasToClipboardAsSvg(tempSvg);
+      copyTextToSystemClipboard(tempSvg.outerHTML);
       return;
     }
   }

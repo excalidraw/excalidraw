@@ -100,8 +100,8 @@ import { getDefaultAppState } from "../appState";
 import { t, getLanguage } from "../i18n";
 
 import {
-  copyToAppClipboard,
-  getClipboardContent,
+  copyToClipboard,
+  parseClipboard,
   probablySupportsClipboardBlob,
   probablySupportsClipboardWriteText,
 } from "../clipboard";
@@ -174,6 +174,7 @@ import {
   shouldEnableBindingForPointerEvent,
 } from "../element/binding";
 import { MaybeTransformHandleType } from "../element/transformHandles";
+import { renderSpreadsheet } from "../charts";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -872,7 +873,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   });
 
   private copyAll = () => {
-    copyToAppClipboard(this.scene.getElements(), this.state);
+    copyToClipboard(this.scene.getElements(), this.state);
   };
 
   private copyToClipboardAsPng = () => {
@@ -960,14 +961,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       ) {
         return;
       }
-      const data = await getClipboardContent(
-        this.state,
-        cursorX,
-        cursorY,
-        event,
-      );
-      if (data.error) {
-        alert(data.error);
+      const data = await parseClipboard(event);
+      if (data.errorMessage) {
+        this.setState({ errorMessage: data.errorMessage });
+      } else if (data.spreadsheet) {
+        this.addElementsFromPasteOrLibrary(
+          renderSpreadsheet(this.state, data.spreadsheet, cursorX, cursorY),
+        );
       } else if (data.elements) {
         this.addElementsFromPasteOrLibrary(data.elements);
       } else if (data.text) {
