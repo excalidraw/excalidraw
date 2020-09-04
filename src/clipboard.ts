@@ -119,9 +119,10 @@ export const parseClipboard = async (
 }> => {
   const systemClipboard = await getSystemClipboard(event);
 
-  // if system clipboard contains previously copied excalidraw scene as SVG,
-  // fall back to previously copied excalidraw elements
-  if (systemClipboard.includes(SVG_EXPORT_TAG)) {
+  // if system clipboard empty, couldn't be resolved, or contains previously
+  // copied excalidraw scene as SVG, fall back to previously copied excalidraw
+  // elements
+  if (!systemClipboard || systemClipboard.includes(SVG_EXPORT_TAG)) {
     return getAppClipboard();
   }
 
