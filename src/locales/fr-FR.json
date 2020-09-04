@@ -144,9 +144,9 @@
   },
   "errorSplash": {
     "headingMain_pre": "Une erreur est survenue. Essayez ",
-    "headingMain_button": "de recharger la page.",
+    "headingMain_button": "rechargement de la page.",
     "clearCanvasMessage": "Si le rechargement ne résout pas l'erreur, essayez ",
-    "clearCanvasMessage_button": "d'effacer le canevas.",
+    "clearCanvasMessage_button": "effacement du canvas.",
     "clearCanvasCaveat": " Cela entraînera une perte du travail ",
     "trackedToSentry_pre": "L'erreur ",
     "trackedToSentry_post": " a été enregistrée dans notre système.",
