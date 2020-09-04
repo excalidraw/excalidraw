@@ -4,19 +4,23 @@ import { AppState } from "./types";
 import { t } from "./i18n";
 import { DEFAULT_VERTICAL_ALIGN } from "./constants";
 
-interface Spreadsheet {
+export interface Spreadsheet {
   yAxisLabel: string | null;
   labels: string[] | null;
   values: number[];
 }
 
+export const NOT_SPREADSHEET = "NOT_SPREADSHEET";
+export const MALFORMED_SPREADSHEET = "MALFORMED_SPREADSHEET";
+export const VALID_SPREADSHEET = "VALID_SPREADSHEET";
+
 type ParseSpreadsheetResult =
   | {
-      type: "not a spreadsheet";
+      type: typeof NOT_SPREADSHEET;
     }
-  | { type: "spreadsheet"; spreadsheet: Spreadsheet }
+  | { type: typeof VALID_SPREADSHEET; spreadsheet: Spreadsheet }
   | {
-      type: "malformed spreadsheet";
+      type: typeof MALFORMED_SPREADSHEET;
       error: string;
     };
 
@@ -38,12 +42,12 @@ function tryParseCells(cells: string[][]): ParseSpreadsheetResult {
   const numCols = cells[0].length;
 
   if (numCols > 2) {
-    return { type: "malformed spreadsheet", error: t("charts.tooManyColumns") };
+    return { type: MALFORMED_SPREADSHEET, error: t("charts.tooManyColumns") };
   }
 
   if (numCols === 1) {
     if (!isNumericColumn(cells, 0)) {
-      return { type: "not a spreadsheet" };
+      return { type: NOT_SPREADSHEET };
     }
 
     const hasHeader = tryParseNumber(cells[0][0]) === null;
@@ -52,11 +56,11 @@ function tryParseCells(cells: string[][]): ParseSpreadsheetResult {
     );
 
     if (values.length < 2) {
-      return { type: "not a spreadsheet" };
+      return { type: NOT_SPREADSHEET };
     }
 
     return {
-      type: "spreadsheet",
+      type: VALID_SPREADSHEET,
       spreadsheet: {
         yAxisLabel: hasHeader ? cells[0][0] : null,
         labels: null,
@@ -69,7 +73,7 @@ function tryParseCells(cells: string[][]): ParseSpreadsheetResult {
 
   if (!isNumericColumn(cells, valueColumnIndex)) {
     return {
-      type: "malformed spreadsheet",
+      type: MALFORMED_SPREADSHEET,
       error: t("charts.noNumericColumn"),
     };
   }
@@ -79,11 +83,11 @@ function tryParseCells(cells: string[][]): ParseSpreadsheetResult {
   const rows = hasHeader ? cells.slice(1) : cells;
 
   if (rows.length < 2) {
-    return { type: "not a spreadsheet" };
+    return { type: NOT_SPREADSHEET };
   }
 
   return {
-    type: "spreadsheet",
+    type: VALID_SPREADSHEET,
     spreadsheet: {
       yAxisLabel: hasHeader ? cells[0][valueColumnIndex] : null,
       labels: rows.map((row) => row[labelColumnIndex]),
@@ -114,7 +118,7 @@ export function tryParseSpreadsheet(text: string): ParseSpreadsheetResult {
     .map((line) => line.trim().split("\t"));
 
   if (lines.length === 0) {
-    return { type: "not a spreadsheet" };
+    return { type: NOT_SPREADSHEET };
   }
 
   const numColsFirstLine = lines[0].length;
@@ -123,13 +127,13 @@ export function tryParseSpreadsheet(text: string): ParseSpreadsheetResult {
   );
 
   if (!isASpreadsheet) {
-    return { type: "not a spreadsheet" };
+    return { type: NOT_SPREADSHEET };
   }
 
   const result = tryParseCells(lines);
-  if (result.type !== "spreadsheet") {
+  if (result.type !== VALID_SPREADSHEET) {
     const transposedResults = tryParseCells(transposeCells(lines));
-    if (transposedResults.type === "spreadsheet") {
+    if (transposedResults.type === VALID_SPREADSHEET) {
       return transposedResults;
     }
   }

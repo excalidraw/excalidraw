@@ -5,7 +5,12 @@ import {
 import { getSelectedElements } from "./scene";
 import { AppState } from "./types";
 import { SVG_EXPORT_TAG } from "./scene/export";
-import { tryParseSpreadsheet, renderSpreadsheet } from "./charts";
+import {
+  tryParseSpreadsheet,
+  Spreadsheet,
+  VALID_SPREADSHEET,
+  MALFORMED_SPREADSHEET,
+} from "./charts";
 
 const TYPE_ELEMENTS = "excalidraw/elements";
 
@@ -16,6 +21,7 @@ type ElementsClipboard = {
 };
 
 let CLIPBOARD = "";
+let PREFER_APP_CLIPBOARD = false;
 
 export const probablySupportsClipboardReadText =
   "clipboard" in navigator && "readText" in navigator.clipboard;
@@ -36,7 +42,7 @@ const isElementsClipboard = (contents: any): contents is ElementsClipboard => {
   return false;
 };
 
-export const copyToAppClipboard = async (
+export const copyToClipboard = async (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
 ) => {
@@ -48,8 +54,12 @@ export const copyToAppClipboard = async (
   const json = JSON.stringify(contents);
   CLIPBOARD = json;
   try {
+    PREFER_APP_CLIPBOARD = false;
     await copyTextToSystemClipboard(json);
-  } catch {}
+  } catch (err) {
+    PREFER_APP_CLIPBOARD = true;
+    console.error(err);
+  }
 };
 
 const getAppClipboard = (): Partial<ElementsClipboard> => {
@@ -61,79 +71,89 @@ const getAppClipboard = (): Partial<ElementsClipboard> => {
     return JSON.parse(CLIPBOARD);
   } catch (error) {
     console.error(error);
+    return {};
   }
-
-  return {};
 };
 
 const parsePotentialSpreadsheet = (
   text: string,
-  appState: AppState,
-  cursorX: number,
-  cursorY: number,
-) => {
+): { spreadsheet: Spreadsheet } | { errorMessage: string } | null => {
   const result = tryParseSpreadsheet(text);
-  if (result.type === "spreadsheet") {
-    return {
-      elements: renderSpreadsheet(
-        appState,
-        result.spreadsheet,
-        cursorX,
-        cursorY,
-      ),
-    };
-  } else if (result.type === "malformed spreadsheet") {
-    return { error: result.error };
+  if (result.type === VALID_SPREADSHEET) {
+    return { spreadsheet: result.spreadsheet };
+  } else if (result.type === MALFORMED_SPREADSHEET) {
+    return { errorMessage: result.error };
   }
   return null;
 };
 
-export const getClipboardContent = async (
-  appState: AppState,
-  cursorX: number,
-  cursorY: number,
+/**
+ * Retrieves content from system clipboard (either from ClipboardEvent or
+ *  via async clipboard API if supported)
+ */
+const getSystemClipboard = async (
   event: ClipboardEvent | null,
-): Promise<{
-  text?: string;
-  elements?: readonly ExcalidrawElement[];
-  error?: string;
-}> => {
+): Promise<string> => {
   try {
     const text = event
       ? event.clipboardData?.getData("text/plain").trim()
       : probablySupportsClipboardReadText &&
         (await navigator.clipboard.readText());
 
-    if (text && !text.includes(SVG_EXPORT_TAG)) {
-      const spreadsheetResult = parsePotentialSpreadsheet(
-        text,
-        appState,
-        cursorX,
-        cursorX,
-      );
-      if (spreadsheetResult) {
-        return spreadsheetResult;
-      }
-      const inAppClipboard = getAppClipboard();
-      try {
-        const contents = JSON.parse(text);
-        if (
-          isElementsClipboard(contents) &&
-          (!inAppClipboard?.created ||
-            inAppClipboard.created < contents.created)
-        ) {
-          return { elements: contents.elements };
-        }
-        return inAppClipboard;
-      } catch {
-        return inAppClipboard.elements ? inAppClipboard : { text };
-      }
-    }
-  } catch (error) {
-    console.error(error);
+    return text || "";
+  } catch {
+    return "";
+  }
+};
+
+/**
+ * Attemps to parse clipboard. Prefers system clipboard.
+ */
+export const parseClipboard = async (
+  event: ClipboardEvent | null,
+): Promise<{
+  spreadsheet?: Spreadsheet;
+  elements?: readonly ExcalidrawElement[];
+  text?: string;
+  errorMessage?: string;
+}> => {
+  const systemClipboard = await getSystemClipboard(event);
+
+  // if system clipboard contains previously copied excalidraw scene as SVG,
+  // fall back to previously copied excalidraw elements
+  if (systemClipboard.includes(SVG_EXPORT_TAG)) {
+    return getAppClipboard();
   }
 
-  return getAppClipboard();
+  // if system clipboard contains spreadsheet, use it even though it's
+  //  technically possible it's staler than in-app clipboard
+  const spreadsheetResult = parsePotentialSpreadsheet(systemClipboard);
+  if (spreadsheetResult) {
+    return spreadsheetResult;
+  }
+
+  const appClipboardData = getAppClipboard();
+
+  try {
+    const systemClipboardData = JSON.parse(systemClipboard);
+    // system clipboard elements are newer than in-app clipboard
+    if (
+      isElementsClipboard(systemClipboardData) &&
+      (!appClipboardData?.created ||
+        appClipboardData.created < systemClipboardData.created)
+    ) {
+      return { elements: systemClipboardData.elements };
+    }
+    // in-app clipboard is newer than system clipboard
+    return appClipboardData;
+  } catch {
+    // system clipboard doesn't contain excalidraw elements → return plaintext
+    //  unless we set a flag to prefer in-app clipboard because browser didn't
+    //  support storing to system clipboard on copy
+    return PREFER_APP_CLIPBOARD && appClipboardData.elements
+      ? appClipboardData
+      : { text: systemClipboard };
+  }
 };
 
 export const copyCanvasToClipboardAsPng = async (canvas: HTMLCanvasElement) =>
