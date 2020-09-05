@@ -25,9 +25,9 @@
     "sloppiness": "Ujamnheit",
     "opacity": "Synlegheit",
     "textAlign": "Tekstjustering",
-    "edges": "",
-    "sharp": "",
-    "round": "",
+    "edges": "Kanter",
+    "sharp": "Skarp",
+    "round": "Rund",
     "fontSize": "Skriftstorleik",
     "fontFamily": "Skrifttype",
     "onlySelected": "Kun valde",
@@ -72,7 +72,7 @@
     "addToLibrary": "Legg til i bibliotek",
     "removeFromLibrary": "Fjern frå bibliotek",
     "libraryLoadingMessage": "Laster bibliotek...",
-    "loadingScene": ""
+    "loadingScene": "Laster scene..."
   },
   "buttons": {
     "clearReset": "Tilbakestill lerretet",
