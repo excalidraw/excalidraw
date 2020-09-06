@@ -1,24 +1,31 @@
 @import "../css/_variables";
 
 .HintViewer {
+  pointer-events: none;
+  box-sizing: border-box;
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  left: 0;
+  top: 100%;
+  max-width: 100%;
+  width: 100%;
+  margin-top: 6px;
+  text-align: center;
   color: $oc-gray-6;
   font-size: 0.8rem;
-  left: 50%;
-  pointer-events: none;
-  position: absolute;
-  top: 54px;
-  transform: translateX(calc(-50% - 16px)); /* 16px is half of lock icon */
-  white-space: pre;
-  text-align: center;
+
+  @media (min-width: 1200px) {
+    white-space: pre;
+  }
+
   @media #{$media-query} {
     position: static;
-    transform: none;
-    margin-top: 0.5rem;
   }
 
   > span {
-    background-color: transparentize($oc-white, 0.12);
     padding: 0.2rem 0.4rem;
-    border-radius: 3px;
+    background-color: var(--overlay-background-color);
+    border-radius: 4px;
   }
 }

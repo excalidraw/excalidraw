@@ -2,7 +2,7 @@
   "labels": {
     "paste": "Вставить",
     "selectAll": "Выбрать все",
-    "multiSelect": "",
+    "multiSelect": "Добавить элемент к выбору",
     "moveCanvas": "Переместить холст",
     "copy": "Копировать",
     "copyAsPng": "Скопировать в буфер обмена как PNG",
@@ -18,13 +18,16 @@
     "background": "Фон",
     "fill": "Заливка",
     "strokeWidth": "Толщина штриха",
-    "strokeStyle": "",
-    "strokeStyle_solid": "",
-    "strokeStyle_dashed": "",
-    "strokeStyle_dotted": "",
+    "strokeStyle": "Стиль обводки",
+    "strokeStyle_solid": "Сплошная",
+    "strokeStyle_dashed": "Штриховая",
+    "strokeStyle_dotted": "Пунктирная",
     "sloppiness": "Стиль обводки",
     "opacity": "Непрозрачность",
     "textAlign": "Выравнивание текста",
+    "edges": "Края",
+    "sharp": "Острые",
+    "round": "Скругленные",
     "fontSize": "Размер шрифта",
     "fontFamily": "Семейство шрифтов",
     "onlySelected": "Только выбранные",
@@ -65,10 +68,11 @@
     "group": "Сгруппировать выделение",
     "ungroup": "Разделить выделение",
     "collaborators": "Сотрудники",
-    "toggleGridMode": "",
+    "toggleGridMode": "Переключить режим сетки",
     "addToLibrary": "Добавить в библиотеку",
     "removeFromLibrary": "Удалить из библиотеки",
-    "libraryLoadingMessage": ""
+    "libraryLoadingMessage": "Загрузка библиотеки...",
+    "loadingScene": "Загрузка сцены..."
   },
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",
@@ -95,6 +99,7 @@
     "roomDialog": "Начать совместную работу",
     "createNewRoom": "Создать новую комнату",
     "toggleFullScreen": "Переключить полноэкранный режим",
+    "toggleDarkMode": "Переключить тёмную тему",
     "toggleZenMode": "Переключить режим концентрации внимания",
     "exitZenMode": "Выключить режим концентрации внимания"
   },
@@ -129,6 +134,7 @@
   "hints": {
     "linearElement": "Нажмите, чтобы начать несколько точек, перетащите для одной линии",
     "freeDraw": "Нажмите и перетаскивайте, отпустите по завершении",
+    "text": "",
     "linearElementMulti": "Кликните на последней точке или нажмите Escape или Enter чтобы закончить",
     "resize": "Вы можете ограничить пропорции, удерживая SHIFT во время изменения размеров,\nудерживайте ALT чтобы изменить размер из центра",
     "rotate": "Вы можете ограничить углы, удерживая SHIFT во время вращения",
@@ -177,7 +183,8 @@
     "github": "Нашли проблему? Отправьте",
     "textNewLine": "Добавить новую строку (текст)",
     "textFinish": "Закончить редактирование (текст)",
-    "zoomToFit": ""
+    "zoomToFit": "",
+    "preventBinding": ""
   },
   "encrypted": {
     "tooltip": ""

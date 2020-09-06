@@ -43,6 +43,7 @@ const Picker = ({
   onClose,
   label,
   showInput = true,
+  type,
 }: {
   colors: string[];
   color: string | null;
@@ -50,6 +51,7 @@ const Picker = ({
   onClose: () => void;
   label: string;
   showInput: boolean;
+  type: "canvasBackground" | "elementBackground" | "elementStroke";
 }) => {
   const firstItem = React.useRef<HTMLButtonElement>();
   const activeItem = React.useRef<HTMLButtonElement>();
@@ -123,7 +125,7 @@ const Picker = ({
 
   return (
     <div
-      className="color-picker"
+      className={`color-picker color-picker-type-${type}`}
       role="dialog"
       aria-modal="true"
       aria-label={t("labels.colorPicker")}
@@ -290,6 +292,7 @@ export const ColorPicker = ({
               }}
               label={label}
               showInput={false}
+              type={type}
             />
           </Popover>
         ) : null}

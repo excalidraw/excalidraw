@@ -1,3 +1,17 @@
+/* http://www.eaglefonts.com/fg-virgil-ttf-131249.htm */
+@font-face {
+  font-family: "Virgil";
+  src: url("/FG_Virgil.woff2");
+  font-display: swap;
+}
+
+/* https://github.com/microsoft/cascadia-code */
+@font-face {
+  font-family: "Cascadia";
+  src: url("/Cascadia.woff2");
+  font-display: swap;
+}
+
 .visually-hidden {
   position: absolute !important;
   height: 1px;
@@ -21,8 +35,9 @@
 }
 
 .LoadingMessage span {
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: var(--button-gray-1);
   border-radius: 5px;
   padding: 0.8em 1.2em;
+  color: var(--popup-text-color);
   font-size: 1.3em;
 }

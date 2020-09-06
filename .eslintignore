@@ -3,3 +3,4 @@ build/
 package-lock.json
 .vscode/
 firebase/
+dist/

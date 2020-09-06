@@ -240,14 +240,27 @@ const generateElementShape = (
 
     switch (element.type) {
       case "rectangle":
-        shape = generator.rectangle(
-          0,
-          0,
-          element.width,
-          element.height,
-          generateRoughOptions(element),
-        );
-
+        if (element.strokeSharpness === "round") {
+          const w = element.width;
+          const h = element.height;
+          const r = Math.min(w, h) * 0.25;
+          shape = generator.path(
+            `M ${r} 0 L ${w - r} 0 Q ${w} 0, ${w} ${r} L ${w} ${
+              h - r
+            } Q ${w} ${h}, ${w - r} ${h} L ${r} ${h} Q 0 ${h}, 0 ${
+              h - r
+            } L 0 ${r} Q 0 0, ${r} 0`,
+            generateRoughOptions(element),
+          );
+        } else {
+          shape = generator.rectangle(
+            0,
+            0,
+            element.width,
+            element.height,
+            generateRoughOptions(element),
+          );
+        }
         break;
       case "diamond": {
         const [
@@ -291,24 +304,37 @@ const generateElementShape = (
 
         // curve is always the first element
         // this simplifies finding the curve for an element
-        shape = [generator.curve(points as [number, number][], options)];
+        if (element.strokeSharpness === "sharp") {
+          if (options.fill) {
+            shape = [generator.polygon(points as [number, number][], options)];
+          } else {
+            shape = [
+              generator.linearPath(points as [number, number][], options),
+            ];
+          }
+        } else {
+          shape = [generator.curve(points as [number, number][], options)];
+        }
 
         // add lines only in arrow
         if (element.type === "arrow") {
-          const [x2, y2, x3, y3, x4, y4] = getArrowPoints(element, shape);
-          // for dotted arrows caps, reduce gap to make it more legible
-          if (element.strokeStyle === "dotted") {
-            options.strokeLineDash = [3, 4];
-            // for solid/dashed, keep solid arrow cap
-          } else {
-            delete options.strokeLineDash;
+          const arrowPoints = getArrowPoints(element, shape);
+          if (arrowPoints) {
+            const [x2, y2, x3, y3, x4, y4] = arrowPoints;
+            // for dotted arrows caps, reduce gap to make it more legible
+            if (element.strokeStyle === "dotted") {
+              options.strokeLineDash = [3, 4];
+              // for solid/dashed, keep solid arrow cap
+            } else {
+              delete options.strokeLineDash;
+            }
+            shape.push(
+              ...[
+                generator.line(x3, y3, x2, y2, options),
+                generator.line(x4, y4, x2, y2, options),
+              ],
+            );
           }
-          shape.push(
-            ...[
-              generator.line(x3, y3, x2, y2, options),
-              generator.line(x4, y4, x2, y2, options),
-            ],
-          );
         }
         break;
       }

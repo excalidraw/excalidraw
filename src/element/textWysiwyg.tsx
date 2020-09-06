@@ -77,6 +77,7 @@ export const textWysiwyg = ({
         textAlign: textAlign,
         color: updatedElement.strokeColor,
         opacity: updatedElement.opacity / 100,
+        filter: "var(--appearance-filter)",
       });
     }
   }
@@ -129,6 +130,7 @@ export const textWysiwyg = ({
   };
 
   const stopEvent = (event: Event) => {
+    event.preventDefault();
     event.stopPropagation();
   };
 
@@ -197,7 +199,10 @@ export const textWysiwyg = ({
   //  device keyboard is opened.
   window.addEventListener("resize", updateWysiwygStyle);
   window.addEventListener("pointerdown", onPointerDown);
-  window.addEventListener("wheel", stopEvent, true);
+  window.addEventListener("wheel", stopEvent, {
+    passive: false,
+    capture: true,
+  });
   document.body.appendChild(editable);
   editable.focus();
   editable.select();

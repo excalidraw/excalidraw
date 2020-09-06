@@ -14,6 +14,7 @@ import { Point as RoughPoint } from "roughjs/bin/geometry";
 import { SocketUpdateDataSource } from "./data";
 import { LinearElementEditor } from "./element/linearElementEditor";
 import { SuggestedBinding } from "./element/binding";
+import { DataState } from "./data/types";
 
 export type FlooredNumber = number & { _brand: "FlooredNumber" };
 export type Point = Readonly<RoughPoint>;
@@ -56,6 +57,8 @@ export type AppState = {
   currentItemFontFamily: FontFamily;
   currentItemFontSize: number;
   currentItemTextAlign: TextAlign;
+  currentItemStrokeSharpness: ExcalidrawElement["strokeSharpness"];
+  currentItemLinearStrokeSharpness: ExcalidrawElement["strokeSharpness"];
   viewBackgroundColor: string;
   scrollX: FlooredNumber;
   scrollY: FlooredNumber;
@@ -77,6 +80,7 @@ export type AppState = {
   shouldCacheIgnoreZoom: boolean;
   showShortcutsDialog: boolean;
   zenModeEnabled: boolean;
+  appearance: "light" | "dark";
   gridSize: number | null;
 
   /** top-most selected groups (i.e. does not include nested groups) */
@@ -119,4 +123,13 @@ export type LibraryItems = readonly LibraryItem[];
 export interface ExcalidrawProps {
   width: number;
   height: number;
+  onChange?: (
+    elements: readonly ExcalidrawElement[],
+    appState: AppState,
+  ) => void;
+  initialData?: DataState;
+  user?: {
+    name?: string | null;
+  };
+  onUsernameChange?: (username: string) => void;
 }

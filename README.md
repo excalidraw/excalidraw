@@ -2,15 +2,17 @@
   <a href="https://excalidraw.com">
     <img src="./public/og-image.png" alt="Excalidraw logo: Sketch handrawn like diagrams." />
   </a>
-  <h3>Excalidraw is a whiteboard tool that lets you easily sketch diagrams with a hand-drawn feel.</h3>
+  <h3>Virtual whiteboard for sketching hand-drawn like diagrams.</h3>
   <p>
     <a href="https://twitter.com/Excalidraw">
       <img alt="Follow Excalidraw on Twitter" src="https://img.shields.io/twitter/follow/excalidraw.svg?label=follow+excalidraw&style=social&logo=twitter">
     </a>
-    <a title="Crowdin" target="_blank" href="https://crowdin.com/project/excalidraw">
+    <a target="_blank" href="https://crowdin.com/project/excalidraw">
       <img src="https://badges.crowdin.net/excalidraw/localized.svg">
     </a>
-    <img src="https://img.shields.io/docker/pulls/excalidraw/excalidraw.svg">
+    <a target="_blank" href="https://hub.docker.com/r/excalidraw/excalidraw">
+      <img src="https://img.shields.io/docker/pulls/excalidraw/excalidraw">
+    </a>
   </p>
 </div>
 

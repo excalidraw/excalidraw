@@ -43,6 +43,7 @@ import { loadLibrary, saveLibrary } from "../data/localStorage";
 import { ToolButton } from "./ToolButton";
 import { saveLibraryAsJSON, importLibraryFromJSON } from "../data/json";
 import { muteFSAbortError } from "../utils";
+import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -355,7 +356,7 @@ const LayerUI = ({
     >
       {/* the zIndex ensures this menu has higher stacking order,
          see https://github.com/excalidraw/excalidraw/pull/1445 */}
-      <Island padding={4} style={{ zIndex: 1 }}>
+      <Island padding={2} style={{ zIndex: 1 }}>
         <Stack.Col gap={4}>
           <Stack.Row gap={1} justifyContent="space-between">
             {actionManager.renderAction("loadScene")}
@@ -370,9 +371,16 @@ const LayerUI = ({
               onUsernameChange={onUsernameChange}
               onRoomCreate={onRoomCreate}
               onRoomDestroy={onRoomDestroy}
+              setErrorMessage={(message: string) =>
+                setAppState({ errorMessage: message })
+              }
             />
           </Stack.Row>
-          {actionManager.renderAction("changeViewBackgroundColor")}
+          <BackgroundPickerAndDarkModeToggle
+            actionManager={actionManager}
+            appState={appState}
+            setAppState={setAppState}
+          />
         </Stack.Col>
       </Island>
     </Section>
@@ -383,7 +391,7 @@ const LayerUI = ({
       heading="selectedShapeActions"
       className={`zen-mode-transition ${zenModeEnabled && "transition-left"}`}
     >
-      <Island className={CLASSES.SHAPE_ACTIONS_MENU} padding={4}>
+      <Island className={CLASSES.SHAPE_ACTIONS_MENU} padding={2}>
         <SelectedShapeActions
           appState={appState}
           elements={elements}
@@ -426,7 +434,6 @@ const LayerUI = ({
 
     return (
       <FixedSideContainer side="top">
-        <HintViewer appState={appState} elements={elements} />
         <div className="App-menu App-menu_top">
           <Stack.Col
             gap={4}
@@ -440,6 +447,7 @@ const LayerUI = ({
               <Stack.Col gap={4} align="start">
                 <Stack.Row gap={1}>
                   <Island padding={1} className={zenModeEnabled && "zen-mode"}>
+                    <HintViewer appState={appState} elements={elements} />
                     {heading}
                     <Stack.Row gap={1}>
                       <ShapesSwitcher
@@ -580,7 +588,7 @@ const LayerUI = ({
             zenModeEnabled && "transition-right"
           }`}
         >
-          <GitHubCorner />
+          <GitHubCorner appearance={appState.appearance} />
         </aside>
       }
       {renderFooter()}

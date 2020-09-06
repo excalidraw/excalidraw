@@ -25,6 +25,9 @@
     "sloppiness": "Estil del traç",
     "opacity": "Opacitat",
     "textAlign": "Alineació del text",
+    "edges": "",
+    "sharp": "",
+    "round": "",
     "fontSize": "Mida de lletra",
     "fontFamily": "Tipus de lletra",
     "onlySelected": "Només seleccionats",
@@ -68,7 +71,8 @@
     "toggleGridMode": "Commutar línies de graella",
     "addToLibrary": "Afegir a la biblioteca",
     "removeFromLibrary": "Eliminar de la biblioteca",
-    "libraryLoadingMessage": "Carregant la biblioteca..."
+    "libraryLoadingMessage": "Carregant la biblioteca...",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "Netejar el llenç",
@@ -95,6 +99,7 @@
     "roomDialog": "Començar col·laboració en directe",
     "createNewRoom": "Crear sala nova",
     "toggleFullScreen": "Commutar pantalla completa",
+    "toggleDarkMode": "",
     "toggleZenMode": "Commutar modo zen",
     "exitZenMode": "Sortir de modo zen"
   },
@@ -129,6 +134,7 @@
   "hints": {
     "linearElement": "Fer clic per dibuixar múltiples punts; arrossegar per una sola línea",
     "freeDraw": "Fer clic i arrosegar, deixar anar al punt final",
+    "text": "",
     "linearElementMulti": "Fer clic a l'ultim punt, o polsar Escape o Enter per acabar",
     "resize": "Per restringir les proporcions mentres es canvia la mida, mantenir premut el majúscul (SHIFT); per canviar la mida des del centre, mantenir premut ALT",
     "rotate": "Per restringir els angles mentre gira, mantenir premut el majúscul (SHIFT)",
@@ -177,7 +183,8 @@
     "github": "Has trobat un problema? Enviar-ho",
     "textNewLine": "Afegir línea nova (text)",
     "textFinish": "Acabar d'editar (text)",
-    "zoomToFit": "Zoom per veure tots els elements"
+    "zoomToFit": "Zoom per veure tots els elements",
+    "preventBinding": ""
   },
   "encrypted": {
     "tooltip": "Els vostres dibuixos estan xifrats de punta a punta de manera que els servidors d’Excalidraw no els veuran mai."

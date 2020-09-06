@@ -24,11 +24,9 @@ class Portal {
     this.socket.on("init-room", () => {
       if (this.socket) {
         this.socket.emit("join-room", this.roomID);
-
-        this.app.restoreUserName();
       }
     });
-    this.socket.on("new-user", async (_socketID: string) => {
+    this.socket.on("new-user", async (_socketId: string) => {
       this.app.broadcastScene(SCENE.INIT, /* syncAll */ true);
     });
     this.socket.on("room-user-change", (clients: string[]) => {

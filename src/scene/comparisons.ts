@@ -20,6 +20,12 @@ export const hasStroke = (type: string) =>
   type === "draw" ||
   type === "line";
 
+export const canChangeSharpness = (type: string) =>
+  type === "rectangle" ||
+  type === "arrow" ||
+  type === "draw" ||
+  type === "line";
+
 export const hasText = (type: string) => type === "text";
 
 export const getElementAtPosition = (
@@ -28,6 +34,8 @@ export const getElementAtPosition = (
 ) => {
   let hitElement = null;
   // We need to to hit testing from front (end of the array) to back (beginning of the array)
+  // because array is ordered from lower z-index to highest and we want element z-index
+  // with higher z-index
   for (let i = elements.length - 1; i >= 0; --i) {
     const element = elements[i];
     if (element.isDeleted) {
@@ -40,6 +48,17 @@ export const getElementAtPosition = (
   }
 
   return hitElement;
+};
+
+export const getElementsAtPosition = (
+  elements: readonly NonDeletedExcalidrawElement[],
+  isAtPositionFn: (element: NonDeletedExcalidrawElement) => boolean,
+) => {
+  // The parameter elements comes ordered from lower z-index to higher.
+  // We want to preserve that order on the returned array.
+  return elements.filter(
+    (element) => !element.isDeleted && isAtPositionFn(element),
+  );
 };
 
 export const getElementContainingPosition = (

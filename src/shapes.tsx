@@ -1,5 +1,4 @@
 import React from "react";
-import oc from "open-color";
 
 // We inline font-awesome icons in order to save on js size rather than including the font awesome react library
 export const SHAPES = [
@@ -62,7 +61,7 @@ export const SHAPES = [
           y1="3"
           x2="6"
           y2="3"
-          stroke={oc.black}
+          stroke="currentColor"
           strokeLinecap="round"
         />
       </svg>

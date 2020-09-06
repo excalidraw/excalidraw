@@ -25,6 +25,9 @@
     "sloppiness": "Sloppiness",
     "opacity": "Opasitas",
     "textAlign": "Perataan Teks",
+    "edges": "",
+    "sharp": "",
+    "round": "",
     "fontSize": "Ukuran font",
     "fontFamily": "Jenis font",
     "onlySelected": "Hanya yang Dipilih",
@@ -68,7 +71,8 @@
     "toggleGridMode": "",
     "addToLibrary": "",
     "removeFromLibrary": "",
-    "libraryLoadingMessage": ""
+    "libraryLoadingMessage": "",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
@@ -95,6 +99,7 @@
     "roomDialog": "Mulai kolaborasi secara langsung",
     "createNewRoom": "Buat ruang baru",
     "toggleFullScreen": "Aktif / Nonaktifkan layar penuh",
+    "toggleDarkMode": "",
     "toggleZenMode": "",
     "exitZenMode": ""
   },
@@ -129,6 +134,7 @@
   "hints": {
     "linearElement": "Klik untuk memulai banyak poin, seret untuk satu baris",
     "freeDraw": "",
+    "text": "",
     "linearElementMulti": "",
     "resize": "",
     "rotate": "",
@@ -177,7 +183,8 @@
     "github": "",
     "textNewLine": "",
     "textFinish": "",
-    "zoomToFit": ""
+    "zoomToFit": "",
+    "preventBinding": ""
   },
   "encrypted": {
     "tooltip": ""

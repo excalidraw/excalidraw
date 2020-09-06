@@ -25,6 +25,9 @@
     "sloppiness": "Ujamnheit",
     "opacity": "Synlegheit",
     "textAlign": "Tekstjustering",
+    "edges": "",
+    "sharp": "",
+    "round": "",
     "fontSize": "Skriftstorleik",
     "fontFamily": "Skrifttype",
     "onlySelected": "Kun valde",
@@ -68,7 +71,8 @@
     "toggleGridMode": "Sla på/av rutenett",
     "addToLibrary": "Legg til i bibliotek",
     "removeFromLibrary": "Fjern frå bibliotek",
-    "libraryLoadingMessage": "Laster bibliotek..."
+    "libraryLoadingMessage": "Laster bibliotek...",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "Tilbakestill lerretet",
@@ -95,6 +99,7 @@
     "roomDialog": "Start sanntids-samarbeid",
     "createNewRoom": "Lag nytt rom",
     "toggleFullScreen": "Slå på/av fullskjerm",
+    "toggleDarkMode": "Skru av/på skumringsmodus",
     "toggleZenMode": "Slå på/av zen-modus",
     "exitZenMode": "Avslutt zen-modus"
   },
@@ -129,6 +134,7 @@
   "hints": {
     "linearElement": "Klikk for å starte linje med fleire punkt, eller drag for ei enkel linje",
     "freeDraw": "Klikk og drag, slepp når du er ferdig",
+    "text": "",
     "linearElementMulti": "Klikk på siste punkt eller trykk Escape eller Enter for å fullføre",
     "resize": "Du kan halde fram med forholdet ved å trykke SHIFT medan du endrar storleik,\ntrykk ALT for å endre storleiken frå midten",
     "rotate": "Du kan låse vinklane ved å halde SHIFT medan du roterer",
@@ -177,7 +183,8 @@
     "github": "Funne eit problem? Send inn",
     "textNewLine": "Legg til ny linje (tekst)",
     "textFinish": "Fullfør redigering (tekst)",
-    "zoomToFit": "Zoom for å sjå alle elementa"
+    "zoomToFit": "Zoom for å sjå alle elementa",
+    "preventBinding": "Hindre pilkobling"
   },
   "encrypted": {
     "tooltip": "Teikningane dine er ende-til-ende-krypterte slik at Excalidraw sine serverar aldri får sjå dei."

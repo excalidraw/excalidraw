@@ -17,6 +17,7 @@ import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 import { LockIcon } from "./LockIcon";
 import { LoadingMessage } from "./LoadingMessage";
 import { UserList } from "./UserList";
+import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -99,8 +100,15 @@ export const MobileMenu = ({
                   onUsernameChange={onUsernameChange}
                   onRoomCreate={onRoomCreate}
                   onRoomDestroy={onRoomDestroy}
+                  setErrorMessage={(message: string) =>
+                    setAppState({ errorMessage: message })
+                  }
                 />
-                {actionManager.renderAction("changeViewBackgroundColor")}
+                <BackgroundPickerAndDarkModeToggle
+                  actionManager={actionManager}
+                  appState={appState}
+                  setAppState={setAppState}
+                />
                 <fieldset>
                   <legend>{t("labels.language")}</legend>
                   <LanguageList

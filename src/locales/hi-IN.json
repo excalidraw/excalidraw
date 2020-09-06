@@ -25,6 +25,9 @@
     "sloppiness": "बेढ़ंगापन",
     "opacity": "अपारदर्शिता",
     "textAlign": "टेक्स्ट संरेखन",
+    "edges": "",
+    "sharp": "",
+    "round": "",
     "fontSize": "फ़ॉन्ट का आकार",
     "fontFamily": "फ़ॉन्ट का परिवार",
     "onlySelected": "केवल चयनित",
@@ -68,7 +71,8 @@
     "toggleGridMode": "टॉगल ग्रिड मोड",
     "addToLibrary": "",
     "removeFromLibrary": "",
-    "libraryLoadingMessage": ""
+    "libraryLoadingMessage": "",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "कैनवास रीसेट करें",
@@ -95,6 +99,7 @@
     "roomDialog": "लाइव सहयोग शुरू करें",
     "createNewRoom": "एक नया कमरा बनाएं",
     "toggleFullScreen": "पूर्णस्क्रीन चालू करें",
+    "toggleDarkMode": "",
     "toggleZenMode": "टॉगल ज़ेन मोड",
     "exitZenMode": "जेन मोड से बाहर निकलें"
   },
@@ -129,6 +134,7 @@
   "hints": {
     "linearElement": "कई बिंदुओं को शुरू करने के लिए क्लिक करें, सिंगल लाइन के लिए खींचें",
     "freeDraw": "क्लिक करें और खींचें। समाप्त करने के लिए, छोड़ो",
+    "text": "",
     "linearElementMulti": "अंतिम बिंदु पर क्लिक करें या समाप्त होने के लिए एस्केप या एंटर दबाएं",
     "resize": "आकार बदलते समय आप SHIFT को पकड़ कर अनुपात में कमी कर सकते हैं,\nकेंद्र से आकार बदलने के लिए ALT दबाए रखें",
     "rotate": "आप घूर्णन करते समय SHIFT पकड़कर कोणों को विवश कर सकते हैं",
@@ -177,7 +183,8 @@
     "github": "एक मुद्दा मिला? प्रस्तुत करे",
     "textNewLine": "नई पंक्ति (पाठ) जोड़ें",
     "textFinish": "संपादन समाप्त करें (पाठ)",
-    "zoomToFit": "सभी तत्वों को फिट करने के लिए ज़ूम करें"
+    "zoomToFit": "सभी तत्वों को फिट करने के लिए ज़ूम करें",
+    "preventBinding": ""
   },
   "encrypted": {
     "tooltip": "आपके चित्र अंत-से-अंत एन्क्रिप्टेड हैं, इसलिए एक्सक्लूसिव्रॉव के सर्वर उन्हें कभी नहीं देखेंगे।"

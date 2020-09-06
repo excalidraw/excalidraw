@@ -25,6 +25,9 @@
     "sloppiness": "Imprecisione",
     "opacity": "Opacità",
     "textAlign": "Allineamento del testo",
+    "edges": "",
+    "sharp": "",
+    "round": "",
     "fontSize": "Dimensione carattere",
     "fontFamily": "Carattere",
     "onlySelected": "Solo selezionati",
@@ -68,7 +71,8 @@
     "toggleGridMode": "Attiva/disattiva modalità quadrícula",
     "addToLibrary": "Aggiungi alla biblioteca",
     "removeFromLibrary": "Rimuovi dalla biblioteca",
-    "libraryLoadingMessage": "Caricamento della biblioteca..."
+    "libraryLoadingMessage": "Caricamento della biblioteca...",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "Ripristina la tela",
@@ -95,6 +99,7 @@
     "roomDialog": "Inizia collaborazione in diretta",
     "createNewRoom": "Crea nuova stanza",
     "toggleFullScreen": "Attiva/Disattiva schermo intero",
+    "toggleDarkMode": "",
     "toggleZenMode": "Attiva/Disattiva modalità zen",
     "exitZenMode": "Uscire dalla modalità zen"
   },
@@ -129,6 +134,7 @@
   "hints": {
     "linearElement": "Clicca per iniziare una linea in più punti, trascina per singola linea",
     "freeDraw": "Clicca e trascina, rilascia quando avrai finito",
+    "text": "",
     "linearElementMulti": "Clicca sull'ultimo punto o premi Esc o Invio per finire",
     "resize": "Per vincolare le proporzioni, tenir premuto MAIUSC durante il ridimensionamento;\nper ridimensionare dal centro, tenir premuto ALT",
     "rotate": "Puoi mantenere gli angoli tenendo premuto SHIFT durante la rotazione",
@@ -177,7 +183,8 @@
     "github": "Hai trovato un problema? Segnalalo",
     "textNewLine": "Aggiungi nuova riga (testo)",
     "textFinish": "Completa la modifica (testo)",
-    "zoomToFit": "Adatta zoom per mostrare tutti gli elementi"
+    "zoomToFit": "Adatta zoom per mostrare tutti gli elementi",
+    "preventBinding": ""
   },
   "encrypted": {
     "tooltip": "I tuoi disegni sono crittografati end-to-end in modo che i server di Excalidraw non li possano mai vedere."

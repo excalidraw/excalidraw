@@ -16,6 +16,7 @@ const RoomModal = ({
   onRoomCreate,
   onRoomDestroy,
   onPressingEnter,
+  setErrorMessage,
 }: {
   activeRoomLink: string;
   username: string;
@@ -23,11 +24,16 @@ const RoomModal = ({
   onRoomCreate: () => void;
   onRoomDestroy: () => void;
   onPressingEnter: () => void;
+  setErrorMessage: (message: string) => void;
 }) => {
   const roomLinkInput = useRef<HTMLInputElement>(null);
 
-  const copyRoomLink = () => {
-    copyTextToSystemClipboard(activeRoomLink);
+  const copyRoomLink = async () => {
+    try {
+      await copyTextToSystemClipboard(activeRoomLink);
+    } catch (error) {
+      setErrorMessage(error.message);
+    }
     if (roomLinkInput.current) {
       roomLinkInput.current.select();
     }
@@ -90,10 +96,15 @@ const RoomModal = ({
               onKeyPress={(event) => event.key === "Enter" && onPressingEnter()}
             />
           </div>
-          <p>{`🔒 ${t("roomDialog.desc_privacy")}`}</p>
           <p>
-            <span role="img" aria-hidden="true">
-              ⚠️
+            <span role="img" aria-hidden="true" className="RoomDialog-emoji">
+              {"🔒"}
+            </span>{" "}
+            {t("roomDialog.desc_privacy")}
+          </p>
+          <p>
+            <span role="img" aria-hidden="true" className="RoomDialog-emoji">
+              {"⚠️️"}
             </span>{" "}
             {t("roomDialog.desc_persistenceWarning")}
           </p>
@@ -122,6 +133,7 @@ export const RoomDialog = ({
   onUsernameChange,
   onRoomCreate,
   onRoomDestroy,
+  setErrorMessage,
 }: {
   isCollaborating: AppState["isCollaborating"];
   collaboratorCount: number;
@@ -129,6 +141,7 @@ export const RoomDialog = ({
   onUsernameChange: (username: string) => void;
   onRoomCreate: () => void;
   onRoomDestroy: () => void;
+  setErrorMessage: (message: string) => void;
 }) => {
   const [modalIsShown, setModalIsShown] = useState(false);
   const [activeRoomLink, setActiveRoomLink] = useState("");
@@ -177,6 +190,7 @@ export const RoomDialog = ({
             onRoomCreate={onRoomCreate}
             onRoomDestroy={onRoomDestroy}
             onPressingEnter={handleClose}
+            setErrorMessage={setErrorMessage}
           />
         </Dialog>
       )}

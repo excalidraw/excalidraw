@@ -25,6 +25,9 @@
     "sloppiness": "Sloppiness",
     "opacity": "Opacity",
     "textAlign": "Text align",
+    "edges": "Edges",
+    "sharp": "Sharp",
+    "round": "Round",
     "fontSize": "Font size",
     "fontFamily": "Font family",
     "onlySelected": "Only selected",
@@ -68,7 +71,8 @@
     "toggleGridMode": "Toggle grid mode",
     "addToLibrary": "Add to library",
     "removeFromLibrary": "Remove from library",
-    "libraryLoadingMessage": "Loading library..."
+    "libraryLoadingMessage": "Loading library...",
+    "loadingScene": "Loading scene..."
   },
   "buttons": {
     "clearReset": "Reset the canvas",
@@ -95,6 +99,7 @@
     "roomDialog": "Start live collaboration",
     "createNewRoom": "Create new room",
     "toggleFullScreen": "Toggle full screen",
+    "toggleDarkMode": "Toggle dark mode",
     "toggleZenMode": "Toggle zen mode",
     "exitZenMode": "Exit zen mode"
   },
@@ -129,6 +134,7 @@
   "hints": {
     "linearElement": "Click to start multiple points, drag for single line",
     "freeDraw": "Click and drag, release when you're finished",
+    "text": "Tip: you can also add text by double-clicking anywhere with the selection tool",
     "linearElementMulti": "Click on last point or press Escape or Enter to finish",
     "resize": "You can constrain proportions by holding SHIFT while resizing,\nhold ALT to resize from the center",
     "rotate": "You can constrain angles by holding SHIFT while rotating",

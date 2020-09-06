@@ -25,6 +25,9 @@
     "sloppiness": "Stílus",
     "opacity": "Áttetszőség",
     "textAlign": "",
+    "edges": "",
+    "sharp": "",
+    "round": "",
     "fontSize": "",
     "fontFamily": "",
     "onlySelected": "Csak a kiválasztott",
@@ -68,7 +71,8 @@
     "toggleGridMode": "",
     "addToLibrary": "",
     "removeFromLibrary": "",
-    "libraryLoadingMessage": ""
+    "libraryLoadingMessage": "",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "Vászon törlése",
@@ -95,6 +99,7 @@
     "roomDialog": "Élő együttműködés indítása",
     "createNewRoom": "Új szoba létrehozása",
     "toggleFullScreen": "",
+    "toggleDarkMode": "",
     "toggleZenMode": "",
     "exitZenMode": ""
   },
@@ -129,6 +134,7 @@
   "hints": {
     "linearElement": "Kattintson a több pont elindításához, húzza az egyenes vonalhoz",
     "freeDraw": "",
+    "text": "",
     "linearElementMulti": "Kattintson az utolsó pontra, vagy nyomja meg az Escape vagy az Enter billentyűt a befejezéshez",
     "resize": "",
     "rotate": "A SHIFT billentyű lenyomva tartásával korlátozhatja a szögek illesztését",
@@ -177,7 +183,8 @@
     "github": "",
     "textNewLine": "",
     "textFinish": "",
-    "zoomToFit": ""
+    "zoomToFit": "",
+    "preventBinding": ""
   },
   "encrypted": {
     "tooltip": ""

@@ -171,7 +171,7 @@ export class LinearElementEditor {
     scenePointer: { x: number; y: number },
   ): {
     didAddPoint: boolean;
-    hitElement: ExcalidrawElement | null;
+    hitElement: NonDeleted<ExcalidrawElement> | null;
   } {
     const ret: ReturnType<typeof LinearElementEditor["handlePointerDown"]> = {
       didAddPoint: false,
@@ -508,8 +508,16 @@ export class LinearElementEditor {
       });
     }
 
-    const nextCoords = getElementPointsCoords(element, nextPoints);
-    const prevCoords = getElementPointsCoords(element, points);
+    const nextCoords = getElementPointsCoords(
+      element,
+      nextPoints,
+      element.strokeSharpness || "round",
+    );
+    const prevCoords = getElementPointsCoords(
+      element,
+      points,
+      element.strokeSharpness || "round",
+    );
     const nextCenterX = (nextCoords[0] + nextCoords[2]) / 2;
     const nextCenterY = (nextCoords[1] + nextCoords[3]) / 2;
     const prevCenterX = (prevCoords[0] + prevCoords[2]) / 2;

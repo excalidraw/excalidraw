@@ -25,6 +25,9 @@
     "sloppiness": "Styl kreski",
     "opacity": "Przeźroczystość",
     "textAlign": "Wyrównanie tekstu",
+    "edges": "",
+    "sharp": "",
+    "round": "",
     "fontSize": "Rozmiar tekstu",
     "fontFamily": "Krój pisma",
     "onlySelected": "Tylko wybrane",
@@ -68,7 +71,8 @@
     "toggleGridMode": "",
     "addToLibrary": "",
     "removeFromLibrary": "",
-    "libraryLoadingMessage": ""
+    "libraryLoadingMessage": "",
+    "loadingScene": ""
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
@@ -95,6 +99,7 @@
     "roomDialog": "Utwórz nową sesję współpracy na żywo",
     "createNewRoom": "Utwórz nowy pokój",
     "toggleFullScreen": "Włącz/wyłącz tryb pełnoekranowy",
+    "toggleDarkMode": "",
     "toggleZenMode": "Włącz tryb Zen",
     "exitZenMode": "Wyjdź z trybu Zen"
   },
@@ -129,6 +134,7 @@
   "hints": {
     "linearElement": "Naciśnij, aby zrobić punkt, przeciągnij, aby narysować linię",
     "freeDraw": "Naciśnij i przeciągnij by rysować, puść kiedy skończysz",
+    "text": "",
     "linearElementMulti": "Aby zakończyć krzywą, ponownie kliknij w ostatni punkt, bądź naciśnij Esc albo Enter",
     "resize": "Możesz zachować proporcję trzymająć wcisnięty SHIFT, przytrzymaj ALT by zmienić rozmiar względem środka",
     "rotate": "Możesz obracać element w równych odstępach trzymając wciśnięty SHIFT",
@@ -177,7 +183,8 @@
     "github": "Znalazłeś problem? Zgłoś go",
     "textNewLine": "Dodaj nową linię (tekst)",
     "textFinish": "Zakończ edycję (tekst)",
-    "zoomToFit": "Powiększ, aby wyświetlić wszystkie elementy"
+    "zoomToFit": "Powiększ, aby wyświetlić wszystkie elementy",
+    "preventBinding": ""
   },
   "encrypted": {
     "tooltip": "Twoje rysunki są zabezpieczone szyfrowaniem end-to-end, tak więc nawet w Excalidraw nie jesteśmy w stanie zobaczyć tego co tworzysz."

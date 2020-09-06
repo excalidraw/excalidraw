@@ -62,7 +62,7 @@ export const saveUsernameToLocalStorage = (username: string) => {
   }
 };
 
-export const restoreUsernameFromLocalStorage = (): string | null => {
+export const importUsernameFromLocalStorage = (): string | null => {
   try {
     const data = localStorage.getItem(LOCAL_STORAGE_KEY_COLLAB);
     if (data) {
@@ -95,7 +95,7 @@ export const saveToLocalStorage = (
   }
 };
 
-export const restoreFromLocalStorage = () => {
+export const importFromLocalStorage = () => {
   let savedElements = null;
   let savedState = null;
 
@@ -131,5 +131,5 @@ export const restoreFromLocalStorage = () => {
       // Do nothing because appState is already null
     }
   }
-  return restore(elements, appState);
+  return { elements, appState };
 };

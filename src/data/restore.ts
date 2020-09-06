@@ -6,6 +6,7 @@ import {
 import { AppState } from "../types";
 import { DataState } from "./types";
 import { isInvisiblySmallElement, getNormalizedDimensions } from "../element";
+import { isLinearElementType } from "../element/typeChecks";
 import { randomId } from "../random";
 import {
   FONT_FAMILY,
@@ -49,6 +50,9 @@ function migrateElementWithProperties<T extends ExcalidrawElement>(
     height: element.height || 0,
     seed: element.seed ?? 1,
     groupIds: element.groupIds ?? [],
+    strokeSharpness:
+      element.strokeSharpness ??
+      (isLinearElementType(element.type) ? "round" : "sharp"),
     boundElementIds: element.boundElementIds ?? [],
   };
 

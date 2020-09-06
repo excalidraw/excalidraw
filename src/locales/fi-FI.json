@@ -25,6 +25,9 @@
     "sloppiness": "Viivan tarkkuus",
     "opacity": "Peittävyys",
     "textAlign": "Tekstin tasaus",
+    "edges": "Reunat",
+    "sharp": "Terävä",
+    "round": "Pyöreä",
     "fontSize": "Kirjasinkoko",
     "fontFamily": "Kirjasintyyppi",
     "onlySelected": "Vain valitut",
@@ -68,7 +71,8 @@
     "toggleGridMode": "Ruudukko päälle/pois",
     "addToLibrary": "Lisää kirjastoon",
     "removeFromLibrary": "Poista kirjastosta",
-    "libraryLoadingMessage": "Ladataan kirjastoa..."
+    "libraryLoadingMessage": "Ladataan kirjastoa...",
+    "loadingScene": "Ladataan työtä..."
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
@@ -95,6 +99,7 @@
     "roomDialog": "Aloita live-yhteistyö",
     "createNewRoom": "Luo huone",
     "toggleFullScreen": "Koko näytön tila päälle/pois",
+    "toggleDarkMode": "Pimeä tila päälle/pois",
     "toggleZenMode": "Zen-tila päälle",
     "exitZenMode": "Poistu zen-tilasta"
   },
@@ -129,6 +134,7 @@
   "hints": {
     "linearElement": "Klikkaa piirtääksesi useampi piste, raahaa piirtääksesi yksittäinen viiva",
     "freeDraw": "Paina ja raahaa, päästä irti kun olet valmis",
+    "text": "Vinkki: voit myös lisätä tekstiä kaksoisnapsauttamalla mihin tahansa valintatyökalulla",
     "linearElementMulti": "Klikkaa viimeistä pistettä, paina Escape tai paina Enter lopettaaksesi",
     "resize": "Voit rajoittaa mittasuhteet pitämällä SHIFT pohjassa kun muutat kokoa, pidä ALT pohjassa muuttaaksesi kokoa keskipisteen suhteen",
     "rotate": "Voit rajoittaa kulman pitämällä SHIFT pohjassa pyörittäessäsi",
@@ -177,7 +183,8 @@
     "github": "Löysitkö ongelman? Kerro meille",
     "textNewLine": "Lisää uusi rivi (teksti)",
     "textFinish": "Lopeta muokkaus (teksti)",
-    "zoomToFit": "Zoomaa kaikki elementit näkyviin"
+    "zoomToFit": "Zoomaa kaikki elementit näkyviin",
+    "preventBinding": "Estä nuolten sitominen"
   },
   "encrypted": {
     "tooltip": "Piirroksesi ovat päästä päähän salattuja, joten Excalidrawin palvelimet eivät koskaan näe niitä."

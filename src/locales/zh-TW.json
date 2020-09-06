@@ -25,6 +25,9 @@
     "sloppiness": "線條風格",
     "opacity": "透明度",
     "textAlign": "文字對齊",
+    "edges": "邊緣",
+    "sharp": "尖銳",
+    "round": "平滑",
     "fontSize": "字型大小",
     "fontFamily": "字體",
     "onlySelected": "僅選取物件",
@@ -68,7 +71,8 @@
     "toggleGridMode": "切換格線模式",
     "addToLibrary": "加入資料庫",
     "removeFromLibrary": "從資料庫中移除",
-    "libraryLoadingMessage": "資料庫讀取中…"
+    "libraryLoadingMessage": "資料庫讀取中…",
+    "loadingScene": "場景讀取中…"
   },
   "buttons": {
     "clearReset": "重置 canvas",
@@ -95,6 +99,7 @@
     "roomDialog": "開始即時協作",
     "createNewRoom": "建立新協作會議室",
     "toggleFullScreen": "切換全螢幕",
+    "toggleDarkMode": "切換深色模式",
     "toggleZenMode": "切換專注模式",
     "exitZenMode": "離開專注模式"
   },
@@ -129,6 +134,7 @@
   "hints": {
     "linearElement": "點擊以繪製多點曲線；或拖曳以繪製直線",
     "freeDraw": "點擊並拖曳來繪圖，放開即結束",
+    "text": "提示：亦可使用選取工具在任何地方雙擊來加入文字",
     "linearElementMulti": "按下 Escape 或 Enter 以結束繪製",
     "resize": "縮放時按住 Shift 可保持原比例縮放；\\n按住 Alt 可由中心點進行縮放",
     "rotate": "旋轉時按住 Shift 可限制旋轉角度",
@@ -177,7 +183,8 @@
     "github": "發現問題？回報 issue",
     "textNewLine": "換行（文字）",
     "textFinish": "完成編輯（文字）",
-    "zoomToFit": "放大至填滿畫面"
+    "zoomToFit": "放大至填滿畫面",
+    "preventBinding": ""
   },
   "encrypted": {
     "tooltip": "你的作品已使用 end-to-end 方式加密，Excalidraw 的伺服器也無法取得其內容。"

@@ -26,18 +26,15 @@ import { getShapeForElement } from "../renderer/renderElement";
 
 const isElementDraggableFromInside = (
   element: NonDeletedExcalidrawElement,
-  appState: AppState,
 ): boolean => {
   if (element.type === "arrow") {
     return false;
   }
-  const dragFromInside =
-    element.backgroundColor !== "transparent" ||
-    appState.selectedElementIds[element.id];
+  const isDraggableFromInside = element.backgroundColor !== "transparent";
   if (element.type === "line" || element.type === "draw") {
-    return dragFromInside && isPathALoop(element.points);
+    return isDraggableFromInside && isPathALoop(element.points);
   }
-  return dragFromInside;
+  return isDraggableFromInside;
 };
 
 export const hitTest = (
@@ -48,14 +45,73 @@ export const hitTest = (
 ): boolean => {
   // How many pixels off the shape boundary we still consider a hit
   const threshold = 10 / appState.zoom;
+  const point: Point = [x, y];
+
+  if (isElementSelected(appState, element)) {
+    return isPointHittingElementBoundingBox(element, point, threshold);
+  }
+
+  return isHittingElementNotConsideringBoundingBox(element, appState, point);
+};
+
+export const isHittingElementBoundingBoxWithoutHittingElement = (
+  element: NonDeletedExcalidrawElement,
+  appState: AppState,
+  x: number,
+  y: number,
+): boolean => {
+  const threshold = 10 / appState.zoom;
+
+  return (
+    !isHittingElementNotConsideringBoundingBox(element, appState, [x, y]) &&
+    isPointHittingElementBoundingBox(element, [x, y], threshold)
+  );
+};
+
+const isHittingElementNotConsideringBoundingBox = (
+  element: NonDeletedExcalidrawElement,
+  appState: AppState,
+  point: Point,
+): boolean => {
+  const threshold = 10 / appState.zoom;
+
   const check =
     element.type === "text"
       ? isStrictlyInside
-      : isElementDraggableFromInside(element, appState)
+      : isElementDraggableFromInside(element)
       ? isInsideCheck
       : isNearCheck;
-  const point: Point = [x, y];
   return hitTestPointAgainstElement({ element, point, threshold, check });
+};
+
+const isElementSelected = (
+  appState: AppState,
+  element: NonDeleted<ExcalidrawElement>,
+) => appState.selectedElementIds[element.id];
+
+const isPointHittingElementBoundingBox = (
+  element: NonDeleted<ExcalidrawElement>,
+  [x, y]: Point,
+  threshold: number,
+) => {
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const elementCenterX = (x1 + x2) / 2;
+  const elementCenterY = (y1 + y2) / 2;
+  // reverse rotate to take element's angle into account.
+  const [rotatedX, rotatedY] = rotate(
+    x,
+    y,
+    elementCenterX,
+    elementCenterY,
+    -element.angle,
+  );
+
+  return (
+    rotatedX > x1 - threshold &&
+    rotatedX < x2 + threshold &&
+    rotatedY > y1 - threshold &&
+    rotatedY < y2 + threshold
+  );
 };
 
 export const bindingBorderTest = (
@@ -235,7 +291,7 @@ const hitTestLinear = (args: HitTestArgs): boolean => {
 
   if (args.check === isInsideCheck) {
     const hit = shape.some((subshape) =>
-      hitTestCurveInside(subshape, relX, relY, threshold),
+      hitTestCurveInside(subshape, relX, relY, element.strokeSharpness),
     );
     if (hit) {
       return true;
@@ -660,23 +716,29 @@ const hitTestCurveInside = (
   drawable: Drawable,
   x: number,
   y: number,
-  lineThreshold: number,
+  sharpness: ExcalidrawElement["strokeSharpness"],
 ) => {
   const ops = getCurvePathOps(drawable);
   const points: Point[] = [];
+  let odd = false; // select one line out of double lines
   for (const operation of ops) {
     if (operation.op === "move") {
-      if (points.length) {
-        break;
+      odd = !odd;
+      if (odd) {
+        points.push([operation.data[0], operation.data[1]]);
       }
-      points.push([operation.data[0], operation.data[1]]);
     } else if (operation.op === "bcurveTo") {
-      points.push([operation.data[0], operation.data[1]]);
-      points.push([operation.data[2], operation.data[3]]);
-      points.push([operation.data[4], operation.data[5]]);
+      if (odd) {
+        points.push([operation.data[0], operation.data[1]]);
+        points.push([operation.data[2], operation.data[3]]);
+        points.push([operation.data[4], operation.data[5]]);
+      }
     }
   }
   if (points.length >= 4) {
+    if (sharpness === "sharp") {
+      return isPointInPolygon(points, x, y);
+    }
     const polygonPoints = pointsOnBezierCurves(points as any, 10, 5);
     return isPointInPolygon(polygonPoints, x, y);
   }
