@@ -48,6 +48,7 @@ export const Modal = (props: {
 const useBodyRoot = () => {
   const createDiv = () => {
     const div = document.createElement("div");
+    div.classList.add("excalidraw");
     document.body.appendChild(div);
     return div;
   };

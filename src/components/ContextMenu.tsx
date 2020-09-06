@@ -48,7 +48,7 @@ const getContextMenuNode = (): HTMLDivElement => {
     return contextMenuNode;
   }
   const div = document.createElement("div");
-  document.body.appendChild(div);
+  document.querySelector(".excalidraw")?.appendChild(div);
   return (contextMenuNode = div);
 };
 
