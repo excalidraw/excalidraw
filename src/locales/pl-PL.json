@@ -2,7 +2,7 @@
   "labels": {
     "paste": "Wklej",
     "selectAll": "Zaznacz wszystko",
-    "multiSelect": "",
+    "multiSelect": "Dodaj element do zaznaczenia",
     "moveCanvas": "Przesuń obszar roboczy",
     "copy": "Kopiuj",
     "copyAsPng": "Skopiuj do schowka jako plik PNG",
@@ -25,8 +25,8 @@
     "sloppiness": "Styl kreski",
     "opacity": "Przeźroczystość",
     "textAlign": "Wyrównanie tekstu",
-    "edges": "",
-    "sharp": "",
+    "edges": "Krawędzie",
+    "sharp": "Ostry",
     "round": "Zaokrąglij",
     "fontSize": "Rozmiar tekstu",
     "fontFamily": "Krój pisma",
@@ -184,7 +184,7 @@
     "textNewLine": "Dodaj nową linię (tekst)",
     "textFinish": "Zakończ edycję (tekst)",
     "zoomToFit": "Powiększ, aby wyświetlić wszystkie elementy",
-    "preventBinding": ""
+    "preventBinding": "Zablokuj przywiązanie strzałek do obiektu"
   },
   "encrypted": {
     "tooltip": "Twoje rysunki są zabezpieczone szyfrowaniem end-to-end, tak więc nawet w Excalidraw nie jesteśmy w stanie zobaczyć tego co tworzysz."
