@@ -8,18 +8,29 @@ import { NonDeletedExcalidrawElement } from "./types";
 
 export const dragSelectedElements = (
   selectedElements: NonDeletedExcalidrawElement[],
+  originalElements: readonly NonDeletedExcalidrawElement[],
   pointerX: number,
   pointerY: number,
   scene: Scene,
+  lockDirection: boolean = false,
+  distanceX: number = 0,
+  distanceY: number = 0,
 ) => {
   const [x1, y1] = getCommonBounds(selectedElements);
   const offset = { x: pointerX - x1, y: pointerY - y1 };
-  selectedElements.forEach((element) => {
+  selectedElements.forEach((element, i) => {
+    const original = originalElements[i];
+    const lockX = lockDirection && distanceX < distanceY;
+    const lockY = lockDirection && distanceX > distanceY;
+
     mutateElement(element, {
-      x: element.x + offset.x,
-      y: element.y + offset.y,
+      x: lockX ? original.x : element.x + offset.x,
+      y: lockY ? original.y : element.y + offset.y,
     });
-    updateBoundElements(element, { simultaneouslyUpdated: selectedElements });
+
+    updateBoundElements(element, {
+      simultaneouslyUpdated: selectedElements,
+    });
   });
 };
 

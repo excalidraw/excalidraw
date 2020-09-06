@@ -2996,7 +2996,25 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             pointerCoords.y - pointerDownState.drag.offset.y,
             this.state.gridSize,
           );
-          dragSelectedElements(selectedElements, dragX, dragY, this.scene);
+
+          const [dragDistanceX, dragDistanceY] = [
+            Math.abs(pointerCoords.x - pointerDownState.origin.x),
+            Math.abs(pointerCoords.y - pointerDownState.origin.y),
+          ];
+
+          // We only drag in one direction if shift is pressed
+          const lockDirection = event.shiftKey;
+
+          dragSelectedElements(
+            selectedElements,
+            pointerDownState.resize.originalElements,
+            dragX,
+            dragY,
+            this.scene,
+            lockDirection,
+            dragDistanceX,
+            dragDistanceY,
+          );
           this.maybeSuggestBindingForAll(selectedElements);
 
           // We duplicate the selected element if alt is pressed on pointer move
