@@ -137,7 +137,6 @@ export const textWysiwyg = ({
 
   const handleSubmit = () => {
     onSubmit(normalizeText(editable.value));
-    updateBoundElements(element as NonDeletedExcalidrawElement);
     cleanup();
   };
 
@@ -158,6 +157,7 @@ export const textWysiwyg = ({
     window.removeEventListener("blur", handleSubmit);
 
     unbindUpdate();
+    updateBoundElements(element as NonDeletedExcalidrawElement);
 
     document.body.removeChild(editable);
   };
