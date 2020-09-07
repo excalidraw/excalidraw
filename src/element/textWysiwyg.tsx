@@ -3,8 +3,9 @@ import { isWritableElement, getFontString } from "../utils";
 import Scene from "../scene/Scene";
 import { isTextElement } from "./typeChecks";
 import { CLASSES } from "../constants";
-import { ExcalidrawElement } from "./types";
+import { ExcalidrawElement, NonDeletedExcalidrawElement } from "./types";
 import { AppState } from "../types";
+import { updateBoundElements } from "./binding";
 
 const normalizeText = (text: string) => {
   return (
@@ -136,6 +137,7 @@ export const textWysiwyg = ({
 
   const handleSubmit = () => {
     onSubmit(normalizeText(editable.value));
+    updateBoundElements(element as NonDeletedExcalidrawElement);
     cleanup();
   };
 
