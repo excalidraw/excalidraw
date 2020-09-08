@@ -209,7 +209,7 @@ const gesture: Gesture = {
   initialScale: null,
 };
 
-type PointerDownState = Readonly<{
+export type PointerDownState = Readonly<{
   // The first position at which pointerDown happened
   origin: Readonly<{ x: number; y: number }>;
   // Same as "origin" but snapped to the grid, if grid is on
@@ -218,6 +218,9 @@ type PointerDownState = Readonly<{
   scrollbars: ReturnType<typeof isOverScrollBars>;
   // The previous pointer position
   lastCoords: { x: number; y: number };
+  // map of original elements data
+  // (for now only a subset of props for perf reasons)
+  originalElements: Map<string, Pick<ExcalidrawElement, "x" | "y" | "angle">>;
   resize: {
     // Handle when resizing, might change during the pointer interaction
     handleType: MaybeTransformHandleType;
@@ -229,8 +232,6 @@ type PointerDownState = Readonly<{
     arrowDirection: "origin" | "end";
     // This is a center point of selected elements determined on the initial pointer down event (for rotation only)
     center: { x: number; y: number };
-    // This is a list of selected elements determined on the initial pointer down event (for rotation only)
-    originalElements: readonly NonDeleted<ExcalidrawElement>[];
   };
   hit: {
     // The element the pointer is "hitting", is determined on the initial
@@ -2427,13 +2428,20 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       ),
       // we need to duplicate because we'll be updating this state
       lastCoords: { ...origin },
+      originalElements: this.scene.getElements().reduce((acc, element) => {
+        acc.set(element.id, {
+          x: element.x,
+          y: element.y,
+          angle: element.angle,
+        });
+        return acc;
+      }, new Map() as PointerDownState["originalElements"]),
       resize: {
         handleType: false,
         isResizing: false,
         offset: { x: 0, y: 0 },
         arrowDirection: "origin",
         center: { x: (maxX + minX) / 2, y: (maxY + minY) / 2 },
-        originalElements: selectedElements.map((element) => ({ ...element })),
       },
       hit: {
         element: null,
@@ -2933,6 +2941,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         );
         if (
           transformElements(
+            pointerDownState,
             transformHandleType,
             (newTransformHandle) => {
               pointerDownState.resize.handleType = newTransformHandle;
@@ -2946,7 +2955,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             resizeY,
             pointerDownState.resize.center.x,
             pointerDownState.resize.center.y,
-            pointerDownState.resize.originalElements,
           )
         ) {
           this.maybeSuggestBindingForAll(selectedElements);
@@ -3006,8 +3014,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           const lockDirection = event.shiftKey;
 
           dragSelectedElements(
+            pointerDownState,
             selectedElements,
-            pointerDownState.resize.originalElements,
             dragX,
             dragY,
             this.scene,
