@@ -489,10 +489,8 @@
   .disable-pointerEvents {
     pointer-events: none !important;
   }
-}
 
-@media print {
-  .excalidraw {
+  @media print {
     .App-bottom-bar,
     .FixedSideContainer,
     .layer-ui__wrapper {

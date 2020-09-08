@@ -73,9 +73,8 @@
     right: calc(var(--space-factor) * 5);
     top: calc(var(--space-factor) * 5);
   }
-}
-@media #{$media-query} {
-  .excalidraw {
+
+  @media #{$media-query} {
     .Modal {
       padding: 0;
     }

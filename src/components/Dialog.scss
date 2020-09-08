@@ -17,10 +17,8 @@
     color: var(--icon-fill-color);
     margin: 0;
   }
-}
 
-@media #{$media-query} {
-  .excalidraw {
+  @media #{$media-query} {
     .Dialog {
       --metric: calc(var(--space-factor) * 4);
       --inset-left: #{"max(var(--metric), var(--sal))"};
