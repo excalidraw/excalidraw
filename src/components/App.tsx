@@ -1683,6 +1683,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       },
       onChange: withBatchedUpdates((text) => {
         updateElement(text);
+        if (isNonDeletedElement(element)) {
+          updateBoundElements(element);
+        }
       }),
       onSubmit: withBatchedUpdates((text) => {
         const isDeleted = !text.trim();

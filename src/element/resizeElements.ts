@@ -88,6 +88,7 @@ export const transformElements = (
         pointerX,
         pointerY,
       );
+      updateBoundElements(element);
     } else if (transformHandleType) {
       resizeSingleElement(
         element,
