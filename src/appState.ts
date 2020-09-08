@@ -47,7 +47,7 @@ export const getDefaultAppState = (): Omit<
     scrolledOutside: false,
     name: `${t("labels.untitled")}-${getDateTime()}`,
     username: "",
-    isBindingEnabled: true,
+    isBindingEnabled: false,
     isCollaborating: false,
     isResizing: false,
     isRotating: false,

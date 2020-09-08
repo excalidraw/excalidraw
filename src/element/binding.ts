@@ -36,7 +36,7 @@ export type SuggestedPointBinding = [
 export const shouldEnableBindingForPointerEvent = (
   event: React.PointerEvent<HTMLCanvasElement>,
 ) => {
-  return !event[KEYS.CTRL_OR_CMD];
+  return event[KEYS.CTRL_OR_CMD];
 };
 
 export const isBindingEnabled = (appState: AppState): boolean => {

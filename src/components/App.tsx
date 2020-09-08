@@ -432,7 +432,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private onBlur = withBatchedUpdates(() => {
     isHoldingSpace = false;
-    this.setState({ isBindingEnabled: true });
+    this.setState({ isBindingEnabled: false });
   });
 
   private onUnload = () => {
@@ -1471,7 +1471,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.toggleGridMode();
     }
     if (event[KEYS.CTRL_OR_CMD]) {
-      this.setState({ isBindingEnabled: false });
+      this.setState({ isBindingEnabled: true });
     }
 
     if (event.code === "KeyC" && event.altKey && event.shiftKey) {
@@ -1592,8 +1592,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
       isHoldingSpace = false;
     }
-    if (!event[KEYS.CTRL_OR_CMD] && !this.state.isBindingEnabled) {
-      this.setState({ isBindingEnabled: true });
+    if (!event[KEYS.CTRL_OR_CMD] && this.state.isBindingEnabled) {
+      this.setState({ isBindingEnabled: false });
     }
   });
 
