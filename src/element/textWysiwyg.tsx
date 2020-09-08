@@ -3,9 +3,8 @@ import { isWritableElement, getFontString } from "../utils";
 import Scene from "../scene/Scene";
 import { isTextElement } from "./typeChecks";
 import { CLASSES } from "../constants";
-import { ExcalidrawElement, NonDeletedExcalidrawElement } from "./types";
+import { ExcalidrawElement } from "./types";
 import { AppState } from "../types";
-import { updateBoundElements } from "./binding";
 
 const normalizeText = (text: string) => {
   return (
@@ -157,7 +156,6 @@ export const textWysiwyg = ({
     window.removeEventListener("blur", handleSubmit);
 
     unbindUpdate();
-    updateBoundElements(element as NonDeletedExcalidrawElement);
 
     document.body.removeChild(editable);
   };
