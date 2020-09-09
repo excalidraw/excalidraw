@@ -1,9 +1,6 @@
-import {
-  newTextElement,
-  duplicateElement,
-  newLinearElement,
-} from "./newElement";
+import { duplicateElement } from "./newElement";
 import { mutateElement } from "./mutateElement";
+import { API } from "../tests/helpers/api";
 
 const isPrimitive = (val: any) => {
   const type = typeof val;
@@ -22,7 +19,7 @@ const assertCloneObjects = (source: any, clone: any) => {
 };
 
 it("clones arrow element", () => {
-  const element = newLinearElement({
+  const element = API.createElement({
     type: "arrow",
     x: 0,
     y: 0,
@@ -68,7 +65,8 @@ it("clones arrow element", () => {
 });
 
 it("clones text element", () => {
-  const element = newTextElement({
+  const element = API.createElement({
+    type: "text",
     x: 0,
     y: 0,
     strokeColor: "#000000",
