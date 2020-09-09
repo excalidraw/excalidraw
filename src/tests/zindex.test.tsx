@@ -3,14 +3,13 @@ import ReactDOM from "react-dom";
 import { render } from "./test-utils";
 import App from "../components/App";
 import { reseed } from "../random";
-import { newElement } from "../element";
 import {
   actionSendBackward,
   actionBringForward,
   actionBringToFront,
   actionSendToBack,
 } from "../actions";
-import { ExcalidrawElement } from "../element/types";
+import { API } from "./helpers/api";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
@@ -28,21 +27,7 @@ const populateElements = (
   const selectedElementIds: any = {};
 
   h.elements = elements.map(({ id, isDeleted = false, isSelected = false }) => {
-    const element: Mutable<ExcalidrawElement> = newElement({
-      type: "rectangle",
-      x: 100,
-      y: 100,
-      strokeColor: h.state.currentItemStrokeColor,
-      backgroundColor: h.state.currentItemBackgroundColor,
-      fillStyle: h.state.currentItemFillStyle,
-      strokeWidth: h.state.currentItemStrokeWidth,
-      strokeStyle: h.state.currentItemStrokeStyle,
-      strokeSharpness: h.state.currentItemStrokeSharpness,
-      roughness: h.state.currentItemRoughness,
-      opacity: h.state.currentItemOpacity,
-    });
-    element.id = id;
-    element.isDeleted = isDeleted;
+    const element = API.createElement({ type: "rectangle", id, isDeleted });
     if (isSelected) {
       selectedElementIds[element.id] = true;
     }
