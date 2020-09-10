@@ -2,6 +2,7 @@
 @import "./theme";
 
 .excalidraw {
+  color: var(--text-color-primary);
   display: flex;
   position: fixed;
   top: 0;
@@ -29,11 +30,14 @@
     image-rendering: pixelated; // chromium
     // NOTE: must be declared *after* the above
     image-rendering: -moz-crisp-edges; // FF
+  }
 
-    .Appearance_dark & {
-      // The percentage is inspired by
-      // https://material.io/design/color/dark-theme.html#properties, which
-      // recommends surface color of #121212, 93% yields #111111 for #FFF
+  &.Appearance_dark {
+    // The percentage is inspired by
+    // https://material.io/design/color/dark-theme.html#properties, which
+    // recommends surface color of #121212, 93% yields #111111 for #FFF
+
+    canvas {
       filter: var(--appearance-filter);
     }
   }

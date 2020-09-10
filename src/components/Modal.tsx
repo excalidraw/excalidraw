@@ -47,8 +47,16 @@ export const Modal = (props: {
 
 const useBodyRoot = () => {
   const createDiv = () => {
+    const isDarkTheme = !!document
+      .querySelector(".excalidraw")
+      ?.classList.contains("Appearance_dark");
     const div = document.createElement("div");
+
     div.classList.add("excalidraw");
+
+    if (isDarkTheme) {
+      div.classList.add("Appearance_dark");
+    }
     document.body.appendChild(div);
     return div;
   };
