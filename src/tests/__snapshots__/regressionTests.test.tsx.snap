@@ -2676,7 +2676,7 @@ Object {
 
 exports[`regression tests arrow keys: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests arrow keys: [end of test] number of renders 1`] = `13`;
+exports[`regression tests arrow keys: [end of test] number of renders 1`] = `19`;
 
 exports[`regression tests can drag element that covers another element, while another elem is selected: [end of test] appState 1`] = `
 Object {

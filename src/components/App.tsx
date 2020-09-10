@@ -1529,6 +1529,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         });
       });
 
+      this.maybeSuggestBindingForAll(selectedElements);
+
       event.preventDefault();
     } else if (event.key === KEYS.ENTER) {
       const selectedElements = getSelectedElements(
@@ -1599,6 +1601,16 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
     if (!event[KEYS.CTRL_OR_CMD] && !this.state.isBindingEnabled) {
       this.setState({ isBindingEnabled: true });
+    }
+    if (isArrowKey(event.key)) {
+      const selectedElements = getSelectedElements(
+        this.scene.getElements(),
+        this.state,
+      );
+      isBindingEnabled(this.state)
+        ? bindOrUnbindSelectedElements(selectedElements)
+        : unbindLinearElements(selectedElements);
+      this.setState({ suggestedBindings: [] });
     }
   });
 
