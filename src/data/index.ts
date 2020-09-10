@@ -313,7 +313,7 @@ export const exportCanvas = async (
     if (type === "svg") {
       await fileSave(new Blob([tempSvg.outerHTML], { type: "image/svg+xml" }), {
         fileName: `${name}.svg`,
-        extensions: ["svg"],
+        extensions: [".svg"],
       });
       return;
     } else if (type === "clipboard-svg") {
@@ -338,7 +338,7 @@ export const exportCanvas = async (
       if (blob) {
         await fileSave(blob, {
           fileName: fileName,
-          extensions: ["png"],
+          extensions: [".png"],
         });
       }
     });
