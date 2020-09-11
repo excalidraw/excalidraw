@@ -10,7 +10,6 @@ import {
   actionSendToBack,
   actionDuplicateSelection,
 } from "../actions";
-import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 import { API } from "./helpers/api";
 
