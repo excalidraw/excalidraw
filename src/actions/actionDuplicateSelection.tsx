@@ -87,7 +87,7 @@ const duplicateElements = (
   const oldElements: ExcalidrawElement[] = [];
   const oldIdToDuplicatedId = new Map();
 
-  const _duplicateElement = (element: ExcalidrawElement) => {
+  const duplicateAndOffsetElement = (element: ExcalidrawElement) => {
     const newElement = duplicateElement(
       appState.editingGroupId,
       groupIdMap,
@@ -116,13 +116,15 @@ const duplicateElements = (
           const groupElements = getElementsInGroup(elements, groupId);
           finalElements.push(
             ...groupElements,
-            ...groupElements.map((element) => _duplicateElement(element)),
+            ...groupElements.map((element) =>
+              duplicateAndOffsetElement(element),
+            ),
           );
           i = i + groupElements.length;
           continue;
         }
       }
-      finalElements.push(element, _duplicateElement(element));
+      finalElements.push(element, duplicateAndOffsetElement(element));
     } else {
       finalElements.push(element);
     }

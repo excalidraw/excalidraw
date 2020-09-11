@@ -45,7 +45,7 @@ export function isSelectedViaGroup(
   appState: AppState,
   element: ExcalidrawElement,
 ) {
-  return !!getSelectedGroupForElement(appState, element);
+  return getSelectedGroupForElement(appState, element) != null;
 }
 
 export const getSelectedGroupForElement = (
