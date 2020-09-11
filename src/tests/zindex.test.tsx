@@ -57,6 +57,7 @@ const populateElements = (
         width,
         height,
       });
+      // @ts-ignore
       element.groupIds = groupIds;
       if (isSelected) {
         selectedElementIds[element.id] = true;
