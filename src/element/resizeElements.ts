@@ -26,6 +26,7 @@ import {
   TransformHandleType,
   MaybeTransformHandleType,
 } from "./transformHandles";
+import { PointerDownState } from "../components/App";
 
 const normalizeAngle = (angle: number): number => {
   if (angle >= 2 * Math.PI) {
@@ -36,6 +37,7 @@ const normalizeAngle = (angle: number): number => {
 
 // Returns true when transform (resizing/rotation) happened
 export const transformElements = (
+  pointerDownState: PointerDownState,
   transformHandleType: MaybeTransformHandleType,
   setTransformHandle: (nextTransformHandle: MaybeTransformHandleType) => void,
   selectedElements: readonly NonDeletedExcalidrawElement[],
@@ -47,7 +49,6 @@ export const transformElements = (
   pointerY: number,
   centerX: number,
   centerY: number,
-  originalElements: readonly NonDeletedExcalidrawElement[],
 ) => {
   if (selectedElements.length === 1) {
     const [element] = selectedElements;
@@ -120,13 +121,13 @@ export const transformElements = (
   } else if (selectedElements.length > 1) {
     if (transformHandleType === "rotation") {
       rotateMultipleElements(
+        pointerDownState,
         selectedElements,
         pointerX,
         pointerY,
         isRotateWithDiscreteAngle,
         centerX,
         centerY,
-        originalElements,
       );
       return true;
     } else if (
@@ -619,13 +620,13 @@ const resizeMultipleElements = (
 };
 
 const rotateMultipleElements = (
+  pointerDownState: PointerDownState,
   elements: readonly NonDeletedExcalidrawElement[],
   pointerX: number,
   pointerY: number,
   isRotateWithDiscreteAngle: boolean,
   centerX: number,
   centerY: number,
-  originalElements: readonly NonDeletedExcalidrawElement[],
 ) => {
   let centerAngle =
     (5 * Math.PI) / 2 + Math.atan2(pointerY - centerY, pointerX - centerX);
@@ -637,17 +638,19 @@ const rotateMultipleElements = (
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
     const cx = (x1 + x2) / 2;
     const cy = (y1 + y2) / 2;
+    const origAngle =
+      pointerDownState.originalElements.get(element.id)?.angle ?? element.angle;
     const [rotatedCX, rotatedCY] = rotate(
       cx,
       cy,
       centerX,
       centerY,
-      centerAngle + originalElements[index].angle - element.angle,
+      centerAngle + origAngle - element.angle,
     );
     mutateElement(element, {
       x: element.x + (rotatedCX - cx),
       y: element.y + (rotatedCY - cy),
-      angle: normalizeAngle(centerAngle + originalElements[index].angle),
+      angle: normalizeAngle(centerAngle + origAngle),
     });
   });
 };
