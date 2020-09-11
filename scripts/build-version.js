@@ -20,7 +20,7 @@ const now = new Date();
 
 const data = JSON.stringify(
   {
-    asar: `excalidraw.asar`,
+    asar: "excalidraw.asar",
     version: versionDate(now),
   },
   undefined,

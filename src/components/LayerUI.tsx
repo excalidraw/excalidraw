@@ -371,6 +371,9 @@ const LayerUI = ({
               onUsernameChange={onUsernameChange}
               onRoomCreate={onRoomCreate}
               onRoomDestroy={onRoomDestroy}
+              setErrorMessage={(message: string) =>
+                setAppState({ errorMessage: message })
+              }
             />
           </Stack.Row>
           <BackgroundPickerAndDarkModeToggle
@@ -431,7 +434,6 @@ const LayerUI = ({
 
     return (
       <FixedSideContainer side="top">
-        <HintViewer appState={appState} elements={elements} />
         <div className="App-menu App-menu_top">
           <Stack.Col
             gap={4}
@@ -445,6 +447,7 @@ const LayerUI = ({
               <Stack.Col gap={4} align="start">
                 <Stack.Row gap={1}>
                   <Island padding={1} className={zenModeEnabled && "zen-mode"}>
+                    <HintViewer appState={appState} elements={elements} />
                     {heading}
                     <Stack.Row gap={1}>
                       <ShapesSwitcher

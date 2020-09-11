@@ -100,8 +100,8 @@ import { getDefaultAppState } from "../appState";
 import { t, getLanguage } from "../i18n";
 
 import {
-  copyToAppClipboard,
-  getClipboardContent,
+  copyToClipboard,
+  parseClipboard,
   probablySupportsClipboardBlob,
   probablySupportsClipboardWriteText,
 } from "../clipboard";
@@ -167,13 +167,14 @@ import {
   bindOrUnbindSelectedElements,
   unbindLinearElements,
   fixBindingsAfterDuplication,
-  getElligibleElementForBindingElementAtCoors,
   fixBindingsAfterDeletion,
   isLinearElementSimpleAndAlreadyBound,
   isBindingEnabled,
   updateBoundElements,
+  shouldEnableBindingForPointerEvent,
 } from "../element/binding";
 import { MaybeTransformHandleType } from "../element/transformHandles";
+import { renderSpreadsheet } from "../charts";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -555,7 +556,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           ),
         };
       }
-      this.syncActionResult(scene);
+      history.clear();
+      this.syncActionResult({
+        ...scene,
+        commitToHistory: true,
+      });
     }
   };
 
@@ -872,7 +877,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   });
 
   private copyAll = () => {
-    copyToAppClipboard(this.scene.getElements(), this.state);
+    copyToClipboard(this.scene.getElements(), this.state);
   };
 
   private copyToClipboardAsPng = () => {
@@ -960,14 +965,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       ) {
         return;
       }
-      const data = await getClipboardContent(
-        this.state,
-        cursorX,
-        cursorY,
-        event,
-      );
-      if (data.error) {
-        alert(data.error);
+      const data = await parseClipboard(event);
+      if (data.errorMessage) {
+        this.setState({ errorMessage: data.errorMessage });
+      } else if (data.spreadsheet) {
+        this.addElementsFromPasteOrLibrary(
+          renderSpreadsheet(this.state, data.spreadsheet, cursorX, cursorY),
+        );
       } else if (data.elements) {
         this.addElementsFromPasteOrLibrary(data.elements);
       } else if (data.text) {
@@ -1001,13 +1005,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     const oldIdToDuplicatedId = new Map();
     const newElements = clipboardElements.map((element) => {
+      const [pastedPositionX, pastedPositionY] = getGridPoint(
+        element.x + dx - minX,
+        element.y + dy - minY,
+        this.state.gridSize,
+      );
       const newElement = duplicateElement(
         this.state.editingGroupId,
         groupIdMap,
         element,
         {
-          x: element.x + dx - minX,
-          y: element.y + dy - minY,
+          x: pastedPositionX,
+          y: pastedPositionY,
         },
       );
       oldIdToDuplicatedId.set(element.id, newElement.id);
@@ -1158,11 +1167,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
       const updateScene = (
         decryptedData: SocketUpdateDataSource[SCENE.INIT | SCENE.UPDATE],
-        { scrollToContent = false }: { scrollToContent?: boolean } = {},
+        { init = false }: { init?: boolean } = {},
       ) => {
         const { elements: remoteElements } = decryptedData.payload;
 
-        if (scrollToContent) {
+        if (init) {
+          history.resumeRecording();
           this.setState({
             ...this.state,
             ...calculateScrollCenter(
@@ -1287,7 +1297,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               return;
             case SCENE.INIT: {
               if (!this.portal.socketInitialized) {
-                updateScene(decryptedData, { scrollToContent: true });
+                updateScene(decryptedData, { init: true });
               }
               break;
             }
@@ -1678,6 +1688,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       },
       onChange: withBatchedUpdates((text) => {
         updateElement(text);
+        if (isNonDeletedElement(element)) {
+          updateBoundElements(element);
+        }
       }),
       onSubmit: withBatchedUpdates((text) => {
         const isDeleted = !text.trim();
@@ -2216,6 +2229,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     this.clearSelectionIfNotUsingSelection();
+    this.updateBindingEnabledOnPointerMove(event);
 
     if (this.handleSelectionOnPointerDown(event, pointerDownState)) {
       return;
@@ -2944,7 +2958,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           )
         ) {
           this.maybeSuggestBindingForAll(selectedElements);
-          bindOrUnbindSelectedElements(selectedElements);
           return;
         }
       }
@@ -3201,6 +3214,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         elementType,
         elementLocked,
         isResizing,
+        isRotating,
       } = this.state;
 
       this.setState({
@@ -3313,7 +3327,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             }));
           }
         }
-
         return;
       }
 
@@ -3337,12 +3350,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           draggingElement,
           getNormalizedDimensions(draggingElement),
         );
-
-        if (isBindingEnabled(this.state)) {
-          bindOrUnbindSelectedElements(
-            getSelectedElements(this.scene.getElements(), this.state),
-          );
-        }
       }
 
       if (resizingElement) {
@@ -3441,20 +3448,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         this.setState({
           selectedElementIds: {},
           selectedGroupIds: {},
-        });
-      }
-
-      if (draggingElement === null) {
-        // if no element is clicked, clear the selection and redraw
-        this.setState({
-          selectedElementIds: {},
-          selectedGroupIds: {},
           editingGroupId: null,
         });
+
         return;
       }
 
-      if (!elementLocked) {
+      if (!elementLocked && draggingElement) {
         this.setState((prevState) => ({
           selectedElementIds: {
             ...prevState.selectedElementIds,
@@ -3470,7 +3470,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         history.resumeRecording();
       }
 
-      if (pointerDownState.drag.hasOccurred || isResizing) {
+      if (pointerDownState.drag.hasOccurred || isResizing || isRotating) {
         (isBindingEnabled(this.state)
           ? bindOrUnbindSelectedElements
           : unbindLinearElements)(
@@ -3493,6 +3493,15 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
     });
   }
+
+  private updateBindingEnabledOnPointerMove = (
+    event: React.PointerEvent<HTMLCanvasElement>,
+  ) => {
+    const shouldEnableBinding = shouldEnableBindingForPointerEvent(event);
+    if (this.state.isBindingEnabled !== shouldEnableBinding) {
+      this.setState({ isBindingEnabled: shouldEnableBinding });
+    }
+  };
 
   private maybeSuggestBindingAtCursor = (pointerCoords: {
     x: number;
@@ -3519,10 +3528,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     // into `linearElement`
     oppositeBindingBoundElement?: ExcalidrawBindableElement | null,
   ): void => {
-    const hoveredBindableElement = getElligibleElementForBindingElementAtCoors(
-      linearElement,
-      startOrEnd,
+    const hoveredBindableElement = getHoveredElementForBinding(
       pointerCoords,
+      this.scene,
     );
     this.setState({
       suggestedBindings:
@@ -3581,7 +3589,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
   };
 
-  private handleCanvasOnDrop = (event: React.DragEvent<HTMLCanvasElement>) => {
+  private handleCanvasOnDrop = async (
+    event: React.DragEvent<HTMLCanvasElement>,
+  ) => {
     const libraryShapes = event.dataTransfer.getData(
       "application/vnd.excalidrawlib+json",
     );
@@ -3600,6 +3610,19 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       file?.name.endsWith(".excalidraw")
     ) {
       this.setState({ isLoading: true });
+      if (
+        "chooseFileSystemEntries" in window ||
+        "showOpenFilePicker" in window
+      ) {
+        try {
+          // This will only work as of Chrome 86,
+          // but can be safely ignored on older releases.
+          const item = event.dataTransfer.items[0];
+          (window as any).handle = await (item as any).getAsFileSystemHandle();
+        } catch (error) {
+          console.warn(error.name, error.message);
+        }
+      }
       loadFromBlob(file, this.state)
         .then(({ elements, appState }) =>
           this.syncActionResult({
@@ -3608,7 +3631,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               ...(appState || this.state),
               isLoading: false,
             },
-            commitToHistory: false,
+            commitToHistory: true,
           }),
         )
         .catch((error) => {

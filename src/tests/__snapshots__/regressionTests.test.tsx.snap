@@ -167,6 +167,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -610,6 +620,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -907,7 +927,7 @@ Object {
   "exportBackground": true,
   "gridSize": null,
   "height": 768,
-  "isBindingEnabled": true,
+  "isBindingEnabled": false,
   "isCollaborating": false,
   "isLibraryOpen": false,
   "isLoading": false,
@@ -1034,6 +1054,16 @@ Object {
   "recording": false,
   "redoStack": Array [],
   "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
     Object {
       "appState": Object {
         "editingGroupId": null,
@@ -1732,6 +1762,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -1967,6 +2007,16 @@ Object {
   "recording": false,
   "redoStack": Array [],
   "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
     Object {
       "appState": Object {
         "editingGroupId": null,
@@ -2370,6 +2420,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -2569,6 +2629,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -2758,6 +2828,16 @@ Object {
   "recording": false,
   "redoStack": Array [],
   "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
     Object {
       "appState": Object {
         "editingGroupId": null,
@@ -3160,6 +3240,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -3446,6 +3536,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -3622,6 +3722,16 @@ Object {
   "recording": false,
   "redoStack": Array [],
   "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
     Object {
       "appState": Object {
         "editingGroupId": null,
@@ -3865,6 +3975,16 @@ Object {
   "recording": false,
   "redoStack": Array [],
   "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
     Object {
       "appState": Object {
         "editingGroupId": null,
@@ -4119,6 +4239,16 @@ Object {
   "recording": false,
   "redoStack": Array [],
   "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
     Object {
       "appState": Object {
         "editingGroupId": null,
@@ -4476,6 +4606,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -4593,7 +4733,29 @@ Object {
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
-  "draggingElement": null,
+  "draggingElement": Object {
+    "angle": 0,
+    "backgroundColor": "transparent",
+    "boundElementIds": null,
+    "fillStyle": "hachure",
+    "groupIds": Array [],
+    "height": 0,
+    "id": "id3",
+    "isDeleted": false,
+    "opacity": 100,
+    "roughness": 1,
+    "seed": 2019559783,
+    "strokeColor": "#000000",
+    "strokeSharpness": "sharp",
+    "strokeStyle": "solid",
+    "strokeWidth": 1,
+    "type": "selection",
+    "version": 1,
+    "versionNonce": 0,
+    "width": 0,
+    "x": 50,
+    "y": 50,
+  },
   "editingElement": null,
   "editingGroupId": null,
   "editingLinearElement": null,
@@ -4624,9 +4786,7 @@ Object {
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "selectedElementIds": Object {
-    "id3": true,
-  },
+  "selectedElementIds": Object {},
   "selectedGroupIds": Object {},
   "selectionElement": null,
   "shouldAddWatermark": false,
@@ -4699,6 +4859,16 @@ Object {
   "recording": false,
   "redoStack": Array [],
   "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
     Object {
       "appState": Object {
         "editingGroupId": null,
@@ -4980,6 +5150,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -5038,7 +5218,29 @@ Object {
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
-  "draggingElement": null,
+  "draggingElement": Object {
+    "angle": 0,
+    "backgroundColor": "transparent",
+    "boundElementIds": null,
+    "fillStyle": "hachure",
+    "groupIds": Array [],
+    "height": 0,
+    "id": "id1",
+    "isDeleted": false,
+    "opacity": 100,
+    "roughness": 1,
+    "seed": 449462985,
+    "strokeColor": "#000000",
+    "strokeSharpness": "sharp",
+    "strokeStyle": "solid",
+    "strokeWidth": 1,
+    "type": "selection",
+    "version": 1,
+    "versionNonce": 0,
+    "width": 0,
+    "x": 100,
+    "y": 100,
+  },
   "editingElement": null,
   "editingGroupId": null,
   "editingLinearElement": null,
@@ -5067,9 +5269,7 @@ Object {
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "selectedElementIds": Object {
-    "id1": true,
-  },
+  "selectedElementIds": Object {},
   "selectedGroupIds": Object {},
   "selectionElement": null,
   "shouldAddWatermark": false,
@@ -5116,6 +5316,16 @@ Object {
   "recording": false,
   "redoStack": Array [],
   "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
     Object {
       "appState": Object {
         "editingGroupId": null,
@@ -5313,6 +5523,16 @@ Object {
   "recording": false,
   "redoStack": Array [],
   "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
     Object {
       "appState": Object {
         "editingGroupId": null,
@@ -5716,6 +5936,16 @@ Object {
   "recording": false,
   "redoStack": Array [],
   "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
     Object {
       "appState": Object {
         "editingGroupId": null,
@@ -8003,6 +8233,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -9061,6 +9301,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -9200,6 +9450,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -9334,6 +9594,16 @@ Object {
   "recording": false,
   "redoStack": Array [],
   "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
     Object {
       "appState": Object {
         "editingGroupId": null,
@@ -9486,6 +9756,16 @@ Object {
   "recording": false,
   "redoStack": Array [],
   "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
     Object {
       "appState": Object {
         "editingGroupId": null,
@@ -9656,6 +9936,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -9816,6 +10106,16 @@ Object {
   "recording": false,
   "redoStack": Array [],
   "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
     Object {
       "appState": Object {
         "editingGroupId": null,
@@ -9986,6 +10286,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -10138,6 +10448,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -10272,6 +10592,16 @@ Object {
   "recording": false,
   "redoStack": Array [],
   "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
     Object {
       "appState": Object {
         "editingGroupId": null,
@@ -10429,6 +10759,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -10581,6 +10921,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -10728,6 +11078,16 @@ Object {
   "recording": false,
   "redoStack": Array [],
   "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
     Object {
       "appState": Object {
         "editingGroupId": null,
@@ -11033,6 +11393,16 @@ Object {
   "recording": false,
   "redoStack": Array [],
   "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
     Object {
       "appState": Object {
         "editingGroupId": null,
@@ -11606,6 +11976,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -11772,7 +12152,18 @@ exports[`regression tests pinch-to-zoom works: [end of test] history 1`] = `
 Object {
   "recording": false,
   "redoStack": Array [],
-  "stateHistory": Array [],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+  ],
 }
 `;
 
@@ -11846,7 +12237,18 @@ exports[`regression tests rerenders UI on language change: [end of test] history
 Object {
   "recording": false,
   "redoStack": Array [],
-  "stateHistory": Array [],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+  ],
 }
 `;
 
@@ -11965,6 +12367,16 @@ Object {
   "recording": false,
   "redoStack": Array [],
   "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
     Object {
       "appState": Object {
         "editingGroupId": null,
@@ -12828,6 +13240,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -13252,6 +13674,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -13589,6 +14021,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -13843,6 +14285,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -14029,6 +14481,16 @@ Object {
   "recording": false,
   "redoStack": Array [],
   "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
     Object {
       "appState": Object {
         "editingGroupId": null,
@@ -14846,6 +15308,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -15555,6 +16027,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -16165,6 +16647,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -16681,6 +17173,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -17150,6 +17652,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -17530,6 +18042,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -17825,6 +18347,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -18050,6 +18582,16 @@ Object {
   "recording": false,
   "redoStack": Array [],
   "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
     Object {
       "appState": Object {
         "editingGroupId": null,
@@ -18920,6 +19462,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -19680,6 +20232,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -20339,6 +20901,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -20893,6 +21465,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -21053,6 +21635,16 @@ Object {
   "recording": false,
   "redoStack": Array [],
   "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
     Object {
       "appState": Object {
         "editingGroupId": null,
@@ -21341,6 +21933,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -21598,6 +22200,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -21730,6 +22342,16 @@ Object {
   "recording": false,
   "redoStack": Array [],
   "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
     Object {
       "appState": Object {
         "editingGroupId": null,
@@ -21929,6 +22551,16 @@ Object {
   "recording": false,
   "redoStack": Array [],
   "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
     Object {
       "appState": Object {
         "editingGroupId": null,
@@ -22163,6 +22795,16 @@ Object {
   "recording": false,
   "redoStack": Array [],
   "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
     Object {
       "appState": Object {
         "editingGroupId": null,
@@ -22452,6 +23094,16 @@ Object {
   "recording": false,
   "redoStack": Array [],
   "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
     Object {
       "appState": Object {
         "editingGroupId": null,
@@ -23271,6 +23923,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -23549,6 +24211,16 @@ Object {
   "recording": false,
   "redoStack": Array [],
   "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
     Object {
       "appState": Object {
         "editingGroupId": null,
@@ -23836,6 +24508,16 @@ Object {
   "recording": false,
   "redoStack": Array [],
   "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
     Object {
       "appState": Object {
         "editingGroupId": null,
@@ -24168,6 +24850,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -24337,6 +25029,16 @@ Object {
   "recording": false,
   "redoStack": Array [],
   "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
     Object {
       "appState": Object {
         "editingGroupId": null,
@@ -24635,6 +25337,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -24871,6 +25583,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -25101,7 +25823,18 @@ exports[`regression tests shows context menu for canvas: [end of test] history 1
 Object {
   "recording": false,
   "redoStack": Array [],
-  "stateHistory": Array [],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+  ],
 }
 `;
 
@@ -25204,6 +25937,16 @@ Object {
   "recording": false,
   "redoStack": Array [],
   "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
     Object {
       "appState": Object {
         "editingGroupId": null,
@@ -25444,6 +26187,16 @@ Object {
   "recording": false,
   "redoStack": Array [],
   "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
     Object {
       "appState": Object {
         "editingGroupId": null,
@@ -26110,7 +26863,18 @@ exports[`regression tests spacebar + drag scrolls the canvas: [end of test] hist
 Object {
   "recording": false,
   "redoStack": Array [],
-  "stateHistory": Array [],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+  ],
 }
 `;
 
@@ -26273,6 +27037,16 @@ Object {
   "recording": false,
   "redoStack": Array [],
   "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
     Object {
       "appState": Object {
         "editingGroupId": null,
@@ -27023,6 +27797,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -27375,6 +28159,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -27541,7 +28335,18 @@ exports[`regression tests two-finger scroll works: [end of test] history 1`] = `
 Object {
   "recording": false,
   "redoStack": Array [],
-  "stateHistory": Array [],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+  ],
 }
 `;
 
@@ -27918,6 +28723,16 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
         },
@@ -28167,7 +28982,18 @@ exports[`regression tests zoom hotkeys: [end of test] history 1`] = `
 Object {
   "recording": false,
   "redoStack": Array [],
-  "stateHistory": Array [],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+  ],
 }
 `;
 
