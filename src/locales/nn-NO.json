@@ -25,9 +25,9 @@
     "sloppiness": "Ujamnheit",
     "opacity": "Synlegheit",
     "textAlign": "Tekstjustering",
-    "edges": "",
-    "sharp": "",
-    "round": "",
+    "edges": "Kanter",
+    "sharp": "Skarp",
+    "round": "Rund",
     "fontSize": "Skriftstorleik",
     "fontFamily": "Skrifttype",
     "onlySelected": "Kun valde",
@@ -72,7 +72,7 @@
     "addToLibrary": "Legg til i bibliotek",
     "removeFromLibrary": "Fjern frå bibliotek",
     "libraryLoadingMessage": "Laster bibliotek...",
-    "loadingScene": ""
+    "loadingScene": "Laster scene..."
   },
   "buttons": {
     "clearReset": "Tilbakestill lerretet",
@@ -134,7 +134,7 @@
   "hints": {
     "linearElement": "Klikk for å starte linje med fleire punkt, eller drag for ei enkel linje",
     "freeDraw": "Klikk og drag, slepp når du er ferdig",
-    "text": "",
+    "text": "Tips: du kan òg leggje til tekst ved å dobbeltklikke kor som helst med utvalgsverktyet",
     "linearElementMulti": "Klikk på siste punkt eller trykk Escape eller Enter for å fullføre",
     "resize": "Du kan halde fram med forholdet ved å trykke SHIFT medan du endrar storleik,\ntrykk ALT for å endre storleiken frå midten",
     "rotate": "Du kan låse vinklane ved å halde SHIFT medan du roterer",

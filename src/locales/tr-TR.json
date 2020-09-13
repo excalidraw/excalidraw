@@ -25,7 +25,7 @@
     "sloppiness": "Üstün körülük",
     "opacity": "Opaklık",
     "textAlign": "Metin hizala",
-    "edges": "",
+    "edges": "Kenarlar",
     "sharp": "Keskin",
     "round": "Yuvarlak",
     "fontSize": "Yazı tipi boyutu",
@@ -134,7 +134,7 @@
   "hints": {
     "linearElement": "Birden fazla nokta için tıklayın, tek çizgi için sürükleyin",
     "freeDraw": "Tıkla ve sürükle, bitirdiğinde serbest bırak",
-    "text": "",
+    "text": "İpucu: seçme aracıyla herhangi bir yere çift tıklayarak da yazı ekleyebilirsin",
     "linearElementMulti": "Tamamlamak için son noktayı seçin veya Escape ve Enter'dan birine basın",
     "resize": "Yeniden boyutlandırırken SHIFT'e basılı tutarak oranları kısıtlayabilirsiniz, merkezden yeniden boyutlandırmak için ALT'a basılı tutun",
     "rotate": "Döndürürken SHIFT tuşuna basılı tutarak açıları koruyabilirsiniz",

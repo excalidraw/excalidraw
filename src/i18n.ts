@@ -41,6 +41,7 @@ const allLanguages: Language[] = [
   { lng: "gl-ES", label: "Galego" },
   { lng: "vi-VN", label: "Tiếng Việt" },
   { lng: "ro-RO", label: "Română" },
+  { lng: "ne-NP", label: "नेपाली" },
 ];
 
 export const languages: Language[] = [{ lng: "en", label: "English" }]
