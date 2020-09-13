@@ -72,7 +72,7 @@
     "addToLibrary": "ライブラリに追加",
     "removeFromLibrary": "ライブラリから削除",
     "libraryLoadingMessage": "ライブラリを読み込み中...",
-    "loadingScene": ""
+    "loadingScene": "シーンを読み込み中..."
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",
