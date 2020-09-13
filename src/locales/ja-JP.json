@@ -144,7 +144,7 @@
   },
   "errorSplash": {
     "headingMain_pre": "エラーが発生しました。もう一度やり直してください。 ",
-    "headingMain_button": "",
+    "headingMain_button": "ページを再読み込みする。",
     "clearCanvasMessage": "",
     "clearCanvasMessage_button": "",
     "clearCanvasCaveat": "",
