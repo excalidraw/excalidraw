@@ -132,14 +132,14 @@
     "shapes": "Forme"
   },
   "hints": {
-    "linearElement": "Dă clic pentru a crea mai multe puncte, trage pentru a forma o singură linie",
-    "freeDraw": "Dă clic pe pânză și trage cursorul, apoi eliberează-l când ai terminat",
+    "linearElement": "Dă clic pentru a crea mai multe puncte, glisează pentru a forma o singură linie",
+    "freeDraw": "Dă clic pe pânză și glisează cursorul, apoi eliberează-l când ai terminat",
     "text": "Sfat: poți adăuga text și dând dublu clic oriunde cu instrumentul de selectare",
     "linearElementMulti": "Dă clic pe ultimul punct sau apasă tasta Escape sau tasta Enter pentru a termina",
     "resize": "Poți constrânge proporțiile, ținând apăsată tasta SHIFT în timp ce redimensionezi,\nține apăsată tasta ALT pentru a redimensiona de la centru",
     "rotate": "Poți constrânge unghiurile, ținând apăsată tasta SHIFT în timp ce rotești",
     "lineEditor_info": "Dă dublu clic sau apasă tasta Enter pentru a edita punctele",
-    "lineEditor_pointSelected": "Apasă tasta Delete pentru a elimina punctul, combinația de taste Ctrl sau Cmd + D pentru a-l duplica sau trage-l pentru a-i schimba poziția",
+    "lineEditor_pointSelected": "Apasă tasta Delete pentru a elimina punctul, combinația de taste Ctrl sau Cmd + D pentru a-l duplica sau glisează-l pentru a-i schimba poziția",
     "lineEditor_nothingSelected": "Selectează un punct pentru a-l muta sau elimina sau ține apăsată tasta Alt și dă clic pentru a adăuga puncte noi"
   },
   "errorSplash": {
@@ -173,7 +173,7 @@
     "shapes": "Forme",
     "or": "sau",
     "click": "clic",
-    "drag": "trage",
+    "drag": "glisare",
     "curvedArrow": "Săgeată curbată",
     "curvedLine": "Linie curbată",
     "editor": "Editor",

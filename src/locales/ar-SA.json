@@ -25,9 +25,9 @@
     "sloppiness": "الإمالة",
     "opacity": "الشفافية",
     "textAlign": "محاذاة النص",
-    "edges": "",
-    "sharp": "",
-    "round": "",
+    "edges": "الحواف",
+    "sharp": "حادة",
+    "round": "دائرية",
     "fontSize": "حجم الخط",
     "fontFamily": "نوع الخط",
     "onlySelected": "المحدد فقط",
@@ -72,7 +72,7 @@
     "addToLibrary": "أضف إلى المكتبة",
     "removeFromLibrary": "حذف من المكتبة",
     "libraryLoadingMessage": "جارٍ تحميل المكتبة...",
-    "loadingScene": ""
+    "loadingScene": "جاري تحميل المشهد..."
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
@@ -99,7 +99,7 @@
     "roomDialog": "بدء المشاركة الحية",
     "createNewRoom": "إنشاء غرفة جديدة",
     "toggleFullScreen": "التبديل لوضع ملء الشاشة",
-    "toggleDarkMode": "",
+    "toggleDarkMode": "تبديل الوضع الليلي",
     "toggleZenMode": "تبديل الوضع الليلي",
     "exitZenMode": "الغاء الوضع الليلى"
   },
@@ -134,7 +134,7 @@
   "hints": {
     "linearElement": "انقر لبدء نقاط متعددة، اسحب لخط واحد",
     "freeDraw": "انقر واسحب، افرج عند الانتهاء",
-    "text": "",
+    "text": "نصيحة: يمكنك أيضًا إضافة نص بالنقر المزدوج في أي مكان بأداة الاختيار",
     "linearElementMulti": "انقر فوق النقطة الأخيرة أو اضغط على Esc أو Enter للإنهاء",
     "resize": "يمكنك تقييد النسب بالضغط على SHIFT أثناء تغيير الحجم،\nاضغط على ALT لتغيير الحجم من المركز",
     "rotate": "يمكنك تقييد الزوايا من خلال الضغط على SHIFT أثناء الدوران",

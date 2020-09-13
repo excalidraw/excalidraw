@@ -25,7 +25,7 @@
     "sloppiness": "Imprecisione",
     "opacity": "Opacità",
     "textAlign": "Allineamento del testo",
-    "edges": "",
+    "edges": "Bordi",
     "sharp": "",
     "round": "",
     "fontSize": "Dimensione carattere",
@@ -99,7 +99,7 @@
     "roomDialog": "Inizia collaborazione in diretta",
     "createNewRoom": "Crea nuova stanza",
     "toggleFullScreen": "Attiva/Disattiva schermo intero",
-    "toggleDarkMode": "",
+    "toggleDarkMode": "Attiva tema scuro",
     "toggleZenMode": "Attiva/Disattiva modalità zen",
     "exitZenMode": "Uscire dalla modalità zen"
   },
