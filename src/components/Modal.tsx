@@ -56,6 +56,7 @@ const useBodyRoot = () => {
 
     if (isDarkTheme) {
       div.classList.add("Appearance_dark");
+      div.classList.add("Appearance_dark-modal");
     }
     document.body.appendChild(div);
     return div;

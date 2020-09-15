@@ -321,7 +321,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     return (
       <div
-        className="excalidraw excalidraw-theme"
+        className="excalidraw"
         ref={this.excalidrawRef}
         style={{
           width: canvasDOMWidth,

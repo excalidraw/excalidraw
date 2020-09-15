@@ -38,9 +38,11 @@
 }
 
 .excalidraw {
-  &.excalidraw-theme {
-    &.Appearance_dark {
-      background: #000;
+  &.Appearance_dark {
+    background: #000;
+
+    &.Appearance_dark-modal {
+      background: none;
     }
   }
 
