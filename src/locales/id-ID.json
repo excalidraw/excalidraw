@@ -66,9 +66,9 @@
     "yourName": "Nama Anda",
     "madeWithExcalidraw": "Dibuat dengan Excalidraw",
     "group": "Kelompokkan pilihan",
-    "ungroup": "",
+    "ungroup": "Pisahkan pilihan",
     "collaborators": "Kolaborator",
-    "toggleGridMode": "",
+    "toggleGridMode": "Aktifkan/Nonaktifkan mode kisi",
     "addToLibrary": "",
     "removeFromLibrary": "",
     "libraryLoadingMessage": "",
@@ -99,8 +99,8 @@
     "roomDialog": "Mulai kolaborasi langsung",
     "createNewRoom": "Buat ruang baru",
     "toggleFullScreen": "Aktif/Nonaktifkan layar penuh",
-    "toggleDarkMode": "",
-    "toggleZenMode": "",
+    "toggleDarkMode": "Aktifkan/Nonaktifkan mode gelap",
+    "toggleZenMode": "Aktifkan/Nonaktifkan mode zen",
     "exitZenMode": ""
   },
   "alerts": {
