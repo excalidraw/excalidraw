@@ -69,10 +69,10 @@
     "ungroup": "Pisahkan pilihan",
     "collaborators": "Kolaborator",
     "toggleGridMode": "Aktifkan/Nonaktifkan mode kisi",
-    "addToLibrary": "",
-    "removeFromLibrary": "",
-    "libraryLoadingMessage": "",
-    "loadingScene": ""
+    "addToLibrary": "Tambahkan ke pustaka",
+    "removeFromLibrary": "Hapus dari pustaka",
+    "libraryLoadingMessage": "Memuat pustaka...",
+    "loadingScene": "Memuat pemandangan..."
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
@@ -101,7 +101,7 @@
     "toggleFullScreen": "Aktif/Nonaktifkan layar penuh",
     "toggleDarkMode": "Aktifkan/Nonaktifkan mode gelap",
     "toggleZenMode": "Aktifkan/Nonaktifkan mode zen",
-    "exitZenMode": ""
+    "exitZenMode": "Keluar dari mode zen"
   },
   "alerts": {
     "clearReset": "Ini akan menghapus semua yang ada dikanvas. Apakah kamu yakin ?",
@@ -112,18 +112,18 @@
     "couldNotCopyToClipboard": "Tidak bisa menyalin ke papan klip. Coba gunakan Browser Chrome",
     "decryptFailed": "Tidak dapat mengdekripsi data.",
     "uploadedSecurly": "Pengunggahan ini telah diamankan menggunakan enkripsi end-to-end, artinya server Excalidraw dan pihak ketiga tidak data membaca nya",
-    "loadSceneOverridePrompt": ""
+    "loadSceneOverridePrompt": "Memuat gambar external akan mengganti konten Anda yang ada. Apakah Anda ingin melanjutkan?"
   },
   "toolBar": {
     "selection": "Pilihan",
-    "draw": "",
+    "draw": "Menggambar bebas",
     "rectangle": "Persegi",
     "diamond": "Berlian",
     "ellipse": "Elips",
     "arrow": "Panah",
     "line": "Garis",
     "text": "Teks",
-    "library": "",
+    "library": "Pustaka",
     "lock": "Biarkan alat yang dipilih aktif setelah menggambar"
   },
   "headings": {
