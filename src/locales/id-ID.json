@@ -5,12 +5,12 @@
     "multiSelect": "",
     "moveCanvas": "",
     "copy": "Salin",
-    "copyAsPng": "Salin ke Papan Klip Sebagai PNG",
-    "copyAsSvg": "Salin ke Papan Klip Sebagai SVG",
-    "bringForward": "Majukan",
-    "sendToBack": "Bawa ke Belakang",
+    "copyAsPng": "Salin ke papan klip sebagai PNG",
+    "copyAsSvg": "Salin ke papan klip sebagai SVG",
+    "bringForward": "Bawa maju",
+    "sendToBack": "Kirim ke belakang",
     "bringToFront": "Bawa ke depan",
-    "sendBackward": "Mundurkan",
+    "sendBackward": "Kirim mundur",
     "delete": "Hapus",
     "copyStyles": "Salin gaya",
     "pasteStyles": "",
@@ -190,7 +190,7 @@
     "tooltip": ""
   },
   "charts": {
-    "noNumericColumn": "",
-    "tooManyColumns": ""
+    "noNumericColumn": "Anda menempelkan sebuah lembar bentang tanpa sebuah kolom numerik.",
+    "tooManyColumns": "Anda menempelkan sebuah lembar bentang dengan lebih dari dua kolom."
   }
 }
