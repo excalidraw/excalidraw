@@ -96,9 +96,9 @@
     "edit": "Edit",
     "undo": "Urungkan",
     "redo": "Ulangi",
-    "roomDialog": "Mulai kolaborasi secara langsung",
+    "roomDialog": "Mulai kolaborasi langsung",
     "createNewRoom": "Buat ruang baru",
-    "toggleFullScreen": "Aktif / Nonaktifkan layar penuh",
+    "toggleFullScreen": "Aktif/Nonaktifkan layar penuh",
     "toggleDarkMode": "",
     "toggleZenMode": "",
     "exitZenMode": ""
@@ -106,11 +106,11 @@
   "alerts": {
     "clearReset": "Ini akan menghapus semua yang ada dikanvas. Apakah kamu yakin ?",
     "couldNotCreateShareableLink": "Tidak bisa membuat tautan yang bisa dibagikan",
-    "couldNotLoadInvalidFile": "Tidak Dapat Memuat Berkas yang Tidak Valid",
+    "couldNotLoadInvalidFile": "Tidak dapat memuat berkas yang tidak valid",
     "importBackendFailed": "Gagal mengimpor dari backend",
     "cannotExportEmptyCanvas": "Tidak bisa mengekspor kanvas kosong",
     "couldNotCopyToClipboard": "Tidak bisa menyalin ke papan klip. Coba gunakan Browser Chrome",
-    "decryptFailed": "Tidak dapat mengdeskripsi data.",
+    "decryptFailed": "Tidak dapat mengdekripsi data.",
     "uploadedSecurly": "Pengunggahan ini telah diamankan menggunakan enkripsi end-to-end, artinya server Excalidraw dan pihak ketiga tidak data membaca nya",
     "loadSceneOverridePrompt": ""
   },
@@ -145,7 +145,7 @@
   "errorSplash": {
     "headingMain_pre": "",
     "headingMain_button": "muat ulang halaman.",
-    "clearCanvasMessage": "Jika memuat halaman tidak bisa, coba ",
+    "clearCanvasMessage": "Jika memuat ulang tidak bekerja, cobalah ",
     "clearCanvasMessage_button": "bersihkan canvas.",
     "clearCanvasCaveat": "",
     "trackedToSentry_pre": "",
