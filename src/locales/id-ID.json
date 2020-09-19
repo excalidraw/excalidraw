@@ -152,7 +152,7 @@
     "trackedToSentry_post": "",
     "openIssueMessage_pre": "",
     "openIssueMessage_button": "",
-    "openIssueMessage_post": " Mohon berikan informasi dibawah ini dengan menyalin dan tempelkan di Github issue.",
+    "openIssueMessage_post": " Mohon sertakan informasi dibawah ini dengan menyalin dan menempelkan di Github issue.",
     "sceneContent": ""
   },
   "roomDialog": {
