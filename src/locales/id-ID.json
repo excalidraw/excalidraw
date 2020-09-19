@@ -182,12 +182,12 @@
     "howto": "",
     "github": "",
     "textNewLine": "",
-    "textFinish": "",
-    "zoomToFit": "",
-    "preventBinding": ""
+    "textFinish": "Selesai mengedit (teks)",
+    "zoomToFit": "Perbesar agar sesuai dengan semua elemen",
+    "preventBinding": "Cegah pengikatan panah"
   },
   "encrypted": {
-    "tooltip": ""
+    "tooltip": "Gambar anda terenkripsi end-to-end sehingga server Excalidraw tidak akan pernah dapat melihatnya."
   },
   "charts": {
     "noNumericColumn": "Anda menempelkan sebuah lembar bentang tanpa sebuah kolom numerik.",
