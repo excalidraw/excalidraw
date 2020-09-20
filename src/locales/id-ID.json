@@ -143,12 +143,12 @@
     "lineEditor_nothingSelected": "Pilih sebuah titik untuk memindah atau menghapus, atau tekan Alt dan klik untuk menambahkan titik baru"
   },
   "errorSplash": {
-    "headingMain_pre": "Mengalami sebuah kesalaan. Cobalah ",
+    "headingMain_pre": "Mengalami sebuah kesalahan. Cobalah ",
     "headingMain_button": "muat ulang halaman.",
     "clearCanvasMessage": "Jika memuat ulang tidak bekerja, cobalah ",
     "clearCanvasMessage_button": "bersihkan canvas.",
-    "clearCanvasCaveat": "",
-    "trackedToSentry_pre": "",
+    "clearCanvasCaveat": " Ini akan menghasilkan hilangnya pekerjaan ",
+    "trackedToSentry_pre": "Kesalahan dengan pengidentifikasi ",
     "trackedToSentry_post": "",
     "openIssueMessage_pre": "",
     "openIssueMessage_button": "",
@@ -166,7 +166,7 @@
     "desc_exitSession": ""
   },
   "errorDialog": {
-    "title": ""
+    "title": "Kesalahan"
   },
   "shortcutsDialog": {
     "title": "",
