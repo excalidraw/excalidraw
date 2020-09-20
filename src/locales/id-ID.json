@@ -161,7 +161,7 @@
     "button_startSession": "Mulai sesi",
     "button_stopSession": "Hentikan sesi",
     "desc_inProgressIntro": "",
-    "desc_persistenceWarning": "",
+    "desc_persistenceWarning": "Perhatikan bahwa data pemandangan dibagikan ke seluruh kolaborator dengan cara P2P, dan tidak disimpan di server kami. Jadi, jika Anda semua terputus jaringan, Anda akan kehilangan data kecuali Anda mengekspornya ke file atau tautan yang dapat dibagikan.",
     "desc_shareLink": "",
     "desc_exitSession": ""
   },
