@@ -68,7 +68,7 @@
     "group": "Kelompokkan pilihan",
     "ungroup": "Pisahkan pilihan",
     "collaborators": "Kolaborator",
-    "toggleGridMode": "Aktifkan/Nonaktifkan mode kisi",
+    "toggleGridMode": "Aktifkan/Matikan mode kisi",
     "addToLibrary": "Tambahkan ke pustaka",
     "removeFromLibrary": "Hapus dari pustaka",
     "libraryLoadingMessage": "Memuat pustaka...",
@@ -98,9 +98,9 @@
     "redo": "Ulangi",
     "roomDialog": "Mulai kolaborasi langsung",
     "createNewRoom": "Buat ruang baru",
-    "toggleFullScreen": "Aktif/Nonaktifkan layar penuh",
-    "toggleDarkMode": "Aktifkan/Nonaktifkan mode gelap",
-    "toggleZenMode": "Aktifkan/Nonaktifkan mode zen",
+    "toggleFullScreen": "Aktif / Nonaktifkan layar penuh",
+    "toggleDarkMode": "Aktifkan/Matikan mode gelap",
+    "toggleZenMode": "Aktifkan/Matikan mode zen",
     "exitZenMode": "Keluar dari mode zen"
   },
   "alerts": {
