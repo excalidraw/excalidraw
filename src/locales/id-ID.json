@@ -149,7 +149,7 @@
     "clearCanvasMessage_button": "bersihkan canvas.",
     "clearCanvasCaveat": " Ini akan menghasilkan hilangnya pekerjaan ",
     "trackedToSentry_pre": "Kesalahan dengan pengidentifikasi ",
-    "trackedToSentry_post": "",
+    "trackedToSentry_post": " dilacak di sistem kami.",
     "openIssueMessage_pre": "Kami sangat berhati-hati untuk tidak menyertakan informasi pemandangan Anda pada kesalahan. Jika pemandangan Anda tidak bersifat pribadi, mohon pertimbangkan menindak lanjut pada ",
     "openIssueMessage_button": "pelacak bug.",
     "openIssueMessage_post": " Mohon sertakan informasi dibawah ini dengan menyalin dan menempelkan di Github issue.",
