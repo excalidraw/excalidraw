@@ -157,23 +157,23 @@
   },
   "roomDialog": {
     "desc_intro": "Anda dapat mengundang orang ke pemandangan Anda saat ini untuk berkolaborasi dengan Anda.",
-    "desc_privacy": "",
+    "desc_privacy": "Jangan khawatir, sesi menggunakan enkripsi end-to-end, sehingga apa pun yang Anda gambar akan tetap bersifat pribadi. Bahkan server kami tidak dapat melihat apa yang Anda lakukan.",
     "button_startSession": "Mulai sesi",
     "button_stopSession": "Hentikan sesi",
-    "desc_inProgressIntro": "",
+    "desc_inProgressIntro": "Sesi kolaborasi langsung sekarang dalam progres.",
     "desc_persistenceWarning": "Perhatikan bahwa data pemandangan dibagikan ke seluruh kolaborator dengan cara P2P, dan tidak disimpan di server kami. Jadi, jika Anda semua terputus jaringan, Anda akan kehilangan data kecuali Anda mengekspornya ke file atau tautan yang dapat dibagikan.",
-    "desc_shareLink": "",
-    "desc_exitSession": ""
+    "desc_shareLink": "Bagikan tautan ini dengan siapa pun yang Anda inginkan untuk berkolaborasi bersama:",
+    "desc_exitSession": "Menghentikan sesi akan memutus hubungan Anda dari ruangan, tetapi Anda dapat melanjutkan bekerja dengan pemandangan Anda secara lokal. Perhatikan bahwa ini tidak mempengarui orang lain, dan mereka masih akan dapat berkolaborasi pada versi mereka."
   },
   "errorDialog": {
     "title": "Kesalahan"
   },
   "shortcutsDialog": {
-    "title": "",
-    "shapes": "",
-    "or": "",
-    "click": "",
-    "drag": "",
+    "title": "Pintasan keyboard",
+    "shapes": "Bentuk",
+    "or": "atau",
+    "click": "klik",
+    "drag": "seret",
     "curvedArrow": "Panah lengkung",
     "curvedLine": "Garis lengkung",
     "editor": "Editor",
