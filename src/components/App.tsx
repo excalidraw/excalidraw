@@ -3808,7 +3808,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           Object.keys(selectedElementIds).length !== 0
             ? selectedElementIds
             : previousSelectedElementIds,
+        shouldCacheIgnoreZoom: true,
       }));
+      this.resetShouldCacheIgnoreZoomDebounced();
       return;
     }
 
