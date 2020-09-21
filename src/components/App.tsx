@@ -3781,6 +3781,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private handleWheel = withBatchedUpdates((event: WheelEvent) => {
     event.preventDefault();
+
+    if (isPanning) {
+      return;
+    }
+
     const { deltaX, deltaY } = event;
     const { selectedElementIds, previousSelectedElementIds } = this.state;
 
