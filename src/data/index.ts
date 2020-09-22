@@ -18,7 +18,7 @@ import { serializeAsJSON } from "./json";
 
 import { ExportType } from "../scene/types";
 import { restore } from "./restore";
-import { DataState } from "./types";
+import { ImportedDataState } from "./types";
 
 export { loadFromBlob } from "./blob";
 export { saveAsJSON, loadFromJSON } from "./json";
@@ -232,7 +232,7 @@ export const exportToBackend = async (
 const importFromBackend = async (
   id: string | null,
   privateKey?: string | null,
-) => {
+): Promise<ImportedDataState> => {
   let elements: readonly ExcalidrawElement[] = [];
   let appState = getDefaultAppState();
 
@@ -364,19 +364,15 @@ export const exportCanvas = async (
 export const loadScene = async (
   id: string | null,
   privateKey?: string | null,
-  initialData?: DataState,
+  initialData?: ImportedDataState,
 ) => {
   let data;
   if (id != null) {
     // the private key is used to decrypt the content from the server, take
     // extra care not to leak it
-    const { elements, appState } = await importFromBackend(id, privateKey);
-    data = restore(elements, appState);
+    data = restore(await importFromBackend(id, privateKey));
   } else {
-    data = restore(
-      initialData?.elements ?? [],
-      initialData?.appState ?? getDefaultAppState(),
-    );
+    data = restore(initialData || {});
   }
 
   return {

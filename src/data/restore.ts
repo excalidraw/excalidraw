@@ -4,7 +4,7 @@ import {
   ExcalidrawSelectionElement,
 } from "../element/types";
 import { AppState } from "../types";
-import { DataState } from "./types";
+import { DataState, ImportedDataState } from "./types";
 import { isInvisiblySmallElement, getNormalizedDimensions } from "../element";
 import { isLinearElementType } from "../element/typeChecks";
 import { randomId } from "../random";
@@ -14,6 +14,7 @@ import {
   DEFAULT_TEXT_ALIGN,
   DEFAULT_VERTICAL_ALIGN,
 } from "../constants";
+import { getDefaultAppState } from "../appState";
 
 const getFontFamilyByName = (fontFamilyName: string): FontFamily => {
   for (const [id, fontFamilyString] of Object.entries(FONT_FAMILY)) {
@@ -117,11 +118,29 @@ const migrateElement = (
   }
 };
 
-export const restore = (
-  savedElements: readonly ExcalidrawElement[],
-  savedState: MarkOptional<AppState, "offsetTop" | "offsetLeft"> | null,
-): DataState => {
-  const elements = savedElements.reduce((elements, element) => {
+const migrateAppState = (appState: ImportedDataState["appState"]): AppState => {
+  appState = appState || {};
+
+  const defaultAppState = getDefaultAppState();
+  const nextAppState = {} as typeof defaultAppState;
+
+  for (const [key, val] of Object.entries(defaultAppState)) {
+    if ((appState as any)[key] !== undefined) {
+      (nextAppState as any)[key] = (appState as any)[key];
+    } else {
+      (nextAppState as any)[key] = val;
+    }
+  }
+
+  return {
+    ...nextAppState,
+    offsetLeft: appState.offsetLeft || 0,
+    offsetTop: appState.offsetTop || 0,
+  };
+};
+
+export const restore = (data: ImportedDataState): DataState => {
+  const elements = (data.elements || []).reduce((elements, element) => {
     // filtering out selection, which is legacy, no longer kept in elements,
     //  and causing issues if retained
     if (element.type !== "selection" && !isInvisiblySmallElement(element)) {
@@ -135,6 +154,6 @@ export const restore = (
 
   return {
     elements: elements,
-    appState: savedState,
+    appState: migrateAppState(data.appState),
   };
 };

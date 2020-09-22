@@ -3927,7 +3927,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.setState({ shouldCacheIgnoreZoom: false });
   }, 300);
 
-  private getCanvasOffsets() {
+  private getCanvasOffsets(): Pick<AppState, "offsetTop" | "offsetLeft"> {
     if (this.excalidrawRef?.current) {
       const parentElement = this.excalidrawRef.current.parentElement;
       const { left, top } = parentElement.getBoundingClientRect();

@@ -22,7 +22,7 @@ export const loadLibrary = (): Promise<LibraryItems> => {
       }
 
       const items = (JSON.parse(data) as LibraryItems).map(
-        (elements) => restore(elements, null).elements,
+        (elements) => restore({ elements, appState: null }).elements,
       ) as Mutable<LibraryItems>;
 
       // clone to ensure we don't mutate the cached library elements in the app
