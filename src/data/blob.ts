@@ -29,6 +29,7 @@ const loadFileContents = async (blob: any) => {
  */
 export const loadFromBlob = async (blob: any, appState?: AppState) => {
   if (blob.handle) {
+    // TODO: Make this part of `AppState`.
     (window as any).handle = blob.handle;
   }
 

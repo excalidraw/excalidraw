@@ -493,6 +493,33 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   }
 
   private initializeScene = async () => {
+    if ("launchQueue" in window && "LaunchParams" in window) {
+      (window as any).launchQueue.setConsumer(
+        async (launchParams: { files: any[] }) => {
+          if (!launchParams.files.length) {
+            return;
+          }
+          const fileHandle = launchParams.files[0];
+          const blob = await fileHandle.getFile();
+          blob.handle = fileHandle;
+          loadFromBlob(blob, this.state)
+            .then(({ elements, appState }) =>
+              this.syncActionResult({
+                elements,
+                appState: {
+                  ...(appState || this.state),
+                  isLoading: false,
+                },
+                commitToHistory: true,
+              }),
+            )
+            .catch((error) => {
+              this.setState({ isLoading: false, errorMessage: error.message });
+            });
+        },
+      );
+    }
+
     const searchParams = new URLSearchParams(window.location.search);
     const id = searchParams.get("id");
     const jsonMatch = window.location.hash.match(
@@ -3656,6 +3683,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           // This will only work as of Chrome 86,
           // but can be safely ignored on older releases.
           const item = event.dataTransfer.items[0];
+          // TODO: Make this part of `AppState`.
           (window as any).handle = await (item as any).getAsFileSystemHandle();
         } catch (error) {
           console.warn(error.name, error.message);
