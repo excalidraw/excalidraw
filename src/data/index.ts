@@ -66,9 +66,7 @@ export type SocketUpdateDataIncoming =
       type: "INVALID_RESPONSE";
     };
 
-// TODO: Defined globally, since file handles aren't yet serializable.
-// Once `FileSystemFileHandle` can be serialized, make this
-// part of `AppState`.
+// TODO: Make this part of `AppState`.
 (window as any).handle = null;
 
 const byteToHex = (byte: number): string => `0${byte.toString(16)}`.slice(-2);

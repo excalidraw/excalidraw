@@ -66,6 +66,7 @@ export const actionChangeShouldAddWatermark = register({
 export const actionSaveScene = register({
   name: "saveScene",
   perform: (elements, appState, value) => {
+    // TODO: Make this part of `AppState`.
     saveAsJSON(elements, appState, (window as any).handle)
       .catch(muteFSAbortError)
       .catch((error) => console.error(error));
