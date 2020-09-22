@@ -33,6 +33,7 @@ export const saveAsJSON = async (
     type: "application/json",
   });
   const name = `${appState.name}.excalidraw`;
+  // TODO: Make this part of `AppState`.
   (window as any).handle = await fileSave(
     blob,
     {
