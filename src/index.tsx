@@ -17,7 +17,7 @@ import {
 } from "./data/localStorage";
 
 import { SAVE_TO_LOCAL_STORAGE_TIMEOUT } from "./time_constants";
-import { DataState } from "./data/types";
+import { ImportedDataState } from "./data/types";
 import { LoadingMessage } from "./components/LoadingMessage";
 import { ExcalidrawElement } from "./element/types";
 import { AppState } from "./types";
@@ -112,7 +112,7 @@ function ExcalidrawApp() {
   // ---------------------------------------------------------------------------
 
   const [initialState, setInitialState] = useState<{
-    data: DataState;
+    data: ImportedDataState;
     user: {
       name: string | null;
     };
