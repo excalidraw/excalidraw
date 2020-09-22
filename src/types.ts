@@ -14,7 +14,7 @@ import { Point as RoughPoint } from "roughjs/bin/geometry";
 import { SocketUpdateDataSource } from "./data";
 import { LinearElementEditor } from "./element/linearElementEditor";
 import { SuggestedBinding } from "./element/binding";
-import { DataState } from "./data/types";
+import { ImportedDataState } from "./data/types";
 
 export type FlooredNumber = number & { _brand: "FlooredNumber" };
 export type Point = Readonly<RoughPoint>;
@@ -127,7 +127,7 @@ export interface ExcalidrawProps {
     elements: readonly ExcalidrawElement[],
     appState: AppState,
   ) => void;
-  initialData?: DataState;
+  initialData?: ImportedDataState;
   user?: {
     name?: string | null;
   };
