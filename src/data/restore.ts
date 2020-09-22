@@ -118,6 +118,22 @@ const restoreElement = (
   }
 };
 
+const restoreElements = (
+  elements: ImportedDataState["elements"],
+): ExcalidrawElement[] => {
+  return (elements || []).reduce((elements, element) => {
+    // filtering out selection, which is legacy, no longer kept in elements,
+    //  and causing issues if retained
+    if (element.type !== "selection" && !isInvisiblySmallElement(element)) {
+      const migratedElement = restoreElement(element);
+      if (migratedElement) {
+        elements.push(migratedElement);
+      }
+    }
+    return elements;
+  }, [] as ExcalidrawElement[]);
+};
+
 const restoreAppState = (appState: ImportedDataState["appState"]): AppState => {
   appState = appState || {};
 
@@ -140,20 +156,8 @@ const restoreAppState = (appState: ImportedDataState["appState"]): AppState => {
 };
 
 export const restore = (data: ImportedDataState): DataState => {
-  const elements = (data.elements || []).reduce((elements, element) => {
-    // filtering out selection, which is legacy, no longer kept in elements,
-    //  and causing issues if retained
-    if (element.type !== "selection" && !isInvisiblySmallElement(element)) {
-      const migratedElement = restoreElement(element);
-      if (migratedElement) {
-        elements.push(migratedElement);
-      }
-    }
-    return elements;
-  }, [] as ExcalidrawElement[]);
-
   return {
-    elements: elements,
+    elements: restoreElements(data.elements),
     appState: restoreAppState(data.appState),
   };
 };
