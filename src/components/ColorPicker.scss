@@ -220,21 +220,22 @@
 
   .color-picker-type-elementBackground .color-picker-keybinding {
     color: #fff;
-
-    .Appearance_dark & {
-      color: #000;
-    }
   }
 
   .color-picker-swatch[aria-label="transparent"] .color-picker-keybinding {
     color: #aaa;
-
-    .Appearance_dark & {
-      color: #000;
-    }
   }
 
   .color-picker-type-elementStroke .color-picker-keybinding {
     color: #d4d4d4;
+  }
+
+  &.Appearance_dark {
+    .color-picker-type-elementBackground .color-picker-keybinding {
+      color: #000;
+    }
+    .color-picker-swatch[aria-label="transparent"] .color-picker-keybinding {
+      color: #000;
+    }
   }
 }
