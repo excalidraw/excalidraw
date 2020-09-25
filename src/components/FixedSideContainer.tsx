@@ -1,4 +1,4 @@
-import "./FixedSideContainer.css";
+import "./FixedSideContainer.scss";
 
 import React from "react";
 

@@ -757,10 +757,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
     }
 
-    document.documentElement.classList.toggle(
-      "Appearance_dark",
-      this.state.appearance === "dark",
-    );
+    document
+      .querySelector(".excalidraw")
+      ?.classList.toggle("Appearance_dark", this.state.appearance === "dark");
 
     if (this.state.isCollaborating && !this.portal.socket) {
       this.initializeSocketClient({ showLoadingState: true });
