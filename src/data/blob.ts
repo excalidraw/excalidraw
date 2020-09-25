@@ -1,8 +1,8 @@
-import { getDefaultAppState, cleanAppStateForExport } from "../appState";
+import { cleanAppStateForExport } from "../appState";
 import { restore } from "./restore";
 import { t } from "../i18n";
 import { AppState } from "../types";
-import { LibraryData } from "./types";
+import { LibraryData, ImportedDataState } from "./types";
 import { calculateScrollCenter } from "../scene";
 
 const loadFileContents = async (blob: any) => {
@@ -29,30 +29,29 @@ const loadFileContents = async (blob: any) => {
  */
 export const loadFromBlob = async (blob: any, appState?: AppState) => {
   if (blob.handle) {
+    // TODO: Make this part of `AppState`.
     (window as any).handle = blob.handle;
   }
 
   const contents = await loadFileContents(blob);
-  const defaultAppState = getDefaultAppState();
-  let elements = [];
-  let _appState = appState || defaultAppState;
   try {
-    const data = JSON.parse(contents);
+    const data: ImportedDataState = JSON.parse(contents);
     if (data.type !== "excalidraw") {
       throw new Error(t("alerts.couldNotLoadInvalidFile"));
     }
-    elements = data.elements || [];
-    _appState = {
-      ...defaultAppState,
-      appearance: _appState.appearance,
-      ...cleanAppStateForExport(data.appState as Partial<AppState>),
-      ...(appState ? calculateScrollCenter(elements, appState, null) : {}),
-    };
+    return restore({
+      elements: data.elements,
+      appState: {
+        appearance: appState?.appearance,
+        ...cleanAppStateForExport(data.appState || {}),
+        ...(appState
+          ? calculateScrollCenter(data.elements || [], appState, null)
+          : {}),
+      },
+    });
   } catch {
     throw new Error(t("alerts.couldNotLoadInvalidFile"));
   }
-
-  return restore(elements, _appState);
 };
 
 export const loadLibraryFromBlob = async (blob: any) => {

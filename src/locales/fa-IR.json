@@ -25,9 +25,9 @@
     "sloppiness": "دقت",
     "opacity": "تاری",
     "textAlign": "چیدمان متن",
-    "edges": "",
-    "sharp": "",
-    "round": "",
+    "edges": "لبه ها",
+    "sharp": "تیز",
+    "round": "دور",
     "fontSize": "اندازه قلم",
     "fontFamily": "نوع قلم",
     "onlySelected": "فقط انتخاب شده ها",
@@ -69,10 +69,10 @@
     "ungroup": "حذف گروهبندی انتخابها",
     "collaborators": "همکاران",
     "toggleGridMode": "سويچ خطوط راهنما",
-    "addToLibrary": "",
-    "removeFromLibrary": "",
-    "libraryLoadingMessage": "",
-    "loadingScene": ""
+    "addToLibrary": "افزودن به کتابخانه",
+    "removeFromLibrary": "حذف از کتابخانه",
+    "libraryLoadingMessage": "بارگذاری کتابخانه...",
+    "loadingScene": "باگذاری صحنه..."
   },
   "buttons": {
     "clearReset": "پاکسازی بوم نقاشی",
@@ -99,7 +99,7 @@
     "roomDialog": "همکاری آنلاین را شروع کنید",
     "createNewRoom": "ایجاد یک اتاق جدید",
     "toggleFullScreen": "تغییر به حالت تمام صفحه",
-    "toggleDarkMode": "",
+    "toggleDarkMode": "تغییر به حالت تاریک",
     "toggleZenMode": "تغییر به حالت تمرکز",
     "exitZenMode": "خروج از حالت تمرکز"
   },
@@ -123,7 +123,7 @@
     "arrow": "پیکان",
     "line": "خط",
     "text": "متن",
-    "library": "",
+    "library": "کتابخانه",
     "lock": "ابزار انتخاب شده را بعد از کشیدن نگه دار"
   },
   "headings": {
@@ -134,7 +134,7 @@
   "hints": {
     "linearElement": "برای چند نقطه کلیک و برای یک خط بکشید",
     "freeDraw": "کلیک کنید و بکشید و وقتی کار تمام شد رها کنید",
-    "text": "",
+    "text": "نکته: با برنامه انتخاب شده شما میتوانید با دوبار کلیک کردن هرکجا میخواید متن اظاف کنید",
     "linearElementMulti": "روی آخرین نقطه کلیک کنید یا کلید ESC را بزنید یا کلید Enter را بزنید برای اتمام کار",
     "resize": "می توانید با نگه داشتن SHIFT در هنگام تغییر اندازه، نسبت ها را محدود کنید،ALT را برای تغییر اندازه از مرکز نگه دارید",
     "rotate": "با نگه داشتن SHIFT هنگام چرخش می توانید زاویه ها را محدود کنید",
@@ -184,7 +184,7 @@
     "textNewLine": "یک خط جدید اضافه کنید (متن)",
     "textFinish": "پایان ویرایش (متن)",
     "zoomToFit": "بزرگنمایی برای دیدن تمام آیتم ها",
-    "preventBinding": ""
+    "preventBinding": "مانع شدن از چسبیدن فلش ها"
   },
   "encrypted": {
     "tooltip": "شما در یک محیط رمزگزاری شده دو طرفه در حال طراحی هستید پس Excalidraw هرگز طرح های شما را نمیبند."

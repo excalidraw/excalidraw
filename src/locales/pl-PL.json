@@ -2,7 +2,7 @@
   "labels": {
     "paste": "Wklej",
     "selectAll": "Zaznacz wszystko",
-    "multiSelect": "",
+    "multiSelect": "Dodaj element do zaznaczenia",
     "moveCanvas": "Przesuń obszar roboczy",
     "copy": "Kopiuj",
     "copyAsPng": "Skopiuj do schowka jako plik PNG",
@@ -25,9 +25,9 @@
     "sloppiness": "Styl kreski",
     "opacity": "Przeźroczystość",
     "textAlign": "Wyrównanie tekstu",
-    "edges": "",
-    "sharp": "",
-    "round": "",
+    "edges": "Krawędzie",
+    "sharp": "Ostry",
+    "round": "Zaokrąglij",
     "fontSize": "Rozmiar tekstu",
     "fontFamily": "Krój pisma",
     "onlySelected": "Tylko wybrane",
@@ -68,11 +68,11 @@
     "group": "Zgrupuj wybrane",
     "ungroup": "Rozgrupuj wybrane",
     "collaborators": "Współtwórcy",
-    "toggleGridMode": "",
-    "addToLibrary": "",
-    "removeFromLibrary": "",
-    "libraryLoadingMessage": "",
-    "loadingScene": ""
+    "toggleGridMode": "Włącz siatkę",
+    "addToLibrary": "Dodaj do biblioteki",
+    "removeFromLibrary": "Usuń z biblioteki",
+    "libraryLoadingMessage": "Wczytywanie biblioteki...",
+    "loadingScene": "Ładowanie sceny..."
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
@@ -99,7 +99,7 @@
     "roomDialog": "Utwórz nową sesję współpracy na żywo",
     "createNewRoom": "Utwórz nowy pokój",
     "toggleFullScreen": "Włącz/wyłącz tryb pełnoekranowy",
-    "toggleDarkMode": "",
+    "toggleDarkMode": "Włącz tryb ciemny",
     "toggleZenMode": "Włącz tryb Zen",
     "exitZenMode": "Wyjdź z trybu Zen"
   },
@@ -112,7 +112,7 @@
     "couldNotCopyToClipboard": "Błąd podczas kopiowania. Spróbuj użyć Google Chrome.",
     "decryptFailed": "Nie udało się odszyfrować danych.",
     "uploadedSecurly": "By zapewnić Ci prywatność, udostępnianie projektu jest zabezpieczone szyfrowaniem end-to-end, co oznacza, że poza tobą i osobą z którą podzielisz się linkiem, nikt nie ma dostępu do tego co udostępniasz.",
-    "loadSceneOverridePrompt": ""
+    "loadSceneOverridePrompt": "Wczytanie zewnętrznego rysunku zastąpi istniejącą zawartość. Czy chcesz kontynuować?"
   },
   "toolBar": {
     "selection": "Zaznaczenie",
@@ -123,7 +123,7 @@
     "arrow": "Strzałka",
     "line": "Linia",
     "text": "Tekst",
-    "library": "",
+    "library": "Biblioteka",
     "lock": "Zablokuj wybrane narzędzie"
   },
   "headings": {
@@ -134,12 +134,12 @@
   "hints": {
     "linearElement": "Naciśnij, aby zrobić punkt, przeciągnij, aby narysować linię",
     "freeDraw": "Naciśnij i przeciągnij by rysować, puść kiedy skończysz",
-    "text": "",
+    "text": "Wskazówka: możesz również dodać tekst klikając dwukrotnie gdziekolwiek za pomocą narzędzia zaznaczania",
     "linearElementMulti": "Aby zakończyć krzywą, ponownie kliknij w ostatni punkt, bądź naciśnij Esc albo Enter",
     "resize": "Możesz zachować proporcję trzymająć wcisnięty SHIFT, przytrzymaj ALT by zmienić rozmiar względem środka",
     "rotate": "Możesz obracać element w równych odstępach trzymając wciśnięty SHIFT",
     "lineEditor_info": "Kliknij dwukrotnie lub naciśnij Enter, aby edytować punkty",
-    "lineEditor_pointSelected": "",
+    "lineEditor_pointSelected": "Naciśnij przycisk Usuń, aby usunąć punkt, Ctrl/Cmd+D, aby zduplikować, lub przeciągnij, aby przenieść",
     "lineEditor_nothingSelected": "Naciśnij w punkt by go edytować, przytrzymaj Alt i naciśnij by dodać nowy punkt"
   },
   "errorSplash": {
@@ -184,7 +184,7 @@
     "textNewLine": "Dodaj nową linię (tekst)",
     "textFinish": "Zakończ edycję (tekst)",
     "zoomToFit": "Powiększ, aby wyświetlić wszystkie elementy",
-    "preventBinding": ""
+    "preventBinding": "Zablokuj przywiązanie strzałek do obiektu"
   },
   "encrypted": {
     "tooltip": "Twoje rysunki są zabezpieczone szyfrowaniem end-to-end, tak więc nawet w Excalidraw nie jesteśmy w stanie zobaczyć tego co tworzysz."

@@ -192,7 +192,7 @@ export class UI {
       size?: number;
       width?: number;
       height?: number;
-    },
+    } = {},
   ): T extends "arrow" | "line" | "draw"
     ? ExcalidrawLinearElement
     : T extends "text"

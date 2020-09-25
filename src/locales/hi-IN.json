@@ -25,9 +25,9 @@
     "sloppiness": "बेढ़ंगापन",
     "opacity": "अपारदर्शिता",
     "textAlign": "टेक्स्ट संरेखन",
-    "edges": "",
-    "sharp": "",
-    "round": "",
+    "edges": "किनारा",
+    "sharp": "नुकीला",
+    "round": "गोल",
     "fontSize": "फ़ॉन्ट का आकार",
     "fontFamily": "फ़ॉन्ट का परिवार",
     "onlySelected": "केवल चयनित",
@@ -69,10 +69,10 @@
     "ungroup": "समूह चयन असमूहीकृत करें",
     "collaborators": "सहयोगी",
     "toggleGridMode": "टॉगल ग्रिड मोड",
-    "addToLibrary": "",
-    "removeFromLibrary": "",
-    "libraryLoadingMessage": "",
-    "loadingScene": ""
+    "addToLibrary": "लाइब्रेरी से जोड़ें",
+    "removeFromLibrary": "लाइब्रेरी से निकालें",
+    "libraryLoadingMessage": "लाइब्रेरी खुल रही है",
+    "loadingScene": "दृश्य खुल रहा है"
   },
   "buttons": {
     "clearReset": "कैनवास रीसेट करें",
