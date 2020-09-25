@@ -1,0 +1,24 @@
+.excalidraw {
+  .UserList {
+    pointer-events: none;
+    /*github corner*/
+    padding: var(--space-factor) 40px var(--space-factor) var(--space-factor);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .UserList > * {
+    pointer-events: all;
+    margin: 0 0 var(--space-factor) var(--space-factor);
+  }
+
+  .UserList_mobile {
+    padding: 0;
+    justify-content: normal;
+  }
+
+  .UserList_mobile > * {
+    margin: 0 var(--space-factor) var(--space-factor) 0;
+  }
+}

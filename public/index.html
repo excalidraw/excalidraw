@@ -81,7 +81,6 @@
       href="manifest.json"
       style="--pwacompat-splash-font: 24px Virgil"
     />
-
     <% if (process.env.REACT_APP_INCLUDE_GTAG === 'true') { %>
     <script
       async
@@ -99,6 +98,17 @@
 
     <!-- FIXME: remove this when we update CRA (fix SW caching) -->
     <style>
+      body {
+        margin: 0;
+        --ui-font: system-ui, BlinkMacSystemFont, -apple-system, Segoe UI,
+          Roboto, Helvetica, Arial, sans-serif;
+        font-family: var(--ui-font);
+        -webkit-text-size-adjust: 100%;
+        user-select: none;
+        width: 100vw;
+        height: 100vh;
+      }
+
       /* http://www.eaglefonts.com/fg-virgil-ttf-131249.htm */
       @font-face {
         font-family: "Virgil";
