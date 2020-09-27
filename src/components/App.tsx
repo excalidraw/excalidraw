@@ -176,6 +176,7 @@ import {
 import { MaybeTransformHandleType } from "../element/transformHandles";
 import { renderSpreadsheet } from "../charts";
 import { isValidLibrary } from "../data/json";
+import { loadFromFirebase, saveToFirebase } from "../data/firebase";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -468,6 +469,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       return false;
     }
 
+    const roomId = roomMatch[1];
+
     let collabForceLoadFlag;
     try {
       collabForceLoadFlag = localStorage?.getItem(
@@ -485,7 +488,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         );
         // if loading same room as the one previously unloaded within 15sec
         //  force reload without prompting
-        if (previousRoom === roomMatch[1] && Date.now() - timestamp < 15000) {
+        if (previousRoom === roomId && Date.now() - timestamp < 15000) {
           return true;
         }
       } catch {}
@@ -1210,6 +1213,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
     const roomMatch = getCollaborationLinkData(window.location.href);
     if (roomMatch) {
+      const roomId = roomMatch[1];
+      const roomSecret = roomMatch[2];
+
       const initialize = () => {
         this.portal.socketInitialized = true;
         clearTimeout(initializationTimer);
@@ -1332,11 +1338,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         /* webpackChunkName: "socketIoClient" */ "socket.io-client"
       );
 
-      this.portal.open(
-        socketIOClient(SOCKET_SERVER),
-        roomMatch[1],
-        roomMatch[2],
-      );
+      this.portal.open(socketIOClient(SOCKET_SERVER), roomId, roomSecret);
 
       // All socket listeners are moving to Portal
       this.portal.socket!.on(
@@ -1406,6 +1408,19 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         isCollaborating: true,
         isLoading: opts.showLoadingState ? true : this.state.isLoading,
       });
+
+      try {
+        const elements = await loadFromFirebase(roomId, roomSecret);
+        if (elements) {
+          updateScene(
+            { type: "SCENE_INIT", payload: { elements } },
+            { init: true },
+          );
+        }
+      } catch (e) {
+        // log the error and move on. other peers will sync us the scene.
+        console.error(e);
+      }
     }
   };
 
@@ -1450,7 +1465,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   // maybe should move to Portal
-  broadcastScene = (sceneType: SCENE.INIT | SCENE.UPDATE, syncAll: boolean) => {
+  broadcastScene = async (
+    sceneType: SCENE.INIT | SCENE.UPDATE,
+    syncAll: boolean,
+  ) => {
     if (sceneType === SCENE.INIT && !syncAll) {
       throw new Error("syncAll must be true when sending SCENE.INIT");
     }
@@ -1487,7 +1505,25 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         syncableElement.version,
       );
     }
-    return this.portal._broadcastSocketData(data as SocketUpdateData);
+
+    const broadcastPromise = this.portal._broadcastSocketData(
+      data as SocketUpdateData,
+    );
+
+    if (syncAll && this.portal.roomID && this.portal.roomKey) {
+      await Promise.all([
+        broadcastPromise,
+        saveToFirebase(
+          this.portal.roomID,
+          this.portal.roomKey,
+          syncableElements,
+        ).catch((e) => {
+          console.error(e);
+        }),
+      ]);
+    } else {
+      await broadcastPromise;
+    }
   };
 
   private onSceneUpdated = () => {
