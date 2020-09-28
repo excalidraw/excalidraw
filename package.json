@@ -47,7 +47,7 @@
     "@types/lodash.throttle": "4.1.6",
     "asar": "3.0.3",
     "eslint": "6.8.0",
-    "eslint-config-prettier": "6.11.0",
+    "eslint-config-prettier": "6.12.0",
     "eslint-plugin-prettier": "3.1.4",
     "husky": "4.3.0",
     "jest-canvas-mock": "2.2.0",
