@@ -131,9 +131,10 @@ const ExportModal = ({
                 key={s}
                 size="s"
                 type="radio"
-                icon={`x${s}`}
+                icon={`${s}x`}
                 name="export-canvas-scale"
-                aria-label={`Scale ${s} x`}
+                title={`${t("buttons.scaleExport")} ${s}x`}
+                aria-label={`${t("buttons.scaleExport")} ${s}x`}
                 id="export-canvas-scale"
                 checked={s === scale}
                 onChange={() => setScale(s)}
