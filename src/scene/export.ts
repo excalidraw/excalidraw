@@ -186,3 +186,20 @@ const getCanvasSize = (
 
   return [minX, minY, width, height];
 };
+
+export const getExportSize = (
+  elements: readonly NonDeletedExcalidrawElement[],
+  exportPadding: number,
+  shouldAddWatermark: boolean,
+  scale: number,
+): [number, number] => {
+  const [, , width, height] = getCanvasSize(
+    elements,
+    exportPadding,
+    shouldAddWatermark,
+  ).map((dimension) => Math.trunc(dimension * scale));
+
+  // TODO: Account for height added by watermark
+
+  return [width, height];
+};
