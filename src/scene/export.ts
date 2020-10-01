@@ -35,19 +35,13 @@ export const exportToCanvas = (
     return tempCanvas;
   },
 ) => {
-  let sceneElements = elements;
-  if (shouldAddWatermark) {
-    const [, , maxX, maxY] = getCommonBounds(elements);
-    sceneElements = [...sceneElements, getWatermarkElement(maxX, maxY)];
-  }
+  const sceneElements = getElementsAndWatermark(elements, shouldAddWatermark);
 
-  // calculate smallest area to fit the contents in
-  const [minX, minY, maxX, maxY] = getCommonBounds(sceneElements);
-  const width = distance(minX, maxX) + exportPadding * 2;
-  const height =
-    distance(minY, maxY) +
-    exportPadding +
-    (shouldAddWatermark ? 0 : exportPadding);
+  const [minX, minY, width, height] = getCanvasSize(
+    sceneElements,
+    exportPadding,
+    shouldAddWatermark,
+  );
 
   const tempCanvas: any = createCanvas(width, height);
 
@@ -93,19 +87,13 @@ export const exportToSvg = (
     shouldAddWatermark: boolean;
   },
 ): SVGSVGElement => {
-  let sceneElements = elements;
-  if (shouldAddWatermark) {
-    const [, , maxX, maxY] = getCommonBounds(elements);
-    sceneElements = [...sceneElements, getWatermarkElement(maxX, maxY)];
-  }
+  const sceneElements = getElementsAndWatermark(elements, shouldAddWatermark);
 
-  // calculate canvas dimensions
-  const [minX, minY, maxX, maxY] = getCommonBounds(sceneElements);
-  const width = distance(minX, maxX) + exportPadding * 2;
-  const height =
-    distance(minY, maxY) +
-    exportPadding +
-    (shouldAddWatermark ? 0 : exportPadding);
+  const [minX, minY, width, height] = getCanvasSize(
+    sceneElements,
+    exportPadding,
+    shouldAddWatermark,
+  );
 
   // initialze SVG root
   const svgRoot = document.createElementNS(SVG_NS, "svg");
@@ -149,6 +137,20 @@ export const exportToSvg = (
   return svgRoot;
 };
 
+const getElementsAndWatermark = (
+  elements: readonly NonDeletedExcalidrawElement[],
+  shouldAddWatermark: boolean,
+): readonly NonDeletedExcalidrawElement[] => {
+  let _elements = [...elements];
+
+  if (shouldAddWatermark) {
+    const [, , maxX, maxY] = getCommonBounds(elements);
+    _elements = [..._elements, getWatermarkElement(maxX, maxY)];
+  }
+
+  return _elements;
+};
+
 const getWatermarkElement = (maxX: number, maxY: number) => {
   return newTextElement({
     text: t("labels.madeWithExcalidraw"),
@@ -167,4 +169,20 @@ const getWatermarkElement = (maxX: number, maxY: number) => {
     opacity: 100,
     strokeSharpness: "sharp",
   });
+};
+
+// calculate smallest area to fit the contents in
+const getCanvasSize = (
+  elements: readonly NonDeletedExcalidrawElement[],
+  exportPadding: number,
+  shouldAddWatermark: boolean,
+): [number, number, number, number] => {
+  const [minX, minY, maxX, maxY] = getCommonBounds(elements);
+  const width = distance(minX, maxX) + exportPadding * 2;
+  const height =
+    distance(minY, maxY) +
+    exportPadding +
+    (shouldAddWatermark ? 0 : exportPadding);
+
+  return [minX, minY, width, height];
 };
