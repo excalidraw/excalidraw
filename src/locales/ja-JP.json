@@ -112,7 +112,9 @@
     "couldNotCopyToClipboard": "クリップボードにコピーできません。Google Chromeでお試しください。",
     "decryptFailed": "データを復号できませんでした。",
     "uploadedSecurly": "データのアップロードはエンドツーエンド暗号化によって保護されています。Excalidrawサーバーと第三者はデータの内容を見ることができません。",
-    "loadSceneOverridePrompt": ""
+    "loadSceneOverridePrompt": "",
+    "errorLoadingLibrary": "",
+    "confirmAddLibrary": ""
   },
   "toolBar": {
     "selection": "選択",

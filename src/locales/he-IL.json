@@ -112,7 +112,9 @@
     "couldNotCopyToClipboard": "לא ניתן להעתיק ללוח. נסה להשתמש בדפדפן Chrome.",
     "decryptFailed": "לא ניתן לפענח מידע.",
     "uploadedSecurly": "ההעלאה הוצפנה מקצה לקצה, ולכן שרת Excalidraw וצד שלישי לא יכולים לקרוא את התוכן.",
-    "loadSceneOverridePrompt": ""
+    "loadSceneOverridePrompt": "",
+    "errorLoadingLibrary": "",
+    "confirmAddLibrary": ""
   },
   "toolBar": {
     "selection": "בחירה",

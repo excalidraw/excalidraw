@@ -112,7 +112,9 @@
     "couldNotCopyToClipboard": "",
     "decryptFailed": "",
     "uploadedSecurly": "",
-    "loadSceneOverridePrompt": ""
+    "loadSceneOverridePrompt": "",
+    "errorLoadingLibrary": "",
+    "confirmAddLibrary": ""
   },
   "toolBar": {
     "selection": "",
