@@ -113,8 +113,8 @@
     "decryptFailed": "Salauksen purkaminen epäonnistui.",
     "uploadedSecurly": "Lähetys on turvattu päästä päähän salauksella. Excalidrawin palvelin ja kolmannet osapuolet eivät voi lukea sisältöä.",
     "loadSceneOverridePrompt": "Ulkopuolisen piirroksen lataaminen korvaa nykyisen sisältösi. Haluatko jatkaa?",
-    "errorLoadingLibrary": "",
-    "confirmAddLibrary": ""
+    "errorLoadingLibrary": "Kolmannen osapuolen kirjastoa ladattaessa tapahtui virhe.",
+    "confirmAddLibrary": "Tämä lisää {{numShapes}} muotoa kirjastoosi. Oletko varma?"
   },
   "toolBar": {
     "selection": "Valinta",
