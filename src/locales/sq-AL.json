@@ -112,7 +112,9 @@
     "couldNotCopyToClipboard": "",
     "decryptFailed": "S'mund të deshifroj të dhënat.",
     "uploadedSecurly": "",
-    "loadSceneOverridePrompt": ""
+    "loadSceneOverridePrompt": "",
+    "errorLoadingLibrary": "",
+    "confirmAddLibrary": ""
   },
   "toolBar": {
     "selection": "Përzgjedhja",

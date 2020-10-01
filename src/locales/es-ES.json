@@ -112,7 +112,9 @@
     "couldNotCopyToClipboard": "No se ha podido copiar al portapapeles, intente usar Chrome como navegador.",
     "decryptFailed": "No se pudieron descifrar los datos.",
     "uploadedSecurly": "La carga ha sido asegurada con cifrado de extremo a extremo, lo que significa que el servidor de Excalidraw y terceros no pueden leer el contenido.",
-    "loadSceneOverridePrompt": "Si carga este dibujo externo, reemplazará el que tiene. ¿Desea continuar?"
+    "loadSceneOverridePrompt": "Si carga este dibujo externo, reemplazará el que tiene. ¿Desea continuar?",
+    "errorLoadingLibrary": "",
+    "confirmAddLibrary": ""
   },
   "toolBar": {
     "selection": "Selección",

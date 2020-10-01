@@ -59,13 +59,13 @@
     "layers": "Lapisan",
     "actions": "Aksi",
     "language": "Bahasa",
-    "createRoom": "Bagikan sebuah sesi kolaborasi langsung",
+    "createRoom": "Bagikan sesi kolaborasi langsung",
     "duplicateSelection": "Duplikat",
     "untitled": "Tanpa judul",
     "name": "Nama",
     "yourName": "Nama Anda",
     "madeWithExcalidraw": "Dibuat dengan Excalidraw",
-    "group": "Kelompokkan pilihan",
+    "group": "Kelompokan pilihan",
     "ungroup": "Pisahkan pilihan",
     "collaborators": "Kolaborator",
     "toggleGridMode": "Aktifkan/Matikan mode kisi",
@@ -112,7 +112,9 @@
     "couldNotCopyToClipboard": "Tidak bisa menyalin ke papan klip. Coba gunakan Browser Chrome",
     "decryptFailed": "Tidak dapat mengdekripsi data.",
     "uploadedSecurly": "Pengunggahan ini telah diamankan menggunakan enkripsi end-to-end, artinya server Excalidraw dan pihak ketiga tidak data membaca nya",
-    "loadSceneOverridePrompt": "Memuat gambar external akan mengganti konten Anda yang ada. Apakah Anda ingin melanjutkan?"
+    "loadSceneOverridePrompt": "Memuat gambar external akan mengganti konten Anda yang ada. Apakah Anda ingin melanjutkan?",
+    "errorLoadingLibrary": "",
+    "confirmAddLibrary": ""
   },
   "toolBar": {
     "selection": "Pilihan",
@@ -160,10 +162,10 @@
     "desc_privacy": "Jangan khawatir, sesi menggunakan enkripsi end-to-end, sehingga apa pun yang Anda gambar akan tetap bersifat pribadi. Bahkan server kami tidak dapat melihat apa yang Anda lakukan.",
     "button_startSession": "Mulai sesi",
     "button_stopSession": "Hentikan sesi",
-    "desc_inProgressIntro": "Sesi kolaborasi langsung sekarang dalam progres.",
-    "desc_persistenceWarning": "Perhatikan bahwa data pemandangan dibagikan ke seluruh kolaborator dengan cara P2P, dan tidak disimpan di server kami. Jadi, jika Anda semua terputus jaringan, Anda akan kehilangan data kecuali Anda mengekspornya ke file atau tautan yang dapat dibagikan.",
-    "desc_shareLink": "Bagikan tautan ini dengan siapa pun yang Anda inginkan untuk berkolaborasi bersama:",
-    "desc_exitSession": "Menghentikan sesi akan memutus hubungan Anda dari ruangan, tetapi Anda dapat melanjutkan bekerja dengan pemandangan Anda secara lokal. Perhatikan bahwa ini tidak mempengarui orang lain, dan mereka masih akan dapat berkolaborasi pada versi mereka."
+    "desc_inProgressIntro": "Sesi kolaborasi sedang berlangsung sekarang.",
+    "desc_persistenceWarning": "Perhatikan bahwa data pemandangan dibagikan ke seluruh kolaborator dengan cara P2P, dan tidak disimpan di server kami. Jadi, jika Anda semua putus sambungan, Anda akan kehilangan data kecuali Anda mengekspornya ke file atau tautan yang dapat dibagikan.",
+    "desc_shareLink": "Bagikan tautan ini dengan siapa pun yang Anda inginkan untuk kolaborasi bersama:",
+    "desc_exitSession": "Menghentikan sesi akan memutuskan hubungan Anda dari ruangan, tetapi Anda dapat melanjutkan bekerja dengan pemandangan Anda secara lokal. Perhatikan bahwa ini tidak memengaruhi orang lain, dan mereka masih dapat berkolaborasi pada versi mereka."
   },
   "errorDialog": {
     "title": "Kesalahan"

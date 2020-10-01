@@ -112,7 +112,9 @@
     "couldNotCopyToClipboard": "",
     "decryptFailed": "Non se poideron descifrar os datos.",
     "uploadedSecurly": "A carga foi asegurada con cifrado de extremo a extremo, o que significa que o servidor de Excalidraw e terceiros non poder ler o contenido.",
-    "loadSceneOverridePrompt": "Si carga este debuxo externo, reemprazará o que ten. ¿Desexa continuar?"
+    "loadSceneOverridePrompt": "Si carga este debuxo externo, reemprazará o que ten. ¿Desexa continuar?",
+    "errorLoadingLibrary": "",
+    "confirmAddLibrary": ""
   },
   "toolBar": {
     "selection": "Selección",
