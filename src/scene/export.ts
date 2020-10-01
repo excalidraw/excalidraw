@@ -11,6 +11,7 @@ import { t } from "../i18n";
 import { DEFAULT_FONT_FAMILY, DEFAULT_VERTICAL_ALIGN } from "../constants";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
+const WATERMARK_HEIGHT = 16;
 
 export const exportToCanvas = (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -154,12 +155,12 @@ const getElementsAndWatermark = (
 const getWatermarkElement = (maxX: number, maxY: number) => {
   return newTextElement({
     text: t("labels.madeWithExcalidraw"),
-    fontSize: 16,
+    fontSize: WATERMARK_HEIGHT,
     fontFamily: DEFAULT_FONT_FAMILY,
     textAlign: "right",
     verticalAlign: DEFAULT_VERTICAL_ALIGN,
     x: maxX,
-    y: maxY + 16,
+    y: maxY + WATERMARK_HEIGHT,
     strokeColor: oc.gray[5],
     backgroundColor: "transparent",
     fillStyle: "hachure",
@@ -193,13 +194,18 @@ export const getExportSize = (
   shouldAddWatermark: boolean,
   scale: number,
 ): [number, number] => {
-  const [, , width, height] = getCanvasSize(
+  let [, , width, height] = getCanvasSize(
     elements,
     exportPadding,
     shouldAddWatermark,
   ).map((dimension) => Math.trunc(dimension * scale));
 
-  // TODO: Account for height added by watermark
+  if (shouldAddWatermark) {
+    // exportPadding is added twice to make up for the fact that
+    //  it's omitted in getCanvasSize's returned height
+    //  if shouldAddWatermark === true
+    height += (WATERMARK_HEIGHT + exportPadding * 2) * scale;
+  }
 
   return [width, height];
 };
