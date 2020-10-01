@@ -112,7 +112,9 @@
     "couldNotCopyToClipboard": "No s'ha pogut copiar al porta-retalls. Intentar amb el navegador Google Chrome.",
     "decryptFailed": "No s'ha pogut desencriptar.",
     "uploadedSecurly": "La càrrega s'ha assegurat amb xifratge punta a punta, cosa que significa que el servidor Excalidraw i tercers no poden llegir el contingut.",
-    "loadSceneOverridePrompt": "Si carregas aquest dibuix extern, substituirá el que tens. Vols continuar?"
+    "loadSceneOverridePrompt": "Si carregas aquest dibuix extern, substituirá el que tens. Vols continuar?",
+    "errorLoadingLibrary": "",
+    "confirmAddLibrary": ""
   },
   "toolBar": {
     "selection": "Selecció",
