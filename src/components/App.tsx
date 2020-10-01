@@ -512,9 +512,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           isLibraryOpen: true,
         });
       }
-    } catch (e) {
+    } catch (error) {
       window.alert(t("alerts.errorLoadingLibrary"));
-      console.error(e);
+      console.error(error);
     }
   };
 
