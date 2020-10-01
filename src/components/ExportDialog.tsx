@@ -135,7 +135,7 @@ const ExportModal = ({
               );
 
               const scaleButtonTitle = `${t(
-                "buttons.scaleExport",
+                "buttons.scale",
               )} ${s}x (${width}x${height})`;
 
               return (
