@@ -112,7 +112,9 @@
     "couldNotCopyToClipboard": "Konnte nicht in die Zwischenablage kopieren. Versuch es mit dem Chrome Browser.",
     "decryptFailed": "Daten konnten nicht entschlüsselt werden.",
     "uploadedSecurly": "Der Upload wurde mit Ende-zu-Ende-Verschlüsselung gespeichert. Weder Excalidraw noch Dritte können den Inhalt einsehen.",
-    "loadSceneOverridePrompt": "Das Laden der externen Zeichnung ersetzt den vorhandenen Inhalt. Möchtest Du fortfahren?"
+    "loadSceneOverridePrompt": "Das Laden der externen Zeichnung ersetzt den vorhandenen Inhalt. Möchtest Du fortfahren?",
+    "errorLoadingLibrary": "",
+    "confirmAddLibrary": ""
   },
   "toolBar": {
     "selection": "Auswahl",
