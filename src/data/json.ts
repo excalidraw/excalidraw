@@ -54,6 +54,15 @@ export const loadFromJSON = async (appState: AppState) => {
   return loadFromBlob(blob, appState);
 };
 
+export const isValidLibrary = (json: any) => {
+  return (
+    typeof json === "object" &&
+    json &&
+    json.type === "excalidrawlib" &&
+    json.version === 1
+  );
+};
+
 export const saveLibraryAsJSON = async () => {
   const library = await loadLibrary();
   const serialized = JSON.stringify(

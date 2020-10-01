@@ -175,6 +175,7 @@ import {
 } from "../element/binding";
 import { MaybeTransformHandleType } from "../element/transformHandles";
 import { renderSpreadsheet } from "../charts";
+import { isValidLibrary } from "../data/json";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -492,6 +493,31 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     return false;
   }
 
+  private addToLibrary = async (url: string) => {
+    window.history.replaceState({}, "Excalidraw", window.location.origin);
+    try {
+      const request = await fetch(url);
+      const blob = await request.blob();
+      const json = JSON.parse(await blob.text());
+      if (!isValidLibrary(json)) {
+        throw new Error();
+      }
+      if (
+        window.confirm(
+          t("alerts.confirmAddLibrary", { numShapes: json.library.length }),
+        )
+      ) {
+        await Library.importLibrary(blob);
+        this.setState({
+          isLibraryOpen: true,
+        });
+      }
+    } catch (error) {
+      window.alert(t("alerts.errorLoadingLibrary"));
+      console.error(error);
+    }
+  };
+
   private initializeScene = async () => {
     if ("launchQueue" in window && "LaunchParams" in window) {
       (window as any).launchQueue.setConsumer(
@@ -589,6 +615,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         ...scene,
         commitToHistory: true,
       });
+    }
+
+    const addToLibraryUrl = searchParams.get("addLibrary");
+
+    if (addToLibraryUrl) {
+      await this.addToLibrary(addToLibraryUrl);
     }
   };
 
