@@ -1,29 +1,42 @@
-import { getImportedKey } from "./index";
-import * as firebase from "firebase/app";
-import "firebase/firestore";
+import { createIV, getImportedKey } from "./index";
 import { ExcalidrawElement } from "../element/types";
-import { getDrawingVersion } from "../element";
+import { getSceneVersion } from "../element";
 
-const firebaseConfig = JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG);
+let firebasePromise: Promise<typeof import("firebase/app")> | null = null;
 
-firebase.initializeApp(firebaseConfig);
+async function loadFirebase() {
+  const firebase = await import("firebase/app");
+  await import("firebase/firestore");
 
-interface FirebaseStoredDrawing {
-  drawingVersion: number;
-  ciphertext: firebase.firestore.Blob;
+  const firebaseConfig = JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG);
+  firebase.initializeApp(firebaseConfig);
+
+  return firebase;
 }
 
-const EMPTY_IV = new Uint8Array(12);
+async function getFirebase(): Promise<typeof import("firebase/app")> {
+  if (!firebasePromise) {
+    firebasePromise = loadFirebase();
+  }
+  const firebase = await firebasePromise!;
+  return firebase;
+}
+
+interface FirebaseStoredScene {
+  sceneVersion: number;
+  iv: firebase.firestore.Blob;
+  ciphertext: firebase.firestore.Blob;
+}
 
 async function encryptElements(
   key: string,
   elements: readonly ExcalidrawElement[],
-): Promise<ArrayBuffer> {
+): Promise<{ ciphertext: ArrayBuffer; iv: Uint8Array }> {
   const importedKey = await getImportedKey(key, "encrypt");
-  const iv = EMPTY_IV;
+  const iv = createIV();
   const json = JSON.stringify(elements);
   const encoded = new TextEncoder().encode(json);
-  return await window.crypto.subtle.encrypt(
+  const ciphertext = await window.crypto.subtle.encrypt(
     {
       name: "AES-GCM",
       iv,
@@ -31,17 +44,20 @@ async function encryptElements(
     importedKey,
     encoded,
   );
+
+  return { ciphertext, iv };
 }
 
 async function decryptElements(
   key: string,
+  iv: Uint8Array,
   ciphertext: ArrayBuffer,
 ): Promise<readonly ExcalidrawElement[]> {
   const importedKey = await getImportedKey(key, "decrypt");
   const decrypted = await window.crypto.subtle.decrypt(
     {
       name: "AES-GCM",
-      iv: EMPTY_IV,
+      iv,
     },
     importedKey,
     ciphertext,
@@ -58,18 +74,20 @@ export async function saveToFirebase(
   roomSecret: string,
   elements: readonly ExcalidrawElement[],
 ) {
-  const drawingVersion = getDrawingVersion(elements);
-  const ciphertext = await encryptElements(roomSecret, elements);
+  const firebase = await getFirebase();
+  const sceneVersion = getSceneVersion(elements);
+  const { ciphertext, iv } = await encryptElements(roomSecret, elements);
 
   const nextDocData = {
-    drawingVersion,
+    sceneVersion,
     ciphertext: firebase.firestore.Blob.fromUint8Array(
       new Uint8Array(ciphertext),
     ),
-  } as FirebaseStoredDrawing;
+    iv: firebase.firestore.Blob.fromUint8Array(iv),
+  } as FirebaseStoredScene;
 
   const db = firebase.firestore();
-  const docRef = db.collection("drawings").doc(roomId);
+  const docRef = db.collection("scenes").doc(roomId);
   const didUpdate = await db.runTransaction(async (transaction) => {
     const doc = await transaction.get(docRef);
     if (!doc.exists) {
@@ -77,8 +95,8 @@ export async function saveToFirebase(
       return true;
     }
 
-    const prevDocData = doc.data() as FirebaseStoredDrawing;
-    if (prevDocData.drawingVersion >= nextDocData.drawingVersion) {
+    const prevDocData = doc.data() as FirebaseStoredScene;
+    if (prevDocData.sceneVersion >= nextDocData.sceneVersion) {
       return false;
     }
 
@@ -93,14 +111,17 @@ export async function loadFromFirebase(
   roomId: string,
   roomSecret: string,
 ): Promise<readonly ExcalidrawElement[] | null> {
+  const firebase = await getFirebase();
   const db = firebase.firestore();
 
-  const docRef = db.collection("drawings").doc(roomId);
+  const docRef = db.collection("scenes").doc(roomId);
   const doc = await docRef.get();
   if (!doc.exists) {
     return null;
   }
-  const ciphertext = (doc.data() as FirebaseStoredDrawing).ciphertext.toUint8Array();
-  const plaintext = await decryptElements(roomSecret, ciphertext);
+  const storedScene = doc.data() as FirebaseStoredScene;
+  const ciphertext = storedScene.ciphertext.toUint8Array();
+  const iv = storedScene.iv.toUint8Array();
+  const plaintext = await decryptElements(roomSecret, iv, ciphertext);
   return plaintext;
 }

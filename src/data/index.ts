@@ -89,7 +89,7 @@ const generateEncryptionKey = async () => {
   return (await window.crypto.subtle.exportKey("jwk", key)).k;
 };
 
-const createIV = () => {
+export const createIV = () => {
   const arr = new Uint8Array(12);
   return window.crypto.getRandomValues(arr);
 };

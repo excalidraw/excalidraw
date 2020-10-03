@@ -17,7 +17,7 @@ import {
   getPerfectElementSize,
   getNormalizedDimensions,
   getElementMap,
-  getDrawingVersion,
+  getSceneVersion,
   getSyncableElements,
   newLinearElement,
   transformElements,
@@ -905,7 +905,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     if (
-      getDrawingVersion(this.scene.getElementsIncludingDeleted()) >
+      getSceneVersion(this.scene.getElementsIncludingDeleted()) >
       this.lastBroadcastedOrReceivedSceneVersion
     ) {
       this.broadcastScene(SCENE.UPDATE, /* syncAll */ false);
@@ -1317,7 +1317,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           // we just received!
           // Note: this needs to be set before replaceAllElements as it
           // syncronously calls render.
-          this.lastBroadcastedOrReceivedSceneVersion = getDrawingVersion(
+          this.lastBroadcastedOrReceivedSceneVersion = getSceneVersion(
             newElements,
           );
 
@@ -1412,10 +1412,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       try {
         const elements = await loadFromFirebase(roomId, roomSecret);
         if (elements) {
-          updateScene(
-            { type: "SCENE_INIT", payload: { elements } },
-            { init: true },
-          );
+          updateScene({ type: "SCENE_INIT", payload: { elements } });
         }
       } catch (e) {
         // log the error and move on. other peers will sync us the scene.
@@ -1497,7 +1494,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     };
     this.lastBroadcastedOrReceivedSceneVersion = Math.max(
       this.lastBroadcastedOrReceivedSceneVersion,
-      getDrawingVersion(this.scene.getElementsIncludingDeleted()),
+      getSceneVersion(this.scene.getElementsIncludingDeleted()),
     );
     for (const syncableElement of syncableElements) {
       this.broadcastedElementVersions.set(
