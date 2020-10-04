@@ -17,7 +17,7 @@ import {
   getPerfectElementSize,
   getNormalizedDimensions,
   getElementMap,
-  getDrawingVersion,
+  getSceneVersion,
   getSyncableElements,
   newLinearElement,
   transformElements,
@@ -176,6 +176,7 @@ import {
 import { MaybeTransformHandleType } from "../element/transformHandles";
 import { renderSpreadsheet } from "../charts";
 import { isValidLibrary } from "../data/json";
+import { loadFromFirebase, saveToFirebase } from "../data/firebase";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -468,6 +469,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       return false;
     }
 
+    const roomId = roomMatch[1];
+
     let collabForceLoadFlag;
     try {
       collabForceLoadFlag = localStorage?.getItem(
@@ -485,7 +488,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         );
         // if loading same room as the one previously unloaded within 15sec
         //  force reload without prompting
-        if (previousRoom === roomMatch[1] && Date.now() - timestamp < 15000) {
+        if (previousRoom === roomId && Date.now() - timestamp < 15000) {
           return true;
         }
       } catch {}
@@ -902,7 +905,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     if (
-      getDrawingVersion(this.scene.getElementsIncludingDeleted()) >
+      getSceneVersion(this.scene.getElementsIncludingDeleted()) >
       this.lastBroadcastedOrReceivedSceneVersion
     ) {
       this.broadcastScene(SCENE.UPDATE, /* syncAll */ false);
@@ -1210,6 +1213,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
     const roomMatch = getCollaborationLinkData(window.location.href);
     if (roomMatch) {
+      const roomId = roomMatch[1];
+      const roomSecret = roomMatch[2];
+
       const initialize = () => {
         this.portal.socketInitialized = true;
         clearTimeout(initializationTimer);
@@ -1226,12 +1232,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
       const updateScene = (
         decryptedData: SocketUpdateDataSource[SCENE.INIT | SCENE.UPDATE],
-        { init = false }: { init?: boolean } = {},
+        {
+          init = false,
+          initFromSnapshot = false,
+        }: { init?: boolean; initFromSnapshot?: boolean } = {},
       ) => {
         const { elements: remoteElements } = decryptedData.payload;
 
         if (init) {
           history.resumeRecording();
+        }
+
+        if (init || initFromSnapshot) {
           this.setState({
             ...this.state,
             ...calculateScrollCenter(
@@ -1311,7 +1323,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           // we just received!
           // Note: this needs to be set before replaceAllElements as it
           // syncronously calls render.
-          this.lastBroadcastedOrReceivedSceneVersion = getDrawingVersion(
+          this.lastBroadcastedOrReceivedSceneVersion = getSceneVersion(
             newElements,
           );
 
@@ -1323,7 +1335,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         // undo, a user makes a change, and then try to redo, your element(s) will be lost. However,
         // right now we think this is the right tradeoff.
         history.clear();
-        if (!this.portal.socketInitialized) {
+        if (!this.portal.socketInitialized && !initFromSnapshot) {
           initialize();
         }
       };
@@ -1332,11 +1344,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         /* webpackChunkName: "socketIoClient" */ "socket.io-client"
       );
 
-      this.portal.open(
-        socketIOClient(SOCKET_SERVER),
-        roomMatch[1],
-        roomMatch[2],
-      );
+      this.portal.open(socketIOClient(SOCKET_SERVER), roomId, roomSecret);
 
       // All socket listeners are moving to Portal
       this.portal.socket!.on(
@@ -1406,6 +1414,19 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         isCollaborating: true,
         isLoading: opts.showLoadingState ? true : this.state.isLoading,
       });
+
+      try {
+        const elements = await loadFromFirebase(roomId, roomSecret);
+        if (elements) {
+          updateScene(
+            { type: "SCENE_UPDATE", payload: { elements } },
+            { initFromSnapshot: true },
+          );
+        }
+      } catch (e) {
+        // log the error and move on. other peers will sync us the scene.
+        console.error(e);
+      }
     }
   };
 
@@ -1450,7 +1471,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   // maybe should move to Portal
-  broadcastScene = (sceneType: SCENE.INIT | SCENE.UPDATE, syncAll: boolean) => {
+  broadcastScene = async (
+    sceneType: SCENE.INIT | SCENE.UPDATE,
+    syncAll: boolean,
+  ) => {
     if (sceneType === SCENE.INIT && !syncAll) {
       throw new Error("syncAll must be true when sending SCENE.INIT");
     }
@@ -1479,7 +1503,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     };
     this.lastBroadcastedOrReceivedSceneVersion = Math.max(
       this.lastBroadcastedOrReceivedSceneVersion,
-      getDrawingVersion(this.scene.getElementsIncludingDeleted()),
+      getSceneVersion(this.scene.getElementsIncludingDeleted()),
     );
     for (const syncableElement of syncableElements) {
       this.broadcastedElementVersions.set(
@@ -1487,7 +1511,25 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         syncableElement.version,
       );
     }
-    return this.portal._broadcastSocketData(data as SocketUpdateData);
+
+    const broadcastPromise = this.portal._broadcastSocketData(
+      data as SocketUpdateData,
+    );
+
+    if (syncAll && this.portal.roomID && this.portal.roomKey) {
+      await Promise.all([
+        broadcastPromise,
+        saveToFirebase(
+          this.portal.roomID,
+          this.portal.roomKey,
+          syncableElements,
+        ).catch((e) => {
+          console.error(e);
+        }),
+      ]);
+    } else {
+      await broadcastPromise;
+    }
   };
 
   private onSceneUpdated = () => {

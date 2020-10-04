@@ -1,0 +1,10 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow get, write: if true;
+      // never set this to true, otherwise anyone can delete anyone else's drawing.
+      allow list: if false;
+    }
+  }
+}
