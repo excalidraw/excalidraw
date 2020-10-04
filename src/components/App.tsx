@@ -1232,12 +1232,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
       const updateScene = (
         decryptedData: SocketUpdateDataSource[SCENE.INIT | SCENE.UPDATE],
-        { init = false }: { init?: boolean } = {},
+        {
+          init = false,
+          initFromSnapshot = false,
+        }: { init?: boolean; initFromSnapshot?: boolean } = {},
       ) => {
         const { elements: remoteElements } = decryptedData.payload;
 
         if (init) {
           history.resumeRecording();
+        }
+
+        if (init || initFromSnapshot) {
           this.setState({
             ...this.state,
             ...calculateScrollCenter(
@@ -1329,7 +1335,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         // undo, a user makes a change, and then try to redo, your element(s) will be lost. However,
         // right now we think this is the right tradeoff.
         history.clear();
-        if (!this.portal.socketInitialized) {
+        if (!this.portal.socketInitialized && !initFromSnapshot) {
           initialize();
         }
       };
@@ -1412,7 +1418,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       try {
         const elements = await loadFromFirebase(roomId, roomSecret);
         if (elements) {
-          updateScene({ type: "SCENE_INIT", payload: { elements } });
+          updateScene(
+            { type: "SCENE_UPDATE", payload: { elements } },
+            { initFromSnapshot: true },
+          );
         }
       } catch (e) {
         // log the error and move on. other peers will sync us the scene.
