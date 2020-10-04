@@ -163,7 +163,6 @@
     "button_startSession": "Sessie starten",
     "button_stopSession": "Sessie afbreken",
     "desc_inProgressIntro": "De live-samenwerkingssessie is nu gestart.",
-    "desc_persistenceWarning": "",
     "desc_shareLink": "Deel deze link met iedereen waarmee je wil samenwerken:",
     "desc_exitSession": ""
   },
