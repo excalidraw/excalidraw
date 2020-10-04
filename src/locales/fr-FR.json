@@ -150,7 +150,7 @@
     "clearCanvasMessage": "Si le rechargement ne résout pas l'erreur, essayez ",
     "clearCanvasMessage_button": "effacement du canvas.",
     "clearCanvasCaveat": " Cela entraînera une perte du travail ",
-    "trackedToSentry_pre": "L'erreur ",
+    "trackedToSentry_pre": "L'erreur avec l'identifiant ",
     "trackedToSentry_post": " a été enregistrée dans notre système.",
     "openIssueMessage_pre": "Nous avons été très prudents de ne pas inclure les informations de votre scène dans l'erreur. Si votre scène n'est pas privée, veuillez envisager de poursuivre sur notre ",
     "openIssueMessage_button": "outil de suivi des bugs.",
@@ -163,7 +163,6 @@
     "button_startSession": "Démarrer la session",
     "button_stopSession": "Arrêter la session",
     "desc_inProgressIntro": "La session de collaboration en direct est maintenant en cours.",
-    "desc_persistenceWarning": "Notez que les données de la scène sont partagées entre collaborateurs de manière P2P et ne sont pas enregistrés sur notre serveur. Ainsi, si vous vous déconnectez tous, vous perdrez les données sauf si vous les exportez vers un fichier ou un lien de partage.",
     "desc_shareLink": "Partagez ce lien avec ceux avec qui vous souhaitez collaborer :",
     "desc_exitSession": "Arrêter la session vous déconnectera du salon, mais vous pourrez continuer à travailler avec la scène, localement. Notez que cela n'affectera pas les autres personnes, et ils seront toujours en mesure de collaborer sur leur version."
   },
