@@ -74,7 +74,7 @@ export const getElementMap = (elements: readonly ExcalidrawElement[]) =>
     {},
   );
 
-export const getDrawingVersion = (elements: readonly ExcalidrawElement[]) =>
+export const getSceneVersion = (elements: readonly ExcalidrawElement[]) =>
   elements.reduce((acc, el) => acc + el.version, 0);
 
 export const getNonDeletedElements = (elements: readonly ExcalidrawElement[]) =>

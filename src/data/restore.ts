@@ -31,7 +31,7 @@ const restoreElementWithProperties = <T extends ExcalidrawElement>(
 ): T => {
   const base: Pick<T, keyof ExcalidrawElement> = {
     type: element.type,
-    // all elements must have version > 0 so getDrawingVersion() will pick up
+    // all elements must have version > 0 so getSceneVersion() will pick up
     //  newly added elements
     version: element.version || 1,
     versionNonce: element.versionNonce ?? 0,
