@@ -163,7 +163,6 @@
     "button_startSession": "Начать сессию",
     "button_stopSession": "Закончить сессию",
     "desc_inProgressIntro": "Совместная сессия теперь активна.",
-    "desc_persistenceWarning": "",
     "desc_shareLink": "Поделитесь этой ссылкой со всеми участниками:",
     "desc_exitSession": ""
   },
