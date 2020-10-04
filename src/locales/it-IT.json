@@ -163,7 +163,6 @@
     "button_startSession": "Avvia sessione",
     "button_stopSession": "Termina sessione",
     "desc_inProgressIntro": "La sessione di collaborazione è attualmente in corso.",
-    "desc_persistenceWarning": "Tieni presente che i dati della scena sono condivisi tra i collaboratori in modo P2P e non persistono sul nostro server. Pertanto, se vi disconnettere tutti, perderete i dati a meno che non li esportiate in un file o in un link condivisibile.",
     "desc_shareLink": "Condividi questo link con chiunque desideri collaborare:",
     "desc_exitSession": "Interrompere la sessione scollegherà la tua stanza ma potrai continuare a lavorare con la scena, localmente. Tieni presente che questo non influirà sulle altre persone, e che saranno ancora in grado di collaborare alla loro versione."
   },

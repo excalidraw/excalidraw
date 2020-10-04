@@ -163,7 +163,6 @@
     "button_startSession": "Rozpocznij sesję",
     "button_stopSession": "Zakończ sesję",
     "desc_inProgressIntro": "Sesja współpracy na żywo właśnie się rozpoczęła.",
-    "desc_persistenceWarning": "Ważne! Wszystko co będziesz tworzyć wraz z osobami które zaprosisz do współpracy jest dostępne tylko dla was (protokół P2P), co oznacza, że nie jest przechowywane na serwerach Excalidraw. Dlatego, jeżeli wszyscy się rozłączycie i nie zapiszecie wcześniej danych (albo nie utworzycie linka do udostępnienia projektu), wasze dane zostaną utracone.",
     "desc_shareLink": "Udostępnij ten link osobom, z którymi chcesz współpracować:",
     "desc_exitSession": "Zakończenie sesji spowoduje odłączenie ciebie od pokoju, ale nadal będziesz mógł lokalnie kontynuować pracę. Zauważ, że osoby z którymi współpracowałeś nadal będą mogły współpracować."
   },

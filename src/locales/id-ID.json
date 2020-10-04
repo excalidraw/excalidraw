@@ -163,7 +163,6 @@
     "button_startSession": "Mulai sesi",
     "button_stopSession": "Hentikan sesi",
     "desc_inProgressIntro": "Sesi kolaborasi sedang berlangsung sekarang.",
-    "desc_persistenceWarning": "Perhatikan bahwa data pemandangan dibagikan ke seluruh kolaborator dengan cara P2P, dan tidak disimpan di server kami. Jadi, jika Anda semua putus sambungan, Anda akan kehilangan data kecuali Anda mengekspornya ke file atau tautan yang dapat dibagikan.",
     "desc_shareLink": "Bagikan tautan ini dengan siapa pun yang Anda inginkan untuk kolaborasi bersama:",
     "desc_exitSession": "Menghentikan sesi akan memutuskan hubungan Anda dari ruangan, tetapi Anda dapat melanjutkan bekerja dengan pemandangan Anda secara lokal. Perhatikan bahwa ini tidak memengaruhi orang lain, dan mereka masih dapat berkolaborasi pada versi mereka."
   },

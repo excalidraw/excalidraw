@@ -163,7 +163,6 @@
     "button_startSession": "Start økt",
     "button_stopSession": "Stopp sesjon",
     "desc_inProgressIntro": "Sanntids-samarbeidsøkt er nå i gang.",
-    "desc_persistenceWarning": "Vær oppmerksom på at scene-data deles på tvers av samarbeidspartnere på en P2P-måte, og er ikke lagret på serveren vår. Dette betyr at hvis alle kobler fra, mister du dataene med mindre du eksporterer dem til en fil eller en delbar lenke.",
     "desc_shareLink": "Del denne linken med de du vil samarbeide med:",
     "desc_exitSession": "Dersom du avslutter sesjonen blir du frakoblet rommet, men du kan fortsette å arbeide med scenen lokalt. Vær oppmerksom på at dette ikke vil påvirke andre personer, og de vil fortsatt ha mulighet til å samarbeide på deres versjon."
   },

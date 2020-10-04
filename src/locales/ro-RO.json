@@ -163,7 +163,6 @@
     "button_startSession": "Pornire sesiune",
     "button_stopSession": "Oprire sesiune",
     "desc_inProgressIntro": "Sesiunea de colaborare în direct este în curs de desfășurare.",
-    "desc_persistenceWarning": "Reține că datele scenei sunt partajate între colaboratori pe cale P2P și nu sunt stocate pe serverul nostru. Astfel, dacă vă deconectați cu toții, datele vor fi pierdute, cu excepția cazului în care sunt exportate într-un fișier sau într-o legătură partajabilă.",
     "desc_shareLink": "Distribuie această legătură persoanelor cu care dorești să colaborezi:",
     "desc_exitSession": "Oprirea sesiunii te va deconecta de la sală, însă vei putea lucra în continuare, pe plan local, cu scena. Reține că această opțiune nu va afecta alte persoane, iar acestea vor putea să colaboreze în continuare pe versiunea lor."
   },

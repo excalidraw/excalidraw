@@ -163,7 +163,6 @@
     "button_startSession": "開始連線",
     "button_stopSession": "停止連線",
     "desc_inProgressIntro": "即時協作連線正在進行中。",
-    "desc_persistenceWarning": "請注意此作品的資料是以 P2P 的方式分享給所有參與者，並未儲存於我們的伺服器。故若所有參加者皆斷線，未輸出或建立分享連結的內容將會遺失。",
     "desc_shareLink": "將此連結分享給欲協作的對象：",
     "desc_exitSession": "停止連線將中斷你與協作會議室的連結，但你仍可於本機編輯此作品。意指停止連線後你的編輯不會被先前共同協作的人看見，且他們可繼續共同協作另一個版本。"
   },

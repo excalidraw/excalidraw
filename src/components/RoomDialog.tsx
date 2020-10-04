@@ -102,12 +102,6 @@ const RoomModal = ({
             </span>{" "}
             {t("roomDialog.desc_privacy")}
           </p>
-          <p>
-            <span role="img" aria-hidden="true" className="RoomDialog-emoji">
-              {"⚠️️"}
-            </span>{" "}
-            {t("roomDialog.desc_persistenceWarning")}
-          </p>
           <p>{t("roomDialog.desc_exitSession")}</p>
           <div className="RoomDialog-sessionStartButtonContainer">
             <ToolButton

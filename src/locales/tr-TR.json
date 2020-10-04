@@ -163,7 +163,6 @@
     "button_startSession": "Oturumu başlat",
     "button_stopSession": "Oturumu sonlandır",
     "desc_inProgressIntro": "Ortak çalışma ortamı oluşturuldu.",
-    "desc_persistenceWarning": "Çalışma ortamında yaptıklarınız sadece ortama katılmış diğer kişiler ile paylaşılmaktadır. Bundan dolayı, hepinizin bağlantısı kesilirse ve bir dosyaya veya paylaşılabilir bir bağlantıya dışa aktarmamışsanız tüm verilerinizi kaybedebilirsiniz.",
     "desc_shareLink": "Bu bağlantıyı birlikte çalışacağınız kişilerle paylaşabilirsiniz:",
     "desc_exitSession": "Çalışma ortamını kapattığınızda ortak çalışmadan ayrılmış olursunuz ancak kendi versiyonunuzda çalışmaya devam edebilirsiniz. Bu durumda ortak çalıştığınız diğer kişiler etkilenmeyecek, çalışma ortamındaki versiyon üzerinden çalışmaya devam edebilecekler."
   },

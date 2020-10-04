@@ -163,7 +163,6 @@
     "button_startSession": "Starta sessionen",
     "button_stopSession": "Stoppa session",
     "desc_inProgressIntro": "Nu pågår en live-samarbetssession.",
-    "desc_persistenceWarning": "Observera att skissdata delas mellan samarbetspartners på ett P2P-sätt och inte kvarstår på vår server. Således, om alla kopplar från kommer ni att förlora data om inte någon av er exporterar den till en fil eller en delbar länk.",
     "desc_shareLink": "Dela denna länk med någon du vill samarbeta med:",
     "desc_exitSession": "Att avbryta sessionen kommer att koppla bort dig från rummet, men du kommer att kunna fortsätta arbeta med skissen, lokalt. Observera att detta inte påverkar andra människor, och de kommer fortfarande att kunna samarbeta på deras version."
   },

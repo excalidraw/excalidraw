@@ -163,7 +163,6 @@
     "button_startSession": "세션 시작",
     "button_stopSession": "세션 중단",
     "desc_inProgressIntro": "실시간 협업 세션이 진행 중입니다.",
-    "desc_persistenceWarning": "",
     "desc_shareLink": "공동 작업자에게 이 링크를 공유하세요.",
     "desc_exitSession": ""
   },

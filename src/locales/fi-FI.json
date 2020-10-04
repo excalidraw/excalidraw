@@ -163,7 +163,6 @@
     "button_startSession": "Aloita istunto",
     "button_stopSession": "Lopeta istunto",
     "desc_inProgressIntro": "Jaettu istunto on nyt käynnissä.",
-    "desc_persistenceWarning": "Huomaa, että työn tiedot jaetaan muiden muiden käyttäjien kesken P2P-menetelmällä, eikä niitä tallenneta palvelimellemme. Jos kaikki työn käyttäjät katkaisevat yhteyden, menetätte työn, ellette tallenna sitä tiedostoksi tai jaettavaksi linkiksi.",
     "desc_shareLink": "Jaa tämä linkki kenelle tahansa, jonka kanssa haluat tehdä yhteistyötä:",
     "desc_exitSession": "Istunnon pysäyttäminen katkaisee yhteyden huoneeseen, mutta voit vielä jatkaa työskentelyä paikallisesti. Huomaa, että tämä ei vaikuta muihin käyttäjiin ja he voivat jatkaa oman versionsa parissa työskentelyä."
   },

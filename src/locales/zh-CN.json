@@ -163,7 +163,6 @@
     "button_startSession": "启动会议",
     "button_stopSession": "结束会议",
     "desc_inProgressIntro": "实时协作会议正在进行。",
-    "desc_persistenceWarning": "请注意，场景数据是以P2P方式在合作者之间共享的，不会持续到我们的服务器。 因此，如果您都断开了连接，您将会丢失数据，除非您将其导出到一个文件或一个可共享的链接。",
     "desc_shareLink": "分享此链接给你要协作的用户",
     "desc_exitSession": "停止会话将中断您在与房间的连接，但您依然可以在本地继续使用画布. 请注意，这不会影响到其他用户, 他们仍可以在他们的版本上继续协作。"
   },
