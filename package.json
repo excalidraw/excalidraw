@@ -52,7 +52,7 @@
     "eslint-plugin-prettier": "3.1.4",
     "firebase-tools": "8.11.2",
     "husky": "4.3.0",
-    "jest-canvas-mock": "2.2.0",
+    "jest-canvas-mock": "2.3.0",
     "lint-staged": "10.4.0",
     "pepjs": "0.5.2",
     "prettier": "2.1.2",
