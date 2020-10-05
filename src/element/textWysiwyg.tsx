@@ -89,6 +89,9 @@ export const textWysiwyg = ({
   editable.dataset.type = "wysiwyg";
   // prevent line wrapping on Safari
   editable.wrap = "off";
+  editable.className = `excalidraw ${
+    appState.appearance === "dark" ? "Appearance_dark" : ""
+  }`;
 
   Object.assign(editable.style, {
     position: "fixed",
