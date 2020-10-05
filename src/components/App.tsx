@@ -473,7 +473,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       return false;
     }
 
-    const roomId = roomMatch[1];
+    const roomID = roomMatch[1];
 
     let collabForceLoadFlag;
     try {
@@ -492,7 +492,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         );
         // if loading same room as the one previously unloaded within 15sec
         //  force reload without prompting
-        if (previousRoom === roomId && Date.now() - timestamp < 15000) {
+        if (previousRoom === roomID && Date.now() - timestamp < 15000) {
           return true;
         }
       } catch {}
@@ -1228,8 +1228,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
     const roomMatch = getCollaborationLinkData(window.location.href);
     if (roomMatch) {
-      const roomId = roomMatch[1];
-      const roomSecret = roomMatch[2];
+      const roomID = roomMatch[1];
+      const roomKey = roomMatch[2];
 
       const initialize = () => {
         this.portal.socketInitialized = true;
@@ -1359,7 +1359,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         /* webpackChunkName: "socketIoClient" */ "socket.io-client"
       );
 
-      this.portal.open(socketIOClient(SOCKET_SERVER), roomId, roomSecret);
+      this.portal.open(socketIOClient(SOCKET_SERVER), roomID, roomKey);
 
       // All socket listeners are moving to Portal
       this.portal.socket!.on(
@@ -1431,7 +1431,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
 
       try {
-        const elements = await loadFromFirebase(roomId, roomSecret);
+        const elements = await loadFromFirebase(roomID, roomKey);
         if (elements) {
           updateScene(
             { type: "SCENE_UPDATE", payload: { elements } },

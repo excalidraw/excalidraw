@@ -139,13 +139,13 @@ export async function saveToFirebase(
 }
 
 export async function loadFromFirebase(
-  roomId: string,
-  roomSecret: string,
+  roomID: string,
+  roomKey: string,
 ): Promise<readonly ExcalidrawElement[] | null> {
   const firebase = await getFirebase();
   const db = firebase.firestore();
 
-  const docRef = db.collection("scenes").doc(roomId);
+  const docRef = db.collection("scenes").doc(roomID);
   const doc = await docRef.get();
   if (!doc.exists) {
     return null;
@@ -153,6 +153,6 @@ export async function loadFromFirebase(
   const storedScene = doc.data() as FirebaseStoredScene;
   const ciphertext = storedScene.ciphertext.toUint8Array();
   const iv = storedScene.iv.toUint8Array();
-  const plaintext = await decryptElements(roomSecret, iv, ciphertext);
+  const plaintext = await decryptElements(roomKey, iv, ciphertext);
   return plaintext;
 }
