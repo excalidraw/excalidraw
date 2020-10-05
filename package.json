@@ -27,7 +27,7 @@
     "@types/nanoid": "2.1.0",
     "@types/react": "16.9.50",
     "@types/react-dom": "16.9.8",
-    "@types/socket.io-client": "1.4.33",
+    "@types/socket.io-client": "1.4.34",
     "browser-nativefs": "0.10.3",
     "firebase": "7.22.0",
     "i18next-browser-languagedetector": "6.0.1",
