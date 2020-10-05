@@ -176,7 +176,11 @@ import {
 import { MaybeTransformHandleType } from "../element/transformHandles";
 import { renderSpreadsheet } from "../charts";
 import { isValidLibrary } from "../data/json";
-import { loadFromFirebase, saveToFirebase } from "../data/firebase";
+import {
+  loadFromFirebase,
+  saveToFirebase,
+  isSavedToFirebase,
+} from "../data/firebase";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -770,7 +774,17 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         );
       } catch {}
     }
-    if (this.state.isCollaborating && this.scene.getElements().length > 0) {
+    const syncableElements = getSyncableElements(
+      this.scene.getElementsIncludingDeleted(),
+    );
+    if (
+      this.state.isCollaborating &&
+      !isSavedToFirebase(this.portal, syncableElements)
+    ) {
+      // this won't run in time if user decides to leave the site, but
+      //  the purpose is to run in immediately after user decides to stay
+      this.saveCollabRoomToFirebase(syncableElements);
+
       event.preventDefault();
       // NOTE: modern browsers no longer allow showing a custom message here
       event.returnValue = "";
@@ -1172,6 +1186,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   closePortal = () => {
+    this.saveCollabRoomToFirebase();
     window.history.pushState({}, "Excalidraw", window.location.origin);
     this.destroySocketClient();
   };
@@ -1470,6 +1485,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
   };
 
+  saveCollabRoomToFirebase = async (
+    syncableElements: ExcalidrawElement[] = getSyncableElements(
+      this.scene.getElementsIncludingDeleted(),
+    ),
+  ) => {
+    try {
+      await saveToFirebase(this.portal, syncableElements);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   // maybe should move to Portal
   broadcastScene = async (
     sceneType: SCENE.INIT | SCENE.UPDATE,
@@ -1516,16 +1543,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       data as SocketUpdateData,
     );
 
-    if (syncAll && this.portal.roomID && this.portal.roomKey) {
+    if (syncAll && this.state.isCollaborating) {
       await Promise.all([
         broadcastPromise,
-        saveToFirebase(
-          this.portal.roomID,
-          this.portal.roomKey,
-          syncableElements,
-        ).catch((e) => {
-          console.error(e);
-        }),
+        this.saveCollabRoomToFirebase(syncableElements),
       ]);
     } else {
       await broadcastPromise;
