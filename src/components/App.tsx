@@ -521,6 +521,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
   };
 
+  /** Completely resets scene & history.
+   * Do not use for clear scene user action. */
+  private resetScene = withBatchedUpdates(() => {
+    this.scene.replaceAllElements([]);
+    this.setState({
+      ...getDefaultAppState(),
+      appearance: this.state.appearance,
+      username: this.state.username,
+    });
+    history.clear();
+  });
+
   private initializeScene = async () => {
     if ("launchQueue" in window && "LaunchParams" in window) {
       (window as any).launchQueue.setConsumer(
@@ -597,6 +609,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     if (isCollaborationScene) {
+      // when joining a room we don't want user's local scene data to be merged
+      //  into the remote scene
+      this.resetScene();
       this.initializeSocketClient({ showLoadingState: true });
     } else if (scene) {
       if (scene.appState) {
