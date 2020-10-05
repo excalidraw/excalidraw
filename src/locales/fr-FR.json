@@ -96,9 +96,9 @@
     "edit": "Modifier",
     "undo": "Annuler",
     "redo": "Rétablir",
-    "roomDialog": "Démarrer la collaboration en temps réel",
+    "roomDialog": "Démarrer le collaboration en temps réel",
     "createNewRoom": "Créer un nouveau salon",
-    "toggleFullScreen": "Mode plein-écran",
+    "toggleFullScreen": "Activer/désactiver le mode plein écran",
     "toggleDarkMode": "Activer/désactiver le mode sombre",
     "toggleZenMode": "Activer/désactiver le mode zen",
     "exitZenMode": "Quitter le mode zen"
@@ -113,8 +113,8 @@
     "decryptFailed": "Les données n'ont pas pu être déchiffrées.",
     "uploadedSecurly": "Le téléchargement a été sécurisé avec un chiffrement de bout en bout, ce qui signifie que ni Excalidraw ni personne d'autre ne peut en lire le contenu.",
     "loadSceneOverridePrompt": "Le chargement d'un dessin externe remplacera votre contenu actuel. Souhaitez-vous continuer ?",
-    "errorLoadingLibrary": "",
-    "confirmAddLibrary": ""
+    "errorLoadingLibrary": "Une erreur s'est produite lors du chargement de la bibliothèque tierce.",
+    "confirmAddLibrary": "Cela va ajouter {{numShapes}} forme(s) à votre bibliothèque. Êtes-vous sûr(e) ?"
   },
   "toolBar": {
     "selection": "Sélection",
@@ -150,7 +150,7 @@
     "clearCanvasMessage": "Si le rechargement ne résout pas l'erreur, essayez ",
     "clearCanvasMessage_button": "effacement du canvas.",
     "clearCanvasCaveat": " Cela entraînera une perte du travail ",
-    "trackedToSentry_pre": "L'erreur ",
+    "trackedToSentry_pre": "L'erreur avec l'identifiant ",
     "trackedToSentry_post": " a été enregistrée dans notre système.",
     "openIssueMessage_pre": "Nous avons été très prudents de ne pas inclure les informations de votre scène dans l'erreur. Si votre scène n'est pas privée, veuillez envisager de poursuivre sur notre ",
     "openIssueMessage_button": "outil de suivi des bugs.",
