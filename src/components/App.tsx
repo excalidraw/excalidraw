@@ -610,9 +610,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     if (isCollaborationScene) {
       // when joining a room we don't want user's local scene data to be merged
-      //  into the remote scene
-      this.resetScene();
-      this.initializeSocketClient({ showLoadingState: true });
+      //  into the remote scene, so set `clearScene`
+      this.initializeSocketClient({ showLoadingState: true, clearScene: true });
     } else if (scene) {
       if (scene.appState) {
         scene.appState = {
@@ -1222,9 +1221,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private initializeSocketClient = async (opts: {
     showLoadingState: boolean;
+    clearScene?: boolean;
   }) => {
     if (this.portal.socket) {
       return;
+    }
+    if (opts.clearScene) {
+      this.resetScene();
     }
     const roomMatch = getCollaborationLinkData(window.location.href);
     if (roomMatch) {
