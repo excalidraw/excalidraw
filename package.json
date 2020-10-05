@@ -29,7 +29,7 @@
     "@types/react-dom": "16.9.8",
     "@types/socket.io-client": "1.4.33",
     "browser-nativefs": "0.10.3",
-    "firebase": "7.21.1",
+    "firebase": "7.22.0",
     "i18next-browser-languagedetector": "6.0.1",
     "lodash.throttle": "4.1.1",
     "nanoid": "2.1.11",
