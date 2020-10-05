@@ -25,9 +25,9 @@
     "sloppiness": "Estilo de trazo",
     "opacity": "Opacidad",
     "textAlign": "Alineado de texto",
-    "edges": "",
-    "sharp": "",
-    "round": "",
+    "edges": "Bordes",
+    "sharp": "Afilado",
+    "round": "Redondo",
     "fontSize": "Tamaño de la fuente",
     "fontFamily": "Tipo de fuente",
     "onlySelected": "Sólo seleccionados",
@@ -72,7 +72,7 @@
     "addToLibrary": "Añadir a la biblioteca",
     "removeFromLibrary": "Eliminar de la biblioteca",
     "libraryLoadingMessage": "Cargando biblioteca...",
-    "loadingScene": ""
+    "loadingScene": "Cargando escena..."
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
@@ -99,7 +99,7 @@
     "roomDialog": "Iniciar colaboración en vivo",
     "createNewRoom": "Crear nueva sala",
     "toggleFullScreen": "Alternar pantalla completa",
-    "toggleDarkMode": "",
+    "toggleDarkMode": "Cambiar a modo oscuro",
     "toggleZenMode": "Alternar modo zen",
     "exitZenMode": "Salir del modo Zen"
   },
@@ -113,8 +113,8 @@
     "decryptFailed": "No se pudieron descifrar los datos.",
     "uploadedSecurly": "La carga ha sido asegurada con cifrado de extremo a extremo, lo que significa que el servidor de Excalidraw y terceros no pueden leer el contenido.",
     "loadSceneOverridePrompt": "Si carga este dibujo externo, reemplazará el que tiene. ¿Desea continuar?",
-    "errorLoadingLibrary": "",
-    "confirmAddLibrary": ""
+    "errorLoadingLibrary": "Se ha producido un error al cargar la biblioteca de terceros.",
+    "confirmAddLibrary": "Esto añadirá {{numShapes}} forma(s) a tu biblioteca. ¿Estás seguro?"
   },
   "toolBar": {
     "selection": "Selección",
@@ -136,7 +136,7 @@
   "hints": {
     "linearElement": "Haga clic para dibujar multiples puntos o arrastre para una sola línea",
     "freeDraw": "Haz clic y arrastra, suelta al terminar",
-    "text": "",
+    "text": "Consejo: también puedes añadir texto haciendo doble clic en cualquier lugar con la herramienta de selección",
     "linearElementMulti": "Haga clic en el último punto o pulse Escape o Enter para finalizar",
     "resize": "Para mantener las proporciones mantén SHIFT presionado mientras modificas el tamaño, \nmantén presionado ALT para modificar el tamaño desde el centro",
     "rotate": "Puede restringir los ángulos manteniendo presionado SHIFT mientras gira",
@@ -185,7 +185,7 @@
     "textNewLine": "Añadir nueva línea (texto)",
     "textFinish": "Finalizar edición (texto)",
     "zoomToFit": "Ajustar para mostrar todos los elementos",
-    "preventBinding": ""
+    "preventBinding": "Evitar enlace de flecha"
   },
   "encrypted": {
     "tooltip": "Tus dibujos están cifrados de punto a punto, por lo que los servidores de Excalidraw nunca los verán."

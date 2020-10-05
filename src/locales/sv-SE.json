@@ -113,8 +113,8 @@
     "decryptFailed": "Kunde inte avkryptera data.",
     "uploadedSecurly": "Uppladdning har säkrats med kryptering från ände till ände. vilket innebär att Excalidraw server och tredje part inte kan läsa innehållet.",
     "loadSceneOverridePrompt": "Laddning av extern skiss kommer att ersätta ditt befintliga innehåll. Vill du fortsätta?",
-    "errorLoadingLibrary": "",
-    "confirmAddLibrary": ""
+    "errorLoadingLibrary": "Fel vid inläsning av tredjeparts bibliotek.",
+    "confirmAddLibrary": "Detta kommer att lägga till {{numShapes}} form(er) till ditt bibliotek. Är du säker?"
   },
   "toolBar": {
     "selection": "Markering",

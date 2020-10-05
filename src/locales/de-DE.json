@@ -113,8 +113,8 @@
     "decryptFailed": "Daten konnten nicht entschlüsselt werden.",
     "uploadedSecurly": "Der Upload wurde mit Ende-zu-Ende-Verschlüsselung gespeichert. Weder Excalidraw noch Dritte können den Inhalt einsehen.",
     "loadSceneOverridePrompt": "Das Laden der externen Zeichnung ersetzt den vorhandenen Inhalt. Möchtest Du fortfahren?",
-    "errorLoadingLibrary": "",
-    "confirmAddLibrary": ""
+    "errorLoadingLibrary": "Beim Laden der Drittanbieter-Bibliothek ist ein Fehler aufgetreten.",
+    "confirmAddLibrary": "Hiermit werden {{numShapes}} Form(en) deiner Bibliothek hinzugefügt. Bist du sicher?"
   },
   "toolBar": {
     "selection": "Auswahl",

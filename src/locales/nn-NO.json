@@ -113,8 +113,8 @@
     "decryptFailed": "Kunne ikkje dekryptere data.",
     "uploadedSecurly": "Opplastinga er kryptert og er ikkje mogleg å lese av Excalidraw-serveren eller tredjepartar.",
     "loadSceneOverridePrompt": "Innlasting av ekstern teikning erstattar ditt eksisterande innhald. Ynskjer du å fortsette?",
-    "errorLoadingLibrary": "",
-    "confirmAddLibrary": ""
+    "errorLoadingLibrary": "Det oppstod ein feil under lastinga av tredjepartsbibliotek.",
+    "confirmAddLibrary": "Dette vil legge til {{numShapes}} form(er) i biblioteket ditt. Er du sikker?"
   },
   "toolBar": {
     "selection": "Vel",
