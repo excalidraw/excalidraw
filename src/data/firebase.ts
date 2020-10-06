@@ -1,6 +1,7 @@
 import { createIV, getImportedKey } from "./index";
 import { ExcalidrawElement } from "../element/types";
 import { getSceneVersion } from "../element";
+import Portal from "../components/Portal";
 
 let firebasePromise: Promise<typeof import("firebase/app")> | null = null;
 
@@ -69,14 +70,40 @@ async function decryptElements(
   return JSON.parse(decodedData);
 }
 
+const firebaseSceneVersionCache = new WeakMap<SocketIOClient.Socket, number>();
+
+export const isSavedToFirebase = (
+  portal: Portal,
+  elements: readonly ExcalidrawElement[],
+): boolean => {
+  if (portal.socket && portal.roomID && portal.roomKey) {
+    const sceneVersion = getSceneVersion(elements);
+    return firebaseSceneVersionCache.get(portal.socket) === sceneVersion;
+  }
+  // if no room exists, consider the room saved so that we don't unnecessarily
+  //  prevent unload (there's nothing we could do at that point anyway)
+  return true;
+};
+
 export async function saveToFirebase(
-  roomId: string,
-  roomSecret: string,
+  portal: Portal,
   elements: readonly ExcalidrawElement[],
 ) {
+  const { roomID, roomKey, socket } = portal;
+  if (
+    // if no room exists, consider the room saved because there's nothing we can
+    //  do at this point
+    !roomID ||
+    !roomKey ||
+    !socket ||
+    isSavedToFirebase(portal, elements)
+  ) {
+    return true;
+  }
+
   const firebase = await getFirebase();
   const sceneVersion = getSceneVersion(elements);
-  const { ciphertext, iv } = await encryptElements(roomSecret, elements);
+  const { ciphertext, iv } = await encryptElements(roomKey, elements);
 
   const nextDocData = {
     sceneVersion,
@@ -87,7 +114,7 @@ export async function saveToFirebase(
   } as FirebaseStoredScene;
 
   const db = firebase.firestore();
-  const docRef = db.collection("scenes").doc(roomId);
+  const docRef = db.collection("scenes").doc(roomID);
   const didUpdate = await db.runTransaction(async (transaction) => {
     const doc = await transaction.get(docRef);
     if (!doc.exists) {
@@ -104,17 +131,21 @@ export async function saveToFirebase(
     return true;
   });
 
+  if (didUpdate) {
+    firebaseSceneVersionCache.set(socket, sceneVersion);
+  }
+
   return didUpdate;
 }
 
 export async function loadFromFirebase(
-  roomId: string,
-  roomSecret: string,
+  roomID: string,
+  roomKey: string,
 ): Promise<readonly ExcalidrawElement[] | null> {
   const firebase = await getFirebase();
   const db = firebase.firestore();
 
-  const docRef = db.collection("scenes").doc(roomId);
+  const docRef = db.collection("scenes").doc(roomID);
   const doc = await docRef.get();
   if (!doc.exists) {
     return null;
@@ -122,6 +153,6 @@ export async function loadFromFirebase(
   const storedScene = doc.data() as FirebaseStoredScene;
   const ciphertext = storedScene.ciphertext.toUint8Array();
   const iv = storedScene.iv.toUint8Array();
-  const plaintext = await decryptElements(roomSecret, iv, ciphertext);
+  const plaintext = await decryptElements(roomKey, iv, ciphertext);
   return plaintext;
 }
