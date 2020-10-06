@@ -194,18 +194,13 @@ export const getExportSize = (
   shouldAddWatermark: boolean,
   scale: number,
 ): [number, number] => {
-  let [, , width, height] = getCanvasSize(
-    elements,
+  const sceneElements = getElementsAndWatermark(elements, shouldAddWatermark);
+
+  const [, , width, height] = getCanvasSize(
+    sceneElements,
     exportPadding,
     shouldAddWatermark,
   ).map((dimension) => Math.trunc(dimension * scale));
-
-  if (shouldAddWatermark) {
-    // exportPadding is added twice to make up for the fact that
-    //  it's omitted in getCanvasSize's returned height
-    //  if shouldAddWatermark === true
-    height += (WATERMARK_HEIGHT + exportPadding * 2) * scale;
-  }
 
   return [width, height];
 };
