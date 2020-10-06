@@ -521,6 +521,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
   };
 
+  /** Completely resets scene & history.
+   * Do not use for clear scene user action. */
+  private resetScene = withBatchedUpdates(() => {
+    this.scene.replaceAllElements([]);
+    this.setState({
+      ...getDefaultAppState(),
+      appearance: this.state.appearance,
+      username: this.state.username,
+    });
+    history.clear();
+  });
+
   private initializeScene = async () => {
     if ("launchQueue" in window && "LaunchParams" in window) {
       (window as any).launchQueue.setConsumer(
@@ -597,7 +609,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     if (isCollaborationScene) {
-      this.initializeSocketClient({ showLoadingState: true });
+      // when joining a room we don't want user's local scene data to be merged
+      //  into the remote scene, so set `clearScene`
+      this.initializeSocketClient({ showLoadingState: true, clearScene: true });
     } else if (scene) {
       if (scene.appState) {
         scene.appState = {
@@ -795,10 +809,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     document
       .querySelector(".excalidraw")
       ?.classList.toggle("Appearance_dark", this.state.appearance === "dark");
-
-    if (this.state.isCollaborating && !this.portal.socket) {
-      this.initializeSocketClient({ showLoadingState: true });
-    }
 
     if (
       this.state.editingLinearElement &&
@@ -1207,9 +1217,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private initializeSocketClient = async (opts: {
     showLoadingState: boolean;
+    clearScene?: boolean;
   }) => {
     if (this.portal.socket) {
       return;
+    }
+    if (opts.clearScene) {
+      this.resetScene();
     }
     const roomMatch = getCollaborationLinkData(window.location.href);
     if (roomMatch) {
