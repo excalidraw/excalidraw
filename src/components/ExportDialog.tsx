@@ -2,6 +2,7 @@ import "./ExportDialog.scss";
 
 import React, { useState, useEffect, useRef } from "react";
 
+import { ErrorCanvasPreview } from "./ErrorCanvasPreview";
 import { ToolButton } from "./ToolButton";
 import { clipboard, exportFile, link } from "./icons";
 import { NonDeletedExcalidrawElement } from "../element/types";
@@ -47,6 +48,7 @@ const ExportModal = ({
   const someElementIsSelected = isSomeElementSelected(elements, appState);
   const [scale, setScale] = useState(defaultScale);
   const [exportSelected, setExportSelected] = useState(someElementIsSelected);
+  const [canvasCreated, setCanvasCreated] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
   const {
     exportBackground,
@@ -71,9 +73,17 @@ const ExportModal = ({
       scale,
       shouldAddWatermark,
     });
-    previewNode?.appendChild(canvas);
+
+    if (canvas) {
+      setCanvasCreated(true);
+      previewNode?.appendChild(canvas);
+    } else {
+      setCanvasCreated(false);
+    }
     return () => {
-      previewNode?.removeChild(canvas);
+      if (canvas) {
+        previewNode?.removeChild(canvas);
+      }
     };
   }, [
     appState,
@@ -87,7 +97,9 @@ const ExportModal = ({
 
   return (
     <div className="ExportDialog">
-      <div className="ExportDialog__preview" ref={previewRef}></div>
+      <div className="ExportDialog__preview" ref={previewRef}>
+        {!canvasCreated && <ErrorCanvasPreview />}
+      </div>
       <Stack.Col gap={2} align="center">
         <div className="ExportDialog__actions">
           <Stack.Row gap={2}>

@@ -8,7 +8,11 @@ import { distance, SVG_NS } from "../utils";
 import { normalizeScroll } from "./scroll";
 import { AppState } from "../types";
 import { t } from "../i18n";
-import { DEFAULT_FONT_FAMILY, DEFAULT_VERTICAL_ALIGN } from "../constants";
+import {
+  DEFAULT_FONT_FAMILY,
+  DEFAULT_VERTICAL_ALIGN,
+  MAX_CANVAS_AREA,
+} from "../constants";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -50,6 +54,11 @@ export const exportToCanvas = (
     (shouldAddWatermark ? 0 : exportPadding);
 
   const tempCanvas: any = createCanvas(width, height);
+
+  if (tempCanvas.width * tempCanvas.height > MAX_CANVAS_AREA) {
+    // console.log(`tempCanvas area too big: ${tempCanvas.width * tempCanvas.height}`);
+    return undefined;
+  }
 
   renderScene(
     sceneElements,

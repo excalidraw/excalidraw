@@ -327,10 +327,12 @@ export const exportCanvas = async (
     scale,
     shouldAddWatermark,
   });
-  tempCanvas.style.display = "none";
-  document.body.appendChild(tempCanvas);
+  if (tempCanvas) {
+    tempCanvas.style.display = "none";
+    document.body.appendChild(tempCanvas);
+  }
 
-  if (type === "png") {
+  if (tempCanvas && type === "png") {
     const fileName = `${name}.png`;
     tempCanvas.toBlob(async (blob: any) => {
       if (blob) {
@@ -340,7 +342,7 @@ export const exportCanvas = async (
         });
       }
     });
-  } else if (type === "clipboard") {
+  } else if (tempCanvas && type === "clipboard") {
     try {
       copyCanvasToClipboardAsPng(tempCanvas);
     } catch {
@@ -357,7 +359,7 @@ export const exportCanvas = async (
 
   // clean up the DOM
   if (tempCanvas !== canvas) {
-    tempCanvas.remove();
+    tempCanvas?.remove();
   }
 };
 
