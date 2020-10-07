@@ -81,6 +81,7 @@
     "exportToSvg": "יצא ל SVG",
     "copyToClipboard": "העתק ללוח",
     "copyPngToClipboard": "העתק PNG ללוח",
+    "scale": "",
     "save": "שמור",
     "saveAs": "",
     "load": "טען",
