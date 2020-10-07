@@ -81,6 +81,7 @@
     "exportToSvg": "Exportar a SNG",
     "copyToClipboard": "Copiar al porta-retalls",
     "copyPngToClipboard": "Copiar PNG al porta-retalls",
+    "scale": "",
     "save": "Desar",
     "saveAs": "Desar com",
     "load": "Carregar",
