@@ -132,4 +132,5 @@ export interface ExcalidrawProps {
     name?: string | null;
   };
   onUsernameChange?: (username: string) => void;
+  forwardedRef?: any;
 }

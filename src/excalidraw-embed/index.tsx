@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, forwardRef } from "react";
 
 import { InitializeApp } from "../components/InitializeApp";
 import App from "../components/App";
@@ -17,6 +17,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     initialData,
     user,
     onUsernameChange,
+    forwardedRef,
   } = props;
 
   useEffect(() => {
@@ -47,6 +48,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
           initialData={initialData}
           user={user}
           onUsernameChange={onUsernameChange}
+          forwardedRef={forwardedRef}
         />
       </IsMobileProvider>
     </InitializeApp>
@@ -67,4 +69,7 @@ const areEqual = (prevProps: ExcalidrawProps, nextProps: ExcalidrawProps) => {
   );
 };
 
-export default React.memo(Excalidraw, areEqual);
+const forwardedRefComp = forwardRef((props: ExcalidrawProps, ref) => (
+  <Excalidraw {...props} forwardedRef={ref} />
+));
+export default React.memo(forwardedRefComp, areEqual);
