@@ -6,7 +6,7 @@ import { ToolButton } from "./ToolButton";
 import { clipboard, exportFile, link } from "./icons";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
-import { exportToCanvas } from "../scene/export";
+import { exportToCanvas, getExportSize } from "../scene/export";
 import { ActionsManagerInterface } from "../actions/types";
 import Stack from "./Stack";
 import { t } from "../i18n";
@@ -126,19 +126,33 @@ const ExportModal = ({
             {actionManager.renderAction("changeProjectName")}
           </div>
           <Stack.Row gap={2}>
-            {scales.map((s) => (
-              <ToolButton
-                key={s}
-                size="s"
-                type="radio"
-                icon={`x${s}`}
-                name="export-canvas-scale"
-                aria-label={`Scale ${s} x`}
-                id="export-canvas-scale"
-                checked={s === scale}
-                onChange={() => setScale(s)}
-              />
-            ))}
+            {scales.map((s) => {
+              const [width, height] = getExportSize(
+                exportedElements,
+                exportPadding,
+                shouldAddWatermark,
+                s,
+              );
+
+              const scaleButtonTitle = `${t(
+                "buttons.scale",
+              )} ${s}x (${width}x${height})`;
+
+              return (
+                <ToolButton
+                  key={s}
+                  size="s"
+                  type="radio"
+                  icon={`${s}x`}
+                  name="export-canvas-scale"
+                  title={scaleButtonTitle}
+                  aria-label={scaleButtonTitle}
+                  id="export-canvas-scale"
+                  checked={s === scale}
+                  onChange={() => setScale(s)}
+                />
+              );
+            })}
           </Stack.Row>
         </div>
         {actionManager.renderAction("changeExportBackground")}
