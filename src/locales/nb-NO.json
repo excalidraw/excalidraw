@@ -112,7 +112,9 @@
     "couldNotCopyToClipboard": "Kunne ikke kopiere til utklippstavlen. Prøv med nettleseren Chrome.",
     "decryptFailed": "Kunne ikke dekryptere data.",
     "uploadedSecurly": "Opplastingen er kryptert og kan ikke leses av Excalidraw-serveren eller tredjeparter.",
-    "loadSceneOverridePrompt": "Å laste inn ekstern tegning vil erstatte det eksisterende innholdet. Ønsker du å fortsette?"
+    "loadSceneOverridePrompt": "Å laste inn ekstern tegning vil erstatte det eksisterende innholdet. Ønsker du å fortsette?",
+    "errorLoadingLibrary": "Det oppstod en feil under lasting av tredjepartsbiblioteket.",
+    "confirmAddLibrary": "Dette vil legge til {{numShapes}} figur(er) i biblioteket ditt. Er du sikker?"
   },
   "toolBar": {
     "selection": "Velg",
@@ -161,7 +163,6 @@
     "button_startSession": "Start økt",
     "button_stopSession": "Stopp sesjon",
     "desc_inProgressIntro": "Sanntids-samarbeidsøkt er nå i gang.",
-    "desc_persistenceWarning": "Vær oppmerksom på at scene-data deles på tvers av samarbeidspartnere på en P2P-måte, og er ikke lagret på serveren vår. Dette betyr at hvis alle kobler fra, mister du dataene med mindre du eksporterer dem til en fil eller en delbar lenke.",
     "desc_shareLink": "Del denne linken med de du vil samarbeide med:",
     "desc_exitSession": "Dersom du avslutter sesjonen blir du frakoblet rommet, men du kan fortsette å arbeide med scenen lokalt. Vær oppmerksom på at dette ikke vil påvirke andre personer, og de vil fortsatt ha mulighet til å samarbeide på deres versjon."
   },

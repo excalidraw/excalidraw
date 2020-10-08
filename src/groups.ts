@@ -45,10 +45,17 @@ export function isSelectedViaGroup(
   appState: AppState,
   element: ExcalidrawElement,
 ) {
-  return !!element.groupIds
+  return getSelectedGroupForElement(appState, element) != null;
+}
+
+export const getSelectedGroupForElement = (
+  appState: AppState,
+  element: ExcalidrawElement,
+) => {
+  return element.groupIds
     .filter((groupId) => groupId !== appState.editingGroupId)
     .find((groupId) => appState.selectedGroupIds[groupId]);
-}
+};
 
 export function getSelectedGroupIds(appState: AppState): GroupId[] {
   return Object.entries(appState.selectedGroupIds)

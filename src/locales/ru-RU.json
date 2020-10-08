@@ -112,7 +112,9 @@
     "couldNotCopyToClipboard": "Не удалось скопировать в буфер обмена. Попробуйте использовать веб-браузер Chrome.",
     "decryptFailed": "Не удалось декодировать данные.",
     "uploadedSecurly": "Загружаемые данные защищена сквозным шифрованием, что означает, что сервер Excalidraw и третьи стороны не могут прочитать содержимое.",
-    "loadSceneOverridePrompt": ""
+    "loadSceneOverridePrompt": "",
+    "errorLoadingLibrary": "",
+    "confirmAddLibrary": ""
   },
   "toolBar": {
     "selection": "Выделение области",
@@ -161,7 +163,6 @@
     "button_startSession": "Начать сессию",
     "button_stopSession": "Закончить сессию",
     "desc_inProgressIntro": "Совместная сессия теперь активна.",
-    "desc_persistenceWarning": "",
     "desc_shareLink": "Поделитесь этой ссылкой со всеми участниками:",
     "desc_exitSession": ""
   },

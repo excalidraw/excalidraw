@@ -81,6 +81,7 @@
     "exportToSvg": "Export to SVG",
     "copyToClipboard": "Copy to clipboard",
     "copyPngToClipboard": "Copy PNG to clipboard",
+    "scale": "Scale",
     "save": "Save",
     "saveAs": "Save as",
     "load": "Load",
@@ -112,7 +113,9 @@
     "couldNotCopyToClipboard": "Couldn't copy to clipboard. Try using Chrome browser.",
     "decryptFailed": "Couldn't decrypt data.",
     "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content.",
-    "loadSceneOverridePrompt": "Loading external drawing will replace your existing content. Do you wish to continue?"
+    "loadSceneOverridePrompt": "Loading external drawing will replace your existing content. Do you wish to continue?",
+    "errorLoadingLibrary": "There was an error loading the third party library.",
+    "confirmAddLibrary": "This will add {{numShapes}} shape(s) to your library. Are you sure?"
   },
   "toolBar": {
     "selection": "Selection",
@@ -161,7 +164,6 @@
     "button_startSession": "Start session",
     "button_stopSession": "Stop session",
     "desc_inProgressIntro": "Live-collaboration session is now in progress.",
-    "desc_persistenceWarning": "Note that the scene data is shared across collaborators in a P2P fashion, and not persisted to our server. Thus, if all of you disconnect, you will lose the data unless you export it to a file or a shareable link.",
     "desc_shareLink": "Share this link with anyone you want to collaborate with:",
     "desc_exitSession": "Stopping the session will disconnect you from the room, but you'll be able to continue working with the scene, locally. Note that this won't affect other people, and they'll still be able to collaborate on their version."
   },

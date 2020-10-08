@@ -1,7 +1,7 @@
 import React from "react";
 import { render } from "./test-utils";
 import App from "../components/App";
-import { UI, Pointer } from "./helpers/ui";
+import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { getTransformHandles } from "../element/transformHandles";
 import { API } from "./helpers/api";
 
@@ -79,4 +79,28 @@ describe("element binding", () => {
       expect(API.getSelectedElement().type).toBe("rectangle");
     },
   );
+
+  it("should bind/unbind arrow when moving it with keyboard", () => {
+    const rectangle = UI.createElement("rectangle", {
+      x: 75,
+      y: 0,
+      size: 100,
+    });
+
+    // Creates arrow 1px away from bidding with rectangle
+    const arrow = UI.createElement("arrow", {
+      x: 0,
+      y: 0,
+      size: 50,
+    });
+
+    expect(arrow.endBinding).toBe(null);
+
+    expect(API.getSelectedElement().type).toBe("arrow");
+    Keyboard.hotkeyPress("ARROW_RIGHT");
+    expect(arrow.endBinding?.elementId).toBe(rectangle.id);
+
+    Keyboard.hotkeyPress("ARROW_LEFT");
+    expect(arrow.endBinding).toBe(null);
+  });
 });

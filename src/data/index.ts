@@ -18,7 +18,7 @@ import { serializeAsJSON } from "./json";
 
 import { ExportType } from "../scene/types";
 import { restore } from "./restore";
-import { DataState } from "./types";
+import { ImportedDataState } from "./types";
 
 export { loadFromBlob } from "./blob";
 export { saveAsJSON, loadFromJSON } from "./json";
@@ -66,9 +66,7 @@ export type SocketUpdateDataIncoming =
       type: "INVALID_RESPONSE";
     };
 
-// TODO: Defined globally, since file handles aren't yet serializable.
-// Once `FileSystemFileHandle` can be serialized, make this
-// part of `AppState`.
+// TODO: Make this part of `AppState`.
 (window as any).handle = null;
 
 const byteToHex = (byte: number): string => `0${byte.toString(16)}`.slice(-2);
@@ -91,7 +89,7 @@ const generateEncryptionKey = async () => {
   return (await window.crypto.subtle.exportKey("jwk", key)).k;
 };
 
-const createIV = () => {
+export const createIV = () => {
   const arr = new Uint8Array(12);
   return window.crypto.getRandomValues(arr);
 };
@@ -110,7 +108,7 @@ export const generateCollaborationLink = async () => {
   return `${window.location.origin}${window.location.pathname}#room=${id},${key}`;
 };
 
-const getImportedKey = (key: string, usage: KeyUsage) =>
+export const getImportedKey = (key: string, usage: KeyUsage) =>
   window.crypto.subtle.importKey(
     "jwk",
     {
@@ -234,7 +232,7 @@ export const exportToBackend = async (
 const importFromBackend = async (
   id: string | null,
   privateKey?: string | null,
-) => {
+): Promise<ImportedDataState> => {
   let elements: readonly ExcalidrawElement[] = [];
   let appState = getDefaultAppState();
 
@@ -313,7 +311,7 @@ export const exportCanvas = async (
     if (type === "svg") {
       await fileSave(new Blob([tempSvg.outerHTML], { type: "image/svg+xml" }), {
         fileName: `${name}.svg`,
-        extensions: ["svg"],
+        extensions: [".svg"],
       });
       return;
     } else if (type === "clipboard-svg") {
@@ -338,7 +336,7 @@ export const exportCanvas = async (
       if (blob) {
         await fileSave(blob, {
           fileName: fileName,
-          extensions: ["png"],
+          extensions: [".png"],
         });
       }
     });
@@ -366,19 +364,15 @@ export const exportCanvas = async (
 export const loadScene = async (
   id: string | null,
   privateKey?: string | null,
-  initialData?: DataState,
+  initialData?: ImportedDataState,
 ) => {
   let data;
   if (id != null) {
     // the private key is used to decrypt the content from the server, take
     // extra care not to leak it
-    const { elements, appState } = await importFromBackend(id, privateKey);
-    data = restore(elements, appState);
+    data = restore(await importFromBackend(id, privateKey));
   } else {
-    data = restore(
-      initialData?.elements ?? [],
-      initialData?.appState ?? getDefaultAppState(),
-    );
+    data = restore(initialData || {});
   }
 
   return {

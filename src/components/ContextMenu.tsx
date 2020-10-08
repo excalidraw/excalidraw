@@ -16,25 +16,35 @@ type Props = {
   left: number;
 };
 
-const ContextMenu = ({ options, onCloseRequest, top, left }: Props) => (
-  <Popover
-    onCloseRequest={onCloseRequest}
-    top={top}
-    left={left}
-    fitInViewport={true}
-  >
-    <ul
-      className="context-menu"
-      onContextMenu={(event) => event.preventDefault()}
-    >
-      {options.map((option, idx) => (
-        <li key={idx} onClick={onCloseRequest}>
-          <ContextMenuOption {...option} />
-        </li>
-      ))}
-    </ul>
-  </Popover>
-);
+const ContextMenu = ({ options, onCloseRequest, top, left }: Props) => {
+  const isDarkTheme = !!document
+    .querySelector(".excalidraw")
+    ?.classList.contains("Appearance_dark");
+  const wrapperClasses = `excalidraw ${
+    isDarkTheme ? "Appearance_dark Appearance_dark-background-none" : ""
+  }`;
+  return (
+    <div className={wrapperClasses}>
+      <Popover
+        onCloseRequest={onCloseRequest}
+        top={top}
+        left={left}
+        fitInViewport={true}
+      >
+        <ul
+          className="context-menu"
+          onContextMenu={(event) => event.preventDefault()}
+        >
+          {options.map((option, idx) => (
+            <li key={idx} onClick={onCloseRequest}>
+              <ContextMenuOption {...option} />
+            </li>
+          ))}
+        </ul>
+      </Popover>
+    </div>
+  );
+};
 
 const ContextMenuOption = ({ label, action }: ContextMenuOption) => (
   <button className="context-menu-option" onClick={action}>

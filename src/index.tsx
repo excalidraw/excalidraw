@@ -8,7 +8,6 @@ import { TopErrorBoundary } from "./components/TopErrorBoundary";
 import Excalidraw from "./excalidraw-embed/index";
 import { register as registerServiceWorker } from "./serviceWorker";
 
-import { loadFromBlob } from "./data";
 import { debounce } from "./utils";
 import {
   importFromLocalStorage,
@@ -18,7 +17,7 @@ import {
 } from "./data/localStorage";
 
 import { SAVE_TO_LOCAL_STORAGE_TIMEOUT } from "./time_constants";
-import { DataState } from "./data/types";
+import { ImportedDataState } from "./data/types";
 import { LoadingMessage } from "./components/LoadingMessage";
 import { ExcalidrawElement } from "./element/types";
 import { AppState } from "./types";
@@ -113,7 +112,7 @@ function ExcalidrawApp() {
   // ---------------------------------------------------------------------------
 
   const [initialState, setInitialState] = useState<{
-    data: DataState;
+    data: ImportedDataState;
     user: {
       name: string | null;
     };
@@ -182,16 +181,3 @@ registerServiceWorker({
     }
   },
 });
-
-if ("launchQueue" in window && "LaunchParams" in window) {
-  (window as any).launchQueue.setConsumer(
-    async (launchParams: { files: any[] }) => {
-      if (!launchParams.files.length) {
-        return;
-      }
-      const fileHandle = launchParams.files[0];
-      const blob = await fileHandle.getFile();
-      loadFromBlob(blob);
-    },
-  );
-}

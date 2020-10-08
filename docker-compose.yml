@@ -20,7 +20,7 @@ services:
     volumes:
       - ./:/opt/node_app/app:delegated
       - ./package.json:/opt/node_app/package.json
-      - ./package-lock.lock:/opt/node_app/package-lock.lock
+      - ./package-lock.json:/opt/node_app/package-lock.json
       - notused:/opt/node_app/app/node_modules
 
 volumes:

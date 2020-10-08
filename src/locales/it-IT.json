@@ -25,7 +25,7 @@
     "sloppiness": "Imprecisione",
     "opacity": "Opacità",
     "textAlign": "Allineamento del testo",
-    "edges": "",
+    "edges": "Bordi",
     "sharp": "",
     "round": "",
     "fontSize": "Dimensione carattere",
@@ -99,7 +99,7 @@
     "roomDialog": "Inizia collaborazione in diretta",
     "createNewRoom": "Crea nuova stanza",
     "toggleFullScreen": "Attiva/Disattiva schermo intero",
-    "toggleDarkMode": "",
+    "toggleDarkMode": "Attiva tema scuro",
     "toggleZenMode": "Attiva/Disattiva modalità zen",
     "exitZenMode": "Uscire dalla modalità zen"
   },
@@ -112,7 +112,9 @@
     "couldNotCopyToClipboard": "Impossibile copiare negli appunti. Provare usando il browser Chrome.",
     "decryptFailed": "Impossibile decriptare i dati.",
     "uploadedSecurly": "L'upload è stato protetto con la crittografia end-to-end, il che significa che il server Excalidraw e terze parti non possono leggere il contenuto.",
-    "loadSceneOverridePrompt": "Se carichi questo disegno esterno, sostituirà quello che hai. Vuoi continuare?"
+    "loadSceneOverridePrompt": "Se carichi questo disegno esterno, sostituirà quello che hai. Vuoi continuare?",
+    "errorLoadingLibrary": "",
+    "confirmAddLibrary": ""
   },
   "toolBar": {
     "selection": "Selezione",
@@ -161,7 +163,6 @@
     "button_startSession": "Avvia sessione",
     "button_stopSession": "Termina sessione",
     "desc_inProgressIntro": "La sessione di collaborazione è attualmente in corso.",
-    "desc_persistenceWarning": "Tieni presente che i dati della scena sono condivisi tra i collaboratori in modo P2P e non persistono sul nostro server. Pertanto, se vi disconnettere tutti, perderete i dati a meno che non li esportiate in un file o in un link condivisibile.",
     "desc_shareLink": "Condividi questo link con chiunque desideri collaborare:",
     "desc_exitSession": "Interrompere la sessione scollegherà la tua stanza ma potrai continuare a lavorare con la scena, localmente. Tieni presente che questo non influirà sulle altre persone, e che saranno ancora in grado di collaborare alla loro versione."
   },

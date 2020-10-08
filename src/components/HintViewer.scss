@@ -1,31 +1,33 @@
 @import "../css/_variables";
 
-.HintViewer {
-  pointer-events: none;
-  box-sizing: border-box;
-  position: absolute;
-  display: flex;
-  justify-content: center;
-  left: 0;
-  top: 100%;
-  max-width: 100%;
-  width: 100%;
-  margin-top: 6px;
-  text-align: center;
-  color: $oc-gray-6;
-  font-size: 0.8rem;
+.excalidraw {
+  .HintViewer {
+    pointer-events: none;
+    box-sizing: border-box;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    left: 0;
+    top: 100%;
+    max-width: 100%;
+    width: 100%;
+    margin-top: 6px;
+    text-align: center;
+    color: $oc-gray-6;
+    font-size: 0.8rem;
 
-  @media (min-width: 1200px) {
-    white-space: pre;
-  }
+    @media (min-width: 1200px) {
+      white-space: pre;
+    }
 
-  @media #{$media-query} {
-    position: static;
-  }
+    @media #{$media-query} {
+      position: static;
+    }
 
-  > span {
-    padding: 0.2rem 0.4rem;
-    background-color: var(--overlay-background-color);
-    border-radius: 4px;
+    > span {
+      padding: 0.2rem 0.4rem;
+      background-color: var(--overlay-background-color);
+      border-radius: 4px;
+    }
   }
 }

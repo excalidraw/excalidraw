@@ -112,7 +112,9 @@
     "couldNotCopyToClipboard": "Неуспешно копиране в клипборда. Опитайте да използвате браузъра Chrome.",
     "decryptFailed": "Данните не можаха да се дешифрират.",
     "uploadedSecurly": "Качването е защитено с криптиране от край до край, което означава, че сървърът Excalidraw и трети страни не могат да четат съдържанието.",
-    "loadSceneOverridePrompt": ""
+    "loadSceneOverridePrompt": "",
+    "errorLoadingLibrary": "",
+    "confirmAddLibrary": ""
   },
   "toolBar": {
     "selection": "Селекция",
@@ -161,7 +163,6 @@
     "button_startSession": "Стартирайте сесията",
     "button_stopSession": "Стоп на сесията",
     "desc_inProgressIntro": "Сесията за сътрудничество на живо е в ход.",
-    "desc_persistenceWarning": "",
     "desc_shareLink": "Споделете тази връзка с всеки, с когото искате да си сътрудничите:",
     "desc_exitSession": ""
   },

@@ -17,7 +17,7 @@ import {
   getPerfectElementSize,
   getNormalizedDimensions,
   getElementMap,
-  getDrawingVersion,
+  getSceneVersion,
   getSyncableElements,
   newLinearElement,
   transformElements,
@@ -175,6 +175,12 @@ import {
 } from "../element/binding";
 import { MaybeTransformHandleType } from "../element/transformHandles";
 import { renderSpreadsheet } from "../charts";
+import { isValidLibrary } from "../data/json";
+import {
+  loadFromFirebase,
+  saveToFirebase,
+  isSavedToFirebase,
+} from "../data/firebase";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -209,7 +215,7 @@ const gesture: Gesture = {
   initialScale: null,
 };
 
-type PointerDownState = Readonly<{
+export type PointerDownState = Readonly<{
   // The first position at which pointerDown happened
   origin: Readonly<{ x: number; y: number }>;
   // Same as "origin" but snapped to the grid, if grid is on
@@ -218,6 +224,9 @@ type PointerDownState = Readonly<{
   scrollbars: ReturnType<typeof isOverScrollBars>;
   // The previous pointer position
   lastCoords: { x: number; y: number };
+  // map of original elements data
+  // (for now only a subset of props for perf reasons)
+  originalElements: Map<string, Pick<ExcalidrawElement, "x" | "y" | "angle">>;
   resize: {
     // Handle when resizing, might change during the pointer interaction
     handleType: MaybeTransformHandleType;
@@ -229,8 +238,6 @@ type PointerDownState = Readonly<{
     arrowDirection: "origin" | "end";
     // This is a center point of selected elements determined on the initial pointer down event (for rotation only)
     center: { x: number; y: number };
-    // This is a list of selected elements determined on the initial pointer down event (for rotation only)
-    originalElements: readonly NonDeleted<ExcalidrawElement>[];
   };
   hit: {
     // The element the pointer is "hitting", is determined on the initial
@@ -466,6 +473,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       return false;
     }
 
+    const roomID = roomMatch[1];
+
     let collabForceLoadFlag;
     try {
       collabForceLoadFlag = localStorage?.getItem(
@@ -483,7 +492,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         );
         // if loading same room as the one previously unloaded within 15sec
         //  force reload without prompting
-        if (previousRoom === roomMatch[1] && Date.now() - timestamp < 15000) {
+        if (previousRoom === roomID && Date.now() - timestamp < 15000) {
           return true;
         }
       } catch {}
@@ -491,7 +500,71 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     return false;
   }
 
+  private addToLibrary = async (url: string) => {
+    window.history.replaceState({}, "Excalidraw", window.location.origin);
+    try {
+      const request = await fetch(url);
+      const blob = await request.blob();
+      const json = JSON.parse(await blob.text());
+      if (!isValidLibrary(json)) {
+        throw new Error();
+      }
+      if (
+        window.confirm(
+          t("alerts.confirmAddLibrary", { numShapes: json.library.length }),
+        )
+      ) {
+        await Library.importLibrary(blob);
+        this.setState({
+          isLibraryOpen: true,
+        });
+      }
+    } catch (error) {
+      window.alert(t("alerts.errorLoadingLibrary"));
+      console.error(error);
+    }
+  };
+
+  /** Completely resets scene & history.
+   * Do not use for clear scene user action. */
+  private resetScene = withBatchedUpdates(() => {
+    this.scene.replaceAllElements([]);
+    this.setState({
+      ...getDefaultAppState(),
+      appearance: this.state.appearance,
+      username: this.state.username,
+    });
+    history.clear();
+  });
+
   private initializeScene = async () => {
+    if ("launchQueue" in window && "LaunchParams" in window) {
+      (window as any).launchQueue.setConsumer(
+        async (launchParams: { files: any[] }) => {
+          if (!launchParams.files.length) {
+            return;
+          }
+          const fileHandle = launchParams.files[0];
+          const blob = await fileHandle.getFile();
+          blob.handle = fileHandle;
+          loadFromBlob(blob, this.state)
+            .then(({ elements, appState }) =>
+              this.syncActionResult({
+                elements,
+                appState: {
+                  ...(appState || this.state),
+                  isLoading: false,
+                },
+                commitToHistory: true,
+              }),
+            )
+            .catch((error) => {
+              this.setState({ isLoading: false, errorMessage: error.message });
+            });
+        },
+      );
+    }
+
     const searchParams = new URLSearchParams(window.location.search);
     const id = searchParams.get("id");
     const jsonMatch = window.location.hash.match(
@@ -540,7 +613,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     if (isCollaborationScene) {
-      this.initializeSocketClient({ showLoadingState: true });
+      // when joining a room we don't want user's local scene data to be merged
+      //  into the remote scene, so set `clearScene`
+      this.initializeSocketClient({ showLoadingState: true, clearScene: true });
     } else if (scene) {
       if (scene.appState) {
         scene.appState = {
@@ -556,7 +631,17 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           ),
         };
       }
-      this.syncActionResult(scene);
+      history.clear();
+      this.syncActionResult({
+        ...scene,
+        commitToHistory: true,
+      });
+    }
+
+    const addToLibraryUrl = searchParams.get("addLibrary");
+
+    if (addToLibraryUrl) {
+      await this.addToLibrary(addToLibraryUrl);
     }
   };
 
@@ -703,7 +788,17 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         );
       } catch {}
     }
-    if (this.state.isCollaborating && this.scene.getElements().length > 0) {
+    const syncableElements = getSyncableElements(
+      this.scene.getElementsIncludingDeleted(),
+    );
+    if (
+      this.state.isCollaborating &&
+      !isSavedToFirebase(this.portal, syncableElements)
+    ) {
+      // this won't run in time if user decides to leave the site, but
+      //  the purpose is to run in immediately after user decides to stay
+      this.saveCollabRoomToFirebase(syncableElements);
+
       event.preventDefault();
       // NOTE: modern browsers no longer allow showing a custom message here
       event.returnValue = "";
@@ -725,14 +820,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
     }
 
-    document.documentElement.classList.toggle(
-      "Appearance_dark",
-      this.state.appearance === "dark",
-    );
-
-    if (this.state.isCollaborating && !this.portal.socket) {
-      this.initializeSocketClient({ showLoadingState: true });
-    }
+    document
+      .querySelector(".excalidraw")
+      ?.classList.toggle("Appearance_dark", this.state.appearance === "dark");
 
     if (
       this.state.editingLinearElement &&
@@ -839,7 +929,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     if (
-      getDrawingVersion(this.scene.getElementsIncludingDeleted()) >
+      getSceneVersion(this.scene.getElementsIncludingDeleted()) >
       this.lastBroadcastedOrReceivedSceneVersion
     ) {
       this.broadcastScene(SCENE.UPDATE, /* syncAll */ false);
@@ -1106,6 +1196,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   closePortal = () => {
+    this.saveCollabRoomToFirebase();
     window.history.pushState({}, "Excalidraw", window.location.origin);
     this.destroySocketClient();
   };
@@ -1141,12 +1232,19 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private initializeSocketClient = async (opts: {
     showLoadingState: boolean;
+    clearScene?: boolean;
   }) => {
     if (this.portal.socket) {
       return;
     }
+    if (opts.clearScene) {
+      this.resetScene();
+    }
     const roomMatch = getCollaborationLinkData(window.location.href);
     if (roomMatch) {
+      const roomID = roomMatch[1];
+      const roomKey = roomMatch[2];
+
       const initialize = () => {
         this.portal.socketInitialized = true;
         clearTimeout(initializationTimer);
@@ -1163,11 +1261,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
       const updateScene = (
         decryptedData: SocketUpdateDataSource[SCENE.INIT | SCENE.UPDATE],
-        { scrollToContent = false }: { scrollToContent?: boolean } = {},
+        {
+          init = false,
+          initFromSnapshot = false,
+        }: { init?: boolean; initFromSnapshot?: boolean } = {},
       ) => {
         const { elements: remoteElements } = decryptedData.payload;
 
-        if (scrollToContent) {
+        if (init) {
+          history.resumeRecording();
+        }
+
+        if (init || initFromSnapshot) {
           this.setState({
             ...this.state,
             ...calculateScrollCenter(
@@ -1247,7 +1352,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           // we just received!
           // Note: this needs to be set before replaceAllElements as it
           // syncronously calls render.
-          this.lastBroadcastedOrReceivedSceneVersion = getDrawingVersion(
+          this.lastBroadcastedOrReceivedSceneVersion = getSceneVersion(
             newElements,
           );
 
@@ -1259,7 +1364,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         // undo, a user makes a change, and then try to redo, your element(s) will be lost. However,
         // right now we think this is the right tradeoff.
         history.clear();
-        if (!this.portal.socketInitialized) {
+        if (!this.portal.socketInitialized && !initFromSnapshot) {
           initialize();
         }
       };
@@ -1268,11 +1373,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         /* webpackChunkName: "socketIoClient" */ "socket.io-client"
       );
 
-      this.portal.open(
-        socketIOClient(SOCKET_SERVER),
-        roomMatch[1],
-        roomMatch[2],
-      );
+      this.portal.open(socketIOClient(SOCKET_SERVER), roomID, roomKey);
 
       // All socket listeners are moving to Portal
       this.portal.socket!.on(
@@ -1292,7 +1393,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               return;
             case SCENE.INIT: {
               if (!this.portal.socketInitialized) {
-                updateScene(decryptedData, { scrollToContent: true });
+                updateScene(decryptedData, { init: true });
               }
               break;
             }
@@ -1342,6 +1443,19 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         isCollaborating: true,
         isLoading: opts.showLoadingState ? true : this.state.isLoading,
       });
+
+      try {
+        const elements = await loadFromFirebase(roomID, roomKey);
+        if (elements) {
+          updateScene(
+            { type: "SCENE_UPDATE", payload: { elements } },
+            { initFromSnapshot: true },
+          );
+        }
+      } catch (e) {
+        // log the error and move on. other peers will sync us the scene.
+        console.error(e);
+      }
     }
   };
 
@@ -1385,8 +1499,23 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
   };
 
+  saveCollabRoomToFirebase = async (
+    syncableElements: ExcalidrawElement[] = getSyncableElements(
+      this.scene.getElementsIncludingDeleted(),
+    ),
+  ) => {
+    try {
+      await saveToFirebase(this.portal, syncableElements);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   // maybe should move to Portal
-  broadcastScene = (sceneType: SCENE.INIT | SCENE.UPDATE, syncAll: boolean) => {
+  broadcastScene = async (
+    sceneType: SCENE.INIT | SCENE.UPDATE,
+    syncAll: boolean,
+  ) => {
     if (sceneType === SCENE.INIT && !syncAll) {
       throw new Error("syncAll must be true when sending SCENE.INIT");
     }
@@ -1415,7 +1544,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     };
     this.lastBroadcastedOrReceivedSceneVersion = Math.max(
       this.lastBroadcastedOrReceivedSceneVersion,
-      getDrawingVersion(this.scene.getElementsIncludingDeleted()),
+      getSceneVersion(this.scene.getElementsIncludingDeleted()),
     );
     for (const syncableElement of syncableElements) {
       this.broadcastedElementVersions.set(
@@ -1423,7 +1552,19 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         syncableElement.version,
       );
     }
-    return this.portal._broadcastSocketData(data as SocketUpdateData);
+
+    const broadcastPromise = this.portal._broadcastSocketData(
+      data as SocketUpdateData,
+    );
+
+    if (syncAll && this.state.isCollaborating) {
+      await Promise.all([
+        broadcastPromise,
+        this.saveCollabRoomToFirebase(syncableElements),
+      ]);
+    } else {
+      await broadcastPromise;
+    }
   };
 
   private onSceneUpdated = () => {
@@ -1524,6 +1665,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         });
       });
 
+      this.maybeSuggestBindingForAll(selectedElements);
+
       event.preventDefault();
     } else if (event.key === KEYS.ENTER) {
       const selectedElements = getSelectedElements(
@@ -1594,6 +1737,16 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
     if (!event[KEYS.CTRL_OR_CMD] && this.state.isBindingEnabled) {
       this.setState({ isBindingEnabled: false });
+    }
+    if (isArrowKey(event.key)) {
+      const selectedElements = getSelectedElements(
+        this.scene.getElements(),
+        this.state,
+      );
+      isBindingEnabled(this.state)
+        ? bindOrUnbindSelectedElements(selectedElements)
+        : unbindLinearElements(selectedElements);
+      this.setState({ suggestedBindings: [] });
     }
   });
 
@@ -1683,6 +1836,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       },
       onChange: withBatchedUpdates((text) => {
         updateElement(text);
+        if (isNonDeletedElement(element)) {
+          updateBoundElements(element);
+        }
       }),
       onSubmit: withBatchedUpdates((text) => {
         const isDeleted = !text.trim();
@@ -2427,13 +2583,20 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       ),
       // we need to duplicate because we'll be updating this state
       lastCoords: { ...origin },
+      originalElements: this.scene.getElements().reduce((acc, element) => {
+        acc.set(element.id, {
+          x: element.x,
+          y: element.y,
+          angle: element.angle,
+        });
+        return acc;
+      }, new Map() as PointerDownState["originalElements"]),
       resize: {
         handleType: false,
         isResizing: false,
         offset: { x: 0, y: 0 },
         arrowDirection: "origin",
         center: { x: (maxX + minX) / 2, y: (maxY + minY) / 2 },
-        originalElements: selectedElements.map((element) => ({ ...element })),
       },
       hit: {
         element: null,
@@ -2933,6 +3096,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         );
         if (
           transformElements(
+            pointerDownState,
             transformHandleType,
             (newTransformHandle) => {
               pointerDownState.resize.handleType = newTransformHandle;
@@ -2946,7 +3110,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             resizeY,
             pointerDownState.resize.center.x,
             pointerDownState.resize.center.y,
-            pointerDownState.resize.originalElements,
           )
         ) {
           this.maybeSuggestBindingForAll(selectedElements);
@@ -2996,7 +3159,25 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             pointerCoords.y - pointerDownState.drag.offset.y,
             this.state.gridSize,
           );
-          dragSelectedElements(selectedElements, dragX, dragY, this.scene);
+
+          const [dragDistanceX, dragDistanceY] = [
+            Math.abs(pointerCoords.x - pointerDownState.origin.x),
+            Math.abs(pointerCoords.y - pointerDownState.origin.y),
+          ];
+
+          // We only drag in one direction if shift is pressed
+          const lockDirection = event.shiftKey;
+
+          dragSelectedElements(
+            pointerDownState,
+            selectedElements,
+            dragX,
+            dragY,
+            this.scene,
+            lockDirection,
+            dragDistanceX,
+            dragDistanceY,
+          );
           this.maybeSuggestBindingForAll(selectedElements);
 
           // We duplicate the selected element if alt is pressed on pointer move
@@ -3610,6 +3791,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           // This will only work as of Chrome 86,
           // but can be safely ignored on older releases.
           const item = event.dataTransfer.items[0];
+          // TODO: Make this part of `AppState`.
           (window as any).handle = await (item as any).getAsFileSystemHandle();
         } catch (error) {
           console.warn(error.name, error.message);
@@ -3623,7 +3805,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               ...(appState || this.state),
               isLoading: false,
             },
-            commitToHistory: false,
+            commitToHistory: true,
           }),
         )
         .catch((error) => {
@@ -3735,6 +3917,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private handleWheel = withBatchedUpdates((event: WheelEvent) => {
     event.preventDefault();
+
+    if (isPanning) {
+      return;
+    }
+
     const { deltaX, deltaY } = event;
     const { selectedElementIds, previousSelectedElementIds } = this.state;
 
@@ -3762,7 +3949,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           Object.keys(selectedElementIds).length !== 0
             ? selectedElementIds
             : previousSelectedElementIds,
+        shouldCacheIgnoreZoom: true,
       }));
+      this.resetShouldCacheIgnoreZoomDebounced();
       return;
     }
 
@@ -3846,7 +4035,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.setState({ shouldCacheIgnoreZoom: false });
   }, 300);
 
-  private getCanvasOffsets() {
+  private getCanvasOffsets(): Pick<AppState, "offsetTop" | "offsetLeft"> {
     if (this.excalidrawRef?.current) {
       const parentElement = this.excalidrawRef.current.parentElement;
       const { left, top } = parentElement.getBoundingClientRect();

@@ -1,4 +1,4 @@
-import "./Stack.css";
+import "./Stack.scss";
 
 import React from "react";
 

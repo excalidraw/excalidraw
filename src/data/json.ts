@@ -33,12 +33,13 @@ export const saveAsJSON = async (
     type: "application/json",
   });
   const name = `${appState.name}.excalidraw`;
+  // TODO: Make this part of `AppState`.
   (window as any).handle = await fileSave(
     blob,
     {
       fileName: name,
       description: "Excalidraw file",
-      extensions: ["excalidraw"],
+      extensions: [".excalidraw"],
     },
     fileHandle || null,
   );
@@ -47,10 +48,19 @@ export const saveAsJSON = async (
 export const loadFromJSON = async (appState: AppState) => {
   const blob = await fileOpen({
     description: "Excalidraw files",
-    extensions: ["json", "excalidraw"],
+    extensions: [".json", ".excalidraw"],
     mimeTypes: ["application/json"],
   });
   return loadFromBlob(blob, appState);
+};
+
+export const isValidLibrary = (json: any) => {
+  return (
+    typeof json === "object" &&
+    json &&
+    json.type === "excalidrawlib" &&
+    json.version === 1
+  );
 };
 
 export const saveLibraryAsJSON = async () => {
@@ -71,14 +81,14 @@ export const saveLibraryAsJSON = async () => {
   await fileSave(blob, {
     fileName,
     description: "Excalidraw library file",
-    extensions: ["excalidrawlib"],
+    extensions: [".excalidrawlib"],
   });
 };
 
 export const importLibraryFromJSON = async () => {
   const blob = await fileOpen({
     description: "Excalidraw library files",
-    extensions: ["json", "excalidrawlib"],
+    extensions: [".json", ".excalidrawlib"],
     mimeTypes: ["application/json"],
   });
   Library.importLibrary(blob);
