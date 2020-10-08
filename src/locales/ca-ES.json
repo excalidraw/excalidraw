@@ -25,9 +25,9 @@
     "sloppiness": "Estil del traç",
     "opacity": "Opacitat",
     "textAlign": "Alineació del text",
-    "edges": "",
-    "sharp": "",
-    "round": "",
+    "edges": "Vores",
+    "sharp": "Agut",
+    "round": "Arrodonit",
     "fontSize": "Mida de lletra",
     "fontFamily": "Tipus de lletra",
     "onlySelected": "Només seleccionats",
@@ -72,7 +72,7 @@
     "addToLibrary": "Afegir a la biblioteca",
     "removeFromLibrary": "Eliminar de la biblioteca",
     "libraryLoadingMessage": "Carregant la biblioteca...",
-    "loadingScene": ""
+    "loadingScene": "Carregant escena ..."
   },
   "buttons": {
     "clearReset": "Netejar el llenç",
@@ -81,7 +81,7 @@
     "exportToSvg": "Exportar a SNG",
     "copyToClipboard": "Copiar al porta-retalls",
     "copyPngToClipboard": "Copiar PNG al porta-retalls",
-    "scale": "",
+    "scale": "Escala",
     "save": "Desar",
     "saveAs": "Desar com",
     "load": "Carregar",
@@ -100,7 +100,7 @@
     "roomDialog": "Començar col·laboració en directe",
     "createNewRoom": "Crear sala nova",
     "toggleFullScreen": "Commutar pantalla completa",
-    "toggleDarkMode": "",
+    "toggleDarkMode": "Commutar modo fosc",
     "toggleZenMode": "Commutar modo zen",
     "exitZenMode": "Sortir de modo zen"
   },
