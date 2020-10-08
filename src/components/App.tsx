@@ -1236,14 +1236,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   public updateScene = (
-    decryptedData: SocketUpdateDataSource[SCENE.INIT | SCENE.UPDATE],
+    remoteElements: readonly ExcalidrawElement[],
     {
       init = false,
       initFromSnapshot = false,
     }: { init?: boolean; initFromSnapshot?: boolean } = {},
   ) => {
-    const { elements: remoteElements } = decryptedData.payload;
-
     if (init) {
       history.resumeRecording();
     }
@@ -1337,11 +1335,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     // right now we think this is the right tradeoff.
     history.clear();
     if (!this.portal.socketInitialized && !initFromSnapshot) {
-      this.initialize();
+      this.initializeSocket();
     }
   };
 
-  private initialize = () => {
+  private initializeSocket = () => {
     this.portal.socketInitialized = true;
     clearTimeout(this.initializationTimer);
     if (this.state.isLoading && !this.unmounted) {
@@ -1367,7 +1365,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       // fallback in case you're not alone in the room but still don't receive
       //  initial SCENE_UPDATE message
       this.initializationTimer = setTimeout(
-        this.initialize,
+        this.initializeSocket,
         INITIAL_SCENE_UPDATE_TIMEOUT,
       );
 
@@ -1395,12 +1393,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               return;
             case SCENE.INIT: {
               if (!this.portal.socketInitialized) {
-                this.updateScene(decryptedData, { init: true });
+                this.updateScene(decryptedData.payload.elements, {
+                  init: true,
+                });
               }
               break;
             }
             case SCENE.UPDATE:
-              this.updateScene(decryptedData);
+              this.updateScene(decryptedData.payload.elements);
               break;
             case "MOUSE_LOCATION": {
               const {
@@ -1438,7 +1438,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         if (this.portal.socket) {
           this.portal.socket.off("first-in-room");
         }
-        this.initialize();
+        this.initializeSocket();
       });
 
       this.setState({
@@ -1449,10 +1449,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       try {
         const elements = await loadFromFirebase(roomID, roomKey);
         if (elements) {
-          this.updateScene(
-            { type: "SCENE_UPDATE", payload: { elements } },
-            { initFromSnapshot: true },
-          );
+          this.updateScene(elements, { initFromSnapshot: true });
         }
       } catch (e) {
         // log the error and move on. other peers will sync us the scene.
