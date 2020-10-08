@@ -25,12 +25,15 @@ describe("element binding", () => {
       width: 200,
       height: 500,
     });
-    const arrow = UI.createElement("arrow", {
-      x: 220,
-      y: 250,
-      width: 160,
-      height: 1,
+    const arrow = Keyboard.withModifierKeys({ ctrl: true }, () => {
+      return UI.createElement("arrow", {
+        x: 220,
+        y: 250,
+        width: 160,
+        height: 1,
+      });
     });
+
     expect(arrow.startBinding?.elementId).toBe(rectLeft.id);
     expect(arrow.endBinding?.elementId).toBe(rectRight.id);
 
@@ -38,9 +41,11 @@ describe("element binding", () => {
       .rotation!;
     const rotationHandleX = rotation[0] + rotation[2] / 2;
     const rotationHandleY = rotation[1] + rotation[3] / 2;
-    mouse.down(rotationHandleX, rotationHandleY);
-    mouse.move(300, 400);
-    mouse.up();
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      mouse.down(rotationHandleX, rotationHandleY);
+      mouse.move(300, 400);
+      mouse.up();
+    });
     expect(arrow.angle).toBeGreaterThan(0.7 * Math.PI);
     expect(arrow.angle).toBeLessThan(1.3 * Math.PI);
     expect(arrow.startBinding?.elementId).toBe(rectRight.id);
@@ -62,10 +67,12 @@ describe("element binding", () => {
 
       // Edit arrow with multi-point
       mouse.doubleClick();
-      // move arrow head
-      mouse.down();
-      mouse.up(0, 10);
-      expect(API.getSelectedElement().type).toBe("arrow");
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        // move arrow head
+        mouse.down();
+        mouse.up(0, 10);
+        expect(API.getSelectedElement().type).toBe("arrow");
+      });
 
       // NOTE this mouse down/up + await needs to be done in order to repro
       //  the issue, due to https://github.com/excalidraw/excalidraw/blob/46bff3daceb602accf60c40a84610797260fca94/src/components/App.tsx#L740
@@ -97,10 +104,11 @@ describe("element binding", () => {
     expect(arrow.endBinding).toBe(null);
 
     expect(API.getSelectedElement().type).toBe("arrow");
-    Keyboard.hotkeyPress("ARROW_RIGHT");
-    expect(arrow.endBinding?.elementId).toBe(rectangle.id);
-
-    Keyboard.hotkeyPress("ARROW_LEFT");
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.hotkeyPress("ARROW_RIGHT");
+      expect(arrow.endBinding?.elementId).toBe(rectangle.id);
+      Keyboard.hotkeyPress("ARROW_LEFT");
+    });
     expect(arrow.endBinding).toBe(null);
   });
 });
