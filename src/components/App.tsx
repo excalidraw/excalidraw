@@ -124,6 +124,7 @@ import {
   DEFAULT_VERTICAL_ALIGN,
   GRID_SIZE,
   LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
+  MIME_TYPES,
 } from "../constants";
 import {
   INITIAL_SCENE_UPDATE_TIMEOUT,
@@ -181,6 +182,8 @@ import {
   saveToFirebase,
   isSavedToFirebase,
 } from "../data/firebase";
+import { restore } from "../data/restore";
+import { ImportedDataState } from "../data/types";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -3765,9 +3768,57 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   private handleCanvasOnDrop = async (
     event: React.DragEvent<HTMLCanvasElement>,
   ) => {
-    const libraryShapes = event.dataTransfer.getData(
-      "application/vnd.excalidrawlib+json",
-    );
+    try {
+      const item = event.dataTransfer.items[0];
+      if (item && item.type === "image/png") {
+        const file = item.getAsFile();
+        if (file) {
+          const { default: decodePng } = await import("png-chunks-extract");
+          const { default: tEXt } = await import("png-chunk-text");
+          const chunks = decodePng(new Uint8Array(await file.arrayBuffer()));
+
+          const metadataChunk = chunks.find((chunk) => chunk.name === "tEXt");
+          if (metadataChunk) {
+            const metadata = tEXt.decode(metadataChunk.data);
+            if (metadata.keyword === MIME_TYPES.excalidraw) {
+              const data = restore(
+                JSON.parse(metadata.text) as ImportedDataState,
+              );
+              this.syncActionResult({
+                elements: data.elements,
+                appState: {
+                  ...data.appState,
+                  ...calculateScrollCenter(
+                    data.elements || [],
+                    this.state,
+                    null,
+                  ),
+                  appearance: this.state.appearance,
+                  isLoading: false,
+                },
+                commitToHistory: true,
+              });
+              return;
+            }
+            throw new Error("invalid");
+          } else {
+            throw new Error("invalid");
+          }
+        } else {
+          throw new Error("no file");
+        }
+      }
+    } catch (error) {
+      return this.setState({
+        isLoading: false,
+        errorMessage:
+          error.message === "invalid"
+            ? t("alerts.imageDoesNotContainScene")
+            : t("alerts.cannotRestoreFromImage"),
+      });
+    }
+
+    const libraryShapes = event.dataTransfer.getData(MIME_TYPES.excalidraw);
     if (libraryShapes !== "") {
       this.addElementsFromPasteOrLibrary(
         JSON.parse(libraryShapes),
@@ -3812,7 +3863,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           this.setState({ isLoading: false, errorMessage: error.message });
         });
     } else if (
-      file?.type === "application/vnd.excalidrawlib+json" ||
+      file?.type === MIME_TYPES.excalidrawlib ||
       file?.name.endsWith(".excalidrawlib")
     ) {
       Library.importLibrary(file)

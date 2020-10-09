@@ -6,6 +6,7 @@ import { fileOpen, fileSave } from "browser-nativefs";
 import { loadFromBlob } from "./blob";
 import { loadLibrary } from "./localStorage";
 import { Library } from "./library";
+import { MIME_TYPES } from "../constants";
 
 export const serializeAsJSON = (
   elements: readonly ExcalidrawElement[],
@@ -76,7 +77,7 @@ export const saveLibraryAsJSON = async () => {
   );
   const fileName = "library.excalidrawlib";
   const blob = new Blob([serialized], {
-    type: "application/vnd.excalidrawlib+json",
+    type: MIME_TYPES.excalidrawlib,
   });
   await fileSave(blob, {
     fileName,

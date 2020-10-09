@@ -29,7 +29,10 @@ export const exportToCanvas = (
     viewBackgroundColor: string;
     shouldAddWatermark: boolean;
   },
-  createCanvas: (width: number, height: number) => any = (width, height) => {
+  createCanvas: (width: number, height: number) => HTMLCanvasElement = (
+    width,
+    height,
+  ) => {
     const tempCanvas = document.createElement("canvas");
     tempCanvas.width = width * scale;
     tempCanvas.height = height * scale;
@@ -44,7 +47,7 @@ export const exportToCanvas = (
     shouldAddWatermark,
   );
 
-  const tempCanvas: any = createCanvas(width, height);
+  const tempCanvas = createCanvas(width, height);
 
   renderScene(
     sceneElements,
