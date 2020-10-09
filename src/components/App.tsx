@@ -3767,7 +3767,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     event: React.DragEvent<HTMLCanvasElement>,
   ) => {
     try {
-      const file = event.dataTransfer.files.item(0);
+      const file = event.dataTransfer.files[0];
       if (file?.type === "image/png" || file?.type === "image/svg+xml") {
         const { elements, appState } = await loadFromBlob(file, this.state);
         this.syncActionResult({
