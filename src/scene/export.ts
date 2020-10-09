@@ -84,11 +84,13 @@ export const exportToSvg = (
     exportPadding = 10,
     viewBackgroundColor,
     shouldAddWatermark,
+    metadata = "",
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
     shouldAddWatermark: boolean;
+    metadata?: string;
   },
 ): SVGSVGElement => {
   const sceneElements = getElementsAndWatermark(elements, shouldAddWatermark);
@@ -107,6 +109,7 @@ export const exportToSvg = (
 
   svgRoot.innerHTML = `
   ${SVG_EXPORT_TAG}
+  ${metadata}
   <defs>
     <style>
       @font-face {

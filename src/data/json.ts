@@ -49,8 +49,8 @@ export const saveAsJSON = async (
 export const loadFromJSON = async (appState: AppState) => {
   const blob = await fileOpen({
     description: "Excalidraw files",
-    extensions: [".json", ".excalidraw", ".png"],
-    mimeTypes: ["application/json", "image/png"],
+    extensions: [".json", ".excalidraw", ".png", ".svg"],
+    mimeTypes: ["application/json", "image/png", "image/svg+xml"],
   });
   return loadFromBlob(blob, appState);
 };

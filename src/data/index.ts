@@ -20,6 +20,7 @@ import { ExportType } from "../scene/types";
 import { restore } from "./restore";
 import { ImportedDataState } from "./types";
 import { MIME_TYPES } from "../constants";
+import { stringToBase64 } from "../base64";
 
 export { loadFromBlob } from "./blob";
 export { saveAsJSON, loadFromJSON } from "./json";
@@ -303,11 +304,21 @@ export const exportCanvas = async (
     return window.alert(t("alerts.cannotExportEmptyCanvas"));
   }
   if (type === "svg" || type === "clipboard-svg") {
+    let metadata = "";
+
+    if (appState.exportEmbedScene && type === "svg") {
+      metadata += `<!-- payload-type:${MIME_TYPES.excalidraw} -->`;
+      metadata += "<!-- payload-start -->";
+      metadata += await stringToBase64(serializeAsJSON(elements, appState));
+      metadata += "<!-- payload-end -->";
+    }
+
     const tempSvg = exportToSvg(elements, {
       exportBackground,
       viewBackgroundColor,
       exportPadding,
       shouldAddWatermark,
+      metadata,
     });
     if (type === "svg") {
       await fileSave(new Blob([tempSvg.outerHTML], { type: "image/svg+xml" }), {
