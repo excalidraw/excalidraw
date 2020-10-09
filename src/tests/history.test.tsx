@@ -96,6 +96,7 @@ describe("history", () => {
     Object.defineProperty(fileDropEvent, "dataTransfer", {
       value: {
         files: [file],
+        items: [],
         getData: (_type: string) => {
           return "";
         },
