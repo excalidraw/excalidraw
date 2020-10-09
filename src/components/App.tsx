@@ -182,8 +182,6 @@ import {
   saveToFirebase,
   isSavedToFirebase,
 } from "../data/firebase";
-import { restore } from "../data/restore";
-import { ImportedDataState } from "../data/types";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -3769,52 +3767,27 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     event: React.DragEvent<HTMLCanvasElement>,
   ) => {
     try {
-      const item = event.dataTransfer.items[0];
-      if (item && item.type === "image/png") {
+      const item = event.dataTransfer.items[0] as DataTransferItem | undefined;
+      if (item?.type === "image/png") {
         const file = item.getAsFile();
         if (file) {
-          const { default: decodePng } = await import("png-chunks-extract");
-          const { default: tEXt } = await import("png-chunk-text");
-          const chunks = decodePng(new Uint8Array(await file.arrayBuffer()));
-
-          const metadataChunk = chunks.find((chunk) => chunk.name === "tEXt");
-          if (metadataChunk) {
-            const metadata = tEXt.decode(metadataChunk.data);
-            if (metadata.keyword === MIME_TYPES.excalidraw) {
-              const data = restore(
-                JSON.parse(metadata.text) as ImportedDataState,
-              );
-              this.syncActionResult({
-                elements: data.elements,
-                appState: {
-                  ...data.appState,
-                  ...calculateScrollCenter(
-                    data.elements || [],
-                    this.state,
-                    null,
-                  ),
-                  appearance: this.state.appearance,
-                  isLoading: false,
-                },
-                commitToHistory: true,
-              });
-              return;
-            }
-            throw new Error("invalid");
-          } else {
-            throw new Error("invalid");
-          }
-        } else {
-          throw new Error("no file");
+          const { elements, appState } = await loadFromBlob(file, this.state);
+          this.syncActionResult({
+            elements,
+            appState: {
+              ...(appState || this.state),
+              isLoading: false,
+            },
+            commitToHistory: true,
+          });
+          return;
         }
+        throw new Error(t("alerts.cannotRestoreFromImage"));
       }
     } catch (error) {
       return this.setState({
         isLoading: false,
-        errorMessage:
-          error.message === "invalid"
-            ? t("alerts.imageDoesNotContainScene")
-            : t("alerts.cannotRestoreFromImage"),
+        errorMessage: error.message,
       });
     }
 
