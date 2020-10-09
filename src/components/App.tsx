@@ -3767,22 +3767,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     event: React.DragEvent<HTMLCanvasElement>,
   ) => {
     try {
-      const item = event.dataTransfer.items[0] as DataTransferItem | undefined;
-      if (item?.type === "image/png") {
-        const file = item.getAsFile();
-        if (file) {
-          const { elements, appState } = await loadFromBlob(file, this.state);
-          this.syncActionResult({
-            elements,
-            appState: {
-              ...(appState || this.state),
-              isLoading: false,
-            },
-            commitToHistory: true,
-          });
-          return;
-        }
-        throw new Error(t("alerts.cannotRestoreFromImage"));
+      const file = event.dataTransfer.files.item(0);
+      if (file?.type === "image/png") {
+        const { elements, appState } = await loadFromBlob(file, this.state);
+        this.syncActionResult({
+          elements,
+          appState: {
+            ...(appState || this.state),
+            isLoading: false,
+          },
+          commitToHistory: true,
+        });
+        return;
       }
     } catch (error) {
       return this.setState({
