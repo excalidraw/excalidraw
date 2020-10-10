@@ -1255,11 +1255,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.setScrollToCenter(remoteElements);
     }
 
+    this.updateScene(remoteElements);
+
     if (!this.portal.socketInitialized && !initFromSnapshot) {
       this.initializeSocket();
     }
-
-    this.updateScene(remoteElements);
   };
 
   private destroySocketClient = () => {
