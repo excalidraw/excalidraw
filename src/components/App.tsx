@@ -268,6 +268,12 @@ export type PointerDownState = Readonly<{
   };
 }>;
 
+export type ExcalidrawImperativeAPI =
+  | {
+      updateScene: InstanceType<typeof App>["updateScene"];
+    }
+  | undefined;
+
 class App extends React.Component<ExcalidrawProps, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
@@ -298,7 +304,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       username: user?.name || "",
       ...this.getCanvasOffsets(),
     };
-    if (forwardedRef) {
+    if (forwardedRef && "current" in forwardedRef) {
       forwardedRef.current = {
         updateScene: this.updateScene,
       };

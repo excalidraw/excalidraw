@@ -1,7 +1,7 @@
 import React, { useEffect, forwardRef } from "react";
 
 import { InitializeApp } from "../components/InitializeApp";
-import App from "../components/App";
+import App, { ExcalidrawImperativeAPI } from "../components/App";
 
 import "../css/app.scss";
 import "../css/styles.scss";
@@ -55,7 +55,12 @@ const Excalidraw = (props: ExcalidrawProps) => {
   );
 };
 
-const areEqual = (prevProps: ExcalidrawProps, nextProps: ExcalidrawProps) => {
+type PublicExcalidrawProps = Omit<ExcalidrawProps, "forwardedRef">;
+
+const areEqual = (
+  prevProps: PublicExcalidrawProps,
+  nextProps: PublicExcalidrawProps,
+) => {
   const { initialData: prevInitialData, user: prevUser, ...prev } = prevProps;
   const { initialData: nextInitialData, user: nextUser, ...next } = nextProps;
 
@@ -69,7 +74,8 @@ const areEqual = (prevProps: ExcalidrawProps, nextProps: ExcalidrawProps) => {
   );
 };
 
-const forwardedRefComp = forwardRef((props: ExcalidrawProps, ref) => (
-  <Excalidraw {...props} forwardedRef={ref} />
-));
+const forwardedRefComp = forwardRef<
+  ExcalidrawImperativeAPI,
+  PublicExcalidrawProps
+>((props, ref) => <Excalidraw {...props} forwardedRef={ref} />);
 export default React.memo(forwardedRefComp, areEqual);
