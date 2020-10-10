@@ -1229,7 +1229,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   setScrollToCenter = (remoteElements: readonly ExcalidrawElement[]) => {
     this.setState({
-      ...this.state,
       ...calculateScrollCenter(
         remoteElements.filter((element: { isDeleted: boolean }) => {
           return !element.isDeleted;
@@ -1273,7 +1272,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   public updateScene = (
     remoteElements: readonly ExcalidrawElement[],
     { replaceAll = false }: { replaceAll?: boolean } = {},
+    remoteAppState?: AppState,
   ) => {
+    // currently we only support syncing background color
+    if (remoteAppState?.viewBackgroundColor) {
+      this.setState({
+        viewBackgroundColor: remoteAppState.viewBackgroundColor,
+      });
+    }
     // Perform reconciliation - in collaboration, if we encounter
     // elements with more staler versions than ours, ignore them
     // and keep ours.
