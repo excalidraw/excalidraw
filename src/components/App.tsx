@@ -1240,6 +1240,28 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     });
   };
 
+  private handleSceneUpdate = (
+    remoteElements: readonly ExcalidrawElement[],
+    {
+      init = false,
+      initFromSnapshot = false,
+    }: { init?: boolean; initFromSnapshot?: boolean } = {},
+  ) => {
+    if (init) {
+      history.resumeRecording();
+    }
+
+    if (init || initFromSnapshot) {
+      this.setScrollToCenter(remoteElements);
+    }
+
+    if (!this.portal.socketInitialized && !initFromSnapshot) {
+      this.initializeSocket();
+    }
+
+    this.updateScene(remoteElements);
+  };
+
   private destroySocketClient = () => {
     this.setState({
       isCollaborating: false,
@@ -1381,15 +1403,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             case SCENE.INIT: {
               if (!this.portal.socketInitialized) {
                 const remoteElements = decryptedData.payload.elements;
-                history.resumeRecording();
-                this.setScrollToCenter(remoteElements);
-                this.updateScene(remoteElements);
-                this.initializeSocket();
+                this.handleSceneUpdate(remoteElements, { init: true });
               }
               break;
             }
             case SCENE.UPDATE:
-              this.updateScene(decryptedData.payload.elements);
+              this.handleSceneUpdate(decryptedData.payload.elements);
               break;
             case "MOUSE_LOCATION": {
               const {
@@ -1438,8 +1457,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       try {
         const elements = await loadFromFirebase(roomID, roomKey);
         if (elements) {
-          this.setScrollToCenter(elements);
-          this.updateScene(elements);
+          this.handleSceneUpdate(elements, { initFromSnapshot: true });
         }
       } catch (e) {
         // log the error and move on. other peers will sync us the scene.
