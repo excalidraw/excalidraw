@@ -1227,6 +1227,19 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     });
   };
 
+  setScrollToCenter = (remoteElements: readonly ExcalidrawElement[]) => {
+    this.setState({
+      ...this.state,
+      ...calculateScrollCenter(
+        remoteElements.filter((element: { isDeleted: boolean }) => {
+          return !element.isDeleted;
+        }),
+        this.state,
+        this.canvas,
+      ),
+    });
+  };
+
   private destroySocketClient = () => {
     this.setState({
       isCollaborating: false,
@@ -1235,30 +1248,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.portal.close();
   };
 
-  public updateScene = (
-    remoteElements: readonly ExcalidrawElement[],
-    {
-      init = false,
-      initFromSnapshot = false,
-    }: { init?: boolean; initFromSnapshot?: boolean } = {},
-  ) => {
-    if (init) {
-      history.resumeRecording();
-    }
-
-    if (init || initFromSnapshot) {
-      this.setState({
-        ...this.state,
-        ...calculateScrollCenter(
-          remoteElements.filter((element: { isDeleted: boolean }) => {
-            return !element.isDeleted;
-          }),
-          this.state,
-          this.canvas,
-        ),
-      });
-    }
-
+  public updateScene = (remoteElements: readonly ExcalidrawElement[]) => {
     // Perform reconciliation - in collaboration, if we encounter
     // elements with more staler versions than ours, ignore them
     // and keep ours.
@@ -1334,9 +1324,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     // undo, a user makes a change, and then try to redo, your element(s) will be lost. However,
     // right now we think this is the right tradeoff.
     history.clear();
-    if (!this.portal.socketInitialized && !initFromSnapshot) {
-      this.initializeSocket();
-    }
   };
 
   private initializeSocket = () => {
@@ -1393,9 +1380,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               return;
             case SCENE.INIT: {
               if (!this.portal.socketInitialized) {
-                this.updateScene(decryptedData.payload.elements, {
-                  init: true,
-                });
+                const remoteElements = decryptedData.payload.elements;
+                history.resumeRecording();
+                this.setScrollToCenter(remoteElements);
+                this.updateScene(remoteElements);
+                this.initializeSocket();
               }
               break;
             }
@@ -1449,7 +1438,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       try {
         const elements = await loadFromFirebase(roomID, roomKey);
         if (elements) {
-          this.updateScene(elements, { initFromSnapshot: true });
+          this.setScrollToCenter(elements);
+          this.updateScene(elements);
         }
       } catch (e) {
         // log the error and move on. other peers will sync us the scene.
