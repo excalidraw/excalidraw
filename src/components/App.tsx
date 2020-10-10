@@ -1270,21 +1270,20 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.portal.close();
   };
 
-  public updateScene = (remoteElements: readonly ExcalidrawElement[]) => {
+  public updateScene = (
+    remoteElements: readonly ExcalidrawElement[],
+    { replaceAll = false }: { replaceAll?: boolean } = {},
+  ) => {
     // Perform reconciliation - in collaboration, if we encounter
     // elements with more staler versions than ours, ignore them
     // and keep ours.
-    if (
-      this.scene.getElementsIncludingDeleted() == null ||
-      this.scene.getElementsIncludingDeleted().length === 0
-    ) {
+    const currentElements = this.scene.getElementsIncludingDeleted();
+    if (replaceAll || !currentElements || !currentElements.length) {
       this.scene.replaceAllElements(remoteElements);
     } else {
       // create a map of ids so we don't have to iterate
       // over the array more than once.
-      const localElementMap = getElementMap(
-        this.scene.getElementsIncludingDeleted(),
-      );
+      const localElementMap = getElementMap(currentElements);
 
       // Reconcile
       const newElements = remoteElements
