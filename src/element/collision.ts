@@ -199,11 +199,10 @@ const distanceToRectangle = (
   point: Point,
 ): number => {
   const [, pointRel, hwidth, hheight] = pointRelativeToElement(element, point);
-  const nearSide =
-    GAPoint.distanceToLine(pointRel, GALine.vector(hwidth, hheight)) > 0
-      ? GALine.equation(0, 1, -hheight)
-      : GALine.equation(1, 0, -hwidth);
-  return GAPoint.distanceToLine(pointRel, nearSide);
+  return Math.max(
+    GAPoint.distanceToLine(pointRel, GALine.equation(0, 1, -hheight)),
+    GAPoint.distanceToLine(pointRel, GALine.equation(1, 0, -hwidth)),
+  );
 };
 
 const distanceToDiamond = (
