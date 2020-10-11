@@ -1281,11 +1281,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     },
     { replaceAll = false }: { replaceAll?: boolean } = {},
   ) => {
-    const { elements: sceneElements, appState } = sceneData;
     // currently we only support syncing background color
-    if (appState?.viewBackgroundColor) {
+    if (sceneData.appState?.viewBackgroundColor) {
       this.setState({
-        viewBackgroundColor: appState.viewBackgroundColor,
+        viewBackgroundColor: sceneData.appState.viewBackgroundColor,
       });
     }
     // Perform reconciliation - in collaboration, if we encounter
@@ -1293,14 +1292,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     // and keep ours.
     const currentElements = this.scene.getElementsIncludingDeleted();
     if (replaceAll || !currentElements.length) {
-      this.scene.replaceAllElements(sceneElements);
+      this.scene.replaceAllElements(sceneData.elements);
     } else {
       // create a map of ids so we don't have to iterate
       // over the array more than once.
       const localElementMap = getElementMap(currentElements);
 
       // Reconcile
-      const newElements = sceneElements
+      const newElements = sceneData.elements
         .reduce((elements, element) => {
           // if the remote element references one that's currently
           //  edited on local, skip it (it'll be added in the next
@@ -1341,7 +1340,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           }
 
           return elements;
-        }, [] as Mutable<typeof sceneElements>)
+        }, [] as Mutable<typeof sceneData.elements>)
         // add local elements that weren't deleted or on remote
         .concat(...Object.values(localElementMap));
 
