@@ -23,10 +23,6 @@ const loadFileContents = async (blob: any) => {
   return contents;
 };
 
-/**
- * @param blob
- * @param localAppState
- */
 export const loadFromBlob = async (
   blob: any,
   /** @see restore.localAppState */
@@ -54,7 +50,7 @@ export const loadFromBlob = async (
             : {}),
         },
       },
-      localAppState || null,
+      localAppState,
     );
   } catch {
     throw new Error(t("alerts.couldNotLoadInvalidFile"));

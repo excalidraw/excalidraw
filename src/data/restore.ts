@@ -166,11 +166,13 @@ const restoreAppState = (
 
 export const restore = (
   data: ImportedDataState,
-  /** restore takes localAppState (`this.state` or initial state
-    from localStorage) so that we don't overwrite local state with default
-    values (when values not explicitly specified).
-   Supply null if you can't get access to it */
-  localAppState: Partial<AppState> | null,
+  /**
+   * Local AppState (`this.state` or initial state from localStorage) so that we
+   *  don't overwrite local state with default values (when values not
+   *  explicitly specified).
+   * Supply null if you can't get access to it
+   */
+  localAppState: Partial<AppState> | null | undefined,
 ): DataState => {
   return {
     elements: restoreElements(data.elements),

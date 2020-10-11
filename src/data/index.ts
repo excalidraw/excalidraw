@@ -373,7 +373,7 @@ export const loadScene = async (
     // extra care not to leak it
     data = restore(
       await importFromBackend(id, privateKey),
-      initialData?.appState || null,
+      initialData?.appState,
     );
   } else {
     data = restore(initialData || {}, null);
