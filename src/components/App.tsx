@@ -1245,7 +1245,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   private handleRemoteSceneUpdate = (
-    remoteElements: readonly ExcalidrawElement[],
+    elements: readonly ExcalidrawElement[],
     {
       init = false,
       initFromSnapshot = false,
@@ -1256,10 +1256,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     if (init || initFromSnapshot) {
-      this.setScrollToCenter(remoteElements);
+      this.setScrollToCenter(elements);
     }
 
-    this.updateScene({ elements: remoteElements });
+    this.updateScene({ elements });
 
     if (!this.portal.socketInitialized && !initFromSnapshot) {
       this.initializeSocket();
@@ -1281,10 +1281,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     },
     { replaceAll = false }: { replaceAll?: boolean } = {},
   ) => {
+    const { elements: remoteElements, appState } = sceneData;
     // currently we only support syncing background color
-    if (sceneData.appState?.viewBackgroundColor) {
+    if (appState?.viewBackgroundColor) {
       this.setState({
-        viewBackgroundColor: sceneData.appState.viewBackgroundColor,
+        viewBackgroundColor: appState.viewBackgroundColor,
       });
     }
     // Perform reconciliation - in collaboration, if we encounter
@@ -1292,14 +1293,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     // and keep ours.
     const currentElements = this.scene.getElementsIncludingDeleted();
     if (replaceAll || !currentElements.length) {
-      this.scene.replaceAllElements(sceneData.elements);
+      this.scene.replaceAllElements(remoteElements);
     } else {
       // create a map of ids so we don't have to iterate
       // over the array more than once.
       const localElementMap = getElementMap(currentElements);
 
       // Reconcile
-      const newElements = sceneData.elements
+      const newElements = remoteElements
         .reduce((elements, element) => {
           // if the remote element references one that's currently
           //  edited on local, skip it (it'll be added in the next
@@ -1340,7 +1341,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           }
 
           return elements;
-        }, [] as Mutable<typeof sceneData.elements>)
+        }, [] as Mutable<typeof remoteElements>)
         // add local elements that weren't deleted or on remote
         .concat(...Object.values(localElementMap));
 
