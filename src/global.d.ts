@@ -61,3 +61,18 @@ declare module "png-chunks-extract" {
   export = extract;
 }
 // -----------------------------------------------------------------------------
+
+// -----------------------------------------------------------------------------
+// type getter for interface's callable type
+// src: https://stackoverflow.com/a/58658851/927631
+// -----------------------------------------------------------------------------
+type SignatureType<T> = T extends (...args: infer R) => any ? R : never;
+type CallableType<T extends (...args: any[]) => any> = (
+  ...args: SignatureType<T>
+) => ReturnType<T>;
+// --------------------------------------------------------------------------—
+
+// Type for React.forwardRef --- supply only the first generic argument T
+type ForwardRef<T, P = any> = Parameters<
+  CallableType<React.ForwardRefRenderFunction<T, P>>
+>[1];
