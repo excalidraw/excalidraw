@@ -15,6 +15,7 @@ import { SocketUpdateDataSource } from "./data";
 import { LinearElementEditor } from "./element/linearElementEditor";
 import { SuggestedBinding } from "./element/binding";
 import { ImportedDataState } from "./data/types";
+import { ExcalidrawImperativeAPI } from "./components/App";
 
 export type FlooredNumber = number & { _brand: "FlooredNumber" };
 export type Point = Readonly<RoughPoint>;
@@ -132,4 +133,5 @@ export interface ExcalidrawProps {
     name?: string | null;
   };
   onUsernameChange?: (username: string) => void;
+  forwardedRef: ForwardRef<ExcalidrawImperativeAPI>;
 }

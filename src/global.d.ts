@@ -40,3 +40,17 @@ type ResolutionType<T extends (...args: any) => any> = T extends (
 
 // https://github.com/krzkaczor/ts-essentials
 type MarkOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+
+// type getter for interface's callable type
+// src: https://stackoverflow.com/a/58658851/927631
+// -----------------------------------------------------------------------------
+type SignatureType<T> = T extends (...args: infer R) => any ? R : never;
+type CallableType<T extends (...args: any[]) => any> = (
+  ...args: SignatureType<T>
+) => ReturnType<T>;
+// --------------------------------------------------------------------------—
+
+// Type for React.forwardRef --- supply only the first generic argument T
+type ForwardRef<T, P = any> = Parameters<
+  CallableType<React.ForwardRefRenderFunction<T, P>>
+>[1];

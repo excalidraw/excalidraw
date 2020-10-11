@@ -1,7 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useEffect, forwardRef } from "react";
 
 import { InitializeApp } from "../components/InitializeApp";
-import App from "../components/App";
+import App, { ExcalidrawImperativeAPI } from "../components/App";
 
 import "../css/app.scss";
 import "../css/styles.scss";
@@ -17,6 +17,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     initialData,
     user,
     onUsernameChange,
+    forwardedRef,
   } = props;
 
   useEffect(() => {
@@ -47,13 +48,19 @@ const Excalidraw = (props: ExcalidrawProps) => {
           initialData={initialData}
           user={user}
           onUsernameChange={onUsernameChange}
+          forwardedRef={forwardedRef}
         />
       </IsMobileProvider>
     </InitializeApp>
   );
 };
 
-const areEqual = (prevProps: ExcalidrawProps, nextProps: ExcalidrawProps) => {
+type PublicExcalidrawProps = Omit<ExcalidrawProps, "forwardedRef">;
+
+const areEqual = (
+  prevProps: PublicExcalidrawProps,
+  nextProps: PublicExcalidrawProps,
+) => {
   const { initialData: prevInitialData, user: prevUser, ...prev } = prevProps;
   const { initialData: nextInitialData, user: nextUser, ...next } = nextProps;
 
@@ -67,4 +74,8 @@ const areEqual = (prevProps: ExcalidrawProps, nextProps: ExcalidrawProps) => {
   );
 };
 
-export default React.memo(Excalidraw, areEqual);
+const forwardedRefComp = forwardRef<
+  ExcalidrawImperativeAPI,
+  PublicExcalidrawProps
+>((props, ref) => <Excalidraw {...props} forwardedRef={ref} />);
+export default React.memo(forwardedRefComp, areEqual);
