@@ -32,6 +32,7 @@ import {
   dragNewElement,
   hitTest,
   isHittingElementBoundingBoxWithoutHittingElement,
+  getNonDeletedElements,
 } from "../element";
 import {
   getElementsWithinSelection,
@@ -283,7 +284,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   unmounted: boolean = false;
   actionManager: ActionManager;
   private excalidrawRef: any;
-  private initializationTimer: any;
+  private socketInitializationTimer: any;
 
   public static defaultProps: Partial<ExcalidrawProps> = {
     width: window.innerWidth,
@@ -1236,16 +1237,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   setScrollToCenter = (remoteElements: readonly ExcalidrawElement[]) => {
     this.setState({
       ...calculateScrollCenter(
-        remoteElements.filter((element: { isDeleted: boolean }) => {
-          return !element.isDeleted;
-        }),
+        getNonDeletedElements(remoteElements),
         this.state,
         this.canvas,
       ),
     });
   };
 
-  private handleSceneUpdate = (
+  private handleRemoteSceneUpdate = (
     remoteElements: readonly ExcalidrawElement[],
     {
       init = false,
@@ -1363,7 +1362,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private initializeSocket = () => {
     this.portal.socketInitialized = true;
-    clearTimeout(this.initializationTimer);
+    clearTimeout(this.socketInitializationTimer);
     if (this.state.isLoading && !this.unmounted) {
       this.setState({ isLoading: false });
     }
@@ -1386,7 +1385,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
       // fallback in case you're not alone in the room but still don't receive
       //  initial SCENE_UPDATE message
-      this.initializationTimer = setTimeout(
+      this.socketInitializationTimer = setTimeout(
         this.initializeSocket,
         INITIAL_SCENE_UPDATE_TIMEOUT,
       );
@@ -1416,12 +1415,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             case SCENE.INIT: {
               if (!this.portal.socketInitialized) {
                 const remoteElements = decryptedData.payload.elements;
-                this.handleSceneUpdate(remoteElements, { init: true });
+                this.handleRemoteSceneUpdate(remoteElements, { init: true });
               }
               break;
             }
             case SCENE.UPDATE:
-              this.handleSceneUpdate(decryptedData.payload.elements);
+              this.handleRemoteSceneUpdate(decryptedData.payload.elements);
               break;
             case "MOUSE_LOCATION": {
               const {
@@ -1470,7 +1469,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       try {
         const elements = await loadFromFirebase(roomID, roomKey);
         if (elements) {
-          this.handleSceneUpdate(elements, { initFromSnapshot: true });
+          this.handleRemoteSceneUpdate(elements, { initFromSnapshot: true });
         }
       } catch (e) {
         // log the error and move on. other peers will sync us the scene.
