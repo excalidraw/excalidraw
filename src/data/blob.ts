@@ -25,9 +25,13 @@ const loadFileContents = async (blob: any) => {
 
 /**
  * @param blob
- * @param appState if provided, used for centering scroll to restored scene
+ * @param localAppState
  */
-export const loadFromBlob = async (blob: any, appState?: AppState) => {
+export const loadFromBlob = async (
+  blob: any,
+  /** @see restore.localAppState */
+  localAppState: AppState | null,
+) => {
   if (blob.handle) {
     // TODO: Make this part of `AppState`.
     (window as any).handle = blob.handle;
@@ -39,16 +43,19 @@ export const loadFromBlob = async (blob: any, appState?: AppState) => {
     if (data.type !== "excalidraw") {
       throw new Error(t("alerts.couldNotLoadInvalidFile"));
     }
-    return restore({
-      elements: data.elements,
-      appState: {
-        appearance: appState?.appearance,
-        ...cleanAppStateForExport(data.appState || {}),
-        ...(appState
-          ? calculateScrollCenter(data.elements || [], appState, null)
-          : {}),
+    return restore(
+      {
+        elements: data.elements,
+        appState: {
+          appearance: localAppState?.appearance,
+          ...cleanAppStateForExport(data.appState || {}),
+          ...(localAppState
+            ? calculateScrollCenter(data.elements || [], localAppState, null)
+            : {}),
+        },
       },
-    });
+      localAppState || null,
+    );
   } catch {
     throw new Error(t("alerts.couldNotLoadInvalidFile"));
   }
