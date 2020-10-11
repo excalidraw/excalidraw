@@ -679,7 +679,7 @@ const renderBindingHighlightForBindableElement = (
   const strokeOffset = 4;
   context.strokeStyle = "rgba(0,0,0,.05)";
   context.lineWidth = threshold - strokeOffset;
-  const padding = strokeOffset + threshold / 2;
+  const padding = strokeOffset / 2 + threshold / 2;
 
   switch (element.type) {
     case "rectangle":
