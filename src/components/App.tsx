@@ -1260,7 +1260,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.setScrollToCenter(remoteElements);
     }
 
-    this.updateScene(remoteElements);
+    this.updateScene({ elements: remoteElements });
 
     if (!this.portal.socketInitialized && !initFromSnapshot) {
       this.initializeSocket();
@@ -1276,29 +1276,31 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   public updateScene = (
-    remoteElements: readonly ExcalidrawElement[],
+    sceneData: {
+      elements: readonly ExcalidrawElement[];
+      appState?: AppState;
+    },
     { replaceAll = false }: { replaceAll?: boolean } = {},
-    remoteAppState?: AppState,
   ) => {
     // currently we only support syncing background color
-    if (remoteAppState?.viewBackgroundColor) {
+    if (sceneData.appState?.viewBackgroundColor) {
       this.setState({
-        viewBackgroundColor: remoteAppState.viewBackgroundColor,
+        viewBackgroundColor: sceneData.appState.viewBackgroundColor,
       });
     }
     // Perform reconciliation - in collaboration, if we encounter
     // elements with more staler versions than ours, ignore them
     // and keep ours.
     const currentElements = this.scene.getElementsIncludingDeleted();
-    if (replaceAll || !currentElements || !currentElements.length) {
-      this.scene.replaceAllElements(remoteElements);
+    if (replaceAll || !currentElements.length) {
+      this.scene.replaceAllElements(sceneData.elements);
     } else {
       // create a map of ids so we don't have to iterate
       // over the array more than once.
       const localElementMap = getElementMap(currentElements);
 
       // Reconcile
-      const newElements = remoteElements
+      const newElements = sceneData.elements
         .reduce((elements, element) => {
           // if the remote element references one that's currently
           //  edited on local, skip it (it'll be added in the next
@@ -1339,7 +1341,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           }
 
           return elements;
-        }, [] as Mutable<typeof remoteElements>)
+        }, [] as Mutable<typeof sceneData.elements>)
         // add local elements that weren't deleted or on remote
         .concat(...Object.values(localElementMap));
 
