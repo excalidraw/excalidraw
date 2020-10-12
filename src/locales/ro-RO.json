@@ -81,6 +81,7 @@
     "exportToSvg": "Exportare ca SVG",
     "copyToClipboard": "Copiere în memoria temporară",
     "copyPngToClipboard": "Copiere PNG în memoria temporară",
+    "scale": "Scală",
     "save": "Salvare",
     "saveAs": "Salvare ca",
     "load": "Încărcare",

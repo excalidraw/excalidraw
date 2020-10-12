@@ -81,6 +81,7 @@
     "exportToSvg": "Изнасяне в SVG",
     "copyToClipboard": "Копиране в клипборда",
     "copyPngToClipboard": "Копирай PNG в клипборда",
+    "scale": "",
     "save": "Запази",
     "saveAs": "Запиши като",
     "load": "Зареждане",

@@ -81,6 +81,7 @@
     "exportToSvg": "Eksporter til SVG",
     "copyToClipboard": "Kopier til utklippstavla",
     "copyPngToClipboard": "Kopier PNG til utklippstavla",
+    "scale": "",
     "save": "Lagre",
     "saveAs": "Lagre som",
     "load": "Opne",

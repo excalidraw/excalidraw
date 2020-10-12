@@ -81,6 +81,7 @@
     "exportToSvg": "SVG로 내보내기",
     "copyToClipboard": "클립보드로 복사",
     "copyPngToClipboard": "클립보드로 PNG 이미지 복사",
+    "scale": "",
     "save": "저장",
     "saveAs": "다른 이름으로 저장",
     "load": "불러오기",
