@@ -81,6 +81,7 @@
     "exportToSvg": "SVG にエクスポート",
     "copyToClipboard": "クリップボードにコピー",
     "copyPngToClipboard": "クリップボードにPNGをコピー",
+    "scale": "",
     "save": "保存",
     "saveAs": "名前を付けて保存",
     "load": "読み込み...",

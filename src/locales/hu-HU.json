@@ -81,6 +81,7 @@
     "exportToSvg": "Exportálás SVG-be",
     "copyToClipboard": "Vágólapra másolás",
     "copyPngToClipboard": "PNG másolása a vágólapra",
+    "scale": "",
     "save": "Mentés",
     "saveAs": "",
     "load": "Betöltés",
