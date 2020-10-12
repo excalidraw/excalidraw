@@ -26,7 +26,7 @@
     "opacity": "Doorzichtigheid",
     "textAlign": "Uitlijning",
     "edges": "Randen",
-    "sharp": "",
+    "sharp": "Hoekig",
     "round": "Rond",
     "fontSize": "Tekstgrootte",
     "fontFamily": "Lettertype",
@@ -67,7 +67,7 @@
     "madeWithExcalidraw": "Gemaakt met Excalidraw",
     "group": "Groeperen",
     "ungroup": "Groep opheffen",
-    "collaborators": "",
+    "collaborators": "Deelnemers",
     "toggleGridMode": "Rasterlijnen in-/uitschakelen",
     "addToLibrary": "Voeg toe aan bibliotheek",
     "removeFromLibrary": "Verwijder uit bibliotheek",
@@ -81,6 +81,7 @@
     "exportToSvg": "Exporteren naar SVG",
     "copyToClipboard": "Kopieer",
     "copyPngToClipboard": "Kopieer als PNG",
+    "scale": "Schaal",
     "save": "Opslaan",
     "saveAs": "Opslaan als",
     "load": "Open",
@@ -113,8 +114,8 @@
     "decryptFailed": "Kan gegevens niet decoderen.",
     "uploadedSecurly": "De upload is beveiligd met end-to-end encryptie, wat betekent dat de Excalidraw server en derden de inhoud niet kunnen lezen.",
     "loadSceneOverridePrompt": "Het laden van externe tekening zal uw bestaande inhoud vervangen. Wil je doorgaan?",
-    "errorLoadingLibrary": "",
-    "confirmAddLibrary": ""
+    "errorLoadingLibrary": "Bij het laden van de externe bibliotheek is een fout opgetreden.",
+    "confirmAddLibrary": "Hiermee worden {{numShapes}} vorm(n) aan uw bibliotheek toegevoegd. Ben je het zeker?"
   },
   "toolBar": {
     "selection": "Selectie",

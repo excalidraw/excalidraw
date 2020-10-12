@@ -26,8 +26,8 @@
     "opacity": "Opacità",
     "textAlign": "Allineamento del testo",
     "edges": "Bordi",
-    "sharp": "",
-    "round": "",
+    "sharp": "Acuto",
+    "round": "Rotondo",
     "fontSize": "Dimensione carattere",
     "fontFamily": "Carattere",
     "onlySelected": "Solo selezionati",
@@ -72,7 +72,7 @@
     "addToLibrary": "Aggiungi alla biblioteca",
     "removeFromLibrary": "Rimuovi dalla biblioteca",
     "libraryLoadingMessage": "Caricamento della biblioteca...",
-    "loadingScene": ""
+    "loadingScene": "Caricamento della scena..."
   },
   "buttons": {
     "clearReset": "Ripristina la tela",
@@ -81,6 +81,7 @@
     "exportToSvg": "Esporta come SVG",
     "copyToClipboard": "Copia negli appunti",
     "copyPngToClipboard": "Copia PNG negli appunti",
+    "scale": "Scala",
     "save": "Salva",
     "saveAs": "Salva con nome",
     "load": "Carica",
@@ -113,8 +114,8 @@
     "decryptFailed": "Impossibile decriptare i dati.",
     "uploadedSecurly": "L'upload è stato protetto con la crittografia end-to-end, il che significa che il server Excalidraw e terze parti non possono leggere il contenuto.",
     "loadSceneOverridePrompt": "Se carichi questo disegno esterno, sostituirà quello che hai. Vuoi continuare?",
-    "errorLoadingLibrary": "",
-    "confirmAddLibrary": ""
+    "errorLoadingLibrary": "Si è verificato un errore nel caricamento della libreria di terze parti.",
+    "confirmAddLibrary": "Questo aggiungerà {{numShapes}} forma(e) alla tua biblioteca. Sei sicuro?"
   },
   "toolBar": {
     "selection": "Selezione",
@@ -136,7 +137,7 @@
   "hints": {
     "linearElement": "Clicca per iniziare una linea in più punti, trascina per singola linea",
     "freeDraw": "Clicca e trascina, rilascia quando avrai finito",
-    "text": "",
+    "text": "Suggerimento: puoi anche aggiungere del testo facendo doppio clic ovunque con lo strumento di selezione",
     "linearElementMulti": "Clicca sull'ultimo punto o premi Esc o Invio per finire",
     "resize": "Per vincolare le proporzioni, tenir premuto MAIUSC durante il ridimensionamento;\nper ridimensionare dal centro, tenir premuto ALT",
     "rotate": "Puoi mantenere gli angoli tenendo premuto SHIFT durante la rotazione",
@@ -185,7 +186,7 @@
     "textNewLine": "Aggiungi nuova riga (testo)",
     "textFinish": "Completa la modifica (testo)",
     "zoomToFit": "Adatta zoom per mostrare tutti gli elementi",
-    "preventBinding": ""
+    "preventBinding": "Prevenire l'associazione freccia"
   },
   "encrypted": {
     "tooltip": "I tuoi disegni sono crittografati end-to-end in modo che i server di Excalidraw non li possano mai vedere."

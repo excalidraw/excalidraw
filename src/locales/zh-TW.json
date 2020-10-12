@@ -81,6 +81,7 @@
     "exportToSvg": "輸出成 SVG",
     "copyToClipboard": "複製至剪貼簿",
     "copyPngToClipboard": "複製 PNG 至剪貼簿",
+    "scale": "縮放比例",
     "save": "儲存",
     "saveAs": "儲存為",
     "load": "載入",

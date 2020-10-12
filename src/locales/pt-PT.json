@@ -25,9 +25,9 @@
     "sloppiness": "Desleixo",
     "opacity": "Opacidade",
     "textAlign": "Alinhamento do texto",
-    "edges": "",
-    "sharp": "",
-    "round": "",
+    "edges": "Arestas",
+    "sharp": "Aguçado",
+    "round": "Redondo",
     "fontSize": "Tamanho da fonte",
     "fontFamily": "Família da fontes",
     "onlySelected": "Somente a seleção",
@@ -81,6 +81,7 @@
     "exportToSvg": "Exportar em SVG",
     "copyToClipboard": "Copiar para o clipboard",
     "copyPngToClipboard": "Copiar PNG para área de transferência",
+    "scale": "Escala",
     "save": "Guardar",
     "saveAs": "Salvar como",
     "load": "Carregar",
@@ -113,8 +114,8 @@
     "decryptFailed": "Não foi possível descriptografar os dados.",
     "uploadedSecurly": "O upload foi protegido com criptografia de ponta a ponta, o que significa que o servidor do Excalidraw e terceiros não podem ler o conteúdo.",
     "loadSceneOverridePrompt": "Carregar um desenho externo substituirá o seu conteúdo existente. Deseja continuar?",
-    "errorLoadingLibrary": "",
-    "confirmAddLibrary": ""
+    "errorLoadingLibrary": "Houve um erro ao carregar a biblioteca de terceiros.",
+    "confirmAddLibrary": "Isso adicionará {{numShapes}} forma(s) à sua biblioteca. Tem certeza?"
   },
   "toolBar": {
     "selection": "Seleção",
@@ -136,7 +137,7 @@
   "hints": {
     "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
     "freeDraw": "Toque e arraste, solte quando terminar",
-    "text": "",
+    "text": "Dica: você também pode adicionar texto clicando duas vezes em qualquer lugar com a ferramenta de seleção",
     "linearElementMulti": "Clique no último ponto ou pressione Escape ou Enter para terminar",
     "resize": "Você pode restringir proporções segurando SHIFT enquanto redimensiona,\nsegure ALT para redimensionar do centro",
     "rotate": "Você pode restringir os ângulos segurando SHIFT enquanto gira",

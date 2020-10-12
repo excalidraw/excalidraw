@@ -81,6 +81,7 @@
     "exportToSvg": "",
     "copyToClipboard": "",
     "copyPngToClipboard": "",
+    "scale": "",
     "save": "",
     "saveAs": "",
     "load": "",

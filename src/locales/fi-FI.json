@@ -81,6 +81,7 @@
     "exportToSvg": "Vie SVG-tiedostona",
     "copyToClipboard": "Kopioi leikepöydälle",
     "copyPngToClipboard": "Kopioi PNG-tiedosto leikepöydälle",
+    "scale": "Koko",
     "save": "Tallenna",
     "saveAs": "Tallenna nimellä",
     "load": "Avaa",

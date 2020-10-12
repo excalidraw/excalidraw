@@ -81,6 +81,7 @@
     "exportToSvg": "Експортувати в SVG",
     "copyToClipboard": "Скопіювати до буферу обміну",
     "copyPngToClipboard": "Скопіювати PNG до буферу обміну",
+    "scale": "",
     "save": "Зберегти",
     "saveAs": "Зберегти як",
     "load": "Завантажити",

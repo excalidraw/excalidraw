@@ -81,6 +81,7 @@
     "exportToSvg": "Exportar a SVG",
     "copyToClipboard": "Copiar al portapapeles",
     "copyPngToClipboard": "Copiar PNG al portapapeles",
+    "scale": "Escala",
     "save": "Guardar",
     "saveAs": "Guardar como",
     "load": "Cargar",

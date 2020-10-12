@@ -81,6 +81,7 @@
     "exportToSvg": "تبدیل به SVG",
     "copyToClipboard": "کپی در حافظه موقت",
     "copyPngToClipboard": "کپی PNG در حافظه موقت",
+    "scale": "",
     "save": "ذخیره",
     "saveAs": "ذخیره با نام",
     "load": "بارگذاری",
