@@ -16,23 +16,31 @@ describe("appState", () => {
           appState: {
             ...defaultAppState,
             exportBackground,
+            viewBackgroundColor: "#F00",
           },
           elements: [],
         }}
       />,
     );
 
-    await waitFor(() =>
-      expect(h.state.exportBackground).toBe(exportBackground),
-    );
+    await waitFor(() => {
+      expect(h.state.exportBackground).toBe(exportBackground);
+      expect(h.state.viewBackgroundColor).toBe("#F00");
+    });
 
     API.dropFile({
+      appState: {
+        viewBackgroundColor: "#000",
+      },
       elements: [API.createElement({ type: "rectangle", id: "A" })],
     });
 
     await waitFor(() => {
       expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]);
+      // non-imported prop → retain
       expect(h.state.exportBackground).toBe(exportBackground);
+      // imported prop → overwrite
+      expect(h.state.viewBackgroundColor).toBe("#000");
     });
   });
 });
