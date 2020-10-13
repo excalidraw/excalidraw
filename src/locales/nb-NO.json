@@ -118,8 +118,8 @@
     "loadSceneOverridePrompt": "Å laste inn ekstern tegning vil erstatte det eksisterende innholdet. Ønsker du å fortsette?",
     "errorLoadingLibrary": "Det oppstod en feil under lasting av tredjepartsbiblioteket.",
     "confirmAddLibrary": "Dette vil legge til {{numShapes}} figur(er) i biblioteket ditt. Er du sikker?",
-    "imageDoesNotContainScene": "",
-    "cannotRestoreFromImage": ""
+    "imageDoesNotContainScene": "Bildefilen inneholder ikke scenedata. Har du aktivert dette under eksport?",
+    "cannotRestoreFromImage": "Scenen kunne ikke gjenopprettes fra denne bildefilen"
   },
   "toolBar": {
     "selection": "Velg",
