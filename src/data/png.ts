@@ -3,7 +3,7 @@ import tEXt from "png-chunk-text";
 import encodePng from "png-chunks-encode";
 
 const blobToArrayBuffer = (blob: Blob): Promise<ArrayBuffer> => {
-  if (false && "arrayBuffer" in blob) {
+  if ("arrayBuffer" in blob) {
     return blob.arrayBuffer();
   }
   // Safari
