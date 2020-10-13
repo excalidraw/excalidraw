@@ -50,7 +50,7 @@
     "eslint": "6.8.0",
     "eslint-config-prettier": "6.12.0",
     "eslint-plugin-prettier": "3.1.4",
-    "firebase-tools": "8.11.2",
+    "firebase-tools": "8.12.1",
     "husky": "4.3.0",
     "jest-canvas-mock": "2.3.0",
     "lint-staged": "10.4.0",
