@@ -118,7 +118,7 @@ const restoreElement = (
   }
 };
 
-const restoreElements = (
+export const restoreElements = (
   elements: ImportedDataState["elements"],
 ): ExcalidrawElement[] => {
   return (elements || []).reduce((elements, element) => {
@@ -134,18 +134,27 @@ const restoreElements = (
   }, [] as ExcalidrawElement[]);
 };
 
-const restoreAppState = (appState: ImportedDataState["appState"]): AppState => {
+const restoreAppState = (
+  appState: ImportedDataState["appState"],
+  localAppState: Partial<AppState> | null,
+): AppState => {
   appState = appState || {};
 
   const defaultAppState = getDefaultAppState();
   const nextAppState = {} as typeof defaultAppState;
 
-  for (const [key, val] of Object.entries(defaultAppState)) {
-    if ((appState as any)[key] !== undefined) {
-      (nextAppState as any)[key] = (appState as any)[key];
-    } else {
-      (nextAppState as any)[key] = val;
-    }
+  for (const [key, val] of Object.entries(defaultAppState) as [
+    keyof typeof defaultAppState,
+    any,
+  ][]) {
+    const restoredValue = appState[key];
+    const localValue = localAppState ? localAppState[key] : undefined;
+    (nextAppState as any)[key] =
+      restoredValue !== undefined
+        ? restoredValue
+        : localValue !== undefined
+        ? localValue
+        : val;
   }
 
   return {
@@ -155,9 +164,18 @@ const restoreAppState = (appState: ImportedDataState["appState"]): AppState => {
   };
 };
 
-export const restore = (data: ImportedDataState): DataState => {
+export const restore = (
+  data: ImportedDataState,
+  /**
+   * Local AppState (`this.state` or initial state from localStorage) so that we
+   * don't overwrite local state with default values (when values not
+   * explicitly specified).
+   * Supply `null` if you can't get access to it.
+   */
+  localAppState: Partial<AppState> | null | undefined,
+): DataState => {
   return {
     elements: restoreElements(data.elements),
-    appState: restoreAppState(data.appState),
+    appState: restoreAppState(data.appState, localAppState || null),
   };
 };

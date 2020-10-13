@@ -1,10 +1,10 @@
 import React from "react";
-import { render, GlobalTestState } from "./test-utils";
+import { render } from "./test-utils";
 import App from "../components/App";
 import { UI } from "./helpers/ui";
 import { API } from "./helpers/api";
 import { getDefaultAppState } from "../appState";
-import { waitFor, fireEvent, createEvent } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
 import { createUndoAction, createRedoAction } from "../actions/actionHistory";
 
 const { h } = window;
@@ -77,31 +77,14 @@ describe("history", () => {
     await waitFor(() =>
       expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]),
     );
-    const fileDropEvent = createEvent.drop(GlobalTestState.canvas);
-    const file = new Blob(
-      [
-        JSON.stringify({
-          type: "excalidraw",
-          appState: {
-            ...getDefaultAppState(),
-            viewBackgroundColor: "#000",
-          },
-          elements: [API.createElement({ type: "rectangle", id: "B" })],
-        }),
-      ],
-      {
-        type: "application/json",
+
+    API.dropFile({
+      appState: {
+        ...getDefaultAppState(),
+        viewBackgroundColor: "#000",
       },
-    );
-    Object.defineProperty(fileDropEvent, "dataTransfer", {
-      value: {
-        files: [file],
-        getData: (_type: string) => {
-          return "";
-        },
-      },
+      elements: [API.createElement({ type: "rectangle", id: "B" })],
     });
-    fireEvent(GlobalTestState.canvas, fileDropEvent);
 
     await waitFor(() => expect(API.getStateHistory().length).toBe(2));
     expect(h.state.viewBackgroundColor).toBe("#000");
