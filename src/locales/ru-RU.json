@@ -32,6 +32,8 @@
     "fontFamily": "Семейство шрифтов",
     "onlySelected": "Только выбранные",
     "withBackground": "С фоном",
+    "exportEmbedScene": "",
+    "exportEmbedScene_details": "",
     "addWatermark": "Добавить \"Сделано с Excalidraw\"",
     "handDrawn": "Нарисованный от руки",
     "normal": "Обычный",
@@ -115,7 +117,9 @@
     "uploadedSecurly": "Загружаемые данные защищена сквозным шифрованием, что означает, что сервер Excalidraw и третьи стороны не могут прочитать содержимое.",
     "loadSceneOverridePrompt": "",
     "errorLoadingLibrary": "",
-    "confirmAddLibrary": ""
+    "confirmAddLibrary": "",
+    "imageDoesNotContainScene": "",
+    "cannotRestoreFromImage": ""
   },
   "toolBar": {
     "selection": "Выделение области",
