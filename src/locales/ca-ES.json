@@ -25,9 +25,9 @@
     "sloppiness": "Estil del traç",
     "opacity": "Opacitat",
     "textAlign": "Alineació del text",
-    "edges": "",
-    "sharp": "",
-    "round": "",
+    "edges": "Vores",
+    "sharp": "Agut",
+    "round": "Arrodonit",
     "fontSize": "Mida de lletra",
     "fontFamily": "Tipus de lletra",
     "onlySelected": "Només seleccionats",
@@ -72,7 +72,7 @@
     "addToLibrary": "Afegir a la biblioteca",
     "removeFromLibrary": "Eliminar de la biblioteca",
     "libraryLoadingMessage": "Carregant la biblioteca...",
-    "loadingScene": ""
+    "loadingScene": "Carregant escena ..."
   },
   "buttons": {
     "clearReset": "Netejar el llenç",
@@ -81,6 +81,7 @@
     "exportToSvg": "Exportar a SNG",
     "copyToClipboard": "Copiar al porta-retalls",
     "copyPngToClipboard": "Copiar PNG al porta-retalls",
+    "scale": "Escala",
     "save": "Desar",
     "saveAs": "Desar com",
     "load": "Carregar",
@@ -99,7 +100,7 @@
     "roomDialog": "Començar col·laboració en directe",
     "createNewRoom": "Crear sala nova",
     "toggleFullScreen": "Commutar pantalla completa",
-    "toggleDarkMode": "",
+    "toggleDarkMode": "Commutar modo fosc",
     "toggleZenMode": "Commutar modo zen",
     "exitZenMode": "Sortir de modo zen"
   },
@@ -113,8 +114,8 @@
     "decryptFailed": "No s'ha pogut desencriptar.",
     "uploadedSecurly": "La càrrega s'ha assegurat amb xifratge punta a punta, cosa que significa que el servidor Excalidraw i tercers no poden llegir el contingut.",
     "loadSceneOverridePrompt": "Si carregas aquest dibuix extern, substituirá el que tens. Vols continuar?",
-    "errorLoadingLibrary": "",
-    "confirmAddLibrary": ""
+    "errorLoadingLibrary": "S'ha produït un error en carregar la biblioteca de tercers.",
+    "confirmAddLibrary": "Això afegirà {{numShapes}} forma(es) a la vostra biblioteca. Estàs segur?"
   },
   "toolBar": {
     "selection": "Selecció",
@@ -136,7 +137,7 @@
   "hints": {
     "linearElement": "Fer clic per dibuixar múltiples punts; arrossegar per una sola línea",
     "freeDraw": "Fer clic i arrosegar, deixar anar al punt final",
-    "text": "",
+    "text": "Consell: també pots afegir text fent doble clic a qualsevol lloc amb l'eina de selecció",
     "linearElementMulti": "Fer clic a l'ultim punt, o polsar Escape o Enter per acabar",
     "resize": "Per restringir les proporcions mentres es canvia la mida, mantenir premut el majúscul (SHIFT); per canviar la mida des del centre, mantenir premut ALT",
     "rotate": "Per restringir els angles mentre gira, mantenir premut el majúscul (SHIFT)",
@@ -185,7 +186,7 @@
     "textNewLine": "Afegir línea nova (text)",
     "textFinish": "Acabar d'editar (text)",
     "zoomToFit": "Zoom per veure tots els elements",
-    "preventBinding": ""
+    "preventBinding": "Prevenir vinculació de la fletxa"
   },
   "encrypted": {
     "tooltip": "Els vostres dibuixos estan xifrats de punta a punta de manera que els servidors d’Excalidraw no els veuran mai."

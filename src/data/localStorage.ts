@@ -1,7 +1,7 @@
 import { ExcalidrawElement } from "../element/types";
 import { AppState, LibraryItems } from "../types";
 import { clearAppStateForLocalStorage, getDefaultAppState } from "../appState";
-import { restore } from "./restore";
+import { restoreElements } from "./restore";
 
 const LOCAL_STORAGE_KEY = "excalidraw";
 const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
@@ -21,8 +21,8 @@ export const loadLibrary = (): Promise<LibraryItems> => {
         return resolve([]);
       }
 
-      const items = (JSON.parse(data) as LibraryItems).map(
-        (elements) => restore({ elements, appState: null }).elements,
+      const items = (JSON.parse(data) as LibraryItems).map((elements) =>
+        restoreElements(elements),
       ) as Mutable<LibraryItems>;
 
       // clone to ensure we don't mutate the cached library elements in the app
