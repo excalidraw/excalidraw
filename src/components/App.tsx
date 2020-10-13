@@ -125,6 +125,7 @@ import {
   DEFAULT_VERTICAL_ALIGN,
   GRID_SIZE,
   LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
+  MIME_TYPES,
 } from "../constants";
 import {
   INITIAL_SCENE_UPDATE_TIMEOUT,
@@ -3788,9 +3789,28 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   private handleCanvasOnDrop = async (
     event: React.DragEvent<HTMLCanvasElement>,
   ) => {
-    const libraryShapes = event.dataTransfer.getData(
-      "application/vnd.excalidrawlib+json",
-    );
+    try {
+      const file = event.dataTransfer.files[0];
+      if (file?.type === "image/png" || file?.type === "image/svg+xml") {
+        const { elements, appState } = await loadFromBlob(file, this.state);
+        this.syncActionResult({
+          elements,
+          appState: {
+            ...(appState || this.state),
+            isLoading: false,
+          },
+          commitToHistory: true,
+        });
+        return;
+      }
+    } catch (error) {
+      return this.setState({
+        isLoading: false,
+        errorMessage: error.message,
+      });
+    }
+
+    const libraryShapes = event.dataTransfer.getData(MIME_TYPES.excalidraw);
     if (libraryShapes !== "") {
       this.addElementsFromPasteOrLibrary(
         JSON.parse(libraryShapes),
@@ -3835,7 +3855,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           this.setState({ isLoading: false, errorMessage: error.message });
         });
     } else if (
-      file?.type === "application/vnd.excalidrawlib+json" ||
+      file?.type === MIME_TYPES.excalidrawlib ||
       file?.name.endsWith(".excalidrawlib")
     ) {
       Library.importLibrary(file)

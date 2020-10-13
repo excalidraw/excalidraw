@@ -29,7 +29,10 @@ export const exportToCanvas = (
     viewBackgroundColor: string;
     shouldAddWatermark: boolean;
   },
-  createCanvas: (width: number, height: number) => any = (width, height) => {
+  createCanvas: (width: number, height: number) => HTMLCanvasElement = (
+    width,
+    height,
+  ) => {
     const tempCanvas = document.createElement("canvas");
     tempCanvas.width = width * scale;
     tempCanvas.height = height * scale;
@@ -44,7 +47,7 @@ export const exportToCanvas = (
     shouldAddWatermark,
   );
 
-  const tempCanvas: any = createCanvas(width, height);
+  const tempCanvas = createCanvas(width, height);
 
   renderScene(
     sceneElements,
@@ -81,11 +84,13 @@ export const exportToSvg = (
     exportPadding = 10,
     viewBackgroundColor,
     shouldAddWatermark,
+    metadata = "",
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
     shouldAddWatermark: boolean;
+    metadata?: string;
   },
 ): SVGSVGElement => {
   const sceneElements = getElementsAndWatermark(elements, shouldAddWatermark);
@@ -104,6 +109,7 @@ export const exportToSvg = (
 
   svgRoot.innerHTML = `
   ${SVG_EXPORT_TAG}
+  ${metadata}
   <defs>
     <style>
       @font-face {
