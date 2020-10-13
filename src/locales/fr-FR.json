@@ -32,6 +32,8 @@
     "fontFamily": "Police",
     "onlySelected": "Uniquement la sélection",
     "withBackground": "Avec arrière-plan",
+    "exportEmbedScene": "",
+    "exportEmbedScene_details": "",
     "addWatermark": "Ajouter \"Fabriqué avec Excalidraw\"",
     "handDrawn": "Manuscrite",
     "normal": "Normale",
@@ -115,7 +117,9 @@
     "uploadedSecurly": "Le téléchargement a été sécurisé avec un chiffrement de bout en bout, ce qui signifie que ni Excalidraw ni personne d'autre ne peut en lire le contenu.",
     "loadSceneOverridePrompt": "Le chargement d'un dessin externe remplacera votre contenu actuel. Souhaitez-vous continuer ?",
     "errorLoadingLibrary": "Une erreur s'est produite lors du chargement de la bibliothèque tierce.",
-    "confirmAddLibrary": "Cela va ajouter {{numShapes}} forme(s) à votre bibliothèque. Êtes-vous sûr(e) ?"
+    "confirmAddLibrary": "Cela va ajouter {{numShapes}} forme(s) à votre bibliothèque. Êtes-vous sûr(e) ?",
+    "imageDoesNotContainScene": "",
+    "cannotRestoreFromImage": ""
   },
   "toolBar": {
     "selection": "Sélection",
