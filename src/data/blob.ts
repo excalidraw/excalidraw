@@ -6,24 +6,14 @@ import { LibraryData, ImportedDataState } from "./types";
 import { calculateScrollCenter } from "../scene";
 import { MIME_TYPES } from "../constants";
 import { base64ToString } from "../base64";
-
 export const parseFileContents = async (blob: Blob | File) => {
   let contents: string;
   if (blob.type === "image/png") {
-    const { default: decodePng } = await import("png-chunks-extract");
-    const { default: tEXt } = await import("png-chunk-text");
-    const chunks = decodePng(new Uint8Array(await blob.arrayBuffer()));
-
-    const metadataChunk = chunks.find((chunk) => chunk.name === "tEXt");
-    if (metadataChunk) {
-      const metadata = tEXt.decode(metadataChunk.data);
-      if (metadata.keyword === MIME_TYPES.excalidraw) {
-        return metadata.text;
-      }
-      throw new Error(t("alerts.imageDoesNotContainScene"));
-    } else {
-      throw new Error(t("alerts.imageDoesNotContainScene"));
+    const metadata = await (await import("./png")).getTEXtChunk(blob);
+    if (metadata?.keyword === MIME_TYPES.excalidraw) {
+      return metadata.text;
     }
+    throw new Error(t("alerts.imageDoesNotContainScene"));
   } else {
     if ("text" in Blob) {
       contents = await blob.text();

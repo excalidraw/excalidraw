@@ -156,7 +156,6 @@ const ExportModal = ({
           </Stack.Row>
         </div>
         {actionManager.renderAction("changeExportBackground")}
-        {actionManager.renderAction("changeExportEmbedScene")}
         {someElementIsSelected && (
           <div>
             <label>
@@ -171,6 +170,7 @@ const ExportModal = ({
             </label>
           </div>
         )}
+        {actionManager.renderAction("changeExportEmbedScene")}
         {actionManager.renderAction("changeShouldAddWatermark")}
       </Stack.Col>
     </div>

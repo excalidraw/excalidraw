@@ -345,17 +345,10 @@ export const exportCanvas = async (
     tempCanvas.toBlob(async (blob) => {
       if (blob) {
         if (appState.exportEmbedScene) {
-          const { default: tEXt } = await import("png-chunk-text");
-          const { default: encodePng } = await import("png-chunks-encode");
-          const { default: decodePng } = await import("png-chunks-extract");
-          const chunks = decodePng(new Uint8Array(await blob.arrayBuffer()));
-          const metadata = tEXt.encode(
-            MIME_TYPES.excalidraw,
-            serializeAsJSON(elements, appState),
-          );
-          // insert metadata before last chunk (iEND)
-          chunks.splice(-1, 0, metadata);
-          blob = new Blob([encodePng(chunks)], { type: "image/png" });
+          blob = await (await import("./png")).encodeTEXtChunk(blob, {
+            keyword: MIME_TYPES.excalidraw,
+            text: serializeAsJSON(elements, appState),
+          });
         }
 
         await fileSave(blob, {
