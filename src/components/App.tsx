@@ -599,9 +599,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       ) {
         // Backwards compatibility with legacy url format
         if (id) {
-          scene = await loadScene(id);
+          scene = await loadScene(id, null, this.props.initialData);
         } else if (jsonMatch) {
-          scene = await loadScene(jsonMatch[1], jsonMatch[2]);
+          scene = await loadScene(
+            jsonMatch[1],
+            jsonMatch[2],
+            this.props.initialData,
+          );
         }
         if (!isCollaborationScene) {
           window.history.replaceState({}, "Excalidraw", window.location.origin);

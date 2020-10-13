@@ -45,13 +45,13 @@ export const saveAsJSON = async (
   );
 };
 
-export const loadFromJSON = async (appState: AppState) => {
+export const loadFromJSON = async (localAppState: AppState) => {
   const blob = await fileOpen({
     description: "Excalidraw files",
     extensions: [".json", ".excalidraw"],
     mimeTypes: ["application/json"],
   });
-  return loadFromBlob(blob, appState);
+  return loadFromBlob(blob, localAppState);
 };
 
 export const isValidLibrary = (json: any) => {

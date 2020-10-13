@@ -7,6 +7,8 @@ import {
 import { newElement, newTextElement, newLinearElement } from "../../element";
 import { DEFAULT_VERTICAL_ALIGN } from "../../constants";
 import { getDefaultAppState } from "../../appState";
+import { GlobalTestState, createEvent, fireEvent } from "../test-utils";
+import { ImportedDataState } from "../../data/types";
 
 const { h } = window;
 
@@ -135,4 +137,28 @@ export class API {
     }
     return element as any;
   };
+
+  static dropFile(sceneData: ImportedDataState) {
+    const fileDropEvent = createEvent.drop(GlobalTestState.canvas);
+    const file = new Blob(
+      [
+        JSON.stringify({
+          type: "excalidraw",
+          ...sceneData,
+        }),
+      ],
+      {
+        type: "application/json",
+      },
+    );
+    Object.defineProperty(fileDropEvent, "dataTransfer", {
+      value: {
+        files: [file],
+        getData: (_type: string) => {
+          return "";
+        },
+      },
+    });
+    fireEvent(GlobalTestState.canvas, fileDropEvent);
+  }
 }

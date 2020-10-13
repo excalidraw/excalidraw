@@ -233,18 +233,15 @@ const importFromBackend = async (
   id: string | null,
   privateKey?: string | null,
 ): Promise<ImportedDataState> => {
-  let elements: readonly ExcalidrawElement[] = [];
-  let appState = getDefaultAppState();
-
   try {
     const response = await fetch(
       privateKey ? `${BACKEND_V2_GET}${id}` : `${BACKEND_GET}${id}.json`,
     );
     if (!response.ok) {
       window.alert(t("alerts.importBackendFailed"));
-      return { elements, appState };
+      return {};
     }
-    let data;
+    let data: ImportedDataState;
     if (privateKey) {
       const buffer = await response.arrayBuffer();
       const key = await getImportedKey(privateKey, "decrypt");
@@ -267,13 +264,14 @@ const importFromBackend = async (
       data = await response.json();
     }
 
-    elements = data.elements || elements;
-    appState = { ...appState, ...data.appState };
+    return {
+      elements: data.elements || null,
+      appState: data.appState || null,
+    };
   } catch (error) {
     window.alert(t("alerts.importBackendFailed"));
     console.error(error);
-  } finally {
-    return { elements, appState };
+    return {};
   }
 };
 
@@ -363,16 +361,22 @@ export const exportCanvas = async (
 
 export const loadScene = async (
   id: string | null,
-  privateKey?: string | null,
-  initialData?: ImportedDataState,
+  privateKey: string | null,
+  // Supply initialData even if importing from backend to ensure we restore
+  // localStorage user settings which we do not persist on server.
+  // Non-optional so we don't forget to pass it even if `undefined`.
+  initialData: ImportedDataState | undefined | null,
 ) => {
   let data;
   if (id != null) {
     // the private key is used to decrypt the content from the server, take
     // extra care not to leak it
-    data = restore(await importFromBackend(id, privateKey));
+    data = restore(
+      await importFromBackend(id, privateKey),
+      initialData?.appState,
+    );
   } else {
-    data = restore(initialData || {});
+    data = restore(initialData || {}, null);
   }
 
   return {
