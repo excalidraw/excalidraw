@@ -363,8 +363,8 @@ export const loadScene = async (
   id: string | null,
   privateKey: string | null,
   // Supply initialData even if importing from backend to ensure we restore
-  //  localStorage user settings which we do not persist on server.
-  // Non-optional so we don't forget to pass it even if undefined
+  // localStorage user settings which we do not persist on server.
+  // Non-optional so we don't forget to pass it even if `undefined`.
   initialData: ImportedDataState | undefined | null,
 ) => {
   let data;
