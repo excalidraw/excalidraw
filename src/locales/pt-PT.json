@@ -32,8 +32,8 @@
     "fontFamily": "Família da fontes",
     "onlySelected": "Somente a seleção",
     "withBackground": "Com fundo",
-    "exportEmbedScene": "",
-    "exportEmbedScene_details": "",
+    "exportEmbedScene": "Incorporar a cena no arquivo exportado",
+    "exportEmbedScene_details": "Os dados da cena serão salvos no arquivo PNG/SVG exportado para que a cena possa ser restaurada.\nIrá aumentar o tamanho do arquivo exportado.",
     "addWatermark": "Adicionar \"Feito com Excalidraw\"",
     "handDrawn": "Manuscrito",
     "normal": "Normal",
@@ -118,8 +118,8 @@
     "loadSceneOverridePrompt": "Carregar um desenho externo substituirá o seu conteúdo existente. Deseja continuar?",
     "errorLoadingLibrary": "Houve um erro ao carregar a biblioteca de terceiros.",
     "confirmAddLibrary": "Isso adicionará {{numShapes}} forma(s) à sua biblioteca. Tem certeza?",
-    "imageDoesNotContainScene": "",
-    "cannotRestoreFromImage": ""
+    "imageDoesNotContainScene": "O arquivo de imagem não contém dados de cena. Você ativou durante a exportação?",
+    "cannotRestoreFromImage": "Não foi possível restaurar a cena deste arquivo de imagem"
   },
   "toolBar": {
     "selection": "Seleção",
