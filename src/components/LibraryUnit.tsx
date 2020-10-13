@@ -6,6 +6,7 @@ import "./LibraryUnit.scss";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
 import { LibraryItem } from "../types";
+import { MIME_TYPES } from "../constants";
 
 // fa-plus
 const PLUS_ICON = (
@@ -78,7 +79,7 @@ export const LibraryUnit = ({
         onDragStart={(event) => {
           setIsHovered(false);
           event.dataTransfer.setData(
-            "application/vnd.excalidrawlib+json",
+            MIME_TYPES.excalidrawlib,
             JSON.stringify(elements),
           );
         }}

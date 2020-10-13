@@ -32,6 +32,8 @@
     "fontFamily": "Font family",
     "onlySelected": "Only selected",
     "withBackground": "With Background",
+    "exportEmbedScene": "Embed scene into exported file",
+    "exportEmbedScene_details": "Scene data will be saved into the exported PNG/SVG file so that the scene can be restored from it.\nWill increase exported file size.",
     "addWatermark": "Add \"Made with Excalidraw\"",
     "handDrawn": "Hand-drawn",
     "normal": "Normal",
@@ -115,7 +117,9 @@
     "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content.",
     "loadSceneOverridePrompt": "Loading external drawing will replace your existing content. Do you wish to continue?",
     "errorLoadingLibrary": "There was an error loading the third party library.",
-    "confirmAddLibrary": "This will add {{numShapes}} shape(s) to your library. Are you sure?"
+    "confirmAddLibrary": "This will add {{numShapes}} shape(s) to your library. Are you sure?",
+    "imageDoesNotContainScene": "Image file doesn't contain scene data. Have you enabled this during export?",
+    "cannotRestoreFromImage": "Scene couldn't be restored from this image file"
   },
   "toolBar": {
     "selection": "Selection",
