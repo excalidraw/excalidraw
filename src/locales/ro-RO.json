@@ -32,7 +32,7 @@
     "fontFamily": "Familia de fonturi",
     "onlySelected": "Numai selecția",
     "withBackground": "Cu fundal",
-    "exportEmbedScene": "",
+    "exportEmbedScene": "Încorporează scena în fișierul exportat",
     "exportEmbedScene_details": "",
     "addWatermark": "Adaugă „Realizat cu Excalidraw”",
     "handDrawn": "Scris de mână",
