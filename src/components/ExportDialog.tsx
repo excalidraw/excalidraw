@@ -156,6 +156,7 @@ const ExportModal = ({
           </Stack.Row>
         </div>
         {actionManager.renderAction("changeExportBackground")}
+        {actionManager.renderAction("changeExportEmbedScene")}
         {someElementIsSelected && (
           <div>
             <label>

@@ -19,6 +19,8 @@ import { serializeAsJSON } from "./json";
 import { ExportType } from "../scene/types";
 import { restore } from "./restore";
 import { ImportedDataState } from "./types";
+import { MIME_TYPES } from "../constants";
+import { stringToBase64 } from "../base64";
 
 export { loadFromBlob } from "./blob";
 export { saveAsJSON, loadFromJSON } from "./json";
@@ -300,11 +302,21 @@ export const exportCanvas = async (
     return window.alert(t("alerts.cannotExportEmptyCanvas"));
   }
   if (type === "svg" || type === "clipboard-svg") {
+    let metadata = "";
+
+    if (appState.exportEmbedScene && type === "svg") {
+      metadata += `<!-- payload-type:${MIME_TYPES.excalidraw} -->`;
+      metadata += "<!-- payload-start -->";
+      metadata += await stringToBase64(serializeAsJSON(elements, appState));
+      metadata += "<!-- payload-end -->";
+    }
+
     const tempSvg = exportToSvg(elements, {
       exportBackground,
       viewBackgroundColor,
       exportPadding,
       shouldAddWatermark,
+      metadata,
     });
     if (type === "svg") {
       await fileSave(new Blob([tempSvg.outerHTML], { type: "image/svg+xml" }), {
@@ -330,8 +342,22 @@ export const exportCanvas = async (
 
   if (type === "png") {
     const fileName = `${name}.png`;
-    tempCanvas.toBlob(async (blob: any) => {
+    tempCanvas.toBlob(async (blob) => {
       if (blob) {
+        if (appState.exportEmbedScene) {
+          const { default: tEXt } = await import("png-chunk-text");
+          const { default: encodePng } = await import("png-chunks-encode");
+          const { default: decodePng } = await import("png-chunks-extract");
+          const chunks = decodePng(new Uint8Array(await blob.arrayBuffer()));
+          const metadata = tEXt.encode(
+            MIME_TYPES.excalidraw,
+            serializeAsJSON(elements, appState),
+          );
+          // insert metadata before last chunk (iEND)
+          chunks.splice(-1, 0, metadata);
+          blob = new Blob([encodePng(chunks)], { type: "image/png" });
+        }
+
         await fileSave(blob, {
           fileName: fileName,
           extensions: [".png"],

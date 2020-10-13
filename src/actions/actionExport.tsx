@@ -43,6 +43,26 @@ export const actionChangeExportBackground = register({
   ),
 });
 
+export const actionChangeExportEmbedScene = register({
+  name: "changeExportEmbedScene",
+  perform: (_elements, appState, value) => {
+    return {
+      appState: { ...appState, exportEmbedScene: value },
+      commitToHistory: false,
+    };
+  },
+  PanelComponent: ({ appState, updateData }) => (
+    <label title={t("labels.exportEmbedScene_details")}>
+      <input
+        type="checkbox"
+        checked={appState.exportEmbedScene}
+        onChange={(event) => updateData(event.target.checked)}
+      />{" "}
+      {t("labels.exportEmbedScene")}
+    </label>
+  ),
+});
+
 export const actionChangeShouldAddWatermark = register({
   name: "changeShouldAddWatermark",
   perform: (_elements, appState, value) => {

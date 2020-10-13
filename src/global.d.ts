@@ -41,6 +41,28 @@ type ResolutionType<T extends (...args: any) => any> = T extends (
 // https://github.com/krzkaczor/ts-essentials
 type MarkOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
+// PNG encoding/decoding
+// -----------------------------------------------------------------------------
+type TEXtChunk = { name: "tEXt"; data: Uint8Array };
+
+declare module "png-chunk-text" {
+  function encode(
+    name: string,
+    value: string,
+  ): { name: "tEXt"; data: Uint8Array };
+  function decode(data: Uint8Array): { keyword: string; text: string };
+}
+declare module "png-chunks-encode" {
+  function encode(chunks: TEXtChunk[]): Uint8Array;
+  export = encode;
+}
+declare module "png-chunks-extract" {
+  function extract(buffer: Uint8Array): TEXtChunk[];
+  export = extract;
+}
+// -----------------------------------------------------------------------------
+
+// -----------------------------------------------------------------------------
 // type getter for interface's callable type
 // src: https://stackoverflow.com/a/58658851/927631
 // -----------------------------------------------------------------------------

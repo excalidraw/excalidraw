@@ -75,7 +75,7 @@ const canvas = exportToCanvas(
 
 const fs = require("fs");
 const out = fs.createWriteStream("test.png");
-const stream = canvas.createPNGStream();
+const stream = (canvas as any).createPNGStream();
 stream.pipe(out);
 out.on("finish", () => {
   console.info("test.png was created.");
