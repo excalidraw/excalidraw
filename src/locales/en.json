@@ -106,6 +106,7 @@
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",
     "couldNotCreateShareableLink": "Couldn't create shareable link.",
+    "couldNotCreateShareableLinkTooBig": "Couldn't create shareable link, too many elements in canvas",
     "couldNotLoadInvalidFile": "Couldn't load invalid file",
     "importBackendFailed": "Importing from backend failed.",
     "cannotExportEmptyCanvas": "Cannot export empty canvas.",
@@ -114,7 +115,8 @@
     "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content.",
     "loadSceneOverridePrompt": "Loading external drawing will replace your existing content. Do you wish to continue?",
     "errorLoadingLibrary": "There was an error loading the third party library.",
-    "confirmAddLibrary": "This will add {{numShapes}} shape(s) to your library. Are you sure?"
+    "confirmAddLibrary": "This will add {{numShapes}} shape(s) to your library. Are you sure?",
+    "cantPreviewTooBig": "Sorry we can't preview your work, too many elements :("
   },
   "toolBar": {
     "selection": "Selection",

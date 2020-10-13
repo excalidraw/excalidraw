@@ -34,8 +34,8 @@ const ExportModal = ({
   onExportToClipboard,
   onExportToBackend,
 }: {
-  appState: AppState;
   elements: readonly NonDeletedExcalidrawElement[];
+  appState: AppState;
   exportPadding?: number;
   actionManager: ActionsManagerInterface;
   onExportToPng: ExportCB;
@@ -64,16 +64,25 @@ const ExportModal = ({
 
   useEffect(() => {
     const previewNode = previewRef.current;
-    const canvas = exportToCanvas(exportedElements, appState, {
-      exportBackground,
-      viewBackgroundColor,
-      exportPadding,
-      scale,
-      shouldAddWatermark,
-    });
-    previewNode?.appendChild(canvas);
+    if (exportedElements.length < appState.tooManyElements) {
+      const canvas = exportToCanvas(exportedElements, appState, {
+        exportBackground,
+        viewBackgroundColor,
+        exportPadding,
+        scale,
+        shouldAddWatermark,
+      });
+      previewNode?.appendChild(canvas);
+      return () => {
+        previewNode?.removeChild(canvas);
+      };
+    }
+    const cantPreview = document
+      .createElement("p")
+      .appendChild(document.createTextNode(t("alerts.cantPreviewTooBig")));
+    previewNode?.appendChild(cantPreview);
     return () => {
-      previewNode?.removeChild(canvas);
+      previewNode?.removeChild(cantPreview);
     };
   }, [
     appState,

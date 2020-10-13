@@ -220,6 +220,8 @@ export const exportToBackend = async (
       const urlString = url.toString();
 
       window.prompt(`🔒${t("alerts.uploadedSecurly")}`, urlString);
+    } else if (elements.length > appState.tooManyElements) {
+      window.alert(t("alerts.couldNotCreateShareableLinkTooBig"));
     } else {
       window.alert(t("alerts.couldNotCreateShareableLink"));
     }
