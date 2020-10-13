@@ -1,5 +1,5 @@
 // `btoa(unescape(encodeURIComponent(str)))` hack doesn't work in edge cases and
-//  `unescape` API shouldn't be used anyway.
+// `unescape` API shouldn't be used anyway.
 // This implem is ~10x faster than using fromCharCode in a loop (in Chrome).
 const stringToByteString = (str: string): Promise<string> => {
   return new Promise((resolve, reject) => {
