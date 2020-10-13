@@ -32,6 +32,8 @@
     "fontFamily": "Skrifttype",
     "onlySelected": "Kun valde",
     "withBackground": "Inkluder bakgrunn",
+    "exportEmbedScene": "",
+    "exportEmbedScene_details": "",
     "addWatermark": "Legg til «Laga med Excalidraw»",
     "handDrawn": "Handteikna",
     "normal": "Normal",
@@ -115,7 +117,9 @@
     "uploadedSecurly": "Opplastinga er kryptert og er ikkje mogleg å lese av Excalidraw-serveren eller tredjepartar.",
     "loadSceneOverridePrompt": "Innlasting av ekstern teikning erstattar ditt eksisterande innhald. Ynskjer du å fortsette?",
     "errorLoadingLibrary": "Det oppstod ein feil under lastinga av tredjepartsbibliotek.",
-    "confirmAddLibrary": "Dette vil legge til {{numShapes}} form(er) i biblioteket ditt. Er du sikker?"
+    "confirmAddLibrary": "Dette vil legge til {{numShapes}} form(er) i biblioteket ditt. Er du sikker?",
+    "imageDoesNotContainScene": "",
+    "cannotRestoreFromImage": ""
   },
   "toolBar": {
     "selection": "Vel",
