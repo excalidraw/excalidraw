@@ -118,8 +118,8 @@
     "loadSceneOverridePrompt": "讀取外部圖樣將取代目前的內容。是否要繼續？",
     "errorLoadingLibrary": "",
     "confirmAddLibrary": "",
-    "imageDoesNotContainScene": "",
-    "cannotRestoreFromImage": ""
+    "imageDoesNotContainScene": "圖檔中未包含場景資料。輸出檔案時是否有包含此資料？",
+    "cannotRestoreFromImage": "無法由此檔案回復場景。"
   },
   "toolBar": {
     "selection": "選取",
