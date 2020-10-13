@@ -32,8 +32,8 @@
     "fontFamily": "Kirjasintyyppi",
     "onlySelected": "Vain valitut",
     "withBackground": "Sisällytä tausta",
-    "exportEmbedScene": "",
-    "exportEmbedScene_details": "",
+    "exportEmbedScene": "Upota teos tiedostoon",
+    "exportEmbedScene_details": "Teoksen tiedot tallennetaan PNG/SVG-tiedostoon, jolloin teoksen voi palauttaa siitä. Kasvattaa tallennetun tiedoston kokoa.",
     "addWatermark": "Lisää \"Tehty Excalidrawilla\"",
     "handDrawn": "Käsinkirjoitettu",
     "normal": "Tavallinen",
@@ -118,8 +118,8 @@
     "loadSceneOverridePrompt": "Ulkopuolisen piirroksen lataaminen korvaa nykyisen sisältösi. Haluatko jatkaa?",
     "errorLoadingLibrary": "Kolmannen osapuolen kirjastoa ladattaessa tapahtui virhe.",
     "confirmAddLibrary": "Tämä lisää {{numShapes}} muotoa kirjastoosi. Oletko varma?",
-    "imageDoesNotContainScene": "",
-    "cannotRestoreFromImage": ""
+    "imageDoesNotContainScene": "Kuvatiedosto ei sisällä teostietoja. Valitsitko sisällyttää ne tallennusvaiheessa?",
+    "cannotRestoreFromImage": "Teosta ei voitu palauttaa tästä kuvatiedostosta"
   },
   "toolBar": {
     "selection": "Valinta",
