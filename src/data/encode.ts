@@ -52,11 +52,6 @@ export const base64ToString = async (base64: string, isByteString = false) => {
   return isByteString ? atob(base64) : byteStringToString(atob(base64));
 };
 
-// @ts-ignore
-window.stringToByteString = toByteString;
-// @ts-ignore
-window.byteStringToString = byteStringToString;
-
 // -----------------------------------------------------------------------------
 // text encoding
 // -----------------------------------------------------------------------------
