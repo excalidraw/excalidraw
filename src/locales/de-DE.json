@@ -32,7 +32,7 @@
     "fontFamily": "Schriftfamilie",
     "onlySelected": "Nur ausgewählte",
     "withBackground": "Mit Hintergrund",
-    "exportEmbedScene": "Dokument in exportierte Datei einbetten",
+    "exportEmbedScene": "Zeichnung in exportierte Datei einbetten",
     "exportEmbedScene_details": "Dokumentdaten werden in die exportierte PNG/SVG-Datei gespeichert, sodass das Dokument später weiter bearbeitet werden kann.\nWird die exportierte Datei vergrößern.",
     "addWatermark": "\"Made with Excalidraw\" hinzufügen",
     "handDrawn": "Handgezeichnet",
