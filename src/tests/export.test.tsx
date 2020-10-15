@@ -2,7 +2,11 @@ import React from "react";
 import { render, waitFor } from "./test-utils";
 import App from "../components/App";
 import { API } from "./helpers/api";
-import { encodePngMetadata } from "../data/image";
+import {
+  encodePngMetadata,
+  encodeSvgMetadata,
+  decodeSvgMetadata,
+} from "../data/image";
 import { serializeAsJSON } from "../data/json";
 
 import fs from "fs";
@@ -12,6 +16,20 @@ import path from "path";
 const readFile = util.promisify(fs.readFile);
 
 const { h } = window;
+
+const testElements = [
+  {
+    ...API.createElement({
+      type: "text",
+      id: "A",
+      text: "😀",
+    }),
+    // can't get jsdom text measurement to work so this is a temp hack
+    //  to ensure the element isn't stripped as invisible
+    width: 16,
+    height: 16,
+  },
+];
 
 // tiny polyfill for TextDecoder.decode on which we depend
 Object.defineProperty(window, "TextDecoder", {
@@ -38,22 +56,7 @@ describe("appState", () => {
 
     const pngBlobEmbedded = await encodePngMetadata({
       blob: pngBlob,
-      metadata: serializeAsJSON(
-        [
-          {
-            ...API.createElement({
-              type: "text",
-              id: "A",
-              text: "😀",
-            }),
-            // can't get jsdom text measurement to work so this is a temp hack
-            //  to ensure the element isn't stripped as invisible
-            width: 16,
-            height: 16,
-          },
-        ],
-        h.state,
-      ),
+      metadata: serializeAsJSON(testElements, h.state),
     });
     API.dropFile(pngBlobEmbedded);
 
@@ -62,6 +65,16 @@ describe("appState", () => {
         expect.objectContaining({ type: "text", text: "😀" }),
       ]);
     });
+  });
+
+  it("test encoding/decoding scene for SVG export", async () => {
+    const encoded = await encodeSvgMetadata({
+      text: serializeAsJSON(testElements, h.state),
+    });
+    const decoded = JSON.parse(await decodeSvgMetadata({ svg: encoded }));
+    expect(decoded.elements).toEqual([
+      expect.objectContaining({ type: "text", text: "😀" }),
+    ]);
   });
 
   it("import embedded png (legacy v1)", async () => {
