@@ -19,8 +19,6 @@ import { serializeAsJSON } from "./json";
 import { ExportType } from "../scene/types";
 import { restore } from "./restore";
 import { ImportedDataState } from "./types";
-import { MIME_TYPES } from "../constants";
-import { stringToBase64 } from "../base64";
 
 export { loadFromBlob } from "./blob";
 export { saveAsJSON, loadFromJSON } from "./json";
@@ -302,21 +300,17 @@ export const exportCanvas = async (
     return window.alert(t("alerts.cannotExportEmptyCanvas"));
   }
   if (type === "svg" || type === "clipboard-svg") {
-    let metadata = "";
-
-    if (appState.exportEmbedScene && type === "svg") {
-      metadata += `<!-- payload-type:${MIME_TYPES.excalidraw} -->`;
-      metadata += "<!-- payload-start -->";
-      metadata += await stringToBase64(serializeAsJSON(elements, appState));
-      metadata += "<!-- payload-end -->";
-    }
-
     const tempSvg = exportToSvg(elements, {
       exportBackground,
       viewBackgroundColor,
       exportPadding,
       shouldAddWatermark,
-      metadata,
+      metadata:
+        appState.exportEmbedScene && type === "svg"
+          ? await (await import("./image")).encodeSvgMetadata({
+              text: serializeAsJSON(elements, appState),
+            })
+          : undefined,
     });
     if (type === "svg") {
       await fileSave(new Blob([tempSvg.outerHTML], { type: "image/svg+xml" }), {
@@ -345,9 +339,9 @@ export const exportCanvas = async (
     tempCanvas.toBlob(async (blob) => {
       if (blob) {
         if (appState.exportEmbedScene) {
-          blob = await (await import("./png")).encodeTEXtChunk(blob, {
-            keyword: MIME_TYPES.excalidraw,
-            text: serializeAsJSON(elements, appState),
+          blob = await (await import("./image")).encodePngMetadata({
+            blob,
+            metadata: serializeAsJSON(elements, appState),
           });
         }
 
