@@ -35,6 +35,7 @@
     "nanoid": "2.1.11",
     "node-sass": "4.14.1",
     "open-color": "1.7.0",
+    "pako": "1.0.11",
     "png-chunk-text": "1.0.0",
     "png-chunks-encode": "1.0.0",
     "png-chunks-extract": "1.0.0",
@@ -49,6 +50,7 @@
   },
   "devDependencies": {
     "@types/lodash.throttle": "4.1.6",
+    "@types/pako": "1.0.1",
     "asar": "3.0.3",
     "eslint": "6.8.0",
     "eslint-config-prettier": "6.12.0",
