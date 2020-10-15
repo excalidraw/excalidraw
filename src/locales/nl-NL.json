@@ -32,6 +32,8 @@
     "fontFamily": "Lettertype",
     "onlySelected": "Enkel geselecteerde",
     "withBackground": "Met achtergrond",
+    "exportEmbedScene": "",
+    "exportEmbedScene_details": "",
     "addWatermark": "Voeg \"Gemaakt met Excalidraw\" toe",
     "handDrawn": "Handgetekend",
     "normal": "Normaal",
@@ -115,7 +117,9 @@
     "uploadedSecurly": "De upload is beveiligd met end-to-end encryptie, wat betekent dat de Excalidraw server en derden de inhoud niet kunnen lezen.",
     "loadSceneOverridePrompt": "Het laden van externe tekening zal uw bestaande inhoud vervangen. Wil je doorgaan?",
     "errorLoadingLibrary": "Bij het laden van de externe bibliotheek is een fout opgetreden.",
-    "confirmAddLibrary": "Hiermee worden {{numShapes}} vorm(n) aan uw bibliotheek toegevoegd. Ben je het zeker?"
+    "confirmAddLibrary": "Hiermee worden {{numShapes}} vorm(n) aan uw bibliotheek toegevoegd. Ben je het zeker?",
+    "imageDoesNotContainScene": "",
+    "cannotRestoreFromImage": ""
   },
   "toolBar": {
     "selection": "Selectie",

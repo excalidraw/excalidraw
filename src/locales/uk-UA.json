@@ -32,6 +32,8 @@
     "fontFamily": "Шрифт",
     "onlySelected": "Тільки вибране",
     "withBackground": "З тлом",
+    "exportEmbedScene": "",
+    "exportEmbedScene_details": "",
     "addWatermark": "Додати «Накреслене в Excalidraw»",
     "handDrawn": "Рукописний",
     "normal": "Звичайний",
@@ -115,7 +117,9 @@
     "uploadedSecurly": "Це завантаження було захищене наскрізним шифруванням, а це означає що сервер Excalidraw та інші не зможуть прочитати вміст.",
     "loadSceneOverridePrompt": "Завантаження зовнішнього креслення замінить ваш наявний контент. Продовжити?",
     "errorLoadingLibrary": "Помилка при завантаженні сторонньої бібліотеки.",
-    "confirmAddLibrary": "Це призведе до додавання {{numShapes}} фігур до вашої бібліотеки. Ви впевнені?"
+    "confirmAddLibrary": "Це призведе до додавання {{numShapes}} фігур до вашої бібліотеки. Ви впевнені?",
+    "imageDoesNotContainScene": "",
+    "cannotRestoreFromImage": ""
   },
   "toolBar": {
     "selection": "Виділення",

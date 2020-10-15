@@ -32,6 +32,8 @@
     "fontFamily": "폰트 스타일",
     "onlySelected": "선택한 항목만",
     "withBackground": "배경 포함",
+    "exportEmbedScene": "",
+    "exportEmbedScene_details": "",
     "addWatermark": "\"Made with Excalidraw\" 추가",
     "handDrawn": "필기체",
     "normal": "일반",
@@ -115,7 +117,9 @@
     "uploadedSecurly": "업로드는 종단 간 암호화로 보호되므로 Excalidraw 서버 및 타사가 콘텐츠를 읽을 수 없습니다.",
     "loadSceneOverridePrompt": "외부 파일을 불러 오면 기존 콘텐츠가 대체됩니다. 계속 진행할까요?",
     "errorLoadingLibrary": "",
-    "confirmAddLibrary": ""
+    "confirmAddLibrary": "",
+    "imageDoesNotContainScene": "",
+    "cannotRestoreFromImage": ""
   },
   "toolBar": {
     "selection": "선택",

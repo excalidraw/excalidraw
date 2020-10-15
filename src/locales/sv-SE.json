@@ -32,6 +32,8 @@
     "fontFamily": "Teckensnitt",
     "onlySelected": "Endast markering",
     "withBackground": "Med bakgrund",
+    "exportEmbedScene": "Bädda in skiss i exporterad fil",
+    "exportEmbedScene_details": "Skissdata kommer att sparas i den exporterade PNG/SVG-filen så att skissen kan återställas från den.\nKommer att öka exporterad filstorlek.",
     "addWatermark": "Lägg till \"Skapad med Excalidraw\"",
     "handDrawn": "Handritad",
     "normal": "Normal",
@@ -115,7 +117,9 @@
     "uploadedSecurly": "Uppladdning har säkrats med kryptering från ände till ände. vilket innebär att Excalidraw server och tredje part inte kan läsa innehållet.",
     "loadSceneOverridePrompt": "Laddning av extern skiss kommer att ersätta ditt befintliga innehåll. Vill du fortsätta?",
     "errorLoadingLibrary": "Fel vid inläsning av tredjeparts bibliotek.",
-    "confirmAddLibrary": "Detta kommer att lägga till {{numShapes}} form(er) till ditt bibliotek. Är du säker?"
+    "confirmAddLibrary": "Detta kommer att lägga till {{numShapes}} form(er) till ditt bibliotek. Är du säker?",
+    "imageDoesNotContainScene": "Bildfilen innehåller inte skissdata. Har du aktiverat detta under export?",
+    "cannotRestoreFromImage": "Skiss kunde inte återställas från denna bildfil"
   },
   "toolBar": {
     "selection": "Markering",

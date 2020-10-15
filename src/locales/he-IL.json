@@ -32,6 +32,8 @@
     "fontFamily": "סוג הגופן",
     "onlySelected": "רק מה שנבחר",
     "withBackground": "עם רקע",
+    "exportEmbedScene": "",
+    "exportEmbedScene_details": "",
     "addWatermark": "הוסף \"נוצר באמצעות Excalidraw\"",
     "handDrawn": "כתב יד",
     "normal": "רגיל",
@@ -115,7 +117,9 @@
     "uploadedSecurly": "ההעלאה הוצפנה מקצה לקצה, ולכן שרת Excalidraw וצד שלישי לא יכולים לקרוא את התוכן.",
     "loadSceneOverridePrompt": "",
     "errorLoadingLibrary": "",
-    "confirmAddLibrary": ""
+    "confirmAddLibrary": "",
+    "imageDoesNotContainScene": "",
+    "cannotRestoreFromImage": ""
   },
   "toolBar": {
     "selection": "בחירה",

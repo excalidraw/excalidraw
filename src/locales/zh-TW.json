@@ -32,6 +32,8 @@
     "fontFamily": "字體",
     "onlySelected": "僅選取物件",
     "withBackground": "包含背景",
+    "exportEmbedScene": "在輸出的檔案中嵌入場景",
+    "exportEmbedScene_details": "用於回復場景的場景資料會被包含在輸出的 PNG/SVG 檔案中。\n會增加輸出的檔案大小。",
     "addWatermark": "加上 \"Made with Excalidraw\"",
     "handDrawn": "手寫",
     "normal": "一般",
@@ -115,7 +117,9 @@
     "uploadedSecurly": "上傳已通過 end-to-end 加密，Excalidraw 伺服器和第三方無法皆讀取其內容。",
     "loadSceneOverridePrompt": "讀取外部圖樣將取代目前的內容。是否要繼續？",
     "errorLoadingLibrary": "",
-    "confirmAddLibrary": ""
+    "confirmAddLibrary": "",
+    "imageDoesNotContainScene": "圖檔中未包含場景資料。輸出檔案時是否有包含此資料？",
+    "cannotRestoreFromImage": "無法由此檔案回復場景。"
   },
   "toolBar": {
     "selection": "選取",

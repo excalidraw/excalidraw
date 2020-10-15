@@ -32,6 +32,8 @@
     "fontFamily": "Tipus de lletra",
     "onlySelected": "Només seleccionats",
     "withBackground": "Amb fons",
+    "exportEmbedScene": "",
+    "exportEmbedScene_details": "",
     "addWatermark": "Afegir \"Fet amb Excalidraw\"",
     "handDrawn": "Dibuixat a mà",
     "normal": "Normal",
@@ -115,7 +117,9 @@
     "uploadedSecurly": "La càrrega s'ha assegurat amb xifratge punta a punta, cosa que significa que el servidor Excalidraw i tercers no poden llegir el contingut.",
     "loadSceneOverridePrompt": "Si carregas aquest dibuix extern, substituirá el que tens. Vols continuar?",
     "errorLoadingLibrary": "S'ha produït un error en carregar la biblioteca de tercers.",
-    "confirmAddLibrary": "Això afegirà {{numShapes}} forma(es) a la vostra biblioteca. Estàs segur?"
+    "confirmAddLibrary": "Això afegirà {{numShapes}} forma(es) a la vostra biblioteca. Estàs segur?",
+    "imageDoesNotContainScene": "",
+    "cannotRestoreFromImage": ""
   },
   "toolBar": {
     "selection": "Selecció",

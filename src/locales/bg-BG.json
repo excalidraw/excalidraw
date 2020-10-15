@@ -32,6 +32,8 @@
     "fontFamily": "Семейство шрифтове",
     "onlySelected": "Само избраното",
     "withBackground": "С фон",
+    "exportEmbedScene": "",
+    "exportEmbedScene_details": "",
     "addWatermark": "",
     "handDrawn": "Нарисувано на ръка",
     "normal": "Нормален",
@@ -115,7 +117,9 @@
     "uploadedSecurly": "Качването е защитено с криптиране от край до край, което означава, че сървърът Excalidraw и трети страни не могат да четат съдържанието.",
     "loadSceneOverridePrompt": "",
     "errorLoadingLibrary": "",
-    "confirmAddLibrary": ""
+    "confirmAddLibrary": "",
+    "imageDoesNotContainScene": "",
+    "cannotRestoreFromImage": ""
   },
   "toolBar": {
     "selection": "Селекция",

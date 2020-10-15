@@ -32,6 +32,8 @@
     "fontFamily": "Carattere",
     "onlySelected": "Solo selezionati",
     "withBackground": "Con Sfondo",
+    "exportEmbedScene": "",
+    "exportEmbedScene_details": "",
     "addWatermark": "Aggiungi \"Creato con Excalidraw\"",
     "handDrawn": "A mano libera",
     "normal": "Normale",
@@ -115,7 +117,9 @@
     "uploadedSecurly": "L'upload è stato protetto con la crittografia end-to-end, il che significa che il server Excalidraw e terze parti non possono leggere il contenuto.",
     "loadSceneOverridePrompt": "Se carichi questo disegno esterno, sostituirà quello che hai. Vuoi continuare?",
     "errorLoadingLibrary": "Si è verificato un errore nel caricamento della libreria di terze parti.",
-    "confirmAddLibrary": "Questo aggiungerà {{numShapes}} forma(e) alla tua biblioteca. Sei sicuro?"
+    "confirmAddLibrary": "Questo aggiungerà {{numShapes}} forma(e) alla tua biblioteca. Sei sicuro?",
+    "imageDoesNotContainScene": "",
+    "cannotRestoreFromImage": ""
   },
   "toolBar": {
     "selection": "Selezione",
