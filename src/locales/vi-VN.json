@@ -32,6 +32,8 @@
     "fontFamily": "",
     "onlySelected": "",
     "withBackground": "",
+    "exportEmbedScene": "",
+    "exportEmbedScene_details": "",
     "addWatermark": "",
     "handDrawn": "",
     "normal": "",
@@ -115,7 +117,9 @@
     "uploadedSecurly": "",
     "loadSceneOverridePrompt": "",
     "errorLoadingLibrary": "",
-    "confirmAddLibrary": ""
+    "confirmAddLibrary": "",
+    "imageDoesNotContainScene": "",
+    "cannotRestoreFromImage": ""
   },
   "toolBar": {
     "selection": "",

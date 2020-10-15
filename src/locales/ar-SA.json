@@ -32,6 +32,8 @@
     "fontFamily": "نوع الخط",
     "onlySelected": "المحدد فقط",
     "withBackground": "مع الخلفية",
+    "exportEmbedScene": "",
+    "exportEmbedScene_details": "",
     "addWatermark": "إضافة \"مصنوعة بواسطة Excalidraw\"",
     "handDrawn": "رسم باليد",
     "normal": "عادي",
@@ -115,7 +117,9 @@
     "uploadedSecurly": "تم تأمين التحميل بتشفير النهاية إلى النهاية، مما يعني أن خادم Excalidraw والأطراف الثالثة لا يمكنها قراءة المحتوى.",
     "loadSceneOverridePrompt": "تحميل الرسم الخارجي سيحل محل المحتوى الموجود لديك. هل ترغب في المتابعة؟",
     "errorLoadingLibrary": "",
-    "confirmAddLibrary": ""
+    "confirmAddLibrary": "",
+    "imageDoesNotContainScene": "",
+    "cannotRestoreFromImage": ""
   },
   "toolBar": {
     "selection": "تحديد",

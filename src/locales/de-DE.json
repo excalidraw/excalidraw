@@ -32,6 +32,8 @@
     "fontFamily": "Schriftfamilie",
     "onlySelected": "Nur ausgewählte",
     "withBackground": "Mit Hintergrund",
+    "exportEmbedScene": "Zeichnung in exportierte Datei einbetten",
+    "exportEmbedScene_details": "Die Zeichnungsdaten werden in der exportierten PNG/SVG-Datei gespeichert, sodass das Dokument später weiter bearbeitet werden kann. \nDieses wird die exportierte Datei vergrößern.",
     "addWatermark": "\"Made with Excalidraw\" hinzufügen",
     "handDrawn": "Handgezeichnet",
     "normal": "Normal",
@@ -115,7 +117,9 @@
     "uploadedSecurly": "Der Upload wurde mit Ende-zu-Ende-Verschlüsselung gespeichert. Weder Excalidraw noch Dritte können den Inhalt einsehen.",
     "loadSceneOverridePrompt": "Das Laden der externen Zeichnung ersetzt den vorhandenen Inhalt. Möchtest Du fortfahren?",
     "errorLoadingLibrary": "Beim Laden der Drittanbieter-Bibliothek ist ein Fehler aufgetreten.",
-    "confirmAddLibrary": "Hiermit werden {{numShapes}} Form(en) deiner Bibliothek hinzugefügt. Bist du sicher?"
+    "confirmAddLibrary": "Dieses fügt {{numShapes}} Form(en) zu deiner Bibliothek hinzu. Bist du sicher?",
+    "imageDoesNotContainScene": "Bilddatei enthält keine Zeichnungsdaten. Hast du das Einbetten beim Export aktiviert?",
+    "cannotRestoreFromImage": "Die Zeichnung konnte aus dieser Bilddatei nicht wiederhergestellt werden"
   },
   "toolBar": {
     "selection": "Auswahl",
