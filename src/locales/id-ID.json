@@ -32,6 +32,8 @@
     "fontFamily": "Jenis font",
     "onlySelected": "Hanya yang Dipilih",
     "withBackground": "Dengan Latar",
+    "exportEmbedScene": "Sematkan pemandangan ke dalam file yang diekspor",
+    "exportEmbedScene_details": "Data pemandangan akan disimpan dalam file PNG/SVG yang diekspor, sehingga pemandangan itu dapat dipulihkan darinya.\nAkan membesarkan ukuran file yang diekspor.",
     "addWatermark": "Tambahkan \"Dibuat dengan Excalidraw\"",
     "handDrawn": "Tulisan tangan",
     "normal": "Normal",
@@ -115,7 +117,9 @@
     "uploadedSecurly": "Pengunggahan ini telah diamankan menggunakan enkripsi end-to-end, artinya server Excalidraw dan pihak ketiga tidak data membaca nya",
     "loadSceneOverridePrompt": "Memuat gambar external akan mengganti konten Anda yang ada. Apakah Anda ingin melanjutkan?",
     "errorLoadingLibrary": "Terdapat kesalahan dalam memuat pustaka pihak ketiga.",
-    "confirmAddLibrary": "Ini akan menambahkan {{numShapes}} bentuk ke pustaka Anda. Anda yakin?"
+    "confirmAddLibrary": "Ini akan menambahkan {{numShapes}} bentuk ke pustaka Anda. Anda yakin?",
+    "imageDoesNotContainScene": "File gambar tidak berisi data pemandangan. Apa Anda sudah aktifkan ini selama ekspor?",
+    "cannotRestoreFromImage": "Pemandangan tidak dapat dipulihkan dari file gambar ini"
   },
   "toolBar": {
     "selection": "Pilihan",

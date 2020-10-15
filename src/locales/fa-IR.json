@@ -32,6 +32,8 @@
     "fontFamily": "نوع قلم",
     "onlySelected": "فقط انتخاب شده ها",
     "withBackground": "با پس زمینه",
+    "exportEmbedScene": "",
+    "exportEmbedScene_details": "",
     "addWatermark": "\"ساخته شده با Excalidraw\" را اضافه کن",
     "handDrawn": "دست نویس",
     "normal": "عادی",
@@ -115,7 +117,9 @@
     "uploadedSecurly": "آپلود با رمزگذاری دو طرفه انجام میشود، به این معنی که سرور Excalidraw و اشخاص ثالث نمی توانند مطالب شما را بخوانند.",
     "loadSceneOverridePrompt": "بارگزاری یک طرح خارجی محتوای فعلی رو از بین میبرد. آیا میخواهید ادامه دهید؟",
     "errorLoadingLibrary": "",
-    "confirmAddLibrary": ""
+    "confirmAddLibrary": "",
+    "imageDoesNotContainScene": "",
+    "cannotRestoreFromImage": ""
   },
   "toolBar": {
     "selection": "گزینش",

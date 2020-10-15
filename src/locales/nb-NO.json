@@ -32,6 +32,8 @@
     "fontFamily": "Fontfamilie",
     "onlySelected": "Kun valgte",
     "withBackground": "Inkluder bakgrunn",
+    "exportEmbedScene": "Bygg inn scenen i den eksporterte filen",
+    "exportEmbedScene_details": "Scenedata vil bli lagret i den eksporterte PNG/SVG-filen, slik at scenen kan gjenopprettes fra den.\nDet vil øke den eksporterte filstørrelsen.",
     "addWatermark": "Legg til \"Laget med Excalidraw\"",
     "handDrawn": "Håndtegnet",
     "normal": "Normal",
@@ -115,7 +117,9 @@
     "uploadedSecurly": "Opplastingen er kryptert og kan ikke leses av Excalidraw-serveren eller tredjeparter.",
     "loadSceneOverridePrompt": "Å laste inn ekstern tegning vil erstatte det eksisterende innholdet. Ønsker du å fortsette?",
     "errorLoadingLibrary": "Det oppstod en feil under lasting av tredjepartsbiblioteket.",
-    "confirmAddLibrary": "Dette vil legge til {{numShapes}} figur(er) i biblioteket ditt. Er du sikker?"
+    "confirmAddLibrary": "Dette vil legge til {{numShapes}} figur(er) i biblioteket ditt. Er du sikker?",
+    "imageDoesNotContainScene": "Bildefilen inneholder ikke scenedata. Har du aktivert dette under eksport?",
+    "cannotRestoreFromImage": "Scenen kunne ikke gjenopprettes fra denne bildefilen"
   },
   "toolBar": {
     "selection": "Velg",

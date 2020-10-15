@@ -32,6 +32,8 @@
     "fontFamily": "フォントの種類",
     "onlySelected": "選択中のみ",
     "withBackground": "背景を含める",
+    "exportEmbedScene": "",
+    "exportEmbedScene_details": "",
     "addWatermark": "\"Made with Excalidraw\"と表示",
     "handDrawn": "手描き風",
     "normal": "普通",
@@ -115,7 +117,9 @@
     "uploadedSecurly": "データのアップロードはエンドツーエンド暗号化によって保護されています。Excalidrawサーバーと第三者はデータの内容を見ることができません。",
     "loadSceneOverridePrompt": "",
     "errorLoadingLibrary": "",
-    "confirmAddLibrary": ""
+    "confirmAddLibrary": "",
+    "imageDoesNotContainScene": "",
+    "cannotRestoreFromImage": ""
   },
   "toolBar": {
     "selection": "選択",

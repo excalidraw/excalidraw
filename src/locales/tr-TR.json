@@ -32,6 +32,8 @@
     "fontFamily": "Yazı tipi ailesi",
     "onlySelected": "Sadece seçilen",
     "withBackground": "Arka Plan İle Beraber",
+    "exportEmbedScene": "",
+    "exportEmbedScene_details": "",
     "addWatermark": "\"Excalidraw ile yapıldı\" yazısını ekle",
     "handDrawn": "El-yazısı",
     "normal": "Normal",
@@ -81,7 +83,7 @@
     "exportToSvg": "SVG olarak dışa aktar",
     "copyToClipboard": "Panoya kopyala",
     "copyPngToClipboard": "PNG'yi panoya kopyala",
-    "scale": "",
+    "scale": "Ölçek",
     "save": "Kaydet",
     "saveAs": "Farklı kaydet",
     "load": "Yükle",
@@ -114,8 +116,10 @@
     "decryptFailed": "Şifrelenmiş veri çözümlenemedi.",
     "uploadedSecurly": "Yükleme uçtan uca şifreleme ile korunmaktadır. Excalidraw sunucusu ve üçüncül şahıslar içeriği okuyamayacaktır.",
     "loadSceneOverridePrompt": "Harici çizimler yüklemek mevcut olan içeriği değiştirecektir. Devam etmek istiyor musunuz?",
-    "errorLoadingLibrary": "",
-    "confirmAddLibrary": ""
+    "errorLoadingLibrary": "Üçüncü taraf kitaplığı yüklerken bir hata oluştu.",
+    "confirmAddLibrary": "Bu, kitaplığınıza {{numShapes}} tane şekil ekleyecek. Emin misiniz?",
+    "imageDoesNotContainScene": "Görsel dosyası herhangi bir sahne verisi bulundurmuyor. Dışa aktarırken bunu etkinleştirdiniz mi?",
+    "cannotRestoreFromImage": "Bu görsel dosyasından sahne onarılamıyor"
   },
   "toolBar": {
     "selection": "Seçme",
