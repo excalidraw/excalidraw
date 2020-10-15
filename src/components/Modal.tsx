@@ -1,6 +1,6 @@
 import "./Modal.scss";
 
-import React, { useEffect, useState } from "react";
+import React, { useState, useLayoutEffect } from "react";
 import { createPortal } from "react-dom";
 import { KEYS } from "../keys";
 
@@ -13,12 +13,17 @@ export const Modal = (props: {
 }) => {
   const modalRoot = useBodyRoot();
 
+  if (!modalRoot) {
+    return null;
+  }
+
   const handleKeydown = (event: React.KeyboardEvent) => {
     if (event.key === KEYS.ESCAPE) {
       event.nativeEvent.stopImmediatePropagation();
       props.onCloseRequest();
     }
   };
+
   return createPortal(
     <div
       className={`Modal ${props.className ?? ""}`}
@@ -46,7 +51,9 @@ export const Modal = (props: {
 };
 
 const useBodyRoot = () => {
-  const createDiv = () => {
+  const [div, setDiv] = useState<HTMLDivElement | null>(null);
+
+  useLayoutEffect(() => {
     const isDarkTheme = !!document
       .querySelector(".excalidraw")
       ?.classList.contains("Appearance_dark");
@@ -59,13 +66,13 @@ const useBodyRoot = () => {
       div.classList.add("Appearance_dark-background-none");
     }
     document.body.appendChild(div);
-    return div;
-  };
-  const [div] = useState(createDiv);
-  useEffect(() => {
+
+    setDiv(div);
+
     return () => {
       document.body.removeChild(div);
     };
-  }, [div]);
+  }, []);
+
   return div;
 };
