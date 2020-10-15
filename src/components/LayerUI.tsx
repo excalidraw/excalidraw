@@ -309,18 +309,23 @@ const LayerUI = ({
   );
 
   const renderExportDialog = () => {
-    const createExporter = (type: ExportType): ExportCB => (
+    const createExporter = (type: ExportType): ExportCB => async (
       exportedElements,
       scale,
     ) => {
       if (canvas) {
-        exportCanvas(type, exportedElements, appState, canvas, {
-          exportBackground: appState.exportBackground,
-          name: appState.name,
-          viewBackgroundColor: appState.viewBackgroundColor,
-          scale,
-          shouldAddWatermark: appState.shouldAddWatermark,
-        });
+        try {
+          await exportCanvas(type, exportedElements, appState, canvas, {
+            exportBackground: appState.exportBackground,
+            name: appState.name,
+            viewBackgroundColor: appState.viewBackgroundColor,
+            scale,
+            shouldAddWatermark: appState.shouldAddWatermark,
+          });
+        } catch (error) {
+          console.error(error);
+          setAppState({ errorMessage: error.message });
+        }
       }
     };
     return (
@@ -331,18 +336,23 @@ const LayerUI = ({
         onExportToPng={createExporter("png")}
         onExportToSvg={createExporter("svg")}
         onExportToClipboard={createExporter("clipboard")}
-        onExportToBackend={(exportedElements) => {
+        onExportToBackend={async (exportedElements) => {
           if (canvas) {
-            exportCanvas(
-              "backend",
-              exportedElements,
-              {
-                ...appState,
-                selectedElementIds: {},
-              },
-              canvas,
-              appState,
-            );
+            try {
+              await exportCanvas(
+                "backend",
+                exportedElements,
+                {
+                  ...appState,
+                  selectedElementIds: {},
+                },
+                canvas,
+                appState,
+              );
+            } catch (error) {
+              console.error(error);
+              setAppState({ errorMessage: error.message });
+            }
           }
         }}
       />
