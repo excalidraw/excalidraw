@@ -73,7 +73,7 @@ export const encode = async ({
   compress,
 }: {
   text: string;
-  /** defaults to `true`. If compression fails, falls back to plain base64. */
+  /** defaults to `true`. If compression fails, falls back to bstring alone. */
   compress?: boolean;
 }): Promise<EncodedData> => {
   let deflated!: string;
