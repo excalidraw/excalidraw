@@ -49,7 +49,7 @@ interface LayerUIProps {
   actionManager: ActionManager;
   appState: AppState;
   canvas: HTMLCanvasElement | null;
-  setAppState: any;
+  setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
   onRoomCreate: () => void;
   onUsernameChange: (username: string) => void;
@@ -103,7 +103,7 @@ const LibraryMenuItems = ({
   onRemoveFromLibrary: (index: number) => void;
   onInsertShape: (elements: LibraryItem) => void;
   onAddToLibrary: (elements: LibraryItem) => void;
-  setAppState: any;
+  setAppState: React.Component<any, AppState>["setState"];
 }) => {
   const isMobile = useIsMobile();
   const numCells = library.length + (pendingElements.length > 0 ? 1 : 0);
@@ -202,7 +202,7 @@ const LibraryMenu = ({
   onClickOutside: (event: MouseEvent) => void;
   onInsertShape: (elements: LibraryItem) => void;
   onAddToLibrary: () => void;
-  setAppState: any;
+  setAppState: React.Component<any, AppState>["setState"];
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   useOnClickOutside(ref, onClickOutside);
@@ -577,7 +577,7 @@ const LayerUI = ({
       )}
       {appState.showShortcutsDialog && (
         <ShortcutsDialog
-          onClose={() => setAppState({ showShortcutsDialog: null })}
+          onClose={() => setAppState({ showShortcutsDialog: false })}
         />
       )}
       {renderFixedSideContainer()}

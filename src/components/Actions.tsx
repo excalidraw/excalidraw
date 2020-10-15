@@ -111,7 +111,7 @@ export const ShapesSwitcher = ({
   isLibraryOpen,
 }: {
   elementType: ExcalidrawElement["type"];
-  setAppState: (appState: Partial<AppState>) => void;
+  setAppState: React.Component<any, AppState>["setState"];
   isLibraryOpen: boolean;
 }) => (
   <>
