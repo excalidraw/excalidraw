@@ -138,19 +138,22 @@ export class API {
     return element as any;
   };
 
-  static dropFile(sceneData: ImportedDataState) {
+  static dropFile(data: ImportedDataState | Blob) {
     const fileDropEvent = createEvent.drop(GlobalTestState.canvas);
-    const file = new Blob(
-      [
-        JSON.stringify({
-          type: "excalidraw",
-          ...sceneData,
-        }),
-      ],
-      {
-        type: "application/json",
-      },
-    );
+    const file =
+      data instanceof Blob
+        ? data
+        : new Blob(
+            [
+              JSON.stringify({
+                type: "excalidraw",
+                ...data,
+              }),
+            ],
+            {
+              type: "application/json",
+            },
+          );
     Object.defineProperty(fileDropEvent, "dataTransfer", {
       value: {
         files: [file],
