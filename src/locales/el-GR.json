@@ -2,7 +2,7 @@
   "labels": {
     "paste": "Επικόλληση",
     "selectAll": "Επιλογή όλων",
-    "multiSelect": "",
+    "multiSelect": "Προσθέστε το στοιχείο στην επιλογή",
     "moveCanvas": "Μετακίνηση καμβά",
     "copy": "Αντιγραφή",
     "copyAsPng": "Αντιγραφή στο πρόχειρο ως PNG",
@@ -32,7 +32,7 @@
     "fontFamily": "Γραμματοσειρά",
     "onlySelected": "Μόνο τα Επιλεγμένα",
     "withBackground": "Με Φόντο",
-    "exportEmbedScene": "",
+    "exportEmbedScene": "Ενσωμάτωση της σκηνής στο αρχείο προς εξαγωγή",
     "exportEmbedScene_details": "",
     "addWatermark": "Προσθήκη \"Φτιαγμένο με Excalidraw\"",
     "handDrawn": "Σχεδιασμένο στο χέρι",
@@ -73,8 +73,8 @@
     "toggleGridMode": "Εναλλαγή λειτουργίας πλέγματος",
     "addToLibrary": "Προσθήκη στη βιβλιοθήκη",
     "removeFromLibrary": "Αφαίρεση από τη βιβλιοθήκη",
-    "libraryLoadingMessage": "",
-    "loadingScene": ""
+    "libraryLoadingMessage": "Φόρτωση βιβλιοθήκης...",
+    "loadingScene": "Φόρτωση σκηνής..."
   },
   "buttons": {
     "clearReset": "Επαναφορά του καμβά",
@@ -102,7 +102,7 @@
     "roomDialog": "Έναρξη ζωντανής συνεργασίας",
     "createNewRoom": "Δημιουργία νέου χώρου",
     "toggleFullScreen": "Εναλλαγή πλήρους οθόνης",
-    "toggleDarkMode": "",
+    "toggleDarkMode": "Εναλλαγή εμφάνισης σε dark",
     "toggleZenMode": "Εναλλαγή λειτουργίας Zen",
     "exitZenMode": "Έξοδος απο την λειτουργία Zen"
   },
