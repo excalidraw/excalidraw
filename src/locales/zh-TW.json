@@ -116,8 +116,8 @@
     "decryptFailed": "無法解密資料。",
     "uploadedSecurly": "上傳已通過 end-to-end 加密，Excalidraw 伺服器和第三方無法皆讀取其內容。",
     "loadSceneOverridePrompt": "讀取外部圖樣將取代目前的內容。是否要繼續？",
-    "errorLoadingLibrary": "",
-    "confirmAddLibrary": "",
+    "errorLoadingLibrary": "載入第三方套件時出現錯誤。",
+    "confirmAddLibrary": "這將會將 {{numShapes}} 個圖形加入你的資料庫，你確定嗎？",
     "imageDoesNotContainScene": "圖檔中未包含場景資料。輸出檔案時是否有包含此資料？",
     "cannotRestoreFromImage": "無法由此檔案回復場景。"
   },
@@ -190,7 +190,7 @@
     "textNewLine": "換行（文字）",
     "textFinish": "完成編輯（文字）",
     "zoomToFit": "放大至填滿畫面",
-    "preventBinding": ""
+    "preventBinding": "防止箭頭綁定"
   },
   "encrypted": {
     "tooltip": "你的作品已使用 end-to-end 方式加密，Excalidraw 的伺服器也無法取得其內容。"

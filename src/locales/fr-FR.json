@@ -32,8 +32,8 @@
     "fontFamily": "Police",
     "onlySelected": "Uniquement la sélection",
     "withBackground": "Avec arrière-plan",
-    "exportEmbedScene": "",
-    "exportEmbedScene_details": "",
+    "exportEmbedScene": "Intégrer la scène au fichier exporté",
+    "exportEmbedScene_details": "Les données de scène seront enregistrées dans le fichier PNG/SVG exporté, afin que la scène puisse être restaurée à partir de celui-ci.\nCela augmentera la taille du fichier exporté.",
     "addWatermark": "Ajouter \"Fabriqué avec Excalidraw\"",
     "handDrawn": "Manuscrite",
     "normal": "Normale",
@@ -118,8 +118,8 @@
     "loadSceneOverridePrompt": "Le chargement d'un dessin externe remplacera votre contenu actuel. Souhaitez-vous continuer ?",
     "errorLoadingLibrary": "Une erreur s'est produite lors du chargement de la bibliothèque tierce.",
     "confirmAddLibrary": "Cela va ajouter {{numShapes}} forme(s) à votre bibliothèque. Êtes-vous sûr(e) ?",
-    "imageDoesNotContainScene": "",
-    "cannotRestoreFromImage": ""
+    "imageDoesNotContainScene": "Le fichier image ne contient pas de données de scène. L'avez-vous activé lors de l'export ?",
+    "cannotRestoreFromImage": "Impossible de restaurer la scène depuis ce fichier image"
   },
   "toolBar": {
     "selection": "Sélection",
