@@ -118,8 +118,8 @@
     "loadSceneOverridePrompt": "",
     "errorLoadingLibrary": "",
     "confirmAddLibrary": "",
-    "imageDoesNotContainScene": "",
-    "cannotRestoreFromImage": ""
+    "imageDoesNotContainScene": "Το αρχείο εικόνας δεν έχει δεδομένα σκηνής. Το είχατε ενεργοποιήσει αυτό κατά την εξαγωγή;",
+    "cannotRestoreFromImage": "Η σκηνή δεν ήταν δυνατό να αποκατασταθεί από αυτό το αρχείο εικόνας"
   },
   "toolBar": {
     "selection": "Επιλογή",
