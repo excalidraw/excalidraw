@@ -987,13 +987,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const elements = this.scene.getElements();
 
     const selectedElements = getSelectedElements(elements, this.state);
-    exportCanvas(
-      "clipboard",
-      selectedElements.length ? selectedElements : elements,
-      this.state,
-      this.canvas!,
-      this.state,
-    );
+    try {
+      exportCanvas(
+        "clipboard",
+        selectedElements.length ? selectedElements : elements,
+        this.state,
+        this.canvas!,
+        this.state,
+      );
+    } catch (error) {
+      console.error(error);
+      this.setState({ errorMessage: error.message });
+    }
   };
 
   private copyToClipboardAsSvg = () => {
@@ -1001,13 +1006,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.scene.getElements(),
       this.state,
     );
-    exportCanvas(
-      "clipboard-svg",
-      selectedElements.length ? selectedElements : this.scene.getElements(),
-      this.state,
-      this.canvas!,
-      this.state,
-    );
+    try {
+      exportCanvas(
+        "clipboard-svg",
+        selectedElements.length ? selectedElements : this.scene.getElements(),
+        this.state,
+        this.canvas!,
+        this.state,
+      );
+    } catch (error) {
+      console.error(error);
+      this.setState({ errorMessage: error.message });
+    }
   };
 
   private static resetTapTwice() {
