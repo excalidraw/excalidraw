@@ -10,7 +10,9 @@ export const parseFileContents = async (blob: Blob | File) => {
 
   if (blob.type === "image/png") {
     try {
-      return await (await import("./image")).decodePngMetadata(blob);
+      return await (
+        await import(/* webpackChunkName: "image-png" */ "./image")
+      ).decodePngMetadata(blob);
     } catch (error) {
       if (error.message === "INVALID") {
         throw new Error(t("alerts.imageDoesNotContainScene"));
@@ -34,7 +36,9 @@ export const parseFileContents = async (blob: Blob | File) => {
     }
     if (blob.type === "image/svg+xml") {
       try {
-        return await (await import("./image")).decodeSvgMetadata({
+        return await (
+          await import(/* webpackChunkName: "image-svg" */ "./image")
+        ).decodeSvgMetadata({
           svg: contents,
         });
       } catch (error) {

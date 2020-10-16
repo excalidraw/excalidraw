@@ -65,7 +65,9 @@ export const setLanguage = async (newLng: string | undefined) => {
 
   document.documentElement.dir = currentLanguage.rtl ? "rtl" : "ltr";
 
-  currentLanguageData = await import(`./locales/${currentLanguage.lng}.json`);
+  currentLanguageData = await import(
+    /* webpackChunkName: "i18n-[request]" */ `./locales/${currentLanguage.lng}.json`
+  );
 
   languageDetector.cacheUserLanguage(currentLanguage.lng);
 };
@@ -78,7 +80,9 @@ export const setLanguageFirstTime = async () => {
 
   document.documentElement.dir = currentLanguage.rtl ? "rtl" : "ltr";
 
-  currentLanguageData = await import(`./locales/${currentLanguage.lng}.json`);
+  currentLanguageData = await import(
+    /* webpackChunkName: "i18n-[request]" */ `./locales/${currentLanguage.lng}.json`
+  );
 
   languageDetector.cacheUserLanguage(currentLanguage.lng);
 };

@@ -77,9 +77,12 @@ module.exports = {
         test: /\.js($|\?)/i,
       }),
       new webpack.optimize.LimitChunkCountPlugin({
-        maxChunks: 1,
+        maxChunks: 38,
       }),
     ],
+    splitChunks: {
+      chunks: "all",
+    },
   },
   plugins: [new MiniCssExtractPlugin({ filename: "[name].css" })],
   externals: {
