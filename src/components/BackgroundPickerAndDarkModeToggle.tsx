@@ -10,7 +10,7 @@ export const BackgroundPickerAndDarkModeToggle = ({
 }: {
   actionManager: ActionManager;
   appState: AppState;
-  setAppState: any;
+  setAppState: React.Component<any, AppState>["setState"];
 }) => (
   <div style={{ display: "flex" }}>
     {actionManager.renderAction("changeViewBackgroundColor")}

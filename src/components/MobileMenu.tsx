@@ -23,7 +23,7 @@ type MobileMenuProps = {
   appState: AppState;
   actionManager: ActionManager;
   exportButton: React.ReactNode;
-  setAppState: any;
+  setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
   libraryMenu: JSX.Element | null;
   onRoomCreate: () => void;
