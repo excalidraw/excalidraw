@@ -26,6 +26,7 @@ export const actionSendBackward = register({
     };
   },
   contextItemLabel: "labels.sendBackward",
+  contextMenuOrder: 10,
   keyPriority: 40,
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] && !event.shiftKey && event.code === "BracketLeft",
@@ -51,6 +52,7 @@ export const actionBringForward = register({
     };
   },
   contextItemLabel: "labels.bringForward",
+  contextMenuOrder: 11,
   keyPriority: 40,
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] && !event.shiftKey && event.code === "BracketRight",
@@ -76,6 +78,7 @@ export const actionSendToBack = register({
     };
   },
   contextItemLabel: "labels.sendToBack",
+  contextMenuOrder: 12,
   keyTest: (event) => {
     return isDarwin
       ? event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === "BracketLeft"
@@ -109,6 +112,7 @@ export const actionBringToFront = register({
     };
   },
   contextItemLabel: "labels.bringToFront",
+  contextMenuOrder: 13,
   keyTest: (event) => {
     return isDarwin
       ? event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === "BracketRight"
