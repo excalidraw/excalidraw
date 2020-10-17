@@ -786,11 +786,17 @@ describe("regression tests", () => {
       "Bring forward",
       "Send to back",
       "Bring to front",
+      "Align top",
+      "Align bottom",
+      "Align left",
+      "Align right",
+      "Center vertically",
+      "Center horizontally",
       "Duplicate",
     ];
 
     expect(contextMenu).not.toBeNull();
-    expect(contextMenu?.children.length).toBe(10);
+    expect(contextMenu?.children.length).toBe(16);
     options?.forEach((opt, i) => {
       expect(opt.textContent).toBe(expectedOptions[i]);
     });
@@ -833,11 +839,17 @@ describe("regression tests", () => {
       "Bring forward",
       "Send to back",
       "Bring to front",
+      "Align top",
+      "Align bottom",
+      "Align left",
+      "Align right",
+      "Center vertically",
+      "Center horizontally",
       "Duplicate",
     ];
 
     expect(contextMenu).not.toBeNull();
-    expect(contextMenu?.children.length).toBe(10);
+    expect(contextMenu?.children.length).toBe(16);
     options?.forEach((opt, i) => {
       expect(opt.textContent).toBe(expectedOptions[i]);
     });
