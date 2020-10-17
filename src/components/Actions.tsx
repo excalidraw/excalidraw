@@ -83,6 +83,21 @@ export const SelectedShapeActions = ({
           {renderAction("bringForward")}
         </div>
       </fieldset>
+
+      {targetElements.length > 1 && (
+        <fieldset>
+          <legend>{t("labels.align")}</legend>
+          <div className="buttonList">
+            {renderAction("alignTop")}
+            {renderAction("alignBottom")}
+            {renderAction("alignLeft")}
+            {renderAction("alignRight")}
+            {renderAction("alignVerticallyCentered")}
+            {renderAction("alignHorizontallyCentered")}
+          </div>
+        </fieldset>
+      )}
+
       {!isMobile && !isEditing && targetElements.length > 0 && (
         <fieldset>
           <legend>{t("labels.actions")}</legend>
