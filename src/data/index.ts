@@ -218,13 +218,13 @@ export const exportToBackend = async (
       // of queryParam in order to never send it to the server
       url.hash = `json=${json.id},${exportedKey.k!}`;
       const urlString = url.toString();
-
       window.prompt(`🔒${t("alerts.uploadedSecurly")}`, urlString);
+    } else if (json.error_class === "RequestTooLargeError") {
+      window.alert(t("alerts.couldNotCreateShareableLinkTooBig"));
     } else {
       window.alert(t("alerts.couldNotCreateShareableLink"));
     }
   } catch (error) {
-    console.error(error);
     window.alert(t("alerts.couldNotCreateShareableLink"));
   }
 };
