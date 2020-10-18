@@ -225,7 +225,7 @@ export const exportToBackend = async (
       window.alert(t("alerts.couldNotCreateShareableLink"));
     }
   } catch (error) {
-    console.log(error)
+    console.error(error);
     window.alert(t("alerts.couldNotCreateShareableLink"));
   }
 };
