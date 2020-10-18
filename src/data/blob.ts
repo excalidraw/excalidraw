@@ -11,7 +11,7 @@ export const parseFileContents = async (blob: Blob | File) => {
   if (blob.type === "image/png") {
     try {
       return await (
-        await import(/* webpackChunkName: "image-png" */ "./image")
+        await import(/* webpackChunkName: "image" */ "./image")
       ).decodePngMetadata(blob);
     } catch (error) {
       if (error.message === "INVALID") {
@@ -37,7 +37,7 @@ export const parseFileContents = async (blob: Blob | File) => {
     if (blob.type === "image/svg+xml") {
       try {
         return await (
-          await import(/* webpackChunkName: "image-svg" */ "./image")
+          await import(/* webpackChunkName: "image" */ "./image")
         ).decodeSvgMetadata({
           svg: contents,
         });

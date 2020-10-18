@@ -308,7 +308,7 @@ export const exportCanvas = async (
       metadata:
         appState.exportEmbedScene && type === "svg"
           ? await (
-              await import(/* webpackChunkName: "image-svg" */ "./image")
+              await import(/* webpackChunkName: "image" */ "./image")
             ).encodeSvgMetadata({
               text: serializeAsJSON(elements, appState),
             })
@@ -342,7 +342,7 @@ export const exportCanvas = async (
       if (blob) {
         if (appState.exportEmbedScene) {
           blob = await (
-            await import(/* webpackChunkName: "image-png" */ "./image")
+            await import(/* webpackChunkName: "image" */ "./image")
           ).encodePngMetadata({
             blob,
             metadata: serializeAsJSON(elements, appState),
