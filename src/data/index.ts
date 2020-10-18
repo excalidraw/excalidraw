@@ -308,7 +308,9 @@ export const exportCanvas = async (
       shouldAddWatermark,
       metadata:
         appState.exportEmbedScene && type === "svg"
-          ? await (await import("./image")).encodeSvgMetadata({
+          ? await (
+              await import(/* webpackChunkName: "image" */ "./image")
+            ).encodeSvgMetadata({
               text: serializeAsJSON(elements, appState),
             })
           : undefined,
@@ -340,7 +342,9 @@ export const exportCanvas = async (
     tempCanvas.toBlob(async (blob) => {
       if (blob) {
         if (appState.exportEmbedScene) {
-          blob = await (await import("./image")).encodePngMetadata({
+          blob = await (
+            await import(/* webpackChunkName: "image" */ "./image")
+          ).encodePngMetadata({
             blob,
             metadata: serializeAsJSON(elements, appState),
           });

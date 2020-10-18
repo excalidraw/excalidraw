@@ -1,5 +1,4 @@
 const path = require("path");
-const webpack = require("webpack");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 
@@ -76,10 +75,16 @@ module.exports = {
       new TerserPlugin({
         test: /\.js($|\?)/i,
       }),
-      new webpack.optimize.LimitChunkCountPlugin({
-        maxChunks: 1,
-      }),
     ],
+    splitChunks: {
+      chunks: "all",
+      cacheGroups: {
+        vendors: {
+          test: /[\\/]node_modules[\\/]/,
+          name: "vendor",
+        },
+      },
+    },
   },
   plugins: [new MiniCssExtractPlugin({ filename: "[name].css" })],
   externals: {
