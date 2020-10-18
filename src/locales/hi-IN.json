@@ -109,6 +109,7 @@
   "alerts": {
     "clearReset": "इससे पूरा कैनवास साफ हो जाएगा। क्या आपको यकीन है?",
     "couldNotCreateShareableLink": "साझा करने योग्य लिंक नहीं बनाया जा सका।",
+    "couldNotCreateShareableLinkTooBig": "",
     "couldNotLoadInvalidFile": "अमान्य फ़ाइल लोड नहीं की जा सकी",
     "importBackendFailed": "बैकएंड से आयात करना विफल रहा।",
     "cannotExportEmptyCanvas": "खाली कैनवास निर्यात नहीं कर सकता।",
