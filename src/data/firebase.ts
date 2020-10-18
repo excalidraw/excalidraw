@@ -6,8 +6,10 @@ import Portal from "../components/Portal";
 let firebasePromise: Promise<typeof import("firebase/app")> | null = null;
 
 async function loadFirebase() {
-  const firebase = await import("firebase/app");
-  await import("firebase/firestore");
+  const firebase = await import(
+    /* webpackChunkName: "firebase" */ "firebase/app"
+  );
+  await import(/* webpackChunkName: "firestore" */ "firebase/firestore");
 
   const firebaseConfig = JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG);
   firebase.initializeApp(firebaseConfig);
