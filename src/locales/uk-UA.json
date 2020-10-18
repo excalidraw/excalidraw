@@ -33,7 +33,7 @@
     "onlySelected": "Тільки вибране",
     "withBackground": "З тлом",
     "exportEmbedScene": "Вставити сцену в експортований файл",
-    "exportEmbedScene_details": "",
+    "exportEmbedScene_details": "Дані сцени будуть збережені в експортований файл PNG/SVG. Ця сцена може бути відновленна з нього, однак це збільшить розмір експортованого файлу.",
     "addWatermark": "Додати «Накреслене в Excalidraw»",
     "handDrawn": "Рукописний",
     "normal": "Звичайний",
@@ -119,8 +119,8 @@
     "loadSceneOverridePrompt": "Завантаження зовнішнього креслення замінить ваш наявний контент. Продовжити?",
     "errorLoadingLibrary": "Помилка при завантаженні сторонньої бібліотеки.",
     "confirmAddLibrary": "Це призведе до додавання {{numShapes}} фігур до вашої бібліотеки. Ви впевнені?",
-    "imageDoesNotContainScene": "",
-    "cannotRestoreFromImage": ""
+    "imageDoesNotContainScene": "Файл зображення не містить даних сцени. Ви увімкнули це під час експорту?",
+    "cannotRestoreFromImage": "Сцена не може бути відновлена з цього файлу зображення"
   },
   "toolBar": {
     "selection": "Виділення",
