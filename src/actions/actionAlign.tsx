@@ -2,7 +2,14 @@ import React from "react";
 import { KEYS } from "../keys";
 import { t } from "../i18n";
 import { register } from "./register";
-import { GroupIcon } from "../components/icons";
+import {
+  AlignBottomIcon,
+  AlignLeftIcon,
+  AlignRightIcon,
+  AlignTopIcon,
+  CenterHorizontallyIcon,
+  CenterVerticallyIcon,
+} from "../components/icons";
 import { newElementWith } from "../element/mutateElement";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { getNonDeletedElements } from "../element";
@@ -59,14 +66,14 @@ export const actionAlignTop = register({
     <ToolButton
       hidden={false && !enableActionGroup(elements, appState)}
       type="button"
-      icon={<GroupIcon appearance={appState.appearance} />}
+      icon={<AlignTopIcon appearance={appState.appearance} />}
       onClick={() => updateData(null)}
       title={t("labels.alignTop")}
       aria-label={t("labels.alignTop")}
       visible={
         true || isSomeElementSelected(getNonDeletedElements(elements), appState)
       }
-    ></ToolButton>
+    />
   ),
 });
 
@@ -109,14 +116,14 @@ export const actionAlignBottom = register({
     <ToolButton
       hidden={false && !enableActionGroup(elements, appState)}
       type="button"
-      icon={<GroupIcon appearance={appState.appearance} />}
+      icon={<AlignBottomIcon appearance={appState.appearance} />}
       onClick={() => updateData(null)}
       title={t("labels.alignBottom")}
       aria-label={t("labels.alignBottom")}
       visible={
         true || isSomeElementSelected(getNonDeletedElements(elements), appState)
       }
-    ></ToolButton>
+    />
   ),
 });
 
@@ -157,14 +164,14 @@ export const actionAlignLeft = register({
     <ToolButton
       hidden={false && !enableActionGroup(elements, appState)}
       type="button"
-      icon={<GroupIcon appearance={appState.appearance} />}
+      icon={<AlignLeftIcon appearance={appState.appearance} />}
       onClick={() => updateData(null)}
       title={t("labels.alignLeft")}
       aria-label={t("labels.alignLeft")}
       visible={
         true || isSomeElementSelected(getNonDeletedElements(elements), appState)
       }
-    ></ToolButton>
+    />
   ),
 });
 
@@ -209,14 +216,14 @@ export const actionAlignRight = register({
     <ToolButton
       hidden={false && !enableActionGroup(elements, appState)}
       type="button"
-      icon={<GroupIcon appearance={appState.appearance} />}
+      icon={<AlignRightIcon appearance={appState.appearance} />}
       onClick={() => updateData(null)}
       title={t("labels.alignRight")}
       aria-label={t("labels.alignRight")}
       visible={
         true || isSomeElementSelected(getNonDeletedElements(elements), appState)
       }
-    ></ToolButton>
+    />
   ),
 });
 
@@ -261,14 +268,14 @@ export const actionAlignVerticallyCentered = register({
     <ToolButton
       hidden={false && !enableActionGroup(elements, appState)}
       type="button"
-      icon={<GroupIcon appearance={appState.appearance} />}
+      icon={<CenterVerticallyIcon appearance={appState.appearance} />}
       onClick={() => updateData(null)}
       title={t("labels.centerVertically")}
       aria-label={t("labels.centerVertically")}
       visible={
         true || isSomeElementSelected(getNonDeletedElements(elements), appState)
       }
-    ></ToolButton>
+    />
   ),
 });
 
@@ -313,13 +320,13 @@ export const actionAlignHorizontallyCentered = register({
     <ToolButton
       hidden={false && !enableActionGroup(elements, appState)}
       type="button"
-      icon={<GroupIcon appearance={appState.appearance} />}
+      icon={<CenterHorizontallyIcon appearance={appState.appearance} />}
       onClick={() => updateData(null)}
       title={t("labels.centerHorizontally")}
       aria-label={t("labels.centerHorizontally")}
       visible={
         true || isSomeElementSelected(getNonDeletedElements(elements), appState)
       }
-    ></ToolButton>
+    />
   ),
 });
