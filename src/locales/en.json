@@ -109,6 +109,7 @@
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",
     "couldNotCreateShareableLink": "Couldn't create shareable link.",
+    "couldNotCreateShareableLinkTooBig": "Couldn't create shareable link: the scene is too big",
     "couldNotLoadInvalidFile": "Couldn't load invalid file",
     "importBackendFailed": "Importing from backend failed.",
     "cannotExportEmptyCanvas": "Cannot export empty canvas.",
