@@ -329,7 +329,7 @@ export const CenterHorizontallyIcon = React.memo(
           d="M 12,2 V 22"
           fill={iconFillColor(appearance)}
           stroke={iconFillColor(appearance)}
-          strokeWidth="1"
+          strokeWidth="2"
           strokeDasharray="1, 2.8"
           strokeLinecap="round"
         />
