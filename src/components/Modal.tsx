@@ -2,6 +2,7 @@ import "./Modal.scss";
 
 import React, { useState, useLayoutEffect } from "react";
 import { createPortal } from "react-dom";
+import clsx from "clsx";
 import { KEYS } from "../keys";
 
 export const Modal = (props: {
@@ -26,7 +27,7 @@ export const Modal = (props: {
 
   return createPortal(
     <div
-      className={`Modal ${props.className ?? ""}`}
+      className={clsx("Modal", props.className)}
       role="dialog"
       aria-modal="true"
       onKeyDown={handleKeydown}

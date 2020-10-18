@@ -1,4 +1,5 @@
 import React from "react";
+import clsx from "clsx";
 
 export const ButtonSelect = <T extends Object>({
   options,
@@ -15,7 +16,7 @@ export const ButtonSelect = <T extends Object>({
     {options.map((option) => (
       <label
         key={option.text}
-        className={value === option.value ? "active" : ""}
+        className={clsx({ active: value === option.value })}
       >
         <input
           type="radio"

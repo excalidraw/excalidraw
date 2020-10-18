@@ -1,4 +1,5 @@
 import React from "react";
+import clsx from "clsx";
 import * as i18n from "../i18n";
 
 export const LanguageList = ({
@@ -14,9 +15,9 @@ export const LanguageList = ({
 }) => (
   <React.Fragment>
     <select
-      className={`dropdown-select dropdown-select__language${
-        floating ? " dropdown-select--floating" : ""
-      }`}
+      className={clsx("dropdown-select dropdown-select__language", {
+        "dropdown-select--floating": floating,
+      })}
       onChange={({ target }) => onChange(target.value)}
       value={currentLanguage}
       aria-label={i18n.t("buttons.selectLanguage")}
