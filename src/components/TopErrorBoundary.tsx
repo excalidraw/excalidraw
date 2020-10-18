@@ -58,7 +58,7 @@ export class TopErrorBoundary extends React.Component<
     try {
       const templateStrFn = (
         await import(
-          /*  webpackChunkName: "bug-issue-template" */ "../bug-issue-template"
+          /* webpackChunkName: "bug-issue-template" */ "../bug-issue-template"
         )
       ).default;
       body = encodeURIComponent(templateStrFn(this.state.sentryEventId));
