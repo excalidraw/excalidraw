@@ -81,12 +81,7 @@ module.exports = {
       cacheGroups: {
         vendors: {
           test: /[\\/]node_modules[\\/]/,
-          name(module) {
-            const packageName = module.context.match(
-              /[\\/]node_modules[\\/](.*?)([\\/]|$)/,
-            )[1];
-            return `vendors~${packageName.replace("@", "")}`;
-          },
+          name: "vendor",
         },
       },
     },
