@@ -10,46 +10,44 @@ import {
   CenterHorizontallyIcon,
   CenterVerticallyIcon,
 } from "../components/icons";
-import { newElementWith } from "../element/mutateElement";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { getNonDeletedElements } from "../element";
 import { ToolButton } from "../components/ToolButton";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
+import { alignElements, AlignmentType } from "../align";
+import { getShortcutKey } from "../utils";
 
 const enableActionGroup = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ) => getSelectedElements(getNonDeletedElements(elements), appState).length > 1;
 
-const alignElements = (
+function alignSelectedElements(
   elements: readonly ExcalidrawElement[],
-  appState: AppState,
-  callback: (element: ExcalidrawElement) => ExcalidrawElement,
-) =>
-  elements.map((element) =>
-    appState.selectedElementIds[element.id] ? callback(element) : element,
+  appState: Readonly<AppState>,
+  alignmentType: AlignmentType,
+) {
+  const selectedElements = getSelectedElements(
+    getNonDeletedElements(elements),
+    appState,
   );
+
+  const updatedElements = alignElements(selectedElements, alignmentType);
+
+  const updatedElementsMap = new Map(updatedElements.map((e) => [e.id, e]));
+
+  return elements.map(
+    (element) => updatedElementsMap.get(element.id) || element,
+  );
+}
 
 export const actionAlignTop = register({
   name: "alignTop",
   perform: (elements, appState) => {
-    const selectedElements = getSelectedElements(
-      getNonDeletedElements(elements),
-      appState,
-    );
-
-    const staticElement = selectedElements.reduce((topmost, current) =>
-      current.y < topmost.y ? current : topmost,
-    );
-
-    const updatedElements = alignElements(elements, appState, (element) =>
-      newElementWith(element, { y: staticElement.y }),
-    );
-
     return {
       appState,
-      elements: updatedElements,
+      elements: alignSelectedElements(elements, appState, "top"),
       commitToHistory: true,
     };
   },
@@ -64,15 +62,13 @@ export const actionAlignTop = register({
   },
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
-      hidden={false && !enableActionGroup(elements, appState)}
+      hidden={!enableActionGroup(elements, appState)}
       type="button"
       icon={<AlignTopIcon appearance={appState.appearance} />}
       onClick={() => updateData(null)}
-      title={t("labels.alignTop")}
+      title={`${t("labels.alignTop")} — ${getShortcutKey("CtrlOrCmd+Shift+🠝")}`}
       aria-label={t("labels.alignTop")}
-      visible={
-        true || isSomeElementSelected(getNonDeletedElements(elements), appState)
-      }
+      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
     />
   ),
 });
@@ -80,26 +76,9 @@ export const actionAlignTop = register({
 export const actionAlignBottom = register({
   name: "alignBottom",
   perform: (elements, appState) => {
-    const selectedElements = getSelectedElements(
-      getNonDeletedElements(elements),
-      appState,
-    );
-
-    const staticElement = selectedElements.reduce((bottommost, current) =>
-      current.y + current.height > bottommost.y + bottommost.height
-        ? current
-        : bottommost,
-    );
-
-    const updatedElements = alignElements(elements, appState, (element) =>
-      newElementWith(element, {
-        y: staticElement.y + staticElement.height - element.height,
-      }),
-    );
-
     return {
       appState,
-      elements: updatedElements,
+      elements: alignSelectedElements(elements, appState, "bottom"),
       commitToHistory: true,
     };
   },
@@ -114,15 +93,15 @@ export const actionAlignBottom = register({
   },
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
-      hidden={false && !enableActionGroup(elements, appState)}
+      hidden={!enableActionGroup(elements, appState)}
       type="button"
       icon={<AlignBottomIcon appearance={appState.appearance} />}
       onClick={() => updateData(null)}
-      title={t("labels.alignBottom")}
+      title={`${t("labels.alignBottom")} — ${getShortcutKey(
+        "CtrlOrCmd+Shift+🠟",
+      )}`}
       aria-label={t("labels.alignBottom")}
-      visible={
-        true || isSomeElementSelected(getNonDeletedElements(elements), appState)
-      }
+      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
     />
   ),
 });
@@ -130,24 +109,9 @@ export const actionAlignBottom = register({
 export const actionAlignLeft = register({
   name: "alignLeft",
   perform: (elements, appState) => {
-    const selectedElements = getSelectedElements(
-      getNonDeletedElements(elements),
-      appState,
-    );
-
-    const staticElement = selectedElements.reduce((leftmost, current) =>
-      current.x < leftmost.x ? current : leftmost,
-    );
-
-    const updatedElements = alignElements(elements, appState, (element) =>
-      newElementWith(element, {
-        x: staticElement.x,
-      }),
-    );
-
     return {
       appState,
-      elements: updatedElements,
+      elements: alignSelectedElements(elements, appState, "left"),
       commitToHistory: true,
     };
   },
@@ -162,15 +126,15 @@ export const actionAlignLeft = register({
   },
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
-      hidden={false && !enableActionGroup(elements, appState)}
+      hidden={!enableActionGroup(elements, appState)}
       type="button"
       icon={<AlignLeftIcon appearance={appState.appearance} />}
       onClick={() => updateData(null)}
-      title={t("labels.alignLeft")}
+      title={`${t("labels.alignLeft")} — ${getShortcutKey(
+        "CtrlOrCmd+Shift+🠜",
+      )}`}
       aria-label={t("labels.alignLeft")}
-      visible={
-        true || isSomeElementSelected(getNonDeletedElements(elements), appState)
-      }
+      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
     />
   ),
 });
@@ -178,26 +142,9 @@ export const actionAlignLeft = register({
 export const actionAlignRight = register({
   name: "alignRight",
   perform: (elements, appState) => {
-    const selectedElements = getSelectedElements(
-      getNonDeletedElements(elements),
-      appState,
-    );
-
-    const staticElement = selectedElements.reduce((rightmost, current) =>
-      current.x + current.width > rightmost.x + rightmost.width
-        ? current
-        : rightmost,
-    );
-
-    const updatedElements = alignElements(elements, appState, (element) =>
-      newElementWith(element, {
-        x: staticElement.x + staticElement.width - element.width,
-      }),
-    );
-
     return {
       appState,
-      elements: updatedElements,
+      elements: alignSelectedElements(elements, appState, "right"),
       commitToHistory: true,
     };
   },
@@ -214,15 +161,15 @@ export const actionAlignRight = register({
   },
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
-      hidden={false && !enableActionGroup(elements, appState)}
+      hidden={!enableActionGroup(elements, appState)}
       type="button"
       icon={<AlignRightIcon appearance={appState.appearance} />}
       onClick={() => updateData(null)}
-      title={t("labels.alignRight")}
+      title={`${t("labels.alignRight")} — ${getShortcutKey(
+        "CtrlOrCmd+Shift+🠞",
+      )}`}
       aria-label={t("labels.alignRight")}
-      visible={
-        true || isSomeElementSelected(getNonDeletedElements(elements), appState)
-      }
+      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
     />
   ),
 });
@@ -230,33 +177,9 @@ export const actionAlignRight = register({
 export const actionAlignVerticallyCentered = register({
   name: "alignVerticallyCentered",
   perform: (elements, appState) => {
-    const selectedElements = getSelectedElements(
-      getNonDeletedElements(elements),
-      appState,
-    );
-
-    const topmostElement = selectedElements.reduce((topmost, current) =>
-      current.y < topmost.y ? current : topmost,
-    );
-
-    const bottommostElement = selectedElements.reduce((bottommost, current) =>
-      current.y + current.height > bottommost.y + bottommost.height
-        ? current
-        : bottommost,
-    );
-
-    const selectionCenterY =
-      (topmostElement.y + bottommostElement.y + bottommostElement.height) / 2;
-
-    const updatedElements = alignElements(elements, appState, (element) =>
-      newElementWith(element, {
-        y: selectionCenterY - element.height / 2,
-      }),
-    );
-
     return {
       appState,
-      elements: updatedElements,
+      elements: alignSelectedElements(elements, appState, "verticallyCentered"),
       commitToHistory: true,
     };
   },
@@ -266,15 +189,13 @@ export const actionAlignVerticallyCentered = register({
     enableActionGroup(elements, appState),
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
-      hidden={false && !enableActionGroup(elements, appState)}
+      hidden={!enableActionGroup(elements, appState)}
       type="button"
       icon={<CenterVerticallyIcon appearance={appState.appearance} />}
       onClick={() => updateData(null)}
       title={t("labels.centerVertically")}
       aria-label={t("labels.centerVertically")}
-      visible={
-        true || isSomeElementSelected(getNonDeletedElements(elements), appState)
-      }
+      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
     />
   ),
 });
@@ -282,33 +203,13 @@ export const actionAlignVerticallyCentered = register({
 export const actionAlignHorizontallyCentered = register({
   name: "alignHorizontallyCentered",
   perform: (elements, appState) => {
-    const selectedElements = getSelectedElements(
-      getNonDeletedElements(elements),
-      appState,
-    );
-
-    const leftmostElement = selectedElements.reduce((leftmost, current) =>
-      current.x < leftmost.x ? current : leftmost,
-    );
-
-    const rightmostElement = selectedElements.reduce((rightmost, current) =>
-      current.x + current.width > rightmost.x + rightmost.width
-        ? current
-        : rightmost,
-    );
-
-    const selectionCenterX =
-      (leftmostElement.x + rightmostElement.x + rightmostElement.width) / 2;
-
-    const updatedElements = alignElements(elements, appState, (element) =>
-      newElementWith(element, {
-        x: selectionCenterX - element.width / 2,
-      }),
-    );
-
     return {
       appState,
-      elements: updatedElements,
+      elements: alignSelectedElements(
+        elements,
+        appState,
+        "horizontallyCentered",
+      ),
       commitToHistory: true,
     };
   },
@@ -318,15 +219,13 @@ export const actionAlignHorizontallyCentered = register({
     enableActionGroup(elements, appState),
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
-      hidden={false && !enableActionGroup(elements, appState)}
+      hidden={!enableActionGroup(elements, appState)}
       type="button"
       icon={<CenterHorizontallyIcon appearance={appState.appearance} />}
       onClick={() => updateData(null)}
       title={t("labels.centerHorizontally")}
       aria-label={t("labels.centerHorizontally")}
-      visible={
-        true || isSomeElementSelected(getNonDeletedElements(elements), appState)
-      }
+      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
     />
   ),
 });
