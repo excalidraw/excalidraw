@@ -1,6 +1,21 @@
 import { ExcalidrawElement } from "./element/types";
 import { newElementWith } from "./element/mutateElement";
 
+interface Box {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export type AlignmentType =
+  | "top"
+  | "bottom"
+  | "left"
+  | "right"
+  | "verticallyCentered"
+  | "horizontallyCentered";
+
 export const getAlignmentGroupsForElements = (
   elements: ExcalidrawElement[],
 ) => {
@@ -15,21 +30,20 @@ export const getAlignmentGroupsForElements = (
         ? element.id
         : element.groupIds[element.groupIds.length - 1];
 
-    const currentNoGroupArray = groups.get(groupId) || [];
+    const currentGroupMembers = groups.get(groupId) || [];
 
-    groups.set(groupId, [...currentNoGroupArray, element]);
+    groups.set(groupId, [...currentGroupMembers, element]);
   });
 
   return groups;
 };
 
-export const calculateBoundingboxForGroups = (
+export const calculateBoundingBoxesForGroups = (
   groups: Map<String, ExcalidrawElement[]>,
 ) => {
   const groupBoundingBoxes = new Map<String, Box>();
 
   groups.forEach((group, groupId) => {
-    // Calculate the bounding box
     const { x } = group.reduce((leftmost, current) =>
       current.x < leftmost.x ? current : leftmost,
     );
@@ -62,21 +76,6 @@ export const calculateBoundingboxForGroups = (
 
   return groupBoundingBoxes;
 };
-
-interface Box {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
-
-export type AlignmentType =
-  | "top"
-  | "bottom"
-  | "left"
-  | "right"
-  | "verticallyCentered"
-  | "horizontallyCentered";
 
 export const getReferenceElement = (elements: Box[], type: AlignmentType) => {
   const axis = type === "top" || type === "bottom" ? "y" : "x";
@@ -169,7 +168,7 @@ export const alignElements = (
   type: AlignmentType,
 ): ExcalidrawElement[] => {
   const groups = getAlignmentGroupsForElements(elements);
-  const groupBoundingBoxes: Map<String, Box> = calculateBoundingboxForGroups(
+  const groupBoundingBoxes: Map<String, Box> = calculateBoundingBoxesForGroups(
     groups,
   );
 
