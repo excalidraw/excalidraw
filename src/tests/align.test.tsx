@@ -147,7 +147,7 @@ it("aligns two objects correctly to the right", () => {
   expect(API.getSelectedElements()[1].y).toEqual(110);
 });
 
-it("centers two objects with different sizes vertically correctly ", () => {
+it("centers two objects with different sizes correctly vertically", () => {
   createAndSelectTwoRectanglesWithDifferentSizes();
 
   expect(API.getSelectedElements()[0].x).toEqual(0);
@@ -166,7 +166,7 @@ it("centers two objects with different sizes vertically correctly ", () => {
   expect(API.getSelectedElements()[1].y).toEqual(55);
 });
 
-it("centers two objects with different sizes horizontally correctly ", () => {
+it("centers two objects with different sizes correctly horizontally", () => {
   createAndSelectTwoRectanglesWithDifferentSizes();
 
   expect(API.getSelectedElements()[0].x).toEqual(0);
@@ -185,7 +185,7 @@ it("centers two objects with different sizes horizontally correctly ", () => {
   expect(API.getSelectedElements()[1].y).toEqual(110);
 });
 
-function createandSelectGroupAndRectangle() {
+function createAndSelectGroupAndRectangle() {
   UI.clickTool("rectangle");
   mouse.down();
   mouse.up(100, 100);
@@ -216,7 +216,7 @@ function createandSelectGroupAndRectangle() {
 }
 
 it("aligns a group with another element correctly to the top", () => {
-  createandSelectGroupAndRectangle();
+  createAndSelectGroupAndRectangle();
 
   expect(API.getSelectedElements()[0].y).toEqual(0);
   expect(API.getSelectedElements()[1].y).toEqual(100);
@@ -230,7 +230,7 @@ it("aligns a group with another element correctly to the top", () => {
 });
 
 it("aligns a group with another element correctly to the bottom", () => {
-  createandSelectGroupAndRectangle();
+  createAndSelectGroupAndRectangle();
 
   expect(API.getSelectedElements()[0].y).toEqual(0);
   expect(API.getSelectedElements()[1].y).toEqual(100);
@@ -244,7 +244,7 @@ it("aligns a group with another element correctly to the bottom", () => {
 });
 
 it("aligns a group with another element correctly to the left", () => {
-  createandSelectGroupAndRectangle();
+  createAndSelectGroupAndRectangle();
 
   expect(API.getSelectedElements()[0].x).toEqual(0);
   expect(API.getSelectedElements()[1].x).toEqual(100);
@@ -258,7 +258,7 @@ it("aligns a group with another element correctly to the left", () => {
 });
 
 it("aligns a group with another element correctly to the right", () => {
-  createandSelectGroupAndRectangle();
+  createAndSelectGroupAndRectangle();
 
   expect(API.getSelectedElements()[0].x).toEqual(0);
   expect(API.getSelectedElements()[1].x).toEqual(100);
@@ -272,7 +272,7 @@ it("aligns a group with another element correctly to the right", () => {
 });
 
 it("centers a group with another element correctly vertically", () => {
-  createandSelectGroupAndRectangle();
+  createAndSelectGroupAndRectangle();
 
   expect(API.getSelectedElements()[0].y).toEqual(0);
   expect(API.getSelectedElements()[1].y).toEqual(100);
@@ -286,7 +286,7 @@ it("centers a group with another element correctly vertically", () => {
 });
 
 it("centers a group with another element correctly horizontally", () => {
-  createandSelectGroupAndRectangle();
+  createAndSelectGroupAndRectangle();
 
   expect(API.getSelectedElements()[0].x).toEqual(0);
   expect(API.getSelectedElements()[1].x).toEqual(100);
@@ -309,7 +309,7 @@ function createAndSelectTwoGroups() {
   mouse.up(100, 100);
 
   // Select the first element.
-  // The second rectangle is already reselected because it was the last element created
+  // The second rectangle is already selected because it was the last element created
   mouse.reset();
   Keyboard.withModifierKeys({ shift: true }, () => {
     mouse.click();
@@ -334,7 +334,7 @@ function createAndSelectTwoGroups() {
   h.app.actionManager.executeAction(actionGroup);
 
   // Select the first group.
-  // The second group is already reselected because it was the last group created
+  // The second group is already selected because it was the last group created
   mouse.reset();
   Keyboard.withModifierKeys({ shift: true }, () => {
     mouse.click();
