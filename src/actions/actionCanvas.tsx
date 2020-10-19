@@ -59,8 +59,6 @@ export const actionClearCanvas = register({
       showAriaLabel={useIsMobile()}
       onClick={() => {
         if (window.confirm(t("alerts.clearReset"))) {
-          // TODO: Make this part of `AppState`.
-          (window as any).handle = null;
           updateData(null);
         }
       }}

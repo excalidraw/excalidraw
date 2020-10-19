@@ -66,9 +66,6 @@ export type SocketUpdateDataIncoming =
       type: "INVALID_RESPONSE";
     };
 
-// TODO: Make this part of `AppState`.
-(window as any).handle = null;
-
 const byteToHex = (byte: number): string => `0${byte.toString(16)}`.slice(-2);
 
 const generateRandomID = async () => {

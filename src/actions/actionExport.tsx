@@ -85,12 +85,16 @@ export const actionChangeShouldAddWatermark = register({
 
 export const actionSaveScene = register({
   name: "saveScene",
-  perform: (elements, appState, value) => {
-    // TODO: Make this part of `AppState`.
-    saveAsJSON(elements, appState, (window as any).handle)
-      .catch(muteFSAbortError)
-      .catch((error) => console.error(error));
-    return { commitToHistory: false };
+  perform: async (elements, appState, value) => {
+    try {
+      const { fileHandle } = await saveAsJSON(elements, appState);
+      return { commitToHistory: false, appState: { ...appState, fileHandle } };
+    } catch (error) {
+      if (error?.name !== "AbortError") {
+        console.error(error);
+      }
+      return { commitToHistory: false };
+    }
   },
   keyTest: (event) => {
     return event.key === "s" && event[KEYS.CTRL_OR_CMD] && !event.shiftKey;
@@ -109,11 +113,19 @@ export const actionSaveScene = register({
 
 export const actionSaveAsScene = register({
   name: "saveAsScene",
-  perform: (elements, appState, value) => {
-    saveAsJSON(elements, appState, null)
-      .catch(muteFSAbortError)
-      .catch((error) => console.error(error));
-    return { commitToHistory: false };
+  perform: async (elements, appState, value) => {
+    try {
+      const { fileHandle } = await saveAsJSON(elements, {
+        ...appState,
+        fileHandle: null,
+      });
+      return { commitToHistory: false, appState: { ...appState, fileHandle } };
+    } catch (error) {
+      if (error?.name !== "AbortError") {
+        console.error(error);
+      }
+      return { commitToHistory: false };
+    }
   },
   keyTest: (event) => {
     return event.key === "s" && event.shiftKey && event[KEYS.CTRL_OR_CMD];

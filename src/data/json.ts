@@ -27,23 +27,23 @@ export const serializeAsJSON = (
 export const saveAsJSON = async (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
-  fileHandle: any,
 ) => {
   const serialized = serializeAsJSON(elements, appState);
   const blob = new Blob([serialized], {
     type: "application/json",
   });
-  const name = `${appState.name}.excalidraw`;
-  // TODO: Make this part of `AppState`.
-  (window as any).handle = await fileSave(
+
+  const fileHandle = await fileSave(
     blob,
     {
-      fileName: name,
+      fileName: appState.name,
       description: "Excalidraw file",
       extensions: [".excalidraw"],
     },
-    fileHandle || null,
+    appState.fileHandle,
   );
+
+  return { fileHandle };
 };
 
 export const loadFromJSON = async (localAppState: AppState) => {

@@ -76,3 +76,10 @@ type CallableType<T extends (...args: any[]) => any> = (
 type ForwardRef<T, P = any> = Parameters<
   CallableType<React.ForwardRefRenderFunction<T, P>>
 >[1];
+
+// --------------------------------------------------------------------------—
+
+interface Blob {
+  handle?: import("browser-nativefs").FileSystemHandle;
+  name?: string;
+}

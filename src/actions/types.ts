@@ -16,9 +16,9 @@ type ActionFn = (
   elements: readonly ExcalidrawElement[],
   appState: Readonly<AppState>,
   formData: any,
-) => ActionResult;
+) => ActionResult | Promise<ActionResult>;
 
-export type UpdaterFn = (res: ActionResult, commitToHistory?: boolean) => void;
+export type UpdaterFn = (res: ActionResult) => void;
 export type ActionFilterFn = (action: Action) => void;
 
 export type ActionName =
