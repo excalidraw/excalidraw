@@ -109,7 +109,7 @@
   "alerts": {
     "clearReset": "Questo cancellerà l'intera tela. Sei sicuro?",
     "couldNotCreateShareableLink": "Non riesco a creare un link condivisibile.",
-    "couldNotCreateShareableLinkTooBig": "",
+    "couldNotCreateShareableLinkTooBig": "Impossibile creare il link condivisibile: la scena è troppo grande",
     "couldNotLoadInvalidFile": "Impossibile caricare un file no valido",
     "importBackendFailed": "Importazione dal server fallita.",
     "cannotExportEmptyCanvas": "Non è possibile esportare una tela vuota.",
