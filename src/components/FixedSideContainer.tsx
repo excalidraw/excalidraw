@@ -16,8 +16,8 @@ export const FixedSideContainer = ({
 }: FixedSideContainerProps) => (
   <div
     className={clsx(
-      `FixedSideContainer`,
-      { [`FixedSideContainer_side_${side}`]: side },
+      "FixedSideContainer",
+      `FixedSideContainer_side_${side}`,
       className,
     )}
   >

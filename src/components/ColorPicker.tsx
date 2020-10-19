@@ -1,5 +1,4 @@
 import React from "react";
-import clsx from "clsx";
 import { Popover } from "./Popover";
 
 import "./ColorPicker.scss";
@@ -126,7 +125,7 @@ const Picker = ({
 
   return (
     <div
-      className={clsx("color-picker", { [`color-picker-type-${type}`]: type })}
+      className={`color-picker color-picker-type-${type}`}
       role="dialog"
       aria-modal="true"
       aria-label={t("labels.colorPicker")}

@@ -84,7 +84,7 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
   return (
     <label className={clsx("ToolIcon", props.className)} title={props.title}>
       <input
-        className={clsx("ToolIcon_type_radio", sizeCn)}
+        className={`ToolIcon_type_radio ${sizeCn}`}
         type="radio"
         name={props.name}
         aria-label={props["aria-label"]}
