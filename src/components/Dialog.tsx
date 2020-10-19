@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import clsx from "clsx";
 import { Modal } from "./Modal";
 import { Island } from "./Island";
 import { t } from "../i18n";
@@ -68,7 +69,7 @@ export const Dialog = (props: {
 
   return (
     <Modal
-      className={`${props.className ?? ""} Dialog`}
+      className={clsx("Dialog", props.className)}
       labelledBy="dialog-title"
       maxWidth={props.maxWidth}
       onCloseRequest={props.onCloseRequest}

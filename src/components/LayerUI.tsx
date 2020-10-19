@@ -44,6 +44,7 @@ import { ToolButton } from "./ToolButton";
 import { saveLibraryAsJSON, importLibraryFromJSON } from "../data/json";
 import { muteFSAbortError } from "../utils";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
+import clsx from "clsx";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -294,9 +295,9 @@ const LayerUI = ({
   // TODO: Extend tooltip component and use here.
   const renderEncryptedIcon = () => (
     <a
-      className={`encrypted-icon tooltip zen-mode-visibility ${
-        zenModeEnabled ? "zen-mode-visibility--hidden" : ""
-      }`}
+      className={clsx("encrypted-icon tooltip zen-mode-visibility", {
+        "zen-mode-visibility--hidden": zenModeEnabled,
+      })}
       href="https://blog.excalidraw.com/end-to-end-encryption/"
       target="_blank"
       rel="noopener noreferrer"
@@ -362,7 +363,9 @@ const LayerUI = ({
   const renderCanvasActions = () => (
     <Section
       heading="canvasActions"
-      className={`zen-mode-transition ${zenModeEnabled && "transition-left"}`}
+      className={clsx("zen-mode-transition", {
+        "transition-left": zenModeEnabled,
+      })}
     >
       {/* the zIndex ensures this menu has higher stacking order,
          see https://github.com/excalidraw/excalidraw/pull/1445 */}
@@ -399,7 +402,9 @@ const LayerUI = ({
   const renderSelectedShapeActions = () => (
     <Section
       heading="selectedShapeActions"
-      className={`zen-mode-transition ${zenModeEnabled && "transition-left"}`}
+      className={clsx("zen-mode-transition", {
+        "transition-left": zenModeEnabled,
+      })}
     >
       <Island className={CLASSES.SHAPE_ACTIONS_MENU} padding={2}>
         <SelectedShapeActions
@@ -447,7 +452,7 @@ const LayerUI = ({
         <div className="App-menu App-menu_top">
           <Stack.Col
             gap={4}
-            className={zenModeEnabled && "disable-pointerEvents"}
+            className={clsx({ "disable-pointerEvents": zenModeEnabled })}
           >
             {renderCanvasActions()}
             {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
@@ -456,7 +461,10 @@ const LayerUI = ({
             {(heading) => (
               <Stack.Col gap={4} align="start">
                 <Stack.Row gap={1}>
-                  <Island padding={1} className={zenModeEnabled && "zen-mode"}>
+                  <Island
+                    padding={1}
+                    className={clsx({ "zen-mode": zenModeEnabled })}
+                  >
                     <HintViewer appState={appState} elements={elements} />
                     {heading}
                     <Stack.Row gap={1}>
@@ -479,9 +487,9 @@ const LayerUI = ({
             )}
           </Section>
           <UserList
-            className={`zen-mode-transition ${
-              zenModeEnabled && "transition-right"
-            }`}
+            className={clsx("zen-mode-transition", {
+              "transition-right": zenModeEnabled,
+            })}
           >
             {Array.from(appState.collaborators)
               // Collaborator is either not initialized or is actually the current user.
@@ -503,9 +511,9 @@ const LayerUI = ({
   const renderBottomAppMenu = () => {
     return (
       <div
-        className={`App-menu App-menu_bottom zen-mode-transition ${
-          zenModeEnabled && "App-menu_bottom--transition-left"
-        }`}
+        className={clsx("App-menu App-menu_bottom zen-mode-transition", {
+          "App-menu_bottom--transition-left": zenModeEnabled,
+        })}
       >
         <Stack.Col gap={2}>
           <Section heading="canvasActions">
@@ -525,9 +533,9 @@ const LayerUI = ({
   const renderFooter = () => (
     <footer role="contentinfo" className="layer-ui__wrapper__footer">
       <div
-        className={`zen-mode-transition ${
-          zenModeEnabled && "transition-right disable-pointerEvents"
-        }`}
+        className={clsx("zen-mode-transition", {
+          "transition-right disable-pointerEvents": zenModeEnabled,
+        })}
       >
         <LanguageList
           onChange={async (lng) => {
@@ -540,9 +548,9 @@ const LayerUI = ({
         {actionManager.renderAction("toggleShortcuts")}
       </div>
       <button
-        className={`disable-zen-mode ${
-          zenModeEnabled && "disable-zen-mode--visible"
-        }`}
+        className={clsx("disable-zen-mode", {
+          "disable-zen-mode--visible": zenModeEnabled,
+        })}
         onClick={toggleZenMode}
       >
         {t("buttons.exitZenMode")}
@@ -594,9 +602,12 @@ const LayerUI = ({
       {renderBottomAppMenu()}
       {
         <aside
-          className={`layer-ui__wrapper__github-corner zen-mode-transition ${
-            zenModeEnabled && "transition-right"
-          }`}
+          className={clsx(
+            "layer-ui__wrapper__github-corner zen-mode-transition",
+            {
+              "transition-right": zenModeEnabled,
+            },
+          )}
         >
           <GitHubCorner appearance={appState.appearance} />
         </aside>

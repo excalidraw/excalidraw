@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import clsx from "clsx";
 import { ToolButton } from "./ToolButton";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
@@ -154,9 +155,9 @@ export const RoomDialog = ({
   return (
     <>
       <ToolButton
-        className={`RoomDialog-modalButton ${
-          isCollaborating ? "is-collaborating" : ""
-        }`}
+        className={clsx("RoomDialog-modalButton", {
+          "is-collaborating": isCollaborating,
+        })}
         onClick={() => setModalIsShown(true)}
         icon={users}
         type="button"
