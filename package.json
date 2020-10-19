@@ -22,7 +22,7 @@
     "@sentry/browser": "5.25.0",
     "@sentry/integrations": "5.26.0",
     "@testing-library/jest-dom": "5.11.4",
-    "@testing-library/react": "11.0.4",
+    "@testing-library/react": "11.1.0",
     "@types/jest": "26.0.14",
     "@types/nanoid": "2.1.0",
     "@types/react": "16.9.52",
