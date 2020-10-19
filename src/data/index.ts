@@ -66,9 +66,6 @@ export type SocketUpdateDataIncoming =
       type: "INVALID_RESPONSE";
     };
 
-// TODO: Make this part of `AppState`.
-(window as any).handle = null;
-
 const byteToHex = (byte: number): string => `0${byte.toString(16)}`.slice(-2);
 
 const generateRandomID = async () => {
@@ -308,7 +305,9 @@ export const exportCanvas = async (
       shouldAddWatermark,
       metadata:
         appState.exportEmbedScene && type === "svg"
-          ? await (await import("./image")).encodeSvgMetadata({
+          ? await (
+              await import(/* webpackChunkName: "image" */ "./image")
+            ).encodeSvgMetadata({
               text: serializeAsJSON(elements, appState),
             })
           : undefined,
@@ -340,7 +339,9 @@ export const exportCanvas = async (
     tempCanvas.toBlob(async (blob) => {
       if (blob) {
         if (appState.exportEmbedScene) {
-          blob = await (await import("./image")).encodePngMetadata({
+          blob = await (
+            await import(/* webpackChunkName: "image" */ "./image")
+          ).encodePngMetadata({
             blob,
             metadata: serializeAsJSON(elements, appState),
           });
