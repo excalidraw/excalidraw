@@ -96,6 +96,7 @@ export type AppState = {
   offsetLeft: number;
 
   isLibraryOpen: boolean;
+  fileHandle: import("browser-nativefs").FileSystemHandle | null;
 };
 
 export type PointerCoords = Readonly<{

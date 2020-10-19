@@ -558,7 +558,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             return;
           }
           const fileHandle = launchParams.files[0];
-          const blob = await fileHandle.getFile();
+          const blob: Blob = await fileHandle.getFile();
           blob.handle = fileHandle;
           loadFromBlob(blob, this.state)
             .then(({ elements, appState }) =>
@@ -3845,7 +3845,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           // but can be safely ignored on older releases.
           const item = event.dataTransfer.items[0];
           // TODO: Make this part of `AppState`.
-          (window as any).handle = await (item as any).getAsFileSystemHandle();
+          (file as any).handle = await (item as any).getAsFileSystemHandle();
         } catch (error) {
           console.warn(error.name, error.message);
         }
