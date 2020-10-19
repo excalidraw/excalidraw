@@ -6,6 +6,7 @@
 import React from "react";
 
 import oc from "open-color";
+import clsx from "clsx";
 
 const activeElementColor = (appearance: "light" | "dark") =>
   appearance === "light" ? oc.orange[4] : oc.orange[9];
@@ -27,7 +28,7 @@ const createIcon = (d: string | React.ReactNode, opts: number | Opts = 512) => {
       focusable="false"
       role="img"
       viewBox={`0 0 ${width} ${height}`}
-      className={mirror && "rtl-mirror"}
+      className={clsx({ "rtl-mirror": mirror })}
       style={style}
     >
       {typeof d === "string" ? <path fill="currentColor" d={d} /> : d}

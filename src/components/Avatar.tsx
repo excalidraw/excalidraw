@@ -9,7 +9,7 @@ type AvatarProps = {
 };
 
 export const Avatar = ({ children, color, onClick }: AvatarProps) => (
-  <div className={`Avatar`} style={{ background: color }} onClick={onClick}>
+  <div className="Avatar" style={{ background: color }} onClick={onClick}>
     {children}
   </div>
 );

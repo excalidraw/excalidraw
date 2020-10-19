@@ -1,6 +1,7 @@
 import React from "react";
-import { Popover } from "./Popover";
 import { render, unmountComponentAtNode } from "react-dom";
+import clsx from "clsx";
+import { Popover } from "./Popover";
 
 import "./ContextMenu.scss";
 
@@ -20,11 +21,13 @@ const ContextMenu = ({ options, onCloseRequest, top, left }: Props) => {
   const isDarkTheme = !!document
     .querySelector(".excalidraw")
     ?.classList.contains("Appearance_dark");
-  const wrapperClasses = `excalidraw ${
-    isDarkTheme ? "Appearance_dark Appearance_dark-background-none" : ""
-  }`;
+
   return (
-    <div className={wrapperClasses}>
+    <div
+      className={clsx("excalidraw", {
+        "Appearance_dark Appearance_dark-background-none": isDarkTheme,
+      })}
+    >
       <Popover
         onCloseRequest={onCloseRequest}
         top={top}
