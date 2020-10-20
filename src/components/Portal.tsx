@@ -102,10 +102,13 @@ class Portal {
         elements: syncableElements,
       },
     };
-    this.app.lastBroadcastedOrReceivedSceneVersion = Math.max(
-      this.app.lastBroadcastedOrReceivedSceneVersion,
+    const currentVersion = this.app.gettLastBroadcastedOrReceivedSceneVersion();
+    const newVersion = Math.max(
+      currentVersion,
       getSceneVersion(this.app.scene.getElementsIncludingDeleted()),
     );
+    this.app.setLastBroadcastedOrReceivedSceneVersion(newVersion);
+
     for (const syncableElement of syncableElements) {
       this.broadcastedElementVersions.set(
         syncableElement.id,

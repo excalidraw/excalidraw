@@ -279,7 +279,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
   portal: Portal;
-  lastBroadcastedOrReceivedSceneVersion: number = -1;
+  private lastBroadcastedOrReceivedSceneVersion: number = -1;
   unmounted: boolean = false;
   actionManager: ActionManager;
   private excalidrawRef: any;
@@ -395,6 +395,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       </div>
     );
   }
+
+  public setLastBroadcastedOrReceivedSceneVersion = (version: number) => {
+    this.lastBroadcastedOrReceivedSceneVersion = version;
+  };
+
+  public gettLastBroadcastedOrReceivedSceneVersion = () => {
+    return this.lastBroadcastedOrReceivedSceneVersion;
+  };
 
   private syncActionResult = withBatchedUpdates(
     (actionResult: ActionResult) => {
@@ -1363,7 +1371,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       // we just received!
       // Note: this needs to be set before replaceAllElements as it
       // syncronously calls render.
-      this.lastBroadcastedOrReceivedSceneVersion = getSceneVersion(newElements);
+
+      this.setLastBroadcastedOrReceivedSceneVersion(
+        getSceneVersion(newElements),
+      );
 
       this.scene.replaceAllElements(newElements);
     }
