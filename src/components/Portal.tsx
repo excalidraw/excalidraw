@@ -81,7 +81,7 @@ class Portal {
     }
 
     let syncableElements = getSyncableElements(
-      this.app.scene.getElementsIncludingDeleted(),
+      this.app.getSceneElementsIncludingDeleted(),
     );
 
     if (!syncAll) {
@@ -105,7 +105,7 @@ class Portal {
     const currentVersion = this.app.getLastBroadcastedOrReceivedSceneVersion();
     const newVersion = Math.max(
       currentVersion,
-      getSceneVersion(this.app.scene.getElementsIncludingDeleted()),
+      getSceneVersion(this.app.getSceneElementsIncludingDeleted()),
     );
     this.app.setLastBroadcastedOrReceivedSceneVersion(newVersion);
 

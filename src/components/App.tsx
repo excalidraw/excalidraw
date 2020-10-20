@@ -289,7 +289,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     width: window.innerWidth,
     height: window.innerHeight,
   };
-  scene: Scene;
+  private scene: Scene;
 
   constructor(props: ExcalidrawProps) {
     super(props);
@@ -402,6 +402,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   public getLastBroadcastedOrReceivedSceneVersion = () => {
     return this.lastBroadcastedOrReceivedSceneVersion;
+  };
+
+  public getSceneElementsIncludingDeleted = () => {
+    return this.scene.getElementsIncludingDeleted();
   };
 
   private syncActionResult = withBatchedUpdates(
