@@ -400,7 +400,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.lastBroadcastedOrReceivedSceneVersion = version;
   };
 
-  public gettLastBroadcastedOrReceivedSceneVersion = () => {
+  public getLastBroadcastedOrReceivedSceneVersion = () => {
     return this.lastBroadcastedOrReceivedSceneVersion;
   };
 
