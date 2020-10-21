@@ -106,6 +106,7 @@ export const exportToSvg = (
   svgRoot.setAttribute("version", "1.1");
   svgRoot.setAttribute("xmlns", SVG_NS);
   svgRoot.setAttribute("viewBox", `0 0 ${width} ${height}`);
+
   svgRoot.innerHTML = `
   ${SVG_EXPORT_TAG}
   ${metadata}
