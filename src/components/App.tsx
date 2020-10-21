@@ -3,7 +3,6 @@ import React from "react";
 import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { simplify, Point } from "points-on-curve";
-import { SocketUpdateData } from "../types";
 
 import {
   newElement,
@@ -279,9 +278,8 @@ export type ExcalidrawImperativeAPI =
 class App extends React.Component<ExcalidrawProps, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
-  portal: Portal = new Portal(this);
-  lastBroadcastedOrReceivedSceneVersion: number = -1;
-  broadcastedElementVersions: Map<string, number> = new Map();
+  portal: Portal;
+  private lastBroadcastedOrReceivedSceneVersion: number = -1;
   unmounted: boolean = false;
   actionManager: ActionManager;
   private excalidrawRef: any;
@@ -312,6 +310,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       };
     }
     this.scene = new Scene();
+    this.portal = new Portal(this);
+
     this.excalidrawRef = React.createRef();
     this.actionManager = new ActionManager(
       this.syncActionResult,
@@ -395,6 +395,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       </div>
     );
   }
+
+  public setLastBroadcastedOrReceivedSceneVersion = (version: number) => {
+    this.lastBroadcastedOrReceivedSceneVersion = version;
+  };
+
+  public getLastBroadcastedOrReceivedSceneVersion = () => {
+    return this.lastBroadcastedOrReceivedSceneVersion;
+  };
+
+  public getSceneElementsIncludingDeleted = () => {
+    return this.scene.getElementsIncludingDeleted();
+  };
 
   private syncActionResult = withBatchedUpdates(
     (actionResult: ActionResult) => {
@@ -823,7 +835,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   });
 
   queueBroadcastAllElements = throttle(() => {
-    this.broadcastScene(SCENE.UPDATE, /* syncAll */ true);
+    this.portal.broadcastScene(SCENE.UPDATE, /* syncAll */ true);
   }, SYNC_FULL_SCENE_INTERVAL_MS);
 
   componentDidUpdate(prevProps: ExcalidrawProps, prevState: AppState) {
@@ -949,7 +961,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       getSceneVersion(this.scene.getElementsIncludingDeleted()) >
       this.lastBroadcastedOrReceivedSceneVersion
     ) {
-      this.broadcastScene(SCENE.UPDATE, /* syncAll */ false);
+      this.portal.broadcastScene(SCENE.UPDATE, /* syncAll */ false);
       this.queueBroadcastAllElements();
     }
 
@@ -1363,7 +1375,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       // we just received!
       // Note: this needs to be set before replaceAllElements as it
       // syncronously calls render.
-      this.lastBroadcastedOrReceivedSceneVersion = getSceneVersion(newElements);
+
+      this.setLastBroadcastedOrReceivedSceneVersion(
+        getSceneVersion(newElements),
+      );
 
       this.scene.replaceAllElements(newElements);
     }
@@ -1511,28 +1526,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     });
   }
 
-  private broadcastMouseLocation = (payload: {
-    pointer: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointer"];
-    button: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["button"];
-  }) => {
-    if (this.portal.socket?.id) {
-      const data: SocketUpdateDataSource["MOUSE_LOCATION"] = {
-        type: "MOUSE_LOCATION",
-        payload: {
-          socketId: this.portal.socket.id,
-          pointer: payload.pointer,
-          button: payload.button || "up",
-          selectedElementIds: this.state.selectedElementIds,
-          username: this.state.username,
-        },
-      };
-      return this.portal._broadcastSocketData(
-        data as SocketUpdateData,
-        true, // volatile
-      );
-    }
-  };
-
   saveCollabRoomToFirebase = async (
     syncableElements: ExcalidrawElement[] = getSyncableElements(
       this.scene.getElementsIncludingDeleted(),
@@ -1542,62 +1535,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       await saveToFirebase(this.portal, syncableElements);
     } catch (error) {
       console.error(error);
-    }
-  };
-
-  // maybe should move to Portal
-  broadcastScene = async (
-    sceneType: SCENE.INIT | SCENE.UPDATE,
-    syncAll: boolean,
-  ) => {
-    if (sceneType === SCENE.INIT && !syncAll) {
-      throw new Error("syncAll must be true when sending SCENE.INIT");
-    }
-
-    let syncableElements = getSyncableElements(
-      this.scene.getElementsIncludingDeleted(),
-    );
-
-    if (!syncAll) {
-      // sync out only the elements we think we need to to save bandwidth.
-      // periodically we'll resync the whole thing to make sure no one diverges
-      // due to a dropped message (server goes down etc).
-      syncableElements = syncableElements.filter(
-        (syncableElement) =>
-          !this.broadcastedElementVersions.has(syncableElement.id) ||
-          syncableElement.version >
-            this.broadcastedElementVersions.get(syncableElement.id)!,
-      );
-    }
-
-    const data: SocketUpdateDataSource[typeof sceneType] = {
-      type: sceneType,
-      payload: {
-        elements: syncableElements,
-      },
-    };
-    this.lastBroadcastedOrReceivedSceneVersion = Math.max(
-      this.lastBroadcastedOrReceivedSceneVersion,
-      getSceneVersion(this.scene.getElementsIncludingDeleted()),
-    );
-    for (const syncableElement of syncableElements) {
-      this.broadcastedElementVersions.set(
-        syncableElement.id,
-        syncableElement.version,
-      );
-    }
-
-    const broadcastPromise = this.portal._broadcastSocketData(
-      data as SocketUpdateData,
-    );
-
-    if (syncAll && this.state.isCollaborating) {
-      await Promise.all([
-        broadcastPromise,
-        this.saveCollabRoomToFirebase(syncableElements),
-      ]);
-    } else {
-      await broadcastPromise;
     }
   };
 
@@ -4078,7 +4015,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.portal.socket &&
       // do not broadcast when more than 1 pointer since that shows flickering on the other side
       gesture.pointers.size < 2 &&
-      this.broadcastMouseLocation({
+      this.portal.broadcastMouseLocation({
         pointer,
         button,
       });
