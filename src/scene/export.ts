@@ -106,7 +106,6 @@ export const exportToSvg = (
   svgRoot.setAttribute("version", "1.1");
   svgRoot.setAttribute("xmlns", SVG_NS);
   svgRoot.setAttribute("viewBox", `0 0 ${width} ${height}`);
-
   svgRoot.innerHTML = `
   ${SVG_EXPORT_TAG}
   ${metadata}
@@ -114,11 +113,11 @@ export const exportToSvg = (
     <style>
       @font-face {
         font-family: "Virgil";
-        src: url("https://excalidraw.com/FG_Virgil.woff2");
+        src: url("https://excalidraw.com/fonts/FG_Virgil.woff2");
       }
       @font-face {
         font-family: "Cascadia";
-        src: url("https://excalidraw.com/Cascadia.woff2");
+        src: url("https://excalidraw.com/fonts/Cascadia.woff2");
       }
     </style>
   </defs>

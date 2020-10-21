@@ -1,0 +1,12 @@
+@font-face {
+  font-family: "Virgil";
+  src: url("fonts/FG_Virgil.woff2");
+  font-display: swap;
+}
+
+/* https://github.com/microsoft/cascadia-code */
+@font-face {
+  font-family: "Cascadia";
+  src: url("fonts/Cascadia.woff2");
+  font-display: swap;
+}
