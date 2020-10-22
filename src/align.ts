@@ -8,14 +8,6 @@ interface Box {
   height: number;
 }
 
-export type AlignmentType =
-  | "top"
-  | "bottom"
-  | "left"
-  | "right"
-  | "verticallyCentered"
-  | "horizontallyCentered";
-
 export const getAlignmentGroupsForElements = (
   elements: ExcalidrawElement[],
 ) => {
@@ -77,95 +69,111 @@ export const calculateBoundingBoxesForGroups = (
   return groupBoundingBoxes;
 };
 
-export const getReferenceElement = (elements: Box[], type: AlignmentType) => {
-  const axis = type === "top" || type === "bottom" ? "y" : "x";
-  const dimension = type === "top" || type === "bottom" ? "height" : "width";
+export const getReferenceElement = (
+  elements: Box[],
+  { axis, position }: Alignment,
+): Box => {
+  const dimension = axis === "x" ? "width" : "height";
 
-  if (type === "top" || type === "left") {
-    return elements.reduce((start, current) =>
-      current[axis] < start[axis] ? current : start,
-    );
-  } else if (type === "right" || type === "bottom") {
-    return elements.reduce((end, current) =>
-      current[axis] + current[dimension] > end[axis] + end[dimension]
-        ? current
-        : end,
-    );
-  } else if (type === "verticallyCentered" || type === "horizontallyCentered") {
-    const startElement = elements.reduce((start, current) =>
-      current[axis] < start[axis] ? current : start,
-    );
+  const startElement = elements.reduce((start, current) =>
+    current[axis] < start[axis] ? current : start,
+  );
 
-    const endElement = elements.reduce((end, current) =>
-      current[axis] + current[dimension] > end[axis] + end[dimension]
-        ? current
-        : end,
-    );
+  const endElement = elements.reduce((end, current) =>
+    current[axis] + current[dimension] > end[axis] + end[dimension]
+      ? current
+      : end,
+  );
 
-    return {
-      x: startElement.x,
-      y: startElement.y,
-      width: endElement.x + endElement.width - startElement.x,
-      height: endElement.y + endElement.height - startElement.y,
-    };
+  if (position === "start") {
+    return startElement;
+  } else if (position === "end") {
+    return endElement;
   }
+
+  //if (position === "center")
+  return {
+    x: startElement.x,
+    y: startElement.y,
+    width: endElement.x + endElement.width - startElement.x,
+    height: endElement.y + endElement.height - startElement.y,
+  };
 };
+
+const alignStart = (
+  referenceElementPosition: number,
+  boundingBoxPosition: number,
+) => {
+  return referenceElementPosition - boundingBoxPosition;
+};
+
+const alignCenter = (
+  referenceElementPosition: number,
+  referenceElementSize: number,
+  boundingBoxPosition: number,
+  boundingBoxSize: number,
+) => {
+  return (
+    referenceElementPosition +
+    referenceElementSize / 2 -
+    (boundingBoxPosition + boundingBoxSize / 2)
+  );
+};
+
+const alignEnd = (
+  referenceElementPosition: number,
+  referenceElementSize: number,
+  boundingBoxPosition: number,
+  boundingBoxSize: number,
+) => {
+  return (
+    referenceElementPosition +
+    referenceElementSize -
+    (boundingBoxPosition + boundingBoxSize)
+  );
+};
+
+export interface Alignment {
+  position: "start" | "center" | "end";
+  axis: "x" | "y";
+}
 
 const calculateTranslation = (
   referenceElement: Box,
   boundingBox: Box,
-  type: AlignmentType,
+  { axis, position }: Alignment,
 ) => {
-  if (type === "verticallyCentered") {
-    return {
-      x: 0,
-      y:
-        referenceElement.y +
-        referenceElement.height / 2 -
-        (boundingBox.y + boundingBox.height / 2),
-    };
-  } else if (type === "horizontallyCentered") {
-    return {
-      x:
-        referenceElement.x +
-        referenceElement.width / 2 -
-        (boundingBox.x + boundingBox.width / 2),
-      y: 0,
-    };
-  } else if (type === "top") {
-    return {
-      x: 0,
-      y: referenceElement.y - boundingBox.y,
-    };
-  } else if (type === "bottom") {
-    return {
-      x: 0,
-      y:
-        referenceElement.y +
-        referenceElement.height -
-        boundingBox.y -
-        boundingBox.height,
-    };
-  } else if (type === "left") {
-    return {
-      x: referenceElement.x - boundingBox.x,
-      y: 0,
-    };
-  } else if (type === "right") {
-    return {
-      x:
-        referenceElement.x +
-        referenceElement.width -
-        boundingBox.x -
-        boundingBox.width,
-      y: 0,
-    };
+  const dimension = axis === "x" ? "width" : "height";
+
+  const translation = {
+    x: 0,
+    y: 0,
+  };
+
+  if (position === "start") {
+    translation[axis] = alignStart(referenceElement[axis], boundingBox[axis]);
+  } else if (position === "center") {
+    translation[axis] = alignCenter(
+      referenceElement[axis],
+      referenceElement[dimension],
+      boundingBox[axis],
+      boundingBox[dimension],
+    );
+  } else if (position === "end") {
+    translation[axis] = alignEnd(
+      referenceElement[axis],
+      referenceElement[dimension],
+      boundingBox[axis],
+      boundingBox[dimension],
+    );
   }
+
+  return translation;
 };
 
 export const alignElements = (
   elements: ExcalidrawElement[],
-  type: AlignmentType,
+  alignment: Alignment,
 ): ExcalidrawElement[] => {
   const groups = getAlignmentGroupsForElements(elements);
   const groupBoundingBoxes: Map<String, Box> = calculateBoundingBoxesForGroups(
@@ -174,32 +182,25 @@ export const alignElements = (
 
   const referenceElement = getReferenceElement(
     Array.from(groupBoundingBoxes.values()),
-    type,
+    alignment,
   );
 
-  const updatedElements: ExcalidrawElement[] = [];
-
-  groups.forEach((elements, groupId) => {
-    const boundingBox: Box = groupBoundingBoxes.get(groupId) as Box;
-    if (!boundingBox || !referenceElement) {
-      return;
-    }
+  return elements.map((element) => {
+    const boundingBox: Box = groupBoundingBoxes.get(
+      element.groupIds.length === 0
+        ? element.id
+        : element.groupIds[element.groupIds.length - 1],
+    ) as Box;
 
     const translation = calculateTranslation(
       referenceElement,
       boundingBox,
-      type,
+      alignment,
     ) as { x: number; y: number };
 
-    elements.forEach((e) =>
-      updatedElements.push(
-        newElementWith(e, {
-          x: e.x + translation.x,
-          y: e.y + translation.y,
-        }),
-      ),
-    );
+    return newElementWith(element, {
+      x: element.x + translation.x,
+      y: element.y + translation.y,
+    });
   });
-
-  return updatedElements;
 };

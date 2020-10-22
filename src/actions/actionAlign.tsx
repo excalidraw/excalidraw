@@ -15,7 +15,7 @@ import { getNonDeletedElements } from "../element";
 import { ToolButton } from "../components/ToolButton";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
-import { alignElements, AlignmentType } from "../align";
+import { alignElements, Alignment } from "../align";
 import { getShortcutKey } from "../utils";
 
 const enableActionGroup = (
@@ -26,14 +26,14 @@ const enableActionGroup = (
 function alignSelectedElements(
   elements: readonly ExcalidrawElement[],
   appState: Readonly<AppState>,
-  alignmentType: AlignmentType,
+  alignment: Alignment,
 ) {
   const selectedElements = getSelectedElements(
     getNonDeletedElements(elements),
     appState,
   );
 
-  const updatedElements = alignElements(selectedElements, alignmentType);
+  const updatedElements = alignElements(selectedElements, alignment);
 
   const updatedElementsMap = new Map(updatedElements.map((e) => [e.id, e]));
 
@@ -47,7 +47,10 @@ export const actionAlignTop = register({
   perform: (elements, appState) => {
     return {
       appState,
-      elements: alignSelectedElements(elements, appState, "top"),
+      elements: alignSelectedElements(elements, appState, {
+        position: "start",
+        axis: "y",
+      }),
       commitToHistory: true,
     };
   },
@@ -78,7 +81,10 @@ export const actionAlignBottom = register({
   perform: (elements, appState) => {
     return {
       appState,
-      elements: alignSelectedElements(elements, appState, "bottom"),
+      elements: alignSelectedElements(elements, appState, {
+        position: "end",
+        axis: "y",
+      }),
       commitToHistory: true,
     };
   },
@@ -111,7 +117,10 @@ export const actionAlignLeft = register({
   perform: (elements, appState) => {
     return {
       appState,
-      elements: alignSelectedElements(elements, appState, "left"),
+      elements: alignSelectedElements(elements, appState, {
+        position: "start",
+        axis: "x",
+      }),
       commitToHistory: true,
     };
   },
@@ -144,7 +153,10 @@ export const actionAlignRight = register({
   perform: (elements, appState) => {
     return {
       appState,
-      elements: alignSelectedElements(elements, appState, "right"),
+      elements: alignSelectedElements(elements, appState, {
+        position: "end",
+        axis: "x",
+      }),
       commitToHistory: true,
     };
   },
@@ -179,7 +191,10 @@ export const actionAlignVerticallyCentered = register({
   perform: (elements, appState) => {
     return {
       appState,
-      elements: alignSelectedElements(elements, appState, "verticallyCentered"),
+      elements: alignSelectedElements(elements, appState, {
+        position: "center",
+        axis: "y",
+      }),
       commitToHistory: true,
     };
   },
@@ -205,11 +220,10 @@ export const actionAlignHorizontallyCentered = register({
   perform: (elements, appState) => {
     return {
       appState,
-      elements: alignSelectedElements(
-        elements,
-        appState,
-        "horizontallyCentered",
-      ),
+      elements: alignSelectedElements(elements, appState, {
+        position: "center",
+        axis: "x",
+      }),
       commitToHistory: true,
     };
   },
