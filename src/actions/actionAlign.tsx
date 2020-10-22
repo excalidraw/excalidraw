@@ -67,7 +67,9 @@ export const actionAlignTop = register({
       type="button"
       icon={<AlignTopIcon appearance={appState.appearance} />}
       onClick={() => updateData(null)}
-      title={`${t("labels.alignTop")} — ${getShortcutKey("CtrlOrCmd+Shift+🠝")}`}
+      title={`${t("labels.alignTop")} — ${getShortcutKey(
+        "CtrlOrCmd+Shift+Up",
+      )}`}
       aria-label={t("labels.alignTop")}
       visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
     />
@@ -102,7 +104,7 @@ export const actionAlignBottom = register({
       icon={<AlignBottomIcon appearance={appState.appearance} />}
       onClick={() => updateData(null)}
       title={`${t("labels.alignBottom")} — ${getShortcutKey(
-        "CtrlOrCmd+Shift+🠟",
+        "CtrlOrCmd+Shift+Down",
       )}`}
       aria-label={t("labels.alignBottom")}
       visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
@@ -138,7 +140,7 @@ export const actionAlignLeft = register({
       icon={<AlignLeftIcon appearance={appState.appearance} />}
       onClick={() => updateData(null)}
       title={`${t("labels.alignLeft")} — ${getShortcutKey(
-        "CtrlOrCmd+Shift+🠜",
+        "CtrlOrCmd+Shift+Left",
       )}`}
       aria-label={t("labels.alignLeft")}
       visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
@@ -176,7 +178,7 @@ export const actionAlignRight = register({
       icon={<AlignRightIcon appearance={appState.appearance} />}
       onClick={() => updateData(null)}
       title={`${t("labels.alignRight")} — ${getShortcutKey(
-        "CtrlOrCmd+Shift+🠞",
+        "CtrlOrCmd+Shift+Right",
       )}`}
       aria-label={t("labels.alignRight")}
       visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
