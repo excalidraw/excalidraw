@@ -1284,7 +1284,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (init || initFromSnapshot) {
       this.setScrollToCenter(elements);
     }
-    const newElements = this.portal.renconcileElements(elements);
+    const newElements = this.portal.reconcileElements(elements);
 
     // Avoid broadcasting to the rest of the collaborators the scene
     // we just received!
