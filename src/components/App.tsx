@@ -1286,7 +1286,15 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.setScrollToCenter(elements);
     }
 
-    this.updateScene({ elements });
+    const newElements = this.getElementsAfterReconcilation(elements);
+
+    // Avoid broadcasting to the rest of the collaborators the scene
+    // we just received!
+    // Note: this needs to be set before updating the scene as it
+    // syncronously calls render.
+    this.setLastBroadcastedOrReceivedSceneVersion(getSceneVersion(newElements));
+
+    this.updateScene({ elements: newElements });
 
     if (!this.portal.socketInitialized && !initFromSnapshot) {
       this.initializeSocket();
@@ -1301,87 +1309,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.portal.close();
   };
 
-  public updateScene = (
-    sceneData: {
-      elements: readonly ExcalidrawElement[];
-      appState?: AppState;
-    },
-    { replaceAll = false }: { replaceAll?: boolean } = {},
-  ) => {
+  public updateScene = (sceneData: {
+    elements: readonly ExcalidrawElement[];
+    appState?: AppState;
+  }) => {
     // currently we only support syncing background color
     if (sceneData.appState?.viewBackgroundColor) {
       this.setState({
         viewBackgroundColor: sceneData.appState.viewBackgroundColor,
       });
     }
-    // Perform reconciliation - in collaboration, if we encounter
-    // elements with more staler versions than ours, ignore them
-    // and keep ours.
-    const currentElements = this.scene.getElementsIncludingDeleted();
-    if (replaceAll || !currentElements.length) {
-      this.scene.replaceAllElements(sceneData.elements);
-    } else {
-      // create a map of ids so we don't have to iterate
-      // over the array more than once.
-      const localElementMap = getElementMap(currentElements);
 
-      // Reconcile
-      const newElements = sceneData.elements
-        .reduce((elements, element) => {
-          // if the remote element references one that's currently
-          //  edited on local, skip it (it'll be added in the next
-          //  step)
-          if (
-            element.id === this.state.editingElement?.id ||
-            element.id === this.state.resizingElement?.id ||
-            element.id === this.state.draggingElement?.id
-          ) {
-            return elements;
-          }
-
-          if (
-            localElementMap.hasOwnProperty(element.id) &&
-            localElementMap[element.id].version > element.version
-          ) {
-            elements.push(localElementMap[element.id]);
-            delete localElementMap[element.id];
-          } else if (
-            localElementMap.hasOwnProperty(element.id) &&
-            localElementMap[element.id].version === element.version &&
-            localElementMap[element.id].versionNonce !== element.versionNonce
-          ) {
-            // resolve conflicting edits deterministically by taking the one with the lowest versionNonce
-            if (
-              localElementMap[element.id].versionNonce < element.versionNonce
-            ) {
-              elements.push(localElementMap[element.id]);
-            } else {
-              // it should be highly unlikely that the two versionNonces are the same. if we are
-              // really worried about this, we can replace the versionNonce with the socket id.
-              elements.push(element);
-            }
-            delete localElementMap[element.id];
-          } else {
-            elements.push(element);
-            delete localElementMap[element.id];
-          }
-
-          return elements;
-        }, [] as Mutable<typeof sceneData.elements>)
-        // add local elements that weren't deleted or on remote
-        .concat(...Object.values(localElementMap));
-
-      // Avoid broadcasting to the rest of the collaborators the scene
-      // we just received!
-      // Note: this needs to be set before replaceAllElements as it
-      // syncronously calls render.
-
-      this.setLastBroadcastedOrReceivedSceneVersion(
-        getSceneVersion(newElements),
-      );
-
-      this.scene.replaceAllElements(newElements);
-    }
+    this.scene.replaceAllElements(sceneData.elements);
 
     // We haven't yet implemented multiplayer undo functionality, so we clear the undo stack
     // when we receive any messages from another peer. This UX can be pretty rough -- if you
@@ -1389,6 +1328,60 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     // right now we think this is the right tradeoff.
     history.clear();
   };
+
+  private getElementsAfterReconcilation(
+    sceneElements: readonly ExcalidrawElement[],
+  ) {
+    const currentElements = this.scene.getElementsIncludingDeleted();
+    // create a map of ids so we don't have to iterate
+    // over the array more than once.
+    const localElementMap = getElementMap(currentElements);
+
+    // Reconcile
+    const newElements = sceneElements
+      .reduce((elements, element) => {
+        // if the remote element references one that's currently
+        //  edited on local, skip it (it'll be added in the next
+        //  step)
+        if (
+          element.id === this.state.editingElement?.id ||
+          element.id === this.state.resizingElement?.id ||
+          element.id === this.state.draggingElement?.id
+        ) {
+          return elements;
+        }
+
+        if (
+          localElementMap.hasOwnProperty(element.id) &&
+          localElementMap[element.id].version > element.version
+        ) {
+          elements.push(localElementMap[element.id]);
+          delete localElementMap[element.id];
+        } else if (
+          localElementMap.hasOwnProperty(element.id) &&
+          localElementMap[element.id].version === element.version &&
+          localElementMap[element.id].versionNonce !== element.versionNonce
+        ) {
+          // resolve conflicting edits deterministically by taking the one with the lowest versionNonce
+          if (localElementMap[element.id].versionNonce < element.versionNonce) {
+            elements.push(localElementMap[element.id]);
+          } else {
+            // it should be highly unlikely that the two versionNonces are the same. if we are
+            // really worried about this, we can replace the versionNonce with the socket id.
+            elements.push(element);
+          }
+          delete localElementMap[element.id];
+        } else {
+          elements.push(element);
+          delete localElementMap[element.id];
+        }
+
+        return elements;
+      }, [] as Mutable<typeof sceneElements>)
+      // add local elements that weren't deleted or on remote
+      .concat(...Object.values(localElementMap));
+    return newElements;
+  }
 
   private initializeSocket = () => {
     this.portal.socketInitialized = true;
