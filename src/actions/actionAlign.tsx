@@ -11,7 +11,7 @@ import {
   CenterVerticallyIcon,
 } from "../components/icons";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
-import { getNonDeletedElements } from "../element";
+import { getElementMap, getNonDeletedElements } from "../element";
 import { ToolButton } from "../components/ToolButton";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
@@ -35,11 +35,9 @@ function alignSelectedElements(
 
   const updatedElements = alignElements(selectedElements, alignment);
 
-  const updatedElementsMap = new Map(updatedElements.map((e) => [e.id, e]));
+  const updatedElementsMap = getElementMap(updatedElements);
 
-  return elements.map(
-    (element) => updatedElementsMap.get(element.id) || element,
-  );
+  return elements.map((element) => updatedElementsMap[element.id] || element);
 }
 
 export const actionAlignTop = register({
