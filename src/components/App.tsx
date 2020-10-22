@@ -31,7 +31,6 @@ import {
   hitTest,
   isHittingElementBoundingBoxWithoutHittingElement,
   getNonDeletedElements,
-  getElementsAfterReconcilation,
 } from "../element";
 import {
   getElementsWithinSelection,
@@ -1285,13 +1284,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (init || initFromSnapshot) {
       this.setScrollToCenter(elements);
     }
-    const currentElements = this.scene.getElementsIncludingDeleted();
-    const { editingElement, resizingElement, draggingElement } = this.state;
-    const newElements = getElementsAfterReconcilation(
-      currentElements,
-      elements,
-      { editingElement, resizingElement, draggingElement },
-    );
+    const newElements = this.portal.renconcileElements(elements);
 
     // Avoid broadcasting to the rest of the collaborators the scene
     // we just received!
@@ -1314,25 +1307,27 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.portal.close();
   };
 
-  public updateScene = (sceneData: {
-    elements: readonly ExcalidrawElement[];
-    appState?: AppState;
-  }) => {
-    // currently we only support syncing background color
-    if (sceneData.appState?.viewBackgroundColor) {
-      this.setState({
-        viewBackgroundColor: sceneData.appState.viewBackgroundColor,
-      });
-    }
+  public updateScene = withBatchedUpdates(
+    (sceneData: {
+      elements: readonly ExcalidrawElement[];
+      appState?: AppState;
+    }) => {
+      // currently we only support syncing background color
+      if (sceneData.appState?.viewBackgroundColor) {
+        this.setState({
+          viewBackgroundColor: sceneData.appState.viewBackgroundColor,
+        });
+      }
 
-    this.scene.replaceAllElements(sceneData.elements);
+      this.scene.replaceAllElements(sceneData.elements);
 
-    // We haven't yet implemented multiplayer undo functionality, so we clear the undo stack
-    // when we receive any messages from another peer. This UX can be pretty rough -- if you
-    // undo, a user makes a change, and then try to redo, your element(s) will be lost. However,
-    // right now we think this is the right tradeoff.
-    history.clear();
-  };
+      // We haven't yet implemented multiplayer undo functionality, so we clear the undo stack
+      // when we receive any messages from another peer. This UX can be pretty rough -- if you
+      // undo, a user makes a change, and then try to redo, your element(s) will be lost. However,
+      // right now we think this is the right tradeoff.
+      history.clear();
+    },
+  );
 
   private initializeSocket = () => {
     this.portal.socketInitialized = true;
