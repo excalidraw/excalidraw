@@ -96,7 +96,7 @@ beforeEach(async () => {
   finger2.reset();
 
   await setLanguage("en.json");
-  render(<App />);
+  render(<App offsetLeft={0} offsetTop={0} />);
 });
 
 afterEach(() => {
