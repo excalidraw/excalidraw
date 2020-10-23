@@ -13,6 +13,8 @@ const Excalidraw = (props: ExcalidrawProps) => {
   const {
     width,
     height,
+    offsetLeft,
+    offsetTop,
     onChange,
     initialData,
     user,
@@ -44,6 +46,8 @@ const Excalidraw = (props: ExcalidrawProps) => {
         <App
           width={width}
           height={height}
+          offsetLeft={offsetLeft}
+          offsetTop={offsetTop}
           onChange={onChange}
           initialData={initialData}
           user={user}

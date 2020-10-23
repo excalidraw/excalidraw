@@ -150,6 +150,8 @@ function ExcalidrawApp() {
       <Excalidraw
         width={dimensions.width}
         height={dimensions.height}
+        offsetLeft={0}
+        offsetTop={0}
         onChange={saveDebounced}
         initialData={initialState.data}
         user={initialState.user}
