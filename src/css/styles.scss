@@ -301,59 +301,6 @@
     max-height: calc(100vh - 236px);
   }
 
-  .ErrorSplash {
-    min-height: 100vh;
-    padding: 20px 0;
-    overflow: auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    user-select: text;
-
-    .ErrorSplash-messageContainer {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-
-      padding: 40px;
-      background-color: $oc-red-1;
-      border: 3px solid $oc-red-9;
-    }
-
-    .ErrorSplash-paragraph {
-      margin: 15px 0;
-      max-width: 600px;
-
-      &.align-center {
-        text-align: center;
-      }
-    }
-
-    .bigger,
-    .bigger button {
-      font-size: 1.1em;
-    }
-
-    .smaller,
-    .smaller button {
-      font-size: 0.9em;
-    }
-
-    .ErrorSplash-details {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-
-      textarea {
-        width: 100%;
-        margin: 10px 0;
-        font-family: "Cascadia";
-        font-size: 0.8em;
-      }
-    }
-  }
-
   .dropdown-select {
     height: 1.5rem;
     padding: 0;
@@ -499,6 +446,59 @@
     .FixedSideContainer,
     .layer-ui__wrapper {
       display: none;
+    }
+  }
+}
+
+.ErrorSplash.excalidraw {
+  min-height: 100vh;
+  padding: 20px 0;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: text;
+
+  .ErrorSplash-messageContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 40px;
+    background-color: $oc-red-1;
+    border: 3px solid $oc-red-9;
+  }
+
+  .ErrorSplash-paragraph {
+    margin: 15px 0;
+    max-width: 600px;
+
+    &.align-center {
+      text-align: center;
+    }
+  }
+
+  .bigger,
+  .bigger button {
+    font-size: 1.1em;
+  }
+
+  .smaller,
+  .smaller button {
+    font-size: 0.9em;
+  }
+
+  .ErrorSplash-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    textarea {
+      width: 100%;
+      margin: 10px 0;
+      font-family: "Cascadia";
+      font-size: 0.8em;
     }
   }
 }
