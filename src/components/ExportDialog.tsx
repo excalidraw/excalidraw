@@ -91,29 +91,26 @@ const ExportModal = ({
         shouldAddWatermark,
       });
 
-      if (canvas) {
-        let isRemoved = false;
-        // if converting to blob fails, there's some problem that will
-        // likely prevent preview and export (e.g. canvas too big)
-        canvasToBlob(canvas)
-          .then(() => {
-            if (isRemoved) {
-              return;
-            }
-            setPreviewError(null);
-            previewNode.appendChild(canvas);
-          })
-          .catch((error) => {
-            console.error(error);
-            setPreviewError(new CanvasError());
-          });
+      let isRemoved = false;
+      // if converting to blob fails, there's some problem that will
+      // likely prevent preview and export (e.g. canvas too big)
+      canvasToBlob(canvas)
+        .then(() => {
+          if (isRemoved) {
+            return;
+          }
+          setPreviewError(null);
+          previewNode.appendChild(canvas);
+        })
+        .catch((error) => {
+          console.error(error);
+          setPreviewError(new CanvasError());
+        });
 
-        return () => {
-          isRemoved = true;
-          canvas.remove();
-        };
-      }
-      setPreviewError(new CanvasError());
+      return () => {
+        isRemoved = true;
+        canvas.remove();
+      };
     } catch (error) {
       console.error(error);
       setPreviewError(new CanvasError());

@@ -332,12 +332,10 @@ export const exportCanvas = async (
     scale,
     shouldAddWatermark,
   });
-  if (tempCanvas) {
-    tempCanvas.style.display = "none";
-    document.body.appendChild(tempCanvas);
-  }
+  tempCanvas.style.display = "none";
+  document.body.appendChild(tempCanvas);
 
-  if (tempCanvas && type === "png") {
+  if (type === "png") {
     const fileName = `${name}.png`;
     let blob = await canvasToBlob(tempCanvas);
     if (appState.exportEmbedScene) {
@@ -353,7 +351,7 @@ export const exportCanvas = async (
       fileName: fileName,
       extensions: [".png"],
     });
-  } else if (tempCanvas && type === "clipboard") {
+  } else if (type === "clipboard") {
     try {
       await copyCanvasToClipboardAsPng(tempCanvas);
     } catch (error) {
@@ -373,7 +371,7 @@ export const exportCanvas = async (
 
   // clean up the DOM
   if (tempCanvas !== canvas) {
-    tempCanvas?.remove();
+    tempCanvas.remove();
   }
 };
 
