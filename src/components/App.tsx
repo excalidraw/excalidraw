@@ -294,14 +294,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     super(props);
     const defaultAppState = getDefaultAppState();
 
-    const { width, height, user, forwardedRef } = props;
+    const { width, height, offsetLeft, offsetTop, user, forwardedRef } = props;
     this.state = {
       ...defaultAppState,
       isLoading: true,
       width,
       height,
       username: user?.name || "",
-      ...this.getCanvasOffsets(),
+      ...this.getCanvasOffsets({ offsetLeft, offsetTop }),
     };
     if (forwardedRef && "current" in forwardedRef) {
       forwardedRef.current = {
@@ -702,9 +702,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.scene.addCallback(this.onSceneUpdated);
 
     this.addEventListeners();
-    this.setState(this.getCanvasOffsets(), () => {
+
+    // optim to avoid extra render on init
+    if (
+      typeof this.props.offsetLeft === "number" &&
+      typeof this.props.offsetTop === "number"
+    ) {
       this.initializeScene();
-    });
+    } else {
+      this.setState(this.getCanvasOffsets(this.props), () => {
+        this.initializeScene();
+      });
+    }
   }
 
   public componentWillUnmount() {
@@ -838,13 +847,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   }, SYNC_FULL_SCENE_INTERVAL_MS);
 
   componentDidUpdate(prevProps: ExcalidrawProps, prevState: AppState) {
-    const { width: prevWidth, height: prevHeight } = prevProps;
-    const { width: currentWidth, height: currentHeight, onChange } = this.props;
-    if (prevWidth !== currentWidth || prevHeight !== currentHeight) {
+    if (
+      prevProps.width !== this.props.width ||
+      prevProps.height !== this.props.height ||
+      (typeof this.props.offsetLeft === "number" &&
+        prevProps.offsetLeft !== this.props.offsetLeft) ||
+      (typeof this.props.offsetTop === "number" &&
+        prevProps.offsetTop !== this.props.offsetTop)
+    ) {
       this.setState({
-        width: currentWidth,
-        height: currentHeight,
-        ...this.getCanvasOffsets(),
+        width: this.props.width,
+        height: this.props.height,
+        ...this.getCanvasOffsets(this.props),
       });
     }
 
@@ -966,8 +980,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     history.record(this.state, this.scene.getElementsIncludingDeleted());
 
-    if (onChange) {
-      onChange(this.scene.getElementsIncludingDeleted(), this.state);
+    if (this.props.onChange) {
+      this.props.onChange(this.scene.getElementsIncludingDeleted(), this.state);
     }
   }
 
@@ -3964,18 +3978,33 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.setState({ shouldCacheIgnoreZoom: false });
   }, 300);
 
-  private getCanvasOffsets(): Pick<AppState, "offsetTop" | "offsetLeft"> {
+  private getCanvasOffsets(offsets?: {
+    offsetLeft?: number;
+    offsetTop?: number;
+  }): Pick<AppState, "offsetTop" | "offsetLeft"> {
+    if (
+      typeof offsets?.offsetLeft === "number" &&
+      typeof offsets?.offsetTop === "number"
+    ) {
+      return {
+        offsetLeft: offsets.offsetLeft,
+        offsetTop: offsets.offsetTop,
+      };
+    }
     if (this.excalidrawRef?.current) {
       const parentElement = this.excalidrawRef.current.parentElement;
       const { left, top } = parentElement.getBoundingClientRect();
       return {
-        offsetLeft: left,
-        offsetTop: top,
+        offsetLeft:
+          typeof offsets?.offsetLeft === "number" ? offsets.offsetLeft : left,
+        offsetTop:
+          typeof offsets?.offsetTop === "number" ? offsets.offsetTop : top,
       };
     }
     return {
-      offsetLeft: 0,
-      offsetTop: 0,
+      offsetLeft:
+        typeof offsets?.offsetLeft === "number" ? offsets.offsetLeft : 0,
+      offsetTop: typeof offsets?.offsetTop === "number" ? offsets.offsetTop : 0,
     };
   }
 }
