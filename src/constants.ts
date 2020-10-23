@@ -85,6 +85,11 @@ export const GRID_SIZE = 20; // TODO make it configurable?
 
 export const LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG = "collabLinkForceLoadFlag";
 
+export const MIME_TYPES = {
+  excalidraw: "application/vnd.excalidraw+json",
+  excalidrawlib: "application/vnd.excalidrawlib+json",
+};
+
 /**
  * Max area of a <canvas> element that we can support for PNG export, (in px*px)
  *

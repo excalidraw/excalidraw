@@ -4,7 +4,7 @@ import { loadLibrary, saveLibrary } from "./localStorage";
 
 export class Library {
   /** imports library (currently merges, removing duplicates) */
-  static async importLibrary(blob: any) {
+  static async importLibrary(blob: Blob) {
     const libraryFile = await loadLibraryFromBlob(blob);
     if (!libraryFile || !libraryFile.library) {
       return;

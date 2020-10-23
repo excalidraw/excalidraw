@@ -43,6 +43,26 @@ export const actionChangeExportBackground = register({
   ),
 });
 
+export const actionChangeExportEmbedScene = register({
+  name: "changeExportEmbedScene",
+  perform: (_elements, appState, value) => {
+    return {
+      appState: { ...appState, exportEmbedScene: value },
+      commitToHistory: false,
+    };
+  },
+  PanelComponent: ({ appState, updateData }) => (
+    <label title={t("labels.exportEmbedScene_details")}>
+      <input
+        type="checkbox"
+        checked={appState.exportEmbedScene}
+        onChange={(event) => updateData(event.target.checked)}
+      />{" "}
+      {t("labels.exportEmbedScene")}
+    </label>
+  ),
+});
+
 export const actionChangeShouldAddWatermark = register({
   name: "changeShouldAddWatermark",
   perform: (_elements, appState, value) => {
@@ -65,12 +85,16 @@ export const actionChangeShouldAddWatermark = register({
 
 export const actionSaveScene = register({
   name: "saveScene",
-  perform: (elements, appState, value) => {
-    // TODO: Make this part of `AppState`.
-    saveAsJSON(elements, appState, (window as any).handle)
-      .catch(muteFSAbortError)
-      .catch((error) => console.error(error));
-    return { commitToHistory: false };
+  perform: async (elements, appState, value) => {
+    try {
+      const { fileHandle } = await saveAsJSON(elements, appState);
+      return { commitToHistory: false, appState: { ...appState, fileHandle } };
+    } catch (error) {
+      if (error?.name !== "AbortError") {
+        console.error(error);
+      }
+      return { commitToHistory: false };
+    }
   },
   keyTest: (event) => {
     return event.key === "s" && event[KEYS.CTRL_OR_CMD] && !event.shiftKey;
@@ -89,11 +113,19 @@ export const actionSaveScene = register({
 
 export const actionSaveAsScene = register({
   name: "saveAsScene",
-  perform: (elements, appState, value) => {
-    saveAsJSON(elements, appState, null)
-      .catch(muteFSAbortError)
-      .catch((error) => console.error(error));
-    return { commitToHistory: false };
+  perform: async (elements, appState, value) => {
+    try {
+      const { fileHandle } = await saveAsJSON(elements, {
+        ...appState,
+        fileHandle: null,
+      });
+      return { commitToHistory: false, appState: { ...appState, fileHandle } };
+    } catch (error) {
+      if (error?.name !== "AbortError") {
+        console.error(error);
+      }
+      return { commitToHistory: false };
+    }
   },
   keyTest: (event) => {
     return event.key === "s" && event.shiftKey && event[KEYS.CTRL_OR_CMD];

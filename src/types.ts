@@ -15,6 +15,7 @@ import { SocketUpdateDataSource } from "./data";
 import { LinearElementEditor } from "./element/linearElementEditor";
 import { SuggestedBinding } from "./element/binding";
 import { ImportedDataState } from "./data/types";
+import { ExcalidrawImperativeAPI } from "./components/App";
 
 export type FlooredNumber = number & { _brand: "FlooredNumber" };
 export type Point = Readonly<RoughPoint>;
@@ -46,6 +47,7 @@ export type AppState = {
   elementType: typeof SHAPES[number]["value"];
   elementLocked: boolean;
   exportBackground: boolean;
+  exportEmbedScene: boolean;
   shouldAddWatermark: boolean;
   currentItemStrokeColor: string;
   currentItemBackgroundColor: string;
@@ -94,6 +96,7 @@ export type AppState = {
   offsetLeft: number;
 
   isLibraryOpen: boolean;
+  fileHandle: import("browser-nativefs").FileSystemHandle | null;
 };
 
 export type PointerCoords = Readonly<{
@@ -132,4 +135,5 @@ export interface ExcalidrawProps {
     name?: string | null;
   };
   onUsernameChange?: (username: string) => void;
+  forwardedRef: ForwardRef<ExcalidrawImperativeAPI>;
 }

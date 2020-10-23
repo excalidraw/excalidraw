@@ -1,6 +1,7 @@
 import "./ToolIcon.scss";
 
 import React from "react";
+import clsx from "clsx";
 
 type LockIconSize = "s" | "m";
 
@@ -41,13 +42,15 @@ const ICONS = {
 };
 
 export const LockIcon = (props: LockIconProps) => {
-  const sizeCn = `ToolIcon_size_${props.size || DEFAULT_SIZE}`;
-
   return (
     <label
-      className={`ToolIcon ToolIcon__lock ToolIcon_type_floating ${sizeCn} zen-mode-visibility ${
-        props.zenModeEnabled ? "zen-mode-visibility--hidden" : ""
-      }`}
+      className={clsx(
+        "ToolIcon ToolIcon__lock ToolIcon_type_floating zen-mode-visibility",
+        `ToolIcon_size_${props.size || DEFAULT_SIZE}`,
+        {
+          "zen-mode-visibility--hidden": props.zenModeEnabled,
+        },
+      )}
       title={`${props.title} — Q`}
     >
       <input

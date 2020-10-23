@@ -39,9 +39,7 @@ const allLanguages: Language[] = [
   { lng: "hi-IN", label: "हिन्दी" },
   { lng: "ta-IN", label: "தமிழ்" },
   { lng: "gl-ES", label: "Galego" },
-  { lng: "vi-VN", label: "Tiếng Việt" },
   { lng: "ro-RO", label: "Română" },
-  { lng: "ne-NP", label: "नेपाली" },
   { lng: "sv-SE", label: "Svenska" },
 ];
 
@@ -65,7 +63,9 @@ export const setLanguage = async (newLng: string | undefined) => {
 
   document.documentElement.dir = currentLanguage.rtl ? "rtl" : "ltr";
 
-  currentLanguageData = await import(`./locales/${currentLanguage.lng}.json`);
+  currentLanguageData = await import(
+    /* webpackChunkName: "i18n-[request]" */ `./locales/${currentLanguage.lng}.json`
+  );
 
   languageDetector.cacheUserLanguage(currentLanguage.lng);
 };
@@ -78,7 +78,9 @@ export const setLanguageFirstTime = async () => {
 
   document.documentElement.dir = currentLanguage.rtl ? "rtl" : "ltr";
 
-  currentLanguageData = await import(`./locales/${currentLanguage.lng}.json`);
+  currentLanguageData = await import(
+    /* webpackChunkName: "i18n-[request]" */ `./locales/${currentLanguage.lng}.json`
+  );
 
   languageDetector.cacheUserLanguage(currentLanguage.lng);
 };

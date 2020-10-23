@@ -160,7 +160,7 @@ export const parseClipboard = async (
 export const copyCanvasToClipboardAsPng = async (canvas: HTMLCanvasElement) =>
   new Promise((resolve, reject) => {
     try {
-      canvas.toBlob(async (blob: any) => {
+      canvas.toBlob(async (blob) => {
         try {
           await navigator.clipboard.write([
             new window.ClipboardItem({ "image/png": blob }),

@@ -66,9 +66,6 @@ export type SocketUpdateDataIncoming =
       type: "INVALID_RESPONSE";
     };
 
-// TODO: Make this part of `AppState`.
-(window as any).handle = null;
-
 const byteToHex = (byte: number): string => `0${byte.toString(16)}`.slice(-2);
 
 const generateRandomID = async () => {
@@ -218,8 +215,9 @@ export const exportToBackend = async (
       // of queryParam in order to never send it to the server
       url.hash = `json=${json.id},${exportedKey.k!}`;
       const urlString = url.toString();
-
       window.prompt(`🔒${t("alerts.uploadedSecurly")}`, urlString);
+    } else if (json.error_class === "RequestTooLargeError") {
+      window.alert(t("alerts.couldNotCreateShareableLinkTooBig"));
     } else {
       window.alert(t("alerts.couldNotCreateShareableLink"));
     }
@@ -233,18 +231,15 @@ const importFromBackend = async (
   id: string | null,
   privateKey?: string | null,
 ): Promise<ImportedDataState> => {
-  let elements: readonly ExcalidrawElement[] = [];
-  let appState = getDefaultAppState();
-
   try {
     const response = await fetch(
       privateKey ? `${BACKEND_V2_GET}${id}` : `${BACKEND_GET}${id}.json`,
     );
     if (!response.ok) {
       window.alert(t("alerts.importBackendFailed"));
-      return { elements, appState };
+      return {};
     }
-    let data;
+    let data: ImportedDataState;
     if (privateKey) {
       const buffer = await response.arrayBuffer();
       const key = await getImportedKey(privateKey, "decrypt");
@@ -267,13 +262,14 @@ const importFromBackend = async (
       data = await response.json();
     }
 
-    elements = data.elements || elements;
-    appState = { ...appState, ...data.appState };
+    return {
+      elements: data.elements || null,
+      appState: data.appState || null,
+    };
   } catch (error) {
     window.alert(t("alerts.importBackendFailed"));
     console.error(error);
-  } finally {
-    return { elements, appState };
+    return {};
   }
 };
 
@@ -307,6 +303,14 @@ export const exportCanvas = async (
       viewBackgroundColor,
       exportPadding,
       shouldAddWatermark,
+      metadata:
+        appState.exportEmbedScene && type === "svg"
+          ? await (
+              await import(/* webpackChunkName: "image" */ "./image")
+            ).encodeSvgMetadata({
+              text: serializeAsJSON(elements, appState),
+            })
+          : undefined,
     });
     if (type === "svg") {
       await fileSave(new Blob([tempSvg.outerHTML], { type: "image/svg+xml" }), {
@@ -334,8 +338,17 @@ export const exportCanvas = async (
 
   if (tempCanvas && type === "png") {
     const fileName = `${name}.png`;
-    tempCanvas.toBlob(async (blob: any) => {
+    tempCanvas.toBlob(async (blob) => {
       if (blob) {
+        if (appState.exportEmbedScene) {
+          blob = await (
+            await import(/* webpackChunkName: "image" */ "./image")
+          ).encodePngMetadata({
+            blob,
+            metadata: serializeAsJSON(elements, appState),
+          });
+        }
+
         await fileSave(blob, {
           fileName: fileName,
           extensions: [".png"],
@@ -365,16 +378,22 @@ export const exportCanvas = async (
 
 export const loadScene = async (
   id: string | null,
-  privateKey?: string | null,
-  initialData?: ImportedDataState,
+  privateKey: string | null,
+  // Supply initialData even if importing from backend to ensure we restore
+  // localStorage user settings which we do not persist on server.
+  // Non-optional so we don't forget to pass it even if `undefined`.
+  initialData: ImportedDataState | undefined | null,
 ) => {
   let data;
   if (id != null) {
     // the private key is used to decrypt the content from the server, take
     // extra care not to leak it
-    data = restore(await importFromBackend(id, privateKey));
+    data = restore(
+      await importFromBackend(id, privateKey),
+      initialData?.appState,
+    );
   } else {
-    data = restore(initialData || {});
+    data = restore(initialData || {}, null);
   }
 
   return {

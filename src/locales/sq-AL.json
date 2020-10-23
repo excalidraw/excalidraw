@@ -32,6 +32,8 @@
     "fontFamily": "Familja e gërmave",
     "onlySelected": "Vetëm të përzgjedhurat",
     "withBackground": "Me sfondin",
+    "exportEmbedScene": "",
+    "exportEmbedScene_details": "",
     "addWatermark": "Shto \"Made with Excalidraw\"",
     "handDrawn": "Vizatuar me dorë",
     "normal": "Normale",
@@ -81,6 +83,7 @@
     "exportToSvg": "",
     "copyToClipboard": "",
     "copyPngToClipboard": "",
+    "scale": "",
     "save": "",
     "saveAs": "",
     "load": "",
@@ -114,7 +117,9 @@
     "uploadedSecurly": "",
     "loadSceneOverridePrompt": "",
     "errorLoadingLibrary": "",
-    "confirmAddLibrary": ""
+    "confirmAddLibrary": "",
+    "imageDoesNotContainScene": "",
+    "cannotRestoreFromImage": ""
   },
   "toolBar": {
     "selection": "Përzgjedhja",

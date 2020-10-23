@@ -25,6 +25,7 @@ export const getDefaultAppState = (): Omit<
     elementType: "selection",
     elementLocked: false,
     exportBackground: true,
+    exportEmbedScene: false,
     shouldAddWatermark: false,
     currentItemStrokeColor: oc.black,
     currentItemBackgroundColor: "transparent",
@@ -68,6 +69,7 @@ export const getDefaultAppState = (): Omit<
     width: window.innerWidth,
     height: window.innerHeight,
     isLibraryOpen: false,
+    fileHandle: null,
   };
 };
 
@@ -112,6 +114,7 @@ const APP_STATE_STORAGE_CONF = (<
   elementType: { browser: true, export: false },
   errorMessage: { browser: false, export: false },
   exportBackground: { browser: true, export: false },
+  exportEmbedScene: { browser: true, export: false },
   gridSize: { browser: true, export: true },
   height: { browser: false, export: false },
   isBindingEnabled: { browser: false, export: false },
@@ -143,6 +146,7 @@ const APP_STATE_STORAGE_CONF = (<
   zoom: { browser: true, export: false },
   offsetTop: { browser: false, export: false },
   offsetLeft: { browser: false, export: false },
+  fileHandle: { browser: false, export: false },
 });
 
 const _clearAppStateForStorage = <ExportType extends "export" | "browser">(

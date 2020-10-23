@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
+import clsx from "clsx";
 import { exportToSvg } from "../scene/export";
 import { close } from "../components/icons";
 
@@ -6,6 +7,7 @@ import "./LibraryUnit.scss";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
 import { LibraryItem } from "../types";
+import { MIME_TYPES } from "../constants";
 
 // fa-plus
 const PLUS_ICON = (
@@ -62,23 +64,23 @@ export const LibraryUnit = ({
 
   return (
     <div
-      className={`library-unit ${
-        elements || pendingElements ? "library-unit__active" : ""
-      }`}
+      className={clsx("library-unit", {
+        "library-unit__active": elements || pendingElements,
+      })}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
-        className={`library-unit__dragger ${
-          !!pendingElements ? "library-unit__pulse" : ""
-        }`}
+        className={clsx("library-unit__dragger", {
+          "library-unit__pulse": !!pendingElements,
+        })}
         ref={ref}
         draggable={!!elements}
         onClick={!!elements || !!pendingElements ? onClick : undefined}
         onDragStart={(event) => {
           setIsHovered(false);
           event.dataTransfer.setData(
-            "application/vnd.excalidrawlib+json",
+            MIME_TYPES.excalidrawlib,
             JSON.stringify(elements),
           );
         }}

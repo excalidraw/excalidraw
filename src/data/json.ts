@@ -6,6 +6,7 @@ import { fileOpen, fileSave } from "browser-nativefs";
 import { loadFromBlob } from "./blob";
 import { loadLibrary } from "./localStorage";
 import { Library } from "./library";
+import { MIME_TYPES } from "../constants";
 
 export const serializeAsJSON = (
   elements: readonly ExcalidrawElement[],
@@ -26,32 +27,32 @@ export const serializeAsJSON = (
 export const saveAsJSON = async (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
-  fileHandle: any,
 ) => {
   const serialized = serializeAsJSON(elements, appState);
   const blob = new Blob([serialized], {
     type: "application/json",
   });
-  const name = `${appState.name}.excalidraw`;
-  // TODO: Make this part of `AppState`.
-  (window as any).handle = await fileSave(
+
+  const fileHandle = await fileSave(
     blob,
     {
-      fileName: name,
+      fileName: appState.name,
       description: "Excalidraw file",
       extensions: [".excalidraw"],
     },
-    fileHandle || null,
+    appState.fileHandle,
   );
+
+  return { fileHandle };
 };
 
-export const loadFromJSON = async (appState: AppState) => {
+export const loadFromJSON = async (localAppState: AppState) => {
   const blob = await fileOpen({
     description: "Excalidraw files",
-    extensions: [".json", ".excalidraw"],
-    mimeTypes: ["application/json"],
+    extensions: [".json", ".excalidraw", ".png", ".svg"],
+    mimeTypes: ["application/json", "image/png", "image/svg+xml"],
   });
-  return loadFromBlob(blob, appState);
+  return loadFromBlob(blob, localAppState);
 };
 
 export const isValidLibrary = (json: any) => {
@@ -76,7 +77,7 @@ export const saveLibraryAsJSON = async () => {
   );
   const fileName = "library.excalidrawlib";
   const blob = new Blob([serialized], {
-    type: "application/vnd.excalidrawlib+json",
+    type: MIME_TYPES.excalidrawlib,
   });
   await fileSave(blob, {
     fileName,

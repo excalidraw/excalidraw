@@ -32,6 +32,8 @@
     "fontFamily": "",
     "onlySelected": "Csak a kiválasztott",
     "withBackground": "Háttérrel együtt",
+    "exportEmbedScene": "",
+    "exportEmbedScene_details": "",
     "addWatermark": "",
     "handDrawn": "",
     "normal": "Normál",
@@ -81,6 +83,7 @@
     "exportToSvg": "Exportálás SVG-be",
     "copyToClipboard": "Vágólapra másolás",
     "copyPngToClipboard": "PNG másolása a vágólapra",
+    "scale": "",
     "save": "Mentés",
     "saveAs": "",
     "load": "Betöltés",
@@ -114,7 +117,9 @@
     "uploadedSecurly": "A feltöltést végpontok közötti titkosítással biztosítottuk, ami azt jelenti, hogy az Excalidraw szerver és harmadik felek nem tudják elolvasni a feltöltés tartalmát.",
     "loadSceneOverridePrompt": "",
     "errorLoadingLibrary": "",
-    "confirmAddLibrary": ""
+    "confirmAddLibrary": "",
+    "imageDoesNotContainScene": "",
+    "cannotRestoreFromImage": ""
   },
   "toolBar": {
     "selection": "Kiválasztás",
