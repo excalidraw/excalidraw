@@ -120,7 +120,8 @@
     "errorLoadingLibrary": "There was an error loading the third party library.",
     "confirmAddLibrary": "This will add {{numShapes}} shape(s) to your library. Are you sure?",
     "imageDoesNotContainScene": "Image file doesn't contain scene data. Have you enabled this during export?",
-    "cannotRestoreFromImage": "Scene couldn't be restored from this image file"
+    "cannotRestoreFromImage": "Scene couldn't be restored from this image file",
+    "canvasPossiblyTooBig": "Canvas may be too big."
   },
   "toolBar": {
     "selection": "Selection",
@@ -151,9 +152,8 @@
     "lineEditor_nothingSelected": "Select a point to move or remove, or hold Alt and click to add new points"
   },
   "errorCanvasPreview": {
-    "title": "Canvas too big for PNG export",
-    "desc_cannotExportPNG": "Cannot show preview image, nor export your drawing as PNG.",
-    "desc_mightExportSVG": "SVG Export might still work though.",
+    "title": "Cannot show preview",
+    "description": "The canvas may be too big.",
     "tip": "Tip: try moving the farthest elements a bit closer together."
   },
   "errorSplash": {

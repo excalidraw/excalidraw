@@ -171,12 +171,6 @@
     "desc_shareLink": "Condividi questo link con chiunque desideri collaborare:",
     "desc_exitSession": "Interrompere la sessione scollegherà la tua stanza ma potrai continuare a lavorare con la scena, localmente. Tieni presente che questo non influirà sulle altre persone, e che saranno ancora in grado di collaborare alla loro versione."
   },
-  "errorCanvasPreview": {
-    "title": "Canvas troppo grande per poterla esportare come PNG",
-    "desc_cannotExportPNG": "Impossibile mostrare un'immagine di anteprima, né esportare il tuo disegno come PNG.",
-    "desc_mightExportSVG": "Tuttavia, potrebbe essere possibile esportare il disegno come SVG.",
-    "tip": "Suggerimento: prova ad avvicinare un po' gli elementi che si trovano più lontani."
-  },
   "errorDialog": {
     "title": "Errore"
   },

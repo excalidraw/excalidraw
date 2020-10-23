@@ -315,18 +315,18 @@ const LayerUI = ({
       scale,
     ) => {
       if (canvas) {
-        try {
-          await exportCanvas(type, exportedElements, appState, canvas, {
-            exportBackground: appState.exportBackground,
-            name: appState.name,
-            viewBackgroundColor: appState.viewBackgroundColor,
-            scale,
-            shouldAddWatermark: appState.shouldAddWatermark,
+        await exportCanvas(type, exportedElements, appState, canvas, {
+          exportBackground: appState.exportBackground,
+          name: appState.name,
+          viewBackgroundColor: appState.viewBackgroundColor,
+          scale,
+          shouldAddWatermark: appState.shouldAddWatermark,
+        })
+          .catch(muteFSAbortError)
+          .catch((error) => {
+            console.error(error);
+            setAppState({ errorMessage: error.message });
           });
-        } catch (error) {
-          console.error(error);
-          setAppState({ errorMessage: error.message });
-        }
       }
     };
     return (
@@ -351,8 +351,11 @@ const LayerUI = ({
                 appState,
               );
             } catch (error) {
-              console.error(error);
-              setAppState({ errorMessage: error.message });
+              if (error.name !== "AbortError") {
+                const { width, height } = canvas;
+                console.error(error, { width, height });
+                setAppState({ errorMessage: error.message });
+              }
             }
           }
         }}

@@ -11,6 +11,7 @@ import {
   VALID_SPREADSHEET,
   MALFORMED_SPREADSHEET,
 } from "./charts";
+import { canvasToBlob } from "./data/blob";
 
 const TYPE_ELEMENTS = "excalidraw/elements";
 
@@ -157,23 +158,12 @@ export const parseClipboard = async (
   }
 };
 
-export const copyCanvasToClipboardAsPng = async (canvas: HTMLCanvasElement) =>
-  new Promise((resolve, reject) => {
-    try {
-      canvas.toBlob(async (blob) => {
-        try {
-          await navigator.clipboard.write([
-            new window.ClipboardItem({ "image/png": blob }),
-          ]);
-          resolve();
-        } catch (error) {
-          reject(error);
-        }
-      });
-    } catch (error) {
-      reject(error);
-    }
-  });
+export const copyCanvasToClipboardAsPng = async (canvas: HTMLCanvasElement) => {
+  const blob = await canvasToBlob(canvas);
+  await navigator.clipboard.write([
+    new window.ClipboardItem({ "image/png": blob }),
+  ]);
+};
 
 export const copyTextToSystemClipboard = async (text: string | null) => {
   let copied = false;

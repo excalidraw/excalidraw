@@ -89,24 +89,3 @@ export const MIME_TYPES = {
   excalidraw: "application/vnd.excalidraw+json",
   excalidrawlib: "application/vnd.excalidrawlib+json",
 };
-
-/**
- * Max area of a <canvas> element that we can support for PNG export, (in px*px)
- *
- * The maximum size of a <canvas> element is very large, but the exact size
- * depends on the browser. Unfortunately, browsers do not provide a way to
- * determine what their limitations are, nor do they provide any kind of
- * feedback after an unusable canvas has been created.
- *
- * The constant defined here is just a heuristic that should be good enough for
- * most browsers. A more robust approach could use of the canvas-size library
- * and detect the canvas limitations at the application startup (or when the
- * components that render into a canvas context mount in the DOM).
- *
- * Note: even when the canvas is too big, the drawing might still be exported
- * succesfully as SVG, since it has nothing to do with the canvas.
- * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas
- * @see https://github.com/jhildenbiddle/canvas-size
- * @see https://stackoverflow.com/questions/6081483/maximum-size-of-a-canvas-element
- */
-export const MAX_CANVAS_AREA = 200_000_000;
