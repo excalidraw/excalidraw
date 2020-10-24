@@ -55,7 +55,7 @@ module.exports = {
                 "@babel/plugin-transform-arrow-functions",
                 "transform-class-properties",
                 "@babel/plugin-transform-async-to-generator",
-                "@babel/transform-runtime",
+                "@babel/plugin-transform-runtime",
               ],
             },
           },
