@@ -3,8 +3,8 @@ import React, { useEffect, forwardRef } from "react";
 import { InitializeApp } from "../components/InitializeApp";
 import App, { ExcalidrawImperativeAPI } from "../components/App";
 
-import "../../src/css/app.scss";
-import "../../src/css/styles.scss";
+import "../css/app.scss";
+import "../css/styles.scss";
 
 import { ExcalidrawProps } from "../types";
 import { IsMobileProvider } from "../is-mobile";
