@@ -109,6 +109,7 @@
   "alerts": {
     "clearReset": "Această opțiune va șterge întreaga pânză. Confirmi?",
     "couldNotCreateShareableLink": "Legătura partajabilă nu a putut fi creată.",
+    "couldNotCreateShareableLinkTooBig": "Nu s-a putut crea o legătură partajabilă: scena este prea mare",
     "couldNotLoadInvalidFile": "Fișierul invalid nu a putut fi încărcat",
     "importBackendFailed": "Importarea de la nivel de server a eșuat.",
     "cannotExportEmptyCanvas": "Nu se poate exporta pânza goală.",

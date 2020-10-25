@@ -109,6 +109,7 @@
   "alerts": {
     "clearReset": "هذا سيزيل كامل اللوحة. هل أنت متأكد ؟",
     "couldNotCreateShareableLink": "تعذر إنشاء رابطة المشاركة.",
+    "couldNotCreateShareableLinkTooBig": "",
     "couldNotLoadInvalidFile": "تعذر التحميل، الملف غير صالح",
     "importBackendFailed": "فشل الإستيراد من السيرفر.",
     "cannotExportEmptyCanvas": "لا يمكن تصدير لوحة فارغة.",

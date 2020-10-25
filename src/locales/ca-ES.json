@@ -109,6 +109,7 @@
   "alerts": {
     "clearReset": "Tot el llenç s'esborrarà. Estàs segur?",
     "couldNotCreateShareableLink": "No s'ha pogut crear un enllaç per compartir.",
+    "couldNotCreateShareableLinkTooBig": "",
     "couldNotLoadInvalidFile": "No s'ha pogut carregar un fitxer no vàlid",
     "importBackendFailed": "Importació fallida.",
     "cannotExportEmptyCanvas": "No es pot exportar un llenç buit.",

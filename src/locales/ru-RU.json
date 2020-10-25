@@ -109,6 +109,7 @@
   "alerts": {
     "clearReset": "Это очистит весь холст. Вы уверены?",
     "couldNotCreateShareableLink": "Не удалось создать общедоступную ссылку.",
+    "couldNotCreateShareableLinkTooBig": "",
     "couldNotLoadInvalidFile": "Не удалось загрузить недопустимый файл",
     "importBackendFailed": "Не удалось импортировать из бэкэнда.",
     "cannotExportEmptyCanvas": "Не может экспортировать пустой холст.",

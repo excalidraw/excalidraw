@@ -109,6 +109,7 @@
   "alerts": {
     "clearReset": "Tämä tyhjentää koko piirtoalueen. Jatketaanko?",
     "couldNotCreateShareableLink": "Jaettavan linkin luominen epäonnistui.",
+    "couldNotCreateShareableLinkTooBig": "Jaettavaa linkkiä ei voitu luoda: teos on liian suuri",
     "couldNotLoadInvalidFile": "Virheellistä tiedostoa ei voitu avata",
     "importBackendFailed": "Palvelimelta tuonti epäonnistui.",
     "cannotExportEmptyCanvas": "Tyhjää piirtoaluetta ei voi viedä.",

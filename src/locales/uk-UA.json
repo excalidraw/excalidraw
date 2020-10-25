@@ -32,8 +32,8 @@
     "fontFamily": "Шрифт",
     "onlySelected": "Тільки вибране",
     "withBackground": "З тлом",
-    "exportEmbedScene": "",
-    "exportEmbedScene_details": "",
+    "exportEmbedScene": "Вставити сцену в експортований файл",
+    "exportEmbedScene_details": "Дані сцени будуть збережені в експортований файл PNG/SVG. Ця сцена може бути відновленна з нього, однак це збільшить розмір експортованого файлу.",
     "addWatermark": "Додати «Накреслене в Excalidraw»",
     "handDrawn": "Рукописний",
     "normal": "Звичайний",
@@ -83,7 +83,7 @@
     "exportToSvg": "Експортувати в SVG",
     "copyToClipboard": "Скопіювати до буферу обміну",
     "copyPngToClipboard": "Скопіювати PNG до буферу обміну",
-    "scale": "",
+    "scale": "Масштаб",
     "save": "Зберегти",
     "saveAs": "Зберегти як",
     "load": "Завантажити",
@@ -109,6 +109,7 @@
   "alerts": {
     "clearReset": "Це очистить все полотно. Впевнені?",
     "couldNotCreateShareableLink": "Не вдалося створити посилання.",
+    "couldNotCreateShareableLinkTooBig": "Не вдалося створити посилання для обміну: сцена занадто велика",
     "couldNotLoadInvalidFile": "Файл з помилками не відкрився",
     "importBackendFailed": "Імпортування невдале.",
     "cannotExportEmptyCanvas": "Не вийшло експортувати пусте полотно.",
@@ -118,8 +119,8 @@
     "loadSceneOverridePrompt": "Завантаження зовнішнього креслення замінить ваш наявний контент. Продовжити?",
     "errorLoadingLibrary": "Помилка при завантаженні сторонньої бібліотеки.",
     "confirmAddLibrary": "Це призведе до додавання {{numShapes}} фігур до вашої бібліотеки. Ви впевнені?",
-    "imageDoesNotContainScene": "",
-    "cannotRestoreFromImage": ""
+    "imageDoesNotContainScene": "Файл зображення не містить даних сцени. Ви увімкнули це під час експорту?",
+    "cannotRestoreFromImage": "Сцена не може бути відновлена з цього файлу зображення"
   },
   "toolBar": {
     "selection": "Виділення",

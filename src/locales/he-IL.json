@@ -109,6 +109,7 @@
   "alerts": {
     "clearReset": "פעולה זו תנקה את כל הלוח. אתה בטוח?",
     "couldNotCreateShareableLink": "לא ניתן לייצר לינק לשיתוף.",
+    "couldNotCreateShareableLinkTooBig": "",
     "couldNotLoadInvalidFile": "לא ניתן לטעון קובץ שאיננו תואם",
     "importBackendFailed": "ייבוא מהשרת נכשל.",
     "cannotExportEmptyCanvas": "לא ניתן לייצא לוח ריק.",

@@ -109,6 +109,7 @@
   "alerts": {
     "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",
     "couldNotCreateShareableLink": "No se pudo crear un enlace para compartir.",
+    "couldNotCreateShareableLinkTooBig": "",
     "couldNotLoadInvalidFile": "No se pudo cargar el archivo inválido",
     "importBackendFailed": "La importación falló.",
     "cannotExportEmptyCanvas": "No se puede exportar un lienzo vació",

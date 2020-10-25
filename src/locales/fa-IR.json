@@ -109,6 +109,7 @@
   "alerts": {
     "clearReset": "این کار کل صفحه را پاک میکند. آیا مطمئنید؟",
     "couldNotCreateShareableLink": "عدم توانایی در ساخت یک لینک قابل اشتراک.",
+    "couldNotCreateShareableLinkTooBig": "",
     "couldNotLoadInvalidFile": "عدم توانایی در بازگذاری فایل نامعتبر",
     "importBackendFailed": "بارگیری از پشت صحنه با شکست مواجه شد.",
     "cannotExportEmptyCanvas": "بوم خالی قابل تبدیل نیست.",

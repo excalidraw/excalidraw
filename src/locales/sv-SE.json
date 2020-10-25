@@ -109,6 +109,7 @@
   "alerts": {
     "clearReset": "Detta rensar hela canvasen. Är du säker?",
     "couldNotCreateShareableLink": "Kunde inte skapa delbar länk.",
+    "couldNotCreateShareableLinkTooBig": "Kunde inte skapa delbar länk: skissen är för stor",
     "couldNotLoadInvalidFile": "Kunde inte ladda ogiltig fil",
     "importBackendFailed": "Importering från backend misslyckades.",
     "cannotExportEmptyCanvas": "Kan inte exportera tom canvas.",

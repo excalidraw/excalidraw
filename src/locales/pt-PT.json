@@ -109,6 +109,7 @@
   "alerts": {
     "clearReset": "Isto irá limpar toda a tela. Você tem certeza?",
     "couldNotCreateShareableLink": "Não foi possível criar um link de compartilhamento.",
+    "couldNotCreateShareableLinkTooBig": "Não foi possível criar um link compartilhável: a cena é muito grande",
     "couldNotLoadInvalidFile": "Não foi possível carregar o arquivo inválido",
     "importBackendFailed": "A importação do servidor falhou.",
     "cannotExportEmptyCanvas": "Não é possível exportar um canvas vazío.",
