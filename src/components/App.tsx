@@ -272,6 +272,7 @@ export type ExcalidrawImperativeAPI =
   | {
       updateScene: InstanceType<typeof App>["updateScene"];
       resetScene: InstanceType<typeof App>["resetScene"];
+      resetHistory: InstanceType<typeof App>["resetHistory"];
       getSceneElementsIncludingDeleted: InstanceType<
         typeof App
       >["getSceneElementsIncludingDeleted"];
@@ -311,6 +312,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       forwardedRef.current = {
         updateScene: this.updateScene,
         resetScene: this.resetScene,
+        resetHistory: this.resetHistory,
         getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
       };
     }
@@ -555,6 +557,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
   };
 
+  private resetHistory = () => {
+    history.clear();
+  };
+
   /** Completely resets scene & history.
    * Do not use for clear scene user action. */
   private resetScene = withBatchedUpdates(() => {
@@ -564,7 +570,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       appearance: this.state.appearance,
       username: this.state.username,
     });
-    history.clear();
+    this.resetHistory();
   });
 
   private initializeScene = async () => {
@@ -665,7 +671,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           ),
         };
       }
-      history.clear();
+      this.resetHistory();
       this.syncActionResult({
         ...scene,
         commitToHistory: true,
@@ -1314,6 +1320,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     this.updateScene({ elements: newElements });
 
+    // We haven't yet implemented multiplayer undo functionality, so we clear the undo stack
+    // when we receive any messages from another peer. This UX can be pretty rough -- if you
+    // undo, a user makes a change, and then try to redo, your element(s) will be lost. However,
+    // right now we think this is the right tradeoff.
+    this.resetHistory();
+
     if (!this.portal.socketInitialized && !initFromSnapshot) {
       this.initializeSocket();
     }
@@ -1340,12 +1352,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
 
       this.scene.replaceAllElements(sceneData.elements);
-
-      // We haven't yet implemented multiplayer undo functionality, so we clear the undo stack
-      // when we receive any messages from another peer. This UX can be pretty rough -- if you
-      // undo, a user makes a change, and then try to redo, your element(s) will be lost. However,
-      // right now we think this is the right tradeoff.
-      history.clear();
     },
   );
 
