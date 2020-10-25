@@ -109,6 +109,7 @@
   "alerts": {
     "clearReset": "Tuvalin tamamı temizlenecek. Emin misiniz?",
     "couldNotCreateShareableLink": "Paylaşılabilir bağlantı oluşturulamadı.",
+    "couldNotCreateShareableLinkTooBig": "",
     "couldNotLoadInvalidFile": "Bilinmeyen dosya yüklenemiyor",
     "importBackendFailed": "Sunucudan içe aktarma başarısız.",
     "cannotExportEmptyCanvas": "Boş tuval dışarıya aktarılamaz.",
