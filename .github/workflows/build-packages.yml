@@ -18,12 +18,16 @@ jobs:
         with:
           node-version: 12.x
 
-      - name: Install and build @excalidraw/excalidraw
+      - name: Install dependencies
         run: |
+          npm ci
           npm ci --prefix packages/embed
+          npm ci --prefix packages/embed
+
+      - name: Build @excalidraw/excalidraw
+        run: |
           npm run pack --prefix packages/embed
 
-      - name: Install and build @excalidraw/utils
+      - name: Build @excalidraw/utils
         run: |
-          npm ci --prefix packages/embed
           npm run pack --prefix packages/embed
