@@ -109,6 +109,7 @@
   "alerts": {
     "clearReset": "Dette vil tømme lerretet. Er du sikker?",
     "couldNotCreateShareableLink": "Kunne ikkje lage delingslenke.",
+    "couldNotCreateShareableLinkTooBig": "",
     "couldNotLoadInvalidFile": "Kunne ikkje laste inn ugyldig fil",
     "importBackendFailed": "Importering av backend feila.",
     "cannotExportEmptyCanvas": "Kan ikkje eksportere eit tomt lerret.",

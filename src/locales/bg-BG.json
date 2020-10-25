@@ -109,6 +109,7 @@
   "alerts": {
     "clearReset": "Това ще изчисти цялото платно. Сигурни ли сте?",
     "couldNotCreateShareableLink": "Връзката не може да бъде създадена.",
+    "couldNotCreateShareableLinkTooBig": "",
     "couldNotLoadInvalidFile": "Невалиден файл не може да се зареди",
     "importBackendFailed": "Импортирането от бекенд не беше успешно.",
     "cannotExportEmptyCanvas": "Не може да се експортира празно платно.",

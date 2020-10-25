@@ -109,6 +109,7 @@
   "alerts": {
     "clearReset": "To spowoduje usunięcie wszystkiego z dokumentu. Czy chcesz kontynuować?",
     "couldNotCreateShareableLink": "Wystąpił błąd przy generowaniu linka do udostępniania.",
+    "couldNotCreateShareableLinkTooBig": "",
     "couldNotLoadInvalidFile": "Nie udało się otworzyć pliku. Wybrany plik jest nieprawidłowy.",
     "importBackendFailed": "Wystąpił błąd podczas importowania pliku.",
     "cannotExportEmptyCanvas": "Najpierw musisz coś narysować, aby zapisać dokument.",

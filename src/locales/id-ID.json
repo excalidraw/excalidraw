@@ -109,6 +109,7 @@
   "alerts": {
     "clearReset": "Ini akan menghapus semua yang ada dikanvas. Apakah kamu yakin ?",
     "couldNotCreateShareableLink": "Tidak bisa membuat tautan yang bisa dibagikan",
+    "couldNotCreateShareableLinkTooBig": "Tidak dapat membuat tautan yang dapat dibagikan: pemandangan terlalu besar",
     "couldNotLoadInvalidFile": "Tidak dapat memuat berkas yang tidak valid",
     "importBackendFailed": "Gagal mengimpor dari backend",
     "cannotExportEmptyCanvas": "Tidak bisa mengekspor kanvas kosong",

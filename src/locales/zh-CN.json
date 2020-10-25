@@ -109,6 +109,7 @@
   "alerts": {
     "clearReset": "这将会清除整个 画板。您是否要继续?",
     "couldNotCreateShareableLink": "无法创建共享链接",
+    "couldNotCreateShareableLinkTooBig": "",
     "couldNotLoadInvalidFile": "无法加载错误文件",
     "importBackendFailed": "从后端导入失败",
     "cannotExportEmptyCanvas": "无法导出空画布。",

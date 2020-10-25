@@ -109,6 +109,7 @@
   "alerts": {
     "clearReset": "모든 작업 내용을 초기화 합니다. 계속 진행할까요?",
     "couldNotCreateShareableLink": "공유 가능한 링크를 생성할 수 없습니다.",
+    "couldNotCreateShareableLinkTooBig": "",
     "couldNotLoadInvalidFile": "유효하지 않은 파일입니다.",
     "importBackendFailed": "서버로부터 불러 오지 못했습니다.",
     "cannotExportEmptyCanvas": "빈 캔버스를 내보낼 수 없습니다.",

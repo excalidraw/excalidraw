@@ -109,6 +109,7 @@
   "alerts": {
     "clearReset": "L'intégralité du canvas va être effacé. Êtes-vous sur ?",
     "couldNotCreateShareableLink": "Impossible de créer un lien de partage.",
+    "couldNotCreateShareableLinkTooBig": "",
     "couldNotLoadInvalidFile": "Impossible de charger un fichier invalide",
     "importBackendFailed": "L'import depuis le backend a échoué.",
     "cannotExportEmptyCanvas": "Impossible d'exporter un canvas vide.",
