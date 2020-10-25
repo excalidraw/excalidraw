@@ -20,7 +20,6 @@ module.exports = {
     rules: [
       {
         test: /\.(ts|tsx|js|jsx|mjs)$/,
-        exclude: /node_modules\/(?!(roughjs|socket.io-client|browser-nativefs)\/).*/,
         use: [
           {
             loader: "ts-loader",
