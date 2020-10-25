@@ -2,7 +2,7 @@ import React, { useState, useLayoutEffect, useEffect } from "react";
 
 import { LoadingMessage } from "../components/LoadingMessage";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
-import Excalidraw from "../../packages/embed/index";
+import Excalidraw from "./app";
 
 import {
   importFromLocalStorage,
