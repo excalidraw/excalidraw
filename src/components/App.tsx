@@ -271,6 +271,10 @@ export type PointerDownState = Readonly<{
 export type ExcalidrawImperativeAPI =
   | {
       updateScene: InstanceType<typeof App>["updateScene"];
+      resetScene: InstanceType<typeof App>["resetScene"];
+      getSceneElementsIncludingDeleted: InstanceType<
+        typeof App
+      >["getSceneElementsIncludingDeleted"];
     }
   | undefined;
 
@@ -306,6 +310,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (forwardedRef && "current" in forwardedRef) {
       forwardedRef.current = {
         updateScene: this.updateScene,
+        resetScene: this.resetScene,
+        getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
       };
     }
     this.scene = new Scene();
