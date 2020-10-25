@@ -25,7 +25,7 @@ module.exports = {
             loader: "ts-loader",
             options: {
               transpileOnly: true,
-              configFile: path.resolve(__dirname, "tsconfig.prod.json"),
+              configFile: path.resolve(__dirname, "../tsconfig.prod.json"),
             },
           },
         ],
