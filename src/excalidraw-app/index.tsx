@@ -1,6 +1,7 @@
 import React, { useState, useLayoutEffect, useEffect } from "react";
 
 import { LoadingMessage } from "../components/LoadingMessage";
+import { TopErrorBoundary } from "../components/TopErrorBoundary";
 import Excalidraw from "../excalidraw-embed/index";
 
 import {
@@ -93,13 +94,15 @@ export default function ExcalidrawApp() {
   }
 
   return (
-    <Excalidraw
-      width={dimensions.width}
-      height={dimensions.height}
-      onChange={saveDebounced}
-      initialData={initialState.data}
-      user={initialState.user}
-      onUsernameChange={onUsernameChange}
-    />
+    <TopErrorBoundary>
+      <Excalidraw
+        width={dimensions.width}
+        height={dimensions.height}
+        onChange={saveDebounced}
+        initialData={initialState.data}
+        user={initialState.user}
+        onUsernameChange={onUsernameChange}
+      />
+    </TopErrorBoundary>
   );
 }
