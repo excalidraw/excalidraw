@@ -654,8 +654,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     if (isCollaborationScene) {
       // when joining a room we don't want user's local scene data to be merged
-      //  into the remote scene, so set `clearScene`
-      this.initializeSocketClient({ showLoadingState: true, clearScene: true });
+      //  into the remote scene
+      this.resetScene();
+
+      this.initializeSocketClient({ showLoadingState: true });
     } else if (scene) {
       if (scene.appState) {
         scene.appState = {
@@ -1256,6 +1258,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       "Excalidraw",
       await generateCollaborationLink(),
     );
+    // remove deleted elements from elements array & history to ensure we don't
+    // expose potentially sensitive user data in case user manually deletes
+    // existing elements (or clears scene), which would otherwise be persisted
+    // to database even if deleted before creating the room.
+    history.clear();
+    history.resumeRecording();
+    this.scene.replaceAllElements(this.scene.getElements());
+
     this.initializeSocketClient({ showLoadingState: false });
   };
 
@@ -1365,14 +1375,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private initializeSocketClient = async (opts: {
     showLoadingState: boolean;
-    clearScene?: boolean;
   }) => {
     if (this.portal.socket) {
       return;
     }
-    if (opts.clearScene) {
-      this.resetScene();
-    }
+
     const roomMatch = getCollaborationLinkData(window.location.href);
     if (roomMatch) {
       const roomID = roomMatch[1];
