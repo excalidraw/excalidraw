@@ -2,6 +2,7 @@ import { createIV, getImportedKey } from "./index";
 import { ExcalidrawElement } from "../element/types";
 import { getSceneVersion } from "../element";
 import Portal from "../components/Portal";
+import { restoreElements } from "./restore";
 
 let firebasePromise: Promise<typeof import("firebase/app")> | null = null;
 
@@ -155,6 +156,5 @@ export async function loadFromFirebase(
   const storedScene = doc.data() as FirebaseStoredScene;
   const ciphertext = storedScene.ciphertext.toUint8Array();
   const iv = storedScene.iv.toUint8Array();
-  const plaintext = await decryptElements(roomKey, iv, ciphertext);
-  return plaintext;
+  return restoreElements(await decryptElements(roomKey, iv, ciphertext));
 }

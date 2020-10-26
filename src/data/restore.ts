@@ -35,7 +35,7 @@ const restoreElementWithProperties = <T extends ExcalidrawElement>(
     //  newly added elements
     version: element.version || 1,
     versionNonce: element.versionNonce ?? 0,
-    isDeleted: false,
+    isDeleted: element.isDeleted ?? false,
     id: element.id || randomId(),
     fillStyle: element.fillStyle || "hachure",
     strokeWidth: element.strokeWidth || 1,
