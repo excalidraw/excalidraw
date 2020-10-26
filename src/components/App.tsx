@@ -276,6 +276,9 @@ export type ExcalidrawImperativeAPI =
       getSceneElementsIncludingDeleted: InstanceType<
         typeof App
       >["getSceneElementsIncludingDeleted"];
+      getSceneSyncableElements: InstanceType<
+        typeof App
+      >["getSceneSyncableElements"];
     }
   | undefined;
 
@@ -314,6 +317,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         resetScene: this.resetScene,
         resetHistory: this.resetHistory,
         getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
+        getSceneSyncableElements: this.getSceneSyncableElements,
       };
     }
     this.scene = new Scene();
@@ -413,6 +417,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   public getSceneElementsIncludingDeleted = () => {
     return this.scene.getElementsIncludingDeleted();
+  };
+
+  public getSceneSyncableElements = () => {
+    return getSyncableElements(this.getSceneElementsIncludingDeleted());
   };
 
   private syncActionResult = withBatchedUpdates(
