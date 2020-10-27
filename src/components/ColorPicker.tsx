@@ -65,6 +65,8 @@ const Picker = ({
       activeItem.current.focus();
     } else if (colorInput.current) {
       colorInput.current.focus();
+    } else if (gallery.current) {
+      gallery.current.focus();
     }
   }, []);
 
@@ -140,6 +142,7 @@ const Picker = ({
             gallery.current = el;
           }
         }}
+        tabIndex={0}
       >
         {colors.map((_color, i) => (
           <button
