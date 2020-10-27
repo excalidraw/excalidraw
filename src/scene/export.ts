@@ -83,11 +83,13 @@ export const exportToSvg = (
     exportBackground,
     exportPadding = 10,
     viewBackgroundColor,
+    scale = 1,
     shouldAddWatermark,
     metadata = "",
   }: {
     exportBackground: boolean;
     exportPadding?: number;
+    scale?: number;
     viewBackgroundColor: string;
     shouldAddWatermark: boolean;
     metadata?: string;
@@ -106,6 +108,8 @@ export const exportToSvg = (
   svgRoot.setAttribute("version", "1.1");
   svgRoot.setAttribute("xmlns", SVG_NS);
   svgRoot.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  svgRoot.setAttribute("width", `${width * scale}`);
+  svgRoot.setAttribute("height", `${height * scale}`);
 
   svgRoot.innerHTML = `
   ${SVG_EXPORT_TAG}
