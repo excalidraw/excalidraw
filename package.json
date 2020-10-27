@@ -54,7 +54,7 @@
     "@types/pako": "1.0.1",
     "asar": "3.0.3",
     "eslint": "6.8.0",
-    "eslint-config-prettier": "6.13.0",
+    "eslint-config-prettier": "6.14.0",
     "eslint-plugin-prettier": "3.1.4",
     "firebase-tools": "8.12.1",
     "husky": "4.3.0",
