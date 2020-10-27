@@ -43,7 +43,7 @@
     "points-on-curve": "0.2.0",
     "pwacompat": "2.0.17",
     "react": "16.14.0",
-    "react-dom": "16.13.1",
+    "react-dom": "16.14.0",
     "react-scripts": "3.4.3",
     "roughjs": "4.3.1",
     "socket.io-client": "2.3.1",
