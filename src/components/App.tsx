@@ -1022,12 +1022,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     copyToClipboard(this.scene.getElements(), this.state);
   };
 
-  private copyToClipboardAsPng = () => {
+  private copyToClipboardAsPng = async () => {
     const elements = this.scene.getElements();
 
     const selectedElements = getSelectedElements(elements, this.state);
     try {
-      exportCanvas(
+      await exportCanvas(
         "clipboard",
         selectedElements.length ? selectedElements : elements,
         this.state,
@@ -1040,13 +1040,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
   };
 
-  private copyToClipboardAsSvg = () => {
+  private copyToClipboardAsSvg = async () => {
     const selectedElements = getSelectedElements(
       this.scene.getElements(),
       this.state,
     );
     try {
-      exportCanvas(
+      await exportCanvas(
         "clipboard-svg",
         selectedElements.length ? selectedElements : this.scene.getElements(),
         this.state,
