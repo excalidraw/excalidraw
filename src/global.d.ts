@@ -1,16 +1,6 @@
-interface Document {
-  fonts?: {
-    ready?: Promise<void>;
-    addEventListener?(
-      type: "loading" | "loadingdone" | "loadingerror",
-      listener: (this: Document, ev: Event) => any,
-    ): void;
-  };
-}
-
 interface Window {
   ClipboardItem: any;
-  __EXCALIDRAW_SHA__: string;
+  __EXCALIDRAW_SHA__: string | undefined;
 }
 
 // https://github.com/facebook/create-react-app/blob/ddcb7d5/packages/react-scripts/lib/react-app.d.ts

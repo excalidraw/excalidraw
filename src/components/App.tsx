@@ -271,6 +271,11 @@ export type PointerDownState = Readonly<{
 export type ExcalidrawImperativeAPI =
   | {
       updateScene: InstanceType<typeof App>["updateScene"];
+      resetScene: InstanceType<typeof App>["resetScene"];
+      resetHistory: InstanceType<typeof App>["resetHistory"];
+      getSceneElementsIncludingDeleted: InstanceType<
+        typeof App
+      >["getSceneElementsIncludingDeleted"];
     }
   | undefined;
 
@@ -306,6 +311,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (forwardedRef && "current" in forwardedRef) {
       forwardedRef.current = {
         updateScene: this.updateScene,
+        resetScene: this.resetScene,
+        resetHistory: this.resetHistory,
+        getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
       };
     }
     this.scene = new Scene();
@@ -549,6 +557,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
   };
 
+  private resetHistory = () => {
+    history.clear();
+  };
+
   /** Completely resets scene & history.
    * Do not use for clear scene user action. */
   private resetScene = withBatchedUpdates(() => {
@@ -558,7 +570,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       appearance: this.state.appearance,
       username: this.state.username,
     });
-    history.clear();
+    this.resetHistory();
   });
 
   private initializeScene = async () => {
@@ -642,8 +654,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     if (isCollaborationScene) {
       // when joining a room we don't want user's local scene data to be merged
-      //  into the remote scene, so set `clearScene`
-      this.initializeSocketClient({ showLoadingState: true, clearScene: true });
+      //  into the remote scene
+      this.resetScene();
+
+      this.initializeSocketClient({ showLoadingState: true });
     } else if (scene) {
       if (scene.appState) {
         scene.appState = {
@@ -659,7 +673,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           ),
         };
       }
-      history.clear();
+      this.resetHistory();
       this.syncActionResult({
         ...scene,
         commitToHistory: true,
@@ -1244,6 +1258,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       "Excalidraw",
       await generateCollaborationLink(),
     );
+    // remove deleted elements from elements array & history to ensure we don't
+    // expose potentially sensitive user data in case user manually deletes
+    // existing elements (or clears scene), which would otherwise be persisted
+    // to database even if deleted before creating the room.
+    history.clear();
+    history.resumeRecording();
+    this.scene.replaceAllElements(this.scene.getElements());
+
     this.initializeSocketClient({ showLoadingState: false });
   };
 
@@ -1308,6 +1330,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     this.updateScene({ elements: newElements });
 
+    // We haven't yet implemented multiplayer undo functionality, so we clear the undo stack
+    // when we receive any messages from another peer. This UX can be pretty rough -- if you
+    // undo, a user makes a change, and then try to redo, your element(s) will be lost. However,
+    // right now we think this is the right tradeoff.
+    this.resetHistory();
+
     if (!this.portal.socketInitialized && !initFromSnapshot) {
       this.initializeSocket();
     }
@@ -1334,12 +1362,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
 
       this.scene.replaceAllElements(sceneData.elements);
-
-      // We haven't yet implemented multiplayer undo functionality, so we clear the undo stack
-      // when we receive any messages from another peer. This UX can be pretty rough -- if you
-      // undo, a user makes a change, and then try to redo, your element(s) will be lost. However,
-      // right now we think this is the right tradeoff.
-      history.clear();
     },
   );
 
@@ -1353,14 +1375,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private initializeSocketClient = async (opts: {
     showLoadingState: boolean;
-    clearScene?: boolean;
   }) => {
     if (this.portal.socket) {
       return;
     }
-    if (opts.clearScene) {
-      this.resetScene();
-    }
+
     const roomMatch = getCollaborationLinkData(window.location.href);
     if (roomMatch) {
       const roomID = roomMatch[1];

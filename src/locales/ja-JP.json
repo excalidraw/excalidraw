@@ -109,6 +109,7 @@
   "alerts": {
     "clearReset": "この操作によってキャンバス全体が消えます。よろしいですか？",
     "couldNotCreateShareableLink": "共有URLを作成できませんでした。",
+    "couldNotCreateShareableLinkTooBig": "",
     "couldNotLoadInvalidFile": "無効なファイルを読み込めませんでした。",
     "importBackendFailed": "サーバーからの読み込みに失敗しました。",
     "cannotExportEmptyCanvas": "空のキャンバスはエクスポートできません。",

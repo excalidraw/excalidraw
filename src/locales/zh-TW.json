@@ -109,6 +109,7 @@
   "alerts": {
     "clearReset": "這將會清除整個 canvas。你確定嗎？",
     "couldNotCreateShareableLink": "無法建立共享連結。",
+    "couldNotCreateShareableLinkTooBig": "無法建立共享連結：場景太大",
     "couldNotLoadInvalidFile": "無法讀取失效的檔案。",
     "importBackendFailed": "後端讀取失敗。",
     "cannotExportEmptyCanvas": "無法輸出空白的 canvas。",

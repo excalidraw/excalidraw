@@ -109,6 +109,7 @@
   "alerts": {
     "clearReset": "Dit zal het hele canvas verwijderen. Weet je het zeker?",
     "couldNotCreateShareableLink": "Kon geen deelbare link aanmaken.",
+    "couldNotCreateShareableLinkTooBig": "",
     "couldNotLoadInvalidFile": "Kan ongeldig bestand niet laden",
     "importBackendFailed": "Importeren vanuit backend mislukt.",
     "cannotExportEmptyCanvas": "Kan geen leeg canvas exporteren.",
