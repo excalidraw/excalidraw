@@ -150,6 +150,11 @@
     "lineEditor_pointSelected": "Paina Delete poistaaksesi pisteen, CtrlOrCmd+D monistaaksesi, tai raahaa liikuttaaksesi",
     "lineEditor_nothingSelected": "Valitse liikutettava tai poistettava piste, tai pidä Alt pohjassa ja napauta lisätäksesi uusia pisteitä"
   },
+  "canvasError": {
+    "cannotShowPreview": "",
+    "canvasTooBig": "",
+    "canvasTooBigTip": ""
+  },
   "errorSplash": {
     "headingMain_pre": "Tapahtui virhe. Yritä ",
     "headingMain_button": "sivun lataamista uudelleen.",
