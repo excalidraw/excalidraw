@@ -32,7 +32,6 @@
     "clsx": "1.1.1",
     "firebase": "7.24.0",
     "i18next-browser-languagedetector": "6.0.1",
-    "jest-environment-jsdom-fourteen": "1.0.1",
     "lodash.throttle": "4.1.1",
     "nanoid": "2.1.11",
     "node-sass": "4.14.1",
