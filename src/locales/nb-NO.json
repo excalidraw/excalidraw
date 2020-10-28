@@ -150,6 +150,11 @@
     "lineEditor_pointSelected": "Trykk på Slett for å fjerne punktet, Ctrl / Cmd+D for å duplisere, eller dra for å flytte",
     "lineEditor_nothingSelected": "Velg et punkt å flytte eller fjerne, eller hold Alt og klikk for å legge til nye punkter"
   },
+  "canvasError": {
+    "cannotShowPreview": "",
+    "canvasTooBig": "",
+    "canvasTooBigTip": ""
+  },
   "errorSplash": {
     "headingMain_pre": "En feil oppsto. Prøv ",
     "headingMain_button": "å laste siden på nytt.",
