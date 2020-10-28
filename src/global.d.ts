@@ -7,6 +7,7 @@ interface Document {
     ): void;
   };
 }
+
 interface Window {
   ClipboardItem: any;
   __EXCALIDRAW_SHA__: string | undefined;
