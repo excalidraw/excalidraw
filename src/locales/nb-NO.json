@@ -151,9 +151,9 @@
     "lineEditor_nothingSelected": "Velg et punkt å flytte eller fjerne, eller hold Alt og klikk for å legge til nye punkter"
   },
   "canvasError": {
-    "cannotShowPreview": "",
-    "canvasTooBig": "",
-    "canvasTooBigTip": ""
+    "cannotShowPreview": "Kan ikke vise forhåndsvisning",
+    "canvasTooBig": "Lerretet kan være for stort.",
+    "canvasTooBigTip": "Tips: Prøv å flytte de ytterste elementene litt tettere sammen."
   },
   "errorSplash": {
     "headingMain_pre": "En feil oppsto. Prøv ",
