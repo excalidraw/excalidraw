@@ -150,6 +150,11 @@
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": ""
   },
+  "canvasError": {
+    "cannotShowPreview": "",
+    "canvasTooBig": "",
+    "canvasTooBigTip": ""
+  },
   "errorSplash": {
     "headingMain_pre": "エラーが発生しました。もう一度やり直してください。 ",
     "headingMain_button": "ページを再読み込みする。",
