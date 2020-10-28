@@ -150,6 +150,11 @@
     "lineEditor_pointSelected": "Stačte Delete na vymazanie bodu, CtrlOrCmd+D na jeho duplikovanie, alebo potiahnite na jeho presunutie",
     "lineEditor_nothingSelected": "Zvoľte bod na jeho presunutie alebo vymazanie, alebo podržte Alt a kliknite na pridanie nového bodu"
   },
+  "canvasError": {
+    "cannotShowPreview": "",
+    "canvasTooBig": "",
+    "canvasTooBigTip": ""
+  },
   "errorSplash": {
     "headingMain_pre": "Nastala chyba. Vyskúšajte ",
     "headingMain_button": "obnoviť stránku.",
