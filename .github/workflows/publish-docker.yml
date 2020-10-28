@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.3.3
       - uses: docker/build-push-action@v2.0.1
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
