@@ -2,8 +2,6 @@
   "extends": ["prettier", "react-app", "react-app/jest"],
   "plugins": ["prettier"],
   "rules": {
-    "@typescript-eslint/no-unused-vars": "off",
-    "@typescript-eslint/no-redeclare": "off",
     "import/no-anonymous-default-export": "off",
     "curly": "warn",
     "no-console": [
