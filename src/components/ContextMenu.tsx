@@ -38,9 +38,11 @@ const ContextMenu = ({ options, onCloseRequest, top, left }: Props) => {
           className="context-menu"
           onContextMenu={(event) => event.preventDefault()}
         >
-          {options.map((option, idx) => (
+          {options.map(({ action, label }, idx) => (
             <li key={idx} onClick={onCloseRequest}>
-              <ContextMenuOption {...option} />
+              <button className="context-menu-option" onClick={action}>
+                {label}
+              </button>
             </li>
           ))}
         </ul>
@@ -48,12 +50,6 @@ const ContextMenu = ({ options, onCloseRequest, top, left }: Props) => {
     </div>
   );
 };
-
-const ContextMenuOption = ({ label, action }: ContextMenuOption) => (
-  <button className="context-menu-option" onClick={action}>
-    {label}
-  </button>
-);
 
 let contextMenuNode: HTMLDivElement;
 const getContextMenuNode = (): HTMLDivElement => {
