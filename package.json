@@ -44,7 +44,7 @@
     "pwacompat": "2.0.17",
     "react": "16.14.0",
     "react-dom": "16.14.0",
-    "react-scripts": "3.4.3",
+    "react-scripts": "4.0.0",
     "roughjs": "4.3.1",
     "socket.io-client": "2.3.1",
     "typescript": "3.9.7"
