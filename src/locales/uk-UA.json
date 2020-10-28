@@ -150,6 +150,11 @@
     "lineEditor_pointSelected": "Натисніть Видалити, щоб видалити точку, CtrlOrCmd+D для дублювання, або перетягніть, щоб переміститися",
     "lineEditor_nothingSelected": "Виберіть точку для переміщення чи видалення, або утримуйте Alt і натисніть, щоб додати нові точки"
   },
+  "canvasError": {
+    "cannotShowPreview": "",
+    "canvasTooBig": "",
+    "canvasTooBigTip": ""
+  },
   "errorSplash": {
     "headingMain_pre": "Сталася помилка. Спробуйте ",
     "headingMain_button": "перезавантажити сторінку.",
