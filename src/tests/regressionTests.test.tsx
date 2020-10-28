@@ -96,7 +96,7 @@ beforeEach(async () => {
   finger2.reset();
 
   await setLanguage("en.json");
-  render(<App />);
+  render(<App offsetLeft={0} offsetTop={0} />);
 });
 
 afterEach(() => {
@@ -210,6 +210,7 @@ describe("regression tests", () => {
     mouse.up(10, 10);
 
     const transformHandles = getTransformHandles("mouse");
+    // @ts-ignore
     delete transformHandles.rotation; // exclude rotation handle
     for (const handlePos in transformHandles) {
       const [x, y] = transformHandles[

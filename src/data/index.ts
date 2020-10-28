@@ -303,6 +303,7 @@ export const exportCanvas = async (
       exportBackground,
       viewBackgroundColor,
       exportPadding,
+      scale,
       shouldAddWatermark,
       metadata:
         appState.exportEmbedScene && type === "svg"

@@ -109,6 +109,7 @@
   "alerts": {
     "clearReset": "Αυτό θα σβήσει ολόκληρο τον καμβά. Είσαι σίγουρος;",
     "couldNotCreateShareableLink": "Δεν ήταν δυνατή η δημιουργία συνδέσμου κοινής χρήσης.",
+    "couldNotCreateShareableLinkTooBig": "",
     "couldNotLoadInvalidFile": "Δεν μπόρεσε να ανοίξει εσφαλμένο αρχείο",
     "importBackendFailed": "Η εισαγωγή από το backend απέτυχε.",
     "cannotExportEmptyCanvas": "Δεν είναι δυνατή η εξαγωγή κενού καμβά.",

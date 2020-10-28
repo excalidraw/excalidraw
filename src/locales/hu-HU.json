@@ -109,6 +109,7 @@
   "alerts": {
     "clearReset": "Ez a művelet törli a vászont. Biztos benne?",
     "couldNotCreateShareableLink": "Nem sikerült megosztható linket létrehozni.",
+    "couldNotCreateShareableLinkTooBig": "",
     "couldNotLoadInvalidFile": "",
     "importBackendFailed": "Nem sikerült betölteni a szerverről.",
     "cannotExportEmptyCanvas": "Üres vászont nem lehet exportálni.",

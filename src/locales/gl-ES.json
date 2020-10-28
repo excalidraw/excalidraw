@@ -109,6 +109,7 @@
   "alerts": {
     "clearReset": "",
     "couldNotCreateShareableLink": "",
+    "couldNotCreateShareableLinkTooBig": "",
     "couldNotLoadInvalidFile": "",
     "importBackendFailed": "",
     "cannotExportEmptyCanvas": "",

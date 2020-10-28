@@ -32,8 +32,8 @@
     "fontFamily": "Carattere",
     "onlySelected": "Solo selezionati",
     "withBackground": "Con Sfondo",
-    "exportEmbedScene": "",
-    "exportEmbedScene_details": "",
+    "exportEmbedScene": "Incorpora la scena nel file esportato",
+    "exportEmbedScene_details": "I dati della scena saranno salvati nel file PNG/SVG esportato in modo che la scena possa essere ripristinata da esso.\nQuesto aumenterà la dimensione del file esportato.",
     "addWatermark": "Aggiungi \"Creato con Excalidraw\"",
     "handDrawn": "A mano libera",
     "normal": "Normale",
@@ -109,6 +109,7 @@
   "alerts": {
     "clearReset": "Questo cancellerà l'intera tela. Sei sicuro?",
     "couldNotCreateShareableLink": "Non riesco a creare un link condivisibile.",
+    "couldNotCreateShareableLinkTooBig": "Impossibile creare il link condivisibile: la scena è troppo grande",
     "couldNotLoadInvalidFile": "Impossibile caricare un file no valido",
     "importBackendFailed": "Importazione dal server fallita.",
     "cannotExportEmptyCanvas": "Non è possibile esportare una tela vuota.",
@@ -118,8 +119,8 @@
     "loadSceneOverridePrompt": "Se carichi questo disegno esterno, sostituirà quello che hai. Vuoi continuare?",
     "errorLoadingLibrary": "Si è verificato un errore nel caricamento della libreria di terze parti.",
     "confirmAddLibrary": "Questo aggiungerà {{numShapes}} forma(e) alla tua biblioteca. Sei sicuro?",
-    "imageDoesNotContainScene": "",
-    "cannotRestoreFromImage": ""
+    "imageDoesNotContainScene": "Il file immagine non contiene dati di scena. È stato abilitato durante l'esportazione?",
+    "cannotRestoreFromImage": "Impossibile ripristinare la scena da questo file immagine"
   },
   "toolBar": {
     "selection": "Selezione",

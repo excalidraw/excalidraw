@@ -109,6 +109,7 @@
   "alerts": {
     "clearReset": "Dies wird die ganze Zeichenfläche löschen. Bist du dir sicher?",
     "couldNotCreateShareableLink": "Konnte keinen teilbaren Link erstellen.",
+    "couldNotCreateShareableLinkTooBig": "Konnte keinen teilbaren Link erstellen: Die Zeichnung ist zu groß",
     "couldNotLoadInvalidFile": "Ungültige Datei konnte nicht geladen werden",
     "importBackendFailed": "Import vom Server ist fehlgeschlagen.",
     "cannotExportEmptyCanvas": "Leere Zeichenfläche kann nicht exportiert werden.",
