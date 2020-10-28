@@ -57,11 +57,11 @@ const restoreElementWithProperties = <T extends ExcalidrawElement>(
     boundElementIds: element.boundElementIds ?? [],
   };
 
-  return {
+  return ({
     ...base,
     ...getNormalizedDimensions(base),
     ...extra,
-  } as T;
+  } as unknown) as T;
 };
 
 const restoreElement = (
