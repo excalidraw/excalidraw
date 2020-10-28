@@ -150,6 +150,11 @@
     "lineEditor_pointSelected": "Apasă tasta Delete pentru a elimina punctul, combinația de taste Ctrl sau Cmd + D pentru a-l duplica sau glisează-l pentru a-i schimba poziția",
     "lineEditor_nothingSelected": "Selectează un punct pentru a-l muta sau elimina sau ține apăsată tasta Alt și dă clic pentru a adăuga puncte noi"
   },
+  "canvasError": {
+    "cannotShowPreview": "",
+    "canvasTooBig": "",
+    "canvasTooBigTip": ""
+  },
   "errorSplash": {
     "headingMain_pre": "A apărut o eroare. Încearcă ",
     "headingMain_button": "să reîncarci pagina.",
