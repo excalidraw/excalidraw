@@ -150,6 +150,11 @@
     "lineEditor_pointSelected": "按下 Delete 移除点，Ctrl 或 Cmd+D 以复制，或拖动以移动",
     "lineEditor_nothingSelected": "选中要移动或移除的点，或按住 Alt 并点击添加新点"
   },
+  "canvasError": {
+    "cannotShowPreview": "",
+    "canvasTooBig": "",
+    "canvasTooBigTip": ""
+  },
   "errorSplash": {
     "headingMain_pre": "遇到异常。请尝试",
     "headingMain_button": "重新加载页面。",
