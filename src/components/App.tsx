@@ -42,15 +42,7 @@ import {
   isSomeElementSelected,
   calculateScrollCenter,
 } from "../scene";
-import {
-  decryptAESGEM,
-  loadScene,
-  loadFromBlob,
-  SOCKET_SERVER,
-  SocketUpdateDataSource,
-  exportCanvas,
-} from "../data";
-import Portal from "./Portal";
+import { loadScene, loadFromBlob, exportCanvas } from "../data";
 
 import { renderScene } from "../renderer";
 import { AppState, GestureEvent, Gesture, ExcalidrawProps } from "../types";
@@ -76,6 +68,7 @@ import {
   sceneCoordsToViewportCoords,
   setCursorForShape,
   tupleToCoors,
+  noop,
 } from "../utils";
 import {
   KEYS,
@@ -116,7 +109,6 @@ import {
   DRAGGING_THRESHOLD,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
   LINE_CONFIRM_THRESHOLD,
-  SCENE,
   EVENT,
   ENV,
   CANVAS_ONLY_ACTIONS,
@@ -126,7 +118,6 @@ import {
   MIME_TYPES,
 } from "../constants";
 import {
-  INITIAL_SCENE_UPDATE_TIMEOUT,
   TAP_TWICE_TIMEOUT,
   SYNC_FULL_SCENE_INTERVAL_MS,
   TOUCH_CTX_MENU_TIMEOUT,
@@ -134,7 +125,7 @@ import {
 
 import LayerUI from "./LayerUI";
 import { ScrollBars, SceneState } from "../scene/types";
-import { generateCollaborationLink, getCollaborationLinkData } from "../data";
+import { getCollaborationLinkData } from "../data";
 import { mutateElement } from "../element/mutateElement";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import { unstable_batchedUpdates } from "react-dom";
@@ -176,11 +167,6 @@ import {
 import { MaybeTransformHandleType } from "../element/transformHandles";
 import { renderSpreadsheet } from "../charts";
 import { isValidLibrary } from "../data/json";
-import {
-  loadFromFirebase,
-  saveToFirebase,
-  isSavedToFirebase,
-} from "../data/firebase";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -272,20 +258,24 @@ export type ExcalidrawImperativeAPI =
   | {
       updateScene: InstanceType<typeof App>["updateScene"];
       resetScene: InstanceType<typeof App>["resetScene"];
-      resetHistory: InstanceType<typeof App>["resetHistory"];
       getSceneElementsIncludingDeleted: InstanceType<
         typeof App
       >["getSceneElementsIncludingDeleted"];
       getSceneSyncableElements: InstanceType<
         typeof App
       >["getSceneSyncableElements"];
+      history: {
+        clear: InstanceType<typeof App>["resetHistory"];
+        resumeRecording: InstanceType<typeof App>["resumeRecording"];
+      };
+      setScrollToCenter: InstanceType<typeof App>["setScrollToCenter"];
     }
   | undefined;
 
 class App extends React.Component<ExcalidrawProps, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
-  portal: Portal;
+  //portal: Portal;
   private lastBroadcastedOrReceivedSceneVersion: number = -1;
   unmounted: boolean = false;
   actionManager: ActionManager;
@@ -302,26 +292,39 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     super(props);
     const defaultAppState = getDefaultAppState();
 
-    const { width, height, offsetLeft, offsetTop, user, forwardedRef } = props;
+    const {
+      width,
+      height,
+      offsetLeft,
+      offsetTop,
+      user,
+      forwardedRef,
+      isCollaborating,
+    } = props;
     this.state = {
       ...defaultAppState,
       isLoading: true,
       width,
       height,
       username: user?.name || "",
+      isCollaborating,
       ...this.getCanvasOffsets({ offsetLeft, offsetTop }),
     };
     if (forwardedRef && "current" in forwardedRef) {
       forwardedRef.current = {
         updateScene: this.updateScene,
         resetScene: this.resetScene,
-        resetHistory: this.resetHistory,
         getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
         getSceneSyncableElements: this.getSceneSyncableElements,
+        history: {
+          clear: this.resetHistory,
+          resumeRecording: this.resumeRecording,
+        },
+        setScrollToCenter: this.setScrollToCenter,
       };
     }
     this.scene = new Scene();
-    this.portal = new Portal(this);
+    //this.portal = new Portal(this);
 
     this.excalidrawRef = React.createRef();
     this.actionManager = new ActionManager(
@@ -344,7 +347,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       offsetLeft,
     } = this.state;
 
-    const { onUsernameChange } = this.props;
+    const { onUsernameChange, onCollaborationStart = noop } = this.props;
     const canvasScale = window.devicePixelRatio;
 
     const canvasWidth = canvasDOMWidth * canvasScale;
@@ -367,7 +370,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           setAppState={this.setAppState}
           actionManager={this.actionManager}
           elements={this.scene.getElements()}
-          onRoomCreate={this.openPortal}
+          onRoomCreate={onCollaborationStart}
           onRoomDestroy={this.closePortal}
           onUsernameChange={(username) => {
             onUsernameChange && onUsernameChange(username);
@@ -406,10 +409,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       </div>
     );
   }
-
-  public setLastBroadcastedOrReceivedSceneVersion = (version: number) => {
-    this.lastBroadcastedOrReceivedSceneVersion = version;
-  };
 
   public getLastBroadcastedOrReceivedSceneVersion = () => {
     return this.lastBroadcastedOrReceivedSceneVersion;
@@ -569,6 +568,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     history.clear();
   };
 
+  private resumeRecording = () => {
+    history.resumeRecording();
+  };
+
   /** Completely resets scene & history.
    * Do not use for clear scene user action. */
   private resetScene = withBatchedUpdates(() => {
@@ -664,8 +667,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       // when joining a room we don't want user's local scene data to be merged
       //  into the remote scene
       this.resetScene();
-
-      this.initializeSocketClient({ showLoadingState: true });
     } else if (scene) {
       if (scene.appState) {
         scene.appState = {
@@ -792,7 +793,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.onGestureEnd as any,
       false,
     );
-    window.removeEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
   }
 
   private addEventListeners() {
@@ -832,40 +832,16 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.onGestureEnd as any,
       false,
     );
-    window.addEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
   }
 
-  private beforeUnload = withBatchedUpdates((event: BeforeUnloadEvent) => {
-    if (this.state.isCollaborating && this.portal.roomID) {
-      try {
-        localStorage?.setItem(
-          LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
-          JSON.stringify({
-            timestamp: Date.now(),
-            room: this.portal.roomID,
-          }),
-        );
-      } catch {}
-    }
-    const syncableElements = getSyncableElements(
-      this.scene.getElementsIncludingDeleted(),
-    );
-    if (
-      this.state.isCollaborating &&
-      !isSavedToFirebase(this.portal, syncableElements)
-    ) {
-      // this won't run in time if user decides to leave the site, but
-      //  the purpose is to run in immediately after user decides to stay
-      this.saveCollabRoomToFirebase(syncableElements);
-
-      event.preventDefault();
-      // NOTE: modern browsers no longer allow showing a custom message here
-      event.returnValue = "";
-    }
-  });
-
   queueBroadcastAllElements = throttle(() => {
-    this.portal.broadcastScene(SCENE.UPDATE, /* syncAll */ true);
+    this.props.broadCastScene(false);
+    const currentVersion = this.lastBroadcastedOrReceivedSceneVersion;
+    const newVersion = Math.max(
+      currentVersion,
+      getSceneVersion(this.scene.getElementsIncludingDeleted()),
+    );
+    this.lastBroadcastedOrReceivedSceneVersion = newVersion;
   }, SYNC_FULL_SCENE_INTERVAL_MS);
 
   componentDidUpdate(prevProps: ExcalidrawProps, prevState: AppState) {
@@ -881,6 +857,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         width: this.props.width,
         height: this.props.height,
         ...this.getCanvasOffsets(this.props),
+      });
+    }
+    if (prevProps.isCollaborating !== this.props.isCollaborating) {
+      this.setState({
+        isCollaborating: this.props.isCollaborating,
       });
     }
 
@@ -991,12 +972,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (this.state.scrolledOutside !== scrolledOutside) {
       this.setState({ scrolledOutside: scrolledOutside });
     }
-
     if (
       getSceneVersion(this.scene.getElementsIncludingDeleted()) >
       this.lastBroadcastedOrReceivedSceneVersion
     ) {
-      this.portal.broadcastScene(SCENE.UPDATE, /* syncAll */ false);
+      this.props.broadCastScene(true);
+      this.lastBroadcastedOrReceivedSceneVersion = getSceneVersion(
+        this.scene.getElementsIncludingDeleted(),
+      );
       this.queueBroadcastAllElements();
     }
 
@@ -1260,25 +1243,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     gesture.pointers.delete(event.pointerId);
   };
 
-  openPortal = async () => {
-    window.history.pushState(
-      {},
-      "Excalidraw",
-      await generateCollaborationLink(),
-    );
-    // remove deleted elements from elements array & history to ensure we don't
-    // expose potentially sensitive user data in case user manually deletes
-    // existing elements (or clears scene), which would otherwise be persisted
-    // to database even if deleted before creating the room.
-    history.clear();
-    history.resumeRecording();
-    this.scene.replaceAllElements(this.scene.getElements());
-
-    this.initializeSocketClient({ showLoadingState: false });
-  };
-
   closePortal = () => {
-    this.saveCollabRoomToFirebase();
+    //this.saveCollabRoomToFirebase();
     window.history.pushState({}, "Excalidraw", window.location.origin);
     this.destroySocketClient();
   };
@@ -1314,47 +1280,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     });
   };
 
-  private handleRemoteSceneUpdate = (
-    elements: readonly ExcalidrawElement[],
-    {
-      init = false,
-      initFromSnapshot = false,
-    }: { init?: boolean; initFromSnapshot?: boolean } = {},
-  ) => {
-    if (init) {
-      history.resumeRecording();
-    }
-
-    if (init || initFromSnapshot) {
-      this.setScrollToCenter(elements);
-    }
-    const newElements = this.portal.reconcileElements(elements);
-
-    // Avoid broadcasting to the rest of the collaborators the scene
-    // we just received!
-    // Note: this needs to be set before updating the scene as it
-    // syncronously calls render.
-    this.setLastBroadcastedOrReceivedSceneVersion(getSceneVersion(newElements));
-
-    this.updateScene({ elements: newElements });
-
-    // We haven't yet implemented multiplayer undo functionality, so we clear the undo stack
-    // when we receive any messages from another peer. This UX can be pretty rough -- if you
-    // undo, a user makes a change, and then try to redo, your element(s) will be lost. However,
-    // right now we think this is the right tradeoff.
-    this.resetHistory();
-
-    if (!this.portal.socketInitialized && !initFromSnapshot) {
-      this.initializeSocket();
-    }
-  };
-
   private destroySocketClient = () => {
     this.setState({
       isCollaborating: false,
       collaborators: new Map(),
     });
-    this.portal.close();
+    //this.portal.close();
   };
 
   public updateScene = withBatchedUpdates(
@@ -1372,151 +1303,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.scene.replaceAllElements(sceneData.elements);
     },
   );
-
-  private initializeSocket = () => {
-    this.portal.socketInitialized = true;
-    clearTimeout(this.socketInitializationTimer);
-    if (this.state.isLoading && !this.unmounted) {
-      this.setState({ isLoading: false });
-    }
-  };
-
-  private initializeSocketClient = async (opts: {
-    showLoadingState: boolean;
-  }) => {
-    if (this.portal.socket) {
-      return;
-    }
-
-    const roomMatch = getCollaborationLinkData(window.location.href);
-    if (roomMatch) {
-      const roomID = roomMatch[1];
-      const roomKey = roomMatch[2];
-
-      // fallback in case you're not alone in the room but still don't receive
-      //  initial SCENE_UPDATE message
-      this.socketInitializationTimer = setTimeout(
-        this.initializeSocket,
-        INITIAL_SCENE_UPDATE_TIMEOUT,
-      );
-
-      const { default: socketIOClient }: any = await import(
-        /* webpackChunkName: "socketIoClient" */ "socket.io-client"
-      );
-
-      this.portal.open(socketIOClient(SOCKET_SERVER), roomID, roomKey);
-
-      // All socket listeners are moving to Portal
-      this.portal.socket!.on(
-        "client-broadcast",
-        async (encryptedData: ArrayBuffer, iv: Uint8Array) => {
-          if (!this.portal.roomKey) {
-            return;
-          }
-          const decryptedData = await decryptAESGEM(
-            encryptedData,
-            this.portal.roomKey,
-            iv,
-          );
-
-          switch (decryptedData.type) {
-            case "INVALID_RESPONSE":
-              return;
-            case SCENE.INIT: {
-              if (!this.portal.socketInitialized) {
-                const remoteElements = decryptedData.payload.elements;
-                this.handleRemoteSceneUpdate(remoteElements, { init: true });
-              }
-              break;
-            }
-            case SCENE.UPDATE:
-              this.handleRemoteSceneUpdate(decryptedData.payload.elements);
-              break;
-            case "MOUSE_LOCATION": {
-              const {
-                pointer,
-                button,
-                username,
-                selectedElementIds,
-              } = decryptedData.payload;
-
-              const socketId: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["socketId"] =
-                decryptedData.payload.socketId ||
-                // @ts-ignore legacy, see #2094 (#2097)
-                decryptedData.payload.socketID;
-
-              // NOTE purposefully mutating collaborators map in case of
-              //  pointer updates so as not to trigger LayerUI rerender
-              this.setState((state) => {
-                if (!state.collaborators.has(socketId)) {
-                  state.collaborators.set(socketId, {});
-                }
-                const user = state.collaborators.get(socketId)!;
-                user.pointer = pointer;
-                user.button = button;
-                user.selectedElementIds = selectedElementIds;
-                user.username = username;
-                state.collaborators.set(socketId, user);
-                return state;
-              });
-              break;
-            }
-          }
-        },
-      );
-      this.portal.socket!.on("first-in-room", () => {
-        if (this.portal.socket) {
-          this.portal.socket.off("first-in-room");
-        }
-        this.initializeSocket();
-      });
-
-      this.setState({
-        isCollaborating: true,
-        isLoading: opts.showLoadingState ? true : this.state.isLoading,
-      });
-
-      try {
-        const elements = await loadFromFirebase(roomID, roomKey);
-        if (elements) {
-          this.handleRemoteSceneUpdate(elements, { initFromSnapshot: true });
-        }
-      } catch (e) {
-        // log the error and move on. other peers will sync us the scene.
-        console.error(e);
-      }
-    }
-  };
-
-  // Portal-only
-  setCollaborators(sockets: string[]) {
-    this.setState((state) => {
-      const collaborators: typeof state.collaborators = new Map();
-      for (const socketId of sockets) {
-        if (state.collaborators.has(socketId)) {
-          collaborators.set(socketId, state.collaborators.get(socketId)!);
-        } else {
-          collaborators.set(socketId, {});
-        }
-      }
-      return {
-        ...state,
-        collaborators,
-      };
-    });
-  }
-
-  saveCollabRoomToFirebase = async (
-    syncableElements: ExcalidrawElement[] = getSyncableElements(
-      this.scene.getElementsIncludingDeleted(),
-    ),
-  ) => {
-    try {
-      await saveToFirebase(this.portal, syncableElements);
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   private onSceneUpdated = () => {
     this.setState({});
@@ -3990,15 +3776,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     if (isNaN(pointer.x) || isNaN(pointer.y)) {
       // sometimes the pointer goes off screen
-      return;
     }
-    this.portal.socket &&
-      // do not broadcast when more than 1 pointer since that shows flickering on the other side
-      gesture.pointers.size < 2 &&
-      this.portal.broadcastMouseLocation({
-        pointer,
-        button,
-      });
+    // this.portal.socket &&
+    //   // do not broadcast when more than 1 pointer since that shows flickering on the other side
+    //   gesture.pointers.size < 2 &&
+    //   this.portal.broadcastMouseLocation({
+    //     pointer,
+    //     button,
+    //   });
   };
 
   private resetShouldCacheIgnoreZoomDebounced = debounce(() => {

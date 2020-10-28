@@ -20,6 +20,10 @@ const Excalidraw = (props: ExcalidrawProps) => {
     user,
     onUsernameChange,
     forwardedRef,
+    onCollaborationStart,
+    onCollaborationEnd,
+    isCollaborating,
+    broadCastScene,
   } = props;
 
   useEffect(() => {
@@ -53,6 +57,10 @@ const Excalidraw = (props: ExcalidrawProps) => {
           user={user}
           onUsernameChange={onUsernameChange}
           forwardedRef={forwardedRef}
+          onCollaborationStart={onCollaborationStart}
+          onCollaborationEnd={onCollaborationEnd}
+          isCollaborating={isCollaborating}
+          broadCastScene={broadCastScene}
         />
       </IsMobileProvider>
     </InitializeApp>

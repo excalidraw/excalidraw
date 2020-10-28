@@ -1,8 +1,9 @@
 import React, { useState, useLayoutEffect, useEffect } from "react";
 
 import { LoadingMessage } from "../components/LoadingMessage";
-import { TopErrorBoundary } from "../components/TopErrorBoundary";
+
 import Excalidraw from "../excalidraw-embed/index";
+import { WithCollaboration } from "./collab/WithCollaboration";
 
 import {
   importFromLocalStorage,
@@ -35,7 +36,7 @@ const onBlur = () => {
   saveDebounced.flush();
 };
 
-export default function ExcalidrawApp() {
+function ExcalidrawApp(props: any) {
   // dimensions
   // ---------------------------------------------------------------------------
 
@@ -43,6 +44,18 @@ export default function ExcalidrawApp() {
     width: window.innerWidth,
     height: window.innerHeight,
   });
+
+  const {
+    context: {
+      excalidrawRef,
+      setExcalidrawAppState,
+      onCollaborationStart,
+      isCollaborating,
+      broadCastScene,
+      onExcalidrawMount,
+    },
+  } = props;
+
   useLayoutEffect(() => {
     const onResize = () => {
       setDimensions({
@@ -66,6 +79,14 @@ export default function ExcalidrawApp() {
     };
   } | null>(null);
 
+  const onChange = (
+    elements: readonly ExcalidrawElement[],
+    state: AppState,
+  ) => {
+    saveDebounced(elements, state);
+    setExcalidrawAppState(state);
+  };
+
   useEffect(() => {
     setInitialState({
       data: importFromLocalStorage(),
@@ -87,6 +108,10 @@ export default function ExcalidrawApp() {
     };
   }, []);
 
+  const onCollaborationEnd = () => {
+    window.history.pushState({}, "Excalidraw", window.location.origin);
+  };
+
   // ---------------------------------------------------------------------------
 
   if (!initialState) {
@@ -94,15 +119,21 @@ export default function ExcalidrawApp() {
   }
 
   return (
-    <TopErrorBoundary>
-      <Excalidraw
-        width={dimensions.width}
-        height={dimensions.height}
-        onChange={saveDebounced}
-        initialData={initialState.data}
-        user={initialState.user}
-        onUsernameChange={onUsernameChange}
-      />
-    </TopErrorBoundary>
+    <Excalidraw
+      ref={excalidrawRef}
+      width={dimensions.width}
+      height={dimensions.height}
+      onChange={onChange}
+      initialData={initialState.data}
+      user={initialState.user}
+      onUsernameChange={onUsernameChange}
+      onCollaborationEnd={onCollaborationEnd}
+      onCollaborationStart={onCollaborationStart}
+      isCollaborating={isCollaborating}
+      broadCastScene={broadCastScene}
+      onMount={onExcalidrawMount}
+    />
   );
 }
+
+export default WithCollaboration(ExcalidrawApp);

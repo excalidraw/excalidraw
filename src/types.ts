@@ -140,4 +140,9 @@ export interface ExcalidrawProps {
   };
   onUsernameChange?: (username: string) => void;
   forwardedRef: ForwardRef<ExcalidrawImperativeAPI>;
+  onCollaborationStart?: () => void;
+  onCollaborationEnd?: () => void;
+  isCollaborating: boolean;
+  broadCastScene: (syncAll: boolean) => void;
+  onMount: () => void;
 }

@@ -290,3 +290,7 @@ export const findLastIndex = <T>(
   }
   return -1;
 };
+
+export const noop = () => {
+  return () => {};
+};

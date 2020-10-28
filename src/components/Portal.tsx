@@ -2,23 +2,19 @@ import { encryptAESGEM, SocketUpdateDataSource } from "../data";
 
 import { SocketUpdateData } from "../types";
 import { BROADCAST, SCENE } from "../constants";
-import App from "./App";
-import {
-  getElementMap,
-  getSceneVersion,
-  getSyncableElements,
-} from "../element";
+import { getElementMap, getSyncableElements } from "../element";
 import { ExcalidrawElement } from "../element/types";
+import CollabWrapper from "../excalidraw-app/collab/CollabWrapper";
 
 class Portal {
-  app: App;
+  app: CollabWrapper;
   socket: SocketIOClient.Socket | null = null;
   socketInitialized: boolean = false; // we don't want the socket to emit any updates until it is fully initialized
   roomID: string | null = null;
   roomKey: string | null = null;
   broadcastedElementVersions: Map<string, number> = new Map();
 
-  constructor(app: App) {
+  constructor(app: CollabWrapper) {
     this.app = app;
   }
 
@@ -107,12 +103,6 @@ class Portal {
         elements: syncableElements,
       },
     };
-    const currentVersion = this.app.getLastBroadcastedOrReceivedSceneVersion();
-    const newVersion = Math.max(
-      currentVersion,
-      getSceneVersion(this.app.getSceneElementsIncludingDeleted()),
-    );
-    this.app.setLastBroadcastedOrReceivedSceneVersion(newVersion);
 
     for (const syncableElement of syncableElements) {
       this.broadcastedElementVersions.set(
@@ -146,8 +136,9 @@ class Portal {
           socketId: this.socket.id,
           pointer: payload.pointer,
           button: payload.button || "up",
-          selectedElementIds: this.app.state.selectedElementIds,
-          username: this.app.state.username,
+          selectedElementIds:
+            this.app.excalidrawAppState?.selectedElementIds || {},
+          username: this.app.excalidrawAppState?.username || "",
         },
       };
       return this._broadcastSocketData(
@@ -170,9 +161,9 @@ class Portal {
         //  edited on local, skip it (it'll be added in the next
         //  step)
         if (
-          element.id === this.app.state.editingElement?.id ||
-          element.id === this.app.state.resizingElement?.id ||
-          element.id === this.app.state.draggingElement?.id
+          element.id === this.app.excalidrawAppState?.editingElement?.id ||
+          element.id === this.app.excalidrawAppState?.resizingElement?.id ||
+          element.id === this.app.excalidrawAppState?.draggingElement?.id
         ) {
           return elements;
         }
