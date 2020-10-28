@@ -150,6 +150,11 @@
     "lineEditor_pointSelected": "Naciśnij przycisk Usuń, aby usunąć punkt, Ctrl/Cmd+D, aby zduplikować, lub przeciągnij, aby przenieść",
     "lineEditor_nothingSelected": "Naciśnij w punkt by go edytować, przytrzymaj Alt i naciśnij by dodać nowy punkt"
   },
+  "canvasError": {
+    "cannotShowPreview": "",
+    "canvasTooBig": "",
+    "canvasTooBigTip": ""
+  },
   "errorSplash": {
     "headingMain_pre": "Wystąpił błąd. Spróbuj ",
     "headingMain_button": "odświeżyć stronę.",
