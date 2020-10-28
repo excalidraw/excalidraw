@@ -150,6 +150,11 @@
     "lineEditor_pointSelected": "Pressione Deletar para remover ponto, CtrlOuCmd+D para duplicar ou arraste para mover",
     "lineEditor_nothingSelected": "Selecione um ponto para mover ou remover, ou segure Alt e clique para adicionar novos pontos"
   },
+  "canvasError": {
+    "cannotShowPreview": "",
+    "canvasTooBig": "",
+    "canvasTooBigTip": ""
+  },
   "errorSplash": {
     "headingMain_pre": "Foi encontrado um erro. Tente ",
     "headingMain_button": "recarregar a página.",
