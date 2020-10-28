@@ -19,6 +19,7 @@ import { serializeAsJSON } from "./json";
 import { ExportType } from "../scene/types";
 import { restore } from "./restore";
 import { ImportedDataState } from "./types";
+import { canvasToBlob } from "./blob";
 
 export { loadFromBlob } from "./blob";
 export { saveAsJSON, loadFromJSON } from "./json";
@@ -337,28 +338,28 @@ export const exportCanvas = async (
 
   if (type === "png") {
     const fileName = `${name}.png`;
-    tempCanvas.toBlob(async (blob) => {
-      if (blob) {
-        if (appState.exportEmbedScene) {
-          blob = await (
-            await import(/* webpackChunkName: "image" */ "./image")
-          ).encodePngMetadata({
-            blob,
-            metadata: serializeAsJSON(elements, appState),
-          });
-        }
+    let blob = await canvasToBlob(tempCanvas);
+    if (appState.exportEmbedScene) {
+      blob = await (
+        await import(/* webpackChunkName: "image" */ "./image")
+      ).encodePngMetadata({
+        blob,
+        metadata: serializeAsJSON(elements, appState),
+      });
+    }
 
-        await fileSave(blob, {
-          fileName: fileName,
-          extensions: [".png"],
-        });
-      }
+    await fileSave(blob, {
+      fileName: fileName,
+      extensions: [".png"],
     });
   } else if (type === "clipboard") {
     try {
-      copyCanvasToClipboardAsPng(tempCanvas);
-    } catch {
-      window.alert(t("alerts.couldNotCopyToClipboard"));
+      await copyCanvasToClipboardAsPng(tempCanvas);
+    } catch (error) {
+      if (error.name === "CANVAS_POSSIBLY_TOO_BIG") {
+        throw error;
+      }
+      throw new Error(t("alerts.couldNotCopyToClipboard"));
     }
   } else if (type === "backend") {
     exportToBackend(elements, {

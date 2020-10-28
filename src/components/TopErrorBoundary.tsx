@@ -73,7 +73,7 @@ export class TopErrorBoundary extends React.Component<
 
   private errorSplash() {
     return (
-      <div className="ErrorSplash">
+      <div className="ErrorSplash excalidraw">
         <div className="ErrorSplash-messageContainer">
           <div className="ErrorSplash-paragraph bigger align-center">
             {t("errorSplash.headingMain_pre")}
