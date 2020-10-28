@@ -2,6 +2,9 @@
   "extends": ["prettier", "react-app"],
   "plugins": ["prettier"],
   "rules": {
+    "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/no-redeclare": "off",
+    "import/no-anonymous-default-export": "off",
     "curly": "warn",
     "no-console": [
       "warn",
