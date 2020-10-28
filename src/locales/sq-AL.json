@@ -150,6 +150,11 @@
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": ""
   },
+  "canvasError": {
+    "cannotShowPreview": "",
+    "canvasTooBig": "",
+    "canvasTooBigTip": ""
+  },
   "errorSplash": {
     "headingMain_pre": "",
     "headingMain_button": "",
