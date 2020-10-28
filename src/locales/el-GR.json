@@ -150,6 +150,11 @@
     "lineEditor_pointSelected": "Πιέστε Διαγραφή για να αφαιρέσετε το σημείου, CtrlOrCmd+D για να το αντιγράψετε ή σύρτε το για να το μετακινήσετε",
     "lineEditor_nothingSelected": "Επιλέξτε ένα σημείο για μετακίνηση ή αφαίρεση, ή κρατήστε παρατεταμένα το Alt και κάντε κλικ για να προσθέσετε νέα σημεία"
   },
+  "canvasError": {
+    "cannotShowPreview": "",
+    "canvasTooBig": "",
+    "canvasTooBigTip": ""
+  },
   "errorSplash": {
     "headingMain_pre": "Συνέβη κάποιο σφάλμα. Προσπάθησε ",
     "headingMain_button": "φόρτωσε ξανά την σελίδα.",
