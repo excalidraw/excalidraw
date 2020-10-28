@@ -210,7 +210,8 @@ describe("regression tests", () => {
     mouse.up(10, 10);
 
     const transformHandles = getTransformHandles("mouse");
-    transformHandles.rotation = [0, 0];
+    // @ts-ignore
+    delete transformHandles.rotation; // exclude rotation handle
     for (const handlePos in transformHandles) {
       const [x, y] = transformHandles[
         handlePos as keyof typeof transformHandles
