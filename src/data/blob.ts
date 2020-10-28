@@ -120,7 +120,7 @@ export const canvasToBlob = async (
         if (!blob) {
           return reject(
             new CanvasError(
-              t("alerts.canvasPossiblyTooBig"),
+              t("canvasError.canvasTooBig"),
               "CANVAS_POSSIBLY_TOO_BIG",
             ),
           );

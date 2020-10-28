@@ -24,11 +24,11 @@ const defaultScale = scales.includes(devicePixelRatio) ? devicePixelRatio : 1;
 export const ErrorCanvasPreview = () => {
   return (
     <div>
-      <h3>{t("errorCanvasPreview.title")}</h3>
+      <h3>{t("canvasError.cannotShowPreview")}</h3>
       <p>
-        <span>{t("errorCanvasPreview.description")}</span>
+        <span>{t("canvasError.canvasTooBig")}</span>
       </p>
-      <em>({t("errorCanvasPreview.tip")})</em>
+      <em>({t("canvasError.canvasTooBigTip")})</em>
     </div>
   );
 };

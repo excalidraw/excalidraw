@@ -120,8 +120,7 @@
     "errorLoadingLibrary": "There was an error loading the third party library.",
     "confirmAddLibrary": "This will add {{numShapes}} shape(s) to your library. Are you sure?",
     "imageDoesNotContainScene": "Image file doesn't contain scene data. Have you enabled this during export?",
-    "cannotRestoreFromImage": "Scene couldn't be restored from this image file",
-    "canvasPossiblyTooBig": "Canvas may be too big."
+    "cannotRestoreFromImage": "Scene couldn't be restored from this image file"
   },
   "toolBar": {
     "selection": "Selection",
@@ -151,10 +150,10 @@
     "lineEditor_pointSelected": "Press Delete to remove point, CtrlOrCmd+D to duplicate, or drag to move",
     "lineEditor_nothingSelected": "Select a point to move or remove, or hold Alt and click to add new points"
   },
-  "errorCanvasPreview": {
-    "title": "Cannot show preview",
-    "description": "The canvas may be too big.",
-    "tip": "Tip: try moving the farthest elements a bit closer together."
+  "canvasError": {
+    "cannotShowPreview": "Cannot show preview",
+    "canvasTooBig": "The canvas may be too big.",
+    "canvasTooBigTip": "Tip: try moving the farthest elements a bit closer together."
   },
   "errorSplash": {
     "headingMain_pre": "Encountered an error. Try ",
