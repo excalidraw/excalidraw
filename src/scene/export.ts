@@ -60,7 +60,11 @@ export const exportToCanvas = (
       viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
       scrollX: normalizeScroll(-minX + exportPadding),
       scrollY: normalizeScroll(-minY + exportPadding),
-      zoom: 1,
+      zoom: {
+        value: 1,
+        focusPoint: { x: 0, y: 0 },
+        translation: { x: 0, y: 0 },
+      },
       remotePointerViewportCoords: {},
       remoteSelectedElementIds: {},
       shouldCacheIgnoreZoom: false,

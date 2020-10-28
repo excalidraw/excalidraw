@@ -1,12 +1,12 @@
 import { ExcalidrawTextElement } from "../element/types";
-import { FlooredNumber } from "../types";
+import { FlooredNumber, Zoom } from "../types";
 
 export type SceneState = {
   scrollX: FlooredNumber;
   scrollY: FlooredNumber;
   // null indicates transparent bg
   viewBackgroundColor: string | null;
-  zoom: number;
+  zoom: Zoom;
   shouldCacheIgnoreZoom: boolean;
   remotePointerViewportCoords: { [id: string]: { x: number; y: number } };
   remotePointerButton?: { [id: string]: string | undefined };

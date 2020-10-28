@@ -53,7 +53,11 @@ export const getDefaultAppState = (): Omit<
     isResizing: false,
     isRotating: false,
     selectionElement: null,
-    zoom: 1,
+    zoom: {
+      value: 1,
+      focusPoint: { x: 0, y: 0 },
+      translation: { x: 0, y: 0 },
+    },
     openMenu: null,
     lastPointerDownWith: "mouse",
     selectedElementIds: {},

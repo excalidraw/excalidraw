@@ -181,6 +181,7 @@ import {
   saveToFirebase,
   isSavedToFirebase,
 } from "../data/firebase";
+import { getNewZoom } from "../scene/zoom";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -1701,15 +1702,20 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.setState({
       selectedElementIds: {},
     });
-    gesture.initialScale = this.state.zoom;
+    gesture.initialScale = this.state.zoom.value;
   });
 
   private onGestureChange = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
-
-    this.setState({
-      zoom: getNormalizedZoom(gesture.initialScale! * event.scale),
-    });
+    const gestureCenter = getCenter(gesture.pointers);
+    this.setState(({ zoom }) => ({
+      zoom: getNewZoom(
+        gestureCenter,
+        getNormalizedZoom(gesture.initialScale! * event.scale),
+        zoom.translation,
+        zoom.value,
+      ),
+    }));
   });
 
   private onGestureEnd = withBatchedUpdates((event: GestureEvent) => {
@@ -2033,12 +2039,17 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       const distance = getDistance(Array.from(gesture.pointers.values()));
       const scaleFactor = distance / gesture.initialDistance!;
 
-      this.setState({
-        scrollX: normalizeScroll(this.state.scrollX + deltaX / this.state.zoom),
-        scrollY: normalizeScroll(this.state.scrollY + deltaY / this.state.zoom),
-        zoom: getNormalizedZoom(gesture.initialScale! * scaleFactor),
+      this.setState(({ zoom, scrollX, scrollY }) => ({
+        scrollX: normalizeScroll(scrollX + deltaX / zoom.value),
+        scrollY: normalizeScroll(scrollY + deltaY / zoom.value),
+        zoom: getNewZoom(
+          center,
+          getNormalizedZoom(gesture.initialScale! * scaleFactor),
+          zoom.translation,
+          zoom.value,
+        ),
         shouldCacheIgnoreZoom: true,
-      });
+      }));
       this.resetShouldCacheIgnoreZoomDebounced();
     } else {
       gesture.lastCenter = gesture.initialDistance = gesture.initialScale = null;
@@ -2435,8 +2446,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
 
       this.setState({
-        scrollX: normalizeScroll(this.state.scrollX - deltaX / this.state.zoom),
-        scrollY: normalizeScroll(this.state.scrollY - deltaY / this.state.zoom),
+        scrollX: normalizeScroll(
+          this.state.scrollX - deltaX / this.state.zoom.value,
+        ),
+        scrollY: normalizeScroll(
+          this.state.scrollY - deltaY / this.state.zoom.value,
+        ),
       });
     });
     const teardown = withBatchedUpdates(
@@ -2473,7 +2488,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     if (gesture.pointers.size === 2) {
       gesture.lastCenter = getCenter(gesture.pointers);
-      gesture.initialScale = this.state.zoom;
+      gesture.initialScale = this.state.zoom.value;
       gesture.initialDistance = getDistance(
         Array.from(gesture.pointers.values()),
       );
@@ -2772,7 +2787,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     // How many pixels off the shape boundary we still consider a hit
-    const threshold = 10 / this.state.zoom;
+    const threshold = 10 / this.state.zoom.value;
     const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
     return (
       point.x > x1 - threshold &&
@@ -3194,7 +3209,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             mutateElement(draggingElement, {
               points: simplify(
                 [...(points as Point[]), [dx, dy]],
-                0.7 / this.state.zoom,
+                0.7 / this.state.zoom.value,
               ),
             });
           } else {
@@ -3282,7 +3297,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       const x = event.clientX;
       const dx = x - pointerDownState.lastCoords.x;
       this.setState({
-        scrollX: normalizeScroll(this.state.scrollX - dx / this.state.zoom),
+        scrollX: normalizeScroll(
+          this.state.scrollX - dx / this.state.zoom.value,
+        ),
       });
       pointerDownState.lastCoords.x = x;
       return true;
@@ -3292,7 +3309,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       const y = event.clientY;
       const dy = y - pointerDownState.lastCoords.y;
       this.setState({
-        scrollY: normalizeScroll(this.state.scrollY - dy / this.state.zoom),
+        scrollY: normalizeScroll(
+          this.state.scrollY - dy / this.state.zoom.value,
+        ),
       });
       pointerDownState.lastCoords.y = y;
       return true;
@@ -3867,7 +3886,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     const { deltaX, deltaY } = event;
     const { selectedElementIds, previousSelectedElementIds } = this.state;
-
     // note that event.ctrlKey is necessary to handle pinch zooming
     if (event.metaKey || event.ctrlKey) {
       const sign = Math.sign(deltaY);
@@ -3885,8 +3903,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           });
         }, 1000);
       }
+
       this.setState(({ zoom }) => ({
-        zoom: getNormalizedZoom(zoom - delta / 100),
+        zoom: getNewZoom(
+          { x: cursorX, y: cursorY },
+          getNormalizedZoom(zoom.value - delta / 100),
+          zoom.translation,
+          zoom.value,
+        ),
         selectedElementIds: {},
         previousSelectedElementIds:
           Object.keys(selectedElementIds).length !== 0
@@ -3902,14 +3926,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (event.shiftKey) {
       this.setState(({ zoom, scrollX }) => ({
         // on Mac, shift+wheel tends to result in deltaX
-        scrollX: normalizeScroll(scrollX - (deltaY || deltaX) / zoom),
+        scrollX: normalizeScroll(scrollX - (deltaY || deltaX) / zoom.value),
       }));
       return;
     }
 
     this.setState(({ zoom, scrollX, scrollY }) => ({
-      scrollX: normalizeScroll(scrollX - deltaX / zoom),
-      scrollY: normalizeScroll(scrollY - deltaY / zoom),
+      scrollX: normalizeScroll(scrollX - deltaX / zoom.value),
+      scrollY: normalizeScroll(scrollY - deltaY / zoom.value),
     }));
   });
 

@@ -12,6 +12,7 @@ import { register } from "./register";
 import { newElementWith } from "../element/mutateElement";
 import { AppState, FlooredNumber } from "../types";
 import { getCommonBounds } from "../element";
+import { getNewZoom } from "../scene/zoom";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -84,7 +85,12 @@ export const actionZoomIn = register({
     return {
       appState: {
         ...appState,
-        zoom: getNormalizedZoom(appState.zoom + ZOOM_STEP),
+        zoom: getNewZoom(
+          appState.zoom.focusPoint,
+          getNormalizedZoom(appState.zoom.value + ZOOM_STEP),
+          appState.zoom.translation,
+          appState.zoom.value,
+        ),
       },
       commitToHistory: false,
     };
@@ -111,7 +117,12 @@ export const actionZoomOut = register({
     return {
       appState: {
         ...appState,
-        zoom: getNormalizedZoom(appState.zoom - ZOOM_STEP),
+        zoom: getNewZoom(
+          appState.zoom.focusPoint,
+          getNormalizedZoom(appState.zoom.value - ZOOM_STEP),
+          appState.zoom.translation,
+          appState.zoom.value,
+        ),
       },
       commitToHistory: false,
     };
@@ -138,7 +149,12 @@ export const actionResetZoom = register({
     return {
       appState: {
         ...appState,
-        zoom: 1,
+        zoom: getNewZoom(
+          appState.zoom.focusPoint,
+          1,
+          appState.zoom.translation,
+          appState.zoom.value,
+        ),
       },
       commitToHistory: false,
     };
@@ -205,7 +221,7 @@ export const actionZoomToFit = register({
     const centerY = (y1 + y2) / 2;
     const scrollX = normalizeScroll(appState.width / 2 - centerX);
     const scrollY = normalizeScroll(appState.height / 2 - centerY);
-    const zoom = calculateZoom(commonBounds, appState.zoom, {
+    const zoomValue = calculateZoom(commonBounds, appState.zoom.value, {
       scrollX,
       scrollY,
     });
@@ -215,7 +231,11 @@ export const actionZoomToFit = register({
         ...appState,
         scrollX,
         scrollY,
-        zoom,
+        zoom: {
+          value: zoomValue,
+          focusPoint: { x: centerX, y: centerY },
+          translation: { x: 0, y: 0 },
+        },
       },
       commitToHistory: false,
     };

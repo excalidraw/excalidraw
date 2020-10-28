@@ -44,7 +44,7 @@ export const hitTest = (
   y: number,
 ): boolean => {
   // How many pixels off the shape boundary we still consider a hit
-  const threshold = 10 / appState.zoom;
+  const threshold = 10 / appState.zoom.value;
   const point: Point = [x, y];
 
   if (isElementSelected(appState, element)) {
@@ -60,7 +60,7 @@ export const isHittingElementBoundingBoxWithoutHittingElement = (
   x: number,
   y: number,
 ): boolean => {
-  const threshold = 10 / appState.zoom;
+  const threshold = 10 / appState.zoom.value;
 
   return (
     !isHittingElementNotConsideringBoundingBox(element, appState, [x, y]) &&
@@ -73,7 +73,7 @@ const isHittingElementNotConsideringBoundingBox = (
   appState: AppState,
   point: Point,
 ): boolean => {
-  const threshold = 10 / appState.zoom;
+  const threshold = 10 / appState.zoom.value;
 
   const check =
     element.type === "text"

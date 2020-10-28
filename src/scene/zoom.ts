@@ -1,3 +1,5 @@
+import { PointerCoords, Translation, Zoom } from "../types";
+
 export const getZoomOrigin = (
   canvas: HTMLCanvasElement | null,
   scale: number,
@@ -16,6 +18,26 @@ export const getZoomOrigin = (
   return {
     x: normalizedCanvasWidth / 2,
     y: normalizedCanvasHeight / 2,
+  };
+};
+
+export const getNewZoom = (
+  focusPoint: PointerCoords,
+  zoomValue: number,
+  preZoomTranslation: Translation,
+  prevZoomValue: number,
+): Zoom => {
+  return {
+    value: zoomValue,
+    focusPoint: focusPoint,
+    translation: {
+      x:
+        focusPoint.x -
+        (focusPoint.x - preZoomTranslation.x) * (zoomValue / prevZoomValue),
+      y:
+        focusPoint.y -
+        (focusPoint.y - preZoomTranslation.y) * (zoomValue / prevZoomValue),
+    },
   };
 };
 
