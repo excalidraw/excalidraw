@@ -150,6 +150,11 @@
     "lineEditor_pointSelected": "제거하려면 Delete 키, 복제하려면 CtrlOrCmd+D, 이동하려면 드래그하세요.",
     "lineEditor_nothingSelected": ""
   },
+  "canvasError": {
+    "cannotShowPreview": "",
+    "canvasTooBig": "",
+    "canvasTooBigTip": ""
+  },
   "errorSplash": {
     "headingMain_pre": "",
     "headingMain_button": "페이지 새로고침",
