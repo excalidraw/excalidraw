@@ -59,6 +59,7 @@
     "firebase-tools": "8.14.1",
     "husky": "4.3.0",
     "jest-canvas-mock": "2.3.0",
+    "jest-environment-jsdom-fourteen": "1.0.1",
     "lint-staged": "10.5.0",
     "pepjs": "0.5.2",
     "prettier": "2.1.2",
