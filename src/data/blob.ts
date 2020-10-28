@@ -5,6 +5,7 @@ import { AppState } from "../types";
 import { LibraryData, ImportedDataState } from "./types";
 import { calculateScrollCenter } from "../scene";
 import { MIME_TYPES } from "../constants";
+import { CanvasError } from "../errors";
 
 export const parseFileContents = async (blob: Blob | File) => {
   let contents: string;
@@ -108,4 +109,26 @@ export const loadLibraryFromBlob = async (blob: Blob) => {
     throw new Error(t("alerts.couldNotLoadInvalidFile"));
   }
   return data;
+};
+
+export const canvasToBlob = async (
+  canvas: HTMLCanvasElement,
+): Promise<Blob> => {
+  return new Promise((resolve, reject) => {
+    try {
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          return reject(
+            new CanvasError(
+              t("canvasError.canvasTooBig"),
+              "CANVAS_POSSIBLY_TOO_BIG",
+            ),
+          );
+        }
+        resolve(blob);
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
 };

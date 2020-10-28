@@ -150,6 +150,11 @@
     "lineEditor_pointSelected": "Press Delete to remove point, CtrlOrCmd+D to duplicate, or drag to move",
     "lineEditor_nothingSelected": "Select a point to move or remove, or hold Alt and click to add new points"
   },
+  "canvasError": {
+    "cannotShowPreview": "Cannot show preview",
+    "canvasTooBig": "The canvas may be too big.",
+    "canvasTooBigTip": "Tip: try moving the farthest elements a bit closer together."
+  },
   "errorSplash": {
     "headingMain_pre": "Encountered an error. Try ",
     "headingMain_button": "reloading the page.",
