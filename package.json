@@ -44,16 +44,15 @@
     "pwacompat": "2.0.17",
     "react": "17.0.1",
     "react-dom": "17.0.1",
-    "react-scripts": "3.4.3",
+    "react-scripts": "4.0.0",
     "roughjs": "4.3.1",
     "socket.io-client": "2.3.1",
-    "typescript": "3.9.7"
+    "typescript": "4.0.5"
   },
   "devDependencies": {
     "@types/lodash.throttle": "4.1.6",
     "@types/pako": "1.0.1",
     "asar": "3.0.3",
-    "eslint": "6.8.0",
     "eslint-config-prettier": "6.15.0",
     "eslint-plugin-prettier": "3.1.4",
     "firebase-tools": "8.14.1",
@@ -76,7 +75,8 @@
   "jest": {
     "transformIgnorePatterns": [
       "node_modules/(?!(roughjs|points-on-curve|path-data-parser|points-on-path|browser-nativefs)/)"
-    ]
+    ],
+    "resetMocks": false
   },
   "name": "excalidraw",
   "private": true,
@@ -94,7 +94,7 @@
     "prettier": "prettier \"**/*.{css,scss,json,md,html,yml}\" --ignore-path=.eslintignore",
     "start": "react-scripts start",
     "test:all": "npm run test:typecheck && npm run test:code && npm run test:other && npm run test:app -- --watchAll=false",
-    "test:app": "react-scripts test --env=jsdom-fourteen --passWithNoTests",
+    "test:app": "react-scripts test --passWithNoTests",
     "test:code": "eslint --max-warnings=0 --ignore-path .gitignore --ext .js,.ts,.tsx .",
     "test:debug": "react-scripts --inspect-brk test --runInBand --no-cache",
     "test:other": "npm run prettier -- --list-different",
