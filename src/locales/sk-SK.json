@@ -151,8 +151,8 @@
     "lineEditor_nothingSelected": "Zvoľte bod na jeho presunutie alebo vymazanie, alebo podržte Alt a kliknite na pridanie nového bodu"
   },
   "canvasError": {
-    "cannotShowPreview": "",
-    "canvasTooBig": "",
+    "cannotShowPreview": "Nie je možné zobraziť náhľad plátna",
+    "canvasTooBig": "Plátno je možno príliš veľké.",
     "canvasTooBigTip": ""
   },
   "errorSplash": {
