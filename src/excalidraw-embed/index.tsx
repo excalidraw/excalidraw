@@ -6,6 +6,8 @@ import App, { ExcalidrawImperativeAPI } from "../components/App";
 import "../css/app.scss";
 import "../css/styles.scss";
 
+import { noop } from "../utils";
+
 import { ExcalidrawProps } from "../types";
 import { IsMobileProvider } from "../is-mobile";
 
@@ -20,8 +22,8 @@ const Excalidraw = (props: ExcalidrawProps) => {
     user,
     onUsernameChange,
     forwardedRef,
-    onCollaborationStart,
-    onCollaborationEnd,
+    onCollaborationStart = noop,
+    onCollaborationEnd = noop,
     isCollaborating,
     broadCastScene,
   } = props;

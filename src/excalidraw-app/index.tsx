@@ -50,6 +50,7 @@ function ExcalidrawApp(props: any) {
       excalidrawRef,
       setExcalidrawAppState,
       onCollaborationStart,
+      onCollaborationEnd,
       isCollaborating,
       broadCastScene,
       onExcalidrawMount,
@@ -107,10 +108,6 @@ function ExcalidrawApp(props: any) {
       window.removeEventListener(EVENT.BLUR, onBlur, false);
     };
   }, []);
-
-  const onCollaborationEnd = () => {
-    window.history.pushState({}, "Excalidraw", window.location.origin);
-  };
 
   // ---------------------------------------------------------------------------
 

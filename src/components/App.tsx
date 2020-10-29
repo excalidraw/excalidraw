@@ -68,7 +68,6 @@ import {
   sceneCoordsToViewportCoords,
   setCursorForShape,
   tupleToCoors,
-  noop,
 } from "../utils";
 import {
   KEYS,
@@ -347,7 +346,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       offsetLeft,
     } = this.state;
 
-    const { onUsernameChange, onCollaborationStart = noop } = this.props;
+    const {
+      onUsernameChange,
+      onCollaborationStart,
+      onCollaborationEnd,
+    } = this.props;
     const canvasScale = window.devicePixelRatio;
 
     const canvasWidth = canvasDOMWidth * canvasScale;
@@ -371,7 +374,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           actionManager={this.actionManager}
           elements={this.scene.getElements()}
           onRoomCreate={onCollaborationStart}
-          onRoomDestroy={this.closePortal}
+          onRoomDestroy={onCollaborationEnd}
           onUsernameChange={(username) => {
             onUsernameChange && onUsernameChange(username);
             this.setState({ username });
@@ -482,7 +485,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   });
 
   private onUnload = () => {
-    this.destroySocketClient();
     this.onBlur();
   };
 
@@ -1243,12 +1245,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     gesture.pointers.delete(event.pointerId);
   };
 
-  closePortal = () => {
-    //this.saveCollabRoomToFirebase();
-    window.history.pushState({}, "Excalidraw", window.location.origin);
-    this.destroySocketClient();
-  };
-
   toggleLock = () => {
     this.setState((prevState) => ({
       elementLocked: !prevState.elementLocked,
@@ -1278,14 +1274,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         this.canvas,
       ),
     });
-  };
-
-  private destroySocketClient = () => {
-    this.setState({
-      isCollaborating: false,
-      collaborators: new Map(),
-    });
-    //this.portal.close();
   };
 
   public updateScene = withBatchedUpdates(

@@ -69,13 +69,19 @@ class CollabWrapper extends PureComponent<Props, State> {
   componentDidMount() {
     this.unmounted = true;
     window.addEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
+    window.addEventListener(EVENT.UNLOAD, this.onUnload);
     this.initializeScene();
   }
 
   componentWillUnmount() {
     this.unmounted = true;
     window.removeEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
+    window.removeEventListener(EVENT.UNLOAD, this.onUnload);
   }
+
+  private onUnload = () => {
+    this.destroySocketClient();
+  };
 
   private beforeUnload = withBatchedUpdates((event: BeforeUnloadEvent) => {
     if (this.state.isCollaborating && this.portal.roomID) {
@@ -125,6 +131,20 @@ class CollabWrapper extends PureComponent<Props, State> {
       await generateCollaborationLink(),
     );
     this.initializeSocketClient({ showLoadingState: false });
+  };
+
+  closePortal = () => {
+    this.saveCollabRoomToFirebase();
+    window.history.pushState({}, "Excalidraw", window.location.origin);
+    this.destroySocketClient();
+  };
+
+  private destroySocketClient = () => {
+    this.setState({
+      isCollaborating: false,
+      collaborators: new Map(),
+    });
+    this.portal.close();
   };
 
   private initializeSocketClient = async (opts: {
@@ -326,6 +346,7 @@ class CollabWrapper extends PureComponent<Props, State> {
   getValue() {
     return {
       onCollaborationStart: this.openPortal,
+      onCollaborationEnd: this.closePortal,
       excalidrawRef: this.excalidrawRef,
       setExcalidrawAppState: this.setExcalidrawAppState,
       isCollaborating: this.state.isCollaborating,
