@@ -89,3 +89,10 @@ export const MIME_TYPES = {
   excalidraw: "application/vnd.excalidraw+json",
   excalidrawlib: "application/vnd.excalidrawlib+json",
 };
+
+export const STORAGE_KEYS = {
+  LOCAL_STORAGE_ELEMENTS: "excalidraw",
+  LOCAL_STORAGE_KEY_APP_STATE: "excalidraw-state",
+  LOCAL_STORAGE_KEY_COLLAB: "excalidraw-collab",
+  LOCAL_STORAGE_KEY_LIBRARY: "excalidraw-library",
+};

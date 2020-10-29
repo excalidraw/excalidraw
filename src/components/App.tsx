@@ -145,7 +145,6 @@ import {
   isBindingElementType,
 } from "../element/typeChecks";
 import { actionFinalize, actionDeleteSelected } from "../actions";
-import { loadLibrary } from "../data/localStorage";
 
 import throttle from "lodash.throttle";
 import { LinearElementEditor } from "../element/linearElementEditor";
