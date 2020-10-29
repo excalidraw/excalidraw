@@ -151,8 +151,8 @@
     "lineEditor_nothingSelected": "Välj en punkt att flytta eller ta bort, eller håll ned ALT och klicka för att lägga till nya punkter"
   },
   "canvasError": {
-    "cannotShowPreview": "",
-    "canvasTooBig": "",
+    "cannotShowPreview": "Kan inte visa förhandsgranskning",
+    "canvasTooBig": "Canvasen kan vara för stor.",
     "canvasTooBigTip": ""
   },
   "errorSplash": {
