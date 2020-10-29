@@ -151,9 +151,9 @@
     "lineEditor_nothingSelected": "點選想移動或刪除的控制點；或按住 Alt 再點擊以增加新控制點"
   },
   "canvasError": {
-    "cannotShowPreview": "",
-    "canvasTooBig": "",
-    "canvasTooBigTip": ""
+    "cannotShowPreview": "無法顯示預覽",
+    "canvasTooBig": "畫布可能過大",
+    "canvasTooBigTip": "提示：可嘗試將最遠的元素移動至較集中的位置"
   },
   "errorSplash": {
     "headingMain_pre": "發生錯誤，嘗試",
