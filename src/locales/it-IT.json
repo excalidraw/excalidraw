@@ -152,8 +152,8 @@
   },
   "canvasError": {
     "cannotShowPreview": "Impossibile visualizzare l'anteprima",
-    "canvasTooBig": "",
-    "canvasTooBigTip": ""
+    "canvasTooBig": "La tela potrebbe essere troppo grande.",
+    "canvasTooBigTip": "Suggerimento: prova a spostare gli elementi più lontani più vicini tra loro."
   },
   "errorSplash": {
     "headingMain_pre": "Si è verificato un errore. Provare ",
