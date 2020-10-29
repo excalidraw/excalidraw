@@ -1265,7 +1265,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     history.resumeRecording();
     this.scene.replaceAllElements(this.scene.getElements());
 
-    this.initializeSocketClient({ showLoadingState: false });
+    await this.initializeSocketClient({ showLoadingState: false });
   };
 
   closePortal = () => {
