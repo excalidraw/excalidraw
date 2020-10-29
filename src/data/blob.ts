@@ -55,13 +55,24 @@ export const parseFileContents = async (blob: Blob | File) => {
   return contents;
 };
 
-const getMimeType = (blob: Blob): string => {
-  if (blob.type) {
-    return blob.type;
+export const getMimeType = (blob: Blob | string): string => {
+  let name: string;
+  if (typeof blob === "string") {
+    name = blob;
+  } else {
+    if (blob.type) {
+      return blob.type;
+    }
+    name = blob.name || "";
   }
-  const name = blob.name || "";
   if (/\.(excalidraw|json)$/.test(name)) {
     return "application/json";
+  } else if (/\.png$/.test(name)) {
+    return "image/png";
+  } else if (/\.jpe?g$/.test(name)) {
+    return "image/jpeg";
+  } else if (/\.svg$/.test(name)) {
+    return "image/svg+xml";
   }
   return "";
 };

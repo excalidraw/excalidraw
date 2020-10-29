@@ -4039,7 +4039,7 @@ declare global {
       setState: React.Component<any, AppState>["setState"];
       history: SceneHistory;
       app: InstanceType<typeof App>;
-      library: ReturnType<typeof loadLibrary>;
+      library: typeof Library;
     };
   }
 }
@@ -4063,7 +4063,7 @@ if (
       get: () => history,
     },
     library: {
-      get: () => loadLibrary(),
+      value: Library,
     },
   });
 }

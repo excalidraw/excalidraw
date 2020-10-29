@@ -6,6 +6,11 @@ import { STORAGE_KEYS } from "../constants";
 export class Library {
   private static libraryCache: LibraryItems | null = null;
 
+  static resetLibrary = () => {
+    Library.libraryCache = null;
+    localStorage.removeItem(STORAGE_KEYS.LOCAL_STORAGE_KEY_LIBRARY);
+  };
+
   /** imports library (currently merges, removing duplicates) */
   static async importLibrary(blob: Blob) {
     const libraryFile = await loadLibraryFromBlob(blob);
