@@ -8,7 +8,7 @@ export class Library {
 
   static resetLibrary = () => {
     Library.libraryCache = null;
-    localStorage.removeItem(STORAGE_KEYS.LOCAL_STORAGE_KEY_LIBRARY);
+    localStorage.removeItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY);
   };
 
   /** imports library (currently merges, removing duplicates) */
@@ -56,9 +56,7 @@ export class Library {
       }
 
       try {
-        const data = localStorage.getItem(
-          STORAGE_KEYS.LOCAL_STORAGE_KEY_LIBRARY,
-        );
+        const data = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY);
         if (!data) {
           return resolve([]);
         }
@@ -85,10 +83,7 @@ export class Library {
       // cache optimistically so that consumers have access to the latest
       //  immediately
       Library.libraryCache = JSON.parse(serializedItems);
-      localStorage.setItem(
-        STORAGE_KEYS.LOCAL_STORAGE_KEY_LIBRARY,
-        serializedItems,
-      );
+      localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY, serializedItems);
     } catch (e) {
       Library.libraryCache = prevLibraryItems;
       console.error(e);

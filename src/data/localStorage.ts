@@ -6,7 +6,7 @@ import { STORAGE_KEYS } from "../constants";
 export const saveUsernameToLocalStorage = (username: string) => {
   try {
     localStorage.setItem(
-      STORAGE_KEYS.LOCAL_STORAGE_KEY_COLLAB,
+      STORAGE_KEYS.LOCAL_STORAGE_COLLAB,
       JSON.stringify({ username }),
     );
   } catch (error) {
@@ -17,7 +17,7 @@ export const saveUsernameToLocalStorage = (username: string) => {
 
 export const importUsernameFromLocalStorage = (): string | null => {
   try {
-    const data = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_KEY_COLLAB);
+    const data = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_COLLAB);
     if (data) {
       return JSON.parse(data).username;
     }
@@ -39,7 +39,7 @@ export const saveToLocalStorage = (
       JSON.stringify(elements.filter((element) => !element.isDeleted)),
     );
     localStorage.setItem(
-      STORAGE_KEYS.LOCAL_STORAGE_KEY_APP_STATE,
+      STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
       JSON.stringify(clearAppStateForLocalStorage(appState)),
     );
   } catch (error) {
@@ -54,7 +54,7 @@ export const importFromLocalStorage = () => {
 
   try {
     savedElements = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS);
-    savedState = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_KEY_APP_STATE);
+    savedState = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_APP_STATE);
   } catch (error) {
     // Unable to access localStorage
     console.error(error);
