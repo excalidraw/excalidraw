@@ -153,7 +153,7 @@
   "canvasError": {
     "cannotShowPreview": "Nie je možné zobraziť náhľad plátna",
     "canvasTooBig": "Plátno je možno príliš veľké.",
-    "canvasTooBigTip": ""
+    "canvasTooBigTip": "Tip: skúste presunúť najvzdialenejšie prvky bližšie k sebe."
   },
   "errorSplash": {
     "headingMain_pre": "Nastala chyba. Vyskúšajte ",
