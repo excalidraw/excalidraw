@@ -11,7 +11,7 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, "dist"),
-    filename: "excalidraw-utils.js",
+    filename: "excalidraw-utils.min.js",
     library: "ExcalidrawUtils",
     libraryTarget: "umd",
   },
