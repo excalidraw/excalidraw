@@ -151,7 +151,7 @@
     "lineEditor_nothingSelected": "Seleziona un punto per spostare o rimuovere, oppure tieni premuto Alt e fai clic per aggiungere nuovi punti"
   },
   "canvasError": {
-    "cannotShowPreview": "",
+    "cannotShowPreview": "Impossibile visualizzare l'anteprima",
     "canvasTooBig": "",
     "canvasTooBigTip": ""
   },
