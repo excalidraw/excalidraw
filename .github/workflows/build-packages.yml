@@ -22,7 +22,7 @@ jobs:
         run: |
           npm ci
           npm ci --prefix packages/excalidraw
-          npm ci --prefix packages/excalidraw
+          npm ci --prefix packages/utils
 
       - name: Build @excalidraw/excalidraw
         run: |
