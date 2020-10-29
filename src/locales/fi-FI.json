@@ -151,9 +151,9 @@
     "lineEditor_nothingSelected": "Valitse liikutettava tai poistettava piste, tai pidä Alt pohjassa ja napauta lisätäksesi uusia pisteitä"
   },
   "canvasError": {
-    "cannotShowPreview": "",
-    "canvasTooBig": "",
-    "canvasTooBigTip": ""
+    "cannotShowPreview": "Esikatselua ei voitu näyttää",
+    "canvasTooBig": "Piirtoalue saattaa olla liian suuri.",
+    "canvasTooBigTip": "Vinkki: yritä siirtää kaukaisimpia elementtejä hieman lähemmäs toisiaan."
   },
   "errorSplash": {
     "headingMain_pre": "Tapahtui virhe. Yritä ",
