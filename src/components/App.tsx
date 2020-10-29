@@ -3728,7 +3728,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
     }
 
-    const libraryShapes = event.dataTransfer.getData(MIME_TYPES.excalidraw);
+    const libraryShapes = event.dataTransfer.getData(MIME_TYPES.excalidrawlib);
     if (libraryShapes !== "") {
       this.addElementsFromPasteOrLibrary(
         JSON.parse(libraryShapes),
