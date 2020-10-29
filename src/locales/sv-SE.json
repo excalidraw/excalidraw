@@ -153,7 +153,7 @@
   "canvasError": {
     "cannotShowPreview": "Kan inte visa förhandsgranskning",
     "canvasTooBig": "Canvasen kan vara för stor.",
-    "canvasTooBigTip": ""
+    "canvasTooBigTip": "Tips: prova att flytta de mest avlägsna elementen lite närmare varandra."
   },
   "errorSplash": {
     "headingMain_pre": "Ett fel uppstod. Försök ",
