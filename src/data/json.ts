@@ -4,7 +4,6 @@ import { cleanAppStateForExport } from "../appState";
 
 import { fileOpen, fileSave } from "browser-nativefs";
 import { loadFromBlob } from "./blob";
-import { loadLibrary } from "./localStorage";
 import { Library } from "./library";
 import { MIME_TYPES } from "../constants";
 
@@ -65,7 +64,7 @@ export const isValidLibrary = (json: any) => {
 };
 
 export const saveLibraryAsJSON = async () => {
-  const library = await loadLibrary();
+  const library = await Library.loadLibrary();
   const serialized = JSON.stringify(
     {
       type: "excalidrawlib",

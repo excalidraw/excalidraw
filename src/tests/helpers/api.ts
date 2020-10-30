@@ -8,7 +8,12 @@ import { newElement, newTextElement, newLinearElement } from "../../element";
 import { DEFAULT_VERTICAL_ALIGN } from "../../constants";
 import { getDefaultAppState } from "../../appState";
 import { GlobalTestState, createEvent, fireEvent } from "../test-utils";
-import { ImportedDataState } from "../../data/types";
+import fs from "fs";
+import util from "util";
+import path from "path";
+import { getMimeType } from "../../data/blob";
+
+const readFile = util.promisify(fs.readFile);
 
 const { h } = window;
 
@@ -138,30 +143,48 @@ export class API {
     return element as any;
   };
 
-  static dropFile(data: ImportedDataState | Blob) {
+  static readFile = async <T extends "utf8" | null>(
+    filepath: string,
+    encoding?: T,
+  ): Promise<T extends "utf8" ? string : Buffer> => {
+    filepath = path.isAbsolute(filepath)
+      ? filepath
+      : path.resolve(path.join(__dirname, "../", filepath));
+    return readFile(filepath, { encoding }) as any;
+  };
+
+  static loadFile = async (filepath: string) => {
+    const { base, ext } = path.parse(filepath);
+    return new File([await API.readFile(filepath, null)], base, {
+      type: getMimeType(ext),
+    });
+  };
+
+  static drop = async (blob: Blob) => {
     const fileDropEvent = createEvent.drop(GlobalTestState.canvas);
-    const file =
-      data instanceof Blob
-        ? data
-        : new Blob(
-            [
-              JSON.stringify({
-                type: "excalidraw",
-                ...data,
-              }),
-            ],
-            {
-              type: "application/json",
-            },
-          );
+    const text = await new Promise<string>((resolve, reject) => {
+      try {
+        const reader = new FileReader();
+        reader.onload = () => {
+          resolve(reader.result as string);
+        };
+        reader.readAsText(blob);
+      } catch (error) {
+        reject(error);
+      }
+    });
+
     Object.defineProperty(fileDropEvent, "dataTransfer", {
       value: {
-        files: [file],
-        getData: (_type: string) => {
+        files: [blob],
+        getData: (type: string) => {
+          if (type === blob.type) {
+            return text;
+          }
           return "";
         },
       },
     });
     fireEvent(GlobalTestState.canvas, fileDropEvent);
-  }
+  };
 }

@@ -145,7 +145,6 @@ import {
   isBindingElementType,
 } from "../element/typeChecks";
 import { actionFinalize, actionDeleteSelected } from "../actions";
-import { loadLibrary } from "../data/localStorage";
 
 import throttle from "lodash.throttle";
 import { LinearElementEditor } from "../element/linearElementEditor";
@@ -1266,7 +1265,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     history.resumeRecording();
     this.scene.replaceAllElements(this.scene.getElements());
 
-    this.initializeSocketClient({ showLoadingState: false });
+    await this.initializeSocketClient({ showLoadingState: false });
   };
 
   closePortal = () => {
@@ -3729,7 +3728,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
     }
 
-    const libraryShapes = event.dataTransfer.getData(MIME_TYPES.excalidraw);
+    const libraryShapes = event.dataTransfer.getData(MIME_TYPES.excalidrawlib);
     if (libraryShapes !== "") {
       this.addElementsFromPasteOrLibrary(
         JSON.parse(libraryShapes),
@@ -4040,7 +4039,7 @@ declare global {
       setState: React.Component<any, AppState>["setState"];
       history: SceneHistory;
       app: InstanceType<typeof App>;
-      library: ReturnType<typeof loadLibrary>;
+      library: typeof Library;
     };
   }
 }
@@ -4064,7 +4063,7 @@ if (
       get: () => history,
     },
     library: {
-      get: () => loadLibrary(),
+      value: Library,
     },
   });
 }

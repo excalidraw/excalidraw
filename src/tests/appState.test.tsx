@@ -28,12 +28,20 @@ describe("appState", () => {
       expect(h.state.viewBackgroundColor).toBe("#F00");
     });
 
-    API.dropFile({
-      appState: {
-        viewBackgroundColor: "#000",
-      },
-      elements: [API.createElement({ type: "rectangle", id: "A" })],
-    });
+    API.drop(
+      new Blob(
+        [
+          JSON.stringify({
+            type: "excalidraw",
+            appState: {
+              viewBackgroundColor: "#000",
+            },
+            elements: [API.createElement({ type: "rectangle", id: "A" })],
+          }),
+        ],
+        { type: "application/json" },
+      ),
+    );
 
     await waitFor(() => {
       expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]);

@@ -1,0 +1,31 @@
+{
+  "type": "excalidrawlib",
+  "version": 1,
+  "library": [
+    [
+      {
+        "type": "rectangle",
+        "version": 38,
+        "versionNonce": 1046419680,
+        "isDeleted": false,
+        "id": "A",
+        "fillStyle": "hachure",
+        "strokeWidth": 1,
+        "strokeStyle": "solid",
+        "roughness": 1,
+        "opacity": 100,
+        "angle": 0,
+        "x": 21801,
+        "y": 719.5,
+        "strokeColor": "#c92a2a",
+        "backgroundColor": "#e64980",
+        "width": 50,
+        "height": 30,
+        "seed": 117297479,
+        "groupIds": [],
+        "strokeSharpness": "sharp",
+        "boundElementIds": []
+      }
+    ]
+  ]
+}
