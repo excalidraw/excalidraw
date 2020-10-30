@@ -9,7 +9,7 @@ module.exports = {
   mode: "production",
   entry: {
     "excalidraw.min": "./index.tsx",
-    "fonts.min": "../../public/fonts.css",
+    "fonts.min": "../../../public/fonts.css",
   },
   output: {
     path: path.resolve(__dirname, "dist"),
