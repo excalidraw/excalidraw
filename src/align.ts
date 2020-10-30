@@ -1,12 +1,66 @@
 import { ExcalidrawElement } from "./element/types";
 import { newElementWith } from "./element/mutateElement";
+import { getCommonBounds } from "./element";
 
 interface Box {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
 }
+
+export type AlignmentType =
+  | "top"
+  | "bottom"
+  | "left"
+  | "right"
+  | "verticallyCentered"
+  | "horizontallyCentered";
+
+export const alignElements = (
+  elements: ExcalidrawElement[],
+  type: AlignmentType,
+): ExcalidrawElement[] => {
+  const groups: Map<
+    String,
+    ExcalidrawElement[]
+  > = getAlignmentGroupsForElements(elements);
+
+  const groupBoundingBoxes = new Map<String, Box>();
+  groups.forEach((group, groupId) => {
+    const [minX, minY, maxX, maxY] = getCommonBounds(group);
+    groupBoundingBoxes.set(groupId, { minX, minY, maxX, maxY });
+  });
+
+  const referenceElement = getReferenceElement(
+    Array.from(groupBoundingBoxes.values()),
+    type,
+  );
+
+  const updatedElements: ExcalidrawElement[] = [];
+
+  groups.forEach((group, groupId) => {
+    const translation = calculateTranslation(
+      groupBoundingBoxes.get(groupId) as Box,
+      referenceElement,
+      type,
+    ) as {
+      x: number;
+      y: number;
+    };
+
+    group.forEach((e) =>
+      updatedElements.push(
+        newElementWith(e, {
+          x: e.x + translation.x,
+          y: e.y + translation.y,
+        }),
+      ),
+    );
+  });
+
+  return updatedElements;
+};
 
 export const getAlignmentGroupsForElements = (
   elements: ExcalidrawElement[],
@@ -30,177 +84,75 @@ export const getAlignmentGroupsForElements = (
   return groups;
 };
 
-export const calculateBoundingBoxesForGroups = (
-  groups: Map<String, ExcalidrawElement[]>,
-) => {
-  const groupBoundingBoxes = new Map<String, Box>();
-
-  groups.forEach((group, groupId) => {
-    const { x } = group.reduce((leftmost, current) =>
-      current.x < leftmost.x ? current : leftmost,
-    );
-
-    const { y } = group.reduce((topmost, current) =>
-      current.y < topmost.y ? current : topmost,
-    );
-
-    const rightmost = group.reduce((rightmost, current) =>
-      current.x + current.width > rightmost.x + rightmost.width
-        ? current
-        : rightmost,
-    );
-    const width = rightmost.x + rightmost.width - x;
-
-    const bottommost = group.reduce((bottommost, current) =>
-      current.y + current.height > bottommost.y + bottommost.height
-        ? current
-        : bottommost,
-    );
-    const height = bottommost.y + bottommost.height - y;
-
-    groupBoundingBoxes.set(groupId, {
-      x,
-      y,
-      width,
-      height,
-    });
-  });
-
-  return groupBoundingBoxes;
-};
-
 export const getReferenceElement = (
-  elements: Box[],
-  { axis, position }: Alignment,
-): Box => {
-  const dimension = axis === "x" ? "width" : "height";
-
-  const startElement = elements.reduce((start, current) =>
-    current[axis] < start[axis] ? current : start,
-  );
-
-  const endElement = elements.reduce((end, current) =>
-    current[axis] + current[dimension] > end[axis] + end[dimension]
-      ? current
-      : end,
-  );
-
-  if (position === "start") {
-    return startElement;
-  } else if (position === "end") {
-    return endElement;
-  }
-
-  //if (position === "center")
-  return {
-    x: startElement.x,
-    y: startElement.y,
-    width: endElement.x + endElement.width - startElement.x,
-    height: endElement.y + endElement.height - startElement.y,
-  };
-};
-
-const alignStart = (
-  referenceElementPosition: number,
-  boundingBoxPosition: number,
+  groupBoundingBoxes: Box[],
+  type: AlignmentType,
 ) => {
-  return referenceElementPosition - boundingBoxPosition;
-};
+  if (type === "top") {
+    return {
+      minY: Math.min(...groupBoundingBoxes.map(({ minY }) => minY)),
+    } as Box;
+  } else if (type === "bottom") {
+    return {
+      maxY: Math.max(...groupBoundingBoxes.map(({ maxY }) => maxY)),
+    } as Box;
+  } else if (type === "left") {
+    return {
+      minX: Math.min(...groupBoundingBoxes.map(({ minX }) => minX)),
+    } as Box;
+  } else if (type === "right") {
+    return {
+      maxX: Math.max(...groupBoundingBoxes.map(({ maxX }) => maxX)),
+    } as Box;
+  } else if (type === "horizontallyCentered") {
+    const minX = Math.min(...groupBoundingBoxes.map(({ minX }) => minX));
+    const maxX = Math.max(...groupBoundingBoxes.map(({ maxX }) => maxX));
 
-const alignCenter = (
-  referenceElementPosition: number,
-  referenceElementSize: number,
-  boundingBoxPosition: number,
-  boundingBoxSize: number,
-) => {
-  return (
-    referenceElementPosition +
-    referenceElementSize / 2 -
-    (boundingBoxPosition + boundingBoxSize / 2)
-  );
-};
+    return { minX, maxX } as Box;
+  } //else if (type === "verticallyCentered") {
+  const minY = Math.min(...groupBoundingBoxes.map(({ minY }) => minY));
+  const maxY = Math.max(...groupBoundingBoxes.map(({ maxY }) => maxY));
 
-const alignEnd = (
-  referenceElementPosition: number,
-  referenceElementSize: number,
-  boundingBoxPosition: number,
-  boundingBoxSize: number,
-) => {
-  return (
-    referenceElementPosition +
-    referenceElementSize -
-    (boundingBoxPosition + boundingBoxSize)
-  );
+  return { minY, maxY } as Box;
 };
-
-export interface Alignment {
-  position: "start" | "center" | "end";
-  axis: "x" | "y";
-}
 
 const calculateTranslation = (
+  groupBoundingBox: Box,
   referenceElement: Box,
-  boundingBox: Box,
-  { axis, position }: Alignment,
-) => {
-  const dimension = axis === "x" ? "width" : "height";
-
-  const translation = {
+  type: AlignmentType,
+): { x: number; y: number } => {
+  if (type === "top") {
+    return {
+      x: 0,
+      y: referenceElement.minY - groupBoundingBox.minY,
+    };
+  } else if (type === "bottom") {
+    return {
+      x: 0,
+      y: referenceElement.maxY - groupBoundingBox.maxY,
+    };
+  } else if (type === "left") {
+    return {
+      x: referenceElement.minX - groupBoundingBox.minX,
+      y: 0,
+    };
+  } else if (type === "right") {
+    return {
+      x: referenceElement.maxX - groupBoundingBox.maxX,
+      y: 0,
+    };
+  } else if (type === "horizontallyCentered") {
+    return {
+      x:
+        (referenceElement.minX + referenceElement.maxX) / 2 -
+        (groupBoundingBox.minX + groupBoundingBox.maxX) / 2,
+      y: 0,
+    };
+  } // else if (type === "verticallyCentered")
+  return {
     x: 0,
-    y: 0,
+    y:
+      (referenceElement.minY + referenceElement.maxY) / 2 -
+      (groupBoundingBox.minY + groupBoundingBox.maxY) / 2,
   };
-
-  if (position === "start") {
-    translation[axis] = alignStart(referenceElement[axis], boundingBox[axis]);
-  } else if (position === "center") {
-    translation[axis] = alignCenter(
-      referenceElement[axis],
-      referenceElement[dimension],
-      boundingBox[axis],
-      boundingBox[dimension],
-    );
-  } else if (position === "end") {
-    translation[axis] = alignEnd(
-      referenceElement[axis],
-      referenceElement[dimension],
-      boundingBox[axis],
-      boundingBox[dimension],
-    );
-  }
-
-  return translation;
-};
-
-export const alignElements = (
-  elements: ExcalidrawElement[],
-  alignment: Alignment,
-): ExcalidrawElement[] => {
-  const groups = getAlignmentGroupsForElements(elements);
-  const groupBoundingBoxes: Map<String, Box> = calculateBoundingBoxesForGroups(
-    groups,
-  );
-
-  const referenceElement = getReferenceElement(
-    Array.from(groupBoundingBoxes.values()),
-    alignment,
-  );
-
-  return elements.map((element) => {
-    const boundingBox: Box = groupBoundingBoxes.get(
-      element.groupIds.length === 0
-        ? element.id
-        : element.groupIds[element.groupIds.length - 1],
-    ) as Box;
-
-    const translation = calculateTranslation(
-      referenceElement,
-      boundingBox,
-      alignment,
-    ) as { x: number; y: number };
-
-    return newElementWith(element, {
-      x: element.x + translation.x,
-      y: element.y + translation.y,
-    });
-  });
 };
