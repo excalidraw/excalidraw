@@ -214,7 +214,7 @@ export const actionChangeStrokeWidth = register({
             icon: (
               <StrokeWidthIcon
                 appearance={appState.appearance}
-                strokeWidth={1}
+                strokeWidth={2}
               />
             ),
           },
@@ -224,7 +224,7 @@ export const actionChangeStrokeWidth = register({
             icon: (
               <StrokeWidthIcon
                 appearance={appState.appearance}
-                strokeWidth={2}
+                strokeWidth={6}
               />
             ),
           },
@@ -234,7 +234,7 @@ export const actionChangeStrokeWidth = register({
             icon: (
               <StrokeWidthIcon
                 appearance={appState.appearance}
-                strokeWidth={4}
+                strokeWidth={10}
               />
             ),
           },
