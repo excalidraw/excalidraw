@@ -52,10 +52,6 @@ export const actionAlignTop = register({
       commitToHistory: true,
     };
   },
-  contextMenuOrder: 20,
-  contextItemLabel: "labels.alignTop",
-  contextItemPredicate: (elements, appState) =>
-    enableActionGroup(elements, appState),
   keyTest: (event) => {
     return (
       event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === KEYS.ARROW_UP
@@ -88,10 +84,6 @@ export const actionAlignBottom = register({
       commitToHistory: true,
     };
   },
-  contextMenuOrder: 21,
-  contextItemLabel: "labels.alignBottom",
-  contextItemPredicate: (elements, appState) =>
-    enableActionGroup(elements, appState),
   keyTest: (event) => {
     return (
       event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === KEYS.ARROW_DOWN
@@ -124,10 +116,6 @@ export const actionAlignLeft = register({
       commitToHistory: true,
     };
   },
-  contextMenuOrder: 22,
-  contextItemLabel: "labels.alignLeft",
-  contextItemPredicate: (elements, appState) =>
-    enableActionGroup(elements, appState),
   keyTest: (event) => {
     return (
       event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === KEYS.ARROW_LEFT
@@ -160,10 +148,6 @@ export const actionAlignRight = register({
       commitToHistory: true,
     };
   },
-  contextMenuOrder: 23,
-  contextItemLabel: "labels.alignRight",
-  contextItemPredicate: (elements, appState) =>
-    enableActionGroup(elements, appState),
   keyTest: (event) => {
     return (
       event[KEYS.CTRL_OR_CMD] &&
@@ -198,10 +182,6 @@ export const actionAlignVerticallyCentered = register({
       commitToHistory: true,
     };
   },
-  contextMenuOrder: 24,
-  contextItemLabel: "labels.centerVertically",
-  contextItemPredicate: (elements, appState) =>
-    enableActionGroup(elements, appState),
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
       hidden={!enableActionGroup(elements, appState)}
@@ -227,10 +207,6 @@ export const actionAlignHorizontallyCentered = register({
       commitToHistory: true,
     };
   },
-  contextMenuOrder: 25,
-  contextItemLabel: "labels.centerHorizontally",
-  contextItemPredicate: (elements, appState) =>
-    enableActionGroup(elements, appState),
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
       hidden={!enableActionGroup(elements, appState)}
