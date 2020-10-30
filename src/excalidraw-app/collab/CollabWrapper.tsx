@@ -205,25 +205,23 @@ class CollabWrapper extends PureComponent<Props, State> {
                 username,
                 selectedElementIds,
               } = decryptedData.payload;
-
               const socketId: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["socketId"] =
                 decryptedData.payload.socketId ||
                 // @ts-ignore legacy, see #2094 (#2097)
                 decryptedData.payload.socketID;
-
-              // NOTE purposefully mutating collaborators map in case of
-              //  pointer updates so as not to trigger LayerUI rerender
+              // Will have to find better soln to prevent rerender
               this.setState((state) => {
-                if (!state.collaborators.has(socketId)) {
-                  state.collaborators.set(socketId, {});
-                }
-                const user = state.collaborators.get(socketId)!;
+                const collaborators = new Map(state.collaborators);
+                const user = collaborators.get(socketId) || {}!;
                 user.pointer = pointer;
                 user.button = button;
                 user.selectedElementIds = selectedElementIds;
                 user.username = username;
-                state.collaborators.set(socketId, user);
-                return state;
+                collaborators.set(socketId, user);
+                return {
+                  ...state,
+                  collaborators,
+                };
               });
               break;
             }
@@ -334,6 +332,13 @@ class CollabWrapper extends PureComponent<Props, State> {
     this.portal.broadcastScene(SCENE.UPDATE, syncAll);
   };
 
+  onMouseBroadCast = (payload: {
+    pointer: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointer"];
+    button: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["button"];
+  }) => {
+    this.portal.socket && this.portal.broadcastMouseLocation(payload);
+  };
+
   initializeScene = () => {
     const isCollaborationScene = !!getCollaborationLinkData(
       window.location.href,
@@ -351,6 +356,8 @@ class CollabWrapper extends PureComponent<Props, State> {
       setExcalidrawAppState: this.setExcalidrawAppState,
       isCollaborating: this.state.isCollaborating,
       broadCastScene: this.broadCastScene,
+      onMouseBroadCast: this.onMouseBroadCast,
+      collaborators: this.state.collaborators,
     };
   }
 

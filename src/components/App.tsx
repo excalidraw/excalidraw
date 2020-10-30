@@ -274,12 +274,10 @@ export type ExcalidrawImperativeAPI =
 class App extends React.Component<ExcalidrawProps, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
-  //portal: Portal;
   private lastBroadcastedOrReceivedSceneVersion: number = -1;
   unmounted: boolean = false;
   actionManager: ActionManager;
   private excalidrawRef: any;
-  private socketInitializationTimer: any;
 
   public static defaultProps: Partial<ExcalidrawProps> = {
     width: window.innerWidth,
@@ -323,7 +321,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       };
     }
     this.scene = new Scene();
-    //this.portal = new Portal(this);
 
     this.excalidrawRef = React.createRef();
     this.actionManager = new ActionManager(
@@ -867,6 +864,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
     }
 
+    if (prevProps.collaborators !== this.props.collaborators) {
+      this.setState({
+        collaborators: this.props.collaborators,
+      });
+    }
     document
       .querySelector(".excalidraw")
       ?.classList.toggle("Appearance_dark", this.state.appearance === "dark");
@@ -3765,13 +3767,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (isNaN(pointer.x) || isNaN(pointer.y)) {
       // sometimes the pointer goes off screen
     }
-    // this.portal.socket &&
-    //   // do not broadcast when more than 1 pointer since that shows flickering on the other side
-    //   gesture.pointers.size < 2 &&
-    //   this.portal.broadcastMouseLocation({
-    //     pointer,
-    //     button,
-    //   });
+
+    gesture.pointers.size < 2 &&
+      this.props.onMouseBroadCast({ pointer, button });
   };
 
   private resetShouldCacheIgnoreZoomDebounced = debounce(() => {
