@@ -1710,10 +1710,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const gestureCenter = getCenter(gesture.pointers);
     this.setState(({ zoom }) => ({
       zoom: getNewZoom(
-        gestureCenter,
         getNormalizedZoom(gesture.initialScale! * event.scale),
-        zoom.translation,
-        zoom.value,
+        zoom,
+        gestureCenter,
       ),
     }));
   });
@@ -2043,10 +2042,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         scrollX: normalizeScroll(scrollX + deltaX / zoom.value),
         scrollY: normalizeScroll(scrollY + deltaY / zoom.value),
         zoom: getNewZoom(
-          center,
           getNormalizedZoom(gesture.initialScale! * scaleFactor),
-          zoom.translation,
-          zoom.value,
+          zoom,
+          center,
         ),
         shouldCacheIgnoreZoom: true,
       }));
@@ -3905,12 +3903,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
 
       this.setState(({ zoom }) => ({
-        zoom: getNewZoom(
-          { x: cursorX, y: cursorY },
-          getNormalizedZoom(zoom.value - delta / 100),
-          zoom.translation,
-          zoom.value,
-        ),
+        zoom: getNewZoom(getNormalizedZoom(zoom.value - delta / 100), zoom, {
+          x: cursorX,
+          y: cursorY,
+        }),
         selectedElementIds: {},
         previousSelectedElementIds:
           Object.keys(selectedElementIds).length !== 0

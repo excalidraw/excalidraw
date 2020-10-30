@@ -359,11 +359,10 @@ const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,
   sceneState?: SceneState,
 ) => {
-  const zoom = sceneState
+  const zoom: Zoom = sceneState
     ? sceneState.zoom
     : {
         value: 1,
-        focusPoint: { x: 0, y: 0 },
         translation: { x: 0, y: 0 },
       };
   const prevElementWithCanvas = elementWithCanvasCache.get(element);

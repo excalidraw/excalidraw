@@ -28,7 +28,7 @@ const getTransform = (
   //  the whole expression afterwards
   return `translate(${((width - offsetLeft * 2) * (zoom.value - 1)) / 2}px, ${
     ((height - offsetTop * 2) * (zoom.value - 1)) / 2
-  }px) scale(${zoom}) rotate(${degree}deg)`;
+  }px) scale(${zoom.value}) rotate(${degree}deg)`;
 };
 
 export const textWysiwyg = ({

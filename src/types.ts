@@ -101,7 +101,6 @@ export type AppState = {
 
 export type Zoom = Readonly<{
   value: number;
-  focusPoint: PointerCoords;
   translation: Translation;
 }>;
 

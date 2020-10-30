@@ -55,7 +55,6 @@ export const getDefaultAppState = (): Omit<
     selectionElement: null,
     zoom: {
       value: 1,
-      focusPoint: { x: 0, y: 0 },
       translation: { x: 0, y: 0 },
     },
     openMenu: null,

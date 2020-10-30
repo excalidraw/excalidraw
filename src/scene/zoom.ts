@@ -1,42 +1,21 @@
-import { PointerCoords, Translation, Zoom } from "../types";
-
-export const getZoomOrigin = (
-  canvas: HTMLCanvasElement | null,
-  scale: number,
-) => {
-  if (canvas === null) {
-    return { x: 0, y: 0 };
-  }
-  const context = canvas.getContext("2d");
-  if (context === null) {
-    return { x: 0, y: 0 };
-  }
-
-  const normalizedCanvasWidth = canvas.width / scale;
-  const normalizedCanvasHeight = canvas.height / scale;
-
-  return {
-    x: normalizedCanvasWidth / 2,
-    y: normalizedCanvasHeight / 2,
-  };
-};
+import { PointerCoords, Zoom } from "../types";
 
 export const getNewZoom = (
-  focusPoint: PointerCoords,
-  zoomValue: number,
-  preZoomTranslation: Translation,
-  prevZoomValue: number,
+  newZoomValue: number,
+  prevZoom: Zoom,
+  zoomOnViewportPoint: PointerCoords = { x: 0, y: 0 },
 ): Zoom => {
   return {
-    value: zoomValue,
-    focusPoint: focusPoint,
+    value: newZoomValue,
     translation: {
       x:
-        focusPoint.x -
-        (focusPoint.x - preZoomTranslation.x) * (zoomValue / prevZoomValue),
+        zoomOnViewportPoint.x -
+        (zoomOnViewportPoint.x - prevZoom.translation.x) *
+          (newZoomValue / prevZoom.value),
       y:
-        focusPoint.y -
-        (focusPoint.y - preZoomTranslation.y) * (zoomValue / prevZoomValue),
+        zoomOnViewportPoint.y -
+        (zoomOnViewportPoint.y - prevZoom.translation.y) *
+          (newZoomValue / prevZoom.value),
     },
   };
 };
