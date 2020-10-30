@@ -9,12 +9,6 @@ import {
 } from "../data/image";
 import { serializeAsJSON } from "../data/json";
 
-import fs from "fs";
-import util from "util";
-import path from "path";
-
-const readFile = util.promisify(fs.readFile);
-
 const { h } = window;
 
 const testElements = [
@@ -43,22 +37,18 @@ Object.defineProperty(window, "TextDecoder", {
   },
 });
 
-describe("appState", () => {
+describe("export", () => {
   beforeEach(() => {
     render(<App />);
   });
 
   it("export embedded png and reimport", async () => {
-    const pngBlob = new Blob(
-      [await readFile(path.resolve(__dirname, "./fixtures/smiley.png"))],
-      { type: "image/png" },
-    );
-
+    const pngBlob = await API.loadFile("./fixtures/smiley.png");
     const pngBlobEmbedded = await encodePngMetadata({
       blob: pngBlob,
       metadata: serializeAsJSON(testElements, h.state),
     });
-    API.dropFile(pngBlobEmbedded);
+    API.drop(pngBlobEmbedded);
 
     await waitFor(() => {
       expect(h.elements).toEqual([
@@ -78,17 +68,7 @@ describe("appState", () => {
   });
 
   it("import embedded png (legacy v1)", async () => {
-    const pngBlob = new Blob(
-      [
-        await readFile(
-          path.resolve(__dirname, "./fixtures/test_embedded_v1.png"),
-        ),
-      ],
-      { type: "image/png" },
-    );
-
-    API.dropFile(pngBlob);
-
+    API.drop(await API.loadFile("./fixtures/test_embedded_v1.png"));
     await waitFor(() => {
       expect(h.elements).toEqual([
         expect.objectContaining({ type: "text", text: "test" }),
@@ -97,17 +77,7 @@ describe("appState", () => {
   });
 
   it("import embedded png (v2)", async () => {
-    const pngBlob = new Blob(
-      [
-        await readFile(
-          path.resolve(__dirname, "./fixtures/smiley_embedded_v2.png"),
-        ),
-      ],
-      { type: "image/png" },
-    );
-
-    API.dropFile(pngBlob);
-
+    API.drop(await API.loadFile("./fixtures/smiley_embedded_v2.png"));
     await waitFor(() => {
       expect(h.elements).toEqual([
         expect.objectContaining({ type: "text", text: "😀" }),
@@ -116,17 +86,7 @@ describe("appState", () => {
   });
 
   it("import embedded svg (legacy v1)", async () => {
-    const svgBlob = new Blob(
-      [
-        await readFile(
-          path.resolve(__dirname, "./fixtures/test_embedded_v1.svg"),
-        ),
-      ],
-      { type: "image/svg+xml" },
-    );
-
-    API.dropFile(svgBlob);
-
+    API.drop(await API.loadFile("./fixtures/test_embedded_v1.svg"));
     await waitFor(() => {
       expect(h.elements).toEqual([
         expect.objectContaining({ type: "text", text: "test" }),
@@ -135,17 +95,7 @@ describe("appState", () => {
   });
 
   it("import embedded svg (v2)", async () => {
-    const svgBlob = new Blob(
-      [
-        await readFile(
-          path.resolve(__dirname, "./fixtures/smiley_embedded_v2.svg"),
-        ),
-      ],
-      { type: "image/svg+xml" },
-    );
-
-    API.dropFile(svgBlob);
-
+    API.drop(await API.loadFile("./fixtures/smiley_embedded_v2.svg"));
     await waitFor(() => {
       expect(h.elements).toEqual([
         expect.objectContaining({ type: "text", text: "😀" }),

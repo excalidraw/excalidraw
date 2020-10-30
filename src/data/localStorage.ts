@@ -1,59 +1,12 @@
 import { ExcalidrawElement } from "../element/types";
-import { AppState, LibraryItems } from "../types";
+import { AppState } from "../types";
 import { clearAppStateForLocalStorage, getDefaultAppState } from "../appState";
-import { restoreElements } from "./restore";
-
-const LOCAL_STORAGE_KEY = "excalidraw";
-const LOCAL_STORAGE_KEY_STATE = "excalidraw-state";
-const LOCAL_STORAGE_KEY_COLLAB = "excalidraw-collab";
-const LOCAL_STORAGE_KEY_LIBRARY = "excalidraw-library";
-
-let _LATEST_LIBRARY_ITEMS: LibraryItems | null = null;
-export const loadLibrary = (): Promise<LibraryItems> => {
-  return new Promise(async (resolve) => {
-    if (_LATEST_LIBRARY_ITEMS) {
-      return resolve(JSON.parse(JSON.stringify(_LATEST_LIBRARY_ITEMS)));
-    }
-
-    try {
-      const data = localStorage.getItem(LOCAL_STORAGE_KEY_LIBRARY);
-      if (!data) {
-        return resolve([]);
-      }
-
-      const items = (JSON.parse(data) as LibraryItems).map((elements) =>
-        restoreElements(elements),
-      ) as Mutable<LibraryItems>;
-
-      // clone to ensure we don't mutate the cached library elements in the app
-      _LATEST_LIBRARY_ITEMS = JSON.parse(JSON.stringify(items));
-
-      resolve(items);
-    } catch (e) {
-      console.error(e);
-      resolve([]);
-    }
-  });
-};
-
-export const saveLibrary = (items: LibraryItems) => {
-  const prevLibraryItems = _LATEST_LIBRARY_ITEMS;
-  try {
-    const serializedItems = JSON.stringify(items);
-    // cache optimistically so that consumers have access to the latest
-    //  immediately
-    _LATEST_LIBRARY_ITEMS = JSON.parse(serializedItems);
-    localStorage.setItem(LOCAL_STORAGE_KEY_LIBRARY, serializedItems);
-  } catch (e) {
-    _LATEST_LIBRARY_ITEMS = prevLibraryItems;
-    console.error(e);
-  }
-};
+import { STORAGE_KEYS } from "../constants";
 
 export const saveUsernameToLocalStorage = (username: string) => {
   try {
     localStorage.setItem(
-      LOCAL_STORAGE_KEY_COLLAB,
+      STORAGE_KEYS.LOCAL_STORAGE_COLLAB,
       JSON.stringify({ username }),
     );
   } catch (error) {
@@ -64,7 +17,7 @@ export const saveUsernameToLocalStorage = (username: string) => {
 
 export const importUsernameFromLocalStorage = (): string | null => {
   try {
-    const data = localStorage.getItem(LOCAL_STORAGE_KEY_COLLAB);
+    const data = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_COLLAB);
     if (data) {
       return JSON.parse(data).username;
     }
@@ -82,11 +35,11 @@ export const saveToLocalStorage = (
 ) => {
   try {
     localStorage.setItem(
-      LOCAL_STORAGE_KEY,
+      STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
       JSON.stringify(elements.filter((element) => !element.isDeleted)),
     );
     localStorage.setItem(
-      LOCAL_STORAGE_KEY_STATE,
+      STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
       JSON.stringify(clearAppStateForLocalStorage(appState)),
     );
   } catch (error) {
@@ -100,8 +53,8 @@ export const importFromLocalStorage = () => {
   let savedState = null;
 
   try {
-    savedElements = localStorage.getItem(LOCAL_STORAGE_KEY);
-    savedState = localStorage.getItem(LOCAL_STORAGE_KEY_STATE);
+    savedElements = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS);
+    savedState = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_APP_STATE);
   } catch (error) {
     // Unable to access localStorage
     console.error(error);

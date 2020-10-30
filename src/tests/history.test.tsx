@@ -78,13 +78,21 @@ describe("history", () => {
       expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]),
     );
 
-    API.dropFile({
-      appState: {
-        ...getDefaultAppState(),
-        viewBackgroundColor: "#000",
-      },
-      elements: [API.createElement({ type: "rectangle", id: "B" })],
-    });
+    API.drop(
+      new Blob(
+        [
+          JSON.stringify({
+            type: "excalidraw",
+            appState: {
+              ...getDefaultAppState(),
+              viewBackgroundColor: "#000",
+            },
+            elements: [API.createElement({ type: "rectangle", id: "B" })],
+          }),
+        ],
+        { type: "application/json" },
+      ),
+    );
 
     await waitFor(() => expect(API.getStateHistory().length).toBe(2));
     expect(h.state.viewBackgroundColor).toBe("#000");
