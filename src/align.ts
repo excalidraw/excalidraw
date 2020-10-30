@@ -9,62 +9,37 @@ interface Box {
   maxY: number;
 }
 
-export type AlignmentType =
-  | "top"
-  | "bottom"
-  | "left"
-  | "right"
-  | "verticallyCentered"
-  | "horizontallyCentered";
+export interface Alignment {
+  position: "start" | "center" | "end";
+  axis: "x" | "y";
+}
 
 export const alignElements = (
-  elements: ExcalidrawElement[],
-  type: AlignmentType,
+  selectedElements: ExcalidrawElement[],
+  alignment: Alignment,
 ): ExcalidrawElement[] => {
-  const groups: Map<
-    String,
-    ExcalidrawElement[]
-  > = getAlignmentGroupsForElements(elements);
+  const groups: ExcalidrawElement[][] = getMaximumGroups(selectedElements);
 
-  const groupBoundingBoxes = new Map<String, Box>();
-  groups.forEach((group, groupId) => {
-    const [minX, minY, maxX, maxY] = getCommonBounds(group);
-    groupBoundingBoxes.set(groupId, { minX, minY, maxX, maxY });
-  });
+  const selectionBoundingBox = getCommonBoundingBox(selectedElements);
 
-  const referenceElement = getReferenceElement(
-    Array.from(groupBoundingBoxes.values()),
-    type,
-  );
-
-  const updatedElements: ExcalidrawElement[] = [];
-
-  groups.forEach((group, groupId) => {
+  return groups.flatMap((group) => {
     const translation = calculateTranslation(
-      groupBoundingBoxes.get(groupId) as Box,
-      referenceElement,
-      type,
-    ) as {
-      x: number;
-      y: number;
-    };
-
-    group.forEach((e) =>
-      updatedElements.push(
-        newElementWith(e, {
-          x: e.x + translation.x,
-          y: e.y + translation.y,
-        }),
-      ),
+      group,
+      selectionBoundingBox,
+      alignment,
+    );
+    return group.map((element) =>
+      newElementWith(element, {
+        x: element.x + translation.x,
+        y: element.y + translation.y,
+      }),
     );
   });
-
-  return updatedElements;
 };
 
-export const getAlignmentGroupsForElements = (
+export const getMaximumGroups = (
   elements: ExcalidrawElement[],
-) => {
+): ExcalidrawElement[][] => {
   const groups: Map<String, ExcalidrawElement[]> = new Map<
     String,
     ExcalidrawElement[]
@@ -81,78 +56,40 @@ export const getAlignmentGroupsForElements = (
     groups.set(groupId, [...currentGroupMembers, element]);
   });
 
-  return groups;
-};
-
-export const getReferenceElement = (
-  groupBoundingBoxes: Box[],
-  type: AlignmentType,
-) => {
-  if (type === "top") {
-    return {
-      minY: Math.min(...groupBoundingBoxes.map(({ minY }) => minY)),
-    } as Box;
-  } else if (type === "bottom") {
-    return {
-      maxY: Math.max(...groupBoundingBoxes.map(({ maxY }) => maxY)),
-    } as Box;
-  } else if (type === "left") {
-    return {
-      minX: Math.min(...groupBoundingBoxes.map(({ minX }) => minX)),
-    } as Box;
-  } else if (type === "right") {
-    return {
-      maxX: Math.max(...groupBoundingBoxes.map(({ maxX }) => maxX)),
-    } as Box;
-  } else if (type === "horizontallyCentered") {
-    const minX = Math.min(...groupBoundingBoxes.map(({ minX }) => minX));
-    const maxX = Math.max(...groupBoundingBoxes.map(({ maxX }) => maxX));
-
-    return { minX, maxX } as Box;
-  } //else if (type === "verticallyCentered") {
-  const minY = Math.min(...groupBoundingBoxes.map(({ minY }) => minY));
-  const maxY = Math.max(...groupBoundingBoxes.map(({ maxY }) => maxY));
-
-  return { minY, maxY } as Box;
+  return Array.from(groups.values());
 };
 
 const calculateTranslation = (
-  groupBoundingBox: Box,
-  referenceElement: Box,
-  type: AlignmentType,
+  group: ExcalidrawElement[],
+  selectionBoundingBox: Box,
+  { axis, position }: Alignment,
 ): { x: number; y: number } => {
-  if (type === "top") {
+  const groupBoundingBox = getCommonBoundingBox(group);
+
+  const [min, max]: ["minX" | "minY", "maxX" | "maxY"] =
+    axis === "x" ? ["minX", "maxX"] : ["minY", "maxY"];
+
+  const noTranslation = { x: 0, y: 0 };
+  if (position === "start") {
     return {
-      x: 0,
-      y: referenceElement.minY - groupBoundingBox.minY,
+      ...noTranslation,
+      [axis]: selectionBoundingBox[min] - groupBoundingBox[min],
     };
-  } else if (type === "bottom") {
+  } else if (position === "end") {
     return {
-      x: 0,
-      y: referenceElement.maxY - groupBoundingBox.maxY,
+      ...noTranslation,
+      [axis]: selectionBoundingBox[max] - groupBoundingBox[max],
     };
-  } else if (type === "left") {
-    return {
-      x: referenceElement.minX - groupBoundingBox.minX,
-      y: 0,
-    };
-  } else if (type === "right") {
-    return {
-      x: referenceElement.maxX - groupBoundingBox.maxX,
-      y: 0,
-    };
-  } else if (type === "horizontallyCentered") {
-    return {
-      x:
-        (referenceElement.minX + referenceElement.maxX) / 2 -
-        (groupBoundingBox.minX + groupBoundingBox.maxX) / 2,
-      y: 0,
-    };
-  } // else if (type === "verticallyCentered")
+  } // else if (position === "center") {
   return {
-    x: 0,
-    y:
-      (referenceElement.minY + referenceElement.maxY) / 2 -
-      (groupBoundingBox.minY + groupBoundingBox.maxY) / 2,
+    ...noTranslation,
+    [axis]:
+      (selectionBoundingBox[min] + selectionBoundingBox[max]) / 2 -
+      (groupBoundingBox[min] + groupBoundingBox[max]) / 2,
   };
 };
+
+function getCommonBoundingBox(elements: ExcalidrawElement[]): Box {
+  const [minX, minY, maxX, maxY] = getCommonBounds(elements);
+  return { minX, minY, maxX, maxY };
+}
