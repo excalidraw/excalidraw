@@ -275,7 +275,7 @@ export const AlignRightIcon = React.memo(
     createIcon(
       <>
         <path
-          d="M 20,2 V 22"
+          d="M 19,2 V 22"
           fill={iconFillColor(appearance)}
           stroke={iconFillColor(appearance)}
           strokeWidth="2"
