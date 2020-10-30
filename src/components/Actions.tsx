@@ -88,12 +88,12 @@ export const SelectedShapeActions = ({
         <fieldset>
           <legend>{t("labels.align")}</legend>
           <div className="buttonList">
-            {renderAction("alignTop")}
-            {renderAction("alignBottom")}
             {renderAction("alignLeft")}
-            {renderAction("alignRight")}
-            {renderAction("alignVerticallyCentered")}
             {renderAction("alignHorizontallyCentered")}
+            {renderAction("alignRight")}
+            {renderAction("alignTop")}
+            {renderAction("alignVerticallyCentered")}
+            {renderAction("alignBottom")}
           </div>
         </fieldset>
       )}
