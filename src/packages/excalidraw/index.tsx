@@ -1,13 +1,13 @@
 import React, { useEffect, forwardRef } from "react";
 
-import { InitializeApp } from "../components/InitializeApp";
-import App, { ExcalidrawImperativeAPI } from "../components/App";
+import { InitializeApp } from "../../components/InitializeApp";
+import App, { ExcalidrawImperativeAPI } from "../../components/App";
 
-import "../css/app.scss";
-import "../css/styles.scss";
+import "../../css/app.scss";
+import "../../css/styles.scss";
 
-import { ExcalidrawProps } from "../types";
-import { IsMobileProvider } from "../is-mobile";
+import { ExcalidrawProps } from "../../types";
+import { IsMobileProvider } from "../../is-mobile";
 
 const Excalidraw = (props: ExcalidrawProps) => {
   const {

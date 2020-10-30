@@ -21,13 +21,13 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          npm ci --prefix packages/excalidraw
-          npm ci --prefix packages/utils
+          npm ci --prefix src/packages/excalidraw
+          npm ci --prefix src/packages/utils
 
       - name: Build @excalidraw/excalidraw
         run: |
-          npm run pack --prefix packages/excalidraw
+          npm run pack --prefix src/packages/excalidraw
 
       - name: Build @excalidraw/utils
         run: |
-          npm run pack --prefix packages/utils
+          npm run pack --prefix src/packages/utils

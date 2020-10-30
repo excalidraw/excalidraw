@@ -1,11 +1,11 @@
 import {
   exportToCanvas as _exportToCanvas,
   exportToSvg as _exportToSvg,
-} from "../src/scene/export";
-import { getDefaultAppState } from "../src/appState";
-import { AppState } from "../src/types";
-import { ExcalidrawElement } from "../src/element/types";
-import { getNonDeletedElements } from "../src/element";
+} from "../scene/export";
+import { getDefaultAppState } from "../appState";
+import { AppState } from "../types";
+import { ExcalidrawElement } from "../element/types";
+import { getNonDeletedElements } from "../element";
 
 type ExportOpts = {
   elements: readonly ExcalidrawElement[];
@@ -29,7 +29,7 @@ const exportToCanvas = ({
       viewBackgroundColor: appState.viewBackgroundColor ?? "#FFF",
       shouldAddWatermark: appState.shouldAddWatermark ?? false,
     },
-    (width, height) => {
+    (width: number, height: number) => {
       const canvas = document.createElement("canvas");
       const ret = getDimensions(width, height);
 
@@ -63,7 +63,7 @@ export const exportToBlob = (
 
   return new Promise((resolve) => {
     canvas.toBlob(
-      (blob) => {
+      (blob: Blob | null) => {
         resolve(blob);
       },
       mimeType,
