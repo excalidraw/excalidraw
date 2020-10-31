@@ -74,7 +74,14 @@
     "addToLibrary": "Kütüphaneye ekle",
     "removeFromLibrary": "Kütüphaneden kaldır",
     "libraryLoadingMessage": "Kütüphane yükleniyor...",
-    "loadingScene": "Çalışma alanı yükleniyor..."
+    "loadingScene": "Çalışma alanı yükleniyor...",
+    "align": "",
+    "alignTop": "",
+    "alignBottom": "",
+    "alignLeft": "",
+    "alignRight": "",
+    "centerVertically": "",
+    "centerHorizontally": ""
   },
   "buttons": {
     "clearReset": "Tuvali sıfırla",
