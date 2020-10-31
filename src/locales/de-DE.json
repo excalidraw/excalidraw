@@ -74,7 +74,14 @@
     "addToLibrary": "Zur Bibliothek hinzufügen",
     "removeFromLibrary": "Aus Bibliothek entfernen",
     "libraryLoadingMessage": "Lade Bibliothek...",
-    "loadingScene": "Lade Zeichnung..."
+    "loadingScene": "Lade Zeichnung...",
+    "align": "",
+    "alignTop": "",
+    "alignBottom": "",
+    "alignLeft": "",
+    "alignRight": "",
+    "centerVertically": "",
+    "centerHorizontally": ""
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
