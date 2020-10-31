@@ -75,13 +75,13 @@
     "removeFromLibrary": "Poista kirjastosta",
     "libraryLoadingMessage": "Ladataan kirjastoa...",
     "loadingScene": "Ladataan työtä...",
-    "align": "",
-    "alignTop": "",
-    "alignBottom": "",
-    "alignLeft": "",
-    "alignRight": "",
-    "centerVertically": "",
-    "centerHorizontally": ""
+    "align": "Tasaa",
+    "alignTop": "Tasaa ylös",
+    "alignBottom": "Tasaa alas",
+    "alignLeft": "Tasaa vasemmalle",
+    "alignRight": "Tasaa oikealle",
+    "centerVertically": "Keskitä pystysuunnassa",
+    "centerHorizontally": "Keskitä vaakasuunnassa"
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
