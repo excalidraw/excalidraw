@@ -160,7 +160,7 @@
   "canvasError": {
     "cannotShowPreview": "Vorschau kann nicht angezeigt werden",
     "canvasTooBig": "Die Leinwand ist möglicherweise zu groß.",
-    "canvasTooBigTip": ""
+    "canvasTooBigTip": "Tipp: Schiebe die am weitesten entfernten Elemente ein wenig näher zusammen."
   },
   "errorSplash": {
     "headingMain_pre": "Es ist ein Fehler aufgetreten. Versuche ",
