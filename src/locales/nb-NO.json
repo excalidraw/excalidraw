@@ -76,12 +76,12 @@
     "libraryLoadingMessage": "Laster bibliotek...",
     "loadingScene": "Laster inn scene...",
     "align": "Juster",
-    "alignTop": "",
-    "alignBottom": "",
-    "alignLeft": "",
-    "alignRight": "",
-    "centerVertically": "",
-    "centerHorizontally": ""
+    "alignTop": "Juster øverst",
+    "alignBottom": "Juster nederst",
+    "alignLeft": "Juster venstre",
+    "alignRight": "Juster høyre",
+    "centerVertically": "Midtstill vertikalt",
+    "centerHorizontally": "Midtstill horisontalt"
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
