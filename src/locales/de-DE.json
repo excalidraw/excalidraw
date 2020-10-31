@@ -75,13 +75,13 @@
     "removeFromLibrary": "Aus Bibliothek entfernen",
     "libraryLoadingMessage": "Lade Bibliothek...",
     "loadingScene": "Lade Zeichnung...",
-    "align": "",
-    "alignTop": "",
-    "alignBottom": "",
-    "alignLeft": "",
-    "alignRight": "",
-    "centerVertically": "",
-    "centerHorizontally": ""
+    "align": "Ausrichten",
+    "alignTop": "Obere Kanten",
+    "alignBottom": "Untere Kanten",
+    "alignLeft": "Linke Kanten",
+    "alignRight": "Rechte Kanten",
+    "centerVertically": "Vertikal zentrieren",
+    "centerHorizontally": "Horizontal zentrieren"
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
@@ -158,8 +158,8 @@
     "lineEditor_nothingSelected": "Wähle einen Punkt zum Verschieben oder Löschen oder halte die Alt-Taste gedrückt und klicke, um neue Punkte hinzuzufügen"
   },
   "canvasError": {
-    "cannotShowPreview": "",
-    "canvasTooBig": "",
+    "cannotShowPreview": "Vorschau kann nicht angezeigt werden",
+    "canvasTooBig": "Die Leinwand ist möglicherweise zu groß.",
     "canvasTooBigTip": ""
   },
   "errorSplash": {
