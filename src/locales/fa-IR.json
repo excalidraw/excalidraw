@@ -74,7 +74,14 @@
     "addToLibrary": "افزودن به کتابخانه",
     "removeFromLibrary": "حذف از کتابخانه",
     "libraryLoadingMessage": "بارگذاری کتابخانه...",
-    "loadingScene": "باگذاری صحنه..."
+    "loadingScene": "باگذاری صحنه...",
+    "align": "",
+    "alignTop": "",
+    "alignBottom": "",
+    "alignLeft": "",
+    "alignRight": "",
+    "centerVertically": "",
+    "centerHorizontally": ""
   },
   "buttons": {
     "clearReset": "پاکسازی بوم نقاشی",
