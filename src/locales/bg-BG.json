@@ -74,7 +74,14 @@
     "addToLibrary": "",
     "removeFromLibrary": "",
     "libraryLoadingMessage": "",
-    "loadingScene": ""
+    "loadingScene": "",
+    "align": "",
+    "alignTop": "",
+    "alignBottom": "",
+    "alignLeft": "",
+    "alignRight": "",
+    "centerVertically": "",
+    "centerHorizontally": ""
   },
   "buttons": {
     "clearReset": "Нулиране на платно",
