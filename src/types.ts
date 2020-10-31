@@ -152,7 +152,6 @@ export interface ExcalidrawProps {
     button: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["button"];
   }) => void;
   collaborators: Map<string, Collaborator>;
-  onMount: () => void;
   initializeScene?: (scene: any) => void;
   isCollaborationScene: () => boolean;
 }
