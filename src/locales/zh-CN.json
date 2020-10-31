@@ -74,7 +74,14 @@
     "addToLibrary": "添加到库中",
     "removeFromLibrary": "从库中移除",
     "libraryLoadingMessage": "正在加载库...",
-    "loadingScene": "正在加载绘图..."
+    "loadingScene": "正在加载绘图...",
+    "align": "",
+    "alignTop": "",
+    "alignBottom": "",
+    "alignLeft": "",
+    "alignRight": "",
+    "centerVertically": "",
+    "centerHorizontally": ""
   },
   "buttons": {
     "clearReset": "重置画布",
