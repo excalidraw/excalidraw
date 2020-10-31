@@ -202,6 +202,143 @@ export const SendToBackIcon = React.memo(
     ),
 );
 
+//
+// Align action icons created from scratch to match those of z-index actions
+//
+export const AlignTopIcon = React.memo(
+  ({ appearance }: { appearance: "light" | "dark" }) =>
+    createIcon(
+      <>
+        <path
+          d="M 2,5 H 22"
+          fill={iconFillColor(appearance)}
+          stroke={iconFillColor(appearance)}
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+        <path
+          d="M 6,7 C 5.446,7 5,7.446 5,8 v 9.999992 c 0,0.554 0.446,1 1,1 h 3.0000001 c 0.554,0 0.9999999,-0.446 0.9999999,-1 V 8 C 10,7.446 9.5540001,7 9.0000001,7 Z m 9,0 c -0.554,0 -1,0.446 -1,1 v 5.999992 c 0,0.554 0.446,1 1,1 h 3 c 0.554,0 1,-0.446 1,-1 V 8 C 19,7.446 18.554,7 18,7 Z"
+          fill={activeElementColor(appearance)}
+          stroke={activeElementColor(appearance)}
+          strokeWidth="2"
+        />
+      </>,
+      { width: 24 },
+    ),
+);
+
+export const AlignBottomIcon = React.memo(
+  ({ appearance }: { appearance: "light" | "dark" }) =>
+    createIcon(
+      <>
+        <path
+          d="M 2,19 H 22"
+          fill={iconFillColor(appearance)}
+          stroke={iconFillColor(appearance)}
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+        <path
+          d="m 6,16.999992 c -0.554,0 -1,-0.446 -1,-1 V 6 C 5,5.446 5.446,5 6,5 H 9.0000001 C 9.5540001,5 10,5.446 10,6 v 9.999992 c 0,0.554 -0.4459999,1 -0.9999999,1 z m 9,0 c -0.554,0 -1,-0.446 -1,-1 V 10 c 0,-0.554 0.446,-1 1,-1 h 3 c 0.554,0 1,0.446 1,1 v 5.999992 c 0,0.554 -0.446,1 -1,1 z"
+          fill={activeElementColor(appearance)}
+          stroke={activeElementColor(appearance)}
+          strokeWidth="2"
+        />
+      </>,
+      { width: 24 },
+    ),
+);
+
+export const AlignLeftIcon = React.memo(
+  ({ appearance }: { appearance: "light" | "dark" }) =>
+    createIcon(
+      <>
+        <path
+          d="M 5,2 V 22"
+          fill={iconFillColor(appearance)}
+          stroke={iconFillColor(appearance)}
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+        <path
+          d="m 7.000004,5.999996 c 0,-0.554 0.446,-1 1,-1 h 9.999992 c 0.554,0 1,0.446 1,1 v 3.0000001 c 0,0.554 -0.446,0.9999999 -1,0.9999999 H 8.000004 c -0.554,0 -1,-0.4459999 -1,-0.9999999 z m 0,9 c 0,-0.554 0.446,-1 1,-1 h 5.999992 c 0.554,0 1,0.446 1,1 v 3 c 0,0.554 -0.446,1 -1,1 H 8.000004 c -0.554,0 -1,-0.446 -1,-1 z"
+          fill={activeElementColor(appearance)}
+          stroke={activeElementColor(appearance)}
+          strokeWidth="2"
+        />
+      </>,
+      { width: 24 },
+    ),
+);
+
+export const AlignRightIcon = React.memo(
+  ({ appearance }: { appearance: "light" | "dark" }) =>
+    createIcon(
+      <>
+        <path
+          d="M 19,2 V 22"
+          fill={iconFillColor(appearance)}
+          stroke={iconFillColor(appearance)}
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+        <path
+          d="m 16.999996,5.999996 c 0,-0.554 -0.446,-1 -1,-1 H 6.000004 c -0.554,0 -1,0.446 -1,1 v 3.0000001 c 0,0.554 0.446,0.9999999 1,0.9999999 h 9.999992 c 0.554,0 1,-0.4459999 1,-0.9999999 z m 0,9 c 0,-0.554 -0.446,-1 -1,-1 h -5.999992 c -0.554,0 -1,0.446 -1,1 v 3 c 0,0.554 0.446,1 1,1 h 5.999992 c 0.554,0 1,-0.446 1,-1 z"
+          fill={activeElementColor(appearance)}
+          stroke={activeElementColor(appearance)}
+          strokeWidth="2"
+        />
+      </>,
+      { width: 24 },
+    ),
+);
+
+export const CenterVerticallyIcon = React.memo(
+  ({ appearance }: { appearance: "light" | "dark" }) =>
+    createIcon(
+      <>
+        <path
+          d="m 5.000004,16.999996 c 0,0.554 0.446,1 1,1 h 3 c 0.554,0 1,-0.446 1,-1 v -10 c 0,-0.554 -0.446,-1 -1,-1 h -3 c -0.554,0 -1,0.446 -1,1 z m 9,-2 c 0,0.554 0.446,1 1,1 h 3 c 0.554,0 1,-0.446 1,-1 v -6 c 0,-0.554 -0.446,-1 -1,-1 h -3 c -0.554,0 -1,0.446 -1,1 z"
+          fill={activeElementColor(appearance)}
+          stroke={activeElementColor(appearance)}
+          strokeWidth="2"
+        />
+        <path
+          d="M 2,12 H 22"
+          fill={iconFillColor(appearance)}
+          stroke={iconFillColor(appearance)}
+          strokeWidth="2"
+          strokeDasharray="1, 2.8"
+          strokeLinecap="round"
+        />
+      </>,
+      { width: 24 },
+    ),
+);
+
+export const CenterHorizontallyIcon = React.memo(
+  ({ appearance }: { appearance: "light" | "dark" }) =>
+    createIcon(
+      <>
+        <path
+          d="M 7 5 C 6.446 5 6 5.446 6 6 L 6 9 C 6 9.554 6.446 10 7 10 L 17 10 C 17.554 10 18 9.554 18 9 L 18 6 C 18 5.446 17.554 5 17 5 L 7 5 z M 9 14 C 8.446 14 8 14.446 8 15 L 8 18 C 8 18.554 8.446 19 9 19 L 15 19 C 15.554 19 16 18.554 16 18 L 16 15 C 16 14.446 15.554 14 15 14 L 9 14 z "
+          fill={activeElementColor(appearance)}
+          stroke={activeElementColor(appearance)}
+          strokeWidth="2"
+        />
+        <path
+          d="M 12,2 V 22"
+          fill={iconFillColor(appearance)}
+          stroke={iconFillColor(appearance)}
+          strokeWidth="2"
+          strokeDasharray="1, 2.8"
+          strokeLinecap="round"
+        />
+      </>,
+      { width: 24 },
+    ),
+);
+
 export const users = createIcon(
   "M192 256c61.9 0 112-50.1 112-112S253.9 32 192 32 80 82.1 80 144s50.1 112 112 112zm76.8 32h-8.3c-20.8 10-43.9 16-68.5 16s-47.6-6-68.5-16h-8.3C51.6 288 0 339.6 0 403.2V432c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48v-28.8c0-63.6-51.6-115.2-115.2-115.2zM480 256c53 0 96-43 96-96s-43-96-96-96-96 43-96 96 43 96 96 96zm48 32h-3.8c-13.9 4.8-28.6 8-44.2 8s-30.3-3.2-44.2-8H432c-20.4 0-39.2 5.9-55.7 15.4 24.4 26.3 39.7 61.2 39.7 99.8v38.4c0 2.2-.5 4.3-.6 6.4H592c26.5 0 48-21.5 48-48 0-61.9-50.1-112-112-112z",
   { width: 640, height: 512, mirror: true },
