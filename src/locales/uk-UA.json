@@ -74,7 +74,14 @@
     "addToLibrary": "Додати до бібліотеки",
     "removeFromLibrary": "Видалити з бібліотеки",
     "libraryLoadingMessage": "Завантажити бібліотеку...",
-    "loadingScene": "Завантаження сцени..."
+    "loadingScene": "Завантаження сцени...",
+    "align": "",
+    "alignTop": "",
+    "alignBottom": "",
+    "alignLeft": "",
+    "alignRight": "",
+    "centerVertically": "",
+    "centerHorizontally": ""
   },
   "buttons": {
     "clearReset": "Очистити полотно",
