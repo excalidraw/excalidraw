@@ -7,13 +7,15 @@ export const ButtonIconSelect = <T extends Object>({
   value,
   onChange,
   group,
+  className,
 }: {
   options: { value: T; text: string; icon: JSX.Element }[];
   value: T | null;
   onChange: (value: T) => void;
   group: string;
+  className?: string;
 }) => (
-  <div className="buttonList buttonListIcon">
+  <div className={clsx("buttonList buttonListIcon", className)}>
     {options.map((option) => (
       <label
         key={option.text}
