@@ -75,13 +75,13 @@
     "removeFromLibrary": "Ta bort från bibliotek",
     "libraryLoadingMessage": "Laddar bibliotek...",
     "loadingScene": "Laddar scen...",
-    "align": "",
-    "alignTop": "",
-    "alignBottom": "",
-    "alignLeft": "",
-    "alignRight": "",
-    "centerVertically": "",
-    "centerHorizontally": ""
+    "align": "Justera",
+    "alignTop": "Justera överkant",
+    "alignBottom": "Justera underkant",
+    "alignLeft": "Justera vänster",
+    "alignRight": "Justera höger",
+    "centerVertically": "Centrera vertikalt",
+    "centerHorizontally": "Centrera horisontellt"
   },
   "buttons": {
     "clearReset": "Återställ canvasen",
