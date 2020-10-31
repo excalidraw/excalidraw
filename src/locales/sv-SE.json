@@ -74,7 +74,14 @@
     "addToLibrary": "Lägg till i biblioteket",
     "removeFromLibrary": "Ta bort från bibliotek",
     "libraryLoadingMessage": "Laddar bibliotek...",
-    "loadingScene": "Laddar scen..."
+    "loadingScene": "Laddar scen...",
+    "align": "",
+    "alignTop": "",
+    "alignBottom": "",
+    "alignLeft": "",
+    "alignRight": "",
+    "centerVertically": "",
+    "centerHorizontally": ""
   },
   "buttons": {
     "clearReset": "Återställ canvasen",
