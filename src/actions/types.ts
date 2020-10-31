@@ -65,7 +65,13 @@ export type ActionName =
   | "ungroup"
   | "goToCollaborator"
   | "addToLibrary"
-  | "changeSharpness";
+  | "changeSharpness"
+  | "alignTop"
+  | "alignBottom"
+  | "alignLeft"
+  | "alignRight"
+  | "alignVerticallyCentered"
+  | "alignHorizontallyCentered";
 
 export interface Action {
   name: ActionName;

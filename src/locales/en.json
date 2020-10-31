@@ -74,7 +74,14 @@
     "addToLibrary": "Add to library",
     "removeFromLibrary": "Remove from library",
     "libraryLoadingMessage": "Loading library...",
-    "loadingScene": "Loading scene..."
+    "loadingScene": "Loading scene...",
+    "align": "Align",
+    "alignTop": "Align top",
+    "alignBottom": "Align bottom",
+    "alignLeft": "Align left",
+    "alignRight": "Align right",
+    "centerVertically": "Center vertically",
+    "centerHorizontally": "Center horizontally"
   },
   "buttons": {
     "clearReset": "Reset the canvas",

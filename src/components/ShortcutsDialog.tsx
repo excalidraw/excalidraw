@@ -281,6 +281,22 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
                 shortcuts={[getShortcutKey("CtrlOrCmd+]")]}
               />
               <Shortcut
+                label={t("labels.alignTop")}
+                shortcuts={[getShortcutKey("CtrlOrCmd+Shift+Up")]}
+              />
+              <Shortcut
+                label={t("labels.alignBottom")}
+                shortcuts={[getShortcutKey("CtrlOrCmd+Shift+Down")]}
+              />
+              <Shortcut
+                label={t("labels.alignLeft")}
+                shortcuts={[getShortcutKey("CtrlOrCmd+Shift+Left")]}
+              />
+              <Shortcut
+                label={t("labels.alignRight")}
+                shortcuts={[getShortcutKey("CtrlOrCmd+Shift+Right")]}
+              />
+              <Shortcut
                 label={t("labels.duplicateSelection")}
                 shortcuts={[
                   getShortcutKey("CtrlOrCmd+D"),
