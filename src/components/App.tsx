@@ -762,7 +762,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   queueBroadcastAllElements = throttle(() => {
     this.props.onSceneBroadCast(
       getSyncableElements(this.getSceneElementsIncludingDeleted()),
-      false,
+      true,
     );
     const currentVersion = this.lastBroadcastedOrReceivedSceneVersion;
     const newVersion = Math.max(
@@ -911,7 +911,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     ) {
       this.props.onSceneBroadCast(
         getSyncableElements(this.getSceneElementsIncludingDeleted()),
-        true,
+        false,
       );
       this.lastBroadcastedOrReceivedSceneVersion = getSceneVersion(
         this.scene.getElementsIncludingDeleted(),
