@@ -25,7 +25,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     onCollaborationStart = noop,
     onCollaborationEnd = noop,
     isCollaborating,
-    broadCastScene,
+    onSceneBroadCast,
     onMouseBroadCast,
     collaborators,
     initializeScene,
@@ -66,7 +66,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
           onCollaborationStart={onCollaborationStart}
           onCollaborationEnd={onCollaborationEnd}
           isCollaborating={isCollaborating}
-          broadCastScene={broadCastScene}
+          onSceneBroadCast={onSceneBroadCast}
           onMouseBroadCast={onMouseBroadCast}
           collaborators={collaborators}
           initializeScene={initializeScene}

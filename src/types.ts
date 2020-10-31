@@ -140,10 +140,13 @@ export interface ExcalidrawProps {
   };
   onUsernameChange?: (username: string) => void;
   forwardedRef: ForwardRef<ExcalidrawImperativeAPI>;
-  onCollaborationStart: () => void;
+  onCollaborationStart: (elements?: readonly ExcalidrawElement[]) => void;
   onCollaborationEnd: () => void;
   isCollaborating: boolean;
-  broadCastScene: (syncAll: boolean) => void;
+  onSceneBroadCast: (
+    syncableElements: readonly ExcalidrawElement[],
+    syncAll: boolean,
+  ) => void;
   onMouseBroadCast: (payload: {
     pointer: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointer"];
     button: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["button"];

@@ -370,7 +370,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           setAppState={this.setAppState}
           actionManager={this.actionManager}
           elements={this.scene.getElements()}
-          onRoomCreate={onCollaborationStart}
+          onRoomCreate={onCollaborationStart.bind(
+            null,
+            this.scene.getElements(),
+          )}
           onRoomDestroy={onCollaborationEnd}
           onUsernameChange={(username) => {
             onUsernameChange && onUsernameChange(username);
@@ -409,6 +412,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       </div>
     );
   }
+
+  public setLastBroadcastedOrReceivedSceneVersion = (version: number) => {
+    this.lastBroadcastedOrReceivedSceneVersion = version;
+  };
 
   public getLastBroadcastedOrReceivedSceneVersion = () => {
     return this.lastBroadcastedOrReceivedSceneVersion;
@@ -753,7 +760,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   }
 
   queueBroadcastAllElements = throttle(() => {
-    this.props.broadCastScene(false);
+    this.props.onSceneBroadCast(
+      getSyncableElements(this.getSceneElementsIncludingDeleted()),
+      false,
+    );
     const currentVersion = this.lastBroadcastedOrReceivedSceneVersion;
     const newVersion = Math.max(
       currentVersion,
@@ -899,7 +909,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       getSceneVersion(this.scene.getElementsIncludingDeleted()) >
       this.lastBroadcastedOrReceivedSceneVersion
     ) {
-      this.props.broadCastScene(true);
+      this.props.onSceneBroadCast(
+        getSyncableElements(this.getSceneElementsIncludingDeleted()),
+        true,
+      );
       this.lastBroadcastedOrReceivedSceneVersion = getSceneVersion(
         this.scene.getElementsIncludingDeleted(),
       );
@@ -1202,6 +1215,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       elements: readonly ExcalidrawElement[];
       appState?: AppState;
     }) => {
+      // Avoid broadcasting to the rest of the collaborators the scene
+      // we just received!
+      // Note: this needs to be set before updating the scene as it
+      // syncronously calls render.
+      this.setLastBroadcastedOrReceivedSceneVersion(
+        getSceneVersion(sceneData.elements),
+      );
+
       // currently we only support syncing background color
       if (sceneData.appState?.viewBackgroundColor) {
         this.setState({

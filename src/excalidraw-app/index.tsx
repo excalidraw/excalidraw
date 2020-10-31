@@ -52,7 +52,7 @@ function ExcalidrawApp(props: any) {
       onCollaborationStart,
       onCollaborationEnd,
       isCollaborating,
-      broadCastScene,
+      onSceneBroadCast,
       onMouseBroadCast,
       onExcalidrawMount,
       collaborators,
@@ -131,7 +131,7 @@ function ExcalidrawApp(props: any) {
       onCollaborationEnd={onCollaborationEnd}
       onCollaborationStart={onCollaborationStart}
       isCollaborating={isCollaborating}
-      broadCastScene={broadCastScene}
+      onSceneBroadCast={onSceneBroadCast}
       onMouseBroadCast={onMouseBroadCast}
       onMount={onExcalidrawMount}
       collaborators={collaborators}

@@ -1,10 +1,11 @@
 import { encryptAESGEM, SocketUpdateDataSource } from "../data";
 
+import CollabWrapper from "../excalidraw-app/collab/CollabWrapper";
+
 import { SocketUpdateData } from "../types";
 import { BROADCAST, SCENE } from "../constants";
-import { getElementMap, getSyncableElements } from "../element";
+import { getElementMap } from "../element";
 import { ExcalidrawElement } from "../element/types";
-import CollabWrapper from "../excalidraw-app/collab/CollabWrapper";
 
 class Portal {
   app: CollabWrapper;
@@ -30,7 +31,11 @@ class Portal {
       }
     });
     this.socket.on("new-user", async (_socketId: string) => {
-      this.broadcastScene(SCENE.INIT, /* syncAll */ true);
+      this.broadcastScene(
+        SCENE.INIT,
+        this.app.getSceneSyncableElemets(),
+        /* syncAll */ true,
+      );
     });
     this.socket.on("room-user-change", (clients: string[]) => {
       this.app.setCollaborators(clients);
@@ -75,15 +80,12 @@ class Portal {
 
   broadcastScene = async (
     sceneType: SCENE.INIT | SCENE.UPDATE,
+    syncableElements: ExcalidrawElement[],
     syncAll: boolean,
   ) => {
     if (sceneType === SCENE.INIT && !syncAll) {
       throw new Error("syncAll must be true when sending SCENE.INIT");
     }
-
-    let syncableElements = getSyncableElements(
-      this.app.getSceneElementsIncludingDeleted(),
-    );
 
     if (!syncAll) {
       // sync out only the elements we think we need to to save bandwidth.

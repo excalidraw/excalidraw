@@ -25,7 +25,6 @@ import {
 import Portal from "../../components/Portal";
 import { AppState, Collaborator } from "../../types";
 import { ExcalidrawElement } from "../../element/types";
-import { getSceneVersion, getSyncableElements } from "../../element";
 import { ExcalidrawImperativeAPI } from "../../components/App";
 import { t } from "../../i18n";
 import { importFromLocalStorage } from "../../data/localStorage";
@@ -52,7 +51,6 @@ const withBatchedUpdates = <
 
 class CollabWrapper extends PureComponent<Props, State> {
   portal: Portal;
-  private lastBroadcastedOrReceivedSceneVersion: number = -1;
   private socketInitializationTimer: any;
   private unmounted: boolean;
   private excalidrawRef: any;
@@ -97,7 +95,7 @@ class CollabWrapper extends PureComponent<Props, State> {
     const isExternalScene = !!(id || jsonMatch || this.isCollabScene);
     if (isExternalScene) {
       if (
-        this.shouldForceLoadScene(scene) ||
+        CollabWrapper.shouldForceLoadScene(scene) ||
         window.confirm(t("alerts.loadSceneOverridePrompt"))
       ) {
         // Backwards compatibility with legacy url format
@@ -139,7 +137,7 @@ class CollabWrapper extends PureComponent<Props, State> {
     return this.isCollabScene;
   }
 
-  private shouldForceLoadScene(
+  private static shouldForceLoadScene(
     scene: ResolutionType<typeof loadScene>,
   ): boolean {
     if (!scene.elements.length) {
@@ -195,9 +193,7 @@ class CollabWrapper extends PureComponent<Props, State> {
         );
       } catch {}
     }
-    const syncableElements = getSyncableElements(
-      this.excalidrawRef.current.getElementsIncludingDeleted(),
-    );
+    const syncableElements = this.excalidrawRef.current.getSceneSyncableElements();
     if (
       this.state.isCollaborating &&
       !isSavedToFirebase(this.portal, syncableElements)
@@ -213,9 +209,7 @@ class CollabWrapper extends PureComponent<Props, State> {
   });
 
   saveCollabRoomToFirebase = async (
-    syncableElements: ExcalidrawElement[] = getSyncableElements(
-      this.excalidrawRef.current.getSceneElementsIncludingDeleted(),
-    ),
+    syncableElements: ExcalidrawElement[] = this.excalidrawRef.current.getSceneSyncableElements(),
   ) => {
     try {
       await saveToFirebase(this.portal, syncableElements);
@@ -224,12 +218,19 @@ class CollabWrapper extends PureComponent<Props, State> {
     }
   };
 
-  openPortal = async () => {
+  openPortal = async (elements: readonly ExcalidrawElement[]) => {
     window.history.pushState(
       {},
       "Excalidraw",
       await generateCollaborationLink(),
     );
+    // remove deleted elements from elements array & history to ensure we don't
+    // expose potentially sensitive user data in case user manually deletes
+    // existing elements (or clears scene), which would otherwise be persisted
+    // to database even if deleted before creating the room.
+    this.excalidrawRef.current.history.clear();
+    this.excalidrawRef.current.history.resumeRecording();
+    this.excalidrawRef.current.updateScene({ elements });
     this.initializeSocketClient({ showLoadingState: false });
   };
 
@@ -376,12 +377,6 @@ class CollabWrapper extends PureComponent<Props, State> {
     }
     const newElements = this.portal.reconcileElements(elements);
 
-    // Avoid broadcasting to the rest of the collaborators the scene
-    // we just received!
-    // Note: this needs to be set before updating the scene as it
-    // syncronously calls render.
-    this.setLastBroadcastedOrReceivedSceneVersion(getSceneVersion(newElements));
-
     this.excalidrawRef.current.updateScene({ elements: newElements });
 
     // We haven't yet implemented multiplayer undo functionality, so we clear the undo stack
@@ -393,14 +388,6 @@ class CollabWrapper extends PureComponent<Props, State> {
     if (!this.portal.socketInitialized && !initFromSnapshot) {
       this.initializeSocket();
     }
-  };
-
-  public setLastBroadcastedOrReceivedSceneVersion = (version: number) => {
-    this.lastBroadcastedOrReceivedSceneVersion = version;
-  };
-
-  public getLastBroadcastedOrReceivedSceneVersion = () => {
-    return this.lastBroadcastedOrReceivedSceneVersion;
   };
 
   setCollaborators(sockets: string[]) {
@@ -424,12 +411,18 @@ class CollabWrapper extends PureComponent<Props, State> {
     return this.excalidrawRef.current.getSceneElementsIncludingDeleted();
   };
 
+  public getSceneSyncableElemets = () => {
+    return this.excalidrawRef.current.getSceneSyncableElements();
+  };
   private setExcalidrawAppState = (state: AppState) => {
     this.excalidrawAppState = state;
   };
 
-  broadCastScene = (syncAll: boolean) => {
-    this.portal.broadcastScene(SCENE.UPDATE, syncAll);
+  onSceneBroadCast = (
+    syncableElements: ExcalidrawElement[],
+    syncAll: boolean,
+  ) => {
+    this.portal.broadcastScene(SCENE.UPDATE, syncableElements, syncAll);
   };
 
   onMouseBroadCast = (payload: {
@@ -446,7 +439,7 @@ class CollabWrapper extends PureComponent<Props, State> {
       excalidrawRef: this.excalidrawRef,
       setExcalidrawAppState: this.setExcalidrawAppState,
       isCollaborating: this.state.isCollaborating,
-      broadCastScene: this.broadCastScene,
+      onSceneBroadCast: this.onSceneBroadCast,
       onMouseBroadCast: this.onMouseBroadCast,
       collaborators: this.state.collaborators,
       initializeScene: this.initializeScene,
