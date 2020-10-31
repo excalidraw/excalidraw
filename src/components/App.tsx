@@ -113,7 +113,6 @@ import {
   CANVAS_ONLY_ACTIONS,
   DEFAULT_VERTICAL_ALIGN,
   GRID_SIZE,
-  LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
   MIME_TYPES,
 } from "../constants";
 import {
@@ -124,7 +123,6 @@ import {
 
 import LayerUI from "./LayerUI";
 import { ScrollBars, SceneState } from "../scene/types";
-import { getCollaborationLinkData } from "../data";
 import { mutateElement } from "../element/mutateElement";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import { unstable_batchedUpdates } from "react-dom";
@@ -268,6 +266,7 @@ export type ExcalidrawImperativeAPI =
         resumeRecording: InstanceType<typeof App>["resumeRecording"];
       };
       setScrollToCenter: InstanceType<typeof App>["setScrollToCenter"];
+      initializeScene: InstanceType<typeof App>["initializeScene"];
     }
   | undefined;
 
@@ -318,6 +317,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           resumeRecording: this.resumeRecording,
         },
         setScrollToCenter: this.setScrollToCenter,
+        initializeScene: this.initializeScene,
       };
     }
     this.scene = new Scene();
@@ -498,46 +498,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.onSceneUpdated();
   };
 
-  private shouldForceLoadScene(
-    scene: ResolutionType<typeof loadScene>,
-  ): boolean {
-    if (!scene.elements.length) {
-      return true;
-    }
-
-    const roomMatch = getCollaborationLinkData(window.location.href);
-
-    if (!roomMatch) {
-      return false;
-    }
-
-    const roomID = roomMatch[1];
-
-    let collabForceLoadFlag;
-    try {
-      collabForceLoadFlag = localStorage?.getItem(
-        LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
-      );
-    } catch {}
-
-    if (collabForceLoadFlag) {
-      try {
-        const {
-          room: previousRoom,
-          timestamp,
-        }: { room: string; timestamp: number } = JSON.parse(
-          collabForceLoadFlag,
-        );
-        // if loading same room as the one previously unloaded within 15sec
-        //  force reload without prompting
-        if (previousRoom === roomID && Date.now() - timestamp < 15000) {
-          return true;
-        }
-      } catch {}
-    }
-    return false;
-  }
-
   private addToLibrary = async (url: string) => {
     window.history.replaceState({}, "Excalidraw", window.location.origin);
     try {
@@ -611,62 +571,19 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       );
     }
 
-    const searchParams = new URLSearchParams(window.location.search);
-    const id = searchParams.get("id");
-    const jsonMatch = window.location.hash.match(
-      /^#json=([0-9]+),([a-zA-Z0-9_-]+)$/,
-    );
-
     if (!this.state.isLoading) {
       this.setState({ isLoading: true });
     }
 
-    let scene = await loadScene(null, null, this.props.initialData);
-
-    let isCollaborationScene = !!getCollaborationLinkData(window.location.href);
-    const isExternalScene = !!(id || jsonMatch || isCollaborationScene);
-
-    if (isExternalScene) {
-      if (
-        this.shouldForceLoadScene(scene) ||
-        window.confirm(t("alerts.loadSceneOverridePrompt"))
-      ) {
-        // Backwards compatibility with legacy url format
-        if (id) {
-          scene = await loadScene(id, null, this.props.initialData);
-        } else if (jsonMatch) {
-          scene = await loadScene(
-            jsonMatch[1],
-            jsonMatch[2],
-            this.props.initialData,
-          );
-        }
-        if (!isCollaborationScene) {
-          window.history.replaceState({}, "Excalidraw", window.location.origin);
-        }
-      } else {
-        // https://github.com/excalidraw/excalidraw/issues/1919
-        if (document.hidden) {
-          window.addEventListener("focus", () => this.initializeScene(), {
-            once: true,
-          });
-          return;
-        }
-
-        isCollaborationScene = false;
-        window.history.replaceState({}, "Excalidraw", window.location.origin);
-      }
-    }
+    const scene = await loadScene(null, null, this.props.initialData);
+    this.props?.initializeScene?.(scene);
 
     if (this.state.isLoading) {
       this.setState({ isLoading: false });
     }
 
-    if (isCollaborationScene) {
-      // when joining a room we don't want user's local scene data to be merged
-      //  into the remote scene
-      this.resetScene();
-    } else if (scene) {
+    const isCollaborationScene = this.props?.isCollaborationScene?.() || false;
+    if (!isCollaborationScene && scene) {
       if (scene.appState) {
         scene.appState = {
           ...scene.appState,
@@ -688,7 +605,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
     }
 
-    const addToLibraryUrl = searchParams.get("addLibrary");
+    const addToLibraryUrl = new URLSearchParams(window.location.search).get(
+      "addLibrary",
+    );
 
     if (addToLibraryUrl) {
       await this.addToLibrary(addToLibraryUrl);

@@ -28,6 +28,8 @@ const Excalidraw = (props: ExcalidrawProps) => {
     broadCastScene,
     onMouseBroadCast,
     collaborators,
+    initializeScene,
+    isCollaborationScene,
   } = props;
 
   useEffect(() => {
@@ -67,6 +69,8 @@ const Excalidraw = (props: ExcalidrawProps) => {
           broadCastScene={broadCastScene}
           onMouseBroadCast={onMouseBroadCast}
           collaborators={collaborators}
+          initializeScene={initializeScene}
+          isCollaborationScene={isCollaborationScene}
         />
       </IsMobileProvider>
     </InitializeApp>

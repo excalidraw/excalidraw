@@ -7,6 +7,7 @@ import {
   decryptAESGEM,
   generateCollaborationLink,
   getCollaborationLinkData,
+  loadScene,
   SOCKET_SERVER,
   SocketUpdateDataSource,
 } from "../../data";
@@ -26,6 +27,9 @@ import { AppState, Collaborator } from "../../types";
 import { ExcalidrawElement } from "../../element/types";
 import { getSceneVersion, getSyncableElements } from "../../element";
 import { ExcalidrawImperativeAPI } from "../../components/App";
+import { t } from "../../i18n";
+import { importFromLocalStorage } from "../../data/localStorage";
+import { ImportedDataState } from "../../data/types";
 
 interface Props {}
 interface State {
@@ -53,6 +57,8 @@ class CollabWrapper extends PureComponent<Props, State> {
   private unmounted: boolean;
   private excalidrawRef: any;
   excalidrawAppState?: AppState;
+  private initialData: ImportedDataState;
+  private isCollabScene: boolean;
 
   constructor(props: Props) {
     super(props);
@@ -64,19 +70,113 @@ class CollabWrapper extends PureComponent<Props, State> {
     this.portal = new Portal(this);
     this.unmounted = false;
     this.excalidrawRef = createRef<ExcalidrawImperativeAPI>();
+    this.initialData = {};
+    this.isCollabScene = false;
   }
 
   componentDidMount() {
     this.unmounted = true;
+    this.initialData = importFromLocalStorage();
     window.addEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
     window.addEventListener(EVENT.UNLOAD, this.onUnload);
-    this.initializeScene();
+    this.isCollabScene = !!getCollaborationLinkData(window.location.href);
   }
 
   componentWillUnmount() {
     this.unmounted = true;
     window.removeEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
     window.removeEventListener(EVENT.UNLOAD, this.onUnload);
+  }
+
+  initializeScene = async (scene: any) => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const id = searchParams.get("id");
+    const jsonMatch = window.location.hash.match(
+      /^#json=([0-9]+),([a-zA-Z0-9_-]+)$/,
+    );
+    const isExternalScene = !!(id || jsonMatch || this.isCollabScene);
+    if (isExternalScene) {
+      if (
+        this.shouldForceLoadScene(scene) ||
+        window.confirm(t("alerts.loadSceneOverridePrompt"))
+      ) {
+        // Backwards compatibility with legacy url format
+        if (id) {
+          scene = await loadScene(id, null, this.initialData);
+        } else if (jsonMatch) {
+          scene = await loadScene(jsonMatch[1], jsonMatch[2], this.initialData);
+        }
+        if (!this.isCollabScene) {
+          window.history.replaceState({}, "Excalidraw", window.location.origin);
+        }
+      } else {
+        // https://github.com/excalidraw/excalidraw/issues/1919
+        if (document.hidden) {
+          window.addEventListener(
+            "focus",
+            () => this.excalidrawRef.current.initializeScene(),
+            {
+              once: true,
+            },
+          );
+          return;
+        }
+
+        this.isCollabScene = false;
+        window.history.replaceState({}, "Excalidraw", window.location.origin);
+      }
+    }
+
+    if (this.isCollabScene) {
+      // when joining a room we don't want user's local scene data to be merged
+      //  into the remote scene
+      this.excalidrawRef.current.resetScene();
+      this.initializeSocketClient({ showLoadingState: true });
+    }
+  };
+
+  private isCollaborationScene() {
+    return this.isCollabScene;
+  }
+
+  private shouldForceLoadScene(
+    scene: ResolutionType<typeof loadScene>,
+  ): boolean {
+    if (!scene.elements.length) {
+      return true;
+    }
+
+    const roomMatch = getCollaborationLinkData(window.location.href);
+
+    if (!roomMatch) {
+      return false;
+    }
+
+    const roomID = roomMatch[1];
+
+    let collabForceLoadFlag;
+    try {
+      collabForceLoadFlag = localStorage?.getItem(
+        LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
+      );
+    } catch {}
+
+    if (collabForceLoadFlag) {
+      try {
+        const {
+          room: previousRoom,
+          timestamp,
+        }: { room: string; timestamp: number } = JSON.parse(
+          collabForceLoadFlag,
+        );
+        // if loading same room as the one previously unloaded within 15sec
+        //  force reload without prompting
+        if (previousRoom === roomID && Date.now() - timestamp < 15000) {
+          return true;
+        }
+      } catch {}
+    }
+    return false;
   }
 
   private onUnload = () => {
@@ -339,15 +439,6 @@ class CollabWrapper extends PureComponent<Props, State> {
     this.portal.socket && this.portal.broadcastMouseLocation(payload);
   };
 
-  initializeScene = () => {
-    const isCollaborationScene = !!getCollaborationLinkData(
-      window.location.href,
-    );
-    if (isCollaborationScene) {
-      this.initializeSocketClient({ showLoadingState: true });
-    }
-  };
-
   getValue() {
     return {
       onCollaborationStart: this.openPortal,
@@ -358,6 +449,8 @@ class CollabWrapper extends PureComponent<Props, State> {
       broadCastScene: this.broadCastScene,
       onMouseBroadCast: this.onMouseBroadCast,
       collaborators: this.state.collaborators,
+      initializeScene: this.initializeScene,
+      isCollaborationScene: this.isCollaborationScene,
     };
   }
 
