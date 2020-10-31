@@ -369,65 +369,81 @@ export const UngroupIcon = React.memo(
 );
 
 export const FillHachureIcon = React.memo(
-  ({ appearance }: { appearance: "light" | "dark" }) =>
+  ({
+    appearance,
+    color,
+  }: {
+    appearance: "light" | "dark";
+    color: string | null;
+  }) =>
     createIcon(
-      <g stroke={iconFillColor(appearance)} fill="none">
+      <g stroke={color ? color : iconFillColor(appearance)} fill="none">
         <path d="M0 0s0 0 0 0m0 0s0 0 0 0m.133 12.04L10.63-.033M.133 12.04L10.63-.034M2.234 21.818L21.26-.07M2.234 21.818L21.26-.07m-8.395 21.852L31.89-.103M12.865 21.783L31.89-.103m-8.395 21.852L41.208 1.37M23.495 21.75L41.208 1.37m-7.083 20.343l7.216-8.302m-7.216 8.302l7.216-8.302" />
         <path
           d="M0 0h40M0 0h40m0 0v20m0-20v20m0 0H0m40 0H0m0 0V0m0 20V0"
           strokeWidth={2}
         />
       </g>,
-      { width: 40, height: 20 },
+      { width: 40, height: 20, style: { filter: "var(--appearance-filter)" } },
     ),
 );
 
 export const FillCrossHatchIcon = React.memo(
-  ({ appearance }: { appearance: "light" | "dark" }) =>
+  ({
+    appearance,
+    color,
+  }: {
+    appearance: "light" | "dark";
+    color: string | null;
+  }) =>
     createIcon(
-      <g stroke={iconFillColor(appearance)} fill="none">
+      <g stroke={color ? color : iconFillColor(appearance)} fill="none">
         <path d="M0 0s0 0 0 0m0 0s0 0 0 0m.133 12.04L10.63-.033M.133 12.04L10.63-.034M2.234 21.818L21.26-.07M2.234 21.818L21.26-.07m-8.395 21.852L31.89-.103M12.865 21.783C17.87 16.025 22.875 10.266 31.89-.103m-8.395 21.852L41.208 1.37M23.495 21.75L41.208 1.37m-7.083 20.343l7.216-8.302m-7.216 8.302l7.216-8.302M-.09 19.92s0 0 0 0m0 0s0 0 0 0m12.04-.133L-.126 9.29m12.075 10.497L-.126 9.29m24.871 11.02C19.872 16.075 15 11.84.595-.684m24.15 20.994L.595-.684m36.19 20.861L12.636-.817m24.15 20.994L12.636-.817m30.909 16.269L24.676-.95m18.868 16.402L24.676-.95m18.833 5.771L37.472-.427m6.037 5.248L37.472-.427" />
         <path
           d="M0 0h40M0 0h40m0 0v20m0-20v20m0 0H0m40 0H0m0 0V0m0 20V0"
           strokeWidth={2}
         />
       </g>,
-      { width: 40, height: 20 },
+      { width: 40, height: 20, style: { filter: "var(--appearance-filter)" } },
     ),
 );
 
 export const FillSolidIcon = React.memo(
-  ({ appearance }: { appearance: "light" | "dark" }) =>
+  ({
+    appearance,
+    color,
+  }: {
+    appearance: "light" | "dark";
+    color: string | null;
+  }) =>
     createIcon(
-      <>
-        <path d="M0 0h120v60H0" strokeWidth={0} />
-        <path
-          d="M0 0h40M0 0h40m0 0v20m0-20v20m0 0H0m40 0H0m0 0V0m0 20V0"
-          stroke={iconFillColor(appearance)}
-          strokeWidth={2}
-          fill="none"
-        />
-      </>,
-      { width: 40, height: 20 },
+      <path
+        d="M0 0h120v60H0"
+        strokeWidth={0}
+        fill={color ? color : iconFillColor(appearance)}
+      />,
+      { width: 40, height: 20, style: { filter: "var(--appearance-filter)" } },
     ),
 );
 
 export const StrokeWidthIcon = React.memo(
   ({
     appearance,
+    color,
     strokeWidth,
   }: {
     appearance: "light" | "dark";
+    color: string | null;
     strokeWidth: number;
   }) =>
     createIcon(
       <path
         d="M0 10h40M0 10h40"
-        stroke={iconFillColor(appearance)}
+        stroke={color ? color : iconFillColor(appearance)}
         strokeWidth={strokeWidth}
         fill="none"
       />,
-      { width: 40, height: 20 },
+      { width: 40, height: 20, style: { filter: "var(--appearance-filter)" } },
     ),
 );
 
