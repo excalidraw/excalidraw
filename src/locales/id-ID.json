@@ -74,7 +74,14 @@
     "addToLibrary": "Tambahkan ke pustaka",
     "removeFromLibrary": "Hapus dari pustaka",
     "libraryLoadingMessage": "Memuat pustaka...",
-    "loadingScene": "Memuat pemandangan..."
+    "loadingScene": "Memuat pemandangan...",
+    "align": "",
+    "alignTop": "",
+    "alignBottom": "",
+    "alignLeft": "",
+    "alignRight": "",
+    "centerVertically": "",
+    "centerHorizontally": ""
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
