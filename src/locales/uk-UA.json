@@ -151,9 +151,9 @@
     "lineEditor_nothingSelected": "Виберіть точку для переміщення чи видалення, або утримуйте Alt і натисніть, щоб додати нові точки"
   },
   "canvasError": {
-    "cannotShowPreview": "",
-    "canvasTooBig": "",
-    "canvasTooBigTip": ""
+    "cannotShowPreview": "Не вдається показати попередній перегляд",
+    "canvasTooBig": "Полотно може бути завеликим.",
+    "canvasTooBigTip": "Порада: спробуйте підсунути найвіддаленіші елементи ближче один до одного."
   },
   "errorSplash": {
     "headingMain_pre": "Сталася помилка. Спробуйте ",
