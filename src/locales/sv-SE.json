@@ -177,7 +177,7 @@
   },
   "roomDialog": {
     "desc_intro": "Du kan bjuda in personer till din nuvarande skiss för att samarbeta med dig.",
-    "desc_privacy": "Oroa dig inte, sessionen använder kryptering från ände till ände, så vad du än ritar kommer att förbli privat. Inte ens vår server kommer att kunna se vad skissar.",
+    "desc_privacy": "Oroa dig inte, sessionen använder kryptering från ände till ände, så vad du än ritar kommer att förbli privat. Inte ens vår server kommer att kunna se vad du skissar.",
     "button_startSession": "Starta sessionen",
     "button_stopSession": "Stoppa session",
     "desc_inProgressIntro": "Nu pågår en live-samarbetssession.",
@@ -199,7 +199,7 @@
     "view": "Visa",
     "blog": "Läs vår blogg",
     "howto": "Följ våra guider",
-    "github": "Hittat ett problem? Skicka",
+    "github": "Hittat ett problem? Rapportera",
     "textNewLine": "Lägg till ny rad (text)",
     "textFinish": "Slutför redigering (text)",
     "zoomToFit": "Zooma för att rymma alla element",
