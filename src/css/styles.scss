@@ -172,6 +172,22 @@
     }
   }
 
+  .buttonList.buttonListIcon {
+    label {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      svg {
+        width: 36px;
+        height: 18px;
+        opacity: 0.6;
+      }
+      &.active svg {
+        opacity: 1;
+      }
+    }
+  }
+
   .App-bottom-bar {
     position: absolute;
     top: 0;
