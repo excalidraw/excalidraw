@@ -170,10 +170,10 @@
     "clearCanvasCaveat": " ရေးဆွဲထားသည်များ ဆုံးရှုံးနိုင်သည် ",
     "trackedToSentry_pre": "ချို့ယွင်းမှုသတ်မှတ်ချက် ",
     "trackedToSentry_post": " အားစနစ်အတွင်းခြေရာကောက်ပြီးပါပြီ။",
-    "openIssueMessage_pre": "",
-    "openIssueMessage_button": "",
-    "openIssueMessage_post": "",
-    "sceneContent": ""
+    "openIssueMessage_pre": "ချို့ယွင်းမှုမှတ်တမ်းတွင် အရေးကြီးအချက်အလက်များပါဝင်မှုမရှိစေရန်အထူးသတိပြုပါသည်။ မပါဝင်ပါက ဆက်လက်ဆောင်ရွက်ရန် ",
+    "openIssueMessage_button": "ချို့ယွင်းမှုအားခြေရာကောက်ပါ။",
+    "openIssueMessage_post": " အောက်ပါအချက်အလက်များအား Github တွင် Issue အနေဖြင့်ဖြည့်သွင်းဖော်ပြပေးပါ။",
+    "sceneContent": "ကားချပ်ပါအချက်အလက်။ ။"
   },
   "roomDialog": {
     "desc_intro": "",
