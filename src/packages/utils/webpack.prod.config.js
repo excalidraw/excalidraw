@@ -1,5 +1,8 @@
 const webpack = require("webpack");
 const path = require("path");
+// uncomment to analyze
+// const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
+//   .BundleAnalyzerPlugin;
 
 module.exports = {
   mode: "production",
@@ -36,5 +39,7 @@ module.exports = {
     new webpack.optimize.LimitChunkCountPlugin({
       maxChunks: 1,
     }),
+    // uncomment to analyze
+    //new BundleAnalyzerPlugin(),
   ],
 };
