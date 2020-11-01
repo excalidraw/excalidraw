@@ -160,30 +160,40 @@ export const actionChangeFillStyle = register({
       (element) => element.backgroundColor,
       appState.currentItemBackgroundColor,
     );
-    const iconProps = {
-      color: backgroundColor || "#fff",
-      background: appState.viewBackgroundColor,
-    };
     return (
       <fieldset>
         <legend>{t("labels.fill")}</legend>
         <ButtonIconSelect
-          className="buttonListIconLive"
           options={[
             {
               value: "hachure",
               text: t("labels.hachure"),
-              icon: <FillHachureIcon {...iconProps} />,
+              icon: (
+                <FillHachureIcon
+                  appearance={appState.appearance}
+                  color={backgroundColor}
+                />
+              ),
             },
             {
               value: "cross-hatch",
               text: t("labels.crossHatch"),
-              icon: <FillCrossHatchIcon {...iconProps} />,
+              icon: (
+                <FillCrossHatchIcon
+                  appearance={appState.appearance}
+                  color={backgroundColor}
+                />
+              ),
             },
             {
               value: "solid",
               text: t("labels.solid"),
-              icon: <FillSolidIcon {...iconProps} />,
+              icon: (
+                <FillSolidIcon
+                  appearance={appState.appearance}
+                  color={backgroundColor}
+                />
+              ),
             },
           ]}
           group="fill"
@@ -215,53 +225,64 @@ export const actionChangeStrokeWidth = register({
       commitToHistory: true,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
-    <fieldset>
-      <legend>{t("labels.strokeWidth")}</legend>
-      <ButtonIconSelect
-        group="stroke-width"
-        options={[
-          {
-            value: 1,
-            text: t("labels.thin"),
-            icon: (
-              <StrokeWidthIcon
-                appearance={appState.appearance}
-                strokeWidth={2}
-              />
-            ),
-          },
-          {
-            value: 2,
-            text: t("labels.bold"),
-            icon: (
-              <StrokeWidthIcon
-                appearance={appState.appearance}
-                strokeWidth={6}
-              />
-            ),
-          },
-          {
-            value: 4,
-            text: t("labels.extraBold"),
-            icon: (
-              <StrokeWidthIcon
-                appearance={appState.appearance}
-                strokeWidth={10}
-              />
-            ),
-          },
-        ]}
-        value={getFormValue(
-          elements,
-          appState,
-          (element) => element.strokeWidth,
-          appState.currentItemStrokeWidth,
-        )}
-        onChange={(value) => updateData(value)}
-      />
-    </fieldset>
-  ),
+  PanelComponent: ({ elements, appState, updateData }) => {
+    const strokeColor = getFormValue(
+      elements,
+      appState,
+      (element) => element.strokeColor,
+      appState.currentItemStrokeColor,
+    );
+    return (
+      <fieldset>
+        <legend>{t("labels.strokeWidth")}</legend>
+        <ButtonIconSelect
+          group="stroke-width"
+          options={[
+            {
+              value: 1,
+              text: t("labels.thin"),
+              icon: (
+                <StrokeWidthIcon
+                  appearance={appState.appearance}
+                  color={strokeColor}
+                  strokeWidth={2}
+                />
+              ),
+            },
+            {
+              value: 2,
+              text: t("labels.bold"),
+              icon: (
+                <StrokeWidthIcon
+                  appearance={appState.appearance}
+                  color={strokeColor}
+                  strokeWidth={6}
+                />
+              ),
+            },
+            {
+              value: 4,
+              text: t("labels.extraBold"),
+              icon: (
+                <StrokeWidthIcon
+                  appearance={appState.appearance}
+                  color={strokeColor}
+                  strokeWidth={10}
+                />
+              ),
+            },
+          ]}
+          value={getFormValue(
+            elements,
+            appState,
+            (element) => element.strokeWidth,
+            appState.currentItemStrokeWidth,
+          )}
+          onChange={(value) => updateData(value)}
+        />
+      </fieldset>
+    );
+  },
 });
 
 export const actionChangeSloppiness = register({

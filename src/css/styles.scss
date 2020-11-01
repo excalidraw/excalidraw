@@ -180,11 +180,11 @@
       svg {
         width: 36px;
         height: 18px;
+        opacity: 0.7;
       }
-    }
-    &.buttonListIconLive svg {
-      box-shadow: 0 0 1px #000;
-      filter: var(--appearance-filter);
+      &.active svg {
+        opacity: 1;
+      }
     }
   }
 
