@@ -75,13 +75,13 @@
     "removeFromLibrary": "Rimuovi dalla biblioteca",
     "libraryLoadingMessage": "Caricamento della biblioteca...",
     "loadingScene": "Caricamento della scena...",
-    "align": "",
-    "alignTop": "",
-    "alignBottom": "",
-    "alignLeft": "",
-    "alignRight": "",
-    "centerVertically": "",
-    "centerHorizontally": ""
+    "align": "Allinea",
+    "alignTop": "Allinea in alto",
+    "alignBottom": "Allinea in basso",
+    "alignLeft": "Allinea a sinistra",
+    "alignRight": "Allinea a destra",
+    "centerVertically": "Centra Verticalmente",
+    "centerHorizontally": "Centra orizzontalmente"
   },
   "buttons": {
     "clearReset": "Ripristina la tela",
