@@ -163,8 +163,8 @@
     "canvasTooBigTip": "မှတ်ချက်။ ။ဝေးကွာနေသော ပုံများ၊ စာများအား ပိုမိုနီးကပ်အောင်ရွှေ့ကြည့်ပါ။"
   },
   "errorSplash": {
-    "headingMain_pre": "",
-    "headingMain_button": "",
+    "headingMain_pre": "ချို့ယွင်းမှုဖြစ်ပေါ်ခဲ့သဖြင့် ထပ်မံကြိုးစားကြည့်ရန် ",
+    "headingMain_button": "စာမျက်နှာအား အသစ်ပြန်လည်ရယူပါ။",
     "clearCanvasMessage": "",
     "clearCanvasMessage_button": "",
     "clearCanvasCaveat": "",
