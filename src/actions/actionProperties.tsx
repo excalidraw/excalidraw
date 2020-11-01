@@ -12,6 +12,7 @@ import {
   canChangeSharpness,
 } from "../scene";
 import { ButtonSelect } from "../components/ButtonSelect";
+import { ButtonIconSelect } from "../components/ButtonIconSelect";
 import {
   isTextElement,
   redrawTextBoundingBox,
@@ -25,6 +26,20 @@ import { register } from "./register";
 import { newElementWith } from "../element/mutateElement";
 import { DEFAULT_FONT_SIZE, DEFAULT_FONT_FAMILY } from "../constants";
 import { randomInteger } from "../random";
+import {
+  FillHachureIcon,
+  FillCrossHatchIcon,
+  FillSolidIcon,
+  StrokeWidthIcon,
+  StrokeStyleSolidIcon,
+  StrokeStyleDashedIcon,
+  StrokeStyleDottedIcon,
+  EdgeSharpIcon,
+  EdgeRoundIcon,
+  SloppinessArchitectIcon,
+  SloppinessArtistIcon,
+  SloppinessCartoonistIcon,
+} from "../components/icons";
 
 const changeProperty = (
   elements: readonly ExcalidrawElement[],
@@ -141,11 +156,23 @@ export const actionChangeFillStyle = register({
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.fill")}</legend>
-      <ButtonSelect
+      <ButtonIconSelect
         options={[
-          { value: "hachure", text: t("labels.hachure") },
-          { value: "cross-hatch", text: t("labels.crossHatch") },
-          { value: "solid", text: t("labels.solid") },
+          {
+            value: "hachure",
+            text: t("labels.hachure"),
+            icon: <FillHachureIcon appearance={appState.appearance} />,
+          },
+          {
+            value: "cross-hatch",
+            text: t("labels.crossHatch"),
+            icon: <FillCrossHatchIcon appearance={appState.appearance} />,
+          },
+          {
+            value: "solid",
+            text: t("labels.solid"),
+            icon: <FillSolidIcon appearance={appState.appearance} />,
+          },
         ]}
         group="fill"
         value={getFormValue(
@@ -178,12 +205,39 @@ export const actionChangeStrokeWidth = register({
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.strokeWidth")}</legend>
-      <ButtonSelect
+      <ButtonIconSelect
         group="stroke-width"
         options={[
-          { value: 1, text: t("labels.thin") },
-          { value: 2, text: t("labels.bold") },
-          { value: 4, text: t("labels.extraBold") },
+          {
+            value: 1,
+            text: t("labels.thin"),
+            icon: (
+              <StrokeWidthIcon
+                appearance={appState.appearance}
+                strokeWidth={2}
+              />
+            ),
+          },
+          {
+            value: 2,
+            text: t("labels.bold"),
+            icon: (
+              <StrokeWidthIcon
+                appearance={appState.appearance}
+                strokeWidth={6}
+              />
+            ),
+          },
+          {
+            value: 4,
+            text: t("labels.extraBold"),
+            icon: (
+              <StrokeWidthIcon
+                appearance={appState.appearance}
+                strokeWidth={10}
+              />
+            ),
+          },
         ]}
         value={getFormValue(
           elements,
@@ -214,12 +268,24 @@ export const actionChangeSloppiness = register({
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.sloppiness")}</legend>
-      <ButtonSelect
+      <ButtonIconSelect
         group="sloppiness"
         options={[
-          { value: 0, text: t("labels.architect") },
-          { value: 1, text: t("labels.artist") },
-          { value: 2, text: t("labels.cartoonist") },
+          {
+            value: 0,
+            text: t("labels.architect"),
+            icon: <SloppinessArchitectIcon appearance={appState.appearance} />,
+          },
+          {
+            value: 1,
+            text: t("labels.artist"),
+            icon: <SloppinessArtistIcon appearance={appState.appearance} />,
+          },
+          {
+            value: 2,
+            text: t("labels.cartoonist"),
+            icon: <SloppinessCartoonistIcon appearance={appState.appearance} />,
+          },
         ]}
         value={getFormValue(
           elements,
@@ -249,12 +315,24 @@ export const actionChangeStrokeStyle = register({
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.strokeStyle")}</legend>
-      <ButtonSelect
+      <ButtonIconSelect
         group="strokeStyle"
         options={[
-          { value: "solid", text: t("labels.strokeStyle_solid") },
-          { value: "dashed", text: t("labels.strokeStyle_dashed") },
-          { value: "dotted", text: t("labels.strokeStyle_dotted") },
+          {
+            value: "solid",
+            text: t("labels.strokeStyle_solid"),
+            icon: <StrokeStyleSolidIcon appearance={appState.appearance} />,
+          },
+          {
+            value: "dashed",
+            text: t("labels.strokeStyle_dashed"),
+            icon: <StrokeStyleDashedIcon appearance={appState.appearance} />,
+          },
+          {
+            value: "dotted",
+            text: t("labels.strokeStyle_dotted"),
+            icon: <StrokeStyleDottedIcon appearance={appState.appearance} />,
+          },
         ]}
         value={getFormValue(
           elements,
@@ -488,11 +566,19 @@ export const actionChangeSharpness = register({
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.edges")}</legend>
-      <ButtonSelect
+      <ButtonIconSelect
         group="edges"
         options={[
-          { value: "sharp", text: t("labels.sharp") },
-          { value: "round", text: t("labels.round") },
+          {
+            value: "sharp",
+            text: t("labels.sharp"),
+            icon: <EdgeSharpIcon appearance={appState.appearance} />,
+          },
+          {
+            value: "round",
+            text: t("labels.round"),
+            icon: <EdgeRoundIcon appearance={appState.appearance} />,
+          },
         ]}
         value={getFormValue(
           elements,

@@ -513,18 +513,18 @@ describe("regression tests", () => {
     // select rectangle tool to show properties menu
     UI.clickTool("rectangle");
     // english lang should display `hachure` label
-    expect(screen.queryByText(/hachure/i)).not.toBeNull();
+    expect(screen.queryByTitle(/hachure/i)).not.toBeNull();
     fireEvent.change(document.querySelector(".dropdown-select__language")!, {
       target: { value: "de-DE" },
     });
     // switching to german, `hachure` label should no longer exist
-    await waitFor(() => expect(screen.queryByText(/hachure/i)).toBeNull());
+    await waitFor(() => expect(screen.queryByTitle(/hachure/i)).toBeNull());
     // reset language
     fireEvent.change(document.querySelector(".dropdown-select__language")!, {
       target: { value: "en" },
     });
     // switching back to English
-    await waitFor(() => expect(screen.queryByText(/hachure/i)).not.toBeNull());
+    await waitFor(() => expect(screen.queryByTitle(/hachure/i)).not.toBeNull());
   });
 
   it("make a group and duplicate it", () => {
@@ -877,13 +877,13 @@ describe("regression tests", () => {
     clickLabeledElement("Background");
     clickLabeledElement("#e64980");
     // Fill style
-    fireEvent.click(screen.getByLabelText("Cross-hatch"));
+    fireEvent.click(screen.getByTitle("Cross-hatch"));
     // Stroke width
-    fireEvent.click(screen.getByLabelText("Bold"));
+    fireEvent.click(screen.getByTitle("Bold"));
     // Stroke style
-    fireEvent.click(screen.getByLabelText("Dotted"));
+    fireEvent.click(screen.getByTitle("Dotted"));
     // Roughness
-    fireEvent.click(screen.getByLabelText("Cartoonist"));
+    fireEvent.click(screen.getByTitle("Cartoonist"));
     // Opacity
     fireEvent.change(screen.getByLabelText("Opacity"), {
       target: { value: "60" },
