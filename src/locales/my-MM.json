@@ -143,11 +143,11 @@
   },
   "headings": {
     "canvasActions": "ကားချပ်လုပ်ဆောင်ချက်",
-    "selectedShapeActions": "",
-    "shapes": ""
+    "selectedShapeActions": "ပုံသဏ္ဌာန်လုပ်ဆောင်ချက်",
+    "shapes": "ပုံသဏ္ဌာန်များ"
   },
   "hints": {
-    "linearElement": "",
+    "linearElement": "အမှတ်များချမှတ်ရေးဆွဲရန်ကလစ်နှိပ်ပါ၊ မျဉ်းတစ်ကြောင်းတည်းအတွက် တရွတ်ဆွဲပါ။",
     "freeDraw": "",
     "text": "",
     "linearElementMulti": "",
