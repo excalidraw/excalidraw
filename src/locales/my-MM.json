@@ -50,17 +50,17 @@
     "left": "ဘယ်",
     "center": "အလယ်",
     "right": "ညာ",
-    "extraBold": "",
-    "architect": "",
-    "artist": "",
-    "cartoonist": "",
-    "fileTitle": "",
-    "colorPicker": "",
-    "canvasBackground": "",
-    "drawingCanvas": "",
-    "layers": "",
-    "actions": "",
-    "language": "",
+    "extraBold": "ပိုထူ",
+    "architect": "ဗိသုကာ",
+    "artist": "ပန်းချီ",
+    "cartoonist": "ကာတွန်း",
+    "fileTitle": "ခေါင်းစဉ်",
+    "colorPicker": "အရောင်ရွေး",
+    "canvasBackground": "ကားချပ်နောက်ခံ",
+    "drawingCanvas": "ပုံဆွဲကားချပ်",
+    "layers": "အလွှာများ",
+    "actions": "လုပ်ဆောင်ချက်များ",
+    "language": "ဘာသာစကား",
     "createRoom": "",
     "duplicateSelection": "",
     "untitled": "",
@@ -182,10 +182,10 @@
     "button_stopSession": "ပူးပေါင်းမှုအဆုံးသတ်",
     "desc_inProgressIntro": "တိုက်ရိုက်ပူးပေါင်းရေးဆွဲမှုများပြုလုပ်နေပါသည်။",
     "desc_shareLink": "ဤ Link အား ပူးပေါင်းရေးဆွဲလိုသူများထံပေးပို့ပါ။ ။ ",
-    "desc_exitSession": ""
+    "desc_exitSession": "ပူးပေါင်းမှုရပ်တန့်ပါက အဖွဲ့အတွင်းမှထွက်ခွာသွားမည်ဖြစ်သော်လည်း မိမိမြင်ကွင်းတွင်ဆက်လက်ရေးဆွဲနိုင်ပါမည်။ အဖွဲ့အတွင်းကျန်ရှိနေခဲ့သောအခြားပါဝင်သူများသည်လည်း ဆက်လက်ပူးပေါင်းရေးဆွဲနေနိုင်ပါလိမ့်မည်။"
   },
   "errorDialog": {
-    "title": ""
+    "title": "ချို့ယွင်းချက်"
   },
   "shortcutsDialog": {
     "title": "",
