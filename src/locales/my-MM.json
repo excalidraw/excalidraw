@@ -181,7 +181,7 @@
     "button_startSession": "ပူးပေါင်းမှုစတင်",
     "button_stopSession": "ပူးပေါင်းမှုအဆုံးသတ်",
     "desc_inProgressIntro": "တိုက်ရိုက်ပူးပေါင်းရေးဆွဲမှုများပြုလုပ်နေပါသည်။",
-    "desc_shareLink": "",
+    "desc_shareLink": "ဤ Link အား ပူးပေါင်းရေးဆွဲလိုသူများထံပေးပို့ပါ။ ။ ",
     "desc_exitSession": ""
   },
   "errorDialog": {
