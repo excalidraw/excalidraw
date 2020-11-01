@@ -78,10 +78,10 @@
     "align": "Zarovnanie",
     "alignTop": "Zarovnať nahor",
     "alignBottom": "Zarovnať nadol",
-    "alignLeft": "Zarovnať vľavo",
-    "alignRight": "Zarovnať vpravo",
-    "centerVertically": "",
-    "centerHorizontally": ""
+    "alignLeft": "Zarovnať doľava",
+    "alignRight": "Zarovnať doprava",
+    "centerVertically": "Zarovnať zvislo na stred",
+    "centerHorizontally": "Zarovnať vodorovne na stred"
   },
   "buttons": {
     "clearReset": "Obnoviť plátno",
