@@ -86,9 +86,9 @@
   "buttons": {
     "clearReset": "ကားချပ်ရှင်းလင်း",
     "export": "ထုတ်",
-    "exportToPng": "",
-    "exportToSvg": "",
-    "copyToClipboard": "",
+    "exportToPng": "PNG ထုတ်",
+    "exportToSvg": "SVG ထုတ်",
+    "copyToClipboard": "ကူးယူ",
     "copyPngToClipboard": "",
     "scale": "",
     "save": "",
