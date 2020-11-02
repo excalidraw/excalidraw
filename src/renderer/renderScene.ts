@@ -2,7 +2,7 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 import { RoughSVG } from "roughjs/bin/svg";
 import oc from "open-color";
 
-import { AppState } from "../types";
+import { AppState, Zoom } from "../types";
 import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -250,12 +250,13 @@ export const renderScene = (
 
   // Paint visible elements
   const visibleElements = elements.filter((element) =>
-    isVisibleElement(
-      element,
-      normalizedCanvasWidth,
-      normalizedCanvasHeight,
-      appState,
-    ),
+    isVisibleElement(element, normalizedCanvasWidth, normalizedCanvasHeight, {
+      zoom: sceneState.zoom,
+      offsetLeft: appState.offsetLeft,
+      offsetTop: appState.offsetTop,
+      scrollX: sceneState.scrollX,
+      scrollY: sceneState.scrollY,
+    }),
   );
 
   visibleElements.forEach((element) => {
@@ -749,20 +750,26 @@ const renderBindingHighlightForSuggestedPointBinding = (
 
 const isVisibleElement = (
   element: ExcalidrawElement,
-  viewportWidth: number,
-  viewportHeight: number,
-  appState: AppState,
+  canvasWidth: number,
+  canvasHeight: number,
+  viewTransformations: {
+    zoom: Zoom;
+    offsetLeft: number;
+    offsetTop: number;
+    scrollX: number;
+    scrollY: number;
+  },
 ) => {
   const [x1, y1, x2, y2] = getElementBounds(element); // scene coordinates
   const topLeftSceneCoords = viewportCoordsToSceneCoords(
     { clientX: 0, clientY: 0 },
-    appState,
+    viewTransformations,
     null,
     0,
   );
   const bottomRightSceneCoords = viewportCoordsToSceneCoords(
-    { clientX: viewportWidth, clientY: viewportHeight },
-    appState,
+    { clientX: canvasWidth, clientY: canvasHeight },
+    viewTransformations,
     null,
     0,
   );

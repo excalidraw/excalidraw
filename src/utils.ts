@@ -1,4 +1,4 @@
-import { AppState } from "./types";
+import { Zoom } from "./types";
 import {
   CURSOR_TYPE,
   FONT_FAMILY,
@@ -185,32 +185,48 @@ export const getShortcutKey = (shortcut: string): string => {
 
 export const viewportCoordsToSceneCoords = (
   { clientX, clientY }: { clientX: number; clientY: number },
-  appState: AppState,
+  {
+    zoom,
+    offsetLeft,
+    offsetTop,
+    scrollX,
+    scrollY,
+  }: {
+    zoom: Zoom;
+    offsetLeft: number;
+    offsetTop: number;
+    scrollX: number;
+    scrollY: number;
+  },
   canvas: HTMLCanvasElement | null,
   scale: number,
 ) => {
-  const invScale = 1 / appState.zoom.value;
-  const x =
-    (clientX - appState.zoom.translation.x - appState.offsetLeft) * invScale -
-    appState.scrollX;
-  const y =
-    (clientY - appState.zoom.translation.y - appState.offsetTop) * invScale -
-    appState.scrollY;
+  const invScale = 1 / zoom.value;
+  const x = (clientX - zoom.translation.x - offsetLeft) * invScale - scrollX;
+  const y = (clientY - zoom.translation.y - offsetTop) * invScale - scrollY;
   return { x, y };
 };
 
 export const sceneCoordsToViewportCoords = (
   { sceneX, sceneY }: { sceneX: number; sceneY: number },
-  appState: AppState,
+  {
+    zoom,
+    offsetLeft,
+    offsetTop,
+    scrollX,
+    scrollY,
+  }: {
+    zoom: Zoom;
+    offsetLeft: number;
+    offsetTop: number;
+    scrollX: number;
+    scrollY: number;
+  },
   canvas: HTMLCanvasElement | null,
   scale: number,
 ) => {
-  const x =
-    (sceneX + appState.scrollX + appState.offsetLeft) * appState.zoom.value +
-    appState.zoom.translation.x;
-  const y =
-    (sceneY + appState.scrollY + appState.offsetTop) * appState.zoom.value +
-    appState.zoom.translation.y;
+  const x = (sceneX + scrollX + offsetLeft) * zoom.value + zoom.translation.x;
+  const y = (sceneY + scrollY + offsetTop) * zoom.value + zoom.translation.y;
   return { x, y };
 };
 
