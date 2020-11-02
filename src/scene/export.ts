@@ -128,7 +128,7 @@ export const exportToSvg = (
   </defs>
   `;
 
-  // render backgroiund rect
+  // render background rect
   if (exportBackground && viewBackgroundColor) {
     const rect = svgRoot.ownerDocument!.createElementNS(SVG_NS, "rect");
     rect.setAttribute("x", "0");

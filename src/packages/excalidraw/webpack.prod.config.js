@@ -9,7 +9,7 @@ module.exports = {
   mode: "production",
   entry: {
     "excalidraw.min": "./index.tsx",
-    "fonts.min": "../../public/fonts.css",
+    "fonts.min": "../../../public/fonts.css",
   },
   output: {
     path: path.resolve(__dirname, "dist"),
@@ -40,7 +40,7 @@ module.exports = {
             loader: "ts-loader",
             options: {
               transpileOnly: true,
-              configFile: path.resolve(__dirname, "tsconfig.prod.json"),
+              configFile: path.resolve(__dirname, "../tsconfig.prod.json"),
             },
           },
           {
