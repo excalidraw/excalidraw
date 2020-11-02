@@ -75,13 +75,13 @@
     "removeFromLibrary": "Видалити з бібліотеки",
     "libraryLoadingMessage": "Завантажити бібліотеку...",
     "loadingScene": "Завантаження сцени...",
-    "align": "",
-    "alignTop": "",
-    "alignBottom": "",
-    "alignLeft": "",
-    "alignRight": "",
-    "centerVertically": "",
-    "centerHorizontally": ""
+    "align": "Вирівнювання",
+    "alignTop": "Вирівняти по верхньому краю",
+    "alignBottom": "Вирівняти по нижньому краю",
+    "alignLeft": "Вирівняти по лівому краю",
+    "alignRight": "Вирівнювання по правому краю",
+    "centerVertically": "Центрувати по вертикалі",
+    "centerHorizontally": "Центрувати по горизонталі"
   },
   "buttons": {
     "clearReset": "Очистити полотно",
