@@ -1,5 +1,6 @@
 import React, { PureComponent, createRef } from "react";
 import { unstable_batchedUpdates } from "react-dom";
+import throttle from "lodash.throttle";
 
 import { CollabProvider } from "./CollabContext";
 
@@ -11,7 +12,11 @@ import {
   SOCKET_SERVER,
   SocketUpdateDataSource,
 } from "../../data";
-import { INITIAL_SCENE_UPDATE_TIMEOUT } from "../../time_constants";
+import {
+  INITIAL_SCENE_UPDATE_TIMEOUT,
+  SAVE_TO_LOCAL_STORAGE_TIMEOUT,
+  SYNC_FULL_SCENE_INTERVAL_MS,
+} from "../../time_constants";
 import {
   EVENT,
   LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
@@ -27,8 +32,13 @@ import { AppState, Collaborator } from "../../types";
 import { ExcalidrawElement } from "../../element/types";
 import { ExcalidrawImperativeAPI } from "../../components/App";
 import { t } from "../../i18n";
-import { importFromLocalStorage } from "../../data/localStorage";
+import {
+  importFromLocalStorage,
+  saveToLocalStorage,
+} from "../../data/localStorage";
 import { ImportedDataState } from "../../data/types";
+import { debounce } from "../../utils";
+import { getSceneVersion, getSyncableElements } from "../../element";
 
 interface Props {}
 interface State {
@@ -57,6 +67,7 @@ class CollabWrapper extends PureComponent<Props, State> {
   excalidrawAppState?: AppState;
   private initialData: ImportedDataState;
   private isCollabScene: boolean;
+  private lastBroadcastedOrReceivedSceneVersion: number = -1;
 
   constructor(props: Props) {
     super(props);
@@ -77,6 +88,8 @@ class CollabWrapper extends PureComponent<Props, State> {
     this.initialData = importFromLocalStorage();
     window.addEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
     window.addEventListener(EVENT.UNLOAD, this.onUnload);
+    window.addEventListener(EVENT.BLUR, this.onBlur, false);
+
     this.isCollabScene = !!getCollaborationLinkData(window.location.href);
   }
 
@@ -84,6 +97,7 @@ class CollabWrapper extends PureComponent<Props, State> {
     this.unmounted = true;
     window.removeEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
     window.removeEventListener(EVENT.UNLOAD, this.onUnload);
+    window.removeEventListener(EVENT.BLUR, this.onBlur);
   }
 
   initializeScene = async (scene: any) => {
@@ -178,6 +192,7 @@ class CollabWrapper extends PureComponent<Props, State> {
   }
 
   private onUnload = () => {
+    this.onBlur();
     this.destroySocketClient();
   };
 
@@ -207,6 +222,10 @@ class CollabWrapper extends PureComponent<Props, State> {
       event.returnValue = "";
     }
   });
+
+  private onBlur = () => {
+    this.saveDebounced.flush();
+  };
 
   saveCollabRoomToFirebase = async (
     syncableElements: ExcalidrawElement[] = this.excalidrawRef.current.getSceneSyncableElements(),
@@ -377,6 +396,12 @@ class CollabWrapper extends PureComponent<Props, State> {
     }
     const newElements = this.portal.reconcileElements(elements);
 
+    // Avoid broadcasting to the rest of the collaborators the scene
+    // we just received!
+    // Note: this needs to be set before updating the scene as it
+    // syncronously calls render.
+
+    this.setLastBroadcastedOrReceivedSceneVersion(getSceneVersion(newElements));
     this.excalidrawRef.current.updateScene({ elements: newElements });
 
     // We haven't yet implemented multiplayer undo functionality, so we clear the undo stack
@@ -407,15 +432,20 @@ class CollabWrapper extends PureComponent<Props, State> {
     });
   }
 
+  public setLastBroadcastedOrReceivedSceneVersion = (version: number) => {
+    this.lastBroadcastedOrReceivedSceneVersion = version;
+  };
+
+  public getLastBroadcastedOrReceivedSceneVersion = () => {
+    return this.lastBroadcastedOrReceivedSceneVersion;
+  };
+
   public getSceneElementsIncludingDeleted = () => {
     return this.excalidrawRef.current.getSceneElementsIncludingDeleted();
   };
 
   public getSceneSyncableElemets = () => {
     return this.excalidrawRef.current.getSceneSyncableElements();
-  };
-  private setExcalidrawAppState = (state: AppState) => {
-    this.excalidrawAppState = state;
   };
 
   onSceneBroadCast = (
@@ -432,18 +462,53 @@ class CollabWrapper extends PureComponent<Props, State> {
     this.portal.socket && this.portal.broadcastMouseLocation(payload);
   };
 
+  onChange = (elements: readonly ExcalidrawElement[], state: AppState) => {
+    this.saveDebounced(elements, state);
+    this.excalidrawAppState = state;
+
+    if (
+      getSceneVersion(elements) >
+      this.getLastBroadcastedOrReceivedSceneVersion()
+    ) {
+      this.onSceneBroadCast(getSyncableElements(elements), false);
+      this.lastBroadcastedOrReceivedSceneVersion = getSceneVersion(elements);
+      this.queueBroadcastAllElements();
+    }
+  };
+
+  private saveDebounced = debounce(
+    (elements: readonly ExcalidrawElement[], state: AppState) => {
+      saveToLocalStorage(elements, state);
+    },
+    SAVE_TO_LOCAL_STORAGE_TIMEOUT,
+  );
+
+  queueBroadcastAllElements = throttle(() => {
+    this.onSceneBroadCast(
+      this.excalidrawRef.current.getSceneSyncableElements(),
+      true,
+    );
+    const currentVersion = this.getLastBroadcastedOrReceivedSceneVersion();
+    const newVersion = Math.max(
+      currentVersion,
+      getSceneVersion(
+        this.excalidrawRef.current.getSceneElementsIncludingDeleted(),
+      ),
+    );
+    this.setLastBroadcastedOrReceivedSceneVersion(newVersion);
+  }, SYNC_FULL_SCENE_INTERVAL_MS);
+
   getValue() {
     return {
       onCollaborationStart: this.openPortal,
       onCollaborationEnd: this.closePortal,
       excalidrawRef: this.excalidrawRef,
-      setExcalidrawAppState: this.setExcalidrawAppState,
       isCollaborating: this.state.isCollaborating,
-      onSceneBroadCast: this.onSceneBroadCast,
       onMouseBroadCast: this.onMouseBroadCast,
       collaborators: this.state.collaborators,
       initializeScene: this.initializeScene,
       isCollaborationScene: this.isCollaborationScene,
+      onChange: this.onChange,
     };
   }
 

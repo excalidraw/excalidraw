@@ -143,10 +143,6 @@ export interface ExcalidrawProps {
   onCollaborationStart: (elements?: readonly ExcalidrawElement[]) => void;
   onCollaborationEnd: () => void;
   isCollaborating: boolean;
-  onSceneBroadCast: (
-    syncableElements: readonly ExcalidrawElement[],
-    syncAll: boolean,
-  ) => void;
   onMouseBroadCast: (payload: {
     pointer: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointer"];
     button: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["button"];

@@ -8,32 +8,13 @@ import { WithCollaboration } from "./collab/WithCollaboration";
 import {
   importFromLocalStorage,
   importUsernameFromLocalStorage,
-  saveToLocalStorage,
   saveUsernameToLocalStorage,
 } from "../data/localStorage";
 
-import { debounce } from "../utils";
-
-import { SAVE_TO_LOCAL_STORAGE_TIMEOUT } from "../time_constants";
-import { EVENT } from "../constants";
-
 import { ImportedDataState } from "../data/types";
-import { ExcalidrawElement } from "../element/types";
-import { AppState } from "../types";
-
-const saveDebounced = debounce(
-  (elements: readonly ExcalidrawElement[], state: AppState) => {
-    saveToLocalStorage(elements, state);
-  },
-  SAVE_TO_LOCAL_STORAGE_TIMEOUT,
-);
 
 const onUsernameChange = (username: string) => {
   saveUsernameToLocalStorage(username);
-};
-
-const onBlur = () => {
-  saveDebounced.flush();
 };
 
 function ExcalidrawApp(props: any) {
@@ -48,15 +29,14 @@ function ExcalidrawApp(props: any) {
   const {
     context: {
       excalidrawRef,
-      setExcalidrawAppState,
       onCollaborationStart,
       onCollaborationEnd,
       isCollaborating,
-      onSceneBroadCast,
       onMouseBroadCast,
       collaborators,
       initializeScene,
       isCollaborationScene,
+      onChange,
     },
   } = props;
 
@@ -83,14 +63,6 @@ function ExcalidrawApp(props: any) {
     };
   } | null>(null);
 
-  const onChange = (
-    elements: readonly ExcalidrawElement[],
-    state: AppState,
-  ) => {
-    saveDebounced(elements, state);
-    setExcalidrawAppState(state);
-  };
-
   useEffect(() => {
     setInitialState({
       data: importFromLocalStorage(),
@@ -99,20 +71,6 @@ function ExcalidrawApp(props: any) {
       },
     });
   }, []);
-
-  // blur/unload
-  // ---------------------------------------------------------------------------
-
-  useEffect(() => {
-    window.addEventListener(EVENT.UNLOAD, onBlur, false);
-    window.addEventListener(EVENT.BLUR, onBlur, false);
-    return () => {
-      window.removeEventListener(EVENT.UNLOAD, onBlur, false);
-      window.removeEventListener(EVENT.BLUR, onBlur, false);
-    };
-  }, []);
-
-  // ---------------------------------------------------------------------------
 
   if (!initialState) {
     return <LoadingMessage />;
@@ -130,7 +88,6 @@ function ExcalidrawApp(props: any) {
       onCollaborationEnd={onCollaborationEnd}
       onCollaborationStart={onCollaborationStart}
       isCollaborating={isCollaborating}
-      onSceneBroadCast={onSceneBroadCast}
       onMouseBroadCast={onMouseBroadCast}
       collaborators={collaborators}
       initializeScene={initializeScene}

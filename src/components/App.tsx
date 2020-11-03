@@ -15,7 +15,6 @@ import {
   getCursorForResizingElement,
   getPerfectElementSize,
   getNormalizedDimensions,
-  getSceneVersion,
   getSyncableElements,
   newLinearElement,
   transformElements,
@@ -115,11 +114,7 @@ import {
   GRID_SIZE,
   MIME_TYPES,
 } from "../constants";
-import {
-  TAP_TWICE_TIMEOUT,
-  SYNC_FULL_SCENE_INTERVAL_MS,
-  TOUCH_CTX_MENU_TIMEOUT,
-} from "../time_constants";
+import { TAP_TWICE_TIMEOUT, TOUCH_CTX_MENU_TIMEOUT } from "../time_constants";
 
 import LayerUI from "./LayerUI";
 import { ScrollBars, SceneState } from "../scene/types";
@@ -134,7 +129,6 @@ import {
 } from "../element/typeChecks";
 import { actionFinalize, actionDeleteSelected } from "../actions";
 
-import throttle from "lodash.throttle";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
   getSelectedGroupIds,
@@ -272,7 +266,6 @@ export type ExcalidrawImperativeAPI =
 class App extends React.Component<ExcalidrawProps, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
-  private lastBroadcastedOrReceivedSceneVersion: number = -1;
   unmounted: boolean = false;
   actionManager: ActionManager;
   private excalidrawRef: any;
@@ -411,14 +404,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       </div>
     );
   }
-
-  public setLastBroadcastedOrReceivedSceneVersion = (version: number) => {
-    this.lastBroadcastedOrReceivedSceneVersion = version;
-  };
-
-  public getLastBroadcastedOrReceivedSceneVersion = () => {
-    return this.lastBroadcastedOrReceivedSceneVersion;
-  };
 
   public getSceneElementsIncludingDeleted = () => {
     return this.scene.getElementsIncludingDeleted();
@@ -758,19 +743,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     );
   }
 
-  queueBroadcastAllElements = throttle(() => {
-    this.props.onSceneBroadCast(
-      getSyncableElements(this.getSceneElementsIncludingDeleted()),
-      true,
-    );
-    const currentVersion = this.lastBroadcastedOrReceivedSceneVersion;
-    const newVersion = Math.max(
-      currentVersion,
-      getSceneVersion(this.scene.getElementsIncludingDeleted()),
-    );
-    this.lastBroadcastedOrReceivedSceneVersion = newVersion;
-  }, SYNC_FULL_SCENE_INTERVAL_MS);
-
   componentDidUpdate(prevProps: ExcalidrawProps, prevState: AppState) {
     if (
       prevProps.width !== this.props.width ||
@@ -903,19 +875,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         : !atLeastOneVisibleElement && elements.length > 0;
     if (this.state.scrolledOutside !== scrolledOutside) {
       this.setState({ scrolledOutside: scrolledOutside });
-    }
-    if (
-      getSceneVersion(this.scene.getElementsIncludingDeleted()) >
-      this.lastBroadcastedOrReceivedSceneVersion
-    ) {
-      this.props.onSceneBroadCast(
-        getSyncableElements(this.getSceneElementsIncludingDeleted()),
-        false,
-      );
-      this.lastBroadcastedOrReceivedSceneVersion = getSceneVersion(
-        this.scene.getElementsIncludingDeleted(),
-      );
-      this.queueBroadcastAllElements();
     }
 
     history.record(this.state, this.scene.getElementsIncludingDeleted());
@@ -1214,14 +1173,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       elements: readonly ExcalidrawElement[];
       appState?: AppState;
     }) => {
-      // Avoid broadcasting to the rest of the collaborators the scene
-      // we just received!
-      // Note: this needs to be set before updating the scene as it
-      // syncronously calls render.
-      this.setLastBroadcastedOrReceivedSceneVersion(
-        getSceneVersion(sceneData.elements),
-      );
-
       // currently we only support syncing background color
       if (sceneData.appState?.viewBackgroundColor) {
         this.setState({
