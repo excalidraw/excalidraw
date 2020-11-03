@@ -93,7 +93,7 @@ module.exports = {
   },
   plugins: [
     new MiniCssExtractPlugin({ filename: "[name].css" }),
-    ...(process.env.ANALYZER ? [new BundleAnalyzerPlugin()] : []),
+    ...(process.env.ANALYZER === "true" ? [new BundleAnalyzerPlugin()] : []),
   ],
   externals: {
     react: {

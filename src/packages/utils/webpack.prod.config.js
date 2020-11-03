@@ -38,6 +38,6 @@ module.exports = {
     new webpack.optimize.LimitChunkCountPlugin({
       maxChunks: 1,
     }),
-    ...(process.env.ANALYZER ? [new BundleAnalyzerPlugin()] : []),
+    ...(process.env.ANALYZER === "true" ? [new BundleAnalyzerPlugin()] : []),
   ],
 };
