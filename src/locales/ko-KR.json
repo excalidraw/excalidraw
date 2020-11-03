@@ -74,7 +74,14 @@
     "addToLibrary": "라이브러리에 추가",
     "removeFromLibrary": "라이브러리에서 제거",
     "libraryLoadingMessage": "라이브러리 불러오는 중...",
-    "loadingScene": "화면 불러오는 중..."
+    "loadingScene": "화면 불러오는 중...",
+    "align": "",
+    "alignTop": "",
+    "alignBottom": "",
+    "alignLeft": "",
+    "alignRight": "",
+    "centerVertically": "",
+    "centerHorizontally": ""
   },
   "buttons": {
     "clearReset": "캔버스 초기화",
@@ -149,6 +156,11 @@
     "lineEditor_info": "포인트를 수정하려면 두 번 클릭하거나 엔터 키를 누르세요.",
     "lineEditor_pointSelected": "제거하려면 Delete 키, 복제하려면 CtrlOrCmd+D, 이동하려면 드래그하세요.",
     "lineEditor_nothingSelected": ""
+  },
+  "canvasError": {
+    "cannotShowPreview": "",
+    "canvasTooBig": "",
+    "canvasTooBigTip": ""
   },
   "errorSplash": {
     "headingMain_pre": "",

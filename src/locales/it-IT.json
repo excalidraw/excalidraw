@@ -74,7 +74,14 @@
     "addToLibrary": "Aggiungi alla biblioteca",
     "removeFromLibrary": "Rimuovi dalla biblioteca",
     "libraryLoadingMessage": "Caricamento della biblioteca...",
-    "loadingScene": "Caricamento della scena..."
+    "loadingScene": "Caricamento della scena...",
+    "align": "Allinea",
+    "alignTop": "Allinea in alto",
+    "alignBottom": "Allinea in basso",
+    "alignLeft": "Allinea a sinistra",
+    "alignRight": "Allinea a destra",
+    "centerVertically": "Centra Verticalmente",
+    "centerHorizontally": "Centra orizzontalmente"
   },
   "buttons": {
     "clearReset": "Ripristina la tela",
@@ -149,6 +156,11 @@
     "lineEditor_info": "Fai doppio click o premi invio per modificare i punti",
     "lineEditor_pointSelected": "Premere Elimina per rimuovere il punto, CtrlOrCmd+D per duplicare o trascinare per spostare",
     "lineEditor_nothingSelected": "Seleziona un punto per spostare o rimuovere, oppure tieni premuto Alt e fai clic per aggiungere nuovi punti"
+  },
+  "canvasError": {
+    "cannotShowPreview": "Impossibile visualizzare l'anteprima",
+    "canvasTooBig": "La tela potrebbe essere troppo grande.",
+    "canvasTooBigTip": "Suggerimento: prova a spostare gli elementi più lontani più vicini tra loro."
   },
   "errorSplash": {
     "headingMain_pre": "Si è verificato un errore. Provare ",

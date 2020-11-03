@@ -74,7 +74,14 @@
     "addToLibrary": "Lisää kirjastoon",
     "removeFromLibrary": "Poista kirjastosta",
     "libraryLoadingMessage": "Ladataan kirjastoa...",
-    "loadingScene": "Ladataan työtä..."
+    "loadingScene": "Ladataan työtä...",
+    "align": "Tasaa",
+    "alignTop": "Tasaa ylös",
+    "alignBottom": "Tasaa alas",
+    "alignLeft": "Tasaa vasemmalle",
+    "alignRight": "Tasaa oikealle",
+    "centerVertically": "Keskitä pystysuunnassa",
+    "centerHorizontally": "Keskitä vaakasuunnassa"
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
@@ -149,6 +156,11 @@
     "lineEditor_info": "Kaksoisnapauta tai paina Enter muokataksesi pisteitä",
     "lineEditor_pointSelected": "Paina Delete poistaaksesi pisteen, CtrlOrCmd+D monistaaksesi, tai raahaa liikuttaaksesi",
     "lineEditor_nothingSelected": "Valitse liikutettava tai poistettava piste, tai pidä Alt pohjassa ja napauta lisätäksesi uusia pisteitä"
+  },
+  "canvasError": {
+    "cannotShowPreview": "Esikatselua ei voitu näyttää",
+    "canvasTooBig": "Piirtoalue saattaa olla liian suuri.",
+    "canvasTooBigTip": "Vinkki: yritä siirtää kaukaisimpia elementtejä hieman lähemmäs toisiaan."
   },
   "errorSplash": {
     "headingMain_pre": "Tapahtui virhe. Yritä ",

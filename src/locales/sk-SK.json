@@ -74,7 +74,14 @@
     "addToLibrary": "Pridať do knižnice",
     "removeFromLibrary": "Odstrániť z knižnice",
     "libraryLoadingMessage": "Načítavanie knižnice...",
-    "loadingScene": "Načítavanie scény..."
+    "loadingScene": "Načítavanie scény...",
+    "align": "Zarovnanie",
+    "alignTop": "Zarovnať nahor",
+    "alignBottom": "Zarovnať nadol",
+    "alignLeft": "Zarovnať doľava",
+    "alignRight": "Zarovnať doprava",
+    "centerVertically": "Zarovnať zvislo na stred",
+    "centerHorizontally": "Zarovnať vodorovne na stred"
   },
   "buttons": {
     "clearReset": "Obnoviť plátno",
@@ -149,6 +156,11 @@
     "lineEditor_info": "Použite dvojklik alebo stlačte Enter na editáciu bodov",
     "lineEditor_pointSelected": "Stačte Delete na vymazanie bodu, CtrlOrCmd+D na jeho duplikovanie, alebo potiahnite na jeho presunutie",
     "lineEditor_nothingSelected": "Zvoľte bod na jeho presunutie alebo vymazanie, alebo podržte Alt a kliknite na pridanie nového bodu"
+  },
+  "canvasError": {
+    "cannotShowPreview": "Nie je možné zobraziť náhľad plátna",
+    "canvasTooBig": "Plátno je možno príliš veľké.",
+    "canvasTooBigTip": "Tip: skúste presunúť najvzdialenejšie prvky bližšie k sebe."
   },
   "errorSplash": {
     "headingMain_pre": "Nastala chyba. Vyskúšajte ",
