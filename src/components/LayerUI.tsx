@@ -39,12 +39,12 @@ import { Tooltip } from "./Tooltip";
 
 import "./LayerUI.scss";
 import { LibraryUnit } from "./LibraryUnit";
-import { loadLibrary, saveLibrary } from "../data/localStorage";
 import { ToolButton } from "./ToolButton";
 import { saveLibraryAsJSON, importLibraryFromJSON } from "../data/json";
 import { muteFSAbortError } from "../utils";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 import clsx from "clsx";
+import { Library } from "../data/library";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -223,7 +223,7 @@ const LibraryMenu = ({
           resolve("loading");
         }, 100);
       }),
-      loadLibrary().then((items) => {
+      Library.loadLibrary().then((items) => {
         setLibraryItems(items);
         setIsLoading("ready");
       }),
@@ -238,18 +238,18 @@ const LibraryMenu = ({
   }, []);
 
   const removeFromLibrary = useCallback(async (indexToRemove) => {
-    const items = await loadLibrary();
+    const items = await Library.loadLibrary();
     const nextItems = items.filter((_, index) => index !== indexToRemove);
-    saveLibrary(nextItems);
+    Library.saveLibrary(nextItems);
     setLibraryItems(nextItems);
   }, []);
 
   const addToLibrary = useCallback(
     async (elements: LibraryItem) => {
-      const items = await loadLibrary();
+      const items = await Library.loadLibrary();
       const nextItems = [...items, elements];
       onAddToLibrary();
-      saveLibrary(nextItems);
+      Library.saveLibrary(nextItems);
       setLibraryItems(nextItems);
     },
     [onAddToLibrary],
@@ -315,18 +315,18 @@ const LayerUI = ({
       scale,
     ) => {
       if (canvas) {
-        try {
-          await exportCanvas(type, exportedElements, appState, canvas, {
-            exportBackground: appState.exportBackground,
-            name: appState.name,
-            viewBackgroundColor: appState.viewBackgroundColor,
-            scale,
-            shouldAddWatermark: appState.shouldAddWatermark,
+        await exportCanvas(type, exportedElements, appState, canvas, {
+          exportBackground: appState.exportBackground,
+          name: appState.name,
+          viewBackgroundColor: appState.viewBackgroundColor,
+          scale,
+          shouldAddWatermark: appState.shouldAddWatermark,
+        })
+          .catch(muteFSAbortError)
+          .catch((error) => {
+            console.error(error);
+            setAppState({ errorMessage: error.message });
           });
-        } catch (error) {
-          console.error(error);
-          setAppState({ errorMessage: error.message });
-        }
       }
     };
     return (
@@ -351,8 +351,11 @@ const LayerUI = ({
                 appState,
               );
             } catch (error) {
-              console.error(error);
-              setAppState({ errorMessage: error.message });
+              if (error.name !== "AbortError") {
+                const { width, height } = canvas;
+                console.error(error, { width, height });
+                setAppState({ errorMessage: error.message });
+              }
             }
           }
         }}

@@ -133,7 +133,6 @@ import {
   isBindingElementType,
 } from "../element/typeChecks";
 import { actionFinalize, actionDeleteSelected } from "../actions";
-import { loadLibrary } from "../data/localStorage";
 
 import throttle from "lodash.throttle";
 import { LinearElementEditor } from "../element/linearElementEditor";
@@ -949,12 +948,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     copyToClipboard(this.scene.getElements(), this.state);
   };
 
-  private copyToClipboardAsPng = () => {
+  private copyToClipboardAsPng = async () => {
     const elements = this.scene.getElements();
 
     const selectedElements = getSelectedElements(elements, this.state);
     try {
-      exportCanvas(
+      await exportCanvas(
         "clipboard",
         selectedElements.length ? selectedElements : elements,
         this.state,
@@ -967,13 +966,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
   };
 
-  private copyToClipboardAsSvg = () => {
+  private copyToClipboardAsSvg = async () => {
     const selectedElements = getSelectedElements(
       this.scene.getElements(),
       this.state,
     );
     try {
-      exportCanvas(
+      await exportCanvas(
         "clipboard-svg",
         selectedElements.length ? selectedElements : this.scene.getElements(),
         this.state,
@@ -3453,7 +3452,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
     }
 
-    const libraryShapes = event.dataTransfer.getData(MIME_TYPES.excalidraw);
+    const libraryShapes = event.dataTransfer.getData(MIME_TYPES.excalidrawlib);
     if (libraryShapes !== "") {
       this.addElementsFromPasteOrLibrary(
         JSON.parse(libraryShapes),
@@ -3759,7 +3758,7 @@ declare global {
       setState: React.Component<any, AppState>["setState"];
       history: SceneHistory;
       app: InstanceType<typeof App>;
-      library: ReturnType<typeof loadLibrary>;
+      library: typeof Library;
     };
   }
 }
@@ -3783,7 +3782,7 @@ if (
       get: () => history,
     },
     library: {
-      get: () => loadLibrary(),
+      value: Library,
     },
   });
 }

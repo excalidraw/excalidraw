@@ -15,9 +15,23 @@ import { probablySupportsClipboardBlob } from "../clipboard";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import useIsMobile from "../is-mobile";
 import { Dialog } from "./Dialog";
+import { canvasToBlob } from "../data/blob";
+import { CanvasError } from "../errors";
 
 const scales = [1, 2, 3];
 const defaultScale = scales.includes(devicePixelRatio) ? devicePixelRatio : 1;
+
+export const ErrorCanvasPreview = () => {
+  return (
+    <div>
+      <h3>{t("canvasError.cannotShowPreview")}</h3>
+      <p>
+        <span>{t("canvasError.canvasTooBig")}</span>
+      </p>
+      <em>({t("canvasError.canvasTooBigTip")})</em>
+    </div>
+  );
+};
 
 export type ExportCB = (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -47,6 +61,7 @@ const ExportModal = ({
   const someElementIsSelected = isSomeElementSelected(elements, appState);
   const [scale, setScale] = useState(defaultScale);
   const [exportSelected, setExportSelected] = useState(someElementIsSelected);
+  const [previewError, setPreviewError] = useState<Error | null>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const {
     exportBackground,
@@ -64,17 +79,42 @@ const ExportModal = ({
 
   useEffect(() => {
     const previewNode = previewRef.current;
-    const canvas = exportToCanvas(exportedElements, appState, {
-      exportBackground,
-      viewBackgroundColor,
-      exportPadding,
-      scale,
-      shouldAddWatermark,
-    });
-    previewNode?.appendChild(canvas);
-    return () => {
-      previewNode?.removeChild(canvas);
-    };
+    if (!previewNode) {
+      return;
+    }
+    try {
+      const canvas = exportToCanvas(exportedElements, appState, {
+        exportBackground,
+        viewBackgroundColor,
+        exportPadding,
+        scale,
+        shouldAddWatermark,
+      });
+
+      let isRemoved = false;
+      // if converting to blob fails, there's some problem that will
+      // likely prevent preview and export (e.g. canvas too big)
+      canvasToBlob(canvas)
+        .then(() => {
+          if (isRemoved) {
+            return;
+          }
+          setPreviewError(null);
+          previewNode.appendChild(canvas);
+        })
+        .catch((error) => {
+          console.error(error);
+          setPreviewError(new CanvasError());
+        });
+
+      return () => {
+        isRemoved = true;
+        canvas.remove();
+      };
+    } catch (error) {
+      console.error(error);
+      setPreviewError(new CanvasError());
+    }
   }, [
     appState,
     exportedElements,
@@ -87,7 +127,9 @@ const ExportModal = ({
 
   return (
     <div className="ExportDialog">
-      <div className="ExportDialog__preview" ref={previewRef}></div>
+      <div className="ExportDialog__preview" ref={previewRef}>
+        {previewError && <ErrorCanvasPreview />}
+      </div>
       <Stack.Col gap={2} align="center">
         <div className="ExportDialog__actions">
           <Stack.Row gap={2}>
