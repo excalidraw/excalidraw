@@ -74,7 +74,14 @@
     "addToLibrary": "Lägg till i biblioteket",
     "removeFromLibrary": "Ta bort från bibliotek",
     "libraryLoadingMessage": "Laddar bibliotek...",
-    "loadingScene": "Laddar scen..."
+    "loadingScene": "Laddar scen...",
+    "align": "Justera",
+    "alignTop": "Justera överkant",
+    "alignBottom": "Justera underkant",
+    "alignLeft": "Justera vänster",
+    "alignRight": "Justera höger",
+    "centerVertically": "Centrera vertikalt",
+    "centerHorizontally": "Centrera horisontellt"
   },
   "buttons": {
     "clearReset": "Återställ canvasen",
@@ -150,6 +157,11 @@
     "lineEditor_pointSelected": "Tryck på Ta bort för att ta bort punkt, Ctrl + D eller Cmd + D för att duplicera, eller dra för att flytta",
     "lineEditor_nothingSelected": "Välj en punkt att flytta eller ta bort, eller håll ned ALT och klicka för att lägga till nya punkter"
   },
+  "canvasError": {
+    "cannotShowPreview": "Kan inte visa förhandsgranskning",
+    "canvasTooBig": "Canvasen kan vara för stor.",
+    "canvasTooBigTip": "Tips: prova att flytta de mest avlägsna elementen lite närmare varandra."
+  },
   "errorSplash": {
     "headingMain_pre": "Ett fel uppstod. Försök ",
     "headingMain_button": "med att läsa in sidan på nytt.",
@@ -165,7 +177,7 @@
   },
   "roomDialog": {
     "desc_intro": "Du kan bjuda in personer till din nuvarande skiss för att samarbeta med dig.",
-    "desc_privacy": "Oroa dig inte, sessionen använder kryptering från ände till ände, så vad du än ritar kommer att förbli privat. Inte ens vår server kommer att kunna se vad skissar.",
+    "desc_privacy": "Oroa dig inte, sessionen använder kryptering från ände till ände, så vad du än ritar kommer att förbli privat. Inte ens vår server kommer att kunna se vad du skissar.",
     "button_startSession": "Starta sessionen",
     "button_stopSession": "Stoppa session",
     "desc_inProgressIntro": "Nu pågår en live-samarbetssession.",
@@ -187,7 +199,7 @@
     "view": "Visa",
     "blog": "Läs vår blogg",
     "howto": "Följ våra guider",
-    "github": "Hittat ett problem? Skicka",
+    "github": "Hittat ett problem? Rapportera",
     "textNewLine": "Lägg till ny rad (text)",
     "textFinish": "Slutför redigering (text)",
     "zoomToFit": "Zooma för att rymma alla element",

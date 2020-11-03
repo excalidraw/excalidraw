@@ -74,7 +74,14 @@
     "addToLibrary": "ライブラリに追加",
     "removeFromLibrary": "ライブラリから削除",
     "libraryLoadingMessage": "ライブラリを読み込み中...",
-    "loadingScene": "シーンを読み込み中..."
+    "loadingScene": "シーンを読み込み中...",
+    "align": "",
+    "alignTop": "",
+    "alignBottom": "",
+    "alignLeft": "",
+    "alignRight": "",
+    "centerVertically": "",
+    "centerHorizontally": ""
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",
@@ -149,6 +156,11 @@
     "lineEditor_info": "",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": ""
+  },
+  "canvasError": {
+    "cannotShowPreview": "",
+    "canvasTooBig": "",
+    "canvasTooBigTip": ""
   },
   "errorSplash": {
     "headingMain_pre": "エラーが発生しました。もう一度やり直してください。 ",

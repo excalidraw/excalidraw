@@ -74,7 +74,14 @@
     "addToLibrary": "Ajouter à la bibliothèque",
     "removeFromLibrary": "Supprimer de la bibliothèque",
     "libraryLoadingMessage": "Chargement de la bibliothèque...",
-    "loadingScene": "Chargement de la scène..."
+    "loadingScene": "Chargement de la scène...",
+    "align": "Aligner",
+    "alignTop": "Aligner en haut",
+    "alignBottom": "Aligner en bas",
+    "alignLeft": "Aligner à gauche",
+    "alignRight": "Aligner à droite",
+    "centerVertically": "Centrer verticalement",
+    "centerHorizontally": "Centrer horizontalement"
   },
   "buttons": {
     "clearReset": "Effacer le canvas & réinitialiser la couleur d'arrière-plan",
@@ -109,7 +116,7 @@
   "alerts": {
     "clearReset": "L'intégralité du canvas va être effacé. Êtes-vous sur ?",
     "couldNotCreateShareableLink": "Impossible de créer un lien de partage.",
-    "couldNotCreateShareableLinkTooBig": "",
+    "couldNotCreateShareableLinkTooBig": "Impossible de créer un lien partageable : la scène est trop volumineuse",
     "couldNotLoadInvalidFile": "Impossible de charger un fichier invalide",
     "importBackendFailed": "L'import depuis le backend a échoué.",
     "cannotExportEmptyCanvas": "Impossible d'exporter un canvas vide.",
@@ -149,6 +156,11 @@
     "lineEditor_info": "Double-cliquez ou appuyez sur Entrée pour éditer les points",
     "lineEditor_pointSelected": "Appuyez sur Supprimer pour supprimer le point, Ctrl ou Cmd+D pour le dupliquer, ou faites-le glisser pour le déplacer",
     "lineEditor_nothingSelected": "Sélectionnez un point à déplacer ou à supprimer, ou maintenez Alt enfoncé et cliquez pour ajouter de nouveaux points"
+  },
+  "canvasError": {
+    "cannotShowPreview": "Impossible d’afficher l’aperçu",
+    "canvasTooBig": "Le tableau peut être trop grand.",
+    "canvasTooBigTip": "Astuce : essayez de rapprocher un peu les éléments les plus éloignés ensemble."
   },
   "errorSplash": {
     "headingMain_pre": "Une erreur est survenue. Essayez ",

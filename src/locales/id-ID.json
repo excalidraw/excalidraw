@@ -74,7 +74,14 @@
     "addToLibrary": "Tambahkan ke pustaka",
     "removeFromLibrary": "Hapus dari pustaka",
     "libraryLoadingMessage": "Memuat pustaka...",
-    "loadingScene": "Memuat pemandangan..."
+    "loadingScene": "Memuat pemandangan...",
+    "align": "Perataan",
+    "alignTop": "Rata atas",
+    "alignBottom": "Rata bawah",
+    "alignLeft": "Rata kiri",
+    "alignRight": "Rata kanan",
+    "centerVertically": "Pusatkan secara vertikal",
+    "centerHorizontally": "Pusatkan secara horizontal"
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
@@ -149,6 +156,11 @@
     "lineEditor_info": "Klik ganda atau tekan Enter untuk mengedit titik",
     "lineEditor_pointSelected": "Tekan Delete untuk menghapus titik, Ctrl/Cmd + D untuk menduplikasi, atau seret untuk memindahkan",
     "lineEditor_nothingSelected": "Pilih sebuah titik untuk memindah atau menghapus, atau tekan Alt dan klik untuk menambahkan titik baru"
+  },
+  "canvasError": {
+    "cannotShowPreview": "Tidak dapat menampilkan pratinjau",
+    "canvasTooBig": "Kanvas mungkin terlalu besar.",
+    "canvasTooBigTip": "Tip: coba pindahkan elemen-terjauh lebih dekat bersama."
   },
   "errorSplash": {
     "headingMain_pre": "Mengalami sebuah kesalahan. Cobalah ",

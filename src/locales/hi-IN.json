@@ -74,7 +74,14 @@
     "addToLibrary": "लाइब्रेरी से जोड़ें",
     "removeFromLibrary": "लाइब्रेरी से निकालें",
     "libraryLoadingMessage": "लाइब्रेरी खुल रही है",
-    "loadingScene": "दृश्य खुल रहा है"
+    "loadingScene": "दृश्य खुल रहा है",
+    "align": "",
+    "alignTop": "",
+    "alignBottom": "",
+    "alignLeft": "",
+    "alignRight": "",
+    "centerVertically": "",
+    "centerHorizontally": ""
   },
   "buttons": {
     "clearReset": "कैनवास रीसेट करें",
@@ -149,6 +156,11 @@
     "lineEditor_info": "बिंदुओं को संपादित करने के लिए Enter पर डबल-क्लिक करें या दबाएँ",
     "lineEditor_pointSelected": "बिंदु हटाने के लिए डिलीट दबाएं, प्रतिरूपित करने के लिए कण्ट्रोल या कमांड डी दबाएं या स्थानांतरित करने के लिए खींचे",
     "lineEditor_nothingSelected": "स्थानांतरित करने या हटाने के लिए एक बिंदु का चयन करें, या Alt दबाए रखें और नए बिंदुओं को जोड़ने के लिए क्लिक करें"
+  },
+  "canvasError": {
+    "cannotShowPreview": "",
+    "canvasTooBig": "",
+    "canvasTooBigTip": ""
   },
   "errorSplash": {
     "headingMain_pre": "एक त्रुटि का सामना करना पड़ा। प्रयत्न ",

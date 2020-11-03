@@ -74,7 +74,14 @@
     "addToLibrary": "Προσθήκη στη βιβλιοθήκη",
     "removeFromLibrary": "Αφαίρεση από τη βιβλιοθήκη",
     "libraryLoadingMessage": "Φόρτωση βιβλιοθήκης...",
-    "loadingScene": "Φόρτωση σκηνής..."
+    "loadingScene": "Φόρτωση σκηνής...",
+    "align": "",
+    "alignTop": "",
+    "alignBottom": "",
+    "alignLeft": "",
+    "alignRight": "",
+    "centerVertically": "",
+    "centerHorizontally": ""
   },
   "buttons": {
     "clearReset": "Επαναφορά του καμβά",
@@ -149,6 +156,11 @@
     "lineEditor_info": "Διπλό-κλικ ή πιέστε Enter για να επεξεργαστείτε τα σημεία",
     "lineEditor_pointSelected": "Πιέστε Διαγραφή για να αφαιρέσετε το σημείου, CtrlOrCmd+D για να το αντιγράψετε ή σύρτε το για να το μετακινήσετε",
     "lineEditor_nothingSelected": "Επιλέξτε ένα σημείο για μετακίνηση ή αφαίρεση, ή κρατήστε παρατεταμένα το Alt και κάντε κλικ για να προσθέσετε νέα σημεία"
+  },
+  "canvasError": {
+    "cannotShowPreview": "",
+    "canvasTooBig": "",
+    "canvasTooBigTip": ""
   },
   "errorSplash": {
     "headingMain_pre": "Συνέβη κάποιο σφάλμα. Προσπάθησε ",

@@ -74,7 +74,14 @@
     "addToLibrary": "Zur Bibliothek hinzufügen",
     "removeFromLibrary": "Aus Bibliothek entfernen",
     "libraryLoadingMessage": "Lade Bibliothek...",
-    "loadingScene": "Lade Zeichnung..."
+    "loadingScene": "Lade Zeichnung...",
+    "align": "Ausrichten",
+    "alignTop": "Obere Kanten",
+    "alignBottom": "Untere Kanten",
+    "alignLeft": "Linke Kanten",
+    "alignRight": "Rechte Kanten",
+    "centerVertically": "Vertikal zentrieren",
+    "centerHorizontally": "Horizontal zentrieren"
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
@@ -150,6 +157,11 @@
     "lineEditor_pointSelected": "Drücke Löschen, um Punkt zu entfernen, Strg+D oder Cmd+D zum Duplizieren oder ziehe zum Verschieben",
     "lineEditor_nothingSelected": "Wähle einen Punkt zum Verschieben oder Löschen oder halte die Alt-Taste gedrückt und klicke, um neue Punkte hinzuzufügen"
   },
+  "canvasError": {
+    "cannotShowPreview": "Vorschau kann nicht angezeigt werden",
+    "canvasTooBig": "Die Leinwand ist möglicherweise zu groß.",
+    "canvasTooBigTip": "Tipp: Schiebe die am weitesten entfernten Elemente ein wenig näher zusammen."
+  },
   "errorSplash": {
     "headingMain_pre": "Es ist ein Fehler aufgetreten. Versuche ",
     "headingMain_button": "die Seite neu zu laden.",
@@ -165,7 +177,7 @@
   },
   "roomDialog": {
     "desc_intro": "Du kannst Leute zu deiner aktuellen Zeichnung einladen um mit ihnen zusammenzuarbeiten.",
-    "desc_privacy": "Sei beruhigt, da die Sitzung eine Ende-zu-Ende-Verschlüsselung nutzt. Alles von dir gezeichnete, privat bleibt. Auch unsere Server sehen nicht, was du dir einfallen lässt.",
+    "desc_privacy": "Keine Sorge, die Sitzung nutzt eine Ende-zu-Ende-Verschlüsselung. Alles was du zeichnest, bleibt privat. Auch unser Server sieht nicht, was du dir einfallen lässt.",
     "button_startSession": "Sitzung starten",
     "button_stopSession": "Sitzung beenden",
     "desc_inProgressIntro": "Die Live-Sitzung wird nun ausgeführt.",
