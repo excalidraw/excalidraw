@@ -74,7 +74,14 @@
     "addToLibrary": "加入資料庫",
     "removeFromLibrary": "從資料庫中移除",
     "libraryLoadingMessage": "資料庫讀取中…",
-    "loadingScene": "場景讀取中…"
+    "loadingScene": "場景讀取中…",
+    "align": "對齊",
+    "alignTop": "對齊頂部",
+    "alignBottom": "對齊底部",
+    "alignLeft": "對齊左側",
+    "alignRight": "對齊右側",
+    "centerVertically": "垂直置中",
+    "centerHorizontally": "水平置中"
   },
   "buttons": {
     "clearReset": "重置 canvas",
@@ -149,6 +156,11 @@
     "lineEditor_info": "雙擊滑鼠左鍵或按 Enter 來編輯控制點",
     "lineEditor_pointSelected": "按下 Delete 可移除錨點；Ctrl 或 Cmd + D 可複製；或可拖曳來移動",
     "lineEditor_nothingSelected": "點選想移動或刪除的控制點；或按住 Alt 再點擊以增加新控制點"
+  },
+  "canvasError": {
+    "cannotShowPreview": "無法顯示預覽",
+    "canvasTooBig": "畫布可能過大",
+    "canvasTooBigTip": "提示：可嘗試將最遠的元素移動至較集中的位置"
   },
   "errorSplash": {
     "headingMain_pre": "發生錯誤，嘗試",

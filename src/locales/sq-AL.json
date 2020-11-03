@@ -74,7 +74,14 @@
     "addToLibrary": "",
     "removeFromLibrary": "",
     "libraryLoadingMessage": "",
-    "loadingScene": ""
+    "loadingScene": "",
+    "align": "",
+    "alignTop": "",
+    "alignBottom": "",
+    "alignLeft": "",
+    "alignRight": "",
+    "centerVertically": "",
+    "centerHorizontally": ""
   },
   "buttons": {
     "clearReset": "",
@@ -149,6 +156,11 @@
     "lineEditor_info": "",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": ""
+  },
+  "canvasError": {
+    "cannotShowPreview": "",
+    "canvasTooBig": "",
+    "canvasTooBigTip": ""
   },
   "errorSplash": {
     "headingMain_pre": "",

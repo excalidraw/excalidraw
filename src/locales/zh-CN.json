@@ -74,7 +74,14 @@
     "addToLibrary": "添加到库中",
     "removeFromLibrary": "从库中移除",
     "libraryLoadingMessage": "正在加载库...",
-    "loadingScene": "正在加载绘图..."
+    "loadingScene": "正在加载绘图...",
+    "align": "",
+    "alignTop": "",
+    "alignBottom": "",
+    "alignLeft": "",
+    "alignRight": "",
+    "centerVertically": "",
+    "centerHorizontally": ""
   },
   "buttons": {
     "clearReset": "重置画布",
@@ -149,6 +156,11 @@
     "lineEditor_info": "双击或按回车键编辑",
     "lineEditor_pointSelected": "按下 Delete 移除点，Ctrl 或 Cmd+D 以复制，或拖动以移动",
     "lineEditor_nothingSelected": "选中要移动或移除的点，或按住 Alt 并点击添加新点"
+  },
+  "canvasError": {
+    "cannotShowPreview": "",
+    "canvasTooBig": "",
+    "canvasTooBigTip": ""
   },
   "errorSplash": {
     "headingMain_pre": "遇到异常。请尝试",
