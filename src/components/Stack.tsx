@@ -9,7 +9,7 @@ type StackProps = {
   align?: "start" | "center" | "end" | "baseline";
   justifyContent?: "center" | "space-around" | "space-between";
   className?: string | boolean;
-  style?: object;
+  style?: React.CSSProperties;
 };
 
 const RowStack = ({
