@@ -9,6 +9,7 @@ type StackProps = {
   align?: "start" | "center" | "end" | "baseline";
   justifyContent?: "center" | "space-around" | "space-between";
   className?: string | boolean;
+  style?: object;
 };
 
 const RowStack = ({
@@ -17,6 +18,7 @@ const RowStack = ({
   align,
   justifyContent,
   className,
+  style,
 }: StackProps) => {
   return (
     <div
@@ -26,6 +28,7 @@ const RowStack = ({
           "--gap": gap,
           alignItems: align,
           justifyContent,
+          ...style,
         } as React.CSSProperties
       }
     >
