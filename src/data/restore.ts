@@ -165,7 +165,7 @@ const restoreAppState = (
     zoom:
       typeof appState.zoom === "number"
         ? { value: appState.zoom as number, translation: { x: 0, y: 0 } }
-        : (appState.zoom as Zoom),
+        : (appState.zoom as Zoom) || { value: 1, translation: { x: 0, y: 0 } },
   };
 };
 
