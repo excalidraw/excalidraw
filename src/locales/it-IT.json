@@ -32,8 +32,8 @@
     "fontFamily": "Carattere",
     "onlySelected": "Solo selezionati",
     "withBackground": "Con Sfondo",
-    "exportEmbedScene": "",
-    "exportEmbedScene_details": "",
+    "exportEmbedScene": "Incorpora la scena nel file esportato",
+    "exportEmbedScene_details": "I dati della scena saranno salvati nel file PNG/SVG esportato in modo che la scena possa essere ripristinata da esso.\nQuesto aumenterà la dimensione del file esportato.",
     "addWatermark": "Aggiungi \"Creato con Excalidraw\"",
     "handDrawn": "A mano libera",
     "normal": "Normale",
@@ -74,7 +74,14 @@
     "addToLibrary": "Aggiungi alla biblioteca",
     "removeFromLibrary": "Rimuovi dalla biblioteca",
     "libraryLoadingMessage": "Caricamento della biblioteca...",
-    "loadingScene": "Caricamento della scena..."
+    "loadingScene": "Caricamento della scena...",
+    "align": "Allinea",
+    "alignTop": "Allinea in alto",
+    "alignBottom": "Allinea in basso",
+    "alignLeft": "Allinea a sinistra",
+    "alignRight": "Allinea a destra",
+    "centerVertically": "Centra Verticalmente",
+    "centerHorizontally": "Centra orizzontalmente"
   },
   "buttons": {
     "clearReset": "Ripristina la tela",
@@ -109,6 +116,7 @@
   "alerts": {
     "clearReset": "Questo cancellerà l'intera tela. Sei sicuro?",
     "couldNotCreateShareableLink": "Non riesco a creare un link condivisibile.",
+    "couldNotCreateShareableLinkTooBig": "Impossibile creare il link condivisibile: la scena è troppo grande",
     "couldNotLoadInvalidFile": "Impossibile caricare un file no valido",
     "importBackendFailed": "Importazione dal server fallita.",
     "cannotExportEmptyCanvas": "Non è possibile esportare una tela vuota.",
@@ -118,8 +126,8 @@
     "loadSceneOverridePrompt": "Se carichi questo disegno esterno, sostituirà quello che hai. Vuoi continuare?",
     "errorLoadingLibrary": "Si è verificato un errore nel caricamento della libreria di terze parti.",
     "confirmAddLibrary": "Questo aggiungerà {{numShapes}} forma(e) alla tua biblioteca. Sei sicuro?",
-    "imageDoesNotContainScene": "",
-    "cannotRestoreFromImage": ""
+    "imageDoesNotContainScene": "Il file immagine non contiene dati di scena. È stato abilitato durante l'esportazione?",
+    "cannotRestoreFromImage": "Impossibile ripristinare la scena da questo file immagine"
   },
   "toolBar": {
     "selection": "Selezione",
@@ -148,6 +156,11 @@
     "lineEditor_info": "Fai doppio click o premi invio per modificare i punti",
     "lineEditor_pointSelected": "Premere Elimina per rimuovere il punto, CtrlOrCmd+D per duplicare o trascinare per spostare",
     "lineEditor_nothingSelected": "Seleziona un punto per spostare o rimuovere, oppure tieni premuto Alt e fai clic per aggiungere nuovi punti"
+  },
+  "canvasError": {
+    "cannotShowPreview": "Impossibile visualizzare l'anteprima",
+    "canvasTooBig": "La tela potrebbe essere troppo grande.",
+    "canvasTooBigTip": "Suggerimento: prova a spostare gli elementi più lontani più vicini tra loro."
   },
   "errorSplash": {
     "headingMain_pre": "Si è verificato un errore. Provare ",

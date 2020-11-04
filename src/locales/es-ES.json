@@ -74,7 +74,14 @@
     "addToLibrary": "Añadir a la biblioteca",
     "removeFromLibrary": "Eliminar de la biblioteca",
     "libraryLoadingMessage": "Cargando biblioteca...",
-    "loadingScene": "Cargando escena..."
+    "loadingScene": "Cargando escena...",
+    "align": "",
+    "alignTop": "",
+    "alignBottom": "",
+    "alignLeft": "",
+    "alignRight": "",
+    "centerVertically": "",
+    "centerHorizontally": ""
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
@@ -109,6 +116,7 @@
   "alerts": {
     "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",
     "couldNotCreateShareableLink": "No se pudo crear un enlace para compartir.",
+    "couldNotCreateShareableLinkTooBig": "",
     "couldNotLoadInvalidFile": "No se pudo cargar el archivo inválido",
     "importBackendFailed": "La importación falló.",
     "cannotExportEmptyCanvas": "No se puede exportar un lienzo vació",
@@ -148,6 +156,11 @@
     "lineEditor_info": "haga doble clic o pulse Enter para editar puntos",
     "lineEditor_pointSelected": "Presione Suprimir para eliminar el punto, CtrlOrCmd+D para duplicarlo, o arrástrelo para moverlo",
     "lineEditor_nothingSelected": "Seleccione un punto para mover o eliminar, o mantenga pulsado Alt y haga clic para añadir nuevos puntos"
+  },
+  "canvasError": {
+    "cannotShowPreview": "",
+    "canvasTooBig": "",
+    "canvasTooBigTip": ""
   },
   "errorSplash": {
     "headingMain_pre": "Se encontró un error. Intente ",

@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface Document {
   fonts?: {
     ready?: Promise<void>;
@@ -10,7 +11,7 @@ interface Document {
 
 interface Window {
   ClipboardItem: any;
-  __EXCALIDRAW_SHA__: string;
+  __EXCALIDRAW_SHA__: string | undefined;
 }
 
 // https://github.com/facebook/create-react-app/blob/ddcb7d5/packages/react-scripts/lib/react-app.d.ts

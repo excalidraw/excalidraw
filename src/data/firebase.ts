@@ -2,13 +2,16 @@ import { createIV, getImportedKey } from "./index";
 import { ExcalidrawElement } from "../element/types";
 import { getSceneVersion } from "../element";
 import Portal from "../components/Portal";
+import { restoreElements } from "./restore";
 
-let firebasePromise: Promise<typeof import("firebase/app")> | null = null;
+let firebasePromise: Promise<
+  typeof import("firebase/app").default
+> | null = null;
 
 async function loadFirebase() {
-  const firebase = await import(
-    /* webpackChunkName: "firebase" */ "firebase/app"
-  );
+  const firebase = (
+    await import(/* webpackChunkName: "firebase" */ "firebase/app")
+  ).default;
   await import(/* webpackChunkName: "firestore" */ "firebase/firestore");
 
   const firebaseConfig = JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG);
@@ -17,7 +20,7 @@ async function loadFirebase() {
   return firebase;
 }
 
-async function getFirebase(): Promise<typeof import("firebase/app")> {
+async function getFirebase(): Promise<typeof import("firebase/app").default> {
   if (!firebasePromise) {
     firebasePromise = loadFirebase();
   }
@@ -27,8 +30,8 @@ async function getFirebase(): Promise<typeof import("firebase/app")> {
 
 interface FirebaseStoredScene {
   sceneVersion: number;
-  iv: firebase.firestore.Blob;
-  ciphertext: firebase.firestore.Blob;
+  iv: firebase.default.firestore.Blob;
+  ciphertext: firebase.default.firestore.Blob;
 }
 
 async function encryptElements(
@@ -155,6 +158,5 @@ export async function loadFromFirebase(
   const storedScene = doc.data() as FirebaseStoredScene;
   const ciphertext = storedScene.ciphertext.toUint8Array();
   const iv = storedScene.iv.toUint8Array();
-  const plaintext = await decryptElements(roomKey, iv, ciphertext);
-  return plaintext;
+  return restoreElements(await decryptElements(roomKey, iv, ciphertext));
 }

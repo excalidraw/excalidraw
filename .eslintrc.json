@@ -1,7 +1,8 @@
 {
-  "extends": ["prettier", "react-app"],
+  "extends": ["prettier", "react-app", "react-app/jest"],
   "plugins": ["prettier"],
   "rules": {
+    "import/no-anonymous-default-export": "off",
     "curly": "warn",
     "no-console": [
       "warn",

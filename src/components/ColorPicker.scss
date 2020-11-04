@@ -51,6 +51,12 @@
     display: grid;
     grid-template-columns: repeat(5, auto);
     grid-gap: 0.5rem;
+    border-radius: 4px;
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--focus-highlight-color);
+    }
   }
 
   .color-picker-content .color-input-container {

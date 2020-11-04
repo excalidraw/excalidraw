@@ -1,18 +1,22 @@
 const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
+// uncomment to analyze
+// const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
+//   .BundleAnalyzerPlugin;
 
 module.exports = {
   mode: "production",
   entry: {
     "excalidraw.min": "./index.tsx",
-    "fonts.min": "../../public/fonts.css",
+    "fonts.min": "../../../public/fonts.css",
   },
   output: {
     path: path.resolve(__dirname, "dist"),
     library: "Excalidraw",
     libraryTarget: "umd",
     filename: "[name].js",
+    publicPath: "/excalidraw-assets/",
   },
   resolve: {
     extensions: [".js", ".ts", ".tsx", ".css", ".scss"],
@@ -30,13 +34,13 @@ module.exports = {
       },
       {
         test: /\.(ts|tsx|js|jsx|mjs)$/,
-        exclude: /node_modules\/(?!(roughjs|socket.io-client|browser-nativefs)\/).*/,
+        exclude: /node_modules/,
         use: [
           {
             loader: "ts-loader",
             options: {
               transpileOnly: true,
-              configFile: path.resolve(__dirname, "tsconfig.prod.json"),
+              configFile: path.resolve(__dirname, "../tsconfig.prod.json"),
             },
           },
           {
@@ -52,6 +56,7 @@ module.exports = {
                 "@babel/plugin-transform-arrow-functions",
                 "transform-class-properties",
                 "@babel/plugin-transform-async-to-generator",
+                "@babel/plugin-transform-runtime",
               ],
             },
           },
@@ -78,7 +83,7 @@ module.exports = {
       }),
     ],
     splitChunks: {
-      chunks: "all",
+      chunks: "async",
       cacheGroups: {
         vendors: {
           test: /[\\/]node_modules[\\/]/,
@@ -87,7 +92,11 @@ module.exports = {
       },
     },
   },
-  plugins: [new MiniCssExtractPlugin({ filename: "[name].css" })],
+  plugins: [
+    new MiniCssExtractPlugin({ filename: "[name].css" }),
+    // uncomment to analyze
+    //new BundleAnalyzerPlugin(),
+  ],
   externals: {
     react: {
       root: "React",

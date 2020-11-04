@@ -32,8 +32,8 @@
     "fontFamily": "字体",
     "onlySelected": "仅被选中",
     "withBackground": "添加背景",
-    "exportEmbedScene": "",
-    "exportEmbedScene_details": "",
+    "exportEmbedScene": "将场景嵌入到导出的文件",
+    "exportEmbedScene_details": "场景数据将被保存到导出的 PNG/SVG 文件，以便恢复。\n将会增加导出的文件大小。",
     "addWatermark": "添加 “使用 Excalidraw 创建” 水印",
     "handDrawn": "手写",
     "normal": "正常",
@@ -74,7 +74,14 @@
     "addToLibrary": "添加到库中",
     "removeFromLibrary": "从库中移除",
     "libraryLoadingMessage": "正在加载库...",
-    "loadingScene": "正在加载绘图..."
+    "loadingScene": "正在加载绘图...",
+    "align": "",
+    "alignTop": "",
+    "alignBottom": "",
+    "alignLeft": "",
+    "alignRight": "",
+    "centerVertically": "",
+    "centerHorizontally": ""
   },
   "buttons": {
     "clearReset": "重置画布",
@@ -109,6 +116,7 @@
   "alerts": {
     "clearReset": "这将会清除整个 画板。您是否要继续?",
     "couldNotCreateShareableLink": "无法创建共享链接",
+    "couldNotCreateShareableLinkTooBig": "无法创建可共享链接：场景过大",
     "couldNotLoadInvalidFile": "无法加载错误文件",
     "importBackendFailed": "从后端导入失败",
     "cannotExportEmptyCanvas": "无法导出空画布。",
@@ -116,10 +124,10 @@
     "decryptFailed": "无法解密数据。",
     "uploadedSecurly": "上传已被端到端加密保护，这意味着 Excalidraw 的服务器和第三方都无法读取内容。",
     "loadSceneOverridePrompt": "加载外部绘图将取代您现有的内容。您想要继续吗？",
-    "errorLoadingLibrary": "",
-    "confirmAddLibrary": "",
-    "imageDoesNotContainScene": "",
-    "cannotRestoreFromImage": ""
+    "errorLoadingLibrary": "加载第三方库时出错。",
+    "confirmAddLibrary": "这将添加 {{numShapes}} 个形状到您的库。您确定吗？",
+    "imageDoesNotContainScene": "图像文件不包含场景数据。您是否在导出过程中启用了此选项？",
+    "cannotRestoreFromImage": "无法从此图像文件恢复场景"
   },
   "toolBar": {
     "selection": "选择",
@@ -148,6 +156,11 @@
     "lineEditor_info": "双击或按回车键编辑",
     "lineEditor_pointSelected": "按下 Delete 移除点，Ctrl 或 Cmd+D 以复制，或拖动以移动",
     "lineEditor_nothingSelected": "选中要移动或移除的点，或按住 Alt 并点击添加新点"
+  },
+  "canvasError": {
+    "cannotShowPreview": "",
+    "canvasTooBig": "",
+    "canvasTooBigTip": ""
   },
   "errorSplash": {
     "headingMain_pre": "遇到异常。请尝试",

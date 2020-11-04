@@ -74,7 +74,14 @@
     "addToLibrary": "Adicionar à biblioteca",
     "removeFromLibrary": "Remover da biblioteca",
     "libraryLoadingMessage": "Carregando biblioteca...",
-    "loadingScene": "Carregando cena..."
+    "loadingScene": "Carregando cena...",
+    "align": "",
+    "alignTop": "",
+    "alignBottom": "",
+    "alignLeft": "",
+    "alignRight": "",
+    "centerVertically": "",
+    "centerHorizontally": ""
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
@@ -109,6 +116,7 @@
   "alerts": {
     "clearReset": "Isto irá limpar toda a tela. Você tem certeza?",
     "couldNotCreateShareableLink": "Não foi possível criar um link de compartilhamento.",
+    "couldNotCreateShareableLinkTooBig": "Não foi possível criar um link compartilhável: a cena é muito grande",
     "couldNotLoadInvalidFile": "Não foi possível carregar o arquivo inválido",
     "importBackendFailed": "A importação do servidor falhou.",
     "cannotExportEmptyCanvas": "Não é possível exportar um canvas vazío.",
@@ -148,6 +156,11 @@
     "lineEditor_info": "Clique duas vezes ou pressione Enter para editar os pontos",
     "lineEditor_pointSelected": "Pressione Deletar para remover ponto, CtrlOuCmd+D para duplicar ou arraste para mover",
     "lineEditor_nothingSelected": "Selecione um ponto para mover ou remover, ou segure Alt e clique para adicionar novos pontos"
+  },
+  "canvasError": {
+    "cannotShowPreview": "",
+    "canvasTooBig": "",
+    "canvasTooBigTip": ""
   },
   "errorSplash": {
     "headingMain_pre": "Foi encontrado um erro. Tente ",

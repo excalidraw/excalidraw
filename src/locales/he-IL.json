@@ -74,7 +74,14 @@
     "addToLibrary": "",
     "removeFromLibrary": "",
     "libraryLoadingMessage": "",
-    "loadingScene": ""
+    "loadingScene": "",
+    "align": "",
+    "alignTop": "",
+    "alignBottom": "",
+    "alignLeft": "",
+    "alignRight": "",
+    "centerVertically": "",
+    "centerHorizontally": ""
   },
   "buttons": {
     "clearReset": "אפס את הלוח",
@@ -109,6 +116,7 @@
   "alerts": {
     "clearReset": "פעולה זו תנקה את כל הלוח. אתה בטוח?",
     "couldNotCreateShareableLink": "לא ניתן לייצר לינק לשיתוף.",
+    "couldNotCreateShareableLinkTooBig": "",
     "couldNotLoadInvalidFile": "לא ניתן לטעון קובץ שאיננו תואם",
     "importBackendFailed": "ייבוא מהשרת נכשל.",
     "cannotExportEmptyCanvas": "לא ניתן לייצא לוח ריק.",
@@ -148,6 +156,11 @@
     "lineEditor_info": "",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": ""
+  },
+  "canvasError": {
+    "cannotShowPreview": "",
+    "canvasTooBig": "",
+    "canvasTooBigTip": ""
   },
   "errorSplash": {
     "headingMain_pre": "אירעה שגיאה. נסה ",
