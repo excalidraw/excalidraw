@@ -198,8 +198,6 @@ export const viewportCoordsToSceneCoords = (
     scrollX: number;
     scrollY: number;
   },
-  canvas: HTMLCanvasElement | null,
-  scale: number,
 ) => {
   const invScale = 1 / zoom.value;
   const x = (clientX - zoom.translation.x - offsetLeft) * invScale - scrollX;
@@ -222,8 +220,6 @@ export const sceneCoordsToViewportCoords = (
     scrollX: number;
     scrollY: number;
   },
-  canvas: HTMLCanvasElement | null,
-  scale: number,
 ) => {
   const x = (sceneX + scrollX + offsetLeft) * zoom.value + zoom.translation.x;
   const y = (sceneY + scrollY + offsetTop) * zoom.value + zoom.translation.y;

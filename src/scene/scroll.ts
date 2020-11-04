@@ -19,14 +19,10 @@ function isOutsideViewPort(
   const { x: viewportX1, y: viewportY1 } = sceneCoordsToViewportCoords(
     { sceneX: x1, sceneY: y1 },
     appState,
-    canvas,
-    window.devicePixelRatio,
   );
   const { x: viewportX2, y: viewportY2 } = sceneCoordsToViewportCoords(
     { sceneX: x2, sceneY: y2 },
     appState,
-    canvas,
-    window.devicePixelRatio,
   );
   return (
     viewportX2 - viewportX1 > appState.width ||
@@ -68,7 +64,6 @@ export const calculateScrollCenter = (
       scrollY: normalizeScroll(0),
     };
   }
-  const scale = window.devicePixelRatio;
   let [x1, y1, x2, y2] = getCommonBounds(elements);
 
   if (isOutsideViewPort(appState, canvas, [x1, y1, x2, y2])) {
@@ -77,8 +72,6 @@ export const calculateScrollCenter = (
       viewportCoordsToSceneCoords(
         { clientX: appState.scrollX, clientY: appState.scrollY },
         appState,
-        canvas,
-        scale,
       ),
     );
   }

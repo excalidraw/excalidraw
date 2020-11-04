@@ -936,8 +936,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           sceneY: user.pointer.y,
         },
         this.state,
-        this.canvas,
-        window.devicePixelRatio,
       );
       cursorButton[socketId] = user.button;
     });
@@ -1147,8 +1145,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const { x, y } = viewportCoordsToSceneCoords(
       { clientX, clientY },
       this.state,
-      this.canvas,
-      window.devicePixelRatio,
     );
 
     const dx = x - elementsCenterX;
@@ -1206,8 +1202,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const { x, y } = viewportCoordsToSceneCoords(
       { clientX: cursorX, clientY: cursorY },
       this.state,
-      this.canvas,
-      window.devicePixelRatio,
     );
 
     const element = newTextElement({
@@ -1776,8 +1770,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             sceneY: y,
           },
           this.state,
-          this.canvas,
-          window.devicePixelRatio,
         );
         return [viewportX, viewportY];
       },
@@ -1995,8 +1987,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
       event,
       this.state,
-      this.canvas,
-      window.devicePixelRatio,
     );
 
     const selectedGroupIds = getSelectedGroupIds(this.state);
@@ -2088,12 +2078,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
     }
 
-    const scenePointer = viewportCoordsToSceneCoords(
-      event,
-      this.state,
-      this.canvas,
-      window.devicePixelRatio,
-    );
+    const scenePointer = viewportCoordsToSceneCoords(event, this.state);
     const { x: scenePointerX, y: scenePointerY } = scenePointer;
 
     if (
@@ -2514,12 +2499,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   private initialPointerDownState(
     event: React.PointerEvent<HTMLCanvasElement>,
   ): PointerDownState {
-    const origin = viewportCoordsToSceneCoords(
-      event,
-      this.state,
-      this.canvas,
-      window.devicePixelRatio,
-    );
+    const origin = viewportCoordsToSceneCoords(event, this.state);
     const selectedElements = getSelectedElements(
       this.scene.getElements(),
       this.state,
@@ -2998,12 +2978,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         return;
       }
 
-      const pointerCoords = viewportCoordsToSceneCoords(
-        event,
-        this.state,
-        this.canvas,
-        window.devicePixelRatio,
-      );
+      const pointerCoords = viewportCoordsToSceneCoords(event, this.state);
       const [gridX, gridY] = getGridPoint(
         pointerCoords.x,
         pointerCoords.y,
@@ -3404,8 +3379,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         const pointerCoords = viewportCoordsToSceneCoords(
           childEvent,
           this.state,
-          this.canvas,
-          window.devicePixelRatio,
         );
 
         if (
@@ -3825,8 +3798,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const { x, y } = viewportCoordsToSceneCoords(
       { clientX, clientY },
       this.state,
-      this.canvas,
-      window.devicePixelRatio,
     );
 
     const elements = this.scene.getElements();
@@ -3980,8 +3951,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
           { sceneX: elementCenterX, sceneY: elementCenterY },
           appState,
-          canvas,
-          scale,
         );
         return { viewportX, viewportY, elementCenterX, elementCenterY };
       }
@@ -3995,8 +3964,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const pointer = viewportCoordsToSceneCoords(
       { clientX: x, clientY: y },
       this.state,
-      this.canvas,
-      window.devicePixelRatio,
     );
 
     if (isNaN(pointer.x) || isNaN(pointer.y)) {

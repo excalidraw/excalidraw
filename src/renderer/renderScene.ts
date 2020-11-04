@@ -764,14 +764,10 @@ const isVisibleElement = (
   const topLeftSceneCoords = viewportCoordsToSceneCoords(
     { clientX: 0, clientY: 0 },
     viewTransformations,
-    null,
-    0,
   );
   const bottomRightSceneCoords = viewportCoordsToSceneCoords(
     { clientX: canvasWidth, clientY: canvasHeight },
     viewTransformations,
-    null,
-    0,
   );
   return (
     topLeftSceneCoords.x <= x2 &&
