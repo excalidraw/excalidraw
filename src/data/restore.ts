@@ -3,7 +3,7 @@ import {
   FontFamily,
   ExcalidrawSelectionElement,
 } from "../element/types";
-import { AppState, Zoom } from "../types";
+import { AppState } from "../types";
 import { DataState, ImportedDataState } from "./types";
 import { isInvisiblySmallElement, getNormalizedDimensions } from "../element";
 import { isLinearElementType } from "../element/typeChecks";
@@ -164,8 +164,11 @@ const restoreAppState = (
     /* Migrates from previous version where appState.zoom was a number */
     zoom:
       typeof appState.zoom === "number"
-        ? { value: appState.zoom as number, translation: { x: 0, y: 0 } }
-        : (appState.zoom as Zoom) || { value: 1, translation: { x: 0, y: 0 } },
+        ? {
+            value: appState.zoom as number,
+            translation: defaultAppState.zoom.translation,
+          }
+        : appState.zoom || defaultAppState.zoom,
   };
 };
 
