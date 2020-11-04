@@ -24,6 +24,9 @@ import {
 import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
 import { Zoom } from "../types";
+import { getDefaultAppState } from "../appState";
+
+const defaultAppState = getDefaultAppState();
 
 const CANVAS_PADDING = 20;
 
@@ -359,12 +362,7 @@ const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,
   sceneState?: SceneState,
 ) => {
-  const zoom: Zoom = sceneState
-    ? sceneState.zoom
-    : {
-        value: 1,
-        translation: { x: 0, y: 0 },
-      };
+  const zoom: Zoom = sceneState ? sceneState.zoom : defaultAppState.zoom;
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
   const shouldRegenerateBecauseZoom =
     prevElementWithCanvas &&
