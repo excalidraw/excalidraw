@@ -36,3 +36,12 @@ workbox.routing.registerNavigationRoute(
     blacklist: [/^\/_/, /\/[^/?]+\.[^/]+$/],
   },
 );
+
+// Cache relevant font files
+workbox.routing.registerRoute(
+  new RegExp("/(fonts.css|.+.(ttf|woff2|otf))"),
+  new workbox.strategies.StaleWhileRevalidate({
+    cacheName: "fonts",
+    plugins: [new workbox.expiration.Plugin({ maxEntries: 10 })],
+  }),
+);
