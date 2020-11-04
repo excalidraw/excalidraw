@@ -74,7 +74,14 @@
     "addToLibrary": "Afegir a la biblioteca",
     "removeFromLibrary": "Eliminar de la biblioteca",
     "libraryLoadingMessage": "Carregant la biblioteca...",
-    "loadingScene": "Carregant escena ..."
+    "loadingScene": "Carregant escena ...",
+    "align": "",
+    "alignTop": "",
+    "alignBottom": "",
+    "alignLeft": "",
+    "alignRight": "",
+    "centerVertically": "",
+    "centerHorizontally": ""
   },
   "buttons": {
     "clearReset": "Netejar el llenç",
@@ -149,6 +156,11 @@
     "lineEditor_info": "Fes doble clic o premi Enter per editar punts",
     "lineEditor_pointSelected": "Premi Suprimir per eliminar el punt, CtrlOrCmd+D per duplicar-lo, o arrosega'l per moure'l",
     "lineEditor_nothingSelected": "Selecciona un punt per moure o eliminar, o manté premut Alt i fes clic per afegir punts nous"
+  },
+  "canvasError": {
+    "cannotShowPreview": "",
+    "canvasTooBig": "",
+    "canvasTooBigTip": ""
   },
   "errorSplash": {
     "headingMain_pre": "S'ha produït un error. Intentar ",

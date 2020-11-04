@@ -74,7 +74,14 @@
     "addToLibrary": "Legg til i bibliotek",
     "removeFromLibrary": "Fjern fra bibliotek",
     "libraryLoadingMessage": "Laster bibliotek...",
-    "loadingScene": "Laster inn scene..."
+    "loadingScene": "Laster inn scene...",
+    "align": "Juster",
+    "alignTop": "Juster øverst",
+    "alignBottom": "Juster nederst",
+    "alignLeft": "Juster venstre",
+    "alignRight": "Juster høyre",
+    "centerVertically": "Midtstill vertikalt",
+    "centerHorizontally": "Midtstill horisontalt"
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
@@ -149,6 +156,11 @@
     "lineEditor_info": "Dobbeltklikk eller trykk Enter for å redigere punkter",
     "lineEditor_pointSelected": "Trykk på Slett for å fjerne punktet, Ctrl / Cmd+D for å duplisere, eller dra for å flytte",
     "lineEditor_nothingSelected": "Velg et punkt å flytte eller fjerne, eller hold Alt og klikk for å legge til nye punkter"
+  },
+  "canvasError": {
+    "cannotShowPreview": "Kan ikke vise forhåndsvisning",
+    "canvasTooBig": "Lerretet kan være for stort.",
+    "canvasTooBigTip": "Tips: Prøv å flytte de ytterste elementene litt tettere sammen."
   },
   "errorSplash": {
     "headingMain_pre": "En feil oppsto. Prøv ",

@@ -5,6 +5,7 @@
 .now
 .vscode
 *.log
+*.tgz
 build
 dist/
 firebase/
