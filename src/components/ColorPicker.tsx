@@ -260,11 +260,7 @@ export const ColorPicker = ({
         <button
           className="color-picker-label-swatch"
           aria-label={label}
-          style={
-            color
-              ? ({ "--swatch-color": color } as React.CSSProperties)
-              : undefined
-          }
+          style={color ? { "--swatch-color": color } : undefined}
           onClick={() => setActive(!isActive)}
           ref={pickerButton}
         />

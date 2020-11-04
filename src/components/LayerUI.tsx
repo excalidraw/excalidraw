@@ -114,7 +114,12 @@ const LibraryMenuItems = ({
   let addedPendingElements = false;
 
   rows.push(
-    <Stack.Row align="center" gap={1} key={"actions"}>
+    <Stack.Row
+      align="center"
+      gap={1}
+      key={"actions"}
+      style={{ padding: "2px 0" }}
+    >
       <ToolButton
         key="import"
         type="button"
