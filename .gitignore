@@ -1,9 +1,12 @@
-*.log
 .DS_Store
 .envrc
+.eslintcache
+.idea
 .now
 .vscode
+*.log
 build
+dist/
 firebase/
 logs
 node_modules
@@ -12,6 +15,3 @@ static
 yarn-debug.log*
 yarn-error.log*
 yarn.lock
-.idea
-dist/
-.eslintcache
