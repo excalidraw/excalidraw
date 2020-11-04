@@ -36,7 +36,7 @@ const DASHARRAY_DOTTED = [3, 6];
 export interface ExcalidrawElementWithCanvas {
   element: ExcalidrawElement | ExcalidrawTextElement;
   canvas: HTMLCanvasElement;
-  canvasZoom: Zoom;
+  canvasZoom: Zoom["value"];
   canvasOffsetX: number;
   canvasOffsetY: number;
 }
@@ -90,7 +90,13 @@ const generateElementCanvas = (
     1 / (window.devicePixelRatio * zoom.value),
     1 / (window.devicePixelRatio * zoom.value),
   );
-  return { element, canvas, canvasZoom: zoom, canvasOffsetX, canvasOffsetY };
+  return {
+    element,
+    canvas,
+    canvasZoom: zoom.value,
+    canvasOffsetX,
+    canvasOffsetY,
+  };
 };
 
 const drawElementOnCanvas = (
@@ -366,7 +372,7 @@ const generateElementWithCanvas = (
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
   const shouldRegenerateBecauseZoom =
     prevElementWithCanvas &&
-    prevElementWithCanvas.canvasZoom !== zoom &&
+    prevElementWithCanvas.canvasZoom !== zoom.value &&
     !sceneState?.shouldCacheIgnoreZoom;
   if (!prevElementWithCanvas || shouldRegenerateBecauseZoom) {
     const elementWithCanvas = generateElementCanvas(element, zoom);
@@ -392,11 +398,11 @@ const drawElementFromCanvas = (
   context.drawImage(
     elementWithCanvas.canvas!,
     (-(x2 - x1) / 2) * window.devicePixelRatio -
-      CANVAS_PADDING / elementWithCanvas.canvasZoom.value,
+      CANVAS_PADDING / elementWithCanvas.canvasZoom,
     (-(y2 - y1) / 2) * window.devicePixelRatio -
-      CANVAS_PADDING / elementWithCanvas.canvasZoom.value,
-    elementWithCanvas.canvas!.width / elementWithCanvas.canvasZoom.value,
-    elementWithCanvas.canvas!.height / elementWithCanvas.canvasZoom.value,
+      CANVAS_PADDING / elementWithCanvas.canvasZoom,
+    elementWithCanvas.canvas!.width / elementWithCanvas.canvasZoom,
+    elementWithCanvas.canvas!.height / elementWithCanvas.canvasZoom,
   );
   context.rotate(-element.angle);
   context.translate(-cx, -cy);
