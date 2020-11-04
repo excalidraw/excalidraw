@@ -681,3 +681,39 @@ export const EdgeRoundIcon = React.memo(
       { width: 40, height: 20 },
     ),
 );
+
+// Source: https://github.com/FortAwesome/Font-Awesome/blob/master/svgs/solid/align-left.svg
+export const TextAlignLeft = React.memo(
+  ({ appearance }: { appearance: "light" | "dark" }) =>
+    createIcon(
+      <path
+        d="M12.83 352h262.34A12.82 12.82 0 00288 339.17v-38.34A12.82 12.82 0 00275.17 288H12.83A12.82 12.82 0 000 300.83v38.34A12.82 12.82 0 0012.83 352zm0-256h262.34A12.82 12.82 0 00288 83.17V44.83A12.82 12.82 0 00275.17 32H12.83A12.82 12.82 0 000 44.83v38.34A12.82 12.82 0 0012.83 96zM432 160H16a16 16 0 00-16 16v32a16 16 0 0016 16h416a16 16 0 0016-16v-32a16 16 0 00-16-16zm0 256H16a16 16 0 00-16 16v32a16 16 0 0016 16h416a16 16 0 0016-16v-32a16 16 0 00-16-16z"
+        fill={iconFillColor(appearance)}
+      />,
+      { width: 448, height: 512 },
+    ),
+);
+
+// Source: https://github.com/FortAwesome/Font-Awesome/blob/master/svgs/solid/align-center.svg
+export const TextAlignCenter = React.memo(
+  ({ appearance }: { appearance: "light" | "dark" }) =>
+    createIcon(
+      <path
+        d="M432 160H16a16 16 0 00-16 16v32a16 16 0 0016 16h416a16 16 0 0016-16v-32a16 16 0 00-16-16zm0 256H16a16 16 0 00-16 16v32a16 16 0 0016 16h416a16 16 0 0016-16v-32a16 16 0 00-16-16zM108.1 96h231.81A12.09 12.09 0 00352 83.9V44.09A12.09 12.09 0 00339.91 32H108.1A12.09 12.09 0 0096 44.09V83.9A12.1 12.1 0 00108.1 96zm231.81 256A12.09 12.09 0 00352 339.9v-39.81A12.09 12.09 0 00339.91 288H108.1A12.09 12.09 0 0096 300.09v39.81a12.1 12.1 0 0012.1 12.1z"
+        fill={iconFillColor(appearance)}
+      />,
+      { width: 448, height: 512 },
+    ),
+);
+
+// Source: https://github.com/FortAwesome/Font-Awesome/blob/master/svgs/solid/align-right.svg
+export const TextAlignRight = React.memo(
+  ({ appearance }: { appearance: "light" | "dark" }) =>
+    createIcon(
+      <path
+        d="M16 224h416a16 16 0 0016-16v-32a16 16 0 00-16-16H16a16 16 0 00-16 16v32a16 16 0 0016 16zm416 192H16a16 16 0 00-16 16v32a16 16 0 0016 16h416a16 16 0 0016-16v-32a16 16 0 00-16-16zm3.17-384H172.83A12.82 12.82 0 00160 44.83v38.34A12.82 12.82 0 00172.83 96h262.34A12.82 12.82 0 00448 83.17V44.83A12.82 12.82 0 00435.17 32zm0 256H172.83A12.82 12.82 0 00160 300.83v38.34A12.82 12.82 0 00172.83 352h262.34A12.82 12.82 0 00448 339.17v-38.34A12.82 12.82 0 00435.17 288z"
+        fill={iconFillColor(appearance)}
+      />,
+      { width: 448, height: 512 },
+    ),
+);

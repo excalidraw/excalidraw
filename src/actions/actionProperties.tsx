@@ -39,6 +39,9 @@ import {
   SloppinessArchitectIcon,
   SloppinessArtistIcon,
   SloppinessCartoonistIcon,
+  TextAlignLeft,
+  TextAlignCenter,
+  TextAlignRight,
 } from "../components/icons";
 
 const changeProperty = (
@@ -513,12 +516,24 @@ export const actionChangeTextAlign = register({
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.textAlign")}</legend>
-      <ButtonSelect<TextAlign | false>
+      <ButtonIconSelect<TextAlign | false>
         group="text-align"
         options={[
-          { value: "left", text: t("labels.left") },
-          { value: "center", text: t("labels.center") },
-          { value: "right", text: t("labels.right") },
+          {
+            value: "left",
+            text: t("labels.left"),
+            icon: <TextAlignLeft appearance={appState.appearance} />,
+          },
+          {
+            value: "center",
+            text: t("labels.center"),
+            icon: <TextAlignCenter appearance={appState.appearance} />,
+          },
+          {
+            value: "right",
+            text: t("labels.right"),
+            icon: <TextAlignRight appearance={appState.appearance} />,
+          },
         ]}
         value={getFormValue(
           elements,
