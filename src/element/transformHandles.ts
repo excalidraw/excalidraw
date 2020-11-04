@@ -2,6 +2,7 @@ import { ExcalidrawElement, PointerType } from "./types";
 
 import { getElementAbsoluteCoords, Bounds } from "./bounds";
 import { rotate } from "../math";
+import { Zoom } from "../types";
 
 export type TransformHandleType =
   | "n"
@@ -76,25 +77,25 @@ const generateTransformHandle = (
 export const getTransformHandlesFromCoords = (
   [x1, y1, x2, y2]: Bounds,
   angle: number,
-  zoom: number,
+  zoom: Zoom,
   pointerType: PointerType = "mouse",
   omitSides: { [T in TransformHandleType]?: boolean } = {},
 ): TransformHandles => {
   const size = transformHandleSizes[pointerType];
-  const handleWidth = size / zoom;
-  const handleHeight = size / zoom;
+  const handleWidth = size / zoom.value;
+  const handleHeight = size / zoom.value;
 
-  const handleMarginX = size / zoom;
-  const handleMarginY = size / zoom;
+  const handleMarginX = size / zoom.value;
+  const handleMarginY = size / zoom.value;
 
   const width = x2 - x1;
   const height = y2 - y1;
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
 
-  const dashedLineMargin = 4 / zoom;
+  const dashedLineMargin = 4 / zoom.value;
 
-  const centeringOffset = (size - 8) / (2 * zoom);
+  const centeringOffset = (size - 8) / (2 * zoom.value);
 
   const transformHandles: TransformHandles = {
     nw: omitSides["nw"]
@@ -149,7 +150,7 @@ export const getTransformHandlesFromCoords = (
             dashedLineMargin -
             handleMarginY +
             centeringOffset -
-            ROTATION_RESIZE_HANDLE_GAP / zoom,
+            ROTATION_RESIZE_HANDLE_GAP / zoom.value,
           handleWidth,
           handleHeight,
           cx,
@@ -159,7 +160,7 @@ export const getTransformHandlesFromCoords = (
   };
 
   // We only want to show height handles (all cardinal directions)  above a certain size
-  const minimumSizeForEightHandles = (5 * size) / zoom;
+  const minimumSizeForEightHandles = (5 * size) / zoom.value;
   if (Math.abs(width) > minimumSizeForEightHandles) {
     if (!omitSides["n"]) {
       transformHandles["n"] = generateTransformHandle(
@@ -214,7 +215,7 @@ export const getTransformHandlesFromCoords = (
 
 export const getTransformHandles = (
   element: ExcalidrawElement,
-  zoom: number,
+  zoom: Zoom,
   pointerType: PointerType = "mouse",
 ): TransformHandles => {
   let omitSides: { [T in TransformHandleType]?: boolean } = {};

@@ -2,7 +2,7 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 import { RoughSVG } from "roughjs/bin/svg";
 import oc from "open-color";
 
-import { FlooredNumber, AppState } from "../types";
+import { AppState, Zoom } from "../types";
 import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -47,6 +47,7 @@ import {
   TransformHandles,
   TransformHandleType,
 } from "../element/transformHandles";
+import { viewportCoordsToSceneCoords } from "../utils";
 
 const strokeRectWithRotation = (
   context: CanvasRenderingContext2D,
@@ -147,7 +148,7 @@ const renderLinearPointHandles = (
   context.translate(sceneState.scrollX, sceneState.scrollY);
   const origStrokeStyle = context.strokeStyle;
   const lineWidth = context.lineWidth;
-  context.lineWidth = 1 / sceneState.zoom;
+  context.lineWidth = 1 / sceneState.zoom.value;
 
   LinearElementEditor.getPointsGlobalCoordinates(element).forEach(
     (point, idx) => {
@@ -162,7 +163,7 @@ const renderLinearPointHandles = (
         context,
         point[0],
         point[1],
-        POINT_HANDLE_SIZE / 2 / sceneState.zoom,
+        POINT_HANDLE_SIZE / 2 / sceneState.zoom.value,
       );
     },
   );
@@ -226,36 +227,36 @@ export const renderScene = (
   }
 
   // Apply zoom
-  const zoomTranslationX = (-normalizedCanvasWidth * (sceneState.zoom - 1)) / 2;
-  const zoomTranslationY =
-    (-normalizedCanvasHeight * (sceneState.zoom - 1)) / 2;
+  const zoomTranslationX = sceneState.zoom.translation.x;
+  const zoomTranslationY = sceneState.zoom.translation.y;
   context.translate(zoomTranslationX, zoomTranslationY);
-  context.scale(sceneState.zoom, sceneState.zoom);
+  context.scale(sceneState.zoom.value, sceneState.zoom.value);
 
   // Grid
   if (renderGrid && appState.gridSize) {
     strokeGrid(
       context,
       appState.gridSize,
-      -Math.ceil(zoomTranslationX / sceneState.zoom / appState.gridSize) *
+      -Math.ceil(zoomTranslationX / sceneState.zoom.value / appState.gridSize) *
         appState.gridSize +
         (sceneState.scrollX % appState.gridSize),
-      -Math.ceil(zoomTranslationY / sceneState.zoom / appState.gridSize) *
+      -Math.ceil(zoomTranslationY / sceneState.zoom.value / appState.gridSize) *
         appState.gridSize +
         (sceneState.scrollY % appState.gridSize),
-      normalizedCanvasWidth / sceneState.zoom,
-      normalizedCanvasHeight / sceneState.zoom,
+      normalizedCanvasWidth / sceneState.zoom.value,
+      normalizedCanvasHeight / sceneState.zoom.value,
     );
   }
 
   // Paint visible elements
   const visibleElements = elements.filter((element) =>
-    isVisibleElement(
-      element,
-      normalizedCanvasWidth,
-      normalizedCanvasHeight,
-      sceneState,
-    ),
+    isVisibleElement(element, normalizedCanvasWidth, normalizedCanvasHeight, {
+      zoom: sceneState.zoom,
+      offsetLeft: appState.offsetLeft,
+      offsetTop: appState.offsetTop,
+      scrollX: sceneState.scrollX,
+      scrollY: sceneState.scrollY,
+    }),
   );
 
   visibleElements.forEach((element) => {
@@ -378,13 +379,13 @@ export const renderScene = (
         locallySelectedElements[0].angle,
       );
     } else if (locallySelectedElements.length > 1 && !appState.isRotating) {
-      const dashedLinePadding = 4 / sceneState.zoom;
+      const dashedLinePadding = 4 / sceneState.zoom.value;
       context.fillStyle = oc.white;
       const [x1, y1, x2, y2] = getCommonBounds(locallySelectedElements);
       const initialLineDash = context.getLineDash();
-      context.setLineDash([2 / sceneState.zoom]);
+      context.setLineDash([2 / sceneState.zoom.value]);
       const lineWidth = context.lineWidth;
-      context.lineWidth = 1 / sceneState.zoom;
+      context.lineWidth = 1 / sceneState.zoom.value;
       strokeRectWithRotation(
         context,
         x1 - dashedLinePadding,
@@ -410,7 +411,7 @@ export const renderScene = (
   }
 
   // Reset zoom
-  context.scale(1 / sceneState.zoom, 1 / sceneState.zoom);
+  context.scale(1 / sceneState.zoom.value, 1 / sceneState.zoom.value);
   context.translate(-zoomTranslationX, -zoomTranslationY);
 
   // Paint remote pointers
@@ -556,7 +557,7 @@ const renderTransformHandles = (
     const transformHandle = transformHandles[key as TransformHandleType];
     if (transformHandle !== undefined) {
       const lineWidth = context.lineWidth;
-      context.lineWidth = 1 / sceneState.zoom;
+      context.lineWidth = 1 / sceneState.zoom.value;
       if (key === "rotation") {
         fillCircle(
           context,
@@ -610,11 +611,11 @@ const renderSelectionBorder = (
   const lineDashOffset = context.lineDashOffset;
   const strokeStyle = context.strokeStyle;
 
-  const dashedLinePadding = 4 / sceneState.zoom;
-  const dashWidth = 8 / sceneState.zoom;
-  const spaceWidth = 4 / sceneState.zoom;
+  const dashedLinePadding = 4 / sceneState.zoom.value;
+  const dashWidth = 8 / sceneState.zoom.value;
+  const spaceWidth = 4 / sceneState.zoom.value;
 
-  context.lineWidth = 1 / sceneState.zoom;
+  context.lineWidth = 1 / sceneState.zoom.value;
 
   context.translate(sceneState.scrollX, sceneState.scrollY);
 
@@ -749,32 +750,30 @@ const renderBindingHighlightForSuggestedPointBinding = (
 
 const isVisibleElement = (
   element: ExcalidrawElement,
-  viewportWidth: number,
-  viewportHeight: number,
-  {
-    scrollX,
-    scrollY,
-    zoom,
-  }: {
-    scrollX: FlooredNumber;
-    scrollY: FlooredNumber;
-    zoom: number;
+  canvasWidth: number,
+  canvasHeight: number,
+  viewTransformations: {
+    zoom: Zoom;
+    offsetLeft: number;
+    offsetTop: number;
+    scrollX: number;
+    scrollY: number;
   },
 ) => {
-  const [x1, y1, x2, y2] = getElementBounds(element);
-
-  // Apply zoom
-  const viewportWidthWithZoom = viewportWidth / zoom;
-  const viewportHeightWithZoom = viewportHeight / zoom;
-
-  const viewportWidthDiff = viewportWidth - viewportWidthWithZoom;
-  const viewportHeightDiff = viewportHeight - viewportHeightWithZoom;
-
+  const [x1, y1, x2, y2] = getElementBounds(element); // scene coordinates
+  const topLeftSceneCoords = viewportCoordsToSceneCoords(
+    { clientX: 0, clientY: 0 },
+    viewTransformations,
+  );
+  const bottomRightSceneCoords = viewportCoordsToSceneCoords(
+    { clientX: canvasWidth, clientY: canvasHeight },
+    viewTransformations,
+  );
   return (
-    x2 + scrollX - viewportWidthDiff / 2 >= 0 &&
-    x1 + scrollX - viewportWidthDiff / 2 <= viewportWidthWithZoom &&
-    y2 + scrollY - viewportHeightDiff / 2 >= 0 &&
-    y1 + scrollY - viewportHeightDiff / 2 <= viewportHeightWithZoom
+    topLeftSceneCoords.x <= x2 &&
+    topLeftSceneCoords.y <= y2 &&
+    bottomRightSceneCoords.x >= x1 &&
+    bottomRightSceneCoords.y >= y1
   );
 };
 

@@ -180,6 +180,7 @@ import {
   saveToFirebase,
   isSavedToFirebase,
 } from "../data/firebase";
+import { getNewZoom } from "../scene/zoom";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -935,8 +936,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           sceneY: user.pointer.y,
         },
         this.state,
-        this.canvas,
-        window.devicePixelRatio,
       );
       cursorButton[socketId] = user.button;
     });
@@ -1146,8 +1145,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const { x, y } = viewportCoordsToSceneCoords(
       { clientX, clientY },
       this.state,
-      this.canvas,
-      window.devicePixelRatio,
     );
 
     const dx = x - elementsCenterX;
@@ -1205,8 +1202,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const { x, y } = viewportCoordsToSceneCoords(
       { clientX: cursorX, clientY: cursorY },
       this.state,
-      this.canvas,
-      window.devicePixelRatio,
     );
 
     const element = newTextElement({
@@ -1719,15 +1714,19 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.setState({
       selectedElementIds: {},
     });
-    gesture.initialScale = this.state.zoom;
+    gesture.initialScale = this.state.zoom.value;
   });
 
   private onGestureChange = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
-
-    this.setState({
-      zoom: getNormalizedZoom(gesture.initialScale! * event.scale),
-    });
+    const gestureCenter = getCenter(gesture.pointers);
+    this.setState(({ zoom }) => ({
+      zoom: getNewZoom(
+        getNormalizedZoom(gesture.initialScale! * event.scale),
+        zoom,
+        gestureCenter,
+      ),
+    }));
   });
 
   private onGestureEnd = withBatchedUpdates((event: GestureEvent) => {
@@ -1771,8 +1770,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             sceneY: y,
           },
           this.state,
-          this.canvas,
-          window.devicePixelRatio,
         );
         return [viewportX, viewportY];
       },
@@ -1990,8 +1987,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
       event,
       this.state,
-      this.canvas,
-      window.devicePixelRatio,
     );
 
     const selectedGroupIds = getSelectedGroupIds(this.state);
@@ -2051,12 +2046,16 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       const distance = getDistance(Array.from(gesture.pointers.values()));
       const scaleFactor = distance / gesture.initialDistance!;
 
-      this.setState({
-        scrollX: normalizeScroll(this.state.scrollX + deltaX / this.state.zoom),
-        scrollY: normalizeScroll(this.state.scrollY + deltaY / this.state.zoom),
-        zoom: getNormalizedZoom(gesture.initialScale! * scaleFactor),
+      this.setState(({ zoom, scrollX, scrollY }) => ({
+        scrollX: normalizeScroll(scrollX + deltaX / zoom.value),
+        scrollY: normalizeScroll(scrollY + deltaY / zoom.value),
+        zoom: getNewZoom(
+          getNormalizedZoom(gesture.initialScale! * scaleFactor),
+          zoom,
+          center,
+        ),
         shouldCacheIgnoreZoom: true,
-      });
+      }));
       this.resetShouldCacheIgnoreZoomDebounced();
     } else {
       gesture.lastCenter = gesture.initialDistance = gesture.initialScale = null;
@@ -2079,12 +2078,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
     }
 
-    const scenePointer = viewportCoordsToSceneCoords(
-      event,
-      this.state,
-      this.canvas,
-      window.devicePixelRatio,
-    );
+    const scenePointer = viewportCoordsToSceneCoords(event, this.state);
     const { x: scenePointerX, y: scenePointerY } = scenePointer;
 
     if (
@@ -2453,8 +2447,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
 
       this.setState({
-        scrollX: normalizeScroll(this.state.scrollX - deltaX / this.state.zoom),
-        scrollY: normalizeScroll(this.state.scrollY - deltaY / this.state.zoom),
+        scrollX: normalizeScroll(
+          this.state.scrollX - deltaX / this.state.zoom.value,
+        ),
+        scrollY: normalizeScroll(
+          this.state.scrollY - deltaY / this.state.zoom.value,
+        ),
       });
     });
     const teardown = withBatchedUpdates(
@@ -2491,7 +2489,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     if (gesture.pointers.size === 2) {
       gesture.lastCenter = getCenter(gesture.pointers);
-      gesture.initialScale = this.state.zoom;
+      gesture.initialScale = this.state.zoom.value;
       gesture.initialDistance = getDistance(
         Array.from(gesture.pointers.values()),
       );
@@ -2501,12 +2499,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   private initialPointerDownState(
     event: React.PointerEvent<HTMLCanvasElement>,
   ): PointerDownState {
-    const origin = viewportCoordsToSceneCoords(
-      event,
-      this.state,
-      this.canvas,
-      window.devicePixelRatio,
-    );
+    const origin = viewportCoordsToSceneCoords(event, this.state);
     const selectedElements = getSelectedElements(
       this.scene.getElements(),
       this.state,
@@ -2790,7 +2783,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     // How many pixels off the shape boundary we still consider a hit
-    const threshold = 10 / this.state.zoom;
+    const threshold = 10 / this.state.zoom.value;
     const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
     return (
       point.x > x1 - threshold &&
@@ -2985,12 +2978,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         return;
       }
 
-      const pointerCoords = viewportCoordsToSceneCoords(
-        event,
-        this.state,
-        this.canvas,
-        window.devicePixelRatio,
-      );
+      const pointerCoords = viewportCoordsToSceneCoords(event, this.state);
       const [gridX, gridY] = getGridPoint(
         pointerCoords.x,
         pointerCoords.y,
@@ -3212,7 +3200,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             mutateElement(draggingElement, {
               points: simplify(
                 [...(points as Point[]), [dx, dy]],
-                0.7 / this.state.zoom,
+                0.7 / this.state.zoom.value,
               ),
             });
           } else {
@@ -3300,7 +3288,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       const x = event.clientX;
       const dx = x - pointerDownState.lastCoords.x;
       this.setState({
-        scrollX: normalizeScroll(this.state.scrollX - dx / this.state.zoom),
+        scrollX: normalizeScroll(
+          this.state.scrollX - dx / this.state.zoom.value,
+        ),
       });
       pointerDownState.lastCoords.x = x;
       return true;
@@ -3310,7 +3300,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       const y = event.clientY;
       const dy = y - pointerDownState.lastCoords.y;
       this.setState({
-        scrollY: normalizeScroll(this.state.scrollY - dy / this.state.zoom),
+        scrollY: normalizeScroll(
+          this.state.scrollY - dy / this.state.zoom.value,
+        ),
       });
       pointerDownState.lastCoords.y = y;
       return true;
@@ -3387,8 +3379,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         const pointerCoords = viewportCoordsToSceneCoords(
           childEvent,
           this.state,
-          this.canvas,
-          window.devicePixelRatio,
         );
 
         if (
@@ -3808,8 +3798,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const { x, y } = viewportCoordsToSceneCoords(
       { clientX, clientY },
       this.state,
-      this.canvas,
-      window.devicePixelRatio,
     );
 
     const elements = this.scene.getElements();
@@ -3885,7 +3873,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     const { deltaX, deltaY } = event;
     const { selectedElementIds, previousSelectedElementIds } = this.state;
-
     // note that event.ctrlKey is necessary to handle pinch zooming
     if (event.metaKey || event.ctrlKey) {
       const sign = Math.sign(deltaY);
@@ -3903,8 +3890,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           });
         }, 1000);
       }
+
       this.setState(({ zoom }) => ({
-        zoom: getNormalizedZoom(zoom - delta / 100),
+        zoom: getNewZoom(getNormalizedZoom(zoom.value - delta / 100), zoom, {
+          x: cursorX,
+          y: cursorY,
+        }),
         selectedElementIds: {},
         previousSelectedElementIds:
           Object.keys(selectedElementIds).length !== 0
@@ -3920,14 +3911,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (event.shiftKey) {
       this.setState(({ zoom, scrollX }) => ({
         // on Mac, shift+wheel tends to result in deltaX
-        scrollX: normalizeScroll(scrollX - (deltaY || deltaX) / zoom),
+        scrollX: normalizeScroll(scrollX - (deltaY || deltaX) / zoom.value),
       }));
       return;
     }
 
     this.setState(({ zoom, scrollX, scrollY }) => ({
-      scrollX: normalizeScroll(scrollX - deltaX / zoom),
-      scrollY: normalizeScroll(scrollY - deltaY / zoom),
+      scrollX: normalizeScroll(scrollX - deltaX / zoom.value),
+      scrollY: normalizeScroll(scrollY - deltaY / zoom.value),
     }));
   });
 
@@ -3960,8 +3951,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
           { sceneX: elementCenterX, sceneY: elementCenterY },
           appState,
-          canvas,
-          scale,
         );
         return { viewportX, viewportY, elementCenterX, elementCenterY };
       }
@@ -3975,8 +3964,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const pointer = viewportCoordsToSceneCoords(
       { clientX: x, clientY: y },
       this.state,
-      this.canvas,
-      window.devicePixelRatio,
     );
 
     if (isNaN(pointer.x) || isNaN(pointer.y)) {
