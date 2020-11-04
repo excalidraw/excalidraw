@@ -12,7 +12,7 @@ import {
   TransformHandle,
   MaybeTransformHandleType,
 } from "./transformHandles";
-import { AppState } from "../types";
+import { AppState, Zoom } from "../types";
 
 const isInsideTransformHandle = (
   transformHandle: TransformHandle,
@@ -29,7 +29,7 @@ export const resizeTest = (
   appState: AppState,
   x: number,
   y: number,
-  zoom: number,
+  zoom: Zoom,
   pointerType: PointerType,
 ): MaybeTransformHandleType => {
   if (!appState.selectedElementIds[element.id]) {
@@ -70,7 +70,7 @@ export const getElementWithTransformHandleType = (
   appState: AppState,
   scenePointerX: number,
   scenePointerY: number,
-  zoom: number,
+  zoom: Zoom,
   pointerType: PointerType,
 ) => {
   return elements.reduce((result, element) => {
@@ -93,7 +93,7 @@ export const getTransformHandleTypeFromCoords = (
   [x1, y1, x2, y2]: readonly [number, number, number, number],
   scenePointerX: number,
   scenePointerY: number,
-  zoom: number,
+  zoom: Zoom,
   pointerType: PointerType,
 ): MaybeTransformHandleType => {
   const transformHandles = getTransformHandlesFromCoords(

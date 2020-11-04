@@ -9,6 +9,7 @@ import { normalizeScroll } from "./scroll";
 import { AppState } from "../types";
 import { t } from "../i18n";
 import { DEFAULT_FONT_FAMILY, DEFAULT_VERTICAL_ALIGN } from "../constants";
+import { getDefaultAppState } from "../appState";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 const WATERMARK_HEIGHT = 16;
@@ -60,7 +61,7 @@ export const exportToCanvas = (
       viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
       scrollX: normalizeScroll(-minX + exportPadding),
       scrollY: normalizeScroll(-minY + exportPadding),
-      zoom: 1,
+      zoom: getDefaultAppState().zoom,
       remotePointerViewportCoords: {},
       remoteSelectedElementIds: {},
       shouldCacheIgnoreZoom: false,

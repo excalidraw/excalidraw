@@ -384,7 +384,7 @@ export class LinearElementEditor {
     while (--idx > -1) {
       const point = pointHandles[idx];
       if (
-        distance2d(x, y, point[0], point[1]) * zoom <
+        distance2d(x, y, point[0], point[1]) * zoom.value <
         // +1px to account for outline stroke
         this.POINT_HANDLE_SIZE / 2 + 1
       ) {

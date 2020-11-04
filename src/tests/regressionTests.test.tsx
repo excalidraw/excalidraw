@@ -364,15 +364,15 @@ describe("regression tests", () => {
   });
 
   it("pinch-to-zoom works", () => {
-    expect(h.state.zoom).toBe(1);
+    expect(h.state.zoom.value).toBe(1);
     finger1.down(50, 50);
     finger2.down(60, 50);
     finger1.move(-10, 0);
-    expect(h.state.zoom).toBeGreaterThan(1);
-    const zoomed = h.state.zoom;
+    expect(h.state.zoom.value).toBeGreaterThan(1);
+    const zoomed = h.state.zoom.value;
     finger1.move(5, 0);
     finger2.move(-5, 0);
-    expect(h.state.zoom).toBeLessThan(zoomed);
+    expect(h.state.zoom.value).toBeLessThan(zoomed);
   });
 
   it("two-finger scroll works", () => {
@@ -500,13 +500,13 @@ describe("regression tests", () => {
   });
 
   it("zoom hotkeys", () => {
-    expect(h.state.zoom).toBe(1);
+    expect(h.state.zoom.value).toBe(1);
     fireEvent.keyDown(document, { code: "Equal", ctrlKey: true });
     fireEvent.keyUp(document, { code: "Equal", ctrlKey: true });
-    expect(h.state.zoom).toBeGreaterThan(1);
+    expect(h.state.zoom.value).toBeGreaterThan(1);
     fireEvent.keyDown(document, { code: "Minus", ctrlKey: true });
     fireEvent.keyUp(document, { code: "Minus", ctrlKey: true });
-    expect(h.state.zoom).toBe(1);
+    expect(h.state.zoom.value).toBe(1);
   });
 
   it("rerenders UI on language change", async () => {

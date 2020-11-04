@@ -1,5 +1,5 @@
 import oc from "open-color";
-import { AppState, FlooredNumber } from "./types";
+import { AppState, FlooredNumber, NormalizedZoomValue } from "./types";
 import { getDateTime } from "./utils";
 import { t } from "./i18n";
 import {
@@ -53,7 +53,10 @@ export const getDefaultAppState = (): Omit<
     isResizing: false,
     isRotating: false,
     selectionElement: null,
-    zoom: 1,
+    zoom: {
+      value: 1 as NormalizedZoomValue,
+      translation: { x: 0, y: 0 },
+    },
     openMenu: null,
     lastPointerDownWith: "mouse",
     selectedElementIds: {},

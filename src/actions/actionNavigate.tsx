@@ -3,7 +3,7 @@ import { Avatar } from "../components/Avatar";
 import { register } from "./register";
 import { getClientColors, getClientInitials } from "../clients";
 import { Collaborator } from "../types";
-import { normalizeScroll } from "../scene";
+import { centerScrollOn } from "../scene/scroll";
 
 export const actionGoToCollaborator = register({
   name: "goToCollaborator",
@@ -16,8 +16,14 @@ export const actionGoToCollaborator = register({
     return {
       appState: {
         ...appState,
-        scrollX: normalizeScroll(appState.width / 2 - point.x),
-        scrollY: normalizeScroll(appState.height / 2 - point.y),
+        ...centerScrollOn({
+          scenePoint: point,
+          viewportDimensions: {
+            width: appState.width,
+            height: appState.height,
+          },
+          zoom: appState.zoom,
+        }),
         // Close mobile menu
         openMenu: appState.openMenu === "canvas" ? null : appState.openMenu,
       },

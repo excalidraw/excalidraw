@@ -4,14 +4,16 @@ import { getDefaultAppState } from "../appState";
 import { trash, zoomIn, zoomOut, resetZoom } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
-import { getNormalizedZoom, normalizeScroll } from "../scene";
+import { getNormalizedZoom } from "../scene";
 import { KEYS } from "../keys";
 import { getShortcutKey } from "../utils";
 import useIsMobile from "../is-mobile";
 import { register } from "./register";
 import { newElementWith } from "../element/mutateElement";
-import { AppState, FlooredNumber } from "../types";
+import { AppState, NormalizedZoomValue } from "../types";
 import { getCommonBounds } from "../element";
+import { getNewZoom } from "../scene/zoom";
+import { centerScrollOn } from "../scene/scroll";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -84,7 +86,11 @@ export const actionZoomIn = register({
     return {
       appState: {
         ...appState,
-        zoom: getNormalizedZoom(appState.zoom + ZOOM_STEP),
+        zoom: getNewZoom(
+          getNormalizedZoom(appState.zoom.value + ZOOM_STEP),
+          appState.zoom,
+          { x: appState.width / 2, y: appState.height / 2 },
+        ),
       },
       commitToHistory: false,
     };
@@ -111,7 +117,11 @@ export const actionZoomOut = register({
     return {
       appState: {
         ...appState,
-        zoom: getNormalizedZoom(appState.zoom - ZOOM_STEP),
+        zoom: getNewZoom(
+          getNormalizedZoom(appState.zoom.value - ZOOM_STEP),
+          appState.zoom,
+          { x: appState.width / 2, y: appState.height / 2 },
+        ),
       },
       commitToHistory: false,
     };
@@ -138,7 +148,10 @@ export const actionResetZoom = register({
     return {
       appState: {
         ...appState,
-        zoom: 1,
+        zoom: getNewZoom(1 as NormalizedZoomValue, appState.zoom, {
+          x: appState.width / 2,
+          y: appState.height / 2,
+        }),
       },
       commitToHistory: false,
     };
@@ -159,40 +172,23 @@ export const actionResetZoom = register({
     (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
 });
 
-const calculateZoom = (
-  commonBounds: number[],
-  currentZoom: number,
-  {
-    scrollX,
-    scrollY,
-  }: {
-    scrollX: FlooredNumber;
-    scrollY: FlooredNumber;
-  },
-): number => {
-  const { innerWidth, innerHeight } = window;
-  const [x, y] = commonBounds;
-  const zoomX = -innerWidth / (2 * scrollX + 2 * x - innerWidth);
-  const zoomY = -innerHeight / (2 * scrollY + 2 * y - innerHeight);
-  const margin = 0.01;
-  let newZoom;
-
-  if (zoomX < zoomY) {
-    newZoom = zoomX - margin;
-  } else if (zoomY <= zoomX) {
-    newZoom = zoomY - margin;
-  } else {
-    newZoom = currentZoom;
-  }
-
-  if (newZoom <= 0.1) {
-    return 0.1;
-  }
-  if (newZoom >= 1) {
-    return 1;
-  }
-
-  return newZoom;
+const zoomValueToFitBoundsOnViewport = (
+  bounds: [number, number, number, number],
+  viewportDimensions: { width: number; height: number },
+) => {
+  const [x1, y1, x2, y2] = bounds;
+  const commonBoundsWidth = x2 - x1;
+  const zoomValueForWidth = viewportDimensions.width / commonBoundsWidth;
+  const commonBoundsHeight = y2 - y1;
+  const zoomValueForHeight = viewportDimensions.height / commonBoundsHeight;
+  const smallestZoomValue = Math.min(zoomValueForWidth, zoomValueForHeight);
+  const zoomAdjustedToSteps =
+    Math.floor(smallestZoomValue / ZOOM_STEP) * ZOOM_STEP;
+  const clampedZoomValueToFitElements = Math.min(
+    Math.max(zoomAdjustedToSteps, ZOOM_STEP),
+    1,
+  );
+  return clampedZoomValueToFitElements as NormalizedZoomValue;
 };
 
 export const actionZoomToFit = register({
@@ -200,22 +196,29 @@ export const actionZoomToFit = register({
   perform: (elements, appState) => {
     const nonDeletedElements = elements.filter((element) => !element.isDeleted);
     const commonBounds = getCommonBounds(nonDeletedElements);
+
+    const zoomValue = zoomValueToFitBoundsOnViewport(commonBounds, {
+      width: appState.width,
+      height: appState.height,
+    });
+    const newZoom = getNewZoom(zoomValue, appState.zoom);
+
     const [x1, y1, x2, y2] = commonBounds;
     const centerX = (x1 + x2) / 2;
     const centerY = (y1 + y2) / 2;
-    const scrollX = normalizeScroll(appState.width / 2 - centerX);
-    const scrollY = normalizeScroll(appState.height / 2 - centerY);
-    const zoom = calculateZoom(commonBounds, appState.zoom, {
-      scrollX,
-      scrollY,
-    });
 
     return {
       appState: {
         ...appState,
-        scrollX,
-        scrollY,
-        zoom,
+        ...centerScrollOn({
+          scenePoint: { x: centerX, y: centerY },
+          viewportDimensions: {
+            width: appState.width,
+            height: appState.height,
+          },
+          zoom: newZoom,
+        }),
+        zoom: newZoom,
       },
       commitToHistory: false,
     };

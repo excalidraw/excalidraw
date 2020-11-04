@@ -23,6 +23,10 @@ import {
 } from "../utils";
 import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
+import { Zoom } from "../types";
+import { getDefaultAppState } from "../appState";
+
+const defaultAppState = getDefaultAppState();
 
 const CANVAS_PADDING = 20;
 
@@ -32,14 +36,14 @@ const DASHARRAY_DOTTED = [3, 6];
 export interface ExcalidrawElementWithCanvas {
   element: ExcalidrawElement | ExcalidrawTextElement;
   canvas: HTMLCanvasElement;
-  canvasZoom: number;
+  canvasZoom: Zoom["value"];
   canvasOffsetX: number;
   canvasOffsetY: number;
 }
 
 const generateElementCanvas = (
   element: NonDeletedExcalidrawElement,
-  zoom: number,
+  zoom: Zoom,
 ): ExcalidrawElementWithCanvas => {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
@@ -50,9 +54,11 @@ const generateElementCanvas = (
   if (isLinearElement(element)) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
     canvas.width =
-      distance(x1, x2) * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
+      distance(x1, x2) * window.devicePixelRatio * zoom.value +
+      CANVAS_PADDING * 2;
     canvas.height =
-      distance(y1, y2) * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
+      distance(y1, y2) * window.devicePixelRatio * zoom.value +
+      CANVAS_PADDING * 2;
 
     canvasOffsetX =
       element.x > x1
@@ -62,25 +68,35 @@ const generateElementCanvas = (
       element.y > y1
         ? Math.floor(distance(element.y, y1)) * window.devicePixelRatio
         : 0;
-    context.translate(canvasOffsetX * zoom, canvasOffsetY * zoom);
+    context.translate(canvasOffsetX * zoom.value, canvasOffsetY * zoom.value);
   } else {
     canvas.width =
-      element.width * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
+      element.width * window.devicePixelRatio * zoom.value + CANVAS_PADDING * 2;
     canvas.height =
-      element.height * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
+      element.height * window.devicePixelRatio * zoom.value +
+      CANVAS_PADDING * 2;
   }
 
   context.translate(CANVAS_PADDING, CANVAS_PADDING);
-  context.scale(window.devicePixelRatio * zoom, window.devicePixelRatio * zoom);
+  context.scale(
+    window.devicePixelRatio * zoom.value,
+    window.devicePixelRatio * zoom.value,
+  );
 
   const rc = rough.canvas(canvas);
   drawElementOnCanvas(element, rc, context);
   context.translate(-CANVAS_PADDING, -CANVAS_PADDING);
   context.scale(
-    1 / (window.devicePixelRatio * zoom),
-    1 / (window.devicePixelRatio * zoom),
+    1 / (window.devicePixelRatio * zoom.value),
+    1 / (window.devicePixelRatio * zoom.value),
   );
-  return { element, canvas, canvasZoom: zoom, canvasOffsetX, canvasOffsetY };
+  return {
+    element,
+    canvas,
+    canvasZoom: zoom.value,
+    canvasOffsetX,
+    canvasOffsetY,
+  };
 };
 
 const drawElementOnCanvas = (
@@ -352,11 +368,11 @@ const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,
   sceneState?: SceneState,
 ) => {
-  const zoom = sceneState ? sceneState.zoom : 1;
+  const zoom: Zoom = sceneState ? sceneState.zoom : defaultAppState.zoom;
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
   const shouldRegenerateBecauseZoom =
     prevElementWithCanvas &&
-    prevElementWithCanvas.canvasZoom !== zoom &&
+    prevElementWithCanvas.canvasZoom !== zoom.value &&
     !sceneState?.shouldCacheIgnoreZoom;
   if (!prevElementWithCanvas || shouldRegenerateBecauseZoom) {
     const elementWithCanvas = generateElementCanvas(element, zoom);

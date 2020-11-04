@@ -26,9 +26,9 @@ const getTransform = (
   const degree = (180 * angle) / Math.PI;
   // offsets must be multiplied by 2 to account for the division by 2 of
   //  the whole expression afterwards
-  return `translate(${((width - offsetLeft * 2) * (zoom - 1)) / 2}px, ${
-    ((height - offsetTop * 2) * (zoom - 1)) / 2
-  }px) scale(${zoom}) rotate(${degree}deg)`;
+  return `translate(${((width - offsetLeft * 2) * (zoom.value - 1)) / 2}px, ${
+    ((height - offsetTop * 2) * (zoom.value - 1)) / 2
+  }px) scale(${zoom.value}) rotate(${degree}deg)`;
 };
 
 export const textWysiwyg = ({

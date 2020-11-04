@@ -1,6 +1,6 @@
 import { ExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element";
-import { FlooredNumber } from "../types";
+import { FlooredNumber, Zoom } from "../types";
 import { ScrollBars } from "./types";
 import { getGlobalCSSVariable } from "../utils";
 import { getLanguage } from "../i18n";
@@ -20,7 +20,7 @@ export const getScrollBars = (
   }: {
     scrollX: FlooredNumber;
     scrollY: FlooredNumber;
-    zoom: number;
+    zoom: Zoom;
   },
 ): ScrollBars => {
   // This is the bounding box of all the elements
@@ -32,8 +32,8 @@ export const getScrollBars = (
   ] = getCommonBounds(elements);
 
   // Apply zoom
-  const viewportWidthWithZoom = viewportWidth / zoom;
-  const viewportHeightWithZoom = viewportHeight / zoom;
+  const viewportWidthWithZoom = viewportWidth / zoom.value;
+  const viewportHeightWithZoom = viewportHeight / zoom.value;
 
   const viewportWidthDiff = viewportWidth - viewportWidthWithZoom;
   const viewportHeightDiff = viewportHeight - viewportHeightWithZoom;
