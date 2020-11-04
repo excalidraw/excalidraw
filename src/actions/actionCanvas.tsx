@@ -10,7 +10,7 @@ import { getShortcutKey } from "../utils";
 import useIsMobile from "../is-mobile";
 import { register } from "./register";
 import { newElementWith } from "../element/mutateElement";
-import { AppState } from "../types";
+import { AppState, NormalizedZoomValue } from "../types";
 import { getCommonBounds } from "../element";
 import { getNewZoom } from "../scene/zoom";
 import { centerScrollOn } from "../scene/scroll";
@@ -148,7 +148,7 @@ export const actionResetZoom = register({
     return {
       appState: {
         ...appState,
-        zoom: getNewZoom(1, appState.zoom, {
+        zoom: getNewZoom(1 as NormalizedZoomValue, appState.zoom, {
           x: appState.width / 2,
           y: appState.height / 2,
         }),
@@ -188,7 +188,7 @@ const zoomValueToFitBoundsOnViewport = (
     Math.max(zoomAdjustedToSteps, ZOOM_STEP),
     1,
   );
-  return clampedZoomValueToFitElements;
+  return clampedZoomValueToFitElements as NormalizedZoomValue;
 };
 
 export const actionZoomToFit = register({

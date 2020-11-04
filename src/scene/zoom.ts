@@ -1,7 +1,7 @@
-import { PointerCoords, Zoom } from "../types";
+import { NormalizedZoomValue, PointerCoords, Zoom } from "../types";
 
 export const getNewZoom = (
-  newZoomValue: number,
+  newZoomValue: NormalizedZoomValue,
   prevZoom: Zoom,
   zoomOnViewportPoint: PointerCoords = { x: 0, y: 0 },
 ): Zoom => {
@@ -20,8 +20,8 @@ export const getNewZoom = (
   };
 };
 
-export const getNormalizedZoom = (zoom: number): number => {
+export const normalizeZoomValue = (zoom: number): NormalizedZoomValue => {
   const normalizedZoom = parseFloat(zoom.toFixed(2));
   const clampedZoom = Math.max(0.1, Math.min(normalizedZoom, 2));
-  return clampedZoom;
+  return clampedZoom as NormalizedZoomValue;
 };
