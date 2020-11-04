@@ -1,26 +1,27 @@
-export const getZoomOrigin = (
-  canvas: HTMLCanvasElement | null,
-  scale: number,
-) => {
-  if (canvas === null) {
-    return { x: 0, y: 0 };
-  }
-  const context = canvas.getContext("2d");
-  if (context === null) {
-    return { x: 0, y: 0 };
-  }
+import { NormalizedZoomValue, PointerCoords, Zoom } from "../types";
 
-  const normalizedCanvasWidth = canvas.width / scale;
-  const normalizedCanvasHeight = canvas.height / scale;
-
+export const getNewZoom = (
+  newZoomValue: NormalizedZoomValue,
+  prevZoom: Zoom,
+  zoomOnViewportPoint: PointerCoords = { x: 0, y: 0 },
+): Zoom => {
   return {
-    x: normalizedCanvasWidth / 2,
-    y: normalizedCanvasHeight / 2,
+    value: newZoomValue,
+    translation: {
+      x:
+        zoomOnViewportPoint.x -
+        (zoomOnViewportPoint.x - prevZoom.translation.x) *
+          (newZoomValue / prevZoom.value),
+      y:
+        zoomOnViewportPoint.y -
+        (zoomOnViewportPoint.y - prevZoom.translation.y) *
+          (newZoomValue / prevZoom.value),
+    },
   };
 };
 
-export const getNormalizedZoom = (zoom: number): number => {
+export const normalizeZoomValue = (zoom: number): NormalizedZoomValue => {
   const normalizedZoom = parseFloat(zoom.toFixed(2));
   const clampedZoom = Math.max(0.1, Math.min(normalizedZoom, 2));
-  return clampedZoom;
+  return clampedZoom as NormalizedZoomValue;
 };
