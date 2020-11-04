@@ -30,7 +30,7 @@ import { exportToSvg, exportToBlob } from "@excalidraw/utils";
 To use it in a browser directly:
 
 ```html
-<script src="https://unpkg.com/@excalidraw/utils@0.1.0/dist/excalidraw.min.js"></script>
+<script src="https://unpkg.com/@excalidraw/utils@0.1.0/dist/excalidraw-utils.min.js"></script>
 <script>
   // ExcalidrawUtils is a global variable defined by excalidraw.min.js
   const { exportToSvg, exportToBlob } = ExcalidrawUtils;

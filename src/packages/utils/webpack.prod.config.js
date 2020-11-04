@@ -1,21 +1,23 @@
 const webpack = require("webpack");
 const path = require("path");
+const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
+  .BundleAnalyzerPlugin;
 
 module.exports = {
   mode: "production",
+  entry: { "excalidraw-utils.min": "./index.js" },
+  output: {
+    path: path.resolve(__dirname, "dist"),
+    filename: "[name].js",
+    library: "ExcalidrawUtils",
+    libraryTarget: "umd",
+  },
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
   },
   optimization: {
     runtimeChunk: false,
   },
-  output: {
-    path: path.resolve(__dirname, "dist"),
-    filename: "excalidraw-utils.min.js",
-    library: "ExcalidrawUtils",
-    libraryTarget: "umd",
-  },
-  entry: "./index.js",
   module: {
     rules: [
       {
@@ -36,5 +38,6 @@ module.exports = {
     new webpack.optimize.LimitChunkCountPlugin({
       maxChunks: 1,
     }),
+    ...(process.env.ANALYZER === "true" ? [new BundleAnalyzerPlugin()] : []),
   ],
 };
