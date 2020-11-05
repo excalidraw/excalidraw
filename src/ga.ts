@@ -85,60 +85,52 @@ export const toString = (nvector: NVector): string => {
 };
 
 // Reverse the order of the basis blades.
-export const reverse = (nvector: NVector): NVector => {
-  return [
-    nvector[0],
-    nvector[1],
-    nvector[2],
-    nvector[3],
-    -nvector[4],
-    -nvector[5],
-    -nvector[6],
-    -nvector[7],
-  ];
-};
+export const reverse = (nvector: NVector): NVector => [
+  nvector[0],
+  nvector[1],
+  nvector[2],
+  nvector[3],
+  -nvector[4],
+  -nvector[5],
+  -nvector[6],
+  -nvector[7],
+];
 
 // Poincare duality operator.
-export const dual = (nvector: NVector): NVector => {
-  return [
-    nvector[7],
-    nvector[6],
-    nvector[5],
-    nvector[4],
-    nvector[3],
-    nvector[2],
-    nvector[1],
-    nvector[0],
-  ];
-};
+export const dual = (nvector: NVector): NVector => [
+  nvector[7],
+  nvector[6],
+  nvector[5],
+  nvector[4],
+  nvector[3],
+  nvector[2],
+  nvector[1],
+  nvector[0],
+];
 
 // Clifford Conjugation
-export const conjugate = (nvector: NVector): NVector => {
-  return [
-    nvector[0],
-    -nvector[1],
-    -nvector[2],
-    -nvector[3],
-    -nvector[4],
-    -nvector[5],
-    -nvector[6],
-    nvector[7],
-  ];
-};
+export const conjugate = (nvector: NVector): NVector => [
+  nvector[0],
+  -nvector[1],
+  -nvector[2],
+  -nvector[3],
+  -nvector[4],
+  -nvector[5],
+  -nvector[6],
+  nvector[7],
+];
 
 // Main involution
-export const involute = (nvector: NVector): NVector => {
-  return [
-    nvector[0],
-    -nvector[1],
-    -nvector[2],
-    -nvector[3],
-    nvector[4],
-    nvector[5],
-    nvector[6],
-    -nvector[7],
-  ];
-};
+export const involute = (nvector: NVector): NVector => [
+  nvector[0],
+  -nvector[1],
+  -nvector[2],
+  -nvector[3],
+  nvector[4],
+  nvector[5],
+  nvector[6],
+  -nvector[7],
+];
 
 // Multivector addition
 export const add = (a: NVector, b: NVector | number): NVector => {
@@ -261,18 +253,15 @@ export const join = (a: NVector, b: NVector): NVector => [
   a[7] * b[7],
 ];
 
-export const joinScalar = (a: NVector, b: NVector): number => {
-  return (
-    a[0] * b[7] +
-    a[1] * b[6] +
-    a[2] * b[5] +
-    a[3] * b[4] +
-    a[4] * b[3] +
-    a[5] * b[2] +
-    a[6] * b[1] +
-    a[7] * b[0]
-  );
-};
+export const joinScalar = (a: NVector, b: NVector): number =>
+  a[0] * b[7] +
+  a[1] * b[6] +
+  a[2] * b[5] +
+  a[3] * b[4] +
+  a[4] * b[3] +
+  a[5] * b[2] +
+  a[6] * b[1] +
+  a[7] * b[0];
 
 // The inner product.
 export const dot = (a: NVector, b: NVector): NVector => [
