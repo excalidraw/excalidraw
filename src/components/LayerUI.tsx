@@ -62,10 +62,10 @@ interface LayerUIProps {
   lng: string;
 }
 
-function useOnClickOutside(
+const useOnClickOutside = (
   ref: RefObject<HTMLElement>,
   cb: (event: MouseEvent) => void,
-) {
+) => {
   useEffect(() => {
     const listener = (event: MouseEvent) => {
       if (!ref.current) {
@@ -88,7 +88,7 @@ function useOnClickOutside(
       document.removeEventListener("pointerdown", listener);
     };
   }, [ref, cb]);
-}
+};
 
 const LibraryMenuItems = ({
   library,

@@ -46,7 +46,7 @@ export const textWysiwyg = ({
   getViewportCoords: (x: number, y: number) => [number, number];
   element: ExcalidrawElement;
 }) => {
-  function updateWysiwygStyle() {
+  const updateWysiwygStyle = () => {
     const updatedElement = Scene.getScene(element)?.getElement(id);
     if (updatedElement && isTextElement(updatedElement)) {
       const [viewportX, viewportY] = getViewportCoords(
@@ -80,7 +80,7 @@ export const textWysiwyg = ({
         filter: "var(--appearance-filter)",
       });
     }
-  }
+  };
 
   const editable = document.createElement("textarea");
 
