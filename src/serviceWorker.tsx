@@ -75,10 +75,9 @@ const registerValidSW = (swUrl: string, config?: Config) => {
               // but the previous service worker will still serve the older
               // content until all client tabs are closed.
 
-              // console.log(
-              //   "New content is available and will be used when all " +
-              //     "tabs for this page are closed.",
-              // );
+              console.info(
+                "New content is available and will be used when all tabs for this page are closed.",
+              );
 
               // Execute callback
               if (config && config.onUpdate) {
@@ -89,7 +88,7 @@ const registerValidSW = (swUrl: string, config?: Config) => {
               // It's the perfect time to display a
               // "Content is cached for offline use." message.
 
-              // console.log("Content is cached for offline use.");
+              console.info("Content is cached for offline use.");
 
               // Execute callback
               if (config && config.onSuccess) {
@@ -128,10 +127,11 @@ const checkValidServiceWorker = (swUrl: string, config?: Config) => {
         registerValidSW(swUrl, config);
       }
     })
-    .catch(() => {
-      // console.log(
-      //   "No internet connection found. App is running in offline mode.",
-      // );
+    .catch((error) => {
+      console.info(
+        "No internet connection found. App is running in offline mode.",
+        error.message,
+      );
     });
 };
 
