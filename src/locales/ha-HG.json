@@ -202,11 +202,11 @@
     "github": "",
     "textNewLine": "Newara sabon layi (rubutu)",
     "textFinish": "",
-    "zoomToFit": "",
+    "zoomToFit": "Zuƙowa don dacewa da dukkan abubuwa",
     "preventBinding": ""
   },
   "encrypted": {
-    "tooltip": ""
+    "tooltip": "Zane-zanenku ɓoye ne daga ƙarshe zuwa ƙarshe don haka sabobin Excalidraw ba za su taɓa ganin su ba."
   },
   "charts": {
     "noNumericColumn": "",
