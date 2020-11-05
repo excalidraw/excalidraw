@@ -2160,19 +2160,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         mutateElement(multiElement, {
           points: points.slice(0, -1),
         });
-      } else if (isPathALoop(points)) {
-        // cursor moved inside commit zone, and there's uncommitted point,
-        // thus remove it
-        if (
-          points.length > 2 &&
-          lastCommittedPoint &&
-          distance2d(
-            scenePointerX - rx,
-            scenePointerY - ry,
-            lastCommittedPoint[0],
-            lastCommittedPoint[1],
-          ) < LINE_CONFIRM_THRESHOLD
-        ) {
+      } else {
+        if (isPathALoop(points)) {
           document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
         }
         // update last uncommitted point
@@ -2183,6 +2172,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           ],
         });
       }
+
       return;
     }
 
