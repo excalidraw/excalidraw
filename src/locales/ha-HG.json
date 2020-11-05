@@ -64,7 +64,7 @@
     "createRoom": "",
     "duplicateSelection": "",
     "untitled": "",
-    "name": "",
+    "name": "Suna",
     "yourName": "Sunanku",
     "madeWithExcalidraw": "",
     "group": "",
@@ -131,13 +131,13 @@
   },
   "toolBar": {
     "selection": "",
-    "draw": "",
+    "draw": "Zane kyauta",
     "rectangle": "",
     "diamond": "",
     "ellipse": "",
     "arrow": "",
     "line": "",
-    "text": "",
+    "text": "Rubutu",
     "library": "",
     "lock": ""
   },
@@ -159,7 +159,7 @@
   },
   "canvasError": {
     "cannotShowPreview": "",
-    "canvasTooBig": "",
+    "canvasTooBig": "Zane ɗin na iya zama babba.",
     "canvasTooBigTip": ""
   },
   "errorSplash": {
@@ -173,7 +173,7 @@
     "openIssueMessage_pre": "",
     "openIssueMessage_button": "",
     "openIssueMessage_post": "",
-    "sceneContent": ""
+    "sceneContent": "Abinda ke ciki:"
   },
   "roomDialog": {
     "desc_intro": "",
@@ -190,7 +190,7 @@
   "shortcutsDialog": {
     "title": "",
     "shapes": "Siffofi",
-    "or": "",
+    "or": "ko",
     "click": "danna",
     "drag": "",
     "curvedArrow": "",
@@ -200,7 +200,7 @@
     "blog": "Karanta shafinmu",
     "howto": "",
     "github": "",
-    "textNewLine": "",
+    "textNewLine": "Newara sabon layi (rubutu)",
     "textFinish": "",
     "zoomToFit": "",
     "preventBinding": ""
