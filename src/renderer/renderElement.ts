@@ -126,7 +126,7 @@ const drawElementOnCanvas = (
         const shouldTemporarilyAttach = rtl && !context.canvas.isConnected;
         if (shouldTemporarilyAttach) {
           // to correctly render RTL text mixed with LTR, we have to append it
-          //  to the DOM
+          // to the DOM
           document.body.appendChild(context.canvas);
         }
         context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
@@ -194,17 +194,17 @@ export const generateRoughOptions = (element: ExcalidrawElement): Options => {
         ? DASHARRAY_DOTTED
         : undefined,
     // for non-solid strokes, disable multiStroke because it tends to make
-    //  dashes/dots overlay each other
+    // dashes/dots overlay each other
     disableMultiStroke: element.strokeStyle !== "solid",
     // for non-solid strokes, increase the width a bit to make it visually
-    //  similar to solid strokes, because we're also disabling multiStroke
+    // similar to solid strokes, because we're also disabling multiStroke
     strokeWidth:
       element.strokeStyle !== "solid"
         ? element.strokeWidth + 0.5
         : element.strokeWidth,
     // when increasing strokeWidth, we must explicitly set fillWeight and
-    //  hachureGap because if not specified, roughjs uses strokeWidth to
-    //  calculate them (and we don't want the fills to be modified)
+    // hachureGap because if not specified, roughjs uses strokeWidth to
+    // calculate them (and we don't want the fills to be modified)
     fillWeight: element.strokeWidth / 2,
     hachureGap: element.strokeWidth * 4,
     roughness: element.roughness,

@@ -227,7 +227,7 @@ export class LinearElementEditor {
     );
 
     // if we clicked on a point, set the element as hitElement otherwise
-    //  it would get deselected if the point is outside the hitbox area
+    // it would get deselected if the point is outside the hitbox area
     if (clickedPointIndex > -1) {
       ret.hitElement = element;
     } else {
@@ -379,8 +379,8 @@ export class LinearElementEditor {
     const pointHandles = this.getPointsGlobalCoordinates(element);
     let idx = pointHandles.length;
     // loop from right to left because points on the right are rendered over
-    //  points on the left, thus should take precedence when clicking, if they
-    //  overlap
+    // points on the left, thus should take precedence when clicking, if they
+    // overlap
     while (--idx > -1) {
       const point = pointHandles[idx];
       if (
@@ -458,10 +458,10 @@ export class LinearElementEditor {
     const { points } = element;
 
     // in case we're moving start point, instead of modifying its position
-    //  which would break the invariant of it being at [0,0], we move
-    //  all the other points in the opposite direction by delta to
-    //  offset it. We do the same with actual element.x/y position, so
-    //  this hacks are completely transparent to the user.
+    // which would break the invariant of it being at [0,0], we move
+    // all the other points in the opposite direction by delta to
+    // offset it. We do the same with actual element.x/y position, so
+    // this hacks are completely transparent to the user.
     let offsetX = 0;
     let offsetY = 0;
 
@@ -475,7 +475,7 @@ export class LinearElementEditor {
       nextPoints.splice(pointIndex, 1);
       if (pointIndex === 0) {
         // if deleting first point, make the next to be [0,0] and recalculate
-        //  positions of the rest with respect to it
+        // positions of the rest with respect to it
         offsetX = nextPoints[0][0];
         offsetY = nextPoints[0][1];
         nextPoints = nextPoints.map((point, idx) => {

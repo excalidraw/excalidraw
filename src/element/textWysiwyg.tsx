@@ -25,7 +25,7 @@ const getTransform = (
   const { zoom, offsetTop, offsetLeft } = appState;
   const degree = (180 * angle) / Math.PI;
   // offsets must be multiplied by 2 to account for the division by 2 of
-  //  the whole expression afterwards
+  // the whole expression afterwards
   return `translate(${((width - offsetLeft * 2) * (zoom.value - 1)) / 2}px, ${
     ((height - offsetTop * 2) * (zoom.value - 1)) / 2
   }px) scale(${zoom.value}) rotate(${degree}deg)`;
@@ -166,7 +166,7 @@ export const textWysiwyg = ({
   const rebindBlur = () => {
     window.removeEventListener("pointerup", rebindBlur);
     // deferred to guard against focus traps on various UIs that steal focus
-    //  upon pointerUp
+    // upon pointerUp
     setTimeout(() => {
       editable.onblur = handleSubmit;
       // case: clicking on the same property → no change → no update → no focus
@@ -184,7 +184,7 @@ export const textWysiwyg = ({
       editable.onblur = null;
       window.addEventListener("pointerup", rebindBlur);
       // handle edge-case where pointerup doesn't fire e.g. due to user
-      //  alt-tabbing away
+      // alt-tabbing away
       window.addEventListener("blur", handleSubmit);
     }
   };
@@ -199,7 +199,7 @@ export const textWysiwyg = ({
 
   editable.onblur = handleSubmit;
   // reposition wysiwyg in case of window resize. Happens on mobile when
-  //  device keyboard is opened.
+  // device keyboard is opened.
   window.addEventListener("resize", updateWysiwygStyle);
   window.addEventListener("pointerdown", onPointerDown);
   window.addEventListener("wheel", stopEvent, {

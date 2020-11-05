@@ -62,7 +62,7 @@ const getTargetIndex = (
       return false;
     }
     // if we're editing group, find closest sibling irrespective of whether
-    //  there's a different-group element between them (for legacy reasons)
+    // there's a different-group element between them (for legacy reasons)
     if (appState.editingGroupId) {
       return element.groupIds.includes(appState.editingGroupId);
     }
@@ -106,7 +106,7 @@ const getTargetIndex = (
 
   if (elementsInSiblingGroup.length) {
     // assumes getElementsInGroup() returned elements are sorted
-    //  by zIndex (ascending)
+    // by zIndex (ascending)
     return direction === "left"
       ? elements.indexOf(elementsInSiblingGroup[0])
       : elements.indexOf(

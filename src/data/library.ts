@@ -31,7 +31,7 @@ export class Library {
         }
 
         // detect z-index difference by checking the excalidraw elements
-        //  are in order
+        // are in order
         return libraryItem.every((libItemExcalidrawItem, idx) => {
           return (
             libItemExcalidrawItem.id === targetLibraryItem[idx].id &&
@@ -69,8 +69,8 @@ export class Library {
         Library.libraryCache = JSON.parse(JSON.stringify(items));
 
         resolve(items);
-      } catch (e) {
-        console.error(e);
+      } catch (error) {
+        console.error(error);
         resolve([]);
       }
     });
@@ -81,12 +81,12 @@ export class Library {
     try {
       const serializedItems = JSON.stringify(items);
       // cache optimistically so that consumers have access to the latest
-      //  immediately
+      // immediately
       Library.libraryCache = JSON.parse(serializedItems);
       localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY, serializedItems);
-    } catch (e) {
+    } catch (error) {
       Library.libraryCache = prevLibraryItems;
-      console.error(e);
+      console.error(error);
     }
   };
 }

@@ -167,8 +167,7 @@ class Portal {
     const newElements = sceneElements
       .reduce((elements, element) => {
         // if the remote element references one that's currently
-        //  edited on local, skip it (it'll be added in the next
-        //  step)
+        // edited on local, skip it (it'll be added in the next step)
         if (
           element.id === this.app.state.editingElement?.id ||
           element.id === this.app.state.resizingElement?.id ||

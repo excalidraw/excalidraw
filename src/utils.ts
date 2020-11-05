@@ -94,7 +94,7 @@ export const measureText = (text: string, font: FontString) => {
   line.innerText = text
     .split("\n")
     // replace empty lines with single space because leading/trailing empty
-    //  lines would be stripped from computation
+    // lines would be stripped from computation
     .map((x) => x || " ")
     .join("\n");
   const width = line.offsetWidth;
