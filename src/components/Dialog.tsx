@@ -39,7 +39,6 @@ export const Dialog = (props: {
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      event.stopImmediatePropagation();
       if (event.key === KEYS.TAB) {
         const focusableElements = queryFocusableElements(node);
         const { activeElement } = document;
