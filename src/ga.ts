@@ -22,22 +22,25 @@ export type Direction = NVector;
 export type Line = NVector;
 export type Transform = NVector;
 
-export const point = (x: number, y: number): Point => {
-  return [0, 0, 0, 0, y, x, 1, 0];
-};
+export const point = (x: number, y: number): Point => [0, 0, 0, 0, y, x, 1, 0];
 
-export const origin = (): Point => {
-  return [0, 0, 0, 0, 0, 0, 1, 0];
-};
+export const origin = (): Point => [0, 0, 0, 0, 0, 0, 1, 0];
 
 export const direction = (x: number, y: number): Direction => {
   const norm = Math.hypot(x, y); // same as `inorm(direction(x, y))`
   return [0, 0, 0, 0, y / norm, x / norm, 0, 0];
 };
 
-export const offset = (x: number, y: number): Direction => {
-  return [0, 0, 0, 0, y, x, 0, 0];
-};
+export const offset = (x: number, y: number): Direction => [
+  0,
+  0,
+  0,
+  0,
+  y,
+  x,
+  0,
+  0,
+];
 
 /// This is the "implementation" part of the library
 
