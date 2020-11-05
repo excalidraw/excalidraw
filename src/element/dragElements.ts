@@ -20,7 +20,8 @@ export const dragSelectedElements = (
   const [x1, y1] = getCommonBounds(selectedElements);
   const offset = { x: pointerX - x1, y: pointerY - y1 };
   selectedElements.forEach((element) => {
-    let x, y;
+    let x;
+    let y;
     if (lockDirection) {
       const lockX = lockDirection && distanceX < distanceY;
       const lockY = lockDirection && distanceX > distanceY;

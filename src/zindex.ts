@@ -187,7 +187,8 @@ const shiftElementsToEnd = (
   const targetElements: ExcalidrawElement[] = [];
   const displacedElements: ExcalidrawElement[] = [];
 
-  let leadingIndex, trailingIndex;
+  let leadingIndex;
+  let trailingIndex;
   if (direction === "left") {
     if (appState.editingGroupId) {
       const groupElements = getElementsInGroup(

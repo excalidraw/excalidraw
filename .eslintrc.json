@@ -1,31 +1,38 @@
 {
-  "extends": ["prettier", "react-app", "react-app/jest"],
+  "extends": ["prettier", "react-app"],
   "plugins": ["prettier"],
   "rules": {
+    "curly": "error",
+    "dot-notation": "error",
     "import/no-anonymous-default-export": "off",
-    "curly": "warn",
     "no-console": [
-      "warn",
+      "error",
       {
         "allow": ["warn", "error", "info"]
       }
     ],
-    "no-else-return": "warn",
-    "no-useless-return": "warn",
+    "no-else-return": "error",
+    "no-lonely-if": "error",
+    "no-restricted-syntax": [
+      "error",
+      {
+        "message": "Use 't(...)' instead of literal text in JSX",
+        "selector": "JSXText[value=/\\w/]"
+      }
+    ],
+    "no-unneeded-ternary": "error",
+    "no-unused-expressions": "error",
+    "no-unused-vars": "error",
+    "no-useless-return": "error",
+    "one-var": ["error", "never"],
+    "prefer-arrow-callback": "error",
     "prefer-const": [
-      "warn",
+      "error",
       {
         "destructuring": "all"
       }
     ],
-    "prefer-template": "warn",
-    "prettier/prettier": "warn",
-    "no-restricted-syntax": [
-      "warn",
-      {
-        "selector": "JSXText[value=/\\w/]",
-        "message": "Use 't(...)' instead of literal text in JSX"
-      }
-    ]
+    "prefer-template": "error",
+    "prettier/prettier": "error"
   }
 }
