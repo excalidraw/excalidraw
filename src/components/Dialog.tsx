@@ -24,14 +24,14 @@ export const Dialog = (props: {
   onCloseRequest(): void;
   title: React.ReactNode;
 }) => {
-  const [node, setNode] = useRefState<HTMLDivElement>();
+  const [islandNode, setIslandNode] = useRefState<HTMLDivElement>();
 
   useEffect(() => {
-    if (!node) {
+    if (!islandNode) {
       return;
     }
 
-    const focusableElements = queryFocusableElements(node);
+    const focusableElements = queryFocusableElements(islandNode);
 
     if (focusableElements.length > 0) {
       // If there's an element other than close, focus it.
@@ -40,7 +40,7 @@ export const Dialog = (props: {
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === KEYS.TAB) {
-        const focusableElements = queryFocusableElements(node);
+        const focusableElements = queryFocusableElements(islandNode);
         const { activeElement } = document;
         const currentIndex = focusableElements.findIndex(
           (element) => element === activeElement,
@@ -59,10 +59,10 @@ export const Dialog = (props: {
       }
     };
 
-    node.addEventListener("keydown", handleKeyDown);
+    islandNode.addEventListener("keydown", handleKeyDown);
 
-    return () => node.removeEventListener("keydown", handleKeyDown);
-  }, [node]);
+    return () => islandNode.removeEventListener("keydown", handleKeyDown);
+  }, [islandNode]);
 
   const queryFocusableElements = (node: HTMLElement) => {
     const focusableElements = node.querySelectorAll<HTMLElement>(
@@ -79,7 +79,7 @@ export const Dialog = (props: {
       maxWidth={props.maxWidth}
       onCloseRequest={props.onCloseRequest}
     >
-      <Island padding={4} ref={setNode}>
+      <Island padding={4} ref={setIslandNode}>
         <h2 id="dialog-title" className="Dialog__title">
           <span className="Dialog__titleContent">{props.title}</span>
           <button
