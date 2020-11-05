@@ -150,8 +150,8 @@ const getAdjustedDimensions = (
   } = measureText(nextText, getFontString(element));
   const { textAlign, verticalAlign } = element;
 
-  let x;
-  let y;
+  let x: number;
+  let y: number;
 
   if (textAlign === "center" && verticalAlign === "middle") {
     const prevMetrics = measureText(element.text, getFontString(element));
