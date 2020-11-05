@@ -540,7 +540,7 @@ export const actionChangeSharpness = register({
       appState,
     );
     const shouldUpdateForNonLinearElements = targetElements.length
-      ? targetElements.every((e) => !isLinearElement(e))
+      ? targetElements.every((el) => !isLinearElement(el))
       : !isLinearElementType(appState.elementType);
     const shouldUpdateForLinearElements = targetElements.length
       ? targetElements.every(isLinearElement)

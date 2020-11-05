@@ -523,7 +523,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           collabForceLoadFlag,
         );
         // if loading same room as the one previously unloaded within 15sec
-        //  force reload without prompting
+        // force reload without prompting
         if (previousRoom === roomID && Date.now() - timestamp < 15000) {
           return true;
         }
@@ -561,8 +561,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     history.clear();
   };
 
-  /** Completely resets scene & history.
-   * Do not use for clear scene user action. */
+  // Completely resets scene & history.
+  // Do not use for clear scene user action.
   private resetScene = withBatchedUpdates(() => {
     this.scene.replaceAllElements([]);
     this.setState({
@@ -654,7 +654,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     if (isCollaborationScene) {
       // when joining a room we don't want user's local scene data to be merged
-      //  into the remote scene
+      // into the remote scene
       this.resetScene();
 
       this.initializeSocketClient({ showLoadingState: true });
@@ -847,7 +847,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       !isSavedToFirebase(this.portal, syncableElements)
     ) {
       // this won't run in time if user decides to leave the site, but
-      //  the purpose is to run in immediately after user decides to stay
+      // the purpose is to run in immediately after user decides to stay
       this.saveCollabRoomToFirebase(syncableElements);
 
       event.preventDefault();
@@ -943,7 +943,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const { atLeastOneVisibleElement, scrollBars } = renderScene(
       elements.filter((element) => {
         // don't render text element that's being currently edited (it's
-        //  rendered on remote only)
+        // rendered on remote only)
         return (
           !this.state.editingElement ||
           this.state.editingElement.type !== "text" ||
@@ -1108,7 +1108,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       const elementUnderCursor = document.elementFromPoint(cursorX, cursorY);
       if (
         // if no ClipboardEvent supplied, assume we're pasting via contextMenu
-        //  thus these checks don't make sense
+        // thus these checks don't make sense
         event &&
         (!(elementUnderCursor instanceof HTMLCanvasElement) ||
           isWritableElement(target))
@@ -1380,7 +1380,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       const roomKey = roomMatch[2];
 
       // fallback in case you're not alone in the room but still don't receive
-      //  initial SCENE_UPDATE message
+      // initial SCENE_UPDATE message
       this.socketInitializationTimer = setTimeout(
         this.initializeSocket,
         INITIAL_SCENE_UPDATE_TIMEOUT,
@@ -1432,7 +1432,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
                 decryptedData.payload.socketID;
 
               // NOTE purposefully mutating collaborators map in case of
-              //  pointer updates so as not to trigger LayerUI rerender
+              // pointer updates so as not to trigger LayerUI rerender
               this.setState((state) => {
                 if (!state.collaborators.has(socketId)) {
                   state.collaborators.set(socketId, {});
@@ -1467,9 +1467,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         if (elements) {
           this.handleRemoteSceneUpdate(elements, { initFromSnapshot: true });
         }
-      } catch (e) {
+      } catch (error) {
         // log the error and move on. other peers will sync us the scene.
-        console.error(e);
+        console.error(error);
       }
     }
   };
@@ -1814,7 +1814,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     });
 
     // do an initial update to re-initialize element position since we were
-    //  modifying element's x/y for sake of editor (case: syncing to remote)
+    // modifying element's x/y for sake of editor (case: syncing to remote)
     updateElement(element.text);
   }
 
@@ -1920,7 +1920,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     if (existingTextElement) {
       // if text element is no longer centered to a container, reset
-      //  verticalAlign to default because it's currently internal-only
+      // verticalAlign to default because it's currently internal-only
       if (!parentCenterPosition || element.textAlign !== "center") {
         mutateElement(element, { verticalAlign: DEFAULT_VERTICAL_ALIGN });
       }
@@ -1931,7 +1931,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       ]);
 
       // case: creating new text not centered to parent elemenent → offset Y
-      //  so that the text is centered to cursor position
+      // so that the text is centered to cursor position
       if (!parentCenterPosition) {
         mutateElement(element, {
           y: element.y - element.baseline / 2,
@@ -1952,7 +1952,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     event: React.MouseEvent<HTMLCanvasElement>,
   ) => {
     // case: double-clicking with arrow/line tool selected would both create
-    //  text and enter multiElement mode
+    // text and enter multiElement mode
     if (this.state.multiElement) {
       return;
     }
@@ -2129,7 +2129,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
       if (lastPoint === lastCommittedPoint) {
         // if we haven't yet created a temp point and we're beyond commit-zone
-        //  threshold, add a point
+        // threshold, add a point
         if (
           distance2d(
             scenePointerX - rx,
@@ -2144,11 +2144,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         } else {
           document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
           // in this branch, we're inside the commit zone, and no uncommitted
-          //  point exists. Thus do nothing (don't add/remove points).
+          // point exists. Thus do nothing (don't add/remove points).
         }
       } else {
         // cursor moved inside commit zone, and there's uncommitted point,
-        //  thus remove it
+        // thus remove it
         if (
           points.length > 2 &&
           lastCommittedPoint &&
@@ -2293,8 +2293,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     // fixes pointermove causing selection of UI texts #32
     event.preventDefault();
     // Preventing the event above disables default behavior
-    //  of defocusing potentially focused element, which is what we
-    //  want when clicking inside the canvas.
+    // of defocusing potentially focused element, which is what we
+    // want when clicking inside the canvas.
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
@@ -2739,8 +2739,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             }
 
             // Add hit element to selection. At this point if we're not holding
-            //  SHIFT the previously selected element(s) were deselected above
-            //  (make sure you use setState updater to use latest state)
+            // SHIFT the previously selected element(s) were deselected above
+            // (make sure you use setState updater to use latest state)
             if (
               !someHitElementIsSelected &&
               !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
@@ -2798,8 +2798,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     pointerDownState: PointerDownState,
   ): void => {
     // if we're currently still editing text, clicking outside
-    //  should only finalize it, not create another (irrespective
-    //  of state.elementLocked)
+    // should only finalize it, not create another (irrespective
+    // of state.elementLocked)
     if (this.state.editingElement?.type === "text") {
       return;
     }
@@ -2860,7 +2860,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         },
       }));
       // clicking outside commit zone → update reference for last committed
-      //  point
+      // point
       mutateElement(multiElement, {
         lastCommittedPoint: multiElement.points[multiElement.points.length - 1],
       });
@@ -2986,9 +2986,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       );
 
       // for arrows/lines, don't start dragging until a given threshold
-      //  to ensure we don't create a 2-point arrow by mistake when
-      //  user clicks mouse in a way that it moves a tiny bit (thus
-      //  triggering pointermove)
+      // to ensure we don't create a 2-point arrow by mistake when
+      // user clicks mouse in a way that it moves a tiny bit (thus
+      // triggering pointermove)
       if (
         !pointerDownState.drag.hasOccurred &&
         (this.state.elementType === "arrow" ||
@@ -3127,7 +3127,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               if (
                 this.state.selectedElementIds[element.id] ||
                 // case: the state.selectedElementIds might not have been
-                //  updated yet by the time this mousemove event is fired
+                // updated yet by the time this mousemove event is fired
                 (element.id === hitElement?.id &&
                   pointerDownState.hit.wasAddedToSelection)
               ) {
@@ -3331,7 +3331,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         selectionElement: null,
         cursorButton: "up",
         // text elements are reset on finalize, and resetting on pointerup
-        //  may cause issues with double taps
+        // may cause issues with double taps
         editingElement:
           multiElement || isTextElement(this.state.editingElement)
             ? this.state.editingElement
@@ -3481,8 +3481,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           if (this.state.selectedElementIds[hitElement.id]) {
             if (isSelectedViaGroup(this.state, hitElement)) {
               // We want to unselect all groups hitElement is part of
-              //  as well as all elements that are part of the groups
-              //  hitElement is part of
+              // as well as all elements that are part of the groups
+              // hitElement is part of
               const idsOfSelectedElementsThatAreInGroups = hitElement.groupIds
                 .flatMap((groupId) =>
                   getElementsInGroup(this.scene.getElements(), groupId),

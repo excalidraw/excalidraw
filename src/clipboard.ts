@@ -57,9 +57,9 @@ export const copyToClipboard = async (
   try {
     PREFER_APP_CLIPBOARD = false;
     await copyTextToSystemClipboard(json);
-  } catch (err) {
+  } catch (error) {
     PREFER_APP_CLIPBOARD = true;
-    console.error(err);
+    console.error(error);
   }
 };
 
@@ -128,7 +128,7 @@ export const parseClipboard = async (
   }
 
   // if system clipboard contains spreadsheet, use it even though it's
-  //  technically possible it's staler than in-app clipboard
+  // technically possible it's staler than in-app clipboard
   const spreadsheetResult = parsePotentialSpreadsheet(systemClipboard);
   if (spreadsheetResult) {
     return spreadsheetResult;
@@ -150,8 +150,8 @@ export const parseClipboard = async (
     return appClipboardData;
   } catch {
     // system clipboard doesn't contain excalidraw elements → return plaintext
-    //  unless we set a flag to prefer in-app clipboard because browser didn't
-    //  support storing to system clipboard on copy
+    // unless we set a flag to prefer in-app clipboard because browser didn't
+    // support storing to system clipboard on copy
     return PREFER_APP_CLIPBOARD && appClipboardData.elements
       ? appClipboardData
       : { text: systemClipboard };
@@ -170,7 +170,7 @@ export const copyTextToSystemClipboard = async (text: string | null) => {
   if (probablySupportsClipboardWriteText) {
     try {
       // NOTE: doesn't work on FF on non-HTTPS domains, or when document
-      //  not focused
+      // not focused
       await navigator.clipboard.writeText(text || "");
       copied = true;
     } catch (error) {
@@ -179,7 +179,7 @@ export const copyTextToSystemClipboard = async (text: string | null) => {
   }
 
   // Note that execCommand doesn't allow copying empty strings, so if we're
-  //  clearing clipboard using this API, we must copy at least an empty char
+  // clearing clipboard using this API, we must copy at least an empty char
   if (!copied && !copyTextViaExecCommand(text || " ")) {
     throw new Error("couldn't copy");
   }

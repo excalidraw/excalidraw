@@ -1,7 +1,7 @@
 const { CLIEngine } = require("eslint");
 
 // see https://github.com/okonet/lint-staged#how-can-i-ignore-files-from-eslintignore-
-//  for explanation
+// for explanation
 const cli = new CLIEngine({});
 
 module.exports = {

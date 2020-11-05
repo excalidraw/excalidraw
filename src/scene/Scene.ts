@@ -129,7 +129,7 @@ class Scene {
       }
     });
     // done not for memory leaks, but to guard against possible late fires
-    //  (I guess?)
+    // (I guess?)
     this.callbacks.clear();
   }
 }

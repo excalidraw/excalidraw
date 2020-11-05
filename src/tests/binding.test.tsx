@@ -68,7 +68,7 @@ describe("element binding", () => {
       expect(API.getSelectedElement().type).toBe("arrow");
 
       // NOTE this mouse down/up + await needs to be done in order to repro
-      //  the issue, due to https://github.com/excalidraw/excalidraw/blob/46bff3daceb602accf60c40a84610797260fca94/src/components/App.tsx#L740
+      // the issue, due to https://github.com/excalidraw/excalidraw/blob/46bff3daceb602accf60c40a84610797260fca94/src/components/App.tsx#L740
       mouse.reset();
       expect(h.state.editingLinearElement).not.toBe(null);
       mouse.down(0, 0);

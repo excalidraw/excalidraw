@@ -1569,7 +1569,7 @@ it(
     expect(API.getSelectedElements().length).toBe(3);
 
     // clicking on first rectangle that is part of the group should select
-    //  that group (exclusively)
+    // that group (exclusively)
     mouse.clickOn(rect1);
     expect(API.getSelectedElements().length).toBe(2);
     expect(Object.keys(h.state.selectedGroupIds).length).toBe(1);
@@ -1594,8 +1594,7 @@ it(
     mouse.up(100, 100);
 
     // Select first rectangle while keeping third one selected.
-    // Third rectangle is selected because it was the last element
-    //  to be created.
+    // Third rectangle is selected because it was the last element to be created.
     mouse.reset();
     Keyboard.withModifierKeys({ shift: true }, () => {
       mouse.click();
@@ -1616,8 +1615,7 @@ it(
     });
     expect(API.getSelectedElements().length).toBe(3);
 
-    // pointer down o first rectangle that is
-    // part of the group
+    // Pointer down o first rectangle that is part of the group
     mouse.reset();
     Keyboard.withModifierKeys({ shift: true }, () => {
       mouse.down();
