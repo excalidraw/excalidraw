@@ -108,7 +108,8 @@ export const loadFromBlob = async (
       },
       localAppState,
     );
-  } catch {
+  } catch (error) {
+    console.error(error.message);
     throw new Error(t("alerts.couldNotLoadInvalidFile"));
   }
 };

@@ -187,7 +187,7 @@ export const renderScene = (
     renderSelection = true,
     // Whether to employ render optimizations to improve performance.
     // Should not be turned on for export operations and similar, because it
-    //  doesn't guarantee pixel-perfect output.
+    // doesn't guarantee pixel-perfect output.
     renderOptimizations = false,
     renderGrid = true,
   }: {
