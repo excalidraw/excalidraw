@@ -2,37 +2,37 @@
   "extends": ["prettier", "react-app"],
   "plugins": ["prettier"],
   "rules": {
-    "curly": "error",
-    "dot-notation": "error",
+    "curly": "warn",
+    "dot-notation": "warn",
     "import/no-anonymous-default-export": "off",
     "no-console": [
-      "error",
+      "warn",
       {
         "allow": ["warn", "error", "info"]
       }
     ],
-    "no-else-return": "error",
-    "no-lonely-if": "error",
+    "no-else-return": "warn",
+    "no-lonely-if": "warn",
     "no-restricted-syntax": [
-      "error",
+      "warn",
       {
         "message": "Use 't(...)' instead of literal text in JSX",
         "selector": "JSXText[value=/\\w/]"
       }
     ],
-    "no-unneeded-ternary": "error",
-    "no-unused-expressions": "error",
-    "no-unused-vars": "error",
-    "no-useless-return": "error",
-    "one-var": ["error", "never"],
-    "prefer-arrow-callback": "error",
+    "no-unneeded-ternary": "warn",
+    "no-unused-expressions": "warn",
+    "no-unused-vars": "warn",
+    "no-useless-return": "warn",
+    "one-var": ["warn", "never"],
+    "prefer-arrow-callback": "warn",
     "prefer-const": [
-      "error",
+      "warn",
       {
         "destructuring": "all"
       }
     ],
-    "prefer-template": "error",
-    "prettier/prettier": "error"
+    "prefer-template": "warn",
+    "prettier/prettier": "warn"
   }
 }
