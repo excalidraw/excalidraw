@@ -185,19 +185,19 @@
     "desc_exitSession": ""
   },
   "errorDialog": {
-    "title": ""
+    "title": "Kuskure"
   },
   "shortcutsDialog": {
     "title": "",
     "shapes": "Siffofi",
     "or": "",
-    "click": "",
+    "click": "danna",
     "drag": "",
     "curvedArrow": "",
-    "curvedLine": "",
-    "editor": "",
+    "curvedLine": "Layin lankwasa",
+    "editor": "Edita",
     "view": "",
-    "blog": "",
+    "blog": "Karanta shafinmu",
     "howto": "",
     "github": "",
     "textNewLine": "",
