@@ -32,7 +32,7 @@ const restoreElementWithProperties = <T extends ExcalidrawElement>(
   const base: Pick<T, keyof ExcalidrawElement> = {
     type: element.type,
     // all elements must have version > 0 so getSceneVersion() will pick up
-    //  newly added elements
+    // newly added elements
     version: element.version || 1,
     versionNonce: element.versionNonce ?? 0,
     isDeleted: element.isDeleted ?? false,
@@ -112,9 +112,9 @@ const restoreElement = (
     case "diamond":
       return restoreElementWithProperties(element, {});
 
-    // don't use default case so as to catch a missing an element type case
-    //  (we also don't want to throw, but instead return void so we
-    //   filter out these unsupported elements from the restored array)
+    // Don't use default case so as to catch a missing an element type case.
+    // We also don't want to throw, but instead return void so we filter
+    // out these unsupported elements from the restored array.
   }
 };
 
@@ -123,7 +123,7 @@ export const restoreElements = (
 ): ExcalidrawElement[] => {
   return (elements || []).reduce((elements, element) => {
     // filtering out selection, which is legacy, no longer kept in elements,
-    //  and causing issues if retained
+    // and causing issues if retained
     if (element.type !== "selection" && !isInvisiblySmallElement(element)) {
       const migratedElement = restoreElement(element);
       if (migratedElement) {
@@ -161,7 +161,7 @@ const restoreAppState = (
     ...nextAppState,
     offsetLeft: appState.offsetLeft || 0,
     offsetTop: appState.offsetTop || 0,
-    /* Migrates from previous version where appState.zoom was a number */
+    // Migrates from previous version where appState.zoom was a number
     zoom:
       typeof appState.zoom === "number"
         ? {
