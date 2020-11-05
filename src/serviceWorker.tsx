@@ -128,7 +128,7 @@ const checkValidServiceWorker = (swUrl: string, config?: Config) => {
       }
     })
     .catch((error) => {
-      console.error(
+      console.info(
         "No internet connection found. App is running in offline mode.",
         error.message,
       );
