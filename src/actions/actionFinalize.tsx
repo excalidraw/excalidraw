@@ -92,8 +92,8 @@ export const actionFinalize = register({
           const linePoints = multiPointElement.points;
           const firstPoint = linePoints[0];
           mutateElement(multiPointElement, {
-            points: linePoints.map((point, i) =>
-              i === linePoints.length - 1
+            points: linePoints.map((point, index) =>
+              index === linePoints.length - 1
                 ? ([firstPoint[0], firstPoint[1]] as const)
                 : point,
             ),
