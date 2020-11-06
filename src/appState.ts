@@ -61,7 +61,6 @@ export const getDefaultAppState = (): Omit<
     lastPointerDownWith: "mouse",
     selectedElementIds: {},
     previousSelectedElementIds: {},
-    collaborators: new Map(),
     shouldCacheIgnoreZoom: false,
     showShortcutsDialog: false,
     suggestedBindings: [],
@@ -92,7 +91,6 @@ const APP_STATE_STORAGE_CONF = (<
   config: { [K in keyof T]: K extends keyof AppState ? T[K] : never },
 ) => config)({
   appearance: { browser: true, export: false },
-  collaborators: { browser: false, export: false },
   currentItemBackgroundColor: { browser: true, export: false },
   currentItemFillStyle: { browser: true, export: false },
   currentItemFontFamily: { browser: true, export: false },

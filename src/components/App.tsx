@@ -320,6 +320,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.syncActionResult,
       () => this.state,
       () => this.scene.getElementsIncludingDeleted(),
+      this.props.collaborators,
     );
     this.actionManager.registerAll(actions);
 
@@ -379,6 +380,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           zenModeEnabled={zenModeEnabled}
           toggleZenMode={this.toggleZenMode}
           lng={getLanguage().lng}
+          collaborators={this.props.collaborators}
         />
         <main>
           <canvas
@@ -447,7 +449,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             editingElement:
               editingElement || actionResult.appState?.editingElement || null,
             isCollaborating: state.isCollaborating,
-            collaborators: state.collaborators,
             width: state.width,
             height: state.height,
             offsetTop: state.offsetTop,
@@ -765,11 +766,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
     }
 
-    if (prevProps.collaborators !== this.props.collaborators) {
-      this.setState({
-        collaborators: this.props.collaborators,
-      });
-    }
     document
       .querySelector(".excalidraw")
       ?.classList.toggle("Appearance_dark", this.state.appearance === "dark");
@@ -809,7 +805,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const pointerViewportCoords: SceneState["remotePointerViewportCoords"] = {};
     const remoteSelectedElementIds: SceneState["remoteSelectedElementIds"] = {};
     const pointerUsernames: { [id: string]: string } = {};
-    this.state.collaborators.forEach((user, socketId) => {
+    this.props.collaborators.forEach((user, socketId) => {
       if (user.selectedElementIds) {
         for (const id of Object.keys(user.selectedElementIds)) {
           if (!(id in remoteSelectedElementIds)) {

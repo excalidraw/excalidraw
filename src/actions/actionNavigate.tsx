@@ -30,14 +30,13 @@ export const actionGoToCollaborator = register({
       commitToHistory: false,
     };
   },
-  PanelComponent: ({ appState, updateData, id }) => {
+  PanelComponent: ({ updateData, id, collaborators }) => {
     const clientId = id;
-
     if (!clientId) {
       return null;
     }
 
-    const collaborator = appState.collaborators.get(clientId);
+    const collaborator = collaborators.get(clientId);
 
     if (!collaborator) {
       return null;

@@ -1,5 +1,5 @@
 import React from "react";
-import { AppState } from "../types";
+import { AppState, Collaborator } from "../types";
 import { ActionManager } from "../actions/manager";
 import { t, setLanguage } from "../i18n";
 import Stack from "./Stack";
@@ -31,6 +31,7 @@ type MobileMenuProps = {
   onRoomDestroy: () => void;
   onLockToggle: () => void;
   canvas: HTMLCanvasElement | null;
+  collaborators: Map<string, Collaborator>;
 };
 
 export const MobileMenu = ({
@@ -45,6 +46,7 @@ export const MobileMenu = ({
   onRoomDestroy,
   onLockToggle,
   canvas,
+  collaborators,
 }: MobileMenuProps) => (
   <>
     {appState.isLoading && <LoadingMessage />}
@@ -95,7 +97,7 @@ export const MobileMenu = ({
                 {actionManager.renderAction("clearCanvas")}
                 <RoomDialog
                   isCollaborating={appState.isCollaborating}
-                  collaboratorCount={appState.collaborators.size}
+                  collaboratorCount={collaborators.size}
                   username={appState.username}
                   onUsernameChange={onUsernameChange}
                   onRoomCreate={onRoomCreate}
@@ -121,7 +123,7 @@ export const MobileMenu = ({
                 <fieldset>
                   <legend>{t("labels.collaborators")}</legend>
                   <UserList mobile>
-                    {Array.from(appState.collaborators)
+                    {Array.from(collaborators)
                       // Collaborator is either not initialized or is actually the current user.
                       .filter(([_, client]) => Object.keys(client).length !== 0)
                       .map(([clientId, client]) => (

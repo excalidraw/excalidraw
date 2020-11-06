@@ -9,7 +9,7 @@ import { showSelectedShapeActions } from "../element";
 import { calculateScrollCenter, getSelectedElements } from "../scene";
 import { exportCanvas } from "../data";
 
-import { AppState, LibraryItems, LibraryItem } from "../types";
+import { AppState, LibraryItems, LibraryItem, Collaborator } from "../types";
 import { NonDeletedExcalidrawElement } from "../element/types";
 
 import { ActionManager } from "../actions/manager";
@@ -60,6 +60,7 @@ interface LayerUIProps {
   zenModeEnabled: boolean;
   toggleZenMode: () => void;
   lng: string;
+  collaborators: Map<string, Collaborator>;
 }
 
 function useOnClickOutside(
@@ -294,6 +295,7 @@ const LayerUI = ({
   onInsertShape,
   zenModeEnabled,
   toggleZenMode,
+  collaborators,
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
@@ -387,7 +389,7 @@ const LayerUI = ({
             {actionManager.renderAction("clearCanvas")}
             <RoomDialog
               isCollaborating={appState.isCollaborating}
-              collaboratorCount={appState.collaborators.size}
+              collaboratorCount={collaborators.size}
               username={appState.username}
               onUsernameChange={onUsernameChange}
               onRoomCreate={onRoomCreate}
@@ -499,7 +501,7 @@ const LayerUI = ({
               "transition-right": zenModeEnabled,
             })}
           >
-            {Array.from(appState.collaborators)
+            {Array.from(collaborators)
               // Collaborator is either not initialized or is actually the current user.
               .filter(([_, client]) => Object.keys(client).length !== 0)
               .map(([clientId, client]) => (
@@ -591,6 +593,7 @@ const LayerUI = ({
       onRoomDestroy={onRoomDestroy}
       onLockToggle={onLockToggle}
       canvas={canvas}
+      collaborators={collaborators}
     />
   ) : (
     <div className="layer-ui__wrapper">
