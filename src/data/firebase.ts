@@ -8,7 +8,7 @@ let firebasePromise: Promise<
   typeof import("firebase/app").default
 > | null = null;
 
-async function loadFirebase() {
+const loadFirebase = async () => {
   const firebase = (
     await import(/* webpackChunkName: "firebase" */ "firebase/app")
   ).default;
@@ -18,15 +18,17 @@ async function loadFirebase() {
   firebase.initializeApp(firebaseConfig);
 
   return firebase;
-}
+};
 
-async function getFirebase(): Promise<typeof import("firebase/app").default> {
+const getFirebase = async (): Promise<
+  typeof import("firebase/app").default
+> => {
   if (!firebasePromise) {
     firebasePromise = loadFirebase();
   }
   const firebase = await firebasePromise!;
   return firebase;
-}
+};
 
 interface FirebaseStoredScene {
   sceneVersion: number;
@@ -34,10 +36,10 @@ interface FirebaseStoredScene {
   ciphertext: firebase.default.firestore.Blob;
 }
 
-async function encryptElements(
+const encryptElements = async (
   key: string,
   elements: readonly ExcalidrawElement[],
-): Promise<{ ciphertext: ArrayBuffer; iv: Uint8Array }> {
+): Promise<{ ciphertext: ArrayBuffer; iv: Uint8Array }> => {
   const importedKey = await getImportedKey(key, "encrypt");
   const iv = createIV();
   const json = JSON.stringify(elements);
@@ -52,13 +54,13 @@ async function encryptElements(
   );
 
   return { ciphertext, iv };
-}
+};
 
-async function decryptElements(
+const decryptElements = async (
   key: string,
   iv: Uint8Array,
   ciphertext: ArrayBuffer,
-): Promise<readonly ExcalidrawElement[]> {
+): Promise<readonly ExcalidrawElement[]> => {
   const importedKey = await getImportedKey(key, "decrypt");
   const decrypted = await window.crypto.subtle.decrypt(
     {
@@ -73,7 +75,7 @@ async function decryptElements(
     new Uint8Array(decrypted) as any,
   );
   return JSON.parse(decodedData);
-}
+};
 
 const firebaseSceneVersionCache = new WeakMap<SocketIOClient.Socket, number>();
 
@@ -90,10 +92,10 @@ export const isSavedToFirebase = (
   return true;
 };
 
-export async function saveToFirebase(
+export const saveToFirebase = async (
   portal: Portal,
   elements: readonly ExcalidrawElement[],
-) {
+) => {
   const { roomID, roomKey, socket } = portal;
   if (
     // if no room exists, consider the room saved because there's nothing we can
@@ -141,12 +143,12 @@ export async function saveToFirebase(
   }
 
   return didUpdate;
-}
+};
 
-export async function loadFromFirebase(
+export const loadFromFirebase = async (
   roomID: string,
   roomKey: string,
-): Promise<readonly ExcalidrawElement[] | null> {
+): Promise<readonly ExcalidrawElement[] | null> => {
   const firebase = await getFirebase();
   const db = firebase.firestore();
 
@@ -159,4 +161,4 @@ export async function loadFromFirebase(
   const ciphertext = storedScene.ciphertext.toUint8Array();
   const iv = storedScene.iv.toUint8Array();
   return restoreElements(await decryptElements(roomKey, iv, ciphertext));
-}
+};

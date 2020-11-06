@@ -22,22 +22,25 @@ export type Direction = NVector;
 export type Line = NVector;
 export type Transform = NVector;
 
-export function point(x: number, y: number): Point {
-  return [0, 0, 0, 0, y, x, 1, 0];
-}
+export const point = (x: number, y: number): Point => [0, 0, 0, 0, y, x, 1, 0];
 
-export function origin(): Point {
-  return [0, 0, 0, 0, 0, 0, 1, 0];
-}
+export const origin = (): Point => [0, 0, 0, 0, 0, 0, 1, 0];
 
-export function direction(x: number, y: number): Direction {
+export const direction = (x: number, y: number): Direction => {
   const norm = Math.hypot(x, y); // same as `inorm(direction(x, y))`
   return [0, 0, 0, 0, y / norm, x / norm, 0, 0];
-}
+};
 
-export function offset(x: number, y: number): Direction {
-  return [0, 0, 0, 0, y, x, 0, 0];
-}
+export const offset = (x: number, y: number): Direction => [
+  0,
+  0,
+  0,
+  0,
+  y,
+  x,
+  0,
+  0,
+];
 
 /// This is the "implementation" part of the library
 
@@ -56,7 +59,7 @@ type NVector = readonly [
 const NVECTOR_BASE = ["1", "e0", "e1", "e2", "e01", "e20", "e12", "e012"];
 
 // Used to represent points, lines and transformations
-export function nvector(value: number = 0, index: number = 0): NVector {
+export const nvector = (value: number = 0, index: number = 0): NVector => {
   const result = [0, 0, 0, 0, 0, 0, 0, 0];
   if (index < 0 || index > 7) {
     throw new Error(`Expected \`index\` betwen 0 and 7, got \`${index}\``);
@@ -65,10 +68,10 @@ export function nvector(value: number = 0, index: number = 0): NVector {
     result[index] = value;
   }
   return (result as unknown) as NVector;
-}
+};
 
 const STRING_EPSILON = 0.000001;
-export function toString(nvector: NVector): string {
+export const toString = (nvector: NVector): string => {
   const result = nvector
     .map((value, index) =>
       Math.abs(value) > STRING_EPSILON
@@ -79,66 +82,58 @@ export function toString(nvector: NVector): string {
     .filter((representation) => representation != null)
     .join(" + ");
   return result === "" ? "0" : result;
-}
+};
 
 // Reverse the order of the basis blades.
-export function reverse(nvector: NVector): NVector {
-  return [
-    nvector[0],
-    nvector[1],
-    nvector[2],
-    nvector[3],
-    -nvector[4],
-    -nvector[5],
-    -nvector[6],
-    -nvector[7],
-  ];
-}
+export const reverse = (nvector: NVector): NVector => [
+  nvector[0],
+  nvector[1],
+  nvector[2],
+  nvector[3],
+  -nvector[4],
+  -nvector[5],
+  -nvector[6],
+  -nvector[7],
+];
 
 // Poincare duality operator.
-export function dual(nvector: NVector): NVector {
-  return [
-    nvector[7],
-    nvector[6],
-    nvector[5],
-    nvector[4],
-    nvector[3],
-    nvector[2],
-    nvector[1],
-    nvector[0],
-  ];
-}
+export const dual = (nvector: NVector): NVector => [
+  nvector[7],
+  nvector[6],
+  nvector[5],
+  nvector[4],
+  nvector[3],
+  nvector[2],
+  nvector[1],
+  nvector[0],
+];
 
 // Clifford Conjugation
-export function conjugate(nvector: NVector): NVector {
-  return [
-    nvector[0],
-    -nvector[1],
-    -nvector[2],
-    -nvector[3],
-    -nvector[4],
-    -nvector[5],
-    -nvector[6],
-    nvector[7],
-  ];
-}
+export const conjugate = (nvector: NVector): NVector => [
+  nvector[0],
+  -nvector[1],
+  -nvector[2],
+  -nvector[3],
+  -nvector[4],
+  -nvector[5],
+  -nvector[6],
+  nvector[7],
+];
 
 // Main involution
-export function involute(nvector: NVector): NVector {
-  return [
-    nvector[0],
-    -nvector[1],
-    -nvector[2],
-    -nvector[3],
-    nvector[4],
-    nvector[5],
-    nvector[6],
-    -nvector[7],
-  ];
-}
+export const involute = (nvector: NVector): NVector => [
+  nvector[0],
+  -nvector[1],
+  -nvector[2],
+  -nvector[3],
+  nvector[4],
+  nvector[5],
+  nvector[6],
+  -nvector[7],
+];
 
 // Multivector addition
-export function add(a: NVector, b: NVector | number): NVector {
+export const add = (a: NVector, b: NVector | number): NVector => {
   if (isNumber(b)) {
     return [a[0] + b, a[1], a[2], a[3], a[4], a[5], a[6], a[7]];
   }
@@ -152,10 +147,10 @@ export function add(a: NVector, b: NVector | number): NVector {
     a[6] + b[6],
     a[7] + b[7],
   ];
-}
+};
 
 // Multivector subtraction
-export function sub(a: NVector, b: NVector | number): NVector {
+export const sub = (a: NVector, b: NVector | number): NVector => {
   if (isNumber(b)) {
     return [a[0] - b, a[1], a[2], a[3], a[4], a[5], a[6], a[7]];
   }
@@ -169,10 +164,10 @@ export function sub(a: NVector, b: NVector | number): NVector {
     a[6] - b[6],
     a[7] - b[7],
   ];
-}
+};
 
 // The geometric product.
-export function mul(a: NVector, b: NVector | number): NVector {
+export const mul = (a: NVector, b: NVector | number): NVector => {
   if (isNumber(b)) {
     return [
       a[0] * b,
@@ -223,112 +218,94 @@ export function mul(a: NVector, b: NVector | number): NVector {
       b[1] * a[6] +
       b[0] * a[7],
   ];
-}
+};
 
-export function mulScalar(a: NVector, b: NVector): number {
-  return b[0] * a[0] + b[2] * a[2] + b[3] * a[3] - b[6] * a[6];
-}
+export const mulScalar = (a: NVector, b: NVector): number =>
+  b[0] * a[0] + b[2] * a[2] + b[3] * a[3] - b[6] * a[6];
 
 // The outer/exterior/wedge product.
-export function meet(a: NVector, b: NVector): NVector {
-  return [
-    b[0] * a[0],
-    b[1] * a[0] + b[0] * a[1],
-    b[2] * a[0] + b[0] * a[2],
-    b[3] * a[0] + b[0] * a[3],
-    b[4] * a[0] + b[2] * a[1] - b[1] * a[2] + b[0] * a[4],
-    b[5] * a[0] - b[3] * a[1] + b[1] * a[3] + b[0] * a[5],
-    b[6] * a[0] + b[3] * a[2] - b[2] * a[3] + b[0] * a[6],
-    b[7] * a[0] +
-      b[6] * a[1] +
-      b[5] * a[2] +
-      b[4] * a[3] +
-      b[3] * a[4] +
-      b[2] * a[5] +
-      b[1] * a[6],
-  ];
-}
+export const meet = (a: NVector, b: NVector): NVector => [
+  b[0] * a[0],
+  b[1] * a[0] + b[0] * a[1],
+  b[2] * a[0] + b[0] * a[2],
+  b[3] * a[0] + b[0] * a[3],
+  b[4] * a[0] + b[2] * a[1] - b[1] * a[2] + b[0] * a[4],
+  b[5] * a[0] - b[3] * a[1] + b[1] * a[3] + b[0] * a[5],
+  b[6] * a[0] + b[3] * a[2] - b[2] * a[3] + b[0] * a[6],
+  b[7] * a[0] +
+    b[6] * a[1] +
+    b[5] * a[2] +
+    b[4] * a[3] +
+    b[3] * a[4] +
+    b[2] * a[5] +
+    b[1] * a[6],
+];
 
 // The regressive product.
-export function join(a: NVector, b: NVector): NVector {
-  return [
-    joinScalar(a, b),
-    a[1] * b[7] + a[4] * b[5] - a[5] * b[4] + a[7] * b[1],
-    a[2] * b[7] - a[4] * b[6] + a[6] * b[4] + a[7] * b[2],
-    a[3] * b[7] + a[5] * b[6] - a[6] * b[5] + a[7] * b[3],
-    a[4] * b[7] + a[7] * b[4],
-    a[5] * b[7] + a[7] * b[5],
-    a[6] * b[7] + a[7] * b[6],
-    a[7] * b[7],
-  ];
-}
+export const join = (a: NVector, b: NVector): NVector => [
+  joinScalar(a, b),
+  a[1] * b[7] + a[4] * b[5] - a[5] * b[4] + a[7] * b[1],
+  a[2] * b[7] - a[4] * b[6] + a[6] * b[4] + a[7] * b[2],
+  a[3] * b[7] + a[5] * b[6] - a[6] * b[5] + a[7] * b[3],
+  a[4] * b[7] + a[7] * b[4],
+  a[5] * b[7] + a[7] * b[5],
+  a[6] * b[7] + a[7] * b[6],
+  a[7] * b[7],
+];
 
-export function joinScalar(a: NVector, b: NVector): number {
-  return (
-    a[0] * b[7] +
-    a[1] * b[6] +
-    a[2] * b[5] +
-    a[3] * b[4] +
-    a[4] * b[3] +
-    a[5] * b[2] +
-    a[6] * b[1] +
-    a[7] * b[0]
-  );
-}
+export const joinScalar = (a: NVector, b: NVector): number =>
+  a[0] * b[7] +
+  a[1] * b[6] +
+  a[2] * b[5] +
+  a[3] * b[4] +
+  a[4] * b[3] +
+  a[5] * b[2] +
+  a[6] * b[1] +
+  a[7] * b[0];
 
 // The inner product.
-export function dot(a: NVector, b: NVector): NVector {
-  return [
-    b[0] * a[0] + b[2] * a[2] + b[3] * a[3] - b[6] * a[6],
-    b[1] * a[0] +
-      b[0] * a[1] -
-      b[4] * a[2] +
-      b[5] * a[3] +
-      b[2] * a[4] -
-      b[3] * a[5] -
-      b[7] * a[6] -
-      b[6] * a[7],
-    b[2] * a[0] + b[0] * a[2] - b[6] * a[3] + b[3] * a[6],
-    b[3] * a[0] + b[6] * a[2] + b[0] * a[3] - b[2] * a[6],
-    b[4] * a[0] + b[7] * a[3] + b[0] * a[4] + b[3] * a[7],
-    b[5] * a[0] + b[7] * a[2] + b[0] * a[5] + b[2] * a[7],
-    b[6] * a[0] + b[0] * a[6],
-    b[7] * a[0] + b[0] * a[7],
-  ];
-}
+export const dot = (a: NVector, b: NVector): NVector => [
+  b[0] * a[0] + b[2] * a[2] + b[3] * a[3] - b[6] * a[6],
+  b[1] * a[0] +
+    b[0] * a[1] -
+    b[4] * a[2] +
+    b[5] * a[3] +
+    b[2] * a[4] -
+    b[3] * a[5] -
+    b[7] * a[6] -
+    b[6] * a[7],
+  b[2] * a[0] + b[0] * a[2] - b[6] * a[3] + b[3] * a[6],
+  b[3] * a[0] + b[6] * a[2] + b[0] * a[3] - b[2] * a[6],
+  b[4] * a[0] + b[7] * a[3] + b[0] * a[4] + b[3] * a[7],
+  b[5] * a[0] + b[7] * a[2] + b[0] * a[5] + b[2] * a[7],
+  b[6] * a[0] + b[0] * a[6],
+  b[7] * a[0] + b[0] * a[7],
+];
 
-export function norm(a: NVector): number {
-  return Math.sqrt(
-    Math.abs(a[0] * a[0] - a[2] * a[2] - a[3] * a[3] + a[6] * a[6]),
-  );
-}
+export const norm = (a: NVector): number =>
+  Math.sqrt(Math.abs(a[0] * a[0] - a[2] * a[2] - a[3] * a[3] + a[6] * a[6]));
 
-export function inorm(a: NVector): number {
-  return Math.sqrt(
-    Math.abs(a[7] * a[7] - a[5] * a[5] - a[4] * a[4] + a[1] * a[1]),
-  );
-}
+export const inorm = (a: NVector): number =>
+  Math.sqrt(Math.abs(a[7] * a[7] - a[5] * a[5] - a[4] * a[4] + a[1] * a[1]));
 
-export function normalized(a: NVector): NVector {
+export const normalized = (a: NVector): NVector => {
   const n = norm(a);
   if (n === 0 || n === 1) {
     return a;
   }
   const sign = a[6] < 0 ? -1 : 1;
   return mul(a, sign / n);
-}
+};
 
-export function inormalized(a: NVector): NVector {
+export const inormalized = (a: NVector): NVector => {
   const n = inorm(a);
   if (n === 0 || n === 1) {
     return a;
   }
   return mul(a, 1 / n);
-}
+};
 
-function isNumber(a: any): a is number {
-  return typeof a === "number";
-}
+const isNumber = (a: any): a is number => typeof a === "number";
 
 export const E0: NVector = nvector(1, 1);
 export const E1: NVector = nvector(1, 2);

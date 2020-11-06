@@ -334,7 +334,7 @@ export const renderScene = (
       return acc;
     }, [] as { angle: number; elementX1: number; elementY1: number; elementX2: number; elementY2: number; selectionColors: string[] }[]);
 
-    function addSelectionForGroupId(groupId: GroupId) {
+    const addSelectionForGroupId = (groupId: GroupId) => {
       const groupElements = getElementsInGroup(elements, groupId);
       const [elementX1, elementY1, elementX2, elementY2] = getCommonBounds(
         groupElements,
@@ -347,7 +347,7 @@ export const renderScene = (
         elementY2,
         selectionColors: [oc.black],
       });
-    }
+    };
 
     for (const groupId of getSelectedGroupIds(appState)) {
       // TODO: support multiplayer selected group IDs

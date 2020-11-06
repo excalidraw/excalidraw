@@ -89,7 +89,7 @@ const calculateTranslation = (
   };
 };
 
-function getCommonBoundingBox(elements: ExcalidrawElement[]): Box {
+const getCommonBoundingBox = (elements: ExcalidrawElement[]): Box => {
   const [minX, minY, maxX, maxY] = getCommonBounds(elements);
   return { minX, minY, maxX, maxY };
-}
+};

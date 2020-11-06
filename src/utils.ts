@@ -242,12 +242,12 @@ const RE_RTL_CHECK = new RegExp(`^[^${RS_LTR_CHARS}]*[${RS_RTL_CHARS}]`);
  */
 export const isRTL = (text: string) => RE_RTL_CHECK.test(text);
 
-export function tupleToCoors(
+export const tupleToCoors = (
   xyTuple: readonly [number, number],
-): { x: number; y: number } {
+): { x: number; y: number } => {
   const [x, y] = xyTuple;
   return { x, y };
-}
+};
 
 /** use as a rejectionHandler to mute filesystem Abort errors */
 export const muteFSAbortError = (error?: Error) => {

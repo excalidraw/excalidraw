@@ -82,7 +82,7 @@ export const newElement = (
   _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
 
 /** computes element x/y offset based on textAlign/verticalAlign */
-function getTextElementPositionOffsets(
+const getTextElementPositionOffsets = (
   opts: {
     textAlign: ExcalidrawTextElement["textAlign"];
     verticalAlign: ExcalidrawTextElement["verticalAlign"];
@@ -91,7 +91,7 @@ function getTextElementPositionOffsets(
     width: number;
     height: number;
   },
-) {
+) => {
   return {
     x:
       opts.textAlign === "center"
@@ -101,7 +101,7 @@ function getTextElementPositionOffsets(
         : 0,
     y: opts.verticalAlign === "middle" ? metrics.height / 2 : 0,
   };
-}
+};
 
 export const newTextElement = (
   opts: {
