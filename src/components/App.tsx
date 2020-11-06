@@ -3645,8 +3645,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       // sometimes the pointer goes off screen
     }
 
-    gesture.pointers.size < 2 &&
-      this.props.onMouseBroadCast({ pointer, button });
+    this.props.onPointerUpdate({
+      pointer,
+      button,
+      pointersMap: gesture.pointers,
+    });
   };
 
   private resetShouldCacheIgnoreZoomDebounced = debounce(() => {

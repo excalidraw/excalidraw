@@ -153,9 +153,10 @@ export interface ExcalidrawProps {
   onCollaborationStart: (elements?: readonly ExcalidrawElement[]) => void;
   onCollaborationEnd: () => void;
   isCollaborating: boolean;
-  onMouseBroadCast: (payload: {
+  onPointerUpdate: (payload: {
     pointer: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointer"];
     button: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["button"];
+    pointersMap: Gesture["pointers"];
   }) => void;
   collaborators: Map<string, Collaborator>;
   initializeScene?: (scene: any) => void;

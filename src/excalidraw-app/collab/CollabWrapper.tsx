@@ -28,7 +28,7 @@ import {
   saveToFirebase,
 } from "../../data/firebase";
 import Portal from "../../components/Portal";
-import { AppState, Collaborator } from "../../types";
+import { AppState, Collaborator, Gesture } from "../../types";
 import { ExcalidrawElement } from "../../element/types";
 import { ExcalidrawImperativeAPI } from "../../components/App";
 import { t } from "../../i18n";
@@ -455,11 +455,14 @@ class CollabWrapper extends PureComponent<Props, State> {
     this.portal.broadcastScene(SCENE.UPDATE, syncableElements, syncAll);
   };
 
-  onMouseBroadCast = (payload: {
+  onPointerUpdate = (payload: {
     pointer: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointer"];
     button: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["button"];
+    pointersMap: Gesture["pointers"];
   }) => {
-    this.portal.socket && this.portal.broadcastMouseLocation(payload);
+    payload.pointersMap.size < 2 &&
+      this.portal.socket &&
+      this.portal.broadcastMouseLocation(payload);
   };
 
   onChange = (elements: readonly ExcalidrawElement[], state: AppState) => {
@@ -504,7 +507,7 @@ class CollabWrapper extends PureComponent<Props, State> {
       onCollaborationEnd: this.closePortal,
       excalidrawRef: this.excalidrawRef,
       isCollaborating: this.state.isCollaborating,
-      onMouseBroadCast: this.onMouseBroadCast,
+      onPointerUpdate: this.onPointerUpdate,
       collaborators: this.state.collaborators,
       initializeScene: this.initializeScene,
       isCollaborationScene: this.isCollaborationScene,
