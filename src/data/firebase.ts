@@ -86,7 +86,7 @@ export const isSavedToFirebase = (
     return firebaseSceneVersionCache.get(portal.socket) === sceneVersion;
   }
   // if no room exists, consider the room saved so that we don't unnecessarily
-  //  prevent unload (there's nothing we could do at that point anyway)
+  // prevent unload (there's nothing we could do at that point anyway)
   return true;
 };
 
@@ -97,7 +97,7 @@ export async function saveToFirebase(
   const { roomID, roomKey, socket } = portal;
   if (
     // if no room exists, consider the room saved because there's nothing we can
-    //  do at this point
+    // do at this point
     !roomID ||
     !roomKey ||
     !socket ||

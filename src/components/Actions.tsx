@@ -1,5 +1,5 @@
 import React from "react";
-import { AppState } from "../types";
+import { AppState, Zoom } from "../types";
 import { ExcalidrawElement } from "../element/types";
 import { ActionManager } from "../actions/manager";
 import {
@@ -183,14 +183,16 @@ export const ZoomActions = ({
   zoom,
 }: {
   renderAction: ActionManager["renderAction"];
-  zoom: number;
+  zoom: Zoom;
 }) => (
   <Stack.Col gap={1}>
     <Stack.Row gap={1} align="center">
       {renderAction("zoomIn")}
       {renderAction("zoomOut")}
       {renderAction("resetZoom")}
-      <div style={{ marginInlineStart: 4 }}>{(zoom * 100).toFixed(0)}%</div>
+      <div style={{ marginInlineStart: 4 }}>
+        {(zoom.value * 100).toFixed(0)}%
+      </div>
     </Stack.Row>
   </Stack.Col>
 );

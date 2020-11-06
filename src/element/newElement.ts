@@ -148,7 +148,6 @@ const getAdjustedDimensions = (
     height: nextHeight,
     baseline: nextBaseline,
   } = measureText(nextText, getFontString(element));
-
   const { textAlign, verticalAlign } = element;
 
   let x, y;
@@ -226,7 +225,7 @@ export const newLinearElement = (
 };
 
 // Simplified deep clone for the purpose of cloning ExcalidrawElement only
-//  (doesn't clone Date, RegExp, Map, Set, Typed arrays etc.)
+// (doesn't clone Date, RegExp, Map, Set, Typed arrays etc.)
 //
 // Adapted from https://github.com/lukeed/klona
 export const deepCopyElement = (val: any, depth: number = 0) => {

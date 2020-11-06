@@ -36,13 +36,11 @@ export const Modal = (props: {
       <div className="Modal__background" onClick={props.onCloseRequest}></div>
       <div
         className="Modal__content"
-        style={
-          {
-            "--max-width": `${props.maxWidth}px`,
-            maxHeight: "100%",
-            overflowY: "scroll",
-          } as any
-        }
+        style={{
+          "--max-width": `${props.maxWidth}px`,
+          maxHeight: "100%",
+          overflowY: "scroll",
+        }}
       >
         {props.children}
       </div>

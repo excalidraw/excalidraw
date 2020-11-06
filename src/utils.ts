@@ -1,5 +1,4 @@
-import { AppState } from "./types";
-import { getZoomOrigin } from "./scene";
+import { Zoom } from "./types";
 import {
   CURSOR_TYPE,
   FONT_FAMILY,
@@ -95,7 +94,7 @@ export const measureText = (text: string, font: FontString) => {
   line.innerText = text
     .split("\n")
     // replace empty lines with single space because leading/trailing empty
-    //  lines would be stripped from computation
+    // lines would be stripped from computation
     .map((x) => x || " ")
     .join("\n");
   const width = line.offsetWidth;
@@ -183,42 +182,47 @@ export const getShortcutKey = (shortcut: string): string => {
   }
   return `${shortcut.replace(/\bCtrlOrCmd\b/i, "Ctrl")}`;
 };
+
 export const viewportCoordsToSceneCoords = (
   { clientX, clientY }: { clientX: number; clientY: number },
-  appState: AppState,
-  canvas: HTMLCanvasElement | null,
-  scale: number,
+  {
+    zoom,
+    offsetLeft,
+    offsetTop,
+    scrollX,
+    scrollY,
+  }: {
+    zoom: Zoom;
+    offsetLeft: number;
+    offsetTop: number;
+    scrollX: number;
+    scrollY: number;
+  },
 ) => {
-  const zoomOrigin = getZoomOrigin(canvas, scale);
-  const clientXWithZoom =
-    zoomOrigin.x +
-    (clientX - zoomOrigin.x - appState.offsetLeft) / appState.zoom;
-  const clientYWithZoom =
-    zoomOrigin.y +
-    (clientY - zoomOrigin.y - appState.offsetTop) / appState.zoom;
-
-  const x = clientXWithZoom - appState.scrollX;
-  const y = clientYWithZoom - appState.scrollY;
-
+  const invScale = 1 / zoom.value;
+  const x = (clientX - zoom.translation.x - offsetLeft) * invScale - scrollX;
+  const y = (clientY - zoom.translation.y - offsetTop) * invScale - scrollY;
   return { x, y };
 };
 
 export const sceneCoordsToViewportCoords = (
   { sceneX, sceneY }: { sceneX: number; sceneY: number },
-  appState: AppState,
-  canvas: HTMLCanvasElement | null,
-  scale: number,
+  {
+    zoom,
+    offsetLeft,
+    offsetTop,
+    scrollX,
+    scrollY,
+  }: {
+    zoom: Zoom;
+    offsetLeft: number;
+    offsetTop: number;
+    scrollX: number;
+    scrollY: number;
+  },
 ) => {
-  const zoomOrigin = getZoomOrigin(canvas, scale);
-  const x =
-    zoomOrigin.x -
-    (zoomOrigin.x - sceneX - appState.scrollX - appState.offsetLeft) *
-      appState.zoom;
-  const y =
-    zoomOrigin.y -
-    (zoomOrigin.y - sceneY - appState.scrollY - appState.offsetTop) *
-      appState.zoom;
-
+  const x = (sceneX + scrollX + offsetLeft) * zoom.value + zoom.translation.x;
+  const y = (sceneY + scrollY + offsetTop) * zoom.value + zoom.translation.y;
   return { x, y };
 };
 

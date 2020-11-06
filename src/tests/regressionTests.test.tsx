@@ -364,15 +364,15 @@ describe("regression tests", () => {
   });
 
   it("pinch-to-zoom works", () => {
-    expect(h.state.zoom).toBe(1);
+    expect(h.state.zoom.value).toBe(1);
     finger1.down(50, 50);
     finger2.down(60, 50);
     finger1.move(-10, 0);
-    expect(h.state.zoom).toBeGreaterThan(1);
-    const zoomed = h.state.zoom;
+    expect(h.state.zoom.value).toBeGreaterThan(1);
+    const zoomed = h.state.zoom.value;
     finger1.move(5, 0);
     finger2.move(-5, 0);
-    expect(h.state.zoom).toBeLessThan(zoomed);
+    expect(h.state.zoom.value).toBeLessThan(zoomed);
   });
 
   it("two-finger scroll works", () => {
@@ -500,13 +500,13 @@ describe("regression tests", () => {
   });
 
   it("zoom hotkeys", () => {
-    expect(h.state.zoom).toBe(1);
+    expect(h.state.zoom.value).toBe(1);
     fireEvent.keyDown(document, { code: "Equal", ctrlKey: true });
     fireEvent.keyUp(document, { code: "Equal", ctrlKey: true });
-    expect(h.state.zoom).toBeGreaterThan(1);
+    expect(h.state.zoom.value).toBeGreaterThan(1);
     fireEvent.keyDown(document, { code: "Minus", ctrlKey: true });
     fireEvent.keyUp(document, { code: "Minus", ctrlKey: true });
-    expect(h.state.zoom).toBe(1);
+    expect(h.state.zoom.value).toBe(1);
   });
 
   it("rerenders UI on language change", async () => {
@@ -1569,7 +1569,7 @@ it(
     expect(API.getSelectedElements().length).toBe(3);
 
     // clicking on first rectangle that is part of the group should select
-    //  that group (exclusively)
+    // that group (exclusively)
     mouse.clickOn(rect1);
     expect(API.getSelectedElements().length).toBe(2);
     expect(Object.keys(h.state.selectedGroupIds).length).toBe(1);
@@ -1594,8 +1594,7 @@ it(
     mouse.up(100, 100);
 
     // Select first rectangle while keeping third one selected.
-    // Third rectangle is selected because it was the last element
-    //  to be created.
+    // Third rectangle is selected because it was the last element to be created.
     mouse.reset();
     Keyboard.withModifierKeys({ shift: true }, () => {
       mouse.click();
@@ -1616,8 +1615,7 @@ it(
     });
     expect(API.getSelectedElements().length).toBe(3);
 
-    // pointer down o first rectangle that is
-    // part of the group
+    // Pointer down o first rectangle that is part of the group
     mouse.reset();
     Keyboard.withModifierKeys({ shift: true }, () => {
       mouse.down();

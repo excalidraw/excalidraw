@@ -41,7 +41,7 @@ export type AppState = {
   startBoundElement: NonDeleted<ExcalidrawBindableElement> | null;
   suggestedBindings: SuggestedBinding[];
   // element being edited, but not necessarily added to elements array yet
-  //  (e.g. text element when typing into the input)
+  // (e.g. text element when typing into the input)
   editingElement: NonDeletedExcalidrawElement | null;
   editingLinearElement: LinearElementEditor | null;
   elementType: typeof SHAPES[number]["value"];
@@ -73,7 +73,7 @@ export type AppState = {
   isCollaborating: boolean;
   isResizing: boolean;
   isRotating: boolean;
-  zoom: number;
+  zoom: Zoom;
   openMenu: "canvas" | "shape" | null;
   lastPointerDownWith: PointerType;
   selectedElementIds: { [id: string]: boolean };
@@ -98,6 +98,16 @@ export type AppState = {
   isLibraryOpen: boolean;
   fileHandle: import("browser-nativefs").FileSystemHandle | null;
 };
+
+export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
+
+export type Zoom = Readonly<{
+  value: NormalizedZoomValue;
+  translation: Readonly<{
+    x: number;
+    y: number;
+  }>;
+}>;
 
 export type PointerCoords = Readonly<{
   x: number;

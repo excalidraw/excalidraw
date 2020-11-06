@@ -74,7 +74,14 @@
     "addToLibrary": "أضف إلى المكتبة",
     "removeFromLibrary": "حذف من المكتبة",
     "libraryLoadingMessage": "جارٍ تحميل المكتبة...",
-    "loadingScene": "جاري تحميل المشهد..."
+    "loadingScene": "جاري تحميل المشهد...",
+    "align": "",
+    "alignTop": "",
+    "alignBottom": "",
+    "alignLeft": "",
+    "alignRight": "",
+    "centerVertically": "",
+    "centerHorizontally": ""
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
@@ -149,6 +156,11 @@
     "lineEditor_info": "انقر نقراً مزدوجاً أو اضغط Enter لتعديل النقاط",
     "lineEditor_pointSelected": "اضغط على حذف لإزالة النقطة، Ctrl Or Cmd+D للتكرار، أو اسحب للانتقال",
     "lineEditor_nothingSelected": "حدد نقطة لتحريك أو إزالتها، أو اضغط Alt ثم انقر لإضافة نقاط جديدة"
+  },
+  "canvasError": {
+    "cannotShowPreview": "",
+    "canvasTooBig": "",
+    "canvasTooBigTip": ""
   },
   "errorSplash": {
     "headingMain_pre": "حدث خطأ، حاول مرة أخرى ",

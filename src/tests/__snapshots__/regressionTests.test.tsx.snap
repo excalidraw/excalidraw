@@ -73,7 +73,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -528,7 +534,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -965,7 +977,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -1730,7 +1748,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -1926,7 +1950,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -2366,7 +2396,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -2603,7 +2639,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -2757,7 +2799,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -3218,7 +3266,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -3516,7 +3570,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -3709,7 +3769,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -3938,7 +4004,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -4178,7 +4250,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -4568,7 +4646,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -4828,7 +4912,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -5142,7 +5232,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -5315,7 +5411,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -5466,7 +5568,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -5913,7 +6021,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -6211,7 +6325,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -8183,7 +8303,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -8533,7 +8659,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -8773,7 +8905,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -9014,7 +9152,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -9311,7 +9455,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -9462,7 +9612,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -9613,7 +9769,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -9764,7 +9926,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -9941,7 +10109,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -10118,7 +10292,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -10295,7 +10475,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -10472,7 +10658,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -10623,7 +10815,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -10774,7 +10972,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -10951,7 +11155,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -11102,7 +11312,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -11290,7 +11506,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -11986,7 +12208,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -12222,7 +12450,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0.3333333333333357,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -12309,7 +12543,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -12414,7 +12654,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -13284,7 +13530,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -13720,7 +13972,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -14069,7 +14327,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -14335,7 +14599,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -14538,7 +14808,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -15362,7 +15638,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -16083,7 +16365,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -16705,7 +16993,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -17233,7 +17527,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -17714,7 +18014,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -18106,7 +18412,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -18413,7 +18725,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -18655,7 +18973,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -19532,7 +19856,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -20304,7 +20634,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -20975,7 +21311,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -21541,7 +21883,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -21692,7 +22040,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -21987,7 +22341,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -22282,7 +22642,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -22431,7 +22797,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -22616,7 +22988,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -22858,7 +23236,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -23163,7 +23547,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -23989,7 +24379,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -24284,7 +24680,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -24583,7 +24985,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -24948,7 +25356,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -25108,7 +25522,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -25413,7 +25833,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -25657,7 +26083,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -25961,7 +26393,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -26050,7 +26488,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -26212,7 +26656,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -27007,7 +27457,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -27096,7 +27552,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -27861,7 +28323,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -28251,7 +28719,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -28487,7 +28961,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1.99,
+  "zoom": Object {
+    "translation": Object {
+      "x": -60.420000000000016,
+      "y": -48.66347517730496,
+    },
+    "value": 1.99,
+  },
 }
 `;
 
@@ -28576,7 +29056,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -29053,7 +29539,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 
@@ -29140,7 +29632,13 @@ Object {
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
-  "zoom": 1,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
 }
 `;
 

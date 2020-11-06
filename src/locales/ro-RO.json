@@ -74,7 +74,14 @@
     "addToLibrary": "Adăugare la bibliotecă",
     "removeFromLibrary": "Eliminare din bibliotecă",
     "libraryLoadingMessage": "Se încarcă biblioteca...",
-    "loadingScene": "Se încarcă scena..."
+    "loadingScene": "Se încarcă scena...",
+    "align": "Aliniere",
+    "alignTop": "Aliniere sus",
+    "alignBottom": "Aliniere jos",
+    "alignLeft": "Aliniere la stânga",
+    "alignRight": "Aliniere la dreapta",
+    "centerVertically": "Centrare verticală",
+    "centerHorizontally": "Centrare orizontală"
   },
   "buttons": {
     "clearReset": "Resetare pânză",
@@ -142,13 +149,18 @@
   "hints": {
     "linearElement": "Dă clic pentru a crea mai multe puncte, glisează pentru a forma o singură linie",
     "freeDraw": "Dă clic pe pânză și glisează cursorul, apoi eliberează-l când ai terminat",
-    "text": "Sfat: poți adăuga text și dând dublu clic oriunde cu instrumentul de selectare",
+    "text": "Sfat: poți adăuga text și dând dublu clic oriunde cu instrumentul de selecție",
     "linearElementMulti": "Dă clic pe ultimul punct sau apasă tasta Escape sau tasta Enter pentru a termina",
     "resize": "Poți constrânge proporțiile, ținând apăsată tasta SHIFT în timp ce redimensionezi,\nține apăsată tasta ALT pentru a redimensiona de la centru",
     "rotate": "Poți constrânge unghiurile, ținând apăsată tasta SHIFT în timp ce rotești",
     "lineEditor_info": "Dă dublu clic sau apasă tasta Enter pentru a edita punctele",
     "lineEditor_pointSelected": "Apasă tasta Delete pentru a elimina punctul, combinația de taste Ctrl sau Cmd + D pentru a-l duplica sau glisează-l pentru a-i schimba poziția",
     "lineEditor_nothingSelected": "Selectează un punct pentru a-l muta sau elimina sau ține apăsată tasta Alt și dă clic pentru a adăuga puncte noi"
+  },
+  "canvasError": {
+    "cannotShowPreview": "Nu se poate afișa previzualizarea",
+    "canvasTooBig": "Pânza poate fi prea mare.",
+    "canvasTooBigTip": "Sfat: încearcă să apropii puțin mai mult elementele cele mai îndepărtate."
   },
   "errorSplash": {
     "headingMain_pre": "A apărut o eroare. Încearcă ",
