@@ -32,6 +32,7 @@ type MobileMenuProps = {
   onLockToggle: () => void;
   canvas: HTMLCanvasElement | null;
   collaborators: Map<string, Collaborator>;
+  isCollaborating: boolean;
 };
 
 export const MobileMenu = ({
@@ -47,6 +48,7 @@ export const MobileMenu = ({
   onLockToggle,
   canvas,
   collaborators,
+  isCollaborating,
 }: MobileMenuProps) => (
   <>
     {appState.isLoading && <LoadingMessage />}
@@ -96,7 +98,7 @@ export const MobileMenu = ({
                 {exportButton}
                 {actionManager.renderAction("clearCanvas")}
                 <RoomDialog
-                  isCollaborating={appState.isCollaborating}
+                  isCollaborating={isCollaborating}
                   collaboratorCount={collaborators.size}
                   username={appState.username}
                   onUsernameChange={onUsernameChange}

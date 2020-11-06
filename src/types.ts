@@ -70,7 +70,6 @@ export type AppState = {
   scrolledOutside: boolean;
   name: string;
   username: string;
-  isCollaborating: boolean;
   isResizing: boolean;
   isRotating: boolean;
   zoom: Zoom;

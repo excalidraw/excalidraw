@@ -8,7 +8,6 @@ import { users, clipboard, start, stop } from "./icons";
 import "./RoomDialog.scss";
 import { copyTextToSystemClipboard } from "../clipboard";
 import { Dialog } from "./Dialog";
-import { AppState } from "../types";
 
 const RoomModal = ({
   activeRoomLink,
@@ -130,7 +129,7 @@ export const RoomDialog = ({
   onRoomDestroy,
   setErrorMessage,
 }: {
-  isCollaborating: AppState["isCollaborating"];
+  isCollaborating: boolean;
   collaboratorCount: number;
   username: string;
   onUsernameChange: (username: string) => void;

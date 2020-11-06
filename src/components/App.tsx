@@ -281,22 +281,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     super(props);
     const defaultAppState = getDefaultAppState();
 
-    const {
-      width,
-      height,
-      offsetLeft,
-      offsetTop,
-      user,
-      forwardedRef,
-      isCollaborating,
-    } = props;
+    const { width, height, offsetLeft, offsetTop, user, forwardedRef } = props;
     this.state = {
       ...defaultAppState,
       isLoading: true,
       width,
       height,
       username: user?.name || "",
-      isCollaborating,
       ...this.getCanvasOffsets({ offsetLeft, offsetTop }),
     };
     if (forwardedRef && "current" in forwardedRef) {
@@ -320,7 +311,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.syncActionResult,
       () => this.state,
       () => this.scene.getElementsIncludingDeleted(),
-      this.props.collaborators,
+      () => this.props.collaborators,
     );
     this.actionManager.registerAll(actions);
 
@@ -381,6 +372,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           toggleZenMode={this.toggleZenMode}
           lng={getLanguage().lng}
           collaborators={this.props.collaborators}
+          isCollaborating={this.props.isCollaborating}
         />
         <main>
           <canvas
@@ -448,7 +440,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             ...actionResult.appState,
             editingElement:
               editingElement || actionResult.appState?.editingElement || null,
-            isCollaborating: state.isCollaborating,
             width: state.width,
             height: state.height,
             offsetTop: state.offsetTop,
@@ -758,11 +749,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         width: this.props.width,
         height: this.props.height,
         ...this.getCanvasOffsets(this.props),
-      });
-    }
-    if (prevProps.isCollaborating !== this.props.isCollaborating) {
-      this.setState({
-        isCollaborating: this.props.isCollaborating,
       });
     }
 

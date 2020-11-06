@@ -61,6 +61,7 @@ interface LayerUIProps {
   toggleZenMode: () => void;
   lng: string;
   collaborators: Map<string, Collaborator>;
+  isCollaborating: boolean;
 }
 
 function useOnClickOutside(
@@ -296,6 +297,7 @@ const LayerUI = ({
   zenModeEnabled,
   toggleZenMode,
   collaborators,
+  isCollaborating,
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
@@ -388,7 +390,7 @@ const LayerUI = ({
             {renderExportDialog()}
             {actionManager.renderAction("clearCanvas")}
             <RoomDialog
-              isCollaborating={appState.isCollaborating}
+              isCollaborating={isCollaborating}
               collaboratorCount={collaborators.size}
               username={appState.username}
               onUsernameChange={onUsernameChange}
@@ -594,6 +596,7 @@ const LayerUI = ({
       onLockToggle={onLockToggle}
       canvas={canvas}
       collaborators={collaborators}
+      isCollaborating={isCollaborating}
     />
   ) : (
     <div className="layer-ui__wrapper">
