@@ -10,11 +10,11 @@ import {
 export const normalizeScroll = (pos: number) =>
   Math.floor(pos) as FlooredNumber;
 
-function isOutsideViewPort(
+const isOutsideViewPort = (
   appState: AppState,
   canvas: HTMLCanvasElement | null,
   cords: Array<number>,
-) {
+) => {
   const [x1, y1, x2, y2] = cords;
   const { x: viewportX1, y: viewportY1 } = sceneCoordsToViewportCoords(
     { sceneX: x1, sceneY: y1 },
@@ -28,7 +28,7 @@ function isOutsideViewPort(
     viewportX2 - viewportX1 > appState.width ||
     viewportY2 - viewportY1 > appState.height
   );
-}
+};
 
 export const centerScrollOn = ({
   scenePoint,

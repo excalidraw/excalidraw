@@ -24,21 +24,21 @@ type ParseSpreadsheetResult =
       error: string;
     };
 
-function tryParseNumber(s: string): number | null {
+const tryParseNumber = (s: string): number | null => {
   const match = /^[$€£¥₩]?([0-9]+(\.[0-9]+)?)$/.exec(s);
   if (!match) {
     return null;
   }
   return parseFloat(match[1]);
-}
+};
 
-function isNumericColumn(lines: string[][], columnIndex: number) {
+const isNumericColumn = (lines: string[][], columnIndex: number) => {
   return lines
     .slice(1)
     .every((line) => tryParseNumber(line[columnIndex]) !== null);
-}
+};
 
-function tryParseCells(cells: string[][]): ParseSpreadsheetResult {
+const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
   const numCols = cells[0].length;
 
   if (numCols > 2) {
@@ -94,9 +94,9 @@ function tryParseCells(cells: string[][]): ParseSpreadsheetResult {
       values: rows.map((row) => tryParseNumber(row[valueColumnIndex])!),
     },
   };
-}
+};
 
-function transposeCells(cells: string[][]) {
+const transposeCells = (cells: string[][]) => {
   const nextCells: string[][] = [];
   for (let col = 0; col < cells[0].length; col++) {
     const nextCellRow: string[] = [];
@@ -107,9 +107,9 @@ function transposeCells(cells: string[][]) {
   }
 
   return nextCells;
-}
+};
 
-export function tryParseSpreadsheet(text: string): ParseSpreadsheetResult {
+export const tryParseSpreadsheet = (text: string): ParseSpreadsheetResult => {
   // copy/paste from excel, in-browser excel, and google sheets is tsv
   // for now we only accept 2 columns with an optional header
   const lines = text
@@ -139,7 +139,7 @@ export function tryParseSpreadsheet(text: string): ParseSpreadsheetResult {
   }
 
   return result;
-}
+};
 
 const BAR_WIDTH = 32;
 const BAR_SPACING = 12;
@@ -148,12 +148,12 @@ const LABEL_SPACING = 3 * BAR_SPACING;
 const Y_AXIS_LABEL_SPACING = LABEL_SPACING;
 const ANGLE = 5.87;
 
-export function renderSpreadsheet(
+export const renderSpreadsheet = (
   appState: AppState,
   spreadsheet: Spreadsheet,
   x: number,
   y: number,
-): ExcalidrawElement[] {
+): ExcalidrawElement[] => {
   const max = Math.max(...spreadsheet.values);
   const min = Math.min(0, ...spreadsheet.values);
   const range = max - min;
@@ -268,4 +268,4 @@ export function renderSpreadsheet(
   return [...bars, yAxisLabel, minYLabel, maxYLabel, ...xLabels].filter(
     (element) => element !== null,
   ) as ExcalidrawElement[];
-}
+};

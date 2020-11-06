@@ -29,7 +29,7 @@ beforeEach(async () => {
   render(<App />);
 });
 
-function createAndSelectTwoRectangles() {
+const createAndSelectTwoRectangles = () => {
   UI.clickTool("rectangle");
   mouse.down();
   mouse.up(100, 100);
@@ -44,9 +44,9 @@ function createAndSelectTwoRectangles() {
   Keyboard.withModifierKeys({ shift: true }, () => {
     mouse.click();
   });
-}
+};
 
-function createAndSelectTwoRectanglesWithDifferentSizes() {
+const createAndSelectTwoRectanglesWithDifferentSizes = () => {
   UI.clickTool("rectangle");
   mouse.down();
   mouse.up(100, 100);
@@ -61,7 +61,7 @@ function createAndSelectTwoRectanglesWithDifferentSizes() {
   Keyboard.withModifierKeys({ shift: true }, () => {
     mouse.click();
   });
-}
+};
 
 it("aligns two objects correctly to the top", () => {
   createAndSelectTwoRectangles();
@@ -185,7 +185,7 @@ it("centers two objects with different sizes correctly horizontally", () => {
   expect(API.getSelectedElements()[1].y).toEqual(110);
 });
 
-function createAndSelectGroupAndRectangle() {
+const createAndSelectGroupAndRectangle = () => {
   UI.clickTool("rectangle");
   mouse.down();
   mouse.up(100, 100);
@@ -213,7 +213,7 @@ function createAndSelectGroupAndRectangle() {
   Keyboard.withModifierKeys({ shift: true }, () => {
     mouse.click();
   });
-}
+};
 
 it("aligns a group with another element correctly to the top", () => {
   createAndSelectGroupAndRectangle();
@@ -299,7 +299,7 @@ it("centers a group with another element correctly horizontally", () => {
   expect(API.getSelectedElements()[2].x).toEqual(100);
 });
 
-function createAndSelectTwoGroups() {
+const createAndSelectTwoGroups = () => {
   UI.clickTool("rectangle");
   mouse.down();
   mouse.up(100, 100);
@@ -339,7 +339,7 @@ function createAndSelectTwoGroups() {
   Keyboard.withModifierKeys({ shift: true }, () => {
     mouse.click();
   });
-}
+};
 
 it("aligns two groups correctly to the top", () => {
   createAndSelectTwoGroups();
@@ -437,7 +437,7 @@ it("centers two groups correctly horizontally", () => {
   expect(API.getSelectedElements()[3].x).toEqual(200);
 });
 
-function createAndSelectNestedGroupAndRectangle() {
+const createAndSelectNestedGroupAndRectangle = () => {
   UI.clickTool("rectangle");
   mouse.down();
   mouse.up(100, 100);
@@ -480,7 +480,7 @@ function createAndSelectNestedGroupAndRectangle() {
   Keyboard.withModifierKeys({ shift: true }, () => {
     mouse.click();
   });
-}
+};
 
 it("aligns nested group and other element correctly to the top", () => {
   createAndSelectNestedGroupAndRectangle();
