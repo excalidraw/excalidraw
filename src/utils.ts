@@ -240,9 +240,7 @@ const RE_RTL_CHECK = new RegExp(`^[^${RS_LTR_CHARS}]*[${RS_RTL_CHARS}]`);
  *  RTL.
  * See https://github.com/excalidraw/excalidraw/pull/1722#discussion_r436340171
  */
-export const isRTL = (text: string) => {
-  return RE_RTL_CHECK.test(text);
-};
+export const isRTL = (text: string) => RE_RTL_CHECK.test(text);
 
 export function tupleToCoors(
   xyTuple: readonly [number, number],
@@ -268,10 +266,10 @@ export const findIndex = <T>(
     fromIndex = array.length + fromIndex;
   }
   fromIndex = Math.min(array.length, Math.max(fromIndex, 0));
-  let i = fromIndex - 1;
-  while (++i < array.length) {
-    if (cb(array[i], i, array)) {
-      return i;
+  let index = fromIndex - 1;
+  while (++index < array.length) {
+    if (cb(array[index], index, array)) {
+      return index;
     }
   }
   return -1;
@@ -286,10 +284,10 @@ export const findLastIndex = <T>(
     fromIndex = array.length + fromIndex;
   }
   fromIndex = Math.min(array.length - 1, Math.max(fromIndex, 0));
-  let i = fromIndex + 1;
-  while (--i > -1) {
-    if (cb(array[i], i, array)) {
-      return i;
+  let index = fromIndex + 1;
+  while (--index > -1) {
+    if (cb(array[index], index, array)) {
+      return index;
     }
   }
   return -1;
