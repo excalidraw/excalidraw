@@ -98,7 +98,7 @@ export const getTransformHandlesFromCoords = (
   const centeringOffset = (size - 8) / (2 * zoom.value);
 
   const transformHandles: TransformHandles = {
-    nw: omitSides["nw"]
+    nw: omitSides.nw
       ? undefined
       : generateTransformHandle(
           x1 - dashedLineMargin - handleMarginX + centeringOffset,
@@ -109,7 +109,7 @@ export const getTransformHandlesFromCoords = (
           cy,
           angle,
         ),
-    ne: omitSides["ne"]
+    ne: omitSides.ne
       ? undefined
       : generateTransformHandle(
           x2 + dashedLineMargin - centeringOffset,
@@ -120,7 +120,7 @@ export const getTransformHandlesFromCoords = (
           cy,
           angle,
         ),
-    sw: omitSides["sw"]
+    sw: omitSides.sw
       ? undefined
       : generateTransformHandle(
           x1 - dashedLineMargin - handleMarginX + centeringOffset,
@@ -131,7 +131,7 @@ export const getTransformHandlesFromCoords = (
           cy,
           angle,
         ),
-    se: omitSides["se"]
+    se: omitSides.se
       ? undefined
       : generateTransformHandle(
           x2 + dashedLineMargin - centeringOffset,
@@ -142,7 +142,7 @@ export const getTransformHandlesFromCoords = (
           cy,
           angle,
         ),
-    rotation: omitSides["rotation"]
+    rotation: omitSides.rotation
       ? undefined
       : generateTransformHandle(
           x1 + width / 2 - handleWidth / 2,
@@ -162,8 +162,8 @@ export const getTransformHandlesFromCoords = (
   // We only want to show height handles (all cardinal directions)  above a certain size
   const minimumSizeForEightHandles = (5 * size) / zoom.value;
   if (Math.abs(width) > minimumSizeForEightHandles) {
-    if (!omitSides["n"]) {
-      transformHandles["n"] = generateTransformHandle(
+    if (!omitSides.n) {
+      transformHandles.n = generateTransformHandle(
         x1 + width / 2 - handleWidth / 2,
         y1 - dashedLineMargin - handleMarginY + centeringOffset,
         handleWidth,
@@ -173,8 +173,8 @@ export const getTransformHandlesFromCoords = (
         angle,
       );
     }
-    if (!omitSides["s"]) {
-      transformHandles["s"] = generateTransformHandle(
+    if (!omitSides.s) {
+      transformHandles.s = generateTransformHandle(
         x1 + width / 2 - handleWidth / 2,
         y2 + dashedLineMargin - centeringOffset,
         handleWidth,
@@ -186,8 +186,8 @@ export const getTransformHandlesFromCoords = (
     }
   }
   if (Math.abs(height) > minimumSizeForEightHandles) {
-    if (!omitSides["w"]) {
-      transformHandles["w"] = generateTransformHandle(
+    if (!omitSides.w) {
+      transformHandles.w = generateTransformHandle(
         x1 - dashedLineMargin - handleMarginX + centeringOffset,
         y1 + height / 2 - handleHeight / 2,
         handleWidth,
@@ -197,8 +197,8 @@ export const getTransformHandlesFromCoords = (
         angle,
       );
     }
-    if (!omitSides["e"]) {
-      transformHandles["e"] = generateTransformHandle(
+    if (!omitSides.e) {
+      transformHandles.e = generateTransformHandle(
         x2 + dashedLineMargin - centeringOffset,
         y1 + height / 2 - handleHeight / 2,
         handleWidth,

@@ -24,7 +24,7 @@ export const ButtonIconSelect = <T extends Object>({
           type="radio"
           name={group}
           onChange={() => onChange(option.value)}
-          checked={value === option.value ? true : false}
+          checked={value === option.value}
         />
         {option.icon}
       </label>

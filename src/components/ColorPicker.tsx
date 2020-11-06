@@ -78,11 +78,9 @@ const Picker = ({
           colorInput.current?.focus();
           event.preventDefault();
         }
-      } else {
-        if (activeElement === colorInput.current) {
-          firstItem.current?.focus();
-          event.preventDefault();
-        }
+      } else if (activeElement === colorInput.current) {
+        firstItem.current?.focus();
+        event.preventDefault();
       }
     } else if (
       event.key === KEYS.ARROW_RIGHT ||

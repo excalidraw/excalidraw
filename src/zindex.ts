@@ -15,18 +15,18 @@ const getIndicesToMove = (
   let selectedIndices: number[] = [];
   let deletedIndices: number[] = [];
   let includeDeletedIndex = null;
-  let i = -1;
-  while (++i < elements.length) {
-    if (appState.selectedElementIds[elements[i].id]) {
+  let index = -1;
+  while (++index < elements.length) {
+    if (appState.selectedElementIds[elements[index].id]) {
       if (deletedIndices.length) {
         selectedIndices = selectedIndices.concat(deletedIndices);
         deletedIndices = [];
       }
-      selectedIndices.push(i);
-      includeDeletedIndex = i + 1;
-    } else if (elements[i].isDeleted && includeDeletedIndex === i) {
-      includeDeletedIndex = i + 1;
-      deletedIndices.push(i);
+      selectedIndices.push(index);
+      includeDeletedIndex = index + 1;
+    } else if (elements[index].isDeleted && includeDeletedIndex === index) {
+      includeDeletedIndex = index + 1;
+      deletedIndices.push(index);
     } else {
       deletedIndices = [];
     }
@@ -187,7 +187,8 @@ const shiftElementsToEnd = (
   const targetElements: ExcalidrawElement[] = [];
   const displacedElements: ExcalidrawElement[] = [];
 
-  let leadingIndex, trailingIndex;
+  let leadingIndex: number;
+  let trailingIndex: number;
   if (direction === "left") {
     if (appState.editingGroupId) {
       const groupElements = getElementsInGroup(

@@ -2,11 +2,15 @@
 
 ## Install
 
-    npm i @excalidraw/utils
+```bash
+npm install @excalidraw/utils
+```
 
 If you prefer Yarn over npm, use this command to install the Excalidraw utils package:
 
-    yarn add @excalidraw/utils
+```bashs
+yarn add @excalidraw/utils
+```
 
 ## API
 

@@ -1,18 +1,18 @@
 import oc from "open-color";
 
-const shades = (i: number) => [
-  oc.red[i],
-  oc.pink[i],
-  oc.grape[i],
-  oc.violet[i],
-  oc.indigo[i],
-  oc.blue[i],
-  oc.cyan[i],
-  oc.teal[i],
-  oc.green[i],
-  oc.lime[i],
-  oc.yellow[i],
-  oc.orange[i],
+const shades = (index: number) => [
+  oc.red[index],
+  oc.pink[index],
+  oc.grape[index],
+  oc.violet[index],
+  oc.indigo[index],
+  oc.blue[index],
+  oc.cyan[index],
+  oc.teal[index],
+  oc.green[index],
+  oc.lime[index],
+  oc.yellow[index],
+  oc.orange[index],
 ];
 
 export default {
