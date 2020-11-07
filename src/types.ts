@@ -68,7 +68,6 @@ export type AppState = {
   cursorButton: "up" | "down";
   scrolledOutside: boolean;
   name: string;
-  username: string;
   isResizing: boolean;
   isRotating: boolean;
   zoom: Zoom;
@@ -141,10 +140,8 @@ export interface ExcalidrawProps {
   user?: {
     name?: string | null;
   };
-  onUsernameChange?: (username: string) => void;
   forwardedRef: ForwardRef<ExcalidrawImperativeAPI>;
-  onCollaborationStart: (elements?: readonly ExcalidrawElement[]) => void;
-  onCollaborationEnd: () => void;
+  onCollabButtonClick?: () => void;
   isCollaborating: boolean;
   onPointerUpdate: (payload: {
     pointer: { x: number; y: number };

@@ -26,9 +26,7 @@ type MobileMenuProps = {
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
   libraryMenu: JSX.Element | null;
-  onRoomCreate: () => void;
-  onUsernameChange: (username: string) => void;
-  onRoomDestroy: () => void;
+  onCollabButtonClick?: () => void;
   onLockToggle: () => void;
   canvas: HTMLCanvasElement | null;
   collaborators: Map<string, Collaborator>;
@@ -42,9 +40,7 @@ export const MobileMenu = ({
   actionManager,
   exportButton,
   setAppState,
-  onRoomCreate,
-  onUsernameChange,
-  onRoomDestroy,
+  onCollabButtonClick,
   onLockToggle,
   canvas,
   collaborators,
@@ -97,17 +93,13 @@ export const MobileMenu = ({
                 {actionManager.renderAction("saveAsScene")}
                 {exportButton}
                 {actionManager.renderAction("clearCanvas")}
-                <RoomDialog
-                  isCollaborating={isCollaborating}
-                  collaboratorCount={collaborators.size}
-                  username={appState.username}
-                  onUsernameChange={onUsernameChange}
-                  onRoomCreate={onRoomCreate}
-                  onRoomDestroy={onRoomDestroy}
-                  setErrorMessage={(message: string) =>
-                    setAppState({ errorMessage: message })
-                  }
-                />
+                {onCollabButtonClick && (
+                  <RoomDialog
+                    isCollaborating={isCollaborating}
+                    collaboratorCount={collaborators.size}
+                    onClick={onCollabButtonClick}
+                  />
+                )}
                 <BackgroundPickerAndDarkModeToggle
                   actionManager={actionManager}
                   appState={appState}

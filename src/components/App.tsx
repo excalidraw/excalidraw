@@ -257,6 +257,7 @@ export type ExcalidrawImperativeAPI =
       };
       setScrollToCenter: InstanceType<typeof App>["setScrollToCenter"];
       initializeScene: InstanceType<typeof App>["initializeScene"];
+      getSceneElements: InstanceType<typeof App>["getSceneElements"];
     }
   | undefined;
 
@@ -277,13 +278,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     super(props);
     const defaultAppState = getDefaultAppState();
 
-    const { width, height, offsetLeft, offsetTop, user, forwardedRef } = props;
+    const { width, height, offsetLeft, offsetTop, forwardedRef } = props;
     this.state = {
       ...defaultAppState,
       isLoading: true,
       width,
       height,
-      username: user?.name || "",
       ...this.getCanvasOffsets({ offsetLeft, offsetTop }),
     };
     if (forwardedRef && "current" in forwardedRef) {
@@ -297,6 +297,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         },
         setScrollToCenter: this.setScrollToCenter,
         initializeScene: this.initializeScene,
+        getSceneElements: this.getSceneElements,
       };
     }
     this.scene = new Scene();
@@ -323,11 +324,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       offsetLeft,
     } = this.state;
 
-    const {
-      onUsernameChange,
-      onCollaborationStart,
-      onCollaborationEnd,
-    } = this.props;
+    const { onCollabButtonClick } = this.props;
     const canvasScale = window.devicePixelRatio;
 
     const canvasWidth = canvasDOMWidth * canvasScale;
@@ -350,15 +347,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           setAppState={this.setAppState}
           actionManager={this.actionManager}
           elements={this.scene.getElements()}
-          onRoomCreate={onCollaborationStart.bind(
-            null,
-            this.scene.getElements(),
-          )}
-          onRoomDestroy={onCollaborationEnd}
-          onUsernameChange={(username) => {
-            onUsernameChange && onUsernameChange(username);
-            this.setState({ username });
-          }}
+          onCollabButtonClick={
+            onCollabButtonClick ? onCollabButtonClick : undefined
+          }
           onLockToggle={this.toggleLock}
           onInsertShape={(elements) =>
             this.addElementsFromPasteOrLibrary(elements)
@@ -397,6 +388,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   public getSceneElementsIncludingDeleted = () => {
     return this.scene.getElementsIncludingDeleted();
+  };
+
+  public getSceneElements = () => {
+    return this.scene.getElements();
   };
 
   private syncActionResult = withBatchedUpdates(
@@ -513,7 +508,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.setState({
       ...getDefaultAppState(),
       appearance: this.state.appearance,
-      username: this.state.username,
     });
     this.resetHistory();
   });

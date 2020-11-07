@@ -36,7 +36,9 @@ import { ExcalidrawImperativeAPI } from "../../components/App";
 import { t } from "../../i18n";
 import {
   importFromLocalStorage,
+  importUsernameFromLocalStorage,
   saveToLocalStorage,
+  saveUsernameToLocalStorage,
 } from "../../data/localStorage";
 import { ImportedDataState } from "../../data/types";
 import { debounce } from "../../utils";
@@ -44,12 +46,18 @@ import {
   getSceneVersion,
   getSyncableElements,
 } from "../../packages/excalidraw/index";
+import CollaborationDialog from "./CollaborationDialog";
+import { ErrorDialog } from "../../components/ErrorDialog";
 
 interface Props {}
 interface State {
   isLoading: boolean;
   collaborators: Map<string, Collaborator>;
   isCollaborating: boolean;
+  modalIsShown: boolean;
+  errorMessage: string;
+  username: string;
+  activeRoomLink: string;
 }
 
 /**
@@ -80,6 +88,10 @@ class CollabWrapper extends PureComponent<Props, State> {
       isLoading: false,
       collaborators: new Map(),
       isCollaborating: false,
+      modalIsShown: false,
+      errorMessage: "",
+      username: importUsernameFromLocalStorage() || "",
+      activeRoomLink: "",
     };
     this.portal = new Portal(this);
     this.unmounted = false;
@@ -245,12 +257,13 @@ class CollabWrapper extends PureComponent<Props, State> {
     }
   };
 
-  openPortal = async (elements: readonly ExcalidrawElement[]) => {
+  openPortal = async () => {
     window.history.pushState(
       {},
       "Excalidraw",
       await generateCollaborationLink(),
     );
+    const elements = this.excalidrawRef.current.getSceneElements();
     // remove deleted elements from elements array & history to ensure we don't
     // expose potentially sensitive user data in case user manually deletes
     // existing elements (or clears scene), which would otherwise be persisted
@@ -271,6 +284,7 @@ class CollabWrapper extends PureComponent<Props, State> {
     this.setState({
       isCollaborating: false,
       collaborators: new Map(),
+      activeRoomLink: "",
     });
     this.portal.close();
   };
@@ -365,6 +379,7 @@ class CollabWrapper extends PureComponent<Props, State> {
 
       this.setState({
         isCollaborating: true,
+        activeRoomLink: window.location.href,
         isLoading: opts.showLoadingState ? true : this.state.isLoading,
       });
 
@@ -504,10 +519,23 @@ class CollabWrapper extends PureComponent<Props, State> {
     this.setLastBroadcastedOrReceivedSceneVersion(newVersion);
   }, SYNC_FULL_SCENE_INTERVAL_MS);
 
+  handleClose = () => {
+    this.setState({ modalIsShown: false });
+  };
+
+  onUsernameChange = (username: string) => {
+    this.setState({ username });
+    saveUsernameToLocalStorage(username);
+  };
+
+  onCollabButtonClick = () => {
+    this.setState({
+      modalIsShown: true,
+    });
+  };
+
   getValue() {
     return {
-      onCollaborationStart: this.openPortal,
-      onCollaborationEnd: this.closePortal,
       excalidrawRef: this.excalidrawRef,
       isCollaborating: this.state.isCollaborating,
       onPointerUpdate: this.onPointerUpdate,
@@ -515,12 +543,37 @@ class CollabWrapper extends PureComponent<Props, State> {
       initializeScene: this.initializeScene,
       isCollaborationScene: this.isCollaborationScene,
       onChange: this.onChange,
+      username: this.state.username,
+      onCollabButtonClick: this.onCollabButtonClick,
     };
   }
-
   render() {
     const { children } = this.props;
-    return <CollabProvider value={this.getValue()}> {children}</CollabProvider>;
+    const { modalIsShown, username, errorMessage, activeRoomLink } = this.state;
+    return (
+      <CollabProvider value={this.getValue()}>
+        {modalIsShown && (
+          <CollaborationDialog
+            handleClose={this.handleClose}
+            activeRoomLink={activeRoomLink}
+            username={username}
+            onUsernameChange={this.onUsernameChange}
+            onRoomCreate={this.openPortal}
+            onRoomDestroy={this.closePortal}
+            setErrorMessage={(errorMessage) => {
+              this.setState({ errorMessage });
+            }}
+          />
+        )}
+        {errorMessage && (
+          <ErrorDialog
+            message={errorMessage}
+            onClose={() => this.setState({ errorMessage: "" })}
+          />
+        )}
+        {children}
+      </CollabProvider>
+    );
   }
 }
 

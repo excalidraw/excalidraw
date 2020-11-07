@@ -6,10 +6,9 @@ import App, { ExcalidrawImperativeAPI } from "../../components/App";
 import "../../css/app.scss";
 import "../../css/styles.scss";
 
-import { noop } from "../../utils";
-
 import { ExcalidrawProps } from "../../types";
 import { IsMobileProvider } from "../../is-mobile";
+import { noop } from "../../utils";
 
 const Excalidraw = (props: ExcalidrawProps) => {
   const {
@@ -20,10 +19,8 @@ const Excalidraw = (props: ExcalidrawProps) => {
     onChange,
     initialData,
     user,
-    onUsernameChange,
     forwardedRef,
-    onCollaborationStart = noop,
-    onCollaborationEnd = noop,
+    onCollabButtonClick = noop,
     isCollaborating,
     onPointerUpdate,
     collaborators,
@@ -60,10 +57,8 @@ const Excalidraw = (props: ExcalidrawProps) => {
           onChange={onChange}
           initialData={initialData}
           user={user}
-          onUsernameChange={onUsernameChange}
           forwardedRef={forwardedRef}
-          onCollaborationStart={onCollaborationStart}
-          onCollaborationEnd={onCollaborationEnd}
+          onCollabButtonClick={onCollabButtonClick}
           isCollaborating={isCollaborating}
           onPointerUpdate={onPointerUpdate}
           collaborators={collaborators}

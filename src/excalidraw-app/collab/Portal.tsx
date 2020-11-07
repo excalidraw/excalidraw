@@ -1,7 +1,7 @@
 import {
   encryptAESGEM,
-  SocketUpdateDataSource,
   SocketUpdateData,
+  SocketUpdateDataSource,
 } from "../data";
 
 import CollabWrapper from "./CollabWrapper";
@@ -146,7 +146,7 @@ class Portal {
           button: payload.button || "up",
           selectedElementIds:
             this.app.excalidrawAppState?.selectedElementIds || {},
-          username: this.app.excalidrawAppState?.username || "",
+          username: this.app.state.username,
         },
       };
       return this._broadcastSocketData(
@@ -163,48 +163,51 @@ class Portal {
     const localElementMap = getElementMap(currentElements);
 
     // Reconcile
-    const newElements = sceneElements
-      .reduce((elements, element) => {
-        // if the remote element references one that's currently
-        // edited on local, skip it (it'll be added in the next step)
-        if (
-          element.id === this.app.excalidrawAppState?.editingElement?.id ||
-          element.id === this.app.excalidrawAppState?.resizingElement?.id ||
-          element.id === this.app.excalidrawAppState?.draggingElement?.id
-        ) {
-          return elements;
-        }
-
-        if (
-          localElementMap.hasOwnProperty(element.id) &&
-          localElementMap[element.id].version > element.version
-        ) {
-          elements.push(localElementMap[element.id]);
-          delete localElementMap[element.id];
-        } else if (
-          localElementMap.hasOwnProperty(element.id) &&
-          localElementMap[element.id].version === element.version &&
-          localElementMap[element.id].versionNonce !== element.versionNonce
-        ) {
-          // resolve conflicting edits deterministically by taking the one with the lowest versionNonce
-          if (localElementMap[element.id].versionNonce < element.versionNonce) {
-            elements.push(localElementMap[element.id]);
-          } else {
-            // it should be highly unlikely that the two versionNonces are the same. if we are
-            // really worried about this, we can replace the versionNonce with the socket id.
-            elements.push(element);
+    return (
+      sceneElements
+        .reduce((elements, element) => {
+          // if the remote element references one that's currently
+          // edited on local, skip it (it'll be added in the next step)
+          if (
+            element.id === this.app.excalidrawAppState?.editingElement?.id ||
+            element.id === this.app.excalidrawAppState?.resizingElement?.id ||
+            element.id === this.app.excalidrawAppState?.draggingElement?.id
+          ) {
+            return elements;
           }
-          delete localElementMap[element.id];
-        } else {
-          elements.push(element);
-          delete localElementMap[element.id];
-        }
 
-        return elements;
-      }, [] as Mutable<typeof sceneElements>)
-      // add local elements that weren't deleted or on remote
-      .concat(...Object.values(localElementMap));
-    return newElements;
+          if (
+            localElementMap.hasOwnProperty(element.id) &&
+            localElementMap[element.id].version > element.version
+          ) {
+            elements.push(localElementMap[element.id]);
+            delete localElementMap[element.id];
+          } else if (
+            localElementMap.hasOwnProperty(element.id) &&
+            localElementMap[element.id].version === element.version &&
+            localElementMap[element.id].versionNonce !== element.versionNonce
+          ) {
+            // resolve conflicting edits deterministically by taking the one with the lowest versionNonce
+            if (
+              localElementMap[element.id].versionNonce < element.versionNonce
+            ) {
+              elements.push(localElementMap[element.id]);
+            } else {
+              // it should be highly unlikely that the two versionNonces are the same. if we are
+              // really worried about this, we can replace the versionNonce with the socket id.
+              elements.push(element);
+            }
+            delete localElementMap[element.id];
+          } else {
+            elements.push(element);
+            delete localElementMap[element.id];
+          }
+
+          return elements;
+        }, [] as Mutable<typeof sceneElements>)
+        // add local elements that weren't deleted or on remote
+        .concat(...Object.values(localElementMap))
+    );
   };
 }
 

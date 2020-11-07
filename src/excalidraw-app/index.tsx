@@ -5,17 +5,9 @@ import { LoadingMessage } from "../components/LoadingMessage";
 import Excalidraw from "../packages/excalidraw/index";
 import { WithCollaboration } from "./collab/WithCollaboration";
 
-import {
-  importFromLocalStorage,
-  importUsernameFromLocalStorage,
-  saveUsernameToLocalStorage,
-} from "../data/localStorage";
+import { importFromLocalStorage } from "../data/localStorage";
 
 import { ImportedDataState } from "../data/types";
-
-const onUsernameChange = (username: string) => {
-  saveUsernameToLocalStorage(username);
-};
 
 function ExcalidrawApp(props: any) {
   // dimensions
@@ -29,14 +21,14 @@ function ExcalidrawApp(props: any) {
   const {
     context: {
       excalidrawRef,
-      onCollaborationStart,
-      onCollaborationEnd,
       isCollaborating,
       onPointerUpdate,
       collaborators,
       initializeScene,
       isCollaborationScene,
       onChange,
+      username,
+      onCollabButtonClick,
     },
   } = props;
 
@@ -58,17 +50,11 @@ function ExcalidrawApp(props: any) {
 
   const [initialState, setInitialState] = useState<{
     data: ImportedDataState;
-    user: {
-      name: string | null;
-    };
   } | null>(null);
 
   useEffect(() => {
     setInitialState({
       data: importFromLocalStorage(),
-      user: {
-        name: importUsernameFromLocalStorage(),
-      },
     });
   }, []);
 
@@ -83,10 +69,8 @@ function ExcalidrawApp(props: any) {
       height={dimensions.height}
       onChange={onChange}
       initialData={initialState.data}
-      user={initialState.user}
-      onUsernameChange={onUsernameChange}
-      onCollaborationEnd={onCollaborationEnd}
-      onCollaborationStart={onCollaborationStart}
+      user={{ name: username }}
+      onCollabButtonClick={onCollabButtonClick}
       isCollaborating={isCollaborating}
       onPointerUpdate={onPointerUpdate}
       collaborators={collaborators}

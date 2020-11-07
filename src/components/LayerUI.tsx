@@ -52,9 +52,7 @@ interface LayerUIProps {
   canvas: HTMLCanvasElement | null;
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
-  onRoomCreate: () => void;
-  onUsernameChange: (username: string) => void;
-  onRoomDestroy: () => void;
+  onCollabButtonClick?: () => void;
   onLockToggle: () => void;
   onInsertShape: (elements: LibraryItem) => void;
   zenModeEnabled: boolean;
@@ -289,9 +287,7 @@ const LayerUI = ({
   setAppState,
   canvas,
   elements,
-  onRoomCreate,
-  onUsernameChange,
-  onRoomDestroy,
+  onCollabButtonClick,
   onLockToggle,
   onInsertShape,
   zenModeEnabled,
@@ -389,17 +385,13 @@ const LayerUI = ({
             {actionManager.renderAction("saveAsScene")}
             {renderExportDialog()}
             {actionManager.renderAction("clearCanvas")}
-            <RoomDialog
-              isCollaborating={isCollaborating}
-              collaboratorCount={collaborators.size}
-              username={appState.username}
-              onUsernameChange={onUsernameChange}
-              onRoomCreate={onRoomCreate}
-              onRoomDestroy={onRoomDestroy}
-              setErrorMessage={(message: string) =>
-                setAppState({ errorMessage: message })
-              }
-            />
+            {onCollabButtonClick && (
+              <RoomDialog
+                isCollaborating={isCollaborating}
+                collaboratorCount={collaborators.size}
+                onClick={onCollabButtonClick}
+              />
+            )}
           </Stack.Row>
           <BackgroundPickerAndDarkModeToggle
             actionManager={actionManager}
@@ -590,9 +582,7 @@ const LayerUI = ({
       libraryMenu={libraryMenu}
       exportButton={renderExportDialog()}
       setAppState={setAppState}
-      onUsernameChange={onUsernameChange}
-      onRoomCreate={onRoomCreate}
-      onRoomDestroy={onRoomDestroy}
+      onCollabButtonClick={onCollabButtonClick}
       onLockToggle={onLockToggle}
       canvas={canvas}
       collaborators={collaborators}
