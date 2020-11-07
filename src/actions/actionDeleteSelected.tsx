@@ -31,10 +31,10 @@ const deleteSelectedElements = (
   };
 };
 
-function handleGroupEditingState(
+const handleGroupEditingState = (
   appState: AppState,
   elements: readonly ExcalidrawElement[],
-): AppState {
+): AppState => {
   if (appState.editingGroupId) {
     const siblingElements = getElementsInGroup(
       getNonDeletedElements(elements),
@@ -48,7 +48,7 @@ function handleGroupEditingState(
     }
   }
   return appState;
-}
+};
 
 export const actionDeleteSelected = register({
   name: "deleteSelectedElements",

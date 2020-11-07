@@ -105,9 +105,9 @@ const duplicateElements = (
 
   const finalElements: ExcalidrawElement[] = [];
 
-  let i = 0;
-  while (i < elements.length) {
-    const element = elements[i];
+  let index = 0;
+  while (index < elements.length) {
+    const element = elements[index];
     if (appState.selectedElementIds[element.id]) {
       if (element.groupIds.length) {
         const groupId = getSelectedGroupForElement(appState, element);
@@ -120,7 +120,7 @@ const duplicateElements = (
               duplicateAndOffsetElement(element),
             ),
           );
-          i = i + groupElements.length;
+          index = index + groupElements.length;
           continue;
         }
       }
@@ -128,7 +128,7 @@ const duplicateElements = (
     } else {
       finalElements.push(element);
     }
-    i++;
+    index++;
   }
 
   fixBindingsAfterDuplication(finalElements, oldElements, oldIdToDuplicatedId);

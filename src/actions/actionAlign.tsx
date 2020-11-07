@@ -23,11 +23,11 @@ const enableActionGroup = (
   appState: AppState,
 ) => getSelectedElements(getNonDeletedElements(elements), appState).length > 1;
 
-function alignSelectedElements(
+const alignSelectedElements = (
   elements: readonly ExcalidrawElement[],
   appState: Readonly<AppState>,
   alignment: Alignment,
-) {
+) => {
   const selectedElements = getSelectedElements(
     getNonDeletedElements(elements),
     appState,
@@ -38,7 +38,7 @@ function alignSelectedElements(
   const updatedElementsMap = getElementMap(updatedElements);
 
   return elements.map((element) => updatedElementsMap[element.id] || element);
-}
+};
 
 export const actionAlignTop = register({
   name: "alignTop",

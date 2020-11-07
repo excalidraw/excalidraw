@@ -327,7 +327,7 @@ const resizeSingleTextElement = (
     cy,
     -element.angle,
   );
-  let scale;
+  let scale: number;
   switch (transformHandleType) {
     case "se":
       scale = Math.max(
