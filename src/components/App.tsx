@@ -258,6 +258,7 @@ export type ExcalidrawImperativeAPI =
       setScrollToCenter: InstanceType<typeof App>["setScrollToCenter"];
       initializeScene: InstanceType<typeof App>["initializeScene"];
       getSceneElements: InstanceType<typeof App>["getSceneElements"];
+      setupScene: InstanceType<typeof App>["setupScene"];
     }
   | undefined;
 
@@ -298,6 +299,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         setScrollToCenter: this.setScrollToCenter,
         initializeScene: this.initializeScene,
         getSceneElements: this.getSceneElements,
+        setupScene: this.setupScene,
       };
     }
     this.scene = new Scene();
@@ -551,27 +553,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.setState({ isLoading: false });
     }
 
-    const isCollaborationScene = this.props?.isCollaborationScene?.() || false;
-    if (!isCollaborationScene && scene) {
-      if (scene.appState) {
-        scene.appState = {
-          ...scene.appState,
-          ...calculateScrollCenter(
-            scene.elements,
-            {
-              ...scene.appState,
-              offsetTop: this.state.offsetTop,
-              offsetLeft: this.state.offsetLeft,
-            },
-            null,
-          ),
-        };
-      }
-      this.resetHistory();
-      this.syncActionResult({
-        ...scene,
-        commitToHistory: true,
-      });
+    if (!this.props.initializeScene) {
+      this.setupScene(scene);
     }
 
     const addToLibraryUrl = new URLSearchParams(window.location.search).get(
@@ -581,6 +564,33 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (addToLibraryUrl) {
       await this.addToLibrary(addToLibraryUrl);
     }
+  };
+
+  // can be renamed to something better ?
+  private setupScene = (scene: {
+    elements: readonly ExcalidrawElement[];
+    appState: MarkOptional<AppState, "offsetTop" | "offsetLeft">;
+    commitToHistory: boolean;
+  }) => {
+    if (scene.appState) {
+      scene.appState = {
+        ...scene.appState,
+        ...calculateScrollCenter(
+          scene.elements,
+          {
+            ...scene.appState,
+            offsetTop: this.state.offsetTop,
+            offsetLeft: this.state.offsetLeft,
+          },
+          null,
+        ),
+      };
+    }
+    this.resetHistory();
+    this.syncActionResult({
+      ...scene,
+      commitToHistory: true,
+    });
   };
 
   public async componentDidMount() {

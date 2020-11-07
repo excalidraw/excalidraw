@@ -150,5 +150,4 @@ export interface ExcalidrawProps {
   }) => void;
   collaborators: Map<string, Collaborator>;
   initializeScene?: (scene: any) => void;
-  isCollaborationScene: () => boolean;
 }

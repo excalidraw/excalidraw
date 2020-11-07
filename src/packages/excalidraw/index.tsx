@@ -25,7 +25,6 @@ const Excalidraw = (props: ExcalidrawProps) => {
     onPointerUpdate,
     collaborators,
     initializeScene,
-    isCollaborationScene,
   } = props;
 
   useEffect(() => {
@@ -63,7 +62,6 @@ const Excalidraw = (props: ExcalidrawProps) => {
           onPointerUpdate={onPointerUpdate}
           collaborators={collaborators}
           initializeScene={initializeScene}
-          isCollaborationScene={isCollaborationScene}
         />
       </IsMobileProvider>
     </InitializeApp>

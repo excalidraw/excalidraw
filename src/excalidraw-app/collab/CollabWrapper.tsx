@@ -117,7 +117,11 @@ class CollabWrapper extends PureComponent<Props, State> {
     window.removeEventListener(EVENT.BLUR, this.onBlur);
   }
 
-  initializeScene = async (scene: any) => {
+  initializeScene = async (scene: {
+    elements: readonly ExcalidrawElement[];
+    appState: MarkOptional<AppState, "offsetTop" | "offsetLeft">;
+    commitToHistory: boolean;
+  }) => {
     const searchParams = new URLSearchParams(window.location.search);
     const id = searchParams.get("id");
     const jsonMatch = window.location.hash.match(
@@ -159,13 +163,11 @@ class CollabWrapper extends PureComponent<Props, State> {
       // when joining a room we don't want user's local scene data to be merged
       //  into the remote scene
       this.excalidrawRef.current.resetScene();
-      this.initializeSocketClient({ showLoadingState: true });
+      await this.initializeSocketClient({ showLoadingState: true });
+    } else if (scene) {
+      this.excalidrawRef.current.setupScene(scene);
     }
   };
-
-  private isCollaborationScene() {
-    return this.isCollabScene;
-  }
 
   private static shouldForceLoadScene(
     scene: ResolutionType<typeof loadScene>,
@@ -545,7 +547,6 @@ class CollabWrapper extends PureComponent<Props, State> {
       onPointerUpdate: this.onPointerUpdate,
       collaborators: this.state.collaborators,
       initializeScene: this.initializeScene,
-      isCollaborationScene: this.isCollaborationScene,
       onChange: this.onChange,
       username: this.state.username,
       onCollabButtonClick: this.onCollabButtonClick,

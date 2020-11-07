@@ -25,7 +25,6 @@ function ExcalidrawApp(props: any) {
       onPointerUpdate,
       collaborators,
       initializeScene,
-      isCollaborationScene,
       onChange,
       username,
       onCollabButtonClick,
@@ -75,7 +74,6 @@ function ExcalidrawApp(props: any) {
       onPointerUpdate={onPointerUpdate}
       collaborators={collaborators}
       initializeScene={initializeScene}
-      isCollaborationScene={isCollaborationScene}
     />
   );
 }
