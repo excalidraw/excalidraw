@@ -12,7 +12,7 @@ import { HintViewer } from "./HintViewer";
 import { calculateScrollCenter } from "../scene";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { Section } from "./Section";
-import { RoomDialog } from "./RoomDialog";
+import CollabButton from "./CollabButton";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 import { LockIcon } from "./LockIcon";
 import { LoadingMessage } from "./LoadingMessage";
@@ -94,7 +94,7 @@ export const MobileMenu = ({
                 {exportButton}
                 {actionManager.renderAction("clearCanvas")}
                 {onCollabButtonClick && (
-                  <RoomDialog
+                  <CollabButton
                     isCollaborating={isCollaborating}
                     collaboratorCount={collaborators.size}
                     onClick={onCollabButtonClick}

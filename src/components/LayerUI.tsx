@@ -28,7 +28,7 @@ import { ExportType } from "../scene/types";
 import { MobileMenu } from "./MobileMenu";
 import { ZoomActions, SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { Section } from "./Section";
-import { RoomDialog } from "./RoomDialog";
+import CollabButton from "./CollabButton";
 import { ErrorDialog } from "./ErrorDialog";
 import { ShortcutsDialog } from "./ShortcutsDialog";
 import { LoadingMessage } from "./LoadingMessage";
@@ -386,7 +386,7 @@ const LayerUI = ({
             {renderExportDialog()}
             {actionManager.renderAction("clearCanvas")}
             {onCollabButtonClick && (
-              <RoomDialog
+              <CollabButton
                 isCollaborating={isCollaborating}
                 collaboratorCount={collaborators.size}
                 onClick={onCollabButtonClick}

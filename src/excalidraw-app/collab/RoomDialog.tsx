@@ -2,7 +2,10 @@ import React from "react";
 import { t } from "../../i18n";
 import { Dialog } from "../../components/Dialog";
 import RoomModal from "./RoomModal";
-const CollaborationDialog = ({
+
+import "./RoomDialog.scss";
+
+const RoomDialog = ({
   handleClose,
   activeRoomLink,
   username,
@@ -38,4 +41,4 @@ const CollaborationDialog = ({
   );
 };
 
-export default CollaborationDialog;
+export default RoomDialog;

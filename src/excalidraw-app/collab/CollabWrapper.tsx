@@ -46,7 +46,7 @@ import {
   getSceneVersion,
   getSyncableElements,
 } from "../../packages/excalidraw/index";
-import CollaborationDialog from "./CollaborationDialog";
+import RoomDialog from "./RoomDialog";
 import { ErrorDialog } from "../../components/ErrorDialog";
 
 interface Props {}
@@ -523,9 +523,7 @@ class CollabWrapper extends PureComponent<Props, State> {
 
   handleClose = () => {
     this.setState({ modalIsShown: false });
-    const collabIcon = document.querySelector(
-      ".RoomDialog-modalButton",
-    ) as HTMLElement;
+    const collabIcon = document.querySelector(".CollabButton") as HTMLElement;
     collabIcon.focus();
   };
 
@@ -558,7 +556,7 @@ class CollabWrapper extends PureComponent<Props, State> {
     return (
       <CollabProvider value={this.getValue()}>
         {modalIsShown && (
-          <CollaborationDialog
+          <RoomDialog
             handleClose={this.handleClose}
             activeRoomLink={activeRoomLink}
             username={username}

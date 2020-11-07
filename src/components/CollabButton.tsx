@@ -5,9 +5,9 @@ import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
 import { users } from "./icons";
 
-import "./RoomDialog.scss";
+import "./CollabButton.scss";
 
-export const RoomDialog = ({
+const CollabButton = ({
   isCollaborating,
   collaboratorCount,
   onClick,
@@ -19,7 +19,7 @@ export const RoomDialog = ({
   return (
     <>
       <ToolButton
-        className={clsx("RoomDialog-modalButton", {
+        className={clsx("CollabButton", {
           "is-collaborating": isCollaborating,
         })}
         onClick={onClick}
@@ -30,11 +30,11 @@ export const RoomDialog = ({
         showAriaLabel={useIsMobile()}
       >
         {collaboratorCount > 0 && (
-          <div className="RoomDialog-modalButton-collaborators">
-            {collaboratorCount}
-          </div>
+          <div className="CollabButton-collaborators">{collaboratorCount}</div>
         )}
       </ToolButton>
     </>
   );
 };
+
+export default CollabButton;
