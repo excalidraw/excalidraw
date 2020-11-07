@@ -99,3 +99,8 @@ const forwardedRefComp = forwardRef<
   PublicExcalidrawProps
 >((props, ref) => <Excalidraw {...props} forwardedRef={ref} />);
 export default React.memo(forwardedRefComp, areEqual);
+export {
+  getSceneVersion,
+  getSyncableElements,
+  getElementMap,
+} from "../../element";

@@ -15,7 +15,6 @@ import {
   getCursorForResizingElement,
   getPerfectElementSize,
   getNormalizedDimensions,
-  getSyncableElements,
   newLinearElement,
   transformElements,
   getElementWithTransformHandleType,
@@ -252,9 +251,6 @@ export type ExcalidrawImperativeAPI =
       getSceneElementsIncludingDeleted: InstanceType<
         typeof App
       >["getSceneElementsIncludingDeleted"];
-      getSceneSyncableElements: InstanceType<
-        typeof App
-      >["getSceneSyncableElements"];
       history: {
         clear: InstanceType<typeof App>["resetHistory"];
         resumeRecording: InstanceType<typeof App>["resumeRecording"];
@@ -295,7 +291,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         updateScene: this.updateScene,
         resetScene: this.resetScene,
         getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
-        getSceneSyncableElements: this.getSceneSyncableElements,
         history: {
           clear: this.resetHistory,
           resumeRecording: this.resumeRecording,
@@ -402,10 +397,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   public getSceneElementsIncludingDeleted = () => {
     return this.scene.getElementsIncludingDeleted();
-  };
-
-  public getSceneSyncableElements = () => {
-    return getSyncableElements(this.getSceneElementsIncludingDeleted());
   };
 
   private syncActionResult = withBatchedUpdates(

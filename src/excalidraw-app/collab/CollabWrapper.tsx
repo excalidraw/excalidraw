@@ -40,7 +40,10 @@ import {
 } from "../../data/localStorage";
 import { ImportedDataState } from "../../data/types";
 import { debounce } from "../../utils";
-import { getSceneVersion, getSyncableElements } from "../../element";
+import {
+  getSceneVersion,
+  getSyncableElements,
+} from "../../packages/excalidraw/index";
 
 interface Props {}
 interface State {
@@ -209,7 +212,9 @@ class CollabWrapper extends PureComponent<Props, State> {
         );
       } catch {}
     }
-    const syncableElements = this.excalidrawRef.current.getSceneSyncableElements();
+    const syncableElements = getSyncableElements(
+      this.getSceneElementsIncludingDeleted(),
+    );
     if (
       this.state.isCollaborating &&
       !isSavedToFirebase(this.portal, syncableElements)
@@ -229,7 +234,9 @@ class CollabWrapper extends PureComponent<Props, State> {
   };
 
   saveCollabRoomToFirebase = async (
-    syncableElements: ExcalidrawElement[] = this.excalidrawRef.current.getSceneSyncableElements(),
+    syncableElements: ExcalidrawElement[] = getSyncableElements(
+      this.excalidrawRef.current.getSceneElementsIncludingDeleted(),
+    ),
   ) => {
     try {
       await saveToFirebase(this.portal, syncableElements);
@@ -445,10 +452,6 @@ class CollabWrapper extends PureComponent<Props, State> {
     return this.excalidrawRef.current.getSceneElementsIncludingDeleted();
   };
 
-  public getSceneSyncableElemets = () => {
-    return this.excalidrawRef.current.getSceneSyncableElements();
-  };
-
   onSceneBroadCast = (
     syncableElements: ExcalidrawElement[],
     syncAll: boolean,
@@ -469,7 +472,6 @@ class CollabWrapper extends PureComponent<Props, State> {
   onChange = (elements: readonly ExcalidrawElement[], state: AppState) => {
     this.saveDebounced(elements, state);
     this.excalidrawAppState = state;
-
     if (
       getSceneVersion(elements) >
       this.getLastBroadcastedOrReceivedSceneVersion()
@@ -489,15 +491,15 @@ class CollabWrapper extends PureComponent<Props, State> {
 
   queueBroadcastAllElements = throttle(() => {
     this.onSceneBroadCast(
-      this.excalidrawRef.current.getSceneSyncableElements(),
+      getSyncableElements(
+        this.excalidrawRef.current.getSceneElementsIncludingDeleted(),
+      ),
       true,
     );
     const currentVersion = this.getLastBroadcastedOrReceivedSceneVersion();
     const newVersion = Math.max(
       currentVersion,
-      getSceneVersion(
-        this.excalidrawRef.current.getSceneElementsIncludingDeleted(),
-      ),
+      getSceneVersion(this.getSceneElementsIncludingDeleted()),
     );
     this.setLastBroadcastedOrReceivedSceneVersion(newVersion);
   }, SYNC_FULL_SCENE_INTERVAL_MS);
