@@ -1,4 +1,4 @@
-FROM node:14-alpine AS deps
+FROM node:12-alpine AS deps
 
 ARG REACT_APP_INCLUDE_GTAG=false
 
@@ -14,7 +14,7 @@ ENV PATH /opt/node_app/node_modules/.bin:$PATH
 WORKDIR /opt/node_app
 COPY . .
 
-FROM node:14-alpine AS build
+FROM node:12-alpine AS build
 
 ARG NODE_ENV=production
 
