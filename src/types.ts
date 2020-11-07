@@ -11,7 +11,6 @@ import {
 } from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
-import { SocketUpdateDataSource } from "./data";
 import { LinearElementEditor } from "./element/linearElementEditor";
 import { SuggestedBinding } from "./element/binding";
 import { ImportedDataState } from "./data/types";
@@ -124,10 +123,6 @@ export declare class GestureEvent extends UIEvent {
   readonly scale: number;
 }
 
-export type SocketUpdateData = SocketUpdateDataSource[keyof SocketUpdateDataSource] & {
-  _brand: "socketUpdateData";
-};
-
 export type LibraryItem = NonDeleted<ExcalidrawElement>[];
 export type LibraryItems = readonly LibraryItem[];
 
@@ -152,8 +147,8 @@ export interface ExcalidrawProps {
   onCollaborationEnd: () => void;
   isCollaborating: boolean;
   onPointerUpdate: (payload: {
-    pointer: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointer"];
-    button: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["button"];
+    pointer: { x: number; y: number };
+    button: "down" | "up";
     pointersMap: Gesture["pointers"];
   }) => void;
   collaborators: Map<string, Collaborator>;

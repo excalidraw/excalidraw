@@ -1,11 +1,14 @@
-import { encryptAESGEM, SocketUpdateDataSource } from "../data";
+import {
+  encryptAESGEM,
+  SocketUpdateDataSource,
+  SocketUpdateData,
+} from "../data";
 
-import CollabWrapper from "../excalidraw-app/collab/CollabWrapper";
+import CollabWrapper from "./CollabWrapper";
 
-import { SocketUpdateData } from "../types";
-import { BROADCAST, SCENE } from "../constants";
-import { getElementMap } from "../element";
-import { ExcalidrawElement } from "../element/types";
+import { BROADCAST, SCENE } from "../../constants";
+import { getElementMap } from "../../element";
+import { ExcalidrawElement } from "../../element/types";
 
 class Portal {
   app: CollabWrapper;

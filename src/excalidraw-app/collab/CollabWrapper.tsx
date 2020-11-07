@@ -4,14 +4,7 @@ import throttle from "lodash.throttle";
 
 import { CollabProvider } from "./CollabContext";
 
-import {
-  decryptAESGEM,
-  generateCollaborationLink,
-  getCollaborationLinkData,
-  loadScene,
-  SOCKET_SERVER,
-  SocketUpdateDataSource,
-} from "../../data";
+import { loadScene } from "../../data";
 import {
   INITIAL_SCENE_UPDATE_TIMEOUT,
   SAVE_TO_LOCAL_STORAGE_TIMEOUT,
@@ -22,12 +15,21 @@ import {
   LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
   SCENE,
 } from "../../constants";
+
+import {
+  decryptAESGEM,
+  SocketUpdateDataSource,
+  getCollaborationLinkData,
+  generateCollaborationLink,
+  SOCKET_SERVER,
+} from "../data";
 import {
   isSavedToFirebase,
   loadFromFirebase,
   saveToFirebase,
-} from "../../data/firebase";
-import Portal from "../../components/Portal";
+} from "../data/firebase";
+
+import Portal from "./Portal";
 import { AppState, Collaborator, Gesture } from "../../types";
 import { ExcalidrawElement } from "../../element/types";
 import { ExcalidrawImperativeAPI } from "../../components/App";
@@ -138,7 +140,6 @@ class CollabWrapper extends PureComponent<Props, State> {
         window.history.replaceState({}, "Excalidraw", window.location.origin);
       }
     }
-
     if (this.isCollabScene) {
       // when joining a room we don't want user's local scene data to be merged
       //  into the remote scene
