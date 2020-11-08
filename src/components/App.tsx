@@ -532,7 +532,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     return false;
   }
 
-  private addToLibrary = async (url: string) => {
+  private importLibraryFromUrl = async (url: string) => {
     window.history.replaceState({}, "Excalidraw", window.location.origin);
     try {
       const request = await fetch(url);
@@ -683,7 +683,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const addToLibraryUrl = searchParams.get("addLibrary");
 
     if (addToLibraryUrl) {
-      await this.addToLibrary(addToLibraryUrl);
+      await this.importLibraryFromUrl(addToLibraryUrl);
     }
   };
 
