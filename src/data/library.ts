@@ -2,6 +2,8 @@ import { loadLibraryFromBlob } from "./blob";
 import { LibraryItems, LibraryItem } from "../types";
 import { restoreElements } from "./restore";
 import { STORAGE_KEYS } from "../constants";
+import { getNonDeletedElements } from "../element";
+import { NonDeleted, ExcalidrawElement } from "../element/types";
 
 export class Library {
   private static libraryCache: LibraryItems | null = null;
@@ -23,7 +25,7 @@ export class Library {
      */
     const isUniqueitem = (
       existingLibraryItems: LibraryItems,
-      targetLibraryItem: LibraryItem,
+      targetLibraryItem: Readonly<LibraryItem>,
     ) => {
       return !existingLibraryItems.find((libraryItem) => {
         if (libraryItem.length !== targetLibraryItem.length) {
@@ -43,9 +45,17 @@ export class Library {
     };
 
     const existingLibraryItems = await Library.loadLibrary();
-    const filtered = libraryFile.library!.filter((libraryItem) =>
-      isUniqueitem(existingLibraryItems, libraryItem),
-    );
+
+    const filtered = libraryFile.library!.reduce((acc, libraryItem) => {
+      const restored = getNonDeletedElements(restoreElements(libraryItem));
+      if (isUniqueitem(existingLibraryItems, restored)) {
+        acc.push(restored);
+      }
+      return acc;
+    }, [] as (readonly NonDeleted<ExcalidrawElement>[])[]);
+
+    console.log(filtered);
+
     Library.saveLibrary([...existingLibraryItems, ...filtered]);
   }
 
