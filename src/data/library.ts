@@ -54,8 +54,6 @@ export class Library {
       return acc;
     }, [] as (readonly NonDeleted<ExcalidrawElement>[])[]);
 
-    console.log(filtered);
-
     Library.saveLibrary([...existingLibraryItems, ...filtered]);
   }
 
