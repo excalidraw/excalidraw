@@ -203,7 +203,7 @@
     "textNewLine": "Добавить новую строку (текст)",
     "textFinish": "Закончить редактирование (текст)",
     "zoomToFit": "",
-    "preventBinding": ""
+    "preventBinding": "Предотвратить привязку стрелок"
   },
   "encrypted": {
     "tooltip": ""
