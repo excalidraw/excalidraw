@@ -47,6 +47,8 @@ export const actionClearCanvas = register({
       appState: {
         ...getDefaultAppState(),
         appearance: appState.appearance,
+        exportBackground: appState.exportBackground,
+        exportEmbedScene: appState.exportEmbedScene,
         gridSize: appState.gridSize,
         username: appState.username,
       },
