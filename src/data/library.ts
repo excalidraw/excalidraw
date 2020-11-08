@@ -25,7 +25,7 @@ export class Library {
      */
     const isUniqueitem = (
       existingLibraryItems: LibraryItems,
-      targetLibraryItem: Readonly<LibraryItem>,
+      targetLibraryItem: LibraryItem,
     ) => {
       return !existingLibraryItems.find((libraryItem) => {
         if (libraryItem.length !== targetLibraryItem.length) {
