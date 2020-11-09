@@ -49,6 +49,8 @@ class Portal {
     this.socket = null;
     this.roomID = null;
     this.roomKey = null;
+    this.socketInitialized = false;
+    this.broadcastedElementVersions = new Map();
   }
 
   isOpen() {
