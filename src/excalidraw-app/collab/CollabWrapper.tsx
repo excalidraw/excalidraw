@@ -2,8 +2,6 @@ import React, { PureComponent, createRef } from "react";
 import { unstable_batchedUpdates } from "react-dom";
 import throttle from "lodash.throttle";
 
-import { CollabProvider } from "./CollabContext";
-
 import { loadScene } from "../../data";
 import {
   INITIAL_SCENE_UPDATE_TIMEOUT,
@@ -551,10 +549,10 @@ class CollabWrapper extends PureComponent<Props, State> {
     };
   }
   render() {
-    const { children } = this.props;
+    const { children } = this.props as { children: (context: any) => any };
     const { modalIsShown, username, errorMessage, activeRoomLink } = this.state;
     return (
-      <CollabProvider value={this.getValue()}>
+      <>
         {modalIsShown && (
           <RoomDialog
             handleClose={this.handleClose}
@@ -574,8 +572,8 @@ class CollabWrapper extends PureComponent<Props, State> {
             onClose={() => this.setState({ errorMessage: "" })}
           />
         )}
-        {children}
-      </CollabProvider>
+        {children(this.getValue())}
+      </>
     );
   }
 }

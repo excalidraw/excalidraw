@@ -3,11 +3,12 @@ import React, { useState, useLayoutEffect, useEffect } from "react";
 import { LoadingMessage } from "../components/LoadingMessage";
 
 import Excalidraw from "../packages/excalidraw/index";
-import { WithCollaboration } from "./collab/WithCollaboration";
 
 import { importFromLocalStorage } from "../data/localStorage";
 
 import { ImportedDataState } from "../data/types";
+import CollabWrapper from "./collab/CollabWrapper";
+import { TopErrorBoundary } from "../components/TopErrorBoundary";
 
 function ExcalidrawApp(props: any) {
   // dimensions
@@ -17,19 +18,6 @@ function ExcalidrawApp(props: any) {
     width: window.innerWidth,
     height: window.innerHeight,
   });
-
-  const {
-    context: {
-      excalidrawRef,
-      isCollaborating,
-      onPointerUpdate,
-      collaborators,
-      initializeScene,
-      onChange,
-      username,
-      onCollabButtonClick,
-    },
-  } = props;
 
   useLayoutEffect(() => {
     const onResize = () => {
@@ -62,20 +50,28 @@ function ExcalidrawApp(props: any) {
   }
 
   return (
-    <Excalidraw
-      ref={excalidrawRef}
-      width={dimensions.width}
-      height={dimensions.height}
-      onChange={onChange}
-      initialData={initialState.data}
-      user={{ name: username }}
-      onCollabButtonClick={onCollabButtonClick}
-      isCollaborating={isCollaborating}
-      onPointerUpdate={onPointerUpdate}
-      collaborators={collaborators}
-      initializeScene={initializeScene}
-    />
+    <TopErrorBoundary>
+      <CollabWrapper>
+        {(context: any) => {
+          return (
+            <Excalidraw
+              ref={context.excalidrawRef}
+              width={dimensions.width}
+              height={dimensions.height}
+              onChange={context.onChange}
+              initialData={initialState.data}
+              user={{ name: context.username }}
+              onCollabButtonClick={context.onCollabButtonClick}
+              isCollaborating={context.isCollaborating}
+              onPointerUpdate={context.onPointerUpdate}
+              collaborators={context.collaborators}
+              initializeScene={context.initializeScene}
+            />
+          );
+        }}
+      </CollabWrapper>
+    </TopErrorBoundary>
   );
 }
 
-export default WithCollaboration(ExcalidrawApp);
+export default ExcalidrawApp;
