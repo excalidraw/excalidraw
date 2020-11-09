@@ -122,7 +122,7 @@ export declare class GestureEvent extends UIEvent {
   readonly scale: number;
 }
 
-export type LibraryItem = NonDeleted<ExcalidrawElement>[];
+export type LibraryItem = readonly NonDeleted<ExcalidrawElement>[];
 export type LibraryItems = readonly LibraryItem[];
 
 export interface ExcalidrawProps {
