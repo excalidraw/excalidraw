@@ -2,7 +2,6 @@ import React, { PureComponent, createRef } from "react";
 import { unstable_batchedUpdates } from "react-dom";
 import throttle from "lodash.throttle";
 
-import { loadScene } from "../../data";
 import {
   INITIAL_SCENE_UPDATE_TIMEOUT,
   SAVE_TO_LOCAL_STORAGE_TIMEOUT,
@@ -21,24 +20,17 @@ import {
   generateCollaborationLink,
   SOCKET_SERVER,
 } from "../data";
-import {
-  isSavedToFirebase,
-  loadFromFirebase,
-  saveToFirebase,
-} from "../data/firebase";
+import { isSavedToFirebase, saveToFirebase } from "../data/firebase";
 
 import Portal from "./Portal";
 import { AppState, Collaborator, Gesture } from "../../types";
 import { ExcalidrawElement } from "../../element/types";
 import { ExcalidrawImperativeAPI } from "../../components/App";
-import { t } from "../../i18n";
 import {
-  importFromLocalStorage,
   importUsernameFromLocalStorage,
   saveToLocalStorage,
   saveUsernameToLocalStorage,
 } from "../../data/localStorage";
-import { ImportedDataState } from "../../data/types";
 import { debounce } from "../../utils";
 import {
   getSceneVersion,
@@ -46,6 +38,7 @@ import {
 } from "../../packages/excalidraw/index";
 import RoomDialog from "./RoomDialog";
 import { ErrorDialog } from "../../components/ErrorDialog";
+import { Emitter } from "../../emitter";
 
 interface Props {}
 interface State {
@@ -76,12 +69,14 @@ class CollabWrapper extends PureComponent<Props, State> {
   private unmounted: boolean;
   private excalidrawRef: any;
   excalidrawAppState?: AppState;
-  private initialData: ImportedDataState;
-  private isCollabScene: boolean;
   private lastBroadcastedOrReceivedSceneVersion: number = -1;
+  private onChangeEmitter = new Emitter<
+    [readonly ExcalidrawElement[], AppState]
+  >();
 
   constructor(props: Props) {
     super(props);
+    this.onChangeEmitter.subscribe(this.onChange);
     this.state = {
       isLoading: false,
       collaborators: new Map(),
@@ -94,117 +89,21 @@ class CollabWrapper extends PureComponent<Props, State> {
     this.portal = new Portal(this);
     this.unmounted = false;
     this.excalidrawRef = createRef<ExcalidrawImperativeAPI>();
-    this.initialData = {};
-    this.isCollabScene = false;
   }
 
   componentDidMount() {
     this.unmounted = true;
-    this.initialData = importFromLocalStorage();
     window.addEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
     window.addEventListener(EVENT.UNLOAD, this.onUnload);
     window.addEventListener(EVENT.BLUR, this.onBlur, false);
-
-    this.isCollabScene = !!getCollaborationLinkData(window.location.href);
   }
 
   componentWillUnmount() {
     this.unmounted = true;
+    this.onChangeEmitter.unsubscribe(this.onChange);
     window.removeEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
     window.removeEventListener(EVENT.UNLOAD, this.onUnload);
     window.removeEventListener(EVENT.BLUR, this.onBlur);
-  }
-
-  initializeScene = async (scene: {
-    elements: readonly ExcalidrawElement[];
-    appState: MarkOptional<AppState, "offsetTop" | "offsetLeft">;
-    commitToHistory: boolean;
-  }) => {
-    const searchParams = new URLSearchParams(window.location.search);
-    const id = searchParams.get("id");
-    const jsonMatch = window.location.hash.match(
-      /^#json=([0-9]+),([a-zA-Z0-9_-]+)$/,
-    );
-    const isExternalScene = !!(id || jsonMatch || this.isCollabScene);
-    if (isExternalScene) {
-      if (
-        CollabWrapper.shouldForceLoadScene(scene) ||
-        window.confirm(t("alerts.loadSceneOverridePrompt"))
-      ) {
-        // Backwards compatibility with legacy url format
-        if (id) {
-          scene = await loadScene(id, null, this.initialData);
-        } else if (jsonMatch) {
-          scene = await loadScene(jsonMatch[1], jsonMatch[2], this.initialData);
-        }
-        if (!this.isCollabScene) {
-          window.history.replaceState({}, "Excalidraw", window.location.origin);
-        }
-      } else {
-        // https://github.com/excalidraw/excalidraw/issues/1919
-        if (document.hidden) {
-          window.addEventListener(
-            "focus",
-            () => this.excalidrawRef.current.initializeScene(),
-            {
-              once: true,
-            },
-          );
-          return;
-        }
-
-        this.isCollabScene = false;
-        window.history.replaceState({}, "Excalidraw", window.location.origin);
-      }
-    }
-    if (this.isCollabScene) {
-      // when joining a room we don't want user's local scene data to be merged
-      //  into the remote scene
-      this.excalidrawRef.current.resetScene();
-      await this.initializeSocketClient({ showLoadingState: true });
-    } else if (scene) {
-      this.excalidrawRef.current.setupScene(scene);
-    }
-  };
-
-  private static shouldForceLoadScene(
-    scene: ResolutionType<typeof loadScene>,
-  ): boolean {
-    if (!scene.elements.length) {
-      return true;
-    }
-
-    const roomMatch = getCollaborationLinkData(window.location.href);
-
-    if (!roomMatch) {
-      return false;
-    }
-
-    const roomID = roomMatch[1];
-
-    let collabForceLoadFlag;
-    try {
-      collabForceLoadFlag = localStorage?.getItem(
-        LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
-      );
-    } catch {}
-
-    if (collabForceLoadFlag) {
-      try {
-        const {
-          room: previousRoom,
-          timestamp,
-        }: { room: string; timestamp: number } = JSON.parse(
-          collabForceLoadFlag,
-        );
-        // if loading same room as the one previously unloaded within 15sec
-        //  force reload without prompting
-        if (previousRoom === roomID && Date.now() - timestamp < 15000) {
-          return true;
-        }
-      } catch {}
-    }
-    return false;
   }
 
   private onUnload = () => {
@@ -269,8 +168,7 @@ class CollabWrapper extends PureComponent<Props, State> {
     // existing elements (or clears scene), which would otherwise be persisted
     // to database even if deleted before creating the room.
     this.excalidrawRef.current.history.clear();
-    this.excalidrawRef.current.history.resumeRecording();
-    this.excalidrawRef.current.updateScene({ elements });
+    this.excalidrawRef.current.updateScene({ elements, commitToHistory: true });
     this.initializeSocketClient({ showLoadingState: false });
   };
 
@@ -382,16 +280,6 @@ class CollabWrapper extends PureComponent<Props, State> {
         activeRoomLink: window.location.href,
         isLoading: opts.showLoadingState ? true : this.state.isLoading,
       });
-
-      try {
-        const elements = await loadFromFirebase(roomID, roomKey);
-        if (elements) {
-          this.handleRemoteSceneUpdate(elements, { initFromSnapshot: true });
-        }
-      } catch (e) {
-        // log the error and move on. other peers will sync us the scene.
-        console.error(e);
-      }
     }
   };
 
@@ -410,10 +298,6 @@ class CollabWrapper extends PureComponent<Props, State> {
       initFromSnapshot = false,
     }: { init?: boolean; initFromSnapshot?: boolean } = {},
   ) => {
-    if (init) {
-      this.excalidrawRef.current.history.resumeRecording();
-    }
-
     if (init || initFromSnapshot) {
       this.excalidrawRef.current.setScrollToCenter(elements);
     }
@@ -425,7 +309,10 @@ class CollabWrapper extends PureComponent<Props, State> {
     // syncronously calls render.
 
     this.setLastBroadcastedOrReceivedSceneVersion(getSceneVersion(newElements));
-    this.excalidrawRef.current.updateScene({ elements: newElements });
+    this.excalidrawRef.current.updateScene({
+      elements: newElements,
+      commitToHistory: !!init,
+    });
 
     // We haven't yet implemented multiplayer undo functionality, so we clear the undo stack
     // when we receive any messages from another peer. This UX can be pretty rough -- if you
@@ -542,14 +429,16 @@ class CollabWrapper extends PureComponent<Props, State> {
       isCollaborating: this.state.isCollaborating,
       onPointerUpdate: this.onPointerUpdate,
       collaborators: this.state.collaborators,
-      initializeScene: this.initializeScene,
-      onChange: this.onChange,
+      initializeSocketClient: this.initializeSocketClient,
+      onChangeEmitter: this.onChangeEmitter,
       username: this.state.username,
       onCollabButtonClick: this.onCollabButtonClick,
     };
   }
   render() {
-    const { children } = this.props as { children: (context: any) => any };
+    const { children } = (this.props as unknown) as {
+      children: (context: any) => any;
+    };
     const { modalIsShown, username, errorMessage, activeRoomLink } = this.state;
     return (
       <>

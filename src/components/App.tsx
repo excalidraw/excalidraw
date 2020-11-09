@@ -253,12 +253,10 @@ export type ExcalidrawImperativeAPI =
       >["getSceneElementsIncludingDeleted"];
       history: {
         clear: InstanceType<typeof App>["resetHistory"];
-        resumeRecording: InstanceType<typeof App>["resumeRecording"];
       };
       setScrollToCenter: InstanceType<typeof App>["setScrollToCenter"];
       initializeScene: InstanceType<typeof App>["initializeScene"];
       getSceneElements: InstanceType<typeof App>["getSceneElements"];
-      setupScene: InstanceType<typeof App>["setupScene"];
     }
   | undefined;
 
@@ -294,12 +292,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
         history: {
           clear: this.resetHistory,
-          resumeRecording: this.resumeRecording,
         },
         setScrollToCenter: this.setScrollToCenter,
         initializeScene: this.initializeScene,
         getSceneElements: this.getSceneElements,
-        setupScene: this.setupScene,
       };
     }
     this.scene = new Scene();
@@ -547,31 +543,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     const scene = await loadScene(null, null, this.props.initialData);
-    this.props?.initializeScene?.(scene);
 
     if (this.state.isLoading) {
       this.setState({ isLoading: false });
     }
 
-    if (!this.props.initializeScene) {
-      this.setupScene(scene);
-    }
-
-    const addToLibraryUrl = new URLSearchParams(window.location.search).get(
-      "addLibrary",
-    );
-
-    if (addToLibraryUrl) {
-      await this.importLibraryFromUrl(addToLibraryUrl);
-    }
-  };
-
-  // can be renamed to something better ?
-  private setupScene = (scene: {
-    elements: readonly ExcalidrawElement[];
-    appState: MarkOptional<AppState, "offsetTop" | "offsetLeft">;
-    commitToHistory: boolean;
-  }) => {
     if (scene.appState) {
       scene.appState = {
         ...scene.appState,
@@ -591,6 +567,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       ...scene,
       commitToHistory: true,
     });
+
+    const addToLibraryUrl = new URLSearchParams(window.location.search).get(
+      "addLibrary",
+    );
+
+    if (addToLibraryUrl) {
+      await this.importLibraryFromUrl(addToLibraryUrl);
+    }
   };
 
   public async componentDidMount() {
@@ -650,12 +634,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.setState({});
   });
 
-  private onHashChange = (_: HashChangeEvent) => {
-    if (window.location.hash.length > 1) {
-      this.initializeScene();
-    }
-  };
-
   private removeEventListeners() {
     document.removeEventListener(EVENT.COPY, this.onCopy);
     document.removeEventListener(EVENT.PASTE, this.pasteFromClipboard);
@@ -673,7 +651,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     window.removeEventListener(EVENT.BLUR, this.onBlur, false);
     window.removeEventListener(EVENT.DRAG_OVER, this.disableEvent, false);
     window.removeEventListener(EVENT.DROP, this.disableEvent, false);
-    window.removeEventListener(EVENT.HASHCHANGE, this.onHashChange, false);
 
     document.removeEventListener(
       EVENT.GESTURE_START,
@@ -708,7 +685,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     window.addEventListener(EVENT.BLUR, this.onBlur, false);
     window.addEventListener(EVENT.DRAG_OVER, this.disableEvent, false);
     window.addEventListener(EVENT.DROP, this.disableEvent, false);
-    window.addEventListener(EVENT.HASHCHANGE, this.onHashChange, false);
 
     // rerender text elements on font load to fix #637 && #1553
     document.fonts?.addEventListener?.("loadingdone", this.onFontLoaded);
@@ -855,8 +831,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     history.record(this.state, this.scene.getElementsIncludingDeleted());
 
-    if (this.props.onChange) {
-      this.props.onChange(this.scene.getElementsIncludingDeleted(), this.state);
+    if (this.props.onChangeEmitter) {
+      this.props.onChangeEmitter.emit(
+        this.scene.getElementsIncludingDeleted(),
+        this.state,
+      );
     }
   }
 
@@ -1144,7 +1123,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     (sceneData: {
       elements: readonly ExcalidrawElement[];
       appState?: AppState;
+      commitToHistory?: boolean;
     }) => {
+      if (sceneData.commitToHistory) {
+        history.resumeRecording();
+      }
+
       // currently we only support syncing background color
       if (sceneData.appState?.viewBackgroundColor) {
         this.setState({

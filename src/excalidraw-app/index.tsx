@@ -9,6 +9,131 @@ import { importFromLocalStorage } from "../data/localStorage";
 import { ImportedDataState } from "../data/types";
 import CollabWrapper from "./collab/CollabWrapper";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
+import { t } from "../i18n";
+import { loadScene } from "../data";
+import { getCollaborationLinkData } from "./data";
+import { EVENT, LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG } from "../constants";
+import { loadFromFirebase } from "./data/firebase";
+import { restore } from "../data/restore";
+
+const shouldForceLoadScene = (
+  scene: ResolutionType<typeof loadScene>,
+): boolean => {
+  if (!scene.elements.length) {
+    return true;
+  }
+
+  const roomMatch = getCollaborationLinkData(window.location.href);
+
+  if (!roomMatch) {
+    return false;
+  }
+
+  const roomID = roomMatch[1];
+
+  let collabForceLoadFlag;
+  try {
+    collabForceLoadFlag = localStorage?.getItem(
+      LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
+    );
+  } catch {}
+
+  if (collabForceLoadFlag) {
+    try {
+      const {
+        room: previousRoom,
+        timestamp,
+      }: { room: string; timestamp: number } = JSON.parse(collabForceLoadFlag);
+      // if loading same room as the one previously unloaded within 15sec
+      //  force reload without prompting
+      if (previousRoom === roomID && Date.now() - timestamp < 15000) {
+        return true;
+      }
+    } catch {}
+  }
+  return false;
+};
+
+type Scene = ResolutionType<typeof loadScene>;
+const initializeScene = async (opts?: {
+  onLateInitialization?: (data: { scene: Scene }) => void;
+}): Promise<Scene | false> => {
+  const searchParams = new URLSearchParams(window.location.search);
+  const id = searchParams.get("id");
+  const jsonMatch = window.location.hash.match(
+    /^#json=([0-9]+),([a-zA-Z0-9_-]+)$/,
+  );
+
+  const initialData = importFromLocalStorage();
+
+  let scene = await loadScene(null, null, initialData);
+
+  let isCollabScene = !!getCollaborationLinkData(window.location.href);
+  const isExternalScene = !!(id || jsonMatch || isCollabScene);
+  if (isExternalScene) {
+    if (
+      shouldForceLoadScene(scene) ||
+      window.confirm(t("alerts.loadSceneOverridePrompt"))
+    ) {
+      // Backwards compatibility with legacy url format
+      if (id) {
+        scene = await loadScene(id, null, initialData);
+      } else if (jsonMatch) {
+        scene = await loadScene(jsonMatch[1], jsonMatch[2], initialData);
+      }
+      if (!isCollabScene) {
+        window.history.replaceState({}, "Excalidraw", window.location.origin);
+      }
+    } else {
+      // https://github.com/excalidraw/excalidraw/issues/1919
+      if (document.hidden) {
+        window.addEventListener(
+          "focus",
+          () =>
+            initializeScene().then((_scene) => {
+              opts?.onLateInitialization?.({ scene: _scene || scene });
+            }),
+          {
+            once: true,
+          },
+        );
+        return false;
+      }
+
+      isCollabScene = false;
+      window.history.replaceState({}, "Excalidraw", window.location.origin);
+    }
+  }
+  if (isCollabScene) {
+    // TODO
+    // when joining a room we don't want user's local scene data to be merged
+    //  into the remote scene
+    // this.excalidrawRef.current.resetScene();
+    // await props.collab.initializeSocketClient({ showLoadingState: true });
+
+    try {
+      const [, roomID, roomKey] = getCollaborationLinkData(
+        window.location.href,
+      )!;
+      const elements = await loadFromFirebase(roomID, roomKey);
+      if (elements) {
+        return {
+          ...restore({ elements }, scene.appState),
+          commitToHistory: true,
+        };
+      }
+      return false;
+    } catch (error) {
+      // log the error and move on. other peers will sync us the scene.
+      console.error(error);
+    }
+
+    return false;
+  } else if (scene) {
+    return scene;
+  }
+  return false;
+};
 
 function ExcalidrawApp(props: any) {
   // dimensions
@@ -40,38 +165,68 @@ function ExcalidrawApp(props: any) {
   } | null>(null);
 
   useEffect(() => {
-    setInitialState({
-      data: importFromLocalStorage(),
+    initializeScene({
+      onLateInitialization: ({ scene }) => {
+        setInitialState({ data: scene });
+      },
+    }).then((scene) => {
+      if (scene !== false) {
+        setInitialState({ data: scene });
+      }
     });
+
+    const onHashChange = (_: HashChangeEvent) => {
+      if (window.location.hash.length > 1) {
+        initializeScene().then((scene) => {
+          if (scene) {
+            // TODO
+            throw new Error("initing scene from hashchange not implemented");
+          }
+        });
+      }
+    };
+
+    window.addEventListener(EVENT.HASHCHANGE, onHashChange, false);
+    return () => {
+      window.removeEventListener(EVENT.HASHCHANGE, onHashChange, false);
+    };
   }, []);
 
   if (!initialState) {
     return <LoadingMessage />;
   }
 
+  const collab = props.collab;
+
   return (
-    <TopErrorBoundary>
-      <CollabWrapper>
-        {(context: any) => {
-          return (
-            <Excalidraw
-              ref={context.excalidrawRef}
-              width={dimensions.width}
-              height={dimensions.height}
-              onChange={context.onChange}
-              initialData={initialState.data}
-              user={{ name: context.username }}
-              onCollabButtonClick={context.onCollabButtonClick}
-              isCollaborating={context.isCollaborating}
-              onPointerUpdate={context.onPointerUpdate}
-              collaborators={context.collaborators}
-              initializeScene={context.initializeScene}
-            />
-          );
-        }}
-      </CollabWrapper>
-    </TopErrorBoundary>
+    <Excalidraw
+      ref={collab.excalidrawRef}
+      onChangeEmitter={collab.onChangeEmitter}
+      width={dimensions.width}
+      height={dimensions.height}
+      initialData={initialState.data}
+      user={{ name: collab.username }}
+      onCollabButtonClick={collab.onCollabButtonClick}
+      isCollaborating={collab.isCollaborating}
+      onPointerUpdate={collab.onPointerUpdate}
+      collaborators={collab.collaborators}
+      initializeScene={collab.initializeScene}
+    />
   );
 }
 
-export default ExcalidrawApp;
+const AppWithCollab = (Component: any) => {
+  return (props: any) => {
+    return (
+      <TopErrorBoundary>
+        <CollabWrapper>
+          {(collab: any) => {
+            return <Component {...props} collab={collab} />;
+          }}
+        </CollabWrapper>
+      </TopErrorBoundary>
+    );
+  };
+};
+
+export default AppWithCollab(ExcalidrawApp);
