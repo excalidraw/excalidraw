@@ -66,6 +66,7 @@ import {
   sceneCoordsToViewportCoords,
   setCursorForShape,
   tupleToCoors,
+  ResolvablePromise,
 } from "../utils";
 import {
   KEYS,
@@ -257,8 +258,13 @@ export type ExcalidrawImperativeAPI =
       setScrollToCenter: InstanceType<typeof App>["setScrollToCenter"];
       initializeScene: InstanceType<typeof App>["initializeScene"];
       getSceneElements: InstanceType<typeof App>["getSceneElements"];
+      readyPromise: ResolvablePromise<undefined>;
+      ready: true;
     }
-  | undefined;
+  | {
+      readyPromise: ResolvablePromise<undefined>;
+      ready: false;
+    };
 
 class App extends React.Component<ExcalidrawProps, AppState> {
   canvas: HTMLCanvasElement | null = null;
@@ -287,6 +293,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     };
     if (forwardedRef && "current" in forwardedRef) {
       forwardedRef.current = {
+        ready: true,
+        readyPromise: forwardedRef.current!.readyPromise,
         updateScene: this.updateScene,
         resetScene: this.resetScene,
         getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
@@ -297,6 +305,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         initializeScene: this.initializeScene,
         getSceneElements: this.getSceneElements,
       };
+      forwardedRef.current!.readyPromise.resolve();
     }
     this.scene = new Scene();
 

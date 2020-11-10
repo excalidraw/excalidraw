@@ -31,7 +31,7 @@ import {
   saveToLocalStorage,
   saveUsernameToLocalStorage,
 } from "../../data/localStorage";
-import { debounce } from "../../utils";
+import { debounce, resolvablePromise } from "../../utils";
 import {
   getSceneVersion,
   getSyncableElements,
@@ -201,10 +201,7 @@ class CollabWrapper extends PureComponent<Props, State> {
       return null;
     }
 
-    let resolve: (scene: ImportedDataState | null) => void;
-    const scenePromise = new Promise<ImportedDataState | null>((_resolve) => {
-      resolve = _resolve;
-    });
+    const scenePromise = resolvablePromise<ImportedDataState | null>();
 
     const roomMatch = getCollaborationLinkData(window.location.href);
 
@@ -216,7 +213,7 @@ class CollabWrapper extends PureComponent<Props, State> {
       //  initial SCENE_UPDATE message
       this.socketInitializationTimer = setTimeout(() => {
         this.initializeSocket();
-        resolve(null);
+        scenePromise.resolve(null);
       }, INITIAL_SCENE_UPDATE_TIMEOUT);
 
       const { default: socketIOClient }: any = await import(
@@ -251,7 +248,7 @@ class CollabWrapper extends PureComponent<Props, State> {
                   init: true,
                 });
                 this.initializeSocket();
-                resolve({ elements: reconciledElements });
+                scenePromise.resolve({ elements: reconciledElements });
               }
               break;
             }
@@ -295,7 +292,7 @@ class CollabWrapper extends PureComponent<Props, State> {
           this.portal.socket.off("first-in-room");
         }
         this.initializeSocket();
-        resolve(null);
+        scenePromise.resolve(null);
       });
 
       this.setState({

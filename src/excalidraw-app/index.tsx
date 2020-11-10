@@ -1,6 +1,10 @@
-import React, { useState, useLayoutEffect, useEffect, useContext } from "react";
-
-import { LoadingMessage } from "../components/LoadingMessage";
+import React, {
+  useState,
+  useLayoutEffect,
+  useEffect,
+  useContext,
+  useRef,
+} from "react";
 
 import Excalidraw from "../packages/excalidraw/index";
 
@@ -16,8 +20,16 @@ import { EVENT, LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG } from "../constants";
 import { loadFromFirebase } from "./data/firebase";
 import { restore } from "../data/restore";
 import { ExcalidrawImperativeAPI } from "../components/App";
+import { resolvablePromise } from "../utils";
 
 const excalidrawRef = React.createRef<ExcalidrawImperativeAPI>();
+
+// @ts-ignore
+excalidrawRef.current = {
+  readyPromise: resolvablePromise(),
+  ready: false,
+};
+
 const context = React.createContext(excalidrawRef);
 
 const shouldForceLoadScene = (
@@ -176,23 +188,28 @@ function ExcalidrawApp(props: any) {
   // initial state
   // ---------------------------------------------------------------------------
 
-  const [initialState, setInitialState] = useState<
-    null | ImportedDataState | Promise<ImportedDataState>
-  >(null);
+  const initialStatePromiseRef = useRef(
+    resolvablePromise<ImportedDataState | null>(),
+  );
+
+  const excalidrawRef = useContext(context);
 
   useEffect(() => {
-    initializeScene({
-      initializeSocketClient: props.collab.initializeSocketClient,
-      onLateInitialization: ({ scene }) => {
-        setInitialState(scene);
-      },
-    }).then((scene) => {
-      if (scene !== null) {
-        setInitialState(scene);
-      }
+    excalidrawRef.current?.readyPromise.then(() => {
+      initializeScene({
+        initializeSocketClient: props.collab.initializeSocketClient,
+        onLateInitialization: ({ scene }) => {
+          initialStatePromiseRef.current.resolve(scene);
+        },
+      }).then((scene) => {
+        initialStatePromiseRef.current.resolve(scene);
+      });
     });
 
     const onHashChange = (_: HashChangeEvent) => {
+      if (excalidrawRef.current?.ready) {
+        return;
+      }
       if (window.location.hash.length > 1) {
         initializeScene({
           initializeSocketClient: props.collab.initializeSocketClient,
@@ -211,12 +228,6 @@ function ExcalidrawApp(props: any) {
     };
   }, [props.collab.initializeSocketClient]);
 
-  const excalidrawRef = useContext(context);
-
-  if (!initialState) {
-    return <LoadingMessage />;
-  }
-
   const collab = props.collab;
 
   return (
@@ -225,7 +236,7 @@ function ExcalidrawApp(props: any) {
       onChangeEmitter={collab.onChangeEmitter}
       width={dimensions.width}
       height={dimensions.height}
-      initialData={initialState}
+      initialData={initialStatePromiseRef.current}
       user={{ name: collab.username }}
       onCollabButtonClick={collab.onCollabButtonClick}
       isCollaborating={collab.isCollaborating}
