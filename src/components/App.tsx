@@ -1518,6 +1518,25 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   // Input handling
 
   private onKeyDown = withBatchedUpdates((event: KeyboardEvent) => {
+    // normalize event.key when CapsLock is pressed
+    if (
+      "Proxy" in window &&
+      ((!event.shiftKey && /^[A-Z]$/.test(event.key)) ||
+        (event.shiftKey && /^[a-z]$/.test(event.key)))
+    ) {
+      event = new Proxy(event, {
+        get(ev: any, prop) {
+          return prop === "key"
+            ? event.shiftKey
+              ? // user holding shift means the key is lower-cased
+                ev.key.toUpperCase()
+              : // key is CapsLock upper-cased
+                ev.key.toLowerCase()
+            : ev[prop];
+        },
+      });
+    }
+
     // ensures we don't prevent devTools select-element feature
     if (event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === "C") {
       return;
