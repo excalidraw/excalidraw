@@ -11,7 +11,7 @@ import Excalidraw from "../packages/excalidraw/index";
 import { importFromLocalStorage } from "../data/localStorage";
 
 import { ImportedDataState } from "../data/types";
-import CollabWrapper from "./collab/CollabWrapper";
+import CollabWrapper, { CollabContext } from "./collab/CollabWrapper";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
 import { t } from "../i18n";
 import { loadScene } from "../data";
@@ -173,7 +173,7 @@ const initializeScene = async (opts: {
   return null;
 };
 
-function ExcalidrawApp(props: any) {
+function ExcalidrawApp(props: { collab: CollabContext }) {
   // dimensions
   // ---------------------------------------------------------------------------
 
@@ -253,20 +253,18 @@ function ExcalidrawApp(props: any) {
       onCollabButtonClick={collab.onCollabButtonClick}
       isCollaborating={collab.isCollaborating}
       onPointerUpdate={collab.onPointerUpdate}
-      collaborators={collab.collaborators}
-      initializeScene={collab.initializeScene}
     />
   );
 }
 
-const AppWithCollab = (Component: any) => {
-  return (props: any) => {
+const AppWithCollab = (Component: typeof ExcalidrawApp) => {
+  return () => {
     return (
       <TopErrorBoundary>
         <context.Provider value={excalidrawRef}>
           <CollabWrapper excalidrawRef={excalidrawRef}>
-            {(collab: any) => {
-              return <Component {...props} collab={collab} />;
+            {(collab: CollabContext) => {
+              return <Component collab={collab} />;
             }}
           </CollabWrapper>
         </context.Provider>

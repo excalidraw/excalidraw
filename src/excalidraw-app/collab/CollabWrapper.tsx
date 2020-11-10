@@ -44,14 +44,27 @@ import { ImportedDataState } from "../../data/types";
 interface Props {
   excalidrawRef: React.RefObject<ExcalidrawImperativeAPI>;
 }
+
 interface State {
   isLoading: boolean;
-  collaborators: Map<string, Collaborator>;
   isCollaborating: boolean;
   modalIsShown: boolean;
   errorMessage: string;
   username: string;
   activeRoomLink: string;
+}
+
+export interface CollabContext {
+  isCollaborating: State["isCollaborating"];
+  onPointerUpdate: InstanceType<typeof CollabWrapper>["onPointerUpdate"];
+  initializeSocketClient: InstanceType<
+    typeof CollabWrapper
+  >["initializeSocketClient"];
+  onChangeEmitter: InstanceType<typeof CollabWrapper>["onChangeEmitter"];
+  username: State["username"];
+  onCollabButtonClick: InstanceType<
+    typeof CollabWrapper
+  >["onCollabButtonClick"];
 }
 
 type ReconciledElements = readonly ExcalidrawElement[] & {
@@ -80,13 +93,13 @@ class CollabWrapper extends PureComponent<Props, State> {
   private onChangeEmitter = new Emitter<
     [readonly ExcalidrawElement[], AppState]
   >();
+  private collaborators = new Map<string, Collaborator>();
 
   constructor(props: Props) {
     super(props);
     this.onChangeEmitter.subscribe(this.onChange);
     this.state = {
       isLoading: false,
-      collaborators: new Map(),
       isCollaborating: false,
       modalIsShown: false,
       errorMessage: "",
@@ -186,9 +199,12 @@ class CollabWrapper extends PureComponent<Props, State> {
   };
 
   private destroySocketClient = () => {
+    this.collaborators = new Map();
+    this.props.excalidrawRef.current?.updateScene({
+      collaborators: this.collaborators,
+    });
     this.setState({
       isCollaborating: false,
-      collaborators: new Map(),
       activeRoomLink: "",
     });
     this.portal.close();
@@ -268,19 +284,16 @@ class CollabWrapper extends PureComponent<Props, State> {
                 decryptedData.payload.socketId ||
                 // @ts-ignore legacy, see #2094 (#2097)
                 decryptedData.payload.socketID;
-              // Will have to find better soln to prevent rerender
-              this.setState((state) => {
-                const collaborators = new Map(state.collaborators);
-                const user = collaborators.get(socketId) || {}!;
-                user.pointer = pointer;
-                user.button = button;
-                user.selectedElementIds = selectedElementIds;
-                user.username = username;
-                collaborators.set(socketId, user);
-                return {
-                  ...state,
-                  collaborators,
-                };
+
+              const collaborators = new Map(this.collaborators);
+              const user = collaborators.get(socketId) || {}!;
+              user.pointer = pointer;
+              user.button = button;
+              user.selectedElementIds = selectedElementIds;
+              user.username = username;
+              collaborators.set(socketId, user);
+              this.props.excalidrawRef.current?.updateScene({
+                collaborators,
               });
               break;
             }
@@ -354,18 +367,18 @@ class CollabWrapper extends PureComponent<Props, State> {
 
   setCollaborators(sockets: string[]) {
     this.setState((state) => {
-      const collaborators: typeof state.collaborators = new Map();
+      const collaborators: InstanceType<
+        typeof CollabWrapper
+      >["collaborators"] = new Map();
       for (const socketId of sockets) {
-        if (state.collaborators.has(socketId)) {
-          collaborators.set(socketId, state.collaborators.get(socketId)!);
+        if (this.collaborators.has(socketId)) {
+          collaborators.set(socketId, this.collaborators.get(socketId)!);
         } else {
           collaborators.set(socketId, {});
         }
       }
-      return {
-        ...state,
-        collaborators,
-      };
+      this.collaborators = collaborators;
+      this.props.excalidrawRef.current?.updateScene({ collaborators });
     });
   }
 
@@ -454,13 +467,13 @@ class CollabWrapper extends PureComponent<Props, State> {
     return {
       isCollaborating: this.state.isCollaborating,
       onPointerUpdate: this.onPointerUpdate,
-      collaborators: this.state.collaborators,
       initializeSocketClient: this.initializeSocketClient,
       onChangeEmitter: this.onChangeEmitter,
       username: this.state.username,
       onCollabButtonClick: this.onCollabButtonClick,
     };
   }
+
   render() {
     const { children } = (this.props as unknown) as {
       children: (context: any) => any;

@@ -70,6 +70,7 @@ export const getDefaultAppState = (): Omit<
     height: window.innerHeight,
     isLibraryOpen: false,
     fileHandle: null,
+    collaborators: new Map(),
   };
 };
 
@@ -144,6 +145,7 @@ const APP_STATE_STORAGE_CONF = (<
   offsetTop: { browser: false, export: false },
   offsetLeft: { browser: false, export: false },
   fileHandle: { browser: false, export: false },
+  collaborators: { browser: false, export: false },
 });
 
 const _clearAppStateForStorage = <ExportType extends "export" | "browser">(

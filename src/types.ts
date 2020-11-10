@@ -94,6 +94,7 @@ export type AppState = {
 
   isLibraryOpen: boolean;
   fileHandle: import("browser-nativefs").FileSystemHandle | null;
+  collaborators: Map<string, Collaborator>;
 };
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
@@ -146,6 +147,4 @@ export interface ExcalidrawProps {
     button: "down" | "up";
     pointersMap: Gesture["pointers"];
   }) => void;
-  collaborators: Map<string, Collaborator>;
-  initializeScene?: (scene: any) => void;
 }

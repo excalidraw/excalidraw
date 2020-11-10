@@ -43,7 +43,13 @@ import {
 import { loadScene, loadFromBlob, exportCanvas } from "../data";
 
 import { renderScene } from "../renderer";
-import { AppState, GestureEvent, Gesture, ExcalidrawProps } from "../types";
+import {
+  AppState,
+  GestureEvent,
+  Gesture,
+  ExcalidrawProps,
+  Collaborator,
+} from "../types";
 import {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -274,7 +280,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     height: window.innerHeight,
   };
   private scene: Scene;
-
   constructor(props: ExcalidrawProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
@@ -310,7 +315,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.syncActionResult,
       () => this.state,
       () => this.scene.getElementsIncludingDeleted(),
-      () => this.props.collaborators,
+      () => this.state.collaborators,
     );
     this.actionManager.registerAll(actions);
 
@@ -360,7 +365,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           zenModeEnabled={zenModeEnabled}
           toggleZenMode={this.toggleZenMode}
           lng={getLanguage().lng}
-          collaborators={this.props.collaborators}
+          collaborators={this.state.collaborators}
           isCollaborating={this.props.isCollaborating}
         />
         <main>
@@ -767,7 +772,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const pointerViewportCoords: SceneState["remotePointerViewportCoords"] = {};
     const remoteSelectedElementIds: SceneState["remoteSelectedElementIds"] = {};
     const pointerUsernames: { [id: string]: string } = {};
-    this.props.collaborators.forEach((user, socketId) => {
+    this.state.collaborators.forEach((user, socketId) => {
       if (user.selectedElementIds) {
         for (const id of Object.keys(user.selectedElementIds)) {
           if (!(id in remoteSelectedElementIds)) {
@@ -1126,8 +1131,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   public updateScene = withBatchedUpdates(
     (sceneData: {
-      elements: ImportedDataState["elements"];
-      appState: ImportedDataState["appState"];
+      elements?: ImportedDataState["elements"];
+      appState?: ImportedDataState["appState"];
+      collaborators?: Map<string, Collaborator>;
       commitToHistory?: boolean;
     }) => {
       if (sceneData.commitToHistory) {
@@ -1143,6 +1149,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
       if (sceneData.elements) {
         this.scene.replaceAllElements(sceneData.elements);
+      }
+
+      if (sceneData.collaborators) {
+        this.setState({ collaborators: sceneData.collaborators });
       }
     },
   );
