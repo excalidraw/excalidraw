@@ -158,6 +158,7 @@ import { MaybeTransformHandleType } from "../element/transformHandles";
 import { renderSpreadsheet } from "../charts";
 import { isValidLibrary } from "../data/json";
 import { getNewZoom } from "../scene/zoom";
+import { ImportedDataState } from "../data/types";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -245,26 +246,21 @@ export type PointerDownState = Readonly<{
   };
 }>;
 
-export type ExcalidrawImperativeAPI =
-  | {
-      updateScene: InstanceType<typeof App>["updateScene"];
-      resetScene: InstanceType<typeof App>["resetScene"];
-      getSceneElementsIncludingDeleted: InstanceType<
-        typeof App
-      >["getSceneElementsIncludingDeleted"];
-      history: {
-        clear: InstanceType<typeof App>["resetHistory"];
-      };
-      setScrollToCenter: InstanceType<typeof App>["setScrollToCenter"];
-      initializeScene: InstanceType<typeof App>["initializeScene"];
-      getSceneElements: InstanceType<typeof App>["getSceneElements"];
-      readyPromise: ResolvablePromise<undefined>;
-      ready: true;
-    }
-  | {
-      readyPromise: ResolvablePromise<undefined>;
-      ready: false;
-    };
+export type ExcalidrawImperativeAPI = {
+  updateScene: InstanceType<typeof App>["updateScene"];
+  resetScene: InstanceType<typeof App>["resetScene"];
+  getSceneElementsIncludingDeleted: InstanceType<
+    typeof App
+  >["getSceneElementsIncludingDeleted"];
+  history: {
+    clear: InstanceType<typeof App>["resetHistory"];
+  };
+  setScrollToCenter: InstanceType<typeof App>["setScrollToCenter"];
+  initializeScene: InstanceType<typeof App>["initializeScene"];
+  getSceneElements: InstanceType<typeof App>["getSceneElements"];
+  readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
+  ready: true;
+};
 
 class App extends React.Component<ExcalidrawProps, AppState> {
   canvas: HTMLCanvasElement | null = null;
@@ -305,7 +301,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         initializeScene: this.initializeScene,
         getSceneElements: this.getSceneElements,
       };
-      forwardedRef.current!.readyPromise.resolve();
+      forwardedRef.current!.readyPromise.resolve(forwardedRef.current);
     }
     this.scene = new Scene();
 
@@ -1130,8 +1126,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   public updateScene = withBatchedUpdates(
     (sceneData: {
-      elements: readonly ExcalidrawElement[];
-      appState?: AppState;
+      elements: ImportedDataState["elements"];
+      appState: ImportedDataState["appState"];
       commitToHistory?: boolean;
     }) => {
       if (sceneData.commitToHistory) {
@@ -1145,7 +1141,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         });
       }
 
-      this.scene.replaceAllElements(sceneData.elements);
+      if (sceneData.elements) {
+        this.scene.replaceAllElements(sceneData.elements);
+      }
     },
   );
 

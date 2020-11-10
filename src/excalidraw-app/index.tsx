@@ -20,7 +20,17 @@ import { EVENT, LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG } from "../constants";
 import { loadFromFirebase } from "./data/firebase";
 import { restore } from "../data/restore";
 import { ExcalidrawImperativeAPI } from "../components/App";
-import { resolvablePromise } from "../utils";
+import { ResolvablePromise, resolvablePromise } from "../utils";
+
+export type ExcalidrawRef =
+  | (ExcalidrawImperativeAPI & {
+      readyPromise: ResolvablePromise<undefined>;
+      ready: true;
+    })
+  | {
+      readyPromise: ResolvablePromise<undefined>;
+      ready: false;
+    };
 
 const excalidrawRef = React.createRef<ExcalidrawImperativeAPI>();
 
@@ -72,6 +82,7 @@ const shouldForceLoadScene = (
 
 type Scene = ResolutionType<typeof loadScene>;
 const initializeScene = async (opts: {
+  resetScene: ExcalidrawImperativeAPI["resetScene"];
   initializeSocketClient: (opts: any) => Promise<ImportedDataState | null>;
   onLateInitialization?: (data: { scene: Scene }) => void;
 }): Promise<Scene | null> => {
@@ -122,10 +133,9 @@ const initializeScene = async (opts: {
     }
   }
   if (isCollabScene) {
-    // TODO
     // when joining a room we don't want user's local scene data to be merged
     //  into the remote scene
-    // this.excalidrawRef.current.resetScene();
+    opts.resetScene();
     const scenePromise = opts.initializeSocketClient({
       showLoadingState: true,
     });
@@ -195,8 +205,9 @@ function ExcalidrawApp(props: any) {
   const excalidrawRef = useContext(context);
 
   useEffect(() => {
-    excalidrawRef.current?.readyPromise.then(() => {
+    excalidrawRef.current?.readyPromise.then((excalidrawApi) => {
       initializeScene({
+        resetScene: excalidrawApi.resetScene,
         initializeSocketClient: props.collab.initializeSocketClient,
         onLateInitialization: ({ scene }) => {
           initialStatePromiseRef.current.resolve(scene);
@@ -207,16 +218,17 @@ function ExcalidrawApp(props: any) {
     });
 
     const onHashChange = (_: HashChangeEvent) => {
-      if (excalidrawRef.current?.ready) {
+      const api = excalidrawRef.current!;
+      if (!api.ready) {
         return;
       }
       if (window.location.hash.length > 1) {
         initializeScene({
+          resetScene: api.resetScene,
           initializeSocketClient: props.collab.initializeSocketClient,
         }).then((scene) => {
           if (scene) {
-            // TODO
-            throw new Error("initing scene from hashchange not implemented");
+            api.updateScene(scene);
           }
         });
       }
@@ -226,7 +238,7 @@ function ExcalidrawApp(props: any) {
     return () => {
       window.removeEventListener(EVENT.HASHCHANGE, onHashChange, false);
     };
-  }, [props.collab.initializeSocketClient]);
+  }, [excalidrawRef, props.collab.initializeSocketClient]);
 
   const collab = props.collab;
 
