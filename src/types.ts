@@ -134,7 +134,7 @@ export interface ExcalidrawProps {
   /** if not supplied, calculated by Excalidraw */
   offsetTop?: number;
   onChangeEmitter?: Emitter<[readonly ExcalidrawElement[], AppState]>;
-  initialData?: ImportedDataState;
+  initialData?: ImportedDataState | Promise<ImportedDataState>;
   user?: {
     name?: string | null;
   };

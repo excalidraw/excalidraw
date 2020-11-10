@@ -39,6 +39,7 @@ import {
 import RoomDialog from "./RoomDialog";
 import { ErrorDialog } from "../../components/ErrorDialog";
 import { Emitter } from "../../emitter";
+import { ImportedDataState } from "../../data/types";
 
 interface Props {
   excalidrawRef: React.RefObject<ExcalidrawImperativeAPI>;
@@ -52,6 +53,10 @@ interface State {
   username: string;
   activeRoomLink: string;
 }
+
+type ReconciledElements = readonly ExcalidrawElement[] & {
+  _brand: "reconciledElements";
+};
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -191,22 +196,28 @@ class CollabWrapper extends PureComponent<Props, State> {
 
   private initializeSocketClient = async (opts: {
     showLoadingState: boolean;
-  }) => {
+  }): Promise<ImportedDataState | null> => {
     if (this.portal.socket) {
-      return;
+      return null;
     }
 
+    let resolve: (scene: ImportedDataState | null) => void;
+    const scenePromise = new Promise<ImportedDataState | null>((_resolve) => {
+      resolve = _resolve;
+    });
+
     const roomMatch = getCollaborationLinkData(window.location.href);
+
     if (roomMatch) {
       const roomID = roomMatch[1];
       const roomKey = roomMatch[2];
 
       // fallback in case you're not alone in the room but still don't receive
       //  initial SCENE_UPDATE message
-      this.socketInitializationTimer = setTimeout(
-        this.initializeSocket,
-        INITIAL_SCENE_UPDATE_TIMEOUT,
-      );
+      this.socketInitializationTimer = setTimeout(() => {
+        this.initializeSocket();
+        resolve(null);
+      }, INITIAL_SCENE_UPDATE_TIMEOUT);
 
       const { default: socketIOClient }: any = await import(
         /* webpackChunkName: "socketIoClient" */ "socket.io-client"
@@ -233,12 +244,21 @@ class CollabWrapper extends PureComponent<Props, State> {
             case SCENE.INIT: {
               if (!this.portal.socketInitialized) {
                 const remoteElements = decryptedData.payload.elements;
-                this.handleRemoteSceneUpdate(remoteElements, { init: true });
+                const reconciledElements = this.reconcileElements(
+                  remoteElements,
+                );
+                this.handleRemoteSceneUpdate(reconciledElements, {
+                  init: true,
+                });
+                this.initializeSocket();
+                resolve({ elements: reconciledElements });
               }
               break;
             }
             case SCENE.UPDATE:
-              this.handleRemoteSceneUpdate(decryptedData.payload.elements);
+              this.handleRemoteSceneUpdate(
+                this.reconcileElements(decryptedData.payload.elements),
+              );
               break;
             case "MOUSE_LOCATION": {
               const {
@@ -275,6 +295,7 @@ class CollabWrapper extends PureComponent<Props, State> {
           this.portal.socket.off("first-in-room");
         }
         this.initializeSocket();
+        resolve(null);
       });
 
       this.setState({
@@ -282,7 +303,11 @@ class CollabWrapper extends PureComponent<Props, State> {
         activeRoomLink: window.location.href,
         isLoading: opts.showLoadingState ? true : this.state.isLoading,
       });
+
+      return scenePromise;
     }
+
+    return null;
   };
 
   private initializeSocket = () => {
@@ -293,8 +318,22 @@ class CollabWrapper extends PureComponent<Props, State> {
     }
   };
 
-  private handleRemoteSceneUpdate = (
+  private reconcileElements = (
     elements: readonly ExcalidrawElement[],
+  ): ReconciledElements => {
+    const newElements = this.portal.reconcileElements(elements);
+
+    // Avoid broadcasting to the rest of the collaborators the scene
+    // we just received!
+    // Note: this needs to be set before updating the scene as it
+    // syncronously calls render.
+    this.setLastBroadcastedOrReceivedSceneVersion(getSceneVersion(newElements));
+
+    return newElements as ReconciledElements;
+  };
+
+  private handleRemoteSceneUpdate = (
+    elements: ReconciledElements,
     {
       init = false,
       initFromSnapshot = false,
@@ -303,16 +342,9 @@ class CollabWrapper extends PureComponent<Props, State> {
     if (init || initFromSnapshot) {
       this.excalidrawRef.current.setScrollToCenter(elements);
     }
-    const newElements = this.portal.reconcileElements(elements);
 
-    // Avoid broadcasting to the rest of the collaborators the scene
-    // we just received!
-    // Note: this needs to be set before updating the scene as it
-    // syncronously calls render.
-
-    this.setLastBroadcastedOrReceivedSceneVersion(getSceneVersion(newElements));
     this.excalidrawRef.current.updateScene({
-      elements: newElements,
+      elements: elements,
       commitToHistory: !!init,
     });
 
@@ -321,10 +353,6 @@ class CollabWrapper extends PureComponent<Props, State> {
     // undo, a user makes a change, and then try to redo, your element(s) will be lost. However,
     // right now we think this is the right tradeoff.
     this.excalidrawRef.current.history.clear();
-
-    if (!this.portal.socketInitialized && !initFromSnapshot) {
-      this.initializeSocket();
-    }
   };
 
   setCollaborators(sockets: string[]) {

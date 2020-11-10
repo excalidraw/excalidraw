@@ -158,7 +158,9 @@ class Portal {
     }
   };
 
-  reconcileElements = (sceneElements: readonly ExcalidrawElement[]) => {
+  reconcileElements = (
+    sceneElements: readonly ExcalidrawElement[],
+  ): readonly ExcalidrawElement[] => {
     const currentElements = this.app.getSceneElementsIncludingDeleted();
     // create a map of ids so we don't have to iterate
     // over the array more than once.

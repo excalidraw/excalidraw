@@ -542,7 +542,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.setState({ isLoading: true });
     }
 
-    const scene = await loadScene(null, null, this.props.initialData);
+    const scene = await loadScene(null, null, await this.props.initialData);
 
     if (this.state.isLoading) {
       this.setState({ isLoading: false });

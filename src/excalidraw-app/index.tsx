@@ -59,9 +59,10 @@ const shouldForceLoadScene = (
 };
 
 type Scene = ResolutionType<typeof loadScene>;
-const initializeScene = async (opts?: {
+const initializeScene = async (opts: {
+  initializeSocketClient: (opts: any) => Promise<ImportedDataState | null>;
   onLateInitialization?: (data: { scene: Scene }) => void;
-}): Promise<Scene | false> => {
+}): Promise<Scene | null> => {
   const searchParams = new URLSearchParams(window.location.search);
   const id = searchParams.get("id");
   const jsonMatch = window.location.hash.match(
@@ -94,14 +95,14 @@ const initializeScene = async (opts?: {
         window.addEventListener(
           "focus",
           () =>
-            initializeScene().then((_scene) => {
+            initializeScene(opts).then((_scene) => {
               opts?.onLateInitialization?.({ scene: _scene || scene });
             }),
           {
             once: true,
           },
         );
-        return false;
+        return null;
       }
 
       isCollabScene = false;
@@ -113,7 +114,9 @@ const initializeScene = async (opts?: {
     // when joining a room we don't want user's local scene data to be merged
     //  into the remote scene
     // this.excalidrawRef.current.resetScene();
-    // await props.collab.initializeSocketClient({ showLoadingState: true });
+    const scenePromise = opts.initializeSocketClient({
+      showLoadingState: true,
+    });
 
     try {
       const [, roomID, roomKey] = getCollaborationLinkData(
@@ -126,17 +129,26 @@ const initializeScene = async (opts?: {
           commitToHistory: true,
         };
       }
-      return false;
+
+      return {
+        ...restore(
+          {
+            ...(await scenePromise),
+          },
+          scene.appState,
+        ),
+        commitToHistory: true,
+      };
     } catch (error) {
       // log the error and move on. other peers will sync us the scene.
       console.error(error);
     }
 
-    return false;
+    return null;
   } else if (scene) {
     return scene;
   }
-  return false;
+  return null;
 };
 
 function ExcalidrawApp(props: any) {
@@ -164,24 +176,27 @@ function ExcalidrawApp(props: any) {
   // initial state
   // ---------------------------------------------------------------------------
 
-  const [initialState, setInitialState] = useState<{
-    data: ImportedDataState;
-  } | null>(null);
+  const [initialState, setInitialState] = useState<
+    null | ImportedDataState | Promise<ImportedDataState>
+  >(null);
 
   useEffect(() => {
     initializeScene({
+      initializeSocketClient: props.collab.initializeSocketClient,
       onLateInitialization: ({ scene }) => {
-        setInitialState({ data: scene });
+        setInitialState(scene);
       },
     }).then((scene) => {
-      if (scene !== false) {
-        setInitialState({ data: scene });
+      if (scene !== null) {
+        setInitialState(scene);
       }
     });
 
     const onHashChange = (_: HashChangeEvent) => {
       if (window.location.hash.length > 1) {
-        initializeScene().then((scene) => {
+        initializeScene({
+          initializeSocketClient: props.collab.initializeSocketClient,
+        }).then((scene) => {
           if (scene) {
             // TODO
             throw new Error("initing scene from hashchange not implemented");
@@ -194,7 +209,7 @@ function ExcalidrawApp(props: any) {
     return () => {
       window.removeEventListener(EVENT.HASHCHANGE, onHashChange, false);
     };
-  }, []);
+  }, [props.collab.initializeSocketClient]);
 
   const excalidrawRef = useContext(context);
 
@@ -210,7 +225,7 @@ function ExcalidrawApp(props: any) {
       onChangeEmitter={collab.onChangeEmitter}
       width={dimensions.width}
       height={dimensions.height}
-      initialData={initialState.data}
+      initialData={initialState}
       user={{ name: collab.username }}
       onCollabButtonClick={collab.onCollabButtonClick}
       isCollaborating={collab.isCollaborating}
