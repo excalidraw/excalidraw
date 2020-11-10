@@ -1,4 +1,4 @@
-import React, { PureComponent, createRef } from "react";
+import React, { PureComponent } from "react";
 import { unstable_batchedUpdates } from "react-dom";
 import throttle from "lodash.throttle";
 
@@ -40,7 +40,9 @@ import RoomDialog from "./RoomDialog";
 import { ErrorDialog } from "../../components/ErrorDialog";
 import { Emitter } from "../../emitter";
 
-interface Props {}
+interface Props {
+  excalidrawRef: React.RefObject<ExcalidrawImperativeAPI>;
+}
 interface State {
   isLoading: boolean;
   collaborators: Map<string, Collaborator>;
@@ -88,7 +90,7 @@ class CollabWrapper extends PureComponent<Props, State> {
     };
     this.portal = new Portal(this);
     this.unmounted = false;
-    this.excalidrawRef = createRef<ExcalidrawImperativeAPI>();
+    this.excalidrawRef = props.excalidrawRef;
   }
 
   componentDidMount() {
@@ -425,7 +427,6 @@ class CollabWrapper extends PureComponent<Props, State> {
 
   getValue() {
     return {
-      excalidrawRef: this.excalidrawRef,
       isCollaborating: this.state.isCollaborating,
       onPointerUpdate: this.onPointerUpdate,
       collaborators: this.state.collaborators,

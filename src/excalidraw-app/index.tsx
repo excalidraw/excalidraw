@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect, useEffect } from "react";
+import React, { useState, useLayoutEffect, useEffect, useContext } from "react";
 
 import { LoadingMessage } from "../components/LoadingMessage";
 
@@ -15,6 +15,10 @@ import { getCollaborationLinkData } from "./data";
 import { EVENT, LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG } from "../constants";
 import { loadFromFirebase } from "./data/firebase";
 import { restore } from "../data/restore";
+import { ExcalidrawImperativeAPI } from "../components/App";
+
+const excalidrawRef = React.createRef<ExcalidrawImperativeAPI>();
+const context = React.createContext(excalidrawRef);
 
 const shouldForceLoadScene = (
   scene: ResolutionType<typeof loadScene>,
@@ -192,6 +196,8 @@ function ExcalidrawApp(props: any) {
     };
   }, []);
 
+  const excalidrawRef = useContext(context);
+
   if (!initialState) {
     return <LoadingMessage />;
   }
@@ -200,7 +206,7 @@ function ExcalidrawApp(props: any) {
 
   return (
     <Excalidraw
-      ref={collab.excalidrawRef}
+      ref={excalidrawRef}
       onChangeEmitter={collab.onChangeEmitter}
       width={dimensions.width}
       height={dimensions.height}
@@ -219,11 +225,14 @@ const AppWithCollab = (Component: any) => {
   return (props: any) => {
     return (
       <TopErrorBoundary>
-        <CollabWrapper>
-          {(collab: any) => {
-            return <Component {...props} collab={collab} />;
-          }}
-        </CollabWrapper>
+        <context.Provider value={excalidrawRef}>
+          <CollabWrapper excalidrawRef={excalidrawRef}>
+            {(collab: any) => {
+              return <Component {...props} collab={collab} />;
+            }}
+          </CollabWrapper>
+        </context.Provider>
+        ;
       </TopErrorBoundary>
     );
   };
