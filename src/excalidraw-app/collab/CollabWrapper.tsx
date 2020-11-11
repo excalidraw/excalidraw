@@ -1,5 +1,4 @@
 import React, { PureComponent } from "react";
-import { unstable_batchedUpdates } from "react-dom";
 import throttle from "lodash.throttle";
 
 import {
@@ -7,11 +6,7 @@ import {
   SAVE_TO_LOCAL_STORAGE_TIMEOUT,
   SYNC_FULL_SCENE_INTERVAL_MS,
 } from "../../time_constants";
-import {
-  EVENT,
-  LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
-  SCENE,
-} from "../../constants";
+import { EVENT, SCENE } from "../../constants";
 
 import {
   decryptAESGEM,
@@ -31,7 +26,7 @@ import {
 } from "../../types";
 import { ExcalidrawElement } from "../../element/types";
 import { saveToLocalStorage } from "../../data/localStorage";
-import { debounce, resolvablePromise } from "../../utils";
+import { debounce, resolvablePromise, withBatchedUpdates } from "../../utils";
 import {
   getSceneVersion,
   getSyncableElements,
@@ -56,6 +51,7 @@ interface State {
 }
 
 export interface CollabContext {
+  roomId: string | null;
   isCollaborating: State["isCollaborating"];
   onPointerUpdate: InstanceType<typeof CollabWrapper>["onPointerUpdate"];
   initializeSocketClient: InstanceType<
@@ -71,18 +67,6 @@ export interface CollabContext {
 type ReconciledElements = readonly ExcalidrawElement[] & {
   _brand: "reconciledElements";
 };
-
-/**
- * @param func handler taking at most single parameter (event).
- */
-const withBatchedUpdates = <
-  TFunction extends ((event: any) => void) | (() => void)
->(
-  func: Parameters<TFunction>["length"] extends 0 | 1 ? TFunction : never,
-) =>
-  ((event) => {
-    unstable_batchedUpdates(func as TFunction, event);
-  }) as TFunction;
 
 class CollabWrapper extends PureComponent<Props, State> {
   portal: Portal;
@@ -133,17 +117,6 @@ class CollabWrapper extends PureComponent<Props, State> {
   };
 
   private beforeUnload = withBatchedUpdates((event: BeforeUnloadEvent) => {
-    if (this.state.isCollaborating && this.portal.roomID) {
-      try {
-        localStorage?.setItem(
-          LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
-          JSON.stringify({
-            timestamp: Date.now(),
-            room: this.portal.roomID,
-          }),
-        );
-      } catch {}
-    }
     const syncableElements = getSyncableElements(
       this.getSceneElementsIncludingDeleted(),
     );
@@ -471,6 +444,7 @@ class CollabWrapper extends PureComponent<Props, State> {
       onChangeEmitter: this.onChangeEmitter,
       username: this.state.username,
       onCollabButtonClick: this.onCollabButtonClick,
+      roomId: this.portal.roomID,
     };
   }
 

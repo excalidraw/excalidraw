@@ -24,7 +24,7 @@ import { EVENT, LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG } from "../constants";
 import { loadFromFirebase } from "./data/firebase";
 import { restore } from "../data/restore";
 import { ExcalidrawImperativeAPI } from "../components/App";
-import { resolvablePromise } from "../utils";
+import { resolvablePromise, withBatchedUpdates } from "../utils";
 import { ExcalidrawAPIRefValue } from "../types";
 
 const excalidrawRef: ExcalidrawAPIRefValue = {
@@ -227,11 +227,33 @@ function ExcalidrawApp(props: { collab: CollabContext }) {
       }
     };
 
+    const beforeUnload = withBatchedUpdates(() => {
+      if (collab.isCollaborating || collab.roomId) {
+        try {
+          localStorage?.setItem(
+            LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
+            JSON.stringify({
+              timestamp: Date.now(),
+              room: collab.roomId,
+            }),
+          );
+        } catch {}
+      }
+    });
+
     window.addEventListener(EVENT.HASHCHANGE, onHashChange, false);
+    window.addEventListener(EVENT.BEFORE_UNLOAD, beforeUnload);
+
     return () => {
       window.removeEventListener(EVENT.HASHCHANGE, onHashChange, false);
+      window.removeEventListener(EVENT.BEFORE_UNLOAD, beforeUnload);
     };
-  }, [excalidrawRef, collab.initializeSocketClient]);
+  }, [
+    excalidrawRef,
+    collab.initializeSocketClient,
+    collab.isCollaborating,
+    collab.roomId,
+  ]);
 
   useEffect(() => {
     saveUsernameToLocalStorage(collab.username);

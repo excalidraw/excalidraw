@@ -5,6 +5,7 @@ import {
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 import { FontFamily, FontString } from "./element/types";
+import { unstable_batchedUpdates } from "react-dom";
 
 export const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -312,3 +313,15 @@ export const resolvablePromise = <T>() => {
   (promise as any).reject = reject;
   return promise as ResolvablePromise<T>;
 };
+
+export /**
+ * @param func handler taking at most single parameter (event).
+ */
+const withBatchedUpdates = <
+  TFunction extends ((event: any) => void) | (() => void)
+>(
+  func: Parameters<TFunction>["length"] extends 0 | 1 ? TFunction : never,
+) =>
+  ((event) => {
+    unstable_batchedUpdates(func as TFunction, event);
+  }) as TFunction;
