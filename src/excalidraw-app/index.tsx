@@ -8,7 +8,11 @@ import React, {
 
 import Excalidraw from "../packages/excalidraw/index";
 
-import { importFromLocalStorage } from "../data/localStorage";
+import {
+  importFromLocalStorage,
+  importUsernameFromLocalStorage,
+  saveUsernameToLocalStorage,
+} from "../data/localStorage";
 
 import { ImportedDataState } from "../data/types";
 import CollabWrapper, { CollabContext } from "./collab/CollabWrapper";
@@ -29,7 +33,7 @@ const excalidrawRef: ExcalidrawAPIRefValue = {
 };
 
 const context = React.createContext(excalidrawRef);
-
+const username = importUsernameFromLocalStorage() || "";
 const shouldForceLoadScene = (
   scene: ResolutionType<typeof loadScene>,
 ): boolean => {
@@ -191,12 +195,13 @@ function ExcalidrawApp(props: { collab: CollabContext }) {
   );
 
   const excalidrawRef = useContext(context) as ExcalidrawAPIRefValue;
+  const { collab } = props;
 
   useEffect(() => {
     excalidrawRef.readyPromise.then((excalidrawApi) => {
       initializeScene({
         resetScene: excalidrawApi.resetScene,
-        initializeSocketClient: props.collab.initializeSocketClient,
+        initializeSocketClient: collab.initializeSocketClient,
         onLateInitialization: ({ scene }) => {
           initialStatePromiseRef.current.resolve(scene);
         },
@@ -213,7 +218,7 @@ function ExcalidrawApp(props: { collab: CollabContext }) {
       if (window.location.hash.length > 1) {
         initializeScene({
           resetScene: api.resetScene,
-          initializeSocketClient: props.collab.initializeSocketClient,
+          initializeSocketClient: collab.initializeSocketClient,
         }).then((scene) => {
           if (scene) {
             api.updateScene(scene);
@@ -226,9 +231,11 @@ function ExcalidrawApp(props: { collab: CollabContext }) {
     return () => {
       window.removeEventListener(EVENT.HASHCHANGE, onHashChange, false);
     };
-  }, [excalidrawRef, props.collab.initializeSocketClient]);
+  }, [excalidrawRef, collab.initializeSocketClient]);
 
-  const collab = props.collab;
+  useEffect(() => {
+    saveUsernameToLocalStorage(collab.username);
+  }, [collab.username]);
 
   return (
     <Excalidraw
@@ -250,7 +257,7 @@ const AppWithCollab = (Component: typeof ExcalidrawApp) => {
     return (
       <TopErrorBoundary>
         <context.Provider value={excalidrawRef}>
-          <CollabWrapper excalidrawRef={excalidrawRef}>
+          <CollabWrapper excalidrawRef={excalidrawRef} username={username}>
             {(collab: CollabContext) => {
               return <Component collab={collab} />;
             }}
