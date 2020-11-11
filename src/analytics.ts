@@ -1,4 +1,4 @@
-declare var gtag: any;
+declare var gtag: Function;
 
 export const EVENT_ACTION = "action";
 
