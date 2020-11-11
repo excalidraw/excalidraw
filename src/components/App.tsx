@@ -73,6 +73,7 @@ import {
   setCursorForShape,
   tupleToCoors,
   ResolvablePromise,
+  resolvablePromise,
 } from "../utils";
 import {
   KEYS,
@@ -292,10 +293,16 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       height,
       ...this.getCanvasOffsets({ offsetLeft, offsetTop }),
     };
-    if (forwardedRef && "current" in forwardedRef) {
-      forwardedRef.current = {
+    if (forwardedRef) {
+      const readyPromise =
+        typeof forwardedRef === "function"
+          ? resolvablePromise<ExcalidrawImperativeAPI>()
+          : "current" in forwardedRef
+          ? forwardedRef.current!.readyPromise
+          : forwardedRef.readyPromise;
+      const api = {
         ready: true,
-        readyPromise: forwardedRef.current!.readyPromise,
+        readyPromise: readyPromise,
         updateScene: this.updateScene,
         resetScene: this.resetScene,
         getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
@@ -305,8 +312,15 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         setScrollToCenter: this.setScrollToCenter,
         initializeScene: this.initializeScene,
         getSceneElements: this.getSceneElements,
-      };
-      forwardedRef.current!.readyPromise.resolve(forwardedRef.current);
+      } as const;
+      if (typeof forwardedRef === "function") {
+        forwardedRef(api);
+      } else if ("current" in forwardedRef) {
+        forwardedRef.current = api;
+      } else {
+        Object.assign(forwardedRef, api);
+      }
+      readyPromise.resolve(api);
     }
     this.scene = new Scene();
 

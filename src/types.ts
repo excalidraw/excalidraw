@@ -139,7 +139,7 @@ export interface ExcalidrawProps {
   user?: {
     name?: string | null;
   };
-  forwardedRef: ForwardRef<ExcalidrawImperativeAPI>;
+  forwardedRef: ExcalidrawImperativeAPI | ForwardRef<ExcalidrawImperativeAPI>;
   onCollabButtonClick?: () => void;
   isCollaborating: boolean;
   onPointerUpdate: (payload: {
