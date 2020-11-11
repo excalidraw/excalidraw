@@ -61,17 +61,16 @@ export const importFromLocalStorage = () => {
     console.error(error);
   }
 
-  let elements = [];
+  let elements: ExcalidrawElement[] = [];
   if (savedElements) {
     try {
-      elements = JSON.parse(savedElements);
+      elements = clearElementsForLocalStorage(JSON.parse(savedElements));
     } catch (error) {
       console.error(error);
       // Do nothing because elements array is already empty
     }
   }
 
-  elements = clearElementsForLocalStorage(elements) as any[];
   let appState = null;
   if (savedState) {
     try {

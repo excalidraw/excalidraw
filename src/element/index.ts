@@ -87,12 +87,14 @@ export const isNonDeletedElement = <T extends ExcalidrawElement>(
   element: T,
 ): element is NonDeleted<T> => !element.isDeleted;
 
-const _clearElements = (elements: readonly ExcalidrawElement[]) =>
+const _clearElements = (
+  elements: readonly ExcalidrawElement[],
+): ExcalidrawElement[] =>
   getNonDeletedElements(elements).map((element) =>
     isLinearElementType(element.type)
-      ? { ...element, lastCommittedPoint: undefined }
+      ? { ...element, lastCommittedPoint: null }
       : element,
-  ) as readonly ExcalidrawElement[];
+  );
 
 export const clearElementsForExport = (
   elements: readonly ExcalidrawElement[],
