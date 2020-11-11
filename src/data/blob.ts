@@ -6,6 +6,7 @@ import { LibraryData, ImportedDataState } from "./types";
 import { calculateScrollCenter } from "../scene";
 import { MIME_TYPES } from "../constants";
 import { CanvasError } from "../errors";
+import { clearElementsForExport } from "../element";
 
 export const parseFileContents = async (blob: Blob | File) => {
   let contents: string;
@@ -90,7 +91,7 @@ export const loadFromBlob = async (
     }
     return restore(
       {
-        elements: data.elements,
+        elements: clearElementsForExport(data.elements || []),
         appState: {
           appearance: localAppState?.appearance,
           fileHandle:
