@@ -147,5 +147,4 @@ export interface ExcalidrawProps {
     button: "down" | "up";
     pointersMap: Gesture["pointers"];
   }) => void;
-  onReady?: () => void;
 }

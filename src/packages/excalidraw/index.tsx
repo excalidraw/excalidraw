@@ -23,7 +23,6 @@ const Excalidraw = (props: ExcalidrawProps) => {
     onCollabButtonClick = noop,
     isCollaborating,
     onPointerUpdate,
-    onReady,
   } = props;
 
   useEffect(() => {
@@ -59,7 +58,6 @@ const Excalidraw = (props: ExcalidrawProps) => {
           onCollabButtonClick={onCollabButtonClick}
           isCollaborating={isCollaborating}
           onPointerUpdate={onPointerUpdate}
-          onReady={onReady}
         />
       </IsMobileProvider>
     </InitializeApp>
