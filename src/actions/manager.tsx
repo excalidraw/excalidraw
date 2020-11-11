@@ -8,7 +8,7 @@ import {
   ActionResult,
 } from "./types";
 import { ExcalidrawElement } from "../element/types";
-import { AppState, Collaborator } from "../types";
+import { AppState } from "../types";
 import { t } from "../i18n";
 
 export class ActionManager implements ActionsManagerInterface {
@@ -20,13 +20,10 @@ export class ActionManager implements ActionsManagerInterface {
 
   getElementsIncludingDeleted: () => readonly ExcalidrawElement[];
 
-  getCollaborators: () => Map<string, Collaborator>;
-
   constructor(
     updater: UpdaterFn,
     getAppState: () => AppState,
     getElementsIncludingDeleted: () => readonly ExcalidrawElement[],
-    getCollaborators: () => Map<string, Collaborator>,
   ) {
     this.updater = (actionResult) => {
       if (actionResult && "then" in actionResult) {
@@ -39,7 +36,6 @@ export class ActionManager implements ActionsManagerInterface {
     };
     this.getAppState = getAppState;
     this.getElementsIncludingDeleted = getElementsIncludingDeleted;
-    this.getCollaborators = getCollaborators;
   }
 
   registerAction(action: Action) {
@@ -73,7 +69,6 @@ export class ActionManager implements ActionsManagerInterface {
         this.getElementsIncludingDeleted(),
         this.getAppState(),
         null,
-        this.getCollaborators(),
       ),
     );
     return true;
@@ -85,7 +80,6 @@ export class ActionManager implements ActionsManagerInterface {
         this.getElementsIncludingDeleted(),
         this.getAppState(),
         null,
-        this.getCollaborators(),
       ),
     );
   }
@@ -115,7 +109,6 @@ export class ActionManager implements ActionsManagerInterface {
               this.getElementsIncludingDeleted(),
               this.getAppState(),
               null,
-              this.getCollaborators(),
             ),
           );
         },
@@ -136,7 +129,6 @@ export class ActionManager implements ActionsManagerInterface {
             this.getElementsIncludingDeleted(),
             this.getAppState(),
             formState,
-            this.getCollaborators(),
           ),
         );
       };
@@ -147,7 +139,6 @@ export class ActionManager implements ActionsManagerInterface {
           appState={this.getAppState()}
           updateData={updateData}
           id={id}
-          collaborators={this.getCollaborators()}
         />
       );
     }

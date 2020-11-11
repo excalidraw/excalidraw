@@ -1,6 +1,6 @@
 import React from "react";
 import { ExcalidrawElement } from "../element/types";
-import { AppState, Collaborator } from "../types";
+import { AppState } from "../types";
 
 /** if false, the action should be prevented */
 export type ActionResult =
@@ -16,7 +16,6 @@ type ActionFn = (
   elements: readonly ExcalidrawElement[],
   appState: Readonly<AppState>,
   formData: any,
-  collaborators: Map<string, Collaborator>,
 ) => ActionResult | Promise<ActionResult>;
 
 export type UpdaterFn = (res: ActionResult) => void;
@@ -81,7 +80,6 @@ export interface Action {
     appState: AppState;
     updateData: (formData?: any) => void;
     id?: string;
-    collaborators: Map<string, Collaborator>;
   }>;
   perform: ActionFn;
   keyPriority?: number;

@@ -1,5 +1,5 @@
 import React from "react";
-import { AppState, Collaborator } from "../types";
+import { AppState } from "../types";
 import { ActionManager } from "../actions/manager";
 import { t, setLanguage } from "../i18n";
 import Stack from "./Stack";
@@ -29,7 +29,6 @@ type MobileMenuProps = {
   onCollabButtonClick?: () => void;
   onLockToggle: () => void;
   canvas: HTMLCanvasElement | null;
-  collaborators: Map<string, Collaborator>;
   isCollaborating: boolean;
 };
 
@@ -43,7 +42,6 @@ export const MobileMenu = ({
   onCollabButtonClick,
   onLockToggle,
   canvas,
-  collaborators,
   isCollaborating,
 }: MobileMenuProps) => (
   <>
@@ -96,7 +94,7 @@ export const MobileMenu = ({
                 {onCollabButtonClick && (
                   <CollabButton
                     isCollaborating={isCollaborating}
-                    collaboratorCount={collaborators.size}
+                    collaboratorCount={appState.collaborators.size}
                     onClick={onCollabButtonClick}
                   />
                 )}
@@ -117,7 +115,7 @@ export const MobileMenu = ({
                 <fieldset>
                   <legend>{t("labels.collaborators")}</legend>
                   <UserList mobile>
-                    {Array.from(collaborators)
+                    {Array.from(appState.collaborators)
                       // Collaborator is either not initialized or is actually the current user.
                       .filter(([_, client]) => Object.keys(client).length !== 0)
                       .map(([clientId, client]) => (

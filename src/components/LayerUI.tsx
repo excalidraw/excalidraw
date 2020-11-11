@@ -9,7 +9,7 @@ import { showSelectedShapeActions } from "../element";
 import { calculateScrollCenter, getSelectedElements } from "../scene";
 import { exportCanvas } from "../data";
 
-import { AppState, LibraryItems, LibraryItem, Collaborator } from "../types";
+import { AppState, LibraryItems, LibraryItem } from "../types";
 import { NonDeletedExcalidrawElement } from "../element/types";
 
 import { ActionManager } from "../actions/manager";
@@ -58,7 +58,6 @@ interface LayerUIProps {
   zenModeEnabled: boolean;
   toggleZenMode: () => void;
   lng: string;
-  collaborators: Map<string, Collaborator>;
   isCollaborating: boolean;
 }
 
@@ -292,7 +291,6 @@ const LayerUI = ({
   onInsertShape,
   zenModeEnabled,
   toggleZenMode,
-  collaborators,
   isCollaborating,
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
@@ -388,7 +386,7 @@ const LayerUI = ({
             {onCollabButtonClick && (
               <CollabButton
                 isCollaborating={isCollaborating}
-                collaboratorCount={collaborators.size}
+                collaboratorCount={appState.collaborators.size}
                 onClick={onCollabButtonClick}
               />
             )}
@@ -495,7 +493,7 @@ const LayerUI = ({
               "transition-right": zenModeEnabled,
             })}
           >
-            {Array.from(collaborators)
+            {Array.from(appState.collaborators)
               // Collaborator is either not initialized or is actually the current user.
               .filter(([_, client]) => Object.keys(client).length !== 0)
               .map(([clientId, client]) => (
@@ -585,7 +583,6 @@ const LayerUI = ({
       onCollabButtonClick={onCollabButtonClick}
       onLockToggle={onLockToggle}
       canvas={canvas}
-      collaborators={collaborators}
       isCollaborating={isCollaborating}
     />
   ) : (

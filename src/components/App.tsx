@@ -315,7 +315,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.syncActionResult,
       () => this.state,
       () => this.scene.getElementsIncludingDeleted(),
-      () => this.state.collaborators,
     );
     this.actionManager.registerAll(actions);
 
@@ -365,7 +364,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           zenModeEnabled={zenModeEnabled}
           toggleZenMode={this.toggleZenMode}
           lng={getLanguage().lng}
-          collaborators={this.state.collaborators}
           isCollaborating={this.props.isCollaborating}
         />
         <main>
