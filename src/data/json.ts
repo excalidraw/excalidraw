@@ -6,6 +6,7 @@ import { fileOpen, fileSave } from "browser-nativefs";
 import { loadFromBlob } from "./blob";
 import { Library } from "./library";
 import { MIME_TYPES } from "../constants";
+import { clearElementsForExport } from "../element";
 
 export const serializeAsJSON = (
   elements: readonly ExcalidrawElement[],
@@ -16,7 +17,7 @@ export const serializeAsJSON = (
       type: "excalidraw",
       version: 2,
       source: window.location.origin,
-      elements: elements.filter((element) => !element.isDeleted),
+      elements: clearElementsForExport(elements),
       appState: cleanAppStateForExport(appState),
     },
     null,

@@ -2,6 +2,7 @@ import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 import { clearAppStateForLocalStorage, getDefaultAppState } from "../appState";
 import { STORAGE_KEYS } from "../constants";
+import { clearElementsForLocalStorage } from "../element";
 
 export const saveUsernameToLocalStorage = (username: string) => {
   try {
@@ -36,7 +37,7 @@ export const saveToLocalStorage = (
   try {
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
-      JSON.stringify(elements.filter((element) => !element.isDeleted)),
+      JSON.stringify(clearElementsForLocalStorage(elements)),
     );
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
@@ -60,10 +61,10 @@ export const importFromLocalStorage = () => {
     console.error(error);
   }
 
-  let elements = [];
+  let elements: ExcalidrawElement[] = [];
   if (savedElements) {
     try {
-      elements = JSON.parse(savedElements);
+      elements = clearElementsForLocalStorage(JSON.parse(savedElements));
     } catch (error) {
       console.error(error);
       // Do nothing because elements array is already empty
