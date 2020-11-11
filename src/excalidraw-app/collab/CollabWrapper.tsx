@@ -23,9 +23,13 @@ import {
 import { isSavedToFirebase, saveToFirebase } from "../data/firebase";
 
 import Portal from "./Portal";
-import { AppState, Collaborator, Gesture } from "../../types";
+import {
+  AppState,
+  Collaborator,
+  ExcalidrawAPIRefValue,
+  Gesture,
+} from "../../types";
 import { ExcalidrawElement } from "../../element/types";
-import { ExcalidrawImperativeAPI } from "../../components/App";
 import {
   importUsernameFromLocalStorage,
   saveToLocalStorage,
@@ -42,7 +46,7 @@ import { Emitter } from "../../emitter";
 import { ImportedDataState } from "../../data/types";
 
 interface Props {
-  excalidrawRef: React.RefObject<ExcalidrawImperativeAPI>;
+  excalidrawRef: ExcalidrawAPIRefValue;
 }
 
 interface State {
@@ -166,7 +170,7 @@ class CollabWrapper extends PureComponent<Props, State> {
 
   saveCollabRoomToFirebase = async (
     syncableElements: ExcalidrawElement[] = getSyncableElements(
-      this.excalidrawRef.current.getSceneElementsIncludingDeleted(),
+      this.excalidrawRef.getSceneElementsIncludingDeleted(),
     ),
   ) => {
     try {
@@ -182,13 +186,13 @@ class CollabWrapper extends PureComponent<Props, State> {
       "Excalidraw",
       await generateCollaborationLink(),
     );
-    const elements = this.excalidrawRef.current.getSceneElements();
+    const elements = this.excalidrawRef.getSceneElements();
     // remove deleted elements from elements array & history to ensure we don't
     // expose potentially sensitive user data in case user manually deletes
     // existing elements (or clears scene), which would otherwise be persisted
     // to database even if deleted before creating the room.
-    this.excalidrawRef.current.history.clear();
-    this.excalidrawRef.current.updateScene({ elements, commitToHistory: true });
+    this.excalidrawRef.history.clear();
+    this.excalidrawRef.updateScene({ elements, commitToHistory: true });
     this.initializeSocketClient({ showLoadingState: false });
   };
 
@@ -200,7 +204,7 @@ class CollabWrapper extends PureComponent<Props, State> {
 
   private destroySocketClient = () => {
     this.collaborators = new Map();
-    this.props.excalidrawRef.current?.updateScene({
+    this.excalidrawRef.updateScene({
       collaborators: this.collaborators,
     });
     this.setState({
@@ -292,7 +296,7 @@ class CollabWrapper extends PureComponent<Props, State> {
               user.selectedElementIds = selectedElementIds;
               user.username = username;
               collaborators.set(socketId, user);
-              this.props.excalidrawRef.current?.updateScene({
+              this.excalidrawRef.updateScene({
                 collaborators,
               });
               break;
@@ -350,10 +354,10 @@ class CollabWrapper extends PureComponent<Props, State> {
     }: { init?: boolean; initFromSnapshot?: boolean } = {},
   ) => {
     if (init || initFromSnapshot) {
-      this.excalidrawRef.current.setScrollToCenter(elements);
+      this.excalidrawRef.setScrollToCenter(elements);
     }
 
-    this.excalidrawRef.current.updateScene({
+    this.excalidrawRef.updateScene({
       elements: elements,
       commitToHistory: !!init,
     });
@@ -362,7 +366,7 @@ class CollabWrapper extends PureComponent<Props, State> {
     // when we receive any messages from another peer. This UX can be pretty rough -- if you
     // undo, a user makes a change, and then try to redo, your element(s) will be lost. However,
     // right now we think this is the right tradeoff.
-    this.excalidrawRef.current.history.clear();
+    this.excalidrawRef.history.clear();
   };
 
   setCollaborators(sockets: string[]) {
@@ -378,7 +382,7 @@ class CollabWrapper extends PureComponent<Props, State> {
         }
       }
       this.collaborators = collaborators;
-      this.props.excalidrawRef.current?.updateScene({ collaborators });
+      this.excalidrawRef.updateScene({ collaborators });
     });
   }
 
@@ -391,7 +395,7 @@ class CollabWrapper extends PureComponent<Props, State> {
   };
 
   public getSceneElementsIncludingDeleted = () => {
-    return this.excalidrawRef.current.getSceneElementsIncludingDeleted();
+    return this.excalidrawRef.getSceneElementsIncludingDeleted();
   };
 
   onSceneBroadCast = (
@@ -434,7 +438,7 @@ class CollabWrapper extends PureComponent<Props, State> {
   queueBroadcastAllElements = throttle(() => {
     this.onSceneBroadCast(
       getSyncableElements(
-        this.excalidrawRef.current.getSceneElementsIncludingDeleted(),
+        this.excalidrawRef.getSceneElementsIncludingDeleted(),
       ),
       true,
     );

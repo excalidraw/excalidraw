@@ -20,22 +20,10 @@ import { EVENT, LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG } from "../constants";
 import { loadFromFirebase } from "./data/firebase";
 import { restore } from "../data/restore";
 import { ExcalidrawImperativeAPI } from "../components/App";
-import { ResolvablePromise, resolvablePromise } from "../utils";
+import { resolvablePromise } from "../utils";
+import { ExcalidrawAPIRefValue } from "../types";
 
-export type ExcalidrawRef =
-  | (ExcalidrawImperativeAPI & {
-      readyPromise: ResolvablePromise<undefined>;
-      ready: true;
-    })
-  | {
-      readyPromise: ResolvablePromise<undefined>;
-      ready: false;
-    };
-
-const excalidrawRef = React.createRef<ExcalidrawImperativeAPI>();
-
-// @ts-ignore
-excalidrawRef.current = {
+const excalidrawRef: ExcalidrawAPIRefValue = {
   readyPromise: resolvablePromise(),
   ready: false,
 };
@@ -202,10 +190,10 @@ function ExcalidrawApp(props: { collab: CollabContext }) {
     resolvablePromise<ImportedDataState | null>(),
   );
 
-  const excalidrawRef = useContext(context);
+  const excalidrawRef = useContext(context) as ExcalidrawAPIRefValue;
 
   useEffect(() => {
-    excalidrawRef.current?.readyPromise.then((excalidrawApi) => {
+    excalidrawRef.readyPromise.then((excalidrawApi) => {
       initializeScene({
         resetScene: excalidrawApi.resetScene,
         initializeSocketClient: props.collab.initializeSocketClient,
@@ -218,7 +206,7 @@ function ExcalidrawApp(props: { collab: CollabContext }) {
     });
 
     const onHashChange = (_: HashChangeEvent) => {
-      const api = excalidrawRef.current!;
+      const api = excalidrawRef;
       if (!api.ready) {
         return;
       }
@@ -244,7 +232,7 @@ function ExcalidrawApp(props: { collab: CollabContext }) {
 
   return (
     <Excalidraw
-      ref={excalidrawRef}
+      excalidrawRef={excalidrawRef}
       onChangeEmitter={collab.onChangeEmitter}
       width={dimensions.width}
       height={dimensions.height}

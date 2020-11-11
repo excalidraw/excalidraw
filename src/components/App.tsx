@@ -285,7 +285,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     super(props);
     const defaultAppState = getDefaultAppState();
 
-    const { width, height, offsetLeft, offsetTop, forwardedRef } = props;
+    const { width, height, offsetLeft, offsetTop, excalidrawRef } = props;
     this.state = {
       ...defaultAppState,
       isLoading: true,
@@ -293,13 +293,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       height,
       ...this.getCanvasOffsets({ offsetLeft, offsetTop }),
     };
-    if (forwardedRef) {
+    if (excalidrawRef) {
       const readyPromise =
-        typeof forwardedRef === "function"
+        typeof excalidrawRef === "function"
           ? resolvablePromise<ExcalidrawImperativeAPI>()
-          : "current" in forwardedRef
-          ? forwardedRef.current!.readyPromise
-          : forwardedRef.readyPromise;
+          : "current" in excalidrawRef
+          ? excalidrawRef.current!.readyPromise
+          : excalidrawRef.readyPromise;
       const api = {
         ready: true,
         readyPromise: readyPromise,
@@ -313,12 +313,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         initializeScene: this.initializeScene,
         getSceneElements: this.getSceneElements,
       } as const;
-      if (typeof forwardedRef === "function") {
-        forwardedRef(api);
-      } else if ("current" in forwardedRef) {
-        forwardedRef.current = api;
+      if (typeof excalidrawRef === "function") {
+        excalidrawRef(api);
+      } else if ("current" in excalidrawRef) {
+        excalidrawRef.current = api;
       } else {
-        Object.assign(forwardedRef, api);
+        Object.assign(excalidrawRef, api);
       }
       readyPromise.resolve(api);
     }

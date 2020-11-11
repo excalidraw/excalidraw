@@ -16,6 +16,7 @@ import { SuggestedBinding } from "./element/binding";
 import { ImportedDataState } from "./data/types";
 import { ExcalidrawImperativeAPI } from "./components/App";
 import type { Emitter } from "./emitter";
+import type { ResolvablePromise } from "./utils";
 
 export type FlooredNumber = number & { _brand: "FlooredNumber" };
 export type Point = Readonly<RoughPoint>;
@@ -127,6 +128,16 @@ export declare class GestureEvent extends UIEvent {
 export type LibraryItem = readonly NonDeleted<ExcalidrawElement>[];
 export type LibraryItems = readonly LibraryItem[];
 
+export type ExcalidrawAPIRefValue =
+  | (ExcalidrawImperativeAPI & {
+      readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
+      ready: true;
+    })
+  | {
+      readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
+      ready: false;
+    };
+
 export interface ExcalidrawProps {
   width: number;
   height: number;
@@ -139,7 +150,7 @@ export interface ExcalidrawProps {
   user?: {
     name?: string | null;
   };
-  forwardedRef: ExcalidrawImperativeAPI | ForwardRef<ExcalidrawImperativeAPI>;
+  excalidrawRef: ExcalidrawAPIRefValue | ForwardRef<ExcalidrawAPIRefValue>;
   onCollabButtonClick?: () => void;
   isCollaborating: boolean;
   onPointerUpdate: (payload: {

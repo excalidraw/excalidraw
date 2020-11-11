@@ -19,7 +19,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     onChangeEmitter,
     initialData,
     user,
-    forwardedRef,
+    excalidrawRef,
     onCollabButtonClick = noop,
     isCollaborating,
     onPointerUpdate,
@@ -54,7 +54,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
           onChangeEmitter={onChangeEmitter}
           initialData={initialData}
           user={user}
-          forwardedRef={forwardedRef}
+          excalidrawRef={excalidrawRef}
           onCollabButtonClick={onCollabButtonClick}
           isCollaborating={isCollaborating}
           onPointerUpdate={onPointerUpdate}
@@ -86,7 +86,7 @@ const areEqual = (
 const forwardedRefComp = forwardRef<
   ExcalidrawImperativeAPI,
   PublicExcalidrawProps
->((props, ref) => <Excalidraw {...props} forwardedRef={ref} />);
+>((props) => <Excalidraw {...props} />);
 export default React.memo(forwardedRefComp, areEqual);
 export {
   getSceneVersion,
