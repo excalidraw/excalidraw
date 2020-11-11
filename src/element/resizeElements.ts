@@ -43,7 +43,6 @@ export const transformElements = (
   selectedElements: readonly NonDeletedExcalidrawElement[],
   resizeArrowDirection: "origin" | "end",
   isRotateWithDiscreteAngle: boolean,
-  isResizeWithSidesSameLength: boolean,
   isResizeCenterPoint: boolean,
   pointerX: number,
   pointerY: number,
@@ -94,7 +93,6 @@ export const transformElements = (
       resizeSingleElement(
         element,
         transformHandleType,
-        isResizeWithSidesSameLength,
         isResizeCenterPoint,
         pointerX,
         pointerY,
@@ -394,7 +392,6 @@ const resizeSingleTextElement = (
 const resizeSingleElement = (
   element: NonDeletedExcalidrawElement,
   transformHandleType: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
-  sidesWithSameLength: boolean,
   isResizeFromCenter: boolean,
   pointerX: number,
   pointerY: number,
@@ -440,11 +437,9 @@ const resizeSingleElement = (
   ) {
     scaleY = (y2 - rotatedY) / (y2 - y1);
   }
-  let nextWidth = element.width * scaleX;
-  let nextHeight = element.height * scaleY;
-  if (sidesWithSameLength) {
-    nextWidth = nextHeight = Math.max(nextWidth, nextHeight);
-  }
+
+  const nextWidth = element.width * scaleX;
+  const nextHeight = element.height * scaleY;
   const [nextX1, nextY1, nextX2, nextY2] = getResizedElementAbsoluteCoords(
     element,
     nextWidth,

@@ -3030,7 +3030,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             selectedElements,
             pointerDownState.resize.arrowDirection,
             getRotateWithDiscreteAngleKey(event),
-            getResizeWithSidesSameLengthKey(event),
             getResizeCenterPointKey(event),
             resizeX,
             resizeY,
