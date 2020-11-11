@@ -4,6 +4,7 @@ import {
   NonDeleted,
 } from "./types";
 import { isInvisiblySmallElement } from "./sizeHelpers";
+import { isLinearElementType } from "./typeChecks";
 
 export {
   newElement,
@@ -85,3 +86,18 @@ export const getNonDeletedElements = (elements: readonly ExcalidrawElement[]) =>
 export const isNonDeletedElement = <T extends ExcalidrawElement>(
   element: T,
 ): element is NonDeleted<T> => !element.isDeleted;
+
+const _clearElements = (elements: readonly ExcalidrawElement[]) =>
+  getNonDeletedElements(elements).map((element) =>
+    isLinearElementType(element.type)
+      ? { ...element, lastCommittedPoint: undefined }
+      : element,
+  ) as readonly ExcalidrawElement[];
+
+export const clearElementsForExport = (
+  elements: readonly ExcalidrawElement[],
+) => _clearElements(elements);
+
+export const clearElementsForLocalStorage = (
+  elements: readonly ExcalidrawElement[],
+) => _clearElements(elements);
