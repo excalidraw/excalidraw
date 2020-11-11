@@ -20,25 +20,9 @@ import { EVENT, LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG } from "../constants";
 import { loadFromFirebase } from "./data/firebase";
 import { restore } from "../data/restore";
 import { ExcalidrawImperativeAPI } from "../components/App";
-import { ResolvablePromise, resolvablePromise } from "../utils";
-
-export type ExcalidrawRef =
-  | (ExcalidrawImperativeAPI & {
-      readyPromise: ResolvablePromise<undefined>;
-      ready: true;
-    })
-  | {
-      readyPromise: ResolvablePromise<undefined>;
-      ready: false;
-    };
+import { resolvablePromise } from "../utils";
 
 const excalidrawRef = React.createRef<ExcalidrawImperativeAPI>();
-
-// @ts-ignore
-excalidrawRef.current = {
-  readyPromise: resolvablePromise(),
-  ready: false,
-};
 
 const context = React.createContext(excalidrawRef);
 
@@ -182,6 +166,8 @@ function ExcalidrawApp(props: { collab: CollabContext }) {
     height: window.innerHeight,
   });
 
+  const [excalidrawLoaded, setExcalidrawLoaded] = useState(false);
+
   useLayoutEffect(() => {
     const onResize = () => {
       setDimensions({
@@ -205,23 +191,24 @@ function ExcalidrawApp(props: { collab: CollabContext }) {
   const excalidrawRef = useContext(context);
 
   useEffect(() => {
-    excalidrawRef.current?.readyPromise.then((excalidrawApi) => {
-      initializeScene({
-        resetScene: excalidrawApi.resetScene,
-        initializeSocketClient: props.collab.initializeSocketClient,
-        onLateInitialization: ({ scene }) => {
-          initialStatePromiseRef.current.resolve(scene);
-        },
-      }).then((scene) => {
+    if (!excalidrawLoaded) {
+      return;
+    }
+    initializeScene({
+      resetScene: excalidrawRef!.current!.resetScene,
+      initializeSocketClient: props.collab.initializeSocketClient,
+      onLateInitialization: ({ scene }) => {
         initialStatePromiseRef.current.resolve(scene);
-      });
+      },
+    }).then((scene) => {
+      initialStatePromiseRef.current.resolve(scene);
     });
 
     const onHashChange = (_: HashChangeEvent) => {
-      const api = excalidrawRef.current!;
-      if (!api.ready) {
+      if (!excalidrawLoaded) {
         return;
       }
+      const api = excalidrawRef.current!;
       if (window.location.hash.length > 1) {
         initializeScene({
           resetScene: api.resetScene,
@@ -238,7 +225,7 @@ function ExcalidrawApp(props: { collab: CollabContext }) {
     return () => {
       window.removeEventListener(EVENT.HASHCHANGE, onHashChange, false);
     };
-  }, [excalidrawRef, props.collab.initializeSocketClient]);
+  }, [excalidrawLoaded, excalidrawRef, props.collab.initializeSocketClient]);
 
   const collab = props.collab;
 
@@ -253,6 +240,7 @@ function ExcalidrawApp(props: { collab: CollabContext }) {
       onCollabButtonClick={collab.onCollabButtonClick}
       isCollaborating={collab.isCollaborating}
       onPointerUpdate={collab.onPointerUpdate}
+      onReady={() => setExcalidrawLoaded(true)}
     />
   );
 }
