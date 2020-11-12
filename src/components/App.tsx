@@ -74,6 +74,7 @@ import {
   tupleToCoors,
   ResolvablePromise,
   resolvablePromise,
+  withBatchedUpdates,
 } from "../utils";
 import {
   KEYS,
@@ -127,7 +128,6 @@ import LayerUI from "./LayerUI";
 import { ScrollBars, SceneState } from "../scene/types";
 import { mutateElement } from "../element/mutateElement";
 import { invalidateShapeForElement } from "../renderer/renderElement";
-import { unstable_batchedUpdates } from "react-dom";
 import {
   isLinearElement,
   isLinearElementType,
@@ -166,18 +166,6 @@ import { renderSpreadsheet } from "../charts";
 import { isValidLibrary } from "../data/json";
 import { getNewZoom } from "../scene/zoom";
 import { ImportedDataState } from "../data/types";
-
-/**
- * @param func handler taking at most single parameter (event).
- */
-const withBatchedUpdates = <
-  TFunction extends ((event: any) => void) | (() => void)
->(
-  func: Parameters<TFunction>["length"] extends 0 | 1 ? TFunction : never,
-) =>
-  ((event) => {
-    unstable_batchedUpdates(func as TFunction, event);
-  }) as TFunction;
 
 const { history } = createHistory();
 

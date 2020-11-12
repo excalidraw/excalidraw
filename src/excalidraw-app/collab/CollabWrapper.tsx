@@ -25,7 +25,11 @@ import {
   Gesture,
 } from "../../types";
 import { ExcalidrawElement } from "../../element/types";
-import { saveToLocalStorage } from "../../data/localStorage";
+import {
+  importUsernameFromLocalStorage,
+  saveToLocalStorage,
+  saveUsernameToLocalStorage,
+} from "../../data/localStorage";
 import { debounce, resolvablePromise, withBatchedUpdates } from "../../utils";
 import {
   getSceneVersion,
@@ -38,7 +42,6 @@ import { ImportedDataState } from "../../data/types";
 
 interface Props {
   excalidrawRef: ExcalidrawAPIRefValue;
-  username: string;
 }
 
 interface State {
@@ -88,7 +91,7 @@ class CollabWrapper extends PureComponent<Props, State> {
       isCollaborating: false,
       modalIsShown: false,
       errorMessage: "",
-      username: props.username,
+      username: importUsernameFromLocalStorage() || "",
       activeRoomLink: "",
     };
     this.portal = new Portal(this);
@@ -428,6 +431,7 @@ class CollabWrapper extends PureComponent<Props, State> {
 
   onUsernameChange = (username: string) => {
     this.setState({ username });
+    saveUsernameToLocalStorage(username);
   };
 
   onCollabButtonClick = () => {

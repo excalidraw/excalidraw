@@ -8,11 +8,7 @@ import React, {
 
 import Excalidraw from "../packages/excalidraw/index";
 
-import {
-  importFromLocalStorage,
-  importUsernameFromLocalStorage,
-  saveUsernameToLocalStorage,
-} from "../data/localStorage";
+import { importFromLocalStorage } from "../data/localStorage";
 
 import { ImportedDataState } from "../data/types";
 import CollabWrapper, { CollabContext } from "./collab/CollabWrapper";
@@ -33,7 +29,6 @@ const excalidrawRef: ExcalidrawAPIRefValue = {
 };
 
 const context = React.createContext(excalidrawRef);
-const username = importUsernameFromLocalStorage() || "";
 const shouldForceLoadScene = (
   scene: ResolutionType<typeof loadScene>,
 ): boolean => {
@@ -255,10 +250,6 @@ function ExcalidrawApp(props: { collab: CollabContext }) {
     collab.roomId,
   ]);
 
-  useEffect(() => {
-    saveUsernameToLocalStorage(collab.username);
-  }, [collab.username]);
-
   return (
     <Excalidraw
       excalidrawRef={excalidrawRef}
@@ -279,7 +270,7 @@ const AppWithCollab = (Component: typeof ExcalidrawApp) => {
     return (
       <TopErrorBoundary>
         <context.Provider value={excalidrawRef}>
-          <CollabWrapper excalidrawRef={excalidrawRef} username={username}>
+          <CollabWrapper excalidrawRef={excalidrawRef}>
             {(collab: CollabContext) => {
               return <Component collab={collab} />;
             }}
