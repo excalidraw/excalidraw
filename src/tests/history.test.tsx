@@ -6,24 +6,24 @@ import { API } from "./helpers/api";
 import { getDefaultAppState } from "../appState";
 import { waitFor } from "@testing-library/react";
 import { createUndoAction, createRedoAction } from "../actions/actionHistory";
+import * as localStorage from "../data/localStorage";
 
 const { h } = window;
+const importFromLocalStorageSpy = jest.spyOn(
+  localStorage,
+  "importFromLocalStorage",
+);
 
 describe("history", () => {
   it("initializing scene should end up with single history entry", async () => {
-    await render(
-      <AppWithCollab
-        testProps={{
-          initialData: {
-            appState: {
-              ...getDefaultAppState(),
-              zenModeEnabled: true,
-            },
-            elements: [API.createElement({ type: "rectangle", id: "A" })],
-          },
-        }}
-      />,
-    );
+    importFromLocalStorageSpy.mockImplementation(() => ({
+      appState: {
+        ...getDefaultAppState(),
+        zenModeEnabled: true,
+      },
+      elements: [API.createElement({ type: "rectangle", id: "A" })],
+    }));
+    await render(<AppWithCollab />);
 
     await waitFor(() => expect(h.state.zenModeEnabled).toBe(true));
     await waitFor(() =>
@@ -63,19 +63,15 @@ describe("history", () => {
   });
 
   it("scene import via drag&drop should create new history entry", async () => {
-    await render(
-      <AppWithCollab
-        testProps={{
-          initialData: {
-            appState: {
-              ...getDefaultAppState(),
-              viewBackgroundColor: "#FFF",
-            },
-            elements: [API.createElement({ type: "rectangle", id: "A" })],
-          },
-        }}
-      />,
-    );
+    importFromLocalStorageSpy.mockImplementation(() => ({
+      appState: {
+        ...getDefaultAppState(),
+        viewBackgroundColor: "#FFF",
+      },
+      elements: [API.createElement({ type: "rectangle", id: "A" })],
+    }));
+
+    await render(<AppWithCollab />);
 
     await waitFor(() => expect(h.state.viewBackgroundColor).toBe("#FFF"));
     await waitFor(() =>

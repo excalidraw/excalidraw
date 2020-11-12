@@ -3,7 +3,7 @@ import { render, waitFor } from "./test-utils";
 import AppWithCollab from "../excalidraw-app";
 import { API } from "./helpers/api";
 import { createUndoAction } from "../actions/actionHistory";
-
+import * as localStorage from "../data/localStorage";
 const { h } = window;
 
 Object.defineProperty(window, "crypto", {
@@ -20,6 +20,11 @@ Object.defineProperty(window, "crypto", {
 Object.defineProperty(window, "confirm", {
   value: () => false,
 });
+
+const importFromLocalStorageSpy = jest.spyOn(
+  localStorage,
+  "importFromLocalStorage",
+);
 
 jest.mock("../excalidraw-app/data/firebase.ts", () => {
   const loadFromFirebase = async () => null;
@@ -46,22 +51,18 @@ jest.mock("socket.io-client", () => {
 
 describe("collaboration", () => {
   it("creating room should reset deleted elements", async () => {
-    await render(
-      <AppWithCollab
-        testProps={{
-          initialData: {
-            elements: [
-              API.createElement({ type: "rectangle", id: "A" }),
-              API.createElement({
-                type: "rectangle",
-                id: "B",
-                isDeleted: true,
-              }),
-            ],
-          },
-        }}
-      />,
-    );
+    importFromLocalStorageSpy.mockImplementation(() => ({
+      elements: [
+        API.createElement({ type: "rectangle", id: "A" }),
+        API.createElement({
+          type: "rectangle",
+          id: "B",
+          isDeleted: true,
+        }),
+      ],
+      appState: null,
+    }));
+    await render(<AppWithCollab />);
 
     await waitFor(() => {
       expect(h.elements).toEqual([

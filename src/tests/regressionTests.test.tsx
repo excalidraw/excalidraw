@@ -9,7 +9,7 @@ import {
   fireEvent,
   GlobalTestState,
 } from "./test-utils";
-import AppWithCollab from "../excalidraw-app";
+import Excalidraw from "../packages/excalidraw/index";
 import { setLanguage } from "../i18n";
 import { setDateTimeForTests } from "../utils";
 import { ExcalidrawElement } from "../element/types";
@@ -96,7 +96,7 @@ beforeEach(async () => {
   finger2.reset();
 
   await setLanguage("en.json");
-  await render(<AppWithCollab testProps={{ offsetLeft: 0, offsetTop: 0 }} />);
+  await render(<Excalidraw offsetLeft={0} offsetTop={0} />);
 });
 
 afterEach(() => {

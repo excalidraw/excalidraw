@@ -273,7 +273,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     super(props);
     const defaultAppState = getDefaultAppState();
 
-    const { width, height, offsetLeft, offsetTop, excalidrawRef } = props;
+    const {
+      width = window.innerWidth,
+      height = window.innerHeight,
+      offsetLeft,
+      offsetTop,
+      excalidrawRef,
+    } = props;
     this.state = {
       ...defaultAppState,
       isLoading: true,
@@ -366,7 +372,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           zenModeEnabled={zenModeEnabled}
           toggleZenMode={this.toggleZenMode}
           lng={getLanguage().lng}
-          isCollaborating={this.props.isCollaborating}
+          isCollaborating={this.props.isCollaborating || false}
         />
         <main>
           <canvas
@@ -727,8 +733,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         prevProps.offsetTop !== this.props.offsetTop)
     ) {
       this.setState({
-        width: this.props.width,
-        height: this.props.height,
+        width: this.props.width || window.innerWidth,
+        height: this.props.height || window.innerHeight,
         ...this.getCanvasOffsets(this.props),
       });
     }
@@ -3614,7 +3620,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       // sometimes the pointer goes off screen
     }
 
-    this.props.onPointerUpdate({
+    this.props.onPointerUpdate?.({
       pointer,
       button,
       pointersMap: gesture.pointers,

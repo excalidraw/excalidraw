@@ -138,8 +138,8 @@ export type ExcalidrawAPIRefValue =
     };
 
 export interface ExcalidrawProps {
-  width: number;
-  height: number;
+  width?: number;
+  height?: number;
   /** if not supplied, calculated by Excalidraw */
   offsetLeft?: number;
   /** if not supplied, calculated by Excalidraw */
@@ -152,10 +152,10 @@ export interface ExcalidrawProps {
   user?: {
     name?: string | null;
   };
-  excalidrawRef: ExcalidrawAPIRefValue | ForwardRef<ExcalidrawAPIRefValue>;
+  excalidrawRef?: ExcalidrawAPIRefValue | ForwardRef<ExcalidrawAPIRefValue>;
   onCollabButtonClick?: () => void;
-  isCollaborating: boolean;
-  onPointerUpdate: (payload: {
+  isCollaborating?: boolean;
+  onPointerUpdate?: (payload: {
     pointer: { x: number; y: number };
     button: "down" | "up";
     pointersMap: Gesture["pointers"];

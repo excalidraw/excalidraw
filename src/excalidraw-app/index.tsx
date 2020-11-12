@@ -25,7 +25,7 @@ import { loadFromFirebase } from "./data/firebase";
 import { restore } from "../data/restore";
 import { ExcalidrawImperativeAPI } from "../components/App";
 import { debounce, resolvablePromise, withBatchedUpdates } from "../utils";
-import { AppState, ExcalidrawAPIRefValue, ExcalidrawProps } from "../types";
+import { AppState, ExcalidrawAPIRefValue } from "../types";
 import { ExcalidrawElement } from "../element/types";
 
 const excalidrawRef: ExcalidrawAPIRefValue = {
@@ -178,10 +178,7 @@ const initializeScene = async (opts: {
   return null;
 };
 
-function ExcalidrawApp(props: {
-  collab: CollabContext;
-  testProps?: Partial<ExcalidrawProps>;
-}) {
+function ExcalidrawApp(props: { collab: CollabContext }) {
   // dimensions
   // ---------------------------------------------------------------------------
 
@@ -294,22 +291,18 @@ function ExcalidrawApp(props: {
       onCollabButtonClick={collab.onCollabButtonClick}
       isCollaborating={collab.isCollaborating}
       onPointerUpdate={collab.onPointerUpdate}
-      {...props.testProps}
     />
   );
 }
 
 const AppWithCollab = (Component: typeof ExcalidrawApp) => {
-  return <K extends keyof ExcalidrawProps>(props: {
-    /** for testing purposes */
-    testProps?: Pick<ExcalidrawProps, K>;
-  }) => {
+  return () => {
     return (
       <TopErrorBoundary>
         <context.Provider value={excalidrawRef}>
           <CollabWrapper excalidrawRef={excalidrawRef}>
             {(collab: CollabContext) => {
-              return <Component collab={collab} testProps={props.testProps} />;
+              return <Component collab={collab} />;
             }}
           </CollabWrapper>
         </context.Provider>
