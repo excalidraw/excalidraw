@@ -3,7 +3,6 @@ import throttle from "lodash.throttle";
 
 import {
   INITIAL_SCENE_UPDATE_TIMEOUT,
-  SAVE_TO_LOCAL_STORAGE_TIMEOUT,
   SYNC_FULL_SCENE_INTERVAL_MS,
 } from "../../time_constants";
 import { ENV, EVENT, SCENE } from "../../constants";
@@ -27,17 +26,15 @@ import {
 import { ExcalidrawElement } from "../../element/types";
 import {
   importUsernameFromLocalStorage,
-  saveToLocalStorage,
   saveUsernameToLocalStorage,
 } from "../../data/localStorage";
-import { debounce, resolvablePromise, withBatchedUpdates } from "../../utils";
+import { resolvablePromise, withBatchedUpdates } from "../../utils";
 import {
   getSceneVersion,
   getSyncableElements,
 } from "../../packages/excalidraw/index";
 import RoomDialog from "./RoomDialog";
 import { ErrorDialog } from "../../components/ErrorDialog";
-import { Emitter } from "../../emitter";
 import { ImportedDataState } from "../../data/types";
 
 interface Props {
@@ -60,11 +57,15 @@ export interface CollabContext {
   initializeSocketClient: InstanceType<
     typeof CollabWrapper
   >["initializeSocketClient"];
-  onChangeEmitter: InstanceType<typeof CollabWrapper>["onChangeEmitter"];
   username: State["username"];
   onCollabButtonClick: InstanceType<
     typeof CollabWrapper
   >["onCollabButtonClick"];
+
+  broadcastElements: (
+    elements: readonly ExcalidrawElement[],
+    appState: AppState,
+  ) => void;
 }
 
 type ReconciledElements = readonly ExcalidrawElement[] & {
@@ -78,14 +79,10 @@ class CollabWrapper extends PureComponent<Props, State> {
   private excalidrawRef: any;
   excalidrawAppState?: AppState;
   private lastBroadcastedOrReceivedSceneVersion: number = -1;
-  private onChangeEmitter = new Emitter<
-    [readonly ExcalidrawElement[], AppState]
-  >();
   private collaborators = new Map<string, Collaborator>();
 
   constructor(props: Props) {
     super(props);
-    this.onChangeEmitter.subscribe(this.onChange);
     this.state = {
       isLoading: false,
       isCollaborating: false,
@@ -103,7 +100,6 @@ class CollabWrapper extends PureComponent<Props, State> {
     this.unmounted = true;
     window.addEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
     window.addEventListener(EVENT.UNLOAD, this.onUnload);
-    window.addEventListener(EVENT.BLUR, this.onBlur, false);
 
     // console.log("(1)");
     if (
@@ -124,14 +120,11 @@ class CollabWrapper extends PureComponent<Props, State> {
 
   componentWillUnmount() {
     this.unmounted = true;
-    this.onChangeEmitter.unsubscribe(this.onChange);
     window.removeEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
     window.removeEventListener(EVENT.UNLOAD, this.onUnload);
-    window.removeEventListener(EVENT.BLUR, this.onBlur);
   }
 
   private onUnload = () => {
-    this.onBlur();
     this.destroySocketClient();
   };
 
@@ -152,10 +145,6 @@ class CollabWrapper extends PureComponent<Props, State> {
       event.returnValue = "";
     }
   });
-
-  private onBlur = () => {
-    this.saveDebounced.flush();
-  };
 
   saveCollabRoomToFirebase = async (
     syncableElements: ExcalidrawElement[] = getSyncableElements(
@@ -404,8 +393,10 @@ class CollabWrapper extends PureComponent<Props, State> {
       this.portal.broadcastMouseLocation(payload);
   };
 
-  onChange = (elements: readonly ExcalidrawElement[], state: AppState) => {
-    this.saveDebounced(elements, state);
+  broadcastElements = (
+    elements: readonly ExcalidrawElement[],
+    state: AppState,
+  ) => {
     this.excalidrawAppState = state;
     if (
       getSceneVersion(elements) >
@@ -416,13 +407,6 @@ class CollabWrapper extends PureComponent<Props, State> {
       this.queueBroadcastAllElements();
     }
   };
-
-  private saveDebounced = debounce(
-    (elements: readonly ExcalidrawElement[], state: AppState) => {
-      saveToLocalStorage(elements, state);
-    },
-    SAVE_TO_LOCAL_STORAGE_TIMEOUT,
-  );
 
   queueBroadcastAllElements = throttle(() => {
     this.onSceneBroadCast(
@@ -461,10 +445,10 @@ class CollabWrapper extends PureComponent<Props, State> {
       isCollaborating: this.state.isCollaborating,
       onPointerUpdate: this.onPointerUpdate,
       initializeSocketClient: this.initializeSocketClient,
-      onChangeEmitter: this.onChangeEmitter,
       username: this.state.username,
       onCollabButtonClick: this.onCollabButtonClick,
       roomId: this.portal.roomID,
+      broadcastElements: this.broadcastElements,
     };
   }
 

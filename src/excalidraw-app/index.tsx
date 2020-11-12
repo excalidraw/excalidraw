@@ -8,7 +8,10 @@ import React, {
 
 import Excalidraw from "../packages/excalidraw/index";
 
-import { importFromLocalStorage } from "../data/localStorage";
+import {
+  importFromLocalStorage,
+  saveToLocalStorage,
+} from "../data/localStorage";
 
 import { ImportedDataState } from "../data/types";
 import CollabWrapper, { CollabContext } from "./collab/CollabWrapper";
@@ -17,11 +20,13 @@ import { t } from "../i18n";
 import { loadScene } from "../data";
 import { getCollaborationLinkData } from "./data";
 import { EVENT, LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG } from "../constants";
+import { SAVE_TO_LOCAL_STORAGE_TIMEOUT } from "../time_constants";
 import { loadFromFirebase } from "./data/firebase";
 import { restore } from "../data/restore";
 import { ExcalidrawImperativeAPI } from "../components/App";
-import { resolvablePromise, withBatchedUpdates } from "../utils";
-import { ExcalidrawAPIRefValue, ExcalidrawProps } from "../types";
+import { debounce, resolvablePromise, withBatchedUpdates } from "../utils";
+import { AppState, ExcalidrawAPIRefValue, ExcalidrawProps } from "../types";
+import { ExcalidrawElement } from "../element/types";
 
 const excalidrawRef: ExcalidrawAPIRefValue = {
   readyPromise: resolvablePromise(),
@@ -29,6 +34,18 @@ const excalidrawRef: ExcalidrawAPIRefValue = {
 };
 
 const context = React.createContext(excalidrawRef);
+
+const saveDebounced = debounce(
+  (elements: readonly ExcalidrawElement[], state: AppState) => {
+    saveToLocalStorage(elements, state);
+  },
+  SAVE_TO_LOCAL_STORAGE_TIMEOUT,
+);
+
+const onBlur = () => {
+  saveDebounced.flush();
+};
+
 const shouldForceLoadScene = (
   scene: ResolutionType<typeof loadScene>,
 ): boolean => {
@@ -242,10 +259,13 @@ function ExcalidrawApp(props: {
 
     window.addEventListener(EVENT.HASHCHANGE, onHashChange, false);
     window.addEventListener(EVENT.BEFORE_UNLOAD, beforeUnload);
-
+    window.addEventListener(EVENT.UNLOAD, onBlur, false);
+    window.addEventListener(EVENT.BLUR, onBlur, false);
     return () => {
       window.removeEventListener(EVENT.HASHCHANGE, onHashChange, false);
       window.removeEventListener(EVENT.BEFORE_UNLOAD, beforeUnload);
+      window.removeEventListener(EVENT.UNLOAD, onBlur, false);
+      window.removeEventListener(EVENT.BLUR, onBlur, false);
     };
   }, [
     excalidrawRef,
@@ -254,10 +274,18 @@ function ExcalidrawApp(props: {
     collab.roomId,
   ]);
 
+  const onChange = (
+    elements: readonly ExcalidrawElement[],
+    appState: AppState,
+  ) => {
+    saveDebounced(elements, appState);
+    collab.broadcastElements(elements, appState);
+  };
+
   return (
     <Excalidraw
       excalidrawRef={excalidrawRef}
-      onChangeEmitter={collab.onChangeEmitter}
+      onChange={onChange}
       width={dimensions.width}
       height={dimensions.height}
       initialData={initialStatePromiseRef.current}

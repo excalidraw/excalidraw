@@ -841,12 +841,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     history.record(this.state, this.scene.getElementsIncludingDeleted());
 
-    if (this.props.onChangeEmitter) {
-      this.props.onChangeEmitter.emit(
-        this.scene.getElementsIncludingDeleted(),
-        this.state,
-      );
-    }
+    this.props.onChange?.(this.scene.getElementsIncludingDeleted(), this.state);
   }
 
   // Copy/paste

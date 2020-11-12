@@ -16,7 +16,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     height,
     offsetLeft,
     offsetTop,
-    onChangeEmitter,
+    onChange,
     initialData,
     user,
     excalidrawRef,
@@ -51,7 +51,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
           height={height}
           offsetLeft={offsetLeft}
           offsetTop={offsetTop}
-          onChangeEmitter={onChangeEmitter}
+          onChange={onChange}
           initialData={initialData}
           user={user}
           excalidrawRef={excalidrawRef}

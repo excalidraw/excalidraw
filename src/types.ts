@@ -15,7 +15,6 @@ import { LinearElementEditor } from "./element/linearElementEditor";
 import { SuggestedBinding } from "./element/binding";
 import { ImportedDataState } from "./data/types";
 import { ExcalidrawImperativeAPI } from "./components/App";
-import type { Emitter } from "./emitter";
 import type { ResolvablePromise } from "./utils";
 
 export type FlooredNumber = number & { _brand: "FlooredNumber" };
@@ -145,7 +144,10 @@ export interface ExcalidrawProps {
   offsetLeft?: number;
   /** if not supplied, calculated by Excalidraw */
   offsetTop?: number;
-  onChangeEmitter?: Emitter<[readonly ExcalidrawElement[], AppState]>;
+  onChange?: (
+    elements: readonly ExcalidrawElement[],
+    appState: AppState,
+  ) => void;
   initialData?: ImportedDataState | null | Promise<ImportedDataState | null>;
   user?: {
     name?: string | null;
