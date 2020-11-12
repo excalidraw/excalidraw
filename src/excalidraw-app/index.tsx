@@ -243,6 +243,17 @@ function ExcalidrawApp(props: {
       }
     };
 
+    window.addEventListener(EVENT.HASHCHANGE, onHashChange, false);
+    window.addEventListener(EVENT.UNLOAD, onBlur, false);
+    window.addEventListener(EVENT.BLUR, onBlur, false);
+    return () => {
+      window.removeEventListener(EVENT.HASHCHANGE, onHashChange, false);
+      window.removeEventListener(EVENT.UNLOAD, onBlur, false);
+      window.removeEventListener(EVENT.BLUR, onBlur, false);
+    };
+  }, [excalidrawRef, collab.initializeSocketClient]);
+
+  useEffect(() => {
     const beforeUnload = withBatchedUpdates(() => {
       if (collab.isCollaborating || collab.roomId) {
         try {
@@ -256,23 +267,11 @@ function ExcalidrawApp(props: {
         } catch {}
       }
     });
-
-    window.addEventListener(EVENT.HASHCHANGE, onHashChange, false);
     window.addEventListener(EVENT.BEFORE_UNLOAD, beforeUnload);
-    window.addEventListener(EVENT.UNLOAD, onBlur, false);
-    window.addEventListener(EVENT.BLUR, onBlur, false);
     return () => {
-      window.removeEventListener(EVENT.HASHCHANGE, onHashChange, false);
       window.removeEventListener(EVENT.BEFORE_UNLOAD, beforeUnload);
-      window.removeEventListener(EVENT.UNLOAD, onBlur, false);
-      window.removeEventListener(EVENT.BLUR, onBlur, false);
     };
-  }, [
-    excalidrawRef,
-    collab.initializeSocketClient,
-    collab.isCollaborating,
-    collab.roomId,
-  ]);
+  }, [collab.isCollaborating, collab.roomId]);
 
   const onChange = (
     elements: readonly ExcalidrawElement[],
