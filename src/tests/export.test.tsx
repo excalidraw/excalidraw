@@ -1,6 +1,6 @@
 import React from "react";
 import { render, waitFor } from "./test-utils";
-import App from "../components/App";
+import AppWithCollab from "../excalidraw-app";
 import { API } from "./helpers/api";
 import {
   encodePngMetadata,
@@ -38,8 +38,8 @@ Object.defineProperty(window, "TextDecoder", {
 });
 
 describe("export", () => {
-  beforeEach(() => {
-    render(<App />);
+  beforeEach(async () => {
+    await render(<AppWithCollab />);
   });
 
   it("export embedded png and reimport", async () => {

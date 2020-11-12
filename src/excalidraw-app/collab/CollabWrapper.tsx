@@ -6,7 +6,7 @@ import {
   SAVE_TO_LOCAL_STORAGE_TIMEOUT,
   SYNC_FULL_SCENE_INTERVAL_MS,
 } from "../../time_constants";
-import { EVENT, SCENE } from "../../constants";
+import { ENV, EVENT, SCENE } from "../../constants";
 
 import {
   decryptAESGEM,
@@ -104,6 +104,22 @@ class CollabWrapper extends PureComponent<Props, State> {
     window.addEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
     window.addEventListener(EVENT.UNLOAD, this.onUnload);
     window.addEventListener(EVENT.BLUR, this.onBlur, false);
+
+    // console.log("(1)");
+    if (
+      process.env.NODE_ENV === ENV.TEST ||
+      process.env.NODE_ENV === ENV.DEVELOPMENT
+    ) {
+      // console.log("(2)");
+      window.h = window.h || ({} as Window["h"]);
+
+      Object.defineProperties(window.h, {
+        collab: {
+          configurable: true,
+          value: this,
+        },
+      });
+    }
   }
 
   componentWillUnmount() {

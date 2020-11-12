@@ -3674,6 +3674,7 @@ declare global {
       history: SceneHistory;
       app: InstanceType<typeof App>;
       library: typeof Library;
+      collab: any;
     };
   }
 }
@@ -3682,7 +3683,7 @@ if (
   process.env.NODE_ENV === ENV.TEST ||
   process.env.NODE_ENV === ENV.DEVELOPMENT
 ) {
-  window.h = {} as Window["h"];
+  window.h = window.h || ({} as Window["h"]);
 
   Object.defineProperties(window.h, {
     elements: {

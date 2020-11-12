@@ -5,6 +5,7 @@ import {
   queries,
   RenderResult,
   RenderOptions,
+  waitFor,
 } from "@testing-library/react";
 
 import * as toolQueries from "./queries/toolQueries";
@@ -17,16 +18,31 @@ const customQueries = {
 type TestRenderFn = (
   ui: React.ReactElement,
   options?: Omit<RenderOptions, "queries">,
-) => RenderResult<typeof customQueries>;
+) => Promise<RenderResult<typeof customQueries>>;
 
-const renderApp: TestRenderFn = (ui, options) => {
+const renderApp: TestRenderFn = async (ui, options) => {
   const renderResult = render(ui, {
     queries: customQueries,
     ...options,
   });
 
   GlobalTestState.renderResult = renderResult;
-  GlobalTestState.canvas = renderResult.container.querySelector("canvas")!;
+
+  Object.defineProperty(GlobalTestState, "canvas", {
+    // must be a getter because at the time of ExcalidrawApp render the
+    //  child App component isn't likely mounted yet (and thus canvas not
+    //  present in DOM)
+    get() {
+      return renderResult.container.querySelector("canvas")!;
+    },
+  });
+
+  await waitFor(() => {
+    const canvas = renderResult.container.querySelector("canvas");
+    if (!canvas) {
+      throw new Error("not initialized yet");
+    }
+  });
 
   return renderResult;
 };
@@ -49,7 +65,9 @@ export class GlobalTestState {
    */
   static renderResult: RenderResult<typeof customQueries> = null!;
   /**
-   * automatically updated on each call to render()
+   * retrieves canvas for currently rendered app instance
    */
-  static canvas: HTMLCanvasElement = null!;
+  static get canvas(): HTMLCanvasElement {
+    return null!;
+  }
 }

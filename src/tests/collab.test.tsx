@@ -1,6 +1,6 @@
 import React from "react";
 import { render, waitFor } from "./test-utils";
-import App from "../components/App";
+import AppWithCollab from "../excalidraw-app";
 import { API } from "./helpers/api";
 import { createUndoAction } from "../actions/actionHistory";
 
@@ -17,7 +17,11 @@ Object.defineProperty(window, "crypto", {
   },
 });
 
-jest.mock("../data/firebase.ts", () => {
+Object.defineProperty(window, "confirm", {
+  value: () => false,
+});
+
+jest.mock("../excalidraw-app/data/firebase.ts", () => {
   const loadFromFirebase = async () => null;
   const saveToFirebase = () => {};
   const isSavedToFirebase = () => true;
@@ -42,13 +46,19 @@ jest.mock("socket.io-client", () => {
 
 describe("collaboration", () => {
   it("creating room should reset deleted elements", async () => {
-    render(
-      <App
-        initialData={{
-          elements: [
-            API.createElement({ type: "rectangle", id: "A" }),
-            API.createElement({ type: "rectangle", id: "B", isDeleted: true }),
-          ],
+    await render(
+      <AppWithCollab
+        testProps={{
+          initialData: {
+            elements: [
+              API.createElement({ type: "rectangle", id: "A" }),
+              API.createElement({
+                type: "rectangle",
+                id: "B",
+                isDeleted: true,
+              }),
+            ],
+          },
         }}
       />,
     );
@@ -60,8 +70,10 @@ describe("collaboration", () => {
       ]);
       expect(API.getStateHistory().length).toBe(1);
     });
-
-    await h.app.openPortal();
+    await new Promise((r) => setTimeout(r, 1500));
+    await waitFor(() => {
+      h.collab.openPortal();
+    });
     await waitFor(() => {
       expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]);
       expect(API.getStateHistory().length).toBe(1);

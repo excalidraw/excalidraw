@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { render, fireEvent } from "./test-utils";
-import App from "../components/App";
+import AppWithCollab from "../excalidraw-app";
 import * as Renderer from "../renderer/renderScene";
 import { reseed } from "../random";
 import { bindOrUnbindLinearElement } from "../element/binding";
@@ -25,8 +25,8 @@ beforeEach(() => {
 const { h } = window;
 
 describe("move element", () => {
-  it("rectangle", () => {
-    const { getByToolName, container } = render(<App />);
+  it("rectangle", async () => {
+    const { getByToolName, container } = await render(<AppWithCollab />);
     const canvas = container.querySelector("canvas")!;
 
     {
@@ -37,7 +37,7 @@ describe("move element", () => {
       fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
       fireEvent.pointerUp(canvas);
 
-      expect(renderScene).toHaveBeenCalledTimes(5);
+      expect(renderScene).toHaveBeenCalledTimes(7);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(1);
       expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -58,8 +58,8 @@ describe("move element", () => {
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
 
-  it("rectangles with binding arrow", () => {
-    render(<App />);
+  it("rectangles with binding arrow", async () => {
+    await render(<AppWithCollab />);
 
     // create elements
     const rectA = UI.createElement("rectangle", { size: 100 });
@@ -76,7 +76,7 @@ describe("move element", () => {
     // select the second rectangles
     new Pointer("mouse").clickOn(rectB);
 
-    expect(renderScene).toHaveBeenCalledTimes(19);
+    expect(renderScene).toHaveBeenCalledTimes(21);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(3);
     expect(h.state.selectedElementIds[rectB.id]).toBeTruthy();
@@ -107,8 +107,8 @@ describe("move element", () => {
 });
 
 describe("duplicate element on move when ALT is clicked", () => {
-  it("rectangle", () => {
-    const { getByToolName, container } = render(<App />);
+  it("rectangle", async () => {
+    const { getByToolName, container } = await render(<AppWithCollab />);
     const canvas = container.querySelector("canvas")!;
 
     {
@@ -119,7 +119,7 @@ describe("duplicate element on move when ALT is clicked", () => {
       fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
       fireEvent.pointerUp(canvas);
 
-      expect(renderScene).toHaveBeenCalledTimes(5);
+      expect(renderScene).toHaveBeenCalledTimes(7);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(1);
       expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
