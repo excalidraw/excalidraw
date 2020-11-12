@@ -70,10 +70,9 @@ describe("collaboration", () => {
       ]);
       expect(API.getStateHistory().length).toBe(1);
     });
-    await new Promise((r) => setTimeout(r, 1500));
-    await waitFor(() => {
-      h.collab.openPortal();
-    });
+    // FIXME haven't investigated why we need this
+    await new Promise((r) => setTimeout(r, 500));
+    h.collab.openPortal();
     await waitFor(() => {
       expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]);
       expect(API.getStateHistory().length).toBe(1);
