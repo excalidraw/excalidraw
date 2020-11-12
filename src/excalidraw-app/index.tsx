@@ -279,7 +279,9 @@ function ExcalidrawApp(props: {
     appState: AppState,
   ) => {
     saveDebounced(elements, appState);
-    collab.broadcastElements(elements, appState);
+    if (collab.isCollaborating) {
+      collab.broadcastElements(elements, appState);
+    }
   };
 
   return (
