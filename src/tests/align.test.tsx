@@ -62,9 +62,6 @@ describe("aligning", () => {
 
     await setLanguage("en.json");
     await render(<AppWithCollab />);
-    // FIXME unless there's a solid wait after render we get some suepr weird
-    // flake
-    await new Promise((r) => setTimeout(r, 300));
   });
 
   it("aligns two objects correctly to the top", () => {

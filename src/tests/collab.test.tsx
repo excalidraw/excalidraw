@@ -17,10 +17,6 @@ Object.defineProperty(window, "crypto", {
   },
 });
 
-Object.defineProperty(window, "confirm", {
-  value: () => false,
-});
-
 const importFromLocalStorageSpy = jest.spyOn(
   localStorage,
   "importFromLocalStorage",
@@ -71,8 +67,6 @@ describe("collaboration", () => {
       ]);
       expect(API.getStateHistory().length).toBe(1);
     });
-    // FIXME haven't investigated why we need this
-    await new Promise((r) => setTimeout(r, 500));
     h.collab.openPortal();
     await waitFor(() => {
       expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]);
