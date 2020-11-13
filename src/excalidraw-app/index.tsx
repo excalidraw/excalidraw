@@ -28,9 +28,11 @@ import { debounce, resolvablePromise, withBatchedUpdates } from "../utils";
 import { AppState, ExcalidrawAPIRefValue } from "../types";
 import { ExcalidrawElement } from "../element/types";
 
-const excalidrawRef: ExcalidrawAPIRefValue = {
-  readyPromise: resolvablePromise(),
-  ready: false,
+const excalidrawRef: React.MutableRefObject<ExcalidrawAPIRefValue> = {
+  current: {
+    readyPromise: resolvablePromise(),
+    ready: false,
+  },
 };
 
 const context = React.createContext(excalidrawRef);
@@ -207,11 +209,11 @@ function ExcalidrawApp(props: { collab: CollabContext }) {
     resolvablePromise<ImportedDataState | null>(),
   );
 
-  const excalidrawRef = useContext(context) as ExcalidrawAPIRefValue;
+  const excalidrawRef = useContext(context);
   const { collab } = props;
 
   useEffect(() => {
-    excalidrawRef.readyPromise.then((excalidrawApi) => {
+    excalidrawRef.current!.readyPromise.then((excalidrawApi) => {
       initializeScene({
         resetScene: excalidrawApi.resetScene,
         initializeSocketClient: collab.initializeSocketClient,
@@ -224,7 +226,7 @@ function ExcalidrawApp(props: { collab: CollabContext }) {
     });
 
     const onHashChange = (_: HashChangeEvent) => {
-      const api = excalidrawRef;
+      const api = excalidrawRef.current!;
       if (!api.ready) {
         return;
       }
@@ -282,7 +284,7 @@ function ExcalidrawApp(props: { collab: CollabContext }) {
 
   return (
     <Excalidraw
-      excalidrawRef={excalidrawRef}
+      ref={excalidrawRef}
       onChange={onChange}
       width={dimensions.width}
       height={dimensions.height}
@@ -300,7 +302,11 @@ const AppWithCollab = (Component: typeof ExcalidrawApp) => {
     return (
       <TopErrorBoundary>
         <context.Provider value={excalidrawRef}>
-          <CollabWrapper excalidrawRef={excalidrawRef}>
+          <CollabWrapper
+            excalidrawRef={
+              excalidrawRef as React.MutableRefObject<ExcalidrawImperativeAPI>
+            }
+          >
             {(collab: CollabContext) => {
               return <Component collab={collab} />;
             }}

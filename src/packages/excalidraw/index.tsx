@@ -1,12 +1,12 @@
 import React, { useEffect, forwardRef } from "react";
 
 import { InitializeApp } from "../../components/InitializeApp";
-import App, { ExcalidrawImperativeAPI } from "../../components/App";
+import App from "../../components/App";
 
 import "../../css/app.scss";
 import "../../css/styles.scss";
 
-import { ExcalidrawProps } from "../../types";
+import { ExcalidrawAPIRefValue, ExcalidrawProps } from "../../types";
 import { IsMobileProvider } from "../../is-mobile";
 import { noop } from "../../utils";
 
@@ -84,9 +84,9 @@ const areEqual = (
 };
 
 const forwardedRefComp = forwardRef<
-  ExcalidrawImperativeAPI,
+  ExcalidrawAPIRefValue,
   PublicExcalidrawProps
->((props) => <Excalidraw {...props} />);
+>((props, ref) => <Excalidraw {...props} excalidrawRef={ref} />);
 export default React.memo(forwardedRefComp, areEqual);
 export {
   getSceneVersion,
