@@ -32,8 +32,8 @@
     "fontFamily": "نوع الخط",
     "onlySelected": "المحدد فقط",
     "withBackground": "مع الخلفية",
-    "exportEmbedScene": "",
-    "exportEmbedScene_details": "",
+    "exportEmbedScene": "تضمين المشهد في ملف التصدير",
+    "exportEmbedScene_details": "سيتم حفظ بيانات المشهد في ملف PNG/SVG المصدّر بحيث يمكن استعادة المشهد منه.\nسيزيد حجم الملف المصدر.",
     "addWatermark": "إضافة \"مصنوعة بواسطة Excalidraw\"",
     "handDrawn": "رسم باليد",
     "normal": "عادي",
@@ -75,13 +75,13 @@
     "removeFromLibrary": "حذف من المكتبة",
     "libraryLoadingMessage": "جارٍ تحميل المكتبة...",
     "loadingScene": "جاري تحميل المشهد...",
-    "align": "",
-    "alignTop": "",
-    "alignBottom": "",
-    "alignLeft": "",
-    "alignRight": "",
-    "centerVertically": "",
-    "centerHorizontally": ""
+    "align": "محاذاة",
+    "alignTop": "محاذاة لأعلى",
+    "alignBottom": "محاذاة لأسفل",
+    "alignLeft": "محاذاة لليسار",
+    "alignRight": "محاذاة اليمين",
+    "centerVertically": "توسيط عامودي",
+    "centerHorizontally": "توسيط أفقي"
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
@@ -90,7 +90,7 @@
     "exportToSvg": "تصدير كـ SVG",
     "copyToClipboard": "نسخ إلى الحافظة",
     "copyPngToClipboard": "نسخ الـ PNG الى الحافظة",
-    "scale": "",
+    "scale": "مقاس",
     "save": "حفظ",
     "saveAs": "حفظ كـ",
     "load": "تحميل",
@@ -116,7 +116,7 @@
   "alerts": {
     "clearReset": "هذا سيزيل كامل اللوحة. هل أنت متأكد ؟",
     "couldNotCreateShareableLink": "تعذر إنشاء رابطة المشاركة.",
-    "couldNotCreateShareableLinkTooBig": "",
+    "couldNotCreateShareableLinkTooBig": "تعذر إنشاء رابط قابل للمشاركة: المشهد كبير جدًا",
     "couldNotLoadInvalidFile": "تعذر التحميل، الملف غير صالح",
     "importBackendFailed": "فشل الإستيراد من السيرفر.",
     "cannotExportEmptyCanvas": "لا يمكن تصدير لوحة فارغة.",
@@ -124,10 +124,10 @@
     "decryptFailed": "تعذر فك تشفير البيانات.",
     "uploadedSecurly": "تم تأمين التحميل بتشفير النهاية إلى النهاية، مما يعني أن خادم Excalidraw والأطراف الثالثة لا يمكنها قراءة المحتوى.",
     "loadSceneOverridePrompt": "تحميل الرسم الخارجي سيحل محل المحتوى الموجود لديك. هل ترغب في المتابعة؟",
-    "errorLoadingLibrary": "",
-    "confirmAddLibrary": "",
-    "imageDoesNotContainScene": "",
-    "cannotRestoreFromImage": ""
+    "errorLoadingLibrary": "حصل خطأ أثناء تحميل مكتبة الطرف الثالث.",
+    "confirmAddLibrary": "هذا سيضيف {{numShapes}} شكل إلى مكتبتك. هل أنت متأكد؟",
+    "imageDoesNotContainScene": "لا يحتوي ملف الصورة على بيانات المشهد. هل قمت بتمكين هذا أثناء التصدير؟",
+    "cannotRestoreFromImage": "تعذر استعادة المشهد من ملف الصورة"
   },
   "toolBar": {
     "selection": "تحديد",
@@ -158,9 +158,9 @@
     "lineEditor_nothingSelected": "حدد نقطة لتحريك أو إزالتها، أو اضغط Alt ثم انقر لإضافة نقاط جديدة"
   },
   "canvasError": {
-    "cannotShowPreview": "",
-    "canvasTooBig": "",
-    "canvasTooBigTip": ""
+    "cannotShowPreview": "تعذر عرض المعاينة",
+    "canvasTooBig": "قد تكون الكانفا كبيرة جداً.",
+    "canvasTooBigTip": "نصيحة: حاول تحريك العناصر البعيدة بشكل أقرب قليلاً."
   },
   "errorSplash": {
     "headingMain_pre": "حدث خطأ، حاول مرة أخرى ",
