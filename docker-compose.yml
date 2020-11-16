@@ -8,9 +8,8 @@ services:
         - NODE_ENV=development
     container_name: excalidraw
     ports:
-      - "3000:3000"
+      - "3000:80"
     restart: on-failure
-    command: npm run start
     stdin_open: true
     healthcheck:
       disable: true
