@@ -6,7 +6,6 @@ services:
       context: .
       args:
         - NODE_ENV=development
-      target: deps
     container_name: excalidraw
     ports:
       - "3000:3000"
