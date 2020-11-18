@@ -21,7 +21,7 @@
   "dependencies": {
     "@sentry/browser": "5.27.3",
     "@sentry/integrations": "5.27.3",
-    "@testing-library/jest-dom": "5.11.5",
+    "@testing-library/jest-dom": "5.11.6",
     "@testing-library/react": "11.1.1",
     "@types/jest": "26.0.15",
     "@types/nanoid": "2.1.0",
