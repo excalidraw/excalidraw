@@ -3,26 +3,22 @@ import { render, waitFor } from "./test-utils";
 import AppWithCollab from "../excalidraw-app";
 import { API } from "./helpers/api";
 import { getDefaultAppState } from "../appState";
-import * as localStorage from "../data/localStorage";
+import { STORAGE_KEYS } from "../constants";
 
 const { h } = window;
 
-const importFromLocalStorageSpy = jest.spyOn(
-  localStorage,
-  "importFromLocalStorage",
-);
 describe("appState", () => {
   it("drag&drop file doesn't reset non-persisted appState", async () => {
     const defaultAppState = getDefaultAppState();
     const exportBackground = !defaultAppState.exportBackground;
-    importFromLocalStorageSpy.mockImplementation(() => ({
-      appState: {
-        ...defaultAppState,
-        exportBackground,
-        viewBackgroundColor: "#F00",
-      },
-      elements: [],
-    }));
+    Storage.prototype.getItem = jest.fn((key) => {
+      let res = null;
+      if (key === STORAGE_KEYS.LOCAL_STORAGE_APP_STATE) {
+        res = { exportBackground, viewBackgroundColor: "#F00" };
+      }
+      return res ? JSON.stringify(res) : null;
+    });
+
     await render(<AppWithCollab />);
 
     await waitFor(() => {

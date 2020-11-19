@@ -6,23 +6,23 @@ import { API } from "./helpers/api";
 import { getDefaultAppState } from "../appState";
 import { waitFor } from "@testing-library/react";
 import { createUndoAction, createRedoAction } from "../actions/actionHistory";
-import * as localStorage from "../data/localStorage";
+import { STORAGE_KEYS } from "../constants";
 
 const { h } = window;
-const importFromLocalStorageSpy = jest.spyOn(
-  localStorage,
-  "importFromLocalStorage",
-);
 
 describe("history", () => {
   it("initializing scene should end up with single history entry", async () => {
-    importFromLocalStorageSpy.mockImplementation(() => ({
-      appState: {
-        ...getDefaultAppState(),
-        zenModeEnabled: true,
-      },
-      elements: [API.createElement({ type: "rectangle", id: "A" })],
-    }));
+    Storage.prototype.getItem = jest.fn((key) => {
+      let res = null;
+      if (key === STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS) {
+        res = [API.createElement({ type: "rectangle", id: "A" })];
+      }
+      if (key === STORAGE_KEYS.LOCAL_STORAGE_APP_STATE) {
+        res = { zenModeEnabled: true };
+      }
+      return res ? JSON.stringify(res) : null;
+    });
+
     await render(<AppWithCollab />);
 
     await waitFor(() => expect(h.state.zenModeEnabled).toBe(true));
@@ -63,13 +63,16 @@ describe("history", () => {
   });
 
   it("scene import via drag&drop should create new history entry", async () => {
-    importFromLocalStorageSpy.mockImplementation(() => ({
-      appState: {
-        ...getDefaultAppState(),
-        viewBackgroundColor: "#FFF",
-      },
-      elements: [API.createElement({ type: "rectangle", id: "A" })],
-    }));
+    Storage.prototype.getItem = jest.fn((key) => {
+      let res = null;
+      if (key === STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS) {
+        res = [API.createElement({ type: "rectangle", id: "A" })];
+      }
+      if (key === STORAGE_KEYS.LOCAL_STORAGE_APP_STATE) {
+        res = { viewBackgroundColor: "#FFF" };
+      }
+      return res ? JSON.stringify(res) : null;
+    });
 
     await render(<AppWithCollab />);
 
