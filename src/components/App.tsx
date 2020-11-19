@@ -507,10 +507,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     history.clear();
   };
 
-  private resumeRecording = () => {
-    history.resumeRecording();
-  };
-
   /** Completely resets scene & history.
    * Do not use for clear scene user action. */
   private resetScene = withBatchedUpdates(() => {
