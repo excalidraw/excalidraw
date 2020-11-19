@@ -274,36 +274,32 @@ function ExcalidrawApp(props: { collab: CollabContext }) {
   };
 
   return (
-    <TopErrorBoundary>
-      <Excalidraw
-        ref={excalidrawRef}
-        onChange={onChange}
-        width={dimensions.width}
-        height={dimensions.height}
-        initialData={initialStatePromiseRef.current}
-        user={{ name: collab.username }}
-        onCollabButtonClick={collab.onCollabButtonClick}
-        isCollaborating={collab.isCollaborating}
-        onPointerUpdate={collab.onPointerUpdate}
-      />
-    </TopErrorBoundary>
+    <Excalidraw
+      ref={excalidrawRef}
+      onChange={onChange}
+      width={dimensions.width}
+      height={dimensions.height}
+      initialData={initialStatePromiseRef.current}
+      user={{ name: collab.username }}
+      onCollabButtonClick={collab.onCollabButtonClick}
+      isCollaborating={collab.isCollaborating}
+      onPointerUpdate={collab.onPointerUpdate}
+    />
   );
 }
 
-const AppWithCollab = (Component: typeof ExcalidrawApp) => {
-  return () => {
-    return (
+export default () => {
+  return (
+    <TopErrorBoundary>
       <CollabWrapper
         excalidrawRef={
           excalidrawRef as React.MutableRefObject<ExcalidrawImperativeAPI>
         }
       >
         {(collab: CollabContext) => {
-          return <Component collab={collab} />;
+          return <ExcalidrawApp collab={collab} />;
         }}
       </CollabWrapper>
-    );
-  };
+    </TopErrorBoundary>
+  );
 };
-
-export default AppWithCollab(ExcalidrawApp);
