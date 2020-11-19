@@ -5,6 +5,7 @@ import App, { ExcalidrawImperativeAPI } from "../../components/App";
 
 import "../../css/app.scss";
 import "../../css/styles.scss";
+import "../../css/theme.scss";
 
 import { ExcalidrawProps } from "../../types";
 import { IsMobileProvider } from "../../is-mobile";
