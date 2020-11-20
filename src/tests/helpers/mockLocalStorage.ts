@@ -34,3 +34,13 @@ global.Storage.prototype.getItem = jest.fn((key: string) => {
 global.Storage.prototype.setItem = jest.fn((key: string, value: any) => {
   localStorage.setItem(key, value);
 });
+
+// @ts-ignore
+global.Storage.prototype.clear = jest.fn(() => {
+  localStorage.clear();
+});
+
+// @ts-ignore
+global.Storage.prototype.removeItem = jest.fn((key: string) => {
+  localStorage.removeItem(key);
+});
