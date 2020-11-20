@@ -3,7 +3,6 @@ import { render, waitFor } from "./test-utils";
 import AppWithCollab from "../excalidraw-app";
 import { API } from "./helpers/api";
 import { createUndoAction } from "../actions/actionHistory";
-import { STORAGE_KEYS } from "../constants";
 const { h } = window;
 
 Object.defineProperty(window, "crypto", {
@@ -42,18 +41,25 @@ jest.mock("socket.io-client", () => {
 
 describe("collaboration", () => {
   it("creating room should reset deleted elements", async () => {
-    // @ts-ignore
-    localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS, [
-      API.createElement({ type: "rectangle", id: "A" }),
-      API.createElement({
-        type: "rectangle",
-        id: "B",
-        isDeleted: true,
-      }),
-    ]);
-
     await render(<AppWithCollab />);
-
+    // To update the scene with deleted elements before starting collab
+    h.collab.excalidrawRef.current.updateScene({
+      elements: [
+        API.createElement({ type: "rectangle", id: "A" }),
+        API.createElement({
+          type: "rectangle",
+          id: "B",
+          isDeleted: true,
+        }),
+      ],
+    });
+    await waitFor(() => {
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: "A" }),
+        expect.objectContaining({ id: "B", isDeleted: true }),
+      ]);
+      expect(API.getStateHistory().length).toBe(1);
+    });
     h.collab.openPortal();
     await waitFor(() => {
       expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]);
