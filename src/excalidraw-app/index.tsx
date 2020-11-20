@@ -172,7 +172,7 @@ const initializeScene = async (opts: {
   return null;
 };
 
-function ExcalidrawApp(props: { collab: CollabContext }) {
+function ExcalidrawWrapper(props: { collab: CollabContext }) {
   // dimensions
   // ---------------------------------------------------------------------------
 
@@ -288,7 +288,7 @@ function ExcalidrawApp(props: { collab: CollabContext }) {
   );
 }
 
-export default () => {
+export default function ExcalidrawApp() {
   return (
     <TopErrorBoundary>
       <CollabWrapper
@@ -297,9 +297,9 @@ export default () => {
         }
       >
         {(collab: CollabContext) => {
-          return <ExcalidrawApp collab={collab} />;
+          return <ExcalidrawWrapper collab={collab} />;
         }}
       </CollabWrapper>
     </TopErrorBoundary>
   );
-};
+}
