@@ -10,9 +10,6 @@ import {
 
 import * as toolQueries from "./queries/toolQueries";
 
-import { ExcalidrawElement } from "../element/types";
-import { AppState, LibraryItems } from "../types";
-
 const customQueries = {
   ...queries,
   ...toolQueries,
@@ -74,15 +71,3 @@ export class GlobalTestState {
     return null!;
   }
 }
-export const storageMock = {
-  getItem: (storageMap: {
-    excalidraw?: readonly ExcalidrawElement[];
-    "excalidraw-state"?: AppState;
-    "excalidraw-collab"?: { username: string };
-    "excalidraw-library"?: LibraryItems;
-  }) => {
-    Storage.prototype.getItem = jest.fn((key: keyof typeof storageMap) => {
-      return key in storageMap ? JSON.stringify(storageMap[key]) : null;
-    });
-  },
-};

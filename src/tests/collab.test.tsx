@@ -1,5 +1,5 @@
 import React from "react";
-import { render, storageMock, waitFor } from "./test-utils";
+import { render, waitFor } from "./test-utils";
 import AppWithCollab from "../excalidraw-app";
 import { API } from "./helpers/api";
 import { createUndoAction } from "../actions/actionHistory";
@@ -42,16 +42,15 @@ jest.mock("socket.io-client", () => {
 
 describe("collaboration", () => {
   it("creating room should reset deleted elements", async () => {
-    storageMock.getItem({
-      [STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS]: [
-        API.createElement({ type: "rectangle", id: "A" }),
-        API.createElement({
-          type: "rectangle",
-          id: "B",
-          isDeleted: true,
-        }),
-      ],
-    });
+    // @ts-ignore
+    localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS, [
+      API.createElement({ type: "rectangle", id: "A" }),
+      API.createElement({
+        type: "rectangle",
+        id: "B",
+        isDeleted: true,
+      }),
+    ]);
 
     await render(<AppWithCollab />);
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { render, storageMock, waitFor } from "./test-utils";
+import { render, waitFor } from "./test-utils";
 import AppWithCollab from "../excalidraw-app";
 import { API } from "./helpers/api";
 import { getDefaultAppState } from "../appState";
@@ -11,11 +11,11 @@ describe("appState", () => {
   it("drag&drop file doesn't reset non-persisted appState", async () => {
     const defaultAppState = getDefaultAppState();
     const exportBackground = !defaultAppState.exportBackground;
-    storageMock.getItem({
-      [STORAGE_KEYS.LOCAL_STORAGE_APP_STATE]: {
-        exportBackground,
-        viewBackgroundColor: "#F00",
-      },
+
+    // @ts-ignore
+    localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_APP_STATE, {
+      exportBackground,
+      viewBackgroundColor: "#F00",
     });
 
     await render(<AppWithCollab />);
