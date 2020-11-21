@@ -21,10 +21,18 @@ const customQueries = {
 
 type TestRenderFn = (
   ui: React.ReactElement,
-  options?: Omit<RenderOptions, "queries">,
+  options?: Omit<
+    RenderOptions & { initialData?: ImportedDataState },
+    "queries"
+  >,
 ) => Promise<RenderResult<typeof customQueries>>;
 
 const renderApp: TestRenderFn = async (ui, options) => {
+  if (options?.initialData) {
+    setInitialData(options.initialData);
+    delete options.initialData;
+  }
+
   const renderResult = render(ui, {
     queries: customQueries,
     ...options,
@@ -76,7 +84,7 @@ export class GlobalTestState {
   }
 }
 
-export const setInitialData = (data: ImportedDataState) => {
+const setInitialData = (data: ImportedDataState) => {
   if (data.elements) {
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,

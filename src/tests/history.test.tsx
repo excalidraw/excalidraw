@@ -1,5 +1,5 @@
 import React from "react";
-import { render, setInitialData } from "./test-utils";
+import { render } from "./test-utils";
 import AppWithCollab from "../excalidraw-app";
 import { UI } from "./helpers/ui";
 import { API } from "./helpers/api";
@@ -11,14 +11,14 @@ const { h } = window;
 
 describe("history", () => {
   it("initializing scene should end up with single history entry", async () => {
-    setInitialData({
-      elements: [API.createElement({ type: "rectangle", id: "A" })],
-      appState: {
-        zenModeEnabled: true,
+    await render(<AppWithCollab />, {
+      initialData: {
+        elements: [API.createElement({ type: "rectangle", id: "A" })],
+        appState: {
+          zenModeEnabled: true,
+        },
       },
     });
-
-    await render(<AppWithCollab />);
 
     await waitFor(() => expect(h.state.zenModeEnabled).toBe(true));
     await waitFor(() =>
@@ -58,14 +58,14 @@ describe("history", () => {
   });
 
   it("scene import via drag&drop should create new history entry", async () => {
-    setInitialData({
-      elements: [API.createElement({ type: "rectangle", id: "A" })],
-      appState: {
-        viewBackgroundColor: "#FFF",
+    await render(<AppWithCollab />, {
+      initialData: {
+        elements: [API.createElement({ type: "rectangle", id: "A" })],
+        appState: {
+          viewBackgroundColor: "#FFF",
+        },
       },
     });
-
-    await render(<AppWithCollab />);
 
     await waitFor(() => expect(h.state.viewBackgroundColor).toBe("#FFF"));
     await waitFor(() =>

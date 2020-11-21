@@ -1,5 +1,5 @@
 import React from "react";
-import { render, setInitialData, waitFor } from "./test-utils";
+import { render, waitFor } from "./test-utils";
 import AppWithCollab from "../excalidraw-app";
 import { API } from "./helpers/api";
 import { getDefaultAppState } from "../appState";
@@ -11,14 +11,14 @@ describe("appState", () => {
     const defaultAppState = getDefaultAppState();
     const exportBackground = !defaultAppState.exportBackground;
 
-    setInitialData({
-      appState: {
-        exportBackground,
-        viewBackgroundColor: "#F00",
+    await render(<AppWithCollab />, {
+      initialData: {
+        appState: {
+          exportBackground,
+          viewBackgroundColor: "#F00",
+        },
       },
     });
-
-    await render(<AppWithCollab />);
 
     await waitFor(() => {
       expect(h.state.exportBackground).toBe(exportBackground);
