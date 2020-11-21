@@ -1,24 +1,21 @@
 import React from "react";
-import { render } from "./test-utils";
+import { render, setInitialData } from "./test-utils";
 import AppWithCollab from "../excalidraw-app";
 import { UI } from "./helpers/ui";
 import { API } from "./helpers/api";
 import { getDefaultAppState } from "../appState";
 import { waitFor } from "@testing-library/react";
 import { createUndoAction, createRedoAction } from "../actions/actionHistory";
-import { STORAGE_KEYS } from "../constants";
 
 const { h } = window;
 
 describe("history", () => {
   it("initializing scene should end up with single history entry", async () => {
-    // @ts-ignore
-    localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS, [
-      API.createElement({ type: "rectangle", id: "A" }),
-    ]);
-    // @ts-ignore
-    localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_APP_STATE, {
-      zenModeEnabled: true,
+    setInitialData({
+      elements: [API.createElement({ type: "rectangle", id: "A" })],
+      appState: {
+        zenModeEnabled: true,
+      },
     });
 
     await render(<AppWithCollab />);
@@ -61,13 +58,11 @@ describe("history", () => {
   });
 
   it("scene import via drag&drop should create new history entry", async () => {
-    // @ts-ignore
-    localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS, [
-      API.createElement({ type: "rectangle", id: "A" }),
-    ]);
-    // @ts-ignore
-    localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_APP_STATE, {
-      viewBackgroundColor: "#FFF",
+    setInitialData({
+      elements: [API.createElement({ type: "rectangle", id: "A" })],
+      appState: {
+        viewBackgroundColor: "#FFF",
+      },
     });
 
     await render(<AppWithCollab />);

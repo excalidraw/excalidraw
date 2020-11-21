@@ -1,9 +1,8 @@
 import React from "react";
-import { render, waitFor } from "./test-utils";
+import { render, setInitialData, waitFor } from "./test-utils";
 import AppWithCollab from "../excalidraw-app";
 import { API } from "./helpers/api";
 import { getDefaultAppState } from "../appState";
-import { STORAGE_KEYS } from "../constants";
 
 const { h } = window;
 
@@ -12,10 +11,11 @@ describe("appState", () => {
     const defaultAppState = getDefaultAppState();
     const exportBackground = !defaultAppState.exportBackground;
 
-    // @ts-ignore
-    localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_APP_STATE, {
-      exportBackground,
-      viewBackgroundColor: "#F00",
+    setInitialData({
+      appState: {
+        exportBackground,
+        viewBackgroundColor: "#F00",
+      },
     });
 
     await render(<AppWithCollab />);

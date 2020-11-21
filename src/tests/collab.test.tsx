@@ -1,5 +1,5 @@
 import React from "react";
-import { render, waitFor } from "./test-utils";
+import { render, updateSceneData, waitFor } from "./test-utils";
 import AppWithCollab from "../excalidraw-app";
 import { API } from "./helpers/api";
 import { createUndoAction } from "../actions/actionHistory";
@@ -43,7 +43,7 @@ describe("collaboration", () => {
   it("creating room should reset deleted elements", async () => {
     await render(<AppWithCollab />);
     // To update the scene with deleted elements before starting collab
-    h.collab.excalidrawRef.current.updateScene({
+    updateSceneData({
       elements: [
         API.createElement({ type: "rectangle", id: "A" }),
         API.createElement({

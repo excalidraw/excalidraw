@@ -954,7 +954,7 @@ describe("regression tests", () => {
     await waitFor(() => {
       const library = localStorage.getItem("excalidraw-library");
       expect(library).not.toBeNull();
-      const addedElement = JSON.parse(JSON.parse(library!))[0][0];
+      const addedElement = JSON.parse(library!)[0][0];
       expect(addedElement).toEqual(h.elements[0]);
     });
   });

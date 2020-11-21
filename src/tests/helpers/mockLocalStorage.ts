@@ -13,7 +13,7 @@ class LocalStorageMock {
   }
 
   setItem(key: string, value: any) {
-    this.store[key] = JSON.stringify(value);
+    this.store[key] = value;
   }
 
   removeItem(key: string) {

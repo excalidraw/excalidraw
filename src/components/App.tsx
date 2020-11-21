@@ -48,7 +48,7 @@ import {
   GestureEvent,
   Gesture,
   ExcalidrawProps,
-  Collaborator,
+  SceneData,
 } from "../types";
 import {
   ExcalidrawElement,
@@ -165,7 +165,6 @@ import { MaybeTransformHandleType } from "../element/transformHandles";
 import { renderSpreadsheet } from "../charts";
 import { isValidLibrary } from "../data/json";
 import { getNewZoom } from "../scene/zoom";
-import { ImportedDataState } from "../data/types";
 
 const { history } = createHistory();
 
@@ -1122,33 +1121,26 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     });
   };
 
-  public updateScene = withBatchedUpdates(
-    (sceneData: {
-      elements?: ImportedDataState["elements"];
-      appState?: ImportedDataState["appState"];
-      collaborators?: Map<string, Collaborator>;
-      commitToHistory?: boolean;
-    }) => {
-      if (sceneData.commitToHistory) {
-        history.resumeRecording();
-      }
+  public updateScene = withBatchedUpdates((sceneData: SceneData) => {
+    if (sceneData.commitToHistory) {
+      history.resumeRecording();
+    }
 
-      // currently we only support syncing background color
-      if (sceneData.appState?.viewBackgroundColor) {
-        this.setState({
-          viewBackgroundColor: sceneData.appState.viewBackgroundColor,
-        });
-      }
+    // currently we only support syncing background color
+    if (sceneData.appState?.viewBackgroundColor) {
+      this.setState({
+        viewBackgroundColor: sceneData.appState.viewBackgroundColor,
+      });
+    }
 
-      if (sceneData.elements) {
-        this.scene.replaceAllElements(sceneData.elements);
-      }
+    if (sceneData.elements) {
+      this.scene.replaceAllElements(sceneData.elements);
+    }
 
-      if (sceneData.collaborators) {
-        this.setState({ collaborators: sceneData.collaborators });
-      }
-    },
-  );
+    if (sceneData.collaborators) {
+      this.setState({ collaborators: sceneData.collaborators });
+    }
+  });
 
   private onSceneUpdated = () => {
     this.setState({});

@@ -9,6 +9,10 @@ import {
 } from "@testing-library/react";
 
 import * as toolQueries from "./queries/toolQueries";
+import { ImportedDataState } from "../data/types";
+import { STORAGE_KEYS } from "../constants";
+
+import { SceneData } from "../types";
 
 const customQueries = {
   ...queries,
@@ -71,3 +75,22 @@ export class GlobalTestState {
     return null!;
   }
 }
+
+export const setInitialData = (data: ImportedDataState) => {
+  if (data.elements) {
+    localStorage.setItem(
+      STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
+      JSON.stringify(data.elements),
+    );
+  }
+  if (data.appState) {
+    localStorage.setItem(
+      STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
+      JSON.stringify(data.appState),
+    );
+  }
+};
+
+export const updateSceneData = (data: SceneData) => {
+  window.h.collab.excalidrawRef.current.updateScene(data);
+};
