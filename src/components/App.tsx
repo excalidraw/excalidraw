@@ -250,7 +250,6 @@ export type ExcalidrawImperativeAPI = {
     clear: InstanceType<typeof App>["resetHistory"];
   };
   setScrollToCenter: InstanceType<typeof App>["setScrollToCenter"];
-  initializeScene: InstanceType<typeof App>["initializeScene"];
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
   readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
   ready: true;
@@ -301,7 +300,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           clear: this.resetHistory,
         },
         setScrollToCenter: this.setScrollToCenter,
-        initializeScene: this.initializeScene,
         getSceneElements: this.getSceneElements,
       } as const;
       if (typeof excalidrawRef === "function") {
