@@ -50,8 +50,8 @@ export const distributeElements = (
 
     return group.map((element) =>
       newElementWith(element, {
-        x: element.x + translation.x,
-        y: element.y + translation.y,
+        x: Math.round(element.x + translation.x),
+        y: Math.round(element.y + translation.y),
       }),
     );
   });
