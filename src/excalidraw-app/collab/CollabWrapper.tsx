@@ -22,7 +22,7 @@ import { ExcalidrawElement } from "../../element/types";
 import {
   importUsernameFromLocalStorage,
   saveUsernameToLocalStorage,
-} from "../../data/localStorage";
+} from "../data/localStorage";
 import { resolvablePromise, withBatchedUpdates } from "../../utils";
 import {
   getSceneVersion,

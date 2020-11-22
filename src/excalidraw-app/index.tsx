@@ -5,7 +5,7 @@ import Excalidraw from "../packages/excalidraw/index";
 import {
   importFromLocalStorage,
   saveToLocalStorage,
-} from "../data/localStorage";
+} from "./data/localStorage";
 
 import { ImportedDataState } from "../data/types";
 import CollabWrapper, { CollabContext } from "./collab/CollabWrapper";

@@ -1,8 +1,16 @@
-import { ExcalidrawElement } from "../element/types";
-import { AppState } from "../types";
-import { clearAppStateForLocalStorage, getDefaultAppState } from "../appState";
-import { STORAGE_KEYS } from "../constants";
-import { clearElementsForLocalStorage } from "../element";
+import { ExcalidrawElement } from "../../element/types";
+import { AppState } from "../../types";
+import {
+  clearAppStateForLocalStorage,
+  getDefaultAppState,
+} from "../../appState";
+import { clearElementsForLocalStorage } from "../../element";
+
+export const STORAGE_KEYS = {
+  LOCAL_STORAGE_ELEMENTS: "excalidraw",
+  LOCAL_STORAGE_APP_STATE: "excalidraw-state",
+  LOCAL_STORAGE_COLLAB: "excalidraw-collab",
+};
 
 export const saveUsernameToLocalStorage = (username: string) => {
   try {

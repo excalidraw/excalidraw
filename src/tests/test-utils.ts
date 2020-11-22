@@ -10,7 +10,7 @@ import {
 
 import * as toolQueries from "./queries/toolQueries";
 import { ImportedDataState } from "../data/types";
-import { STORAGE_KEYS } from "../constants";
+import { STORAGE_KEYS } from "../excalidraw-app/data/localStorage";
 
 import { SceneData } from "../types";
 
