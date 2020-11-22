@@ -81,7 +81,10 @@
     "alignLeft": "Align left",
     "alignRight": "Align right",
     "centerVertically": "Center vertically",
-    "centerHorizontally": "Center horizontally"
+    "centerHorizontally": "Center horizontally",
+    "distribute": "Distribute",
+    "distributeHorizontally": "Distribute horizontally",
+    "distributeVertically": "Distribute vertically"
   },
   "buttons": {
     "clearReset": "Reset the canvas",

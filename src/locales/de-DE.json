@@ -81,7 +81,10 @@
     "alignLeft": "Linke Kanten",
     "alignRight": "Rechte Kanten",
     "centerVertically": "Vertikal zentrieren",
-    "centerHorizontally": "Horizontal zentrieren"
+    "centerHorizontally": "Horizontal zentrieren",
+    "distribute": "",
+    "distributeHorizontally": "",
+    "distributeVertically": ""
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
