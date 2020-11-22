@@ -78,12 +78,12 @@ const shouldForceLoadScene = (
   return false;
 };
 
-type Scene = ResolutionType<typeof loadScene>;
+type Scene = ImportedDataState & { commitToHistory: boolean };
 
 const initializeScene = async (opts: {
   resetScene: ExcalidrawImperativeAPI["resetScene"];
   initializeSocketClient: (opts: any) => Promise<ImportedDataState | null>;
-  onLateInitialization?: (data: { scene: Scene }) => void;
+  onLateInitialization?: (scene: Scene) => void;
 }): Promise<Scene | null> => {
   const searchParams = new URLSearchParams(window.location.search);
   const id = searchParams.get("id");
@@ -118,7 +118,7 @@ const initializeScene = async (opts: {
           "focus",
           () =>
             initializeScene(opts).then((_scene) => {
-              opts?.onLateInitialization?.({ scene: _scene || scene });
+              opts?.onLateInitialization?.(_scene || scene);
             }),
           {
             once: true,
@@ -152,12 +152,7 @@ const initializeScene = async (opts: {
       }
 
       return {
-        ...restore(
-          {
-            ...(await scenePromise),
-          },
-          scene.appState,
-        ),
+        ...(await scenePromise),
         commitToHistory: true,
       };
     } catch (error) {
@@ -208,7 +203,7 @@ function ExcalidrawWrapper(props: { collab: CollabContext }) {
       initializeScene({
         resetScene: excalidrawApi.resetScene,
         initializeSocketClient: collab.initializeSocketClient,
-        onLateInitialization: ({ scene }) => {
+        onLateInitialization: (scene) => {
           initialStatePromiseRef.current.resolve(scene);
         },
       }).then((scene) => {
