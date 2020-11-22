@@ -32,8 +32,8 @@
     "fontFamily": "フォントの種類",
     "onlySelected": "選択中のみ",
     "withBackground": "背景を含める",
-    "exportEmbedScene": "",
-    "exportEmbedScene_details": "",
+    "exportEmbedScene": "エクスポートされたファイルにシーンを埋め込みます",
+    "exportEmbedScene_details": "シーンデータはエクスポートされたPNG/SVGファイルに保存され、シーンを復元することができます。\nエクスポートされたファイルのサイズは増加します。",
     "addWatermark": "\"Made with Excalidraw\"と表示",
     "handDrawn": "手描き風",
     "normal": "普通",
@@ -97,7 +97,7 @@
     "getShareableLink": "共有URLの取得",
     "close": "閉じる",
     "selectLanguage": "言語の選択",
-    "scrollBackToContent": "",
+    "scrollBackToContent": "コンテンツまでスクロールで戻る",
     "zoomIn": "拡大",
     "zoomOut": "縮小",
     "resetZoom": "拡大/縮小をリセット",
@@ -124,10 +124,10 @@
     "decryptFailed": "データを復号できませんでした。",
     "uploadedSecurly": "データのアップロードはエンドツーエンド暗号化によって保護されています。Excalidrawサーバーと第三者はデータの内容を見ることができません。",
     "loadSceneOverridePrompt": "外部図面を読み込むと、既存のコンテンツが置き換わります。続行しますか？",
-    "errorLoadingLibrary": "",
-    "confirmAddLibrary": "",
-    "imageDoesNotContainScene": "",
-    "cannotRestoreFromImage": ""
+    "errorLoadingLibrary": "サードパーティライブラリの読み込み中にエラーが発生しました。",
+    "confirmAddLibrary": "{{numShapes}} 個の図形をライブラリに追加します。よろしいですか？",
+    "imageDoesNotContainScene": "画像ファイルにシーンデータが含まれていません。エクスポート中にこれを有効にしましたか？",
+    "cannotRestoreFromImage": "このイメージファイルからシーンを復元できませんでした"
   },
   "toolBar": {
     "selection": "選択",
@@ -147,10 +147,10 @@
     "shapes": "図形"
   },
   "hints": {
-    "linearElement": "",
-    "freeDraw": "",
-    "text": "",
-    "linearElementMulti": "",
+    "linearElement": "クリックして複数の点を開始し、1行にドラッグします。",
+    "freeDraw": "クリックしてドラッグします。離すと終了します",
+    "text": "ヒント: 選択ツールを使用して任意の場所をダブルクリックしてテキストを追加することもできます",
+    "linearElementMulti": "最後のポイントをクリックするか、エスケープまたはEnterを押して終了します",
     "resize": "",
     "rotate": "",
     "lineEditor_info": "",
@@ -173,7 +173,7 @@
     "openIssueMessage_pre": "",
     "openIssueMessage_button": "バグ報告",
     "openIssueMessage_post": "",
-    "sceneContent": ""
+    "sceneContent": "シーンの内容:"
   },
   "roomDialog": {
     "desc_intro": "他の人を編集中のあなたの画面に招待して共同編集することができます。",
