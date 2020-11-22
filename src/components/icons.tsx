@@ -230,7 +230,7 @@ export const AlignTopIcon = React.memo(
 export const AlignBottomIcon = React.memo(
   ({ appearance }: { appearance: "light" | "dark" }) =>
     createIcon(
-      <svg>
+      <>
         <path
           d="M 2,19 H 22"
           fill={iconFillColor(appearance)}
@@ -244,7 +244,7 @@ export const AlignBottomIcon = React.memo(
           stroke={activeElementColor(appearance)}
           strokeWidth="2"
         />
-      </svg>,
+      </>,
       { width: 24 },
     ),
 );
