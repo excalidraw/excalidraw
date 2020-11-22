@@ -81,10 +81,7 @@
     "alignLeft": "محاذاة لليسار",
     "alignRight": "محاذاة اليمين",
     "centerVertically": "توسيط عامودي",
-    "centerHorizontally": "توسيط أفقي",
-    "distribute": "",
-    "distributeHorizontally": "",
-    "distributeVertically": ""
+    "centerHorizontally": "توسيط أفقي"
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",

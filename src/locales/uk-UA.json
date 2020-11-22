@@ -81,10 +81,7 @@
     "alignLeft": "Вирівняти по лівому краю",
     "alignRight": "Вирівнювання по правому краю",
     "centerVertically": "Центрувати по вертикалі",
-    "centerHorizontally": "Центрувати по горизонталі",
-    "distribute": "",
-    "distributeHorizontally": "",
-    "distributeVertically": ""
+    "centerHorizontally": "Центрувати по горизонталі"
   },
   "buttons": {
     "clearReset": "Очистити полотно",

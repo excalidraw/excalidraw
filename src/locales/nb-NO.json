@@ -81,10 +81,7 @@
     "alignLeft": "Juster venstre",
     "alignRight": "Juster høyre",
     "centerVertically": "Midtstill vertikalt",
-    "centerHorizontally": "Midtstill horisontalt",
-    "distribute": "",
-    "distributeHorizontally": "",
-    "distributeVertically": ""
+    "centerHorizontally": "Midtstill horisontalt"
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",

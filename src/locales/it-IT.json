@@ -81,10 +81,7 @@
     "alignLeft": "Allinea a sinistra",
     "alignRight": "Allinea a destra",
     "centerVertically": "Centra Verticalmente",
-    "centerHorizontally": "Centra orizzontalmente",
-    "distribute": "",
-    "distributeHorizontally": "",
-    "distributeVertically": ""
+    "centerHorizontally": "Centra orizzontalmente"
   },
   "buttons": {
     "clearReset": "Ripristina la tela",
