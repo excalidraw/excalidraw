@@ -1,6 +1,6 @@
 import React from "react";
 import { render } from "./test-utils";
-import AppWithCollab from "../excalidraw-app";
+import ExcalidrawApp from "../excalidraw-app";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { getTransformHandles } from "../element/transformHandles";
 import { API } from "./helpers/api";
@@ -11,7 +11,7 @@ const mouse = new Pointer("mouse");
 
 describe("element binding", () => {
   beforeEach(async () => {
-    await render(<AppWithCollab />);
+    await render(<ExcalidrawApp />);
   });
 
   it("rotation of arrow should rebind both ends", () => {

@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { render, fireEvent } from "./test-utils";
-import AppWithCollab from "../excalidraw-app";
+import ExcalidrawApp from "../excalidraw-app";
 import * as Renderer from "../renderer/renderScene";
 import { KEYS } from "../keys";
 import { reseed } from "../random";
@@ -20,7 +20,7 @@ const { h } = window;
 
 describe("selection element", () => {
   it("create selection element on pointer down", async () => {
-    const { getByToolName, container } = await render(<AppWithCollab />);
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
     const tool = getByToolName("selection");
     fireEvent.click(tool);
@@ -40,7 +40,7 @@ describe("selection element", () => {
   });
 
   it("resize selection element on pointer move", async () => {
-    const { getByToolName, container } = await render(<AppWithCollab />);
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
     const tool = getByToolName("selection");
     fireEvent.click(tool);
@@ -61,7 +61,7 @@ describe("selection element", () => {
   });
 
   it("remove selection element on pointer up", async () => {
-    const { getByToolName, container } = await render(<AppWithCollab />);
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
     const tool = getByToolName("selection");
     fireEvent.click(tool);
@@ -78,7 +78,7 @@ describe("selection element", () => {
 
 describe("select single element on the scene", () => {
   it("rectangle", async () => {
-    const { getByToolName, container } = await render(<AppWithCollab />);
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     const canvas = container.querySelector("canvas")!;
     {
       // create element
@@ -105,7 +105,7 @@ describe("select single element on the scene", () => {
   });
 
   it("diamond", async () => {
-    const { getByToolName, container } = await render(<AppWithCollab />);
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     const canvas = container.querySelector("canvas")!;
     {
       // create element
@@ -132,7 +132,7 @@ describe("select single element on the scene", () => {
   });
 
   it("ellipse", async () => {
-    const { getByToolName, container } = await render(<AppWithCollab />);
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     const canvas = container.querySelector("canvas")!;
     {
       // create element
@@ -159,7 +159,7 @@ describe("select single element on the scene", () => {
   });
 
   it("arrow", async () => {
-    const { getByToolName, container } = await render(<AppWithCollab />);
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     const canvas = container.querySelector("canvas")!;
     {
       // create element
@@ -198,7 +198,7 @@ describe("select single element on the scene", () => {
   });
 
   it("arrow escape", async () => {
-    const { getByToolName, container } = await render(<AppWithCollab />);
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     const canvas = container.querySelector("canvas")!;
     {
       // create element

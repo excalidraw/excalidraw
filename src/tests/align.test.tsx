@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { render } from "./test-utils";
-import AppWithCollab from "../excalidraw-app";
+import ExcalidrawApp from "../excalidraw-app";
 import { setLanguage } from "../i18n";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { API } from "./helpers/api";
@@ -61,7 +61,7 @@ describe("aligning", () => {
     mouse.reset();
 
     await setLanguage("en.json");
-    await render(<AppWithCollab />);
+    await render(<ExcalidrawApp />);
   });
 
   it("aligns two objects correctly to the top", () => {

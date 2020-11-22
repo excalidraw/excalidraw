@@ -1,6 +1,6 @@
 import React from "react";
 import { render, updateSceneData, waitFor } from "./test-utils";
-import AppWithCollab from "../excalidraw-app";
+import ExcalidrawApp from "../excalidraw-app";
 import { API } from "./helpers/api";
 import { createUndoAction } from "../actions/actionHistory";
 const { h } = window;
@@ -41,7 +41,7 @@ jest.mock("socket.io-client", () => {
 
 describe("collaboration", () => {
   it("creating room should reset deleted elements", async () => {
-    await render(<AppWithCollab />);
+    await render(<ExcalidrawApp />);
     // To update the scene with deleted elements before starting collab
     updateSceneData({
       elements: [

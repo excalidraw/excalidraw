@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import AppWithCollab from "../excalidraw-app";
+import ExcalidrawApp from "../excalidraw-app";
 import * as Renderer from "../renderer/renderScene";
 import { KEYS } from "../keys";
 import { render, fireEvent } from "./test-utils";
@@ -21,7 +21,7 @@ const { h } = window;
 
 describe("add element to the scene when pointer dragging long enough", () => {
   it("rectangle", async () => {
-    const { getByToolName, container } = await render(<AppWithCollab />);
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
     const tool = getByToolName("rectangle");
     fireEvent.click(tool);
@@ -52,7 +52,7 @@ describe("add element to the scene when pointer dragging long enough", () => {
   });
 
   it("ellipse", async () => {
-    const { getByToolName, container } = await render(<AppWithCollab />);
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
     const tool = getByToolName("ellipse");
     fireEvent.click(tool);
@@ -83,7 +83,7 @@ describe("add element to the scene when pointer dragging long enough", () => {
   });
 
   it("diamond", async () => {
-    const { getByToolName, container } = await render(<AppWithCollab />);
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
     const tool = getByToolName("diamond");
     fireEvent.click(tool);
@@ -114,7 +114,7 @@ describe("add element to the scene when pointer dragging long enough", () => {
   });
 
   it("arrow", async () => {
-    const { getByToolName, container } = await render(<AppWithCollab />);
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
     const tool = getByToolName("arrow");
     fireEvent.click(tool);
@@ -149,7 +149,7 @@ describe("add element to the scene when pointer dragging long enough", () => {
   });
 
   it("line", async () => {
-    const { getByToolName, container } = await render(<AppWithCollab />);
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
     const tool = getByToolName("line");
     fireEvent.click(tool);
@@ -185,7 +185,7 @@ describe("add element to the scene when pointer dragging long enough", () => {
 
 describe("do not add element to the scene if size is too small", () => {
   it("rectangle", async () => {
-    const { getByToolName, container } = await render(<AppWithCollab />);
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
     const tool = getByToolName("rectangle");
     fireEvent.click(tool);
@@ -204,7 +204,7 @@ describe("do not add element to the scene if size is too small", () => {
   });
 
   it("ellipse", async () => {
-    const { getByToolName, container } = await render(<AppWithCollab />);
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
     const tool = getByToolName("ellipse");
     fireEvent.click(tool);
@@ -223,7 +223,7 @@ describe("do not add element to the scene if size is too small", () => {
   });
 
   it("diamond", async () => {
-    const { getByToolName, container } = await render(<AppWithCollab />);
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
     const tool = getByToolName("diamond");
     fireEvent.click(tool);
@@ -242,7 +242,7 @@ describe("do not add element to the scene if size is too small", () => {
   });
 
   it("arrow", async () => {
-    const { getByToolName, container } = await render(<AppWithCollab />);
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
     const tool = getByToolName("arrow");
     fireEvent.click(tool);
@@ -264,7 +264,7 @@ describe("do not add element to the scene if size is too small", () => {
   });
 
   it("line", async () => {
-    const { getByToolName, container } = await render(<AppWithCollab />);
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
     const tool = getByToolName("line");
     fireEvent.click(tool);

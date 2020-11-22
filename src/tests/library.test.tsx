@@ -1,6 +1,6 @@
 import React from "react";
 import { render, waitFor } from "./test-utils";
-import AppWithCollab from "../excalidraw-app";
+import ExcalidrawApp from "../excalidraw-app";
 import { API } from "./helpers/api";
 import { MIME_TYPES } from "../constants";
 import { LibraryItem } from "../types";
@@ -10,7 +10,7 @@ const { h } = window;
 describe("library", () => {
   beforeEach(async () => {
     h.library.resetLibrary();
-    await render(<AppWithCollab />);
+    await render(<ExcalidrawApp />);
   });
 
   it("import library via drag&drop", async () => {

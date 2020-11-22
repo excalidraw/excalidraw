@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { render } from "./test-utils";
-import AppWithCollab from "../excalidraw-app";
+import ExcalidrawApp from "../excalidraw-app";
 import { reseed } from "../random";
 import {
   actionSendBackward,
@@ -108,7 +108,7 @@ const assertZindex = ({
 
 describe("z-index manipulation", () => {
   beforeEach(async () => {
-    await render(<AppWithCollab />);
+    await render(<ExcalidrawApp />);
   });
 
   it("send back", () => {

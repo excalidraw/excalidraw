@@ -1,6 +1,6 @@
 import React from "react";
 import { render, waitFor } from "./test-utils";
-import AppWithCollab from "../excalidraw-app";
+import ExcalidrawApp from "../excalidraw-app";
 import { API } from "./helpers/api";
 import { getDefaultAppState } from "../appState";
 
@@ -11,8 +11,8 @@ describe("appState", () => {
     const defaultAppState = getDefaultAppState();
     const exportBackground = !defaultAppState.exportBackground;
 
-    await render(<AppWithCollab />, {
-      initialData: {
+    await render(<ExcalidrawApp />, {
+      localStorageData: {
         appState: {
           exportBackground,
           viewBackgroundColor: "#F00",

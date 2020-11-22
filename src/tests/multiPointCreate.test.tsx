@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { render, fireEvent } from "./test-utils";
-import AppWithCollab from "../excalidraw-app";
+import ExcalidrawApp from "../excalidraw-app";
 import * as Renderer from "../renderer/renderScene";
 import { KEYS } from "../keys";
 import { ExcalidrawLinearElement } from "../element/types";
@@ -21,7 +21,7 @@ const { h } = window;
 
 describe("remove shape in non linear elements", () => {
   it("rectangle", async () => {
-    const { getByToolName, container } = await render(<AppWithCollab />);
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
     const tool = getByToolName("rectangle");
     fireEvent.click(tool);
@@ -35,7 +35,7 @@ describe("remove shape in non linear elements", () => {
   });
 
   it("ellipse", async () => {
-    const { getByToolName, container } = await render(<AppWithCollab />);
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
     const tool = getByToolName("ellipse");
     fireEvent.click(tool);
@@ -49,7 +49,7 @@ describe("remove shape in non linear elements", () => {
   });
 
   it("diamond", async () => {
-    const { getByToolName, container } = await render(<AppWithCollab />);
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
     const tool = getByToolName("diamond");
     fireEvent.click(tool);
@@ -65,7 +65,7 @@ describe("remove shape in non linear elements", () => {
 
 describe("multi point mode in linear elements", () => {
   it("arrow", async () => {
-    const { getByToolName, container } = await render(<AppWithCollab />);
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
     const tool = getByToolName("arrow");
     fireEvent.click(tool);
@@ -106,7 +106,7 @@ describe("multi point mode in linear elements", () => {
   });
 
   it("line", async () => {
-    const { getByToolName, container } = await render(<AppWithCollab />);
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
     const tool = getByToolName("line");
     fireEvent.click(tool);
