@@ -16,7 +16,6 @@ import { getCollaborationLinkData } from "./data";
 import { EVENT, LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG } from "../constants";
 import { SAVE_TO_LOCAL_STORAGE_TIMEOUT } from "../time_constants";
 import { loadFromFirebase } from "./data/firebase";
-import { restore } from "../data/restore";
 import { ExcalidrawImperativeAPI } from "../components/App";
 import { debounce, resolvablePromise, withBatchedUpdates } from "../utils";
 import { AppState, ExcalidrawAPIRefValue } from "../types";
@@ -146,7 +145,7 @@ const initializeScene = async (opts: {
       const elements = await loadFromFirebase(roomID, roomKey);
       if (elements) {
         return {
-          ...restore({ elements }, scene.appState),
+          elements,
           commitToHistory: true,
         };
       }
