@@ -82,8 +82,8 @@
     "alignRight": "Aliniere la dreapta",
     "centerVertically": "Centrare verticală",
     "centerHorizontally": "Centrare orizontală",
-    "distributeHorizontally": "",
-    "distributeVertically": ""
+    "distributeHorizontally": "Distribuie orizontal",
+    "distributeVertically": "Distribuie vertical"
   },
   "buttons": {
     "clearReset": "Resetare pânză",
