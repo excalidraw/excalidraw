@@ -15,9 +15,11 @@ const iconFillColor = (appearance: "light" | "dark") =>
 const handlerColor = (appearance: "light" | "dark") =>
   appearance === "light" ? oc.white : "#1e1e1e";
 
-type Opts = { width?: number; height?: number; mirror?: true } & React.SVGProps<
-  SVGSVGElement
->;
+type Opts = {
+  width?: number;
+  height?: number;
+  mirror?: true;
+} & React.SVGProps<SVGSVGElement>;
 
 const createIcon = (d: string | React.ReactNode, opts: number | Opts = 512) => {
   const { width = 512, height = width, mirror, style } =
