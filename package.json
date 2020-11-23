@@ -26,7 +26,7 @@
     "@types/jest": "26.0.15",
     "@types/nanoid": "2.1.0",
     "@types/react": "16.9.56",
-    "@types/react-dom": "16.9.9",
+    "@types/react-dom": "17.0.0",
     "@types/socket.io-client": "1.4.34",
     "browser-nativefs": "0.11.0",
     "clsx": "1.1.1",
