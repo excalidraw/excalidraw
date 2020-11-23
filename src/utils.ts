@@ -314,10 +314,10 @@ export const resolvablePromise = <T>() => {
   return promise as ResolvablePromise<T>;
 };
 
-export /**
+/**
  * @param func handler taking at most single parameter (event).
  */
-const withBatchedUpdates = <
+export const withBatchedUpdates = <
   TFunction extends ((event: any) => void) | (() => void)
 >(
   func: Parameters<TFunction>["length"] extends 0 | 1 ? TFunction : never,
