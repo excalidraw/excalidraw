@@ -91,13 +91,19 @@ export const SelectedShapeActions = ({
             {renderAction("alignLeft")}
             {renderAction("alignHorizontallyCentered")}
             {renderAction("alignRight")}
-            {renderAction("alignTop")}
-            {renderAction("alignVerticallyCentered")}
-            {renderAction("alignBottom")}
+            {targetElements.length > 2 &&
+              renderAction("distributeHorizontally")}
+            <div className="iconRow">
+              {renderAction("alignTop")}
+              {renderAction("alignVerticallyCentered")}
+              {renderAction("alignBottom")}
+              {targetElements.length > 2 &&
+                renderAction("distributeVertically")}
+            </div>
           </div>
         </fieldset>
       )}
-
+      {/* 
       {targetElements.length > 2 && (
         <fieldset>
           <legend>{t("labels.distribute")}</legend>
@@ -106,7 +112,7 @@ export const SelectedShapeActions = ({
             {renderAction("distributeVertically")}
           </div>
         </fieldset>
-      )}
+      )} */}
 
       {!isMobile && !isEditing && targetElements.length > 0 && (
         <fieldset>
