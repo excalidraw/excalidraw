@@ -91,13 +91,18 @@ export const SelectedShapeActions = ({
             {renderAction("alignLeft")}
             {renderAction("alignHorizontallyCentered")}
             {renderAction("alignRight")}
-            {renderAction("alignTop")}
-            {renderAction("alignVerticallyCentered")}
-            {renderAction("alignBottom")}
+            {targetElements.length > 2 &&
+              renderAction("distributeHorizontally")}
+            <div className="iconRow">
+              {renderAction("alignTop")}
+              {renderAction("alignVerticallyCentered")}
+              {renderAction("alignBottom")}
+              {targetElements.length > 2 &&
+                renderAction("distributeVertically")}
+            </div>
           </div>
         </fieldset>
       )}
-
       {!isMobile && !isEditing && targetElements.length > 0 && (
         <fieldset>
           <legend>{t("labels.actions")}</legend>
