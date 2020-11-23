@@ -82,8 +82,8 @@
     "alignRight": "Rechte Kanten",
     "centerVertically": "Vertikal zentrieren",
     "centerHorizontally": "Horizontal zentrieren",
-    "distributeHorizontally": "",
-    "distributeVertically": ""
+    "distributeHorizontally": "Horizontal verteilen",
+    "distributeVertically": "Vertikal verteilen"
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
