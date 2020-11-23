@@ -71,7 +71,9 @@ export type ActionName =
   | "alignLeft"
   | "alignRight"
   | "alignVerticallyCentered"
-  | "alignHorizontallyCentered";
+  | "alignHorizontallyCentered"
+  | "distributeHorizontally"
+  | "distributeVertically";
 
 export interface Action {
   name: ActionName;

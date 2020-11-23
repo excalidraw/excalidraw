@@ -295,6 +295,58 @@ export const AlignRightIcon = React.memo(
     ),
 );
 
+export const DistributeHorizontallyIcon = React.memo(
+  ({ appearance }: { appearance: "light" | "dark" }) =>
+    createIcon(
+      <>
+        <path d="M5 5V19Z" fill="black" />
+        <path
+          d="M19 5V19M5 5V19"
+          stroke={iconFillColor(appearance)}
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+        <path
+          d="M15 9C15.554 9 16 9.446 16 10V14C16 14.554 15.554 15 15 15H9C8.446 15 8 14.554 8 14V10C8 9.446 8.446 9 9 9H15Z"
+          fill={activeElementColor(appearance)}
+          stroke={activeElementColor(appearance)}
+          strokeWidth="2"
+        />
+      </>,
+      { width: 24 },
+    ),
+);
+
+<svg
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+></svg>;
+
+export const DistributeVerticallyIcon = React.memo(
+  ({ appearance }: { appearance: "light" | "dark" }) =>
+    createIcon(
+      <>
+        <path
+          d="M5 5L19 5M5 19H19"
+          fill={iconFillColor(appearance)}
+          stroke={iconFillColor(appearance)}
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+        <path
+          d="M15 9C15.554 9 16 9.446 16 10V14C16 14.554 15.554 15 15 15H9C8.446 15 8 14.554 8 14V10C8 9.446 8.446 9 9 9H15Z"
+          fill={activeElementColor(appearance)}
+          stroke={activeElementColor(appearance)}
+          strokeWidth="2"
+        />
+      </>,
+      { width: 24 },
+    ),
+);
+
 export const CenterVerticallyIcon = React.memo(
   ({ appearance }: { appearance: "light" | "dark" }) =>
     createIcon(
