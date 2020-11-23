@@ -1,9 +1,13 @@
-import { getImportedKey } from "../../data";
 import { t } from "../../i18n";
 import { ExcalidrawElement } from "../../element/types";
 import { AppState } from "../../types";
+import { ImportedDataState } from "../../data/types";
+import { restore } from "../../data/restore";
 
 const byteToHex = (byte: number): string => `0${byte.toString(16)}`.slice(-2);
+
+const BACKEND_GET = process.env.REACT_APP_BACKEND_V1_GET_URL;
+const BACKEND_V2_GET = process.env.REACT_APP_BACKEND_V2_GET_URL;
 
 const generateRandomID = async () => {
   const arr = new Uint8Array(10);
@@ -130,4 +134,95 @@ export const generateCollaborationLink = async () => {
   const id = await generateRandomID();
   const key = await generateEncryptionKey();
   return `${window.location.origin}${window.location.pathname}#room=${id},${key}`;
+};
+
+export const getImportedKey = (key: string, usage: KeyUsage) =>
+  window.crypto.subtle.importKey(
+    "jwk",
+    {
+      alg: "A128GCM",
+      ext: true,
+      k: key,
+      key_ops: ["encrypt", "decrypt"],
+      kty: "oct",
+    },
+    {
+      name: "AES-GCM",
+      length: 128,
+    },
+    false, // extractable
+    [usage],
+  );
+
+const importFromBackend = async (
+  id: string | null,
+  privateKey?: string | null,
+): Promise<ImportedDataState> => {
+  try {
+    const response = await fetch(
+      privateKey ? `${BACKEND_V2_GET}${id}` : `${BACKEND_GET}${id}.json`,
+    );
+    if (!response.ok) {
+      window.alert(t("alerts.importBackendFailed"));
+      return {};
+    }
+    let data: ImportedDataState;
+    if (privateKey) {
+      const buffer = await response.arrayBuffer();
+      const key = await getImportedKey(privateKey, "decrypt");
+      const iv = new Uint8Array(12);
+      const decrypted = await window.crypto.subtle.decrypt(
+        {
+          name: "AES-GCM",
+          iv: iv,
+        },
+        key,
+        buffer,
+      );
+      // We need to convert the decrypted array buffer to a string
+      const string = new window.TextDecoder("utf-8").decode(
+        new Uint8Array(decrypted) as any,
+      );
+      data = JSON.parse(string);
+    } else {
+      // Legacy format
+      data = await response.json();
+    }
+
+    return {
+      elements: data.elements || null,
+      appState: data.appState || null,
+    };
+  } catch (error) {
+    window.alert(t("alerts.importBackendFailed"));
+    console.error(error);
+    return {};
+  }
+};
+
+export const loadScene = async (
+  id: string | null,
+  privateKey: string | null,
+  // Supply initialData even if importing from backend to ensure we restore
+  // localStorage user settings which we do not persist on server.
+  // Non-optional so we don't forget to pass it even if `undefined`.
+  initialData: ImportedDataState | undefined | null,
+) => {
+  let data;
+  if (id != null) {
+    // the private key is used to decrypt the content from the server, take
+    // extra care not to leak it
+    data = restore(
+      await importFromBackend(id, privateKey),
+      initialData?.appState,
+    );
+  } else {
+    data = restore(initialData || {}, null);
+  }
+
+  return {
+    elements: data.elements,
+    appState: data.appState,
+    commitToHistory: false,
+  };
 };

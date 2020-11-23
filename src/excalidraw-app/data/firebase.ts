@@ -1,4 +1,4 @@
-import { getImportedKey } from "../../data";
+import { getImportedKey } from "../data";
 import { createIV } from "./index";
 import { ExcalidrawElement } from "../../element/types";
 import { getSceneVersion } from "../../element";

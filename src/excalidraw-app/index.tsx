@@ -5,15 +5,16 @@ import Excalidraw from "../packages/excalidraw/index";
 import {
   importFromLocalStorage,
   saveToLocalStorage,
+  STORAGE_KEYS,
 } from "./data/localStorage";
 
 import { ImportedDataState } from "../data/types";
 import CollabWrapper, { CollabContext } from "./collab/CollabWrapper";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
 import { t } from "../i18n";
-import { loadScene } from "../data";
+import { loadScene } from "./data";
 import { getCollaborationLinkData } from "./data";
-import { EVENT, LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG } from "../constants";
+import { EVENT } from "../constants";
 import { SAVE_TO_LOCAL_STORAGE_TIMEOUT } from "../time_constants";
 import { loadFromFirebase } from "./data/firebase";
 import { ExcalidrawImperativeAPI } from "../components/App";
@@ -57,7 +58,7 @@ const shouldForceLoadScene = (
   let collabForceLoadFlag;
   try {
     collabForceLoadFlag = localStorage?.getItem(
-      LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
+      STORAGE_KEYS.LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
     );
   } catch {}
 
@@ -242,7 +243,7 @@ function ExcalidrawWrapper(props: { collab: CollabContext }) {
       if (collab.isCollaborating || collab.roomId) {
         try {
           localStorage?.setItem(
-            LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
+            STORAGE_KEYS.LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
             JSON.stringify({
               timestamp: Date.now(),
               room: collab.roomId,
