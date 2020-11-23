@@ -103,17 +103,6 @@ export const SelectedShapeActions = ({
           </div>
         </fieldset>
       )}
-      {/* 
-      {targetElements.length > 2 && (
-        <fieldset>
-          <legend>{t("labels.distribute")}</legend>
-          <div className="buttonList">
-            {renderAction("distributeHorizontally")}
-            {renderAction("distributeVertically")}
-          </div>
-        </fieldset>
-      )} */}
-
       {!isMobile && !isEditing && targetElements.length > 0 && (
         <fieldset>
           <legend>{t("labels.actions")}</legend>
