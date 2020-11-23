@@ -100,11 +100,11 @@
       }
 
       .iconRow {
-        margin-top: 4px;
+        margin-top: 8px;
       }
 
       .ToolIcon {
-        margin: 0 4px 0 0;
+        margin: 0 8px 0 0;
 
         &:focus {
           outline: transparent;
@@ -392,7 +392,7 @@
   }
 
   .zIndexButton {
-    margin: 0 4px 0 0;
+    margin: 0 8px 0 0;
     padding: 5px;
     display: inline-flex;
     align-items: center;
