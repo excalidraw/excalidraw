@@ -81,7 +81,9 @@
     "alignLeft": "",
     "alignRight": "",
     "centerVertically": "",
-    "centerHorizontally": ""
+    "centerHorizontally": "",
+    "distributeHorizontally": "",
+    "distributeVertically": ""
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",

@@ -81,7 +81,9 @@
     "alignLeft": "",
     "alignRight": "",
     "centerVertically": "",
-    "centerHorizontally": ""
+    "centerHorizontally": "",
+    "distributeHorizontally": "",
+    "distributeVertically": ""
   },
   "buttons": {
     "clearReset": "캔버스 초기화",
