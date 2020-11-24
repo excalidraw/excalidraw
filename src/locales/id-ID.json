@@ -81,7 +81,9 @@
     "alignLeft": "Rata kiri",
     "alignRight": "Rata kanan",
     "centerVertically": "Pusatkan secara vertikal",
-    "centerHorizontally": "Pusatkan secara horizontal"
+    "centerHorizontally": "Pusatkan secara horizontal",
+    "distributeHorizontally": "Distribusikan horizontal",
+    "distributeVertically": "Distribusikan vertikal"
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
