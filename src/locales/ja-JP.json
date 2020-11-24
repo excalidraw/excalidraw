@@ -81,7 +81,9 @@
     "alignLeft": "左揃え",
     "alignRight": "右揃え",
     "centerVertically": "縦方向に中央揃え",
-    "centerHorizontally": "横方向に中央揃え"
+    "centerHorizontally": "横方向に中央揃え",
+    "distributeHorizontally": "",
+    "distributeVertically": ""
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",

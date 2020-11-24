@@ -81,7 +81,9 @@
     "alignLeft": "Tasaa vasemmalle",
     "alignRight": "Tasaa oikealle",
     "centerVertically": "Keskitä pystysuunnassa",
-    "centerHorizontally": "Keskitä vaakasuunnassa"
+    "centerHorizontally": "Keskitä vaakasuunnassa",
+    "distributeHorizontally": "Jaa vaakasuunnassa",
+    "distributeVertically": "Jaa pystysuunnassa"
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",

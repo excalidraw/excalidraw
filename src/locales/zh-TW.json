@@ -81,7 +81,9 @@
     "alignLeft": "對齊左側",
     "alignRight": "對齊右側",
     "centerVertically": "垂直置中",
-    "centerHorizontally": "水平置中"
+    "centerHorizontally": "水平置中",
+    "distributeHorizontally": "水平分布",
+    "distributeVertically": "垂直分布"
   },
   "buttons": {
     "clearReset": "重置 canvas",

@@ -81,7 +81,9 @@
     "alignLeft": "ဘယ်ညှိ",
     "alignRight": "ညာညှိ",
     "centerVertically": "ဒေါင်လိုက်အလယ်ညှိ",
-    "centerHorizontally": "အလျားလိုက်အလယ်ညှိ"
+    "centerHorizontally": "အလျားလိုက်အလယ်ညှိ",
+    "distributeHorizontally": "",
+    "distributeVertically": ""
   },
   "buttons": {
     "clearReset": "ကားချပ်ရှင်းလင်း",
