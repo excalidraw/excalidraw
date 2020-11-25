@@ -121,8 +121,9 @@ import {
   DEFAULT_VERTICAL_ALIGN,
   GRID_SIZE,
   MIME_TYPES,
+  TAP_TWICE_TIMEOUT,
+  TOUCH_CTX_MENU_TIMEOUT,
 } from "../constants";
-import { TAP_TWICE_TIMEOUT, TOUCH_CTX_MENU_TIMEOUT } from "../time_constants";
 
 import LayerUI from "./LayerUI";
 import { ScrollBars, SceneState } from "../scene/types";
