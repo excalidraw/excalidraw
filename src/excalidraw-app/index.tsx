@@ -82,7 +82,7 @@ type Scene = ImportedDataState & { commitToHistory: boolean };
 
 const initializeScene = async (opts: {
   resetScene: ExcalidrawImperativeAPI["resetScene"];
-  initializeSocketClient: (opts: any) => Promise<ImportedDataState | null>;
+  initializeSocketClient: CollabContext["initializeSocketClient"];
   onLateInitialization?: (scene: Scene) => void;
 }): Promise<Scene | null> => {
   const searchParams = new URLSearchParams(window.location.search);

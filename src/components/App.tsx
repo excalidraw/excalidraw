@@ -291,7 +291,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         typeof excalidrawRef === "function"
           ? resolvablePromise<ExcalidrawImperativeAPI>()
           : excalidrawRef.current!.readyPromise;
-      const api = {
+      const api: ExcalidrawImperativeAPI = {
         ready: true,
         readyPromise: readyPromise,
         updateScene: this.updateScene,
@@ -3684,7 +3684,9 @@ declare global {
       history: SceneHistory;
       app: InstanceType<typeof App>;
       library: typeof Library;
-      collab: any;
+      collab: InstanceType<
+        typeof import("../excalidraw-app/collab/CollabWrapper").default
+      >;
     };
   }
 }

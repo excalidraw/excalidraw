@@ -100,5 +100,5 @@ const initLocalStorage = (data: ImportedDataState) => {
 };
 
 export const updateSceneData = (data: SceneData) => {
-  window.h.collab.excalidrawRef.current.updateScene(data);
+  (window.h.collab as any).excalidrawRef.current.updateScene(data);
 };
