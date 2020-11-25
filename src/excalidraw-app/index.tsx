@@ -17,7 +17,12 @@ import { getCollaborationLinkData } from "./data";
 import { EVENT } from "../constants";
 import { loadFromFirebase } from "./data/firebase";
 import { ExcalidrawImperativeAPI } from "../components/App";
-import { debounce, resolvablePromise, withBatchedUpdates } from "../utils";
+import {
+  debounce,
+  ResolvablePromise,
+  resolvablePromise,
+  withBatchedUpdates,
+} from "../utils";
 import { AppState, ExcalidrawAPIRefValue } from "../types";
 import { ExcalidrawElement } from "../element/types";
 import { SAVE_TO_LOCAL_STORAGE_TIMEOUT } from "./app_constants";
@@ -192,9 +197,12 @@ function ExcalidrawWrapper(props: { collab: CollabContext }) {
   // initial state
   // ---------------------------------------------------------------------------
 
-  const initialStatePromiseRef = useRef(
-    resolvablePromise<ImportedDataState | null>(),
-  );
+  const initialStatePromiseRef = useRef<{
+    promise: ResolvablePromise<ImportedDataState | null>;
+  }>({ promise: null! });
+  if (!initialStatePromiseRef.current.promise) {
+    initialStatePromiseRef.current.promise = resolvablePromise<ImportedDataState | null>();
+  }
 
   const { collab } = props;
 
@@ -204,10 +212,10 @@ function ExcalidrawWrapper(props: { collab: CollabContext }) {
         resetScene: excalidrawApi.resetScene,
         initializeSocketClient: collab.initializeSocketClient,
         onLateInitialization: (scene) => {
-          initialStatePromiseRef.current.resolve(scene);
+          initialStatePromiseRef.current.promise.resolve(scene);
         },
       }).then((scene) => {
-        initialStatePromiseRef.current.resolve(scene);
+        initialStatePromiseRef.current.promise.resolve(scene);
       });
     });
 
@@ -274,7 +282,7 @@ function ExcalidrawWrapper(props: { collab: CollabContext }) {
       onChange={onChange}
       width={dimensions.width}
       height={dimensions.height}
-      initialData={initialStatePromiseRef.current}
+      initialData={initialStatePromiseRef.current.promise}
       user={{ name: collab.username }}
       onCollabButtonClick={collab.onCollabButtonClick}
       isCollaborating={collab.isCollaborating}
