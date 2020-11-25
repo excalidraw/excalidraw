@@ -7,6 +7,8 @@ interface Box {
   minY: number;
   maxX: number;
   maxY: number;
+  midX: number;
+  midY: number;
 }
 
 export interface Distribution {
@@ -18,40 +20,43 @@ export const distributeElements = (
   selectedElements: ExcalidrawElement[],
   distribution: Distribution,
 ): ExcalidrawElement[] => {
-  const start = distribution.axis === "x" ? "minX" : "minY";
-  const extent = distribution.axis === "x" ? "width" : "height";
+  const [start, end, mid] =
+    distribution.axis === "x"
+      ? (["minX", "maxX", "midX"] as const)
+      : (["minY", "maxY", "midY"] as const);
 
-  const selectionBoundingBox = getCommonBoundingBox(selectedElements);
+  let max: number = null as any;
+  let min: number = null as any;
 
   const groups = getMaximumGroups(selectedElements)
-    .map((group) => [group, getCommonBoundingBox(group)] as const)
-    .sort((a, b) => a[1][start] - b[1][start]);
+    .map((group) => {
+      const box = getCommonBoundingBox(group);
+      const tmp = (box[start] + box[end]) / 2;
+      max = max !== null ? Math.max(max, tmp) : tmp;
+      min = min !== null ? Math.min(min, tmp) : tmp;
+      return [group, box] as const;
+    })
+    .sort((a, b) => a[1][mid] - b[1][mid]);
 
-  let span = 0;
-  for (const group of groups) {
-    span += group[1][extent];
-  }
+  const step = (max - min) / groups.length;
+  let pos = min;
 
-  const step = (selectionBoundingBox[extent] - span) / (groups.length - 1);
-  let pos = selectionBoundingBox[start];
-
-  return groups.flatMap(([group, box]) => {
+  return groups.flatMap(([group, box], i) => {
     const translation = {
       x: 0,
       y: 0,
     };
 
-    if (Math.abs(pos - box[start]) >= 1e-6) {
-      translation[distribution.axis] = pos - box[start];
+    if (i > 0 && i < groups.length - 1) {
+      pos += step;
+      translation[distribution.axis] =
+        Math.round(pos - (box[end] - box[start]) / 2) - box[start];
     }
-
-    pos += box[extent];
-    pos += step;
 
     return group.map((element) =>
       newElementWith(element, {
-        x: Math.round(element.x + translation.x),
-        y: Math.round(element.y + translation.y),
+        x: element.x + translation.x,
+        y: element.y + translation.y,
       }),
     );
   });
@@ -79,9 +84,15 @@ export const getMaximumGroups = (
   return Array.from(groups.values());
 };
 
-const getCommonBoundingBox = (
-  elements: ExcalidrawElement[],
-): Box & { width: number; height: number } => {
+const getCommonBoundingBox = (elements: ExcalidrawElement[]): Box => {
   const [minX, minY, maxX, maxY] = getCommonBounds(elements);
-  return { minX, minY, maxX, maxY, width: maxX - minX, height: maxY - minY };
+
+  return {
+    minX,
+    minY,
+    maxX,
+    maxY,
+    midX: minX + maxX / 2,
+    midY: minY + maxY / 2,
+  };
 };
