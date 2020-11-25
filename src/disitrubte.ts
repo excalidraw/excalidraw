@@ -20,10 +20,7 @@ export const distributeElements = (
   selectedElements: ExcalidrawElement[],
   distribution: Distribution,
 ): ExcalidrawElement[] => {
-  const [start, end, mid] =
-    distribution.axis === "x"
-      ? (["minX", "maxX", "midX"] as const)
-      : (["minY", "maxY", "midY"] as const);
+  const mid = distribution.axis === "x" ? "midX" : "midY";
 
   const groups = getMaximumGroups(selectedElements)
     .map((group) => [group, getCommonBoundingBox(group)] as const)
@@ -41,15 +38,11 @@ export const distributeElements = (
   let pos = min;
 
   return groups.flatMap(([group, box], i) => {
-    const translation = {
-      x: 0,
-      y: 0,
-    };
+    const translation = { x: 0, y: 0 };
 
     if (i > 0 && i < groups.length - 1) {
       pos += step;
-      translation[distribution.axis] =
-        Math.round(pos - (box[end] - box[start]) / 2) - box[start];
+      translation[distribution.axis] = pos - box[mid];
     }
 
     return group.map((element) =>
@@ -85,7 +78,6 @@ export const getMaximumGroups = (
 
 const getCommonBoundingBox = (elements: ExcalidrawElement[]): Box => {
   const [minX, minY, maxX, maxY] = getCommonBounds(elements);
-
   return {
     minX,
     minY,
