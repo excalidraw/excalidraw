@@ -21,11 +21,6 @@ export const POINTER_BUTTON = {
   TOUCH: -1,
 };
 
-export enum SCENE {
-  INIT = "SCENE_INIT",
-  UPDATE = "SCENE_UPDATE",
-}
-
 export enum EVENT {
   COPY = "copy",
   PASTE = "paste",
@@ -54,11 +49,6 @@ export enum EVENT {
 export const ENV = {
   TEST: "test",
   DEVELOPMENT: "development",
-};
-
-export const BROADCAST = {
-  SERVER_VOLATILE: "server-volatile-broadcast",
-  SERVER: "server-broadcast",
 };
 
 export const CLASSES = {

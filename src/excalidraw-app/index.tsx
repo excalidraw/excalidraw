@@ -15,12 +15,12 @@ import { t } from "../i18n";
 import { loadScene } from "./data";
 import { getCollaborationLinkData } from "./data";
 import { EVENT } from "../constants";
-import { SAVE_TO_LOCAL_STORAGE_TIMEOUT } from "../time_constants";
 import { loadFromFirebase } from "./data/firebase";
 import { ExcalidrawImperativeAPI } from "../components/App";
 import { debounce, resolvablePromise, withBatchedUpdates } from "../utils";
 import { AppState, ExcalidrawAPIRefValue } from "../types";
 import { ExcalidrawElement } from "../element/types";
+import { SAVE_TO_LOCAL_STORAGE_TIMEOUT } from "./app_constants";
 
 const excalidrawRef: React.MutableRefObject<ExcalidrawAPIRefValue> = {
   current: {

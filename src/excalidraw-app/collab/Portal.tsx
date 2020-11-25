@@ -6,12 +6,12 @@ import {
 
 import CollabWrapper from "./CollabWrapper";
 
-import { BROADCAST, SCENE } from "../../constants";
 import {
   getElementMap,
   getSyncableElements,
 } from "../../packages/excalidraw/index";
 import { ExcalidrawElement } from "../../element/types";
+import { BROADCAST, SCENE } from "../app_constants";
 
 class Portal {
   app: CollabWrapper;

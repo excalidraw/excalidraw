@@ -1,11 +1,7 @@
 import React, { PureComponent } from "react";
 import throttle from "lodash.throttle";
 
-import {
-  INITIAL_SCENE_UPDATE_TIMEOUT,
-  SYNC_FULL_SCENE_INTERVAL_MS,
-} from "../../time_constants";
-import { ENV, EVENT, SCENE } from "../../constants";
+import { ENV, EVENT } from "../../constants";
 
 import {
   decryptAESGEM,
@@ -32,6 +28,11 @@ import RoomDialog from "./RoomDialog";
 import { ErrorDialog } from "../../components/ErrorDialog";
 import { ImportedDataState } from "../../data/types";
 import { ExcalidrawImperativeAPI } from "../../components/App";
+import {
+  INITIAL_SCENE_UPDATE_TIMEOUT,
+  SCENE,
+  SYNC_FULL_SCENE_INTERVAL_MS,
+} from "../app_constants";
 
 interface State {
   isLoading: boolean;
