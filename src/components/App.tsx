@@ -507,9 +507,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
    * ! Do not use to clear scene user action !
    */
   private resetScene = withBatchedUpdates(
-    (opts?: {
-      resetLoadingState: boolean;
-    }) => {
+    (opts?: { resetLoadingState: boolean }) => {
       this.scene.replaceAllElements([]);
       this.setState((state) => ({
         ...getDefaultAppState(),
