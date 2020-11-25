@@ -35,6 +35,8 @@ export const SelectedShapeActions = ({
   const isEditing = Boolean(appState.editingElement);
   const isMobile = useIsMobile();
 
+  const isRTL = document.documentElement.getAttribute("dir") === "rtl";
+
   return (
     <div className="panelColumn">
       {renderAction("changeStrokeColor")}
@@ -88,9 +90,23 @@ export const SelectedShapeActions = ({
         <fieldset>
           <legend>{t("labels.align")}</legend>
           <div className="buttonList">
-            {renderAction("alignLeft")}
-            {renderAction("alignHorizontallyCentered")}
-            {renderAction("alignRight")}
+            {
+              // swap this order for RTL so the button positions always match their action
+              // (i.e. the leftmost button aligns left)
+            }
+            {isRTL ? (
+              <>
+                {renderAction("alignRight")}
+                {renderAction("alignHorizontallyCentered")}
+                {renderAction("alignLeft")}
+              </>
+            ) : (
+              <>
+                {renderAction("alignLeft")}
+                {renderAction("alignHorizontallyCentered")}
+                {renderAction("alignRight")}
+              </>
+            )}
             {targetElements.length > 2 &&
               renderAction("distributeHorizontally")}
             <div className="iconRow">

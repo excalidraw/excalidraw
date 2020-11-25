@@ -37,7 +37,6 @@ const Shortcut = (props: {
   shortcuts: string[];
   isOr: boolean;
 }) => {
-  const isRTL = document.documentElement.getAttribute("dir") === "rtl";
   return (
     <div className="ShorcutsDialog-shortcut">
       <div
@@ -60,8 +59,7 @@ const Shortcut = (props: {
             display: "flex",
             flex: "0 0 auto",
             justifyContent: "flex-end",
-            marginLeft: isRTL ? "0em" : "auto",
-            marginRight: isRTL ? "auto" : "0em",
+            marginInlineStart: "auto",
             minWidth: "30%",
           }}
         >

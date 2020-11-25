@@ -104,7 +104,8 @@
       }
 
       .ToolIcon {
-        margin: 0 8px 0 0;
+        margin: 0;
+        margin-inline-end: 8px;
 
         &:focus {
           outline: transparent;
@@ -392,7 +393,8 @@
   }
 
   .zIndexButton {
-    margin: 0 8px 0 0;
+    margin: 0;
+    margin-inline-end: 8px;
     padding: 5px;
     display: inline-flex;
     align-items: center;
