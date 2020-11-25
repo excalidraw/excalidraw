@@ -42,8 +42,8 @@ const renderApp: TestRenderFn = async (ui, options) => {
 
   Object.defineProperty(GlobalTestState, "canvas", {
     // must be a getter because at the time of ExcalidrawApp render the
-    //  child App component isn't likely mounted yet (and thus canvas not
-    //  present in DOM)
+    // child App component isn't likely mounted yet (and thus canvas not
+    // present in DOM)
     get() {
       return renderResult.container.querySelector("canvas")!;
     },
