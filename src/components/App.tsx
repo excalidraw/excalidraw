@@ -508,13 +508,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
    */
   private resetScene = withBatchedUpdates(
     (opts?: {
-      /** defaults to `true` */
-      resetIsLoading: boolean;
+      resetLoadingState: boolean;
     }) => {
       this.scene.replaceAllElements([]);
       this.setState((state) => ({
         ...getDefaultAppState(),
-        isLoading: opts?.resetIsLoading !== false ? false : state.isLoading,
+        isLoading: opts?.resetLoadingState ? false : state.isLoading,
         appearance: this.state.appearance,
       }));
       this.resetHistory();
