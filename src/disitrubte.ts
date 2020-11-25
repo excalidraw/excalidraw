@@ -25,18 +25,17 @@ export const distributeElements = (
       ? (["minX", "maxX", "midX"] as const)
       : (["minY", "maxY", "midY"] as const);
 
-  let max: number = null as any;
-  let min: number = null as any;
-
   const groups = getMaximumGroups(selectedElements)
-    .map((group) => {
-      const box = getCommonBoundingBox(group);
-      const tmp = (box[start] + box[end]) / 2;
-      max = max !== null ? Math.max(max, tmp) : tmp;
-      min = min !== null ? Math.min(min, tmp) : tmp;
-      return [group, box] as const;
-    })
+    .map((group) => [group, getCommonBoundingBox(group)] as const)
     .sort((a, b) => a[1][mid] - b[1][mid]);
+
+  const [max, min] = groups.reduce<number[]>((acc, cur) => {
+    const tmp = cur[1][mid];
+    return [
+      acc[0] !== undefined ? Math.max(acc[0], tmp) : tmp,
+      acc[1] !== undefined ? Math.min(acc[1], tmp) : tmp,
+    ];
+  }, []);
 
   const step = (max - min) / groups.length;
   let pos = min;
@@ -92,7 +91,7 @@ const getCommonBoundingBox = (elements: ExcalidrawElement[]): Box => {
     minY,
     maxX,
     maxY,
-    midX: minX + maxX / 2,
-    midY: minY + maxY / 2,
+    midX: (minX + maxX) / 2,
+    midY: (minY + maxY) / 2,
   };
 };
