@@ -1,5 +1,6 @@
 import { Zoom } from "./types";
 import {
+  BACKGROUND_COLORS,
   CURSOR_TYPE,
   FONT_FAMILY,
   WINDOWS_EMOJI_FALLBACK_FONT,
@@ -292,3 +293,6 @@ export const findLastIndex = <T>(
   }
   return -1;
 };
+
+export const isBackgroundTransparent = (backgroundColor: string) =>
+  backgroundColor === BACKGROUND_COLORS.TRANSPARENT;
