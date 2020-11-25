@@ -217,7 +217,7 @@ export const loadScene = async (
       initialData?.appState,
     );
   } else {
-    data = restore(initialData || {}, null);
+    data = restore(initialData || null, null);
   }
 
   return {

@@ -17,8 +17,6 @@ import {
 import { serializeAsJSON } from "./json";
 
 import { ExportType } from "../scene/types";
-import { restore } from "./restore";
-import { ImportedDataState } from "./types";
 import { canvasToBlob } from "./blob";
 
 export { loadFromBlob } from "./blob";
@@ -182,16 +180,4 @@ export const exportCanvas = async (
   if (tempCanvas !== canvas) {
     tempCanvas.remove();
   }
-};
-
-export const loadScene = (
-  initialData: ImportedDataState | undefined | null,
-) => {
-  const data = restore(initialData || {}, null);
-
-  return {
-    elements: data.elements,
-    appState: data.appState,
-    commitToHistory: false,
-  };
 };

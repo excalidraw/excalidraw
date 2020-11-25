@@ -40,7 +40,7 @@ import {
   isSomeElementSelected,
   calculateScrollCenter,
 } from "../scene";
-import { loadScene, loadFromBlob, exportCanvas } from "../data";
+import { loadFromBlob, exportCanvas } from "../data";
 
 import { renderScene } from "../renderer";
 import {
@@ -166,6 +166,7 @@ import { MaybeTransformHandleType } from "../element/transformHandles";
 import { renderSpreadsheet } from "../charts";
 import { isValidLibrary } from "../data/json";
 import { getNewZoom } from "../scene/zoom";
+import { restore } from "../data/restore";
 
 const { history } = createHistory();
 
@@ -552,29 +553,27 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     let data = null;
     try {
-      data = await this.props.initialData;
-    } catch (e) {}
-
-    const scene = loadScene(data);
-
-    if (this.state.isLoading) {
-      this.setState({ isLoading: false });
+      data = (await this.props.initialData) || null;
+    } catch (error) {
+      console.error(error);
     }
 
-    if (scene.appState) {
-      scene.appState = {
-        ...scene.appState,
-        ...calculateScrollCenter(
-          scene.elements,
-          {
-            ...scene.appState,
-            offsetTop: this.state.offsetTop,
-            offsetLeft: this.state.offsetLeft,
-          },
-          null,
-        ),
-      };
-    }
+    const scene = restore(data, null);
+
+    scene.appState = {
+      ...scene.appState,
+      ...calculateScrollCenter(
+        scene.elements,
+        {
+          ...scene.appState,
+          offsetTop: this.state.offsetTop,
+          offsetLeft: this.state.offsetLeft,
+        },
+        null,
+      ),
+      isLoading: false,
+    };
+
     this.resetHistory();
     this.syncActionResult({
       ...scene,
