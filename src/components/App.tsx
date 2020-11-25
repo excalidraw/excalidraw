@@ -502,16 +502,24 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     history.clear();
   };
 
-  /** Completely resets scene & history.
-   * Do not use for clear scene user action. */
-  private resetScene = withBatchedUpdates(() => {
-    this.scene.replaceAllElements([]);
-    this.setState({
-      ...getDefaultAppState(),
-      appearance: this.state.appearance,
-    });
-    this.resetHistory();
-  });
+  /**
+   * Resets scene & history.
+   * ! Do not use to clear scene user action !
+   */
+  private resetScene = withBatchedUpdates(
+    (opts?: {
+      /** defaults to `true` */
+      resetIsLoading: boolean;
+    }) => {
+      this.scene.replaceAllElements([]);
+      this.setState((state) => ({
+        ...getDefaultAppState(),
+        isLoading: opts?.resetIsLoading !== false ? false : state.isLoading,
+        appearance: this.state.appearance,
+      }));
+      this.resetHistory();
+    },
+  );
 
   private initializeScene = async () => {
     if ("launchQueue" in window && "LaunchParams" in window) {

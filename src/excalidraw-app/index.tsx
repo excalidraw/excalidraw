@@ -139,7 +139,7 @@ const initializeScene = async (opts: {
   if (isCollabScene) {
     // when joining a room we don't want user's local scene data to be merged
     //  into the remote scene
-    opts.resetScene();
+    opts.resetScene({ resetIsLoading: false });
     const scenePromise = opts.initializeSocketClient();
 
     try {
