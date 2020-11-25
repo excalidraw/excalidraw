@@ -355,9 +355,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           setAppState={this.setAppState}
           actionManager={this.actionManager}
           elements={this.scene.getElements()}
-          onCollabButtonClick={
-            onCollabButtonClick ? onCollabButtonClick : undefined
-          }
+          onCollabButtonClick={onCollabButtonClick}
           onLockToggle={this.toggleLock}
           onInsertShape={(elements) =>
             this.addElementsFromPasteOrLibrary(elements)
