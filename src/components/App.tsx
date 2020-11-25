@@ -551,14 +551,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.setState({ isLoading: true });
     }
 
-    let data = null;
+    let initialData = null;
     try {
-      data = (await this.props.initialData) || null;
+      initialData = (await this.props.initialData) || null;
     } catch (error) {
       console.error(error);
     }
 
-    const scene = restore(data, null);
+    const scene = restore(initialData, null);
 
     scene.appState = {
       ...scene.appState,
