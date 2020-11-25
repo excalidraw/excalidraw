@@ -35,7 +35,6 @@ import {
 } from "../app_constants";
 
 interface State {
-  isLoading: boolean;
   isCollaborating: boolean;
   modalIsShown: boolean;
   errorMessage: string;
@@ -74,7 +73,6 @@ interface Props {
 class CollabWrapper extends PureComponent<Props, State> {
   portal: Portal;
   private socketInitializationTimer: any;
-  private unmounted: boolean;
   private excalidrawRef: Props["excalidrawRef"];
   excalidrawAppState?: AppState;
   private lastBroadcastedOrReceivedSceneVersion: number = -1;
@@ -83,7 +81,6 @@ class CollabWrapper extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      isLoading: false,
       isCollaborating: false,
       modalIsShown: false,
       errorMessage: "",
@@ -91,12 +88,10 @@ class CollabWrapper extends PureComponent<Props, State> {
       activeRoomLink: "",
     };
     this.portal = new Portal(this);
-    this.unmounted = false;
     this.excalidrawRef = props.excalidrawRef;
   }
 
   componentDidMount() {
-    this.unmounted = true;
     window.addEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
     window.addEventListener(EVENT.UNLOAD, this.onUnload);
 
@@ -115,7 +110,6 @@ class CollabWrapper extends PureComponent<Props, State> {
   }
 
   componentWillUnmount() {
-    this.unmounted = true;
     window.removeEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
     window.removeEventListener(EVENT.UNLOAD, this.onUnload);
   }
@@ -170,7 +164,7 @@ class CollabWrapper extends PureComponent<Props, State> {
       elements,
       commitToHistory: true,
     });
-    this.initializeSocketClient({ showLoadingState: false });
+    return this.initializeSocketClient();
   };
 
   closePortal = () => {
@@ -191,9 +185,7 @@ class CollabWrapper extends PureComponent<Props, State> {
     this.portal.close();
   };
 
-  private initializeSocketClient = async (opts: {
-    showLoadingState: boolean;
-  }): Promise<ImportedDataState | null> => {
+  private initializeSocketClient = async (): Promise<ImportedDataState | null> => {
     if (this.portal.socket) {
       return null;
     }
@@ -292,7 +284,6 @@ class CollabWrapper extends PureComponent<Props, State> {
       this.setState({
         isCollaborating: true,
         activeRoomLink: window.location.href,
-        isLoading: opts.showLoadingState ? true : this.state.isLoading,
       });
 
       return scenePromise;
@@ -304,9 +295,6 @@ class CollabWrapper extends PureComponent<Props, State> {
   private initializeSocket = () => {
     this.portal.socketInitialized = true;
     clearTimeout(this.socketInitializationTimer);
-    if (this.state.isLoading && !this.unmounted) {
-      this.setState({ isLoading: false });
-    }
   };
 
   private reconcileElements = (

@@ -140,9 +140,7 @@ const initializeScene = async (opts: {
     // when joining a room we don't want user's local scene data to be merged
     //  into the remote scene
     opts.resetScene();
-    const scenePromise = opts.initializeSocketClient({
-      showLoadingState: true,
-    });
+    const scenePromise = opts.initializeSocketClient();
 
     try {
       const [, roomID, roomKey] = getCollaborationLinkData(
