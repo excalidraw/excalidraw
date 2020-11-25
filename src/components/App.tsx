@@ -261,7 +261,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   rc: RoughCanvas | null = null;
   unmounted: boolean = false;
   actionManager: ActionManager;
-  private excalidrawRef: any;
+  private excalidrawContainerRef = React.createRef<HTMLDivElement>();
 
   public static defaultProps: Partial<ExcalidrawProps> = {
     width: window.innerWidth,
@@ -312,7 +312,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
     this.scene = new Scene();
 
-    this.excalidrawRef = React.createRef();
     this.actionManager = new ActionManager(
       this.syncActionResult,
       () => this.state,
@@ -342,7 +341,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     return (
       <div
         className="excalidraw"
-        ref={this.excalidrawRef}
+        ref={this.excalidrawContainerRef}
         style={{
           width: canvasDOMWidth,
           height: canvasDOMHeight,
@@ -3656,8 +3655,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         offsetTop: offsets.offsetTop,
       };
     }
-    if (this.excalidrawRef?.current) {
-      const parentElement = this.excalidrawRef.current.parentElement;
+    if (this.excalidrawContainerRef?.current?.parentElement) {
+      const parentElement = this.excalidrawContainerRef.current.parentElement;
       const { left, top } = parentElement.getBoundingClientRect();
       return {
         offsetLeft:
