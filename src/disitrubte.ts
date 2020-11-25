@@ -7,6 +7,10 @@ interface Box {
   minY: number;
   maxX: number;
   maxY: number;
+  midX: number;
+  midY: number;
+  width: number;
+  height: number;
 }
 
 export interface Distribution {
@@ -18,22 +22,62 @@ export const distributeElements = (
   selectedElements: ExcalidrawElement[],
   distribution: Distribution,
 ): ExcalidrawElement[] => {
-  const start = distribution.axis === "x" ? "minX" : "minY";
-  const extent = distribution.axis === "x" ? "width" : "height";
+  const [start, mid, end, extent] =
+    distribution.axis === "x"
+      ? (["minX", "midX", "maxX", "width"] as const)
+      : (["minY", "midY", "maxY", "height"] as const);
 
-  const selectionBoundingBox = getCommonBoundingBox(selectedElements);
-
+  const bounds = getCommonBoundingBox(selectedElements);
   const groups = getMaximumGroups(selectedElements)
     .map((group) => [group, getCommonBoundingBox(group)] as const)
-    .sort((a, b) => a[1][start] - b[1][start]);
+    .sort((a, b) => a[1][mid] - b[1][mid]);
 
   let span = 0;
   for (const group of groups) {
     span += group[1][extent];
   }
 
-  const step = (selectionBoundingBox[extent] - span) / (groups.length - 1);
-  let pos = selectionBoundingBox[start];
+  const step = (bounds[extent] - span) / (groups.length - 1);
+
+  if (step < 0) {
+    // If we have a negative step, we'll need to distribute from centers
+    // rather than from gaps. Buckle up, this is a weird one.
+
+    // Get indices of boxes that define start and end of our bounding box
+    const i0 = groups.findIndex((g) => g[1][start] === bounds[start]);
+    const i1 = groups.findIndex((g) => g[1][end] === bounds[end]);
+
+    // Get our step, based on the distance between the center points of our
+    // start and end boxes
+    const step =
+      (groups[i1][1][mid] - groups[i0][1][mid]) / (groups.length - 1);
+
+    let pos = groups[i0][1][mid];
+
+    return groups.flatMap(([group, box], i) => {
+      const translation = {
+        x: 0,
+        y: 0,
+      };
+
+      // Don't move our start and end boxes
+      if (i !== i0 && i !== i1) {
+        pos += step;
+        translation[distribution.axis] = pos - box[mid];
+      }
+
+      return group.map((element) =>
+        newElementWith(element, {
+          x: element.x + translation.x,
+          y: element.y + translation.y,
+        }),
+      );
+    });
+  }
+
+  // Distribute from gaps
+
+  let pos = bounds[start];
 
   return groups.flatMap(([group, box]) => {
     const translation = {
@@ -41,17 +85,15 @@ export const distributeElements = (
       y: 0,
     };
 
-    if (Math.abs(pos - box[start]) >= 1e-6) {
-      translation[distribution.axis] = pos - box[start];
-    }
+    translation[distribution.axis] = pos - box[start];
 
-    pos += box[extent];
     pos += step;
+    pos += box[extent];
 
     return group.map((element) =>
       newElementWith(element, {
-        x: Math.round(element.x + translation.x),
-        y: Math.round(element.y + translation.y),
+        x: element.x + translation.x,
+        y: element.y + translation.y,
       }),
     );
   });
@@ -79,9 +121,16 @@ export const getMaximumGroups = (
   return Array.from(groups.values());
 };
 
-const getCommonBoundingBox = (
-  elements: ExcalidrawElement[],
-): Box & { width: number; height: number } => {
+const getCommonBoundingBox = (elements: ExcalidrawElement[]): Box => {
   const [minX, minY, maxX, maxY] = getCommonBounds(elements);
-  return { minX, minY, maxX, maxY, width: maxX - minX, height: maxY - minY };
+  return {
+    minX,
+    minY,
+    maxX,
+    maxY,
+    width: maxX - minX,
+    height: maxY - minY,
+    midX: (minX + maxX) / 2,
+    midY: (minY + maxY) / 2,
+  };
 };
