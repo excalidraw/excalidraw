@@ -206,7 +206,7 @@ class CollabWrapper extends PureComponent<Props, State> {
       const roomKey = roomMatch[2];
 
       // fallback in case you're not alone in the room but still don't receive
-      //  initial SCENE_UPDATE message
+      // initial SCENE_UPDATE message
       this.socketInitializationTimer = setTimeout(() => {
         this.initializeSocket();
         scenePromise.resolve(null);
