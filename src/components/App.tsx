@@ -3699,6 +3699,7 @@ if (
 
   Object.defineProperties(window.h, {
     elements: {
+      configurable: true,
       get() {
         return this.app.scene.getElementsIncludingDeleted();
       },
@@ -3707,9 +3708,11 @@ if (
       },
     },
     history: {
+      configurable: true,
       get: () => history,
     },
     library: {
+      configurable: true,
       value: Library,
     },
   });
