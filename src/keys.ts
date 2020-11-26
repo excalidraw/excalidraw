@@ -17,6 +17,7 @@ export const KEYS = {
   ALT_KEY_CODE: 18,
   Z_KEY_CODE: 90,
   GRID_KEY_CODE: 222,
+  H_KEY_CODE: 72,
   G_KEY_CODE: 71,
   C_KEY_CODE: 67,
   V_KEY_CODE: 86,

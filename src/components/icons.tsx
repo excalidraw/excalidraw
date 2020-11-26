@@ -3,6 +3,9 @@
 // Icons are under the license https://fontawesome.com/license
 //
 
+// Note: when adding new icons, review https://developer.mozilla.org/en-US/docs/Mozilla/Developer_guide/RTL_Guidelines
+// to determine whether or not the icons should be mirrored in right-to-left languages.
+
 import React from "react";
 
 import oc from "open-color";
@@ -15,9 +18,11 @@ const iconFillColor = (appearance: "light" | "dark") =>
 const handlerColor = (appearance: "light" | "dark") =>
   appearance === "light" ? oc.white : "#1e1e1e";
 
-type Opts = { width?: number; height?: number; mirror?: true } & React.SVGProps<
-  SVGSVGElement
->;
+type Opts = {
+  width?: number;
+  height?: number;
+  mirror?: true;
+} & React.SVGProps<SVGSVGElement>;
 
 const createIcon = (d: string | React.ReactNode, opts: number | Opts = 512) => {
   const { width = 512, height = width, mirror, style } =
@@ -87,7 +92,6 @@ export const zoomOut = createIcon(
 
 export const done = createIcon(
   "M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z",
-  { mirror: true },
 );
 
 export const menu = createIcon(
@@ -133,7 +137,7 @@ export const BringForwardIcon = React.memo(
           strokeWidth="2"
         />
       </>,
-      { width: 24 },
+      { width: 24, mirror: true },
     ),
 );
 
@@ -154,7 +158,7 @@ export const SendBackwardIcon = React.memo(
           strokeWidth="2"
         />
       </>,
-      { width: 24 },
+      { width: 24, mirror: true },
     ),
 );
 
@@ -175,7 +179,7 @@ export const BringToFrontIcon = React.memo(
           strokeWidth="2"
         />
       </>,
-      { width: 24 },
+      { width: 24, mirror: true },
     ),
 );
 
@@ -198,12 +202,15 @@ export const SendToBackIcon = React.memo(
           strokeWidth="2"
         />
       </>,
-      { width: 24 },
+      { width: 24, mirror: true },
     ),
 );
 
 //
 // Align action icons created from scratch to match those of z-index actions
+// Note: vertical align icons are flipped so the larger item is always the
+// first one the user sees. Horizontal align icons should not be flipped since
+// that would make them lie about their function.
 //
 export const AlignTopIcon = React.memo(
   ({ appearance }: { appearance: "light" | "dark" }) =>
@@ -223,7 +230,7 @@ export const AlignTopIcon = React.memo(
           strokeWidth="2"
         />
       </>,
-      { width: 24 },
+      { width: 24, mirror: true },
     ),
 );
 
@@ -245,7 +252,7 @@ export const AlignBottomIcon = React.memo(
           strokeWidth="2"
         />
       </>,
-      { width: 24 },
+      { width: 24, mirror: true },
     ),
 );
 
@@ -293,6 +300,58 @@ export const AlignRightIcon = React.memo(
     ),
 );
 
+export const DistributeHorizontallyIcon = React.memo(
+  ({ appearance }: { appearance: "light" | "dark" }) =>
+    createIcon(
+      <>
+        <path d="M5 5V19Z" fill="black" />
+        <path
+          d="M19 5V19M5 5V19"
+          stroke={iconFillColor(appearance)}
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+        <path
+          d="M15 9C15.554 9 16 9.446 16 10V14C16 14.554 15.554 15 15 15H9C8.446 15 8 14.554 8 14V10C8 9.446 8.446 9 9 9H15Z"
+          fill={activeElementColor(appearance)}
+          stroke={activeElementColor(appearance)}
+          strokeWidth="2"
+        />
+      </>,
+      { width: 24 },
+    ),
+);
+
+<svg
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+></svg>;
+
+export const DistributeVerticallyIcon = React.memo(
+  ({ appearance }: { appearance: "light" | "dark" }) =>
+    createIcon(
+      <>
+        <path
+          d="M5 5L19 5M5 19H19"
+          fill={iconFillColor(appearance)}
+          stroke={iconFillColor(appearance)}
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+        <path
+          d="M15 9C15.554 9 16 9.446 16 10V14C16 14.554 15.554 15 15 15H9C8.446 15 8 14.554 8 14V10C8 9.446 8.446 9 9 9H15Z"
+          fill={activeElementColor(appearance)}
+          stroke={activeElementColor(appearance)}
+          strokeWidth="2"
+        />
+      </>,
+      { width: 24 },
+    ),
+);
+
 export const CenterVerticallyIcon = React.memo(
   ({ appearance }: { appearance: "light" | "dark" }) =>
     createIcon(
@@ -312,7 +371,7 @@ export const CenterVerticallyIcon = React.memo(
           strokeLinecap="round"
         />
       </>,
-      { width: 24 },
+      { width: 24, mirror: true },
     ),
 );
 
@@ -344,6 +403,7 @@ export const users = createIcon(
   { width: 640, height: 512, mirror: true },
 );
 
+// not mirrored because it's inspired by a playback control, which is always RTL
 export const start = createIcon(
   "M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm115.7 272l-176 101c-15.8 8.8-35.7-2.5-35.7-21V152c0-18.4 19.8-29.8 35.7-21l176 107c16.4 9.2 16.4 32.9 0 42z",
 );
@@ -426,7 +486,7 @@ export const GroupIcon = React.memo(
           strokeWidth="6"
         />
       </>,
-      { width: 182, height: 182 },
+      { width: 182, height: 182, mirror: true },
     ),
 );
 
@@ -501,7 +561,7 @@ export const UngroupIcon = React.memo(
           strokeWidth="6"
         />
       </>,
-      { width: 182, height: 182 },
+      { width: 182, height: 182, mirror: true },
     ),
 );
 
@@ -618,7 +678,7 @@ export const SloppinessArchitectIcon = React.memo(
         strokeWidth={2}
         fill="none"
       />,
-      { width: 40, height: 20 },
+      { width: 40, height: 20, mirror: true },
     ),
 );
 
@@ -631,7 +691,7 @@ export const SloppinessArtistIcon = React.memo(
         strokeWidth={2}
         fill="none"
       />,
-      { width: 40, height: 20 },
+      { width: 40, height: 20, mirror: true },
     ),
 );
 
@@ -652,7 +712,7 @@ export const SloppinessCartoonistIcon = React.memo(
           fill="none"
         />
       </>,
-      { width: 40, height: 20 },
+      { width: 40, height: 20, mirror: true },
     ),
 );
 
@@ -665,7 +725,7 @@ export const EdgeSharpIcon = React.memo(
         strokeWidth={2}
         fill="none"
       />,
-      { width: 40, height: 20 },
+      { width: 40, height: 20, mirror: true },
     ),
 );
 
@@ -678,6 +738,6 @@ export const EdgeRoundIcon = React.memo(
         strokeWidth={2}
         fill="none"
       />,
-      { width: 40, height: 20 },
+      { width: 40, height: 20, mirror: true },
     ),
 );

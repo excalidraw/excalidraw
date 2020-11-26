@@ -81,7 +81,9 @@
     "alignLeft": "Justera vänster",
     "alignRight": "Justera höger",
     "centerVertically": "Centrera vertikalt",
-    "centerHorizontally": "Centrera horisontellt"
+    "centerHorizontally": "Centrera horisontellt",
+    "distributeHorizontally": "Fördela horisontellt",
+    "distributeVertically": "Fördela vertikalt"
   },
   "buttons": {
     "clearReset": "Återställ canvasen",

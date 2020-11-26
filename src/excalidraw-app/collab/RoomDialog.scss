@@ -10,7 +10,7 @@
     color: var(--text-color-primary);
     min-width: 0;
     flex: 1 1 auto;
-    margin-left: 1em;
+    margin-inline-start: 1em;
     display: inline-block;
     cursor: pointer;
     border: none;
@@ -40,7 +40,7 @@
     appearance: none;
     min-width: 0;
     flex: 1 1 auto;
-    margin-left: 1em;
+    margin-inline-start: 1em;
     height: 2.5rem;
     font-size: 1em;
     line-height: 1.5;
