@@ -1546,6 +1546,21 @@ describe("regression tests", () => {
     });
     assertSelectedElements(rect3);
   });
+
+  it("should show fill icons when element has non transparent background", async () => {
+    UI.clickTool("rectangle");
+    expect(screen.queryByText(/fill/i)).not.toBeNull();
+    mouse.down();
+    mouse.up(10, 10);
+    expect(screen.queryByText(/fill/i)).toBeNull();
+
+    clickLabeledElement("Background");
+    clickLabeledElement("#fa5252");
+    // select rectangle
+    mouse.reset();
+    mouse.click();
+    expect(screen.queryByText(/fill/i)).not.toBeNull();
+  });
 });
 
 it(
