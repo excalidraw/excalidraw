@@ -83,7 +83,7 @@
     "centerVertically": "وسط قرار دادن به صورت عمودی",
     "centerHorizontally": "وسط قرار دادن به صورت افقی",
     "distributeHorizontally": "توزیع کردن به صورت افقی",
-    "distributeVertically": ""
+    "distributeVertically": "توزیع کردن به صورت عمودی"
   },
   "buttons": {
     "clearReset": "پاکسازی بوم نقاشی",
@@ -118,7 +118,7 @@
   "alerts": {
     "clearReset": "این کار کل صفحه را پاک میکند. آیا مطمئنید؟",
     "couldNotCreateShareableLink": "عدم توانایی در ساخت یک لینک قابل اشتراک.",
-    "couldNotCreateShareableLinkTooBig": "",
+    "couldNotCreateShareableLinkTooBig": "لینک قابل اشتراک گذاری ایجاد نشد: محتوای صحنه بسیار بزرگ است",
     "couldNotLoadInvalidFile": "عدم توانایی در بازگذاری فایل نامعتبر",
     "importBackendFailed": "بارگیری از پشت صحنه با شکست مواجه شد.",
     "cannotExportEmptyCanvas": "بوم خالی قابل تبدیل نیست.",
@@ -126,7 +126,7 @@
     "decryptFailed": "رمزگشایی داده ها امکان پذیر نیست.",
     "uploadedSecurly": "آپلود با رمزگذاری دو طرفه انجام میشود، به این معنی که سرور Excalidraw و اشخاص ثالث نمی توانند مطالب شما را بخوانند.",
     "loadSceneOverridePrompt": "بارگزاری یک طرح خارجی محتوای فعلی رو از بین میبرد. آیا میخواهید ادامه دهید؟",
-    "errorLoadingLibrary": "",
+    "errorLoadingLibrary": "خطایی در بارگذاری کتابخانه ثالث وجود داشت.",
     "confirmAddLibrary": "{{numShapes}} از اشکال به کتابخانه شما اضافه خواهد شد. مطمئن هستید؟",
     "imageDoesNotContainScene": "فایل تصویر دارای محتوای صحنه نیست. آیا در هنگام خروجی گرفتن آن را فعال کرده‌اید؟",
     "cannotRestoreFromImage": "صحنه را نمی توان از این فایل تصویری بازیابی کرد"
