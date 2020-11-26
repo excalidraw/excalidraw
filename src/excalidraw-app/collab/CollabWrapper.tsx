@@ -358,13 +358,6 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     return this.excalidrawRef.current!.getSceneElementsIncludingDeleted();
   };
 
-  onSceneBroadCast = (
-    syncableElements: ExcalidrawElement[],
-    syncAll: boolean,
-  ) => {
-    this.portal.broadcastScene(SCENE.UPDATE, syncableElements, syncAll);
-  };
-
   onPointerUpdate = (payload: {
     pointer: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointer"];
     button: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["button"];
@@ -384,14 +377,19 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       getSceneVersion(elements) >
       this.getLastBroadcastedOrReceivedSceneVersion()
     ) {
-      this.onSceneBroadCast(getSyncableElements(elements), false);
+      this.portal.broadcastScene(
+        SCENE.UPDATE,
+        getSyncableElements(elements),
+        false,
+      );
       this.lastBroadcastedOrReceivedSceneVersion = getSceneVersion(elements);
       this.queueBroadcastAllElements();
     }
   };
 
   queueBroadcastAllElements = throttle(() => {
-    this.onSceneBroadCast(
+    this.portal.broadcastScene(
+      SCENE.UPDATE,
       getSyncableElements(
         this.excalidrawRef.current!.getSceneElementsIncludingDeleted(),
       ),
