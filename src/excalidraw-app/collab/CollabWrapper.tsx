@@ -67,7 +67,7 @@ interface Props {
 
 class CollabWrapper extends PureComponent<Props, CollabState> {
   portal: Portal;
-  private socketInitializationTimer: any;
+  private socketInitializationTimer?: NodeJS.Timeout;
   private excalidrawRef: Props["excalidrawRef"];
   excalidrawAppState?: AppState;
   private lastBroadcastedOrReceivedSceneVersion: number = -1;
@@ -289,7 +289,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
   private initializeSocket = () => {
     this.portal.socketInitialized = true;
-    clearTimeout(this.socketInitializationTimer);
+    clearTimeout(this.socketInitializationTimer!);
   };
 
   private reconcileElements = (
