@@ -210,12 +210,12 @@ const LibraryMenu = ({
   setAppState: React.Component<any, AppState>["setState"];
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
-  useOnClickOutside(ref, (ev) => {
+  useOnClickOutside(ref, (event) => {
     // If click on the library icon, do nothing.
-    if ((ev.target as Element).closest(".ToolIcon_type_button__library")) {
+    if ((event.target as Element).closest(".ToolIcon_type_button__library")) {
       return;
     }
-    onClickOutside(ev);
+    onClickOutside(event);
   });
 
   const [libraryItems, setLibraryItems] = useState<LibraryItems>([]);
