@@ -729,8 +729,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         prevProps.offsetTop !== this.props.offsetTop)
     ) {
       this.setState({
-        width: this.props.width || window.innerWidth,
-        height: this.props.height || window.innerHeight,
+        width: this.props.width ?? window.innerWidth,
+        height: this.props.height ?? window.innerHeight,
         ...this.getCanvasOffsets(this.props),
       });
     }
