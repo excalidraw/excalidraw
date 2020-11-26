@@ -82,8 +82,8 @@
     "alignRight": "Aligner à droite",
     "centerVertically": "Centrer verticalement",
     "centerHorizontally": "Centrer horizontalement",
-    "distributeHorizontally": "",
-    "distributeVertically": ""
+    "distributeHorizontally": "Répartir horizontalement",
+    "distributeVertically": "Répartir verticalement"
   },
   "buttons": {
     "clearReset": "Effacer le canvas & réinitialiser la couleur d'arrière-plan",
