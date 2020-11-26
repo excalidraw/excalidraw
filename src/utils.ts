@@ -295,13 +295,11 @@ export const findLastIndex = <T>(
 };
 
 export const isTransparent = (color: string) => {
-  // #RGB0
-  if (color.length === 5 && color.substr(4, 1) === "0") {
-    return true;
-  }
-  // #RRGGBB00
-  if (color.length === 9 && color.substr(7, 2) === "00") {
-    return true;
-  }
-  return color === colors.elementBackground[0];
+  const isRGBTransparent = color.length === 5 && color.substr(4, 1) === "0";
+  const isRRGGBBTransparent = color.length === 9 && color.substr(7, 2) === "00";
+  return (
+    isRGBTransparent ||
+    isRRGGBBTransparent ||
+    color === colors.elementBackground[0]
+  );
 };
