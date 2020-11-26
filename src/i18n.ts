@@ -37,7 +37,6 @@ const allLanguages: Language[] = [
   { lng: "ar-SA", label: "العربية", rtl: true },
   { lng: "he-IL", label: "עברית", rtl: true },
   { lng: "hi-IN", label: "हिन्दी" },
-  { lng: "gl-ES", label: "Galego" },
   { lng: "ro-RO", label: "Română" },
   { lng: "sv-SE", label: "Svenska" },
   { lng: "sk-SK", label: "Slovenčina" },
