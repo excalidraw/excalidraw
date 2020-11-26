@@ -12,11 +12,7 @@ import {
 import { t } from "../i18n";
 import { SHAPES } from "../shapes";
 import { ToolButton } from "./ToolButton";
-import {
-  capitalizeString,
-  isBackgroundTransparent,
-  setCursorForShape,
-} from "../utils";
+import { capitalizeString, isTransparent, setCursorForShape } from "../utils";
 import Stack from "./Stack";
 import useIsMobile from "../is-mobile";
 import { getNonDeletedElements } from "../element";
@@ -48,7 +44,7 @@ export const SelectedShapeActions = ({
           {renderAction("changeBackgroundColor")}
 
           {targetElements.some(
-            (element) => !isBackgroundTransparent(element.backgroundColor),
+            (element) => !isTransparent(element.backgroundColor),
           ) && renderAction("changeFillStyle")}
         </>
       )}

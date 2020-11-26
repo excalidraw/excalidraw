@@ -96,7 +96,3 @@ export const STORAGE_KEYS = {
   LOCAL_STORAGE_COLLAB: "excalidraw-collab",
   LOCAL_STORAGE_LIBRARY: "excalidraw-library",
 };
-
-export const BACKGROUND_COLORS = {
-  TRANSPARENT: "transparent",
-};

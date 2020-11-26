@@ -1,11 +1,11 @@
-import { Zoom } from "./types";
+import colors from "./colors";
 import {
-  BACKGROUND_COLORS,
   CURSOR_TYPE,
   FONT_FAMILY,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 import { FontFamily, FontString } from "./element/types";
+import { Zoom } from "./types";
 
 export const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -294,5 +294,14 @@ export const findLastIndex = <T>(
   return -1;
 };
 
-export const isBackgroundTransparent = (backgroundColor: string) =>
-  backgroundColor === BACKGROUND_COLORS.TRANSPARENT;
+export const isTransparent = (color: string) => {
+  // #RGB0
+  if (color.length === 5 && color.substr(4, 1) === "0") {
+    return true;
+  }
+  // #RRGGBB00
+  if (color.length === 9 && color.substr(7, 2) === "00") {
+    return true;
+  }
+  return color === colors.elementBackground[0];
+};
