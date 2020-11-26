@@ -161,7 +161,7 @@
   },
   "canvasError": {
     "cannotShowPreview": "پیش نمایش نشان داده نمی شود",
-    "canvasTooBig": "",
+    "canvasTooBig": "بوم نقاشی بسیار بزرگ است.",
     "canvasTooBigTip": ""
   },
   "errorSplash": {
