@@ -1547,7 +1547,7 @@ describe("regression tests", () => {
     assertSelectedElements(rect3);
   });
 
-  it("should show fill icons when element has non transparent background", async () => {
+  it("should show fill icons when element has non transparent background", () => {
     UI.clickTool("rectangle");
     expect(screen.queryByText(/fill/i)).not.toBeNull();
     mouse.down();
