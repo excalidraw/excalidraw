@@ -45,7 +45,7 @@ interface CollabState {
 type CollabInstance = InstanceType<typeof CollabWrapper>;
 
 export interface CollabAPI {
-  roomId: Portal["roomID"];
+  roomID: Portal["roomID"];
   isCollaborating: CollabState["isCollaborating"];
   username: CollabState["username"];
   onPointerUpdate: CollabInstance["onPointerUpdate"];
@@ -448,7 +448,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
           />
         )}
         {children({
-          roomId: this.portal.roomID,
+          roomID: this.portal.roomID,
           isCollaborating: this.state.isCollaborating,
           username: this.state.username,
           onPointerUpdate: this.onPointerUpdate,

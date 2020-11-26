@@ -246,13 +246,13 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
 
   useEffect(() => {
     const beforeUnload = withBatchedUpdates(() => {
-      if (collab.isCollaborating || collab.roomId) {
+      if (collab.isCollaborating || collab.roomID) {
         try {
           localStorage?.setItem(
             STORAGE_KEYS.LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
             JSON.stringify({
               timestamp: Date.now(),
-              room: collab.roomId,
+              room: collab.roomID,
             }),
           );
         } catch {}
@@ -262,7 +262,7 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
     return () => {
       window.removeEventListener(EVENT.BEFORE_UNLOAD, beforeUnload);
     };
-  }, [collab.isCollaborating, collab.roomId]);
+  }, [collab.isCollaborating, collab.roomID]);
 
   const onChange = (
     elements: readonly ExcalidrawElement[],
