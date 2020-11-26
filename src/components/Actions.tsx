@@ -184,7 +184,7 @@ export const ShapesSwitcher = ({
       );
     })}
     <ToolButton
-      className="Shape"
+      className="Shape ToolIcon_type_button__library"
       type="button"
       icon={LIBRARY_ICON}
       name="editor-library"
