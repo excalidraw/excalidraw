@@ -9,7 +9,7 @@ import {
 } from "./data/localStorage";
 
 import { ImportedDataState } from "../data/types";
-import CollabWrapper, { CollabContext } from "./collab/CollabWrapper";
+import CollabWrapper, { CollabAPI } from "./collab/CollabWrapper";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
 import { t } from "../i18n";
 import { loadScene } from "./data";
@@ -87,7 +87,7 @@ type Scene = ImportedDataState & { commitToHistory: boolean };
 
 const initializeScene = async (opts: {
   resetScene: ExcalidrawImperativeAPI["resetScene"];
-  initializeSocketClient: CollabContext["initializeSocketClient"];
+  initializeSocketClient: CollabAPI["initializeSocketClient"];
   onLateInitialization?: (scene: Scene) => void;
 }): Promise<Scene | null> => {
   const searchParams = new URLSearchParams(window.location.search);
@@ -170,7 +170,7 @@ const initializeScene = async (opts: {
   return null;
 };
 
-function ExcalidrawWrapper(props: { collab: CollabContext }) {
+function ExcalidrawWrapper(props: { collab: CollabAPI }) {
   // dimensions
   // ---------------------------------------------------------------------------
 
@@ -297,9 +297,7 @@ export default function ExcalidrawApp() {
           excalidrawRef as React.MutableRefObject<ExcalidrawImperativeAPI>
         }
       >
-        {(collab: CollabContext) => {
-          return <ExcalidrawWrapper collab={collab} />;
-        }}
+        {(collab) => <ExcalidrawWrapper collab={collab} />}
       </CollabWrapper>
     </TopErrorBoundary>
   );

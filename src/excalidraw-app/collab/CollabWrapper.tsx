@@ -34,7 +34,7 @@ import {
   SYNC_FULL_SCENE_INTERVAL_MS,
 } from "../app_constants";
 
-interface State {
+interface CollabState {
   isCollaborating: boolean;
   modalIsShown: boolean;
   errorMessage: string;
@@ -42,22 +42,16 @@ interface State {
   activeRoomLink: string;
 }
 
-export interface CollabContext {
-  roomId: string | null;
-  isCollaborating: State["isCollaborating"];
-  onPointerUpdate: InstanceType<typeof CollabWrapper>["onPointerUpdate"];
-  initializeSocketClient: InstanceType<
-    typeof CollabWrapper
-  >["initializeSocketClient"];
-  username: State["username"];
-  onCollabButtonClick: InstanceType<
-    typeof CollabWrapper
-  >["onCollabButtonClick"];
+type CollabInstance = InstanceType<typeof CollabWrapper>;
 
-  broadcastElements: (
-    elements: readonly ExcalidrawElement[],
-    appState: AppState,
-  ) => void;
+export interface CollabAPI {
+  roomId: Portal["roomID"];
+  isCollaborating: CollabState["isCollaborating"];
+  username: CollabState["username"];
+  onPointerUpdate: CollabInstance["onPointerUpdate"];
+  initializeSocketClient: CollabInstance["initializeSocketClient"];
+  onCollabButtonClick: CollabInstance["onCollabButtonClick"];
+  broadcastElements: CollabInstance["broadcastElements"];
 }
 
 type ReconciledElements = readonly ExcalidrawElement[] & {
@@ -65,12 +59,13 @@ type ReconciledElements = readonly ExcalidrawElement[] & {
 };
 
 interface Props {
+  children: (collab: CollabAPI) => React.ReactNode;
   // NOTE not type-safe because the refObject may in fact not be initialized
   // with ExcalidrawImperativeAPI yet
   excalidrawRef: React.MutableRefObject<ExcalidrawImperativeAPI>;
 }
 
-class CollabWrapper extends PureComponent<Props, State> {
+class CollabWrapper extends PureComponent<Props, CollabState> {
   portal: Portal;
   private socketInitializationTimer: any;
   private excalidrawRef: Props["excalidrawRef"];
@@ -427,23 +422,10 @@ class CollabWrapper extends PureComponent<Props, State> {
     });
   };
 
-  getValue() {
-    return {
-      isCollaborating: this.state.isCollaborating,
-      onPointerUpdate: this.onPointerUpdate,
-      initializeSocketClient: this.initializeSocketClient,
-      username: this.state.username,
-      onCollabButtonClick: this.onCollabButtonClick,
-      roomId: this.portal.roomID,
-      broadcastElements: this.broadcastElements,
-    };
-  }
-
   render() {
-    const { children } = (this.props as unknown) as {
-      children: (context: any) => any;
-    };
+    const { children } = this.props;
     const { modalIsShown, username, errorMessage, activeRoomLink } = this.state;
+
     return (
       <>
         {modalIsShown && (
@@ -465,7 +447,15 @@ class CollabWrapper extends PureComponent<Props, State> {
             onClose={() => this.setState({ errorMessage: "" })}
           />
         )}
-        {children(this.getValue())}
+        {children({
+          roomId: this.portal.roomID,
+          isCollaborating: this.state.isCollaborating,
+          username: this.state.username,
+          onPointerUpdate: this.onPointerUpdate,
+          initializeSocketClient: this.initializeSocketClient,
+          onCollabButtonClick: this.onCollabButtonClick,
+          broadcastElements: this.broadcastElements,
+        })}
       </>
     );
   }
