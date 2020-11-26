@@ -128,8 +128,8 @@
     "loadSceneOverridePrompt": "بارگزاری یک طرح خارجی محتوای فعلی رو از بین میبرد. آیا میخواهید ادامه دهید؟",
     "errorLoadingLibrary": "",
     "confirmAddLibrary": "",
-    "imageDoesNotContainScene": "",
-    "cannotRestoreFromImage": ""
+    "imageDoesNotContainScene": "فایل تصویر دارای محتوای صحنه نیست. آیا در هنگام خروجی گرفتن آن را فعال کرده‌اید؟",
+    "cannotRestoreFromImage": "صحنه را نمی توان از این فایل تصویری بازیابی کرد"
   },
   "toolBar": {
     "selection": "گزینش",
@@ -160,7 +160,7 @@
     "lineEditor_nothingSelected": "یک نقطه را برای جابجایی یا حذف انتخاب کنید یا کلید Alt بگیرید و کلیک کنید تا بتوانید یک نقطه جدید اضافه کنید"
   },
   "canvasError": {
-    "cannotShowPreview": "",
+    "cannotShowPreview": "پیش نمایش نشان داده نمی شود",
     "canvasTooBig": "",
     "canvasTooBigTip": ""
   },
