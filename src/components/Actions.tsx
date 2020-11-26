@@ -34,20 +34,20 @@ export const SelectedShapeActions = ({
   );
   const isEditing = Boolean(appState.editingElement);
   const isMobile = useIsMobile();
-
+  const showFillIcons =
+    hasBackground(elementType) ||
+    targetElements.some(
+      (element) =>
+        hasBackground(element.type) && !isTransparent(element.backgroundColor),
+    );
+  const showChangeBackgroundIcons =
+    hasBackground(elementType) ||
+    targetElements.some((element) => hasBackground(element.type));
   return (
     <div className="panelColumn">
       {renderAction("changeStrokeColor")}
-      {(hasBackground(elementType) ||
-        targetElements.some((element) => hasBackground(element.type))) && (
-        <>
-          {renderAction("changeBackgroundColor")}
-
-          {targetElements.some(
-            (element) => !isTransparent(element.backgroundColor),
-          ) && renderAction("changeFillStyle")}
-        </>
-      )}
+      {showChangeBackgroundIcons && renderAction("changeBackgroundColor")}
+      {showFillIcons && renderAction("changeFillStyle")}
 
       {(hasStroke(elementType) ||
         targetElements.some((element) => hasStroke(element.type))) && (
