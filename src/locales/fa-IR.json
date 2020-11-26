@@ -162,7 +162,7 @@
   "canvasError": {
     "cannotShowPreview": "پیش نمایش نشان داده نمی شود",
     "canvasTooBig": "بوم نقاشی بسیار بزرگ است.",
-    "canvasTooBigTip": ""
+    "canvasTooBigTip": "نکته: سعی کنید دورترین عناصر را کمی به همدیگر نزدیک کنید."
   },
   "errorSplash": {
     "headingMain_pre": "با مشکلی مواجه شدیم. این را امتحان کنید ",
