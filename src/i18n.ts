@@ -18,6 +18,7 @@ const allLanguages: Language[] = [
   { lng: "de-DE", label: "Deutsch" },
   { lng: "el-GR", label: "Ελληνικά" },
   { lng: "es-ES", label: "Español" },
+  { lng: "fa-IR", label: "فارسی", rtl: true },
   { lng: "fi-FI", label: "Suomi" },
   { lng: "fr-FR", label: "Français" },
   { lng: "he-IL", label: "עברית", rtl: true },
