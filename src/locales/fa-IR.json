@@ -32,8 +32,8 @@
     "fontFamily": "نوع قلم",
     "onlySelected": "فقط انتخاب شده ها",
     "withBackground": "با پس زمینه",
-    "exportEmbedScene": "",
-    "exportEmbedScene_details": "",
+    "exportEmbedScene": "قرار دادن صحنه در فایل خروجی",
+    "exportEmbedScene_details": "متحوای صحنه به فایل خروجی SVG/PNG اضافه خواهد شد برای بازیابی صحنه به آن اضافه خواهد شد.\nباعث افزایش حجم فایل خروجی میشود.",
     "addWatermark": "\"ساخته شده با Excalidraw\" را اضافه کن",
     "handDrawn": "دست نویس",
     "normal": "عادی",
@@ -75,15 +75,15 @@
     "removeFromLibrary": "حذف از کتابخانه",
     "libraryLoadingMessage": "بارگذاری کتابخانه...",
     "loadingScene": "باگذاری صحنه...",
-    "align": "",
-    "alignTop": "",
-    "alignBottom": "",
-    "alignLeft": "",
-    "alignRight": "",
-    "centerVertically": "",
-    "centerHorizontally": "",
-    "distributeHorizontally": "",
-    "distributeVertically": ""
+    "align": "تراز",
+    "alignTop": "تراز به بالا",
+    "alignBottom": "تراز به پایین",
+    "alignLeft": "تراز به چپ",
+    "alignRight": "تراز به راست",
+    "centerVertically": "وسط قرار دادن به صورت عمودی",
+    "centerHorizontally": "وسط قرار دادن به صورت افقی",
+    "distributeHorizontally": "توزیع کردن به صورت افقی",
+    "distributeVertically": "توزیع کردن به صورت عمودی"
   },
   "buttons": {
     "clearReset": "پاکسازی بوم نقاشی",
@@ -92,7 +92,7 @@
     "exportToSvg": "تبدیل به SVG",
     "copyToClipboard": "کپی در حافظه موقت",
     "copyPngToClipboard": "کپی PNG در حافظه موقت",
-    "scale": "",
+    "scale": "مقیاس",
     "save": "ذخیره",
     "saveAs": "ذخیره با نام",
     "load": "بارگذاری",
@@ -118,7 +118,7 @@
   "alerts": {
     "clearReset": "این کار کل صفحه را پاک میکند. آیا مطمئنید؟",
     "couldNotCreateShareableLink": "عدم توانایی در ساخت یک لینک قابل اشتراک.",
-    "couldNotCreateShareableLinkTooBig": "",
+    "couldNotCreateShareableLinkTooBig": "لینک قابل اشتراک گذاری ایجاد نشد: محتوای صحنه بسیار بزرگ است",
     "couldNotLoadInvalidFile": "عدم توانایی در بازگذاری فایل نامعتبر",
     "importBackendFailed": "بارگیری از پشت صحنه با شکست مواجه شد.",
     "cannotExportEmptyCanvas": "بوم خالی قابل تبدیل نیست.",
@@ -126,10 +126,10 @@
     "decryptFailed": "رمزگشایی داده ها امکان پذیر نیست.",
     "uploadedSecurly": "آپلود با رمزگذاری دو طرفه انجام میشود، به این معنی که سرور Excalidraw و اشخاص ثالث نمی توانند مطالب شما را بخوانند.",
     "loadSceneOverridePrompt": "بارگزاری یک طرح خارجی محتوای فعلی رو از بین میبرد. آیا میخواهید ادامه دهید؟",
-    "errorLoadingLibrary": "",
-    "confirmAddLibrary": "",
-    "imageDoesNotContainScene": "",
-    "cannotRestoreFromImage": ""
+    "errorLoadingLibrary": "خطایی در بارگذاری کتابخانه ثالث وجود داشت.",
+    "confirmAddLibrary": "{{numShapes}} از اشکال به کتابخانه شما اضافه خواهد شد. مطمئن هستید؟",
+    "imageDoesNotContainScene": "فایل تصویر دارای محتوای صحنه نیست. آیا در هنگام خروجی گرفتن آن را فعال کرده‌اید؟",
+    "cannotRestoreFromImage": "صحنه را نمی توان از این فایل تصویری بازیابی کرد"
   },
   "toolBar": {
     "selection": "گزینش",
@@ -160,9 +160,9 @@
     "lineEditor_nothingSelected": "یک نقطه را برای جابجایی یا حذف انتخاب کنید یا کلید Alt بگیرید و کلیک کنید تا بتوانید یک نقطه جدید اضافه کنید"
   },
   "canvasError": {
-    "cannotShowPreview": "",
-    "canvasTooBig": "",
-    "canvasTooBigTip": ""
+    "cannotShowPreview": "پیش نمایش نشان داده نمی شود",
+    "canvasTooBig": "بوم نقاشی بسیار بزرگ است.",
+    "canvasTooBigTip": "نکته: سعی کنید دورترین عناصر را کمی به همدیگر نزدیک کنید."
   },
   "errorSplash": {
     "headingMain_pre": "با مشکلی مواجه شدیم. این را امتحان کنید ",
