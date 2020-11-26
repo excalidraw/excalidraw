@@ -100,7 +100,6 @@ const LibraryMenuItems = ({
 }: {
   library: LibraryItems;
   pendingElements: LibraryItem;
-  onClickOutside: (event: MouseEvent) => void;
   onRemoveFromLibrary: (index: number) => void;
   onInsertShape: (elements: LibraryItem) => void;
   onAddToLibrary: (elements: LibraryItem) => void;
@@ -211,7 +210,13 @@ const LibraryMenu = ({
   setAppState: React.Component<any, AppState>["setState"];
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
-  useOnClickOutside(ref, onClickOutside);
+  useOnClickOutside(ref, (event) => {
+    // If click on the library icon, do nothing.
+    if ((event.target as Element).closest(".ToolIcon_type_button__library")) {
+      return;
+    }
+    onClickOutside(event);
+  });
 
   const [libraryItems, setLibraryItems] = useState<LibraryItems>([]);
 
@@ -269,7 +274,6 @@ const LibraryMenu = ({
       ) : (
         <LibraryMenuItems
           library={libraryItems}
-          onClickOutside={onClickOutside}
           onRemoveFromLibrary={removeFromLibrary}
           onAddToLibrary={addToLibrary}
           onInsertShape={onInsertShape}
