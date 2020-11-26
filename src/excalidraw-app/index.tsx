@@ -17,12 +17,7 @@ import { getCollaborationLinkData } from "./data";
 import { EVENT } from "../constants";
 import { loadFromFirebase } from "./data/firebase";
 import { ExcalidrawImperativeAPI } from "../components/App";
-import {
-  debounce,
-  ResolvablePromise,
-  resolvablePromise,
-  withBatchedUpdates,
-} from "../utils";
+import { debounce, ResolvablePromise, resolvablePromise } from "../utils";
 import { AppState, ExcalidrawAPIRefValue } from "../types";
 import { ExcalidrawElement } from "../element/types";
 import { SAVE_TO_LOCAL_STORAGE_TIMEOUT } from "./app_constants";
@@ -243,26 +238,6 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
       window.removeEventListener(EVENT.BLUR, onBlur, false);
     };
   }, [collab.initializeSocketClient]);
-
-  useEffect(() => {
-    const beforeUnload = withBatchedUpdates(() => {
-      if (collab.isCollaborating || collab.roomID) {
-        try {
-          localStorage?.setItem(
-            STORAGE_KEYS.LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
-            JSON.stringify({
-              timestamp: Date.now(),
-              room: collab.roomID,
-            }),
-          );
-        } catch {}
-      }
-    });
-    window.addEventListener(EVENT.BEFORE_UNLOAD, beforeUnload);
-    return () => {
-      window.removeEventListener(EVENT.BEFORE_UNLOAD, beforeUnload);
-    };
-  }, [collab.isCollaborating, collab.roomID]);
 
   const onChange = (
     elements: readonly ExcalidrawElement[],

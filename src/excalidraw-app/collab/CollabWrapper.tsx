@@ -18,6 +18,7 @@ import { ExcalidrawElement } from "../../element/types";
 import {
   importUsernameFromLocalStorage,
   saveUsernameToLocalStorage,
+  STORAGE_KEYS,
 } from "../data/localStorage";
 import { resolvablePromise, withBatchedUpdates } from "../../utils";
 import {
@@ -45,7 +46,6 @@ interface CollabState {
 type CollabInstance = InstanceType<typeof CollabWrapper>;
 
 export interface CollabAPI {
-  roomID: Portal["roomID"];
   isCollaborating: CollabState["isCollaborating"];
   username: CollabState["username"];
   onPointerUpdate: CollabInstance["onPointerUpdate"];
@@ -128,6 +128,18 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       event.preventDefault();
       // NOTE: modern browsers no longer allow showing a custom message here
       event.returnValue = "";
+    }
+
+    if (this.state.isCollaborating || this.portal.roomID) {
+      try {
+        localStorage?.setItem(
+          STORAGE_KEYS.LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
+          JSON.stringify({
+            timestamp: Date.now(),
+            room: this.portal.roomID,
+          }),
+        );
+      } catch {}
     }
   });
 
@@ -446,7 +458,6 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
           />
         )}
         {children({
-          roomID: this.portal.roomID,
           isCollaborating: this.state.isCollaborating,
           username: this.state.username,
           onPointerUpdate: this.onPointerUpdate,
