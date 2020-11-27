@@ -4,6 +4,10 @@ import { render, fireEvent } from "./test-utils";
 import App from "../components/App";
 import * as Renderer from "../renderer/renderScene";
 import { reseed } from "../random";
+import { UI, Pointer, Keyboard } from "./helpers/ui";
+import { getTransformHandles } from "../element/transformHandles";
+
+const mouse = new Pointer("mouse");
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
@@ -57,5 +61,30 @@ describe("resize element", () => {
     expect([h.elements[0].width, h.elements[0].height]).toEqual([30, 50]);
 
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
+  });
+});
+
+describe("resize element with  s clicked", () => {
+  it("rectangle", () => {
+    render(<App />);
+
+    const rectangle = UI.createElement("rectangle", {
+      x: 0,
+      width: 50,
+      height: 100,
+    });
+
+    mouse.select(rectangle);
+
+    const se = getTransformHandles(rectangle, h.state.zoom, "mouse").se!;
+    const clientX = se[0] + se[2] / 2;
+    const clientY = se[1] + se[3] / 2;
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.reset();
+      mouse.down(clientX, clientY);
+      mouse.move(2, 50);
+      mouse.up();
+    });
+    expect([h.elements[0].width, h.elements[0].height]).toEqual([75, 150]);
   });
 });

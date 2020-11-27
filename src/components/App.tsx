@@ -173,6 +173,7 @@ import {
   shouldEnableBindingForPointerEvent,
 } from "../element/binding";
 import { MaybeTransformHandleType } from "../element/transformHandles";
+import { deepCopyElement } from "../element/newElement";
 import { renderSpreadsheet } from "../charts";
 import { isValidLibrary } from "../data/json";
 import {
@@ -226,7 +227,7 @@ export type PointerDownState = Readonly<{
   lastCoords: { x: number; y: number };
   // map of original elements data
   // (for now only a subset of props for perf reasons)
-  originalElements: Map<string, Pick<ExcalidrawElement, "x" | "y" | "angle">>;
+  originalElements: Map<string, NonDeleted<ExcalidrawElement>>;
   resize: {
     // Handle when resizing, might change during the pointer interaction
     handleType: MaybeTransformHandleType;
@@ -2515,11 +2516,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       // we need to duplicate because we'll be updating this state
       lastCoords: { ...origin },
       originalElements: this.scene.getElements().reduce((acc, element) => {
-        acc.set(element.id, {
-          x: element.x,
-          y: element.y,
-          angle: element.angle,
-        });
+        acc.set(element.id, deepCopyElement(element));
         return acc;
       }, new Map() as PointerDownState["originalElements"]),
       resize: {
@@ -3031,6 +3028,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             pointerDownState.resize.arrowDirection,
             getRotateWithDiscreteAngleKey(event),
             getResizeCenterPointKey(event),
+            getResizeWithSidesSameLengthKey(event),
             resizeX,
             resizeY,
             pointerDownState.resize.center.x,

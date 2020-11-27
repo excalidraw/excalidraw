@@ -44,6 +44,7 @@ export const transformElements = (
   resizeArrowDirection: "origin" | "end",
   isRotateWithDiscreteAngle: boolean,
   isResizeCenterPoint: boolean,
+  shouldKeepSidesRatio: boolean,
   pointerX: number,
   pointerY: number,
   centerX: number,
@@ -90,21 +91,35 @@ export const transformElements = (
       );
       updateBoundElements(element);
     } else if (transformHandleType) {
-      resizeSingleElement(
-        element,
-        transformHandleType,
-        isResizeCenterPoint,
-        pointerX,
-        pointerY,
-      );
-      setTransformHandle(
-        normalizeTransformHandleType(element, transformHandleType),
-      );
-      if (element.width < 0) {
-        mutateElement(element, { width: -element.width });
-      }
-      if (element.height < 0) {
-        mutateElement(element, { height: -element.height });
+      if (!isLinearElement(element)) {
+        resizeSingleRectDiamondEllipsesElement(
+          pointerDownState.originalElements.get(element.id)!,
+          shouldKeepSidesRatio,
+          element,
+          transformHandleType,
+          isResizeCenterPoint,
+          pointerX,
+          pointerY,
+        );
+      } else {
+        resizeSingleElement(
+          pointerDownState.originalElements.get(element.id)!,
+          shouldKeepSidesRatio,
+          element,
+          transformHandleType,
+          isResizeCenterPoint,
+          pointerX,
+          pointerY,
+        );
+        setTransformHandle(
+          normalizeTransformHandleType(element, transformHandleType),
+        );
+        if (element.width < 0) {
+          mutateElement(element, { width: -element.width });
+        }
+        if (element.height < 0) {
+          mutateElement(element, { height: -element.height });
+        }
       }
     }
 
@@ -389,7 +404,799 @@ const resizeSingleTextElement = (
   }
 };
 
+const resizeSingleRectDiamondEllipsesElement = (
+  stateAtResizeStart: NonDeletedExcalidrawElement,
+  shouldKeepSidesRatio: boolean,
+  element: NonDeletedExcalidrawElement,
+  transformHandleType: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
+  isResizeFromCenter: boolean,
+  pointerX: number,
+  pointerY: number,
+) => {
+  if (transformHandleType === "e") {
+    const center = [
+      stateAtResizeStart.x + stateAtResizeStart.width / 2,
+      stateAtResizeStart.y + stateAtResizeStart.height / 2,
+    ];
+    const rotatedPointer = rotate(
+      pointerX,
+      pointerY,
+      center[0],
+      center[1],
+      -stateAtResizeStart.angle,
+    );
+    let newWidth = rotatedPointer[0] - stateAtResizeStart.x;
+
+    const topLeft = [stateAtResizeStart.x, stateAtResizeStart.y];
+    if (isResizeFromCenter) {
+      const widthDiff = newWidth - stateAtResizeStart.width;
+      newWidth += widthDiff;
+      topLeft[0] -= widthDiff;
+    }
+
+    // Horizontal Flip
+    if (newWidth < 0) {
+      newWidth = Math.abs(newWidth);
+      topLeft[0] = topLeft[0] - newWidth;
+    }
+
+    const rotatedTopLeft = rotate(
+      topLeft[0],
+      topLeft[1],
+      center[0],
+      center[1],
+      stateAtResizeStart.angle,
+    );
+
+    const bottomRight = [
+      topLeft[0] + newWidth,
+      topLeft[1] + stateAtResizeStart.height,
+    ];
+    const rotatedBottomRight = rotate(
+      bottomRight[0],
+      bottomRight[1],
+      center[0],
+      center[1],
+      stateAtResizeStart.angle,
+    );
+
+    const newCenter = [
+      (rotatedTopLeft[0] + rotatedBottomRight[0]) / 2,
+      (rotatedTopLeft[1] + rotatedBottomRight[1]) / 2,
+    ];
+
+    if (isResizeFromCenter) {
+      newCenter[0] = center[0];
+      newCenter[1] = center[1];
+    }
+
+    const newTopLeft = rotate(
+      rotatedTopLeft[0],
+      rotatedTopLeft[1],
+      newCenter[0],
+      newCenter[1],
+      -stateAtResizeStart.angle,
+    );
+
+    let newHeight = stateAtResizeStart.height;
+    if (shouldKeepSidesRatio) {
+      newHeight *= newWidth / stateAtResizeStart.width;
+      // Adjust so rect's center Y stays the same.
+      const yAdjustment = (stateAtResizeStart.height - newHeight) / 2;
+      newTopLeft[1] = newTopLeft[1] + yAdjustment;
+    }
+
+    updateBoundElements(element, {
+      newSize: { width: newWidth, height: newHeight },
+    });
+
+    mutateElement(element, {
+      width: newWidth,
+      height: newHeight,
+      x: newTopLeft[0],
+      y: newTopLeft[1],
+    });
+  }
+  if (transformHandleType === "w") {
+    const center = [
+      stateAtResizeStart.x + stateAtResizeStart.width / 2,
+      stateAtResizeStart.y + stateAtResizeStart.height / 2,
+    ];
+    const rotatedPointer = rotate(
+      pointerX,
+      pointerY,
+      center[0],
+      center[1],
+      -stateAtResizeStart.angle,
+    );
+
+    let newWidth =
+      stateAtResizeStart.x + stateAtResizeStart.width - rotatedPointer[0];
+
+    const topRight = [
+      stateAtResizeStart.x + stateAtResizeStart.width,
+      stateAtResizeStart.y,
+    ];
+    if (isResizeFromCenter) {
+      const widthDiff = newWidth - stateAtResizeStart.width;
+      newWidth += widthDiff;
+      topRight[0] += widthDiff;
+    }
+
+    // Horizontal Flip
+    if (newWidth < 0) {
+      newWidth = Math.abs(newWidth);
+      topRight[0] += newWidth;
+    }
+
+    const rotatedTopRight = rotate(
+      topRight[0],
+      topRight[1],
+      center[0],
+      center[1],
+      stateAtResizeStart.angle,
+    );
+
+    const bottomLeft = [
+      topRight[0] - newWidth,
+      topRight[1] + stateAtResizeStart.height,
+    ];
+    const rotatedBottomLeft = rotate(
+      bottomLeft[0],
+      bottomLeft[1],
+      center[0],
+      center[1],
+      stateAtResizeStart.angle,
+    );
+
+    const newCenter = [
+      (rotatedTopRight[0] + rotatedBottomLeft[0]) / 2,
+      (rotatedTopRight[1] + rotatedBottomLeft[1]) / 2,
+    ];
+
+    if (isResizeFromCenter) {
+      newCenter[0] = center[0];
+      newCenter[1] = center[1];
+    }
+
+    const newTopRight = rotate(
+      rotatedTopRight[0],
+      rotatedTopRight[1],
+      newCenter[0],
+      newCenter[1],
+      -stateAtResizeStart.angle,
+    );
+
+    let newHeight = stateAtResizeStart.height;
+    if (shouldKeepSidesRatio) {
+      newHeight *= newWidth / stateAtResizeStart.width;
+      // Adjust so rect's center Y stays the same.
+      const yAdjustment = (stateAtResizeStart.height - newHeight) / 2;
+      newTopRight[1] += yAdjustment;
+    }
+
+    updateBoundElements(element, {
+      newSize: { width: newWidth, height: newHeight },
+    });
+
+    mutateElement(element, {
+      width: newWidth,
+      height: newHeight,
+      x: newTopRight[0] - newWidth,
+      y: newTopRight[1],
+    });
+  }
+  if (transformHandleType === "n") {
+    const center = [
+      stateAtResizeStart.x + stateAtResizeStart.width / 2,
+      stateAtResizeStart.y + stateAtResizeStart.height / 2,
+    ];
+    const rotatedPointer = rotate(
+      pointerX,
+      pointerY,
+      center[0],
+      center[1],
+      -stateAtResizeStart.angle,
+    );
+    let newHeight =
+      stateAtResizeStart.y + stateAtResizeStart.height - rotatedPointer[1];
+
+    const bottomLeft = [
+      stateAtResizeStart.x,
+      stateAtResizeStart.y + stateAtResizeStart.height,
+    ];
+
+    if (isResizeFromCenter) {
+      const heightDiff = newHeight - stateAtResizeStart.height;
+      newHeight += heightDiff;
+      bottomLeft[1] += heightDiff;
+    }
+
+    //Vertical Flip
+    if (newHeight < 0) {
+      newHeight = Math.abs(newHeight);
+      bottomLeft[1] = bottomLeft[1] + newHeight;
+    }
+
+    const rotatedBottomLeft = rotate(
+      bottomLeft[0],
+      bottomLeft[1],
+      center[0],
+      center[1],
+      stateAtResizeStart.angle,
+    );
+
+    const topRight = [
+      bottomLeft[0] + stateAtResizeStart.width,
+      bottomLeft[1] - newHeight,
+    ];
+    const rotatedTopRight = rotate(
+      topRight[0],
+      topRight[1],
+      center[0],
+      center[1],
+      stateAtResizeStart.angle,
+    );
+
+    const newCenter = [
+      (rotatedBottomLeft[0] + rotatedTopRight[0]) / 2,
+      (rotatedBottomLeft[1] + rotatedTopRight[1]) / 2,
+    ];
+
+    if (isResizeFromCenter) {
+      newCenter[0] = center[0];
+      newCenter[1] = center[1];
+    }
+
+    const newBottomLeft = rotate(
+      rotatedBottomLeft[0],
+      rotatedBottomLeft[1],
+      newCenter[0],
+      newCenter[1],
+      -stateAtResizeStart.angle,
+    );
+
+    let newWidth = stateAtResizeStart.width;
+    if (shouldKeepSidesRatio) {
+      newWidth *= newHeight / stateAtResizeStart.height;
+      // Adjust so rect's center X stays the same.
+      const xAdjustment = (stateAtResizeStart.width - newWidth) / 2;
+      newBottomLeft[0] = newBottomLeft[0] + xAdjustment;
+    }
+
+    updateBoundElements(element, {
+      newSize: { width: newWidth, height: newHeight },
+    });
+
+    mutateElement(element, {
+      width: newWidth,
+      height: newHeight,
+      x: newBottomLeft[0],
+      y: newBottomLeft[1] - newHeight,
+    });
+  }
+  if (transformHandleType === "s") {
+    const center = [
+      stateAtResizeStart.x + stateAtResizeStart.width / 2,
+      stateAtResizeStart.y + stateAtResizeStart.height / 2,
+    ];
+    const rotatedPointer = rotate(
+      pointerX,
+      pointerY,
+      center[0],
+      center[1],
+      -stateAtResizeStart.angle,
+    );
+    let newHeight = rotatedPointer[1] - stateAtResizeStart.y;
+
+    const bottomLeft = [stateAtResizeStart.x, stateAtResizeStart.y + newHeight];
+
+    if (isResizeFromCenter) {
+      const heightDiff = newHeight - stateAtResizeStart.height;
+      newHeight += heightDiff;
+    }
+
+    //Vertical Flip
+    if (newHeight < 0) {
+      newHeight = Math.abs(newHeight);
+      bottomLeft[1] = bottomLeft[1] + newHeight;
+    }
+
+    const rotatedBottomLeft = rotate(
+      bottomLeft[0],
+      bottomLeft[1],
+      center[0],
+      center[1],
+      stateAtResizeStart.angle,
+    );
+
+    const topRight = [
+      bottomLeft[0] + stateAtResizeStart.width,
+      bottomLeft[1] - newHeight,
+    ];
+    const rotatedTopRight = rotate(
+      topRight[0],
+      topRight[1],
+      center[0],
+      center[1],
+      stateAtResizeStart.angle,
+    );
+
+    const newCenter = [
+      (rotatedBottomLeft[0] + rotatedTopRight[0]) / 2,
+      (rotatedBottomLeft[1] + rotatedTopRight[1]) / 2,
+    ];
+
+    if (isResizeFromCenter) {
+      newCenter[0] = center[0];
+      newCenter[1] = center[1];
+    }
+
+    const newBottomLeft = rotate(
+      rotatedBottomLeft[0],
+      rotatedBottomLeft[1],
+      newCenter[0],
+      newCenter[1],
+      -stateAtResizeStart.angle,
+    );
+
+    let newWidth = stateAtResizeStart.width;
+    if (shouldKeepSidesRatio) {
+      newWidth *= newHeight / stateAtResizeStart.height;
+      // Adjust so rect's center X stays the same.
+      const xAdjustment = (stateAtResizeStart.width - newWidth) / 2;
+      newBottomLeft[0] = newBottomLeft[0] + xAdjustment;
+    }
+
+    updateBoundElements(element, {
+      newSize: { width: newWidth, height: newHeight },
+    });
+
+    mutateElement(element, {
+      width: newWidth,
+      height: newHeight,
+      x: newBottomLeft[0],
+      y: newBottomLeft[1] - newHeight,
+    });
+  }
+  if (transformHandleType === "se") {
+    const center = [
+      stateAtResizeStart.x + stateAtResizeStart.width / 2,
+      stateAtResizeStart.y + stateAtResizeStart.height / 2,
+    ];
+    const rotatedPointer = rotate(
+      pointerX,
+      pointerY,
+      center[0],
+      center[1],
+      -stateAtResizeStart.angle,
+    );
+
+    let newWidth = rotatedPointer[0] - stateAtResizeStart.x;
+    let newHeight = rotatedPointer[1] - stateAtResizeStart.y;
+    if (shouldKeepSidesRatio) {
+      const ratio = Math.abs(
+        Math.max(
+          newWidth / stateAtResizeStart.width,
+          newHeight / stateAtResizeStart.height,
+        ),
+      );
+      newWidth = ratio * stateAtResizeStart.width;
+      newHeight = ratio * stateAtResizeStart.height;
+      // We need to keep the sign of width and height so flipping works correctly
+      if (rotatedPointer[0] - stateAtResizeStart.x < 0) {
+        newWidth = -newWidth;
+      }
+      if (rotatedPointer[1] - stateAtResizeStart.y < 0) {
+        newHeight = -newHeight;
+      }
+    }
+
+    const topLeft = [stateAtResizeStart.x, stateAtResizeStart.y];
+    if (isResizeFromCenter) {
+      const heightDiff = newHeight - stateAtResizeStart.height;
+      const widthDiff = newWidth - stateAtResizeStart.width;
+      newHeight += heightDiff;
+      newWidth += widthDiff;
+      topLeft[0] -= widthDiff;
+      topLeft[1] -= heightDiff;
+    }
+    const rotatedTopLeft = rotate(
+      topLeft[0],
+      topLeft[1],
+      center[0],
+      center[1],
+      stateAtResizeStart.angle,
+    );
+
+    const bottomRight = [
+      stateAtResizeStart.x + newWidth,
+      stateAtResizeStart.y + newHeight,
+    ];
+    const rotatedBottomRight = rotate(
+      bottomRight[0],
+      bottomRight[1],
+      center[0],
+      center[1],
+      stateAtResizeStart.angle,
+    );
+
+    const newCenter = [
+      (rotatedTopLeft[0] + rotatedBottomRight[0]) / 2,
+      (rotatedTopLeft[1] + rotatedBottomRight[1]) / 2,
+    ];
+
+    if (isResizeFromCenter) {
+      newCenter[0] = center[0];
+      newCenter[1] = center[1];
+    }
+
+    const newTopLeft = rotate(
+      rotatedTopLeft[0],
+      rotatedTopLeft[1],
+      newCenter[0],
+      newCenter[1],
+      -stateAtResizeStart.angle,
+    );
+
+    // Flip horizontally
+    if (newWidth < 0) {
+      newWidth = Math.abs(newWidth);
+      newTopLeft[0] = newTopLeft[0] - newWidth;
+    }
+
+    // Flip vertically
+    if (newHeight < 0) {
+      newHeight = Math.abs(newHeight);
+      newTopLeft[1] = newTopLeft[1] - newHeight;
+    }
+
+    updateBoundElements(element, {
+      newSize: { width: newWidth, height: newHeight },
+    });
+
+    mutateElement(element, {
+      width: newWidth,
+      height: newHeight,
+      x: newTopLeft[0],
+      y: newTopLeft[1],
+    });
+  }
+  if (transformHandleType === "ne") {
+    const center = [
+      stateAtResizeStart.x + stateAtResizeStart.width / 2,
+      stateAtResizeStart.y + stateAtResizeStart.height / 2,
+    ];
+    const rotatedPointer = rotate(
+      pointerX,
+      pointerY,
+      center[0],
+      center[1],
+      -stateAtResizeStart.angle,
+    );
+
+    let newWidth = rotatedPointer[0] - stateAtResizeStart.x;
+    let newHeight =
+      stateAtResizeStart.y + stateAtResizeStart.height - rotatedPointer[1];
+
+    if (shouldKeepSidesRatio) {
+      const ratio = Math.abs(
+        Math.max(
+          newWidth / stateAtResizeStart.width,
+          newHeight / stateAtResizeStart.height,
+        ),
+      );
+      newWidth = ratio * stateAtResizeStart.width;
+      newHeight = ratio * stateAtResizeStart.height;
+      // We need to keep the sign of width and height so flipping works correctly
+      if (rotatedPointer[0] - stateAtResizeStart.x < 0) {
+        newWidth = -newWidth;
+      }
+      if (
+        stateAtResizeStart.y + stateAtResizeStart.height - rotatedPointer[1] <
+        0
+      ) {
+        newHeight = -newHeight;
+      }
+    }
+
+    const bottomLeft = [
+      stateAtResizeStart.x,
+      stateAtResizeStart.y + stateAtResizeStart.height,
+    ];
+    if (isResizeFromCenter) {
+      const heightDiff = newHeight - stateAtResizeStart.height;
+      const widthDiff = newWidth - stateAtResizeStart.width;
+      newHeight += heightDiff;
+      newWidth += widthDiff;
+      bottomLeft[0] -= widthDiff;
+      bottomLeft[1] += heightDiff;
+    }
+    const rotatedBottomLeft = rotate(
+      bottomLeft[0],
+      bottomLeft[1],
+      center[0],
+      center[1],
+      stateAtResizeStart.angle,
+    );
+
+    const topRight = [bottomLeft[0] + newWidth, bottomLeft[1] - newHeight];
+    const rotatedTopRight = rotate(
+      topRight[0],
+      topRight[1],
+      center[0],
+      center[1],
+      stateAtResizeStart.angle,
+    );
+
+    const newCenter = [
+      (rotatedBottomLeft[0] + rotatedTopRight[0]) / 2,
+      (rotatedBottomLeft[1] + rotatedTopRight[1]) / 2,
+    ];
+
+    if (isResizeFromCenter) {
+      newCenter[0] = center[0];
+      newCenter[1] = center[1];
+    }
+
+    const newBottomLeft = rotate(
+      rotatedBottomLeft[0],
+      rotatedBottomLeft[1],
+      newCenter[0],
+      newCenter[1],
+      -stateAtResizeStart.angle,
+    );
+
+    // Flip horizontally
+    if (newWidth < 0) {
+      newWidth = Math.abs(newWidth);
+      newBottomLeft[0] = newBottomLeft[0] - newWidth;
+    }
+
+    // Flip vertically
+    if (newHeight < 0) {
+      newHeight = Math.abs(newHeight);
+      newBottomLeft[1] = newBottomLeft[1] + newHeight;
+    }
+
+    updateBoundElements(element, {
+      newSize: { width: newWidth, height: newHeight },
+    });
+
+    mutateElement(element, {
+      width: newWidth,
+      height: newHeight,
+      x: newBottomLeft[0],
+      y: newBottomLeft[1] - newHeight,
+    });
+  }
+  if (transformHandleType === "nw") {
+    const center = [
+      stateAtResizeStart.x + stateAtResizeStart.width / 2,
+      stateAtResizeStart.y + stateAtResizeStart.height / 2,
+    ];
+    const rotatedPointer = rotate(
+      pointerX,
+      pointerY,
+      center[0],
+      center[1],
+      -stateAtResizeStart.angle,
+    );
+
+    let newWidth =
+      stateAtResizeStart.x + stateAtResizeStart.width - rotatedPointer[0];
+
+    let newHeight =
+      stateAtResizeStart.y + stateAtResizeStart.height - rotatedPointer[1];
+
+    if (shouldKeepSidesRatio) {
+      const ratio = Math.abs(
+        Math.max(
+          newWidth / stateAtResizeStart.width,
+          newHeight / stateAtResizeStart.height,
+        ),
+      );
+      newWidth = ratio * stateAtResizeStart.width;
+      newHeight = ratio * stateAtResizeStart.height;
+      // We need to keep the sign of width and height so flipping works correctly
+      if (
+        stateAtResizeStart.x + stateAtResizeStart.width - rotatedPointer[0] <
+        0
+      ) {
+        newWidth = -newWidth;
+      }
+      if (
+        stateAtResizeStart.y + stateAtResizeStart.height - rotatedPointer[1] <
+        0
+      ) {
+        newHeight = -newHeight;
+      }
+    }
+
+    const bottomRight = [
+      stateAtResizeStart.x + stateAtResizeStart.width,
+      stateAtResizeStart.y + stateAtResizeStart.height,
+    ];
+    if (isResizeFromCenter) {
+      const heightDiff = newHeight - stateAtResizeStart.height;
+      const widthDiff = newWidth - stateAtResizeStart.width;
+      newHeight += heightDiff;
+      newWidth += widthDiff;
+      bottomRight[0] += widthDiff;
+      bottomRight[1] += heightDiff;
+    }
+    const rotatedBottomRight = rotate(
+      bottomRight[0],
+      bottomRight[1],
+      center[0],
+      center[1],
+      stateAtResizeStart.angle,
+    );
+
+    const topLeft = [bottomRight[0] - newWidth, bottomRight[1] - newHeight];
+    const rotatedTopLeft = rotate(
+      topLeft[0],
+      topLeft[1],
+      center[0],
+      center[1],
+      stateAtResizeStart.angle,
+    );
+
+    const newCenter = [
+      (rotatedBottomRight[0] + rotatedTopLeft[0]) / 2,
+      (rotatedBottomRight[1] + rotatedTopLeft[1]) / 2,
+    ];
+
+    if (isResizeFromCenter) {
+      newCenter[0] = center[0];
+      newCenter[1] = center[1];
+    }
+
+    const newBottomRight = rotate(
+      rotatedBottomRight[0],
+      rotatedBottomRight[1],
+      newCenter[0],
+      newCenter[1],
+      -stateAtResizeStart.angle,
+    );
+
+    // Flip horizontally
+    if (newWidth < 0) {
+      newWidth = Math.abs(newWidth);
+      newBottomRight[0] = newBottomRight[0] + newWidth;
+    }
+
+    // Flip vertically
+    if (newHeight < 0) {
+      newHeight = Math.abs(newHeight);
+      newBottomRight[1] = newBottomRight[1] + newHeight;
+    }
+
+    updateBoundElements(element, {
+      newSize: { width: newWidth, height: newHeight },
+    });
+
+    mutateElement(element, {
+      width: newWidth,
+      height: newHeight,
+      x: newBottomRight[0] - newWidth,
+      y: newBottomRight[1] - newHeight,
+    });
+  }
+  if (transformHandleType === "sw") {
+    const center = [
+      stateAtResizeStart.x + stateAtResizeStart.width / 2,
+      stateAtResizeStart.y + stateAtResizeStart.height / 2,
+    ];
+    const rotatedPointer = rotate(
+      pointerX,
+      pointerY,
+      center[0],
+      center[1],
+      -stateAtResizeStart.angle,
+    );
+
+    let newWidth =
+      stateAtResizeStart.x + stateAtResizeStart.width - rotatedPointer[0];
+
+    let newHeight = rotatedPointer[1] - stateAtResizeStart.y;
+
+    if (shouldKeepSidesRatio) {
+      const ratio = Math.abs(
+        Math.max(
+          newWidth / stateAtResizeStart.width,
+          newHeight / stateAtResizeStart.height,
+        ),
+      );
+      newWidth = ratio * stateAtResizeStart.width;
+      newHeight = ratio * stateAtResizeStart.height;
+      // We need to keep the sign of width and height so flipping works correctly
+      if (
+        stateAtResizeStart.x + stateAtResizeStart.width - rotatedPointer[0] <
+        0
+      ) {
+        newWidth = -newWidth;
+      }
+      if (rotatedPointer[1] - stateAtResizeStart.y < 0) {
+        newHeight = -newHeight;
+      }
+    }
+
+    const topRight = [
+      stateAtResizeStart.x + stateAtResizeStart.width,
+      stateAtResizeStart.y,
+    ];
+    if (isResizeFromCenter) {
+      const heightDiff = newHeight - stateAtResizeStart.height;
+      const widthDiff = newWidth - stateAtResizeStart.width;
+      newHeight += heightDiff;
+      newWidth += widthDiff;
+      topRight[0] += widthDiff;
+      topRight[1] -= heightDiff;
+    }
+    const rotatedTopRight = rotate(
+      topRight[0],
+      topRight[1],
+      center[0],
+      center[1],
+      stateAtResizeStart.angle,
+    );
+
+    const bottomLeft = [topRight[0] - newWidth, topRight[1] + newHeight];
+    const rotatedBottomLeft = rotate(
+      bottomLeft[0],
+      bottomLeft[1],
+      center[0],
+      center[1],
+      stateAtResizeStart.angle,
+    );
+
+    const newCenter = [
+      (rotatedBottomLeft[0] + rotatedTopRight[0]) / 2,
+      (rotatedBottomLeft[1] + rotatedTopRight[1]) / 2,
+    ];
+
+    if (isResizeFromCenter) {
+      newCenter[0] = center[0];
+      newCenter[1] = center[1];
+    }
+
+    const newTopRight = rotate(
+      rotatedTopRight[0],
+      rotatedTopRight[1],
+      newCenter[0],
+      newCenter[1],
+      -stateAtResizeStart.angle,
+    );
+
+    // Flip horizontally
+    if (newWidth < 0) {
+      newWidth = Math.abs(newWidth);
+      newTopRight[0] = newTopRight[0] + newWidth;
+    }
+
+    // Flip vertically
+    if (newHeight < 0) {
+      newHeight = Math.abs(newHeight);
+      newTopRight[1] = newTopRight[1] - newHeight;
+    }
+
+    updateBoundElements(element, {
+      newSize: { width: newWidth, height: newHeight },
+    });
+
+    mutateElement(element, {
+      width: newWidth,
+      height: newHeight,
+      x: newTopRight[0] - newWidth,
+      y: newTopRight[1],
+    });
+  }
+};
+
 const resizeSingleElement = (
+  stateAtResizeStart: NonDeletedExcalidrawElement,
+  shouldKeepSidesRatio: boolean,
   element: NonDeletedExcalidrawElement,
   transformHandleType: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
   isResizeFromCenter: boolean,
@@ -399,6 +1206,7 @@ const resizeSingleElement = (
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
+
   // rotation pointer with reverse angle
   const [rotatedX, rotatedY] = rotate(
     pointerX,
@@ -407,6 +1215,7 @@ const resizeSingleElement = (
     cy,
     -element.angle,
   );
+
   let scaleX = 1;
   let scaleY = 1;
   if (
@@ -437,9 +1246,9 @@ const resizeSingleElement = (
   ) {
     scaleY = (y2 - rotatedY) / (y2 - y1);
   }
-
   const nextWidth = element.width * scaleX;
   const nextHeight = element.height * scaleY;
+
   const [nextX1, nextY1, nextX2, nextY2] = getResizedElementAbsoluteCoords(
     element,
     nextWidth,
@@ -449,7 +1258,9 @@ const resizeSingleElement = (
   const deltaY1 = (y1 - nextY1) / 2;
   const deltaX2 = (x2 - nextX2) / 2;
   const deltaY2 = (y2 - nextY2) / 2;
+
   const rescaledPoints = rescalePointsInElement(element, nextWidth, nextHeight);
+
   updateBoundElements(element, {
     newSize: { width: nextWidth, height: nextHeight },
   });
@@ -486,6 +1297,7 @@ const resizeSingleElement = (
     deltaX2,
     deltaY2,
   );
+
   if (
     nextWidth !== 0 &&
     nextHeight !== 0 &&
