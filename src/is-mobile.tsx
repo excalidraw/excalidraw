@@ -15,16 +15,18 @@ export const IsMobileProvider = ({
         )
       : (({
           matches: false,
-          addListener: () => {},
-          removeListener: () => {},
+          addEventListener: () => {},
+          removeEventListener: () => {},
         } as any) as MediaQueryList);
   }
   const [isMobile, setMobile] = useState(query.current.matches);
 
   useEffect(() => {
-    const handler = () => setMobile(query.current!.matches);
-    query.current!.addListener(handler);
-    return () => query.current!.removeListener(handler);
+    const handler = () => {
+      setMobile(query.current!.matches);
+    };
+    query.current!.addEventListener("change", handler);
+    return () => query.current!.removeEventListener("change", handler);
   }, []);
 
   return <context.Provider value={isMobile}>{children}</context.Provider>;

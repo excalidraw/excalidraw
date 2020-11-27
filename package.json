@@ -5,7 +5,7 @@
       "not dead",
       "not ie <= 11",
       "not op_mini all",
-      "not safari < 12",
+      "not safari < 14",
       "not kaios <= 2.5",
       "not edge < 79",
       "not chrome < 70",
