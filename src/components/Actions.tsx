@@ -12,7 +12,7 @@ import {
 import { t } from "../i18n";
 import { SHAPES } from "../shapes";
 import { ToolButton } from "./ToolButton";
-import { capitalizeString, setCursorForShape } from "../utils";
+import { capitalizeString, isTransparent, setCursorForShape } from "../utils";
 import Stack from "./Stack";
 import useIsMobile from "../is-mobile";
 import { getNonDeletedElements } from "../element";
@@ -34,18 +34,22 @@ export const SelectedShapeActions = ({
   );
   const isEditing = Boolean(appState.editingElement);
   const isMobile = useIsMobile();
+  const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
+  const showFillIcons =
+    hasBackground(elementType) ||
+    targetElements.some(
+      (element) =>
+        hasBackground(element.type) && !isTransparent(element.backgroundColor),
+    );
+  const showChangeBackgroundIcons =
+    hasBackground(elementType) ||
+    targetElements.some((element) => hasBackground(element.type));
   return (
     <div className="panelColumn">
       {renderAction("changeStrokeColor")}
-      {(hasBackground(elementType) ||
-        targetElements.some((element) => hasBackground(element.type))) && (
-        <>
-          {renderAction("changeBackgroundColor")}
-
-          {renderAction("changeFillStyle")}
-        </>
-      )}
+      {showChangeBackgroundIcons && renderAction("changeBackgroundColor")}
+      {showFillIcons && renderAction("changeFillStyle")}
 
       {(hasStroke(elementType) ||
         targetElements.some((element) => hasStroke(element.type))) && (
@@ -88,16 +92,35 @@ export const SelectedShapeActions = ({
         <fieldset>
           <legend>{t("labels.align")}</legend>
           <div className="buttonList">
-            {renderAction("alignLeft")}
-            {renderAction("alignHorizontallyCentered")}
-            {renderAction("alignRight")}
-            {renderAction("alignTop")}
-            {renderAction("alignVerticallyCentered")}
-            {renderAction("alignBottom")}
+            {
+              // swap this order for RTL so the button positions always match their action
+              // (i.e. the leftmost button aligns left)
+            }
+            {isRTL ? (
+              <>
+                {renderAction("alignRight")}
+                {renderAction("alignHorizontallyCentered")}
+                {renderAction("alignLeft")}
+              </>
+            ) : (
+              <>
+                {renderAction("alignLeft")}
+                {renderAction("alignHorizontallyCentered")}
+                {renderAction("alignRight")}
+              </>
+            )}
+            {targetElements.length > 2 &&
+              renderAction("distributeHorizontally")}
+            <div className="iconRow">
+              {renderAction("alignTop")}
+              {renderAction("alignVerticallyCentered")}
+              {renderAction("alignBottom")}
+              {targetElements.length > 2 &&
+                renderAction("distributeVertically")}
+            </div>
           </div>
         </fieldset>
       )}
-
       {!isMobile && !isEditing && targetElements.length > 0 && (
         <fieldset>
           <legend>{t("labels.actions")}</legend>
@@ -163,7 +186,7 @@ export const ShapesSwitcher = ({
       );
     })}
     <ToolButton
-      className="Shape"
+      className="Shape ToolIcon_type_button__library"
       type="button"
       icon={LIBRARY_ICON}
       name="editor-library"

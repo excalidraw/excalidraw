@@ -512,19 +512,19 @@ describe("regression tests", () => {
   it("rerenders UI on language change", async () => {
     // select rectangle tool to show properties menu
     UI.clickTool("rectangle");
-    // english lang should display `hachure` label
-    expect(screen.queryByTitle(/hachure/i)).not.toBeNull();
+    // english lang should display `thin` label
+    expect(screen.queryByTitle(/thin/i)).not.toBeNull();
     fireEvent.change(document.querySelector(".dropdown-select__language")!, {
       target: { value: "de-DE" },
     });
-    // switching to german, `hachure` label should no longer exist
-    await waitFor(() => expect(screen.queryByTitle(/hachure/i)).toBeNull());
+    // switching to german, `thin` label should no longer exist
+    await waitFor(() => expect(screen.queryByTitle(/thin/i)).toBeNull());
     // reset language
     fireEvent.change(document.querySelector(".dropdown-select__language")!, {
       target: { value: "en" },
     });
     // switching back to English
-    await waitFor(() => expect(screen.queryByTitle(/hachure/i)).not.toBeNull());
+    await waitFor(() => expect(screen.queryByTitle(/thin/i)).not.toBeNull());
   });
 
   it("make a group and duplicate it", () => {
@@ -1545,6 +1545,21 @@ describe("regression tests", () => {
       mouse.clickOn(rect3);
     });
     assertSelectedElements(rect3);
+  });
+
+  it("should show fill icons when element has non transparent background", () => {
+    UI.clickTool("rectangle");
+    expect(screen.queryByText(/fill/i)).not.toBeNull();
+    mouse.down();
+    mouse.up(10, 10);
+    expect(screen.queryByText(/fill/i)).toBeNull();
+
+    clickLabeledElement("Background");
+    clickLabeledElement("#fa5252");
+    // select rectangle
+    mouse.reset();
+    mouse.click();
+    expect(screen.queryByText(/fill/i)).not.toBeNull();
   });
 });
 

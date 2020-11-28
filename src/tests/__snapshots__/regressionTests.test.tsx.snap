@@ -25765,6 +25765,238 @@ exports[`regression tests shift-click to multiselect, then drag: [end of test] n
 
 exports[`regression tests shift-click to multiselect, then drag: [end of test] number of renders 1`] = `17`;
 
+exports[`regression tests should show fill icons when element has non transparent background: [end of test] appState 1`] = `
+Object {
+  "appearance": "light",
+  "collaborators": Map {},
+  "currentItemBackgroundColor": "#fa5252",
+  "currentItemFillStyle": "hachure",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemLinearStrokeSharpness": "round",
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemStrokeColor": "#000000",
+  "currentItemStrokeSharpness": "sharp",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "cursorX": 0,
+  "cursorY": 0,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementLocked": false,
+  "elementType": "selection",
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "fileHandle": null,
+  "gridSize": null,
+  "height": 768,
+  "isBindingEnabled": true,
+  "isCollaborating": false,
+  "isLibraryOpen": false,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "name": "Untitled-201933152653",
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openMenu": null,
+  "previousSelectedElementIds": Object {
+    "id0": true,
+  },
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": Object {
+    "id0": true,
+    "id1": true,
+  },
+  "selectedGroupIds": Object {},
+  "selectionElement": null,
+  "shouldAddWatermark": false,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "startBoundElement": null,
+  "suggestedBindings": Array [],
+  "username": "",
+  "viewBackgroundColor": "#ffffff",
+  "width": 1024,
+  "zenModeEnabled": false,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
+}
+`;
+
+exports[`regression tests should show fill icons when element has non transparent background: [end of test] element 0 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "#fa5252",
+  "boundElementIds": null,
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 10,
+  "id": "id0",
+  "isDeleted": false,
+  "opacity": 100,
+  "roughness": 1,
+  "seed": 337897,
+  "strokeColor": "#000000",
+  "strokeSharpness": "sharp",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "rectangle",
+  "version": 5,
+  "versionNonce": 401146281,
+  "width": 10,
+  "x": 0,
+  "y": 0,
+}
+`;
+
+exports[`regression tests should show fill icons when element has non transparent background: [end of test] history 1`] = `
+Object {
+  "recording": false,
+  "redoStack": Array [],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElementIds": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeSharpness": "sharp",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 10,
+          "x": 0,
+          "y": 0,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElementIds": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeSharpness": "sharp",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 449462985,
+          "width": 10,
+          "x": 0,
+          "y": 0,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "#fa5252",
+          "boundElementIds": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeSharpness": "sharp",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 5,
+          "versionNonce": 401146281,
+          "width": 10,
+          "x": 0,
+          "y": 0,
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`regression tests should show fill icons when element has non transparent background: [end of test] number of elements 1`] = `1`;
+
+exports[`regression tests should show fill icons when element has non transparent background: [end of test] number of renders 1`] = `10`;
+
 exports[`regression tests shows 'Group selection' in context menu for multiple selected elements: [end of test] appState 1`] = `
 Object {
   "appearance": "light",

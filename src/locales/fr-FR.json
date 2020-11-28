@@ -81,7 +81,9 @@
     "alignLeft": "Aligner à gauche",
     "alignRight": "Aligner à droite",
     "centerVertically": "Centrer verticalement",
-    "centerHorizontally": "Centrer horizontalement"
+    "centerHorizontally": "Centrer horizontalement",
+    "distributeHorizontally": "Répartir horizontalement",
+    "distributeVertically": "Répartir verticalement"
   },
   "buttons": {
     "clearReset": "Effacer le canvas & réinitialiser la couleur d'arrière-plan",
@@ -206,7 +208,7 @@
     "preventBinding": "Empêcher la liaison de la flèche"
   },
   "encrypted": {
-    "tooltip": "Vos dessins sont cryptés de bout en bout, les serveurs d'Excalidraw ne les verront jamais."
+    "tooltip": "Vos dessins sont chiffrés de bout en bout, les serveurs d'Excalidraw ne les verront jamais."
   },
   "charts": {
     "noNumericColumn": "Vous avez collé une feuille de calcul sans données numérique.",

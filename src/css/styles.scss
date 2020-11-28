@@ -99,8 +99,30 @@
         pointer-events: none;
       }
 
+      .iconRow {
+        margin-top: 8px;
+      }
+
       .ToolIcon {
-        margin: 0 5px;
+        margin: 0;
+        margin-inline-end: 8px;
+
+        &:focus {
+          outline: transparent;
+          box-shadow: 0 0 0 2px var(--focus-highlight-color);
+        }
+
+        &:hover {
+          background-color: var(--button-gray-2);
+        }
+
+        &:active {
+          background-color: var(--button-gray-3);
+        }
+
+        &:disabled {
+          cursor: not-allowed;
+        }
       }
 
       .ToolIcon__icon {
@@ -371,7 +393,8 @@
   }
 
   .zIndexButton {
-    margin: 0 5px;
+    margin: 0;
+    margin-inline-end: 8px;
     padding: 5px;
     display: inline-flex;
     align-items: center;

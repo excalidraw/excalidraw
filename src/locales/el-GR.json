@@ -75,13 +75,15 @@
     "removeFromLibrary": "Αφαίρεση από τη βιβλιοθήκη",
     "libraryLoadingMessage": "Φόρτωση βιβλιοθήκης...",
     "loadingScene": "Φόρτωση σκηνής...",
-    "align": "",
-    "alignTop": "",
-    "alignBottom": "",
-    "alignLeft": "",
-    "alignRight": "",
+    "align": "Στοίχιση",
+    "alignTop": "Στοίχιση πάνω",
+    "alignBottom": "Στοίχιση κάτω",
+    "alignLeft": "Στοίχιση αριστερά",
+    "alignRight": "Στοίχιση δεξιά",
     "centerVertically": "",
-    "centerHorizontally": ""
+    "centerHorizontally": "",
+    "distributeHorizontally": "",
+    "distributeVertically": ""
   },
   "buttons": {
     "clearReset": "Επαναφορά του καμβά",
