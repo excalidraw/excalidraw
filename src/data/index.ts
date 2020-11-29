@@ -283,14 +283,12 @@ export const exportCanvas = async (
     exportBackground,
     exportPadding = 10,
     viewBackgroundColor,
-    name,
     scale = 1,
     shouldAddWatermark,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
-    name: string;
     scale?: number;
     shouldAddWatermark: boolean;
   },
@@ -316,7 +314,6 @@ export const exportCanvas = async (
     });
     if (type === "svg") {
       await fileSave(new Blob([tempSvg.outerHTML], { type: "image/svg+xml" }), {
-        fileName: `${name}.svg`,
         extensions: [".svg"],
       });
       return;
@@ -337,7 +334,6 @@ export const exportCanvas = async (
   document.body.appendChild(tempCanvas);
 
   if (type === "png") {
-    const fileName = `${name}.png`;
     let blob = await canvasToBlob(tempCanvas);
     if (appState.exportEmbedScene) {
       blob = await (
@@ -349,7 +345,6 @@ export const exportCanvas = async (
     }
 
     await fileSave(blob, {
-      fileName: fileName,
       extensions: [".png"],
     });
   } else if (type === "clipboard") {

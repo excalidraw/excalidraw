@@ -24,7 +24,6 @@ const clearAppStatePropertiesForHistory = (appState: AppState) => {
     viewBackgroundColor: appState.viewBackgroundColor,
     editingLinearElement: appState.editingLinearElement,
     editingGroupId: appState.editingGroupId,
-    name: appState.name,
   };
 };
 

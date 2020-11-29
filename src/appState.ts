@@ -1,7 +1,5 @@
 import oc from "open-color";
 import { AppState, FlooredNumber, NormalizedZoomValue } from "./types";
-import { getDateTime } from "./utils";
-import { t } from "./i18n";
 import {
   DEFAULT_FONT_SIZE,
   DEFAULT_FONT_FAMILY,
@@ -46,7 +44,6 @@ export const getDefaultAppState = (): Omit<
     cursorY: 0,
     cursorButton: "up",
     scrolledOutside: false,
-    name: `${t("labels.untitled")}-${getDateTime()}`,
     username: "",
     isBindingEnabled: true,
     isCollaborating: false,
@@ -128,7 +125,6 @@ const APP_STATE_STORAGE_CONF = (<
   isRotating: { browser: false, export: false },
   lastPointerDownWith: { browser: true, export: false },
   multiElement: { browser: false, export: false },
-  name: { browser: true, export: false },
   openMenu: { browser: true, export: false },
   previousSelectedElementIds: { browser: true, export: false },
   resizingElement: { browser: false, export: false },

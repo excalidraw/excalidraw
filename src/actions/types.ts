@@ -42,7 +42,6 @@ export type ActionName =
   | "undo"
   | "redo"
   | "finalize"
-  | "changeProjectName"
   | "changeExportBackground"
   | "changeExportEmbedScene"
   | "changeShouldAddWatermark"
