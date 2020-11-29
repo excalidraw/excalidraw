@@ -13,8 +13,8 @@ export const KEYS = {
   ESCAPE: "Escape",
   MINUS: "Minus",
   QUESTION_MARK_KEY: "?",
-  QUOTE_CODE: "Quote",
-  SPACE_CODE: "Space",
+  QUOTE: "Quote",
+  SPACE: "Space",
   TAB: "Tab",
 
   A_CODE: "KeyA",

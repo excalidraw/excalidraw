@@ -396,10 +396,10 @@ describe("regression tests", () => {
 
   it("spacebar + drag scrolls the canvas", () => {
     const { scrollX: startScrollX, scrollY: startScrollY } = h.state;
-    Keyboard.keyDown(KEYS.SPACE_CODE);
+    Keyboard.keyDown(KEYS.SPACE);
     mouse.down(50, 50);
     mouse.up(60, 60);
-    Keyboard.keyUp(KEYS.SPACE_CODE);
+    Keyboard.keyUp(KEYS.SPACE);
     const { scrollX, scrollY } = h.state;
     expect(scrollX).not.toEqual(startScrollX);
     expect(scrollY).not.toEqual(startScrollY);

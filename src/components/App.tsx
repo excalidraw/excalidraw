@@ -1541,7 +1541,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.toggleZenMode();
     }
 
-    if (event[KEYS.CTRL_OR_CMD] && event.code === KEYS.QUOTE_CODE) {
+    if (event[KEYS.CTRL_OR_CMD] && event.code === KEYS.QUOTE) {
       this.toggleGridMode();
     }
     if (event[KEYS.CTRL_OR_CMD]) {
@@ -1648,14 +1648,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         this.toggleLock();
       }
     }
-    if (event.code === KEYS.SPACE_CODE && gesture.pointers.size === 0) {
+    if (event.code === KEYS.SPACE && gesture.pointers.size === 0) {
       isHoldingSpace = true;
       document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
     }
   });
 
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
-    if (event.code === KEYS.SPACE_CODE) {
+    if (event.code === KEYS.SPACE) {
       if (this.state.elementType === "selection") {
         resetCursor();
       } else {
