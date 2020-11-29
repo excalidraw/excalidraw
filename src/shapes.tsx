@@ -10,7 +10,6 @@ export const SHAPES = [
       </svg>
     ),
     value: "selection",
-    key: "v",
     code: ["KeyV", "KeyS"],
   },
   {
@@ -21,7 +20,6 @@ export const SHAPES = [
       </svg>
     ),
     value: "rectangle",
-    key: "r",
     code: "KeyR",
   },
   {
@@ -32,7 +30,6 @@ export const SHAPES = [
       </svg>
     ),
     value: "diamond",
-    key: "d",
     code: "KeyD",
   },
   {
@@ -43,7 +40,6 @@ export const SHAPES = [
       </svg>
     ),
     value: "ellipse",
-    key: "e",
     code: "KeyE",
   },
   {
@@ -54,7 +50,6 @@ export const SHAPES = [
       </svg>
     ),
     value: "arrow",
-    key: "a",
     code: "KeyA",
   },
   {
@@ -72,7 +67,6 @@ export const SHAPES = [
       </svg>
     ),
     value: "line",
-    key: "p",
     code: ["KeyP", "KeyL"],
   },
   {
@@ -86,7 +80,6 @@ export const SHAPES = [
       </svg>
     ),
     value: "draw",
-    key: "x",
     code: "KeyX",
   },
   {
@@ -97,7 +90,6 @@ export const SHAPES = [
       </svg>
     ),
     value: "text",
-    key: "t",
     code: "KeyT",
   },
 ] as const;

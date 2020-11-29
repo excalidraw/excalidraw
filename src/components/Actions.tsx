@@ -153,11 +153,10 @@ export const ShapesSwitcher = ({
   isLibraryOpen: boolean;
 }) => (
   <>
-    {SHAPES.map(({ value, icon, key }, index) => {
+    {SHAPES.map(({ value, icon, code }, index) => {
       const label = t(`toolBar.${value}`);
-      const letter = typeof key === "string" ? key : key[0];
-      const letterShortcut = /[a-z]/.test(letter) ? letter : `Shift+${letter}`;
-      const shortcut = `${capitalizeString(letterShortcut)} ${t(
+      const letter = typeof code === "string" ? code[3] : code[0][3];
+      const shortcut = `${capitalizeString(letter)} ${t(
         "shortcutsDialog.or",
       )} ${index + 1}`;
       return (
@@ -171,7 +170,7 @@ export const ShapesSwitcher = ({
           title={`${capitalizeString(label)} — ${shortcut}`}
           keyBindingLabel={`${index + 1}`}
           aria-label={capitalizeString(label)}
-          aria-keyshortcuts={`${key} ${index + 1}`}
+          aria-keyshortcuts={shortcut}
           data-testid={value}
           onChange={() => {
             setAppState({
