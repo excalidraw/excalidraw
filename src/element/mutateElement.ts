@@ -44,10 +44,10 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
         const nextPoints = value;
         if (prevPoints.length === nextPoints.length) {
           let didChangePoints = false;
-          let i = prevPoints.length;
-          while (--i) {
-            const prevPoint: Point = prevPoints[i];
-            const nextPoint: Point = nextPoints[i];
+          let index = prevPoints.length;
+          while (--index) {
+            const prevPoint: Point = prevPoints[index];
+            const nextPoint: Point = nextPoints[index];
             if (
               prevPoint[0] !== nextPoint[0] ||
               prevPoint[1] !== nextPoint[1]

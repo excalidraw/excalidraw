@@ -153,7 +153,7 @@ export const decryptAESGEM = async (
     const decrypted = await window.crypto.subtle.decrypt(
       {
         name: "AES-GCM",
-        iv: iv,
+        iv,
       },
       importedKey,
       data,
@@ -195,7 +195,7 @@ export const exportToBackend = async (
   const encrypted = await window.crypto.subtle.encrypt(
     {
       name: "AES-GCM",
-      iv: iv,
+      iv,
     },
     key,
     encoded,
@@ -248,7 +248,7 @@ const importFromBackend = async (
       const decrypted = await window.crypto.subtle.decrypt(
         {
           name: "AES-GCM",
-          iv: iv,
+          iv,
         },
         key,
         buffer,

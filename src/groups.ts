@@ -127,8 +127,8 @@ export const getNewGroupIdsForDuplication = (
     : -1;
   const endIndex =
     positionOfEditingGroupId > -1 ? positionOfEditingGroupId : groupIds.length;
-  for (let i = 0; i < endIndex; i++) {
-    copy[i] = mapper(copy[i]);
+  for (let index = 0; index < endIndex; index++) {
+    copy[index] = mapper(copy[index]);
   }
 
   return copy;

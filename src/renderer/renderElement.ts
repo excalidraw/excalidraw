@@ -147,11 +147,11 @@ const drawElementOnCanvas = (
             : element.textAlign === "right"
             ? element.width
             : 0;
-        for (let i = 0; i < lines.length; i++) {
+        for (let index = 0; index < lines.length; index++) {
           context.fillText(
-            lines[i],
+            lines[index],
             horizontalOffset,
-            (i + 1) * lineHeight - verticalOffset,
+            (index + 1) * lineHeight - verticalOffset,
           );
         }
         context.fillStyle = fillStyle;

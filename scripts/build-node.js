@@ -9,9 +9,9 @@
 //   node build/static/js/build-node.js
 //   open test.png
 
-var rewire = require("rewire");
-var defaults = rewire("react-scripts/scripts/build.js");
-var config = defaults.__get__("config");
+const rewire = require("rewire");
+const defaults = rewire("react-scripts/scripts/build.js");
+const config = defaults.__get__("config");
 
 // Disable multiple chunks
 config.optimization.runtimeChunk = false;

@@ -156,7 +156,7 @@ export const actionLoadScene = register({
       onClick={() => {
         loadFromJSON(appState)
           .then(({ elements, appState }) => {
-            updateData({ elements: elements, appState: appState });
+            updateData({ elements, appState });
           })
           .catch(muteFSAbortError)
           .catch((error) => {

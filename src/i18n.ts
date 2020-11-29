@@ -89,8 +89,8 @@ export const setLanguageFirstTime = async () => {
 export const getLanguage = () => currentLanguage;
 
 const findPartsForData = (data: any, parts: string[]) => {
-  for (var i = 0; i < parts.length; ++i) {
-    const part = parts[i];
+  for (let index = 0; index < parts.length; ++index) {
+    const part = parts[index];
     if (data[part] === undefined) {
       return undefined;
     }
@@ -112,7 +112,7 @@ export const t = (path: string, replacement?: { [key: string]: string }) => {
   }
 
   if (replacement) {
-    for (var key in replacement) {
+    for (const key in replacement) {
       translation = translation.replace(`{{${key}}}`, replacement[key]);
     }
   }

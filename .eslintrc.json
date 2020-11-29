@@ -24,6 +24,8 @@
     "no-unused-expressions": "warn",
     "no-unused-vars": "warn",
     "no-useless-return": "warn",
+    "no-var": "warn",
+    "object-shorthand": "warn",
     "one-var": ["warn", "never"],
     "prefer-arrow-callback": "warn",
     "prefer-const": [
