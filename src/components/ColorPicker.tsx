@@ -59,8 +59,7 @@ const Picker = ({
   const colorInput = React.useRef<HTMLInputElement>();
 
   React.useEffect(() => {
-    // After the component is first mounted
-    // focus on first input
+    // After the component is first mounted focus on first input
     if (activeItem.current) {
       activeItem.current.focus();
     } else if (colorInput.current) {

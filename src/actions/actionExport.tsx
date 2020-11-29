@@ -115,7 +115,9 @@ export const actionSaveAsScene = register({
     }
   },
   keyTest: (event) => {
-    return event.key === "s" && event.shiftKey && event[KEYS.CTRL_OR_CMD];
+    return (
+      event.code === KEYS.S_CODE && event.shiftKey && event[KEYS.CTRL_OR_CMD]
+    );
   },
   PanelComponent: ({ updateData }) => (
     <ToolButton
