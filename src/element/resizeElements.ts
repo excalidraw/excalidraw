@@ -1,7 +1,13 @@
 import { SHIFT_LOCKING_ANGLE } from "../constants";
 import { rescalePoints } from "../points";
 
-import { rotate, adjustXYWithRotation, getFlipAdjustment } from "../math";
+import {
+  rotate,
+  adjustXYWithRotation,
+  getFlipAdjustment,
+  centerPoint,
+  rotatePoint,
+} from "../math";
 import {
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
@@ -27,6 +33,7 @@ import {
   MaybeTransformHandleType,
 } from "./transformHandles";
 import { PointerDownState } from "../components/App";
+import { Point } from "../types";
 
 const normalizeAngle = (angle: number): number => {
   if (angle >= 2 * Math.PI) {
@@ -413,7 +420,7 @@ const resizeSingleRectDiamondEllipsesElement = (
   pointerX: number,
   pointerY: number,
 ) => {
-  const center = [
+  const center: Point = [
     stateAtResizeStart.x + stateAtResizeStart.width / 2,
     stateAtResizeStart.y + stateAtResizeStart.height / 2,
   ];
@@ -424,16 +431,16 @@ const resizeSingleRectDiamondEllipsesElement = (
     center[1],
     -stateAtResizeStart.angle,
   );
-  let resizedElement = {
-    width: stateAtResizeStart.width,
-    height: stateAtResizeStart.height,
-    x: stateAtResizeStart.x,
-    y: stateAtResizeStart.y,
-  };
-  if (transformHandleType === "e") {
-    let newWidth = rotatedPointer[0] - stateAtResizeStart.x;
 
-    const topLeft = [stateAtResizeStart.x, stateAtResizeStart.y];
+  let newWidth = 0;
+  let newHeight = 0;
+  let bottomRight: any = [0, 0];
+  let topLeft: any = [0, 0];
+
+  if (transformHandleType === "e") {
+    newWidth = rotatedPointer[0] - stateAtResizeStart.x;
+
+    topLeft = [stateAtResizeStart.x, stateAtResizeStart.y];
     if (isResizeFromCenter) {
       const widthDiff = newWidth - stateAtResizeStart.width;
       newWidth += widthDiff;
@@ -446,58 +453,18 @@ const resizeSingleRectDiamondEllipsesElement = (
       topLeft[0] = topLeft[0] - newWidth;
     }
 
-    const rotatedTopLeft = rotate(
-      topLeft[0],
-      topLeft[1],
-      center[0],
-      center[1],
-      stateAtResizeStart.angle,
-    );
-
-    const bottomRight = [
-      topLeft[0] + newWidth,
-      topLeft[1] + stateAtResizeStart.height,
-    ];
-    const rotatedBottomRight = rotate(
-      bottomRight[0],
-      bottomRight[1],
-      center[0],
-      center[1],
-      stateAtResizeStart.angle,
-    );
-
-    const newCenter = isResizeFromCenter
-      ? center
-      : [
-          (rotatedTopLeft[0] + rotatedBottomRight[0]) / 2,
-          (rotatedTopLeft[1] + rotatedBottomRight[1]) / 2,
-        ];
-
-    const newTopLeft = rotate(
-      rotatedTopLeft[0],
-      rotatedTopLeft[1],
-      newCenter[0],
-      newCenter[1],
-      -stateAtResizeStart.angle,
-    );
-
-    let newHeight = stateAtResizeStart.height;
+    newHeight = stateAtResizeStart.height;
     if (shouldKeepSidesRatio) {
       newHeight *= newWidth / stateAtResizeStart.width;
       // Adjust so rect's center Y stays the same.
       const yAdjustment = (stateAtResizeStart.height - newHeight) / 2;
-      newTopLeft[1] = newTopLeft[1] + yAdjustment;
+      topLeft[1] = topLeft[1] + yAdjustment;
     }
 
-    resizedElement = {
-      width: newWidth,
-      height: newHeight,
-      x: newTopLeft[0],
-      y: newTopLeft[1],
-    };
+    bottomRight = [topLeft[0] + newWidth, topLeft[1] + newHeight];
   }
   if (transformHandleType === "w") {
-    let newWidth =
+    newWidth =
       stateAtResizeStart.x + stateAtResizeStart.width - rotatedPointer[0];
 
     const topRight = [
@@ -516,58 +483,19 @@ const resizeSingleRectDiamondEllipsesElement = (
       topRight[0] += newWidth;
     }
 
-    const rotatedTopRight = rotate(
-      topRight[0],
-      topRight[1],
-      center[0],
-      center[1],
-      stateAtResizeStart.angle,
-    );
-
-    const bottomLeft = [
-      topRight[0] - newWidth,
-      topRight[1] + stateAtResizeStart.height,
-    ];
-    const rotatedBottomLeft = rotate(
-      bottomLeft[0],
-      bottomLeft[1],
-      center[0],
-      center[1],
-      stateAtResizeStart.angle,
-    );
-
-    const newCenter = isResizeFromCenter
-      ? center
-      : [
-          (rotatedTopRight[0] + rotatedBottomLeft[0]) / 2,
-          (rotatedTopRight[1] + rotatedBottomLeft[1]) / 2,
-        ];
-
-    const newTopRight = rotate(
-      rotatedTopRight[0],
-      rotatedTopRight[1],
-      newCenter[0],
-      newCenter[1],
-      -stateAtResizeStart.angle,
-    );
-
-    let newHeight = stateAtResizeStart.height;
+    newHeight = stateAtResizeStart.height;
     if (shouldKeepSidesRatio) {
       newHeight *= newWidth / stateAtResizeStart.width;
       // Adjust so rect's center Y stays the same.
       const yAdjustment = (stateAtResizeStart.height - newHeight) / 2;
-      newTopRight[1] += yAdjustment;
+      topRight[1] += yAdjustment;
     }
 
-    resizedElement = {
-      width: newWidth,
-      height: newHeight,
-      x: newTopRight[0] - newWidth,
-      y: newTopRight[1],
-    };
+    bottomRight = [topRight[0], topRight[1] + newHeight];
+    topLeft = [topRight[0] - newWidth, topRight[1]];
   }
   if (transformHandleType === "n") {
-    let newHeight =
+    newHeight =
       stateAtResizeStart.y + stateAtResizeStart.height - rotatedPointer[1];
 
     const bottomLeft = [
@@ -587,60 +515,21 @@ const resizeSingleRectDiamondEllipsesElement = (
       bottomLeft[1] = bottomLeft[1] + newHeight;
     }
 
-    const rotatedBottomLeft = rotate(
-      bottomLeft[0],
-      bottomLeft[1],
-      center[0],
-      center[1],
-      stateAtResizeStart.angle,
-    );
-
-    const topRight = [
-      bottomLeft[0] + stateAtResizeStart.width,
-      bottomLeft[1] - newHeight,
-    ];
-    const rotatedTopRight = rotate(
-      topRight[0],
-      topRight[1],
-      center[0],
-      center[1],
-      stateAtResizeStart.angle,
-    );
-
-    const newCenter = isResizeFromCenter
-      ? center
-      : [
-          (rotatedBottomLeft[0] + rotatedTopRight[0]) / 2,
-          (rotatedBottomLeft[1] + rotatedTopRight[1]) / 2,
-        ];
-
-    const newBottomLeft = rotate(
-      rotatedBottomLeft[0],
-      rotatedBottomLeft[1],
-      newCenter[0],
-      newCenter[1],
-      -stateAtResizeStart.angle,
-    );
-
-    let newWidth = stateAtResizeStart.width;
+    newWidth = stateAtResizeStart.width;
     if (shouldKeepSidesRatio) {
       newWidth *= newHeight / stateAtResizeStart.height;
       // Adjust so rect's center X stays the same.
       const xAdjustment = (stateAtResizeStart.width - newWidth) / 2;
-      newBottomLeft[0] = newBottomLeft[0] + xAdjustment;
+      bottomLeft[0] = bottomLeft[0] + xAdjustment;
     }
 
-    resizedElement = {
-      width: newWidth,
-      height: newHeight,
-      x: newBottomLeft[0],
-      y: newBottomLeft[1] - newHeight,
-    };
+    bottomRight = [bottomLeft[0] + newWidth, bottomLeft[1]];
+    topLeft = [bottomLeft[0], bottomLeft[1] - newHeight];
   }
   if (transformHandleType === "s") {
-    let newHeight = rotatedPointer[1] - stateAtResizeStart.y;
+    newHeight = rotatedPointer[1] - stateAtResizeStart.y;
 
-    const topLeft = [stateAtResizeStart.x, stateAtResizeStart.y];
+    topLeft = [stateAtResizeStart.x, stateAtResizeStart.y];
     if (isResizeFromCenter) {
       const heightDiff = newHeight - stateAtResizeStart.height;
       newHeight += heightDiff;
@@ -653,78 +542,31 @@ const resizeSingleRectDiamondEllipsesElement = (
       topLeft[1] = topLeft[1] - newHeight;
     }
 
-    const rotatedTopLeft = rotate(
-      topLeft[0],
-      topLeft[1],
-      center[0],
-      center[1],
-      stateAtResizeStart.angle,
-    );
-
-    const bottomRight = [
-      topLeft[0] + stateAtResizeStart.width,
-      topLeft[1] + newHeight,
-    ];
-    const rotatedBottomRight = rotate(
-      bottomRight[0],
-      bottomRight[1],
-      center[0],
-      center[1],
-      stateAtResizeStart.angle,
-    );
-
-    const newCenter = isResizeFromCenter
-      ? center
-      : [
-          (rotatedTopLeft[0] + rotatedBottomRight[0]) / 2,
-          (rotatedTopLeft[1] + rotatedBottomRight[1]) / 2,
-        ];
-
-    const newTopLeft = rotate(
-      rotatedTopLeft[0],
-      rotatedTopLeft[1],
-      newCenter[0],
-      newCenter[1],
-      -stateAtResizeStart.angle,
-    );
-
-    let newWidth = stateAtResizeStart.width;
+    newWidth = stateAtResizeStart.width;
     if (shouldKeepSidesRatio) {
       newWidth *= newHeight / stateAtResizeStart.height;
       // Adjust so rect's center X stays the same.
       const xAdjustment = (stateAtResizeStart.width - newWidth) / 2;
-      newTopLeft[0] = newTopLeft[0] + xAdjustment;
+      topLeft[0] = topLeft[0] + xAdjustment;
     }
 
-    resizedElement = {
-      width: newWidth,
-      height: newHeight,
-      x: newTopLeft[0],
-      y: newTopLeft[1],
-    };
+    bottomRight = [topLeft[0] + newWidth, topLeft[1] + newHeight];
   }
   if (transformHandleType === "se") {
-    let newWidth = rotatedPointer[0] - stateAtResizeStart.x;
-    let newHeight = rotatedPointer[1] - stateAtResizeStart.y;
+    newWidth = rotatedPointer[0] - stateAtResizeStart.x;
+    newHeight = rotatedPointer[1] - stateAtResizeStart.y;
     if (shouldKeepSidesRatio) {
-      const widthResizeDirection = Math.sign(newWidth);
-      const heightResizeDirection = Math.sign(newHeight);
-
-      const widthRatio = newWidth / stateAtResizeStart.width;
-      const heightRatio = newHeight / stateAtResizeStart.height;
-
-      if (Math.abs(widthRatio) > Math.abs(heightRatio)) {
-        newHeight = widthRatio * stateAtResizeStart.height;
-      }
-      if (Math.abs(widthRatio) < Math.abs(heightRatio)) {
-        newWidth = heightRatio * stateAtResizeStart.width;
-      }
-
-      newWidth = Math.abs(newWidth) * widthResizeDirection;
-      newHeight = Math.abs(newHeight) * heightResizeDirection;
+      const dimensions = adjustDimensionsToHighestRatio({
+        originalWidth: stateAtResizeStart.width,
+        newWidth,
+        originalHeight: stateAtResizeStart.height,
+        newHeight,
+      });
+      newWidth = dimensions.width;
+      newHeight = dimensions.height;
     }
 
-    const topLeft = [stateAtResizeStart.x, stateAtResizeStart.y];
+    topLeft = [stateAtResizeStart.x, stateAtResizeStart.y];
     if (isResizeFromCenter) {
       newWidth = Math.abs((center[0] - rotatedPointer[0]) * 2);
       newHeight = Math.abs((center[1] - rotatedPointer[1]) * 2);
@@ -757,46 +599,11 @@ const resizeSingleRectDiamondEllipsesElement = (
       topLeft[1] = topLeft[1] - newHeight;
     }
 
-    const rotatedTopLeft = rotate(
-      topLeft[0],
-      topLeft[1],
-      center[0],
-      center[1],
-      stateAtResizeStart.angle,
-    );
-
-    const bottomRight = [topLeft[0] + newWidth, topLeft[1] + newHeight];
-    const rotatedBottomRight = rotate(
-      bottomRight[0],
-      bottomRight[1],
-      center[0],
-      center[1],
-      stateAtResizeStart.angle,
-    );
-
-    const newCenter = [
-      (rotatedTopLeft[0] + rotatedBottomRight[0]) / 2,
-      (rotatedTopLeft[1] + rotatedBottomRight[1]) / 2,
-    ];
-
-    const newTopLeft = rotate(
-      rotatedTopLeft[0],
-      rotatedTopLeft[1],
-      newCenter[0],
-      newCenter[1],
-      -stateAtResizeStart.angle,
-    );
-
-    resizedElement = {
-      width: newWidth,
-      height: newHeight,
-      x: newTopLeft[0],
-      y: newTopLeft[1],
-    };
+    bottomRight = [topLeft[0] + newWidth, topLeft[1] + newHeight];
   }
   if (transformHandleType === "ne") {
-    let newWidth = rotatedPointer[0] - stateAtResizeStart.x;
-    let newHeight =
+    newWidth = rotatedPointer[0] - stateAtResizeStart.x;
+    newHeight =
       stateAtResizeStart.y + stateAtResizeStart.height - rotatedPointer[1];
 
     const bottomLeft = [
@@ -805,21 +612,14 @@ const resizeSingleRectDiamondEllipsesElement = (
     ];
 
     if (shouldKeepSidesRatio) {
-      const widthResizeDirection = Math.sign(newWidth);
-      const heightResizeDirection = Math.sign(newHeight);
-
-      const widthRatio = newWidth / stateAtResizeStart.width;
-      const heightRatio = newHeight / stateAtResizeStart.height;
-
-      if (Math.abs(widthRatio) > Math.abs(heightRatio)) {
-        newHeight = widthRatio * stateAtResizeStart.height;
-      }
-      if (Math.abs(widthRatio) < Math.abs(heightRatio)) {
-        newWidth = heightRatio * stateAtResizeStart.width;
-      }
-
-      newWidth = Math.abs(newWidth) * widthResizeDirection;
-      newHeight = Math.abs(newHeight) * heightResizeDirection;
+      const dimensions = adjustDimensionsToHighestRatio({
+        originalWidth: stateAtResizeStart.width,
+        newWidth,
+        originalHeight: stateAtResizeStart.height,
+        newHeight,
+      });
+      newWidth = dimensions.width;
+      newHeight = dimensions.height;
     }
 
     if (isResizeFromCenter) {
@@ -854,69 +654,28 @@ const resizeSingleRectDiamondEllipsesElement = (
       bottomLeft[1] = bottomLeft[1] + newHeight;
     }
 
-    const rotatedBottomLeft = rotate(
-      bottomLeft[0],
-      bottomLeft[1],
-      center[0],
-      center[1],
-      stateAtResizeStart.angle,
-    );
-
-    const topRight = [bottomLeft[0] + newWidth, bottomLeft[1] - newHeight];
-    const rotatedTopRight = rotate(
-      topRight[0],
-      topRight[1],
-      center[0],
-      center[1],
-      stateAtResizeStart.angle,
-    );
-
-    const newCenter = [
-      (rotatedBottomLeft[0] + rotatedTopRight[0]) / 2,
-      (rotatedBottomLeft[1] + rotatedTopRight[1]) / 2,
-    ];
-
-    const newBottomLeft = rotate(
-      rotatedBottomLeft[0],
-      rotatedBottomLeft[1],
-      newCenter[0],
-      newCenter[1],
-      -stateAtResizeStart.angle,
-    );
-
-    resizedElement = {
-      width: newWidth,
-      height: newHeight,
-      x: newBottomLeft[0],
-      y: newBottomLeft[1] - newHeight,
-    };
+    bottomRight = [bottomLeft[0] + newWidth, bottomLeft[1]];
+    topLeft = [bottomLeft[0], bottomLeft[1] - newHeight];
   }
   if (transformHandleType === "nw") {
-    let newWidth =
+    newWidth =
       stateAtResizeStart.x + stateAtResizeStart.width - rotatedPointer[0];
 
-    let newHeight =
+    newHeight =
       stateAtResizeStart.y + stateAtResizeStart.height - rotatedPointer[1];
 
     if (shouldKeepSidesRatio) {
-      const widthResizeDirection = Math.sign(newWidth);
-      const heightResizeDirection = Math.sign(newHeight);
-
-      const widthRatio = newWidth / stateAtResizeStart.width;
-      const heightRatio = newHeight / stateAtResizeStart.height;
-
-      if (Math.abs(widthRatio) > Math.abs(heightRatio)) {
-        newHeight = widthRatio * stateAtResizeStart.height;
-      }
-      if (Math.abs(widthRatio) < Math.abs(heightRatio)) {
-        newWidth = heightRatio * stateAtResizeStart.width;
-      }
-
-      newWidth = Math.abs(newWidth) * widthResizeDirection;
-      newHeight = Math.abs(newHeight) * heightResizeDirection;
+      const dimensions = adjustDimensionsToHighestRatio({
+        originalWidth: stateAtResizeStart.width,
+        newWidth,
+        originalHeight: stateAtResizeStart.height,
+        newHeight,
+      });
+      newWidth = dimensions.width;
+      newHeight = dimensions.height;
     }
 
-    const bottomRight = [
+    bottomRight = [
       stateAtResizeStart.x + stateAtResizeStart.width,
       stateAtResizeStart.y + stateAtResizeStart.height,
     ];
@@ -952,65 +711,23 @@ const resizeSingleRectDiamondEllipsesElement = (
       bottomRight[1] = bottomRight[1] + newHeight;
     }
 
-    const rotatedBottomRight = rotate(
-      bottomRight[0],
-      bottomRight[1],
-      center[0],
-      center[1],
-      stateAtResizeStart.angle,
-    );
-
-    const topLeft = [bottomRight[0] - newWidth, bottomRight[1] - newHeight];
-    const rotatedTopLeft = rotate(
-      topLeft[0],
-      topLeft[1],
-      center[0],
-      center[1],
-      stateAtResizeStart.angle,
-    );
-
-    const newCenter = [
-      (rotatedBottomRight[0] + rotatedTopLeft[0]) / 2,
-      (rotatedBottomRight[1] + rotatedTopLeft[1]) / 2,
-    ];
-
-    const newBottomRight = rotate(
-      rotatedBottomRight[0],
-      rotatedBottomRight[1],
-      newCenter[0],
-      newCenter[1],
-      -stateAtResizeStart.angle,
-    );
-
-    resizedElement = {
-      width: newWidth,
-      height: newHeight,
-      x: newBottomRight[0] - newWidth,
-      y: newBottomRight[1] - newHeight,
-    };
+    topLeft = [bottomRight[0] - newWidth, bottomRight[1] - newHeight];
   }
   if (transformHandleType === "sw") {
-    let newWidth =
+    newWidth =
       stateAtResizeStart.x + stateAtResizeStart.width - rotatedPointer[0];
 
-    let newHeight = rotatedPointer[1] - stateAtResizeStart.y;
+    newHeight = rotatedPointer[1] - stateAtResizeStart.y;
 
     if (shouldKeepSidesRatio) {
-      const widthResizeDirection = Math.sign(newWidth);
-      const heightResizeDirection = Math.sign(newHeight);
-
-      const widthRatio = newWidth / stateAtResizeStart.width;
-      const heightRatio = newHeight / stateAtResizeStart.height;
-
-      if (Math.abs(widthRatio) > Math.abs(heightRatio)) {
-        newHeight = widthRatio * stateAtResizeStart.height;
-      }
-      if (Math.abs(widthRatio) < Math.abs(heightRatio)) {
-        newWidth = heightRatio * stateAtResizeStart.width;
-      }
-
-      newWidth = Math.abs(newWidth) * widthResizeDirection;
-      newHeight = Math.abs(newHeight) * heightResizeDirection;
+      const dimensions = adjustDimensionsToHighestRatio({
+        originalWidth: stateAtResizeStart.width,
+        newWidth,
+        originalHeight: stateAtResizeStart.height,
+        newHeight,
+      });
+      newWidth = dimensions.width;
+      newHeight = dimensions.height;
     }
 
     const topRight = [
@@ -1049,49 +766,69 @@ const resizeSingleRectDiamondEllipsesElement = (
       topRight[1] = topRight[1] - newHeight;
     }
 
-    const rotatedTopRight = rotate(
-      topRight[0],
-      topRight[1],
-      center[0],
-      center[1],
-      stateAtResizeStart.angle,
-    );
-
     const bottomLeft = [topRight[0] - newWidth, topRight[1] + newHeight];
-    const rotatedBottomLeft = rotate(
-      bottomLeft[0],
-      bottomLeft[1],
-      center[0],
-      center[1],
-      stateAtResizeStart.angle,
-    );
-
-    const newCenter = [
-      (rotatedBottomLeft[0] + rotatedTopRight[0]) / 2,
-      (rotatedBottomLeft[1] + rotatedTopRight[1]) / 2,
-    ];
-
-    const newTopRight = rotate(
-      rotatedTopRight[0],
-      rotatedTopRight[1],
-      newCenter[0],
-      newCenter[1],
-      -stateAtResizeStart.angle,
-    );
-
-    resizedElement = {
-      width: newWidth,
-      height: newHeight,
-      x: newTopRight[0] - newWidth,
-      y: newTopRight[1],
-    };
+    bottomRight = [bottomLeft[0] + newWidth, bottomLeft[1]];
+    topLeft = [bottomLeft[0], bottomLeft[1] - newHeight];
   }
+
+  const newTopLeft = adjustElementRotation({
+    topLeft,
+    bottomRight,
+    rotationPoint: center,
+    angle: stateAtResizeStart.angle,
+  });
+
+  const resizedElement = {
+    width: newWidth,
+    height: newHeight,
+    x: newTopLeft[0],
+    y: newTopLeft[1],
+  };
 
   updateBoundElements(element, {
     newSize: { width: resizedElement.width, height: resizedElement.height },
   });
-
   mutateElement(element, resizedElement);
+
+  function adjustElementRotation({
+    topLeft,
+    bottomRight,
+    rotationPoint,
+    angle,
+  }: {
+    topLeft: Point;
+    bottomRight: Point;
+    rotationPoint: Point;
+    angle: number;
+  }) {
+    const rotatedTopLeft = rotatePoint(topLeft, rotationPoint, angle);
+    const rotatedBottomRight = rotatePoint(bottomRight, rotationPoint, angle);
+    const newCenter = centerPoint(rotatedTopLeft, rotatedBottomRight);
+    return rotatePoint(rotatedTopLeft, newCenter, -angle);
+  }
+
+  function adjustDimensionsToHighestRatio({
+    originalWidth,
+    newWidth,
+    originalHeight,
+    newHeight,
+  }: {
+    originalWidth: number;
+    newWidth: number;
+    originalHeight: number;
+    newHeight: number;
+  }) {
+    const widthRatio = newWidth / originalWidth;
+    const heightRatio = newHeight / originalHeight;
+
+    const ratio =
+      Math.abs(widthRatio) < Math.abs(heightRatio) ? heightRatio : widthRatio;
+
+    return {
+      width: Math.abs(originalWidth * ratio) * Math.sign(newWidth),
+      height: Math.abs(originalHeight * ratio) * Math.sign(newHeight),
+    };
+  }
 };
 
 const resizeSingleElement = (
