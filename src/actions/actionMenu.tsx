@@ -65,7 +65,7 @@ export const actionFullScreen = register({
       commitToHistory: false,
     };
   },
-  keyTest: (event) => event.keyCode === KEYS.F_KEY_CODE,
+  keyTest: (event) => event.code === KEYS.F_CODE,
 });
 
 export const actionShortcuts = register({
@@ -82,5 +82,5 @@ export const actionShortcuts = register({
   PanelComponent: ({ updateData }) => (
     <HelpIcon title={t("shortcutsDialog.title")} onClick={updateData} />
   ),
-  keyTest: (event) => event.key === KEYS.QUESTION_MARK,
+  keyTest: (event) => event.key === KEYS.QUESTION_MARK_KEY,
 });

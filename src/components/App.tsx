@@ -79,7 +79,7 @@ import {
 } from "../utils";
 import {
   KEYS,
-  isArrowKey,
+  isArrowCode,
   getResizeCenterPointKey,
   getResizeWithSidesSameLengthKey,
   getRotateWithDiscreteAngleKey,
@@ -1543,19 +1543,23 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     // ensures we don't prevent devTools select-element feature
-    if (event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === "C") {
-      return;
-    }
-
     if (
-      (isWritableElement(event.target) && event.key !== KEYS.ESCAPE) ||
-      // case: using arrows to move between buttons
-      (isArrowKey(event.key) && isInputLike(event.target))
+      event[KEYS.CTRL_OR_CMD] &&
+      event.shiftKey &&
+      event.code === KEYS.C_CODE
     ) {
       return;
     }
 
-    if (event.key === KEYS.QUESTION_MARK) {
+    if (
+      (isWritableElement(event.target) && event.code !== KEYS.ESCAPE) ||
+      // case: using arrows to move between buttons
+      (isArrowCode(event.code) && isInputLike(event.target))
+    ) {
+      return;
+    }
+
+    if (event.key === KEYS.QUESTION_MARK_KEY) {
       this.setState({
         showShortcutsDialog: true,
       });
@@ -1564,12 +1568,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (
       !event[KEYS.CTRL_OR_CMD] &&
       event.altKey &&
-      event.keyCode === KEYS.Z_KEY_CODE
+      event.code === KEYS.Z_CODE
     ) {
       this.toggleZenMode();
     }
 
-    if (event[KEYS.CTRL_OR_CMD] && event.keyCode === KEYS.GRID_KEY_CODE) {
+    if (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.QUOTE_KEY) {
       this.toggleGridMode();
     }
     if (event[KEYS.CTRL_OR_CMD]) {
@@ -1590,7 +1594,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.setState({ isLibraryOpen: !this.state.isLibraryOpen });
     }
 
-    if (isArrowKey(event.key)) {
+    if (isArrowCode(event.key)) {
       const step =
         (this.state.gridSize &&
           (event.shiftKey ? ELEMENT_TRANSLATE_AMOUNT : this.state.gridSize)) ||
@@ -1676,14 +1680,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         this.toggleLock();
       }
     }
-    if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
+    if (event.key === KEYS.SPACE_CODE && gesture.pointers.size === 0) {
       isHoldingSpace = true;
       document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
     }
   });
 
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
-    if (event.key === KEYS.SPACE) {
+    if (event.key === KEYS.SPACE_CODE) {
       if (this.state.elementType === "selection") {
         resetCursor();
       } else {
@@ -1699,7 +1703,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (!event[KEYS.CTRL_OR_CMD] && !this.state.isBindingEnabled) {
       this.setState({ isBindingEnabled: true });
     }
-    if (isArrowKey(event.key)) {
+    if (isArrowCode(event.key)) {
       const selectedElements = getSelectedElements(
         this.scene.getElements(),
         this.state,

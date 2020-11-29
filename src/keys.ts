@@ -1,38 +1,37 @@
 export const isDarwin = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform);
 
 export const KEYS = {
+  ARROW_DOWN: "ArrowDown",
   ARROW_LEFT: "ArrowLeft",
   ARROW_RIGHT: "ArrowRight",
-  ARROW_DOWN: "ArrowDown",
   ARROW_UP: "ArrowUp",
+  BACKSPACE: "Backspace",
+  C_CODE: "KeyC",
+  CTRL_OR_CMD: isDarwin ? "metaKey" : "ctrlKey",
+  DELETE: "Delete",
   ENTER: "Enter",
   ESCAPE: "Escape",
-  DELETE: "Delete",
-  BACKSPACE: "Backspace",
-  CTRL_OR_CMD: isDarwin ? "metaKey" : "ctrlKey",
+  F_CODE: "KeyF",
+  G_CODE: "KeyG",
+  H_CODE: "KeyH",
+  QUESTION_MARK_KEY: "?",
+  QUOTE_KEY: "'",
+  SPACE_CODE: "Space",
   TAB: "Tab",
-  SPACE: " ",
-  QUESTION_MARK: "?",
-  F_KEY_CODE: 70,
-  ALT_KEY_CODE: 18,
-  Z_KEY_CODE: 90,
-  GRID_KEY_CODE: 222,
-  H_KEY_CODE: 72,
-  G_KEY_CODE: 71,
-  C_KEY_CODE: 67,
-  V_KEY_CODE: 86,
+  V_CODE: "KeyV",
+  Z_CODE: "KeyZ",
 } as const;
 
 export type Key = keyof typeof KEYS;
 
-export const isArrowKey = (keyCode: string) =>
-  keyCode === KEYS.ARROW_LEFT ||
-  keyCode === KEYS.ARROW_RIGHT ||
-  keyCode === KEYS.ARROW_DOWN ||
-  keyCode === KEYS.ARROW_UP;
+export const isArrowCode = (code: string) =>
+  code === KEYS.ARROW_LEFT ||
+  code === KEYS.ARROW_RIGHT ||
+  code === KEYS.ARROW_DOWN ||
+  code === KEYS.ARROW_UP;
 
 export const getResizeCenterPointKey = (event: MouseEvent | KeyboardEvent) =>
-  event.altKey || event.which === KEYS.ALT_KEY_CODE;
+  event.altKey;
 
 export const getResizeWithSidesSameLengthKey = (event: MouseEvent) =>
   event.shiftKey;
