@@ -1,6 +1,6 @@
 import { ToolName } from "../queries/toolQueries";
 import { fireEvent, GlobalTestState } from "../test-utils";
-import { KEYS, Key } from "../../keys";
+import { KEYS } from "../../keys";
 import {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -34,22 +34,6 @@ export class Keyboard {
       shiftKey = prevShiftKey;
       ctrlKey = prevCtrlKey;
     }
-  };
-
-  static hotkeyDown = (hotkey: Key) => {
-    const key = KEYS[hotkey];
-    if (typeof key !== "string") {
-      throw new Error("must provide a hotkey, not a key code");
-    }
-    Keyboard.keyDown(key);
-  };
-
-  static hotkeyUp = (hotkey: Key) => {
-    const key = KEYS[hotkey];
-    if (typeof key !== "string") {
-      throw new Error("must provide a hotkey, not a key code");
-    }
-    Keyboard.keyUp(key);
   };
 
   static keyDown = (code: string) => {
