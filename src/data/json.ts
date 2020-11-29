@@ -36,7 +36,6 @@ export const saveAsJSON = async (
   const fileHandle = await fileSave(
     blob,
     {
-      fileName: appState.name,
       description: "Excalidraw file",
       extensions: [".excalidraw"],
     },
