@@ -47,7 +47,6 @@ import {
   loadScene,
   loadFromBlob,
   SOCKET_SERVER,
-  SocketUpdateDataSource,
   exportCanvas,
 } from "../data";
 import Portal from "./Portal";
@@ -505,7 +504,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       return false;
     }
 
-    const roomID = roomMatch[1];
+    const roomId = roomMatch[1];
 
     let collabForceLoadFlag;
     try {
@@ -524,7 +523,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         );
         // if loading same room as the one previously unloaded within 15sec
         // force reload without prompting
-        if (previousRoom === roomID && Date.now() - timestamp < 15000) {
+        if (previousRoom === roomId && Date.now() - timestamp < 15000) {
           return true;
         }
       } catch {}
@@ -828,13 +827,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   }
 
   private beforeUnload = withBatchedUpdates((event: BeforeUnloadEvent) => {
-    if (this.state.isCollaborating && this.portal.roomID) {
+    if (this.state.isCollaborating && this.portal.roomId) {
       try {
         localStorage?.setItem(
           LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
           JSON.stringify({
             timestamp: Date.now(),
-            room: this.portal.roomID,
+            room: this.portal.roomId,
           }),
         );
       } catch {}
@@ -962,7 +961,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         zoom: this.state.zoom,
         remotePointerViewportCoords: pointerViewportCoords,
         remotePointerButton: cursorButton,
-        remoteSelectedElementIds: remoteSelectedElementIds,
+        remoteSelectedElementIds,
         remotePointerUsernames: pointerUsernames,
         shouldCacheIgnoreZoom: this.state.shouldCacheIgnoreZoom,
       },
@@ -979,7 +978,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         ? false
         : !atLeastOneVisibleElement && elements.length > 0;
     if (this.state.scrolledOutside !== scrolledOutside) {
-      this.setState({ scrolledOutside: scrolledOutside });
+      this.setState({ scrolledOutside });
     }
 
     if (
@@ -1205,8 +1204,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     );
 
     const element = newTextElement({
-      x: x,
-      y: y,
+      x,
+      y,
       strokeColor: this.state.currentItemStrokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
@@ -1215,7 +1214,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
       strokeSharpness: this.state.currentItemStrokeSharpness,
-      text: text,
+      text,
       fontSize: this.state.currentItemFontSize,
       fontFamily: this.state.currentItemFontFamily,
       textAlign: this.state.currentItemTextAlign,
@@ -1376,7 +1375,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     const roomMatch = getCollaborationLinkData(window.location.href);
     if (roomMatch) {
-      const roomID = roomMatch[1];
+      const roomId = roomMatch[1];
       const roomKey = roomMatch[2];
 
       // fallback in case you're not alone in the room but still don't receive
@@ -1386,11 +1385,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         INITIAL_SCENE_UPDATE_TIMEOUT,
       );
 
-      const { default: socketIOClient }: any = await import(
-        /* webpackChunkName: "socketIoClient" */ "socket.io-client"
-      );
+      const { default: socketIOClient }: any = await import("socket.io-client");
 
-      this.portal.open(socketIOClient(SOCKET_SERVER), roomID, roomKey);
+      this.portal.open(socketIOClient(SOCKET_SERVER), roomId, roomKey);
 
       // All socket listeners are moving to Portal
       this.portal.socket!.on(
@@ -1420,17 +1417,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               break;
             case "MOUSE_LOCATION": {
               const {
+                socketId,
                 pointer,
                 button,
                 username,
                 selectedElementIds,
               } = decryptedData.payload;
-
-              const socketId: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["socketId"] =
-                decryptedData.payload.socketId ||
-                // @ts-ignore legacy, see #2094 (#2097)
-                decryptedData.payload.socketID;
-
               // NOTE purposefully mutating collaborators map in case of
               // pointer updates so as not to trigger LayerUI rerender
               this.setState((state) => {
@@ -1463,7 +1455,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
 
       try {
-        const elements = await loadFromFirebase(roomID, roomKey);
+        const elements = await loadFromFirebase(roomId, roomKey);
         if (elements) {
           this.handleRemoteSceneUpdate(elements, { initFromSnapshot: true });
         }
