@@ -326,7 +326,6 @@ const LayerUI = ({
       if (canvas) {
         await exportCanvas(type, exportedElements, appState, canvas, {
           exportBackground: appState.exportBackground,
-          name: appState.name,
           viewBackgroundColor: appState.viewBackgroundColor,
           scale,
           shouldAddWatermark: appState.shouldAddWatermark,

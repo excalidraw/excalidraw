@@ -620,13 +620,13 @@ const renderSelectionBorder = (
   context.translate(sceneState.scrollX, sceneState.scrollY);
 
   const count = selectionColors.length;
-  for (var i = 0; i < count; ++i) {
-    context.strokeStyle = selectionColors[i];
+  for (let index = 0; index < count; ++index) {
+    context.strokeStyle = selectionColors[index];
     context.setLineDash([
       dashWidth,
       spaceWidth + (dashWidth + spaceWidth) * (count - 1),
     ]);
-    context.lineDashOffset = (dashWidth + spaceWidth) * i;
+    context.lineDashOffset = (dashWidth + spaceWidth) * index;
     strokeRectWithRotation(
       context,
       elementX1 - dashedLinePadding,

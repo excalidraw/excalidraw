@@ -44,24 +44,24 @@ export const distributeElements = (
     // rather than from gaps. Buckle up, this is a weird one.
 
     // Get indices of boxes that define start and end of our bounding box
-    const i0 = groups.findIndex((g) => g[1][start] === bounds[start]);
-    const i1 = groups.findIndex((g) => g[1][end] === bounds[end]);
+    const index0 = groups.findIndex((g) => g[1][start] === bounds[start]);
+    const index1 = groups.findIndex((g) => g[1][end] === bounds[end]);
 
     // Get our step, based on the distance between the center points of our
     // start and end boxes
     const step =
-      (groups[i1][1][mid] - groups[i0][1][mid]) / (groups.length - 1);
+      (groups[index1][1][mid] - groups[index0][1][mid]) / (groups.length - 1);
 
-    let pos = groups[i0][1][mid];
+    let pos = groups[index0][1][mid];
 
-    return groups.flatMap(([group, box], i) => {
+    return groups.flatMap(([group, box], index) => {
       const translation = {
         x: 0,
         y: 0,
       };
 
       // Don't move our start and end boxes
-      if (i !== i0 && i !== i1) {
+      if (index !== index0 && index !== index1) {
         pos += step;
         translation[distribution.axis] = pos - box[mid];
       }

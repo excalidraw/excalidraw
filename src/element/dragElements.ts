@@ -91,8 +91,8 @@ export const dragNewElement = (
     mutateElement(draggingElement, {
       x: newX,
       y: newY,
-      width: width,
-      height: height,
+      width,
+      height,
     });
   }
 };

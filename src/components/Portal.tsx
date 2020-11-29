@@ -14,7 +14,7 @@ class Portal {
   app: App;
   socket: SocketIOClient.Socket | null = null;
   socketInitialized: boolean = false; // we don't want the socket to emit any updates until it is fully initialized
-  roomID: string | null = null;
+  roomId: string | null = null;
   roomKey: string | null = null;
   broadcastedElementVersions: Map<string, number> = new Map();
 
@@ -24,13 +24,13 @@ class Portal {
 
   open(socket: SocketIOClient.Socket, id: string, key: string) {
     this.socket = socket;
-    this.roomID = id;
+    this.roomId = id;
     this.roomKey = key;
 
     // Initialize socket listeners (moving from App)
     this.socket.on("init-room", () => {
       if (this.socket) {
-        this.socket.emit("join-room", this.roomID);
+        this.socket.emit("join-room", this.roomId);
       }
     });
     this.socket.on("new-user", async (_socketId: string) => {
@@ -47,7 +47,7 @@ class Portal {
     }
     this.socket.close();
     this.socket = null;
-    this.roomID = null;
+    this.roomId = null;
     this.roomKey = null;
     this.socketInitialized = false;
     this.broadcastedElementVersions = new Map();
@@ -57,7 +57,7 @@ class Portal {
     return !!(
       this.socketInitialized &&
       this.socket &&
-      this.roomID &&
+      this.roomId &&
       this.roomKey
     );
   }
@@ -72,7 +72,7 @@ class Portal {
       const encrypted = await encryptAESGEM(encoded, this.roomKey!);
       this.socket!.emit(
         volatile ? BROADCAST.SERVER_VOLATILE : BROADCAST.SERVER,
-        this.roomID,
+        this.roomId,
         encrypted.data,
         encrypted.iv,
       );
