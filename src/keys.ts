@@ -1,6 +1,7 @@
 export const isDarwin = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform);
 
 export const KEYS = {
+  A_CODE: "KeyA",
   ARROW_DOWN: "ArrowDown",
   ARROW_LEFT: "ArrowLeft",
   ARROW_RIGHT: "ArrowRight",

@@ -52,36 +52,27 @@ export class Keyboard {
     Keyboard.keyUp(key);
   };
 
-  static keyDown = (key: string) => {
+  static keyDown = (code: string) => {
     fireEvent.keyDown(document, {
-      key,
+      code,
       ctrlKey,
       shiftKey,
       altKey,
-      keyCode: key.toUpperCase().charCodeAt(0),
-      which: key.toUpperCase().charCodeAt(0),
     });
   };
 
-  static keyUp = (key: string) => {
+  static keyUp = (code: string) => {
     fireEvent.keyUp(document, {
-      key,
+      code,
       ctrlKey,
       shiftKey,
       altKey,
-      keyCode: key.toUpperCase().charCodeAt(0),
-      which: key.toUpperCase().charCodeAt(0),
     });
   };
 
-  static hotkeyPress = (key: Key) => {
-    Keyboard.hotkeyDown(key);
-    Keyboard.hotkeyUp(key);
-  };
-
-  static keyPress = (key: string) => {
-    Keyboard.keyDown(key);
-    Keyboard.keyUp(key);
+  static keyPress = (code: string) => {
+    Keyboard.keyDown(code);
+    Keyboard.keyUp(code);
   };
 }
 
@@ -209,7 +200,7 @@ export class UI {
   static group(elements: ExcalidrawElement[]) {
     mouse.select(elements);
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress("g");
+      Keyboard.keyPress(KEYS.G_CODE);
     });
   }
 }

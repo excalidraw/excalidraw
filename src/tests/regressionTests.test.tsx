@@ -18,6 +18,7 @@ import { queryByText } from "@testing-library/react";
 import { copiedStyles } from "../actions/actionStyles";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { API } from "./helpers/api";
+import { KEYS } from "../keys";
 
 const { h } = window;
 
@@ -129,13 +130,13 @@ describe("regression tests", () => {
     mouse.click(40, -10);
     mouse.click(50, 10);
     mouse.click(30, 10);
-    Keyboard.hotkeyPress("ENTER");
+    Keyboard.keyPress(KEYS.ENTER);
 
     UI.clickTool("line");
     mouse.click(40, -20);
     mouse.click(50, 10);
     mouse.click(30, 10);
-    Keyboard.hotkeyPress("ENTER");
+    Keyboard.keyPress(KEYS.ENTER);
 
     UI.clickTool("draw");
     mouse.down(40, -20);
@@ -171,24 +172,22 @@ describe("regression tests", () => {
     expect(API.getSelectedElement().id).not.toEqual(prevSelectedId);
   });
 
-  for (const [keys, shape] of [
-    ["2r", "rectangle"],
-    ["3d", "diamond"],
-    ["4e", "ellipse"],
-    ["5a", "arrow"],
-    ["6l", "line"],
-    ["7x", "draw"],
-  ] as [string, ExcalidrawElement["type"]][]) {
-    for (const key of keys) {
-      it(`hotkey ${key} selects ${shape} tool`, () => {
-        Keyboard.keyPress(key);
+  for (const [code, shape] of [
+    ["KeyR", "rectangle"],
+    ["KeyD", "diamond"],
+    ["KeyE", "ellipse"],
+    ["KeyA", "arrow"],
+    ["KeyL", "line"],
+    ["KeyX", "draw"],
+  ]) {
+    it(`code ${code} selects ${shape} tool`, () => {
+      Keyboard.keyPress(code);
 
-        mouse.down(10, 10);
-        mouse.up(10, 10);
+      mouse.down(10, 10);
+      mouse.up(10, 10);
 
-        expect(API.getSelectedElement().type).toBe(shape);
-      });
-    }
+      expect(API.getSelectedElement().type).toBe(shape);
+    });
   }
 
   it("change the properties of a shape", () => {
@@ -410,12 +409,12 @@ describe("regression tests", () => {
     UI.clickTool("rectangle");
     mouse.down(10, 10);
     mouse.up(10, 10);
-    Keyboard.hotkeyPress("ARROW_LEFT");
-    Keyboard.hotkeyPress("ARROW_LEFT");
-    Keyboard.hotkeyPress("ARROW_RIGHT");
-    Keyboard.hotkeyPress("ARROW_UP");
-    Keyboard.hotkeyPress("ARROW_UP");
-    Keyboard.hotkeyPress("ARROW_DOWN");
+    Keyboard.keyPress(KEYS.ARROW_LEFT);
+    Keyboard.keyPress(KEYS.ARROW_LEFT);
+    Keyboard.keyPress(KEYS.ARROW_RIGHT);
+    Keyboard.keyPress(KEYS.ARROW_UP);
+    Keyboard.keyPress(KEYS.ARROW_UP);
+    Keyboard.keyPress(KEYS.ARROW_DOWN);
     expect(h.elements[0].x).toBe(9);
     expect(h.elements[0].y).toBe(9);
   });
@@ -433,20 +432,20 @@ describe("regression tests", () => {
     mouse.click(60, -10);
     mouse.click(60, 10);
     mouse.click(40, 10);
-    Keyboard.hotkeyPress("ENTER");
+    Keyboard.keyPress(KEYS.ENTER);
 
     expect(h.elements.filter((element) => !element.isDeleted).length).toBe(3);
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress("z");
-      Keyboard.keyPress("z");
+      Keyboard.keyPress(KEYS.Z_CODE);
+      Keyboard.keyPress(KEYS.Z_CODE);
     });
     expect(h.elements.filter((element) => !element.isDeleted).length).toBe(2);
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress("z");
+      Keyboard.keyPress(KEYS.Z_CODE);
     });
     expect(h.elements.filter((element) => !element.isDeleted).length).toBe(1);
     Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
-      Keyboard.keyPress("z");
+      Keyboard.keyPress(KEYS.Z_CODE);
     });
     expect(h.elements.filter((element) => !element.isDeleted).length).toBe(2);
   });
@@ -469,7 +468,7 @@ describe("regression tests", () => {
     expect(API.getStateHistory().length).toBe(3);
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress("z");
+      Keyboard.keyPress(KEYS.Z_CODE);
     });
 
     expect(API.getStateHistory().length).toBe(2);
@@ -480,7 +479,7 @@ describe("regression tests", () => {
     expect(API.getStateHistory().length).toBe(2);
 
     Keyboard.withModifierKeys({ shift: true, ctrl: true }, () => {
-      Keyboard.keyPress("z");
+      Keyboard.keyPress(KEYS.Z_CODE);
     });
 
     expect(API.getStateHistory().length).toBe(3);
@@ -553,7 +552,7 @@ describe("regression tests", () => {
     }
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress("g");
+      Keyboard.keyPress(KEYS.G_CODE);
     });
 
     for (const element of h.elements) {
@@ -591,8 +590,8 @@ describe("regression tests", () => {
     mouse.up(10, 10);
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress("a");
-      Keyboard.keyPress("g");
+      Keyboard.keyPress(KEYS.A_CODE);
+      Keyboard.keyPress(KEYS.G_CODE);
     });
 
     expect(API.getSelectedElements().length).toBe(3);
@@ -629,7 +628,7 @@ describe("regression tests", () => {
       mouse.click();
     });
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress("g");
+      Keyboard.keyPress(KEYS.G_CODE);
     });
 
     expect(h.elements.map((element) => element.id)).toEqual([
@@ -658,8 +657,8 @@ describe("regression tests", () => {
     positions.push(mouse.getPosition());
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress("a");
-      Keyboard.keyPress("g");
+      Keyboard.keyPress(KEYS.A_CODE);
+      Keyboard.keyPress(KEYS.G_CODE);
     });
 
     mouse.doubleClick();
@@ -668,7 +667,7 @@ describe("regression tests", () => {
       mouse.click();
     });
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress("g");
+      Keyboard.keyPress(KEYS.G_CODE);
     });
 
     const groupIds = h.elements[2].groupIds;
@@ -813,7 +812,7 @@ describe("regression tests", () => {
     });
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress("g");
+      Keyboard.keyPress(KEYS.G_CODE);
     });
 
     fireEvent.contextMenu(GlobalTestState.canvas, {
@@ -1106,7 +1105,7 @@ describe("regression tests", () => {
     });
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress("g");
+      Keyboard.keyPress(KEYS.G_CODE);
     });
 
     fireEvent.contextMenu(GlobalTestState.canvas, {
@@ -1502,8 +1501,8 @@ describe("regression tests", () => {
     UI.group([rect3, rect4]);
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress("a");
-      Keyboard.keyPress("g");
+      Keyboard.keyPress(KEYS.A_CODE);
+      Keyboard.keyPress(KEYS.G_CODE);
     });
 
     const selectedGroupIds_prev = h.state.selectedGroupIds;
@@ -1617,7 +1616,7 @@ it(
 
     // Create group with first and third rectangle
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress("g");
+      Keyboard.keyPress(KEYS.G_CODE);
     });
 
     expect(API.getSelectedElements().length).toBe(2);
