@@ -159,7 +159,7 @@ export const renderSpreadsheet = (
   const range = max - min;
 
   const minYLabel = newTextElement({
-    x: x,
+    x,
     y: y + BAR_HEIGHT,
     strokeColor: appState.currentItemStrokeColor,
     backgroundColor: appState.currentItemBackgroundColor,
@@ -177,8 +177,8 @@ export const renderSpreadsheet = (
   });
 
   const maxYLabel = newTextElement({
-    x: x,
-    y: y,
+    x,
+    y,
     strokeColor: appState.currentItemStrokeColor,
     backgroundColor: appState.currentItemBackgroundColor,
     fillStyle: appState.currentItemFillStyle,
@@ -194,11 +194,11 @@ export const renderSpreadsheet = (
     verticalAlign: DEFAULT_VERTICAL_ALIGN,
   });
 
-  const bars = spreadsheet.values.map((value, i) => {
+  const bars = spreadsheet.values.map((value, index) => {
     const valueBarHeight = value - min;
     const percentBarHeight = valueBarHeight / range;
     const barHeight = percentBarHeight * BAR_HEIGHT;
-    const barX = i * (BAR_WIDTH + BAR_SPACING) + LABEL_SPACING;
+    const barX = index * (BAR_WIDTH + BAR_SPACING) + LABEL_SPACING;
     const barY = BAR_HEIGHT - barHeight;
     return newElement({
       type: "rectangle",
@@ -218,9 +218,9 @@ export const renderSpreadsheet = (
   });
 
   const xLabels =
-    spreadsheet.labels?.map((label, i) => {
+    spreadsheet.labels?.map((label, index) => {
       const labelX =
-        i * (BAR_WIDTH + BAR_SPACING) + LABEL_SPACING + BAR_SPACING;
+        index * (BAR_WIDTH + BAR_SPACING) + LABEL_SPACING + BAR_SPACING;
       const labelY = BAR_HEIGHT + BAR_SPACING;
       return newTextElement({
         text: label.length > 8 ? `${label.slice(0, 5)}...` : label,
