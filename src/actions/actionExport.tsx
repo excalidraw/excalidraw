@@ -82,7 +82,9 @@ export const actionSaveScene = register({
     }
   },
   keyTest: (event) => {
-    return event.key === "s" && event[KEYS.CTRL_OR_CMD] && !event.shiftKey;
+    return (
+      event.code === KEYS.S_CODE && event[KEYS.CTRL_OR_CMD] && !event.shiftKey
+    );
   },
   PanelComponent: ({ updateData }) => (
     <ToolButton

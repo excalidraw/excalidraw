@@ -54,7 +54,7 @@ export const actionAlignTop = register({
   },
   keyTest: (event) => {
     return (
-      event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === KEYS.ARROW_UP
+      event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.code === KEYS.ARROW_UP
     );
   },
   PanelComponent: ({ elements, appState, updateData }) => (
@@ -86,7 +86,9 @@ export const actionAlignBottom = register({
   },
   keyTest: (event) => {
     return (
-      event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === KEYS.ARROW_DOWN
+      event[KEYS.CTRL_OR_CMD] &&
+      event.shiftKey &&
+      event.code === KEYS.ARROW_DOWN
     );
   },
   PanelComponent: ({ elements, appState, updateData }) => (
@@ -118,7 +120,9 @@ export const actionAlignLeft = register({
   },
   keyTest: (event) => {
     return (
-      event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === KEYS.ARROW_LEFT
+      event[KEYS.CTRL_OR_CMD] &&
+      event.shiftKey &&
+      event.code === KEYS.ARROW_LEFT
     );
   },
   PanelComponent: ({ elements, appState, updateData }) => (
@@ -152,7 +156,7 @@ export const actionAlignRight = register({
     return (
       event[KEYS.CTRL_OR_CMD] &&
       event.shiftKey &&
-      event.key === KEYS.ARROW_RIGHT
+      event.code === KEYS.ARROW_RIGHT
     );
   },
   PanelComponent: ({ elements, appState, updateData }) => (

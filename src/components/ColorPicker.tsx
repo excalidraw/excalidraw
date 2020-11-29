@@ -71,7 +71,7 @@ const Picker = ({
   }, []);
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === KEYS.TAB) {
+    if (event.code === KEYS.TAB) {
       const { activeElement } = document;
       if (event.shiftKey) {
         if (activeElement === firstItem.current) {
@@ -83,10 +83,10 @@ const Picker = ({
         event.preventDefault();
       }
     } else if (
-      event.key === KEYS.ARROW_RIGHT ||
-      event.key === KEYS.ARROW_LEFT ||
-      event.key === KEYS.ARROW_UP ||
-      event.key === KEYS.ARROW_DOWN
+      event.code === KEYS.ARROW_RIGHT ||
+      event.code === KEYS.ARROW_LEFT ||
+      event.code === KEYS.ARROW_UP ||
+      event.code === KEYS.ARROW_DOWN
     ) {
       const { activeElement } = document;
       const isRTL = getLanguage().rtl;
@@ -97,13 +97,13 @@ const Picker = ({
       if (index !== -1) {
         const length = gallery!.current!.children.length - (showInput ? 1 : 0);
         const nextIndex =
-          event.key === (isRTL ? KEYS.ARROW_LEFT : KEYS.ARROW_RIGHT)
+          event.code === (isRTL ? KEYS.ARROW_LEFT : KEYS.ARROW_RIGHT)
             ? (index + 1) % length
-            : event.key === (isRTL ? KEYS.ARROW_RIGHT : KEYS.ARROW_LEFT)
+            : event.code === (isRTL ? KEYS.ARROW_RIGHT : KEYS.ARROW_LEFT)
             ? (length + index - 1) % length
-            : event.key === KEYS.ARROW_DOWN
+            : event.code === KEYS.ARROW_DOWN
             ? (index + 5) % length
-            : event.key === KEYS.ARROW_UP
+            : event.code === KEYS.ARROW_UP
             ? (length + index - 5) % length
             : index;
         (gallery!.current!.children![nextIndex] as any).focus();
@@ -116,7 +116,7 @@ const Picker = ({
       const index = keyBindings.indexOf(event.key.toLowerCase());
       (gallery!.current!.children![index] as any).focus();
       event.preventDefault();
-    } else if (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) {
+    } else if (event.code === KEYS.ESCAPE || event.code === KEYS.ENTER) {
       event.preventDefault();
       onClose();
     }

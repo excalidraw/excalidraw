@@ -39,7 +39,7 @@ export const Dialog = (props: {
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === KEYS.TAB) {
+      if (event.code === KEYS.TAB) {
         const focusableElements = queryFocusableElements(islandNode);
         const { activeElement } = document;
         const currentIndex = focusableElements.findIndex(

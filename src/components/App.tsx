@@ -1601,13 +1601,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       let offsetX = 0;
       let offsetY = 0;
 
-      if (event.key === KEYS.ARROW_LEFT) {
+      if (event.code === KEYS.ARROW_LEFT) {
         offsetX = -step;
-      } else if (event.key === KEYS.ARROW_RIGHT) {
+      } else if (event.code === KEYS.ARROW_RIGHT) {
         offsetX = step;
-      } else if (event.key === KEYS.ARROW_UP) {
+      } else if (event.code === KEYS.ARROW_UP) {
         offsetY = -step;
-      } else if (event.key === KEYS.ARROW_DOWN) {
+      } else if (event.code === KEYS.ARROW_DOWN) {
         offsetY = step;
       }
 
@@ -1625,7 +1625,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.maybeSuggestBindingForAll(selectedElements);
 
       event.preventDefault();
-    } else if (event.key === KEYS.ENTER) {
+    } else if (event.code === KEYS.ENTER) {
       const selectedElements = getSelectedElements(
         this.scene.getElements(),
         this.state,
@@ -1665,21 +1665,21 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       !event.metaKey &&
       this.state.draggingElement === null
     ) {
-      const shape = findShapeByKey(event.key);
+      const shape = findShapeByKey(event.code);
       if (shape) {
         this.selectShapeTool(shape);
-      } else if (event.key === "q") {
+      } else if (event.code === KEYS.Q_CODE) {
         this.toggleLock();
       }
     }
-    if (event.key === KEYS.SPACE_CODE && gesture.pointers.size === 0) {
+    if (event.code === KEYS.SPACE_CODE && gesture.pointers.size === 0) {
       isHoldingSpace = true;
       document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
     }
   });
 
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
-    if (event.key === KEYS.SPACE_CODE) {
+    if (event.code === KEYS.SPACE_CODE) {
       if (this.state.elementType === "selection") {
         resetCursor();
       } else {
@@ -1695,7 +1695,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (!event[KEYS.CTRL_OR_CMD] && !this.state.isBindingEnabled) {
       this.setState({ isBindingEnabled: true });
     }
-    if (isArrowCode(event.key)) {
+    if (isArrowCode(event.code)) {
       const selectedElements = getSelectedElements(
         this.scene.getElements(),
         this.state,
