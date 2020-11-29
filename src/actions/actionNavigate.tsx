@@ -43,12 +43,13 @@ export const actionGoToCollaborator = register({
       return null;
     }
 
-    const { background } = getClientColors(clientId);
+    const { background, stroke } = getClientColors(clientId);
     const shortName = getClientInitials(collaborator.username);
 
     return (
       <Avatar
         color={background}
+        border={stroke}
         onClick={() => updateData(collaborator.pointer)}
       >
         {shortName}
