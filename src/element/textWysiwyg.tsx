@@ -123,7 +123,7 @@ export const textWysiwyg = ({
       handleSubmit();
     } else if (event.code === KEYS.ENTER && event[KEYS.CTRL_OR_CMD]) {
       event.preventDefault();
-      if (event.isComposing || event.keyCode === 229) {
+      if (event.isComposing) {
         return;
       }
       handleSubmit();

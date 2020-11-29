@@ -500,11 +500,11 @@ describe("regression tests", () => {
 
   it("zoom hotkeys", () => {
     expect(h.state.zoom.value).toBe(1);
-    fireEvent.keyDown(document, { code: "Equal", ctrlKey: true });
-    fireEvent.keyUp(document, { code: "Equal", ctrlKey: true });
+    fireEvent.keyDown(document, { code: KEYS.EQUAL, ctrlKey: true });
+    fireEvent.keyUp(document, { code: KEYS.EQUAL, ctrlKey: true });
     expect(h.state.zoom.value).toBeGreaterThan(1);
-    fireEvent.keyDown(document, { code: "Minus", ctrlKey: true });
-    fireEvent.keyUp(document, { code: "Minus", ctrlKey: true });
+    fireEvent.keyDown(document, { code: KEYS.MINUS, ctrlKey: true });
+    fireEvent.keyUp(document, { code: KEYS.MINUS, ctrlKey: true });
     expect(h.state.zoom.value).toBe(1);
   });
 
