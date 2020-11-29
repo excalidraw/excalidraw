@@ -1565,7 +1565,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.toggleZenMode();
     }
 
-    if (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.QUOTE_KEY) {
+    if (event[KEYS.CTRL_OR_CMD] && event.code === KEYS.QUOTE_CODE) {
       this.toggleGridMode();
     }
     if (event[KEYS.CTRL_OR_CMD]) {

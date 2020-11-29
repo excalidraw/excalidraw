@@ -16,7 +16,7 @@ export const KEYS = {
   G_CODE: "KeyG",
   H_CODE: "KeyH",
   QUESTION_MARK_KEY: "?",
-  QUOTE_KEY: "'",
+  QUOTE_CODE: "Quote",
   SPACE_CODE: "Space",
   TAB: "Tab",
   V_CODE: "KeyV",
