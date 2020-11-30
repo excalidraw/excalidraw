@@ -76,12 +76,12 @@
     "align": "对齐",
     "alignTop": "顶部对齐",
     "alignBottom": "底端对齐",
-    "alignLeft": "靠左对齐",
-    "alignRight": "",
-    "centerVertically": "",
-    "centerHorizontally": "",
-    "distributeHorizontally": "",
-    "distributeVertically": ""
+    "alignLeft": "左对齐",
+    "alignRight": "右对齐",
+    "centerVertically": "垂直居中",
+    "centerHorizontally": "水平居中",
+    "distributeHorizontally": "水平等距分布",
+    "distributeVertically": "垂直等距分布"
   },
   "buttons": {
     "clearReset": "重置画布",
@@ -90,7 +90,7 @@
     "exportToSvg": "导出为 SVG",
     "copyToClipboard": "复制到剪贴板",
     "copyPngToClipboard": "复制 PNG 到剪切板",
-    "scale": "",
+    "scale": "缩放",
     "save": "保存",
     "saveAs": "保存为",
     "load": "载入文件",
