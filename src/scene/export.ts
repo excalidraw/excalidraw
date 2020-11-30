@@ -125,6 +125,14 @@ export const exportToSvg = (
         font-family: "Cascadia";
         src: url("https://excalidraw.com/Cascadia.woff2");
       }
+      @font-face {
+        font-family: "ZhiMangXing";
+        src: url("ZhiMangXing-Regular.woff2"");
+      }
+      @font-face {
+        font-family: "ZCOOLQingKeHuangYou";
+        src: url("ZCOOLQingKeHuangYou-Regular.woff2"");
+      }
     </style>
   </defs>
   `;

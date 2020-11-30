@@ -67,9 +67,9 @@ export const CLASSES = {
 
 // 1-based in case we ever do `if(element.fontFamily)`
 export const FONT_FAMILY = {
-  1: "Virgil",
+  1: "Virgil, ZhiMangXing",
   2: "Helvetica",
-  3: "Cascadia",
+  3: "Cascadia, ZCOOLQingKeHuangYou",
 } as const;
 
 export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";

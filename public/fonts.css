@@ -11,3 +11,17 @@
   src: url("Cascadia.woff2");
   font-display: swap;
 }
+
+/* https://fonts.google.com/specimen/Zhi+Mang+Xing?preview.text=%E6%88%91%E6%9C%89%E4%B8%80%E4%B8%AA%E6%A2%A6%E6%83%B3&preview.text_type=custom&subset=chinese-simplified#license */
+@font-face {
+  font-family: "ZhiMangXing";
+  src: url("ZhiMangXing-Regular.woff2");
+  font-display: swap;
+}
+
+/* https://fonts.google.com/specimen/ZCOOL+QingKe+HuangYou?preview.text=%E6%88%91%E6%9C%89%E4%B8%80%E4%B8%AA%E6%A2%A6%E6%83%B3&preview.text_type=custom&subset=chinese-simplified#license */
+@font-face {
+  font-family: "ZCOOLQingKeHuangYou";
+  src: url("ZCOOLQingKeHuangYou-Regular.woff2");
+  font-display: swap;
+}
