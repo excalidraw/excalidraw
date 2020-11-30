@@ -12,9 +12,14 @@ export const KEYS = {
   EQUAL: "Equal",
   ESCAPE: "Escape",
   MINUS: "Minus",
-  SPACE: "Space",
   TAB: "Tab",
+  ONE: "Digit1",
+  ZERO: "Digit0",
+  NUM_SUBTRACT: "NumpadSubtract",
+  NUM_ADD: "NumpadAdd",
+  NUM_ZERO: "Numpad0",
 
+  SPACE: " ",
   QUESTION_MARK_KEY: "?",
   QUOTE_KEY: "'",
 

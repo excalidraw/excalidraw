@@ -1663,14 +1663,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         this.toggleLock();
       }
     }
-    if (event.code === KEYS.SPACE && gesture.pointers.size === 0) {
+    if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
       isHoldingSpace = true;
       document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
     }
   });
 
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
-    if (event.code === KEYS.SPACE) {
+    if (event.key === KEYS.SPACE) {
       if (this.state.elementType === "selection") {
         resetCursor();
       } else {
