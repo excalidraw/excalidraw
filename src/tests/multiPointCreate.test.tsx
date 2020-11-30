@@ -86,7 +86,7 @@ describe("multi point mode in linear elements", () => {
     // done
     fireEvent.pointerDown(canvas);
     fireEvent.pointerUp(canvas);
-    fireEvent.keyDown(document, { code: KEYS.ENTER });
+    fireEvent.keyDown(document, { key: KEYS.ENTER });
 
     expect(renderScene).toHaveBeenCalledTimes(11);
     expect(h.elements.length).toEqual(1);
@@ -127,7 +127,7 @@ describe("multi point mode in linear elements", () => {
     // done
     fireEvent.pointerDown(canvas);
     fireEvent.pointerUp(canvas);
-    fireEvent.keyDown(document, { code: KEYS.ENTER });
+    fireEvent.keyDown(document, { key: KEYS.ENTER });
 
     expect(renderScene).toHaveBeenCalledTimes(11);
     expect(h.elements.length).toEqual(1);

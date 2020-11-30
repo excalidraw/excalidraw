@@ -12,10 +12,11 @@ export const KEYS = {
   EQUAL: "Equal",
   ESCAPE: "Escape",
   MINUS: "Minus",
-  QUESTION_MARK_KEY: "?",
-  QUOTE_KEY: "'",
   SPACE: "Space",
   TAB: "Tab",
+
+  QUESTION_MARK_KEY: "?",
+  QUOTE_KEY: "'",
 
   A_KEY: "a",
   C_KEY: "c",

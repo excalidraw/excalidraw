@@ -118,16 +118,16 @@ export const textWysiwyg = ({
   }
 
   editable.onkeydown = (event) => {
-    if (event.code === KEYS.ESCAPE) {
+    if (event.key === KEYS.ESCAPE) {
       event.preventDefault();
       handleSubmit();
-    } else if (event.code === KEYS.ENTER && event[KEYS.CTRL_OR_CMD]) {
+    } else if (event.key === KEYS.ENTER && event[KEYS.CTRL_OR_CMD]) {
       event.preventDefault();
       if (event.isComposing) {
         return;
       }
       handleSubmit();
-    } else if (event.code === KEYS.ENTER && !event.altKey) {
+    } else if (event.key === KEYS.ENTER && !event.altKey) {
       event.stopPropagation();
     }
   };

@@ -19,7 +19,7 @@ export const Modal = (props: {
   }
 
   const handleKeydown = (event: React.KeyboardEvent) => {
-    if (event.code === KEYS.ESCAPE) {
+    if (event.key === KEYS.ESCAPE) {
       event.nativeEvent.stopImmediatePropagation();
       props.onCloseRequest();
     }

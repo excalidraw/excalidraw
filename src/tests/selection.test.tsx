@@ -87,7 +87,7 @@ describe("select single element on the scene", () => {
       fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
       fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
       fireEvent.pointerUp(canvas);
-      fireEvent.keyDown(document, { code: KEYS.ESCAPE });
+      fireEvent.keyDown(document, { key: KEYS.ESCAPE });
     }
 
     const tool = getByToolName("selection");
@@ -114,7 +114,7 @@ describe("select single element on the scene", () => {
       fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
       fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
       fireEvent.pointerUp(canvas);
-      fireEvent.keyDown(document, { code: KEYS.ESCAPE });
+      fireEvent.keyDown(document, { key: KEYS.ESCAPE });
     }
 
     const tool = getByToolName("selection");
@@ -141,7 +141,7 @@ describe("select single element on the scene", () => {
       fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
       fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
       fireEvent.pointerUp(canvas);
-      fireEvent.keyDown(document, { code: KEYS.ESCAPE });
+      fireEvent.keyDown(document, { key: KEYS.ESCAPE });
     }
 
     const tool = getByToolName("selection");
@@ -168,7 +168,7 @@ describe("select single element on the scene", () => {
       fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
       fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
       fireEvent.pointerUp(canvas);
-      fireEvent.keyDown(document, { code: KEYS.ESCAPE });
+      fireEvent.keyDown(document, { key: KEYS.ESCAPE });
     }
 
     /*
@@ -207,7 +207,7 @@ describe("select single element on the scene", () => {
       fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
       fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
       fireEvent.pointerUp(canvas);
-      fireEvent.keyDown(document, { code: KEYS.ESCAPE });
+      fireEvent.keyDown(document, { key: KEYS.ESCAPE });
     }
 
     /*

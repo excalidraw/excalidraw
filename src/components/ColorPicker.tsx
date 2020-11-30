@@ -110,7 +110,7 @@ const Picker = ({
       const index = keyBindings.indexOf(event.key.toLowerCase());
       (gallery!.current!.children![index] as any).focus();
       event.preventDefault();
-    } else if (event.code === KEYS.ESCAPE || event.code === KEYS.ENTER) {
+    } else if (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) {
       event.preventDefault();
       onClose();
     }

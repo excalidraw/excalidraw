@@ -96,7 +96,7 @@ const RoomModal = ({
               className="RoomDialog-username TextInput"
               onChange={(event) => onUsernameChange(event.target.value)}
               onKeyPress={(event) =>
-                event.code === KEYS.ENTER && onPressingEnter()
+                event.key === KEYS.ENTER && onPressingEnter()
               }
             />
           </div>

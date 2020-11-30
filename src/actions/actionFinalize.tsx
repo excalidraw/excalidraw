@@ -150,10 +150,10 @@ export const actionFinalize = register({
     };
   },
   keyTest: (event, appState) =>
-    (event.code === KEYS.ESCAPE &&
+    (event.key === KEYS.ESCAPE &&
       (appState.editingLinearElement !== null ||
         (!appState.draggingElement && appState.multiElement === null))) ||
-    ((event.code === KEYS.ESCAPE || event.code === KEYS.ENTER) &&
+    ((event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
       appState.multiElement !== null),
   PanelComponent: ({ appState, updateData }) => (
     <ToolButton

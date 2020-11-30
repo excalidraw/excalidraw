@@ -256,7 +256,7 @@ describe("do not add element to the scene if size is too small", () => {
     fireEvent.pointerUp(canvas);
 
     // we need to finalize it because arrows and lines enter multi-mode
-    fireEvent.keyDown(document, { code: KEYS.ENTER });
+    fireEvent.keyDown(document, { key: KEYS.ENTER });
 
     expect(renderScene).toHaveBeenCalledTimes(5);
     expect(h.state.selectionElement).toBeNull();
@@ -278,7 +278,7 @@ describe("do not add element to the scene if size is too small", () => {
     fireEvent.pointerUp(canvas);
 
     // we need to finalize it because arrows and lines enter multi-mode
-    fireEvent.keyDown(document, { code: KEYS.ENTER });
+    fireEvent.keyDown(document, { key: KEYS.ENTER });
 
     expect(renderScene).toHaveBeenCalledTimes(5);
     expect(h.state.selectionElement).toBeNull();

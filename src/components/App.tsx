@@ -1616,7 +1616,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.maybeSuggestBindingForAll(selectedElements);
 
       event.preventDefault();
-    } else if (event.code === KEYS.ENTER) {
+    } else if (event.key === KEYS.ENTER) {
       const selectedElements = getSelectedElements(
         this.scene.getElements(),
         this.state,
