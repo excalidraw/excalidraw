@@ -1735,12 +1735,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private onGestureChange = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
-    const gestureCenter = getCenter(gesture.pointers);
     this.setState(({ zoom }) => ({
       zoom: getNewZoom(
         getNormalizedZoom(gesture.initialScale! * event.scale),
         zoom,
-        gestureCenter,
+        { x: cursorX, y: cursorY },
       ),
     }));
   });
