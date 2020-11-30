@@ -78,7 +78,7 @@ import {
 } from "../utils";
 import {
   KEYS,
-  isArrowCode,
+  isArrowKey,
   getResizeCenterPointKey,
   getResizeWithSidesSameLengthKey,
   getRotateWithDiscreteAngleKey,
@@ -1541,7 +1541,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (
       (isWritableElement(event.target) && event.key !== KEYS.ESCAPE) ||
       // case: using arrows to move between buttons
-      (isArrowCode(event.code) && isInputLike(event.target))
+      (isArrowKey(event.key) && isInputLike(event.target))
     ) {
       return;
     }
@@ -1577,7 +1577,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.setState({ isLibraryOpen: !this.state.isLibraryOpen });
     }
 
-    if (isArrowCode(event.code)) {
+    if (isArrowKey(event.key)) {
       const step =
         (this.state.gridSize &&
           (event.shiftKey ? ELEMENT_TRANSLATE_AMOUNT : this.state.gridSize)) ||
@@ -1592,13 +1592,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       let offsetX = 0;
       let offsetY = 0;
 
-      if (event.code === KEYS.ARROW_LEFT) {
+      if (event.key === KEYS.ARROW_LEFT) {
         offsetX = -step;
-      } else if (event.code === KEYS.ARROW_RIGHT) {
+      } else if (event.key === KEYS.ARROW_RIGHT) {
         offsetX = step;
-      } else if (event.code === KEYS.ARROW_UP) {
+      } else if (event.key === KEYS.ARROW_UP) {
         offsetY = -step;
-      } else if (event.code === KEYS.ARROW_DOWN) {
+      } else if (event.key === KEYS.ARROW_DOWN) {
         offsetY = step;
       }
 
@@ -1686,7 +1686,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (!event[KEYS.CTRL_OR_CMD] && !this.state.isBindingEnabled) {
       this.setState({ isBindingEnabled: true });
     }
-    if (isArrowCode(event.code)) {
+    if (isArrowKey(event.key)) {
       const selectedElements = getSelectedElements(
         this.scene.getElements(),
         this.state,

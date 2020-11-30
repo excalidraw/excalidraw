@@ -2630,11 +2630,11 @@ Object {
   "strokeStyle": "solid",
   "strokeWidth": 1,
   "type": "rectangle",
-  "version": 2,
-  "versionNonce": 1278240551,
+  "version": 8,
+  "versionNonce": 1116226695,
   "width": 10,
-  "x": 10,
-  "y": 10,
+  "x": 9,
+  "y": 9,
 }
 `;
 
@@ -2693,7 +2693,7 @@ Object {
 
 exports[`regression tests arrow keys: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests arrow keys: [end of test] number of renders 1`] = `6`;
+exports[`regression tests arrow keys: [end of test] number of renders 1`] = `18`;
 
 exports[`regression tests can drag element that covers another element, while another elem is selected: [end of test] appState 1`] = `
 Object {

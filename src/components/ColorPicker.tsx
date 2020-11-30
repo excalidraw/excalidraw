@@ -2,7 +2,7 @@ import React from "react";
 import { Popover } from "./Popover";
 
 import "./ColorPicker.scss";
-import { isArrowCode, KEYS } from "../keys";
+import { isArrowKey, KEYS } from "../keys";
 import { t, getLanguage } from "../i18n";
 import { isWritableElement } from "../utils";
 import colors from "../colors";
@@ -81,7 +81,7 @@ const Picker = ({
         firstItem.current?.focus();
         event.preventDefault();
       }
-    } else if (isArrowCode(event.code)) {
+    } else if (isArrowKey(event.key)) {
       const { activeElement } = document;
       const isRTL = getLanguage().rtl;
       const index = Array.prototype.indexOf.call(
@@ -91,13 +91,13 @@ const Picker = ({
       if (index !== -1) {
         const length = gallery!.current!.children.length - (showInput ? 1 : 0);
         const nextIndex =
-          event.code === (isRTL ? KEYS.ARROW_LEFT : KEYS.ARROW_RIGHT)
+          event.key === (isRTL ? KEYS.ARROW_LEFT : KEYS.ARROW_RIGHT)
             ? (index + 1) % length
-            : event.code === (isRTL ? KEYS.ARROW_RIGHT : KEYS.ARROW_LEFT)
+            : event.key === (isRTL ? KEYS.ARROW_RIGHT : KEYS.ARROW_LEFT)
             ? (length + index - 1) % length
-            : event.code === KEYS.ARROW_DOWN
+            : event.key === KEYS.ARROW_DOWN
             ? (index + 5) % length
-            : event.code === KEYS.ARROW_UP
+            : event.key === KEYS.ARROW_UP
             ? (length + index - 5) % length
             : index;
         (gallery!.current!.children![nextIndex] as any).focus();
