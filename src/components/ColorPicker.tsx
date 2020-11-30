@@ -2,7 +2,7 @@ import React from "react";
 import { Popover } from "./Popover";
 
 import "./ColorPicker.scss";
-import { KEYS } from "../keys";
+import { isArrowCode, KEYS } from "../keys";
 import { t, getLanguage } from "../i18n";
 import { isWritableElement } from "../utils";
 import colors from "../colors";
@@ -81,12 +81,7 @@ const Picker = ({
         firstItem.current?.focus();
         event.preventDefault();
       }
-    } else if (
-      event.code === KEYS.ARROW_RIGHT ||
-      event.code === KEYS.ARROW_LEFT ||
-      event.code === KEYS.ARROW_UP ||
-      event.code === KEYS.ARROW_DOWN
-    ) {
+    } else if (isArrowCode(event.code)) {
       const { activeElement } = document;
       const isRTL = getLanguage().rtl;
       const index = Array.prototype.indexOf.call(

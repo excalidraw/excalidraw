@@ -31,11 +31,11 @@ export const KEYS = {
 
 export type Key = keyof typeof KEYS;
 
-export const isArrowKey = (key: string) =>
-  key === KEYS.ARROW_LEFT ||
-  key === KEYS.ARROW_RIGHT ||
-  key === KEYS.ARROW_DOWN ||
-  key === KEYS.ARROW_UP;
+export const isArrowCode = (code: string) =>
+  code === KEYS.ARROW_LEFT ||
+  code === KEYS.ARROW_RIGHT ||
+  code === KEYS.ARROW_DOWN ||
+  code === KEYS.ARROW_UP;
 
 export const getResizeCenterPointKey = (event: MouseEvent | KeyboardEvent) =>
   event.altKey;
