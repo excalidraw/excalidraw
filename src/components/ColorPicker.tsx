@@ -70,7 +70,7 @@ const Picker = ({
   }, []);
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.code === KEYS.TAB) {
+    if (event.key === KEYS.TAB) {
       const { activeElement } = document;
       if (event.shiftKey) {
         if (activeElement === firstItem.current) {
