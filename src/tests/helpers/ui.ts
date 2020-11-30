@@ -58,29 +58,6 @@ export class Keyboard {
     Keyboard.keyDown(key);
     Keyboard.keyUp(key);
   };
-
-  static codeDown = (code: string) => {
-    fireEvent.keyDown(document, {
-      code,
-      ctrlKey,
-      shiftKey,
-      altKey,
-    });
-  };
-
-  static codeUp = (code: string) => {
-    fireEvent.keyUp(document, {
-      code,
-      ctrlKey,
-      shiftKey,
-      altKey,
-    });
-  };
-
-  static codePress = (code: string) => {
-    Keyboard.codeDown(code);
-    Keyboard.codeUp(code);
-  };
 }
 
 export class Pointer {

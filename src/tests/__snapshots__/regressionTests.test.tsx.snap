@@ -2630,11 +2630,11 @@ Object {
   "strokeStyle": "solid",
   "strokeWidth": 1,
   "type": "rectangle",
-  "version": 8,
-  "versionNonce": 1116226695,
+  "version": 2,
+  "versionNonce": 1278240551,
   "width": 10,
-  "x": 9,
-  "y": 9,
+  "x": 10,
+  "y": 10,
 }
 `;
 
@@ -2693,7 +2693,7 @@ Object {
 
 exports[`regression tests arrow keys: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests arrow keys: [end of test] number of renders 1`] = `18`;
+exports[`regression tests arrow keys: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests can drag element that covers another element, while another elem is selected: [end of test] appState 1`] = `
 Object {
@@ -4538,45 +4538,6 @@ Object {
 }
 `;
 
-exports[`regression tests code KeyA selects arrow tool: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElementIds": null,
-  "endBinding": null,
-  "fillStyle": "hachure",
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "lastCommittedPoint": null,
-  "opacity": 100,
-  "points": Array [
-    Array [
-      0,
-      0,
-    ],
-    Array [
-      10,
-      10,
-    ],
-  ],
-  "roughness": 1,
-  "seed": 337897,
-  "startBinding": null,
-  "strokeColor": "#000000",
-  "strokeSharpness": "round",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "arrow",
-  "version": 3,
-  "versionNonce": 449462985,
-  "width": 10,
-  "x": 10,
-  "y": 10,
-}
-`;
-
 exports[`regression tests code KeyA selects arrow tool: [end of test] history 1`] = `
 Object {
   "recording": false,
@@ -4591,61 +4552,13 @@ Object {
       },
       "elements": Array [],
     },
-    Object {
-      "appState": Object {
-        "editingGroupId": null,
-        "editingLinearElement": null,
-        "selectedElementIds": Object {
-          "id0": true,
-        },
-        "viewBackgroundColor": "#ffffff",
-      },
-      "elements": Array [
-        Object {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElementIds": null,
-          "endBinding": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [],
-          "height": 10,
-          "id": "id0",
-          "isDeleted": false,
-          "lastCommittedPoint": null,
-          "opacity": 100,
-          "points": Array [
-            Array [
-              0,
-              0,
-            ],
-            Array [
-              10,
-              10,
-            ],
-          ],
-          "roughness": 1,
-          "seed": 337897,
-          "startBinding": null,
-          "strokeColor": "#000000",
-          "strokeSharpness": "round",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "arrow",
-          "version": 3,
-          "versionNonce": 449462985,
-          "width": 10,
-          "x": 10,
-          "y": 10,
-        },
-      ],
-    },
   ],
 }
 `;
 
-exports[`regression tests code KeyA selects arrow tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests code KeyA selects arrow tool: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests code KeyA selects arrow tool: [end of test] number of renders 1`] = `7`;
+exports[`regression tests code KeyA selects arrow tool: [end of test] number of renders 1`] = `5`;
 
 exports[`regression tests code KeyD selects diamond tool: [end of test] appState 1`] = `
 Object {
@@ -4718,32 +4631,6 @@ Object {
 }
 `;
 
-exports[`regression tests code KeyD selects diamond tool: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElementIds": null,
-  "fillStyle": "hachure",
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "opacity": 100,
-  "roughness": 1,
-  "seed": 337897,
-  "strokeColor": "#000000",
-  "strokeSharpness": "sharp",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "diamond",
-  "version": 2,
-  "versionNonce": 1278240551,
-  "width": 10,
-  "x": 10,
-  "y": 10,
-}
-`;
-
 exports[`regression tests code KeyD selects diamond tool: [end of test] history 1`] = `
 Object {
   "recording": false,
@@ -4758,48 +4645,13 @@ Object {
       },
       "elements": Array [],
     },
-    Object {
-      "appState": Object {
-        "editingGroupId": null,
-        "editingLinearElement": null,
-        "selectedElementIds": Object {
-          "id0": true,
-        },
-        "viewBackgroundColor": "#ffffff",
-      },
-      "elements": Array [
-        Object {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElementIds": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [],
-          "height": 10,
-          "id": "id0",
-          "isDeleted": false,
-          "opacity": 100,
-          "roughness": 1,
-          "seed": 337897,
-          "strokeColor": "#000000",
-          "strokeSharpness": "sharp",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "diamond",
-          "version": 2,
-          "versionNonce": 1278240551,
-          "width": 10,
-          "x": 10,
-          "y": 10,
-        },
-      ],
-    },
   ],
 }
 `;
 
-exports[`regression tests code KeyD selects diamond tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests code KeyD selects diamond tool: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests code KeyD selects diamond tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests code KeyD selects diamond tool: [end of test] number of renders 1`] = `5`;
 
 exports[`regression tests code KeyE selects ellipse tool: [end of test] appState 1`] = `
 Object {
@@ -4872,32 +4724,6 @@ Object {
 }
 `;
 
-exports[`regression tests code KeyE selects ellipse tool: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElementIds": null,
-  "fillStyle": "hachure",
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "opacity": 100,
-  "roughness": 1,
-  "seed": 337897,
-  "strokeColor": "#000000",
-  "strokeSharpness": "sharp",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "ellipse",
-  "version": 2,
-  "versionNonce": 1278240551,
-  "width": 10,
-  "x": 10,
-  "y": 10,
-}
-`;
-
 exports[`regression tests code KeyE selects ellipse tool: [end of test] history 1`] = `
 Object {
   "recording": false,
@@ -4912,48 +4738,13 @@ Object {
       },
       "elements": Array [],
     },
-    Object {
-      "appState": Object {
-        "editingGroupId": null,
-        "editingLinearElement": null,
-        "selectedElementIds": Object {
-          "id0": true,
-        },
-        "viewBackgroundColor": "#ffffff",
-      },
-      "elements": Array [
-        Object {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElementIds": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [],
-          "height": 10,
-          "id": "id0",
-          "isDeleted": false,
-          "opacity": 100,
-          "roughness": 1,
-          "seed": 337897,
-          "strokeColor": "#000000",
-          "strokeSharpness": "sharp",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "ellipse",
-          "version": 2,
-          "versionNonce": 1278240551,
-          "width": 10,
-          "x": 10,
-          "y": 10,
-        },
-      ],
-    },
   ],
 }
 `;
 
-exports[`regression tests code KeyE selects ellipse tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests code KeyE selects ellipse tool: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests code KeyE selects ellipse tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests code KeyE selects ellipse tool: [end of test] number of renders 1`] = `5`;
 
 exports[`regression tests code KeyL selects line tool: [end of test] appState 1`] = `
 Object {
@@ -5026,45 +4817,6 @@ Object {
 }
 `;
 
-exports[`regression tests code KeyL selects line tool: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElementIds": null,
-  "endBinding": null,
-  "fillStyle": "hachure",
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "lastCommittedPoint": null,
-  "opacity": 100,
-  "points": Array [
-    Array [
-      0,
-      0,
-    ],
-    Array [
-      10,
-      10,
-    ],
-  ],
-  "roughness": 1,
-  "seed": 337897,
-  "startBinding": null,
-  "strokeColor": "#000000",
-  "strokeSharpness": "round",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "line",
-  "version": 3,
-  "versionNonce": 449462985,
-  "width": 10,
-  "x": 10,
-  "y": 10,
-}
-`;
-
 exports[`regression tests code KeyL selects line tool: [end of test] history 1`] = `
 Object {
   "recording": false,
@@ -5079,61 +4831,13 @@ Object {
       },
       "elements": Array [],
     },
-    Object {
-      "appState": Object {
-        "editingGroupId": null,
-        "editingLinearElement": null,
-        "selectedElementIds": Object {
-          "id0": true,
-        },
-        "viewBackgroundColor": "#ffffff",
-      },
-      "elements": Array [
-        Object {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElementIds": null,
-          "endBinding": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [],
-          "height": 10,
-          "id": "id0",
-          "isDeleted": false,
-          "lastCommittedPoint": null,
-          "opacity": 100,
-          "points": Array [
-            Array [
-              0,
-              0,
-            ],
-            Array [
-              10,
-              10,
-            ],
-          ],
-          "roughness": 1,
-          "seed": 337897,
-          "startBinding": null,
-          "strokeColor": "#000000",
-          "strokeSharpness": "round",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "line",
-          "version": 3,
-          "versionNonce": 449462985,
-          "width": 10,
-          "x": 10,
-          "y": 10,
-        },
-      ],
-    },
   ],
 }
 `;
 
-exports[`regression tests code KeyL selects line tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests code KeyL selects line tool: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests code KeyL selects line tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests code KeyL selects line tool: [end of test] number of renders 1`] = `5`;
 
 exports[`regression tests code KeyR selects rectangle tool: [end of test] appState 1`] = `
 Object {
@@ -5206,32 +4910,6 @@ Object {
 }
 `;
 
-exports[`regression tests code KeyR selects rectangle tool: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElementIds": null,
-  "fillStyle": "hachure",
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "opacity": 100,
-  "roughness": 1,
-  "seed": 337897,
-  "strokeColor": "#000000",
-  "strokeSharpness": "sharp",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "rectangle",
-  "version": 2,
-  "versionNonce": 1278240551,
-  "width": 10,
-  "x": 10,
-  "y": 10,
-}
-`;
-
 exports[`regression tests code KeyR selects rectangle tool: [end of test] history 1`] = `
 Object {
   "recording": false,
@@ -5246,48 +4924,13 @@ Object {
       },
       "elements": Array [],
     },
-    Object {
-      "appState": Object {
-        "editingGroupId": null,
-        "editingLinearElement": null,
-        "selectedElementIds": Object {
-          "id0": true,
-        },
-        "viewBackgroundColor": "#ffffff",
-      },
-      "elements": Array [
-        Object {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElementIds": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [],
-          "height": 10,
-          "id": "id0",
-          "isDeleted": false,
-          "opacity": 100,
-          "roughness": 1,
-          "seed": 337897,
-          "strokeColor": "#000000",
-          "strokeSharpness": "sharp",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "rectangle",
-          "version": 2,
-          "versionNonce": 1278240551,
-          "width": 10,
-          "x": 10,
-          "y": 10,
-        },
-      ],
-    },
   ],
 }
 `;
 
-exports[`regression tests code KeyR selects rectangle tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests code KeyR selects rectangle tool: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests code KeyR selects rectangle tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests code KeyR selects rectangle tool: [end of test] number of renders 1`] = `5`;
 
 exports[`regression tests code KeyX selects draw tool: [end of test] appState 1`] = `
 Object {
@@ -5305,7 +4948,7 @@ Object {
   "currentItemStrokeStyle": "solid",
   "currentItemStrokeWidth": 1,
   "currentItemTextAlign": "left",
-  "cursorButton": "down",
+  "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
   "draggingElement": null,
@@ -5360,45 +5003,6 @@ Object {
 }
 `;
 
-exports[`regression tests code KeyX selects draw tool: [end of test] element 0 1`] = `
-Object {
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElementIds": null,
-  "endBinding": null,
-  "fillStyle": "hachure",
-  "groupIds": Array [],
-  "height": 10,
-  "id": "id0",
-  "isDeleted": false,
-  "lastCommittedPoint": null,
-  "opacity": 100,
-  "points": Array [
-    Array [
-      0,
-      0,
-    ],
-    Array [
-      10,
-      10,
-    ],
-  ],
-  "roughness": 1,
-  "seed": 337897,
-  "startBinding": null,
-  "strokeColor": "#000000",
-  "strokeSharpness": "round",
-  "strokeStyle": "solid",
-  "strokeWidth": 1,
-  "type": "draw",
-  "version": 3,
-  "versionNonce": 449462985,
-  "width": 10,
-  "x": 10,
-  "y": 10,
-}
-`;
-
 exports[`regression tests code KeyX selects draw tool: [end of test] history 1`] = `
 Object {
   "recording": false,
@@ -5413,61 +5017,13 @@ Object {
       },
       "elements": Array [],
     },
-    Object {
-      "appState": Object {
-        "editingGroupId": null,
-        "editingLinearElement": null,
-        "selectedElementIds": Object {
-          "id0": true,
-        },
-        "viewBackgroundColor": "#ffffff",
-      },
-      "elements": Array [
-        Object {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElementIds": null,
-          "endBinding": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [],
-          "height": 10,
-          "id": "id0",
-          "isDeleted": false,
-          "lastCommittedPoint": null,
-          "opacity": 100,
-          "points": Array [
-            Array [
-              0,
-              0,
-            ],
-            Array [
-              10,
-              10,
-            ],
-          ],
-          "roughness": 1,
-          "seed": 337897,
-          "startBinding": null,
-          "strokeColor": "#000000",
-          "strokeSharpness": "round",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "draw",
-          "version": 3,
-          "versionNonce": 449462985,
-          "width": 10,
-          "x": 10,
-          "y": 10,
-        },
-      ],
-    },
   ],
 }
 `;
 
-exports[`regression tests code KeyX selects draw tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests code KeyX selects draw tool: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests code KeyX selects draw tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests code KeyX selects draw tool: [end of test] number of renders 1`] = `5`;
 
 exports[`regression tests deselects group of selected elements on pointer down when pointer doesn't hit any element: [end of test] appState 1`] = `
 Object {
@@ -9127,7 +8683,7 @@ Object {
 
 exports[`regression tests draw every type of shape: [end of test] number of elements 1`] = `8`;
 
-exports[`regression tests draw every type of shape: [end of test] number of renders 1`] = `50`;
+exports[`regression tests draw every type of shape: [end of test] number of renders 1`] = `48`;
 
 exports[`regression tests given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up: [end of test] appState 1`] = `
 Object {
@@ -11001,7 +10557,7 @@ Object {
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
-  "isBindingEnabled": true,
+  "isBindingEnabled": false,
   "isCollaborating": false,
   "isLibraryOpen": false,
   "isLoading": false,
@@ -11012,17 +10568,13 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
-  "previousSelectedElementIds": Object {
-    "id0": true,
-    "id3": true,
-  },
+  "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
   "selectedElementIds": Object {
     "id1": true,
-    "id4": true,
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
@@ -11063,8 +10615,8 @@ Object {
   "strokeStyle": "solid",
   "strokeWidth": 1,
   "type": "rectangle",
-  "version": 4,
-  "versionNonce": 1116226695,
+  "version": 2,
+  "versionNonce": 1278240551,
   "width": 10,
   "x": 10,
   "y": 10,
@@ -11089,8 +10641,8 @@ Object {
   "strokeStyle": "solid",
   "strokeWidth": 1,
   "type": "rectangle",
-  "version": 4,
-  "versionNonce": 1014066025,
+  "version": 2,
+  "versionNonce": 453191,
   "width": 10,
   "x": 30,
   "y": 10,
@@ -11210,7 +10762,7 @@ Object {
 
 exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] number of renders 1`] = `18`;
+exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] number of renders 1`] = `11`;
 
 exports[`regression tests pinch-to-zoom works: [end of test] appState 1`] = `
 Object {
@@ -26195,10 +25747,12 @@ Object {
   "openMenu": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
-  "scrollX": 60,
-  "scrollY": 60,
+  "scrollX": 0,
+  "scrollY": 0,
   "scrolledOutside": false,
-  "selectedElementIds": Object {},
+  "selectedElementIds": Object {
+    "id0": true,
+  },
   "selectedGroupIds": Object {},
   "selectionElement": null,
   "shouldAddWatermark": false,
@@ -27745,26 +27299,152 @@ Object {
   "cursorButton": "up",
   "cursorX": 0,
   "cursorY": 0,
-  "draggingElement": null,
-  "editingElement": null,
+  "draggingElement": Object {
+    "angle": 0,
+    "backgroundColor": "transparent",
+    "boundElementIds": null,
+    "endBinding": null,
+    "fillStyle": "hachure",
+    "groupIds": Array [],
+    "height": 20,
+    "id": "id2",
+    "isDeleted": false,
+    "lastCommittedPoint": Array [
+      100,
+      20,
+    ],
+    "opacity": 100,
+    "points": Array [
+      Array [
+        0,
+        0,
+      ],
+      Array [
+        60,
+        10,
+      ],
+      Array [
+        100,
+        20,
+      ],
+    ],
+    "roughness": 1,
+    "seed": 401146281,
+    "startBinding": null,
+    "strokeColor": "#000000",
+    "strokeSharpness": "round",
+    "strokeStyle": "solid",
+    "strokeWidth": 1,
+    "type": "arrow",
+    "version": 7,
+    "versionNonce": 400692809,
+    "width": 100,
+    "x": 130,
+    "y": 10,
+  },
+  "editingElement": Object {
+    "angle": 0,
+    "backgroundColor": "transparent",
+    "boundElementIds": null,
+    "endBinding": null,
+    "fillStyle": "hachure",
+    "groupIds": Array [],
+    "height": 20,
+    "id": "id2",
+    "isDeleted": false,
+    "lastCommittedPoint": Array [
+      100,
+      20,
+    ],
+    "opacity": 100,
+    "points": Array [
+      Array [
+        0,
+        0,
+      ],
+      Array [
+        60,
+        10,
+      ],
+      Array [
+        100,
+        20,
+      ],
+    ],
+    "roughness": 1,
+    "seed": 401146281,
+    "startBinding": null,
+    "strokeColor": "#000000",
+    "strokeSharpness": "round",
+    "strokeStyle": "solid",
+    "strokeWidth": 1,
+    "type": "arrow",
+    "version": 7,
+    "versionNonce": 400692809,
+    "width": 100,
+    "x": 130,
+    "y": 10,
+  },
   "editingGroupId": null,
   "editingLinearElement": null,
   "elementLocked": false,
-  "elementType": "selection",
+  "elementType": "arrow",
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
-  "isBindingEnabled": true,
+  "isBindingEnabled": false,
   "isCollaborating": false,
   "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
-  "multiElement": null,
+  "multiElement": Object {
+    "angle": 0,
+    "backgroundColor": "transparent",
+    "boundElementIds": null,
+    "endBinding": null,
+    "fillStyle": "hachure",
+    "groupIds": Array [],
+    "height": 20,
+    "id": "id2",
+    "isDeleted": false,
+    "lastCommittedPoint": Array [
+      100,
+      20,
+    ],
+    "opacity": 100,
+    "points": Array [
+      Array [
+        0,
+        0,
+      ],
+      Array [
+        60,
+        10,
+      ],
+      Array [
+        100,
+        20,
+      ],
+    ],
+    "roughness": 1,
+    "seed": 401146281,
+    "startBinding": null,
+    "strokeColor": "#000000",
+    "strokeSharpness": "round",
+    "strokeStyle": "solid",
+    "strokeWidth": 1,
+    "type": "arrow",
+    "version": 7,
+    "versionNonce": 400692809,
+    "width": 100,
+    "x": 130,
+    "y": 10,
+  },
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
@@ -27774,7 +27454,7 @@ Object {
   "scrollY": 0,
   "scrolledOutside": false,
   "selectedElementIds": Object {
-    "id1": true,
+    "id2": true,
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
@@ -27815,8 +27495,8 @@ Object {
   "strokeStyle": "solid",
   "strokeWidth": 1,
   "type": "rectangle",
-  "version": 6,
-  "versionNonce": 1006504105,
+  "version": 2,
+  "versionNonce": 1278240551,
   "width": 20,
   "x": 10,
   "y": -10,
@@ -27841,8 +27521,8 @@ Object {
   "strokeStyle": "solid",
   "strokeWidth": 1,
   "type": "rectangle",
-  "version": 6,
-  "versionNonce": 289600103,
+  "version": 2,
+  "versionNonce": 453191,
   "width": 30,
   "x": 40,
   "y": 0,
@@ -27857,12 +27537,12 @@ Object {
   "endBinding": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
-  "height": 10,
+  "height": 20,
   "id": "id2",
-  "isDeleted": true,
+  "isDeleted": false,
   "lastCommittedPoint": Array [
-    60,
-    10,
+    100,
+    20,
   ],
   "opacity": 100,
   "points": Array [
@@ -27874,6 +27554,10 @@ Object {
       60,
       10,
     ],
+    Array [
+      100,
+      20,
+    ],
   ],
   "roughness": 1,
   "seed": 401146281,
@@ -27883,9 +27567,9 @@ Object {
   "strokeStyle": "solid",
   "strokeWidth": 1,
   "type": "arrow",
-  "version": 11,
-  "versionNonce": 1315507081,
-  "width": 60,
+  "version": 7,
+  "versionNonce": 400692809,
+  "width": 100,
   "x": 130,
   "y": 10,
 }
@@ -27894,206 +27578,7 @@ Object {
 exports[`regression tests undo/redo drawing an element: [end of test] history 1`] = `
 Object {
   "recording": false,
-  "redoStack": Array [
-    Object {
-      "appState": Object {
-        "editingGroupId": null,
-        "editingLinearElement": null,
-        "selectedElementIds": Object {
-          "id2": true,
-        },
-        "viewBackgroundColor": "#ffffff",
-      },
-      "elements": Array [
-        Object {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElementIds": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [],
-          "height": 10,
-          "id": "id0",
-          "isDeleted": false,
-          "opacity": 100,
-          "roughness": 1,
-          "seed": 337897,
-          "strokeColor": "#000000",
-          "strokeSharpness": "sharp",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "rectangle",
-          "version": 2,
-          "versionNonce": 1278240551,
-          "width": 20,
-          "x": 10,
-          "y": -10,
-        },
-        Object {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElementIds": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [],
-          "height": 20,
-          "id": "id1",
-          "isDeleted": false,
-          "opacity": 100,
-          "roughness": 1,
-          "seed": 449462985,
-          "strokeColor": "#000000",
-          "strokeSharpness": "sharp",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "rectangle",
-          "version": 2,
-          "versionNonce": 453191,
-          "width": 30,
-          "x": 40,
-          "y": 0,
-        },
-        Object {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElementIds": null,
-          "endBinding": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [],
-          "height": 20,
-          "id": "id2",
-          "isDeleted": false,
-          "lastCommittedPoint": Array [
-            100,
-            20,
-          ],
-          "opacity": 100,
-          "points": Array [
-            Array [
-              0,
-              0,
-            ],
-            Array [
-              60,
-              10,
-            ],
-            Array [
-              100,
-              20,
-            ],
-          ],
-          "roughness": 1,
-          "seed": 401146281,
-          "startBinding": null,
-          "strokeColor": "#000000",
-          "strokeSharpness": "round",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "arrow",
-          "version": 7,
-          "versionNonce": 400692809,
-          "width": 100,
-          "x": 130,
-          "y": 10,
-        },
-      ],
-    },
-    Object {
-      "appState": Object {
-        "editingGroupId": null,
-        "editingLinearElement": null,
-        "selectedElementIds": Object {
-          "id2": true,
-        },
-        "viewBackgroundColor": "#ffffff",
-      },
-      "elements": Array [
-        Object {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElementIds": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [],
-          "height": 10,
-          "id": "id0",
-          "isDeleted": false,
-          "opacity": 100,
-          "roughness": 1,
-          "seed": 337897,
-          "strokeColor": "#000000",
-          "strokeSharpness": "sharp",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "rectangle",
-          "version": 2,
-          "versionNonce": 1278240551,
-          "width": 20,
-          "x": 10,
-          "y": -10,
-        },
-        Object {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElementIds": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [],
-          "height": 20,
-          "id": "id1",
-          "isDeleted": false,
-          "opacity": 100,
-          "roughness": 1,
-          "seed": 449462985,
-          "strokeColor": "#000000",
-          "strokeSharpness": "sharp",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "rectangle",
-          "version": 2,
-          "versionNonce": 453191,
-          "width": 30,
-          "x": 40,
-          "y": 0,
-        },
-        Object {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElementIds": null,
-          "endBinding": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [],
-          "height": 10,
-          "id": "id2",
-          "isDeleted": false,
-          "lastCommittedPoint": Array [
-            60,
-            10,
-          ],
-          "opacity": 100,
-          "points": Array [
-            Array [
-              0,
-              0,
-            ],
-            Array [
-              60,
-              10,
-            ],
-          ],
-          "roughness": 1,
-          "seed": 401146281,
-          "startBinding": null,
-          "strokeColor": "#000000",
-          "strokeSharpness": "round",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "arrow",
-          "version": 5,
-          "versionNonce": 1014066025,
-          "width": 60,
-          "x": 130,
-          "y": 10,
-        },
-      ],
-    },
-  ],
+  "redoStack": Array [],
   "stateHistory": Array [
     Object {
       "appState": Object {
@@ -28197,13 +27682,211 @@ Object {
         },
       ],
     },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "selectedElementIds": Object {
+          "id2": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElementIds": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeSharpness": "sharp",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": -10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElementIds": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 449462985,
+          "strokeColor": "#000000",
+          "strokeSharpness": "sharp",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 453191,
+          "width": 30,
+          "x": 40,
+          "y": 0,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElementIds": null,
+          "endBinding": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 10,
+          "id": "id2",
+          "isDeleted": false,
+          "lastCommittedPoint": Array [
+            60,
+            10,
+          ],
+          "opacity": 100,
+          "points": Array [
+            Array [
+              0,
+              0,
+            ],
+            Array [
+              60,
+              10,
+            ],
+          ],
+          "roughness": 1,
+          "seed": 401146281,
+          "startBinding": null,
+          "strokeColor": "#000000",
+          "strokeSharpness": "round",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "arrow",
+          "version": 5,
+          "versionNonce": 1014066025,
+          "width": 60,
+          "x": 130,
+          "y": 10,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "selectedElementIds": Object {
+          "id2": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElementIds": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeSharpness": "sharp",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": -10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElementIds": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 449462985,
+          "strokeColor": "#000000",
+          "strokeSharpness": "sharp",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 453191,
+          "width": 30,
+          "x": 40,
+          "y": 0,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElementIds": null,
+          "endBinding": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id2",
+          "isDeleted": false,
+          "lastCommittedPoint": Array [
+            100,
+            20,
+          ],
+          "opacity": 100,
+          "points": Array [
+            Array [
+              0,
+              0,
+            ],
+            Array [
+              60,
+              10,
+            ],
+            Array [
+              100,
+              20,
+            ],
+          ],
+          "roughness": 1,
+          "seed": 401146281,
+          "startBinding": null,
+          "strokeColor": "#000000",
+          "strokeSharpness": "round",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "arrow",
+          "version": 7,
+          "versionNonce": 400692809,
+          "width": 100,
+          "x": 130,
+          "y": 10,
+        },
+      ],
+    },
   ],
 }
 `;
 
 exports[`regression tests undo/redo drawing an element: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests undo/redo drawing an element: [end of test] number of renders 1`] = `27`;
+exports[`regression tests undo/redo drawing an element: [end of test] number of renders 1`] = `24`;
 
 exports[`regression tests updates fontSize & fontFamily appState: [end of test] appState 1`] = `
 Object {
