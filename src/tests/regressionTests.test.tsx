@@ -172,24 +172,25 @@ describe("regression tests", () => {
     expect(API.getSelectedElement().id).not.toEqual(prevSelectedId);
   });
 
-  for (const [key, shape] of [
-    ["r", "rectangle"],
-    ["d", "diamond"],
-    ["e", "ellipse"],
-    ["a", "arrow"],
-    ["l", "line"],
-    ["x", "draw"],
-  ]) {
-    it(`key ${key} selects ${shape} tool`, () => {
-      Keyboard.keyPress(key);
+  for (const [keys, shape] of [
+    ["2r", "rectangle"],
+    ["3d", "diamond"],
+    ["4e", "ellipse"],
+    ["5a", "arrow"],
+    ["6l", "line"],
+    ["7x", "draw"],
+  ] as [string, ExcalidrawElement["type"]][]) {
+    for (const key of keys) {
+      it(`key ${key} selects ${shape} tool`, () => {
+        Keyboard.keyPress(key);
 
-      mouse.down(10, 10);
-      mouse.up(10, 10);
+        mouse.down(10, 10);
+        mouse.up(10, 10);
 
-      expect(API.getSelectedElement().type).toBe(shape);
-    });
+        expect(API.getSelectedElement().type).toBe(shape);
+      });
+    }
   }
-
   it("change the properties of a shape", () => {
     UI.clickTool("rectangle");
     mouse.down(10, 10);

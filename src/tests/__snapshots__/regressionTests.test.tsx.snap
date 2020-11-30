@@ -9266,6 +9266,1008 @@ exports[`regression tests given selected element A with lower z-index than unsel
 
 exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when dragging on intersection between A and B A should be dragged and keep being selected: [end of test] number of renders 1`] = `17`;
 
+exports[`regression tests key 2 selects rectangle tool: [end of test] appState 1`] = `
+Object {
+  "appearance": "light",
+  "collaborators": Map {},
+  "currentItemBackgroundColor": "transparent",
+  "currentItemFillStyle": "hachure",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemLinearStrokeSharpness": "round",
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemStrokeColor": "#000000",
+  "currentItemStrokeSharpness": "sharp",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "cursorX": 0,
+  "cursorY": 0,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementLocked": false,
+  "elementType": "selection",
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "fileHandle": null,
+  "gridSize": null,
+  "height": 768,
+  "isBindingEnabled": true,
+  "isCollaborating": false,
+  "isLibraryOpen": false,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openMenu": null,
+  "previousSelectedElementIds": Object {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": Object {
+    "id0": true,
+  },
+  "selectedGroupIds": Object {},
+  "selectionElement": null,
+  "shouldAddWatermark": false,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "startBoundElement": null,
+  "suggestedBindings": Array [],
+  "username": "",
+  "viewBackgroundColor": "#ffffff",
+  "width": 1024,
+  "zenModeEnabled": false,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
+}
+`;
+
+exports[`regression tests key 2 selects rectangle tool: [end of test] element 0 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElementIds": null,
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 10,
+  "id": "id0",
+  "isDeleted": false,
+  "opacity": 100,
+  "roughness": 1,
+  "seed": 337897,
+  "strokeColor": "#000000",
+  "strokeSharpness": "sharp",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "rectangle",
+  "version": 2,
+  "versionNonce": 1278240551,
+  "width": 10,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`regression tests key 2 selects rectangle tool: [end of test] history 1`] = `
+Object {
+  "recording": false,
+  "redoStack": Array [],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElementIds": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeSharpness": "sharp",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`regression tests key 2 selects rectangle tool: [end of test] number of elements 1`] = `1`;
+
+exports[`regression tests key 2 selects rectangle tool: [end of test] number of renders 1`] = `6`;
+
+exports[`regression tests key 3 selects diamond tool: [end of test] appState 1`] = `
+Object {
+  "appearance": "light",
+  "collaborators": Map {},
+  "currentItemBackgroundColor": "transparent",
+  "currentItemFillStyle": "hachure",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemLinearStrokeSharpness": "round",
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemStrokeColor": "#000000",
+  "currentItemStrokeSharpness": "sharp",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "cursorX": 0,
+  "cursorY": 0,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementLocked": false,
+  "elementType": "selection",
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "fileHandle": null,
+  "gridSize": null,
+  "height": 768,
+  "isBindingEnabled": true,
+  "isCollaborating": false,
+  "isLibraryOpen": false,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openMenu": null,
+  "previousSelectedElementIds": Object {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": Object {
+    "id0": true,
+  },
+  "selectedGroupIds": Object {},
+  "selectionElement": null,
+  "shouldAddWatermark": false,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "startBoundElement": null,
+  "suggestedBindings": Array [],
+  "username": "",
+  "viewBackgroundColor": "#ffffff",
+  "width": 1024,
+  "zenModeEnabled": false,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
+}
+`;
+
+exports[`regression tests key 3 selects diamond tool: [end of test] element 0 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElementIds": null,
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 10,
+  "id": "id0",
+  "isDeleted": false,
+  "opacity": 100,
+  "roughness": 1,
+  "seed": 337897,
+  "strokeColor": "#000000",
+  "strokeSharpness": "sharp",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "diamond",
+  "version": 2,
+  "versionNonce": 1278240551,
+  "width": 10,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`regression tests key 3 selects diamond tool: [end of test] history 1`] = `
+Object {
+  "recording": false,
+  "redoStack": Array [],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElementIds": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeSharpness": "sharp",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "diamond",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`regression tests key 3 selects diamond tool: [end of test] number of elements 1`] = `1`;
+
+exports[`regression tests key 3 selects diamond tool: [end of test] number of renders 1`] = `6`;
+
+exports[`regression tests key 4 selects ellipse tool: [end of test] appState 1`] = `
+Object {
+  "appearance": "light",
+  "collaborators": Map {},
+  "currentItemBackgroundColor": "transparent",
+  "currentItemFillStyle": "hachure",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemLinearStrokeSharpness": "round",
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemStrokeColor": "#000000",
+  "currentItemStrokeSharpness": "sharp",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "cursorX": 0,
+  "cursorY": 0,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementLocked": false,
+  "elementType": "selection",
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "fileHandle": null,
+  "gridSize": null,
+  "height": 768,
+  "isBindingEnabled": true,
+  "isCollaborating": false,
+  "isLibraryOpen": false,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openMenu": null,
+  "previousSelectedElementIds": Object {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": Object {
+    "id0": true,
+  },
+  "selectedGroupIds": Object {},
+  "selectionElement": null,
+  "shouldAddWatermark": false,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "startBoundElement": null,
+  "suggestedBindings": Array [],
+  "username": "",
+  "viewBackgroundColor": "#ffffff",
+  "width": 1024,
+  "zenModeEnabled": false,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
+}
+`;
+
+exports[`regression tests key 4 selects ellipse tool: [end of test] element 0 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElementIds": null,
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 10,
+  "id": "id0",
+  "isDeleted": false,
+  "opacity": 100,
+  "roughness": 1,
+  "seed": 337897,
+  "strokeColor": "#000000",
+  "strokeSharpness": "sharp",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "ellipse",
+  "version": 2,
+  "versionNonce": 1278240551,
+  "width": 10,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`regression tests key 4 selects ellipse tool: [end of test] history 1`] = `
+Object {
+  "recording": false,
+  "redoStack": Array [],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElementIds": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeSharpness": "sharp",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "ellipse",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`regression tests key 4 selects ellipse tool: [end of test] number of elements 1`] = `1`;
+
+exports[`regression tests key 4 selects ellipse tool: [end of test] number of renders 1`] = `6`;
+
+exports[`regression tests key 5 selects arrow tool: [end of test] appState 1`] = `
+Object {
+  "appearance": "light",
+  "collaborators": Map {},
+  "currentItemBackgroundColor": "transparent",
+  "currentItemFillStyle": "hachure",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemLinearStrokeSharpness": "round",
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemStrokeColor": "#000000",
+  "currentItemStrokeSharpness": "sharp",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "cursorX": 0,
+  "cursorY": 0,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementLocked": false,
+  "elementType": "selection",
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "fileHandle": null,
+  "gridSize": null,
+  "height": 768,
+  "isBindingEnabled": true,
+  "isCollaborating": false,
+  "isLibraryOpen": false,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openMenu": null,
+  "previousSelectedElementIds": Object {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": Object {
+    "id0": true,
+  },
+  "selectedGroupIds": Object {},
+  "selectionElement": null,
+  "shouldAddWatermark": false,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "startBoundElement": null,
+  "suggestedBindings": Array [],
+  "username": "",
+  "viewBackgroundColor": "#ffffff",
+  "width": 1024,
+  "zenModeEnabled": false,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
+}
+`;
+
+exports[`regression tests key 5 selects arrow tool: [end of test] element 0 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElementIds": null,
+  "endBinding": null,
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 10,
+  "id": "id0",
+  "isDeleted": false,
+  "lastCommittedPoint": null,
+  "opacity": 100,
+  "points": Array [
+    Array [
+      0,
+      0,
+    ],
+    Array [
+      10,
+      10,
+    ],
+  ],
+  "roughness": 1,
+  "seed": 337897,
+  "startBinding": null,
+  "strokeColor": "#000000",
+  "strokeSharpness": "round",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "arrow",
+  "version": 3,
+  "versionNonce": 449462985,
+  "width": 10,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`regression tests key 5 selects arrow tool: [end of test] history 1`] = `
+Object {
+  "recording": false,
+  "redoStack": Array [],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElementIds": null,
+          "endBinding": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "lastCommittedPoint": null,
+          "opacity": 100,
+          "points": Array [
+            Array [
+              0,
+              0,
+            ],
+            Array [
+              10,
+              10,
+            ],
+          ],
+          "roughness": 1,
+          "seed": 337897,
+          "startBinding": null,
+          "strokeColor": "#000000",
+          "strokeSharpness": "round",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "arrow",
+          "version": 3,
+          "versionNonce": 449462985,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`regression tests key 5 selects arrow tool: [end of test] number of elements 1`] = `1`;
+
+exports[`regression tests key 5 selects arrow tool: [end of test] number of renders 1`] = `7`;
+
+exports[`regression tests key 6 selects line tool: [end of test] appState 1`] = `
+Object {
+  "appearance": "light",
+  "collaborators": Map {},
+  "currentItemBackgroundColor": "transparent",
+  "currentItemFillStyle": "hachure",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemLinearStrokeSharpness": "round",
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemStrokeColor": "#000000",
+  "currentItemStrokeSharpness": "sharp",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "cursorX": 0,
+  "cursorY": 0,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementLocked": false,
+  "elementType": "selection",
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "fileHandle": null,
+  "gridSize": null,
+  "height": 768,
+  "isBindingEnabled": true,
+  "isCollaborating": false,
+  "isLibraryOpen": false,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openMenu": null,
+  "previousSelectedElementIds": Object {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": Object {
+    "id0": true,
+  },
+  "selectedGroupIds": Object {},
+  "selectionElement": null,
+  "shouldAddWatermark": false,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "startBoundElement": null,
+  "suggestedBindings": Array [],
+  "username": "",
+  "viewBackgroundColor": "#ffffff",
+  "width": 1024,
+  "zenModeEnabled": false,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
+}
+`;
+
+exports[`regression tests key 6 selects line tool: [end of test] element 0 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElementIds": null,
+  "endBinding": null,
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 10,
+  "id": "id0",
+  "isDeleted": false,
+  "lastCommittedPoint": null,
+  "opacity": 100,
+  "points": Array [
+    Array [
+      0,
+      0,
+    ],
+    Array [
+      10,
+      10,
+    ],
+  ],
+  "roughness": 1,
+  "seed": 337897,
+  "startBinding": null,
+  "strokeColor": "#000000",
+  "strokeSharpness": "round",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "line",
+  "version": 3,
+  "versionNonce": 449462985,
+  "width": 10,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`regression tests key 6 selects line tool: [end of test] history 1`] = `
+Object {
+  "recording": false,
+  "redoStack": Array [],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElementIds": null,
+          "endBinding": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "lastCommittedPoint": null,
+          "opacity": 100,
+          "points": Array [
+            Array [
+              0,
+              0,
+            ],
+            Array [
+              10,
+              10,
+            ],
+          ],
+          "roughness": 1,
+          "seed": 337897,
+          "startBinding": null,
+          "strokeColor": "#000000",
+          "strokeSharpness": "round",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "line",
+          "version": 3,
+          "versionNonce": 449462985,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`regression tests key 6 selects line tool: [end of test] number of elements 1`] = `1`;
+
+exports[`regression tests key 6 selects line tool: [end of test] number of renders 1`] = `6`;
+
+exports[`regression tests key 7 selects draw tool: [end of test] appState 1`] = `
+Object {
+  "appearance": "light",
+  "collaborators": Map {},
+  "currentItemBackgroundColor": "transparent",
+  "currentItemFillStyle": "hachure",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemLinearStrokeSharpness": "round",
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemStrokeColor": "#000000",
+  "currentItemStrokeSharpness": "sharp",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 1,
+  "currentItemTextAlign": "left",
+  "cursorButton": "down",
+  "cursorX": 0,
+  "cursorY": 0,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementLocked": false,
+  "elementType": "selection",
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "fileHandle": null,
+  "gridSize": null,
+  "height": 768,
+  "isBindingEnabled": true,
+  "isCollaborating": false,
+  "isLibraryOpen": false,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openMenu": null,
+  "previousSelectedElementIds": Object {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": Object {
+    "id0": true,
+  },
+  "selectedGroupIds": Object {},
+  "selectionElement": null,
+  "shouldAddWatermark": false,
+  "shouldCacheIgnoreZoom": false,
+  "showShortcutsDialog": false,
+  "startBoundElement": null,
+  "suggestedBindings": Array [],
+  "username": "",
+  "viewBackgroundColor": "#ffffff",
+  "width": 1024,
+  "zenModeEnabled": false,
+  "zoom": Object {
+    "translation": Object {
+      "x": 0,
+      "y": 0,
+    },
+    "value": 1,
+  },
+}
+`;
+
+exports[`regression tests key 7 selects draw tool: [end of test] element 0 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElementIds": null,
+  "endBinding": null,
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 10,
+  "id": "id0",
+  "isDeleted": false,
+  "lastCommittedPoint": null,
+  "opacity": 100,
+  "points": Array [
+    Array [
+      0,
+      0,
+    ],
+    Array [
+      10,
+      10,
+    ],
+  ],
+  "roughness": 1,
+  "seed": 337897,
+  "startBinding": null,
+  "strokeColor": "#000000",
+  "strokeSharpness": "round",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "draw",
+  "version": 3,
+  "versionNonce": 449462985,
+  "width": 10,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`regression tests key 7 selects draw tool: [end of test] history 1`] = `
+Object {
+  "recording": false,
+  "redoStack": Array [],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElementIds": null,
+          "endBinding": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "lastCommittedPoint": null,
+          "opacity": 100,
+          "points": Array [
+            Array [
+              0,
+              0,
+            ],
+            Array [
+              10,
+              10,
+            ],
+          ],
+          "roughness": 1,
+          "seed": 337897,
+          "startBinding": null,
+          "strokeColor": "#000000",
+          "strokeSharpness": "round",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "draw",
+          "version": 3,
+          "versionNonce": 449462985,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`regression tests key 7 selects draw tool: [end of test] number of elements 1`] = `1`;
+
+exports[`regression tests key 7 selects draw tool: [end of test] number of renders 1`] = `6`;
+
 exports[`regression tests key a selects arrow tool: [end of test] appState 1`] = `
 Object {
   "appearance": "light",
@@ -11001,7 +12003,7 @@ Object {
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
-  "isBindingEnabled": false,
+  "isBindingEnabled": true,
   "isCollaborating": false,
   "isLibraryOpen": false,
   "isLoading": false,
@@ -11014,14 +12016,15 @@ Object {
   "openMenu": null,
   "previousSelectedElementIds": Object {
     "id0": true,
+    "id3": true,
   },
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
   "selectedElementIds": Object {
-    "id0": true,
-    "id2": true,
+    "id1": true,
+    "id4": true,
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
@@ -11062,8 +12065,8 @@ Object {
   "strokeStyle": "solid",
   "strokeWidth": 1,
   "type": "rectangle",
-  "version": 3,
-  "versionNonce": 401146281,
+  "version": 4,
+  "versionNonce": 1116226695,
   "width": 10,
   "x": 10,
   "y": 10,
@@ -11079,7 +12082,7 @@ Object {
   "groupIds": Array [],
   "height": 10,
   "id": "id1",
-  "isDeleted": true,
+  "isDeleted": false,
   "opacity": 100,
   "roughness": 1,
   "seed": 449462985,
@@ -11088,8 +12091,8 @@ Object {
   "strokeStyle": "solid",
   "strokeWidth": 1,
   "type": "rectangle",
-  "version": 3,
-  "versionNonce": 2019559783,
+  "version": 4,
+  "versionNonce": 1014066025,
   "width": 10,
   "x": 30,
   "y": 10,
@@ -11099,7 +12102,52 @@ Object {
 exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] history 1`] = `
 Object {
   "recording": false,
-  "redoStack": Array [
+  "redoStack": Array [],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElementIds": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeSharpness": "sharp",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
     Object {
       "appState": Object {
         "editingGroupId": null,
@@ -11159,58 +12207,12 @@ Object {
       ],
     },
   ],
-  "stateHistory": Array [
-    Object {
-      "appState": Object {
-        "editingGroupId": null,
-        "editingLinearElement": null,
-        "selectedElementIds": Object {},
-        "viewBackgroundColor": "#ffffff",
-      },
-      "elements": Array [],
-    },
-    Object {
-      "appState": Object {
-        "editingGroupId": null,
-        "editingLinearElement": null,
-        "selectedElementIds": Object {
-          "id0": true,
-        },
-        "viewBackgroundColor": "#ffffff",
-      },
-      "elements": Array [
-        Object {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElementIds": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [],
-          "height": 10,
-          "id": "id0",
-          "isDeleted": false,
-          "opacity": 100,
-          "roughness": 1,
-          "seed": 337897,
-          "strokeColor": "#000000",
-          "strokeSharpness": "sharp",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "rectangle",
-          "version": 2,
-          "versionNonce": 1278240551,
-          "width": 10,
-          "x": 10,
-          "y": 10,
-        },
-      ],
-    },
-  ],
 }
 `;
 
 exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] number of renders 1`] = `14`;
+exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] number of renders 1`] = `18`;
 
 exports[`regression tests pinch-to-zoom works: [end of test] appState 1`] = `
 Object {
@@ -27757,7 +28759,7 @@ Object {
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
-  "isBindingEnabled": false,
+  "isBindingEnabled": true,
   "isCollaborating": false,
   "isLibraryOpen": false,
   "isLoading": false,
@@ -27774,7 +28776,7 @@ Object {
   "scrollY": 0,
   "scrolledOutside": false,
   "selectedElementIds": Object {
-    "id0": true,
+    "id1": true,
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
@@ -27815,8 +28817,8 @@ Object {
   "strokeStyle": "solid",
   "strokeWidth": 1,
   "type": "rectangle",
-  "version": 5,
-  "versionNonce": 747212839,
+  "version": 6,
+  "versionNonce": 1006504105,
   "width": 20,
   "x": 10,
   "y": -10,
@@ -27832,7 +28834,7 @@ Object {
   "groupIds": Array [],
   "height": 20,
   "id": "id1",
-  "isDeleted": true,
+  "isDeleted": false,
   "opacity": 100,
   "roughness": 1,
   "seed": 449462985,
@@ -27841,8 +28843,8 @@ Object {
   "strokeStyle": "solid",
   "strokeWidth": 1,
   "type": "rectangle",
-  "version": 5,
-  "versionNonce": 1723083209,
+  "version": 6,
+  "versionNonce": 289600103,
   "width": 30,
   "x": 40,
   "y": 0,
@@ -27883,8 +28885,8 @@ Object {
   "strokeStyle": "solid",
   "strokeWidth": 1,
   "type": "arrow",
-  "version": 10,
-  "versionNonce": 760410951,
+  "version": 11,
+  "versionNonce": 1315507081,
   "width": 60,
   "x": 130,
   "y": 10,
@@ -28093,6 +29095,52 @@ Object {
         },
       ],
     },
+  ],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElementIds": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeSharpness": "sharp",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": -10,
+        },
+      ],
+    },
     Object {
       "appState": Object {
         "editingGroupId": null,
@@ -28148,52 +29196,6 @@ Object {
           "width": 30,
           "x": 40,
           "y": 0,
-        },
-      ],
-    },
-  ],
-  "stateHistory": Array [
-    Object {
-      "appState": Object {
-        "editingGroupId": null,
-        "editingLinearElement": null,
-        "selectedElementIds": Object {},
-        "viewBackgroundColor": "#ffffff",
-      },
-      "elements": Array [],
-    },
-    Object {
-      "appState": Object {
-        "editingGroupId": null,
-        "editingLinearElement": null,
-        "selectedElementIds": Object {
-          "id0": true,
-        },
-        "viewBackgroundColor": "#ffffff",
-      },
-      "elements": Array [
-        Object {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElementIds": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [],
-          "height": 10,
-          "id": "id0",
-          "isDeleted": false,
-          "opacity": 100,
-          "roughness": 1,
-          "seed": 337897,
-          "strokeColor": "#000000",
-          "strokeSharpness": "sharp",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "rectangle",
-          "version": 2,
-          "versionNonce": 1278240551,
-          "width": 20,
-          "x": 10,
-          "y": -10,
         },
       ],
     },
