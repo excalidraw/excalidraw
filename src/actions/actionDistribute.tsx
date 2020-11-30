@@ -49,7 +49,7 @@ export const distributeHorizontally = register({
     };
   },
   keyTest: (event) => {
-    return event.altKey && event.code === KEYS.H_CODE;
+    return event.altKey && event.key === KEYS.H_KEY;
   },
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
@@ -79,7 +79,7 @@ export const distributeVertically = register({
     };
   },
   keyTest: (event) => {
-    return event.altKey && event.code === KEYS.V_CODE;
+    return event.altKey && event.key === KEYS.V_KEY;
   },
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton

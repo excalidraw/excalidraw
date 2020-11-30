@@ -28,7 +28,7 @@ export const actionCopyStyles = register({
   },
   contextItemLabel: "labels.copyStyles",
   keyTest: (event) =>
-    event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === KEYS.C_CODE,
+    event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === KEYS.C_KEY,
   contextMenuOrder: 0,
 });
 
@@ -68,6 +68,6 @@ export const actionPasteStyles = register({
   },
   contextItemLabel: "labels.pasteStyles",
   keyTest: (event) =>
-    event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === KEYS.V_CODE,
+    event[KEYS.CTRL_OR_CMD] && event.altKey && event.key === KEYS.V_KEY,
   contextMenuOrder: 1,
 });

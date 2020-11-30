@@ -36,7 +36,30 @@ export class Keyboard {
     }
   };
 
-  static keyDown = (code: string) => {
+  static keyDown = (key: string) => {
+    fireEvent.keyDown(document, {
+      key,
+      ctrlKey,
+      shiftKey,
+      altKey,
+    });
+  };
+
+  static keyUp = (key: string) => {
+    fireEvent.keyUp(document, {
+      key,
+      ctrlKey,
+      shiftKey,
+      altKey,
+    });
+  };
+
+  static keyPress = (key: string) => {
+    Keyboard.keyDown(key);
+    Keyboard.keyUp(key);
+  };
+
+  static codeDown = (code: string) => {
     fireEvent.keyDown(document, {
       code,
       ctrlKey,
@@ -45,7 +68,7 @@ export class Keyboard {
     });
   };
 
-  static keyUp = (code: string) => {
+  static codeUp = (code: string) => {
     fireEvent.keyUp(document, {
       code,
       ctrlKey,
@@ -54,9 +77,9 @@ export class Keyboard {
     });
   };
 
-  static keyPress = (code: string) => {
-    Keyboard.keyDown(code);
-    Keyboard.keyUp(code);
+  static codePress = (code: string) => {
+    Keyboard.codeDown(code);
+    Keyboard.codeUp(code);
   };
 }
 
@@ -184,7 +207,7 @@ export class UI {
   static group(elements: ExcalidrawElement[]) {
     mouse.select(elements);
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress(KEYS.G_CODE);
+      Keyboard.keyPress(KEYS.G_KEY);
     });
   }
 }

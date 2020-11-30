@@ -83,7 +83,7 @@ export const actionSaveScene = register({
   },
   keyTest: (event) => {
     return (
-      event.code === KEYS.S_CODE && event[KEYS.CTRL_OR_CMD] && !event.shiftKey
+      event.key === KEYS.S_KEY && event[KEYS.CTRL_OR_CMD] && !event.shiftKey
     );
   },
   PanelComponent: ({ updateData }) => (
@@ -116,7 +116,7 @@ export const actionSaveAsScene = register({
   },
   keyTest: (event) => {
     return (
-      event.code === KEYS.S_CODE && event.shiftKey && event[KEYS.CTRL_OR_CMD]
+      event.key === KEYS.S_KEY && event.shiftKey && event[KEYS.CTRL_OR_CMD]
     );
   },
   PanelComponent: ({ updateData }) => (

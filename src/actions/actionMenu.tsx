@@ -65,7 +65,7 @@ export const actionFullScreen = register({
       commitToHistory: false,
     };
   },
-  keyTest: (event) => event.code === KEYS.F_CODE,
+  keyTest: (event) => event.key === KEYS.F_KEY,
 });
 
 export const actionShortcuts = register({

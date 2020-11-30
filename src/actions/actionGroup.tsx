@@ -131,7 +131,7 @@ export const actionGroup = register({
     enableActionGroup(elements, appState),
   keyTest: (event) => {
     return (
-      !event.shiftKey && event[KEYS.CTRL_OR_CMD] && event.code === KEYS.G_CODE
+      !event.shiftKey && event[KEYS.CTRL_OR_CMD] && event.key === KEYS.G_KEY
     );
   },
   PanelComponent: ({ elements, appState, updateData }) => (
@@ -177,7 +177,7 @@ export const actionUngroup = register({
   },
   keyTest: (event) => {
     return (
-      event.shiftKey && event[KEYS.CTRL_OR_CMD] && event.code === KEYS.G_CODE
+      event.shiftKey && event[KEYS.CTRL_OR_CMD] && event.key === KEYS.G_KEY
     );
   },
   contextMenuOrder: 5,

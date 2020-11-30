@@ -78,7 +78,7 @@ import {
 } from "../utils";
 import {
   KEYS,
-  isArrowCode,
+  isArrowKey,
   getResizeCenterPointKey,
   getResizeWithSidesSameLengthKey,
   getRotateWithDiscreteAngleKey,
@@ -1510,19 +1510,38 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   // Input handling
 
   private onKeyDown = withBatchedUpdates((event: KeyboardEvent) => {
-    // ensures we don't prevent devTools select-element feature
+    // normalize `event.key` when CapsLock is pressed #2372
     if (
-      event[KEYS.CTRL_OR_CMD] &&
-      event.shiftKey &&
-      event.code === KEYS.C_CODE
+      "Proxy" in window &&
+      ((!event.shiftKey && /^[A-Z]$/.test(event.key)) ||
+        (event.shiftKey && /^[a-z]$/.test(event.key)))
     ) {
+      event = new Proxy(event, {
+        get(ev: any, prop) {
+          const value = ev[prop];
+          if (typeof value === "function") {
+            // fix for Proxies hijacking `this`
+            return value.bind(ev);
+          }
+          return prop === "key"
+            ? // CapsLock inverts capitalization based on ShiftKey, so invert
+              // it back
+              event.shiftKey
+              ? ev.key.toUpperCase()
+              : ev.key.toLowerCase()
+            : value;
+        },
+      });
+    }
+    // ensures we don't prevent devTools select-element feature
+    if (event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === KEYS.C_KEY) {
       return;
     }
 
     if (
-      (isWritableElement(event.target) && event.code !== KEYS.ESCAPE) ||
+      (isWritableElement(event.target) && event.key !== KEYS.ESCAPE) ||
       // case: using arrows to move between buttons
-      (isArrowCode(event.code) && isInputLike(event.target))
+      (isArrowKey(event.key) && isInputLike(event.target))
     ) {
       return;
     }
@@ -1533,22 +1552,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
     }
 
-    if (
-      !event[KEYS.CTRL_OR_CMD] &&
-      event.altKey &&
-      event.code === KEYS.Z_CODE
-    ) {
+    if (!event[KEYS.CTRL_OR_CMD] && event.altKey && event.key === KEYS.Z_KEY) {
       this.toggleZenMode();
     }
 
-    if (event[KEYS.CTRL_OR_CMD] && event.code === KEYS.QUOTE) {
+    if (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.QUOTE_KEY) {
       this.toggleGridMode();
     }
     if (event[KEYS.CTRL_OR_CMD]) {
       this.setState({ isBindingEnabled: false });
     }
 
-    if (event.code === KEYS.C_CODE && event.altKey && event.shiftKey) {
+    if (event.code === KEYS.C_KEY && event.altKey && event.shiftKey) {
       this.copyToClipboardAsPng();
       event.preventDefault();
       return;
@@ -1562,7 +1577,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.setState({ isLibraryOpen: !this.state.isLibraryOpen });
     }
 
-    if (isArrowCode(event.code)) {
+    if (isArrowKey(event.code)) {
       const step =
         (this.state.gridSize &&
           (event.shiftKey ? ELEMENT_TRANSLATE_AMOUNT : this.state.gridSize)) ||
@@ -1641,10 +1656,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       !event.metaKey &&
       this.state.draggingElement === null
     ) {
-      const shape = findShapeByKey(event.code);
+      const shape = findShapeByKey(event.key);
       if (shape) {
         this.selectShapeTool(shape);
-      } else if (event.code === KEYS.Q_CODE) {
+      } else if (event.key === KEYS.Q_KEY) {
         this.toggleLock();
       }
     }
@@ -1671,7 +1686,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (!event[KEYS.CTRL_OR_CMD] && !this.state.isBindingEnabled) {
       this.setState({ isBindingEnabled: true });
     }
-    if (isArrowCode(event.code)) {
+    if (isArrowKey(event.code)) {
       const selectedElements = getSelectedElements(
         this.scene.getElements(),
         this.state,

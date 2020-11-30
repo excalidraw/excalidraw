@@ -10,7 +10,7 @@ export const SHAPES = [
       </svg>
     ),
     value: "selection",
-    code: ["KeyV", "KeyS"],
+    key: ["v", "s"],
   },
   {
     icon: (
@@ -20,7 +20,7 @@ export const SHAPES = [
       </svg>
     ),
     value: "rectangle",
-    code: "KeyR",
+    key: "r",
   },
   {
     icon: (
@@ -30,7 +30,7 @@ export const SHAPES = [
       </svg>
     ),
     value: "diamond",
-    code: "KeyD",
+    key: "d",
   },
   {
     icon: (
@@ -40,7 +40,7 @@ export const SHAPES = [
       </svg>
     ),
     value: "ellipse",
-    code: "KeyE",
+    key: "e",
   },
   {
     icon: (
@@ -50,7 +50,7 @@ export const SHAPES = [
       </svg>
     ),
     value: "arrow",
-    code: "KeyA",
+    key: "a",
   },
   {
     icon: (
@@ -67,7 +67,7 @@ export const SHAPES = [
       </svg>
     ),
     value: "line",
-    code: ["KeyP", "KeyL"],
+    key: ["p", "l"],
   },
   {
     icon: (
@@ -80,7 +80,7 @@ export const SHAPES = [
       </svg>
     ),
     value: "draw",
-    code: "KeyX",
+    key: "x",
   },
   {
     icon: (
@@ -90,17 +90,17 @@ export const SHAPES = [
       </svg>
     ),
     value: "text",
-    code: "KeyT",
+    key: "t",
   },
 ] as const;
 
-export const findShapeByKey = (code: string) => {
+export const findShapeByKey = (key: string) => {
   const shape = SHAPES.find((shape, index) => {
     return (
-      code === (index + 1).toString() ||
-      (typeof shape.code === "string"
-        ? shape.code === code
-        : (shape.code as readonly string[]).includes(code))
+      key === (index + 1).toString() ||
+      (typeof shape.key === "string"
+        ? shape.key === key
+        : (shape.key as readonly string[]).includes(key))
     );
   });
   return shape?.value || null;
