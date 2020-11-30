@@ -172,16 +172,16 @@ describe("regression tests", () => {
     expect(API.getSelectedElement().id).not.toEqual(prevSelectedId);
   });
 
-  for (const [code, shape] of [
-    ["KeyR", "rectangle"],
-    ["KeyD", "diamond"],
-    ["KeyE", "ellipse"],
-    ["KeyA", "arrow"],
-    ["KeyL", "line"],
-    ["KeyX", "draw"],
+  for (const [key, shape] of [
+    ["r", "rectangle"],
+    ["d", "diamond"],
+    ["e", "ellipse"],
+    ["a", "arrow"],
+    ["l", "line"],
+    ["x", "draw"],
   ]) {
-    it(`code ${code} selects ${shape} tool`, () => {
-      Keyboard.keyPress(code);
+    it(`key ${key} selects ${shape} tool`, () => {
+      Keyboard.keyPress(key);
 
       mouse.down(10, 10);
       mouse.up(10, 10);
