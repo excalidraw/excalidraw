@@ -31,6 +31,7 @@ import { updateBoundElements } from "./binding";
 import {
   TransformHandleType,
   MaybeTransformHandleType,
+  TransformHandleDirection,
 } from "./transformHandles";
 import { PointerDownState } from "../components/App";
 import { Point } from "../types";
@@ -415,146 +416,121 @@ const resizeSingleRectDiamondEllipsesElement = (
   stateAtResizeStart: NonDeletedExcalidrawElement,
   shouldKeepSidesRatio: boolean,
   element: NonDeletedExcalidrawElement,
-  transformHandleType: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
+  transformHandleDirection: TransformHandleDirection,
   isResizeFromCenter: boolean,
   pointerX: number,
   pointerY: number,
 ) => {
-  const center: Point = [
-    stateAtResizeStart.x + stateAtResizeStart.width / 2,
-    stateAtResizeStart.y + stateAtResizeStart.height / 2,
-  ];
-  const rotatedPointer = rotate(
-    pointerX,
-    pointerY,
-    center[0],
-    center[1],
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(stateAtResizeStart);
+  let topLeft: any = [x1, y1];
+  let bottomRight: any = [x2, y2];
+
+  const center: Point = centerPoint(topLeft, bottomRight);
+  const rotatedPointer = rotatePoint(
+    [pointerX, pointerY],
+    center,
     -stateAtResizeStart.angle,
   );
 
-  let newWidth = 0;
-  let newHeight = 0;
-  let bottomRight: any = [0, 0];
-  let topLeft: any = [0, 0];
+  let { width: newWidth, height: newHeight } = getNewDimensions(
+    rotatedPointer,
+    stateAtResizeStart,
+    transformHandleDirection,
+  );
 
-  if (transformHandleType === "e") {
-    newWidth = rotatedPointer[0] - stateAtResizeStart.x;
-
+  if (transformHandleDirection === "e") {
     topLeft = [stateAtResizeStart.x, stateAtResizeStart.y];
+
     if (isResizeFromCenter) {
-      const widthDiff = newWidth - stateAtResizeStart.width;
-      newWidth += widthDiff;
-      topLeft[0] -= widthDiff;
+      newWidth = Math.abs((center[0] - rotatedPointer[0]) * 2);
+      topLeft[0] = center[0] - newWidth / 2;
     }
 
-    // Horizontal Flip
     if (newWidth < 0) {
       newWidth = Math.abs(newWidth);
       topLeft[0] = topLeft[0] - newWidth;
     }
 
-    newHeight = stateAtResizeStart.height;
     if (shouldKeepSidesRatio) {
       newHeight *= newWidth / stateAtResizeStart.width;
-      // Adjust so rect's center Y stays the same.
-      const yAdjustment = (stateAtResizeStart.height - newHeight) / 2;
-      topLeft[1] = topLeft[1] + yAdjustment;
+      topLeft[1] = center[1] - newHeight / 2;
     }
 
     bottomRight = [topLeft[0] + newWidth, topLeft[1] + newHeight];
   }
-  if (transformHandleType === "w") {
-    newWidth =
-      stateAtResizeStart.x + stateAtResizeStart.width - rotatedPointer[0];
-
+  if (transformHandleDirection === "w") {
     const topRight = [
       stateAtResizeStart.x + stateAtResizeStart.width,
       stateAtResizeStart.y,
     ];
     if (isResizeFromCenter) {
-      const widthDiff = newWidth - stateAtResizeStart.width;
-      newWidth += widthDiff;
-      topRight[0] += widthDiff;
+      newWidth = Math.abs((center[0] - rotatedPointer[0]) * 2);
+      topRight[0] = center[0] + newWidth / 2;
     }
 
-    // Horizontal Flip
     if (newWidth < 0) {
       newWidth = Math.abs(newWidth);
       topRight[0] += newWidth;
     }
 
-    newHeight = stateAtResizeStart.height;
     if (shouldKeepSidesRatio) {
       newHeight *= newWidth / stateAtResizeStart.width;
-      // Adjust so rect's center Y stays the same.
-      const yAdjustment = (stateAtResizeStart.height - newHeight) / 2;
-      topRight[1] += yAdjustment;
+      topRight[1] = center[1] - newHeight / 2;
     }
 
     bottomRight = [topRight[0], topRight[1] + newHeight];
     topLeft = [topRight[0] - newWidth, topRight[1]];
   }
-  if (transformHandleType === "n") {
-    newHeight =
-      stateAtResizeStart.y + stateAtResizeStart.height - rotatedPointer[1];
-
+  if (transformHandleDirection === "n") {
     const bottomLeft = [
       stateAtResizeStart.x,
       stateAtResizeStart.y + stateAtResizeStart.height,
     ];
 
     if (isResizeFromCenter) {
-      const heightDiff = newHeight - stateAtResizeStart.height;
-      newHeight += heightDiff;
-      bottomLeft[1] += heightDiff;
+      newHeight = Math.abs((center[1] - rotatedPointer[1]) * 2);
+      bottomLeft[1] = center[1] + newHeight / 2;
     }
 
-    //Vertical Flip
     if (newHeight < 0) {
       newHeight = Math.abs(newHeight);
       bottomLeft[1] = bottomLeft[1] + newHeight;
     }
 
-    newWidth = stateAtResizeStart.width;
     if (shouldKeepSidesRatio) {
       newWidth *= newHeight / stateAtResizeStart.height;
-      // Adjust so rect's center X stays the same.
-      const xAdjustment = (stateAtResizeStart.width - newWidth) / 2;
-      bottomLeft[0] = bottomLeft[0] + xAdjustment;
+      bottomLeft[0] = center[0] - newWidth / 2;
     }
 
     bottomRight = [bottomLeft[0] + newWidth, bottomLeft[1]];
     topLeft = [bottomLeft[0], bottomLeft[1] - newHeight];
   }
-  if (transformHandleType === "s") {
-    newHeight = rotatedPointer[1] - stateAtResizeStart.y;
-
+  if (transformHandleDirection === "s") {
     topLeft = [stateAtResizeStart.x, stateAtResizeStart.y];
     if (isResizeFromCenter) {
-      const heightDiff = newHeight - stateAtResizeStart.height;
-      newHeight += heightDiff;
-      topLeft[1] -= heightDiff;
+      newHeight = Math.abs((center[1] - rotatedPointer[1]) * 2);
+      topLeft[1] = center[1] - newHeight / 2;
     }
 
-    //Vertical Flip
     if (newHeight < 0) {
       newHeight = Math.abs(newHeight);
       topLeft[1] = topLeft[1] - newHeight;
     }
 
-    newWidth = stateAtResizeStart.width;
     if (shouldKeepSidesRatio) {
       newWidth *= newHeight / stateAtResizeStart.height;
-      // Adjust so rect's center X stays the same.
-      const xAdjustment = (stateAtResizeStart.width - newWidth) / 2;
-      topLeft[0] = topLeft[0] + xAdjustment;
+      topLeft[0] = center[0] - newWidth / 2;
     }
 
     bottomRight = [topLeft[0] + newWidth, topLeft[1] + newHeight];
   }
-  if (transformHandleType === "se") {
-    newWidth = rotatedPointer[0] - stateAtResizeStart.x;
-    newHeight = rotatedPointer[1] - stateAtResizeStart.y;
+  if (transformHandleDirection === "se") {
+    topLeft = [stateAtResizeStart.x, stateAtResizeStart.y];
+    if (isResizeFromCenter) {
+      newWidth = Math.abs((center[0] - rotatedPointer[0]) * 2);
+      newHeight = Math.abs((center[1] - rotatedPointer[1]) * 2);
+    }
+
     if (shouldKeepSidesRatio) {
       const dimensions = adjustDimensionsToHighestRatio({
         originalWidth: stateAtResizeStart.width,
@@ -566,23 +542,7 @@ const resizeSingleRectDiamondEllipsesElement = (
       newHeight = dimensions.height;
     }
 
-    topLeft = [stateAtResizeStart.x, stateAtResizeStart.y];
     if (isResizeFromCenter) {
-      newWidth = Math.abs((center[0] - rotatedPointer[0]) * 2);
-      newHeight = Math.abs((center[1] - rotatedPointer[1]) * 2);
-
-      if (shouldKeepSidesRatio) {
-        const widthRatio = newWidth / stateAtResizeStart.width;
-        const heightRatio = newHeight / stateAtResizeStart.height;
-
-        if (widthRatio > heightRatio) {
-          newHeight = widthRatio * stateAtResizeStart.height;
-        }
-        if (widthRatio < heightRatio) {
-          newWidth = heightRatio * stateAtResizeStart.width;
-        }
-      }
-
       topLeft[0] = center[0] - newWidth / 2;
       topLeft[1] = center[1] - newHeight / 2;
     }
@@ -601,15 +561,20 @@ const resizeSingleRectDiamondEllipsesElement = (
 
     bottomRight = [topLeft[0] + newWidth, topLeft[1] + newHeight];
   }
-  if (transformHandleType === "ne") {
-    newWidth = rotatedPointer[0] - stateAtResizeStart.x;
-    newHeight =
-      stateAtResizeStart.y + stateAtResizeStart.height - rotatedPointer[1];
-
+  if (transformHandleDirection === "ne") {
+    // TODO: Get back to trying to make the direction of the resize explicit
+    // as to get done with the idea of negative dimensions
+    // newWidth = Math.abs(newWidth);
+    // newHeight = Math.abs(newHeight);
     const bottomLeft = [
       stateAtResizeStart.x,
       stateAtResizeStart.y + stateAtResizeStart.height,
     ];
+
+    if (isResizeFromCenter) {
+      newWidth = Math.abs((center[0] - rotatedPointer[0]) * 2);
+      newHeight = Math.abs((center[1] - rotatedPointer[1]) * 2);
+    }
 
     if (shouldKeepSidesRatio) {
       const dimensions = adjustDimensionsToHighestRatio({
@@ -623,32 +588,34 @@ const resizeSingleRectDiamondEllipsesElement = (
     }
 
     if (isResizeFromCenter) {
-      newWidth = Math.abs((center[0] - rotatedPointer[0]) * 2);
-      newHeight = Math.abs((center[1] - rotatedPointer[1]) * 2);
-
-      if (shouldKeepSidesRatio) {
-        const widthRatio = newWidth / stateAtResizeStart.width;
-        const heightRatio = newHeight / stateAtResizeStart.height;
-
-        if (widthRatio > heightRatio) {
-          newHeight = widthRatio * stateAtResizeStart.height;
-        }
-        if (widthRatio < heightRatio) {
-          newWidth = heightRatio * stateAtResizeStart.width;
-        }
-      }
-
       bottomLeft[0] = center[0] - newWidth / 2;
       bottomLeft[1] = center[1] + newHeight / 2;
     }
 
+    // if (isResizeFromCenter) {
+    //   bottomLeft[0] =
+    //     center[0] -
+    //     (newWidth * Math.sign(rotatedPointer[0] - stateAtResizeStart.x)) / 2;
+    //   bottomLeft[1] =
+    //     center[1] +
+    //     (newHeight *
+    //       Math.sign(
+    //         stateAtResizeStart.y +
+    //           stateAtResizeStart.height -
+    //           rotatedPointer[1],
+    //       )) /
+    //       2;
+    // }
+
     // Flip horizontally
+    // We actually want to check for direction
     if (newWidth < 0) {
       newWidth = Math.abs(newWidth);
       bottomLeft[0] = bottomLeft[0] - newWidth;
     }
 
     // Flip vertically
+    // We actually want to check for direction
     if (newHeight < 0) {
       newHeight = Math.abs(newHeight);
       bottomLeft[1] = bottomLeft[1] + newHeight;
@@ -657,12 +624,16 @@ const resizeSingleRectDiamondEllipsesElement = (
     bottomRight = [bottomLeft[0] + newWidth, bottomLeft[1]];
     topLeft = [bottomLeft[0], bottomLeft[1] - newHeight];
   }
-  if (transformHandleType === "nw") {
-    newWidth =
-      stateAtResizeStart.x + stateAtResizeStart.width - rotatedPointer[0];
+  if (transformHandleDirection === "nw") {
+    bottomRight = [
+      stateAtResizeStart.x + stateAtResizeStart.width,
+      stateAtResizeStart.y + stateAtResizeStart.height,
+    ];
 
-    newHeight =
-      stateAtResizeStart.y + stateAtResizeStart.height - rotatedPointer[1];
+    if (isResizeFromCenter) {
+      newWidth = Math.abs((center[0] - rotatedPointer[0]) * 2);
+      newHeight = Math.abs((center[1] - rotatedPointer[1]) * 2);
+    }
 
     if (shouldKeepSidesRatio) {
       const dimensions = adjustDimensionsToHighestRatio({
@@ -675,26 +646,7 @@ const resizeSingleRectDiamondEllipsesElement = (
       newHeight = dimensions.height;
     }
 
-    bottomRight = [
-      stateAtResizeStart.x + stateAtResizeStart.width,
-      stateAtResizeStart.y + stateAtResizeStart.height,
-    ];
     if (isResizeFromCenter) {
-      newWidth = Math.abs((center[0] - rotatedPointer[0]) * 2);
-      newHeight = Math.abs((center[1] - rotatedPointer[1]) * 2);
-
-      if (shouldKeepSidesRatio) {
-        const widthRatio = newWidth / stateAtResizeStart.width;
-        const heightRatio = newHeight / stateAtResizeStart.height;
-
-        if (widthRatio > heightRatio) {
-          newHeight = widthRatio * stateAtResizeStart.height;
-        }
-        if (widthRatio < heightRatio) {
-          newWidth = heightRatio * stateAtResizeStart.width;
-        }
-      }
-
       bottomRight[0] = center[0] + newWidth / 2;
       bottomRight[1] = center[1] + newHeight / 2;
     }
@@ -713,11 +665,16 @@ const resizeSingleRectDiamondEllipsesElement = (
 
     topLeft = [bottomRight[0] - newWidth, bottomRight[1] - newHeight];
   }
-  if (transformHandleType === "sw") {
-    newWidth =
-      stateAtResizeStart.x + stateAtResizeStart.width - rotatedPointer[0];
+  if (transformHandleDirection === "sw") {
+    const topRight = [
+      stateAtResizeStart.x + stateAtResizeStart.width,
+      stateAtResizeStart.y,
+    ];
 
-    newHeight = rotatedPointer[1] - stateAtResizeStart.y;
+    if (isResizeFromCenter) {
+      newWidth = Math.abs((center[0] - rotatedPointer[0]) * 2);
+      newHeight = Math.abs((center[1] - rotatedPointer[1]) * 2);
+    }
 
     if (shouldKeepSidesRatio) {
       const dimensions = adjustDimensionsToHighestRatio({
@@ -730,26 +687,7 @@ const resizeSingleRectDiamondEllipsesElement = (
       newHeight = dimensions.height;
     }
 
-    const topRight = [
-      stateAtResizeStart.x + stateAtResizeStart.width,
-      stateAtResizeStart.y,
-    ];
     if (isResizeFromCenter) {
-      newWidth = Math.abs((center[0] - rotatedPointer[0]) * 2);
-      newHeight = Math.abs((center[1] - rotatedPointer[1]) * 2);
-
-      if (shouldKeepSidesRatio) {
-        const widthRatio = newWidth / stateAtResizeStart.width;
-        const heightRatio = newHeight / stateAtResizeStart.height;
-
-        if (widthRatio > heightRatio) {
-          newHeight = widthRatio * stateAtResizeStart.height;
-        }
-        if (widthRatio < heightRatio) {
-          newWidth = heightRatio * stateAtResizeStart.width;
-        }
-      }
-
       topRight[0] = center[0] + newWidth / 2;
       topRight[1] = center[1] - newHeight / 2;
     }
@@ -789,6 +727,32 @@ const resizeSingleRectDiamondEllipsesElement = (
     newSize: { width: resizedElement.width, height: resizedElement.height },
   });
   mutateElement(element, resizedElement);
+
+  function getNewDimensions(
+    pointer: Point,
+    element: NonDeletedExcalidrawElement,
+    transformHandleDirection: TransformHandleDirection,
+  ) {
+    const dimensions = {
+      width: element.width,
+      height: element.height,
+    };
+    if (transformHandleDirection.includes("e")) {
+      dimensions.width = pointer[0] - stateAtResizeStart.x;
+    }
+    if (transformHandleDirection.includes("s")) {
+      dimensions.height = pointer[1] - stateAtResizeStart.y;
+    }
+    if (transformHandleDirection.includes("w")) {
+      dimensions.width =
+        stateAtResizeStart.x + stateAtResizeStart.width - pointer[0];
+    }
+    if (transformHandleDirection.includes("n")) {
+      dimensions.height =
+        stateAtResizeStart.y + stateAtResizeStart.height - pointer[1];
+    }
+    return dimensions;
+  }
 
   function adjustElementRotation({
     topLeft,
