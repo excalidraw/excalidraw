@@ -73,10 +73,10 @@
     "removeFromLibrary": "从库中移除",
     "libraryLoadingMessage": "正在加载库...",
     "loadingScene": "正在加载绘图...",
-    "align": "",
-    "alignTop": "",
-    "alignBottom": "",
-    "alignLeft": "",
+    "align": "对齐",
+    "alignTop": "顶部对齐",
+    "alignBottom": "底端对齐",
+    "alignLeft": "靠左对齐",
     "alignRight": "",
     "centerVertically": "",
     "centerHorizontally": "",
@@ -158,9 +158,9 @@
     "lineEditor_nothingSelected": "选中要移动或移除的点，或按住 Alt 并点击添加新点"
   },
   "canvasError": {
-    "cannotShowPreview": "",
-    "canvasTooBig": "",
-    "canvasTooBigTip": ""
+    "cannotShowPreview": "无法显示预览",
+    "canvasTooBig": "画布可能过大。",
+    "canvasTooBigTip": "提示：尝试将最远的元素移动到和其它元素更近一些。"
   },
   "errorSplash": {
     "headingMain_pre": "遇到异常。请尝试",
