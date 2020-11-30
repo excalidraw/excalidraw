@@ -1563,7 +1563,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.setState({ isBindingEnabled: false });
     }
 
-    if (event.code === KEYS.C_KEY && event.altKey && event.shiftKey) {
+    if (event.key === KEYS.C_KEY && event.altKey && event.shiftKey) {
       this.copyToClipboardAsPng();
       event.preventDefault();
       return;

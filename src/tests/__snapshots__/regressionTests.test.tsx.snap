@@ -10568,13 +10568,16 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
-  "previousSelectedElementIds": Object {},
+  "previousSelectedElementIds": Object {
+    "id0": true,
+  },
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
   "selectedElementIds": Object {
-    "id1": true,
+    "id0": true,
+    "id2": true,
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
@@ -10615,8 +10618,8 @@ Object {
   "strokeStyle": "solid",
   "strokeWidth": 1,
   "type": "rectangle",
-  "version": 2,
-  "versionNonce": 1278240551,
+  "version": 3,
+  "versionNonce": 401146281,
   "width": 10,
   "x": 10,
   "y": 10,
@@ -10632,7 +10635,7 @@ Object {
   "groupIds": Array [],
   "height": 10,
   "id": "id1",
-  "isDeleted": false,
+  "isDeleted": true,
   "opacity": 100,
   "roughness": 1,
   "seed": 449462985,
@@ -10641,8 +10644,8 @@ Object {
   "strokeStyle": "solid",
   "strokeWidth": 1,
   "type": "rectangle",
-  "version": 2,
-  "versionNonce": 453191,
+  "version": 3,
+  "versionNonce": 2019559783,
   "width": 10,
   "x": 30,
   "y": 10,
@@ -10652,52 +10655,7 @@ Object {
 exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] history 1`] = `
 Object {
   "recording": false,
-  "redoStack": Array [],
-  "stateHistory": Array [
-    Object {
-      "appState": Object {
-        "editingGroupId": null,
-        "editingLinearElement": null,
-        "selectedElementIds": Object {},
-        "viewBackgroundColor": "#ffffff",
-      },
-      "elements": Array [],
-    },
-    Object {
-      "appState": Object {
-        "editingGroupId": null,
-        "editingLinearElement": null,
-        "selectedElementIds": Object {
-          "id0": true,
-        },
-        "viewBackgroundColor": "#ffffff",
-      },
-      "elements": Array [
-        Object {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElementIds": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [],
-          "height": 10,
-          "id": "id0",
-          "isDeleted": false,
-          "opacity": 100,
-          "roughness": 1,
-          "seed": 337897,
-          "strokeColor": "#000000",
-          "strokeSharpness": "sharp",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "rectangle",
-          "version": 2,
-          "versionNonce": 1278240551,
-          "width": 10,
-          "x": 10,
-          "y": 10,
-        },
-      ],
-    },
+  "redoStack": Array [
     Object {
       "appState": Object {
         "editingGroupId": null,
@@ -10757,12 +10715,58 @@ Object {
       ],
     },
   ],
+  "stateHistory": Array [
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "selectedElementIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "selectedElementIds": Object {
+          "id0": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElementIds": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeSharpness": "sharp",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 10,
+          "x": 10,
+          "y": 10,
+        },
+      ],
+    },
+  ],
 }
 `;
 
 exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] number of renders 1`] = `11`;
+exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] number of renders 1`] = `14`;
 
 exports[`regression tests pinch-to-zoom works: [end of test] appState 1`] = `
 Object {

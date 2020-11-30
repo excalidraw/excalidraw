@@ -61,7 +61,7 @@ const writeData = (
 
 const testUndo = (shift: boolean) => (event: KeyboardEvent) =>
   event[KEYS.CTRL_OR_CMD] &&
-  event.code === KEYS.Z_KEY &&
+  event.key === KEYS.Z_KEY &&
   event.shiftKey === shift;
 
 type ActionCreator = (history: SceneHistory) => Action;
