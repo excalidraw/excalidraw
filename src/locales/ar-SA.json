@@ -80,8 +80,8 @@
     "alignRight": "محاذاة إلى اليمين",
     "centerVertically": "توسيط عمودي",
     "centerHorizontally": "توسيط أفقي",
-    "distributeHorizontally": "",
-    "distributeVertically": ""
+    "distributeHorizontally": "التوزيع الأفقي",
+    "distributeVertically": "التوزيع عمودياً"
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
