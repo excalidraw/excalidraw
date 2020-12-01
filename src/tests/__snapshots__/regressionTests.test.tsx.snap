@@ -9393,7 +9393,7 @@ exports[`regression tests given selected element A with lower z-index than unsel
 
 exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when dragging on intersection between A and B A should be dragged and keep being selected: [end of test] number of renders 1`] = `17`;
 
-exports[`regression tests hotkey 2 selects rectangle tool: [end of test] appState 1`] = `
+exports[`regression tests key 2 selects rectangle tool: [end of test] appState 1`] = `
 Object {
   "appearance": "light",
   "collaborators": Map {},
@@ -9465,7 +9465,7 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey 2 selects rectangle tool: [end of test] element 0 1`] = `
+exports[`regression tests key 2 selects rectangle tool: [end of test] element 0 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -9491,7 +9491,7 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey 2 selects rectangle tool: [end of test] history 1`] = `
+exports[`regression tests key 2 selects rectangle tool: [end of test] history 1`] = `
 Object {
   "recording": false,
   "redoStack": Array [],
@@ -9546,11 +9546,11 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey 2 selects rectangle tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests key 2 selects rectangle tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey 2 selects rectangle tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests key 2 selects rectangle tool: [end of test] number of renders 1`] = `6`;
 
-exports[`regression tests hotkey 3 selects diamond tool: [end of test] appState 1`] = `
+exports[`regression tests key 3 selects diamond tool: [end of test] appState 1`] = `
 Object {
   "appearance": "light",
   "collaborators": Map {},
@@ -9622,7 +9622,7 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey 3 selects diamond tool: [end of test] element 0 1`] = `
+exports[`regression tests key 3 selects diamond tool: [end of test] element 0 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -9648,7 +9648,7 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey 3 selects diamond tool: [end of test] history 1`] = `
+exports[`regression tests key 3 selects diamond tool: [end of test] history 1`] = `
 Object {
   "recording": false,
   "redoStack": Array [],
@@ -9703,11 +9703,11 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey 3 selects diamond tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests key 3 selects diamond tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey 3 selects diamond tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests key 3 selects diamond tool: [end of test] number of renders 1`] = `6`;
 
-exports[`regression tests hotkey 4 selects ellipse tool: [end of test] appState 1`] = `
+exports[`regression tests key 4 selects ellipse tool: [end of test] appState 1`] = `
 Object {
   "appearance": "light",
   "collaborators": Map {},
@@ -9779,7 +9779,7 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey 4 selects ellipse tool: [end of test] element 0 1`] = `
+exports[`regression tests key 4 selects ellipse tool: [end of test] element 0 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -9805,7 +9805,7 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey 4 selects ellipse tool: [end of test] history 1`] = `
+exports[`regression tests key 4 selects ellipse tool: [end of test] history 1`] = `
 Object {
   "recording": false,
   "redoStack": Array [],
@@ -9860,11 +9860,11 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey 4 selects ellipse tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests key 4 selects ellipse tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey 4 selects ellipse tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests key 4 selects ellipse tool: [end of test] number of renders 1`] = `6`;
 
-exports[`regression tests hotkey 5 selects arrow tool: [end of test] appState 1`] = `
+exports[`regression tests key 5 selects arrow tool: [end of test] appState 1`] = `
 Object {
   "appearance": "light",
   "collaborators": Map {},
@@ -9936,7 +9936,7 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey 5 selects arrow tool: [end of test] element 0 1`] = `
+exports[`regression tests key 5 selects arrow tool: [end of test] element 0 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -9975,7 +9975,7 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey 5 selects arrow tool: [end of test] history 1`] = `
+exports[`regression tests key 5 selects arrow tool: [end of test] history 1`] = `
 Object {
   "recording": false,
   "redoStack": Array [],
@@ -10043,11 +10043,11 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey 5 selects arrow tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests key 5 selects arrow tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey 5 selects arrow tool: [end of test] number of renders 1`] = `7`;
+exports[`regression tests key 5 selects arrow tool: [end of test] number of renders 1`] = `7`;
 
-exports[`regression tests hotkey 6 selects line tool: [end of test] appState 1`] = `
+exports[`regression tests key 6 selects line tool: [end of test] appState 1`] = `
 Object {
   "appearance": "light",
   "collaborators": Map {},
@@ -10119,7 +10119,7 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey 6 selects line tool: [end of test] element 0 1`] = `
+exports[`regression tests key 6 selects line tool: [end of test] element 0 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -10158,7 +10158,7 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey 6 selects line tool: [end of test] history 1`] = `
+exports[`regression tests key 6 selects line tool: [end of test] history 1`] = `
 Object {
   "recording": false,
   "redoStack": Array [],
@@ -10226,11 +10226,11 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey 6 selects line tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests key 6 selects line tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey 6 selects line tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests key 6 selects line tool: [end of test] number of renders 1`] = `6`;
 
-exports[`regression tests hotkey 7 selects draw tool: [end of test] appState 1`] = `
+exports[`regression tests key 7 selects draw tool: [end of test] appState 1`] = `
 Object {
   "appearance": "light",
   "collaborators": Map {},
@@ -10302,7 +10302,7 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey 7 selects draw tool: [end of test] element 0 1`] = `
+exports[`regression tests key 7 selects draw tool: [end of test] element 0 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -10341,7 +10341,7 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey 7 selects draw tool: [end of test] history 1`] = `
+exports[`regression tests key 7 selects draw tool: [end of test] history 1`] = `
 Object {
   "recording": false,
   "redoStack": Array [],
@@ -10409,11 +10409,11 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey 7 selects draw tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests key 7 selects draw tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey 7 selects draw tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests key 7 selects draw tool: [end of test] number of renders 1`] = `6`;
 
-exports[`regression tests hotkey a selects arrow tool: [end of test] appState 1`] = `
+exports[`regression tests key a selects arrow tool: [end of test] appState 1`] = `
 Object {
   "appearance": "light",
   "collaborators": Map {},
@@ -10485,7 +10485,7 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey a selects arrow tool: [end of test] element 0 1`] = `
+exports[`regression tests key a selects arrow tool: [end of test] element 0 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -10524,7 +10524,7 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey a selects arrow tool: [end of test] history 1`] = `
+exports[`regression tests key a selects arrow tool: [end of test] history 1`] = `
 Object {
   "recording": false,
   "redoStack": Array [],
@@ -10592,11 +10592,11 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey a selects arrow tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests key a selects arrow tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey a selects arrow tool: [end of test] number of renders 1`] = `7`;
+exports[`regression tests key a selects arrow tool: [end of test] number of renders 1`] = `7`;
 
-exports[`regression tests hotkey d selects diamond tool: [end of test] appState 1`] = `
+exports[`regression tests key d selects diamond tool: [end of test] appState 1`] = `
 Object {
   "appearance": "light",
   "collaborators": Map {},
@@ -10668,7 +10668,7 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey d selects diamond tool: [end of test] element 0 1`] = `
+exports[`regression tests key d selects diamond tool: [end of test] element 0 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -10694,7 +10694,7 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey d selects diamond tool: [end of test] history 1`] = `
+exports[`regression tests key d selects diamond tool: [end of test] history 1`] = `
 Object {
   "recording": false,
   "redoStack": Array [],
@@ -10749,11 +10749,11 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey d selects diamond tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests key d selects diamond tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey d selects diamond tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests key d selects diamond tool: [end of test] number of renders 1`] = `6`;
 
-exports[`regression tests hotkey e selects ellipse tool: [end of test] appState 1`] = `
+exports[`regression tests key e selects ellipse tool: [end of test] appState 1`] = `
 Object {
   "appearance": "light",
   "collaborators": Map {},
@@ -10825,7 +10825,7 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey e selects ellipse tool: [end of test] element 0 1`] = `
+exports[`regression tests key e selects ellipse tool: [end of test] element 0 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -10851,7 +10851,7 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey e selects ellipse tool: [end of test] history 1`] = `
+exports[`regression tests key e selects ellipse tool: [end of test] history 1`] = `
 Object {
   "recording": false,
   "redoStack": Array [],
@@ -10906,11 +10906,11 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey e selects ellipse tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests key e selects ellipse tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey e selects ellipse tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests key e selects ellipse tool: [end of test] number of renders 1`] = `6`;
 
-exports[`regression tests hotkey l selects line tool: [end of test] appState 1`] = `
+exports[`regression tests key l selects line tool: [end of test] appState 1`] = `
 Object {
   "appearance": "light",
   "collaborators": Map {},
@@ -10982,7 +10982,7 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey l selects line tool: [end of test] element 0 1`] = `
+exports[`regression tests key l selects line tool: [end of test] element 0 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -11021,7 +11021,7 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey l selects line tool: [end of test] history 1`] = `
+exports[`regression tests key l selects line tool: [end of test] history 1`] = `
 Object {
   "recording": false,
   "redoStack": Array [],
@@ -11089,11 +11089,11 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey l selects line tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests key l selects line tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey l selects line tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests key l selects line tool: [end of test] number of renders 1`] = `6`;
 
-exports[`regression tests hotkey r selects rectangle tool: [end of test] appState 1`] = `
+exports[`regression tests key r selects rectangle tool: [end of test] appState 1`] = `
 Object {
   "appearance": "light",
   "collaborators": Map {},
@@ -11165,7 +11165,7 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey r selects rectangle tool: [end of test] element 0 1`] = `
+exports[`regression tests key r selects rectangle tool: [end of test] element 0 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -11191,7 +11191,7 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey r selects rectangle tool: [end of test] history 1`] = `
+exports[`regression tests key r selects rectangle tool: [end of test] history 1`] = `
 Object {
   "recording": false,
   "redoStack": Array [],
@@ -11246,11 +11246,11 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey r selects rectangle tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests key r selects rectangle tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey r selects rectangle tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests key r selects rectangle tool: [end of test] number of renders 1`] = `6`;
 
-exports[`regression tests hotkey x selects draw tool: [end of test] appState 1`] = `
+exports[`regression tests key x selects draw tool: [end of test] appState 1`] = `
 Object {
   "appearance": "light",
   "collaborators": Map {},
@@ -11322,7 +11322,7 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey x selects draw tool: [end of test] element 0 1`] = `
+exports[`regression tests key x selects draw tool: [end of test] element 0 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -11361,7 +11361,7 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey x selects draw tool: [end of test] history 1`] = `
+exports[`regression tests key x selects draw tool: [end of test] history 1`] = `
 Object {
   "recording": false,
   "redoStack": Array [],
@@ -11429,9 +11429,9 @@ Object {
 }
 `;
 
-exports[`regression tests hotkey x selects draw tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests key x selects draw tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests hotkey x selects draw tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests key x selects draw tool: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests make a group and duplicate it: [end of test] appState 1`] = `
 Object {

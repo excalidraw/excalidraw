@@ -52,11 +52,8 @@ export const actionAlignTop = register({
       commitToHistory: true,
     };
   },
-  keyTest: (event) => {
-    return (
-      event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === KEYS.ARROW_UP
-    );
-  },
+  keyTest: (event) =>
+    event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === KEYS.ARROW_UP,
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
       hidden={!enableActionGroup(elements, appState)}
@@ -84,11 +81,8 @@ export const actionAlignBottom = register({
       commitToHistory: true,
     };
   },
-  keyTest: (event) => {
-    return (
-      event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === KEYS.ARROW_DOWN
-    );
-  },
+  keyTest: (event) =>
+    event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === KEYS.ARROW_DOWN,
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
       hidden={!enableActionGroup(elements, appState)}
@@ -116,11 +110,8 @@ export const actionAlignLeft = register({
       commitToHistory: true,
     };
   },
-  keyTest: (event) => {
-    return (
-      event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === KEYS.ARROW_LEFT
-    );
-  },
+  keyTest: (event) =>
+    event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === KEYS.ARROW_LEFT,
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
       hidden={!enableActionGroup(elements, appState)}
@@ -148,13 +139,8 @@ export const actionAlignRight = register({
       commitToHistory: true,
     };
   },
-  keyTest: (event) => {
-    return (
-      event[KEYS.CTRL_OR_CMD] &&
-      event.shiftKey &&
-      event.key === KEYS.ARROW_RIGHT
-    );
-  },
+  keyTest: (event) =>
+    event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === KEYS.ARROW_RIGHT,
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
       hidden={!enableActionGroup(elements, appState)}

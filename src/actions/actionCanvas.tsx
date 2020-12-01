@@ -5,7 +5,7 @@ import { trash, zoomIn, zoomOut, resetZoom } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import { getNormalizedZoom } from "../scene";
-import { KEYS } from "../keys";
+import { CODES, KEYS } from "../keys";
 import { getShortcutKey } from "../utils";
 import useIsMobile from "../is-mobile";
 import { register } from "./register";
@@ -75,16 +75,6 @@ export const actionClearCanvas = register({
 
 const ZOOM_STEP = 0.1;
 
-const KEY_CODES = {
-  MINUS: "Minus",
-  EQUAL: "Equal",
-  ONE: "Digit1",
-  ZERO: "Digit0",
-  NUM_SUBTRACT: "NumpadSubtract",
-  NUM_ADD: "NumpadAdd",
-  NUM_ZERO: "Numpad0",
-};
-
 export const actionZoomIn = register({
   name: "zoomIn",
   perform: (_elements, appState) => {
@@ -112,7 +102,7 @@ export const actionZoomIn = register({
     />
   ),
   keyTest: (event) =>
-    (event.code === KEY_CODES.EQUAL || event.code === KEY_CODES.NUM_ADD) &&
+    (event.code === CODES.EQUAL || event.code === CODES.NUM_ADD) &&
     (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
 });
 
@@ -143,7 +133,7 @@ export const actionZoomOut = register({
     />
   ),
   keyTest: (event) =>
-    (event.code === KEY_CODES.MINUS || event.code === KEY_CODES.NUM_SUBTRACT) &&
+    (event.code === CODES.MINUS || event.code === CODES.NUM_SUBTRACT) &&
     (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
 });
 
@@ -173,7 +163,7 @@ export const actionResetZoom = register({
     />
   ),
   keyTest: (event) =>
-    (event.code === KEY_CODES.ZERO || event.code === KEY_CODES.NUM_ZERO) &&
+    (event.code === CODES.ZERO || event.code === CODES.NUM_ZERO) &&
     (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
 });
 
@@ -229,7 +219,7 @@ export const actionZoomToFit = register({
     };
   },
   keyTest: (event) =>
-    event.code === KEY_CODES.ONE &&
+    event.code === CODES.ONE &&
     event.shiftKey &&
     !event.altKey &&
     !event[KEYS.CTRL_OR_CMD],

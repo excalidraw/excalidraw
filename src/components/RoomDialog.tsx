@@ -9,6 +9,7 @@ import "./RoomDialog.scss";
 import { copyTextToSystemClipboard } from "../clipboard";
 import { Dialog } from "./Dialog";
 import { AppState } from "../types";
+import { KEYS } from "../keys";
 
 const RoomModal = ({
   activeRoomLink,
@@ -94,7 +95,9 @@ const RoomModal = ({
               value={username || ""}
               className="RoomDialog-username TextInput"
               onChange={(event) => onUsernameChange(event.target.value)}
-              onKeyPress={(event) => event.key === "Enter" && onPressingEnter()}
+              onKeyPress={(event) =>
+                event.key === KEYS.ENTER && onPressingEnter()
+              }
             />
           </div>
           <p>

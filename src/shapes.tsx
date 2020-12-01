@@ -1,4 +1,5 @@
 import React from "react";
+import { KEYS } from "./keys";
 
 // We inline font-awesome icons in order to save on js size rather than including the font awesome react library
 export const SHAPES = [
@@ -10,7 +11,7 @@ export const SHAPES = [
       </svg>
     ),
     value: "selection",
-    key: ["v", "s"],
+    key: [KEYS.V, KEYS.S],
   },
   {
     icon: (
@@ -20,7 +21,7 @@ export const SHAPES = [
       </svg>
     ),
     value: "rectangle",
-    key: "r",
+    key: KEYS.R,
   },
   {
     icon: (
@@ -30,7 +31,7 @@ export const SHAPES = [
       </svg>
     ),
     value: "diamond",
-    key: "d",
+    key: KEYS.D,
   },
   {
     icon: (
@@ -40,7 +41,7 @@ export const SHAPES = [
       </svg>
     ),
     value: "ellipse",
-    key: "e",
+    key: KEYS.E,
   },
   {
     icon: (
@@ -50,7 +51,7 @@ export const SHAPES = [
       </svg>
     ),
     value: "arrow",
-    key: "a",
+    key: KEYS.A,
   },
   {
     icon: (
@@ -67,7 +68,7 @@ export const SHAPES = [
       </svg>
     ),
     value: "line",
-    key: ["p", "l"],
+    key: [KEYS.P, KEYS.L],
   },
   {
     icon: (
@@ -80,7 +81,7 @@ export const SHAPES = [
       </svg>
     ),
     value: "draw",
-    key: ["P", "x"],
+    key: KEYS.X,
   },
   {
     icon: (
@@ -90,7 +91,7 @@ export const SHAPES = [
       </svg>
     ),
     value: "text",
-    key: "t",
+    key: KEYS.T,
   },
 ] as const;
 
