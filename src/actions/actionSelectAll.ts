@@ -27,5 +27,5 @@ export const actionSelectAll = register({
     };
   },
   contextItemLabel: "labels.selectAll",
-  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.A_KEY,
+  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.A,
 });

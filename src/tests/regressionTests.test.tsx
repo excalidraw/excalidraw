@@ -437,16 +437,16 @@ describe("regression tests", () => {
 
     expect(h.elements.filter((element) => !element.isDeleted).length).toBe(3);
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress(KEYS.Z_KEY);
-      Keyboard.keyPress(KEYS.Z_KEY);
+      Keyboard.keyPress(KEYS.Z);
+      Keyboard.keyPress(KEYS.Z);
     });
     expect(h.elements.filter((element) => !element.isDeleted).length).toBe(2);
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress(KEYS.Z_KEY);
+      Keyboard.keyPress(KEYS.Z);
     });
     expect(h.elements.filter((element) => !element.isDeleted).length).toBe(1);
     Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
-      Keyboard.keyPress(KEYS.Z_KEY);
+      Keyboard.keyPress(KEYS.Z);
     });
     expect(h.elements.filter((element) => !element.isDeleted).length).toBe(2);
   });
@@ -469,7 +469,7 @@ describe("regression tests", () => {
     expect(API.getStateHistory().length).toBe(3);
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress(KEYS.Z_KEY);
+      Keyboard.keyPress(KEYS.Z);
     });
 
     expect(API.getStateHistory().length).toBe(2);
@@ -480,7 +480,7 @@ describe("regression tests", () => {
     expect(API.getStateHistory().length).toBe(2);
 
     Keyboard.withModifierKeys({ shift: true, ctrl: true }, () => {
-      Keyboard.keyPress(KEYS.Z_KEY);
+      Keyboard.keyPress(KEYS.Z);
     });
 
     expect(API.getStateHistory().length).toBe(3);
@@ -501,11 +501,11 @@ describe("regression tests", () => {
 
   it("zoom hotkeys", () => {
     expect(h.state.zoom.value).toBe(1);
-    fireEvent.keyDown(document, { code: KEYS.EQUAL, ctrlKey: true });
-    fireEvent.keyUp(document, { code: KEYS.EQUAL, ctrlKey: true });
+    fireEvent.keyDown(document, { code: CODES.EQUAL, ctrlKey: true });
+    fireEvent.keyUp(document, { code: CODES.EQUAL, ctrlKey: true });
     expect(h.state.zoom.value).toBeGreaterThan(1);
-    fireEvent.keyDown(document, { code: KEYS.MINUS, ctrlKey: true });
-    fireEvent.keyUp(document, { code: KEYS.MINUS, ctrlKey: true });
+    fireEvent.keyDown(document, { code: CODES.MINUS, ctrlKey: true });
+    fireEvent.keyUp(document, { code: CODES.MINUS, ctrlKey: true });
     expect(h.state.zoom.value).toBe(1);
   });
 
@@ -591,7 +591,7 @@ describe("regression tests", () => {
     mouse.up(10, 10);
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress(KEYS.A_KEY);
+      Keyboard.keyPress(KEYS.A);
       Keyboard.codePress(CODES.G);
     });
 
@@ -658,7 +658,7 @@ describe("regression tests", () => {
     positions.push(mouse.getPosition());
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress(KEYS.A_KEY);
+      Keyboard.keyPress(KEYS.A);
       Keyboard.codePress(CODES.G);
     });
 
@@ -1502,7 +1502,7 @@ describe("regression tests", () => {
     UI.group([rect3, rect4]);
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress(KEYS.A_KEY);
+      Keyboard.keyPress(KEYS.A);
       Keyboard.codePress(CODES.G);
     });
 

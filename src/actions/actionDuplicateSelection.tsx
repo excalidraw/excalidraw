@@ -63,7 +63,7 @@ export const actionDuplicateSelection = register({
     };
   },
   contextItemLabel: "labels.duplicateSelection",
-  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.D_KEY,
+  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.D,
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
       type="button"

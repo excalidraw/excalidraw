@@ -31,14 +31,14 @@ export const KEYS = {
   QUESTION_MARK_KEY: "?",
   QUOTE_KEY: "'",
 
-  A_KEY: "a",
-  C_KEY: "c",
-  D_KEY: "d",
-  F_KEY: "f",
+  A: "a",
+  C: "c",
+  D: "d",
+  F: "f",
   H: "h",
-  Q_KEY: "q",
-  S_KEY: "s",
-  Z_KEY: "z",
+  Q: "q",
+  S: "s",
+  Z: "z",
 } as const;
 
 export type Key = keyof typeof KEYS;
