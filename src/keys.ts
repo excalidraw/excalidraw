@@ -12,8 +12,10 @@ export const CODES = {
   NINE: "Digit9",
   QUOTE: "Quote",
   ZERO: "Digit0",
+  C: "KeyC",
   G: "KeyG",
   F: "KeyF",
+  H: "KeyH",
   V: "KeyV",
 } as const;
 
@@ -32,10 +34,8 @@ export const KEYS = {
   TAB: "Tab",
 
   A: "a",
-  C: "c",
   D: "d",
   E: "e",
-  H: "h",
   L: "l",
   P: "p",
   Q: "q",

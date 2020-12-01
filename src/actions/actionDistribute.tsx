@@ -1,5 +1,5 @@
 import React from "react";
-import { CODES, KEYS } from "../keys";
+import { CODES } from "../keys";
 import { t } from "../i18n";
 import { register } from "./register";
 import {
@@ -48,9 +48,7 @@ export const distributeHorizontally = register({
       commitToHistory: true,
     };
   },
-  keyTest: (event) => {
-    return event.altKey && event.key === KEYS.H;
-  },
+  keyTest: (event) => event.altKey && event.code === CODES.H,
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
       hidden={!enableActionGroup(elements, appState)}

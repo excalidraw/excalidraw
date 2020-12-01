@@ -1535,7 +1535,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
     }
     // ensures we don't prevent devTools select-element feature
-    if (event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === KEYS.C) {
+    if (event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.code === CODES.C) {
       return;
     }
 
@@ -1564,7 +1564,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.setState({ isBindingEnabled: false });
     }
 
-    if (event.code === KEYS.C && event.altKey && event.shiftKey) {
+    if (event.code === CODES.C && event.altKey && event.shiftKey) {
       this.copyToClipboardAsPng();
       event.preventDefault();
       return;
