@@ -1534,10 +1534,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         },
       });
     }
-    // ensures we don't prevent devTools select-element feature
-    if (event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.code === CODES.C) {
-      return;
-    }
 
     if (
       (isWritableElement(event.target) && event.key !== KEYS.ESCAPE) ||
