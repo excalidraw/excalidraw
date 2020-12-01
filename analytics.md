@@ -13,3 +13,8 @@
 | Zoom out                   | action | Zoom                    | out          | `value` |
 | Zoom fit                   | action | Zoom                    | fit          | `value` |
 | Zoom reset                 | action | Zoom                    | reset        | `value` |
+| E2EE shield                | exit   | E2EE shield             |
+| GitHub corner              | exit   | GitHub                  |
+| Excalidraw blog            | exit   | Blog                    |
+| Excalidraw guides          | exit   | Guides                  |
+| File issues                | exit   | Issues                  |
