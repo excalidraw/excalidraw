@@ -81,9 +81,8 @@ export const actionSaveScene = register({
       return { commitToHistory: false };
     }
   },
-  keyTest: (event) => {
-    return event.key === KEYS.S && event[KEYS.CTRL_OR_CMD] && !event.shiftKey;
-  },
+  keyTest: (event) =>
+    event.key === KEYS.S && event[KEYS.CTRL_OR_CMD] && !event.shiftKey,
   PanelComponent: ({ updateData }) => (
     <ToolButton
       type="button"
@@ -112,9 +111,8 @@ export const actionSaveAsScene = register({
       return { commitToHistory: false };
     }
   },
-  keyTest: (event) => {
-    return event.key === KEYS.S && event.shiftKey && event[KEYS.CTRL_OR_CMD];
-  },
+  keyTest: (event) =>
+    event.key === KEYS.S && event.shiftKey && event[KEYS.CTRL_OR_CMD],
   PanelComponent: ({ updateData }) => (
     <ToolButton
       type="button"

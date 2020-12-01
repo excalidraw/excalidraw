@@ -129,9 +129,8 @@ export const actionGroup = register({
   contextItemLabel: "labels.group",
   contextItemPredicate: (elements, appState) =>
     enableActionGroup(elements, appState),
-  keyTest: (event) => {
-    return !event.shiftKey && event[KEYS.CTRL_OR_CMD] && event.code === CODES.G;
-  },
+  keyTest: (event) =>
+    !event.shiftKey && event[KEYS.CTRL_OR_CMD] && event.code === CODES.G,
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
       hidden={!enableActionGroup(elements, appState)}
@@ -173,9 +172,8 @@ export const actionUngroup = register({
       commitToHistory: true,
     };
   },
-  keyTest: (event) => {
-    return event.shiftKey && event[KEYS.CTRL_OR_CMD] && event.code === CODES.G;
-  },
+  keyTest: (event) =>
+    event.shiftKey && event[KEYS.CTRL_OR_CMD] && event.code === CODES.G,
   contextMenuOrder: 5,
   contextItemLabel: "labels.ungroup",
   contextItemPredicate: (elements, appState) =>

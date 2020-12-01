@@ -80,15 +80,14 @@ export const actionSendToBack = register({
     };
   },
   contextItemLabel: "labels.sendToBack",
-  keyTest: (event) => {
-    return isDarwin
+  keyTest: (event) =>
+    isDarwin
       ? event[KEYS.CTRL_OR_CMD] &&
-          event.altKey &&
-          event.code === CODES.BRACKET_LEFT
+        event.altKey &&
+        event.code === CODES.BRACKET_LEFT
       : event[KEYS.CTRL_OR_CMD] &&
-          event.shiftKey &&
-          event.code === CODES.BRACKET_LEFT;
-  },
+        event.shiftKey &&
+        event.code === CODES.BRACKET_LEFT,
   PanelComponent: ({ updateData, appState }) => (
     <button
       type="button"
@@ -115,15 +114,14 @@ export const actionBringToFront = register({
     };
   },
   contextItemLabel: "labels.bringToFront",
-  keyTest: (event) => {
-    return isDarwin
+  keyTest: (event) =>
+    isDarwin
       ? event[KEYS.CTRL_OR_CMD] &&
-          event.altKey &&
-          event.code === CODES.BRACKET_RIGHT
+        event.altKey &&
+        event.code === CODES.BRACKET_RIGHT
       : event[KEYS.CTRL_OR_CMD] &&
-          event.shiftKey &&
-          event.code === CODES.BRACKET_RIGHT;
-  },
+        event.shiftKey &&
+        event.code === CODES.BRACKET_RIGHT,
   PanelComponent: ({ updateData, appState }) => (
     <button
       type="button"
