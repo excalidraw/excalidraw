@@ -31,6 +31,7 @@ export {
 export { actionFinalize } from "./actionFinalize";
 
 export {
+  actionChangeProjectName,
   actionChangeExportBackground,
   actionSaveScene,
   actionSaveAsScene,

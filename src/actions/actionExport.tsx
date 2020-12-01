@@ -1,4 +1,5 @@
 import React from "react";
+import { ProjectName } from "../components/ProjectName";
 import { saveAsJSON, loadFromJSON } from "../data";
 import { load, save, saveAs } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
@@ -7,6 +8,20 @@ import useIsMobile from "../is-mobile";
 import { register } from "./register";
 import { KEYS } from "../keys";
 import { muteFSAbortError } from "../utils";
+
+export const actionChangeProjectName = register({
+  name: "changeProjectName",
+  perform: (_elements, appState, value) => {
+    return { appState: { ...appState, name: value }, commitToHistory: false };
+  },
+  PanelComponent: ({ appState, updateData }) => (
+    <ProjectName
+      label={t("labels.fileTitle")}
+      value={appState.name || "Unnamed"}
+      onChange={(name: string) => updateData(name)}
+    />
+  ),
+});
 
 export const actionChangeExportBackground = register({
   name: "changeExportBackground",
