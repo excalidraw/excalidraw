@@ -123,6 +123,9 @@ export const textWysiwyg = ({
       handleSubmit();
     } else if (event.key === KEYS.ENTER && event[KEYS.CTRL_OR_CMD]) {
       event.preventDefault();
+      if (event.isComposing) {
+        return;
+      }
       handleSubmit();
     } else if (event.key === KEYS.ENTER && !event.altKey) {
       event.stopPropagation();
