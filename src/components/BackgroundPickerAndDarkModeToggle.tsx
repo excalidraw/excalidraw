@@ -20,7 +20,7 @@ export const BackgroundPickerAndDarkModeToggle = ({
         value={appState.appearance}
         onChange={(appearance) => {
           // TODO: track the theme on the first load too
-          trackEvent(EVENT_ACTION, "Change Theme", appearance);
+          trackEvent(EVENT_ACTION, "Change theme", appearance);
           setAppState({ appearance });
         }}
       />

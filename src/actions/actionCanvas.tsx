@@ -14,6 +14,7 @@ import { AppState, NormalizedZoomValue } from "../types";
 import { getCommonBounds } from "../element";
 import { getNewZoom } from "../scene/zoom";
 import { centerScrollOn } from "../scene/scroll";
+import { EVENT_ACTION, trackEvent } from "../analytics";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -66,6 +67,7 @@ export const actionClearCanvas = register({
       showAriaLabel={useIsMobile()}
       onClick={() => {
         if (window.confirm(t("alerts.clearReset"))) {
+          trackEvent(EVENT_ACTION, "Clear canvas");
           updateData(null);
         }
       }}

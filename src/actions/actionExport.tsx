@@ -8,6 +8,7 @@ import useIsMobile from "../is-mobile";
 import { register } from "./register";
 import { KEYS } from "../keys";
 import { muteFSAbortError } from "../utils";
+import { EVENT_ACTION, trackEvent } from "../analytics";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -88,6 +89,7 @@ export const actionSaveScene = register({
   perform: async (elements, appState, value) => {
     try {
       const { fileHandle } = await saveAsJSON(elements, appState);
+      trackEvent(EVENT_ACTION, "Save");
       return { commitToHistory: false, appState: { ...appState, fileHandle } };
     } catch (error) {
       if (error?.name !== "AbortError") {
@@ -118,6 +120,7 @@ export const actionSaveAsScene = register({
         ...appState,
         fileHandle: null,
       });
+      trackEvent(EVENT_ACTION, "Save as");
       return { commitToHistory: false, appState: { ...appState, fileHandle } };
     } catch (error) {
       if (error?.name !== "AbortError") {
@@ -149,16 +152,14 @@ export const actionLoadScene = register({
     elements,
     appState,
     { elements: loadedElements, appState: loadedAppState, error },
-  ) => {
-    return {
-      elements: loadedElements,
-      appState: {
-        ...loadedAppState,
-        errorMessage: error,
-      },
-      commitToHistory: true,
-    };
-  },
+  ) => ({
+    elements: loadedElements,
+    appState: {
+      ...loadedAppState,
+      errorMessage: error,
+    },
+    commitToHistory: true,
+  }),
   PanelComponent: ({ updateData, appState }) => (
     <ToolButton
       type="button"
