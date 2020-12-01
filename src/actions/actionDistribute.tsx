@@ -76,9 +76,7 @@ export const distributeVertically = register({
       commitToHistory: true,
     };
   },
-  keyTest: (event) => {
-    return event.altKey && event.code === CODES.V;
-  },
+  keyTest: (event) => event.altKey && event.code === CODES.V,
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
       hidden={!enableActionGroup(elements, appState)}
