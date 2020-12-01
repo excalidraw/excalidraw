@@ -1,11 +1,11 @@
-import { ToolName } from "../queries/toolQueries";
-import { fireEvent, GlobalTestState } from "../test-utils";
-import { KEYS, Key } from "../../keys";
 import {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
 } from "../../element/types";
+import { CODES } from "../../keys";
+import { ToolName } from "../queries/toolQueries";
+import { fireEvent, GlobalTestState } from "../test-utils";
 import { API } from "./api";
 
 const { h } = window;
@@ -36,30 +36,12 @@ export class Keyboard {
     }
   };
 
-  static hotkeyDown = (hotkey: Key) => {
-    const key = KEYS[hotkey];
-    if (typeof key !== "string") {
-      throw new Error("must provide a hotkey, not a key code");
-    }
-    Keyboard.keyDown(key);
-  };
-
-  static hotkeyUp = (hotkey: Key) => {
-    const key = KEYS[hotkey];
-    if (typeof key !== "string") {
-      throw new Error("must provide a hotkey, not a key code");
-    }
-    Keyboard.keyUp(key);
-  };
-
   static keyDown = (key: string) => {
     fireEvent.keyDown(document, {
       key,
       ctrlKey,
       shiftKey,
       altKey,
-      keyCode: key.toUpperCase().charCodeAt(0),
-      which: key.toUpperCase().charCodeAt(0),
     });
   };
 
@@ -69,19 +51,35 @@ export class Keyboard {
       ctrlKey,
       shiftKey,
       altKey,
-      keyCode: key.toUpperCase().charCodeAt(0),
-      which: key.toUpperCase().charCodeAt(0),
     });
-  };
-
-  static hotkeyPress = (key: Key) => {
-    Keyboard.hotkeyDown(key);
-    Keyboard.hotkeyUp(key);
   };
 
   static keyPress = (key: string) => {
     Keyboard.keyDown(key);
     Keyboard.keyUp(key);
+  };
+
+  static codeDown = (code: string) => {
+    fireEvent.keyDown(document, {
+      code,
+      ctrlKey,
+      shiftKey,
+      altKey,
+    });
+  };
+
+  static codeUp = (code: string) => {
+    fireEvent.keyUp(document, {
+      code,
+      ctrlKey,
+      shiftKey,
+      altKey,
+    });
+  };
+
+  static codePress = (code: string) => {
+    Keyboard.codeDown(code);
+    Keyboard.codeUp(code);
   };
 }
 
@@ -209,7 +207,7 @@ export class UI {
   static group(elements: ExcalidrawElement[]) {
     mouse.select(elements);
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress("g");
+      Keyboard.codePress(CODES.G);
     });
   }
 }
