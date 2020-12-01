@@ -8,5 +8,6 @@ jobs:
     steps:
       - uses: styfle/cancel-workflow-action@0.6.0
         with:
+          # https://api.github.com/repos/excalidraw/excalidraw/actions/workflows
           workflow_id: 400555,400556,504084,1708148,1710116,3185001,3251573,3438604
           access_token: ${{ github.token }}
