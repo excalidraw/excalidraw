@@ -34,9 +34,16 @@ export const KEYS = {
   A: "a",
   C: "c",
   D: "d",
+  E: "e",
   H: "h",
+  L: "l",
+  P: "p",
   Q: "q",
+  R: "r",
   S: "s",
+  T: "t",
+  V: "v",
+  X: "x",
   Z: "z",
 } as const;
 
