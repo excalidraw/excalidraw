@@ -5,7 +5,7 @@ import { trash, zoomIn, zoomOut, resetZoom } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import { getNormalizedZoom } from "../scene";
-import { KEYS } from "../keys";
+import { CODES, KEYS } from "../keys";
 import { getShortcutKey } from "../utils";
 import useIsMobile from "../is-mobile";
 import { register } from "./register";
@@ -102,7 +102,7 @@ export const actionZoomIn = register({
     />
   ),
   keyTest: (event) =>
-    (event.code === KEYS.EQUAL || event.code === KEYS.NUM_ADD) &&
+    (event.code === CODES.EQUAL || event.code === CODES.NUM_ADD) &&
     (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
 });
 
@@ -133,7 +133,7 @@ export const actionZoomOut = register({
     />
   ),
   keyTest: (event) =>
-    (event.code === KEYS.MINUS || event.code === KEYS.NUM_SUBTRACT) &&
+    (event.code === CODES.MINUS || event.code === CODES.NUM_SUBTRACT) &&
     (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
 });
 
@@ -163,7 +163,7 @@ export const actionResetZoom = register({
     />
   ),
   keyTest: (event) =>
-    (event.code === KEYS.ZERO || event.code === KEYS.NUM_ZERO) &&
+    (event.code === CODES.ZERO || event.code === CODES.NUM_ZERO) &&
     (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
 });
 
@@ -219,7 +219,7 @@ export const actionZoomToFit = register({
     };
   },
   keyTest: (event) =>
-    event.code === KEYS.ONE &&
+    event.code === CODES.ONE &&
     event.shiftKey &&
     !event.altKey &&
     !event[KEYS.CTRL_OR_CMD],

@@ -29329,7 +29329,7 @@ Object {
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
-  "isBindingEnabled": true,
+  "isBindingEnabled": false,
   "isCollaborating": false,
   "isLibraryOpen": false,
   "isLoading": false,
@@ -29387,4 +29387,4 @@ Object {
 
 exports[`regression tests zoom hotkeys: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests zoom hotkeys: [end of test] number of renders 1`] = `4`;
+exports[`regression tests zoom hotkeys: [end of test] number of renders 1`] = `3`;

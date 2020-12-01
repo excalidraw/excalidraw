@@ -1,5 +1,5 @@
 import React from "react";
-import { KEYS } from "../keys";
+import { CODES, KEYS } from "../keys";
 import { t } from "../i18n";
 import { getShortcutKey } from "../utils";
 import { register } from "./register";
@@ -130,9 +130,7 @@ export const actionGroup = register({
   contextItemPredicate: (elements, appState) =>
     enableActionGroup(elements, appState),
   keyTest: (event) => {
-    return (
-      !event.shiftKey && event[KEYS.CTRL_OR_CMD] && event.key === KEYS.G_KEY
-    );
+    return !event.shiftKey && event[KEYS.CTRL_OR_CMD] && event.code === CODES.G;
   },
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
@@ -176,9 +174,7 @@ export const actionUngroup = register({
     };
   },
   keyTest: (event) => {
-    return (
-      event.shiftKey && event[KEYS.CTRL_OR_CMD] && event.key === KEYS.G_KEY
-    );
+    return event.shiftKey && event[KEYS.CTRL_OR_CMD] && event.code === CODES.G;
   },
   contextMenuOrder: 5,
   contextItemLabel: "labels.ungroup",

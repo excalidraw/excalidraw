@@ -1,11 +1,11 @@
-import { ToolName } from "../queries/toolQueries";
-import { fireEvent, GlobalTestState } from "../test-utils";
-import { KEYS } from "../../keys";
 import {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
 } from "../../element/types";
+import { CODES } from "../../keys";
+import { ToolName } from "../queries/toolQueries";
+import { fireEvent, GlobalTestState } from "../test-utils";
 import { API } from "./api";
 
 const { h } = window;
@@ -57,6 +57,29 @@ export class Keyboard {
   static keyPress = (key: string) => {
     Keyboard.keyDown(key);
     Keyboard.keyUp(key);
+  };
+
+  static codeDown = (code: string) => {
+    fireEvent.keyDown(document, {
+      code,
+      ctrlKey,
+      shiftKey,
+      altKey,
+    });
+  };
+
+  static codeUp = (code: string) => {
+    fireEvent.keyUp(document, {
+      code,
+      ctrlKey,
+      shiftKey,
+      altKey,
+    });
+  };
+
+  static codePress = (code: string) => {
+    Keyboard.codeDown(code);
+    Keyboard.codeUp(code);
   };
 }
 
@@ -184,7 +207,7 @@ export class UI {
   static group(elements: ExcalidrawElement[]) {
     mouse.select(elements);
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress(KEYS.G_KEY);
+      Keyboard.codePress(CODES.G);
     });
   }
 }

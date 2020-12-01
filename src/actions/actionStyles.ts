@@ -3,7 +3,7 @@ import {
   isExcalidrawElement,
   redrawTextBoundingBox,
 } from "../element";
-import { KEYS } from "../keys";
+import { CODES, KEYS } from "../keys";
 import { register } from "./register";
 import { mutateElement, newElementWith } from "../element/mutateElement";
 import {
@@ -68,6 +68,6 @@ export const actionPasteStyles = register({
   },
   contextItemLabel: "labels.pasteStyles",
   keyTest: (event) =>
-    event[KEYS.CTRL_OR_CMD] && event.altKey && event.key === KEYS.V_KEY,
+    event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.V,
   contextMenuOrder: 1,
 });

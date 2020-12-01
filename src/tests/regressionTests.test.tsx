@@ -18,7 +18,7 @@ import { queryByText } from "@testing-library/react";
 import { copiedStyles } from "../actions/actionStyles";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { API } from "./helpers/api";
-import { KEYS } from "../keys";
+import { CODES, KEYS } from "../keys";
 
 const { h } = window;
 
@@ -553,7 +553,7 @@ describe("regression tests", () => {
     }
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress(KEYS.G_KEY);
+      Keyboard.codePress(CODES.G);
     });
 
     for (const element of h.elements) {
@@ -592,7 +592,7 @@ describe("regression tests", () => {
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       Keyboard.keyPress(KEYS.A_KEY);
-      Keyboard.keyPress(KEYS.G_KEY);
+      Keyboard.codePress(CODES.G);
     });
 
     expect(API.getSelectedElements().length).toBe(3);
@@ -629,7 +629,7 @@ describe("regression tests", () => {
       mouse.click();
     });
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress(KEYS.G_KEY);
+      Keyboard.codePress(CODES.G);
     });
 
     expect(h.elements.map((element) => element.id)).toEqual([
@@ -659,7 +659,7 @@ describe("regression tests", () => {
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       Keyboard.keyPress(KEYS.A_KEY);
-      Keyboard.keyPress(KEYS.G_KEY);
+      Keyboard.codePress(CODES.G);
     });
 
     mouse.doubleClick();
@@ -668,7 +668,7 @@ describe("regression tests", () => {
       mouse.click();
     });
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress(KEYS.G_KEY);
+      Keyboard.codePress(CODES.G);
     });
 
     const groupIds = h.elements[2].groupIds;
@@ -813,7 +813,7 @@ describe("regression tests", () => {
     });
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress(KEYS.G_KEY);
+      Keyboard.codePress(CODES.G);
     });
 
     fireEvent.contextMenu(GlobalTestState.canvas, {
@@ -1106,7 +1106,7 @@ describe("regression tests", () => {
     });
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress(KEYS.G_KEY);
+      Keyboard.codePress(CODES.G);
     });
 
     fireEvent.contextMenu(GlobalTestState.canvas, {
@@ -1503,7 +1503,7 @@ describe("regression tests", () => {
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       Keyboard.keyPress(KEYS.A_KEY);
-      Keyboard.keyPress(KEYS.G_KEY);
+      Keyboard.codePress(CODES.G);
     });
 
     const selectedGroupIds_prev = h.state.selectedGroupIds;
@@ -1617,7 +1617,7 @@ it(
 
     // Create group with first and third rectangle
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress(KEYS.G_KEY);
+      Keyboard.codePress(CODES.G);
     });
 
     expect(API.getSelectedElements().length).toBe(2);

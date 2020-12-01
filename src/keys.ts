@@ -1,23 +1,31 @@
 export const isDarwin = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform);
 
-export const KEYS = {
-  ARROW_DOWN: "ArrowDown",
-  ARROW_LEFT: "ArrowLeft",
-  ARROW_RIGHT: "ArrowRight",
-  ARROW_UP: "ArrowUp",
-  BACKSPACE: "Backspace",
-  CTRL_OR_CMD: isDarwin ? "metaKey" : "ctrlKey",
-  DELETE: "Delete",
-  ENTER: "Enter",
+export const CODES = {
   EQUAL: "Equal",
-  ESCAPE: "Escape",
   MINUS: "Minus",
   NUM_ADD: "NumpadAdd",
   NUM_SUBTRACT: "NumpadSubtract",
   NUM_ZERO: "Numpad0",
   ONE: "Digit1",
-  TAB: "Tab",
   ZERO: "Digit0",
+  G: "KeyG",
+  H: "KeyV",
+  V: "KeyV",
+} as const;
+
+export const KEYS = {
+  CTRL_OR_CMD: isDarwin ? "metaKey" : "ctrlKey",
+
+  ARROW_DOWN: "ArrowDown",
+  ARROW_LEFT: "ArrowLeft",
+  ARROW_RIGHT: "ArrowRight",
+  ARROW_UP: "ArrowUp",
+
+  BACKSPACE: "Backspace",
+  ESCAPE: "Escape",
+  DELETE: "Delete",
+  ENTER: "Enter",
+  TAB: "Tab",
 
   SPACE: " ",
   QUESTION_MARK_KEY: "?",
@@ -27,11 +35,9 @@ export const KEYS = {
   C_KEY: "c",
   D_KEY: "d",
   F_KEY: "f",
-  G_KEY: "g",
-  H_KEY: "h",
+  H: "h",
   Q_KEY: "q",
   S_KEY: "s",
-  V_KEY: "v",
   Z_KEY: "z",
 } as const;
 

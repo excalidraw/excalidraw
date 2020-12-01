@@ -1,5 +1,5 @@
 import React from "react";
-import { KEYS } from "../keys";
+import { CODES, KEYS } from "../keys";
 import { t } from "../i18n";
 import { register } from "./register";
 import {
@@ -49,7 +49,7 @@ export const distributeHorizontally = register({
     };
   },
   keyTest: (event) => {
-    return event.altKey && event.key === KEYS.H_KEY;
+    return event.altKey && event.key === KEYS.H;
   },
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
@@ -79,7 +79,7 @@ export const distributeVertically = register({
     };
   },
   keyTest: (event) => {
-    return event.altKey && event.key === KEYS.V_KEY;
+    return event.altKey && event.code === CODES.V;
   },
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
