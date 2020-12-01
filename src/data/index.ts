@@ -349,7 +349,7 @@ export const exportCanvas = async (
     }
 
     await fileSave(blob, {
-      fileName: fileName,
+      fileName,
       extensions: [".png"],
     });
   } else if (type === "clipboard") {
