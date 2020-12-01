@@ -5,7 +5,7 @@ import {
   moveAllLeft,
   moveAllRight,
 } from "../zindex";
-import { KEYS, isDarwin } from "../keys";
+import { KEYS, isDarwin, CODES } from "../keys";
 import { t } from "../i18n";
 import { getShortcutKey } from "../utils";
 import { register } from "./register";
@@ -28,7 +28,9 @@ export const actionSendBackward = register({
   contextItemLabel: "labels.sendBackward",
   keyPriority: 40,
   keyTest: (event) =>
-    event[KEYS.CTRL_OR_CMD] && !event.shiftKey && event.code === "BracketLeft",
+    event[KEYS.CTRL_OR_CMD] &&
+    !event.shiftKey &&
+    event.code === CODES.BRACKET_LEFT,
   PanelComponent: ({ updateData, appState }) => (
     <button
       type="button"
@@ -53,7 +55,9 @@ export const actionBringForward = register({
   contextItemLabel: "labels.bringForward",
   keyPriority: 40,
   keyTest: (event) =>
-    event[KEYS.CTRL_OR_CMD] && !event.shiftKey && event.code === "BracketRight",
+    event[KEYS.CTRL_OR_CMD] &&
+    !event.shiftKey &&
+    event.code === CODES.BRACKET_RIGHT,
   PanelComponent: ({ updateData, appState }) => (
     <button
       type="button"
@@ -78,10 +82,12 @@ export const actionSendToBack = register({
   contextItemLabel: "labels.sendToBack",
   keyTest: (event) => {
     return isDarwin
-      ? event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === "BracketLeft"
+      ? event[KEYS.CTRL_OR_CMD] &&
+          event.altKey &&
+          event.code === CODES.BRACKET_LEFT
       : event[KEYS.CTRL_OR_CMD] &&
           event.shiftKey &&
-          event.code === "BracketLeft";
+          event.code === CODES.BRACKET_LEFT;
   },
   PanelComponent: ({ updateData, appState }) => (
     <button
@@ -111,10 +117,12 @@ export const actionBringToFront = register({
   contextItemLabel: "labels.bringToFront",
   keyTest: (event) => {
     return isDarwin
-      ? event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === "BracketRight"
+      ? event[KEYS.CTRL_OR_CMD] &&
+          event.altKey &&
+          event.code === CODES.BRACKET_RIGHT
       : event[KEYS.CTRL_OR_CMD] &&
           event.shiftKey &&
-          event.code === "BracketRight";
+          event.code === CODES.BRACKET_RIGHT;
   },
   PanelComponent: ({ updateData, appState }) => (
     <button

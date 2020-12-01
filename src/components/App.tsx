@@ -82,6 +82,7 @@ import {
   getResizeCenterPointKey,
   getResizeWithSidesSameLengthKey,
   getRotateWithDiscreteAngleKey,
+  CODES,
 } from "../keys";
 
 import { findShapeByKey } from "../shapes";
@@ -1556,7 +1557,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.toggleZenMode();
     }
 
-    if (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.QUOTE) {
+    if (event[KEYS.CTRL_OR_CMD] && event.code === CODES.QUOTE) {
       this.toggleGridMode();
     }
     if (event[KEYS.CTRL_OR_CMD]) {
@@ -1573,7 +1574,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       return;
     }
 
-    if (event.code === "Digit9") {
+    if (event.code === CODES.NINE) {
       this.setState({ isLibraryOpen: !this.state.isLibraryOpen });
     }
 
