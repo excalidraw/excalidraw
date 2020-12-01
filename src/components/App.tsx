@@ -82,6 +82,7 @@ import {
   getResizeCenterPointKey,
   getResizeWithSidesSameLengthKey,
   getRotateWithDiscreteAngleKey,
+  CODES,
 } from "../keys";
 
 import { findShapeByKey } from "../shapes";
@@ -1534,11 +1535,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
     }
 
-    // ensures we don't prevent devTools select-element feature
-    if (event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === "C") {
-      return;
-    }
-
     if (
       (isWritableElement(event.target) && event.key !== KEYS.ESCAPE) ||
       // case: using arrows to move between buttons
@@ -1553,22 +1549,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
     }
 
-    if (
-      !event[KEYS.CTRL_OR_CMD] &&
-      event.altKey &&
-      event.keyCode === KEYS.Z_KEY_CODE
-    ) {
+    if (!event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.Z) {
       this.toggleZenMode();
     }
 
-    if (event[KEYS.CTRL_OR_CMD] && event.keyCode === KEYS.GRID_KEY_CODE) {
+    if (event[KEYS.CTRL_OR_CMD] && event.code === CODES.QUOTE) {
       this.toggleGridMode();
     }
     if (event[KEYS.CTRL_OR_CMD]) {
       this.setState({ isBindingEnabled: false });
     }
 
-    if (event.code === "KeyC" && event.altKey && event.shiftKey) {
+    if (event.code === CODES.C && event.altKey && event.shiftKey) {
       this.copyToClipboardAsPng();
       event.preventDefault();
       return;
@@ -1578,7 +1570,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       return;
     }
 
-    if (event.code === "Digit9") {
+    if (event.code === CODES.NINE) {
       this.setState({ isLibraryOpen: !this.state.isLibraryOpen });
     }
 
@@ -1664,7 +1656,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       const shape = findShapeByKey(event.key);
       if (shape) {
         this.selectShapeTool(shape);
-      } else if (event.key === "q") {
+      } else if (event.key === KEYS.Q) {
         this.toggleLock();
       }
     }
