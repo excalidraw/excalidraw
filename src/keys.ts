@@ -9,27 +9,23 @@ export const CODES = {
   ONE: "Digit1",
   ZERO: "Digit0",
   G: "KeyG",
-  H: "KeyV",
   V: "KeyV",
 } as const;
 
 export const KEYS = {
-  CTRL_OR_CMD: isDarwin ? "metaKey" : "ctrlKey",
-
   ARROW_DOWN: "ArrowDown",
   ARROW_LEFT: "ArrowLeft",
   ARROW_RIGHT: "ArrowRight",
   ARROW_UP: "ArrowUp",
-
   BACKSPACE: "Backspace",
-  ESCAPE: "Escape",
+  CTRL_OR_CMD: isDarwin ? "metaKey" : "ctrlKey",
   DELETE: "Delete",
   ENTER: "Enter",
-  TAB: "Tab",
-
+  ESCAPE: "Escape",
+  QUESTION_MARK: "?",
+  QUOTE: "'",
   SPACE: " ",
-  QUESTION_MARK_KEY: "?",
-  QUOTE_KEY: "'",
+  TAB: "Tab",
 
   A: "a",
   C: "c",
