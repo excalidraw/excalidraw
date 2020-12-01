@@ -1,5 +1,5 @@
-| Excalidraw                 | name   | category                | label        | value |
-| -------------------------- | ------ | ----------------------- | ------------ | ----- |
+| Excalidraw                 | name   | category                | label        | value   |
+| -------------------------- | ------ | ----------------------- | ------------ | ------- |
 | Load file                  | action | Load                    | `MIME type`  |
 | Import from URL            | action | Import                  |
 | Open shortcut menu         | action | Keyboard shortcuts      |
@@ -9,7 +9,7 @@
 | Clear canvas               | action | Clear canvas            |
 | Save                       | action | Save                    |
 | Save as                    | action | Save as                 |
-| Zoom in                    | action | Zoom                    | in           |
-| Zoom out                   | action | Zoom                    | out          |
-| Zoom fit                   | action | Zoom                    | fit          |
-| Zoom reset                 | action | Zoom                    | reset        |
+| Zoom in                    | action | Zoom                    | in           | `value` |
+| Zoom out                   | action | Zoom                    | out          | `value` |
+| Zoom fit                   | action | Zoom                    | fit          | `value` |
+| Zoom reset                 | action | Zoom                    | reset        | `value` |

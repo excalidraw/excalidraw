@@ -80,15 +80,16 @@ const ZOOM_STEP = 0.1;
 export const actionZoomIn = register({
   name: "zoomIn",
   perform: (_elements, appState) => {
-    trackEvent(EVENT_ACTION, "Zoom", "in");
+    const zoom = getNewZoom(
+      getNormalizedZoom(appState.zoom.value + ZOOM_STEP),
+      appState.zoom,
+      { x: appState.width / 2, y: appState.height / 2 },
+    );
+    trackEvent(EVENT_ACTION, "Zoom", "in", zoom.value);
     return {
       appState: {
         ...appState,
-        zoom: getNewZoom(
-          getNormalizedZoom(appState.zoom.value + ZOOM_STEP),
-          appState.zoom,
-          { x: appState.width / 2, y: appState.height / 2 },
-        ),
+        zoom,
       },
       commitToHistory: false,
     };
@@ -112,15 +113,17 @@ export const actionZoomIn = register({
 export const actionZoomOut = register({
   name: "zoomOut",
   perform: (_elements, appState) => {
-    trackEvent(EVENT_ACTION, "Zoom", "out");
+    const zoom = getNewZoom(
+      getNormalizedZoom(appState.zoom.value - ZOOM_STEP),
+      appState.zoom,
+      { x: appState.width / 2, y: appState.height / 2 },
+    );
+
+    trackEvent(EVENT_ACTION, "Zoom", "out", zoom.value);
     return {
       appState: {
         ...appState,
-        zoom: getNewZoom(
-          getNormalizedZoom(appState.zoom.value - ZOOM_STEP),
-          appState.zoom,
-          { x: appState.width / 2, y: appState.height / 2 },
-        ),
+        zoom,
       },
       commitToHistory: false,
     };
@@ -144,7 +147,7 @@ export const actionZoomOut = register({
 export const actionResetZoom = register({
   name: "resetZoom",
   perform: (_elements, appState) => {
-    trackEvent(EVENT_ACTION, "Zoom", "reset");
+    trackEvent(EVENT_ACTION, "Zoom", "reset", 1);
     return {
       appState: {
         ...appState,
@@ -206,7 +209,7 @@ export const actionZoomToFit = register({
     const [x1, y1, x2, y2] = commonBounds;
     const centerX = (x1 + x2) / 2;
     const centerY = (y1 + y2) / 2;
-    trackEvent(EVENT_ACTION, "Zoom", "fit");
+    trackEvent(EVENT_ACTION, "Zoom", "fit", newZoom.value);
     return {
       appState: {
         ...appState,
