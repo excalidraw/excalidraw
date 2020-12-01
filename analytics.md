@@ -9,3 +9,7 @@
 | Clear canvas               | action | Clear canvas            |
 | Save                       | action | Save                    |
 | Save as                    | action | Save as                 |
+| Zoom in                    | action | Zoom                    | in           |
+| Zoom out                   | action | Zoom                    | out          |
+| Zoom fit                   | action | Zoom                    | fit          |
+| Zoom reset                 | action | Zoom                    | reset        |
