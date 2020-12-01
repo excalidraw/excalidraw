@@ -15,9 +15,12 @@ let shiftKey = false;
 let ctrlKey = false;
 
 export class Keyboard {
-  static withModifierKeys = (
+  /**
+   * @returns whatever callback returns
+   */
+  static withModifierKeys = <T>(
     modifiers: { alt?: boolean; shift?: boolean; ctrl?: boolean },
-    cb: () => void,
+    cb: () => T,
   ) => {
     const prevAltKey = altKey;
     const prevShiftKey = shiftKey;
@@ -28,7 +31,7 @@ export class Keyboard {
     ctrlKey = !!modifiers.ctrl;
 
     try {
-      cb();
+      return cb();
     } finally {
       altKey = prevAltKey;
       shiftKey = prevShiftKey;
