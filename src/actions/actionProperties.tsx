@@ -83,7 +83,7 @@ export const actionChangeStrokeColor = register({
   name: "changeStrokeColor",
   perform: (elements, appState, value) => {
     if (value !== appState.currentItemStrokeColor) {
-      trackEvent(EVENT_CHANGE, "Stroke", "color", value);
+      trackEvent(EVENT_CHANGE, "Stroke color", value);
     }
     return {
       elements: changeProperty(elements, appState, (el) =>
@@ -117,7 +117,7 @@ export const actionChangeBackgroundColor = register({
   name: "changeBackgroundColor",
   perform: (elements, appState, value) => {
     if (value !== appState.currentItemBackgroundColor) {
-      trackEvent(EVENT_CHANGE, "Background", "color", value);
+      trackEvent(EVENT_CHANGE, "Background color", value);
     }
 
     return {
@@ -151,6 +151,7 @@ export const actionChangeBackgroundColor = register({
 export const actionChangeFillStyle = register({
   name: "changeFillStyle",
   perform: (elements, appState, value) => {
+    trackEvent(EVENT_CHANGE, "Fill", value);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
