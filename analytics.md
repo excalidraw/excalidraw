@@ -21,3 +21,5 @@
 | Canvas color               | change | Canvas                  | color        | `value` |
 | Background color           | change | Background              | color        | `value` |
 | Stroke color               | change | Stroke                  | color        | `value` |
+| Stroke width               | change | Stroke                  | width        | `value` |
+| Stroke sloppiness          | change | Stroke                  | sloppiness   | `value` |

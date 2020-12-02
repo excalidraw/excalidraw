@@ -200,6 +200,7 @@ export const actionChangeFillStyle = register({
 export const actionChangeStrokeWidth = register({
   name: "changeStrokeWidth",
   perform: (elements, appState, value) => {
+    trackEvent(EVENT_CHANGE, "Stroke", "width", value);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -262,6 +263,7 @@ export const actionChangeStrokeWidth = register({
 export const actionChangeSloppiness = register({
   name: "changeSloppiness",
   perform: (elements, appState, value) => {
+    trackEvent(EVENT_CHANGE, "Stroke", "sloppiness", value);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
