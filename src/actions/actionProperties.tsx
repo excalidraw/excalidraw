@@ -360,6 +360,7 @@ export const actionChangeStrokeStyle = register({
 export const actionChangeOpacity = register({
   name: "changeOpacity",
   perform: (elements, appState, value) => {
+    trackEvent(EVENT_CHANGE, "Opacity", "value", value);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -556,6 +557,7 @@ export const actionChangeSharpness = register({
     const shouldUpdateForLinearElements = targetElements.length
       ? targetElements.every(isLinearElement)
       : isLinearElementType(appState.elementType);
+    trackEvent(EVENT_CHANGE, "Edge", value);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
