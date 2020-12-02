@@ -14,11 +14,14 @@ import { AppState, NormalizedZoomValue } from "../types";
 import { getCommonBounds } from "../element";
 import { getNewZoom } from "../scene/zoom";
 import { centerScrollOn } from "../scene/scroll";
-import { EVENT_ACTION, trackEvent } from "../analytics";
+import { EVENT_ACTION, EVENT_CHANGE, trackEvent } from "../analytics";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
   perform: (_, appState, value) => {
+    if (value !== appState.viewBackgroundColor) {
+      trackEvent(EVENT_CHANGE, "Canvas", "color", value);
+    }
     return {
       appState: { ...appState, viewBackgroundColor: value },
       commitToHistory: true,
@@ -41,6 +44,7 @@ export const actionChangeViewBackgroundColor = register({
 export const actionClearCanvas = register({
   name: "clearCanvas",
   perform: (elements, appState: AppState) => {
+    trackEvent(EVENT_ACTION, "Clear canvas");
     return {
       elements: elements.map((element) =>
         newElementWith(element, { isDeleted: true }),
@@ -67,7 +71,6 @@ export const actionClearCanvas = register({
       showAriaLabel={useIsMobile()}
       onClick={() => {
         if (window.confirm(t("alerts.clearReset"))) {
-          trackEvent(EVENT_ACTION, "Clear canvas");
           updateData(null);
         }
       }}

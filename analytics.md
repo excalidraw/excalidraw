@@ -18,3 +18,6 @@
 | Excalidraw blog            | exit   | Blog                    |
 | Excalidraw guides          | exit   | Guides                  |
 | File issues                | exit   | Issues                  |
+| Canvas color               | change | Canvas                  | color        | `value` |
+| Background color           | change | Background              | color        | `value` |
+| Stroke color               | change | Stroke                  | color        | `value` |

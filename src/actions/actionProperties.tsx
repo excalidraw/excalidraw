@@ -40,6 +40,7 @@ import {
   SloppinessArtistIcon,
   SloppinessCartoonistIcon,
 } from "../components/icons";
+import { EVENT_CHANGE, trackEvent } from "../analytics";
 
 const changeProperty = (
   elements: readonly ExcalidrawElement[],
@@ -81,6 +82,9 @@ const getFormValue = function <T>(
 export const actionChangeStrokeColor = register({
   name: "changeStrokeColor",
   perform: (elements, appState, value) => {
+    if (value !== appState.currentItemStrokeColor) {
+      trackEvent(EVENT_CHANGE, "Stroke", "color", value);
+    }
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -112,6 +116,10 @@ export const actionChangeStrokeColor = register({
 export const actionChangeBackgroundColor = register({
   name: "changeBackgroundColor",
   perform: (elements, appState, value) => {
+    if (value !== appState.currentItemBackgroundColor) {
+      trackEvent(EVENT_CHANGE, "Background", "color", value);
+    }
+
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
