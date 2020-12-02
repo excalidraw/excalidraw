@@ -16,6 +16,7 @@ import { capitalizeString, isTransparent, setCursorForShape } from "../utils";
 import Stack from "./Stack";
 import useIsMobile from "../is-mobile";
 import { getNonDeletedElements } from "../element";
+import { trackEvent, EVENT_SHAPE } from "../analytics";
 
 export const SelectedShapeActions = ({
   appState,
@@ -173,6 +174,7 @@ export const ShapesSwitcher = ({
           aria-keyshortcuts={shortcut}
           data-testid={value}
           onChange={() => {
+            trackEvent(EVENT_SHAPE, value, "toolbar");
             setAppState({
               elementType: value,
               multiElement: null,

@@ -12,6 +12,7 @@ interface Document {
 interface Window {
   ClipboardItem: any;
   __EXCALIDRAW_SHA__: string | undefined;
+  gtag: Function;
 }
 
 // https://github.com/facebook/create-react-app/blob/ddcb7d5/packages/react-scripts/lib/react-app.d.ts

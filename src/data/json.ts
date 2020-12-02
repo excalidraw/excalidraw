@@ -42,7 +42,6 @@ export const saveAsJSON = async (
     },
     appState.fileHandle,
   );
-
   return { fileHandle };
 };
 

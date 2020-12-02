@@ -7,6 +7,7 @@ import { calculateScrollCenter } from "../scene";
 import { MIME_TYPES } from "../constants";
 import { CanvasError } from "../errors";
 import { clearElementsForExport } from "../element";
+import { EVENT_ACTION, trackEvent } from "../analytics";
 
 export const parseFileContents = async (blob: Blob | File) => {
   let contents: string;
@@ -89,7 +90,7 @@ export const loadFromBlob = async (
     if (data.type !== "excalidraw") {
       throw new Error(t("alerts.couldNotLoadInvalidFile"));
     }
-    return restore(
+    const result = restore(
       {
         elements: clearElementsForExport(data.elements || []),
         appState: {
@@ -109,6 +110,9 @@ export const loadFromBlob = async (
       },
       localAppState,
     );
+
+    trackEvent(EVENT_ACTION, "load", getMimeType(blob));
+    return result;
   } catch (error) {
     console.error(error.message);
     throw new Error(t("alerts.couldNotLoadInvalidFile"));

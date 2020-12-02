@@ -1,5 +1,6 @@
 import React from "react";
 import oc from "open-color";
+import { EVENT_EXIT, trackEvent } from "../analytics";
 
 // https://github.com/tholman/github-corners
 export const GitHubCorner = React.memo(
@@ -16,6 +17,9 @@ export const GitHubCorner = React.memo(
         target="_blank"
         rel="noopener noreferrer"
         aria-label="GitHub repository"
+        onClick={() => {
+          trackEvent(EVENT_EXIT, "github");
+        }}
       >
         <path
           d="M0 0l115 115h15l12 27 108 108V0z"

@@ -181,6 +181,7 @@ import {
   isSavedToFirebase,
 } from "../data/firebase";
 import { getNewZoom } from "../scene/zoom";
+import { EVENT_SHAPE, trackEvent } from "../analytics";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -1270,12 +1271,15 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   toggleLock = () => {
-    this.setState((prevState) => ({
-      elementLocked: !prevState.elementLocked,
-      elementType: prevState.elementLocked
-        ? "selection"
-        : prevState.elementType,
-    }));
+    this.setState((prevState) => {
+      trackEvent(EVENT_SHAPE, "lock", !prevState.elementLocked ? "on" : "off");
+      return {
+        elementLocked: !prevState.elementLocked,
+        elementType: prevState.elementLocked
+          ? "selection"
+          : prevState.elementType,
+      };
+    });
   };
 
   toggleZenMode = () => {
@@ -1655,6 +1659,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     ) {
       const shape = findShapeByKey(event.key);
       if (shape) {
+        trackEvent(EVENT_SHAPE, shape, "shortcut");
         this.selectShapeTool(shape);
       } else if (event.key === KEYS.Q) {
         this.toggleLock();

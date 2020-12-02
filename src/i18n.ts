@@ -1,4 +1,5 @@
 import LanguageDetector from "i18next-browser-languagedetector";
+import { EVENT_CHANGE, trackEvent } from "./analytics";
 
 import fallbackLanguageData from "./locales/en.json";
 import percentages from "./locales/percentages.json";
@@ -67,8 +68,8 @@ export const setLanguage = async (newLng: string | undefined) => {
   currentLanguageData = await import(
     /* webpackChunkName: "i18n-[request]" */ `./locales/${currentLanguage.lng}.json`
   );
-
   languageDetector.cacheUserLanguage(currentLanguage.lng);
+  trackEvent(EVENT_CHANGE, "language", currentLanguage.lng);
 };
 
 export const setLanguageFirstTime = async () => {
@@ -84,6 +85,7 @@ export const setLanguageFirstTime = async () => {
   );
 
   languageDetector.cacheUserLanguage(currentLanguage.lng);
+  trackEvent(EVENT_CHANGE, "language on load", currentLanguage.lng);
 };
 
 export const getLanguage = () => currentLanguage;
