@@ -45,6 +45,7 @@ import { muteFSAbortError } from "../utils";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 import clsx from "clsx";
 import { Library } from "../data/library";
+import { EVENT_EXIT, trackEvent } from "../analytics";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -310,6 +311,9 @@ const LayerUI = ({
       href="https://blog.excalidraw.com/end-to-end-encryption/"
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => {
+        trackEvent(EVENT_EXIT, "e2ee shield");
+      }}
     >
       <span className="tooltip-text" dir="auto">
         {t("encrypted.tooltip")}

@@ -20,6 +20,7 @@ import { ExportType } from "../scene/types";
 import { restore } from "./restore";
 import { ImportedDataState } from "./types";
 import { canvasToBlob } from "./blob";
+import { EVENT_ACTION, trackEvent } from "../analytics";
 
 export { loadFromBlob } from "./blob";
 export { saveAsJSON, loadFromJSON } from "./json";
@@ -263,6 +264,7 @@ const importFromBackend = async (
       data = await response.json();
     }
 
+    trackEvent(EVENT_ACTION, "import");
     return {
       elements: data.elements || null,
       appState: data.appState || null,

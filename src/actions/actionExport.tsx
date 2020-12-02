@@ -8,10 +8,12 @@ import useIsMobile from "../is-mobile";
 import { register } from "./register";
 import { KEYS } from "../keys";
 import { muteFSAbortError } from "../utils";
+import { EVENT_ACTION, EVENT_CHANGE, trackEvent } from "../analytics";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
   perform: (_elements, appState, value) => {
+    trackEvent(EVENT_CHANGE, "title");
     return { appState: { ...appState, name: value }, commitToHistory: false };
   },
   PanelComponent: ({ appState, updateData }) => (
@@ -88,6 +90,7 @@ export const actionSaveScene = register({
   perform: async (elements, appState, value) => {
     try {
       const { fileHandle } = await saveAsJSON(elements, appState);
+      trackEvent(EVENT_ACTION, "save");
       return { commitToHistory: false, appState: { ...appState, fileHandle } };
     } catch (error) {
       if (error?.name !== "AbortError") {
@@ -118,6 +121,7 @@ export const actionSaveAsScene = register({
         ...appState,
         fileHandle: null,
       });
+      trackEvent(EVENT_ACTION, "save as");
       return { commitToHistory: false, appState: { ...appState, fileHandle } };
     } catch (error) {
       if (error?.name !== "AbortError") {
@@ -149,16 +153,14 @@ export const actionLoadScene = register({
     elements,
     appState,
     { elements: loadedElements, appState: loadedAppState, error },
-  ) => {
-    return {
-      elements: loadedElements,
-      appState: {
-        ...loadedAppState,
-        errorMessage: error,
-      },
-      commitToHistory: true,
-    };
-  },
+  ) => ({
+    elements: loadedElements,
+    appState: {
+      ...loadedAppState,
+      errorMessage: error,
+    },
+    commitToHistory: true,
+  }),
   PanelComponent: ({ updateData, appState }) => (
     <ToolButton
       type="button"
