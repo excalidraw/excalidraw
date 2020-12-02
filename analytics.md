@@ -11,9 +11,6 @@
 | Zoom out           | action | Zoom                               | out                     | `zoom`    |
 | Zoom fit           | action | Zoom                               | fit                     | `zoom`    |
 | Zoom reset         | action | Zoom                               | reset                   | `zoom`    |
-| Change theme       | action | Change theme                       | `light` or `dark`       |
-| Change language    | action | Language                           | `language`              |
-| Language on load   | action | Language on load                   | `language`              |
 | Open shortcut menu | action | Keyboard shortcuts                 |
 | Canvas color       | change | Canvas color                       | `color`                 |
 | Background color   | change | Background color                   | `color`                 |
@@ -24,6 +21,9 @@
 | Edge               | change | Edge                               | `value`                 |
 | Opacity            | change | Opacity                            | value                   | `opacity` |
 | Project name       | change | Title                              |
+| Theme              | change | Theme                              | `light` or `dark`       |
+| Change language    | change | Language                           | `language`              |
+| Language on load   | change | Language on load                   | `language`              |
 | E2EE shield        | exit   | E2EE shield                        |
 | GitHub corner      | exit   | GitHub                             |
 | Excalidraw blog    | exit   | Blog                               |
