@@ -8,11 +8,12 @@ import useIsMobile from "../is-mobile";
 import { register } from "./register";
 import { KEYS } from "../keys";
 import { muteFSAbortError } from "../utils";
-import { EVENT_ACTION, trackEvent } from "../analytics";
+import { EVENT_ACTION, EVENT_CHANGE, trackEvent } from "../analytics";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
   perform: (_elements, appState, value) => {
+    trackEvent(EVENT_CHANGE, "Title");
     return { appState: { ...appState, name: value }, commitToHistory: false };
   },
   PanelComponent: ({ appState, updateData }) => (
