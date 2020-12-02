@@ -163,13 +163,17 @@ const getLinearElementAbsoluteCoords = (
 export const getArrowPoints = (
   element: ExcalidrawLinearElement,
   shape: Drawable[],
+  reverse = false,
 ) => {
   const ops = getCurvePathOps(shape[0]);
   if (ops.length < 1) {
     return null;
   }
 
-  const data = ops[ops.length - 1].data;
+  // the index of the bCurve op to examine
+  const index = reverse ? 1 : ops.length - 1;
+
+  const data = ops[index].data;
   const p3 = [data[4], data[5]] as Point;
   const p2 = [data[2], data[3]] as Point;
   const p1 = [data[0], data[1]] as Point;
@@ -177,7 +181,7 @@ export const getArrowPoints = (
   // we need to find p0 of the bezier curve
   // it is typically the last point of the previous
   // curve; it can also be the position of moveTo operation
-  const prevOp = ops[ops.length - 2];
+  const prevOp = ops[index - 1];
   let p0: Point = [0, 0];
   if (prevOp.op === "move") {
     p0 = (prevOp.data as unknown) as Point;
@@ -192,8 +196,8 @@ export const getArrowPoints = (
     3 * Math.pow(t, 2) * (1 - t) * p1[idx] +
     p0[idx] * Math.pow(t, 3);
 
-  // we know the last point of the arrow
-  const [x2, y2] = p3;
+  // we know the last point of the arrow (or the first, if reversed)
+  const [x2, y2] = reverse ? p0 : p3;
 
   // by using cubic bezier equation (B(t)) and the given parameters,
   // we calculate a point that is closer to the last point
