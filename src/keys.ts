@@ -9,6 +9,7 @@ export const KEYS = {
   ESCAPE: "Escape",
   DELETE: "Delete",
   BACKSPACE: "Backspace",
+  ALT: "Alt",
   CTRL_OR_CMD: isDarwin ? "metaKey" : "ctrlKey",
   TAB: "Tab",
   SPACE: " ",
@@ -31,10 +32,12 @@ export const isArrowKey = (keyCode: string) =>
   keyCode === KEYS.ARROW_UP;
 
 export const getResizeCenterPointKey = (event: MouseEvent | KeyboardEvent) =>
-  event.altKey || event.which === KEYS.ALT_KEY_CODE;
+  event.altKey;
 
-export const getResizeWithSidesSameLengthKey = (event: MouseEvent) =>
-  event.shiftKey;
+export const getResizeWithSidesSameLengthKey = (
+  event: MouseEvent | KeyboardEvent,
+) => event.shiftKey;
 
-export const getRotateWithDiscreteAngleKey = (event: MouseEvent) =>
-  event.shiftKey;
+export const getRotateWithDiscreteAngleKey = (
+  event: MouseEvent | KeyboardEvent,
+) => event.shiftKey;

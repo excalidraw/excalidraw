@@ -266,6 +266,10 @@ export type PointerDownState = Readonly<{
     onMove: null | ((event: PointerEvent) => void);
     // It's defined on the initial pointer down event
     onUp: null | ((event: PointerEvent) => void);
+    // It's defined on the initial pointer down event
+    onKeyDown: null | ((event: KeyboardEvent) => void);
+    // It's defined on the initial pointer down event
+    onKeyUp: null | ((event: KeyboardEvent) => void);
   };
 }>;
 
@@ -2344,12 +2348,19 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       pointerDownState,
     );
 
+    const onKeyDown = this.onKeyDownFromPointerDownHandler(pointerDownState);
+    const onKeyUp = this.onKeyUpFromPointerDownHandler(pointerDownState);
+
     lastPointerUp = onPointerUp;
 
     window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
     window.addEventListener(EVENT.POINTER_UP, onPointerUp);
+    window.addEventListener(EVENT.KEYDOWN, onKeyDown);
+    window.addEventListener(EVENT.KEYUP, onKeyUp);
     pointerDownState.eventListeners.onMove = onPointerMove;
     pointerDownState.eventListeners.onUp = onPointerUp;
+    pointerDownState.eventListeners.onKeyUp = onKeyUp;
+    pointerDownState.eventListeners.onKeyDown = onKeyDown;
   };
 
   private maybeOpenContextMenuAfterPointerDownOnTouchDevices = (
@@ -2543,6 +2554,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       eventListeners: {
         onMove: null,
         onUp: null,
+        onKeyUp: null,
+        onKeyDown: null,
       },
     };
   }
@@ -2944,6 +2957,24 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
   };
 
+  private onKeyDownFromPointerDownHandler(
+    pointerDownState: PointerDownState,
+  ): (event: KeyboardEvent) => void {
+    return withBatchedUpdates((event: KeyboardEvent) => {
+      this.maybeHandleResize(pointerDownState, event);
+    });
+  }
+
+  private onKeyUpFromPointerDownHandler(
+    pointerDownState: PointerDownState,
+  ): (event: KeyboardEvent) => void {
+    return withBatchedUpdates((event: KeyboardEvent) => {
+      this.maybeHandleResize(pointerDownState, event);
+      // Prevents focus from escaping excalidraw tab
+      event.key === KEYS.ALT && event.preventDefault();
+    });
+  }
+
   private onPointerMoveFromPointerDownHandler(
     pointerDownState: PointerDownState,
   ): (event: PointerEvent) => void {
@@ -3000,43 +3031,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
 
       if (pointerDownState.resize.isResizing) {
-        const selectedElements = getSelectedElements(
-          this.scene.getElements(),
-          this.state,
-        );
-        const transformHandleType = pointerDownState.resize.handleType;
-        this.setState({
-          // TODO: rename this state field to "isScaling" to distinguish
-          // it from the generic "isResizing" which includes scaling and
-          // rotating
-          isResizing: transformHandleType && transformHandleType !== "rotation",
-          isRotating: transformHandleType === "rotation",
-        });
-        const [resizeX, resizeY] = getGridPoint(
-          pointerCoords.x - pointerDownState.resize.offset.x,
-          pointerCoords.y - pointerDownState.resize.offset.y,
-          this.state.gridSize,
-        );
-        if (
-          transformElements(
-            pointerDownState,
-            transformHandleType,
-            (newTransformHandle) => {
-              pointerDownState.resize.handleType = newTransformHandle;
-            },
-            selectedElements,
-            pointerDownState.resize.arrowDirection,
-            getRotateWithDiscreteAngleKey(event),
-            getResizeCenterPointKey(event),
-            getResizeWithSidesSameLengthKey(event),
-            resizeX,
-            resizeY,
-            pointerDownState.resize.center.x,
-            pointerDownState.resize.center.y,
-          )
-        ) {
-          this.maybeSuggestBindingForAll(selectedElements);
-          return;
+        pointerDownState.lastCoords.x = pointerCoords.x;
+        pointerDownState.lastCoords.y = pointerCoords.y;
+        if (this.maybeHandleResize(pointerDownState, event)) {
+          return true;
         }
       }
 
@@ -3358,6 +3356,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       window.removeEventListener(
         EVENT.POINTER_UP,
         pointerDownState.eventListeners.onUp!,
+      );
+      window.removeEventListener(
+        EVENT.KEYDOWN,
+        pointerDownState.eventListeners.onKeyDown!,
+      );
+      window.removeEventListener(
+        EVENT.KEYUP,
+        pointerDownState.eventListeners.onKeyUp!,
       );
 
       if (draggingElement?.type === "draw") {
@@ -3779,6 +3785,52 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   ) => {
     event.preventDefault();
     this.openContextMenu(event);
+  };
+
+  private maybeHandleResize = (
+    pointerDownState: PointerDownState,
+    event: MouseEvent | KeyboardEvent,
+  ): boolean => {
+    const selectedElements = getSelectedElements(
+      this.scene.getElements(),
+      this.state,
+    );
+    const transformHandleType = pointerDownState.resize.handleType;
+    this.setState({
+      // TODO: rename this state field to "isScaling" to distinguish
+      // it from the generic "isResizing" which includes scaling and
+      // rotating
+      isResizing: transformHandleType && transformHandleType !== "rotation",
+      isRotating: transformHandleType === "rotation",
+    });
+    const pointerCoords = pointerDownState.lastCoords;
+    const [resizeX, resizeY] = getGridPoint(
+      pointerCoords.x - pointerDownState.resize.offset.x,
+      pointerCoords.y - pointerDownState.resize.offset.y,
+      this.state.gridSize,
+    );
+    if (
+      transformElements(
+        pointerDownState,
+        transformHandleType,
+        (newTransformHandle) => {
+          pointerDownState.resize.handleType = newTransformHandle;
+        },
+        selectedElements,
+        pointerDownState.resize.arrowDirection,
+        getRotateWithDiscreteAngleKey(event),
+        getResizeCenterPointKey(event),
+        getResizeWithSidesSameLengthKey(event),
+        resizeX,
+        resizeY,
+        pointerDownState.resize.center.x,
+        pointerDownState.resize.center.y,
+      )
+    ) {
+      this.maybeSuggestBindingForAll(selectedElements);
+      return true;
+    }
+    return false;
   };
 
   private openContextMenu = ({
