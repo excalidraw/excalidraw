@@ -2029,6 +2029,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     resetCursor();
 
     if (!event[KEYS.CTRL_OR_CMD]) {
+      trackEvent(EVENT_SHAPE, "text", "double-click");
       this.startTextEditing({
         sceneX,
         sceneY,
