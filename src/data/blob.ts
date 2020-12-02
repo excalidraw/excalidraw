@@ -111,7 +111,7 @@ export const loadFromBlob = async (
       localAppState,
     );
 
-    trackEvent(EVENT_ACTION, "Load", getMimeType(blob));
+    trackEvent(EVENT_ACTION, "load", getMimeType(blob));
     return result;
   } catch (error) {
     console.error(error.message);

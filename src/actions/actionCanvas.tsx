@@ -20,7 +20,7 @@ export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
   perform: (_, appState, value) => {
     if (value !== appState.viewBackgroundColor) {
-      trackEvent(EVENT_CHANGE, "Canvas color", value);
+      trackEvent(EVENT_CHANGE, "canvas color", value);
     }
     return {
       appState: { ...appState, viewBackgroundColor: value },
@@ -44,7 +44,7 @@ export const actionChangeViewBackgroundColor = register({
 export const actionClearCanvas = register({
   name: "clearCanvas",
   perform: (elements, appState: AppState) => {
-    trackEvent(EVENT_ACTION, "Clear canvas");
+    trackEvent(EVENT_ACTION, "clear canvas");
     return {
       elements: elements.map((element) =>
         newElementWith(element, { isDeleted: true }),
@@ -88,7 +88,7 @@ export const actionZoomIn = register({
       appState.zoom,
       { x: appState.width / 2, y: appState.height / 2 },
     );
-    trackEvent(EVENT_ACTION, "Zoom", "in", zoom.value * 100);
+    trackEvent(EVENT_ACTION, "zoom", "in", zoom.value * 100);
     return {
       appState: {
         ...appState,
@@ -122,7 +122,7 @@ export const actionZoomOut = register({
       { x: appState.width / 2, y: appState.height / 2 },
     );
 
-    trackEvent(EVENT_ACTION, "Zoom", "out", zoom.value * 100);
+    trackEvent(EVENT_ACTION, "zoom", "out", zoom.value * 100);
     return {
       appState: {
         ...appState,
@@ -150,7 +150,7 @@ export const actionZoomOut = register({
 export const actionResetZoom = register({
   name: "resetZoom",
   perform: (_elements, appState) => {
-    trackEvent(EVENT_ACTION, "Zoom", "reset", 100);
+    trackEvent(EVENT_ACTION, "zoom", "reset", 100);
     return {
       appState: {
         ...appState,
@@ -212,7 +212,7 @@ export const actionZoomToFit = register({
     const [x1, y1, x2, y2] = commonBounds;
     const centerX = (x1 + x2) / 2;
     const centerY = (y1 + y2) / 2;
-    trackEvent(EVENT_ACTION, "Zoom", "fit", newZoom.value * 100);
+    trackEvent(EVENT_ACTION, "zoom", "fit", newZoom.value * 100);
     return {
       appState: {
         ...appState,

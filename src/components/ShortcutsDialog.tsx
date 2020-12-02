@@ -93,7 +93,7 @@ const Footer = () => (
       target="_blank"
       rel="noopener noreferrer"
       onClick={() => {
-        trackEvent(EVENT_EXIT, "Blog");
+        trackEvent(EVENT_EXIT, "blog");
       }}
     >
       {t("shortcutsDialog.blog")}
@@ -103,7 +103,7 @@ const Footer = () => (
       target="_blank"
       rel="noopener noreferrer"
       onClick={() => {
-        trackEvent(EVENT_EXIT, "Guides");
+        trackEvent(EVENT_EXIT, "guides");
       }}
     >
       {t("shortcutsDialog.howto")}
@@ -113,7 +113,7 @@ const Footer = () => (
       target="_blank"
       rel="noopener noreferrer"
       onClick={() => {
-        trackEvent(EVENT_EXIT, "Issues");
+        trackEvent(EVENT_EXIT, "issues");
       }}
     >
       {t("shortcutsDialog.github")}

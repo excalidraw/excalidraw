@@ -312,7 +312,7 @@ const LayerUI = ({
       target="_blank"
       rel="noopener noreferrer"
       onClick={() => {
-        trackEvent(EVENT_EXIT, "E2EE shield");
+        trackEvent(EVENT_EXIT, "e2ee shield");
       }}
     >
       <span className="tooltip-text" dir="auto">

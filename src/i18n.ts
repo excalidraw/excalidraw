@@ -69,7 +69,7 @@ export const setLanguage = async (newLng: string | undefined) => {
     /* webpackChunkName: "i18n-[request]" */ `./locales/${currentLanguage.lng}.json`
   );
   languageDetector.cacheUserLanguage(currentLanguage.lng);
-  trackEvent(EVENT_CHANGE, "Language", currentLanguage.lng);
+  trackEvent(EVENT_CHANGE, "language", currentLanguage.lng);
 };
 
 export const setLanguageFirstTime = async () => {
@@ -85,7 +85,7 @@ export const setLanguageFirstTime = async () => {
   );
 
   languageDetector.cacheUserLanguage(currentLanguage.lng);
-  trackEvent(EVENT_CHANGE, "Language on load", currentLanguage.lng);
+  trackEvent(EVENT_CHANGE, "language on load", currentLanguage.lng);
 };
 
 export const getLanguage = () => currentLanguage;

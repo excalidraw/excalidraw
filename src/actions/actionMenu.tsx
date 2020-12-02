@@ -72,7 +72,7 @@ export const actionFullScreen = register({
 export const actionShortcuts = register({
   name: "toggleShortcuts",
   perform: (_elements, appState) => {
-    trackEvent(EVENT_ACTION, "Keyboard shortcuts");
+    trackEvent(EVENT_ACTION, "keyboard shortcuts");
     return {
       appState: {
         ...appState,

@@ -83,7 +83,7 @@ export const actionChangeStrokeColor = register({
   name: "changeStrokeColor",
   perform: (elements, appState, value) => {
     if (value !== appState.currentItemStrokeColor) {
-      trackEvent(EVENT_CHANGE, "Stroke color", value);
+      trackEvent(EVENT_CHANGE, "stroke color", value);
     }
     return {
       elements: changeProperty(elements, appState, (el) =>
@@ -117,7 +117,7 @@ export const actionChangeBackgroundColor = register({
   name: "changeBackgroundColor",
   perform: (elements, appState, value) => {
     if (value !== appState.currentItemBackgroundColor) {
-      trackEvent(EVENT_CHANGE, "Background color", value);
+      trackEvent(EVENT_CHANGE, "background color", value);
     }
 
     return {
@@ -151,7 +151,7 @@ export const actionChangeBackgroundColor = register({
 export const actionChangeFillStyle = register({
   name: "changeFillStyle",
   perform: (elements, appState, value) => {
-    trackEvent(EVENT_CHANGE, "Fill", value);
+    trackEvent(EVENT_CHANGE, "fill", value);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -201,7 +201,7 @@ export const actionChangeFillStyle = register({
 export const actionChangeStrokeWidth = register({
   name: "changeStrokeWidth",
   perform: (elements, appState, value) => {
-    trackEvent(EVENT_CHANGE, "Stroke", "width", value);
+    trackEvent(EVENT_CHANGE, "stroke", "width", value);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -264,7 +264,7 @@ export const actionChangeStrokeWidth = register({
 export const actionChangeSloppiness = register({
   name: "changeSloppiness",
   perform: (elements, appState, value) => {
-    trackEvent(EVENT_CHANGE, "Stroke", "sloppiness", value);
+    trackEvent(EVENT_CHANGE, "stroke", "sloppiness", value);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -360,7 +360,7 @@ export const actionChangeStrokeStyle = register({
 export const actionChangeOpacity = register({
   name: "changeOpacity",
   perform: (elements, appState, value) => {
-    trackEvent(EVENT_CHANGE, "Opacity", "value", value);
+    trackEvent(EVENT_CHANGE, "opacity", "value", value);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -557,7 +557,7 @@ export const actionChangeSharpness = register({
     const shouldUpdateForLinearElements = targetElements.length
       ? targetElements.every(isLinearElement)
       : isLinearElementType(appState.elementType);
-    trackEvent(EVENT_CHANGE, "Edge", value);
+    trackEvent(EVENT_CHANGE, "edge", value);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {

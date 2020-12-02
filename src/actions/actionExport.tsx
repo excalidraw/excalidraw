@@ -13,7 +13,7 @@ import { EVENT_ACTION, EVENT_CHANGE, trackEvent } from "../analytics";
 export const actionChangeProjectName = register({
   name: "changeProjectName",
   perform: (_elements, appState, value) => {
-    trackEvent(EVENT_CHANGE, "Title");
+    trackEvent(EVENT_CHANGE, "title");
     return { appState: { ...appState, name: value }, commitToHistory: false };
   },
   PanelComponent: ({ appState, updateData }) => (
@@ -90,7 +90,7 @@ export const actionSaveScene = register({
   perform: async (elements, appState, value) => {
     try {
       const { fileHandle } = await saveAsJSON(elements, appState);
-      trackEvent(EVENT_ACTION, "Save");
+      trackEvent(EVENT_ACTION, "save");
       return { commitToHistory: false, appState: { ...appState, fileHandle } };
     } catch (error) {
       if (error?.name !== "AbortError") {
@@ -121,7 +121,7 @@ export const actionSaveAsScene = register({
         ...appState,
         fileHandle: null,
       });
-      trackEvent(EVENT_ACTION, "Save as");
+      trackEvent(EVENT_ACTION, "save as");
       return { commitToHistory: false, appState: { ...appState, fileHandle } };
     } catch (error) {
       if (error?.name !== "AbortError") {

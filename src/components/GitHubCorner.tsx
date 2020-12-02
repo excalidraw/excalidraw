@@ -18,7 +18,7 @@ export const GitHubCorner = React.memo(
         rel="noopener noreferrer"
         aria-label="GitHub repository"
         onClick={() => {
-          trackEvent(EVENT_EXIT, "GitHub");
+          trackEvent(EVENT_EXIT, "github");
         }}
       >
         <path

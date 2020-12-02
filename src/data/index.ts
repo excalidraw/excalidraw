@@ -264,7 +264,7 @@ const importFromBackend = async (
       data = await response.json();
     }
 
-    trackEvent(EVENT_ACTION, "Import");
+    trackEvent(EVENT_ACTION, "import");
     return {
       elements: data.elements || null,
       appState: data.appState || null,
