@@ -326,6 +326,7 @@ export const actionChangeSloppiness = register({
 export const actionChangeStrokeStyle = register({
   name: "changeStrokeStyle",
   perform: (elements, appState, value) => {
+    trackEvent(EVENT_CHANGE, "style", value);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
