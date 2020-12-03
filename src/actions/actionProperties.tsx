@@ -41,6 +41,7 @@ import {
   SloppinessCartoonistIcon,
 } from "../components/icons";
 import { EVENT_CHANGE, trackEvent } from "../analytics";
+import colors from "../colors";
 
 const changeProperty = (
   elements: readonly ExcalidrawElement[],
@@ -83,7 +84,13 @@ export const actionChangeStrokeColor = register({
   name: "changeStrokeColor",
   perform: (elements, appState, value) => {
     if (value !== appState.currentItemStrokeColor) {
-      trackEvent(EVENT_CHANGE, "stroke color", value);
+      trackEvent(
+        EVENT_CHANGE,
+        "stroke color",
+        colors.elementStroke.includes(value)
+          ? `${value} (picker ${colors.elementStroke.indexOf(value)})`
+          : value,
+      );
     }
     return {
       elements: changeProperty(elements, appState, (el) =>
@@ -117,7 +124,13 @@ export const actionChangeBackgroundColor = register({
   name: "changeBackgroundColor",
   perform: (elements, appState, value) => {
     if (value !== appState.currentItemBackgroundColor) {
-      trackEvent(EVENT_CHANGE, "background color", value);
+      trackEvent(
+        EVENT_CHANGE,
+        "background color",
+        colors.elementBackground.includes(value)
+          ? `${value} (picker ${colors.elementBackground.indexOf(value)})`
+          : value,
+      );
     }
 
     return {
@@ -313,6 +326,7 @@ export const actionChangeSloppiness = register({
 export const actionChangeStrokeStyle = register({
   name: "changeStrokeStyle",
   perform: (elements, appState, value) => {
+    trackEvent(EVENT_CHANGE, "style", value);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {

@@ -15,12 +15,19 @@ import { getCommonBounds } from "../element";
 import { getNewZoom } from "../scene/zoom";
 import { centerScrollOn } from "../scene/scroll";
 import { EVENT_ACTION, EVENT_CHANGE, trackEvent } from "../analytics";
+import colors from "../colors";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
   perform: (_, appState, value) => {
     if (value !== appState.viewBackgroundColor) {
-      trackEvent(EVENT_CHANGE, "canvas color", value);
+      trackEvent(
+        EVENT_CHANGE,
+        "canvas color",
+        colors.canvasBackground.includes(value)
+          ? `${value} (picker ${colors.canvasBackground.indexOf(value)})`
+          : value,
+      );
     }
     return {
       appState: { ...appState, viewBackgroundColor: value },
