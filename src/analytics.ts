@@ -5,6 +5,7 @@ export const EVENT_SHAPE = "shape";
 export const EVENT_LAYER = "layer";
 export const EVENT_ALIGN = "align";
 export const EVENT_SHARE = "share";
+export const EVENT_IO = "io";
 
 export const trackEvent = window.gtag
   ? (category: string, name: string, label?: string, value?: number) => {

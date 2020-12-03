@@ -3,21 +3,21 @@
 | Shape / Selection       | shape    | selection, rectangle, diamond, etc | `toolbar` or `shortcut`         |
 | Text on double click    | shape    | text                               | `double-click`                  |
 | Lock selection          | shape    | lock                               | `on` or `off`                   |
-| Load file               | action   | load                               | `MIME type`                     |
-| Import from URL         | action   | import                             |
-| Save                    | action   | save                               |
-| Save as                 | action   | save as                            |
 | Clear canvas            | action   | clear canvas                       |
 | Zoom in                 | action   | zoom                               | in                              | `zoom`    |
 | Zoom out                | action   | zoom                               | out                             | `zoom`    |
 | Zoom fit                | action   | zoom                               | fit                             | `zoom`    |
 | Zoom reset              | action   | zoom                               | reset                           | `zoom`    |
-| Export dialog           | action   | export                             | dialog                          |
-| Export to backend       | action   | export                             | backend                         |
-| Export as SVG           | action   | export                             | `svg` or `clipboard-svg`        |
-| Export to PNG           | action   | export                             | `png` or `clipboard-png`        |
 | Scroll back to content  | action   | scroll to content                  |
 | Open shortcut menu      | action   | keyboard shortcuts                 |
+| Load file               | io       | load                               | `MIME type`                     |
+| Import from URL         | io       | import                             |
+| Save                    | io       | save                               |
+| Save as                 | io       | save as                            |
+| Export dialog           | io       | export                             | dialog                          |
+| Export to backend       | io       | export                             | backend                         |
+| Export as SVG           | io       | export                             | `svg` or `clipboard-svg`        |
+| Export to PNG           | io       | export                             | `png` or `clipboard-png`        |
 | Canvas color            | change   | canvas color                       | `color`                         |
 | Background color        | change   | background color                   | `color`                         |
 | Stroke color            | change   | stroke color                       | `color`                         |
