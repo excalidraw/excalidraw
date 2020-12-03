@@ -741,3 +741,43 @@ export const EdgeRoundIcon = React.memo(
       { width: 40, height: 20, mirror: true },
     ),
 );
+
+export const NullDecoratorIcon = React.memo(
+  ({
+    appearance,
+    flip = false,
+  }: {
+    appearance: "light" | "dark";
+    flip?: boolean;
+  }) =>
+    createIcon(
+      <path
+        transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
+        d=""
+        stroke={iconFillColor(appearance)}
+        strokeWidth={1.25}
+        fill="none"
+      />,
+      { width: 40, height: 20, mirror: true },
+    ),
+);
+
+export const ArrowDecoratorIcon = React.memo(
+  ({
+    appearance,
+    flip = false,
+  }: {
+    appearance: "light" | "dark";
+    flip?: boolean;
+  }) =>
+    createIcon(
+      <path
+        transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
+        d="M6 10.3945C10.8066 10.6948 29.9969 10.4972 34.8705 10.3549M34.0584 9.54562C24.8144 13.2247 20.5182 14.6056 14.7065 16.8992L34.0584 9.54562ZM34.0584 9.54562C24.7043 6.69619 20.3979 4.3917 14.6676 3L34.0584 9.54562ZM14.7603 17C19.6322 15.5373 22.389 14.8515 34.8557 10.9147C22.4035 6.557 19.6389 4.44021 14.7214 3.10075M6.14167 8.81109C10.9658 8.9172 30.1965 9.26077 35 9.26345L6.14167 8.81109Z"
+        stroke={iconFillColor(appearance)}
+        strokeWidth={1.25}
+        fill="none"
+      />,
+      { width: 40, height: 20, mirror: true },
+    ),
+);

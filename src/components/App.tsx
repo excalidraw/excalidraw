@@ -2886,6 +2886,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         roughness: this.state.currentItemRoughness,
         opacity: this.state.currentItemOpacity,
         strokeSharpness: this.state.currentItemLinearStrokeSharpness,
+        startDecorator: this.state.currentItemLinearDecorators.start,
+        endDecorator: this.state.currentItemLinearDecorators.end,
       });
       this.setState((prevState) => ({
         selectedElementIds: {

@@ -8,6 +8,7 @@ import {
   FontFamily,
   GroupId,
   ExcalidrawBindableElement,
+  LinearElementDecorator,
 } from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -60,6 +61,10 @@ export type AppState = {
   currentItemFontSize: number;
   currentItemTextAlign: TextAlign;
   currentItemStrokeSharpness: ExcalidrawElement["strokeSharpness"];
+  currentItemLinearDecorators: {
+    start: LinearElementDecorator | null;
+    end: LinearElementDecorator | null;
+  };
   currentItemLinearStrokeSharpness: ExcalidrawElement["strokeSharpness"];
   viewBackgroundColor: string;
   scrollX: FlooredNumber;

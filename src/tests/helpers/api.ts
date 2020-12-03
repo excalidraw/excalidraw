@@ -130,6 +130,8 @@ export class API {
       case "draw":
         element = newLinearElement({
           type: type as "arrow" | "line" | "draw",
+          startDecorator: null,
+          endDecorator: null,
           ...base,
         });
         break;

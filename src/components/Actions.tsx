@@ -7,6 +7,7 @@ import {
   hasStroke,
   canChangeSharpness,
   hasText,
+  hasDecorators,
   getTargetElement,
 } from "../scene";
 import { t } from "../i18n";
@@ -45,6 +46,7 @@ export const SelectedShapeActions = ({
   const showChangeBackgroundIcons =
     hasBackground(elementType) ||
     targetElements.some((element) => hasBackground(element.type));
+
   return (
     <div className="panelColumn">
       {renderAction("changeStrokeColor")}
@@ -74,6 +76,11 @@ export const SelectedShapeActions = ({
 
           {renderAction("changeTextAlign")}
         </>
+      )}
+
+      {(hasDecorators(elementType) ||
+        targetElements.some((element) => hasDecorators(element.type))) && (
+        <>{renderAction("changeDecorator")}</>
       )}
 
       {renderAction("changeOpacity")}

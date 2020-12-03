@@ -102,6 +102,8 @@ const restoreElement = (
               ]
             : element.points,
         lastCommittedPoint: null,
+        startDecorator: element.startDecorator || null,
+        endDecorator: element.endDecorator || null,
       });
     }
     // generic elements

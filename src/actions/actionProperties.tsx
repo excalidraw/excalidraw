@@ -4,6 +4,7 @@ import {
   ExcalidrawTextElement,
   TextAlign,
   FontFamily,
+  ExcalidrawLinearElement,
 } from "../element/types";
 import {
   getCommonAttributeOfSelectedElements,
@@ -13,6 +14,7 @@ import {
 } from "../scene";
 import { ButtonSelect } from "../components/ButtonSelect";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
+import { ButtonIconCycle } from "../components/ButtonIconCycle";
 import {
   isTextElement,
   redrawTextBoundingBox,
@@ -27,6 +29,7 @@ import { newElementWith } from "../element/mutateElement";
 import { DEFAULT_FONT_SIZE, DEFAULT_FONT_FAMILY } from "../constants";
 import { randomInteger } from "../random";
 import {
+  ArrowDecoratorIcon,
   FillHachureIcon,
   FillCrossHatchIcon,
   FillSolidIcon,
@@ -592,6 +595,102 @@ export const actionChangeSharpness = register({
         )}
         onChange={(value) => updateData(value)}
       />
+    </fieldset>
+  ),
+});
+
+export const actionChangeDecorator = register({
+  name: "changeDecorator",
+  perform: (
+    elements,
+    appState,
+    value, // { position: "start" | "end"; type: LinearElementDecorator | null },
+  ) => {
+    return {
+      elements: changeProperty(elements, appState, (el) => {
+        if (isLinearElement(el)) {
+          const { position, type } = value;
+          if (position === "start") {
+            const element: ExcalidrawLinearElement = newElementWith(el, {
+              startDecorator: type,
+            });
+            return element;
+          } else if (position === "end") {
+            const element: ExcalidrawLinearElement = newElementWith(el, {
+              endDecorator: type,
+            });
+            return element;
+          }
+        }
+
+        return el;
+      }),
+      appState: {
+        ...appState,
+        currentItemLinearDecorators: {
+          ...appState.currentItemLinearDecorators,
+          [value.position]: value.type,
+        },
+      },
+      commitToHistory: true,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData }) => (
+    <fieldset>
+      <legend>{t("labels.decorators")}</legend>
+      <div className="buttonList buttonListIcon">
+        <ButtonIconCycle
+          group="start_decorator"
+          options={[
+            {
+              value: null,
+              text: t("labels.nullDecorator"),
+              icon: <StrokeStyleSolidIcon appearance={appState.appearance} />,
+            },
+            {
+              value: "arrow",
+              text: t("labels.arrowDecorator"),
+              icon: (
+                <ArrowDecoratorIcon
+                  appearance={appState.appearance}
+                  flip={true}
+                />
+              ),
+            },
+          ]}
+          value={getFormValue(
+            elements,
+            appState,
+            (element) =>
+              isLinearElement(element) ? element.startDecorator : null,
+            appState.currentItemLinearDecorators.start,
+          )}
+          onChange={(value) => updateData({ position: "start", type: value })}
+        />
+        <ButtonIconCycle
+          group="end_decorator"
+          options={[
+            {
+              value: null,
+              text: "none",
+              icon: <StrokeStyleSolidIcon appearance={appState.appearance} />,
+            },
+            {
+              value: "arrow",
+              text: "arrow",
+              icon: <ArrowDecoratorIcon appearance={appState.appearance} />,
+            },
+          ]}
+          value={getFormValue(
+            elements,
+            appState,
+            (element) =>
+              isLinearElement(element) ? element.endDecorator : null,
+            appState.currentItemLinearDecorators.end,
+          )}
+          onChange={(value) => updateData({ position: "end", type: value })}
+        />
+      </div>
     </fieldset>
   ),
 });

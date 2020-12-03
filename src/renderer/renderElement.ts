@@ -1,5 +1,6 @@
 import {
   ExcalidrawElement,
+  ExcalidrawLinearElement,
   ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
 } from "../element/types";
@@ -334,8 +335,16 @@ const generateElementShape = (
 
         // add lines only in arrow
         if (element.type === "arrow") {
-          const arrowPoints = getArrowPoints(element, shape);
-          if (arrowPoints) {
+          function getArrowShapes(
+            element: ExcalidrawLinearElement,
+            shape: Drawable[],
+            position: "start" | "end",
+          ) {
+            const arrowPoints = getArrowPoints(element, shape, position);
+            if (arrowPoints === null) {
+              return [];
+            }
+
             const [x2, y2, x3, y3, x4, y4] = arrowPoints;
             // for dotted arrows caps, reduce gap to make it more legible
             if (element.strokeStyle === "dotted") {
@@ -344,31 +353,20 @@ const generateElementShape = (
             } else {
               delete options.strokeLineDash;
             }
-            shape.push(
-              ...[
-                generator.line(x3, y3, x2, y2, options),
-                generator.line(x4, y4, x2, y2, options),
-              ],
-            );
+            return [
+              generator.line(x3, y3, x2, y2, options),
+              generator.line(x4, y4, x2, y2, options),
+            ];
           }
-          // ...now do it again for the starting-end arrow points.
-          // TODO: Break this out into an "add arrowheads" method to use for both ends
-          const startArrowPoints = getArrowPoints(element, shape, true);
-          if (startArrowPoints) {
-            const [x2, y2, x3, y3, x4, y4] = startArrowPoints;
-            // for dotted arrows caps, reduce gap to make it more legible
-            if (element.strokeStyle === "dotted") {
-              options.strokeLineDash = [3, 4];
-              // for solid/dashed, keep solid arrow cap
-            } else {
-              delete options.strokeLineDash;
-            }
-            shape.push(
-              ...[
-                generator.line(x3, y3, x2, y2, options),
-                generator.line(x4, y4, x2, y2, options),
-              ],
-            );
+
+          if (element.startDecorator === "arrow") {
+            const shapes = getArrowShapes(element, shape, "start");
+            shape.push(...shapes);
+          }
+
+          if (element.endDecorator === "arrow") {
+            const shapes = getArrowShapes(element, shape, "end");
+            shape.push(...shapes);
           }
         }
         break;

@@ -163,7 +163,7 @@ const getLinearElementAbsoluteCoords = (
 export const getArrowPoints = (
   element: ExcalidrawLinearElement,
   shape: Drawable[],
-  reverse = false,
+  position: "start" | "end",
 ) => {
   const ops = getCurvePathOps(shape[0]);
   if (ops.length < 1) {
@@ -171,7 +171,7 @@ export const getArrowPoints = (
   }
 
   // the index of the bCurve op to examine
-  const index = reverse ? 1 : ops.length - 1;
+  const index = position === "start" ? 1 : ops.length - 1;
 
   const data = ops[index].data;
   const p3 = [data[4], data[5]] as Point;
@@ -197,7 +197,7 @@ export const getArrowPoints = (
     p0[idx] * Math.pow(t, 3);
 
   // we know the last point of the arrow (or the first, if reversed)
-  const [x2, y2] = reverse ? p0 : p3;
+  const [x2, y2] = position === "start" ? p0 : p3;
 
   // by using cubic bezier equation (B(t)) and the given parameters,
   // we calculate a point that is closer to the last point
