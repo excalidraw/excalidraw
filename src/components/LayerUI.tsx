@@ -45,7 +45,7 @@ import { muteFSAbortError } from "../utils";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 import clsx from "clsx";
 import { Library } from "../data/library";
-import { EVENT_EXIT, trackEvent } from "../analytics";
+import { EVENT_ACTION, EVENT_EXIT, trackEvent } from "../analytics";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -575,6 +575,7 @@ const LayerUI = ({
         <button
           className="scroll-back-to-content"
           onClick={() => {
+            trackEvent(EVENT_ACTION, "scroll to content");
             setAppState({
               ...calculateScrollCenter(elements, appState, canvas),
             });
