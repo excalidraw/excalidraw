@@ -30,7 +30,6 @@
 | Project name            | change   | title                              |
 | Theme                   | change   | theme                              | `light` or `dark`               |
 | Change language         | change   | language                           | `language`                      |
-| Language on load        | change   | language on load                   | `language`                      |
 | Send to back            | layer    | move                               | `back`                          |
 | Send backward           | layer    | move                               | `down`                          |
 | Bring to front          | layer    | move                               | `front`                         |

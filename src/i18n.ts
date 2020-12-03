@@ -85,7 +85,6 @@ export const setLanguageFirstTime = async () => {
   );
 
   languageDetector.cacheUserLanguage(currentLanguage.lng);
-  trackEvent(EVENT_CHANGE, "language on load", currentLanguage.lng);
 };
 
 export const getLanguage = () => currentLanguage;
