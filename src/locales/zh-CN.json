@@ -75,15 +75,15 @@
     "removeFromLibrary": "从库中移除",
     "libraryLoadingMessage": "正在加载库...",
     "loadingScene": "正在加载绘图...",
-    "align": "",
-    "alignTop": "",
-    "alignBottom": "",
-    "alignLeft": "",
-    "alignRight": "",
-    "centerVertically": "",
-    "centerHorizontally": "",
-    "distributeHorizontally": "",
-    "distributeVertically": ""
+    "align": "对齐",
+    "alignTop": "顶部对齐",
+    "alignBottom": "底端对齐",
+    "alignLeft": "左对齐",
+    "alignRight": "右对齐",
+    "centerVertically": "垂直居中",
+    "centerHorizontally": "水平居中",
+    "distributeHorizontally": "水平等距分布",
+    "distributeVertically": "垂直等距分布"
   },
   "buttons": {
     "clearReset": "重置画布",
@@ -92,7 +92,7 @@
     "exportToSvg": "导出为 SVG",
     "copyToClipboard": "复制到剪贴板",
     "copyPngToClipboard": "复制 PNG 到剪切板",
-    "scale": "",
+    "scale": "缩放",
     "save": "保存",
     "saveAs": "保存为",
     "load": "载入文件",
@@ -160,9 +160,9 @@
     "lineEditor_nothingSelected": "选中要移动或移除的点，或按住 Alt 并点击添加新点"
   },
   "canvasError": {
-    "cannotShowPreview": "",
-    "canvasTooBig": "",
-    "canvasTooBigTip": ""
+    "cannotShowPreview": "无法显示预览",
+    "canvasTooBig": "画布可能过大。",
+    "canvasTooBigTip": "提示：尝试将最远的元素移动到和其它元素更近一些。"
   },
   "errorSplash": {
     "headingMain_pre": "遇到异常。请尝试",
