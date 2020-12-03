@@ -46,6 +46,7 @@
 | Join session            | share    | session join                       |
 | Start end               | share    | session end                        |
 | Copy room link          | share    | copy link                          |
+| Go to collaborator      | share    | go to collaborator                 |
 | Change name             | share    | name                               |
 | E2EE shield             | exit     | e2ee shield                        |
 | GitHub corner           | exit     | github                             |
