@@ -218,6 +218,7 @@ export const exportToBackend = async (
       url.hash = `json=${json.id},${exportedKey.k!}`;
       const urlString = url.toString();
       window.prompt(`🔒${t("alerts.uploadedSecurly")}`, urlString);
+      trackEvent(EVENT_ACTION, "export", "backend");
     } else if (json.error_class === "RequestTooLargeError") {
       window.alert(t("alerts.couldNotCreateShareableLinkTooBig"));
     } else {
@@ -321,8 +322,10 @@ export const exportCanvas = async (
         fileName: `${name}.svg`,
         extensions: [".svg"],
       });
+      trackEvent(EVENT_ACTION, "export", "svg");
       return;
     } else if (type === "clipboard-svg") {
+      trackEvent(EVENT_ACTION, "export", "clipboard-svg");
       copyTextToSystemClipboard(tempSvg.outerHTML);
       return;
     }
@@ -354,9 +357,11 @@ export const exportCanvas = async (
       fileName,
       extensions: [".png"],
     });
+    trackEvent(EVENT_ACTION, "export", "png");
   } else if (type === "clipboard") {
     try {
       await copyCanvasToClipboardAsPng(tempCanvas);
+      trackEvent(EVENT_ACTION, "export", "clipboard-png");
     } catch (error) {
       if (error.name === "CANVAS_POSSIBLY_TOO_BIG") {
         throw error;
