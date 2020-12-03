@@ -1,16 +1,15 @@
-import React, { useState, useEffect, useRef } from "react";
 import clsx from "clsx";
-import { ToolButton } from "./ToolButton";
+import React, { useEffect, useRef, useState } from "react";
+import { EVENT_SHARE, trackEvent } from "../analytics";
+import { copyTextToSystemClipboard } from "../clipboard";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
-import { users, clipboard, start, stop } from "./icons";
-
-import "./RoomDialog.scss";
-import { copyTextToSystemClipboard } from "../clipboard";
-import { Dialog } from "./Dialog";
-import { AppState } from "../types";
 import { KEYS } from "../keys";
-import { EVENT_SHAPE, EVENT_SHARE, trackEvent } from "../analytics";
+import { AppState } from "../types";
+import { Dialog } from "./Dialog";
+import { clipboard, start, stop, users } from "./icons";
+import "./RoomDialog.scss";
+import { ToolButton } from "./ToolButton";
 
 const RoomModal = ({
   activeRoomLink,
@@ -34,7 +33,7 @@ const RoomModal = ({
   const copyRoomLink = async () => {
     try {
       await copyTextToSystemClipboard(activeRoomLink);
-      trackEvent(EVENT_SHAPE, "copy link");
+      trackEvent(EVENT_SHARE, "copy link");
     } catch (error) {
       setErrorMessage(error.message);
     }
