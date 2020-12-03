@@ -6,13 +6,13 @@ export const EVENT_LAYER = "layer";
 export const EVENT_ALIGN = "align";
 
 export const trackEvent = window.gtag
-  ? (name: string, category: string, label?: string, value?: number) => {
+  ? (category: string, name: string, label?: string, value?: number) => {
       window.gtag("event", name, {
         event_category: category,
         event_label: label,
         value,
       });
     }
-  : (name: string, category: string, label?: string, value?: number) => {
-      console.info("Track Event", name, category, label, value);
+  : (category: string, name: string, label?: string, value?: number) => {
+      console.info("Track Event", category, name, label, value);
     };
