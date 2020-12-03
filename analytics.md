@@ -42,6 +42,11 @@
 | Center vertically       | align    | vertically                         | `center`                        |
 | Distribute horizontally | align    | distribute                         | `horizontally`                  |
 | Distribute vertically   | align    | distribute                         | `vertically`                    |
+| Start session           | share    | session start                      |
+| Join session            | share    | session join                       |
+| Start end               | share    | session end                        |
+| Copy room link          | share    | copy link                          |
+| Change name             | share    | name                               |
 | E2EE shield             | exit     | e2ee shield                        |
 | GitHub corner           | exit     | github                             |
 | Excalidraw blog         | exit     | blog                               |

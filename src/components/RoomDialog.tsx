@@ -10,6 +10,7 @@ import { copyTextToSystemClipboard } from "../clipboard";
 import { Dialog } from "./Dialog";
 import { AppState } from "../types";
 import { KEYS } from "../keys";
+import { EVENT_SHAPE, trackEvent } from "../analytics";
 
 const RoomModal = ({
   activeRoomLink,
@@ -33,6 +34,7 @@ const RoomModal = ({
   const copyRoomLink = async () => {
     try {
       await copyTextToSystemClipboard(activeRoomLink);
+      trackEvent(EVENT_SHAPE, "copy link");
     } catch (error) {
       setErrorMessage(error.message);
     }
