@@ -181,7 +181,7 @@ import {
   isSavedToFirebase,
 } from "../data/firebase";
 import { getNewZoom } from "../scene/zoom";
-import { EVENT_SHAPE, trackEvent } from "../analytics";
+import { EVENT_SHAPE, EVENT_SHARE, trackEvent } from "../analytics";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -657,8 +657,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       // when joining a room we don't want user's local scene data to be merged
       // into the remote scene
       this.resetScene();
-
       this.initializeSocketClient({ showLoadingState: true });
+      trackEvent(EVENT_SHARE, "session join");
     } else if (scene) {
       if (scene.appState) {
         scene.appState = {
@@ -1262,12 +1262,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.scene.replaceAllElements(this.scene.getElements());
 
     await this.initializeSocketClient({ showLoadingState: false });
+    trackEvent(EVENT_SHARE, "session start");
   };
 
   closePortal = () => {
     this.saveCollabRoomToFirebase();
     window.history.pushState({}, "Excalidraw", window.location.origin);
     this.destroySocketClient();
+    trackEvent(EVENT_SHARE, "session end");
   };
 
   toggleLock = () => {
