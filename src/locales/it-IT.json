@@ -54,7 +54,7 @@
     "architect": "Architetto",
     "artist": "Artista",
     "cartoonist": "Fumettista",
-    "fileTitle": "Titolo file",
+    "fileTitle": "Titolo del file",
     "colorPicker": "Selettore colore",
     "canvasBackground": "Sfondo tela",
     "drawingCanvas": "Area di disegno",
@@ -86,7 +86,7 @@
     "distributeVertically": "Distribuisci verticalmente"
   },
   "buttons": {
-    "clearReset": "Ripristina la tela",
+    "clearReset": "Svuota la tela",
     "export": "Esporta",
     "exportToPng": "Esporta come PNG",
     "exportToSvg": "Esporta come SVG",
