@@ -19,7 +19,6 @@ import { EVENT } from "../constants";
 import { ImportedDataState } from "../data/types";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
-import { EVENT_SHARE, trackEvent } from "../analytics";
 
 const saveDebounced = debounce(
   (elements: readonly ExcalidrawElement[], state: AppState) => {
@@ -29,7 +28,6 @@ const saveDebounced = debounce(
 );
 
 const onUsernameChange = (username: string) => {
-  trackEvent(EVENT_SHARE, "name");
   saveUsernameToLocalStorage(username);
 };
 

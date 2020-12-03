@@ -10,7 +10,7 @@ import { copyTextToSystemClipboard } from "../clipboard";
 import { Dialog } from "./Dialog";
 import { AppState } from "../types";
 import { KEYS } from "../keys";
-import { EVENT_SHAPE, trackEvent } from "../analytics";
+import { EVENT_SHAPE, EVENT_SHARE, trackEvent } from "../analytics";
 
 const RoomModal = ({
   activeRoomLink,
@@ -97,6 +97,7 @@ const RoomModal = ({
               value={username || ""}
               className="RoomDialog-username TextInput"
               onChange={(event) => onUsernameChange(event.target.value)}
+              onBlur={() => trackEvent(EVENT_SHARE, "name")}
               onKeyPress={(event) =>
                 event.key === KEYS.ENTER && onPressingEnter()
               }
