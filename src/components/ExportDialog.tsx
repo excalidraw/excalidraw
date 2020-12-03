@@ -18,6 +18,7 @@ import useIsMobile from "../is-mobile";
 import { Dialog } from "./Dialog";
 import { canvasToBlob } from "../data/blob";
 import { CanvasError } from "../errors";
+import { EVENT_ACTION, trackEvent } from "../analytics";
 
 const scales = [1, 2, 3];
 const defaultScale = scales.includes(devicePixelRatio) ? devicePixelRatio : 1;
@@ -250,7 +251,10 @@ export const ExportDialog = ({
   return (
     <>
       <ToolButton
-        onClick={() => setModalIsShown(true)}
+        onClick={() => {
+          trackEvent(EVENT_ACTION, "export", "dialog");
+          setModalIsShown(true);
+        }}
         icon={exportFile}
         type="button"
         aria-label={t("buttons.export")}
