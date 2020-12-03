@@ -4,11 +4,13 @@ import { register } from "./register";
 import { getClientColors, getClientInitials } from "../clients";
 import { Collaborator } from "../types";
 import { centerScrollOn } from "../scene/scroll";
+import { EVENT_SHARE, trackEvent } from "../analytics";
 
 export const actionGoToCollaborator = register({
   name: "goToCollaborator",
   perform: (_elements, appState, value) => {
     const point = value as Collaborator["pointer"];
+    trackEvent(EVENT_SHARE, "go to collaborator");
     if (!point) {
       return { appState, commitToHistory: false };
     }
