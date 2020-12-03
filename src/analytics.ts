@@ -2,6 +2,8 @@ export const EVENT_ACTION = "action";
 export const EVENT_EXIT = "exit";
 export const EVENT_CHANGE = "change";
 export const EVENT_SHAPE = "shape";
+export const EVENT_LAYER = "layer";
+export const EVENT_ALIGN = "align";
 
 export const trackEvent = window.gtag
   ? (name: string, category: string, label?: string, value?: number) => {

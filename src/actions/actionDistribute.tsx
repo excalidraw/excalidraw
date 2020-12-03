@@ -13,6 +13,7 @@ import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 import { distributeElements, Distribution } from "../disitrubte";
 import { getShortcutKey } from "../utils";
+import { EVENT_ALIGN, trackEvent } from "../analytics";
 
 const enableActionGroup = (
   elements: readonly ExcalidrawElement[],
@@ -39,6 +40,7 @@ const distributeSelectedElements = (
 export const distributeHorizontally = register({
   name: "distributeHorizontally",
   perform: (elements, appState) => {
+    trackEvent(EVENT_ALIGN, "distribute", "horizontally");
     return {
       appState,
       elements: distributeSelectedElements(elements, appState, {
@@ -67,6 +69,7 @@ export const distributeHorizontally = register({
 export const distributeVertically = register({
   name: "distributeVertically",
   perform: (elements, appState) => {
+    trackEvent(EVENT_ALIGN, "distribute", "vertically");
     return {
       appState,
       elements: distributeSelectedElements(elements, appState, {

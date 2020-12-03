@@ -78,7 +78,6 @@ export const calculateScrollCenter = (
 
   const centerX = (x1 + x2) / 2;
   const centerY = (y1 + y2) / 2;
-
   return centerScrollOn({
     scenePoint: { x: centerX, y: centerY },
     viewportDimensions: { width: appState.width, height: appState.height },
