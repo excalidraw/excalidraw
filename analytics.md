@@ -9,12 +9,10 @@
 | Zoom fit                | action   | zoom                               | fit                             | `zoom`    |
 | Zoom reset              | action   | zoom                               | reset                           | `zoom`    |
 | Scroll back to content  | action   | scroll to content                  |
-| Open shortcut menu      | action   | keyboard shortcuts                 |
 | Load file               | io       | load                               | `MIME type`                     |
 | Import from URL         | io       | import                             |
 | Save                    | io       | save                               |
 | Save as                 | io       | save as                            |
-| Export dialog           | io       | export                             | dialog                          |
 | Export to backend       | io       | export                             | backend                         |
 | Export as SVG           | io       | export                             | `svg` or `clipboard-svg`        |
 | Export to PNG           | io       | export                             | `png` or `clipboard-png`        |
@@ -48,6 +46,9 @@
 | Copy room link          | share    | copy link                          |
 | Go to collaborator      | share    | go to collaborator                 |
 | Change name             | share    | name                               |
+| Shortcuts dialog        | dialog   | shortcuts                          |
+| Collaboration dialog    | dialog   | collaboration                      |
+| Export dialog           | dialog   | export                             |
 | E2EE shield             | exit     | e2ee shield                        |
 | GitHub corner           | exit     | github                             |
 | Excalidraw blog         | exit     | blog                               |

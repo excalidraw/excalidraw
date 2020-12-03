@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import React, { useEffect, useRef, useState } from "react";
-import { EVENT_SHARE, trackEvent } from "../analytics";
+import { EVENT_DIALOG, EVENT_SHARE, trackEvent } from "../analytics";
 import { copyTextToSystemClipboard } from "../clipboard";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
@@ -163,7 +163,10 @@ export const RoomDialog = ({
         className={clsx("RoomDialog-modalButton", {
           "is-collaborating": isCollaborating,
         })}
-        onClick={() => setModalIsShown(true)}
+        onClick={() => {
+          trackEvent(EVENT_DIALOG, "collaboration");
+          setModalIsShown(true);
+        }}
         icon={users}
         type="button"
         title={t("buttons.roomDialog")}
