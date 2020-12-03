@@ -40,8 +40,8 @@
 | Align bottom            | align  | align                              | `bottom`                 |
 | Center horizontally     | align  | horizontally                       | `center`                 |
 | Center vertically       | align  | vertically                         | `center`                 |
-| Distribute horizontally | align  | distribute                         | `vertically`             |
-| Distribute vertically   | align  | distribute                         | `horizontally`           |
+| Distribute horizontally | align  | distribute                         | `horizontally`           |
+| Distribute vertically   | align  | distribute                         | `vertically`             |
 | E2EE shield             | exit   | e2ee shield                        |
 | GitHub corner           | exit   | github                             |
 | Excalidraw blog         | exit   | blog                               |
