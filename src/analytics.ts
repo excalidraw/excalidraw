@@ -7,6 +7,7 @@ export const EVENT_ALIGN = "align";
 export const EVENT_SHARE = "share";
 export const EVENT_IO = "io";
 export const EVENT_DIALOG = "dialog";
+export const EVENT_LIBRARY = "library";
 
 export const trackEvent = window.gtag
   ? (category: string, name: string, label?: string, value?: number) => {

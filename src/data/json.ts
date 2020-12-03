@@ -7,6 +7,7 @@ import { loadFromBlob } from "./blob";
 import { Library } from "./library";
 import { MIME_TYPES } from "../constants";
 import { clearElementsForExport } from "../element";
+import { EVENT_LIBRARY, trackEvent } from "../analytics";
 
 export const serializeAsJSON = (
   elements: readonly ExcalidrawElement[],
@@ -83,6 +84,7 @@ export const saveLibraryAsJSON = async () => {
     description: "Excalidraw library file",
     extensions: [".excalidrawlib"],
   });
+  trackEvent(EVENT_LIBRARY, "save");
 };
 
 export const importLibraryFromJSON = async () => {
@@ -91,5 +93,6 @@ export const importLibraryFromJSON = async () => {
     extensions: [".json", ".excalidrawlib"],
     mimeTypes: ["application/json"],
   });
+  trackEvent(EVENT_LIBRARY, "load");
   Library.importLibrary(blob);
 };
