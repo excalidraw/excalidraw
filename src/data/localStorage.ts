@@ -87,3 +87,17 @@ export const importFromLocalStorage = () => {
   }
   return { elements, appState };
 };
+
+export const getTotalStorageSize = () => {
+  const appState = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_APP_STATE);
+  const collab = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_COLLAB);
+  const elements = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS);
+  const library = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY);
+
+  const appStateSize = appState ? JSON.stringify(appState).length : 0;
+  const collabSize = collab ? JSON.stringify(collab).length : 0;
+  const elementsSize = elements ? JSON.stringify(elements).length : 0;
+  const librarySize = library ? JSON.stringify(library).length : 0;
+
+  return appStateSize + collabSize + elementsSize + librarySize;
+};

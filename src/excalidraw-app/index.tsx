@@ -1,24 +1,21 @@
-import React, { useState, useLayoutEffect, useEffect } from "react";
-
+import React, { useEffect, useLayoutEffect, useState } from "react";
+import { EVENT_LOAD, trackEvent } from "../analytics";
 import { LoadingMessage } from "../components/LoadingMessage";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
-import Excalidraw from "../packages/excalidraw/index";
-
+import { EVENT } from "../constants";
 import {
+  getTotalStorageSize,
   importFromLocalStorage,
   importUsernameFromLocalStorage,
   saveToLocalStorage,
   saveUsernameToLocalStorage,
 } from "../data/localStorage";
-
-import { debounce } from "../utils";
-
-import { SAVE_TO_LOCAL_STORAGE_TIMEOUT } from "../time_constants";
-import { EVENT } from "../constants";
-
 import { ImportedDataState } from "../data/types";
 import { ExcalidrawElement } from "../element/types";
+import Excalidraw from "../packages/excalidraw/index";
+import { SAVE_TO_LOCAL_STORAGE_TIMEOUT } from "../time_constants";
 import { AppState } from "../types";
+import { debounce } from "../utils";
 
 const saveDebounced = debounce(
   (elements: readonly ExcalidrawElement[], state: AppState) => {
@@ -36,9 +33,6 @@ const onBlur = () => {
 };
 
 export default function ExcalidrawApp() {
-  // dimensions
-  // ---------------------------------------------------------------------------
-
   const [dimensions, setDimensions] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
@@ -56,9 +50,6 @@ export default function ExcalidrawApp() {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  // initial state
-  // ---------------------------------------------------------------------------
-
   const [initialState, setInitialState] = useState<{
     data: ImportedDataState;
     user: {
@@ -67,6 +58,12 @@ export default function ExcalidrawApp() {
   } | null>(null);
 
   useEffect(() => {
+    const storageSize = getTotalStorageSize();
+    if (storageSize) {
+      trackEvent(EVENT_LOAD, "storage", "size", storageSize);
+    } else {
+      trackEvent(EVENT_LOAD, "first time");
+    }
     setInitialState({
       data: importFromLocalStorage(),
       user: {
@@ -74,9 +71,6 @@ export default function ExcalidrawApp() {
       },
     });
   }, []);
-
-  // blur/unload
-  // ---------------------------------------------------------------------------
 
   useEffect(() => {
     window.addEventListener(EVENT.UNLOAD, onBlur, false);
@@ -87,13 +81,7 @@ export default function ExcalidrawApp() {
     };
   }, []);
 
-  // ---------------------------------------------------------------------------
-
-  if (!initialState) {
-    return <LoadingMessage />;
-  }
-
-  return (
+  return initialState ? (
     <TopErrorBoundary>
       <Excalidraw
         width={dimensions.width}
@@ -104,5 +92,7 @@ export default function ExcalidrawApp() {
         onUsernameChange={onUsernameChange}
       />
     </TopErrorBoundary>
+  ) : (
+    <LoadingMessage />
   );
 }
