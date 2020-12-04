@@ -181,7 +181,13 @@ import {
   isSavedToFirebase,
 } from "../data/firebase";
 import { getNewZoom } from "../scene/zoom";
-import { EVENT_SHAPE, EVENT_SHARE, trackEvent } from "../analytics";
+import {
+  EVENT_DIALOG,
+  EVENT_LIBRARY,
+  EVENT_SHAPE,
+  EVENT_SHARE,
+  trackEvent,
+} from "../analytics";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -548,6 +554,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         )
       ) {
         await Library.importLibrary(blob);
+        trackEvent(EVENT_LIBRARY, "import");
         this.setState({
           isLibraryOpen: true,
         });
@@ -1577,6 +1584,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     if (event.code === CODES.NINE) {
+      if (!this.state.isLibraryOpen) {
+        trackEvent(EVENT_DIALOG, "library");
+      }
       this.setState({ isLibraryOpen: !this.state.isLibraryOpen });
     }
 
