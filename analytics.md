@@ -60,3 +60,5 @@
 | Excalidraw blog         | exit     | blog                               |
 | Excalidraw guides       | exit     | guides                             |
 | File issues             | exit     | issues                             |
+| First load              | load     | first load                         |
+| Load from stroage       | load     | storage                            | size                            | `bytes`   |
