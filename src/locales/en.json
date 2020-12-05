@@ -214,5 +214,16 @@
   "charts": {
     "noNumericColumn": "You pasted a spreadsheet without a numeric column.",
     "tooManyColumns": "You pasted a spreadsheet with more than two columns."
+  },
+  "stats": {
+    "element": "Element",
+    "elements": "Elements",
+    "height": "Height",
+    "scene": "Scene",
+    "selection": "Selection",
+    "storage": "Storage",
+    "title": "Stats for nerds",
+    "total": "Total",
+    "width": "Width"
   }
 }

@@ -14,6 +14,7 @@ import {
 } from "../excalidraw-app/data/localStorage";
 import { debounce, nFormatter } from "../utils";
 import { close } from "./icons";
+import { t } from "../i18n";
 
 type StorageSizes = { scene: number; total: number };
 
@@ -49,40 +50,40 @@ export const StatsForNerds = (props: {
   return (
     <div className="StatsForNerds">
       <div className={"close"}>{close}</div>
-      <h3>{"Stats for nerds"}</h3>
+      <h3>{t("stats.title")}</h3>
       <table>
         <tbody>
           <tr>
-            <th colSpan={2}>{"Scene"}</th>
+            <th colSpan={2}>{t("stats.scene")}</th>
           </tr>
           <tr>
-            <td>{"Elements"}</td>
+            <td>{t("stats.elements")}</td>
             <td>{props.elements.length}</td>
           </tr>
           <tr>
-            <td>{"Width"}</td>
+            <td>{t("stats.width")}</td>
             <td>{Math.round(boundingBox[2]) - Math.round(boundingBox[0])}</td>
           </tr>
           <tr>
-            <td>{"Height"}</td>
+            <td>{t("stats.height")}</td>
             <td>{Math.round(boundingBox[3]) - Math.round(boundingBox[1])}</td>
           </tr>
           <tr>
-            <th colSpan={2}>{"Storage"}</th>
+            <th colSpan={2}>{t("stats.storage")}</th>
           </tr>
           <tr>
-            <td>{"Scene"}</td>
+            <td>{t("stats.scene")}</td>
             <td>{nFormatter(storageSizes.scene, 1)}</td>
           </tr>
           <tr>
-            <td>{"Total"}</td>
+            <td>{t("stats.total")}</td>
             <td>{nFormatter(storageSizes.total, 1)}</td>
           </tr>
 
           {selectedElements.length === 1 && (
             <>
               <tr>
-                <th colSpan={2}>{"Element"}</th>
+                <th colSpan={2}>{t("stats.element")}</th>
               </tr>
             </>
           )}
@@ -90,10 +91,10 @@ export const StatsForNerds = (props: {
           {selectedElements.length > 1 && (
             <>
               <tr>
-                <th colSpan={2}>{"Selection"}</th>
+                <th colSpan={2}>{t("stats.selection")}</th>
               </tr>
               <tr>
-                <td>{"Elements"}</td>
+                <td>{t("stats.elements")}</td>
                 <td>{selectedElements.length}</td>
               </tr>
             </>
@@ -121,7 +122,7 @@ export const StatsForNerds = (props: {
                 </td>
               </tr>
               <tr>
-                <td>{"Width"}</td>
+                <td>{t("stats.width")}</td>
                 <td>
                   {Math.round(
                     selectedElements.length === 1
@@ -131,7 +132,7 @@ export const StatsForNerds = (props: {
                 </td>
               </tr>
               <tr>
-                <td>{"Height"}</td>
+                <td>{t("stats.height")}</td>
                 <td>
                   {Math.round(
                     selectedElements.length === 1
