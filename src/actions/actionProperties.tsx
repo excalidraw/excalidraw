@@ -689,7 +689,9 @@ export const actionChangeDecorator = register({
             elements,
             appState,
             (element) =>
-              isLinearElement(element) ? element.startDecorator : null,
+              isLinearElement(element)
+                ? element.startDecorator
+                : appState.currentItemLinearDecorators.start,
             appState.currentItemLinearDecorators.start,
           )}
           onChange={(value) => updateData({ position: "start", type: value })}
@@ -712,7 +714,9 @@ export const actionChangeDecorator = register({
             elements,
             appState,
             (element) =>
-              isLinearElement(element) ? element.endDecorator : null,
+              isLinearElement(element)
+                ? element.endDecorator
+                : appState.currentItemLinearDecorators.end,
             appState.currentItemLinearDecorators.end,
           )}
           onChange={(value) => updateData({ position: "end", type: value })}

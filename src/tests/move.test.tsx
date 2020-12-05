@@ -65,7 +65,7 @@ describe("move element", () => {
     // create elements
     const rectA = UI.createElement("rectangle", { size: 100 });
     const rectB = UI.createElement("rectangle", { x: 200, y: 0, size: 300 });
-    const line = UI.createElement("line", { x: 110, y: 50, size: 80 });
+    const line = UI.createElement("arrow", { x: 110, y: 50, size: 80 });
 
     // bind line to two rectangles
     bindOrUnbindLinearElement(
@@ -77,7 +77,7 @@ describe("move element", () => {
     // select the second rectangles
     new Pointer("mouse").clickOn(rectB);
 
-    expect(renderScene).toHaveBeenCalledTimes(19);
+    expect(renderScene).toHaveBeenCalledTimes(20);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(3);
     expect(h.state.selectedElementIds[rectB.id]).toBeTruthy();

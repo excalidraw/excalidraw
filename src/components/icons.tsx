@@ -569,8 +569,8 @@ export const FillHachureIcon = React.memo(
   ({ appearance }: { appearance: "light" | "dark" }) =>
     createIcon(
       <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M20.101 16H28.0934L36 8.95989V4H33.5779L20.101 16ZM30.5704 4L17.0935 16H9.10101L22.5779 4H30.5704ZM19.5704 4L6.09349 16H4V10.7475L11.5779 4H19.5704ZM8.57036 4H4V8.06952L8.57036 4ZM36 11.6378L31.101 16H36V11.6378ZM2 2V18H38V2H2Z"
         fill={iconFillColor(appearance)}
       />,
@@ -581,11 +581,7 @@ export const FillHachureIcon = React.memo(
 export const FillCrossHatchIcon = React.memo(
   ({ appearance }: { appearance: "light" | "dark" }) =>
     createIcon(
-      <g
-        fill={iconFillColor(appearance)}
-        fill-rule="evenodd"
-        clip-rule="evenodd"
-      >
+      <g fill={iconFillColor(appearance)} fillRule="evenodd" clipRule="evenodd">
         <path d="M20.101 16H28.0934L36 8.95989V4H33.5779L20.101 16ZM30.5704 4L17.0935 16H9.10101L22.5779 4H30.5704ZM19.5704 4L6.09349 16H4V10.7475L11.5779 4H19.5704ZM8.57036 4H4V8.06952L8.57036 4ZM36 11.6378L31.101 16H36V11.6378ZM2 2V18H38V2H2Z" />
         <path d="M14.0001 18L3.00006 4.00002L4.5727 2.76438L15.5727 16.7644L14.0001 18ZM25.0001 18L14.0001 4.00002L15.5727 2.76438L26.5727 16.7644L25.0001 18ZM36.0001 18L25.0001 4.00002L26.5727 2.76438L37.5727 16.7644L36.0001 18Z" />
       </g>,
