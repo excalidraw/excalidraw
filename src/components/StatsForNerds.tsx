@@ -45,7 +45,7 @@ export const StatsForNerds = (props: {
 
   return (
     <div className="StatsForNerds">
-      <div className={"close"} onClick={props.onClose}>
+      <div className="close" onClick={props.onClose}>
         {close}
       </div>
       <h3>{t("stats.title")}</h3>
