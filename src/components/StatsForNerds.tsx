@@ -41,7 +41,9 @@ export const StatsForNerds = (props: {
   useEffect(() => () => getStorageSizes.cancel(), []);
 
   const boundingBox = getCommonBounds(props.elements);
-  const selectedElements = getSelectedElements(props.elements, props.appState);
+  const selectedElements = props.appState.editingElement
+    ? [props.appState.editingElement]
+    : getSelectedElements(props.elements, props.appState);
   const selectedBoundingBox = getCommonBounds(selectedElements);
 
   return (
