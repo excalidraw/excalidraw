@@ -8,6 +8,11 @@ import {
 } from "../element/types";
 import { getCommonBoundingBox } from "../element/bounds";
 import { getSelectedElements } from "../scene";
+import {
+  getElementsStorageSize,
+  getTotalStorageSize,
+} from "../excalidraw-app/data/localStorage";
+import { nFormatter } from "../utils";
 
 type StatsForNerdsProps = {
   appState: AppState;
@@ -38,12 +43,23 @@ export class StatsForNerds extends React.Component<StatsForNerdsProps> {
             <td>{this.props.elements.length}</td>
           </tr>
           <tr>
-            <td>{"Height"}</td>
+            <td>{"Width"}</td>
             <td>{Math.round(boundingBox[2]) - Math.round(boundingBox[0])}</td>
           </tr>
           <tr>
-            <td>{"Width"}</td>
+            <td>{"Height"}</td>
             <td>{Math.round(boundingBox[3]) - Math.round(boundingBox[1])}</td>
+          </tr>
+          <tr>
+            <th colSpan={2}>{"Storage"}</th>
+          </tr>
+          <tr>
+            <td>{"Scene"}</td>
+            <td>{nFormatter(getElementsStorageSize(), 1)}</td>
+          </tr>
+          <tr>
+            <td>{"Total"}</td>
+            <td>{nFormatter(getTotalStorageSize(), 1)}</td>
           </tr>
 
           {selectedElements.length > 0 && (
