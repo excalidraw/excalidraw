@@ -71,7 +71,7 @@ export const getDefaultAppState = (): Omit<
     isLibraryOpen: false,
     fileHandle: null,
     collaborators: new Map(),
-    showStatsForNerds: true,
+    showStatsForNerds: false,
   };
 };
 

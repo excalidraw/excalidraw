@@ -28,6 +28,7 @@ const getStorageSizes = debounce((cb: (sizes: StorageSizes) => void) => {
 export const StatsForNerds = (props: {
   appState: AppState;
   elements: readonly NonDeletedExcalidrawElement[];
+  onClose: () => void;
 }) => {
   const [storageSizes, setStorageSizes] = useState<StorageSizes>({
     scene: 0,
@@ -49,7 +50,9 @@ export const StatsForNerds = (props: {
   const selectedBoundingBox = getCommonBoundingBox(selectedElements);
   return (
     <div className="StatsForNerds">
-      <div className={"close"}>{close}</div>
+      <div className={"close"} onClick={props.onClose}>
+        {close}
+      </div>
       <h3>{t("stats.title")}</h3>
       <table>
         <tbody>
