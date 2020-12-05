@@ -1,15 +1,15 @@
-import React, { useState, useEffect, useRef } from "react";
 import clsx from "clsx";
-import { ToolButton } from "./ToolButton";
+import React, { useEffect, useRef, useState } from "react";
+import { EVENT_DIALOG, EVENT_SHARE, trackEvent } from "../analytics";
+import { copyTextToSystemClipboard } from "../clipboard";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
-import { users, clipboard, start, stop } from "./icons";
-
-import "./RoomDialog.scss";
-import { copyTextToSystemClipboard } from "../clipboard";
-import { Dialog } from "./Dialog";
-import { AppState } from "../types";
 import { KEYS } from "../keys";
+import { AppState } from "../types";
+import { Dialog } from "./Dialog";
+import { clipboard, start, stop, users } from "./icons";
+import "./RoomDialog.scss";
+import { ToolButton } from "./ToolButton";
 
 const RoomModal = ({
   activeRoomLink,
@@ -33,6 +33,7 @@ const RoomModal = ({
   const copyRoomLink = async () => {
     try {
       await copyTextToSystemClipboard(activeRoomLink);
+      trackEvent(EVENT_SHARE, "copy link");
     } catch (error) {
       setErrorMessage(error.message);
     }
@@ -95,6 +96,7 @@ const RoomModal = ({
               value={username || ""}
               className="RoomDialog-username TextInput"
               onChange={(event) => onUsernameChange(event.target.value)}
+              onBlur={() => trackEvent(EVENT_SHARE, "name")}
               onKeyPress={(event) =>
                 event.key === KEYS.ENTER && onPressingEnter()
               }
@@ -161,7 +163,10 @@ export const RoomDialog = ({
         className={clsx("RoomDialog-modalButton", {
           "is-collaborating": isCollaborating,
         })}
-        onClick={() => setModalIsShown(true)}
+        onClick={() => {
+          trackEvent(EVENT_DIALOG, "collaboration");
+          setModalIsShown(true);
+        }}
         icon={users}
         type="button"
         title={t("buttons.roomDialog")}

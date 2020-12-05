@@ -181,6 +181,13 @@ import {
   isSavedToFirebase,
 } from "../data/firebase";
 import { getNewZoom } from "../scene/zoom";
+import {
+  EVENT_DIALOG,
+  EVENT_LIBRARY,
+  EVENT_SHAPE,
+  EVENT_SHARE,
+  trackEvent,
+} from "../analytics";
 
 /**
  * @param func handler taking at most single parameter (event).
@@ -547,6 +554,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         )
       ) {
         await Library.importLibrary(blob);
+        trackEvent(EVENT_LIBRARY, "import");
         this.setState({
           isLibraryOpen: true,
         });
@@ -656,8 +664,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       // when joining a room we don't want user's local scene data to be merged
       // into the remote scene
       this.resetScene();
-
       this.initializeSocketClient({ showLoadingState: true });
+      trackEvent(EVENT_SHARE, "session join");
     } else if (scene) {
       if (scene.appState) {
         scene.appState = {
@@ -1261,21 +1269,26 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.scene.replaceAllElements(this.scene.getElements());
 
     await this.initializeSocketClient({ showLoadingState: false });
+    trackEvent(EVENT_SHARE, "session start");
   };
 
   closePortal = () => {
     this.saveCollabRoomToFirebase();
     window.history.pushState({}, "Excalidraw", window.location.origin);
     this.destroySocketClient();
+    trackEvent(EVENT_SHARE, "session end");
   };
 
   toggleLock = () => {
-    this.setState((prevState) => ({
-      elementLocked: !prevState.elementLocked,
-      elementType: prevState.elementLocked
-        ? "selection"
-        : prevState.elementType,
-    }));
+    this.setState((prevState) => {
+      trackEvent(EVENT_SHAPE, "lock", !prevState.elementLocked ? "on" : "off");
+      return {
+        elementLocked: !prevState.elementLocked,
+        elementType: prevState.elementLocked
+          ? "selection"
+          : prevState.elementType,
+      };
+    });
   };
 
   toggleZenMode = () => {
@@ -1571,6 +1584,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     if (event.code === CODES.NINE) {
+      if (!this.state.isLibraryOpen) {
+        trackEvent(EVENT_DIALOG, "library");
+      }
       this.setState({ isLibraryOpen: !this.state.isLibraryOpen });
     }
 
@@ -1655,6 +1671,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     ) {
       const shape = findShapeByKey(event.key);
       if (shape) {
+        trackEvent(EVENT_SHAPE, shape, "shortcut");
         this.selectShapeTool(shape);
       } else if (event.key === KEYS.Q) {
         this.toggleLock();
@@ -2024,6 +2041,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     resetCursor();
 
     if (!event[KEYS.CTRL_OR_CMD]) {
+      trackEvent(EVENT_SHAPE, "text", "double-click");
       this.startTextEditing({
         sceneX,
         sceneY,

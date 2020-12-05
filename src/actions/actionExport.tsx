@@ -1,17 +1,19 @@
 import React from "react";
-import { ProjectName } from "../components/ProjectName";
-import { saveAsJSON, loadFromJSON } from "../data";
+import { EVENT_CHANGE, EVENT_IO, trackEvent } from "../analytics";
 import { load, save, saveAs } from "../components/icons";
+import { ProjectName } from "../components/ProjectName";
 import { ToolButton } from "../components/ToolButton";
+import { loadFromJSON, saveAsJSON } from "../data";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
-import { register } from "./register";
 import { KEYS } from "../keys";
 import { muteFSAbortError } from "../utils";
+import { register } from "./register";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
   perform: (_elements, appState, value) => {
+    trackEvent(EVENT_CHANGE, "title");
     return { appState: { ...appState, name: value }, commitToHistory: false };
   },
   PanelComponent: ({ appState, updateData }) => (
@@ -88,6 +90,7 @@ export const actionSaveScene = register({
   perform: async (elements, appState, value) => {
     try {
       const { fileHandle } = await saveAsJSON(elements, appState);
+      trackEvent(EVENT_IO, "save");
       return { commitToHistory: false, appState: { ...appState, fileHandle } };
     } catch (error) {
       if (error?.name !== "AbortError") {
@@ -118,6 +121,7 @@ export const actionSaveAsScene = register({
         ...appState,
         fileHandle: null,
       });
+      trackEvent(EVENT_IO, "save as");
       return { commitToHistory: false, appState: { ...appState, fileHandle } };
     } catch (error) {
       if (error?.name !== "AbortError") {
@@ -149,16 +153,14 @@ export const actionLoadScene = register({
     elements,
     appState,
     { elements: loadedElements, appState: loadedAppState, error },
-  ) => {
-    return {
-      elements: loadedElements,
-      appState: {
-        ...loadedAppState,
-        errorMessage: error,
-      },
-      commitToHistory: true,
-    };
-  },
+  ) => ({
+    elements: loadedElements,
+    appState: {
+      ...loadedAppState,
+      errorMessage: error,
+    },
+    commitToHistory: true,
+  }),
   PanelComponent: ({ updateData, appState }) => (
     <ToolButton
       type="button"

@@ -4,6 +4,7 @@ import { isDarwin } from "../keys";
 import { Dialog } from "./Dialog";
 import { getShortcutKey } from "../utils";
 import "./ShortcutsDialog.scss";
+import { EVENT_EXIT, trackEvent } from "../analytics";
 
 const Columns = (props: { children: React.ReactNode }) => (
   <div
@@ -91,6 +92,9 @@ const Footer = () => (
       href="https://blog.excalidraw.com"
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => {
+        trackEvent(EVENT_EXIT, "blog");
+      }}
     >
       {t("shortcutsDialog.blog")}
     </a>
@@ -98,6 +102,9 @@ const Footer = () => (
       href="https://howto.excalidraw.com"
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => {
+        trackEvent(EVENT_EXIT, "guides");
+      }}
     >
       {t("shortcutsDialog.howto")}
     </a>
@@ -105,6 +112,9 @@ const Footer = () => (
       href="https://github.com/excalidraw/excalidraw/issues"
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => {
+        trackEvent(EVENT_EXIT, "issues");
+      }}
     >
       {t("shortcutsDialog.github")}
     </a>

@@ -18,6 +18,7 @@ import { LockIcon } from "./LockIcon";
 import { LoadingMessage } from "./LoadingMessage";
 import { UserList } from "./UserList";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
+import { EVENT_ACTION, trackEvent } from "../analytics";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -163,6 +164,7 @@ export const MobileMenu = ({
             <button
               className="scroll-back-to-content"
               onClick={() => {
+                trackEvent(EVENT_ACTION, "scroll to content");
                 setAppState({
                   ...calculateScrollCenter(elements, appState, canvas),
                 });

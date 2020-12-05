@@ -7,6 +7,7 @@ import { register } from "./register";
 import { allowFullScreen, exitFullScreen, isFullScreen } from "../utils";
 import { CODES, KEYS } from "../keys";
 import { HelpIcon } from "../components/HelpIcon";
+import { EVENT_DIALOG, trackEvent } from "../analytics";
 
 export const actionToggleCanvasMenu = register({
   name: "toggleCanvasMenu",
@@ -71,6 +72,7 @@ export const actionFullScreen = register({
 export const actionShortcuts = register({
   name: "toggleShortcuts",
   perform: (_elements, appState) => {
+    trackEvent(EVENT_DIALOG, "shortcuts");
     return {
       appState: {
         ...appState,

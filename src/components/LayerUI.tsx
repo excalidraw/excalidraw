@@ -45,6 +45,12 @@ import { muteFSAbortError } from "../utils";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 import clsx from "clsx";
 import { Library } from "../data/library";
+import {
+  EVENT_ACTION,
+  EVENT_EXIT,
+  EVENT_LIBRARY,
+  trackEvent,
+} from "../analytics";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -251,6 +257,7 @@ const LibraryMenu = ({
     const items = await Library.loadLibrary();
     const nextItems = items.filter((_, index) => index !== indexToRemove);
     Library.saveLibrary(nextItems);
+    trackEvent(EVENT_LIBRARY, "remove");
     setLibraryItems(nextItems);
   }, []);
 
@@ -259,6 +266,7 @@ const LibraryMenu = ({
       const items = await Library.loadLibrary();
       const nextItems = [...items, elements];
       onAddToLibrary();
+      trackEvent(EVENT_LIBRARY, "add");
       Library.saveLibrary(nextItems);
       setLibraryItems(nextItems);
     },
@@ -310,6 +318,9 @@ const LayerUI = ({
       href="https://blog.excalidraw.com/end-to-end-encryption/"
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => {
+        trackEvent(EVENT_EXIT, "e2ee shield");
+      }}
     >
       <span className="tooltip-text" dir="auto">
         {t("encrypted.tooltip")}
@@ -571,6 +582,7 @@ const LayerUI = ({
         <button
           className="scroll-back-to-content"
           onClick={() => {
+            trackEvent(EVENT_ACTION, "scroll to content");
             setAppState({
               ...calculateScrollCenter(elements, appState, canvas),
             });

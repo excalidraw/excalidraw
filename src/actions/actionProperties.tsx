@@ -45,6 +45,8 @@ import {
   DotDecoratorIcon,
   BarDecoratorIcon,
 } from "../components/icons";
+import { EVENT_CHANGE, trackEvent } from "../analytics";
+import colors from "../colors";
 
 const changeProperty = (
   elements: readonly ExcalidrawElement[],
@@ -86,6 +88,15 @@ const getFormValue = function <T>(
 export const actionChangeStrokeColor = register({
   name: "changeStrokeColor",
   perform: (elements, appState, value) => {
+    if (value !== appState.currentItemStrokeColor) {
+      trackEvent(
+        EVENT_CHANGE,
+        "stroke color",
+        colors.elementStroke.includes(value)
+          ? `${value} (picker ${colors.elementStroke.indexOf(value)})`
+          : value,
+      );
+    }
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -117,6 +128,16 @@ export const actionChangeStrokeColor = register({
 export const actionChangeBackgroundColor = register({
   name: "changeBackgroundColor",
   perform: (elements, appState, value) => {
+    if (value !== appState.currentItemBackgroundColor) {
+      trackEvent(
+        EVENT_CHANGE,
+        "background color",
+        colors.elementBackground.includes(value)
+          ? `${value} (picker ${colors.elementBackground.indexOf(value)})`
+          : value,
+      );
+    }
+
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -148,6 +169,7 @@ export const actionChangeBackgroundColor = register({
 export const actionChangeFillStyle = register({
   name: "changeFillStyle",
   perform: (elements, appState, value) => {
+    trackEvent(EVENT_CHANGE, "fill", value);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -197,6 +219,7 @@ export const actionChangeFillStyle = register({
 export const actionChangeStrokeWidth = register({
   name: "changeStrokeWidth",
   perform: (elements, appState, value) => {
+    trackEvent(EVENT_CHANGE, "stroke", "width", value);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -259,6 +282,7 @@ export const actionChangeStrokeWidth = register({
 export const actionChangeSloppiness = register({
   name: "changeSloppiness",
   perform: (elements, appState, value) => {
+    trackEvent(EVENT_CHANGE, "stroke", "sloppiness", value);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -307,6 +331,7 @@ export const actionChangeSloppiness = register({
 export const actionChangeStrokeStyle = register({
   name: "changeStrokeStyle",
   perform: (elements, appState, value) => {
+    trackEvent(EVENT_CHANGE, "style", value);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -354,6 +379,7 @@ export const actionChangeStrokeStyle = register({
 export const actionChangeOpacity = register({
   name: "changeOpacity",
   perform: (elements, appState, value) => {
+    trackEvent(EVENT_CHANGE, "opacity", "value", value);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -550,6 +576,7 @@ export const actionChangeSharpness = register({
     const shouldUpdateForLinearElements = targetElements.length
       ? targetElements.every(isLinearElement)
       : isLinearElementType(appState.elementType);
+    trackEvent(EVENT_CHANGE, "edge", value);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {

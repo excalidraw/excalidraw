@@ -1,28 +1,25 @@
-import {
-  ExcalidrawElement,
-  NonDeletedExcalidrawElement,
-} from "../element/types";
-
-import { getDefaultAppState } from "../appState";
-
-import { AppState } from "../types";
-import { exportToCanvas, exportToSvg } from "../scene/export";
 import { fileSave } from "browser-nativefs";
-
-import { t } from "../i18n";
+import { EVENT_IO, trackEvent } from "../analytics";
+import { getDefaultAppState } from "../appState";
 import {
   copyCanvasToClipboardAsPng,
   copyTextToSystemClipboard,
 } from "../clipboard";
-import { serializeAsJSON } from "./json";
-
+import {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "../element/types";
+import { t } from "../i18n";
+import { exportToCanvas, exportToSvg } from "../scene/export";
 import { ExportType } from "../scene/types";
+import { AppState } from "../types";
+import { canvasToBlob } from "./blob";
+import { serializeAsJSON } from "./json";
 import { restore } from "./restore";
 import { ImportedDataState } from "./types";
-import { canvasToBlob } from "./blob";
 
 export { loadFromBlob } from "./blob";
-export { saveAsJSON, loadFromJSON } from "./json";
+export { loadFromJSON, saveAsJSON } from "./json";
 
 const BACKEND_GET = process.env.REACT_APP_BACKEND_V1_GET_URL;
 
@@ -217,6 +214,7 @@ export const exportToBackend = async (
       url.hash = `json=${json.id},${exportedKey.k!}`;
       const urlString = url.toString();
       window.prompt(`🔒${t("alerts.uploadedSecurly")}`, urlString);
+      trackEvent(EVENT_IO, "export", "backend");
     } else if (json.error_class === "RequestTooLargeError") {
       window.alert(t("alerts.couldNotCreateShareableLinkTooBig"));
     } else {
@@ -263,6 +261,7 @@ const importFromBackend = async (
       data = await response.json();
     }
 
+    trackEvent(EVENT_IO, "import");
     return {
       elements: data.elements || null,
       appState: data.appState || null,
@@ -319,8 +318,10 @@ export const exportCanvas = async (
         fileName: `${name}.svg`,
         extensions: [".svg"],
       });
+      trackEvent(EVENT_IO, "export", "svg");
       return;
     } else if (type === "clipboard-svg") {
+      trackEvent(EVENT_IO, "export", "clipboard-svg");
       copyTextToSystemClipboard(tempSvg.outerHTML);
       return;
     }
@@ -352,9 +353,11 @@ export const exportCanvas = async (
       fileName,
       extensions: [".png"],
     });
+    trackEvent(EVENT_IO, "export", "png");
   } else if (type === "clipboard") {
     try {
       await copyCanvasToClipboardAsPng(tempCanvas);
+      trackEvent(EVENT_IO, "export", "clipboard-png");
     } catch (error) {
       if (error.name === "CANVAS_POSSIBLY_TOO_BIG") {
         throw error;
