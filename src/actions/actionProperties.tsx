@@ -29,7 +29,6 @@ import { newElementWith } from "../element/mutateElement";
 import { DEFAULT_FONT_SIZE, DEFAULT_FONT_FAMILY } from "../constants";
 import { randomInteger } from "../random";
 import {
-  ArrowDecoratorIcon,
   FillHachureIcon,
   FillCrossHatchIcon,
   FillSolidIcon,
@@ -42,6 +41,9 @@ import {
   SloppinessArchitectIcon,
   SloppinessArtistIcon,
   SloppinessCartoonistIcon,
+  ArrowDecoratorIcon,
+  DotDecoratorIcon,
+  BarDecoratorIcon,
 } from "../components/icons";
 
 const changeProperty = (
@@ -657,6 +659,26 @@ export const actionChangeDecorator = register({
                 />
               ),
             },
+            {
+              value: "dot",
+              text: t("labels.dotDecorator"),
+              icon: (
+                <DotDecoratorIcon
+                  appearance={appState.appearance}
+                  flip={true}
+                />
+              ),
+            },
+            {
+              value: "bar",
+              text: t("labels.barDecorator"),
+              icon: (
+                <BarDecoratorIcon
+                  appearance={appState.appearance}
+                  flip={true}
+                />
+              ),
+            },
           ]}
           value={getFormValue(
             elements,
@@ -679,6 +701,16 @@ export const actionChangeDecorator = register({
               value: "arrow",
               text: t("labels.arrowDecorator"),
               icon: <ArrowDecoratorIcon appearance={appState.appearance} />,
+            },
+            {
+              value: "dot",
+              text: t("labels.dotDecorator"),
+              icon: <DotDecoratorIcon appearance={appState.appearance} />,
+            },
+            {
+              value: "bar",
+              text: t("labels.barDecorator"),
+              icon: <BarDecoratorIcon appearance={appState.appearance} />,
             },
           ]}
           value={getFormValue(
