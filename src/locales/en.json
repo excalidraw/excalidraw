@@ -31,8 +31,6 @@
     "decorators": "Decorators",
     "nullDecorator": "None",
     "arrowDecorator": "Arrow",
-    "dotDecorator": "Dot",
-    "barDecorator": "Bar",
     "fontSize": "Font size",
     "fontFamily": "Font family",
     "onlySelected": "Only selected",
