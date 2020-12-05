@@ -1,16 +1,17 @@
 @import "../css/_variables";
 
 .StatsForNerds {
-  background-color: $oc-gray-1;
+  background-color: var(--popup-secondary-background-color);
   position: fixed;
   top: 64px;
   right: 16px;
   padding: 8px;
   opacity: 0.9;
-  border: 1px solid $oc-gray-5;
-  border-radius: 4px;
+  border: 1px solid var(--button-gray-3);
+  border-radius: var(--border-radius-m);
   font-size: 12px;
   backdrop-filter: saturate(100%) blur(10px);
+  z-index: 1;
   h3 {
     margin: 0 24px 8px 0;
     text-align: center;
@@ -30,7 +31,7 @@
   table {
     width: 100%;
     th {
-      border-bottom: 1px solid $oc-gray-5;
+      border-bottom: 1px solid var(--button-gray-3);
     }
     tr {
       td:nth-child(2) {
