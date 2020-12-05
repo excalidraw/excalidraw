@@ -1,6 +1,6 @@
 import React from "react";
 import { render, waitFor } from "./test-utils";
-import App from "../components/App";
+import ExcalidrawApp from "../excalidraw-app";
 import { API } from "./helpers/api";
 import { MIME_TYPES } from "../constants";
 import { LibraryItem } from "../types";
@@ -8,9 +8,9 @@ import { LibraryItem } from "../types";
 const { h } = window;
 
 describe("library", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     h.library.resetLibrary();
-    render(<App />);
+    await render(<ExcalidrawApp />);
   });
 
   it("import library via drag&drop", async () => {

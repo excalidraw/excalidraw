@@ -11,11 +11,11 @@ import {
 } from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
-import { SocketUpdateDataSource } from "./data";
 import { LinearElementEditor } from "./element/linearElementEditor";
 import { SuggestedBinding } from "./element/binding";
 import { ImportedDataState } from "./data/types";
 import { ExcalidrawImperativeAPI } from "./components/App";
+import type { ResolvablePromise } from "./utils";
 
 export type FlooredNumber = number & { _brand: "FlooredNumber" };
 export type Point = Readonly<RoughPoint>;
@@ -69,8 +69,6 @@ export type AppState = {
   cursorButton: "up" | "down";
   scrolledOutside: boolean;
   name: string;
-  username: string;
-  isCollaborating: boolean;
   isResizing: boolean;
   isRotating: boolean;
   zoom: Zoom;
@@ -78,7 +76,6 @@ export type AppState = {
   lastPointerDownWith: PointerType;
   selectedElementIds: { [id: string]: boolean };
   previousSelectedElementIds: { [id: string]: boolean };
-  collaborators: Map<string, Collaborator>;
   shouldCacheIgnoreZoom: boolean;
   showShortcutsDialog: boolean;
   zenModeEnabled: boolean;
@@ -97,6 +94,7 @@ export type AppState = {
 
   isLibraryOpen: boolean;
   fileHandle: import("browser-nativefs").FileSystemHandle | null;
+  collaborators: Map<string, Collaborator>;
 };
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
@@ -126,16 +124,22 @@ export declare class GestureEvent extends UIEvent {
   readonly scale: number;
 }
 
-export type SocketUpdateData = SocketUpdateDataSource[keyof SocketUpdateDataSource] & {
-  _brand: "socketUpdateData";
-};
-
 export type LibraryItem = readonly NonDeleted<ExcalidrawElement>[];
 export type LibraryItems = readonly LibraryItem[];
 
+export type ExcalidrawAPIRefValue =
+  | (ExcalidrawImperativeAPI & {
+      readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
+      ready: true;
+    })
+  | {
+      readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
+      ready: false;
+    };
+
 export interface ExcalidrawProps {
-  width: number;
-  height: number;
+  width?: number;
+  height?: number;
   /** if not supplied, calculated by Excalidraw */
   offsetLeft?: number;
   /** if not supplied, calculated by Excalidraw */
@@ -144,10 +148,23 @@ export interface ExcalidrawProps {
     elements: readonly ExcalidrawElement[],
     appState: AppState,
   ) => void;
-  initialData?: ImportedDataState;
+  initialData?: ImportedDataState | null | Promise<ImportedDataState | null>;
   user?: {
     name?: string | null;
   };
-  onUsernameChange?: (username: string) => void;
-  forwardedRef: ForwardRef<ExcalidrawImperativeAPI>;
+  excalidrawRef?: ForwardRef<ExcalidrawAPIRefValue>;
+  onCollabButtonClick?: () => void;
+  isCollaborating?: boolean;
+  onPointerUpdate?: (payload: {
+    pointer: { x: number; y: number };
+    button: "down" | "up";
+    pointersMap: Gesture["pointers"];
+  }) => void;
 }
+
+export type SceneData = {
+  elements?: ImportedDataState["elements"];
+  appState?: ImportedDataState["appState"];
+  collaborators?: Map<string, Collaborator>;
+  commitToHistory?: boolean;
+};

@@ -1,8 +1,9 @@
-import { createIV, getImportedKey } from "./index";
-import { ExcalidrawElement } from "../element/types";
-import { getSceneVersion } from "../element";
-import Portal from "../components/Portal";
-import { restoreElements } from "./restore";
+import { getImportedKey } from "../data";
+import { createIV } from "./index";
+import { ExcalidrawElement } from "../../element/types";
+import { getSceneVersion } from "../../element";
+import Portal from "../collab/Portal";
+import { restoreElements } from "../../data/restore";
 
 let firebasePromise: Promise<
   typeof import("firebase/app").default
@@ -26,8 +27,7 @@ const getFirebase = async (): Promise<
   if (!firebasePromise) {
     firebasePromise = loadFirebase();
   }
-  const firebase = await firebasePromise!;
-  return firebase;
+  return await firebasePromise!;
 };
 
 interface FirebaseStoredScene {
