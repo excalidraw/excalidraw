@@ -93,7 +93,7 @@ export const StatsForNerds = (props: {
             {selectedElements.length > 1 && (
               <>
                 <tr>
-                  <th colSpan={2}>{t("stats.selection")}</th>
+                  <th colSpan={2}>{t("stats.selected")}</th>
                 </tr>
                 <tr>
                   <td>{t("stats.elements")}</td>
