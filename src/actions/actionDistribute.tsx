@@ -1,5 +1,5 @@
 import React from "react";
-import { KEYS } from "../keys";
+import { CODES } from "../keys";
 import { t } from "../i18n";
 import { register } from "./register";
 import {
@@ -13,6 +13,7 @@ import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 import { distributeElements, Distribution } from "../disitrubte";
 import { getShortcutKey } from "../utils";
+import { EVENT_ALIGN, trackEvent } from "../analytics";
 
 const enableActionGroup = (
   elements: readonly ExcalidrawElement[],
@@ -39,6 +40,7 @@ const distributeSelectedElements = (
 export const distributeHorizontally = register({
   name: "distributeHorizontally",
   perform: (elements, appState) => {
+    trackEvent(EVENT_ALIGN, "distribute", "horizontally");
     return {
       appState,
       elements: distributeSelectedElements(elements, appState, {
@@ -48,9 +50,7 @@ export const distributeHorizontally = register({
       commitToHistory: true,
     };
   },
-  keyTest: (event) => {
-    return event.altKey && event.keyCode === KEYS.H_KEY_CODE;
-  },
+  keyTest: (event) => event.altKey && event.code === CODES.H,
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
       hidden={!enableActionGroup(elements, appState)}
@@ -69,6 +69,7 @@ export const distributeHorizontally = register({
 export const distributeVertically = register({
   name: "distributeVertically",
   perform: (elements, appState) => {
+    trackEvent(EVENT_ALIGN, "distribute", "vertically");
     return {
       appState,
       elements: distributeSelectedElements(elements, appState, {
@@ -78,9 +79,7 @@ export const distributeVertically = register({
       commitToHistory: true,
     };
   },
-  keyTest: (event) => {
-    return event.altKey && event.keyCode === KEYS.V_KEY_CODE;
-  },
+  keyTest: (event) => event.altKey && event.code === CODES.V,
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
       hidden={!enableActionGroup(elements, appState)}

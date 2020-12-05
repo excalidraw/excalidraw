@@ -3,6 +3,7 @@ import React, { useState, useLayoutEffect, useEffect, useRef } from "react";
 import Excalidraw from "../packages/excalidraw/index";
 
 import {
+  getTotalStorageSize,
   importFromLocalStorage,
   saveToLocalStorage,
   STORAGE_KEYS,
@@ -21,6 +22,7 @@ import { debounce, ResolvablePromise, resolvablePromise } from "../utils";
 import { AppState, ExcalidrawAPIRefValue } from "../types";
 import { ExcalidrawElement } from "../element/types";
 import { SAVE_TO_LOCAL_STORAGE_TIMEOUT } from "./app_constants";
+import { EVENT_LOAD, EVENT_SHARE, trackEvent } from "../analytics";
 
 const excalidrawRef: React.MutableRefObject<ExcalidrawAPIRefValue> = {
   current: {
@@ -136,6 +138,7 @@ const initializeScene = async (opts: {
     // into the remote scene
     opts.resetScene();
     const scenePromise = opts.initializeSocketClient();
+    trackEvent(EVENT_SHARE, "session join");
 
     try {
       const [, roomID, roomKey] = getCollaborationLinkData(
@@ -200,6 +203,12 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
   const { collab } = props;
 
   useEffect(() => {
+    const storageSize = getTotalStorageSize();
+    if (storageSize) {
+      trackEvent(EVENT_LOAD, "storage", "size", storageSize);
+    } else {
+      trackEvent(EVENT_LOAD, "first time");
+    }
     excalidrawRef.current!.readyPromise.then((excalidrawApi) => {
       initializeScene({
         resetScene: excalidrawApi.resetScene,

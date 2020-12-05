@@ -6,6 +6,7 @@ import useIsMobile from "../is-mobile";
 import { users } from "./icons";
 
 import "./CollabButton.scss";
+import { EVENT_DIALOG, trackEvent } from "../analytics";
 
 const CollabButton = ({
   isCollaborating,
@@ -22,7 +23,10 @@ const CollabButton = ({
         className={clsx("CollabButton", {
           "is-collaborating": isCollaborating,
         })}
-        onClick={onClick}
+        onClick={() => {
+          trackEvent(EVENT_DIALOG, "collaboration");
+          onClick();
+        }}
         icon={users}
         type="button"
         title={t("buttons.roomDialog")}

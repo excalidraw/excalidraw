@@ -1,10 +1,11 @@
-import { Zoom } from "./types";
+import colors from "./colors";
 import {
   CURSOR_TYPE,
   FONT_FAMILY,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 import { FontFamily, FontString } from "./element/types";
+import { Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
 
 export const SVG_NS = "http://www.w3.org/2000/svg";
@@ -294,6 +295,16 @@ export const findLastIndex = <T>(
     }
   }
   return -1;
+};
+
+export const isTransparent = (color: string) => {
+  const isRGBTransparent = color.length === 5 && color.substr(4, 1) === "0";
+  const isRRGGBBTransparent = color.length === 9 && color.substr(7, 2) === "00";
+  return (
+    isRGBTransparent ||
+    isRRGGBBTransparent ||
+    color === colors.elementBackground[0]
+  );
 };
 
 export const noop = () => ({});

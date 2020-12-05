@@ -3,6 +3,7 @@ import { ExcalidrawElement } from "../../element/types";
 import { AppState } from "../../types";
 import { ImportedDataState } from "../../data/types";
 import { restore } from "../../data/restore";
+import { EVENT_ACTION, trackEvent } from "../../analytics";
 
 const byteToHex = (byte: number): string => `0${byte.toString(16)}`.slice(-2);
 
@@ -103,7 +104,7 @@ export const decryptAESGEM = async (
     const decrypted = await window.crypto.subtle.decrypt(
       {
         name: "AES-GCM",
-        iv: iv,
+        iv,
       },
       importedKey,
       data,
@@ -174,7 +175,7 @@ const importFromBackend = async (
       const decrypted = await window.crypto.subtle.decrypt(
         {
           name: "AES-GCM",
-          iv: iv,
+          iv,
         },
         key,
         buffer,
@@ -189,6 +190,7 @@ const importFromBackend = async (
       data = await response.json();
     }
 
+    trackEvent(EVENT_ACTION, "import");
     return {
       elements: data.elements || null,
       appState: data.appState || null,

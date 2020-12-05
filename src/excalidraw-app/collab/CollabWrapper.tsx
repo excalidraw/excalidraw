@@ -34,6 +34,7 @@ import {
   SCENE,
   SYNC_FULL_SCENE_INTERVAL_MS,
 } from "../app_constants";
+import { EVENT_SHARE, trackEvent } from "../../analytics";
 
 interface CollabState {
   isCollaborating: boolean;
@@ -130,13 +131,13 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       event.returnValue = "";
     }
 
-    if (this.state.isCollaborating || this.portal.roomID) {
+    if (this.state.isCollaborating || this.portal.roomId) {
       try {
         localStorage?.setItem(
           STORAGE_KEYS.LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
           JSON.stringify({
             timestamp: Date.now(),
-            room: this.portal.roomID,
+            room: this.portal.roomId,
           }),
         );
       } catch {}
@@ -171,6 +172,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       elements,
       commitToHistory: true,
     });
+    trackEvent(EVENT_SHARE, "session start");
     return this.initializeSocketClient();
   };
 
@@ -178,6 +180,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     this.saveCollabRoomToFirebase();
     window.history.pushState({}, "Excalidraw", window.location.origin);
     this.destroySocketClient();
+    trackEvent(EVENT_SHARE, "session end");
   };
 
   private destroySocketClient = () => {
@@ -330,7 +333,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     }
 
     this.excalidrawRef.current!.updateScene({
-      elements: elements,
+      elements,
       commitToHistory: !!init,
     });
 

@@ -12,10 +12,11 @@ import {
 import { t } from "../i18n";
 import { SHAPES } from "../shapes";
 import { ToolButton } from "./ToolButton";
-import { capitalizeString, setCursorForShape } from "../utils";
+import { capitalizeString, isTransparent, setCursorForShape } from "../utils";
 import Stack from "./Stack";
 import useIsMobile from "../is-mobile";
 import { getNonDeletedElements } from "../element";
+import { trackEvent, EVENT_SHAPE, EVENT_DIALOG } from "../analytics";
 
 export const SelectedShapeActions = ({
   appState,
@@ -34,20 +35,22 @@ export const SelectedShapeActions = ({
   );
   const isEditing = Boolean(appState.editingElement);
   const isMobile = useIsMobile();
-
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
+  const showFillIcons =
+    hasBackground(elementType) ||
+    targetElements.some(
+      (element) =>
+        hasBackground(element.type) && !isTransparent(element.backgroundColor),
+    );
+  const showChangeBackgroundIcons =
+    hasBackground(elementType) ||
+    targetElements.some((element) => hasBackground(element.type));
   return (
     <div className="panelColumn">
       {renderAction("changeStrokeColor")}
-      {(hasBackground(elementType) ||
-        targetElements.some((element) => hasBackground(element.type))) && (
-        <>
-          {renderAction("changeBackgroundColor")}
-
-          {renderAction("changeFillStyle")}
-        </>
-      )}
+      {showChangeBackgroundIcons && renderAction("changeBackgroundColor")}
+      {showFillIcons && renderAction("changeFillStyle")}
 
       {(hasStroke(elementType) ||
         targetElements.some((element) => hasStroke(element.type))) && (
@@ -154,8 +157,7 @@ export const ShapesSwitcher = ({
     {SHAPES.map(({ value, icon, key }, index) => {
       const label = t(`toolBar.${value}`);
       const letter = typeof key === "string" ? key : key[0];
-      const letterShortcut = /[a-z]/.test(letter) ? letter : `Shift+${letter}`;
-      const shortcut = `${capitalizeString(letterShortcut)} ${t(
+      const shortcut = `${capitalizeString(letter)} ${t(
         "shortcutsDialog.or",
       )} ${index + 1}`;
       return (
@@ -169,9 +171,10 @@ export const ShapesSwitcher = ({
           title={`${capitalizeString(label)} — ${shortcut}`}
           keyBindingLabel={`${index + 1}`}
           aria-label={capitalizeString(label)}
-          aria-keyshortcuts={`${key} ${index + 1}`}
+          aria-keyshortcuts={shortcut}
           data-testid={value}
           onChange={() => {
+            trackEvent(EVENT_SHAPE, value, "toolbar");
             setAppState({
               elementType: value,
               multiElement: null,
@@ -184,7 +187,7 @@ export const ShapesSwitcher = ({
       );
     })}
     <ToolButton
-      className="Shape"
+      className="Shape ToolIcon_type_button__library"
       type="button"
       icon={LIBRARY_ICON}
       name="editor-library"
@@ -193,6 +196,9 @@ export const ShapesSwitcher = ({
       title={`${capitalizeString(t("toolBar.library"))} — 9`}
       aria-label={capitalizeString(t("toolBar.library"))}
       onClick={() => {
+        if (!isLibraryOpen) {
+          trackEvent(EVENT_DIALOG, "library");
+        }
         setAppState({ isLibraryOpen: !isLibraryOpen });
       }}
     />

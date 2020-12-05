@@ -83,7 +83,7 @@ export const isSavedToFirebase = (
   portal: Portal,
   elements: readonly ExcalidrawElement[],
 ): boolean => {
-  if (portal.socket && portal.roomID && portal.roomKey) {
+  if (portal.socket && portal.roomId && portal.roomKey) {
     const sceneVersion = getSceneVersion(elements);
     return firebaseSceneVersionCache.get(portal.socket) === sceneVersion;
   }
@@ -96,11 +96,11 @@ export const saveToFirebase = async (
   portal: Portal,
   elements: readonly ExcalidrawElement[],
 ) => {
-  const { roomID, roomKey, socket } = portal;
+  const { roomId, roomKey, socket } = portal;
   if (
     // if no room exists, consider the room saved because there's nothing we can
     // do at this point
-    !roomID ||
+    !roomId ||
     !roomKey ||
     !socket ||
     isSavedToFirebase(portal, elements)
@@ -121,7 +121,7 @@ export const saveToFirebase = async (
   } as FirebaseStoredScene;
 
   const db = firebase.firestore();
-  const docRef = db.collection("scenes").doc(roomID);
+  const docRef = db.collection("scenes").doc(roomId);
   const didUpdate = await db.runTransaction(async (transaction) => {
     const doc = await transaction.get(docRef);
     if (!doc.exists) {
@@ -146,13 +146,13 @@ export const saveToFirebase = async (
 };
 
 export const loadFromFirebase = async (
-  roomID: string,
+  roomId: string,
   roomKey: string,
 ): Promise<readonly ExcalidrawElement[] | null> => {
   const firebase = await getFirebase();
   const db = firebase.firestore();
 
-  const docRef = db.collection("scenes").doc(roomID);
+  const docRef = db.collection("scenes").doc(roomId);
   const doc = await docRef.get();
   if (!doc.exists) {
     return null;

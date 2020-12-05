@@ -98,7 +98,7 @@ export const actionDeleteSelected = register({
       LinearElementEditor.movePoint(element, activePointIndex, "delete");
 
       return {
-        elements: elements,
+        elements,
         appState: {
           ...appState,
           editingLinearElement: {

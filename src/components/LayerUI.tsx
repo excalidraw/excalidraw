@@ -45,6 +45,12 @@ import { muteFSAbortError } from "../utils";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 import clsx from "clsx";
 import { Library } from "../data/library";
+import {
+  EVENT_ACTION,
+  EVENT_EXIT,
+  EVENT_LIBRARY,
+  trackEvent,
+} from "../analytics";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -99,7 +105,6 @@ const LibraryMenuItems = ({
 }: {
   library: LibraryItems;
   pendingElements: LibraryItem;
-  onClickOutside: (event: MouseEvent) => void;
   onRemoveFromLibrary: (index: number) => void;
   onInsertShape: (elements: LibraryItem) => void;
   onAddToLibrary: (elements: LibraryItem) => void;
@@ -210,7 +215,13 @@ const LibraryMenu = ({
   setAppState: React.Component<any, AppState>["setState"];
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
-  useOnClickOutside(ref, onClickOutside);
+  useOnClickOutside(ref, (event) => {
+    // If click on the library icon, do nothing.
+    if ((event.target as Element).closest(".ToolIcon_type_button__library")) {
+      return;
+    }
+    onClickOutside(event);
+  });
 
   const [libraryItems, setLibraryItems] = useState<LibraryItems>([]);
 
@@ -245,6 +256,7 @@ const LibraryMenu = ({
     const items = await Library.loadLibrary();
     const nextItems = items.filter((_, index) => index !== indexToRemove);
     Library.saveLibrary(nextItems);
+    trackEvent(EVENT_LIBRARY, "remove");
     setLibraryItems(nextItems);
   }, []);
 
@@ -253,6 +265,7 @@ const LibraryMenu = ({
       const items = await Library.loadLibrary();
       const nextItems = [...items, elements];
       onAddToLibrary();
+      trackEvent(EVENT_LIBRARY, "add");
       Library.saveLibrary(nextItems);
       setLibraryItems(nextItems);
     },
@@ -268,7 +281,6 @@ const LibraryMenu = ({
       ) : (
         <LibraryMenuItems
           library={libraryItems}
-          onClickOutside={onClickOutside}
           onRemoveFromLibrary={removeFromLibrary}
           onAddToLibrary={addToLibrary}
           onInsertShape={onInsertShape}
@@ -304,6 +316,9 @@ const LayerUI = ({
       href="https://blog.excalidraw.com/end-to-end-encryption/"
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => {
+        trackEvent(EVENT_EXIT, "e2ee shield");
+      }}
     >
       <span className="tooltip-text" dir="auto">
         {t("encrypted.tooltip")}
@@ -561,6 +576,7 @@ const LayerUI = ({
         <button
           className="scroll-back-to-content"
           onClick={() => {
+            trackEvent(EVENT_ACTION, "scroll to content");
             setAppState({
               ...calculateScrollCenter(elements, appState, canvas),
             });

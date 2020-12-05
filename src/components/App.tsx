@@ -82,6 +82,7 @@ import {
   getResizeCenterPointKey,
   getResizeWithSidesSameLengthKey,
   getRotateWithDiscreteAngleKey,
+  CODES,
 } from "../keys";
 
 import { findShapeByKey } from "../shapes";
@@ -167,6 +168,12 @@ import { renderSpreadsheet } from "../charts";
 import { isValidLibrary } from "../data/json";
 import { getNewZoom } from "../scene/zoom";
 import { restore } from "../data/restore";
+import {
+  EVENT_DIALOG,
+  EVENT_LIBRARY,
+  EVENT_SHAPE,
+  trackEvent,
+} from "../analytics";
 
 const { history } = createHistory();
 
@@ -294,7 +301,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           : excalidrawRef.current!.readyPromise;
       const api: ExcalidrawImperativeAPI = {
         ready: true,
-        readyPromise: readyPromise,
+        readyPromise,
         updateScene: this.updateScene,
         resetScene: this.resetScene,
         getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
@@ -489,6 +496,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         )
       ) {
         await Library.importLibrary(blob);
+        trackEvent(EVENT_LIBRARY, "import");
         this.setState({
           isLibraryOpen: true,
         });
@@ -821,7 +829,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         zoom: this.state.zoom,
         remotePointerViewportCoords: pointerViewportCoords,
         remotePointerButton: cursorButton,
-        remoteSelectedElementIds: remoteSelectedElementIds,
+        remoteSelectedElementIds,
         remotePointerUsernames: pointerUsernames,
         shouldCacheIgnoreZoom: this.state.shouldCacheIgnoreZoom,
       },
@@ -838,7 +846,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         ? false
         : !atLeastOneVisibleElement && elements.length > 0;
     if (this.state.scrolledOutside !== scrolledOutside) {
-      this.setState({ scrolledOutside: scrolledOutside });
+      this.setState({ scrolledOutside });
     }
 
     history.record(this.state, this.scene.getElementsIncludingDeleted());
@@ -1054,8 +1062,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     );
 
     const element = newTextElement({
-      x: x,
-      y: y,
+      x,
+      y,
       strokeColor: this.state.currentItemStrokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
@@ -1064,7 +1072,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
       strokeSharpness: this.state.currentItemStrokeSharpness,
-      text: text,
+      text,
       fontSize: this.state.currentItemFontSize,
       fontFamily: this.state.currentItemFontFamily,
       textAlign: this.state.currentItemTextAlign,
@@ -1096,12 +1104,15 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   toggleLock = () => {
-    this.setState((prevState) => ({
-      elementLocked: !prevState.elementLocked,
-      elementType: prevState.elementLocked
-        ? "selection"
-        : prevState.elementType,
-    }));
+    this.setState((prevState) => {
+      trackEvent(EVENT_SHAPE, "lock", !prevState.elementLocked ? "on" : "off");
+      return {
+        elementLocked: !prevState.elementLocked,
+        elementType: prevState.elementLocked
+          ? "selection"
+          : prevState.elementType,
+      };
+    });
   };
 
   toggleZenMode = () => {
@@ -1185,11 +1196,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
     }
 
-    // ensures we don't prevent devTools select-element feature
-    if (event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === "C") {
-      return;
-    }
-
     if (
       (isWritableElement(event.target) && event.key !== KEYS.ESCAPE) ||
       // case: using arrows to move between buttons
@@ -1204,22 +1210,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
     }
 
-    if (
-      !event[KEYS.CTRL_OR_CMD] &&
-      event.altKey &&
-      event.keyCode === KEYS.Z_KEY_CODE
-    ) {
+    if (!event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.Z) {
       this.toggleZenMode();
     }
 
-    if (event[KEYS.CTRL_OR_CMD] && event.keyCode === KEYS.GRID_KEY_CODE) {
+    if (event[KEYS.CTRL_OR_CMD] && event.code === CODES.QUOTE) {
       this.toggleGridMode();
     }
     if (event[KEYS.CTRL_OR_CMD]) {
       this.setState({ isBindingEnabled: false });
     }
 
-    if (event.code === "KeyC" && event.altKey && event.shiftKey) {
+    if (event.code === CODES.C && event.altKey && event.shiftKey) {
       this.copyToClipboardAsPng();
       event.preventDefault();
       return;
@@ -1229,7 +1231,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       return;
     }
 
-    if (event.code === "Digit9") {
+    if (event.code === CODES.NINE) {
+      if (!this.state.isLibraryOpen) {
+        trackEvent(EVENT_DIALOG, "library");
+      }
       this.setState({ isLibraryOpen: !this.state.isLibraryOpen });
     }
 
@@ -1314,8 +1319,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     ) {
       const shape = findShapeByKey(event.key);
       if (shape) {
+        trackEvent(EVENT_SHAPE, shape, "shortcut");
         this.selectShapeTool(shape);
-      } else if (event.key === "q") {
+      } else if (event.key === KEYS.Q) {
         this.toggleLock();
       }
     }
@@ -1386,12 +1392,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private onGestureChange = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
-    const gestureCenter = getCenter(gesture.pointers);
     this.setState(({ zoom }) => ({
       zoom: getNewZoom(
         getNormalizedZoom(gesture.initialScale! * event.scale),
         zoom,
-        gestureCenter,
+        { x: cursorX, y: cursorY },
       ),
     }));
   });
@@ -1684,6 +1689,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     resetCursor();
 
     if (!event[KEYS.CTRL_OR_CMD]) {
+      trackEvent(EVENT_SHAPE, "text", "double-click");
       this.startTextEditing({
         sceneX,
         sceneY,

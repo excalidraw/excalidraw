@@ -6,6 +6,7 @@ import { ToolButton } from "../../components/ToolButton";
 import { clipboard, start, stop } from "../../components/icons";
 
 import "./RoomDialog.scss";
+import { EVENT_SHARE, trackEvent } from "../../analytics";
 
 const RoomDialog = ({
   handleClose,
@@ -29,6 +30,7 @@ const RoomDialog = ({
   const copyRoomLink = async () => {
     try {
       await copyTextToSystemClipboard(activeRoomLink);
+      trackEvent(EVENT_SHARE, "copy link");
     } catch (error) {
       setErrorMessage(error.message);
     }
@@ -93,6 +95,7 @@ const RoomDialog = ({
                 value={username || ""}
                 className="RoomDialog-username TextInput"
                 onChange={(event) => onUsernameChange(event.target.value)}
+                onBlur={() => trackEvent(EVENT_SHARE, "name")}
                 onKeyPress={(event) => event.key === "Enter" && handleClose()}
               />
             </div>

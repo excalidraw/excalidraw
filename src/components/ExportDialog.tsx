@@ -1,23 +1,21 @@
-import "./ExportDialog.scss";
-
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
-
-import { ToolButton } from "./ToolButton";
-import { clipboard, exportFile, link } from "./icons";
-import { NonDeletedExcalidrawElement } from "../element/types";
-import { AppState } from "../types";
-import { exportToCanvas, getExportSize } from "../scene/export";
 import { ActionsManagerInterface } from "../actions/types";
-import Stack from "./Stack";
-import { t } from "../i18n";
-
+import { EVENT_DIALOG, trackEvent } from "../analytics";
 import { probablySupportsClipboardBlob } from "../clipboard";
-import { getSelectedElements, isSomeElementSelected } from "../scene";
-import useIsMobile from "../is-mobile";
-import { Dialog } from "./Dialog";
 import { canvasToBlob } from "../data/blob";
+import { NonDeletedExcalidrawElement } from "../element/types";
 import { CanvasError } from "../errors";
+import { t } from "../i18n";
+import useIsMobile from "../is-mobile";
+import { getSelectedElements, isSomeElementSelected } from "../scene";
+import { exportToCanvas, getExportSize } from "../scene/export";
+import { AppState } from "../types";
+import { Dialog } from "./Dialog";
+import "./ExportDialog.scss";
+import { clipboard, exportFile, link } from "./icons";
+import Stack from "./Stack";
+import { ToolButton } from "./ToolButton";
 
 const scales = [1, 2, 3];
 const defaultScale = scales.includes(devicePixelRatio) ? devicePixelRatio : 1;
@@ -250,7 +248,10 @@ export const ExportDialog = ({
   return (
     <>
       <ToolButton
-        onClick={() => setModalIsShown(true)}
+        onClick={() => {
+          trackEvent(EVENT_DIALOG, "export");
+          setModalIsShown(true);
+        }}
         icon={exportFile}
         type="button"
         aria-label={t("buttons.export")}

@@ -11,6 +11,7 @@ import {
   ExcalidrawRectangleElement,
 } from "../element/types";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
+import { KEYS } from "../keys";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
@@ -88,9 +89,9 @@ describe("move element", () => {
     renderScene.mockClear();
 
     // Move selected rectangle
-    Keyboard.keyDown("ArrowRight");
-    Keyboard.keyDown("ArrowDown");
-    Keyboard.keyDown("ArrowDown");
+    Keyboard.keyDown(KEYS.ARROW_RIGHT);
+    Keyboard.keyDown(KEYS.ARROW_DOWN);
+    Keyboard.keyDown(KEYS.ARROW_DOWN);
 
     // Check that the arrow size has been changed according to moving the rectangle
     expect(renderScene).toHaveBeenCalledTimes(3);

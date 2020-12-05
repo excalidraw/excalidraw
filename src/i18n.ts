@@ -1,4 +1,5 @@
 import LanguageDetector from "i18next-browser-languagedetector";
+import { EVENT_CHANGE, trackEvent } from "./analytics";
 
 import fallbackLanguageData from "./locales/en.json";
 import percentages from "./locales/percentages.json";
@@ -18,6 +19,7 @@ const allLanguages: Language[] = [
   { lng: "de-DE", label: "Deutsch" },
   { lng: "el-GR", label: "Ελληνικά" },
   { lng: "es-ES", label: "Español" },
+  { lng: "fa-IR", label: "فارسی", rtl: true },
   { lng: "fi-FI", label: "Suomi" },
   { lng: "fr-FR", label: "Français" },
   { lng: "he-IL", label: "עברית", rtl: true },
@@ -66,8 +68,8 @@ export const setLanguage = async (newLng: string | undefined) => {
   currentLanguageData = await import(
     /* webpackChunkName: "i18n-[request]" */ `./locales/${currentLanguage.lng}.json`
   );
-
   languageDetector.cacheUserLanguage(currentLanguage.lng);
+  trackEvent(EVENT_CHANGE, "language", currentLanguage.lng);
 };
 
 export const setLanguageFirstTime = async () => {
@@ -88,8 +90,8 @@ export const setLanguageFirstTime = async () => {
 export const getLanguage = () => currentLanguage;
 
 const findPartsForData = (data: any, parts: string[]) => {
-  for (var i = 0; i < parts.length; ++i) {
-    const part = parts[i];
+  for (let index = 0; index < parts.length; ++index) {
+    const part = parts[index];
     if (data[part] === undefined) {
       return undefined;
     }
@@ -111,7 +113,7 @@ export const t = (path: string, replacement?: { [key: string]: string }) => {
   }
 
   if (replacement) {
-    for (var key in replacement) {
+    for (const key in replacement) {
       translation = translation.replace(`{{${key}}}`, replacement[key]);
     }
   }
