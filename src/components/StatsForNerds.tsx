@@ -2,10 +2,7 @@ import "./StatsForNerds.scss";
 
 import React, { useEffect, useState } from "react";
 import { AppState } from "../types";
-import {
-  ExcalidrawElement,
-  NonDeletedExcalidrawElement,
-} from "../element/types";
+import { NonDeletedExcalidrawElement } from "../element/types";
 import { getCommonBoundingBox } from "../element/bounds";
 import { getSelectedElements } from "../scene";
 import {
@@ -41,9 +38,9 @@ export const StatsForNerds = (props: {
     });
   });
 
-  const boundingBox = getCommonBoundingBox(
-    props.elements as ExcalidrawElement[],
-  );
+  useEffect(() => () => getStorageSizes.cancel(), []);
+
+  const boundingBox = getCommonBoundingBox(props.elements);
 
   const selectedElements = getSelectedElements(props.elements, props.appState);
 

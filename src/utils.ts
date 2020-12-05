@@ -133,6 +133,9 @@ export const debounce = <T extends any[]>(
       fn(...lastArgs);
     }
   };
+  ret.cancel = () => {
+    clearTimeout(handle);
+  };
   return ret;
 };
 
