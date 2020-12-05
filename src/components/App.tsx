@@ -1136,6 +1136,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   toggleStatsForNerds = () => {
+    if (!this.state.showStatsForNerds) {
+      trackEvent(EVENT_DIALOG, "stats for nerds");
+    }
     this.setState({
       showStatsForNerds: !this.state.showStatsForNerds,
     });
@@ -3510,7 +3513,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             action: this.toggleGridMode,
           },
           {
-            label: t("labels.showStatsForNerds"),
+            label: t("labels.toggleStatsForNerds"),
             action: this.toggleStatsForNerds,
           },
         ],

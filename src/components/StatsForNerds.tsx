@@ -41,10 +41,9 @@ export const StatsForNerds = (props: {
   useEffect(() => () => getStorageSizes.cancel(), []);
 
   const boundingBox = getCommonBoundingBox(props.elements);
-
   const selectedElements = getSelectedElements(props.elements, props.appState);
-
   const selectedBoundingBox = getCommonBoundingBox(selectedElements);
+
   return (
     <div className="StatsForNerds">
       <div className={"close"} onClick={props.onClose}>

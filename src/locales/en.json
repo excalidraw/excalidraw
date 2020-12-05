@@ -71,7 +71,7 @@
     "ungroup": "Ungroup selection",
     "collaborators": "Collaborators",
     "toggleGridMode": "Toggle grid mode",
-    "showStatsForNerds": "Show stats for nerds",
+    "toggleStatsForNerds": "Toggle stats for nerds",
     "addToLibrary": "Add to library",
     "removeFromLibrary": "Remove from library",
     "libraryLoadingMessage": "Loading library...",
