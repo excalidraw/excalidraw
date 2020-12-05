@@ -1,0 +1,31 @@
+@import "../css/_variables";
+
+.StatsForNerds {
+  background-color: $oc-gray-1;
+  position: fixed;
+  top: 64px;
+  right: 16px;
+  padding: 8px;
+  opacity: 0.9;
+  border: 1px solid $oc-gray-5;
+  border-radius: 4px;
+  font-size: 12px;
+  box-shadow: 0 4px 4px $oc-gray-2;
+  h3 {
+    margin: 0 0 8px;
+    text-align: center;
+  }
+
+  table {
+    width: 100%;
+    th {
+      border-bottom: 1px solid $oc-gray-5;
+    }
+    tr {
+      td:nth-child(2) {
+        min-width: 48px;
+        text-align: right;
+      }
+    }
+  }
+}

@@ -1303,6 +1303,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     });
   };
 
+  toggleStatsForNerds = () => {
+    this.setState({
+      showStatsForNerds: !this.state.showStatsForNerds,
+    });
+  };
+
   setScrollToCenter = (remoteElements: readonly ExcalidrawElement[]) => {
     this.setState({
       ...calculateScrollCenter(
@@ -3846,6 +3852,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           {
             label: t("labels.toggleGridMode"),
             action: this.toggleGridMode,
+          },
+          {
+            label: t("labels.showStatsForNerds"),
+            action: this.toggleStatsForNerds,
           },
         ],
         top: clientY,

@@ -73,6 +73,7 @@ export const getDefaultAppState = (): Omit<
     height: window.innerHeight,
     isLibraryOpen: false,
     fileHandle: null,
+    showStatsForNerds: true,
   };
 };
 
@@ -150,6 +151,7 @@ const APP_STATE_STORAGE_CONF = (<
   offsetTop: { browser: false, export: false },
   offsetLeft: { browser: false, export: false },
   fileHandle: { browser: false, export: false },
+  showStatsForNerds: { browser: true, export: false },
 });
 
 const _clearAppStateForStorage = <ExportType extends "export" | "browser">(
