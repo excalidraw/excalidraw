@@ -62,7 +62,15 @@ export class StatsForNerds extends React.Component<StatsForNerdsProps> {
             <td>{nFormatter(getTotalStorageSize(), 1)}</td>
           </tr>
 
-          {selectedElements.length > 0 && (
+          {selectedElements.length === 1 && (
+            <>
+              <tr>
+                <th colSpan={2}>{"Element"}</th>
+              </tr>
+            </>
+          )}
+
+          {selectedElements.length > 1 && (
             <>
               <tr>
                 <th colSpan={2}>{"Selection"}</th>
@@ -71,6 +79,10 @@ export class StatsForNerds extends React.Component<StatsForNerdsProps> {
                 <td>{"Elements"}</td>
                 <td>{selectedElements.length}</td>
               </tr>
+            </>
+          )}
+          {selectedElements.length > 0 && (
+            <>
               <tr>
                 <td>{"x"}</td>
                 <td>
