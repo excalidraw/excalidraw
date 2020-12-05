@@ -72,6 +72,26 @@ export class StatsForNerds extends React.Component<StatsForNerdsProps> {
                 <td>{selectedElements.length}</td>
               </tr>
               <tr>
+                <td>{"x"}</td>
+                <td>
+                  {Math.round(
+                    selectedElements.length === 1
+                      ? selectedElements[0].x
+                      : selectedBoundingBox[0],
+                  )}
+                </td>
+              </tr>
+              <tr>
+                <td>{"y"}</td>
+                <td>
+                  {Math.round(
+                    selectedElements.length === 1
+                      ? selectedElements[0].y
+                      : selectedBoundingBox[1],
+                  )}
+                </td>
+              </tr>
+              <tr>
                 <td>{"Width"}</td>
                 <td>
                   {Math.round(
