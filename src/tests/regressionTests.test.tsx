@@ -716,10 +716,14 @@ describe("regression tests", () => {
     });
     const contextMenu = document.querySelector(".context-menu");
     const options = contextMenu?.querySelectorAll(".context-menu-option");
-    const expectedOptions = ["Select all", "Toggle grid mode"];
+    const expectedOptions = [
+      "Select all",
+      "Toggle grid mode",
+      "Show stats for nerds",
+    ];
 
     expect(contextMenu).not.toBeNull();
-    expect(options?.length).toBe(2);
+    expect(options?.length).toBe(3);
     expect(options?.item(0).textContent).toBe(expectedOptions[0]);
   });
 
