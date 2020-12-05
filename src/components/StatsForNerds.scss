@@ -10,7 +10,7 @@
   border: 1px solid $oc-gray-5;
   border-radius: 4px;
   font-size: 12px;
-  box-shadow: 0 4px 4px $oc-gray-2;
+  backdrop-filter: saturate(100%) blur(10px);
   h3 {
     margin: 0 0 8px;
     text-align: center;
