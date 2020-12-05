@@ -6,6 +6,7 @@ import {
 } from "./constants";
 import { FontFamily, FontString } from "./element/types";
 import { Zoom } from "./types";
+import { unstable_batchedUpdates } from "react-dom";
 
 export const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -128,7 +129,9 @@ export const debounce = <T extends any[]>(
   };
   ret.flush = () => {
     clearTimeout(handle);
-    fn(...lastArgs);
+    if (lastArgs) {
+      fn(...lastArgs);
+    }
   };
   return ret;
 };
@@ -303,3 +306,33 @@ export const isTransparent = (color: string) => {
     color === colors.elementBackground[0]
   );
 };
+
+export const noop = () => ({});
+
+export type ResolvablePromise<T> = Promise<T> & {
+  resolve: [T] extends [undefined] ? (value?: T) => void : (value: T) => void;
+  reject: (error: Error) => void;
+};
+export const resolvablePromise = <T>() => {
+  let resolve!: any;
+  let reject!: any;
+  const promise = new Promise((_resolve, _reject) => {
+    resolve = _resolve;
+    reject = _reject;
+  });
+  (promise as any).resolve = resolve;
+  (promise as any).reject = reject;
+  return promise as ResolvablePromise<T>;
+};
+
+/**
+ * @param func handler taking at most single parameter (event).
+ */
+export const withBatchedUpdates = <
+  TFunction extends ((event: any) => void) | (() => void)
+>(
+  func: Parameters<TFunction>["length"] extends 0 | 1 ? TFunction : never,
+) =>
+  ((event) => {
+    unstable_batchedUpdates(func as TFunction, event);
+  }) as TFunction;
