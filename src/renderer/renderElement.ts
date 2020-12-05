@@ -355,19 +355,9 @@ const generateElementShape = (
               return [];
             }
 
-            if (decorator === "dot") {
-              const [x2, y2, xs, ys] = decoratorPoints;
-              return [
-                generator.circle(x2, y2, Math.hypot(ys - y2, xs - x2), {
-                  ...options,
-                  fill:
-                    element.strokeColor === "transparent"
-                      ? undefined
-                      : element.strokeColor,
-                  fillStyle: "solid",
-                }),
-              ];
-            }
+            // Other decorators here...
+
+            // Arrow decorators
             const [x2, y2, x3, y3, x4, y4] = decoratorPoints;
             if (element.strokeStyle === "dotted") {
               // for dotted arrows caps, reduce gap to make it more legible
