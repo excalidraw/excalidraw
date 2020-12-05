@@ -1,17 +1,16 @@
-import "./StatsForNerds.scss";
-
 import React, { useEffect, useState } from "react";
-import { AppState } from "../types";
+import { getCommonBounds } from "../element/bounds";
 import { NonDeletedExcalidrawElement } from "../element/types";
-import { getCommonBoundingBox } from "../element/bounds";
-import { getSelectedElements } from "../scene";
 import {
   getElementsStorageSize,
   getTotalStorageSize,
 } from "../excalidraw-app/data/localStorage";
+import { t } from "../i18n";
+import { getSelectedElements } from "../scene";
+import { AppState } from "../types";
 import { debounce, nFormatter } from "../utils";
 import { close } from "./icons";
-import { t } from "../i18n";
+import "./StatsForNerds.scss";
 
 type StorageSizes = { scene: number; total: number };
 
@@ -40,9 +39,9 @@ export const StatsForNerds = (props: {
 
   useEffect(() => () => getStorageSizes.cancel(), []);
 
-  const boundingBox = getCommonBoundingBox(props.elements);
+  const boundingBox = getCommonBounds(props.elements);
   const selectedElements = getSelectedElements(props.elements, props.appState);
-  const selectedBoundingBox = getCommonBoundingBox(selectedElements);
+  const selectedBoundingBox = getCommonBounds(selectedElements);
 
   return (
     <div className="StatsForNerds">
