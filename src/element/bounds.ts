@@ -216,7 +216,8 @@ export const getDecoratorPoints = (
   const nx = (x2 - x1) / distance;
   const ny = (y2 - y1) / distance;
 
-  const size = decorator === "arrow" ? 30 : 15; // pixels
+  const size = decorator === "arrow" ? 30 : decorator === "bar" ? 15 : 10; // pixels
+
   const length = element.points.reduce((total, [cx, cy], idx, points) => {
     const [px, py] = idx > 0 ? points[idx - 1] : [0, 0];
     return total + Math.hypot(cx - px, cy - py);
