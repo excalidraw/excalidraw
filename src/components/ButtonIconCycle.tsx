@@ -29,11 +29,8 @@ export const ButtonIconCycle = <T extends any>({
   const current = options[index];
 
   return (
-    <label
-      key={current.text}
-      className={clsx({ active: current.value !== null })}
-    >
-      <input type="radio" name={group} onClick={cycle} />
+    <label key={group} className={clsx({ active: current.value !== null })}>
+      <input type="button" name={group} onClick={cycle} />
       {current.icon}
     </label>
   );

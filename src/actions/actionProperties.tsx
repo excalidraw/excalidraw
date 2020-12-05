@@ -672,12 +672,12 @@ export const actionChangeDecorator = register({
           options={[
             {
               value: null,
-              text: "none",
+              text: t("labels.nullDecorator"),
               icon: <StrokeStyleSolidIcon appearance={appState.appearance} />,
             },
             {
               value: "arrow",
-              text: "arrow",
+              text: t("labels.arrowDecorator"),
               icon: <ArrowDecoratorIcon appearance={appState.appearance} />,
             },
           ]}
