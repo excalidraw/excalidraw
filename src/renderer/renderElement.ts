@@ -2,13 +2,14 @@ import {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
+  LinearElementDecorator,
   NonDeletedExcalidrawElement,
 } from "../element/types";
 import { isTextElement, isLinearElement } from "../element/typeChecks";
 import {
   getDiamondPoints,
-  getArrowPoints,
   getElementAbsoluteCoords,
+  getDecoratorPoints,
 } from "../element/bounds";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { Drawable, Options } from "roughjs/bin/core";
@@ -335,22 +336,37 @@ const generateElementShape = (
 
         // add lines only in arrow
         if (element.type === "arrow") {
-          function getArrowShapes(
+          const { startDecorator = null, endDecorator = "arrow" } = element;
+
+          function getDecoratorShapes(
             element: ExcalidrawLinearElement,
             shape: Drawable[],
             position: "start" | "end",
+            decorator: LinearElementDecorator,
           ) {
-            const arrowPoints = getArrowPoints(element, shape, position);
-            if (arrowPoints === null) {
+            const decoratorPoints = getDecoratorPoints(
+              element,
+              shape,
+              position,
+              decorator,
+            );
+
+            if (decoratorPoints === null) {
               return [];
             }
 
-            const [x2, y2, x3, y3, x4, y4] = arrowPoints;
-            // for dotted arrows caps, reduce gap to make it more legible
+            if (decorator === "dot") {
+              const [x2, y2, xs, ys] = decoratorPoints;
+              return [
+                generator.circle(x2, y2, Math.hypot(ys - y2, xs - x2), options),
+              ];
+            }
+            const [x2, y2, x3, y3, x4, y4] = decoratorPoints;
             if (element.strokeStyle === "dotted") {
+              // for dotted arrows caps, reduce gap to make it more legible
               options.strokeLineDash = [3, 4];
-              // for solid/dashed, keep solid arrow cap
             } else {
+              // for solid/dashed, keep solid arrow cap
               delete options.strokeLineDash;
             }
             return [
@@ -359,13 +375,27 @@ const generateElementShape = (
             ];
           }
 
-          if (element.startDecorator === "arrow") {
-            const shapes = getArrowShapes(element, shape, "start");
+          if (startDecorator !== null) {
+            const shapes = getDecoratorShapes(
+              element,
+              shape,
+              "start",
+              startDecorator,
+            );
             shape.push(...shapes);
           }
 
-          if (element.endDecorator === "arrow") {
-            const shapes = getArrowShapes(element, shape, "end");
+          if (endDecorator !== null) {
+            if (endDecorator === undefined) {
+              // Hey, we have an old arrow here!
+            }
+
+            const shapes = getDecoratorShapes(
+              element,
+              shape,
+              "end",
+              endDecorator,
+            );
             shape.push(...shapes);
           }
         }

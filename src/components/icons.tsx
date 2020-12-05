@@ -760,7 +760,11 @@ export const DotDecoratorIcon = React.memo(
     flip?: boolean;
   }) =>
     createIcon(
-      <g stroke={iconFillColor(appearance)} fill={iconFillColor(appearance)}>
+      <g
+        stroke={iconFillColor(appearance)}
+        fill={iconFillColor(appearance)}
+        transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
+      >
         <path d="M32 10L6 10" strokeWidth={2} />
         <circle r="4" transform="matrix(-1 0 0 1 30 10)" />
       </g>,
@@ -777,12 +781,14 @@ export const BarDecoratorIcon = React.memo(
     flip?: boolean;
   }) =>
     createIcon(
-      <path
-        d="M34 10H5.99996M34 10L34 5M34 10L34 15"
-        stroke={iconFillColor(appearance)}
-        strokeWidth={2}
-        fill="none"
-      />,
+      <g transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}>
+        <path
+          d="M34 10H5.99996M34 10L34 5M34 10L34 15"
+          stroke={iconFillColor(appearance)}
+          strokeWidth={2}
+          fill="none"
+        />
+      </g>,
       { width: 40, height: 20, mirror: true },
     ),
 );

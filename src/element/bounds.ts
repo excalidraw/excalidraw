@@ -1,4 +1,8 @@
-import { ExcalidrawElement, ExcalidrawLinearElement } from "./types";
+import {
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  LinearElementDecorator,
+} from "./types";
 import { distance2d, rotate } from "../math";
 import rough from "roughjs/bin/rough";
 import { Drawable, Op } from "roughjs/bin/core";
@@ -158,6 +162,80 @@ const getLinearElementAbsoluteCoords = (
     maxX + element.x,
     maxY + element.y,
   ];
+};
+
+export const getDecoratorPoints = (
+  element: ExcalidrawLinearElement,
+  shape: Drawable[],
+  position: "start" | "end",
+  decorator: LinearElementDecorator,
+) => {
+  const ops = getCurvePathOps(shape[0]);
+  if (ops.length < 1) {
+    return null;
+  }
+
+  // The index of the bCurve operation to examine.
+  const index = position === "start" ? 1 : ops.length - 1;
+
+  const data = ops[index].data;
+  const p3 = [data[4], data[5]] as Point;
+  const p2 = [data[2], data[3]] as Point;
+  const p1 = [data[0], data[1]] as Point;
+
+  // We need to find p0 of the bezier curve.
+  // It is typically the last point of the previous
+  // curve; it can also be the position of moveTo operation.
+  const prevOp = ops[index - 1];
+  let p0: Point = [0, 0];
+  if (prevOp.op === "move") {
+    p0 = (prevOp.data as unknown) as Point;
+  } else if (prevOp.op === "bcurveTo") {
+    p0 = [prevOp.data[4], prevOp.data[5]];
+  }
+
+  // B(t) = p0 * (1-t)^3 + 3p1 * t * (1-t)^2 + 3p2 * t^2 * (1-t) + p3 * t^3
+  const equation = (t: number, idx: number) =>
+    Math.pow(1 - t, 3) * p3[idx] +
+    3 * t * Math.pow(1 - t, 2) * p2[idx] +
+    3 * Math.pow(t, 2) * (1 - t) * p1[idx] +
+    p0[idx] * Math.pow(t, 3);
+
+  // Ee know the last point of the arrow (or the first, if reversed).
+  const [x2, y2] = position === "start" ? p0 : p3;
+
+  // By using cubic bezier equation (B(t)) and the given parameters,
+  // we calculate a point that is closer to the last point.
+  // The value 0.3 is chosen arbitrarily and it works best for all
+  // the tested cases.
+  const [x1, y1] = [equation(0.3, 0), equation(0.3, 1)];
+
+  // Find the normalized direction vector based on the
+  // previously calculated points.
+  const distance = Math.hypot(x2 - x1, y2 - y1);
+  const nx = (x2 - x1) / distance;
+  const ny = (y2 - y1) / distance;
+
+  const size = decorator === "arrow" ? 30 : 15; // pixels
+  const length = element.points.reduce((total, [cx, cy], idx, points) => {
+    const [px, py] = idx > 0 ? points[idx - 1] : [0, 0];
+    return total + Math.hypot(cx - px, cy - py);
+  }, 0);
+
+  // Scale down the decorator until we hit a certain size so that it doesn't look weird.
+  // This value is selected by minimizing a minimum size with the whole length of the
+  // decorator instead of last segment of the decorator.
+  const minSize = Math.min(size, length / 2);
+  const xs = x2 - nx * minSize;
+  const ys = y2 - ny * minSize;
+
+  if (decorator === "dot") {
+    return [x2, y2, xs, ys];
+  }
+  const angle = decorator === "arrow" ? 20 : 90; // degrees
+  const [x3, y3] = rotate(xs, ys, x2, y2, (-angle * Math.PI) / 180);
+  const [x4, y4] = rotate(xs, ys, x2, y2, (angle * Math.PI) / 180);
+  return [x2, y2, x3, y3, x4, y4];
 };
 
 export const getArrowPoints = (
