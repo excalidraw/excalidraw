@@ -205,7 +205,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     const roomMatch = getCollaborationLinkData(window.location.href);
 
     if (roomMatch) {
-      const roomID = roomMatch[1];
+      const roomId = roomMatch[1];
       const roomKey = roomMatch[2];
 
       // fallback in case you're not alone in the room but still don't receive
@@ -219,7 +219,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
         /* webpackChunkName: "socketIoClient" */ "socket.io-client"
       );
 
-      this.portal.open(socketIOClient(SOCKET_SERVER), roomID, roomKey);
+      this.portal.open(socketIOClient(SOCKET_SERVER), roomId, roomKey);
 
       // All socket listeners are moving to Portal
       this.portal.socket!.on(

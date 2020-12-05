@@ -55,7 +55,7 @@ const shouldForceLoadScene = (
     return false;
   }
 
-  const roomID = roomMatch[1];
+  const roomId = roomMatch[1];
 
   let collabForceLoadFlag;
   try {
@@ -72,7 +72,7 @@ const shouldForceLoadScene = (
       }: { room: string; timestamp: number } = JSON.parse(collabForceLoadFlag);
       // if loading same room as the one previously unloaded within 15sec
       //  force reload without prompting
-      if (previousRoom === roomID && Date.now() - timestamp < 15000) {
+      if (previousRoom === roomId && Date.now() - timestamp < 15000) {
         return true;
       }
     } catch {}
@@ -141,10 +141,10 @@ const initializeScene = async (opts: {
     trackEvent(EVENT_SHARE, "session join");
 
     try {
-      const [, roomID, roomKey] = getCollaborationLinkData(
+      const [, roomId, roomKey] = getCollaborationLinkData(
         window.location.href,
       )!;
-      const elements = await loadFromFirebase(roomID, roomKey);
+      const elements = await loadFromFirebase(roomId, roomKey);
       if (elements) {
         return {
           elements,
