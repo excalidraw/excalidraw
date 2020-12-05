@@ -64,6 +64,7 @@ export const actionClearCanvas = register({
         exportEmbedScene: appState.exportEmbedScene,
         gridSize: appState.gridSize,
         shouldAddWatermark: appState.shouldAddWatermark,
+        showStatsForNerds: appState.showStatsForNerds,
       },
       commitToHistory: true,
     };
