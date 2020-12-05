@@ -407,7 +407,9 @@ export const getClosestElementBounds = (
   return getElementBounds(closestElement);
 };
 
-export const getCommonBoundingBox = (elements: ExcalidrawElement[]): Bounds => {
+export const getCommonBoundingBox = (
+  elements: readonly ExcalidrawElement[],
+): Bounds => {
   const [minX, minY, maxX, maxY] = getCommonBounds(elements);
   return [minX, minY, maxX, maxY];
 };

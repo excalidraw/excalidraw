@@ -174,6 +174,7 @@ import {
   EVENT_SHAPE,
   trackEvent,
 } from "../analytics";
+import { StatsForNerds } from "./StatsForNerds";
 
 const { history } = createHistory();
 
@@ -373,6 +374,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           lng={getLanguage().lng}
           isCollaborating={this.props.isCollaborating || false}
         />
+        {this.state.showStatsForNerds && (
+          <StatsForNerds
+            appState={this.state}
+            elements={this.scene.getElements()}
+          />
+        )}
         <main>
           <canvas
             id="canvas"
