@@ -51,7 +51,6 @@ import {
   EVENT_LIBRARY,
   trackEvent,
 } from "../analytics";
-import { StatsForNerds } from "./StatsForNerds";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -618,9 +617,6 @@ const LayerUI = ({
       )}
       {renderFixedSideContainer()}
       {renderBottomAppMenu()}
-      {appState.showStatsForNerds && (
-        <StatsForNerds appState={appState} elements={elements} />
-      )}
       {
         <aside
           className={clsx(
