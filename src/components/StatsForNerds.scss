@@ -12,8 +12,19 @@
   font-size: 12px;
   backdrop-filter: saturate(100%) blur(10px);
   h3 {
-    margin: 0 0 8px;
+    margin: 0 24px 8px 0;
     text-align: center;
+  }
+
+  .close {
+    float: right;
+    height: 16px;
+    width: 16px;
+    cursor: pointer;
+    svg {
+      width: 100%;
+      height: 100%;
+    }
   }
 
   table {
