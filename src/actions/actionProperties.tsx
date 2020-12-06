@@ -43,6 +43,8 @@ import {
   SloppinessArtistIcon,
   SloppinessCartoonistIcon,
   ArrowDecoratorIcon,
+  DotDecoratorIcon,
+  BarDecoratorIcon,
 } from "../components/icons";
 import { EVENT_CHANGE, trackEvent } from "../analytics";
 import colors from "../colors";
@@ -685,6 +687,26 @@ export const actionChangeDecorator = register({
                 />
               ),
             },
+            {
+              value: "dot",
+              text: t("labels.dotDecorator"),
+              icon: (
+                <DotDecoratorIcon
+                  appearance={appState.appearance}
+                  flip={true}
+                />
+              ),
+            },
+            {
+              value: "bar",
+              text: t("labels.barDecorator"),
+              icon: (
+                <BarDecoratorIcon
+                  appearance={appState.appearance}
+                  flip={true}
+                />
+              ),
+            },
           ]}
           value={getFormValue(
             elements,
@@ -709,6 +731,16 @@ export const actionChangeDecorator = register({
               value: "arrow",
               text: t("labels.arrowDecorator"),
               icon: <ArrowDecoratorIcon appearance={appState.appearance} />,
+            },
+            {
+              value: "dot",
+              text: t("labels.dotDecorator"),
+              icon: <DotDecoratorIcon appearance={appState.appearance} />,
+            },
+            {
+              value: "bar",
+              text: t("labels.barDecorator"),
+              icon: <BarDecoratorIcon appearance={appState.appearance} />,
             },
           ]}
           value={getFormValue(
