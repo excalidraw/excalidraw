@@ -17,6 +17,12 @@ export const rotate = (
     (x1 - x2) * Math.sin(angle) + (y1 - y2) * Math.cos(angle) + y2,
   ];
 
+export const rotatePoint = (
+  point: Point,
+  center: Point,
+  angle: number,
+): [number, number] => rotate(point[0], point[1], center[0], center[1], angle);
+
 export const adjustXYWithRotation = (
   sides: {
     n?: boolean;
