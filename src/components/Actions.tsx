@@ -7,7 +7,7 @@ import {
   hasStroke,
   canChangeSharpness,
   hasText,
-  hasDecorators,
+  canHaveDecorators,
   getTargetElement,
 } from "../scene";
 import { t } from "../i18n";
@@ -79,8 +79,8 @@ export const SelectedShapeActions = ({
         </>
       )}
 
-      {(hasDecorators(elementType) ||
-        targetElements.some((element) => hasDecorators(element.type))) && (
+      {(canHaveDecorators(elementType) ||
+        targetElements.some((element) => canHaveDecorators(element.type))) && (
         <>{renderAction("changeDecorator")}</>
       )}
 

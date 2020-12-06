@@ -11,7 +11,7 @@ import {
   isSomeElementSelected,
   getTargetElement,
   canChangeSharpness,
-  hasDecorators,
+  canHaveDecorators,
 } from "../scene";
 import { ButtonSelect } from "../components/ButtonSelect";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
@@ -690,7 +690,7 @@ export const actionChangeDecorator = register({
             elements,
             appState,
             (element) =>
-              isLinearElement(element) && hasDecorators(element.type)
+              isLinearElement(element) && canHaveDecorators(element.type)
                 ? element.startDecorator
                 : appState.currentItemLinearDecorators.start,
             appState.currentItemLinearDecorators.start,
@@ -715,7 +715,7 @@ export const actionChangeDecorator = register({
             elements,
             appState,
             (element) =>
-              isLinearElement(element) && hasDecorators(element.type)
+              isLinearElement(element) && canHaveDecorators(element.type)
                 ? element.endDecorator
                 : appState.currentItemLinearDecorators.end,
             appState.currentItemLinearDecorators.end,

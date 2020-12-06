@@ -10,7 +10,7 @@ export { normalizeScroll, calculateScrollCenter } from "./scroll";
 export {
   hasBackground,
   hasStroke,
-  hasDecorators,
+  canHaveDecorators,
   canChangeSharpness,
   getElementAtPosition,
   getElementContainingPosition,

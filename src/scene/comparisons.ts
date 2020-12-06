@@ -28,7 +28,7 @@ export const canChangeSharpness = (type: string) =>
 
 export const hasText = (type: string) => type === "text";
 
-export const hasDecorators = (type: string) => type === "arrow";
+export const canHaveDecorators = (type: string) => type === "arrow";
 
 export const getElementAtPosition = (
   elements: readonly NonDeletedExcalidrawElement[],
