@@ -54,7 +54,7 @@
     "architect": "Arkkitehti",
     "artist": "Taiteilija",
     "cartoonist": "Sarjakuva",
-    "fileTitle": "Tiedostonimi",
+    "fileTitle": "Tiedoston otsikko",
     "colorPicker": "Värin valinta",
     "canvasBackground": "Piirtoalueen tausta",
     "drawingCanvas": "Piirtoalue",
@@ -81,7 +81,9 @@
     "alignLeft": "Tasaa vasemmalle",
     "alignRight": "Tasaa oikealle",
     "centerVertically": "Keskitä pystysuunnassa",
-    "centerHorizontally": "Keskitä vaakasuunnassa"
+    "centerHorizontally": "Keskitä vaakasuunnassa",
+    "distributeHorizontally": "Jaa vaakasuunnassa",
+    "distributeVertically": "Jaa pystysuunnassa"
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",

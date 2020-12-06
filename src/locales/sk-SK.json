@@ -81,7 +81,9 @@
     "alignLeft": "Zarovnať doľava",
     "alignRight": "Zarovnať doprava",
     "centerVertically": "Zarovnať zvislo na stred",
-    "centerHorizontally": "Zarovnať vodorovne na stred"
+    "centerHorizontally": "Zarovnať vodorovne na stred",
+    "distributeHorizontally": "Rozmiestniť vodorovne",
+    "distributeVertically": "Rozmiestniť zvisle"
   },
   "buttons": {
     "clearReset": "Obnoviť plátno",

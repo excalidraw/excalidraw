@@ -1,7 +1,18 @@
-import { ExcalidrawElement } from "../element/types";
-import { AppState } from "../types";
-import { clearAppStateForLocalStorage, getDefaultAppState } from "../appState";
-import { STORAGE_KEYS } from "../constants";
+import { ExcalidrawElement } from "../../element/types";
+import { AppState } from "../../types";
+import {
+  clearAppStateForLocalStorage,
+  getDefaultAppState,
+} from "../../appState";
+import { clearElementsForLocalStorage } from "../../element";
+import { STORAGE_KEYS as APP_STORAGE_KEYS } from "../../constants";
+
+export const STORAGE_KEYS = {
+  LOCAL_STORAGE_ELEMENTS: "excalidraw",
+  LOCAL_STORAGE_APP_STATE: "excalidraw-state",
+  LOCAL_STORAGE_COLLAB: "excalidraw-collab",
+  LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG: "collabLinkForceLoadFlag",
+};
 
 export const saveUsernameToLocalStorage = (username: string) => {
   try {
@@ -36,7 +47,7 @@ export const saveToLocalStorage = (
   try {
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
-      JSON.stringify(elements.filter((element) => !element.isDeleted)),
+      JSON.stringify(clearElementsForLocalStorage(elements)),
     );
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
@@ -60,10 +71,10 @@ export const importFromLocalStorage = () => {
     console.error(error);
   }
 
-  let elements = [];
+  let elements: ExcalidrawElement[] = [];
   if (savedElements) {
     try {
-      elements = JSON.parse(savedElements);
+      elements = clearElementsForLocalStorage(JSON.parse(savedElements));
     } catch (error) {
       console.error(error);
       // Do nothing because elements array is already empty
@@ -85,4 +96,18 @@ export const importFromLocalStorage = () => {
     }
   }
   return { elements, appState };
+};
+
+export const getTotalStorageSize = () => {
+  const appState = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_APP_STATE);
+  const collab = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_COLLAB);
+  const elements = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS);
+  const library = localStorage.getItem(APP_STORAGE_KEYS.LOCAL_STORAGE_LIBRARY);
+
+  const appStateSize = appState ? JSON.stringify(appState).length : 0;
+  const collabSize = collab ? JSON.stringify(collab).length : 0;
+  const elementsSize = elements ? JSON.stringify(elements).length : 0;
+  const librarySize = library ? JSON.stringify(library).length : 0;
+
+  return appStateSize + collabSize + elementsSize + librarySize;
 };

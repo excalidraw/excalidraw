@@ -1,5 +1,6 @@
 import React from "react";
 import { ActionManager } from "../actions/manager";
+import { EVENT_CHANGE, trackEvent } from "../analytics";
 import { AppState } from "../types";
 import { DarkModeToggle } from "./DarkModeToggle";
 
@@ -18,6 +19,8 @@ export const BackgroundPickerAndDarkModeToggle = ({
       <DarkModeToggle
         value={appState.appearance}
         onChange={(appearance) => {
+          // TODO: track the theme on the first load too
+          trackEvent(EVENT_CHANGE, "theme", appearance);
           setAppState({ appearance });
         }}
       />

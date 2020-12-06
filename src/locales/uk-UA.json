@@ -63,7 +63,7 @@
     "language": "Мова",
     "createRoom": "Поділитися сесією для спільної роботи",
     "duplicateSelection": "Дублювати",
-    "untitled": "Без-назви",
+    "untitled": "Без назви",
     "name": "Ім’я",
     "yourName": "Ваше ім’я",
     "madeWithExcalidraw": "Накреслене в Excalidraw",
@@ -81,7 +81,9 @@
     "alignLeft": "Вирівняти по лівому краю",
     "alignRight": "Вирівнювання по правому краю",
     "centerVertically": "Центрувати по вертикалі",
-    "centerHorizontally": "Центрувати по горизонталі"
+    "centerHorizontally": "Центрувати по горизонталі",
+    "distributeHorizontally": "Розподілити по горизонталі",
+    "distributeVertically": "Розподілити вертикально"
   },
   "buttons": {
     "clearReset": "Очистити полотно",
