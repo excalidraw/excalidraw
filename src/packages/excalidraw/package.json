@@ -5,6 +5,9 @@
   "files": [
     "dist/*"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "Excalidraw as a React component",
   "license": "MIT",
   "keywords": [
