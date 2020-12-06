@@ -2,7 +2,8 @@
 
 const fs = require("fs");
 const path = require("path");
-const asar = require("asar");
+const versionFile = path.join("build", "version.json");
+const indexFile = path.join("build", "index.html");
 
 const zero = (digit) => `0${digit}`.slice(-2);
 
@@ -20,18 +21,24 @@ const now = new Date();
 
 const data = JSON.stringify(
   {
-    asar: "excalidraw.asar",
     version: versionDate(now),
   },
   undefined,
   2,
 );
 
-fs.writeFileSync(path.join("build", "version.json"), data);
+fs.writeFileSync(versionFile, data);
 
-(async () => {
-  const src = "build/";
-  const dest = path.join("build", `excalidraw.asar`);
+// https://stackoverflow.com/a/14181136/8418
+fs.readFile(indexFile, "utf8", (error, data) => {
+  if (error) {
+    return console.error(error);
+  }
+  const result = data.replace(/{version}/g, versionDate(now));
 
-  await asar.createPackage(src, dest);
-})();
+  fs.writeFile(indexFile, result, "utf8", (error) => {
+    if (error) {
+      return console.error(error);
+    }
+  });
+});
