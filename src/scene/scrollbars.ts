@@ -23,6 +23,12 @@ export const getScrollBars = (
     zoom: Zoom;
   },
 ): ScrollBars => {
+  if (elements.length === 0) {
+    return {
+      horizontal: null,
+      vertical: null,
+    };
+  }
   // This is the bounding box of all the elements
   const [
     elementsMinX,
