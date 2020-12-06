@@ -113,8 +113,6 @@ export const transformElements = (
         );
       } else {
         resizeSingleNonGenericElement(
-          pointerDownState.originalElements.get(element.id) as typeof element,
-          shouldKeepSidesRatio,
           element,
           transformHandleType,
           isResizeCenterPoint,
@@ -550,10 +548,6 @@ const resizeSingleGenericElement = (
 };
 
 const resizeSingleNonGenericElement = (
-  stateAtResizeStart: NonDeleted<
-    Exclude<ExcalidrawElement, ExcalidrawGenericElement>
-  >,
-  shouldKeepSidesRatio: boolean,
   element: NonDeleted<Exclude<ExcalidrawElement, ExcalidrawGenericElement>>,
   transformHandleType: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
   isResizeFromCenter: boolean,
