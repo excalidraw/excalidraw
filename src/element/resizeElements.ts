@@ -13,13 +13,15 @@ import {
   ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
   NonDeleted,
+  ExcalidrawGenericElement,
+  ExcalidrawElement,
 } from "./types";
 import {
   getElementAbsoluteCoords,
   getCommonBounds,
   getResizedElementAbsoluteCoords,
 } from "./bounds";
-import { isLinearElement } from "./typeChecks";
+import { isGenericElement, isLinearElement, isTextElement } from "./typeChecks";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
 import {
@@ -84,7 +86,7 @@ export const transformElements = (
         pointerY,
       );
     } else if (
-      element.type === "text" &&
+      isTextElement(element) &&
       (transformHandleType === "nw" ||
         transformHandleType === "ne" ||
         transformHandleType === "sw" ||
@@ -99,9 +101,9 @@ export const transformElements = (
       );
       updateBoundElements(element);
     } else if (transformHandleType) {
-      if (!isLinearElement(element)) {
-        resizeSingleRectDiamondEllipsesElement(
-          pointerDownState.originalElements.get(element.id)!,
+      if (isGenericElement(element)) {
+        resizeSingleGenericElement(
+          pointerDownState.originalElements.get(element.id) as typeof element,
           shouldKeepSidesRatio,
           element,
           transformHandleType,
@@ -110,8 +112,8 @@ export const transformElements = (
           pointerY,
         );
       } else {
-        resizeSingleElement(
-          pointerDownState.originalElements.get(element.id)!,
+        resizeSingleNonGenericElement(
+          pointerDownState.originalElements.get(element.id) as typeof element,
           shouldKeepSidesRatio,
           element,
           transformHandleType,
@@ -412,8 +414,8 @@ const resizeSingleTextElement = (
   }
 };
 
-const resizeSingleRectDiamondEllipsesElement = (
-  stateAtResizeStart: NonDeletedExcalidrawElement,
+const resizeSingleGenericElement = (
+  stateAtResizeStart: NonDeleted<ExcalidrawGenericElement>,
   shouldKeepSidesRatio: boolean,
   element: NonDeletedExcalidrawElement,
   transformHandleDirection: TransformHandleDirection,
@@ -547,10 +549,12 @@ const resizeSingleRectDiamondEllipsesElement = (
   mutateElement(element, resizedElement);
 };
 
-const resizeSingleElement = (
-  stateAtResizeStart: NonDeletedExcalidrawElement,
+const resizeSingleNonGenericElement = (
+  stateAtResizeStart: NonDeleted<
+    Exclude<ExcalidrawElement, ExcalidrawGenericElement>
+  >,
   shouldKeepSidesRatio: boolean,
-  element: NonDeletedExcalidrawElement,
+  element: NonDeleted<Exclude<ExcalidrawElement, ExcalidrawGenericElement>>,
   transformHandleType: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
   isResizeFromCenter: boolean,
   pointerX: number,
