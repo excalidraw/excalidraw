@@ -31,11 +31,6 @@ type ElementConstructorOpts = MarkOptional<
   | "versionNonce"
 >;
 
-type LinearElementConstructorOpts = {
-  startDecorator: LinearElementDecorator | null;
-  endDecorator: LinearElementDecorator | null;
-};
-
 const _newElementBase = <T extends ExcalidrawElement>(
   type: T["type"],
   {
@@ -220,8 +215,9 @@ export const updateTextElement = (
 export const newLinearElement = (
   opts: {
     type: ExcalidrawLinearElement["type"];
-  } & ElementConstructorOpts &
-    LinearElementConstructorOpts,
+    startDecorator: LinearElementDecorator | null;
+    endDecorator: LinearElementDecorator | null;
+  } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawLinearElement> => {
   return {
     ..._newElementBase<ExcalidrawLinearElement>(opts.type, opts),
