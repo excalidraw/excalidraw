@@ -112,10 +112,12 @@ export const transformElements = (
           pointerY,
         );
       } else {
+        const keepSquareAspectRatio = shouldKeepSidesRatio;
         resizeSingleNonGenericElement(
           element,
           transformHandleType,
           isResizeCenterPoint,
+          keepSquareAspectRatio,
           pointerX,
           pointerY,
         );
@@ -551,6 +553,7 @@ const resizeSingleNonGenericElement = (
   element: NonDeleted<Exclude<ExcalidrawElement, ExcalidrawGenericElement>>,
   transformHandleType: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
   isResizeFromCenter: boolean,
+  keepSquareAspectRatio: boolean,
   pointerX: number,
   pointerY: number,
 ) => {
@@ -597,8 +600,11 @@ const resizeSingleNonGenericElement = (
   ) {
     scaleY = (y2 - rotatedY) / (y2 - y1);
   }
-  const nextWidth = element.width * scaleX;
-  const nextHeight = element.height * scaleY;
+  let nextWidth = element.width * scaleX;
+  let nextHeight = element.height * scaleY;
+  if (keepSquareAspectRatio) {
+    nextWidth = nextHeight = Math.max(nextWidth, nextHeight);
+  }
 
   const [nextX1, nextY1, nextX2, nextY2] = getResizedElementAbsoluteCoords(
     element,
