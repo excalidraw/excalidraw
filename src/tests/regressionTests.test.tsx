@@ -1,24 +1,24 @@
-import { reseed } from "../random";
+import { queryByText } from "@testing-library/react";
 import React from "react";
 import ReactDOM from "react-dom";
+import { copiedStyles } from "../actions/actionStyles";
+import { getTransformHandles as _getTransformHandles } from "../element";
+import { ExcalidrawElement } from "../element/types";
+import { setLanguage, t } from "../i18n";
+import { CODES, KEYS } from "../keys";
+import Excalidraw from "../packages/excalidraw/index";
+import { reseed } from "../random";
 import * as Renderer from "../renderer/renderScene";
+import { setDateTimeForTests } from "../utils";
+import { API } from "./helpers/api";
+import { Keyboard, Pointer, UI } from "./helpers/ui";
 import {
-  waitFor,
-  render,
-  screen,
   fireEvent,
   GlobalTestState,
+  render,
+  screen,
+  waitFor,
 } from "./test-utils";
-import Excalidraw from "../packages/excalidraw/index";
-import { setLanguage } from "../i18n";
-import { setDateTimeForTests } from "../utils";
-import { ExcalidrawElement } from "../element/types";
-import { getTransformHandles as _getTransformHandles } from "../element";
-import { queryByText } from "@testing-library/react";
-import { copiedStyles } from "../actions/actionStyles";
-import { UI, Pointer, Keyboard } from "./helpers/ui";
-import { API } from "./helpers/api";
-import { CODES, KEYS } from "../keys";
 
 const { h } = window;
 
@@ -717,9 +717,9 @@ describe("regression tests", () => {
     const contextMenu = document.querySelector(".context-menu");
     const options = contextMenu?.querySelectorAll(".context-menu-option");
     const expectedOptions = [
-      "Select all",
-      "Toggle grid mode",
-      "Show stats for nerds",
+      t("labels.selectAll"),
+      t("labels.toggleGridMode"),
+      t("labels.toggleStatsForNerds"),
     ];
 
     expect(contextMenu).not.toBeNull();
