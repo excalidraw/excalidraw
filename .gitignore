@@ -2,6 +2,7 @@
 .DS_Store
 .envrc
 .now
+.vercel
 .vscode
 build
 firebase/
@@ -21,5 +22,3 @@ dist/
 .env.development.local
 .env.test.local
 .env.production.local
-
-.vercel
