@@ -6,6 +6,9 @@
     "dist/*"
   ],
   "description": "Excalidraw utilities functions",
+  "publishConfig": {
+    "access": "public"
+  },
   "license": "MIT",
   "keywords": [
     "excalidraw",
