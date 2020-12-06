@@ -216,6 +216,7 @@
     "tooManyColumns": "You pasted a spreadsheet with more than two columns."
   },
   "stats": {
+    "angle": "Angle",
     "element": "Element",
     "elements": "Elements",
     "height": "Height",

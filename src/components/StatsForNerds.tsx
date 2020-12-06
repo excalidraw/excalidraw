@@ -83,11 +83,9 @@ export const StatsForNerds = (props: {
             </tr>
 
             {selectedElements.length === 1 && (
-              <>
-                <tr>
-                  <th colSpan={2}>{t("stats.element")}</th>
-                </tr>
-              </>
+              <tr>
+                <th colSpan={2}>{t("stats.element")}</th>
+              </tr>
             )}
 
             {selectedElements.length > 1 && (
@@ -144,6 +142,16 @@ export const StatsForNerds = (props: {
                   </td>
                 </tr>
               </>
+            )}
+            {selectedElements.length === 1 && (
+              <tr>
+                <td>{t("stats.angle")}</td>
+                <td>
+                  {`${Math.round(
+                    (selectedElements[0].angle * 180) / Math.PI,
+                  )}°`}
+                </td>
+              </tr>
             )}
           </tbody>
         </table>
