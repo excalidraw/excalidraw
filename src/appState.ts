@@ -39,7 +39,10 @@ export const getDefaultAppState = (): Omit<
     currentItemTextAlign: DEFAULT_TEXT_ALIGN,
     currentItemStrokeSharpness: "sharp",
     currentItemLinearStrokeSharpness: "round",
-    currentItemLinearDecorators: { start: null, end: "arrow" },
+    currentItemLinearDecorators: {
+      start: null,
+      end: "arrow",
+    },
     viewBackgroundColor: oc.white,
     scrollX: 0 as FlooredNumber,
     scrollY: 0 as FlooredNumber,

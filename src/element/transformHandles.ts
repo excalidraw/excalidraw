@@ -17,11 +17,11 @@ export type TransformHandleType =
 
 export type TransformHandle = [number, number, number, number];
 export type TransformHandles = Partial<
-  { [T in TransformHandleType]: TransformHandle }
+  Record<TransformHandleType, TransformHandle>
 >;
 export type MaybeTransformHandleType = TransformHandleType | false;
 
-const transformHandleSizes: { [k in PointerType]: number } = {
+const transformHandleSizes: Record<PointerType, number> = {
   mouse: 8,
   pen: 16,
   touch: 28,
@@ -79,7 +79,7 @@ export const getTransformHandlesFromCoords = (
   angle: number,
   zoom: Zoom,
   pointerType: PointerType = "mouse",
-  omitSides: { [T in TransformHandleType]?: boolean } = {},
+  omitSides: Partial<Record<TransformHandleType, boolean>> = {},
 ): TransformHandles => {
   const size = transformHandleSizes[pointerType];
   const handleWidth = size / zoom.value;
@@ -218,7 +218,7 @@ export const getTransformHandles = (
   zoom: Zoom,
   pointerType: PointerType = "mouse",
 ): TransformHandles => {
-  let omitSides: { [T in TransformHandleType]?: boolean } = {};
+  let omitSides: Partial<Record<TransformHandleType, boolean>> = {};
   if (
     element.type === "arrow" ||
     element.type === "line" ||

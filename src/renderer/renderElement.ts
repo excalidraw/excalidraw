@@ -1,8 +1,8 @@
 import {
   ExcalidrawElement,
-  ExcalidrawLinearElement,
   ExcalidrawTextElement,
   LinearElementDecorator,
+  LinearElementDecoratorPosition,
   NonDeletedExcalidrawElement,
 } from "../element/types";
 import { isTextElement, isLinearElement } from "../element/typeChecks";
@@ -336,17 +336,19 @@ const generateElementShape = (
 
         // add lines only in arrow
         if (element.type === "arrow") {
-          const { startDecorator = null, endDecorator = "arrow" } = element;
+          const {
+            points,
+            startDecorator = null,
+            endDecorator = "arrow",
+          } = element;
 
           function getDecoratorShapes(
-            element: ExcalidrawLinearElement,
-            shape: Drawable[],
-            position: "start" | "end",
+            position: LinearElementDecoratorPosition,
             decorator: LinearElementDecorator,
           ) {
             const decoratorPoints = getDecoratorPoints(
-              element,
-              shape,
+              points,
+              shape as Drawable[],
               position,
               decorator,
             );
@@ -355,54 +357,48 @@ const generateElementShape = (
               return [];
             }
 
-            if (decorator === "dot") {
-              const [x2, y2, xs, ys] = decoratorPoints;
-              return [
-                generator.circle(x2, y2, Math.hypot(ys - y2, xs - x2), {
-                  ...options,
-                  fill:
-                    element.strokeColor === "transparent"
-                      ? undefined
-                      : element.strokeColor,
-                  fillStyle: "solid",
-                }),
-              ];
+            switch (decorator) {
+              case "dot": {
+                const [x, y, r] = decoratorPoints;
+
+                return [
+                  generator.circle(x, y, r, {
+                    ...options,
+                    fillStyle: "solid",
+                    fill: element.strokeColor,
+                  }),
+                ];
+              }
+              case "bar":
+              case "arrow": {
+                const [x2, y2, x3, y3, x4, y4] = decoratorPoints;
+
+                // for dotted arrows caps, reduce gap to make it more legible
+                // for solid/dashed, keep solid arrow cap
+                options.strokeLineDash =
+                  element.strokeStyle === "dotted" ? [3, 4] : undefined;
+
+                return [
+                  generator.line(x3, y3, x2, y2, options),
+                  generator.line(x4, y4, x2, y2, options),
+                ];
+              }
             }
-            const [x2, y2, x3, y3, x4, y4] = decoratorPoints;
-            if (element.strokeStyle === "dotted") {
-              // for dotted arrows caps, reduce gap to make it more legible
-              options.strokeLineDash = [3, 4];
-            } else {
-              // for solid/dashed, keep solid arrow cap
-              delete options.strokeLineDash;
-            }
-            return [
-              generator.line(x3, y3, x2, y2, options),
-              generator.line(x4, y4, x2, y2, options),
-            ];
           }
 
           if (startDecorator !== null) {
-            const shapes = getDecoratorShapes(
-              element,
-              shape,
-              "start",
-              startDecorator,
-            );
+            const shapes = getDecoratorShapes("start", startDecorator);
             shape.push(...shapes);
           }
 
           if (endDecorator !== null) {
             if (endDecorator === undefined) {
-              // Hey, we have an old arrow here!
+              throw new Error(
+                "Missing end decorator on a linear element. An old arrow somehow slipped through?",
+              );
             }
 
-            const shapes = getDecoratorShapes(
-              element,
-              shape,
-              "end",
-              endDecorator,
-            );
+            const shapes = getDecoratorShapes("end", endDecorator);
             shape.push(...shapes);
           }
         }

@@ -165,7 +165,7 @@ const getLinearElementAbsoluteCoords = (
 };
 
 export const getDecoratorPoints = (
-  element: ExcalidrawLinearElement,
+  points: readonly (readonly [number, number])[],
   shape: Drawable[],
   position: "start" | "end",
   decorator: LinearElementDecorator,
@@ -218,7 +218,7 @@ export const getDecoratorPoints = (
 
   const size = decorator === "arrow" ? 30 : decorator === "bar" ? 15 : 10; // pixels
 
-  const length = element.points.reduce((total, [cx, cy], idx, points) => {
+  const length = points.reduce((total, [cx, cy], idx, points) => {
     const [px, py] = idx > 0 ? points[idx - 1] : [0, 0];
     return total + Math.hypot(cx - px, cy - py);
   }, 0);
@@ -227,12 +227,15 @@ export const getDecoratorPoints = (
   // This value is selected by minimizing a minimum size with the whole length of the
   // decorator instead of last segment of the decorator.
   const minSize = Math.min(size, length / 2);
-  const xs = x2 - nx * minSize;
-  const ys = y2 - ny * minSize;
 
   if (decorator === "dot") {
-    return [x2, y2, xs, ys];
+    const xs = x2 - nx * (minSize / 2);
+    const ys = y2 - ny * (minSize / 2);
+    return [x2, y2, Math.hypot(y2 - ys, x2 - xs) * 2];
   }
+
+  const xs = x2 - nx * minSize;
+  const ys = y2 - ny * minSize;
   const angle = decorator === "arrow" ? 20 : 90; // degrees
   const [x3, y3] = rotate(xs, ys, x2, y2, (-angle * Math.PI) / 180);
   const [x4, y4] = rotate(xs, ys, x2, y2, (angle * Math.PI) / 180);
