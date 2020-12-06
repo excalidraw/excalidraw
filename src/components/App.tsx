@@ -187,7 +187,7 @@ let isPanning: boolean = false;
 let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
-let touchMoving = false;
+let invalidateContextMenu = false;
 
 let lastPointerUp: ((event: any) => void) | null = null;
 const gesture: Gesture = {
@@ -653,6 +653,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.removeEventListeners();
     this.scene.destroy();
     clearTimeout(touchTimeout);
+    touchTimeout = 0;
   }
 
   private onResize = withBatchedUpdates(() => {
@@ -1105,7 +1106,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     // remove touch handler for context menu on touch devices
     if (event.pointerType === "touch" && touchTimeout) {
       clearTimeout(touchTimeout);
-      touchMoving = false;
+      touchTimeout = 0;
+      invalidateContextMenu = false;
     }
 
     gesture.pointers.delete(event.pointerId);
@@ -1401,30 +1403,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private onGestureStart = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
-    this.setState({
-      selectedElementIds: {},
-    });
-    gesture.initialScale = this.state.zoom.value;
   });
 
   private onGestureChange = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
-    this.setState(({ zoom }) => ({
-      zoom: getNewZoom(
-        getNormalizedZoom(gesture.initialScale! * event.scale),
-        zoom,
-        { x: cursorX, y: cursorY },
-      ),
-    }));
   });
 
   private onGestureEnd = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
-    this.setState({
-      previousSelectedElementIds: {},
-      selectedElementIds: this.state.previousSelectedElementIds,
-    });
-    gesture.initialScale = null;
   });
 
   private handleTextWysiwyg(
@@ -1941,7 +1927,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   // set touch moving for mobile context menu
   private handleTouchMove = (event: React.TouchEvent<HTMLCanvasElement>) => {
-    touchMoving = true;
+    invalidateContextMenu = true;
   };
 
   private handleCanvasPointerDown = (
@@ -2046,18 +2032,26 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   ): void => {
     // deal with opening context menu on touch devices
     if (event.pointerType === "touch") {
-      touchMoving = false;
+      invalidateContextMenu = false;
 
-      // open the context menu with the first touch's clientX and clientY
-      // if the touch is not moving
-      touchTimeout = window.setTimeout(() => {
-        if (!touchMoving) {
-          this.openContextMenu({
-            clientX: event.clientX,
-            clientY: event.clientY,
-          });
-        }
-      }, TOUCH_CTX_MENU_TIMEOUT);
+      if (touchTimeout) {
+        // If there's already a touchTimeout, this means that there's another
+        // touch down and we are doing another touch, so we shouldn't open the
+        // context menu.
+        invalidateContextMenu = true;
+      } else {
+        // open the context menu with the first touch's clientX and clientY
+        // if the touch is not moving
+        touchTimeout = window.setTimeout(() => {
+          touchTimeout = 0;
+          if (!invalidateContextMenu) {
+            this.openContextMenu({
+              clientX: event.clientX,
+              clientY: event.clientY,
+            });
+          }
+        }, TOUCH_CTX_MENU_TIMEOUT);
+      }
     }
   };
 
