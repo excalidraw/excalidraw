@@ -26,6 +26,7 @@ FG_Virgil.woff2
 Please follow the below instruction to serve the above fonts
 
 1.Create a folder `excalidraw-assets` and copy these files into that folder.
+
 2.Move the folder `excalidraw-assets` to the path where your assets are served. In the example its served from `public/excalidraw-assets`
 
 ### Demo
@@ -77,7 +78,6 @@ export default function App() {
         initialData={InitialData}
         onChange={onChange}
         user={{ name: "Excalidraw User" }}
-        options={options}
       />
     </div>
   );
@@ -104,25 +104,31 @@ export default function App() {
 
 <a name="width"></a>
 
-##### width
+#### width
 
 This props defines the width of the Excalidraw component. Defaults to `window.innerWidth` if not passed.
 
 <a name="height"></a>
 
-##### height
+#### height
 
 This props defines the height of the Excalidraw component. Defaults to `window.innerHeight` if not passed.
 
 <a name="offsetLeft"></a>
+
+#### offsetLeft
+
 This prop defines left position relative to which Excalidraw should be rendered
 
 <a name="offsetTop"></a>
+
+#### offsetTop
+
 This prop defines top position relative to which Excalidraw should be rendered
 
 <a name="onChange"></a>
 
-##### onChange
+#### onChange
 
 Every time component updates, this callback if passed will get triggered and has the below signature.
 
@@ -138,7 +144,7 @@ Here you can try saving the data to your backend or local storage for example.
 
 <a name="initialData"></a>
 
-##### initialData
+#### initialData
 
 This helps to load Excalidraw with `initialData`.
 It must be an object or a [promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise) which resolves to an object containing the below optional fields.
@@ -181,11 +187,13 @@ You might want to use this when you want to load excalidraw with some initial el
 
 <a name="user"><a/>
 
-##### user
+#### user
 
 This is the user name which shows during collaboration. Defaults to `{name: ''}`.
 
 <a name="excalidrawRef"></a>
+
+#### excalidrawRef
 
 You can pass a ref when you want to access some excalidraw API's.
 We expose the below API's
@@ -202,5 +210,7 @@ We expose the below API's
 | setScrollToCenter                | ([ExcalidrawElement []](https://github.com/excalidraw/excalidraw/blob/4c90ea5667d29effe8ec4a115e49efc7c340cdb3/src/element/types.ts#L59)) => void | sets the elements to center                                                                                                                                                                                                                      |
 
 <a name="readyPromise"></a>
+
+#### readyPromise
 
 const excalidrawRef = { current: { readyPromise: [resolvablePromise](https://github.com/excalidraw/excalidraw/blob/4c90ea5667d29effe8ec4a115e49efc7c340cdb3/src/utils.ts#L312) }
