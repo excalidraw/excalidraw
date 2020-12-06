@@ -629,11 +629,7 @@ export const actionChangeSharpness = register({
 
 export const actionChangeDecorator = register({
   name: "changeDecorator",
-  perform: (
-    elements,
-    appState,
-    value, // { position: "start" | "end"; type: LinearElementDecorator | null },
-  ) => {
+  perform: (elements, appState, value) => {
     return {
       elements: changeProperty(elements, appState, (el) => {
         if (isLinearElement(el)) {
