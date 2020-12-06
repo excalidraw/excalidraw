@@ -2960,7 +2960,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     pointerDownState: PointerDownState,
   ): (event: KeyboardEvent) => void {
     return withBatchedUpdates((event: KeyboardEvent) => {
-      this.maybeHandleResize(pointerDownState, event);
+      if (this.maybeHandleResize(pointerDownState, event)) {
+        return;
+      }
+      this.maybeDragNewGenericElement(pointerDownState, event);
     });
   }
 
@@ -2968,9 +2971,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     pointerDownState: PointerDownState,
   ): (event: KeyboardEvent) => void {
     return withBatchedUpdates((event: KeyboardEvent) => {
-      this.maybeHandleResize(pointerDownState, event);
       // Prevents focus from escaping excalidraw tab
       event.key === KEYS.ALT && event.preventDefault();
+      if (this.maybeHandleResize(pointerDownState, event)) {
+        return;
+      }
+      this.maybeDragNewGenericElement(pointerDownState, event);
     });
   }
 
@@ -3208,33 +3214,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             this.state.startBoundElement,
           );
         }
-      } else if (draggingElement.type === "selection") {
-        dragNewElement(
-          draggingElement,
-          this.state.elementType,
-          pointerDownState.origin.x,
-          pointerDownState.origin.y,
-          pointerCoords.x,
-          pointerCoords.y,
-          distance(pointerDownState.origin.x, pointerCoords.x),
-          distance(pointerDownState.origin.y, pointerCoords.y),
-          getResizeWithSidesSameLengthKey(event),
-          getResizeCenterPointKey(event),
-        );
       } else {
-        dragNewElement(
-          draggingElement,
-          this.state.elementType,
-          pointerDownState.originInGrid.x,
-          pointerDownState.originInGrid.y,
-          gridX,
-          gridY,
-          distance(pointerDownState.originInGrid.x, gridX),
-          distance(pointerDownState.originInGrid.y, gridY),
-          getResizeWithSidesSameLengthKey(event),
-          getResizeCenterPointKey(event),
-        );
-        this.maybeSuggestBindingForAll([draggingElement]);
+        pointerDownState.lastCoords.x = pointerCoords.x;
+        pointerDownState.lastCoords.y = pointerCoords.y;
+        this.maybeDragNewGenericElement(pointerDownState, event);
       }
 
       if (this.state.elementType === "selection") {
@@ -3784,6 +3767,50 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   ) => {
     event.preventDefault();
     this.openContextMenu(event);
+  };
+
+  private maybeDragNewGenericElement = (
+    pointerDownState: PointerDownState,
+    event: MouseEvent | KeyboardEvent,
+  ): void => {
+    const draggingElement = this.state.draggingElement;
+    const pointerCoords = pointerDownState.lastCoords;
+    if (!draggingElement) {
+      return;
+    }
+    if (draggingElement.type === "selection") {
+      dragNewElement(
+        draggingElement,
+        this.state.elementType,
+        pointerDownState.origin.x,
+        pointerDownState.origin.y,
+        pointerCoords.x,
+        pointerCoords.y,
+        distance(pointerDownState.origin.x, pointerCoords.x),
+        distance(pointerDownState.origin.y, pointerCoords.y),
+        getResizeWithSidesSameLengthKey(event),
+        getResizeCenterPointKey(event),
+      );
+    } else {
+      const [gridX, gridY] = getGridPoint(
+        pointerCoords.x,
+        pointerCoords.y,
+        this.state.gridSize,
+      );
+      dragNewElement(
+        draggingElement,
+        this.state.elementType,
+        pointerDownState.originInGrid.x,
+        pointerDownState.originInGrid.y,
+        gridX,
+        gridY,
+        distance(pointerDownState.originInGrid.x, gridX),
+        distance(pointerDownState.originInGrid.y, gridY),
+        getResizeWithSidesSameLengthKey(event),
+        getResizeCenterPointKey(event),
+      );
+      this.maybeSuggestBindingForAll([draggingElement]);
+    }
   };
 
   private maybeHandleResize = (
