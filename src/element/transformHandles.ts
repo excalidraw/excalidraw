@@ -78,7 +78,7 @@ export const getTransformHandlesFromCoords = (
   [x1, y1, x2, y2]: Bounds,
   angle: number,
   zoom: Zoom,
-  pointerType: PointerType = "mouse",
+  pointerType: PointerType,
   omitSides: { [T in TransformHandleType]?: boolean } = {},
 ): TransformHandles => {
   const size = transformHandleSizes[pointerType];
@@ -160,7 +160,9 @@ export const getTransformHandlesFromCoords = (
   };
 
   // We only want to show height handles (all cardinal directions)  above a certain size
-  const minimumSizeForEightHandles = (5 * size) / zoom.value;
+  // Note: we render using "mouse" size so we should also use "mouse" size for this check
+  const minimumSizeForEightHandles =
+    (5 * transformHandleSizes.mouse) / zoom.value;
   if (Math.abs(width) > minimumSizeForEightHandles) {
     if (!omitSides.n) {
       transformHandles.n = generateTransformHandle(
