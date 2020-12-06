@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { render, fireEvent } from "./test-utils";
-import App from "../components/App";
+import ExcalidrawApp from "../excalidraw-app";
 import * as Renderer from "../renderer/renderScene";
 import { reseed } from "../random";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
@@ -22,8 +22,8 @@ beforeEach(() => {
 const { h } = window;
 
 describe("resize element", () => {
-  it("rectangle", () => {
-    const { getByToolName, container } = render(<App />);
+  it("rectangle", async () => {
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     const canvas = container.querySelector("canvas")!;
 
     {
@@ -34,7 +34,7 @@ describe("resize element", () => {
       fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
       fireEvent.pointerUp(canvas);
 
-      expect(renderScene).toHaveBeenCalledTimes(5);
+      expect(renderScene).toHaveBeenCalledTimes(6);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(1);
       expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -65,8 +65,8 @@ describe("resize element", () => {
 });
 
 describe("resize element with aspect ratio when SHIFT is clicked", () => {
-  it("rectangle", () => {
-    render(<App />);
+  it("rectangle", async () => {
+    await render(<ExcalidrawApp />);
 
     const rectangle = UI.createElement("rectangle", {
       x: 0,
