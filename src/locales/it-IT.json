@@ -71,6 +71,7 @@
     "ungroup": "Dividi gruppo da selezione",
     "collaborators": "Collaboratori",
     "toggleGridMode": "Attiva/disattiva modalità quadrícula",
+    "toggleStats": "",
     "addToLibrary": "Aggiungi alla biblioteca",
     "removeFromLibrary": "Rimuovi dalla biblioteca",
     "libraryLoadingMessage": "Caricamento della biblioteca...",
@@ -213,5 +214,17 @@
   "charts": {
     "noNumericColumn": "Hai incollato un foglio di calcolo senza una colonna numerica.",
     "tooManyColumns": "Hai incollato un foglio di calcolo con più di due colonne."
+  },
+  "stats": {
+    "angle": "",
+    "element": "",
+    "elements": "",
+    "height": "",
+    "scene": "",
+    "selected": "",
+    "storage": "",
+    "title": "",
+    "total": "",
+    "width": ""
   }
 }
