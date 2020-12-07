@@ -71,11 +71,11 @@
     "ungroup": "Zrušiť zoskupenie",
     "collaborators": "Spolupracovníci",
     "toggleGridMode": "Prepnúť mriežku",
-    "toggleStats": "",
+    "toggleStats": "Prepnúť štatistiky",
     "addToLibrary": "Pridať do knižnice",
     "removeFromLibrary": "Odstrániť z knižnice",
     "libraryLoadingMessage": "Načítavanie knižnice...",
-    "libraries": "",
+    "libraries": "Prehliadať knižnice",
     "loadingScene": "Načítavanie scény...",
     "align": "Zarovnanie",
     "alignTop": "Zarovnať nahor",
@@ -217,15 +217,15 @@
     "tooManyColumns": "Prilepili ste tabuľku s viac ako dvoma stĺpcami."
   },
   "stats": {
-    "angle": "",
-    "element": "",
-    "elements": "",
-    "height": "",
+    "angle": "Uhol",
+    "element": "Prvok",
+    "elements": "Prvky",
+    "height": "Výška",
     "scene": "Scéna",
     "selected": "Vybrané",
     "storage": "",
     "title": "",
-    "total": "",
-    "width": ""
+    "total": "Celkom",
+    "width": "Šírka"
   }
 }
