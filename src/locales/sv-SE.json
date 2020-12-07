@@ -75,6 +75,7 @@
     "addToLibrary": "Lägg till i biblioteket",
     "removeFromLibrary": "Ta bort från bibliotek",
     "libraryLoadingMessage": "Laddar bibliotek...",
+    "libraries": "",
     "loadingScene": "Laddar scen...",
     "align": "Justera",
     "alignTop": "Justera överkant",
