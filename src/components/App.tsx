@@ -175,7 +175,7 @@ import {
   EVENT_SHAPE,
   trackEvent,
 } from "../analytics";
-import { StatsForNerds } from "./StatsForNerds";
+import { Stats } from "./Stats";
 
 const { history } = createHistory();
 
@@ -378,11 +378,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           lng={getLanguage().lng}
           isCollaborating={this.props.isCollaborating || false}
         />
-        {this.state.showStatsForNerds && (
-          <StatsForNerds
+        {this.state.showStats && (
+          <Stats
             appState={this.state}
             elements={this.scene.getElements()}
-            onClose={this.toggleStatsForNerds}
+            onClose={this.toggleStats}
           />
         )}
         <main>
@@ -1141,12 +1141,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     });
   };
 
-  toggleStatsForNerds = () => {
-    if (!this.state.showStatsForNerds) {
-      trackEvent(EVENT_DIALOG, "stats for nerds");
+  toggleStats = () => {
+    if (!this.state.showStats) {
+      trackEvent(EVENT_DIALOG, "stats");
     }
     this.setState({
-      showStatsForNerds: !this.state.showStatsForNerds,
+      showStats: !this.state.showStats,
     });
   };
 
@@ -3582,8 +3582,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             action: this.toggleGridMode,
           },
           {
-            label: t("labels.toggleStatsForNerds"),
-            action: this.toggleStatsForNerds,
+            label: t("labels.toggleStats"),
+            action: this.toggleStats,
           },
         ],
         top: clientY,

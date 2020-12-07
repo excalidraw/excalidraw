@@ -11,7 +11,7 @@ import { AppState } from "../types";
 import { debounce, nFormatter } from "../utils";
 import { close } from "./icons";
 import { Island } from "./Island";
-import "./StatsForNerds.scss";
+import "./Stats.scss";
 
 type StorageSizes = { scene: number; total: number };
 
@@ -22,7 +22,7 @@ const getStorageSizes = debounce((cb: (sizes: StorageSizes) => void) => {
   });
 }, 500);
 
-export const StatsForNerds = (props: {
+export const Stats = (props: {
   appState: AppState;
   elements: readonly NonDeletedExcalidrawElement[];
   onClose: () => void;
@@ -45,7 +45,7 @@ export const StatsForNerds = (props: {
   const selectedBoundingBox = getCommonBounds(selectedElements);
 
   return (
-    <div className="StatsForNerds">
+    <div className="Stats">
       <Island padding={2}>
         <div className="close" onClick={props.onClose}>
           {close}

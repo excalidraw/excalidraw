@@ -636,7 +636,7 @@ describe("regression tests", () => {
     const expectedOptions = [
       t("labels.selectAll"),
       t("labels.toggleGridMode"),
-      t("labels.toggleStatsForNerds"),
+      t("labels.toggleStats"),
     ];
 
     expect(contextMenu).not.toBeNull();
