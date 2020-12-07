@@ -75,6 +75,7 @@
     "addToLibrary": "添加到库中",
     "removeFromLibrary": "从库中移除",
     "libraryLoadingMessage": "正在加载库...",
+    "libraries": "",
     "loadingScene": "正在加载绘图...",
     "align": "对齐",
     "alignTop": "顶部对齐",
