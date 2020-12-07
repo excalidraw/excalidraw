@@ -71,6 +71,7 @@
     "ungroup": "Desagrupar seleção",
     "collaborators": "Colaboradores",
     "toggleGridMode": "Alternar modo de grade",
+    "toggleStats": "",
     "addToLibrary": "Adicionar à biblioteca",
     "removeFromLibrary": "Remover da biblioteca",
     "libraryLoadingMessage": "Carregando biblioteca...",
@@ -213,5 +214,17 @@
   "charts": {
     "noNumericColumn": "Você colou uma planilha sem uma coluna numérica.",
     "tooManyColumns": "Você colou uma planilha com mais de duas colunas."
+  },
+  "stats": {
+    "angle": "",
+    "element": "",
+    "elements": "",
+    "height": "",
+    "scene": "",
+    "selected": "",
+    "storage": "",
+    "title": "",
+    "total": "",
+    "width": ""
   }
 }
