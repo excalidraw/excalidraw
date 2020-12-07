@@ -71,6 +71,7 @@
     "ungroup": "Avgrupper utval",
     "collaborators": "Samarbeidarar",
     "toggleGridMode": "Sla på/av rutenett",
+    "toggleStats": "",
     "addToLibrary": "Legg til i bibliotek",
     "removeFromLibrary": "Fjern frå bibliotek",
     "libraryLoadingMessage": "Laster bibliotek...",
@@ -213,5 +214,17 @@
   "charts": {
     "noNumericColumn": "Du limte inn eit rekneark utan ei numerisk kolonne.",
     "tooManyColumns": "Du limte inn eit rekneark med meir enn to kolonnar."
+  },
+  "stats": {
+    "angle": "",
+    "element": "",
+    "elements": "",
+    "height": "",
+    "scene": "",
+    "selected": "",
+    "storage": "",
+    "title": "",
+    "total": "",
+    "width": ""
   }
 }
