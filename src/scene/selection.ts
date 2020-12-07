@@ -33,9 +33,8 @@ export const getElementsWithinSelection = (
 export const isSomeElementSelected = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
-): boolean => {
-  return elements.some((element) => appState.selectedElementIds[element.id]);
-};
+): boolean =>
+  elements.some((element) => appState.selectedElementIds[element.id]);
 
 /**
  * Returns common attribute (picked by `getAttribute` callback) of selected
