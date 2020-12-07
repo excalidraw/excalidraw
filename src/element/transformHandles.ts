@@ -4,7 +4,7 @@ import { getElementAbsoluteCoords, Bounds } from "./bounds";
 import { rotate } from "../math";
 import { Zoom } from "../types";
 
-export type TransformHandleType =
+export type TransformHandleDirection =
   | "n"
   | "s"
   | "w"
@@ -12,8 +12,9 @@ export type TransformHandleType =
   | "nw"
   | "ne"
   | "sw"
-  | "se"
-  | "rotation";
+  | "se";
+
+export type TransformHandleType = TransformHandleDirection | "rotation";
 
 export type TransformHandle = [number, number, number, number];
 export type TransformHandles = Partial<
