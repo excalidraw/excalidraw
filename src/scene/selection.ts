@@ -33,9 +33,8 @@ export const getElementsWithinSelection = (
 export const isSomeElementSelected = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
-): boolean => {
-  return elements.some((element) => appState.selectedElementIds[element.id]);
-};
+): boolean =>
+  elements.some((element) => appState.selectedElementIds[element.id]);
 
 /**
  * Returns common attribute (picked by `getAttribute` callback) of selected
@@ -59,15 +58,12 @@ export const getCommonAttributeOfSelectedElements = <T>(
 export const getSelectedElements = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
-) => {
-  return elements.filter((element) => appState.selectedElementIds[element.id]);
-};
+) => elements.filter((element) => appState.selectedElementIds[element.id]);
 
-export const getTargetElement = (
+export const getTargetElements = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
-) => {
-  return appState.editingElement
+) =>
+  appState.editingElement
     ? [appState.editingElement]
     : getSelectedElements(elements, appState);
-};

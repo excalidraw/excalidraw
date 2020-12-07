@@ -133,6 +133,9 @@ export const debounce = <T extends any[]>(
       fn(...lastArgs);
     }
   };
+  ret.cancel = () => {
+    clearTimeout(handle);
+  };
   return ret;
 };
 
@@ -336,3 +339,23 @@ export const withBatchedUpdates = <
   ((event) => {
     unstable_batchedUpdates(func as TFunction, event);
   }) as TFunction;
+
+//https://stackoverflow.com/a/9462382/8418
+export const nFormatter = (num: number, digits: number): string => {
+  const si = [
+    { value: 1, symbol: "b" },
+    { value: 1e3, symbol: "k" },
+    { value: 1e6, symbol: "M" },
+    { value: 1e9, symbol: "G" },
+  ];
+  const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+  let index;
+  for (index = si.length - 1; index > 0; index--) {
+    if (num >= si[index].value) {
+      break;
+    }
+  }
+  return (
+    (num / si[index].value).toFixed(digits).replace(rx, "$1") + si[index].symbol
+  );
+};

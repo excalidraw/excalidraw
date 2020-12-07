@@ -175,6 +175,7 @@ import {
   EVENT_SHAPE,
   trackEvent,
 } from "../analytics";
+import { Stats } from "./Stats";
 
 const { history } = createHistory();
 
@@ -377,6 +378,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           lng={getLanguage().lng}
           isCollaborating={this.props.isCollaborating || false}
         />
+        {this.state.showStats && (
+          <Stats
+            appState={this.state}
+            elements={this.scene.getElements()}
+            onClose={this.toggleStats}
+          />
+        )}
         <main>
           <canvas
             id="canvas"
@@ -1130,6 +1138,15 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   toggleGridMode = () => {
     this.setState({
       gridSize: this.state.gridSize ? null : GRID_SIZE,
+    });
+  };
+
+  toggleStats = () => {
+    if (!this.state.showStats) {
+      trackEvent(EVENT_DIALOG, "stats");
+    }
+    this.setState({
+      showStats: !this.state.showStats,
     });
   };
 
@@ -3563,6 +3580,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           {
             label: t("labels.toggleGridMode"),
             action: this.toggleGridMode,
+          },
+          {
+            label: t("labels.toggleStats"),
+            action: this.toggleStats,
           },
         ],
         top: clientY,

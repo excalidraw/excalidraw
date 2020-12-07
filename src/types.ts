@@ -95,6 +95,7 @@ export type AppState = {
   isLibraryOpen: boolean;
   fileHandle: import("browser-nativefs").FileSystemHandle | null;
   collaborators: Map<string, Collaborator>;
+  showStats: boolean;
 };
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
