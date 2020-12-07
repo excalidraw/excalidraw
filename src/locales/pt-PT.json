@@ -75,6 +75,7 @@
     "addToLibrary": "Adicionar à biblioteca",
     "removeFromLibrary": "Remover da biblioteca",
     "libraryLoadingMessage": "Carregando biblioteca...",
+    "libraries": "",
     "loadingScene": "Carregando cena...",
     "align": "",
     "alignTop": "",
