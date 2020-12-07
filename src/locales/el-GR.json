@@ -71,6 +71,7 @@
     "ungroup": "Κατάργηση ομάδας από επιλογή",
     "collaborators": "Συνεργάτες",
     "toggleGridMode": "Εναλλαγή λειτουργίας πλέγματος",
+    "toggleStats": "",
     "addToLibrary": "Προσθήκη στη βιβλιοθήκη",
     "removeFromLibrary": "Αφαίρεση από τη βιβλιοθήκη",
     "libraryLoadingMessage": "Φόρτωση βιβλιοθήκης...",
@@ -213,5 +214,17 @@
   "charts": {
     "noNumericColumn": "Επικόλλησες ένα υπολογιστικό φύλλο χωρίς αριθμητική στήλη.",
     "tooManyColumns": "Επικόλλησες ένα υπολογιστικό φύλλο με περισσότερες από δύο στήλες."
+  },
+  "stats": {
+    "angle": "",
+    "element": "",
+    "elements": "",
+    "height": "",
+    "scene": "",
+    "selected": "",
+    "storage": "",
+    "title": "",
+    "total": "",
+    "width": ""
   }
 }
