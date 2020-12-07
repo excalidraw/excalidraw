@@ -71,6 +71,7 @@
     "ungroup": "Desagrupar la selecció",
     "collaborators": "Col·laboradors",
     "toggleGridMode": "Commutar línies de graella",
+    "toggleStats": "",
     "addToLibrary": "Afegir a la biblioteca",
     "removeFromLibrary": "Eliminar de la biblioteca",
     "libraryLoadingMessage": "Carregant la biblioteca...",
@@ -213,5 +214,17 @@
   "charts": {
     "noNumericColumn": "Has enganxat un full de càlcul sense columna numèrica.",
     "tooManyColumns": "Has enganxat un full de càlcul amb més de dues columnes."
+  },
+  "stats": {
+    "angle": "",
+    "element": "",
+    "elements": "",
+    "height": "",
+    "scene": "",
+    "selected": "",
+    "storage": "",
+    "title": "",
+    "total": "",
+    "width": ""
   }
 }
