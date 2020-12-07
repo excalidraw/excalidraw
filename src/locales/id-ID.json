@@ -75,6 +75,7 @@
     "addToLibrary": "Tambahkan ke pustaka",
     "removeFromLibrary": "Hapus dari pustaka",
     "libraryLoadingMessage": "Memuat pustaka...",
+    "libraries": "",
     "loadingScene": "Memuat pemandangan...",
     "align": "Perataan",
     "alignTop": "Rata atas",
