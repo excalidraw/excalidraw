@@ -75,6 +75,7 @@
     "addToLibrary": "မှတ်တမ်းတင်",
     "removeFromLibrary": "မှတ်တမ်းမှထုတ်",
     "libraryLoadingMessage": "မှတ်တမ်းအား တင်သွင်းနေသည်...",
+    "libraries": "",
     "loadingScene": "မြင်ကွင်းဖော်နေသည်...",
     "align": "ချိန်ညှိ",
     "alignTop": "ထိပ်ညှိ",
