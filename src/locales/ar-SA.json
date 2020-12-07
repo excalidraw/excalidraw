@@ -75,6 +75,7 @@
     "addToLibrary": "أضف إلى المكتبة",
     "removeFromLibrary": "حذف من المكتبة",
     "libraryLoadingMessage": "جارٍ تحميل المكتبة...",
+    "libraries": "",
     "loadingScene": "جاري تحميل المشهد...",
     "align": "محاذاة",
     "alignTop": "محاذاة إلى اﻷعلى",
