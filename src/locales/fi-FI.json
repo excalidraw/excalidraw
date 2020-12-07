@@ -71,11 +71,11 @@
     "ungroup": "Pura valittu ryhmä",
     "collaborators": "Yhteistyökumppanit",
     "toggleGridMode": "Ruudukko päälle/pois",
-    "toggleStats": "",
+    "toggleStats": "Nörttien tilastot päälle/pois",
     "addToLibrary": "Lisää kirjastoon",
     "removeFromLibrary": "Poista kirjastosta",
     "libraryLoadingMessage": "Ladataan kirjastoa...",
-    "libraries": "",
+    "libraries": "Selaa kirjastoja",
     "loadingScene": "Ladataan työtä...",
     "align": "Tasaa",
     "alignTop": "Tasaa ylös",
@@ -217,15 +217,15 @@
     "tooManyColumns": "Liitit taulukon, jossa on enemmän kuin kaksi saraketta."
   },
   "stats": {
-    "angle": "",
-    "element": "",
-    "elements": "",
-    "height": "",
-    "scene": "",
-    "selected": "",
-    "storage": "",
-    "title": "",
-    "total": "",
-    "width": ""
+    "angle": "Kulma",
+    "element": "Elementti",
+    "elements": "Elementit",
+    "height": "Korkeus",
+    "scene": "Teos",
+    "selected": "Valitut",
+    "storage": "Tallennustila",
+    "title": "Nörttien tilastot",
+    "total": "Yhteensä",
+    "width": "Leveys"
   }
 }
