@@ -75,6 +75,7 @@
     "addToLibrary": "Kütüphaneye ekle",
     "removeFromLibrary": "Kütüphaneden kaldır",
     "libraryLoadingMessage": "Kütüphane yükleniyor...",
+    "libraries": "",
     "loadingScene": "Çalışma alanı yükleniyor...",
     "align": "",
     "alignTop": "",
