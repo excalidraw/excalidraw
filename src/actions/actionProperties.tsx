@@ -638,7 +638,14 @@ export const actionChangeArrowhead = register({
     return {
       elements: changeProperty(elements, appState, (el) => {
         if (isLinearElement(el)) {
+          trackEvent(
+            EVENT_CHANGE,
+            `arrowhead ${value.position}`,
+            value.type || "none",
+          );
+
           const { position, type } = value;
+
           if (position === "start") {
             const element: ExcalidrawLinearElement = newElementWith(el, {
               startArrowhead: type,
@@ -651,12 +658,6 @@ export const actionChangeArrowhead = register({
             return element;
           }
         }
-
-        trackEvent(
-          EVENT_CHANGE,
-          `arrowhead ${value.position}`,
-          value.type.toString(),
-        );
 
         return el;
       }),
