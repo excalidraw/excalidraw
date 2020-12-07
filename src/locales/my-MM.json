@@ -71,6 +71,7 @@
     "ungroup": "အုပ်စုဖျက်သိမ်း",
     "collaborators": "ပူးပေါင်းပါဝင်သူများ",
     "toggleGridMode": "ဇယားကွက်ဖော်/ဖျောက်",
+    "toggleStats": "",
     "addToLibrary": "မှတ်တမ်းတင်",
     "removeFromLibrary": "မှတ်တမ်းမှထုတ်",
     "libraryLoadingMessage": "မှတ်တမ်းအား တင်သွင်းနေသည်...",
@@ -213,5 +214,17 @@
   "charts": {
     "noNumericColumn": "အမှတ်စဉ်ကော်လံမပါဝင်သောဇယားအားထည့်သွင်းလိုက်သည်။",
     "tooManyColumns": "ကော်လံနှစ်ခုထက်ပိုပါနေသောဇယားအားထည့်သွင်းလိုက်သည်။"
+  },
+  "stats": {
+    "angle": "",
+    "element": "",
+    "elements": "",
+    "height": "",
+    "scene": "",
+    "selected": "",
+    "storage": "",
+    "title": "",
+    "total": "",
+    "width": ""
   }
 }
