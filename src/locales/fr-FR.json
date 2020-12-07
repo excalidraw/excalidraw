@@ -75,6 +75,7 @@
     "addToLibrary": "Ajouter à la bibliothèque",
     "removeFromLibrary": "Supprimer de la bibliothèque",
     "libraryLoadingMessage": "Chargement de la bibliothèque...",
+    "libraries": "",
     "loadingScene": "Chargement de la scène...",
     "align": "Aligner",
     "alignTop": "Aligner en haut",
