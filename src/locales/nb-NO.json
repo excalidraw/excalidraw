@@ -71,7 +71,7 @@
     "ungroup": "Avgruppér utvalg",
     "collaborators": "Samarbeidspartnere",
     "toggleGridMode": "Slå av/på rutenett",
-    "toggleStats": "",
+    "toggleStats": "Skru av/på statistikk for nerder",
     "addToLibrary": "Legg til i bibliotek",
     "removeFromLibrary": "Fjern fra bibliotek",
     "libraryLoadingMessage": "Laster bibliotek...",
@@ -217,15 +217,15 @@
     "tooManyColumns": "Du limte inn et regneark med mer enn to kolonner."
   },
   "stats": {
-    "angle": "",
-    "element": "",
-    "elements": "",
-    "height": "",
-    "scene": "",
-    "selected": "",
-    "storage": "",
-    "title": "",
-    "total": "",
-    "width": ""
+    "angle": "Vinkel",
+    "element": "Element",
+    "elements": "Elementer",
+    "height": "Høyde",
+    "scene": "Scene",
+    "selected": "Valgt",
+    "storage": "Lagring",
+    "title": "Statistikk for nerder",
+    "total": "Totalt",
+    "width": "Bredde"
   }
 }
