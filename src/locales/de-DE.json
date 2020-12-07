@@ -71,6 +71,7 @@
     "ungroup": "Gruppierung aufheben",
     "collaborators": "Mitarbeitende",
     "toggleGridMode": "Gitterlinien ein-/ausschalten",
+    "toggleStats": "",
     "addToLibrary": "Zur Bibliothek hinzufügen",
     "removeFromLibrary": "Aus Bibliothek entfernen",
     "libraryLoadingMessage": "Lade Bibliothek...",
@@ -213,5 +214,17 @@
   "charts": {
     "noNumericColumn": "Du hast eine Tabelle ohne numerische Spalte eingefügt.",
     "tooManyColumns": "Du hast eine Tabelle mit mehr als zwei Spalten eingefügt."
+  },
+  "stats": {
+    "angle": "",
+    "element": "",
+    "elements": "",
+    "height": "",
+    "scene": "",
+    "selected": "",
+    "storage": "",
+    "title": "",
+    "total": "",
+    "width": ""
   }
 }
