@@ -71,6 +71,7 @@
     "ungroup": "그룹 해제",
     "collaborators": "공동 작업자",
     "toggleGridMode": "격자 모드 켜기/끄기",
+    "toggleStats": "",
     "addToLibrary": "라이브러리에 추가",
     "removeFromLibrary": "라이브러리에서 제거",
     "libraryLoadingMessage": "라이브러리 불러오는 중...",
@@ -213,5 +214,17 @@
   "charts": {
     "noNumericColumn": "",
     "tooManyColumns": ""
+  },
+  "stats": {
+    "angle": "",
+    "element": "",
+    "elements": "",
+    "height": "",
+    "scene": "",
+    "selected": "",
+    "storage": "",
+    "title": "",
+    "total": "",
+    "width": ""
   }
 }
