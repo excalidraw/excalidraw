@@ -220,11 +220,11 @@
     "element": "Element",
     "elements": "Element",
     "height": "Höjd",
-    "scene": "",
-    "selected": "",
-    "storage": "",
-    "title": "",
-    "total": "",
-    "width": ""
+    "scene": "Skiss",
+    "selected": "Valda",
+    "storage": "Lagring",
+    "title": "Statistik för nördar",
+    "total": "Totalt",
+    "width": "Bredd"
   }
 }
