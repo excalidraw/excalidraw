@@ -71,6 +71,7 @@
     "ungroup": "Розгрупувати виділене",
     "collaborators": "Співавтори",
     "toggleGridMode": "Режим сітки",
+    "toggleStats": "",
     "addToLibrary": "Додати до бібліотеки",
     "removeFromLibrary": "Видалити з бібліотеки",
     "libraryLoadingMessage": "Завантажити бібліотеку...",
@@ -213,5 +214,17 @@
   "charts": {
     "noNumericColumn": "Ви вставили таблицю без числової колонки.",
     "tooManyColumns": "Ви вставляли таблицю з більш ніж двома колонками."
+  },
+  "stats": {
+    "angle": "",
+    "element": "",
+    "elements": "",
+    "height": "",
+    "scene": "",
+    "selected": "",
+    "storage": "",
+    "title": "",
+    "total": "",
+    "width": ""
   }
 }
