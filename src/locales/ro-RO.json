@@ -71,6 +71,7 @@
     "ungroup": "Degrupare selecție",
     "collaborators": "Colaboratori",
     "toggleGridMode": "Comută modul grilă",
+    "toggleStats": "",
     "addToLibrary": "Adăugare la bibliotecă",
     "removeFromLibrary": "Eliminare din bibliotecă",
     "libraryLoadingMessage": "Se încarcă biblioteca...",
@@ -213,5 +214,17 @@
   "charts": {
     "noNumericColumn": "Ai inserat o foaie de calcul fără o coloană numerică.",
     "tooManyColumns": "Ai inserat o foaie de calcul cu mai mult de două coloane."
+  },
+  "stats": {
+    "angle": "",
+    "element": "",
+    "elements": "",
+    "height": "",
+    "scene": "",
+    "selected": "",
+    "storage": "",
+    "title": "",
+    "total": "",
+    "width": ""
   }
 }
