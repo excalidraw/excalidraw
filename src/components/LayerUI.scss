@@ -6,6 +6,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
+
+    .public-libraries {
+      white-space: nowrap;
+      margin-right: 16px;
+    }
   }
 
   .layer-ui__library-message {

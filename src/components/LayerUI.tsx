@@ -124,6 +124,16 @@ const LibraryMenuItems = ({
       key={"actions"}
       style={{ padding: "2px 0" }}
     >
+      <a
+        className="public-libraries"
+        href="https://libraries.excalidraw.com"
+        target="_excalidraw_libraries"
+        onClick={() => {
+          trackEvent(EVENT_EXIT, "libraries");
+        }}
+      >
+        {t("labels.libraries")}
+      </a>
       <ToolButton
         key="import"
         type="button"
@@ -161,27 +171,27 @@ const LibraryMenuItems = ({
   );
 
   for (let row = 0; row < numRows; row++) {
-    const i = CELLS_PER_ROW * row;
+    const y = CELLS_PER_ROW * row;
     const children = [];
-    for (let j = 0; j < CELLS_PER_ROW; j++) {
+    for (let x = 0; x < CELLS_PER_ROW; x++) {
       const shouldAddPendingElements: boolean =
         pendingElements.length > 0 &&
         !addedPendingElements &&
-        i + j >= library.length;
+        y + x >= library.length;
       addedPendingElements = addedPendingElements || shouldAddPendingElements;
 
       children.push(
-        <Stack.Col key={j}>
+        <Stack.Col key={x}>
           <LibraryUnit
-            elements={library[i + j]}
+            elements={library[y + x]}
             pendingElements={
               shouldAddPendingElements ? pendingElements : undefined
             }
-            onRemoveFromLibrary={onRemoveFromLibrary.bind(null, i + j)}
+            onRemoveFromLibrary={onRemoveFromLibrary.bind(null, y + x)}
             onClick={
               shouldAddPendingElements
                 ? onAddToLibrary.bind(null, pendingElements)
-                : onInsertShape.bind(null, library[i + j])
+                : onInsertShape.bind(null, library[y + x])
             }
           />
         </Stack.Col>,
