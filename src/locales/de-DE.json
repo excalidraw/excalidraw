@@ -75,6 +75,7 @@
     "addToLibrary": "Zur Bibliothek hinzufügen",
     "removeFromLibrary": "Aus Bibliothek entfernen",
     "libraryLoadingMessage": "Lade Bibliothek...",
+    "libraries": "",
     "loadingScene": "Lade Zeichnung...",
     "align": "Ausrichten",
     "alignTop": "Obere Kanten",
