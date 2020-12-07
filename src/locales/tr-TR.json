@@ -71,6 +71,7 @@
     "ungroup": "Seçilen grubu dağıt",
     "collaborators": "Ortaklar",
     "toggleGridMode": "Izgara modunu aç",
+    "toggleStats": "",
     "addToLibrary": "Kütüphaneye ekle",
     "removeFromLibrary": "Kütüphaneden kaldır",
     "libraryLoadingMessage": "Kütüphane yükleniyor...",
@@ -213,5 +214,17 @@
   "charts": {
     "noNumericColumn": "Sayısal sütunu olmayan bir tablo yapıştırdın.",
     "tooManyColumns": "İkiden daha fazla sütuna sahip bir tablo yapıştırdın."
+  },
+  "stats": {
+    "angle": "",
+    "element": "",
+    "elements": "",
+    "height": "",
+    "scene": "",
+    "selected": "",
+    "storage": "",
+    "title": "",
+    "total": "",
+    "width": ""
   }
 }
