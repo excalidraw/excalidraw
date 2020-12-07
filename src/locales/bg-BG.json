@@ -71,6 +71,7 @@
     "ungroup": "",
     "collaborators": "",
     "toggleGridMode": "",
+    "toggleStats": "",
     "addToLibrary": "",
     "removeFromLibrary": "",
     "libraryLoadingMessage": "",
@@ -213,5 +214,17 @@
   "charts": {
     "noNumericColumn": "",
     "tooManyColumns": ""
+  },
+  "stats": {
+    "angle": "",
+    "element": "",
+    "elements": "",
+    "height": "",
+    "scene": "",
+    "selected": "",
+    "storage": "",
+    "title": "",
+    "total": "",
+    "width": ""
   }
 }
