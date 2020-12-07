@@ -71,6 +71,7 @@
     "ungroup": "取消组选",
     "collaborators": "协作者",
     "toggleGridMode": "切换网格模式",
+    "toggleStats": "",
     "addToLibrary": "添加到库中",
     "removeFromLibrary": "从库中移除",
     "libraryLoadingMessage": "正在加载库...",
@@ -213,5 +214,17 @@
   "charts": {
     "noNumericColumn": "您粘贴了一个没有数字列的表格。",
     "tooManyColumns": "您粘贴了两列以上的表格。"
+  },
+  "stats": {
+    "angle": "",
+    "element": "",
+    "elements": "",
+    "height": "",
+    "scene": "",
+    "selected": "",
+    "storage": "",
+    "title": "",
+    "total": "",
+    "width": ""
   }
 }
