@@ -120,7 +120,7 @@ const LibraryMenuItems = ({
   rows.push(
     <>
       <a
-        className="public-libraries"
+        className="browse-libraries"
         href="https://libraries.excalidraw.com"
         target="_excalidraw_libraries"
         onClick={() => {
