@@ -71,7 +71,7 @@
     "ungroup": "Dividi gruppo da selezione",
     "collaborators": "Collaboratori",
     "toggleGridMode": "Attiva/disattiva modalità quadrícula",
-    "toggleStats": "",
+    "toggleStats": "Attiva/disattiva statistiche per nerd",
     "addToLibrary": "Aggiungi alla biblioteca",
     "removeFromLibrary": "Rimuovi dalla biblioteca",
     "libraryLoadingMessage": "Caricamento della biblioteca...",
@@ -216,15 +216,15 @@
     "tooManyColumns": "Hai incollato un foglio di calcolo con più di due colonne."
   },
   "stats": {
-    "angle": "",
-    "element": "",
-    "elements": "",
-    "height": "",
-    "scene": "",
-    "selected": "",
-    "storage": "",
-    "title": "",
-    "total": "",
-    "width": ""
+    "angle": "Angolo",
+    "element": "Elemento",
+    "elements": "Elementi",
+    "height": "Altezza",
+    "scene": "Scena",
+    "selected": "Selezionato",
+    "storage": "Memoria",
+    "title": "Statistiche per nerd",
+    "total": "Totale",
+    "width": "Larghezza"
   }
 }
