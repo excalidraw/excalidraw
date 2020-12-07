@@ -71,7 +71,7 @@
     "ungroup": "取消群組",
     "collaborators": "協作者",
     "toggleGridMode": "切換格線模式",
-    "toggleStats": "",
+    "toggleStats": "切換詳細統計",
     "addToLibrary": "加入資料庫",
     "removeFromLibrary": "從資料庫中移除",
     "libraryLoadingMessage": "資料庫讀取中…",
@@ -216,15 +216,15 @@
     "tooManyColumns": "你貼上的 spreadsheet 超過兩欄。"
   },
   "stats": {
-    "angle": "",
-    "element": "",
-    "elements": "",
-    "height": "",
-    "scene": "",
-    "selected": "",
-    "storage": "",
-    "title": "",
-    "total": "",
-    "width": ""
+    "angle": "角度",
+    "element": "元素",
+    "elements": "元素",
+    "height": "高度",
+    "scene": "場景",
+    "selected": "已選",
+    "storage": "儲存",
+    "title": "詳細統計",
+    "total": "合計",
+    "width": "寬度"
   }
 }
