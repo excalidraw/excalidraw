@@ -71,6 +71,7 @@
     "ungroup": "Avgruppera markering",
     "collaborators": "Medarbetare",
     "toggleGridMode": "Växla rutnätsläge",
+    "toggleStats": "",
     "addToLibrary": "Lägg till i biblioteket",
     "removeFromLibrary": "Ta bort från bibliotek",
     "libraryLoadingMessage": "Laddar bibliotek...",
@@ -213,5 +214,17 @@
   "charts": {
     "noNumericColumn": "Du klistrade in ett kalkylblad utan en numerisk kolumn.",
     "tooManyColumns": "Du klistrade in ett kalkylblad med mer än två kolumner."
+  },
+  "stats": {
+    "angle": "",
+    "element": "",
+    "elements": "",
+    "height": "",
+    "scene": "",
+    "selected": "",
+    "storage": "",
+    "title": "",
+    "total": "",
+    "width": ""
   }
 }
