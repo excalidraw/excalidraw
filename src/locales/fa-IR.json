@@ -75,6 +75,7 @@
     "addToLibrary": "افزودن به کتابخانه",
     "removeFromLibrary": "حذف از کتابخانه",
     "libraryLoadingMessage": "بارگذاری کتابخانه...",
+    "libraries": "",
     "loadingScene": "باگذاری صحنه...",
     "align": "تراز",
     "alignTop": "تراز به بالا",
