@@ -53,7 +53,7 @@
     "@types/lodash.throttle": "4.1.6",
     "@types/pako": "1.0.1",
     "asar": "3.0.3",
-    "eslint-config-prettier": "6.15.0",
+    "eslint-config-prettier": "7.0.0",
     "eslint-plugin-prettier": "3.1.4",
     "firebase-tools": "8.16.2",
     "husky": "4.3.0",
