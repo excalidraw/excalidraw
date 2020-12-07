@@ -6,7 +6,7 @@ import {
   getTotalStorageSize,
 } from "../excalidraw-app/data/localStorage";
 import { t } from "../i18n";
-import { getSelectedElements } from "../scene";
+import { getTargetElement } from "../scene";
 import { AppState } from "../types";
 import { debounce, nFormatter } from "../utils";
 import { close } from "./icons";
@@ -41,9 +41,7 @@ export const StatsForNerds = (props: {
   useEffect(() => () => getStorageSizes.cancel(), []);
 
   const boundingBox = getCommonBounds(props.elements);
-  const selectedElements = props.appState.editingElement
-    ? [props.appState.editingElement]
-    : getSelectedElements(props.elements, props.appState);
+  const selectedElements = getTargetElement(props.elements, props.appState);
   const selectedBoundingBox = getCommonBounds(selectedElements);
 
   return (

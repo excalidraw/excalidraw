@@ -59,15 +59,12 @@ export const getCommonAttributeOfSelectedElements = <T>(
 export const getSelectedElements = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
-) => {
-  return elements.filter((element) => appState.selectedElementIds[element.id]);
-};
+) => elements.filter((element) => appState.selectedElementIds[element.id]);
 
 export const getTargetElement = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
-) => {
-  return appState.editingElement
+) =>
+  appState.editingElement
     ? [appState.editingElement]
     : getSelectedElements(elements, appState);
-};
