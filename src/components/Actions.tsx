@@ -7,7 +7,7 @@ import {
   hasStroke,
   canChangeSharpness,
   hasText,
-  getTargetElement,
+  getTargetElements,
 } from "../scene";
 import { t } from "../i18n";
 import { SHAPES } from "../shapes";
@@ -29,7 +29,7 @@ export const SelectedShapeActions = ({
   renderAction: ActionManager["renderAction"];
   elementType: ExcalidrawElement["type"];
 }) => {
-  const targetElements = getTargetElement(
+  const targetElements = getTargetElements(
     getNonDeletedElements(elements),
     appState,
   );

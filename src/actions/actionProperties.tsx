@@ -8,7 +8,7 @@ import {
 import {
   getCommonAttributeOfSelectedElements,
   isSomeElementSelected,
-  getTargetElement,
+  getTargetElements,
   canChangeSharpness,
 } from "../scene";
 import { ButtonSelect } from "../components/ButtonSelect";
@@ -561,7 +561,7 @@ export const actionChangeTextAlign = register({
 export const actionChangeSharpness = register({
   name: "changeSharpness",
   perform: (elements, appState, value) => {
-    const targetElements = getTargetElement(
+    const targetElements = getTargetElements(
       getNonDeletedElements(elements),
       appState,
     );
