@@ -71,6 +71,7 @@
     "ungroup": "Groep opheffen",
     "collaborators": "Deelnemers",
     "toggleGridMode": "Rasterlijnen in-/uitschakelen",
+    "toggleStats": "",
     "addToLibrary": "Voeg toe aan bibliotheek",
     "removeFromLibrary": "Verwijder uit bibliotheek",
     "libraryLoadingMessage": "Bibliotheek laden...",
@@ -213,5 +214,17 @@
   "charts": {
     "noNumericColumn": "Je hebt een werkblad geplakt zonder een numerieke kolom.",
     "tooManyColumns": "Je hebt een werkblad geplakt met meer dan twee kolommen."
+  },
+  "stats": {
+    "angle": "",
+    "element": "",
+    "elements": "",
+    "height": "",
+    "scene": "",
+    "selected": "",
+    "storage": "",
+    "title": "",
+    "total": "",
+    "width": ""
   }
 }
