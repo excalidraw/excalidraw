@@ -71,6 +71,7 @@
     "ungroup": "حذف گروهبندی انتخابها",
     "collaborators": "همکاران",
     "toggleGridMode": "سويچ خطوط راهنما",
+    "toggleStats": "",
     "addToLibrary": "افزودن به کتابخانه",
     "removeFromLibrary": "حذف از کتابخانه",
     "libraryLoadingMessage": "بارگذاری کتابخانه...",
@@ -213,5 +214,17 @@
   "charts": {
     "noNumericColumn": "شما یک صفحه گسترده را بدون ستون عددی کپی کرده اید.",
     "tooManyColumns": "شما یک صفحه گسترده را با بیش از دو ستون کپی کرده اید."
+  },
+  "stats": {
+    "angle": "",
+    "element": "",
+    "elements": "",
+    "height": "",
+    "scene": "",
+    "selected": "",
+    "storage": "",
+    "title": "",
+    "total": "",
+    "width": ""
   }
 }
