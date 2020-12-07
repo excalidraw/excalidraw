@@ -71,6 +71,7 @@
     "ungroup": "Zrušiť zoskupenie",
     "collaborators": "Spolupracovníci",
     "toggleGridMode": "Prepnúť mriežku",
+    "toggleStats": "",
     "addToLibrary": "Pridať do knižnice",
     "removeFromLibrary": "Odstrániť z knižnice",
     "libraryLoadingMessage": "Načítavanie knižnice...",
@@ -213,5 +214,17 @@
   "charts": {
     "noNumericColumn": "Prilepili ste tabuľku bez číselného stĺpca.",
     "tooManyColumns": "Prilepili ste tabuľku s viac ako dvoma stĺpcami."
+  },
+  "stats": {
+    "angle": "",
+    "element": "",
+    "elements": "",
+    "height": "",
+    "scene": "",
+    "selected": "",
+    "storage": "",
+    "title": "",
+    "total": "",
+    "width": ""
   }
 }
