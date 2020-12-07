@@ -75,6 +75,7 @@
     "addToLibrary": "Pridať do knižnice",
     "removeFromLibrary": "Odstrániť z knižnice",
     "libraryLoadingMessage": "Načítavanie knižnice...",
+    "libraries": "",
     "loadingScene": "Načítavanie scény...",
     "align": "Zarovnanie",
     "alignTop": "Zarovnať nahor",
