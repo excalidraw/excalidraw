@@ -8,8 +8,13 @@
     justify-content: center;
 
     .public-libraries {
+      position: absolute;
+      right: 12px;
+      top: 16px;
       white-space: nowrap;
-      margin-right: 16px;
+      max-width: 140px;
+      text-overflow: ellipsis;
+      overflow: hidden;
     }
   }
 

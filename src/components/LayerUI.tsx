@@ -118,12 +118,7 @@ const LibraryMenuItems = ({
   let addedPendingElements = false;
 
   rows.push(
-    <Stack.Row
-      align="center"
-      gap={1}
-      key={"actions"}
-      style={{ padding: "2px 0" }}
-    >
+    <>
       <a
         className="public-libraries"
         href="https://libraries.excalidraw.com"
@@ -134,40 +129,48 @@ const LibraryMenuItems = ({
       >
         {t("labels.libraries")}
       </a>
-      <ToolButton
-        key="import"
-        type="button"
-        title={t("buttons.load")}
-        aria-label={t("buttons.load")}
-        icon={load}
-        onClick={() => {
-          importLibraryFromJSON()
-            .then(() => {
-              // Maybe we should close and open the menu so that the items get updated.
-              // But for now we just close the menu.
-              setAppState({ isLibraryOpen: false });
-            })
-            .catch(muteFSAbortError)
-            .catch((error) => {
-              setAppState({ errorMessage: error.message });
-            });
-        }}
-      />
-      <ToolButton
-        key="export"
-        type="button"
-        title={t("buttons.export")}
-        aria-label={t("buttons.export")}
-        icon={exportFile}
-        onClick={() => {
-          saveLibraryAsJSON()
-            .catch(muteFSAbortError)
-            .catch((error) => {
-              setAppState({ errorMessage: error.message });
-            });
-        }}
-      />
-    </Stack.Row>,
+
+      <Stack.Row
+        align="center"
+        gap={1}
+        key={"actions"}
+        style={{ padding: "2px 0" }}
+      >
+        <ToolButton
+          key="import"
+          type="button"
+          title={t("buttons.load")}
+          aria-label={t("buttons.load")}
+          icon={load}
+          onClick={() => {
+            importLibraryFromJSON()
+              .then(() => {
+                // Maybe we should close and open the menu so that the items get updated.
+                // But for now we just close the menu.
+                setAppState({ isLibraryOpen: false });
+              })
+              .catch(muteFSAbortError)
+              .catch((error) => {
+                setAppState({ errorMessage: error.message });
+              });
+          }}
+        />
+        <ToolButton
+          key="export"
+          type="button"
+          title={t("buttons.export")}
+          aria-label={t("buttons.export")}
+          icon={exportFile}
+          onClick={() => {
+            saveLibraryAsJSON()
+              .catch(muteFSAbortError)
+              .catch((error) => {
+                setAppState({ errorMessage: error.message });
+              });
+          }}
+        />
+      </Stack.Row>
+    </>,
   );
 
   for (let row = 0; row < numRows; row++) {
