@@ -5,6 +5,7 @@ import {
   TextAlign,
   FontFamily,
   ExcalidrawLinearElement,
+  Arrowhead,
 } from "../element/types";
 import {
   getCommonAttributeOfSelectedElements,
@@ -629,7 +630,11 @@ export const actionChangeSharpness = register({
 
 export const actionChangeArrowhead = register({
   name: "changeArrowhead",
-  perform: (elements, appState, value) => {
+  perform: (
+    elements,
+    appState,
+    value: { position: "start" | "end"; type: Arrowhead },
+  ) => {
     return {
       elements: changeProperty(elements, appState, (el) => {
         if (isLinearElement(el)) {
@@ -646,6 +651,12 @@ export const actionChangeArrowhead = register({
             return element;
           }
         }
+
+        trackEvent(
+          EVENT_CHANGE,
+          `arrowhead ${value.position}`,
+          value.type.toString(),
+        );
 
         return el;
       }),
@@ -682,7 +693,7 @@ export const actionChangeArrowhead = register({
               ),
             },
           ]}
-          value={getFormValue(
+          value={getFormValue<Arrowhead | null>(
             elements,
             appState,
             (element) =>
@@ -707,7 +718,7 @@ export const actionChangeArrowhead = register({
               icon: <ArrowArrowheadIcon appearance={appState.appearance} />,
             },
           ]}
-          value={getFormValue(
+          value={getFormValue<Arrowhead | null>(
             elements,
             appState,
             (element) =>
