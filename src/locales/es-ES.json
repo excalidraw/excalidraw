@@ -71,6 +71,7 @@
     "ungroup": "Desagrupar",
     "collaborators": "Colaboradores",
     "toggleGridMode": "Alternar modo cuadrícula",
+    "toggleStats": "",
     "addToLibrary": "Añadir a la biblioteca",
     "removeFromLibrary": "Eliminar de la biblioteca",
     "libraryLoadingMessage": "Cargando biblioteca...",
@@ -213,5 +214,17 @@
   "charts": {
     "noNumericColumn": "Pegaste una hoja de cálculo sin una columna numérica.",
     "tooManyColumns": "Pegaste una hoja de cálculo con más de dos columnas."
+  },
+  "stats": {
+    "angle": "",
+    "element": "",
+    "elements": "",
+    "height": "",
+    "scene": "",
+    "selected": "",
+    "storage": "",
+    "title": "",
+    "total": "",
+    "width": ""
   }
 }
