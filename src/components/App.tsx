@@ -1407,14 +1407,30 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private onGestureStart = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
+    this.setState({
+      selectedElementIds: {},
+    });
+    gesture.initialScale = this.state.zoom.value;
   });
 
   private onGestureChange = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
+    this.setState(({ zoom }) => ({
+      zoom: getNewZoom(
+        getNormalizedZoom(gesture.initialScale! * event.scale),
+        zoom,
+        { x: cursorX, y: cursorY },
+      ),
+    }));
   });
 
   private onGestureEnd = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
+    this.setState({
+      previousSelectedElementIds: {},
+      selectedElementIds: this.state.previousSelectedElementIds,
+    });
+    gesture.initialScale = null;
   });
 
   private handleTextWysiwyg(
