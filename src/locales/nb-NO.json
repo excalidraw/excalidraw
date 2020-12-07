@@ -75,6 +75,7 @@
     "addToLibrary": "Legg til i bibliotek",
     "removeFromLibrary": "Fjern fra bibliotek",
     "libraryLoadingMessage": "Laster bibliotek...",
+    "libraries": "",
     "loadingScene": "Laster inn scene...",
     "align": "Juster",
     "alignTop": "Juster øverst",
