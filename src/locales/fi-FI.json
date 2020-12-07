@@ -75,6 +75,7 @@
     "addToLibrary": "Lisää kirjastoon",
     "removeFromLibrary": "Poista kirjastosta",
     "libraryLoadingMessage": "Ladataan kirjastoa...",
+    "libraries": "",
     "loadingScene": "Ladataan työtä...",
     "align": "Tasaa",
     "alignTop": "Tasaa ylös",
