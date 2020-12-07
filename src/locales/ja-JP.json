@@ -75,6 +75,7 @@
     "addToLibrary": "ライブラリに追加",
     "removeFromLibrary": "ライブラリから削除",
     "libraryLoadingMessage": "ライブラリを読み込み中...",
+    "libraries": "",
     "loadingScene": "シーンを読み込み中...",
     "align": "整列",
     "alignTop": "上揃え",
