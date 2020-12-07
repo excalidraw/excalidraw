@@ -71,6 +71,7 @@
     "ungroup": "समूह चयन असमूहीकृत करें",
     "collaborators": "सहयोगी",
     "toggleGridMode": "टॉगल ग्रिड मोड",
+    "toggleStats": "",
     "addToLibrary": "लाइब्रेरी से जोड़ें",
     "removeFromLibrary": "लाइब्रेरी से निकालें",
     "libraryLoadingMessage": "लाइब्रेरी खुल रही है",
@@ -213,5 +214,17 @@
   "charts": {
     "noNumericColumn": "आपने एक संख्यात्मक कॉलम के बिना एक स्प्रेडशीट चिपकाई।",
     "tooManyColumns": "आपने दो से अधिक कॉलम के साथ एक स्प्रेडशीट चिपकाई।"
+  },
+  "stats": {
+    "angle": "",
+    "element": "",
+    "elements": "",
+    "height": "",
+    "scene": "",
+    "selected": "",
+    "storage": "",
+    "title": "",
+    "total": "",
+    "width": ""
   }
 }
