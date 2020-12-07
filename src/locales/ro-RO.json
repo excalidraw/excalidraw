@@ -71,10 +71,11 @@
     "ungroup": "Degrupare selecție",
     "collaborators": "Colaboratori",
     "toggleGridMode": "Comută modul grilă",
-    "toggleStats": "",
+    "toggleStats": "Comută statisticile pentru pasionați",
     "addToLibrary": "Adăugare la bibliotecă",
     "removeFromLibrary": "Eliminare din bibliotecă",
     "libraryLoadingMessage": "Se încarcă biblioteca...",
+    "libraries": "",
     "loadingScene": "Se încarcă scena...",
     "align": "Aliniere",
     "alignTop": "Aliniere sus",
@@ -216,15 +217,15 @@
     "tooManyColumns": "Ai inserat o foaie de calcul cu mai mult de două coloane."
   },
   "stats": {
-    "angle": "",
-    "element": "",
-    "elements": "",
-    "height": "",
-    "scene": "",
-    "selected": "",
-    "storage": "",
-    "title": "",
-    "total": "",
-    "width": ""
+    "angle": "Unghi",
+    "element": "Element",
+    "elements": "Elemente",
+    "height": "Înălțime",
+    "scene": "Scenă",
+    "selected": "Selectate",
+    "storage": "Stocare",
+    "title": "Statistici pentru pasionați",
+    "total": "Total",
+    "width": "Lățime"
   }
 }
