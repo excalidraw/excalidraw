@@ -71,7 +71,7 @@
     "ungroup": "Avgruppera markering",
     "collaborators": "Medarbetare",
     "toggleGridMode": "Växla rutnätsläge",
-    "toggleStats": "",
+    "toggleStats": "Visa/dölj statistik för nördar",
     "addToLibrary": "Lägg till i biblioteket",
     "removeFromLibrary": "Ta bort från bibliotek",
     "libraryLoadingMessage": "Laddar bibliotek...",
@@ -216,10 +216,10 @@
     "tooManyColumns": "Du klistrade in ett kalkylblad med mer än två kolumner."
   },
   "stats": {
-    "angle": "",
-    "element": "",
-    "elements": "",
-    "height": "",
+    "angle": "Vinkel",
+    "element": "Element",
+    "elements": "Element",
+    "height": "Höjd",
     "scene": "",
     "selected": "",
     "storage": "",
