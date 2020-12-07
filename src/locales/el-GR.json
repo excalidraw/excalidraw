@@ -217,15 +217,15 @@
     "tooManyColumns": "Επικόλλησες ένα υπολογιστικό φύλλο με περισσότερες από δύο στήλες."
   },
   "stats": {
-    "angle": "",
+    "angle": "Γωνία",
     "element": "",
     "elements": "",
-    "height": "",
+    "height": "Ύψος",
     "scene": "",
-    "selected": "",
-    "storage": "",
+    "selected": "Επιλεγμένα",
+    "storage": "Χώρος",
     "title": "",
-    "total": "",
-    "width": ""
+    "total": "Σύνολο ",
+    "width": "Πλάτος"
   }
 }
