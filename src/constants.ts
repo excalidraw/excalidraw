@@ -21,11 +21,6 @@ export const POINTER_BUTTON = {
   TOUCH: -1,
 };
 
-export enum SCENE {
-  INIT = "SCENE_INIT",
-  UPDATE = "SCENE_UPDATE",
-}
-
 export enum EVENT {
   COPY = "copy",
   PASTE = "paste",
@@ -56,11 +51,6 @@ export const ENV = {
   DEVELOPMENT: "development",
 };
 
-export const BROADCAST = {
-  SERVER_VOLATILE: "server-volatile-broadcast",
-  SERVER: "server-broadcast",
-};
-
 export const CLASSES = {
   SHAPE_ACTIONS_MENU: "App-menu__left",
 };
@@ -83,16 +73,15 @@ export const CANVAS_ONLY_ACTIONS = ["selectAll"];
 
 export const GRID_SIZE = 20; // TODO make it configurable?
 
-export const LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG = "collabLinkForceLoadFlag";
-
 export const MIME_TYPES = {
   excalidraw: "application/vnd.excalidraw+json",
   excalidrawlib: "application/vnd.excalidrawlib+json",
 };
 
 export const STORAGE_KEYS = {
-  LOCAL_STORAGE_ELEMENTS: "excalidraw",
-  LOCAL_STORAGE_APP_STATE: "excalidraw-state",
-  LOCAL_STORAGE_COLLAB: "excalidraw-collab",
   LOCAL_STORAGE_LIBRARY: "excalidraw-library",
 };
+
+// time in milliseconds
+export const TAP_TWICE_TIMEOUT = 300;
+export const TOUCH_CTX_MENU_TIMEOUT = 500;

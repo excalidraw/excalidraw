@@ -48,9 +48,7 @@ export const getDefaultAppState = (): Omit<
     cursorButton: "up",
     scrolledOutside: false,
     name: `${t("labels.untitled")}-${getDateTime()}`,
-    username: "",
     isBindingEnabled: true,
-    isCollaborating: false,
     isResizing: false,
     isRotating: false,
     selectionElement: null,
@@ -62,7 +60,6 @@ export const getDefaultAppState = (): Omit<
     lastPointerDownWith: "mouse",
     selectedElementIds: {},
     previousSelectedElementIds: {},
-    collaborators: new Map(),
     shouldCacheIgnoreZoom: false,
     showShortcutsDialog: false,
     suggestedBindings: [],
@@ -74,6 +71,8 @@ export const getDefaultAppState = (): Omit<
     height: window.innerHeight,
     isLibraryOpen: false,
     fileHandle: null,
+    collaborators: new Map(),
+    showStats: false,
   };
 };
 
@@ -93,7 +92,6 @@ const APP_STATE_STORAGE_CONF = (<
   config: { [K in keyof T]: K extends keyof AppState ? T[K] : never },
 ) => config)({
   appearance: { browser: true, export: false },
-  collaborators: { browser: false, export: false },
   currentItemBackgroundColor: { browser: true, export: false },
   currentItemFillStyle: { browser: true, export: false },
   currentItemFontFamily: { browser: true, export: false },
@@ -123,7 +121,6 @@ const APP_STATE_STORAGE_CONF = (<
   gridSize: { browser: true, export: true },
   height: { browser: false, export: false },
   isBindingEnabled: { browser: false, export: false },
-  isCollaborating: { browser: false, export: false },
   isLibraryOpen: { browser: false, export: false },
   isLoading: { browser: false, export: false },
   isResizing: { browser: false, export: false },
@@ -144,7 +141,6 @@ const APP_STATE_STORAGE_CONF = (<
   shouldCacheIgnoreZoom: { browser: true, export: false },
   showShortcutsDialog: { browser: false, export: false },
   suggestedBindings: { browser: false, export: false },
-  username: { browser: true, export: false },
   viewBackgroundColor: { browser: true, export: true },
   width: { browser: false, export: false },
   zenModeEnabled: { browser: true, export: false },
@@ -152,6 +148,8 @@ const APP_STATE_STORAGE_CONF = (<
   offsetTop: { browser: false, export: false },
   offsetLeft: { browser: false, export: false },
   fileHandle: { browser: false, export: false },
+  collaborators: { browser: false, export: false },
+  showStats: { browser: true, export: false },
 });
 
 const _clearAppStateForStorage = <ExportType extends "export" | "browser">(

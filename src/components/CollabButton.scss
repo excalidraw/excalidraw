@@ -1,0 +1,29 @@
+@import "../css/_variables";
+
+.excalidraw {
+  .CollabButton.is-collaborating {
+    background-color: var(--button-special-active-background-color);
+
+    .ToolIcon__icon svg {
+      color: var(--icon-green-fill-color);
+    }
+  }
+
+  .CollabButton-collaborators {
+    :root[dir="ltr"] & {
+      right: -5px;
+    }
+    :root[dir="rtl"] & {
+      left: -5px;
+    }
+    min-width: 1em;
+    position: absolute;
+    bottom: -5px;
+    padding: 3px;
+    border-radius: 50%;
+    background-color: $oc-green-6;
+    color: $oc-white;
+    font-size: 0.7em;
+    font-family: var(--ui-font);
+  }
+}

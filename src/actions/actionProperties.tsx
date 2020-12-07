@@ -10,7 +10,7 @@ import {
 import {
   getCommonAttributeOfSelectedElements,
   isSomeElementSelected,
-  getTargetElement,
+  getTargetElements,
   canChangeSharpness,
   canHaveArrowheads,
 } from "../scene";
@@ -566,7 +566,7 @@ export const actionChangeTextAlign = register({
 export const actionChangeSharpness = register({
   name: "changeSharpness",
   perform: (elements, appState, value) => {
-    const targetElements = getTargetElement(
+    const targetElements = getTargetElements(
       getNonDeletedElements(elements),
       appState,
     );

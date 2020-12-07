@@ -12,7 +12,7 @@ import { HintViewer } from "./HintViewer";
 import { calculateScrollCenter } from "../scene";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { Section } from "./Section";
-import { RoomDialog } from "./RoomDialog";
+import CollabButton from "./CollabButton";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 import { LockIcon } from "./LockIcon";
 import { LoadingMessage } from "./LoadingMessage";
@@ -27,11 +27,10 @@ type MobileMenuProps = {
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
   libraryMenu: JSX.Element | null;
-  onRoomCreate: () => void;
-  onUsernameChange: (username: string) => void;
-  onRoomDestroy: () => void;
+  onCollabButtonClick?: () => void;
   onLockToggle: () => void;
   canvas: HTMLCanvasElement | null;
+  isCollaborating: boolean;
 };
 
 export const MobileMenu = ({
@@ -41,11 +40,10 @@ export const MobileMenu = ({
   actionManager,
   exportButton,
   setAppState,
-  onRoomCreate,
-  onUsernameChange,
-  onRoomDestroy,
+  onCollabButtonClick,
   onLockToggle,
   canvas,
+  isCollaborating,
 }: MobileMenuProps) => (
   <>
     {appState.isLoading && <LoadingMessage />}
@@ -94,17 +92,13 @@ export const MobileMenu = ({
                 {actionManager.renderAction("saveAsScene")}
                 {exportButton}
                 {actionManager.renderAction("clearCanvas")}
-                <RoomDialog
-                  isCollaborating={appState.isCollaborating}
-                  collaboratorCount={appState.collaborators.size}
-                  username={appState.username}
-                  onUsernameChange={onUsernameChange}
-                  onRoomCreate={onRoomCreate}
-                  onRoomDestroy={onRoomDestroy}
-                  setErrorMessage={(message: string) =>
-                    setAppState({ errorMessage: message })
-                  }
-                />
+                {onCollabButtonClick && (
+                  <CollabButton
+                    isCollaborating={isCollaborating}
+                    collaboratorCount={appState.collaborators.size}
+                    onClick={onCollabButtonClick}
+                  />
+                )}
                 <BackgroundPickerAndDarkModeToggle
                   actionManager={actionManager}
                   appState={appState}
