@@ -4,7 +4,7 @@ export {
   getElementsWithinSelection,
   getCommonAttributeOfSelectedElements,
   getSelectedElements,
-  getTargetElement,
+  getTargetElements as getTargetElement,
 } from "./selection";
 export { normalizeScroll, calculateScrollCenter } from "./scroll";
 export {

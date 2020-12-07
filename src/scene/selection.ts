@@ -61,7 +61,7 @@ export const getSelectedElements = (
   appState: AppState,
 ) => elements.filter((element) => appState.selectedElementIds[element.id]);
 
-export const getTargetElement = (
+export const getTargetElements = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
 ) =>
