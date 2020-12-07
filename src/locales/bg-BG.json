@@ -75,6 +75,7 @@
     "addToLibrary": "",
     "removeFromLibrary": "",
     "libraryLoadingMessage": "",
+    "libraries": "",
     "loadingScene": "",
     "align": "",
     "alignTop": "",
