@@ -75,6 +75,7 @@
     "addToLibrary": "Voeg toe aan bibliotheek",
     "removeFromLibrary": "Verwijder uit bibliotheek",
     "libraryLoadingMessage": "Bibliotheek laden...",
+    "libraries": "",
     "loadingScene": "Scène laden...",
     "align": "",
     "alignTop": "",
