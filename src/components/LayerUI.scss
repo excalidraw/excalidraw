@@ -6,6 +6,16 @@
     display: flex;
     align-items: center;
     justify-content: center;
+
+    .browse-libraries {
+      position: absolute;
+      right: 12px;
+      top: 16px;
+      white-space: nowrap;
+      max-width: 140px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
   }
 
   .layer-ui__library-message {
