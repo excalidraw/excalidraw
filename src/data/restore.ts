@@ -91,8 +91,8 @@ const restoreElement = (
     case "line":
     case "arrow": {
       const {
-        startDecorator = null,
-        endDecorator = element.type === "arrow" ? "arrow" : null,
+        startArrowhead = null,
+        endArrowhead = element.type === "arrow" ? "arrow" : null,
       } = element;
 
       return restoreElementWithProperties(element, {
@@ -107,8 +107,8 @@ const restoreElement = (
               ]
             : element.points,
         lastCommittedPoint: null,
-        startDecorator,
-        endDecorator,
+        startArrowhead,
+        endArrowhead,
       });
     }
     // generic elements

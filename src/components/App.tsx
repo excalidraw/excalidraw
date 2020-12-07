@@ -2893,11 +2893,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         elementType === "draw" ? null : this.state.gridSize,
       );
 
-      // If arrow is pre-decorators, it will have undefined for both start and end decorators.
+      // If arrow is pre-arrowheads, it will have undefined for both start and end arrowheads.
       // If so, we want it to be null/"arrow". If the linear item is not an arrow, we want it
-      // to be null/null. Otherwise, we want it to use the currentItemLinearDecorators values.
-      const { start, end } = this.state.currentItemLinearDecorators;
-      const [startDecorator, endDecorator] =
+      // to be null/null. Otherwise, we want it to use the currentItemArrowheads values.
+      const { start, end } = this.state.currentItemArrowheads;
+      const [startArrowhead, endArrowhead] =
         elementType === "arrow" ? [start, end] : [null, null];
 
       const element = newLinearElement({
@@ -2912,8 +2912,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         roughness: this.state.currentItemRoughness,
         opacity: this.state.currentItemOpacity,
         strokeSharpness: this.state.currentItemLinearStrokeSharpness,
-        startDecorator,
-        endDecorator,
+        startArrowhead,
+        endArrowhead,
       });
       this.setState((prevState) => ({
         selectedElementIds: {

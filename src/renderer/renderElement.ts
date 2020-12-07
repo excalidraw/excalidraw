@@ -2,14 +2,14 @@ import {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
-  LinearElementDecorator,
+  Arrowhead,
   NonDeletedExcalidrawElement,
 } from "../element/types";
 import { isTextElement, isLinearElement } from "../element/typeChecks";
 import {
   getDiamondPoints,
   getElementAbsoluteCoords,
-  getDecoratorPoints,
+  getArrowheadPoints,
 } from "../element/bounds";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { Drawable, Options } from "roughjs/bin/core";
@@ -336,29 +336,29 @@ const generateElementShape = (
 
         // add lines only in arrow
         if (element.type === "arrow") {
-          const { startDecorator = null, endDecorator = "arrow" } = element;
+          const { startArrowhead = null, endArrowhead = "arrow" } = element;
 
-          function getDecoratorShapes(
+          function getArrowheadShapes(
             element: ExcalidrawLinearElement,
             shape: Drawable[],
             position: "start" | "end",
-            decorator: LinearElementDecorator,
+            arrowhead: Arrowhead,
           ) {
-            const decoratorPoints = getDecoratorPoints(
+            const arrowheadPoints = getArrowheadPoints(
               element,
               shape,
               position,
-              decorator,
+              arrowhead,
             );
 
-            if (decoratorPoints === null) {
+            if (arrowheadPoints === null) {
               return [];
             }
 
-            // Other decorators here...
+            // Other arrowheads here...
 
-            // Arrow decorators
-            const [x2, y2, x3, y3, x4, y4] = decoratorPoints;
+            // Arrow arrowheads
+            const [x2, y2, x3, y3, x4, y4] = arrowheadPoints;
             if (element.strokeStyle === "dotted") {
               // for dotted arrows caps, reduce gap to make it more legible
               options.strokeLineDash = [3, 4];
@@ -372,26 +372,26 @@ const generateElementShape = (
             ];
           }
 
-          if (startDecorator !== null) {
-            const shapes = getDecoratorShapes(
+          if (startArrowhead !== null) {
+            const shapes = getArrowheadShapes(
               element,
               shape,
               "start",
-              startDecorator,
+              startArrowhead,
             );
             shape.push(...shapes);
           }
 
-          if (endDecorator !== null) {
-            if (endDecorator === undefined) {
+          if (endArrowhead !== null) {
+            if (endArrowhead === undefined) {
               // Hey, we have an old arrow here!
             }
 
-            const shapes = getDecoratorShapes(
+            const shapes = getArrowheadShapes(
               element,
               shape,
               "end",
-              endDecorator,
+              endArrowhead,
             );
             shape.push(...shapes);
           }

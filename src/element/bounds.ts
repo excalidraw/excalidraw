@@ -1,8 +1,4 @@
-import {
-  ExcalidrawElement,
-  ExcalidrawLinearElement,
-  LinearElementDecorator,
-} from "./types";
+import { ExcalidrawElement, ExcalidrawLinearElement, Arrowhead } from "./types";
 import { distance2d, rotate } from "../math";
 import rough from "roughjs/bin/rough";
 import { Drawable, Op } from "roughjs/bin/core";
@@ -164,11 +160,11 @@ const getLinearElementAbsoluteCoords = (
   ];
 };
 
-export const getDecoratorPoints = (
+export const getArrowheadPoints = (
   element: ExcalidrawLinearElement,
   shape: Drawable[],
   position: "start" | "end",
-  decorator: LinearElementDecorator,
+  arrowhead: Arrowhead,
 ) => {
   const ops = getCurvePathOps(shape[0]);
   if (ops.length < 1) {
@@ -201,7 +197,7 @@ export const getDecoratorPoints = (
     3 * Math.pow(t, 2) * (1 - t) * p1[idx] +
     p0[idx] * Math.pow(t, 3);
 
-  // Ee know the last point of the arrow (or the first, if start decorator).
+  // Ee know the last point of the arrow (or the first, if start arrowhead).
   const [x2, y2] = position === "start" ? p0 : p3;
 
   // By using cubic bezier equation (B(t)) and the given parameters,
@@ -216,16 +212,16 @@ export const getDecoratorPoints = (
   const nx = (x2 - x1) / distance;
   const ny = (y2 - y1) / distance;
 
-  const size = 30; // pixels (will differ for each decorator)
+  const size = 30; // pixels (will differ for each arrowhead)
 
   const length = element.points.reduce((total, [cx, cy], idx, points) => {
     const [px, py] = idx > 0 ? points[idx - 1] : [0, 0];
     return total + Math.hypot(cx - px, cy - py);
   }, 0);
 
-  // Scale down the decorator until we hit a certain size so that it doesn't look weird.
+  // Scale down the arrowhead until we hit a certain size so that it doesn't look weird.
   // This value is selected by minimizing a minimum size with the whole length of the
-  // decorator instead of last segment of the decorator.
+  // arrowhead instead of last segment of the arrowhead.
   const minSize = Math.min(size, length / 2);
   const xs = x2 - nx * minSize;
   const ys = y2 - ny * minSize;

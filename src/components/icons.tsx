@@ -725,7 +725,7 @@ export const EdgeRoundIcon = React.memo(
     ),
 );
 
-export const ArrowDecoratorIcon = React.memo(
+export const ArrowArrowheadIcon = React.memo(
   ({
     appearance,
     flip = false,

@@ -90,7 +90,7 @@ export type PointBinding = {
   gap: number;
 };
 
-export type LinearElementDecorator = "arrow";
+export type Arrowhead = "arrow";
 
 export type ExcalidrawLinearElement = _ExcalidrawElementBase &
   Readonly<{
@@ -99,8 +99,8 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
     lastCommittedPoint: Point | null;
     startBinding: PointBinding | null;
     endBinding: PointBinding | null;
-    startDecorator: LinearElementDecorator | null;
-    endDecorator: LinearElementDecorator | null;
+    startArrowhead: Arrowhead | null;
+    endArrowhead: Arrowhead | null;
   }>;
 
 export type PointerType = "mouse" | "pen" | "touch";

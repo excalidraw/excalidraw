@@ -8,7 +8,7 @@ import {
   FontFamily,
   GroupId,
   VerticalAlign,
-  LinearElementDecorator,
+  Arrowhead,
 } from "../element/types";
 import { measureText, getFontString } from "../utils";
 import { randomInteger, randomId } from "../random";
@@ -215,8 +215,8 @@ export const updateTextElement = (
 export const newLinearElement = (
   opts: {
     type: ExcalidrawLinearElement["type"];
-    startDecorator: LinearElementDecorator | null;
-    endDecorator: LinearElementDecorator | null;
+    startArrowhead: Arrowhead | null;
+    endArrowhead: Arrowhead | null;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawLinearElement> => {
   return {
@@ -225,8 +225,8 @@ export const newLinearElement = (
     lastCommittedPoint: null,
     startBinding: null,
     endBinding: null,
-    startDecorator: opts.startDecorator,
-    endDecorator: opts.endDecorator,
+    startArrowhead: opts.startArrowhead,
+    endArrowhead: opts.endArrowhead,
   };
 };
 
