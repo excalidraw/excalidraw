@@ -71,6 +71,7 @@
     "ungroup": "Разделить выделение",
     "collaborators": "Сотрудники",
     "toggleGridMode": "Переключить режим сетки",
+    "toggleStats": "",
     "addToLibrary": "Добавить в библиотеку",
     "removeFromLibrary": "Удалить из библиотеки",
     "libraryLoadingMessage": "Загрузка библиотеки...",
@@ -213,5 +214,17 @@
   "charts": {
     "noNumericColumn": "",
     "tooManyColumns": "Вы вставили таблицу с более чем двумя столбцами."
+  },
+  "stats": {
+    "angle": "",
+    "element": "",
+    "elements": "",
+    "height": "",
+    "scene": "",
+    "selected": "",
+    "storage": "",
+    "title": "",
+    "total": "",
+    "width": ""
   }
 }
