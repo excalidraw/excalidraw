@@ -71,6 +71,7 @@
     "ungroup": "Pisahkan pilihan",
     "collaborators": "Kolaborator",
     "toggleGridMode": "Aktifkan/Matikan mode kisi",
+    "toggleStats": "",
     "addToLibrary": "Tambahkan ke pustaka",
     "removeFromLibrary": "Hapus dari pustaka",
     "libraryLoadingMessage": "Memuat pustaka...",
@@ -213,5 +214,17 @@
   "charts": {
     "noNumericColumn": "Anda menempelkan sebuah lembar bentang tanpa sebuah kolom numerik.",
     "tooManyColumns": "Anda menempelkan sebuah lembar bentang dengan lebih dari dua kolom."
+  },
+  "stats": {
+    "angle": "",
+    "element": "",
+    "elements": "",
+    "height": "",
+    "scene": "",
+    "selected": "",
+    "storage": "",
+    "title": "",
+    "total": "",
+    "width": ""
   }
 }
