@@ -71,6 +71,7 @@
     "ungroup": "إلغاء تحديد مجموعة",
     "collaborators": "المتعاونون",
     "toggleGridMode": "التبديل إلى وضع الشبكة",
+    "toggleStats": "",
     "addToLibrary": "أضف إلى المكتبة",
     "removeFromLibrary": "حذف من المكتبة",
     "libraryLoadingMessage": "جارٍ تحميل المكتبة...",
@@ -213,5 +214,17 @@
   "charts": {
     "noNumericColumn": "قمت بلصق جدول بيانات دون عمود رقمي.",
     "tooManyColumns": "قمت بلصق جدول بيانات دون عمود رقمي."
+  },
+  "stats": {
+    "angle": "",
+    "element": "",
+    "elements": "",
+    "height": "",
+    "scene": "",
+    "selected": "",
+    "storage": "",
+    "title": "",
+    "total": "",
+    "width": ""
   }
 }
