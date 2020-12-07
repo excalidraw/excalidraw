@@ -2897,7 +2897,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       // If so, we want it to be null/"arrow". If the linear item is not an arrow, we want it
       // to be null/null. Otherwise, we want it to use the currentItemLinearDecorators values.
       const { start, end } = this.state.currentItemLinearDecorators;
-      const [startDecorator = null, endDecorator = "arrow"] =
+      const [startDecorator, endDecorator] =
         elementType === "arrow" ? [start, end] : [null, null];
 
       const element = newLinearElement({
