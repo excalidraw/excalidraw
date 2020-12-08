@@ -43,7 +43,9 @@ import {
   SloppinessArchitectIcon,
   SloppinessArtistIcon,
   SloppinessCartoonistIcon,
-  ArrowArrowheadIcon,
+  ArrowheadArrowIcon,
+  ArrowheadBarIcon,
+  ArrowheadDotIcon,
 } from "../components/icons";
 import { EVENT_CHANGE, trackEvent } from "../analytics";
 import colors from "../colors";
@@ -687,11 +689,18 @@ export const actionChangeArrowhead = register({
               value: "arrow",
               text: t("labels.arrowhead_arrow"),
               icon: (
-                <ArrowArrowheadIcon
-                  appearance={appState.appearance}
-                  flip={true}
-                />
+                <ArrowheadArrowIcon appearance={appState.appearance} flip />
               ),
+            },
+            {
+              value: "bar",
+              text: t("labels.arrowhead_bar"),
+              icon: <ArrowheadBarIcon appearance={appState.appearance} flip />,
+            },
+            {
+              value: "dot",
+              text: t("labels.arrowhead_dot"),
+              icon: <ArrowheadDotIcon appearance={appState.appearance} flip />,
             },
           ]}
           value={getFormValue<Arrowhead | null>(
@@ -716,7 +725,17 @@ export const actionChangeArrowhead = register({
             {
               value: "arrow",
               text: t("labels.arrowhead_arrow"),
-              icon: <ArrowArrowheadIcon appearance={appState.appearance} />,
+              icon: <ArrowheadArrowIcon appearance={appState.appearance} />,
+            },
+            {
+              value: "bar",
+              text: t("labels.arrowhead_bar"),
+              icon: <ArrowheadBarIcon appearance={appState.appearance} />,
+            },
+            {
+              value: "dot",
+              text: t("labels.arrowhead_dot"),
+              icon: <ArrowheadDotIcon appearance={appState.appearance} />,
             },
           ]}
           value={getFormValue<Arrowhead | null>(
