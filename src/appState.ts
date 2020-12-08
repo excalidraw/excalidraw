@@ -39,6 +39,7 @@ export const getDefaultAppState = (): Omit<
     currentItemTextAlign: DEFAULT_TEXT_ALIGN,
     currentItemStrokeSharpness: "sharp",
     currentItemLinearStrokeSharpness: "round",
+    currentItemArrowheads: { start: null, end: "arrow" },
     viewBackgroundColor: oc.white,
     scrollX: 0 as FlooredNumber,
     scrollY: 0 as FlooredNumber,
@@ -71,6 +72,7 @@ export const getDefaultAppState = (): Omit<
     isLibraryOpen: false,
     fileHandle: null,
     collaborators: new Map(),
+    showStats: false,
   };
 };
 
@@ -102,6 +104,7 @@ const APP_STATE_STORAGE_CONF = (<
   currentItemTextAlign: { browser: true, export: false },
   currentItemStrokeSharpness: { browser: true, export: false },
   currentItemLinearStrokeSharpness: { browser: true, export: false },
+  currentItemArrowheads: { browser: true, export: false },
   cursorButton: { browser: true, export: false },
   cursorX: { browser: true, export: false },
   cursorY: { browser: true, export: false },
@@ -146,6 +149,7 @@ const APP_STATE_STORAGE_CONF = (<
   offsetLeft: { browser: false, export: false },
   fileHandle: { browser: false, export: false },
   collaborators: { browser: false, export: false },
+  showStats: { browser: true, export: false },
 });
 
 const _clearAppStateForStorage = <ExportType extends "export" | "browser">(

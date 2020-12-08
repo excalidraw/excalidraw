@@ -8,6 +8,7 @@ import {
   FontFamily,
   GroupId,
   ExcalidrawBindableElement,
+  Arrowhead,
 } from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -60,6 +61,10 @@ export type AppState = {
   currentItemFontSize: number;
   currentItemTextAlign: TextAlign;
   currentItemStrokeSharpness: ExcalidrawElement["strokeSharpness"];
+  currentItemArrowheads: {
+    start: Arrowhead | null;
+    end: Arrowhead | null;
+  };
   currentItemLinearStrokeSharpness: ExcalidrawElement["strokeSharpness"];
   viewBackgroundColor: string;
   scrollX: FlooredNumber;
@@ -95,6 +100,7 @@ export type AppState = {
   isLibraryOpen: boolean;
   fileHandle: import("browser-nativefs").FileSystemHandle | null;
   collaborators: Map<string, Collaborator>;
+  showStats: boolean;
 };
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };

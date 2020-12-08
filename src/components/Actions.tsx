@@ -7,7 +7,8 @@ import {
   hasStroke,
   canChangeSharpness,
   hasText,
-  getTargetElement,
+  canHaveArrowheads,
+  getTargetElements,
 } from "../scene";
 import { t } from "../i18n";
 import { SHAPES } from "../shapes";
@@ -29,7 +30,7 @@ export const SelectedShapeActions = ({
   renderAction: ActionManager["renderAction"];
   elementType: ExcalidrawElement["type"];
 }) => {
-  const targetElements = getTargetElement(
+  const targetElements = getTargetElements(
     getNonDeletedElements(elements),
     appState,
   );
@@ -46,6 +47,7 @@ export const SelectedShapeActions = ({
   const showChangeBackgroundIcons =
     hasBackground(elementType) ||
     targetElements.some((element) => hasBackground(element.type));
+
   return (
     <div className="panelColumn">
       {renderAction("changeStrokeColor")}
@@ -75,6 +77,11 @@ export const SelectedShapeActions = ({
 
           {renderAction("changeTextAlign")}
         </>
+      )}
+
+      {(canHaveArrowheads(elementType) ||
+        targetElements.some((element) => canHaveArrowheads(element.type))) && (
+        <>{renderAction("changeArrowhead")}</>
       )}
 
       {renderAction("changeOpacity")}
