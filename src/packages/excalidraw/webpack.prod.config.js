@@ -7,7 +7,8 @@ const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
 module.exports = {
   mode: "production",
   entry: {
-    "excalidraw.min": ["./index.tsx", "../../../public/fonts.css"],
+    "excalidraw.min": "./index.tsx",
+    "fonts.min": "../../../public/fonts.css",
   },
   output: {
     path: path.resolve(__dirname, "dist"),
