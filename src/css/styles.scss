@@ -93,7 +93,8 @@
         display: inline-block;
       }
 
-      input[type="radio"] {
+      input[type="radio"],
+      input[type="button"] {
         opacity: 0;
         position: absolute;
         pointer-events: none;

@@ -90,6 +90,11 @@ const restoreElement = (
     case "draw":
     case "line":
     case "arrow": {
+      const {
+        startArrowhead = null,
+        endArrowhead = element.type === "arrow" ? "arrow" : null,
+      } = element;
+
       return restoreElementWithProperties(element, {
         startBinding: element.startBinding,
         endBinding: element.endBinding,
@@ -102,6 +107,8 @@ const restoreElement = (
               ]
             : element.points,
         lastCommittedPoint: null,
+        startArrowhead,
+        endArrowhead,
       });
     }
     // generic elements

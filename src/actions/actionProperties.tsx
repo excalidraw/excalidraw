@@ -4,15 +4,19 @@ import {
   ExcalidrawTextElement,
   TextAlign,
   FontFamily,
+  ExcalidrawLinearElement,
+  Arrowhead,
 } from "../element/types";
 import {
   getCommonAttributeOfSelectedElements,
   isSomeElementSelected,
   getTargetElements,
   canChangeSharpness,
+  canHaveArrowheads,
 } from "../scene";
 import { ButtonSelect } from "../components/ButtonSelect";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
+import { ButtonIconCycle } from "../components/ButtonIconCycle";
 import {
   isTextElement,
   redrawTextBoundingBox,
@@ -39,6 +43,7 @@ import {
   SloppinessArchitectIcon,
   SloppinessArtistIcon,
   SloppinessCartoonistIcon,
+  ArrowArrowheadIcon,
 } from "../components/icons";
 import { EVENT_CHANGE, trackEvent } from "../analytics";
 import colors from "../colors";
@@ -619,6 +624,113 @@ export const actionChangeSharpness = register({
         )}
         onChange={(value) => updateData(value)}
       />
+    </fieldset>
+  ),
+});
+
+export const actionChangeArrowhead = register({
+  name: "changeArrowhead",
+  perform: (
+    elements,
+    appState,
+    value: { position: "start" | "end"; type: Arrowhead },
+  ) => {
+    return {
+      elements: changeProperty(elements, appState, (el) => {
+        if (isLinearElement(el)) {
+          trackEvent(
+            EVENT_CHANGE,
+            `arrowhead ${value.position}`,
+            value.type || "none",
+          );
+
+          const { position, type } = value;
+
+          if (position === "start") {
+            const element: ExcalidrawLinearElement = newElementWith(el, {
+              startArrowhead: type,
+            });
+            return element;
+          } else if (position === "end") {
+            const element: ExcalidrawLinearElement = newElementWith(el, {
+              endArrowhead: type,
+            });
+            return element;
+          }
+        }
+
+        return el;
+      }),
+      appState: {
+        ...appState,
+        currentItemArrowheads: {
+          ...appState.currentItemArrowheads,
+          [value.position]: value.type,
+        },
+      },
+      commitToHistory: true,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData }) => (
+    <fieldset>
+      <legend>{t("labels.arrowheads")}</legend>
+      <div className="buttonList buttonListIcon">
+        <ButtonIconCycle
+          group="arrowhead_start"
+          options={[
+            {
+              value: null,
+              text: t("labels.arrowhead_none"),
+              icon: <StrokeStyleSolidIcon appearance={appState.appearance} />,
+            },
+            {
+              value: "arrow",
+              text: t("labels.arrowhead_arrow"),
+              icon: (
+                <ArrowArrowheadIcon
+                  appearance={appState.appearance}
+                  flip={true}
+                />
+              ),
+            },
+          ]}
+          value={getFormValue<Arrowhead | null>(
+            elements,
+            appState,
+            (element) =>
+              isLinearElement(element) && canHaveArrowheads(element.type)
+                ? element.startArrowhead
+                : appState.currentItemArrowheads.start,
+            appState.currentItemArrowheads.start,
+          )}
+          onChange={(value) => updateData({ position: "start", type: value })}
+        />
+        <ButtonIconCycle
+          group="arrowhead_end"
+          options={[
+            {
+              value: null,
+              text: t("labels.arrowhead_none"),
+              icon: <StrokeStyleSolidIcon appearance={appState.appearance} />,
+            },
+            {
+              value: "arrow",
+              text: t("labels.arrowhead_arrow"),
+              icon: <ArrowArrowheadIcon appearance={appState.appearance} />,
+            },
+          ]}
+          value={getFormValue<Arrowhead | null>(
+            elements,
+            appState,
+            (element) =>
+              isLinearElement(element) && canHaveArrowheads(element.type)
+                ? element.endArrowhead
+                : appState.currentItemArrowheads.end,
+            appState.currentItemArrowheads.end,
+          )}
+          onChange={(value) => updateData({ position: "end", type: value })}
+        />
+      </div>
     </fieldset>
   ),
 });

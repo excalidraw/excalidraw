@@ -35,6 +35,7 @@ export type ActionName =
   | "changeStrokeWidth"
   | "changeSloppiness"
   | "changeStrokeStyle"
+  | "changeArrowhead"
   | "changeOpacity"
   | "changeFontSize"
   | "toggleCanvasMenu"
@@ -99,9 +100,7 @@ export interface Action {
 }
 
 export interface ActionsManagerInterface {
-  actions: {
-    [actionName in ActionName]: Action;
-  };
+  actions: Record<ActionName, Action>;
   registerAction: (action: Action) => void;
   handleKeyDown: (event: KeyboardEvent) => boolean;
   getContextMenuItems: (
