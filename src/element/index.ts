@@ -18,7 +18,7 @@ export {
   getElementBounds,
   getCommonBounds,
   getDiamondPoints,
-  getArrowPoints,
+  getArrowheadPoints,
   getClosestElementBounds,
 } from "./bounds";
 

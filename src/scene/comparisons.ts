@@ -28,6 +28,8 @@ export const canChangeSharpness = (type: string) =>
 
 export const hasText = (type: string) => type === "text";
 
+export const canHaveArrowheads = (type: string) => type === "arrow";
+
 export const getElementAtPosition = (
   elements: readonly NonDeletedExcalidrawElement[],
   isAtPositionFn: (element: NonDeletedExcalidrawElement) => boolean,
