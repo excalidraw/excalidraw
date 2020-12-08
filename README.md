@@ -22,7 +22,7 @@ Go to https://excalidraw.com to start sketching.
 
 Read our [blog](https://blog.excalidraw.com) and follow the [guides](https://howto.excalidraw.com) to learn more about Excalidraw and how to use it effectively.
 
-## Libraries
+## Browse libraries
 
 Find a growing list of libraries containing assets for your drawings at [https://libraries.excalidraw.com/](). See [here](https://github.com/excalidraw/excalidraw-libraries#add-your-own-library-to-the-list) how to add your own libraries. 
 
