@@ -217,15 +217,15 @@
     "tooManyColumns": "您粘贴了两列以上的表格。"
   },
   "stats": {
-    "angle": "",
-    "element": "",
-    "elements": "",
-    "height": "",
-    "scene": "",
-    "selected": "",
-    "storage": "",
+    "angle": "角度",
+    "element": "元素",
+    "elements": "元素",
+    "height": "高度",
+    "scene": "场景",
+    "selected": "选中",
+    "storage": "存储",
     "title": "",
-    "total": "",
-    "width": ""
+    "total": "总计",
+    "width": "宽度"
   }
 }
