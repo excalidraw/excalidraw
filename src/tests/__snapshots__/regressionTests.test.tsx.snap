@@ -4,6 +4,10 @@ exports[`given element A and group of elements B and given both are selected whe
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -457,6 +461,10 @@ exports[`given element A and group of elements B and given both are selected whe
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -916,6 +924,10 @@ exports[`regression tests Cmd/Ctrl-click exclusively select element under pointe
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -1684,6 +1696,10 @@ exports[`regression tests Drags selected element when hitting only bounding box 
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -1880,6 +1896,10 @@ exports[`regression tests adjusts z order when grouping: [end of test] appState 
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -2330,6 +2350,10 @@ exports[`regression tests alt-drag duplicates an element: [end of test] appState
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -2575,6 +2599,10 @@ exports[`regression tests arrow keys: [end of test] appState 1`] = `
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -2731,6 +2759,10 @@ exports[`regression tests can drag element that covers another element, while an
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -3200,6 +3232,10 @@ exports[`regression tests change the properties of a shape: [end of test] appSta
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "#fa5252",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -3500,6 +3536,10 @@ exports[`regression tests click on an element and drag it: [dragged] appState 1`
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -3696,6 +3736,10 @@ exports[`regression tests click on an element and drag it: [end of test] appStat
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -3932,6 +3976,10 @@ exports[`regression tests click to select a shape: [end of test] appState 1`] = 
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -4176,6 +4224,10 @@ exports[`regression tests click-drag to select a group: [end of test] appState 1
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -4529,6 +4581,10 @@ exports[`regression tests deselects group of selected elements on pointer down w
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -4816,6 +4872,10 @@ exports[`regression tests deselects group of selected elements on pointer up whe
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -5115,6 +5175,10 @@ exports[`regression tests deselects selected element on pointer down when pointe
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -5315,6 +5379,10 @@ exports[`regression tests deselects selected element, on pointer up, when click 
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -5493,6 +5561,10 @@ exports[`regression tests double click to edit a group: [end of test] appState 1
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -5938,6 +6010,10 @@ exports[`regression tests drags selected elements from point inside common bound
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -6248,6 +6324,10 @@ exports[`regression tests draw every type of shape: [end of test] appState 1`] =
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -6398,6 +6478,7 @@ Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElementIds": null,
+  "endArrowhead": "arrow",
   "endBinding": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
@@ -6418,6 +6499,7 @@ Object {
   ],
   "roughness": 1,
   "seed": 1150084233,
+  "startArrowhead": null,
   "startBinding": null,
   "strokeColor": "#000000",
   "strokeSharpness": "round",
@@ -6437,6 +6519,7 @@ Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElementIds": null,
+  "endArrowhead": null,
   "endBinding": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
@@ -6457,6 +6540,7 @@ Object {
   ],
   "roughness": 1,
   "seed": 238820263,
+  "startArrowhead": null,
   "startBinding": null,
   "strokeColor": "#000000",
   "strokeSharpness": "round",
@@ -6476,6 +6560,7 @@ Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElementIds": null,
+  "endArrowhead": "arrow",
   "endBinding": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
@@ -6503,6 +6588,7 @@ Object {
   ],
   "roughness": 1,
   "seed": 1505387817,
+  "startArrowhead": null,
   "startBinding": null,
   "strokeColor": "#000000",
   "strokeSharpness": "round",
@@ -6522,6 +6608,7 @@ Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElementIds": null,
+  "endArrowhead": null,
   "endBinding": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
@@ -6549,6 +6636,7 @@ Object {
   ],
   "roughness": 1,
   "seed": 760410951,
+  "startArrowhead": null,
   "startBinding": null,
   "strokeColor": "#000000",
   "strokeSharpness": "round",
@@ -6568,6 +6656,7 @@ Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElementIds": null,
+  "endArrowhead": null,
   "endBinding": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
@@ -6588,6 +6677,7 @@ Object {
   ],
   "roughness": 1,
   "seed": 941653321,
+  "startArrowhead": null,
   "startBinding": null,
   "strokeColor": "#000000",
   "strokeSharpness": "round",
@@ -6878,6 +6968,7 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
+          "endArrowhead": "arrow",
           "endBinding": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -6898,6 +6989,7 @@ Object {
           ],
           "roughness": 1,
           "seed": 1150084233,
+          "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#000000",
           "strokeSharpness": "round",
@@ -6996,6 +7088,7 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
+          "endArrowhead": "arrow",
           "endBinding": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -7016,6 +7109,7 @@ Object {
           ],
           "roughness": 1,
           "seed": 1150084233,
+          "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#000000",
           "strokeSharpness": "round",
@@ -7032,6 +7126,7 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
+          "endArrowhead": null,
           "endBinding": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -7052,6 +7147,7 @@ Object {
           ],
           "roughness": 1,
           "seed": 238820263,
+          "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#000000",
           "strokeSharpness": "round",
@@ -7150,6 +7246,7 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
+          "endArrowhead": "arrow",
           "endBinding": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -7170,6 +7267,7 @@ Object {
           ],
           "roughness": 1,
           "seed": 1150084233,
+          "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#000000",
           "strokeSharpness": "round",
@@ -7186,6 +7284,7 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
+          "endArrowhead": null,
           "endBinding": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -7206,6 +7305,7 @@ Object {
           ],
           "roughness": 1,
           "seed": 238820263,
+          "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#000000",
           "strokeSharpness": "round",
@@ -7222,6 +7322,7 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
+          "endArrowhead": "arrow",
           "endBinding": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -7245,6 +7346,7 @@ Object {
           ],
           "roughness": 1,
           "seed": 1505387817,
+          "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#000000",
           "strokeSharpness": "round",
@@ -7343,6 +7445,7 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
+          "endArrowhead": "arrow",
           "endBinding": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -7363,6 +7466,7 @@ Object {
           ],
           "roughness": 1,
           "seed": 1150084233,
+          "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#000000",
           "strokeSharpness": "round",
@@ -7379,6 +7483,7 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
+          "endArrowhead": null,
           "endBinding": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -7399,6 +7504,7 @@ Object {
           ],
           "roughness": 1,
           "seed": 238820263,
+          "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#000000",
           "strokeSharpness": "round",
@@ -7415,6 +7521,7 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
+          "endArrowhead": "arrow",
           "endBinding": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -7442,6 +7549,7 @@ Object {
           ],
           "roughness": 1,
           "seed": 1505387817,
+          "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#000000",
           "strokeSharpness": "round",
@@ -7540,6 +7648,7 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
+          "endArrowhead": "arrow",
           "endBinding": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -7560,6 +7669,7 @@ Object {
           ],
           "roughness": 1,
           "seed": 1150084233,
+          "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#000000",
           "strokeSharpness": "round",
@@ -7576,6 +7686,7 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
+          "endArrowhead": null,
           "endBinding": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -7596,6 +7707,7 @@ Object {
           ],
           "roughness": 1,
           "seed": 238820263,
+          "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#000000",
           "strokeSharpness": "round",
@@ -7612,6 +7724,7 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
+          "endArrowhead": "arrow",
           "endBinding": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -7639,6 +7752,7 @@ Object {
           ],
           "roughness": 1,
           "seed": 1505387817,
+          "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#000000",
           "strokeSharpness": "round",
@@ -7655,6 +7769,7 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
+          "endArrowhead": null,
           "endBinding": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -7678,6 +7793,7 @@ Object {
           ],
           "roughness": 1,
           "seed": 760410951,
+          "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#000000",
           "strokeSharpness": "round",
@@ -7776,6 +7892,7 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
+          "endArrowhead": "arrow",
           "endBinding": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -7796,6 +7913,7 @@ Object {
           ],
           "roughness": 1,
           "seed": 1150084233,
+          "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#000000",
           "strokeSharpness": "round",
@@ -7812,6 +7930,7 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
+          "endArrowhead": null,
           "endBinding": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -7832,6 +7951,7 @@ Object {
           ],
           "roughness": 1,
           "seed": 238820263,
+          "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#000000",
           "strokeSharpness": "round",
@@ -7848,6 +7968,7 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
+          "endArrowhead": "arrow",
           "endBinding": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -7875,6 +7996,7 @@ Object {
           ],
           "roughness": 1,
           "seed": 1505387817,
+          "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#000000",
           "strokeSharpness": "round",
@@ -7891,6 +8013,7 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
+          "endArrowhead": null,
           "endBinding": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -7918,6 +8041,7 @@ Object {
           ],
           "roughness": 1,
           "seed": 760410951,
+          "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#000000",
           "strokeSharpness": "round",
@@ -8016,6 +8140,7 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
+          "endArrowhead": "arrow",
           "endBinding": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -8036,6 +8161,7 @@ Object {
           ],
           "roughness": 1,
           "seed": 1150084233,
+          "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#000000",
           "strokeSharpness": "round",
@@ -8052,6 +8178,7 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
+          "endArrowhead": null,
           "endBinding": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -8072,6 +8199,7 @@ Object {
           ],
           "roughness": 1,
           "seed": 238820263,
+          "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#000000",
           "strokeSharpness": "round",
@@ -8088,6 +8216,7 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
+          "endArrowhead": "arrow",
           "endBinding": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -8115,6 +8244,7 @@ Object {
           ],
           "roughness": 1,
           "seed": 1505387817,
+          "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#000000",
           "strokeSharpness": "round",
@@ -8131,6 +8261,7 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
+          "endArrowhead": null,
           "endBinding": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -8158,6 +8289,7 @@ Object {
           ],
           "roughness": 1,
           "seed": 760410951,
+          "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#000000",
           "strokeSharpness": "round",
@@ -8174,6 +8306,7 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
+          "endArrowhead": null,
           "endBinding": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -8194,6 +8327,7 @@ Object {
           ],
           "roughness": 1,
           "seed": 941653321,
+          "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#000000",
           "strokeSharpness": "round",
@@ -8220,6 +8354,10 @@ exports[`regression tests given a group of selected elements with an element tha
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -8574,6 +8712,10 @@ exports[`regression tests given a selected element A and a not selected element 
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "#fa5252",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -8821,6 +8963,10 @@ exports[`regression tests given selected element A with lower z-index than unsel
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "#fa5252",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -9066,6 +9212,10 @@ exports[`regression tests given selected element A with lower z-index than unsel
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "#fa5252",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -9373,6 +9523,10 @@ exports[`regression tests key 2 selects rectangle tool: [end of test] appState 1
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -9529,6 +9683,10 @@ exports[`regression tests key 3 selects diamond tool: [end of test] appState 1`]
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -9685,6 +9843,10 @@ exports[`regression tests key 4 selects ellipse tool: [end of test] appState 1`]
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -9841,6 +10003,10 @@ exports[`regression tests key 5 selects arrow tool: [end of test] appState 1`] =
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -9913,6 +10079,7 @@ Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElementIds": null,
+  "endArrowhead": "arrow",
   "endBinding": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
@@ -9933,6 +10100,7 @@ Object {
   ],
   "roughness": 1,
   "seed": 337897,
+  "startArrowhead": null,
   "startBinding": null,
   "strokeColor": "#000000",
   "strokeSharpness": "round",
@@ -9977,6 +10145,7 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
+          "endArrowhead": "arrow",
           "endBinding": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -9997,6 +10166,7 @@ Object {
           ],
           "roughness": 1,
           "seed": 337897,
+          "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#000000",
           "strokeSharpness": "round",
@@ -10023,6 +10193,10 @@ exports[`regression tests key 6 selects line tool: [end of test] appState 1`] = 
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -10095,6 +10269,7 @@ Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElementIds": null,
+  "endArrowhead": null,
   "endBinding": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
@@ -10115,6 +10290,7 @@ Object {
   ],
   "roughness": 1,
   "seed": 337897,
+  "startArrowhead": null,
   "startBinding": null,
   "strokeColor": "#000000",
   "strokeSharpness": "round",
@@ -10159,6 +10335,7 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
+          "endArrowhead": null,
           "endBinding": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -10179,6 +10356,7 @@ Object {
           ],
           "roughness": 1,
           "seed": 337897,
+          "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#000000",
           "strokeSharpness": "round",
@@ -10205,6 +10383,10 @@ exports[`regression tests key 7 selects draw tool: [end of test] appState 1`] = 
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -10277,6 +10459,7 @@ Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElementIds": null,
+  "endArrowhead": null,
   "endBinding": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
@@ -10297,6 +10480,7 @@ Object {
   ],
   "roughness": 1,
   "seed": 337897,
+  "startArrowhead": null,
   "startBinding": null,
   "strokeColor": "#000000",
   "strokeSharpness": "round",
@@ -10341,6 +10525,7 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
+          "endArrowhead": null,
           "endBinding": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -10361,6 +10546,7 @@ Object {
           ],
           "roughness": 1,
           "seed": 337897,
+          "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#000000",
           "strokeSharpness": "round",
@@ -10387,6 +10573,10 @@ exports[`regression tests key a selects arrow tool: [end of test] appState 1`] =
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -10459,6 +10649,7 @@ Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElementIds": null,
+  "endArrowhead": "arrow",
   "endBinding": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
@@ -10479,6 +10670,7 @@ Object {
   ],
   "roughness": 1,
   "seed": 337897,
+  "startArrowhead": null,
   "startBinding": null,
   "strokeColor": "#000000",
   "strokeSharpness": "round",
@@ -10523,6 +10715,7 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
+          "endArrowhead": "arrow",
           "endBinding": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -10543,6 +10736,7 @@ Object {
           ],
           "roughness": 1,
           "seed": 337897,
+          "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#000000",
           "strokeSharpness": "round",
@@ -10569,6 +10763,10 @@ exports[`regression tests key d selects diamond tool: [end of test] appState 1`]
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -10725,6 +10923,10 @@ exports[`regression tests key e selects ellipse tool: [end of test] appState 1`]
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -10881,6 +11083,10 @@ exports[`regression tests key l selects line tool: [end of test] appState 1`] = 
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -10953,6 +11159,7 @@ Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElementIds": null,
+  "endArrowhead": null,
   "endBinding": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
@@ -10973,6 +11180,7 @@ Object {
   ],
   "roughness": 1,
   "seed": 337897,
+  "startArrowhead": null,
   "startBinding": null,
   "strokeColor": "#000000",
   "strokeSharpness": "round",
@@ -11017,6 +11225,7 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
+          "endArrowhead": null,
           "endBinding": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -11037,6 +11246,7 @@ Object {
           ],
           "roughness": 1,
           "seed": 337897,
+          "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#000000",
           "strokeSharpness": "round",
@@ -11063,6 +11273,10 @@ exports[`regression tests key r selects rectangle tool: [end of test] appState 1
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -11219,6 +11433,10 @@ exports[`regression tests key x selects draw tool: [end of test] appState 1`] = 
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -11291,6 +11509,7 @@ Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElementIds": null,
+  "endArrowhead": null,
   "endBinding": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
@@ -11311,6 +11530,7 @@ Object {
   ],
   "roughness": 1,
   "seed": 337897,
+  "startArrowhead": null,
   "startBinding": null,
   "strokeColor": "#000000",
   "strokeSharpness": "round",
@@ -11355,6 +11575,7 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
+          "endArrowhead": null,
           "endBinding": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -11375,6 +11596,7 @@ Object {
           ],
           "roughness": 1,
           "seed": 337897,
+          "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#000000",
           "strokeSharpness": "round",
@@ -11401,6 +11623,10 @@ exports[`regression tests make a group and duplicate it: [end of test] appState 
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -12109,6 +12335,10 @@ exports[`regression tests noop interaction after undo shouldn't create history e
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -12354,6 +12584,10 @@ exports[`regression tests pinch-to-zoom works: [end of test] appState 1`] = `
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -12448,6 +12682,10 @@ exports[`regression tests rerenders UI on language change: [end of test] appStat
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -12540,6 +12778,10 @@ exports[`regression tests selecting 'Add to library' in context menu adds elemen
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -12696,6 +12938,10 @@ exports[`regression tests selecting 'Bring forward' in context menu brings eleme
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -12996,6 +13242,10 @@ exports[`regression tests selecting 'Bring to front' in context menu brings elem
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -13296,6 +13546,10 @@ exports[`regression tests selecting 'Copy styles' in context menu copies styles:
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -13452,6 +13706,10 @@ exports[`regression tests selecting 'Delete' in context menu deletes element: [e
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -13640,6 +13898,10 @@ exports[`regression tests selecting 'Duplicate' in context menu duplicates eleme
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -13881,6 +14143,10 @@ exports[`regression tests selecting 'Group selection' in context menu groups sel
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -14197,6 +14463,10 @@ exports[`regression tests selecting 'Paste styles' in context menu pastes styles
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "#e64980",
   "currentItemFillStyle": "cross-hatch",
   "currentItemFontFamily": 1,
@@ -15028,6 +15298,10 @@ exports[`regression tests selecting 'Send backward' in context menu sends elemen
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -15328,6 +15602,10 @@ exports[`regression tests selecting 'Send to back' in context menu sends element
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -15628,6 +15906,10 @@ exports[`regression tests selecting 'Ungroup selection' in context menu ungroups
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -15999,6 +16281,10 @@ exports[`regression tests shift click on selected element should deselect it on 
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -16158,6 +16444,10 @@ exports[`regression tests shift-click to multiselect, then drag: [end of test] a
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -16471,6 +16761,10 @@ exports[`regression tests should show fill icons when element has non transparen
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "#fa5252",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -16702,6 +16996,10 @@ exports[`regression tests shows 'Group selection' in context menu for multiple s
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -16949,6 +17247,10 @@ exports[`regression tests shows 'Ungroup selection' in context menu for group in
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -17268,6 +17570,10 @@ exports[`regression tests shows context menu for canvas: [end of test] appState 
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -17360,6 +17666,10 @@ exports[`regression tests shows context menu for element: [end of test] appState
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -17516,6 +17826,10 @@ exports[`regression tests single-clicking on a subgroup of a selected group shou
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -18329,6 +18643,10 @@ exports[`regression tests spacebar + drag scrolls the canvas: [end of test] appS
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -18421,6 +18739,10 @@ exports[`regression tests supports nested groups: [end of test] appState 1`] = `
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -19143,6 +19465,10 @@ exports[`regression tests switches from group of selected elements to another el
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -19540,6 +19866,10 @@ exports[`regression tests switches selected element on pointer down: [end of tes
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -19827,6 +20157,10 @@ exports[`regression tests two-finger scroll works: [end of test] appState 1`] = 
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -19921,6 +20255,10 @@ exports[`regression tests undo/redo drawing an element: [end of test] appState 1
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -20045,6 +20383,7 @@ Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElementIds": null,
+  "endArrowhead": "arrow",
   "endBinding": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
@@ -20068,6 +20407,7 @@ Object {
   ],
   "roughness": 1,
   "seed": 401146281,
+  "startArrowhead": null,
   "startBinding": null,
   "strokeColor": "#000000",
   "strokeSharpness": "round",
@@ -20147,6 +20487,7 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
+          "endArrowhead": "arrow",
           "endBinding": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -20174,6 +20515,7 @@ Object {
           ],
           "roughness": 1,
           "seed": 401146281,
+          "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#000000",
           "strokeSharpness": "round",
@@ -20249,6 +20591,7 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
+          "endArrowhead": "arrow",
           "endBinding": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -20272,6 +20615,7 @@ Object {
           ],
           "roughness": 1,
           "seed": 401146281,
+          "startArrowhead": null,
           "startBinding": null,
           "strokeColor": "#000000",
           "strokeSharpness": "round",
@@ -20405,6 +20749,10 @@ exports[`regression tests updates fontSize & fontFamily appState: [end of test] 
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 3,
@@ -20497,6 +20845,10 @@ exports[`regression tests zoom hotkeys: [end of test] appState 1`] = `
 Object {
   "appearance": "light",
   "collaborators": Map {},
+  "currentItemArrowheads": Object {
+    "end": "arrow",
+    "start": null,
+  },
   "currentItemBackgroundColor": "transparent",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
