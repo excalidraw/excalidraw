@@ -4,7 +4,7 @@ import { getElementAbsoluteCoords, Bounds } from "./bounds";
 import { rotate } from "../math";
 import { Zoom } from "../types";
 
-export type TransformHandleType =
+export type TransformHandleDirection =
   | "n"
   | "s"
   | "w"
@@ -12,16 +12,17 @@ export type TransformHandleType =
   | "nw"
   | "ne"
   | "sw"
-  | "se"
-  | "rotation";
+  | "se";
+
+export type TransformHandleType = TransformHandleDirection | "rotation";
 
 export type TransformHandle = [number, number, number, number];
 export type TransformHandles = Partial<
-  Record<TransformHandleType, TransformHandle>
+  { [T in TransformHandleType]: TransformHandle }
 >;
 export type MaybeTransformHandleType = TransformHandleType | false;
 
-const transformHandleSizes: Record<PointerType, number> = {
+const transformHandleSizes: { [k in PointerType]: number } = {
   mouse: 8,
   pen: 16,
   touch: 28,
@@ -78,8 +79,8 @@ export const getTransformHandlesFromCoords = (
   [x1, y1, x2, y2]: Bounds,
   angle: number,
   zoom: Zoom,
-  pointerType: PointerType = "mouse",
-  omitSides: Partial<Record<TransformHandleType, boolean>> = {},
+  pointerType: PointerType,
+  omitSides: { [T in TransformHandleType]?: boolean } = {},
 ): TransformHandles => {
   const size = transformHandleSizes[pointerType];
   const handleWidth = size / zoom.value;
@@ -160,7 +161,9 @@ export const getTransformHandlesFromCoords = (
   };
 
   // We only want to show height handles (all cardinal directions)  above a certain size
-  const minimumSizeForEightHandles = (5 * size) / zoom.value;
+  // Note: we render using "mouse" size so we should also use "mouse" size for this check
+  const minimumSizeForEightHandles =
+    (5 * transformHandleSizes.mouse) / zoom.value;
   if (Math.abs(width) > minimumSizeForEightHandles) {
     if (!omitSides.n) {
       transformHandles.n = generateTransformHandle(
@@ -218,7 +221,7 @@ export const getTransformHandles = (
   zoom: Zoom,
   pointerType: PointerType = "mouse",
 ): TransformHandles => {
-  let omitSides: Partial<Record<TransformHandleType, boolean>> = {};
+  let omitSides: { [T in TransformHandleType]?: boolean } = {};
   if (
     element.type === "arrow" ||
     element.type === "line" ||

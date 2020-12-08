@@ -7,8 +7,8 @@ import {
   hasStroke,
   canChangeSharpness,
   hasText,
-  hasDecorators,
-  getTargetElement,
+  canHaveArrowheads,
+  getTargetElements,
 } from "../scene";
 import { t } from "../i18n";
 import { SHAPES } from "../shapes";
@@ -30,7 +30,7 @@ export const SelectedShapeActions = ({
   renderAction: ActionManager["renderAction"];
   elementType: ExcalidrawElement["type"];
 }) => {
-  const targetElements = getTargetElement(
+  const targetElements = getTargetElements(
     getNonDeletedElements(elements),
     appState,
   );
@@ -79,9 +79,9 @@ export const SelectedShapeActions = ({
         </>
       )}
 
-      {(hasDecorators(elementType) ||
-        targetElements.some((element) => hasDecorators(element.type))) && (
-        <>{renderAction("changeDecorator")}</>
+      {(canHaveArrowheads(elementType) ||
+        targetElements.some((element) => canHaveArrowheads(element.type))) && (
+        <>{renderAction("changeArrowhead")}</>
       )}
 
       {renderAction("changeOpacity")}

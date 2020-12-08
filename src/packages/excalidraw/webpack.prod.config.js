@@ -7,15 +7,15 @@ const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
 module.exports = {
   mode: "production",
   entry: {
-    "excalidraw.min": "./index.tsx",
-    "fonts.min": "../../../public/fonts.css",
+    "excalidraw.min": ["./index.tsx", "../../../public/fonts.css"],
   },
   output: {
     path: path.resolve(__dirname, "dist"),
     library: "Excalidraw",
     libraryTarget: "umd",
     filename: "[name].js",
-    publicPath: "/excalidraw-assets/",
+    publicPath: "/",
+    chunkFilename: "excalidraw-assets/[name].js",
   },
   resolve: {
     extensions: [".js", ".ts", ".tsx", ".css", ".scss"],
@@ -68,6 +68,7 @@ module.exports = {
             loader: "file-loader",
             options: {
               name: "[name].[ext]",
+              outputPath: "excalidraw-assets",
             },
           },
         ],

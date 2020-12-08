@@ -725,7 +725,7 @@ export const EdgeRoundIcon = React.memo(
     ),
 );
 
-export const ArrowDecoratorIcon = React.memo(
+export const ArrowArrowheadIcon = React.memo(
   ({
     appearance,
     flip = false,
@@ -742,48 +742,6 @@ export const ArrowDecoratorIcon = React.memo(
       >
         <path d="M34 10H6M34 10L27 5M34 10L27 15" />
         <path d="M27.5 5L34.5 10L27.5 15" />
-      </g>,
-      { width: 40, height: 20, mirror: true },
-    ),
-);
-
-export const DotDecoratorIcon = React.memo(
-  ({
-    appearance,
-    flip = false,
-  }: {
-    appearance: "light" | "dark";
-    flip?: boolean;
-  }) =>
-    createIcon(
-      <g
-        stroke={iconFillColor(appearance)}
-        fill={iconFillColor(appearance)}
-        transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
-      >
-        <path d="M32 10L6 10" strokeWidth={2} />
-        <circle r="4" transform="matrix(-1 0 0 1 30 10)" />
-      </g>,
-      { width: 40, height: 20, mirror: true },
-    ),
-);
-
-export const BarDecoratorIcon = React.memo(
-  ({
-    appearance,
-    flip = false,
-  }: {
-    appearance: "light" | "dark";
-    flip?: boolean;
-  }) =>
-    createIcon(
-      <g transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}>
-        <path
-          d="M34 10H5.99996M34 10L34 5M34 10L34 15"
-          stroke={iconFillColor(appearance)}
-          strokeWidth={2}
-          fill="none"
-        />
       </g>,
       { width: 40, height: 20, mirror: true },
     ),

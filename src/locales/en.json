@@ -28,11 +28,9 @@
     "edges": "Edges",
     "sharp": "Sharp",
     "round": "Round",
-    "decorators": "Decorators",
-    "nullDecorator": "None",
-    "arrowDecorator": "Arrow",
-    "dotDecorator": "Dot",
-    "barDecorator": "Bar",
+    "arrowheads": "Arrowheads",
+    "arrowhead_none": "None",
+    "arrowhead_arrow": "Arrow",
     "fontSize": "Font size",
     "fontFamily": "Font family",
     "onlySelected": "Only selected",
@@ -76,9 +74,11 @@
     "ungroup": "Ungroup selection",
     "collaborators": "Collaborators",
     "toggleGridMode": "Toggle grid mode",
+    "toggleStats": "Toggle stats for nerds",
     "addToLibrary": "Add to library",
     "removeFromLibrary": "Remove from library",
     "libraryLoadingMessage": "Loading library...",
+    "libraries": "Browse libraries",
     "loadingScene": "Loading scene...",
     "align": "Align",
     "alignTop": "Align top",
@@ -218,5 +218,17 @@
   "charts": {
     "noNumericColumn": "You pasted a spreadsheet without a numeric column.",
     "tooManyColumns": "You pasted a spreadsheet with more than two columns."
+  },
+  "stats": {
+    "angle": "Angle",
+    "element": "Element",
+    "elements": "Elements",
+    "height": "Height",
+    "scene": "Scene",
+    "selected": "Selected",
+    "storage": "Storage",
+    "title": "Stats for nerds",
+    "total": "Total",
+    "width": "Width"
   }
 }

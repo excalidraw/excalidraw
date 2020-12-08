@@ -5,13 +5,14 @@ import {
   TextAlign,
   FontFamily,
   ExcalidrawLinearElement,
+  Arrowhead,
 } from "../element/types";
 import {
   getCommonAttributeOfSelectedElements,
   isSomeElementSelected,
-  getTargetElement,
+  getTargetElements,
   canChangeSharpness,
-  hasDecorators,
+  canHaveArrowheads,
 } from "../scene";
 import { ButtonSelect } from "../components/ButtonSelect";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
@@ -42,9 +43,7 @@ import {
   SloppinessArchitectIcon,
   SloppinessArtistIcon,
   SloppinessCartoonistIcon,
-  ArrowDecoratorIcon,
-  DotDecoratorIcon,
-  BarDecoratorIcon,
+  ArrowArrowheadIcon,
 } from "../components/icons";
 import { EVENT_CHANGE, trackEvent } from "../analytics";
 import colors from "../colors";
@@ -567,7 +566,7 @@ export const actionChangeTextAlign = register({
 export const actionChangeSharpness = register({
   name: "changeSharpness",
   perform: (elements, appState, value) => {
-    const targetElements = getTargetElement(
+    const targetElements = getTargetElements(
       getNonDeletedElements(elements),
       appState,
     );
@@ -629,25 +628,32 @@ export const actionChangeSharpness = register({
   ),
 });
 
-export const actionChangeDecorator = register({
-  name: "changeDecorator",
+export const actionChangeArrowhead = register({
+  name: "changeArrowhead",
   perform: (
     elements,
     appState,
-    value, // { position: "start" | "end"; type: LinearElementDecorator | null },
+    value: { position: "start" | "end"; type: Arrowhead },
   ) => {
     return {
       elements: changeProperty(elements, appState, (el) => {
         if (isLinearElement(el)) {
+          trackEvent(
+            EVENT_CHANGE,
+            `arrowhead ${value.position}`,
+            value.type || "none",
+          );
+
           const { position, type } = value;
+
           if (position === "start") {
             const element: ExcalidrawLinearElement = newElementWith(el, {
-              startDecorator: type,
+              startArrowhead: type,
             });
             return element;
           } else if (position === "end") {
             const element: ExcalidrawLinearElement = newElementWith(el, {
-              endDecorator: type,
+              endArrowhead: type,
             });
             return element;
           }
@@ -657,8 +663,8 @@ export const actionChangeDecorator = register({
       }),
       appState: {
         ...appState,
-        currentItemLinearDecorators: {
-          ...appState.currentItemLinearDecorators,
+        currentItemArrowheads: {
+          ...appState.currentItemArrowheads,
           [value.position]: value.type,
         },
       },
@@ -667,90 +673,60 @@ export const actionChangeDecorator = register({
   },
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
-      <legend>{t("labels.decorators")}</legend>
+      <legend>{t("labels.arrowheads")}</legend>
       <div className="buttonList buttonListIcon">
         <ButtonIconCycle
-          group="start_decorator"
+          group="arrowhead_start"
           options={[
             {
               value: null,
-              text: t("labels.nullDecorator"),
+              text: t("labels.arrowhead_none"),
               icon: <StrokeStyleSolidIcon appearance={appState.appearance} />,
             },
             {
               value: "arrow",
-              text: t("labels.arrowDecorator"),
+              text: t("labels.arrowhead_arrow"),
               icon: (
-                <ArrowDecoratorIcon
-                  appearance={appState.appearance}
-                  flip={true}
-                />
-              ),
-            },
-            {
-              value: "dot",
-              text: t("labels.dotDecorator"),
-              icon: (
-                <DotDecoratorIcon
-                  appearance={appState.appearance}
-                  flip={true}
-                />
-              ),
-            },
-            {
-              value: "bar",
-              text: t("labels.barDecorator"),
-              icon: (
-                <BarDecoratorIcon
+                <ArrowArrowheadIcon
                   appearance={appState.appearance}
                   flip={true}
                 />
               ),
             },
           ]}
-          value={getFormValue(
+          value={getFormValue<Arrowhead | null>(
             elements,
             appState,
             (element) =>
-              isLinearElement(element) && hasDecorators(element.type)
-                ? element.startDecorator
-                : appState.currentItemLinearDecorators.start,
-            appState.currentItemLinearDecorators.start,
+              isLinearElement(element) && canHaveArrowheads(element.type)
+                ? element.startArrowhead
+                : appState.currentItemArrowheads.start,
+            appState.currentItemArrowheads.start,
           )}
           onChange={(value) => updateData({ position: "start", type: value })}
         />
         <ButtonIconCycle
-          group="end_decorator"
+          group="arrowhead_end"
           options={[
             {
               value: null,
-              text: t("labels.nullDecorator"),
+              text: t("labels.arrowhead_none"),
               icon: <StrokeStyleSolidIcon appearance={appState.appearance} />,
             },
             {
               value: "arrow",
-              text: t("labels.arrowDecorator"),
-              icon: <ArrowDecoratorIcon appearance={appState.appearance} />,
-            },
-            {
-              value: "dot",
-              text: t("labels.dotDecorator"),
-              icon: <DotDecoratorIcon appearance={appState.appearance} />,
-            },
-            {
-              value: "bar",
-              text: t("labels.barDecorator"),
-              icon: <BarDecoratorIcon appearance={appState.appearance} />,
+              text: t("labels.arrowhead_arrow"),
+              icon: <ArrowArrowheadIcon appearance={appState.appearance} />,
             },
           ]}
-          value={getFormValue(
+          value={getFormValue<Arrowhead | null>(
             elements,
             appState,
             (element) =>
-              isLinearElement(element) && hasDecorators(element.type)
-                ? element.endDecorator
-                : appState.currentItemLinearDecorators.end,
-            appState.currentItemLinearDecorators.end,
+              isLinearElement(element) && canHaveArrowheads(element.type)
+                ? element.endArrowhead
+                : appState.currentItemArrowheads.end,
+            appState.currentItemArrowheads.end,
           )}
           onChange={(value) => updateData({ position: "end", type: value })}
         />

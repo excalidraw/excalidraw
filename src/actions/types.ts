@@ -35,7 +35,7 @@ export type ActionName =
   | "changeStrokeWidth"
   | "changeSloppiness"
   | "changeStrokeStyle"
-  | "changeDecorator"
+  | "changeArrowhead"
   | "changeOpacity"
   | "changeFontSize"
   | "toggleCanvasMenu"

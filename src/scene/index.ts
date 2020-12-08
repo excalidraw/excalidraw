@@ -4,13 +4,13 @@ export {
   getElementsWithinSelection,
   getCommonAttributeOfSelectedElements,
   getSelectedElements,
-  getTargetElement,
+  getTargetElements,
 } from "./selection";
 export { normalizeScroll, calculateScrollCenter } from "./scroll";
 export {
   hasBackground,
   hasStroke,
-  hasDecorators,
+  canHaveArrowheads,
   canChangeSharpness,
   getElementAtPosition,
   getElementContainingPosition,

@@ -91,8 +91,8 @@ const restoreElement = (
     case "line":
     case "arrow": {
       const {
-        startDecorator = null,
-        endDecorator = element.type === "arrow" ? "arrow" : null,
+        startArrowhead = null,
+        endArrowhead = element.type === "arrow" ? "arrow" : null,
       } = element;
 
       return restoreElementWithProperties(element, {
@@ -107,8 +107,8 @@ const restoreElement = (
               ]
             : element.points,
         lastCommittedPoint: null,
-        startDecorator,
-        endDecorator,
+        startArrowhead,
+        endArrowhead,
       });
     }
     // generic elements
@@ -180,7 +180,7 @@ const restoreAppState = (
 };
 
 export const restore = (
-  data: ImportedDataState,
+  data: ImportedDataState | null,
   /**
    * Local AppState (`this.state` or initial state from localStorage) so that we
    * don't overwrite local state with default values (when values not
@@ -190,7 +190,7 @@ export const restore = (
   localAppState: Partial<AppState> | null | undefined,
 ): DataState => {
   return {
-    elements: restoreElements(data.elements),
-    appState: restoreAppState(data.appState, localAppState || null),
+    elements: restoreElements(data?.elements),
+    appState: restoreAppState(data?.appState, localAppState || null),
   };
 };

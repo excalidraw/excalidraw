@@ -12,26 +12,18 @@ export const ButtonIconCycle = <T extends any>({
   onChange: (value: T) => void;
   group: string;
 }) => {
-  const [index, setIndex] = React.useState(() =>
-    options.findIndex((o) => o.value === value),
-  );
-
-  React.useEffect(() => {
-    setIndex(options.findIndex((o) => o.value === value));
-  }, [value, options]);
+  const current = options.find((op) => op.value === value);
 
   function cycle() {
+    const index = options.indexOf(current!);
     const next = (index + 1) % options.length;
-    setIndex(next);
     onChange(options[next].value);
   }
 
-  const current = options[index];
-
   return (
-    <label key={group} className={clsx({ active: current.value !== null })}>
+    <label key={group} className={clsx({ active: current!.value !== null })}>
       <input type="button" name={group} onClick={cycle} />
-      {current.icon}
+      {current!.icon}
     </label>
   );
 };
