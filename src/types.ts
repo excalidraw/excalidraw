@@ -133,14 +133,16 @@ export declare class GestureEvent extends UIEvent {
 export type LibraryItem = readonly NonDeleted<ExcalidrawElement>[];
 export type LibraryItems = readonly LibraryItem[];
 
+// NOTE ready/readyPromise props are optional for host apps' sake (our own
+// implem guarantees existence)
 export type ExcalidrawAPIRefValue =
   | (ExcalidrawImperativeAPI & {
-      readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
-      ready: true;
+      readyPromise?: ResolvablePromise<ExcalidrawImperativeAPI>;
+      ready?: true;
     })
   | {
-      readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
-      ready: false;
+      readyPromise?: ResolvablePromise<ExcalidrawImperativeAPI>;
+      ready?: false;
     };
 
 export interface ExcalidrawProps {

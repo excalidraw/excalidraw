@@ -301,9 +301,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     };
     if (excalidrawRef) {
       const readyPromise =
-        typeof excalidrawRef === "function"
-          ? resolvablePromise<ExcalidrawImperativeAPI>()
-          : excalidrawRef.current!.readyPromise;
+        ("current" in excalidrawRef && excalidrawRef.current?.readyPromise) ||
+        resolvablePromise<ExcalidrawImperativeAPI>();
+
       const api: ExcalidrawImperativeAPI = {
         ready: true,
         readyPromise,
