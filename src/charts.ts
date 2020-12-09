@@ -209,6 +209,9 @@ export const renderSpreadsheet = (
 
   // TODO: X-axis arrow: Start: [x, y], End: [x + chartWidth + BAR_GAP * 2, y]
   // TODO: Y-axis arrow: Start: [x, y], End: [x, y - chartHeight - BAR_GAP * 2]
+  // TODO: Dashed horizontal line for max value:
+  //       Start [x, y - BAR_HEIGHT - BAR_GAP]
+  //       End:  [x + chartWidth, y - BAR_HEIGHT - BAR_GAP]
 
   const bars = values.map((value, index) => {
     const barHeight = (value / max) * BAR_HEIGHT;
