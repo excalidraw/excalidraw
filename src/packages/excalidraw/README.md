@@ -176,9 +176,9 @@ Every time component updates, this callback if passed will get triggered and has
 (excalidrawElements, appState) => void;
 ```
 
-1.excalidrawElements: Array of [excalidrawElements](https://github.com/excalidraw/excalidraw/blob/4c90ea5667d29effe8ec4a115e49efc7c340cdb3/src/element/types.ts#L59) in the scene.
+1.`excalidrawElements`: Array of [excalidrawElements](https://github.com/excalidraw/excalidraw/blob/4c90ea5667d29effe8ec4a115e49efc7c340cdb3/src/element/types.ts#L59) in the scene.
 
-2.appState: [AppState](https://github.com/excalidraw/excalidraw/blob/4c90ea5667d29effe8ec4a115e49efc7c340cdb3/src/types.ts#L33) of the scene
+2.`appState`: [AppState](https://github.com/excalidraw/excalidraw/blob/4c90ea5667d29effe8ec4a115e49efc7c340cdb3/src/types.ts#L33) of the scene
 
 Here you can try saving the data to your backend or local storage for example.
 
