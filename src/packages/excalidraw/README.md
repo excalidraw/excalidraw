@@ -98,7 +98,15 @@ export default function App() {
   return (
     <div className="App">
       <button className="update-scene" onClick={updateScene}>
-        update scene{" "}
+        Update Scene
+      </button>
+      <button
+        className="reset-scene"
+        onClick={() => {
+          excalidrawRef.current.resetScene();
+        }}
+      >
+        Reset Scene
       </button>
       <div className="excalidraw-wrapper">
         <Excalidraw
@@ -150,13 +158,13 @@ This props defines the height of the Excalidraw component. Defaults to `window.i
 
 #### `offsetLeft`
 
-This prop defines left position relative to which Excalidraw should be rendered. Calculated by Excalidraw if not passed
+This prop defines left position relative to which Excalidraw should be rendered. Defaults to 0 if not passed.
 
 <a name="offsetTop"></a>
 
 #### `offsetTop`
 
-This prop defines top position relative to which Excalidraw should be rendered. Calculated by Excalidraw if not passed
+This prop defines top position relative to which Excalidraw should be rendered. Defaults to 0 if not passed.
 
 <a name="onChange"></a>
 
