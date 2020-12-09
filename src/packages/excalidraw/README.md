@@ -259,19 +259,19 @@ const excalidrawRef = { current: { readyPromise: [resolvablePromise](https://git
 
 <a name="onCollabButtoClick"><a/>
 
-### `onCollabButtoClick`
+#### `onCollabButtonClick`
 
 This callback is triggered when clicked on the collab button in excalidraw
 
 <a name="isCollaborating"><a/>
 
-### `isCollaborating`
+#### `isCollaborating`
 
 This props implies if the app is in collaboration mode
 
 <a name="onPointerUpdate"><a/>
 
-### `onPointerUpdate`
+#### `onPointerUpdate`
 
 This callback is triggered when mouse pointer is updated
 
