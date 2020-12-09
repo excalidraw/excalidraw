@@ -86,11 +86,6 @@
     grid-auto-flow: column;
     grid-gap: 0.5rem;
     border-radius: 4px;
-
-    &:focus {
-      outline: none;
-      box-shadow: 0 0 0 2px var(--focus-highlight-color);
-    }
   }
 
   .picker-keybinding {
