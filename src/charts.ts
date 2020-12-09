@@ -164,7 +164,11 @@ export const renderSpreadsheet = (
   const chartWidth =
     (BAR_WIDTH + BAR_GAP) * spreadsheet.values.length + BAR_GAP;
 
-  const color = colors.elementBackground[7];
+  const backgrounds = colors.elementBackground.slice(
+    2,
+    colors.elementBackground.length,
+  );
+  const color = backgrounds[Math.floor(Math.random() * backgrounds.length)];
 
   // Min value label
   const minYLabel = newTextElement({
@@ -275,6 +279,7 @@ export const renderSpreadsheet = (
       })
     : null;
 
+  // TODO: delete this element
   const testRect = newElement({
     type: "rectangle",
     x,
@@ -282,12 +287,12 @@ export const renderSpreadsheet = (
     width: chartWidth,
     height: chartHeight,
     strokeColor: colors.elementStroke[0],
-    backgroundColor: colors.elementBackground[3],
+    backgroundColor: color,
     fillStyle: "solid",
     strokeWidth: 1,
     strokeStyle: "solid",
-    roughness: 1,
-    opacity: 8,
+    roughness: 0,
+    opacity: 6,
     strokeSharpness: "sharp",
     groupIds,
   });
