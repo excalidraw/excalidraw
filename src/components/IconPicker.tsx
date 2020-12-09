@@ -36,7 +36,7 @@ function Picker<T>({
       (option) => option.keyBinding === event.key.toLowerCase(),
     )!;
 
-    if (!(event.metaKey || event.altKey || event.ctrlKey || pressedOption)) {
+    if (!(event.metaKey || event.altKey || event.ctrlKey) && pressedOption) {
       // Keybinding navigation
       const index = options.indexOf(pressedOption);
       (rGallery!.current!.children![index] as any).focus();
