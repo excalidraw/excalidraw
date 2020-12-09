@@ -5,9 +5,6 @@ import "./IconPicker.scss";
 import { isArrowKey, KEYS } from "../keys";
 import { getLanguage } from "../i18n";
 
-// Unfortunately, we can't detect keyboard layout in the browser. So this will
-// only work well for QWERTY but not AZERTY or others...
-
 function Picker<T>({
   options,
   value,
@@ -37,8 +34,9 @@ function Picker<T>({
   const handleKeyDown = (event: React.KeyboardEvent) => {
     const pressedOption = options.find(
       (option) => option.keyBinding === event.key.toLowerCase(),
-    );
-    if (pressedOption) {
+    )!;
+
+    if (!(event.metaKey || event.altKey || event.ctrlKey || pressedOption)) {
       // Keybinding navigation
       const index = options.indexOf(pressedOption);
       (rGallery!.current!.children![index] as any).focus();
