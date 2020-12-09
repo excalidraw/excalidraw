@@ -150,13 +150,13 @@ This props defines the height of the Excalidraw component. Defaults to `window.i
 
 #### `offsetLeft`
 
-This prop defines left position relative to which Excalidraw should be rendered
+This prop defines left position relative to which Excalidraw should be rendered. Calculated by Excalidraw if not passed
 
 <a name="offsetTop"></a>
 
 #### `offsetTop`
 
-This prop defines top position relative to which Excalidraw should be rendered
+This prop defines top position relative to which Excalidraw should be rendered. Calculated by Excalidraw if not passed
 
 <a name="onChange"></a>
 
@@ -265,14 +265,14 @@ This props implies if the app is in collaboration mode
 
 ### `onPointerUpdate`
 
-This callback is triggered when mouse pointer is updated.
+This callback is triggered when mouse pointer is updated
 
 ```js
 ({ x, y }, button, pointersMap}) => void;
 ```
 
-1.`{x, y}`: Pointer coordinates.
+1.`{x, y}`: Pointer coordinates
 
-2.`button`: The position of the button. This will be one of `["down", "up"]`.
+2.`button`: The position of the button. This will be one of `["down", "up"]`
 
-3.`pointersMap`: [`pointers map`](https://github.com/excalidraw/excalidraw/blob/182a3e39e1362d73d2a565c870eb2fb72071fdcc/src/types.ts#L122) of the scene.
+3.`pointersMap`: [`pointers map`](https://github.com/excalidraw/excalidraw/blob/182a3e39e1362d73d2a565c870eb2fb72071fdcc/src/types.ts#L122) of the scene
