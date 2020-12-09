@@ -12,13 +12,13 @@ npm install react react-dom @excalidraw/excalidraw
 
 or via yarn
 
-```cassandraql
+```
 yarn add react react-dom @excalidraw/excalidraw
 ```
 
 After installation you will see the below font files in `dist` directory.
 
-```cassandraql
+```
 Cascadia.woff2
 FG_Virgil.woff2
 ```
@@ -35,8 +35,8 @@ Please follow the below instruction to serve the above fonts
 
 ### Usage
 
-```javascript
-import React, { useEffect, useState } from "react";
+```js
+import React, { useEffect, useState, createRef } from "react";
 import Excalidraw from "@excalidraw/excalidraw";
 import InitialData from "./initialData";
 
@@ -46,7 +46,10 @@ import "@excalidraw/excalidraw/dist/fonts.min.css";
 import "./styles.css";
 
 export default function App() {
+  const excalidrawRef = createRef();
+
   const onChange = (elements, state) => {
+    console.log(excalidrawRef.current);
     console.log("Elements :", elements, "State : ", state);
   };
 
@@ -68,17 +71,55 @@ export default function App() {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
+  const updateScene = () => {
+    const sceneData = {
+      elements: [
+        {
+          type: "rectangle",
+          version: 141,
+          versionNonce: 361174001,
+          isDeleted: false,
+          id: "oDVXy8D6rom3H1-LLH2-f",
+          fillStyle: "hachure",
+          strokeWidth: 1,
+          strokeStyle: "solid",
+          roughness: 1,
+          opacity: 100,
+          angle: 0,
+          x: 100.50390625,
+          y: 93.67578125,
+          strokeColor: "#c92a2a",
+          backgroundColor: "transparent",
+          width: 186.47265625,
+          height: 141.9765625,
+          seed: 1968410350,
+          groupIds: [],
+        },
+      ],
+      appState: {
+        viewBackgroundColor: "#edf2ff",
+      },
+    };
+    excalidrawRef.current.updateScene(sceneData);
+  };
+
   const { width, height } = dimensions;
-  const options = { zenModeEnabled: true, viewBackgroundColor: "#AFEEEE" };
   return (
     <div className="App">
-      <Excalidraw
-        width={width}
-        height={height}
-        initialData={InitialData}
-        onChange={onChange}
-        user={{ name: "Excalidraw User" }}
-      />
+      <button className="update-scene" onClick={updateScene}>
+        update scene{" "}
+      </button>
+      <div className="excalidraw-wrapper">
+        <Excalidraw
+          ref={excalidrawRef}
+          width={width}
+          height={height}
+          initialData={InitialData}
+          onChange={onChange}
+          user={{ name: "Excalidraw User" }}
+          onPointerUpdate={(payload) => console.log(payload)}
+        />
+      </div>
     </div>
   );
 }
@@ -88,52 +129,52 @@ export default function App() {
 
 ### Props
 
-| Name                                        | Type                                                                                                                                                                                                                                                                                                                     | Default                        | Description                                                                                                                                                |
-| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [width](#width)                             | Number                                                                                                                                                                                                                                                                                                                   | window.innerWidth              | The width of Excalidraw component                                                                                                                          |
-| [height](#height)                           | Number                                                                                                                                                                                                                                                                                                                   | window.innerHeight             | The height of Excalidraw component                                                                                                                         |
-| [offsetLeft](#offsetLeft)                   | Number                                                                                                                                                                                                                                                                                                                   | 0                              | left position relative to which Excalidraw should be rendered                                                                                              |
-| [offsetTop](#offsetTop)                     | Number                                                                                                                                                                                                                                                                                                                   | 0                              | top position relative to which Excalidraw should render                                                                                                    |
-| [onChange](#onChange)                       | Function                                                                                                                                                                                                                                                                                                                 |                                | This callback is triggered whenever the component updates due to any change. This callback will receive the excalidraw elements and the current app state. |
-| [initialData](#initialData)                 | [ExcalidrawElement[]](https://github.com/excalidraw/excalidraw/blob/4c90ea5667d29effe8ec4a115e49efc7c340cdb3/src/types.ts#L151)                                                                                                                                                                                          | []                             | The initial data with which app loads.                                                                                                                     |
-| [user](#user)                               | { name?: string }                                                                                                                                                                                                                                                                                                        |                                | User details. The name refers to the name of the user to be shown                                                                                          |
-| [excalidrawRef](#excalidrawRef)             | [createRef](https://reactjs.org/docs/refs-and-the-dom.html#creating-refs) or [callbackRef](https://reactjs.org/docs/refs-and-the-dom.html#callback-refs) or { current: { readyPromise: [resolvablePromise](https://github.com/excalidraw/excalidraw/blob/4c90ea5667d29effe8ec4a115e49efc7c340cdb3/src/utils.ts#L312) } } | Ref to be passed to Excalidraw |
-| [onCollabButtonClick](#onCollabButtonClick) | Function                                                                                                                                                                                                                                                                                                                 |                                | Callback to be triggered when the collab button is clicked                                                                                                 |
-| [isCollaborating](#isCollaborating)         | boolean                                                                                                                                                                                                                                                                                                                  |                                | This implies if the app is in collaboration mode                                                                                                           |
-| [onPointerUpdate](#onPointerUpdate)         | Function                                                                                                                                                                                                                                                                                                                 |                                | Callback triggered when mouse pointer is updated.                                                                                                          |
+| Name                                          | Type                                                                                                                                                                                                                                                                                                                           | Default            | Description                                                                                                                                                |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`width`](#width)                             | Number                                                                                                                                                                                                                                                                                                                         | window.innerWidth  | The width of Excalidraw component                                                                                                                          |
+| [`height`](#height)                           | Number                                                                                                                                                                                                                                                                                                                         | window.innerHeight | The height of Excalidraw component                                                                                                                         |
+| [`offsetLeft`](#offsetLeft)                   | Number                                                                                                                                                                                                                                                                                                                         | 0                  | left position relative to which Excalidraw should be rendered                                                                                              |
+| [`offsetTop`](#offsetTop)                     | Number                                                                                                                                                                                                                                                                                                                         | 0                  | top position relative to which Excalidraw should render                                                                                                    |
+| [`onChange`](#onChange)                       | Function                                                                                                                                                                                                                                                                                                                       |                    | This callback is triggered whenever the component updates due to any change. This callback will receive the excalidraw elements and the current app state. |
+| [`initialData`](#initialData)                 | [`ExcalidrawElement[]`](https://github.com/excalidraw/excalidraw/blob/4c90ea5667d29effe8ec4a115e49efc7c340cdb3/src/types.ts#L151)                                                                                                                                                                                              | []                 | The initial data with which app loads.                                                                                                                     |
+| [`user`](#user)                               | { name?: string }                                                                                                                                                                                                                                                                                                              |                    | User details. The name refers to the name of the user to be shown                                                                                          |
+| [`excalidrawRef`](#excalidrawRef)             | [`createRef`](https://reactjs.org/docs/refs-and-the-dom.html#creating-refs) or [`callbackRef`](https://reactjs.org/docs/refs-and-the-dom.html#callback-refs) or { current: { readyPromise: [`resolvablePromise`](https://github.com/excalidraw/excalidraw/blob/4c90ea5667d29effe8ec4a115e49efc7c340cdb3/src/utils.ts#L312) } } |                    | Ref to be passed to Excalidraw                                                                                                                             |
+| [`onCollabButtonClick`](#onCollabButtonClick) | Function                                                                                                                                                                                                                                                                                                                       |                    | Callback to be triggered when the collab button is clicked                                                                                                 |
+| [`isCollaborating`](#isCollaborating)         | boolean                                                                                                                                                                                                                                                                                                                        |                    | This implies if the app is in collaboration mode                                                                                                           |
+| [`onPointerUpdate`](#onPointerUpdate)         | Function                                                                                                                                                                                                                                                                                                                       |                    | Callback triggered when mouse pointer is updated.                                                                                                          |
 
 <a name="width"></a>
 
-#### width
+#### `width`
 
 This props defines the width of the Excalidraw component. Defaults to `window.innerWidth` if not passed.
 
 <a name="height"></a>
 
-#### height
+#### `height`
 
 This props defines the height of the Excalidraw component. Defaults to `window.innerHeight` if not passed.
 
 <a name="offsetLeft"></a>
 
-#### offsetLeft
+#### `offsetLeft`
 
 This prop defines left position relative to which Excalidraw should be rendered
 
 <a name="offsetTop"></a>
 
-#### offsetTop
+#### `offsetTop`
 
 This prop defines top position relative to which Excalidraw should be rendered
 
 <a name="onChange"></a>
 
-#### onChange
+#### `onChange`
 
 Every time component updates, this callback if passed will get triggered and has the below signature.
 
-```javascript
-(excalidrawElements, appState) => void
+```js
+(excalidrawElements, appState) => void;
 ```
 
 1.excalidrawElements: Array of [excalidrawElements](https://github.com/excalidraw/excalidraw/blob/4c90ea5667d29effe8ec4a115e49efc7c340cdb3/src/element/types.ts#L59) in the scene.
@@ -144,7 +185,7 @@ Here you can try saving the data to your backend or local storage for example.
 
 <a name="initialData"></a>
 
-#### initialData
+#### `initialData`
 
 This helps to load Excalidraw with `initialData`.
 It must be an object or a [promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise) which resolves to an object containing the below optional fields.
@@ -154,32 +195,32 @@ It must be an object or a [promise](https://developer.mozilla.org/en-US/docs/Web
 | elements | [ExcalidrawElement []](https://github.com/excalidraw/excalidraw/blob/4c90ea5667d29effe8ec4a115e49efc7c340cdb3/src/element/types.ts#L59) |
 | appState | [AppState](https://github.com/excalidraw/excalidraw/blob/4c90ea5667d29effe8ec4a115e49efc7c340cdb3/src/types.ts#L33)                     |
 
-```javascript
+```json
 {
-  elements: [
+  "elements": [
     {
-      type: "rectangle",
-      version: 141,
-      versionNonce: 361174001,
-      isDeleted: false,
-      id: "oDVXy8D6rom3H1-LLH2-f",
-      fillStyle: "hachure",
-      strokeWidth: 1,
-      strokeStyle: "solid",
-      roughness: 1,
-      opacity: 100,
-      angle: 0,
-      x: 100.50390625,
-      y: 93.67578125,
-      strokeColor: "#000000",
-      backgroundColor: "transparent",
-      width: 186.47265625,
-      height: 141.9765625,
-      seed: 1968410350,
-      groupIds: []
-    },
+      "type": "rectangle",
+      "version": 141,
+      "versionNonce": 361174001,
+      "isDeleted": false,
+      "id": "oDVXy8D6rom3H1-LLH2-f",
+      "fillStyle": "hachure",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "angle": 0,
+      "x": 100.50390625,
+      "y": 93.67578125,
+      "strokeColor": "#000000",
+      "backgroundColor": "transparent",
+      "width": 186.47265625,
+      "height": 141.9765625,
+      "seed": 1968410350,
+      "groupIds": []
+    }
   ],
-  appState: { zenModeEnabled: true, viewBackgroundColor: "#AFEEEE" }
+  "appState": { "zenModeEnabled": true, "viewBackgroundColor": "#AFEEEE" }
 }
 ```
 
@@ -187,13 +228,13 @@ You might want to use this when you want to load excalidraw with some initial el
 
 <a name="user"><a/>
 
-#### user
+#### `user`
 
 This is the user name which shows during collaboration. Defaults to `{name: ''}`.
 
 <a name="excalidrawRef"></a>
 
-#### excalidrawRef
+#### `excalidrawRef`
 
 You can pass a ref when you want to access some excalidraw API's.
 We expose the below API's
@@ -211,6 +252,36 @@ We expose the below API's
 
 <a name="readyPromise"></a>
 
-#### readyPromise
+#### `readyPromise`
 
+```js
 const excalidrawRef = { current: { readyPromise: [resolvablePromise](https://github.com/excalidraw/excalidraw/blob/4c90ea5667d29effe8ec4a115e49efc7c340cdb3/src/utils.ts#L312) }
+```
+
+<a name="onCollabButtoClick"><a/>
+
+### `onCollabButtoClick`
+
+This callback is triggered when clicked on the collab button in excalidraw
+
+<a name="isCollaborating"><a/>
+
+### `isCollaborating`
+
+This props implies if the app is in collaboration mode
+
+<a name="onPointerUpdate"><a/>
+
+### `onPointerUpdate`
+
+This callback is triggered when mouse pointer is updated.
+
+```js
+({ x, y }, button, pointersMap}) => void;
+```
+
+1.`{x, y}`: Pointer coordinates.
+
+2.`button`: The position of the button. This will be one of `["down", "up"]`.
+
+3.`pointersMap`: [`pointers map`](https://github.com/excalidraw/excalidraw/blob/182a3e39e1362d73d2a565c870eb2fb72071fdcc/src/types.ts#L122) of the scene.
