@@ -144,19 +144,19 @@ export default function App() {
 
 #### `width`
 
-This props defines the width of the Excalidraw component. Defaults to `window.innerWidth` if not passed.
+This props defines the `width` of the Excalidraw component. Defaults to `window.innerWidth` if not passed.
 
 #### `height`
 
-This props defines the height of the Excalidraw component. Defaults to `window.innerHeight` if not passed.
+This props defines the `height` of the Excalidraw component. Defaults to `window.innerHeight` if not passed.
 
 #### `offsetLeft`
 
-This prop defines left position relative to which Excalidraw should be rendered. Defaults to 0 if not passed.
+This prop defines `left` position relative to which Excalidraw should be rendered. Defaults to `0` if not passed.
 
 #### `offsetTop`
 
-This prop defines top position relative to which Excalidraw should be rendered. Defaults to 0 if not passed.
+This prop defines `top` position relative to which Excalidraw should be rendered. Defaults to `0` if not passed.
 
 #### `onChange`
 
