@@ -16,18 +16,9 @@ or via yarn
 yarn add react react-dom @excalidraw/excalidraw
 ```
 
-After installation you will see the below font files in `dist` directory.
+After installation you will see a folder `excalidraw-assets` in `dist` directory which contains the assets needed for this app.
 
-```
-Cascadia.woff2
-FG_Virgil.woff2
-```
-
-Please follow the below instruction to serve the above fonts
-
-1.Create a folder `excalidraw-assets` and copy these files into that folder.
-
-2.Move the folder `excalidraw-assets` to the path where your assets are served. In the example its served from `public/excalidraw-assets`
+Move the folder `excalidraw-assets` to the path where your assets are served. In the example its served from `public/excalidraw-assets`
 
 ### Demo
 
