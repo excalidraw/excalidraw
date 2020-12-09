@@ -9,7 +9,7 @@ type _ExcalidrawElementBase = Readonly<{
   y: number;
   strokeColor: string;
   backgroundColor: string;
-  fillStyle: string;
+  fillStyle: "hachure" | "cross-hatch" | "solid";
   strokeWidth: number;
   strokeStyle: "solid" | "dashed" | "dotted";
   strokeSharpness: "round" | "sharp";

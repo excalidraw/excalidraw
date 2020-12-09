@@ -52,7 +52,7 @@ export type AppState = {
   shouldAddWatermark: boolean;
   currentItemStrokeColor: string;
   currentItemBackgroundColor: string;
-  currentItemFillStyle: string;
+  currentItemFillStyle: ExcalidrawElement["fillStyle"];
   currentItemStrokeWidth: number;
   currentItemStrokeStyle: ExcalidrawElement["strokeStyle"];
   currentItemRoughness: number;

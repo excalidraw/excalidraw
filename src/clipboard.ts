@@ -5,12 +5,7 @@ import {
 import { getSelectedElements } from "./scene";
 import { AppState } from "./types";
 import { SVG_EXPORT_TAG } from "./scene/export";
-import {
-  tryParseSpreadsheet,
-  Spreadsheet,
-  VALID_SPREADSHEET,
-  MALFORMED_SPREADSHEET,
-} from "./charts";
+import { tryParseSpreadsheet, Spreadsheet, VALID_SPREADSHEET } from "./charts";
 import { canvasToBlob } from "./data/blob";
 
 const TYPE_ELEMENTS = "excalidraw/elements";
@@ -82,8 +77,6 @@ const parsePotentialSpreadsheet = (
   const result = tryParseSpreadsheet(text);
   if (result.type === VALID_SPREADSHEET) {
     return { spreadsheet: result.spreadsheet };
-  } else if (result.type === MALFORMED_SPREADSHEET) {
-    return { errorMessage: result.error };
   }
   return null;
 };
