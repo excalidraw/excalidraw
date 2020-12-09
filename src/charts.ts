@@ -158,17 +158,14 @@ export const renderSpreadsheet = (
   x: number,
   y: number,
 ): ExcalidrawElement[] => {
-  const max = Math.max(...spreadsheet.values);
-  const groupIds = [randomId()];
+  const values = spreadsheet.values;
+  const max = Math.max(...values);
   const chartHeight = BAR_HEIGHT + BAR_GAP * 2;
-  const chartWidth =
-    (BAR_WIDTH + BAR_GAP) * spreadsheet.values.length + BAR_GAP;
-
-  const backgrounds = colors.elementBackground.slice(
-    2,
-    colors.elementBackground.length,
-  );
+  const chartWidth = (BAR_WIDTH + BAR_GAP) * values.length + BAR_GAP;
+  const maxColors = colors.elementBackground.length;
+  const backgrounds = colors.elementBackground.slice(2, maxColors);
   const color = backgrounds[Math.floor(Math.random() * backgrounds.length)];
+  const groupIds = [randomId()];
 
   // Min value label
   const minYLabel = newTextElement({
@@ -210,7 +207,10 @@ export const renderSpreadsheet = (
     verticalAlign: "middle",
   });
 
-  const bars = spreadsheet.values.map((value, index) => {
+  // TODO: X-axis arrow: Start: [x, y], End: [x + chartWidth + BAR_GAP * 2, y]
+  // TODO: Y-axis arrow: Start: [x, y], End: [x, y - chartHeight - BAR_GAP * 2]
+
+  const bars = values.map((value, index) => {
     const barHeight = (value / max) * BAR_HEIGHT;
     return newElement({
       type: "rectangle",
