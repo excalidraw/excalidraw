@@ -154,7 +154,7 @@ export function IconPicker<T>({
         name={group}
         className={isActive ? "active" : ""}
         aria-label={label}
-        onClick={() => setActive(true)}
+        onClick={() => setActive(!isActive)}
         ref={rPickerButton}
       >
         {options.find((option) => option.value === value)?.icon}
