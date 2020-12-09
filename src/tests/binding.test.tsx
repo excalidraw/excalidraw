@@ -27,9 +27,9 @@ describe("element binding", () => {
       height: 500,
     });
     const arrow = UI.createElement("arrow", {
-      x: 220,
+      x: 210,
       y: 250,
-      width: 160,
+      width: 180,
       height: 1,
     });
     expect(arrow.startBinding?.elementId).toBe(rectLeft.id);
