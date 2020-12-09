@@ -107,7 +107,7 @@ export const tryParseSpreadsheet = (text: string): ParseSpreadsheetResult => {
   // copy/paste from excel, in-browser excel, google sheets is tsv
   // we also check for csv
   // for now we only accept 2 columns with an optional header
-
+  // TODO: Try maybe something smarter to understand if we can parse it
   // Check for Tab separeted values
   let lines = text
     .trim()
@@ -115,7 +115,7 @@ export const tryParseSpreadsheet = (text: string): ParseSpreadsheetResult => {
     .map((line) => line.trim().split("\t"));
 
   // Check for comma separeted files
-  if (lines.length !== 0) {
+  if (lines.length !== 0 && lines[0].length !== 2) {
     lines = text
       .trim()
       .split("\n")
