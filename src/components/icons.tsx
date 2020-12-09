@@ -725,6 +725,22 @@ export const EdgeRoundIcon = React.memo(
     ),
 );
 
+export const ArrowheadNoneIcon = React.memo(
+  ({ appearance }: { appearance: "light" | "dark" }) =>
+    createIcon(
+      <path
+        d="M6 10H34"
+        stroke={iconFillColor(appearance)}
+        strokeWidth={2}
+        fill="none"
+      />,
+      {
+        width: 40,
+        height: 20,
+      },
+    ),
+);
+
 export const ArrowheadArrowIcon = React.memo(
   ({
     appearance,
@@ -743,7 +759,7 @@ export const ArrowheadArrowIcon = React.memo(
         <path d="M34 10H6M34 10L27 5M34 10L27 15" />
         <path d="M27.5 5L34.5 10L27.5 15" />
       </g>,
-      { width: 40, height: 20, mirror: true },
+      { width: 40, height: 20 },
     ),
 );
 
@@ -764,7 +780,7 @@ export const ArrowheadDotIcon = React.memo(
         <path d="M32 10L6 10" strokeWidth={2} />
         <circle r="4" transform="matrix(-1 0 0 1 30 10)" />
       </g>,
-      { width: 40, height: 20, mirror: true },
+      { width: 40, height: 20 },
     ),
 );
 
@@ -785,6 +801,6 @@ export const ArrowheadBarIcon = React.memo(
           fill="none"
         />
       </g>,
-      { width: 40, height: 20, mirror: true },
+      { width: 40, height: 20 },
     ),
 );

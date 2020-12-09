@@ -16,7 +16,7 @@ import {
 } from "../scene";
 import { ButtonSelect } from "../components/ButtonSelect";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
-import { ButtonIconCycle } from "../components/ButtonIconCycle";
+import { IconPicker } from "../components/IconPicker";
 import {
   isTextElement,
   redrawTextBoundingBox,
@@ -46,6 +46,7 @@ import {
   ArrowheadArrowIcon,
   ArrowheadBarIcon,
   ArrowheadDotIcon,
+  ArrowheadNoneIcon,
 } from "../components/icons";
 import { EVENT_CHANGE, trackEvent } from "../analytics";
 import colors from "../colors";
@@ -676,14 +677,15 @@ export const actionChangeArrowhead = register({
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.arrowheads")}</legend>
-      <div className="buttonList buttonListIcon">
-        <ButtonIconCycle
-          group="arrowhead_start"
+      <div className="iconSelectList">
+        <IconPicker
+          label="arrowhead_start"
           options={[
             {
               value: null,
               text: t("labels.arrowhead_none"),
-              icon: <StrokeStyleSolidIcon appearance={appState.appearance} />,
+              icon: <ArrowheadNoneIcon appearance={appState.appearance} />,
+              keyBinding: "q",
             },
             {
               value: "arrow",
@@ -691,16 +693,19 @@ export const actionChangeArrowhead = register({
               icon: (
                 <ArrowheadArrowIcon appearance={appState.appearance} flip />
               ),
+              keyBinding: "w",
             },
             {
               value: "bar",
               text: t("labels.arrowhead_bar"),
               icon: <ArrowheadBarIcon appearance={appState.appearance} flip />,
+              keyBinding: "e",
             },
             {
               value: "dot",
               text: t("labels.arrowhead_dot"),
               icon: <ArrowheadDotIcon appearance={appState.appearance} flip />,
+              keyBinding: "r",
             },
           ]}
           value={getFormValue<Arrowhead | null>(
@@ -714,27 +719,32 @@ export const actionChangeArrowhead = register({
           )}
           onChange={(value) => updateData({ position: "start", type: value })}
         />
-        <ButtonIconCycle
-          group="arrowhead_end"
+        <IconPicker
+          label="arrowhead_end"
+          group="arrowheads"
           options={[
             {
               value: null,
               text: t("labels.arrowhead_none"),
-              icon: <StrokeStyleSolidIcon appearance={appState.appearance} />,
+              keyBinding: "q",
+              icon: <ArrowheadNoneIcon appearance={appState.appearance} />,
             },
             {
               value: "arrow",
               text: t("labels.arrowhead_arrow"),
+              keyBinding: "w",
               icon: <ArrowheadArrowIcon appearance={appState.appearance} />,
             },
             {
               value: "bar",
               text: t("labels.arrowhead_bar"),
+              keyBinding: "e",
               icon: <ArrowheadBarIcon appearance={appState.appearance} />,
             },
             {
               value: "dot",
               text: t("labels.arrowhead_dot"),
+              keyBinding: "r",
               icon: <ArrowheadDotIcon appearance={appState.appearance} />,
             },
           ]}
