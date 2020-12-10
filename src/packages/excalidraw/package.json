@@ -1,6 +1,6 @@
 {
   "name": "@excalidraw/excalidraw",
-  "version": "0.7.0",
+  "version": "0.1.0",
   "main": "dist/excalidraw.min.js",
   "files": [
     "dist/*"
