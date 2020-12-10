@@ -218,9 +218,9 @@ export const renderSpreadsheet = (
 
   mutateElement(axesLine, {
     points: [
-      [0, -chartHeight - BAR_GAP],
+      [0, -chartHeight],
       [0, 0],
-      [chartWidth + BAR_GAP, 0],
+      [chartWidth, 0],
     ],
   });
 
@@ -273,7 +273,7 @@ export const renderSpreadsheet = (
         ...commonProps,
         text: spreadsheet.title,
         x: x + chartWidth / 2,
-        y: y - BAR_HEIGHT - BAR_GAP * 3 - maxYLabel.height,
+        y: y - BAR_HEIGHT - BAR_GAP * 2 - maxYLabel.height,
         strokeSharpness: "sharp",
         strokeStyle: "solid",
         textAlign: "center",
