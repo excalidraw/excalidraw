@@ -1,19 +1,15 @@
 import { Point } from "../types";
 import { FONT_FAMILY } from "../constants";
 
-export type GroupId = string;
-
 export type FillStyle = "hachure" | "cross-hatch" | "solid";
-export type StrokeStyle = "solid" | "dashed" | "dotted";
-export type StrokeSharpness = "round" | "sharp";
-
-export type PointerType = "mouse" | "pen" | "touch";
-
-export type TextAlign = "left" | "center" | "right";
-export type VerticalAlign = "top" | "middle";
-
 export type FontFamily = keyof typeof FONT_FAMILY;
 export type FontString = string & { _brand: "fontString" };
+export type GroupId = string;
+export type PointerType = "mouse" | "pen" | "touch";
+export type StrokeSharpness = "round" | "sharp";
+export type StrokeStyle = "solid" | "dashed" | "dotted";
+export type TextAlign = "left" | "center" | "right";
+export type VerticalAlign = "top" | "middle";
 
 type _ExcalidrawElementBase = Readonly<{
   id: string;

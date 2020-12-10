@@ -215,7 +215,6 @@ export const renderSpreadsheet = (
     endArrowhead: null,
     ...commonProps,
   });
-
   mutateElement(axesLine, {
     points: [
       [0, -chartHeight],
@@ -232,7 +231,6 @@ export const renderSpreadsheet = (
     endArrowhead: null,
     ...commonProps,
   });
-
   mutateElement(maxValueLine, {
     points: [
       [0, 0],
