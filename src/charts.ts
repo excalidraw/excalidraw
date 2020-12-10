@@ -108,11 +108,10 @@ const transposeCells = (cells: string[][]) => {
 };
 
 export const tryParseSpreadsheet = (text: string): ParseSpreadsheetResult => {
-  // copy/paste from excel, in-browser excel, google sheets is tsv
-  // we also check for csv
-  // for now we only accept 2 columns with an optional header
-  // TODO: Try maybe something smarter to understand if we can parse it
-  // Check for Tab separeted values
+  // Copy/paste from excel, spreadhseets, tsv, csv.
+  // For now we only accept 2 columns with an optional header
+
+  // Check for tab separeted values
   let lines = text
     .trim()
     .split("\n")
@@ -131,11 +130,9 @@ export const tryParseSpreadsheet = (text: string): ParseSpreadsheetResult => {
   }
 
   const numColsFirstLine = lines[0].length;
-  const isASpreadsheet = lines.every(
-    (line) => line.length === numColsFirstLine,
-  );
+  const isSpreadsheet = lines.every((line) => line.length === numColsFirstLine);
 
-  if (!isASpreadsheet) {
+  if (!isSpreadsheet) {
     return { type: NOT_SPREADSHEET };
   }
 
@@ -153,8 +150,6 @@ export const tryParseSpreadsheet = (text: string): ParseSpreadsheetResult => {
 const BAR_WIDTH = 32;
 const BAR_GAP = 12;
 const BAR_HEIGHT = 256;
-
-const ANGLE = 5.87;
 
 // For the maths behind it https://excalidraw.com/#json=6320864370884608,O_5xfD-Agh32tytHpRJx1g
 export const renderSpreadsheet = (
@@ -175,15 +170,16 @@ export const renderSpreadsheet = (
   // the properties dialog shows the correct selected values
   const commonProps: {
     backgroundColor: string;
+    fillStyle: FillStyle;
     fontFamily: FontFamily;
     fontSize: number;
     groupIds: any;
     opacity: number;
     roughness: number;
-    strokeWidth: number;
-    fillStyle: FillStyle;
-    strokeStyle: StrokeStyle;
+    strokeColor: string;
     strokeSharpness: StrokeSharpness;
+    strokeStyle: StrokeStyle;
+    strokeWidth: number;
     verticalAlign: VerticalAlign;
   } = {
     backgroundColor: color,
@@ -193,28 +189,25 @@ export const renderSpreadsheet = (
     groupIds,
     opacity: 100,
     roughness: 1,
+    strokeColor: colors.elementStroke[0],
     strokeSharpness: "sharp",
     strokeStyle: "solid",
     strokeWidth: 1,
     verticalAlign: "middle",
   };
 
-  // Min value label
   const minYLabel = newTextElement({
     ...commonProps,
     x: x - BAR_GAP,
     y: y - BAR_GAP,
-    strokeColor: colors.elementStroke[0],
     text: "0",
     textAlign: "right",
   });
 
-  // Max value label
   const maxYLabel = newTextElement({
     ...commonProps,
     x: x - BAR_GAP,
     y: y - BAR_HEIGHT - minYLabel.height / 2,
-    strokeColor: colors.elementStroke[0],
     text: max.toLocaleString(),
     textAlign: "right",
   });
@@ -234,7 +227,6 @@ export const renderSpreadsheet = (
       y: y - barHeight - BAR_GAP,
       width: BAR_WIDTH,
       height: barHeight,
-      strokeColor: colors.elementStroke[0],
     });
   });
 
@@ -246,43 +238,38 @@ export const renderSpreadsheet = (
         x: x + index * (BAR_WIDTH + BAR_GAP) + BAR_GAP * 2,
         y: y + BAR_GAP / 2,
         width: BAR_WIDTH,
-        angle: ANGLE,
+        angle: 5.87,
         fontSize: 16,
-        strokeColor: colors.elementStroke[0],
         textAlign: "center",
         verticalAlign: "top",
       });
     }) || [];
 
-  // Title on top of the chart in the middle
   const title = spreadsheet.title
     ? newTextElement({
         ...commonProps,
         text: spreadsheet.title,
         x: x + chartWidth / 2,
         y: y - BAR_HEIGHT - BAR_GAP * 3 - maxYLabel.height,
-        strokeColor: colors.elementStroke[0],
         strokeSharpness: "sharp",
         strokeStyle: "solid",
         textAlign: "center",
       })
     : null;
 
-  // TODO: delete this element
-  const testRect = newElement({
+  const debugRect = newElement({
     ...commonProps,
     type: "rectangle",
     x,
     y: y - chartHeight,
     width: chartWidth,
     height: chartHeight,
-    strokeColor: colors.elementStroke[0],
     fillStyle: "solid",
     opacity: 6,
   });
 
   trackEvent(EVENT_MAGIC, "chart", "bars", bars.length);
-  return [...bars, title, minYLabel, maxYLabel, ...xLabels, testRect].filter(
+  return [...bars, title, minYLabel, maxYLabel, ...xLabels, debugRect].filter(
     (element) => element !== null,
   ) as ExcalidrawElement[];
 };
