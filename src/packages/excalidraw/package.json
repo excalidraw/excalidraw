@@ -1,6 +1,6 @@
 {
   "name": "@excalidraw/excalidraw",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "dist/excalidraw.min.js",
   "files": [
     "dist/*"
@@ -64,6 +64,7 @@
   },
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
   "repository": "https://github.com/excalidraw/excalidraw",
+  "homepage": "https://github.com/excalidraw/excalidraw/tree/master/src/packages/excalidraw",
   "scripts": {
     "build:umd": "cross-env NODE_ENV=production webpack --config webpack.prod.config.js",
     "build:umd:withAnalyzer": "cross-env NODE_ENV=production ANALYZER=true webpack --config webpack.prod.config.js",
