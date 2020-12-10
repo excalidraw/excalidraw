@@ -4,7 +4,7 @@ import ReactDOM from "react-dom";
 import { copiedStyles } from "../actions/actionStyles";
 import { ShortcutName } from "../actions/shortcuts";
 import { ExcalidrawElement } from "../element/types";
-import { setLanguage, t } from "../i18n";
+import { setLanguage } from "../i18n";
 import { CODES, KEYS } from "../keys";
 import Excalidraw from "../packages/excalidraw/index";
 import { reseed } from "../random";
