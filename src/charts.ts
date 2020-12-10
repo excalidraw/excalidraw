@@ -1,7 +1,8 @@
 import { EVENT_MAGIC, trackEvent } from "./analytics";
 import colors from "./colors";
 import { DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE } from "./constants";
-import { newElement, newTextElement } from "./element";
+import { newElement, newTextElement, newLinearElement } from "./element";
+import { mutateElement } from "./element/mutateElement";
 import {
   ExcalidrawElement,
   FillStyle,
@@ -11,6 +12,10 @@ import {
   VerticalAlign,
 } from "./element/types";
 import { randomId } from "./random";
+
+const BAR_WIDTH = 32;
+const BAR_GAP = 12;
+const BAR_HEIGHT = 256;
 
 export interface Spreadsheet {
   title: string | null;
@@ -143,10 +148,6 @@ export const tryParseSpreadsheet = (text: string): ParseSpreadsheetResult => {
   return result;
 };
 
-const BAR_WIDTH = 32;
-const BAR_GAP = 12;
-const BAR_HEIGHT = 256;
-
 // For the maths behind it https://excalidraw.com/#json=6320864370884608,O_5xfD-Agh32tytHpRJx1g
 export const renderSpreadsheet = (
   spreadsheet: Spreadsheet,
@@ -206,15 +207,39 @@ export const renderSpreadsheet = (
     textAlign: "right",
   });
 
-  /**
-   * TODO:
-   *   - X-axis arrow or line: Start: [x, y], End: [x + chartWidth + BAR_GAP * 2, y]
-   *   - Y-axis arrow or line: Start: [x, y], End: [x, y - chartHeight - BAR_GAP * 2]
-   *     (The above arrows or line, could be essentially one with sharp edges)
-   *   - Dashed horizontal line for max value:
-   *     Start [x, y - BAR_HEIGHT - BAR_GAP]
-   *     End:  [x + chartWidth, y - BAR_HEIGHT - BAR_GAP]
-   */
+  const axesLine = newLinearElement({
+    type: "line",
+    x,
+    y,
+    startArrowhead: null,
+    endArrowhead: null,
+    ...commonProps,
+  });
+
+  mutateElement(axesLine, {
+    points: [
+      [0, -chartHeight - BAR_GAP],
+      [0, 0],
+      [chartWidth + BAR_GAP, 0],
+    ],
+  });
+
+  const maxValueLine = newLinearElement({
+    type: "line",
+    x,
+    y: y - BAR_HEIGHT - BAR_GAP,
+    startArrowhead: null,
+    endArrowhead: null,
+    ...commonProps,
+  });
+
+  mutateElement(maxValueLine, {
+    points: [
+      [0, 0],
+      [chartWidth, 0],
+    ],
+    strokeStyle: "dotted",
+  });
 
   const bars = values.map((value, index) => {
     const barHeight = (value / max) * BAR_HEIGHT;
@@ -255,19 +280,14 @@ export const renderSpreadsheet = (
       })
     : null;
 
-  const debugRect = newElement({
-    ...commonProps,
-    type: "rectangle",
-    x,
-    y: y - chartHeight,
-    width: chartWidth,
-    height: chartHeight,
-    fillStyle: "solid",
-    opacity: 6,
-  });
-
   trackEvent(EVENT_MAGIC, "chart", "bars", bars.length);
-  return [...bars, title, minYLabel, maxYLabel, ...xLabels, debugRect].filter(
-    (element) => element !== null,
-  ) as ExcalidrawElement[];
+  return [
+    title,
+    ...bars,
+    ...xLabels,
+    axesLine,
+    maxValueLine,
+    minYLabel,
+    maxYLabel,
+  ].filter((element) => element !== null) as ExcalidrawElement[];
 };
