@@ -29,6 +29,18 @@
     background-color: transparent;
     border: none;
     white-space: nowrap;
+
+    display: grid;
+    grid-template-columns: 50% 50%;
+    div:nth-child(1) {
+      justify-self: left;
+      margin-right: 20px;
+    }
+    div:nth-child(2) {
+      justify-self: right;
+      opacity: 0.6;
+      font-size: 0.7rem;
+    }
   }
 
   .context-menu-option:hover {
