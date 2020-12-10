@@ -121,7 +121,7 @@
     "exitZenMode": "Uscire dalla modalità zen"
   },
   "alerts": {
-    "clearReset": "Questo cancellerà l'intera tela. Sei sicuro?",
+    "clearReset": "Questa azione cancellerà l'intera tela. Sei sicuro?",
     "couldNotCreateShareableLink": "Non riesco a creare un link condivisibile.",
     "couldNotCreateShareableLinkTooBig": "Impossibile creare il link condivisibile: la scena è troppo grande",
     "couldNotLoadInvalidFile": "Impossibile caricare un file no valido",
