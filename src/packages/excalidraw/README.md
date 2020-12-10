@@ -226,7 +226,7 @@ We expose the below API's
 | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | ready                            | `boolean`                                                                                                                                         | This is set to true once Excalidraw is rendered                                                                                                                                                                                                  |
 | readyPromise                     | [resolvablePromise](https://github.com/excalidraw/excalidraw/blob/4c90ea5667d29effe8ec4a115e49efc7c340cdb3/src/utils.ts#L312)                     | This promise will be resolved with the api once excalidraw has rendered. This will be helpful when you want do some action on the host app once this promise resolves. For this to work you will have to pass ref as shown [here](#readyPromise) |
-| updateScene                      | ([sceneData](https://github.com/excalidraw/excalidraw/blob/4c90ea5667d29effe8ec4a115e49efc7c340cdb3/src/types.ts#L165) => void                    | updates the scene with the sceneData                                                                                                                                                                                                             |
+| updateScene                      | ([sceneData](https://github.com/excalidraw/excalidraw/blob/4c90ea5667d29effe8ec4a115e49efc7c340cdb3/src/types.ts#L165)) => void                    | updates the scene with the sceneData                                                                                                                                                                                                             |
 | resetScene                       | ({ resetLoadingState: boolean }) => void                                                                                                          | Resets the scene. If `resetLoadingState` is passed as true then it will also force set the loading state to false.                                                                                                                               |
 | getSceneElementsIncludingDeleted | () => [ExcalidrawElement []](https://github.com/excalidraw/excalidraw/blob/4c90ea5667d29effe8ec4a115e49efc7c340cdb3/src/element/types.ts#L59)     | Returns all the elements including the deleted in the scene                                                                                                                                                                                      |
 | getSceneElements                 | () => [ExcalidrawElement []](https://github.com/excalidraw/excalidraw/blob/4c90ea5667d29effe8ec4a115e49efc7c340cdb3/src/element/types.ts#L59)     | Returns all the elements excluding the deleted in the scene                                                                                                                                                                                      |
@@ -235,9 +235,7 @@ We expose the below API's
 
 #### `readyPromise`
 
-```js
-const excalidrawRef = { current: { readyPromise: [resolvablePromise](https://github.com/excalidraw/excalidraw/blob/4c90ea5667d29effe8ec4a115e49efc7c340cdb3/src/utils.ts#L312) }
-```
+const excalidrawRef = { current: { readyPromise: [resolvablePromise](https://github.com/excalidraw/excalidraw/blob/4c90ea5667d29effe8ec4a115e49efc7c340cdb3/src/utils.ts#L312) }}
 
 #### `onCollabButtonClick`
 
