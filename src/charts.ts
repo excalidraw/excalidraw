@@ -33,11 +33,8 @@ const tryParseNumber = (s: string): number | null => {
   return parseFloat(match[1]);
 };
 
-const isNumericColumn = (lines: string[][], columnIndex: number) => {
-  return lines
-    .slice(1)
-    .every((line) => tryParseNumber(line[columnIndex]) !== null);
-};
+const isNumericColumn = (lines: string[][], columnIndex: number) =>
+  lines.slice(1).every((line) => tryParseNumber(line[columnIndex]) !== null);
 
 const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
   const numCols = cells[0].length;
@@ -103,7 +100,6 @@ const transposeCells = (cells: string[][]) => {
     }
     nextCells.push(nextCellRow);
   }
-
   return nextCells;
 };
 
@@ -162,9 +158,7 @@ export const renderSpreadsheet = (
   const chartHeight = BAR_HEIGHT + BAR_GAP * 2;
   const chartWidth = (BAR_WIDTH + BAR_GAP) * values.length + BAR_GAP;
   const maxColors = colors.elementBackground.length;
-  const backgrounds = colors.elementBackground.slice(2, maxColors);
-  const color = backgrounds[Math.floor(Math.random() * backgrounds.length)];
-  const groupIds = [randomId()];
+  const bgColors = colors.elementBackground.slice(2, maxColors);
 
   // Put all the common properties here so when the whole chart is selected
   // the properties dialog shows the correct selected values
@@ -182,11 +176,11 @@ export const renderSpreadsheet = (
     strokeWidth: number;
     verticalAlign: VerticalAlign;
   } = {
-    backgroundColor: color,
+    backgroundColor: bgColors[Math.floor(Math.random() * bgColors.length)],
     fillStyle: "hachure",
     fontFamily: DEFAULT_FONT_FAMILY,
     fontSize: DEFAULT_FONT_SIZE,
-    groupIds,
+    groupIds: [randomId()],
     opacity: 100,
     roughness: 1,
     strokeColor: colors.elementStroke[0],
