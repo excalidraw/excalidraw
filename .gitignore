@@ -17,7 +17,6 @@ logs
 node_modules
 npm-debug.log*
 static
-temp
 yarn-debug.log*
 yarn-error.log*
 yarn.lock
