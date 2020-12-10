@@ -3,16 +3,28 @@ import { FONT_FAMILY } from "../constants";
 
 export type GroupId = string;
 
+export type FillStyle = "hachure" | "cross-hatch" | "solid";
+export type StrokeStyle = "solid" | "dashed" | "dotted";
+export type StrokeSharpness = "round" | "sharp";
+
+export type PointerType = "mouse" | "pen" | "touch";
+
+export type TextAlign = "left" | "center" | "right";
+export type VerticalAlign = "top" | "middle";
+
+export type FontFamily = keyof typeof FONT_FAMILY;
+export type FontString = string & { _brand: "fontString" };
+
 type _ExcalidrawElementBase = Readonly<{
   id: string;
   x: number;
   y: number;
   strokeColor: string;
   backgroundColor: string;
-  fillStyle: "hachure" | "cross-hatch" | "solid";
+  fillStyle: FillStyle;
   strokeWidth: number;
-  strokeStyle: "solid" | "dashed" | "dotted";
-  strokeSharpness: "round" | "sharp";
+  strokeStyle: StrokeStyle;
+  strokeSharpness: StrokeSharpness;
   roughness: number;
   opacity: number;
   width: number;
@@ -102,11 +114,3 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
     startArrowhead: Arrowhead | null;
     endArrowhead: Arrowhead | null;
   }>;
-
-export type PointerType = "mouse" | "pen" | "touch";
-
-export type TextAlign = "left" | "center" | "right";
-export type VerticalAlign = "top" | "middle";
-
-export type FontFamily = keyof typeof FONT_FAMILY;
-export type FontString = string & { _brand: "fontString" };

@@ -1,11 +1,15 @@
+import { EVENT_MAGIC, trackEvent } from "./analytics";
 import colors from "./colors";
-import {
-  DEFAULT_VERTICAL_ALIGN,
-  DEFAULT_FONT_FAMILY,
-  DEFAULT_FONT_SIZE,
-} from "./constants";
+import { DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE } from "./constants";
 import { newElement, newTextElement } from "./element";
-import { ExcalidrawElement } from "./element/types";
+import {
+  ExcalidrawElement,
+  FillStyle,
+  FontFamily,
+  StrokeSharpness,
+  StrokeStyle,
+  VerticalAlign,
+} from "./element/types";
 import { randomId } from "./random";
 
 export interface Spreadsheet {
@@ -167,44 +171,52 @@ export const renderSpreadsheet = (
   const color = backgrounds[Math.floor(Math.random() * backgrounds.length)];
   const groupIds = [randomId()];
 
-  // Min value label
-  const minYLabel = newTextElement({
-    x: x - BAR_GAP,
-    y: y - BAR_GAP,
+  // Put all the common properties here so when the whole chart is selected
+  // the properties dialog shows the correct selected values
+  const commonProps: {
+    backgroundColor: string;
+    fontFamily: FontFamily;
+    fontSize: number;
+    groupIds: any;
+    opacity: number;
+    roughness: number;
+    strokeWidth: number;
+    fillStyle: FillStyle;
+    strokeStyle: StrokeStyle;
+    strokeSharpness: StrokeSharpness;
+    verticalAlign: VerticalAlign;
+  } = {
     backgroundColor: color,
-    fillStyle: "cross-hatch",
+    fillStyle: "hachure",
     fontFamily: DEFAULT_FONT_FAMILY,
     fontSize: DEFAULT_FONT_SIZE,
     groupIds,
     opacity: 100,
     roughness: 1,
-    strokeColor: colors.elementStroke[0],
     strokeSharpness: "sharp",
     strokeStyle: "solid",
     strokeWidth: 1,
+    verticalAlign: "middle",
+  };
+
+  // Min value label
+  const minYLabel = newTextElement({
+    ...commonProps,
+    x: x - BAR_GAP,
+    y: y - BAR_GAP,
+    strokeColor: colors.elementStroke[0],
     text: "0",
     textAlign: "right",
-    verticalAlign: "middle",
   });
 
   // Max value label
   const maxYLabel = newTextElement({
+    ...commonProps,
     x: x - BAR_GAP,
     y: y - BAR_HEIGHT - minYLabel.height / 2,
-    backgroundColor: color,
-    fillStyle: "cross-hatch",
-    fontFamily: DEFAULT_FONT_FAMILY,
-    fontSize: DEFAULT_FONT_SIZE,
-    groupIds,
-    opacity: 100,
-    roughness: 1,
     strokeColor: colors.elementStroke[0],
-    strokeSharpness: "sharp",
-    strokeStyle: "solid",
-    strokeWidth: 1,
     text: max.toLocaleString(),
     textAlign: "right",
-    verticalAlign: "middle",
   });
 
   // TODO: X-axis arrow: Start: [x, y], End: [x + chartWidth + BAR_GAP * 2, y]
@@ -216,90 +228,60 @@ export const renderSpreadsheet = (
   const bars = values.map((value, index) => {
     const barHeight = (value / max) * BAR_HEIGHT;
     return newElement({
+      ...commonProps,
       type: "rectangle",
       x: x + index * (BAR_WIDTH + BAR_GAP) + BAR_GAP,
       y: y - barHeight - BAR_GAP,
       width: BAR_WIDTH,
       height: barHeight,
-
-      backgroundColor: color,
-      fillStyle: "hachure",
-      groupIds,
-      opacity: 100,
-      roughness: 1,
       strokeColor: colors.elementStroke[0],
-      strokeSharpness: "sharp",
-      strokeStyle: "solid",
-      strokeWidth: 1,
     });
   });
 
   const xLabels =
     spreadsheet.labels?.map((label, index) => {
       return newTextElement({
+        ...commonProps,
         text: label.length > 8 ? `${label.slice(0, 5)}...` : label,
         x: x + index * (BAR_WIDTH + BAR_GAP) + BAR_GAP * 2,
         y: y + BAR_GAP / 2,
-
-        angle: ANGLE,
-        backgroundColor: color,
-        fillStyle: "hachure",
-        fontFamily: DEFAULT_FONT_FAMILY,
-        fontSize: 16,
-        groupIds,
-        opacity: 100,
-        roughness: 1,
-        strokeColor: colors.elementStroke[0],
-        strokeSharpness: "sharp",
-        strokeStyle: "solid",
-        strokeWidth: 1,
-        textAlign: "center",
-        verticalAlign: DEFAULT_VERTICAL_ALIGN,
         width: BAR_WIDTH,
+        angle: ANGLE,
+        fontSize: 16,
+        strokeColor: colors.elementStroke[0],
+        textAlign: "center",
+        verticalAlign: "top",
       });
     }) || [];
 
   // Title on top of the chart in the middle
   const title = spreadsheet.title
     ? newTextElement({
+        ...commonProps,
         text: spreadsheet.title,
         x: x + chartWidth / 2,
         y: y - BAR_HEIGHT - BAR_GAP * 3 - maxYLabel.height,
-
-        backgroundColor: color,
-        fillStyle: "cross-hatch",
-        fontFamily: DEFAULT_FONT_FAMILY,
-        fontSize: DEFAULT_FONT_SIZE,
-        groupIds,
-        opacity: 100,
-        roughness: 1,
         strokeColor: colors.elementStroke[0],
         strokeSharpness: "sharp",
         strokeStyle: "solid",
-        strokeWidth: 1,
         textAlign: "center",
-        verticalAlign: DEFAULT_VERTICAL_ALIGN,
       })
     : null;
 
   // TODO: delete this element
   const testRect = newElement({
+    ...commonProps,
     type: "rectangle",
     x,
     y: y - chartHeight,
     width: chartWidth,
     height: chartHeight,
     strokeColor: colors.elementStroke[0],
-    backgroundColor: color,
     fillStyle: "solid",
-    strokeWidth: 1,
-    strokeStyle: "solid",
-    roughness: 0,
     opacity: 6,
-    strokeSharpness: "sharp",
-    groupIds,
   });
 
+  trackEvent(EVENT_MAGIC, "chart", "bars", bars.length);
   return [...bars, title, minYLabel, maxYLabel, ...xLabels, testRect].filter(
     (element) => element !== null,
   ) as ExcalidrawElement[];
