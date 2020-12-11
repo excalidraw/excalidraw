@@ -31,6 +31,8 @@
     "arrowheads": "Pilhuvuden",
     "arrowhead_none": "Inga",
     "arrowhead_arrow": "Pil",
+    "arrowhead_bar": "",
+    "arrowhead_dot": "",
     "fontSize": "Teckenstorlek",
     "fontFamily": "Teckensnitt",
     "onlySelected": "Endast markering",
