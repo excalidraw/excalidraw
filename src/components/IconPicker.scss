@@ -1,4 +1,4 @@
-@import "open-color/open-color.scss";
+@import "../css/_variables";
 
 .excalidraw {
   .picker-container {
@@ -98,6 +98,7 @@
   .picker-keybinding {
     position: absolute;
     bottom: 2px;
+    font-size: 0.7em;
 
     :root[dir="ltr"] & {
       right: 2px;
@@ -106,8 +107,9 @@
     :root[dir="rtl"] & {
       left: 2px;
     }
-
-    font-size: 0.7em;
+    @media #{$media-query} {
+      display: none;
+    }
   }
 
   .picker-type-canvasBackground .picker-keybinding {
