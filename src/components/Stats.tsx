@@ -6,6 +6,7 @@ import {
   getTotalStorageSize,
 } from "../excalidraw-app/data/localStorage";
 import { t } from "../i18n";
+import useIsMobile from "../is-mobile";
 import { getTargetElements } from "../scene";
 import { AppState } from "../types";
 import { debounce, nFormatter } from "../utils";
@@ -27,6 +28,7 @@ export const Stats = (props: {
   elements: readonly NonDeletedExcalidrawElement[];
   onClose: () => void;
 }) => {
+  const isMobile = useIsMobile();
   const [storageSizes, setStorageSizes] = useState<StorageSizes>({
     scene: 0,
     total: 0,
@@ -43,6 +45,10 @@ export const Stats = (props: {
   const boundingBox = getCommonBounds(props.elements);
   const selectedElements = getTargetElements(props.elements, props.appState);
   const selectedBoundingBox = getCommonBounds(selectedElements);
+
+  if (isMobile && props.appState.openMenu) {
+    return null;
+  }
 
   return (
     <div className="Stats">
