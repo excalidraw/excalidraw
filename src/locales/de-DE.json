@@ -31,6 +31,8 @@
     "arrowheads": "Pfeilspitzen",
     "arrowhead_none": "Keine",
     "arrowhead_arrow": "Pfeil",
+    "arrowhead_bar": "",
+    "arrowhead_dot": "",
     "fontSize": "Schriftgröße",
     "fontFamily": "Schriftfamilie",
     "onlySelected": "Nur ausgewählte",
