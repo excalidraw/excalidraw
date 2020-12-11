@@ -215,10 +215,6 @@
   "encrypted": {
     "tooltip": "Çizimleriniz uçtan-uca şifrelenmiştir, Excalidraw'ın sunucuları bile onları göremez."
   },
-  "charts": {
-    "noNumericColumn": "Sayısal sütunu olmayan bir tablo yapıştırdın.",
-    "tooManyColumns": "İkiden daha fazla sütuna sahip bir tablo yapıştırdın."
-  },
   "stats": {
     "angle": "",
     "element": "",
