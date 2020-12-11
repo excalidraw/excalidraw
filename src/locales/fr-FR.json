@@ -215,10 +215,6 @@
   "encrypted": {
     "tooltip": "Vos dessins sont chiffrés de bout en bout, les serveurs d'Excalidraw ne les verront jamais."
   },
-  "charts": {
-    "noNumericColumn": "Vous avez collé une feuille de calcul sans données numérique.",
-    "tooManyColumns": "Vous avez collé une feuille de calcul avec plus de deux colonnes."
-  },
   "stats": {
     "angle": "Angle",
     "element": "Élément",
