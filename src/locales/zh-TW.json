@@ -31,6 +31,8 @@
     "arrowheads": "箭頭",
     "arrowhead_none": "無",
     "arrowhead_arrow": "箭頭",
+    "arrowhead_bar": "",
+    "arrowhead_dot": "",
     "fontSize": "字型大小",
     "fontFamily": "字體",
     "onlySelected": "僅選取物件",
