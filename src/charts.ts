@@ -111,7 +111,7 @@ export const tryParseSpreadsheet = (text: string): ParseSpreadsheetResult => {
     .map((line) => line.trim().split("\t"));
 
   // Check for comma separeted files
-  if (lines.length !== 0 && lines[0].length !== 2) {
+  if (lines.length && lines[0].length !== 2) {
     lines = text
       .trim()
       .split("\n")
