@@ -82,7 +82,7 @@ export const MobileMenu = ({
         marginRight: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN * 2,
       }}
     >
-      <Island padding={3}>
+      <Island padding={0}>
         {appState.openMenu === "canvas" ? (
           <Section className="App-mobile-menu" heading="canvasActions">
             <div className="panelColumn">

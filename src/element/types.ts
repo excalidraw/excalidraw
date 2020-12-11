@@ -98,7 +98,7 @@ export type PointBinding = {
   gap: number;
 };
 
-export type Arrowhead = "arrow";
+export type Arrowhead = "arrow" | "bar" | "dot";
 
 export type ExcalidrawLinearElement = _ExcalidrawElementBase &
   Readonly<{
