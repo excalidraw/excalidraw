@@ -31,6 +31,8 @@
     "arrowheads": "Nuolenkärjet",
     "arrowhead_none": "Ei mitään",
     "arrowhead_arrow": "Nuoli",
+    "arrowhead_bar": "",
+    "arrowhead_dot": "",
     "fontSize": "Kirjasinkoko",
     "fontFamily": "Kirjasintyyppi",
     "onlySelected": "Vain valitut",
