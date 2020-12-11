@@ -154,7 +154,7 @@ export const MobileMenu = ({
             )}
             {actionManager.renderAction("deleteSelectedElements")}
           </div>
-          {appState.scrolledOutside && (
+          {appState.scrolledOutside && !appState.openMenu && (
             <button
               className="scroll-back-to-content"
               onClick={() => {
