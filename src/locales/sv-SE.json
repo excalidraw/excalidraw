@@ -215,10 +215,6 @@
   "encrypted": {
     "tooltip": "Dina skisser är krypterade från ände till ände så Excalidraws servrar kommer aldrig att se dem."
   },
-  "charts": {
-    "noNumericColumn": "Du klistrade in ett kalkylblad utan en numerisk kolumn.",
-    "tooManyColumns": "Du klistrade in ett kalkylblad med mer än två kolumner."
-  },
   "stats": {
     "angle": "Vinkel",
     "element": "Element",
