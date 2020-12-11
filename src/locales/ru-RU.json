@@ -31,6 +31,8 @@
     "arrowheads": "",
     "arrowhead_none": "",
     "arrowhead_arrow": "",
+    "arrowhead_bar": "",
+    "arrowhead_dot": "",
     "fontSize": "Размер шрифта",
     "fontFamily": "Семейство шрифтов",
     "onlySelected": "Только выбранные",
