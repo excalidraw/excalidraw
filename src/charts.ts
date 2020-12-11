@@ -2,15 +2,7 @@ import { EVENT_MAGIC, trackEvent } from "./analytics";
 import colors from "./colors";
 import { DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE } from "./constants";
 import { newElement, newTextElement, newLinearElement } from "./element";
-import { mutateElement } from "./element/mutateElement";
-import {
-  ExcalidrawElement,
-  FillStyle,
-  FontFamily,
-  StrokeSharpness,
-  StrokeStyle,
-  VerticalAlign,
-} from "./element/types";
+import { ExcalidrawElement } from "./element/types";
 import { randomId } from "./random";
 
 const BAR_WIDTH = 32;
@@ -163,20 +155,7 @@ export const renderSpreadsheet = (
 
   // Put all the common properties here so when the whole chart is selected
   // the properties dialog shows the correct selected values
-  const commonProps: {
-    backgroundColor: string;
-    fillStyle: FillStyle;
-    fontFamily: FontFamily;
-    fontSize: number;
-    groupIds: any;
-    opacity: number;
-    roughness: number;
-    strokeColor: string;
-    strokeSharpness: StrokeSharpness;
-    strokeStyle: StrokeStyle;
-    strokeWidth: number;
-    verticalAlign: VerticalAlign;
-  } = {
+  const commonProps = {
     backgroundColor: bgColors[Math.floor(Math.random() * bgColors.length)],
     fillStyle: "hachure",
     fontFamily: DEFAULT_FONT_FAMILY,
@@ -189,7 +168,7 @@ export const renderSpreadsheet = (
     strokeStyle: "solid",
     strokeWidth: 1,
     verticalAlign: "middle",
-  };
+  } as const;
 
   const minYLabel = newTextElement({
     ...commonProps,
@@ -213,13 +192,11 @@ export const renderSpreadsheet = (
     y,
     startArrowhead: null,
     endArrowhead: null,
-    ...commonProps,
-  });
-  mutateElement(xAxisLine, {
     points: [
       [0, 0],
       [chartWidth, 0],
     ],
+    ...commonProps,
   });
 
   const yAxisLine = newLinearElement({
@@ -228,13 +205,11 @@ export const renderSpreadsheet = (
     y,
     startArrowhead: null,
     endArrowhead: null,
-    ...commonProps,
-  });
-  mutateElement(yAxisLine, {
     points: [
       [0, 0],
       [0, -chartHeight],
     ],
+    ...commonProps,
   });
 
   const maxValueLine = newLinearElement({
@@ -244,13 +219,11 @@ export const renderSpreadsheet = (
     startArrowhead: null,
     endArrowhead: null,
     ...commonProps,
-  });
-  mutateElement(maxValueLine, {
+    strokeStyle: "dotted",
     points: [
       [0, 0],
       [chartWidth, 0],
     ],
-    strokeStyle: "dotted",
   });
 
   const bars = values.map((value, index) => {
