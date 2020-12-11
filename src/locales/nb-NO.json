@@ -31,6 +31,8 @@
     "arrowheads": "Pilspisser",
     "arrowhead_none": "Ingen",
     "arrowhead_arrow": "Pil",
+    "arrowhead_bar": "",
+    "arrowhead_dot": "",
     "fontSize": "Skriftstørrelse",
     "fontFamily": "Fontfamilie",
     "onlySelected": "Kun valgte",
