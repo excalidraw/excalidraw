@@ -215,10 +215,6 @@
   "encrypted": {
     "tooltip": ""
   },
-  "charts": {
-    "noNumericColumn": "",
-    "tooManyColumns": "Вы вставили таблицу с более чем двумя столбцами."
-  },
   "stats": {
     "angle": "",
     "element": "",
