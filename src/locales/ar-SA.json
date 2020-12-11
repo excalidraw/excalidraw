@@ -215,10 +215,6 @@
   "encrypted": {
     "tooltip": "رسوماتك مشفرة من النهاية إلى النهاية حتى أن خوادم Excalidraw لن تراها أبدا."
   },
-  "charts": {
-    "noNumericColumn": "قمت بلصق جدول بيانات دون عمود رقمي.",
-    "tooManyColumns": "قمت بلصق جدول بيانات دون عمود رقمي."
-  },
   "stats": {
     "angle": "",
     "element": "",
