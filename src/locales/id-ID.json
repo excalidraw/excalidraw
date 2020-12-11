@@ -31,6 +31,8 @@
     "arrowheads": "Mata panah",
     "arrowhead_none": "Tidak ada",
     "arrowhead_arrow": "Panah",
+    "arrowhead_bar": "",
+    "arrowhead_dot": "",
     "fontSize": "Ukuran font",
     "fontFamily": "Jenis font",
     "onlySelected": "Hanya yang Dipilih",
