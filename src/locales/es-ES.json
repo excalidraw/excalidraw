@@ -215,10 +215,6 @@
   "encrypted": {
     "tooltip": "Tus dibujos están cifrados de punto a punto, por lo que los servidores de Excalidraw nunca los verán."
   },
-  "charts": {
-    "noNumericColumn": "Pegaste una hoja de cálculo sin una columna numérica.",
-    "tooManyColumns": "Pegaste una hoja de cálculo con más de dos columnas."
-  },
   "stats": {
     "angle": "",
     "element": "",
