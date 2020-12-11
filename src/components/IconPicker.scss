@@ -60,7 +60,13 @@
     height: 0px;
     position: relative;
     top: -10px;
-    left: 12px;
+    :root[dir="ltr"] & {
+      left: 12px;
+    }
+
+    :root[dir="rtl"] & {
+      right: 12px;
+    }
     z-index: 10;
 
     &:before {
