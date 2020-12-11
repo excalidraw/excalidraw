@@ -99,19 +99,31 @@ export const importFromLocalStorage = () => {
 };
 
 export const getElementsStorageSize = () => {
-  const elements = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS);
-  const elementsSize = elements ? JSON.stringify(elements).length : 0;
-  return elementsSize;
+  try {
+    const elements = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS);
+    const elementsSize = elements ? JSON.stringify(elements).length : 0;
+    return elementsSize;
+  } catch (error) {
+    console.error(error);
+    return 0;
+  }
 };
 
 export const getTotalStorageSize = () => {
-  const appState = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_APP_STATE);
-  const collab = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_COLLAB);
-  const library = localStorage.getItem(APP_STORAGE_KEYS.LOCAL_STORAGE_LIBRARY);
+  try {
+    const appState = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_APP_STATE);
+    const collab = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_COLLAB);
+    const library = localStorage.getItem(
+      APP_STORAGE_KEYS.LOCAL_STORAGE_LIBRARY,
+    );
 
-  const appStateSize = appState ? JSON.stringify(appState).length : 0;
-  const collabSize = collab ? JSON.stringify(collab).length : 0;
-  const librarySize = library ? JSON.stringify(library).length : 0;
+    const appStateSize = appState ? JSON.stringify(appState).length : 0;
+    const collabSize = collab ? JSON.stringify(collab).length : 0;
+    const librarySize = library ? JSON.stringify(library).length : 0;
 
-  return appStateSize + collabSize + librarySize + getElementsStorageSize();
+    return appStateSize + collabSize + librarySize + getElementsStorageSize();
+  } catch (error) {
+    console.error(error);
+    return 0;
+  }
 };
