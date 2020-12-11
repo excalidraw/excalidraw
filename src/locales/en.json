@@ -215,10 +215,6 @@
   "encrypted": {
     "tooltip": "Your drawings are end-to-end encrypted so Excalidraw's servers will never see them."
   },
-  "charts": {
-    "noNumericColumn": "You pasted a spreadsheet without a numeric column.",
-    "tooManyColumns": "You pasted a spreadsheet with more than two columns."
-  },
   "stats": {
     "angle": "Angle",
     "element": "Element",
