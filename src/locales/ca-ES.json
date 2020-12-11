@@ -31,6 +31,8 @@
     "arrowheads": "",
     "arrowhead_none": "",
     "arrowhead_arrow": "",
+    "arrowhead_bar": "",
+    "arrowhead_dot": "",
     "fontSize": "Mida de lletra",
     "fontFamily": "Tipus de lletra",
     "onlySelected": "Només seleccionats",
