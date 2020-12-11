@@ -9,6 +9,7 @@ export const EVENT_LIBRARY = "library";
 export const EVENT_LOAD = "load";
 export const EVENT_SHAPE = "shape";
 export const EVENT_SHARE = "share";
+export const EVENT_MAGIC = "magic";
 
 export const trackEvent = window.gtag
   ? (category: string, name: string, label?: string, value?: number) => {

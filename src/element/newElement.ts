@@ -217,11 +217,12 @@ export const newLinearElement = (
     type: ExcalidrawLinearElement["type"];
     startArrowhead: Arrowhead | null;
     endArrowhead: Arrowhead | null;
+    points?: ExcalidrawLinearElement["points"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawLinearElement> => {
   return {
     ..._newElementBase<ExcalidrawLinearElement>(opts.type, opts),
-    points: [],
+    points: opts.points || [],
     lastCommittedPoint: null,
     startBinding: null,
     endBinding: null,
