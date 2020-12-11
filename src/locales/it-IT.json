@@ -31,6 +31,8 @@
     "arrowheads": "Punta della freccia",
     "arrowhead_none": "Nessuno",
     "arrowhead_arrow": "Freccia",
+    "arrowhead_bar": "",
+    "arrowhead_dot": "",
     "fontSize": "Dimensione carattere",
     "fontFamily": "Carattere",
     "onlySelected": "Solo selezionati",
