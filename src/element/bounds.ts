@@ -212,7 +212,11 @@ export const getArrowheadPoints = (
   const nx = (x2 - x1) / distance;
   const ny = (y2 - y1) / distance;
 
-  const size = 30; // pixels (will differ for each arrowhead)
+  const size = {
+    arrow: 30,
+    bar: 15,
+    dot: 15,
+  }[arrowhead]; // pixels (will differ for each arrowhead)
 
   const length = element.points.reduce((total, [cx, cy], idx, points) => {
     const [px, py] = idx > 0 ? points[idx - 1] : [0, 0];
@@ -226,7 +230,15 @@ export const getArrowheadPoints = (
   const xs = x2 - nx * minSize;
   const ys = y2 - ny * minSize;
 
-  const angle = 20; // degrees
+  if (arrowhead === "dot") {
+    const r = Math.hypot(ys - y2, xs - x2);
+    return [x2, y2, r];
+  }
+
+  const angle = {
+    arrow: 20,
+    bar: 90,
+  }[arrowhead]; // degrees
 
   // Return points
   const [x3, y3] = rotate(xs, ys, x2, y2, (-angle * Math.PI) / 180);

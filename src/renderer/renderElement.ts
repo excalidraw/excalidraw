@@ -356,6 +356,17 @@ const generateElementShape = (
             }
 
             // Other arrowheads here...
+            if (arrowhead === "dot") {
+              const [x, y, r] = arrowheadPoints;
+
+              return [
+                generator.circle(x, y, r, {
+                  ...options,
+                  fill: element.strokeColor,
+                  fillStyle: "solid",
+                }),
+              ];
+            }
 
             // Arrow arrowheads
             const [x2, y2, x3, y3, x4, y4] = arrowheadPoints;
