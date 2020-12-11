@@ -33,11 +33,11 @@
     display: grid;
     grid-template-columns: 1fr 0.2fr;
     div:nth-child(1) {
-      justify-self: left;
-      margin-right: 20px;
+      justify-self: start;
+      margin-inline-end: 20px;
     }
     div:nth-child(2) {
-      justify-self: right;
+      justify-self: end;
       opacity: 0.6;
       font-size: 0.7rem;
     }
