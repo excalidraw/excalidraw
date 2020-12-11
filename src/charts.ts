@@ -207,7 +207,7 @@ export const renderSpreadsheet = (
     textAlign: "right",
   });
 
-  const axesLine = newLinearElement({
+  const xAxisLine = newLinearElement({
     type: "line",
     x,
     y,
@@ -215,11 +215,25 @@ export const renderSpreadsheet = (
     endArrowhead: null,
     ...commonProps,
   });
-  mutateElement(axesLine, {
+  mutateElement(xAxisLine, {
     points: [
-      [0, -chartHeight],
       [0, 0],
       [chartWidth, 0],
+    ],
+  });
+
+  const yAxisLine = newLinearElement({
+    type: "line",
+    x,
+    y,
+    startArrowhead: null,
+    endArrowhead: null,
+    ...commonProps,
+  });
+  mutateElement(yAxisLine, {
+    points: [
+      [0, 0],
+      [0, -chartHeight],
     ],
   });
 
@@ -283,7 +297,8 @@ export const renderSpreadsheet = (
     title,
     ...bars,
     ...xLabels,
-    axesLine,
+    xAxisLine,
+    yAxisLine,
     maxValueLine,
     minYLabel,
     maxYLabel,
