@@ -31,6 +31,8 @@
     "arrowheads": "",
     "arrowhead_none": "",
     "arrowhead_arrow": "",
+    "arrowhead_bar": "",
+    "arrowhead_dot": "",
     "fontSize": "폰트 크기",
     "fontFamily": "폰트 스타일",
     "onlySelected": "선택한 항목만",
