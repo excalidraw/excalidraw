@@ -215,10 +215,6 @@
   "encrypted": {
     "tooltip": "Vaše kresby používajú end-to-end šifrovanie, takže ich Excalidraw server nedokáže prečítať."
   },
-  "charts": {
-    "noNumericColumn": "Prilepili ste tabuľku bez číselného stĺpca.",
-    "tooManyColumns": "Prilepili ste tabuľku s viac ako dvoma stĺpcami."
-  },
   "stats": {
     "angle": "Uhol",
     "element": "Prvok",
