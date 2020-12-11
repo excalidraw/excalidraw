@@ -215,10 +215,6 @@
   "encrypted": {
     "tooltip": "Dine tegninger er ende-til-ende-krypterte slik at Excalidraw sine servere aldri vil se dem."
   },
-  "charts": {
-    "noNumericColumn": "Du limte inn et regneark uten en numerisk kolonne.",
-    "tooManyColumns": "Du limte inn et regneark med mer enn to kolonner."
-  },
   "stats": {
     "angle": "Vinkel",
     "element": "Element",
