@@ -215,10 +215,6 @@
   "encrypted": {
     "tooltip": "Da deine Zeichnungen Ende-zu-Ende verschlüsselt werden, sehen auch unsere Excalidraw-Server sie niemals."
   },
-  "charts": {
-    "noNumericColumn": "Du hast eine Tabelle ohne numerische Spalte eingefügt.",
-    "tooManyColumns": "Du hast eine Tabelle mit mehr als zwei Spalten eingefügt."
-  },
   "stats": {
     "angle": "Winkel",
     "element": "Element",
