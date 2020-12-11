@@ -215,10 +215,6 @@
   "encrypted": {
     "tooltip": "你的作品已使用 end-to-end 方式加密，Excalidraw 的伺服器也無法取得其內容。"
   },
-  "charts": {
-    "noNumericColumn": "你貼上的 spreadsheet 沒有數字欄。",
-    "tooManyColumns": "你貼上的 spreadsheet 超過兩欄。"
-  },
   "stats": {
     "angle": "角度",
     "element": "元素",
