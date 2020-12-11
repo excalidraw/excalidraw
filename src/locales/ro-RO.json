@@ -31,6 +31,8 @@
     "arrowheads": "Vârfuri de săgeată",
     "arrowhead_none": "Niciunul",
     "arrowhead_arrow": "Săgeată",
+    "arrowhead_bar": "",
+    "arrowhead_dot": "",
     "fontSize": "Dimensiune font",
     "fontFamily": "Familia de fonturi",
     "onlySelected": "Numai selecția",
