@@ -31,6 +31,8 @@
     "arrowheads": "မြှားခေါင်း",
     "arrowhead_none": "ဘာမျှမရှိ",
     "arrowhead_arrow": "မြှား",
+    "arrowhead_bar": "",
+    "arrowhead_dot": "",
     "fontSize": "စာလုံးအရွယ်",
     "fontFamily": "စာလုံးပုံစံ",
     "onlySelected": "ရွေးထားသလောက်",
