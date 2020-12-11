@@ -215,10 +215,6 @@
   "encrypted": {
     "tooltip": "Els vostres dibuixos estan xifrats de punta a punta de manera que els servidors d’Excalidraw no els veuran mai."
   },
-  "charts": {
-    "noNumericColumn": "Has enganxat un full de càlcul sense columna numèrica.",
-    "tooManyColumns": "Has enganxat un full de càlcul amb més de dues columnes."
-  },
   "stats": {
     "angle": "",
     "element": "",
