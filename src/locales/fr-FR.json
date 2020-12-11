@@ -31,6 +31,8 @@
     "arrowheads": "Pointes de flèche",
     "arrowhead_none": "Aucun",
     "arrowhead_arrow": "Flèche",
+    "arrowhead_bar": "",
+    "arrowhead_dot": "",
     "fontSize": "Taille de la police",
     "fontFamily": "Police",
     "onlySelected": "Uniquement la sélection",
