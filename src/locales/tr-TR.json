@@ -31,6 +31,8 @@
     "arrowheads": "",
     "arrowhead_none": "",
     "arrowhead_arrow": "",
+    "arrowhead_bar": "",
+    "arrowhead_dot": "",
     "fontSize": "Yazı tipi boyutu",
     "fontFamily": "Yazı tipi ailesi",
     "onlySelected": "Sadece seçilen",
