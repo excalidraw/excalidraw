@@ -215,10 +215,6 @@
   "encrypted": {
     "tooltip": "Piirroksesi ovat päästä päähän salattuja, joten Excalidrawin palvelimet eivät koskaan näe niitä."
   },
-  "charts": {
-    "noNumericColumn": "Liitit taulukon ilman lukuja sisältävää saraketta.",
-    "tooManyColumns": "Liitit taulukon, jossa on enemmän kuin kaksi saraketta."
-  },
   "stats": {
     "angle": "Kulma",
     "element": "Elementti",
