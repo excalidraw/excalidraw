@@ -31,6 +31,8 @@
     "arrowheads": "",
     "arrowhead_none": "",
     "arrowhead_arrow": "",
+    "arrowhead_bar": "",
+    "arrowhead_dot": "",
     "fontSize": "Tekstgrootte",
     "fontFamily": "Lettertype",
     "onlySelected": "Enkel geselecteerde",
