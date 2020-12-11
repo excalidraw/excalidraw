@@ -215,10 +215,6 @@
   "encrypted": {
     "tooltip": "Desenele tale sunt criptate integral, astfel că serverele Excalidraw nu le vor vedea niciodată."
   },
-  "charts": {
-    "noNumericColumn": "Ai inserat o foaie de calcul fără o coloană numerică.",
-    "tooManyColumns": "Ai inserat o foaie de calcul cu mai mult de două coloane."
-  },
   "stats": {
     "angle": "Unghi",
     "element": "Element",
