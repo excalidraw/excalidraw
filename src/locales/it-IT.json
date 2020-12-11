@@ -215,10 +215,6 @@
   "encrypted": {
     "tooltip": "I tuoi disegni sono crittografati end-to-end in modo che i server di Excalidraw non li possano mai vedere."
   },
-  "charts": {
-    "noNumericColumn": "Hai incollato un foglio di calcolo senza una colonna numerica.",
-    "tooManyColumns": "Hai incollato un foglio di calcolo con più di due colonne."
-  },
   "stats": {
     "angle": "Angolo",
     "element": "Elemento",
