@@ -1,4 +1,5 @@
 import React from "react";
+import { getLanguage } from "../i18n";
 import {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -674,92 +675,124 @@ export const actionChangeArrowhead = register({
       commitToHistory: true,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
-    <fieldset>
-      <legend>{t("labels.arrowheads")}</legend>
-      <div className="iconSelectList">
-        <IconPicker
-          label="arrowhead_start"
-          options={[
-            {
-              value: null,
-              text: t("labels.arrowhead_none"),
-              icon: <ArrowheadNoneIcon appearance={appState.appearance} />,
-              keyBinding: "q",
-            },
-            {
-              value: "arrow",
-              text: t("labels.arrowhead_arrow"),
-              icon: (
-                <ArrowheadArrowIcon appearance={appState.appearance} flip />
-              ),
-              keyBinding: "w",
-            },
-            {
-              value: "bar",
-              text: t("labels.arrowhead_bar"),
-              icon: <ArrowheadBarIcon appearance={appState.appearance} flip />,
-              keyBinding: "e",
-            },
-            {
-              value: "dot",
-              text: t("labels.arrowhead_dot"),
-              icon: <ArrowheadDotIcon appearance={appState.appearance} flip />,
-              keyBinding: "r",
-            },
-          ]}
-          value={getFormValue<Arrowhead | null>(
-            elements,
-            appState,
-            (element) =>
-              isLinearElement(element) && canHaveArrowheads(element.type)
-                ? element.startArrowhead
-                : appState.currentItemArrowheads.start,
-            appState.currentItemArrowheads.start,
-          )}
-          onChange={(value) => updateData({ position: "start", type: value })}
-        />
-        <IconPicker
-          label="arrowhead_end"
-          group="arrowheads"
-          options={[
-            {
-              value: null,
-              text: t("labels.arrowhead_none"),
-              keyBinding: "q",
-              icon: <ArrowheadNoneIcon appearance={appState.appearance} />,
-            },
-            {
-              value: "arrow",
-              text: t("labels.arrowhead_arrow"),
-              keyBinding: "w",
-              icon: <ArrowheadArrowIcon appearance={appState.appearance} />,
-            },
-            {
-              value: "bar",
-              text: t("labels.arrowhead_bar"),
-              keyBinding: "e",
-              icon: <ArrowheadBarIcon appearance={appState.appearance} />,
-            },
-            {
-              value: "dot",
-              text: t("labels.arrowhead_dot"),
-              keyBinding: "r",
-              icon: <ArrowheadDotIcon appearance={appState.appearance} />,
-            },
-          ]}
-          value={getFormValue<Arrowhead | null>(
-            elements,
-            appState,
-            (element) =>
-              isLinearElement(element) && canHaveArrowheads(element.type)
-                ? element.endArrowhead
-                : appState.currentItemArrowheads.end,
-            appState.currentItemArrowheads.end,
-          )}
-          onChange={(value) => updateData({ position: "end", type: value })}
-        />
-      </div>
-    </fieldset>
-  ),
+  PanelComponent: ({ elements, appState, updateData }) => {
+    const isRTL = getLanguage().rtl;
+
+    return (
+      <fieldset>
+        <legend>{t("labels.arrowheads")}</legend>
+        <div className="iconSelectList">
+          <IconPicker
+            label="arrowhead_start"
+            options={[
+              {
+                value: null,
+                text: t("labels.arrowhead_none"),
+                icon: <ArrowheadNoneIcon appearance={appState.appearance} />,
+                keyBinding: "q",
+              },
+              {
+                value: "arrow",
+                text: t("labels.arrowhead_arrow"),
+                icon: (
+                  <ArrowheadArrowIcon
+                    appearance={appState.appearance}
+                    flip={!isRTL}
+                  />
+                ),
+                keyBinding: "w",
+              },
+              {
+                value: "bar",
+                text: t("labels.arrowhead_bar"),
+                icon: (
+                  <ArrowheadBarIcon
+                    appearance={appState.appearance}
+                    flip={!isRTL}
+                  />
+                ),
+                keyBinding: "e",
+              },
+              {
+                value: "dot",
+                text: t("labels.arrowhead_dot"),
+                icon: (
+                  <ArrowheadDotIcon
+                    appearance={appState.appearance}
+                    flip={!isRTL}
+                  />
+                ),
+                keyBinding: "r",
+              },
+            ]}
+            value={getFormValue<Arrowhead | null>(
+              elements,
+              appState,
+              (element) =>
+                isLinearElement(element) && canHaveArrowheads(element.type)
+                  ? element.startArrowhead
+                  : appState.currentItemArrowheads.start,
+              appState.currentItemArrowheads.start,
+            )}
+            onChange={(value) => updateData({ position: "start", type: value })}
+          />
+          <IconPicker
+            label="arrowhead_end"
+            group="arrowheads"
+            options={[
+              {
+                value: null,
+                text: t("labels.arrowhead_none"),
+                keyBinding: "q",
+                icon: <ArrowheadNoneIcon appearance={appState.appearance} />,
+              },
+              {
+                value: "arrow",
+                text: t("labels.arrowhead_arrow"),
+                keyBinding: "w",
+                icon: (
+                  <ArrowheadArrowIcon
+                    appearance={appState.appearance}
+                    flip={isRTL}
+                  />
+                ),
+              },
+              {
+                value: "bar",
+                text: t("labels.arrowhead_bar"),
+                keyBinding: "e",
+                icon: (
+                  <ArrowheadBarIcon
+                    appearance={appState.appearance}
+                    flip={isRTL}
+                  />
+                ),
+              },
+              {
+                value: "dot",
+                text: t("labels.arrowhead_dot"),
+                keyBinding: "r",
+                icon: (
+                  <ArrowheadDotIcon
+                    appearance={appState.appearance}
+                    flip={isRTL}
+                  />
+                ),
+              },
+            ]}
+            value={getFormValue<Arrowhead | null>(
+              elements,
+              appState,
+              (element) =>
+                isLinearElement(element) && canHaveArrowheads(element.type)
+                  ? element.endArrowhead
+                  : appState.currentItemArrowheads.end,
+              appState.currentItemArrowheads.end,
+            )}
+            onChange={(value) => updateData({ position: "end", type: value })}
+          />
+        </div>
+      </fieldset>
+    );
+  },
 });
