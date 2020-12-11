@@ -215,10 +215,6 @@
   "encrypted": {
     "tooltip": "您的绘图采用的端到端加密，因此Excalidraw服务器永远不会收集。"
   },
-  "charts": {
-    "noNumericColumn": "您粘贴了一个没有数字列的表格。",
-    "tooManyColumns": "您粘贴了两列以上的表格。"
-  },
   "stats": {
     "angle": "角度",
     "element": "元素",
