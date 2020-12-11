@@ -215,10 +215,6 @@
   "encrypted": {
     "tooltip": ""
   },
-  "charts": {
-    "noNumericColumn": "",
-    "tooManyColumns": ""
-  },
   "stats": {
     "angle": "",
     "element": "",
