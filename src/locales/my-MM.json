@@ -28,9 +28,9 @@
     "edges": "အစွန်း",
     "sharp": "ထောင့်ချွန်",
     "round": "ထောင့်ဝိုင်း",
-    "arrowheads": "",
-    "arrowhead_none": "",
-    "arrowhead_arrow": "",
+    "arrowheads": "မြှားခေါင်း",
+    "arrowhead_none": "ဘာမျှမရှိ",
+    "arrowhead_arrow": "မြှား",
     "fontSize": "စာလုံးအရွယ်",
     "fontFamily": "စာလုံးပုံစံ",
     "onlySelected": "ရွေးထားသလောက်",
@@ -57,7 +57,7 @@
     "architect": "ဗိသုကာ",
     "artist": "ပန်းချီ",
     "cartoonist": "ကာတွန်း",
-    "fileTitle": "",
+    "fileTitle": "ခေါင်းစဉ်",
     "colorPicker": "အရောင်ရွေး",
     "canvasBackground": "ကားချပ်နောက်ခံ",
     "drawingCanvas": "ပုံဆွဲကားချပ်",
@@ -66,7 +66,7 @@
     "language": "ဘာသာစကား",
     "createRoom": "တိုက်ရိုက်ပူးပေါင်းဆောင်ရွက်ရန်အဖွဲ့ဖွဲ့",
     "duplicateSelection": "ပွား",
-    "untitled": "",
+    "untitled": "အမည်မရှိ",
     "name": "အမည်",
     "yourName": "သင့်အမည်",
     "madeWithExcalidraw": "Excalidraw ဖြင့်ဖန်တီးသည်။",
@@ -78,7 +78,7 @@
     "addToLibrary": "မှတ်တမ်းတင်",
     "removeFromLibrary": "မှတ်တမ်းမှထုတ်",
     "libraryLoadingMessage": "မှတ်တမ်းအား တင်သွင်းနေသည်...",
-    "libraries": "",
+    "libraries": "စာကြည့်တိုက်တွင်ရှာဖွေပါ",
     "loadingScene": "မြင်ကွင်းဖော်နေသည်...",
     "align": "ချိန်ညှိ",
     "alignTop": "ထိပ်ညှိ",
@@ -87,8 +87,8 @@
     "alignRight": "ညာညှိ",
     "centerVertically": "ဒေါင်လိုက်အလယ်ညှိ",
     "centerHorizontally": "အလျားလိုက်အလယ်ညှိ",
-    "distributeHorizontally": "",
-    "distributeVertically": ""
+    "distributeHorizontally": "အလျားလိုက်",
+    "distributeVertically": "ထောင်လိုက်"
   },
   "buttons": {
     "clearReset": "ကားချပ်ရှင်းလင်း",
@@ -216,15 +216,15 @@
     "tooltip": "ရေးဆွဲထားသောပုံများအား နှစ်ဘက်စွန်းတိုင်လျှို့ဝှက်ထားသဖြင့် Excalidraw ၏ဆာဗာများပင်လျှင်မြင်တွေ့ရမည်မဟုတ်ပါ။"
   },
   "stats": {
-    "angle": "",
+    "angle": "ထောင့်",
     "element": "",
     "elements": "",
-    "height": "",
-    "scene": "",
-    "selected": "",
-    "storage": "",
-    "title": "",
-    "total": "",
-    "width": ""
+    "height": "အမြင့်",
+    "scene": "မြင်ကွင်း",
+    "selected": "ရွေးချယ်သည်",
+    "storage": "သိုလှောင်ခန်း",
+    "title": "အက္ခရာများအတွက်အချက်အလက်များ",
+    "total": "စုစုပေါင်း",
+    "width": "အကျယ်"
   }
 }
