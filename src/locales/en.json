@@ -31,6 +31,8 @@
     "arrowheads": "Arrowheads",
     "arrowhead_none": "None",
     "arrowhead_arrow": "Arrow",
+    "arrowhead_bar": "Bar",
+    "arrowhead_dot": "Dot",
     "fontSize": "Font size",
     "fontFamily": "Font family",
     "onlySelected": "Only selected",

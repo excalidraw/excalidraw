@@ -84,6 +84,11 @@
       padding: 0;
     }
 
+    .iconSelectList {
+      flex-wrap: wrap;
+      position: relative;
+    }
+
     .buttonList {
       flex-wrap: wrap;
 
@@ -236,6 +241,10 @@
       display: flex;
       flex-direction: column;
       pointer-events: initial;
+
+      .panelColumn {
+        padding: 8px 8px 0px 8px;
+      }
     }
   }
 
@@ -249,6 +258,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding: 8px;
   }
 
   .App-mobile-menu {
