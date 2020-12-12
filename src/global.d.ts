@@ -46,6 +46,15 @@ type MarkOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 type MarkRequired<T, RK extends keyof T> = Exclude<T, RK> &
   Required<Pick<T, RK>>;
 
+type UnionToIntersection<T> = (T extends any ? (x: T) => any : never) extends (
+  x: infer R,
+) => any
+  ? R
+  : never;
+
+/** Assert K is a subset of T, and returns K */
+type AssertSubset<T, K extends T> = K;
+
 // PNG encoding/decoding
 // -----------------------------------------------------------------------------
 type TEXtChunk = { name: "tEXt"; data: Uint8Array };

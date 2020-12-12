@@ -1,7 +1,7 @@
 import { queryByText } from "@testing-library/react";
 import React from "react";
 import ReactDOM from "react-dom";
-import { copiedStyles } from "../actions/actionStyles";
+import { getDefaultAppState } from "../appState";
 import { ExcalidrawElement } from "../element/types";
 import { setLanguage, t } from "../i18n";
 import { CODES, KEYS } from "../keys";
@@ -768,82 +768,224 @@ describe("regression tests", () => {
     });
   });
 
-  it("selecting 'Copy styles' in context menu copies styles", () => {
-    UI.clickTool("rectangle");
-    mouse.down(10, 10);
-    mouse.up(20, 20);
+  it("copy-styles updates appState defaults", () => {
+    h.app.updateScene({
+      elements: [
+        API.createElement({
+          type: "rectangle",
+          id: "A",
+          x: 0,
+          y: 0,
+          opacity: 90,
+          strokeColor: "#FF0000",
+          strokeStyle: "solid",
+          strokeWidth: 10,
+          roughness: 2,
+          backgroundColor: "#00FF00",
+          fillStyle: "solid",
+          strokeSharpness: "sharp",
+        }),
+        API.createElement({
+          type: "arrow",
+          id: "B",
+          x: 200,
+          y: 200,
+          startArrowhead: "bar",
+          endArrowhead: "bar",
+        }),
+        API.createElement({
+          type: "text",
+          id: "C",
+          x: 200,
+          y: 200,
+          fontFamily: 3,
+          fontSize: 200,
+          textAlign: "center",
+        }),
+      ],
+    });
+
+    h.app.setState({
+      selectedElementIds: { A: true, B: true, C: true },
+    });
+
+    const defaultAppState = getDefaultAppState();
+
+    expect(h.state).toEqual(
+      expect.objectContaining({
+        currentItemOpacity: defaultAppState.currentItemOpacity,
+        currentItemStrokeColor: defaultAppState.currentItemStrokeColor,
+        currentItemStrokeStyle: defaultAppState.currentItemStrokeStyle,
+        currentItemStrokeWidth: defaultAppState.currentItemStrokeWidth,
+        currentItemRoughness: defaultAppState.currentItemRoughness,
+        currentItemBackgroundColor: defaultAppState.currentItemBackgroundColor,
+        currentItemFillStyle: defaultAppState.currentItemFillStyle,
+        currentItemStrokeSharpness: defaultAppState.currentItemStrokeSharpness,
+        currentItemStartArrowhead: defaultAppState.currentItemStartArrowhead,
+        currentItemEndArrowhead: defaultAppState.currentItemEndArrowhead,
+        currentItemFontFamily: defaultAppState.currentItemFontFamily,
+        currentItemFontSize: defaultAppState.currentItemFontSize,
+        currentItemTextAlign: defaultAppState.currentItemTextAlign,
+      }),
+    );
 
     fireEvent.contextMenu(GlobalTestState.canvas, {
       button: 2,
       clientX: 1,
       clientY: 1,
     });
+
     const contextMenu = document.querySelector(".context-menu");
-    expect(copiedStyles).toBe("{}");
     fireEvent.click(queryByText(contextMenu as HTMLElement, "Copy styles")!);
-    expect(copiedStyles).not.toBe("{}");
-    const element = JSON.parse(copiedStyles);
-    expect(element).toEqual(API.getSelectedElement());
+
+    expect(h.state).toEqual(
+      expect.objectContaining({
+        currentItemOpacity: 90,
+        currentItemStrokeColor: "#FF0000",
+        currentItemStrokeStyle: "solid",
+        currentItemStrokeWidth: 10,
+        currentItemRoughness: 2,
+        currentItemBackgroundColor: "#00FF00",
+        currentItemFillStyle: "solid",
+        currentItemStrokeSharpness: "sharp",
+        currentItemStartArrowhead: "bar",
+        currentItemEndArrowhead: "bar",
+        currentItemFontFamily: 3,
+        currentItemFontSize: 200,
+        currentItemTextAlign: "center",
+      }),
+    );
   });
 
-  it("selecting 'Paste styles' in context menu pastes styles", () => {
-    UI.clickTool("rectangle");
-    mouse.down(10, 10);
-    mouse.up(20, 20);
-
-    UI.clickTool("rectangle");
-    mouse.down(10, 10);
-    mouse.up(20, 20);
-
-    // Change some styles of second rectangle
-    clickLabeledElement("Stroke");
-    clickLabeledElement("#c92a2a");
-    clickLabeledElement("Background");
-    clickLabeledElement("#e64980");
-    // Fill style
-    fireEvent.click(screen.getByTitle("Cross-hatch"));
-    // Stroke width
-    fireEvent.click(screen.getByTitle("Bold"));
-    // Stroke style
-    fireEvent.click(screen.getByTitle("Dotted"));
-    // Roughness
-    fireEvent.click(screen.getByTitle("Cartoonist"));
-    // Opacity
-    fireEvent.change(screen.getByLabelText("Opacity"), {
-      target: { value: "60" },
+  it("paste-styles action", () => {
+    h.app.updateScene({
+      elements: [
+        API.createElement({
+          type: "rectangle",
+          id: "A",
+          x: 0,
+          y: 0,
+          opacity: 90,
+          strokeColor: "#FF0000",
+          strokeStyle: "solid",
+          strokeWidth: 10,
+          roughness: 2,
+          backgroundColor: "#00FF00",
+          fillStyle: "solid",
+          strokeSharpness: "sharp",
+        }),
+        API.createElement({
+          type: "arrow",
+          id: "B",
+          x: 0,
+          y: 0,
+          startArrowhead: "bar",
+          endArrowhead: "bar",
+        }),
+        API.createElement({
+          type: "text",
+          id: "C",
+          x: 0,
+          y: 0,
+          fontFamily: 3,
+          fontSize: 200,
+          textAlign: "center",
+        }),
+        API.createElement({
+          type: "rectangle",
+          id: "D",
+          x: 200,
+          y: 200,
+        }),
+        API.createElement({
+          type: "arrow",
+          id: "E",
+          x: 200,
+          y: 200,
+        }),
+        API.createElement({
+          type: "text",
+          id: "F",
+          x: 200,
+          y: 200,
+        }),
+      ],
     });
 
-    mouse.reset();
-    // Copy styles of second rectangle
+    h.app.setState({
+      selectedElementIds: { A: true, B: true, C: true },
+    });
+
     fireEvent.contextMenu(GlobalTestState.canvas, {
       button: 2,
-      clientX: 40,
-      clientY: 40,
+      clientX: 1,
+      clientY: 1,
     });
-    let contextMenu = document.querySelector(".context-menu");
-    fireEvent.click(queryByText(contextMenu as HTMLElement, "Copy styles")!);
-    const secondRect = JSON.parse(copiedStyles);
-    expect(secondRect.id).toBe(h.elements[1].id);
+    fireEvent.click(
+      queryByText(
+        document.querySelector(".context-menu") as HTMLElement,
+        "Copy styles",
+      )!,
+    );
 
-    mouse.reset();
-    // Paste styles to first rectangle
+    h.app.setState({
+      selectedElementIds: { D: true, E: true, F: true },
+    });
     fireEvent.contextMenu(GlobalTestState.canvas, {
       button: 2,
-      clientX: 10,
-      clientY: 10,
+      clientX: 201,
+      clientY: 201,
     });
-    contextMenu = document.querySelector(".context-menu");
-    fireEvent.click(queryByText(contextMenu as HTMLElement, "Paste styles")!);
+    fireEvent.click(
+      queryByText(
+        document.querySelector(".context-menu") as HTMLElement,
+        "Paste styles",
+      )!,
+    );
 
-    const firstRect = API.getSelectedElement();
-    expect(firstRect.id).toBe(h.elements[0].id);
-    expect(firstRect.strokeColor).toBe("#c92a2a");
-    expect(firstRect.backgroundColor).toBe("#e64980");
-    expect(firstRect.fillStyle).toBe("cross-hatch");
-    expect(firstRect.strokeWidth).toBe(2); // Bold: 2
-    expect(firstRect.strokeStyle).toBe("dotted");
-    expect(firstRect.roughness).toBe(2); // Cartoonist: 2
-    expect(firstRect.opacity).toBe(60);
+    const defaultAppState = getDefaultAppState();
+
+    expect(h.elements.find((element) => element.id === "D")).toEqual(
+      expect.objectContaining({
+        opacity: 90,
+        strokeColor: "#FF0000",
+        strokeStyle: "solid",
+        strokeWidth: 10,
+        roughness: 2,
+        backgroundColor: "#00FF00",
+        fillStyle: "solid",
+        strokeSharpness: "sharp",
+      }),
+    );
+    expect(h.elements.find((element) => element.id === "E")).toEqual(
+      expect.objectContaining({
+        opacity: defaultAppState.currentItemOpacity,
+        strokeColor: defaultAppState.currentItemStrokeColor,
+        strokeStyle: defaultAppState.currentItemStrokeStyle,
+        strokeWidth: defaultAppState.currentItemStrokeWidth,
+        roughness: defaultAppState.currentItemRoughness,
+        backgroundColor: "#00FF00",
+        fillStyle: "solid",
+        strokeSharpness: "sharp",
+        startArrowhead: "bar",
+        endArrowhead: "bar",
+      }),
+    );
+    expect(h.elements.find((element) => element.id === "F")).toEqual(
+      expect.objectContaining({
+        opacity: defaultAppState.currentItemOpacity,
+        strokeColor: defaultAppState.currentItemStrokeColor,
+        strokeStyle: defaultAppState.currentItemStrokeStyle,
+        strokeWidth: 10,
+        roughness: 2,
+        backgroundColor: "#00FF00",
+        fillStyle: "solid",
+        strokeSharpness: "sharp",
+        fontFamily: 3,
+        fontSize: 200,
+        textAlign: "center",
+      }),
+    );
   });
 
   it("selecting 'Delete' in context menu deletes element", () => {
