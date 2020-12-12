@@ -4,6 +4,7 @@
     "selectAll": "Pilih semua",
     "multiSelect": "Tambahkan elemen ke pilihan",
     "moveCanvas": "Pindahkan kanvas",
+    "cut": "",
     "copy": "Salin",
     "copyAsPng": "Salin ke papan klip sebagai PNG",
     "copyAsSvg": "Salin ke papan klip sebagai SVG",
