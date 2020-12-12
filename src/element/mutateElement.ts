@@ -24,13 +24,13 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   // (see https://github.com/microsoft/TypeScript/issues/21732)
   const { points } = updates as any;
 
-  if (typeof points !== "undefined") {
+  if (points !== undefined) {
     updates = { ...getSizeFromPoints(points), ...updates };
   }
 
   for (const key in updates) {
     const value = (updates as any)[key];
-    if (typeof value !== "undefined") {
+    if (value !== undefined) {
       if (
         (element as any)[key] === value &&
         // if object, always update in case its deep prop was mutated
@@ -72,9 +72,9 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   }
 
   if (
-    typeof updates.height !== "undefined" ||
-    typeof updates.width !== "undefined" ||
-    typeof points !== "undefined"
+    updates.height !== undefined ||
+    updates.width !== undefined ||
+    points !== undefined
   ) {
     invalidateShapeForElement(element);
   }
