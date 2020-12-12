@@ -12,8 +12,8 @@ const changeLogCheck = () => {
         process.exit(0);
       }
 
-      const onlyNonsrcFilesUpdated = stdout.indexOf("src") < 0;
-      if (onlyNonsrcFilesUpdated) {
+      const onlyNonSrcFilesUpdated = stdout.indexOf("src") < 0;
+      if (onlyNonSrcFilesUpdated) {
         process.exit(0);
       }
 
