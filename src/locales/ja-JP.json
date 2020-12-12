@@ -4,6 +4,7 @@
     "selectAll": "すべて選択",
     "multiSelect": "複数選択",
     "moveCanvas": "キャンバスを移動",
+    "cut": "",
     "copy": "コピー",
     "copyAsPng": "PNGとしてクリップボードへコピー",
     "copyAsSvg": "SVGとしてクリップボードへコピー",
