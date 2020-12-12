@@ -464,9 +464,11 @@ const drawElementFromCanvas = (
   context.drawImage(
     elementWithCanvas.canvas!,
     (-(x2 - x1) / 2) * window.devicePixelRatio -
-      (CANVAS_PADDING * sceneState.zoom.value) / elementWithCanvas.canvasZoom,
+      (CANVAS_PADDING * elementWithCanvas.canvasZoom) /
+        elementWithCanvas.canvasZoom,
     (-(y2 - y1) / 2) * window.devicePixelRatio -
-      (CANVAS_PADDING * sceneState.zoom.value) / elementWithCanvas.canvasZoom,
+      (CANVAS_PADDING * elementWithCanvas.canvasZoom) /
+        elementWithCanvas.canvasZoom,
     elementWithCanvas.canvas!.width / elementWithCanvas.canvasZoom,
     elementWithCanvas.canvas!.height / elementWithCanvas.canvasZoom,
   );
