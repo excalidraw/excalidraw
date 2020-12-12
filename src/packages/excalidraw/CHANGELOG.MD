@@ -5,7 +5,7 @@
 - Aligns arrowhead schemas [#2517](https://github.com/excalidraw/excalidraw/pull/2517)
 - Expand canvas padding based on zoom. [#2515](https://github.com/excalidraw/excalidraw/pull/2515)
 - Fix Library Menu Layout [#2502](https://github.com/excalidraw/excalidraw/pull/2502)
--Add Cut to menus [#2511)](https://github.com/excalidraw/excalidraw/pull/2498)
+- Add Cut to menus [#2511)](https://github.com/excalidraw/excalidraw/pull/2498)
 - hide stats and scrollToContent-button when mobile menus open [#2509](https://github.com/excalidraw/excalidraw/pull/2509)
 - Hide shortcuts on pickers for mobile [#2508](https://github.com/excalidraw/excalidraw/pull/2508)
 - More Arrowheads: dot, bar [#2486](https://github.com/excalidraw/excalidraw/pull/2486)
