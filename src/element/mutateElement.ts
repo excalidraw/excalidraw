@@ -84,9 +84,12 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   Scene.getScene(element)?.informMutation();
 };
 
-export const newElementWith = <TElement extends ExcalidrawElement>(
+export const newElementWith = <
+  TElement extends ExcalidrawElement,
+  K extends keyof Omit<TElement, "id" | "version" | "versionNonce">
+>(
   element: TElement,
-  updates: ElementUpdate<TElement>,
+  updates: Pick<TElement, K>,
 ): TElement => ({
   ...element,
   ...updates,
