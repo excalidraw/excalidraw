@@ -38,7 +38,7 @@ import {
 import { PointerDownState } from "../components/App";
 import { Point } from "../types";
 
-const normalizeAngle = (angle: number): number => {
+export const normalizeAngle = (angle: number): number => {
   if (angle >= 2 * Math.PI) {
     return angle - 2 * Math.PI;
   }
@@ -414,7 +414,7 @@ const resizeSingleTextElement = (
   }
 };
 
-const resizeSingleGenericElement = (
+export const resizeSingleGenericElement = (
   stateAtResizeStart: NonDeleted<ExcalidrawGenericElement>,
   shouldKeepSidesRatio: boolean,
   element: NonDeletedExcalidrawElement,
@@ -549,7 +549,7 @@ const resizeSingleGenericElement = (
   mutateElement(element, resizedElement);
 };
 
-const resizeSingleNonGenericElement = (
+export const resizeSingleNonGenericElement = (
   element: NonDeleted<Exclude<ExcalidrawElement, ExcalidrawGenericElement>>,
   transformHandleType: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
   isResizeFromCenter: boolean,

@@ -91,7 +91,9 @@
     "centerVertically": "Center vertically",
     "centerHorizontally": "Center horizontally",
     "distributeHorizontally": "Distribute horizontally",
-    "distributeVertically": "Distribute vertically"
+    "distributeVertically": "Distribute vertically",
+    "flipHorizontal": "Flip horizontal",
+    "flipVertical": "Flip vertical"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
