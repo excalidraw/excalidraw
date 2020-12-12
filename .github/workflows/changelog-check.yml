@@ -1,4 +1,4 @@
-name: Changelog Check
+name: Changelog in sync for packages
 
 on:
   push:
