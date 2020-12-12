@@ -134,7 +134,7 @@ const LibraryMenuItems = ({
         align="center"
         gap={1}
         key={"actions"}
-        style={{ padding: "2px 0" }}
+        style={{ padding: "2px" }}
       >
         <ToolButton
           key="import"
@@ -208,7 +208,7 @@ const LibraryMenuItems = ({
   }
 
   return (
-    <Stack.Col align="center" gap={1} className="layer-ui__library-items">
+    <Stack.Col align="start" gap={1} className="layer-ui__library-items">
       {rows}
     </Stack.Col>
   );
