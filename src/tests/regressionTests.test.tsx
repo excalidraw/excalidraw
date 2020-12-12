@@ -657,6 +657,7 @@ describe("regression tests", () => {
     const contextMenu = document.querySelector(".context-menu");
     const options = contextMenu?.querySelectorAll(".context-menu-option");
     const expectedOptions = [
+      "Cut",
       "Copy styles",
       "Paste styles",
       "Delete",
@@ -669,7 +670,7 @@ describe("regression tests", () => {
     ];
 
     expect(contextMenu).not.toBeNull();
-    expect(contextMenu?.children.length).toBe(9);
+    expect(contextMenu?.children.length).toBe(10);
     options?.forEach((opt, i) => {
       expect(opt.textContent).toBe(expectedOptions[i]);
     });
@@ -699,6 +700,7 @@ describe("regression tests", () => {
     const contextMenu = document.querySelector(".context-menu");
     const options = contextMenu?.querySelectorAll(".context-menu-option");
     const expectedOptions = [
+      "Cut",
       "Copy styles",
       "Paste styles",
       "Delete",
@@ -712,7 +714,7 @@ describe("regression tests", () => {
     ];
 
     expect(contextMenu).not.toBeNull();
-    expect(contextMenu?.children.length).toBe(10);
+    expect(contextMenu?.children.length).toBe(11);
     options?.forEach((opt, i) => {
       expect(opt.textContent).toBe(expectedOptions[i]);
     });
@@ -746,6 +748,7 @@ describe("regression tests", () => {
     const contextMenu = document.querySelector(".context-menu");
     const options = contextMenu?.querySelectorAll(".context-menu-option");
     const expectedOptions = [
+      "Cut",
       "Copy styles",
       "Paste styles",
       "Delete",
@@ -759,7 +762,7 @@ describe("regression tests", () => {
     ];
 
     expect(contextMenu).not.toBeNull();
-    expect(contextMenu?.children.length).toBe(10);
+    expect(contextMenu?.children.length).toBe(11);
     options?.forEach((opt, i) => {
       expect(opt.textContent).toBe(expectedOptions[i]);
     });

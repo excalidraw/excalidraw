@@ -873,8 +873,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (isWritableElement(event.target)) {
       return;
     }
-    this.copyAll();
-    this.actionManager.executeAction(actionDeleteSelected);
+    this.cutAll();
     event.preventDefault();
   });
 
@@ -885,6 +884,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.copyAll();
     event.preventDefault();
   });
+
+  private cutAll = () => {
+    this.copyAll();
+    this.actionManager.executeAction(actionDeleteSelected);
+  };
 
   private copyAll = () => {
     copyToClipboard(this.scene.getElements(), this.state);
@@ -3621,6 +3625,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     ContextMenu.push({
       options: [
+        {
+          label: t("labels.cut"),
+          action: this.cutAll,
+        },
         navigator.clipboard && {
           label: t("labels.copy"),
           action: this.copyAll,
