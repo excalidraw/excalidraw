@@ -4,7 +4,8 @@ import { getDefaultAppState } from "../appState";
 import { trash, zoomIn, zoomOut, resetZoom } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
-import { getNormalizedZoom } from "../scene";
+import { getNormalizedZoom, getSelectedElements } from "../scene";
+import { getNonDeletedElements } from "../element";
 import { CODES, KEYS } from "../keys";
 import { getShortcutKey } from "../utils";
 import useIsMobile from "../is-mobile";
@@ -207,8 +208,13 @@ const zoomValueToFitBoundsOnViewport = (
 export const actionZoomToFit = register({
   name: "zoomToFit",
   perform: (elements, appState) => {
-    const nonDeletedElements = elements.filter((element) => !element.isDeleted);
-    const commonBounds = getCommonBounds(nonDeletedElements);
+    const nonDeletedElements = getNonDeletedElements(elements);
+    const selectedElements = getSelectedElements(nonDeletedElements, appState);
+
+    const commonBounds =
+      selectedElements.length > 0
+        ? getCommonBounds(selectedElements)
+        : getCommonBounds(nonDeletedElements);
 
     const zoomValue = zoomValueToFitBoundsOnViewport(commonBounds, {
       width: appState.width,
