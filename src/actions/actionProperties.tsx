@@ -667,10 +667,9 @@ export const actionChangeArrowhead = register({
       }),
       appState: {
         ...appState,
-        currentItemArrowheads: {
-          ...appState.currentItemArrowheads,
-          [value.position]: value.type,
-        },
+        [value.position === "start"
+          ? "currentItemStartArrowhead"
+          : "currentItemEndArrowhead"]: value.type,
       },
       commitToHistory: true,
     };
@@ -731,8 +730,8 @@ export const actionChangeArrowhead = register({
               (element) =>
                 isLinearElement(element) && canHaveArrowheads(element.type)
                   ? element.startArrowhead
-                  : appState.currentItemArrowheads.start,
-              appState.currentItemArrowheads.start,
+                  : appState.currentItemStartArrowhead,
+              appState.currentItemStartArrowhead,
             )}
             onChange={(value) => updateData({ position: "start", type: value })}
           />
@@ -786,8 +785,8 @@ export const actionChangeArrowhead = register({
               (element) =>
                 isLinearElement(element) && canHaveArrowheads(element.type)
                   ? element.endArrowhead
-                  : appState.currentItemArrowheads.end,
-              appState.currentItemArrowheads.end,
+                  : appState.currentItemEndArrowhead,
+              appState.currentItemEndArrowhead,
             )}
             onChange={(value) => updateData({ position: "end", type: value })}
           />
