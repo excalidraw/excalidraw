@@ -4,6 +4,7 @@
     "selectAll": "Tout sélectionner",
     "multiSelect": "Ajouter l'élément à la sélection",
     "moveCanvas": "Déplacer le canvas",
+    "cut": "",
     "copy": "Copier",
     "copyAsPng": "Copier dans le presse-papier en PNG",
     "copyAsSvg": "Copier dans le presse-papier en SVG",
