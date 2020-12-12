@@ -1,6 +1,6 @@
 const { exec } = require("child_process");
 
-function changeLogCheck() {
+const changeLogCheck = () => {
   exec(
     "git diff origin/master --cached --name-only",
     (error, stdout, stderr) => {
@@ -30,5 +30,5 @@ function changeLogCheck() {
       process.exit(0);
     },
   );
-}
+};
 changeLogCheck();
