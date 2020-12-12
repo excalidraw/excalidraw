@@ -4,6 +4,7 @@
     "selectAll": "Alle auswählen",
     "multiSelect": "Element zur Auswahl hinzufügen",
     "moveCanvas": "Leinwand verschieben",
+    "cut": "",
     "copy": "Kopieren",
     "copyAsPng": "In Zwischenablage kopieren (PNG)",
     "copyAsSvg": "In Zwischenablage kopieren (SVG)",
