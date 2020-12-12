@@ -3635,6 +3635,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     ContextMenu.push({
       options: [
         {
+          shortcutName: "cut",
           label: t("labels.cut"),
           action: this.cutAll,
         },

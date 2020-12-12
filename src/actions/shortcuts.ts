@@ -3,6 +3,7 @@ import { isDarwin } from "../keys";
 import { getShortcutKey } from "../utils";
 
 export type ShortcutName =
+  | "cut"
   | "copy"
   | "paste"
   | "copyStyles"
@@ -23,6 +24,7 @@ export type ShortcutName =
   | "addToLibrary";
 
 const shortcutMap: Record<ShortcutName, string[]> = {
+  cut: [getShortcutKey("CtrlOrCmd+X")],
   copy: [getShortcutKey("CtrlOrCmd+C")],
   paste: [getShortcutKey("CtrlOrCmd+V")],
   copyStyles: [getShortcutKey("CtrlOrCmd+Alt+C")],
