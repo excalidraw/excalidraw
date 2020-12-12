@@ -4,6 +4,7 @@
     "selectAll": "تحديد الكل",
     "multiSelect": "إضافة عنصر للتحديد",
     "moveCanvas": "نقل لوح رسم",
+    "cut": "",
     "copy": "نسخ",
     "copyAsPng": "نسخ إلى الحافظة بصيغة PNG",
     "copyAsSvg": "نسخ بصيغة SVG",
