@@ -457,7 +457,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
         {errorMessage && (
           <ErrorDialog
             message={errorMessage}
-            onClose={() => this.setState({ errorMessage: "1" })}
+            onClose={() => this.setState({ errorMessage: "" })}
           />
         )}
         {children({
