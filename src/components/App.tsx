@@ -3592,16 +3592,19 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       ContextMenu.push({
         options: [
           navigator.clipboard && {
+            shortcutName: "paste",
             label: t("labels.paste"),
             action: () => this.pasteFromClipboard(null),
           },
           probablySupportsClipboardBlob &&
             elements.length > 0 && {
+              shortcutName: "copyAsPng",
               label: t("labels.copyAsPng"),
               action: this.copyToClipboardAsPng,
             },
           probablySupportsClipboardWriteText &&
             elements.length > 0 && {
+              shortcutName: "copyAsSvg",
               label: t("labels.copyAsSvg"),
               action: this.copyToClipboardAsSvg,
             },
@@ -3609,10 +3612,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             CANVAS_ONLY_ACTIONS.includes(action.name),
           ),
           {
+            shortcutName: "toggleGridMode",
             label: t("labels.toggleGridMode"),
             action: this.toggleGridMode,
           },
           {
+            shortcutName: "toggleStats",
             label: t("labels.toggleStats"),
             action: this.toggleStats,
           },
@@ -3630,22 +3635,27 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     ContextMenu.push({
       options: [
         {
+          shortcutName: "cut",
           label: t("labels.cut"),
           action: this.cutAll,
         },
         navigator.clipboard && {
+          shortcutName: "copy",
           label: t("labels.copy"),
           action: this.copyAll,
         },
         navigator.clipboard && {
+          shortcutName: "paste",
           label: t("labels.paste"),
           action: () => this.pasteFromClipboard(null),
         },
         probablySupportsClipboardBlob && {
+          shortcutName: "copyAsPng",
           label: t("labels.copyAsPng"),
           action: this.copyToClipboardAsPng,
         },
         probablySupportsClipboardWriteText && {
+          shortcutName: "copyAsSvg",
           label: t("labels.copyAsSvg"),
           action: this.copyToClipboardAsSvg,
         },

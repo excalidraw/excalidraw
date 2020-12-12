@@ -10,6 +10,7 @@ import {
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 import { t } from "../i18n";
+import { ShortcutName } from "./shortcuts";
 
 export class ActionManager implements ActionsManagerInterface {
   actions = {} as ActionsManagerInterface["actions"];
@@ -102,6 +103,8 @@ export class ActionManager implements ActionsManagerInterface {
           (b.contextMenuOrder !== undefined ? b.contextMenuOrder : 999),
       )
       .map((action) => ({
+        // take last bit of the label  "labels.<shortcutName>"
+        shortcutName: action.contextItemLabel?.split(".").pop() as ShortcutName,
         label: action.contextItemLabel ? t(action.contextItemLabel) : "",
         action: () => {
           this.updater(
