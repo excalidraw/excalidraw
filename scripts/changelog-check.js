@@ -9,16 +9,15 @@ function changeLogCheck() {
         return;
       }
 
-      if (!stdout) {
+      if (!stdout || stdout.includes("packages/excalidraw/CHANGELOG.MD")) {
         process.exit(0);
       }
 
-      const changedFiles = stdout.trim().split("\n");
       const filesToIgnoreRegex = /src\/excalidraw-app|packages\/utils/;
-      const excalidrawPackageFiles = changedFiles.filter((file) => {
-        return file.indexOf("src") >= 0 && !filesToIgnoreRegex.test(file);
-      });
-      if (excalidrawPackageFiles.length) {
+      const excalidrawPackageFilesUpdated =
+        stdout.indexOf("src") >= 0 && !filesToIgnoreRegex.test(stdout);
+
+      if (excalidrawPackageFilesUpdated) {
         process.exit(1);
       }
       process.exit(0);
