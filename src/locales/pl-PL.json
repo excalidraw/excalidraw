@@ -4,6 +4,7 @@
     "selectAll": "Zaznacz wszystko",
     "multiSelect": "Dodaj element do zaznaczenia",
     "moveCanvas": "Przesuń obszar roboczy",
+    "cut": "",
     "copy": "Kopiuj",
     "copyAsPng": "Skopiuj do schowka jako plik PNG",
     "copyAsSvg": "Skopiuj do schowka jako plik SVG",
