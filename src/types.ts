@@ -61,10 +61,8 @@ export type AppState = {
   currentItemFontSize: number;
   currentItemTextAlign: TextAlign;
   currentItemStrokeSharpness: ExcalidrawElement["strokeSharpness"];
-  currentItemArrowheads: {
-    start: Arrowhead | null;
-    end: Arrowhead | null;
-  };
+  currentItemStartArrowhead: Arrowhead | null;
+  currentItemEndArrowhead: Arrowhead | null;
   currentItemLinearStrokeSharpness: ExcalidrawElement["strokeSharpness"];
   viewBackgroundColor: string;
   scrollX: FlooredNumber;
