@@ -57,29 +57,37 @@ const generateElementCanvas = (
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
     canvas.width =
       distance(x1, x2) * window.devicePixelRatio * zoom.value +
-      CANVAS_PADDING * 2;
+      CANVAS_PADDING * zoom.value * 2;
     canvas.height =
       distance(y1, y2) * window.devicePixelRatio * zoom.value +
-      CANVAS_PADDING * 2;
+      CANVAS_PADDING * zoom.value * 2;
 
     canvasOffsetX =
       element.x > x1
-        ? Math.floor(distance(element.x, x1)) * window.devicePixelRatio
+        ? Math.floor(distance(element.x, x1)) *
+          window.devicePixelRatio *
+          zoom.value
         : 0;
+
     canvasOffsetY =
       element.y > y1
-        ? Math.floor(distance(element.y, y1)) * window.devicePixelRatio
+        ? Math.floor(distance(element.y, y1)) *
+          window.devicePixelRatio *
+          zoom.value
         : 0;
-    context.translate(canvasOffsetX * zoom.value, canvasOffsetY * zoom.value);
+
+    context.translate(canvasOffsetX, canvasOffsetY);
   } else {
     canvas.width =
-      element.width * window.devicePixelRatio * zoom.value + CANVAS_PADDING * 2;
+      element.width * window.devicePixelRatio * zoom.value +
+      CANVAS_PADDING * zoom.value * 2;
     canvas.height =
       element.height * window.devicePixelRatio * zoom.value +
-      CANVAS_PADDING * 2;
+      CANVAS_PADDING * zoom.value * 2;
   }
 
-  context.translate(CANVAS_PADDING, CANVAS_PADDING);
+  context.translate(CANVAS_PADDING * zoom.value, CANVAS_PADDING * zoom.value);
+
   context.scale(
     window.devicePixelRatio * zoom.value,
     window.devicePixelRatio * zoom.value,
@@ -87,7 +95,10 @@ const generateElementCanvas = (
 
   const rc = rough.canvas(canvas);
   drawElementOnCanvas(element, rc, context);
-  context.translate(-CANVAS_PADDING, -CANVAS_PADDING);
+  context.translate(
+    -(CANVAS_PADDING * zoom.value),
+    -(CANVAS_PADDING * zoom.value),
+  );
   context.scale(
     1 / (window.devicePixelRatio * zoom.value),
     1 / (window.devicePixelRatio * zoom.value),
@@ -453,9 +464,11 @@ const drawElementFromCanvas = (
   context.drawImage(
     elementWithCanvas.canvas!,
     (-(x2 - x1) / 2) * window.devicePixelRatio -
-      CANVAS_PADDING / elementWithCanvas.canvasZoom,
+      (CANVAS_PADDING * elementWithCanvas.canvasZoom) /
+        elementWithCanvas.canvasZoom,
     (-(y2 - y1) / 2) * window.devicePixelRatio -
-      CANVAS_PADDING / elementWithCanvas.canvasZoom,
+      (CANVAS_PADDING * elementWithCanvas.canvasZoom) /
+        elementWithCanvas.canvasZoom,
     elementWithCanvas.canvas!.width / elementWithCanvas.canvasZoom,
     elementWithCanvas.canvas!.height / elementWithCanvas.canvasZoom,
   );
