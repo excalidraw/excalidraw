@@ -1,10 +1,7 @@
 # Changelog
 
-## 0.1.0
-
-First release of `@excalidraw/excalidraw`
-
 ### [Unreleased]
+
 - Aligns arrowhead schemas [#2517](https://github.com/excalidraw/excalidraw/pull/2517)
 - Expand canvas padding based on zoom. [#2515](https://github.com/excalidraw/excalidraw/pull/2515)
 - Fix Library Menu Layout [#2502](https://github.com/excalidraw/excalidraw/pull/2502)
@@ -19,3 +16,7 @@ First release of `@excalidraw/excalidraw`
 
 #### Fix
 - Update the homepage URL so it redirects to correct readme [#2498](https://github.com/excalidraw/excalidraw/pull/2498)
+
+## 0.1.0
+
+First release of `@excalidraw/excalidraw`
