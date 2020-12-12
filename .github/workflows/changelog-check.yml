@@ -1,0 +1,26 @@
+name: Changelog Check
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Setup Node.js 12.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
+      - name: Install and run changelog check
+        run: |
+          npm ci
+          npm run changelog:check
+        env:
+          CI: true
