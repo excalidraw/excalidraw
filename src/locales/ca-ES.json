@@ -4,6 +4,7 @@
     "selectAll": "Seleccionar tot",
     "multiSelect": "Afegir element a la selecció",
     "moveCanvas": "Moure el llenç",
+    "cut": "",
     "copy": "Copiar",
     "copyAsPng": "Copiar al porta-retalls com a PNG",
     "copyAsSvg": "Copiar al porta-retalls com a SVG",
