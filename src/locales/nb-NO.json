@@ -4,6 +4,7 @@
     "selectAll": "Velg alt",
     "multiSelect": "Legg til element i utvalg",
     "moveCanvas": "Flytt lerretet",
+    "cut": "",
     "copy": "Kopier",
     "copyAsPng": "Kopier til PNG",
     "copyAsSvg": "Kopier til utklippstavlen som SVG",
