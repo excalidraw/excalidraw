@@ -16,7 +16,7 @@ export const actionAddToLibrary = register({
     Library.loadLibrary().then((items) => {
       Library.saveLibrary([...items, selectedElements.map(deepCopyElement)]);
     });
-    trackEvent(EVENT_LIBRARY, "add");
+    trackEvent(EVENT_LIBRARY, "add1");
     return false;
   },
   contextMenuOrder: 6,
