@@ -4,7 +4,7 @@
     "selectAll": "Valitse kaikki",
     "multiSelect": "Lisää kohde valintaan",
     "moveCanvas": "Siirrä piirtoaluetta",
-    "cut": "",
+    "cut": "Leikkaa",
     "copy": "Kopioi",
     "copyAsPng": "Kopioi leikepöydälle PNG-tiedostona",
     "copyAsSvg": "Kopioi leikepöydälle SVG-tiedostona",
