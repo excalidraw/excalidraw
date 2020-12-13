@@ -213,6 +213,7 @@
     "textNewLine": "Lisää uusi rivi (teksti)",
     "textFinish": "Lopeta muokkaus (teksti)",
     "zoomToFit": "Zoomaa kaikki elementit näkyviin",
+    "zoomToSelection": "",
     "preventBinding": "Estä nuolten sitominen"
   },
   "encrypted": {
