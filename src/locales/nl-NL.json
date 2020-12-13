@@ -213,6 +213,7 @@
     "textNewLine": "Nieuwe regel toevoegen (tekst)",
     "textFinish": "Voltooi bewerken (tekst)",
     "zoomToFit": "Zoom in op alle elementen",
+    "zoomToSelection": "",
     "preventBinding": ""
   },
   "encrypted": {
