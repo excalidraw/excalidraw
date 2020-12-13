@@ -213,6 +213,7 @@
     "textNewLine": "Afegir línea nova (text)",
     "textFinish": "Acabar d'editar (text)",
     "zoomToFit": "Zoom per veure tots els elements",
+    "zoomToSelection": "",
     "preventBinding": "Prevenir vinculació de la fletxa"
   },
   "encrypted": {
