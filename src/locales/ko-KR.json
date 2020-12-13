@@ -213,6 +213,7 @@
     "textNewLine": "줄바꾸기",
     "textFinish": "편집 완료",
     "zoomToFit": "",
+    "zoomToSelection": "",
     "preventBinding": ""
   },
   "encrypted": {
