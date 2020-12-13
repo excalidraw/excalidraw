@@ -213,6 +213,7 @@
     "textNewLine": "إضافة سطر جديد (نص)",
     "textFinish": "الانتهاء من تحرير (النص)",
     "zoomToFit": "تكبير لتلائم جميع العناصر",
+    "zoomToSelection": "",
     "preventBinding": "منع ربط السهم"
   },
   "encrypted": {
