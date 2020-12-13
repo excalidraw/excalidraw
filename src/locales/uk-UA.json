@@ -213,6 +213,7 @@
     "textNewLine": "Додати новий рядок (текст)",
     "textFinish": "Завершити редагування (текст)",
     "zoomToFit": "Збільшити щоб умістити все",
+    "zoomToSelection": "",
     "preventBinding": "Запобігти зв'язування зі стрілками"
   },
   "encrypted": {
