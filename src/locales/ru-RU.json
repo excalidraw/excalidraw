@@ -213,6 +213,7 @@
     "textNewLine": "Добавить новую строку (текст)",
     "textFinish": "Закончить редактирование (текст)",
     "zoomToFit": "",
+    "zoomToSelection": "",
     "preventBinding": "Предотвратить привязку стрелок"
   },
   "encrypted": {
