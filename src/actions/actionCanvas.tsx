@@ -224,11 +224,12 @@ const zoomToFitElements = (
     height: appState.height,
   });
   const newZoom = getNewZoom(zoomValue, appState.zoom);
+  const action = zoomToSelection ? "selection" : "fit";
 
   const [x1, y1, x2, y2] = commonBounds;
   const centerX = (x1 + x2) / 2;
   const centerY = (y1 + y2) / 2;
-  trackEvent(EVENT_ACTION, "zoom", "fit", newZoom.value * 100);
+  trackEvent(EVENT_ACTION, "zoom", action, newZoom.value * 100);
   return {
     appState: {
       ...appState,
@@ -248,9 +249,7 @@ const zoomToFitElements = (
 
 export const actionZoomToFitSelected = register({
   name: "zoomToFitSelection",
-  perform: (elements, appState) => {
-    return zoomToFitElements(elements, appState, true);
-  },
+  perform: (elements, appState) => zoomToFitElements(elements, appState, true),
   keyTest: (event) =>
     event.code === CODES.TWO &&
     event.shiftKey &&
@@ -260,9 +259,7 @@ export const actionZoomToFitSelected = register({
 
 export const actionZoomToFit = register({
   name: "zoomToFit",
-  perform: (elements, appState) => {
-    return zoomToFitElements(elements, appState, false);
-  },
+  perform: (elements, appState) => zoomToFitElements(elements, appState, false),
   keyTest: (event) =>
     event.code === CODES.ONE &&
     event.shiftKey &&
