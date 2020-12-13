@@ -3,7 +3,11 @@ import { getSelectedElements } from "../scene";
 import { getElementMap, getNonDeletedElements } from "../element";
 import { mutateElement } from "../element/mutateElement";
 import { ExcalidrawElement, NonDeleted } from "../element/types";
-import { normalizeAngle, resizeSingleGenericElement, resizeSingleNonGenericElement } from "../element/resizeElements";
+import {
+  normalizeAngle,
+  resizeSingleGenericElement,
+  resizeSingleNonGenericElement,
+} from "../element/resizeElements";
 import { AppState } from "../types";
 import { getTransformHandles } from "../element/transformHandles";
 import { isGenericElement } from "../element/typeChecks";
@@ -35,7 +39,7 @@ export const actionFlipHorizontal = register({
   perform: (elements, appState) => {
     return {
       elements: flipSelectedElements(elements, appState, "horizontal"),
-      appState: appState,
+      appState,
       commitToHistory: true,
     };
   },
@@ -50,7 +54,7 @@ export const actionFlipVertical = register({
   perform: (elements, appState) => {
     return {
       elements: flipSelectedElements(elements, appState, "vertical"),
-      appState: appState,
+      appState,
       commitToHistory: true,
     };
   },
@@ -162,9 +166,9 @@ const flipElementHorizontally = (
     angle = normalizeAngle(angle + 2 * Math.PI);
   }
   mutateElement(element, {
-    width: width,
-    height: height,
-    angle: angle,
+    width,
+    height,
+    angle,
   });
 
   if (element.width < 0) {
@@ -189,7 +193,7 @@ const rotateElement = (element: ExcalidrawElement, rotationAngle: number) => {
     angle = normalizeAngle(2 * Math.PI + angle);
   }
   mutateElement(element, {
-    angle: angle,
+    angle,
   });
 
   // Move back to original spot
