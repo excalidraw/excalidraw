@@ -213,6 +213,7 @@
     "textNewLine": "הוסף שורה חדשה (טקסט)",
     "textFinish": "סיים עריכה (טקסט)",
     "zoomToFit": "זום להתאמת כל האלמנטים למסך",
+    "zoomToSelection": "",
     "preventBinding": ""
   },
   "encrypted": {
