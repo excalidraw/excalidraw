@@ -24,9 +24,10 @@ import { ExcalidrawElement } from "../element/types";
 import { SAVE_TO_LOCAL_STORAGE_TIMEOUT } from "./app_constants";
 import { EVENT_LOAD, EVENT_SHARE, trackEvent } from "../analytics";
 
-const excalidrawRef: React.MutableRefObject<
-  MarkRequired<ExcalidrawAPIRefValue, "ready" | "readyPromise">
-> = {
+const excalidrawRef: React.MutableRefObject<MarkRequired<
+  ExcalidrawAPIRefValue,
+  "ready" | "readyPromise"
+>> = {
   current: {
     readyPromise: resolvablePromise(),
     ready: false,
