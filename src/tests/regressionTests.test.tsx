@@ -665,6 +665,8 @@ describe("regression tests", () => {
       "pasteStyles",
       "delete",
       "addToLibrary",
+      "flipHorizontal",
+      "flipVertical",
       "sendBackward",
       "bringForward",
       "sendToBack",
@@ -673,7 +675,7 @@ describe("regression tests", () => {
     ];
 
     expect(contextMenu).not.toBeNull();
-    expect(contextMenu?.children.length).toBe(expectedShortcutNames.length + 2);
+    expect(contextMenu?.children.length).toBe(expectedShortcutNames.length);
     expectedShortcutNames.forEach((shortcutName) => {
       expect(
         contextMenu?.querySelector(`li[data-testid="${shortcutName}"]`),

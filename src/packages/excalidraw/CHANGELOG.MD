@@ -18,7 +18,7 @@ The change should be grouped under one of the below section and must contain PR 
 - Add Cut to menus [#2511](https://github.com/excalidraw/excalidraw/pull/2511)
 - More Arrowheads: dot, bar [#2486](https://github.com/excalidraw/excalidraw/pull/2486)
 - Support CSV graphs and improve the look and feel [#2495](https://github.com/excalidraw/excalidraw/pull/2495)
-- Flip single elements horizontally or vertically from the context menu [#2520](https://github.com/excalidraw/excalidraw/pull/2520)
+- Flip single elements horizontally or vertically [#2520](https://github.com/excalidraw/excalidraw/pull/2520)
 
 ### Fixes
 - Fix Library Menu Layout [#2502](https://github.com/excalidraw/excalidraw/pull/2502)

@@ -403,19 +403,10 @@ it("flips a rotated ellipse vertically correctly", () => {
 it("flips an unrotated arrow horizontally correctly", () => {
   createAndSelectOneArrow();
 
-  expect(API.getSelectedElements()[0].x).toEqual(0);
-
-  expect(API.getSelectedElements()[0].y).toEqual(0);
-
   const originalWidth = API.getSelectedElements()[0].width;
   const originalHeight = API.getSelectedElements()[0].height;
 
   h.app.actionManager.executeAction(actionFlipHorizontal);
-
-  // Check if x position did not change
-  expect(API.getSelectedElements()[0].x).toEqual(0);
-
-  expect(API.getSelectedElements()[0].y).toEqual(0);
 
   // Check if width and height did not change
   expect(API.getSelectedElements()[0].width).toEqual(originalWidth);
@@ -426,19 +417,10 @@ it("flips an unrotated arrow horizontally correctly", () => {
 it("flips an unrotated arrow vertically correctly", () => {
   createAndSelectOneArrow();
 
-  expect(API.getSelectedElements()[0].x).toEqual(0);
-
-  expect(API.getSelectedElements()[0].y).toEqual(0);
-
   const originalWidth = API.getSelectedElements()[0].width;
   const originalHeight = API.getSelectedElements()[0].height;
 
   h.app.actionManager.executeAction(actionFlipVertical);
-
-  // Check if x position did not change
-  expect(API.getSelectedElements()[0].x).toEqual(0);
-
-  expect(API.getSelectedElements()[0].y).toEqual(0);
 
   // Check if width and height did not change
   expect(API.getSelectedElements()[0].width).toEqual(originalWidth);
@@ -451,19 +433,10 @@ it("flips a rotated arrow horizontally correctly", () => {
   const expectedAngle = (7 * Math.PI) / 4;
   createAndSelectOneArrow(originalAngle);
 
-  expect(API.getSelectedElements()[0].x).toEqual(0);
-
-  expect(API.getSelectedElements()[0].y).toEqual(0);
-
   const originalWidth = API.getSelectedElements()[0].width;
   const originalHeight = API.getSelectedElements()[0].height;
 
   h.app.actionManager.executeAction(actionFlipHorizontal);
-
-  // Check if x position did not change
-  expect(API.getSelectedElements()[0].x).toEqual(0);
-
-  expect(API.getSelectedElements()[0].y).toEqual(0);
 
   // Check if width and height did not change
   expect(API.getSelectedElements()[0].width).toEqual(originalWidth);
@@ -479,19 +452,10 @@ it("flips a rotated arrow vertically correctly", () => {
   const expectedAngle = (3 * Math.PI) / 4;
   createAndSelectOneArrow(originalAngle);
 
-  expect(API.getSelectedElements()[0].x).toEqual(0);
-
-  expect(API.getSelectedElements()[0].y).toEqual(0);
-
   const originalWidth = API.getSelectedElements()[0].width;
   const originalHeight = API.getSelectedElements()[0].height;
 
   h.app.actionManager.executeAction(actionFlipVertical);
-
-  // Check if x position did not change
-  expect(API.getSelectedElements()[0].x).toEqual(0);
-
-  expect(API.getSelectedElements()[0].y).toEqual(0);
 
   // Check if width and height did not change
   expect(API.getSelectedElements()[0].width).toEqual(originalWidth);
@@ -507,19 +471,10 @@ it("flips a rotated arrow vertically correctly", () => {
 it("flips an unrotated line horizontally correctly", () => {
   createAndSelectOneLine();
 
-  expect(API.getSelectedElements()[0].x).toEqual(0);
-
-  expect(API.getSelectedElements()[0].y).toEqual(0);
-
   const originalWidth = API.getSelectedElements()[0].width;
   const originalHeight = API.getSelectedElements()[0].height;
 
   h.app.actionManager.executeAction(actionFlipHorizontal);
-
-  // Check if x position did not change
-  expect(API.getSelectedElements()[0].x).toEqual(0);
-
-  expect(API.getSelectedElements()[0].y).toEqual(0);
 
   // Check if width and height did not change
   expect(API.getSelectedElements()[0].width).toEqual(originalWidth);
@@ -530,19 +485,10 @@ it("flips an unrotated line horizontally correctly", () => {
 it("flips an unrotated line vertically correctly", () => {
   createAndSelectOneLine();
 
-  expect(API.getSelectedElements()[0].x).toEqual(0);
-
-  expect(API.getSelectedElements()[0].y).toEqual(0);
-
   const originalWidth = API.getSelectedElements()[0].width;
   const originalHeight = API.getSelectedElements()[0].height;
 
   h.app.actionManager.executeAction(actionFlipVertical);
-
-  // Check if x position did not change
-  expect(API.getSelectedElements()[0].x).toEqual(0);
-
-  expect(API.getSelectedElements()[0].y).toEqual(0);
 
   // Check if width and height did not change
   expect(API.getSelectedElements()[0].width).toEqual(originalWidth);
@@ -556,19 +502,10 @@ it("flips a rotated line horizontally correctly", () => {
 
   createAndSelectOneLine(originalAngle);
 
-  expect(API.getSelectedElements()[0].x).toEqual(0);
-
-  expect(API.getSelectedElements()[0].y).toEqual(0);
-
   const originalWidth = API.getSelectedElements()[0].width;
   const originalHeight = API.getSelectedElements()[0].height;
 
   h.app.actionManager.executeAction(actionFlipHorizontal);
-
-  // Check if x position did not change
-  expect(API.getSelectedElements()[0].x).toEqual(0);
-
-  expect(API.getSelectedElements()[0].y).toEqual(0);
 
   // Check if width and height did not change
   expect(API.getSelectedElements()[0].width).toEqual(originalWidth);
@@ -585,19 +522,10 @@ it("flips a rotated line vertically correctly", () => {
 
   createAndSelectOneLine(originalAngle);
 
-  expect(API.getSelectedElements()[0].x).toEqual(0);
-
-  expect(API.getSelectedElements()[0].y).toEqual(0);
-
   const originalWidth = API.getSelectedElements()[0].width;
   const originalHeight = API.getSelectedElements()[0].height;
 
   h.app.actionManager.executeAction(actionFlipVertical);
-
-  // Check if x position did not change
-  expect(API.getSelectedElements()[0].x).toEqual(0);
-
-  expect(API.getSelectedElements()[0].y).toEqual(0);
 
   // Check if width and height did not change
   expect(API.getSelectedElements()[0].width).toEqual(originalWidth);

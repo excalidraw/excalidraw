@@ -10,7 +10,7 @@ import {
 } from "../element/resizeElements";
 import { AppState } from "../types";
 import { getTransformHandles } from "../element/transformHandles";
-import { isGenericElement } from "../element/typeChecks";
+import { isGenericElement, isLinearElement } from "../element/typeChecks";
 
 const enableActionFlipHorizontal = (
   elements: readonly ExcalidrawElement[],
@@ -43,6 +43,7 @@ export const actionFlipHorizontal = register({
       commitToHistory: true,
     };
   },
+  keyTest: (event) => event.shiftKey && event.code === "KeyH",
   contextMenuOrder: 8,
   contextItemLabel: "labels.flipHorizontal",
   contextItemPredicate: (elements, appState) =>
@@ -58,6 +59,7 @@ export const actionFlipVertical = register({
       commitToHistory: true,
     };
   },
+  keyTest: (event) => event.shiftKey && event.code === "KeyV",
   contextMenuOrder: 8,
   contextItemLabel: "labels.flipVertical",
   contextItemPredicate: (elements, appState) =>
@@ -118,6 +120,7 @@ const flipElementHorizontally = (
   let usingNWHandle = true;
   let nHandle = transformHandles.nw;
   let sHandle = transformHandles.se;
+  let xHandleDistance = 0;
   let [newNCoordsX, newNCoordsY] = [0, 0];
   if (!nHandle || !sHandle) {
     // Check if we can use ne and sw handles
@@ -131,13 +134,14 @@ const flipElementHorizontally = (
       return;
     }
     [newNCoordsX, newNCoordsY] = [nHandle[0], nHandle[1]];
-    newNCoordsX =
-      nHandle[0] - 2 * (Math.abs(nHandle[0] - sHandle[0]) - nHandle[2]);
+    xHandleDistance = Math.abs(nHandle[0] - sHandle[0]);
+    newNCoordsX = nHandle[0] - 2 * xHandleDistance;
   } else {
     [newNCoordsX, newNCoordsY] = [nHandle[0], nHandle[1]];
-    newNCoordsX =
-      nHandle[0] + 2 * (Math.abs(nHandle[0] - sHandle[0]) - nHandle[2]);
+    xHandleDistance = Math.abs(nHandle[0] - sHandle[0]);
+    newNCoordsX = nHandle[0] + 2 * xHandleDistance;
   }
+
   if (isGenericElement(element)) {
     resizeSingleGenericElement(
       element,
@@ -178,10 +182,20 @@ const flipElementHorizontally = (
     mutateElement(element, { height: -height });
   }
   // Move back to original spot
-  mutateElement(element, {
-    x: originalX,
-    y: originalY,
-  });
+  if (isLinearElement(element) && element.type !== "draw") {
+    const newX = usingNWHandle
+      ? originalX - xHandleDistance
+      : originalX + xHandleDistance;
+    mutateElement(element, {
+      x: newX,
+      y: originalY,
+    });
+  } else {
+    mutateElement(element, {
+      x: originalX,
+      y: originalY,
+    });
+  }
 };
 
 const rotateElement = (element: ExcalidrawElement, rotationAngle: number) => {
