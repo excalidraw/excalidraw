@@ -213,6 +213,7 @@
     "textNewLine": "テキストの改行",
     "textFinish": "テキストの編集を終える",
     "zoomToFit": "すべての図形が収まるよう拡大/縮小",
+    "zoomToSelection": "",
     "preventBinding": "矢印を結合しない"
   },
   "encrypted": {
