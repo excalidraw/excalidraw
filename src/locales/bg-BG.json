@@ -213,6 +213,7 @@
     "textNewLine": "Добавяне на нов ред (текст)",
     "textFinish": "Завършете редактиране (текст)",
     "zoomToFit": "",
+    "zoomToSelection": "",
     "preventBinding": ""
   },
   "encrypted": {
