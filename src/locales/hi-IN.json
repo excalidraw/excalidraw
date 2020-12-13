@@ -213,6 +213,7 @@
     "textNewLine": "नई पंक्ति (पाठ) जोड़ें",
     "textFinish": "संपादन समाप्त करें (पाठ)",
     "zoomToFit": "सभी तत्वों को फिट करने के लिए ज़ूम करें",
+    "zoomToSelection": "",
     "preventBinding": ""
   },
   "encrypted": {
