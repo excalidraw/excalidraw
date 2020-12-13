@@ -6,8 +6,10 @@
   right: 12px;
   font-size: 12px;
   z-index: 999;
+
   h3 {
     margin: 0 24px 8px 0;
+    white-space: nowrap;
   }
 
   .close {
@@ -29,9 +31,21 @@
     }
     tr {
       td:nth-child(2) {
-        min-width: 48px;
+        min-width: 24px;
         text-align: right;
       }
+    }
+  }
+
+  :root[dir="rtl"] & {
+    left: 12px;
+    right: initial;
+
+    h3 {
+      margin: 0 0 8px 24px;
+    }
+    .close {
+      float: left;
     }
   }
 }

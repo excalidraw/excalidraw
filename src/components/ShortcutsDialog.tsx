@@ -245,6 +245,10 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
                 isOr={true}
               />
               <Shortcut
+                label={t("labels.cut")}
+                shortcuts={[getShortcutKey("CtrlOrCmd+X")]}
+              />
+              <Shortcut
                 label={t("labels.copy")}
                 shortcuts={[getShortcutKey("CtrlOrCmd+C")]}
               />
