@@ -213,7 +213,7 @@
     "textNewLine": "Add new line (text)",
     "textFinish": "Finish editing (text)",
     "zoomToFit": "Zoom to fit all elements",
-    "zoomToFitSelection": "Zoom to selection",
+    "zoomToFitSelection": "Zoom to fit selection",
     "preventBinding": "Prevent arrow binding"
   },
   "encrypted": {
