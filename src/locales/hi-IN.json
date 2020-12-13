@@ -4,7 +4,7 @@
     "selectAll": "सभी चुनें",
     "multiSelect": "आकार को चयन में जोड़ें",
     "moveCanvas": "कैनवास को स्थानांतरित करें",
-    "cut": "",
+    "cut": "काटें",
     "copy": "प्रतिलिपि",
     "copyAsPng": "क्लिपबोर्ड पर कॉपी करें ,पीएनजी के रूप में",
     "copyAsSvg": "क्लिपबोर्ड पर कॉपी करें,एसवीजी के रूप में",
@@ -31,7 +31,7 @@
     "round": "गोल",
     "arrowheads": "",
     "arrowhead_none": "",
-    "arrowhead_arrow": "",
+    "arrowhead_arrow": "तीर",
     "arrowhead_bar": "",
     "arrowhead_dot": "",
     "fontSize": "फ़ॉन्ट का आकार",
@@ -69,7 +69,7 @@
     "language": "भाषा",
     "createRoom": "अधिवेशन",
     "duplicateSelection": "डुप्लिकेट",
-    "untitled": "",
+    "untitled": "अशीर्षित",
     "name": "नाम",
     "yourName": "आपका नाम",
     "madeWithExcalidraw": "मेड विथ एक्सकैलिडराव",
@@ -220,15 +220,15 @@
     "tooltip": "आपके चित्र अंत-से-अंत एन्क्रिप्टेड हैं, इसलिए एक्सक्लूसिव्रॉव के सर्वर उन्हें कभी नहीं देखेंगे।"
   },
   "stats": {
-    "angle": "",
+    "angle": "कोण",
     "element": "",
     "elements": "",
-    "height": "",
-    "scene": "",
-    "selected": "",
-    "storage": "",
+    "height": "ऊंचाई",
+    "scene": "दृश्य",
+    "selected": "चयनित",
+    "storage": "संग्रह",
     "title": "",
-    "total": "",
-    "width": ""
+    "total": "कुल",
+    "width": "चौड़ाई"
   }
 }
