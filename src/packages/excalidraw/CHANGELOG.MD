@@ -25,7 +25,7 @@ The change should be grouped under one of the below section and must contain PR 
 ### Improvements
 - Expand canvas padding based on zoom. [#2515](https://github.com/excalidraw/excalidraw/pull/2515)
 - Hide shortcuts on pickers for mobile [#2508](https://github.com/excalidraw/excalidraw/pull/2508)
-- hide stats and scrollToContent-button when mobile menus open [#2509](https://github.com/excalidraw/excalidraw/pull/2509)
+- Hide stats and scrollToContent-button when mobile menus open [#2509](https://github.com/excalidraw/excalidraw/pull/2509)
 
 ### Chore
 - Bump ini from 1.3.5 to 1.3.7 in /src/packages/excalidraw [#2500](https://github.com/excalidraw/excalidraw/pull/2500)
