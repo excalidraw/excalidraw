@@ -351,6 +351,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const canvasWidth = canvasDOMWidth * canvasScale;
     const canvasHeight = canvasDOMHeight * canvasScale;
 
+    const DEFAULT_PASTE_X = canvasDOMWidth / 2;
+    const DEFAULT_PASTE_Y = canvasDOMHeight / 2;
+
     return (
       <div
         className="excalidraw"
@@ -371,7 +374,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           onCollabButtonClick={onCollabButtonClick}
           onLockToggle={this.toggleLock}
           onInsertShape={(elements) =>
-            this.addElementsFromPasteOrLibrary(elements)
+            this.addElementsFromPasteOrLibrary(
+              elements,
+              DEFAULT_PASTE_X,
+              DEFAULT_PASTE_Y,
+            )
           }
           zenModeEnabled={zenModeEnabled}
           toggleZenMode={this.toggleZenMode}
