@@ -26,7 +26,7 @@ const createAndSelectOneRectangle = (angle: number = 0) => {
     y: 0,
     width: 100,
     height: 50,
-    angle: angle,
+    angle,
   });
 };
 
@@ -36,7 +36,7 @@ const createAndSelectOneDiamond = (angle: number = 0) => {
     y: 0,
     width: 100,
     height: 50,
-    angle: angle,
+    angle,
   });
 };
 
@@ -46,7 +46,7 @@ const createAndSelectOneEllipse = (angle: number = 0) => {
     y: 0,
     width: 100,
     height: 50,
-    angle: angle,
+    angle,
   });
 };
 
@@ -56,7 +56,7 @@ const createAndSelectOneArrow = (angle: number = 0) => {
     y: 0,
     width: 100,
     height: 50,
-    angle: angle,
+    angle,
   });
 };
 
@@ -66,7 +66,7 @@ const createAndSelectOneLine = (angle: number = 0) => {
     y: 0,
     width: 100,
     height: 50,
-    angle: angle,
+    angle,
   });
 };
 
@@ -76,7 +76,7 @@ const createAndSelectOneDraw = (angle: number = 0) => {
     y: 0,
     width: 100,
     height: 50,
-    angle: angle,
+    angle,
   });
 };
 

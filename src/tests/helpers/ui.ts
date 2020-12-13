@@ -207,7 +207,7 @@ export class UI {
     mouse.reset();
     mouse.up(x + (width ?? height ?? size), y + (height ?? size));
     if (angle !== 0) {
-      mutateElement(h.elements[h.elements.length - 1], { angle: angle });
+      mutateElement(h.elements[h.elements.length - 1], { angle });
     }
     return h.elements[h.elements.length - 1] as any;
   }
