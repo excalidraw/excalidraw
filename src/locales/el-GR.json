@@ -213,6 +213,7 @@
     "textNewLine": "Προσθήκη νέας γραμμής (κείμενο)",
     "textFinish": "Ολοκλήρωση επεξεργασίας (κείμενο)",
     "zoomToFit": "Zoom ώστε να χωρέσουν όλα τα στοιχεία",
+    "zoomToSelection": "",
     "preventBinding": "Αποτροπή δέσμευσης βέλων"
   },
   "encrypted": {
