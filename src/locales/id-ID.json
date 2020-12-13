@@ -213,6 +213,7 @@
     "textNewLine": "Tambahkan baris baru (teks)",
     "textFinish": "Selesai mengedit (teks)",
     "zoomToFit": "Perbesar agar sesuai dengan semua elemen",
+    "zoomToSelection": "",
     "preventBinding": "Cegah pengikatan panah"
   },
   "encrypted": {
