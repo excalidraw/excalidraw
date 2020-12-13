@@ -23,6 +23,7 @@ The change should be grouped under one of the below section and must contain PR 
 - Fix Library Menu Layout [#2502](https://github.com/excalidraw/excalidraw/pull/2502)
 
 ### Improvements
+- RTL support for the stats dialog [#2530](https://github.com/excalidraw/excalidraw/pull/2530)
 - Expand canvas padding based on zoom. [#2515](https://github.com/excalidraw/excalidraw/pull/2515)
 - Hide shortcuts on pickers for mobile [#2508](https://github.com/excalidraw/excalidraw/pull/2508)
 - Hide stats and scrollToContent-button when mobile menus open [#2509](https://github.com/excalidraw/excalidraw/pull/2509)
