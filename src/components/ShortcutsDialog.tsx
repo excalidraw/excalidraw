@@ -207,6 +207,10 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
                 shortcuts={["Shift+1"]}
               />
               <Shortcut
+                label={t("shortcutsDialog.zoomToFitSelection")}
+                shortcuts={["Shift+2"]}
+              />
+              <Shortcut
                 label={t("buttons.toggleFullScreen")}
                 shortcuts={["F"]}
               />
