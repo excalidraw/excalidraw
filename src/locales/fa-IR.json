@@ -213,6 +213,7 @@
     "textNewLine": "یک خط جدید اضافه کنید (متن)",
     "textFinish": "پایان ویرایش (متن)",
     "zoomToFit": "بزرگنمایی برای دیدن تمام آیتم ها",
+    "zoomToSelection": "",
     "preventBinding": "مانع شدن از چسبیدن فلش ها"
   },
   "encrypted": {
