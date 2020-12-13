@@ -213,6 +213,7 @@
     "textNewLine": "Legg til ny linje (tekst)",
     "textFinish": "Fullfør redigering (tekst)",
     "zoomToFit": "Zoom for å sjå alle elementa",
+    "zoomToSelection": "",
     "preventBinding": "Hindre pilkobling"
   },
   "encrypted": {
