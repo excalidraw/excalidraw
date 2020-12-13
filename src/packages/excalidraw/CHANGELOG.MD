@@ -8,7 +8,7 @@ The change should be grouped under one of the below section and must contain PR 
 - Improvements: For any improvements.
 - Refactor: For any refactoring.
 
-Please add the latest features to the top!
+Please add the latest change on the top under the correct section.
 -->
 
 ## [Unreleased]
