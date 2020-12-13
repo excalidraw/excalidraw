@@ -12,6 +12,8 @@ The change should be grouped under one of the below section and must contain PR 
 ## [Unreleased]
 
 ### Features
+- Insert Library items in the middle of the screen [#2527](https://github.com/excalidraw/excalidraw/pull/2527)
+- Show shortcut context menu [#2501](https://github.com/excalidraw/excalidraw/pull/2501)
 - Aligns arrowhead schemas [#2517](https://github.com/excalidraw/excalidraw/pull/2517)
 - Add Cut to menus [#2511)](https://github.com/excalidraw/excalidraw/pull/2498)
 - More Arrowheads: dot, bar [#2486](https://github.com/excalidraw/excalidraw/pull/2486)
