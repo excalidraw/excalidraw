@@ -213,6 +213,7 @@
     "textNewLine": "Vložiť nový riadok (text)",
     "textFinish": "Ukončenie editovania (text)",
     "zoomToFit": "Priblížiť aby boli zahrnuté všetky prvky",
+    "zoomToSelection": "",
     "preventBinding": "Zakázať pripájanie šípky"
   },
   "encrypted": {
