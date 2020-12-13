@@ -7,11 +7,14 @@ The change should be grouped under one of the below section and must contain PR 
 - Chore: Changes for non src files example package.json.
 - Improvements: For any improvements.
 - Refactor: For any refactoring.
+
+Please add the latest change on the top under the correct section.
 -->
 
 ## [Unreleased]
 
 ### Features
+- Add zoom to selection [#2522](https://github.com/excalidraw/excalidraw/pull/2522)
 - Insert Library items in the middle of the screen [#2527](https://github.com/excalidraw/excalidraw/pull/2527)
 - Show shortcut context menu [#2501](https://github.com/excalidraw/excalidraw/pull/2501)
 - Aligns arrowhead schemas [#2517](https://github.com/excalidraw/excalidraw/pull/2517)

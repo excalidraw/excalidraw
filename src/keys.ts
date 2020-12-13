@@ -9,6 +9,7 @@ export const CODES = {
   BRACKET_RIGHT: "BracketRight",
   BRACKET_LEFT: "BracketLeft",
   ONE: "Digit1",
+  TWO: "Digit2",
   NINE: "Digit9",
   QUOTE: "Quote",
   ZERO: "Digit0",
