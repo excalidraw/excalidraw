@@ -213,6 +213,7 @@
     "textNewLine": "Yeni satır ekle (yazı)",
     "textFinish": "(Yazıyı) düzenlemeyi bitir",
     "zoomToFit": "Tüm öğeleri sığdırmak için yakınlaştır",
+    "zoomToSelection": "",
     "preventBinding": "Ok bağlamayı önleyin"
   },
   "encrypted": {
