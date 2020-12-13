@@ -213,6 +213,7 @@
     "textNewLine": "Neue Zeile hinzufügen (Text)",
     "textFinish": "Bearbeiten beenden (Text)",
     "zoomToFit": "Zoomen um alle Elemente einzupassen",
+    "zoomToSelection": "",
     "preventBinding": "Pfeil-Bindung verhindern"
   },
   "encrypted": {
