@@ -213,6 +213,7 @@
     "textNewLine": "Añadir nueva línea (texto)",
     "textFinish": "Finalizar edición (texto)",
     "zoomToFit": "Ajustar para mostrar todos los elementos",
+    "zoomToSelection": "",
     "preventBinding": "Evitar enlace de flecha"
   },
   "encrypted": {
