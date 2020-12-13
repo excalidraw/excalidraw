@@ -207,7 +207,7 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
                 shortcuts={["Shift+1"]}
               />
               <Shortcut
-                label={t("shortcutsDialog.zoomToFitSelection")}
+                label={t("shortcutsDialog.zoomToSelection")}
                 shortcuts={["Shift+2"]}
               />
               <Shortcut
