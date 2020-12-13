@@ -213,6 +213,7 @@
     "textNewLine": "",
     "textFinish": "",
     "zoomToFit": "",
+    "zoomToSelection": "",
     "preventBinding": ""
   },
   "encrypted": {
