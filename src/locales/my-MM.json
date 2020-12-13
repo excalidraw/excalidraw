@@ -213,6 +213,7 @@
     "textNewLine": "စာသားဖြည့်သွင်း",
     "textFinish": "စာသားဖြည့်သွင်းပြီး",
     "zoomToFit": "ကားချပ်အပြည့်ဖေါ်",
+    "zoomToSelection": "",
     "preventBinding": "မြှားများမပေါင်းစေရန်"
   },
   "encrypted": {
