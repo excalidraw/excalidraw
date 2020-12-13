@@ -111,6 +111,7 @@ class Portal {
       type: sceneType,
       payload: {
         elements: syncableElements,
+        appState: this.app.excalidrawAppState!,
       },
     };
 

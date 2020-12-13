@@ -256,7 +256,7 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
   ) => {
     saveDebounced(elements, appState);
     if (collab.isCollaborating) {
-      collab.broadcastElements(elements, appState);
+      collab.broadcastScene(elements, appState);
     }
   };
 

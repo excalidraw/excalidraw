@@ -52,7 +52,7 @@ export interface CollabAPI {
   onPointerUpdate: CollabInstance["onPointerUpdate"];
   initializeSocketClient: CollabInstance["initializeSocketClient"];
   onCollabButtonClick: CollabInstance["onCollabButtonClick"];
-  broadcastElements: CollabInstance["broadcastElements"];
+  broadcastScene: CollabInstance["broadcastScene"];
 }
 
 type ReconciledElements = readonly ExcalidrawElement[] & {
@@ -239,11 +239,9 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
               return;
             case SCENE.INIT: {
               if (!this.portal.socketInitialized) {
-                const remoteElements = decryptedData.payload.elements;
-                const reconciledElements = this.reconcileElements(
-                  remoteElements,
-                );
-                this.handleRemoteSceneUpdate(reconciledElements, {
+                const { elements, appState } = decryptedData.payload;
+                const reconciledElements = this.reconcileElements(elements);
+                this.handleRemoteSceneUpdate(reconciledElements, appState, {
                   init: true,
                 });
                 this.initializeSocket();
@@ -254,6 +252,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
             case SCENE.UPDATE:
               this.handleRemoteSceneUpdate(
                 this.reconcileElements(decryptedData.payload.elements),
+                decryptedData.payload.appState,
               );
               break;
             case "MOUSE_LOCATION": {
@@ -323,6 +322,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
   private handleRemoteSceneUpdate = (
     elements: ReconciledElements,
+    appState: AppState,
     {
       init = false,
       initFromSnapshot = false,
@@ -334,6 +334,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
     this.excalidrawRef.current!.updateScene({
       elements,
+      appState,
       commitToHistory: !!init,
     });
 
@@ -383,22 +384,28 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       this.portal.broadcastMouseLocation(payload);
   };
 
-  broadcastElements = (
+  broadcastScene = (
     elements: readonly ExcalidrawElement[],
     state: AppState,
   ) => {
+    const didBackgroundUpdate =
+      this.excalidrawAppState?.viewBackgroundColor !==
+      state.viewBackgroundColor;
     this.excalidrawAppState = state;
     if (
       getSceneVersion(elements) >
-      this.getLastBroadcastedOrReceivedSceneVersion()
+        this.getLastBroadcastedOrReceivedSceneVersion() ||
+      didBackgroundUpdate
     ) {
       this.portal.broadcastScene(
         SCENE.UPDATE,
         getSyncableElements(elements),
         false,
       );
-      this.lastBroadcastedOrReceivedSceneVersion = getSceneVersion(elements);
-      this.queueBroadcastAllElements();
+      if (!didBackgroundUpdate) {
+        this.lastBroadcastedOrReceivedSceneVersion = getSceneVersion(elements);
+        this.queueBroadcastAllElements();
+      }
     }
   };
 
@@ -466,7 +473,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
           onPointerUpdate: this.onPointerUpdate,
           initializeSocketClient: this.initializeSocketClient,
           onCollabButtonClick: this.onCollabButtonClick,
-          broadcastElements: this.broadcastElements,
+          broadcastScene: this.broadcastScene,
         })}
       </>
     );
