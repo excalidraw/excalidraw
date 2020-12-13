@@ -21,9 +21,7 @@ export type ShortcutName =
   | "ungroup"
   | "toggleGridMode"
   | "toggleStats"
-  | "addToLibrary"
-  | "flipHorizontal"
-  | "flipVertical";
+  | "addToLibrary";
 
 const shortcutMap: Record<ShortcutName, string[]> = {
   cut: [getShortcutKey("CtrlOrCmd+X")],
