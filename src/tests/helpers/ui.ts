@@ -6,6 +6,7 @@ import {
 import { CODES } from "../../keys";
 import { ToolName } from "../queries/toolQueries";
 import { fireEvent, GlobalTestState } from "../test-utils";
+import { mutateElement } from "../../element/mutateElement";
 import { API } from "./api";
 
 const { h } = window;
@@ -186,12 +187,14 @@ export class UI {
       size = 10,
       width = size,
       height = width,
+      angle = 0,
     }: {
       x?: number;
       y?: number;
       size?: number;
       width?: number;
       height?: number;
+      angle?: number;
     } = {},
   ): T extends "arrow" | "line" | "draw"
     ? ExcalidrawLinearElement
@@ -203,6 +206,9 @@ export class UI {
     mouse.down(x, y);
     mouse.reset();
     mouse.up(x + (width ?? height ?? size), y + (height ?? size));
+    if (angle !== 0) {
+      mutateElement(h.elements[h.elements.length - 1], { angle: angle });
+    }
     return h.elements[h.elements.length - 1] as any;
   }
 
