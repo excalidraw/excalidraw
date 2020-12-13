@@ -247,8 +247,8 @@ const zoomToFitElements = (
   };
 };
 
-export const actionZoomToFitSelected = register({
-  name: "zoomToFitSelection",
+export const actionZoomToSelected = register({
+  name: "zoomToSelection",
   perform: (elements, appState) => zoomToFitElements(elements, appState, true),
   keyTest: (event) =>
     event.code === CODES.TWO &&
