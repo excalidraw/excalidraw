@@ -11,6 +11,7 @@ import { getShortcutKey } from "../utils";
 import useIsMobile from "../is-mobile";
 import { register } from "./register";
 import { newElementWith } from "../element/mutateElement";
+import { ExcalidrawElement } from "../element/types";
 import { AppState, NormalizedZoomValue } from "../types";
 import { getCommonBounds } from "../element";
 import { getNewZoom } from "../scene/zoom";
@@ -205,42 +206,62 @@ const zoomValueToFitBoundsOnViewport = (
   return clampedZoomValueToFitElements as NormalizedZoomValue;
 };
 
+const zoomToFitElements = (
+  elements: readonly ExcalidrawElement[],
+  appState: Readonly<AppState>,
+  zoomToSelection: boolean,
+) => {
+  const nonDeletedElements = getNonDeletedElements(elements);
+  const selectedElements = getSelectedElements(nonDeletedElements, appState);
+
+  const commonBounds =
+    zoomToSelection && selectedElements.length > 0
+      ? getCommonBounds(selectedElements)
+      : getCommonBounds(nonDeletedElements);
+
+  const zoomValue = zoomValueToFitBoundsOnViewport(commonBounds, {
+    width: appState.width,
+    height: appState.height,
+  });
+  const newZoom = getNewZoom(zoomValue, appState.zoom);
+
+  const [x1, y1, x2, y2] = commonBounds;
+  const centerX = (x1 + x2) / 2;
+  const centerY = (y1 + y2) / 2;
+  trackEvent(EVENT_ACTION, "zoom", "fit", newZoom.value * 100);
+  return {
+    appState: {
+      ...appState,
+      ...centerScrollOn({
+        scenePoint: { x: centerX, y: centerY },
+        viewportDimensions: {
+          width: appState.width,
+          height: appState.height,
+        },
+        zoom: newZoom,
+      }),
+      zoom: newZoom,
+    },
+    commitToHistory: false,
+  };
+};
+
+export const actionZoomToFitSelected = register({
+  name: "zoomToFitSelection",
+  perform: (elements, appState) => {
+    return zoomToFitElements(elements, appState, true);
+  },
+  keyTest: (event) =>
+    event.code === CODES.TWO &&
+    event.shiftKey &&
+    !event.altKey &&
+    !event[KEYS.CTRL_OR_CMD],
+});
+
 export const actionZoomToFit = register({
   name: "zoomToFit",
   perform: (elements, appState) => {
-    const nonDeletedElements = getNonDeletedElements(elements);
-    const selectedElements = getSelectedElements(nonDeletedElements, appState);
-
-    const commonBounds =
-      selectedElements.length > 0
-        ? getCommonBounds(selectedElements)
-        : getCommonBounds(nonDeletedElements);
-
-    const zoomValue = zoomValueToFitBoundsOnViewport(commonBounds, {
-      width: appState.width,
-      height: appState.height,
-    });
-    const newZoom = getNewZoom(zoomValue, appState.zoom);
-
-    const [x1, y1, x2, y2] = commonBounds;
-    const centerX = (x1 + x2) / 2;
-    const centerY = (y1 + y2) / 2;
-    trackEvent(EVENT_ACTION, "zoom", "fit", newZoom.value * 100);
-    return {
-      appState: {
-        ...appState,
-        ...centerScrollOn({
-          scenePoint: { x: centerX, y: centerY },
-          viewportDimensions: {
-            width: appState.width,
-            height: appState.height,
-          },
-          zoom: newZoom,
-        }),
-        zoom: newZoom,
-      },
-      commitToHistory: false,
-    };
+    return zoomToFitElements(elements, appState, false);
   },
   keyTest: (event) =>
     event.code === CODES.ONE &&
