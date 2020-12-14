@@ -16,7 +16,7 @@ type ExportOpts = {
   ) => { width: number; height: number; scale: number };
 };
 
-const exportToCanvas = ({
+export const exportToCanvas = ({
   elements,
   appState = getDefaultAppState(),
   getDimensions = (width, height) => ({ width, height, scale: 1 }),
