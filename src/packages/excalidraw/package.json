@@ -49,7 +49,7 @@
     "@babel/preset-env": "7.9.5",
     "@babel/preset-react": "7.9.4",
     "@babel/preset-typescript": "7.9.0",
-    "babel-loader": "8.1.0",
+    "babel-loader": "8.2.2",
     "babel-plugin-transform-class-properties": "6.24.1",
     "cross-env": "7.0.2",
     "css-loader": "3.5.2",
