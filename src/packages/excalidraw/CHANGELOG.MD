@@ -31,6 +31,7 @@ Please add the latest change on the top under the correct section.
 
 ### Improvements
 
+- Add tooltip with icon for embedding scenes [#2532](https://github.com/excalidraw/excalidraw/pull/2532)
 - RTL support for the stats dialog [#2530](https://github.com/excalidraw/excalidraw/pull/2530)
 - Expand canvas padding based on zoom. [#2515](https://github.com/excalidraw/excalidraw/pull/2515)
 - Hide shortcuts on pickers for mobile [#2508](https://github.com/excalidraw/excalidraw/pull/2508)
