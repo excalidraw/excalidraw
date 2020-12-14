@@ -4,7 +4,7 @@
     "selectAll": "Seleziona tutto",
     "multiSelect": "Aggiungi elemento alla selezione",
     "moveCanvas": "Sposta tela",
-    "cut": "",
+    "cut": "Taglia",
     "copy": "Copia",
     "copyAsPng": "Copia negli appunti come PNG",
     "copyAsSvg": "Copia negli appunti come SVG",
@@ -213,7 +213,7 @@
     "textNewLine": "Aggiungi nuova riga (testo)",
     "textFinish": "Completa la modifica (testo)",
     "zoomToFit": "Adatta zoom per mostrare tutti gli elementi",
-    "zoomToSelection": "",
+    "zoomToSelection": "Zoom alla selezione",
     "preventBinding": "Prevenire l'associazione freccia"
   },
   "encrypted": {
