@@ -1,6 +1,6 @@
 import React from "react";
 import { render, waitFor } from "./test-utils";
-import App from "../components/App";
+import ExcalidrawApp from "../excalidraw-app";
 import { API } from "./helpers/api";
 import { getDefaultAppState } from "../appState";
 
@@ -10,18 +10,15 @@ describe("appState", () => {
   it("drag&drop file doesn't reset non-persisted appState", async () => {
     const defaultAppState = getDefaultAppState();
     const exportBackground = !defaultAppState.exportBackground;
-    render(
-      <App
-        initialData={{
-          appState: {
-            ...defaultAppState,
-            exportBackground,
-            viewBackgroundColor: "#F00",
-          },
-          elements: [],
-        }}
-      />,
-    );
+
+    await render(<ExcalidrawApp />, {
+      localStorageData: {
+        appState: {
+          exportBackground,
+          viewBackgroundColor: "#F00",
+        },
+      },
+    });
 
     await waitFor(() => {
       expect(h.state.exportBackground).toBe(exportBackground);

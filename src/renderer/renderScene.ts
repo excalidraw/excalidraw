@@ -371,6 +371,7 @@ export const renderScene = (
       const transformHandles = getTransformHandles(
         locallySelectedElements[0],
         sceneState.zoom,
+        "mouse", // when we render we don't know which pointer type so use mouse
       );
       renderTransformHandles(
         context,
@@ -402,7 +403,7 @@ export const renderScene = (
         [x1, y1, x2, y2],
         0,
         sceneState.zoom,
-        undefined,
+        "mouse",
         OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
       );
       renderTransformHandles(context, sceneState, transformHandles, 0);
@@ -762,13 +763,20 @@ const isVisibleElement = (
 ) => {
   const [x1, y1, x2, y2] = getElementBounds(element); // scene coordinates
   const topLeftSceneCoords = viewportCoordsToSceneCoords(
-    { clientX: 0, clientY: 0 },
+    {
+      clientX: viewTransformations.offsetLeft,
+      clientY: viewTransformations.offsetTop,
+    },
     viewTransformations,
   );
   const bottomRightSceneCoords = viewportCoordsToSceneCoords(
-    { clientX: canvasWidth, clientY: canvasHeight },
+    {
+      clientX: viewTransformations.offsetLeft + canvasWidth,
+      clientY: viewTransformations.offsetTop + canvasHeight,
+    },
     viewTransformations,
   );
+
   return (
     topLeftSceneCoords.x <= x2 &&
     topLeftSceneCoords.y <= y2 &&

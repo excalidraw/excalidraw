@@ -1,28 +1,26 @@
+import { EVENT_MAGIC, trackEvent } from "./analytics";
+import colors from "./colors";
+import { DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE } from "./constants";
+import { newElement, newTextElement, newLinearElement } from "./element";
 import { ExcalidrawElement } from "./element/types";
-import { newElement, newTextElement } from "./element";
-import { AppState } from "./types";
-import { t } from "./i18n";
-import { DEFAULT_VERTICAL_ALIGN } from "./constants";
+import { randomId } from "./random";
+
+const BAR_WIDTH = 32;
+const BAR_GAP = 12;
+const BAR_HEIGHT = 256;
 
 export interface Spreadsheet {
-  yAxisLabel: string | null;
+  title: string | null;
   labels: string[] | null;
   values: number[];
 }
 
 export const NOT_SPREADSHEET = "NOT_SPREADSHEET";
-export const MALFORMED_SPREADSHEET = "MALFORMED_SPREADSHEET";
 export const VALID_SPREADSHEET = "VALID_SPREADSHEET";
 
 type ParseSpreadsheetResult =
-  | {
-      type: typeof NOT_SPREADSHEET;
-    }
-  | { type: typeof VALID_SPREADSHEET; spreadsheet: Spreadsheet }
-  | {
-      type: typeof MALFORMED_SPREADSHEET;
-      error: string;
-    };
+  | { type: typeof NOT_SPREADSHEET }
+  | { type: typeof VALID_SPREADSHEET; spreadsheet: Spreadsheet };
 
 const tryParseNumber = (s: string): number | null => {
   const match = /^[$€£¥₩]?([0-9]+(\.[0-9]+)?)$/.exec(s);
@@ -32,17 +30,14 @@ const tryParseNumber = (s: string): number | null => {
   return parseFloat(match[1]);
 };
 
-const isNumericColumn = (lines: string[][], columnIndex: number) => {
-  return lines
-    .slice(1)
-    .every((line) => tryParseNumber(line[columnIndex]) !== null);
-};
+const isNumericColumn = (lines: string[][], columnIndex: number) =>
+  lines.slice(1).every((line) => tryParseNumber(line[columnIndex]) !== null);
 
 const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
   const numCols = cells[0].length;
 
   if (numCols > 2) {
-    return { type: MALFORMED_SPREADSHEET, error: t("charts.tooManyColumns") };
+    return { type: NOT_SPREADSHEET };
   }
 
   if (numCols === 1) {
@@ -62,7 +57,7 @@ const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
     return {
       type: VALID_SPREADSHEET,
       spreadsheet: {
-        yAxisLabel: hasHeader ? cells[0][0] : null,
+        title: hasHeader ? cells[0][0] : null,
         labels: null,
         values: values as number[],
       },
@@ -72,10 +67,7 @@ const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
   const valueColumnIndex = isNumericColumn(cells, 0) ? 0 : 1;
 
   if (!isNumericColumn(cells, valueColumnIndex)) {
-    return {
-      type: MALFORMED_SPREADSHEET,
-      error: t("charts.noNumericColumn"),
-    };
+    return { type: NOT_SPREADSHEET };
   }
 
   const labelColumnIndex = (valueColumnIndex + 1) % 2;
@@ -89,7 +81,7 @@ const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
   return {
     type: VALID_SPREADSHEET,
     spreadsheet: {
-      yAxisLabel: hasHeader ? cells[0][valueColumnIndex] : null,
+      title: hasHeader ? cells[0][valueColumnIndex] : null,
       labels: rows.map((row) => row[labelColumnIndex]),
       values: rows.map((row) => tryParseNumber(row[valueColumnIndex])!),
     },
@@ -105,28 +97,35 @@ const transposeCells = (cells: string[][]) => {
     }
     nextCells.push(nextCellRow);
   }
-
   return nextCells;
 };
 
 export const tryParseSpreadsheet = (text: string): ParseSpreadsheetResult => {
-  // copy/paste from excel, in-browser excel, and google sheets is tsv
-  // for now we only accept 2 columns with an optional header
-  const lines = text
+  // Copy/paste from excel, spreadhseets, tsv, csv.
+  // For now we only accept 2 columns with an optional header
+
+  // Check for tab separeted values
+  let lines = text
     .trim()
     .split("\n")
     .map((line) => line.trim().split("\t"));
+
+  // Check for comma separeted files
+  if (lines.length && lines[0].length !== 2) {
+    lines = text
+      .trim()
+      .split("\n")
+      .map((line) => line.trim().split(","));
+  }
 
   if (lines.length === 0) {
     return { type: NOT_SPREADSHEET };
   }
 
   const numColsFirstLine = lines[0].length;
-  const isASpreadsheet = lines.every(
-    (line) => line.length === numColsFirstLine,
-  );
+  const isSpreadsheet = lines.every((line) => line.length === numColsFirstLine);
 
-  if (!isASpreadsheet) {
+  if (!isSpreadsheet) {
     return { type: NOT_SPREADSHEET };
   }
 
@@ -141,131 +140,143 @@ export const tryParseSpreadsheet = (text: string): ParseSpreadsheetResult => {
   return result;
 };
 
-const BAR_WIDTH = 32;
-const BAR_SPACING = 12;
-const BAR_HEIGHT = 192;
-const LABEL_SPACING = 3 * BAR_SPACING;
-const Y_AXIS_LABEL_SPACING = LABEL_SPACING;
-const ANGLE = 5.87;
-
+// For the maths behind it https://excalidraw.com/#json=6320864370884608,O_5xfD-Agh32tytHpRJx1g
 export const renderSpreadsheet = (
-  appState: AppState,
   spreadsheet: Spreadsheet,
   x: number,
   y: number,
 ): ExcalidrawElement[] => {
-  const max = Math.max(...spreadsheet.values);
-  const min = Math.min(0, ...spreadsheet.values);
-  const range = max - min;
+  const values = spreadsheet.values;
+  const max = Math.max(...values);
+  const chartHeight = BAR_HEIGHT + BAR_GAP * 2;
+  const chartWidth = (BAR_WIDTH + BAR_GAP) * values.length + BAR_GAP;
+  const maxColors = colors.elementBackground.length;
+  const bgColors = colors.elementBackground.slice(2, maxColors);
+
+  // Put all the common properties here so when the whole chart is selected
+  // the properties dialog shows the correct selected values
+  const commonProps = {
+    backgroundColor: bgColors[Math.floor(Math.random() * bgColors.length)],
+    fillStyle: "hachure",
+    fontFamily: DEFAULT_FONT_FAMILY,
+    fontSize: DEFAULT_FONT_SIZE,
+    groupIds: [randomId()],
+    opacity: 100,
+    roughness: 1,
+    strokeColor: colors.elementStroke[0],
+    strokeSharpness: "sharp",
+    strokeStyle: "solid",
+    strokeWidth: 1,
+    verticalAlign: "middle",
+  } as const;
 
   const minYLabel = newTextElement({
-    x,
-    y: y + BAR_HEIGHT,
-    strokeColor: appState.currentItemStrokeColor,
-    backgroundColor: appState.currentItemBackgroundColor,
-    fillStyle: appState.currentItemFillStyle,
-    strokeWidth: appState.currentItemStrokeWidth,
-    strokeStyle: appState.currentItemStrokeStyle,
-    roughness: appState.currentItemRoughness,
-    opacity: appState.currentItemOpacity,
-    strokeSharpness: appState.currentItemStrokeSharpness,
-    text: min.toLocaleString(),
-    fontSize: 16,
-    fontFamily: appState.currentItemFontFamily,
-    textAlign: appState.currentItemTextAlign,
-    verticalAlign: DEFAULT_VERTICAL_ALIGN,
+    ...commonProps,
+    x: x - BAR_GAP,
+    y: y - BAR_GAP,
+    text: "0",
+    textAlign: "right",
   });
 
   const maxYLabel = newTextElement({
-    x,
-    y,
-    strokeColor: appState.currentItemStrokeColor,
-    backgroundColor: appState.currentItemBackgroundColor,
-    fillStyle: appState.currentItemFillStyle,
-    strokeWidth: appState.currentItemStrokeWidth,
-    strokeStyle: appState.currentItemStrokeStyle,
-    roughness: appState.currentItemRoughness,
-    opacity: appState.currentItemOpacity,
-    strokeSharpness: appState.currentItemStrokeSharpness,
+    ...commonProps,
+    x: x - BAR_GAP,
+    y: y - BAR_HEIGHT - minYLabel.height / 2,
     text: max.toLocaleString(),
-    fontSize: 16,
-    fontFamily: appState.currentItemFontFamily,
-    textAlign: appState.currentItemTextAlign,
-    verticalAlign: DEFAULT_VERTICAL_ALIGN,
+    textAlign: "right",
   });
 
-  const bars = spreadsheet.values.map((value, index) => {
-    const valueBarHeight = value - min;
-    const percentBarHeight = valueBarHeight / range;
-    const barHeight = percentBarHeight * BAR_HEIGHT;
-    const barX = index * (BAR_WIDTH + BAR_SPACING) + LABEL_SPACING;
-    const barY = BAR_HEIGHT - barHeight;
+  const xAxisLine = newLinearElement({
+    type: "line",
+    x,
+    y,
+    startArrowhead: null,
+    endArrowhead: null,
+    width: chartWidth,
+    points: [
+      [0, 0],
+      [chartWidth, 0],
+    ],
+    ...commonProps,
+  });
+
+  const yAxisLine = newLinearElement({
+    type: "line",
+    x,
+    y,
+    startArrowhead: null,
+    endArrowhead: null,
+    height: chartHeight,
+    points: [
+      [0, 0],
+      [0, -chartHeight],
+    ],
+    ...commonProps,
+  });
+
+  const maxValueLine = newLinearElement({
+    type: "line",
+    x,
+    y: y - BAR_HEIGHT - BAR_GAP,
+    startArrowhead: null,
+    endArrowhead: null,
+    ...commonProps,
+    strokeStyle: "dotted",
+    width: chartWidth,
+    points: [
+      [0, 0],
+      [chartWidth, 0],
+    ],
+  });
+
+  const bars = values.map((value, index) => {
+    const barHeight = (value / max) * BAR_HEIGHT;
     return newElement({
+      ...commonProps,
       type: "rectangle",
-      x: barX + x,
-      y: barY + y,
+      x: x + index * (BAR_WIDTH + BAR_GAP) + BAR_GAP,
+      y: y - barHeight - BAR_GAP,
       width: BAR_WIDTH,
       height: barHeight,
-      strokeColor: appState.currentItemStrokeColor,
-      backgroundColor: appState.currentItemBackgroundColor,
-      fillStyle: appState.currentItemFillStyle,
-      strokeWidth: appState.currentItemStrokeWidth,
-      strokeStyle: appState.currentItemStrokeStyle,
-      roughness: appState.currentItemRoughness,
-      opacity: appState.currentItemOpacity,
-      strokeSharpness: appState.currentItemStrokeSharpness,
     });
   });
 
   const xLabels =
     spreadsheet.labels?.map((label, index) => {
-      const labelX =
-        index * (BAR_WIDTH + BAR_SPACING) + LABEL_SPACING + BAR_SPACING;
-      const labelY = BAR_HEIGHT + BAR_SPACING;
       return newTextElement({
+        ...commonProps,
         text: label.length > 8 ? `${label.slice(0, 5)}...` : label,
-        x: x + labelX,
-        y: y + labelY,
-        strokeColor: appState.currentItemStrokeColor,
-        backgroundColor: appState.currentItemBackgroundColor,
-        fillStyle: appState.currentItemFillStyle,
-        strokeWidth: appState.currentItemStrokeWidth,
-        strokeStyle: appState.currentItemStrokeStyle,
-        roughness: appState.currentItemRoughness,
-        opacity: appState.currentItemOpacity,
-        strokeSharpness: appState.currentItemStrokeSharpness,
-        fontSize: 16,
-        fontFamily: appState.currentItemFontFamily,
-        textAlign: "center",
-        verticalAlign: DEFAULT_VERTICAL_ALIGN,
+        x: x + index * (BAR_WIDTH + BAR_GAP) + BAR_GAP * 2,
+        y: y + BAR_GAP / 2,
         width: BAR_WIDTH,
-        angle: ANGLE,
+        angle: 5.87,
+        fontSize: 16,
+        textAlign: "center",
+        verticalAlign: "top",
       });
     }) || [];
 
-  const yAxisLabel = spreadsheet.yAxisLabel
+  const title = spreadsheet.title
     ? newTextElement({
-        text: spreadsheet.yAxisLabel,
-        x: x - Y_AXIS_LABEL_SPACING,
-        y: y + BAR_HEIGHT / 2 - 10,
-        strokeColor: appState.currentItemStrokeColor,
-        backgroundColor: appState.currentItemBackgroundColor,
-        fillStyle: appState.currentItemFillStyle,
-        strokeWidth: appState.currentItemStrokeWidth,
-        strokeStyle: appState.currentItemStrokeStyle,
-        roughness: appState.currentItemRoughness,
-        opacity: appState.currentItemOpacity,
-        strokeSharpness: appState.currentItemStrokeSharpness,
-        fontSize: 20,
-        fontFamily: appState.currentItemFontFamily,
+        ...commonProps,
+        text: spreadsheet.title,
+        x: x + chartWidth / 2,
+        y: y - BAR_HEIGHT - BAR_GAP * 2 - maxYLabel.height,
+        strokeSharpness: "sharp",
+        strokeStyle: "solid",
         textAlign: "center",
-        verticalAlign: DEFAULT_VERTICAL_ALIGN,
-        width: BAR_WIDTH,
-        angle: ANGLE,
       })
     : null;
 
-  return [...bars, yAxisLabel, minYLabel, maxYLabel, ...xLabels].filter(
-    (element) => element !== null,
-  ) as ExcalidrawElement[];
+  trackEvent(EVENT_MAGIC, "chart", "bars", bars.length);
+  return [
+    title,
+    ...bars,
+    ...xLabels,
+    xAxisLine,
+    yAxisLine,
+    maxValueLine,
+    minYLabel,
+    maxYLabel,
+  ].filter((element) => element !== null) as ExcalidrawElement[];
 };

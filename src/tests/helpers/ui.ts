@@ -14,11 +14,13 @@ let altKey = false;
 let shiftKey = false;
 let ctrlKey = false;
 
+export type KeyboardModifiers = {
+  alt?: boolean;
+  shift?: boolean;
+  ctrl?: boolean;
+};
 export class Keyboard {
-  static withModifierKeys = (
-    modifiers: { alt?: boolean; shift?: boolean; ctrl?: boolean },
-    cb: () => void,
-  ) => {
+  static withModifierKeys = (modifiers: KeyboardModifiers, cb: () => void) => {
     const prevAltKey = altKey;
     const prevShiftKey = shiftKey;
     const prevCtrlKey = ctrlKey;

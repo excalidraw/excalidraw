@@ -133,7 +133,7 @@ export const maxBindingGap = (
   const shapeRatio = element.type === "diamond" ? 1 / Math.sqrt(2) : 1;
   const smallerDimension = shapeRatio * Math.min(elementWidth, elementHeight);
   // We make the bindable boundary bigger for bigger elements
-  return Math.max(15, Math.min(0.25 * smallerDimension, 80));
+  return Math.max(16, Math.min(0.25 * smallerDimension, 32));
 };
 
 type HitTestArgs = {

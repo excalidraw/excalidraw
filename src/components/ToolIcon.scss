@@ -1,4 +1,6 @@
 @import "open-color/open-color.scss";
+@import "../css/variables";
+
 .excalidraw {
   .ToolIcon {
     display: inline-flex;
@@ -151,7 +153,7 @@
     }
   }
 
-  @media (max-width: 360px) {
+  @media (max-width: 760px) {
     .ToolIcon.ToolIcon__lock {
       display: inline-block;
       position: absolute;
@@ -178,6 +180,17 @@
       svg {
         position: static;
       }
+    }
+  }
+
+  .TooltipIcon {
+    width: 0.9em;
+    height: 0.9em;
+    margin-left: 5px;
+    margin-top: 1px;
+
+    @media #{$media-query} {
+      display: none;
     }
   }
 

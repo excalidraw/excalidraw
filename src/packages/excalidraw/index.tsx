@@ -1,13 +1,14 @@
 import React, { useEffect, forwardRef } from "react";
 
 import { InitializeApp } from "../../components/InitializeApp";
-import App, { ExcalidrawImperativeAPI } from "../../components/App";
+import App from "../../components/App";
 
 import "../../css/app.scss";
 import "../../css/styles.scss";
 
-import { ExcalidrawProps } from "../../types";
+import { ExcalidrawAPIRefValue, ExcalidrawProps } from "../../types";
 import { IsMobileProvider } from "../../is-mobile";
+import { noop } from "../../utils";
 
 const Excalidraw = (props: ExcalidrawProps) => {
   const {
@@ -18,8 +19,10 @@ const Excalidraw = (props: ExcalidrawProps) => {
     onChange,
     initialData,
     user,
-    onUsernameChange,
-    forwardedRef,
+    excalidrawRef,
+    onCollabButtonClick = noop,
+    isCollaborating,
+    onPointerUpdate,
   } = props;
 
   useEffect(() => {
@@ -51,8 +54,10 @@ const Excalidraw = (props: ExcalidrawProps) => {
           onChange={onChange}
           initialData={initialData}
           user={user}
-          onUsernameChange={onUsernameChange}
-          forwardedRef={forwardedRef}
+          excalidrawRef={excalidrawRef}
+          onCollabButtonClick={onCollabButtonClick}
+          isCollaborating={isCollaborating}
+          onPointerUpdate={onPointerUpdate}
         />
       </IsMobileProvider>
     </InitializeApp>
@@ -79,7 +84,12 @@ const areEqual = (
 };
 
 const forwardedRefComp = forwardRef<
-  ExcalidrawImperativeAPI,
+  ExcalidrawAPIRefValue,
   PublicExcalidrawProps
->((props, ref) => <Excalidraw {...props} forwardedRef={ref} />);
+>((props, ref) => <Excalidraw {...props} excalidrawRef={ref} />);
 export default React.memo(forwardedRefComp, areEqual);
+export {
+  getSceneVersion,
+  getSyncableElements,
+  getElementMap,
+} from "../../element";

@@ -7,7 +7,8 @@ import {
   hasStroke,
   canChangeSharpness,
   hasText,
-  getTargetElement,
+  canHaveArrowheads,
+  getTargetElements,
 } from "../scene";
 import { t } from "../i18n";
 import { SHAPES } from "../shapes";
@@ -16,7 +17,7 @@ import { capitalizeString, isTransparent, setCursorForShape } from "../utils";
 import Stack from "./Stack";
 import useIsMobile from "../is-mobile";
 import { getNonDeletedElements } from "../element";
-import { trackEvent, EVENT_SHAPE } from "../analytics";
+import { trackEvent, EVENT_SHAPE, EVENT_DIALOG } from "../analytics";
 
 export const SelectedShapeActions = ({
   appState,
@@ -29,7 +30,7 @@ export const SelectedShapeActions = ({
   renderAction: ActionManager["renderAction"];
   elementType: ExcalidrawElement["type"];
 }) => {
-  const targetElements = getTargetElement(
+  const targetElements = getTargetElements(
     getNonDeletedElements(elements),
     appState,
   );
@@ -46,6 +47,7 @@ export const SelectedShapeActions = ({
   const showChangeBackgroundIcons =
     hasBackground(elementType) ||
     targetElements.some((element) => hasBackground(element.type));
+
   return (
     <div className="panelColumn">
       {renderAction("changeStrokeColor")}
@@ -75,6 +77,11 @@ export const SelectedShapeActions = ({
 
           {renderAction("changeTextAlign")}
         </>
+      )}
+
+      {(canHaveArrowheads(elementType) ||
+        targetElements.some((element) => canHaveArrowheads(element.type))) && (
+        <>{renderAction("changeArrowhead")}</>
       )}
 
       {renderAction("changeOpacity")}
@@ -196,6 +203,9 @@ export const ShapesSwitcher = ({
       title={`${capitalizeString(t("toolBar.library"))} — 9`}
       aria-label={capitalizeString(t("toolBar.library"))}
       onClick={() => {
+        if (!isLibraryOpen) {
+          trackEvent(EVENT_DIALOG, "library");
+        }
         setAppState({ isLibraryOpen: !isLibraryOpen });
       }}
     />

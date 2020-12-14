@@ -1,10 +1,13 @@
 {
   "name": "@excalidraw/excalidraw",
-  "version": "0.7.0",
+  "version": "0.1.1",
   "main": "dist/excalidraw.min.js",
   "files": [
     "dist/*"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "Excalidraw as a React component",
   "license": "MIT",
   "keywords": [
@@ -57,10 +60,11 @@
     "ts-loader": "7.0.0",
     "webpack": "4.42.0",
     "webpack-bundle-analyzer": "3.9.0",
-    "webpack-cli": "3.3.11"
+    "webpack-cli": "4.2.0"
   },
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
   "repository": "https://github.com/excalidraw/excalidraw",
+  "homepage": "https://github.com/excalidraw/excalidraw/tree/master/src/packages/excalidraw",
   "scripts": {
     "build:umd": "cross-env NODE_ENV=production webpack --config webpack.prod.config.js",
     "build:umd:withAnalyzer": "cross-env NODE_ENV=production ANALYZER=true webpack --config webpack.prod.config.js",

@@ -28,7 +28,7 @@ import { ExportType } from "../scene/types";
 import { MobileMenu } from "./MobileMenu";
 import { ZoomActions, SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { Section } from "./Section";
-import { RoomDialog } from "./RoomDialog";
+import CollabButton from "./CollabButton";
 import { ErrorDialog } from "./ErrorDialog";
 import { ShortcutsDialog } from "./ShortcutsDialog";
 import { LoadingMessage } from "./LoadingMessage";
@@ -45,7 +45,12 @@ import { muteFSAbortError } from "../utils";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 import clsx from "clsx";
 import { Library } from "../data/library";
-import { EVENT_ACTION, EVENT_EXIT, trackEvent } from "../analytics";
+import {
+  EVENT_ACTION,
+  EVENT_EXIT,
+  EVENT_LIBRARY,
+  trackEvent,
+} from "../analytics";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -53,14 +58,13 @@ interface LayerUIProps {
   canvas: HTMLCanvasElement | null;
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
-  onRoomCreate: () => void;
-  onUsernameChange: (username: string) => void;
-  onRoomDestroy: () => void;
+  onCollabButtonClick?: () => void;
   onLockToggle: () => void;
   onInsertShape: (elements: LibraryItem) => void;
   zenModeEnabled: boolean;
   toggleZenMode: () => void;
   lng: string;
+  isCollaborating: boolean;
 }
 
 const useOnClickOutside = (
@@ -114,70 +118,83 @@ const LibraryMenuItems = ({
   let addedPendingElements = false;
 
   rows.push(
-    <Stack.Row
-      align="center"
-      gap={1}
-      key={"actions"}
-      style={{ padding: "2px 0" }}
-    >
-      <ToolButton
-        key="import"
-        type="button"
-        title={t("buttons.load")}
-        aria-label={t("buttons.load")}
-        icon={load}
+    <>
+      <a
+        className="browse-libraries"
+        href="https://libraries.excalidraw.com"
+        target="_excalidraw_libraries"
         onClick={() => {
-          importLibraryFromJSON()
-            .then(() => {
-              // Maybe we should close and open the menu so that the items get updated.
-              // But for now we just close the menu.
-              setAppState({ isLibraryOpen: false });
-            })
-            .catch(muteFSAbortError)
-            .catch((error) => {
-              setAppState({ errorMessage: error.message });
-            });
+          trackEvent(EVENT_EXIT, "libraries");
         }}
-      />
-      <ToolButton
-        key="export"
-        type="button"
-        title={t("buttons.export")}
-        aria-label={t("buttons.export")}
-        icon={exportFile}
-        onClick={() => {
-          saveLibraryAsJSON()
-            .catch(muteFSAbortError)
-            .catch((error) => {
-              setAppState({ errorMessage: error.message });
-            });
-        }}
-      />
-    </Stack.Row>,
+      >
+        {t("labels.libraries")}
+      </a>
+
+      <Stack.Row
+        align="center"
+        gap={1}
+        key={"actions"}
+        style={{ padding: "2px" }}
+      >
+        <ToolButton
+          key="import"
+          type="button"
+          title={t("buttons.load")}
+          aria-label={t("buttons.load")}
+          icon={load}
+          onClick={() => {
+            importLibraryFromJSON()
+              .then(() => {
+                // Maybe we should close and open the menu so that the items get updated.
+                // But for now we just close the menu.
+                setAppState({ isLibraryOpen: false });
+              })
+              .catch(muteFSAbortError)
+              .catch((error) => {
+                setAppState({ errorMessage: error.message });
+              });
+          }}
+        />
+        <ToolButton
+          key="export"
+          type="button"
+          title={t("buttons.export")}
+          aria-label={t("buttons.export")}
+          icon={exportFile}
+          onClick={() => {
+            saveLibraryAsJSON()
+              .catch(muteFSAbortError)
+              .catch((error) => {
+                setAppState({ errorMessage: error.message });
+              });
+          }}
+        />
+      </Stack.Row>
+    </>,
   );
 
   for (let row = 0; row < numRows; row++) {
-    const i = CELLS_PER_ROW * row;
+    const y = CELLS_PER_ROW * row;
     const children = [];
-    for (let j = 0; j < CELLS_PER_ROW; j++) {
+    for (let x = 0; x < CELLS_PER_ROW; x++) {
       const shouldAddPendingElements: boolean =
         pendingElements.length > 0 &&
         !addedPendingElements &&
-        i + j >= library.length;
+        y + x >= library.length;
       addedPendingElements = addedPendingElements || shouldAddPendingElements;
 
       children.push(
-        <Stack.Col key={j}>
+        <Stack.Col key={x}>
           <LibraryUnit
-            elements={library[i + j]}
+            elements={library[y + x]}
             pendingElements={
               shouldAddPendingElements ? pendingElements : undefined
             }
-            onRemoveFromLibrary={onRemoveFromLibrary.bind(null, i + j)}
+            onRemoveFromLibrary={onRemoveFromLibrary.bind(null, y + x)}
             onClick={
               shouldAddPendingElements
                 ? onAddToLibrary.bind(null, pendingElements)
-                : onInsertShape.bind(null, library[i + j])
+                : onInsertShape.bind(null, library[y + x])
             }
           />
         </Stack.Col>,
@@ -191,7 +208,7 @@ const LibraryMenuItems = ({
   }
 
   return (
-    <Stack.Col align="center" gap={1} className="layer-ui__library-items">
+    <Stack.Col align="start" gap={1} className="layer-ui__library-items">
       {rows}
     </Stack.Col>
   );
@@ -252,6 +269,7 @@ const LibraryMenu = ({
     const items = await Library.loadLibrary();
     const nextItems = items.filter((_, index) => index !== indexToRemove);
     Library.saveLibrary(nextItems);
+    trackEvent(EVENT_LIBRARY, "remove");
     setLibraryItems(nextItems);
   }, []);
 
@@ -260,6 +278,7 @@ const LibraryMenu = ({
       const items = await Library.loadLibrary();
       const nextItems = [...items, elements];
       onAddToLibrary();
+      trackEvent(EVENT_LIBRARY, "add");
       Library.saveLibrary(nextItems);
       setLibraryItems(nextItems);
     },
@@ -292,17 +311,15 @@ const LayerUI = ({
   setAppState,
   canvas,
   elements,
-  onRoomCreate,
-  onUsernameChange,
-  onRoomDestroy,
+  onCollabButtonClick,
   onLockToggle,
   onInsertShape,
   zenModeEnabled,
   toggleZenMode,
+  isCollaborating,
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
-  // TODO: Extend tooltip component and use here.
   const renderEncryptedIcon = () => (
     <a
       className={clsx("encrypted-icon tooltip zen-mode-visibility", {
@@ -315,10 +332,9 @@ const LayerUI = ({
         trackEvent(EVENT_EXIT, "e2ee shield");
       }}
     >
-      <span className="tooltip-text" dir="auto">
-        {t("encrypted.tooltip")}
-      </span>
-      {shield}
+      <Tooltip label={t("encrypted.tooltip")} position="above" long={true}>
+        {shield}
+      </Tooltip>
     </a>
   );
 
@@ -393,17 +409,13 @@ const LayerUI = ({
             {actionManager.renderAction("saveAsScene")}
             {renderExportDialog()}
             {actionManager.renderAction("clearCanvas")}
-            <RoomDialog
-              isCollaborating={appState.isCollaborating}
-              collaboratorCount={appState.collaborators.size}
-              username={appState.username}
-              onUsernameChange={onUsernameChange}
-              onRoomCreate={onRoomCreate}
-              onRoomDestroy={onRoomDestroy}
-              setErrorMessage={(message: string) =>
-                setAppState({ errorMessage: message })
-              }
-            />
+            {onCollabButtonClick && (
+              <CollabButton
+                isCollaborating={isCollaborating}
+                collaboratorCount={appState.collaborators.size}
+                onClick={onCollabButtonClick}
+              />
+            )}
           </Stack.Row>
           <BackgroundPickerAndDarkModeToggle
             actionManager={actionManager}
@@ -595,11 +607,10 @@ const LayerUI = ({
       libraryMenu={libraryMenu}
       exportButton={renderExportDialog()}
       setAppState={setAppState}
-      onUsernameChange={onUsernameChange}
-      onRoomCreate={onRoomCreate}
-      onRoomDestroy={onRoomDestroy}
+      onCollabButtonClick={onCollabButtonClick}
       onLockToggle={onLockToggle}
       canvas={canvas}
+      isCollaborating={isCollaborating}
     />
   ) : (
     <div className="layer-ui__wrapper">

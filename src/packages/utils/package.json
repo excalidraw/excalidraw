@@ -6,6 +6,9 @@
     "dist/*"
   ],
   "description": "Excalidraw utilities functions",
+  "publishConfig": {
+    "access": "public"
+  },
   "license": "MIT",
   "keywords": [
     "excalidraw",
@@ -32,7 +35,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.9.0",
-    "@babel/plugin-transform-arrow-functions": "7.8.3",
+    "@babel/plugin-transform-arrow-functions": "7.12.1",
     "@babel/plugin-transform-async-to-generator": "7.8.3",
     "@babel/plugin-transform-runtime": "^7.12.1",
     "@babel/plugin-transform-typescript": "7.9.4",
@@ -43,7 +46,7 @@
     "cross-env": "7.0.2",
     "file-loader": "6.0.0",
     "ts-loader": "7.0.0",
-    "webpack": "4.42.0",
+    "webpack": "4.44.2",
     "webpack-bundle-analyzer": "3.9.0",
     "webpack-cli": "3.3.11"
   },

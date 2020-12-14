@@ -46,11 +46,19 @@
 | Copy room link          | share    | copy link                          |
 | Go to collaborator      | share    | go to collaborator                 |
 | Change name             | share    | name                               |
+| Add to library          | library  | add                                |
+| Remove from library     | library  | remove                             |
+| Load library            | library  | load                               |
+| Save library            | library  | save                               |
+| Import library          | library  | import                             |
 | Shortcuts dialog        | dialog   | shortcuts                          |
 | Collaboration dialog    | dialog   | collaboration                      |
 | Export dialog           | dialog   | export                             |
+| Library dialog          | dialog   | library                            |
 | E2EE shield             | exit     | e2ee shield                        |
 | GitHub corner           | exit     | github                             |
 | Excalidraw blog         | exit     | blog                               |
 | Excalidraw guides       | exit     | guides                             |
 | File issues             | exit     | issues                             |
+| First load              | load     | first load                         |
+| Load from stroage       | load     | storage                            | size                            | `bytes`   |

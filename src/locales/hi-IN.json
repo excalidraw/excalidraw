@@ -4,6 +4,7 @@
     "selectAll": "सभी चुनें",
     "multiSelect": "आकार को चयन में जोड़ें",
     "moveCanvas": "कैनवास को स्थानांतरित करें",
+    "cut": "काटें",
     "copy": "प्रतिलिपि",
     "copyAsPng": "क्लिपबोर्ड पर कॉपी करें ,पीएनजी के रूप में",
     "copyAsSvg": "क्लिपबोर्ड पर कॉपी करें,एसवीजी के रूप में",
@@ -28,6 +29,11 @@
     "edges": "किनारा",
     "sharp": "नुकीला",
     "round": "गोल",
+    "arrowheads": "",
+    "arrowhead_none": "",
+    "arrowhead_arrow": "तीर",
+    "arrowhead_bar": "",
+    "arrowhead_dot": "",
     "fontSize": "फ़ॉन्ट का आकार",
     "fontFamily": "फ़ॉन्ट का परिवार",
     "onlySelected": "केवल चयनित",
@@ -63,7 +69,7 @@
     "language": "भाषा",
     "createRoom": "अधिवेशन",
     "duplicateSelection": "डुप्लिकेट",
-    "untitled": "",
+    "untitled": "अशीर्षित",
     "name": "नाम",
     "yourName": "आपका नाम",
     "madeWithExcalidraw": "मेड विथ एक्सकैलिडराव",
@@ -71,9 +77,11 @@
     "ungroup": "समूह चयन असमूहीकृत करें",
     "collaborators": "सहयोगी",
     "toggleGridMode": "टॉगल ग्रिड मोड",
+    "toggleStats": "",
     "addToLibrary": "लाइब्रेरी से जोड़ें",
     "removeFromLibrary": "लाइब्रेरी से निकालें",
     "libraryLoadingMessage": "लाइब्रेरी खुल रही है",
+    "libraries": "",
     "loadingScene": "दृश्य खुल रहा है",
     "align": "",
     "alignTop": "",
@@ -205,13 +213,22 @@
     "textNewLine": "नई पंक्ति (पाठ) जोड़ें",
     "textFinish": "संपादन समाप्त करें (पाठ)",
     "zoomToFit": "सभी तत्वों को फिट करने के लिए ज़ूम करें",
+    "zoomToSelection": "",
     "preventBinding": ""
   },
   "encrypted": {
     "tooltip": "आपके चित्र अंत-से-अंत एन्क्रिप्टेड हैं, इसलिए एक्सक्लूसिव्रॉव के सर्वर उन्हें कभी नहीं देखेंगे।"
   },
-  "charts": {
-    "noNumericColumn": "आपने एक संख्यात्मक कॉलम के बिना एक स्प्रेडशीट चिपकाई।",
-    "tooManyColumns": "आपने दो से अधिक कॉलम के साथ एक स्प्रेडशीट चिपकाई।"
+  "stats": {
+    "angle": "कोण",
+    "element": "",
+    "elements": "",
+    "height": "ऊंचाई",
+    "scene": "दृश्य",
+    "selected": "चयनित",
+    "storage": "संग्रह",
+    "title": "",
+    "total": "कुल",
+    "width": "चौड़ाई"
   }
 }

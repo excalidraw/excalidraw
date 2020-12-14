@@ -207,6 +207,10 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
                 shortcuts={["Shift+1"]}
               />
               <Shortcut
+                label={t("shortcutsDialog.zoomToSelection")}
+                shortcuts={["Shift+2"]}
+              />
+              <Shortcut
                 label={t("buttons.toggleFullScreen")}
                 shortcuts={["F"]}
               />
@@ -239,6 +243,10 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
                   getShortcutKey(`Wheel+${t("shortcutsDialog.drag")}`),
                 ]}
                 isOr={true}
+              />
+              <Shortcut
+                label={t("labels.cut")}
+                shortcuts={[getShortcutKey("CtrlOrCmd+X")]}
               />
               <Shortcut
                 label={t("labels.copy")}

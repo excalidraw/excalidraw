@@ -108,6 +108,11 @@ export const redo = createIcon(
   { mirror: true },
 );
 
+export const questionCircle = createIcon(
+  "M504 256c0 136.997-111.043 248-248 248S8 392.997 8 256C8 119.083 119.043 8 256 8s248 111.083 248 248zM262.655 90c-54.497 0-89.255 22.957-116.549 63.758-3.536 5.286-2.353 12.415 2.715 16.258l34.699 26.31c5.205 3.947 12.621 3.008 16.665-2.122 17.864-22.658 30.113-35.797 57.303-35.797 20.429 0 45.698 13.148 45.698 32.958 0 14.976-12.363 22.667-32.534 33.976C247.128 238.528 216 254.941 216 296v4c0 6.627 5.373 12 12 12h56c6.627 0 12-5.373 12-12v-1.333c0-28.462 83.186-29.647 83.186-106.667 0-58.002-60.165-102-116.531-102zM256 338c-25.365 0-46 20.635-46 46 0 25.364 20.635 46 46 46s46-20.636 46-46c0-25.365-20.635-46-46-46z",
+  { mirror: true },
+);
+
 // Icon imported form Storybook
 // Storybook is licensed under MIT https://github.com/storybookjs/storybook/blob/next/LICENSE
 export const resetZoom = createIcon(
@@ -568,13 +573,12 @@ export const UngroupIcon = React.memo(
 export const FillHachureIcon = React.memo(
   ({ appearance }: { appearance: "light" | "dark" }) =>
     createIcon(
-      <g stroke={iconFillColor(appearance)} fill="none">
-        <path d="M0 0s0 0 0 0m0 0s0 0 0 0m.133 12.04L10.63-.033M.133 12.04L10.63-.034M2.234 21.818L21.26-.07M2.234 21.818L21.26-.07m-8.395 21.852L31.89-.103M12.865 21.783L31.89-.103m-8.395 21.852L41.208 1.37M23.495 21.75L41.208 1.37m-7.083 20.343l7.216-8.302m-7.216 8.302l7.216-8.302" />
-        <path
-          d="M0 0h40M0 0h40m0 0v20m0-20v20m0 0H0m40 0H0m0 0V0m0 20V0"
-          strokeWidth={2}
-        />
-      </g>,
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M20.101 16H28.0934L36 8.95989V4H33.5779L20.101 16ZM30.5704 4L17.0935 16H9.10101L22.5779 4H30.5704ZM19.5704 4L6.09349 16H4V10.7475L11.5779 4H19.5704ZM8.57036 4H4V8.06952L8.57036 4ZM36 11.6378L31.101 16H36V11.6378ZM2 2V18H38V2H2Z"
+        fill={iconFillColor(appearance)}
+      />,
       { width: 40, height: 20 },
     ),
 );
@@ -582,12 +586,9 @@ export const FillHachureIcon = React.memo(
 export const FillCrossHatchIcon = React.memo(
   ({ appearance }: { appearance: "light" | "dark" }) =>
     createIcon(
-      <g stroke={iconFillColor(appearance)} fill="none">
-        <path d="M0 0s0 0 0 0m0 0s0 0 0 0m.133 12.04L10.63-.033M.133 12.04L10.63-.034M2.234 21.818L21.26-.07M2.234 21.818L21.26-.07m-8.395 21.852L31.89-.103M12.865 21.783C17.87 16.025 22.875 10.266 31.89-.103m-8.395 21.852L41.208 1.37M23.495 21.75L41.208 1.37m-7.083 20.343l7.216-8.302m-7.216 8.302l7.216-8.302M-.09 19.92s0 0 0 0m0 0s0 0 0 0m12.04-.133L-.126 9.29m12.075 10.497L-.126 9.29m24.871 11.02C19.872 16.075 15 11.84.595-.684m24.15 20.994L.595-.684m36.19 20.861L12.636-.817m24.15 20.994L12.636-.817m30.909 16.269L24.676-.95m18.868 16.402L24.676-.95m18.833 5.771L37.472-.427m6.037 5.248L37.472-.427" />
-        <path
-          d="M0 0h40M0 0h40m0 0v20m0-20v20m0 0H0m40 0H0m0 0V0m0 20V0"
-          strokeWidth={2}
-        />
+      <g fill={iconFillColor(appearance)} fillRule="evenodd" clipRule="evenodd">
+        <path d="M20.101 16H28.0934L36 8.95989V4H33.5779L20.101 16ZM30.5704 4L17.0935 16H9.10101L22.5779 4H30.5704ZM19.5704 4L6.09349 16H4V10.7475L11.5779 4H19.5704ZM8.57036 4H4V8.06952L8.57036 4ZM36 11.6378L31.101 16H36V11.6378ZM2 2V18H38V2H2Z" />
+        <path d="M14.0001 18L3.00006 4.00002L4.5727 2.76438L15.5727 16.7644L14.0001 18ZM25.0001 18L14.0001 4.00002L15.5727 2.76438L26.5727 16.7644L25.0001 18ZM36.0001 18L25.0001 4.00002L26.5727 2.76438L37.5727 16.7644L36.0001 18Z" />
       </g>,
       { width: 40, height: 20 },
     ),
@@ -595,18 +596,10 @@ export const FillCrossHatchIcon = React.memo(
 
 export const FillSolidIcon = React.memo(
   ({ appearance }: { appearance: "light" | "dark" }) =>
-    createIcon(
-      <>
-        <path d="M0 0h120v60H0" strokeWidth={0} />
-        <path
-          d="M0 0h40M0 0h40m0 0v20m0-20v20m0 0H0m40 0H0m0 0V0m0 20V0"
-          stroke={iconFillColor(appearance)}
-          strokeWidth={2}
-          fill="none"
-        />
-      </>,
-      { width: 40, height: 20 },
-    ),
+    createIcon(<path d="M2 2H38V18H2V2Z" fill={iconFillColor(appearance)} />, {
+      width: 40,
+      height: 20,
+    }),
 );
 
 export const StrokeWidthIcon = React.memo(
@@ -619,7 +612,7 @@ export const StrokeWidthIcon = React.memo(
   }) =>
     createIcon(
       <path
-        d="M0 10h40M0 10h40"
+        d="M6 10H34"
         stroke={iconFillColor(appearance)}
         strokeWidth={strokeWidth}
         fill="none"
@@ -632,12 +625,15 @@ export const StrokeStyleSolidIcon = React.memo(
   ({ appearance }: { appearance: "light" | "dark" }) =>
     createIcon(
       <path
-        d="M0 10h40M0 10h40"
+        d="M6 10H34"
         stroke={iconFillColor(appearance)}
         strokeWidth={2}
         fill="none"
       />,
-      { width: 40, height: 20 },
+      {
+        width: 40,
+        height: 20,
+      },
     ),
 );
 
@@ -645,11 +641,11 @@ export const StrokeStyleDashedIcon = React.memo(
   ({ appearance }: { appearance: "light" | "dark" }) =>
     createIcon(
       <path
-        d="M3.286 9.998h32.759"
+        d="M6 10H34"
         stroke={iconFillColor(appearance)}
         strokeWidth={2.5}
+        strokeDasharray={"10, 8"}
         fill="none"
-        strokeDasharray="12 8"
       />,
       { width: 40, height: 20 },
     ),
@@ -659,11 +655,11 @@ export const StrokeStyleDottedIcon = React.memo(
   ({ appearance }: { appearance: "light" | "dark" }) =>
     createIcon(
       <path
-        d="M0 10h40M0 10h40"
+        d="M6 10H34"
         stroke={iconFillColor(appearance)}
-        strokeWidth={2}
+        strokeWidth={2.5}
+        strokeDasharray={"4, 4"}
         fill="none"
-        strokeDasharray="3 6"
       />,
       { width: 40, height: 20 },
     ),
@@ -673,7 +669,7 @@ export const SloppinessArchitectIcon = React.memo(
   ({ appearance }: { appearance: "light" | "dark" }) =>
     createIcon(
       <path
-        d="M.268 17.938C4.05 15.093 19.414.725 22.96.868c3.547.143-4.149 16.266-1.41 17.928 2.738 1.662 14.866-6.632 17.84-7.958m-39.123 7.1C4.05 15.093 19.414.725 22.96.868c3.547.143-4.149 16.266-1.41 17.928 2.738 1.662 14.866-6.632 17.84-7.958"
+        d="M3.00098 16.1691C6.28774 13.9744 19.6399 2.8905 22.7215 3.00082C25.8041 3.11113 19.1158 15.5488 21.4962 16.8309C23.8757 18.1131 34.4155 11.7148 37.0001 10.6919"
         stroke={iconFillColor(appearance)}
         strokeWidth={2}
         fill="none"
@@ -686,7 +682,7 @@ export const SloppinessArtistIcon = React.memo(
   ({ appearance }: { appearance: "light" | "dark" }) =>
     createIcon(
       <path
-        d="M2.663 18.134c3.963-2.578 18.855-12.098 22.675-12.68 3.82-.58-1.966 8.367.242 9.196 2.209.828 10.649-3.14 13.01-4.224M7.037 15.474c4.013-2.198 14.19-14.648 17.18-14.32 2.99.329-1.749 14.286.759 16.292 2.507 2.006 12.284-2.68 14.286-4.256"
+        d="M3 17C6.68158 14.8752 16.1296 9.09849 22.0648 6.54922C28 3.99995 22.2896 13.3209 25 14C27.7104 14.6791 36.3757 9.6471 36.3757 9.6471M6.40706 15C13 11.1918 20.0468 1.51045 23.0234 3.0052C26 4.49995 20.457 12.8659 22.7285 16.4329C25 20 36.3757 13 36.3757 13"
         stroke={iconFillColor(appearance)}
         strokeWidth={2}
         fill="none"
@@ -698,20 +694,12 @@ export const SloppinessArtistIcon = React.memo(
 export const SloppinessCartoonistIcon = React.memo(
   ({ appearance }: { appearance: "light" | "dark" }) =>
     createIcon(
-      <>
-        <path
-          d="M1.944 17.15C6.056 14.637 22.368 1.86 26.615 2.083c4.248.223-.992 14.695.815 16.406 1.807 1.71 8.355-5.117 10.026-6.14m-35.512 4.8C6.056 14.637 22.368 1.86 26.615 2.083c4.248.223-.992 14.695.815 16.406 1.807 1.71 8.355-5.117 10.026-6.14"
-          stroke={iconFillColor(appearance)}
-          strokeWidth={2}
-          fill="none"
-        />
-        <path
-          d="M3.114 10.534c2.737-1.395 12.854-8.814 16.42-8.368 3.568.445 2.35 10.282 4.984 11.04 2.635.756 9.019-5.416 10.822-6.5M3.114 10.535c2.737-1.395 12.854-8.814 16.42-8.368 3.568.445 2.35 10.282 4.984 11.04 2.635.756 9.019-5.416 10.822-6.5"
-          stroke={iconFillColor(appearance)}
-          strokeWidth={2}
-          fill="none"
-        />
-      </>,
+      <path
+        d="M3 15.6468C6.93692 13.5378 22.5544 2.81528 26.6206 3.00242C30.6877 3.18956 25.6708 15.3346 27.4009 16.7705C29.1309 18.2055 35.4001 12.4762 37 11.6177M3.97143 10.4917C6.61158 9.24563 16.3706 2.61886 19.8104 3.01724C23.2522 3.41472 22.0773 12.2013 24.6181 12.8783C27.1598 13.5536 33.3179 8.04068 35.0571 7.07244"
+        stroke={iconFillColor(appearance)}
+        strokeWidth={2}
+        fill="none"
+      />,
       { width: 40, height: 20, mirror: true },
     ),
 );
@@ -720,7 +708,7 @@ export const EdgeSharpIcon = React.memo(
   ({ appearance }: { appearance: "light" | "dark" }) =>
     createIcon(
       <path
-        d="M9.18 19.68V6.346m0 13.336V6.345m0 0h29.599m-29.6 0h29.6"
+        d="M10 17L10 5L35 5"
         stroke={iconFillColor(appearance)}
         strokeWidth={2}
         fill="none"
@@ -733,11 +721,91 @@ export const EdgeRoundIcon = React.memo(
   ({ appearance }: { appearance: "light" | "dark" }) =>
     createIcon(
       <path
-        d="M9.444 19.537c.484-2.119-2.1-10.449 2.904-12.71 5.004-2.263 22.601-.72 27.121-.863M9.444 19.537c.484-2.119-2.1-10.449 2.904-12.71 5.004-2.263 22.601-.72 27.121-.863"
+        d="M10 17V15C10 8 13 5 21 5L33.5 5"
         stroke={iconFillColor(appearance)}
         strokeWidth={2}
         fill="none"
       />,
       { width: 40, height: 20, mirror: true },
+    ),
+);
+
+export const ArrowheadNoneIcon = React.memo(
+  ({ appearance }: { appearance: "light" | "dark" }) =>
+    createIcon(
+      <path
+        d="M6 10H34"
+        stroke={iconFillColor(appearance)}
+        strokeWidth={2}
+        fill="none"
+      />,
+      {
+        width: 40,
+        height: 20,
+      },
+    ),
+);
+
+export const ArrowheadArrowIcon = React.memo(
+  ({
+    appearance,
+    flip = false,
+  }: {
+    appearance: "light" | "dark";
+    flip?: boolean;
+  }) =>
+    createIcon(
+      <g
+        transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
+        stroke={iconFillColor(appearance)}
+        strokeWidth={2}
+        fill="none"
+      >
+        <path d="M34 10H6M34 10L27 5M34 10L27 15" />
+        <path d="M27.5 5L34.5 10L27.5 15" />
+      </g>,
+      { width: 40, height: 20 },
+    ),
+);
+
+export const ArrowheadDotIcon = React.memo(
+  ({
+    appearance,
+    flip = false,
+  }: {
+    appearance: "light" | "dark";
+    flip?: boolean;
+  }) =>
+    createIcon(
+      <g
+        stroke={iconFillColor(appearance)}
+        fill={iconFillColor(appearance)}
+        transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
+      >
+        <path d="M32 10L6 10" strokeWidth={2} />
+        <circle r="4" transform="matrix(-1 0 0 1 30 10)" />
+      </g>,
+      { width: 40, height: 20 },
+    ),
+);
+
+export const ArrowheadBarIcon = React.memo(
+  ({
+    appearance,
+    flip = false,
+  }: {
+    appearance: "light" | "dark";
+    flip?: boolean;
+  }) =>
+    createIcon(
+      <g transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}>
+        <path
+          d="M34 10H5.99996M34 10L34 5M34 10L34 15"
+          stroke={iconFillColor(appearance)}
+          strokeWidth={2}
+          fill="none"
+        />
+      </g>,
+      { width: 40, height: 20 },
     ),
 );

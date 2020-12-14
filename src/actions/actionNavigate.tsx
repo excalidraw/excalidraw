@@ -34,7 +34,6 @@ export const actionGoToCollaborator = register({
   },
   PanelComponent: ({ appState, updateData, id }) => {
     const clientId = id;
-
     if (!clientId) {
       return null;
     }

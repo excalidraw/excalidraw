@@ -3,12 +3,15 @@ import { EVENT_CHANGE, EVENT_IO, trackEvent } from "../analytics";
 import { load, save, saveAs } from "../components/icons";
 import { ProjectName } from "../components/ProjectName";
 import { ToolButton } from "../components/ToolButton";
+import { Tooltip } from "../components/Tooltip";
+import { questionCircle } from "../components/icons";
 import { loadFromJSON, saveAsJSON } from "../data";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
 import { KEYS } from "../keys";
 import { muteFSAbortError } from "../utils";
 import { register } from "./register";
+import "../components/ToolIcon.scss";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -54,13 +57,20 @@ export const actionChangeExportEmbedScene = register({
     };
   },
   PanelComponent: ({ appState, updateData }) => (
-    <label title={t("labels.exportEmbedScene_details")}>
+    <label style={{ display: "flex" }}>
       <input
         type="checkbox"
         checked={appState.exportEmbedScene}
         onChange={(event) => updateData(event.target.checked)}
       />{" "}
       {t("labels.exportEmbedScene")}
+      <Tooltip
+        label={t("labels.exportEmbedScene_details")}
+        position="above"
+        long={true}
+      >
+        <div className="TooltipIcon">{questionCircle}</div>
+      </Tooltip>
     </label>
   ),
 });

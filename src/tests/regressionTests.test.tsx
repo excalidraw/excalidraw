@@ -1,24 +1,24 @@
-import { reseed } from "../random";
+import { queryByText } from "@testing-library/react";
 import React from "react";
 import ReactDOM from "react-dom";
+import { copiedStyles } from "../actions/actionStyles";
+import { ShortcutName } from "../actions/shortcuts";
+import { ExcalidrawElement } from "../element/types";
+import { setLanguage } from "../i18n";
+import { CODES, KEYS } from "../keys";
+import Excalidraw from "../packages/excalidraw/index";
+import { reseed } from "../random";
 import * as Renderer from "../renderer/renderScene";
+import { setDateTimeForTests } from "../utils";
+import { API } from "./helpers/api";
+import { Keyboard, Pointer, UI } from "./helpers/ui";
 import {
-  waitFor,
-  render,
-  screen,
   fireEvent,
   GlobalTestState,
+  render,
+  screen,
+  waitFor,
 } from "./test-utils";
-import App from "../components/App";
-import { setLanguage } from "../i18n";
-import { setDateTimeForTests } from "../utils";
-import { ExcalidrawElement } from "../element/types";
-import { getTransformHandles as _getTransformHandles } from "../element";
-import { queryByText } from "@testing-library/react";
-import { copiedStyles } from "../actions/actionStyles";
-import { UI, Pointer, Keyboard } from "./helpers/ui";
-import { API } from "./helpers/api";
-import { CODES, KEYS } from "../keys";
 
 const { h } = window;
 
@@ -42,27 +42,6 @@ const clickLabeledElement = (label: string) => {
     throw new Error(`No labeled element found: ${label}`);
   }
   fireEvent.click(element);
-};
-
-type HandlerRectanglesRet = keyof ReturnType<typeof _getTransformHandles>;
-const getTransformHandles = (pointerType: "mouse" | "touch" | "pen") => {
-  const rects = _getTransformHandles(
-    API.getSelectedElement(),
-    h.state.zoom,
-    pointerType,
-  ) as {
-    [T in HandlerRectanglesRet]: [number, number, number, number];
-  };
-
-  const rv: { [K in keyof typeof rects]: [number, number] } = {} as any;
-
-  for (const handlePos in rects) {
-    const [x, y, width, height] = rects[handlePos as keyof typeof rects];
-
-    rv[handlePos as keyof typeof rects] = [x + width / 2, y + height / 2];
-  }
-
-  return rv;
 };
 
 /**
@@ -97,7 +76,7 @@ beforeEach(async () => {
   finger2.reset();
 
   await setLanguage("en.json");
-  render(<App offsetLeft={0} offsetTop={0} />);
+  await render(<Excalidraw offsetLeft={0} offsetTop={0} />);
 });
 
 afterEach(() => {
@@ -202,67 +181,6 @@ describe("regression tests", () => {
     clickLabeledElement("#5f3dc4");
     expect(API.getSelectedElement().backgroundColor).toBe("#fa5252");
     expect(API.getSelectedElement().strokeColor).toBe("#5f3dc4");
-  });
-
-  it("resize an element, trying every resize handle", () => {
-    UI.clickTool("rectangle");
-    mouse.down(10, 10);
-    mouse.up(10, 10);
-
-    const transformHandles = getTransformHandles("mouse");
-    // @ts-ignore
-    delete transformHandles.rotation; // exclude rotation handle
-    for (const handlePos in transformHandles) {
-      const [x, y] = transformHandles[
-        handlePos as keyof typeof transformHandles
-      ];
-      const { width: prevWidth, height: prevHeight } = API.getSelectedElement();
-      mouse.restorePosition(x, y);
-      mouse.down();
-      mouse.up(-5, -5);
-
-      const {
-        width: nextWidthNegative,
-        height: nextHeightNegative,
-      } = API.getSelectedElement();
-      expect(
-        prevWidth !== nextWidthNegative || prevHeight !== nextHeightNegative,
-      ).toBeTruthy();
-      checkpoint(`resize handle ${handlePos} (-5, -5)`);
-
-      mouse.down();
-      mouse.up(5, 5);
-
-      const { width, height } = API.getSelectedElement();
-      expect(width).toBe(prevWidth);
-      expect(height).toBe(prevHeight);
-      checkpoint(`unresize handle ${handlePos} (-5, -5)`);
-
-      mouse.restorePosition(x, y);
-      mouse.down();
-      mouse.up(5, 5);
-
-      const {
-        width: nextWidthPositive,
-        height: nextHeightPositive,
-      } = API.getSelectedElement();
-      expect(
-        prevWidth !== nextWidthPositive || prevHeight !== nextHeightPositive,
-      ).toBeTruthy();
-      checkpoint(`resize handle ${handlePos} (+5, +5)`);
-
-      mouse.down();
-      mouse.up(-5, -5);
-
-      const {
-        width: finalWidth,
-        height: finalHeight,
-      } = API.getSelectedElement();
-      expect(finalWidth).toBe(prevWidth);
-      expect(finalHeight).toBe(prevHeight);
-
-      checkpoint(`unresize handle ${handlePos} (+5, +5)`);
-    }
   });
 
   it("click on an element and drag it", () => {
@@ -715,12 +633,19 @@ describe("regression tests", () => {
       clientY: 1,
     });
     const contextMenu = document.querySelector(".context-menu");
-    const options = contextMenu?.querySelectorAll(".context-menu-option");
-    const expectedOptions = ["Select all", "Toggle grid mode"];
+    const expectedShortcutNames: ShortcutName[] = [
+      "selectAll",
+      "toggleGridMode",
+      "toggleStats",
+    ];
 
     expect(contextMenu).not.toBeNull();
-    expect(options?.length).toBe(2);
-    expect(options?.item(0).textContent).toBe(expectedOptions[0]);
+    expect(contextMenu?.children.length).toBe(expectedShortcutNames.length);
+    expectedShortcutNames.forEach((shortcutName) => {
+      expect(
+        contextMenu?.querySelector(`li[data-testid="${shortcutName}"]`),
+      ).not.toBeNull();
+    });
   });
 
   it("shows context menu for element", () => {
@@ -734,23 +659,25 @@ describe("regression tests", () => {
       clientY: 1,
     });
     const contextMenu = document.querySelector(".context-menu");
-    const options = contextMenu?.querySelectorAll(".context-menu-option");
-    const expectedOptions = [
-      "Copy styles",
-      "Paste styles",
-      "Delete",
-      "Add to library",
-      "Send backward",
-      "Bring forward",
-      "Send to back",
-      "Bring to front",
-      "Duplicate",
+    const expectedShortcutNames: ShortcutName[] = [
+      "cut",
+      "copyStyles",
+      "pasteStyles",
+      "delete",
+      "addToLibrary",
+      "sendBackward",
+      "bringForward",
+      "sendToBack",
+      "bringToFront",
+      "duplicateSelection",
     ];
 
     expect(contextMenu).not.toBeNull();
-    expect(contextMenu?.children.length).toBe(9);
-    options?.forEach((opt, i) => {
-      expect(opt.textContent).toBe(expectedOptions[i]);
+    expect(contextMenu?.children.length).toBe(expectedShortcutNames.length);
+    expectedShortcutNames.forEach((shortcutName) => {
+      expect(
+        contextMenu?.querySelector(`li[data-testid="${shortcutName}"]`),
+      ).not.toBeNull();
     });
   });
 
@@ -776,24 +703,26 @@ describe("regression tests", () => {
     });
 
     const contextMenu = document.querySelector(".context-menu");
-    const options = contextMenu?.querySelectorAll(".context-menu-option");
-    const expectedOptions = [
-      "Copy styles",
-      "Paste styles",
-      "Delete",
-      "Group selection",
-      "Add to library",
-      "Send backward",
-      "Bring forward",
-      "Send to back",
-      "Bring to front",
-      "Duplicate",
+    const expectedShortcutNames: ShortcutName[] = [
+      "cut",
+      "copyStyles",
+      "pasteStyles",
+      "delete",
+      "group",
+      "addToLibrary",
+      "sendBackward",
+      "bringForward",
+      "sendToBack",
+      "bringToFront",
+      "duplicateSelection",
     ];
 
     expect(contextMenu).not.toBeNull();
-    expect(contextMenu?.children.length).toBe(10);
-    options?.forEach((opt, i) => {
-      expect(opt.textContent).toBe(expectedOptions[i]);
+    expect(contextMenu?.children.length).toBe(expectedShortcutNames.length);
+    expectedShortcutNames.forEach((shortcutName) => {
+      expect(
+        contextMenu?.querySelector(`li[data-testid="${shortcutName}"]`),
+      ).not.toBeNull();
     });
   });
 
@@ -823,24 +752,26 @@ describe("regression tests", () => {
     });
 
     const contextMenu = document.querySelector(".context-menu");
-    const options = contextMenu?.querySelectorAll(".context-menu-option");
-    const expectedOptions = [
-      "Copy styles",
-      "Paste styles",
-      "Delete",
-      "Ungroup selection",
-      "Add to library",
-      "Send backward",
-      "Bring forward",
-      "Send to back",
-      "Bring to front",
-      "Duplicate",
+    const expectedShortcutNames: ShortcutName[] = [
+      "cut",
+      "copyStyles",
+      "pasteStyles",
+      "delete",
+      "ungroup",
+      "addToLibrary",
+      "sendBackward",
+      "bringForward",
+      "sendToBack",
+      "bringToFront",
+      "duplicateSelection",
     ];
 
     expect(contextMenu).not.toBeNull();
-    expect(contextMenu?.children.length).toBe(10);
-    options?.forEach((opt, i) => {
-      expect(opt.textContent).toBe(expectedOptions[i]);
+    expect(contextMenu?.children.length).toBe(expectedShortcutNames.length);
+    expectedShortcutNames.forEach((shortcutName) => {
+      expect(
+        contextMenu?.querySelector(`li[data-testid="${shortcutName}"]`),
+      ).not.toBeNull();
     });
   });
 
