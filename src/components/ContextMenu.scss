@@ -32,6 +32,13 @@
 
     display: grid;
     grid-template-columns: 1fr 0.2fr;
+
+    &.dangerous {
+      div:nth-child(1) {
+        color: $oc-red-7;
+      }
+    }
+
     div:nth-child(1) {
       justify-self: start;
       margin-inline-end: 20px;
@@ -46,6 +53,13 @@
   .context-menu-option:hover {
     color: var(--popup-background-color);
     background-color: var(--select-highlight-color);
+
+    &.dangerous {
+      div:nth-child(1) {
+        color: var(--popup-background-color);
+      }
+      background-color: $oc-red-6;
+    }
   }
 
   .context-menu-option:focus {
