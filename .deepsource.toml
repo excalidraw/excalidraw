@@ -1,0 +1,25 @@
+version = 1
+
+test_patterns = ["/src/tests/**"]
+
+exclude_patterns = [
+    "/firebase-project/**",
+]
+
+[[analyzers]]
+name = "javascript"
+enabled = true
+
+  [analyzers.meta]
+  environment = [
+    "jest",
+    "browser",
+    "nodejs"
+  ]
+  plugins = ["react"]
+  dialect = "typescript"
+  module_system = "es-modules"
+
+[[transformers]]
+name = "prettier"
+enabled = true
