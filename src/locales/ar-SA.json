@@ -4,6 +4,7 @@
     "selectAll": "تحديد الكل",
     "multiSelect": "إضافة عنصر للتحديد",
     "moveCanvas": "نقل لوح رسم",
+    "cut": "",
     "copy": "نسخ",
     "copyAsPng": "نسخ إلى الحافظة بصيغة PNG",
     "copyAsSvg": "نسخ بصيغة SVG",
@@ -28,6 +29,11 @@
     "edges": "الحواف",
     "sharp": "حادة",
     "round": "دائرية",
+    "arrowheads": "",
+    "arrowhead_none": "",
+    "arrowhead_arrow": "",
+    "arrowhead_bar": "",
+    "arrowhead_dot": "",
     "fontSize": "حجم الخط",
     "fontFamily": "نوع الخط",
     "onlySelected": "المحدد فقط",
@@ -71,9 +77,11 @@
     "ungroup": "إلغاء تحديد مجموعة",
     "collaborators": "المتعاونون",
     "toggleGridMode": "التبديل إلى وضع الشبكة",
+    "toggleStats": "",
     "addToLibrary": "أضف إلى المكتبة",
     "removeFromLibrary": "حذف من المكتبة",
     "libraryLoadingMessage": "جارٍ تحميل المكتبة...",
+    "libraries": "",
     "loadingScene": "جاري تحميل المشهد...",
     "align": "محاذاة",
     "alignTop": "محاذاة إلى اﻷعلى",
@@ -205,13 +213,22 @@
     "textNewLine": "إضافة سطر جديد (نص)",
     "textFinish": "الانتهاء من تحرير (النص)",
     "zoomToFit": "تكبير لتلائم جميع العناصر",
+    "zoomToSelection": "",
     "preventBinding": "منع ربط السهم"
   },
   "encrypted": {
     "tooltip": "رسوماتك مشفرة من النهاية إلى النهاية حتى أن خوادم Excalidraw لن تراها أبدا."
   },
-  "charts": {
-    "noNumericColumn": "قمت بلصق جدول بيانات دون عمود رقمي.",
-    "tooManyColumns": "قمت بلصق جدول بيانات دون عمود رقمي."
+  "stats": {
+    "angle": "",
+    "element": "",
+    "elements": "",
+    "height": "",
+    "scene": "",
+    "selected": "",
+    "storage": "",
+    "title": "",
+    "total": "",
+    "width": ""
   }
 }

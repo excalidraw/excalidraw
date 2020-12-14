@@ -4,6 +4,7 @@
     "selectAll": "בחר הכל",
     "multiSelect": "",
     "moveCanvas": "",
+    "cut": "",
     "copy": "העתק",
     "copyAsPng": "העתק ללוח כ PNG",
     "copyAsSvg": "העתק ללוח כ SVG",
@@ -28,6 +29,11 @@
     "edges": "",
     "sharp": "",
     "round": "",
+    "arrowheads": "",
+    "arrowhead_none": "",
+    "arrowhead_arrow": "",
+    "arrowhead_bar": "",
+    "arrowhead_dot": "",
     "fontSize": "גודל גופן",
     "fontFamily": "סוג הגופן",
     "onlySelected": "רק מה שנבחר",
@@ -71,9 +77,11 @@
     "ungroup": "פרק קבוצה",
     "collaborators": "",
     "toggleGridMode": "",
+    "toggleStats": "",
     "addToLibrary": "",
     "removeFromLibrary": "",
     "libraryLoadingMessage": "",
+    "libraries": "",
     "loadingScene": "",
     "align": "",
     "alignTop": "",
@@ -205,13 +213,22 @@
     "textNewLine": "הוסף שורה חדשה (טקסט)",
     "textFinish": "סיים עריכה (טקסט)",
     "zoomToFit": "זום להתאמת כל האלמנטים למסך",
+    "zoomToSelection": "",
     "preventBinding": ""
   },
   "encrypted": {
     "tooltip": "הרישומים שלך מוצפנים מקצה לקצה כך שהשרתים של Excalidraw לא יראו אותם לעולם."
   },
-  "charts": {
-    "noNumericColumn": "",
-    "tooManyColumns": ""
+  "stats": {
+    "angle": "",
+    "element": "",
+    "elements": "",
+    "height": "",
+    "scene": "",
+    "selected": "",
+    "storage": "",
+    "title": "",
+    "total": "",
+    "width": ""
   }
 }

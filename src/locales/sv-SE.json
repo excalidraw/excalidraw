@@ -4,6 +4,7 @@
     "selectAll": "Markera alla",
     "multiSelect": "Lägg till element till markering",
     "moveCanvas": "Flytta canvas",
+    "cut": "Klipp ut",
     "copy": "Kopiera",
     "copyAsPng": "Kopiera till urklipp som PNG",
     "copyAsSvg": "Kopiera till urklipp som SVG",
@@ -28,6 +29,11 @@
     "edges": "Kanter",
     "sharp": "Skarp",
     "round": "Rund",
+    "arrowheads": "Pilhuvuden",
+    "arrowhead_none": "Inga",
+    "arrowhead_arrow": "Pil",
+    "arrowhead_bar": "Stolpe",
+    "arrowhead_dot": "Punkt",
     "fontSize": "Teckenstorlek",
     "fontFamily": "Teckensnitt",
     "onlySelected": "Endast markering",
@@ -71,9 +77,11 @@
     "ungroup": "Avgruppera markering",
     "collaborators": "Medarbetare",
     "toggleGridMode": "Växla rutnätsläge",
+    "toggleStats": "Visa/dölj statistik för nördar",
     "addToLibrary": "Lägg till i biblioteket",
     "removeFromLibrary": "Ta bort från bibliotek",
     "libraryLoadingMessage": "Laddar bibliotek...",
+    "libraries": "Bläddra i bibliotek",
     "loadingScene": "Laddar scen...",
     "align": "Justera",
     "alignTop": "Justera överkant",
@@ -205,13 +213,22 @@
     "textNewLine": "Lägg till ny rad (text)",
     "textFinish": "Slutför redigering (text)",
     "zoomToFit": "Zooma för att rymma alla element",
+    "zoomToSelection": "Zooma till markering",
     "preventBinding": "Förhindra pilbindning"
   },
   "encrypted": {
     "tooltip": "Dina skisser är krypterade från ände till ände så Excalidraws servrar kommer aldrig att se dem."
   },
-  "charts": {
-    "noNumericColumn": "Du klistrade in ett kalkylblad utan en numerisk kolumn.",
-    "tooManyColumns": "Du klistrade in ett kalkylblad med mer än två kolumner."
+  "stats": {
+    "angle": "Vinkel",
+    "element": "Element",
+    "elements": "Element",
+    "height": "Höjd",
+    "scene": "Skiss",
+    "selected": "Valda",
+    "storage": "Lagring",
+    "title": "Statistik för nördar",
+    "total": "Totalt",
+    "width": "Bredd"
   }
 }

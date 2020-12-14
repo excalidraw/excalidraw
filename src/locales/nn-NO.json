@@ -4,6 +4,7 @@
     "selectAll": "Vel alt",
     "multiSelect": "Legg til element i utval",
     "moveCanvas": "Flytt lerretet",
+    "cut": "",
     "copy": "Kopier",
     "copyAsPng": "Kopier til utklippstavla som PNG",
     "copyAsSvg": "Kopier til utklippstavla som SVG",
@@ -28,6 +29,11 @@
     "edges": "Kanter",
     "sharp": "Skarp",
     "round": "Rund",
+    "arrowheads": "",
+    "arrowhead_none": "",
+    "arrowhead_arrow": "",
+    "arrowhead_bar": "",
+    "arrowhead_dot": "",
     "fontSize": "Skriftstorleik",
     "fontFamily": "Skrifttype",
     "onlySelected": "Kun valde",
@@ -71,9 +77,11 @@
     "ungroup": "Avgrupper utval",
     "collaborators": "Samarbeidarar",
     "toggleGridMode": "Sla på/av rutenett",
+    "toggleStats": "",
     "addToLibrary": "Legg til i bibliotek",
     "removeFromLibrary": "Fjern frå bibliotek",
     "libraryLoadingMessage": "Laster bibliotek...",
+    "libraries": "",
     "loadingScene": "Laster scene...",
     "align": "",
     "alignTop": "",
@@ -205,13 +213,22 @@
     "textNewLine": "Legg til ny linje (tekst)",
     "textFinish": "Fullfør redigering (tekst)",
     "zoomToFit": "Zoom for å sjå alle elementa",
+    "zoomToSelection": "",
     "preventBinding": "Hindre pilkobling"
   },
   "encrypted": {
     "tooltip": "Teikningane dine er ende-til-ende-krypterte slik at Excalidraw sine serverar aldri får sjå dei."
   },
-  "charts": {
-    "noNumericColumn": "Du limte inn eit rekneark utan ei numerisk kolonne.",
-    "tooManyColumns": "Du limte inn eit rekneark med meir enn to kolonnar."
+  "stats": {
+    "angle": "",
+    "element": "",
+    "elements": "",
+    "height": "",
+    "scene": "",
+    "selected": "",
+    "storage": "",
+    "title": "",
+    "total": "",
+    "width": ""
   }
 }

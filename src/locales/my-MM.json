@@ -4,6 +4,7 @@
     "selectAll": "အကုန်ရွေး",
     "multiSelect": "ရွေးထားသည့်ထဲပုံထည့်",
     "moveCanvas": "ကားချပ်ရွှေ့",
+    "cut": "",
     "copy": "ကူး",
     "copyAsPng": "PNG အနေဖြင့်ကူး",
     "copyAsSvg": "SVG အနေဖြင့်ကူး",
@@ -28,6 +29,11 @@
     "edges": "အစွန်း",
     "sharp": "ထောင့်ချွန်",
     "round": "ထောင့်ဝိုင်း",
+    "arrowheads": "မြှားခေါင်း",
+    "arrowhead_none": "ဘာမျှမရှိ",
+    "arrowhead_arrow": "မြှား",
+    "arrowhead_bar": "",
+    "arrowhead_dot": "",
     "fontSize": "စာလုံးအရွယ်",
     "fontFamily": "စာလုံးပုံစံ",
     "onlySelected": "ရွေးထားသလောက်",
@@ -54,7 +60,7 @@
     "architect": "ဗိသုကာ",
     "artist": "ပန်းချီ",
     "cartoonist": "ကာတွန်း",
-    "fileTitle": "",
+    "fileTitle": "ခေါင်းစဉ်",
     "colorPicker": "အရောင်ရွေး",
     "canvasBackground": "ကားချပ်နောက်ခံ",
     "drawingCanvas": "ပုံဆွဲကားချပ်",
@@ -63,7 +69,7 @@
     "language": "ဘာသာစကား",
     "createRoom": "တိုက်ရိုက်ပူးပေါင်းဆောင်ရွက်ရန်အဖွဲ့ဖွဲ့",
     "duplicateSelection": "ပွား",
-    "untitled": "",
+    "untitled": "အမည်မရှိ",
     "name": "အမည်",
     "yourName": "သင့်အမည်",
     "madeWithExcalidraw": "Excalidraw ဖြင့်ဖန်တီးသည်။",
@@ -71,9 +77,11 @@
     "ungroup": "အုပ်စုဖျက်သိမ်း",
     "collaborators": "ပူးပေါင်းပါဝင်သူများ",
     "toggleGridMode": "ဇယားကွက်ဖော်/ဖျောက်",
+    "toggleStats": "",
     "addToLibrary": "မှတ်တမ်းတင်",
     "removeFromLibrary": "မှတ်တမ်းမှထုတ်",
     "libraryLoadingMessage": "မှတ်တမ်းအား တင်သွင်းနေသည်...",
+    "libraries": "စာကြည့်တိုက်တွင်ရှာဖွေပါ",
     "loadingScene": "မြင်ကွင်းဖော်နေသည်...",
     "align": "ချိန်ညှိ",
     "alignTop": "ထိပ်ညှိ",
@@ -82,8 +90,8 @@
     "alignRight": "ညာညှိ",
     "centerVertically": "ဒေါင်လိုက်အလယ်ညှိ",
     "centerHorizontally": "အလျားလိုက်အလယ်ညှိ",
-    "distributeHorizontally": "",
-    "distributeVertically": ""
+    "distributeHorizontally": "အလျားလိုက်",
+    "distributeVertically": "ထောင်လိုက်"
   },
   "buttons": {
     "clearReset": "ကားချပ်ရှင်းလင်း",
@@ -205,13 +213,22 @@
     "textNewLine": "စာသားဖြည့်သွင်း",
     "textFinish": "စာသားဖြည့်သွင်းပြီး",
     "zoomToFit": "ကားချပ်အပြည့်ဖေါ်",
+    "zoomToSelection": "",
     "preventBinding": "မြှားများမပေါင်းစေရန်"
   },
   "encrypted": {
     "tooltip": "ရေးဆွဲထားသောပုံများအား နှစ်ဘက်စွန်းတိုင်လျှို့ဝှက်ထားသဖြင့် Excalidraw ၏ဆာဗာများပင်လျှင်မြင်တွေ့ရမည်မဟုတ်ပါ။"
   },
-  "charts": {
-    "noNumericColumn": "အမှတ်စဉ်ကော်လံမပါဝင်သောဇယားအားထည့်သွင်းလိုက်သည်။",
-    "tooManyColumns": "ကော်လံနှစ်ခုထက်ပိုပါနေသောဇယားအားထည့်သွင်းလိုက်သည်။"
+  "stats": {
+    "angle": "ထောင့်",
+    "element": "",
+    "elements": "",
+    "height": "အမြင့်",
+    "scene": "မြင်ကွင်း",
+    "selected": "ရွေးချယ်သည်",
+    "storage": "သိုလှောင်ခန်း",
+    "title": "အက္ခရာများအတွက်အချက်အလက်များ",
+    "total": "စုစုပေါင်း",
+    "width": "အကျယ်"
   }
 }

@@ -4,6 +4,7 @@
     "selectAll": "انتخاب همه",
     "multiSelect": "یک ایتم به انتخاب شده ها اضافه کنید.",
     "moveCanvas": "بوم را حرکت بدهید",
+    "cut": "",
     "copy": "کپی",
     "copyAsPng": "کپی در حافطه موقت به صورت PNG",
     "copyAsSvg": "کپی در حافطه موقت به صورت SVG",
@@ -28,6 +29,11 @@
     "edges": "لبه ها",
     "sharp": "تیز",
     "round": "دور",
+    "arrowheads": "",
+    "arrowhead_none": "",
+    "arrowhead_arrow": "",
+    "arrowhead_bar": "",
+    "arrowhead_dot": "",
     "fontSize": "اندازه قلم",
     "fontFamily": "نوع قلم",
     "onlySelected": "فقط انتخاب شده ها",
@@ -71,9 +77,11 @@
     "ungroup": "حذف گروهبندی انتخابها",
     "collaborators": "همکاران",
     "toggleGridMode": "سويچ خطوط راهنما",
+    "toggleStats": "",
     "addToLibrary": "افزودن به کتابخانه",
     "removeFromLibrary": "حذف از کتابخانه",
     "libraryLoadingMessage": "بارگذاری کتابخانه...",
+    "libraries": "",
     "loadingScene": "باگذاری صحنه...",
     "align": "تراز",
     "alignTop": "تراز به بالا",
@@ -205,13 +213,22 @@
     "textNewLine": "یک خط جدید اضافه کنید (متن)",
     "textFinish": "پایان ویرایش (متن)",
     "zoomToFit": "بزرگنمایی برای دیدن تمام آیتم ها",
+    "zoomToSelection": "",
     "preventBinding": "مانع شدن از چسبیدن فلش ها"
   },
   "encrypted": {
     "tooltip": "شما در یک محیط رمزگزاری شده دو طرفه در حال طراحی هستید پس Excalidraw هرگز طرح های شما را نمیبند."
   },
-  "charts": {
-    "noNumericColumn": "شما یک صفحه گسترده را بدون ستون عددی کپی کرده اید.",
-    "tooManyColumns": "شما یک صفحه گسترده را با بیش از دو ستون کپی کرده اید."
+  "stats": {
+    "angle": "",
+    "element": "",
+    "elements": "",
+    "height": "",
+    "scene": "",
+    "selected": "",
+    "storage": "",
+    "title": "",
+    "total": "",
+    "width": ""
   }
 }

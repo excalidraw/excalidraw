@@ -4,6 +4,7 @@
     "selectAll": "Pilih semua",
     "multiSelect": "Tambahkan elemen ke pilihan",
     "moveCanvas": "Pindahkan kanvas",
+    "cut": "Potong",
     "copy": "Salin",
     "copyAsPng": "Salin ke papan klip sebagai PNG",
     "copyAsSvg": "Salin ke papan klip sebagai SVG",
@@ -28,6 +29,11 @@
     "edges": "Tepi",
     "sharp": "Tajam",
     "round": "Bulat",
+    "arrowheads": "Mata panah",
+    "arrowhead_none": "Tidak ada",
+    "arrowhead_arrow": "Panah",
+    "arrowhead_bar": "Batang",
+    "arrowhead_dot": "Titik",
     "fontSize": "Ukuran font",
     "fontFamily": "Jenis font",
     "onlySelected": "Hanya yang Dipilih",
@@ -71,9 +77,11 @@
     "ungroup": "Pisahkan pilihan",
     "collaborators": "Kolaborator",
     "toggleGridMode": "Aktifkan/Matikan mode kisi",
+    "toggleStats": "Aktifkan statistik untuk nerd",
     "addToLibrary": "Tambahkan ke pustaka",
     "removeFromLibrary": "Hapus dari pustaka",
     "libraryLoadingMessage": "Memuat pustaka...",
+    "libraries": "Telusur pustaka",
     "loadingScene": "Memuat pemandangan...",
     "align": "Perataan",
     "alignTop": "Rata atas",
@@ -205,13 +213,22 @@
     "textNewLine": "Tambahkan baris baru (teks)",
     "textFinish": "Selesai mengedit (teks)",
     "zoomToFit": "Perbesar agar sesuai dengan semua elemen",
+    "zoomToSelection": "",
     "preventBinding": "Cegah pengikatan panah"
   },
   "encrypted": {
     "tooltip": "Gambar anda terenkripsi end-to-end sehingga server Excalidraw tidak akan pernah dapat melihatnya."
   },
-  "charts": {
-    "noNumericColumn": "Anda menempelkan sebuah lembar bentang tanpa sebuah kolom numerik.",
-    "tooManyColumns": "Anda menempelkan sebuah lembar bentang dengan lebih dari dua kolom."
+  "stats": {
+    "angle": "Sudut",
+    "element": "Elemen",
+    "elements": "Elemen",
+    "height": "Tinggi",
+    "scene": "Pemandangan",
+    "selected": "Terpilih",
+    "storage": "Penyimpanan",
+    "title": "Statistik untuk nerd",
+    "total": "Total",
+    "width": "Lebar"
   }
 }

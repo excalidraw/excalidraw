@@ -4,6 +4,7 @@
     "selectAll": "전체 선택",
     "multiSelect": "선택 영역에 추가하기",
     "moveCanvas": "캔버스 이동",
+    "cut": "",
     "copy": "복사하기",
     "copyAsPng": "클립보드로 PNG 이미지 복사",
     "copyAsSvg": "클립보드로 SVG 이미지 복사",
@@ -28,6 +29,11 @@
     "edges": "가장자리",
     "sharp": "선명하게",
     "round": "둥글게",
+    "arrowheads": "",
+    "arrowhead_none": "",
+    "arrowhead_arrow": "",
+    "arrowhead_bar": "",
+    "arrowhead_dot": "",
     "fontSize": "폰트 크기",
     "fontFamily": "폰트 스타일",
     "onlySelected": "선택한 항목만",
@@ -71,9 +77,11 @@
     "ungroup": "그룹 해제",
     "collaborators": "공동 작업자",
     "toggleGridMode": "격자 모드 켜기/끄기",
+    "toggleStats": "",
     "addToLibrary": "라이브러리에 추가",
     "removeFromLibrary": "라이브러리에서 제거",
     "libraryLoadingMessage": "라이브러리 불러오는 중...",
+    "libraries": "",
     "loadingScene": "화면 불러오는 중...",
     "align": "",
     "alignTop": "",
@@ -205,13 +213,22 @@
     "textNewLine": "줄바꾸기",
     "textFinish": "편집 완료",
     "zoomToFit": "",
+    "zoomToSelection": "",
     "preventBinding": ""
   },
   "encrypted": {
     "tooltip": ""
   },
-  "charts": {
-    "noNumericColumn": "",
-    "tooManyColumns": ""
+  "stats": {
+    "angle": "",
+    "element": "",
+    "elements": "",
+    "height": "",
+    "scene": "",
+    "selected": "",
+    "storage": "",
+    "title": "",
+    "total": "",
+    "width": ""
   }
 }

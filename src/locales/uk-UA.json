@@ -4,6 +4,7 @@
     "selectAll": "Вибрати все",
     "multiSelect": "Додати елемент до вибраного",
     "moveCanvas": "Перемістити полотно",
+    "cut": "Вирізати",
     "copy": "Копіювати",
     "copyAsPng": "Копіювати як PNG",
     "copyAsSvg": "Копіювати як SVG",
@@ -28,6 +29,11 @@
     "edges": "Краї",
     "sharp": "Гострі",
     "round": "Круглі",
+    "arrowheads": "",
+    "arrowhead_none": "Жоден",
+    "arrowhead_arrow": "Стрілка",
+    "arrowhead_bar": "Колона",
+    "arrowhead_dot": "Точка",
     "fontSize": "Розмір шрифту",
     "fontFamily": "Шрифт",
     "onlySelected": "Тільки вибране",
@@ -71,9 +77,11 @@
     "ungroup": "Розгрупувати виділене",
     "collaborators": "Співавтори",
     "toggleGridMode": "Режим сітки",
+    "toggleStats": "",
     "addToLibrary": "Додати до бібліотеки",
     "removeFromLibrary": "Видалити з бібліотеки",
     "libraryLoadingMessage": "Завантажити бібліотеку...",
+    "libraries": "Огляд бібліотек",
     "loadingScene": "Завантаження сцени...",
     "align": "Вирівнювання",
     "alignTop": "Вирівняти по верхньому краю",
@@ -205,13 +213,22 @@
     "textNewLine": "Додати новий рядок (текст)",
     "textFinish": "Завершити редагування (текст)",
     "zoomToFit": "Збільшити щоб умістити все",
+    "zoomToSelection": "Перейти до виділеного",
     "preventBinding": "Запобігти зв'язування зі стрілками"
   },
   "encrypted": {
     "tooltip": "Ваші креслення захищені наскрізним шифруванням — сервери Excalidraw ніколи їх не побачать."
   },
-  "charts": {
-    "noNumericColumn": "Ви вставили таблицю без числової колонки.",
-    "tooManyColumns": "Ви вставляли таблицю з більш ніж двома колонками."
+  "stats": {
+    "angle": "Кут",
+    "element": "Елемент",
+    "elements": "Елементи",
+    "height": "Висота",
+    "scene": "Сцена",
+    "selected": "Вибраний",
+    "storage": "Сховище",
+    "title": "",
+    "total": "Всього",
+    "width": "Ширина"
   }
 }

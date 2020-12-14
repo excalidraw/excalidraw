@@ -4,6 +4,7 @@
     "selectAll": "Выбрать все",
     "multiSelect": "Добавить элемент к выбору",
     "moveCanvas": "Переместить холст",
+    "cut": "",
     "copy": "Копировать",
     "copyAsPng": "Скопировать в буфер обмена как PNG",
     "copyAsSvg": "Скопировать в буфер обмена как SVG",
@@ -28,6 +29,11 @@
     "edges": "Края",
     "sharp": "Острые",
     "round": "Скругленные",
+    "arrowheads": "",
+    "arrowhead_none": "",
+    "arrowhead_arrow": "",
+    "arrowhead_bar": "",
+    "arrowhead_dot": "",
     "fontSize": "Размер шрифта",
     "fontFamily": "Семейство шрифтов",
     "onlySelected": "Только выбранные",
@@ -71,9 +77,11 @@
     "ungroup": "Разделить выделение",
     "collaborators": "Сотрудники",
     "toggleGridMode": "Переключить режим сетки",
+    "toggleStats": "",
     "addToLibrary": "Добавить в библиотеку",
     "removeFromLibrary": "Удалить из библиотеки",
     "libraryLoadingMessage": "Загрузка библиотеки...",
+    "libraries": "",
     "loadingScene": "Загрузка сцены...",
     "align": "",
     "alignTop": "",
@@ -205,13 +213,22 @@
     "textNewLine": "Добавить новую строку (текст)",
     "textFinish": "Закончить редактирование (текст)",
     "zoomToFit": "",
+    "zoomToSelection": "",
     "preventBinding": "Предотвратить привязку стрелок"
   },
   "encrypted": {
     "tooltip": ""
   },
-  "charts": {
-    "noNumericColumn": "",
-    "tooManyColumns": "Вы вставили таблицу с более чем двумя столбцами."
+  "stats": {
+    "angle": "",
+    "element": "",
+    "elements": "",
+    "height": "",
+    "scene": "",
+    "selected": "",
+    "storage": "",
+    "title": "",
+    "total": "",
+    "width": ""
   }
 }
