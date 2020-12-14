@@ -1423,10 +1423,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private onGestureChange = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
-    this.setState(({ zoom }) => ({
+    this.setState(({ zoom, offsetLeft, offsetTop }) => ({
       zoom: getNewZoom(
         getNormalizedZoom(gesture.initialScale! * event.scale),
         zoom,
+        { left: offsetLeft, top: offsetTop },
         { x: cursorX, y: cursorY },
       ),
     }));
@@ -1750,12 +1751,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       const distance = getDistance(Array.from(gesture.pointers.values()));
       const scaleFactor = distance / gesture.initialDistance!;
 
-      this.setState(({ zoom, scrollX, scrollY }) => ({
+      this.setState(({ zoom, scrollX, scrollY, offsetLeft, offsetTop }) => ({
         scrollX: normalizeScroll(scrollX + deltaX / zoom.value),
         scrollY: normalizeScroll(scrollY + deltaY / zoom.value),
         zoom: getNewZoom(
           getNormalizedZoom(gesture.initialScale! * scaleFactor),
           zoom,
+          { left: offsetLeft, top: offsetTop },
           center,
         ),
         shouldCacheIgnoreZoom: true,
@@ -2586,9 +2588,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       );
 
       /* If arrow is pre-arrowheads, it will have undefined for both start and end arrowheads.
-			 If so, we want it to be null for start and "arrow" for end. If the linear item is not 
-			 an arrow, we want it to be null for both. Otherwise, we want it to use the 
-			 values from appState. */
+      If so, we want it to be null for start and "arrow" for end. If the linear item is not
+      an arrow, we want it to be null for both. Otherwise, we want it to use the
+      values from appState. */
 
       const { currentItemStartArrowhead, currentItemEndArrowhead } = this.state;
       const [startArrowhead, endArrowhead] =
@@ -3702,11 +3704,16 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         }, 1000);
       }
 
-      this.setState(({ zoom }) => ({
-        zoom: getNewZoom(getNormalizedZoom(zoom.value - delta / 100), zoom, {
-          x: cursorX,
-          y: cursorY,
-        }),
+      this.setState(({ zoom, offsetLeft, offsetTop }) => ({
+        zoom: getNewZoom(
+          getNormalizedZoom(zoom.value - delta / 100),
+          zoom,
+          { left: offsetLeft, top: offsetTop },
+          {
+            x: cursorX,
+            y: cursorY,
+          },
+        ),
         selectedElementIds: {},
         previousSelectedElementIds:
           Object.keys(selectedElementIds).length !== 0
