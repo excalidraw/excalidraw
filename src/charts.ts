@@ -192,6 +192,7 @@ export const renderSpreadsheet = (
     y,
     startArrowhead: null,
     endArrowhead: null,
+    width: chartWidth,
     points: [
       [0, 0],
       [chartWidth, 0],
@@ -205,6 +206,7 @@ export const renderSpreadsheet = (
     y,
     startArrowhead: null,
     endArrowhead: null,
+    height: chartHeight,
     points: [
       [0, 0],
       [0, -chartHeight],
@@ -220,6 +222,7 @@ export const renderSpreadsheet = (
     endArrowhead: null,
     ...commonProps,
     strokeStyle: "dotted",
+    width: chartWidth,
     points: [
       [0, 0],
       [chartWidth, 0],
