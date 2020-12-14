@@ -43,7 +43,7 @@
     "@babel/preset-typescript": "7.9.0",
     "babel-loader": "8.1.0",
     "babel-plugin-transform-class-properties": "6.24.1",
-    "cross-env": "7.0.2",
+    "cross-env": "7.0.3",
     "file-loader": "6.0.0",
     "ts-loader": "7.0.0",
     "webpack": "4.44.2",
