@@ -1,1 +1,1 @@
-export { exportToBlob, exportToSvg } from "../utils.ts";
+export { exportToBlob, exportToSvg, exportToCanvas } from "../utils.ts";
