@@ -4,6 +4,7 @@
     "selectAll": "Selectare totală",
     "multiSelect": "Adaugă element la selecție",
     "moveCanvas": "Mutare pânză",
+    "cut": "Decupare",
     "copy": "Copiere",
     "copyAsPng": "Copiere în memoria temporară ca PNG",
     "copyAsSvg": "Copiere în memoria temporară ca SVG",
@@ -28,6 +29,11 @@
     "edges": "Margini",
     "sharp": "Ascuțite",
     "round": "Rotunde",
+    "arrowheads": "Vârfuri de săgeată",
+    "arrowhead_none": "Niciunul",
+    "arrowhead_arrow": "Săgeată",
+    "arrowhead_bar": "Bară",
+    "arrowhead_dot": "Bulină",
     "fontSize": "Dimensiune font",
     "fontFamily": "Familia de fonturi",
     "onlySelected": "Numai selecția",
@@ -71,9 +77,11 @@
     "ungroup": "Degrupare selecție",
     "collaborators": "Colaboratori",
     "toggleGridMode": "Comută modul grilă",
+    "toggleStats": "Comută statisticile pentru pasionați",
     "addToLibrary": "Adăugare la bibliotecă",
     "removeFromLibrary": "Eliminare din bibliotecă",
     "libraryLoadingMessage": "Se încarcă biblioteca...",
+    "libraries": "Răsfoiește bibliotecile",
     "loadingScene": "Se încarcă scena...",
     "align": "Aliniere",
     "alignTop": "Aliniere sus",
@@ -205,13 +213,22 @@
     "textNewLine": "Adaugă o linie nouă (text)",
     "textFinish": "Finalizează editarea (text)",
     "zoomToFit": "Apropiere/depărtare pentru a cuprinde totul",
+    "zoomToSelection": "Panoramare la selecție",
     "preventBinding": "Împiedică legarea săgeții"
   },
   "encrypted": {
     "tooltip": "Desenele tale sunt criptate integral, astfel că serverele Excalidraw nu le vor vedea niciodată."
   },
-  "charts": {
-    "noNumericColumn": "Ai inserat o foaie de calcul fără o coloană numerică.",
-    "tooManyColumns": "Ai inserat o foaie de calcul cu mai mult de două coloane."
+  "stats": {
+    "angle": "Unghi",
+    "element": "Element",
+    "elements": "Elemente",
+    "height": "Înălțime",
+    "scene": "Scenă",
+    "selected": "Selectate",
+    "storage": "Stocare",
+    "title": "Statistici pentru pasionați",
+    "total": "Total",
+    "width": "Lățime"
   }
 }

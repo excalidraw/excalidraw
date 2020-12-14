@@ -4,6 +4,7 @@
     "selectAll": "Alle auswählen",
     "multiSelect": "Element zur Auswahl hinzufügen",
     "moveCanvas": "Leinwand verschieben",
+    "cut": "Ausschneiden",
     "copy": "Kopieren",
     "copyAsPng": "In Zwischenablage kopieren (PNG)",
     "copyAsSvg": "In Zwischenablage kopieren (SVG)",
@@ -28,6 +29,11 @@
     "edges": "Kanten",
     "sharp": "Eckig",
     "round": "Rund",
+    "arrowheads": "Pfeilspitzen",
+    "arrowhead_none": "Keine",
+    "arrowhead_arrow": "Pfeil",
+    "arrowhead_bar": "Balken",
+    "arrowhead_dot": "Punkt",
     "fontSize": "Schriftgröße",
     "fontFamily": "Schriftfamilie",
     "onlySelected": "Nur ausgewählte",
@@ -71,9 +77,11 @@
     "ungroup": "Gruppierung aufheben",
     "collaborators": "Mitarbeitende",
     "toggleGridMode": "Gitterlinien ein-/ausschalten",
+    "toggleStats": "Statistiken für Nerds ein-/ausschalten",
     "addToLibrary": "Zur Bibliothek hinzufügen",
     "removeFromLibrary": "Aus Bibliothek entfernen",
     "libraryLoadingMessage": "Lade Bibliothek...",
+    "libraries": "Bibliotheken durchsuchen",
     "loadingScene": "Lade Zeichnung...",
     "align": "Ausrichten",
     "alignTop": "Obere Kanten",
@@ -205,13 +213,22 @@
     "textNewLine": "Neue Zeile hinzufügen (Text)",
     "textFinish": "Bearbeiten beenden (Text)",
     "zoomToFit": "Zoomen um alle Elemente einzupassen",
+    "zoomToSelection": "",
     "preventBinding": "Pfeil-Bindung verhindern"
   },
   "encrypted": {
     "tooltip": "Da deine Zeichnungen Ende-zu-Ende verschlüsselt werden, sehen auch unsere Excalidraw-Server sie niemals."
   },
-  "charts": {
-    "noNumericColumn": "Du hast eine Tabelle ohne numerische Spalte eingefügt.",
-    "tooManyColumns": "Du hast eine Tabelle mit mehr als zwei Spalten eingefügt."
+  "stats": {
+    "angle": "Winkel",
+    "element": "Element",
+    "elements": "Elemente",
+    "height": "Höhe",
+    "scene": "Zeichnung",
+    "selected": "Ausgewählt",
+    "storage": "Speicher",
+    "title": "Statistiken für Nerds",
+    "total": "Gesamt",
+    "width": "Breite"
   }
 }
