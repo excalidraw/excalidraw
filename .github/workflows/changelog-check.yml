@@ -2,9 +2,8 @@ name: Changelog in sync for packages
 
 on:
   push:
-    branches:
-      - master
-      - "!l10n_master"
+    branches-ignore:
+      - "l10n_master"
 jobs:
   test:
     runs-on: ubuntu-latest
