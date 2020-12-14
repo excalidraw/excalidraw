@@ -2,11 +2,11 @@ name: Changelog in sync for packages
 
 on:
   push:
+  pull_request:
     branches-ignore:
       - l10n_master
       - dependabot/*
       - chenagelog # just testing
-  pull_request:
 
 jobs:
   test:
