@@ -23,8 +23,8 @@ Please add the latest change on the top under the correct section.
 - Support CSV graphs and improve the look and feel [#2495](https://github.com/excalidraw/excalidraw/pull/2495)
 
 ### Fixes
-- Fix Library Menu Layout [#2502](https://github.com/excalidraw/excalidraw/pull/2502)
 - Fix resizing the pasted charts [#2586](https://github.com/excalidraw/excalidraw/pull/2586)
+- Fix Library Menu Layout [#2502](https://github.com/excalidraw/excalidraw/pull/2502)
 
 ### Improvements
 - Add tooltip with icon for embedding scenes [#2532](https://github.com/excalidraw/excalidraw/pull/2532)
