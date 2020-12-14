@@ -213,7 +213,7 @@
     "textNewLine": "文本换行",
     "textFinish": "完成编辑文本",
     "zoomToFit": "缩放以适应所有元素",
-    "zoomToSelection": "",
+    "zoomToSelection": "缩放至选择部分",
     "preventBinding": "防止箭头吸附"
   },
   "encrypted": {
