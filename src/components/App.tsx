@@ -2588,8 +2588,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       );
 
       /* If arrow is pre-arrowheads, it will have undefined for both start and end arrowheads.
-			 If so, we want it to be null for start and "arrow" for end. If the linear item is not
-			 an arrow, we want it to be null for both. Otherwise, we want it to use the
+			 If so, we want it to be null for start and "arrow" for end. If the linear item is not 
+			 an arrow, we want it to be null for both. Otherwise, we want it to use the 
 			 values from appState. */
 
       const { currentItemStartArrowhead, currentItemEndArrowhead } = this.state;
