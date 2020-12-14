@@ -11,8 +11,6 @@ updates:
       - lipis
     assignees:
       - lipis
-    labels:
-      - "type: chore \U0001F9F9"
 
   - package-ecosystem: npm
     directory: "/src/packages/excalidraw/"
@@ -25,5 +23,15 @@ updates:
       - lipis
     assignees:
       - lipis
-    labels:
-      - "type: chore \U0001F9F9"
+
+  - package-ecosystem: npm
+    directory: "/src/packages/utils/"
+    schedule:
+      interval: weekly
+      day: sunday
+      time: "01:00"
+    open-pull-requests-limit: 99
+    reviewers:
+      - lipis
+    assignees:
+      - lipis
