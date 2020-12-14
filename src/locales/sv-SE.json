@@ -213,7 +213,7 @@
     "textNewLine": "Lägg till ny rad (text)",
     "textFinish": "Slutför redigering (text)",
     "zoomToFit": "Zooma för att rymma alla element",
-    "zoomToSelection": "",
+    "zoomToSelection": "Zooma till markering",
     "preventBinding": "Förhindra pilbindning"
   },
   "encrypted": {
