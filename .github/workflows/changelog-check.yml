@@ -2,10 +2,9 @@ name: Changelog in sync for packages
 
 on:
   push:
-    branches:
-      - master
-  pull_request:
-
+    branches-ignore:
+      - "l10n_master"
+      - "dependabot/**"
 jobs:
   test:
     runs-on: ubuntu-latest
