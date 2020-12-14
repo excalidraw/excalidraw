@@ -4,6 +4,7 @@ on:
   push:
     branches-ignore:
       - "l10n_master"
+      - "aakansha-test"
 jobs:
   test:
     runs-on: ubuntu-latest
