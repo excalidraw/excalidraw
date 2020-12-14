@@ -1,0 +1,37 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: sunday
+      time: "01:00"
+    open-pull-requests-limit: 99
+    reviewers:
+      - lipis
+    assignees:
+      - lipis
+
+  - package-ecosystem: npm
+    directory: "/src/packages/excalidraw/"
+    schedule:
+      interval: weekly
+      day: sunday
+      time: "01:00"
+    open-pull-requests-limit: 99
+    reviewers:
+      - lipis
+    assignees:
+      - lipis
+
+  - package-ecosystem: npm
+    directory: "/src/packages/utils/"
+    schedule:
+      interval: weekly
+      day: sunday
+      time: "01:00"
+    open-pull-requests-limit: 99
+    reviewers:
+      - lipis
+    assignees:
+      - lipis
