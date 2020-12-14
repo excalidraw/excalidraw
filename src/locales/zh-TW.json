@@ -213,7 +213,7 @@
     "textNewLine": "換行（文字）",
     "textFinish": "完成編輯（文字）",
     "zoomToFit": "放大至填滿畫面",
-    "zoomToSelection": "",
+    "zoomToSelection": "縮放至選取區",
     "preventBinding": "防止箭頭綁定"
   },
   "encrypted": {
