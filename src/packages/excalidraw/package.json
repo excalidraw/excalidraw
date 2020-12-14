@@ -55,7 +55,7 @@
     "css-loader": "3.5.2",
     "file-loader": "6.0.0",
     "mini-css-extract-plugin": "0.8.0",
-    "sass-loader": "8.0.2",
+    "sass-loader": "10.1.0",
     "terser-webpack-plugin": "2.3.5",
     "ts-loader": "7.0.0",
     "webpack": "4.42.0",
