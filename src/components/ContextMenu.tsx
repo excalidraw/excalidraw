@@ -26,7 +26,6 @@ const ContextMenu = ({ options, onCloseRequest, top, left }: Props) => {
   const isDarkTheme = !!document
     .querySelector(".excalidraw")
     ?.classList.contains("Appearance_dark");
-
   return (
     <div
       className={clsx("excalidraw", {
@@ -45,7 +44,12 @@ const ContextMenu = ({ options, onCloseRequest, top, left }: Props) => {
         >
           {options.map(({ action, shortcutName, label }, idx) => (
             <li data-testid={shortcutName} key={idx} onClick={onCloseRequest}>
-              <button className="context-menu-option" onClick={action}>
+              <button
+                className={`context-menu-option ${
+                  shortcutName === "delete" ? "dangerous" : ""
+                }`}
+                onClick={action}
+              >
                 <div>{label}</div>
                 <div>
                   {shortcutName
