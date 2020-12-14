@@ -4,7 +4,7 @@
     "selectAll": "Tout sélectionner",
     "multiSelect": "Ajouter l'élément à la sélection",
     "moveCanvas": "Déplacer le canvas",
-    "cut": "",
+    "cut": "Couper",
     "copy": "Copier",
     "copyAsPng": "Copier dans le presse-papier en PNG",
     "copyAsSvg": "Copier dans le presse-papier en SVG",
@@ -29,7 +29,7 @@
     "edges": "Angles",
     "sharp": "Aigu",
     "round": "Rond",
-    "arrowheads": "Pointes de flèche",
+    "arrowheads": "Extrémités de ligne",
     "arrowhead_none": "Aucun",
     "arrowhead_arrow": "Flèche",
     "arrowhead_bar": "",
@@ -213,7 +213,7 @@
     "textNewLine": "Ajouter une nouvelle ligne (texte)",
     "textFinish": "Terminer l'édition (texte)",
     "zoomToFit": "Zoomer pour visualiser tous les éléments",
-    "zoomToSelection": "",
+    "zoomToSelection": "Zoom sur la sélection",
     "preventBinding": "Empêcher la liaison de la flèche"
   },
   "encrypted": {
