@@ -24,6 +24,7 @@ Please add the latest change on the top under the correct section.
 
 ### Fixes
 - Fix Library Menu Layout [#2502](https://github.com/excalidraw/excalidraw/pull/2502)
+- Fix resizing the pasted charts [#2586](https://github.com/excalidraw/excalidraw/pull/2586)
 
 ### Improvements
 - Add tooltip with icon for embedding scenes [#2532](https://github.com/excalidraw/excalidraw/pull/2532)
