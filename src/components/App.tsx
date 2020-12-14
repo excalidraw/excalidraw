@@ -301,9 +301,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     };
     if (excalidrawRef) {
       const readyPromise =
-        typeof excalidrawRef === "function"
-          ? resolvablePromise<ExcalidrawImperativeAPI>()
-          : excalidrawRef.current!.readyPromise;
+        ("current" in excalidrawRef && excalidrawRef.current?.readyPromise) ||
+        resolvablePromise<ExcalidrawImperativeAPI>();
+
       const api: ExcalidrawImperativeAPI = {
         ready: true,
         readyPromise,
@@ -351,6 +351,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const canvasWidth = canvasDOMWidth * canvasScale;
     const canvasHeight = canvasDOMHeight * canvasScale;
 
+    const DEFAULT_PASTE_X = canvasDOMWidth / 2;
+    const DEFAULT_PASTE_Y = canvasDOMHeight / 2;
+
     return (
       <div
         className="excalidraw"
@@ -371,7 +374,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           onCollabButtonClick={onCollabButtonClick}
           onLockToggle={this.toggleLock}
           onInsertShape={(elements) =>
-            this.addElementsFromPasteOrLibrary(elements)
+            this.addElementsFromPasteOrLibrary(
+              elements,
+              DEFAULT_PASTE_X,
+              DEFAULT_PASTE_Y,
+            )
           }
           zenModeEnabled={zenModeEnabled}
           toggleZenMode={this.toggleZenMode}
@@ -873,8 +880,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (isWritableElement(event.target)) {
       return;
     }
-    this.copyAll();
-    this.actionManager.executeAction(actionDeleteSelected);
+    this.cutAll();
     event.preventDefault();
   });
 
@@ -885,6 +891,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.copyAll();
     event.preventDefault();
   });
+
+  private cutAll = () => {
+    this.copyAll();
+    this.actionManager.executeAction(actionDeleteSelected);
+  };
 
   private copyAll = () => {
     copyToClipboard(this.scene.getElements(), this.state);
@@ -990,7 +1001,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         this.setState({ errorMessage: data.errorMessage });
       } else if (data.spreadsheet) {
         this.addElementsFromPasteOrLibrary(
-          renderSpreadsheet(this.state, data.spreadsheet, cursorX, cursorY),
+          renderSpreadsheet(data.spreadsheet, cursorX, cursorY),
         );
       } else if (data.elements) {
         this.addElementsFromPasteOrLibrary(data.elements);
@@ -1021,20 +1032,17 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const dy = y - elementsCenterY;
     const groupIdMap = new Map();
 
+    const [gridX, gridY] = getGridPoint(dx, dy, this.state.gridSize);
+
     const oldIdToDuplicatedId = new Map();
     const newElements = clipboardElements.map((element) => {
-      const [pastedPositionX, pastedPositionY] = getGridPoint(
-        element.x + dx - minX,
-        element.y + dy - minY,
-        this.state.gridSize,
-      );
       const newElement = duplicateElement(
         this.state.editingGroupId,
         groupIdMap,
         element,
         {
-          x: pastedPositionX,
-          y: pastedPositionY,
+          x: element.x + gridX - minX,
+          y: element.y + gridY - minY,
         },
       );
       oldIdToDuplicatedId.set(element.id, newElement.id);
@@ -1407,14 +1415,30 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private onGestureStart = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
+    this.setState({
+      selectedElementIds: {},
+    });
+    gesture.initialScale = this.state.zoom.value;
   });
 
   private onGestureChange = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
+    this.setState(({ zoom }) => ({
+      zoom: getNewZoom(
+        getNormalizedZoom(gesture.initialScale! * event.scale),
+        zoom,
+        { x: cursorX, y: cursorY },
+      ),
+    }));
   });
 
   private onGestureEnd = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
+    this.setState({
+      previousSelectedElementIds: {},
+      selectedElementIds: this.state.previousSelectedElementIds,
+    });
+    gesture.initialScale = null;
   });
 
   private handleTextWysiwyg(
@@ -2560,6 +2584,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         pointerDownState.origin.y,
         elementType === "draw" ? null : this.state.gridSize,
       );
+
+      /* If arrow is pre-arrowheads, it will have undefined for both start and end arrowheads.
+			 If so, we want it to be null for start and "arrow" for end. If the linear item is not 
+			 an arrow, we want it to be null for both. Otherwise, we want it to use the 
+			 values from appState. */
+
+      const { currentItemStartArrowhead, currentItemEndArrowhead } = this.state;
+      const [startArrowhead, endArrowhead] =
+        elementType === "arrow"
+          ? [currentItemStartArrowhead, currentItemEndArrowhead]
+          : [null, null];
+
       const element = newLinearElement({
         type: elementType,
         x: gridX,
@@ -2572,6 +2608,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         roughness: this.state.currentItemRoughness,
         opacity: this.state.currentItemOpacity,
         strokeSharpness: this.state.currentItemLinearStrokeSharpness,
+        startArrowhead,
+        endArrowhead,
       });
       this.setState((prevState) => ({
         selectedElementIds: {
@@ -3561,16 +3599,19 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       ContextMenu.push({
         options: [
           navigator.clipboard && {
+            shortcutName: "paste",
             label: t("labels.paste"),
             action: () => this.pasteFromClipboard(null),
           },
           probablySupportsClipboardBlob &&
             elements.length > 0 && {
+              shortcutName: "copyAsPng",
               label: t("labels.copyAsPng"),
               action: this.copyToClipboardAsPng,
             },
           probablySupportsClipboardWriteText &&
             elements.length > 0 && {
+              shortcutName: "copyAsSvg",
               label: t("labels.copyAsSvg"),
               action: this.copyToClipboardAsSvg,
             },
@@ -3578,10 +3619,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             CANVAS_ONLY_ACTIONS.includes(action.name),
           ),
           {
+            shortcutName: "toggleGridMode",
             label: t("labels.toggleGridMode"),
             action: this.toggleGridMode,
           },
           {
+            shortcutName: "toggleStats",
             label: t("labels.toggleStats"),
             action: this.toggleStats,
           },
@@ -3598,19 +3641,28 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     ContextMenu.push({
       options: [
+        {
+          shortcutName: "cut",
+          label: t("labels.cut"),
+          action: this.cutAll,
+        },
         navigator.clipboard && {
+          shortcutName: "copy",
           label: t("labels.copy"),
           action: this.copyAll,
         },
         navigator.clipboard && {
+          shortcutName: "paste",
           label: t("labels.paste"),
           action: () => this.pasteFromClipboard(null),
         },
         probablySupportsClipboardBlob && {
+          shortcutName: "copyAsPng",
           label: t("labels.copyAsPng"),
           action: this.copyToClipboardAsPng,
         },
         probablySupportsClipboardWriteText && {
+          shortcutName: "copyAsSvg",
           label: t("labels.copyAsSvg"),
           action: this.copyToClipboardAsSvg,
         },

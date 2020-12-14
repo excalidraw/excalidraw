@@ -2,8 +2,9 @@ import { queryByText } from "@testing-library/react";
 import React from "react";
 import ReactDOM from "react-dom";
 import { copiedStyles } from "../actions/actionStyles";
+import { ShortcutName } from "../actions/shortcuts";
 import { ExcalidrawElement } from "../element/types";
-import { setLanguage, t } from "../i18n";
+import { setLanguage } from "../i18n";
 import { CODES, KEYS } from "../keys";
 import Excalidraw from "../packages/excalidraw/index";
 import { reseed } from "../random";
@@ -632,16 +633,19 @@ describe("regression tests", () => {
       clientY: 1,
     });
     const contextMenu = document.querySelector(".context-menu");
-    const options = contextMenu?.querySelectorAll(".context-menu-option");
-    const expectedOptions = [
-      t("labels.selectAll"),
-      t("labels.toggleGridMode"),
-      t("labels.toggleStats"),
+    const expectedShortcutNames: ShortcutName[] = [
+      "selectAll",
+      "toggleGridMode",
+      "toggleStats",
     ];
 
     expect(contextMenu).not.toBeNull();
-    expect(options?.length).toBe(3);
-    expect(options?.item(0).textContent).toBe(expectedOptions[0]);
+    expect(contextMenu?.children.length).toBe(expectedShortcutNames.length);
+    expectedShortcutNames.forEach((shortcutName) => {
+      expect(
+        contextMenu?.querySelector(`li[data-testid="${shortcutName}"]`),
+      ).not.toBeNull();
+    });
   });
 
   it("shows context menu for element", () => {
@@ -655,23 +659,25 @@ describe("regression tests", () => {
       clientY: 1,
     });
     const contextMenu = document.querySelector(".context-menu");
-    const options = contextMenu?.querySelectorAll(".context-menu-option");
-    const expectedOptions = [
-      "Copy styles",
-      "Paste styles",
-      "Delete",
-      "Add to library",
-      "Send backward",
-      "Bring forward",
-      "Send to back",
-      "Bring to front",
-      "Duplicate",
+    const expectedShortcutNames: ShortcutName[] = [
+      "cut",
+      "copyStyles",
+      "pasteStyles",
+      "delete",
+      "addToLibrary",
+      "sendBackward",
+      "bringForward",
+      "sendToBack",
+      "bringToFront",
+      "duplicateSelection",
     ];
 
     expect(contextMenu).not.toBeNull();
-    expect(contextMenu?.children.length).toBe(9);
-    options?.forEach((opt, i) => {
-      expect(opt.textContent).toBe(expectedOptions[i]);
+    expect(contextMenu?.children.length).toBe(expectedShortcutNames.length);
+    expectedShortcutNames.forEach((shortcutName) => {
+      expect(
+        contextMenu?.querySelector(`li[data-testid="${shortcutName}"]`),
+      ).not.toBeNull();
     });
   });
 
@@ -697,24 +703,26 @@ describe("regression tests", () => {
     });
 
     const contextMenu = document.querySelector(".context-menu");
-    const options = contextMenu?.querySelectorAll(".context-menu-option");
-    const expectedOptions = [
-      "Copy styles",
-      "Paste styles",
-      "Delete",
-      "Group selection",
-      "Add to library",
-      "Send backward",
-      "Bring forward",
-      "Send to back",
-      "Bring to front",
-      "Duplicate",
+    const expectedShortcutNames: ShortcutName[] = [
+      "cut",
+      "copyStyles",
+      "pasteStyles",
+      "delete",
+      "group",
+      "addToLibrary",
+      "sendBackward",
+      "bringForward",
+      "sendToBack",
+      "bringToFront",
+      "duplicateSelection",
     ];
 
     expect(contextMenu).not.toBeNull();
-    expect(contextMenu?.children.length).toBe(10);
-    options?.forEach((opt, i) => {
-      expect(opt.textContent).toBe(expectedOptions[i]);
+    expect(contextMenu?.children.length).toBe(expectedShortcutNames.length);
+    expectedShortcutNames.forEach((shortcutName) => {
+      expect(
+        contextMenu?.querySelector(`li[data-testid="${shortcutName}"]`),
+      ).not.toBeNull();
     });
   });
 
@@ -744,24 +752,26 @@ describe("regression tests", () => {
     });
 
     const contextMenu = document.querySelector(".context-menu");
-    const options = contextMenu?.querySelectorAll(".context-menu-option");
-    const expectedOptions = [
-      "Copy styles",
-      "Paste styles",
-      "Delete",
-      "Ungroup selection",
-      "Add to library",
-      "Send backward",
-      "Bring forward",
-      "Send to back",
-      "Bring to front",
-      "Duplicate",
+    const expectedShortcutNames: ShortcutName[] = [
+      "cut",
+      "copyStyles",
+      "pasteStyles",
+      "delete",
+      "ungroup",
+      "addToLibrary",
+      "sendBackward",
+      "bringForward",
+      "sendToBack",
+      "bringToFront",
+      "duplicateSelection",
     ];
 
     expect(contextMenu).not.toBeNull();
-    expect(contextMenu?.children.length).toBe(10);
-    options?.forEach((opt, i) => {
-      expect(opt.textContent).toBe(expectedOptions[i]);
+    expect(contextMenu?.children.length).toBe(expectedShortcutNames.length);
+    expectedShortcutNames.forEach((shortcutName) => {
+      expect(
+        contextMenu?.querySelector(`li[data-testid="${shortcutName}"]`),
+      ).not.toBeNull();
     });
   });
 

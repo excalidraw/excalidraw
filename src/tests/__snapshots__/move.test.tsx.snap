@@ -139,6 +139,7 @@ Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElementIds": null,
+  "endArrowhead": null,
   "endBinding": Object {
     "elementId": "id1",
     "focus": -0.46666666666666673,
@@ -163,6 +164,7 @@ Object {
   ],
   "roughness": 1,
   "seed": 401146281,
+  "startArrowhead": null,
   "startBinding": Object {
     "elementId": "id0",
     "focus": -0.6000000000000001,

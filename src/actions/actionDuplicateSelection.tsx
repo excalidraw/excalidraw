@@ -18,6 +18,7 @@ import {
 import { AppState } from "../types";
 import { fixBindingsAfterDuplication } from "../element/binding";
 import { ActionResult } from "./types";
+import { GRID_SIZE } from "../constants";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
@@ -93,8 +94,8 @@ const duplicateElements = (
       groupIdMap,
       element,
       {
-        x: element.x + 10,
-        y: element.y + 10,
+        x: element.x + GRID_SIZE / 2,
+        y: element.y + GRID_SIZE / 2,
       },
     );
     oldIdToDuplicatedId.set(element.id, newElement.id);

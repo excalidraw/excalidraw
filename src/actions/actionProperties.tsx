@@ -1,18 +1,23 @@
 import React from "react";
+import { getLanguage } from "../i18n";
 import {
   ExcalidrawElement,
   ExcalidrawTextElement,
   TextAlign,
   FontFamily,
+  ExcalidrawLinearElement,
+  Arrowhead,
 } from "../element/types";
 import {
   getCommonAttributeOfSelectedElements,
   isSomeElementSelected,
   getTargetElements,
   canChangeSharpness,
+  canHaveArrowheads,
 } from "../scene";
 import { ButtonSelect } from "../components/ButtonSelect";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
+import { IconPicker } from "../components/IconPicker";
 import {
   isTextElement,
   redrawTextBoundingBox,
@@ -39,6 +44,10 @@ import {
   SloppinessArchitectIcon,
   SloppinessArtistIcon,
   SloppinessCartoonistIcon,
+  ArrowheadArrowIcon,
+  ArrowheadBarIcon,
+  ArrowheadDotIcon,
+  ArrowheadNoneIcon,
 } from "../components/icons";
 import { EVENT_CHANGE, trackEvent } from "../analytics";
 import colors from "../colors";
@@ -621,4 +630,168 @@ export const actionChangeSharpness = register({
       />
     </fieldset>
   ),
+});
+
+export const actionChangeArrowhead = register({
+  name: "changeArrowhead",
+  perform: (
+    elements,
+    appState,
+    value: { position: "start" | "end"; type: Arrowhead },
+  ) => {
+    return {
+      elements: changeProperty(elements, appState, (el) => {
+        if (isLinearElement(el)) {
+          trackEvent(
+            EVENT_CHANGE,
+            `arrowhead ${value.position}`,
+            value.type || "none",
+          );
+
+          const { position, type } = value;
+
+          if (position === "start") {
+            const element: ExcalidrawLinearElement = newElementWith(el, {
+              startArrowhead: type,
+            });
+            return element;
+          } else if (position === "end") {
+            const element: ExcalidrawLinearElement = newElementWith(el, {
+              endArrowhead: type,
+            });
+            return element;
+          }
+        }
+
+        return el;
+      }),
+      appState: {
+        ...appState,
+        [value.position === "start"
+          ? "currentItemStartArrowhead"
+          : "currentItemEndArrowhead"]: value.type,
+      },
+      commitToHistory: true,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData }) => {
+    const isRTL = getLanguage().rtl;
+
+    return (
+      <fieldset>
+        <legend>{t("labels.arrowheads")}</legend>
+        <div className="iconSelectList">
+          <IconPicker
+            label="arrowhead_start"
+            options={[
+              {
+                value: null,
+                text: t("labels.arrowhead_none"),
+                icon: <ArrowheadNoneIcon appearance={appState.appearance} />,
+                keyBinding: "q",
+              },
+              {
+                value: "arrow",
+                text: t("labels.arrowhead_arrow"),
+                icon: (
+                  <ArrowheadArrowIcon
+                    appearance={appState.appearance}
+                    flip={!isRTL}
+                  />
+                ),
+                keyBinding: "w",
+              },
+              {
+                value: "bar",
+                text: t("labels.arrowhead_bar"),
+                icon: (
+                  <ArrowheadBarIcon
+                    appearance={appState.appearance}
+                    flip={!isRTL}
+                  />
+                ),
+                keyBinding: "e",
+              },
+              {
+                value: "dot",
+                text: t("labels.arrowhead_dot"),
+                icon: (
+                  <ArrowheadDotIcon
+                    appearance={appState.appearance}
+                    flip={!isRTL}
+                  />
+                ),
+                keyBinding: "r",
+              },
+            ]}
+            value={getFormValue<Arrowhead | null>(
+              elements,
+              appState,
+              (element) =>
+                isLinearElement(element) && canHaveArrowheads(element.type)
+                  ? element.startArrowhead
+                  : appState.currentItemStartArrowhead,
+              appState.currentItemStartArrowhead,
+            )}
+            onChange={(value) => updateData({ position: "start", type: value })}
+          />
+          <IconPicker
+            label="arrowhead_end"
+            group="arrowheads"
+            options={[
+              {
+                value: null,
+                text: t("labels.arrowhead_none"),
+                keyBinding: "q",
+                icon: <ArrowheadNoneIcon appearance={appState.appearance} />,
+              },
+              {
+                value: "arrow",
+                text: t("labels.arrowhead_arrow"),
+                keyBinding: "w",
+                icon: (
+                  <ArrowheadArrowIcon
+                    appearance={appState.appearance}
+                    flip={isRTL}
+                  />
+                ),
+              },
+              {
+                value: "bar",
+                text: t("labels.arrowhead_bar"),
+                keyBinding: "e",
+                icon: (
+                  <ArrowheadBarIcon
+                    appearance={appState.appearance}
+                    flip={isRTL}
+                  />
+                ),
+              },
+              {
+                value: "dot",
+                text: t("labels.arrowhead_dot"),
+                keyBinding: "r",
+                icon: (
+                  <ArrowheadDotIcon
+                    appearance={appState.appearance}
+                    flip={isRTL}
+                  />
+                ),
+              },
+            ]}
+            value={getFormValue<Arrowhead | null>(
+              elements,
+              appState,
+              (element) =>
+                isLinearElement(element) && canHaveArrowheads(element.type)
+                  ? element.endArrowhead
+                  : appState.currentItemEndArrowhead,
+              appState.currentItemEndArrowhead,
+            )}
+            onChange={(value) => updateData({ position: "end", type: value })}
+          />
+        </div>
+      </fieldset>
+    );
+  },
 });

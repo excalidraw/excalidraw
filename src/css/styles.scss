@@ -84,6 +84,11 @@
       padding: 0;
     }
 
+    .iconSelectList {
+      flex-wrap: wrap;
+      position: relative;
+    }
+
     .buttonList {
       flex-wrap: wrap;
 
@@ -93,7 +98,8 @@
         display: inline-block;
       }
 
-      input[type="radio"] {
+      input[type="radio"],
+      input[type="button"] {
         opacity: 0;
         position: absolute;
         pointer-events: none;
@@ -235,6 +241,10 @@
       display: flex;
       flex-direction: column;
       pointer-events: initial;
+
+      .panelColumn {
+        padding: 8px 8px 0px 8px;
+      }
     }
   }
 
@@ -248,6 +258,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding: 8px;
   }
 
   .App-mobile-menu {

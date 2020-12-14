@@ -1,4 +1,4 @@
-import { ExcalidrawElement, ExcalidrawLinearElement } from "./types";
+import { ExcalidrawElement, ExcalidrawLinearElement, Arrowhead } from "./types";
 import { distance2d, rotate } from "../math";
 import rough from "roughjs/bin/rough";
 import { Drawable, Op } from "roughjs/bin/core";
@@ -160,24 +160,29 @@ const getLinearElementAbsoluteCoords = (
   ];
 };
 
-export const getArrowPoints = (
+export const getArrowheadPoints = (
   element: ExcalidrawLinearElement,
   shape: Drawable[],
+  position: "start" | "end",
+  arrowhead: Arrowhead,
 ) => {
   const ops = getCurvePathOps(shape[0]);
   if (ops.length < 1) {
     return null;
   }
 
-  const data = ops[ops.length - 1].data;
+  // The index of the bCurve operation to examine.
+  const index = position === "start" ? 1 : ops.length - 1;
+
+  const data = ops[index].data;
   const p3 = [data[4], data[5]] as Point;
   const p2 = [data[2], data[3]] as Point;
   const p1 = [data[0], data[1]] as Point;
 
-  // we need to find p0 of the bezier curve
-  // it is typically the last point of the previous
-  // curve; it can also be the position of moveTo operation
-  const prevOp = ops[ops.length - 2];
+  // We need to find p0 of the bezier curve.
+  // It is typically the last point of the previous
+  // curve; it can also be the position of moveTo operation.
+  const prevOp = ops[index - 1];
   let p0: Point = [0, 0];
   if (prevOp.op === "move") {
     p0 = (prevOp.data as unknown) as Point;
@@ -192,38 +197,52 @@ export const getArrowPoints = (
     3 * Math.pow(t, 2) * (1 - t) * p1[idx] +
     p0[idx] * Math.pow(t, 3);
 
-  // we know the last point of the arrow
-  const [x2, y2] = p3;
+  // Ee know the last point of the arrow (or the first, if start arrowhead).
+  const [x2, y2] = position === "start" ? p0 : p3;
 
-  // by using cubic bezier equation (B(t)) and the given parameters,
-  // we calculate a point that is closer to the last point
+  // By using cubic bezier equation (B(t)) and the given parameters,
+  // we calculate a point that is closer to the last point.
   // The value 0.3 is chosen arbitrarily and it works best for all
-  // the tested cases
+  // the tested cases.
   const [x1, y1] = [equation(0.3, 0), equation(0.3, 1)];
 
-  // find the normalized direction vector based on the
-  // previously calculated points
+  // Find the normalized direction vector based on the
+  // previously calculated points.
   const distance = Math.hypot(x2 - x1, y2 - y1);
   const nx = (x2 - x1) / distance;
   const ny = (y2 - y1) / distance;
 
-  const size = 30; // pixels
-  const arrowLength = element.points.reduce((total, [cx, cy], idx, points) => {
+  const size = {
+    arrow: 30,
+    bar: 15,
+    dot: 15,
+  }[arrowhead]; // pixels (will differ for each arrowhead)
+
+  const length = element.points.reduce((total, [cx, cy], idx, points) => {
     const [px, py] = idx > 0 ? points[idx - 1] : [0, 0];
     return total + Math.hypot(cx - px, cy - py);
   }, 0);
 
-  // Scale down the arrow until we hit a certain size so that it doesn't look weird
-  // This value is selected by minizing a minmum size with the whole length of the arrow
-  // intead of last segment of the arrow
-  const minSize = Math.min(size, arrowLength / 2);
+  // Scale down the arrowhead until we hit a certain size so that it doesn't look weird.
+  // This value is selected by minimizing a minimum size with the whole length of the
+  // arrowhead instead of last segment of the arrowhead.
+  const minSize = Math.min(size, length / 2);
   const xs = x2 - nx * minSize;
   const ys = y2 - ny * minSize;
 
-  const angle = 20; // degrees
+  if (arrowhead === "dot") {
+    const r = Math.hypot(ys - y2, xs - x2);
+    return [x2, y2, r];
+  }
+
+  const angle = {
+    arrow: 20,
+    bar: 90,
+  }[arrowhead]; // degrees
+
+  // Return points
   const [x3, y3] = rotate(xs, ys, x2, y2, (-angle * Math.PI) / 180);
   const [x4, y4] = rotate(xs, ys, x2, y2, (angle * Math.PI) / 180);
-
   return [x2, y2, x3, y3, x4, y4];
 };
 

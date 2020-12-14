@@ -4,6 +4,7 @@
     "selectAll": "Select all",
     "multiSelect": "Add element to selection",
     "moveCanvas": "Move canvas",
+    "cut": "Cut",
     "copy": "Copy",
     "copyAsPng": "Copy to clipboard as PNG",
     "copyAsSvg": "Copy to clipboard as SVG",
@@ -28,6 +29,11 @@
     "edges": "Edges",
     "sharp": "Sharp",
     "round": "Round",
+    "arrowheads": "Arrowheads",
+    "arrowhead_none": "None",
+    "arrowhead_arrow": "Arrow",
+    "arrowhead_bar": "Bar",
+    "arrowhead_dot": "Dot",
     "fontSize": "Font size",
     "fontFamily": "Font family",
     "onlySelected": "Only selected",
@@ -75,6 +81,7 @@
     "addToLibrary": "Add to library",
     "removeFromLibrary": "Remove from library",
     "libraryLoadingMessage": "Loading library...",
+    "libraries": "Browse libraries",
     "loadingScene": "Loading scene...",
     "align": "Align",
     "alignTop": "Align top",
@@ -206,14 +213,11 @@
     "textNewLine": "Add new line (text)",
     "textFinish": "Finish editing (text)",
     "zoomToFit": "Zoom to fit all elements",
+    "zoomToSelection": "Zoom to selection",
     "preventBinding": "Prevent arrow binding"
   },
   "encrypted": {
     "tooltip": "Your drawings are end-to-end encrypted so Excalidraw's servers will never see them."
-  },
-  "charts": {
-    "noNumericColumn": "You pasted a spreadsheet without a numeric column.",
-    "tooManyColumns": "You pasted a spreadsheet with more than two columns."
   },
   "stats": {
     "angle": "Angle",

@@ -18,9 +18,13 @@
 
 ## Try it now
 
-Go to https://excalidraw.com to start sketching.
+Go to [excalidraw.com](https://excalidraw.com) to start sketching.
 
 Read our [blog](https://blog.excalidraw.com) and follow the [guides](https://howto.excalidraw.com) to learn more about Excalidraw and how to use it effectively.
+
+## Shape libraries
+
+Find a growing list of libraries containing assets for your drawings at [libraries.excalidraw.com](https://libraries.excalidraw.com).
 
 ## Run the code
 

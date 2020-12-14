@@ -8,6 +8,7 @@ import {
   FontFamily,
   GroupId,
   ExcalidrawBindableElement,
+  Arrowhead,
 } from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -51,7 +52,7 @@ export type AppState = {
   shouldAddWatermark: boolean;
   currentItemStrokeColor: string;
   currentItemBackgroundColor: string;
-  currentItemFillStyle: string;
+  currentItemFillStyle: ExcalidrawElement["fillStyle"];
   currentItemStrokeWidth: number;
   currentItemStrokeStyle: ExcalidrawElement["strokeStyle"];
   currentItemRoughness: number;
@@ -60,6 +61,8 @@ export type AppState = {
   currentItemFontSize: number;
   currentItemTextAlign: TextAlign;
   currentItemStrokeSharpness: ExcalidrawElement["strokeSharpness"];
+  currentItemStartArrowhead: Arrowhead | null;
+  currentItemEndArrowhead: Arrowhead | null;
   currentItemLinearStrokeSharpness: ExcalidrawElement["strokeSharpness"];
   viewBackgroundColor: string;
   scrollX: FlooredNumber;
@@ -128,14 +131,16 @@ export declare class GestureEvent extends UIEvent {
 export type LibraryItem = readonly NonDeleted<ExcalidrawElement>[];
 export type LibraryItems = readonly LibraryItem[];
 
+// NOTE ready/readyPromise props are optional for host apps' sake (our own
+// implem guarantees existence)
 export type ExcalidrawAPIRefValue =
   | (ExcalidrawImperativeAPI & {
-      readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
-      ready: true;
+      readyPromise?: ResolvablePromise<ExcalidrawImperativeAPI>;
+      ready?: true;
     })
   | {
-      readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
-      ready: false;
+      readyPromise?: ResolvablePromise<ExcalidrawImperativeAPI>;
+      ready?: false;
     };
 
 export interface ExcalidrawProps {

@@ -7,6 +7,7 @@ import {
   hasStroke,
   canChangeSharpness,
   hasText,
+  canHaveArrowheads,
   getTargetElements,
 } from "../scene";
 import { t } from "../i18n";
@@ -46,6 +47,7 @@ export const SelectedShapeActions = ({
   const showChangeBackgroundIcons =
     hasBackground(elementType) ||
     targetElements.some((element) => hasBackground(element.type));
+
   return (
     <div className="panelColumn">
       {renderAction("changeStrokeColor")}
@@ -75,6 +77,11 @@ export const SelectedShapeActions = ({
 
           {renderAction("changeTextAlign")}
         </>
+      )}
+
+      {(canHaveArrowheads(elementType) ||
+        targetElements.some((element) => canHaveArrowheads(element.type))) && (
+        <>{renderAction("changeArrowhead")}</>
       )}
 
       {renderAction("changeOpacity")}
