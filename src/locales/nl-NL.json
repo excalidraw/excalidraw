@@ -4,6 +4,7 @@
     "selectAll": "Alles selecteren",
     "multiSelect": "Voeg element toe aan selectie",
     "moveCanvas": "Canvas verplaatsen",
+    "cut": "",
     "copy": "Kopiëren",
     "copyAsPng": "Kopieer als PNG",
     "copyAsSvg": "Kopieer als SVG",
@@ -28,6 +29,11 @@
     "edges": "Randen",
     "sharp": "Hoekig",
     "round": "Rond",
+    "arrowheads": "",
+    "arrowhead_none": "",
+    "arrowhead_arrow": "",
+    "arrowhead_bar": "",
+    "arrowhead_dot": "",
     "fontSize": "Tekstgrootte",
     "fontFamily": "Lettertype",
     "onlySelected": "Enkel geselecteerde",
@@ -71,9 +77,11 @@
     "ungroup": "Groep opheffen",
     "collaborators": "Deelnemers",
     "toggleGridMode": "Rasterlijnen in-/uitschakelen",
+    "toggleStats": "",
     "addToLibrary": "Voeg toe aan bibliotheek",
     "removeFromLibrary": "Verwijder uit bibliotheek",
     "libraryLoadingMessage": "Bibliotheek laden...",
+    "libraries": "",
     "loadingScene": "Scène laden...",
     "align": "",
     "alignTop": "",
@@ -205,13 +213,22 @@
     "textNewLine": "Nieuwe regel toevoegen (tekst)",
     "textFinish": "Voltooi bewerken (tekst)",
     "zoomToFit": "Zoom in op alle elementen",
+    "zoomToSelection": "",
     "preventBinding": ""
   },
   "encrypted": {
     "tooltip": "Je tekeningen zijn beveiligd met end-to-end encryptie, dus Excalidraw's servers zullen nooit zien wat je tekent."
   },
-  "charts": {
-    "noNumericColumn": "Je hebt een werkblad geplakt zonder een numerieke kolom.",
-    "tooManyColumns": "Je hebt een werkblad geplakt met meer dan twee kolommen."
+  "stats": {
+    "angle": "",
+    "element": "",
+    "elements": "",
+    "height": "",
+    "scene": "",
+    "selected": "",
+    "storage": "",
+    "title": "",
+    "total": "",
+    "width": ""
   }
 }
