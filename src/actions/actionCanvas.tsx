@@ -95,6 +95,7 @@ export const actionZoomIn = register({
     const zoom = getNewZoom(
       getNormalizedZoom(appState.zoom.value + ZOOM_STEP),
       appState.zoom,
+      { left: appState.offsetLeft, top: appState.offsetTop },
       { x: appState.width / 2, y: appState.height / 2 },
     );
     trackEvent(EVENT_ACTION, "zoom", "in", zoom.value * 100);
@@ -128,6 +129,7 @@ export const actionZoomOut = register({
     const zoom = getNewZoom(
       getNormalizedZoom(appState.zoom.value - ZOOM_STEP),
       appState.zoom,
+      { left: appState.offsetLeft, top: appState.offsetTop },
       { x: appState.width / 2, y: appState.height / 2 },
     );
 
@@ -163,10 +165,15 @@ export const actionResetZoom = register({
     return {
       appState: {
         ...appState,
-        zoom: getNewZoom(1 as NormalizedZoomValue, appState.zoom, {
-          x: appState.width / 2,
-          y: appState.height / 2,
-        }),
+        zoom: getNewZoom(
+          1 as NormalizedZoomValue,
+          appState.zoom,
+          { left: appState.offsetLeft, top: appState.offsetTop },
+          {
+            x: appState.width / 2,
+            y: appState.height / 2,
+          },
+        ),
       },
       commitToHistory: false,
     };
@@ -223,7 +230,10 @@ const zoomToFitElements = (
     width: appState.width,
     height: appState.height,
   });
-  const newZoom = getNewZoom(zoomValue, appState.zoom);
+  const newZoom = getNewZoom(zoomValue, appState.zoom, {
+    left: appState.offsetLeft,
+    top: appState.offsetTop,
+  });
   const action = zoomToSelection ? "selection" : "fit";
 
   const [x1, y1, x2, y2] = commonBounds;
