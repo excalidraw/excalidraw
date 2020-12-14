@@ -4,8 +4,7 @@ on:
   push:
     branches:
       - master
-  pull_request:
-
+      - "!l10n_master"
 jobs:
   test:
     runs-on: ubuntu-latest
