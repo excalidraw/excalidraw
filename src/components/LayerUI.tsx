@@ -320,7 +320,6 @@ const LayerUI = ({
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
-  // TODO: Extend tooltip component and use here.
   const renderEncryptedIcon = () => (
     <a
       className={clsx("encrypted-icon tooltip zen-mode-visibility", {
@@ -333,10 +332,9 @@ const LayerUI = ({
         trackEvent(EVENT_EXIT, "e2ee shield");
       }}
     >
-      <span className="tooltip-text" dir="auto">
-        {t("encrypted.tooltip")}
-      </span>
-      {shield}
+      <Tooltip label={t("encrypted.tooltip")} position="above" long={true}>
+        {shield}
+      </Tooltip>
     </a>
   );
 
