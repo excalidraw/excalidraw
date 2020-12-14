@@ -5,6 +5,7 @@ on:
     branches-ignore:
       - l10n_master
       - dependabot/*
+      - chenagelog # just testing
   pull_request:
 
 jobs:
