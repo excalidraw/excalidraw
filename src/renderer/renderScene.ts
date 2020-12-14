@@ -763,13 +763,20 @@ const isVisibleElement = (
 ) => {
   const [x1, y1, x2, y2] = getElementBounds(element); // scene coordinates
   const topLeftSceneCoords = viewportCoordsToSceneCoords(
-    { clientX: 0, clientY: 0 },
+    {
+      clientX: viewTransformations.offsetLeft,
+      clientY: viewTransformations.offsetTop,
+    },
     viewTransformations,
   );
   const bottomRightSceneCoords = viewportCoordsToSceneCoords(
-    { clientX: canvasWidth, clientY: canvasHeight },
+    {
+      clientX: viewTransformations.offsetLeft + canvasWidth,
+      clientY: viewTransformations.offsetTop + canvasHeight,
+    },
     viewTransformations,
   );
+
   return (
     topLeftSceneCoords.x <= x2 &&
     topLeftSceneCoords.y <= y2 &&
