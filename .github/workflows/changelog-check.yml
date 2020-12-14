@@ -4,7 +4,7 @@ on:
   push:
     branches-ignore:
       - "l10n_master"
-      - "aakansha-test"
+      - "dependabot/**"
 jobs:
   test:
     runs-on: ubuntu-latest
