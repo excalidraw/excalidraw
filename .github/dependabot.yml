@@ -20,9 +20,9 @@ updates:
       time: "01:00"
     open-pull-requests-limit: 99
     reviewers:
-      - lipis
+      - ad1992
     assignees:
-      - lipis
+      - ad1992
 
   - package-ecosystem: npm
     directory: "/src/packages/utils/"
@@ -32,6 +32,6 @@ updates:
       time: "01:00"
     open-pull-requests-limit: 99
     reviewers:
-      - lipis
+      - ad1992
     assignees:
-      - lipis
+      - ad1992
