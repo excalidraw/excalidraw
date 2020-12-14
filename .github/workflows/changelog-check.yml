@@ -4,7 +4,7 @@ on:
   push:
   pull_request:
     branches-ignore:
-      - "l10n_master"
+      - "master"
       - "dependabot/*"
 
 jobs:
