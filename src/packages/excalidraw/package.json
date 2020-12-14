@@ -51,7 +51,7 @@
     "@babel/preset-typescript": "7.9.0",
     "babel-loader": "8.1.0",
     "babel-plugin-transform-class-properties": "6.24.1",
-    "cross-env": "7.0.2",
+    "cross-env": "7.0.3",
     "css-loader": "3.5.2",
     "file-loader": "6.0.0",
     "mini-css-extract-plugin": "0.8.0",
