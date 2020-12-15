@@ -219,8 +219,8 @@ This is the user name which shows during collaboration. Defaults to `{name: ''}`
 
 #### `excalidrawRef`
 
-You can pass a ref when you want to access some excalidraw API's.
-We expose the below API's
+You can pass a `ref` when you want to access some excalidraw APIs.
+We expose the below APIs:
 
 | API                              | signature                                                                                                                                                                | Usage                                                                                                                                                                                                                                            |
 | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -241,15 +241,15 @@ const excalidrawRef = { current: { readyPromise: <a href="https://github.com/exc
 
 #### `onCollabButtonClick`
 
-This callback is triggered when clicked on the collab button in excalidraw
+This callback is triggered when clicked on the collab button in excalidraw. If not supplied, the collab dialog button is not rendered.
 
 #### `isCollaborating`
 
-This props implies if the app is in collaboration mode
+This prop indicates if the app is in collaboration mode.
 
 #### `onPointerUpdate`
 
-This callback is triggered when mouse pointer is updated
+This callback is triggered when mouse pointer is updated.
 
 ```js
 ({ x, y }, button, pointersMap}) => void;

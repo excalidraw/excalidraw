@@ -26,6 +26,7 @@ Please add the latest change on the top under the correct section.
 
 ### Fixes
 
+- Hide collab button when onCollabButtonClick not supplied [#2598](https://github.com/excalidraw/excalidraw/pull/2598)
 - Fix resizing the pasted charts [#2586](https://github.com/excalidraw/excalidraw/pull/2586)
 - Fix element visibility and zoom on cursor when canvas offset isn't 0. [#2534](https://github.com/excalidraw/excalidraw/pull/2534)
 - Fix Library Menu Layout [#2502](https://github.com/excalidraw/excalidraw/pull/2502)
