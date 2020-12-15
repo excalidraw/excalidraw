@@ -17,11 +17,12 @@ jobs:
           node-version: 14.x
       - name: Install and run changelog check
         run:
-          if [[ $GITHUB_HEAD_REF =~ dependabot || $GITHUB_HEAD_REF == "l10n_master" ]]
-          then exit 0;
+          if [[ $GITHUB_HEAD_REF =~ dependabot || $GITHUB_HEAD_REF == "l10n_master" ]]; then
+          echo "Skipping running changelog check"
+          exit 0
           else
-          npm ci;
-          npm run changelog:check;
+          npm ci
+          npm run changelog:check
           fi
         env:
           CI: true
