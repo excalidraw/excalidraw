@@ -44,7 +44,7 @@ const alignSelectedElements = (
 export const actionAlignTop = register({
   name: "alignTop",
   perform: (elements, appState) => {
-    trackEvent(EVENT_ALIGN, "align", "top");
+    trackEvent(EVENT_ALIGN, "align", "top1");
     return {
       appState,
       elements: alignSelectedElements(elements, appState, {
