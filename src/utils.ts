@@ -310,8 +310,6 @@ export const isTransparent = (color: string) => {
   );
 };
 
-export const noop = () => ({});
-
 export type ResolvablePromise<T> = Promise<T> & {
   resolve: [T] extends [undefined] ? (value?: T) => void : (value: T) => void;
   reject: (error: Error) => void;
