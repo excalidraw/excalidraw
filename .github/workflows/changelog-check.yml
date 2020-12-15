@@ -17,7 +17,7 @@ jobs:
           node-version: 14.x
       - name: Install and run changelog check
         run:
-          if [[ $GITHUB_HEAD_REF =~ dependabot || $GITHUB_HEAD_REF == "l10n_master" ]];
+          if [[ $GITHUB_HEAD_REF =~ dependabot || $GITHUB_HEAD_REF == "l10n_master" ]]
           then exit 0;
           else
           npm ci;
