@@ -268,7 +268,7 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
       height={dimensions.height}
       initialData={initialStatePromiseRef.current.promise}
       user={{ name: collab.username }}
-      onCollabButtonClick={collab.onCollabButtonClick}
+      // onCollabButtonClick={collab.onCollabButtonClick}
       isCollaborating={collab.isCollaborating}
       onPointerUpdate={collab.onPointerUpdate}
     />
