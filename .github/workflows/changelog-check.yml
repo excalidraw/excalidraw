@@ -19,7 +19,6 @@ jobs:
         run:
           if [[ $GITHUB_HEAD_REF =~ dependabot || $GITHUB_HEAD_REF == "l10n_master" ]]; then
           echo "Skipping running changelog check";
-          exit 0;
           else
           npm ci;
           npm run changelog:check;
