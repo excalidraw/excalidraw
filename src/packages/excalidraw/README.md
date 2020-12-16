@@ -39,11 +39,6 @@ import "./styles.css";
 export default function App() {
   const excalidrawRef = createRef();
 
-  const onChange = (elements, state) => {
-    console.log(excalidrawRef.current);
-    console.log("Elements :", elements, "State : ", state);
-  };
-
   const [dimensions, setDimensions] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
@@ -92,7 +87,6 @@ export default function App() {
     excalidrawRef.current.updateScene(sceneData);
   };
 
-  const { width, height } = dimensions;
   return (
     <div className="App">
       <button className="update-scene" onClick={updateScene}>
@@ -109,12 +103,14 @@ export default function App() {
       <div className="excalidraw-wrapper">
         <Excalidraw
           ref={excalidrawRef}
-          width={width}
-          height={height}
+          width={dimensions.width}
+          height={dimensions.height}
           initialData={InitialData}
-          onChange={onChange}
+          onChange={(elements, state) => {
+            console.log("Latest elements:", elements, "Latest state:", state);
+          }}
           user={{ name: "Excalidraw User" }}
-          onPointerUpdate={(payload) => console.log(payload)}
+          onPointerUpdate={(pointerData) => console.log(pointerData)}
         />
       </div>
     </div>
