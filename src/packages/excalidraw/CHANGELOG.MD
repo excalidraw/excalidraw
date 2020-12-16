@@ -26,6 +26,7 @@ Please add the latest change on the top under the correct section.
 
 ### Fixes
 
+- Fix scroll-to-center on init for non-zero canvas offsets [#2445](https://github.com/excalidraw/excalidraw/pull/2445)
 - Hide collab button when onCollabButtonClick not supplied [#2598](https://github.com/excalidraw/excalidraw/pull/2598)
 - Fix resizing the pasted charts [#2586](https://github.com/excalidraw/excalidraw/pull/2586)
 - Fix element visibility and zoom on cursor when canvas offset isn't 0. [#2534](https://github.com/excalidraw/excalidraw/pull/2534)
