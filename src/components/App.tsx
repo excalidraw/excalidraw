@@ -593,6 +593,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         scene.elements,
         {
           ...scene.appState,
+          width: this.state.width,
+          height: this.state.height,
           offsetTop: this.state.offsetTop,
           offsetLeft: this.state.offsetLeft,
         },
