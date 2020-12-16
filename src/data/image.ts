@@ -44,7 +44,6 @@ export const encodePngMetadata = async ({
   metadata: string;
 }) => {
   const chunks = decodePng(new Uint8Array(await blobToArrayBuffer(blob)));
-
   const metadataChunk = tEXt.encode(
     MIME_TYPES.excalidraw,
     JSON.stringify(
@@ -56,7 +55,6 @@ export const encodePngMetadata = async ({
   );
   // insert metadata before last chunk (iEND)
   chunks.splice(-1, 0, metadataChunk);
-
   return new Blob([encodePng(chunks)], { type: "image/png" });
 };
 
@@ -81,6 +79,25 @@ export const decodePngMetadata = async (blob: Blob) => {
   throw new Error("INVALID");
 };
 
+export const getPngMetatdataSize = async ({
+  metadata,
+}: {
+  metadata: string;
+}) => {
+  const metadataChunk = tEXt.encode(
+    MIME_TYPES.excalidraw,
+    JSON.stringify(
+      await encode({
+        text: metadata,
+        compress: true,
+      }),
+    ),
+  );
+
+  // Here 12 is magic number!
+  return new Blob([metadataChunk.data], { type: "image/png" }).size + 12;
+};
+
 // -----------------------------------------------------------------------------
 // SVG
 // -----------------------------------------------------------------------------
@@ -97,6 +114,7 @@ export const encodeSvgMetadata = async ({ text }: { text: string }) => {
   metadata += "<!-- payload-start -->";
   metadata += base64;
   metadata += "<!-- payload-end -->";
+
   return metadata;
 };
 
@@ -127,4 +145,9 @@ export const decodeSvgMetadata = async ({ svg }: { svg: string }) => {
     }
   }
   throw new Error("INVALID");
+};
+
+export const getSvgMetatdataSize = async ({ text }: { text: string }) => {
+  const metadata = await encodeSvgMetadata({ text });
+  return new Blob([metadata], { type: "image/svg+xml" }).size;
 };
