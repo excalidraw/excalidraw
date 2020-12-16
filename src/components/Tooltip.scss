@@ -6,6 +6,7 @@
 
   .Tooltip__label {
     --arrow-size: 4px;
+    min-width: 10ch;
     visibility: hidden;
     background: $oc-black;
     color: $oc-white;

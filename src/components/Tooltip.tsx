@@ -22,7 +22,10 @@ export const Tooltip = ({
           ? "Tooltip__label Tooltip__label--above"
           : "Tooltip__label Tooltip__label--below"
       }
-      style={{ width: long ? "50ch" : "10ch" }}
+      style={{
+        width: long ? "50ch" : "",
+        whiteSpace: long ? "normal" : "nowrap",
+      }}
     >
       {label}
     </span>
