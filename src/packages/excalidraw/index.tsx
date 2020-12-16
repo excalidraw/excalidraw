@@ -8,7 +8,6 @@ import "../../css/styles.scss";
 
 import { ExcalidrawAPIRefValue, ExcalidrawProps } from "../../types";
 import { IsMobileProvider } from "../../is-mobile";
-import { noop } from "../../utils";
 
 const Excalidraw = (props: ExcalidrawProps) => {
   const {
@@ -20,7 +19,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     initialData,
     user,
     excalidrawRef,
-    onCollabButtonClick = noop,
+    onCollabButtonClick,
     isCollaborating,
     onPointerUpdate,
   } = props;
