@@ -93,7 +93,7 @@
     grid-auto-flow: column;
     grid-gap: 0.5rem;
     border-radius: 4px;
-    :root[dir='rtl'] & {
+    :root[dir="rtl"] & {
       padding: 0.4rem;
     }
   }
