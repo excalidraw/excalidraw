@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { EVENT_CHANGE, EVENT_IO, trackEvent } from "../analytics";
 import { load, save, saveAs } from "../components/icons";
 import { ProjectName } from "../components/ProjectName";
@@ -9,9 +9,10 @@ import { loadFromJSON, saveAsJSON } from "../data";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
 import { KEYS } from "../keys";
-import { muteFSAbortError } from "../utils";
+import { muteFSAbortError, nFormatter } from "../utils";
 import { register } from "./register";
 import "../components/ToolIcon.scss";
+import { serializeAsJSON } from "../data/json";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -56,23 +57,63 @@ export const actionChangeExportEmbedScene = register({
       commitToHistory: false,
     };
   },
-  PanelComponent: ({ appState, updateData }) => (
-    <label style={{ display: "flex" }}>
-      <input
-        type="checkbox"
-        checked={appState.exportEmbedScene}
-        onChange={(event) => updateData(event.target.checked)}
-      />{" "}
-      {t("labels.exportEmbedScene")}
-      <Tooltip
-        label={t("labels.exportEmbedScene_details")}
-        position="above"
-        long={true}
-      >
-        <div className="TooltipIcon">{questionCircle}</div>
-      </Tooltip>
-    </label>
-  ),
+  PanelComponent: ({ elements, appState, updateData }) => {
+    const [increasedPngSize, setPngIncreasedSize] = useState(0);
+    const [increasedSvgSize, setSvgIncreasedSize] = useState(0);
+
+    if (appState.exportEmbedScene) {
+      import(/* webpackChunkName: "image" */ "../data/image").then(
+        async (_) => {
+          const incPng = await _.getPngMetatdataSize({
+            metadata: serializeAsJSON(elements, appState),
+          });
+          setPngIncreasedSize(incPng);
+
+          const incSvg = await _.getSvgMetatdataSize({
+            text: serializeAsJSON(elements, appState),
+          });
+          setSvgIncreasedSize(incSvg);
+        },
+      );
+    }
+
+    const format = (size: number) =>
+      `+${nFormatter(size, 1)}${size >= 1000 ? "b" : ""}`;
+
+    return (
+      <label style={{ display: "flex" }}>
+        <input
+          type="checkbox"
+          checked={appState.exportEmbedScene}
+          onChange={(event) => updateData(event.target.checked)}
+        />{" "}
+        {t("labels.exportEmbedScene")}
+        {appState.exportEmbedScene === true ? (
+          <Tooltip
+            label={`PNG: ${format(increasedPngSize)}, SVG: ${format(
+              increasedSvgSize,
+            )}`}
+            position="above"
+          >
+            {
+              <div style={{ color: "gray", paddingLeft: 3 }}>
+                {`(Avg: ${format((increasedPngSize + increasedSvgSize) / 2)})`}
+              </div>
+            }
+          </Tooltip>
+        ) : (
+          ""
+        )}
+        <Tooltip
+          label={t("labels.exportEmbedScene_details")}
+          position="above"
+          long={true}
+        >
+          <div className="TooltipIcon">{questionCircle}</div>
+        </Tooltip>
+      </label>
+    );
+  },
 });
 
 export const actionChangeShouldAddWatermark = register({
