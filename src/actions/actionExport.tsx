@@ -88,7 +88,7 @@ export const actionChangeExportEmbedScene = register({
           onChange={(event) => updateData(event.target.checked)}
         />{" "}
         {t("labels.exportEmbedScene")}
-        {appState.exportEmbedScene === true ? (
+        {appState.exportEmbedScene && (
           <Tooltip
             label={`PNG: ${format(increasedPngSize)}, SVG: ${format(
               increasedSvgSize,
@@ -101,8 +101,6 @@ export const actionChangeExportEmbedScene = register({
               </div>
             }
           </Tooltip>
-        ) : (
-          ""
         )}
         <Tooltip
           label={t("labels.exportEmbedScene_details")}
