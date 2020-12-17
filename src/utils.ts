@@ -346,9 +346,9 @@ export const withBatchedUpdates = <
 export const nFormatter = (num: number, digits: number): string => {
   const si = [
     { value: 1, symbol: "b" },
-    { value: 1e3, symbol: "k" },
-    { value: 1e6, symbol: "M" },
-    { value: 1e9, symbol: "G" },
+    { value: 1e3, symbol: "kB" },
+    { value: 1e6, symbol: "MB" },
+    { value: 1e9, symbol: "GB" },
   ];
   const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
   let index;

@@ -77,9 +77,6 @@ export const actionChangeExportEmbedScene = register({
       );
     }
 
-    const format = (size: number) =>
-      `+${nFormatter(size, 1)}${size >= 1000 ? "b" : ""}`;
-
     return (
       <label style={{ display: "flex" }}>
         <input
@@ -90,14 +87,18 @@ export const actionChangeExportEmbedScene = register({
         {t("labels.exportEmbedScene")}
         {appState.exportEmbedScene && (
           <Tooltip
-            label={`PNG: ${format(increasedPngSize)}, SVG: ${format(
+            label={`PNG: ${nFormatter(increasedPngSize, 1)}, SVG: ${nFormatter(
               increasedSvgSize,
+              1,
             )}`}
             position="above"
           >
             {
               <div style={{ color: "gray", paddingLeft: 3 }}>
-                {`(Avg: ${format((increasedPngSize + increasedSvgSize) / 2)})`}
+                {`(Avg: ${nFormatter(
+                  (increasedPngSize + increasedSvgSize) / 2,
+                  1,
+                )})`}
               </div>
             }
           </Tooltip>
