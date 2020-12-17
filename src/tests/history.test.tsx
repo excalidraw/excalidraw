@@ -1,6 +1,6 @@
 import React from "react";
 import { render } from "./test-utils";
-import App from "../components/App";
+import ExcalidrawApp from "../excalidraw-app";
 import { UI } from "./helpers/ui";
 import { API } from "./helpers/api";
 import { getDefaultAppState } from "../appState";
@@ -11,17 +11,14 @@ const { h } = window;
 
 describe("history", () => {
   it("initializing scene should end up with single history entry", async () => {
-    render(
-      <App
-        initialData={{
-          appState: {
-            ...getDefaultAppState(),
-            zenModeEnabled: true,
-          },
-          elements: [API.createElement({ type: "rectangle", id: "A" })],
-        }}
-      />,
-    );
+    await render(<ExcalidrawApp />, {
+      localStorageData: {
+        elements: [API.createElement({ type: "rectangle", id: "A" })],
+        appState: {
+          zenModeEnabled: true,
+        },
+      },
+    });
 
     await waitFor(() => expect(h.state.zenModeEnabled).toBe(true));
     await waitFor(() =>
@@ -61,17 +58,14 @@ describe("history", () => {
   });
 
   it("scene import via drag&drop should create new history entry", async () => {
-    render(
-      <App
-        initialData={{
-          appState: {
-            ...getDefaultAppState(),
-            viewBackgroundColor: "#FFF",
-          },
-          elements: [API.createElement({ type: "rectangle", id: "A" })],
-        }}
-      />,
-    );
+    await render(<ExcalidrawApp />, {
+      localStorageData: {
+        elements: [API.createElement({ type: "rectangle", id: "A" })],
+        appState: {
+          viewBackgroundColor: "#FFF",
+        },
+      },
+    });
 
     await waitFor(() => expect(h.state.viewBackgroundColor).toBe("#FFF"));
     await waitFor(() =>

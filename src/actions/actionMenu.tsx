@@ -5,8 +5,9 @@ import { t } from "../i18n";
 import { showSelectedShapeActions, getNonDeletedElements } from "../element";
 import { register } from "./register";
 import { allowFullScreen, exitFullScreen, isFullScreen } from "../utils";
-import { KEYS } from "../keys";
+import { CODES, KEYS } from "../keys";
 import { HelpIcon } from "../components/HelpIcon";
+import { EVENT_DIALOG, trackEvent } from "../analytics";
 
 export const actionToggleCanvasMenu = register({
   name: "toggleCanvasMenu",
@@ -65,12 +66,13 @@ export const actionFullScreen = register({
       commitToHistory: false,
     };
   },
-  keyTest: (event) => event.keyCode === KEYS.F_KEY_CODE,
+  keyTest: (event) => event.code === CODES.F && !event[KEYS.CTRL_OR_CMD],
 });
 
 export const actionShortcuts = register({
   name: "toggleShortcuts",
   perform: (_elements, appState) => {
+    trackEvent(EVENT_DIALOG, "shortcuts");
     return {
       appState: {
         ...appState,

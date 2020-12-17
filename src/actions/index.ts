@@ -60,3 +60,8 @@ export {
   actionAlignVerticallyCentered,
   actionAlignHorizontallyCentered,
 } from "./actionAlign";
+
+export {
+  distributeHorizontally,
+  distributeVertically,
+} from "./actionDistribute";

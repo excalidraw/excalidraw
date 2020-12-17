@@ -4,6 +4,7 @@
     "selectAll": "Seleccionar todo",
     "multiSelect": "Añadir elemento a la selección",
     "moveCanvas": "Mover el lienzo",
+    "cut": "",
     "copy": "Copiar",
     "copyAsPng": "Copiar al portapapeles como PNG",
     "copyAsSvg": "Copiar al portapapeles como SVG",
@@ -28,6 +29,11 @@
     "edges": "Bordes",
     "sharp": "Afilado",
     "round": "Redondo",
+    "arrowheads": "",
+    "arrowhead_none": "",
+    "arrowhead_arrow": "",
+    "arrowhead_bar": "",
+    "arrowhead_dot": "",
     "fontSize": "Tamaño de la fuente",
     "fontFamily": "Tipo de fuente",
     "onlySelected": "Sólo seleccionados",
@@ -54,7 +60,7 @@
     "architect": "Arquitecto",
     "artist": "Artista",
     "cartoonist": "Caricatura",
-    "fileTitle": "Título del archivo",
+    "fileTitle": "",
     "colorPicker": "Selector de color",
     "canvasBackground": "Fondo del lienzo",
     "drawingCanvas": "Lienzo de dibujo",
@@ -63,7 +69,7 @@
     "language": "Idioma",
     "createRoom": "Compartir una sesión de colaboración en vivo",
     "duplicateSelection": "Duplicar",
-    "untitled": "Sin título",
+    "untitled": "",
     "name": "Nombre",
     "yourName": "Tu nombre",
     "madeWithExcalidraw": "Hecho con Excalidraw",
@@ -71,9 +77,11 @@
     "ungroup": "Desagrupar",
     "collaborators": "Colaboradores",
     "toggleGridMode": "Alternar modo cuadrícula",
+    "toggleStats": "",
     "addToLibrary": "Añadir a la biblioteca",
     "removeFromLibrary": "Eliminar de la biblioteca",
     "libraryLoadingMessage": "Cargando biblioteca...",
+    "libraries": "",
     "loadingScene": "Cargando escena...",
     "align": "",
     "alignTop": "",
@@ -81,7 +89,9 @@
     "alignLeft": "",
     "alignRight": "",
     "centerVertically": "",
-    "centerHorizontally": ""
+    "centerHorizontally": "",
+    "distributeHorizontally": "",
+    "distributeVertically": ""
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
@@ -203,13 +213,22 @@
     "textNewLine": "Añadir nueva línea (texto)",
     "textFinish": "Finalizar edición (texto)",
     "zoomToFit": "Ajustar para mostrar todos los elementos",
+    "zoomToSelection": "",
     "preventBinding": "Evitar enlace de flecha"
   },
   "encrypted": {
     "tooltip": "Tus dibujos están cifrados de punto a punto, por lo que los servidores de Excalidraw nunca los verán."
   },
-  "charts": {
-    "noNumericColumn": "Pegaste una hoja de cálculo sin una columna numérica.",
-    "tooManyColumns": "Pegaste una hoja de cálculo con más de dos columnas."
+  "stats": {
+    "angle": "",
+    "element": "",
+    "elements": "",
+    "height": "",
+    "scene": "",
+    "selected": "",
+    "storage": "",
+    "title": "",
+    "total": "",
+    "width": ""
   }
 }

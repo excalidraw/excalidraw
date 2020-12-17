@@ -90,6 +90,11 @@ const restoreElement = (
     case "draw":
     case "line":
     case "arrow": {
+      const {
+        startArrowhead = null,
+        endArrowhead = element.type === "arrow" ? "arrow" : null,
+      } = element;
+
       return restoreElementWithProperties(element, {
         startBinding: element.startBinding,
         endBinding: element.endBinding,
@@ -102,6 +107,8 @@ const restoreElement = (
               ]
             : element.points,
         lastCommittedPoint: null,
+        startArrowhead,
+        endArrowhead,
       });
     }
     // generic elements
@@ -173,7 +180,7 @@ const restoreAppState = (
 };
 
 export const restore = (
-  data: ImportedDataState,
+  data: ImportedDataState | null,
   /**
    * Local AppState (`this.state` or initial state from localStorage) so that we
    * don't overwrite local state with default values (when values not
@@ -183,7 +190,7 @@ export const restore = (
   localAppState: Partial<AppState> | null | undefined,
 ): DataState => {
   return {
-    elements: restoreElements(data.elements),
-    appState: restoreAppState(data.appState, localAppState || null),
+    elements: restoreElements(data?.elements),
+    appState: restoreAppState(data?.appState, localAppState || null),
   };
 };

@@ -4,6 +4,7 @@
     "selectAll": "Velg alt",
     "multiSelect": "Legg til element i utvalg",
     "moveCanvas": "Flytt lerretet",
+    "cut": "Klipp ut",
     "copy": "Kopier",
     "copyAsPng": "Kopier til PNG",
     "copyAsSvg": "Kopier til utklippstavlen som SVG",
@@ -28,6 +29,11 @@
     "edges": "Kanter",
     "sharp": "Skarp",
     "round": "Rund",
+    "arrowheads": "Pilspisser",
+    "arrowhead_none": "Ingen",
+    "arrowhead_arrow": "Pil",
+    "arrowhead_bar": "Søyle",
+    "arrowhead_dot": "Prikk",
     "fontSize": "Skriftstørrelse",
     "fontFamily": "Fontfamilie",
     "onlySelected": "Kun valgte",
@@ -71,9 +77,11 @@
     "ungroup": "Avgruppér utvalg",
     "collaborators": "Samarbeidspartnere",
     "toggleGridMode": "Slå av/på rutenett",
+    "toggleStats": "Skru av/på statistikk for nerder",
     "addToLibrary": "Legg til i bibliotek",
     "removeFromLibrary": "Fjern fra bibliotek",
     "libraryLoadingMessage": "Laster bibliotek...",
+    "libraries": "Bla gjennom biblioteker",
     "loadingScene": "Laster inn scene...",
     "align": "Juster",
     "alignTop": "Juster øverst",
@@ -81,7 +89,9 @@
     "alignLeft": "Juster venstre",
     "alignRight": "Juster høyre",
     "centerVertically": "Midtstill vertikalt",
-    "centerHorizontally": "Midtstill horisontalt"
+    "centerHorizontally": "Midtstill horisontalt",
+    "distributeHorizontally": "Distribuer horisontalt",
+    "distributeVertically": "Distribuer vertikalt"
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
@@ -116,7 +126,7 @@
   "alerts": {
     "clearReset": "Dette vil tømme lerretet. Er du sikker?",
     "couldNotCreateShareableLink": "Kunne ikke lage delbar lenke.",
-    "couldNotCreateShareableLinkTooBig": "",
+    "couldNotCreateShareableLinkTooBig": "Kunne ikke opprette lenke til deling: scenen er for stor",
     "couldNotLoadInvalidFile": "Kunne ikke laste inn ugyldig fil",
     "importBackendFailed": "Importering av backend feilet.",
     "cannotExportEmptyCanvas": "Kan ikke eksportere et tomt lerret.",
@@ -203,13 +213,22 @@
     "textNewLine": "Legg til ny linje (tekst)",
     "textFinish": "Fullfør redigering (tekst)",
     "zoomToFit": "Zoom for å passe alle elementene",
+    "zoomToSelection": "Zoom til utvalg",
     "preventBinding": "Forhindre pilbinding"
   },
   "encrypted": {
     "tooltip": "Dine tegninger er ende-til-ende-krypterte slik at Excalidraw sine servere aldri vil se dem."
   },
-  "charts": {
-    "noNumericColumn": "Du limte inn et regneark uten en numerisk kolonne.",
-    "tooManyColumns": "Du limte inn et regneark med mer enn to kolonner."
+  "stats": {
+    "angle": "Vinkel",
+    "element": "Element",
+    "elements": "Elementer",
+    "height": "Høyde",
+    "scene": "Scene",
+    "selected": "Valgt",
+    "storage": "Lagring",
+    "title": "Statistikk for nerder",
+    "total": "Totalt",
+    "width": "Bredde"
   }
 }

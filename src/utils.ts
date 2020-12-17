@@ -1,10 +1,12 @@
-import { Zoom } from "./types";
+import colors from "./colors";
 import {
   CURSOR_TYPE,
   FONT_FAMILY,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 import { FontFamily, FontString } from "./element/types";
+import { Zoom } from "./types";
+import { unstable_batchedUpdates } from "react-dom";
 
 export const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -127,7 +129,12 @@ export const debounce = <T extends any[]>(
   };
   ret.flush = () => {
     clearTimeout(handle);
-    fn(...lastArgs);
+    if (lastArgs) {
+      fn(...lastArgs);
+    }
+  };
+  ret.cancel = () => {
+    clearTimeout(handle);
   };
   return ret;
 };
@@ -291,4 +298,62 @@ export const findLastIndex = <T>(
     }
   }
   return -1;
+};
+
+export const isTransparent = (color: string) => {
+  const isRGBTransparent = color.length === 5 && color.substr(4, 1) === "0";
+  const isRRGGBBTransparent = color.length === 9 && color.substr(7, 2) === "00";
+  return (
+    isRGBTransparent ||
+    isRRGGBBTransparent ||
+    color === colors.elementBackground[0]
+  );
+};
+
+export type ResolvablePromise<T> = Promise<T> & {
+  resolve: [T] extends [undefined] ? (value?: T) => void : (value: T) => void;
+  reject: (error: Error) => void;
+};
+export const resolvablePromise = <T>() => {
+  let resolve!: any;
+  let reject!: any;
+  const promise = new Promise((_resolve, _reject) => {
+    resolve = _resolve;
+    reject = _reject;
+  });
+  (promise as any).resolve = resolve;
+  (promise as any).reject = reject;
+  return promise as ResolvablePromise<T>;
+};
+
+/**
+ * @param func handler taking at most single parameter (event).
+ */
+export const withBatchedUpdates = <
+  TFunction extends ((event: any) => void) | (() => void)
+>(
+  func: Parameters<TFunction>["length"] extends 0 | 1 ? TFunction : never,
+) =>
+  ((event) => {
+    unstable_batchedUpdates(func as TFunction, event);
+  }) as TFunction;
+
+//https://stackoverflow.com/a/9462382/8418
+export const nFormatter = (num: number, digits: number): string => {
+  const si = [
+    { value: 1, symbol: "b" },
+    { value: 1e3, symbol: "k" },
+    { value: 1e6, symbol: "M" },
+    { value: 1e9, symbol: "G" },
+  ];
+  const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+  let index;
+  for (index = si.length - 1; index > 0; index--) {
+    if (num >= si[index].value) {
+      break;
+    }
+  }
+  return (
+    (num / si[index].value).toFixed(digits).replace(rx, "$1") + si[index].symbol
+  );
 };

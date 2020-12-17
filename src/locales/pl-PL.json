@@ -4,6 +4,7 @@
     "selectAll": "Zaznacz wszystko",
     "multiSelect": "Dodaj element do zaznaczenia",
     "moveCanvas": "Przesuń obszar roboczy",
+    "cut": "",
     "copy": "Kopiuj",
     "copyAsPng": "Skopiuj do schowka jako plik PNG",
     "copyAsSvg": "Skopiuj do schowka jako plik SVG",
@@ -28,6 +29,11 @@
     "edges": "Krawędzie",
     "sharp": "Ostry",
     "round": "Zaokrąglij",
+    "arrowheads": "",
+    "arrowhead_none": "",
+    "arrowhead_arrow": "",
+    "arrowhead_bar": "",
+    "arrowhead_dot": "",
     "fontSize": "Rozmiar tekstu",
     "fontFamily": "Krój pisma",
     "onlySelected": "Tylko wybrane",
@@ -54,7 +60,7 @@
     "architect": "Dokładny",
     "artist": "Artystyczny",
     "cartoonist": "Rysunkowy",
-    "fileTitle": "Nazwa pliku",
+    "fileTitle": "",
     "colorPicker": "Paleta kolorów",
     "canvasBackground": "Kolor dokumentu",
     "drawingCanvas": "Obszar roboczy",
@@ -63,7 +69,7 @@
     "language": "Język",
     "createRoom": "Udostępnij sesję współpracy na żywo",
     "duplicateSelection": "Powiel",
-    "untitled": "Bez tytułu",
+    "untitled": "",
     "name": "Nazwa",
     "yourName": "Twoje imię",
     "madeWithExcalidraw": "Zrobione w Excalidraw",
@@ -71,9 +77,11 @@
     "ungroup": "Rozgrupuj wybrane",
     "collaborators": "Współtwórcy",
     "toggleGridMode": "Włącz siatkę",
+    "toggleStats": "",
     "addToLibrary": "Dodaj do biblioteki",
     "removeFromLibrary": "Usuń z biblioteki",
     "libraryLoadingMessage": "Wczytywanie biblioteki...",
+    "libraries": "",
     "loadingScene": "Ładowanie sceny...",
     "align": "",
     "alignTop": "",
@@ -81,7 +89,9 @@
     "alignLeft": "",
     "alignRight": "",
     "centerVertically": "",
-    "centerHorizontally": ""
+    "centerHorizontally": "",
+    "distributeHorizontally": "",
+    "distributeVertically": ""
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
@@ -203,13 +213,22 @@
     "textNewLine": "Dodaj nową linię (tekst)",
     "textFinish": "Zakończ edycję (tekst)",
     "zoomToFit": "Powiększ, aby wyświetlić wszystkie elementy",
+    "zoomToSelection": "",
     "preventBinding": "Zablokuj przywiązanie strzałek do obiektu"
   },
   "encrypted": {
     "tooltip": "Twoje rysunki są zabezpieczone szyfrowaniem end-to-end, tak więc nawet w Excalidraw nie jesteśmy w stanie zobaczyć tego co tworzysz."
   },
-  "charts": {
-    "noNumericColumn": "Wklejono arkusz kalkulacyjny bez kolumny numerycznej.",
-    "tooManyColumns": "Wklejono arkusz kalkulacyjny z więcej niż dwoma kolumnami."
+  "stats": {
+    "angle": "",
+    "element": "",
+    "elements": "",
+    "height": "",
+    "scene": "",
+    "selected": "",
+    "storage": "",
+    "title": "",
+    "total": "",
+    "width": ""
   }
 }

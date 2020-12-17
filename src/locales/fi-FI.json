@@ -4,6 +4,7 @@
     "selectAll": "Valitse kaikki",
     "multiSelect": "Lisää kohde valintaan",
     "moveCanvas": "Siirrä piirtoaluetta",
+    "cut": "Leikkaa",
     "copy": "Kopioi",
     "copyAsPng": "Kopioi leikepöydälle PNG-tiedostona",
     "copyAsSvg": "Kopioi leikepöydälle SVG-tiedostona",
@@ -28,6 +29,11 @@
     "edges": "Reunat",
     "sharp": "Terävä",
     "round": "Pyöreä",
+    "arrowheads": "Nuolenkärjet",
+    "arrowhead_none": "Ei mitään",
+    "arrowhead_arrow": "Nuoli",
+    "arrowhead_bar": "Tasapää",
+    "arrowhead_dot": "Piste",
     "fontSize": "Kirjasinkoko",
     "fontFamily": "Kirjasintyyppi",
     "onlySelected": "Vain valitut",
@@ -54,7 +60,7 @@
     "architect": "Arkkitehti",
     "artist": "Taiteilija",
     "cartoonist": "Sarjakuva",
-    "fileTitle": "Tiedostonimi",
+    "fileTitle": "Tiedoston otsikko",
     "colorPicker": "Värin valinta",
     "canvasBackground": "Piirtoalueen tausta",
     "drawingCanvas": "Piirtoalue",
@@ -71,9 +77,11 @@
     "ungroup": "Pura valittu ryhmä",
     "collaborators": "Yhteistyökumppanit",
     "toggleGridMode": "Ruudukko päälle/pois",
+    "toggleStats": "Nörttien tilastot päälle/pois",
     "addToLibrary": "Lisää kirjastoon",
     "removeFromLibrary": "Poista kirjastosta",
     "libraryLoadingMessage": "Ladataan kirjastoa...",
+    "libraries": "Selaa kirjastoja",
     "loadingScene": "Ladataan työtä...",
     "align": "Tasaa",
     "alignTop": "Tasaa ylös",
@@ -81,7 +89,9 @@
     "alignLeft": "Tasaa vasemmalle",
     "alignRight": "Tasaa oikealle",
     "centerVertically": "Keskitä pystysuunnassa",
-    "centerHorizontally": "Keskitä vaakasuunnassa"
+    "centerHorizontally": "Keskitä vaakasuunnassa",
+    "distributeHorizontally": "Jaa vaakasuunnassa",
+    "distributeVertically": "Jaa pystysuunnassa"
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
@@ -203,13 +213,22 @@
     "textNewLine": "Lisää uusi rivi (teksti)",
     "textFinish": "Lopeta muokkaus (teksti)",
     "zoomToFit": "Zoomaa kaikki elementit näkyviin",
+    "zoomToSelection": "Zoomaa valintaan",
     "preventBinding": "Estä nuolten sitominen"
   },
   "encrypted": {
     "tooltip": "Piirroksesi ovat päästä päähän salattuja, joten Excalidrawin palvelimet eivät koskaan näe niitä."
   },
-  "charts": {
-    "noNumericColumn": "Liitit taulukon ilman lukuja sisältävää saraketta.",
-    "tooManyColumns": "Liitit taulukon, jossa on enemmän kuin kaksi saraketta."
+  "stats": {
+    "angle": "Kulma",
+    "element": "Elementti",
+    "elements": "Elementit",
+    "height": "Korkeus",
+    "scene": "Teos",
+    "selected": "Valitut",
+    "storage": "Tallennustila",
+    "title": "Nörttien tilastot",
+    "total": "Yhteensä",
+    "width": "Leveys"
   }
 }

@@ -4,8 +4,13 @@ import clsx from "clsx";
 import { Popover } from "./Popover";
 
 import "./ContextMenu.scss";
+import {
+  getShortcutFromShortcutName,
+  ShortcutName,
+} from "../actions/shortcuts";
 
 type ContextMenuOption = {
+  shortcutName: ShortcutName;
   label: string;
   action(): void;
 };
@@ -21,7 +26,6 @@ const ContextMenu = ({ options, onCloseRequest, top, left }: Props) => {
   const isDarkTheme = !!document
     .querySelector(".excalidraw")
     ?.classList.contains("Appearance_dark");
-
   return (
     <div
       className={clsx("excalidraw", {
@@ -38,10 +42,20 @@ const ContextMenu = ({ options, onCloseRequest, top, left }: Props) => {
           className="context-menu"
           onContextMenu={(event) => event.preventDefault()}
         >
-          {options.map(({ action, label }, idx) => (
-            <li key={idx} onClick={onCloseRequest}>
-              <button className="context-menu-option" onClick={action}>
-                {label}
+          {options.map(({ action, shortcutName, label }, idx) => (
+            <li data-testid={shortcutName} key={idx} onClick={onCloseRequest}>
+              <button
+                className={`context-menu-option ${
+                  shortcutName === "delete" ? "dangerous" : ""
+                }`}
+                onClick={action}
+              >
+                <div>{label}</div>
+                <div>
+                  {shortcutName
+                    ? getShortcutFromShortcutName(shortcutName)
+                    : ""}
+                </div>
               </button>
             </li>
           ))}

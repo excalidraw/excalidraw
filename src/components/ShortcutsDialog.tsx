@@ -4,6 +4,7 @@ import { isDarwin } from "../keys";
 import { Dialog } from "./Dialog";
 import { getShortcutKey } from "../utils";
 import "./ShortcutsDialog.scss";
+import { EVENT_EXIT, trackEvent } from "../analytics";
 
 const Columns = (props: { children: React.ReactNode }) => (
   <div
@@ -37,7 +38,6 @@ const Shortcut = (props: {
   shortcuts: string[];
   isOr: boolean;
 }) => {
-  const isRTL = document.documentElement.getAttribute("dir") === "rtl";
   return (
     <div className="ShorcutsDialog-shortcut">
       <div
@@ -60,8 +60,7 @@ const Shortcut = (props: {
             display: "flex",
             flex: "0 0 auto",
             justifyContent: "flex-end",
-            marginLeft: isRTL ? "0em" : "auto",
-            marginRight: isRTL ? "auto" : "0em",
+            marginInlineStart: "auto",
             minWidth: "30%",
           }}
         >
@@ -93,6 +92,9 @@ const Footer = () => (
       href="https://blog.excalidraw.com"
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => {
+        trackEvent(EVENT_EXIT, "blog");
+      }}
     >
       {t("shortcutsDialog.blog")}
     </a>
@@ -100,6 +102,9 @@ const Footer = () => (
       href="https://howto.excalidraw.com"
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => {
+        trackEvent(EVENT_EXIT, "guides");
+      }}
     >
       {t("shortcutsDialog.howto")}
     </a>
@@ -107,6 +112,9 @@ const Footer = () => (
       href="https://github.com/excalidraw/excalidraw/issues"
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => {
+        trackEvent(EVENT_EXIT, "issues");
+      }}
     >
       {t("shortcutsDialog.github")}
     </a>
@@ -199,6 +207,10 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
                 shortcuts={["Shift+1"]}
               />
               <Shortcut
+                label={t("shortcutsDialog.zoomToSelection")}
+                shortcuts={["Shift+2"]}
+              />
+              <Shortcut
                 label={t("buttons.toggleFullScreen")}
                 shortcuts={["F"]}
               />
@@ -231,6 +243,10 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
                   getShortcutKey(`Wheel+${t("shortcutsDialog.drag")}`),
                 ]}
                 isOr={true}
+              />
+              <Shortcut
+                label={t("labels.cut")}
+                shortcuts={[getShortcutKey("CtrlOrCmd+X")]}
               />
               <Shortcut
                 label={t("labels.copy")}

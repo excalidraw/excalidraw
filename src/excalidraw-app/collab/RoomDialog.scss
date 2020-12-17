@@ -1,27 +1,6 @@
-@import "../css/_variables";
+@import "../../css/_variables";
 
 .excalidraw {
-  .RoomDialog-modalButton.is-collaborating {
-    background-color: var(--button-special-active-background-color);
-
-    .ToolIcon__icon svg {
-      color: var(--icon-green-fill-color);
-    }
-  }
-
-  .RoomDialog-modalButton-collaborators {
-    min-width: 1em;
-    position: absolute;
-    bottom: -5px;
-    right: -5px;
-    padding: 3px;
-    border-radius: 50%;
-    background-color: $oc-green-6;
-    color: $oc-white;
-    font-size: 0.7em;
-    font-family: var(--ui-font);
-  }
-
   .RoomDialog-linkContainer {
     display: flex;
     margin: 1.5em 0;
@@ -31,7 +10,7 @@
     color: var(--text-color-primary);
     min-width: 0;
     flex: 1 1 auto;
-    margin-left: 1em;
+    margin-inline-start: 1em;
     display: inline-block;
     cursor: pointer;
     border: none;
@@ -61,7 +40,7 @@
     appearance: none;
     min-width: 0;
     flex: 1 1 auto;
-    margin-left: 1em;
+    margin-inline-start: 1em;
     height: 2.5rem;
     font-size: 1em;
     line-height: 1.5;

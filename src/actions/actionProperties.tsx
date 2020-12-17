@@ -1,18 +1,23 @@
 import React from "react";
+import { getLanguage } from "../i18n";
 import {
   ExcalidrawElement,
   ExcalidrawTextElement,
   TextAlign,
   FontFamily,
+  ExcalidrawLinearElement,
+  Arrowhead,
 } from "../element/types";
 import {
   getCommonAttributeOfSelectedElements,
   isSomeElementSelected,
-  getTargetElement,
+  getTargetElements,
   canChangeSharpness,
+  canHaveArrowheads,
 } from "../scene";
 import { ButtonSelect } from "../components/ButtonSelect";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
+import { IconPicker } from "../components/IconPicker";
 import {
   isTextElement,
   redrawTextBoundingBox,
@@ -42,7 +47,13 @@ import {
   TextAlignLeftIcon,
   TextAlignCenterIcon,
   TextAlignRightIcon,
+  ArrowheadArrowIcon,
+  ArrowheadBarIcon,
+  ArrowheadDotIcon,
+  ArrowheadNoneIcon,
 } from "../components/icons";
+import { EVENT_CHANGE, trackEvent } from "../analytics";
+import colors from "../colors";
 
 const changeProperty = (
   elements: readonly ExcalidrawElement[],
@@ -84,6 +95,15 @@ const getFormValue = function <T>(
 export const actionChangeStrokeColor = register({
   name: "changeStrokeColor",
   perform: (elements, appState, value) => {
+    if (value !== appState.currentItemStrokeColor) {
+      trackEvent(
+        EVENT_CHANGE,
+        "stroke color",
+        colors.elementStroke.includes(value)
+          ? `${value} (picker ${colors.elementStroke.indexOf(value)})`
+          : value,
+      );
+    }
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -115,6 +135,16 @@ export const actionChangeStrokeColor = register({
 export const actionChangeBackgroundColor = register({
   name: "changeBackgroundColor",
   perform: (elements, appState, value) => {
+    if (value !== appState.currentItemBackgroundColor) {
+      trackEvent(
+        EVENT_CHANGE,
+        "background color",
+        colors.elementBackground.includes(value)
+          ? `${value} (picker ${colors.elementBackground.indexOf(value)})`
+          : value,
+      );
+    }
+
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -146,6 +176,7 @@ export const actionChangeBackgroundColor = register({
 export const actionChangeFillStyle = register({
   name: "changeFillStyle",
   perform: (elements, appState, value) => {
+    trackEvent(EVENT_CHANGE, "fill", value);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -195,6 +226,7 @@ export const actionChangeFillStyle = register({
 export const actionChangeStrokeWidth = register({
   name: "changeStrokeWidth",
   perform: (elements, appState, value) => {
+    trackEvent(EVENT_CHANGE, "stroke", "width", value);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -257,6 +289,7 @@ export const actionChangeStrokeWidth = register({
 export const actionChangeSloppiness = register({
   name: "changeSloppiness",
   perform: (elements, appState, value) => {
+    trackEvent(EVENT_CHANGE, "stroke", "sloppiness", value);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -305,6 +338,7 @@ export const actionChangeSloppiness = register({
 export const actionChangeStrokeStyle = register({
   name: "changeStrokeStyle",
   perform: (elements, appState, value) => {
+    trackEvent(EVENT_CHANGE, "style", value);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -352,6 +386,7 @@ export const actionChangeStrokeStyle = register({
 export const actionChangeOpacity = register({
   name: "changeOpacity",
   perform: (elements, appState, value) => {
+    trackEvent(EVENT_CHANGE, "opacity", "value", value);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -550,7 +585,7 @@ export const actionChangeTextAlign = register({
 export const actionChangeSharpness = register({
   name: "changeSharpness",
   perform: (elements, appState, value) => {
-    const targetElements = getTargetElement(
+    const targetElements = getTargetElements(
       getNonDeletedElements(elements),
       appState,
     );
@@ -560,6 +595,7 @@ export const actionChangeSharpness = register({
     const shouldUpdateForLinearElements = targetElements.length
       ? targetElements.every(isLinearElement)
       : isLinearElementType(appState.elementType);
+    trackEvent(EVENT_CHANGE, "edge", value);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -609,4 +645,168 @@ export const actionChangeSharpness = register({
       />
     </fieldset>
   ),
+});
+
+export const actionChangeArrowhead = register({
+  name: "changeArrowhead",
+  perform: (
+    elements,
+    appState,
+    value: { position: "start" | "end"; type: Arrowhead },
+  ) => {
+    return {
+      elements: changeProperty(elements, appState, (el) => {
+        if (isLinearElement(el)) {
+          trackEvent(
+            EVENT_CHANGE,
+            `arrowhead ${value.position}`,
+            value.type || "none",
+          );
+
+          const { position, type } = value;
+
+          if (position === "start") {
+            const element: ExcalidrawLinearElement = newElementWith(el, {
+              startArrowhead: type,
+            });
+            return element;
+          } else if (position === "end") {
+            const element: ExcalidrawLinearElement = newElementWith(el, {
+              endArrowhead: type,
+            });
+            return element;
+          }
+        }
+
+        return el;
+      }),
+      appState: {
+        ...appState,
+        [value.position === "start"
+          ? "currentItemStartArrowhead"
+          : "currentItemEndArrowhead"]: value.type,
+      },
+      commitToHistory: true,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData }) => {
+    const isRTL = getLanguage().rtl;
+
+    return (
+      <fieldset>
+        <legend>{t("labels.arrowheads")}</legend>
+        <div className="iconSelectList">
+          <IconPicker
+            label="arrowhead_start"
+            options={[
+              {
+                value: null,
+                text: t("labels.arrowhead_none"),
+                icon: <ArrowheadNoneIcon appearance={appState.appearance} />,
+                keyBinding: "q",
+              },
+              {
+                value: "arrow",
+                text: t("labels.arrowhead_arrow"),
+                icon: (
+                  <ArrowheadArrowIcon
+                    appearance={appState.appearance}
+                    flip={!isRTL}
+                  />
+                ),
+                keyBinding: "w",
+              },
+              {
+                value: "bar",
+                text: t("labels.arrowhead_bar"),
+                icon: (
+                  <ArrowheadBarIcon
+                    appearance={appState.appearance}
+                    flip={!isRTL}
+                  />
+                ),
+                keyBinding: "e",
+              },
+              {
+                value: "dot",
+                text: t("labels.arrowhead_dot"),
+                icon: (
+                  <ArrowheadDotIcon
+                    appearance={appState.appearance}
+                    flip={!isRTL}
+                  />
+                ),
+                keyBinding: "r",
+              },
+            ]}
+            value={getFormValue<Arrowhead | null>(
+              elements,
+              appState,
+              (element) =>
+                isLinearElement(element) && canHaveArrowheads(element.type)
+                  ? element.startArrowhead
+                  : appState.currentItemStartArrowhead,
+              appState.currentItemStartArrowhead,
+            )}
+            onChange={(value) => updateData({ position: "start", type: value })}
+          />
+          <IconPicker
+            label="arrowhead_end"
+            group="arrowheads"
+            options={[
+              {
+                value: null,
+                text: t("labels.arrowhead_none"),
+                keyBinding: "q",
+                icon: <ArrowheadNoneIcon appearance={appState.appearance} />,
+              },
+              {
+                value: "arrow",
+                text: t("labels.arrowhead_arrow"),
+                keyBinding: "w",
+                icon: (
+                  <ArrowheadArrowIcon
+                    appearance={appState.appearance}
+                    flip={isRTL}
+                  />
+                ),
+              },
+              {
+                value: "bar",
+                text: t("labels.arrowhead_bar"),
+                keyBinding: "e",
+                icon: (
+                  <ArrowheadBarIcon
+                    appearance={appState.appearance}
+                    flip={isRTL}
+                  />
+                ),
+              },
+              {
+                value: "dot",
+                text: t("labels.arrowhead_dot"),
+                keyBinding: "r",
+                icon: (
+                  <ArrowheadDotIcon
+                    appearance={appState.appearance}
+                    flip={isRTL}
+                  />
+                ),
+              },
+            ]}
+            value={getFormValue<Arrowhead | null>(
+              elements,
+              appState,
+              (element) =>
+                isLinearElement(element) && canHaveArrowheads(element.type)
+                  ? element.endArrowhead
+                  : appState.currentItemEndArrowhead,
+              appState.currentItemEndArrowhead,
+            )}
+            onChange={(value) => updateData({ position: "end", type: value })}
+          />
+        </div>
+      </fieldset>
+    );
+  },
 });

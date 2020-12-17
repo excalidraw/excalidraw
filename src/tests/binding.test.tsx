@@ -1,17 +1,18 @@
 import React from "react";
 import { render } from "./test-utils";
-import App from "../components/App";
+import ExcalidrawApp from "../excalidraw-app";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { getTransformHandles } from "../element/transformHandles";
 import { API } from "./helpers/api";
+import { KEYS } from "../keys";
 
 const { h } = window;
 
 const mouse = new Pointer("mouse");
 
 describe("element binding", () => {
-  beforeEach(() => {
-    render(<App />);
+  beforeEach(async () => {
+    await render(<ExcalidrawApp />);
   });
 
   it("rotation of arrow should rebind both ends", () => {
@@ -26,9 +27,9 @@ describe("element binding", () => {
       height: 500,
     });
     const arrow = UI.createElement("arrow", {
-      x: 220,
+      x: 210,
       y: 250,
-      width: 160,
+      width: 180,
       height: 1,
     });
     expect(arrow.startBinding?.elementId).toBe(rectLeft.id);
@@ -97,10 +98,10 @@ describe("element binding", () => {
     expect(arrow.endBinding).toBe(null);
 
     expect(API.getSelectedElement().type).toBe("arrow");
-    Keyboard.hotkeyPress("ARROW_RIGHT");
+    Keyboard.keyPress(KEYS.ARROW_RIGHT);
     expect(arrow.endBinding?.elementId).toBe(rectangle.id);
 
-    Keyboard.hotkeyPress("ARROW_LEFT");
+    Keyboard.keyPress(KEYS.ARROW_LEFT);
     expect(arrow.endBinding).toBe(null);
   });
 });

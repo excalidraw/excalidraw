@@ -87,7 +87,7 @@
     <% if (process.env.REACT_APP_INCLUDE_GTAG === 'true') { %>
     <script
       async
-      src="https://www.googletagmanager.com/gtag/js?id=G-H3S0KQSBGX"
+      src="https://www.googletagmanager.com/gtag/js?id=UA-387204-13"
     ></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -96,7 +96,6 @@
       }
       gtag("js", new Date());
       gtag("config", "UA-387204-13");
-      gtag("config", "G-H3S0KQSBGX");
     </script>
     <% } %>
 
@@ -108,6 +107,7 @@
           Roboto, Helvetica, Arial, sans-serif;
         font-family: var(--ui-font);
         -webkit-text-size-adjust: 100%;
+        -webkit-user-select: none;
         user-select: none;
         width: 100vw;
         height: 100vh;

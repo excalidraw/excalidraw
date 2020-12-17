@@ -4,6 +4,7 @@
     "selectAll": "Összes kijelölése",
     "multiSelect": "",
     "moveCanvas": "",
+    "cut": "",
     "copy": "Másolás",
     "copyAsPng": "Vágólapra másolás mint PNG",
     "copyAsSvg": "Vágólapra másolás mint SVG",
@@ -28,6 +29,11 @@
     "edges": "",
     "sharp": "",
     "round": "",
+    "arrowheads": "",
+    "arrowhead_none": "",
+    "arrowhead_arrow": "",
+    "arrowhead_bar": "",
+    "arrowhead_dot": "",
     "fontSize": "",
     "fontFamily": "",
     "onlySelected": "Csak a kiválasztott",
@@ -54,7 +60,7 @@
     "architect": "Tervezői",
     "artist": "Művészi",
     "cartoonist": "Karikatúrás",
-    "fileTitle": "Fájl címe",
+    "fileTitle": "",
     "colorPicker": "Színválasztó",
     "canvasBackground": "Vászon háttérszíne",
     "drawingCanvas": "",
@@ -71,9 +77,11 @@
     "ungroup": "",
     "collaborators": "",
     "toggleGridMode": "",
+    "toggleStats": "",
     "addToLibrary": "",
     "removeFromLibrary": "",
     "libraryLoadingMessage": "",
+    "libraries": "",
     "loadingScene": "",
     "align": "",
     "alignTop": "",
@@ -81,7 +89,9 @@
     "alignLeft": "",
     "alignRight": "",
     "centerVertically": "",
-    "centerHorizontally": ""
+    "centerHorizontally": "",
+    "distributeHorizontally": "",
+    "distributeVertically": ""
   },
   "buttons": {
     "clearReset": "Vászon törlése",
@@ -203,13 +213,22 @@
     "textNewLine": "",
     "textFinish": "",
     "zoomToFit": "",
+    "zoomToSelection": "",
     "preventBinding": ""
   },
   "encrypted": {
     "tooltip": ""
   },
-  "charts": {
-    "noNumericColumn": "",
-    "tooManyColumns": ""
+  "stats": {
+    "angle": "",
+    "element": "",
+    "elements": "",
+    "height": "",
+    "scene": "",
+    "selected": "",
+    "storage": "",
+    "title": "",
+    "total": "",
+    "width": ""
   }
 }

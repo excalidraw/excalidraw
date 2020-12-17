@@ -4,6 +4,7 @@
     "selectAll": "全選",
     "multiSelect": "將物件加入選取範圍",
     "moveCanvas": "移動畫布",
+    "cut": "剪下",
     "copy": "複製",
     "copyAsPng": "複製 PNG 至剪貼簿",
     "copyAsSvg": "複製 SVG 至剪貼簿",
@@ -28,6 +29,11 @@
     "edges": "邊緣",
     "sharp": "尖銳",
     "round": "平滑",
+    "arrowheads": "箭頭",
+    "arrowhead_none": "無",
+    "arrowhead_arrow": "箭頭",
+    "arrowhead_bar": "塊",
+    "arrowhead_dot": "點",
     "fontSize": "字型大小",
     "fontFamily": "字體",
     "onlySelected": "僅選取物件",
@@ -54,7 +60,7 @@
     "architect": "精確",
     "artist": "藝術",
     "cartoonist": "卡通",
-    "fileTitle": "檔案名稱",
+    "fileTitle": "檔案標題",
     "colorPicker": "色彩選擇工具",
     "canvasBackground": "Canvas 背景",
     "drawingCanvas": "繪圖 canvas",
@@ -71,9 +77,11 @@
     "ungroup": "取消群組",
     "collaborators": "協作者",
     "toggleGridMode": "切換格線模式",
+    "toggleStats": "切換詳細統計",
     "addToLibrary": "加入資料庫",
     "removeFromLibrary": "從資料庫中移除",
     "libraryLoadingMessage": "資料庫讀取中…",
+    "libraries": "",
     "loadingScene": "場景讀取中…",
     "align": "對齊",
     "alignTop": "對齊頂部",
@@ -81,7 +89,9 @@
     "alignLeft": "對齊左側",
     "alignRight": "對齊右側",
     "centerVertically": "垂直置中",
-    "centerHorizontally": "水平置中"
+    "centerHorizontally": "水平置中",
+    "distributeHorizontally": "水平分布",
+    "distributeVertically": "垂直分布"
   },
   "buttons": {
     "clearReset": "重置 canvas",
@@ -203,13 +213,22 @@
     "textNewLine": "換行（文字）",
     "textFinish": "完成編輯（文字）",
     "zoomToFit": "放大至填滿畫面",
+    "zoomToSelection": "縮放至選取區",
     "preventBinding": "防止箭頭綁定"
   },
   "encrypted": {
     "tooltip": "你的作品已使用 end-to-end 方式加密，Excalidraw 的伺服器也無法取得其內容。"
   },
-  "charts": {
-    "noNumericColumn": "你貼上的 spreadsheet 沒有數字欄。",
-    "tooManyColumns": "你貼上的 spreadsheet 超過兩欄。"
+  "stats": {
+    "angle": "角度",
+    "element": "元素",
+    "elements": "元素",
+    "height": "高度",
+    "scene": "場景",
+    "selected": "已選",
+    "storage": "儲存",
+    "title": "詳細統計",
+    "total": "合計",
+    "width": "寬度"
   }
 }

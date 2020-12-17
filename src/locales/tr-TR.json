@@ -4,6 +4,7 @@
     "selectAll": "Tümünü seç",
     "multiSelect": "Seçime öge ekle",
     "moveCanvas": "Tuvali taşı",
+    "cut": "",
     "copy": "Kopyala",
     "copyAsPng": "Panoya PNG olarak kopyala",
     "copyAsSvg": "Panoya SVG olarak kopyala",
@@ -28,6 +29,11 @@
     "edges": "Kenarlar",
     "sharp": "Keskin",
     "round": "Yuvarlak",
+    "arrowheads": "",
+    "arrowhead_none": "",
+    "arrowhead_arrow": "",
+    "arrowhead_bar": "",
+    "arrowhead_dot": "",
     "fontSize": "Yazı tipi boyutu",
     "fontFamily": "Yazı tipi ailesi",
     "onlySelected": "Sadece seçilen",
@@ -54,7 +60,7 @@
     "architect": "Mimar",
     "artist": "Sanatçı",
     "cartoonist": "Karikatürist",
-    "fileTitle": "Dosya başlığı",
+    "fileTitle": "",
     "colorPicker": "Renk seçici",
     "canvasBackground": "Tuval arka planı",
     "drawingCanvas": "Çizim tuvali",
@@ -63,7 +69,7 @@
     "language": "Dil",
     "createRoom": "Ortak çalışma ortamını paylaş",
     "duplicateSelection": "Çoğalt",
-    "untitled": "Başlıksız",
+    "untitled": "",
     "name": "İsim",
     "yourName": "İsminiz",
     "madeWithExcalidraw": "Excalidraw ile yapıldı",
@@ -71,9 +77,11 @@
     "ungroup": "Seçilen grubu dağıt",
     "collaborators": "Ortaklar",
     "toggleGridMode": "Izgara modunu aç",
+    "toggleStats": "",
     "addToLibrary": "Kütüphaneye ekle",
     "removeFromLibrary": "Kütüphaneden kaldır",
     "libraryLoadingMessage": "Kütüphane yükleniyor...",
+    "libraries": "",
     "loadingScene": "Çalışma alanı yükleniyor...",
     "align": "",
     "alignTop": "",
@@ -81,7 +89,9 @@
     "alignLeft": "",
     "alignRight": "",
     "centerVertically": "",
-    "centerHorizontally": ""
+    "centerHorizontally": "",
+    "distributeHorizontally": "",
+    "distributeVertically": ""
   },
   "buttons": {
     "clearReset": "Tuvali sıfırla",
@@ -203,13 +213,22 @@
     "textNewLine": "Yeni satır ekle (yazı)",
     "textFinish": "(Yazıyı) düzenlemeyi bitir",
     "zoomToFit": "Tüm öğeleri sığdırmak için yakınlaştır",
+    "zoomToSelection": "",
     "preventBinding": "Ok bağlamayı önleyin"
   },
   "encrypted": {
     "tooltip": "Çizimleriniz uçtan-uca şifrelenmiştir, Excalidraw'ın sunucuları bile onları göremez."
   },
-  "charts": {
-    "noNumericColumn": "Sayısal sütunu olmayan bir tablo yapıştırdın.",
-    "tooManyColumns": "İkiden daha fazla sütuna sahip bir tablo yapıştırdın."
+  "stats": {
+    "angle": "",
+    "element": "",
+    "elements": "",
+    "height": "",
+    "scene": "",
+    "selected": "",
+    "storage": "",
+    "title": "",
+    "total": "",
+    "width": ""
   }
 }

@@ -4,6 +4,7 @@
     "selectAll": "Seleziona tutto",
     "multiSelect": "Aggiungi elemento alla selezione",
     "moveCanvas": "Sposta tela",
+    "cut": "Taglia",
     "copy": "Copia",
     "copyAsPng": "Copia negli appunti come PNG",
     "copyAsSvg": "Copia negli appunti come SVG",
@@ -28,6 +29,11 @@
     "edges": "Bordi",
     "sharp": "Acuto",
     "round": "Rotondo",
+    "arrowheads": "Punta della freccia",
+    "arrowhead_none": "Nessuno",
+    "arrowhead_arrow": "Freccia",
+    "arrowhead_bar": "Barra",
+    "arrowhead_dot": "Punto",
     "fontSize": "Dimensione carattere",
     "fontFamily": "Carattere",
     "onlySelected": "Solo selezionati",
@@ -54,7 +60,7 @@
     "architect": "Architetto",
     "artist": "Artista",
     "cartoonist": "Fumettista",
-    "fileTitle": "Titolo file",
+    "fileTitle": "Titolo del file",
     "colorPicker": "Selettore colore",
     "canvasBackground": "Sfondo tela",
     "drawingCanvas": "Area di disegno",
@@ -70,10 +76,12 @@
     "group": "Crea gruppo da selezione",
     "ungroup": "Dividi gruppo da selezione",
     "collaborators": "Collaboratori",
-    "toggleGridMode": "Attiva/disattiva modalità quadrícula",
+    "toggleGridMode": "Attiva/disattiva modalità griglia",
+    "toggleStats": "Attiva/disattiva statistiche per nerd",
     "addToLibrary": "Aggiungi alla biblioteca",
     "removeFromLibrary": "Rimuovi dalla biblioteca",
     "libraryLoadingMessage": "Caricamento della biblioteca...",
+    "libraries": "Sfoglia librerie",
     "loadingScene": "Caricamento della scena...",
     "align": "Allinea",
     "alignTop": "Allinea in alto",
@@ -81,10 +89,12 @@
     "alignLeft": "Allinea a sinistra",
     "alignRight": "Allinea a destra",
     "centerVertically": "Centra Verticalmente",
-    "centerHorizontally": "Centra orizzontalmente"
+    "centerHorizontally": "Centra orizzontalmente",
+    "distributeHorizontally": "Distribuisci orizzontalmente",
+    "distributeVertically": "Distribuisci verticalmente"
   },
   "buttons": {
-    "clearReset": "Ripristina la tela",
+    "clearReset": "Svuota la tela",
     "export": "Esporta",
     "exportToPng": "Esporta come PNG",
     "exportToSvg": "Esporta come SVG",
@@ -114,7 +124,7 @@
     "exitZenMode": "Uscire dalla modalità zen"
   },
   "alerts": {
-    "clearReset": "Questo cancellerà l'intera tela. Sei sicuro?",
+    "clearReset": "Questa azione cancellerà l'intera tela. Sei sicuro?",
     "couldNotCreateShareableLink": "Non riesco a creare un link condivisibile.",
     "couldNotCreateShareableLinkTooBig": "Impossibile creare il link condivisibile: la scena è troppo grande",
     "couldNotLoadInvalidFile": "Impossibile caricare un file no valido",
@@ -203,13 +213,22 @@
     "textNewLine": "Aggiungi nuova riga (testo)",
     "textFinish": "Completa la modifica (testo)",
     "zoomToFit": "Adatta zoom per mostrare tutti gli elementi",
+    "zoomToSelection": "Zoom alla selezione",
     "preventBinding": "Prevenire l'associazione freccia"
   },
   "encrypted": {
     "tooltip": "I tuoi disegni sono crittografati end-to-end in modo che i server di Excalidraw non li possano mai vedere."
   },
-  "charts": {
-    "noNumericColumn": "Hai incollato un foglio di calcolo senza una colonna numerica.",
-    "tooManyColumns": "Hai incollato un foglio di calcolo con più di due colonne."
+  "stats": {
+    "angle": "Angolo",
+    "element": "Elemento",
+    "elements": "Elementi",
+    "height": "Altezza",
+    "scene": "Scena",
+    "selected": "Selezionato",
+    "storage": "Memoria",
+    "title": "Statistiche per nerd",
+    "total": "Totale",
+    "width": "Larghezza"
   }
 }

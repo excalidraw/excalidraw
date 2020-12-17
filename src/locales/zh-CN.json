@@ -4,6 +4,7 @@
     "selectAll": "全部选中",
     "multiSelect": "添加元素到选区",
     "moveCanvas": "移动画布",
+    "cut": "",
     "copy": "复制",
     "copyAsPng": "复制为 PNG 到剪贴板",
     "copyAsSvg": "复制为 SVG 到剪贴板",
@@ -28,6 +29,11 @@
     "edges": "边角",
     "sharp": "尖锐",
     "round": "圆润",
+    "arrowheads": "",
+    "arrowhead_none": "",
+    "arrowhead_arrow": "",
+    "arrowhead_bar": "",
+    "arrowhead_dot": "",
     "fontSize": "字体大小",
     "fontFamily": "字体",
     "onlySelected": "仅被选中",
@@ -71,17 +77,21 @@
     "ungroup": "取消组选",
     "collaborators": "协作者",
     "toggleGridMode": "切换网格模式",
+    "toggleStats": "",
     "addToLibrary": "添加到库中",
     "removeFromLibrary": "从库中移除",
     "libraryLoadingMessage": "正在加载库...",
+    "libraries": "",
     "loadingScene": "正在加载绘图...",
-    "align": "",
-    "alignTop": "",
-    "alignBottom": "",
-    "alignLeft": "",
-    "alignRight": "",
-    "centerVertically": "",
-    "centerHorizontally": ""
+    "align": "对齐",
+    "alignTop": "顶部对齐",
+    "alignBottom": "底端对齐",
+    "alignLeft": "左对齐",
+    "alignRight": "右对齐",
+    "centerVertically": "垂直居中",
+    "centerHorizontally": "水平居中",
+    "distributeHorizontally": "水平等距分布",
+    "distributeVertically": "垂直等距分布"
   },
   "buttons": {
     "clearReset": "重置画布",
@@ -90,7 +100,7 @@
     "exportToSvg": "导出为 SVG",
     "copyToClipboard": "复制到剪贴板",
     "copyPngToClipboard": "复制 PNG 到剪切板",
-    "scale": "",
+    "scale": "缩放",
     "save": "保存",
     "saveAs": "保存为",
     "load": "载入文件",
@@ -158,9 +168,9 @@
     "lineEditor_nothingSelected": "选中要移动或移除的点，或按住 Alt 并点击添加新点"
   },
   "canvasError": {
-    "cannotShowPreview": "",
-    "canvasTooBig": "",
-    "canvasTooBigTip": ""
+    "cannotShowPreview": "无法显示预览",
+    "canvasTooBig": "画布可能过大。",
+    "canvasTooBigTip": "提示：尝试将最远的元素移动到和其它元素更近一些。"
   },
   "errorSplash": {
     "headingMain_pre": "遇到异常。请尝试",
@@ -203,13 +213,22 @@
     "textNewLine": "文本换行",
     "textFinish": "完成编辑文本",
     "zoomToFit": "缩放以适应所有元素",
+    "zoomToSelection": "缩放至选择部分",
     "preventBinding": "防止箭头吸附"
   },
   "encrypted": {
     "tooltip": "您的绘图采用的端到端加密，因此Excalidraw服务器永远不会收集。"
   },
-  "charts": {
-    "noNumericColumn": "您粘贴了一个没有数字列的表格。",
-    "tooManyColumns": "您粘贴了两列以上的表格。"
+  "stats": {
+    "angle": "角度",
+    "element": "元素",
+    "elements": "元素",
+    "height": "高度",
+    "scene": "场景",
+    "selected": "选中",
+    "storage": "存储",
+    "title": "",
+    "total": "总计",
+    "width": "宽度"
   }
 }

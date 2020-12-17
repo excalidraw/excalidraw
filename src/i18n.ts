@@ -1,4 +1,5 @@
 import LanguageDetector from "i18next-browser-languagedetector";
+import { EVENT_CHANGE, trackEvent } from "./analytics";
 
 import fallbackLanguageData from "./locales/en.json";
 import percentages from "./locales/percentages.json";
@@ -12,38 +13,36 @@ interface Language {
 }
 
 const allLanguages: Language[] = [
+  { lng: "ar-SA", label: "العربية", rtl: true },
   { lng: "bg-BG", label: "Български" },
-  { lng: "de-DE", label: "Deutsch" },
-  { lng: "es-ES", label: "Español" },
   { lng: "ca-ES", label: "Catalan" },
+  { lng: "de-DE", label: "Deutsch" },
   { lng: "el-GR", label: "Ελληνικά" },
+  { lng: "es-ES", label: "Español" },
+  { lng: "fa-IR", label: "فارسی", rtl: true },
+  { lng: "fi-FI", label: "Suomi" },
   { lng: "fr-FR", label: "Français" },
+  { lng: "he-IL", label: "עברית", rtl: true },
+  { lng: "hi-IN", label: "हिन्दी" },
+  { lng: "hu-HU", label: "Magyar" },
   { lng: "id-ID", label: "Bahasa Indonesia" },
   { lng: "it-IT", label: "Italiano" },
-  { lng: "hu-HU", label: "Magyar" },
-  { lng: "nl-NL", label: "Nederlands" },
+  { lng: "ja-JP", label: "日本語" },
+  { lng: "ko-KR", label: "한국어" },
+  { lng: "my-MM", label: "Burmese" },
   { lng: "nb-NO", label: "Norsk bokmål" },
+  { lng: "nl-NL", label: "Nederlands" },
   { lng: "nn-NO", label: "Norsk nynorsk" },
   { lng: "pl-PL", label: "Polski" },
   { lng: "pt-PT", label: "Português" },
-  { lng: "ru-RU", label: "Русский" },
-  { lng: "uk-UA", label: "Українська" },
-  { lng: "fi-FI", label: "Suomi" },
-  { lng: "tr-TR", label: "Türkçe" },
-  { lng: "ja-JP", label: "日本語" },
-  { lng: "ko-KR", label: "한국어" },
-  { lng: "zh-TW", label: "繁體中文" },
-  { lng: "zh-CN", label: "简体中文" },
-  { lng: "ar-SA", label: "العربية", rtl: true },
-  { lng: "he-IL", label: "עברית", rtl: true },
-  { lng: "hi-IN", label: "हिन्दी" },
-  { lng: "ta-IN", label: "தமிழ்" },
-  { lng: "gl-ES", label: "Galego" },
   { lng: "ro-RO", label: "Română" },
-  { lng: "sv-SE", label: "Svenska" },
+  { lng: "ru-RU", label: "Русский" },
   { lng: "sk-SK", label: "Slovenčina" },
-  { lng: "my-MM", label: "Burmese" },
-  { lng: "ha-HG", label: "Hausa" },
+  { lng: "sv-SE", label: "Svenska" },
+  { lng: "tr-TR", label: "Türkçe" },
+  { lng: "uk-UA", label: "Українська" },
+  { lng: "zh-CN", label: "简体中文" },
+  { lng: "zh-TW", label: "繁體中文" },
 ];
 
 export const languages: Language[] = [{ lng: "en", label: "English" }]
@@ -69,8 +68,8 @@ export const setLanguage = async (newLng: string | undefined) => {
   currentLanguageData = await import(
     /* webpackChunkName: "i18n-[request]" */ `./locales/${currentLanguage.lng}.json`
   );
-
   languageDetector.cacheUserLanguage(currentLanguage.lng);
+  trackEvent(EVENT_CHANGE, "language", currentLanguage.lng);
 };
 
 export const setLanguageFirstTime = async () => {
@@ -91,8 +90,8 @@ export const setLanguageFirstTime = async () => {
 export const getLanguage = () => currentLanguage;
 
 const findPartsForData = (data: any, parts: string[]) => {
-  for (var i = 0; i < parts.length; ++i) {
-    const part = parts[i];
+  for (let index = 0; index < parts.length; ++index) {
+    const part = parts[index];
     if (data[part] === undefined) {
       return undefined;
     }
@@ -114,7 +113,7 @@ export const t = (path: string, replacement?: { [key: string]: string }) => {
   }
 
   if (replacement) {
-    for (var key in replacement) {
+    for (const key in replacement) {
       translation = translation.replace(`{{${key}}}`, replacement[key]);
     }
   }

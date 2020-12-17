@@ -6,6 +6,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
+
+    .browse-libraries {
+      position: absolute;
+      right: 12px;
+      top: 16px;
+      white-space: nowrap;
+    }
   }
 
   .layer-ui__library-message {
@@ -31,64 +38,6 @@
       svg {
         width: 1.2rem;
         height: 1.2rem;
-      }
-
-      &.tooltip .tooltip-text {
-        visibility: hidden;
-        width: 20rem;
-        bottom: calc(50% + 0.8rem + 6px);
-
-        :root[dir="ltr"] & {
-          left: -5px;
-        }
-
-        :root[dir="rtl"] & {
-          right: -5px;
-        }
-
-        background-color: $oc-black;
-        color: $oc-white;
-        text-align: center;
-        border-radius: 6px;
-        padding: 5px;
-        position: absolute;
-        z-index: 10;
-        font-size: 13px;
-        line-height: 1.5;
-        white-space: pre-wrap;
-
-        &::after {
-          --size: 6px;
-          content: "";
-          border: var(--size) solid transparent;
-          border-top-color: $oc-black;
-          position: absolute;
-          bottom: calc(-2 * var(--size));
-
-          :root[dir="ltr"] & {
-            left: calc(5px + var(--size) / 2);
-          }
-
-          :root[dir="rtl"] & {
-            right: calc(5px + var(--size) / 2);
-          }
-        }
-      }
-
-      // the following 3 rules ensure that the tooltip doesn't show (nor affect
-      // the cursor) when you drag over when you draw on canvas, but at the same
-      // time it still works when clicking on the link/shield
-
-      body:active &.tooltip:not(:hover) {
-        pointer-events: none;
-      }
-
-      body:not(:active) &.tooltip:hover .tooltip-text {
-        visibility: visible;
-      }
-
-      .tooltip-text:hover {
-        visibility: visible;
       }
     }
 
@@ -142,8 +91,11 @@
         transform: translate(-999px, 0);
       }
 
-      &.App-menu_bottom--transition-left {
+      :root[dir="ltr"] &.App-menu_bottom--transition-left {
         transform: translate(-92px, 0);
+      }
+      :root[dir="rtl"] &.App-menu_bottom--transition-left {
+        transform: translate(92px, 0);
       }
     }
 
@@ -151,7 +103,12 @@
       height: 30px;
       position: absolute;
       bottom: 10px;
-      right: 15px;
+      [dir="ltr"] & {
+        right: 15px;
+      }
+      [dir="rtl"] & {
+        left: 15px;
+      }
       font-size: 10px;
       padding: 10px;
       font-weight: 500;

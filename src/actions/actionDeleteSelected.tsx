@@ -98,7 +98,7 @@ export const actionDeleteSelected = register({
       LinearElementEditor.movePoint(element, activePointIndex, "delete");
 
       return {
-        elements: elements,
+        elements,
         appState: {
           ...appState,
           editingLinearElement: {
@@ -136,7 +136,7 @@ export const actionDeleteSelected = register({
     };
   },
   contextItemLabel: "labels.delete",
-  contextMenuOrder: 3,
+  contextMenuOrder: 999999,
   keyTest: (event) => event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE,
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
