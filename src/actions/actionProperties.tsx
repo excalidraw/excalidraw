@@ -39,9 +39,9 @@ import {
   SloppinessArchitectIcon,
   SloppinessArtistIcon,
   SloppinessCartoonistIcon,
-  TextAlignLeft,
-  TextAlignCenter,
-  TextAlignRight,
+  TextAlignLeftIcon,
+  TextAlignCenterIcon,
+  TextAlignRightIcon,
 } from "../components/icons";
 
 const changeProperty = (
@@ -522,17 +522,17 @@ export const actionChangeTextAlign = register({
           {
             value: "left",
             text: t("labels.left"),
-            icon: <TextAlignLeft appearance={appState.appearance} />,
+            icon: <TextAlignLeftIcon appearance={appState.appearance} />,
           },
           {
             value: "center",
             text: t("labels.center"),
-            icon: <TextAlignCenter appearance={appState.appearance} />,
+            icon: <TextAlignCenterIcon appearance={appState.appearance} />,
           },
           {
             value: "right",
             text: t("labels.right"),
-            icon: <TextAlignRight appearance={appState.appearance} />,
+            icon: <TextAlignRightIcon appearance={appState.appearance} />,
           },
         ]}
         value={getFormValue(

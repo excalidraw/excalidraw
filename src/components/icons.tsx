@@ -683,7 +683,7 @@ export const EdgeRoundIcon = React.memo(
 );
 
 // Source: https://github.com/FortAwesome/Font-Awesome/blob/master/svgs/solid/align-left.svg
-export const TextAlignLeft = React.memo(
+export const TextAlignLeftIcon = React.memo(
   ({ appearance }: { appearance: "light" | "dark" }) =>
     createIcon(
       <path
@@ -695,7 +695,7 @@ export const TextAlignLeft = React.memo(
 );
 
 // Source: https://github.com/FortAwesome/Font-Awesome/blob/master/svgs/solid/align-center.svg
-export const TextAlignCenter = React.memo(
+export const TextAlignCenterIcon = React.memo(
   ({ appearance }: { appearance: "light" | "dark" }) =>
     createIcon(
       <path
@@ -707,7 +707,7 @@ export const TextAlignCenter = React.memo(
 );
 
 // Source: https://github.com/FortAwesome/Font-Awesome/blob/master/svgs/solid/align-right.svg
-export const TextAlignRight = React.memo(
+export const TextAlignRightIcon = React.memo(
   ({ appearance }: { appearance: "light" | "dark" }) =>
     createIcon(
       <path
