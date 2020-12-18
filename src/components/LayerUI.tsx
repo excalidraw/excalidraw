@@ -65,6 +65,11 @@ interface LayerUIProps {
   toggleZenMode: () => void;
   lng: string;
   isCollaborating: boolean;
+  onExportToBackend?: (
+    exportedElements: readonly NonDeletedExcalidrawElement[],
+    canvas: HTMLCanvasElement | null,
+    appState: AppState,
+  ) => void;
 }
 
 const useOnClickOutside = (
@@ -317,6 +322,7 @@ const LayerUI = ({
   zenModeEnabled,
   toggleZenMode,
   isCollaborating,
+  onExportToBackend,
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
@@ -366,27 +372,8 @@ const LayerUI = ({
         onExportToPng={createExporter("png")}
         onExportToSvg={createExporter("svg")}
         onExportToClipboard={createExporter("clipboard")}
-        onExportToBackend={async (exportedElements) => {
-          if (canvas) {
-            try {
-              await exportCanvas(
-                "backend",
-                exportedElements,
-                {
-                  ...appState,
-                  selectedElementIds: {},
-                },
-                canvas,
-                appState,
-              );
-            } catch (error) {
-              if (error.name !== "AbortError") {
-                const { width, height } = canvas;
-                console.error(error, { width, height });
-                setAppState({ errorMessage: error.message });
-              }
-            }
-          }
+        onExportToBackend={(elements) => {
+          onExportToBackend && onExportToBackend(elements, canvas, appState);
         }}
       />
     );

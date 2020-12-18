@@ -13,16 +13,21 @@ import { ImportedDataState } from "../data/types";
 import CollabWrapper, { CollabAPI } from "./collab/CollabWrapper";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
 import { t } from "../i18n";
-import { loadScene } from "./data";
+import { exportToBackend, loadScene } from "./data";
 import { getCollaborationLinkData } from "./data";
 import { EVENT } from "../constants";
 import { loadFromFirebase } from "./data/firebase";
 import { ExcalidrawImperativeAPI } from "../components/App";
 import { debounce, ResolvablePromise, resolvablePromise } from "../utils";
 import { AppState, ExcalidrawAPIRefValue } from "../types";
-import { ExcalidrawElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "../element/types";
 import { SAVE_TO_LOCAL_STORAGE_TIMEOUT } from "./app_constants";
 import { EVENT_LOAD, EVENT_SHARE, trackEvent } from "../analytics";
+import { ErrorDialog } from "../components/ErrorDialog";
+import { getDefaultAppState } from "../appState";
 
 const excalidrawRef: React.MutableRefObject<
   MarkRequired<ExcalidrawAPIRefValue, "ready" | "readyPromise">
@@ -178,6 +183,7 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
     width: window.innerWidth,
     height: window.innerHeight,
   });
+  const [errorMessage, setErrorMessage] = useState("");
 
   useLayoutEffect(() => {
     const onResize = () => {
@@ -260,18 +266,52 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
     }
   };
 
+  const onExportToBackend = async (
+    exportedElements: readonly NonDeletedExcalidrawElement[],
+    canvas: HTMLCanvasElement | null,
+    appState: AppState,
+  ) => {
+    if (exportedElements.length === 0) {
+      return window.alert(t("alerts.cannotExportEmptyCanvas"));
+    }
+    if (canvas) {
+      try {
+        await exportToBackend(exportedElements, {
+          ...appState,
+          viewBackgroundColor: appState.exportBackground
+            ? appState.viewBackgroundColor
+            : getDefaultAppState().viewBackgroundColor,
+        });
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          const { width, height } = canvas;
+          console.error(error, { width, height });
+          setErrorMessage(error.message);
+        }
+      }
+    }
+  };
   return (
-    <Excalidraw
-      ref={excalidrawRef}
-      onChange={onChange}
-      width={dimensions.width}
-      height={dimensions.height}
-      initialData={initialStatePromiseRef.current.promise}
-      user={{ name: collab.username }}
-      onCollabButtonClick={collab.onCollabButtonClick}
-      isCollaborating={collab.isCollaborating}
-      onPointerUpdate={collab.onPointerUpdate}
-    />
+    <>
+      <Excalidraw
+        ref={excalidrawRef}
+        onChange={onChange}
+        width={dimensions.width}
+        height={dimensions.height}
+        initialData={initialStatePromiseRef.current.promise}
+        user={{ name: collab.username }}
+        onCollabButtonClick={collab.onCollabButtonClick}
+        isCollaborating={collab.isCollaborating}
+        onPointerUpdate={collab.onPointerUpdate}
+        onExportToBackend={onExportToBackend}
+      />
+      {errorMessage && (
+        <ErrorDialog
+          message={errorMessage}
+          onClose={() => setErrorMessage("")}
+        />
+      )}
+    </>
   );
 }
 
