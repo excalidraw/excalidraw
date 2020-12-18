@@ -52,7 +52,6 @@
   "devDependencies": {
     "@types/lodash.throttle": "4.1.6",
     "@types/pako": "1.0.1",
-    "asar": "3.0.3",
     "eslint-config-prettier": "7.0.0",
     "eslint-plugin-prettier": "3.3.0",
     "firebase-tools": "8.19.0",
@@ -84,8 +83,8 @@
     "build-node": "node ./scripts/build-node.js",
     "build:app:docker": "REACT_APP_INCLUDE_GTAG=false REACT_APP_DISABLE_SENTRY=true react-scripts build",
     "build:app": "REACT_APP_INCLUDE_GTAG=true REACT_APP_GIT_SHA=$NOW_GITHUB_COMMIT_SHA react-scripts build",
-    "build:zip": "node ./scripts/build-version.js",
-    "build": "npm run build:app && npm run build:zip",
+    "build:version": "node ./scripts/build-version.js",
+    "build": "npm run build:app && npm run build:version",
     "eject": "react-scripts eject",
     "fix:code": "npm run test:code -- --fix",
     "fix:other": "npm run prettier -- --write",
