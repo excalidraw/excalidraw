@@ -95,7 +95,7 @@ export const actionChangeExportEmbedScene = register({
           >
             {
               <div style={{ color: "gray", paddingLeft: 3 }}>
-                {`(Avg: +${nFormatter(
+                {`(${t("labels.average")}: +${nFormatter(
                   (increasedPngSize + increasedSvgSize) / 2,
                   1,
                 )})`}
