@@ -345,7 +345,7 @@ export const withBatchedUpdates = <
 //https://stackoverflow.com/a/9462382/8418
 export const nFormatter = (num: number, digits: number): string => {
   const si = [
-    { value: 1, symbol: "b" },
+    { value: 1, symbol: "B" },
     { value: 1e3, symbol: "kB" },
     { value: 1e6, symbol: "MB" },
     { value: 1e9, symbol: "GB" },
