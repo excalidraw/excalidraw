@@ -87,15 +87,15 @@ export const actionChangeExportEmbedScene = register({
         {t("labels.exportEmbedScene")}
         {appState.exportEmbedScene && (
           <Tooltip
-            label={`PNG: ${nFormatter(increasedPngSize, 1)}, SVG: ${nFormatter(
-              increasedSvgSize,
+            label={`PNG: +${nFormatter(
+              increasedPngSize,
               1,
-            )}`}
+            )}, SVG: +${nFormatter(increasedSvgSize, 1)}`}
             position="above"
           >
             {
               <div style={{ color: "gray", paddingLeft: 3 }}>
-                {`(Avg: ${nFormatter(
+                {`(Avg: +${nFormatter(
                   (increasedPngSize + increasedSvgSize) / 2,
                   1,
                 )})`}
