@@ -90,7 +90,7 @@
     "fix:other": "npm run prettier -- --write",
     "fix": "npm run fix:other && npm run fix:code",
     "locales-coverage": "node scripts/build-locales-coverage.js",
-    "locales-coverage:comment": "node scripts/locales-coverage-comment.js",
+    "locales-coverage:description": "node scripts/locales-coverage-description.js",
     "prettier": "prettier \"**/*.{css,scss,json,md,html,yml}\" --ignore-path=.eslintignore",
     "start": "react-scripts start",
     "test:all": "npm run test:typecheck && npm run test:code && npm run test:other && npm run test:app -- --watchAll=false",
