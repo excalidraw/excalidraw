@@ -35,5 +35,5 @@ jobs:
         uses: kt3k/update-pr-description@v1.0.1
         with:
           pr_body: "Hello, world"
-          title: "chore: New Crowdin updates"
+          pr_title: "chore: New Crowdin updates"
           github_token: ${{ secrets.PUSH_TRANSLATIONS_COVERAGE_PAT }}
