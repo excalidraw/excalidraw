@@ -31,21 +31,6 @@ jobs:
             git push
           fi
 
-      - name: Find pull request number
-        uses: jwalton/gh-find-current-pr@v1
-        id: findPullRequestNumber
-        with:
-          github-token: ${{ secrets.PUSH_TRANSLATIONS_COVERAGE_PAT }}
-
-      - name: Find Comment
-        uses: peter-evans/find-comment@v1
-        id: findComment
-        with:
-          token: ${{ secrets.PUSH_TRANSLATIONS_COVERAGE_PAT }}
-          issue-number: ${{ steps.findPullRequestNumber.outputs.pr }}
-          comment-author: "kbariotis"
-          body-includes: "Languages check"
-
       - name: Construct comment body
         id: getCommentBody
         run: |
@@ -55,19 +40,8 @@ jobs:
           comment_body="${comment_body//$'\r'/'%0D'}"
           echo ::set-output name=body::$comment_body
 
-      - name: Create comment
-        if: ${{ steps.findComment.outputs.comment-id == 0 }}
-        uses: peter-evans/create-or-update-comment@v1
+      - name: update-pull-request
+        uses: kt3k/update-pr-description@v1.0.1
         with:
-          token: ${{ secrets.PUSH_TRANSLATIONS_COVERAGE_PAT }}
-          issue-number: ${{ steps.findPullRequestNumber.outputs.pr }}
-          body: ${{ steps.getCommentBody.outputs.body }}
-
-      - name: Update comment
-        if: ${{ steps.findComment.outputs.comment-id != 0 }}
-        uses: peter-evans/create-or-update-comment@v1
-        with:
-          edit-mode: "replace"
-          token: ${{ secrets.PUSH_TRANSLATIONS_COVERAGE_PAT }}
-          comment-id: ${{ steps.findComment.outputs.comment-id }}
-          body: ${{ steps.getCommentBody.outputs.body }}
+          pr_body: ${{ steps.getCommentBody.outputs.body }}
+          github-token: ${{ secrets.PUSH_TRANSLATIONS_COVERAGE_PAT }}
