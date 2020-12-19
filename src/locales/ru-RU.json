@@ -31,9 +31,9 @@
     "round": "Скругленные",
     "arrowheads": "",
     "arrowhead_none": "",
-    "arrowhead_arrow": "",
+    "arrowhead_arrow": "Cтрелка",
     "arrowhead_bar": "",
-    "arrowhead_dot": "",
+    "arrowhead_dot": "Точка",
     "fontSize": "Размер шрифта",
     "fontFamily": "Семейство шрифтов",
     "onlySelected": "Только выбранные",
@@ -220,15 +220,15 @@
     "tooltip": ""
   },
   "stats": {
-    "angle": "",
-    "element": "",
-    "elements": "",
-    "height": "",
+    "angle": "Угол",
+    "element": "Элемент",
+    "elements": "Элементы",
+    "height": "Высота",
     "scene": "",
     "selected": "",
     "storage": "",
     "title": "",
     "total": "",
-    "width": ""
+    "width": "Ширина"
   }
 }
