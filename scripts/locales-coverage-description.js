@@ -127,7 +127,7 @@ const printRow = (id, locale, coverage) => {
   let language = locale in languages ? languages[locale] : locale;
 
   if (coverage === 100) {
-    language += " ⭐️";
+    language = `⭐️ ${language}`;
   }
 
   if (locale in crowdinMap && crowdinMap[locale]) {
