@@ -40,8 +40,8 @@ jobs:
           comment_body="${comment_body//$'\r'/'%0D'}"
           echo ::set-output name=body::$comment_body
 
-      - name: update-pull-request
+      - name: Update description with coverage
         uses: kt3k/update-pr-description@v1.0.1
         with:
-          pr_body: ${{ steps.getCommentBody.outputs.body }}
+          pr_body: "Hello, world!"
           github_token: ${{ secrets.PUSH_TRANSLATIONS_COVERAGE_PAT }}
