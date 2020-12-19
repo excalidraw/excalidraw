@@ -136,8 +136,8 @@
     "loadSceneOverridePrompt": "Si carga este dibujo externo, reemplazará el que tiene. ¿Desea continuar?",
     "errorLoadingLibrary": "Se ha producido un error al cargar la biblioteca de terceros.",
     "confirmAddLibrary": "Esto añadirá {{numShapes}} forma(s) a tu biblioteca. ¿Estás seguro?",
-    "imageDoesNotContainScene": "",
-    "cannotRestoreFromImage": ""
+    "imageDoesNotContainScene": "El archivo de imagen no contiene datos de la escena. ¿Ha activado esta opción durante la exportación?",
+    "cannotRestoreFromImage": "No se pudo restaurar la escena desde este archivo de imagen"
   },
   "toolBar": {
     "selection": "Selección",
@@ -168,9 +168,9 @@
     "lineEditor_nothingSelected": "Seleccione un punto para mover o eliminar, o mantenga pulsado Alt y haga clic para añadir nuevos puntos"
   },
   "canvasError": {
-    "cannotShowPreview": "",
-    "canvasTooBig": "",
-    "canvasTooBigTip": ""
+    "cannotShowPreview": "No se puede mostrar la vista previa",
+    "canvasTooBig": "El lienzo podría ser demasiado grande.",
+    "canvasTooBigTip": "Sugerencia: intenta acercar un poco los elementos más lejanos."
   },
   "errorSplash": {
     "headingMain_pre": "Se encontró un error. Intente ",
@@ -213,22 +213,22 @@
     "textNewLine": "Añadir nueva línea (texto)",
     "textFinish": "Finalizar edición (texto)",
     "zoomToFit": "Ajustar para mostrar todos los elementos",
-    "zoomToSelection": "",
+    "zoomToSelection": "Hacer zoom a la selección",
     "preventBinding": "Evitar enlace de flecha"
   },
   "encrypted": {
     "tooltip": "Tus dibujos están cifrados de punto a punto, por lo que los servidores de Excalidraw nunca los verán."
   },
   "stats": {
-    "angle": "",
-    "element": "",
-    "elements": "",
-    "height": "",
-    "scene": "",
-    "selected": "",
-    "storage": "",
+    "angle": "Ángulo",
+    "element": "Elemento",
+    "elements": "Elementos",
+    "height": "Alto",
+    "scene": "Escena",
+    "selected": "Seleccionado",
+    "storage": "Almacenamiento",
     "title": "",
-    "total": "",
-    "width": ""
+    "total": "Total",
+    "width": "Ancho"
   }
 }
