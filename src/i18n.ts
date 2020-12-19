@@ -6,46 +6,49 @@ import percentages from "./locales/percentages.json";
 
 const COMPLETION_THRESHOLD_TO_EXCEED = 85;
 
-interface Language {
+export interface Language {
   lng: string;
   label: string;
+  emoji: string;
   rtl?: boolean;
 }
 
 const allLanguages: Language[] = [
-  { lng: "ar-SA", label: "العربية", rtl: true },
-  { lng: "bg-BG", label: "Български" },
-  { lng: "ca-ES", label: "Catalan" },
-  { lng: "de-DE", label: "Deutsch" },
-  { lng: "el-GR", label: "Ελληνικά" },
-  { lng: "es-ES", label: "Español" },
-  { lng: "fa-IR", label: "فارسی", rtl: true },
-  { lng: "fi-FI", label: "Suomi" },
-  { lng: "fr-FR", label: "Français" },
-  { lng: "he-IL", label: "עברית", rtl: true },
-  { lng: "hi-IN", label: "हिन्दी" },
-  { lng: "hu-HU", label: "Magyar" },
-  { lng: "id-ID", label: "Bahasa Indonesia" },
-  { lng: "it-IT", label: "Italiano" },
-  { lng: "ja-JP", label: "日本語" },
-  { lng: "ko-KR", label: "한국어" },
-  { lng: "my-MM", label: "Burmese" },
-  { lng: "nb-NO", label: "Norsk bokmål" },
-  { lng: "nl-NL", label: "Nederlands" },
-  { lng: "nn-NO", label: "Norsk nynorsk" },
-  { lng: "pl-PL", label: "Polski" },
-  { lng: "pt-PT", label: "Português" },
-  { lng: "ro-RO", label: "Română" },
-  { lng: "ru-RU", label: "Русский" },
-  { lng: "sk-SK", label: "Slovenčina" },
-  { lng: "sv-SE", label: "Svenska" },
-  { lng: "tr-TR", label: "Türkçe" },
-  { lng: "uk-UA", label: "Українська" },
-  { lng: "zh-CN", label: "简体中文" },
-  { lng: "zh-TW", label: "繁體中文" },
+  { lng: "ar-SA", emoji: "🇸🇦", label: "العربية", rtl: true },
+  { lng: "bg-BG", emoji: "🇧🇬", label: "Български" },
+  { lng: "ca-ES", emoji: "🇪🇸", label: "Catalan" },
+  { lng: "de-DE", emoji: "🇩🇪", label: "Deutsch" },
+  { lng: "el-GR", emoji: "🇬🇷", label: "Ελληνικά" },
+  { lng: "es-ES", emoji: "🇪🇸", label: "Español" },
+  { lng: "fa-IR", emoji: "🇮🇷", label: "فارسی", rtl: true },
+  { lng: "fi-FI", emoji: "🇫🇮", label: "Suomi" },
+  { lng: "fr-FR", emoji: "🇫🇷", label: "Français" },
+  { lng: "he-IL", emoji: "🇮🇱", label: "עברית", rtl: true },
+  { lng: "hi-IN", emoji: "🇮🇳", label: "हिन्दी" },
+  { lng: "hu-HU", emoji: "🇭🇺", label: "Magyar" },
+  { lng: "id-ID", emoji: "🇮🇩", label: "Bahasa Indonesia" },
+  { lng: "it-IT", emoji: "🇮🇹", label: "Italiano" },
+  { lng: "ja-JP", emoji: "🇯🇵", label: "日本語" },
+  { lng: "ko-KR", emoji: "🇰🇷", label: "한국어" },
+  { lng: "my-MM", emoji: "🇲🇲", label: "Burmese" },
+  { lng: "nb-NO", emoji: "🇳🇴", label: "Norsk bokmål" },
+  { lng: "nl-NL", emoji: "🇳🇱", label: "Nederlands" },
+  { lng: "nn-NO", emoji: "🇳🇴", label: "Norsk nynorsk" },
+  { lng: "pl-PL", emoji: "🇵🇱", label: "Polski" },
+  { lng: "pt-PT", emoji: "🇵🇹", label: "Português" },
+  { lng: "ro-RO", emoji: "🇷🇴", label: "Română" },
+  { lng: "ru-RU", emoji: "🇷🇺", label: "Русский" },
+  { lng: "sk-SK", emoji: "🇸🇰", label: "Slovenčina" },
+  { lng: "sv-SE", emoji: "🇸🇪", label: "Svenska" },
+  { lng: "tr-TR", emoji: "🇹🇷", label: "Türkçe" },
+  { lng: "uk-UA", emoji: "🇺🇦", label: "Українська" },
+  { lng: "zh-CN", emoji: "🇨🇳", label: "简体中文" },
+  { lng: "zh-TW", emoji: "🇹🇼", label: "繁體中文" },
 ];
 
-export const languages: Language[] = [{ lng: "en", label: "English" }]
+export const languages: Language[] = [
+  { lng: "en", emoji: "🇬🇧", label: "English" },
+]
   .concat(
     allLanguages.sort((left, right) => (left.label > right.label ? 1 : -1)),
   )
