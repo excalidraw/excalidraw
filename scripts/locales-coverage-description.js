@@ -121,15 +121,8 @@ const printHeader = () => {
 const printRow = (id, locale, coverage) => {
   const isOver = coverage > THRESSHOLD;
   let result = `| ${isOver ? id : "..."} | `;
-
   result += `${locale in flags ? flags[locale] : ""} | `;
-
-  let language = locale in languages ? languages[locale] : locale;
-
-  if (coverage === 100) {
-    language = `⭐️ ${language}`;
-  }
-
+  const language = locale in languages ? languages[locale] : locale;
   if (locale in crowdinMap && crowdinMap[locale]) {
     result += `[${boldIf(
       language,
@@ -138,7 +131,7 @@ const printRow = (id, locale, coverage) => {
   } else {
     result += `${boldIf(language, isOver)} | `;
   }
-  result += `${boldIf(coverage, isOver)} |`;
+  result += `${coverage === 100 ? "✅" : boldIf(coverage, isOver)} |`;
   return result;
 };
 
