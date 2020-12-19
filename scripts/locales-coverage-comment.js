@@ -36,9 +36,36 @@ const crowdinMap = {
 };
 
 const flags = {
+  "ar-SA": "",
+  "bg-BG": "",
+  "ca-ES": "",
+  "de-DE": "",
   "el-GR": "🇬🇷",
+  "es-ES": "",
+  "fa-IR": "",
   "fi-FI": "🇫🇮",
+  "fr-FR": "",
+  "he-IL": "",
+  "hi-IN": "",
+  "hu-HU": "",
+  "id-ID": "",
+  "it-IT": "",
   "ja-JP": "🇯🇵",
+  "ko-KR": "",
+  "my-MM": "",
+  "nb-NO": "",
+  "nl-NL": "",
+  "nn-NO": "",
+  "pl-PL": "",
+  "pt-PT": "",
+  "ro-RO": "",
+  "ru-RU": "",
+  "sk-SK": "",
+  "sv-SE": "",
+  "tr-TR": "",
+  "uk-UA": "",
+  "zh-CN": "",
+  "zh-TW": "",
 };
 
 const languages = {
