@@ -152,7 +152,5 @@ for (const coverage in coverages) {
   console.info(printRow(index, coverage, coverages[coverage]));
   index++;
 }
-
-console.info("\n\r");
 console.info("\n\r");
 console.info("\\* Languages in **bold** are going to appear on production.");
