@@ -30,44 +30,18 @@ jobs:
             git commit -am "Auto commit: Calculate translation coverage"
             git push
           fi
-
-      - name: Find pull request number
-        uses: jwalton/gh-find-current-pr@v1
-        id: findPullRequestNumber
-        with:
-          github-token: ${{ secrets.PUSH_TRANSLATIONS_COVERAGE_PAT }}
-
-      - name: Find Comment
-        uses: peter-evans/find-comment@v1
-        id: findComment
-        with:
-          token: ${{ secrets.PUSH_TRANSLATIONS_COVERAGE_PAT }}
-          issue-number: ${{ steps.findPullRequestNumber.outputs.pr }}
-          comment-author: "kbariotis"
-          body-includes: "Languages check"
-
       - name: Construct comment body
         id: getCommentBody
         run: |
-          body=$(npm run locales-coverage:comment)
-          comment_body="${comment_body//'%'/'%25'}"
-          comment_body="${comment_body//$'\n'/'%0A'}"
-          comment_body="${comment_body//$'\r'/'%0D'}"
-          echo ::set-output name=body::$comment_body
+          body=$(npm run locales-coverage:description | grep '^[^>]')
+          body="${body//'%'/'%25'}"
+          body="${body//$'\n'/'%0A'}"
+          body="${body//$'\r'/'%0D'}"
+          echo ::set-output name=body::$body
 
-      - name: Create comment
-        if: ${{ steps.findComment.outputs.comment-id == 0 }}
-        uses: peter-evans/create-or-update-comment@v1
+      - name: Update description with coverage
+        uses: kt3k/update-pr-description@v1.0.1
         with:
-          token: ${{ secrets.PUSH_TRANSLATIONS_COVERAGE_PAT }}
-          issue-number: ${{ steps.findPullRequestNumber.outputs.pr }}
-          body: ${{ steps.getCommentBody.outputs.body }}
-
-      - name: Update comment
-        if: ${{ steps.findComment.outputs.comment-id != 0 }}
-        uses: peter-evans/create-or-update-comment@v1
-        with:
-          edit-mode: "replace"
-          token: ${{ secrets.PUSH_TRANSLATIONS_COVERAGE_PAT }}
-          comment-id: ${{ steps.findComment.outputs.comment-id }}
-          body: ${{ steps.getCommentBody.outputs.body }}
+          pr_body: ${{ steps.getCommentBody.outputs.body }}
+          pr_title: "chore: New Crowdin updates"
+          github_token: ${{ secrets.PUSH_TRANSLATIONS_COVERAGE_PAT }}
