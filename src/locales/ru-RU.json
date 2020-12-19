@@ -29,8 +29,8 @@
     "edges": "Края",
     "sharp": "Острые",
     "round": "Скругленные",
-    "arrowheads": "",
-    "arrowhead_none": "",
+    "arrowheads": "Стрелка",
+    "arrowhead_none": "Без стрелки",
     "arrowhead_arrow": "Cтрелка",
     "arrowhead_bar": "Столбец",
     "arrowhead_dot": "Точка",
@@ -38,8 +38,8 @@
     "fontFamily": "Семейство шрифтов",
     "onlySelected": "Только выбранные",
     "withBackground": "С фоном",
-    "exportEmbedScene": "",
-    "exportEmbedScene_details": "",
+    "exportEmbedScene": "Встроить информацию о сцене в экспортируемый файл",
+    "exportEmbedScene_details": "Сцена будет сохранена в PNG/SVG файл так, чтобы всю сцену можно будет восстановить из этого файла. Это увеличит размер файла.",
     "addWatermark": "Добавить \"Сделано с Excalidraw\"",
     "handDrawn": "Нарисованный от руки",
     "normal": "Обычный",
@@ -126,7 +126,7 @@
   "alerts": {
     "clearReset": "Это очистит весь холст. Вы уверены?",
     "couldNotCreateShareableLink": "Не удалось создать общедоступную ссылку.",
-    "couldNotCreateShareableLinkTooBig": "",
+    "couldNotCreateShareableLinkTooBig": "Нельзя создать ссылку, чтобы поделиться. Сцена слишком большая",
     "couldNotLoadInvalidFile": "Не удалось загрузить недопустимый файл",
     "importBackendFailed": "Не удалось импортировать из бэкэнда.",
     "cannotExportEmptyCanvas": "Не может экспортировать пустой холст.",
@@ -165,10 +165,10 @@
     "rotate": "Вы можете ограничить углы, удерживая SHIFT во время вращения",
     "lineEditor_info": "Дважды кликните или нажмите Enter, чтобы редактировать точки",
     "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": ""
+    "lineEditor_nothingSelected": "Выберите точку для перемещения или удаления. Alt + клик чтобы добавить новые точки"
   },
   "canvasError": {
-    "cannotShowPreview": "",
+    "cannotShowPreview": "Не удается отобразить предпросмотр",
     "canvasTooBig": "",
     "canvasTooBigTip": ""
   },
