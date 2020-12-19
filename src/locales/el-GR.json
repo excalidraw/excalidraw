@@ -221,8 +221,8 @@
   },
   "stats": {
     "angle": "Γωνία",
-    "element": "",
-    "elements": "",
+    "element": "Στοιχείο",
+    "elements": "Στοιχεία",
     "height": "Ύψος",
     "scene": "",
     "selected": "Επιλεγμένα",
