@@ -110,6 +110,8 @@ const coverages = Object.entries(rowData)
   .sort(([, a], [, b]) => b - a)
   .reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
 
+const boldIf = (text, condition) => (condition ? `**${text}**` : text);
+
 const printHeader = () => {
   let result = "| | Flag | Locale | % |\n";
   result += "| --: | :--: | -- | --: |";
@@ -117,55 +119,38 @@ const printHeader = () => {
 };
 
 const printRow = (id, locale, coverage) => {
-  let result = `| ${id} | `;
+  const isOver = coverage > THRESSHOLD;
+  let result = `| ${boldIf(id, isOver)} | `;
 
   result += `${locale in flags ? flags[locale] : ""} | `;
+
   const language = locale in languages ? languages[locale] : locale;
   if (locale in crowdinMap && crowdinMap[locale]) {
-    result += `[${language}](https://crowdin.com/translate/excalidraw/10/${crowdinMap[locale]}) | `;
+    result += `[${boldIf(
+      language,
+      isOver,
+    )}](https://crowdin.com/translate/excalidraw/10/${crowdinMap[locale]}) | `;
   } else {
-    result += `${language} | `;
+    result += `${boldIf(language, isOver)} | `;
   }
-  result += `${coverage} |`;
+  result += `${boldIf(coverage, isOver)} |`;
   return result;
 };
 
-let passId = 1;
-let notPassId = 1;
-const over = [];
-const under = [];
-
+console.info("## Languages check");
+console.info("\n\r");
+console.info(
+  `Our translations for every languages should be at least **${THRESSHOLD}%** to appear on Excalidraw. Join our project in [Crowdin](https://crowdin.com/project/excalidraw) and help us translate it in your language. **Can't find your own?** Open an [issue](https://github.com/excalidraw/excalidraw/issues/new) and we'll add it to the list.`,
+);
+console.info("\n\r");
+console.info(printHeader());
+let index = 1;
 for (const coverage in coverages) {
   if (coverage === "en") {
     continue;
   }
-  const per = coverages[coverage];
-
-  if (per > THRESSHOLD) {
-    over.push(printRow(passId, coverage, per));
-    passId++;
-  } else {
-    under.push(printRow(notPassId, coverage, per));
-    notPassId++;
-  }
+  console.info(printRow(index, coverage, coverages[coverage]));
+  index++;
 }
-
-console.info("## Languages check");
-console.info("");
-console.info(
-  `Our translations for every languages should be at least **${THRESSHOLD}%** to appear on Excalidraw. Join our project in [Crowdin](https://crowdin.com/project/excalidraw) and help us translate it in your language.`,
-);
-console.info("");
-console.info("### Languages over the threshold");
-console.info("");
-console.info(printHeader());
-for (const row of over) {
-  console.info(row);
-}
-console.info("");
-console.info("### Languages below the threshold");
-console.info("");
-console.info(printHeader());
-for (const row of under) {
-  console.info(row);
-}
+console.info("\n\r");
+console.info("\\* Languages in **bold** are going to appear on production.");
