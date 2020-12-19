@@ -44,4 +44,4 @@ jobs:
         uses: kt3k/update-pr-description@v1.0.1
         with:
           pr_body: ${{ steps.getCommentBody.outputs.body }}
-          github-token: ${{ secrets.PUSH_TRANSLATIONS_COVERAGE_PAT }}
+          github_token: ${{ secrets.PUSH_TRANSLATIONS_COVERAGE_PAT }}
