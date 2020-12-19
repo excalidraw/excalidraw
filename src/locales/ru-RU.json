@@ -135,9 +135,9 @@
     "uploadedSecurly": "Загружаемые данные защищена сквозным шифрованием, что означает, что сервер Excalidraw и третьи стороны не могут прочитать содержимое.",
     "loadSceneOverridePrompt": "",
     "errorLoadingLibrary": "Произошла ошибка при загрузке сторонней библиотеки.",
-    "confirmAddLibrary": "",
-    "imageDoesNotContainScene": "",
-    "cannotRestoreFromImage": ""
+    "confirmAddLibrary": "Будет добавлено {{numShapes}} фигур в вашу библиотеку. Продолжить?",
+    "imageDoesNotContainScene": "Это изображение не содежит данных о сцене. Вы включали сохранение данных во время экспорта?",
+    "cannotRestoreFromImage": "Сцена не может быть восстановлена из этого изображения"
   },
   "toolBar": {
     "selection": "Выделение области",
@@ -164,12 +164,12 @@
     "resize": "Вы можете ограничить пропорции, удерживая SHIFT во время изменения размеров,\nудерживайте ALT чтобы изменить размер из центра",
     "rotate": "Вы можете ограничить углы, удерживая SHIFT во время вращения",
     "lineEditor_info": "Дважды кликните или нажмите Enter, чтобы редактировать точки",
-    "lineEditor_pointSelected": "",
+    "lineEditor_pointSelected": "Нажмите Delete для удаления точки, Ctrl или Cmd + D для дублирования, перетащите для перемещения",
     "lineEditor_nothingSelected": "Выберите точку для перемещения или удаления. Alt + клик чтобы добавить новые точки"
   },
   "canvasError": {
     "cannotShowPreview": "Не удается отобразить предпросмотр",
-    "canvasTooBig": "",
+    "canvasTooBig": "Сцена слишком большая.",
     "canvasTooBigTip": ""
   },
   "errorSplash": {
@@ -212,12 +212,12 @@
     "github": "Нашли проблему? Отправьте",
     "textNewLine": "Добавить новую строку (текст)",
     "textFinish": "Закончить редактирование (текст)",
-    "zoomToFit": "",
-    "zoomToSelection": "",
+    "zoomToFit": "Отмастштабировать, чтобы поместились все элементы",
+    "zoomToSelection": "Перейти к выделенному",
     "preventBinding": "Предотвратить привязку стрелок"
   },
   "encrypted": {
-    "tooltip": ""
+    "tooltip": "Ваши данные защищены сквозным (End-to-end) шифрованием. Серверы Excalidraw никогда не получат доступ к ним."
   },
   "stats": {
     "angle": "Угол",
