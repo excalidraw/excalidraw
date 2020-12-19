@@ -5,6 +5,11 @@ const THRESSHOLD = 85;
 const crowdinMap = {
   "ar-SA": "en-ar",
   "el-GR": "en-el",
+  "fi-FI": "en-fi",
+};
+
+const flags = {
+  "el-GR": "🇬🇷",
 };
 
 const percentages = fs.readFileSync(
@@ -18,6 +23,9 @@ const coverages = Object.entries(rowData)
 
 const printRow = (id, locale, coverage) => {
   let result = `| ${id} | `;
+  if (locale in flags) {
+    result += flags[locale];
+  }
   if (locale in crowdinMap) {
     result += `[${locale}](https://crowdin.com/translate/excalidraw/10/${crowdinMap[locale]}) | `;
   } else {
