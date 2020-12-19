@@ -153,7 +153,7 @@ for (const coverage in coverages) {
 console.info("## Languages check");
 console.info("");
 console.info(
-  `Our translations for every languages should be at least **${THRESSHOLD}%** to appear on Excalidraw. Help us translate them in [Crowdin](https://crowdin.com/project/excalidraw).`,
+  `Our translations for every languages should be at least **${THRESSHOLD}%** to appear on Excalidraw. Join our project in [Crowdin](https://crowdin.com/project/excalidraw) and help us translate.`,
 );
 console.info("");
 console.info("### Languages over the threshold");
