@@ -9,7 +9,7 @@ import { AppState } from "../types";
 import { restore } from "./restore";
 import { ImportedDataState, LibraryData } from "./types";
 
-export const parseFileContents = async (blob: Blob | File) => {
+const parseFileContents = async (blob: Blob | File) => {
   let contents: string;
 
   if (blob.type === "image/png") {
