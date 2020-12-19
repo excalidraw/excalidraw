@@ -49,22 +49,7 @@ jobs:
       - name: Construct comment body
         id: getCommentBody
         run: |
-          locales_above_threshold=$(cat src/locales/percentages.json | jq -r 'to_entries[] | select(.value > 85) | "|\(.key)|\(.value)|"')
-          locales_below_threshold=$(cat src/locales/percentages.json | jq -r 'to_entries[] | select(.value <= 85) | "|\(.key)|\(.value)|"')
-          header=$(echo "
-          ## Languages check
-          Our translations for every languages should be at least **85%** to appear on Excalidraw. Help us translate them in [Crowdin](https://crowdin.com/project/excalidraw).
-          ")
-          comment_body=$(echo "$header
-          ### Languages over the threshold
-          |Locale|%|
-          |----|----|
-          $locales_above_threshold
-          ### Languages below the threshold
-          |Locale|%|
-          |----|----|
-          $locales_below_threshold
-          ")
+          body=$(npm run locales-coverage:comment)
           comment_body="${comment_body//'%'/'%25'}"
           comment_body="${comment_body//$'\n'/'%0A'}"
           comment_body="${comment_body//$'\r'/'%0D'}"
