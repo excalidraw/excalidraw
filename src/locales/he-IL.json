@@ -159,18 +159,18 @@
   "hints": {
     "linearElement": "הקלק בשביל לבחור נקודות מרובות, גרור בשביל קו בודד",
     "freeDraw": "לחץ וגרור, שחרר כשסיימת",
-    "text": "",
+    "text": "טיפ: אפשר להוסיף טקסט על ידי לחיצה כפולה בכל מקום עם כלי הבחירה",
     "linearElementMulti": "הקלק על הנקודה האחרונה או הקש Escape או Enter לסיום",
     "resize": "ניתן להגביל פרופורציות על ידי לחיצה על SHIFT תוך כדי שינוי גודל,\nהחזק ALT בשביל לשנות גודל ביחס למרכז",
     "rotate": "ניתן להגביל זוויות על ידי לחיצה על SHIFT תוך כדי סיבוב",
-    "lineEditor_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": ""
+    "lineEditor_info": "לחץ לחיצה כפולה או אנטר לעריכת הנקודות",
+    "lineEditor_pointSelected": "לחץ על Delete להסרת נקודה, CtrlOrCmd+D לשכפל, או גרור להזזה",
+    "lineEditor_nothingSelected": "בחר נקודה להזזה או הסרה, או החזק את כפתור Alt והקלק להוספת נקודות חדשות"
   },
   "canvasError": {
-    "cannotShowPreview": "",
-    "canvasTooBig": "",
-    "canvasTooBigTip": ""
+    "cannotShowPreview": "לא הצלחנו להציג את התצוגה המקדימה",
+    "canvasTooBig": "הקנבס עלול להיות גדול מדי.",
+    "canvasTooBigTip": "טיפ: נסה להזיז את האלמנטים הרחוקים ביותר מעט קרוב יותר יחד."
   },
   "errorSplash": {
     "headingMain_pre": "אירעה שגיאה. נסה ",
@@ -213,21 +213,21 @@
     "textNewLine": "הוסף שורה חדשה (טקסט)",
     "textFinish": "סיים עריכה (טקסט)",
     "zoomToFit": "זום להתאמת כל האלמנטים למסך",
-    "zoomToSelection": "",
-    "preventBinding": ""
+    "zoomToSelection": "התמקד בבחירה",
+    "preventBinding": "מנע השתלבות חצים"
   },
   "encrypted": {
     "tooltip": "הרישומים שלך מוצפנים מקצה לקצה כך שהשרתים של Excalidraw לא יראו אותם לעולם."
   },
   "stats": {
-    "angle": "",
-    "element": "",
-    "elements": "",
-    "height": "",
-    "scene": "",
-    "selected": "",
-    "storage": "",
-    "title": "",
+    "angle": "זווית",
+    "element": "אלמנט",
+    "elements": "אלמנטים",
+    "height": "גובה",
+    "scene": "תצוגה",
+    "selected": "נבחר/ים",
+    "storage": "אחסון",
+    "title": "סטטיסטיקות לחנונים",
     "total": "",
     "width": ""
   }
