@@ -154,4 +154,5 @@ for (const coverage in coverages) {
 }
 
 console.info("");
+console.info("");
 console.info("\\* Languages in **bold** are going to appear on production.");
