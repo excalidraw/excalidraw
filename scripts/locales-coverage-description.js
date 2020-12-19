@@ -138,11 +138,11 @@ const printRow = (id, locale, coverage) => {
 };
 
 console.info("## Languages check");
-console.info("");
+console.info("\n");
 console.info(
   `Our translations for every languages should be at least **${THRESSHOLD}%** to appear on Excalidraw. Join our project in [Crowdin](https://crowdin.com/project/excalidraw) and help us translate it in your language. Can't find your own? Open an [issue](https://github.com/excalidraw/excalidraw/issues/new) and we'll add it to the list.`,
 );
-console.info("");
+console.info("\n");
 console.info(printHeader());
 let index = 1;
 for (const coverage in coverages) {
@@ -153,6 +153,6 @@ for (const coverage in coverages) {
   index++;
 }
 
-console.info("");
-console.info("");
+console.info("\n");
+console.info("\n");
 console.info("\\* Languages in **bold** are going to appear on production.");
