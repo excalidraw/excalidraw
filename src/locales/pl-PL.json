@@ -60,7 +60,7 @@
     "architect": "Dokładny",
     "artist": "Artystyczny",
     "cartoonist": "Rysunkowy",
-    "fileTitle": "",
+    "fileTitle": "Tytuł pliku",
     "colorPicker": "Paleta kolorów",
     "canvasBackground": "Kolor dokumentu",
     "drawingCanvas": "Obszar roboczy",
@@ -77,21 +77,21 @@
     "ungroup": "Rozgrupuj wybrane",
     "collaborators": "Współtwórcy",
     "toggleGridMode": "Włącz siatkę",
-    "toggleStats": "",
+    "toggleStats": "Przełącz statystyki dla nerdów",
     "addToLibrary": "Dodaj do biblioteki",
     "removeFromLibrary": "Usuń z biblioteki",
     "libraryLoadingMessage": "Wczytywanie biblioteki...",
     "libraries": "Przeglądaj biblioteki",
     "loadingScene": "Ładowanie sceny...",
-    "align": "",
-    "alignTop": "",
+    "align": "Wyrównaj",
+    "alignTop": "Wyrównaj do góry",
     "alignBottom": "",
-    "alignLeft": "",
-    "alignRight": "",
-    "centerVertically": "",
-    "centerHorizontally": "",
-    "distributeHorizontally": "",
-    "distributeVertically": ""
+    "alignLeft": "Wyrównaj do lewej",
+    "alignRight": "Wyrównaj do prawej",
+    "centerVertically": "Wyśrodkuj w pionie",
+    "centerHorizontally": "Wyśrodkuj w poziomie",
+    "distributeHorizontally": "Rozłóż poziomo",
+    "distributeVertically": "Rozłóż pionowo"
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
@@ -126,7 +126,7 @@
   "alerts": {
     "clearReset": "To spowoduje usunięcie wszystkiego z dokumentu. Czy chcesz kontynuować?",
     "couldNotCreateShareableLink": "Wystąpił błąd przy generowaniu linka do udostępniania.",
-    "couldNotCreateShareableLinkTooBig": "",
+    "couldNotCreateShareableLinkTooBig": "Nie można utworzyć udostępnialnego linku: scena jest za duża",
     "couldNotLoadInvalidFile": "Nie udało się otworzyć pliku. Wybrany plik jest nieprawidłowy.",
     "importBackendFailed": "Wystąpił błąd podczas importowania pliku.",
     "cannotExportEmptyCanvas": "Najpierw musisz coś narysować, aby zapisać dokument.",
@@ -134,10 +134,10 @@
     "decryptFailed": "Nie udało się odszyfrować danych.",
     "uploadedSecurly": "By zapewnić Ci prywatność, udostępnianie projektu jest zabezpieczone szyfrowaniem end-to-end, co oznacza, że poza tobą i osobą z którą podzielisz się linkiem, nikt nie ma dostępu do tego co udostępniasz.",
     "loadSceneOverridePrompt": "Wczytanie zewnętrznego rysunku zastąpi istniejącą zawartość. Czy chcesz kontynuować?",
-    "errorLoadingLibrary": "",
-    "confirmAddLibrary": "",
-    "imageDoesNotContainScene": "",
-    "cannotRestoreFromImage": ""
+    "errorLoadingLibrary": "Wystąpił błąd podczas ładowania biblioteki stron trzecich.",
+    "confirmAddLibrary": "To doda {{numShapes}} kształtów do twojej biblioteki. Jesteś pewien?",
+    "imageDoesNotContainScene": "Plik obrazu nie zawiera danych sceny. Czy włączyłeś to podczas eksportu?",
+    "cannotRestoreFromImage": "Scena nie mogła zostać przywrócona z pliku obrazu"
   },
   "toolBar": {
     "selection": "Zaznaczenie",
@@ -168,9 +168,9 @@
     "lineEditor_nothingSelected": "Naciśnij w punkt by go edytować, przytrzymaj Alt i naciśnij by dodać nowy punkt"
   },
   "canvasError": {
-    "cannotShowPreview": "",
-    "canvasTooBig": "",
-    "canvasTooBigTip": ""
+    "cannotShowPreview": "Nie można pokazać podglądu",
+    "canvasTooBig": "Płótno może być za duże.",
+    "canvasTooBigTip": "Wskazówka: spróbuj nieco zbliżyć najdalej wysunięte elementy."
   },
   "errorSplash": {
     "headingMain_pre": "Wystąpił błąd. Spróbuj ",
@@ -213,7 +213,7 @@
     "textNewLine": "Dodaj nową linię (tekst)",
     "textFinish": "Zakończ edycję (tekst)",
     "zoomToFit": "Powiększ, aby wyświetlić wszystkie elementy",
-    "zoomToSelection": "",
+    "zoomToSelection": "Przybliż zaznaczenie",
     "preventBinding": "Zablokuj przywiązanie strzałek do obiektu"
   },
   "encrypted": {
@@ -223,9 +223,9 @@
     "angle": "Kąt",
     "element": "Element",
     "elements": "Elementy",
-    "height": "",
-    "scene": "",
-    "selected": "",
+    "height": "Wysokość",
+    "scene": "Scena",
+    "selected": "Zaznaczenie",
     "storage": "Pamięć",
     "title": "",
     "total": "Suma",
