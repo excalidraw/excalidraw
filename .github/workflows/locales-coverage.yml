@@ -30,3 +30,59 @@ jobs:
             git commit -am "Auto commit: Calculate translation coverage"
             git push
           fi
+
+      - name: Find pull request number
+        uses: jwalton/gh-find-current-pr@v1
+        id: findPullRequestNumber
+        with:
+          github-token: ${{ secrets.PUSH_TRANSLATIONS_COVERAGE_PAT }}
+
+      - name: Find Comment
+        uses: peter-evans/find-comment@v1
+        id: findComment
+        with:
+          token: ${{ secrets.PUSH_TRANSLATIONS_COVERAGE_PAT }}
+          issue-number: ${{ steps.findPullRequestNumber.outputs.pr }}
+          comment-author: "kbariotis"
+          body-includes: "Languages check"
+
+      - name: Construct comment body
+        id: getCommentBody
+        run: |
+          locales_above_threshold=$(cat src/locales/percentages.json | jq -r 'to_entries[] | select(.value > 85) | "|\(.key)|\(.value)|"')
+          locales_below_threshold=$(cat src/locales/percentages.json | jq -r 'to_entries[] | select(.value <= 85) | "|\(.key)|\(.value)|"')
+          header=$(echo "
+          ## Languages check
+          Our translations for every languages should be at least **85%** to appear on Excalidraw. Help us translate them in [Crowdin](https://crowdin.com/project/excalidraw).
+          ")
+          comment_body=$(echo "$header
+          ### Languages over the threshold
+          |Locale|%|
+          |----|----|
+          $locales_above_threshold
+          ### Languages below the threshold
+          |Locale|%|
+          |----|----|
+          $locales_below_threshold
+          ")
+          comment_body="${comment_body//'%'/'%25'}"
+          comment_body="${comment_body//$'\n'/'%0A'}"
+          comment_body="${comment_body//$'\r'/'%0D'}"
+          echo ::set-output name=body::$comment_body
+
+      - name: Create comment
+        if: ${{ steps.findComment.outputs.comment-id == 0 }}
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          token: ${{ secrets.PUSH_TRANSLATIONS_COVERAGE_PAT }}
+          issue-number: ${{ steps.findPullRequestNumber.outputs.pr }}
+          body: ${{ steps.getCommentBody.outputs.body }}
+
+      - name: Update comment
+        if: ${{ steps.findComment.outputs.comment-id != 0 }}
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          edit-mode: "replace"
+          token: ${{ secrets.PUSH_TRANSLATIONS_COVERAGE_PAT }}
+          comment-id: ${{ steps.findComment.outputs.comment-id }}
+          body: ${{ steps.getCommentBody.outputs.body }}
