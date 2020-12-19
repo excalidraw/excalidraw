@@ -69,7 +69,7 @@
     "language": "Dil",
     "createRoom": "Ortak çalışma ortamını paylaş",
     "duplicateSelection": "Çoğalt",
-    "untitled": "",
+    "untitled": "Adsız",
     "name": "İsim",
     "yourName": "İsminiz",
     "madeWithExcalidraw": "Excalidraw ile yapıldı",
@@ -86,10 +86,10 @@
     "align": "",
     "alignTop": "",
     "alignBottom": "",
-    "alignLeft": "",
-    "alignRight": "",
-    "centerVertically": "",
-    "centerHorizontally": "",
+    "alignLeft": "Sola yasla\n",
+    "alignRight": "Sağa yasla",
+    "centerVertically": "Dikeyde ortala",
+    "centerHorizontally": "Yatayda ortala",
     "distributeHorizontally": "",
     "distributeVertically": ""
   },
@@ -168,7 +168,7 @@
     "lineEditor_nothingSelected": "Kaldırmak veya oynatmak için bir nokta seç, veya yeni noktalar eklemek için Alt'a basılı tut"
   },
   "canvasError": {
-    "cannotShowPreview": "",
+    "cannotShowPreview": "Önizleme gösterilemiyor",
     "canvasTooBig": "",
     "canvasTooBigTip": ""
   },
@@ -220,10 +220,10 @@
     "tooltip": "Çizimleriniz uçtan-uca şifrelenmiştir, Excalidraw'ın sunucuları bile onları göremez."
   },
   "stats": {
-    "angle": "",
-    "element": "",
-    "elements": "",
-    "height": "",
+    "angle": "Açı",
+    "element": "Bileşen",
+    "elements": "Bileşenler",
+    "height": "Yükseklik",
     "scene": "",
     "selected": "",
     "storage": "",
