@@ -120,7 +120,7 @@ const printHeader = () => {
 
 const printRow = (id, locale, coverage) => {
   const isOver = coverage > THRESSHOLD;
-  let result = `| ${isOver ? id : "..."} | `;
+  let result = `| ${isOver ? boldIf(id, coverage === 100) : "..."} | `;
 
   result += `${locale in flags ? flags[locale] : ""} | `;
 
