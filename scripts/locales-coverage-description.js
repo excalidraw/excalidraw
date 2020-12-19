@@ -114,7 +114,7 @@ const boldIf = (text, condition) => (condition ? `**${text}**` : text);
 
 const printHeader = () => {
   let result = "| | Flag | Locale | % |\n";
-  result += "| --: | :--: | -- | --: |";
+  result += "| --: | :--: | -- | :--: |";
   return result;
 };
 
