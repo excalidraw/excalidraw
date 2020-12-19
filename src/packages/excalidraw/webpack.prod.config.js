@@ -15,7 +15,7 @@ module.exports = {
     library: "Excalidraw",
     libraryTarget: "umd",
     filename: "[name].js",
-    publicPath: "/",
+    publicPath: "https://unpkg.com/aakansha-excalidraw@0.2.1-cdn/dist/",
     chunkFilename: "excalidraw-assets/[name].js",
   },
   resolve: {
