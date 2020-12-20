@@ -25,7 +25,7 @@ Please add the latest change on the top under the correct section.
 - Support CSV graphs and improve the look and feel [#2495](https://github.com/excalidraw/excalidraw/pull/2495)
 
 ### Fixes
-- Fix(appstate.ts): remove unnecessary console.error as it was polluting sentry[#2637](https://github.com/excalidraw/excalidraw/pull/2637)
+- Remove unnecessary console.error as it was polluting Sentry [#2637](https://github.com/excalidraw/excalidraw/pull/2637)
 - Fix scroll-to-center on init for non-zero canvas offsets [#2445](https://github.com/excalidraw/excalidraw/pull/2445)
 - Hide collab button when onCollabButtonClick not supplied [#2598](https://github.com/excalidraw/excalidraw/pull/2598)
 - Fix resizing the pasted charts [#2586](https://github.com/excalidraw/excalidraw/pull/2586)
