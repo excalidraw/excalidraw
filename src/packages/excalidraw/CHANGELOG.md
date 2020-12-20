@@ -38,6 +38,7 @@ Please add the latest change on the top under the correct section.
 
 ### Improvements
 
+- Improve error message around importing images [#2619](https://github.com/excalidraw/excalidraw/pull/2619)
 - Add tooltip with icon for embedding scenes [#2532](https://github.com/excalidraw/excalidraw/pull/2532)
 - RTL support for the stats dialog [#2530](https://github.com/excalidraw/excalidraw/pull/2530)
 - Expand canvas padding based on zoom. [#2515](https://github.com/excalidraw/excalidraw/pull/2515)
