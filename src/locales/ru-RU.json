@@ -170,7 +170,7 @@
   "canvasError": {
     "cannotShowPreview": "Не удается отобразить предпросмотр",
     "canvasTooBig": "Сцена слишком большая.",
-    "canvasTooBigTip": ""
+    "canvasTooBigTip": "Совет: попробуйте сблизить элементы рисунка."
   },
   "errorSplash": {
     "headingMain_pre": "Возникла ошибка. Попробуйте ",
