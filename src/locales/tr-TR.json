@@ -37,7 +37,7 @@
     "fontSize": "Yazı tipi boyutu",
     "fontFamily": "Yazı tipi ailesi",
     "onlySelected": "Sadece seçilen",
-    "withBackground": "Arka Plan İle Beraber",
+    "withBackground": "",
     "exportEmbedScene": "",
     "exportEmbedScene_details": "",
     "addWatermark": "\"Excalidraw ile yapıldı\" yazısını ekle",
