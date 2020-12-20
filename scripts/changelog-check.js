@@ -1,34 +1,34 @@
 const { exec } = require("child_process");
 
-const changeLogCheck = () => {
-  exec(
-    "git diff origin/master --cached --name-only",
-    (error, stdout, stderr) => {
-      if (error || stderr) {
-        process.exit(1);
-      }
+const normalizePath = (path) => path.replace(/\\+/g, "/").trim().toLowerCase();
 
-      if (!stdout || stdout.includes("packages/excalidraw/CHANGELOG.md")) {
-        process.exit(0);
-      }
+const IGNORED_PATHS = [
+  "src/excalidraw-app",
+  "packages/utils",
+  "CHANGELOG.md",
+  "README.md",
+].map(normalizePath);
 
-      const onlyNonSrcFilesUpdated = stdout.indexOf("src") < 0;
-      if (onlyNonSrcFilesUpdated) {
-        process.exit(0);
-      }
+exec("git diff origin/master --cached --name-only", (error, stdout, stderr) => {
+  if (error || stderr) {
+    process.exit(1);
+  }
 
-      const changedFiles = stdout.trim().split("\n");
-      const filesToIgnoreRegex = /src\/excalidraw-app|packages\/utils/;
+  if (!stdout || stdout.includes("packages/excalidraw/CHANGELOG.md")) {
+    process.exit(0);
+  }
 
-      const excalidrawPackageFiles = changedFiles.filter((file) => {
-        return file.indexOf("src") >= 0 && !filesToIgnoreRegex.test(file);
-      });
+  const changedFiles = stdout.trim().split("\n").map(normalizePath);
 
-      if (excalidrawPackageFiles.length) {
-        process.exit(1);
-      }
-      process.exit(0);
-    },
-  );
-};
-changeLogCheck();
+  const excalidrawPackageFiles = changedFiles.filter((filename) => {
+    return (
+      filename.includes("src") &&
+      !IGNORED_PATHS.find((ignoredPath) => filename.includes(ignoredPath))
+    );
+  });
+
+  if (excalidrawPackageFiles.length) {
+    process.exit(1);
+  }
+  process.exit(0);
+});
