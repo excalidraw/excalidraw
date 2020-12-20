@@ -77,21 +77,21 @@
     "ungroup": "Groep opheffen",
     "collaborators": "Deelnemers",
     "toggleGridMode": "Rasterlijnen in-/uitschakelen",
-    "toggleStats": "",
+    "toggleStats": "Statistieken voor nerds",
     "addToLibrary": "Voeg toe aan bibliotheek",
     "removeFromLibrary": "Verwijder uit bibliotheek",
     "libraryLoadingMessage": "Bibliotheek laden...",
-    "libraries": "",
+    "libraries": "Blader door bibliotheken",
     "loadingScene": "Scène laden...",
-    "align": "",
-    "alignTop": "",
-    "alignBottom": "",
-    "alignLeft": "",
-    "alignRight": "",
-    "centerVertically": "",
-    "centerHorizontally": "",
-    "distributeHorizontally": "",
-    "distributeVertically": ""
+    "align": "Uitlijnen",
+    "alignTop": "Boven uitlijnen",
+    "alignBottom": "Onder uitlijnen",
+    "alignLeft": "Links uitlijnen",
+    "alignRight": "Rechts uitlijnen",
+    "centerVertically": "Verticaal Centreren",
+    "centerHorizontally": "Horizontaal Centreren",
+    "distributeHorizontally": "Horizontaal verspreiden",
+    "distributeVertically": "Verticaal distribueren"
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
@@ -126,7 +126,7 @@
   "alerts": {
     "clearReset": "Dit zal het hele canvas verwijderen. Weet je het zeker?",
     "couldNotCreateShareableLink": "Kon geen deelbare link aanmaken.",
-    "couldNotCreateShareableLinkTooBig": "",
+    "couldNotCreateShareableLinkTooBig": "Kan geen deelbare link aanmaken: de scène is te groot",
     "couldNotLoadInvalidFile": "Kan ongeldig bestand niet laden",
     "importBackendFailed": "Importeren vanuit backend mislukt.",
     "cannotExportEmptyCanvas": "Kan geen leeg canvas exporteren.",
@@ -137,7 +137,7 @@
     "errorLoadingLibrary": "Bij het laden van de externe bibliotheek is een fout opgetreden.",
     "confirmAddLibrary": "Hiermee worden {{numShapes}} vorm(n) aan uw bibliotheek toegevoegd. Ben je het zeker?",
     "imageDoesNotContainScene": "",
-    "cannotRestoreFromImage": ""
+    "cannotRestoreFromImage": "Scène kan niet worden hersteld vanuit dit afbeeldingsbestand"
   },
   "toolBar": {
     "selection": "Selectie",
@@ -168,9 +168,9 @@
     "lineEditor_nothingSelected": "Selecteer een punt om te verplaatsen of te verwijderen, of houd Alt ingedrukt en klik om nieuwe punten toe te voegen"
   },
   "canvasError": {
-    "cannotShowPreview": "",
-    "canvasTooBig": "",
-    "canvasTooBigTip": ""
+    "cannotShowPreview": "Kan voorbeeld niet tonen",
+    "canvasTooBig": "Het canvas is mogelijk te groot.",
+    "canvasTooBigTip": "Tip: beweeg de verste elementen iets dichter bij elkaar."
   },
   "errorSplash": {
     "headingMain_pre": "Fout opgetreden. Probeer ",
