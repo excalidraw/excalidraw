@@ -747,7 +747,7 @@ export const actionChangeArrowhead = register({
               },
               {
                 value: "arrow",
-                text: t("toolBar.arrow"),
+                text: t("labels.arrowhead_arrow"),
                 keyBinding: "w",
                 icon: (
                   <ArrowheadArrowIcon
