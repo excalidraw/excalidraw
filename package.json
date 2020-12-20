@@ -52,7 +52,7 @@
   "devDependencies": {
     "@types/lodash.throttle": "4.1.6",
     "@types/pako": "1.0.1",
-    "eslint-config-prettier": "7.0.0",
+    "eslint-config-prettier": "7.1.0",
     "eslint-plugin-prettier": "3.3.0",
     "firebase-tools": "8.19.0",
     "husky": "4.3.6",
@@ -100,7 +100,6 @@
     "test:other": "npm run prettier -- --list-different",
     "test:typecheck": "tsc",
     "test:update": "npm run test:app -- --updateSnapshot --watchAll=false",
-    "test": "npm run test:app",
-    "changelog:check": "node ./scripts/changelog-check.js"
+    "test": "npm run test:app"
   }
 }
