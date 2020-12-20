@@ -37,7 +37,7 @@
     "fontSize": "Veľkosť písma",
     "fontFamily": "Písmo",
     "onlySelected": "Iba vybrané",
-    "withBackground": "S pozadím",
+    "withBackground": "",
     "exportEmbedScene": "Uložiť scénu do exportovaného súboru",
     "exportEmbedScene_details": "Údaje scény budú uložené do exportovaného PNG/SVG súboru, takže scéna z neho môže byť opäť obnovená.\nBude to mať za následok zvýšenie veľkosti súboru.",
     "addWatermark": "Pridať \"Vytvorené s Excalidraw\"",
