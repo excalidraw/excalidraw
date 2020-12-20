@@ -136,7 +136,7 @@
     "loadSceneOverridePrompt": "讀取外部圖樣將取代目前的內容。是否要繼續？",
     "errorLoadingLibrary": "載入第三方套件時出現錯誤。",
     "confirmAddLibrary": "這將會將 {{numShapes}} 個圖形加入你的資料庫，你確定嗎？",
-    "imageDoesNotContainScene": "圖檔中未包含場景資料。輸出檔案時是否有包含此資料？",
+    "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "無法由此檔案回復場景。"
   },
   "toolBar": {
