@@ -136,7 +136,7 @@
     "loadSceneOverridePrompt": "加载外部绘图将取代您现有的内容。您想要继续吗？",
     "errorLoadingLibrary": "加载第三方库时出错。",
     "confirmAddLibrary": "这将添加 {{numShapes}} 个形状到您的库。您确定吗？",
-    "imageDoesNotContainScene": "图像文件不包含场景数据。您是否在导出过程中启用了此选项？",
+    "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "无法从此图像文件恢复场景"
   },
   "toolBar": {
