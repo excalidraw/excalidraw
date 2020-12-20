@@ -37,7 +37,7 @@
     "fontSize": "Schriftgröße",
     "fontFamily": "Schriftfamilie",
     "onlySelected": "Nur ausgewählte",
-    "withBackground": "Mit Hintergrund",
+    "withBackground": "",
     "exportEmbedScene": "Zeichnung in exportierte Datei einbetten",
     "exportEmbedScene_details": "Die Zeichnungsdaten werden in der exportierten PNG/SVG-Datei gespeichert, sodass das Dokument später weiter bearbeitet werden kann. \nDieses wird die exportierte Datei vergrößern.",
     "addWatermark": "\"Made with Excalidraw\" hinzufügen",
