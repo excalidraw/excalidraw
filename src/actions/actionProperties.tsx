@@ -692,7 +692,7 @@ export const actionChangeArrowhead = register({
               },
               {
                 value: "arrow",
-                text: t("labels.arrowhead_arrow"),
+                text: t("toolBar.arrow"),
                 icon: (
                   <ArrowheadArrowIcon
                     appearance={appState.appearance}
@@ -747,7 +747,7 @@ export const actionChangeArrowhead = register({
               },
               {
                 value: "arrow",
-                text: t("labels.arrowhead_arrow"),
+                text: t("toolBar.arrow"),
                 keyBinding: "w",
                 icon: (
                   <ArrowheadArrowIcon
