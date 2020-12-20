@@ -37,7 +37,7 @@
     "fontSize": "Размер на шрифта",
     "fontFamily": "Семейство шрифтове",
     "onlySelected": "Само избраното",
-    "withBackground": "С фон",
+    "withBackground": "",
     "exportEmbedScene": "",
     "exportEmbedScene_details": "",
     "addWatermark": "",
