@@ -127,13 +127,13 @@
     "clearReset": "Ez a művelet törli a vászont. Biztos benne?",
     "couldNotCreateShareableLink": "Nem sikerült megosztható linket létrehozni.",
     "couldNotCreateShareableLinkTooBig": "",
-    "couldNotLoadInvalidFile": "",
+    "couldNotLoadInvalidFile": "Nem sikerült betölteni a helytelen fájlt",
     "importBackendFailed": "Nem sikerült betölteni a szerverről.",
     "cannotExportEmptyCanvas": "Üres vászont nem lehet exportálni.",
     "couldNotCopyToClipboard": "Nem sikerült vágólapra menteni. Próbálja meg Chrome böngészővel.",
     "decryptFailed": "Nem sikerült visszafejteni a titkosított adatot.",
     "uploadedSecurly": "A feltöltést végpontok közötti titkosítással biztosítottuk, ami azt jelenti, hogy az Excalidraw szerver és harmadik felek nem tudják elolvasni a feltöltés tartalmát.",
-    "loadSceneOverridePrompt": "",
+    "loadSceneOverridePrompt": "A betöltött külső rajz felül fogja írnia meglévőt. Szeretnéd folytatni?",
     "errorLoadingLibrary": "",
     "confirmAddLibrary": "",
     "imageDoesNotContainScene": "",
@@ -163,14 +163,14 @@
     "linearElementMulti": "Kattintson az utolsó pontra, vagy nyomja meg az Escape vagy az Enter billentyűt a befejezéshez",
     "resize": "",
     "rotate": "A SHIFT billentyű lenyomva tartásával korlátozhatja a szögek illesztését",
-    "lineEditor_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": ""
+    "lineEditor_info": "Kattints duplán, vagy nyomj entert a pontok szerkesztéséhez",
+    "lineEditor_pointSelected": "Nyomd meg a delete gombot a pont eltávolításához, Ctrl vagy Cmd + D-t a duplikáláshoz, vagy húzva mozgasd",
+    "lineEditor_nothingSelected": "Válassz ki egy pontot a mozgatáshoz vagy törtléshez, vagy az Alt lenyomása mellett kattintva hozz létre új pontokat"
   },
   "canvasError": {
     "cannotShowPreview": "",
-    "canvasTooBig": "",
-    "canvasTooBigTip": ""
+    "canvasTooBig": "A vászon talán túl nagy.",
+    "canvasTooBigTip": "Tipp: próbáld meg a legtávolabbi elemeket közelebb mozgazni egy máshoz."
   },
   "errorSplash": {
     "headingMain_pre": "Hiba történt. Próbálja ",
@@ -192,14 +192,14 @@
     "button_stopSession": "Munkamenet leállítása",
     "desc_inProgressIntro": "Az élő együttműködési munkamenet folyamatban van.",
     "desc_shareLink": "Ossza meg ezt a linket bárkivel, akivel együtt szeretne működni:",
-    "desc_exitSession": ""
+    "desc_exitSession": "Az munkamenet leállítása kilépteti önt a szobából, de folytathatja a munkát a saját gépén. Vegye figyelembe, hogy ez nem érinti más emberek munkáját és ők továbbra is együttműködhetnek a saját változatukon."
   },
   "errorDialog": {
-    "title": ""
+    "title": "Hiba"
   },
   "shortcutsDialog": {
-    "title": "",
-    "shapes": "",
+    "title": "Gyorsbillentyűk",
+    "shapes": "Formák",
     "or": "vagy",
     "click": "klikk",
     "drag": "húzd",
