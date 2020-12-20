@@ -111,7 +111,9 @@ export default function App() {
           }}
           user={{ name: "Excalidraw User" }}
           onPointerUpdate={(pointerData) => console.log(pointerData)}
-          onCollabButtonClick={() => window.alert("You clicked on collab button")}
+          onCollabButtonClick={() => {
+            window.alert("You clicked on collab button");
+          }}
         />
       </div>
     </div>
