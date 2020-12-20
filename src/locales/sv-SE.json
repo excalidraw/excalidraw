@@ -37,7 +37,7 @@
     "fontSize": "Teckenstorlek",
     "fontFamily": "Teckensnitt",
     "onlySelected": "Endast markering",
-    "withBackground": "",
+    "withBackground": "Med bakgrund",
     "exportEmbedScene": "Bädda in skiss i exporterad fil",
     "exportEmbedScene_details": "Skissdata kommer att sparas i den exporterade PNG/SVG-filen så att skissen kan återställas från den.\nKommer att öka exporterad filstorlek.",
     "addWatermark": "Lägg till \"Skapad med Excalidraw\"",
