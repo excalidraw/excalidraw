@@ -364,6 +364,7 @@ const LayerUI = ({
           });
       }
     };
+
     return (
       <ExportDialog
         elements={elements}
@@ -372,9 +373,14 @@ const LayerUI = ({
         onExportToPng={createExporter("png")}
         onExportToSvg={createExporter("svg")}
         onExportToClipboard={createExporter("clipboard")}
-        onExportToBackend={(elements) => {
-          onExportToBackend && onExportToBackend(elements, canvas, appState);
-        }}
+        onExportToBackend={
+          onExportToBackend
+            ? (elements) => {
+                onExportToBackend &&
+                  onExportToBackend(elements, canvas, appState);
+              }
+            : undefined
+        }
       />
     );
   };
