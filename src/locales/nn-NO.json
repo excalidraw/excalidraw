@@ -37,7 +37,7 @@
     "fontSize": "Skriftstorleik",
     "fontFamily": "Skrifttype",
     "onlySelected": "Kun valde",
-    "withBackground": "Inkluder bakgrunn",
+    "withBackground": "",
     "exportEmbedScene": "",
     "exportEmbedScene_details": "",
     "addWatermark": "Legg til «Laga med Excalidraw»",
