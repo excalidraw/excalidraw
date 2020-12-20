@@ -37,7 +37,7 @@
     "fontSize": "حجم الخط",
     "fontFamily": "نوع الخط",
     "onlySelected": "المحدد فقط",
-    "withBackground": "مع الخلفية",
+    "withBackground": "",
     "exportEmbedScene": "تضمين المشهد في ملف التصدير",
     "exportEmbedScene_details": "سيتم حفظ بيانات المشهد في ملف PNG/SVG المصدّر بحيث يمكن استعادة المشهد منه.\nسيزيد حجم الملف المصدر.",
     "addWatermark": "إضافة \"مصنوعة بواسطة Excalidraw\"",
