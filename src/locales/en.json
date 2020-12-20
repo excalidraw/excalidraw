@@ -37,7 +37,7 @@
     "fontSize": "Font size",
     "fontFamily": "Font family",
     "onlySelected": "Only selected",
-    "withBackground": "With Background",
+    "withBackground": "With background",
     "exportEmbedScene": "Embed scene into exported file",
     "exportEmbedScene_details": "Scene data will be saved into the exported PNG/SVG file so that the scene can be restored from it.\nWill increase exported file size.",
     "addWatermark": "Add \"Made with Excalidraw\"",
