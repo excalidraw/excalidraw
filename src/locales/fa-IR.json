@@ -136,7 +136,7 @@
     "loadSceneOverridePrompt": "بارگزاری یک طرح خارجی محتوای فعلی رو از بین میبرد. آیا میخواهید ادامه دهید؟",
     "errorLoadingLibrary": "خطایی در بارگذاری کتابخانه ثالث وجود داشت.",
     "confirmAddLibrary": "{{numShapes}} از اشکال به کتابخانه شما اضافه خواهد شد. مطمئن هستید؟",
-    "imageDoesNotContainScene": "فایل تصویر دارای محتوای صحنه نیست. آیا در هنگام خروجی گرفتن آن را فعال کرده‌اید؟",
+    "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "صحنه را نمی توان از این فایل تصویری بازیابی کرد"
   },
   "toolBar": {
