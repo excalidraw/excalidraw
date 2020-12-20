@@ -37,7 +37,7 @@
     "fontSize": "Rozmiar tekstu",
     "fontFamily": "Krój pisma",
     "onlySelected": "Tylko wybrane",
-    "withBackground": "Z tłem dokumentu",
+    "withBackground": "",
     "exportEmbedScene": "Osadź scenę w eksportowanym pliku",
     "exportEmbedScene_details": "Dane sceny zostaną zapisane w eksportowanym pliku PNG/SVG tak, aby scena mogła zostać z niego przywrócona.\nZwiększy to rozmiar eksportowanego pliku.",
     "addWatermark": "Dodaj \"Zrobione w Excalidraw\"",
