@@ -26,6 +26,7 @@ Please add the latest change on the top under the correct section.
 - Support CSV graphs and improve the look and feel [#2495](https://github.com/excalidraw/excalidraw/pull/2495)
 
 ### Fixes
+
 - Consistent case for export locale strings [#2622](https://github.com/excalidraw/excalidraw/pull/2622)
 - Remove unnecessary console.error as it was polluting Sentry [#2637](https://github.com/excalidraw/excalidraw/pull/2637)
 - Fix scroll-to-center on init for non-zero canvas offsets [#2445](https://github.com/excalidraw/excalidraw/pull/2445)
