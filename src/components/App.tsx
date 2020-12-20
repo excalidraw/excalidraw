@@ -3645,13 +3645,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           {
             checked: this.state.gridSize !== null,
             shortcutName: "gridMode",
-            label: t("labels.toggleGridMode"),
+            label: t("labels.gridMode"),
             action: this.toggleGridMode,
           },
           {
             checked: this.state.showStats,
             shortcutName: "stats",
-            label: t("labels.toggleStats"),
+            label: t("labels.stats"),
             action: this.toggleStats,
           },
         ],
