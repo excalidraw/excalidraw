@@ -11,14 +11,17 @@ export const EVENT_SHAPE = "shape";
 export const EVENT_SHARE = "share";
 export const EVENT_MAGIC = "magic";
 
-export const trackEvent = window.gtag
-  ? (category: string, name: string, label?: string, value?: number) => {
-      window.gtag("event", name, {
-        event_category: category,
-        event_label: label,
-        value,
-      });
-    }
-  : (category: string, name: string, label?: string, value?: number) => {
-      console.info("Track Event", category, name, label, value);
-    };
+export const trackEvent =
+  typeof window !== "undefined" && window.gtag
+    ? (category: string, name: string, label?: string, value?: number) => {
+        window.gtag("event", name, {
+          event_category: category,
+          event_label: label,
+          value,
+        });
+      }
+    : typeof process !== "undefined" && process?.env?.JEST_WORKER_ID
+    ? (category: string, name: string, label?: string, value?: number) => {}
+    : (category: string, name: string, label?: string, value?: number) => {
+        console.info("Track Event", category, name, label, value);
+      };
