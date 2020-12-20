@@ -136,7 +136,7 @@
     "loadSceneOverridePrompt": "Laddning av extern skiss kommer att ersätta ditt befintliga innehåll. Vill du fortsätta?",
     "errorLoadingLibrary": "Fel vid inläsning av tredjeparts bibliotek.",
     "confirmAddLibrary": "Detta kommer att lägga till {{numShapes}} form(er) till ditt bibliotek. Är du säker?",
-    "imageDoesNotContainScene": "Bildfilen innehåller inte skissdata. Har du aktiverat detta under export?",
+    "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "Skiss kunde inte återställas från denna bildfil"
   },
   "toolBar": {
