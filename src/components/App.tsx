@@ -1426,6 +1426,16 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private onGestureChange = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
+
+    // onGestureChange only has zoom factor but not the center.
+    // If we're on iPad or iPhone, then we recognize multi-touch and will
+    // zoom in at the right location on the touchMove handler already.
+    // On Macbook, we don't have those events so will zoom in at the
+    // current location instead.
+    if (gesture.pointers.size === 2) {
+      return;
+    }
+
     const initialScale = gesture.initialScale;
     if (initialScale) {
       this.setState(({ zoom, offsetLeft, offsetTop }) => ({
