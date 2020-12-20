@@ -4,7 +4,7 @@
     "selectAll": "Selecionar tudo",
     "multiSelect": "Adicionar elemento à seleção",
     "moveCanvas": "Mover tela",
-    "cut": "",
+    "cut": "Cortar",
     "copy": "Copiar",
     "copyAsPng": "Copiar para a área de transferência como PNG",
     "copyAsSvg": "Copiar para a área de transferência como SVG",
@@ -37,7 +37,7 @@
     "fontSize": "Tamanho da fonte",
     "fontFamily": "Família da fontes",
     "onlySelected": "Somente a seleção",
-    "withBackground": "",
+    "withBackground": "Com fundo",
     "exportEmbedScene": "Incorporar a cena no arquivo exportado",
     "exportEmbedScene_details": "Os dados da cena serão salvos no arquivo PNG/SVG exportado para que a cena possa ser restaurada.\nIrá aumentar o tamanho do arquivo exportado.",
     "addWatermark": "Adicionar \"Feito com Excalidraw\"",
@@ -136,7 +136,7 @@
     "loadSceneOverridePrompt": "Carregar um desenho externo substituirá o seu conteúdo existente. Deseja continuar?",
     "errorLoadingLibrary": "Houve um erro ao carregar a biblioteca de terceiros.",
     "confirmAddLibrary": "Isso adicionará {{numShapes}} forma(s) à sua biblioteca. Tem certeza?",
-    "imageDoesNotContainScene": "",
+    "imageDoesNotContainScene": "A importação de imagens não é suportada no momento.\n\nVocê deseja importar uma cena? Esta imagem parece não conter dados de cena. Você ativou isto durante a exportação?",
     "cannotRestoreFromImage": "Não foi possível restaurar a cena deste arquivo de imagem"
   },
   "toolBar": {
