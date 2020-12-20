@@ -16,6 +16,7 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
+- Add Emoji flag to the language selector [#2621](https://github.com/excalidraw/excalidraw/pull/2621)
 - Add zoom to selection [#2522](https://github.com/excalidraw/excalidraw/pull/2522)
 - Insert Library items in the middle of the screen [#2527](https://github.com/excalidraw/excalidraw/pull/2527)
 - Show shortcut context menu [#2501](https://github.com/excalidraw/excalidraw/pull/2501)
