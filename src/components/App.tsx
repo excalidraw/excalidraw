@@ -345,7 +345,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       offsetLeft,
     } = this.state;
 
-    const { onCollabButtonClick } = this.props;
+    const { onCollabButtonClick, onExportToBackend } = this.props;
     const canvasScale = window.devicePixelRatio;
 
     const canvasWidth = canvasDOMWidth * canvasScale;
@@ -384,6 +384,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           toggleZenMode={this.toggleZenMode}
           lng={getLanguage().lng}
           isCollaborating={this.props.isCollaborating || false}
+          onExportToBackend={onExportToBackend}
         />
         {this.state.showStats && (
           <Stats
