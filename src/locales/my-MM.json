@@ -37,7 +37,7 @@
     "fontSize": "စာလုံးအရွယ်",
     "fontFamily": "စာလုံးပုံစံ",
     "onlySelected": "ရွေးထားသလောက်",
-    "withBackground": "နောက်ခံပါထည့်",
+    "withBackground": "",
     "exportEmbedScene": "မြင်ကွင်းပါမြှုပ်နှံ၍ထုတ်ပါ",
     "exportEmbedScene_details": "ထုတ်ယူလိုက်သော PNG/SVG ထဲမြင်ကွင်းအချက်အလက်များပါဝင်သဖြင့် ပြန်လည်ရယူနိုင်သော်လည်း ဖိုင်အရွယ်အစားကြီးပါမည်။",
     "addWatermark": "\"Excalidraw ဖြင့်ဖန်တီးသည်။\" စာသားထည့်",
