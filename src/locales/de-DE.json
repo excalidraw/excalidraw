@@ -136,7 +136,7 @@
     "loadSceneOverridePrompt": "Das Laden der externen Zeichnung ersetzt den vorhandenen Inhalt. Möchtest Du fortfahren?",
     "errorLoadingLibrary": "Beim Laden der Drittanbieter-Bibliothek ist ein Fehler aufgetreten.",
     "confirmAddLibrary": "Dieses fügt {{numShapes}} Form(en) zu deiner Bibliothek hinzu. Bist du sicher?",
-    "imageDoesNotContainScene": "",
+    "imageDoesNotContainScene": "Das Importieren von Bildern wird derzeit nicht unterstützt.\n\nMöchtest du eine Szene importieren? Dieses Bild scheint keine Zeichnungsdaten zu enthalten. Hast du dies beim Exportieren aktiviert?",
     "cannotRestoreFromImage": "Die Zeichnung konnte aus dieser Bilddatei nicht wiederhergestellt werden"
   },
   "toolBar": {
