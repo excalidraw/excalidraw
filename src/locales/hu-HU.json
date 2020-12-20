@@ -37,7 +37,7 @@
     "fontSize": "Betűméret",
     "fontFamily": "Betűkészlet család",
     "onlySelected": "Csak a kiválasztott",
-    "withBackground": "Háttérrel együtt",
+    "withBackground": "",
     "exportEmbedScene": "Jelenet beágyazása az exportált fájlba",
     "exportEmbedScene_details": "",
     "addWatermark": "Add hozzá, hogy \"Excalidraw-val készült\"",
