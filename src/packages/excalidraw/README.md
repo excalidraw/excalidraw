@@ -138,6 +138,7 @@ export default function App() {
 | [`onCollabButtonClick`](#onCollabButtonClick) | Function                                                                                                                                                                                                                                                                                                                                           |                      | Callback to be triggered when the collab button is clicked                                                                                                 |
 | [`isCollaborating`](#isCollaborating)         | `boolean`                                                                                                                                                                                                                                                                                                                                          |                      | This implies if the app is in collaboration mode                                                                                                           |
 | [`onPointerUpdate`](#onPointerUpdate)         | Function                                                                                                                                                                                                                                                                                                                                           |                      | Callback triggered when mouse pointer is updated.                                                                                                          |
+| [`onExportToBackend`](#onExportToBackend)     | Function                                                                                                                                                                                                                                                                                                                                           |                      | Callback triggered when link button is clicked on export dialog                                                                                            |
 
 #### `width`
 
@@ -257,3 +258,15 @@ This callback is triggered when mouse pointer is updated.
 2.`button`: The position of the button. This will be one of `["down", "up"]`
 
 3.`pointersMap`: [`pointers map`](https://github.com/excalidraw/excalidraw/blob/182a3e39e1362d73d2a565c870eb2fb72071fdcc/src/types.ts#L122) of the scene
+
+#### `onExportToBackend`
+
+This callback is triggered when the shareable-link button is clicked in the export dialog. The link button will only be shown if this callback is passed.
+
+```js
+(exportedElements, appState, canvas) => void
+```
+
+1. `exportedElements`: An array of [non deleted elements](https://github.com/excalidraw/excalidraw/blob/6e45cb95dbd7a8be1859c7055b06957298e3097c/src/element/types.ts#L76) which needs to be exported.
+2. `appState`: [AppState](https://github.com/excalidraw/excalidraw/blob/4c90ea5667d29effe8ec4a115e49efc7c340cdb3/src/types.ts#L33) of the scene.
+3. `canvas`: The `HTMLCanvasElement` of the scene.

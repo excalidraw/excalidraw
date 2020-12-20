@@ -14,7 +14,7 @@ exec("git diff origin/master --cached --name-only", (error, stdout, stderr) => {
     process.exit(1);
   }
 
-  if (!stdout || stdout.includes("packages/excalidraw/CHANGELOG.MD")) {
+  if (!stdout || stdout.includes("packages/excalidraw/CHANGELOG.md")) {
     process.exit(0);
   }
 
