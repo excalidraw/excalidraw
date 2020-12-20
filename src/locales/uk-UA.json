@@ -37,7 +37,7 @@
     "fontSize": "Розмір шрифту",
     "fontFamily": "Шрифт",
     "onlySelected": "Тільки вибране",
-    "withBackground": "З тлом",
+    "withBackground": "",
     "exportEmbedScene": "Вставити сцену в експортований файл",
     "exportEmbedScene_details": "Дані сцени будуть збережені в експортований файл PNG/SVG. Ця сцена може бути відновленна з нього, однак це збільшить розмір експортованого файлу.",
     "addWatermark": "Додати «Накреслене в Excalidraw»",
