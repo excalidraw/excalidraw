@@ -3643,11 +3643,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             CANVAS_ONLY_ACTIONS.includes(action.name),
           ),
           {
+            checked: this.state.gridSize !== null,
             shortcutName: "toggleGridMode",
             label: t("labels.toggleGridMode"),
             action: this.toggleGridMode,
           },
           {
+            checked: this.state.showStats,
             shortcutName: "toggleStats",
             label: t("labels.toggleStats"),
             action: this.toggleStats,
