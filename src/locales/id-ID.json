@@ -76,8 +76,8 @@
     "group": "Kelompokan pilihan",
     "ungroup": "Pisahkan pilihan",
     "collaborators": "Kolaborator",
-    "gridMode": "",
-    "stats": "",
+    "gridMode": "Mode grid",
+    "stats": "Statistik untuk nerd",
     "addToLibrary": "Tambahkan ke pustaka",
     "removeFromLibrary": "Hapus dari pustaka",
     "libraryLoadingMessage": "Memuat pustaka...",
@@ -136,7 +136,7 @@
     "loadSceneOverridePrompt": "Memuat gambar external akan mengganti konten Anda yang ada. Apakah Anda ingin melanjutkan?",
     "errorLoadingLibrary": "Terdapat kesalahan dalam memuat pustaka pihak ketiga.",
     "confirmAddLibrary": "Ini akan menambahkan {{numShapes}} bentuk ke pustaka Anda. Anda yakin?",
-    "imageDoesNotContainScene": "",
+    "imageDoesNotContainScene": "Mengimpor gambar tidak didukung saat ini.\n\nApakah Anda ingin impor pemandangan? Gambar ini tidak berisi data pemandangan. Sudah ka Anda aktifkan ini ketika ekspor?",
     "cannotRestoreFromImage": "Pemandangan tidak dapat dipulihkan dari file gambar ini"
   },
   "toolBar": {
@@ -213,7 +213,7 @@
     "textNewLine": "Tambahkan baris baru (teks)",
     "textFinish": "Selesai mengedit (teks)",
     "zoomToFit": "Perbesar agar sesuai dengan semua elemen",
-    "zoomToSelection": "",
+    "zoomToSelection": "Perbesar ke seleksi",
     "preventBinding": "Cegah pengikatan panah"
   },
   "encrypted": {
