@@ -166,6 +166,11 @@ export interface ExcalidrawProps {
     button: "down" | "up";
     pointersMap: Gesture["pointers"];
   }) => void;
+  onExportToBackend?: (
+    exportedElements: readonly NonDeletedExcalidrawElement[],
+    appState: AppState,
+    canvas: HTMLCanvasElement | null,
+  ) => void;
 }
 
 export type SceneData = {
