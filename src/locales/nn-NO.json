@@ -136,7 +136,7 @@
     "loadSceneOverridePrompt": "Innlasting av ekstern teikning erstattar ditt eksisterande innhald. Ynskjer du å fortsette?",
     "errorLoadingLibrary": "Det oppstod ein feil under lastinga av tredjepartsbibliotek.",
     "confirmAddLibrary": "Dette vil legge til {{numShapes}} form(er) i biblioteket ditt. Er du sikker?",
-    "imageDoesNotContainScene": "Biletfila inneheld ikkje scenedata. Aktiverte du dette då du eksporterte?",
+    "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "Scena kunne ikkje gjenopprettast frå denne biletfila"
   },
   "toolBar": {
