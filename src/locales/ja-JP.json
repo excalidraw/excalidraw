@@ -37,7 +37,7 @@
     "fontSize": "フォントの大きさ",
     "fontFamily": "フォントの種類",
     "onlySelected": "選択中のみ",
-    "withBackground": "背景を含める",
+    "withBackground": "",
     "exportEmbedScene": "エクスポートされたファイルにシーンを埋め込みます",
     "exportEmbedScene_details": "シーンデータはエクスポートされたPNG/SVGファイルに保存され、シーンを復元することができます。\nエクスポートされたファイルのサイズは増加します。",
     "addWatermark": "\"Made with Excalidraw\"と表示",
