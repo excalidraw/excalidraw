@@ -268,8 +268,8 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
 
   const onExportToBackend = async (
     exportedElements: readonly NonDeletedExcalidrawElement[],
-    canvas: HTMLCanvasElement | null,
     appState: AppState,
+    canvas: HTMLCanvasElement | null,
   ) => {
     if (exportedElements.length === 0) {
       return window.alert(t("alerts.cannotExportEmptyCanvas"));

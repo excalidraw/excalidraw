@@ -264,12 +264,12 @@ This callback is triggered when mouse pointer is updated.
 
 #### `onExportToBackend`
 
-This callback is triggered when link button is clicked on export dialog. The link button will only be shown if this callback is passed.
+This callback is triggered when the shareable-link button is clicked in the export dialog. The link button will only be shown if this callback is passed.
 
 ```js
-(exportedElements, canvas, appState) => void
+(exportedElements, appState, canvas) => void
 ```
 
 1. `exportedElements`: An array of [non deleted elements](https://github.com/excalidraw/excalidraw/blob/6e45cb95dbd7a8be1859c7055b06957298e3097c/src/element/types.ts#L76) which needs to be exported.
-2. `canvas`: The canvas of the scene with exported elements.
-3. `appState`: [AppState](https://github.com/excalidraw/excalidraw/blob/4c90ea5667d29effe8ec4a115e49efc7c340cdb3/src/types.ts#L33) of the scene.
+2. `appState`: [AppState](https://github.com/excalidraw/excalidraw/blob/4c90ea5667d29effe8ec4a115e49efc7c340cdb3/src/types.ts#L33) of the scene.
+3. `canvas`: The `HTMLCanvasElement` of the scene.

@@ -168,8 +168,8 @@ export interface ExcalidrawProps {
   }) => void;
   onExportToBackend?: (
     exportedElements: readonly NonDeletedExcalidrawElement[],
-    canvas: HTMLCanvasElement | null,
     appState: AppState,
+    canvas: HTMLCanvasElement | null,
   ) => void;
 }
 
