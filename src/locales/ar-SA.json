@@ -136,7 +136,7 @@
     "loadSceneOverridePrompt": "تحميل الرسم الخارجي سيحل محل المحتوى الموجود لديك. هل ترغب في المتابعة؟",
     "errorLoadingLibrary": "حصل خطأ أثناء تحميل مكتبة الطرف الثالث.",
     "confirmAddLibrary": "هذا سيضيف {{numShapes}} شكل إلى مكتبتك. هل أنت متأكد؟",
-    "imageDoesNotContainScene": "لا يحتوي ملف الصورة على بيانات المشهد. هل قمت بتمكين هذا أثناء التصدير؟",
+    "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "تعذر استعادة المشهد من ملف الصورة"
   },
   "toolBar": {
