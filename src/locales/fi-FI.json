@@ -37,7 +37,7 @@
     "fontSize": "Kirjasinkoko",
     "fontFamily": "Kirjasintyyppi",
     "onlySelected": "Vain valitut",
-    "withBackground": "Sisällytä tausta",
+    "withBackground": "",
     "exportEmbedScene": "Upota teos tiedostoon",
     "exportEmbedScene_details": "Teoksen tiedot tallennetaan PNG/SVG-tiedostoon, jolloin teoksen voi palauttaa siitä. Kasvattaa tallennetun tiedoston kokoa.",
     "addWatermark": "Lisää \"Tehty Excalidrawilla\"",
