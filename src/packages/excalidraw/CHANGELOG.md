@@ -35,6 +35,7 @@ Please add the latest change on the top under the correct section.
 - Fix element visibility and zoom on cursor when canvas offset isn't 0. [#2534](https://github.com/excalidraw/excalidraw/pull/2534)
 - Fix Library Menu Layout [#2502](https://github.com/excalidraw/excalidraw/pull/2502)
 - Support number with commas in charts [#2636](https://github.com/excalidraw/excalidraw/pull/2636)
+- Don't break zoom when zooming in on UI [#2638](https://github.com/excalidraw/excalidraw/pull/2638)
 
 ### Improvements
 
