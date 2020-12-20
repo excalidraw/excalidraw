@@ -37,7 +37,7 @@
     "fontSize": "Tamanho da fonte",
     "fontFamily": "Família da fontes",
     "onlySelected": "Somente a seleção",
-    "withBackground": "Com fundo",
+    "withBackground": "",
     "exportEmbedScene": "Incorporar a cena no arquivo exportado",
     "exportEmbedScene_details": "Os dados da cena serão salvos no arquivo PNG/SVG exportado para que a cena possa ser restaurada.\nIrá aumentar o tamanho do arquivo exportado.",
     "addWatermark": "Adicionar \"Feito com Excalidraw\"",
