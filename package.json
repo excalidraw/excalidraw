@@ -100,7 +100,6 @@
     "test:other": "npm run prettier -- --list-different",
     "test:typecheck": "tsc",
     "test:update": "npm run test:app -- --updateSnapshot --watchAll=false",
-    "test": "npm run test:app",
-    "changelog:check": "node ./scripts/changelog-check.js"
+    "test": "npm run test:app"
   }
 }
