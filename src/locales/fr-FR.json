@@ -136,7 +136,7 @@
     "loadSceneOverridePrompt": "Le chargement d'un dessin externe remplacera votre contenu actuel. Souhaitez-vous continuer ?",
     "errorLoadingLibrary": "Une erreur s'est produite lors du chargement de la bibliothèque tierce.",
     "confirmAddLibrary": "Cela va ajouter {{numShapes}} forme(s) à votre bibliothèque. Êtes-vous sûr(e) ?",
-    "imageDoesNotContainScene": "Le fichier image ne contient pas de données de scène. L'avez-vous activé lors de l'export ?",
+    "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "Impossible de restaurer la scène depuis ce fichier image"
   },
   "toolBar": {
