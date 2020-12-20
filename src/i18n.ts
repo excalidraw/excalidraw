@@ -1,4 +1,3 @@
-import LanguageDetector from "i18next-browser-languagedetector";
 import { EVENT_CHANGE, trackEvent } from "./analytics";
 
 import fallbackLanguageData from "./locales/en.json";
@@ -6,7 +5,7 @@ import percentages from "./locales/percentages.json";
 
 const COMPLETION_THRESHOLD_TO_EXCEED = 85;
 
-interface Language {
+export interface Language {
   lng: string;
   label: string;
   rtl?: boolean;
@@ -57,34 +56,24 @@ export const languages: Language[] = [{ lng: "en", label: "English" }]
 
 let currentLanguage = languages[0];
 let currentLanguageData = {};
-const fallbackLanguage = languages[0];
 
-export const setLanguage = async (newLng: string | undefined) => {
-  currentLanguage =
-    languages.find((language) => language.lng === newLng) || fallbackLanguage;
-
+export const setLanguage = async (lang: Language) => {
+  currentLanguage = lang;
   document.documentElement.dir = currentLanguage.rtl ? "rtl" : "ltr";
 
   currentLanguageData = await import(
     /* webpackChunkName: "i18n-[request]" */ `./locales/${currentLanguage.lng}.json`
   );
-  languageDetector.cacheUserLanguage(currentLanguage.lng);
   trackEvent(EVENT_CHANGE, "language", currentLanguage.lng);
 };
 
-export const setLanguageFirstTime = async () => {
-  const newLng: string | undefined = languageDetector.detect();
-
-  currentLanguage =
-    languages.find((language) => language.lng === newLng) || fallbackLanguage;
-
+export const setLanguageFirstTime = async (lang: Language) => {
+  currentLanguage = lang;
   document.documentElement.dir = currentLanguage.rtl ? "rtl" : "ltr";
 
   currentLanguageData = await import(
     /* webpackChunkName: "i18n-[request]" */ `./locales/${currentLanguage.lng}.json`
   );
-
-  languageDetector.cacheUserLanguage(currentLanguage.lng);
 };
 
 export const getLanguage = () => currentLanguage;
@@ -119,12 +108,3 @@ export const t = (path: string, replacement?: { [key: string]: string }) => {
   }
   return translation;
 };
-
-const languageDetector = new LanguageDetector();
-languageDetector.init({
-  languageUtils: {
-    formatLanguageCode: (lng: string) => lng,
-    isWhitelisted: () => true,
-  },
-  checkWhitelist: false,
-});

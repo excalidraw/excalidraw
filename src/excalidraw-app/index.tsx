@@ -1,4 +1,5 @@
 import React, { useState, useLayoutEffect, useEffect, useRef } from "react";
+import LanguageDetector from "i18next-browser-languagedetector";
 
 import Excalidraw from "../packages/excalidraw/index";
 
@@ -12,7 +13,7 @@ import {
 import { ImportedDataState } from "../data/types";
 import CollabWrapper, { CollabAPI } from "./collab/CollabWrapper";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
-import { t } from "../i18n";
+import { Language, languages, t } from "../i18n";
 import { exportToBackend, loadScene } from "./data";
 import { getCollaborationLinkData } from "./data";
 import { EVENT } from "../constants";
@@ -28,6 +29,16 @@ import { SAVE_TO_LOCAL_STORAGE_TIMEOUT } from "./app_constants";
 import { EVENT_LOAD, EVENT_SHARE, trackEvent } from "../analytics";
 import { ErrorDialog } from "../components/ErrorDialog";
 import { getDefaultAppState } from "../appState";
+import { LanguageList } from "./components/LanguageList";
+
+const languageDetector = new LanguageDetector();
+languageDetector.init({
+  languageUtils: {
+    formatLanguageCode: (lng: string) => lng,
+    isWhitelisted: () => true,
+  },
+  checkWhitelist: false,
+});
 
 const excalidrawRef: React.MutableRefObject<
   MarkRequired<ExcalidrawAPIRefValue, "ready" | "readyPromise">
@@ -184,6 +195,9 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
     height: window.innerHeight,
   });
   const [errorMessage, setErrorMessage] = useState("");
+  const currentLang = languageDetector.detect() || languages[0];
+  // @ts-ignore
+  const [lang, setLang] = useState(currentLang.lng);
 
   useLayoutEffect(() => {
     const onResize = () => {
@@ -291,6 +305,33 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
       }
     }
   };
+
+  const renderLanguageList = (isMobile: boolean) => (
+    <LanguageList
+      onChange={(lng) => {
+        setLang(lng);
+      }}
+      languages={languages}
+      floating={!isMobile}
+      currentLanguage={lang}
+    />
+  );
+  const renderFooter = (isMobile: boolean) => {
+    if (isMobile) {
+      return (
+        <fieldset>
+          <legend>{t("labels.language")}</legend>
+          {renderLanguageList(isMobile)}
+        </fieldset>
+      );
+    }
+    return renderLanguageList(isMobile);
+  };
+
+  const onLangChange = (lang: Language["lng"]) => {
+    languageDetector.cacheUserLanguage(lang);
+  };
+  // @ts-ignore
   return (
     <>
       <Excalidraw
@@ -304,6 +345,9 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
         isCollaborating={collab.isCollaborating}
         onPointerUpdate={collab.onPointerUpdate}
         onExportToBackend={onExportToBackend}
+        renderFooter={renderFooter}
+        lang={lang}
+        onLangChange={onLangChange}
       />
       {errorMessage && (
         <ErrorDialog

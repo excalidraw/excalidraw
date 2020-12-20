@@ -23,6 +23,9 @@ const Excalidraw = (props: ExcalidrawProps) => {
     isCollaborating,
     onPointerUpdate,
     onExportToBackend,
+    renderFooter,
+    lang,
+    onLangChange,
   } = props;
 
   useEffect(() => {
@@ -44,7 +47,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
   }, []);
 
   return (
-    <InitializeApp>
+    <InitializeApp lang={lang} onLangChange={onLangChange}>
       <IsMobileProvider>
         <App
           width={width}
@@ -59,6 +62,9 @@ const Excalidraw = (props: ExcalidrawProps) => {
           isCollaborating={isCollaborating}
           onPointerUpdate={onPointerUpdate}
           onExportToBackend={onExportToBackend}
+          renderFooter={renderFooter}
+          lang={lang}
+          onLangChange={onLangChange}
         />
       </IsMobileProvider>
     </InitializeApp>

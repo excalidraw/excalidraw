@@ -96,7 +96,7 @@ import { actions } from "../actions/register";
 
 import { ActionResult } from "../actions/types";
 import { getDefaultAppState } from "../appState";
-import { t, getLanguage } from "../i18n";
+import { t, getLanguage, setLanguage, languages } from "../i18n";
 
 import {
   copyToClipboard,
@@ -197,6 +197,7 @@ const gesture: Gesture = {
   initialDistance: null,
   initialScale: null,
 };
+const fallbackLanguage = languages[0];
 
 export type PointerDownState = Readonly<{
   // The first position at which pointerDown happened
@@ -345,7 +346,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       offsetLeft,
     } = this.state;
 
-    const { onCollabButtonClick, onExportToBackend } = this.props;
+    const { onCollabButtonClick, onExportToBackend, renderFooter } = this.props;
     const canvasScale = window.devicePixelRatio;
 
     const canvasWidth = canvasDOMWidth * canvasScale;
@@ -385,6 +386,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           lng={getLanguage().lng}
           isCollaborating={this.props.isCollaborating || false}
           onExportToBackend={onExportToBackend}
+          renderCustomFooter={renderFooter}
         />
         {this.state.showStats && (
           <Stats
@@ -751,6 +753,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   }
 
   componentDidUpdate(prevProps: ExcalidrawProps, prevState: AppState) {
+    if (prevProps.lang !== this.props.lang) {
+      this.updateLanguage();
+    }
+
     if (
       prevProps.width !== this.props.width ||
       prevProps.height !== this.props.height ||
@@ -3830,6 +3836,15 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         typeof offsets?.offsetLeft === "number" ? offsets.offsetLeft : 0,
       offsetTop: typeof offsets?.offsetTop === "number" ? offsets.offsetTop : 0,
     };
+  }
+
+  private async updateLanguage() {
+    const currentLanguage =
+      languages.find((language) => language.lng === this.props.lang) ||
+      fallbackLanguage;
+    await setLanguage(currentLanguage);
+    this.props?.onLangChange?.(currentLanguage.lng);
+    this.setAppState({});
   }
 }
 

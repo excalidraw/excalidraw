@@ -1,9 +1,8 @@
 import React from "react";
 import { AppState } from "../types";
 import { ActionManager } from "../actions/manager";
-import { t, setLanguage } from "../i18n";
+import { t } from "../i18n";
 import Stack from "./Stack";
-import { LanguageList } from "./LanguageList";
 import { showSelectedShapeActions } from "../element";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { FixedSideContainer } from "./FixedSideContainer";
@@ -31,6 +30,7 @@ type MobileMenuProps = {
   onLockToggle: () => void;
   canvas: HTMLCanvasElement | null;
   isCollaborating: boolean;
+  renderCustomFooter?: (isMobile: boolean) => JSX.Element;
 };
 
 export const MobileMenu = ({
@@ -44,6 +44,7 @@ export const MobileMenu = ({
   onLockToggle,
   canvas,
   isCollaborating,
+  renderCustomFooter,
 }: MobileMenuProps) => (
   <>
     {appState.isLoading && <LoadingMessage />}
@@ -104,15 +105,7 @@ export const MobileMenu = ({
                   appState={appState}
                   setAppState={setAppState}
                 />
-                <fieldset>
-                  <legend>{t("labels.language")}</legend>
-                  <LanguageList
-                    onChange={async (lng) => {
-                      await setLanguage(lng);
-                      setAppState({});
-                    }}
-                  />
-                </fieldset>
+                {renderCustomFooter?.(true)}
                 <fieldset>
                   <legend>{t("labels.collaborators")}</legend>
                   <UserList mobile>

@@ -19,8 +19,7 @@ import { FixedSideContainer } from "./FixedSideContainer";
 import { UserList } from "./UserList";
 import { LockIcon } from "./LockIcon";
 import { ExportDialog, ExportCB } from "./ExportDialog";
-import { LanguageList } from "./LanguageList";
-import { t, languages, setLanguage } from "../i18n";
+import { Language, t } from "../i18n";
 import { HintViewer } from "./HintViewer";
 import useIsMobile from "../is-mobile";
 
@@ -63,13 +62,14 @@ interface LayerUIProps {
   onInsertShape: (elements: LibraryItem) => void;
   zenModeEnabled: boolean;
   toggleZenMode: () => void;
-  lng: string;
+  lng: Language["lng"];
   isCollaborating: boolean;
   onExportToBackend?: (
     exportedElements: readonly NonDeletedExcalidrawElement[],
     appState: AppState,
     canvas: HTMLCanvasElement | null,
   ) => void;
+  renderCustomFooter?: (isMobile: boolean) => JSX.Element;
 }
 
 const useOnClickOutside = (
@@ -323,6 +323,7 @@ const LayerUI = ({
   toggleZenMode,
   isCollaborating,
   onExportToBackend,
+  renderCustomFooter,
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
@@ -558,14 +559,7 @@ const LayerUI = ({
           "transition-right disable-pointerEvents": zenModeEnabled,
         })}
       >
-        <LanguageList
-          onChange={async (lng) => {
-            await setLanguage(lng);
-            setAppState({});
-          }}
-          languages={languages}
-          floating
-        />
+        {renderCustomFooter?.(false)}
         {actionManager.renderAction("toggleShortcuts")}
       </div>
       <button
@@ -604,6 +598,7 @@ const LayerUI = ({
       onLockToggle={onLockToggle}
       canvas={canvas}
       isCollaborating={isCollaborating}
+      renderCustomFooter={renderCustomFooter}
     />
   ) : (
     <div className="layer-ui__wrapper">
@@ -653,7 +648,6 @@ const areEqual = (prev: LayerUIProps, next: LayerUIProps) => {
   const nextAppState = getNecessaryObj(next.appState);
 
   const keys = Object.keys(prevAppState) as (keyof Partial<AppState>)[];
-
   return (
     prev.lng === next.lng &&
     prev.elements === next.elements &&

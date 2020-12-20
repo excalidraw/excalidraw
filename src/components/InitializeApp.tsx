@@ -1,18 +1,28 @@
 import React from "react";
 
 import { LoadingMessage } from "./LoadingMessage";
-import { setLanguageFirstTime } from "../i18n";
+import { Language, languages, setLanguageFirstTime } from "../i18n";
 
-export class InitializeApp extends React.Component<
-  any,
-  { isLoading: boolean }
-> {
+interface Props {
+  lang: Language["lng"];
+  onLangChange?: (lang: Language["lng"]) => void;
+}
+interface State {
+  isLoading: boolean;
+}
+export class InitializeApp extends React.Component<Props, State> {
   public state: { isLoading: boolean } = {
     isLoading: true,
   };
 
   async componentDidMount() {
-    await setLanguageFirstTime();
+    const fallbackLanguage = languages[0];
+
+    const currentLanguage =
+      languages.find((language) => language.lng === this.props.lang) ||
+      fallbackLanguage;
+    await setLanguageFirstTime(currentLanguage);
+    this.props.onLangChange?.(currentLanguage.lng);
     this.setState({
       isLoading: false,
     });

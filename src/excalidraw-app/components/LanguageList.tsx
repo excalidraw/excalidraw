@@ -1,6 +1,6 @@
 import React from "react";
 import clsx from "clsx";
-import * as i18n from "../i18n";
+import * as i18n from "../../i18n";
 
 export const LanguageList = ({
   onChange,
