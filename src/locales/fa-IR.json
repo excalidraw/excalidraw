@@ -37,7 +37,7 @@
     "fontSize": "اندازه قلم",
     "fontFamily": "نوع قلم",
     "onlySelected": "فقط انتخاب شده ها",
-    "withBackground": "با پس زمینه",
+    "withBackground": "",
     "exportEmbedScene": "قرار دادن صحنه در فایل خروجی",
     "exportEmbedScene_details": "متحوای صحنه به فایل خروجی SVG/PNG اضافه خواهد شد برای بازیابی صحنه به آن اضافه خواهد شد.\nباعث افزایش حجم فایل خروجی میشود.",
     "addWatermark": "\"ساخته شده با Excalidraw\" را اضافه کن",
