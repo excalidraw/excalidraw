@@ -19,15 +19,15 @@ export const NOT_SPREADSHEET = "NOT_SPREADSHEET";
 export const VALID_SPREADSHEET = "VALID_SPREADSHEET";
 
 type ParseSpreadsheetResult =
-  | { type: typeof NOT_SPREADSHEET }
+  | { type: typeof NOT_SPREADSHEET; reason: string }
   | { type: typeof VALID_SPREADSHEET; spreadsheet: Spreadsheet };
 
 const tryParseNumber = (s: string): number | null => {
-  const match = /^[$€£¥₩]?([0-9]+(\.[0-9]+)?)$/.exec(s);
+  const match = /^[$€£¥₩]?([0-9,]+(\.[0-9]+)?)$/.exec(s);
   if (!match) {
     return null;
   }
-  return parseFloat(match[1]);
+  return parseFloat(match[1].replace(/,/g, ""));
 };
 
 const isNumericColumn = (lines: string[][], columnIndex: number) =>
@@ -37,12 +37,12 @@ const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
   const numCols = cells[0].length;
 
   if (numCols > 2) {
-    return { type: NOT_SPREADSHEET };
+    return { type: NOT_SPREADSHEET, reason: "More than 2 columns" };
   }
 
   if (numCols === 1) {
     if (!isNumericColumn(cells, 0)) {
-      return { type: NOT_SPREADSHEET };
+      return { type: NOT_SPREADSHEET, reason: "Value is not numeric" };
     }
 
     const hasHeader = tryParseNumber(cells[0][0]) === null;
@@ -51,7 +51,7 @@ const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
     );
 
     if (values.length < 2) {
-      return { type: NOT_SPREADSHEET };
+      return { type: NOT_SPREADSHEET, reason: "Less than two rows" };
     }
 
     return {
@@ -67,7 +67,7 @@ const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
   const valueColumnIndex = isNumericColumn(cells, 0) ? 0 : 1;
 
   if (!isNumericColumn(cells, valueColumnIndex)) {
-    return { type: NOT_SPREADSHEET };
+    return { type: NOT_SPREADSHEET, reason: "Value is not numeric" };
   }
 
   const labelColumnIndex = (valueColumnIndex + 1) % 2;
@@ -75,7 +75,7 @@ const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
   const rows = hasHeader ? cells.slice(1) : cells;
 
   if (rows.length < 2) {
-    return { type: NOT_SPREADSHEET };
+    return { type: NOT_SPREADSHEET, reason: "Less than 2 rows" };
   }
 
   return {
@@ -104,13 +104,13 @@ export const tryParseSpreadsheet = (text: string): ParseSpreadsheetResult => {
   // Copy/paste from excel, spreadhseets, tsv, csv.
   // For now we only accept 2 columns with an optional header
 
-  // Check for tab separeted values
+  // Check for tab separated values
   let lines = text
     .trim()
     .split("\n")
     .map((line) => line.trim().split("\t"));
 
-  // Check for comma separeted files
+  // Check for comma separated files
   if (lines.length && lines[0].length !== 2) {
     lines = text
       .trim()
@@ -119,14 +119,17 @@ export const tryParseSpreadsheet = (text: string): ParseSpreadsheetResult => {
   }
 
   if (lines.length === 0) {
-    return { type: NOT_SPREADSHEET };
+    return { type: NOT_SPREADSHEET, reason: "No values" };
   }
 
   const numColsFirstLine = lines[0].length;
   const isSpreadsheet = lines.every((line) => line.length === numColsFirstLine);
 
   if (!isSpreadsheet) {
-    return { type: NOT_SPREADSHEET };
+    return {
+      type: NOT_SPREADSHEET,
+      reason: "All rows don't have same number of columns",
+    };
   }
 
   const result = tryParseCells(lines);
