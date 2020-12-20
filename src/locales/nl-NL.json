@@ -37,7 +37,7 @@
     "fontSize": "Tekstgrootte",
     "fontFamily": "Lettertype",
     "onlySelected": "Enkel geselecteerde",
-    "withBackground": "Met achtergrond",
+    "withBackground": "",
     "exportEmbedScene": "Scène in geëxporteerd bestand invoegen",
     "exportEmbedScene_details": "",
     "addWatermark": "Voeg \"Gemaakt met Excalidraw\" toe",
