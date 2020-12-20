@@ -37,7 +37,7 @@
     "fontSize": "폰트 크기",
     "fontFamily": "폰트 스타일",
     "onlySelected": "선택한 항목만",
-    "withBackground": "배경 포함",
+    "withBackground": "",
     "exportEmbedScene": "",
     "exportEmbedScene_details": "",
     "addWatermark": "\"Made with Excalidraw\" 추가",
