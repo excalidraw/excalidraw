@@ -37,7 +37,7 @@
     "fontSize": "Dimensione carattere",
     "fontFamily": "Carattere",
     "onlySelected": "Solo selezionati",
-    "withBackground": "Con Sfondo",
+    "withBackground": "",
     "exportEmbedScene": "Incorpora la scena nel file esportato",
     "exportEmbedScene_details": "I dati della scena saranno salvati nel file PNG/SVG esportato in modo che la scena possa essere ripristinata da esso.\nQuesto aumenterà la dimensione del file esportato.",
     "addWatermark": "Aggiungi \"Creato con Excalidraw\"",
