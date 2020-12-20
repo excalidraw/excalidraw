@@ -37,7 +37,7 @@
     "fontSize": "Mida de lletra",
     "fontFamily": "Tipus de lletra",
     "onlySelected": "Només seleccionats",
-    "withBackground": "Amb fons",
+    "withBackground": "",
     "exportEmbedScene": "",
     "exportEmbedScene_details": "",
     "addWatermark": "Afegir \"Fet amb Excalidraw\"",
