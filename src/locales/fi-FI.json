@@ -136,7 +136,7 @@
     "loadSceneOverridePrompt": "Ulkopuolisen piirroksen lataaminen korvaa nykyisen sisältösi. Haluatko jatkaa?",
     "errorLoadingLibrary": "Kolmannen osapuolen kirjastoa ladattaessa tapahtui virhe.",
     "confirmAddLibrary": "Tämä lisää {{numShapes}} muotoa kirjastoosi. Oletko varma?",
-    "imageDoesNotContainScene": "Kuvatiedosto ei sisällä teostietoja. Valitsitko sisällyttää ne tallennusvaiheessa?",
+    "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "Teosta ei voitu palauttaa tästä kuvatiedostosta"
   },
   "toolBar": {
