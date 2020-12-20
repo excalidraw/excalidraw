@@ -37,7 +37,7 @@
     "fontSize": "Dimensiune font",
     "fontFamily": "Familia de fonturi",
     "onlySelected": "Numai selecția",
-    "withBackground": "",
+    "withBackground": "Cu fundal",
     "exportEmbedScene": "Încorporează scena în fișierul exportat",
     "exportEmbedScene_details": "Datele scenei vor fi salvate în fișierul PNG/SVG exportat, astfel că scena va putea fi restaurată din acesta.\nVa crește dimensiunea fișierului exportat.",
     "addWatermark": "Adaugă „Realizat cu Excalidraw”",
