@@ -635,8 +635,8 @@ describe("regression tests", () => {
     const contextMenu = document.querySelector(".context-menu");
     const expectedShortcutNames: ShortcutName[] = [
       "selectAll",
-      "toggleGridMode",
-      "toggleStats",
+      "gridMode",
+      "stats",
     ];
 
     expect(contextMenu).not.toBeNull();

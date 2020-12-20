@@ -34,6 +34,13 @@
     grid-template-columns: 1fr 0.2fr;
     align-items: center;
 
+    &.checkmark::before {
+      position: absolute;
+      left: 6px;
+      margin-bottom: 1px;
+      content: "\2713";
+    }
+
     &.dangerous {
       div:nth-child(1) {
         color: $oc-red-7;

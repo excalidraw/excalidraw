@@ -19,8 +19,8 @@ export type ShortcutName =
   | "copyAsSvg"
   | "group"
   | "ungroup"
-  | "toggleGridMode"
-  | "toggleStats"
+  | "gridMode"
+  | "stats"
   | "addToLibrary";
 
 const shortcutMap: Record<ShortcutName, string[]> = {
@@ -51,8 +51,8 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   copyAsSvg: [],
   group: [getShortcutKey("CtrlOrCmd+G")],
   ungroup: [getShortcutKey("CtrlOrCmd+Shift+G")],
-  toggleGridMode: [getShortcutKey("CtrlOrCmd+'")],
-  toggleStats: [],
+  gridMode: [getShortcutKey("CtrlOrCmd+'")],
+  stats: [],
   addToLibrary: [],
 };
 
