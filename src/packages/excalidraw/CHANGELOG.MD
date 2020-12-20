@@ -17,6 +17,7 @@ Please add the latest change on the top under the correct section.
 ### Features
 
 - Add zoom to selection [#2522](https://github.com/excalidraw/excalidraw/pull/2522)
+- Add zoom to selection [#2522](https://github.com/excalidraw/excalidraw/pull/2522)
 - Insert Library items in the middle of the screen [#2527](https://github.com/excalidraw/excalidraw/pull/2527)
 - Show shortcut context menu [#2501](https://github.com/excalidraw/excalidraw/pull/2501)
 - Aligns arrowhead schemas [#2517](https://github.com/excalidraw/excalidraw/pull/2517)
@@ -25,7 +26,7 @@ Please add the latest change on the top under the correct section.
 - Support CSV graphs and improve the look and feel [#2495](https://github.com/excalidraw/excalidraw/pull/2495)
 
 ### Fixes
-
+- Consistent case and remove duplicate locale strings [#2622](https://github.com/excalidraw/excalidraw/pull/2622)
 - Fix scroll-to-center on init for non-zero canvas offsets [#2445](https://github.com/excalidraw/excalidraw/pull/2445)
 - Hide collab button when onCollabButtonClick not supplied [#2598](https://github.com/excalidraw/excalidraw/pull/2598)
 - Fix resizing the pasted charts [#2586](https://github.com/excalidraw/excalidraw/pull/2586)
