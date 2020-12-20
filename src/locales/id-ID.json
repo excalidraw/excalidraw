@@ -136,7 +136,7 @@
     "loadSceneOverridePrompt": "Memuat gambar external akan mengganti konten Anda yang ada. Apakah Anda ingin melanjutkan?",
     "errorLoadingLibrary": "Terdapat kesalahan dalam memuat pustaka pihak ketiga.",
     "confirmAddLibrary": "Ini akan menambahkan {{numShapes}} bentuk ke pustaka Anda. Anda yakin?",
-    "imageDoesNotContainScene": "File gambar tidak berisi data pemandangan. Apa Anda sudah aktifkan ini selama ekspor?",
+    "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "Pemandangan tidak dapat dipulihkan dari file gambar ini"
   },
   "toolBar": {
