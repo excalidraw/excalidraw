@@ -213,20 +213,20 @@
     "textNewLine": "Nieuwe regel toevoegen (tekst)",
     "textFinish": "Voltooi bewerken (tekst)",
     "zoomToFit": "Zoom in op alle elementen",
-    "zoomToSelection": "",
-    "preventBinding": ""
+    "zoomToSelection": "Inzoomen op selectie",
+    "preventBinding": "Pijlbinding voorkomen"
   },
   "encrypted": {
     "tooltip": "Je tekeningen zijn beveiligd met end-to-end encryptie, dus Excalidraw's servers zullen nooit zien wat je tekent."
   },
   "stats": {
-    "angle": "",
-    "element": "",
-    "elements": "",
-    "height": "",
-    "scene": "",
-    "selected": "",
-    "storage": "",
+    "angle": "Hoek",
+    "element": "Element",
+    "elements": "Elementen",
+    "height": "Hoogte",
+    "scene": "Scene",
+    "selected": "Geselecteerd",
+    "storage": "Opslag",
     "title": "",
     "total": "",
     "width": ""
