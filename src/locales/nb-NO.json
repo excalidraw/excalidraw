@@ -37,7 +37,7 @@
     "fontSize": "Skriftstørrelse",
     "fontFamily": "Fontfamilie",
     "onlySelected": "Kun valgte",
-    "withBackground": "",
+    "withBackground": "Med bakgrunn",
     "exportEmbedScene": "Bygg inn scenen i den eksporterte filen",
     "exportEmbedScene_details": "Scenedata vil bli lagret i den eksporterte PNG/SVG-filen, slik at scenen kan gjenopprettes fra den.\nDet vil øke den eksporterte filstørrelsen.",
     "addWatermark": "Legg til \"Laget med Excalidraw\"",
