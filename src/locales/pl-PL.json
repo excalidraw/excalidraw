@@ -136,7 +136,7 @@
     "loadSceneOverridePrompt": "Wczytanie zewnętrznego rysunku zastąpi istniejącą zawartość. Czy chcesz kontynuować?",
     "errorLoadingLibrary": "Wystąpił błąd podczas ładowania biblioteki stron trzecich.",
     "confirmAddLibrary": "To doda {{numShapes}} kształtów do twojej biblioteki. Jesteś pewien?",
-    "imageDoesNotContainScene": "Plik obrazu nie zawiera danych sceny. Czy włączyłeś to podczas eksportu?",
+    "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "Scena nie mogła zostać przywrócona z pliku obrazu"
   },
   "toolBar": {
