@@ -136,7 +136,7 @@
     "loadSceneOverridePrompt": "Harici çizimler yüklemek mevcut olan içeriği değiştirecektir. Devam etmek istiyor musunuz?",
     "errorLoadingLibrary": "Üçüncü taraf kitaplığı yüklerken bir hata oluştu.",
     "confirmAddLibrary": "Bu, kitaplığınıza {{numShapes}} tane şekil ekleyecek. Emin misiniz?",
-    "imageDoesNotContainScene": "Görsel dosyası herhangi bir sahne verisi bulundurmuyor. Dışa aktarırken bunu etkinleştirdiniz mi?",
+    "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "Bu görsel dosyasından sahne onarılamıyor"
   },
   "toolBar": {
