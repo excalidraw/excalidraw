@@ -118,10 +118,10 @@
     "redo": "重做",
     "roomDialog": "開始即時協作",
     "createNewRoom": "建立新協作會議室",
-    "fullScreen": "",
-    "darkMode": "",
-    "lightMode": "",
-    "zenMode": "",
+    "fullScreen": "全螢幕",
+    "darkMode": "深色模式",
+    "lightMode": "淺色模式",
+    "zenMode": "專注模式",
     "exitZenMode": "離開專注模式"
   },
   "alerts": {
