@@ -118,9 +118,10 @@
     "redo": "Herstel ongedaan maken",
     "roomDialog": "Live-samenwerkingssessie starten",
     "createNewRoom": "Creëer live-samenwerkingssessie",
-    "toggleFullScreen": "Volledig scherm in-/uitschakelen",
-    "toggleDarkMode": "Donkere modus in-/uitschakelen",
-    "toggleZenMode": "Zen modus in-/uitschakelen",
+    "fullScreen": "",
+    "darkMode": "",
+    "lightMode": "",
+    "zenMode": "",
     "exitZenMode": "Verlaat zen modus"
   },
   "alerts": {
