@@ -118,9 +118,10 @@
     "redo": "Rétablir",
     "roomDialog": "Démarrer le collaboration en temps réel",
     "createNewRoom": "Créer un nouveau salon",
-    "toggleFullScreen": "Activer/désactiver le mode plein écran",
-    "toggleDarkMode": "Activer/désactiver le mode sombre",
-    "toggleZenMode": "Activer/désactiver le mode zen",
+    "fullScreen": "",
+    "darkMode": "",
+    "lightMode": "",
+    "zenMode": "",
     "exitZenMode": "Quitter le mode zen"
   },
   "alerts": {
