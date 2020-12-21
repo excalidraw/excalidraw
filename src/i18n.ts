@@ -4,7 +4,7 @@ import { EVENT_CHANGE, trackEvent } from "./analytics";
 import fallbackLanguageData from "./locales/en.json";
 import percentages from "./locales/percentages.json";
 
-const COMPLETION_THRESHOLD_TO_EXCEED = 85;
+const COMPLETION_THRESHOLD = 85;
 
 interface Language {
   lng: string;
@@ -52,8 +52,7 @@ export const languages: Language[] = [{ lng: "en", label: "English" }]
   )
   .filter(
     (lang) =>
-      (percentages as Record<string, number>)[lang.lng] >=
-      COMPLETION_THRESHOLD_TO_EXCEED,
+      (percentages as Record<string, number>)[lang.lng] >= COMPLETION_THRESHOLD,
   );
 
 let currentLanguage = languages[0];
