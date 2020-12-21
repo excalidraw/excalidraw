@@ -83,15 +83,15 @@
     "libraryLoadingMessage": "Chargement de la bibliothèque...",
     "libraries": "Explorer les bibliothèques",
     "loadingScene": "Chargement de la scène...",
-    "align": "Aligner",
+    "align": "Alignement",
     "alignTop": "Aligner en haut",
     "alignBottom": "Aligner en bas",
     "alignLeft": "Aligner à gauche",
     "alignRight": "Aligner à droite",
     "centerVertically": "Centrer verticalement",
     "centerHorizontally": "Centrer horizontalement",
-    "distributeHorizontally": "Répartir horizontalement",
-    "distributeVertically": "Répartir verticalement"
+    "distributeHorizontally": "Distribuer horizontalement",
+    "distributeVertically": "Distribuer verticalement"
   },
   "buttons": {
     "clearReset": "Effacer le canvas & réinitialiser la couleur d'arrière-plan",
@@ -170,8 +170,8 @@
   },
   "canvasError": {
     "cannotShowPreview": "Impossible d’afficher l’aperçu",
-    "canvasTooBig": "Le tableau peut être trop grand.",
-    "canvasTooBigTip": "Astuce : essayez de rapprocher un peu les éléments les plus éloignés ensemble."
+    "canvasTooBig": "Le dessin est peut-être trop grand.",
+    "canvasTooBigTip": "Conseil : essayez de rapprocher un peu plus les éléments les plus éloignés."
   },
   "errorSplash": {
     "headingMain_pre": "Une erreur est survenue. Essayez ",
