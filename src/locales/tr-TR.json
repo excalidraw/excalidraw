@@ -118,9 +118,10 @@
     "redo": "Yeniden yap",
     "roomDialog": "Ortak çalışma ortamı yarat",
     "createNewRoom": "Yeni oda oluştur",
-    "toggleFullScreen": "Tam ekranı aç/kapa",
-    "toggleDarkMode": "Karanlık modu aç/kapa",
-    "toggleZenMode": "Zen modunu aç/kapa",
+    "fullScreen": "",
+    "darkMode": "",
+    "lightMode": "",
+    "zenMode": "",
     "exitZenMode": "Zen modundan çık"
   },
   "alerts": {
