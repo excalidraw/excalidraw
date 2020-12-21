@@ -37,7 +37,7 @@
     "fontSize": "Font size",
     "fontFamily": "Font family",
     "onlySelected": "Only selected",
-    "withBackground": "With Background",
+    "withBackground": "With background",
     "exportEmbedScene": "Embed scene into exported file",
     "exportEmbedScene_details": "Scene data will be saved into the exported PNG/SVG file so that the scene can be restored from it.\nWill increase exported file size.",
     "addWatermark": "Add \"Made with Excalidraw\"",
@@ -76,8 +76,8 @@
     "group": "Group selection",
     "ungroup": "Ungroup selection",
     "collaborators": "Collaborators",
-    "toggleGridMode": "Toggle grid mode",
-    "toggleStats": "Toggle stats for nerds",
+    "gridMode": "Grid mode",
+    "stats": "Stats for nerds",
     "addToLibrary": "Add to library",
     "removeFromLibrary": "Remove from library",
     "libraryLoadingMessage": "Loading library...",
@@ -118,9 +118,10 @@
     "redo": "Redo",
     "roomDialog": "Start live collaboration",
     "createNewRoom": "Create new room",
-    "toggleFullScreen": "Toggle full screen",
-    "toggleDarkMode": "Toggle dark mode",
-    "toggleZenMode": "Toggle zen mode",
+    "fullScreen": "Full screen",
+    "darkMode": "Dark mode",
+    "lightMode": "Light mode",
+    "zenMode": "Zen mode",
     "exitZenMode": "Exit zen mode"
   },
   "alerts": {
@@ -136,7 +137,7 @@
     "loadSceneOverridePrompt": "Loading external drawing will replace your existing content. Do you wish to continue?",
     "errorLoadingLibrary": "There was an error loading the third party library.",
     "confirmAddLibrary": "This will add {{numShapes}} shape(s) to your library. Are you sure?",
-    "imageDoesNotContainScene": "Image file doesn't contain scene data. Have you enabled this during export?",
+    "imageDoesNotContainScene": "Importing images isn't supported at the moment.\n\nDid you want to import a scene? This image does not seem to contain any scene data. Have you enabled this during export?",
     "cannotRestoreFromImage": "Scene couldn't be restored from this image file"
   },
   "toolBar": {

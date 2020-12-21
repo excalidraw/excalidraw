@@ -28,7 +28,7 @@
     "@types/react": "17.0.0",
     "@types/react-dom": "17.0.0",
     "@types/socket.io-client": "1.4.34",
-    "browser-nativefs": "0.11.2",
+    "browser-nativefs": "0.12.0",
     "clsx": "1.1.1",
     "firebase": "8.2.0",
     "i18next-browser-languagedetector": "6.0.1",
@@ -52,7 +52,7 @@
   "devDependencies": {
     "@types/lodash.throttle": "4.1.6",
     "@types/pako": "1.0.1",
-    "eslint-config-prettier": "7.0.0",
+    "eslint-config-prettier": "7.1.0",
     "eslint-plugin-prettier": "3.3.0",
     "firebase-tools": "8.19.0",
     "husky": "4.3.6",
@@ -100,7 +100,6 @@
     "test:other": "npm run prettier -- --list-different",
     "test:typecheck": "tsc",
     "test:update": "npm run test:app -- --updateSnapshot --watchAll=false",
-    "test": "npm run test:app",
-    "changelog:check": "node ./scripts/changelog-check.js"
+    "test": "npm run test:app"
   }
 }

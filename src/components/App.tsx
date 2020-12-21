@@ -345,7 +345,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       offsetLeft,
     } = this.state;
 
-    const { onCollabButtonClick } = this.props;
+    const { onCollabButtonClick, onExportToBackend } = this.props;
     const canvasScale = window.devicePixelRatio;
 
     const canvasWidth = canvasDOMWidth * canvasScale;
@@ -384,6 +384,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           toggleZenMode={this.toggleZenMode}
           lng={getLanguage().lng}
           isCollaborating={this.props.isCollaborating || false}
+          onExportToBackend={onExportToBackend}
         />
         {this.state.showStats && (
           <Stats
@@ -1425,14 +1426,27 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private onGestureChange = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
-    this.setState(({ zoom, offsetLeft, offsetTop }) => ({
-      zoom: getNewZoom(
-        getNormalizedZoom(gesture.initialScale! * event.scale),
-        zoom,
-        { left: offsetLeft, top: offsetTop },
-        { x: cursorX, y: cursorY },
-      ),
-    }));
+
+    // onGestureChange only has zoom factor but not the center.
+    // If we're on iPad or iPhone, then we recognize multi-touch and will
+    // zoom in at the right location on the touchMove handler already.
+    // On Macbook, we don't have those events so will zoom in at the
+    // current location instead.
+    if (gesture.pointers.size === 2) {
+      return;
+    }
+
+    const initialScale = gesture.initialScale;
+    if (initialScale) {
+      this.setState(({ zoom, offsetLeft, offsetTop }) => ({
+        zoom: getNewZoom(
+          getNormalizedZoom(initialScale * event.scale),
+          zoom,
+          { left: offsetLeft, top: offsetTop },
+          { x: cursorX, y: cursorY },
+        ),
+      }));
+    }
   });
 
   private onGestureEnd = withBatchedUpdates((event: GestureEvent) => {
@@ -1744,20 +1758,26 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
     }
 
-    if (gesture.pointers.size === 2) {
+    const initialScale = gesture.initialScale;
+    if (
+      gesture.pointers.size === 2 &&
+      gesture.lastCenter &&
+      initialScale &&
+      gesture.initialDistance
+    ) {
       const center = getCenter(gesture.pointers);
-      const deltaX = center.x - gesture.lastCenter!.x;
-      const deltaY = center.y - gesture.lastCenter!.y;
+      const deltaX = center.x - gesture.lastCenter.x;
+      const deltaY = center.y - gesture.lastCenter.y;
       gesture.lastCenter = center;
 
       const distance = getDistance(Array.from(gesture.pointers.values()));
-      const scaleFactor = distance / gesture.initialDistance!;
+      const scaleFactor = distance / gesture.initialDistance;
 
       this.setState(({ zoom, scrollX, scrollY, offsetLeft, offsetTop }) => ({
         scrollX: normalizeScroll(scrollX + deltaX / zoom.value),
         scrollY: normalizeScroll(scrollY + deltaY / zoom.value),
         zoom: getNewZoom(
-          getNormalizedZoom(gesture.initialScale! * scaleFactor),
+          getNormalizedZoom(initialScale * scaleFactor),
           zoom,
           { left: offsetLeft, top: offsetTop },
           center,
@@ -3623,13 +3643,15 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             CANVAS_ONLY_ACTIONS.includes(action.name),
           ),
           {
-            shortcutName: "toggleGridMode",
-            label: t("labels.toggleGridMode"),
+            checked: this.state.gridSize !== null,
+            shortcutName: "gridMode",
+            label: t("labels.gridMode"),
             action: this.toggleGridMode,
           },
           {
-            shortcutName: "toggleStats",
-            label: t("labels.toggleStats"),
+            checked: this.state.showStats,
+            shortcutName: "stats",
+            label: t("labels.stats"),
             action: this.toggleStats,
           },
         ],
