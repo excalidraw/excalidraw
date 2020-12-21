@@ -118,9 +118,10 @@
     "redo": "Gjer om",
     "roomDialog": "Start sanntids-samarbeid",
     "createNewRoom": "Lag nytt rom",
-    "toggleFullScreen": "Slå på/av fullskjerm",
-    "toggleDarkMode": "Skru av/på skumringsmodus",
-    "toggleZenMode": "Slå på/av zen-modus",
+    "fullScreen": "",
+    "darkMode": "",
+    "lightMode": "",
+    "zenMode": "",
     "exitZenMode": "Avslutt zen-modus"
   },
   "alerts": {
