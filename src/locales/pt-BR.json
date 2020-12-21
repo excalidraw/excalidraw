@@ -165,7 +165,7 @@
     "resize": "Você pode restringir proporções segurando SHIFT enquanto redimensiona,\nsegure ALT para redimensionar do centro",
     "rotate": "Você pode restringir os ângulos segurando SHIFT enquanto gira",
     "lineEditor_info": "Clique duas vezes ou pressione Enter para editar os pontos",
-    "lineEditor_pointSelected": "Pressione Deletar para remover ponto, CtrlOuCmd+D para duplicar ou arraste para mover",
+    "lineEditor_pointSelected": "Pressione Deletar para remover o ponto, CtrlOuCmd+D para duplicar ou arraste para mover",
     "lineEditor_nothingSelected": "Selecione um ponto para mover ou remover, ou segure Alt e clique para adicionar novos pontos"
   },
   "canvasError": {
