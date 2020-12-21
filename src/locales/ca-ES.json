@@ -118,9 +118,10 @@
     "redo": "Refer",
     "roomDialog": "Començar col·laboració en directe",
     "createNewRoom": "Crear sala nova",
-    "toggleFullScreen": "Commutar pantalla completa",
-    "toggleDarkMode": "Commutar modo fosc",
-    "toggleZenMode": "Commutar modo zen",
+    "fullScreen": "",
+    "darkMode": "",
+    "lightMode": "",
+    "zenMode": "",
     "exitZenMode": "Sortir de modo zen"
   },
   "alerts": {
