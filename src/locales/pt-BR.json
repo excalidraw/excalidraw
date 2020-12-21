@@ -176,7 +176,7 @@
   "errorSplash": {
     "headingMain_pre": "Foi encontrado um erro. Tente ",
     "headingMain_button": "recarregar a página.",
-    "clearCanvasMessage": "Se a recarga não funcionar, tente ",
+    "clearCanvasMessage": "Se recarregar a página não funcionar, tente ",
     "clearCanvasMessage_button": "limpando a tela.",
     "clearCanvasCaveat": " Isso resultará em perda de trabalho ",
     "trackedToSentry_pre": "O erro com o identificador ",
@@ -193,7 +193,7 @@
     "button_stopSession": "Parar sessão",
     "desc_inProgressIntro": "A sessão de colaboração ao vivo está agora em andamento.",
     "desc_shareLink": "Compartilhe este link com qualquer pessoa com quem você queira colaborar:",
-    "desc_exitSession": "Interrompendo a sessão você irá se desconectar da sala, mas você poderá continuar trabalhando com a cena localmente. Observe que isso não afetará outras pessoas, e elas ainda poderão colaborar em sua versão."
+    "desc_exitSession": "Interrompendo a sessão você irá se desconectar da sala, mas você poderá continuar trabalhando com a cena localmente. Observe que isso não afetará outras pessoas, e elas ainda poderão colaborar em suas versões."
   },
   "errorDialog": {
     "title": "Erro"
