@@ -37,7 +37,7 @@
     "fontSize": "字体大小",
     "fontFamily": "字体",
     "onlySelected": "仅被选中",
-    "withBackground": "",
+    "withBackground": "使用背景",
     "exportEmbedScene": "将场景嵌入到导出的文件",
     "exportEmbedScene_details": "场景数据将被保存到导出的 PNG/SVG 文件，以便恢复。\n将会增加导出的文件大小。",
     "addWatermark": "添加 “使用 Excalidraw 创建” 水印",
