@@ -118,10 +118,10 @@
     "redo": "Tee uudelleen",
     "roomDialog": "Aloita live-yhteistyö",
     "createNewRoom": "Luo huone",
-    "fullScreen": "",
-    "darkMode": "",
-    "lightMode": "",
-    "zenMode": "",
+    "fullScreen": "Koko näyttö",
+    "darkMode": "Tumma tila",
+    "lightMode": "Vaalea tila",
+    "zenMode": "Zen-tila",
     "exitZenMode": "Poistu zen-tilasta"
   },
   "alerts": {
