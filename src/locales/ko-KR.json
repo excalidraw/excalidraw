@@ -118,9 +118,10 @@
     "redo": "다시 실행",
     "roomDialog": "실시간 협업 시작하기",
     "createNewRoom": "방 만들기",
-    "toggleFullScreen": "전체화면",
-    "toggleDarkMode": "다크 모드 켜기/끄기",
-    "toggleZenMode": "젠 모드 켜기/끄기",
+    "fullScreen": "",
+    "darkMode": "",
+    "lightMode": "",
+    "zenMode": "",
     "exitZenMode": "젠 모드 종료하기"
   },
   "alerts": {
