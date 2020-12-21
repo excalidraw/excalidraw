@@ -118,10 +118,10 @@
     "redo": "Gjør om",
     "roomDialog": "Start sanntids-samarbeid",
     "createNewRoom": "Opprett et nytt rom",
-    "fullScreen": "",
-    "darkMode": "",
-    "lightMode": "",
-    "zenMode": "",
+    "fullScreen": "Fullskjerm",
+    "darkMode": "Mørk modus",
+    "lightMode": "Lys modus",
+    "zenMode": "Zen-modus",
     "exitZenMode": "Avslutt zen-modus"
   },
   "alerts": {
