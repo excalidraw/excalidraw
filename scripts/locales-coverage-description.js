@@ -24,6 +24,7 @@ const crowdinMap = {
   "nl-NL": "en-nl",
   "nn-NO": "en-nnno",
   "pl-PL": "en-pl",
+  "pt-BR": "en-ptbr",
   "pt-PT": "en-pt",
   "ro-RO": "en-ro",
   "ru-RU": "en-ru",
