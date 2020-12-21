@@ -29,7 +29,7 @@
     "edges": "Краї",
     "sharp": "Гострі",
     "round": "Круглі",
-    "arrowheads": "",
+    "arrowheads": "Закінчення стрілки",
     "arrowhead_none": "Жоден",
     "arrowhead_arrow": "Стрілка",
     "arrowhead_bar": "Колона",
@@ -37,7 +37,7 @@
     "fontSize": "Розмір шрифту",
     "fontFamily": "Шрифт",
     "onlySelected": "Тільки вибране",
-    "withBackground": "",
+    "withBackground": "З фоном",
     "exportEmbedScene": "Вставити сцену в експортований файл",
     "exportEmbedScene_details": "Дані сцени будуть збережені в експортований файл PNG/SVG. Ця сцена може бути відновленна з нього, однак це збільшить розмір експортованого файлу.",
     "addWatermark": "Додати «Накреслене в Excalidraw»",
@@ -76,8 +76,8 @@
     "group": "Групувати виділене",
     "ungroup": "Розгрупувати виділене",
     "collaborators": "Співавтори",
-    "gridMode": "",
-    "stats": "",
+    "gridMode": "Режим сітки",
+    "stats": "Статистика",
     "addToLibrary": "Додати до бібліотеки",
     "removeFromLibrary": "Видалити з бібліотеки",
     "libraryLoadingMessage": "Завантажити бібліотеку...",
@@ -136,7 +136,7 @@
     "loadSceneOverridePrompt": "Завантаження зовнішнього креслення замінить ваш наявний контент. Продовжити?",
     "errorLoadingLibrary": "Помилка при завантаженні сторонньої бібліотеки.",
     "confirmAddLibrary": "Це призведе до додавання {{numShapes}} фігур до вашої бібліотеки. Ви впевнені?",
-    "imageDoesNotContainScene": "",
+    "imageDoesNotContainScene": "Імпортування зображень на даний момент не підтримується.\n\nЧи хочете ви імпортувати сцену? Це зображення не містить ніяких даних сцен. Ви увімкнули це під час експорту?",
     "cannotRestoreFromImage": "Сцена не може бути відновлена з цього файлу зображення"
   },
   "toolBar": {
@@ -227,7 +227,7 @@
     "scene": "Сцена",
     "selected": "Вибраний",
     "storage": "Сховище",
-    "title": "",
+    "title": "Статистика",
     "total": "Всього",
     "width": "Ширина"
   }
