@@ -118,9 +118,10 @@
     "redo": "重做",
     "roomDialog": "开始实时协作",
     "createNewRoom": "新建会议室",
-    "toggleFullScreen": "切换全屏显示",
-    "toggleDarkMode": "切换暗黑模式",
-    "toggleZenMode": "切换禅模式",
+    "fullScreen": "",
+    "darkMode": "",
+    "lightMode": "",
+    "zenMode": "",
     "exitZenMode": "退出禅模式"
   },
   "alerts": {
