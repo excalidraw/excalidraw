@@ -118,10 +118,10 @@
     "redo": "Rehacer",
     "roomDialog": "Iniciar colaboración en vivo",
     "createNewRoom": "Crear nueva sala",
-    "fullScreen": "",
-    "darkMode": "",
-    "lightMode": "",
-    "zenMode": "",
+    "fullScreen": "Pantalla completa",
+    "darkMode": "Modo oscuro",
+    "lightMode": "Modo claro",
+    "zenMode": "Modo Zen",
     "exitZenMode": "Salir del modo Zen"
   },
   "alerts": {
