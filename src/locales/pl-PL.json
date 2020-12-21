@@ -118,9 +118,10 @@
     "redo": "Przywróć",
     "roomDialog": "Utwórz nową sesję współpracy na żywo",
     "createNewRoom": "Utwórz nowy pokój",
-    "toggleFullScreen": "Włącz/wyłącz tryb pełnoekranowy",
-    "toggleDarkMode": "Włącz tryb ciemny",
-    "toggleZenMode": "Włącz tryb Zen",
+    "fullScreen": "",
+    "darkMode": "",
+    "lightMode": "",
+    "zenMode": "",
     "exitZenMode": "Wyjdź z trybu Zen"
   },
   "alerts": {
