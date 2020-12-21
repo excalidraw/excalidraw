@@ -62,7 +62,7 @@ interface LayerUIProps {
   onLockToggle: () => void;
   onInsertShape: (elements: LibraryItem) => void;
   zenModeEnabled: boolean;
-  zenMode: () => void;
+  toggleZenMode: () => void;
   lng: string;
   isCollaborating: boolean;
   onExportToBackend?: (
@@ -320,7 +320,7 @@ const LayerUI = ({
   onLockToggle,
   onInsertShape,
   zenModeEnabled,
-  zenMode,
+  toggleZenMode,
   isCollaborating,
   onExportToBackend,
 }: LayerUIProps) => {
@@ -572,7 +572,7 @@ const LayerUI = ({
         className={clsx("disable-zen-mode", {
           "disable-zen-mode--visible": zenModeEnabled,
         })}
-        onClick={zenMode}
+        onClick={toggleZenMode}
       >
         {t("buttons.exitZenMode")}
       </button>
