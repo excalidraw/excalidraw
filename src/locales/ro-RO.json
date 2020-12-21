@@ -118,10 +118,10 @@
     "redo": "Refacere",
     "roomDialog": "Colaborare în direct",
     "createNewRoom": "Creare cameră nouă",
-    "fullScreen": "",
-    "darkMode": "",
-    "lightMode": "",
-    "zenMode": "",
+    "fullScreen": "Ecran complet",
+    "darkMode": "Mod întunecat",
+    "lightMode": "Mod luminos",
+    "zenMode": "Mod zen",
     "exitZenMode": "Ieșire din modul zen"
   },
   "alerts": {
