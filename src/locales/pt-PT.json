@@ -29,7 +29,7 @@
     "edges": "Arestas",
     "sharp": "Aguçado",
     "round": "Redondo",
-    "arrowheads": "",
+    "arrowheads": "Flechas",
     "arrowhead_none": "Nenhuma",
     "arrowhead_arrow": "Flecha",
     "arrowhead_bar": "Barra",
@@ -77,21 +77,21 @@
     "ungroup": "Desagrupar seleção",
     "collaborators": "Colaboradores",
     "gridMode": "Modo grade",
-    "stats": "",
+    "stats": "Estatísticas para nerds",
     "addToLibrary": "Adicionar à biblioteca",
     "removeFromLibrary": "Remover da biblioteca",
     "libraryLoadingMessage": "Carregando biblioteca...",
     "libraries": "Procurar bibliotecas",
     "loadingScene": "Carregando cena...",
-    "align": "",
-    "alignTop": "",
-    "alignBottom": "",
+    "align": "Alinhamento",
+    "alignTop": "Alinhamento superior",
+    "alignBottom": "Alinhamento inferior",
     "alignLeft": "Alinhar à esquerda",
     "alignRight": "Alinhar à direita",
     "centerVertically": "Centralizar verticalmente",
     "centerHorizontally": "Centralizar horizontalmente",
-    "distributeHorizontally": "",
-    "distributeVertically": ""
+    "distributeHorizontally": "Distribuir horizontalmente",
+    "distributeVertically": "Distribuir verticalmente"
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
@@ -169,9 +169,9 @@
     "lineEditor_nothingSelected": "Selecione um ponto para mover ou remover, ou segure Alt e clique para adicionar novos pontos"
   },
   "canvasError": {
-    "cannotShowPreview": "",
-    "canvasTooBig": "",
-    "canvasTooBigTip": ""
+    "cannotShowPreview": "Não é possível mostrar pré-visualização",
+    "canvasTooBig": "A tela pode ser muito grande.",
+    "canvasTooBigTip": "Dica: tente aproximar um pouco os elementos mais distantes."
   },
   "errorSplash": {
     "headingMain_pre": "Foi encontrado um erro. Tente ",
@@ -214,7 +214,7 @@
     "textNewLine": "Adicionar nova linha (texto)",
     "textFinish": "Finalizar edição (texto)",
     "zoomToFit": "Ajustar para caber todos os elementos",
-    "zoomToSelection": "",
+    "zoomToSelection": "Zoom para a seleção",
     "preventBinding": "Prevenir fixação de seta"
   },
   "encrypted": {
@@ -224,11 +224,11 @@
     "angle": "Ângulo",
     "element": "Elemento",
     "elements": "Elementos",
-    "height": "",
-    "scene": "",
-    "selected": "",
-    "storage": "",
-    "title": "",
+    "height": "Altura",
+    "scene": "Cena",
+    "selected": "Selecionado",
+    "storage": "Armazenamento",
+    "title": "Estatísticas para nerds",
     "total": "Total",
     "width": "Largura"
   }
