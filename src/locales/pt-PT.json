@@ -118,9 +118,10 @@
     "redo": "Refazer",
     "roomDialog": "Iniciar colaboração ao vivo",
     "createNewRoom": "Criar nova sala",
-    "toggleFullScreen": "Alternar tela cheia",
-    "toggleDarkMode": "Alternar modo escuro",
-    "toggleZenMode": "Alternar modo zen",
+    "fullScreen": "",
+    "darkMode": "",
+    "lightMode": "",
+    "zenMode": "",
     "exitZenMode": "Sair do modo zen"
   },
   "alerts": {
