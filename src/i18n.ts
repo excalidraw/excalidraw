@@ -52,7 +52,7 @@ export const languages: Language[] = [{ lng: "en", label: "English" }]
   )
   .filter(
     (lang) =>
-      (percentages as Record<string, number>)[lang.lng] >
+      (percentages as Record<string, number>)[lang.lng] >=
       COMPLETION_THRESHOLD_TO_EXCEED,
   );
 
