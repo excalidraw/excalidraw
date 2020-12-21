@@ -381,7 +381,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             )
           }
           zenModeEnabled={zenModeEnabled}
-          toggleZenMode={this.toggleZenMode}
+          zenMode={this.zenMode}
           lng={getLanguage().lng}
           isCollaborating={this.props.isCollaborating || false}
           onExportToBackend={onExportToBackend}
@@ -1140,7 +1140,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     });
   };
 
-  toggleZenMode = () => {
+  zenMode = () => {
     this.setState({
       zenModeEnabled: !this.state.zenModeEnabled,
     });
@@ -1245,7 +1245,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     if (!event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.Z) {
-      this.toggleZenMode();
+      this.zenMode();
     }
 
     if (event[KEYS.CTRL_OR_CMD] && event.code === CODES.QUOTE) {

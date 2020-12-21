@@ -61,7 +61,7 @@ export type ActionName =
   | "zoomToSelection"
   | "changeFontFamily"
   | "changeTextAlign"
-  | "toggleFullScreen"
+  | "fullScreen"
   | "toggleShortcuts"
   | "group"
   | "ungroup"
