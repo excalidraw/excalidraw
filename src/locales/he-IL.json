@@ -118,9 +118,10 @@
     "redo": "בצע מחדש",
     "roomDialog": "התחל שיתוף חי",
     "createNewRoom": "צור חדר",
-    "toggleFullScreen": "הפעל/הפסק מסך מלא",
-    "toggleDarkMode": "שפעל מצב לילה",
-    "toggleZenMode": "התחל/הפסק מצב תפריט מרחף",
+    "fullScreen": "",
+    "darkMode": "",
+    "lightMode": "",
+    "zenMode": "",
     "exitZenMode": "צא ממצב תפריט מרחף"
   },
   "alerts": {
