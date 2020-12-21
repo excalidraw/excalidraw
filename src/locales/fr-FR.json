@@ -118,10 +118,10 @@
     "redo": "Rétablir",
     "roomDialog": "Démarrer le collaboration en temps réel",
     "createNewRoom": "Créer un nouveau salon",
-    "fullScreen": "",
-    "darkMode": "",
-    "lightMode": "",
-    "zenMode": "",
+    "fullScreen": "Plein écran",
+    "darkMode": "Mode sombre",
+    "lightMode": "Mode Clair",
+    "zenMode": "Mode Zen",
     "exitZenMode": "Quitter le mode zen"
   },
   "alerts": {
