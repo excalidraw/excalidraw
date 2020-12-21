@@ -104,10 +104,10 @@
     "save": "Guardar",
     "saveAs": "Salvar como",
     "load": "Carregar",
-    "getShareableLink": "Obter um link de partilha",
+    "getShareableLink": "Obter um link de compartilhamento",
     "close": "Fechar",
     "selectLanguage": "Selecionar idioma",
-    "scrollBackToContent": "Voltar ao conteúdo",
+    "scrollBackToContent": "Voltar para o conteúdo",
     "zoomIn": "Aumentar zoom",
     "zoomOut": "Diminuir zoom",
     "resetZoom": "Redefinir zoom",
@@ -130,8 +130,8 @@
     "couldNotCreateShareableLinkTooBig": "Não foi possível criar um link compartilhável: a cena é muito grande",
     "couldNotLoadInvalidFile": "Não foi possível carregar o arquivo inválido",
     "importBackendFailed": "A importação do servidor falhou.",
-    "cannotExportEmptyCanvas": "Não é possível exportar um canvas vazío.",
-    "couldNotCopyToClipboard": "Não foi possível copiar no clipboard. Experimente no navegador Chrome.",
+    "cannotExportEmptyCanvas": "Não é possível exportar um canvas vazio.",
+    "couldNotCopyToClipboard": "Não foi possível copiar para a área de transferência. Experimente usando o navegador Chrome.",
     "decryptFailed": "Não foi possível descriptografar os dados.",
     "uploadedSecurly": "O upload foi protegido com criptografia de ponta a ponta, o que significa que o servidor do Excalidraw e terceiros não podem ler o conteúdo.",
     "loadSceneOverridePrompt": "Carregar um desenho externo substituirá o seu conteúdo existente. Deseja continuar?",
@@ -150,7 +150,7 @@
     "line": "Linha",
     "text": "Texto",
     "library": "Biblioteca",
-    "lock": "Manter a ferramenta selecionada ativa após desenhar"
+    "lock": "Manter ativa a ferramenta selecionada após desenhar"
   },
   "headings": {
     "canvasActions": "Ações da tela",
