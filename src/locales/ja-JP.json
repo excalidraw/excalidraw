@@ -118,9 +118,10 @@
     "redo": "やり直し",
     "roomDialog": "共同編集を開始する",
     "createNewRoom": "新しい部屋を作成する",
-    "toggleFullScreen": "全画面表示に切り替える",
-    "toggleDarkMode": "ダークモードに切り替える",
-    "toggleZenMode": "集中モードに切り替える",
+    "fullScreen": "",
+    "darkMode": "",
+    "lightMode": "",
+    "zenMode": "",
     "exitZenMode": "集中モードをやめる"
   },
   "alerts": {
