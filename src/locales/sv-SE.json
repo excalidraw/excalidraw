@@ -118,9 +118,10 @@
     "redo": "Gör om",
     "roomDialog": "Starta live-samarbete",
     "createNewRoom": "Skapa ett nytt rum",
-    "toggleFullScreen": "Växla fullskärmsläge",
-    "toggleDarkMode": "Växla mörkt läge",
-    "toggleZenMode": "Växla zen-läge",
+    "fullScreen": "",
+    "darkMode": "",
+    "lightMode": "",
+    "zenMode": "",
     "exitZenMode": "Gå ur zen-läge"
   },
   "alerts": {
