@@ -118,9 +118,10 @@
     "redo": "फिर से करें",
     "roomDialog": "लाइव सहयोग शुरू करें",
     "createNewRoom": "एक नया कमरा बनाएं",
-    "toggleFullScreen": "पूर्णस्क्रीन चालू करें",
-    "toggleDarkMode": "",
-    "toggleZenMode": "टॉगल ज़ेन मोड",
+    "fullScreen": "",
+    "darkMode": "",
+    "lightMode": "",
+    "zenMode": "",
     "exitZenMode": "जेन मोड से बाहर निकलें"
   },
   "alerts": {
