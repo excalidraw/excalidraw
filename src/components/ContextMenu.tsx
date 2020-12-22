@@ -2,31 +2,39 @@ import React from "react";
 import { render, unmountComponentAtNode } from "react-dom";
 import clsx from "clsx";
 import { Popover } from "./Popover";
+import { t } from "../i18n";
 
 import "./ContextMenu.scss";
 import {
   getShortcutFromShortcutName,
   ShortcutName,
 } from "../actions/shortcuts";
+import { Action } from "../actions/types";
+import { ActionManager } from "../actions/manager";
 
-type ContextMenuOption = {
-  checked?: boolean;
-  shortcutName: ShortcutName;
-  label: string;
-  action(): void;
-};
+type ContextMenuOption = "separator" | Action;
 
 type Props = {
   options: ContextMenuOption[];
   onCloseRequest?(): void;
   top: number;
   left: number;
+  actionManager: ActionManager;
+  canvas: HTMLCanvasElement | null;
 };
 
-const ContextMenu = ({ options, onCloseRequest, top, left }: Props) => {
+const ContextMenu = ({
+  options,
+  onCloseRequest,
+  top,
+  left,
+  actionManager,
+  canvas,
+}: Props) => {
   const isDarkTheme = !!document
     .querySelector(".excalidraw")
     ?.classList.contains("Appearance_dark");
+
   return (
     <div
       className={clsx("excalidraw", {
@@ -43,23 +51,47 @@ const ContextMenu = ({ options, onCloseRequest, top, left }: Props) => {
           className="context-menu"
           onContextMenu={(event) => event.preventDefault()}
         >
-          {options.map(({ action, checked, shortcutName, label }, idx) => (
-            <li data-testid={shortcutName} key={idx} onClick={onCloseRequest}>
-              <button
-                className={`context-menu-option 
-                ${shortcutName === "delete" ? "dangerous" : ""}
-                ${checked ? "checkmark" : ""}`}
-                onClick={action}
-              >
-                <div className="context-menu-option__label">{label}</div>
-                <kbd className="context-menu-option__shortcut">
-                  {shortcutName
-                    ? getShortcutFromShortcutName(shortcutName)
-                    : ""}
-                </kbd>
-              </button>
-            </li>
-          ))}
+          {options.map((option, idx) => {
+            if (option === "separator") {
+              return (
+                <hr key={idx} className="context-menu-option-separator"></hr>
+              );
+            }
+
+            const action = option;
+            const shortcutName = action.name;
+            const label = action.contextItemLabel
+              ? t(action.contextItemLabel)
+              : "";
+            return (
+              <li key={idx} data-testid={shortcutName} onClick={onCloseRequest}>
+                <button
+                  className={`context-menu-option 
+                  ${
+                    shortcutName === "deleteSelectedElements" ? "dangerous" : ""
+                  }
+                  ${action.checked ? "checkmark" : ""}`}
+                  onClick={() => {
+                    actionManager.executeAction(
+                      action,
+                      action.name === "copyAsPng" || action.name === "copyAsSvg"
+                        ? canvas
+                        : null,
+                    );
+                  }}
+                >
+                  <div className="context-menu-option__label">{label}</div>
+                  <div className="context-menu-option__shortcut">
+                    {shortcutName
+                      ? getShortcutFromShortcutName(
+                          shortcutName as ShortcutName,
+                        )
+                      : ""}
+                  </div>
+                </button>
+              </li>
+            );
+          })}
         </ul>
       </Popover>
     </div>
@@ -80,6 +112,8 @@ type ContextMenuParams = {
   options: (ContextMenuOption | false | null | undefined)[];
   top: number;
   left: number;
+  actionManager: ActionManager;
+  canvas: HTMLCanvasElement | null;
 };
 
 const handleClose = () => {
@@ -101,6 +135,8 @@ export default {
           left={params.left}
           options={options}
           onCloseRequest={handleClose}
+          actionManager={params.actionManager}
+          canvas={params.canvas}
         />,
         getContextMenuNode(),
       );

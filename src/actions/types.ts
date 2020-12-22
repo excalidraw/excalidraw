@@ -22,6 +22,11 @@ export type UpdaterFn = (res: ActionResult) => void;
 export type ActionFilterFn = (action: Action) => void;
 
 export type ActionName =
+  | "copy"
+  | "cut"
+  | "paste"
+  | "copyAsPng"
+  | "copyAsSvg"
   | "sendBackward"
   | "bringForward"
   | "sendToBack"
@@ -29,6 +34,9 @@ export type ActionName =
   | "copyStyles"
   | "selectAll"
   | "pasteStyles"
+  | "gridMode"
+  | "zenMode"
+  | "stats"
   | "changeStrokeColor"
   | "changeBackgroundColor"
   | "changeFillStyle"
@@ -93,19 +101,16 @@ export interface Action {
     elements: readonly ExcalidrawElement[],
   ) => boolean;
   contextItemLabel?: string;
-  contextMenuOrder?: number;
   contextItemPredicate?: (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
   ) => boolean;
+  checked?: boolean;
 }
 
 export interface ActionsManagerInterface {
   actions: Record<ActionName, Action>;
   registerAction: (action: Action) => void;
   handleKeyDown: (event: KeyboardEvent) => boolean;
-  getContextMenuItems: (
-    actionFilter: ActionFilterFn,
-  ) => { label: string; action: () => void }[];
   renderAction: (name: ActionName) => React.ReactElement | null;
 }

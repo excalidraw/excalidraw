@@ -3,14 +3,11 @@ import {
   Action,
   ActionsManagerInterface,
   UpdaterFn,
-  ActionFilterFn,
   ActionName,
   ActionResult,
 } from "./types";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
-import { t } from "../i18n";
-import { ShortcutName } from "./shortcuts";
 
 export class ActionManager implements ActionsManagerInterface {
   actions = {} as ActionsManagerInterface["actions"];
@@ -75,47 +72,14 @@ export class ActionManager implements ActionsManagerInterface {
     return true;
   }
 
-  executeAction(action: Action) {
+  executeAction(action: Action, data: HTMLCanvasElement | null = null) {
     this.updater(
       action.perform(
         this.getElementsIncludingDeleted(),
         this.getAppState(),
-        null,
+        data,
       ),
     );
-  }
-
-  getContextMenuItems(actionFilter: ActionFilterFn = (action) => action) {
-    return Object.values(this.actions)
-      .filter(actionFilter)
-      .filter((action) => "contextItemLabel" in action)
-      .filter((action) =>
-        action.contextItemPredicate
-          ? action.contextItemPredicate(
-              this.getElementsIncludingDeleted(),
-              this.getAppState(),
-            )
-          : true,
-      )
-      .sort(
-        (a, b) =>
-          (a.contextMenuOrder !== undefined ? a.contextMenuOrder : 999) -
-          (b.contextMenuOrder !== undefined ? b.contextMenuOrder : 999),
-      )
-      .map((action) => ({
-        // take last bit of the label  "labels.<shortcutName>"
-        shortcutName: action.contextItemLabel?.split(".").pop() as ShortcutName,
-        label: action.contextItemLabel ? t(action.contextItemLabel) : "",
-        action: () => {
-          this.updater(
-            action.perform(
-              this.getElementsIncludingDeleted(),
-              this.getAppState(),
-              null,
-            ),
-          );
-        },
-      }));
   }
 
   // Id is an attribute that we can use to pass in data like keys.
