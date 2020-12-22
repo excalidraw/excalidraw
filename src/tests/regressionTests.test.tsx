@@ -1,4 +1,4 @@
-import { queryByText } from "@testing-library/react";
+import { queryAllByText, queryByText } from "@testing-library/react";
 import React from "react";
 import ReactDOM from "react-dom";
 import { copiedStyles } from "../actions/actionStyles";
@@ -864,7 +864,7 @@ describe("regression tests", () => {
       clientY: 1,
     });
     const contextMenu = document.querySelector(".context-menu");
-    fireEvent.click(queryByText(contextMenu as HTMLElement, "Delete")!);
+    fireEvent.click(queryAllByText(contextMenu as HTMLElement, "Delete")[0]);
     expect(API.getSelectedElements()).toHaveLength(0);
     expect(h.elements[0].isDeleted).toBe(true);
   });

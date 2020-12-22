@@ -38,8 +38,8 @@ const getHints = ({ appState, elements }: Hint) => {
     selectedElements.length === 1
   ) {
     const targetElement = selectedElements[0];
-    if (isLinearElement(targetElement) && targetElement.points.length > 2) {
-      return null;
+    if (isLinearElement(targetElement) && targetElement.points.length === 2) {
+      return t("hints.lockAngle");
     }
     return t("hints.resize");
   }

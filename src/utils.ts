@@ -7,6 +7,7 @@ import {
 import { FontFamily, FontString } from "./element/types";
 import { Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
+import { isDarwin } from "./keys";
 
 export const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -179,15 +180,18 @@ export const allowFullScreen = () =>
 export const exitFullScreen = () => document.exitFullscreen();
 
 export const getShortcutKey = (shortcut: string): string => {
-  const isMac = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform);
-  if (isMac) {
-    return `${shortcut
+  shortcut = shortcut
+    .replace(/\bAlt\b/i, "Alt")
+    .replace(/\bShift\b/i, "Shift")
+    .replace(/\b(Enter|Return)\b/i, "Enter")
+    .replace(/\bDel\b/i, "Delete");
+
+  if (isDarwin) {
+    return shortcut
       .replace(/\bCtrlOrCmd\b/i, "Cmd")
-      .replace(/\bAlt\b/i, "Option")
-      .replace(/\bDel\b/i, "Delete")
-      .replace(/\b(Enter|Return)\b/i, "Enter")}`;
+      .replace(/\bAlt\b/i, "Option");
   }
-  return `${shortcut.replace(/\bCtrlOrCmd\b/i, "Ctrl")}`;
+  return shortcut.replace(/\bCtrlOrCmd\b/i, "Ctrl");
 };
 
 export const viewportCoordsToSceneCoords = (
