@@ -9,7 +9,7 @@
     "copyAsPng": "Kopieer als PNG",
     "copyAsSvg": "Kopieer als SVG",
     "bringForward": "Breng naar voren",
-    "sendToBack": "Breng naar achtergrond",
+    "sendToBack": "Stuur naar achtergrond",
     "bringToFront": "Breng naar voorgrond",
     "sendBackward": "Breng naar achter",
     "delete": "Verwijderen",
@@ -39,7 +39,7 @@
     "onlySelected": "Enkel geselecteerde",
     "withBackground": "Met achtergrond",
     "exportEmbedScene": "Scène in geëxporteerd bestand invoegen",
-    "exportEmbedScene_details": "",
+    "exportEmbedScene_details": "Scènegegevens worden in het geëxporteerde PNG/SVG-bestand opgeslagen zodat de scène kan worden hersteld.\nDe grootte van de geëxporteerde bestanden zal toenemen.",
     "addWatermark": "Voeg \"Gemaakt met Excalidraw\" toe",
     "handDrawn": "Handgetekend",
     "normal": "Normaal",
@@ -117,10 +117,10 @@
     "redo": "Herstel ongedaan maken",
     "roomDialog": "Live-samenwerkingssessie starten",
     "createNewRoom": "Creëer live-samenwerkingssessie",
-    "fullScreen": "",
-    "darkMode": "",
-    "lightMode": "",
-    "zenMode": "",
+    "fullScreen": "Volledig scherm",
+    "darkMode": "Donkere modus",
+    "lightMode": "Lichte modus",
+    "zenMode": "Zen modus",
     "exitZenMode": "Verlaat zen modus"
   },
   "alerts": {
@@ -136,7 +136,7 @@
     "loadSceneOverridePrompt": "Het laden van externe tekening zal uw bestaande inhoud vervangen. Wil je doorgaan?",
     "errorLoadingLibrary": "Bij het laden van de externe bibliotheek is een fout opgetreden.",
     "confirmAddLibrary": "Hiermee worden {{numShapes}} vorm(n) aan uw bibliotheek toegevoegd. Ben je het zeker?",
-    "imageDoesNotContainScene": "",
+    "imageDoesNotContainScene": "Afbeeldingen importeren wordt op dit moment niet ondersteund.\n\nWil je een scène importeren? Deze afbeelding lijkt geen scène gegevens te bevatten. Heb je dit geactiveerd tijdens het exporteren?",
     "cannotRestoreFromImage": "Scène kan niet worden hersteld vanuit dit afbeeldingsbestand"
   },
   "toolBar": {
@@ -161,7 +161,7 @@
     "freeDraw": "Klik en sleep, laat los als je klaar bent",
     "text": "Tip: je kunt tekst toevoegen door ergens dubbel te klikken met de selectietool",
     "linearElementMulti": "Klik op het laatste punt of druk op Escape of Enter om te stoppen",
-    "lockAngle": "",
+    "lockAngle": "Je kunt de hoek beperken door SHIFT ingedrukt te houden",
     "resize": "Houd tijdens het vergroten SHIFT ingedrukt om verhoudingen te behouden,\ngebruik ALT om vanuit het midden te vergroten/verkleinen",
     "rotate": "Je kan hoeken beperken door SHIFT ingedrukt te houden wanneer je draait",
     "lineEditor_info": "Dubbelklik of druk op Enter om punten te bewerken",
@@ -193,7 +193,7 @@
     "button_stopSession": "Sessie afbreken",
     "desc_inProgressIntro": "De live-samenwerkingssessie is nu gestart.",
     "desc_shareLink": "Deel deze link met iedereen waarmee je wil samenwerken:",
-    "desc_exitSession": ""
+    "desc_exitSession": "Het stoppen van de sessie zal je loskoppelen van de kamer, maar je kunt lokaal doorwerken met de scène.\nPas op: dit heeft geen invloed op andere mensen en dat zij nog steeds in staat zullen zijn om samen te werken aan hun versie."
   },
   "errorDialog": {
     "title": "Fout"
@@ -228,8 +228,8 @@
     "scene": "Scene",
     "selected": "Geselecteerd",
     "storage": "Opslag",
-    "title": "",
-    "total": "",
-    "width": ""
+    "title": "Statistieken voor nerds",
+    "total": "Totaal",
+    "width": "Breedte"
   }
 }
