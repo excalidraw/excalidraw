@@ -1,12 +1,12 @@
 import { EVENT_MAGIC, trackEvent } from "./analytics";
 import colors from "./colors";
 import { DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE } from "./constants";
-import { newElement, newTextElement, newLinearElement } from "./element";
+import { newElement, newLinearElement, newTextElement } from "./element";
 import { ExcalidrawElement } from "./element/types";
 import { randomId } from "./random";
 
-const BAR_WIDTH = 32;
-const BAR_GAP = 12;
+const BAR_WIDTH = 40;
+const BAR_GAP = 10;
 const BAR_HEIGHT = 256;
 
 export interface Spreadsheet {
@@ -143,38 +143,38 @@ export const tryParseSpreadsheet = (text: string): ParseSpreadsheetResult => {
   return result;
 };
 
-// For the maths behind it https://excalidraw.com/#json=6320864370884608,O_5xfD-Agh32tytHpRJx1g
-export const renderSpreadsheet = (
+const maxColors = colors.elementBackground.length;
+const bgColors = colors.elementBackground.slice(2, maxColors);
+// Put all the common properties here so when the whole chart is selected
+// the properties dialog shows the correct selected values
+const commonProps = {
+  backgroundColor: bgColors[Math.floor(Math.random() * bgColors.length)],
+  fillStyle: "hachure",
+  fontFamily: DEFAULT_FONT_FAMILY,
+  fontSize: DEFAULT_FONT_SIZE,
+  opacity: 100,
+  roughness: 1,
+  strokeColor: colors.elementStroke[0],
+  strokeSharpness: "sharp",
+  strokeStyle: "solid",
+  strokeWidth: 1,
+  verticalAlign: "middle",
+} as const;
+
+const renderSpreadsheetBase = (
   spreadsheet: Spreadsheet,
   x: number,
   y: number,
+  groupId?: string,
 ): ExcalidrawElement[] => {
+  const props = groupId ? { groupIds: [groupId], ...commonProps } : commonProps;
   const values = spreadsheet.values;
   const max = Math.max(...values);
   const chartHeight = BAR_HEIGHT + BAR_GAP * 2;
   const chartWidth = (BAR_WIDTH + BAR_GAP) * values.length + BAR_GAP;
-  const maxColors = colors.elementBackground.length;
-  const bgColors = colors.elementBackground.slice(2, maxColors);
-
-  // Put all the common properties here so when the whole chart is selected
-  // the properties dialog shows the correct selected values
-  const commonProps = {
-    backgroundColor: bgColors[Math.floor(Math.random() * bgColors.length)],
-    fillStyle: "hachure",
-    fontFamily: DEFAULT_FONT_FAMILY,
-    fontSize: DEFAULT_FONT_SIZE,
-    groupIds: [randomId()],
-    opacity: 100,
-    roughness: 1,
-    strokeColor: colors.elementStroke[0],
-    strokeSharpness: "sharp",
-    strokeStyle: "solid",
-    strokeWidth: 1,
-    verticalAlign: "middle",
-  } as const;
 
   const minYLabel = newTextElement({
-    ...commonProps,
+    ...props,
     x: x - BAR_GAP,
     y: y - BAR_GAP,
     text: "0",
@@ -182,7 +182,7 @@ export const renderSpreadsheet = (
   });
 
   const maxYLabel = newTextElement({
-    ...commonProps,
+    ...props,
     x: x - BAR_GAP,
     y: y - BAR_HEIGHT - minYLabel.height / 2,
     text: max.toLocaleString(),
@@ -200,7 +200,7 @@ export const renderSpreadsheet = (
       [0, 0],
       [chartWidth, 0],
     ],
-    ...commonProps,
+    ...props,
   });
 
   const yAxisLine = newLinearElement({
@@ -214,7 +214,7 @@ export const renderSpreadsheet = (
       [0, 0],
       [0, -chartHeight],
     ],
-    ...commonProps,
+    ...props,
   });
 
   const maxValueLine = newLinearElement({
@@ -223,7 +223,7 @@ export const renderSpreadsheet = (
     y: y - BAR_HEIGHT - BAR_GAP,
     startArrowhead: null,
     endArrowhead: null,
-    ...commonProps,
+    ...props,
     strokeStyle: "dotted",
     width: chartWidth,
     points: [
@@ -232,22 +232,10 @@ export const renderSpreadsheet = (
     ],
   });
 
-  const bars = values.map((value, index) => {
-    const barHeight = (value / max) * BAR_HEIGHT;
-    return newElement({
-      ...commonProps,
-      type: "rectangle",
-      x: x + index * (BAR_WIDTH + BAR_GAP) + BAR_GAP,
-      y: y - barHeight - BAR_GAP,
-      width: BAR_WIDTH,
-      height: barHeight,
-    });
-  });
-
   const xLabels =
     spreadsheet.labels?.map((label, index) => {
       return newTextElement({
-        ...commonProps,
+        ...props,
         text: label.length > 8 ? `${label.slice(0, 5)}...` : label,
         x: x + index * (BAR_WIDTH + BAR_GAP) + BAR_GAP * 2,
         y: y + BAR_GAP / 2,
@@ -261,7 +249,7 @@ export const renderSpreadsheet = (
 
   const title = spreadsheet.title
     ? newTextElement({
-        ...commonProps,
+        ...props,
         text: spreadsheet.title,
         x: x + chartWidth / 2,
         y: y - BAR_HEIGHT - BAR_GAP * 2 - maxYLabel.height,
@@ -271,10 +259,8 @@ export const renderSpreadsheet = (
       })
     : null;
 
-  trackEvent(EVENT_MAGIC, "chart", "bars", bars.length);
   return [
     title,
-    ...bars,
     ...xLabels,
     xAxisLine,
     yAxisLine,
@@ -282,4 +268,102 @@ export const renderSpreadsheet = (
     minYLabel,
     maxYLabel,
   ].filter((element) => element !== null) as ExcalidrawElement[];
+};
+
+const renderSpreadsheetLine = (
+  spreadsheet: Spreadsheet,
+  x: number,
+  y: number,
+): ExcalidrawElement[] => {
+  const max = Math.max(...spreadsheet.values);
+  const groupId = randomId();
+  const props = { groupIds: [groupId], ...commonProps };
+
+  let index = 0;
+  const points = [[0, 0]];
+  for (const value of spreadsheet.values) {
+    const cx = index * (BAR_WIDTH + BAR_GAP) + BAR_GAP + BAR_WIDTH / 2;
+    const cy = -(value / max) * BAR_HEIGHT - BAR_GAP;
+    points.push([cx, cy]);
+    console.info("####", value, index);
+    index++;
+  }
+
+  const maxX = Math.max(...points.map((element) => element[0]));
+  const maxY = Math.max(...points.map((element) => element[1]));
+
+  console.info("####", points, maxX, maxY);
+
+  const line = newLinearElement({
+    type: "line",
+    x,
+    y,
+    // x: x + points[0][0],
+    // y: y + points[0][1],
+
+    startArrowhead: null,
+    endArrowhead: null,
+    ...props,
+    height: 10,
+    width: 10,
+    strokeStyle: "solid",
+    strokeWidth: 2,
+    points: points as any,
+  });
+
+  const bars = spreadsheet.values.map((value, index) => {
+    const barHeight = (value / max) * BAR_HEIGHT;
+    return newElement({
+      ...props,
+      type: "rectangle",
+      x: x + index * (BAR_WIDTH + BAR_GAP) + BAR_GAP,
+      y: y - barHeight - BAR_GAP,
+      width: BAR_WIDTH,
+      height: barHeight,
+      opacity: 5,
+    });
+  });
+
+  return [line, ...bars, ...renderSpreadsheetBase(spreadsheet, x, y, groupId)];
+};
+
+const renderSpreadsheetBar = (
+  spreadsheet: Spreadsheet,
+  x: number,
+  y: number,
+): ExcalidrawElement[] => {
+  const max = Math.max(...spreadsheet.values);
+  const groupId = randomId();
+  const props = { groupIds: [groupId], ...commonProps };
+
+  const bars = spreadsheet.values.map((value, index) => {
+    const barHeight = (value / max) * BAR_HEIGHT;
+    return newElement({
+      ...props,
+      type: "rectangle",
+      x: x + index * (BAR_WIDTH + BAR_GAP) + BAR_GAP,
+      y: y - barHeight - BAR_GAP,
+      width: BAR_WIDTH,
+      height: barHeight,
+    });
+  });
+
+  return [...bars, ...renderSpreadsheetBase(spreadsheet, x, y, groupId)];
+};
+
+// For the maths behind it https://excalidraw.com/#json=6320864370884608,O_5xfD-Agh32tytHpRJx1g
+export const renderSpreadsheet = (
+  chartType: string,
+  spreadsheet: Spreadsheet,
+  x: number,
+  y: number,
+): ExcalidrawElement[] => {
+  let chart: ExcalidrawElement[];
+  if (chartType === "line") {
+    chart = renderSpreadsheetLine(spreadsheet, x, y);
+  } else {
+    chart = renderSpreadsheetBar(spreadsheet, x, y);
+  }
+  trackEvent(EVENT_MAGIC, "chart", chartType, chart.length);
+  return chart;
 };
