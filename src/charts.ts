@@ -1,6 +1,6 @@
 import { EVENT_MAGIC, trackEvent } from "./analytics";
 import colors from "./colors";
-import { DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE } from "./constants";
+import { DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE, ENV } from "./constants";
 import { newElement, newLinearElement, newTextElement } from "./element";
 import { ExcalidrawElement } from "./element/types";
 import { randomId } from "./random";
@@ -139,12 +139,14 @@ export const tryParseSpreadsheet = (text: string): ParseSpreadsheetResult => {
       return transposedResults;
     }
   }
-
   return result;
 };
 
-const maxColors = colors.elementBackground.length;
-const bgColors = colors.elementBackground.slice(2, maxColors);
+const bgColors = colors.elementBackground.slice(
+  2,
+  colors.elementBackground.length,
+);
+
 // Put all the common properties here so when the whole chart is selected
 // the properties dialog shows the correct selected values
 const commonProps = {
@@ -161,21 +163,46 @@ const commonProps = {
   verticalAlign: "middle",
 } as const;
 
-// For the maths behind it https://excalidraw.com/#json=6320864370884608,O_5xfD-Agh32tytHpRJx1g
-const renderSpreadsheetBase = (
+const getChartDimentions = (spreadsheet: Spreadsheet) => {
+  const chartWidth =
+    (BAR_WIDTH + BAR_GAP) * spreadsheet.values.length + BAR_GAP;
+  const chartHeight = BAR_HEIGHT + BAR_GAP * 2;
+  return { chartWidth, chartHeight };
+};
+
+const chartXLabels = (
   spreadsheet: Spreadsheet,
   x: number,
   y: number,
-  groupId?: string,
+  groupId: string,
 ): ExcalidrawElement[] => {
-  const props = groupId ? { groupIds: [groupId], ...commonProps } : commonProps;
-  const values = spreadsheet.values;
-  const max = Math.max(...values);
-  const chartHeight = BAR_HEIGHT + BAR_GAP * 2;
-  const chartWidth = (BAR_WIDTH + BAR_GAP) * values.length + BAR_GAP;
+  return (
+    spreadsheet.labels?.map((label, index) => {
+      return newTextElement({
+        groupIds: [groupId],
+        ...commonProps,
+        text: label.length > 8 ? `${label.slice(0, 5)}...` : label,
+        x: x + index * (BAR_WIDTH + BAR_GAP) + BAR_GAP * 2,
+        y: y + BAR_GAP / 2,
+        width: BAR_WIDTH,
+        angle: 5.87,
+        fontSize: 16,
+        textAlign: "center",
+        verticalAlign: "top",
+      });
+    }) || []
+  );
+};
 
+const chartYLabels = (
+  spreadsheet: Spreadsheet,
+  x: number,
+  y: number,
+  groupId: string,
+): ExcalidrawElement[] => {
   const minYLabel = newTextElement({
-    ...props,
+    groupIds: [groupId],
+    ...commonProps,
     x: x - BAR_GAP,
     y: y - BAR_GAP,
     text: "0",
@@ -183,14 +210,27 @@ const renderSpreadsheetBase = (
   });
 
   const maxYLabel = newTextElement({
-    ...props,
+    groupIds: [groupId],
+    ...commonProps,
     x: x - BAR_GAP,
     y: y - BAR_HEIGHT - minYLabel.height / 2,
-    text: max.toLocaleString(),
+    text: Math.max(...spreadsheet.values).toLocaleString(),
     textAlign: "right",
   });
 
-  const xAxisLine = newLinearElement({
+  return [minYLabel, maxYLabel];
+};
+
+const chartLines = (
+  spreadsheet: Spreadsheet,
+  x: number,
+  y: number,
+  groupId: string,
+): ExcalidrawElement[] => {
+  const { chartWidth, chartHeight } = getChartDimentions(spreadsheet);
+  const xLine = newLinearElement({
+    groupIds: [groupId],
+    ...commonProps,
     type: "line",
     x,
     y,
@@ -201,10 +241,11 @@ const renderSpreadsheetBase = (
       [0, 0],
       [chartWidth, 0],
     ],
-    ...props,
   });
 
-  const yAxisLine = newLinearElement({
+  const yLine = newLinearElement({
+    groupIds: [groupId],
+    ...commonProps,
     type: "line",
     x,
     y,
@@ -215,16 +256,16 @@ const renderSpreadsheetBase = (
       [0, 0],
       [0, -chartHeight],
     ],
-    ...props,
   });
 
-  const maxValueLine = newLinearElement({
+  const maxLine = newLinearElement({
+    groupIds: [groupId],
+    ...commonProps,
     type: "line",
     x,
     y: y - BAR_HEIGHT - BAR_GAP,
     startArrowhead: null,
     endArrowhead: null,
-    ...props,
     strokeStyle: "dotted",
     width: chartWidth,
     points: [
@@ -233,41 +274,53 @@ const renderSpreadsheetBase = (
     ],
   });
 
-  const xLabels =
-    spreadsheet.labels?.map((label, index) => {
-      return newTextElement({
-        ...props,
-        text: label.length > 8 ? `${label.slice(0, 5)}...` : label,
-        x: x + index * (BAR_WIDTH + BAR_GAP) + BAR_GAP * 2,
-        y: y + BAR_GAP / 2,
-        width: BAR_WIDTH,
-        angle: 5.87,
-        fontSize: 16,
-        textAlign: "center",
-        verticalAlign: "top",
-      });
-    }) || [];
+  return [xLine, yLine, maxLine];
+};
+
+// For the maths behind it https://excalidraw.com/#json=6320864370884608,O_5xfD-Agh32tytHpRJx1g
+const chartBaseElements = (
+  spreadsheet: Spreadsheet,
+  x: number,
+  y: number,
+  groupId: string,
+  debug?: boolean,
+): ExcalidrawElement[] => {
+  const { chartWidth, chartHeight } = getChartDimentions(spreadsheet);
 
   const title = spreadsheet.title
     ? newTextElement({
-        ...props,
+        groupIds: [groupId],
+        ...commonProps,
         text: spreadsheet.title,
         x: x + chartWidth / 2,
-        y: y - BAR_HEIGHT - BAR_GAP * 2 - maxYLabel.height,
+        y: y - BAR_HEIGHT - BAR_GAP * 2 - DEFAULT_FONT_SIZE,
         strokeSharpness: "sharp",
         strokeStyle: "solid",
         textAlign: "center",
       })
     : null;
 
+  const debugRect = debug
+    ? newElement({
+        groupIds: [groupId],
+        ...commonProps,
+        type: "rectangle",
+        x,
+        y: y - chartHeight,
+        width: chartWidth,
+        height: chartHeight,
+        strokeColor: colors.elementStroke[0],
+        fillStyle: "solid",
+        opacity: 6,
+      })
+    : null;
+
   return [
     title,
-    ...xLabels,
-    xAxisLine,
-    yAxisLine,
-    maxValueLine,
-    minYLabel,
-    maxYLabel,
+    ...chartXLabels(spreadsheet, x, y, groupId),
+    ...chartYLabels(spreadsheet, x, y, groupId),
+    ...chartLines(spreadsheet, x, y, groupId),
+    debugRect,
   ].filter((element) => element !== null) as ExcalidrawElement[];
 };
 
@@ -278,12 +331,12 @@ const renderSpreadsheetBar = (
 ): ExcalidrawElement[] => {
   const max = Math.max(...spreadsheet.values);
   const groupId = randomId();
-  const props = { groupIds: [groupId], ...commonProps };
 
   const bars = spreadsheet.values.map((value, index) => {
     const barHeight = (value / max) * BAR_HEIGHT;
     return newElement({
-      ...props,
+      groupIds: [groupId],
+      ...commonProps,
       type: "rectangle",
       x: x + index * (BAR_WIDTH + BAR_GAP) + BAR_GAP,
       y: y - barHeight - BAR_GAP,
@@ -292,7 +345,16 @@ const renderSpreadsheetBar = (
     });
   });
 
-  return [...bars, ...renderSpreadsheetBase(spreadsheet, x, y, groupId)];
+  return [
+    ...bars,
+    ...chartBaseElements(
+      spreadsheet,
+      x,
+      y,
+      groupId,
+      process.env.NODE_ENV === ENV.DEVELOPMENT,
+    ),
+  ];
 };
 
 export const renderSpreadsheet = (
@@ -302,6 +364,6 @@ export const renderSpreadsheet = (
   y: number,
 ): ExcalidrawElement[] => {
   const chart: ExcalidrawElement[] = renderSpreadsheetBar(spreadsheet, x, y);
-  trackEvent(EVENT_MAGIC, "chart", chartType, chart.length);
+  trackEvent(EVENT_MAGIC, "chart", chartType, spreadsheet.values.length);
   return chart;
 };
