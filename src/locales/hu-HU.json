@@ -161,6 +161,7 @@
     "freeDraw": "Kattints és húzd, majd engedd el, amikor végeztél",
     "text": "Tipp: A kiválasztó eszközzel bárhol létrehozhatsz szöveget dupla kattintással",
     "linearElementMulti": "Kattintson az utolsó pontra, vagy nyomja meg az Escape vagy az Enter billentyűt a befejezéshez",
+    "lockAngle": "",
     "resize": "",
     "rotate": "A SHIFT billentyű lenyomva tartásával korlátozhatja a szögek illesztését",
     "lineEditor_info": "Kattints duplán, vagy nyomj entert a pontok szerkesztéséhez",
