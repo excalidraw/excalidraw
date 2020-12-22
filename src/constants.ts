@@ -1,5 +1,7 @@
 import { FontFamily } from "./element/types";
 
+export const APP_NAME = "Excalidraw";
+
 export const DRAGGING_THRESHOLD = 10; // 10px
 export const LINE_CONFIRM_THRESHOLD = 10; // 10px
 export const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
@@ -85,3 +87,4 @@ export const STORAGE_KEYS = {
 // time in milliseconds
 export const TAP_TWICE_TIMEOUT = 300;
 export const TOUCH_CTX_MENU_TIMEOUT = 500;
+export const TITLE_TIMEOUT = 10000;

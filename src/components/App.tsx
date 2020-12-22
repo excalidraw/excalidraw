@@ -124,6 +124,7 @@ import {
   MIME_TYPES,
   TAP_TWICE_TIMEOUT,
   TOUCH_CTX_MENU_TIMEOUT,
+  APP_NAME,
 } from "../constants";
 
 import LayerUI from "./LayerUI";
@@ -502,7 +503,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   private importLibraryFromUrl = async (url: string) => {
-    window.history.replaceState({}, "Excalidraw", window.location.origin);
+    window.history.replaceState({}, APP_NAME, window.location.origin);
     try {
       const request = await fetch(url);
       const blob = await request.blob();
