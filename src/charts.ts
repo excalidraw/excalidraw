@@ -280,14 +280,16 @@ const renderSpreadsheetLine = (
   const props = { groupIds: [groupId], ...commonProps };
 
   let index = 0;
-  const points = [[0, 0]];
+  const points = [];
   for (const value of spreadsheet.values) {
-    const cx = index * (BAR_WIDTH + BAR_GAP) + BAR_GAP + BAR_WIDTH / 2;
-    const cy = -(value / max) * BAR_HEIGHT - BAR_GAP;
+    const cx = index * (BAR_WIDTH + BAR_GAP);
+    const cy = -(value / max) * BAR_HEIGHT;
     points.push([cx, cy]);
     console.info("####", value, index);
     index++;
   }
+  // points.push([(BAR_WIDTH + BAR_GAP) * (index - 1), 0]);
+  // points.push([0, 0]);
 
   const maxX = Math.max(...points.map((element) => element[0]));
   const maxY = Math.max(...points.map((element) => element[1]));
@@ -296,8 +298,8 @@ const renderSpreadsheetLine = (
 
   const line = newLinearElement({
     type: "line",
-    x,
-    y,
+    x: x + BAR_GAP + BAR_WIDTH / 2,
+    y: y - BAR_GAP,
     // x: x + points[0][0],
     // y: y + points[0][1],
 
