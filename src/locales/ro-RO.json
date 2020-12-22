@@ -161,6 +161,7 @@
     "freeDraw": "Dă clic pe pânză și glisează cursorul, apoi eliberează-l când ai terminat",
     "text": "Sfat: poți adăuga text și dând dublu clic oriunde cu instrumentul de selecție",
     "linearElementMulti": "Dă clic pe ultimul punct sau apasă tasta Escape sau tasta Enter pentru a termina",
+    "lockAngle": "",
     "resize": "Poți constrânge proporțiile, ținând apăsată tasta SHIFT în timp ce redimensionezi,\nține apăsată tasta ALT pentru a redimensiona de la centru",
     "rotate": "Poți constrânge unghiurile, ținând apăsată tasta SHIFT în timp ce rotești",
     "lineEditor_info": "Dă dublu clic sau apasă tasta Enter pentru a edita punctele",
