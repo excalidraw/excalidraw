@@ -247,7 +247,10 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
       }
     };
 
-    setTimeout(() => (document.title = APP_NAME), TITLE_TIMEOUT);
+    const titleTimeout = setTimeout(
+      () => (document.title = APP_NAME),
+      TITLE_TIMEOUT,
+    );
     window.addEventListener(EVENT.HASHCHANGE, onHashChange, false);
     window.addEventListener(EVENT.UNLOAD, onBlur, false);
     window.addEventListener(EVENT.BLUR, onBlur, false);
@@ -255,6 +258,7 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
       window.removeEventListener(EVENT.HASHCHANGE, onHashChange, false);
       window.removeEventListener(EVENT.UNLOAD, onBlur, false);
       window.removeEventListener(EVENT.BLUR, onBlur, false);
+      clearTimeout(titleTimeout);
     };
   }, [collab.initializeSocketClient]);
 
