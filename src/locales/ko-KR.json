@@ -161,6 +161,7 @@
     "freeDraw": "클릭 후 드래그하세요. 완료되면 놓으세요.",
     "text": "",
     "linearElementMulti": "마지막 지점을 클릭하거나 Esc 또는 Enter 키를 눌러 완료하세요.",
+    "lockAngle": "",
     "resize": "",
     "rotate": "SHIFT 키를 누르면서 회전하면 각도를 제한할 수 있습니다.",
     "lineEditor_info": "포인트를 수정하려면 두 번 클릭하거나 엔터 키를 누르세요.",
