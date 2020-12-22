@@ -161,6 +161,7 @@
     "freeDraw": "Fer clic i arrosegar, deixar anar al punt final",
     "text": "Consell: també pots afegir text fent doble clic a qualsevol lloc amb l'eina de selecció",
     "linearElementMulti": "Fer clic a l'ultim punt, o polsar Escape o Enter per acabar",
+    "lockAngle": "",
     "resize": "Per restringir les proporcions mentres es canvia la mida, mantenir premut el majúscul (SHIFT); per canviar la mida des del centre, mantenir premut ALT",
     "rotate": "Per restringir els angles mentre gira, mantenir premut el majúscul (SHIFT)",
     "lineEditor_info": "Fes doble clic o premi Enter per editar punts",
