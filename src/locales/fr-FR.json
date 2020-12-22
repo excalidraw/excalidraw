@@ -161,7 +161,7 @@
     "freeDraw": "Cliquez et faites glissez, relâchez quand vous avez terminé",
     "text": "Astuce : vous pouvez également ajouter du texte en double-cliquant n'importe où avec l'outil de sélection",
     "linearElementMulti": "Cliquez sur le dernier point ou appuyez sur Échap ou Entrée pour terminer",
-    "lockAngle": "",
+    "lockAngle": "Vous pouvez contraindre l'angle en maintenant SHIFT",
     "resize": "Vous pouvez conserver les proportions en maintenant la touche SHIFT pendant le redimensionnement,\nen maintenant la touche ALT pour redimensionner par rapport au centre",
     "rotate": "Vous pouvez contraindre les angles en maintenant MAJ enfoncé pendant la rotation",
     "lineEditor_info": "Double-cliquez ou appuyez sur Entrée pour éditer les points",
