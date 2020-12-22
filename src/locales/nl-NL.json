@@ -161,6 +161,7 @@
     "freeDraw": "Klik en sleep, laat los als je klaar bent",
     "text": "Tip: je kunt tekst toevoegen door ergens dubbel te klikken met de selectietool",
     "linearElementMulti": "Klik op het laatste punt of druk op Escape of Enter om te stoppen",
+    "lockAngle": "",
     "resize": "Houd tijdens het vergroten SHIFT ingedrukt om verhoudingen te behouden,\ngebruik ALT om vanuit het midden te vergroten/verkleinen",
     "rotate": "Je kan hoeken beperken door SHIFT ingedrukt te houden wanneer je draait",
     "lineEditor_info": "Dubbelklik of druk op Enter om punten te bewerken",
