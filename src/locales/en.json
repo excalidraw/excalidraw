@@ -77,7 +77,6 @@
     "ungroup": "Ungroup selection",
     "collaborators": "Collaborators",
     "gridMode": "Grid mode",
-    "stats": "Stats for nerds",
     "addToLibrary": "Add to library",
     "removeFromLibrary": "Remove from library",
     "libraryLoadingMessage": "Loading library...",
@@ -118,9 +117,10 @@
     "redo": "Redo",
     "roomDialog": "Start live collaboration",
     "createNewRoom": "Create new room",
-    "toggleFullScreen": "Toggle full screen",
-    "toggleDarkMode": "Toggle dark mode",
-    "toggleZenMode": "Toggle zen mode",
+    "fullScreen": "Full screen",
+    "darkMode": "Dark mode",
+    "lightMode": "Light mode",
+    "zenMode": "Zen mode",
     "exitZenMode": "Exit zen mode"
   },
   "alerts": {
