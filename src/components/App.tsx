@@ -3652,7 +3652,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           {
             checked: this.state.showStats,
             shortcutName: "stats",
-            label: t("labels.stats"),
+            label: t("stats.title"),
             action: this.toggleStats,
           },
         ],
