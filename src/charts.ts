@@ -161,6 +161,7 @@ const commonProps = {
   verticalAlign: "middle",
 } as const;
 
+// For the maths behind it https://excalidraw.com/#json=6320864370884608,O_5xfD-Agh32tytHpRJx1g
 const renderSpreadsheetBase = (
   spreadsheet: Spreadsheet,
   x: number,
@@ -270,65 +271,6 @@ const renderSpreadsheetBase = (
   ].filter((element) => element !== null) as ExcalidrawElement[];
 };
 
-const renderSpreadsheetLine = (
-  spreadsheet: Spreadsheet,
-  x: number,
-  y: number,
-): ExcalidrawElement[] => {
-  const max = Math.max(...spreadsheet.values);
-  const groupId = randomId();
-  const props = { groupIds: [groupId], ...commonProps };
-
-  let index = 0;
-  const points = [];
-  for (const value of spreadsheet.values) {
-    const cx = index * (BAR_WIDTH + BAR_GAP);
-    const cy = -(value / max) * BAR_HEIGHT;
-    points.push([cx, cy]);
-    console.info("####", value, index);
-    index++;
-  }
-  // points.push([(BAR_WIDTH + BAR_GAP) * (index - 1), 0]);
-  // points.push([0, 0]);
-
-  const maxX = Math.max(...points.map((element) => element[0]));
-  const maxY = Math.max(...points.map((element) => element[1]));
-
-  console.info("####", points, maxX, maxY);
-
-  const line = newLinearElement({
-    type: "line",
-    x: x + BAR_GAP + BAR_WIDTH / 2,
-    y: y - BAR_GAP,
-    // x: x + points[0][0],
-    // y: y + points[0][1],
-
-    startArrowhead: null,
-    endArrowhead: null,
-    ...props,
-    height: 10,
-    width: 10,
-    strokeStyle: "solid",
-    strokeWidth: 2,
-    points: points as any,
-  });
-
-  const bars = spreadsheet.values.map((value, index) => {
-    const barHeight = (value / max) * BAR_HEIGHT;
-    return newElement({
-      ...props,
-      type: "rectangle",
-      x: x + index * (BAR_WIDTH + BAR_GAP) + BAR_GAP,
-      y: y - barHeight - BAR_GAP,
-      width: BAR_WIDTH,
-      height: barHeight,
-      opacity: 5,
-    });
-  });
-
-  return [line, ...bars, ...renderSpreadsheetBase(spreadsheet, x, y, groupId)];
-};
-
 const renderSpreadsheetBar = (
   spreadsheet: Spreadsheet,
   x: number,
@@ -353,19 +295,13 @@ const renderSpreadsheetBar = (
   return [...bars, ...renderSpreadsheetBase(spreadsheet, x, y, groupId)];
 };
 
-// For the maths behind it https://excalidraw.com/#json=6320864370884608,O_5xfD-Agh32tytHpRJx1g
 export const renderSpreadsheet = (
   chartType: string,
   spreadsheet: Spreadsheet,
   x: number,
   y: number,
 ): ExcalidrawElement[] => {
-  let chart: ExcalidrawElement[];
-  if (chartType === "line") {
-    chart = renderSpreadsheetLine(spreadsheet, x, y);
-  } else {
-    chart = renderSpreadsheetBar(spreadsheet, x, y);
-  }
+  const chart: ExcalidrawElement[] = renderSpreadsheetBar(spreadsheet, x, y);
   trackEvent(EVENT_MAGIC, "chart", chartType, chart.length);
   return chart;
 };

@@ -74,7 +74,7 @@ export const getDefaultAppState = (): Omit<
     fileHandle: null,
     collaborators: new Map(),
     showStats: false,
-    chartType: "line",
+    chartType: "bar",
   };
 };
 
