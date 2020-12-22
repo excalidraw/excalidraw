@@ -21,7 +21,7 @@ type _ExcalidrawElementBase = Readonly<{
   strokeWidth: number;
   strokeStyle: StrokeStyle;
   strokeSharpness: StrokeSharpness;
-  roughness: number;
+  roughness: 0 | 1 | 2;
   opacity: number;
   width: number;
   height: number;
@@ -110,3 +110,16 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
     startArrowhead: Arrowhead | null;
     endArrowhead: Arrowhead | null;
   }>;
+
+export type ExcalidrawElementTypes = Pick<ExcalidrawElement, "type">["type"];
+
+/** @private */
+type __ExcalidrawElementPossibleProps_withoutType<T> = T extends any
+  ? { [K in keyof Omit<T, "type">]: T[K] }
+  : never;
+
+/** Do not use for anything unless you really need it for some abstract
+    API types */
+export type ExcalidrawElementPossibleProps = UnionToIntersection<
+  __ExcalidrawElementPossibleProps_withoutType<ExcalidrawElement>
+> & { type: ExcalidrawElementTypes };

@@ -81,6 +81,12 @@ export class API {
     verticalAlign?: T extends "text"
       ? ExcalidrawTextElement["verticalAlign"]
       : never;
+    startArrowhead?: T extends "arrow" | "line" | "draw"
+      ? ExcalidrawLinearElement["startArrowhead"]
+      : never;
+    endArrowhead?: T extends "arrow" | "line" | "draw"
+      ? ExcalidrawLinearElement["endArrowhead"]
+      : never;
   }): T extends "arrow" | "line" | "draw"
     ? ExcalidrawLinearElement
     : T extends "text"
@@ -130,8 +136,8 @@ export class API {
       case "draw":
         element = newLinearElement({
           type: type as "arrow" | "line" | "draw",
-          startArrowhead: null,
-          endArrowhead: null,
+          startArrowhead: rest.startArrowhead ?? null,
+          endArrowhead: rest.endArrowhead ?? null,
           ...base,
         });
         break;

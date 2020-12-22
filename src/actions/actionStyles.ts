@@ -1,28 +1,110 @@
 import {
   isTextElement,
-  isExcalidrawElement,
   redrawTextBoundingBox,
+  getNonDeletedElements,
 } from "../element";
 import { CODES, KEYS } from "../keys";
 import { register } from "./register";
-import { mutateElement, newElementWith } from "../element/mutateElement";
+import { newElementWith } from "../element/mutateElement";
 import {
-  DEFAULT_FONT_SIZE,
-  DEFAULT_FONT_FAMILY,
-  DEFAULT_TEXT_ALIGN,
-} from "../constants";
+  ExcalidrawElement,
+  ExcalidrawElementPossibleProps,
+} from "../element/types";
+import { AppState } from "../types";
+import {
+  canChangeSharpness,
+  getSelectedElements,
+  hasBackground,
+  hasStroke,
+  hasText,
+} from "../scene";
+import { isLinearElement, isLinearElementType } from "../element/typeChecks";
+
+type AppStateStyles = {
+  [K in AssertSubset<
+    keyof AppState,
+    typeof copyableStyles[number][0]
+  >]: AppState[K];
+};
+
+type ElementStyles = {
+  [K in AssertSubset<
+    keyof ExcalidrawElementPossibleProps,
+    typeof copyableStyles[number][1]
+  >]: ExcalidrawElementPossibleProps[K];
+};
+
+type ElemelementStylesByType = Record<ExcalidrawElement["type"], ElementStyles>;
 
 // `copiedStyles` is exported only for tests.
-export let copiedStyles: string = "{}";
+let COPIED_STYLES: {
+  appStateStyles: Partial<AppStateStyles>;
+  elementStyles: Partial<ElementStyles>;
+  elementStylesByType: Partial<ElemelementStylesByType>;
+} | null = null;
+
+/* [AppState prop, ExcalidrawElement prop, predicate] */
+const copyableStyles = [
+  ["currentItemOpacity", "opacity", () => true],
+  ["currentItemStrokeColor", "strokeColor", () => true],
+  ["currentItemStrokeStyle", "strokeStyle", hasStroke],
+  ["currentItemStrokeWidth", "strokeWidth", hasStroke],
+  ["currentItemRoughness", "roughness", hasStroke],
+  ["currentItemBackgroundColor", "backgroundColor", hasBackground],
+  ["currentItemFillStyle", "fillStyle", hasBackground],
+  ["currentItemStrokeSharpness", "strokeSharpness", canChangeSharpness],
+  ["currentItemLinearStrokeSharpness", "strokeSharpness", isLinearElementType],
+  ["currentItemStartArrowhead", "startArrowhead", isLinearElementType],
+  ["currentItemEndArrowhead", "endArrowhead", isLinearElementType],
+  ["currentItemFontFamily", "fontFamily", hasText],
+  ["currentItemFontSize", "fontSize", hasText],
+  ["currentItemTextAlign", "textAlign", hasText],
+] as const;
+
+const getCommonStyleProps = (
+  elements: readonly ExcalidrawElement[],
+): Exclude<typeof COPIED_STYLES, null> => {
+  const appStateStyles = {} as AppStateStyles;
+  const elementStyles = {} as ElementStyles;
+
+  const elementStylesByType = elements.reduce((acc, element) => {
+    // only use the first element of given type
+    if (!acc[element.type]) {
+      acc[element.type] = {} as ElementStyles;
+      copyableStyles.forEach(([appStateProp, prop, predicate]) => {
+        const value = (element as any)[prop];
+        if (value !== undefined && predicate(element.type)) {
+          if (appStateStyles[appStateProp] === undefined) {
+            (appStateStyles as any)[appStateProp] = value;
+          }
+          if (elementStyles[prop] === undefined) {
+            (elementStyles as any)[prop] = value;
+          }
+          (acc as any)[element.type][prop] = value;
+        }
+      });
+    }
+    return acc;
+  }, {} as ElemelementStylesByType);
+
+  // clone in case we ever make some of the props into non-primitives
+  return JSON.parse(
+    JSON.stringify({ appStateStyles, elementStyles, elementStylesByType }),
+  );
+};
 
 export const actionCopyStyles = register({
   name: "copyStyles",
   perform: (elements, appState) => {
-    const element = elements.find((el) => appState.selectedElementIds[el.id]);
-    if (element) {
-      copiedStyles = JSON.stringify(element);
-    }
+    COPIED_STYLES = getCommonStyleProps(
+      getSelectedElements(getNonDeletedElements(elements), appState),
+    );
+
     return {
+      appState: {
+        ...appState,
+        ...COPIED_STYLES.appStateStyles,
+      },
       commitToHistory: false,
     };
   },
@@ -35,31 +117,49 @@ export const actionCopyStyles = register({
 export const actionPasteStyles = register({
   name: "pasteStyles",
   perform: (elements, appState) => {
-    const pastedElement = JSON.parse(copiedStyles);
-    if (!isExcalidrawElement(pastedElement)) {
+    if (!COPIED_STYLES) {
       return { elements, commitToHistory: false };
     }
+    const getStyle = <T extends ExcalidrawElement, K extends keyof T>(
+      element: T,
+      prop: K,
+    ) => {
+      return (COPIED_STYLES?.elementStylesByType[element.type]?.[
+        prop as keyof ElementStyles
+      ] ??
+        COPIED_STYLES?.elementStyles[prop as keyof ElementStyles] ??
+        element[prop]) as T[K];
+    };
     return {
       elements: elements.map((element) => {
         if (appState.selectedElementIds[element.id]) {
-          const newElement = newElementWith(element, {
-            backgroundColor: pastedElement?.backgroundColor,
-            strokeWidth: pastedElement?.strokeWidth,
-            strokeColor: pastedElement?.strokeColor,
-            strokeStyle: pastedElement?.strokeStyle,
-            fillStyle: pastedElement?.fillStyle,
-            opacity: pastedElement?.opacity,
-            roughness: pastedElement?.roughness,
-          });
-          if (isTextElement(newElement)) {
-            mutateElement(newElement, {
-              fontSize: pastedElement?.fontSize || DEFAULT_FONT_SIZE,
-              fontFamily: pastedElement?.fontFamily || DEFAULT_FONT_FAMILY,
-              textAlign: pastedElement?.textAlign || DEFAULT_TEXT_ALIGN,
+          const commonProps = {
+            backgroundColor: getStyle(element, "backgroundColor"),
+            strokeWidth: getStyle(element, "strokeWidth"),
+            strokeColor: getStyle(element, "strokeColor"),
+            strokeStyle: getStyle(element, "strokeStyle"),
+            fillStyle: getStyle(element, "fillStyle"),
+            opacity: getStyle(element, "opacity"),
+            roughness: getStyle(element, "roughness"),
+            strokeSharpness: getStyle(element, "strokeSharpness"),
+          };
+          if (isTextElement(element)) {
+            const newElement = newElementWith(element, {
+              ...commonProps,
+              fontSize: getStyle(element, "fontSize"),
+              fontFamily: getStyle(element, "fontFamily"),
+              textAlign: getStyle(element, "textAlign"),
             });
             redrawTextBoundingBox(newElement);
+            return newElement;
+          } else if (isLinearElement(element)) {
+            return newElementWith(element, {
+              ...commonProps,
+              startArrowhead: getStyle(element, "startArrowhead"),
+              endArrowhead: getStyle(element, "endArrowhead"),
+            });
           }
-          return newElement;
+          return newElementWith(element, commonProps);
         }
         return element;
       }),
