@@ -5,8 +5,8 @@ import { newElement, newLinearElement, newTextElement } from "./element";
 import { ExcalidrawElement } from "./element/types";
 import { randomId } from "./random";
 
-const BAR_WIDTH = 40;
-const BAR_GAP = 10;
+const BAR_WIDTH = 32;
+const BAR_GAP = 12;
 const BAR_HEIGHT = 256;
 
 export interface Spreadsheet {
