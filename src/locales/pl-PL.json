@@ -161,6 +161,7 @@
     "freeDraw": "Naciśnij i przeciągnij by rysować, puść kiedy skończysz",
     "text": "Wskazówka: możesz również dodać tekst klikając dwukrotnie gdziekolwiek za pomocą narzędzia zaznaczania",
     "linearElementMulti": "Aby zakończyć krzywą, ponownie kliknij w ostatni punkt, bądź naciśnij Esc albo Enter",
+    "lockAngle": "",
     "resize": "Możesz zachować proporcję trzymająć wcisnięty SHIFT, przytrzymaj ALT by zmienić rozmiar względem środka",
     "rotate": "Możesz obracać element w równych odstępach trzymając wciśnięty SHIFT",
     "lineEditor_info": "Kliknij dwukrotnie lub naciśnij Enter, aby edytować punkty",
