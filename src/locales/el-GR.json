@@ -170,7 +170,7 @@
   },
   "canvasError": {
     "cannotShowPreview": "",
-    "canvasTooBig": "",
+    "canvasTooBig": "Ο καμβάς μπορεί να είναι μεγάλος.",
     "canvasTooBigTip": ""
   },
   "errorSplash": {
@@ -225,7 +225,7 @@
     "element": "Στοιχείο",
     "elements": "Στοιχεία",
     "height": "Ύψος",
-    "scene": "",
+    "scene": "Σκηνή",
     "selected": "Επιλεγμένα",
     "storage": "Χώρος",
     "title": "Στατιστικά για σπασίκλες",
