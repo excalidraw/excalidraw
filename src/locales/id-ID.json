@@ -161,6 +161,7 @@
     "freeDraw": "Klik dan seret, lepaskan jika Anda selesai",
     "text": "Tip: Anda juga dapat menambahkan teks dengan klik ganda di mana saja dengan alat pemilihan",
     "linearElementMulti": "Klik pada titik akhir atau tekan Escape atau Enter untuk menyelesaikan",
+    "lockAngle": "",
     "resize": "Anda dapat menjaga proposi dengan menekan SHIFT sambil mengubah ukuran,\ntekan AlT untuk mengubah ukuran dari tengah",
     "rotate": "Anda dapat menjaga sudut dengan menahan SHIFT sambil memutar",
     "lineEditor_info": "Klik ganda atau tekan Enter untuk mengedit titik",
