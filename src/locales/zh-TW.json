@@ -161,7 +161,7 @@
     "freeDraw": "點擊並拖曳來繪圖，放開即結束",
     "text": "提示：亦可使用選取工具在任何地方雙擊來加入文字",
     "linearElementMulti": "按下 Escape 或 Enter 以結束繪製",
-    "lockAngle": "",
+    "lockAngle": "按住 SHIFT 可限制旋轉角度",
     "resize": "縮放時按住 Shift 可保持原比例縮放；\\n按住 Alt 可由中心點進行縮放",
     "rotate": "旋轉時按住 Shift 可限制旋轉角度",
     "lineEditor_info": "雙擊滑鼠左鍵或按 Enter 來編輯控制點",
