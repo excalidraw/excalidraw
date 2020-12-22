@@ -118,10 +118,10 @@
     "redo": "Повторити",
     "roomDialog": "Відкрити сесію спільної роботи",
     "createNewRoom": "Створити нову кімнату",
-    "fullScreen": "",
-    "darkMode": "",
-    "lightMode": "",
-    "zenMode": "",
+    "fullScreen": "Повноекранний режим",
+    "darkMode": "Темний режим",
+    "lightMode": "Світлий режим",
+    "zenMode": "Режим Дзен",
     "exitZenMode": "Вийти з дзен-режиму"
   },
   "alerts": {
