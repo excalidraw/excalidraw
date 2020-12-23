@@ -74,7 +74,7 @@ export const getDefaultAppState = (): Omit<
     fileHandle: null,
     collaborators: new Map(),
     showStats: false,
-    chartType: "bar",
+    currentChartType: "bar",
   };
 };
 
@@ -153,7 +153,7 @@ const APP_STATE_STORAGE_CONF = (<
   fileHandle: { browser: false, export: false },
   collaborators: { browser: false, export: false },
   showStats: { browser: true, export: false },
-  chartType: { browser: true, export: true },
+  currentChartType: { browser: true, export: true },
 });
 
 const _clearAppStateForStorage = <ExportType extends "export" | "browser">(

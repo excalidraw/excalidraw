@@ -1006,7 +1006,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       } else if (data.spreadsheet) {
         this.addElementsFromPasteOrLibrary(
           renderSpreadsheet(
-            this.state.chartType,
+            this.state.currentChartType,
             data.spreadsheet,
             cursorX,
             cursorY,
