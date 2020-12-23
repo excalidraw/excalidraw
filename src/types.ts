@@ -83,7 +83,7 @@ export type AppState = {
   showShortcutsDialog: boolean;
   zenModeEnabled: boolean;
   appearance: "light" | "dark";
-  gridSize: number | null;
+  showGrid: boolean;
 
   /** top-most selected groups (i.e. does not include nested groups) */
   selectedGroupIds: { [groupId: string]: boolean };

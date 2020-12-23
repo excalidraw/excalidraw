@@ -48,6 +48,7 @@ import {
   TransformHandleType,
 } from "../element/transformHandles";
 import { viewportCoordsToSceneCoords } from "../utils";
+import { GRID_SIZE } from "../constants";
 
 const strokeRectWithRotation = (
   context: CanvasRenderingContext2D,
@@ -118,7 +119,6 @@ const fillCircle = (
 
 const strokeGrid = (
   context: CanvasRenderingContext2D,
-  gridSize: number,
   offsetX: number,
   offsetY: number,
   width: number,
@@ -127,13 +127,13 @@ const strokeGrid = (
   const origStrokeStyle = context.strokeStyle;
   context.strokeStyle = "rgba(0,0,0,0.1)";
   context.beginPath();
-  for (let x = offsetX; x < offsetX + width + gridSize * 2; x += gridSize) {
-    context.moveTo(x, offsetY - gridSize);
-    context.lineTo(x, offsetY + height + gridSize * 2);
+  for (let x = offsetX; x < offsetX + width + GRID_SIZE * 2; x += GRID_SIZE) {
+    context.moveTo(x, offsetY - GRID_SIZE);
+    context.lineTo(x, offsetY + height + GRID_SIZE * 2);
   }
-  for (let y = offsetY; y < offsetY + height + gridSize * 2; y += gridSize) {
-    context.moveTo(offsetX - gridSize, y);
-    context.lineTo(offsetX + width + gridSize * 2, y);
+  for (let y = offsetY; y < offsetY + height + GRID_SIZE * 2; y += GRID_SIZE) {
+    context.moveTo(offsetX - GRID_SIZE, y);
+    context.lineTo(offsetX + width + GRID_SIZE * 2, y);
   }
   context.stroke();
   context.strokeStyle = origStrokeStyle;
@@ -233,16 +233,15 @@ export const renderScene = (
   context.scale(sceneState.zoom.value, sceneState.zoom.value);
 
   // Grid
-  if (renderGrid && appState.gridSize) {
+  if (renderGrid && appState.showGrid) {
     strokeGrid(
       context,
-      appState.gridSize,
-      -Math.ceil(zoomTranslationX / sceneState.zoom.value / appState.gridSize) *
-        appState.gridSize +
-        (sceneState.scrollX % appState.gridSize),
-      -Math.ceil(zoomTranslationY / sceneState.zoom.value / appState.gridSize) *
-        appState.gridSize +
-        (sceneState.scrollY % appState.gridSize),
+      -Math.ceil(zoomTranslationX / sceneState.zoom.value / GRID_SIZE) *
+        GRID_SIZE +
+        (sceneState.scrollX % GRID_SIZE),
+      -Math.ceil(zoomTranslationY / sceneState.zoom.value / GRID_SIZE) *
+        GRID_SIZE +
+        (sceneState.scrollY % GRID_SIZE),
       normalizedCanvasWidth / sceneState.zoom.value,
       normalizedCanvasHeight / sceneState.zoom.value,
     );

@@ -1,5 +1,5 @@
 import { Point } from "./types";
-import { LINE_CONFIRM_THRESHOLD } from "./constants";
+import { GRID_SIZE, LINE_CONFIRM_THRESHOLD } from "./constants";
 import { ExcalidrawLinearElement } from "./element/types";
 
 export const rotate = (
@@ -307,12 +307,12 @@ const doSegmentsIntersect = (p1: Point, q1: Point, p2: Point, q2: Point) => {
 export const getGridPoint = (
   x: number,
   y: number,
-  gridSize: number | null,
+  isGridOn: boolean,
 ): [number, number] => {
-  if (gridSize) {
+  if (isGridOn) {
     return [
-      Math.round(x / gridSize) * gridSize,
-      Math.round(y / gridSize) * gridSize,
+      Math.round(x / GRID_SIZE) * GRID_SIZE,
+      Math.round(y / GRID_SIZE) * GRID_SIZE,
     ];
   }
   return [x, y];
