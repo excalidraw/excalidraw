@@ -24,6 +24,7 @@ const getStorageSizes = debounce((cb: (sizes: StorageSizes) => void) => {
 }, 500);
 
 export const Stats = (props: {
+  setAppState: React.Component<any, AppState>["setState"];
   appState: AppState;
   elements: readonly NonDeletedExcalidrawElement[];
   onClose: () => void;
@@ -47,8 +48,9 @@ export const Stats = (props: {
   const selectedBoundingBox = getCommonBounds(selectedElements);
 
   const onGridSizeChange = () => {
-    //TODO: Update the state properly and rerender the grid
-    props.appState.gridSize = ((props.appState.gridSize - 5) % 50) + 10;
+    props.setAppState({
+      gridSize: ((props.appState.gridSize - 5) % 50) + 10,
+    });
   };
 
   if (isMobile && props.appState.openMenu) {
