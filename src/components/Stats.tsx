@@ -46,6 +46,11 @@ export const Stats = (props: {
   const selectedElements = getTargetElements(props.elements, props.appState);
   const selectedBoundingBox = getCommonBounds(selectedElements);
 
+  const onGridSizeChange = () => {
+    //TODO: Update the state properly and rerender the grid
+    props.appState.gridSize = ((props.appState.gridSize - 5) % 50) + 10;
+  };
+
   if (isMobile && props.appState.openMenu) {
     return null;
   }
@@ -162,13 +167,7 @@ export const Stats = (props: {
                 <tr>
                   <th colSpan={2}>{"Misc"}</th>
                 </tr>
-                <tr
-                  onClick={() => {
-                    // TODO: better way to update the gridSize and re-render the scene
-                    props.appState.gridSize =
-                      ((props.appState.gridSize - 5) % 50) + 10;
-                  }}
-                >
+                <tr onClick={onGridSizeChange} style={{ cursor: "pointer" }}>
                   <td>{"Grid size"}</td>
                   <td>{props.appState.gridSize}</td>
                 </tr>
