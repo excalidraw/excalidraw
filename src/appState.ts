@@ -6,6 +6,7 @@ import {
   DEFAULT_FONT_SIZE,
   DEFAULT_FONT_FAMILY,
   DEFAULT_TEXT_ALIGN,
+  GRID_SIZE,
 } from "./constants";
 
 export const getDefaultAppState = (): Omit<
@@ -65,7 +66,8 @@ export const getDefaultAppState = (): Omit<
     showShortcutsDialog: false,
     suggestedBindings: [],
     zenModeEnabled: false,
-    gridSize: null,
+    gridSize: GRID_SIZE,
+    showGrid: false,
     editingGroupId: null,
     selectedGroupIds: {},
     width: window.innerWidth,
@@ -121,6 +123,7 @@ const APP_STATE_STORAGE_CONF = (<
   exportBackground: { browser: true, export: false },
   exportEmbedScene: { browser: true, export: false },
   gridSize: { browser: true, export: true },
+  showGrid: { browser: true, export: false },
   height: { browser: false, export: false },
   isBindingEnabled: { browser: false, export: false },
   isLibraryOpen: { browser: false, export: false },

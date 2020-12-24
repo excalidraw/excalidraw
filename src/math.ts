@@ -307,9 +307,10 @@ const doSegmentsIntersect = (p1: Point, q1: Point, p2: Point, q2: Point) => {
 export const getGridPoint = (
   x: number,
   y: number,
-  gridSize: number | null,
+  isGridOn: boolean,
+  gridSize: number,
 ): [number, number] => {
-  if (gridSize) {
+  if (isGridOn) {
     return [
       Math.round(x / gridSize) * gridSize,
       Math.round(y / gridSize) * gridSize,

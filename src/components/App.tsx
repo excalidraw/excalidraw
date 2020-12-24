@@ -1036,7 +1036,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const dy = y - elementsCenterY;
     const groupIdMap = new Map();
 
-    const [gridX, gridY] = getGridPoint(dx, dy, this.state.gridSize);
+    const [gridX, gridY] = getGridPoint(
+      dx,
+      dy,
+      this.state.showGrid,
+      this.state.gridSize,
+    );
 
     const oldIdToDuplicatedId = new Map();
     const newElements = clipboardElements.map((element) => {
@@ -1149,7 +1154,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   toggleGridMode = () => {
     this.setState({
-      gridSize: this.state.gridSize ? null : GRID_SIZE,
+      showGrid: !this.state.showGrid,
     });
   };
 
@@ -1275,7 +1280,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     if (isArrowKey(event.key)) {
       const step =
-        (this.state.gridSize &&
+        (this.state.showGrid &&
           (event.shiftKey ? ELEMENT_TRANSLATE_AMOUNT : this.state.gridSize)) ||
         (event.shiftKey
           ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
@@ -1819,6 +1824,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         scenePointerX,
         scenePointerY,
         this.state.editingLinearElement,
+        this.state.showGrid,
         this.state.gridSize,
       );
       if (editingLinearElement !== this.state.editingLinearElement) {
@@ -2249,7 +2255,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     return {
       origin,
       originInGrid: tupleToCoors(
-        getGridPoint(origin.x, origin.y, this.state.gridSize),
+        getGridPoint(
+          origin.x,
+          origin.y,
+          this.state.showGrid,
+          this.state.gridSize,
+        ),
       ),
       scrollbars: isOverScrollBars(
         currentScrollBars,
@@ -2607,7 +2618,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       const [gridX, gridY] = getGridPoint(
         pointerDownState.origin.x,
         pointerDownState.origin.y,
-        elementType === "draw" ? null : this.state.gridSize,
+        elementType === "draw" ? false : this.state.showGrid,
+        this.state.gridSize,
       );
 
       /* If arrow is pre-arrowheads, it will have undefined for both start and end arrowheads.
@@ -2669,6 +2681,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const [gridX, gridY] = getGridPoint(
       pointerDownState.origin.x,
       pointerDownState.origin.y,
+      this.state.showGrid,
       this.state.gridSize,
     );
     const element = newElement({
@@ -2758,6 +2771,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       const [gridX, gridY] = getGridPoint(
         pointerCoords.x,
         pointerCoords.y,
+        this.state.showGrid,
         this.state.gridSize,
       );
 
@@ -2830,6 +2844,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           const [dragX, dragY] = getGridPoint(
             pointerCoords.x - pointerDownState.drag.offset.x,
             pointerCoords.y - pointerDownState.drag.offset.y,
+            this.state.showGrid,
             this.state.gridSize,
           );
 
@@ -2882,6 +2897,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
                 const [originDragX, originDragY] = getGridPoint(
                   pointerDownState.origin.x - pointerDownState.drag.offset.x,
                   pointerDownState.origin.y - pointerDownState.drag.offset.y,
+                  this.state.showGrid,
                   this.state.gridSize,
                 );
                 mutateElement(duplicatedElement, {
@@ -3542,6 +3558,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       const [gridX, gridY] = getGridPoint(
         pointerCoords.x,
         pointerCoords.y,
+        this.state.showGrid,
         this.state.gridSize,
       );
       dragNewElement(
@@ -3580,6 +3597,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const [resizeX, resizeY] = getGridPoint(
       pointerCoords.x - pointerDownState.resize.offset.x,
       pointerCoords.y - pointerDownState.resize.offset.y,
+      this.state.showGrid,
       this.state.gridSize,
     );
     if (

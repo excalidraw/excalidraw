@@ -102,6 +102,7 @@ export class LinearElementEditor {
         element,
         scenePointerX - editingLinearElement.pointerOffset.x,
         scenePointerY - editingLinearElement.pointerOffset.y,
+        appState.showGrid,
         appState.gridSize,
       );
       LinearElementEditor.movePoint(element, activePointIndex, newPoint);
@@ -198,6 +199,7 @@ export class LinearElementEditor {
               element,
               scenePointer.x,
               scenePointer.y,
+              appState.showGrid,
               appState.gridSize,
             ),
           ],
@@ -282,7 +284,8 @@ export class LinearElementEditor {
     scenePointerX: number,
     scenePointerY: number,
     editingLinearElement: LinearElementEditor,
-    gridSize: number | null,
+    isGridOn: boolean,
+    gridSize: number,
   ): LinearElementEditor {
     const { elementId, lastUncommittedPoint } = editingLinearElement;
     const element = LinearElementEditor.getElement(elementId);
@@ -304,6 +307,7 @@ export class LinearElementEditor {
       element,
       scenePointerX - editingLinearElement.pointerOffset.x,
       scenePointerY - editingLinearElement.pointerOffset.y,
+      isGridOn,
       gridSize,
     );
 
@@ -398,9 +402,15 @@ export class LinearElementEditor {
     element: NonDeleted<ExcalidrawLinearElement>,
     scenePointerX: number,
     scenePointerY: number,
-    gridSize: number | null,
+    isGridOn: boolean,
+    gridSize: number,
   ): Point {
-    const pointerOnGrid = getGridPoint(scenePointerX, scenePointerY, gridSize);
+    const pointerOnGrid = getGridPoint(
+      scenePointerX,
+      scenePointerY,
+      isGridOn,
+      gridSize,
+    );
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
     const cx = (x1 + x2) / 2;
     const cy = (y1 + y2) / 2;
