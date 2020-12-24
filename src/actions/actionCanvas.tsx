@@ -18,6 +18,7 @@ import { getNewZoom } from "../scene/zoom";
 import { centerScrollOn } from "../scene/scroll";
 import { EVENT_ACTION, EVENT_CHANGE, trackEvent } from "../analytics";
 import colors from "../colors";
+import { GRID_SIZE } from "../constants";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -64,7 +65,7 @@ export const actionClearCanvas = register({
         elementLocked: appState.elementLocked,
         exportBackground: appState.exportBackground,
         exportEmbedScene: appState.exportEmbedScene,
-        gridSize: appState.gridSize,
+        gridSize: appState.gridSize || GRID_SIZE,
         shouldAddWatermark: appState.shouldAddWatermark,
         showStats: appState.showStats,
       },

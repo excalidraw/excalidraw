@@ -12,7 +12,6 @@ import { AppState } from "../types";
 import { debounce, nFormatter } from "../utils";
 import { close } from "./icons";
 import { Island } from "./Island";
-import { SlidableInput } from "./SlidableInput";
 import "./Stats.scss";
 
 type StorageSizes = { scene: number; total: number };
@@ -158,19 +157,23 @@ export const Stats = (props: {
                 </td>
               </tr>
             )}
-
-            <tr>
-              <th colSpan={2}>{"Misc"}</th>
-            </tr>
-            <tr>
-              <td>{"Grid size"}</td>
-              <td>
-                <SlidableInput
-                  value={props.appState.gridSize || 8}
-                  minValue={8}
-                />
-              </td>
-            </tr>
+            {props.appState.showGrid && (
+              <>
+                <tr>
+                  <th colSpan={2}>{"Misc"}</th>
+                </tr>
+                <tr
+                  onClick={() => {
+                    // TODO: better way to update the gridSize and re-render the scene
+                    props.appState.gridSize =
+                      ((props.appState.gridSize - 5) % 50) + 10;
+                  }}
+                >
+                  <td>{"Grid size"}</td>
+                  <td>{props.appState.gridSize}</td>
+                </tr>
+              </>
+            )}
           </tbody>
         </table>
       </Island>

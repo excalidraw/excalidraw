@@ -233,7 +233,7 @@ export const renderScene = (
   context.scale(sceneState.zoom.value, sceneState.zoom.value);
 
   // Grid
-  if (renderGrid && appState.gridSize) {
+  if (renderGrid && appState.showGrid) {
     strokeGrid(
       context,
       appState.gridSize,
