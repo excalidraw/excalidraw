@@ -641,8 +641,6 @@ const LayerUI = ({
 const areEqual = (prev: LayerUIProps, next: LayerUIProps) => {
   const getNecessaryObj = (appState: AppState): Partial<AppState> => {
     const {
-      cursorX,
-      cursorY,
       suggestedBindings,
       startBoundElement: boundElement,
       ...ret

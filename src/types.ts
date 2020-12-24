@@ -67,8 +67,6 @@ export type AppState = {
   viewBackgroundColor: string;
   scrollX: FlooredNumber;
   scrollY: FlooredNumber;
-  cursorX: number;
-  cursorY: number;
   cursorButton: "up" | "down";
   scrolledOutside: boolean;
   name: string;
