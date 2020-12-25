@@ -73,4 +73,12 @@
   .context-menu-option:focus {
     z-index: 1;
   }
+
+  @media screen and (max-width: 1000px) {
+    .context-menu-option {
+      div:nth-child(2) {
+        visibility: hidden;
+      }
+    }
+  }
 }
