@@ -51,7 +51,7 @@ const ContextMenu = ({ options, onCloseRequest, top, left }: Props) => {
                 ${checked ? "checkmark" : ""}`}
                 onClick={action}
               >
-                <div>{label}</div>
+                <div className="context-menu-option__label">{label}</div>
                 <div className="context-menu-option__shortcut">
                   {shortcutName
                     ? getShortcutFromShortcutName(shortcutName)
