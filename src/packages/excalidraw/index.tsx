@@ -24,7 +24,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     onPointerUpdate,
     onExportToBackend,
     renderFooter,
-    lang,
+    lang = "en",
     onLangChange,
   } = props;
 

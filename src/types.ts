@@ -173,7 +173,7 @@ export interface ExcalidrawProps {
     canvas: HTMLCanvasElement | null,
   ) => void;
   renderFooter?: (isMobile: boolean) => JSX.Element;
-  lang: Language["lng"];
+  lang?: Language["lng"];
   onLangChange?: (lang: Language["lng"]) => void;
 }
 

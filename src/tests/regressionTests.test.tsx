@@ -4,9 +4,8 @@ import ReactDOM from "react-dom";
 import { copiedStyles } from "../actions/actionStyles";
 import { ShortcutName } from "../actions/shortcuts";
 import { ExcalidrawElement } from "../element/types";
-import { setLanguage } from "../i18n";
 import { CODES, KEYS } from "../keys";
-import Excalidraw from "../packages/excalidraw/index";
+import ExcalidrawApp from "../excalidraw-app";
 import { reseed } from "../random";
 import * as Renderer from "../renderer/renderScene";
 import { setDateTimeForTests } from "../utils";
@@ -75,8 +74,7 @@ beforeEach(async () => {
   finger1.reset();
   finger2.reset();
 
-  await setLanguage("en.json");
-  await render(<Excalidraw offsetLeft={0} offsetTop={0} />);
+  await render(<ExcalidrawApp />);
 });
 
 afterEach(() => {
@@ -428,6 +426,10 @@ describe("regression tests", () => {
   });
 
   it("rerenders UI on language change", async () => {
+    //await ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+
+    //await render(<ExcalidrawApp />);
+
     // select rectangle tool to show properties menu
     UI.clickTool("rectangle");
     // english lang should display `thin` label
