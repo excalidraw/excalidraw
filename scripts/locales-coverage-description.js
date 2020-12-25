@@ -24,6 +24,7 @@ const crowdinMap = {
   "nl-NL": "en-nl",
   "nn-NO": "en-nnno",
   "pl-PL": "en-pl",
+  "pt-BR": "en-ptbr",
   "pt-PT": "en-pt",
   "ro-RO": "en-ro",
   "ru-RU": "en-ru",
@@ -57,6 +58,7 @@ const flags = {
   "nl-NL": "🇳🇱",
   "nn-NO": "🇳🇴",
   "pl-PL": "🇵🇱",
+  "pt-BR": "🇧🇷",
   "pt-PT": "🇵🇹",
   "ro-RO": "🇷🇴",
   "ru-RU": "🇷🇺",
@@ -90,6 +92,7 @@ const languages = {
   "nl-NL": "Nederlands",
   "nn-NO": "Norsk nynorsk",
   "pl-PL": "Polski",
+  "pt-BR": "Português Brasileiro",
   "pt-PT": "Português",
   "ro-RO": "Română",
   "ru-RU": "Русский",
@@ -114,16 +117,14 @@ const boldIf = (text, condition) => (condition ? `**${text}**` : text);
 
 const printHeader = () => {
   let result = "| | Flag | Locale | % |\n";
-  result += "| --: | :--: | -- | --: |";
+  result += "| :--: | :--: | -- | :--: |";
   return result;
 };
 
 const printRow = (id, locale, coverage) => {
-  const isOver = coverage > THRESSHOLD;
-  let result = `| ${boldIf(id, isOver)} | `;
-
+  const isOver = coverage >= THRESSHOLD;
+  let result = `| ${isOver ? id : "..."} | `;
   result += `${locale in flags ? flags[locale] : ""} | `;
-
   const language = locale in languages ? languages[locale] : locale;
   if (locale in crowdinMap && crowdinMap[locale]) {
     result += `[${boldIf(
@@ -133,14 +134,12 @@ const printRow = (id, locale, coverage) => {
   } else {
     result += `${boldIf(language, isOver)} | `;
   }
-  result += `${boldIf(coverage, isOver)} |`;
+  result += `${coverage === 100 ? "✅" : boldIf(coverage, isOver)} |`;
   return result;
 };
 
-console.info("## Languages check");
-console.info("\n\r");
 console.info(
-  `Our translations for every languages should be at least **${THRESSHOLD}%** to appear on Excalidraw. Join our project in [Crowdin](https://crowdin.com/project/excalidraw) and help us translate it in your language. **Can't find your own?** Open an [issue](https://github.com/excalidraw/excalidraw/issues/new) and we'll add it to the list.`,
+  `Each language must be at least **${THRESSHOLD}%** translated in order to appear on Excalidraw. Join us on [Crowdin](https://crowdin.com/project/excalidraw) and help us translate your own language. **Can't find yours yet?** Open an [issue](https://github.com/excalidraw/excalidraw/issues/new) and we'll add it to the list.`,
 );
 console.info("\n\r");
 console.info(printHeader());

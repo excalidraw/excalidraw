@@ -37,7 +37,7 @@
     "fontSize": "Ukuran font",
     "fontFamily": "Jenis font",
     "onlySelected": "Hanya yang Dipilih",
-    "withBackground": "Dengan Latar",
+    "withBackground": "Dengan latar",
     "exportEmbedScene": "Sematkan pemandangan ke dalam file yang diekspor",
     "exportEmbedScene_details": "Data pemandangan akan disimpan dalam file PNG/SVG yang diekspor, sehingga pemandangan itu dapat dipulihkan darinya.\nAkan membesarkan ukuran file yang diekspor.",
     "addWatermark": "Tambahkan \"Dibuat dengan Excalidraw\"",
@@ -76,8 +76,7 @@
     "group": "Kelompokan pilihan",
     "ungroup": "Pisahkan pilihan",
     "collaborators": "Kolaborator",
-    "toggleGridMode": "Aktifkan/Matikan mode kisi",
-    "toggleStats": "Aktifkan statistik untuk nerd",
+    "gridMode": "Mode grid",
     "addToLibrary": "Tambahkan ke pustaka",
     "removeFromLibrary": "Hapus dari pustaka",
     "libraryLoadingMessage": "Memuat pustaka...",
@@ -118,9 +117,10 @@
     "redo": "Ulangi",
     "roomDialog": "Mulai kolaborasi langsung",
     "createNewRoom": "Buat ruang baru",
-    "toggleFullScreen": "Beralih ke layar penuh",
-    "toggleDarkMode": "Aktifkan/Matikan mode gelap",
-    "toggleZenMode": "Aktifkan/Matikan mode zen",
+    "fullScreen": "Layar penuh",
+    "darkMode": "Mode gelap",
+    "lightMode": "Mode terang",
+    "zenMode": "Mode zen",
     "exitZenMode": "Keluar dari mode zen"
   },
   "alerts": {
@@ -136,7 +136,7 @@
     "loadSceneOverridePrompt": "Memuat gambar external akan mengganti konten Anda yang ada. Apakah Anda ingin melanjutkan?",
     "errorLoadingLibrary": "Terdapat kesalahan dalam memuat pustaka pihak ketiga.",
     "confirmAddLibrary": "Ini akan menambahkan {{numShapes}} bentuk ke pustaka Anda. Anda yakin?",
-    "imageDoesNotContainScene": "File gambar tidak berisi data pemandangan. Apa Anda sudah aktifkan ini selama ekspor?",
+    "imageDoesNotContainScene": "Mengimpor gambar tidak didukung saat ini.\n\nApakah Anda ingin impor pemandangan? Gambar ini tidak berisi data pemandangan. Sudah ka Anda aktifkan ini ketika ekspor?",
     "cannotRestoreFromImage": "Pemandangan tidak dapat dipulihkan dari file gambar ini"
   },
   "toolBar": {
@@ -161,6 +161,7 @@
     "freeDraw": "Klik dan seret, lepaskan jika Anda selesai",
     "text": "Tip: Anda juga dapat menambahkan teks dengan klik ganda di mana saja dengan alat pemilihan",
     "linearElementMulti": "Klik pada titik akhir atau tekan Escape atau Enter untuk menyelesaikan",
+    "lockAngle": "Anda dapat menjaga sudut dengan menahan SHIFT",
     "resize": "Anda dapat menjaga proposi dengan menekan SHIFT sambil mengubah ukuran,\ntekan AlT untuk mengubah ukuran dari tengah",
     "rotate": "Anda dapat menjaga sudut dengan menahan SHIFT sambil memutar",
     "lineEditor_info": "Klik ganda atau tekan Enter untuk mengedit titik",
@@ -213,7 +214,7 @@
     "textNewLine": "Tambahkan baris baru (teks)",
     "textFinish": "Selesai mengedit (teks)",
     "zoomToFit": "Perbesar agar sesuai dengan semua elemen",
-    "zoomToSelection": "",
+    "zoomToSelection": "Perbesar ke seleksi",
     "preventBinding": "Cegah pengikatan panah"
   },
   "encrypted": {

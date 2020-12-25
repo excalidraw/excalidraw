@@ -76,8 +76,7 @@
     "group": "建立群組",
     "ungroup": "取消群組",
     "collaborators": "協作者",
-    "toggleGridMode": "切換格線模式",
-    "toggleStats": "切換詳細統計",
+    "gridMode": "網格模式",
     "addToLibrary": "加入資料庫",
     "removeFromLibrary": "從資料庫中移除",
     "libraryLoadingMessage": "資料庫讀取中…",
@@ -118,9 +117,10 @@
     "redo": "重做",
     "roomDialog": "開始即時協作",
     "createNewRoom": "建立新協作會議室",
-    "toggleFullScreen": "切換全螢幕",
-    "toggleDarkMode": "切換深色模式",
-    "toggleZenMode": "切換專注模式",
+    "fullScreen": "全螢幕",
+    "darkMode": "深色模式",
+    "lightMode": "淺色模式",
+    "zenMode": "專注模式",
     "exitZenMode": "離開專注模式"
   },
   "alerts": {
@@ -136,7 +136,7 @@
     "loadSceneOverridePrompt": "讀取外部圖樣將取代目前的內容。是否要繼續？",
     "errorLoadingLibrary": "載入第三方套件時出現錯誤。",
     "confirmAddLibrary": "這將會將 {{numShapes}} 個圖形加入你的資料庫，你確定嗎？",
-    "imageDoesNotContainScene": "圖檔中未包含場景資料。輸出檔案時是否有包含此資料？",
+    "imageDoesNotContainScene": "目前尚不支援載入圖片。\n您是否要載入場景？此圖片中並無任何場景資料，輸出時是否有選擇包含？",
     "cannotRestoreFromImage": "無法由此檔案回復場景。"
   },
   "toolBar": {
@@ -161,6 +161,7 @@
     "freeDraw": "點擊並拖曳來繪圖，放開即結束",
     "text": "提示：亦可使用選取工具在任何地方雙擊來加入文字",
     "linearElementMulti": "按下 Escape 或 Enter 以結束繪製",
+    "lockAngle": "按住 SHIFT 可限制旋轉角度",
     "resize": "縮放時按住 Shift 可保持原比例縮放；\\n按住 Alt 可由中心點進行縮放",
     "rotate": "旋轉時按住 Shift 可限制旋轉角度",
     "lineEditor_info": "雙擊滑鼠左鍵或按 Enter 來編輯控制點",

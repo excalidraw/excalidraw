@@ -76,8 +76,7 @@
     "group": "Gruppera markering",
     "ungroup": "Avgruppera markering",
     "collaborators": "Medarbetare",
-    "toggleGridMode": "Växla rutnätsläge",
-    "toggleStats": "Visa/dölj statistik för nördar",
+    "gridMode": "Rutnätsläge",
     "addToLibrary": "Lägg till i biblioteket",
     "removeFromLibrary": "Ta bort från bibliotek",
     "libraryLoadingMessage": "Laddar bibliotek...",
@@ -118,9 +117,10 @@
     "redo": "Gör om",
     "roomDialog": "Starta live-samarbete",
     "createNewRoom": "Skapa ett nytt rum",
-    "toggleFullScreen": "Växla fullskärmsläge",
-    "toggleDarkMode": "Växla mörkt läge",
-    "toggleZenMode": "Växla zen-läge",
+    "fullScreen": "Helskärm",
+    "darkMode": "Mörkt läge",
+    "lightMode": "Ljust läge",
+    "zenMode": "Zen-läge",
     "exitZenMode": "Gå ur zen-läge"
   },
   "alerts": {
@@ -136,7 +136,7 @@
     "loadSceneOverridePrompt": "Laddning av extern skiss kommer att ersätta ditt befintliga innehåll. Vill du fortsätta?",
     "errorLoadingLibrary": "Fel vid inläsning av tredjeparts bibliotek.",
     "confirmAddLibrary": "Detta kommer att lägga till {{numShapes}} form(er) till ditt bibliotek. Är du säker?",
-    "imageDoesNotContainScene": "Bildfilen innehåller inte skissdata. Har du aktiverat detta under export?",
+    "imageDoesNotContainScene": "Importering av bilder stöds inte just nu.\n\nVill du importera en skiss? Den här bilden verkar inte innehålla någon skissdata. Har du aktiverat detta under export?",
     "cannotRestoreFromImage": "Skiss kunde inte återställas från denna bildfil"
   },
   "toolBar": {
@@ -161,6 +161,7 @@
     "freeDraw": "Klicka och dra, släpp när du är klar",
     "text": "Tips: du kan också lägga till text genom att dubbelklicka var som helst med markeringsverktyget",
     "linearElementMulti": "Klicka på sista punkten eller tryck Escape eller Enter för att avsluta",
+    "lockAngle": "Du kan begränsa vinkeln genom att hålla SKIFT",
     "resize": "Du kan behålla proportioner genom att hålla SHIFT medan du ändrar storlek,\nhåller du ALT ändras storlek relativt mitten",
     "rotate": "Du kan begränsa vinklar genom att hålla SHIFT medan du roterar",
     "lineEditor_info": "Dubbelklicka eller tryck på Enter för att redigera punkter",
