@@ -196,9 +196,8 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
     height: window.innerHeight,
   });
   const [errorMessage, setErrorMessage] = useState("");
-  const currentLang = languageDetector.detect() || languages[0];
-  // @ts-ignore
-  const [lang, setLang] = useState(currentLang.lng);
+  const currentLang = languageDetector.detect() || languages[0].lng;
+  const [lang, setLang] = useState(currentLang);
 
   useLayoutEffect(() => {
     const onResize = () => {
