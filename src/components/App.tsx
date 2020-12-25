@@ -177,6 +177,10 @@ import {
   trackEvent,
 } from "../analytics";
 import { Stats } from "./Stats";
+import { createState, useStateDesigner } from "@state-designer/react";
+import { X } from "react-feather";
+import { motion, AnimateSharedLayout, AnimatePresence } from "framer-motion";
+import "../css/toast_style.css";
 
 const { history } = createHistory();
 
@@ -269,6 +273,111 @@ export type ExcalidrawImperativeAPI = {
   readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
   ready: true;
 };
+
+interface ToastMessage {
+  id: string;
+  message: string;
+  delay: number;
+  autohide?: boolean;
+}
+
+export const toastState = createState({
+  data: {
+    toasts: {} as Record<string, ToastMessage>,
+  },
+  on: {
+    SHOWED_TOAST: "addToast",
+    DISMISSED_TOAST: "deleteToast",
+  },
+  actions: {
+    addToast(
+      data,
+      payload: { message: string; autohide?: boolean; delay?: number },
+    ) {
+      const id = "unique";
+      const { message, autohide = true, delay = 5000 } = payload;
+      data.toasts[id] = { id, message, autohide, delay };
+    },
+    deleteToast(data, payload: { id: string }) {
+      const { id } = payload;
+      delete data.toasts[id];
+    },
+  },
+});
+
+interface MessageProps {
+  toast: ToastMessage;
+}
+
+function Toast({ toast }: MessageProps) {
+  React.useEffect(() => {
+    if (!toast.autohide) {
+      return;
+    }
+
+    const timeout = setTimeout(
+      () => toastState.send("DISMISSED_TOAST", { id: toast.id }),
+      toast.delay,
+    );
+    return () => clearTimeout(timeout);
+  }, [toast]);
+
+  return (
+    <motion.div
+      className="toast-message"
+      layoutId={toast.id}
+      initial={{ opacity: 0, y: 32 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{
+        opacity: 0,
+        x: 16,
+        transition: {
+          type: "spring",
+          damping: 20,
+          stiffness: 300,
+          restDelta: 1,
+          restSpeed: 1,
+        },
+      }}
+      transition={{
+        type: "spring",
+        damping: 24,
+        stiffness: 200,
+      }}
+    >
+      <p>{toast.message}</p>
+      <button
+        onClick={() => toastState.send("DISMISSED_TOAST", { id: toast.id })}
+      >
+        <X />
+      </button>
+    </motion.div>
+  );
+}
+
+function ToastContainer() {
+  const local = useStateDesigner(toastState);
+
+  return (
+    <AnimateSharedLayout>
+      <motion.div className="toast-container" layout>
+        <AnimatePresence>
+          {Object.values(local.data.toasts).map((toast) => (
+            <Toast key={toast.id} toast={toast} />
+          ))}
+        </AnimatePresence>
+      </motion.div>
+    </AnimateSharedLayout>
+  );
+}
+
+function createToast(message: string) {
+  toastState.send("SHOWED_TOAST", {
+    message,
+    autohide: true,
+    delay: 3000,
+  });
+}
 
 class App extends React.Component<ExcalidrawProps, AppState> {
   canvas: HTMLCanvasElement | null = null;
@@ -366,6 +475,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           left: offsetLeft,
         }}
       >
+        <ToastContainer />
         <LayerUI
           canvas={this.canvas}
           appState={this.state}
@@ -899,10 +1009,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   private cutAll = () => {
     this.copyAll();
     this.actionManager.executeAction(actionDeleteSelected);
+    createToast("Cut to clipboard! ");
   };
 
   private copyAll = () => {
     copyToClipboard(this.scene.getElements(), this.state);
+    createToast("Copied to clipboard!");
   };
 
   private copyToClipboardAsPng = async () => {
@@ -917,6 +1029,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         this.canvas!,
         this.state,
       );
+      createToast("Copied to clipboard as PNG!");
     } catch (error) {
       console.error(error);
       this.setState({ errorMessage: error.message });
@@ -936,6 +1049,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         this.canvas!,
         this.state,
       );
+      createToast("Copied to clipboard as SVG!");
     } catch (error) {
       console.error(error);
       this.setState({ errorMessage: error.message });

@@ -1,0 +1,59 @@
+html,
+* {
+  box-sizing: border-box;
+}
+
+.App {
+  font-size: 1em;
+  font-family: sans-serif;
+}
+
+.toast-options {
+  display: grid;
+  align-items: center;
+  gap: 16px;
+  margin: 16px 0;
+  grid-template-columns: auto 1fr;
+}
+
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  width: 100%;
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+  align-items: center;
+  pointer-events: none;
+}
+
+.toast-message {
+  pointer-events: all;
+  display: flex;
+  align-items: center;
+  background-color: #ffffff;
+  color: #333333;
+  width: fit-content;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(144, 144, 144, 0.4);
+  padding: 8px 8px 4px 8px;
+  margin-top: 16px;
+}
+
+.toast-message > button {
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 8px;
+  margin-left: 10px;
+  outline: none;
+}
+
+.toast-message > button:hover {
+  background-color: #efefef;
+}
+
+.toast-message > button > svg {
+  height: 1em;
+  width: 1em;
+}
