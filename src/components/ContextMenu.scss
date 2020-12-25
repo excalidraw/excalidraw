@@ -77,7 +77,7 @@
   @media #{$media-query} {
     .context-menu-option {
       display: block;
-      margin-inline-end: 0px;
+      margin-inline-end: 0;
 
       .context-menu-option__shortcut {
         display: none;
