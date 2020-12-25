@@ -29,6 +29,7 @@ import { SAVE_TO_LOCAL_STORAGE_TIMEOUT } from "./app_constants";
 import { EVENT_LOAD, EVENT_SHARE, trackEvent } from "../analytics";
 import { ErrorDialog } from "../components/ErrorDialog";
 import { getDefaultAppState } from "../appState";
+import { APP_NAME, TITLE_TIMEOUT } from "../constants";
 import { LanguageList } from "./components/LanguageList";
 
 const languageDetector = new LanguageDetector();
@@ -129,7 +130,7 @@ const initializeScene = async (opts: {
         scene = await loadScene(jsonMatch[1], jsonMatch[2], initialData);
       }
       if (!isCollabScene) {
-        window.history.replaceState({}, "Excalidraw", window.location.origin);
+        window.history.replaceState({}, APP_NAME, window.location.origin);
       }
     } else {
       // https://github.com/excalidraw/excalidraw/issues/1919
@@ -148,7 +149,7 @@ const initializeScene = async (opts: {
       }
 
       isCollabScene = false;
-      window.history.replaceState({}, "Excalidraw", window.location.origin);
+      window.history.replaceState({}, APP_NAME, window.location.origin);
     }
   }
   if (isCollabScene) {
@@ -260,6 +261,10 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
       }
     };
 
+    const titleTimeout = setTimeout(
+      () => (document.title = APP_NAME),
+      TITLE_TIMEOUT,
+    );
     window.addEventListener(EVENT.HASHCHANGE, onHashChange, false);
     window.addEventListener(EVENT.UNLOAD, onBlur, false);
     window.addEventListener(EVENT.BLUR, onBlur, false);
@@ -267,6 +272,7 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
       window.removeEventListener(EVENT.HASHCHANGE, onHashChange, false);
       window.removeEventListener(EVENT.UNLOAD, onBlur, false);
       window.removeEventListener(EVENT.BLUR, onBlur, false);
+      clearTimeout(titleTimeout);
     };
   }, [collab.initializeSocketClient]);
 

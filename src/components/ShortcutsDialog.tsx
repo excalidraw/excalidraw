@@ -210,16 +210,13 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
                 label={t("shortcutsDialog.zoomToSelection")}
                 shortcuts={["Shift+2"]}
               />
+              <Shortcut label={t("buttons.fullScreen")} shortcuts={["F"]} />
               <Shortcut
-                label={t("buttons.toggleFullScreen")}
-                shortcuts={["F"]}
-              />
-              <Shortcut
-                label={t("buttons.toggleZenMode")}
+                label={t("buttons.zenMode")}
                 shortcuts={[getShortcutKey("Alt+Z")]}
               />
               <Shortcut
-                label={t("labels.toggleGridMode")}
+                label={t("labels.gridMode")}
                 shortcuts={[getShortcutKey("CtrlOrCmd+'")]}
               />
             </ShortcutIsland>
