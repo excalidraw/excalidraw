@@ -69,9 +69,9 @@ describe("move element", () => {
 
     // bind line to two rectangles
     bindOrUnbindLinearElement(
-      line as NonDeleted<ExcalidrawLinearElement>,
-      rectA as ExcalidrawRectangleElement,
-      rectB as ExcalidrawRectangleElement,
+      line.get() as NonDeleted<ExcalidrawLinearElement>,
+      rectA.get() as ExcalidrawRectangleElement,
+      rectB.get() as ExcalidrawRectangleElement,
     );
 
     // select the second rectangles
