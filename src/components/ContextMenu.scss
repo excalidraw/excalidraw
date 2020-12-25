@@ -79,6 +79,10 @@
       display: block;
       margin-inline-end: 0;
 
+      div:nth-child(1) {
+        margin-inline-end: 0;
+      }
+
       .context-menu-option__shortcut {
         display: none;
       }
