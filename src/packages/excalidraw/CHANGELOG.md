@@ -36,9 +36,11 @@ Please add the latest change on the top under the correct section.
 - Fix element visibility and zoom on cursor when canvas offset isn't 0. [#2534](https://github.com/excalidraw/excalidraw/pull/2534)
 - Fix Library Menu Layout [#2502](https://github.com/excalidraw/excalidraw/pull/2502)
 - Support number with commas in charts [#2636](https://github.com/excalidraw/excalidraw/pull/2636)
+- Don't break zoom when zooming in on UI [#2638](https://github.com/excalidraw/excalidraw/pull/2638)
 
 ### Improvements
 
+- Display proper tooltip for 2-point lines during resize, and normalize modifier key labels in hints [#2655](https://github.com/excalidraw/excalidraw/pull/2655)
 - Improve error message around importing images [#2619](https://github.com/excalidraw/excalidraw/pull/2619)
 - Add tooltip with icon for embedding scenes [#2532](https://github.com/excalidraw/excalidraw/pull/2532)
 - RTL support for the stats dialog [#2530](https://github.com/excalidraw/excalidraw/pull/2530)

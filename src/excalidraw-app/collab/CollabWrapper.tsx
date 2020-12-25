@@ -1,7 +1,7 @@
 import React, { PureComponent } from "react";
 import throttle from "lodash.throttle";
 
-import { ENV, EVENT } from "../../constants";
+import { APP_NAME, ENV, EVENT } from "../../constants";
 
 import {
   decryptAESGEM,
@@ -157,11 +157,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   };
 
   openPortal = async () => {
-    window.history.pushState(
-      {},
-      "Excalidraw",
-      await generateCollaborationLink(),
-    );
+    window.history.pushState({}, APP_NAME, await generateCollaborationLink());
     const elements = this.excalidrawRef.current!.getSceneElements();
     // remove deleted elements from elements array & history to ensure we don't
     // expose potentially sensitive user data in case user manually deletes
@@ -178,7 +174,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
   closePortal = () => {
     this.saveCollabRoomToFirebase();
-    window.history.pushState({}, "Excalidraw", window.location.origin);
+    window.history.pushState({}, APP_NAME, window.location.origin);
     this.destroySocketClient();
     trackEvent(EVENT_SHARE, "session end");
   };
