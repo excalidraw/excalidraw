@@ -63,7 +63,7 @@ export const Dialog = (props: {
     islandNode.addEventListener("keydown", handleKeyDown);
 
     return () => islandNode.removeEventListener("keydown", handleKeyDown);
-  }, [islandNode]);
+  }, [islandNode, props.autofocus]);
 
   const queryFocusableElements = (node: HTMLElement) => {
     const focusableElements = node.querySelectorAll<HTMLElement>(
