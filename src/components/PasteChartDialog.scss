@@ -10,21 +10,27 @@
     .ChartPreview {
       margin: 8px;
       text-align: center;
-      width: 128px;
+      width: 192px;
       height: 128px;
-      line-height: 128px;
       border-radius: 2px;
       padding: 1px;
-      border: 1px solid $oc-gray-5;
+      border: 1px solid $oc-gray-4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      div {
+        display: inline-block;
+      }
 
       svg {
-        max-width: 96px;
-        max-width: 96px;
+        max-height: 128px;
+        max-width: 192px;
       }
 
       &.selected {
         padding: 0;
-        border: 2px solid $oc-blue-5;
+        border: 2px solid $oc-green-5;
       }
     }
   }

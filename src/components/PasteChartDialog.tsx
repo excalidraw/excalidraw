@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { renderSpreadsheet, Spreadsheet } from "../charts";
 import { ChartType } from "../element/types";
 import { exportToSvg } from "../scene/export";
@@ -12,21 +12,37 @@ const ChartPreviewBtn = (props: {
   selected: boolean;
   onClick: (chartType: ChartType) => void;
 }) => {
-  let svg: SVGSVGElement;
-  if (props.spreadsheet) {
+  const ref = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!props.spreadsheet) {
+      return;
+    }
+
     const chartPreview = renderSpreadsheet(
       props.chartType,
       props.spreadsheet,
       0,
       0,
     );
-    svg = exportToSvg(chartPreview as any, {
+    const svg = exportToSvg(chartPreview as any, {
       exportBackground: false,
       viewBackgroundColor: "#fff",
       shouldAddWatermark: false,
     });
-    console.info("#####", svg);
-  }
+    for (const child of ref.current!.children) {
+      if (child.tagName !== "svg") {
+        continue;
+      }
+      ref.current!.removeChild(child);
+    }
+    ref.current!.appendChild(svg);
+
+    const current = ref.current!;
+    return () => {
+      current.removeChild(svg);
+    };
+  });
 
   return (
     <a
@@ -34,7 +50,7 @@ const ChartPreviewBtn = (props: {
       className={`ChartPreview ${props.selected ? "selected" : ""}`}
       onClick={() => props.onClick(props.chartType)}
     >
-      {props.chartType}
+      <div ref={ref} />
     </a>
   );
 };
@@ -67,7 +83,7 @@ export const PasteChartDialog = ({
 
   return (
     <Dialog
-      maxWidth={420}
+      maxWidth={500}
       onCloseRequest={handleClose}
       title={"Paste chart"}
       className={"PasteChartDialog"}
