@@ -1,0 +1,15 @@
+@import "../css/_variables";
+
+.excalidraw {
+  @media #{$media-query} {
+    .ExportDialog__dialog,
+    .ExportDialog__dialog .Island {
+      height: 100%;
+      box-sizing: border-box;
+    }
+
+    .ExportDialog__dialog .Island {
+      overflow-y: auto;
+    }
+  }
+}
