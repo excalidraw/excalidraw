@@ -558,64 +558,46 @@ describe("regression tests", () => {
   });
 
   it("supports nested groups", () => {
-    const positions: number[][] = [];
-
-    UI.clickTool("rectangle");
-    mouse.down(10, 10);
-    mouse.up(10, 10);
-    positions.push(mouse.getPosition());
-
-    UI.clickTool("rectangle");
-    mouse.down(10, -10);
-    mouse.up(10, 10);
-    positions.push(mouse.getPosition());
-
-    UI.clickTool("rectangle");
-    mouse.down(10, -10);
-    mouse.up(10, 10);
-    positions.push(mouse.getPosition());
+    const rectA = UI.createElement("rectangle", { position: 0, size: 50 });
+    const rectB = UI.createElement("rectangle", { position: 100, size: 50 });
+    const rectC = UI.createElement("rectangle", { position: 200, size: 50 });
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       Keyboard.keyPress(KEYS.A);
       Keyboard.codePress(CODES.G);
     });
 
-    mouse.doubleClick();
+    mouse.doubleClickOn(rectC);
     Keyboard.withModifierKeys({ shift: true }, () => {
-      mouse.restorePosition(...positions[0]);
-      mouse.click();
+      mouse.clickOn(rectA);
     });
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       Keyboard.codePress(CODES.G);
     });
 
-    const groupIds = h.elements[2].groupIds;
-    expect(groupIds.length).toBe(2);
-    expect(h.elements[1].groupIds).toEqual(groupIds);
-    expect(h.elements[0].groupIds).toEqual(groupIds.slice(1));
+    expect(rectC.groupIds.length).toBe(2);
+    expect(rectA.groupIds).toEqual(rectC.groupIds);
+    expect(rectB.groupIds).toEqual(rectA.groupIds.slice(1));
 
-    mouse.click(50, 50);
+    mouse.click(0, 100);
     expect(API.getSelectedElements().length).toBe(0);
-    mouse.restorePosition(...positions[0]);
-    mouse.click();
+
+    mouse.clickOn(rectA);
     expect(API.getSelectedElements().length).toBe(3);
     expect(h.state.editingGroupId).toBe(null);
 
-    mouse.doubleClick();
+    mouse.doubleClickOn(rectA);
     expect(API.getSelectedElements().length).toBe(2);
-    expect(h.state.editingGroupId).toBe(groupIds[1]);
+    expect(h.state.editingGroupId).toBe(rectA.groupIds[1]);
 
-    mouse.doubleClick();
+    mouse.doubleClickOn(rectA);
     expect(API.getSelectedElements().length).toBe(1);
-    expect(h.state.editingGroupId).toBe(groupIds[0]);
+    expect(h.state.editingGroupId).toBe(rectA.groupIds[0]);
 
-    // click out of the group
-    mouse.restorePosition(...positions[1]);
-    mouse.click();
-    expect(API.getSelectedElements().length).toBe(0);
-    mouse.click();
+    // click outside current (sub)group
+    mouse.clickOn(rectB);
     expect(API.getSelectedElements().length).toBe(3);
-    mouse.doubleClick();
+    mouse.doubleClickOn(rectB);
     expect(API.getSelectedElements().length).toBe(1);
   });
 
