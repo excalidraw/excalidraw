@@ -1,3 +1,4 @@
+import oc from "open-color";
 import React, { useEffect, useRef } from "react";
 import { renderSpreadsheet, Spreadsheet } from "../charts";
 import { ChartType } from "../element/types";
@@ -27,15 +28,9 @@ const ChartPreviewBtn = (props: {
     );
     const svg = exportToSvg(chartPreview as any, {
       exportBackground: false,
-      viewBackgroundColor: "#fff",
+      viewBackgroundColor: oc.white,
       shouldAddWatermark: false,
     });
-    for (const child of ref.current!.children) {
-      if (child.tagName !== "svg") {
-        continue;
-      }
-      ref.current!.removeChild(child);
-    }
     ref.current!.appendChild(svg);
 
     const current = ref.current!;
