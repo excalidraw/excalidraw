@@ -42,7 +42,7 @@
     }
 
     &.dangerous {
-      div:nth-child(1) {
+      .context-menu-option__label {
         color: $oc-red-7;
       }
     }
@@ -51,7 +51,7 @@
       justify-self: start;
       margin-inline-end: 20px;
     }
-    div:nth-child(2) {
+    .context-menu-option__shortcut {
       justify-self: end;
       opacity: 0.6;
       font-size: 0.7rem;
@@ -63,7 +63,7 @@
     background-color: var(--select-highlight-color);
 
     &.dangerous {
-      div:nth-child(1) {
+      .context-menu-option__label {
         color: var(--popup-background-color);
       }
       background-color: $oc-red-6;
