@@ -51,7 +51,7 @@ Please add the latest change on the top under the correct section.
 
 - Bump ini from 1.3.5 to 1.3.7 in /src/packages/excalidraw [#2500](https://github.com/excalidraw/excalidraw/pull/2500)
 
-### Doc
+### Docs
 
 - Document some of the more exotic element props [#2673](https://github.com/excalidraw/excalidraw/pull/2673)
 
