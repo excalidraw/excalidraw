@@ -47,7 +47,7 @@
       }
     }
 
-    div:nth-child(1) {
+    .context-menu-option__label {
       justify-self: start;
       margin-inline-end: 20px;
     }
@@ -80,7 +80,7 @@
       margin-inline-end: 0;
 
       .context-menu-option__label {
-        margin-inline-end: 0 !important;
+        margin-inline-end: 0;
       }
 
       .context-menu-option__shortcut {
