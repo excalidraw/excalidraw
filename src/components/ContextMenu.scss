@@ -77,7 +77,6 @@
   @media #{$media-query} {
     .context-menu-option {
       display: block;
-      margin-inline-end: 0;
 
       .context-menu-option__label {
         margin-inline-end: 0 !important;
