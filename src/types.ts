@@ -81,8 +81,6 @@ export type AppState = {
   previousSelectedElementIds: { [id: string]: boolean };
   shouldCacheIgnoreZoom: boolean;
   showShortcutsDialog: boolean;
-  spreadsheet: Spreadsheet | null;
-  showPasteChartDialog: boolean;
   zenModeEnabled: boolean;
   appearance: "light" | "dark";
   gridSize: number | null;
@@ -101,7 +99,11 @@ export type AppState = {
   fileHandle: import("browser-nativefs").FileSystemHandle | null;
   collaborators: Map<string, Collaborator>;
   showStats: boolean;
-  currentChartType: ChartType;
+  charts: {
+    shown: boolean;
+    data: Spreadsheet | null;
+    currentChartType: ChartType;
+  };
 };
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };

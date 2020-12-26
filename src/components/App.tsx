@@ -994,8 +994,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         //   renderSpreadsheet(chartType, data.spreadsheet, cursorX, cursorY),
         // );
         this.setState({
-          spreadsheet: data.spreadsheet,
-          showPasteChartDialog: true,
+          charts: {
+            data: data.spreadsheet,
+            shown: true,
+            currentChartType: this.state.charts.currentChartType,
+          },
         });
       } else if (data.elements) {
         this.addElementsFromPasteOrLibrary(data.elements);

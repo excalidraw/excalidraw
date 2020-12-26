@@ -36,11 +36,14 @@ export const PasteChartDialog = ({
   }, [onClose]);
 
   const handleChart = (chartType: ChartType) => {
-    console.info("### Paste", chartType, appState.spreadsheet);
+    console.info("### Paste", chartType, appState.charts.data);
     setAppState({
-      currentChartType: chartType,
+      charts: {
+        shown: false,
+        data: null,
+        currentChartType: chartType,
+      },
     });
-    onClose();
   };
 
   return (
@@ -53,14 +56,14 @@ export const PasteChartDialog = ({
       <div className={"container"}>
         <ChartPreviewBtn
           chartType="bar"
-          spreadsheet={appState.spreadsheet}
-          selected={appState.currentChartType === "bar"}
+          spreadsheet={appState.charts.data}
+          selected={appState.charts.currentChartType === "bar"}
           onClick={handleChart}
         />
         <ChartPreviewBtn
           chartType="line"
-          spreadsheet={appState.spreadsheet}
-          selected={appState.currentChartType === "line"}
+          spreadsheet={appState.charts.data}
+          selected={appState.charts.currentChartType === "line"}
           onClick={handleChart}
         />
       </div>

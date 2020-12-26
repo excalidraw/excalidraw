@@ -61,8 +61,6 @@ export const getDefaultAppState = (): Omit<
     previousSelectedElementIds: {},
     shouldCacheIgnoreZoom: false,
     showShortcutsDialog: false,
-    showPasteChartDialog: false,
-    spreadsheet: null,
     suggestedBindings: [],
     zenModeEnabled: false,
     gridSize: null,
@@ -74,7 +72,11 @@ export const getDefaultAppState = (): Omit<
     fileHandle: null,
     collaborators: new Map(),
     showStats: false,
-    currentChartType: "bar",
+    charts: {
+      shown: false,
+      data: null,
+      currentChartType: "bar",
+    },
   };
 };
 
@@ -141,8 +143,7 @@ const APP_STATE_STORAGE_CONF = (<
   shouldAddWatermark: { browser: true, export: false },
   shouldCacheIgnoreZoom: { browser: true, export: false },
   showShortcutsDialog: { browser: false, export: false },
-  showPasteChartDialog: { browser: false, export: false },
-  spreadsheet: { browser: false, export: false },
+  charts: { browser: true, export: false },
   suggestedBindings: { browser: false, export: false },
   viewBackgroundColor: { browser: true, export: true },
   width: { browser: false, export: false },
@@ -153,7 +154,6 @@ const APP_STATE_STORAGE_CONF = (<
   fileHandle: { browser: false, export: false },
   collaborators: { browser: false, export: false },
   showStats: { browser: true, export: false },
-  currentChartType: { browser: true, export: false },
 });
 
 const _clearAppStateForStorage = <ExportType extends "export" | "browser">(

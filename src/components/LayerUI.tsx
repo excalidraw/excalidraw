@@ -620,11 +620,13 @@ const LayerUI = ({
           onClose={() => setAppState({ showShortcutsDialog: false })}
         />
       )}
-      {appState.showPasteChartDialog && (
+      {appState.charts.shown && (
         <PasteChartDialog
           setAppState={setAppState}
           appState={appState}
-          onClose={() => setAppState({ showPasteChartDialog: false })}
+          onClose={() =>
+            setAppState({ charts: { ...appState.charts, shown: false } })
+          }
         />
       )}
       {renderFixedSideContainer()}
