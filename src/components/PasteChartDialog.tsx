@@ -39,13 +39,13 @@ const ChartPreviewBtn = (props: {
   });
 
   return (
-    <a
-      href={`#${props.chartType}`}
-      className={`ChartPreview ${props.selected ? "selected" : ""}`}
+    <button
+      data-chart-type={props.chartType}
+      className="ChartPreview"
       onClick={() => props.onClick(props.chartType)}
     >
       <div ref={ref} />
-    </a>
+    </button>
   );
 };
 
@@ -82,6 +82,17 @@ export const PasteChartDialog = ({
     });
   };
 
+  const focusActiveChartType = (node: HTMLDivElement | null) => {
+    if (!node) {
+      return;
+    }
+    const button = node.querySelector(
+      `.ChartPreview[data-chart-type="${appState.charts.currentChartType}"]`,
+    );
+
+    (button as HTMLDivElement).focus();
+  };
+
   return (
     <Dialog
       maxWidth={500}
@@ -89,7 +100,7 @@ export const PasteChartDialog = ({
       title={"Paste chart"}
       className={"PasteChartDialog"}
     >
-      <div className={"container"}>
+      <div className={"container"} ref={focusActiveChartType}>
         <ChartPreviewBtn
           chartType="bar"
           spreadsheet={appState.charts.data}
