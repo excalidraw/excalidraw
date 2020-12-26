@@ -1,6 +1,7 @@
 import React from "react";
-import { Spreadsheet } from "../charts";
+import { renderSpreadsheet, Spreadsheet } from "../charts";
 import { ChartType } from "../element/types";
+import { exportToSvg } from "../scene/export";
 import { AppState } from "../types";
 import { Dialog } from "./Dialog";
 import "./PasteChartDialog.scss";
@@ -10,15 +11,33 @@ const ChartPreviewBtn = (props: {
   chartType: ChartType;
   selected: boolean;
   onClick: (chartType: ChartType) => void;
-}) => (
-  <a
-    href={`#${props.chartType}`}
-    className={`ChartPreview ${props.selected ? "selected" : ""}`}
-    onClick={() => props.onClick(props.chartType)}
-  >
-    {props.chartType}
-  </a>
-);
+}) => {
+  let svg: SVGSVGElement;
+  if (props.spreadsheet) {
+    const chartPreview = renderSpreadsheet(
+      props.chartType,
+      props.spreadsheet,
+      0,
+      0,
+    );
+    svg = exportToSvg(chartPreview as any, {
+      exportBackground: false,
+      viewBackgroundColor: "#fff",
+      shouldAddWatermark: false,
+    });
+    console.info("#####", svg);
+  }
+
+  return (
+    <a
+      href={`#${props.chartType}`}
+      className={`ChartPreview ${props.selected ? "selected" : ""}`}
+      onClick={() => props.onClick(props.chartType)}
+    >
+      {props.chartType}
+    </a>
+  );
+};
 
 export const PasteChartDialog = ({
   setAppState,

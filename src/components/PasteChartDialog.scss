@@ -17,6 +17,11 @@
       padding: 1px;
       border: 1px solid $oc-gray-5;
 
+      svg {
+        max-width: 96px;
+        max-width: 96px;
+      }
+
       &.selected {
         padding: 0;
         border: 2px solid $oc-blue-5;
