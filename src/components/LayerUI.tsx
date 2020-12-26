@@ -622,6 +622,7 @@ const LayerUI = ({
       )}
       {appState.showPasteChartDialog && (
         <PasteChartDialog
+          setAppState={setAppState}
           appState={appState}
           onClose={() => setAppState({ showPasteChartDialog: false })}
         />

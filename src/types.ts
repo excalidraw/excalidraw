@@ -9,6 +9,7 @@ import {
   GroupId,
   ExcalidrawBindableElement,
   Arrowhead,
+  ChartType,
 } from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -100,6 +101,7 @@ export type AppState = {
   fileHandle: import("browser-nativefs").FileSystemHandle | null;
   collaborators: Map<string, Collaborator>;
   showStats: boolean;
+  currentChartType: ChartType;
 };
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };

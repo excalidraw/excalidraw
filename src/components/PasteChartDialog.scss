@@ -7,9 +7,20 @@
       align-items: center;
       justify-content: center;
     }
-    .chart-btn {
-      padding: 32px;
+    .ChartPreview {
       margin: 8px;
+      text-align: center;
+      width: 128px;
+      height: 128px;
+      line-height: 128px;
+      border-radius: 2px;
+      padding: 1px;
+      border: 1px solid $oc-gray-5;
+
+      &.selected {
+        padding: 0;
+        border: 2px solid $oc-blue-5;
+      }
     }
   }
 }

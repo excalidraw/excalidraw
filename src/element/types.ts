@@ -10,6 +10,7 @@ export type StrokeSharpness = "round" | "sharp";
 export type StrokeStyle = "solid" | "dashed" | "dotted";
 export type TextAlign = "left" | "center" | "right";
 export type VerticalAlign = "top" | "middle";
+export type ChartType = "bar" | "line";
 
 type _ExcalidrawElementBase = Readonly<{
   id: string;
