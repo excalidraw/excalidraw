@@ -61,7 +61,7 @@ interface LayerUIProps {
   elements: readonly NonDeletedExcalidrawElement[];
   onCollabButtonClick?: () => void;
   onLockToggle: () => void;
-  onInsertShape: (elements: LibraryItem) => void;
+  onInsertElements: (elements: readonly NonDeletedExcalidrawElement[]) => void;
   zenModeEnabled: boolean;
   toggleZenMode: () => void;
   lng: string;
@@ -319,7 +319,7 @@ const LayerUI = ({
   elements,
   onCollabButtonClick,
   onLockToggle,
-  onInsertShape,
+  onInsertElements,
   zenModeEnabled,
   toggleZenMode,
   isCollaborating,
@@ -457,7 +457,7 @@ const LayerUI = ({
     <LibraryMenu
       pendingElements={getSelectedElements(elements, appState)}
       onClickOutside={closeLibrary}
-      onInsertShape={onInsertShape}
+      onInsertShape={onInsertElements}
       onAddToLibrary={deselectItems}
       setAppState={setAppState}
     />
@@ -624,7 +624,7 @@ const LayerUI = ({
         <PasteChartDialog
           setAppState={setAppState}
           appState={appState}
-          onInsertShape={onInsertShape}
+          onInsertChart={onInsertElements}
           onClose={() =>
             setAppState({ charts: { ...appState.charts, shown: false } })
           }

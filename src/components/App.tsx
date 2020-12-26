@@ -360,7 +360,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           elements={this.scene.getElements()}
           onCollabButtonClick={onCollabButtonClick}
           onLockToggle={this.toggleLock}
-          onInsertShape={(elements) =>
+          onInsertElements={(elements) =>
             this.addElementsFromPasteOrLibrary(
               elements,
               DEFAULT_PASTE_X,

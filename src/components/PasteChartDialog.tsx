@@ -1,32 +1,39 @@
 import oc from "open-color";
-import React, { useLayoutEffect, useRef } from "react";
-import { renderSpreadsheet, Spreadsheet } from "../charts";
+import React, { useLayoutEffect, useRef, useState } from "react";
+import { ChartElements, renderSpreadsheet, Spreadsheet } from "../charts";
 import { ChartType } from "../element/types";
 import { exportToSvg } from "../scene/export";
 import { AppState, LibraryItem } from "../types";
 import { Dialog } from "./Dialog";
 import "./PasteChartDialog.scss";
 
+type OnInsertChart = (chartType: ChartType, elements: ChartElements) => void;
+
 const ChartPreviewBtn = (props: {
   spreadsheet: Spreadsheet | null;
   chartType: ChartType;
   selected: boolean;
-  onClick: (chartType: ChartType) => void;
+  onClick: OnInsertChart;
 }) => {
   const previewRef = useRef<HTMLDivElement | null>(null);
+  const [chartElements, setChartElements] = useState<ChartElements | null>(
+    null,
+  );
 
   useLayoutEffect(() => {
     if (!props.spreadsheet) {
       return;
     }
 
-    const chartPreview = renderSpreadsheet(
+    const elements = renderSpreadsheet(
       props.chartType,
       props.spreadsheet,
       0,
       0,
     );
-    const svg = exportToSvg(chartPreview as any, {
+    setChartElements(elements);
+
+    const svg = exportToSvg(elements, {
       exportBackground: false,
       viewBackgroundColor: oc.white,
       shouldAddWatermark: false,
@@ -48,7 +55,11 @@ const ChartPreviewBtn = (props: {
   return (
     <button
       className="ChartPreview"
-      onClick={() => props.onClick(props.chartType)}
+      onClick={() => {
+        if (chartElements) {
+          props.onClick(props.chartType, chartElements);
+        }
+      }}
     >
       <div ref={previewRef} />
     </button>
@@ -59,12 +70,12 @@ export const PasteChartDialog = ({
   setAppState,
   appState,
   onClose,
-  onInsertShape,
+  onInsertChart,
 }: {
   appState: AppState;
   onClose: () => void;
   setAppState: React.Component<any, AppState>["setState"];
-  onInsertShape: (elements: LibraryItem) => void;
+  onInsertChart: (elements: LibraryItem) => void;
 }) => {
   const handleClose = React.useCallback(() => {
     if (onClose) {
@@ -72,13 +83,8 @@ export const PasteChartDialog = ({
     }
   }, [onClose]);
 
-  const handleChartClick = (chartType: ChartType) => {
-    if (appState.charts.data) {
-      onInsertShape(
-        renderSpreadsheet(chartType, appState.charts.data, 0, 0) as LibraryItem,
-      );
-    }
-    console.info("### Paste", chartType, appState.charts.data);
+  const handleChartClick = (chartType: ChartType, elements: ChartElements) => {
+    onInsertChart(elements);
     setAppState({
       charts: {
         shown: false,

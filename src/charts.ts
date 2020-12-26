@@ -2,8 +2,10 @@ import { EVENT_MAGIC, trackEvent } from "./analytics";
 import colors from "./colors";
 import { DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE, ENV } from "./constants";
 import { newElement, newLinearElement, newTextElement } from "./element";
-import { ExcalidrawElement } from "./element/types";
+import { NonDeletedExcalidrawElement } from "./element/types";
 import { randomId } from "./random";
+
+export type ChartElements = readonly NonDeletedExcalidrawElement[];
 
 const BAR_WIDTH = 32;
 const BAR_GAP = 12;
@@ -181,7 +183,7 @@ const chartXLabels = (
   y: number,
   groupId: string,
   backgroundColor: string,
-): ExcalidrawElement[] => {
+): ChartElements => {
   return (
     spreadsheet.labels?.map((label, index) => {
       return newTextElement({
@@ -207,7 +209,7 @@ const chartYLabels = (
   y: number,
   groupId: string,
   backgroundColor: string,
-): ExcalidrawElement[] => {
+): ChartElements => {
   const minYLabel = newTextElement({
     groupIds: [groupId],
     backgroundColor,
@@ -237,7 +239,7 @@ const chartLines = (
   y: number,
   groupId: string,
   backgroundColor: string,
-): ExcalidrawElement[] => {
+): ChartElements => {
   const { chartWidth, chartHeight } = getChartDimentions(spreadsheet);
   const xLine = newLinearElement({
     backgroundColor,
@@ -300,7 +302,7 @@ const chartBaseElements = (
   groupId: string,
   backgroundColor: string,
   debug?: boolean,
-): ExcalidrawElement[] => {
+): ChartElements => {
   const { chartWidth, chartHeight } = getChartDimentions(spreadsheet);
 
   const title = spreadsheet.title
@@ -334,19 +336,19 @@ const chartBaseElements = (
     : null;
 
   return [
-    debugRect,
-    title,
+    ...(debugRect ? [debugRect] : []),
+    ...(title ? [title] : []),
     ...chartXLabels(spreadsheet, x, y, groupId, backgroundColor),
     ...chartYLabels(spreadsheet, x, y, groupId, backgroundColor),
     ...chartLines(spreadsheet, x, y, groupId, backgroundColor),
-  ].filter((element) => element !== null) as ExcalidrawElement[];
+  ];
 };
 
 const chartTypeBar = (
   spreadsheet: Spreadsheet,
   x: number,
   y: number,
-): ExcalidrawElement[] => {
+): ChartElements => {
   const max = Math.max(...spreadsheet.values);
   const groupId = randomId();
   const backgroundColor = bgColors[Math.floor(Math.random() * bgColors.length)];
@@ -382,7 +384,7 @@ const chartTypeLine = (
   spreadsheet: Spreadsheet,
   x: number,
   y: number,
-): ExcalidrawElement[] => {
+): ChartElements => {
   const max = Math.max(...spreadsheet.values);
   const groupId = randomId();
   const backgroundColor = bgColors[Math.floor(Math.random() * bgColors.length)];
@@ -475,13 +477,10 @@ export const renderSpreadsheet = (
   spreadsheet: Spreadsheet,
   x: number,
   y: number,
-): ExcalidrawElement[] => {
-  let chart: ExcalidrawElement[];
-  if (chartType === "line") {
-    chart = chartTypeLine(spreadsheet, x, y);
-  } else {
-    chart = chartTypeBar(spreadsheet, x, y);
-  }
+): ChartElements => {
   trackEvent(EVENT_MAGIC, "chart", chartType, spreadsheet.values.length);
-  return chart;
+  if (chartType === "line") {
+    return chartTypeLine(spreadsheet, x, y);
+  }
+  return chartTypeBar(spreadsheet, x, y);
 };
