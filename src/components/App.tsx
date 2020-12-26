@@ -990,17 +990,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       if (data.errorMessage) {
         this.setState({ errorMessage: data.errorMessage });
       } else if (data.spreadsheet) {
-        // const fastPaste = Date.now() - this.state.lastImportedChartTimestamp;
-        // let nextChartType = this.state.currentChartType;
-        // if (fastPaste < NEXT_CHART_TYPE_TIMEOUT) {
-        //   //TOOD: add all the types in an array and cycle through them
-        //   nextChartType = nextChartType === "bar" ? "line" : "bar";
-        // }
-
         // this.addElementsFromPasteOrLibrary(
-        //   renderSpreadsheet(nextChartType, data.spreadsheet, cursorX, cursorY),
+        //   renderSpreadsheet(chartType, data.spreadsheet, cursorX, cursorY),
         // );
-
         this.setState({
           spreadsheet: data.spreadsheet,
           showPasteChartDialog: true,
