@@ -990,9 +990,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       if (data.errorMessage) {
         this.setState({ errorMessage: data.errorMessage });
       } else if (data.spreadsheet) {
-        // this.addElementsFromPasteOrLibrary(
-        //   renderSpreadsheet(chartType, data.spreadsheet, cursorX, cursorY),
-        // );
         this.setState({
           charts: {
             data: data.spreadsheet,
