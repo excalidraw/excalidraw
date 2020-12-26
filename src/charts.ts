@@ -342,27 +342,14 @@ const chartBaseElements = (
   ].filter((element) => element !== null) as ExcalidrawElement[];
 };
 
-const getBackgroundColor = (seed?: number) => {
-  // https://stackoverflow.com/a/19303725/927631
-  const randomNumberFromSeed = (seed: number) => {
-    const x = Math.sin(seed++) * 10000;
-    return x - Math.floor(x);
-  };
-
-  return seed != null
-    ? bgColors[Math.floor(randomNumberFromSeed(seed) * bgColors.length)]
-    : bgColors[Math.floor(Math.random() * bgColors.length)];
-};
-
 const chartTypeBar = (
   spreadsheet: Spreadsheet,
   x: number,
   y: number,
-  seed?: number,
 ): ExcalidrawElement[] => {
   const max = Math.max(...spreadsheet.values);
   const groupId = randomId();
-  const backgroundColor = getBackgroundColor(seed);
+  const backgroundColor = bgColors[Math.floor(Math.random() * bgColors.length)];
 
   const bars = spreadsheet.values.map((value, index) => {
     const barHeight = (value / max) * BAR_HEIGHT;
@@ -395,11 +382,10 @@ const chartTypeLine = (
   spreadsheet: Spreadsheet,
   x: number,
   y: number,
-  seed?: number,
 ): ExcalidrawElement[] => {
   const max = Math.max(...spreadsheet.values);
   const groupId = randomId();
-  const backgroundColor = getBackgroundColor(seed);
+  const backgroundColor = bgColors[Math.floor(Math.random() * bgColors.length)];
 
   let index = 0;
   const points = [];
@@ -489,14 +475,12 @@ export const renderSpreadsheet = (
   spreadsheet: Spreadsheet,
   x: number,
   y: number,
-  /** used for background color */
-  seed?: number,
 ): ExcalidrawElement[] => {
   let chart: ExcalidrawElement[];
   if (chartType === "line") {
-    chart = chartTypeLine(spreadsheet, x, y, seed);
+    chart = chartTypeLine(spreadsheet, x, y);
   } else {
-    chart = chartTypeBar(spreadsheet, x, y, seed);
+    chart = chartTypeBar(spreadsheet, x, y);
   }
   trackEvent(EVENT_MAGIC, "chart", chartType, spreadsheet.values.length);
   return chart;
