@@ -23,6 +23,7 @@ export const Dialog = (props: {
   maxWidth?: number;
   onCloseRequest(): void;
   title: React.ReactNode;
+  autofocus?: boolean;
 }) => {
   const [islandNode, setIslandNode] = useRefState<HTMLDivElement>();
 
@@ -33,7 +34,7 @@ export const Dialog = (props: {
 
     const focusableElements = queryFocusableElements(islandNode);
 
-    if (focusableElements.length > 0) {
+    if (focusableElements.length > 0 && props.autofocus !== false) {
       // If there's an element other than close, focus it.
       (focusableElements[1] || focusableElements[0]).focus();
     }

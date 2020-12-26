@@ -1,5 +1,5 @@
 import oc from "open-color";
-import React, { useEffect, useRef } from "react";
+import React, { useLayoutEffect, useRef } from "react";
 import { renderSpreadsheet, Spreadsheet } from "../charts";
 import { ChartType } from "../element/types";
 import { exportToSvg } from "../scene/export";
@@ -13,8 +13,9 @@ const ChartPreviewBtn = (props: {
   selected: boolean;
   onClick: (chartType: ChartType) => void;
 }) => {
-  const ref = useRef<HTMLDivElement | null>(null);
-  useEffect(() => {
+  const previewRef = useRef<HTMLDivElement | null>(null);
+
+  useLayoutEffect(() => {
     if (!props.spreadsheet) {
       return;
     }
@@ -30,21 +31,26 @@ const ChartPreviewBtn = (props: {
       viewBackgroundColor: oc.white,
       shouldAddWatermark: false,
     });
-    ref.current!.appendChild(svg);
 
-    const current = ref.current!;
+    const previewNode = previewRef.current!;
+
+    previewNode.appendChild(svg);
+
+    if (props.selected) {
+      (previewNode.parentNode as HTMLDivElement).focus();
+    }
+
     return () => {
-      current.removeChild(svg);
+      previewNode.removeChild(svg);
     };
-  });
+  }, [props.spreadsheet, props.chartType, props.selected]);
 
   return (
     <button
-      data-chart-type={props.chartType}
       className="ChartPreview"
       onClick={() => props.onClick(props.chartType)}
     >
-      <div ref={ref} />
+      <div ref={previewRef} />
     </button>
   );
 };
@@ -82,25 +88,15 @@ export const PasteChartDialog = ({
     });
   };
 
-  const focusActiveChartType = (node: HTMLDivElement | null) => {
-    if (!node) {
-      return;
-    }
-    const button = node.querySelector(
-      `.ChartPreview[data-chart-type="${appState.charts.currentChartType}"]`,
-    );
-
-    (button as HTMLDivElement).focus();
-  };
-
   return (
     <Dialog
       maxWidth={500}
       onCloseRequest={handleClose}
       title={"Paste chart"}
       className={"PasteChartDialog"}
+      autofocus={false}
     >
-      <div className={"container"} ref={focusActiveChartType}>
+      <div className={"container"}>
         <ChartPreviewBtn
           chartType="bar"
           spreadsheet={appState.charts.data}
