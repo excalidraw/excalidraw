@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from "react";
 import { renderSpreadsheet, Spreadsheet } from "../charts";
 import { ChartType } from "../element/types";
 import { exportToSvg } from "../scene/export";
-import { AppState } from "../types";
+import { AppState, LibraryItem } from "../types";
 import { Dialog } from "./Dialog";
 import "./PasteChartDialog.scss";
 
@@ -14,7 +14,6 @@ const ChartPreviewBtn = (props: {
   onClick: (chartType: ChartType) => void;
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
-
   useEffect(() => {
     if (!props.spreadsheet) {
       return;
@@ -54,10 +53,12 @@ export const PasteChartDialog = ({
   setAppState,
   appState,
   onClose,
+  onInsertShape,
 }: {
   appState: AppState;
   onClose: () => void;
   setAppState: React.Component<any, AppState>["setState"];
+  onInsertShape: (elements: LibraryItem) => void;
 }) => {
   const handleClose = React.useCallback(() => {
     if (onClose) {
@@ -65,7 +66,12 @@ export const PasteChartDialog = ({
     }
   }, [onClose]);
 
-  const handleChart = (chartType: ChartType) => {
+  const handleChartClick = (chartType: ChartType) => {
+    if (appState.charts.data) {
+      onInsertShape(
+        renderSpreadsheet(chartType, appState.charts.data, 0, 0) as LibraryItem,
+      );
+    }
     console.info("### Paste", chartType, appState.charts.data);
     setAppState({
       charts: {
@@ -88,13 +94,13 @@ export const PasteChartDialog = ({
           chartType="bar"
           spreadsheet={appState.charts.data}
           selected={appState.charts.currentChartType === "bar"}
-          onClick={handleChart}
+          onClick={handleChartClick}
         />
         <ChartPreviewBtn
           chartType="line"
           spreadsheet={appState.charts.data}
           selected={appState.charts.currentChartType === "line"}
-          onClick={handleChart}
+          onClick={handleChartClick}
         />
       </div>
     </Dialog>

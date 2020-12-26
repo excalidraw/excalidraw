@@ -624,6 +624,7 @@ const LayerUI = ({
         <PasteChartDialog
           setAppState={setAppState}
           appState={appState}
+          onInsertShape={onInsertShape}
           onClose={() =>
             setAppState({ charts: { ...appState.charts, shown: false } })
           }
