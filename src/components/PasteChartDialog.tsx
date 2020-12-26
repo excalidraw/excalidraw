@@ -1,5 +1,5 @@
 import oc from "open-color";
-import React, { useLayoutEffect, useRef } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import { renderSpreadsheet, Spreadsheet } from "../charts";
 import { ChartType } from "../element/types";
 import { exportToSvg } from "../scene/export";
@@ -11,9 +11,10 @@ const ChartPreviewBtn = (props: {
   spreadsheet: Spreadsheet | null;
   chartType: ChartType;
   selected: boolean;
-  onClick: (chartType: ChartType) => void;
+  onClick: (chartType: ChartType, seed: number) => void;
 }) => {
   const previewRef = useRef<HTMLDivElement | null>(null);
+  const [seed] = useState(Math.random());
 
   useLayoutEffect(() => {
     if (!props.spreadsheet) {
@@ -25,6 +26,7 @@ const ChartPreviewBtn = (props: {
       props.spreadsheet,
       0,
       0,
+      seed,
     );
     const svg = exportToSvg(chartPreview as any, {
       exportBackground: false,
@@ -43,12 +45,12 @@ const ChartPreviewBtn = (props: {
     return () => {
       previewNode.removeChild(svg);
     };
-  }, [props.spreadsheet, props.chartType, props.selected]);
+  }, [props.spreadsheet, props.chartType, props.selected, seed]);
 
   return (
     <button
       className="ChartPreview"
-      onClick={() => props.onClick(props.chartType)}
+      onClick={() => props.onClick(props.chartType, seed)}
     >
       <div ref={previewRef} />
     </button>
@@ -72,10 +74,16 @@ export const PasteChartDialog = ({
     }
   }, [onClose]);
 
-  const handleChartClick = (chartType: ChartType) => {
+  const handleChartClick = (chartType: ChartType, seed: number) => {
     if (appState.charts.data) {
       onInsertShape(
-        renderSpreadsheet(chartType, appState.charts.data, 0, 0) as LibraryItem,
+        renderSpreadsheet(
+          chartType,
+          appState.charts.data,
+          0,
+          0,
+          seed,
+        ) as LibraryItem,
       );
     }
     console.info("### Paste", chartType, appState.charts.data);
