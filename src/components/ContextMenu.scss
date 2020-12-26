@@ -1,5 +1,5 @@
-@import "open-color/open-color.scss";
 @import "../css/_variables";
+
 .excalidraw {
   .context-menu {
     position: relative;
@@ -77,7 +77,6 @@
   @media #{$media-query} {
     .context-menu-option {
       display: block;
-      margin-inline-end: 0;
 
       .context-menu-option__label {
         margin-inline-end: 0;
