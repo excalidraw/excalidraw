@@ -15,7 +15,6 @@ import {
   trackEvent,
 } from "../analytics";
 import { getDefaultAppState } from "../appState";
-import { renderSpreadsheet } from "../charts";
 import {
   copyToClipboard,
   parseClipboard,
@@ -35,7 +34,6 @@ import {
   GRID_SIZE,
   LINE_CONFIRM_THRESHOLD,
   MIME_TYPES,
-  NEXT_CHART_TYPE_TIMEOUT,
   POINTER_BUTTON,
   TAP_TWICE_TIMEOUT,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
@@ -992,20 +990,20 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       if (data.errorMessage) {
         this.setState({ errorMessage: data.errorMessage });
       } else if (data.spreadsheet) {
-        const fastPaste = Date.now() - this.state.lastImportedChartTimestamp;
-        let nextChartType = this.state.currentChartType;
-        if (fastPaste < NEXT_CHART_TYPE_TIMEOUT) {
-          //TOOD: add all the types in an array and cycle through them
-          nextChartType = nextChartType === "bar" ? "line" : "bar";
-        }
+        // const fastPaste = Date.now() - this.state.lastImportedChartTimestamp;
+        // let nextChartType = this.state.currentChartType;
+        // if (fastPaste < NEXT_CHART_TYPE_TIMEOUT) {
+        //   //TOOD: add all the types in an array and cycle through them
+        //   nextChartType = nextChartType === "bar" ? "line" : "bar";
+        // }
 
-        this.addElementsFromPasteOrLibrary(
-          renderSpreadsheet(nextChartType, data.spreadsheet, cursorX, cursorY),
-        );
+        // this.addElementsFromPasteOrLibrary(
+        //   renderSpreadsheet(nextChartType, data.spreadsheet, cursorX, cursorY),
+        // );
 
         this.setState({
-          currentChartType: nextChartType,
-          lastImportedChartTimestamp: Date.now(),
+          spreadsheet: data.spreadsheet,
+          showPasteChartDialog: true,
         });
       } else if (data.elements) {
         this.addElementsFromPasteOrLibrary(data.elements);

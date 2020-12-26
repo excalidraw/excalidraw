@@ -88,4 +88,3 @@ export const STORAGE_KEYS = {
 export const TAP_TWICE_TIMEOUT = 300;
 export const TOUCH_CTX_MENU_TIMEOUT = 500;
 export const TITLE_TIMEOUT = 10000;
-export const NEXT_CHART_TYPE_TIMEOUT = 4000;

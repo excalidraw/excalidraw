@@ -51,6 +51,7 @@ import {
   EVENT_LIBRARY,
   trackEvent,
 } from "../analytics";
+import { PasteChartDialog } from "./PasteChartDialog";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -617,6 +618,13 @@ const LayerUI = ({
       {appState.showShortcutsDialog && (
         <ShortcutsDialog
           onClose={() => setAppState({ showShortcutsDialog: false })}
+        />
+      )}
+      {appState.showPasteChartDialog && (
+        <PasteChartDialog
+          className={"PasteChartDialog"}
+          appState={appState}
+          onClose={() => setAppState({ showPasteChartDialog: false })}
         />
       )}
       {renderFixedSideContainer()}

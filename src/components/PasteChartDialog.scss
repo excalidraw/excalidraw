@@ -1,15 +1,15 @@
 @import "../css/_variables";
 
 .excalidraw {
-  @media #{$media-query} {
-    .ExportDialog__dialog,
-    .ExportDialog__dialog .Island {
-      height: 100%;
-      box-sizing: border-box;
+  .PasteChartDialog {
+    .container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-
-    .ExportDialog__dialog .Island {
-      overflow-y: auto;
+    .chart-btn {
+      padding: 32px;
+      margin: 8px;
     }
   }
 }

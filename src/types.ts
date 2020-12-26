@@ -17,6 +17,7 @@ import { SuggestedBinding } from "./element/binding";
 import { ImportedDataState } from "./data/types";
 import { ExcalidrawImperativeAPI } from "./components/App";
 import type { ResolvablePromise } from "./utils";
+import { Spreadsheet } from "./charts";
 
 export type FlooredNumber = number & { _brand: "FlooredNumber" };
 export type Point = Readonly<RoughPoint>;
@@ -79,6 +80,8 @@ export type AppState = {
   previousSelectedElementIds: { [id: string]: boolean };
   shouldCacheIgnoreZoom: boolean;
   showShortcutsDialog: boolean;
+  spreadsheet: Spreadsheet | null;
+  showPasteChartDialog: boolean;
   zenModeEnabled: boolean;
   appearance: "light" | "dark";
   gridSize: number | null;
@@ -97,8 +100,6 @@ export type AppState = {
   fileHandle: import("browser-nativefs").FileSystemHandle | null;
   collaborators: Map<string, Collaborator>;
   showStats: boolean;
-  currentChartType: "bar" | "line";
-  lastImportedChartTimestamp: number;
 };
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
