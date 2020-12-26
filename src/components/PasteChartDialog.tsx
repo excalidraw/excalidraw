@@ -4,11 +4,9 @@ import { Dialog } from "./Dialog";
 import "./PasteChartDialog.scss";
 
 export const PasteChartDialog = ({
-  className,
   appState,
   onClose,
 }: {
-  className?: string;
   appState: AppState;
   onClose: () => void;
 }) => {
@@ -28,7 +26,7 @@ export const PasteChartDialog = ({
       maxWidth={420}
       onCloseRequest={handleClose}
       title={"Paste chart"}
-      className={className}
+      className={"PasteChartDialog"}
     >
       <div className={"container"}>
         <button
