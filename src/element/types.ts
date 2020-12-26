@@ -26,11 +26,21 @@ type _ExcalidrawElementBase = Readonly<{
   width: number;
   height: number;
   angle: number;
+  /** random integer used to seed shape generation so that the roughjs shape
+      doesn't differ across renders */
   seed: number;
+  /** integer that is sequentially incremented on each change. Used to reconcile
+      elements during collaboration or when saving to server */
   version: number;
+  /** random integer that is regenerated on each change.
+      Used for deterministic reconciliation of updates during collaboration,
+      in case the versions (see above) are identical */
   versionNonce: number;
   isDeleted: boolean;
+  /** list of groups the element belongs to.
+      Ordered from deepest to shallowest. */
   groupIds: readonly GroupId[];
+  /** ids of (linear) elements that are bound to this element */
   boundElementIds: readonly ExcalidrawLinearElement["id"][] | null;
 }>;
 
