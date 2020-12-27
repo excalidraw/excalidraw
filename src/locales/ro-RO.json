@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Lipire",
+    "pasteCharts": "",
     "selectAll": "Selectare totală",
     "multiSelect": "Adaugă element la selecție",
     "moveCanvas": "Mutare pânză",
@@ -90,9 +91,7 @@
     "centerVertically": "Centrare verticală",
     "centerHorizontally": "Centrare orizontală",
     "distributeHorizontally": "Distribuie orizontal",
-    "distributeVertically": "Distribuie vertical",
-    "chartTypeBar": "",
-    "chartTypeLine": ""
+    "distributeVertically": "Distribuie vertical"
   },
   "buttons": {
     "clearReset": "Resetare pânză",
@@ -224,8 +223,6 @@
   },
   "stats": {
     "angle": "Unghi",
-    "charts": "",
-    "current": "",
     "element": "Element",
     "elements": "Elemente",
     "height": "Înălțime",
