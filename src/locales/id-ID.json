@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Tempel",
+    "pasteCharts": "",
     "selectAll": "Pilih semua",
     "multiSelect": "Tambahkan elemen ke pilihan",
     "moveCanvas": "Pindahkan kanvas",
@@ -90,9 +91,7 @@
     "centerVertically": "Pusatkan secara vertikal",
     "centerHorizontally": "Pusatkan secara horizontal",
     "distributeHorizontally": "Distribusikan horizontal",
-    "distributeVertically": "Distribusikan vertikal",
-    "chartTypeBar": "",
-    "chartTypeLine": ""
+    "distributeVertically": "Distribusikan vertikal"
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
@@ -224,8 +223,6 @@
   },
   "stats": {
     "angle": "Sudut",
-    "charts": "",
-    "current": "",
     "element": "Elemen",
     "elements": "Elemen",
     "height": "Tinggi",
