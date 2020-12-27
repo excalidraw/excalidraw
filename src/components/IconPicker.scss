@@ -110,7 +110,7 @@
     :root[dir="rtl"] & {
       left: 2px;
     }
-    @media #{$media-query} {
+    @media #{$is-mobile-query} {
       display: none;
     }
   }
