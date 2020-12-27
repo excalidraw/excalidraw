@@ -262,11 +262,7 @@ export const ExportDialog = ({
         ref={triggerButton}
       />
       {modalIsShown && (
-        <Dialog
-          size="large"
-          onCloseRequest={handleClose}
-          title={t("buttons.export")}
-        >
+        <Dialog onCloseRequest={handleClose} title={t("buttons.export")}>
           <ExportModal
             elements={elements}
             appState={appState}

@@ -24,7 +24,7 @@ export const ErrorDialog = ({
     <>
       {modalIsShown && (
         <Dialog
-          size="small"
+          small
           onCloseRequest={handleClose}
           title={t("errorDialog.title")}
         >

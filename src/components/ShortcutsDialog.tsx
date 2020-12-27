@@ -130,11 +130,7 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
 
   return (
     <>
-      <Dialog
-        size="large"
-        onCloseRequest={handleClose}
-        title={t("shortcutsDialog.title")}
-      >
+      <Dialog onCloseRequest={handleClose} title={t("shortcutsDialog.title")}>
         <Columns>
           <Column>
             <ShortcutIsland caption={t("shortcutsDialog.shapes")}>

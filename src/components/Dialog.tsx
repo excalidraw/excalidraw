@@ -9,11 +9,6 @@ import { KEYS } from "../keys";
 
 import "./Dialog.scss";
 
-const widths = {
-  small: 550,
-  large: 800,
-} as const;
-
 const useRefState = <T,>() => {
   const [refValue, setRefValue] = useState<T | null>(null);
   const refCallback = useCallback((value: T) => {
@@ -25,7 +20,7 @@ const useRefState = <T,>() => {
 export const Dialog = (props: {
   children: React.ReactNode;
   className?: string;
-  size: keyof typeof widths;
+  small: boolean;
   onCloseRequest(): void;
   title: React.ReactNode;
 }) => {
@@ -81,7 +76,7 @@ export const Dialog = (props: {
     <Modal
       className={clsx("Dialog", props.className)}
       labelledBy="dialog-title"
-      maxWidth={widths[props.size]}
+      maxWidth={props.small ? 550 : 800}
       onCloseRequest={props.onCloseRequest}
     >
       <Island padding={4} ref={setIslandNode}>
