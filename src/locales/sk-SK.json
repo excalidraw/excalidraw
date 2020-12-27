@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Vložiť",
+    "pasteCharts": "",
     "selectAll": "Vybrať všetko",
     "multiSelect": "Pridať prvok do výberu",
     "moveCanvas": "Pohyb plátna",
@@ -90,9 +91,7 @@
     "centerVertically": "Zarovnať zvislo na stred",
     "centerHorizontally": "Zarovnať vodorovne na stred",
     "distributeHorizontally": "Rozmiestniť vodorovne",
-    "distributeVertically": "Rozmiestniť zvisle",
-    "chartTypeBar": "",
-    "chartTypeLine": ""
+    "distributeVertically": "Rozmiestniť zvisle"
   },
   "buttons": {
     "clearReset": "Obnoviť plátno",
@@ -224,8 +223,6 @@
   },
   "stats": {
     "angle": "Uhol",
-    "charts": "",
-    "current": "",
     "element": "Prvok",
     "elements": "Prvky",
     "height": "Výška",
