@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Lim inn",
+    "pasteCharts": "",
     "selectAll": "Vel alt",
     "multiSelect": "Legg til element i utval",
     "moveCanvas": "Flytt lerretet",
@@ -90,9 +91,7 @@
     "centerVertically": "Midtstill vertikalt",
     "centerHorizontally": "Midtstill horisontalt",
     "distributeHorizontally": "Sprei horisontalt",
-    "distributeVertically": "Sprei vertikalt",
-    "chartTypeBar": "",
-    "chartTypeLine": ""
+    "distributeVertically": "Sprei vertikalt"
   },
   "buttons": {
     "clearReset": "Tilbakestill lerretet",
@@ -224,8 +223,6 @@
   },
   "stats": {
     "angle": "Vinkel",
-    "charts": "",
-    "current": "",
     "element": "Element",
     "elements": "Element",
     "height": "Høgde",
