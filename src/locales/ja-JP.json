@@ -90,7 +90,9 @@
     "centerVertically": "縦方向に中央揃え",
     "centerHorizontally": "横方向に中央揃え",
     "distributeHorizontally": "",
-    "distributeVertically": ""
+    "distributeVertically": "",
+    "chartTypeBar": "",
+    "chartTypeLine": ""
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",
@@ -222,6 +224,8 @@
   },
   "stats": {
     "angle": "",
+    "charts": "",
+    "current": "",
     "element": "",
     "elements": "",
     "height": "",
