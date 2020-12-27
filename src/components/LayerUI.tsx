@@ -593,21 +593,8 @@ const LayerUI = ({
     </footer>
   );
 
-  return isMobile ? (
-    <MobileMenu
-      appState={appState}
-      elements={elements}
-      actionManager={actionManager}
-      libraryMenu={libraryMenu}
-      exportButton={renderExportDialog()}
-      setAppState={setAppState}
-      onCollabButtonClick={onCollabButtonClick}
-      onLockToggle={onLockToggle}
-      canvas={canvas}
-      isCollaborating={isCollaborating}
-    />
-  ) : (
-    <div className="layer-ui__wrapper">
+  const dialogs = (
+    <>
       {appState.isLoading && <LoadingMessage />}
       {appState.errorMessage && (
         <ErrorDialog
@@ -630,6 +617,28 @@ const LayerUI = ({
           }
         />
       )}
+    </>
+  );
+
+  return isMobile ? (
+    <>
+      {dialogs}
+      <MobileMenu
+        appState={appState}
+        elements={elements}
+        actionManager={actionManager}
+        libraryMenu={libraryMenu}
+        exportButton={renderExportDialog()}
+        setAppState={setAppState}
+        onCollabButtonClick={onCollabButtonClick}
+        onLockToggle={onLockToggle}
+        canvas={canvas}
+        isCollaborating={isCollaborating}
+      />
+    </>
+  ) : (
+    <div className="layer-ui__wrapper">
+      {dialogs}
       {renderFixedSideContainer()}
       {renderBottomAppMenu()}
       {
