@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Plakken",
+    "pasteCharts": "",
     "selectAll": "Alles selecteren",
     "multiSelect": "Voeg element toe aan selectie",
     "moveCanvas": "Canvas verplaatsen",
@@ -90,9 +91,7 @@
     "centerVertically": "Verticaal Centreren",
     "centerHorizontally": "Horizontaal Centreren",
     "distributeHorizontally": "Horizontaal verspreiden",
-    "distributeVertically": "Verticaal distribueren",
-    "chartTypeBar": "",
-    "chartTypeLine": ""
+    "distributeVertically": "Verticaal distribueren"
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
@@ -224,8 +223,6 @@
   },
   "stats": {
     "angle": "Hoek",
-    "charts": "",
-    "current": "",
     "element": "Element",
     "elements": "Elementen",
     "height": "Hoogte",
