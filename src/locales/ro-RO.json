@@ -90,7 +90,9 @@
     "centerVertically": "Centrare verticală",
     "centerHorizontally": "Centrare orizontală",
     "distributeHorizontally": "Distribuie orizontal",
-    "distributeVertically": "Distribuie vertical"
+    "distributeVertically": "Distribuie vertical",
+    "chartTypeBar": "",
+    "chartTypeLine": ""
   },
   "buttons": {
     "clearReset": "Resetare pânză",
@@ -222,6 +224,8 @@
   },
   "stats": {
     "angle": "Unghi",
+    "charts": "",
+    "current": "",
     "element": "Element",
     "elements": "Elemente",
     "height": "Înălțime",
