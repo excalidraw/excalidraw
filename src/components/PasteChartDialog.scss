@@ -8,7 +8,6 @@
         flex-direction: column;
       }
     }
-
     .container {
       display: flex;
       align-items: center;
@@ -31,16 +30,13 @@
       align-items: center;
       justify-content: center;
       background: transparent;
-
       div {
         display: inline-block;
       }
-
       svg {
         max-height: 120px;
         max-width: 186px;
       }
-
       &:hover {
         padding: 0;
         border: 2px solid $oc-green-8;
