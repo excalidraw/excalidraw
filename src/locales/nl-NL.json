@@ -90,7 +90,9 @@
     "centerVertically": "Verticaal Centreren",
     "centerHorizontally": "Horizontaal Centreren",
     "distributeHorizontally": "Horizontaal verspreiden",
-    "distributeVertically": "Verticaal distribueren"
+    "distributeVertically": "Verticaal distribueren",
+    "chartTypeBar": "",
+    "chartTypeLine": ""
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
@@ -222,6 +224,8 @@
   },
   "stats": {
     "angle": "Hoek",
+    "charts": "",
+    "current": "",
     "element": "Element",
     "elements": "Elementen",
     "height": "Hoogte",
