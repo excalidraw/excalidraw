@@ -1,4 +1,4 @@
-@import "open-color/open-color.scss";
+@import "../css/_variables";
 
 .excalidraw {
   .context-menu {
@@ -42,16 +42,16 @@
     }
 
     &.dangerous {
-      div:nth-child(1) {
+      .context-menu-option__label {
         color: $oc-red-7;
       }
     }
 
-    div:nth-child(1) {
+    .context-menu-option__label {
       justify-self: start;
       margin-inline-end: 20px;
     }
-    div:nth-child(2) {
+    .context-menu-option__shortcut {
       justify-self: end;
       opacity: 0.6;
       font-size: 0.7rem;
@@ -63,7 +63,7 @@
     background-color: var(--select-highlight-color);
 
     &.dangerous {
-      div:nth-child(1) {
+      .context-menu-option__label {
         color: var(--popup-background-color);
       }
       background-color: $oc-red-6;
@@ -72,5 +72,19 @@
 
   .context-menu-option:focus {
     z-index: 1;
+  }
+
+  @media #{$media-query} {
+    .context-menu-option {
+      display: block;
+
+      .context-menu-option__label {
+        margin-inline-end: 0;
+      }
+
+      .context-menu-option__shortcut {
+        display: none;
+      }
+    }
   }
 }
