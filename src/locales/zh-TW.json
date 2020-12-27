@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "貼上",
+    "pasteCharts": "",
     "selectAll": "全選",
     "multiSelect": "將物件加入選取範圍",
     "moveCanvas": "移動畫布",
@@ -90,9 +91,7 @@
     "centerVertically": "垂直置中",
     "centerHorizontally": "水平置中",
     "distributeHorizontally": "水平分布",
-    "distributeVertically": "垂直分布",
-    "chartTypeBar": "",
-    "chartTypeLine": ""
+    "distributeVertically": "垂直分布"
   },
   "buttons": {
     "clearReset": "重置 canvas",
@@ -224,8 +223,6 @@
   },
   "stats": {
     "angle": "角度",
-    "charts": "",
-    "current": "",
     "element": "元素",
     "elements": "元素",
     "height": "高度",
