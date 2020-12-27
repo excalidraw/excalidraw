@@ -90,7 +90,9 @@
     "centerVertically": "",
     "centerHorizontally": "",
     "distributeHorizontally": "",
-    "distributeVertically": ""
+    "distributeVertically": "",
+    "chartTypeBar": "",
+    "chartTypeLine": ""
   },
   "buttons": {
     "clearReset": "캔버스 초기화",
@@ -222,6 +224,8 @@
   },
   "stats": {
     "angle": "",
+    "charts": "",
+    "current": "",
     "element": "",
     "elements": "",
     "height": "",
