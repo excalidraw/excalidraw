@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "चिपकाएँ",
+    "pasteCharts": "",
     "selectAll": "सभी चुनें",
     "multiSelect": "आकार को चयन में जोड़ें",
     "moveCanvas": "कैनवास को स्थानांतरित करें",
@@ -90,9 +91,7 @@
     "centerVertically": "",
     "centerHorizontally": "",
     "distributeHorizontally": "",
-    "distributeVertically": "",
-    "chartTypeBar": "",
-    "chartTypeLine": ""
+    "distributeVertically": ""
   },
   "buttons": {
     "clearReset": "कैनवास रीसेट करें",
@@ -224,8 +223,6 @@
   },
   "stats": {
     "angle": "कोण",
-    "charts": "",
-    "current": "",
     "element": "",
     "elements": "",
     "height": "ऊंचाई",
