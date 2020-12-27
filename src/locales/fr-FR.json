@@ -90,7 +90,9 @@
     "centerVertically": "Centrer verticalement",
     "centerHorizontally": "Centrer horizontalement",
     "distributeHorizontally": "Distribuer horizontalement",
-    "distributeVertically": "Distribuer verticalement"
+    "distributeVertically": "Distribuer verticalement",
+    "chartTypeBar": "",
+    "chartTypeLine": ""
   },
   "buttons": {
     "clearReset": "Effacer le canvas & réinitialiser la couleur d'arrière-plan",
@@ -222,6 +224,8 @@
   },
   "stats": {
     "angle": "Angle",
+    "charts": "",
+    "current": "",
     "element": "Élément",
     "elements": "Éléments",
     "height": "Hauteur",
