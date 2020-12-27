@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Wklej",
+    "pasteCharts": "",
     "selectAll": "Zaznacz wszystko",
     "multiSelect": "Dodaj element do zaznaczenia",
     "moveCanvas": "Przesuń obszar roboczy",
@@ -90,9 +91,7 @@
     "centerVertically": "Wyśrodkuj w pionie",
     "centerHorizontally": "Wyśrodkuj w poziomie",
     "distributeHorizontally": "Rozłóż poziomo",
-    "distributeVertically": "Rozłóż pionowo",
-    "chartTypeBar": "",
-    "chartTypeLine": ""
+    "distributeVertically": "Rozłóż pionowo"
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
@@ -224,8 +223,6 @@
   },
   "stats": {
     "angle": "Kąt",
-    "charts": "",
-    "current": "",
     "element": "Element",
     "elements": "Elementy",
     "height": "Wysokość",
