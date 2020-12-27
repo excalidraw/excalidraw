@@ -90,7 +90,9 @@
     "centerVertically": "Keskitä pystysuunnassa",
     "centerHorizontally": "Keskitä vaakasuunnassa",
     "distributeHorizontally": "Jaa vaakasuunnassa",
-    "distributeVertically": "Jaa pystysuunnassa"
+    "distributeVertically": "Jaa pystysuunnassa",
+    "chartTypeBar": "",
+    "chartTypeLine": ""
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
@@ -222,6 +224,8 @@
   },
   "stats": {
     "angle": "Kulma",
+    "charts": "",
+    "current": "",
     "element": "Elementti",
     "elements": "Elementit",
     "height": "Korkeus",
