@@ -90,7 +90,9 @@
     "centerVertically": "Függőlegesen középre igazított",
     "centerHorizontally": "Vízszintesen középre igazított",
     "distributeHorizontally": "Vízszintes elosztás",
-    "distributeVertically": "Függőleges elosztás"
+    "distributeVertically": "Függőleges elosztás",
+    "chartTypeBar": "",
+    "chartTypeLine": ""
   },
   "buttons": {
     "clearReset": "Vászon törlése",
@@ -222,6 +224,8 @@
   },
   "stats": {
     "angle": "Szög",
+    "charts": "",
+    "current": "",
     "element": "Elem",
     "elements": "Elemek",
     "height": "Magasság",
