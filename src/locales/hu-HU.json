@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Beillesztés",
+    "pasteCharts": "",
     "selectAll": "Összes kijelölése",
     "multiSelect": "Elem hozzáadása a kiválasztáshoz",
     "moveCanvas": "Vászon mozgatása",
@@ -90,9 +91,7 @@
     "centerVertically": "Függőlegesen középre igazított",
     "centerHorizontally": "Vízszintesen középre igazított",
     "distributeHorizontally": "Vízszintes elosztás",
-    "distributeVertically": "Függőleges elosztás",
-    "chartTypeBar": "",
-    "chartTypeLine": ""
+    "distributeVertically": "Függőleges elosztás"
   },
   "buttons": {
     "clearReset": "Vászon törlése",
@@ -224,8 +223,6 @@
   },
   "stats": {
     "angle": "Szög",
-    "charts": "",
-    "current": "",
     "element": "Elem",
     "elements": "Elemek",
     "height": "Magasság",
