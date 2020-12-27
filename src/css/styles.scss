@@ -441,7 +441,7 @@
     }
   }
 
-  @media #{$media-query} {
+  @media #{$is-mobile-query} {
     aside {
       display: none;
     }
