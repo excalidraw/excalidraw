@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Вставить",
+    "pasteCharts": "",
     "selectAll": "Выбрать все",
     "multiSelect": "Добавить элемент в выделенный фрагмент",
     "moveCanvas": "Переместить холст",
@@ -90,9 +91,7 @@
     "centerVertically": "Центрировать по вертикали",
     "centerHorizontally": "Центрировать по горизонтали",
     "distributeHorizontally": "Распределить по горизонтали",
-    "distributeVertically": "Распределить по вертикали",
-    "chartTypeBar": "",
-    "chartTypeLine": ""
+    "distributeVertically": "Распределить по вертикали"
   },
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",
@@ -224,8 +223,6 @@
   },
   "stats": {
     "angle": "Угол",
-    "charts": "",
-    "current": "",
     "element": "Элемент",
     "elements": "Элементы",
     "height": "Высота",
