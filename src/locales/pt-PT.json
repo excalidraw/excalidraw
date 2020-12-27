@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Colar",
+    "pasteCharts": "",
     "selectAll": "Selecionar tudo",
     "multiSelect": "Adicionar elemento à seleção",
     "moveCanvas": "Mover tela",
@@ -90,9 +91,7 @@
     "centerVertically": "Centralizar verticalmente",
     "centerHorizontally": "Centralizar horizontalmente",
     "distributeHorizontally": "Distribuir horizontalmente",
-    "distributeVertically": "Distribuir verticalmente",
-    "chartTypeBar": "Barra",
-    "chartTypeLine": "Linha"
+    "distributeVertically": "Distribuir verticalmente"
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
@@ -224,8 +223,6 @@
   },
   "stats": {
     "angle": "Ângulo",
-    "charts": "Gráficos",
-    "current": "Atual",
     "element": "Elemento",
     "elements": "Elementos",
     "height": "Altura",
