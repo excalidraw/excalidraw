@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Вставити",
+    "pasteCharts": "",
     "selectAll": "Вибрати все",
     "multiSelect": "Додати елемент до вибраного",
     "moveCanvas": "Перемістити полотно",
@@ -90,9 +91,7 @@
     "centerVertically": "Центрувати по вертикалі",
     "centerHorizontally": "Центрувати по горизонталі",
     "distributeHorizontally": "Розподілити по горизонталі",
-    "distributeVertically": "Розподілити вертикально",
-    "chartTypeBar": "",
-    "chartTypeLine": ""
+    "distributeVertically": "Розподілити вертикально"
   },
   "buttons": {
     "clearReset": "Очистити полотно",
@@ -224,8 +223,6 @@
   },
   "stats": {
     "angle": "Кут",
-    "charts": "",
-    "current": "",
     "element": "Елемент",
     "elements": "Елементи",
     "height": "Висота",
