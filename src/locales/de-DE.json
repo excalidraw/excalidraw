@@ -90,7 +90,9 @@
     "centerVertically": "Vertikal zentrieren",
     "centerHorizontally": "Horizontal zentrieren",
     "distributeHorizontally": "Horizontal verteilen",
-    "distributeVertically": "Vertikal verteilen"
+    "distributeVertically": "Vertikal verteilen",
+    "chartTypeBar": "",
+    "chartTypeLine": ""
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
@@ -222,6 +224,8 @@
   },
   "stats": {
     "angle": "Winkel",
+    "charts": "",
+    "current": "",
     "element": "Element",
     "elements": "Elemente",
     "height": "Höhe",
