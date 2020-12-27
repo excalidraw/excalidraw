@@ -176,7 +176,7 @@ const initializeScene = async (opts: {
   return null;
 };
 
-function ExcalidrawWrapper(props: { collab: CollabAPI }) {
+const ExcalidrawWrapper = (props: { collab: CollabAPI }) => {
   // dimensions
   // ---------------------------------------------------------------------------
 
@@ -319,7 +319,7 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
       )}
     </>
   );
-}
+};
 
 export default function ExcalidrawApp() {
   return (
