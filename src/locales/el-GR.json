@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Επικόλληση",
+    "pasteCharts": "",
     "selectAll": "Επιλογή όλων",
     "multiSelect": "Προσθέστε το στοιχείο στην επιλογή",
     "moveCanvas": "Μετακίνηση καμβά",
@@ -90,9 +91,7 @@
     "centerVertically": "Κέντρο κάθετα",
     "centerHorizontally": "Κέντρο οριζόντια",
     "distributeHorizontally": "",
-    "distributeVertically": "",
-    "chartTypeBar": "Ραβδόγραμμα",
-    "chartTypeLine": "Γραμμή"
+    "distributeVertically": ""
   },
   "buttons": {
     "clearReset": "Επαναφορά του καμβά",
@@ -224,8 +223,6 @@
   },
   "stats": {
     "angle": "Γωνία",
-    "charts": "Διαγράμματα",
-    "current": "",
     "element": "Στοιχείο",
     "elements": "Στοιχεία",
     "height": "Ύψος",
