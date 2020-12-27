@@ -19,7 +19,7 @@ const useRefState = <T,>() => {
 export const Dialog = (props: {
   children: React.ReactNode;
   className?: string;
-  small: boolean;
+  small?: boolean;
   onCloseRequest(): void;
   title: React.ReactNode;
   autofocus?: boolean;
