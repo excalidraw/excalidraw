@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Enganxar",
+    "pasteCharts": "",
     "selectAll": "Seleccionar tot",
     "multiSelect": "Afegir element a la selecció",
     "moveCanvas": "Moure el llenç",
@@ -90,9 +91,7 @@
     "centerVertically": "",
     "centerHorizontally": "",
     "distributeHorizontally": "",
-    "distributeVertically": "",
-    "chartTypeBar": "",
-    "chartTypeLine": ""
+    "distributeVertically": ""
   },
   "buttons": {
     "clearReset": "Netejar el llenç",
@@ -224,8 +223,6 @@
   },
   "stats": {
     "angle": "",
-    "charts": "",
-    "current": "",
     "element": "",
     "elements": "",
     "height": "",
