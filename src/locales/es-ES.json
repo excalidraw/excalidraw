@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Pegar",
+    "pasteCharts": "",
     "selectAll": "Seleccionar todo",
     "multiSelect": "Añadir elemento a la selección",
     "moveCanvas": "Mover el lienzo",
@@ -90,9 +91,7 @@
     "centerVertically": "Centrar verticalmente",
     "centerHorizontally": "Centrar horizontalmente",
     "distributeHorizontally": "Distribuir horizontalmente",
-    "distributeVertically": "Distribuir verticalmente",
-    "chartTypeBar": "",
-    "chartTypeLine": ""
+    "distributeVertically": "Distribuir verticalmente"
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
@@ -224,8 +223,6 @@
   },
   "stats": {
     "angle": "Ángulo",
-    "charts": "",
-    "current": "",
     "element": "Elemento",
     "elements": "Elementos",
     "height": "Alto",
