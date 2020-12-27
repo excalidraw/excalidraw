@@ -19,7 +19,7 @@ const useRefState = <T,>() => {
 export const Dialog = (props: {
   children: React.ReactNode;
   className?: string;
-  maxWidth?: number;
+  small?: boolean;
   onCloseRequest(): void;
   title: React.ReactNode;
   autofocus?: boolean;
@@ -76,7 +76,7 @@ export const Dialog = (props: {
     <Modal
       className={clsx("Dialog", props.className)}
       labelledBy="dialog-title"
-      maxWidth={props.maxWidth}
+      maxWidth={props.small ? 550 : 800}
       onCloseRequest={props.onCloseRequest}
     >
       <Island padding={4} ref={setIslandNode}>

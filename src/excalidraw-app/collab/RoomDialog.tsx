@@ -123,11 +123,7 @@ const RoomDialog = ({
     );
   };
   return (
-    <Dialog
-      maxWidth={800}
-      onCloseRequest={handleClose}
-      title={t("labels.createRoom")}
-    >
+    <Dialog small onCloseRequest={handleClose} title={t("labels.createRoom")}>
       {renderRoomDialog()}
     </Dialog>
   );
