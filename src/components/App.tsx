@@ -994,7 +994,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           charts: {
             data: data.spreadsheet,
             shown: true,
-            currentChartType: this.state.charts.currentChartType,
           },
         });
       } else if (data.elements) {

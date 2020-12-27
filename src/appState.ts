@@ -72,10 +72,10 @@ export const getDefaultAppState = (): Omit<
     fileHandle: null,
     collaborators: new Map(),
     showStats: false,
+    currentChartType: "bar",
     charts: {
       shown: false,
       data: null,
-      currentChartType: "bar",
     },
   };
 };
@@ -96,7 +96,8 @@ const APP_STATE_STORAGE_CONF = (<
   config: { [K in keyof T]: K extends keyof AppState ? T[K] : never },
 ) => config)({
   appearance: { browser: true, export: false },
-  charts: { browser: true, export: false },
+  charts: { browser: false, export: false },
+  currentChartType: { browser: true, export: false },
   collaborators: { browser: false, export: false },
   currentItemBackgroundColor: { browser: true, export: false },
   currentItemEndArrowhead: { browser: true, export: false },

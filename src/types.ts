@@ -99,11 +99,16 @@ export type AppState = {
   fileHandle: import("browser-nativefs").FileSystemHandle | null;
   collaborators: Map<string, Collaborator>;
   showStats: boolean;
-  charts: {
-    shown: boolean;
-    data: Spreadsheet | null;
-    currentChartType: ChartType;
-  };
+  currentChartType: ChartType;
+  charts:
+    | {
+        shown: false;
+        data: null;
+      }
+    | {
+        shown: true;
+        data: Spreadsheet;
+      };
 };
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };

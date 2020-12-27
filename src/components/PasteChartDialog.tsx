@@ -86,10 +86,10 @@ export const PasteChartDialog = ({
   const handleChartClick = (chartType: ChartType, elements: ChartElements) => {
     onInsertChart(elements);
     setAppState({
+      currentChartType: chartType,
       charts: {
         shown: false,
         data: null,
-        currentChartType: chartType,
       },
     });
   };
@@ -106,13 +106,13 @@ export const PasteChartDialog = ({
         <ChartPreviewBtn
           chartType="bar"
           spreadsheet={appState.charts.data}
-          selected={appState.charts.currentChartType === "bar"}
+          selected={appState.currentChartType === "bar"}
           onClick={handleChartClick}
         />
         <ChartPreviewBtn
           chartType="line"
           spreadsheet={appState.charts.data}
-          selected={appState.charts.currentChartType === "line"}
+          selected={appState.currentChartType === "line"}
           onClick={handleChartClick}
         />
       </div>

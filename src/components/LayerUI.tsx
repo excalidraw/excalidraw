@@ -613,7 +613,9 @@ const LayerUI = ({
           appState={appState}
           onInsertChart={onInsertElements}
           onClose={() =>
-            setAppState({ charts: { ...appState.charts, shown: false } })
+            setAppState({
+              charts: { shown: false, data: null },
+            })
           }
         />
       )}
