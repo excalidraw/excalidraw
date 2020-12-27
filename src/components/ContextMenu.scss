@@ -74,7 +74,7 @@
     z-index: 1;
   }
 
-  @media #{$media-query} {
+  @media #{$is-mobile-query} {
     .context-menu-option {
       display: block;
 

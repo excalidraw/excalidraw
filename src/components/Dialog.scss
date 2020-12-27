@@ -18,7 +18,7 @@
     margin: 0;
   }
 
-  @media #{$media-query} {
+  @media #{$is-mobile-query} {
     .Dialog {
       --metric: calc(var(--space-factor) * 4);
       --inset-left: #{"max(var(--metric), var(--sal))"};

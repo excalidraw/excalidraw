@@ -40,7 +40,7 @@
     background: var(--bg-color-island);
     backdrop-filter: none;
 
-    @media #{$media-query} {
+    @media #{$is-mobile-query} {
       max-width: 100%;
     }
   }
@@ -74,7 +74,7 @@
     top: calc(var(--space-factor) * 5);
   }
 
-  @media #{$media-query} {
+  @media #{$is-mobile-query} {
     .Modal {
       padding: 0;
     }
