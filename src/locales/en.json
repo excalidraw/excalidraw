@@ -90,9 +90,7 @@
     "centerVertically": "Center vertically",
     "centerHorizontally": "Center horizontally",
     "distributeHorizontally": "Distribute horizontally",
-    "distributeVertically": "Distribute vertically",
-    "chartTypeBar": "Bar",
-    "chartTypeLine": "Line"
+    "distributeVertically": "Distribute vertically"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
