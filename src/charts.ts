@@ -12,11 +12,6 @@ const BAR_GAP = 12;
 const BAR_HEIGHT = 256;
 const GRID_OPACITY = 50;
 
-export const CHART_LABELS = {
-  bar: "labels.chartTypeBar",
-  line: "labels.chartTypeLine",
-};
-
 export interface Spreadsheet {
   title: string | null;
   labels: string[] | null;
