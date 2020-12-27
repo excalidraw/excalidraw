@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Paste",
+    "pasteCharts": "Paste charts",
     "selectAll": "Select all",
     "multiSelect": "Add element to selection",
     "moveCanvas": "Move canvas",
@@ -90,9 +91,7 @@
     "centerVertically": "Center vertically",
     "centerHorizontally": "Center horizontally",
     "distributeHorizontally": "Distribute horizontally",
-    "distributeVertically": "Distribute vertically",
-    "chartTypeBar": "Bar",
-    "chartTypeLine": "Line"
+    "distributeVertically": "Distribute vertically"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
@@ -224,8 +223,6 @@
   },
   "stats": {
     "angle": "Angle",
-    "charts": "Charts",
-    "current": "Current",
     "element": "Element",
     "elements": "Elements",
     "height": "Height",
