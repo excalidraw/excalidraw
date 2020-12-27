@@ -1,12 +1,12 @@
 import oc from "open-color";
-import { AppState, FlooredNumber, NormalizedZoomValue } from "./types";
-import { getDateTime } from "./utils";
-import { t } from "./i18n";
 import {
-  DEFAULT_FONT_SIZE,
   DEFAULT_FONT_FAMILY,
+  DEFAULT_FONT_SIZE,
   DEFAULT_TEXT_ALIGN,
 } from "./constants";
+import { t } from "./i18n";
+import { AppState, FlooredNumber, NormalizedZoomValue } from "./types";
+import { getDateTime } from "./utils";
 
 export const getDefaultAppState = (): Omit<
   AppState,

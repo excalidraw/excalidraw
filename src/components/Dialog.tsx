@@ -1,13 +1,12 @@
-import React, { useCallback, useEffect, useState } from "react";
 import clsx from "clsx";
-import { Modal } from "./Modal";
-import { Island } from "./Island";
+import React, { useCallback, useEffect, useState } from "react";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
-import { back, close } from "./icons";
 import { KEYS } from "../keys";
-
 import "./Dialog.scss";
+import { back, close } from "./icons";
+import { Island } from "./Island";
+import { Modal } from "./Modal";
 
 const useRefState = <T,>() => {
   const [refValue, setRefValue] = useState<T | null>(null);

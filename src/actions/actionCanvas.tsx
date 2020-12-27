@@ -1,23 +1,22 @@
 import React from "react";
-import { ColorPicker } from "../components/ColorPicker";
+import { EVENT_ACTION, EVENT_CHANGE, trackEvent } from "../analytics";
 import { getDefaultAppState } from "../appState";
-import { trash, zoomIn, zoomOut, resetZoom } from "../components/icons";
+import colors from "../colors";
+import { ColorPicker } from "../components/ColorPicker";
+import { resetZoom, trash, zoomIn, zoomOut } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
-import { t } from "../i18n";
-import { getNormalizedZoom, getSelectedElements } from "../scene";
-import { getNonDeletedElements } from "../element";
-import { CODES, KEYS } from "../keys";
-import { getShortcutKey } from "../utils";
-import useIsMobile from "../is-mobile";
-import { register } from "./register";
+import { getCommonBounds, getNonDeletedElements } from "../element";
 import { newElementWith } from "../element/mutateElement";
 import { ExcalidrawElement } from "../element/types";
-import { AppState, NormalizedZoomValue } from "../types";
-import { getCommonBounds } from "../element";
-import { getNewZoom } from "../scene/zoom";
+import { t } from "../i18n";
+import useIsMobile from "../is-mobile";
+import { CODES, KEYS } from "../keys";
+import { getNormalizedZoom, getSelectedElements } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
-import { EVENT_ACTION, EVENT_CHANGE, trackEvent } from "../analytics";
-import colors from "../colors";
+import { getNewZoom } from "../scene/zoom";
+import { AppState, NormalizedZoomValue } from "../types";
+import { getShortcutKey } from "../utils";
+import { register } from "./register";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
