@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "لصق",
+    "pasteCharts": "",
     "selectAll": "تحديد الكل",
     "multiSelect": "إضافة عنصر للتحديد",
     "moveCanvas": "نقل لوح رسم",
@@ -90,9 +91,7 @@
     "centerVertically": "توسيط عمودي",
     "centerHorizontally": "توسيط أفقي",
     "distributeHorizontally": "التوزيع الأفقي",
-    "distributeVertically": "التوزيع عمودياً",
-    "chartTypeBar": "",
-    "chartTypeLine": ""
+    "distributeVertically": "التوزيع عمودياً"
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
@@ -224,8 +223,6 @@
   },
   "stats": {
     "angle": "",
-    "charts": "",
-    "current": "",
     "element": "",
     "elements": "",
     "height": "",
