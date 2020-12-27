@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "貼り付け",
+    "pasteCharts": "",
     "selectAll": "すべて選択",
     "multiSelect": "複数選択",
     "moveCanvas": "キャンバスを移動",
@@ -90,9 +91,7 @@
     "centerVertically": "縦方向に中央揃え",
     "centerHorizontally": "横方向に中央揃え",
     "distributeHorizontally": "",
-    "distributeVertically": "",
-    "chartTypeBar": "",
-    "chartTypeLine": ""
+    "distributeVertically": ""
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",
@@ -224,8 +223,6 @@
   },
   "stats": {
     "angle": "",
-    "charts": "",
-    "current": "",
     "element": "",
     "elements": "",
     "height": "",
