@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "ထား",
+    "pasteCharts": "",
     "selectAll": "အကုန်ရွေး",
     "multiSelect": "ရွေးထားသည့်ထဲပုံထည့်",
     "moveCanvas": "ကားချပ်ရွှေ့",
@@ -90,9 +91,7 @@
     "centerVertically": "ဒေါင်လိုက်အလယ်ညှိ",
     "centerHorizontally": "အလျားလိုက်အလယ်ညှိ",
     "distributeHorizontally": "အလျားလိုက်",
-    "distributeVertically": "ထောင်လိုက်",
-    "chartTypeBar": "",
-    "chartTypeLine": ""
+    "distributeVertically": "ထောင်လိုက်"
   },
   "buttons": {
     "clearReset": "ကားချပ်ရှင်းလင်း",
@@ -224,8 +223,6 @@
   },
   "stats": {
     "angle": "ထောင့်",
-    "charts": "",
-    "current": "",
     "element": "",
     "elements": "",
     "height": "အမြင့်",
