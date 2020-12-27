@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Einfügen",
+    "pasteCharts": "",
     "selectAll": "Alle auswählen",
     "multiSelect": "Element zur Auswahl hinzufügen",
     "moveCanvas": "Leinwand verschieben",
@@ -90,9 +91,7 @@
     "centerVertically": "Vertikal zentrieren",
     "centerHorizontally": "Horizontal zentrieren",
     "distributeHorizontally": "Horizontal verteilen",
-    "distributeVertically": "Vertikal verteilen",
-    "chartTypeBar": "",
-    "chartTypeLine": ""
+    "distributeVertically": "Vertikal verteilen"
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
@@ -224,8 +223,6 @@
   },
   "stats": {
     "angle": "Winkel",
-    "charts": "",
-    "current": "",
     "element": "Element",
     "elements": "Elemente",
     "height": "Höhe",
