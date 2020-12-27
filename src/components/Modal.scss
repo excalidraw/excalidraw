@@ -37,7 +37,7 @@
     position: relative;
 
     // for modals, reset blurry bg
-    background: var(--bg-color-island);
+    background: var(--island-bg-color);
     backdrop-filter: none;
 
     @media #{$is-mobile-query} {

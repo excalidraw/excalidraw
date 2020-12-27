@@ -35,7 +35,7 @@
   }
 
   .RoomDialog-username {
-    background-color: var(--input-background-color);
+    background-color: var(--input-bg-color);
     border-color: var(--input-border-color);
     appearance: none;
     min-width: 0;
@@ -53,7 +53,7 @@
   }
 
   .Modal .RoomDialog-stopSession {
-    background-color: var(--button-destructive-background-color);
+    background-color: var(--button-destructive-bg-color);
 
     .ToolIcon__label,
     .ToolIcon__icon svg {

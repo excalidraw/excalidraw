@@ -8,7 +8,7 @@
   }
 
   .picker {
-    background: var(--popup-background-color);
+    background: var(--popup-bg-color);
     border: 0px solid transparentize($oc-white, 0.75);
     box-shadow: transparentize($oc-black, 0.75) 0px 1px 4px;
     border-radius: 4px;
@@ -83,7 +83,7 @@
       position: absolute;
       border-style: solid;
       border-width: 0px 9px 10px;
-      border-color: transparent transparent var(--popup-background-color);
+      border-color: transparent transparent var(--popup-bg-color);
     }
   }
 
