@@ -40,6 +40,9 @@
     background: var(--bg-color-island);
     backdrop-filter: none;
 
+    border: 1px solid var(--dialog-border);
+    border-radius: var(--border-radius-m);
+
     @media #{$is-mobile-query} {
       max-width: 100%;
     }
