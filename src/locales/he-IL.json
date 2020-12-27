@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "הדבק",
+    "pasteCharts": "",
     "selectAll": "בחר הכל",
     "multiSelect": "הוסף אובייקט לבחירה",
     "moveCanvas": "הזז את הקנבס",
@@ -90,9 +91,7 @@
     "centerVertically": "מרכז אנכית",
     "centerHorizontally": "מרכז אופקית",
     "distributeHorizontally": "חלוקה אופקית",
-    "distributeVertically": "חלוקה אנכית",
-    "chartTypeBar": "",
-    "chartTypeLine": ""
+    "distributeVertically": "חלוקה אנכית"
   },
   "buttons": {
     "clearReset": "אפס את הלוח",
@@ -224,8 +223,6 @@
   },
   "stats": {
     "angle": "זווית",
-    "charts": "",
-    "current": "",
     "element": "אלמנט",
     "elements": "אלמנטים",
     "height": "גובה",
