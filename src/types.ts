@@ -100,7 +100,7 @@ export type AppState = {
   collaborators: Map<string, Collaborator>;
   showStats: boolean;
   currentChartType: ChartType;
-  charts:
+  pasteDialog:
     | {
         shown: false;
         data: null;

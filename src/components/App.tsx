@@ -991,7 +991,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         this.setState({ errorMessage: data.errorMessage });
       } else if (data.spreadsheet) {
         this.setState({
-          charts: {
+          pasteDialog: {
             data: data.spreadsheet,
             shown: true,
           },

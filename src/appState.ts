@@ -73,7 +73,7 @@ export const getDefaultAppState = (): Omit<
     collaborators: new Map(),
     showStats: false,
     currentChartType: "bar",
-    charts: {
+    pasteDialog: {
       shown: false,
       data: null,
     },
@@ -96,7 +96,7 @@ const APP_STATE_STORAGE_CONF = (<
   config: { [K in keyof T]: K extends keyof AppState ? T[K] : never },
 ) => config)({
   appearance: { browser: true, export: false },
-  charts: { browser: false, export: false },
+  pasteDialog: { browser: false, export: false },
   currentChartType: { browser: true, export: false },
   collaborators: { browser: false, export: false },
   currentItemBackgroundColor: { browser: true, export: false },

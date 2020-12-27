@@ -607,14 +607,14 @@ const LayerUI = ({
           onClose={() => setAppState({ showShortcutsDialog: false })}
         />
       )}
-      {appState.charts.shown && (
+      {appState.pasteDialog.shown && (
         <PasteChartDialog
           setAppState={setAppState}
           appState={appState}
           onInsertChart={onInsertElements}
           onClose={() =>
             setAppState({
-              charts: { shown: false, data: null },
+              pasteDialog: { shown: false, data: null },
             })
           }
         />
