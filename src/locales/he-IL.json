@@ -90,7 +90,9 @@
     "centerVertically": "מרכז אנכית",
     "centerHorizontally": "מרכז אופקית",
     "distributeHorizontally": "חלוקה אופקית",
-    "distributeVertically": "חלוקה אנכית"
+    "distributeVertically": "חלוקה אנכית",
+    "chartTypeBar": "",
+    "chartTypeLine": ""
   },
   "buttons": {
     "clearReset": "אפס את הלוח",
@@ -222,6 +224,8 @@
   },
   "stats": {
     "angle": "זווית",
+    "charts": "",
+    "current": "",
     "element": "אלמנט",
     "elements": "אלמנטים",
     "height": "גובה",
