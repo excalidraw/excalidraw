@@ -9,7 +9,7 @@ import { loadFromJSON, saveAsJSON } from "../data";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
 import { KEYS } from "../keys";
-import { muteFSAbortError } from "../utils";
+import { getDateTime, muteFSAbortError } from "../utils";
 import { register } from "./register";
 import "../components/ToolIcon.scss";
 
@@ -22,7 +22,7 @@ export const actionChangeProjectName = register({
   PanelComponent: ({ appState, updateData }) => (
     <ProjectName
       label={t("labels.fileTitle")}
-      value={appState.name || "Unnamed"}
+      value={appState.name || `${t("labels.untitled")}-${getDateTime()}`}
       onChange={(name: string) => updateData(name)}
     />
   ),

@@ -41,7 +41,7 @@ import "./LayerUI.scss";
 import { LibraryUnit } from "./LibraryUnit";
 import { ToolButton } from "./ToolButton";
 import { saveLibraryAsJSON, importLibraryFromJSON } from "../data/json";
-import { muteFSAbortError } from "../utils";
+import { getDateTime, muteFSAbortError } from "../utils";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 import clsx from "clsx";
 import { Library } from "../data/library";
@@ -352,7 +352,7 @@ const LayerUI = ({
       if (canvas) {
         await exportCanvas(type, exportedElements, appState, canvas, {
           exportBackground: appState.exportBackground,
-          name: appState.name,
+          name: appState.name || `${t("labels.untitled")}-${getDateTime()}`,
           viewBackgroundColor: appState.viewBackgroundColor,
           scale,
           shouldAddWatermark: appState.shouldAddWatermark,

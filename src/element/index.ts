@@ -49,7 +49,6 @@ export {
   dragNewElement,
 } from "./dragElements";
 export { isTextElement, isExcalidrawElement } from "./typeChecks";
-export { textWysiwyg } from "./textWysiwyg";
 export { redrawTextBoundingBox } from "./textElement";
 export {
   getPerfectElementSize,

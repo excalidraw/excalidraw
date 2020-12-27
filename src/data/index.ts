@@ -75,6 +75,7 @@ export const exportCanvas = async (
     exportPadding,
     scale,
     shouldAddWatermark,
+    watermarkText: t("labels.madeWithExcalidraw"),
   });
   tempCanvas.style.display = "none";
   document.body.appendChild(tempCanvas);

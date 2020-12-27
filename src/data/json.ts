@@ -8,6 +8,8 @@ import { Library } from "./library";
 import { MIME_TYPES } from "../constants";
 import { clearElementsForExport } from "../element";
 import { EVENT_LIBRARY, trackEvent } from "../analytics";
+import { t } from "../i18n";
+import { getDateTime } from "../utils";
 
 export const serializeAsJSON = (
   elements: readonly ExcalidrawElement[],
@@ -33,11 +35,10 @@ export const saveAsJSON = async (
   const blob = new Blob([serialized], {
     type: "application/json",
   });
-
   const fileHandle = await fileSave(
     blob,
     {
-      fileName: appState.name,
+      fileName: appState.name || `${t("labels.untitled")}-${getDateTime()}`,
       description: "Excalidraw file",
       extensions: [".excalidraw"],
     },

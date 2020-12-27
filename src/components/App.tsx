@@ -10,7 +10,6 @@ import {
   duplicateElement,
   isInvisiblySmallElement,
   isTextElement,
-  textWysiwyg,
   getCommonBounds,
   getCursorForResizingElement,
   getPerfectElementSize,
@@ -177,6 +176,7 @@ import {
   trackEvent,
 } from "../analytics";
 import { Stats } from "./Stats";
+import { textWysiwyg } from "../element/textWysiwyg";
 
 const { history } = createHistory();
 

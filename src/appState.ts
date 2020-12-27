@@ -1,7 +1,5 @@
 import oc from "open-color";
 import { AppState, FlooredNumber, NormalizedZoomValue } from "./types";
-import { getDateTime } from "./utils";
-import { t } from "./i18n";
 import {
   DEFAULT_FONT_SIZE,
   DEFAULT_FONT_FAMILY,
@@ -46,7 +44,7 @@ export const getDefaultAppState = (): Omit<
     scrollY: 0 as FlooredNumber,
     cursorButton: "up",
     scrolledOutside: false,
-    name: `${t("labels.untitled")}-${getDateTime()}`,
+    name: "",
     isBindingEnabled: true,
     isResizing: false,
     isRotating: false,

@@ -7,7 +7,6 @@ import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
 import { distance, SVG_NS } from "../utils";
 import { normalizeScroll } from "./scroll";
 import { AppState } from "../types";
-import { t } from "../i18n";
 import { DEFAULT_FONT_FAMILY, DEFAULT_VERTICAL_ALIGN } from "../constants";
 import { getDefaultAppState } from "../appState";
 
@@ -23,12 +22,14 @@ export const exportToCanvas = (
     viewBackgroundColor,
     scale = 1,
     shouldAddWatermark,
+    watermarkText,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     scale?: number;
     viewBackgroundColor: string;
     shouldAddWatermark: boolean;
+    watermarkText?: string;
   },
   createCanvas: (width: number, height: number) => HTMLCanvasElement = (
     width,
@@ -40,7 +41,11 @@ export const exportToCanvas = (
     return tempCanvas;
   },
 ) => {
-  const sceneElements = getElementsAndWatermark(elements, shouldAddWatermark);
+  const sceneElements = getElementsAndWatermark(
+    elements,
+    shouldAddWatermark,
+    watermarkText,
+  );
 
   const [minX, minY, width, height] = getCanvasSize(
     sceneElements,
@@ -152,20 +157,25 @@ export const exportToSvg = (
 const getElementsAndWatermark = (
   elements: readonly NonDeletedExcalidrawElement[],
   shouldAddWatermark: boolean,
+  watermarkText?: string,
 ): readonly NonDeletedExcalidrawElement[] => {
   let _elements = [...elements];
 
   if (shouldAddWatermark) {
     const [, , maxX, maxY] = getCommonBounds(elements);
-    _elements = [..._elements, getWatermarkElement(maxX, maxY)];
+    _elements = [..._elements, getWatermarkElement(maxX, maxY, watermarkText)];
   }
 
   return _elements;
 };
 
-const getWatermarkElement = (maxX: number, maxY: number) => {
+const getWatermarkElement = (
+  maxX: number,
+  maxY: number,
+  watermarkText: string = "",
+) => {
   return newTextElement({
-    text: t("labels.madeWithExcalidraw"),
+    text: watermarkText,
     fontSize: WATERMARK_HEIGHT,
     fontFamily: DEFAULT_FONT_FAMILY,
     textAlign: "right",
@@ -204,8 +214,13 @@ export const getExportSize = (
   exportPadding: number,
   shouldAddWatermark: boolean,
   scale: number,
+  watermarkText?: string,
 ): [number, number] => {
-  const sceneElements = getElementsAndWatermark(elements, shouldAddWatermark);
+  const sceneElements = getElementsAndWatermark(
+    elements,
+    shouldAddWatermark,
+    watermarkText,
+  );
 
   const [, , width, height] = getCanvasSize(
     sceneElements,

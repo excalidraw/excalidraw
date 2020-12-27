@@ -1,11 +1,11 @@
 import {
   exportToCanvas as _exportToCanvas,
   exportToSvg as _exportToSvg,
-} from "../scene/export";
-import { getDefaultAppState } from "../appState";
-import { AppState } from "../types";
-import { ExcalidrawElement } from "../element/types";
-import { getNonDeletedElements } from "../element";
+} from "../../scene/export";
+import { getDefaultAppState } from "../../appState";
+import { AppState } from "../../types";
+import { ExcalidrawElement } from "../../element/types";
+import { getNonDeletedElements } from "../../element";
 
 type ExportOpts = {
   elements: readonly ExcalidrawElement[];

@@ -2,6 +2,8 @@ import { AppState } from "./types";
 import { ExcalidrawElement } from "./element/types";
 import { isLinearElement } from "./element/typeChecks";
 import { deepCopyElement } from "./element/newElement";
+import { getDateTime } from "./utils";
+import { t } from "./i18n";
 
 export interface HistoryEntry {
   appState: ReturnType<typeof clearAppStatePropertiesForHistory>;
@@ -24,7 +26,7 @@ const clearAppStatePropertiesForHistory = (appState: AppState) => {
     viewBackgroundColor: appState.viewBackgroundColor,
     editingLinearElement: appState.editingLinearElement,
     editingGroupId: appState.editingGroupId,
-    name: appState.name,
+    name: appState.name || `${t("labels.untitled")}-${getDateTime()}`,
   };
 };
 

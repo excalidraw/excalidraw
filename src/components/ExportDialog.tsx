@@ -100,6 +100,7 @@ const ExportModal = ({
         exportPadding,
         scale,
         shouldAddWatermark,
+        watermarkText: t("labels.madeWithExcalidraw"),
       });
 
       // if converting to blob fails, there's some problem that will
@@ -175,6 +176,7 @@ const ExportModal = ({
                 exportPadding,
                 shouldAddWatermark,
                 s,
+                t("labels.madeWithExcalidraw"),
               );
 
               const scaleButtonTitle = `${t(
