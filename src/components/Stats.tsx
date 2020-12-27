@@ -85,7 +85,6 @@ export const Stats = (props: {
               <td>{t("stats.total")}</td>
               <td>{nFormatter(storageSizes.total, 1)}</td>
             </tr>
-
             {selectedElements.length === 1 && (
               <tr>
                 <th colSpan={2}>{t("stats.element")}</th>

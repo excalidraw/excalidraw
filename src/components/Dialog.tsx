@@ -1,13 +1,12 @@
-import React, { useCallback, useEffect, useState } from "react";
 import clsx from "clsx";
-import { Modal } from "./Modal";
-import { Island } from "./Island";
+import React, { useCallback, useEffect, useState } from "react";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
-import { back, close } from "./icons";
 import { KEYS } from "../keys";
-
 import "./Dialog.scss";
+import { back, close } from "./icons";
+import { Island } from "./Island";
+import { Modal } from "./Modal";
 
 const useRefState = <T,>() => {
   const [refValue, setRefValue] = useState<T | null>(null);
@@ -23,6 +22,7 @@ export const Dialog = (props: {
   small: boolean;
   onCloseRequest(): void;
   title: React.ReactNode;
+  autofocus?: boolean;
 }) => {
   const [islandNode, setIslandNode] = useRefState<HTMLDivElement>();
 
@@ -33,7 +33,7 @@ export const Dialog = (props: {
 
     const focusableElements = queryFocusableElements(islandNode);
 
-    if (focusableElements.length > 0) {
+    if (focusableElements.length > 0 && props.autofocus !== false) {
       // If there's an element other than close, focus it.
       (focusableElements[1] || focusableElements[0]).focus();
     }
@@ -62,7 +62,7 @@ export const Dialog = (props: {
     islandNode.addEventListener("keydown", handleKeyDown);
 
     return () => islandNode.removeEventListener("keydown", handleKeyDown);
-  }, [islandNode]);
+  }, [islandNode, props.autofocus]);
 
   const queryFocusableElements = (node: HTMLElement) => {
     const focusableElements = node.querySelectorAll<HTMLElement>(
