@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "붙여넣기",
+    "pasteCharts": "",
     "selectAll": "전체 선택",
     "multiSelect": "선택 영역에 추가하기",
     "moveCanvas": "캔버스 이동",
@@ -90,9 +91,7 @@
     "centerVertically": "",
     "centerHorizontally": "",
     "distributeHorizontally": "",
-    "distributeVertically": "",
-    "chartTypeBar": "",
-    "chartTypeLine": ""
+    "distributeVertically": ""
   },
   "buttons": {
     "clearReset": "캔버스 초기화",
@@ -224,8 +223,6 @@
   },
   "stats": {
     "angle": "",
-    "charts": "",
-    "current": "",
     "element": "",
     "elements": "",
     "height": "",
