@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Yapıştır",
+    "pasteCharts": "",
     "selectAll": "Tümünü seç",
     "multiSelect": "Seçime öge ekle",
     "moveCanvas": "Tuvali taşı",
@@ -90,9 +91,7 @@
     "centerVertically": "Dikeyde ortala",
     "centerHorizontally": "Yatayda ortala",
     "distributeHorizontally": "",
-    "distributeVertically": "",
-    "chartTypeBar": "",
-    "chartTypeLine": ""
+    "distributeVertically": ""
   },
   "buttons": {
     "clearReset": "Tuvali sıfırla",
@@ -224,8 +223,6 @@
   },
   "stats": {
     "angle": "Açı",
-    "charts": "",
-    "current": "",
     "element": "Bileşen",
     "elements": "Bileşenler",
     "height": "Yükseklik",
