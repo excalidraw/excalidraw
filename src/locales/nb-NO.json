@@ -90,7 +90,9 @@
     "centerVertically": "Midtstill vertikalt",
     "centerHorizontally": "Midtstill horisontalt",
     "distributeHorizontally": "Distribuer horisontalt",
-    "distributeVertically": "Distribuer vertikalt"
+    "distributeVertically": "Distribuer vertikalt",
+    "chartTypeBar": "",
+    "chartTypeLine": ""
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
@@ -222,6 +224,8 @@
   },
   "stats": {
     "angle": "Vinkel",
+    "charts": "",
+    "current": "",
     "element": "Element",
     "elements": "Elementer",
     "height": "Høyde",
