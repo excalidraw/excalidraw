@@ -2,7 +2,7 @@
 
 .excalidraw {
   .PasteChartDialog {
-    @media #{$media-query} {
+    @media #{$is-mobile-query} {
       .Island {
         display: flex;
         flex-direction: column;
@@ -13,7 +13,7 @@
       align-items: center;
       justify-content: space-around;
       flex-wrap: wrap;
-      @media #{$media-query} {
+      @media #{$is-mobile-query} {
         flex-direction: column;
         justify-content: center;
       }
