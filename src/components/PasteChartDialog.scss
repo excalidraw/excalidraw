@@ -2,6 +2,13 @@
 
 .excalidraw {
   .PasteChartDialog {
+    @media #{$media-query} {
+      .Island {
+        display: flex;
+        flex-direction: column;
+      }
+    }
+
     .container {
       display: flex;
       align-items: center;
@@ -22,25 +29,14 @@
       align-items: center;
       justify-content: center;
       background: transparent;
-      @media #{$media-query} {
-        width: 100%;
-        height: auto;
-      }
 
       div {
         display: inline-block;
-        max-width: 100%;
       }
 
       svg {
         max-height: 120px;
         max-width: 186px;
-        @media #{$media-query} {
-          max-width: calc(100% - 2em);
-          max-height: none;
-          margin: 0 1em;
-          box-sizing: border-box;
-        }
       }
 
       &:hover {
