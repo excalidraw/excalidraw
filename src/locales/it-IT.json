@@ -90,7 +90,9 @@
     "centerVertically": "Centra Verticalmente",
     "centerHorizontally": "Centra orizzontalmente",
     "distributeHorizontally": "Distribuisci orizzontalmente",
-    "distributeVertically": "Distribuisci verticalmente"
+    "distributeVertically": "Distribuisci verticalmente",
+    "chartTypeBar": "",
+    "chartTypeLine": ""
   },
   "buttons": {
     "clearReset": "Svuota la tela",
@@ -222,6 +224,8 @@
   },
   "stats": {
     "angle": "Angolo",
+    "charts": "",
+    "current": "",
     "element": "Elemento",
     "elements": "Elementi",
     "height": "Altezza",
