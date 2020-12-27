@@ -875,7 +875,16 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     history.record(this.state, this.scene.getElementsIncludingDeleted());
 
-    this.props.onChange?.(this.scene.getElementsIncludingDeleted(), this.state);
+    // do not notify consumers if we're still loading the scene. Among other
+    // potential issues, this fixes a case where the tab isn't focused during
+    // init, which would trigger onChange with empty elements, which would then
+    // override whatever is in localStorage currently
+    if (!this.state.isLoading) {
+      this.props.onChange?.(
+        this.scene.getElementsIncludingDeleted(),
+        this.state,
+      );
+    }
   }
 
   // Copy/paste
