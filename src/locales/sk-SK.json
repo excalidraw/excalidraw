@@ -90,7 +90,9 @@
     "centerVertically": "Zarovnať zvislo na stred",
     "centerHorizontally": "Zarovnať vodorovne na stred",
     "distributeHorizontally": "Rozmiestniť vodorovne",
-    "distributeVertically": "Rozmiestniť zvisle"
+    "distributeVertically": "Rozmiestniť zvisle",
+    "chartTypeBar": "",
+    "chartTypeLine": ""
   },
   "buttons": {
     "clearReset": "Obnoviť plátno",
@@ -222,6 +224,8 @@
   },
   "stats": {
     "angle": "Uhol",
+    "charts": "",
+    "current": "",
     "element": "Prvok",
     "elements": "Prvky",
     "height": "Výška",
