@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Lim inn",
+    "pasteCharts": "",
     "selectAll": "Velg alt",
     "multiSelect": "Legg til element i utvalg",
     "moveCanvas": "Flytt lerretet",
@@ -90,9 +91,7 @@
     "centerVertically": "Midtstill vertikalt",
     "centerHorizontally": "Midtstill horisontalt",
     "distributeHorizontally": "Distribuer horisontalt",
-    "distributeVertically": "Distribuer vertikalt",
-    "chartTypeBar": "",
-    "chartTypeLine": ""
+    "distributeVertically": "Distribuer vertikalt"
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
@@ -224,8 +223,6 @@
   },
   "stats": {
     "angle": "Vinkel",
-    "charts": "",
-    "current": "",
     "element": "Element",
     "elements": "Elementer",
     "height": "Høyde",
