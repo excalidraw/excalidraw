@@ -37,7 +37,7 @@
     }
   }
 
-  @media (max-width: 550px) {
+  @media #{$media-query} {
     .ExportDialog {
       display: flex;
       flex-direction: column;
@@ -51,9 +51,7 @@
     .ExportDialog__actions > * {
       margin-bottom: calc(var(--space-factor) * 3);
     }
-  }
 
-  @media #{$media-query} {
     .ExportDialog__preview canvas {
       max-height: 30vh;
     }
