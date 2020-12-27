@@ -90,7 +90,9 @@
     "centerVertically": "Centrera vertikalt",
     "centerHorizontally": "Centrera horisontellt",
     "distributeHorizontally": "Fördela horisontellt",
-    "distributeVertically": "Fördela vertikalt"
+    "distributeVertically": "Fördela vertikalt",
+    "chartTypeBar": "",
+    "chartTypeLine": ""
   },
   "buttons": {
     "clearReset": "Återställ canvasen",
@@ -222,6 +224,8 @@
   },
   "stats": {
     "angle": "Vinkel",
+    "charts": "",
+    "current": "",
     "element": "Element",
     "elements": "Element",
     "height": "Höjd",
