@@ -2,8 +2,8 @@
   "ar-SA": 85,
   "bg-BG": 60,
   "ca-ES": 77,
-  "de-DE": 99,
-  "el-GR": 95,
+  "de-DE": 100,
+  "el-GR": 99,
   "en": 100,
   "es-ES": 98,
   "fa-IR": 85,
@@ -22,13 +22,13 @@
   "nn-NO": 96,
   "pl-PL": 95,
   "pt-BR": 99,
-  "pt-PT": 99,
+  "pt-PT": 100,
   "ro-RO": 99,
-  "ru-RU": 96,
+  "ru-RU": 98,
   "sk-SK": 99,
   "sv-SE": 99,
   "tr-TR": 86,
   "uk-UA": 99,
   "zh-CN": 99,
-  "zh-TW": 99
+  "zh-TW": 100
 }
