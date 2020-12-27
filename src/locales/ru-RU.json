@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Вставить",
-    "pasteCharts": "",
+    "pasteCharts": "Вставить диаграммы",
     "selectAll": "Выбрать все",
     "multiSelect": "Добавить элемент в выделенный фрагмент",
     "moveCanvas": "Переместить холст",
@@ -119,9 +119,9 @@
     "roomDialog": "Начать совместную работу",
     "createNewRoom": "Создать новую комнату",
     "fullScreen": "Полный экран",
-    "darkMode": "",
-    "lightMode": "",
-    "zenMode": "",
+    "darkMode": "Темная тема",
+    "lightMode": "Светлая тема",
+    "zenMode": "Режим Дзен",
     "exitZenMode": "Выключить режим концентрации внимания"
   },
   "alerts": {
