@@ -90,7 +90,9 @@
     "centerVertically": "Центрувати по вертикалі",
     "centerHorizontally": "Центрувати по горизонталі",
     "distributeHorizontally": "Розподілити по горизонталі",
-    "distributeVertically": "Розподілити вертикально"
+    "distributeVertically": "Розподілити вертикально",
+    "chartTypeBar": "",
+    "chartTypeLine": ""
   },
   "buttons": {
     "clearReset": "Очистити полотно",
@@ -222,6 +224,8 @@
   },
   "stats": {
     "angle": "Кут",
+    "charts": "",
+    "current": "",
     "element": "Елемент",
     "elements": "Елементи",
     "height": "Висота",
