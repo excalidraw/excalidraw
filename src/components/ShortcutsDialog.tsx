@@ -131,7 +131,7 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
   return (
     <>
       <Dialog
-        maxWidth={900}
+        size="large"
         onCloseRequest={handleClose}
         title={t("shortcutsDialog.title")}
       >

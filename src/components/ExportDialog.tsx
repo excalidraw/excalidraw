@@ -263,7 +263,7 @@ export const ExportDialog = ({
       />
       {modalIsShown && (
         <Dialog
-          maxWidth={800}
+          size="large"
           onCloseRequest={handleClose}
           title={t("buttons.export")}
         >

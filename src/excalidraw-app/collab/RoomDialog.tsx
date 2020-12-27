@@ -124,7 +124,7 @@ const RoomDialog = ({
   };
   return (
     <Dialog
-      maxWidth={800}
+      size="small"
       onCloseRequest={handleClose}
       title={t("labels.createRoom")}
     >
