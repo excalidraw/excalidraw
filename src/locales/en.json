@@ -90,7 +90,9 @@
     "centerVertically": "Center vertically",
     "centerHorizontally": "Center horizontally",
     "distributeHorizontally": "Distribute horizontally",
-    "distributeVertically": "Distribute vertically"
+    "distributeVertically": "Distribute vertically",
+    "chartTypeBar": "Bar",
+    "chartTypeLine": "Line"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
@@ -222,6 +224,8 @@
   },
   "stats": {
     "angle": "Angle",
+    "charts": "Charts",
+    "current": "Current",
     "element": "Element",
     "elements": "Elements",
     "height": "Height",

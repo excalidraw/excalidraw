@@ -15,7 +15,6 @@ import { Section } from "./Section";
 import CollabButton from "./CollabButton";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 import { LockIcon } from "./LockIcon";
-import { LoadingMessage } from "./LoadingMessage";
 import { UserList } from "./UserList";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 import { EVENT_ACTION, trackEvent } from "../analytics";
@@ -46,7 +45,6 @@ export const MobileMenu = ({
   isCollaborating,
 }: MobileMenuProps) => (
   <>
-    {appState.isLoading && <LoadingMessage />}
     <FixedSideContainer side="top">
       <Section heading="shapes">
         {(heading) => (
