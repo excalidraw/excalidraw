@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Klistra in",
+    "pasteCharts": "",
     "selectAll": "Markera alla",
     "multiSelect": "Lägg till element till markering",
     "moveCanvas": "Flytta canvas",
@@ -90,9 +91,7 @@
     "centerVertically": "Centrera vertikalt",
     "centerHorizontally": "Centrera horisontellt",
     "distributeHorizontally": "Fördela horisontellt",
-    "distributeVertically": "Fördela vertikalt",
-    "chartTypeBar": "Stapel",
-    "chartTypeLine": "Linje"
+    "distributeVertically": "Fördela vertikalt"
   },
   "buttons": {
     "clearReset": "Återställ canvasen",
@@ -224,8 +223,6 @@
   },
   "stats": {
     "angle": "Vinkel",
-    "charts": "Diagram",
-    "current": "Nuvarande",
     "element": "Element",
     "elements": "Element",
     "height": "Höjd",
