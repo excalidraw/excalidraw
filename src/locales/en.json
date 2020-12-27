@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Paste",
+    "pasteCharts": "Paste charts",
     "selectAll": "Select all",
     "multiSelect": "Add element to selection",
     "moveCanvas": "Move canvas",
