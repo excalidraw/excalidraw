@@ -90,7 +90,9 @@
     "centerVertically": "Κέντρο κάθετα",
     "centerHorizontally": "Κέντρο οριζόντια",
     "distributeHorizontally": "",
-    "distributeVertically": ""
+    "distributeVertically": "",
+    "chartTypeBar": "",
+    "chartTypeLine": ""
   },
   "buttons": {
     "clearReset": "Επαναφορά του καμβά",
@@ -222,6 +224,8 @@
   },
   "stats": {
     "angle": "Γωνία",
+    "charts": "",
+    "current": "",
     "element": "Στοιχείο",
     "elements": "Στοιχεία",
     "height": "Ύψος",
