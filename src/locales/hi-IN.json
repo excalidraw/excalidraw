@@ -90,7 +90,9 @@
     "centerVertically": "",
     "centerHorizontally": "",
     "distributeHorizontally": "",
-    "distributeVertically": ""
+    "distributeVertically": "",
+    "chartTypeBar": "",
+    "chartTypeLine": ""
   },
   "buttons": {
     "clearReset": "कैनवास रीसेट करें",
@@ -222,6 +224,8 @@
   },
   "stats": {
     "angle": "कोण",
+    "charts": "",
+    "current": "",
     "element": "",
     "elements": "",
     "height": "ऊंचाई",
