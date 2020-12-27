@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Liitä",
+    "pasteCharts": "",
     "selectAll": "Valitse kaikki",
     "multiSelect": "Lisää kohde valintaan",
     "moveCanvas": "Siirrä piirtoaluetta",
@@ -90,9 +91,7 @@
     "centerVertically": "Keskitä pystysuunnassa",
     "centerHorizontally": "Keskitä vaakasuunnassa",
     "distributeHorizontally": "Jaa vaakasuunnassa",
-    "distributeVertically": "Jaa pystysuunnassa",
-    "chartTypeBar": "",
-    "chartTypeLine": ""
+    "distributeVertically": "Jaa pystysuunnassa"
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
@@ -224,8 +223,6 @@
   },
   "stats": {
     "angle": "Kulma",
-    "charts": "",
-    "current": "",
     "element": "Elementti",
     "elements": "Elementit",
     "height": "Korkeus",
