@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Incolla",
+    "pasteCharts": "",
     "selectAll": "Seleziona tutto",
     "multiSelect": "Aggiungi elemento alla selezione",
     "moveCanvas": "Sposta tela",
@@ -90,9 +91,7 @@
     "centerVertically": "Centra Verticalmente",
     "centerHorizontally": "Centra orizzontalmente",
     "distributeHorizontally": "Distribuisci orizzontalmente",
-    "distributeVertically": "Distribuisci verticalmente",
-    "chartTypeBar": "",
-    "chartTypeLine": ""
+    "distributeVertically": "Distribuisci verticalmente"
   },
   "buttons": {
     "clearReset": "Svuota la tela",
@@ -224,8 +223,6 @@
   },
   "stats": {
     "angle": "Angolo",
-    "charts": "",
-    "current": "",
     "element": "Elemento",
     "elements": "Elementi",
     "height": "Altezza",
