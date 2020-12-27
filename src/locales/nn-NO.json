@@ -90,7 +90,9 @@
     "centerVertically": "Midtstill vertikalt",
     "centerHorizontally": "Midtstill horisontalt",
     "distributeHorizontally": "Sprei horisontalt",
-    "distributeVertically": "Sprei vertikalt"
+    "distributeVertically": "Sprei vertikalt",
+    "chartTypeBar": "",
+    "chartTypeLine": ""
   },
   "buttons": {
     "clearReset": "Tilbakestill lerretet",
@@ -222,6 +224,8 @@
   },
   "stats": {
     "angle": "Vinkel",
+    "charts": "",
+    "current": "",
     "element": "Element",
     "elements": "Element",
     "height": "Høgde",
