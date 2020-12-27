@@ -51,6 +51,7 @@ import {
   EVENT_LIBRARY,
   trackEvent,
 } from "../analytics";
+import { PasteChartDialog } from "./PasteChartDialog";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -60,7 +61,7 @@ interface LayerUIProps {
   elements: readonly NonDeletedExcalidrawElement[];
   onCollabButtonClick?: () => void;
   onLockToggle: () => void;
-  onInsertShape: (elements: LibraryItem) => void;
+  onInsertElements: (elements: readonly NonDeletedExcalidrawElement[]) => void;
   zenModeEnabled: boolean;
   toggleZenMode: () => void;
   lng: string;
@@ -318,7 +319,7 @@ const LayerUI = ({
   elements,
   onCollabButtonClick,
   onLockToggle,
-  onInsertShape,
+  onInsertElements,
   zenModeEnabled,
   toggleZenMode,
   isCollaborating,
@@ -456,7 +457,7 @@ const LayerUI = ({
     <LibraryMenu
       pendingElements={getSelectedElements(elements, appState)}
       onClickOutside={closeLibrary}
-      onInsertShape={onInsertShape}
+      onInsertShape={onInsertElements}
       onAddToLibrary={deselectItems}
       setAppState={setAppState}
     />
@@ -592,21 +593,8 @@ const LayerUI = ({
     </footer>
   );
 
-  return isMobile ? (
-    <MobileMenu
-      appState={appState}
-      elements={elements}
-      actionManager={actionManager}
-      libraryMenu={libraryMenu}
-      exportButton={renderExportDialog()}
-      setAppState={setAppState}
-      onCollabButtonClick={onCollabButtonClick}
-      onLockToggle={onLockToggle}
-      canvas={canvas}
-      isCollaborating={isCollaborating}
-    />
-  ) : (
-    <div className="layer-ui__wrapper">
+  const dialogs = (
+    <>
       {appState.isLoading && <LoadingMessage />}
       {appState.errorMessage && (
         <ErrorDialog
@@ -619,6 +607,40 @@ const LayerUI = ({
           onClose={() => setAppState({ showShortcutsDialog: false })}
         />
       )}
+      {appState.pasteDialog.shown && (
+        <PasteChartDialog
+          setAppState={setAppState}
+          appState={appState}
+          onInsertChart={onInsertElements}
+          onClose={() =>
+            setAppState({
+              pasteDialog: { shown: false, data: null },
+            })
+          }
+        />
+      )}
+    </>
+  );
+
+  return isMobile ? (
+    <>
+      {dialogs}
+      <MobileMenu
+        appState={appState}
+        elements={elements}
+        actionManager={actionManager}
+        libraryMenu={libraryMenu}
+        exportButton={renderExportDialog()}
+        setAppState={setAppState}
+        onCollabButtonClick={onCollabButtonClick}
+        onLockToggle={onLockToggle}
+        canvas={canvas}
+        isCollaborating={isCollaborating}
+      />
+    </>
+  ) : (
+    <div className="layer-ui__wrapper">
+      {dialogs}
       {renderFixedSideContainer()}
       {renderBottomAppMenu()}
       {
