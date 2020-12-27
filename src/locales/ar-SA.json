@@ -90,7 +90,9 @@
     "centerVertically": "توسيط عمودي",
     "centerHorizontally": "توسيط أفقي",
     "distributeHorizontally": "التوزيع الأفقي",
-    "distributeVertically": "التوزيع عمودياً"
+    "distributeVertically": "التوزيع عمودياً",
+    "chartTypeBar": "",
+    "chartTypeLine": ""
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
@@ -222,6 +224,8 @@
   },
   "stats": {
     "angle": "",
+    "charts": "",
+    "current": "",
     "element": "",
     "elements": "",
     "height": "",
