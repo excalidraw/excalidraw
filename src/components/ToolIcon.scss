@@ -193,7 +193,7 @@
     margin-left: 5px;
     margin-top: 1px;
 
-    @media #{$media-query} {
+    @media #{$is-mobile-query} {
       display: none;
     }
   }
