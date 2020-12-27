@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "جای گذاری",
+    "pasteCharts": "",
     "selectAll": "انتخاب همه",
     "multiSelect": "یک ایتم به انتخاب شده ها اضافه کنید.",
     "moveCanvas": "بوم را حرکت بدهید",
@@ -90,9 +91,7 @@
     "centerVertically": "وسط قرار دادن به صورت عمودی",
     "centerHorizontally": "وسط قرار دادن به صورت افقی",
     "distributeHorizontally": "توزیع کردن به صورت افقی",
-    "distributeVertically": "توزیع کردن به صورت عمودی",
-    "chartTypeBar": "",
-    "chartTypeLine": ""
+    "distributeVertically": "توزیع کردن به صورت عمودی"
   },
   "buttons": {
     "clearReset": "پاکسازی بوم نقاشی",
@@ -224,8 +223,6 @@
   },
   "stats": {
     "angle": "",
-    "charts": "",
-    "current": "",
     "element": "",
     "elements": "",
     "height": "",
