@@ -9,8 +9,8 @@
 
   .picker {
     background: var(--popup-bg-color);
-    border: 0px solid transparentize($oc-white, 0.75);
-    box-shadow: transparentize($oc-black, 0.75) 0px 1px 4px;
+    border: 0 solid transparentize($oc-white, 0.75);
+    box-shadow: transparentize($oc-black, 0.75) 0 1px 4px;
     border-radius: 4px;
     position: absolute;
   }
@@ -56,8 +56,8 @@
   }
 
   .picker-triangle {
-    width: 0px;
-    height: 0px;
+    width: 0;
+    height: 0;
     position: relative;
     top: -10px;
     :root[dir="ltr"] & {
@@ -73,7 +73,7 @@
       content: "";
       position: absolute;
       border-style: solid;
-      border-width: 0px 9px 10px;
+      border-width: 0 9px 10px;
       border-color: transparent transparent transparentize($oc-black, 0.9);
       top: -1px;
     }
@@ -82,7 +82,7 @@
       content: "";
       position: absolute;
       border-style: solid;
-      border-width: 0px 9px 10px;
+      border-width: 0 9px 10px;
       border-color: transparent transparent var(--popup-bg-color);
     }
   }

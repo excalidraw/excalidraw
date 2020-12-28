@@ -43,10 +43,10 @@
   }
 
   .FixedSideContainer {
-    padding-top: var(--sat, 0px);
-    padding-right: var(--sar, 0px);
-    padding-bottom: var(--sab, 0px);
-    padding-left: var(--sal, 0px);
+    padding-top: var(--sat, 0);
+    padding-right: var(--sar, 0);
+    padding-bottom: var(--sab, 0);
+    padding-left: var(--sal, 0);
   }
 
   .panelRow {
@@ -223,10 +223,10 @@
     left: 0;
     right: 0;
     --bar-padding: calc(4 * var(--space-factor));
-    padding-top: #{"max(var(--bar-padding), var(--sat, 0px))"};
-    padding-right: var(--sar, 0px);
-    padding-bottom: var(--sab, 0px);
-    padding-left: var(--sal, 0px);
+    padding-top: #{"max(var(--bar-padding), var(--sat, 0))"};
+    padding-right: var(--sar, 0);
+    padding-bottom: var(--sab, 0);
+    padding-left: var(--sal, 0);
     z-index: 4;
     display: flex;
     align-items: flex-end;
@@ -243,7 +243,7 @@
       pointer-events: initial;
 
       .panelColumn {
-        padding: 8px 8px 0px 8px;
+        padding: 8px 8px 0 8px;
       }
     }
   }
@@ -446,7 +446,7 @@
       display: none;
     }
     .scroll-back-to-content {
-      bottom: calc(80px + var(--sab, 0px));
+      bottom: calc(80px + var(--sab, 0));
       z-index: -1;
     }
   }
