@@ -38,7 +38,7 @@
     "fontSize": "Rozmiar tekstu",
     "fontFamily": "Krój pisma",
     "onlySelected": "Tylko wybrane",
-    "withBackground": "",
+    "withBackground": "Z tłem",
     "exportEmbedScene": "Osadź scenę w eksportowanym pliku",
     "exportEmbedScene_details": "Dane sceny zostaną zapisane w eksportowanym pliku PNG/SVG tak, aby scena mogła zostać z niego przywrócona.\nZwiększy to rozmiar eksportowanego pliku.",
     "addWatermark": "Dodaj \"Zrobione w Excalidraw\"",
@@ -100,7 +100,7 @@
     "exportToSvg": "Zapisz jako SVG",
     "copyToClipboard": "Skopiuj do schowka",
     "copyPngToClipboard": "Skopiuj do schowka jako plik PNG",
-    "scale": "",
+    "scale": "Skala",
     "save": "Zapisz",
     "saveAs": "Zapisz jako",
     "load": "Otwórz",
@@ -118,10 +118,10 @@
     "redo": "Przywróć",
     "roomDialog": "Utwórz nową sesję współpracy na żywo",
     "createNewRoom": "Utwórz nowy pokój",
-    "fullScreen": "",
-    "darkMode": "",
-    "lightMode": "",
-    "zenMode": "",
+    "fullScreen": "Pełny ekran",
+    "darkMode": "Ciemny motyw",
+    "lightMode": "Jasny motyw",
+    "zenMode": "Tryb Zen",
     "exitZenMode": "Wyjdź z trybu Zen"
   },
   "alerts": {
@@ -162,7 +162,7 @@
     "freeDraw": "Naciśnij i przeciągnij by rysować, puść kiedy skończysz",
     "text": "Wskazówka: możesz również dodać tekst klikając dwukrotnie gdziekolwiek za pomocą narzędzia zaznaczania",
     "linearElementMulti": "Aby zakończyć krzywą, ponownie kliknij w ostatni punkt, bądź naciśnij Esc albo Enter",
-    "lockAngle": "",
+    "lockAngle": "Możesz ograniczyć kąt trzymając SHIFT",
     "resize": "Możesz zachować proporcję trzymająć wcisnięty SHIFT, przytrzymaj ALT by zmienić rozmiar względem środka",
     "rotate": "Możesz obracać element w równych odstępach trzymając wciśnięty SHIFT",
     "lineEditor_info": "Kliknij dwukrotnie lub naciśnij Enter, aby edytować punkty",
@@ -170,8 +170,8 @@
     "lineEditor_nothingSelected": "Naciśnij w punkt by go edytować, przytrzymaj Alt i naciśnij by dodać nowy punkt"
   },
   "canvasError": {
-    "cannotShowPreview": "Nie można pokazać podglądu",
-    "canvasTooBig": "Płótno może być za duże.",
+    "cannotShowPreview": "Nie można wyświetlić podglądu",
+    "canvasTooBig": "Obszar roboczy może być za duży.",
     "canvasTooBigTip": "Wskazówka: spróbuj nieco zbliżyć najdalej wysunięte elementy."
   },
   "errorSplash": {
