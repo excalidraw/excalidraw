@@ -127,7 +127,7 @@
   "alerts": {
     "clearReset": "To spowoduje usunięcie wszystkiego z dokumentu. Czy chcesz kontynuować?",
     "couldNotCreateShareableLink": "Wystąpił błąd przy generowaniu linka do udostępniania.",
-    "couldNotCreateShareableLinkTooBig": "Nie można utworzyć udostępnialnego linku: scena jest za duża",
+    "couldNotCreateShareableLinkTooBig": "Nie można utworzyć linku do udostępnienia: scena jest za duża",
     "couldNotLoadInvalidFile": "Nie udało się otworzyć pliku. Wybrany plik jest nieprawidłowy.",
     "importBackendFailed": "Wystąpił błąd podczas importowania pliku.",
     "cannotExportEmptyCanvas": "Najpierw musisz coś narysować, aby zapisać dokument.",
@@ -137,7 +137,7 @@
     "loadSceneOverridePrompt": "Wczytanie zewnętrznego rysunku zastąpi istniejącą zawartość. Czy chcesz kontynuować?",
     "errorLoadingLibrary": "Wystąpił błąd podczas ładowania biblioteki stron trzecich.",
     "confirmAddLibrary": "To doda {{numShapes}} kształtów do twojej biblioteki. Jesteś pewien?",
-    "imageDoesNotContainScene": "",
+    "imageDoesNotContainScene": "Importowanie zdjęć nie jest obecnie obsługiwane.\n\nCzy chciałeś zaimportować scenę? Ten obraz nie zawiera żadnych danych sceny. Czy włączyłeś to podczas eksportowania?",
     "cannotRestoreFromImage": "Scena nie mogła zostać przywrócona z pliku obrazu"
   },
   "toolBar": {
@@ -230,7 +230,7 @@
     "selected": "Zaznaczenie",
     "storage": "Pamięć",
     "title": "Statystyki dla nerdów",
-    "total": "Suma",
+    "total": "Łącznie",
     "width": "Szerokość"
   }
 }
