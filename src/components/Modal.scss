@@ -41,7 +41,7 @@
     background: var(--bg-color-island);
     backdrop-filter: none;
 
-    border: 1px solid var(--dialog-border);
+    border: 1.5px solid var(--dialog-border);
     border-radius: 6px;
 
     @media #{$is-mobile-query} {
