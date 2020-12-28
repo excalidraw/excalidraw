@@ -45,6 +45,8 @@
 
     @media #{$is-mobile-query} {
       max-width: 100%;
+      border: 0;
+      border-radius: 0;
     }
   }
 
