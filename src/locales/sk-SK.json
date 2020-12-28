@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Vložiť",
-    "pasteCharts": "",
+    "pasteCharts": "Vložiť grafy",
     "selectAll": "Vybrať všetko",
     "multiSelect": "Pridať prvok do výberu",
     "moveCanvas": "Pohyb plátna",
@@ -15,7 +15,7 @@
     "sendBackward": "Presunúť o úroveň dozadu",
     "delete": "Vymazať",
     "copyStyles": "Kopírovať štýly",
-    "pasteStyles": "Prilepiť štýly",
+    "pasteStyles": "Vložiť štýly",
     "stroke": "Obrys",
     "background": "Pozadie",
     "fill": "Výplň",
