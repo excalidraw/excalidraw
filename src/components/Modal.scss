@@ -35,6 +35,7 @@
     transform: translateY(10px);
     animation: Modal__content_fade-in 0.1s ease-out 0.05s forwards;
     position: relative;
+    overflow-y: auto;
 
     // for modals, reset blurry bg
     background: var(--bg-color-island);
