@@ -42,7 +42,7 @@
     backdrop-filter: none;
 
     border: 1px solid var(--dialog-border);
-    border-radius: var(--border-radius-m);
+    border-radius: 6px;
 
     @media #{$is-mobile-query} {
       max-width: 100%;
