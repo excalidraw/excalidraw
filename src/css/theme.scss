@@ -32,7 +32,6 @@
   --popup-text-color: #{$oc-black};
   --popup-text-inverted-color: #{$oc-white};
   --dialog-border: #{$oc-gray-6};
-  --dialog-title-bg: #{$oc-gray-4};
 }
 
 .excalidraw {
@@ -71,6 +70,5 @@
     --popup-text-color: #{$oc-gray-4};
     --popup-text-inverted-color: #2c2c2c;
     --dialog-border: #{$oc-gray-8};
-    --dialog-title-bg: #{$oc-gray-9};
   }
 }
