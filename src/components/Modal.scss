@@ -30,6 +30,7 @@
     z-index: 2;
     width: 100%;
     max-width: var(--max-width);
+    max-height: 100%;
 
     opacity: 0;
     transform: translateY(10px);
@@ -41,7 +42,8 @@
     background: var(--bg-color-island);
     backdrop-filter: none;
 
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--dialog-border);
+    box-shadow: 0 2px 10px transparentize($oc-black, 0.75);
     border-radius: 6px;
 
     @media #{$is-mobile-query} {
@@ -72,12 +74,6 @@
     svg {
       height: calc(var(--space-factor) * 5);
     }
-  }
-
-  .Modal__close--floating {
-    position: absolute;
-    right: calc(var(--space-factor) * 5);
-    top: calc(var(--space-factor) * 5);
   }
 
   @media #{$is-mobile-query} {
