@@ -7,7 +7,7 @@
     margin-top: 0;
     grid-template-columns: 1fr calc(var(--space-factor) * 7);
     grid-gap: var(--metric);
-    padding: 4px;
+    padding: calc(var(--space-factor) * 2);
     text-align: center;
     font-variant: small-caps;
   }
@@ -39,8 +39,6 @@
       position: sticky;
       top: 0;
       padding: calc(var(--space-factor) * 2);
-      padding-left: var(--inset-left);
-      padding-right: var(--inset-right);
       background: var(--bg-color-island);
       font-size: 1.25em;
 
