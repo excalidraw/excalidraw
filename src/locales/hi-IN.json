@@ -121,7 +121,7 @@
     "fullScreen": "पूरी स्क्रीन",
     "darkMode": "डार्क मोड",
     "lightMode": "लाइट मोड",
-    "zenMode": "",
+    "zenMode": "ज़ेन मोड",
     "exitZenMode": "जेन मोड से बाहर निकलें"
   },
   "alerts": {
@@ -223,7 +223,7 @@
   },
   "stats": {
     "angle": "कोण",
-    "element": "",
+    "element": "एलिमेंट",
     "elements": "",
     "height": "ऊंचाई",
     "scene": "दृश्य",
