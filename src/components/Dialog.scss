@@ -7,7 +7,6 @@
     margin-top: 0;
     grid-template-columns: 1fr calc(var(--space-factor) * 7);
     grid-gap: var(--metric);
-    background-color: var(--dialog-title-bg);
     padding: 4px;
     text-align: center;
     font-variant: small-caps;
@@ -38,10 +37,7 @@
           var(--space-factor) * 7
         );
       position: sticky;
-      top: calc(-1 * var(--metric));
-      margin: calc(-1 * var(--inset-right));
-      margin-top: calc(-1 * var(--metric));
-      margin-bottom: var(--metric);
+      top: 0;
       padding: calc(var(--space-factor) * 2);
       padding-left: var(--inset-left);
       padding-right: var(--inset-right);
