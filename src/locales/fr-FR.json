@@ -4,7 +4,7 @@
     "pasteCharts": "Coller les graphiques",
     "selectAll": "Tout sélectionner",
     "multiSelect": "Ajouter l'élément à la sélection",
-    "moveCanvas": "Déplacer le canvas",
+    "moveCanvas": "Déplacer le canevas",
     "cut": "Couper",
     "copy": "Copier",
     "copyAsPng": "Copier dans le presse-papier en PNG",
@@ -63,7 +63,7 @@
     "cartoonist": "Caricaturiste",
     "fileTitle": "Titre du fichier",
     "colorPicker": "Sélecteur de couleur",
-    "canvasBackground": "Fond du canevas",
+    "canvasBackground": "Arrière-plan du canevas",
     "drawingCanvas": "Canvas de dessin",
     "layers": "Calques",
     "actions": "Actions",
@@ -94,7 +94,7 @@
     "distributeVertically": "Distribuer verticalement"
   },
   "buttons": {
-    "clearReset": "Réinitialiser le canvas",
+    "clearReset": "Réinitialiser le canevas",
     "export": "Exporter",
     "exportToPng": "Exporter en PNG",
     "exportToSvg": "Exporter en SVG",
@@ -125,12 +125,12 @@
     "exitZenMode": "Quitter le mode zen"
   },
   "alerts": {
-    "clearReset": "L'intégralité du canvas va être effacée. Êtes-vous sûr ?",
+    "clearReset": "L'intégralité du canevas va être effacée. Êtes-vous sûr ?",
     "couldNotCreateShareableLink": "Impossible de créer un lien de partage.",
     "couldNotCreateShareableLinkTooBig": "Impossible de créer un lien partageable : la scène est trop volumineuse",
     "couldNotLoadInvalidFile": "Impossible de charger un fichier invalide",
     "importBackendFailed": "L'importation depuis le backend a échoué.",
-    "cannotExportEmptyCanvas": "Impossible d'exporter un canvas vide.",
+    "cannotExportEmptyCanvas": "Impossible d'exporter un canevas vide.",
     "couldNotCopyToClipboard": "Impossible de copier dans le presse-papier. Essayez d'utiliser le navigateur Chrome.",
     "decryptFailed": "Les données n'ont pas pu être déchiffrées.",
     "uploadedSecurly": "Le téléchargement a été sécurisé avec un chiffrement de bout en bout, ce qui signifie que ni Excalidraw ni personne d'autre ne peut en lire le contenu.",
@@ -171,14 +171,14 @@
   },
   "canvasError": {
     "cannotShowPreview": "Impossible d’afficher l’aperçu",
-    "canvasTooBig": "Le dessin est peut-être trop grand.",
+    "canvasTooBig": "Le canevas est peut-être trop grand.",
     "canvasTooBigTip": "Conseil : essayez de rapprocher un peu plus les éléments les plus éloignés."
   },
   "errorSplash": {
     "headingMain_pre": "Une erreur est survenue. Essayez ",
     "headingMain_button": "rechargement de la page.",
     "clearCanvasMessage": "Si le rechargement ne résout pas l'erreur, essayez ",
-    "clearCanvasMessage_button": "effacement du canvas.",
+    "clearCanvasMessage_button": "effacement du canevas.",
     "clearCanvasCaveat": " Cela entraînera une perte du travail ",
     "trackedToSentry_pre": "L'erreur avec l'identifiant ",
     "trackedToSentry_post": " a été enregistrée dans notre système.",
