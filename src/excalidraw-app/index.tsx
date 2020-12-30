@@ -104,7 +104,6 @@ type Scene = ImportedDataState & { commitToHistory: boolean };
 const initializeScene = async (opts: {
   resetScene: ExcalidrawImperativeAPI["resetScene"];
   initializeSocketClient: CollabAPI["initializeSocketClient"];
-  onLateInitialization?: (scene: Scene) => void;
 }): Promise<Scene | null> => {
   const searchParams = new URLSearchParams(window.location.search);
   const id = searchParams.get("id");
@@ -135,17 +134,15 @@ const initializeScene = async (opts: {
     } else {
       // https://github.com/excalidraw/excalidraw/issues/1919
       if (document.hidden) {
-        window.addEventListener(
-          "focus",
-          () =>
-            initializeScene(opts).then((_scene) => {
-              opts?.onLateInitialization?.(_scene || scene);
-            }),
-          {
-            once: true,
-          },
-        );
-        return null;
+        return new Promise((resolve, reject) => {
+          window.addEventListener(
+            "focus",
+            () => initializeScene(opts).then(resolve).catch(reject),
+            {
+              once: true,
+            },
+          );
+        });
       }
 
       isCollabScene = false;
@@ -235,9 +232,6 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
       initializeScene({
         resetScene: excalidrawApi.resetScene,
         initializeSocketClient: collab.initializeSocketClient,
-        onLateInitialization: (scene) => {
-          initialStatePromiseRef.current.promise.resolve(scene);
-        },
       }).then((scene) => {
         initialStatePromiseRef.current.promise.resolve(scene);
       });

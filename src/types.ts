@@ -9,6 +9,7 @@ import {
   GroupId,
   ExcalidrawBindableElement,
   Arrowhead,
+  ChartType,
 } from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -17,6 +18,7 @@ import { SuggestedBinding } from "./element/binding";
 import { ImportedDataState } from "./data/types";
 import { ExcalidrawImperativeAPI } from "./components/App";
 import type { ResolvablePromise } from "./utils";
+import { Spreadsheet } from "./charts";
 import { Language } from "./i18n";
 
 export type FlooredNumber = number & { _brand: "FlooredNumber" };
@@ -98,6 +100,16 @@ export type AppState = {
   fileHandle: import("browser-nativefs").FileSystemHandle | null;
   collaborators: Map<string, Collaborator>;
   showStats: boolean;
+  currentChartType: ChartType;
+  pasteDialog:
+    | {
+        shown: false;
+        data: null;
+      }
+    | {
+        shown: true;
+        data: Spreadsheet;
+      };
 };
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };

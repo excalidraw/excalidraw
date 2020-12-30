@@ -1,13 +1,16 @@
 import { EVENT_MAGIC, trackEvent } from "./analytics";
 import colors from "./colors";
-import { DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE } from "./constants";
-import { newElement, newTextElement, newLinearElement } from "./element";
-import { ExcalidrawElement } from "./element/types";
+import { DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE, ENV } from "./constants";
+import { newElement, newLinearElement, newTextElement } from "./element";
+import { NonDeletedExcalidrawElement } from "./element/types";
 import { randomId } from "./random";
+
+export type ChartElements = readonly NonDeletedExcalidrawElement[];
 
 const BAR_WIDTH = 32;
 const BAR_GAP = 12;
 const BAR_HEIGHT = 256;
+const GRID_OPACITY = 50;
 
 export interface Spreadsheet {
   title: string | null;
@@ -139,114 +142,48 @@ export const tryParseSpreadsheet = (text: string): ParseSpreadsheetResult => {
       return transposedResults;
     }
   }
-
   return result;
 };
 
-// For the maths behind it https://excalidraw.com/#json=6320864370884608,O_5xfD-Agh32tytHpRJx1g
-export const renderSpreadsheet = (
+const bgColors = colors.elementBackground.slice(
+  2,
+  colors.elementBackground.length,
+);
+
+// Put all the common properties here so when the whole chart is selected
+// the properties dialog shows the correct selected values
+const commonProps = {
+  fillStyle: "hachure",
+  fontFamily: DEFAULT_FONT_FAMILY,
+  fontSize: DEFAULT_FONT_SIZE,
+  opacity: 100,
+  roughness: 1,
+  strokeColor: colors.elementStroke[0],
+  strokeSharpness: "sharp",
+  strokeStyle: "solid",
+  strokeWidth: 1,
+  verticalAlign: "middle",
+} as const;
+
+const getChartDimentions = (spreadsheet: Spreadsheet) => {
+  const chartWidth =
+    (BAR_WIDTH + BAR_GAP) * spreadsheet.values.length + BAR_GAP;
+  const chartHeight = BAR_HEIGHT + BAR_GAP * 2;
+  return { chartWidth, chartHeight };
+};
+
+const chartXLabels = (
   spreadsheet: Spreadsheet,
   x: number,
   y: number,
-): ExcalidrawElement[] => {
-  const values = spreadsheet.values;
-  const max = Math.max(...values);
-  const chartHeight = BAR_HEIGHT + BAR_GAP * 2;
-  const chartWidth = (BAR_WIDTH + BAR_GAP) * values.length + BAR_GAP;
-  const maxColors = colors.elementBackground.length;
-  const bgColors = colors.elementBackground.slice(2, maxColors);
-
-  // Put all the common properties here so when the whole chart is selected
-  // the properties dialog shows the correct selected values
-  const commonProps = {
-    backgroundColor: bgColors[Math.floor(Math.random() * bgColors.length)],
-    fillStyle: "hachure",
-    fontFamily: DEFAULT_FONT_FAMILY,
-    fontSize: DEFAULT_FONT_SIZE,
-    groupIds: [randomId()],
-    opacity: 100,
-    roughness: 1,
-    strokeColor: colors.elementStroke[0],
-    strokeSharpness: "sharp",
-    strokeStyle: "solid",
-    strokeWidth: 1,
-    verticalAlign: "middle",
-  } as const;
-
-  const minYLabel = newTextElement({
-    ...commonProps,
-    x: x - BAR_GAP,
-    y: y - BAR_GAP,
-    text: "0",
-    textAlign: "right",
-  });
-
-  const maxYLabel = newTextElement({
-    ...commonProps,
-    x: x - BAR_GAP,
-    y: y - BAR_HEIGHT - minYLabel.height / 2,
-    text: max.toLocaleString(),
-    textAlign: "right",
-  });
-
-  const xAxisLine = newLinearElement({
-    type: "line",
-    x,
-    y,
-    startArrowhead: null,
-    endArrowhead: null,
-    width: chartWidth,
-    points: [
-      [0, 0],
-      [chartWidth, 0],
-    ],
-    ...commonProps,
-  });
-
-  const yAxisLine = newLinearElement({
-    type: "line",
-    x,
-    y,
-    startArrowhead: null,
-    endArrowhead: null,
-    height: chartHeight,
-    points: [
-      [0, 0],
-      [0, -chartHeight],
-    ],
-    ...commonProps,
-  });
-
-  const maxValueLine = newLinearElement({
-    type: "line",
-    x,
-    y: y - BAR_HEIGHT - BAR_GAP,
-    startArrowhead: null,
-    endArrowhead: null,
-    ...commonProps,
-    strokeStyle: "dotted",
-    width: chartWidth,
-    points: [
-      [0, 0],
-      [chartWidth, 0],
-    ],
-  });
-
-  const bars = values.map((value, index) => {
-    const barHeight = (value / max) * BAR_HEIGHT;
-    return newElement({
-      ...commonProps,
-      type: "rectangle",
-      x: x + index * (BAR_WIDTH + BAR_GAP) + BAR_GAP,
-      y: y - barHeight - BAR_GAP,
-      width: BAR_WIDTH,
-      height: barHeight,
-    });
-  });
-
-  const xLabels =
+  groupId: string,
+  backgroundColor: string,
+): ChartElements => {
+  return (
     spreadsheet.labels?.map((label, index) => {
       return newTextElement({
+        groupIds: [groupId],
+        backgroundColor,
         ...commonProps,
         text: label.length > 8 ? `${label.slice(0, 5)}...` : label,
         x: x + index * (BAR_WIDTH + BAR_GAP) + BAR_GAP * 2,
@@ -257,29 +194,288 @@ export const renderSpreadsheet = (
         textAlign: "center",
         verticalAlign: "top",
       });
-    }) || [];
+    }) || []
+  );
+};
+
+const chartYLabels = (
+  spreadsheet: Spreadsheet,
+  x: number,
+  y: number,
+  groupId: string,
+  backgroundColor: string,
+): ChartElements => {
+  const minYLabel = newTextElement({
+    groupIds: [groupId],
+    backgroundColor,
+    ...commonProps,
+    x: x - BAR_GAP,
+    y: y - BAR_GAP,
+    text: "0",
+    textAlign: "right",
+  });
+
+  const maxYLabel = newTextElement({
+    groupIds: [groupId],
+    backgroundColor,
+    ...commonProps,
+    x: x - BAR_GAP,
+    y: y - BAR_HEIGHT - minYLabel.height / 2,
+    text: Math.max(...spreadsheet.values).toLocaleString(),
+    textAlign: "right",
+  });
+
+  return [minYLabel, maxYLabel];
+};
+
+const chartLines = (
+  spreadsheet: Spreadsheet,
+  x: number,
+  y: number,
+  groupId: string,
+  backgroundColor: string,
+): ChartElements => {
+  const { chartWidth, chartHeight } = getChartDimentions(spreadsheet);
+  const xLine = newLinearElement({
+    backgroundColor,
+    groupIds: [groupId],
+    ...commonProps,
+    type: "line",
+    x,
+    y,
+    startArrowhead: null,
+    endArrowhead: null,
+    width: chartWidth,
+    points: [
+      [0, 0],
+      [chartWidth, 0],
+    ],
+  });
+
+  const yLine = newLinearElement({
+    backgroundColor,
+    groupIds: [groupId],
+    ...commonProps,
+    type: "line",
+    x,
+    y,
+    startArrowhead: null,
+    endArrowhead: null,
+    height: chartHeight,
+    points: [
+      [0, 0],
+      [0, -chartHeight],
+    ],
+  });
+
+  const maxLine = newLinearElement({
+    backgroundColor,
+    groupIds: [groupId],
+    ...commonProps,
+    type: "line",
+    x,
+    y: y - BAR_HEIGHT - BAR_GAP,
+    startArrowhead: null,
+    endArrowhead: null,
+    strokeStyle: "dotted",
+    width: chartWidth,
+    opacity: GRID_OPACITY,
+    points: [
+      [0, 0],
+      [chartWidth, 0],
+    ],
+  });
+
+  return [xLine, yLine, maxLine];
+};
+
+// For the maths behind it https://excalidraw.com/#json=6320864370884608,O_5xfD-Agh32tytHpRJx1g
+const chartBaseElements = (
+  spreadsheet: Spreadsheet,
+  x: number,
+  y: number,
+  groupId: string,
+  backgroundColor: string,
+  debug?: boolean,
+): ChartElements => {
+  const { chartWidth, chartHeight } = getChartDimentions(spreadsheet);
 
   const title = spreadsheet.title
     ? newTextElement({
+        backgroundColor,
+        groupIds: [groupId],
         ...commonProps,
         text: spreadsheet.title,
         x: x + chartWidth / 2,
-        y: y - BAR_HEIGHT - BAR_GAP * 2 - maxYLabel.height,
+        y: y - BAR_HEIGHT - BAR_GAP * 2 - DEFAULT_FONT_SIZE,
         strokeSharpness: "sharp",
         strokeStyle: "solid",
         textAlign: "center",
       })
     : null;
 
-  trackEvent(EVENT_MAGIC, "chart", "bars", bars.length);
+  const debugRect = debug
+    ? newElement({
+        backgroundColor,
+        groupIds: [groupId],
+        ...commonProps,
+        type: "rectangle",
+        x,
+        y: y - chartHeight,
+        width: chartWidth,
+        height: chartHeight,
+        strokeColor: colors.elementStroke[0],
+        fillStyle: "solid",
+        opacity: 6,
+      })
+    : null;
+
   return [
-    title,
+    ...(debugRect ? [debugRect] : []),
+    ...(title ? [title] : []),
+    ...chartXLabels(spreadsheet, x, y, groupId, backgroundColor),
+    ...chartYLabels(spreadsheet, x, y, groupId, backgroundColor),
+    ...chartLines(spreadsheet, x, y, groupId, backgroundColor),
+  ];
+};
+
+const chartTypeBar = (
+  spreadsheet: Spreadsheet,
+  x: number,
+  y: number,
+): ChartElements => {
+  const max = Math.max(...spreadsheet.values);
+  const groupId = randomId();
+  const backgroundColor = bgColors[Math.floor(Math.random() * bgColors.length)];
+
+  const bars = spreadsheet.values.map((value, index) => {
+    const barHeight = (value / max) * BAR_HEIGHT;
+    return newElement({
+      backgroundColor,
+      groupIds: [groupId],
+      ...commonProps,
+      type: "rectangle",
+      x: x + index * (BAR_WIDTH + BAR_GAP) + BAR_GAP,
+      y: y - barHeight - BAR_GAP,
+      width: BAR_WIDTH,
+      height: barHeight,
+    });
+  });
+
+  return [
     ...bars,
-    ...xLabels,
-    xAxisLine,
-    yAxisLine,
-    maxValueLine,
-    minYLabel,
-    maxYLabel,
-  ].filter((element) => element !== null) as ExcalidrawElement[];
+    ...chartBaseElements(
+      spreadsheet,
+      x,
+      y,
+      groupId,
+      backgroundColor,
+      process.env.NODE_ENV === ENV.DEVELOPMENT,
+    ),
+  ];
+};
+
+const chartTypeLine = (
+  spreadsheet: Spreadsheet,
+  x: number,
+  y: number,
+): ChartElements => {
+  const max = Math.max(...spreadsheet.values);
+  const groupId = randomId();
+  const backgroundColor = bgColors[Math.floor(Math.random() * bgColors.length)];
+
+  let index = 0;
+  const points = [];
+  for (const value of spreadsheet.values) {
+    const cx = index * (BAR_WIDTH + BAR_GAP);
+    const cy = -(value / max) * BAR_HEIGHT;
+    points.push([cx, cy]);
+    index++;
+  }
+
+  const maxX = Math.max(...points.map((element) => element[0]));
+  const maxY = Math.max(...points.map((element) => element[1]));
+  const minX = Math.min(...points.map((element) => element[0]));
+  const minY = Math.min(...points.map((element) => element[1]));
+
+  const line = newLinearElement({
+    backgroundColor,
+    groupIds: [groupId],
+    ...commonProps,
+    type: "line",
+    x: x + BAR_GAP + BAR_WIDTH / 2,
+    y: y - BAR_GAP,
+    startArrowhead: null,
+    endArrowhead: null,
+    height: maxY - minY,
+    width: maxX - minX,
+    strokeWidth: 2,
+    points: points as any,
+  });
+
+  const dots = spreadsheet.values.map((value, index) => {
+    const cx = index * (BAR_WIDTH + BAR_GAP) + BAR_GAP / 2;
+    const cy = -(value / max) * BAR_HEIGHT + BAR_GAP / 2;
+    return newElement({
+      backgroundColor,
+      groupIds: [groupId],
+      ...commonProps,
+      fillStyle: "solid",
+      strokeWidth: 2,
+      type: "ellipse",
+      x: x + cx + BAR_WIDTH / 2,
+      y: y + cy - BAR_GAP * 2,
+      width: BAR_GAP,
+      height: BAR_GAP,
+    });
+  });
+
+  const lines = spreadsheet.values.map((value, index) => {
+    const cx = index * (BAR_WIDTH + BAR_GAP) + BAR_GAP / 2;
+    const cy = (value / max) * BAR_HEIGHT + BAR_GAP / 2 + BAR_GAP;
+    return newLinearElement({
+      backgroundColor,
+      groupIds: [groupId],
+      ...commonProps,
+      type: "line",
+      x: x + cx + BAR_WIDTH / 2 + BAR_GAP / 2,
+      y: y - cy,
+      startArrowhead: null,
+      endArrowhead: null,
+      height: cy,
+      strokeStyle: "dotted",
+      opacity: GRID_OPACITY,
+      points: [
+        [0, 0],
+        [0, cy],
+      ],
+    });
+  });
+
+  return [
+    ...chartBaseElements(
+      spreadsheet,
+      x,
+      y,
+      groupId,
+      backgroundColor,
+      process.env.NODE_ENV === ENV.DEVELOPMENT,
+    ),
+    line,
+    ...lines,
+    ...dots,
+  ];
+};
+
+export const renderSpreadsheet = (
+  chartType: string,
+  spreadsheet: Spreadsheet,
+  x: number,
+  y: number,
+): ChartElements => {
+  trackEvent(EVENT_MAGIC, "chart", chartType, spreadsheet.values.length);
+  if (chartType === "line") {
+    return chartTypeLine(spreadsheet, x, y);
+  }
+  return chartTypeBar(spreadsheet, x, y);
 };
