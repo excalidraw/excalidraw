@@ -2468,8 +2468,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           // otherwise, it will trigger selection based on current
           // state of the box
           if (!this.state.selectedElementIds[hitElement.id]) {
-            // if we are currently editing a group, treat all selections outside of the group
-            // as exiting editing mode.
+            // if we are currently editing a group, exiting editing mode and deselect the group.
             if (
               this.state.editingGroupId &&
               !isElementInGroup(hitElement, this.state.editingGroupId)
@@ -2479,7 +2478,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
                 selectedGroupIds: {},
                 editingGroupId: null,
               });
-              return true;
             }
 
             // Add hit element to selection. At this point if we're not holding
