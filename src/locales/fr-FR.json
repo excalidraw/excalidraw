@@ -94,7 +94,7 @@
     "distributeVertically": "Distribuer verticalement"
   },
   "buttons": {
-    "clearReset": "Effacer le canvas & réinitialiser la couleur d'arrière-plan",
+    "clearReset": "Réinitialiser le canvas",
     "export": "Exporter",
     "exportToPng": "Exporter en PNG",
     "exportToSvg": "Exporter en SVG",
@@ -125,11 +125,11 @@
     "exitZenMode": "Quitter le mode zen"
   },
   "alerts": {
-    "clearReset": "L'intégralité du canvas va être effacé. Êtes-vous sur ?",
+    "clearReset": "L'intégralité du canvas va être effacée. Êtes-vous sûr ?",
     "couldNotCreateShareableLink": "Impossible de créer un lien de partage.",
     "couldNotCreateShareableLinkTooBig": "Impossible de créer un lien partageable : la scène est trop volumineuse",
     "couldNotLoadInvalidFile": "Impossible de charger un fichier invalide",
-    "importBackendFailed": "L'import depuis le backend a échoué.",
+    "importBackendFailed": "L'importation depuis le backend a échoué.",
     "cannotExportEmptyCanvas": "Impossible d'exporter un canvas vide.",
     "couldNotCopyToClipboard": "Impossible de copier dans le presse-papier. Essayez d'utiliser le navigateur Chrome.",
     "decryptFailed": "Les données n'ont pas pu être déchiffrées.",
