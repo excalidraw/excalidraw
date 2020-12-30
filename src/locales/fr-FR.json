@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Coller",
-    "pasteCharts": "",
+    "pasteCharts": "Coller les graphiques",
     "selectAll": "Tout sélectionner",
     "multiSelect": "Ajouter l'élément à la sélection",
     "moveCanvas": "Déplacer le canvas",
@@ -41,7 +41,7 @@
     "withBackground": "Avec arrière-plan",
     "exportEmbedScene": "Intégrer la scène au fichier exporté",
     "exportEmbedScene_details": "Les données de scène seront enregistrées dans le fichier PNG/SVG exporté, afin que la scène puisse être restaurée à partir de celui-ci.\nCela augmentera la taille du fichier exporté.",
-    "addWatermark": "Ajouter \"Fabriqué avec Excalidraw\"",
+    "addWatermark": "Ajouter \"Fait avec Excalidraw\"",
     "handDrawn": "Manuscrite",
     "normal": "Normale",
     "code": "Code",
@@ -73,7 +73,7 @@
     "untitled": "Sans-titre",
     "name": "Nom",
     "yourName": "Votre nom",
-    "madeWithExcalidraw": "Fabriqué avec Excalidraw",
+    "madeWithExcalidraw": "Fait avec Excalidraw",
     "group": "Grouper la sélection",
     "ungroup": "Dégrouper la sélection",
     "collaborators": "Collaborateurs",
