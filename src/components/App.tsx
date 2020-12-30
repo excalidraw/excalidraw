@@ -15,8 +15,6 @@ import {
   trackEvent,
 } from "../analytics";
 import { getDefaultAppState } from "../appState";
-import { t, getLanguage, setLanguage, languages } from "../i18n";
-
 import {
   copyToClipboard,
   parseClipboard,
@@ -113,6 +111,7 @@ import {
   selectGroupsForSelectedElements,
 } from "../groups";
 import { createHistory, SceneHistory } from "../history";
+import { t, getLanguage, setLanguage, languages } from "../i18n";
 import {
   CODES,
   getResizeCenterPointKey,

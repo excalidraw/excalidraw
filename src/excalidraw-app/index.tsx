@@ -330,7 +330,6 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
   const onLangChange = (lang: Language["lng"]) => {
     languageDetector.cacheUserLanguage(lang);
   };
-  // @ts-ignore
   return (
     <>
       <Excalidraw
