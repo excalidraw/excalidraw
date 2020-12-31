@@ -134,7 +134,7 @@ const printRow = (id, locale, coverage) => {
   } else {
     result += `${boldIf(language, isOver)} | `;
   }
-  result += `${coverage === 100 ? "✅" : boldIf(coverage, isOver)} |`;
+  result += `${coverage === 100 ? "💯" : boldIf(coverage, isOver)} |`;
   return result;
 };
 
