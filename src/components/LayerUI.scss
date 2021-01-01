@@ -7,11 +7,17 @@
     align-items: center;
     justify-content: center;
 
-    .browse-libraries {
-      position: absolute;
-      right: 12px;
-      top: 16px;
-      white-space: nowrap;
+    .browse-libraries-container {
+      align-items: center;
+      display: flex;
+      flex-direction: row-reverse;
+      justify-content: space-between;
+      width: 100%;
+
+      a {
+        padding-right: 17px;
+        white-space: nowrap;
+      }
     }
   }
 

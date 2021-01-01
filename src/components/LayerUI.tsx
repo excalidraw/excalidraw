@@ -124,9 +124,8 @@ const LibraryMenuItems = ({
   let addedPendingElements = false;
 
   rows.push(
-    <>
+    <div className="browse-libraries-container">
       <a
-        className="browse-libraries"
         href="https://libraries.excalidraw.com"
         target="_excalidraw_libraries"
         onClick={() => {
@@ -176,7 +175,7 @@ const LibraryMenuItems = ({
           }}
         />
       </Stack.Row>
-    </>,
+    </div>,
   );
 
   for (let row = 0; row < numRows; row++) {
