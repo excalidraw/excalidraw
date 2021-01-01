@@ -13,6 +13,8 @@ import { muteFSAbortError, nFormatter } from "../utils";
 import { register } from "./register";
 import "../components/ToolIcon.scss";
 import { serializeAsJSON } from "../data/json";
+import { getSelectedElements } from "../scene";
+import { getNonDeletedElements } from "../element";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -49,6 +51,26 @@ export const actionChangeExportBackground = register({
   ),
 });
 
+export const actionChangeExportSelected = register({
+  name: "changeExportSelected",
+  perform: (_elements, appState, value) => {
+    return {
+      appState: { ...appState, exportSelected: value },
+      commitToHistory: false,
+    };
+  },
+  PanelComponent: ({ appState, updateData }) => (
+    <label>
+      <input
+        type="checkbox"
+        checked={appState.exportSelected}
+        onChange={(event) => updateData(event.target.checked)}
+      />{" "}
+      {t("labels.onlySelected")}
+    </label>
+  ),
+});
+
 export const actionChangeExportEmbedScene = register({
   name: "changeExportEmbedScene",
   perform: (_elements, appState, value) => {
@@ -60,17 +82,26 @@ export const actionChangeExportEmbedScene = register({
   PanelComponent: ({ elements, appState, updateData }) => {
     const [increasedPngSize, setPngIncreasedSize] = useState(0);
     const [increasedSvgSize, setSvgIncreasedSize] = useState(0);
-
     if (appState.exportEmbedScene) {
       import(/* webpackChunkName: "image" */ "../data/image").then(
         async (_) => {
+          const nonDeletedElements = getNonDeletedElements(elements);
+          const selectedElements = getSelectedElements(
+            nonDeletedElements,
+            appState,
+          );
           const incPng = await _.getPngMetatdataSize({
-            metadata: serializeAsJSON(elements, appState),
+            metadata: serializeAsJSON(
+              appState.exportSelected ? selectedElements : elements,
+              appState,
+            ),
           });
           setPngIncreasedSize(incPng);
-
           const incSvg = await _.getSvgMetatdataSize({
-            text: serializeAsJSON(elements, appState),
+            text: serializeAsJSON(
+              appState.exportSelected ? selectedElements : elements,
+              appState,
+            ),
           });
           setSvgIncreasedSize(incSvg);
         },

@@ -50,6 +50,7 @@ export type AppState = {
   elementType: typeof SHAPES[number]["value"];
   elementLocked: boolean;
   exportBackground: boolean;
+  exportSelected: boolean;
   exportEmbedScene: boolean;
   shouldAddWatermark: boolean;
   currentItemStrokeColor: string;
