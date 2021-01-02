@@ -7,15 +7,20 @@
     align-items: center;
     justify-content: center;
 
-    .browse-libraries-container {
-      align-items: center;
+    .layer-ui__library-header {
       display: flex;
-      flex-direction: row-reverse;
+      align-items: center;
       justify-content: space-between;
       width: 100%;
+      margin: 2px 0;
+
+      button {
+        margin-right: 4px;
+      }
 
       a {
-        padding-right: 17px;
+        margin-left: auto;
+        padding-right: 5px;
         white-space: nowrap;
       }
     }
