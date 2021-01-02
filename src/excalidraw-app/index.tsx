@@ -1,4 +1,10 @@
-import React, { useState, useLayoutEffect, useEffect, useRef } from "react";
+import React, {
+  useState,
+  useLayoutEffect,
+  useEffect,
+  useRef,
+  useCallback,
+} from "react";
 import LanguageDetector from "i18next-browser-languagedetector";
 
 import Excalidraw from "../packages/excalidraw/index";
@@ -305,27 +311,30 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
     }
   };
 
-  const renderLanguageList = (isMobile: boolean) => (
-    <LanguageList
-      onChange={(lng) => {
-        setLang(lng);
-      }}
-      languages={languages}
-      floating={!isMobile}
-      currentLanguage={lang}
-    />
-  );
-  const renderFooter = (isMobile: boolean) => {
-    if (isMobile) {
-      return (
-        <fieldset>
-          <legend>{t("labels.language")}</legend>
-          {renderLanguageList(isMobile)}
-        </fieldset>
+  const renderFooter = useCallback(
+    (isMobile: boolean) => {
+      const renderLanguageList = () => (
+        <LanguageList
+          onChange={(lng) => {
+            setLang(lng);
+          }}
+          languages={languages}
+          floating={!isMobile}
+          currentLanguage={lang}
+        />
       );
-    }
-    return renderLanguageList(isMobile);
-  };
+      if (isMobile) {
+        return (
+          <fieldset>
+            <legend>{t("labels.language")}</legend>
+            {renderLanguageList()}
+          </fieldset>
+        );
+      }
+      return renderLanguageList();
+    },
+    [lang],
+  );
 
   const onLangChange = (lang: Language["lng"]) => {
     languageDetector.cacheUserLanguage(lang);
