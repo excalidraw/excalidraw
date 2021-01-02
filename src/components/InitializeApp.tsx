@@ -1,7 +1,12 @@
 import React from "react";
 
 import { LoadingMessage } from "./LoadingMessage";
-import { Language, languages, setLanguageFirstTime } from "../i18n";
+import {
+  defaultLang,
+  Language,
+  languages,
+  setLanguageFirstTime,
+} from "../i18n";
 
 interface Props {
   lang: Language["lng"];
@@ -16,11 +21,9 @@ export class InitializeApp extends React.Component<Props, State> {
   };
 
   async componentDidMount() {
-    const fallbackLanguage = languages[0];
-
     const currentLanguage =
       languages.find((language) => language.lng === this.props.lang) ||
-      fallbackLanguage;
+      defaultLang;
     await setLanguageFirstTime(currentLanguage);
     this.props.onLangChange?.(currentLanguage.lng);
     this.setState({

@@ -111,7 +111,7 @@ import {
   selectGroupsForSelectedElements,
 } from "../groups";
 import { createHistory, SceneHistory } from "../history";
-import { t, getLanguage, setLanguage, languages } from "../i18n";
+import { t, getLanguage, setLanguage, languages, defaultLang } from "../i18n";
 import {
   CODES,
   getResizeCenterPointKey,
@@ -184,7 +184,6 @@ const gesture: Gesture = {
   initialDistance: null,
   initialScale: null,
 };
-const fallbackLanguage = languages[0];
 
 export type PointerDownState = Readonly<{
   // The first position at which pointerDown happened
@@ -3859,7 +3858,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   private async updateLanguage() {
     const currentLanguage =
       languages.find((language) => language.lng === this.props.lang) ||
-      fallbackLanguage;
+      defaultLang;
     await setLanguage(currentLanguage);
     this.props?.onLangChange?.(currentLanguage.lng);
     this.setAppState({});

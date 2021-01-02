@@ -45,7 +45,9 @@ const allLanguages: Language[] = [
   { lng: "zh-TW", label: "繁體中文" },
 ];
 
-export const languages: Language[] = [{ lng: "en", label: "English" }]
+export const defaultLang = { lng: "en", label: "English" };
+
+export const languages: Language[] = [defaultLang]
   .concat(
     allLanguages.sort((left, right) => (left.label > right.label ? 1 : -1)),
   )
@@ -54,7 +56,7 @@ export const languages: Language[] = [{ lng: "en", label: "English" }]
       (percentages as Record<string, number>)[lang.lng] >= COMPLETION_THRESHOLD,
   );
 
-let currentLanguage = languages[0];
+let currentLanguage: Language = defaultLang;
 let currentLanguageData = {};
 
 export const setLanguage = async (lang: Language) => {

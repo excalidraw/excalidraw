@@ -13,7 +13,7 @@ import {
 import { ImportedDataState } from "../data/types";
 import CollabWrapper, { CollabAPI } from "./collab/CollabWrapper";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
-import { Language, languages, t } from "../i18n";
+import { defaultLang, Language, languages, t } from "../i18n";
 import { exportToBackend, loadScene } from "./data";
 import { getCollaborationLinkData } from "./data";
 import { EVENT } from "../constants";
@@ -193,7 +193,7 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
     height: window.innerHeight,
   });
   const [errorMessage, setErrorMessage] = useState("");
-  const currentLang = languageDetector.detect() || languages[0].lng;
+  const currentLang = languageDetector.detect() || defaultLang.lng;
   const [lang, setLang] = useState(currentLang);
 
   useLayoutEffect(() => {
