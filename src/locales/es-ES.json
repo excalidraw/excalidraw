@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Pegar",
-    "pasteCharts": "",
+    "pasteCharts": "Pegar gráficos",
     "selectAll": "Seleccionar todo",
     "multiSelect": "Añadir elemento a la selección",
     "moveCanvas": "Mover el lienzo",
@@ -162,7 +162,7 @@
     "freeDraw": "Haz clic y arrastra, suelta al terminar",
     "text": "Consejo: también puedes añadir texto haciendo doble clic en cualquier lugar con la herramienta de selección",
     "linearElementMulti": "Haga clic en el último punto o pulse Escape o Enter para finalizar",
-    "lockAngle": "",
+    "lockAngle": "Puedes restringir el ángulo manteniendo presionado el botón SHIFT",
     "resize": "Para mantener las proporciones mantén SHIFT presionado mientras modificas el tamaño, \nmantén presionado ALT para modificar el tamaño desde el centro",
     "rotate": "Puede restringir los ángulos manteniendo presionado SHIFT mientras gira",
     "lineEditor_info": "haga doble clic o pulse Enter para editar puntos",
@@ -229,7 +229,7 @@
     "scene": "Escena",
     "selected": "Seleccionado",
     "storage": "Almacenamiento",
-    "title": "",
+    "title": "Estadísticas para los nerds",
     "total": "Total",
     "width": "Ancho"
   }
