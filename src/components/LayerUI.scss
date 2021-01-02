@@ -20,7 +20,8 @@
 
       a {
         margin-left: auto;
-        padding-right: 17px;
+        // 17px for scrollbar (needed for overlay scrollbars on Big Sur?) + 1px extra
+        padding-right: 18px;
         white-space: nowrap;
       }
     }
