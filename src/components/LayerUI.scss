@@ -7,11 +7,23 @@
     align-items: center;
     justify-content: center;
 
-    .browse-libraries {
-      position: absolute;
-      right: 12px;
-      top: 16px;
-      white-space: nowrap;
+    .layer-ui__library-header {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      margin: 2px 0;
+
+      button {
+        // 2px from the left to account for focus border of left-most button
+        margin: 0 2px;
+      }
+
+      a {
+        margin-left: auto;
+        // 17px for scrollbar (needed for overlay scrollbars on Big Sur?) + 1px extra
+        padding-right: 18px;
+        white-space: nowrap;
+      }
     }
   }
 
