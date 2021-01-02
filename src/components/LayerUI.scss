@@ -14,12 +14,13 @@
       margin: 2px 0;
 
       button {
-        margin-right: 4px;
+        // 2px from the left to account for focus border of left-most button
+        margin: 0 2px;
       }
 
       a {
         margin-left: auto;
-        padding-right: 5px;
+        padding-right: 17px;
         white-space: nowrap;
       }
     }
