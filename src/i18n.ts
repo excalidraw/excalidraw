@@ -33,6 +33,7 @@ const allLanguages: Language[] = [
   { lng: "nb-NO", label: "Norsk bokmål" },
   { lng: "nl-NL", label: "Nederlands" },
   { lng: "nn-NO", label: "Norsk nynorsk" },
+  { lng: "pa-IN", label: "ਪੰਜਾਬੀ" },
   { lng: "pl-PL", label: "Polski" },
   { lng: "pt-BR", label: "Português Brasileiro" },
   { lng: "pt-PT", label: "Português" },
