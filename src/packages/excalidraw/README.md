@@ -276,7 +276,7 @@ This callback is triggered when the shareable-link button is clicked in the expo
 
 #### `langCode`
 
-Determines the language of the UI. It should be one of the[ available language codes](https://github.com/excalidraw/excalidraw/blob/d337c8b15f6c1085287b12ecbe59c96e2c4e0ff4/src/i18n.ts#L14). Defaults to `en` (English).
+Determines the language of the UI. It should be one of the [available language codes](https://github.com/excalidraw/excalidraw/blob/d337c8b15f6c1085287b12ecbe59c96e2c4e0ff4/src/i18n.ts#L14). Defaults to `en` (English).
 
 #### `onLangChange`
 
