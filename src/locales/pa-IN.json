@@ -188,49 +188,49 @@
     "sceneContent": "ਦ੍ਰਿਸ਼ ਦੀ ਸਮੱਗਰੀ:"
   },
   "roomDialog": {
-    "desc_intro": "",
+    "desc_intro": "ਤੁਸੀਂ ਲੋਕਾਂ ਨੂੰ ਆਪਣੇ ਨਾਲ ਮੌਜੂਦਾ ਦ੍ਰਿਸ਼ 'ਤੇ ਮਿਲਵਰਤਨ ਕਰਨ ਲਈ ਸੱਦਾ ਭੇਜ ਸਕਦੇ ਹੋ।",
     "desc_privacy": "",
-    "button_startSession": "",
-    "button_stopSession": "",
-    "desc_inProgressIntro": "",
-    "desc_shareLink": "",
+    "button_startSession": "ਇਜਲਾਸ ਸ਼ੁਰੂ ਕਰੋ",
+    "button_stopSession": "ਇਜਲਾਸ ਰੋਕੋ",
+    "desc_inProgressIntro": "ਲਾਇਵ ਮਿਲਵਰਤਨ ਹੁਣ ਚੱਲ ਰਿਹਾ ਹੈ।",
+    "desc_shareLink": "ਇਸ ਲਿੰਕ ਨੂੰ ਉਹਨਾਂ ਨਾਲ ਸਾਂਝਾ ਕਰੋ ਜਿਹਨਾਂ ਨਾਲ ਤੁਸੀਂ ਮਿਲਵਰਤਨ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ:",
     "desc_exitSession": ""
   },
   "errorDialog": {
-    "title": ""
+    "title": "ਗਲਤੀ"
   },
   "shortcutsDialog": {
-    "title": "",
-    "shapes": "",
-    "or": "",
-    "click": "",
+    "title": "ਕੀਬੋਰਡ ਸ਼ਾਰਟਕੱਟ",
+    "shapes": "ਅਕਾਰ",
+    "or": "ਜਾਂ",
+    "click": "ਕਲਿੱਕ",
     "drag": "",
     "curvedArrow": "",
     "curvedLine": "",
     "editor": "",
-    "view": "",
-    "blog": "",
-    "howto": "",
-    "github": "",
-    "textNewLine": "",
-    "textFinish": "",
-    "zoomToFit": "",
-    "zoomToSelection": "",
+    "view": "ਦਿੱਖ",
+    "blog": "ਸਾਡਾ ਬਲੌਗ ਪੜ੍ਹੋ",
+    "howto": "ਸਾਡੀਆਂ ਗਾਈਡਾਂ ਦੀ ਪਾਲਣਾ ਕਰੋ",
+    "github": "ਕੋਈ ਸਮੱਸਿਆ ਲੱਭੀ? ਜਮ੍ਹਾਂ ਕਰਵਾਓ",
+    "textNewLine": "ਨਵੀਂ ਲਾਇਨ ਜੋੜੋ (ਪਾਠ)",
+    "textFinish": "ਸੋਧ ਮੁਕੰਮਲ ਕਰੋ (ਪਾਠ)",
+    "zoomToFit": "ਸਾਰੇ ਐਲੀਮੈਂਟਾਂ ਨੂੰ ਫਿੱਟ ਕਰਨ ਲਈ ਜ਼ੂਮ ਕਰੋ",
+    "zoomToSelection": "ਚੋਣ ਤੱਕ ਜ਼ੂਮ ਕਰੋ",
     "preventBinding": ""
   },
   "encrypted": {
     "tooltip": ""
   },
   "stats": {
-    "angle": "",
-    "element": "",
-    "elements": "",
-    "height": "",
-    "scene": "",
-    "selected": "",
-    "storage": "",
+    "angle": "ਕੋਣ",
+    "element": "ਐਲੀਮੈਂਟ",
+    "elements": "ਐਲੀਮੈਂਟ",
+    "height": "ਉਚਾਈ",
+    "scene": "ਦ੍ਰਿਸ਼",
+    "selected": "ਚੁਣੇ",
+    "storage": "ਸਟੋਰੇਜ",
     "title": "",
-    "total": "",
-    "width": ""
+    "total": "ਕੁੱਲ",
+    "width": "ਚੌੜਾਈ"
   }
 }
