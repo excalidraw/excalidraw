@@ -4,11 +4,14 @@
   --appearance-filter: none;
   --border-radius-m: 4px;
   --button-destructive-bg-color: #{$oc-red-1};
+  --button-destructive-bg-color: #{$oc-red-1};
   --button-destructive-color: #{$oc-red-9};
   --button-gray-1: #{$oc-gray-2};
   --button-gray-2: #{$oc-gray-4};
   --button-gray-3: #{$oc-gray-5};
   --button-special-active-bg-color: #{$oc-green-0};
+  --button-special-active-bg-color: #{$oc-green-0};
+  --dialog-border: #{$oc-gray-6};
   --dropdown-icon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="292.4" height="292.4" viewBox="0 0 292 292"><path d="M287 197L159 69c-4-3-8-5-13-5s-9 2-13 5L5 197c-3 4-5 8-5 13s2 9 5 13c4 4 8 5 13 5h256c5 0 9-1 13-5s5-8 5-13-1-9-5-13z"/></svg>');
   --focus-highlight-color: #{$oc-blue-2};
   --icon-fill-color: #{$oc-black};
@@ -20,6 +23,8 @@
   --island-bg-color: #{transparentize($oc-white, 0.12)};
   --keybinding-color: #{$oc-gray-5};
   --overlay-bg-color: #{transparentize($oc-white, 0.12)};
+  --overlay-bg-color: #{transparentize($oc-white, 0.12)};
+  --popup-bg-color: #{$oc-white};
   --popup-bg-color: #{$oc-white};
   --popup-secondary-bg-color: #{$oc-gray-1};
   --popup-text-color: #{$oc-black};
@@ -46,11 +51,14 @@
   &.Appearance_dark {
     --appearance-filter: invert(93%) hue-rotate(180deg);
     --button-destructive-bg-color: #5a0000;
+    --button-destructive-bg-color: #5a0000;
     --button-destructive-color: #{$oc-red-3};
     --button-gray-1: #363636;
     --button-gray-2: #272727;
     --button-gray-3: #222;
     --button-special-active-bg-color: #204624;
+    --button-special-active-bg-color: #204624;
+    --dialog-border: #{$oc-gray-9};
     --dropdown-icon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="292.4" height="292.4" viewBox="0 0 292 292"><path fill="%23ced4da" d="M287 197L159 69c-4-3-8-5-13-5s-9 2-13 5L5 197c-3 4-5 8-5 13s2 9 5 13c4 4 8 5 13 5h256c5 0 9-1 13-5s5-8 5-13-1-9-5-13z"/></svg>');
     --focus-highlight-color: #{$oc-blue-6};
     --icon-fill-color: #{$oc-gray-4};
@@ -62,12 +70,10 @@
     --island-bg-color: #1e1e1e;
     --keybinding-color: #{$oc-gray-6};
     --overlay-bg-color: rgba(30, 30, 30, 0.88);
-    --popup-bg-color: #2c2c2c;
     --popup-secondary-bg-color: #222;
     --popup-text-color: #{$oc-gray-4};
     --popup-text-inverted-color: #2c2c2c;
     --select-highlight-color: #{$oc-blue-4};
     --shadow-island: 0 1px 5px #{transparentize($oc-black, 0.7)};
-    --text-color-primary: #{$oc-gray-4};
   }
 }
