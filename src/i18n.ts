@@ -1,93 +1,85 @@
-import LanguageDetector from "i18next-browser-languagedetector";
 import { EVENT_CHANGE, trackEvent } from "./analytics";
 
-import fallbackLanguageData from "./locales/en.json";
+import fallbackLangData from "./locales/en.json";
 import percentages from "./locales/percentages.json";
 
 const COMPLETION_THRESHOLD = 85;
 
-interface Language {
-  lng: string;
+export interface Language {
+  code: string;
   label: string;
   rtl?: boolean;
 }
 
 const allLanguages: Language[] = [
-  { lng: "ar-SA", label: "العربية", rtl: true },
-  { lng: "bg-BG", label: "Български" },
-  { lng: "ca-ES", label: "Catalan" },
-  { lng: "de-DE", label: "Deutsch" },
-  { lng: "el-GR", label: "Ελληνικά" },
-  { lng: "es-ES", label: "Español" },
-  { lng: "fa-IR", label: "فارسی", rtl: true },
-  { lng: "fi-FI", label: "Suomi" },
-  { lng: "fr-FR", label: "Français" },
-  { lng: "he-IL", label: "עברית", rtl: true },
-  { lng: "hi-IN", label: "हिन्दी" },
-  { lng: "hu-HU", label: "Magyar" },
-  { lng: "id-ID", label: "Bahasa Indonesia" },
-  { lng: "it-IT", label: "Italiano" },
-  { lng: "ja-JP", label: "日本語" },
-  { lng: "ko-KR", label: "한국어" },
-  { lng: "my-MM", label: "Burmese" },
-  { lng: "nb-NO", label: "Norsk bokmål" },
-  { lng: "nl-NL", label: "Nederlands" },
-  { lng: "nn-NO", label: "Norsk nynorsk" },
-  { lng: "pl-PL", label: "Polski" },
-  { lng: "pt-BR", label: "Português Brasileiro" },
-  { lng: "pt-PT", label: "Português" },
-  { lng: "ro-RO", label: "Română" },
-  { lng: "ru-RU", label: "Русский" },
-  { lng: "sk-SK", label: "Slovenčina" },
-  { lng: "sv-SE", label: "Svenska" },
-  { lng: "tr-TR", label: "Türkçe" },
-  { lng: "uk-UA", label: "Українська" },
-  { lng: "zh-CN", label: "简体中文" },
-  { lng: "zh-TW", label: "繁體中文" },
+  { code: "ar-SA", label: "العربية", rtl: true },
+  { code: "bg-BG", label: "Български" },
+  { code: "ca-ES", label: "Catalan" },
+  { code: "de-DE", label: "Deutsch" },
+  { code: "el-GR", label: "Ελληνικά" },
+  { code: "es-ES", label: "Español" },
+  { code: "fa-IR", label: "فارسی", rtl: true },
+  { code: "fi-FI", label: "Suomi" },
+  { code: "fr-FR", label: "Français" },
+  { code: "he-IL", label: "עברית", rtl: true },
+  { code: "hi-IN", label: "हिन्दी" },
+  { code: "hu-HU", label: "Magyar" },
+  { code: "id-ID", label: "Bahasa Indonesia" },
+  { code: "it-IT", label: "Italiano" },
+  { code: "ja-JP", label: "日本語" },
+  { code: "ko-KR", label: "한국어" },
+  { code: "my-MM", label: "Burmese" },
+  { code: "nb-NO", label: "Norsk bokmål" },
+  { code: "nl-NL", label: "Nederlands" },
+  { code: "nn-NO", label: "Norsk nynorsk" },
+  { code: "pl-PL", label: "Polski" },
+  { code: "pt-BR", label: "Português Brasileiro" },
+  { code: "pt-PT", label: "Português" },
+  { code: "ro-RO", label: "Română" },
+  { code: "ru-RU", label: "Русский" },
+  { code: "sk-SK", label: "Slovenčina" },
+  { code: "sv-SE", label: "Svenska" },
+  { code: "tr-TR", label: "Türkçe" },
+  { code: "uk-UA", label: "Українська" },
+  { code: "zh-CN", label: "简体中文" },
+  { code: "zh-TW", label: "繁體中文" },
 ];
 
-export const languages: Language[] = [{ lng: "en", label: "English" }]
+export const defaultLang = { code: "en", label: "English" };
+
+export const languages: Language[] = [defaultLang]
   .concat(
     allLanguages.sort((left, right) => (left.label > right.label ? 1 : -1)),
   )
   .filter(
     (lang) =>
-      (percentages as Record<string, number>)[lang.lng] >= COMPLETION_THRESHOLD,
+      (percentages as Record<string, number>)[lang.code] >=
+      COMPLETION_THRESHOLD,
   );
 
-let currentLanguage = languages[0];
-let currentLanguageData = {};
-const fallbackLanguage = languages[0];
+let currentLang: Language = defaultLang;
+let currentLangData = {};
 
-export const setLanguage = async (newLng: string | undefined) => {
-  currentLanguage =
-    languages.find((language) => language.lng === newLng) || fallbackLanguage;
+export const setLanguage = async (lang: Language) => {
+  currentLang = lang;
+  document.documentElement.dir = currentLang.rtl ? "rtl" : "ltr";
 
-  document.documentElement.dir = currentLanguage.rtl ? "rtl" : "ltr";
-
-  currentLanguageData = await import(
-    /* webpackChunkName: "i18n-[request]" */ `./locales/${currentLanguage.lng}.json`
+  currentLangData = await import(
+    /* webpackChunkName: "i18n-[request]" */ `./locales/${currentLang.code}.json`
   );
-  languageDetector.cacheUserLanguage(currentLanguage.lng);
-  trackEvent(EVENT_CHANGE, "language", currentLanguage.lng);
+  trackEvent(EVENT_CHANGE, "language", currentLang.code);
 };
 
-export const setLanguageFirstTime = async () => {
-  const newLng: string | undefined = languageDetector.detect();
+export const setLanguageFirstTime = async (lang: Language) => {
+  currentLang = lang;
+  document.documentElement.dir = currentLang.rtl ? "rtl" : "ltr";
 
-  currentLanguage =
-    languages.find((language) => language.lng === newLng) || fallbackLanguage;
-
-  document.documentElement.dir = currentLanguage.rtl ? "rtl" : "ltr";
-
-  currentLanguageData = await import(
-    /* webpackChunkName: "i18n-[request]" */ `./locales/${currentLanguage.lng}.json`
+  currentLangData = await import(
+    /* webpackChunkName: "i18n-[request]" */ `./locales/${currentLang.code}.json`
   );
-
-  languageDetector.cacheUserLanguage(currentLanguage.lng);
 };
 
-export const getLanguage = () => currentLanguage;
+export const getLanguage = () => currentLang;
 
 const findPartsForData = (data: any, parts: string[]) => {
   for (let index = 0; index < parts.length; ++index) {
@@ -106,8 +98,8 @@ const findPartsForData = (data: any, parts: string[]) => {
 export const t = (path: string, replacement?: { [key: string]: string }) => {
   const parts = path.split(".");
   let translation =
-    findPartsForData(currentLanguageData, parts) ||
-    findPartsForData(fallbackLanguageData, parts);
+    findPartsForData(currentLangData, parts) ||
+    findPartsForData(fallbackLangData, parts);
   if (translation === undefined) {
     throw new Error(`Can't find translation for ${path}`);
   }
@@ -119,12 +111,3 @@ export const t = (path: string, replacement?: { [key: string]: string }) => {
   }
   return translation;
 };
-
-const languageDetector = new LanguageDetector();
-languageDetector.init({
-  languageUtils: {
-    formatLanguageCode: (lng: string) => lng,
-    isWhitelisted: () => true,
-  },
-  checkWhitelist: false,
-});

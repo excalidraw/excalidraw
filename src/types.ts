@@ -19,6 +19,7 @@ import { ImportedDataState } from "./data/types";
 import { ExcalidrawImperativeAPI } from "./components/App";
 import type { ResolvablePromise } from "./utils";
 import { Spreadsheet } from "./charts";
+import { Language } from "./i18n";
 
 export type FlooredNumber = number & { _brand: "FlooredNumber" };
 export type Point = Readonly<RoughPoint>;
@@ -181,6 +182,8 @@ export interface ExcalidrawProps {
     appState: AppState,
     canvas: HTMLCanvasElement | null,
   ) => void;
+  renderFooter?: (isMobile: boolean) => JSX.Element;
+  langCode?: Language["code"];
 }
 
 export type SceneData = {
