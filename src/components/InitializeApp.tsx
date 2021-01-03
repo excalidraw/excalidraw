@@ -9,8 +9,8 @@ import {
 } from "../i18n";
 
 interface Props {
-  lang: Language["lng"];
-  onLangChange?: (lang: Language["lng"]) => void;
+  langCode: Language["code"];
+  onLangChange?: (lang: Language) => void;
 }
 interface State {
   isLoading: boolean;
@@ -22,10 +22,10 @@ export class InitializeApp extends React.Component<Props, State> {
 
   async componentDidMount() {
     const currentLanguage =
-      languages.find((language) => language.lng === this.props.lang) ||
+      languages.find((language) => language.code === this.props.langCode) ||
       defaultLang;
     await setLanguageFirstTime(currentLanguage);
-    this.props.onLangChange?.(currentLanguage.lng);
+    this.props.onLangChange?.(currentLanguage);
     this.setState({
       isLoading: false,
     });

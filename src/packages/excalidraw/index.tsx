@@ -24,7 +24,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     onPointerUpdate,
     onExportToBackend,
     renderFooter,
-    lang = "en",
+    langCode = "en",
     onLangChange,
   } = props;
 
@@ -47,7 +47,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
   }, []);
 
   return (
-    <InitializeApp lang={lang} onLangChange={onLangChange}>
+    <InitializeApp langCode={langCode} onLangChange={onLangChange}>
       <IsMobileProvider>
         <App
           width={width}
@@ -63,7 +63,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
           onPointerUpdate={onPointerUpdate}
           onExportToBackend={onExportToBackend}
           renderFooter={renderFooter}
-          lang={lang}
+          langCode={langCode}
           onLangChange={onLangChange}
         />
       </IsMobileProvider>

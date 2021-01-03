@@ -63,7 +63,7 @@ interface LayerUIProps {
   onInsertElements: (elements: readonly NonDeletedExcalidrawElement[]) => void;
   zenModeEnabled: boolean;
   toggleZenMode: () => void;
-  lng: Language["lng"];
+  lng: Language["code"];
   isCollaborating: boolean;
   onExportToBackend?: (
     exportedElements: readonly NonDeletedExcalidrawElement[],

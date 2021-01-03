@@ -369,7 +369,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           }
           zenModeEnabled={zenModeEnabled}
           toggleZenMode={this.toggleZenMode}
-          lng={getLanguage().lng}
+          lng={getLanguage().code}
           isCollaborating={this.props.isCollaborating || false}
           onExportToBackend={onExportToBackend}
           renderCustomFooter={renderFooter}
@@ -739,7 +739,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   }
 
   componentDidUpdate(prevProps: ExcalidrawProps, prevState: AppState) {
-    if (prevProps.lang !== this.props.lang) {
+    if (prevProps.langCode !== this.props.langCode) {
       this.updateLanguage();
     }
 
@@ -3857,10 +3857,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private async updateLanguage() {
     const currentLanguage =
-      languages.find((language) => language.lng === this.props.lang) ||
+      languages.find((language) => language.code === this.props.langCode) ||
       defaultLang;
     await setLanguage(currentLanguage);
-    this.props?.onLangChange?.(currentLanguage.lng);
+    this.props?.onLangChange?.(currentLanguage);
     this.setAppState({});
   }
 }

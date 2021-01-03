@@ -199,7 +199,7 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
     height: window.innerHeight,
   });
   const [errorMessage, setErrorMessage] = useState("");
-  const currentLang = languageDetector.detect() || defaultLang.lng;
+  const currentLang = languageDetector.detect() || defaultLang.code;
   const [lang, setLang] = useState(currentLang);
 
   useLayoutEffect(() => {
@@ -336,8 +336,8 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
     [lang],
   );
 
-  const onLangChange = (lang: Language["lng"]) => {
-    languageDetector.cacheUserLanguage(lang);
+  const onLangChange = (lang: Language) => {
+    languageDetector.cacheUserLanguage(lang.code);
   };
   return (
     <>
@@ -353,7 +353,7 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
         onPointerUpdate={collab.onPointerUpdate}
         onExportToBackend={onExportToBackend}
         renderFooter={renderFooter}
-        lang={lang}
+        langCode={lang}
         onLangChange={onLangChange}
       />
       {errorMessage && (

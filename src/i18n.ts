@@ -6,46 +6,46 @@ import percentages from "./locales/percentages.json";
 const COMPLETION_THRESHOLD = 85;
 
 export interface Language {
-  lng: string;
+  code: string;
   label: string;
   rtl?: boolean;
 }
 
 const allLanguages: Language[] = [
-  { lng: "ar-SA", label: "العربية", rtl: true },
-  { lng: "bg-BG", label: "Български" },
-  { lng: "ca-ES", label: "Catalan" },
-  { lng: "de-DE", label: "Deutsch" },
-  { lng: "el-GR", label: "Ελληνικά" },
-  { lng: "es-ES", label: "Español" },
-  { lng: "fa-IR", label: "فارسی", rtl: true },
-  { lng: "fi-FI", label: "Suomi" },
-  { lng: "fr-FR", label: "Français" },
-  { lng: "he-IL", label: "עברית", rtl: true },
-  { lng: "hi-IN", label: "हिन्दी" },
-  { lng: "hu-HU", label: "Magyar" },
-  { lng: "id-ID", label: "Bahasa Indonesia" },
-  { lng: "it-IT", label: "Italiano" },
-  { lng: "ja-JP", label: "日本語" },
-  { lng: "ko-KR", label: "한국어" },
-  { lng: "my-MM", label: "Burmese" },
-  { lng: "nb-NO", label: "Norsk bokmål" },
-  { lng: "nl-NL", label: "Nederlands" },
-  { lng: "nn-NO", label: "Norsk nynorsk" },
-  { lng: "pl-PL", label: "Polski" },
-  { lng: "pt-BR", label: "Português Brasileiro" },
-  { lng: "pt-PT", label: "Português" },
-  { lng: "ro-RO", label: "Română" },
-  { lng: "ru-RU", label: "Русский" },
-  { lng: "sk-SK", label: "Slovenčina" },
-  { lng: "sv-SE", label: "Svenska" },
-  { lng: "tr-TR", label: "Türkçe" },
-  { lng: "uk-UA", label: "Українська" },
-  { lng: "zh-CN", label: "简体中文" },
-  { lng: "zh-TW", label: "繁體中文" },
+  { code: "ar-SA", label: "العربية", rtl: true },
+  { code: "bg-BG", label: "Български" },
+  { code: "ca-ES", label: "Catalan" },
+  { code: "de-DE", label: "Deutsch" },
+  { code: "el-GR", label: "Ελληνικά" },
+  { code: "es-ES", label: "Español" },
+  { code: "fa-IR", label: "فارسی", rtl: true },
+  { code: "fi-FI", label: "Suomi" },
+  { code: "fr-FR", label: "Français" },
+  { code: "he-IL", label: "עברית", rtl: true },
+  { code: "hi-IN", label: "हिन्दी" },
+  { code: "hu-HU", label: "Magyar" },
+  { code: "id-ID", label: "Bahasa Indonesia" },
+  { code: "it-IT", label: "Italiano" },
+  { code: "ja-JP", label: "日本語" },
+  { code: "ko-KR", label: "한국어" },
+  { code: "my-MM", label: "Burmese" },
+  { code: "nb-NO", label: "Norsk bokmål" },
+  { code: "nl-NL", label: "Nederlands" },
+  { code: "nn-NO", label: "Norsk nynorsk" },
+  { code: "pl-PL", label: "Polski" },
+  { code: "pt-BR", label: "Português Brasileiro" },
+  { code: "pt-PT", label: "Português" },
+  { code: "ro-RO", label: "Română" },
+  { code: "ru-RU", label: "Русский" },
+  { code: "sk-SK", label: "Slovenčina" },
+  { code: "sv-SE", label: "Svenska" },
+  { code: "tr-TR", label: "Türkçe" },
+  { code: "uk-UA", label: "Українська" },
+  { code: "zh-CN", label: "简体中文" },
+  { code: "zh-TW", label: "繁體中文" },
 ];
 
-export const defaultLang = { lng: "en", label: "English" };
+export const defaultLang = { code: "en", label: "English" };
 
 export const languages: Language[] = [defaultLang]
   .concat(
@@ -53,7 +53,8 @@ export const languages: Language[] = [defaultLang]
   )
   .filter(
     (lang) =>
-      (percentages as Record<string, number>)[lang.lng] >= COMPLETION_THRESHOLD,
+      (percentages as Record<string, number>)[lang.code] >=
+      COMPLETION_THRESHOLD,
   );
 
 let currentLanguage: Language = defaultLang;
@@ -64,9 +65,9 @@ export const setLanguage = async (lang: Language) => {
   document.documentElement.dir = currentLanguage.rtl ? "rtl" : "ltr";
 
   currentLanguageData = await import(
-    /* webpackChunkName: "i18n-[request]" */ `./locales/${currentLanguage.lng}.json`
+    /* webpackChunkName: "i18n-[request]" */ `./locales/${currentLanguage.code}.json`
   );
-  trackEvent(EVENT_CHANGE, "language", currentLanguage.lng);
+  trackEvent(EVENT_CHANGE, "language", currentLanguage.code);
 };
 
 export const setLanguageFirstTime = async (lang: Language) => {
@@ -74,7 +75,7 @@ export const setLanguageFirstTime = async (lang: Language) => {
   document.documentElement.dir = currentLanguage.rtl ? "rtl" : "ltr";
 
   currentLanguageData = await import(
-    /* webpackChunkName: "i18n-[request]" */ `./locales/${currentLanguage.lng}.json`
+    /* webpackChunkName: "i18n-[request]" */ `./locales/${currentLanguage.code}.json`
   );
 };
 
