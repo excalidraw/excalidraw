@@ -275,6 +275,10 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
     };
   }, [collab.initializeSocketClient]);
 
+  useEffect(() => {
+    languageDetector.cacheUserLanguage(langCode);
+  }, [langCode]);
+
   const onChange = (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
@@ -336,9 +340,6 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
     [langCode],
   );
 
-  const onLangChange = (lang: Language) => {
-    languageDetector.cacheUserLanguage(lang.code);
-  };
   return (
     <>
       <Excalidraw
@@ -354,7 +355,6 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
         onExportToBackend={onExportToBackend}
         renderFooter={renderFooter}
         langCode={langCode}
-        onLangChange={onLangChange}
       />
       {errorMessage && (
         <ErrorDialog
