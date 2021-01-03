@@ -22,7 +22,7 @@ export class InitializeApp extends React.Component<Props, State> {
 
   async componentDidMount() {
     const currentLanguage =
-      languages.find((language) => language.code === this.props.langCode) ||
+      languages.find((lang) => lang.code === this.props.langCode) ||
       defaultLang;
     await setLanguageFirstTime(currentLanguage);
     this.props.onLangChange?.(currentLanguage);

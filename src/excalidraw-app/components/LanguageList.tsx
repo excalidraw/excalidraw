@@ -9,8 +9,8 @@ export const LanguageList = ({
   floating,
 }: {
   languages?: { code: string; label: string }[];
-  onChange: (value: string) => void;
-  currentLanguage?: string;
+  onChange: (langCode: i18n.Language["code"]) => void;
+  currentLanguage?: i18n.Language["code"];
   floating?: boolean;
 }) => (
   <React.Fragment>
@@ -22,9 +22,9 @@ export const LanguageList = ({
       value={currentLanguage}
       aria-label={i18n.t("buttons.selectLanguage")}
     >
-      {languages.map((language) => (
-        <option key={language.code} value={language.code}>
-          {language.label}
+      {languages.map((lang) => (
+        <option key={lang.code} value={lang.code}>
+          {lang.label}
         </option>
       ))}
     </select>

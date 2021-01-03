@@ -41,7 +41,7 @@ import { LanguageList } from "./components/LanguageList";
 const languageDetector = new LanguageDetector();
 languageDetector.init({
   languageUtils: {
-    formatLanguageCode: (lng: string) => lng,
+    formatLanguageCode: (langCode: Language["code"]) => langCode,
     isWhitelisted: () => true,
   },
   checkWhitelist: false,
@@ -199,8 +199,8 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
     height: window.innerHeight,
   });
   const [errorMessage, setErrorMessage] = useState("");
-  const currentLang = languageDetector.detect() || defaultLang.code;
-  const [lang, setLang] = useState(currentLang);
+  const currentLangCode = languageDetector.detect() || defaultLang.code;
+  const [langCode, setLangCode] = useState(currentLangCode);
 
   useLayoutEffect(() => {
     const onResize = () => {
@@ -315,12 +315,12 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
     (isMobile: boolean) => {
       const renderLanguageList = () => (
         <LanguageList
-          onChange={(lng) => {
-            setLang(lng);
+          onChange={(langCode) => {
+            setLangCode(langCode);
           }}
           languages={languages}
           floating={!isMobile}
-          currentLanguage={lang}
+          currentLanguage={langCode}
         />
       );
       if (isMobile) {
@@ -333,7 +333,7 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
       }
       return renderLanguageList();
     },
-    [lang],
+    [langCode],
   );
 
   const onLangChange = (lang: Language) => {
@@ -353,7 +353,7 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
         onPointerUpdate={collab.onPointerUpdate}
         onExportToBackend={onExportToBackend}
         renderFooter={renderFooter}
-        langCode={lang}
+        langCode={langCode}
         onLangChange={onLangChange}
       />
       {errorMessage && (
