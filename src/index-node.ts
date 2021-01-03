@@ -1,5 +1,6 @@
 import { exportToCanvas } from "./scene/export";
 import { getDefaultAppState } from "./appState";
+import { SCENE_NAME_FALLBACK } from "./constants";
 
 const { registerFont, createCanvas } = require("canvas");
 
@@ -61,6 +62,7 @@ const canvas = exportToCanvas(
   elements as any,
   {
     ...getDefaultAppState(),
+    name: SCENE_NAME_FALLBACK,
     offsetTop: 0,
     offsetLeft: 0,
   },

@@ -148,6 +148,7 @@ import {
 import {
   debounce,
   distance,
+  getNewSceneName,
   isInputLike,
   isToolIcon,
   isWritableElement,
@@ -281,6 +282,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     } = props;
     this.state = {
       ...defaultAppState,
+      name: getNewSceneName(),
       isLoading: true,
       width,
       height,
@@ -528,6 +530,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.scene.replaceAllElements([]);
       this.setState((state) => ({
         ...getDefaultAppState(),
+        name: getNewSceneName(),
         isLoading: opts?.resetLoadingState ? false : state.isLoading,
         appearance: this.state.appearance,
       }));

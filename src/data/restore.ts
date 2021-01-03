@@ -15,6 +15,7 @@ import {
   DEFAULT_VERTICAL_ALIGN,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
+import { getNewSceneName } from "../utils";
 
 const getFontFamilyByName = (fontFamilyName: string): FontFamily => {
   for (const [id, fontFamilyString] of Object.entries(FONT_FAMILY)) {
@@ -166,6 +167,7 @@ const restoreAppState = (
 
   return {
     ...nextAppState,
+    name: appState.name ?? localAppState?.name ?? getNewSceneName(),
     offsetLeft: appState.offsetLeft || 0,
     offsetTop: appState.offsetTop || 0,
     // Migrates from previous version where appState.zoom was a number
