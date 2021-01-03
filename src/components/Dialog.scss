@@ -7,6 +7,9 @@
     margin-top: 0;
     grid-template-columns: 1fr calc(var(--space-factor) * 7);
     grid-gap: var(--metric);
+    padding: calc(var(--space-factor) * 2);
+    text-align: center;
+    font-variant: small-caps;
   }
 
   .Dialog__titleContent {
@@ -16,6 +19,10 @@
   .Dialog .Modal__close {
     color: var(--icon-fill-color);
     margin: 0;
+  }
+
+  .Dialog__content {
+    padding: 0 16px 16px;
   }
 
   @media #{$is-mobile-query} {
@@ -30,13 +37,8 @@
           var(--space-factor) * 7
         );
       position: sticky;
-      top: calc(-1 * var(--metric));
-      margin: calc(-1 * var(--inset-right));
-      margin-top: calc(-1 * var(--metric));
-      margin-bottom: var(--metric);
+      top: 0;
       padding: calc(var(--space-factor) * 2);
-      padding-left: var(--inset-left);
-      padding-right: var(--inset-right);
       background: var(--bg-color-island);
       font-size: 1.25em;
 
