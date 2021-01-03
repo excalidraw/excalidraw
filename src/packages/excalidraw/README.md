@@ -284,4 +284,4 @@ This callback is triggered when the `langCode` prop passed to the Excalidraw com
 
 #### `renderFooter`
 
-Function that renders (returns JSX) custom UI footer. For example, you can use this to render language picker that was previously being rendered by Excalidraw itself (for now,you'll need to implement your own language picker).
+A function that renders (returns JSX) custom UI footer. For example, you can use this to render a language picker that was previously being rendered by Excalidraw itself (for now, you'll need to implement your own language picker).
