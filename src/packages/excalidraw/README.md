@@ -139,6 +139,9 @@ export default function App() {
 | [`isCollaborating`](#isCollaborating)         | `boolean`                                                                                                                                                                                                                                                                                                                                          |                      | This implies if the app is in collaboration mode                                                                                                           |
 | [`onPointerUpdate`](#onPointerUpdate)         | Function                                                                                                                                                                                                                                                                                                                                           |                      | Callback triggered when mouse pointer is updated.                                                                                                          |
 | [`onExportToBackend`](#onExportToBackend)     | Function                                                                                                                                                                                                                                                                                                                                           |                      | Callback triggered when link button is clicked on export dialog                                                                                            |
+| [`langCode`](#langCode) | string | `en` | Language code string |
+| [`onLangChange`](#onLangChange) | Function | | Callback triggered when language is changed |
+| [`renderFooter `](#renderFooter ) | Function | | Function that renders custom UI footer |
 
 #### `width`
 
@@ -270,3 +273,15 @@ This callback is triggered when the shareable-link button is clicked in the expo
 1. `exportedElements`: An array of [non deleted elements](https://github.com/excalidraw/excalidraw/blob/6e45cb95dbd7a8be1859c7055b06957298e3097c/src/element/types.ts#L76) which needs to be exported.
 2. `appState`: [AppState](https://github.com/excalidraw/excalidraw/blob/4c90ea5667d29effe8ec4a115e49efc7c340cdb3/src/types.ts#L33) of the scene.
 3. `canvas`: The `HTMLCanvasElement` of the scene.
+
+#### `langCode`
+
+Determines the language of the UI. For available language codes, check [src/i18n.ts](https://github.com/excalidraw/excalidraw/blob/master/src/i18n.ts). Defaults to `en` (English).
+
+#### `onLangChange`
+
+This callback in triggered when language is changed when the `langCode` prop passed to the Excalidraw component changes. It is also invoked on initial mount.
+
+#### `renderFooter`
+
+Function that renders (returns JSX) custom UI footer. For example, you can use this to render language picker that was previously being rendered by Excalidraw itself (for now,you'll need to implement your own language picker).

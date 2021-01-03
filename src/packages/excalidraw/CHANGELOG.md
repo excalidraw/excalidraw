@@ -16,6 +16,10 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
+- Changes to i18n [#2644](https://github.com/excalidraw/excalidraw/pull/2644):
+  - BREAKING: removed language picker from UI. It is now host app's responsibility to implement language picker if desirable, using the newly added [`renderFooter`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#renderFooter) prop. The reasoning is that host apps will the i18n be controlled by the app itself, not by the nested Excalidraw component.
+  - Added [`langCode`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#langCode) prop to control language.
+  - Added [`onLangChange`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#langCode) callback.
 - Add support for `exportToBackend` prop to allow host apps to implement shareable links [#2612](https://github.com/excalidraw/excalidraw/pull/2612/files)
 - Add zoom to selection [#2522](https://github.com/excalidraw/excalidraw/pull/2522)
 - Insert Library items in the middle of the screen [#2527](https://github.com/excalidraw/excalidraw/pull/2527)
