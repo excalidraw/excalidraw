@@ -99,3 +99,4 @@ export {
   getSyncableElements,
   getElementMap,
 } from "../../element";
+export { defaultLang, languages } from "../../i18n";

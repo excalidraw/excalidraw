@@ -7,7 +7,10 @@ import React, {
 } from "react";
 import LanguageDetector from "i18next-browser-languagedetector";
 
-import Excalidraw from "../packages/excalidraw/index";
+import Excalidraw, {
+  languages,
+  defaultLang,
+} from "../packages/excalidraw/index";
 
 import {
   getTotalStorageSize,
@@ -19,7 +22,7 @@ import {
 import { ImportedDataState } from "../data/types";
 import CollabWrapper, { CollabAPI } from "./collab/CollabWrapper";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
-import { defaultLang, Language, languages, t } from "../i18n";
+import { Language, t } from "../i18n";
 import { exportToBackend, loadScene } from "./data";
 import { getCollaborationLinkData } from "./data";
 import { EVENT } from "../constants";

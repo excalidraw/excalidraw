@@ -276,6 +276,16 @@ This callback is triggered when the shareable-link button is clicked in the expo
 #### `langCode`
 
 Determines the language of the UI. It should be one of the [available language codes](https://github.com/excalidraw/excalidraw/blob/d337c8b15f6c1085287b12ecbe59c96e2c4e0ff4/src/i18n.ts#L14). Defaults to `en` (English).
+We also export default language and supported languages which you can import as shown below.
+
+```js
+import { defaultLang, languages } from "@excalidraw/excalidraw";
+```
+
+| name        | type                                                                                                                 |
+| ----------- | -------------------------------------------------------------------------------------------------------------------- |
+| defaultLang | string                                                                                                               |
+| languages   | [Language []](https://github.com/excalidraw/excalidraw/blob/c35d983fef8a83ba842dd892c0f461111a3e8589/src/i18n.ts#L9) |
 
 #### `renderFooter`
 
