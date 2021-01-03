@@ -8,6 +8,7 @@ import "../../css/styles.scss";
 
 import { ExcalidrawAPIRefValue, ExcalidrawProps } from "../../types";
 import { IsMobileProvider } from "../../is-mobile";
+import { defaultLang } from "../../i18n";
 
 const Excalidraw = (props: ExcalidrawProps) => {
   const {
@@ -23,6 +24,8 @@ const Excalidraw = (props: ExcalidrawProps) => {
     isCollaborating,
     onPointerUpdate,
     onExportToBackend,
+    renderFooter,
+    langCode = defaultLang.code,
   } = props;
 
   useEffect(() => {
@@ -44,7 +47,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
   }, []);
 
   return (
-    <InitializeApp>
+    <InitializeApp langCode={langCode}>
       <IsMobileProvider>
         <App
           width={width}
@@ -59,6 +62,8 @@ const Excalidraw = (props: ExcalidrawProps) => {
           isCollaborating={isCollaborating}
           onPointerUpdate={onPointerUpdate}
           onExportToBackend={onExportToBackend}
+          renderFooter={renderFooter}
+          langCode={langCode}
         />
       </IsMobileProvider>
     </InitializeApp>
@@ -94,3 +99,4 @@ export {
   getSyncableElements,
   getElementMap,
 } from "../../element";
+export { defaultLang, languages } from "../../i18n";

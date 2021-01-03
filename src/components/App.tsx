@@ -111,7 +111,7 @@ import {
   selectGroupsForSelectedElements,
 } from "../groups";
 import { createHistory, SceneHistory } from "../history";
-import { getLanguage, t } from "../i18n";
+import { t, getLanguage, setLanguage, languages, defaultLang } from "../i18n";
 import {
   CODES,
   getResizeCenterPointKey,
@@ -332,7 +332,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       offsetLeft,
     } = this.state;
 
-    const { onCollabButtonClick, onExportToBackend } = this.props;
+    const { onCollabButtonClick, onExportToBackend, renderFooter } = this.props;
     const canvasScale = window.devicePixelRatio;
 
     const canvasWidth = canvasDOMWidth * canvasScale;
@@ -369,9 +369,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           }
           zenModeEnabled={zenModeEnabled}
           toggleZenMode={this.toggleZenMode}
-          lng={getLanguage().lng}
+          langCode={getLanguage().code}
           isCollaborating={this.props.isCollaborating || false}
           onExportToBackend={onExportToBackend}
+          renderCustomFooter={renderFooter}
         />
         {this.state.showStats && (
           <Stats
@@ -738,6 +739,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   }
 
   componentDidUpdate(prevProps: ExcalidrawProps, prevState: AppState) {
+    if (prevProps.langCode !== this.props.langCode) {
+      this.updateLanguage();
+    }
+
     if (
       prevProps.width !== this.props.width ||
       prevProps.height !== this.props.height ||
@@ -3848,6 +3853,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         typeof offsets?.offsetLeft === "number" ? offsets.offsetLeft : 0,
       offsetTop: typeof offsets?.offsetTop === "number" ? offsets.offsetTop : 0,
     };
+  }
+
+  private async updateLanguage() {
+    const currentLang =
+      languages.find((lang) => lang.code === this.props.langCode) ||
+      defaultLang;
+    await setLanguage(currentLang);
+    this.setAppState({});
   }
 }
 

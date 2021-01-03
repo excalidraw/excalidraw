@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { render } from "./test-utils";
 import ExcalidrawApp from "../excalidraw-app";
-import { setLanguage } from "../i18n";
+import { defaultLang, setLanguage } from "../i18n";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { API } from "./helpers/api";
 import { KEYS } from "../keys";
@@ -60,7 +60,7 @@ describe("aligning", () => {
     ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
     mouse.reset();
 
-    await setLanguage("en.json");
+    await setLanguage(defaultLang);
     await render(<ExcalidrawApp />);
   });
 

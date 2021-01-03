@@ -4,9 +4,8 @@ import ReactDOM from "react-dom";
 import { copiedStyles } from "../actions/actionStyles";
 import { ShortcutName } from "../actions/shortcuts";
 import { ExcalidrawElement } from "../element/types";
-import { setLanguage } from "../i18n";
 import { CODES, KEYS } from "../keys";
-import Excalidraw from "../packages/excalidraw/index";
+import ExcalidrawApp from "../excalidraw-app";
 import { reseed } from "../random";
 import * as Renderer from "../renderer/renderScene";
 import { setDateTimeForTests } from "../utils";
@@ -19,6 +18,7 @@ import {
   screen,
   waitFor,
 } from "./test-utils";
+import { defaultLang } from "../i18n";
 
 const { h } = window;
 
@@ -75,8 +75,7 @@ beforeEach(async () => {
   finger1.reset();
   finger2.reset();
 
-  await setLanguage("en.json");
-  await render(<Excalidraw offsetLeft={0} offsetTop={0} />);
+  await render(<ExcalidrawApp />);
 });
 
 afterEach(() => {
@@ -439,7 +438,7 @@ describe("regression tests", () => {
     await waitFor(() => expect(screen.queryByTitle(/thin/i)).toBeNull());
     // reset language
     fireEvent.change(document.querySelector(".dropdown-select__language")!, {
-      target: { value: "en" },
+      target: { value: defaultLang.code },
     });
     // switching back to English
     await waitFor(() => expect(screen.queryByTitle(/thin/i)).not.toBeNull());

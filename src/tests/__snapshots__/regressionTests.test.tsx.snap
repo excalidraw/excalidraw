@@ -456,7 +456,7 @@ Object {
 
 exports[`given element A and group of elements B and given both are selected when user clicks on B, on pointer up only elements from B should be selected: [end of test] number of elements 1`] = `3`;
 
-exports[`given element A and group of elements B and given both are selected when user clicks on B, on pointer up only elements from B should be selected: [end of test] number of renders 1`] = `24`;
+exports[`given element A and group of elements B and given both are selected when user clicks on B, on pointer up only elements from B should be selected: [end of test] number of renders 1`] = `25`;
 
 exports[`given element A and group of elements B and given both are selected when user shift-clicks on B, on pointer up only element A should be selected: [end of test] appState 1`] = `
 Object {
@@ -920,7 +920,7 @@ Object {
 
 exports[`given element A and group of elements B and given both are selected when user shift-clicks on B, on pointer up only element A should be selected: [end of test] number of elements 1`] = `3`;
 
-exports[`given element A and group of elements B and given both are selected when user shift-clicks on B, on pointer up only element A should be selected: [end of test] number of renders 1`] = `20`;
+exports[`given element A and group of elements B and given both are selected when user shift-clicks on B, on pointer up only element A should be selected: [end of test] number of renders 1`] = `21`;
 
 exports[`regression tests Cmd/Ctrl-click exclusively select element under pointer: [end of test] appState 1`] = `
 Object {
@@ -1693,7 +1693,7 @@ Object {
 
 exports[`regression tests Cmd/Ctrl-click exclusively select element under pointer: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests Cmd/Ctrl-click exclusively select element under pointer: [end of test] number of renders 1`] = `39`;
+exports[`regression tests Cmd/Ctrl-click exclusively select element under pointer: [end of test] number of renders 1`] = `40`;
 
 exports[`regression tests Drags selected element when hitting only bounding box and keeps element selected: [end of test] appState 1`] = `
 Object {
@@ -1894,7 +1894,7 @@ Object {
 
 exports[`regression tests Drags selected element when hitting only bounding box and keeps element selected: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests Drags selected element when hitting only bounding box and keeps element selected: [end of test] number of renders 1`] = `8`;
+exports[`regression tests Drags selected element when hitting only bounding box and keeps element selected: [end of test] number of renders 1`] = `9`;
 
 exports[`regression tests adjusts z order when grouping: [end of test] appState 1`] = `
 Object {
@@ -2349,7 +2349,7 @@ Object {
 
 exports[`regression tests adjusts z order when grouping: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests adjusts z order when grouping: [end of test] number of renders 1`] = `18`;
+exports[`regression tests adjusts z order when grouping: [end of test] number of renders 1`] = `19`;
 
 exports[`regression tests alt-drag duplicates an element: [end of test] appState 1`] = `
 Object {
@@ -2599,7 +2599,7 @@ Object {
 
 exports[`regression tests alt-drag duplicates an element: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests alt-drag duplicates an element: [end of test] number of renders 1`] = `8`;
+exports[`regression tests alt-drag duplicates an element: [end of test] number of renders 1`] = `9`;
 
 exports[`regression tests arrow keys: [end of test] appState 1`] = `
 Object {
@@ -2760,7 +2760,7 @@ Object {
 
 exports[`regression tests arrow keys: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests arrow keys: [end of test] number of renders 1`] = `17`;
+exports[`regression tests arrow keys: [end of test] number of renders 1`] = `18`;
 
 exports[`regression tests can drag element that covers another element, while another elem is selected: [end of test] appState 1`] = `
 Object {
@@ -3234,7 +3234,7 @@ Object {
 
 exports[`regression tests can drag element that covers another element, while another elem is selected: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests can drag element that covers another element, while another elem is selected: [end of test] number of renders 1`] = `16`;
+exports[`regression tests can drag element that covers another element, while another elem is selected: [end of test] number of renders 1`] = `17`;
 
 exports[`regression tests change the properties of a shape: [end of test] appState 1`] = `
 Object {
@@ -3539,7 +3539,7 @@ Object {
 
 exports[`regression tests change the properties of a shape: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests change the properties of a shape: [end of test] number of renders 1`] = `9`;
+exports[`regression tests change the properties of a shape: [end of test] number of renders 1`] = `10`;
 
 exports[`regression tests click on an element and drag it: [dragged] appState 1`] = `
 Object {
@@ -3740,7 +3740,7 @@ Object {
 
 exports[`regression tests click on an element and drag it: [dragged] number of elements 1`] = `1`;
 
-exports[`regression tests click on an element and drag it: [dragged] number of renders 1`] = `8`;
+exports[`regression tests click on an element and drag it: [dragged] number of renders 1`] = `9`;
 
 exports[`regression tests click on an element and drag it: [end of test] appState 1`] = `
 Object {
@@ -3981,7 +3981,7 @@ Object {
 
 exports[`regression tests click on an element and drag it: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests click on an element and drag it: [end of test] number of renders 1`] = `11`;
+exports[`regression tests click on an element and drag it: [end of test] number of renders 1`] = `12`;
 
 exports[`regression tests click to select a shape: [end of test] appState 1`] = `
 Object {
@@ -4230,7 +4230,7 @@ Object {
 
 exports[`regression tests click to select a shape: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests click to select a shape: [end of test] number of renders 1`] = `11`;
+exports[`regression tests click to select a shape: [end of test] number of renders 1`] = `12`;
 
 exports[`regression tests click-drag to select a group: [end of test] appState 1`] = `
 Object {
@@ -4588,7 +4588,7 @@ Object {
 
 exports[`regression tests click-drag to select a group: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests click-drag to select a group: [end of test] number of renders 1`] = `17`;
+exports[`regression tests click-drag to select a group: [end of test] number of renders 1`] = `18`;
 
 exports[`regression tests deselects group of selected elements on pointer down when pointer doesn't hit any element: [end of test] appState 1`] = `
 Object {
@@ -4880,7 +4880,7 @@ Object {
 
 exports[`regression tests deselects group of selected elements on pointer down when pointer doesn't hit any element: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests deselects group of selected elements on pointer down when pointer doesn't hit any element: [end of test] number of renders 1`] = `12`;
+exports[`regression tests deselects group of selected elements on pointer down when pointer doesn't hit any element: [end of test] number of renders 1`] = `13`;
 
 exports[`regression tests deselects group of selected elements on pointer up when pointer hits common bounding box without hitting any element: [end of test] appState 1`] = `
 Object {
@@ -5184,7 +5184,7 @@ Object {
 
 exports[`regression tests deselects group of selected elements on pointer up when pointer hits common bounding box without hitting any element: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests deselects group of selected elements on pointer up when pointer hits common bounding box without hitting any element: [end of test] number of renders 1`] = `13`;
+exports[`regression tests deselects group of selected elements on pointer up when pointer hits common bounding box without hitting any element: [end of test] number of renders 1`] = `14`;
 
 exports[`regression tests deselects selected element on pointer down when pointer doesn't hit any element: [end of test] appState 1`] = `
 Object {
@@ -5389,7 +5389,7 @@ Object {
 
 exports[`regression tests deselects selected element on pointer down when pointer doesn't hit any element: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests deselects selected element on pointer down when pointer doesn't hit any element: [end of test] number of renders 1`] = `6`;
+exports[`regression tests deselects selected element on pointer down when pointer doesn't hit any element: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests deselects selected element, on pointer up, when click hits element bounding box but doesn't hit the element: [end of test] appState 1`] = `
 Object {
@@ -5572,7 +5572,7 @@ Object {
 
 exports[`regression tests deselects selected element, on pointer up, when click hits element bounding box but doesn't hit the element: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests deselects selected element, on pointer up, when click hits element bounding box but doesn't hit the element: [end of test] number of renders 1`] = `7`;
+exports[`regression tests deselects selected element, on pointer up, when click hits element bounding box but doesn't hit the element: [end of test] number of renders 1`] = `8`;
 
 exports[`regression tests double click to edit a group: [end of test] appState 1`] = `
 Object {
@@ -6022,7 +6022,7 @@ Object {
 
 exports[`regression tests double click to edit a group: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests double click to edit a group: [end of test] number of renders 1`] = `16`;
+exports[`regression tests double click to edit a group: [end of test] number of renders 1`] = `17`;
 
 exports[`regression tests drags selected elements from point inside common bounding box that doesn't hit any element and keeps elements selected after dragging: [end of test] appState 1`] = `
 Object {
@@ -6337,7 +6337,7 @@ Object {
 
 exports[`regression tests drags selected elements from point inside common bounding box that doesn't hit any element and keeps elements selected after dragging: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests drags selected elements from point inside common bounding box that doesn't hit any element and keeps elements selected after dragging: [end of test] number of renders 1`] = `14`;
+exports[`regression tests drags selected elements from point inside common bounding box that doesn't hit any element and keeps elements selected after dragging: [end of test] number of renders 1`] = `15`;
 
 exports[`regression tests draw every type of shape: [end of test] appState 1`] = `
 Object {
@@ -8368,7 +8368,7 @@ Object {
 
 exports[`regression tests draw every type of shape: [end of test] number of elements 1`] = `8`;
 
-exports[`regression tests draw every type of shape: [end of test] number of renders 1`] = `49`;
+exports[`regression tests draw every type of shape: [end of test] number of renders 1`] = `50`;
 
 exports[`regression tests given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up: [end of test] appState 1`] = `
 Object {
@@ -8727,7 +8727,7 @@ Object {
 
 exports[`regression tests given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up: [end of test] number of renders 1`] = `17`;
+exports[`regression tests given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up: [end of test] number of renders 1`] = `18`;
 
 exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partialy overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] appState 1`] = `
 Object {
@@ -8979,7 +8979,7 @@ Object {
 
 exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partialy overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partialy overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] number of renders 1`] = `15`;
+exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partialy overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] number of renders 1`] = `16`;
 
 exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when clicking intersection between A and B B should be selected on pointer up: [end of test] appState 1`] = `
 Object {
@@ -9229,7 +9229,7 @@ Object {
 
 exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when clicking intersection between A and B B should be selected on pointer up: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when clicking intersection between A and B B should be selected on pointer up: [end of test] number of renders 1`] = `15`;
+exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when clicking intersection between A and B B should be selected on pointer up: [end of test] number of renders 1`] = `16`;
 
 exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when dragging on intersection between A and B A should be dragged and keep being selected: [end of test] appState 1`] = `
 Object {
@@ -9541,7 +9541,7 @@ Object {
 
 exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when dragging on intersection between A and B A should be dragged and keep being selected: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when dragging on intersection between A and B A should be dragged and keep being selected: [end of test] number of renders 1`] = `16`;
+exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when dragging on intersection between A and B A should be dragged and keep being selected: [end of test] number of renders 1`] = `17`;
 
 exports[`regression tests key 2 selects rectangle tool: [end of test] appState 1`] = `
 Object {
@@ -9702,7 +9702,7 @@ Object {
 
 exports[`regression tests key 2 selects rectangle tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests key 2 selects rectangle tool: [end of test] number of renders 1`] = `5`;
+exports[`regression tests key 2 selects rectangle tool: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests key 3 selects diamond tool: [end of test] appState 1`] = `
 Object {
@@ -9863,7 +9863,7 @@ Object {
 
 exports[`regression tests key 3 selects diamond tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests key 3 selects diamond tool: [end of test] number of renders 1`] = `5`;
+exports[`regression tests key 3 selects diamond tool: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests key 4 selects ellipse tool: [end of test] appState 1`] = `
 Object {
@@ -10024,7 +10024,7 @@ Object {
 
 exports[`regression tests key 4 selects ellipse tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests key 4 selects ellipse tool: [end of test] number of renders 1`] = `5`;
+exports[`regression tests key 4 selects ellipse tool: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests key 5 selects arrow tool: [end of test] appState 1`] = `
 Object {
@@ -10215,7 +10215,7 @@ Object {
 
 exports[`regression tests key 5 selects arrow tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests key 5 selects arrow tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests key 5 selects arrow tool: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests key 6 selects line tool: [end of test] appState 1`] = `
 Object {
@@ -10406,7 +10406,7 @@ Object {
 
 exports[`regression tests key 6 selects line tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests key 6 selects line tool: [end of test] number of renders 1`] = `5`;
+exports[`regression tests key 6 selects line tool: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests key 7 selects draw tool: [end of test] appState 1`] = `
 Object {
@@ -10597,7 +10597,7 @@ Object {
 
 exports[`regression tests key 7 selects draw tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests key 7 selects draw tool: [end of test] number of renders 1`] = `5`;
+exports[`regression tests key 7 selects draw tool: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests key a selects arrow tool: [end of test] appState 1`] = `
 Object {
@@ -10788,7 +10788,7 @@ Object {
 
 exports[`regression tests key a selects arrow tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests key a selects arrow tool: [end of test] number of renders 1`] = `6`;
+exports[`regression tests key a selects arrow tool: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests key d selects diamond tool: [end of test] appState 1`] = `
 Object {
@@ -10949,7 +10949,7 @@ Object {
 
 exports[`regression tests key d selects diamond tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests key d selects diamond tool: [end of test] number of renders 1`] = `5`;
+exports[`regression tests key d selects diamond tool: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests key e selects ellipse tool: [end of test] appState 1`] = `
 Object {
@@ -11110,7 +11110,7 @@ Object {
 
 exports[`regression tests key e selects ellipse tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests key e selects ellipse tool: [end of test] number of renders 1`] = `5`;
+exports[`regression tests key e selects ellipse tool: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests key l selects line tool: [end of test] appState 1`] = `
 Object {
@@ -11301,7 +11301,7 @@ Object {
 
 exports[`regression tests key l selects line tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests key l selects line tool: [end of test] number of renders 1`] = `5`;
+exports[`regression tests key l selects line tool: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests key r selects rectangle tool: [end of test] appState 1`] = `
 Object {
@@ -11462,7 +11462,7 @@ Object {
 
 exports[`regression tests key r selects rectangle tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests key r selects rectangle tool: [end of test] number of renders 1`] = `5`;
+exports[`regression tests key r selects rectangle tool: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests key x selects draw tool: [end of test] appState 1`] = `
 Object {
@@ -11653,7 +11653,7 @@ Object {
 
 exports[`regression tests key x selects draw tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests key x selects draw tool: [end of test] number of renders 1`] = `5`;
+exports[`regression tests key x selects draw tool: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests make a group and duplicate it: [end of test] appState 1`] = `
 Object {
@@ -12366,7 +12366,7 @@ Object {
 
 exports[`regression tests make a group and duplicate it: [end of test] number of elements 1`] = `6`;
 
-exports[`regression tests make a group and duplicate it: [end of test] number of renders 1`] = `20`;
+exports[`regression tests make a group and duplicate it: [end of test] number of renders 1`] = `21`;
 
 exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] appState 1`] = `
 Object {
@@ -12616,7 +12616,7 @@ Object {
 
 exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] number of renders 1`] = `17`;
+exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] number of renders 1`] = `18`;
 
 exports[`regression tests pinch-to-zoom works: [end of test] appState 1`] = `
 Object {
@@ -12715,7 +12715,7 @@ Object {
 
 exports[`regression tests pinch-to-zoom works: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests pinch-to-zoom works: [end of test] number of renders 1`] = `7`;
+exports[`regression tests pinch-to-zoom works: [end of test] number of renders 1`] = `8`;
 
 exports[`regression tests rerenders UI on language change: [end of test] appState 1`] = `
 Object {
@@ -12812,7 +12812,7 @@ Object {
 
 exports[`regression tests rerenders UI on language change: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests rerenders UI on language change: [end of test] number of renders 1`] = `4`;
+exports[`regression tests rerenders UI on language change: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests selecting 'Add to library' in context menu adds element to library: [end of test] appState 1`] = `
 Object {
@@ -12973,7 +12973,7 @@ Object {
 
 exports[`regression tests selecting 'Add to library' in context menu adds element to library: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests selecting 'Add to library' in context menu adds element to library: [end of test] number of renders 1`] = `5`;
+exports[`regression tests selecting 'Add to library' in context menu adds element to library: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests selecting 'Bring forward' in context menu brings element forward: [end of test] appState 1`] = `
 Object {
@@ -13278,7 +13278,7 @@ Object {
 
 exports[`regression tests selecting 'Bring forward' in context menu brings element forward: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests selecting 'Bring forward' in context menu brings element forward: [end of test] number of renders 1`] = `11`;
+exports[`regression tests selecting 'Bring forward' in context menu brings element forward: [end of test] number of renders 1`] = `12`;
 
 exports[`regression tests selecting 'Bring to front' in context menu brings element to front: [end of test] appState 1`] = `
 Object {
@@ -13583,7 +13583,7 @@ Object {
 
 exports[`regression tests selecting 'Bring to front' in context menu brings element to front: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests selecting 'Bring to front' in context menu brings element to front: [end of test] number of renders 1`] = `11`;
+exports[`regression tests selecting 'Bring to front' in context menu brings element to front: [end of test] number of renders 1`] = `12`;
 
 exports[`regression tests selecting 'Copy styles' in context menu copies styles: [end of test] appState 1`] = `
 Object {
@@ -13744,7 +13744,7 @@ Object {
 
 exports[`regression tests selecting 'Copy styles' in context menu copies styles: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests selecting 'Copy styles' in context menu copies styles: [end of test] number of renders 1`] = `5`;
+exports[`regression tests selecting 'Copy styles' in context menu copies styles: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests selecting 'Delete' in context menu deletes element: [end of test] appState 1`] = `
 Object {
@@ -13937,7 +13937,7 @@ Object {
 
 exports[`regression tests selecting 'Delete' in context menu deletes element: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests selecting 'Delete' in context menu deletes element: [end of test] number of renders 1`] = `6`;
+exports[`regression tests selecting 'Delete' in context menu deletes element: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests selecting 'Duplicate' in context menu duplicates element: [end of test] appState 1`] = `
 Object {
@@ -14183,7 +14183,7 @@ Object {
 
 exports[`regression tests selecting 'Duplicate' in context menu duplicates element: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests selecting 'Duplicate' in context menu duplicates element: [end of test] number of renders 1`] = `6`;
+exports[`regression tests selecting 'Duplicate' in context menu duplicates element: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests selecting 'Group selection' in context menu groups selected elements: [end of test] appState 1`] = `
 Object {
@@ -14504,7 +14504,7 @@ Object {
 
 exports[`regression tests selecting 'Group selection' in context menu groups selected elements: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests selecting 'Group selection' in context menu groups selected elements: [end of test] number of renders 1`] = `12`;
+exports[`regression tests selecting 'Group selection' in context menu groups selected elements: [end of test] number of renders 1`] = `13`;
 
 exports[`regression tests selecting 'Paste styles' in context menu pastes styles: [end of test] appState 1`] = `
 Object {
@@ -15340,7 +15340,7 @@ Object {
 
 exports[`regression tests selecting 'Paste styles' in context menu pastes styles: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests selecting 'Paste styles' in context menu pastes styles: [end of test] number of renders 1`] = `20`;
+exports[`regression tests selecting 'Paste styles' in context menu pastes styles: [end of test] number of renders 1`] = `21`;
 
 exports[`regression tests selecting 'Send backward' in context menu sends element backward: [end of test] appState 1`] = `
 Object {
@@ -15645,7 +15645,7 @@ Object {
 
 exports[`regression tests selecting 'Send backward' in context menu sends element backward: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests selecting 'Send backward' in context menu sends element backward: [end of test] number of renders 1`] = `10`;
+exports[`regression tests selecting 'Send backward' in context menu sends element backward: [end of test] number of renders 1`] = `11`;
 
 exports[`regression tests selecting 'Send to back' in context menu sends element to back: [end of test] appState 1`] = `
 Object {
@@ -15950,7 +15950,7 @@ Object {
 
 exports[`regression tests selecting 'Send to back' in context menu sends element to back: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests selecting 'Send to back' in context menu sends element to back: [end of test] number of renders 1`] = `10`;
+exports[`regression tests selecting 'Send to back' in context menu sends element to back: [end of test] number of renders 1`] = `11`;
 
 exports[`regression tests selecting 'Ungroup selection' in context menu ungroups selected group: [end of test] appState 1`] = `
 Object {
@@ -16326,7 +16326,7 @@ Object {
 
 exports[`regression tests selecting 'Ungroup selection' in context menu ungroups selected group: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests selecting 'Ungroup selection' in context menu ungroups selected group: [end of test] number of renders 1`] = `13`;
+exports[`regression tests selecting 'Ungroup selection' in context menu ungroups selected group: [end of test] number of renders 1`] = `14`;
 
 exports[`regression tests shift click on selected element should deselect it on pointer up: [end of test] appState 1`] = `
 Object {
@@ -16490,7 +16490,7 @@ Object {
 
 exports[`regression tests shift click on selected element should deselect it on pointer up: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests shift click on selected element should deselect it on pointer up: [end of test] number of renders 1`] = `7`;
+exports[`regression tests shift click on selected element should deselect it on pointer up: [end of test] number of renders 1`] = `8`;
 
 exports[`regression tests shift-click to multiselect, then drag: [end of test] appState 1`] = `
 Object {
@@ -16808,7 +16808,7 @@ Object {
 
 exports[`regression tests shift-click to multiselect, then drag: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests shift-click to multiselect, then drag: [end of test] number of renders 1`] = `16`;
+exports[`regression tests shift-click to multiselect, then drag: [end of test] number of renders 1`] = `17`;
 
 exports[`regression tests should show fill icons when element has non transparent background: [end of test] appState 1`] = `
 Object {
@@ -17044,7 +17044,7 @@ Object {
 
 exports[`regression tests should show fill icons when element has non transparent background: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests should show fill icons when element has non transparent background: [end of test] number of renders 1`] = `9`;
+exports[`regression tests should show fill icons when element has non transparent background: [end of test] number of renders 1`] = `10`;
 
 exports[`regression tests shows 'Group selection' in context menu for multiple selected elements: [end of test] appState 1`] = `
 Object {
@@ -17296,7 +17296,7 @@ Object {
 
 exports[`regression tests shows 'Group selection' in context menu for multiple selected elements: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests shows 'Group selection' in context menu for multiple selected elements: [end of test] number of renders 1`] = `13`;
+exports[`regression tests shows 'Group selection' in context menu for multiple selected elements: [end of test] number of renders 1`] = `14`;
 
 exports[`regression tests shows 'Ungroup selection' in context menu for group inside selected elements: [end of test] appState 1`] = `
 Object {
@@ -17620,7 +17620,7 @@ Object {
 
 exports[`regression tests shows 'Ungroup selection' in context menu for group inside selected elements: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests shows 'Ungroup selection' in context menu for group inside selected elements: [end of test] number of renders 1`] = `14`;
+exports[`regression tests shows 'Ungroup selection' in context menu for group inside selected elements: [end of test] number of renders 1`] = `15`;
 
 exports[`regression tests shows context menu for canvas: [end of test] appState 1`] = `
 Object {
@@ -17717,7 +17717,7 @@ Object {
 
 exports[`regression tests shows context menu for canvas: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests shows context menu for canvas: [end of test] number of renders 1`] = `1`;
+exports[`regression tests shows context menu for canvas: [end of test] number of renders 1`] = `2`;
 
 exports[`regression tests shows context menu for element: [end of test] appState 1`] = `
 Object {
@@ -17878,7 +17878,7 @@ Object {
 
 exports[`regression tests shows context menu for element: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests shows context menu for element: [end of test] number of renders 1`] = `5`;
+exports[`regression tests shows context menu for element: [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests single-clicking on a subgroup of a selected group should not alter selection: [end of test] appState 1`] = `
 Object {
@@ -18696,7 +18696,7 @@ Object {
 
 exports[`regression tests single-clicking on a subgroup of a selected group should not alter selection: [end of test] number of elements 1`] = `4`;
 
-exports[`regression tests single-clicking on a subgroup of a selected group should not alter selection: [end of test] number of renders 1`] = `35`;
+exports[`regression tests single-clicking on a subgroup of a selected group should not alter selection: [end of test] number of renders 1`] = `36`;
 
 exports[`regression tests spacebar + drag scrolls the canvas: [end of test] appState 1`] = `
 Object {
@@ -18793,7 +18793,7 @@ Object {
 
 exports[`regression tests spacebar + drag scrolls the canvas: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests spacebar + drag scrolls the canvas: [end of test] number of renders 1`] = `4`;
+exports[`regression tests spacebar + drag scrolls the canvas: [end of test] number of renders 1`] = `5`;
 
 exports[`regression tests supports nested groups: [end of test] appState 1`] = `
 Object {
@@ -19522,7 +19522,7 @@ Object {
 
 exports[`regression tests supports nested groups: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests supports nested groups: [end of test] number of renders 1`] = `28`;
+exports[`regression tests supports nested groups: [end of test] number of renders 1`] = `29`;
 
 exports[`regression tests switches from group of selected elements to another element on pointer down: [end of test] appState 1`] = `
 Object {
@@ -19924,7 +19924,7 @@ Object {
 
 exports[`regression tests switches from group of selected elements to another element on pointer down: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests switches from group of selected elements to another element on pointer down: [end of test] number of renders 1`] = `16`;
+exports[`regression tests switches from group of selected elements to another element on pointer down: [end of test] number of renders 1`] = `17`;
 
 exports[`regression tests switches selected element on pointer down: [end of test] appState 1`] = `
 Object {
@@ -20216,7 +20216,7 @@ Object {
 
 exports[`regression tests switches selected element on pointer down: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests switches selected element on pointer down: [end of test] number of renders 1`] = `10`;
+exports[`regression tests switches selected element on pointer down: [end of test] number of renders 1`] = `11`;
 
 exports[`regression tests two-finger scroll works: [end of test] appState 1`] = `
 Object {
@@ -20315,7 +20315,7 @@ Object {
 
 exports[`regression tests two-finger scroll works: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests two-finger scroll works: [end of test] number of renders 1`] = `9`;
+exports[`regression tests two-finger scroll works: [end of test] number of renders 1`] = `10`;
 
 exports[`regression tests undo/redo drawing an element: [end of test] appState 1`] = `
 Object {
@@ -20810,7 +20810,7 @@ Object {
 
 exports[`regression tests undo/redo drawing an element: [end of test] number of elements 1`] = `3`;
 
-exports[`regression tests undo/redo drawing an element: [end of test] number of renders 1`] = `26`;
+exports[`regression tests undo/redo drawing an element: [end of test] number of renders 1`] = `27`;
 
 exports[`regression tests updates fontSize & fontFamily appState: [end of test] appState 1`] = `
 Object {
@@ -20907,7 +20907,7 @@ Object {
 
 exports[`regression tests updates fontSize & fontFamily appState: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests updates fontSize & fontFamily appState: [end of test] number of renders 1`] = `3`;
+exports[`regression tests updates fontSize & fontFamily appState: [end of test] number of renders 1`] = `4`;
 
 exports[`regression tests zoom hotkeys: [end of test] appState 1`] = `
 Object {
@@ -21004,4 +21004,4 @@ Object {
 
 exports[`regression tests zoom hotkeys: [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests zoom hotkeys: [end of test] number of renders 1`] = `3`;
+exports[`regression tests zoom hotkeys: [end of test] number of renders 1`] = `4`;

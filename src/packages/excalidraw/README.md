@@ -139,6 +139,8 @@ export default function App() {
 | [`isCollaborating`](#isCollaborating)         | `boolean`                                                                                                                                                                                                                                                                                                                                          |                      | This implies if the app is in collaboration mode                                                                                                           |
 | [`onPointerUpdate`](#onPointerUpdate)         | Function                                                                                                                                                                                                                                                                                                                                           |                      | Callback triggered when mouse pointer is updated.                                                                                                          |
 | [`onExportToBackend`](#onExportToBackend)     | Function                                                                                                                                                                                                                                                                                                                                           |                      | Callback triggered when link button is clicked on export dialog                                                                                            |
+| [`langCode`](#langCode)                       | string                                                                                                                                                                                                                                                                                                                                             | `en`                 | Language code string                                                                                                                                       |
+| [`renderFooter `](#renderFooter)              | Function                                                                                                                                                                                                                                                                                                                                           |                      | Function that renders custom UI footer                                                                                                                     |
 
 #### `width`
 
@@ -270,3 +272,21 @@ This callback is triggered when the shareable-link button is clicked in the expo
 1. `exportedElements`: An array of [non deleted elements](https://github.com/excalidraw/excalidraw/blob/6e45cb95dbd7a8be1859c7055b06957298e3097c/src/element/types.ts#L76) which needs to be exported.
 2. `appState`: [AppState](https://github.com/excalidraw/excalidraw/blob/4c90ea5667d29effe8ec4a115e49efc7c340cdb3/src/types.ts#L33) of the scene.
 3. `canvas`: The `HTMLCanvasElement` of the scene.
+
+#### `langCode`
+
+Determines the language of the UI. It should be one of the [available language codes](https://github.com/excalidraw/excalidraw/blob/d337c8b15f6c1085287b12ecbe59c96e2c4e0ff4/src/i18n.ts#L14). Defaults to `en` (English).
+We also export default language and supported languages which you can import as shown below.
+
+```js
+import { defaultLang, languages } from "@excalidraw/excalidraw";
+```
+
+| name        | type                                                                                                                 |
+| ----------- | -------------------------------------------------------------------------------------------------------------------- |
+| defaultLang | string                                                                                                               |
+| languages   | [Language []](https://github.com/excalidraw/excalidraw/blob/c35d983fef8a83ba842dd892c0f461111a3e8589/src/i18n.ts#L9) |
+
+#### `renderFooter`
+
+A function that renders (returns JSX) custom UI footer. For example, you can use this to render a language picker that was previously being rendered by Excalidraw itself (for now, you'll need to implement your own language picker).
