@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "चिपकाएँ",
-    "pasteCharts": "",
+    "pasteCharts": "चार्ट चिपकाएँ",
     "selectAll": "सभी चुनें",
     "multiSelect": "आकार को चयन में जोड़ें",
     "moveCanvas": "कैनवास को स्थानांतरित करें",
@@ -39,8 +39,8 @@
     "fontFamily": "फ़ॉन्ट का परिवार",
     "onlySelected": "केवल चयनित",
     "withBackground": "बैकग्राउंड के साथ",
-    "exportEmbedScene": "",
-    "exportEmbedScene_details": "",
+    "exportEmbedScene": "निर्यात एम्बेड दृश्य",
+    "exportEmbedScene_details": "निर्यात एम्बेड दृश्य विवरण",
     "addWatermark": "ऐड \"मेड विथ एक्सकैलिडराव\"",
     "handDrawn": "हाथ से बनाया हुआ",
     "normal": "साधारण",
@@ -127,7 +127,7 @@
   "alerts": {
     "clearReset": "इससे पूरा कैनवास साफ हो जाएगा। क्या आपको यकीन है?",
     "couldNotCreateShareableLink": "साझा करने योग्य लिंक नहीं बनाया जा सका।",
-    "couldNotCreateShareableLinkTooBig": "",
+    "couldNotCreateShareableLinkTooBig": "लिंक शेयर नहीं कर सकता: दृश्य बहुत बड़ा",
     "couldNotLoadInvalidFile": "अमान्य फ़ाइल लोड नहीं की जा सकी",
     "importBackendFailed": "बैकएंड से आयात करना विफल रहा।",
     "cannotExportEmptyCanvas": "खाली कैनवास निर्यात नहीं कर सकता।",
@@ -135,7 +135,7 @@
     "decryptFailed": "डेटा को डिक्रिप्ट नहीं किया जा सका।",
     "uploadedSecurly": "अपलोड को एंड-टू-एंड एन्क्रिप्शन के साथ सुरक्षित किया गया है, जिसका मतलब है कि एक्सक्लूसिव सर्वर और थर्ड पार्टी कंटेंट नहीं पढ़ सकते हैं।",
     "loadSceneOverridePrompt": "लोड हो रहा है बाहरी ड्राइंग आपके मौजूदा सामग्री को बदल देगा। क्या आप जारी रखना चाहते हैं?",
-    "errorLoadingLibrary": "",
+    "errorLoadingLibrary": "लाइब्रेरी लोड करने में त्रुटि",
     "confirmAddLibrary": "",
     "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": ""
@@ -149,7 +149,7 @@
     "arrow": "तीर",
     "line": "रेखा",
     "text": "पाठ",
-    "library": "",
+    "library": "लाइब्रेरी",
     "lock": "ड्राइंग के बाद चयनित टूल को सक्रिय रखें"
   },
   "headings": {
@@ -171,8 +171,8 @@
   },
   "canvasError": {
     "cannotShowPreview": "",
-    "canvasTooBig": "",
-    "canvasTooBigTip": ""
+    "canvasTooBig": "कैनवास बहुत बड़ा",
+    "canvasTooBigTip": "कैनवास बहुत बड़ा टिप"
   },
   "errorSplash": {
     "headingMain_pre": "एक त्रुटि का सामना करना पड़ा। प्रयत्न ",
@@ -215,8 +215,8 @@
     "textNewLine": "नई पंक्ति (पाठ) जोड़ें",
     "textFinish": "संपादन समाप्त करें (पाठ)",
     "zoomToFit": "सभी तत्वों को फिट करने के लिए ज़ूम करें",
-    "zoomToSelection": "",
-    "preventBinding": ""
+    "zoomToSelection": "सिलेक्शन तक ज़ूम करे",
+    "preventBinding": "तीर बंधन रोकें"
   },
   "encrypted": {
     "tooltip": "आपके चित्र अंत-से-अंत एन्क्रिप्टेड हैं, इसलिए एक्सक्लूसिव्रॉव के सर्वर उन्हें कभी नहीं देखेंगे।"
@@ -224,12 +224,12 @@
   "stats": {
     "angle": "कोण",
     "element": "एलिमेंट",
-    "elements": "",
+    "elements": "एलिमेंट",
     "height": "ऊंचाई",
     "scene": "दृश्य",
     "selected": "चयनित",
     "storage": "संग्रह",
-    "title": "",
+    "title": "बेवकूफ के लिए आँकड़े",
     "total": "कुल",
     "width": "चौड़ाई"
   }
