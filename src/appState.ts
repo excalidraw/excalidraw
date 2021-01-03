@@ -2,16 +2,20 @@ import oc from "open-color";
 import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
+  SCENE_NAME_FALLBACK,
   DEFAULT_TEXT_ALIGN,
 } from "./constants";
-import { t } from "./i18n";
 import { AppState, FlooredNumber, NormalizedZoomValue } from "./types";
-import { getDateTime } from "./utils";
 
-export const getDefaultAppState = (): Omit<
-  AppState,
-  "offsetTop" | "offsetLeft"
-> => {
+type DefaultAppState = Omit<AppState, "offsetTop" | "offsetLeft" | "name"> & {
+  /**
+   * You should override this with current appState.name, or whatever is
+   * applicable at a given place where you get default appState.
+   */
+  name: undefined;
+};
+
+export const getDefaultAppState = (): DefaultAppState => {
   return {
     appearance: "light",
     collaborators: new Map(),
@@ -50,7 +54,11 @@ export const getDefaultAppState = (): Omit<
     isRotating: false,
     lastPointerDownWith: "mouse",
     multiElement: null,
-    name: `${t("labels.untitled")}-${getDateTime()}`,
+    // for safety (because TS mostly doesn't distinguish optional types and
+    //  undefined values), we set `name` to the fallback name, but we cast it to
+    // `undefined` so that TS forces us to explicitly specify it wherever
+    // possible
+    name: (SCENE_NAME_FALLBACK as unknown) as undefined,
     openMenu: null,
     pasteDialog: { shown: false, data: null },
     previousSelectedElementIds: {},

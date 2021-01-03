@@ -8,6 +8,7 @@ import { FontFamily, FontString } from "./element/types";
 import { Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
 import { isDarwin } from "./keys";
+import { t } from "./i18n";
 
 export const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -30,6 +31,10 @@ export const getDateTime = () => {
   const min = `${date.getMinutes()}`.padStart(2, "0");
 
   return `${year}-${month}-${day}-${hr}${min}`;
+};
+
+export const getNewSceneName = () => {
+  return `${t("labels.untitled")}-${getDateTime()}`;
 };
 
 export const capitalizeString = (str: string) =>

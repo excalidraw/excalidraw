@@ -12,6 +12,7 @@ import { KEYS } from "../keys";
 import { muteFSAbortError } from "../utils";
 import { register } from "./register";
 import "../components/ToolIcon.scss";
+import { SCENE_NAME_FALLBACK } from "../constants";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -22,7 +23,7 @@ export const actionChangeProjectName = register({
   PanelComponent: ({ appState, updateData }) => (
     <ProjectName
       label={t("labels.fileTitle")}
-      value={appState.name || "Unnamed"}
+      value={appState.name || SCENE_NAME_FALLBACK}
       onChange={(name: string) => updateData(name)}
     />
   ),

@@ -6,6 +6,7 @@ import { getDefaultAppState } from "../appState";
 import { AppState } from "../types";
 import { ExcalidrawElement } from "../element/types";
 import { getNonDeletedElements } from "../element";
+import { SCENE_NAME_FALLBACK } from "../constants";
 
 type ExportOpts = {
   elements: readonly ExcalidrawElement[];
@@ -18,7 +19,7 @@ type ExportOpts = {
 
 export const exportToCanvas = ({
   elements,
-  appState = getDefaultAppState(),
+  appState = { ...getDefaultAppState(), name: SCENE_NAME_FALLBACK },
   getDimensions = (width, height) => ({ width, height, scale: 1 }),
 }: ExportOpts) => {
   return _exportToCanvas(
@@ -74,7 +75,7 @@ export const exportToBlob = (
 
 export const exportToSvg = ({
   elements,
-  appState = getDefaultAppState(),
+  appState = { ...getDefaultAppState(), name: SCENE_NAME_FALLBACK },
   exportPadding,
   metadata,
 }: ExportOpts & {

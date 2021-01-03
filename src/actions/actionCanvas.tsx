@@ -15,7 +15,7 @@ import { getNormalizedZoom, getSelectedElements } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
 import { getNewZoom } from "../scene/zoom";
 import { AppState, NormalizedZoomValue } from "../types";
-import { getShortcutKey } from "../utils";
+import { getNewSceneName, getShortcutKey } from "../utils";
 import { register } from "./register";
 
 export const actionChangeViewBackgroundColor = register({
@@ -59,6 +59,7 @@ export const actionClearCanvas = register({
       ),
       appState: {
         ...getDefaultAppState(),
+        name: getNewSceneName(),
         appearance: appState.appearance,
         elementLocked: appState.elementLocked,
         exportBackground: appState.exportBackground,

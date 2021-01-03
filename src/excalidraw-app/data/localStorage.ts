@@ -6,6 +6,7 @@ import {
 } from "../../appState";
 import { clearElementsForLocalStorage } from "../../element";
 import { STORAGE_KEYS as APP_STORAGE_KEYS } from "../../constants";
+import { ImportedDataState } from "../../data/types";
 
 export const STORAGE_KEYS = {
   LOCAL_STORAGE_ELEMENTS: "excalidraw",
@@ -81,7 +82,7 @@ export const importFromLocalStorage = () => {
     }
   }
 
-  let appState = null;
+  let appState: ImportedDataState["appState"] = null;
   if (savedState) {
     try {
       appState = {
