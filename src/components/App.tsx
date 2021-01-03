@@ -3860,7 +3860,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       languages.find((lang) => lang.code === this.props.langCode) ||
       defaultLang;
     await setLanguage(currentLang);
-    this.props?.onLangChange?.(currentLang);
     this.setAppState({});
   }
 }

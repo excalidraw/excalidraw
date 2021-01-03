@@ -10,7 +10,6 @@ import {
 
 interface Props {
   langCode: Language["code"];
-  onLangChange?: (lang: Language) => void;
 }
 interface State {
   isLoading: boolean;
@@ -25,7 +24,6 @@ export class InitializeApp extends React.Component<Props, State> {
       languages.find((lang) => lang.code === this.props.langCode) ||
       defaultLang;
     await setLanguageFirstTime(currentLang);
-    this.props.onLangChange?.(currentLang);
     this.setState({
       isLoading: false,
     });

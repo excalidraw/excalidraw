@@ -184,7 +184,6 @@ export interface ExcalidrawProps {
   ) => void;
   renderFooter?: (isMobile: boolean) => JSX.Element;
   langCode?: Language["code"];
-  onLangChange?: (lang: Language) => void;
 }
 
 export type SceneData = {

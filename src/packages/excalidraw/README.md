@@ -140,7 +140,6 @@ export default function App() {
 | [`onPointerUpdate`](#onPointerUpdate)         | Function                                                                                                                                                                                                                                                                                                                                           |                      | Callback triggered when mouse pointer is updated.                                                                                                          |
 | [`onExportToBackend`](#onExportToBackend)     | Function                                                                                                                                                                                                                                                                                                                                           |                      | Callback triggered when link button is clicked on export dialog                                                                                            |
 | [`langCode`](#langCode)                       | string                                                                                                                                                                                                                                                                                                                                             | `en`                 | Language code string                                                                                                                                       |
-| [`onLangChange`](#onLangChange)               | Function                                                                                                                                                                                                                                                                                                                                           |                      | Callback triggered when language is changed                                                                                                                |
 | [`renderFooter `](#renderFooter)              | Function                                                                                                                                                                                                                                                                                                                                           |                      | Function that renders custom UI footer                                                                                                                     |
 
 #### `width`
@@ -277,10 +276,6 @@ This callback is triggered when the shareable-link button is clicked in the expo
 #### `langCode`
 
 Determines the language of the UI. It should be one of the [available language codes](https://github.com/excalidraw/excalidraw/blob/d337c8b15f6c1085287b12ecbe59c96e2c4e0ff4/src/i18n.ts#L14). Defaults to `en` (English).
-
-#### `onLangChange`
-
-This callback is triggered when the `langCode` prop passed to the Excalidraw component changes. It is also invoked on the initial mount.
 
 #### `renderFooter`
 

@@ -26,7 +26,6 @@ const Excalidraw = (props: ExcalidrawProps) => {
     onExportToBackend,
     renderFooter,
     langCode = defaultLang.code,
-    onLangChange,
   } = props;
 
   useEffect(() => {
@@ -48,7 +47,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
   }, []);
 
   return (
-    <InitializeApp langCode={langCode} onLangChange={onLangChange}>
+    <InitializeApp langCode={langCode}>
       <IsMobileProvider>
         <App
           width={width}
@@ -65,7 +64,6 @@ const Excalidraw = (props: ExcalidrawProps) => {
           onExportToBackend={onExportToBackend}
           renderFooter={renderFooter}
           langCode={langCode}
-          onLangChange={onLangChange}
         />
       </IsMobileProvider>
     </InitializeApp>
