@@ -18,6 +18,7 @@ import {
   screen,
   waitFor,
 } from "./test-utils";
+import { defaultLang } from "../i18n";
 
 const { h } = window;
 
@@ -437,7 +438,7 @@ describe("regression tests", () => {
     await waitFor(() => expect(screen.queryByTitle(/thin/i)).toBeNull());
     // reset language
     fireEvent.change(document.querySelector(".dropdown-select__language")!, {
-      target: { value: "en" },
+      target: { value: defaultLang.code },
     });
     // switching back to English
     await waitFor(() => expect(screen.queryByTitle(/thin/i)).not.toBeNull());

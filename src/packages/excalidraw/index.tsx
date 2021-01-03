@@ -8,6 +8,7 @@ import "../../css/styles.scss";
 
 import { ExcalidrawAPIRefValue, ExcalidrawProps } from "../../types";
 import { IsMobileProvider } from "../../is-mobile";
+import { defaultLang } from "../../i18n";
 
 const Excalidraw = (props: ExcalidrawProps) => {
   const {
@@ -24,7 +25,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     onPointerUpdate,
     onExportToBackend,
     renderFooter,
-    langCode = "en",
+    langCode = defaultLang.code,
     onLangChange,
   } = props;
 
