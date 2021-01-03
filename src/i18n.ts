@@ -1,6 +1,6 @@
 import { EVENT_CHANGE, trackEvent } from "./analytics";
 
-import fallbackLanguageData from "./locales/en.json";
+import fallbackLangData from "./locales/en.json";
 import percentages from "./locales/percentages.json";
 
 const COMPLETION_THRESHOLD = 85;
@@ -57,29 +57,29 @@ export const languages: Language[] = [defaultLang]
       COMPLETION_THRESHOLD,
   );
 
-let currentLanguage: Language = defaultLang;
-let currentLanguageData = {};
+let currentLang: Language = defaultLang;
+let currentLangData = {};
 
 export const setLanguage = async (lang: Language) => {
-  currentLanguage = lang;
-  document.documentElement.dir = currentLanguage.rtl ? "rtl" : "ltr";
+  currentLang = lang;
+  document.documentElement.dir = currentLang.rtl ? "rtl" : "ltr";
 
-  currentLanguageData = await import(
-    /* webpackChunkName: "i18n-[request]" */ `./locales/${currentLanguage.code}.json`
+  currentLangData = await import(
+    /* webpackChunkName: "i18n-[request]" */ `./locales/${currentLang.code}.json`
   );
-  trackEvent(EVENT_CHANGE, "language", currentLanguage.code);
+  trackEvent(EVENT_CHANGE, "language", currentLang.code);
 };
 
 export const setLanguageFirstTime = async (lang: Language) => {
-  currentLanguage = lang;
-  document.documentElement.dir = currentLanguage.rtl ? "rtl" : "ltr";
+  currentLang = lang;
+  document.documentElement.dir = currentLang.rtl ? "rtl" : "ltr";
 
-  currentLanguageData = await import(
-    /* webpackChunkName: "i18n-[request]" */ `./locales/${currentLanguage.code}.json`
+  currentLangData = await import(
+    /* webpackChunkName: "i18n-[request]" */ `./locales/${currentLang.code}.json`
   );
 };
 
-export const getLanguage = () => currentLanguage;
+export const getLanguage = () => currentLang;
 
 const findPartsForData = (data: any, parts: string[]) => {
   for (let index = 0; index < parts.length; ++index) {
@@ -98,8 +98,8 @@ const findPartsForData = (data: any, parts: string[]) => {
 export const t = (path: string, replacement?: { [key: string]: string }) => {
   const parts = path.split(".");
   let translation =
-    findPartsForData(currentLanguageData, parts) ||
-    findPartsForData(fallbackLanguageData, parts);
+    findPartsForData(currentLangData, parts) ||
+    findPartsForData(fallbackLangData, parts);
   if (translation === undefined) {
     throw new Error(`Can't find translation for ${path}`);
   }

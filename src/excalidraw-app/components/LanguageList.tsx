@@ -5,12 +5,12 @@ import * as i18n from "../../i18n";
 export const LanguageList = ({
   onChange,
   languages = i18n.languages,
-  currentLanguage = i18n.getLanguage().code,
+  currentLangCode = i18n.getLanguage().code,
   floating,
 }: {
   languages?: { code: string; label: string }[];
   onChange: (langCode: i18n.Language["code"]) => void;
-  currentLanguage?: i18n.Language["code"];
+  currentLangCode?: i18n.Language["code"];
   floating?: boolean;
 }) => (
   <React.Fragment>
@@ -19,7 +19,7 @@ export const LanguageList = ({
         "dropdown-select--floating": floating,
       })}
       onChange={({ target }) => onChange(target.value)}
-      value={currentLanguage}
+      value={currentLangCode}
       aria-label={i18n.t("buttons.selectLanguage")}
     >
       {languages.map((lang) => (

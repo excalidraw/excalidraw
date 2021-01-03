@@ -3856,11 +3856,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   }
 
   private async updateLanguage() {
-    const currentLanguage =
+    const currentLang =
       languages.find((lang) => lang.code === this.props.langCode) ||
       defaultLang;
-    await setLanguage(currentLanguage);
-    this.props?.onLangChange?.(currentLanguage);
+    await setLanguage(currentLang);
+    this.props?.onLangChange?.(currentLang);
     this.setAppState({});
   }
 }

@@ -320,7 +320,7 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
           }}
           languages={languages}
           floating={!isMobile}
-          currentLanguage={langCode}
+          currentLangCode={langCode}
         />
       );
       if (isMobile) {
