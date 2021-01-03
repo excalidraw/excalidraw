@@ -280,7 +280,7 @@ Determines the language of the UI. For available language codes, check [src/i18n
 
 #### `onLangChange`
 
-This callback in triggered when language is changed when the `langCode` prop passed to the Excalidraw component changes. It is also invoked on initial mount.
+This callback is triggered when the `langCode` prop passed to the Excalidraw component changes. It is also invoked on the initial mount.
 
 #### `renderFooter`
 
