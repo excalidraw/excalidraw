@@ -2,6 +2,7 @@ import oc from "open-color";
 import React, { useLayoutEffect, useRef, useState } from "react";
 import { ChartElements, renderSpreadsheet, Spreadsheet } from "../charts";
 import { ChartType } from "../element/types";
+import { t } from "../i18n";
 import { exportToSvg } from "../scene/export";
 import { AppState, LibraryItem } from "../types";
 import { Dialog } from "./Dialog";
@@ -96,9 +97,9 @@ export const PasteChartDialog = ({
 
   return (
     <Dialog
-      maxWidth={500}
+      small
       onCloseRequest={handleClose}
-      title={"Paste chart"}
+      title={t("labels.pasteCharts")}
       className={"PasteChartDialog"}
       autofocus={false}
     >

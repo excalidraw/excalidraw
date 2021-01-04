@@ -19,7 +19,7 @@ const useRefState = <T,>() => {
 export const Dialog = (props: {
   children: React.ReactNode;
   className?: string;
-  maxWidth?: number;
+  small?: boolean;
   onCloseRequest(): void;
   title: React.ReactNode;
   autofocus?: boolean;
@@ -76,11 +76,11 @@ export const Dialog = (props: {
     <Modal
       className={clsx("Dialog", props.className)}
       labelledBy="dialog-title"
-      maxWidth={props.maxWidth}
+      maxWidth={props.small ? 550 : 800}
       onCloseRequest={props.onCloseRequest}
     >
-      <Island padding={4} ref={setIslandNode}>
-        <h2 id="dialog-title" className="Dialog__title">
+      <Island ref={setIslandNode}>
+        <h3 id="dialog-title" className="Dialog__title">
           <span className="Dialog__titleContent">{props.title}</span>
           <button
             className="Modal__close"
@@ -89,8 +89,8 @@ export const Dialog = (props: {
           >
             {useIsMobile() ? back : close}
           </button>
-        </h2>
-        {props.children}
+        </h3>
+        <div className="Dialog__content">{props.children}</div>
       </Island>
     </Modal>
   );

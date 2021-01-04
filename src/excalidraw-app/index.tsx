@@ -1,6 +1,16 @@
-import React, { useState, useLayoutEffect, useEffect, useRef } from "react";
+import React, {
+  useState,
+  useLayoutEffect,
+  useEffect,
+  useRef,
+  useCallback,
+} from "react";
+import LanguageDetector from "i18next-browser-languagedetector";
 
-import Excalidraw from "../packages/excalidraw/index";
+import Excalidraw, {
+  languages,
+  defaultLang,
+} from "../packages/excalidraw/index";
 
 import {
   getTotalStorageSize,
@@ -12,7 +22,7 @@ import {
 import { ImportedDataState } from "../data/types";
 import CollabWrapper, { CollabAPI } from "./collab/CollabWrapper";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
-import { t } from "../i18n";
+import { Language, t } from "../i18n";
 import { exportToBackend, loadScene } from "./data";
 import { getCollaborationLinkData } from "./data";
 import { EVENT } from "../constants";
@@ -29,6 +39,16 @@ import { EVENT_LOAD, EVENT_SHARE, trackEvent } from "../analytics";
 import { ErrorDialog } from "../components/ErrorDialog";
 import { getDefaultAppState } from "../appState";
 import { APP_NAME, TITLE_TIMEOUT } from "../constants";
+import { LanguageList } from "./components/LanguageList";
+
+const languageDetector = new LanguageDetector();
+languageDetector.init({
+  languageUtils: {
+    formatLanguageCode: (langCode: Language["code"]) => langCode,
+    isWhitelisted: () => true,
+  },
+  checkWhitelist: false,
+});
 
 const excalidrawRef: React.MutableRefObject<
   MarkRequired<ExcalidrawAPIRefValue, "ready" | "readyPromise">
@@ -93,7 +113,6 @@ type Scene = ImportedDataState & { commitToHistory: boolean };
 const initializeScene = async (opts: {
   resetScene: ExcalidrawImperativeAPI["resetScene"];
   initializeSocketClient: CollabAPI["initializeSocketClient"];
-  onLateInitialization?: (scene: Scene) => void;
 }): Promise<Scene | null> => {
   const searchParams = new URLSearchParams(window.location.search);
   const id = searchParams.get("id");
@@ -124,17 +143,15 @@ const initializeScene = async (opts: {
     } else {
       // https://github.com/excalidraw/excalidraw/issues/1919
       if (document.hidden) {
-        window.addEventListener(
-          "focus",
-          () =>
-            initializeScene(opts).then((_scene) => {
-              opts?.onLateInitialization?.(_scene || scene);
-            }),
-          {
-            once: true,
-          },
-        );
-        return null;
+        return new Promise((resolve, reject) => {
+          window.addEventListener(
+            "focus",
+            () => initializeScene(opts).then(resolve).catch(reject),
+            {
+              once: true,
+            },
+          );
+        });
       }
 
       isCollabScene = false;
@@ -185,6 +202,8 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
     height: window.innerHeight,
   });
   const [errorMessage, setErrorMessage] = useState("");
+  const currentLangCode = languageDetector.detect() || defaultLang.code;
+  const [langCode, setLangCode] = useState(currentLangCode);
 
   useLayoutEffect(() => {
     const onResize = () => {
@@ -222,9 +241,6 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
       initializeScene({
         resetScene: excalidrawApi.resetScene,
         initializeSocketClient: collab.initializeSocketClient,
-        onLateInitialization: (scene) => {
-          initialStatePromiseRef.current.promise.resolve(scene);
-        },
       }).then((scene) => {
         initialStatePromiseRef.current.promise.resolve(scene);
       });
@@ -262,6 +278,10 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
     };
   }, [collab.initializeSocketClient]);
 
+  useEffect(() => {
+    languageDetector.cacheUserLanguage(langCode);
+  }, [langCode]);
+
   const onChange = (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
@@ -297,6 +317,32 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
       }
     }
   };
+
+  const renderFooter = useCallback(
+    (isMobile: boolean) => {
+      const renderLanguageList = () => (
+        <LanguageList
+          onChange={(langCode) => {
+            setLangCode(langCode);
+          }}
+          languages={languages}
+          floating={!isMobile}
+          currentLangCode={langCode}
+        />
+      );
+      if (isMobile) {
+        return (
+          <fieldset>
+            <legend>{t("labels.language")}</legend>
+            {renderLanguageList()}
+          </fieldset>
+        );
+      }
+      return renderLanguageList();
+    },
+    [langCode],
+  );
+
   return (
     <>
       <Excalidraw
@@ -310,6 +356,8 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
         isCollaborating={collab.isCollaborating}
         onPointerUpdate={collab.onPointerUpdate}
         onExportToBackend={onExportToBackend}
+        renderFooter={renderFooter}
+        langCode={langCode}
       />
       {errorMessage && (
         <ErrorDialog
