@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "粘贴",
-    "pasteCharts": "",
+    "pasteCharts": "粘贴图表",
     "selectAll": "全部选中",
     "multiSelect": "添加元素到选区",
     "moveCanvas": "移动画布",
@@ -229,7 +229,7 @@
     "scene": "场景",
     "selected": "选中",
     "storage": "存储",
-    "title": "玩家统计",
+    "title": "详细统计信息",
     "total": "总计",
     "width": "宽度"
   }
