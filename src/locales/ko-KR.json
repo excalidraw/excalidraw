@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "붙여넣기",
-    "pasteCharts": "파이 차트",
+    "pasteCharts": "Paste charts",
     "selectAll": "전체 선택",
     "multiSelect": "선택 영역에 추가하기",
     "moveCanvas": "캔버스 이동",
