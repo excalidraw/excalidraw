@@ -38,7 +38,7 @@
     "fontSize": "ਫੌਂਟ ਅਕਾਰ",
     "fontFamily": "ਫੌਂਟ ਪਰਿਵਾਰ",
     "onlySelected": "ਸਿਰਫ ਚੁਣੇ ਹੋਏ ਹੀ",
-    "withBackground": "",
+    "withBackground": "ਬੈਕਗਰਾਉਂਂਡ ਨਾਲ",
     "exportEmbedScene": "",
     "exportEmbedScene_details": "",
     "addWatermark": "\"Excalidraw ਨਾਲ ਬਣਾਇਆ\" ਜੋੜੋ",
@@ -153,9 +153,9 @@
     "lock": ""
   },
   "headings": {
-    "canvasActions": "",
-    "selectedShapeActions": "",
-    "shapes": ""
+    "canvasActions": "ਕੈਨਵਸ ਦੀਆਂ ਕਾਰਵਾਈਆਂ",
+    "selectedShapeActions": "ਚੁਣੀ ਆਕ੍ਰਿਤੀ ਦੀਆਂ ਕਾਰਵਾਈਆਂ",
+    "shapes": "ਆਕ੍ਰਿਤੀਆਂ"
   },
   "hints": {
     "linearElement": "",
@@ -165,13 +165,13 @@
     "lockAngle": "",
     "resize": "",
     "rotate": "",
-    "lineEditor_info": "",
+    "lineEditor_info": "ਬਿੰਦੂਆਂ ਨੂੰ ਸੋਧਣ ਲਈ ਡਬਲ-ਕਲਿੱਕ ਜਾਂ ਐਂਟਰ ਦਬਾਓ",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": ""
   },
   "canvasError": {
     "cannotShowPreview": "ਝਲਕ ਨਹੀਂ ਦਿਖਾ ਸਕਦੇ",
-    "canvasTooBig": "",
+    "canvasTooBig": "ਸ਼ਾਇਦ ਕੈਨਵਸ ਬਹੁਤ ਜ਼ਿਆਦਾ ਵੱਡਾ ਹੈ।",
     "canvasTooBigTip": ""
   },
   "errorSplash": {
@@ -179,11 +179,11 @@
     "headingMain_button": "ਪੰਨਾ ਮੁੜ-ਲੋਡ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ।",
     "clearCanvasMessage": "ਜੇ ਮੁੜ-ਲੋਡ ਕਰਨਾ ਕੰਮ ਨਾ ਕਰੇ, ਤਾਂ ਇਹ ਕਰਕੇ ਦੇਖੋ ",
     "clearCanvasMessage_button": "ਕੈਨਵਸ ਸਾਫ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ।",
-    "clearCanvasCaveat": "",
+    "clearCanvasCaveat": " ਇਹ ਸਾਰਾ ਕੰਮ ਗਵਾ ਦੇਵੇਗਾ ",
     "trackedToSentry_pre": "",
     "trackedToSentry_post": " ਸਾਡੇ ਸਿਸਟਮ 'ਤੇ ਟਰੈਕ ਕੀਤਾ ਗਿਆ ਸੀ।",
     "openIssueMessage_pre": "",
-    "openIssueMessage_button": "",
+    "openIssueMessage_button": "ਬੱਗ ਟਰੈਕਰ।",
     "openIssueMessage_post": "",
     "sceneContent": "ਦ੍ਰਿਸ਼ ਦੀ ਸਮੱਗਰੀ:"
   },
@@ -201,7 +201,7 @@
   },
   "shortcutsDialog": {
     "title": "ਕੀਬੋਰਡ ਸ਼ਾਰਟਕੱਟ",
-    "shapes": "ਅਕਾਰ",
+    "shapes": "ਆਕ੍ਰਿਤੀਆਂ",
     "or": "ਜਾਂ",
     "click": "ਕਲਿੱਕ",
     "drag": "",
