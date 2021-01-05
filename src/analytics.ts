@@ -2,7 +2,9 @@ export const EVENT_CHANGE = "change";
 export const EVENT_MAGIC = "magic";
 
 export const trackEvent =
-  typeof window !== "undefined" && window.gtag
+  process.env.REACT_APP_INCLUDE_GTAG &&
+  typeof window !== "undefined" &&
+  window.gtag
     ? (category: string, name: string, label?: string, value?: number) => {
         window.gtag("event", name, {
           event_category: category,
