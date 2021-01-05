@@ -109,16 +109,17 @@ const initializeScene = async (opts: {
 }): Promise<Scene | null> => {
   const searchParams = new URLSearchParams(window.location.search);
   const id = searchParams.get("id");
-  const jsonMatch = window.location.hash.match(
+  const jsonBackendMatch = window.location.hash.match(
     /^#json=([0-9]+),([a-zA-Z0-9_-]+)$/,
   );
+  const jsonUrlMatch = window.location.hash.match(/^#url=(.*)$/);
 
   const initialData = importFromLocalStorage();
 
   let scene = await loadScene(null, null, initialData);
 
   let isCollabScene = !!getCollaborationLinkData(window.location.href);
-  const isExternalScene = !!(id || jsonMatch || isCollabScene);
+  const isExternalScene = !!(id || jsonBackendMatch || isCollabScene);
   if (isExternalScene) {
     if (
       shouldForceLoadScene(scene) ||
@@ -127,8 +128,12 @@ const initializeScene = async (opts: {
       // Backwards compatibility with legacy url format
       if (id) {
         scene = await loadScene(id, null, initialData);
-      } else if (jsonMatch) {
-        scene = await loadScene(jsonMatch[1], jsonMatch[2], initialData);
+      } else if (jsonBackendMatch) {
+        scene = await loadScene(
+          jsonBackendMatch[1],
+          jsonBackendMatch[2],
+          initialData,
+        );
       }
       if (!isCollabScene) {
         window.history.replaceState({}, APP_NAME, window.location.origin);
@@ -149,6 +154,23 @@ const initializeScene = async (opts: {
 
       isCollabScene = false;
       window.history.replaceState({}, APP_NAME, window.location.origin);
+    }
+  }
+  if (jsonUrlMatch) {
+    const url = jsonUrlMatch[1];
+    try {
+      const request = await fetch(window.decodeURIComponent(url));
+      const blob = await request.blob();
+      const scene = JSON.parse(await blob.text());
+      if (
+        shouldForceLoadScene(scene) ||
+        window.confirm(t("alerts.loadSceneOverridePrompt"))
+      ) {
+        return scene;
+      }
+    } catch (error) {
+      window.alert(t("alerts.invalidSceneUrl"));
+      console.error(error);
     }
   }
   if (isCollabScene) {

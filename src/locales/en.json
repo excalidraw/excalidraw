@@ -138,7 +138,8 @@
     "errorLoadingLibrary": "There was an error loading the third party library.",
     "confirmAddLibrary": "This will add {{numShapes}} shape(s) to your library. Are you sure?",
     "imageDoesNotContainScene": "Importing images isn't supported at the moment.\n\nDid you want to import a scene? This image does not seem to contain any scene data. Have you enabled this during export?",
-    "cannotRestoreFromImage": "Scene couldn't be restored from this image file"
+    "cannotRestoreFromImage": "Scene couldn't be restored from this image file",
+    "invalidSceneUrl": "URL supplied doesn't contain valid Excalidraw JSON data"
   },
   "toolBar": {
     "selection": "Selection",
