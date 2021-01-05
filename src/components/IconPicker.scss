@@ -102,6 +102,7 @@
     position: absolute;
     bottom: 2px;
     font-size: 0.7em;
+    color: var(--keybinding-color);
 
     :root[dir="ltr"] & {
       right: 2px;
