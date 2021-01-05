@@ -133,7 +133,7 @@ export const actionFinalize = register({
       appState: {
         ...appState,
         elementType:
-          (appState.elementType === "draw" || appState.elementLocked) &&
+          (appState.elementLocked || appState.elementType === "draw") &&
           multiPointElement
             ? appState.elementType
             : "selection",
