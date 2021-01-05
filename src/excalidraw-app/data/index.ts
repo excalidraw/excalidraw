@@ -1,10 +1,9 @@
-import { t } from "../../i18n";
-import { ExcalidrawElement } from "../../element/types";
-import { AppState } from "../../types";
-import { ImportedDataState } from "../../data/types";
-import { restore } from "../../data/restore";
-import { EVENT_ACTION, EVENT_IO, trackEvent } from "../../analytics";
 import { serializeAsJSON } from "../../data/json";
+import { restore } from "../../data/restore";
+import { ImportedDataState } from "../../data/types";
+import { ExcalidrawElement } from "../../element/types";
+import { t } from "../../i18n";
+import { AppState } from "../../types";
 
 const byteToHex = (byte: number): string => `0${byte.toString(16)}`.slice(-2);
 
@@ -192,7 +191,6 @@ const importFromBackend = async (
       data = await response.json();
     }
 
-    trackEvent(EVENT_ACTION, "import");
     return {
       elements: data.elements || null,
       appState: data.appState || null,
@@ -276,7 +274,6 @@ export const exportToBackend = async (
       url.hash = `json=${json.id},${exportedKey.k!}`;
       const urlString = url.toString();
       window.prompt(`🔒${t("alerts.uploadedSecurly")}`, urlString);
-      trackEvent(EVENT_IO, "export", "backend");
     } else if (json.error_class === "RequestTooLargeError") {
       window.alert(t("alerts.couldNotCreateShareableLinkTooBig"));
     } else {

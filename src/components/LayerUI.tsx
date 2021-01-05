@@ -1,56 +1,46 @@
+import clsx from "clsx";
 import React, {
+  RefObject,
+  useCallback,
+  useEffect,
   useRef,
   useState,
-  RefObject,
-  useEffect,
-  useCallback,
 } from "react";
-import { showSelectedShapeActions } from "../element";
-import { calculateScrollCenter, getSelectedElements } from "../scene";
-import { exportCanvas } from "../data";
-
-import { AppState, LibraryItems, LibraryItem } from "../types";
-import { NonDeletedExcalidrawElement } from "../element/types";
-
 import { ActionManager } from "../actions/manager";
-import { Island } from "./Island";
-import Stack from "./Stack";
-import { FixedSideContainer } from "./FixedSideContainer";
-import { UserList } from "./UserList";
-import { LockIcon } from "./LockIcon";
-import { ExportDialog, ExportCB } from "./ExportDialog";
+import { CLASSES } from "../constants";
+import { exportCanvas } from "../data";
+import { importLibraryFromJSON, saveLibraryAsJSON } from "../data/json";
+import { Library } from "../data/library";
+import { showSelectedShapeActions } from "../element";
+import { NonDeletedExcalidrawElement } from "../element/types";
 import { Language, t } from "../i18n";
-import { HintViewer } from "./HintViewer";
 import useIsMobile from "../is-mobile";
-
+import { calculateScrollCenter, getSelectedElements } from "../scene";
 import { ExportType } from "../scene/types";
-import { MobileMenu } from "./MobileMenu";
-import { ZoomActions, SelectedShapeActions, ShapesSwitcher } from "./Actions";
-import { Section } from "./Section";
+import { AppState, LibraryItem, LibraryItems } from "../types";
+import { muteFSAbortError } from "../utils";
+import { SelectedShapeActions, ShapesSwitcher, ZoomActions } from "./Actions";
+import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 import CollabButton from "./CollabButton";
 import { ErrorDialog } from "./ErrorDialog";
-import { ShortcutsDialog } from "./ShortcutsDialog";
-import { LoadingMessage } from "./LoadingMessage";
-import { CLASSES } from "../constants";
-import { shield, exportFile, load } from "./icons";
+import { ExportCB, ExportDialog } from "./ExportDialog";
+import { FixedSideContainer } from "./FixedSideContainer";
 import { GitHubCorner } from "./GitHubCorner";
-import { Tooltip } from "./Tooltip";
-
+import { HintViewer } from "./HintViewer";
+import { exportFile, load, shield } from "./icons";
+import { Island } from "./Island";
 import "./LayerUI.scss";
 import { LibraryUnit } from "./LibraryUnit";
-import { ToolButton } from "./ToolButton";
-import { saveLibraryAsJSON, importLibraryFromJSON } from "../data/json";
-import { muteFSAbortError } from "../utils";
-import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
-import clsx from "clsx";
-import { Library } from "../data/library";
-import {
-  EVENT_ACTION,
-  EVENT_EXIT,
-  EVENT_LIBRARY,
-  trackEvent,
-} from "../analytics";
+import { LoadingMessage } from "./LoadingMessage";
+import { LockIcon } from "./LockIcon";
+import { MobileMenu } from "./MobileMenu";
 import { PasteChartDialog } from "./PasteChartDialog";
+import { Section } from "./Section";
+import { ShortcutsDialog } from "./ShortcutsDialog";
+import Stack from "./Stack";
+import { ToolButton } from "./ToolButton";
+import { Tooltip } from "./Tooltip";
+import { UserList } from "./UserList";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -159,13 +149,7 @@ const LibraryMenuItems = ({
         }}
       />
 
-      <a
-        href="https://libraries.excalidraw.com"
-        target="_excalidraw_libraries"
-        onClick={() => {
-          trackEvent(EVENT_EXIT, "libraries");
-        }}
-      >
+      <a href="https://libraries.excalidraw.com" target="_excalidraw_libraries">
         {t("labels.libraries")}
       </a>
     </div>,
@@ -267,7 +251,6 @@ const LibraryMenu = ({
     const items = await Library.loadLibrary();
     const nextItems = items.filter((_, index) => index !== indexToRemove);
     Library.saveLibrary(nextItems);
-    trackEvent(EVENT_LIBRARY, "remove");
     setLibraryItems(nextItems);
   }, []);
 
@@ -276,7 +259,6 @@ const LibraryMenu = ({
       const items = await Library.loadLibrary();
       const nextItems = [...items, elements];
       onAddToLibrary();
-      trackEvent(EVENT_LIBRARY, "add");
       Library.saveLibrary(nextItems);
       setLibraryItems(nextItems);
     },
@@ -328,9 +310,6 @@ const LayerUI = ({
       href="https://blog.excalidraw.com/end-to-end-encryption/"
       target="_blank"
       rel="noopener noreferrer"
-      onClick={() => {
-        trackEvent(EVENT_EXIT, "e2ee shield");
-      }}
     >
       <Tooltip label={t("encrypted.tooltip")} position="above" long={true}>
         {shield}
@@ -567,7 +546,6 @@ const LayerUI = ({
         <button
           className="scroll-back-to-content"
           onClick={() => {
-            trackEvent(EVENT_ACTION, "scroll to content");
             setAppState({
               ...calculateScrollCenter(elements, appState, canvas),
             });

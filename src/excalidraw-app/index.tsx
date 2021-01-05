@@ -1,45 +1,38 @@
-import React, {
-  useState,
-  useLayoutEffect,
-  useEffect,
-  useRef,
-  useCallback,
-} from "react";
 import LanguageDetector from "i18next-browser-languagedetector";
-
-import Excalidraw, {
-  languages,
-  defaultLang,
-} from "../packages/excalidraw/index";
-
-import {
-  getTotalStorageSize,
-  importFromLocalStorage,
-  saveToLocalStorage,
-  STORAGE_KEYS,
-} from "./data/localStorage";
-
-import { ImportedDataState } from "../data/types";
-import CollabWrapper, { CollabAPI } from "./collab/CollabWrapper";
-import { TopErrorBoundary } from "../components/TopErrorBoundary";
-import { Language, t } from "../i18n";
-import { exportToBackend, loadScene } from "./data";
-import { getCollaborationLinkData } from "./data";
-import { EVENT } from "../constants";
-import { loadFromFirebase } from "./data/firebase";
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+import { getDefaultAppState } from "../appState";
 import { ExcalidrawImperativeAPI } from "../components/App";
-import { debounce, ResolvablePromise, resolvablePromise } from "../utils";
-import { AppState, ExcalidrawAPIRefValue } from "../types";
+import { ErrorDialog } from "../components/ErrorDialog";
+import { TopErrorBoundary } from "../components/TopErrorBoundary";
+import { APP_NAME, EVENT, TITLE_TIMEOUT } from "../constants";
+import { ImportedDataState } from "../data/types";
 import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
 } from "../element/types";
+import { Language, t } from "../i18n";
+import Excalidraw, {
+  defaultLang,
+  languages,
+} from "../packages/excalidraw/index";
+import { AppState, ExcalidrawAPIRefValue } from "../types";
+import { debounce, ResolvablePromise, resolvablePromise } from "../utils";
 import { SAVE_TO_LOCAL_STORAGE_TIMEOUT } from "./app_constants";
-import { EVENT_LOAD, EVENT_SHARE, trackEvent } from "../analytics";
-import { ErrorDialog } from "../components/ErrorDialog";
-import { getDefaultAppState } from "../appState";
-import { APP_NAME, TITLE_TIMEOUT } from "../constants";
+import CollabWrapper, { CollabAPI } from "./collab/CollabWrapper";
 import { LanguageList } from "./components/LanguageList";
+import { exportToBackend, getCollaborationLinkData, loadScene } from "./data";
+import { loadFromFirebase } from "./data/firebase";
+import {
+  importFromLocalStorage,
+  saveToLocalStorage,
+  STORAGE_KEYS,
+} from "./data/localStorage";
 
 const languageDetector = new LanguageDetector();
 languageDetector.init({
@@ -163,7 +156,6 @@ const initializeScene = async (opts: {
     // into the remote scene
     opts.resetScene();
     const scenePromise = opts.initializeSocketClient();
-    trackEvent(EVENT_SHARE, "session join");
 
     try {
       const [, roomId, roomKey] = getCollaborationLinkData(
@@ -231,12 +223,6 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
   const { collab } = props;
 
   useEffect(() => {
-    const storageSize = getTotalStorageSize();
-    if (storageSize) {
-      trackEvent(EVENT_LOAD, "storage", "size", storageSize);
-    } else {
-      trackEvent(EVENT_LOAD, "first time");
-    }
     excalidrawRef.current!.readyPromise.then((excalidrawApi) => {
       initializeScene({
         resetScene: excalidrawApi.resetScene,

@@ -1,4 +1,3 @@
-import { EVENT_IO, trackEvent } from "../analytics";
 import { cleanAppStateForExport } from "../appState";
 import { MIME_TYPES } from "../constants";
 import { clearElementsForExport } from "../element";
@@ -111,7 +110,6 @@ export const loadFromBlob = async (
       localAppState,
     );
 
-    trackEvent(EVENT_IO, "load", getMimeType(blob));
     return result;
   } catch (error) {
     console.error(error.message);
