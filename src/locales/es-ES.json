@@ -29,7 +29,7 @@
     "textAlign": "Alineado de texto",
     "edges": "Bordes",
     "sharp": "Afilado",
-    "round": "Redondo",
+    "round": "Redonda",
     "arrowheads": "Puntas de flecha",
     "arrowhead_none": "Vacía",
     "arrowhead_arrow": "Flecha",
@@ -128,7 +128,7 @@
     "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",
     "couldNotCreateShareableLink": "No se pudo crear un enlace para compartir.",
     "couldNotCreateShareableLinkTooBig": "No se pudo crear el enlace para compartir: la escena es demasiado grande",
-    "couldNotLoadInvalidFile": "No se pudo cargar el archivo inválido",
+    "couldNotLoadInvalidFile": "No se pudo cargar el archivo no válido",
     "importBackendFailed": "La importación falló.",
     "cannotExportEmptyCanvas": "No se puede exportar un lienzo vació",
     "couldNotCopyToClipboard": "No se ha podido copiar al portapapeles, intente usar Chrome como navegador.",
@@ -183,7 +183,7 @@
     "trackedToSentry_pre": "El error con el identificador ",
     "trackedToSentry_post": " fue rastreado en nuestro sistema.",
     "openIssueMessage_pre": "Fuimos muy cautelosos para no incluir la información de tu escena en el error. Si tu escena no es privada, por favor considera seguir nuestro ",
-    "openIssueMessage_button": "seguimiento de errores.",
+    "openIssueMessage_button": "rastreador de errores.",
     "openIssueMessage_post": " Por favor, incluya la siguiente información copiándola y pegándola en el issue de GitHub.",
     "sceneContent": "Contenido de la escena:"
   },
@@ -229,7 +229,7 @@
     "scene": "Escena",
     "selected": "Seleccionado",
     "storage": "Almacenamiento",
-    "title": "Estadísticas para los nerds",
+    "title": "Estadísticas para nerds",
     "total": "Total",
     "width": "Ancho"
   }
