@@ -1,40 +1,36 @@
-import React, { PureComponent } from "react";
 import throttle from "lodash.throttle";
-
+import React, { PureComponent } from "react";
+import { ExcalidrawImperativeAPI } from "../../components/App";
+import { ErrorDialog } from "../../components/ErrorDialog";
 import { APP_NAME, ENV, EVENT } from "../../constants";
-
-import {
-  decryptAESGEM,
-  SocketUpdateDataSource,
-  getCollaborationLinkData,
-  generateCollaborationLink,
-  SOCKET_SERVER,
-} from "../data";
-import { isSavedToFirebase, saveToFirebase } from "../data/firebase";
-
-import Portal from "./Portal";
-import { AppState, Collaborator, Gesture } from "../../types";
+import { ImportedDataState } from "../../data/types";
 import { ExcalidrawElement } from "../../element/types";
-import {
-  importUsernameFromLocalStorage,
-  saveUsernameToLocalStorage,
-  STORAGE_KEYS,
-} from "../data/localStorage";
-import { resolvablePromise, withBatchedUpdates } from "../../utils";
 import {
   getSceneVersion,
   getSyncableElements,
 } from "../../packages/excalidraw/index";
-import RoomDialog from "./RoomDialog";
-import { ErrorDialog } from "../../components/ErrorDialog";
-import { ImportedDataState } from "../../data/types";
-import { ExcalidrawImperativeAPI } from "../../components/App";
+import { AppState, Collaborator, Gesture } from "../../types";
+import { resolvablePromise, withBatchedUpdates } from "../../utils";
 import {
   INITIAL_SCENE_UPDATE_TIMEOUT,
   SCENE,
   SYNC_FULL_SCENE_INTERVAL_MS,
 } from "../app_constants";
-import { EVENT_SHARE, trackEvent } from "../../analytics";
+import {
+  decryptAESGEM,
+  generateCollaborationLink,
+  getCollaborationLinkData,
+  SocketUpdateDataSource,
+  SOCKET_SERVER,
+} from "../data";
+import { isSavedToFirebase, saveToFirebase } from "../data/firebase";
+import {
+  importUsernameFromLocalStorage,
+  saveUsernameToLocalStorage,
+  STORAGE_KEYS,
+} from "../data/localStorage";
+import Portal from "./Portal";
+import RoomDialog from "./RoomDialog";
 
 interface CollabState {
   isCollaborating: boolean;
@@ -168,7 +164,6 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       elements,
       commitToHistory: true,
     });
-    trackEvent(EVENT_SHARE, "session start");
     return this.initializeSocketClient();
   };
 
@@ -176,7 +171,6 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     this.saveCollabRoomToFirebase();
     window.history.pushState({}, APP_NAME, window.location.origin);
     this.destroySocketClient();
-    trackEvent(EVENT_SHARE, "session end");
   };
 
   private destroySocketClient = () => {
