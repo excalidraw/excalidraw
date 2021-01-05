@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Beillesztés",
-    "pasteCharts": "",
+    "pasteCharts": "Grafikon beillesztése",
     "selectAll": "Összes kijelölése",
     "multiSelect": "Elem hozzáadása a kijelöléshez",
     "moveCanvas": "Vászon mozgatása",
@@ -162,8 +162,8 @@
     "freeDraw": "Kattints és húzd, majd engedd el, amikor végeztél",
     "text": "Tipp: A kiválasztó eszközzel bárhol létrehozhatsz szöveget dupla kattintással",
     "linearElementMulti": "Kattints a következő ív pozíciójára, vagy fejezd be a nyilat az Escape vagy Enter megnyomásával",
-    "lockAngle": "",
-    "resize": "",
+    "lockAngle": "A SHIFT billentyű lenyomva tartásával korlátozhatja forgatás szögét",
+    "resize": "A SHIFT billentyű lenyomva tartásával az átméretezés megtartja az arányokat,\naz ALT lenyomva tartásával pedig a középpont egy helyben marad",
     "rotate": "A SHIFT billentyű lenyomva tartásával korlátozhatja a szögek illesztését",
     "lineEditor_info": "Kattints duplán, vagy nyomj entert a pontok szerkesztéséhez",
     "lineEditor_pointSelected": "Nyomd meg a delete gombot a pont eltávolításához, Ctrl vagy Cmd + D-t a duplikáláshoz, vagy húzva mozgasd",
@@ -214,9 +214,9 @@
     "github": "Hibát találtál? Küld be",
     "textNewLine": "Új sor hozzáadása (szöveg)",
     "textFinish": "Szerkesztés befejezése (szöveg)",
-    "zoomToFit": "",
+    "zoomToFit": "Az összes elem látószögbe hozása",
     "zoomToSelection": "Kijelölésre nagyítás",
-    "preventBinding": ""
+    "preventBinding": "A nyíl ne ragadjon"
   },
   "encrypted": {
     "tooltip": "A rajzaidat end-to-end titkositással tároljuk, tehát az Excalidraw szervereiről se tud más belenézni."
