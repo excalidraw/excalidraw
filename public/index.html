@@ -86,10 +86,10 @@
 
     <link rel="stylesheet" href="fonts.css" type="text/css" />
 
-    <% if (process.env.REACT_APP_INCLUDE_GTAG === 'true') { %>
+    <% if (process.env.REACT_APP_GOOGLE_ANALYTICS_ID) { %>
     <script
       async
-      src="https://www.googletagmanager.com/gtag/js?id=UA-387204-13"
+      src="https://www.googletagmanager.com/gtag/js?id=<% process.env.REACT_APP_GOOGLE_ANALYTICS_ID %>"
     ></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -97,7 +97,7 @@
         dataLayer.push(arguments);
       }
       gtag("js", new Date());
-      gtag("config", "UA-387204-13");
+      gtag("config", "<% process.env.REACT_APP_GOOGLE_ANALYTICS_ID %>");
     </script>
     <% } %>
 
