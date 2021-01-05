@@ -39,8 +39,8 @@
     "fontFamily": "Yazı tipi ailesi",
     "onlySelected": "Sadece seçilen",
     "withBackground": "Arka planla beraber",
-    "exportEmbedScene": "",
-    "exportEmbedScene_details": "",
+    "exportEmbedScene": "Sahneyi çıktı dosyasına dahil et",
+    "exportEmbedScene_details": "Sahne datası, daha sonra geri kullanılabilmesi için çıktı alınan PNG/SVG dosyasına dahil edicelek. Bu işlem dosya boyutunu arttıracaktır.",
     "addWatermark": "\"Excalidraw ile yapıldı\" yazısını ekle",
     "handDrawn": "El-yazısı",
     "normal": "Normal",
@@ -81,7 +81,7 @@
     "addToLibrary": "Kütüphaneye ekle",
     "removeFromLibrary": "Kütüphaneden kaldır",
     "libraryLoadingMessage": "Kütüphane yükleniyor...",
-    "libraries": "",
+    "libraries": "Kütüphanelere gözat",
     "loadingScene": "Çalışma alanı yükleniyor...",
     "align": "Hizala",
     "alignTop": "Yukarı hizala",
@@ -137,8 +137,8 @@
     "loadSceneOverridePrompt": "Harici çizimler yüklemek mevcut olan içeriği değiştirecektir. Devam etmek istiyor musunuz?",
     "errorLoadingLibrary": "Üçüncü taraf kitaplığı yüklerken bir hata oluştu.",
     "confirmAddLibrary": "Bu, kitaplığınıza {{numShapes}} tane şekil ekleyecek. Emin misiniz?",
-    "imageDoesNotContainScene": "",
-    "cannotRestoreFromImage": ""
+    "imageDoesNotContainScene": "Resim ekleme şuan için desteklenmiyor.\nBir sahneyi içeri aktarmak mı istediniz? Bu dosya herhangi bir sahne içeriyor gibi durmuyor. Çıktı alırken sahneyi dahil ettiniz mi?",
+    "cannotRestoreFromImage": "Sahne bu dosyadan oluşturulamıyor"
   },
   "toolBar": {
     "selection": "Seçme",
