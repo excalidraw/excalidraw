@@ -3141,7 +3141,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             );
           }
           this.setState({ suggestedBindings: [], startBoundElement: null });
-          if (!elementLocked) {
+          if (!elementLocked && elementType !== "draw") {
             resetCursor();
             this.setState((prevState) => ({
               draggingElement: null,
@@ -3288,7 +3288,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         return;
       }
 
-      if (!elementLocked && draggingElement) {
+      if (!elementLocked && elementType !== "draw" && draggingElement) {
         this.setState((prevState) => ({
           selectedElementIds: {
             ...prevState.selectedElementIds,
@@ -3312,7 +3312,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         );
       }
 
-      if (!elementLocked) {
+      if (!elementLocked && elementType !== "draw") {
         resetCursor();
         this.setState({
           draggingElement: null,
