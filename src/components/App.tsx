@@ -1149,8 +1149,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   toggleStats = () => {
-    if (!this.state.showStats) {
-    }
     this.setState({
       showStats: !this.state.showStats,
     });
@@ -1261,8 +1259,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     if (event.code === CODES.NINE) {
-      if (!this.state.isLibraryOpen) {
-      }
       this.setState({ isLibraryOpen: !this.state.isLibraryOpen });
     }
 
