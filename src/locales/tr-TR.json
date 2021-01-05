@@ -171,7 +171,7 @@
   },
   "canvasError": {
     "cannotShowPreview": "Önizleme gösterilemiyor",
-    "canvasTooBig": "",
+    "canvasTooBig": "Kanvas çok büyük olabilir.",
     "canvasTooBigTip": ""
   },
   "errorSplash": {
