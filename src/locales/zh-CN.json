@@ -202,7 +202,7 @@
   "shortcutsDialog": {
     "title": "快捷键列表",
     "shapes": "形状",
-    "or": "或者",
+    "or": "或",
     "click": "点击",
     "drag": "拖动",
     "curvedArrow": "曲线（带有箭头）",
@@ -211,7 +211,7 @@
     "view": "视图",
     "blog": "浏览我们的博客",
     "howto": "跟随我们的指南",
-    "github": "发现问题？提交",
+    "github": "发现问题？请提出来",
     "textNewLine": "文本换行",
     "textFinish": "完成编辑文本",
     "zoomToFit": "缩放以适应所有元素",
@@ -219,7 +219,7 @@
     "preventBinding": "防止箭头吸附"
   },
   "encrypted": {
-    "tooltip": "您的绘图采用的端到端加密，因此Excalidraw服务器永远不会收集。"
+    "tooltip": "您的绘图采用的端到端加密，其内容对于Excalidraw服务器是不可见的。"
   },
   "stats": {
     "angle": "角度",
