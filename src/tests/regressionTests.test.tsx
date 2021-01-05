@@ -150,22 +150,26 @@ describe("regression tests", () => {
     expect(API.getSelectedElement().id).not.toEqual(prevSelectedId);
   });
 
-  for (const [keys, shape] of [
-    [`2${KEYS.R}`, "rectangle"],
-    [`3${KEYS.D}`, "diamond"],
-    [`4${KEYS.E}`, "ellipse"],
-    [`5${KEYS.A}`, "arrow"],
-    [`6${KEYS.L}`, "line"],
-    [`7${KEYS.X}`, "draw"],
-  ] as [string, ExcalidrawElement["type"]][]) {
+  for (const [keys, shape, shouldSelect] of [
+    [`2${KEYS.R}`, "rectangle", true],
+    [`3${KEYS.D}`, "diamond", true],
+    [`4${KEYS.E}`, "ellipse", true],
+    [`5${KEYS.A}`, "arrow", true],
+    [`6${KEYS.L}`, "line", true],
+    [`7${KEYS.X}`, "draw", false],
+  ] as [string, ExcalidrawElement["type"], boolean][]) {
     for (const key of keys) {
       it(`key ${key} selects ${shape} tool`, () => {
         Keyboard.keyPress(key);
 
+        expect(h.state.elementType).toBe(shape);
+
         mouse.down(10, 10);
         mouse.up(10, 10);
 
-        expect(API.getSelectedElement().type).toBe(shape);
+        if (shouldSelect) {
+          expect(API.getSelectedElement().type).toBe(shape);
+        }
       });
     }
   }
