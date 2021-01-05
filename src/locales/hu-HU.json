@@ -119,7 +119,7 @@
     "roomDialog": "Élő együttműködés indítása",
     "createNewRoom": "Új szoba létrehozása",
     "fullScreen": "Teljes képernyő",
-    "darkMode": "Éjszakai mód",
+    "darkMode": "Sötét mód",
     "lightMode": "Világos mód",
     "zenMode": "Zen mód",
     "exitZenMode": "Zen mód elhagyása"
@@ -219,7 +219,7 @@
     "preventBinding": ""
   },
   "encrypted": {
-    "tooltip": ""
+    "tooltip": "A rajzaidat end-to-end titkositással tároljuk, tehát az Excalidraw szervereiről se tud más belenézni."
   },
   "stats": {
     "angle": "Szög",
@@ -229,7 +229,7 @@
     "scene": "Jelenet",
     "selected": "Kiválasztott",
     "storage": "Tárhely",
-    "title": "Számok kockáknak",
+    "title": "Statisztikák",
     "total": "Összesen",
     "width": "Szélesség"
   }
