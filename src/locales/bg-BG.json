@@ -1,11 +1,11 @@
 {
   "labels": {
     "paste": "Постави",
-    "pasteCharts": "",
+    "pasteCharts": "Постави графики",
     "selectAll": "Маркирай всичко",
-    "multiSelect": "",
-    "moveCanvas": "",
-    "cut": "",
+    "multiSelect": "Добави елемент към селекция",
+    "moveCanvas": "Премести платно",
+    "cut": "Изрежи",
     "copy": "Копирай",
     "copyAsPng": "Копиране в клипборда",
     "copyAsSvg": "Копиране в клипборда",
