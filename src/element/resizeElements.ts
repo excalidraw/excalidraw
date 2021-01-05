@@ -503,7 +503,7 @@ const resizeSingleElement = (
   const rotatedNewCenter = rotatePoint(newCenter, startCenter, angle);
   newTopLeft = rotatePoint(rotatedTopLeft, rotatedNewCenter, -angle);
 
-  // For Non generic elements
+  // For linear elements
   const rescaledPoints = rescalePointsInElement(
     stateAtResizeStart,
     newWidth,
