@@ -40,7 +40,7 @@
     "onlySelected": "Csak a kiválasztott",
     "withBackground": "Háttérrel",
     "exportEmbedScene": "Jelenet beágyazása az exportált fájlba",
-    "exportEmbedScene_details": "",
+    "exportEmbedScene_details": "A jelenetet leíró adatok hozzá lesznek adva a PNG/SVG fájlhoz, így a jelenetet vissza lehet majd tölteni belőle. Ez megnöveli a fájl méretét.",
     "addWatermark": "Add hozzá, hogy \"Excalidraw-val készült\"",
     "handDrawn": "Kézzel rajzolt",
     "normal": "Normál",
@@ -137,7 +137,7 @@
     "loadSceneOverridePrompt": "A betöltött külső rajz felül fogja írnia meglévőt. Szeretnéd folytatni?",
     "errorLoadingLibrary": "Hibába ütközött a harmarmadik féltől származó könyvtár betöltése.",
     "confirmAddLibrary": "Ez a művelet {{numShapes}} formát fog hozzáadni a könyvtáradhoz. Biztos vagy benne?",
-    "imageDoesNotContainScene": "",
+    "imageDoesNotContainScene": "Képek importálása egyelőre nem támogatott.\n\nEgy jelenetet szeretnél betölteni? Úgy tűnik ez a kép fájl nem tartalmazza a szükséges adatokat. Exportáláskor ezt egy külön opcióval lehet beállítani.",
     "cannotRestoreFromImage": "A jelenet visszaállítása nem sikerült ebből a kép fájlból"
   },
   "toolBar": {
@@ -189,7 +189,7 @@
   },
   "roomDialog": {
     "desc_intro": "Meghívhat embereket a jelenlegi jelenetbe, hogy együttműködjenek önnel.",
-    "desc_privacy": "Ne aggódjon, a munkamenet végpontok közötti titkosítást használ, tehát bármit rajzol, privát marad. Még a szerverünk sem fogja látni, hogy mit rajzolt.",
+    "desc_privacy": "Ne aggódj, a munkamenet végpontok közötti titkosítást használ, tehát bármit rajzolsz, privát marad. Még a szerverünkről se lehet belenézni.",
     "button_startSession": "Munkamenet indítása",
     "button_stopSession": "Munkamenet leállítása",
     "desc_inProgressIntro": "Az élő együttműködési munkamenet folyamatban van.",
@@ -219,7 +219,7 @@
     "preventBinding": "A nyíl ne ragadjon"
   },
   "encrypted": {
-    "tooltip": "A rajzaidat end-to-end titkositással tároljuk, tehát az Excalidraw szervereiről se tud más belenézni."
+    "tooltip": "A rajzaidat végpontok közötti titkosítással tároljuk, tehát az Excalidraw szervereiről se tud más belenézni."
   },
   "stats": {
     "angle": "Szög",
