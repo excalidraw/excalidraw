@@ -161,12 +161,12 @@ const initializeScene = async (opts: {
     try {
       const request = await fetch(window.decodeURIComponent(url));
       const blob = await request.blob();
-      const scene = JSON.parse(await blob.text());
+      const json = JSON.parse(await blob.text());
       if (
         shouldForceLoadScene(scene) ||
         window.confirm(t("alerts.loadSceneOverridePrompt"))
       ) {
-        return scene;
+        return json;
       }
     } catch (error) {
       window.alert(t("alerts.invalidSceneUrl"));
