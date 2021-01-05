@@ -63,8 +63,8 @@
     "cartoonist": "Dibuixant",
     "fileTitle": "Títol de fitxer",
     "colorPicker": "Selector de colors",
-    "canvasBackground": "Fons de la tela",
-    "drawingCanvas": "Tela de dibuix",
+    "canvasBackground": "Fons del llenç",
+    "drawingCanvas": "Llenç de dibuix",
     "layers": "Capes",
     "actions": "Accions",
     "language": "Llengua",
@@ -82,7 +82,7 @@
     "removeFromLibrary": "Eliminar de la biblioteca",
     "libraryLoadingMessage": "Carregant la biblioteca...",
     "libraries": "Explorar biblioteques",
-    "loadingScene": "Carregant escena ...",
+    "loadingScene": "Carregant escena...",
     "align": "Alinear",
     "alignTop": "Alinear a dalt",
     "alignBottom": "Alinear a baix",
@@ -230,7 +230,7 @@
     "selected": "Seleccionat",
     "storage": "Emmagatzematge",
     "title": "Estadístiques per nerds",
-    "total": "",
-    "width": ""
+    "total": "Total",
+    "width": "Amplada"
   }
 }
