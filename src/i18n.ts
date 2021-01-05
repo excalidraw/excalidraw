@@ -1,5 +1,3 @@
-import { EVENT_CHANGE, trackEvent } from "./analytics";
-
 import fallbackLangData from "./locales/en.json";
 import percentages from "./locales/percentages.json";
 
@@ -68,7 +66,6 @@ export const setLanguage = async (lang: Language) => {
   currentLangData = await import(
     /* webpackChunkName: "i18n-[request]" */ `./locales/${currentLang.code}.json`
   );
-  trackEvent(EVENT_CHANGE, "language", currentLang.code);
 };
 
 export const setLanguageFirstTime = async (lang: Language) => {

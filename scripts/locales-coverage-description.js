@@ -75,7 +75,7 @@ const flags = {
 const languages = {
   "ar-SA": "العربية",
   "bg-BG": "Български",
-  "ca-ES": "Catalan",
+  "ca-ES": "Català",
   "de-DE": "Deutsch",
   "el-GR": "Ελληνικά",
   "es-ES": "Español",

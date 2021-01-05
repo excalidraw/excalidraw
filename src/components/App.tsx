@@ -8,12 +8,7 @@ import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
 import { ActionResult } from "../actions/types";
-import {
-  EVENT_DIALOG,
-  EVENT_LIBRARY,
-  EVENT_SHAPE,
-  trackEvent,
-} from "../analytics";
+import { trackEvent } from "../analytics";
 import { getDefaultAppState } from "../appState";
 import {
   copyToClipboard,
@@ -111,7 +106,7 @@ import {
   selectGroupsForSelectedElements,
 } from "../groups";
 import { createHistory, SceneHistory } from "../history";
-import { t, getLanguage, setLanguage, languages, defaultLang } from "../i18n";
+import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
 import {
   CODES,
   getResizeCenterPointKey,
@@ -504,7 +499,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         )
       ) {
         await Library.importLibrary(blob);
-        trackEvent(EVENT_LIBRARY, "import");
         this.setState({
           isLibraryOpen: true,
         });
@@ -1134,7 +1128,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   toggleLock = () => {
     this.setState((prevState) => {
-      trackEvent(EVENT_SHAPE, "lock", !prevState.elementLocked ? "on" : "off");
       return {
         elementLocked: !prevState.elementLocked,
         elementType: prevState.elementLocked
@@ -1158,7 +1151,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   toggleStats = () => {
     if (!this.state.showStats) {
-      trackEvent(EVENT_DIALOG, "stats");
+      trackEvent("dialog", "stats");
     }
     this.setState({
       showStats: !this.state.showStats,
@@ -1270,9 +1263,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     if (event.code === CODES.NINE) {
-      if (!this.state.isLibraryOpen) {
-        trackEvent(EVENT_DIALOG, "library");
-      }
       this.setState({ isLibraryOpen: !this.state.isLibraryOpen });
     }
 
@@ -1357,7 +1347,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     ) {
       const shape = findShapeByKey(event.key);
       if (shape) {
-        trackEvent(EVENT_SHAPE, shape, "shortcut");
         this.selectShapeTool(shape);
       } else if (event.key === KEYS.Q) {
         this.toggleLock();
@@ -1741,7 +1730,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     resetCursor();
 
     if (!event[KEYS.CTRL_OR_CMD]) {
-      trackEvent(EVENT_SHAPE, "text", "double-click");
       this.startTextEditing({
         sceneX,
         sceneY,
@@ -3141,7 +3129,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             );
           }
           this.setState({ suggestedBindings: [], startBoundElement: null });
-          if (!elementLocked) {
+          if (!elementLocked && elementType !== "draw") {
             resetCursor();
             this.setState((prevState) => ({
               draggingElement: null,
@@ -3288,7 +3276,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         return;
       }
 
-      if (!elementLocked && draggingElement) {
+      if (!elementLocked && elementType !== "draw" && draggingElement) {
         this.setState((prevState) => ({
           selectedElementIds: {
             ...prevState.selectedElementIds,
@@ -3312,7 +3300,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         );
       }
 
-      if (!elementLocked) {
+      if (!elementLocked && elementType !== "draw") {
         resetCursor();
         this.setState({
           draggingElement: null,
