@@ -179,7 +179,7 @@
     "headingMain_button": "recargando la página.",
     "clearCanvasMessage": "Si la recarga no funciona, intente ",
     "clearCanvasMessage_button": "limpiando el lienzo.",
-    "clearCanvasCaveat": " Esto resultará en la pérdida del trabajo ",
+    "clearCanvasCaveat": " Esto provocará la pérdida de su trabajo ",
     "trackedToSentry_pre": "El error con el identificador ",
     "trackedToSentry_post": " fue rastreado en nuestro sistema.",
     "openIssueMessage_pre": "Fuimos muy cautelosos para no incluir la información de tu escena en el error. Si tu escena no es privada, por favor considera seguir nuestro ",
