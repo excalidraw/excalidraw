@@ -1,17 +1,16 @@
 import React from "react";
-import { EVENT_CHANGE, EVENT_IO, trackEvent } from "../analytics";
-import { load, save, saveAs } from "../components/icons";
+import { EVENT_CHANGE, trackEvent } from "../analytics";
+import { load, questionCircle, save, saveAs } from "../components/icons";
 import { ProjectName } from "../components/ProjectName";
 import { ToolButton } from "../components/ToolButton";
+import "../components/ToolIcon.scss";
 import { Tooltip } from "../components/Tooltip";
-import { questionCircle } from "../components/icons";
 import { loadFromJSON, saveAsJSON } from "../data";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
 import { KEYS } from "../keys";
 import { muteFSAbortError } from "../utils";
 import { register } from "./register";
-import "../components/ToolIcon.scss";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -100,7 +99,6 @@ export const actionSaveScene = register({
   perform: async (elements, appState, value) => {
     try {
       const { fileHandle } = await saveAsJSON(elements, appState);
-      trackEvent(EVENT_IO, "save");
       return { commitToHistory: false, appState: { ...appState, fileHandle } };
     } catch (error) {
       if (error?.name !== "AbortError") {
@@ -131,7 +129,6 @@ export const actionSaveAsScene = register({
         ...appState,
         fileHandle: null,
       });
-      trackEvent(EVENT_IO, "save as");
       return { commitToHistory: false, appState: { ...appState, fileHandle } };
     } catch (error) {
       if (error?.name !== "AbortError") {
