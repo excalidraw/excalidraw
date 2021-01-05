@@ -127,7 +127,7 @@
   "alerts": {
     "clearReset": "Αυτό θα σβήσει ολόκληρο τον καμβά. Είσαι σίγουρος;",
     "couldNotCreateShareableLink": "Δεν ήταν δυνατή η δημιουργία συνδέσμου κοινής χρήσης.",
-    "couldNotCreateShareableLinkTooBig": "",
+    "couldNotCreateShareableLinkTooBig": "Δεν ήταν δυνατή η δημιουργία κοινόχρηστου συνδέσμου: η σκηνή είναι πολύ μεγάλη",
     "couldNotLoadInvalidFile": "Δεν μπόρεσε να ανοίξει εσφαλμένο αρχείο",
     "importBackendFailed": "Η εισαγωγή από το backend απέτυχε.",
     "cannotExportEmptyCanvas": "Δεν είναι δυνατή η εξαγωγή κενού καμβά.",
@@ -172,7 +172,7 @@
   "canvasError": {
     "cannotShowPreview": "Αδυναμία εμφάνισης προεπισκόπησης",
     "canvasTooBig": "Ο καμβάς μπορεί να είναι μεγάλος.",
-    "canvasTooBigTip": ""
+    "canvasTooBigTip": "Συμβουλή: προσπαθήστε να μετακινήσετε τα πιο απομακρυσμένα στοιχεία λίγο πιο κοντά μαζί."
   },
   "errorSplash": {
     "headingMain_pre": "Συνέβη κάποιο σφάλμα. Προσπάθησε ",
