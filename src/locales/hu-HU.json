@@ -3,7 +3,7 @@
     "paste": "Beillesztés",
     "pasteCharts": "",
     "selectAll": "Összes kijelölése",
-    "multiSelect": "Elem hozzáadása a kiválasztáshoz",
+    "multiSelect": "Elem hozzáadása a kijelöléshez",
     "moveCanvas": "Vászon mozgatása",
     "cut": "Kivágás",
     "copy": "Másolás",
@@ -44,7 +44,7 @@
     "addWatermark": "Add hozzá, hogy \"Excalidraw-val készült\"",
     "handDrawn": "Kézzel rajzolt",
     "normal": "Normál",
-    "code": "Code",
+    "code": "Kód",
     "small": "Kicsi",
     "medium": "Közepes",
     "large": "Nagy",
@@ -138,10 +138,10 @@
     "errorLoadingLibrary": "Hibába ütközött a harmarmadik féltől származó könyvtár betöltése.",
     "confirmAddLibrary": "Ez a művelet {{numShapes}} formát fog hozzáadni a könyvtáradhoz. Biztos vagy benne?",
     "imageDoesNotContainScene": "",
-    "cannotRestoreFromImage": ""
+    "cannotRestoreFromImage": "A jelenet visszaállítása nem sikerült ebből a kép fájlból"
   },
   "toolBar": {
-    "selection": "Kiválasztás",
+    "selection": "Kijelölés",
     "draw": "Szabadkézi rajz",
     "rectangle": "Téglalap",
     "diamond": "Rombusz",
@@ -172,7 +172,7 @@
   "canvasError": {
     "cannotShowPreview": "Előnézet nem jeleníthető meg",
     "canvasTooBig": "A vászon talán túl nagy.",
-    "canvasTooBigTip": "Tipp: próbáld meg a legtávolabbi elemeket közelebb mozgazni egy máshoz."
+    "canvasTooBigTip": "Tipp: próbáld meg a legtávolabbi elemeket közelebb hozni egy máshoz."
   },
   "errorSplash": {
     "headingMain_pre": "Hiba történt. Próbálja ",
