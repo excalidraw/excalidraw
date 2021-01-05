@@ -8,6 +8,7 @@ import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
 import { ActionResult } from "../actions/types";
+import { trackEvent } from "../analytics";
 import { getDefaultAppState } from "../appState";
 import {
   copyToClipboard,
@@ -1149,6 +1150,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   toggleStats = () => {
+    if (!this.state.showStats) {
+      trackEvent("dialog", "stats");
+    }
     this.setState({
       showStats: !this.state.showStats,
     });

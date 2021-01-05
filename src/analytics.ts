@@ -1,6 +1,3 @@
-export const EVENT_CHANGE = "change";
-export const EVENT_MAGIC = "magic";
-
 export const trackEvent =
   process.env.REACT_APP_GOOGLE_ANALYTICS_ID &&
   typeof window !== "undefined" &&

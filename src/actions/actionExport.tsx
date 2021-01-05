@@ -1,5 +1,5 @@
 import React from "react";
-import { EVENT_CHANGE, trackEvent } from "../analytics";
+import { trackEvent } from "../analytics";
 import { load, questionCircle, save, saveAs } from "../components/icons";
 import { ProjectName } from "../components/ProjectName";
 import { ToolButton } from "../components/ToolButton";
@@ -15,7 +15,7 @@ import { register } from "./register";
 export const actionChangeProjectName = register({
   name: "changeProjectName",
   perform: (_elements, appState, value) => {
-    trackEvent(EVENT_CHANGE, "title");
+    trackEvent("change", "title");
     return { appState: { ...appState, name: value }, commitToHistory: false };
   },
   PanelComponent: ({ appState, updateData }) => (
