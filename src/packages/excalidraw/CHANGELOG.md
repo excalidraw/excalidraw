@@ -20,11 +20,9 @@ Please add the latest change on the top under the correct section.
   - BREAKING: removed the language picker from UI. It is now the host app's responsibility to implement a language picker if desirable, using the newly added [`renderFooter`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#renderFooter) prop. The reasoning is that the i18n should be controlled by the app itself, not by the nested Excalidraw component.
   - Added [`langCode`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#langCode) prop to control the UI language.
 - Add support for `exportToBackend` prop to allow host apps to implement shareable links [#2612](https://github.com/excalidraw/excalidraw/pull/2612/files)
-
-- browse libraries styles fixed[#2694](https://github.com/excalidraw/excalidraw/pull/2694)
 - Require use of a preset dialog size; adjust dialog sizing [#2684](<(https://github.com/excalidraw/excalidraw/pull/2684)>)
 - Add line chart and paste dialog selection [#2670](https://github.com/excalidraw/excalidraw/pull/2670)
-- tweak editing behavior [#2668](https://github.com/excalidraw/excalidraw/pull/2668)
+- Tweak editing behavior [#2668](https://github.com/excalidraw/excalidraw/pull/2668)
 - Change title to Excalidraw after a timeout
 - Checkmark to toggle context-menu-items [#2645](https://github.com/excalidraw/excalidraw/pull/2645)
 - Add zoom to selection [#2522](https://github.com/excalidraw/excalidraw/pull/2522)
@@ -37,7 +35,7 @@ Please add the latest change on the top under the correct section.
 
 ### Fixes
 
-- fix typo for initialData and point all links to master [#2707](https://github.com/excalidraw/excalidraw/pull/2707)
+- Fix typo for initialData and point all links to master [#2707](https://github.com/excalidraw/excalidraw/pull/2707)
 - Fix compile error [#2685](https://github.com/excalidraw/excalidraw/pull/2685)
 - Center zoom on iPhone and iPad [#2642](https://github.com/excalidraw/excalidraw/pull/2642)
 - Fix initialization when browser tab not focused [#2677](https://github.com/excalidraw/excalidraw/pull/2677)
@@ -53,11 +51,11 @@ Please add the latest change on the top under the correct section.
 
 ### Improvements
 
-- do not reset to selection for draw tool [#2721]((https://github.com/excalidraw/excalidraw/pull/2721)
+- Do not reset to selection for draw tool [#2721]((https://github.com/excalidraw/excalidraw/pull/2721)
 - Make dialogs look more like dialogs [#2686](<(https://github.com/excalidraw/excalidraw/pull/2686)>)
-- browse libraries styles fixed [#2694](<(https://github.com/excalidraw/excalidraw/pull/2694)>)
-- change hint for 2-point lines on resize [#2655](https://github.com/excalidraw/excalidraw/pull/2655)
-- align items in context menu [#2640](https://github.com/excalidraw/excalidraw/pull/2640)
+- Browse libraries styles fixed [#2694](<(https://github.com/excalidraw/excalidraw/pull/2694)>)
+- Change hint for 2-point lines on resize [#2655](https://github.com/excalidraw/excalidraw/pull/2655)
+- Align items in context menu [#2640](https://github.com/excalidraw/excalidraw/pull/2640)
 - Do not reset to selection when using the draw tool [#2721](https://github.com/excalidraw/excalidraw/pull/2721)
 - Display proper tooltip for 2-point lines during resize, and normalize modifier key labels in hints [#2655](https://github.com/excalidraw/excalidraw/pull/2655)
 - Improve error message around importing images [#2619](https://github.com/excalidraw/excalidraw/pull/2619)
