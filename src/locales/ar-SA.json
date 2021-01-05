@@ -8,11 +8,11 @@
     "cut": "قص",
     "copy": "نسخ",
     "copyAsPng": "نسخ إلى الحافظة بصيغة PNG",
-    "copyAsSvg": "نسخ بصيغة SVG",
-    "bringForward": "ارقع للأمام",
+    "copyAsSvg": "نسخ إلى الحافظة بصيغة SVG",
+    "bringForward": "جلب للأمام",
     "sendToBack": "أرسل للخلف",
     "bringToFront": "أحضر للأمام",
-    "sendBackward": "أنزل للوراء",
+    "sendBackward": "أرسل للخلف",
     "delete": "حذف",
     "copyStyles": "نسخ النمط",
     "pasteStyles": "لصق النمط",
@@ -53,7 +53,7 @@
     "hachure": "خطوط",
     "crossHatch": "خطوط متقطعة",
     "thin": "نحيف",
-    "bold": "داكن",
+    "bold": "غامق",
     "left": "الـيسار",
     "center": "وسط",
     "right": "يمين",
@@ -137,7 +137,7 @@
     "loadSceneOverridePrompt": "تحميل الرسم الخارجي سيحل محل المحتوى الموجود لديك. هل ترغب في المتابعة؟",
     "errorLoadingLibrary": "حصل خطأ أثناء تحميل مكتبة الطرف الثالث.",
     "confirmAddLibrary": "هذا سيضيف {{numShapes}} شكل إلى مكتبتك. هل أنت متأكد؟",
-    "imageDoesNotContainScene": "",
+    "imageDoesNotContainScene": "استيراد الصور غير مدعوم في الوقت الراهن.\n\nهل تريد استيراد مشهد؟ لا يبدو أن هذه الصورة تحتوي على أي بيانات مشهد. هل قمت بسماح هذا أثناء التصدير؟",
     "cannotRestoreFromImage": "تعذر استعادة المشهد من ملف الصورة"
   },
   "toolBar": {
@@ -215,7 +215,7 @@
     "textNewLine": "إضافة سطر جديد (نص)",
     "textFinish": "الانتهاء من تحرير (النص)",
     "zoomToFit": "تكبير لتلائم جميع العناصر",
-    "zoomToSelection": "",
+    "zoomToSelection": "تقريب للمحدد",
     "preventBinding": "منع ربط السهم"
   },
   "encrypted": {
