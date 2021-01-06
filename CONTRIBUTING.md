@@ -48,7 +48,7 @@ Make sure the title starts with a semantic prefix:
 ### Changelog
 
 Add a brief description of your pull request to the changelog located here:
-[src/packages/excalidraw/CHANGELOG.md](src/packages/excalidraw/CHANGELOG.md)
+[`src/packages/excalidraw/CHANGELOG.md`](src/packages/excalidraw/CHANGELOG.md)
 
 Notes:
 
