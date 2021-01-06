@@ -172,15 +172,15 @@
   "canvasError": {
     "cannotShowPreview": "ਝਲਕ ਨਹੀਂ ਦਿਖਾ ਸਕਦੇ",
     "canvasTooBig": "ਸ਼ਾਇਦ ਕੈਨਵਸ ਬਹੁਤ ਜ਼ਿਆਦਾ ਵੱਡਾ ਹੈ।",
-    "canvasTooBigTip": ""
+    "canvasTooBigTip": "ਨੁਸਖਾ: ਸਭ ਤੋਂ ਦੂਰ ਸਥਿੱਤ ਐਲੀਮੈਂਟਾਂ ਨੂੰ ਥੋੜ੍ਹਾ ਜਿਹਾ ਨੇੜੇ ਲਿਆ ਕੇ ਦੇਖੋ।"
   },
   "errorSplash": {
-    "headingMain_pre": "",
+    "headingMain_pre": "ਗਲਤੀ ਹੋਈ। ਇਹ ਕਰਕੇ ਦੇਖੋ ",
     "headingMain_button": "ਪੰਨਾ ਮੁੜ-ਲੋਡ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ।",
     "clearCanvasMessage": "ਜੇ ਮੁੜ-ਲੋਡ ਕਰਨਾ ਕੰਮ ਨਾ ਕਰੇ, ਤਾਂ ਇਹ ਕਰਕੇ ਦੇਖੋ ",
     "clearCanvasMessage_button": "ਕੈਨਵਸ ਸਾਫ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ।",
     "clearCanvasCaveat": " ਇਹ ਸਾਰਾ ਕੰਮ ਗਵਾ ਦੇਵੇਗਾ ",
-    "trackedToSentry_pre": "",
+    "trackedToSentry_pre": "ਗਲਤੀ ਸੂਚਕ ",
     "trackedToSentry_post": " ਸਾਡੇ ਸਿਸਟਮ 'ਤੇ ਟਰੈਕ ਕੀਤਾ ਗਿਆ ਸੀ।",
     "openIssueMessage_pre": "",
     "openIssueMessage_button": "ਬੱਗ ਟਰੈਕਰ।",
@@ -189,7 +189,7 @@
   },
   "roomDialog": {
     "desc_intro": "ਤੁਸੀਂ ਲੋਕਾਂ ਨੂੰ ਆਪਣੇ ਨਾਲ ਮੌਜੂਦਾ ਦ੍ਰਿਸ਼ 'ਤੇ ਮਿਲਵਰਤਨ ਕਰਨ ਲਈ ਸੱਦਾ ਭੇਜ ਸਕਦੇ ਹੋ।",
-    "desc_privacy": "",
+    "desc_privacy": "ਫਿਕਰ ਨਾ ਕਰੋ, ਇਜਲਾਸ ਸਿਰੇ-ਤੋਂ-ਸਿਰੇ ਤੱਕ ਇਨਕਰਿਪਸ਼ਨ ਵਰਤਦਾ ਹੈ, ਸੋ ਜੋ ਕੁਝ ਵੀ ਤੁਸੀਂ ਵਾਹੁੰਦੇ ਹੋ ਉਹ ਨਿੱਜੀ ਹੀ ਰਹਿੰਦਾ ਹੈ। ਇੱਥੋਂ ਤੱਕ ਕਿ ਸਾਡੇ ਸਰਵਰ ਵੀ ਨਹੀਂ ਜਾਣ ਸਕਣਗੇ ਕਿ ਤੁਸੀਂ ਕੀ ਬਣਾਇਆ ਹੈ।",
     "button_startSession": "ਇਜਲਾਸ ਸ਼ੁਰੂ ਕਰੋ",
     "button_stopSession": "ਇਜਲਾਸ ਰੋਕੋ",
     "desc_inProgressIntro": "ਲਾਇਵ ਮਿਲਵਰਤਨ ਹੁਣ ਚੱਲ ਰਿਹਾ ਹੈ।",
@@ -204,7 +204,7 @@
     "shapes": "ਆਕ੍ਰਿਤੀਆਂ",
     "or": "ਜਾਂ",
     "click": "ਕਲਿੱਕ",
-    "drag": "",
+    "drag": "ਘਸੀਟੋ",
     "curvedArrow": "",
     "curvedLine": "",
     "editor": "ਸੋਧਕ",
