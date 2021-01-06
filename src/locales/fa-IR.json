@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "جای گذاری",
-    "pasteCharts": "",
+    "pasteCharts": "قراردادن نمودار",
     "selectAll": "انتخاب همه",
     "multiSelect": "یک ایتم به انتخاب شده ها اضافه کنید.",
     "moveCanvas": "بوم را حرکت بدهید",
@@ -30,11 +30,11 @@
     "edges": "لبه ها",
     "sharp": "تیز",
     "round": "دور",
-    "arrowheads": "",
+    "arrowheads": "سر پیکان",
     "arrowhead_none": "هیچ کدام",
     "arrowhead_arrow": "فلش",
     "arrowhead_bar": "",
-    "arrowhead_dot": "",
+    "arrowhead_dot": "نقطه",
     "fontSize": "اندازه قلم",
     "fontFamily": "نوع قلم",
     "onlySelected": "فقط انتخاب شده ها",
