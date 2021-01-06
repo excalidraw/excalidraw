@@ -8,8 +8,7 @@
 1. Run `npm install` to install dependencies
 1. Create a branch for your PR with `git checkout -b your-branch-name`
 
-> To keep `master` branch pointing to remote repository and make
-> pull requests from branches on your fork. To do this, run:
+> To keep `master` branch pointing to remote repository and make pull requests from branches on your fork. To do this, run:
 >
 > ```sh
 > git remote add upstream https://github.com/excalidraw/excalidraw.git
@@ -49,28 +48,17 @@ Make sure the title starts with a semantic prefix:
 
 ### Changelog
 
-Add a brief description of your pull request to the changelog located here:
-[`src/packages/excalidraw/CHANGELOG.md`](src/packages/excalidraw/CHANGELOG.md)
+Add a brief description of your pull request to the changelog located here: [`src/packages/excalidraw/CHANGELOG.md`](src/packages/excalidraw/CHANGELOG.md)
 
 Notes:
 
-- Make sure to prepend to the section corresponding with the semantic prefix you
-  selected in the title
-- Link to your pull request - this will require updating the CHANGELOG _after_
-  creating the pull request
+- Make sure to prepend to the section corresponding with the semantic prefix you selected in the title
+- Link to your pull request - this will require updating the CHANGELOG _after_ creating the pull request
 
 ### Testing
 
-Once you submit your pull request it will automatically be tested. Be sure to
-check the results of the test and fix any issues that arise.
+Once you submit your pull request it will automatically be tested. Be sure to check the results of the test and fix any issues that arise.
 
-It's also a good idea to consider if your change should include additional
-tests. This is highly recommended for new features or bug-fixes. For example,
-it's good practice to create a test for each bug you fix which ensures that we
-don't regress the code in the future.
+It's also a good idea to consider if your change should include additional tests. This is highly recommended for new features or bug-fixes. For example, it's good practice to create a test for each bug you fix which ensures that we don't regress the code in the future.
 
-Finally - always manually test your changes using the convenient staging
-environment deployed for each pull request. As much as local development
-attempts to replicate production, there can still be subtle differences in
-behavior. For larger features consider testing your change in multiple browsers
-as well.
+Finally - always manually test your changes using the convenient staging environment deployed for each pull request. As much as local development attempts to replicate production, there can still be subtle differences in behavior. For larger features consider testing your change in multiple browsers as well.
