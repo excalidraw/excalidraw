@@ -42,7 +42,7 @@
     "exportEmbedScene": "화면을 내보낸 파일에 담기",
     "exportEmbedScene_details": "화면 정보가 내보내는 PNG/SVG 파일에 저장되어 이후에 파일에서 화면을 복구할 수 있습니다. 파일 크기가 증가합니다.",
     "addWatermark": "\"Made with Excalidraw\" 추가",
-    "handDrawn": "필기체",
+    "handDrawn": "손글씨",
     "normal": "일반",
     "code": "코드",
     "small": "작게",
