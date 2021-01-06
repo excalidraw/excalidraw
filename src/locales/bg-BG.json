@@ -33,14 +33,14 @@
     "arrowheads": "Стрелки",
     "arrowhead_none": "Без",
     "arrowhead_arrow": "Стрелка",
-    "arrowhead_bar": "",
+    "arrowhead_bar": "Връх на стрелката",
     "arrowhead_dot": "Точка",
     "fontSize": "Размер на шрифта",
     "fontFamily": "Семейство шрифтове",
     "onlySelected": "Само избраното",
     "withBackground": "С фон",
     "exportEmbedScene": "Вгради сцената във файл",
-    "exportEmbedScene_details": "",
+    "exportEmbedScene_details": "Данните от сцената ще бъдат екпортирани в PNG/SVG файл, за да може сцената да бъде възстановена от него.\nТова ще увеличи размера на файла.",
     "addWatermark": "Добави \"Made with Excalidraw\"",
     "handDrawn": "Нарисувано на ръка",
     "normal": "Нормален",
@@ -165,14 +165,14 @@
     "lockAngle": "Можете да ограничите ъгъла, като задържите SHIFT",
     "resize": "Може да ограничите при преоразмеряване като задържите SHIFT,\nзадръжте ALT за преоразмерите през центъра",
     "rotate": "Можете да ограничите ъглите, като държите SHIFT, докато се въртите",
-    "lineEditor_info": "",
+    "lineEditor_info": "Кликнете два пъти или натиснете Enter за да промените точките",
     "lineEditor_pointSelected": "Натиснете Delete за да изтриете точка, CtrlOrCmd+D за дуплициране, или извлачете за да преместите",
     "lineEditor_nothingSelected": "Изберете точка за местене или изтриване, или пък задръжте Alt и натиснете за да добавите нови точки"
   },
   "canvasError": {
     "cannotShowPreview": "Невъзможност за показване на preview",
     "canvasTooBig": "Платното е твърде голямо.",
-    "canvasTooBigTip": ""
+    "canvasTooBigTip": "Подсказка: пробвайте да приближите далечните елементи по-близко."
   },
   "errorSplash": {
     "headingMain_pre": "Среща грешка. Опитайте ",
