@@ -621,6 +621,7 @@ describe("regression tests", () => {
     const expectedShortcutNames: ShortcutName[] = [
       "selectAll",
       "gridMode",
+      "zenMode",
       "stats",
     ];
 
