@@ -161,7 +161,7 @@
     "linearElement": "Haga clic para dibujar multiples puntos o arrastre para una sola línea",
     "freeDraw": "Haz clic y arrastra, suelta al terminar",
     "text": "Consejo: también puedes añadir texto haciendo doble clic en cualquier lugar con la herramienta de selección",
-    "linearElementMulti": "Haga clic en el último punto o pulse Escape o Enter para finalizar",
+    "linearElementMulti": "Haz clic en el último punto o presiona Escape o Enter para finalizar",
     "lockAngle": "Puedes restringir el ángulo manteniendo presionado el botón SHIFT",
     "resize": "Para mantener las proporciones mantén SHIFT presionado mientras modificas el tamaño, \nmantén presionado ALT para modificar el tamaño desde el centro",
     "rotate": "Puedes restringir los ángulos manteniendo presionado SHIFT mientras giras",
