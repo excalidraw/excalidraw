@@ -158,16 +158,16 @@
     "shapes": "ਆਕ੍ਰਿਤੀਆਂ"
   },
   "hints": {
-    "linearElement": "",
+    "linearElement": "ਇੱਕ ਤੋਂ ਜ਼ਿਆਦਾ ਬਿੰਦੂਆਂ ਲਈ ਕਲਿੱਕ ਕਰਕੇ ਸ਼ੁਰੂਆਤ ਕਰੋ, ਇਕਹਿਰੀ ਰੇਖਾ ਲਈ ਘਸੀਟੋ",
     "freeDraw": "ਕਲਿੱਕ ਕਰਕੇ ਘਸੀਟੋ, ਪੂਰਾ ਹੋਣ 'ਤੇ ਛੱਡ ਦਿਉ",
-    "text": "",
-    "linearElementMulti": "",
+    "text": "ਨੁਸਖਾ: ਤੁਸੀਂ ਚੋਣਕਾਰ ਸੰਦ ਰਾਹੀਂ ਕਿਤੇ ਵੀ ਡਬਲ-ਕਲਿੱਕ ਕਰਕੇ ਵੀ ਪਾਠ ਜੋੜ ਸਕਦੇ ਹੋ",
+    "linearElementMulti": "ਮੁਕੰਮਲ ਕਰਨ ਲਈ ਆਖਰੀ ਬਿੰਦੂ 'ਤੇ ਕਲਿੱਕ ਕਰੋ ਜਾਂ ਇਸਕੇਪ ਜਾਂ ਐਂਟਰ ਦਬਾਓ",
     "lockAngle": "",
     "resize": "",
     "rotate": "",
     "lineEditor_info": "ਬਿੰਦੂਆਂ ਨੂੰ ਸੋਧਣ ਲਈ ਡਬਲ-ਕਲਿੱਕ ਜਾਂ ਐਂਟਰ ਦਬਾਓ",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": ""
+    "lineEditor_pointSelected": "ਬਿੰਦੀ ਹਟਾਉਣ ਲਈ ਡਲੀਟ ਦਬਾਓ, ਜੁਪਲੀਕੇਟ ਬਣਾਉਣ ਲਈ CtrlOrCmd+D, ਜਾਂ ਹਿਲਾਉਣ ਲਈ ਘਸੀਟੋ",
+    "lineEditor_nothingSelected": "ਹਿਲਾਉਣ ਜਾਂ ਹਟਾਉਣ ਲਈ ਬਿੰਦੂ ਚੁਣੋ, ਜਾਂ ਨਵਾਂ ਬਿੰਦੂ ਜੋੜਨ ਲਈ Alt ਦਬਾਕੇ ਕਲਿੱਕ ਕਰੋ"
   },
   "canvasError": {
     "cannotShowPreview": "ਝਲਕ ਨਹੀਂ ਦਿਖਾ ਸਕਦੇ",
