@@ -28,6 +28,7 @@ Please add the latest change on the top under the correct section.
 - Add Cut to menus [#2511](https://github.com/excalidraw/excalidraw/pull/2511)
 - More Arrowheads: dot, bar [#2486](https://github.com/excalidraw/excalidraw/pull/2486)
 - Support CSV graphs and improve the look and feel [#2495](https://github.com/excalidraw/excalidraw/pull/2495)
+- Added Zen Mode to the context menu [#2734](https://github.com/excalidraw/excalidraw/pull/2734)
 
 ### Fixes
 
