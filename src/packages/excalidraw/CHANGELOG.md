@@ -28,7 +28,6 @@ Please add the latest change on the top under the correct section.
 - Add Cut to menus [#2511](https://github.com/excalidraw/excalidraw/pull/2511)
 - More Arrowheads: dot, bar [#2486](https://github.com/excalidraw/excalidraw/pull/2486)
 - Support CSV graphs and improve the look and feel [#2495](https://github.com/excalidraw/excalidraw/pull/2495)
-- Added Zen Mode to the context menu [#2734](https://github.com/excalidraw/excalidraw/pull/2734)
 
 ### Fixes
 
@@ -45,6 +44,7 @@ Please add the latest change on the top under the correct section.
 
 ### Improvements
 
+- Added Zen Mode to the context menu [#2734](https://github.com/excalidraw/excalidraw/pull/2734)
 - Do not reset to selection when using the draw tool [#2721](https://github.com/excalidraw/excalidraw/pull/2721)
 - Display proper tooltip for 2-point lines during resize, and normalize modifier key labels in hints [#2655](https://github.com/excalidraw/excalidraw/pull/2655)
 - Improve error message around importing images [#2619](https://github.com/excalidraw/excalidraw/pull/2619)
