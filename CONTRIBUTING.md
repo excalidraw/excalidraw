@@ -32,18 +32,18 @@
 
 Make sure the title starts with a semantic prefix:
 
-* feat: A new feature
-* fix: A bug fix
-* improvement: An improvement to a current feature
-* docs: Documentation only changes
-* style: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
-* refactor: A code change that neither fixes a bug nor adds a feature
-* perf: A code change that improves performance
-* test: Adding missing tests or correcting existing tests
-* build: Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)
-* ci: Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)
-* chore: Other changes that don't modify src or test files
-* revert: Reverts a previous commit
+- feat: A new feature
+- fix: A bug fix
+- improvement: An improvement to a current feature
+- docs: Documentation only changes
+- style: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
+- refactor: A code change that neither fixes a bug nor adds a feature
+- perf: A code change that improves performance
+- test: Adding missing tests or correcting existing tests
+- build: Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)
+- ci: Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)
+- chore: Other changes that don't modify src or test files
+- revert: Reverts a previous commit
 
 ### Changelog
 
@@ -51,23 +51,24 @@ Add a brief description of your pull request to the changelog located here:
 [src/packages/excalidraw/CHANGELOG.md](src/packages/excalidraw/CHANGELOG.md)
 
 Notes:
-* Make sure to prepend to the section corresponding with the semantic prefix you
+
+- Make sure to prepend to the section corresponding with the semantic prefix you
   selected in the title
-* Link to your pull request - this will require updating the CHANGELOG *after*
+- Link to your pull request - this will require updating the CHANGELOG _after_
   creating the pull request
 
 ### Testing
 
-Once you submit your pull request it will automatically be tested.  Be sure to
+Once you submit your pull request it will automatically be tested. Be sure to
 check the results of the test and fix any issues that arise.
 
 It's also a good idea to consider if your change should include additional
-tests.  This is highly recommended for new features or bug-fixes.  For example,
+tests. This is highly recommended for new features or bug-fixes. For example,
 it's good practice to create a test for each bug you fix which ensures that we
 don't regress the code in the future.
 
 Finally - always manually test your changes using the convenient staging
-environment deployed for each pull request.  As much as local development
+environment deployed for each pull request. As much as local development
 attempts to replicate production, there can still be subtle differences in
-behavior.  For larger features consider testing your change in multiple browsers
+behavior. For larger features consider testing your change in multiple browsers
 as well.
