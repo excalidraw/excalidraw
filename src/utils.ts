@@ -364,8 +364,5 @@ export const nFormatter = (num: number, digits: number): string => {
 
 export const getVersion = () => {
   const version = document.querySelector('meta[name="version"]');
-  if (version) {
-    return (version as any).content;
-  }
-  return "{version}";
+  return version ? (version as any).content : "{version}";
 };
