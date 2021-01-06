@@ -205,8 +205,8 @@
     "or": "ਜਾਂ",
     "click": "ਕਲਿੱਕ",
     "drag": "ਘਸੀਟੋ",
-    "curvedArrow": "",
-    "curvedLine": "",
+    "curvedArrow": "ਵਿੰਗਾ ਤੀਰ",
+    "curvedLine": "ਵਿੰਗੀ ਲਕੀਰ",
     "editor": "ਸੋਧਕ",
     "view": "ਦਿੱਖ",
     "blog": "ਸਾਡਾ ਬਲੌਗ ਪੜ੍ਹੋ",
@@ -216,10 +216,10 @@
     "textFinish": "ਸੋਧ ਮੁਕੰਮਲ ਕਰੋ (ਪਾਠ)",
     "zoomToFit": "ਸਾਰੇ ਐਲੀਮੈਂਟਾਂ ਨੂੰ ਫਿੱਟ ਕਰਨ ਲਈ ਜ਼ੂਮ ਕਰੋ",
     "zoomToSelection": "ਚੋਣ ਤੱਕ ਜ਼ੂਮ ਕਰੋ",
-    "preventBinding": ""
+    "preventBinding": "ਤੀਰ ਬੱਝਣਾ ਰੋਕੋ"
   },
   "encrypted": {
-    "tooltip": ""
+    "tooltip": "ਤੁਹਾਡੀ ਡਰਾਇੰਗ ਸਿਰੇ-ਤੋਂ-ਸਿਰੇ ਤੱਕ ਇਨਕਰਿਪਟ ਕੀਤੀਆਂ ਹੋਈਆਂ ਹਨ, ਇਸ ਲਈ Excalidraw ਦੇ ਸਰਵਰ ਉਹਨਾਂ ਨੂੰ ਕਦੇ ਵੀ ਨਹੀਂ ਦੇਖਣਗੇ।"
   },
   "stats": {
     "angle": "ਕੋਣ",
