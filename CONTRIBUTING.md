@@ -28,6 +28,8 @@
 
 ## Pull Request Guidelines
 
+Don't worry if you get any of the below wrong, or if you don't know how. We'll gladly help out.
+
 ### Title
 
 Make sure the title starts with a semantic prefix:
