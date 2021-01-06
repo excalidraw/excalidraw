@@ -172,7 +172,7 @@
   "canvasError": {
     "cannotShowPreview": "Önizleme gösterilemiyor",
     "canvasTooBig": "Kanvas çok büyük olabilir.",
-    "canvasTooBigTip": ""
+    "canvasTooBigTip": "İpucu: En uzaktaki elemanları birbirine yakınlaştırmayı deneyin."
   },
   "errorSplash": {
     "headingMain_pre": "Hata oluştu. Lütfen ",
@@ -183,7 +183,7 @@
     "trackedToSentry_pre": "Tanımlayıcı ile ilgili hata ",
     "trackedToSentry_post": " sistemimize yakalandı.",
     "openIssueMessage_pre": "",
-    "openIssueMessage_button": "hata takibinde bir yardım bileti oluşturun.",
+    "openIssueMessage_button": "hata takibi.",
     "openIssueMessage_post": " Lütfen aşağıya GitHub sorununa kopyalayarak ve yapıştırarak bilgi ekleyin.",
     "sceneContent": "Sahne içeriği:"
   },
