@@ -3639,6 +3639,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             action: this.toggleGridMode,
           },
           {
+            checked: this.state.gridSize !== null,
+            shortcutName: "zenMode",
+            label: t("buttons.zenMode"),
+            action: this.toggleZenMode,
+          },
+          {
             checked: this.state.showStats,
             shortcutName: "stats",
             label: t("stats.title"),
