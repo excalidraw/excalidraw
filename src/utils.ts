@@ -1,6 +1,7 @@
 import colors from "./colors";
 import {
   CURSOR_TYPE,
+  DEFAULT_VERSION,
   FONT_FAMILY,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
@@ -364,5 +365,15 @@ export const nFormatter = (num: number, digits: number): string => {
 
 export const getVersion = () => {
   const version = document.querySelector('meta[name="version"]');
-  return version ? (version as any).content : "{version}";
+  return version ? (version as any).content : DEFAULT_VERSION;
+};
+
+export const getLatestVersion = async () => {
+  try {
+    const response = await fetch("/version.json");
+    const version = await response.json();
+    return version.version;
+  } catch {
+    return DEFAULT_VERSION;
+  }
 };
