@@ -25,7 +25,7 @@
     "strokeStyle_dashed": "Пунктир",
     "strokeStyle_dotted": "Пунктирано",
     "sloppiness": "Небрежност",
-    "opacity": "Непрозрачност",
+    "opacity": "Прозрачност",
     "textAlign": "Подравняване на текста",
     "edges": "Крайща",
     "sharp": "Остър",
@@ -80,9 +80,9 @@
     "gridMode": "Решетъчен режим",
     "addToLibrary": "Добавяне към библиотеката",
     "removeFromLibrary": "Премахване от библиотеката",
-    "libraryLoadingMessage": "",
-    "libraries": "",
-    "loadingScene": "",
+    "libraryLoadingMessage": "Зареждане на библиотеката...",
+    "libraries": "Разглеждане на библиотеките",
+    "loadingScene": "Зареждане на сцена...",
     "align": "Подравняване",
     "alignTop": "Подравняване отгоре",
     "alignBottom": "Подравняване отдолу",
@@ -163,15 +163,15 @@
     "text": "Подсказка: Можете също да добавите текст като натиснете някъде два път с инструмента за селекция",
     "linearElementMulti": "Кликнете върху последната точка или натиснете Escape или Enter, за да завършите",
     "lockAngle": "Можете да ограничите ъгъла, като задържите SHIFT",
-    "resize": "",
+    "resize": "Може да ограничите при преоразмеряване като задържите SHIFT,\nзадръжте ALT за преоразмерите през центъра",
     "rotate": "Можете да ограничите ъглите, като държите SHIFT, докато се въртите",
     "lineEditor_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": ""
+    "lineEditor_pointSelected": "Натиснете Delete за да изтриете точка, CtrlOrCmd+D за дуплициране, или извлачете за да преместите",
+    "lineEditor_nothingSelected": "Изберете точка за местене или изтриване, или пък задръжте Alt и натиснете за да добавите нови точки"
   },
   "canvasError": {
-    "cannotShowPreview": "",
-    "canvasTooBig": "",
+    "cannotShowPreview": "Невъзможност за показване на preview",
+    "canvasTooBig": "Платното е твърде голямо.",
     "canvasTooBigTip": ""
   },
   "errorSplash": {
@@ -214,23 +214,23 @@
     "github": "Намерихте проблем? Изпратете",
     "textNewLine": "Добавяне на нов ред (текст)",
     "textFinish": "Завършете редактиране (текст)",
-    "zoomToFit": "",
-    "zoomToSelection": "",
-    "preventBinding": ""
+    "zoomToFit": "Приближи докато се виждат всички елементи",
+    "zoomToSelection": "Приближи селекцията",
+    "preventBinding": "Спри прилепяне на стрелките"
   },
   "encrypted": {
-    "tooltip": ""
+    "tooltip": "Вашите рисунки са криптирани от край до край, така че сървърите на Excalidraw няма да могат да ги виждат."
   },
   "stats": {
-    "angle": "",
-    "element": "",
-    "elements": "",
-    "height": "",
-    "scene": "",
-    "selected": "",
-    "storage": "",
-    "title": "",
-    "total": "",
-    "width": ""
+    "angle": "Ъгъл",
+    "element": "Елемент",
+    "elements": "Елементи",
+    "height": "Височина",
+    "scene": "Сцена",
+    "selected": "Селектирано",
+    "storage": "Съхранение на данни",
+    "title": "Статистика за хакери",
+    "total": "Общо",
+    "width": "Широчина"
   }
 }
