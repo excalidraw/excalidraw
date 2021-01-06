@@ -125,22 +125,22 @@ export default function App() {
 
 ### Props
 
-| Name                                          | Type                                                                                                                                                                                                                                                                                                             | Default              | Description                                                                                                                                                |
-| --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`width`](#width)                             | Number                                                                                                                                                                                                                                                                                                           | `window.innerWidth`  | The width of Excalidraw component                                                                                                                          |
-| [`height`](#height)                           | Number                                                                                                                                                                                                                                                                                                           | `window.innerHeight` | The height of Excalidraw component                                                                                                                         |
-| [`offsetLeft`](#offsetLeft)                   | Number                                                                                                                                                                                                                                                                                                           | `0`                  | left position relative to which Excalidraw should be rendered                                                                                              |
-| [`offsetTop`](#offsetTop)                     | Number                                                                                                                                                                                                                                                                                                           | `0`                  | top position relative to which Excalidraw should render                                                                                                    |
-| [`onChange`](#onChange)                       | Function                                                                                                                                                                                                                                                                                                         |                      | This callback is triggered whenever the component updates due to any change. This callback will receive the excalidraw elements and the current app state. |
-| [`initialData`](#initialData)                 | <pre>{elements?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>, appState?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37">AppState<a> } </pre>                                                                | null                 | The initial data with which app loads.                                                                                                                     |
-| [`user`](#user)                               | `{ name?: string }`                                                                                                                                                                                                                                                                                              |                      | User details. The name refers to the name of the user to be shown                                                                                          |
-| [`excalidrawRef`](#excalidrawRef)             | [`createRef`](https://reactjs.org/docs/refs-and-the-dom.html#creating-refs) or [`callbackRef`](https://reactjs.org/docs/refs-and-the-dom.html#callback-refs) or <pre>{ current: { readyPromise: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317">resolvablePromise</a> } }</pre> |                      | Ref to be passed to Excalidraw                                                                                                                             |
-| [`onCollabButtonClick`](#onCollabButtonClick) | Function                                                                                                                                                                                                                                                                                                         |                      | Callback to be triggered when the collab button is clicked                                                                                                 |
-| [`isCollaborating`](#isCollaborating)         | `boolean`                                                                                                                                                                                                                                                                                                        |                      | This implies if the app is in collaboration mode                                                                                                           |
-| [`onPointerUpdate`](#onPointerUpdate)         | Function                                                                                                                                                                                                                                                                                                         |                      | Callback triggered when mouse pointer is updated.                                                                                                          |
-| [`onExportToBackend`](#onExportToBackend)     | Function                                                                                                                                                                                                                                                                                                         |                      | Callback triggered when link button is clicked on export dialog                                                                                            |
-| [`langCode`](#langCode)                       | string                                                                                                                                                                                                                                                                                                           | `en`                 | Language code string                                                                                                                                       |
-| [`renderFooter `](#renderFooter)              | Function                                                                                                                                                                                                                                                                                                         |                      | Function that renders custom UI footer                                                                                                                     |
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| [`width`](#width) | Number | `window.innerWidth` | The width of Excalidraw component |
+| [`height`](#height) | Number | `window.innerHeight` | The height of Excalidraw component |
+| [`offsetLeft`](#offsetLeft) | Number | `0` | left position relative to which Excalidraw should be rendered |
+| [`offsetTop`](#offsetTop) | Number | `0` | top position relative to which Excalidraw should render |
+| [`onChange`](#onChange) | Function |  | This callback is triggered whenever the component updates due to any change. This callback will receive the excalidraw elements and the current app state. |
+| [`initialData`](#initialData) | <pre>{elements?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>, appState?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37">AppState<a> } </pre> | null | The initial data with which app loads. |
+| [`user`](#user) | `{ name?: string }` |  | User details. The name refers to the name of the user to be shown |
+| [`excalidrawRef`](#excalidrawRef) | [`createRef`](https://reactjs.org/docs/refs-and-the-dom.html#creating-refs) or [`callbackRef`](https://reactjs.org/docs/refs-and-the-dom.html#callback-refs) or <pre>{ current: { readyPromise: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317">resolvablePromise</a> } }</pre> |  | Ref to be passed to Excalidraw |
+| [`onCollabButtonClick`](#onCollabButtonClick) | Function |  | Callback to be triggered when the collab button is clicked |
+| [`isCollaborating`](#isCollaborating) | `boolean` |  | This implies if the app is in collaboration mode |
+| [`onPointerUpdate`](#onPointerUpdate) | Function |  | Callback triggered when mouse pointer is updated. |
+| [`onExportToBackend`](#onExportToBackend) | Function |  | Callback triggered when link button is clicked on export dialog |
+| [`langCode`](#langCode) | string | `en` | Language code string |
+| [`renderFooter `](#renderFooter) | Function |  | Function that renders custom UI footer |
 
 #### `width`
 
@@ -174,13 +174,12 @@ Here you can try saving the data to your backend or local storage for example.
 
 #### `initialData`
 
-This helps to load Excalidraw with `initialData`.
-It must be an object or a [promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise) which resolves to an object containing the below optional fields.
+This helps to load Excalidraw with `initialData`. It must be an object or a [promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise) which resolves to an object containing the below optional fields.
 
-| name     | type                                                                                                  |
-| -------- | ----------------------------------------------------------------------------------------------------- |
+| name | type |
+| --- | --- |
 | elements | [ExcalidrawElement []](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78) |
-| appState | [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37)                     |
+| appState | [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37) |
 
 ```json
 {
@@ -219,19 +218,18 @@ This is the user name which shows during collaboration. Defaults to `{name: ''}`
 
 #### `excalidrawRef`
 
-You can pass a `ref` when you want to access some excalidraw APIs.
-We expose the below APIs:
+You can pass a `ref` when you want to access some excalidraw APIs. We expose the below APIs:
 
-| API                              | signature                                                                                                                              | Usage                                                                                                                                                                                                                                            |
-| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| ready                            | `boolean`                                                                                                                              | This is set to true once Excalidraw is rendered                                                                                                                                                                                                  |
-| readyPromise                     | [resolvablePromise](https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317)                                            | This promise will be resolved with the api once excalidraw has rendered. This will be helpful when you want do some action on the host app once this promise resolves. For this to work you will have to pass ref as shown [here](#readyPromise) |
-| updateScene                      | <pre>(<a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L189">sceneData</a>)) => void </pre>                  | updates the scene with the sceneData                                                                                                                                                                                                             |
-| resetScene                       | `({ resetLoadingState: boolean }) => void`                                                                                             | Resets the scene. If `resetLoadingState` is passed as true then it will also force set the loading state to false.                                                                                                                               |
-| getSceneElementsIncludingDeleted | <pre> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement []</a></pre>     | Returns all the elements including the deleted in the scene                                                                                                                                                                                      |
-| getSceneElements                 | <pre> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement []</a></pre>     | Returns all the elements excluding the deleted in the scene                                                                                                                                                                                      |
-| history                          | `{ clear: () => void }`                                                                                                                | This is the history API. `history.clear()` will clear the history                                                                                                                                                                                |
-| setScrollToCenter                | <pre> (<a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>) => void </pre> | sets the elements to center                                                                                                                                                                                                                      |
+| API | signature | Usage |
+| --- | --- | --- |
+| ready | `boolean` | This is set to true once Excalidraw is rendered |
+| readyPromise | [resolvablePromise](https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317) | This promise will be resolved with the api once excalidraw has rendered. This will be helpful when you want do some action on the host app once this promise resolves. For this to work you will have to pass ref as shown [here](#readyPromise) |
+| updateScene | <pre>(<a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L189">sceneData</a>)) => void </pre> | updates the scene with the sceneData |
+| resetScene | `({ resetLoadingState: boolean }) => void` | Resets the scene. If `resetLoadingState` is passed as true then it will also force set the loading state to false. |
+| getSceneElementsIncludingDeleted | <pre> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement []</a></pre> | Returns all the elements including the deleted in the scene |
+| getSceneElements | <pre> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement []</a></pre> | Returns all the elements excluding the deleted in the scene |
+| history | `{ clear: () => void }` | This is the history API. `history.clear()` will clear the history |
+| setScrollToCenter | <pre> (<a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>) => void </pre> | sets the elements to center |
 
 #### `readyPromise`
 
@@ -275,17 +273,16 @@ This callback is triggered when the shareable-link button is clicked in the expo
 
 #### `langCode`
 
-Determines the language of the UI. It should be one of the [available language codes](https://github.com/excalidraw/excalidraw/blob/master/src/i18n.ts#L14). Defaults to `en` (English).
-We also export default language and supported languages which you can import as shown below.
+Determines the language of the UI. It should be one of the [available language codes](https://github.com/excalidraw/excalidraw/blob/master/src/i18n.ts#L14). Defaults to `en` (English). We also export default language and supported languages which you can import as shown below.
 
 ```js
 import { defaultLang, languages } from "@excalidraw/excalidraw";
 ```
 
-| name        | type                                                                               |
-| ----------- | ---------------------------------------------------------------------------------- |
-| defaultLang | string                                                                             |
-| languages   | [Language []](https://github.com/excalidraw/excalidraw/blob/master/src/i18n.ts#L8) |
+| name | type |
+| --- | --- |
+| defaultLang | string |
+| languages | [Language []](https://github.com/excalidraw/excalidraw/blob/master/src/i18n.ts#L8) |
 
 #### `renderFooter`
 
