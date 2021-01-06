@@ -83,15 +83,15 @@
     "libraryLoadingMessage": "",
     "libraries": "",
     "loadingScene": "",
-    "align": "",
-    "alignTop": "",
-    "alignBottom": "",
-    "alignLeft": "",
-    "alignRight": "",
-    "centerVertically": "",
-    "centerHorizontally": "",
-    "distributeHorizontally": "",
-    "distributeVertically": ""
+    "align": "Подравняване",
+    "alignTop": "Подравняване отгоре",
+    "alignBottom": "Подравняване отдолу",
+    "alignLeft": "Подравняване отляво",
+    "alignRight": "Подравняване отдясно",
+    "centerVertically": "Центрирай вертикално",
+    "centerHorizontally": "Центрирай хоризонтално",
+    "distributeHorizontally": "Разпредели хоризонтално",
+    "distributeVertically": "Разпредели вертикално"
   },
   "buttons": {
     "clearReset": "Нулиране на платно",
@@ -127,7 +127,7 @@
   "alerts": {
     "clearReset": "Това ще изчисти цялото платно. Сигурни ли сте?",
     "couldNotCreateShareableLink": "Връзката не може да бъде създадена.",
-    "couldNotCreateShareableLinkTooBig": "",
+    "couldNotCreateShareableLinkTooBig": "Не може да се създаде връзка за споделяне: сцената е твърде голяма",
     "couldNotLoadInvalidFile": "Невалиден файл не може да се зареди",
     "importBackendFailed": "Импортирането от бекенд не беше успешно.",
     "cannotExportEmptyCanvas": "Не може да се експортира празно платно.",
@@ -149,7 +149,7 @@
     "arrow": "Стрелка",
     "line": "Линия",
     "text": "Текст",
-    "library": "",
+    "library": "Библиотека",
     "lock": "Поддържайте избрания инструмент активен след рисуване"
   },
   "headings": {
