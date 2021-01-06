@@ -131,7 +131,7 @@
     "couldNotLoadInvalidFile": "Nem sikerült betölteni a helytelen fájlt",
     "importBackendFailed": "Nem sikerült betölteni a szerverről.",
     "cannotExportEmptyCanvas": "Üres vászont nem lehet exportálni.",
-    "couldNotCopyToClipboard": "Nem sikerült vágólapra menteni. Próbálja meg Chrome böngészővel.",
+    "couldNotCopyToClipboard": "Nem sikerült vágólapra menteni. Próbáld meg Chrome böngészővel.",
     "decryptFailed": "Nem sikerült visszafejteni a titkosított adatot.",
     "uploadedSecurly": "A feltöltést végpontok közötti titkosítással biztosítottuk, ami azt jelenti, hogy egy harmadik fél nem tudja megnézni a tartalmát, beleértve az Excalidraw szervereit is.",
     "loadSceneOverridePrompt": "A betöltött külső rajz felül fogja írnia meglévőt. Szeretnéd folytatni?",
@@ -214,7 +214,7 @@
     "github": "Hibát találtál? Küld be",
     "textNewLine": "Új sor hozzáadása (szöveg)",
     "textFinish": "Szerkesztés befejezése (szöveg)",
-    "zoomToFit": "Az összes elem látószögbe hozása",
+    "zoomToFit": "Az összes elem látótérbe hozása",
     "zoomToSelection": "Kijelölésre nagyítás",
     "preventBinding": "A nyíl ne ragadjon"
   },
