@@ -137,7 +137,7 @@
     "loadSceneOverridePrompt": "Si carga este dibujo externo, reemplazará el que tiene. ¿Desea continuar?",
     "errorLoadingLibrary": "Se ha producido un error al cargar la biblioteca de terceros.",
     "confirmAddLibrary": "Esto añadirá {{numShapes}} forma(s) a tu biblioteca. ¿Estás seguro?",
-    "imageDoesNotContainScene": "La importación de imágenes no está soportada en este momento.\n\n¿Querías importar una escena? Esta imagen no parece contener ningún dato de escena. ¿Lo ha activado durante la exportación?",
+    "imageDoesNotContainScene": "La importación de imágenes no está homologada en este momento.\n\n¿Deseas importar una escena? Esta imagen no parece contener ningún dato de escena. ¿Lo has activado durante la exportación?",
     "cannotRestoreFromImage": "No se pudo restaurar la escena desde este archivo de imagen"
   },
   "toolBar": {
@@ -158,7 +158,7 @@
     "shapes": "Formas"
   },
   "hints": {
-    "linearElement": "Haga clic para dibujar multiples puntos o arrastre para una sola línea",
+    "linearElement": "Haz clic para dibujar múltiples puntos, arrastrar para solo una línea",
     "freeDraw": "Haz clic y arrastra, suelta al terminar",
     "text": "Consejo: también puedes añadir texto haciendo doble clic en cualquier lugar con la herramienta de selección",
     "linearElementMulti": "Haz clic en el último punto o presiona Escape o Enter para finalizar",
@@ -167,12 +167,12 @@
     "rotate": "Puedes restringir los ángulos manteniendo presionado SHIFT mientras giras",
     "lineEditor_info": "Doble clic o pulse Enter para editar puntos",
     "lineEditor_pointSelected": "Presione Suprimir para eliminar el punto, CtrlOrCmd+D para duplicarlo, o arrástrelo para moverlo",
-    "lineEditor_nothingSelected": "Seleccione un punto para mover o eliminar, o mantenga pulsado Alt y haga clic para añadir nuevos puntos"
+    "lineEditor_nothingSelected": "Selecciona un punto sea para mover o eliminar, o mantén pulsado Alt y haz clic para añadir nuevos puntos"
   },
   "canvasError": {
     "cannotShowPreview": "No se puede mostrar la vista previa",
     "canvasTooBig": "El lienzo podría ser demasiado grande.",
-    "canvasTooBigTip": "Sugerencia: intenta acercar un poco los elementos más lejanos."
+    "canvasTooBigTip": "Sugerencia: intenta acercar un poco más los elementos más lejanos."
   },
   "errorSplash": {
     "headingMain_pre": "Se encontró un error. Intente ",
@@ -189,12 +189,12 @@
   },
   "roomDialog": {
     "desc_intro": "Puede invitar a otras personas a tu actual escena para que colaboren contigo.",
-    "desc_privacy": "No te preocupes, la sesión usa encriptación de extremo a extremo, por lo que todo lo que se dibuje se mantendrá privado. Ni siquiera nuestro servidor podrá ver lo que haces.",
+    "desc_privacy": "No te preocupes, la sesión usa encriptación de punta a punta, por lo que todo lo que se dibuje se mantendrá privadamente. Ni siquiera nuestro servidor podrá ver lo que haces.",
     "button_startSession": "Iniciar sesión",
     "button_stopSession": "Detener sesión",
     "desc_inProgressIntro": "La sesión de colaboración en vivo está ahora en progreso.",
-    "desc_shareLink": "Comparte este enlace con tus colaboradores:",
-    "desc_exitSession": "Detener la sesión te desconectará de la sala, pero podrás seguir trabajando con la escena localmente. Ten en cuenta que esto no afectará a otras personas, y que seguirán siendo capaces de colaborar en su versión."
+    "desc_shareLink": "Comparte este enlace con cualquier persona con quien quieras colaborar:",
+    "desc_exitSession": "Detener la sesión te desconectará de la sala, pero podrás seguir trabajando con la escena en su computadora, esto es de modo local. Ten en cuenta que esto no afectará a otras personas, y que las mismas seguirán siendo capaces de colaborar en tu escena."
   },
   "errorDialog": {
     "title": "Error"
@@ -215,7 +215,7 @@
     "textNewLine": "Añadir nueva línea (texto)",
     "textFinish": "Finalizar edición (texto)",
     "zoomToFit": "Ajustar la vista para mostrar todos los elementos",
-    "zoomToSelection": "Acercarse a la selección",
+    "zoomToSelection": "Hacer zoom a la selección",
     "preventBinding": "Evitar yuxtaposición de flechas"
   },
   "encrypted": {
