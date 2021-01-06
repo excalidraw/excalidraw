@@ -88,10 +88,10 @@
     "alignBottom": "ਹੇਠਾਂ ਇਕਸਾਰ ਕਰੋ",
     "alignLeft": "ਖੱਬੇ ਇਕਸਾਰ ਕਰੋ",
     "alignRight": "ਸੱਜੇ ਇਕਸਾਰ ਕਰੋ",
-    "centerVertically": "",
-    "centerHorizontally": "",
-    "distributeHorizontally": "",
-    "distributeVertically": ""
+    "centerVertically": "ਲੇਟਵੇਂ ਵਿਚਕਾਰ ਕਰੋ",
+    "centerHorizontally": "ਖੜ੍ਹਵੇਂ ਵਿਚਕਾਰ ਕਰੋ",
+    "distributeHorizontally": "ਖੜ੍ਹਵੇਂ ਇਕਸਾਰ ਵੰਡੋ",
+    "distributeVertically": "ਲੇਟਵੇਂ ਇਕਸਾਰ ਵੰਡੋ"
   },
   "buttons": {
     "clearReset": "ਕੈਨਵਸ ਰੀਸੈੱਟ ਕਰੋ",
