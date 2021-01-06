@@ -162,7 +162,7 @@
     "freeDraw": "Tıkla ve sürükle, bitirdiğinde serbest bırak",
     "text": "İpucu: seçme aracıyla herhangi bir yere çift tıklayarak da yazı ekleyebilirsin",
     "linearElementMulti": "Tamamlamak için son noktayı seçin veya Escape ve Enter'dan birine basın",
-    "lockAngle": "",
+    "lockAngle": "SHIFT tuşuna basılı tutarak açıyı koruyabilirsiniz",
     "resize": "Yeniden boyutlandırırken SHIFT'e basılı tutarak oranları kısıtlayabilirsiniz, merkezden yeniden boyutlandırmak için ALT'a basılı tutun",
     "rotate": "Döndürürken SHIFT tuşuna basılı tutarak açıları koruyabilirsiniz",
     "lineEditor_info": "Noktaları düzenlemek için çift-tıklayın veya Enter'a basın",
