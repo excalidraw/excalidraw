@@ -361,3 +361,11 @@ export const nFormatter = (num: number, digits: number): string => {
     (num / si[index].value).toFixed(digits).replace(rx, "$1") + si[index].symbol
   );
 };
+
+export const getVersion = () => {
+  const version = document.querySelector('meta[name="version"]');
+  if (version) {
+    return (version as any).content;
+  }
+  return "{version}";
+};
