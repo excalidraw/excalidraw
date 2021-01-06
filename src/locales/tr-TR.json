@@ -182,7 +182,7 @@
     "clearCanvasCaveat": " Bu, yaptığınız değişiklikleri sıfırlayacak ",
     "trackedToSentry_pre": "Tanımlayıcı ile ilgili hata ",
     "trackedToSentry_post": " sistemimize yakalandı.",
-    "openIssueMessage_pre": "",
+    "openIssueMessage_pre": "Sahne bilginizi hata mesajına yansıtmamak için oldukça dikkatli davrandık. Eğer sahneniz gizli değilse hatayı lütfen şuradan takip edin ",
     "openIssueMessage_button": "hata takibi.",
     "openIssueMessage_post": " Lütfen aşağıya GitHub sorununa kopyalayarak ve yapıştırarak bilgi ekleyin.",
     "sceneContent": "Sahne içeriği:"
