@@ -229,7 +229,7 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
   const { collab } = props;
 
   useEffect(() => {
-    trackEvent("version", getVersion());
+    trackEvent("load", "version", getVersion());
     excalidrawRef.current!.readyPromise.then((excalidrawApi) => {
       initializeScene({
         resetScene: excalidrawApi.resetScene,
