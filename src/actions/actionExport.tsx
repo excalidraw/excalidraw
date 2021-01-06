@@ -9,7 +9,6 @@ import { loadFromJSON, saveAsJSON } from "../data";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
 import { KEYS } from "../keys";
-import { muteFSAbortError } from "../utils";
 import { register } from "./register";
 
 export const actionChangeProjectName = register({
