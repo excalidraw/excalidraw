@@ -22,7 +22,7 @@
     "strokeWidth": "Grosor del trazo",
     "strokeStyle": "Estilo del trazo",
     "strokeStyle_solid": "Sólido",
-    "strokeStyle_dashed": "Linea discontinua",
+    "strokeStyle_dashed": "Discontinua",
     "strokeStyle_dotted": "Punteado",
     "sloppiness": "Estilo de trazo",
     "opacity": "Opacidad",
@@ -164,7 +164,7 @@
     "linearElementMulti": "Haga clic en el último punto o pulse Escape o Enter para finalizar",
     "lockAngle": "Puedes restringir el ángulo manteniendo presionado el botón SHIFT",
     "resize": "Para mantener las proporciones mantén SHIFT presionado mientras modificas el tamaño, \nmantén presionado ALT para modificar el tamaño desde el centro",
-    "rotate": "Puede restringir los ángulos manteniendo presionado SHIFT mientras gira",
+    "rotate": "Puedes restringir los ángulos manteniendo presionado SHIFT mientras giras",
     "lineEditor_info": "Doble clic o pulse Enter para editar puntos",
     "lineEditor_pointSelected": "Presione Suprimir para eliminar el punto, CtrlOrCmd+D para duplicarlo, o arrástrelo para moverlo",
     "lineEditor_nothingSelected": "Seleccione un punto para mover o eliminar, o mantenga pulsado Alt y haga clic para añadir nuevos puntos"
@@ -216,7 +216,7 @@
     "textFinish": "Finalizar edición (texto)",
     "zoomToFit": "Ajustar la vista para mostrar todos los elementos",
     "zoomToSelection": "Acercarse a la selección",
-    "preventBinding": "Evitar enlace de flecha"
+    "preventBinding": "Evitar yuxtaposición de flechas"
   },
   "encrypted": {
     "tooltip": "Tus dibujos están cifrados de punto a punto, por lo que los servidores de Excalidraw nunca los verán."
