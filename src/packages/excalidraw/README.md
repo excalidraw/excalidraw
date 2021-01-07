@@ -142,6 +142,51 @@ export default function App() {
 | [`langCode`](#langCode)                       | string                                                                                                                                                                                                                                                                                                           | `en`                 | Language code string                                                                                                                                       |
 | [`renderFooter `](#renderFooter)              | Function                                                                                                                                                                                                                                                                                                         |                      | Function that renders custom UI footer                                                                                                                     |
 
+### `Extra API's`
+
+#### `getSceneVersion`
+
+**How to use**
+
+<pre>
+import { getSceneVersion } from "./index";
+getSceneVersion(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement []</a>)
+</pre>
+
+This function returns the current scene version.
+
+#### `getSyncableElements`
+
+**_Signature_**
+
+<pre>
+getSyncableElements(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement []</a>):<a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement []</a>
+</pre>
+
+**_How to use_**
+
+```js
+import { getSyncableElements } from "./index";
+```
+
+This function returns all the deleted elements of the scene.
+
+### `getElementMap`
+
+**_Signature_**
+
+<pre>
+getElementsMap(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement []</a>): {[id: string]: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement</a>}
+</pre>
+
+**_ How to use _**
+
+```js
+import { getElementsMap } from "./index";
+```
+
+This function returns an object where each element is mapped to its id.
+
 #### `width`
 
 This props defines the `width` of the Excalidraw component. Defaults to `window.innerWidth` if not passed.
