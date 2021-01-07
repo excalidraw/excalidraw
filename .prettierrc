@@ -1,3 +1,4 @@
 {
+  "proseWrap": "never",
   "trailingComma": "all"
 }

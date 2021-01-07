@@ -16,6 +16,7 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
+- Add `cmd+o` shortcut to load scene [#2732](https://github.com/excalidraw/excalidraw/pull/2732)
 - Remove language picker, and add `langCode`, `renderFooter` [#2644](https://github.com/excalidraw/excalidraw/pull/2644):
   - BREAKING: removed the language picker from UI. It is now the host app's responsibility to implement a language picker if desirable, using the newly added [`renderFooter`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#renderFooter) prop. The reasoning is that the i18n should be controlled by the app itself, not by the nested Excalidraw component.
   - Added [`langCode`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#langCode) prop to control the UI language.
@@ -43,6 +44,7 @@ Please add the latest change on the top under the correct section.
 
 ### Improvements
 
+- Added Zen Mode to the context menu [#2734](https://github.com/excalidraw/excalidraw/pull/2734)
 - Do not reset to selection when using the draw tool [#2721](https://github.com/excalidraw/excalidraw/pull/2721)
 - Display proper tooltip for 2-point lines during resize, and normalize modifier key labels in hints [#2655](https://github.com/excalidraw/excalidraw/pull/2655)
 - Improve error message around importing images [#2619](https://github.com/excalidraw/excalidraw/pull/2619)

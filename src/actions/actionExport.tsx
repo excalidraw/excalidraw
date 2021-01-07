@@ -9,7 +9,6 @@ import { loadFromJSON, saveAsJSON } from "../data";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
 import { KEYS } from "../keys";
-import { muteFSAbortError } from "../utils";
 import { register } from "./register";
 
 export const actionChangeProjectName = register({
@@ -156,18 +155,29 @@ export const actionSaveAsScene = register({
 
 export const actionLoadScene = register({
   name: "loadScene",
-  perform: (
-    elements,
-    appState,
-    { elements: loadedElements, appState: loadedAppState, error },
-  ) => ({
-    elements: loadedElements,
-    appState: {
-      ...loadedAppState,
-      errorMessage: error,
-    },
-    commitToHistory: true,
-  }),
+  perform: async (elements, appState) => {
+    try {
+      const {
+        elements: loadedElements,
+        appState: loadedAppState,
+      } = await loadFromJSON(appState);
+      return {
+        elements: loadedElements,
+        appState: loadedAppState,
+        commitToHistory: true,
+      };
+    } catch (error) {
+      if (error?.name === "AbortError") {
+        return false;
+      }
+      return {
+        elements,
+        appState: { ...appState, errorMessage: error.message },
+        commitToHistory: false,
+      };
+    }
+  },
+  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.O,
   PanelComponent: ({ updateData, appState }) => (
     <ToolButton
       type="button"
@@ -175,16 +185,7 @@ export const actionLoadScene = register({
       title={t("buttons.load")}
       aria-label={t("buttons.load")}
       showAriaLabel={useIsMobile()}
-      onClick={() => {
-        loadFromJSON(appState)
-          .then(({ elements, appState }) => {
-            updateData({ elements, appState });
-          })
-          .catch(muteFSAbortError)
-          .catch((error) => {
-            updateData({ error: error.message });
-          });
-      }}
+      onClick={updateData}
     />
   ),
 });
