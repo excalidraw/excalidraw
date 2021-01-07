@@ -9,6 +9,8 @@ export interface Language {
   rtl?: boolean;
 }
 
+export const defaultLang = { code: "en", label: "English" };
+
 const allLanguages: Language[] = [
   { code: "ar-SA", label: "العربية", rtl: true },
   { code: "bg-BG", label: "Български" },
@@ -42,14 +44,10 @@ const allLanguages: Language[] = [
   { code: "uk-UA", label: "Українська" },
   { code: "zh-CN", label: "简体中文" },
   { code: "zh-TW", label: "繁體中文" },
-];
+].concat([defaultLang]);
 
-export const defaultLang = { code: "en", label: "English" };
-
-export const languages: Language[] = [defaultLang]
-  .concat(
-    allLanguages.sort((left, right) => (left.label > right.label ? 1 : -1)),
-  )
+export const languages: Language[] = allLanguages
+  .sort((left, right) => (left.label > right.label ? 1 : -1))
   .filter(
     (lang) =>
       (percentages as Record<string, number>)[lang.code] >=

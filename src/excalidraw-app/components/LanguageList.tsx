@@ -22,6 +22,10 @@ export const LanguageList = ({
       value={currentLangCode}
       aria-label={i18n.t("buttons.selectLanguage")}
     >
+      <option key={i18n.defaultLang.code} value={i18n.defaultLang.code}>
+        {i18n.defaultLang.label}
+      </option>
+      <option disabled>{"──────────"}</option>
       {languages.map((lang) => (
         <option key={lang.code} value={lang.code}>
           {lang.label}
