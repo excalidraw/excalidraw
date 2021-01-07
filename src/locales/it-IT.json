@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Incolla",
+    "pasteCharts": "Incolla grafici",
     "selectAll": "Seleziona tutto",
     "multiSelect": "Aggiungi elemento alla selezione",
     "moveCanvas": "Sposta tela",
@@ -77,8 +78,8 @@
     "ungroup": "Dividi gruppo da selezione",
     "collaborators": "Collaboratori",
     "gridMode": "Modalità griglia",
-    "addToLibrary": "Aggiungi alla biblioteca",
-    "removeFromLibrary": "Rimuovi dalla biblioteca",
+    "addToLibrary": "Aggiungi alla libreria",
+    "removeFromLibrary": "Rimuovi dalla libreria",
     "libraryLoadingMessage": "Caricamento della biblioteca...",
     "libraries": "Sfoglia librerie",
     "loadingScene": "Caricamento della scena...",
@@ -135,7 +136,7 @@
     "uploadedSecurly": "L'upload è stato protetto con la crittografia end-to-end, il che significa che il server Excalidraw e terze parti non possono leggere il contenuto.",
     "loadSceneOverridePrompt": "Se carichi questo disegno esterno, sostituirà quello che hai. Vuoi continuare?",
     "errorLoadingLibrary": "Si è verificato un errore nel caricamento della libreria di terze parti.",
-    "confirmAddLibrary": "Questo aggiungerà {{numShapes}} forma(e) alla tua biblioteca. Sei sicuro?",
+    "confirmAddLibrary": "Questo aggiungerà {{numShapes}} forma(e) alla tua libreria. Sei sicuro?",
     "imageDoesNotContainScene": "L'importazione di immagini al momento non è supportata.\n\nVuoi importare una scena? Questa immagine non sembra contenere alcun dato di scena. Hai abilitato questa opzione durante l'esportazione?",
     "cannotRestoreFromImage": "Impossibile ripristinare la scena da questo file immagine"
   },
@@ -148,7 +149,7 @@
     "arrow": "Freccia",
     "line": "Linea",
     "text": "Testo",
-    "library": "Biblioteca",
+    "library": "Libreria",
     "lock": "Mantieni lo strumento selezionato attivo dopo aver disegnato"
   },
   "headings": {

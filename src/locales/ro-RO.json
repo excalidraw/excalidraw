@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Lipire",
+    "pasteCharts": "Lipire diagrame",
     "selectAll": "Selectare totală",
     "multiSelect": "Adaugă element la selecție",
     "moveCanvas": "Mutare pânză",

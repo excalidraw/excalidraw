@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "चिपकाएँ",
+    "pasteCharts": "चार्ट चिपकाएँ",
     "selectAll": "सभी चुनें",
     "multiSelect": "आकार को चयन में जोड़ें",
     "moveCanvas": "कैनवास को स्थानांतरित करें",
@@ -38,8 +39,8 @@
     "fontFamily": "फ़ॉन्ट का परिवार",
     "onlySelected": "केवल चयनित",
     "withBackground": "बैकग्राउंड के साथ",
-    "exportEmbedScene": "",
-    "exportEmbedScene_details": "",
+    "exportEmbedScene": "निर्यात एम्बेड दृश्य",
+    "exportEmbedScene_details": "निर्यात एम्बेड दृश्य विवरण",
     "addWatermark": "ऐड \"मेड विथ एक्सकैलिडराव\"",
     "handDrawn": "हाथ से बनाया हुआ",
     "normal": "साधारण",
@@ -60,7 +61,7 @@
     "architect": "वास्तुकार",
     "artist": "कलाकार",
     "cartoonist": "व्यंग्य चित्रकार",
-    "fileTitle": "",
+    "fileTitle": "फ़ाइल का शीर्षक",
     "colorPicker": "रंग चयन",
     "canvasBackground": "कैनवास बैकग्राउंड",
     "drawingCanvas": "कैनवास बना रहे हैं",
@@ -76,21 +77,21 @@
     "group": "समूह चयन",
     "ungroup": "समूह चयन असमूहीकृत करें",
     "collaborators": "सहयोगी",
-    "gridMode": "",
+    "gridMode": "ग्रिड मॉड",
     "addToLibrary": "लाइब्रेरी से जोड़ें",
     "removeFromLibrary": "लाइब्रेरी से निकालें",
     "libraryLoadingMessage": "लाइब्रेरी खुल रही है",
-    "libraries": "",
+    "libraries": "लाइब्रेरी ब्राउज़ करें",
     "loadingScene": "दृश्य खुल रहा है",
-    "align": "",
-    "alignTop": "",
-    "alignBottom": "",
-    "alignLeft": "",
-    "alignRight": "",
-    "centerVertically": "",
-    "centerHorizontally": "",
-    "distributeHorizontally": "",
-    "distributeVertically": ""
+    "align": "संरेखित करें",
+    "alignTop": "ऊपर संरेखित करें",
+    "alignBottom": "नीचे संरेखित करें",
+    "alignLeft": "बायें संरेखित करें",
+    "alignRight": "दायें संरेखित करें",
+    "centerVertically": "लंबवत केन्द्रित",
+    "centerHorizontally": "क्षैतिज केन्द्रित",
+    "distributeHorizontally": "क्षैतिज रूप से वितरित करें",
+    "distributeVertically": "खड़ी रूप से वितरित करें"
   },
   "buttons": {
     "clearReset": "कैनवास रीसेट करें",
@@ -99,7 +100,7 @@
     "exportToSvg": "Svg के रूप में निर्यात करे",
     "copyToClipboard": "क्लिपबोर्ड पर प्रतिलिपि बनाएँ",
     "copyPngToClipboard": "क्लिपबोर्ड पर कॉपी करें,पीएनजी के रूप में",
-    "scale": "",
+    "scale": "पैमाना",
     "save": "सहेजें",
     "saveAs": "सेव करे इस तरह",
     "load": "लोड करें",
@@ -117,16 +118,16 @@
     "redo": "फिर से करें",
     "roomDialog": "लाइव सहयोग शुरू करें",
     "createNewRoom": "एक नया कमरा बनाएं",
-    "fullScreen": "",
-    "darkMode": "",
-    "lightMode": "",
-    "zenMode": "",
+    "fullScreen": "पूरी स्क्रीन",
+    "darkMode": "डार्क मोड",
+    "lightMode": "लाइट मोड",
+    "zenMode": "ज़ेन मोड",
     "exitZenMode": "जेन मोड से बाहर निकलें"
   },
   "alerts": {
     "clearReset": "इससे पूरा कैनवास साफ हो जाएगा। क्या आपको यकीन है?",
     "couldNotCreateShareableLink": "साझा करने योग्य लिंक नहीं बनाया जा सका।",
-    "couldNotCreateShareableLinkTooBig": "",
+    "couldNotCreateShareableLinkTooBig": "लिंक शेयर नहीं कर सकता: दृश्य बहुत बड़ा",
     "couldNotLoadInvalidFile": "अमान्य फ़ाइल लोड नहीं की जा सकी",
     "importBackendFailed": "बैकएंड से आयात करना विफल रहा।",
     "cannotExportEmptyCanvas": "खाली कैनवास निर्यात नहीं कर सकता।",
@@ -134,10 +135,10 @@
     "decryptFailed": "डेटा को डिक्रिप्ट नहीं किया जा सका।",
     "uploadedSecurly": "अपलोड को एंड-टू-एंड एन्क्रिप्शन के साथ सुरक्षित किया गया है, जिसका मतलब है कि एक्सक्लूसिव सर्वर और थर्ड पार्टी कंटेंट नहीं पढ़ सकते हैं।",
     "loadSceneOverridePrompt": "लोड हो रहा है बाहरी ड्राइंग आपके मौजूदा सामग्री को बदल देगा। क्या आप जारी रखना चाहते हैं?",
-    "errorLoadingLibrary": "",
-    "confirmAddLibrary": "",
-    "imageDoesNotContainScene": "",
-    "cannotRestoreFromImage": ""
+    "errorLoadingLibrary": "लाइब्रेरी लोड करने में त्रुटि",
+    "confirmAddLibrary": "लाइब्रेरी जोड़ें पुष्‍टि करें आकार संख्या",
+    "imageDoesNotContainScene": "दृश्य में छवि नहीं है",
+    "cannotRestoreFromImage": "छवि फ़ाइल बहाल दृश्य नहीं है"
   },
   "toolBar": {
     "selection": "चयन",
@@ -148,7 +149,7 @@
     "arrow": "तीर",
     "line": "रेखा",
     "text": "पाठ",
-    "library": "",
+    "library": "लाइब्रेरी",
     "lock": "ड्राइंग के बाद चयनित टूल को सक्रिय रखें"
   },
   "headings": {
@@ -159,9 +160,9 @@
   "hints": {
     "linearElement": "कई बिंदुओं को शुरू करने के लिए क्लिक करें, सिंगल लाइन के लिए खींचें",
     "freeDraw": "क्लिक करें और खींचें। समाप्त करने के लिए, छोड़ो",
-    "text": "",
+    "text": "आप चयन टूल से कहीं भी डबल-क्लिक करके टेक्स्ट जोड़ सकते हैं",
     "linearElementMulti": "अंतिम बिंदु पर क्लिक करें या समाप्त होने के लिए एस्केप या एंटर दबाएं",
-    "lockAngle": "",
+    "lockAngle": "आप घूर्णन करते समय SHIFT पकड़कर कोणों को मोड़ सकते हैं",
     "resize": "आकार बदलते समय आप SHIFT को पकड़ कर अनुपात में कमी कर सकते हैं,\nकेंद्र से आकार बदलने के लिए ALT दबाए रखें",
     "rotate": "आप घूर्णन करते समय SHIFT पकड़कर कोणों को विवश कर सकते हैं",
     "lineEditor_info": "बिंदुओं को संपादित करने के लिए Enter पर डबल-क्लिक करें या दबाएँ",
@@ -169,9 +170,9 @@
     "lineEditor_nothingSelected": "स्थानांतरित करने या हटाने के लिए एक बिंदु का चयन करें, या Alt दबाए रखें और नए बिंदुओं को जोड़ने के लिए क्लिक करें"
   },
   "canvasError": {
-    "cannotShowPreview": "",
-    "canvasTooBig": "",
-    "canvasTooBigTip": ""
+    "cannotShowPreview": "पूर्वावलोकन नहीं दिखा सकते हैं",
+    "canvasTooBig": "कैनवास बहुत बड़ा",
+    "canvasTooBigTip": "कैनवास बहुत बड़ा टिप"
   },
   "errorSplash": {
     "headingMain_pre": "एक त्रुटि का सामना करना पड़ा। प्रयत्न ",
@@ -214,21 +215,21 @@
     "textNewLine": "नई पंक्ति (पाठ) जोड़ें",
     "textFinish": "संपादन समाप्त करें (पाठ)",
     "zoomToFit": "सभी तत्वों को फिट करने के लिए ज़ूम करें",
-    "zoomToSelection": "",
-    "preventBinding": ""
+    "zoomToSelection": "सिलेक्शन तक ज़ूम करे",
+    "preventBinding": "तीर बंधन रोकें"
   },
   "encrypted": {
     "tooltip": "आपके चित्र अंत-से-अंत एन्क्रिप्टेड हैं, इसलिए एक्सक्लूसिव्रॉव के सर्वर उन्हें कभी नहीं देखेंगे।"
   },
   "stats": {
     "angle": "कोण",
-    "element": "",
-    "elements": "",
+    "element": "एलिमेंट",
+    "elements": "एलिमेंट",
     "height": "ऊंचाई",
     "scene": "दृश्य",
     "selected": "चयनित",
     "storage": "संग्रह",
-    "title": "",
+    "title": "बेवकूफ के लिए आँकड़े",
     "total": "कुल",
     "width": "चौड़ाई"
   }

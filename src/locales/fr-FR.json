@@ -1,9 +1,10 @@
 {
   "labels": {
     "paste": "Coller",
+    "pasteCharts": "Coller les graphiques",
     "selectAll": "Tout sélectionner",
     "multiSelect": "Ajouter l'élément à la sélection",
-    "moveCanvas": "Déplacer le canvas",
+    "moveCanvas": "Déplacer le canevas",
     "cut": "Couper",
     "copy": "Copier",
     "copyAsPng": "Copier dans le presse-papier en PNG",
@@ -40,7 +41,7 @@
     "withBackground": "Avec arrière-plan",
     "exportEmbedScene": "Intégrer la scène au fichier exporté",
     "exportEmbedScene_details": "Les données de scène seront enregistrées dans le fichier PNG/SVG exporté, afin que la scène puisse être restaurée à partir de celui-ci.\nCela augmentera la taille du fichier exporté.",
-    "addWatermark": "Ajouter \"Fabriqué avec Excalidraw\"",
+    "addWatermark": "Ajouter \"Fait avec Excalidraw\"",
     "handDrawn": "Manuscrite",
     "normal": "Normale",
     "code": "Code",
@@ -62,7 +63,7 @@
     "cartoonist": "Caricaturiste",
     "fileTitle": "Titre du fichier",
     "colorPicker": "Sélecteur de couleur",
-    "canvasBackground": "Fond du canevas",
+    "canvasBackground": "Arrière-plan du canevas",
     "drawingCanvas": "Canvas de dessin",
     "layers": "Calques",
     "actions": "Actions",
@@ -72,7 +73,7 @@
     "untitled": "Sans-titre",
     "name": "Nom",
     "yourName": "Votre nom",
-    "madeWithExcalidraw": "Fabriqué avec Excalidraw",
+    "madeWithExcalidraw": "Fait avec Excalidraw",
     "group": "Grouper la sélection",
     "ungroup": "Dégrouper la sélection",
     "collaborators": "Collaborateurs",
@@ -93,7 +94,7 @@
     "distributeVertically": "Distribuer verticalement"
   },
   "buttons": {
-    "clearReset": "Effacer le canvas & réinitialiser la couleur d'arrière-plan",
+    "clearReset": "Réinitialiser le canevas",
     "export": "Exporter",
     "exportToPng": "Exporter en PNG",
     "exportToSvg": "Exporter en SVG",
@@ -124,12 +125,12 @@
     "exitZenMode": "Quitter le mode zen"
   },
   "alerts": {
-    "clearReset": "L'intégralité du canvas va être effacé. Êtes-vous sur ?",
+    "clearReset": "L'intégralité du canevas va être effacée. Êtes-vous sûr ?",
     "couldNotCreateShareableLink": "Impossible de créer un lien de partage.",
     "couldNotCreateShareableLinkTooBig": "Impossible de créer un lien partageable : la scène est trop volumineuse",
     "couldNotLoadInvalidFile": "Impossible de charger un fichier invalide",
-    "importBackendFailed": "L'import depuis le backend a échoué.",
-    "cannotExportEmptyCanvas": "Impossible d'exporter un canvas vide.",
+    "importBackendFailed": "L'importation depuis le backend a échoué.",
+    "cannotExportEmptyCanvas": "Impossible d'exporter un canevas vide.",
     "couldNotCopyToClipboard": "Impossible de copier dans le presse-papier. Essayez d'utiliser le navigateur Chrome.",
     "decryptFailed": "Les données n'ont pas pu être déchiffrées.",
     "uploadedSecurly": "Le téléchargement a été sécurisé avec un chiffrement de bout en bout, ce qui signifie que ni Excalidraw ni personne d'autre ne peut en lire le contenu.",
@@ -170,14 +171,14 @@
   },
   "canvasError": {
     "cannotShowPreview": "Impossible d’afficher l’aperçu",
-    "canvasTooBig": "Le dessin est peut-être trop grand.",
+    "canvasTooBig": "Le canevas est peut-être trop grand.",
     "canvasTooBigTip": "Conseil : essayez de rapprocher un peu plus les éléments les plus éloignés."
   },
   "errorSplash": {
     "headingMain_pre": "Une erreur est survenue. Essayez ",
     "headingMain_button": "rechargement de la page.",
     "clearCanvasMessage": "Si le rechargement ne résout pas l'erreur, essayez ",
-    "clearCanvasMessage_button": "effacement du canvas.",
+    "clearCanvasMessage_button": "effacement du canevas.",
     "clearCanvasCaveat": " Cela entraînera une perte du travail ",
     "trackedToSentry_pre": "L'erreur avec l'identifiant ",
     "trackedToSentry_post": " a été enregistrée dans notre système.",
@@ -214,7 +215,7 @@
     "textNewLine": "Ajouter une nouvelle ligne (texte)",
     "textFinish": "Terminer l'édition (texte)",
     "zoomToFit": "Zoomer pour visualiser tous les éléments",
-    "zoomToSelection": "Zoom sur la sélection",
+    "zoomToSelection": "Zoomer sur la sélection",
     "preventBinding": "Empêcher la liaison de la flèche"
   },
   "encrypted": {

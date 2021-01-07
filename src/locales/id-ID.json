@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Tempel",
+    "pasteCharts": "Tempel diagram",
     "selectAll": "Pilih semua",
     "multiSelect": "Tambahkan elemen ke pilihan",
     "moveCanvas": "Pindahkan kanvas",

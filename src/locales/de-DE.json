@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Einfügen",
+    "pasteCharts": "Diagramme einfügen",
     "selectAll": "Alle auswählen",
     "multiSelect": "Element zur Auswahl hinzufügen",
     "moveCanvas": "Leinwand verschieben",

@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "הדבק",
+    "pasteCharts": "הדבק גרפים",
     "selectAll": "בחר הכל",
     "multiSelect": "הוסף אובייקט לבחירה",
     "moveCanvas": "הזז את הקנבס",
@@ -76,7 +77,7 @@
     "group": "אחד לקבוצה",
     "ungroup": "פרק קבוצה",
     "collaborators": "שותפים",
-    "gridMode": "",
+    "gridMode": "מצב רשת",
     "addToLibrary": "הוסף לספריה",
     "removeFromLibrary": "הסר מספריה",
     "libraryLoadingMessage": "טוען ספריה...",
@@ -117,10 +118,10 @@
     "redo": "בצע מחדש",
     "roomDialog": "התחל שיתוף חי",
     "createNewRoom": "צור חדר",
-    "fullScreen": "",
-    "darkMode": "",
-    "lightMode": "",
-    "zenMode": "",
+    "fullScreen": "מסך מלא",
+    "darkMode": "מצב כהה",
+    "lightMode": "מצב בהיר",
+    "zenMode": "מצב זן",
     "exitZenMode": "צא ממצב תפריט מרחף"
   },
   "alerts": {
@@ -136,7 +137,7 @@
     "loadSceneOverridePrompt": "טעינה של ציור חיצוני תחליף את התוכן הקיים שלך. האם תרצה להמשיך?",
     "errorLoadingLibrary": "קרתה שגיאה בטעינת הספריה החיצונית.",
     "confirmAddLibrary": "הפעולה תוסיף {{numShapes}} צורה(ות) לספריה שלך. האם אתה בטוח?",
-    "imageDoesNotContainScene": "",
+    "imageDoesNotContainScene": "אין תמיכה בייבוא תמונות כעת.\n\nהאם אתה רוצה לייבא תצוגה? התמונה הזאת אינה מכילה מידע על תצוגה. האם הפעלת את האפשרות הזאת בזמן הוצאת המידע?",
     "cannotRestoreFromImage": "לא הצלחנו לשחזר את התצוגה מקובץ התמונה"
   },
   "toolBar": {
@@ -161,7 +162,7 @@
     "freeDraw": "לחץ וגרור, שחרר כשסיימת",
     "text": "טיפ: אפשר להוסיף טקסט על ידי לחיצה כפולה בכל מקום עם כלי הבחירה",
     "linearElementMulti": "הקלק על הנקודה האחרונה או הקש Escape או Enter לסיום",
-    "lockAngle": "",
+    "lockAngle": "אתה יכול להגביל זווית ע״י לחיצה על SHIFT",
     "resize": "ניתן להגביל פרופורציות על ידי לחיצה על SHIFT תוך כדי שינוי גודל,\nהחזק ALT בשביל לשנות גודל ביחס למרכז",
     "rotate": "ניתן להגביל זוויות על ידי לחיצה על SHIFT תוך כדי סיבוב",
     "lineEditor_info": "לחץ לחיצה כפולה או אנטר לעריכת הנקודות",
