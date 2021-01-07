@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "ထား",
+    "pasteCharts": "",
     "selectAll": "အကုန်ရွေး",
     "multiSelect": "ရွေးထားသည့်ထဲပုံထည့်",
     "moveCanvas": "ကားချပ်ရွှေ့",
@@ -33,7 +34,7 @@
     "arrowhead_none": "ဘာမျှမရှိ",
     "arrowhead_arrow": "မြှား",
     "arrowhead_bar": "",
-    "arrowhead_dot": "",
+    "arrowhead_dot": "အစက်",
     "fontSize": "စာလုံးအရွယ်",
     "fontFamily": "စာလုံးပုံစံ",
     "onlySelected": "ရွေးထားသလောက်",

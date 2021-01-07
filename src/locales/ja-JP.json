@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "貼り付け",
+    "pasteCharts": "",
     "selectAll": "すべて選択",
     "multiSelect": "複数選択",
     "moveCanvas": "キャンバスを移動",
