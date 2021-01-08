@@ -1,6 +1,6 @@
-import React, { useLayoutEffect, useRef, useEffect } from "react";
-import "./Popover.scss";
+import React, { useEffect, useLayoutEffect, useRef } from "react";
 import { unstable_batchedUpdates } from "react-dom";
+import "./Popover.scss";
 
 type Props = {
   top?: number;
