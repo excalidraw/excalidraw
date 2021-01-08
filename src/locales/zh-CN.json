@@ -39,8 +39,8 @@
     "fontFamily": "字体",
     "onlySelected": "仅被选中",
     "withBackground": "使用背景",
-    "exportEmbedScene": "将场景嵌入到导出的文件",
-    "exportEmbedScene_details": "场景数据将被保存到导出的 PNG/SVG 文件，以便恢复。\n将会增加导出的文件大小。",
+    "exportEmbedScene": "将画布数据嵌入到导出的文件",
+    "exportEmbedScene_details": "画布数据将被保存到导出的 PNG/SVG 文件，以便恢复。\n将会增加导出的文件大小。",
     "addWatermark": "添加 “使用 Excalidraw 创建” 水印",
     "handDrawn": "手写",
     "normal": "正常",
@@ -127,7 +127,7 @@
   "alerts": {
     "clearReset": "这将会清除整个 画板。您是否要继续?",
     "couldNotCreateShareableLink": "无法创建共享链接",
-    "couldNotCreateShareableLinkTooBig": "无法创建可共享链接：场景过大",
+    "couldNotCreateShareableLinkTooBig": "无法创建可共享链接：画布过大",
     "couldNotLoadInvalidFile": "无法加载错误文件",
     "importBackendFailed": "从后端导入失败",
     "cannotExportEmptyCanvas": "无法导出空画布。",
@@ -137,8 +137,8 @@
     "loadSceneOverridePrompt": "加载外部绘图将取代您现有的内容。您想要继续吗？",
     "errorLoadingLibrary": "加载第三方库时出错。",
     "confirmAddLibrary": "这将添加 {{numShapes}} 个形状到您的库。您确定吗？",
-    "imageDoesNotContainScene": "当前不支持导入图片。\n\n您想要导入场景吗？此图像似乎不包含任何场景数据。您是否在导出过程中启用了这个数据？",
-    "cannotRestoreFromImage": "无法从此图像文件恢复场景"
+    "imageDoesNotContainScene": "当前不支持导入图片。\n\n您想要导入画布数据吗？此图像似乎不包含任何画布数据。您是否在导出过程中启用了嵌入画布的选项？",
+    "cannotRestoreFromImage": "无法从此图像文件恢复画布"
   },
   "toolBar": {
     "selection": "选择",
@@ -226,7 +226,7 @@
     "element": "元素",
     "elements": "元素",
     "height": "高度",
-    "scene": "场景",
+    "scene": "画布",
     "selected": "选中",
     "storage": "存储",
     "title": "详细统计信息",
