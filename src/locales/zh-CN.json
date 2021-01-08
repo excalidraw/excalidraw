@@ -182,7 +182,7 @@
     "clearCanvasCaveat": "这会造成当前工作丢失",
     "trackedToSentry_pre": "带有标识符的错误",
     "trackedToSentry_post": "已在我们的系统中跟踪",
-    "openIssueMessage_pre": "我们非常谨慎地不将您的场景信息包含在错误信息中。如果您的场景不是私密的，请考虑跟进我们的",
+    "openIssueMessage_pre": "我们非常谨慎地处理错误信息，您的画布内容不会被包含在错误报告中。如果您的画布内容不需要保持私密，请考虑使用我们的",
     "openIssueMessage_button": "错误追踪器。",
     "openIssueMessage_post": " 请复制并粘贴以下信息到 GitHub Issue 中。",
     "sceneContent": "画布内容:"
