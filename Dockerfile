@@ -5,7 +5,6 @@ WORKDIR /opt/node_app
 COPY package.json package-lock.json ./
 RUN npm i --no-optional
 
-ARG REACT_APP_INCLUDE_GTAG=false
 ARG NODE_ENV=production
 
 COPY . .

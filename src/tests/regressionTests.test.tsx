@@ -4,9 +4,8 @@ import ReactDOM from "react-dom";
 import { copiedStyles } from "../actions/actionStyles";
 import { ShortcutName } from "../actions/shortcuts";
 import { ExcalidrawElement } from "../element/types";
-import { setLanguage } from "../i18n";
 import { CODES, KEYS } from "../keys";
-import Excalidraw from "../packages/excalidraw/index";
+import ExcalidrawApp from "../excalidraw-app";
 import { reseed } from "../random";
 import * as Renderer from "../renderer/renderScene";
 import { setDateTimeForTests } from "../utils";
@@ -19,6 +18,7 @@ import {
   screen,
   waitFor,
 } from "./test-utils";
+import { defaultLang } from "../i18n";
 
 const { h } = window;
 
@@ -75,8 +75,7 @@ beforeEach(async () => {
   finger1.reset();
   finger2.reset();
 
-  await setLanguage("en.json");
-  await render(<Excalidraw offsetLeft={0} offsetTop={0} />);
+  await render(<ExcalidrawApp />);
 });
 
 afterEach(() => {
@@ -151,22 +150,26 @@ describe("regression tests", () => {
     expect(API.getSelectedElement().id).not.toEqual(prevSelectedId);
   });
 
-  for (const [keys, shape] of [
-    [`2${KEYS.R}`, "rectangle"],
-    [`3${KEYS.D}`, "diamond"],
-    [`4${KEYS.E}`, "ellipse"],
-    [`5${KEYS.A}`, "arrow"],
-    [`6${KEYS.L}`, "line"],
-    [`7${KEYS.X}`, "draw"],
-  ] as [string, ExcalidrawElement["type"]][]) {
+  for (const [keys, shape, shouldSelect] of [
+    [`2${KEYS.R}`, "rectangle", true],
+    [`3${KEYS.D}`, "diamond", true],
+    [`4${KEYS.E}`, "ellipse", true],
+    [`5${KEYS.A}`, "arrow", true],
+    [`6${KEYS.L}`, "line", true],
+    [`7${KEYS.X}`, "draw", false],
+  ] as [string, ExcalidrawElement["type"], boolean][]) {
     for (const key of keys) {
       it(`key ${key} selects ${shape} tool`, () => {
         Keyboard.keyPress(key);
 
+        expect(h.state.elementType).toBe(shape);
+
         mouse.down(10, 10);
         mouse.up(10, 10);
 
-        expect(API.getSelectedElement().type).toBe(shape);
+        if (shouldSelect) {
+          expect(API.getSelectedElement().type).toBe(shape);
+        }
       });
     }
   }
@@ -439,7 +442,7 @@ describe("regression tests", () => {
     await waitFor(() => expect(screen.queryByTitle(/thin/i)).toBeNull());
     // reset language
     fireEvent.change(document.querySelector(".dropdown-select__language")!, {
-      target: { value: "en" },
+      target: { value: defaultLang.code },
     });
     // switching back to English
     await waitFor(() => expect(screen.queryByTitle(/thin/i)).not.toBeNull());
@@ -618,6 +621,7 @@ describe("regression tests", () => {
     const expectedShortcutNames: ShortcutName[] = [
       "selectAll",
       "gridMode",
+      "zenMode",
       "stats",
     ];
 

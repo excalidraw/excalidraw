@@ -8,12 +8,7 @@ import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
 import { ActionResult } from "../actions/types";
-import {
-  EVENT_DIALOG,
-  EVENT_LIBRARY,
-  EVENT_SHAPE,
-  trackEvent,
-} from "../analytics";
+import { trackEvent } from "../analytics";
 import { getDefaultAppState } from "../appState";
 import {
   copyToClipboard,
@@ -111,7 +106,7 @@ import {
   selectGroupsForSelectedElements,
 } from "../groups";
 import { createHistory, SceneHistory } from "../history";
-import { getLanguage, t } from "../i18n";
+import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
 import {
   CODES,
   getResizeCenterPointKey,
@@ -332,7 +327,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       offsetLeft,
     } = this.state;
 
-    const { onCollabButtonClick, onExportToBackend } = this.props;
+    const { onCollabButtonClick, onExportToBackend, renderFooter } = this.props;
     const canvasScale = window.devicePixelRatio;
 
     const canvasWidth = canvasDOMWidth * canvasScale;
@@ -369,9 +364,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           }
           zenModeEnabled={zenModeEnabled}
           toggleZenMode={this.toggleZenMode}
-          lng={getLanguage().lng}
+          langCode={getLanguage().code}
           isCollaborating={this.props.isCollaborating || false}
           onExportToBackend={onExportToBackend}
+          renderCustomFooter={renderFooter}
         />
         {this.state.showStats && (
           <Stats
@@ -503,7 +499,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         )
       ) {
         await Library.importLibrary(blob);
-        trackEvent(EVENT_LIBRARY, "import");
         this.setState({
           isLibraryOpen: true,
         });
@@ -738,6 +733,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   }
 
   componentDidUpdate(prevProps: ExcalidrawProps, prevState: AppState) {
+    if (prevProps.langCode !== this.props.langCode) {
+      this.updateLanguage();
+    }
+
     if (
       prevProps.width !== this.props.width ||
       prevProps.height !== this.props.height ||
@@ -1129,7 +1128,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   toggleLock = () => {
     this.setState((prevState) => {
-      trackEvent(EVENT_SHAPE, "lock", !prevState.elementLocked ? "on" : "off");
       return {
         elementLocked: !prevState.elementLocked,
         elementType: prevState.elementLocked
@@ -1153,7 +1151,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   toggleStats = () => {
     if (!this.state.showStats) {
-      trackEvent(EVENT_DIALOG, "stats");
+      trackEvent("dialog", "stats");
     }
     this.setState({
       showStats: !this.state.showStats,
@@ -1265,9 +1263,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     if (event.code === CODES.NINE) {
-      if (!this.state.isLibraryOpen) {
-        trackEvent(EVENT_DIALOG, "library");
-      }
       this.setState({ isLibraryOpen: !this.state.isLibraryOpen });
     }
 
@@ -1352,7 +1347,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     ) {
       const shape = findShapeByKey(event.key);
       if (shape) {
-        trackEvent(EVENT_SHAPE, shape, "shortcut");
         this.selectShapeTool(shape);
       } else if (event.key === KEYS.Q) {
         this.toggleLock();
@@ -1736,7 +1730,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     resetCursor();
 
     if (!event[KEYS.CTRL_OR_CMD]) {
-      trackEvent(EVENT_SHAPE, "text", "double-click");
       this.startTextEditing({
         sceneX,
         sceneY,
@@ -3136,7 +3129,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             );
           }
           this.setState({ suggestedBindings: [], startBoundElement: null });
-          if (!elementLocked) {
+          if (!elementLocked && elementType !== "draw") {
             resetCursor();
             this.setState((prevState) => ({
               draggingElement: null,
@@ -3283,7 +3276,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         return;
       }
 
-      if (!elementLocked && draggingElement) {
+      if (!elementLocked && elementType !== "draw" && draggingElement) {
         this.setState((prevState) => ({
           selectedElementIds: {
             ...prevState.selectedElementIds,
@@ -3307,7 +3300,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         );
       }
 
-      if (!elementLocked) {
+      if (!elementLocked && elementType !== "draw") {
         resetCursor();
         this.setState({
           draggingElement: null,
@@ -3646,6 +3639,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             action: this.toggleGridMode,
           },
           {
+            checked: this.state.zenModeEnabled,
+            shortcutName: "zenMode",
+            label: t("buttons.zenMode"),
+            action: this.toggleZenMode,
+          },
+          {
             checked: this.state.showStats,
             shortcutName: "stats",
             label: t("stats.title"),
@@ -3848,6 +3847,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         typeof offsets?.offsetLeft === "number" ? offsets.offsetLeft : 0,
       offsetTop: typeof offsets?.offsetTop === "number" ? offsets.offsetTop : 0,
     };
+  }
+
+  private async updateLanguage() {
+    const currentLang =
+      languages.find((lang) => lang.code === this.props.langCode) ||
+      defaultLang;
+    await setLanguage(currentLang);
+    this.setAppState({});
   }
 }
 

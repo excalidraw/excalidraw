@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Plakken",
+    "pasteCharts": "Plak grafieken",
     "selectAll": "Alles selecteren",
     "multiSelect": "Voeg element toe aan selectie",
     "moveCanvas": "Canvas verplaatsen",

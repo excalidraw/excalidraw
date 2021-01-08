@@ -1,4 +1,4 @@
-import { EVENT_MAGIC, trackEvent } from "./analytics";
+import { trackEvent } from "./analytics";
 import colors from "./colors";
 import { DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE, ENV } from "./constants";
 import { newElement, newLinearElement, newTextElement } from "./element";
@@ -473,7 +473,7 @@ export const renderSpreadsheet = (
   x: number,
   y: number,
 ): ChartElements => {
-  trackEvent(EVENT_MAGIC, "chart", chartType, spreadsheet.values.length);
+  trackEvent("magic", "chart", chartType, spreadsheet.values.length);
   if (chartType === "line") {
     return chartTypeLine(spreadsheet, x, y);
   }
