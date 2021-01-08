@@ -114,7 +114,6 @@ export const encodeSvgMetadata = async ({ text }: { text: string }) => {
   metadata += "<!-- payload-start -->";
   metadata += base64;
   metadata += "<!-- payload-end -->";
-
   return metadata;
 };
 
