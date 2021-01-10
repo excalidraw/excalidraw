@@ -70,6 +70,7 @@ export const DEFAULT_FONT_SIZE = 20;
 export const DEFAULT_FONT_FAMILY: FontFamily = 1;
 export const DEFAULT_TEXT_ALIGN = "left";
 export const DEFAULT_VERTICAL_ALIGN = "top";
+export const DEFAULT_VERSION = "{version}";
 
 export const CANVAS_ONLY_ACTIONS = ["selectAll"];
 
