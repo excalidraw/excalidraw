@@ -58,7 +58,7 @@
     "sass-loader": "10.1.0",
     "terser-webpack-plugin": "5.0.3",
     "ts-loader": "8.0.13",
-    "webpack": "5.11.1",
+    "webpack": "5.12.2",
     "webpack-bundle-analyzer": "4.3.0",
     "webpack-cli": "4.3.1"
   },
