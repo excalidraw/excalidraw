@@ -35,7 +35,7 @@
     "lodash.throttle": "4.1.1",
     "nanoid": "2.1.11",
     "node-sass": "4.14.1",
-    "open-color": "1.7.0",
+    "open-color": "1.8.0",
     "pako": "1.0.11",
     "png-chunk-text": "1.0.0",
     "png-chunks-encode": "1.0.0",
