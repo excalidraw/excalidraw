@@ -367,13 +367,3 @@ export const getVersion = () => {
   const version = document.querySelector('meta[name="version"]');
   return version ? (version as any).content : DEFAULT_VERSION;
 };
-
-export const getLatestVersion = async () => {
-  try {
-    const response = await fetch("/version.json");
-    const version = await response.json();
-    return version.version;
-  } catch {
-    return DEFAULT_VERSION;
-  }
-};
