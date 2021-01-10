@@ -17,11 +17,38 @@ const versionDate = (date) => {
   return `${date_}-${time}`;
 };
 
-const now = new Date();
+const commitHash = () => {
+  try {
+    return require("child_process")
+      .execSync("git rev-parse --short HEAD")
+      .toString()
+      .trim();
+  } catch {
+    return "none";
+  }
+};
+
+const commitDate = (hash) => {
+  try {
+    const unix = require("child_process")
+      .execSync(`git show -s --format=%ct ${hash}`)
+      .toString()
+      .trim();
+    const date = new Date(parseInt(unix) * 1000);
+    return versionDate(date);
+  } catch {
+    return versionDate(new Date());
+  }
+};
+
+const getFullVersion = () => {
+  const hash = commitHash();
+  return `${commitDate(hash)}-${hash}`;
+};
 
 const data = JSON.stringify(
   {
-    version: versionDate(now),
+    version: getFullVersion(),
   },
   undefined,
   2,
@@ -34,7 +61,7 @@ fs.readFile(indexFile, "utf8", (error, data) => {
   if (error) {
     return console.error(error);
   }
-  const result = data.replace(/{version}/g, versionDate(now));
+  const result = data.replace(/{version}/g, getFullVersion());
 
   fs.writeFile(indexFile, result, "utf8", (error) => {
     if (error) {
