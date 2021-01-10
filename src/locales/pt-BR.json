@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Colar",
+    "pasteCharts": "Colar gráficos",
     "selectAll": "Selecionar tudo",
     "multiSelect": "Adicionar elemento à seleção",
     "moveCanvas": "Mover tela",

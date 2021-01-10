@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Liitä",
+    "pasteCharts": "Liitä kaaviot",
     "selectAll": "Valitse kaikki",
     "multiSelect": "Lisää kohde valintaan",
     "moveCanvas": "Siirrä piirtoaluetta",

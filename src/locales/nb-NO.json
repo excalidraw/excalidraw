@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Lim inn",
+    "pasteCharts": "Lim inn diagrammer",
     "selectAll": "Velg alt",
     "multiSelect": "Legg til element i utvalg",
     "moveCanvas": "Flytt lerretet",

@@ -9,10 +9,12 @@ export interface Language {
   rtl?: boolean;
 }
 
+export const defaultLang = { code: "en", label: "English" };
+
 const allLanguages: Language[] = [
   { code: "ar-SA", label: "العربية", rtl: true },
   { code: "bg-BG", label: "Български" },
-  { code: "ca-ES", label: "Catalan" },
+  { code: "ca-ES", label: "Català" },
   { code: "de-DE", label: "Deutsch" },
   { code: "el-GR", label: "Ελληνικά" },
   { code: "es-ES", label: "Español" },
@@ -30,6 +32,7 @@ const allLanguages: Language[] = [
   { code: "nb-NO", label: "Norsk bokmål" },
   { code: "nl-NL", label: "Nederlands" },
   { code: "nn-NO", label: "Norsk nynorsk" },
+  { code: "pa-IN", label: "ਪੰਜਾਬੀ" },
   { code: "pl-PL", label: "Polski" },
   { code: "pt-BR", label: "Português Brasileiro" },
   { code: "pt-PT", label: "Português" },
@@ -41,14 +44,10 @@ const allLanguages: Language[] = [
   { code: "uk-UA", label: "Українська" },
   { code: "zh-CN", label: "简体中文" },
   { code: "zh-TW", label: "繁體中文" },
-];
+].concat([defaultLang]);
 
-export const defaultLang = { code: "en", label: "English" };
-
-export const languages: Language[] = [defaultLang]
-  .concat(
-    allLanguages.sort((left, right) => (left.label > right.label ? 1 : -1)),
-  )
+export const languages: Language[] = allLanguages
+  .sort((left, right) => (left.label > right.label ? 1 : -1))
   .filter(
     (lang) =>
       (percentages as Record<string, number>)[lang.code] >=
