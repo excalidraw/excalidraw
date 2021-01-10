@@ -23,7 +23,7 @@
     "@sentry/integrations": "5.29.2",
     "@testing-library/jest-dom": "5.11.8",
     "@testing-library/react": "11.2.2",
-    "@types/jest": "26.0.19",
+    "@types/jest": "26.0.20",
     "@types/nanoid": "2.1.0",
     "@types/react": "17.0.0",
     "@types/react-dom": "17.0.0",
