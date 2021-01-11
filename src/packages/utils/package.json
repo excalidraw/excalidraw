@@ -45,7 +45,7 @@
     "babel-plugin-transform-class-properties": "6.24.1",
     "cross-env": "7.0.3",
     "file-loader": "6.2.0",
-    "ts-loader": "8.0.13",
+    "ts-loader": "8.0.14",
     "webpack": "5.11.1",
     "webpack-bundle-analyzer": "4.3.0",
     "webpack-cli": "4.3.1"
