@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Liitä",
+    "pasteCharts": "Liitä kaaviot",
     "selectAll": "Valitse kaikki",
     "multiSelect": "Lisää kohde valintaan",
     "moveCanvas": "Siirrä piirtoaluetta",
@@ -76,8 +77,7 @@
     "group": "Ryhmitä valinta",
     "ungroup": "Pura valittu ryhmä",
     "collaborators": "Yhteistyökumppanit",
-    "toggleGridMode": "Ruudukko päälle/pois",
-    "toggleStats": "Nörttien tilastot päälle/pois",
+    "gridMode": "Ruudukkotila",
     "addToLibrary": "Lisää kirjastoon",
     "removeFromLibrary": "Poista kirjastosta",
     "libraryLoadingMessage": "Ladataan kirjastoa...",
@@ -118,9 +118,10 @@
     "redo": "Tee uudelleen",
     "roomDialog": "Aloita live-yhteistyö",
     "createNewRoom": "Luo huone",
-    "toggleFullScreen": "Koko näytön tila päälle/pois",
-    "toggleDarkMode": "Pimeä tila päälle/pois",
-    "toggleZenMode": "Zen-tila päälle",
+    "fullScreen": "Koko näyttö",
+    "darkMode": "Tumma tila",
+    "lightMode": "Vaalea tila",
+    "zenMode": "Zen-tila",
     "exitZenMode": "Poistu zen-tilasta"
   },
   "alerts": {
@@ -136,7 +137,7 @@
     "loadSceneOverridePrompt": "Ulkopuolisen piirroksen lataaminen korvaa nykyisen sisältösi. Haluatko jatkaa?",
     "errorLoadingLibrary": "Kolmannen osapuolen kirjastoa ladattaessa tapahtui virhe.",
     "confirmAddLibrary": "Tämä lisää {{numShapes}} muotoa kirjastoosi. Oletko varma?",
-    "imageDoesNotContainScene": "Kuvatiedosto ei sisällä teostietoja. Valitsitko sisällyttää ne tallennusvaiheessa?",
+    "imageDoesNotContainScene": "Kuvien lisääminen ei ole tällä hetkellä mahdollista.\n\nHaluatko tuoda piirroksen? Tämä kuva ei näytä sisältävän tarvittavia tietoja. Oletko ottanut piirrostietojen tallennuksen käyttöön viennin aikana?",
     "cannotRestoreFromImage": "Teosta ei voitu palauttaa tästä kuvatiedostosta"
   },
   "toolBar": {
@@ -161,6 +162,7 @@
     "freeDraw": "Paina ja raahaa, päästä irti kun olet valmis",
     "text": "Vinkki: voit myös lisätä tekstiä kaksoisnapsauttamalla mihin tahansa valintatyökalulla",
     "linearElementMulti": "Klikkaa viimeistä pistettä, paina Escape tai paina Enter lopettaaksesi",
+    "lockAngle": "Voit rajoittaa kulmaa pitämällä SHIFT pohjassa",
     "resize": "Voit rajoittaa mittasuhteet pitämällä SHIFT pohjassa kun muutat kokoa, pidä ALT pohjassa muuttaaksesi kokoa keskipisteen suhteen",
     "rotate": "Voit rajoittaa kulman pitämällä SHIFT pohjassa pyörittäessäsi",
     "lineEditor_info": "Kaksoisnapauta tai paina Enter muokataksesi pisteitä",

@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Lim inn",
+    "pasteCharts": "Lim inn diagrammer",
     "selectAll": "Velg alt",
     "multiSelect": "Legg til element i utvalg",
     "moveCanvas": "Flytt lerretet",
@@ -37,7 +38,7 @@
     "fontSize": "Skriftstørrelse",
     "fontFamily": "Fontfamilie",
     "onlySelected": "Kun valgte",
-    "withBackground": "Inkluder bakgrunn",
+    "withBackground": "Med bakgrunn",
     "exportEmbedScene": "Bygg inn scenen i den eksporterte filen",
     "exportEmbedScene_details": "Scenedata vil bli lagret i den eksporterte PNG/SVG-filen, slik at scenen kan gjenopprettes fra den.\nDet vil øke den eksporterte filstørrelsen.",
     "addWatermark": "Legg til \"Laget med Excalidraw\"",
@@ -76,8 +77,7 @@
     "group": "Gruppér utvalg",
     "ungroup": "Avgruppér utvalg",
     "collaborators": "Samarbeidspartnere",
-    "toggleGridMode": "Slå av/på rutenett",
-    "toggleStats": "Skru av/på statistikk for nerder",
+    "gridMode": "Rutevisning",
     "addToLibrary": "Legg til i bibliotek",
     "removeFromLibrary": "Fjern fra bibliotek",
     "libraryLoadingMessage": "Laster bibliotek...",
@@ -118,9 +118,10 @@
     "redo": "Gjør om",
     "roomDialog": "Start sanntids-samarbeid",
     "createNewRoom": "Opprett et nytt rom",
-    "toggleFullScreen": "Skru fullskjerm av/på",
-    "toggleDarkMode": "Skru mørk modus av/på",
-    "toggleZenMode": "Slå av/på zen-modus",
+    "fullScreen": "Fullskjerm",
+    "darkMode": "Mørk modus",
+    "lightMode": "Lys modus",
+    "zenMode": "Zen-modus",
     "exitZenMode": "Avslutt zen-modus"
   },
   "alerts": {
@@ -136,7 +137,7 @@
     "loadSceneOverridePrompt": "Å laste inn ekstern tegning vil erstatte det eksisterende innholdet. Ønsker du å fortsette?",
     "errorLoadingLibrary": "Det oppstod en feil under lasting av tredjepartsbiblioteket.",
     "confirmAddLibrary": "Dette vil legge til {{numShapes}} figur(er) i biblioteket ditt. Er du sikker?",
-    "imageDoesNotContainScene": "Bildefilen inneholder ikke scenedata. Har du aktivert dette under eksport?",
+    "imageDoesNotContainScene": "Importering av bilder støttes ikke for øyeblikket.\n\nVil du importere en scene? Dette bildet ser ikke ut til å inneholde noen scene-data. Har du aktivert dette under eksporten?",
     "cannotRestoreFromImage": "Scenen kunne ikke gjenopprettes fra denne bildefilen"
   },
   "toolBar": {
@@ -161,6 +162,7 @@
     "freeDraw": "Klikk og dra, slipp når du er ferdig",
     "text": "Tips: du kan også legge til tekst ved å dobbeltklikke hvor som helst med utvalgsverktøyet",
     "linearElementMulti": "Klikk på siste punkt eller trykk Escape eller Enter for å fullføre",
+    "lockAngle": "Du kan låse vinkelen ved å holde nede SHIFT",
     "resize": "Du kan beholde forholdet ved å trykke SHIFT mens du endrer størrelse,\ntrykk ALT for å endre størrelsen fra midten",
     "rotate": "Du kan låse vinklene ved å holde SHIFT mens du roterer",
     "lineEditor_info": "Dobbeltklikk eller trykk Enter for å redigere punkter",

@@ -1,13 +1,12 @@
-import React, { useCallback, useEffect, useState } from "react";
 import clsx from "clsx";
-import { Modal } from "./Modal";
-import { Island } from "./Island";
+import React, { useCallback, useEffect, useState } from "react";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
-import { back, close } from "./icons";
 import { KEYS } from "../keys";
-
 import "./Dialog.scss";
+import { back, close } from "./icons";
+import { Island } from "./Island";
+import { Modal } from "./Modal";
 
 const useRefState = <T,>() => {
   const [refValue, setRefValue] = useState<T | null>(null);
@@ -20,9 +19,10 @@ const useRefState = <T,>() => {
 export const Dialog = (props: {
   children: React.ReactNode;
   className?: string;
-  maxWidth?: number;
+  small?: boolean;
   onCloseRequest(): void;
   title: React.ReactNode;
+  autofocus?: boolean;
 }) => {
   const [islandNode, setIslandNode] = useRefState<HTMLDivElement>();
 
@@ -33,7 +33,7 @@ export const Dialog = (props: {
 
     const focusableElements = queryFocusableElements(islandNode);
 
-    if (focusableElements.length > 0) {
+    if (focusableElements.length > 0 && props.autofocus !== false) {
       // If there's an element other than close, focus it.
       (focusableElements[1] || focusableElements[0]).focus();
     }
@@ -62,7 +62,7 @@ export const Dialog = (props: {
     islandNode.addEventListener("keydown", handleKeyDown);
 
     return () => islandNode.removeEventListener("keydown", handleKeyDown);
-  }, [islandNode]);
+  }, [islandNode, props.autofocus]);
 
   const queryFocusableElements = (node: HTMLElement) => {
     const focusableElements = node.querySelectorAll<HTMLElement>(
@@ -76,11 +76,11 @@ export const Dialog = (props: {
     <Modal
       className={clsx("Dialog", props.className)}
       labelledBy="dialog-title"
-      maxWidth={props.maxWidth}
+      maxWidth={props.small ? 550 : 800}
       onCloseRequest={props.onCloseRequest}
     >
-      <Island padding={4} ref={setIslandNode}>
-        <h2 id="dialog-title" className="Dialog__title">
+      <Island ref={setIslandNode}>
+        <h3 id="dialog-title" className="Dialog__title">
           <span className="Dialog__titleContent">{props.title}</span>
           <button
             className="Modal__close"
@@ -89,8 +89,8 @@ export const Dialog = (props: {
           >
             {useIsMobile() ? back : close}
           </button>
-        </h2>
-        {props.children}
+        </h3>
+        <div className="Dialog__content">{props.children}</div>
       </Island>
     </Modal>
   );

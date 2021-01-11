@@ -1,180 +1,161 @@
+import { Point, simplify } from "points-on-curve";
 import React from "react";
-
-import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
-import { simplify, Point } from "points-on-curve";
-
-import {
-  newElement,
-  newTextElement,
-  duplicateElement,
-  isInvisiblySmallElement,
-  isTextElement,
-  textWysiwyg,
-  getCommonBounds,
-  getCursorForResizingElement,
-  getPerfectElementSize,
-  getNormalizedDimensions,
-  newLinearElement,
-  transformElements,
-  getElementWithTransformHandleType,
-  getResizeOffsetXY,
-  getResizeArrowDirection,
-  getTransformHandleTypeFromCoords,
-  isNonDeletedElement,
-  updateTextElement,
-  dragSelectedElements,
-  getDragOffsetXY,
-  dragNewElement,
-  hitTest,
-  isHittingElementBoundingBoxWithoutHittingElement,
-  getNonDeletedElements,
-} from "../element";
-import {
-  getElementsWithinSelection,
-  isOverScrollBars,
-  getElementsAtPosition,
-  getElementContainingPosition,
-  getNormalizedZoom,
-  getSelectedElements,
-  isSomeElementSelected,
-  calculateScrollCenter,
-} from "../scene";
-import { loadFromBlob, exportCanvas } from "../data";
-
-import { renderScene } from "../renderer";
-import {
-  AppState,
-  GestureEvent,
-  Gesture,
-  ExcalidrawProps,
-  SceneData,
-} from "../types";
-import {
-  ExcalidrawElement,
-  ExcalidrawTextElement,
-  NonDeleted,
-  ExcalidrawGenericElement,
-  ExcalidrawLinearElement,
-  ExcalidrawBindableElement,
-} from "../element/types";
-
-import { distance2d, isPathALoop, getGridPoint } from "../math";
-
-import {
-  isWritableElement,
-  isInputLike,
-  isToolIcon,
-  debounce,
-  distance,
-  resetCursor,
-  viewportCoordsToSceneCoords,
-  sceneCoordsToViewportCoords,
-  setCursorForShape,
-  tupleToCoors,
-  ResolvablePromise,
-  resolvablePromise,
-  withBatchedUpdates,
-} from "../utils";
-import {
-  KEYS,
-  isArrowKey,
-  getResizeCenterPointKey,
-  getResizeWithSidesSameLengthKey,
-  getRotateWithDiscreteAngleKey,
-  CODES,
-} from "../keys";
-
-import { findShapeByKey } from "../shapes";
-import { createHistory, SceneHistory } from "../history";
-
-import ContextMenu from "./ContextMenu";
-
-import { ActionManager } from "../actions/manager";
+import rough from "roughjs/bin/rough";
 import "../actions";
+import { actionDeleteSelected, actionFinalize } from "../actions";
+import { createRedoAction, createUndoAction } from "../actions/actionHistory";
+import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
-
 import { ActionResult } from "../actions/types";
+import { trackEvent } from "../analytics";
 import { getDefaultAppState } from "../appState";
-import { t, getLanguage } from "../i18n";
-
 import {
   copyToClipboard,
   parseClipboard,
   probablySupportsClipboardBlob,
   probablySupportsClipboardWriteText,
 } from "../clipboard";
-import { normalizeScroll } from "../scene";
-import { getCenter, getDistance } from "../gesture";
-import { createUndoAction, createRedoAction } from "../actions/actionHistory";
-
 import {
+  APP_NAME,
+  CANVAS_ONLY_ACTIONS,
   CURSOR_TYPE,
+  DEFAULT_VERTICAL_ALIGN,
+  DRAGGING_THRESHOLD,
   ELEMENT_SHIFT_TRANSLATE_AMOUNT,
   ELEMENT_TRANSLATE_AMOUNT,
-  POINTER_BUTTON,
-  DRAGGING_THRESHOLD,
-  TEXT_TO_CENTER_SNAP_THRESHOLD,
-  LINE_CONFIRM_THRESHOLD,
-  EVENT,
   ENV,
-  CANVAS_ONLY_ACTIONS,
-  DEFAULT_VERTICAL_ALIGN,
+  EVENT,
+  LINE_CONFIRM_THRESHOLD,
   MIME_TYPES,
+  POINTER_BUTTON,
   TAP_TWICE_TIMEOUT,
+  TEXT_TO_CENTER_SNAP_THRESHOLD,
   TOUCH_CTX_MENU_TIMEOUT,
-  APP_NAME,
 } from "../constants";
-
-import LayerUI from "./LayerUI";
-import { ScrollBars, SceneState } from "../scene/types";
-import { mutateElement } from "../element/mutateElement";
-import { invalidateShapeForElement } from "../renderer/renderElement";
-import {
-  isLinearElement,
-  isLinearElementType,
-  isBindingElement,
-  isBindingElementType,
-} from "../element/typeChecks";
-import { actionFinalize, actionDeleteSelected } from "../actions";
-
-import { LinearElementEditor } from "../element/linearElementEditor";
-import {
-  getSelectedGroupIds,
-  isSelectedViaGroup,
-  selectGroupsForSelectedElements,
-  isElementInGroup,
-  getSelectedGroupIdForElement,
-  getElementsInGroup,
-  editGroupForSelectedElement,
-} from "../groups";
-import { Library } from "../data/library";
-import Scene from "../scene/Scene";
-import {
-  getHoveredElementForBinding,
-  maybeBindLinearElement,
-  getEligibleElementsForBinding,
-  bindOrUnbindSelectedElements,
-  unbindLinearElements,
-  fixBindingsAfterDuplication,
-  fixBindingsAfterDeletion,
-  isLinearElementSimpleAndAlreadyBound,
-  isBindingEnabled,
-  updateBoundElements,
-  shouldEnableBindingForPointerEvent,
-} from "../element/binding";
-import { MaybeTransformHandleType } from "../element/transformHandles";
-import { deepCopyElement } from "../element/newElement";
-import { renderSpreadsheet } from "../charts";
+import { exportCanvas, loadFromBlob } from "../data";
 import { isValidLibrary } from "../data/json";
-import { getNewZoom } from "../scene/zoom";
+import { Library } from "../data/library";
 import { restore } from "../data/restore";
 import {
-  EVENT_DIALOG,
-  EVENT_LIBRARY,
-  EVENT_SHAPE,
-  trackEvent,
-} from "../analytics";
+  dragNewElement,
+  dragSelectedElements,
+  duplicateElement,
+  getCommonBounds,
+  getCursorForResizingElement,
+  getDragOffsetXY,
+  getElementWithTransformHandleType,
+  getNonDeletedElements,
+  getNormalizedDimensions,
+  getPerfectElementSize,
+  getResizeArrowDirection,
+  getResizeOffsetXY,
+  getTransformHandleTypeFromCoords,
+  hitTest,
+  isHittingElementBoundingBoxWithoutHittingElement,
+  isInvisiblySmallElement,
+  isNonDeletedElement,
+  isTextElement,
+  newElement,
+  newLinearElement,
+  newTextElement,
+  textWysiwyg,
+  transformElements,
+  updateTextElement,
+} from "../element";
+import {
+  bindOrUnbindSelectedElements,
+  fixBindingsAfterDeletion,
+  fixBindingsAfterDuplication,
+  getEligibleElementsForBinding,
+  getHoveredElementForBinding,
+  isBindingEnabled,
+  isLinearElementSimpleAndAlreadyBound,
+  maybeBindLinearElement,
+  shouldEnableBindingForPointerEvent,
+  unbindLinearElements,
+  updateBoundElements,
+} from "../element/binding";
+import { LinearElementEditor } from "../element/linearElementEditor";
+import { mutateElement } from "../element/mutateElement";
+import { deepCopyElement } from "../element/newElement";
+import { MaybeTransformHandleType } from "../element/transformHandles";
+import {
+  isBindingElement,
+  isBindingElementType,
+  isLinearElement,
+  isLinearElementType,
+} from "../element/typeChecks";
+import {
+  ExcalidrawBindableElement,
+  ExcalidrawElement,
+  ExcalidrawGenericElement,
+  ExcalidrawLinearElement,
+  ExcalidrawTextElement,
+  NonDeleted,
+} from "../element/types";
+import { getCenter, getDistance } from "../gesture";
+import {
+  editGroupForSelectedElement,
+  getElementsInGroup,
+  getSelectedGroupIdForElement,
+  getSelectedGroupIds,
+  isElementInGroup,
+  isSelectedViaGroup,
+  selectGroupsForSelectedElements,
+} from "../groups";
+import { createHistory, SceneHistory } from "../history";
+import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
+import {
+  CODES,
+  getResizeCenterPointKey,
+  getResizeWithSidesSameLengthKey,
+  getRotateWithDiscreteAngleKey,
+  isArrowKey,
+  KEYS,
+} from "../keys";
+import { distance2d, getGridPoint, isPathALoop } from "../math";
+import { renderScene } from "../renderer";
+import { invalidateShapeForElement } from "../renderer/renderElement";
+import {
+  calculateScrollCenter,
+  getElementContainingPosition,
+  getElementsAtPosition,
+  getElementsWithinSelection,
+  getNormalizedZoom,
+  getSelectedElements,
+  isOverScrollBars,
+  isSomeElementSelected,
+  normalizeScroll,
+} from "../scene";
+import Scene from "../scene/Scene";
+import { SceneState, ScrollBars } from "../scene/types";
+import { getNewZoom } from "../scene/zoom";
+import { findShapeByKey } from "../shapes";
+import {
+  AppState,
+  ExcalidrawProps,
+  Gesture,
+  GestureEvent,
+  SceneData,
+} from "../types";
+import {
+  debounce,
+  distance,
+  isInputLike,
+  isToolIcon,
+  isWritableElement,
+  resetCursor,
+  ResolvablePromise,
+  resolvablePromise,
+  sceneCoordsToViewportCoords,
+  setCursorForShape,
+  tupleToCoors,
+  viewportCoordsToSceneCoords,
+  withBatchedUpdates,
+} from "../utils";
+import ContextMenu from "./ContextMenu";
+import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
 
 const { history } = createHistory();
@@ -345,7 +326,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       offsetLeft,
     } = this.state;
 
-    const { onCollabButtonClick, onExportToBackend } = this.props;
+    const { onCollabButtonClick, onExportToBackend, renderFooter } = this.props;
     const canvasScale = window.devicePixelRatio;
 
     const canvasWidth = canvasDOMWidth * canvasScale;
@@ -373,7 +354,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           elements={this.scene.getElements()}
           onCollabButtonClick={onCollabButtonClick}
           onLockToggle={this.toggleLock}
-          onInsertShape={(elements) =>
+          onInsertElements={(elements) =>
             this.addElementsFromPasteOrLibrary(
               elements,
               DEFAULT_PASTE_X,
@@ -382,9 +363,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           }
           zenModeEnabled={zenModeEnabled}
           toggleZenMode={this.toggleZenMode}
-          lng={getLanguage().lng}
+          langCode={getLanguage().code}
           isCollaborating={this.props.isCollaborating || false}
           onExportToBackend={onExportToBackend}
+          renderCustomFooter={renderFooter}
         />
         {this.state.showStats && (
           <Stats
@@ -517,7 +499,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         )
       ) {
         await Library.importLibrary(blob);
-        trackEvent(EVENT_LIBRARY, "import");
         this.setState({
           isLibraryOpen: true,
         });
@@ -752,6 +733,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   }
 
   componentDidUpdate(prevProps: ExcalidrawProps, prevState: AppState) {
+    if (prevProps.langCode !== this.props.langCode) {
+      this.updateLanguage();
+    }
+
     if (
       prevProps.width !== this.props.width ||
       prevProps.height !== this.props.height ||
@@ -875,7 +860,16 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     history.record(this.state, this.scene.getElementsIncludingDeleted());
 
-    this.props.onChange?.(this.scene.getElementsIncludingDeleted(), this.state);
+    // Do not notify consumers if we're still loading the scene. Among other
+    // potential issues, this fixes a case where the tab isn't focused during
+    // init, which would trigger onChange with empty elements, which would then
+    // override whatever is in localStorage currently.
+    if (!this.state.isLoading) {
+      this.props.onChange?.(
+        this.scene.getElementsIncludingDeleted(),
+        this.state,
+      );
+    }
   }
 
   // Copy/paste
@@ -1004,9 +998,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       if (data.errorMessage) {
         this.setState({ errorMessage: data.errorMessage });
       } else if (data.spreadsheet) {
-        this.addElementsFromPasteOrLibrary(
-          renderSpreadsheet(data.spreadsheet, cursorX, cursorY),
-        );
+        this.setState({
+          pasteDialog: {
+            data: data.spreadsheet,
+            shown: true,
+          },
+        });
       } else if (data.elements) {
         this.addElementsFromPasteOrLibrary(data.elements);
       } else if (data.text) {
@@ -1136,7 +1133,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   toggleLock = () => {
     this.setState((prevState) => {
-      trackEvent(EVENT_SHAPE, "lock", !prevState.elementLocked ? "on" : "off");
       return {
         elementLocked: !prevState.elementLocked,
         elementType: prevState.elementLocked
@@ -1160,7 +1156,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   toggleStats = () => {
     if (!this.state.showStats) {
-      trackEvent(EVENT_DIALOG, "stats");
+      trackEvent("dialog", "stats");
     }
     this.setState({
       showStats: !this.state.showStats,
@@ -1272,9 +1268,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     if (event.code === CODES.NINE) {
-      if (!this.state.isLibraryOpen) {
-        trackEvent(EVENT_DIALOG, "library");
-      }
       this.setState({ isLibraryOpen: !this.state.isLibraryOpen });
     }
 
@@ -1359,7 +1352,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     ) {
       const shape = findShapeByKey(event.key);
       if (shape) {
-        trackEvent(EVENT_SHAPE, shape, "shortcut");
         this.selectShapeTool(shape);
       } else if (event.key === KEYS.Q) {
         this.toggleLock();
@@ -1743,7 +1735,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     resetCursor();
 
     if (!event[KEYS.CTRL_OR_CMD]) {
-      trackEvent(EVENT_SHAPE, "text", "double-click");
       this.startTextEditing({
         sceneX,
         sceneY,
@@ -2473,8 +2464,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           // otherwise, it will trigger selection based on current
           // state of the box
           if (!this.state.selectedElementIds[hitElement.id]) {
-            // if we are currently editing a group, treat all selections outside of the group
-            // as exiting editing mode.
+            // if we are currently editing a group, exiting editing mode and deselect the group.
             if (
               this.state.editingGroupId &&
               !isElementInGroup(hitElement, this.state.editingGroupId)
@@ -2484,7 +2474,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
                 selectedGroupIds: {},
                 editingGroupId: null,
               });
-              return true;
             }
 
             // Add hit element to selection. At this point if we're not holding
@@ -3156,7 +3145,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             );
           }
           this.setState({ suggestedBindings: [], startBoundElement: null });
-          if (!elementLocked) {
+          if (!elementLocked && elementType !== "draw") {
             resetCursor();
             this.setState((prevState) => ({
               draggingElement: null,
@@ -3303,7 +3292,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         return;
       }
 
-      if (!elementLocked && draggingElement) {
+      if (!elementLocked && elementType !== "draw" && draggingElement) {
         this.setState((prevState) => ({
           selectedElementIds: {
             ...prevState.selectedElementIds,
@@ -3327,7 +3316,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         );
       }
 
-      if (!elementLocked) {
+      if (!elementLocked && elementType !== "draw") {
         resetCursor();
         this.setState({
           draggingElement: null,
@@ -3668,6 +3657,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             action: this.toggleGridMode,
           },
           {
+            checked: this.state.zenModeEnabled,
+            shortcutName: "zenMode",
+            label: t("buttons.zenMode"),
+            action: this.toggleZenMode,
+          },
+          {
             checked: this.state.showStats,
             shortcutName: "stats",
             label: t("stats.title"),
@@ -3870,6 +3865,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         typeof offsets?.offsetLeft === "number" ? offsets.offsetLeft : 0,
       offsetTop: typeof offsets?.offsetTop === "number" ? offsets.offsetTop : 0,
     };
+  }
+
+  private async updateLanguage() {
+    const currentLang =
+      languages.find((lang) => lang.code === this.props.langCode) ||
+      defaultLang;
+    await setLanguage(currentLang);
+    this.setAppState({});
   }
 }
 

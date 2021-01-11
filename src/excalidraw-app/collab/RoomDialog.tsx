@@ -1,12 +1,10 @@
 import React, { useRef } from "react";
-import { t } from "../../i18n";
-import { Dialog } from "../../components/Dialog";
 import { copyTextToSystemClipboard } from "../../clipboard";
-import { ToolButton } from "../../components/ToolButton";
+import { Dialog } from "../../components/Dialog";
 import { clipboard, start, stop } from "../../components/icons";
-
+import { ToolButton } from "../../components/ToolButton";
+import { t } from "../../i18n";
 import "./RoomDialog.scss";
-import { EVENT_SHARE, trackEvent } from "../../analytics";
 
 const RoomDialog = ({
   handleClose,
@@ -30,7 +28,6 @@ const RoomDialog = ({
   const copyRoomLink = async () => {
     try {
       await copyTextToSystemClipboard(activeRoomLink);
-      trackEvent(EVENT_SHARE, "copy link");
     } catch (error) {
       setErrorMessage(error.message);
     }
@@ -95,7 +92,6 @@ const RoomDialog = ({
                 value={username || ""}
                 className="RoomDialog-username TextInput"
                 onChange={(event) => onUsernameChange(event.target.value)}
-                onBlur={() => trackEvent(EVENT_SHARE, "name")}
                 onKeyPress={(event) => event.key === "Enter" && handleClose()}
               />
             </div>
@@ -123,11 +119,7 @@ const RoomDialog = ({
     );
   };
   return (
-    <Dialog
-      maxWidth={800}
-      onCloseRequest={handleClose}
-      title={t("labels.createRoom")}
-    >
+    <Dialog small onCloseRequest={handleClose} title={t("labels.createRoom")}>
       {renderRoomDialog()}
     </Dialog>
   );

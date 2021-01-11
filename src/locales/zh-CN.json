@@ -1,10 +1,11 @@
 {
   "labels": {
     "paste": "粘贴",
+    "pasteCharts": "粘贴图表",
     "selectAll": "全部选中",
     "multiSelect": "添加元素到选区",
     "moveCanvas": "移动画布",
-    "cut": "",
+    "cut": "剪切",
     "copy": "复制",
     "copyAsPng": "复制为 PNG 到剪贴板",
     "copyAsSvg": "复制为 SVG 到剪贴板",
@@ -29,15 +30,15 @@
     "edges": "边角",
     "sharp": "尖锐",
     "round": "圆润",
-    "arrowheads": "",
-    "arrowhead_none": "",
-    "arrowhead_arrow": "",
-    "arrowhead_bar": "",
-    "arrowhead_dot": "",
+    "arrowheads": "箭头",
+    "arrowhead_none": "无",
+    "arrowhead_arrow": "箭头",
+    "arrowhead_bar": "条",
+    "arrowhead_dot": "圆点",
     "fontSize": "字体大小",
     "fontFamily": "字体",
     "onlySelected": "仅被选中",
-    "withBackground": "添加背景",
+    "withBackground": "使用背景",
     "exportEmbedScene": "将场景嵌入到导出的文件",
     "exportEmbedScene_details": "场景数据将被保存到导出的 PNG/SVG 文件，以便恢复。\n将会增加导出的文件大小。",
     "addWatermark": "添加 “使用 Excalidraw 创建” 水印",
@@ -76,12 +77,11 @@
     "group": "组选",
     "ungroup": "取消组选",
     "collaborators": "协作者",
-    "toggleGridMode": "切换网格模式",
-    "toggleStats": "",
+    "gridMode": "网格模式",
     "addToLibrary": "添加到库中",
     "removeFromLibrary": "从库中移除",
     "libraryLoadingMessage": "正在加载库...",
-    "libraries": "",
+    "libraries": "浏览库",
     "loadingScene": "正在加载绘图...",
     "align": "对齐",
     "alignTop": "顶部对齐",
@@ -118,9 +118,10 @@
     "redo": "重做",
     "roomDialog": "开始实时协作",
     "createNewRoom": "新建会议室",
-    "toggleFullScreen": "切换全屏显示",
-    "toggleDarkMode": "切换暗黑模式",
-    "toggleZenMode": "切换禅模式",
+    "fullScreen": "全屏",
+    "darkMode": "暗色主题",
+    "lightMode": "浅色模式",
+    "zenMode": "禅意模式",
     "exitZenMode": "退出禅模式"
   },
   "alerts": {
@@ -136,7 +137,7 @@
     "loadSceneOverridePrompt": "加载外部绘图将取代您现有的内容。您想要继续吗？",
     "errorLoadingLibrary": "加载第三方库时出错。",
     "confirmAddLibrary": "这将添加 {{numShapes}} 个形状到您的库。您确定吗？",
-    "imageDoesNotContainScene": "图像文件不包含场景数据。您是否在导出过程中启用了此选项？",
+    "imageDoesNotContainScene": "当前不支持导入图片。\n\n您想要导入场景吗？此图像似乎不包含任何场景数据。您是否在导出过程中启用了这个数据？",
     "cannotRestoreFromImage": "无法从此图像文件恢复场景"
   },
   "toolBar": {
@@ -161,6 +162,7 @@
     "freeDraw": "点击并拖动，完成后发布",
     "text": "提示：您也可以使用选择工具双击任意位置来添加文字",
     "linearElementMulti": "点击最后一个点或按下 Esc/Enter 来完成",
+    "lockAngle": "可以按住 Shift 来约束角度",
     "resize": "您可以按住SHIFT来限制比例大小，\n按住ALT来调整中心大小",
     "rotate": "旋转时可以按住 Shift 来约束角度",
     "lineEditor_info": "双击或按回车键编辑",
@@ -200,7 +202,7 @@
   "shortcutsDialog": {
     "title": "快捷键列表",
     "shapes": "形状",
-    "or": "或者",
+    "or": "或",
     "click": "点击",
     "drag": "拖动",
     "curvedArrow": "曲线（带有箭头）",
@@ -209,7 +211,7 @@
     "view": "视图",
     "blog": "浏览我们的博客",
     "howto": "跟随我们的指南",
-    "github": "发现问题？提交",
+    "github": "发现问题？请提出来",
     "textNewLine": "文本换行",
     "textFinish": "完成编辑文本",
     "zoomToFit": "缩放以适应所有元素",
@@ -217,7 +219,7 @@
     "preventBinding": "防止箭头吸附"
   },
   "encrypted": {
-    "tooltip": "您的绘图采用的端到端加密，因此Excalidraw服务器永远不会收集。"
+    "tooltip": "您的绘图采用的端到端加密，其内容对于Excalidraw服务器是不可见的。"
   },
   "stats": {
     "angle": "角度",
@@ -227,7 +229,7 @@
     "scene": "场景",
     "selected": "选中",
     "storage": "存储",
-    "title": "",
+    "title": "详细统计信息",
     "total": "总计",
     "width": "宽度"
   }

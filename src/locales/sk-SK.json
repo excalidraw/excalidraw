@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Vložiť",
+    "pasteCharts": "Vložiť grafy",
     "selectAll": "Vybrať všetko",
     "multiSelect": "Pridať prvok do výberu",
     "moveCanvas": "Pohyb plátna",
@@ -14,7 +15,7 @@
     "sendBackward": "Presunúť o úroveň dozadu",
     "delete": "Vymazať",
     "copyStyles": "Kopírovať štýly",
-    "pasteStyles": "Prilepiť štýly",
+    "pasteStyles": "Vložiť štýly",
     "stroke": "Obrys",
     "background": "Pozadie",
     "fill": "Výplň",
@@ -76,8 +77,7 @@
     "group": "Zoskupiť",
     "ungroup": "Zrušiť zoskupenie",
     "collaborators": "Spolupracovníci",
-    "toggleGridMode": "Prepnúť mriežku",
-    "toggleStats": "Prepnúť štatistiky",
+    "gridMode": "Režim mriežky",
     "addToLibrary": "Pridať do knižnice",
     "removeFromLibrary": "Odstrániť z knižnice",
     "libraryLoadingMessage": "Načítavanie knižnice...",
@@ -118,9 +118,10 @@
     "redo": "Znova",
     "roomDialog": "Začať živú spoluprácu",
     "createNewRoom": "Vytvoriť novú miestnosť",
-    "toggleFullScreen": "Prepnúť režim celej obrazovky",
-    "toggleDarkMode": "Prepnúť tmavý režim",
-    "toggleZenMode": "Prepnúť režim zen",
+    "fullScreen": "Celá obrazovka",
+    "darkMode": "Tmavý režim",
+    "lightMode": "Svetlý režim",
+    "zenMode": "Režim zen",
     "exitZenMode": "Zrušiť režim zen"
   },
   "alerts": {
@@ -136,7 +137,7 @@
     "loadSceneOverridePrompt": "Nahratie externej kresby nahradí existujúci obsah. Prajete si pokračovať?",
     "errorLoadingLibrary": "Nepodarilo sa načítať externú knižnicu.",
     "confirmAddLibrary": "Týmto sa pridá {{numShapes}} tvar(ov) do vašej knižnice. Ste si istí?",
-    "imageDoesNotContainScene": "Obrázkový súbor neobsahuje údaje scény. Povolili ste ich pri exportovaní?",
+    "imageDoesNotContainScene": "Importovanie obrázku v tomto momente nie je možné.\n\nChceli ste importovať scénu? Tento obrázok neobsahuje žiadne údaje scény. Povolili ste túto možnosť počas exportovania?",
     "cannotRestoreFromImage": "Nepodarilo sa obnoviť scénu z tohto obrázkového súboru"
   },
   "toolBar": {
@@ -161,6 +162,7 @@
     "freeDraw": "Kliknite a ťahajte, pustite na ukončenie",
     "text": "Tip: text môžete pridať aj dvojklikom kdekoľvek, ak je zvolený nástroj výber",
     "linearElementMulti": "Kliknite na počiatočný bod alebo stlačte Escape alebo Enter na ukončenie",
+    "lockAngle": "Počas rotácie obmedzíte uhol podržaním SHIFT",
     "resize": "Počas zmeny veľkosti zachováte proporcie podržaním SHIFT,\\npodržaním ALT meníte veľkosť so zachovaním stredu",
     "rotate": "Počas rotácie obmedzíte uhol podržaním SHIFT",
     "lineEditor_info": "Použite dvojklik alebo stlačte Enter na editáciu bodov",

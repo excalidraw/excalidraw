@@ -1,56 +1,53 @@
 import React from "react";
-import { getLanguage } from "../i18n";
-import {
-  ExcalidrawElement,
-  ExcalidrawTextElement,
-  TextAlign,
-  FontFamily,
-  ExcalidrawLinearElement,
-  Arrowhead,
-} from "../element/types";
-import {
-  getCommonAttributeOfSelectedElements,
-  isSomeElementSelected,
-  getTargetElements,
-  canChangeSharpness,
-  canHaveArrowheads,
-} from "../scene";
-import { ButtonSelect } from "../components/ButtonSelect";
+import { AppState } from "../../src/types";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
+import { ButtonSelect } from "../components/ButtonSelect";
+import { ColorPicker } from "../components/ColorPicker";
 import { IconPicker } from "../components/IconPicker";
 import {
-  isTextElement,
-  redrawTextBoundingBox,
-  getNonDeletedElements,
-} from "../element";
-import { isLinearElement, isLinearElementType } from "../element/typeChecks";
-import { ColorPicker } from "../components/ColorPicker";
-import { AppState } from "../../src/types";
-import { t } from "../i18n";
-import { register } from "./register";
-import { newElementWith } from "../element/mutateElement";
-import { DEFAULT_FONT_SIZE, DEFAULT_FONT_FAMILY } from "../constants";
-import { randomInteger } from "../random";
-import {
-  FillHachureIcon,
-  FillCrossHatchIcon,
-  FillSolidIcon,
-  StrokeWidthIcon,
-  StrokeStyleSolidIcon,
-  StrokeStyleDashedIcon,
-  StrokeStyleDottedIcon,
-  EdgeSharpIcon,
-  EdgeRoundIcon,
-  SloppinessArchitectIcon,
-  SloppinessArtistIcon,
-  SloppinessCartoonistIcon,
   ArrowheadArrowIcon,
   ArrowheadBarIcon,
   ArrowheadDotIcon,
   ArrowheadNoneIcon,
+  EdgeRoundIcon,
+  EdgeSharpIcon,
+  FillCrossHatchIcon,
+  FillHachureIcon,
+  FillSolidIcon,
+  SloppinessArchitectIcon,
+  SloppinessArtistIcon,
+  SloppinessCartoonistIcon,
+  StrokeStyleDashedIcon,
+  StrokeStyleDottedIcon,
+  StrokeStyleSolidIcon,
+  StrokeWidthIcon,
 } from "../components/icons";
-import { EVENT_CHANGE, trackEvent } from "../analytics";
-import colors from "../colors";
+import { DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE } from "../constants";
+import {
+  getNonDeletedElements,
+  isTextElement,
+  redrawTextBoundingBox,
+} from "../element";
+import { newElementWith } from "../element/mutateElement";
+import { isLinearElement, isLinearElementType } from "../element/typeChecks";
+import {
+  Arrowhead,
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  ExcalidrawTextElement,
+  FontFamily,
+  TextAlign,
+} from "../element/types";
+import { getLanguage, t } from "../i18n";
+import { randomInteger } from "../random";
+import {
+  canChangeSharpness,
+  canHaveArrowheads,
+  getCommonAttributeOfSelectedElements,
+  getTargetElements,
+  isSomeElementSelected,
+} from "../scene";
+import { register } from "./register";
 
 const changeProperty = (
   elements: readonly ExcalidrawElement[],
@@ -92,15 +89,6 @@ const getFormValue = function <T>(
 export const actionChangeStrokeColor = register({
   name: "changeStrokeColor",
   perform: (elements, appState, value) => {
-    if (value !== appState.currentItemStrokeColor) {
-      trackEvent(
-        EVENT_CHANGE,
-        "stroke color",
-        colors.elementStroke.includes(value)
-          ? `${value} (picker ${colors.elementStroke.indexOf(value)})`
-          : value,
-      );
-    }
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -132,16 +120,6 @@ export const actionChangeStrokeColor = register({
 export const actionChangeBackgroundColor = register({
   name: "changeBackgroundColor",
   perform: (elements, appState, value) => {
-    if (value !== appState.currentItemBackgroundColor) {
-      trackEvent(
-        EVENT_CHANGE,
-        "background color",
-        colors.elementBackground.includes(value)
-          ? `${value} (picker ${colors.elementBackground.indexOf(value)})`
-          : value,
-      );
-    }
-
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -173,7 +151,6 @@ export const actionChangeBackgroundColor = register({
 export const actionChangeFillStyle = register({
   name: "changeFillStyle",
   perform: (elements, appState, value) => {
-    trackEvent(EVENT_CHANGE, "fill", value);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -223,7 +200,6 @@ export const actionChangeFillStyle = register({
 export const actionChangeStrokeWidth = register({
   name: "changeStrokeWidth",
   perform: (elements, appState, value) => {
-    trackEvent(EVENT_CHANGE, "stroke", "width", value);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -286,7 +262,6 @@ export const actionChangeStrokeWidth = register({
 export const actionChangeSloppiness = register({
   name: "changeSloppiness",
   perform: (elements, appState, value) => {
-    trackEvent(EVENT_CHANGE, "stroke", "sloppiness", value);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -335,7 +310,6 @@ export const actionChangeSloppiness = register({
 export const actionChangeStrokeStyle = register({
   name: "changeStrokeStyle",
   perform: (elements, appState, value) => {
-    trackEvent(EVENT_CHANGE, "style", value);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -383,7 +357,6 @@ export const actionChangeStrokeStyle = register({
 export const actionChangeOpacity = register({
   name: "changeOpacity",
   perform: (elements, appState, value) => {
-    trackEvent(EVENT_CHANGE, "opacity", "value", value);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -580,7 +553,6 @@ export const actionChangeSharpness = register({
     const shouldUpdateForLinearElements = targetElements.length
       ? targetElements.every(isLinearElement)
       : isLinearElementType(appState.elementType);
-    trackEvent(EVENT_CHANGE, "edge", value);
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
@@ -642,12 +614,6 @@ export const actionChangeArrowhead = register({
     return {
       elements: changeProperty(elements, appState, (el) => {
         if (isLinearElement(el)) {
-          trackEvent(
-            EVENT_CHANGE,
-            `arrowhead ${value.position}`,
-            value.type || "none",
-          );
-
           const { position, type } = value;
 
           if (position === "start") {

@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Incolla",
+    "pasteCharts": "Incolla grafici",
     "selectAll": "Seleziona tutto",
     "multiSelect": "Aggiungi elemento alla selezione",
     "moveCanvas": "Sposta tela",
@@ -37,7 +38,7 @@
     "fontSize": "Dimensione carattere",
     "fontFamily": "Carattere",
     "onlySelected": "Solo selezionati",
-    "withBackground": "Con Sfondo",
+    "withBackground": "Con sfondo",
     "exportEmbedScene": "Incorpora la scena nel file esportato",
     "exportEmbedScene_details": "I dati della scena saranno salvati nel file PNG/SVG esportato in modo che la scena possa essere ripristinata da esso.\nQuesto aumenterà la dimensione del file esportato.",
     "addWatermark": "Aggiungi \"Creato con Excalidraw\"",
@@ -76,10 +77,9 @@
     "group": "Crea gruppo da selezione",
     "ungroup": "Dividi gruppo da selezione",
     "collaborators": "Collaboratori",
-    "toggleGridMode": "Attiva/disattiva modalità griglia",
-    "toggleStats": "Attiva/disattiva statistiche per nerd",
-    "addToLibrary": "Aggiungi alla biblioteca",
-    "removeFromLibrary": "Rimuovi dalla biblioteca",
+    "gridMode": "Modalità griglia",
+    "addToLibrary": "Aggiungi alla libreria",
+    "removeFromLibrary": "Rimuovi dalla libreria",
     "libraryLoadingMessage": "Caricamento della biblioteca...",
     "libraries": "Sfoglia librerie",
     "loadingScene": "Caricamento della scena...",
@@ -118,9 +118,10 @@
     "redo": "Ripeti",
     "roomDialog": "Inizia collaborazione in diretta",
     "createNewRoom": "Crea nuova stanza",
-    "toggleFullScreen": "Attiva/Disattiva schermo intero",
-    "toggleDarkMode": "Attiva tema scuro",
-    "toggleZenMode": "Attiva/Disattiva modalità zen",
+    "fullScreen": "Schermo intero",
+    "darkMode": "Tema scuro",
+    "lightMode": "Tema chiaro",
+    "zenMode": "Modalità Zen",
     "exitZenMode": "Uscire dalla modalità zen"
   },
   "alerts": {
@@ -135,8 +136,8 @@
     "uploadedSecurly": "L'upload è stato protetto con la crittografia end-to-end, il che significa che il server Excalidraw e terze parti non possono leggere il contenuto.",
     "loadSceneOverridePrompt": "Se carichi questo disegno esterno, sostituirà quello che hai. Vuoi continuare?",
     "errorLoadingLibrary": "Si è verificato un errore nel caricamento della libreria di terze parti.",
-    "confirmAddLibrary": "Questo aggiungerà {{numShapes}} forma(e) alla tua biblioteca. Sei sicuro?",
-    "imageDoesNotContainScene": "Il file immagine non contiene dati di scena. È stato abilitato durante l'esportazione?",
+    "confirmAddLibrary": "Questo aggiungerà {{numShapes}} forma(e) alla tua libreria. Sei sicuro?",
+    "imageDoesNotContainScene": "L'importazione di immagini al momento non è supportata.\n\nVuoi importare una scena? Questa immagine non sembra contenere alcun dato di scena. Hai abilitato questa opzione durante l'esportazione?",
     "cannotRestoreFromImage": "Impossibile ripristinare la scena da questo file immagine"
   },
   "toolBar": {
@@ -148,7 +149,7 @@
     "arrow": "Freccia",
     "line": "Linea",
     "text": "Testo",
-    "library": "Biblioteca",
+    "library": "Libreria",
     "lock": "Mantieni lo strumento selezionato attivo dopo aver disegnato"
   },
   "headings": {
@@ -161,6 +162,7 @@
     "freeDraw": "Clicca e trascina, rilascia quando avrai finito",
     "text": "Suggerimento: puoi anche aggiungere del testo facendo doppio clic ovunque con lo strumento di selezione",
     "linearElementMulti": "Clicca sull'ultimo punto o premi Esc o Invio per finire",
+    "lockAngle": "Puoi limitare l'angolo tenendo premuto SHIFT",
     "resize": "Per vincolare le proporzioni, tenir premuto MAIUSC durante il ridimensionamento;\nper ridimensionare dal centro, tenir premuto ALT",
     "rotate": "Puoi mantenere gli angoli tenendo premuto SHIFT durante la rotazione",
     "lineEditor_info": "Fai doppio click o premi invio per modificare i punti",

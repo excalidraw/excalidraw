@@ -4,26 +4,28 @@ const THRESSHOLD = 85;
 
 const crowdinMap = {
   "ar-SA": "en-ar",
-  "el-GR": "en-el",
-  "fi-FI": "en-fi",
-  "ja-JP": "en-ja",
   "bg-BG": "en-bg",
   "ca-ES": "en-ca",
   "de-DE": "en-de",
+  "el-GR": "en-el",
   "es-ES": "en-es",
   "fa-IR": "en-fa",
+  "fi-FI": "en-fi",
   "fr-FR": "en-fr",
   "he-IL": "en-he",
   "hi-IN": "en-hi",
   "hu-HU": "en-hu",
   "id-ID": "en-id",
   "it-IT": "en-it",
+  "ja-JP": "en-ja",
   "ko-KR": "en-ko",
   "my-MM": "en-my",
   "nb-NO": "en-nb",
   "nl-NL": "en-nl",
   "nn-NO": "en-nnno",
+  "pa-IN": "en-pain",
   "pl-PL": "en-pl",
+  "pt-BR": "en-ptbr",
   "pt-PT": "en-pt",
   "ro-RO": "en-ro",
   "ru-RU": "en-ru",
@@ -56,7 +58,9 @@ const flags = {
   "nb-NO": "🇳🇴",
   "nl-NL": "🇳🇱",
   "nn-NO": "🇳🇴",
+  "pa-IN": "🇮🇳",
   "pl-PL": "🇵🇱",
+  "pt-BR": "🇧🇷",
   "pt-PT": "🇵🇹",
   "ro-RO": "🇷🇴",
   "ru-RU": "🇷🇺",
@@ -71,7 +75,7 @@ const flags = {
 const languages = {
   "ar-SA": "العربية",
   "bg-BG": "Български",
-  "ca-ES": "Catalan",
+  "ca-ES": "Català",
   "de-DE": "Deutsch",
   "el-GR": "Ελληνικά",
   "es-ES": "Español",
@@ -89,7 +93,9 @@ const languages = {
   "nb-NO": "Norsk bokmål",
   "nl-NL": "Nederlands",
   "nn-NO": "Norsk nynorsk",
+  "pa-IN": "ਪੰਜਾਬੀ",
   "pl-PL": "Polski",
+  "pt-BR": "Português Brasileiro",
   "pt-PT": "Português",
   "ro-RO": "Română",
   "ru-RU": "Русский",
@@ -114,16 +120,14 @@ const boldIf = (text, condition) => (condition ? `**${text}**` : text);
 
 const printHeader = () => {
   let result = "| | Flag | Locale | % |\n";
-  result += "| --: | :--: | -- | --: |";
+  result += "| :--: | :--: | -- | :--: |";
   return result;
 };
 
 const printRow = (id, locale, coverage) => {
-  const isOver = coverage > THRESSHOLD;
-  let result = `| ${boldIf(id, isOver)} | `;
-
+  const isOver = coverage >= THRESSHOLD;
+  let result = `| ${isOver ? id : "..."} | `;
   result += `${locale in flags ? flags[locale] : ""} | `;
-
   const language = locale in languages ? languages[locale] : locale;
   if (locale in crowdinMap && crowdinMap[locale]) {
     result += `[${boldIf(
@@ -133,14 +137,12 @@ const printRow = (id, locale, coverage) => {
   } else {
     result += `${boldIf(language, isOver)} | `;
   }
-  result += `${boldIf(coverage, isOver)} |`;
+  result += `${coverage === 100 ? "💯" : boldIf(coverage, isOver)} |`;
   return result;
 };
 
-console.info("## Languages check");
-console.info("\n\r");
 console.info(
-  `Our translations for every languages should be at least **${THRESSHOLD}%** to appear on Excalidraw. Join our project in [Crowdin](https://crowdin.com/project/excalidraw) and help us translate it in your language. **Can't find your own?** Open an [issue](https://github.com/excalidraw/excalidraw/issues/new) and we'll add it to the list.`,
+  `Each language must be at least **${THRESSHOLD}%** translated in order to appear on Excalidraw. Join us on [Crowdin](https://crowdin.com/project/excalidraw) and help us translate your own language. **Can't find yours yet?** Open an [issue](https://github.com/excalidraw/excalidraw/issues/new) and we'll add it to the list.`,
 );
 console.info("\n\r");
 console.info(printHeader());

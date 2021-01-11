@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
 import { ActionsManagerInterface } from "../actions/types";
-import { EVENT_DIALOG, trackEvent } from "../analytics";
 import { probablySupportsClipboardBlob } from "../clipboard";
 import { canvasToBlob } from "../data/blob";
 import { NonDeletedExcalidrawElement } from "../element/types";
@@ -251,7 +250,6 @@ export const ExportDialog = ({
     <>
       <ToolButton
         onClick={() => {
-          trackEvent(EVENT_DIALOG, "export");
           setModalIsShown(true);
         }}
         icon={exportFile}
@@ -262,11 +260,7 @@ export const ExportDialog = ({
         ref={triggerButton}
       />
       {modalIsShown && (
-        <Dialog
-          maxWidth={800}
-          onCloseRequest={handleClose}
-          title={t("buttons.export")}
-        >
+        <Dialog onCloseRequest={handleClose} title={t("buttons.export")}>
           <ExportModal
             elements={elements}
             appState={appState}

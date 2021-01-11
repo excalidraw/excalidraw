@@ -1,37 +1,25 @@
 import React from "react";
-import { ColorPicker } from "../components/ColorPicker";
 import { getDefaultAppState } from "../appState";
-import { trash, zoomIn, zoomOut, resetZoom } from "../components/icons";
+import { ColorPicker } from "../components/ColorPicker";
+import { resetZoom, trash, zoomIn, zoomOut } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
-import { t } from "../i18n";
-import { getNormalizedZoom, getSelectedElements } from "../scene";
-import { getNonDeletedElements } from "../element";
-import { CODES, KEYS } from "../keys";
-import { getShortcutKey } from "../utils";
-import useIsMobile from "../is-mobile";
-import { register } from "./register";
+import { GRID_SIZE } from "../constants";
+import { getCommonBounds, getNonDeletedElements } from "../element";
 import { newElementWith } from "../element/mutateElement";
 import { ExcalidrawElement } from "../element/types";
-import { AppState, NormalizedZoomValue } from "../types";
-import { getCommonBounds } from "../element";
-import { getNewZoom } from "../scene/zoom";
+import { t } from "../i18n";
+import useIsMobile from "../is-mobile";
+import { CODES, KEYS } from "../keys";
+import { getNormalizedZoom, getSelectedElements } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
-import { EVENT_ACTION, EVENT_CHANGE, trackEvent } from "../analytics";
-import colors from "../colors";
-import { GRID_SIZE } from "../constants";
+import { getNewZoom } from "../scene/zoom";
+import { AppState, NormalizedZoomValue } from "../types";
+import { getShortcutKey } from "../utils";
+import { register } from "./register";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
   perform: (_, appState, value) => {
-    if (value !== appState.viewBackgroundColor) {
-      trackEvent(
-        EVENT_CHANGE,
-        "canvas color",
-        colors.canvasBackground.includes(value)
-          ? `${value} (picker ${colors.canvasBackground.indexOf(value)})`
-          : value,
-      );
-    }
     return {
       appState: { ...appState, viewBackgroundColor: value },
       commitToHistory: true,
@@ -54,7 +42,6 @@ export const actionChangeViewBackgroundColor = register({
 export const actionClearCanvas = register({
   name: "clearCanvas",
   perform: (elements, appState: AppState) => {
-    trackEvent(EVENT_ACTION, "clear canvas");
     return {
       elements: elements.map((element) =>
         newElementWith(element, { isDeleted: true }),
@@ -68,6 +55,7 @@ export const actionClearCanvas = register({
         gridSize: appState.gridSize || GRID_SIZE,
         shouldAddWatermark: appState.shouldAddWatermark,
         showStats: appState.showStats,
+        pasteDialog: appState.pasteDialog,
       },
       commitToHistory: true,
     };
@@ -99,7 +87,6 @@ export const actionZoomIn = register({
       { left: appState.offsetLeft, top: appState.offsetTop },
       { x: appState.width / 2, y: appState.height / 2 },
     );
-    trackEvent(EVENT_ACTION, "zoom", "in", zoom.value * 100);
     return {
       appState: {
         ...appState,
@@ -134,7 +121,6 @@ export const actionZoomOut = register({
       { x: appState.width / 2, y: appState.height / 2 },
     );
 
-    trackEvent(EVENT_ACTION, "zoom", "out", zoom.value * 100);
     return {
       appState: {
         ...appState,
@@ -162,7 +148,6 @@ export const actionZoomOut = register({
 export const actionResetZoom = register({
   name: "resetZoom",
   perform: (_elements, appState) => {
-    trackEvent(EVENT_ACTION, "zoom", "reset", 100);
     return {
       appState: {
         ...appState,
@@ -235,12 +220,10 @@ const zoomToFitElements = (
     left: appState.offsetLeft,
     top: appState.offsetTop,
   });
-  const action = zoomToSelection ? "selection" : "fit";
 
   const [x1, y1, x2, y2] = commonBounds;
   const centerX = (x1 + x2) / 2;
   const centerY = (y1 + y2) / 2;
-  trackEvent(EVENT_ACTION, "zoom", action, newZoom.value * 100);
   return {
     appState: {
       ...appState,

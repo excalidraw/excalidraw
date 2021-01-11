@@ -1,7 +1,5 @@
 import React from "react";
-import { KEYS } from "../keys";
-import { t } from "../i18n";
-import { register } from "./register";
+import { alignElements, Alignment } from "../align";
 import {
   AlignBottomIcon,
   AlignLeftIcon,
@@ -10,14 +8,15 @@ import {
   CenterHorizontallyIcon,
   CenterVerticallyIcon,
 } from "../components/icons";
-import { getSelectedElements, isSomeElementSelected } from "../scene";
-import { getElementMap, getNonDeletedElements } from "../element";
 import { ToolButton } from "../components/ToolButton";
+import { getElementMap, getNonDeletedElements } from "../element";
 import { ExcalidrawElement } from "../element/types";
+import { t } from "../i18n";
+import { KEYS } from "../keys";
+import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { AppState } from "../types";
-import { alignElements, Alignment } from "../align";
 import { getShortcutKey } from "../utils";
-import { trackEvent, EVENT_ALIGN } from "../analytics";
+import { register } from "./register";
 
 const enableActionGroup = (
   elements: readonly ExcalidrawElement[],
@@ -44,7 +43,6 @@ const alignSelectedElements = (
 export const actionAlignTop = register({
   name: "alignTop",
   perform: (elements, appState) => {
-    trackEvent(EVENT_ALIGN, "align", "top");
     return {
       appState,
       elements: alignSelectedElements(elements, appState, {
@@ -74,7 +72,6 @@ export const actionAlignTop = register({
 export const actionAlignBottom = register({
   name: "alignBottom",
   perform: (elements, appState) => {
-    trackEvent(EVENT_ALIGN, "align", "bottom");
     return {
       appState,
       elements: alignSelectedElements(elements, appState, {
@@ -104,7 +101,6 @@ export const actionAlignBottom = register({
 export const actionAlignLeft = register({
   name: "alignLeft",
   perform: (elements, appState) => {
-    trackEvent(EVENT_ALIGN, "align", "left");
     return {
       appState,
       elements: alignSelectedElements(elements, appState, {
@@ -134,7 +130,6 @@ export const actionAlignLeft = register({
 export const actionAlignRight = register({
   name: "alignRight",
   perform: (elements, appState) => {
-    trackEvent(EVENT_ALIGN, "align", "right");
     return {
       appState,
       elements: alignSelectedElements(elements, appState, {
@@ -164,7 +159,6 @@ export const actionAlignRight = register({
 export const actionAlignVerticallyCentered = register({
   name: "alignVerticallyCentered",
   perform: (elements, appState) => {
-    trackEvent(EVENT_ALIGN, "vertically", "center");
     return {
       appState,
       elements: alignSelectedElements(elements, appState, {
@@ -190,7 +184,6 @@ export const actionAlignVerticallyCentered = register({
 export const actionAlignHorizontallyCentered = register({
   name: "alignHorizontallyCentered",
   perform: (elements, appState) => {
-    trackEvent(EVENT_ALIGN, "horizontally", "center");
     return {
       appState,
       elements: alignSelectedElements(elements, appState, {

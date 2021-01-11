@@ -1,9 +1,8 @@
 import React from "react";
 import { AppState } from "../types";
 import { ActionManager } from "../actions/manager";
-import { t, setLanguage } from "../i18n";
+import { t } from "../i18n";
 import Stack from "./Stack";
-import { LanguageList } from "./LanguageList";
 import { showSelectedShapeActions } from "../element";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { FixedSideContainer } from "./FixedSideContainer";
@@ -15,10 +14,8 @@ import { Section } from "./Section";
 import CollabButton from "./CollabButton";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 import { LockIcon } from "./LockIcon";
-import { LoadingMessage } from "./LoadingMessage";
 import { UserList } from "./UserList";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
-import { EVENT_ACTION, trackEvent } from "../analytics";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -31,6 +28,7 @@ type MobileMenuProps = {
   onLockToggle: () => void;
   canvas: HTMLCanvasElement | null;
   isCollaborating: boolean;
+  renderCustomFooter?: (isMobile: boolean) => JSX.Element;
 };
 
 export const MobileMenu = ({
@@ -44,9 +42,9 @@ export const MobileMenu = ({
   onLockToggle,
   canvas,
   isCollaborating,
+  renderCustomFooter,
 }: MobileMenuProps) => (
   <>
-    {appState.isLoading && <LoadingMessage />}
     <FixedSideContainer side="top">
       <Section heading="shapes">
         {(heading) => (
@@ -104,15 +102,7 @@ export const MobileMenu = ({
                   appState={appState}
                   setAppState={setAppState}
                 />
-                <fieldset>
-                  <legend>{t("labels.language")}</legend>
-                  <LanguageList
-                    onChange={async (lng) => {
-                      await setLanguage(lng);
-                      setAppState({});
-                    }}
-                  />
-                </fieldset>
+                {renderCustomFooter?.(true)}
                 <fieldset>
                   <legend>{t("labels.collaborators")}</legend>
                   <UserList mobile>
@@ -158,7 +148,6 @@ export const MobileMenu = ({
             <button
               className="scroll-back-to-content"
               onClick={() => {
-                trackEvent(EVENT_ACTION, "scroll to content");
                 setAppState({
                   ...calculateScrollCenter(elements, appState, canvas),
                 });

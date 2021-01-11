@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Lipire",
+    "pasteCharts": "Lipire diagrame",
     "selectAll": "Selectare totală",
     "multiSelect": "Adaugă element la selecție",
     "moveCanvas": "Mutare pânză",
@@ -76,8 +77,7 @@
     "group": "Grupare selecție",
     "ungroup": "Degrupare selecție",
     "collaborators": "Colaboratori",
-    "toggleGridMode": "Comută modul grilă",
-    "toggleStats": "Comută statisticile pentru pasionați",
+    "gridMode": "Mod grilă",
     "addToLibrary": "Adăugare la bibliotecă",
     "removeFromLibrary": "Eliminare din bibliotecă",
     "libraryLoadingMessage": "Se încarcă biblioteca...",
@@ -118,9 +118,10 @@
     "redo": "Refacere",
     "roomDialog": "Colaborare în direct",
     "createNewRoom": "Creare cameră nouă",
-    "toggleFullScreen": "Comută modul ecran complet",
-    "toggleDarkMode": "Comută modul întunecat",
-    "toggleZenMode": "Comută modul zen",
+    "fullScreen": "Ecran complet",
+    "darkMode": "Mod întunecat",
+    "lightMode": "Mod luminos",
+    "zenMode": "Mod zen",
     "exitZenMode": "Ieșire din modul zen"
   },
   "alerts": {
@@ -136,7 +137,7 @@
     "loadSceneOverridePrompt": "Încărcarea desenului extern va înlocui conținutul existent. Dorești să continui?",
     "errorLoadingLibrary": "A apărut o eroare la încărcarea bibliotecii terțe.",
     "confirmAddLibrary": "Această acțiune va adăuga {{numShapes}} formă(e) la biblioteca ta. Confirmi?",
-    "imageDoesNotContainScene": "Fișierul de imagine nu conține date de scenă. Ai activat această opțiune pe durata exportării?",
+    "imageDoesNotContainScene": "Importarea imaginilor nu este acceptată în acest moment.\n\nVoiai să imporți o scenă? Această imagine nu pare să conțină date de scenă. Ai activat această opțiune pe durata exportării?",
     "cannotRestoreFromImage": "Scena nu a putut fi restaurată din acest fișier de imagine"
   },
   "toolBar": {
@@ -161,6 +162,7 @@
     "freeDraw": "Dă clic pe pânză și glisează cursorul, apoi eliberează-l când ai terminat",
     "text": "Sfat: poți adăuga text și dând dublu clic oriunde cu instrumentul de selecție",
     "linearElementMulti": "Dă clic pe ultimul punct sau apasă tasta Escape sau tasta Enter pentru a termina",
+    "lockAngle": "Poți constrânge unghiul prin ținerea apăsată a tastei SHIFT",
     "resize": "Poți constrânge proporțiile, ținând apăsată tasta SHIFT în timp ce redimensionezi,\nține apăsată tasta ALT pentru a redimensiona de la centru",
     "rotate": "Poți constrânge unghiurile, ținând apăsată tasta SHIFT în timp ce rotești",
     "lineEditor_info": "Dă dublu clic sau apasă tasta Enter pentru a edita punctele",
