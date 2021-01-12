@@ -364,6 +364,8 @@ export const nFormatter = (num: number, digits: number): string => {
 };
 
 export const getVersion = () => {
-  const version = document.querySelector('meta[name="version"]');
-  return version ? (version as any).content : DEFAULT_VERSION;
+  return (
+    document.querySelector<HTMLMetaElement>('meta[name="version"]')?.content ||
+    DEFAULT_VERSION
+  );
 };
