@@ -229,7 +229,19 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
   const { collab } = props;
 
   useEffect(() => {
-    trackEvent("load", "version", getVersion());
+    // delayed by 15 sec so that the app has a time to load the latest SW
+    setTimeout(() => {
+      const version = getVersion();
+      const loggedVersion = window.localStorage.getItem(
+        "excalidraw-lastLoggedVersion",
+      );
+      // prevent logging on multiple visits
+      if (version && version !== loggedVersion) {
+        window.localStorage.setItem("excalidraw-lastLoggedVersion", version);
+        trackEvent("load", "version", version);
+      }
+    }, 15000);
+
     excalidrawRef.current!.readyPromise.then((excalidrawApi) => {
       initializeScene({
         resetScene: excalidrawApi.resetScene,
