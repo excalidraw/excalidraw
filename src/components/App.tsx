@@ -1260,6 +1260,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     if (event.code === CODES.C && event.altKey && event.shiftKey) {
       this.copyToClipboardAsPng();
+      this.setState({ toastMessage: t("toasts.copyToClipboardAsPng") });
       event.preventDefault();
       return;
     }
