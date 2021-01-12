@@ -158,6 +158,7 @@ import {
 import ContextMenu from "./ContextMenu";
 import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
+import { Toast } from "./Toast";
 
 const { history } = createHistory();
 
@@ -376,6 +377,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             onClose={this.toggleStats}
           />
         )}
+        <Toast message={this.state.toastMessage} clearToast={this.clearToast} />
         <main>
           <canvas
             id="canvas"
@@ -1166,6 +1168,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         this.canvas,
       ),
     });
+  };
+
+  clearToast = () => {
+    this.setState({ toastMessage: null });
   };
 
   public updateScene = withBatchedUpdates((sceneData: SceneData) => {

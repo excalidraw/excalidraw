@@ -1,0 +1,31 @@
+@import "../css/_variables";
+
+.excalidraw {
+  .toast {
+    box-sizing: border-box;
+    position: fixed;
+    z-index: 999999;
+    top: 64px;
+    right: 12px;
+    transition: transform 0.6s ease-in-out;
+    animation: toast-in-right 0.7s;
+    background-color: $oc-gray-6;
+    padding: 1rem;
+    border-radius: 4px;
+    width: 300px;
+  }
+
+  .toast__message {
+    font-size: 1rem;
+    color: $oc-white;
+  }
+
+  @keyframes toast-in-right {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+}
