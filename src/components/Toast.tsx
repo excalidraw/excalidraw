@@ -16,7 +16,7 @@ export const Toast = ({
 
   useEffect(() => {
     const interval = setInterval(() => {
-      clearToast(null);
+      clearToast();
     }, 2000);
 
     return () => {
