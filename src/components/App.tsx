@@ -465,7 +465,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   private onBlur = withBatchedUpdates(() => {
     isHoldingSpace = false;
     this.setState({ isBindingEnabled: true });
-    this.resetShouldCacheIgnoreZoomDebounced.flush();
   });
 
   private onUnload = () => {
