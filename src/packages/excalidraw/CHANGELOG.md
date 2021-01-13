@@ -31,6 +31,7 @@ Please add the latest change on the top under the correct section.
 
 ### Fixes
 
+- Fix late-render due to debounced zoom [#2779](https://github.com/excalidraw/excalidraw/pull/2779)
 - Fix initialization when browser tab not focused [#2677](https://github.com/excalidraw/excalidraw/pull/2677)
 - Consistent case for export locale strings [#2622](https://github.com/excalidraw/excalidraw/pull/2622)
 - Remove unnecessary console.error as it was polluting Sentry [#2637](https://github.com/excalidraw/excalidraw/pull/2637)
