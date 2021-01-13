@@ -395,130 +395,157 @@ const resizeSingleElement = (
   pointerX: number,
   pointerY: number,
 ) => {
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(stateAtResizeStart);
+  // Gets bounds corners
+  const [x1, y1, x2, y2] = getResizedElementAbsoluteCoords(
+    stateAtResizeStart,
+    stateAtResizeStart.width,
+    stateAtResizeStart.height,
+  );
   const startTopLeft: Point = [x1, y1];
   const startBottomRight: Point = [x2, y2];
   const startCenter: Point = centerPoint(startTopLeft, startBottomRight);
 
   // Calculate new dimensions based on cursor position
-  let newWidth = stateAtResizeStart.width;
-  let newHeight = stateAtResizeStart.height;
   const rotatedPointer = rotatePoint(
     [pointerX, pointerY],
     startCenter,
     -stateAtResizeStart.angle,
   );
+  const boundsInitialWidth = x2 - x1;
+  const boundsInitialHeight = y2 - y1;
+  let scaleX = 1;
+  let scaleY = 1;
   if (transformHandleDirection.includes("e")) {
-    newWidth = rotatedPointer[0] - startTopLeft[0];
+    scaleX = (rotatedPointer[0] - startTopLeft[0]) / boundsInitialWidth;
   }
   if (transformHandleDirection.includes("s")) {
-    newHeight = rotatedPointer[1] - startTopLeft[1];
+    scaleY = (rotatedPointer[1] - startTopLeft[1]) / boundsInitialHeight;
   }
   if (transformHandleDirection.includes("w")) {
-    newWidth = startBottomRight[0] - rotatedPointer[0];
+    scaleX = (startBottomRight[0] - rotatedPointer[0]) / boundsInitialWidth;
   }
   if (transformHandleDirection.includes("n")) {
-    newHeight = startBottomRight[1] - rotatedPointer[1];
+    scaleY = (startBottomRight[1] - rotatedPointer[1]) / boundsInitialHeight;
   }
+  // Linear elements dimensions differ from bounds dimensions
+  const eleInitialWidth = stateAtResizeStart.width;
+  const eleInitialHeight = stateAtResizeStart.height;
+  let eleNewWidth = eleInitialWidth * scaleX;
+  let eleNewHeight = eleInitialHeight * scaleY;
 
   // adjust dimensions for resizing from center
   if (isResizeFromCenter) {
-    newWidth = 2 * newWidth - stateAtResizeStart.width;
-    newHeight = 2 * newHeight - stateAtResizeStart.height;
+    eleNewWidth = 2 * eleNewWidth - eleInitialWidth;
+    eleNewHeight = 2 * eleNewHeight - eleInitialHeight;
   }
 
   // adjust dimensions to keep sides ratio
   if (shouldKeepSidesRatio) {
-    const widthRatio = Math.abs(newWidth) / stateAtResizeStart.width;
-    const heightRatio = Math.abs(newHeight) / stateAtResizeStart.height;
+    const widthRatio = Math.abs(eleNewWidth) / eleInitialWidth;
+    const heightRatio = Math.abs(eleNewHeight) / eleInitialHeight;
     if (transformHandleDirection.length === 1) {
-      newHeight *= widthRatio;
-      newWidth *= heightRatio;
+      eleNewHeight *= widthRatio;
+      eleNewWidth *= heightRatio;
     }
     if (transformHandleDirection.length === 2) {
       const ratio = Math.max(widthRatio, heightRatio);
-      newWidth = stateAtResizeStart.width * ratio * Math.sign(newWidth);
-      newHeight = stateAtResizeStart.height * ratio * Math.sign(newHeight);
+      eleNewWidth = eleInitialWidth * ratio * Math.sign(eleNewWidth);
+      eleNewHeight = eleInitialHeight * ratio * Math.sign(eleNewHeight);
     }
   }
+
+  const [
+    newBoundsX1,
+    newBoundsY1,
+    newBoundsX2,
+    newBoundsY2,
+  ] = getResizedElementAbsoluteCoords(
+    stateAtResizeStart,
+    eleNewWidth,
+    eleNewHeight,
+  );
+  const newBoundsWidth = newBoundsX2 - newBoundsX1;
+  const newBoundsHeight = newBoundsY2 - newBoundsY1;
 
   // Calculate new topLeft based on fixed corner during resize
   let newTopLeft = [...startTopLeft] as [number, number];
   if (["n", "w", "nw"].includes(transformHandleDirection)) {
     newTopLeft = [
-      startBottomRight[0] - Math.abs(newWidth),
-      startBottomRight[1] - Math.abs(newHeight),
+      startBottomRight[0] - Math.abs(newBoundsWidth),
+      startBottomRight[1] - Math.abs(newBoundsHeight),
     ];
   }
   if (transformHandleDirection === "ne") {
     const bottomLeft = [startTopLeft[0], startBottomRight[1]];
-    newTopLeft = [bottomLeft[0], bottomLeft[1] - Math.abs(newHeight)];
+    newTopLeft = [bottomLeft[0], bottomLeft[1] - Math.abs(newBoundsHeight)];
   }
   if (transformHandleDirection === "sw") {
     const topRight = [startBottomRight[0], startTopLeft[1]];
-    newTopLeft = [topRight[0] - Math.abs(newWidth), topRight[1]];
+    newTopLeft = [topRight[0] - Math.abs(newBoundsWidth), topRight[1]];
   }
 
   // Keeps opposite handle fixed during resize
   if (shouldKeepSidesRatio) {
     if (["s", "n"].includes(transformHandleDirection)) {
-      newTopLeft[0] = startCenter[0] - newWidth / 2;
+      newTopLeft[0] = startCenter[0] - newBoundsWidth / 2;
     }
     if (["e", "w"].includes(transformHandleDirection)) {
-      newTopLeft[1] = startCenter[1] - newHeight / 2;
+      newTopLeft[1] = startCenter[1] - newBoundsHeight / 2;
     }
   }
 
   // Flip horizontally
-  if (newWidth < 0) {
+  if (eleNewWidth < 0) {
     if (transformHandleDirection.includes("e")) {
-      newTopLeft[0] -= Math.abs(newWidth);
+      newTopLeft[0] -= Math.abs(newBoundsWidth);
     }
     if (transformHandleDirection.includes("w")) {
-      newTopLeft[0] += Math.abs(newWidth);
+      newTopLeft[0] += Math.abs(newBoundsWidth);
     }
   }
   // Flip vertically
-  if (newHeight < 0) {
+  if (eleNewHeight < 0) {
     if (transformHandleDirection.includes("s")) {
-      newTopLeft[1] -= Math.abs(newHeight);
+      newTopLeft[1] -= Math.abs(newBoundsHeight);
     }
     if (transformHandleDirection.includes("n")) {
-      newTopLeft[1] += Math.abs(newHeight);
+      newTopLeft[1] += Math.abs(newBoundsHeight);
     }
   }
 
   if (isResizeFromCenter) {
-    newTopLeft[0] = startCenter[0] - Math.abs(newWidth) / 2;
-    newTopLeft[1] = startCenter[1] - Math.abs(newHeight) / 2;
+    newTopLeft[0] = startCenter[0] - Math.abs(newBoundsWidth) / 2;
+    newTopLeft[1] = startCenter[1] - Math.abs(newBoundsHeight) / 2;
   }
 
   // adjust topLeft to new rotation point
   const angle = stateAtResizeStart.angle;
   const rotatedTopLeft = rotatePoint(newTopLeft, startCenter, angle);
   const newCenter: Point = [
-    newTopLeft[0] + Math.abs(newWidth) / 2,
-    newTopLeft[1] + Math.abs(newHeight) / 2,
+    newTopLeft[0] + Math.abs(newBoundsWidth) / 2,
+    newTopLeft[1] + Math.abs(newBoundsHeight) / 2,
   ];
   const rotatedNewCenter = rotatePoint(newCenter, startCenter, angle);
   newTopLeft = rotatePoint(rotatedTopLeft, rotatedNewCenter, -angle);
 
-  // For linear elements
+  // Readjust points for linear elements
   const rescaledPoints = rescalePointsInElement(
     stateAtResizeStart,
-    newWidth,
-    newHeight,
+    eleNewWidth,
+    eleNewHeight,
   );
-  // For linear elements x,y are not the top-left corner
-  // So we need to readjust them according to the original position
-  const deltaX1 = startTopLeft[0] - stateAtResizeStart.x;
-  const deltaY1 = startTopLeft[1] - stateAtResizeStart.y;
+
+  // For linear elements (x,y) are the coordinates of the first drawn point not the top-left corner
+  // So we need to readjust (x,y) to be where the first point should be
+  const newOrigin = [...newTopLeft];
+  newOrigin[0] += stateAtResizeStart.x - newBoundsX1;
+  newOrigin[1] += stateAtResizeStart.y - newBoundsY1;
 
   const resizedElement = {
-    width: Math.abs(newWidth),
-    height: Math.abs(newHeight),
-    x: newTopLeft[0] - deltaX1,
-    y: newTopLeft[1] - deltaY1,
+    width: Math.abs(eleNewWidth),
+    height: Math.abs(eleNewHeight),
+    x: newOrigin[0],
+    y: newOrigin[1],
     ...rescaledPoints,
   };
   updateBoundElements(element, {
