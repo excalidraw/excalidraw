@@ -1,5 +1,6 @@
 import oc from "open-color";
 import React, { useLayoutEffect, useRef, useState } from "react";
+import { trackEvent } from "../analytics";
 import { ChartElements, renderSpreadsheet, Spreadsheet } from "../charts";
 import { ChartType } from "../element/types";
 import { t } from "../i18n";
@@ -86,6 +87,7 @@ export const PasteChartDialog = ({
 
   const handleChartClick = (chartType: ChartType, elements: ChartElements) => {
     onInsertChart(elements);
+    trackEvent("magic", "chart", chartType);
     setAppState({
       currentChartType: chartType,
       pasteDialog: {
