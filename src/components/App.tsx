@@ -465,6 +465,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   private onBlur = withBatchedUpdates(() => {
     isHoldingSpace = false;
     this.setState({ isBindingEnabled: true });
+    this.resetShouldCacheIgnoreZoomDebounced.flush();
   });
 
   private onUnload = () => {
@@ -3816,7 +3817,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   private resetShouldCacheIgnoreZoomDebounced = debounce(() => {
-    this.setState({ shouldCacheIgnoreZoom: false });
+    if (!this.unmounted) {
+      this.setState({ shouldCacheIgnoreZoom: false });
+    }
   }, 300);
 
   private getCanvasOffsets(offsets?: {
