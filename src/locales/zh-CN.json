@@ -69,7 +69,7 @@
     "actions": "操作",
     "language": "语言",
     "createRoom": "分享实时协作会议",
-    "duplicateSelection": "复制所有已选择的元素",
+    "duplicateSelection": "复制",
     "untitled": "无标题",
     "name": "名字",
     "yourName": "您的姓名",
@@ -121,7 +121,7 @@
     "fullScreen": "全屏",
     "darkMode": "暗色主题",
     "lightMode": "浅色模式",
-    "zenMode": "禅意模式",
+    "zenMode": "禅模式",
     "exitZenMode": "退出禅模式"
   },
   "alerts": {
