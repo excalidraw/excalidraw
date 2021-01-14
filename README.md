@@ -1,6 +1,6 @@
 <div align="center" style="display:flex;flex-direction:column;">
   <a href="https://excalidraw.com">
-    <img src="./public/og-image-sm.png" alt="Excalidraw logo: Sketch handrawn like diagrams." />
+    <img width="540" src="./public/og-image-sm.png" alt="Excalidraw logo: Sketch handrawn like diagrams." />
   </a>
   <h3>Virtual whiteboard for sketching hand-drawn like diagrams. Collaborative and end to end encrypted.</h3>
   <p>
