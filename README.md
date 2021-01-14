@@ -117,9 +117,9 @@ We are working towards providing a full-fledged solution for self hosting your o
 
 Pull requests are welcome. For major changes, please [open an issue](https://github.com/excalidraw/excalidraw/issues/new) first to discuss what you would like to change.
 
-## Excalidraw is built using these awesome tools
+## Notable used tools
 
-- [React](https://reactjs.org)
+- [Create React App](https://github.com/facebook/create-react-app)
 - [Rough.js](https://roughjs.com)
 - [TypeScript](https://www.typescriptlang.org)
 - [Vercel](https://vercel.com)
