@@ -30,10 +30,10 @@
     "edges": "Vores",
     "sharp": "Agut",
     "round": "Arrodonit",
-    "arrowheads": "Punta de fletxa",
+    "arrowheads": "Puntes de fletxa",
     "arrowhead_none": "Cap",
     "arrowhead_arrow": "Fletxa",
-    "arrowhead_bar": "Línia",
+    "arrowhead_bar": "Barra",
     "arrowhead_dot": "Punt",
     "fontSize": "Mida de lletra",
     "fontFamily": "Tipus de lletra",
@@ -61,7 +61,7 @@
     "architect": "Arquitecte",
     "artist": "Artista",
     "cartoonist": "Dibuixant",
-    "fileTitle": "Títol de fitxer",
+    "fileTitle": "Títol del fitxer",
     "colorPicker": "Selector de colors",
     "canvasBackground": "Fons del llenç",
     "drawingCanvas": "Llenç de dibuix",
@@ -171,7 +171,7 @@
   },
   "canvasError": {
     "cannotShowPreview": "No es pot mostrar la vista prèvia",
-    "canvasTooBig": "El llenç pot ser massa gran.",
+    "canvasTooBig": "Pot ser que el llenç sigui massa gran.",
     "canvasTooBigTip": "Consell: prova d’acostar una mica els elements més allunyats."
   },
   "errorSplash": {
@@ -215,7 +215,7 @@
     "textNewLine": "Afegir línea nova (text)",
     "textFinish": "Acabar d'editar (text)",
     "zoomToFit": "Zoom per veure tots els elements",
-    "zoomToSelection": "Amplia la selecció",
+    "zoomToSelection": "Zoom per veure la selecció",
     "preventBinding": "Prevenir vinculació de la fletxa"
   },
   "encrypted": {
