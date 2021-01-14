@@ -913,6 +913,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         this.canvas!,
         this.state,
       );
+      this.setState({ toastMessage: t("toasts.copyToClipboardAsPng") });
     } catch (error) {
       console.error(error);
       this.setState({ errorMessage: error.message });
@@ -1260,7 +1261,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     if (event.code === CODES.C && event.altKey && event.shiftKey) {
       this.copyToClipboardAsPng();
-      this.setState({ toastMessage: t("toasts.copyToClipboardAsPng") });
       event.preventDefault();
       return;
     }

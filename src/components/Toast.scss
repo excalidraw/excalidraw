@@ -4,13 +4,13 @@
   .toast {
     box-sizing: border-box;
     position: fixed;
+    bottom: 10px;
+    left: 50%;
+    margin-left: -150px;
     z-index: 999999;
-    top: 64px;
-    right: 12px;
-    transition: transform 0.6s ease-in-out;
-    animation: toast-in-right 0.7s;
+    animation: fade-in 0.5s;
     background-color: $oc-gray-6;
-    padding: 1rem;
+    padding: 0.2rem 0.8rem;
     border-radius: 4px;
     width: 300px;
   }
@@ -20,12 +20,12 @@
     color: $oc-white;
   }
 
-  @keyframes toast-in-right {
+  @keyframes fade-in {
     from {
-      transform: translateX(100%);
+      opacity: 0;
     }
     to {
-      transform: translateX(0);
+      opacity: 1;
     }
   }
 }

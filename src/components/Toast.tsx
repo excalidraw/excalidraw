@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./Toast.scss";
 
 export const Toast = ({
@@ -8,15 +8,32 @@ export const Toast = ({
   message: string | null;
   clearToast: Function;
 }) => {
+  const [shouldClear, setShouldClear] = useState(true);
+
   useEffect(() => {
     if (message !== null) {
-      const timeout = setTimeout(clearToast, 2000);
+      const timeout = setTimeout(() => {
+        if (shouldClear) {
+          clearToast();
+        }
+      }, 2000);
       return () => clearTimeout(timeout);
     }
-  });
+  }, [shouldClear, clearToast, message]);
+
+  const handleMouseLeave = (
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>,
+  ) => {
+    clearToast();
+    setShouldClear(true);
+  };
 
   return message ? (
-    <div className="toast">
+    <div
+      className="toast"
+      onMouseOver={() => setShouldClear(false)}
+      onMouseLeave={handleMouseLeave}
+    >
       <p className="toast__message">{message}</p>
     </div>
   ) : null;
