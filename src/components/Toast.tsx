@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import "./Toast.scss";
 
 export const Toast = ({
@@ -8,25 +8,16 @@ export const Toast = ({
   message: string | null;
   clearToast: Function;
 }) => {
-  const [toastMessage, setToastMessage] = useState<string | null>(message);
-
   useEffect(() => {
-    setToastMessage(message);
-  }, [message]);
+    if (message !== null) {
+      const timeout = setTimeout(clearToast, 2000);
+      return () => clearTimeout(timeout);
+    }
+  });
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      clearToast();
-    }, 2000);
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, [clearToast]);
-
-  return toastMessage ? (
+  return message ? (
     <div className="toast">
-      <p className="toast__message">{toastMessage}</p>
+      <p className="toast__message">{message}</p>
     </div>
   ) : null;
 };
