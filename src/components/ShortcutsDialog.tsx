@@ -95,13 +95,6 @@ const Footer = () => (
       {t("shortcutsDialog.blog")}
     </a>
     <a
-      href="https://howto.excalidraw.com"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      {t("shortcutsDialog.howto")}
-    </a>
-    <a
       href="https://github.com/excalidraw/excalidraw/issues"
       target="_blank"
       rel="noopener noreferrer"
