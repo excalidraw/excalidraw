@@ -82,7 +82,7 @@ Shortcut.defaultProps = {
 };
 
 const ShortcutKey = (props: { children: React.ReactNode }) => (
-  <span className="ShorcutsDialog-key" {...props} />
+  <kbd className="ShorcutsDialog-key" {...props} />
 );
 
 const Footer = () => (
