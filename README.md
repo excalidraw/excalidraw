@@ -117,7 +117,7 @@ Become a financial contributor and help us sustain our community. [[Contribute](
 
 #### Individuals
 
-<a href="https://opencollective.com/excalidraw"><img src="https://opencollective.com/excalidraw/individuals.svg?width=890"></a>
+<a href="https://opencollective.com/excalidraw"><img src="https://opencollective.com/excalidraw/individuals.svg?width=890&button=true" /></a>
 
 #### Organizations
 
