@@ -10,9 +10,6 @@
     <a target="_blank" href="https://crowdin.com/project/excalidraw">
       <img src="https://badges.crowdin.net/excalidraw/localized.svg">
     </a>
-    <a target="_blank" href="https://hub.docker.com/r/excalidraw/excalidraw">
-      <img src="https://img.shields.io/docker/pulls/excalidraw/excalidraw">
-    </a>
   </p>
 </div>
 
