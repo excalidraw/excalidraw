@@ -25,7 +25,6 @@ export const LanguageList = ({
       <option key={i18n.defaultLang.code} value={i18n.defaultLang.code}>
         {i18n.defaultLang.label}
       </option>
-      <option disabled>{"──────────"}</option>
       {languages.map((lang) => (
         <option key={lang.code} value={lang.code}>
           {lang.label}
