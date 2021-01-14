@@ -36,6 +36,12 @@ Choose line or arrow and click click click instead of drag.
 
 You can easily create charts by copy pasting data from Excel or just plain comma separated text.
 
+### Translating
+
+To translate Excalidraw into other languages, please visit [our Crowdin page](https://crowdin.com/project/excalidraw). To add a new language, [open an issue](https://github.com/excalidraw/excalidraw/issues/new) so we can get things set up on our end first.
+
+Translations will be available on the app if they exceed a certain threshold of completion (currently 85%).
+
 ### Create a collaboration session manually
 
 In order to create a session manually you just need to generate a link of this form:
@@ -57,12 +63,6 @@ The second set of digits is the encryption key. The Excalidraw server doesn’t 
 ## Shape libraries
 
 Find a growing list of libraries containing assets for your drawings at [libraries.excalidraw.com](https://libraries.excalidraw.com).
-
-## Translating
-
-To translate Excalidraw into other languages, please visit [our Crowdin page](https://crowdin.com/project/excalidraw). To add a new language, [open an issue](https://github.com/excalidraw/excalidraw/issues/new) so we can get things set up on our end first.
-
-Translations will be available on the app if they exceed a certain threshold of completion (currently 85%).
 
 ## Developement
 
