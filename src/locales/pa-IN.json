@@ -234,7 +234,7 @@
     "width": "ਚੌੜਾਈ"
   },
   "toast": {
-    "copyStyles": "",
-    "copyToClipboardAsPng": ""
+    "copyStyles": "ਕਾਪੀ ਕੀਤੇ ਸਟਾਇਲ।",
+    "copyToClipboardAsPng": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ PNG ਵਜੋਂ ਕਾਪੀ ਕੀਤਾ।"
   }
 }
