@@ -117,7 +117,7 @@
     "undo": "Annuler",
     "redo": "Rétablir",
     "roomDialog": "Démarrer la collaboration en direct",
-    "createNewRoom": "Créer un nouveau salon",
+    "createNewRoom": "Créer une nouvelle salle",
     "fullScreen": "Plein écran",
     "darkMode": "Mode sombre",
     "lightMode": "Mode clair",
@@ -193,8 +193,8 @@
     "button_startSession": "Démarrer la session",
     "button_stopSession": "Arrêter la session",
     "desc_inProgressIntro": "La session de collaboration en direct est maintenant en cours.",
-    "desc_shareLink": "Partagez ce lien avec ceux avec qui vous souhaitez collaborer :",
-    "desc_exitSession": "Arrêter la session vous déconnectera du salon, mais vous pourrez continuer à travailler avec la scène, localement. Notez que cela n'affectera pas les autres personnes, et ils seront toujours en mesure de collaborer sur leur version."
+    "desc_shareLink": "Partagez ce lien avec les personnes avec lesquelles vous souhaitez collaborer :",
+    "desc_exitSession": "Arrêter la session vous déconnectera de la salle, mais vous pourrez continuer à travailler avec la scène, localement. Notez que cela n'affectera pas les autres personnes, et ils pourront toujours collaborer sur leur version."
   },
   "errorDialog": {
     "title": "Erreur"
@@ -209,12 +209,12 @@
     "curvedLine": "Ligne courbée",
     "editor": "Éditeur",
     "view": "Afficher",
-    "blog": "Lisez notre blog",
-    "howto": "Suivez nos guides",
-    "github": "Vous avez trouvé un problème ? Envoyer",
+    "blog": "Lire notre blog",
+    "howto": "Voir nos guides",
+    "github": "Un problème trouvé ? Soumettre",
     "textNewLine": "Ajouter une nouvelle ligne (texte)",
     "textFinish": "Terminer l'édition (texte)",
-    "zoomToFit": "Zoomer pour visualiser tous les éléments",
+    "zoomToFit": "Zoomer pour voir tous les éléments",
     "zoomToSelection": "Zoomer sur la sélection",
     "preventBinding": "Empêcher la liaison de la flèche"
   },
