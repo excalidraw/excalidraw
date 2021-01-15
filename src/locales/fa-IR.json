@@ -232,5 +232,9 @@
     "title": "آمار برای نردها",
     "total": "مجموع",
     "width": "عرض"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboardAsPng": ""
   }
 }
