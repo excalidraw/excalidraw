@@ -36,7 +36,7 @@ export const exportCanvas = async (
   },
 ) => {
   if (elements.length === 0) {
-    return window.alert(t("alerts.cannotExportEmptyCanvas"));
+    throw new Error(t("alerts.cannotExportEmptyCanvas"));
   }
   if (type === "svg" || type === "clipboard-svg") {
     const tempSvg = exportToSvg(elements, {

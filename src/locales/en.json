@@ -232,5 +232,9 @@
     "title": "Stats for nerds",
     "total": "Total",
     "width": "Width"
+  },
+  "toast": {
+    "copyStyles": "Copied styles.",
+    "copyToClipboardAsPng": "Copied to clipboard as PNG."
   }
 }
