@@ -232,5 +232,9 @@
     "title": "Štatistiky",
     "total": "Celkom",
     "width": "Šírka"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboardAsPng": ""
   }
 }
