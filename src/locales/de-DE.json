@@ -234,7 +234,7 @@
     "width": "Breite"
   },
   "toast": {
-    "copyStyles": "",
-    "copyToClipboardAsPng": ""
+    "copyStyles": "Formatierung kopiert.",
+    "copyToClipboardAsPng": "In die Zwischenablage als PNG kopiert."
   }
 }
