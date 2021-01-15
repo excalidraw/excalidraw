@@ -160,14 +160,14 @@
   "hints": {
     "linearElement": "Cliquez pour démarrer plusieurs points, faites glisser pour une seule ligne",
     "freeDraw": "Cliquez et faites glissez, relâchez quand vous avez terminé",
-    "text": "Astuce : vous pouvez également ajouter du texte en double-cliquant n'importe où avec l'outil de sélection",
+    "text": "Astuce : vous pouvez aussi ajouter du texte en double-cliquant n'importe où avec l'outil de sélection",
     "linearElementMulti": "Cliquez sur le dernier point ou appuyez sur Échap ou Entrée pour terminer",
-    "lockAngle": "Vous pouvez contraindre l'angle en maintenant SHIFT",
-    "resize": "Vous pouvez conserver les proportions en maintenant la touche SHIFT pendant le redimensionnement,\nen maintenant la touche ALT pour redimensionner par rapport au centre",
-    "rotate": "Vous pouvez contraindre les angles en maintenant MAJ enfoncé pendant la rotation",
+    "lockAngle": "Vous pouvez restreindre l'angle en maintenant MAJ",
+    "resize": "Vous pouvez conserver les proportions en maintenant la touche MAJ pendant le redimensionnement,\nmaintenez la touche ALT pour redimensionner par rapport au centre",
+    "rotate": "Vous pouvez restreindre les angles en maintenant MAJ pendant la rotation",
     "lineEditor_info": "Double-cliquez ou appuyez sur Entrée pour éditer les points",
     "lineEditor_pointSelected": "Appuyez sur Supprimer pour supprimer le point, Ctrl ou Cmd+D pour le dupliquer, ou faites-le glisser pour le déplacer",
-    "lineEditor_nothingSelected": "Sélectionnez un point à déplacer ou à supprimer, ou maintenez Alt enfoncé et cliquez pour ajouter de nouveaux points"
+    "lineEditor_nothingSelected": "Sélectionnez un point à déplacer ou supprimer, ou maintenez Alt et cliquez pour ajouter de nouveaux points"
   },
   "canvasError": {
     "cannotShowPreview": "Impossible d’afficher l’aperçu",
