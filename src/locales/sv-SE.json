@@ -232,5 +232,9 @@
     "title": "Statistik för nördar",
     "total": "Totalt",
     "width": "Bredd"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboardAsPng": ""
   }
 }
