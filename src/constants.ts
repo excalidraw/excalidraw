@@ -66,11 +66,11 @@ export const FONT_FAMILY = {
 
 export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";
 
-export const DEFAULT_FONT_SIZE = 20;
 export const DEFAULT_FONT_FAMILY: FontFamily = 1;
+export const DEFAULT_FONT_SIZE = 20;
 export const DEFAULT_TEXT_ALIGN = "left";
-export const DEFAULT_VERTICAL_ALIGN = "top";
 export const DEFAULT_VERSION = "{version}";
+export const DEFAULT_VERTICAL_ALIGN = "top";
 
 export const CANVAS_ONLY_ACTIONS = ["selectAll"];
 
@@ -87,6 +87,6 @@ export const STORAGE_KEYS = {
 
 // Time in milliseconds
 export const TAP_TWICE_TIMEOUT = 300;
-export const TOUCH_CTX_MENU_TIMEOUT = 500;
 export const TITLE_TIMEOUT = 10000;
 export const TOAST_TIMEOUT = 5000;
+export const TOUCH_CTX_MENU_TIMEOUT = 500;
