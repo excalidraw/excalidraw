@@ -234,7 +234,7 @@
     "width": "Width"
   },
   "toast": {
-    "copyToClipboardAsPng": "Copied to clipboard as PNG.",
-    "copyStyles": "Copied styles."
+    "copyStyles": "Copied styles.",
+    "copyToClipboardAsPng": "Copied to clipboard as PNG."
   }
 }
