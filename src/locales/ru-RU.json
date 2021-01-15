@@ -232,5 +232,9 @@
     "title": "Статистика для ботаников",
     "total": "Всего",
     "width": "Ширина"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboardAsPng": ""
   }
 }
