@@ -232,5 +232,9 @@
     "title": "बेवकूफ के लिए आँकड़े",
     "total": "कुल",
     "width": "चौड़ाई"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboardAsPng": ""
   }
 }
