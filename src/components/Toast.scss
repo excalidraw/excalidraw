@@ -3,7 +3,7 @@
 .excalidraw {
   .Toast {
     animation: fade-in 0.5s;
-    background-color: $oc-gray-5;
+    background-color: var(--button-gray-1);
     border-radius: 4px;
     bottom: 10px;
     box-sizing: border-box;
@@ -18,7 +18,7 @@
   }
 
   .Toast__message {
-    color: $oc-white;
+    color: var(--popup-text-color);
   }
 
   @keyframes fade-in {
