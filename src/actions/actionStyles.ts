@@ -4,6 +4,7 @@ import {
   redrawTextBoundingBox,
 } from "../element";
 import { CODES, KEYS } from "../keys";
+import { t } from "../i18n";
 import { register } from "./register";
 import { mutateElement, newElementWith } from "../element/mutateElement";
 import {
@@ -23,6 +24,10 @@ export const actionCopyStyles = register({
       copiedStyles = JSON.stringify(element);
     }
     return {
+      appState: {
+        ...appState,
+        toastMessage: t("toast.copyStyles"),
+      },
       commitToHistory: false,
     };
   },
