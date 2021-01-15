@@ -234,7 +234,7 @@
     "width": "Leveys"
   },
   "toast": {
-    "copyStyles": "",
-    "copyToClipboardAsPng": ""
+    "copyStyles": "Tyylit kopioitu.",
+    "copyToClipboardAsPng": "Kopioitu leikepöydälle PNG-tiedostona."
   }
 }
