@@ -172,24 +172,24 @@
   "canvasError": {
     "cannotShowPreview": "Impossible d’afficher l’aperçu",
     "canvasTooBig": "Le canevas est peut-être trop grand.",
-    "canvasTooBigTip": "Conseil : essayez de rapprocher un peu plus les éléments les plus éloignés."
+    "canvasTooBigTip": "Astuce : essayez de rapprocher un peu les éléments les plus éloignés."
   },
   "errorSplash": {
     "headingMain_pre": "Une erreur est survenue. Essayez ",
-    "headingMain_button": "rechargement de la page.",
+    "headingMain_button": "de recharger la page.",
     "clearCanvasMessage": "Si le rechargement ne résout pas l'erreur, essayez ",
     "clearCanvasMessage_button": "effacement du canevas.",
     "clearCanvasCaveat": " Cela entraînera une perte du travail ",
     "trackedToSentry_pre": "L'erreur avec l'identifiant ",
     "trackedToSentry_post": " a été enregistrée dans notre système.",
-    "openIssueMessage_pre": "Nous avons été très prudents de ne pas inclure les informations de votre scène dans l'erreur. Si votre scène n'est pas privée, veuillez envisager de poursuivre sur notre ",
+    "openIssueMessage_pre": "Nous avons fait très attention à ne pas inclure les informations de votre scène dans l'erreur. Si votre scène n'est pas privée, veuillez envisager de poursuivre sur notre ",
     "openIssueMessage_button": "outil de suivi des bugs.",
     "openIssueMessage_post": " Veuillez inclure les informations ci-dessous en les copiant-collant dans le ticket GitHub.",
     "sceneContent": "Contenu de la scène :"
   },
   "roomDialog": {
-    "desc_intro": "Vous pouvez inviter des personnes dans votre scène actuelle à collaborer avec vous.",
-    "desc_privacy": "Ne vous inquiétez pas, la session utilise le chiffrement de bout en bout, donc tout ce que vous dessinez restera privé. Même notre serveur ne sera pas en mesure de voir ce que vous faites.",
+    "desc_intro": "Vous pouvez inviter des personnes à collaborer avec vous sur votre scène actuelle.",
+    "desc_privacy": "Pas d'inquiétude, la session utilise le chiffrement de bout en bout, donc tout ce que vous dessinez restera privé. Même notre serveur ne pourra voir ce que vous faites.",
     "button_startSession": "Démarrer la session",
     "button_stopSession": "Arrêter la session",
     "desc_inProgressIntro": "La session de collaboration en direct est maintenant en cours.",
