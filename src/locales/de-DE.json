@@ -232,5 +232,9 @@
     "title": "Statistiken für Nerds",
     "total": "Gesamt",
     "width": "Breite"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboardAsPng": ""
   }
 }
