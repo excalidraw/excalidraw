@@ -234,7 +234,7 @@
     "width": "Πλάτος"
   },
   "toast": {
-    "copyStyles": "",
-    "copyToClipboardAsPng": ""
+    "copyStyles": "Αντιγράφηκαν στυλ.",
+    "copyToClipboardAsPng": "Αντιγράφτηκε στο πρόχειρο ως PNG."
   }
 }
