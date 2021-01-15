@@ -232,5 +232,9 @@
     "title": "အက္ခရာများအတွက်အချက်အလက်များ",
     "total": "စုစုပေါင်း",
     "width": "အကျယ်"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboardAsPng": ""
   }
 }
