@@ -232,5 +232,9 @@
     "title": "ਪੜਾਕੂਆਂ ਲਈ ਅੰਕੜੇ",
     "total": "ਕੁੱਲ",
     "width": "ਚੌੜਾਈ"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboardAsPng": ""
   }
 }
