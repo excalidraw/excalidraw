@@ -163,7 +163,7 @@
     "text": "Suggerimento: puoi anche aggiungere del testo facendo doppio clic ovunque con lo strumento di selezione",
     "linearElementMulti": "Clicca sull'ultimo punto o premi Esc o Invio per finire",
     "lockAngle": "Puoi limitare l'angolo tenendo premuto SHIFT",
-    "resize": "Per vincolare le proporzioni, tenir premuto MAIUSC durante il ridimensionamento;\nper ridimensionare dal centro, tenir premuto ALT",
+    "resize": "Per vincolare le proporzioni, tieni premuto MAIUSC durante il ridimensionamento;\nper ridimensionare dal centro, tieni premuto ALT",
     "rotate": "Puoi mantenere gli angoli tenendo premuto SHIFT durante la rotazione",
     "lineEditor_info": "Fai doppio click o premi invio per modificare i punti",
     "lineEditor_pointSelected": "Premere Elimina per rimuovere il punto, CtrlOrCmd+D per duplicare o trascinare per spostare",
@@ -175,7 +175,7 @@
     "canvasTooBigTip": "Suggerimento: prova a spostare gli elementi più lontani più vicini tra loro."
   },
   "errorSplash": {
-    "headingMain_pre": "Si è verificato un errore. Provare ",
+    "headingMain_pre": "Si è verificato un errore. Riprovare ",
     "headingMain_button": "ricaricando la pagina.",
     "clearCanvasMessage": "Se ricaricare non funziona, prova ",
     "clearCanvasMessage_button": "pulire la tela.",
