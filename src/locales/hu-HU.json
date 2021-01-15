@@ -232,5 +232,9 @@
     "title": "Statisztikák",
     "total": "Összesen",
     "width": "Szélesség"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboardAsPng": ""
   }
 }
