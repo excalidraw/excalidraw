@@ -232,5 +232,9 @@
     "title": "סטטיסטיקות לחנונים",
     "total": "סה״כ",
     "width": "רוחב"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboardAsPng": ""
   }
 }
