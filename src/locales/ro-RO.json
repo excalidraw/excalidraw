@@ -232,5 +232,9 @@
     "title": "Statistici pentru pasionați",
     "total": "Total",
     "width": "Lățime"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboardAsPng": ""
   }
 }
