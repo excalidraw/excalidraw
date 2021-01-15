@@ -216,7 +216,7 @@
     "textFinish": "Terminer l'édition (texte)",
     "zoomToFit": "Zoomer pour voir tous les éléments",
     "zoomToSelection": "Zoomer sur la sélection",
-    "preventBinding": "Empêcher la liaison de la flèche"
+    "preventBinding": "Empêcher la liaison de flèche"
   },
   "encrypted": {
     "tooltip": "Vos dessins sont chiffrés de bout en bout, les serveurs d'Excalidraw ne les verront jamais."
@@ -235,6 +235,6 @@
   },
   "toast": {
     "copyStyles": "Styles copiés.",
-    "copyToClipboardAsPng": "Copier vers le presse-papier en PNG."
+    "copyToClipboardAsPng": "Copié vers le presse-papier en PNG."
   }
 }
