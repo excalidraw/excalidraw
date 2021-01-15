@@ -1,6 +1,7 @@
 import colors from "./colors";
 import {
   CURSOR_TYPE,
+  DEFAULT_VERSION,
   FONT_FAMILY,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
@@ -359,5 +360,12 @@ export const nFormatter = (num: number, digits: number): string => {
   }
   return (
     (num / si[index].value).toFixed(digits).replace(rx, "$1") + si[index].symbol
+  );
+};
+
+export const getVersion = () => {
+  return (
+    document.querySelector<HTMLMetaElement>('meta[name="version"]')?.content ||
+    DEFAULT_VERSION
   );
 };

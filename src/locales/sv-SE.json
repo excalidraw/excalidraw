@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Klistra in",
+    "pasteCharts": "Klistra in diagram",
     "selectAll": "Markera alla",
     "multiSelect": "Lägg till element till markering",
     "moveCanvas": "Flytta canvas",

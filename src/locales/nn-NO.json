@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Lim inn",
+    "pasteCharts": "Lim inn diagram",
     "selectAll": "Vel alt",
     "multiSelect": "Legg til element i utval",
     "moveCanvas": "Flytt lerretet",
@@ -39,7 +40,7 @@
     "onlySelected": "Kun valde",
     "withBackground": "Med bakgrunn",
     "exportEmbedScene": "Bygg scena inn i eksportert fil",
-    "exportEmbedScene_details": "Scenedataa vert lagra i den eksporterte PNG- eller SVG-fila slik at scena kan bli gjenopprettast frå den. Dette vil auke eksportert filstorleik.",
+    "exportEmbedScene_details": "Scenedata vert lagra i den eksporterte PNG- eller SVG-fila slik at scena kan bli gjenopprettast frå den. Dette vil auke eksportert filstorleik.",
     "addWatermark": "Legg til «Laga med Excalidraw»",
     "handDrawn": "Handteikna",
     "normal": "Normal",
@@ -76,7 +77,7 @@
     "group": "Grupper utval",
     "ungroup": "Avgrupper utval",
     "collaborators": "Samarbeidarar",
-    "gridMode": "",
+    "gridMode": "Rutevisning",
     "addToLibrary": "Legg til i bibliotek",
     "removeFromLibrary": "Fjern frå bibliotek",
     "libraryLoadingMessage": "Laster bibliotek...",
@@ -117,10 +118,10 @@
     "redo": "Gjer om",
     "roomDialog": "Start sanntids-samarbeid",
     "createNewRoom": "Lag nytt rom",
-    "fullScreen": "",
-    "darkMode": "",
-    "lightMode": "",
-    "zenMode": "",
+    "fullScreen": "Fullskjerm",
+    "darkMode": "Mørk modus",
+    "lightMode": "Lys modus",
+    "zenMode": "Zen-modus",
     "exitZenMode": "Avslutt zen-modus"
   },
   "alerts": {
@@ -136,7 +137,7 @@
     "loadSceneOverridePrompt": "Innlasting av ekstern teikning erstattar ditt eksisterande innhald. Ynskjer du å fortsette?",
     "errorLoadingLibrary": "Det oppstod ein feil under lastinga av tredjepartsbibliotek.",
     "confirmAddLibrary": "Dette vil legge til {{numShapes}} form(er) i biblioteket ditt. Er du sikker?",
-    "imageDoesNotContainScene": "",
+    "imageDoesNotContainScene": "Importering av bilder støttes ikkje for p. t.\n\nVil du importere ein scene? Dette bildet ser ikkje ut til å inneholde noen scene-data. Har du aktivert dette under eksporten?",
     "cannotRestoreFromImage": "Scena kunne ikkje gjenopprettast frå denne biletfila"
   },
   "toolBar": {
@@ -161,7 +162,7 @@
     "freeDraw": "Klikk og drag, slepp når du er ferdig",
     "text": "Tips: du kan òg leggje til tekst ved å dobbeltklikke kor som helst med utvalgsverktyet",
     "linearElementMulti": "Klikk på siste punkt eller trykk Escape eller Enter for å fullføre",
-    "lockAngle": "",
+    "lockAngle": "Du kan begrense vinkelen ved å holde nede SKIFT",
     "resize": "Du kan halde fram med forholdet ved å trykke SHIFT medan du endrar storleik,\ntrykk ALT for å endre storleiken frå midten",
     "rotate": "Du kan låse vinklane ved å halde SHIFT medan du roterer",
     "lineEditor_info": "Dobbeltklikk eller trykk Enter for å redigere punkt",

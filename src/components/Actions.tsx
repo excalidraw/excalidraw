@@ -1,23 +1,22 @@
 import React from "react";
-import { AppState, Zoom } from "../types";
-import { ExcalidrawElement } from "../element/types";
 import { ActionManager } from "../actions/manager";
+import { getNonDeletedElements } from "../element";
+import { ExcalidrawElement } from "../element/types";
+import { t } from "../i18n";
+import useIsMobile from "../is-mobile";
 import {
-  hasBackground,
-  hasStroke,
   canChangeSharpness,
-  hasText,
   canHaveArrowheads,
   getTargetElements,
+  hasBackground,
+  hasStroke,
+  hasText,
 } from "../scene";
-import { t } from "../i18n";
 import { SHAPES } from "../shapes";
-import { ToolButton } from "./ToolButton";
+import { AppState, Zoom } from "../types";
 import { capitalizeString, isTransparent, setCursorForShape } from "../utils";
 import Stack from "./Stack";
-import useIsMobile from "../is-mobile";
-import { getNonDeletedElements } from "../element";
-import { trackEvent, EVENT_SHAPE, EVENT_DIALOG } from "../analytics";
+import { ToolButton } from "./ToolButton";
 
 export const SelectedShapeActions = ({
   appState,
@@ -181,7 +180,6 @@ export const ShapesSwitcher = ({
           aria-keyshortcuts={shortcut}
           data-testid={value}
           onChange={() => {
-            trackEvent(EVENT_SHAPE, value, "toolbar");
             setAppState({
               elementType: value,
               multiElement: null,
@@ -203,9 +201,6 @@ export const ShapesSwitcher = ({
       title={`${capitalizeString(t("toolBar.library"))} — 9`}
       aria-label={capitalizeString(t("toolBar.library"))}
       onClick={() => {
-        if (!isLibraryOpen) {
-          trackEvent(EVENT_DIALOG, "library");
-        }
         setAppState({ isLibraryOpen: !isLibraryOpen });
       }}
     />

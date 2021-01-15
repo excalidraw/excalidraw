@@ -1,6 +1,11 @@
 @import "../css/_variables";
 
 .excalidraw {
+  .Dialog {
+    user-select: text;
+    cursor: auto;
+  }
+
   .Dialog__title {
     display: grid;
     align-items: center;

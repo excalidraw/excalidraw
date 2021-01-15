@@ -1,5 +1,4 @@
 import { fileSave } from "browser-nativefs";
-import { EVENT_IO, trackEvent } from "../analytics";
 import {
   copyCanvasToClipboardAsPng,
   copyTextToSystemClipboard,
@@ -8,8 +7,8 @@ import { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { exportToCanvas, exportToSvg } from "../scene/export";
 import { ExportType } from "../scene/types";
-import { canvasToBlob } from "./blob";
 import { AppState } from "../types";
+import { canvasToBlob } from "./blob";
 import { serializeAsJSON } from "./json";
 
 export { loadFromBlob } from "./blob";
@@ -37,7 +36,7 @@ export const exportCanvas = async (
   },
 ) => {
   if (elements.length === 0) {
-    return window.alert(t("alerts.cannotExportEmptyCanvas"));
+    throw new Error(t("alerts.cannotExportEmptyCanvas"));
   }
   if (type === "svg" || type === "clipboard-svg") {
     const tempSvg = exportToSvg(elements, {
@@ -60,10 +59,8 @@ export const exportCanvas = async (
         fileName: `${name}.svg`,
         extensions: [".svg"],
       });
-      trackEvent(EVENT_IO, "export", "svg");
       return;
     } else if (type === "clipboard-svg") {
-      trackEvent(EVENT_IO, "export", "clipboard-svg");
       copyTextToSystemClipboard(tempSvg.outerHTML);
       return;
     }
@@ -95,11 +92,9 @@ export const exportCanvas = async (
       fileName,
       extensions: [".png"],
     });
-    trackEvent(EVENT_IO, "export", "png");
   } else if (type === "clipboard") {
     try {
       await copyCanvasToClipboardAsPng(tempCanvas);
-      trackEvent(EVENT_IO, "export", "clipboard-png");
     } catch (error) {
       if (error.name === "CANVAS_POSSIBLY_TOO_BIG") {
         throw error;

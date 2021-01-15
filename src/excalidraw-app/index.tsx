@@ -1,34 +1,53 @@
-import React, { useState, useLayoutEffect, useEffect, useRef } from "react";
-
-import Excalidraw from "../packages/excalidraw/index";
-
+import LanguageDetector from "i18next-browser-languagedetector";
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+import { trackEvent } from "../analytics";
+import { getDefaultAppState } from "../appState";
+import { ExcalidrawImperativeAPI } from "../components/App";
+import { ErrorDialog } from "../components/ErrorDialog";
+import { TopErrorBoundary } from "../components/TopErrorBoundary";
+import { APP_NAME, EVENT, TITLE_TIMEOUT } from "../constants";
+import { ImportedDataState } from "../data/types";
 import {
-  getTotalStorageSize,
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "../element/types";
+import { Language, t } from "../i18n";
+import Excalidraw, {
+  defaultLang,
+  languages,
+} from "../packages/excalidraw/index";
+import { AppState, ExcalidrawAPIRefValue } from "../types";
+import {
+  debounce,
+  getVersion,
+  ResolvablePromise,
+  resolvablePromise,
+} from "../utils";
+import { SAVE_TO_LOCAL_STORAGE_TIMEOUT } from "./app_constants";
+import CollabWrapper, { CollabAPI } from "./collab/CollabWrapper";
+import { LanguageList } from "./components/LanguageList";
+import { exportToBackend, getCollaborationLinkData, loadScene } from "./data";
+import { loadFromFirebase } from "./data/firebase";
+import {
   importFromLocalStorage,
   saveToLocalStorage,
   STORAGE_KEYS,
 } from "./data/localStorage";
 
-import { ImportedDataState } from "../data/types";
-import CollabWrapper, { CollabAPI } from "./collab/CollabWrapper";
-import { TopErrorBoundary } from "../components/TopErrorBoundary";
-import { t } from "../i18n";
-import { exportToBackend, loadScene } from "./data";
-import { getCollaborationLinkData } from "./data";
-import { EVENT } from "../constants";
-import { loadFromFirebase } from "./data/firebase";
-import { ExcalidrawImperativeAPI } from "../components/App";
-import { debounce, ResolvablePromise, resolvablePromise } from "../utils";
-import { AppState, ExcalidrawAPIRefValue } from "../types";
-import {
-  ExcalidrawElement,
-  NonDeletedExcalidrawElement,
-} from "../element/types";
-import { SAVE_TO_LOCAL_STORAGE_TIMEOUT } from "./app_constants";
-import { EVENT_LOAD, EVENT_SHARE, trackEvent } from "../analytics";
-import { ErrorDialog } from "../components/ErrorDialog";
-import { getDefaultAppState } from "../appState";
-import { APP_NAME, TITLE_TIMEOUT } from "../constants";
+const languageDetector = new LanguageDetector();
+languageDetector.init({
+  languageUtils: {
+    formatLanguageCode: (langCode: Language["code"]) => langCode,
+    isWhitelisted: () => true,
+  },
+  checkWhitelist: false,
+});
 
 const excalidrawRef: React.MutableRefObject<
   MarkRequired<ExcalidrawAPIRefValue, "ready" | "readyPromise">
@@ -143,7 +162,6 @@ const initializeScene = async (opts: {
     // into the remote scene
     opts.resetScene();
     const scenePromise = opts.initializeSocketClient();
-    trackEvent(EVENT_SHARE, "session join");
 
     try {
       const [, roomId, roomKey] = getCollaborationLinkData(
@@ -182,6 +200,8 @@ const ExcalidrawWrapper = (props: { collab: CollabAPI }) => {
     height: window.innerHeight,
   });
   const [errorMessage, setErrorMessage] = useState("");
+  const currentLangCode = languageDetector.detect() || defaultLang.code;
+  const [langCode, setLangCode] = useState(currentLangCode);
 
   useLayoutEffect(() => {
     const onResize = () => {
@@ -209,12 +229,19 @@ const ExcalidrawWrapper = (props: { collab: CollabAPI }) => {
   const { collab } = props;
 
   useEffect(() => {
-    const storageSize = getTotalStorageSize();
-    if (storageSize) {
-      trackEvent(EVENT_LOAD, "storage", "size", storageSize);
-    } else {
-      trackEvent(EVENT_LOAD, "first time");
-    }
+    // delayed by 15 sec so that the app has a time to load the latest SW
+    setTimeout(() => {
+      const version = getVersion();
+      const loggedVersion = window.localStorage.getItem(
+        "excalidraw-lastLoggedVersion",
+      );
+      // prevent logging on multiple visits
+      if (version && version !== loggedVersion) {
+        window.localStorage.setItem("excalidraw-lastLoggedVersion", version);
+        trackEvent("load", "version", version);
+      }
+    }, 15000);
+
     excalidrawRef.current!.readyPromise.then((excalidrawApi) => {
       initializeScene({
         resetScene: excalidrawApi.resetScene,
@@ -256,6 +283,10 @@ const ExcalidrawWrapper = (props: { collab: CollabAPI }) => {
     };
   }, [collab.initializeSocketClient]);
 
+  useEffect(() => {
+    languageDetector.cacheUserLanguage(langCode);
+  }, [langCode]);
+
   const onChange = (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
@@ -291,6 +322,32 @@ const ExcalidrawWrapper = (props: { collab: CollabAPI }) => {
       }
     }
   };
+
+  const renderFooter = useCallback(
+    (isMobile: boolean) => {
+      const renderLanguageList = () => (
+        <LanguageList
+          onChange={(langCode) => {
+            setLangCode(langCode);
+          }}
+          languages={languages}
+          floating={!isMobile}
+          currentLangCode={langCode}
+        />
+      );
+      if (isMobile) {
+        return (
+          <fieldset>
+            <legend>{t("labels.language")}</legend>
+            {renderLanguageList()}
+          </fieldset>
+        );
+      }
+      return renderLanguageList();
+    },
+    [langCode],
+  );
+
   return (
     <>
       <Excalidraw
@@ -304,6 +361,8 @@ const ExcalidrawWrapper = (props: { collab: CollabAPI }) => {
         isCollaborating={collab.isCollaborating}
         onPointerUpdate={collab.onPointerUpdate}
         onExportToBackend={onExportToBackend}
+        renderFooter={renderFooter}
+        langCode={langCode}
       />
       {errorMessage && (
         <ErrorDialog
