@@ -233,7 +233,7 @@
     "total": "Total",
     "width": "Width"
   },
-  "toasts": {
+  "toast": {
     "copyToClipboardAsPng": "Copied to clipboard as PNG."
   }
 }
