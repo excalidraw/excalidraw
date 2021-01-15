@@ -234,7 +234,7 @@
     "width": "Ширина"
   },
   "toast": {
-    "copyStyles": "",
-    "copyToClipboardAsPng": ""
+    "copyStyles": "Скопійовані стилі.",
+    "copyToClipboardAsPng": "Скопійовано в буфер обміну як PNG."
   }
 }
