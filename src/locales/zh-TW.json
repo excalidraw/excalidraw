@@ -234,7 +234,7 @@
     "width": "寬度"
   },
   "toast": {
-    "copyStyles": "",
-    "copyToClipboardAsPng": ""
+    "copyStyles": "已複製樣式",
+    "copyToClipboardAsPng": "已複製 PNG 至剪貼簿"
   }
 }
