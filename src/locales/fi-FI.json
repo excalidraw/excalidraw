@@ -232,5 +232,9 @@
     "title": "Nörttien tilastot",
     "total": "Yhteensä",
     "width": "Leveys"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboardAsPng": ""
   }
 }
