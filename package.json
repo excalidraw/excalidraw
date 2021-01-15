@@ -1,5 +1,10 @@
 {
   "browserslist": {
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ],
     "production": [
       ">0.2%",
       "not dead",
@@ -11,11 +16,6 @@
       "not chrome < 70",
       "not and_uc < 13",
       "not samsung < 10"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
     ]
   },
   "dependencies": {
@@ -71,34 +71,34 @@
     }
   },
   "jest": {
+    "resetMocks": false,
     "transformIgnorePatterns": [
       "node_modules/(?!(roughjs|points-on-curve|path-data-parser|points-on-path|browser-nativefs)/)"
-    ],
-    "resetMocks": false
+    ]
   },
   "name": "excalidraw",
   "private": true,
   "scripts": {
-    "build-node": "node ./scripts/build-node.js",
-    "build:app:docker": "REACT_APP_DISABLE_SENTRY=true react-scripts build",
-    "build:app": "REACT_APP_GIT_SHA=$NOW_GITHUB_COMMIT_SHA react-scripts build",
-    "build:version": "node ./scripts/build-version.js",
     "build": "npm run build:app && npm run build:version",
+    "build-node": "node ./scripts/build-node.js",
+    "build:app": "REACT_APP_GIT_SHA=$NOW_GITHUB_COMMIT_SHA react-scripts build",
+    "build:app:docker": "REACT_APP_DISABLE_SENTRY=true react-scripts build",
+    "build:version": "node ./scripts/build-version.js",
     "eject": "react-scripts eject",
+    "fix": "npm run fix:other && npm run fix:code",
     "fix:code": "npm run test:code -- --fix",
     "fix:other": "npm run prettier -- --write",
-    "fix": "npm run fix:other && npm run fix:code",
     "locales-coverage": "node scripts/build-locales-coverage.js",
     "locales-coverage:description": "node scripts/locales-coverage-description.js",
     "prettier": "prettier \"**/*.{css,scss,json,md,html,yml}\" --ignore-path=.eslintignore",
     "start": "react-scripts start",
+    "test": "npm run test:app",
     "test:all": "npm run test:typecheck && npm run test:code && npm run test:other && npm run test:app -- --watchAll=false",
     "test:app": "react-scripts test --passWithNoTests",
     "test:code": "eslint --max-warnings=0 --ignore-path .gitignore --ext .js,.ts,.tsx .",
     "test:debug": "react-scripts --inspect-brk test --runInBand --no-cache",
     "test:other": "npm run prettier -- --list-different",
     "test:typecheck": "tsc",
-    "test:update": "npm run test:app -- --updateSnapshot --watchAll=false",
-    "test": "npm run test:app"
+    "test:update": "npm run test:app -- --updateSnapshot --watchAll=false"
   }
 }
