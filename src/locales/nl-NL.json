@@ -232,5 +232,9 @@
     "title": "Statistieken voor nerds",
     "total": "Totaal",
     "width": "Breedte"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboardAsPng": ""
   }
 }
