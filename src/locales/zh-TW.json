@@ -232,5 +232,9 @@
     "title": "詳細統計",
     "total": "合計",
     "width": "寬度"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboardAsPng": ""
   }
 }
