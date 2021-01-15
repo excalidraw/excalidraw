@@ -1,7 +1,7 @@
 @import "../css/_variables";
 
 .excalidraw {
-  .toast {
+  .Toast {
     box-sizing: border-box;
     position: fixed;
     bottom: 10px;
@@ -9,13 +9,14 @@
     margin-left: -150px;
     z-index: 999999;
     animation: fade-in 0.5s;
-    background-color: $oc-gray-6;
-    padding: 0.2rem 0.8rem;
+    background-color: $oc-gray-5;
+    padding: 4px 0;
     border-radius: 4px;
     width: 300px;
+    text-align: center;
   }
 
-  .toast__message {
+  .Toast__message {
     font-size: 1rem;
     color: $oc-white;
   }

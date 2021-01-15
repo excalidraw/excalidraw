@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { TOAST_TIMEOUT } from "../constants";
 import "./Toast.scss";
 
 export const Toast = ({
@@ -16,7 +17,7 @@ export const Toast = ({
         if (shouldClear) {
           clearToast();
         }
-      }, 2000);
+      }, TOAST_TIMEOUT);
       return () => clearTimeout(timeout);
     }
   }, [shouldClear, clearToast, message]);
@@ -30,11 +31,11 @@ export const Toast = ({
 
   return message ? (
     <div
-      className="toast"
+      className="Toast"
       onMouseOver={() => setShouldClear(false)}
       onMouseLeave={handleMouseLeave}
     >
-      <p className="toast__message">{message}</p>
+      <p className="Toast__message">{message}</p>
     </div>
   ) : null;
 };
