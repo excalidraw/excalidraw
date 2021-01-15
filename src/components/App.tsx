@@ -913,7 +913,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         this.canvas!,
         this.state,
       );
-      this.setState({ toastMessage: t("toasts.copyToClipboardAsPng") });
+      this.setState({ toastMessage: t("toast.copyToClipboardAsPng") });
     } catch (error) {
       console.error(error);
       this.setState({ errorMessage: error.message });
