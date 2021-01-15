@@ -232,5 +232,9 @@
     "title": "덕후들을 위한 통계",
     "total": "합계",
     "width": "너비"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboardAsPng": ""
   }
 }
