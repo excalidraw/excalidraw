@@ -2,19 +2,19 @@
 
 .excalidraw {
   .Toast {
-    box-sizing: border-box;
-    position: fixed;
-    bottom: 10px;
-    left: 50%;
-    margin-left: -150px;
-    z-index: 999999;
     animation: fade-in 0.5s;
     background-color: $oc-gray-5;
-    padding: 4px 0;
     border-radius: 4px;
-    width: 300px;
-    text-align: center;
+    bottom: 10px;
+    box-sizing: border-box;
     cursor: pointer;
+    left: 50%;
+    margin-left: -150px;
+    padding: 4px 0;
+    position: fixed;
+    text-align: center;
+    width: 300px;
+    z-index: 999999;
   }
 
   .Toast__message {
