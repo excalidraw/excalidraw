@@ -232,5 +232,9 @@
     "title": "Статистика",
     "total": "Всього",
     "width": "Ширина"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboardAsPng": ""
   }
 }
