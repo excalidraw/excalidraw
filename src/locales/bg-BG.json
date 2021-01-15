@@ -232,5 +232,9 @@
     "title": "Статистика за хакери",
     "total": "Общо",
     "width": "Широчина"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboardAsPng": ""
   }
 }
