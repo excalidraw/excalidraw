@@ -13691,7 +13691,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
-  "toastMessage": null,
+  "toastMessage": "Copied styles.",
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
@@ -13788,7 +13788,7 @@ Object {
 
 exports[`regression tests selecting 'Copy styles' in context menu copies styles: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests selecting 'Copy styles' in context menu copies styles: [end of test] number of renders 1`] = `6`;
+exports[`regression tests selecting 'Copy styles' in context menu copies styles: [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests selecting 'Delete' in context menu deletes element: [end of test] appState 1`] = `
 Object {
@@ -14616,7 +14616,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
-  "toastMessage": null,
+  "toastMessage": "Copied styles.",
   "viewBackgroundColor": "#ffffff",
   "width": 1024,
   "zenModeEnabled": false,
@@ -15388,7 +15388,7 @@ Object {
 
 exports[`regression tests selecting 'Paste styles' in context menu pastes styles: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests selecting 'Paste styles' in context menu pastes styles: [end of test] number of renders 1`] = `21`;
+exports[`regression tests selecting 'Paste styles' in context menu pastes styles: [end of test] number of renders 1`] = `22`;
 
 exports[`regression tests selecting 'Send backward' in context menu sends element backward: [end of test] appState 1`] = `
 Object {
