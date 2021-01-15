@@ -19,7 +19,7 @@
     "stroke": "Contour",
     "background": "Arrière-plan",
     "fill": "Remplissage",
-    "strokeWidth": "Largeur du contour",
+    "strokeWidth": "Largeur du trait",
     "strokeStyle": "Style du trait",
     "strokeStyle_solid": "Plein",
     "strokeStyle_dashed": "Tirets",
