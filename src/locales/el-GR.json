@@ -232,5 +232,9 @@
     "title": "Στατιστικά για σπασίκλες",
     "total": "Σύνολο ",
     "width": "Πλάτος"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboardAsPng": ""
   }
 }
