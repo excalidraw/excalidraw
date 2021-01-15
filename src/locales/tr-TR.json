@@ -232,5 +232,9 @@
     "title": "İnekler için istatistikler",
     "total": "Toplam",
     "width": "Genişlik"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboardAsPng": ""
   }
 }
