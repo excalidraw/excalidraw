@@ -234,7 +234,7 @@
     "width": "Lățime"
   },
   "toast": {
-    "copyStyles": "",
-    "copyToClipboardAsPng": ""
+    "copyStyles": "Stiluri copiate.",
+    "copyToClipboardAsPng": "Copiat în memoria temporară ca PNG."
   }
 }
