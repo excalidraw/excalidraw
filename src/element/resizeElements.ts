@@ -411,27 +411,42 @@ const resizeSingleElement = (
     startCenter,
     -stateAtResizeStart.angle,
   );
-  const boundsInitialWidth = x2 - x1;
-  const boundsInitialHeight = y2 - y1;
-  let scaleX = 1;
-  let scaleY = 1;
+
+  //Get bounds corners rendered on screen
+  const [esx1, esy1, esx2, esy2] = getResizedElementAbsoluteCoords(
+    element,
+    element.width,
+    element.height,
+  );
+  const boundsOnScreenWidth = esx2 - esx1;
+  const boundsOnScreenHeight = esy2 - esy1;
+
+  // It's important we set initial scale value based on the width and height at resize start,
+  // otherwise previous dimensions affected by modifiers will be taken into account.
+  const atStartBoundsWidth = startBottomRight[0] - startTopLeft[0];
+  const atStartBoundsHeight = startBottomRight[1] - startTopLeft[1];
+  let scaleX = atStartBoundsWidth / boundsOnScreenWidth;
+  let scaleY = atStartBoundsHeight / boundsOnScreenHeight;
+
   if (transformHandleDirection.includes("e")) {
-    scaleX = (rotatedPointer[0] - startTopLeft[0]) / boundsInitialWidth;
+    scaleX = (rotatedPointer[0] - startTopLeft[0]) / boundsOnScreenWidth;
   }
   if (transformHandleDirection.includes("s")) {
-    scaleY = (rotatedPointer[1] - startTopLeft[1]) / boundsInitialHeight;
+    scaleY = (rotatedPointer[1] - startTopLeft[1]) / boundsOnScreenHeight;
   }
   if (transformHandleDirection.includes("w")) {
-    scaleX = (startBottomRight[0] - rotatedPointer[0]) / boundsInitialWidth;
+    scaleX = (startBottomRight[0] - rotatedPointer[0]) / boundsOnScreenWidth;
   }
   if (transformHandleDirection.includes("n")) {
-    scaleY = (startBottomRight[1] - rotatedPointer[1]) / boundsInitialHeight;
+    scaleY = (startBottomRight[1] - rotatedPointer[1]) / boundsOnScreenHeight;
   }
   // Linear elements dimensions differ from bounds dimensions
   const eleInitialWidth = stateAtResizeStart.width;
   const eleInitialHeight = stateAtResizeStart.height;
-  let eleNewWidth = eleInitialWidth * scaleX;
-  let eleNewHeight = eleInitialHeight * scaleY;
+  // We have to use dimensions of element on screen, otherwise the scaling of the
+  // dimensions won't match the cursor for linear elements.
+  let eleNewWidth = element.width * scaleX;
+  let eleNewHeight = element.height * scaleY;
 
   // adjust dimensions for resizing from center
   if (isResizeFromCenter) {
@@ -534,7 +549,6 @@ const resizeSingleElement = (
     eleNewWidth,
     eleNewHeight,
   );
-
   // For linear elements (x,y) are the coordinates of the first drawn point not the top-left corner
   // So we need to readjust (x,y) to be where the first point should be
   const newOrigin = [...newTopLeft];
@@ -548,10 +562,18 @@ const resizeSingleElement = (
     y: newOrigin[1],
     ...rescaledPoints,
   };
-  updateBoundElements(element, {
-    newSize: { width: resizedElement.width, height: resizedElement.height },
-  });
-  mutateElement(element, resizedElement);
+
+  if (
+    resizedElement.width !== 0 &&
+    resizedElement.height !== 0 &&
+    Number.isFinite(resizedElement.x) &&
+    Number.isFinite(resizedElement.y)
+  ) {
+    updateBoundElements(element, {
+      newSize: { width: resizedElement.width, height: resizedElement.height },
+    });
+    mutateElement(element, resizedElement);
+  }
 };
 
 const resizeMultipleElements = (
