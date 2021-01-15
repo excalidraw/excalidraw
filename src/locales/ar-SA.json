@@ -232,5 +232,9 @@
     "title": "إحصائيات للمهووسين",
     "total": "المجموع",
     "width": "العرض"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboardAsPng": ""
   }
 }
