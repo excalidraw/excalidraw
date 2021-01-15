@@ -2,50 +2,50 @@ import { FontFamily } from "./element/types";
 
 export const APP_NAME = "Excalidraw";
 
-export const DRAGGING_THRESHOLD = 10; // 10px
-export const LINE_CONFIRM_THRESHOLD = 10; // 10px
+export const DRAGGING_THRESHOLD = 10;
+export const LINE_CONFIRM_THRESHOLD = 10;
 export const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
 export const ELEMENT_TRANSLATE_AMOUNT = 1;
 export const TEXT_TO_CENTER_SNAP_THRESHOLD = 30;
 export const SHIFT_LOCKING_ANGLE = Math.PI / 12;
 export const CURSOR_TYPE = {
-  TEXT: "text",
+  AUTO: "",
   CROSSHAIR: "crosshair",
   GRABBING: "grabbing",
-  POINTER: "pointer",
   MOVE: "move",
-  AUTO: "",
+  POINTER: "pointer",
+  TEXT: "text",
 };
 export const POINTER_BUTTON = {
   MAIN: 0,
-  WHEEL: 1,
   SECONDARY: 2,
   TOUCH: -1,
+  WHEEL: 1,
 };
 
 export enum EVENT {
+  BEFORE_UNLOAD = "beforeunload",
+  BLUR = "blur",
   COPY = "copy",
-  PASTE = "paste",
   CUT = "cut",
+  DRAG_OVER = "dragover",
+  DROP = "drop",
+  GESTURE_CHANGE = "gesturechange",
+  GESTURE_END = "gestureend",
+  GESTURE_START = "gesturestart",
+  HASHCHANGE = "hashchange",
   KEYDOWN = "keydown",
   KEYUP = "keyup",
   MOUSE_MOVE = "mousemove",
-  RESIZE = "resize",
-  UNLOAD = "unload",
-  BLUR = "blur",
-  DRAG_OVER = "dragover",
-  DROP = "drop",
-  GESTURE_END = "gestureend",
-  BEFORE_UNLOAD = "beforeunload",
-  GESTURE_START = "gesturestart",
-  GESTURE_CHANGE = "gesturechange",
+  PASTE = "paste",
   POINTER_MOVE = "pointermove",
   POINTER_UP = "pointerup",
+  RESIZE = "resize",
   STATE_CHANGE = "statechange",
-  WHEEL = "wheel",
-  TOUCH_START = "touchstart",
   TOUCH_END = "touchend",
-  HASHCHANGE = "hashchange",
+  TOUCH_START = "touchstart",
+  UNLOAD = "unload",
+  WHEEL = "wheel",
 }
 
 export const ENV = {
