@@ -377,7 +377,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             onClose={this.toggleStats}
           />
         )}
-        <Toast message={this.state.toastMessage} clearToast={this.clearToast} />
+        {this.state.toastMessage !== null && (
+          <Toast
+            message={this.state.toastMessage}
+            clearToast={this.clearToast}
+          />
+        )}
         <main>
           <canvas
             id="canvas"

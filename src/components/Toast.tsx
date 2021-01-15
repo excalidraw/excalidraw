@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { TOAST_TIMEOUT } from "../constants";
 import "./Toast.scss";
 
@@ -6,36 +6,29 @@ export const Toast = ({
   message,
   clearToast,
 }: {
-  message: string | null;
-  clearToast: Function;
+  message: string;
+  clearToast: () => void;
 }) => {
-  const [shouldClear, setShouldClear] = useState(true);
+  const timerRef = useRef<number>(0);
+
+  const scheduleTimeout = useCallback(
+    () =>
+      (timerRef.current = window.setTimeout(() => clearToast(), TOAST_TIMEOUT)),
+    [clearToast],
+  );
 
   useEffect(() => {
-    if (message !== null) {
-      const timeout = setTimeout(() => {
-        if (shouldClear) {
-          clearToast();
-        }
-      }, TOAST_TIMEOUT);
-      return () => clearTimeout(timeout);
-    }
-  }, [shouldClear, clearToast, message]);
+    scheduleTimeout();
+    return () => clearTimeout(timerRef.current);
+  }, [scheduleTimeout, message]);
 
-  const handleMouseLeave = (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>,
-  ) => {
-    clearToast();
-    setShouldClear(true);
-  };
-
-  return message ? (
+  return (
     <div
       className="Toast"
-      onMouseOver={() => setShouldClear(false)}
-      onMouseLeave={handleMouseLeave}
+      onMouseEnter={() => clearTimeout(timerRef?.current)}
+      onMouseLeave={scheduleTimeout}
     >
       <p className="Toast__message">{message}</p>
     </div>
-  ) : null;
+  );
 };
