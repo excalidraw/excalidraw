@@ -234,7 +234,7 @@
     "width": "Šírka"
   },
   "toast": {
-    "copyStyles": "",
-    "copyToClipboardAsPng": ""
+    "copyStyles": "Štýly skopírované.",
+    "copyToClipboardAsPng": "Skopírované do schránky ako PNG."
   }
 }
