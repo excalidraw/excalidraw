@@ -59,8 +59,8 @@ Please add the latest change on the top under the correct section.
 
 - Added Zen Mode to the context menu [#2734](https://github.com/excalidraw/excalidraw/pull/2734)
 - Do not reset to selection for draw tool [#2721]((https://github.com/excalidraw/excalidraw/pull/2721)
-- Make dialogs look more like dialogs [#2686](<(https://github.com/excalidraw/excalidraw/pull/2686)>)
-- Browse libraries styles fixed [#2694](<(https://github.com/excalidraw/excalidraw/pull/2694)>)
+- Make dialogs look more like dialogs [#2686](https://github.com/excalidraw/excalidraw/pull/2686)
+- Browse libraries styles fixed [#2694](https://github.com/excalidraw/excalidraw/pull/2694)
 - Change hint for 2-point lines on resize [#2655](https://github.com/excalidraw/excalidraw/pull/2655)
 - Align items in context menu [#2640](https://github.com/excalidraw/excalidraw/pull/2640)
 - Do not reset to selection when using the draw tool [#2721](https://github.com/excalidraw/excalidraw/pull/2721)
