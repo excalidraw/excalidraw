@@ -149,7 +149,7 @@ export default function App() {
 **How to use**
 
 <pre>
-import { getSceneVersion } from "./index";
+import { getSceneVersion } from "@excalidraw/excalidraw";
 getSceneVersion(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement []</a>)
 </pre>
 
@@ -166,7 +166,7 @@ getSyncableElements(elements:  <a href="https://github.com/excalidraw/excalidraw
 **_How to use_**
 
 ```js
-import { getSyncableElements } from "./index";
+import { getSyncableElements } from "@excalidraw/excalidraw";
 ```
 
 This function returns all the deleted elements of the scene.
@@ -182,7 +182,7 @@ getElementsMap(elements:  <a href="https://github.com/excalidraw/excalidraw/blob
 **_ How to use _**
 
 ```js
-import { getElementsMap } from "./index";
+import { getElementsMap } from "@excalidraw/excalidraw";
 ```
 
 This function returns an object where each element is mapped to its id.
