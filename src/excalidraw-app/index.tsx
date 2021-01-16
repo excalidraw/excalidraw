@@ -229,7 +229,7 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
   const { collab } = props;
 
   useEffect(() => {
-    // delayed by 15 sec so that the app has a time to load the latest SW
+    // Delayed so that the app has a time to load the latest SW
     setTimeout(() => {
       trackEvent("load", "version", getVersion());
     }, VERSION_TIMEOUT);
