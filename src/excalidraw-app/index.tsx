@@ -233,13 +233,6 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
     setTimeout(() => {
       const version = getVersion();
       trackEvent("load", "version", version);
-      const loggedVersion = window.localStorage.getItem(
-        "excalidraw-lastLoggedVersion",
-      );
-      if (version !== loggedVersion) {
-        window.localStorage.setItem("excalidraw-lastLoggedVersion", version);
-        trackEvent("load", "fresh", version);
-      }
     }, 15000);
 
     excalidrawRef.current!.readyPromise.then((excalidrawApi) => {
