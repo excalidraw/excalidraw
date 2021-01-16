@@ -3587,9 +3587,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       transformElements(
         pointerDownState,
         transformHandleType,
-        (newTransformHandle) => {
-          pointerDownState.resize.handleType = newTransformHandle;
-        },
         selectedElements,
         pointerDownState.resize.arrowDirection,
         getRotateWithDiscreteAngleKey(event),

@@ -34,7 +34,6 @@ export {
 export {
   resizeTest,
   getCursorForResizingElement,
-  normalizeTransformHandleType,
   getElementWithTransformHandleType,
   getTransformHandleTypeFromCoords,
 } from "./resizeTest";
