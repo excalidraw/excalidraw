@@ -11,7 +11,7 @@ import { getDefaultAppState } from "../appState";
 import { ExcalidrawImperativeAPI } from "../components/App";
 import { ErrorDialog } from "../components/ErrorDialog";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
-import { APP_NAME, EVENT, TITLE_TIMEOUT } from "../constants";
+import { APP_NAME, EVENT, TITLE_TIMEOUT, VERSION_TIMEOUT } from "../constants";
 import { ImportedDataState } from "../data/types";
 import {
   ExcalidrawElement,
@@ -231,9 +231,8 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
   useEffect(() => {
     // delayed by 15 sec so that the app has a time to load the latest SW
     setTimeout(() => {
-      const version = getVersion();
-      trackEvent("load", "version", version);
-    }, 15000);
+      trackEvent("load", "version", getVersion());
+    }, VERSION_TIMEOUT);
 
     excalidrawRef.current!.readyPromise.then((excalidrawApi) => {
       initializeScene({
