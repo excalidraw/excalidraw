@@ -418,27 +418,27 @@ const resizeSingleElement = (
     element.width,
     element.height,
   );
-  const boundsOnScreenWidth = esx2 - esx1;
-  const boundsOnScreenHeight = esy2 - esy1;
+  const boundsCurrWidth = esx2 - esx1;
+  const boundsCurrHeight = esy2 - esy1;
 
-  // It's important we set initial scale value based on the width and height at resize start,
+  // It's important we set the initial scale value based on the width and height at resize start,
   // otherwise previous dimensions affected by modifiers will be taken into account.
   const atStartBoundsWidth = startBottomRight[0] - startTopLeft[0];
   const atStartBoundsHeight = startBottomRight[1] - startTopLeft[1];
-  let scaleX = atStartBoundsWidth / boundsOnScreenWidth;
-  let scaleY = atStartBoundsHeight / boundsOnScreenHeight;
+  let scaleX = atStartBoundsWidth / boundsCurrWidth;
+  let scaleY = atStartBoundsHeight / boundsCurrHeight;
 
   if (transformHandleDirection.includes("e")) {
-    scaleX = (rotatedPointer[0] - startTopLeft[0]) / boundsOnScreenWidth;
+    scaleX = (rotatedPointer[0] - startTopLeft[0]) / boundsCurrWidth;
   }
   if (transformHandleDirection.includes("s")) {
-    scaleY = (rotatedPointer[1] - startTopLeft[1]) / boundsOnScreenHeight;
+    scaleY = (rotatedPointer[1] - startTopLeft[1]) / boundsCurrHeight;
   }
   if (transformHandleDirection.includes("w")) {
-    scaleX = (startBottomRight[0] - rotatedPointer[0]) / boundsOnScreenWidth;
+    scaleX = (startBottomRight[0] - rotatedPointer[0]) / boundsCurrWidth;
   }
   if (transformHandleDirection.includes("n")) {
-    scaleY = (startBottomRight[1] - rotatedPointer[1]) / boundsOnScreenHeight;
+    scaleY = (startBottomRight[1] - rotatedPointer[1]) / boundsCurrHeight;
   }
   // Linear elements dimensions differ from bounds dimensions
   const eleInitialWidth = stateAtResizeStart.width;
