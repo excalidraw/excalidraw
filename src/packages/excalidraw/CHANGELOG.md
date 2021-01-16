@@ -16,13 +16,13 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
-- feat: Add toast [#2772](https://github.com/excalidraw/excalidraw/pull/2772)
+- Add toast [#2772](https://github.com/excalidraw/excalidraw/pull/2772)
 - Add `cmd+o` shortcut to load scene [#2732](https://github.com/excalidraw/excalidraw/pull/2732)
 - Remove language picker, and add `langCode`, `renderFooter` [#2644](https://github.com/excalidraw/excalidraw/pull/2644):
   - BREAKING: removed the language picker from UI. It is now the host app's responsibility to implement a language picker if desirable, using the newly added [`renderFooter`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#renderFooter) prop. The reasoning is that the i18n should be controlled by the app itself, not by the nested Excalidraw component.
   - Added [`langCode`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#langCode) prop to control the UI language.
 - Add support for `exportToBackend` prop to allow host apps to implement shareable links [#2612](https://github.com/excalidraw/excalidraw/pull/2612/files)
-- Require use of a preset dialog size; adjust dialog sizing [#2684](<(https://github.com/excalidraw/excalidraw/pull/2684)>)
+- Require use of a preset dialog size; adjust dialog sizing [#2684](https://github.com/excalidraw/excalidraw/pull/2684)
 - Add line chart and paste dialog selection [#2670](https://github.com/excalidraw/excalidraw/pull/2670)
 - Tweak editing behavior [#2668](https://github.com/excalidraw/excalidraw/pull/2668)
 - Change title to Excalidraw after a timeout
@@ -41,7 +41,7 @@ Please add the latest change on the top under the correct section.
 - Fix compile error [#2685](https://github.com/excalidraw/excalidraw/pull/2685)
 - Center zoom on iPhone and iPad [#2642](https://github.com/excalidraw/excalidraw/pull/2642)
 - Allow text-selecting in dialogs & reset cursor [#2783](https://github.com/excalidraw/excalidraw/pull/2783)
-- don't render due to zoom after unmount [#2779](https://github.com/excalidraw/excalidraw/pull/2779)
+- Don't render due to zoom after unmount [#2779](https://github.com/excalidraw/excalidraw/pull/2779)
 - Track the chart type correctly [#2773](https://github.com/excalidraw/excalidraw/pull/2773)
 - Fix late-render due to debounced zoom [#2779](https://github.com/excalidraw/excalidraw/pull/2779)
 - Fix initialization when browser tab not focused [#2677](https://github.com/excalidraw/excalidraw/pull/2677)
