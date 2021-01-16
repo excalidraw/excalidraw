@@ -57,7 +57,6 @@ Please add the latest change on the top under the correct section.
 
 ### Improvements
 
-- Perform lossless compression on all PNG images [#2740](https://github.com/excalidraw/excalidraw/pull/2740)
 - Added Zen Mode to the context menu [#2734](https://github.com/excalidraw/excalidraw/pull/2734)
 - Do not reset to selection for draw tool [#2721]((https://github.com/excalidraw/excalidraw/pull/2721)
 - Make dialogs look more like dialogs [#2686](<(https://github.com/excalidraw/excalidraw/pull/2686)>)
