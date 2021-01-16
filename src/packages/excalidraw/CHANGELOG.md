@@ -16,6 +16,7 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
+- feat: Add toast [#2772](https://github.com/excalidraw/excalidraw/pull/2772)
 - Add `cmd+o` shortcut to load scene [#2732](https://github.com/excalidraw/excalidraw/pull/2732)
 - Remove language picker, and add `langCode`, `renderFooter` [#2644](https://github.com/excalidraw/excalidraw/pull/2644):
   - BREAKING: removed the language picker from UI. It is now the host app's responsibility to implement a language picker if desirable, using the newly added [`renderFooter`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#renderFooter) prop. The reasoning is that the i18n should be controlled by the app itself, not by the nested Excalidraw component.
@@ -40,6 +41,8 @@ Please add the latest change on the top under the correct section.
 - Fix compile error [#2685](https://github.com/excalidraw/excalidraw/pull/2685)
 - Center zoom on iPhone and iPad [#2642](https://github.com/excalidraw/excalidraw/pull/2642)
 - Allow text-selecting in dialogs & reset cursor [#2783](https://github.com/excalidraw/excalidraw/pull/2783)
+- don't render due to zoom after unmount [#2779](https://github.com/excalidraw/excalidraw/pull/2779)
+- Track the chart type correctly [#2773](https://github.com/excalidraw/excalidraw/pull/2773)
 - Fix late-render due to debounced zoom [#2779](https://github.com/excalidraw/excalidraw/pull/2779)
 - Fix initialization when browser tab not focused [#2677](https://github.com/excalidraw/excalidraw/pull/2677)
 - Consistent case for export locale strings [#2622](https://github.com/excalidraw/excalidraw/pull/2622)
@@ -54,6 +57,7 @@ Please add the latest change on the top under the correct section.
 
 ### Improvements
 
+- Perform lossless compression on all PNG images [#2740](https://github.com/excalidraw/excalidraw/pull/2740)
 - Added Zen Mode to the context menu [#2734](https://github.com/excalidraw/excalidraw/pull/2734)
 - Do not reset to selection for draw tool [#2721]((https://github.com/excalidraw/excalidraw/pull/2721)
 - Make dialogs look more like dialogs [#2686](<(https://github.com/excalidraw/excalidraw/pull/2686)>)
@@ -71,6 +75,7 @@ Please add the latest change on the top under the correct section.
 
 ### Refactor
 
+- refactor: Converting span to kbd tag [#2774](https://github.com/excalidraw/excalidraw/pull/2774)
 - Media queries [#2680](https://github.com/excalidraw/excalidraw/pull/2680)
 - Remove duplicate entry from en.json[#2654](https://github.com/excalidraw/excalidraw/pull/2654)
 - Remove the word toggle from labels [#2648](https://github.com/excalidraw/excalidraw/pull/2648)
