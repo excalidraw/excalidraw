@@ -234,7 +234,7 @@
     "width": "Lebar"
   },
   "toast": {
-    "copyStyles": "",
-    "copyToClipboardAsPng": ""
+    "copyStyles": "Gaya tersalin.",
+    "copyToClipboardAsPng": "Tersalin ke clipboard sebagai PNG."
   }
 }
