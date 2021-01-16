@@ -6,6 +6,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { trackEvent } from "../analytics";
 import { getDefaultAppState } from "../appState";
 import { ExcalidrawImperativeAPI } from "../components/App";
 import { ErrorDialog } from "../components/ErrorDialog";
@@ -22,7 +23,12 @@ import Excalidraw, {
   languages,
 } from "../packages/excalidraw/index";
 import { AppState, ExcalidrawAPIRefValue } from "../types";
-import { debounce, ResolvablePromise, resolvablePromise } from "../utils";
+import {
+  debounce,
+  getVersion,
+  ResolvablePromise,
+  resolvablePromise,
+} from "../utils";
 import { SAVE_TO_LOCAL_STORAGE_TIMEOUT } from "./app_constants";
 import CollabWrapper, { CollabAPI } from "./collab/CollabWrapper";
 import { LanguageList } from "./components/LanguageList";
@@ -223,6 +229,19 @@ function ExcalidrawWrapper(props: { collab: CollabAPI }) {
   const { collab } = props;
 
   useEffect(() => {
+    // delayed by 15 sec so that the app has a time to load the latest SW
+    setTimeout(() => {
+      const version = getVersion();
+      const loggedVersion = window.localStorage.getItem(
+        "excalidraw-lastLoggedVersion",
+      );
+      // prevent logging on multiple visits
+      if (version && version !== loggedVersion) {
+        window.localStorage.setItem("excalidraw-lastLoggedVersion", version);
+        trackEvent("load", "version", version);
+      }
+    }, 15000);
+
     excalidrawRef.current!.readyPromise.then((excalidrawApi) => {
       initializeScene({
         resetScene: excalidrawApi.resetScene,

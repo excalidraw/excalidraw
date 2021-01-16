@@ -158,6 +158,7 @@ import {
 import ContextMenu from "./ContextMenu";
 import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
+import { Toast } from "./Toast";
 
 const { history } = createHistory();
 
@@ -374,6 +375,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             appState={this.state}
             elements={this.scene.getElements()}
             onClose={this.toggleStats}
+          />
+        )}
+        {this.state.toastMessage !== null && (
+          <Toast
+            message={this.state.toastMessage}
+            clearToast={this.clearToast}
           />
         )}
         <main>
@@ -911,6 +918,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         this.canvas!,
         this.state,
       );
+      this.setState({ toastMessage: t("toast.copyToClipboardAsPng") });
     } catch (error) {
       console.error(error);
       this.setState({ errorMessage: error.message });
@@ -1166,6 +1174,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         this.canvas,
       ),
     });
+  };
+
+  clearToast = () => {
+    this.setState({ toastMessage: null });
   };
 
   public updateScene = withBatchedUpdates((sceneData: SceneData) => {
@@ -3816,7 +3828,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   private resetShouldCacheIgnoreZoomDebounced = debounce(() => {
-    this.setState({ shouldCacheIgnoreZoom: false });
+    if (!this.unmounted) {
+      this.setState({ shouldCacheIgnoreZoom: false });
+    }
   }, 300);
 
   private getCanvasOffsets(offsets?: {

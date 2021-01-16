@@ -82,7 +82,7 @@ Shortcut.defaultProps = {
 };
 
 const ShortcutKey = (props: { children: React.ReactNode }) => (
-  <span className="ShorcutsDialog-key" {...props} />
+  <kbd className="ShorcutsDialog-key" {...props} />
 );
 
 const Footer = () => (
@@ -93,13 +93,6 @@ const Footer = () => (
       rel="noopener noreferrer"
     >
       {t("shortcutsDialog.blog")}
-    </a>
-    <a
-      href="https://howto.excalidraw.com"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      {t("shortcutsDialog.howto")}
     </a>
     <a
       href="https://github.com/excalidraw/excalidraw/issues"
