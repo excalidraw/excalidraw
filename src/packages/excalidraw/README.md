@@ -163,7 +163,7 @@ This function returns the current scene version.
 getSyncableElements(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement []</a>):<a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement []</a>
 </pre>
 
-**_How to use_**
+**How to use**
 
 ```js
 import { getSyncableElements } from "@excalidraw/excalidraw";
@@ -179,7 +179,7 @@ This function returns all the deleted elements of the scene.
 getElementsMap(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement []</a>): {[id: string]: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement</a>}
 </pre>
 
-**_ How to use _**
+**How to use**
 
 ```js
 import { getElementsMap } from "@excalidraw/excalidraw";
