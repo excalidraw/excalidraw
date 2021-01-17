@@ -74,13 +74,13 @@ export const actionShortcuts = register({
     return {
       appState: {
         ...appState,
-        showShortcutsDialog: true,
+        showHelpDialog: true,
       },
       commitToHistory: false,
     };
   },
   PanelComponent: ({ updateData }) => (
-    <HelpIcon title={t("shortcutsDialog.title")} onClick={updateData} />
+    <HelpIcon title={t("helpDialog.title")} onClick={updateData} />
   ),
   keyTest: (event) => event.key === KEYS.QUESTION_MARK,
 });
