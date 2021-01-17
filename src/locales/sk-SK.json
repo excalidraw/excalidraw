@@ -199,24 +199,26 @@
   "errorDialog": {
     "title": "Chyba"
   },
-  "shortcutsDialog": {
-    "title": "Klávesové skratky",
-    "shapes": "Tvary",
-    "or": "alebo",
-    "click": "kliknutie",
-    "drag": "potiahnutie",
-    "curvedArrow": "Zakrivená šípka",
-    "curvedLine": "Zakrivená čiara",
-    "editor": "Editovanie",
-    "view": "Zobrazenie",
-    "blog": "Prečítajte si náš blog",
-    "howto": "Postupujte podľa naších návodov",
-    "github": "Objavili ste problém? Nahláste ho",
-    "textNewLine": "Vložiť nový riadok (text)",
-    "textFinish": "Ukončenie editovania (text)",
-    "zoomToFit": "Priblížiť aby boli zahrnuté všetky prvky",
-    "zoomToSelection": "Priblížiť na výber",
-    "preventBinding": "Zakázať pripájanie šípky"
+  "helpDialog": {
+    "blog": "",
+    "click": "",
+    "curvedArrow": "",
+    "curvedLine": "",
+    "documentation": "",
+    "drag": "",
+    "editor": "",
+    "github": "",
+    "howto": "",
+    "or": "",
+    "preventBinding": "",
+    "shapes": "",
+    "shortcuts": "",
+    "textFinish": "",
+    "textNewLine": "",
+    "title": "",
+    "view": "",
+    "zoomToFit": "",
+    "zoomToSelection": ""
   },
   "encrypted": {
     "tooltip": "Vaše kresby používajú end-to-end šifrovanie, takže ich Excalidraw server nedokáže prečítať."
