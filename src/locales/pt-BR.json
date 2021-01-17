@@ -210,14 +210,14 @@
     "github": "Encontrou algum problema? Nos informe",
     "howto": "Siga nossos guias",
     "or": "ou",
-    "preventBinding": "",
+    "preventBinding": "Evitar fixação de seta",
     "shapes": "Formas",
     "shortcuts": "Atalhos de teclado",
     "textFinish": "Finalizar edição (texto)",
     "textNewLine": "Adicionar nova linha (texto)",
     "title": "Ajudar",
     "view": "Visualizar",
-    "zoomToFit": "Ajustar para encaixar todos os elementos",
+    "zoomToFit": "Ampliar para encaixar todos os elementos",
     "zoomToSelection": "Ampliar a seleção"
   },
   "encrypted": {
