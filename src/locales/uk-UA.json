@@ -199,24 +199,26 @@
   "errorDialog": {
     "title": "Помилка"
   },
-  "shortcutsDialog": {
-    "title": "Гарячі клавіші",
-    "shapes": "Фігури",
-    "or": "або",
-    "click": "натиснути",
-    "drag": "перетягнути",
-    "curvedArrow": "Вигнута стрілка",
-    "curvedLine": "Вигнута лінія",
-    "editor": "Редактор",
-    "view": "Вигляд",
-    "blog": "Читайте наш блог",
-    "howto": "Дотримуйтесь наших інструкцій",
-    "github": "Знайшли помилку? Повідомте!",
-    "textNewLine": "Додати новий рядок (текст)",
-    "textFinish": "Завершити редагування (текст)",
-    "zoomToFit": "Збільшити щоб умістити все",
-    "zoomToSelection": "Перейти до виділеного",
-    "preventBinding": "Запобігти зв'язування зі стрілками"
+  "helpDialog": {
+    "blog": "",
+    "click": "",
+    "curvedArrow": "",
+    "curvedLine": "",
+    "documentation": "",
+    "drag": "",
+    "editor": "",
+    "github": "",
+    "howto": "",
+    "or": "",
+    "preventBinding": "",
+    "shapes": "",
+    "shortcuts": "",
+    "textFinish": "",
+    "textNewLine": "",
+    "title": "",
+    "view": "",
+    "zoomToFit": "",
+    "zoomToSelection": ""
   },
   "encrypted": {
     "tooltip": "Ваші креслення захищені наскрізним шифруванням — сервери Excalidraw ніколи їх не побачать."
