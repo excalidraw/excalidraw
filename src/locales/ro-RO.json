@@ -199,24 +199,26 @@
   "errorDialog": {
     "title": "Eroare"
   },
-  "shortcutsDialog": {
-    "title": "Comenzi rapide de la tastatură",
-    "shapes": "Forme",
-    "or": "sau",
-    "click": "clic",
-    "drag": "glisare",
-    "curvedArrow": "Săgeată curbată",
-    "curvedLine": "Linie curbată",
-    "editor": "Editor",
-    "view": "Vizualizare",
-    "blog": "Citește blogul nostru",
-    "howto": "Urmărește ghidurile noastre",
-    "github": "Ai întâmpinat o problemă? Trimite un raport",
-    "textNewLine": "Adaugă o linie nouă (text)",
-    "textFinish": "Finalizează editarea (text)",
-    "zoomToFit": "Apropiere/depărtare pentru a cuprinde totul",
-    "zoomToSelection": "Panoramare la selecție",
-    "preventBinding": "Împiedică legarea săgeții"
+  "helpDialog": {
+    "blog": "",
+    "click": "",
+    "curvedArrow": "",
+    "curvedLine": "",
+    "documentation": "",
+    "drag": "",
+    "editor": "",
+    "github": "",
+    "howto": "",
+    "or": "",
+    "preventBinding": "",
+    "shapes": "",
+    "shortcuts": "",
+    "textFinish": "",
+    "textNewLine": "",
+    "title": "",
+    "view": "",
+    "zoomToFit": "",
+    "zoomToSelection": ""
   },
   "encrypted": {
     "tooltip": "Desenele tale sunt criptate integral, astfel că serverele Excalidraw nu le vor vedea niciodată."
