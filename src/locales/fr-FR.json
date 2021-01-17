@@ -216,9 +216,9 @@
     "textFinish": "Terminer l'édition (texte)",
     "textNewLine": "Ajouter une nouvelle ligne (texte)",
     "title": "Aide",
-    "view": "",
-    "zoomToFit": "",
-    "zoomToSelection": ""
+    "view": "Affichage",
+    "zoomToFit": "Zoomer pour voir tous les éléments",
+    "zoomToSelection": "Zoomer sur la sélection"
   },
   "encrypted": {
     "tooltip": "Vos dessins sont chiffrés de bout en bout, les serveurs d'Excalidraw ne les verront jamais."
