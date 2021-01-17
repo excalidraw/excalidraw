@@ -3,30 +3,30 @@ import { t } from "../i18n";
 import { isDarwin } from "../keys";
 import { Dialog } from "./Dialog";
 import { getShortcutKey } from "../utils";
-import "./ShortcutsDialog.scss";
+import "./HelpDialog.scss";
 
 const Header = () => (
-  <div className="ShortcutsDialog-footer">
+  <div className="HelpDialog-footer">
     <a
       href="https://blog.excalidraw.com"
       target="_blank"
       rel="noopener noreferrer"
     >
-      {t("shortcutsDialog.blog")}
+      {t("helpDialog.blog")}
     </a>
     <a
       href="https://github.com/excalidraw/excalidraw/issues"
       target="_blank"
       rel="noopener noreferrer"
     >
-      {t("shortcutsDialog.github")}
+      {t("helpDialog.github")}
     </a>
   </div>
 );
 
 const Section = (props: { title: string; children: React.ReactNode }) => (
-  <div className="ShortcutsDialog-section">
-    <h3 className="ShortcutsDialog-section__title">{props.title}</h3>
+  <div className="HelpDialog-section">
+    <h3 className="HelpDialog-section__title">{props.title}</h3>
     {props.children}
   </div>
 );
@@ -52,8 +52,8 @@ const ShortcutIsland = (props: {
   caption: string;
   children: React.ReactNode;
 }) => (
-  <div className="ShortcutsDialog-island">
-    <h3 className="ShortcutsDialog-island-title">{props.caption}</h3>
+  <div className="HelpDialog-island">
+    <h3 className="HelpDialog-island-title">{props.caption}</h3>
     {props.children}
   </div>
 );
@@ -64,7 +64,7 @@ const Shortcut = (props: {
   isOr: boolean;
 }) => {
   return (
-    <div className="ShorcutsDialog-shortcut">
+    <div className="HelpDialog-shortcut">
       <div
         style={{
           display: "flex",
@@ -94,7 +94,7 @@ const Shortcut = (props: {
               <ShortcutKey>{shortcut}</ShortcutKey>
               {props.isOr &&
                 index !== props.shortcuts.length - 1 &&
-                t("shortcutsDialog.or")}
+                t("helpDialog.or")}
             </React.Fragment>
           ))}
         </div>
@@ -108,10 +108,10 @@ Shortcut.defaultProps = {
 };
 
 const ShortcutKey = (props: { children: React.ReactNode }) => (
-  <kbd className="ShorcutsDialog-key" {...props} />
+  <kbd className="HelpDialog-key" {...props} />
 );
 
-export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
+export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
   const handleClose = React.useCallback(() => {
     if (onClose) {
       onClose();
@@ -120,12 +120,12 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
 
   return (
     <>
-      <Dialog onCloseRequest={handleClose} title={t("shortcutsDialog.title")}>
+      <Dialog onCloseRequest={handleClose} title={t("helpDialog.title")}>
         <Header />
-        <Section title={t("shortcutsDialog.shortcuts")}>
+        <Section title={t("helpDialog.shortcuts")}>
           <Columns>
             <Column>
-              <ShortcutIsland caption={t("shortcutsDialog.shapes")}>
+              <ShortcutIsland caption={t("helpDialog.shapes")}>
                 <Shortcut
                   label={t("toolBar.selection")}
                   shortcuts={["V", "1"]}
@@ -144,46 +144,46 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
                 />
                 <Shortcut label={t("toolBar.text")} shortcuts={["T", "8"]} />
                 <Shortcut
-                  label={t("shortcutsDialog.textNewLine")}
+                  label={t("helpDialog.textNewLine")}
                   shortcuts={[
                     getShortcutKey("Enter"),
                     getShortcutKey("Shift+Enter"),
                   ]}
                 />
                 <Shortcut
-                  label={t("shortcutsDialog.textFinish")}
+                  label={t("helpDialog.textFinish")}
                   shortcuts={[
                     getShortcutKey("Esc"),
                     getShortcutKey("CtrlOrCmd+Enter"),
                   ]}
                 />
                 <Shortcut
-                  label={t("shortcutsDialog.curvedArrow")}
+                  label={t("helpDialog.curvedArrow")}
                   shortcuts={[
                     "A",
-                    t("shortcutsDialog.click"),
-                    t("shortcutsDialog.click"),
-                    t("shortcutsDialog.click"),
+                    t("helpDialog.click"),
+                    t("helpDialog.click"),
+                    t("helpDialog.click"),
                   ]}
                   isOr={false}
                 />
                 <Shortcut
-                  label={t("shortcutsDialog.curvedLine")}
+                  label={t("helpDialog.curvedLine")}
                   shortcuts={[
                     "L",
-                    t("shortcutsDialog.click"),
-                    t("shortcutsDialog.click"),
-                    t("shortcutsDialog.click"),
+                    t("helpDialog.click"),
+                    t("helpDialog.click"),
+                    t("helpDialog.click"),
                   ]}
                   isOr={false}
                 />
                 <Shortcut label={t("toolBar.lock")} shortcuts={["Q"]} />
                 <Shortcut
-                  label={t("shortcutsDialog.preventBinding")}
+                  label={t("helpDialog.preventBinding")}
                   shortcuts={[getShortcutKey("CtrlOrCmd")]}
                 />
               </ShortcutIsland>
-              <ShortcutIsland caption={t("shortcutsDialog.view")}>
+              <ShortcutIsland caption={t("helpDialog.view")}>
                 <Shortcut
                   label={t("buttons.zoomIn")}
                   shortcuts={[getShortcutKey("CtrlOrCmd++")]}
@@ -197,11 +197,11 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
                   shortcuts={[getShortcutKey("CtrlOrCmd+0")]}
                 />
                 <Shortcut
-                  label={t("shortcutsDialog.zoomToFit")}
+                  label={t("helpDialog.zoomToFit")}
                   shortcuts={["Shift+1"]}
                 />
                 <Shortcut
-                  label={t("shortcutsDialog.zoomToSelection")}
+                  label={t("helpDialog.zoomToSelection")}
                   shortcuts={["Shift+2"]}
                 />
                 <Shortcut label={t("buttons.fullScreen")} shortcuts={["F"]} />
@@ -216,22 +216,20 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
               </ShortcutIsland>
             </Column>
             <Column>
-              <ShortcutIsland caption={t("shortcutsDialog.editor")}>
+              <ShortcutIsland caption={t("helpDialog.editor")}>
                 <Shortcut
                   label={t("labels.selectAll")}
                   shortcuts={[getShortcutKey("CtrlOrCmd+A")]}
                 />
                 <Shortcut
                   label={t("labels.multiSelect")}
-                  shortcuts={[
-                    getShortcutKey(`Shift+${t("shortcutsDialog.click")}`),
-                  ]}
+                  shortcuts={[getShortcutKey(`Shift+${t("helpDialog.click")}`)]}
                 />
                 <Shortcut
                   label={t("labels.moveCanvas")}
                   shortcuts={[
-                    getShortcutKey(`Space+${t("shortcutsDialog.drag")}`),
-                    getShortcutKey(`Wheel+${t("shortcutsDialog.drag")}`),
+                    getShortcutKey(`Space+${t("helpDialog.drag")}`),
+                    getShortcutKey(`Wheel+${t("helpDialog.drag")}`),
                   ]}
                   isOr={true}
                 />
@@ -307,7 +305,7 @@ export const ShortcutsDialog = ({ onClose }: { onClose?: () => void }) => {
                   label={t("labels.duplicateSelection")}
                   shortcuts={[
                     getShortcutKey("CtrlOrCmd+D"),
-                    getShortcutKey(`Alt+${t("shortcutsDialog.drag")}`),
+                    getShortcutKey(`Alt+${t("helpDialog.drag")}`),
                   ]}
                 />
                 <Shortcut

@@ -1,23 +1,23 @@
 @import "../css/_variables";
 
 .excalidraw {
-  .ShortcutsDialog-island {
+  .HelpDialog-island {
     border: 1px solid var(--button-gray-2);
     margin-bottom: 16px;
   }
 
-  .ShortcutsDialog-island-title {
+  .HelpDialog-island-title {
     margin: 0;
     padding: 4px;
     background-color: var(--button-gray-1);
     text-align: center;
   }
 
-  .ShorcutsDialog-shortcut {
+  .HelpDialog-shortcut {
     border-top: 1px solid var(--button-gray-2);
   }
 
-  .ShorcutsDialog-key {
+  .HelpDialog-key {
     word-break: keep-all;
     border: 1px solid var(--button-gray-2);
     padding: 2px 8px;
@@ -32,7 +32,7 @@
     font-family: inherit;
   }
 
-  .ShortcutsDialog-footer {
+  .HelpDialog-footer {
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;

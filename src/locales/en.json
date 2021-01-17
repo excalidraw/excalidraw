@@ -199,7 +199,7 @@
   "errorDialog": {
     "title": "Error"
   },
-  "shortcutsDialog": {
+  "helpDialog": {
     "title": "Help",
     "shapes": "Shapes",
     "or": "or",
