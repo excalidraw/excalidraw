@@ -199,24 +199,26 @@
   "errorDialog": {
     "title": "エラー"
   },
-  "shortcutsDialog": {
-    "title": "キーボードショートカット",
-    "shapes": "図形",
-    "or": "または",
-    "click": "クリック",
-    "drag": "ドラッグ",
-    "curvedArrow": "曲がった矢印",
-    "curvedLine": "曲線",
-    "editor": "エディタ",
-    "view": "表示",
-    "blog": "公式ブログを読む",
-    "howto": "ヘルプ・マニュアル",
-    "github": "不具合報告はこちら",
-    "textNewLine": "テキストの改行",
-    "textFinish": "テキストの編集を終える",
-    "zoomToFit": "すべての図形が収まるよう拡大/縮小",
-    "zoomToSelection": "",
-    "preventBinding": "矢印を結合しない"
+  "helpDialog": {
+    "blog": "",
+    "click": "",
+    "curvedArrow": "",
+    "curvedLine": "",
+    "documentation": "",
+    "drag": "",
+    "editor": "",
+    "github": "",
+    "howto": "",
+    "or": "",
+    "preventBinding": "",
+    "shapes": "",
+    "shortcuts": "",
+    "textFinish": "",
+    "textNewLine": "",
+    "title": "",
+    "view": "",
+    "zoomToFit": "",
+    "zoomToSelection": ""
   },
   "encrypted": {
     "tooltip": "描画内容はエンドツーエンド暗号化が施されており、Excalidrawサーバーが内容を見ることはできません。"
