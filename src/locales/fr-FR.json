@@ -199,24 +199,26 @@
   "errorDialog": {
     "title": "Erreur"
   },
-  "shortcutsDialog": {
-    "title": "Raccourcis clavier",
-    "shapes": "Formes",
-    "or": "ou",
-    "click": "cliquer",
-    "drag": "glisser",
-    "curvedArrow": "Flèche courbée",
-    "curvedLine": "Ligne courbée",
-    "editor": "Éditeur",
-    "view": "Afficher",
-    "blog": "Lire notre blog",
-    "howto": "Voir nos guides",
-    "github": "Un problème trouvé ? Soumettre",
-    "textNewLine": "Ajouter une nouvelle ligne (texte)",
-    "textFinish": "Terminer l'édition (texte)",
-    "zoomToFit": "Zoomer pour voir tous les éléments",
-    "zoomToSelection": "Zoomer sur la sélection",
-    "preventBinding": "Empêcher la liaison de flèche"
+  "helpDialog": {
+    "blog": "",
+    "click": "",
+    "curvedArrow": "",
+    "curvedLine": "",
+    "documentation": "",
+    "drag": "",
+    "editor": "",
+    "github": "",
+    "howto": "",
+    "or": "",
+    "preventBinding": "",
+    "shapes": "",
+    "shortcuts": "",
+    "textFinish": "",
+    "textNewLine": "",
+    "title": "",
+    "view": "",
+    "zoomToFit": "",
+    "zoomToSelection": ""
   },
   "encrypted": {
     "tooltip": "Vos dessins sont chiffrés de bout en bout, les serveurs d'Excalidraw ne les verront jamais."
