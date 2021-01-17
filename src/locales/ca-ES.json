@@ -199,24 +199,26 @@
   "errorDialog": {
     "title": "Error"
   },
-  "shortcutsDialog": {
-    "title": "Dreceres de teclat",
-    "shapes": "Formes",
-    "or": "o",
-    "click": "fer clic",
-    "drag": "arrosegar",
-    "curvedArrow": "Fletxa curva",
-    "curvedLine": "Línea curva",
-    "editor": "Editor",
-    "view": "Vista",
-    "blog": "Llegir el nostre blog",
-    "howto": "Seguir els nostres guies",
-    "github": "Has trobat un problema? Enviar-ho",
-    "textNewLine": "Afegir línea nova (text)",
-    "textFinish": "Acabar d'editar (text)",
-    "zoomToFit": "Zoom per veure tots els elements",
-    "zoomToSelection": "Zoom per veure la selecció",
-    "preventBinding": "Prevenir vinculació de la fletxa"
+  "helpDialog": {
+    "blog": "",
+    "click": "",
+    "curvedArrow": "",
+    "curvedLine": "",
+    "documentation": "",
+    "drag": "",
+    "editor": "",
+    "github": "",
+    "howto": "",
+    "or": "",
+    "preventBinding": "",
+    "shapes": "",
+    "shortcuts": "",
+    "textFinish": "",
+    "textNewLine": "",
+    "title": "",
+    "view": "",
+    "zoomToFit": "",
+    "zoomToSelection": ""
   },
   "encrypted": {
     "tooltip": "Els vostres dibuixos estan xifrats de punta a punta de manera que els servidors d’Excalidraw no els veuran mai."
