@@ -199,24 +199,26 @@
   "errorDialog": {
     "title": "Feil"
   },
-  "shortcutsDialog": {
-    "title": "Tastatursnarveier",
-    "shapes": "Figurer",
-    "or": "eller",
-    "click": "klikk",
-    "drag": "dra",
-    "curvedArrow": "Buet pil",
-    "curvedLine": "Buet linje",
-    "editor": "Redigering",
-    "view": "Visning",
-    "blog": "Les bloggen vår",
-    "howto": "Følg våre veiledninger",
-    "github": "Funnet et problem? Send inn",
-    "textNewLine": "Legg til ny linje (tekst)",
-    "textFinish": "Fullfør redigering (tekst)",
-    "zoomToFit": "Zoom for å passe alle elementene",
-    "zoomToSelection": "Zoom til utvalg",
-    "preventBinding": "Forhindre pilbinding"
+  "helpDialog": {
+    "blog": "",
+    "click": "",
+    "curvedArrow": "",
+    "curvedLine": "",
+    "documentation": "",
+    "drag": "",
+    "editor": "",
+    "github": "",
+    "howto": "",
+    "or": "",
+    "preventBinding": "",
+    "shapes": "",
+    "shortcuts": "",
+    "textFinish": "",
+    "textNewLine": "",
+    "title": "",
+    "view": "",
+    "zoomToFit": "",
+    "zoomToSelection": ""
   },
   "encrypted": {
     "tooltip": "Dine tegninger er ende-til-ende-krypterte slik at Excalidraw sine servere aldri vil se dem."
