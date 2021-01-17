@@ -199,24 +199,26 @@
   "errorDialog": {
     "title": "Errore"
   },
-  "shortcutsDialog": {
-    "title": "Scorciatoie da tastiera",
-    "shapes": "Forme",
-    "or": "oppure",
-    "click": "click",
-    "drag": "trascina",
-    "curvedArrow": "Freccia curva",
-    "curvedLine": "Linea curva",
-    "editor": "Editor",
-    "view": "Vista",
-    "blog": "Leggi il nostro blog",
-    "howto": "Segui le nostre guide",
-    "github": "Hai trovato un problema? Segnalalo",
-    "textNewLine": "Aggiungi nuova riga (testo)",
-    "textFinish": "Completa la modifica (testo)",
-    "zoomToFit": "Adatta zoom per mostrare tutti gli elementi",
-    "zoomToSelection": "Zoom alla selezione",
-    "preventBinding": "Prevenire l'associazione freccia"
+  "helpDialog": {
+    "blog": "",
+    "click": "",
+    "curvedArrow": "",
+    "curvedLine": "",
+    "documentation": "",
+    "drag": "",
+    "editor": "",
+    "github": "",
+    "howto": "",
+    "or": "",
+    "preventBinding": "",
+    "shapes": "",
+    "shortcuts": "",
+    "textFinish": "",
+    "textNewLine": "",
+    "title": "",
+    "view": "",
+    "zoomToFit": "",
+    "zoomToSelection": ""
   },
   "encrypted": {
     "tooltip": "I tuoi disegni sono crittografati end-to-end in modo che i server di Excalidraw non li possano mai vedere."
