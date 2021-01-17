@@ -200,7 +200,7 @@
     "title": "Error"
   },
   "shortcutsDialog": {
-    "title": "Keyboard shortcuts",
+    "title": "Help",
     "shapes": "Shapes",
     "or": "or",
     "click": "click",
@@ -216,7 +216,8 @@
     "textFinish": "Finish editing (text)",
     "zoomToFit": "Zoom to fit all elements",
     "zoomToSelection": "Zoom to selection",
-    "preventBinding": "Prevent arrow binding"
+    "preventBinding": "Prevent arrow binding",
+    "shortcuts": "Keyboard shortcuts"
   },
   "encrypted": {
     "tooltip": "Your drawings are end-to-end encrypted so Excalidraw's servers will never see them."

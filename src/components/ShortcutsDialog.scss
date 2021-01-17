@@ -36,8 +36,8 @@
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
-    border-top: 1px solid var(--button-gray-2);
-    margin-top: 8px;
-    padding-top: 16px;
+    border-bottom: 1px solid var(--button-gray-2);
+    margin-bottom: 32px;
+    padding-bottom: 16px;
   }
 }
