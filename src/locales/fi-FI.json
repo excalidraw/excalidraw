@@ -200,12 +200,12 @@
     "title": "Virhe"
   },
   "helpDialog": {
-    "blog": "",
-    "click": "",
-    "curvedArrow": "",
-    "curvedLine": "",
-    "documentation": "",
-    "drag": "",
+    "blog": "Lue blogiamme",
+    "click": "klikkaa",
+    "curvedArrow": "Kaareva nuoli",
+    "curvedLine": "Kaareva viiva",
+    "documentation": "Käyttöohjeet",
+    "drag": "vedä",
     "editor": "",
     "github": "",
     "howto": "",
