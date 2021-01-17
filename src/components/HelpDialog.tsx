@@ -6,8 +6,9 @@ import { getShortcutKey } from "../utils";
 import "./HelpDialog.scss";
 
 const Header = () => (
-  <div className="HelpDialog-header">
+  <div className="HelpDialog--header">
     <a
+      className="HelpDialog--btn"
       href="https://blog.excalidraw.com"
       target="_blank"
       rel="noopener noreferrer"
@@ -15,6 +16,7 @@ const Header = () => (
       {t("helpDialog.blog")}
     </a>
     <a
+      className="HelpDialog--btn"
       href="https://github.com/excalidraw/excalidraw/issues"
       target="_blank"
       rel="noopener noreferrer"
@@ -25,10 +27,10 @@ const Header = () => (
 );
 
 const Section = (props: { title: string; children: React.ReactNode }) => (
-  <div className="HelpDialog-section">
-    <h3 className="HelpDialog-section__title">{props.title}</h3>
+  <>
+    <h3>{props.title}</h3>
     {props.children}
-  </div>
+  </>
 );
 
 const Columns = (props: { children: React.ReactNode }) => (
@@ -52,8 +54,8 @@ const ShortcutIsland = (props: {
   caption: string;
   children: React.ReactNode;
 }) => (
-  <div className="HelpDialog-island">
-    <h3 className="HelpDialog-island-title">{props.caption}</h3>
+  <div className="HelpDialog--island">
+    <h3 className="HelpDialog--island-title">{props.caption}</h3>
     {props.children}
   </div>
 );
@@ -64,7 +66,7 @@ const Shortcut = (props: {
   isOr: boolean;
 }) => {
   return (
-    <div className="HelpDialog-shortcut">
+    <div className="HelpDialog--shortcut">
       <div
         style={{
           display: "flex",
@@ -108,7 +110,7 @@ Shortcut.defaultProps = {
 };
 
 const ShortcutKey = (props: { children: React.ReactNode }) => (
-  <kbd className="HelpDialog-key" {...props} />
+  <kbd className="HelpDialog--key" {...props} />
 );
 
 export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
@@ -120,8 +122,14 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
 
   return (
     <>
-      <Dialog onCloseRequest={handleClose} title={t("helpDialog.title")}>
-        <Header />
+      <Dialog
+        onCloseRequest={handleClose}
+        title={t("helpDialog.title")}
+        className={"HelpDialog"}
+      >
+        <Section title={t("helpDialog.support")}>
+          <Header />
+        </Section>
         <Section title={t("helpDialog.shortcuts")}>
           <Columns>
             <Column>
