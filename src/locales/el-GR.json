@@ -199,24 +199,26 @@
   "errorDialog": {
     "title": "Σφάλμα"
   },
-  "shortcutsDialog": {
-    "title": "Συντομεύσεις πληκτρολογίου",
-    "shapes": "Σχήματα",
-    "or": "ή",
-    "click": "κλικ",
-    "drag": "σύρε",
-    "curvedArrow": "Κυρτό βέλος",
-    "curvedLine": "Κυρτή γραμμή",
-    "editor": "Επεξεργαστής",
-    "view": "Προβολή",
-    "blog": "Διαβάστε το ιστολόγιο μας",
-    "howto": "Ακολουθήστε τους οδηγούς μας",
-    "github": "Βρήκατε πρόβλημα; Υποβάλετε το",
-    "textNewLine": "Προσθήκη νέας γραμμής (κείμενο)",
-    "textFinish": "Ολοκλήρωση επεξεργασίας (κείμενο)",
-    "zoomToFit": "Zoom ώστε να χωρέσουν όλα τα στοιχεία",
-    "zoomToSelection": "Εστίαση στην επιλογή",
-    "preventBinding": "Αποτροπή δέσμευσης βέλων"
+  "helpDialog": {
+    "blog": "",
+    "click": "",
+    "curvedArrow": "",
+    "curvedLine": "",
+    "documentation": "",
+    "drag": "",
+    "editor": "",
+    "github": "",
+    "howto": "",
+    "or": "",
+    "preventBinding": "",
+    "shapes": "",
+    "shortcuts": "",
+    "textFinish": "",
+    "textNewLine": "",
+    "title": "",
+    "view": "",
+    "zoomToFit": "",
+    "zoomToSelection": ""
   },
   "encrypted": {
     "tooltip": "Τα σχέδιά σου είναι κρυπτογραφημένα από άκρο σε άκρο, έτσι δεν θα έιναι ποτέ ορατά μέσα από τους διακομιστές του Excalidraw."
