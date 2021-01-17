@@ -199,24 +199,26 @@
   "errorDialog": {
     "title": "Грешка"
   },
-  "shortcutsDialog": {
-    "title": "Клавиши за бърз достъп",
-    "shapes": "Фигури",
-    "or": "или",
-    "click": "клик",
-    "drag": "плъзнете",
-    "curvedArrow": "Извита стрелка",
-    "curvedLine": "Извита линия",
-    "editor": "Редактор",
-    "view": "Преглед",
-    "blog": "Прочетете нашия блог",
-    "howto": "Следвайте нашите ръководства",
-    "github": "Намерихте проблем? Изпратете",
-    "textNewLine": "Добавяне на нов ред (текст)",
-    "textFinish": "Завършете редактиране (текст)",
-    "zoomToFit": "Приближи докато се виждат всички елементи",
-    "zoomToSelection": "Приближи селекцията",
-    "preventBinding": "Спри прилепяне на стрелките"
+  "helpDialog": {
+    "blog": "",
+    "click": "",
+    "curvedArrow": "",
+    "curvedLine": "",
+    "documentation": "",
+    "drag": "",
+    "editor": "",
+    "github": "",
+    "howto": "",
+    "or": "",
+    "preventBinding": "",
+    "shapes": "",
+    "shortcuts": "",
+    "textFinish": "",
+    "textNewLine": "",
+    "title": "",
+    "view": "",
+    "zoomToFit": "",
+    "zoomToSelection": ""
   },
   "encrypted": {
     "tooltip": "Вашите рисунки са криптирани от край до край, така че сървърите на Excalidraw няма да могат да ги виждат."
