@@ -199,24 +199,26 @@
   "errorDialog": {
     "title": "Fel"
   },
-  "shortcutsDialog": {
-    "title": "Tangentbordsgenvägar",
-    "shapes": "Former",
-    "or": "eller",
-    "click": "klicka",
-    "drag": "dra",
-    "curvedArrow": "Böjd pil",
-    "curvedLine": "Böjd linje",
-    "editor": "Redigerare",
-    "view": "Visa",
-    "blog": "Läs vår blogg",
-    "howto": "Följ våra guider",
-    "github": "Hittat ett problem? Rapportera",
-    "textNewLine": "Lägg till ny rad (text)",
-    "textFinish": "Slutför redigering (text)",
-    "zoomToFit": "Zooma för att rymma alla element",
-    "zoomToSelection": "Zooma till markering",
-    "preventBinding": "Förhindra pilbindning"
+  "helpDialog": {
+    "blog": "",
+    "click": "",
+    "curvedArrow": "",
+    "curvedLine": "",
+    "documentation": "",
+    "drag": "",
+    "editor": "",
+    "github": "",
+    "howto": "",
+    "or": "",
+    "preventBinding": "",
+    "shapes": "",
+    "shortcuts": "",
+    "textFinish": "",
+    "textNewLine": "",
+    "title": "",
+    "view": "",
+    "zoomToFit": "",
+    "zoomToSelection": ""
   },
   "encrypted": {
     "tooltip": "Dina skisser är krypterade från ände till ände så Excalidraws servrar kommer aldrig att se dem."
