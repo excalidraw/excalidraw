@@ -208,17 +208,17 @@
     "drag": "拖曳",
     "editor": "編輯器",
     "github": "發現異常？回報問題",
-    "howto": "依照我們的說明",
+    "howto": "參照我們的說明",
     "or": "或",
-    "preventBinding": "",
-    "shapes": "",
-    "shortcuts": "",
-    "textFinish": "",
-    "textNewLine": "",
-    "title": "",
-    "view": "",
-    "zoomToFit": "",
-    "zoomToSelection": ""
+    "preventBinding": "避免箭號連結",
+    "shapes": "形狀",
+    "shortcuts": "鍵盤快速鍵",
+    "textFinish": "完成編輯 (文字)",
+    "textNewLine": "換行 (文字)",
+    "title": "說明",
+    "view": "檢視",
+    "zoomToFit": "放大至填滿畫面",
+    "zoomToSelection": "縮放至選取區"
   },
   "encrypted": {
     "tooltip": "你的作品已使用 end-to-end 方式加密，Excalidraw 的伺服器也無法取得其內容。"
