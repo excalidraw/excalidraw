@@ -6,7 +6,7 @@ import { getShortcutKey } from "../utils";
 import "./HelpDialog.scss";
 
 const Header = () => (
-  <div className="HelpDialog-footer">
+  <div className="HelpDialog-header">
     <a
       href="https://blog.excalidraw.com"
       target="_blank"
