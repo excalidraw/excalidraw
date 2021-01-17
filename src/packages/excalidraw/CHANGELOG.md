@@ -27,8 +27,11 @@ Please add the latest change on the top under the correct section.
 
 ### Fixes
 
-- Fix typo for initialData and point all links to master [#2707](https://github.com/excalidraw/excalidraw/pull/2707)
 - Hide collab button when onCollabButtonClick not supplied [#2598](https://github.com/excalidraw/excalidraw/pull/2598)
+
+### Docs
+
+- Fix typo for initialData and point all links to master [#2707](https://github.com/excalidraw/excalidraw/pull/2707)
 
 ## Excalidraw Library
 
