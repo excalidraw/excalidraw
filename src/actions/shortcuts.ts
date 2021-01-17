@@ -34,7 +34,7 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   delete: [getShortcutKey("Del")],
   duplicateSelection: [
     getShortcutKey("CtrlOrCmd+D"),
-    getShortcutKey(`Alt+${t("shortcutsDialog.drag")}`),
+    getShortcutKey(`Alt+${t("helpDialog.drag")}`),
   ],
   sendBackward: [getShortcutKey("CtrlOrCmd+[")],
   bringForward: [getShortcutKey("CtrlOrCmd+]")],
