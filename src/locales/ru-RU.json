@@ -199,24 +199,26 @@
   "errorDialog": {
     "title": "Ошибка"
   },
-  "shortcutsDialog": {
-    "title": "Сочетания клавиш",
-    "shapes": "Фигуры",
-    "or": "или",
-    "click": "нажать",
-    "drag": "перетащить",
-    "curvedArrow": "Изогнутая стрелка",
-    "curvedLine": "Изогнутая линия",
-    "editor": "Редактор",
-    "view": "Просмотр",
-    "blog": "Прочитайте наш блог",
-    "howto": "Следуйте нашим инструкциям",
-    "github": "Нашли проблему? Отправьте",
-    "textNewLine": "Добавить новую строку (текст)",
-    "textFinish": "Закончить редактирование (текст)",
-    "zoomToFit": "Отмастштабировать, чтобы поместились все элементы",
-    "zoomToSelection": "Перейти к выделенному",
-    "preventBinding": "Предотвратить привязку стрелок"
+  "helpDialog": {
+    "blog": "",
+    "click": "",
+    "curvedArrow": "",
+    "curvedLine": "",
+    "documentation": "",
+    "drag": "",
+    "editor": "",
+    "github": "",
+    "howto": "",
+    "or": "",
+    "preventBinding": "",
+    "shapes": "",
+    "shortcuts": "",
+    "textFinish": "",
+    "textNewLine": "",
+    "title": "",
+    "view": "",
+    "zoomToFit": "",
+    "zoomToSelection": ""
   },
   "encrypted": {
     "tooltip": "Ваши данные защищены сквозным (End-to-end) шифрованием. Серверы Excalidraw никогда не получат доступ к ним."
