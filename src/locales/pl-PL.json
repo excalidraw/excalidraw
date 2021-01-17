@@ -199,24 +199,26 @@
   "errorDialog": {
     "title": "Wystąpił błąd"
   },
-  "shortcutsDialog": {
-    "title": "Skróty klawiszowe",
-    "shapes": "Kształty",
-    "or": "lub",
-    "click": "klik",
-    "drag": "przeciągnij",
-    "curvedArrow": "Zakrzywiona strzałka",
-    "curvedLine": "Zakrzywiona linia",
-    "editor": "Edytor",
-    "view": "Widok",
-    "blog": "Przeczytaj naszego bloga",
-    "howto": "Skorzystaj z instrukcji",
-    "github": "Znalazłeś problem? Zgłoś go",
-    "textNewLine": "Dodaj nową linię (tekst)",
-    "textFinish": "Zakończ edycję (tekst)",
-    "zoomToFit": "Powiększ, aby wyświetlić wszystkie elementy",
-    "zoomToSelection": "Przybliż zaznaczenie",
-    "preventBinding": "Zablokuj przywiązanie strzałek do obiektu"
+  "helpDialog": {
+    "blog": "",
+    "click": "",
+    "curvedArrow": "",
+    "curvedLine": "",
+    "documentation": "",
+    "drag": "",
+    "editor": "",
+    "github": "",
+    "howto": "",
+    "or": "",
+    "preventBinding": "",
+    "shapes": "",
+    "shortcuts": "",
+    "textFinish": "",
+    "textNewLine": "",
+    "title": "",
+    "view": "",
+    "zoomToFit": "",
+    "zoomToSelection": ""
   },
   "encrypted": {
     "tooltip": "Twoje rysunki są zabezpieczone szyfrowaniem end-to-end, tak więc nawet w Excalidraw nie jesteśmy w stanie zobaczyć tego co tworzysz."
