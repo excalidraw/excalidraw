@@ -28,6 +28,7 @@ Please add the latest change on the top under the correct section.
 ### Fixes
 
 - Fix typo for initialData and point all links to master [#2707](https://github.com/excalidraw/excalidraw/pull/2707)
+- Hide collab button when onCollabButtonClick not supplied [#2598](https://github.com/excalidraw/excalidraw/pull/2598)
 
 ## Excalidraw Library
 
@@ -60,7 +61,6 @@ Please add the latest change on the top under the correct section.
 - Consistent case for export locale strings [#2622](https://github.com/excalidraw/excalidraw/pull/2622)
 - Remove unnecessary console.error as it was polluting Sentry [#2637](https://github.com/excalidraw/excalidraw/pull/2637)
 - Fix scroll-to-center on init for non-zero canvas offsets [#2445](https://github.com/excalidraw/excalidraw/pull/2445)
-- Hide collab button when onCollabButtonClick not supplied [#2598](https://github.com/excalidraw/excalidraw/pull/2598)
 - Fix resizing the pasted charts [#2586](https://github.com/excalidraw/excalidraw/pull/2586)
 - Fix element visibility and zoom on cursor when canvas offset isn't 0. [#2534](https://github.com/excalidraw/excalidraw/pull/2534)
 - Fix Library Menu Layout [#2502](https://github.com/excalidraw/excalidraw/pull/2502)
@@ -91,10 +91,6 @@ Please add the latest change on the top under the correct section.
 - Remove duplicate entry from en.json[#2654](https://github.com/excalidraw/excalidraw/pull/2654)
 - Remove the word toggle from labels [#2648](https://github.com/excalidraw/excalidraw/pull/2648)
 -
-
-### Chore
-
-- Bump ini from 1.3.5 to 1.3.7 in /src/packages/excalidraw [#2500](https://github.com/excalidraw/excalidraw/pull/2500)
 
 ### Docs
 
