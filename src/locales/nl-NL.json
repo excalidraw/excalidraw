@@ -208,17 +208,17 @@
     "drag": "slepen",
     "editor": "Editor",
     "github": "Probleem gevonden? Verzenden",
-    "howto": "",
-    "or": "",
-    "preventBinding": "",
-    "shapes": "",
-    "shortcuts": "",
-    "textFinish": "",
-    "textNewLine": "",
-    "title": "",
-    "view": "",
-    "zoomToFit": "",
-    "zoomToSelection": ""
+    "howto": "Volg onze handleidingen",
+    "or": "of",
+    "preventBinding": "Pijlbinding voorkomen",
+    "shapes": "Vormen",
+    "shortcuts": "Sneltoetsen",
+    "textFinish": "Voltooi bewerken (tekst)",
+    "textNewLine": "Nieuwe regel toevoegen (tekst)",
+    "title": "Help",
+    "view": "Weergave",
+    "zoomToFit": "Zoom in op alle elementen",
+    "zoomToSelection": "Inzoomen op selectie"
   },
   "encrypted": {
     "tooltip": "Je tekeningen zijn beveiligd met end-to-end encryptie, dus Excalidraw's servers zullen nooit zien wat je tekent."
