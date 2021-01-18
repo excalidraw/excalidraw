@@ -199,24 +199,26 @@
   "errorDialog": {
     "title": "خطا"
   },
-  "shortcutsDialog": {
-    "title": "میانبرهای صفحه کلید",
-    "shapes": "شکل‌ها",
-    "or": "یا",
-    "click": "کلیک",
-    "drag": "کشیدن",
-    "curvedArrow": "فلش خمیده",
-    "curvedLine": "منحنی",
-    "editor": "ویرایشگر",
-    "view": "نمایش",
-    "blog": "بلاگ ما را بخوانید",
-    "howto": "راهنمای ما را دنبال کنید",
-    "github": "اشکالی می بینید؟ گزارش دهید",
-    "textNewLine": "یک خط جدید اضافه کنید (متن)",
-    "textFinish": "پایان ویرایش (متن)",
-    "zoomToFit": "بزرگنمایی برای دیدن تمام آیتم ها",
-    "zoomToSelection": "بزرگنمایی قسمت انتخاب شده",
-    "preventBinding": "مانع شدن از چسبیدن فلش ها"
+  "helpDialog": {
+    "blog": "",
+    "click": "",
+    "curvedArrow": "",
+    "curvedLine": "",
+    "documentation": "",
+    "drag": "",
+    "editor": "",
+    "github": "",
+    "howto": "",
+    "or": "",
+    "preventBinding": "",
+    "shapes": "",
+    "shortcuts": "",
+    "textFinish": "",
+    "textNewLine": "",
+    "title": "",
+    "view": "",
+    "zoomToFit": "",
+    "zoomToSelection": ""
   },
   "encrypted": {
     "tooltip": "شما در یک محیط رمزگزاری شده دو طرفه در حال طراحی هستید پس Excalidraw هرگز طرح های شما را نمیبند."
@@ -232,5 +234,9 @@
     "title": "آمار برای نردها",
     "total": "مجموع",
     "width": "عرض"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboardAsPng": ""
   }
 }

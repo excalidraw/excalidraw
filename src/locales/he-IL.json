@@ -199,24 +199,26 @@
   "errorDialog": {
     "title": "שגיאה"
   },
-  "shortcutsDialog": {
-    "title": "קיצורי מקלדת",
-    "shapes": "צורות",
-    "or": "או",
-    "click": "לחץ",
-    "drag": "גרור",
-    "curvedArrow": "חץ מעוקל",
-    "curvedLine": "קו מעוקל",
-    "editor": "עורך",
-    "view": "תצוגה",
-    "blog": "קרא את הבלוג שלנו",
-    "howto": "עקוב אחר המדריכים שלנו",
-    "github": "מצאת בעיה? דווח",
-    "textNewLine": "הוסף שורה חדשה (טקסט)",
-    "textFinish": "סיים עריכה (טקסט)",
-    "zoomToFit": "זום להתאמת כל האלמנטים למסך",
-    "zoomToSelection": "התמקד בבחירה",
-    "preventBinding": "מנע השתלבות חצים"
+  "helpDialog": {
+    "blog": "",
+    "click": "",
+    "curvedArrow": "",
+    "curvedLine": "",
+    "documentation": "",
+    "drag": "",
+    "editor": "",
+    "github": "",
+    "howto": "",
+    "or": "",
+    "preventBinding": "",
+    "shapes": "",
+    "shortcuts": "",
+    "textFinish": "",
+    "textNewLine": "",
+    "title": "",
+    "view": "",
+    "zoomToFit": "",
+    "zoomToSelection": ""
   },
   "encrypted": {
     "tooltip": "הרישומים שלך מוצפנים מקצה לקצה כך שהשרתים של Excalidraw לא יראו אותם לעולם."
@@ -232,5 +234,9 @@
     "title": "סטטיסטיקות לחנונים",
     "total": "סה״כ",
     "width": "רוחב"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboardAsPng": ""
   }
 }

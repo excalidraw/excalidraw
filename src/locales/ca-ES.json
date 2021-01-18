@@ -30,17 +30,17 @@
     "edges": "Vores",
     "sharp": "Agut",
     "round": "Arrodonit",
-    "arrowheads": "Punta de fletxa",
+    "arrowheads": "Puntes de fletxa",
     "arrowhead_none": "Cap",
     "arrowhead_arrow": "Fletxa",
-    "arrowhead_bar": "Línia",
+    "arrowhead_bar": "Barra",
     "arrowhead_dot": "Punt",
     "fontSize": "Mida de lletra",
     "fontFamily": "Tipus de lletra",
     "onlySelected": "Només seleccionats",
     "withBackground": "Amb fons",
     "exportEmbedScene": "Incrustar escena al fitxer exportat",
-    "exportEmbedScene_details": "Les dades de l’escena es desaran al fitxer PNG/SVG exportat de manera que es pugui restaurar l’escena.\nAugmentarà la mida del fitxer exportat.",
+    "exportEmbedScene_details": "Les dades de l’escena es desaran al fitxer PNG/SVG de manera que es pugui restaurar l’escena.\nAugmentarà la mida del fitxer exportat.",
     "addWatermark": "Afegir \"Fet amb Excalidraw\"",
     "handDrawn": "Dibuixat a mà",
     "normal": "Normal",
@@ -61,7 +61,7 @@
     "architect": "Arquitecte",
     "artist": "Artista",
     "cartoonist": "Dibuixant",
-    "fileTitle": "Títol de fitxer",
+    "fileTitle": "Títol del fitxer",
     "colorPicker": "Selector de colors",
     "canvasBackground": "Fons del llenç",
     "drawingCanvas": "Llenç de dibuix",
@@ -127,7 +127,7 @@
   "alerts": {
     "clearReset": "Tot el llenç s'esborrarà. Estàs segur?",
     "couldNotCreateShareableLink": "No s'ha pogut crear un enllaç per compartir.",
-    "couldNotCreateShareableLinkTooBig": "No s’ha pogut crear un enllaç compartible: l’escena és massa gran",
+    "couldNotCreateShareableLinkTooBig": "No s’ha pogut crear un enllaç per compartir: l’escena és massa gran",
     "couldNotLoadInvalidFile": "No s'ha pogut carregar un fitxer no vàlid",
     "importBackendFailed": "Importació fallida.",
     "cannotExportEmptyCanvas": "No es pot exportar un llenç buit.",
@@ -162,7 +162,7 @@
     "freeDraw": "Fer clic i arrosegar, deixar anar al punt final",
     "text": "Consell: també pots afegir text fent doble clic a qualsevol lloc amb l'eina de selecció",
     "linearElementMulti": "Fer clic a l'ultim punt, o polsar Escape o Enter per acabar",
-    "lockAngle": "Pots restringir l’angle mantenint premuda MAJÚS",
+    "lockAngle": "Per restringir els angles, mantenir premut el majúscul (SHIFT)",
     "resize": "Per restringir les proporcions mentres es canvia la mida, mantenir premut el majúscul (SHIFT); per canviar la mida des del centre, mantenir premut ALT",
     "rotate": "Per restringir els angles mentre gira, mantenir premut el majúscul (SHIFT)",
     "lineEditor_info": "Fes doble clic o premi Enter per editar punts",
@@ -171,7 +171,7 @@
   },
   "canvasError": {
     "cannotShowPreview": "No es pot mostrar la vista prèvia",
-    "canvasTooBig": "El llenç pot ser massa gran.",
+    "canvasTooBig": "Pot ser que el llenç sigui massa gran.",
     "canvasTooBigTip": "Consell: prova d’acostar una mica els elements més allunyats."
   },
   "errorSplash": {
@@ -199,24 +199,26 @@
   "errorDialog": {
     "title": "Error"
   },
-  "shortcutsDialog": {
-    "title": "Dreceres de teclat",
-    "shapes": "Formes",
-    "or": "o",
-    "click": "fer clic",
-    "drag": "arrosegar",
-    "curvedArrow": "Fletxa curva",
-    "curvedLine": "Línea curva",
-    "editor": "Editor",
-    "view": "Vista",
-    "blog": "Llegir el nostre blog",
-    "howto": "Seguir els nostres guies",
-    "github": "Has trobat un problema? Enviar-ho",
-    "textNewLine": "Afegir línea nova (text)",
-    "textFinish": "Acabar d'editar (text)",
-    "zoomToFit": "Zoom per veure tots els elements",
-    "zoomToSelection": "Amplia la selecció",
-    "preventBinding": "Prevenir vinculació de la fletxa"
+  "helpDialog": {
+    "blog": "",
+    "click": "",
+    "curvedArrow": "",
+    "curvedLine": "",
+    "documentation": "",
+    "drag": "",
+    "editor": "",
+    "github": "",
+    "howto": "",
+    "or": "",
+    "preventBinding": "",
+    "shapes": "",
+    "shortcuts": "",
+    "textFinish": "",
+    "textNewLine": "",
+    "title": "",
+    "view": "",
+    "zoomToFit": "",
+    "zoomToSelection": ""
   },
   "encrypted": {
     "tooltip": "Els vostres dibuixos estan xifrats de punta a punta de manera que els servidors d’Excalidraw no els veuran mai."
@@ -232,5 +234,9 @@
     "title": "Estadístiques per nerds",
     "total": "Total",
     "width": "Amplada"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboardAsPng": ""
   }
 }
