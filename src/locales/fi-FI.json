@@ -199,24 +199,26 @@
   "errorDialog": {
     "title": "Virhe"
   },
-  "shortcutsDialog": {
-    "title": "Pikanäppäimet",
-    "shapes": "Muodot",
-    "or": "tai",
+  "helpDialog": {
+    "blog": "Lue blogiamme",
     "click": "klikkaa",
-    "drag": "vedä",
     "curvedArrow": "Kaareva nuoli",
     "curvedLine": "Kaareva viiva",
-    "editor": "Editori",
-    "view": "Näkymä",
-    "blog": "Lue blogiamme",
-    "howto": "Seuraa oppaitamme",
+    "documentation": "Käyttöohjeet",
+    "drag": "vedä",
+    "editor": "Muokkausohjelma",
     "github": "Löysitkö ongelman? Kerro meille",
-    "textNewLine": "Lisää uusi rivi (teksti)",
+    "howto": "Seuraa oppaitamme",
+    "or": "tai",
+    "preventBinding": "Estä nuolten kiinnitys",
+    "shapes": "Muodot",
+    "shortcuts": "Pikanäppäimet",
     "textFinish": "Lopeta muokkaus (teksti)",
-    "zoomToFit": "Zoomaa kaikki elementit näkyviin",
-    "zoomToSelection": "Zoomaa valintaan",
-    "preventBinding": "Estä nuolten sitominen"
+    "textNewLine": "Lisää uusi rivi (teksti)",
+    "title": "Ohjeet",
+    "view": "Näkymä",
+    "zoomToFit": "Näytä kaikki elementit",
+    "zoomToSelection": "Näytä valinta"
   },
   "encrypted": {
     "tooltip": "Piirroksesi ovat päästä päähän salattuja, joten Excalidrawin palvelimet eivät koskaan näe niitä."
@@ -232,5 +234,9 @@
     "title": "Nörttien tilastot",
     "total": "Yhteensä",
     "width": "Leveys"
+  },
+  "toast": {
+    "copyStyles": "Tyylit kopioitu.",
+    "copyToClipboardAsPng": "Kopioitu leikepöydälle PNG-tiedostona."
   }
 }
