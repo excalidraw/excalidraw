@@ -199,24 +199,26 @@
   "errorDialog": {
     "title": "Hata"
   },
-  "shortcutsDialog": {
-    "title": "Klavye kısayolları",
-    "shapes": "Şekiller",
-    "or": "veya",
-    "click": "tıkla",
-    "drag": "sürükle",
-    "curvedArrow": "Eğri ok",
-    "curvedLine": "Eğri çizgi",
-    "editor": "Düzenleyici",
-    "view": "Görüntüle",
-    "blog": "Blog'umuzu okuyun",
-    "howto": "Rehberlerimizi takip edin",
-    "github": "Bir hata mı buldun? Bildir",
-    "textNewLine": "Yeni satır ekle (yazı)",
-    "textFinish": "(Yazıyı) düzenlemeyi bitir",
-    "zoomToFit": "Tüm öğeleri sığdırmak için yakınlaştır",
-    "zoomToSelection": "Seçime yaklaş",
-    "preventBinding": "Ok bağlamayı önleyin"
+  "helpDialog": {
+    "blog": "",
+    "click": "",
+    "curvedArrow": "",
+    "curvedLine": "",
+    "documentation": "",
+    "drag": "",
+    "editor": "",
+    "github": "",
+    "howto": "",
+    "or": "",
+    "preventBinding": "",
+    "shapes": "",
+    "shortcuts": "",
+    "textFinish": "",
+    "textNewLine": "",
+    "title": "",
+    "view": "",
+    "zoomToFit": "",
+    "zoomToSelection": ""
   },
   "encrypted": {
     "tooltip": "Çizimleriniz uçtan-uca şifrelenmiştir, Excalidraw'ın sunucuları bile onları göremez."
@@ -232,5 +234,9 @@
     "title": "İnekler için istatistikler",
     "total": "Toplam",
     "width": "Genişlik"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboardAsPng": ""
   }
 }

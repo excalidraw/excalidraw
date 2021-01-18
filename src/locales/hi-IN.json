@@ -199,24 +199,26 @@
   "errorDialog": {
     "title": "गलती"
   },
-  "shortcutsDialog": {
-    "title": "कीबोर्ड के शॉर्टकट्स",
-    "shapes": "आकृतियाँ",
-    "or": "या",
-    "click": "क्लिक करें",
-    "drag": "खींचें",
-    "curvedArrow": "घुमावदार तीर",
-    "curvedLine": "घुमावदार रेखा",
-    "editor": "संपादक",
-    "view": "दृश्य",
-    "blog": "हमारा ब्लॉग पढे",
-    "howto": "हमारे गाइड का पालन करें",
-    "github": "एक मुद्दा मिला? प्रस्तुत करे",
-    "textNewLine": "नई पंक्ति (पाठ) जोड़ें",
-    "textFinish": "संपादन समाप्त करें (पाठ)",
-    "zoomToFit": "सभी तत्वों को फिट करने के लिए ज़ूम करें",
-    "zoomToSelection": "सिलेक्शन तक ज़ूम करे",
-    "preventBinding": "तीर बंधन रोकें"
+  "helpDialog": {
+    "blog": "",
+    "click": "",
+    "curvedArrow": "",
+    "curvedLine": "",
+    "documentation": "",
+    "drag": "",
+    "editor": "",
+    "github": "",
+    "howto": "",
+    "or": "",
+    "preventBinding": "",
+    "shapes": "",
+    "shortcuts": "",
+    "textFinish": "",
+    "textNewLine": "",
+    "title": "",
+    "view": "",
+    "zoomToFit": "",
+    "zoomToSelection": ""
   },
   "encrypted": {
     "tooltip": "आपके चित्र अंत-से-अंत एन्क्रिप्टेड हैं, इसलिए एक्सक्लूसिव्रॉव के सर्वर उन्हें कभी नहीं देखेंगे।"
@@ -232,5 +234,9 @@
     "title": "बेवकूफ के लिए आँकड़े",
     "total": "कुल",
     "width": "चौड़ाई"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboardAsPng": ""
   }
 }

@@ -199,24 +199,26 @@
   "errorDialog": {
     "title": "Feil"
   },
-  "shortcutsDialog": {
-    "title": "Tastatursnarvegar",
-    "shapes": "Figurar",
-    "or": "eller",
-    "click": "klikk",
-    "drag": "drag",
-    "curvedArrow": "Boga pil",
-    "curvedLine": "Boga linje",
-    "editor": "Redigering",
-    "view": "Vising",
-    "blog": "Les bloggen vår",
-    "howto": "Følg vegleiinga vår",
-    "github": "Funne eit problem? Send inn",
-    "textNewLine": "Legg til ny linje (tekst)",
-    "textFinish": "Fullfør redigering (tekst)",
-    "zoomToFit": "Zoom for å sjå alle elementa",
-    "zoomToSelection": "Zoom til utval",
-    "preventBinding": "Hindre pilkobling"
+  "helpDialog": {
+    "blog": "",
+    "click": "",
+    "curvedArrow": "",
+    "curvedLine": "",
+    "documentation": "",
+    "drag": "",
+    "editor": "",
+    "github": "",
+    "howto": "",
+    "or": "",
+    "preventBinding": "",
+    "shapes": "",
+    "shortcuts": "",
+    "textFinish": "",
+    "textNewLine": "",
+    "title": "",
+    "view": "",
+    "zoomToFit": "",
+    "zoomToSelection": ""
   },
   "encrypted": {
     "tooltip": "Teikningane dine er ende-til-ende-krypterte slik at Excalidraw sine serverar aldri får sjå dei."
@@ -232,5 +234,9 @@
     "title": "Statistikk for nerdar",
     "total": "Totalt",
     "width": "Breidde"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboardAsPng": ""
   }
 }

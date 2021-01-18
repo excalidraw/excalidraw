@@ -199,24 +199,26 @@
   "errorDialog": {
     "title": "錯誤"
   },
-  "shortcutsDialog": {
-    "title": "鍵盤快速鍵",
-    "shapes": "形狀",
-    "or": "或",
-    "click": "點擊",
-    "drag": "拖曳",
-    "curvedArrow": "箭頭曲線",
-    "curvedLine": "曲線",
-    "editor": "編輯器",
-    "view": "檢視",
+  "helpDialog": {
     "blog": "閱讀部落格",
-    "howto": "官方指南",
-    "github": "發現問題？回報 issue",
-    "textNewLine": "換行（文字）",
-    "textFinish": "完成編輯（文字）",
+    "click": "點擊",
+    "curvedArrow": "曲箭頭",
+    "curvedLine": "曲線",
+    "documentation": "文件",
+    "drag": "拖曳",
+    "editor": "編輯器",
+    "github": "發現異常？回報問題",
+    "howto": "參照我們的說明",
+    "or": "或",
+    "preventBinding": "避免箭號連結",
+    "shapes": "形狀",
+    "shortcuts": "鍵盤快速鍵",
+    "textFinish": "完成編輯 (文字)",
+    "textNewLine": "換行 (文字)",
+    "title": "說明",
+    "view": "檢視",
     "zoomToFit": "放大至填滿畫面",
-    "zoomToSelection": "縮放至選取區",
-    "preventBinding": "防止箭頭綁定"
+    "zoomToSelection": "縮放至選取區"
   },
   "encrypted": {
     "tooltip": "你的作品已使用 end-to-end 方式加密，Excalidraw 的伺服器也無法取得其內容。"
@@ -232,5 +234,9 @@
     "title": "詳細統計",
     "total": "合計",
     "width": "寬度"
+  },
+  "toast": {
+    "copyStyles": "已複製樣式",
+    "copyToClipboardAsPng": "已複製 PNG 至剪貼簿"
   }
 }

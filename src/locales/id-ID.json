@@ -199,24 +199,26 @@
   "errorDialog": {
     "title": "Kesalahan"
   },
-  "shortcutsDialog": {
-    "title": "Pintasan keyboard",
-    "shapes": "Bentuk",
-    "or": "atau",
-    "click": "klik",
-    "drag": "seret",
-    "curvedArrow": "Panah lengkung",
-    "curvedLine": "Garis lengkung",
-    "editor": "Editor",
-    "view": "Tampilan",
-    "blog": "Baca blog kami",
-    "howto": "Ikuti panduan kami",
-    "github": "Menemukan sebuah masalah? Kirimkan",
-    "textNewLine": "Tambahkan baris baru (teks)",
-    "textFinish": "Selesai mengedit (teks)",
-    "zoomToFit": "Perbesar agar sesuai dengan semua elemen",
-    "zoomToSelection": "Perbesar ke seleksi",
-    "preventBinding": "Cegah pengikatan panah"
+  "helpDialog": {
+    "blog": "",
+    "click": "",
+    "curvedArrow": "",
+    "curvedLine": "",
+    "documentation": "",
+    "drag": "",
+    "editor": "",
+    "github": "",
+    "howto": "",
+    "or": "",
+    "preventBinding": "",
+    "shapes": "",
+    "shortcuts": "",
+    "textFinish": "",
+    "textNewLine": "",
+    "title": "",
+    "view": "",
+    "zoomToFit": "",
+    "zoomToSelection": ""
   },
   "encrypted": {
     "tooltip": "Gambar anda terenkripsi end-to-end sehingga server Excalidraw tidak akan pernah dapat melihatnya."
@@ -232,5 +234,9 @@
     "title": "Statistik untuk nerd",
     "total": "Total",
     "width": "Lebar"
+  },
+  "toast": {
+    "copyStyles": "Gaya tersalin.",
+    "copyToClipboardAsPng": "Tersalin ke clipboard sebagai PNG."
   }
 }
