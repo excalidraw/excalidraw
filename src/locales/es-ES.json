@@ -200,9 +200,9 @@
     "title": "Error"
   },
   "helpDialog": {
-    "blog": "",
-    "click": "",
-    "curvedArrow": "",
+    "blog": "Lee nuestro blog",
+    "click": "click",
+    "curvedArrow": "Flecha curvada",
     "curvedLine": "Línea curva",
     "documentation": "Documentación",
     "drag": "arrastrar",
