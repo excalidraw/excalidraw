@@ -236,7 +236,7 @@
     "width": "Breedte"
   },
   "toast": {
-    "copyStyles": "",
-    "copyToClipboardAsPng": ""
+    "copyStyles": "Stijlen gekopieerd.",
+    "copyToClipboardAsPng": "Gekopieerd naar klembord als PNG."
   }
 }
