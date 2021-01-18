@@ -1249,7 +1249,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     if (event.key === KEYS.QUESTION_MARK) {
       this.setState({
-        showShortcutsDialog: true,
+        showHelpDialog: true,
       });
     }
 
@@ -3587,9 +3587,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       transformElements(
         pointerDownState,
         transformHandleType,
-        (newTransformHandle) => {
-          pointerDownState.resize.handleType = newTransformHandle;
-        },
         selectedElements,
         pointerDownState.resize.arrowDirection,
         getRotateWithDiscreteAngleKey(event),

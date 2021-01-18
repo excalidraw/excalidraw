@@ -70,64 +70,6 @@ export const adjustXYWithRotation = (
   return [x, y];
 };
 
-export const getFlipAdjustment = (
-  side: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
-  nextWidth: number,
-  nextHeight: number,
-  nextX1: number,
-  nextY1: number,
-  nextX2: number,
-  nextY2: number,
-  finalX1: number,
-  finalY1: number,
-  finalX2: number,
-  finalY2: number,
-  needsRotation: boolean,
-  angle: number,
-): [number, number] => {
-  const cos = Math.cos(angle);
-  const sin = Math.sin(angle);
-  let flipDiffX = 0;
-  let flipDiffY = 0;
-  if (nextWidth < 0) {
-    if (side === "e" || side === "ne" || side === "se") {
-      if (needsRotation) {
-        flipDiffX += (finalX2 - nextX1) * cos;
-        flipDiffY += (finalX2 - nextX1) * sin;
-      } else {
-        flipDiffX += finalX2 - nextX1;
-      }
-    }
-    if (side === "w" || side === "nw" || side === "sw") {
-      if (needsRotation) {
-        flipDiffX += (finalX1 - nextX2) * cos;
-        flipDiffY += (finalX1 - nextX2) * sin;
-      } else {
-        flipDiffX += finalX1 - nextX2;
-      }
-    }
-  }
-  if (nextHeight < 0) {
-    if (side === "s" || side === "se" || side === "sw") {
-      if (needsRotation) {
-        flipDiffY += (finalY2 - nextY1) * cos;
-        flipDiffX += (finalY2 - nextY1) * -sin;
-      } else {
-        flipDiffY += finalY2 - nextY1;
-      }
-    }
-    if (side === "n" || side === "ne" || side === "nw") {
-      if (needsRotation) {
-        flipDiffY += (finalY1 - nextY2) * cos;
-        flipDiffX += (finalY1 - nextY2) * -sin;
-      } else {
-        flipDiffY += finalY1 - nextY2;
-      }
-    }
-  }
-  return [flipDiffX, flipDiffY];
-};
-
 export const getPointOnAPath = (point: Point, path: Point[]) => {
   const [px, py] = point;
   const [start, ...other] = path;

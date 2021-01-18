@@ -13,7 +13,7 @@
   a {
     font-weight: 500;
     text-decoration: none;
-    color: $oc-blue-7; /* OC Blue 7 */
+    color: var(--link-color);
 
     &:hover {
       text-decoration: underline;
@@ -431,6 +431,7 @@
     cursor: pointer;
     fill: $oc-gray-6;
     bottom: 14px;
+    width: 1.5rem;
 
     :root[dir="ltr"] & {
       right: 14px;
