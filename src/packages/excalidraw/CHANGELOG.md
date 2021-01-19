@@ -18,7 +18,7 @@ Please add the latest change on the top under the correct section.
 
 ### Build
 
-- Bundle css files with js (#2819). The host would not need to import css files separately.
+- Bundle css files with js [#2819](https://github.com/excalidraw/excalidraw/pull/2819). The host would not need to import css files separately.
 
 ## 0.2.0
 
