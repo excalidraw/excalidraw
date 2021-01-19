@@ -1,10 +1,18 @@
-import React, { useRef } from "react";
+import React, { ChangeEvent, useRef } from "react";
 import { copyTextToSystemClipboard } from "../../clipboard";
 import { Dialog } from "../../components/Dialog";
 import { clipboard, start, stop } from "../../components/icons";
 import { ToolButton } from "../../components/ToolButton";
 import { t } from "../../i18n";
 import "./RoomDialog.scss";
+
+declare global {
+  interface Window {
+    IdleDetector: any;
+  }
+}
+
+const idleDetectorSupported = "IdleDetector" in window;
 
 const RoomDialog = ({
   handleClose,
@@ -43,6 +51,23 @@ const RoomDialog = ({
     }
   };
 
+  const onShareIdleStateChange = async (e: ChangeEvent) => {
+    if (!idleDetectorSupported) {
+      return;
+    }
+    const checkbox = e.target;
+    if ((checkbox as HTMLInputElement).checked) {
+      const state = await window.IdleDetector.requestPermission();
+      if (state !== "granted") {
+        console.log("Idle detection permission not granted.");
+        (checkbox as HTMLInputElement).checked = false;
+        return;
+      }
+      console.log("Idle detection permission granted.");
+      (checkbox as HTMLInputElement).checked = true;
+    }
+  };
+
   const renderRoomDialog = () => {
     return (
       <div className="RoomDialog-modal">
@@ -60,6 +85,18 @@ const RoomDialog = ({
                 showAriaLabel={true}
                 onClick={onRoomCreate}
               />
+              <span>
+                <input
+                  id="shareIdleState"
+                  type="checkbox"
+                  checked={false}
+                  hidden={!idleDetectorSupported}
+                  onChange={onShareIdleStateChange}
+                />
+                <label htmlFor="shareIdleState" hidden={!idleDetectorSupported}>
+                  {t("labels.shareIdleState")}
+                </label>
+              </span>
             </div>
           </>
         )}

@@ -37,6 +37,7 @@ interface CollabState {
   modalIsShown: boolean;
   errorMessage: string;
   username: string;
+  idleState: string;
   activeRoomLink: string;
 }
 
@@ -45,6 +46,7 @@ type CollabInstance = InstanceType<typeof CollabWrapper>;
 export interface CollabAPI {
   isCollaborating: CollabState["isCollaborating"];
   username: CollabState["username"];
+  idleState: CollabState["idleState"];
   onPointerUpdate: CollabInstance["onPointerUpdate"];
   initializeSocketClient: CollabInstance["initializeSocketClient"];
   onCollabButtonClick: CollabInstance["onCollabButtonClick"];
@@ -62,6 +64,14 @@ interface Props {
   excalidrawRef: React.MutableRefObject<ExcalidrawImperativeAPI>;
 }
 
+declare global {
+  interface Window {
+    IdleDetector: any;
+  }
+}
+
+const idleDetectorSupported = "IdleDetector" in window;
+
 class CollabWrapper extends PureComponent<Props, CollabState> {
   portal: Portal;
   private socketInitializationTimer?: NodeJS.Timeout;
@@ -77,6 +87,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       modalIsShown: false,
       errorMessage: "",
       username: importUsernameFromLocalStorage() || "",
+      idleState: "",
       activeRoomLink: "",
     };
     this.portal = new Portal(this);
@@ -194,6 +205,8 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
     const roomMatch = getCollaborationLinkData(window.location.href);
 
+    this.initializeIdleDetector();
+
     if (roomMatch) {
       const roomId = roomMatch[1];
       const roomKey = roomMatch[2];
@@ -305,7 +318,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     // Avoid broadcasting to the rest of the collaborators the scene
     // we just received!
     // Note: this needs to be set before updating the scene as it
-    // syncronously calls render.
+    // synchronously calls render.
     this.setLastBroadcastedOrReceivedSceneVersion(getSceneVersion(newElements));
 
     return newElements as ReconciledElements;
@@ -332,6 +345,34 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     // undo, a user makes a change, and then try to redo, your element(s) will be lost. However,
     // right now we think this is the right tradeoff.
     this.excalidrawRef.current!.history.clear();
+  };
+
+  private initializeIdleDetector = async () => {
+    if (!idleDetectorSupported) {
+      return;
+    }
+    try {
+      const controller = new AbortController();
+      const signal = controller.signal;
+
+      const idleDetector = new window.IdleDetector();
+      idleDetector.addEventListener("change", () => {
+        const userState = idleDetector.userState;
+        const screenState = idleDetector.screenState;
+        console.log(`Idle change: ${userState}, ${screenState}.`);
+        this.onIdleStateChange(userState);
+      });
+
+      await idleDetector.start({
+        threshold: 60000,
+        signal,
+      });
+      console.log("IdleDetector is active.");
+    } catch (err) {
+      // Deal with initialization errors like permission denied,
+      // running outside of top-level frame, etc.
+      console.error(err.name, err.message);
+    }
   };
 
   setCollaborators(sockets: string[]) {
@@ -371,6 +412,11 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     payload.pointersMap.size < 2 &&
       this.portal.socket &&
       this.portal.broadcastMouseLocation(payload);
+  };
+
+  onIdleStateChange = (idleState: string) => {
+    this.setState({ idleState });
+    this.portal.broadcastIdleChange(idleState);
   };
 
   broadcastElements = (
@@ -453,6 +499,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
         {children({
           isCollaborating: this.state.isCollaborating,
           username: this.state.username,
+          idleState: this.state.idleState,
           onPointerUpdate: this.onPointerUpdate,
           initializeSocketClient: this.initializeSocketClient,
           onCollabButtonClick: this.onCollabButtonClick,

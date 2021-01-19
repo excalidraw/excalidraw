@@ -419,6 +419,8 @@ export const renderScene = (
   for (const clientId in sceneState.remotePointerViewportCoords) {
     let { x, y } = sceneState.remotePointerViewportCoords[clientId];
     const username = sceneState.remotePointerUsernames[clientId];
+    const idleState = sceneState.remotePointerIdleStates[clientId];
+    const usernameAndPotentiallyIdleState = idleState ? `${username} (${idleState})` : username;
 
     const width = 9;
     const height = 14;
@@ -478,7 +480,7 @@ export const renderScene = (
       const offsetY = y + height;
       const paddingHorizontal = 4;
       const paddingVertical = 4;
-      const measure = context.measureText(username);
+      const measure = context.measureText(usernameAndPotentiallyIdleState);
       const measureHeight =
         measure.actualBoundingBoxDescent + measure.actualBoundingBoxAscent;
 
@@ -501,7 +503,7 @@ export const renderScene = (
       );
       context.fillStyle = oc.white;
       context.fillText(
-        username,
+        usernameAndPotentiallyIdleState,
         offsetX + paddingHorizontal,
         offsetY + paddingVertical + measure.actualBoundingBoxAscent,
       );

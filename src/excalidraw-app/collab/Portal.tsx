@@ -135,6 +135,23 @@ class Portal {
     }
   };
 
+  broadcastIdleChange = () => {
+    if (this.socket?.id) {
+      const data: SocketUpdateDataSource["IDLE_STATUS"] = {
+        type: "IDLE_STATUS",
+        payload: {
+          socketId: this.socket.id,
+          idleState: this.app.state.idleState,
+          username: this.app.state.username,
+        },
+      };
+      return this._broadcastSocketData(
+        data as SocketUpdateData,
+        true, // volatile
+      );
+    }
+  }
+
   broadcastMouseLocation = (payload: {
     pointer: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointer"];
     button: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["button"];
