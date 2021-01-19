@@ -2,6 +2,7 @@ const path = require("path");
 const TerserPlugin = require("terser-webpack-plugin");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
   .BundleAnalyzerPlugin;
+const webpack = require("webpack");
 
 module.exports = {
   mode: "production",
@@ -24,7 +25,16 @@ module.exports = {
       {
         test: /\.(sa|sc|c)ss$/,
         exclude: /node_modules/,
-        use: ["style-loader", { loader: "css-loader" }, "sass-loader"],
+        use: [
+          "style-loader",
+          {
+            loader: "css-loader",
+            options: {
+              sourceMap: false,
+            },
+          },
+          "sass-loader",
+        ],
       },
       {
         test: /\.(ts|tsx|js|jsx|mjs)$/,
@@ -89,6 +99,9 @@ module.exports = {
   },
   plugins: [
     ...(process.env.ANALYZER === "true" ? [new BundleAnalyzerPlugin()] : []),
+    new webpack.SourceMapDevToolPlugin({
+      filename: "[name].js.map",
+    }),
   ],
   externals: {
     react: {
