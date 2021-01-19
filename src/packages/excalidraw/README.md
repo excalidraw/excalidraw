@@ -31,9 +31,6 @@ import React, { useEffect, useState, createRef } from "react";
 import Excalidraw from "@excalidraw/excalidraw";
 import InitialData from "./initialData";
 
-import "@excalidraw/excalidraw/dist/excalidraw.min.css";
-import "@excalidraw/excalidraw/dist/fonts.min.css";
-
 import "./styles.css";
 
 export default function App() {
