@@ -1,5 +1,6 @@
 export const trackEvent =
-  process.env.REACT_APP_GOOGLE_ANALYTICS_ID &&
+  typeof process !== "undefined" &&
+  process?.env?.REACT_APP_GOOGLE_ANALYTICS_ID &&
   typeof window !== "undefined" &&
   window.gtag
     ? (category: string, name: string, label?: string, value?: number) => {
