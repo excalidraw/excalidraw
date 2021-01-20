@@ -66,7 +66,6 @@
   "repository": "https://github.com/excalidraw/excalidraw",
   "homepage": "https://github.com/excalidraw/excalidraw/tree/master/src/packages/excalidraw",
   "scripts": {
-    "build:dev": "webpack --config webpack.dev.config.js",
     "build:umd": "cross-env NODE_ENV=production webpack --config webpack.prod.config.js",
     "build:umd:withAnalyzer": "cross-env NODE_ENV=production ANALYZER=true webpack --config webpack.prod.config.js",
     "pack": "npm run build:umd && npm pack"
