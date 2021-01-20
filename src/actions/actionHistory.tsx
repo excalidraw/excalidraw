@@ -59,16 +59,16 @@ const writeData = (
   return { commitToHistory };
 };
 
-const testUndo = (shift: boolean) => (event: KeyboardEvent) =>
-  event[KEYS.CTRL_OR_CMD] && /z/i.test(event.key) && event.shiftKey === shift;
-
 type ActionCreator = (history: SceneHistory) => Action;
 
 export const createUndoAction: ActionCreator = (history) => ({
   name: "undo",
   perform: (elements, appState) =>
     writeData(elements, appState, () => history.undoOnce()),
-  keyTest: testUndo(false),
+  keyTest: (event) =>
+    event[KEYS.CTRL_OR_CMD] &&
+    event.key.toLowerCase() === KEYS.Z &&
+    !event.shiftKey,
   PanelComponent: ({ updateData }) => (
     <ToolButton
       type="button"
@@ -84,7 +84,10 @@ export const createRedoAction: ActionCreator = (history) => ({
   name: "redo",
   perform: (elements, appState) =>
     writeData(elements, appState, () => history.redoOnce()),
-  keyTest: testUndo(true),
+  keyTest: (event) =>
+    event[KEYS.CTRL_OR_CMD] &&
+    ((event.shiftKey && event.key.toLowerCase() === KEYS.Z) ||
+      (!event.shiftKey && event.key === KEYS.Y)),
   PanelComponent: ({ updateData }) => (
     <ToolButton
       type="button"

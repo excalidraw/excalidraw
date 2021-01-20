@@ -48,6 +48,7 @@ export const KEYS = {
   T: "t",
   V: "v",
   X: "x",
+  Y: "y",
   Z: "z",
 } as const;
 
