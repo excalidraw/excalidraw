@@ -100,7 +100,8 @@ module.exports = {
   plugins: [
     ...(process.env.ANALYZER === "true" ? [new BundleAnalyzerPlugin()] : []),
     new webpack.SourceMapDevToolPlugin({
-      filename: "[name].js.map",
+      filename: "sourcemaps/[name].js.map",
+      publicPath: "https://unpkg.com/@excalidraw/excalidraw@0.2.2/dist/",
     }),
   ],
   externals: {
