@@ -6,7 +6,7 @@ import { t } from "../i18n";
 import { SceneHistory, HistoryEntry } from "../history";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
-import { KEYS } from "../keys";
+import { isWindows, KEYS } from "../keys";
 import { getElementMap } from "../element";
 import { newElementWith } from "../element/mutateElement";
 import { fixBindingsAfterDeletion } from "../element/binding";
@@ -85,9 +85,10 @@ export const createRedoAction: ActionCreator = (history) => ({
   perform: (elements, appState) =>
     writeData(elements, appState, () => history.redoOnce()),
   keyTest: (event) =>
-    event[KEYS.CTRL_OR_CMD] &&
-    ((event.shiftKey && event.key.toLowerCase() === KEYS.Z) ||
-      (!event.shiftKey && event.key === KEYS.Y)),
+    (event[KEYS.CTRL_OR_CMD] &&
+      event.shiftKey &&
+      event.key.toLowerCase() === KEYS.Z) ||
+    (isWindows && event.ctrlKey && !event.shiftKey && event.key === KEYS.Y),
   PanelComponent: ({ updateData }) => (
     <ToolButton
       type="button"
