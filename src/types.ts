@@ -146,10 +146,7 @@ export type LibraryItems = readonly LibraryItem[];
 // NOTE ready/readyPromise props are optional for host apps' sake (our own
 // implem guarantees existence)
 export type ExcalidrawAPIRefValue =
-  | (ExcalidrawImperativeAPI & {
-      readyPromise?: ResolvablePromise<ExcalidrawImperativeAPI>;
-      ready?: true;
-    })
+  | ExcalidrawImperativeAPI
   | {
       readyPromise?: ResolvablePromise<ExcalidrawImperativeAPI>;
       ready?: false;

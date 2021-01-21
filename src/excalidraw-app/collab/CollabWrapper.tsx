@@ -31,6 +31,7 @@ import {
 } from "../data/localStorage";
 import Portal from "./Portal";
 import RoomDialog from "./RoomDialog";
+import { createInverseContext } from "../../createInverseContext";
 
 interface CollabState {
   isCollaborating: boolean;
@@ -56,16 +57,21 @@ type ReconciledElements = readonly ExcalidrawElement[] & {
 };
 
 interface Props {
-  children: (collab: CollabAPI) => React.ReactNode;
-  // NOTE not type-safe because the refObject may in fact not be initialized
-  // with ExcalidrawImperativeAPI yet
-  excalidrawRef: React.MutableRefObject<ExcalidrawImperativeAPI>;
+  excalidrawAPI: ExcalidrawImperativeAPI;
 }
+
+const {
+  Context: CollabContext,
+  Consumer: CollabContextConsumer,
+  Provider: CollabContextProvider,
+} = createInverseContext<{ api: CollabAPI | null }>({ api: null });
+
+export { CollabContext, CollabContextConsumer };
 
 class CollabWrapper extends PureComponent<Props, CollabState> {
   portal: Portal;
   private socketInitializationTimer?: NodeJS.Timeout;
-  private excalidrawRef: Props["excalidrawRef"];
+  private excalidrawAPI: Props["excalidrawAPI"];
   excalidrawAppState?: AppState;
   private lastBroadcastedOrReceivedSceneVersion: number = -1;
   private collaborators = new Map<string, Collaborator>();
@@ -80,7 +86,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       activeRoomLink: "",
     };
     this.portal = new Portal(this);
-    this.excalidrawRef = props.excalidrawRef;
+    this.excalidrawAPI = props.excalidrawAPI;
   }
 
   componentDidMount() {
@@ -142,7 +148,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
   saveCollabRoomToFirebase = async (
     syncableElements: ExcalidrawElement[] = getSyncableElements(
-      this.excalidrawRef.current!.getSceneElementsIncludingDeleted(),
+      this.excalidrawAPI.getSceneElementsIncludingDeleted(),
     ),
   ) => {
     try {
@@ -154,13 +160,13 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
   openPortal = async () => {
     window.history.pushState({}, APP_NAME, await generateCollaborationLink());
-    const elements = this.excalidrawRef.current!.getSceneElements();
+    const elements = this.excalidrawAPI.getSceneElements();
     // remove deleted elements from elements array & history to ensure we don't
     // expose potentially sensitive user data in case user manually deletes
     // existing elements (or clears scene), which would otherwise be persisted
     // to database even if deleted before creating the room.
-    this.excalidrawRef.current!.history.clear();
-    this.excalidrawRef.current!.updateScene({
+    this.excalidrawAPI.history.clear();
+    this.excalidrawAPI.updateScene({
       elements,
       commitToHistory: true,
     });
@@ -175,7 +181,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
   private destroySocketClient = () => {
     this.collaborators = new Map();
-    this.excalidrawRef.current!.updateScene({
+    this.excalidrawAPI.updateScene({
       collaborators: this.collaborators,
     });
     this.setState({
@@ -265,7 +271,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
               user.selectedElementIds = selectedElementIds;
               user.username = username;
               collaborators.set(socketId, user);
-              this.excalidrawRef.current!.updateScene({
+              this.excalidrawAPI.updateScene({
                 collaborators,
               });
               break;
@@ -319,10 +325,10 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     }: { init?: boolean; initFromSnapshot?: boolean } = {},
   ) => {
     if (init || initFromSnapshot) {
-      this.excalidrawRef.current!.setScrollToCenter(elements);
+      this.excalidrawAPI.setScrollToCenter(elements);
     }
 
-    this.excalidrawRef.current!.updateScene({
+    this.excalidrawAPI.updateScene({
       elements,
       commitToHistory: !!init,
     });
@@ -331,7 +337,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     // when we receive any messages from another peer. This UX can be pretty rough -- if you
     // undo, a user makes a change, and then try to redo, your element(s) will be lost. However,
     // right now we think this is the right tradeoff.
-    this.excalidrawRef.current!.history.clear();
+    this.excalidrawAPI.history.clear();
   };
 
   setCollaborators(sockets: string[]) {
@@ -347,7 +353,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
         }
       }
       this.collaborators = collaborators;
-      this.excalidrawRef.current!.updateScene({ collaborators });
+      this.excalidrawAPI.updateScene({ collaborators });
     });
   }
 
@@ -360,7 +366,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   };
 
   public getSceneElementsIncludingDeleted = () => {
-    return this.excalidrawRef.current!.getSceneElementsIncludingDeleted();
+    return this.excalidrawAPI.getSceneElementsIncludingDeleted();
   };
 
   onPointerUpdate = (payload: {
@@ -396,7 +402,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     this.portal.broadcastScene(
       SCENE.UPDATE,
       getSyncableElements(
-        this.excalidrawRef.current!.getSceneElementsIncludingDeleted(),
+        this.excalidrawAPI.getSceneElementsIncludingDeleted(),
       ),
       true,
     );
@@ -425,8 +431,23 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     });
   };
 
+  /** PRIVATE. Use `this.getContextValue()` instead. */
+  private contextValue: CollabAPI | null = null;
+
+  /** Getter of context value. Returned object is stable. */
+  getContextValue = (): CollabAPI => {
+    this.contextValue = this.contextValue || ({} as CollabAPI);
+
+    this.contextValue.isCollaborating = this.state.isCollaborating;
+    this.contextValue.username = this.state.username;
+    this.contextValue.onPointerUpdate = this.onPointerUpdate;
+    this.contextValue.initializeSocketClient = this.initializeSocketClient;
+    this.contextValue.onCollabButtonClick = this.onCollabButtonClick;
+    this.contextValue.broadcastElements = this.broadcastElements;
+    return this.contextValue;
+  };
+
   render() {
-    const { children } = this.props;
     const { modalIsShown, username, errorMessage, activeRoomLink } = this.state;
 
     return (
@@ -450,14 +471,11 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
             onClose={() => this.setState({ errorMessage: "" })}
           />
         )}
-        {children({
-          isCollaborating: this.state.isCollaborating,
-          username: this.state.username,
-          onPointerUpdate: this.onPointerUpdate,
-          initializeSocketClient: this.initializeSocketClient,
-          onCollabButtonClick: this.onCollabButtonClick,
-          broadcastElements: this.broadcastElements,
-        })}
+        <CollabContextProvider
+          value={{
+            api: this.getContextValue(),
+          }}
+        />
       </>
     );
   }
