@@ -14,6 +14,12 @@ Please add the latest change on the top under the correct section.
 
 ## [Unreleased]
 
+## Excalidraw API
+
+### Build
+
+- Remove publicPath so host can use `__webpack_public_path__` to host the assets
+
 ## Excalidraw Library
 
 ### Features
