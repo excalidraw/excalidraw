@@ -14,15 +14,15 @@ import { ExcalidrawElement } from "../../element/types";
 import { BROADCAST, SCENE } from "../app_constants";
 
 class Portal {
-  app: CollabWrapper;
+  collab: CollabWrapper;
   socket: SocketIOClient.Socket | null = null;
   socketInitialized: boolean = false; // we don't want the socket to emit any updates until it is fully initialized
   roomId: string | null = null;
   roomKey: string | null = null;
   broadcastedElementVersions: Map<string, number> = new Map();
 
-  constructor(app: CollabWrapper) {
-    this.app = app;
+  constructor(collab: CollabWrapper) {
+    this.collab = collab;
   }
 
   open(socket: SocketIOClient.Socket, id: string, key: string) {
@@ -30,7 +30,7 @@ class Portal {
     this.roomId = id;
     this.roomKey = key;
 
-    // Initialize socket listeners (moving from App)
+    // Initialize socket listeners
     this.socket.on("init-room", () => {
       if (this.socket) {
         this.socket.emit("join-room", this.roomId);
@@ -39,12 +39,12 @@ class Portal {
     this.socket.on("new-user", async (_socketId: string) => {
       this.broadcastScene(
         SCENE.INIT,
-        getSyncableElements(this.app.getSceneElementsIncludingDeleted()),
+        getSyncableElements(this.collab.getSceneElementsIncludingDeleted()),
         /* syncAll */ true,
       );
     });
     this.socket.on("room-user-change", (clients: string[]) => {
-      this.app.setCollaborators(clients);
+      this.collab.setCollaborators(clients);
     });
   }
 
@@ -125,10 +125,10 @@ class Portal {
       data as SocketUpdateData,
     );
 
-    if (syncAll && this.app.state.isCollaborating) {
+    if (syncAll && this.collab.state.isCollaborating) {
       await Promise.all([
         broadcastPromise,
-        this.app.saveCollabRoomToFirebase(syncableElements),
+        this.collab.saveCollabRoomToFirebase(syncableElements),
       ]);
     } else {
       await broadcastPromise;
@@ -147,8 +147,8 @@ class Portal {
           pointer: payload.pointer,
           button: payload.button || "up",
           selectedElementIds:
-            this.app.excalidrawAPI.getAppState().selectedElementIds || {},
-          username: this.app.state.username,
+            this.collab.excalidrawAPI.getAppState().selectedElementIds || {},
+          username: this.collab.state.username,
         },
       };
       return this._broadcastSocketData(
@@ -161,12 +161,12 @@ class Portal {
   reconcileElements = (
     sceneElements: readonly ExcalidrawElement[],
   ): readonly ExcalidrawElement[] => {
-    const currentElements = this.app.getSceneElementsIncludingDeleted();
+    const currentElements = this.collab.getSceneElementsIncludingDeleted();
     // create a map of ids so we don't have to iterate
     // over the array more than once.
     const localElementMap = getElementMap(currentElements);
 
-    const appState = this.app.excalidrawAPI.getAppState();
+    const appState = this.collab.excalidrawAPI.getAppState();
 
     // Reconcile
     return (
