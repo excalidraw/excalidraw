@@ -9,7 +9,7 @@ import {
   getSceneVersion,
   getSyncableElements,
 } from "../../packages/excalidraw/index";
-import { AppState, Collaborator, Gesture } from "../../types";
+import { Collaborator, Gesture } from "../../types";
 import { resolvablePromise, withBatchedUpdates } from "../../utils";
 import {
   INITIAL_SCENE_UPDATE_TIMEOUT,
