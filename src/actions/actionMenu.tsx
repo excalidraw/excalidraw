@@ -74,7 +74,7 @@ export const actionShortcuts = register({
     return {
       appState: {
         ...appState,
-        showHelpDialog: true,
+        showHelpDialog: !appState.showHelpDialog,
       },
       commitToHistory: false,
     };
