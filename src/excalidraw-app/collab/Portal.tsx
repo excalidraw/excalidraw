@@ -147,7 +147,7 @@ class Portal {
           pointer: payload.pointer,
           button: payload.button || "up",
           selectedElementIds:
-            this.app.excalidrawAppState?.selectedElementIds || {},
+            this.app.excalidrawAPI.getAppState().selectedElementIds || {},
           username: this.app.state.username,
         },
       };
@@ -166,6 +166,8 @@ class Portal {
     // over the array more than once.
     const localElementMap = getElementMap(currentElements);
 
+    const appState = this.app.excalidrawAPI.getAppState();
+
     // Reconcile
     return (
       sceneElements
@@ -173,9 +175,9 @@ class Portal {
           // if the remote element references one that's currently
           // edited on local, skip it (it'll be added in the next step)
           if (
-            element.id === this.app.excalidrawAppState?.editingElement?.id ||
-            element.id === this.app.excalidrawAppState?.resizingElement?.id ||
-            element.id === this.app.excalidrawAppState?.draggingElement?.id
+            element.id === appState.editingElement?.id ||
+            element.id === appState.resizingElement?.id ||
+            element.id === appState.draggingElement?.id
           ) {
             return elements;
           }

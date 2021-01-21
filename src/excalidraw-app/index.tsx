@@ -287,7 +287,7 @@ function ExcalidrawWrapper() {
   ) => {
     saveDebounced(elements, appState);
     if (collabAPI?.isCollaborating) {
-      collabAPI.broadcastElements(elements, appState);
+      collabAPI.broadcastElements(elements);
     }
   };
 

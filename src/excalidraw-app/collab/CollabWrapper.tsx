@@ -70,9 +70,8 @@ export { CollabContext, CollabContextConsumer };
 
 class CollabWrapper extends PureComponent<Props, CollabState> {
   portal: Portal;
+  excalidrawAPI: Props["excalidrawAPI"];
   private socketInitializationTimer?: NodeJS.Timeout;
-  private excalidrawAPI: Props["excalidrawAPI"];
-  excalidrawAppState?: AppState;
   private lastBroadcastedOrReceivedSceneVersion: number = -1;
   private collaborators = new Map<string, Collaborator>();
 
@@ -379,11 +378,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       this.portal.broadcastMouseLocation(payload);
   };
 
-  broadcastElements = (
-    elements: readonly ExcalidrawElement[],
-    state: AppState,
-  ) => {
-    this.excalidrawAppState = state;
+  broadcastElements = (elements: readonly ExcalidrawElement[]) => {
     if (
       getSceneVersion(elements) >
       this.getLastBroadcastedOrReceivedSceneVersion()
