@@ -110,7 +110,7 @@
     "scrollBackToContent": "Derulare înapoi la conținut",
     "zoomIn": "Apropiere",
     "zoomOut": "Depărtare",
-    "resetZoom": "Resetare panoramare",
+    "resetZoom": "Resetare transfocare",
     "menu": "Meniu",
     "done": "Efectuat",
     "edit": "Edit",
@@ -217,8 +217,8 @@
     "textNewLine": "Adaugă o linie nouă (text)",
     "title": "Ajutor",
     "view": "Vizualizare",
-    "zoomToFit": "Panoramare pentru a cuprinde totul",
-    "zoomToSelection": "Panoramare la selecție"
+    "zoomToFit": "Transfocare pentru a cuprinde totul",
+    "zoomToSelection": "Transfocare la selecție"
   },
   "encrypted": {
     "tooltip": "Desenele tale sunt criptate integral, astfel că serverele Excalidraw nu le vor vedea niciodată."
