@@ -2,6 +2,8 @@ import { Point, simplify } from "points-on-curve";
 import React from "react";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
+import clsx from "clsx";
+
 import "../actions";
 import { actionDeleteSelected, actionFinalize } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
@@ -319,6 +321,52 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.actionManager.registerAction(createRedoAction(history));
   }
 
+  private renderCanvas() {
+    const canvasScale = window.devicePixelRatio;
+    const { width: canvasDOMWidth, height: canvasDOMHeight } = this.state;
+    const canvasWidth = canvasDOMWidth * canvasScale;
+    const canvasHeight = canvasDOMHeight * canvasScale;
+    if (this.props.readonly) {
+      return (
+        <canvas
+          id="canvas"
+          style={{
+            width: canvasDOMWidth,
+            height: canvasDOMHeight,
+            cursor: "not-allowed",
+          }}
+          width={canvasWidth}
+          height={canvasHeight}
+          ref={this.handleCanvasRef}
+        >
+          {t("labels.drawingCanvas")}
+        </canvas>
+      );
+    }
+    return (
+      <canvas
+        id="canvas"
+        style={{
+          width: canvasDOMWidth,
+          height: canvasDOMHeight,
+        }}
+        width={canvasWidth}
+        height={canvasHeight}
+        ref={this.handleCanvasRef}
+        onContextMenu={this.handleCanvasContextMenu}
+        onPointerDown={this.handleCanvasPointerDown}
+        onDoubleClick={this.handleCanvasDoubleClick}
+        onPointerMove={this.handleCanvasPointerMove}
+        onPointerUp={this.removePointer}
+        onPointerCancel={this.removePointer}
+        onTouchMove={this.handleTouchMove}
+        onDrop={this.handleCanvasOnDrop}
+      >
+        {t("labels.drawingCanvas")}
+      </canvas>
+    );
+  }
+
   public render() {
     const {
       zenModeEnabled,
@@ -328,18 +376,19 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       offsetLeft,
     } = this.state;
 
-    const { onCollabButtonClick, onExportToBackend, renderFooter } = this.props;
-    const canvasScale = window.devicePixelRatio;
-
-    const canvasWidth = canvasDOMWidth * canvasScale;
-    const canvasHeight = canvasDOMHeight * canvasScale;
+    const {
+      onCollabButtonClick,
+      onExportToBackend,
+      renderFooter,
+      readonly,
+    } = this.props;
 
     const DEFAULT_PASTE_X = canvasDOMWidth / 2;
     const DEFAULT_PASTE_Y = canvasDOMHeight / 2;
 
     return (
       <div
-        className="excalidraw"
+        className={clsx("excalidraw", { "excalidraw--readonly": readonly })}
         ref={this.excalidrawContainerRef}
         style={{
           width: canvasDOMWidth,
@@ -369,6 +418,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           isCollaborating={this.props.isCollaborating || false}
           onExportToBackend={onExportToBackend}
           renderCustomFooter={renderFooter}
+          readonly={readonly}
         />
         {this.state.showStats && (
           <Stats
@@ -383,28 +433,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             clearToast={this.clearToast}
           />
         )}
-        <main>
-          <canvas
-            id="canvas"
-            style={{
-              width: canvasDOMWidth,
-              height: canvasDOMHeight,
-            }}
-            width={canvasWidth}
-            height={canvasHeight}
-            ref={this.handleCanvasRef}
-            onContextMenu={this.handleCanvasContextMenu}
-            onPointerDown={this.handleCanvasPointerDown}
-            onDoubleClick={this.handleCanvasDoubleClick}
-            onPointerMove={this.handleCanvasPointerMove}
-            onPointerUp={this.removePointer}
-            onPointerCancel={this.removePointer}
-            onTouchMove={this.handleTouchMove}
-            onDrop={this.handleCanvasOnDrop}
-          >
-            {t("labels.drawingCanvas")}
-          </canvas>
-        </main>
+        <main>{this.renderCanvas()}</main>
       </div>
     );
   }
@@ -635,8 +664,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     this.scene.addCallback(this.onSceneUpdated);
-
-    this.addEventListeners();
+    if (!this.props.readonly) {
+      this.addEventListeners();
+    }
 
     // optim to avoid extra render on init
     if (

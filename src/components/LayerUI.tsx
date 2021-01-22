@@ -61,6 +61,7 @@ interface LayerUIProps {
     canvas: HTMLCanvasElement | null,
   ) => void;
   renderCustomFooter?: (isMobile: boolean) => JSX.Element;
+  readonly?: boolean;
 }
 
 const useOnClickOutside = (
@@ -299,6 +300,7 @@ const LayerUI = ({
   isCollaborating,
   onExportToBackend,
   renderCustomFooter,
+  readonly,
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
@@ -524,6 +526,20 @@ const LayerUI = ({
     );
   };
 
+  const renderGithubCorner = () => {
+    return (
+      <aside
+        className={clsx(
+          "layer-ui__wrapper__github-corner zen-mode-transition",
+          {
+            "transition-right": zenModeEnabled,
+          },
+        )}
+      >
+        <GitHubCorner appearance={appState.appearance} />
+      </aside>
+    );
+  };
   const renderFooter = () => (
     <footer role="contentinfo" className="layer-ui__wrapper__footer">
       <div
@@ -604,20 +620,9 @@ const LayerUI = ({
   ) : (
     <div className="layer-ui__wrapper">
       {dialogs}
-      {renderFixedSideContainer()}
+      {!readonly && renderFixedSideContainer()}
       {renderBottomAppMenu()}
-      {
-        <aside
-          className={clsx(
-            "layer-ui__wrapper__github-corner zen-mode-transition",
-            {
-              "transition-right": zenModeEnabled,
-            },
-          )}
-        >
-          <GitHubCorner appearance={appState.appearance} />
-        </aside>
-      }
+      {renderGithubCorner()}
       {renderFooter()}
     </div>
   );
