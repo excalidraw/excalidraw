@@ -615,6 +615,7 @@ const LayerUI = ({
         canvas={canvas}
         isCollaborating={isCollaborating}
         renderCustomFooter={renderCustomFooter}
+        readonly={readonly}
       />
     </>
   ) : (
