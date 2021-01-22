@@ -24,8 +24,8 @@ jobs:
           npm run locales-coverage
           FILE_CHANGED=$(git diff src/locales/percentages.json)
           if [ ! -z "${FILE_CHANGED}" ]; then
-            git config --global user.name 'Kostas Bariotis'
-            git config --global user.email 'konmpar@gmail.com'
+            git config --global user.name 'Excalidraw Bot'
+            git config --global user.email 'bot@excalidraw.com'
             git add src/locales/percentages.json
             git commit -am "Auto commit: Calculate translation coverage"
             git push
