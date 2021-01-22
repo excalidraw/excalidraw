@@ -216,9 +216,9 @@
     "textFinish": "",
     "textNewLine": "",
     "title": "",
-    "view": "",
+    "view": "Преглед",
     "zoomToFit": "",
-    "zoomToSelection": ""
+    "zoomToSelection": "Приближи селекцията"
   },
   "encrypted": {
     "tooltip": "Вашите рисунки са криптирани от край до край, така че сървърите на Excalidraw няма да могат да ги виждат."
