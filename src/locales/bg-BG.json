@@ -201,7 +201,7 @@
   },
   "helpDialog": {
     "blog": "",
-    "click": "",
+    "click": "клик",
     "curvedArrow": "",
     "curvedLine": "",
     "documentation": "",
@@ -209,7 +209,7 @@
     "editor": "",
     "github": "",
     "howto": "",
-    "or": "",
+    "or": "или",
     "preventBinding": "",
     "shapes": "",
     "shortcuts": "",
