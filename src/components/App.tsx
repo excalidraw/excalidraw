@@ -345,6 +345,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           height={canvasHeight}
           ref={this.handleCanvasRef}
           onContextMenu={this.handleCanvasContextMenu}
+          onPointerMove={this.handleCanvasPointerMove}
+          onPointerUp={this.removePointer}
+          onPointerCancel={this.removePointer}
+          onTouchMove={this.handleTouchMove}
         >
           {t("labels.drawingCanvas")}
         </canvas>
@@ -733,25 +737,16 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   }
 
   private addEventListeners() {
+    this.removeEventListeners();
     document.addEventListener(EVENT.COPY, this.onCopy);
-    document.addEventListener(EVENT.PASTE, this.pasteFromClipboard);
-    document.addEventListener(EVENT.CUT, this.onCut);
-
     document.addEventListener(EVENT.KEYDOWN, this.onKeyDown, false);
     document.addEventListener(EVENT.KEYUP, this.onKeyUp, { passive: true });
     document.addEventListener(
       EVENT.MOUSE_MOVE,
       this.updateCurrentCursorPosition,
     );
-    window.addEventListener(EVENT.RESIZE, this.onResize, false);
-    window.addEventListener(EVENT.UNLOAD, this.onUnload, false);
-    window.addEventListener(EVENT.BLUR, this.onBlur, false);
-    window.addEventListener(EVENT.DRAG_OVER, this.disableEvent, false);
-    window.addEventListener(EVENT.DROP, this.disableEvent, false);
-
     // rerender text elements on font load to fix #637 && #1553
     document.fonts?.addEventListener?.("loadingdone", this.onFontLoaded);
-
     // Safari-only desktop pinch zoom
     document.addEventListener(
       EVENT.GESTURE_START,
@@ -768,6 +763,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.onGestureEnd as any,
       false,
     );
+    if (this.state.readonly) {
+      return;
+    }
+
+    document.addEventListener(EVENT.PASTE, this.pasteFromClipboard);
+    document.addEventListener(EVENT.CUT, this.onCut);
+
+    window.addEventListener(EVENT.RESIZE, this.onResize, false);
+    window.addEventListener(EVENT.UNLOAD, this.onUnload, false);
+    window.addEventListener(EVENT.BLUR, this.onBlur, false);
+    window.addEventListener(EVENT.DRAG_OVER, this.disableEvent, false);
+    window.addEventListener(EVENT.DROP, this.disableEvent, false);
   }
 
   componentDidUpdate(prevProps: ExcalidrawProps, prevState: AppState) {
@@ -791,7 +798,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     if (prevProps.readonly !== this.props.readonly) {
-      this.setState({ readonly: !!this.props.readonly });
+      this.setState(
+        { readonly: !!this.props.readonly },
+        this.addEventListeners,
+      );
     }
 
     document
@@ -1202,9 +1212,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   toggleReadonlyMode = () => {
-    this.setState({
-      readonly: !this.state.readonly,
-    });
+    this.setState(
+      {
+        readonly: !this.state.readonly,
+      },
+      this.addEventListeners,
+    );
   };
 
   setScrollToCenter = (remoteElements: readonly ExcalidrawElement[]) => {
@@ -1256,12 +1269,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   // Input handling
 
   private onKeyDown = withBatchedUpdates((event: KeyboardEvent) => {
-    if (!event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.R) {
-      this.toggleReadonlyMode();
-    }
-    if (this.state.readonly) {
-      return;
-    }
     // normalize `event.key` when CapsLock is pressed #2372
     if (
       "Proxy" in window &&
@@ -1286,6 +1293,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
     }
 
+    if (!event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.R) {
+      this.toggleReadonlyMode();
+    }
+
     if (
       (isWritableElement(event.target) && event.key !== KEYS.ESCAPE) ||
       // case: using arrows to move between buttons
@@ -1300,6 +1311,16 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
     }
 
+    if (event.code === CODES.C && event.altKey && event.shiftKey) {
+      this.copyToClipboardAsPng();
+      event.preventDefault();
+      return;
+    }
+
+    if (this.state.readonly) {
+      return;
+    }
+
     if (!event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.Z) {
       this.toggleZenMode();
     }
@@ -1309,12 +1330,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
     if (event[KEYS.CTRL_OR_CMD]) {
       this.setState({ isBindingEnabled: false });
-    }
-
-    if (event.code === CODES.C && event.altKey && event.shiftKey) {
-      this.copyToClipboardAsPng();
-      event.preventDefault();
-      return;
     }
 
     if (this.actionManager.handleKeyDown(event)) {
