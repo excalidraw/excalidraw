@@ -92,7 +92,7 @@
     "centerHorizontally": "Center horizontally",
     "distributeHorizontally": "Distribute horizontally",
     "distributeVertically": "Distribute vertically",
-    "readonlyMode": "Readonly mode"
+    "readonlyMode": "Read only mode"
   },
   "buttons": {
     "clearReset": "Reset the canvas",

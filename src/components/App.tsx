@@ -667,9 +667,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     this.scene.addCallback(this.onSceneUpdated);
-    if (!this.state.readonly) {
-      this.addEventListeners();
-    }
+    this.addEventListeners();
 
     // optim to avoid extra render on init
     if (
@@ -790,6 +788,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         height: this.props.height ?? window.innerHeight,
         ...this.getCanvasOffsets(this.props),
       });
+    }
+
+    if (prevProps.readonly !== this.props.readonly) {
+      this.setState({ readonly: !!this.props.readonly });
     }
 
     document
@@ -1200,18 +1202,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   toggleReadonlyMode = () => {
-    this.setState(
-      {
-        readonly: !this.state.readonly,
-      },
-      () => {
-        if (this.state.readonly) {
-          this.removeEventListeners();
-        } else {
-          this.addEventListeners();
-        }
-      },
-    );
+    this.setState({
+      readonly: !this.state.readonly,
+    });
   };
 
   setScrollToCenter = (remoteElements: readonly ExcalidrawElement[]) => {
@@ -1263,6 +1256,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   // Input handling
 
   private onKeyDown = withBatchedUpdates((event: KeyboardEvent) => {
+    if (!event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.R) {
+      this.toggleReadonlyMode();
+    }
+    if (this.state.readonly) {
+      return;
+    }
     // normalize `event.key` when CapsLock is pressed #2372
     if (
       "Proxy" in window &&
