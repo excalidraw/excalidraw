@@ -157,7 +157,7 @@ import {
   viewportCoordsToSceneCoords,
   withBatchedUpdates,
 } from "../utils";
-import ContextMenu from "./ContextMenu";
+import ContextMenu, { ContextMenuOption } from "./ContextMenu";
 import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
 import { Toast } from "./Toast";
@@ -276,6 +276,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       offsetLeft,
       offsetTop,
       excalidrawRef,
+      readonly = false,
     } = props;
     this.state = {
       ...defaultAppState,
@@ -283,6 +284,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       width,
       height,
       ...this.getCanvasOffsets({ offsetLeft, offsetTop }),
+      readonly,
     };
     if (excalidrawRef) {
       const readyPromise =
@@ -323,10 +325,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private renderCanvas() {
     const canvasScale = window.devicePixelRatio;
-    const { width: canvasDOMWidth, height: canvasDOMHeight } = this.state;
+    const {
+      width: canvasDOMWidth,
+      height: canvasDOMHeight,
+      readonly,
+    } = this.state;
     const canvasWidth = canvasDOMWidth * canvasScale;
     const canvasHeight = canvasDOMHeight * canvasScale;
-    if (this.props.readonly) {
+    if (readonly) {
       return (
         <canvas
           id="canvas"
@@ -338,6 +344,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           width={canvasWidth}
           height={canvasHeight}
           ref={this.handleCanvasRef}
+          onContextMenu={this.handleCanvasContextMenu}
         >
           {t("labels.drawingCanvas")}
         </canvas>
@@ -374,14 +381,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       height: canvasDOMHeight,
       offsetTop,
       offsetLeft,
+      readonly,
     } = this.state;
 
-    const {
-      onCollabButtonClick,
-      onExportToBackend,
-      renderFooter,
-      readonly,
-    } = this.props;
+    const { onCollabButtonClick, onExportToBackend, renderFooter } = this.props;
 
     const DEFAULT_PASTE_X = canvasDOMWidth / 2;
     const DEFAULT_PASTE_Y = canvasDOMHeight / 2;
@@ -664,7 +667,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     this.scene.addCallback(this.onSceneUpdated);
-    if (!this.props.readonly) {
+    if (!this.state.readonly) {
       this.addEventListeners();
     }
 
@@ -1194,6 +1197,21 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.setState({
       showStats: !this.state.showStats,
     });
+  };
+
+  toggleReadonlyMode = () => {
+    this.setState(
+      {
+        readonly: !this.state.readonly,
+      },
+      () => {
+        if (this.state.readonly) {
+          this.removeEventListeners();
+        } else {
+          this.addEventListeners();
+        }
+      },
+    );
   };
 
   setScrollToCenter = (remoteElements: readonly ExcalidrawElement[]) => {
@@ -3648,26 +3666,57 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     const elements = this.scene.getElements();
     const element = this.getElementAtPosition(x, y);
+    const options: ContextMenuOption[] = [];
+    if (probablySupportsClipboardBlob && elements.length > 0) {
+      options.push({
+        shortcutName: "copyAsPng",
+        label: t("labels.copyAsPng"),
+        action: this.copyToClipboardAsPng,
+      });
+    }
+
+    if (probablySupportsClipboardWriteText && elements.length > 0) {
+      options.push({
+        shortcutName: "copyAsSvg",
+        label: t("labels.copyAsSvg"),
+        action: this.copyToClipboardAsSvg,
+      });
+    }
     if (!element) {
+      const readonlyOptions: ContextMenuOption[] = [
+        ...options,
+        {
+          checked: this.state.showStats,
+          shortcutName: "stats",
+          label: t("stats.title"),
+          action: this.toggleStats,
+        },
+        {
+          checked: this.state.readonly,
+          shortcutName: "readonlyMode",
+          label: t("labels.readonlyMode"),
+          action: this.toggleReadonlyMode,
+        },
+      ];
+
+      ContextMenu.push({
+        options: readonlyOptions,
+        top: clientY,
+        left: clientX,
+      });
+
+      if (this.state.readonly) {
+        return;
+      }
+
       ContextMenu.push({
         options: [
+          ...readonlyOptions,
           navigator.clipboard && {
             shortcutName: "paste",
             label: t("labels.paste"),
             action: () => this.pasteFromClipboard(null),
           },
-          probablySupportsClipboardBlob &&
-            elements.length > 0 && {
-              shortcutName: "copyAsPng",
-              label: t("labels.copyAsPng"),
-              action: this.copyToClipboardAsPng,
-            },
-          probablySupportsClipboardWriteText &&
-            elements.length > 0 && {
-              shortcutName: "copyAsSvg",
-              label: t("labels.copyAsSvg"),
-              action: this.copyToClipboardAsSvg,
-            },
           ...this.actionManager.getContextMenuItems((action) =>
             CANVAS_ONLY_ACTIONS.includes(action.name),
           ),
@@ -3683,12 +3732,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             label: t("buttons.zenMode"),
             action: this.toggleZenMode,
           },
-          {
-            checked: this.state.showStats,
-            shortcutName: "stats",
-            label: t("stats.title"),
-            action: this.toggleStats,
-          },
         ],
         top: clientY,
         left: clientX,
@@ -3698,6 +3741,22 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     if (!this.state.selectedElementIds[element.id]) {
       this.setState({ selectedElementIds: { [element.id]: true } });
+    }
+
+    if (this.state.readonly) {
+      ContextMenu.push({
+        options: [
+          navigator.clipboard && {
+            shortcutName: "copy",
+            label: t("labels.copy"),
+            action: this.copyAll,
+          },
+          ...options,
+        ],
+        top: clientY,
+        left: clientX,
+      });
+      return;
     }
 
     ContextMenu.push({
@@ -3717,16 +3776,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           label: t("labels.paste"),
           action: () => this.pasteFromClipboard(null),
         },
-        probablySupportsClipboardBlob && {
-          shortcutName: "copyAsPng",
-          label: t("labels.copyAsPng"),
-          action: this.copyToClipboardAsPng,
-        },
-        probablySupportsClipboardWriteText && {
-          shortcutName: "copyAsSvg",
-          label: t("labels.copyAsSvg"),
-          action: this.copyToClipboardAsSvg,
-        },
+        ...options,
         ...this.actionManager.getContextMenuItems(
           (action) => !CANVAS_ONLY_ACTIONS.includes(action.name),
         ),

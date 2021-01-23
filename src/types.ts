@@ -86,6 +86,7 @@ export type AppState = {
   zenModeEnabled: boolean;
   appearance: "light" | "dark";
   gridSize: number | null;
+  readonly: boolean;
 
   /** top-most selected groups (i.e. does not include nested groups) */
   selectedGroupIds: { [groupId: string]: boolean };

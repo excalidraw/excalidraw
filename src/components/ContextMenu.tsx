@@ -9,7 +9,7 @@ import {
   ShortcutName,
 } from "../actions/shortcuts";
 
-type ContextMenuOption = {
+export type ContextMenuOption = {
   checked?: boolean;
   shortcutName: ShortcutName;
   label: string;
@@ -46,7 +46,7 @@ const ContextMenu = ({ options, onCloseRequest, top, left }: Props) => {
           {options.map(({ action, checked, shortcutName, label }, idx) => (
             <li data-testid={shortcutName} key={idx} onClick={onCloseRequest}>
               <button
-                className={`context-menu-option 
+                className={`context-menu-option
                 ${shortcutName === "delete" ? "dangerous" : ""}
                 ${checked ? "checkmark" : ""}`}
                 onClick={action}

@@ -26,7 +26,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     onExportToBackend,
     renderFooter,
     langCode = defaultLang.code,
-    readonly = false,
+    readonly,
   } = props;
 
   useEffect(() => {
