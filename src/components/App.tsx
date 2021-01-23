@@ -3710,12 +3710,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
       ContextMenu.push({
         options: [
-          ...readonlyOptions,
           navigator.clipboard && {
             shortcutName: "paste",
             label: t("labels.paste"),
             action: () => this.pasteFromClipboard(null),
           },
+          ...options,
           ...this.actionManager.getContextMenuItems((action) =>
             CANVAS_ONLY_ACTIONS.includes(action.name),
           ),
@@ -3730,6 +3730,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             shortcutName: "zenMode",
             label: t("buttons.zenMode"),
             action: this.toggleZenMode,
+          },
+          {
+            checked: this.state.readonly,
+            shortcutName: "readonlyMode",
+            label: t("labels.readonlyMode"),
+            action: this.toggleReadonlyMode,
+          },
+          {
+            checked: this.state.showStats,
+            shortcutName: "stats",
+            label: t("stats.title"),
+            action: this.toggleStats,
           },
         ],
         top: clientY,
