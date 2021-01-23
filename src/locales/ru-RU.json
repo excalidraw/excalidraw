@@ -202,10 +202,10 @@
   "helpDialog": {
     "blog": "Прочитайте наш блог",
     "click": "нажать",
-    "curvedArrow": "",
-    "curvedLine": "",
+    "curvedArrow": "Изогнутая стрелка",
+    "curvedLine": "Изогнутая линия",
     "documentation": "Документация",
-    "drag": "",
+    "drag": "перетащить",
     "editor": "",
     "github": "",
     "howto": "",
