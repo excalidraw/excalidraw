@@ -136,7 +136,7 @@ export const MobileMenu = ({
   };
   return (
     <>
-      {renderFixedSideContainer()}
+      {!readonly && renderFixedSideContainer()}
       <div
         className="App-bottom-bar"
         style={{
@@ -174,6 +174,7 @@ export const MobileMenu = ({
               </div>
             </Section>
           ) : appState.openMenu === "shape" &&
+            !readonly &&
             showSelectedShapeActions(appState, elements) ? (
             <Section className="App-mobile-menu" heading="selectedShapeActions">
               <SelectedShapeActions
