@@ -489,6 +489,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             height: state.height,
             offsetTop: state.offsetTop,
             offsetLeft: state.offsetLeft,
+            readonly: state.readonly,
           }),
           () => {
             if (actionResult.syncHistory) {
@@ -623,6 +624,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           height: this.state.height,
           offsetTop: this.state.offsetTop,
           offsetLeft: this.state.offsetLeft,
+          readonly: this.state.readonly,
         },
         null,
       ),
