@@ -29,7 +29,7 @@
     "@types/socket.io-client": "1.4.35",
     "browser-nativefs": "0.12.0",
     "clsx": "1.1.1",
-    "firebase": "8.2.3",
+    "firebase": "8.2.4",
     "i18next-browser-languagedetector": "6.0.1",
     "lodash.throttle": "4.1.1",
     "nanoid": "3.1.20",
