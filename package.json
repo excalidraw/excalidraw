@@ -53,7 +53,7 @@
     "@types/pako": "1.0.1",
     "eslint-config-prettier": "7.1.0",
     "eslint-plugin-prettier": "3.3.1",
-    "firebase-tools": "9.2.1",
+    "firebase-tools": "9.2.2",
     "husky": "4.3.8",
     "jest-canvas-mock": "2.3.0",
     "lint-staged": "10.5.3",
