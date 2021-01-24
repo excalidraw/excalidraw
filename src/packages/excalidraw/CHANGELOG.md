@@ -12,9 +12,13 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
-## [unreleased]
+## [Unreleased]
 
-## Excalidraw library
+## Excalidraw Library
+
+### Features
+
+- Support `Ctrl-Y` shortcut to redo on Windows [#2831](https://github.com/excalidraw/excalidraw/pull/2831).
 
 ### Fixes
 
