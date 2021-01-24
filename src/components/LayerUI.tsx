@@ -360,6 +360,28 @@ const LayerUI = ({
     );
   };
 
+  const renderReadonlyCanvasActions = () => {
+    return (
+      <Section
+        heading="canvasActions"
+        className={clsx("zen-mode-transition", {
+          "transition-left": zenModeEnabled,
+        })}
+      >
+        {/* the zIndex ensures this menu has higher stacking order,
+         see https://github.com/excalidraw/excalidraw/pull/1445 */}
+        <Island padding={2} style={{ zIndex: 1 }}>
+          <Stack.Col gap={4}>
+            <Stack.Row gap={1} justifyContent="space-between">
+              {actionManager.renderAction("saveScene")}
+              {actionManager.renderAction("saveAsScene")}
+              {renderExportDialog()}
+            </Stack.Row>
+          </Stack.Col>
+        </Island>
+      </Section>
+    );
+  };
   const renderCanvasActions = () => (
     <Section
       heading="canvasActions"
@@ -450,38 +472,40 @@ const LayerUI = ({
             gap={4}
             className={clsx({ "disable-pointerEvents": zenModeEnabled })}
           >
-            {renderCanvasActions()}
+            {readonly ? renderReadonlyCanvasActions() : renderCanvasActions()}
             {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
           </Stack.Col>
-          <Section heading="shapes">
-            {(heading) => (
-              <Stack.Col gap={4} align="start">
-                <Stack.Row gap={1}>
-                  <Island
-                    padding={1}
-                    className={clsx({ "zen-mode": zenModeEnabled })}
-                  >
-                    <HintViewer appState={appState} elements={elements} />
-                    {heading}
-                    <Stack.Row gap={1}>
-                      <ShapesSwitcher
-                        elementType={appState.elementType}
-                        setAppState={setAppState}
-                        isLibraryOpen={appState.isLibraryOpen}
-                      />
-                    </Stack.Row>
-                  </Island>
-                  <LockIcon
-                    zenModeEnabled={zenModeEnabled}
-                    checked={appState.elementLocked}
-                    onChange={onLockToggle}
-                    title={t("toolBar.lock")}
-                  />
-                </Stack.Row>
-                {libraryMenu}
-              </Stack.Col>
-            )}
-          </Section>
+          {!readonly && (
+            <Section heading="shapes">
+              {(heading) => (
+                <Stack.Col gap={4} align="start">
+                  <Stack.Row gap={1}>
+                    <Island
+                      padding={1}
+                      className={clsx({ "zen-mode": zenModeEnabled })}
+                    >
+                      <HintViewer appState={appState} elements={elements} />
+                      {heading}
+                      <Stack.Row gap={1}>
+                        <ShapesSwitcher
+                          elementType={appState.elementType}
+                          setAppState={setAppState}
+                          isLibraryOpen={appState.isLibraryOpen}
+                        />
+                      </Stack.Row>
+                    </Island>
+                    <LockIcon
+                      zenModeEnabled={zenModeEnabled}
+                      checked={appState.elementLocked}
+                      onChange={onLockToggle}
+                      title={t("toolBar.lock")}
+                    />
+                  </Stack.Row>
+                  {libraryMenu}
+                </Stack.Col>
+              )}
+            </Section>
+          )}
           <UserList
             className={clsx("zen-mode-transition", {
               "transition-right": zenModeEnabled,
@@ -621,7 +645,7 @@ const LayerUI = ({
   ) : (
     <div className="layer-ui__wrapper">
       {dialogs}
-      {!readonly && renderFixedSideContainer()}
+      {renderFixedSideContainer()}
       {renderBottomAppMenu()}
       {renderGithubCorner()}
       {renderFooter()}
