@@ -143,8 +143,8 @@ class Portal {
           socketId: this.socket.id,
           pointer: payload.pointer,
           button: payload.button || "up",
-          selectedElementIds:
-            this.collab.excalidrawAPI.getAppState().selectedElementIds || {},
+          selectedElementIds: this.collab.excalidrawAPI.getAppState()
+            .selectedElementIds,
           username: this.collab.state.username,
         },
       };
