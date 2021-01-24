@@ -12,6 +12,14 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
+## [unreleased]
+
+## Excalidraw library
+
+### Fixes
+
+- Fix remote pointers not accounting for offset [#2855](https://github.com/excalidraw/excalidraw/pull/2855).
+
 ## 0.2.1
 
 ## Excalidraw API
