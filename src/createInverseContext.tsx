@@ -4,14 +4,14 @@ export const createInverseContext = <T extends unknown = null>(
   initialValue: T,
 ) => {
   const Context = React.createContext(initialValue) as React.Context<T> & {
-    __updateProviderValue?: (value: T) => void;
+    _updateProviderValue?: (value: T) => void;
   };
 
   class InverseConsumer extends React.Component {
     state = { value: initialValue };
     constructor(props: any) {
       super(props);
-      Context.__updateProviderValue = (value: T) => this.setState({ value });
+      Context._updateProviderValue = (value: T) => this.setState({ value });
     }
     render() {
       return (
@@ -24,10 +24,10 @@ export const createInverseContext = <T extends unknown = null>(
 
   class InverseProvider extends React.Component<{ value: T }> {
     componentDidMount() {
-      Context.__updateProviderValue?.(this.props.value);
+      Context._updateProviderValue?.(this.props.value);
     }
     componentDidUpdate() {
-      Context.__updateProviderValue?.(this.props.value);
+      Context._updateProviderValue?.(this.props.value);
     }
     render() {
       return <Context.Consumer>{() => this.props.children}</Context.Consumer>;
