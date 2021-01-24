@@ -79,6 +79,13 @@ export const MobileMenu = ({
   };
 
   const renderAppToolbar = () => {
+    if (readonly) {
+      return (
+        <div className="App-toolbar-content">
+          {actionManager.renderAction("toggleCanvasMenu")}
+        </div>
+      );
+    }
     return (
       <div className="App-toolbar-content">
         {actionManager.renderAction("toggleCanvasMenu")}
@@ -92,9 +99,44 @@ export const MobileMenu = ({
       </div>
     );
   };
+
+  const renderCanvasActions = () => {
+    if (readonly) {
+      return (
+        <>
+          {actionManager.renderAction("saveScene")}
+          {actionManager.renderAction("saveAsScene")}
+          {exportButton}
+        </>
+      );
+    }
+    return (
+      <>
+        {actionManager.renderAction("loadScene")}
+        {actionManager.renderAction("saveScene")}
+        {actionManager.renderAction("saveAsScene")}
+        {exportButton}
+        {actionManager.renderAction("clearCanvas")}
+        {onCollabButtonClick && (
+          <CollabButton
+            isCollaborating={isCollaborating}
+            collaboratorCount={appState.collaborators.size}
+            onClick={onCollabButtonClick}
+          />
+        )}
+        {
+          <BackgroundPickerAndDarkModeToggle
+            actionManager={actionManager}
+            appState={appState}
+            setAppState={setAppState}
+          />
+        }
+      </>
+    );
+  };
   return (
     <>
-      {!readonly && renderFixedSideContainer()}
+      {renderFixedSideContainer()}
       <div
         className="App-bottom-bar"
         style={{
@@ -108,23 +150,7 @@ export const MobileMenu = ({
             <Section className="App-mobile-menu" heading="canvasActions">
               <div className="panelColumn">
                 <Stack.Col gap={4}>
-                  {actionManager.renderAction("loadScene")}
-                  {actionManager.renderAction("saveScene")}
-                  {actionManager.renderAction("saveAsScene")}
-                  {exportButton}
-                  {actionManager.renderAction("clearCanvas")}
-                  {onCollabButtonClick && (
-                    <CollabButton
-                      isCollaborating={isCollaborating}
-                      collaboratorCount={appState.collaborators.size}
-                      onClick={onCollabButtonClick}
-                    />
-                  )}
-                  <BackgroundPickerAndDarkModeToggle
-                    actionManager={actionManager}
-                    appState={appState}
-                    setAppState={setAppState}
-                  />
+                  {renderCanvasActions()}
                   {renderCustomFooter?.(true)}
                   <fieldset>
                     <legend>{t("labels.collaborators")}</legend>
@@ -159,7 +185,7 @@ export const MobileMenu = ({
             </Section>
           ) : null}
           <footer className="App-toolbar">
-            {!readonly && renderAppToolbar()}
+            {renderAppToolbar()}
             {appState.scrolledOutside && !appState.openMenu && (
               <button
                 className="scroll-back-to-content"
