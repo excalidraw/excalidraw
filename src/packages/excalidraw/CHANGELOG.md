@@ -22,13 +22,11 @@ Please add the latest change on the top under the correct section.
 
 ### Build
 
-- Build
-
 - Remove publicPath so host can use `__webpack_public_path__` to host the assets[#2835](https://github.com/excalidraw/excalidraw/pull/2835)
 
 ### Fixes
 
-- add safe check for process so Excalidraw can be loaded via script [#2824](https://github.com/excalidraw/excalidraw/pull/2824)
+- Add safe check for process so Excalidraw can be loaded via script [#2824](https://github.com/excalidraw/excalidraw/pull/2824)
 
 ## Excalidraw Library
 
