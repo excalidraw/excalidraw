@@ -16,9 +16,19 @@ Please add the latest change on the top under the correct section.
 
 ## Excalidraw API
 
+### Features
+
+- Expose `getAppState` on `excalidrawRef` [#2834](https://github.com/excalidraw/excalidraw/pull/2834).
+
 ### Build
 
-- Remove publicPath so host can use `__webpack_public_path__` to host the assets
+- Build
+
+- Remove publicPath so host can use `__webpack_public_path__` to host the assets[#2835](https://github.com/excalidraw/excalidraw/pull/2835)
+
+### Fixes
+
+- add safe check for process so Excalidraw can be loaded via script [#2824](https://github.com/excalidraw/excalidraw/pull/2824)
 
 ## Excalidraw Library
 
@@ -28,7 +38,7 @@ Please add the latest change on the top under the correct section.
 
 ### Fixes
 
-- add safe check for process so Excalidraw can be loaded via script [#2824](https://github.com/excalidraw/excalidraw/pull/2824)
+- Fix remote pointers not accounting for offset [#2855](https://github.com/excalidraw/excalidraw/pull/2855).
 
 ## 0.2.1
 
