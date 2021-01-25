@@ -12,7 +12,7 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
-## [Unreleased]
+## 0.2.2
 
 ## Excalidraw API
 
@@ -25,6 +25,10 @@ Please add the latest change on the top under the correct section.
 ### Features
 
 - Support `Ctrl-Y` shortcut to redo on Windows [#2831](https://github.com/excalidraw/excalidraw/pull/2831).
+
+### Fixes
+
+- add safe check for process so Excalidraw can be loaded via script [#2824](https://github.com/excalidraw/excalidraw/pull/2824)
 
 ## 0.2.1
 
