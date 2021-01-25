@@ -248,6 +248,7 @@ export type ExcalidrawImperativeAPI = {
   };
   setScrollToCenter: InstanceType<typeof App>["setScrollToCenter"];
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
+  getAppState: () => InstanceType<typeof App>["state"];
   readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
   ready: true;
 };
@@ -298,6 +299,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         },
         setScrollToCenter: this.setScrollToCenter,
         getSceneElements: this.getSceneElements,
+        getAppState: () => this.state,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);

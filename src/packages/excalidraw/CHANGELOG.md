@@ -14,6 +14,10 @@ Please add the latest change on the top under the correct section.
 
 ## [Unreleased]
 
+## Excalidraw API
+
+- Expose `getAppState` on `excalidrawRef` [#2834](https://github.com/excalidraw/excalidraw/pull/2834).
+
 ## Excalidraw Library
 
 ### Features
