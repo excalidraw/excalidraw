@@ -24,6 +24,10 @@ Please add the latest change on the top under the correct section.
 
 - Support `Ctrl-Y` shortcut to redo on Windows [#2831](https://github.com/excalidraw/excalidraw/pull/2831).
 
+### Fixes
+
+- Fix remote pointers not accounting for offset [#2855](https://github.com/excalidraw/excalidraw/pull/2855).
+
 ## 0.2.1
 
 ## Excalidraw API
