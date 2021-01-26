@@ -349,6 +349,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           onPointerUp={this.removePointer}
           onPointerCancel={this.removePointer}
           onTouchMove={this.handleTouchMove}
+          onPointerDown={this.handleCanvasPointerDown}
         >
           {t("labels.drawingCanvas")}
         </canvas>
@@ -2144,14 +2145,16 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     lastPointerUp = onPointerUp;
 
-    window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
-    window.addEventListener(EVENT.POINTER_UP, onPointerUp);
-    window.addEventListener(EVENT.KEYDOWN, onKeyDown);
-    window.addEventListener(EVENT.KEYUP, onKeyUp);
-    pointerDownState.eventListeners.onMove = onPointerMove;
-    pointerDownState.eventListeners.onUp = onPointerUp;
-    pointerDownState.eventListeners.onKeyUp = onKeyUp;
-    pointerDownState.eventListeners.onKeyDown = onKeyDown;
+    if (!this.state.readonly) {
+      window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
+      window.addEventListener(EVENT.POINTER_UP, onPointerUp);
+      window.addEventListener(EVENT.KEYDOWN, onKeyDown);
+      window.addEventListener(EVENT.KEYUP, onKeyUp);
+      pointerDownState.eventListeners.onMove = onPointerMove;
+      pointerDownState.eventListeners.onUp = onPointerUp;
+      pointerDownState.eventListeners.onKeyUp = onKeyUp;
+      pointerDownState.eventListeners.onKeyDown = onKeyDown;
+    }
   };
 
   private maybeOpenContextMenuAfterPointerDownOnTouchDevices = (
