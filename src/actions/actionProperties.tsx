@@ -21,6 +21,13 @@ import {
   StrokeStyleDottedIcon,
   StrokeStyleSolidIcon,
   StrokeWidthIcon,
+  FontSizeSmallIcon,
+  FontSizeMediumIcon,
+  FontSizeLargeIcon,
+  FontSizeExtraLargeIcon,
+  FontFamilyHandDrawnIcon,
+  FontFamilyNormalIcon,
+  FontFamilyCodeIcon,
 } from "../components/icons";
 import { DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE } from "../constants";
 import {
@@ -413,13 +420,29 @@ export const actionChangeFontSize = register({
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.fontSize")}</legend>
-      <ButtonSelect
+      <ButtonIconSelect
         group="font-size"
         options={[
-          { value: 16, text: t("labels.small") },
-          { value: 20, text: t("labels.medium") },
-          { value: 28, text: t("labels.large") },
-          { value: 36, text: t("labels.veryLarge") },
+          {
+            value: 16,
+            text: t("labels.small"),
+            icon: <FontSizeSmallIcon appearance={appState.appearance} />,
+          },
+          {
+            value: 20,
+            text: t("labels.medium"),
+            icon: <FontSizeMediumIcon appearance={appState.appearance} />,
+          },
+          {
+            value: 28,
+            text: t("labels.large"),
+            icon: <FontSizeLargeIcon appearance={appState.appearance} />,
+          },
+          {
+            value: 36,
+            text: t("labels.veryLarge"),
+            icon: <FontSizeExtraLargeIcon appearance={appState.appearance} />,
+          },
         ]}
         value={getFormValue(
           elements,
@@ -456,16 +479,28 @@ export const actionChangeFontFamily = register({
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => {
-    const options: { value: FontFamily; text: string }[] = [
-      { value: 1, text: t("labels.handDrawn") },
-      { value: 2, text: t("labels.normal") },
-      { value: 3, text: t("labels.code") },
+    const options: { value: FontFamily; text: string; icon: JSX.Element }[] = [
+      {
+        value: 1,
+        text: t("labels.handDrawn"),
+        icon: <FontFamilyHandDrawnIcon appearance={appState.appearance} />,
+      },
+      {
+        value: 2,
+        text: t("labels.normal"),
+        icon: <FontFamilyNormalIcon appearance={appState.appearance} />,
+      },
+      {
+        value: 3,
+        text: t("labels.code"),
+        icon: <FontFamilyCodeIcon appearance={appState.appearance} />,
+      },
     ];
 
     return (
       <fieldset>
         <legend>{t("labels.fontFamily")}</legend>
-        <ButtonSelect<FontFamily | false>
+        <ButtonIconSelect<FontFamily | false>
           group="font-family"
           options={options}
           value={getFormValue(
