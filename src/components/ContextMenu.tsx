@@ -67,11 +67,11 @@ const ContextMenu = ({
                   onClick={() => actionManager.executeAction(option)}
                 >
                   <div className="context-menu-option__label">{label}</div>
-                  <div className="context-menu-option__shortcut">
+                  <kbd className="context-menu-option__shortcut">
                     {actionName
                       ? getShortcutFromShortcutName(actionName as ShortcutName)
                       : ""}
-                  </div>
+                  </kbd>
                 </button>
               </li>
             );
