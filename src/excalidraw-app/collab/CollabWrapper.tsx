@@ -6,10 +6,11 @@ import { APP_NAME, ENV, EVENT } from "../../constants";
 import { ImportedDataState } from "../../data/types";
 import { ExcalidrawElement } from "../../element/types";
 import {
+  getElementMap,
   getSceneVersion,
   getSyncableElements,
 } from "../../packages/excalidraw/index";
-import { AppState, Collaborator, Gesture } from "../../types";
+import { Collaborator, Gesture } from "../../types";
 import { resolvablePromise, withBatchedUpdates } from "../../utils";
 import {
   INITIAL_SCENE_UPDATE_TIMEOUT,
@@ -31,6 +32,9 @@ import {
 } from "../data/localStorage";
 import Portal from "./Portal";
 import RoomDialog from "./RoomDialog";
+import { createInverseContext } from "../../createInverseContext";
+
+const idleDetectorSupported: boolean = "IdleDetector" in window;
 
 interface CollabState {
   isCollaborating: boolean;
@@ -58,10 +62,7 @@ type ReconciledElements = readonly ExcalidrawElement[] & {
 };
 
 interface Props {
-  children: (collab: CollabAPI) => React.ReactNode;
-  // NOTE not type-safe because the refObject may in fact not be initialized
-  // with ExcalidrawImperativeAPI yet
-  excalidrawRef: React.MutableRefObject<ExcalidrawImperativeAPI>;
+  excalidrawAPI: ExcalidrawImperativeAPI;
 }
 
 declare global {
@@ -70,13 +71,18 @@ declare global {
   }
 }
 
-const idleDetectorSupported = "IdleDetector" in window;
+const {
+  Context: CollabContext,
+  Consumer: CollabContextConsumer,
+  Provider: CollabContextProvider,
+} = createInverseContext<{ api: CollabAPI | null }>({ api: null });
+
+export { CollabContext, CollabContextConsumer };
 
 class CollabWrapper extends PureComponent<Props, CollabState> {
   portal: Portal;
+  excalidrawAPI: Props["excalidrawAPI"];
   private socketInitializationTimer?: NodeJS.Timeout;
-  private excalidrawRef: Props["excalidrawRef"];
-  excalidrawAppState?: AppState;
   private lastBroadcastedOrReceivedSceneVersion: number = -1;
   private collaborators = new Map<string, Collaborator>();
 
@@ -91,7 +97,14 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       activeRoomLink: "",
     };
     this.portal = new Portal(this);
-    this.excalidrawRef = props.excalidrawRef;
+    this.excalidrawAPI = props.excalidrawAPI;
+    if (idleDetectorSupported) {
+      document.addEventListener('idledetectionpermissionchange', (event: CustomEvent) => {
+        if (event.detail.idleDetectionPermissionGranted) {
+          this.initializeIdleDetector();
+        }
+      });
+    }
   }
 
   componentDidMount() {
@@ -153,7 +166,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
   saveCollabRoomToFirebase = async (
     syncableElements: ExcalidrawElement[] = getSyncableElements(
-      this.excalidrawRef.current!.getSceneElementsIncludingDeleted(),
+      this.excalidrawAPI.getSceneElementsIncludingDeleted(),
     ),
   ) => {
     try {
@@ -165,13 +178,13 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
   openPortal = async () => {
     window.history.pushState({}, APP_NAME, await generateCollaborationLink());
-    const elements = this.excalidrawRef.current!.getSceneElements();
+    const elements = this.excalidrawAPI.getSceneElements();
     // remove deleted elements from elements array & history to ensure we don't
     // expose potentially sensitive user data in case user manually deletes
     // existing elements (or clears scene), which would otherwise be persisted
     // to database even if deleted before creating the room.
-    this.excalidrawRef.current!.history.clear();
-    this.excalidrawRef.current!.updateScene({
+    this.excalidrawAPI.history.clear();
+    this.excalidrawAPI.updateScene({
       elements,
       commitToHistory: true,
     });
@@ -186,7 +199,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
   private destroySocketClient = () => {
     this.collaborators = new Map();
-    this.excalidrawRef.current!.updateScene({
+    this.excalidrawAPI.updateScene({
       collaborators: this.collaborators,
     });
     this.setState({
@@ -204,8 +217,6 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     const scenePromise = resolvablePromise<ImportedDataState | null>();
 
     const roomMatch = getCollaborationLinkData(window.location.href);
-
-    this.initializeIdleDetector();
 
     if (roomMatch) {
       const roomId = roomMatch[1];
@@ -278,11 +289,23 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
               user.selectedElementIds = selectedElementIds;
               user.username = username;
               collaborators.set(socketId, user);
-              this.excalidrawRef.current!.updateScene({
+              this.excalidrawAPI.updateScene({
                 collaborators,
               });
               break;
             }
+            case "IDLE_STATUS": {
+              const {idleState, socketId, username} = decryptedData.payload;
+              const collaborators = new Map(this.collaborators);
+              const user = collaborators.get(socketId) || {}!;
+              user.idleState = idleState;
+              user.username = username;
+              this.excalidrawAPI.updateScene({
+                collaborators,
+              });
+              break;
+            }
+
           }
         },
       );
@@ -299,6 +322,8 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
         activeRoomLink: window.location.href,
       });
 
+      this.initializeIdleDetector();
+
       return scenePromise;
     }
 
@@ -313,7 +338,55 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   private reconcileElements = (
     elements: readonly ExcalidrawElement[],
   ): ReconciledElements => {
-    const newElements = this.portal.reconcileElements(elements);
+    const currentElements = this.getSceneElementsIncludingDeleted();
+    // create a map of ids so we don't have to iterate
+    // over the array more than once.
+    const localElementMap = getElementMap(currentElements);
+
+    const appState = this.excalidrawAPI.getAppState();
+
+    // Reconcile
+    const newElements: readonly ExcalidrawElement[] = elements
+      .reduce((elements, element) => {
+        // if the remote element references one that's currently
+        // edited on local, skip it (it'll be added in the next step)
+        if (
+          element.id === appState.editingElement?.id ||
+          element.id === appState.resizingElement?.id ||
+          element.id === appState.draggingElement?.id
+        ) {
+          return elements;
+        }
+
+        if (
+          localElementMap.hasOwnProperty(element.id) &&
+          localElementMap[element.id].version > element.version
+        ) {
+          elements.push(localElementMap[element.id]);
+          delete localElementMap[element.id];
+        } else if (
+          localElementMap.hasOwnProperty(element.id) &&
+          localElementMap[element.id].version === element.version &&
+          localElementMap[element.id].versionNonce !== element.versionNonce
+        ) {
+          // resolve conflicting edits deterministically by taking the one with the lowest versionNonce
+          if (localElementMap[element.id].versionNonce < element.versionNonce) {
+            elements.push(localElementMap[element.id]);
+          } else {
+            // it should be highly unlikely that the two versionNonces are the same. if we are
+            // really worried about this, we can replace the versionNonce with the socket id.
+            elements.push(element);
+          }
+          delete localElementMap[element.id];
+        } else {
+          elements.push(element);
+          delete localElementMap[element.id];
+        }
+
+        return elements;
+      }, [] as Mutable<typeof elements>)
+      // add local elements that weren't deleted or on remote
+      .concat(...Object.values(localElementMap));
 
     // Avoid broadcasting to the rest of the collaborators the scene
     // we just received!
@@ -332,10 +405,10 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     }: { init?: boolean; initFromSnapshot?: boolean } = {},
   ) => {
     if (init || initFromSnapshot) {
-      this.excalidrawRef.current!.setScrollToCenter(elements);
+      this.excalidrawAPI.setScrollToCenter(elements);
     }
 
-    this.excalidrawRef.current!.updateScene({
+    this.excalidrawAPI.updateScene({
       elements,
       commitToHistory: !!init,
     });
@@ -344,7 +417,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     // when we receive any messages from another peer. This UX can be pretty rough -- if you
     // undo, a user makes a change, and then try to redo, your element(s) will be lost. However,
     // right now we think this is the right tradeoff.
-    this.excalidrawRef.current!.history.clear();
+    this.excalidrawAPI.history.clear();
   };
 
   private initializeIdleDetector = async () => {
@@ -388,7 +461,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
         }
       }
       this.collaborators = collaborators;
-      this.excalidrawRef.current!.updateScene({ collaborators });
+      this.excalidrawAPI.updateScene({ collaborators });
     });
   }
 
@@ -401,7 +474,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   };
 
   public getSceneElementsIncludingDeleted = () => {
-    return this.excalidrawRef.current!.getSceneElementsIncludingDeleted();
+    return this.excalidrawAPI.getSceneElementsIncludingDeleted();
   };
 
   onPointerUpdate = (payload: {
@@ -419,11 +492,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     this.portal.broadcastIdleChange(idleState);
   };
 
-  broadcastElements = (
-    elements: readonly ExcalidrawElement[],
-    state: AppState,
-  ) => {
-    this.excalidrawAppState = state;
+  broadcastElements = (elements: readonly ExcalidrawElement[]) => {
     if (
       getSceneVersion(elements) >
       this.getLastBroadcastedOrReceivedSceneVersion()
@@ -442,7 +511,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     this.portal.broadcastScene(
       SCENE.UPDATE,
       getSyncableElements(
-        this.excalidrawRef.current!.getSceneElementsIncludingDeleted(),
+        this.excalidrawAPI.getSceneElementsIncludingDeleted(),
       ),
       true,
     );
@@ -471,8 +540,23 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     });
   };
 
+  /** PRIVATE. Use `this.getContextValue()` instead. */
+  private contextValue: CollabAPI | null = null;
+
+  /** Getter of context value. Returned object is stable. */
+  getContextValue = (): CollabAPI => {
+    this.contextValue = this.contextValue || ({} as CollabAPI);
+
+    this.contextValue.isCollaborating = this.state.isCollaborating;
+    this.contextValue.username = this.state.username;
+    this.contextValue.onPointerUpdate = this.onPointerUpdate;
+    this.contextValue.initializeSocketClient = this.initializeSocketClient;
+    this.contextValue.onCollabButtonClick = this.onCollabButtonClick;
+    this.contextValue.broadcastElements = this.broadcastElements;
+    return this.contextValue;
+  };
+
   render() {
-    const { children } = this.props;
     const { modalIsShown, username, errorMessage, activeRoomLink } = this.state;
 
     return (
@@ -496,15 +580,11 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
             onClose={() => this.setState({ errorMessage: "" })}
           />
         )}
-        {children({
-          isCollaborating: this.state.isCollaborating,
-          username: this.state.username,
-          idleState: this.state.idleState,
-          onPointerUpdate: this.onPointerUpdate,
-          initializeSocketClient: this.initializeSocketClient,
-          onCollabButtonClick: this.onCollabButtonClick,
-          broadcastElements: this.broadcastElements,
-        })}
+        <CollabContextProvider
+          value={{
+            api: this.getContextValue(),
+          }}
+        />
       </>
     );
   }

@@ -92,7 +92,7 @@
     "centerHorizontally": "Center horizontally",
     "distributeHorizontally": "Distribute horizontally",
     "distributeVertically": "Distribute vertically",
-    "shareIdleState": "Let others see when I'm active."
+    "shareIdleState": "Let others see if I'm active."
   },
   "buttons": {
     "clearReset": "Reset the canvas",

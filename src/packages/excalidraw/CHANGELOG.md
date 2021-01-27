@@ -12,6 +12,22 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
+## [Unreleased]
+
+## Excalidraw API
+
+- Expose `getAppState` on `excalidrawRef` [#2834](https://github.com/excalidraw/excalidraw/pull/2834).
+
+## Excalidraw Library
+
+### Features
+
+- Support `Ctrl-Y` shortcut to redo on Windows [#2831](https://github.com/excalidraw/excalidraw/pull/2831).
+
+### Fixes
+
+- Fix remote pointers not accounting for offset [#2855](https://github.com/excalidraw/excalidraw/pull/2855).
+
 ## 0.2.1
 
 ## Excalidraw API

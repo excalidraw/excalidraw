@@ -12,7 +12,8 @@ declare global {
   }
 }
 
-const idleDetectorSupported = "IdleDetector" in window;
+const idleDetectorSupported: boolean = "IdleDetector" in window;
+let idleDetectionPermissionGranted: boolean = false;
 
 const RoomDialog = ({
   handleClose,
@@ -61,10 +62,14 @@ const RoomDialog = ({
       if (state !== "granted") {
         console.log("Idle detection permission not granted.");
         (checkbox as HTMLInputElement).checked = false;
-        return;
+        idleDetectionPermissionGranted = false;
+      } else {
+        console.log("Idle detection permission granted.");
+        (checkbox as HTMLInputElement).checked = true;
+        idleDetectionPermissionGranted = true;
       }
-      console.log("Idle detection permission granted.");
-      (checkbox as HTMLInputElement).checked = true;
+      const ev = new CustomEvent('idledetectionpermissionchange', {detail: {idleDetectionPermissionGranted}});
+      document.dispatchEvent(ev);
     }
   };
 
@@ -75,6 +80,18 @@ const RoomDialog = ({
           <>
             <p>{t("roomDialog.desc_intro")}</p>
             <p>{`🔒 ${t("roomDialog.desc_privacy")}`}</p>
+            <p>
+              <input
+                id="shareIdleState"
+                type="checkbox"
+                checked={false}
+                hidden={!idleDetectorSupported}
+                onChange={onShareIdleStateChange}
+              />
+              <label htmlFor="shareIdleState" hidden={!idleDetectorSupported}>
+                {t("labels.shareIdleState")}
+              </label>
+            </p>
             <div className="RoomDialog-sessionStartButtonContainer">
               <ToolButton
                 className="RoomDialog-startSession"
@@ -85,18 +102,6 @@ const RoomDialog = ({
                 showAriaLabel={true}
                 onClick={onRoomCreate}
               />
-              <span>
-                <input
-                  id="shareIdleState"
-                  type="checkbox"
-                  checked={false}
-                  hidden={!idleDetectorSupported}
-                  onChange={onShareIdleStateChange}
-                />
-                <label htmlFor="shareIdleState" hidden={!idleDetectorSupported}>
-                  {t("labels.shareIdleState")}
-                </label>
-              </span>
             </div>
           </>
         )}
@@ -132,6 +137,18 @@ const RoomDialog = ({
                 onKeyPress={(event) => event.key === "Enter" && handleClose()}
               />
             </div>
+            <p>
+              <input
+                id="shareIdleState"
+                type="checkbox"
+                checked={idleDetectionPermissionGranted}
+                hidden={!idleDetectorSupported}
+                onChange={onShareIdleStateChange}
+              />
+              <label htmlFor="shareIdleState" hidden={!idleDetectorSupported}>
+                {t("labels.shareIdleState")}
+              </label>
+            </p>
             <p>
               <span role="img" aria-hidden="true" className="RoomDialog-emoji">
                 {"🔒"}

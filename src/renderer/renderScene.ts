@@ -418,9 +418,9 @@ export const renderScene = (
   // Paint remote pointers
   for (const clientId in sceneState.remotePointerViewportCoords) {
     let { x, y } = sceneState.remotePointerViewportCoords[clientId];
-    const username = sceneState.remotePointerUsernames[clientId];
-    const idleState = sceneState.remotePointerIdleStates[clientId];
-    const usernameAndPotentiallyIdleState = idleState ? `${username} (${idleState})` : username;
+
+    x -= appState.offsetLeft;
+    y -= appState.offsetTop;
 
     const width = 9;
     const height = 14;
@@ -474,6 +474,10 @@ export const renderScene = (
     context.lineTo(x, y);
     context.fill();
     context.stroke();
+
+    const username = sceneState.remotePointerUsernames[clientId];
+    const idleState = sceneState.remotePointerIdleStates[clientId];
+    const usernameAndPotentiallyIdleState = idleState ? `${username} (${idleState})` : username;
 
     if (!isOutOfBounds && username) {
       const offsetX = x + width;

@@ -6,23 +6,20 @@ import {
 
 import CollabWrapper from "./CollabWrapper";
 
-import {
-  getElementMap,
-  getSyncableElements,
-} from "../../packages/excalidraw/index";
+import { getSyncableElements } from "../../packages/excalidraw/index";
 import { ExcalidrawElement } from "../../element/types";
 import { BROADCAST, SCENE } from "../app_constants";
 
 class Portal {
-  app: CollabWrapper;
+  collab: CollabWrapper;
   socket: SocketIOClient.Socket | null = null;
   socketInitialized: boolean = false; // we don't want the socket to emit any updates until it is fully initialized
   roomId: string | null = null;
   roomKey: string | null = null;
   broadcastedElementVersions: Map<string, number> = new Map();
 
-  constructor(app: CollabWrapper) {
-    this.app = app;
+  constructor(collab: CollabWrapper) {
+    this.collab = collab;
   }
 
   open(socket: SocketIOClient.Socket, id: string, key: string) {
@@ -30,7 +27,7 @@ class Portal {
     this.roomId = id;
     this.roomKey = key;
 
-    // Initialize socket listeners (moving from App)
+    // Initialize socket listeners
     this.socket.on("init-room", () => {
       if (this.socket) {
         this.socket.emit("join-room", this.roomId);
@@ -39,12 +36,12 @@ class Portal {
     this.socket.on("new-user", async (_socketId: string) => {
       this.broadcastScene(
         SCENE.INIT,
-        getSyncableElements(this.app.getSceneElementsIncludingDeleted()),
+        getSyncableElements(this.collab.getSceneElementsIncludingDeleted()),
         /* syncAll */ true,
       );
     });
     this.socket.on("room-user-change", (clients: string[]) => {
-      this.app.setCollaborators(clients);
+      this.collab.setCollaborators(clients);
     });
   }
 
@@ -125,24 +122,25 @@ class Portal {
       data as SocketUpdateData,
     );
 
-    if (syncAll && this.app.state.isCollaborating) {
+    if (syncAll && this.collab.state.isCollaborating) {
       await Promise.all([
         broadcastPromise,
-        this.app.saveCollabRoomToFirebase(syncableElements),
+        this.collab.saveCollabRoomToFirebase(syncableElements),
       ]);
     } else {
       await broadcastPromise;
     }
   };
 
-  broadcastIdleChange = () => {
+  broadcastIdleChange = (idleState: string) => {
+    console.log('👉', idleState)
     if (this.socket?.id) {
       const data: SocketUpdateDataSource["IDLE_STATUS"] = {
         type: "IDLE_STATUS",
         payload: {
           socketId: this.socket.id,
-          idleState: this.app.state.idleState,
-          username: this.app.state.username,
+          idleState,
+          username: this.collab.state.username,
         },
       };
       return this._broadcastSocketData(
@@ -163,9 +161,9 @@ class Portal {
           socketId: this.socket.id,
           pointer: payload.pointer,
           button: payload.button || "up",
-          selectedElementIds:
-            this.app.excalidrawAppState?.selectedElementIds || {},
-          username: this.app.state.username,
+          selectedElementIds: this.collab.excalidrawAPI.getAppState()
+            .selectedElementIds,
+          username: this.collab.state.username,
         },
       };
       return this._broadcastSocketData(
@@ -173,62 +171,6 @@ class Portal {
         true, // volatile
       );
     }
-  };
-
-  reconcileElements = (
-    sceneElements: readonly ExcalidrawElement[],
-  ): readonly ExcalidrawElement[] => {
-    const currentElements = this.app.getSceneElementsIncludingDeleted();
-    // create a map of ids so we don't have to iterate
-    // over the array more than once.
-    const localElementMap = getElementMap(currentElements);
-
-    // Reconcile
-    return (
-      sceneElements
-        .reduce((elements, element) => {
-          // if the remote element references one that's currently
-          // edited on local, skip it (it'll be added in the next step)
-          if (
-            element.id === this.app.excalidrawAppState?.editingElement?.id ||
-            element.id === this.app.excalidrawAppState?.resizingElement?.id ||
-            element.id === this.app.excalidrawAppState?.draggingElement?.id
-          ) {
-            return elements;
-          }
-
-          if (
-            localElementMap.hasOwnProperty(element.id) &&
-            localElementMap[element.id].version > element.version
-          ) {
-            elements.push(localElementMap[element.id]);
-            delete localElementMap[element.id];
-          } else if (
-            localElementMap.hasOwnProperty(element.id) &&
-            localElementMap[element.id].version === element.version &&
-            localElementMap[element.id].versionNonce !== element.versionNonce
-          ) {
-            // resolve conflicting edits deterministically by taking the one with the lowest versionNonce
-            if (
-              localElementMap[element.id].versionNonce < element.versionNonce
-            ) {
-              elements.push(localElementMap[element.id]);
-            } else {
-              // it should be highly unlikely that the two versionNonces are the same. if we are
-              // really worried about this, we can replace the versionNonce with the socket id.
-              elements.push(element);
-            }
-            delete localElementMap[element.id];
-          } else {
-            elements.push(element);
-            delete localElementMap[element.id];
-          }
-
-          return elements;
-        }, [] as Mutable<typeof sceneElements>)
-        // add local elements that weren't deleted or on remote
-        .concat(...Object.values(localElementMap))
-    );
   };
 }
 

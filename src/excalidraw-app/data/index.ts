@@ -59,6 +59,14 @@ export type SocketUpdateDataSource = {
       username: string;
     };
   };
+  IDLE_STATUS: {
+    type: "IDLE_STATUS";
+    payload: {
+      socketId: string;
+      idleState: string;
+      username: string;
+    }
+  }
 };
 
 export type SocketUpdateDataIncoming =
