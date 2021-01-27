@@ -333,6 +333,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.syncActionResult,
       () => this.state,
       () => this.scene.getElementsIncludingDeleted(),
+      this,
     );
     this.actionManager.registerAll(actions);
 
@@ -3674,7 +3675,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         top: clientY,
         left: clientX,
         actionManager: this.actionManager,
-        canvas: this.canvas,
       });
       return;
     }
@@ -3720,7 +3720,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       top: clientY,
       left: clientX,
       actionManager: this.actionManager,
-      canvas: this.canvas,
     });
   };
 

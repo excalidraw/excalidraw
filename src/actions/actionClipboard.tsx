@@ -21,9 +21,9 @@ export const actionCopy = register({
 
 export const actionCut = register({
   name: "cut",
-  perform: (elements, appState) => {
-    actionCopy.perform(elements, appState, null);
-    return actionDeleteSelected.perform(elements, appState, null);
+  perform: (elements, appState, data, app) => {
+    actionCopy.perform(elements, appState, data, app);
+    return actionDeleteSelected.perform(elements, appState, data, app);
   },
   contextItemLabel: "labels.cut",
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.code === CODES.X,
@@ -31,7 +31,12 @@ export const actionCut = register({
 
 export const actionCopyAsSvg = register({
   name: "copyAsSvg",
-  perform: async (elements, appState, canvas) => {
+  perform: async (elements, appState, _data, app) => {
+    if (!app.canvas) {
+      return {
+        commitToHistory: false,
+      };
+    }
     const selectedElements = getSelectedElements(
       getNonDeletedElements(elements),
       appState,
@@ -43,9 +48,12 @@ export const actionCopyAsSvg = register({
           ? selectedElements
           : getNonDeletedElements(elements),
         appState,
-        canvas,
+        app.canvas,
         appState,
       );
+      return {
+        commitToHistory: false,
+      };
     } catch (error) {
       console.error(error);
       return {
@@ -56,16 +64,18 @@ export const actionCopyAsSvg = register({
         commitToHistory: false,
       };
     }
-    return {
-      commitToHistory: false,
-    };
   },
   contextItemLabel: "labels.copyAsSvg",
 });
 
 export const actionCopyAsPng = register({
   name: "copyAsPng",
-  perform: async (elements, appState, canvas) => {
+  perform: async (elements, appState, _data, app) => {
+    if (!app.canvas) {
+      return {
+        commitToHistory: false,
+      };
+    }
     const selectedElements = getSelectedElements(
       getNonDeletedElements(elements),
       appState,
@@ -77,9 +87,12 @@ export const actionCopyAsPng = register({
           ? selectedElements
           : getNonDeletedElements(elements),
         appState,
-        canvas,
+        app.canvas,
         appState,
       );
+      return {
+        commitToHistory: false,
+      };
     } catch (error) {
       console.error(error);
       return {
@@ -90,9 +103,6 @@ export const actionCopyAsPng = register({
         commitToHistory: false,
       };
     }
-    return {
-      commitToHistory: false,
-    };
   },
   contextItemLabel: "labels.copyAsPng",
 });

@@ -9,19 +9,24 @@ import {
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 
+// This is the <App> component, but for now we don't care about anything but its
+// `canvas` state.
+type App = { canvas: HTMLCanvasElement | null };
+
 export class ActionManager implements ActionsManagerInterface {
   actions = {} as ActionsManagerInterface["actions"];
 
   updater: (actionResult: ActionResult | Promise<ActionResult>) => void;
 
   getAppState: () => Readonly<AppState>;
-
   getElementsIncludingDeleted: () => readonly ExcalidrawElement[];
+  app: App;
 
   constructor(
     updater: UpdaterFn,
     getAppState: () => AppState,
     getElementsIncludingDeleted: () => readonly ExcalidrawElement[],
+    app: App,
   ) {
     this.updater = (actionResult) => {
       if (actionResult && "then" in actionResult) {
@@ -34,6 +39,7 @@ export class ActionManager implements ActionsManagerInterface {
     };
     this.getAppState = getAppState;
     this.getElementsIncludingDeleted = getElementsIncludingDeleted;
+    this.app = app;
   }
 
   registerAction(action: Action) {
@@ -67,17 +73,19 @@ export class ActionManager implements ActionsManagerInterface {
         this.getElementsIncludingDeleted(),
         this.getAppState(),
         null,
+        this.app,
       ),
     );
     return true;
   }
 
-  executeAction(action: Action, data: HTMLCanvasElement | null = null) {
+  executeAction(action: Action) {
     this.updater(
       action.perform(
         this.getElementsIncludingDeleted(),
         this.getAppState(),
-        data,
+        null,
+        this.app,
       ),
     );
   }
@@ -96,6 +104,7 @@ export class ActionManager implements ActionsManagerInterface {
             this.getElementsIncludingDeleted(),
             this.getAppState(),
             formState,
+            this.app,
           ),
         );
       };

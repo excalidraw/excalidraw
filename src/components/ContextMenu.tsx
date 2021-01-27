@@ -14,13 +14,12 @@ import { ActionManager } from "../actions/manager";
 
 type ContextMenuOption = "separator" | Action;
 
-type Props = {
+type ContextMenuProps = {
   options: ContextMenuOption[];
   onCloseRequest?(): void;
   top: number;
   left: number;
   actionManager: ActionManager;
-  canvas: HTMLCanvasElement | null;
 };
 
 const ContextMenu = ({
@@ -29,8 +28,7 @@ const ContextMenu = ({
   top,
   left,
   actionManager,
-  canvas,
-}: Props) => {
+}: ContextMenuProps) => {
   const isDarkTheme = !!document
     .querySelector(".excalidraw")
     ?.classList.contains("Appearance_dark");
@@ -66,14 +64,7 @@ const ContextMenu = ({
                   className={`context-menu-option
                   ${actionName === "deleteSelectedElements" ? "dangerous" : ""}
                   ${option.checked ? "checkmark" : ""}`}
-                  onClick={() => {
-                    actionManager.executeAction(
-                      option,
-                      option.name === "copyAsPng" || option.name === "copyAsSvg"
-                        ? canvas
-                        : null,
-                    );
-                  }}
+                  onClick={() => actionManager.executeAction(option)}
                 >
                   <div className="context-menu-option__label">{label}</div>
                   <div className="context-menu-option__shortcut">
@@ -103,10 +94,9 @@ const getContextMenuNode = (): HTMLDivElement => {
 
 type ContextMenuParams = {
   options: (ContextMenuOption | false | null | undefined)[];
-  top: number;
-  left: number;
-  actionManager: ActionManager;
-  canvas: HTMLCanvasElement | null;
+  top: ContextMenuProps["top"];
+  left: ContextMenuProps["left"];
+  actionManager: ContextMenuProps["actionManager"];
 };
 
 const handleClose = () => {
@@ -129,7 +119,6 @@ export default {
           options={options}
           onCloseRequest={handleClose}
           actionManager={params.actionManager}
-          canvas={params.canvas}
         />,
         getContextMenuNode(),
       );
