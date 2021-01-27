@@ -200,25 +200,25 @@
     "title": "错误"
   },
   "helpDialog": {
-    "blog": "",
-    "click": "",
-    "curvedArrow": "",
-    "curvedLine": "",
-    "documentation": "",
-    "drag": "",
-    "editor": "",
-    "github": "",
-    "howto": "",
-    "or": "",
-    "preventBinding": "",
-    "shapes": "",
-    "shortcuts": "",
-    "textFinish": "",
-    "textNewLine": "",
-    "title": "",
-    "view": "",
-    "zoomToFit": "",
-    "zoomToSelection": ""
+    "blog": "浏览我们的博客",
+    "click": "单击",
+    "curvedArrow": "曲线箭头",
+    "curvedLine": "曲线",
+    "documentation": "文档",
+    "drag": "拖动",
+    "editor": "编辑器",
+    "github": "提交问题",
+    "howto": "帮助文档",
+    "or": "或",
+    "preventBinding": "禁用箭头吸附",
+    "shapes": "形状",
+    "shortcuts": "快捷键列表",
+    "textFinish": "完成文本编辑",
+    "textNewLine": "文本换行",
+    "title": "帮助",
+    "view": "视图",
+    "zoomToFit": "缩放以适应所有元素",
+    "zoomToSelection": "缩放到选区"
   },
   "encrypted": {
     "tooltip": "您的绘图采用的端到端加密，其内容对于Excalidraw服务器是不可见的。"
@@ -236,7 +236,7 @@
     "width": "宽度"
   },
   "toast": {
-    "copyStyles": "",
-    "copyToClipboardAsPng": ""
+    "copyStyles": "复制样式",
+    "copyToClipboardAsPng": "复制为 PNG 到剪贴板"
   }
 }
