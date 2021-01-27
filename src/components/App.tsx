@@ -106,6 +106,7 @@ import {
   actionSelectAll,
   actionToggleGridMode,
   actionToggleStats,
+  actionToggleZenMode,
 } from "../actions";
 
 import {
@@ -1149,15 +1150,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   toggleZenMode = () => {
-    this.setState({
-      zenModeEnabled: !this.state.zenModeEnabled,
-    });
+    this.actionManager.executeAction(actionToggleZenMode);
   };
 
   toggleGridMode = () => {
-    this.setState({
-      gridSize: this.state.gridSize ? null : GRID_SIZE,
-    });
+    this.actionManager.executeAction(actionToggleGridMode);
   };
 
   toggleStats = () => {
@@ -3659,17 +3656,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           actionSelectAll,
           separator,
           actionToggleGridMode,
-          {
-            name: "zenMode",
-            perform: (elements, appState) => {
-              this.toggleZenMode();
-              return {
-                commitToHistory: false,
-              };
-            },
-            checked: this.state.zenModeEnabled,
-            contextItemLabel: "buttons.zenMode",
-          },
+          actionToggleZenMode,
           actionToggleStats,
         ],
         top: clientY,
