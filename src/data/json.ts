@@ -1,4 +1,4 @@
-import { fileOpen, fileSave } from "browser-nativefs";
+import { fileOpen, fileSave } from "browser-fs-access";
 import { cleanAppStateForExport } from "../appState";
 import { MIME_TYPES } from "../constants";
 import { clearElementsForExport } from "../element";

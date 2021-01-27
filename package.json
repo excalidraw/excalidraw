@@ -27,7 +27,7 @@
     "@types/react": "17.0.0",
     "@types/react-dom": "17.0.0",
     "@types/socket.io-client": "1.4.35",
-    "browser-nativefs": "0.12.0",
+    "browser-fs-access": "0.13.0",
     "clsx": "1.1.1",
     "firebase": "8.2.4",
     "i18next-browser-languagedetector": "6.0.1",
@@ -72,7 +72,7 @@
   },
   "jest": {
     "transformIgnorePatterns": [
-      "node_modules/(?!(roughjs|points-on-curve|path-data-parser|points-on-path|browser-nativefs)/)"
+      "node_modules/(?!(roughjs|points-on-curve|path-data-parser|points-on-path|browser-fs-access)/)"
     ],
     "resetMocks": false
   },

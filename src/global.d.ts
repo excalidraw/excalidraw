@@ -85,6 +85,6 @@ type ForwardRef<T, P = any> = Parameters<
 // --------------------------------------------------------------------------—
 
 interface Blob {
-  handle?: import("browser-nativefs").FileSystemHandle;
+  handle?: import("browser-fs-acces").FileSystemHandle;
   name?: string;
 }

@@ -1,4 +1,4 @@
-import { fileSave } from "browser-nativefs";
+import { fileSave } from "browser-fs-access";
 import {
   copyCanvasToClipboardAsPng,
   copyTextToSystemClipboard,
