@@ -9,9 +9,10 @@
     list-style: none;
     user-select: none;
     margin: -0.25rem 0 0 0.125rem;
-    padding: 0.25rem 0;
+    padding: 0.5rem 0;
     background-color: var(--popup-secondary-background-color);
     border: 1px solid var(--button-gray-3);
+    cursor: default;
   }
 
   .context-menu button {
@@ -87,5 +88,10 @@
         display: none;
       }
     }
+  }
+
+  .context-menu-option-separator {
+    border: none;
+    border-top: 1px solid $oc-gray-5;
   }
 }
