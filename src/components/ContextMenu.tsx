@@ -53,28 +53,23 @@ const ContextMenu = ({
         >
           {options.map((option, idx) => {
             if (option === "separator") {
-              return (
-                <hr key={idx} className="context-menu-option-separator"></hr>
-              );
+              return <hr key={idx} className="context-menu-option-separator" />;
             }
 
-            const action = option;
-            const shortcutName = action.name;
-            const label = action.contextItemLabel
-              ? t(action.contextItemLabel)
+            const actionName = option.name;
+            const label = option.contextItemLabel
+              ? t(option.contextItemLabel)
               : "";
             return (
-              <li key={idx} data-testid={shortcutName} onClick={onCloseRequest}>
+              <li key={idx} data-testid={actionName} onClick={onCloseRequest}>
                 <button
-                  className={`context-menu-option 
-                  ${
-                    shortcutName === "deleteSelectedElements" ? "dangerous" : ""
-                  }
-                  ${action.checked ? "checkmark" : ""}`}
+                  className={`context-menu-option
+                  ${actionName === "deleteSelectedElements" ? "dangerous" : ""}
+                  ${option.checked ? "checkmark" : ""}`}
                   onClick={() => {
                     actionManager.executeAction(
-                      action,
-                      action.name === "copyAsPng" || action.name === "copyAsSvg"
+                      option,
+                      option.name === "copyAsPng" || option.name === "copyAsSvg"
                         ? canvas
                         : null,
                     );
@@ -82,10 +77,8 @@ const ContextMenu = ({
                 >
                   <div className="context-menu-option__label">{label}</div>
                   <div className="context-menu-option__shortcut">
-                    {shortcutName
-                      ? getShortcutFromShortcutName(
-                          shortcutName as ShortcutName,
-                        )
+                    {actionName
+                      ? getShortcutFromShortcutName(actionName as ShortcutName)
                       : ""}
                   </div>
                 </button>
