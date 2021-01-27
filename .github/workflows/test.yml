@@ -1,7 +1,6 @@
 name: Tests
 
-on:
-  push:
+on: push
 
 jobs:
   test:
