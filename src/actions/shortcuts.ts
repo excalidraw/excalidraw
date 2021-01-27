@@ -9,7 +9,7 @@ export type ShortcutName =
   | "copyStyles"
   | "pasteStyles"
   | "selectAll"
-  | "delete"
+  | "deleteSelectedElements"
   | "duplicateSelection"
   | "sendBackward"
   | "bringForward"
@@ -31,7 +31,7 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   copyStyles: [getShortcutKey("CtrlOrCmd+Alt+C")],
   pasteStyles: [getShortcutKey("CtrlOrCmd+Alt+V")],
   selectAll: [getShortcutKey("CtrlOrCmd+A")],
-  delete: [getShortcutKey("Del")],
+  deleteSelectedElements: [getShortcutKey("Del")],
   duplicateSelection: [
     getShortcutKey("CtrlOrCmd+D"),
     getShortcutKey(`Alt+${t("helpDialog.drag")}`),

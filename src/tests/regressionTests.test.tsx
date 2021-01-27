@@ -618,6 +618,7 @@ describe("regression tests", () => {
       clientY: 1,
     });
     const contextMenu = document.querySelector(".context-menu");
+    const contextMenuOptions = document.querySelectorAll(".context-menu li");
     const expectedShortcutNames: ShortcutName[] = [
       "selectAll",
       "gridMode",
@@ -626,7 +627,7 @@ describe("regression tests", () => {
     ];
 
     expect(contextMenu).not.toBeNull();
-    expect(contextMenu?.children.length).toBe(expectedShortcutNames.length);
+    expect(contextMenuOptions.length).toBe(expectedShortcutNames.length);
     expectedShortcutNames.forEach((shortcutName) => {
       expect(
         contextMenu?.querySelector(`li[data-testid="${shortcutName}"]`),
@@ -645,11 +646,12 @@ describe("regression tests", () => {
       clientY: 1,
     });
     const contextMenu = document.querySelector(".context-menu");
+    const contextMenuOptions = document.querySelectorAll(".context-menu li");
     const expectedShortcutNames: ShortcutName[] = [
       "cut",
       "copyStyles",
       "pasteStyles",
-      "delete",
+      "deleteSelectedElements",
       "addToLibrary",
       "sendBackward",
       "bringForward",
@@ -659,7 +661,7 @@ describe("regression tests", () => {
     ];
 
     expect(contextMenu).not.toBeNull();
-    expect(contextMenu?.children.length).toBe(expectedShortcutNames.length);
+    expect(contextMenuOptions.length).toBe(expectedShortcutNames.length);
     expectedShortcutNames.forEach((shortcutName) => {
       expect(
         contextMenu?.querySelector(`li[data-testid="${shortcutName}"]`),
@@ -689,11 +691,12 @@ describe("regression tests", () => {
     });
 
     const contextMenu = document.querySelector(".context-menu");
+    const contextMenuOptions = document.querySelectorAll(".context-menu li");
     const expectedShortcutNames: ShortcutName[] = [
       "cut",
       "copyStyles",
       "pasteStyles",
-      "delete",
+      "deleteSelectedElements",
       "group",
       "addToLibrary",
       "sendBackward",
@@ -704,7 +707,7 @@ describe("regression tests", () => {
     ];
 
     expect(contextMenu).not.toBeNull();
-    expect(contextMenu?.children.length).toBe(expectedShortcutNames.length);
+    expect(contextMenuOptions.length).toBe(expectedShortcutNames.length);
     expectedShortcutNames.forEach((shortcutName) => {
       expect(
         contextMenu?.querySelector(`li[data-testid="${shortcutName}"]`),
@@ -738,11 +741,12 @@ describe("regression tests", () => {
     });
 
     const contextMenu = document.querySelector(".context-menu");
+    const contextMenuOptions = document.querySelectorAll(".context-menu li");
     const expectedShortcutNames: ShortcutName[] = [
       "cut",
       "copyStyles",
       "pasteStyles",
-      "delete",
+      "deleteSelectedElements",
       "ungroup",
       "addToLibrary",
       "sendBackward",
@@ -753,7 +757,7 @@ describe("regression tests", () => {
     ];
 
     expect(contextMenu).not.toBeNull();
-    expect(contextMenu?.children.length).toBe(expectedShortcutNames.length);
+    expect(contextMenuOptions.length).toBe(expectedShortcutNames.length);
     expectedShortcutNames.forEach((shortcutName) => {
       expect(
         contextMenu?.querySelector(`li[data-testid="${shortcutName}"]`),

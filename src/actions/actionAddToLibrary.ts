@@ -17,6 +17,5 @@ export const actionAddToLibrary = register({
     });
     return false;
   },
-  contextMenuOrder: 6,
   contextItemLabel: "labels.addToLibrary",
 });
