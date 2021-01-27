@@ -3,6 +3,28 @@ import React from "react";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
 import "../actions";
+import {
+  actionAddToLibrary,
+  actionBringForward,
+  actionBringToFront,
+  actionCopy,
+  actionCopyAsPng,
+  actionCopyAsSvg,
+  actionCopyStyles,
+  actionCut,
+  actionDeleteSelected,
+  actionDuplicateSelection,
+  actionFinalize,
+  actionGroup,
+  actionPasteStyles,
+  actionSelectAll,
+  actionSendBackward,
+  actionSendToBack,
+  actionToggleGridMode,
+  actionToggleStats,
+  actionToggleZenMode,
+  actionUngroup,
+} from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
@@ -24,7 +46,6 @@ import {
   ELEMENT_TRANSLATE_AMOUNT,
   ENV,
   EVENT,
-  GRID_SIZE,
   LINE_CONFIRM_THRESHOLD,
   MIME_TYPES,
   POINTER_BUTTON,
@@ -85,30 +106,6 @@ import {
   isLinearElement,
   isLinearElementType,
 } from "../element/typeChecks";
-
-import {
-  actionCut,
-  actionCopy,
-  actionCopyAsPng,
-  actionCopyAsSvg,
-  actionCopyStyles,
-  actionPasteStyles,
-  actionGroup,
-  actionUngroup,
-  actionAddToLibrary,
-  actionBringForward,
-  actionBringToFront,
-  actionSendBackward,
-  actionSendToBack,
-  actionFinalize,
-  actionDuplicateSelection,
-  actionDeleteSelected,
-  actionSelectAll,
-  actionToggleGridMode,
-  actionToggleStats,
-  actionToggleZenMode,
-} from "../actions";
-
 import {
   ExcalidrawBindableElement,
   ExcalidrawElement,
