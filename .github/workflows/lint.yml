@@ -2,8 +2,6 @@ name: Lint
 
 on:
   push:
-    branches:
-      - master
   pull_request:
 
 jobs:
@@ -13,10 +11,10 @@ jobs:
     steps:
       - uses: actions/checkout@v1
 
-      - name: Setup Node.js 12.x
+      - name: Setup Node.js 14.x
         uses: actions/setup-node@v1
         with:
-          node-version: 12.x
+          node-version: 14.x
 
       - name: Install and lint
         run: |
@@ -24,5 +22,3 @@ jobs:
           npm run test:other
           npm run test:code
           npm run test:typecheck
-        env:
-          CI: true
