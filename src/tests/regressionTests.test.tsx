@@ -648,7 +648,6 @@ describe("regression tests", () => {
     const contextMenu = document.querySelector(".context-menu");
     const contextMenuOptions = document.querySelectorAll(".context-menu li");
     const expectedShortcutNames: ShortcutName[] = [
-      "cut",
       "copyStyles",
       "pasteStyles",
       "deleteSelectedElements",
@@ -693,7 +692,6 @@ describe("regression tests", () => {
     const contextMenu = document.querySelector(".context-menu");
     const contextMenuOptions = document.querySelectorAll(".context-menu li");
     const expectedShortcutNames: ShortcutName[] = [
-      "cut",
       "copyStyles",
       "pasteStyles",
       "deleteSelectedElements",
@@ -743,7 +741,6 @@ describe("regression tests", () => {
     const contextMenu = document.querySelector(".context-menu");
     const contextMenuOptions = document.querySelectorAll(".context-menu li");
     const expectedShortcutNames: ShortcutName[] = [
-      "cut",
       "copyStyles",
       "pasteStyles",
       "deleteSelectedElements",
