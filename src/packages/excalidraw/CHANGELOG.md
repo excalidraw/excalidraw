@@ -22,6 +22,7 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
+- Remove `copy`, `cut`, and `paste` actions from contextmenu [#2872](https://github.com/excalidraw/excalidraw/pull/2872)
 - Support `Ctrl-Y` shortcut to redo on Windows [#2831](https://github.com/excalidraw/excalidraw/pull/2831).
 
 ### Fixes
