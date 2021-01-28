@@ -3,7 +3,7 @@ import variables from "./css/variables.module.scss";
 
 const context = React.createContext(false);
 
-export const getIsMobileMatcher = () => {
+const getIsMobileMatcher = () => {
   return window.matchMedia
     ? window.matchMedia(variables.isMobileQuery)
     : (({
@@ -32,6 +32,8 @@ export const IsMobileProvider = ({
 
   return <context.Provider value={isMobile}>{children}</context.Provider>;
 };
+
+export const isMobile = getIsMobileMatcher().matches;
 
 export default function useIsMobile() {
   return useContext(context);

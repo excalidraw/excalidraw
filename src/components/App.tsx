@@ -174,7 +174,7 @@ import {
   viewportCoordsToSceneCoords,
   withBatchedUpdates,
 } from "../utils";
-import { getIsMobileMatcher } from "../is-mobile";
+import { isMobile } from "../is-mobile";
 import ContextMenu from "./ContextMenu";
 import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
@@ -3630,7 +3630,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     const elements = this.scene.getElements();
     const element = this.getElementAtPosition(x, y);
-    const isMobile = getIsMobileMatcher().matches;
     if (!element) {
       ContextMenu.push({
         options: [
