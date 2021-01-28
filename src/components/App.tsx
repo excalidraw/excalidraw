@@ -3628,12 +3628,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     const separator = "separator";
 
+    const _isMobile = isMobile();
+
     const elements = this.scene.getElements();
     const element = this.getElementAtPosition(x, y);
     if (!element) {
       ContextMenu.push({
         options: [
-          isMobile &&
+          _isMobile &&
             navigator.clipboard && {
               name: "paste",
               perform: (elements, appStates) => {
@@ -3644,7 +3646,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               },
               contextItemLabel: "labels.paste",
             },
-          isMobile && navigator.clipboard && separator,
+          _isMobile && navigator.clipboard && separator,
           probablySupportsClipboardBlob &&
             elements.length > 0 &&
             actionCopyAsPng,
@@ -3673,9 +3675,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     ContextMenu.push({
       options: [
-        isMobile && actionCut,
-        isMobile && navigator.clipboard && actionCopy,
-        isMobile &&
+        _isMobile && actionCut,
+        _isMobile && navigator.clipboard && actionCopy,
+        _isMobile &&
           navigator.clipboard && {
             name: "paste",
             perform: (elements, appStates) => {
@@ -3686,7 +3688,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             },
             contextItemLabel: "labels.paste",
           },
-        isMobile && separator,
+        _isMobile && separator,
         probablySupportsClipboardBlob && actionCopyAsPng,
         probablySupportsClipboardWriteText && actionCopyAsSvg,
         separator,

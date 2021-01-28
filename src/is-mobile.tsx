@@ -33,7 +33,7 @@ export const IsMobileProvider = ({
   return <context.Provider value={isMobile}>{children}</context.Provider>;
 };
 
-export const isMobile = getIsMobileMatcher().matches;
+export const isMobile = () => getIsMobileMatcher().matches;
 
 export default function useIsMobile() {
   return useContext(context);
