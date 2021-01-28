@@ -65,8 +65,8 @@ export type SocketUpdateDataSource = {
       socketId: string;
       idleState: string;
       username: string;
-    }
-  }
+    };
+  };
 };
 
 export type SocketUpdateDataIncoming =

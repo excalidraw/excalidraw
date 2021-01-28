@@ -14,6 +14,12 @@ declare global {
 
 const idleDetectorSupported: boolean = "IdleDetector" in window;
 let idleDetectionPermissionGranted: boolean = false;
+(async () => {
+  const granted =
+    (await navigator.permissions.query({ name: "idle-detection" as any }))
+      .state === "granted";
+  idleDetectionPermissionGranted = idleDetectorSupported ? granted : false;
+})();
 
 const RoomDialog = ({
   handleClose,
@@ -68,8 +74,10 @@ const RoomDialog = ({
         (checkbox as HTMLInputElement).checked = true;
         idleDetectionPermissionGranted = true;
       }
-      const ev = new CustomEvent('idledetectionpermissionchange', {detail: {idleDetectionPermissionGranted}});
-      document.dispatchEvent(ev);
+      const ev = new CustomEvent("idledetectionpermissionchange", {
+        detail: { permission: idleDetectionPermissionGranted },
+      });
+      window.dispatchEvent(ev);
     }
   };
 

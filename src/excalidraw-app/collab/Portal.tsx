@@ -133,7 +133,7 @@ class Portal {
   };
 
   broadcastIdleChange = (idleState: string) => {
-    console.log('👉', idleState)
+    console.log("👉", idleState);
     if (this.socket?.id) {
       const data: SocketUpdateDataSource["IDLE_STATUS"] = {
         type: "IDLE_STATUS",
@@ -148,7 +148,7 @@ class Portal {
         true, // volatile
       );
     }
-  }
+  };
 
   broadcastMouseLocation = (payload: {
     pointer: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointer"];

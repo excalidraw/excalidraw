@@ -71,6 +71,12 @@ declare global {
   }
 }
 
+declare global {
+  interface WindowEventMap {
+    idledetectionpermissionchange: CustomEvent;
+  }
+}
+
 const {
   Context: CollabContext,
   Consumer: CollabContextConsumer,
@@ -81,6 +87,7 @@ export { CollabContext, CollabContextConsumer };
 
 class CollabWrapper extends PureComponent<Props, CollabState> {
   portal: Portal;
+  signal: AbortSignal | null;
   excalidrawAPI: Props["excalidrawAPI"];
   private socketInitializationTimer?: NodeJS.Timeout;
   private lastBroadcastedOrReceivedSceneVersion: number = -1;
@@ -98,12 +105,16 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     };
     this.portal = new Portal(this);
     this.excalidrawAPI = props.excalidrawAPI;
+    this.signal = null;
     if (idleDetectorSupported) {
-      document.addEventListener('idledetectionpermissionchange', (event: CustomEvent) => {
-        if (event.detail.idleDetectionPermissionGranted) {
-          this.initializeIdleDetector();
-        }
-      });
+      window.addEventListener(
+        "idledetectionpermissionchange",
+        (event: CustomEvent) => {
+          if (event.detail.permission) {
+            this.initializeIdleDetector();
+          }
+        },
+      );
     }
   }
 
@@ -295,7 +306,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
               break;
             }
             case "IDLE_STATUS": {
-              const {idleState, socketId, username} = decryptedData.payload;
+              const { idleState, socketId, username } = decryptedData.payload;
               const collaborators = new Map(this.collaborators);
               const user = collaborators.get(socketId) || {}!;
               user.idleState = idleState;
@@ -305,7 +316,6 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
               });
               break;
             }
-
           }
         },
       );
@@ -426,7 +436,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     }
     try {
       const controller = new AbortController();
-      const signal = controller.signal;
+      this.signal = controller.signal;
 
       const idleDetector = new window.IdleDetector();
       idleDetector.addEventListener("change", () => {
@@ -438,7 +448,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
       await idleDetector.start({
         threshold: 60000,
-        signal,
+        signal: this.signal,
       });
       console.log("IdleDetector is active.");
     } catch (err) {

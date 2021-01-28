@@ -477,7 +477,9 @@ export const renderScene = (
 
     const username = sceneState.remotePointerUsernames[clientId];
     const idleState = sceneState.remotePointerIdleStates[clientId];
-    const usernameAndPotentiallyIdleState = idleState ? `${username} (${idleState})` : username;
+    const usernameAndPotentiallyIdleState = idleState
+      ? `${username} (${idleState})`
+      : username;
 
     if (!isOutOfBounds && username) {
       const offsetX = x + width;
