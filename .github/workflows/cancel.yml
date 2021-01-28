@@ -1,9 +1,11 @@
-name: Cancel
-on: [push]
+name: Cancel previous runs
+
+on: push
+
 jobs:
   cancel:
-    name: "Cancel Previous Runs"
     runs-on: ubuntu-latest
+
     timeout-minutes: 3
     steps:
       - uses: styfle/cancel-workflow-action@0.6.0
