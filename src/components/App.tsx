@@ -1160,9 +1160,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (!this.state.showStats) {
       trackEvent("dialog", "stats");
     }
-    this.setState({
-      showStats: !this.state.showStats,
-    });
+    this.actionManager.executeAction(actionToggleStats);
   };
 
   setScrollToCenter = (remoteElements: readonly ExcalidrawElement[]) => {
