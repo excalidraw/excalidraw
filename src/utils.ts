@@ -369,12 +369,3 @@ export const getVersion = () => {
     DEFAULT_VERSION
   );
 };
-
-export const getWhetherMobile = () => {
-  const match = window.matchMedia;
-  if (match) {
-    const mediaQuery = match("(pointer: coarse)");
-    return mediaQuery.matches;
-  }
-  return false;
-};

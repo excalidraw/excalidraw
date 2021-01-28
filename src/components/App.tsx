@@ -162,7 +162,6 @@ import {
 import {
   debounce,
   distance,
-  getWhetherMobile,
   isInputLike,
   isToolIcon,
   isWritableElement,
@@ -175,6 +174,7 @@ import {
   viewportCoordsToSceneCoords,
   withBatchedUpdates,
 } from "../utils";
+import { getIsMobileMatcher } from "../is-mobile";
 import ContextMenu from "./ContextMenu";
 import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
@@ -3630,7 +3630,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     const elements = this.scene.getElements();
     const element = this.getElementAtPosition(x, y);
-    const isMobile = getWhetherMobile();
+    const isMobile = getIsMobileMatcher().matches;
     if (!element) {
       ContextMenu.push({
         options: [
@@ -3674,7 +3674,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     ContextMenu.push({
       options: [
-        actionCut,
+        isMobile && actionCut,
         isMobile && navigator.clipboard && actionCopy,
         isMobile &&
           navigator.clipboard && {
@@ -3687,7 +3687,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             },
             contextItemLabel: "labels.paste",
           },
-        separator,
+        isMobile && separator,
         probablySupportsClipboardBlob && actionCopyAsPng,
         probablySupportsClipboardWriteText && actionCopyAsSvg,
         separator,
