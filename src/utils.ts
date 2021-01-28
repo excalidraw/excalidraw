@@ -9,6 +9,7 @@ import { FontFamily, FontString } from "./element/types";
 import { Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
 import { isDarwin } from "./keys";
+import variables from "./css/variables.module.scss";
 
 export const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -368,4 +369,13 @@ export const getVersion = () => {
     document.querySelector<HTMLMetaElement>('meta[name="version"]')?.content ||
     DEFAULT_VERSION
   );
+};
+
+export const getWhetherMobile = () => {
+  const match = window.matchMedia;
+  if (match) {
+    const mediaQuery = match(variables.isMobileQuery);
+    return mediaQuery.matches;
+  }
+  return false;
 };

@@ -162,6 +162,7 @@ import {
 import {
   debounce,
   distance,
+  getWhetherMobile,
   isInputLike,
   isToolIcon,
   isWritableElement,
@@ -3629,20 +3630,22 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     const elements = this.scene.getElements();
     const element = this.getElementAtPosition(x, y);
+    const isMobile = getWhetherMobile();
     if (!element) {
       ContextMenu.push({
         options: [
-          navigator.clipboard && {
-            name: "paste",
-            perform: (elements, appStates) => {
-              this.pasteFromClipboard(null);
-              return {
-                commitToHistory: false,
-              };
+          isMobile &&
+            navigator.clipboard && {
+              name: "paste",
+              perform: (elements, appStates) => {
+                this.pasteFromClipboard(null);
+                return {
+                  commitToHistory: false,
+                };
+              },
+              contextItemLabel: "labels.paste",
             },
-            contextItemLabel: "labels.paste",
-          },
-          separator,
+          isMobile && navigator.clipboard && separator,
           probablySupportsClipboardBlob &&
             elements.length > 0 &&
             actionCopyAsPng,
@@ -3672,17 +3675,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     ContextMenu.push({
       options: [
         actionCut,
-        navigator.clipboard && actionCopy,
-        navigator.clipboard && {
-          name: "paste",
-          perform: (elements, appStates) => {
-            this.pasteFromClipboard(null);
-            return {
-              commitToHistory: false,
-            };
+        isMobile && navigator.clipboard && actionCopy,
+        isMobile &&
+          navigator.clipboard && {
+            name: "paste",
+            perform: (elements, appStates) => {
+              this.pasteFromClipboard(null);
+              return {
+                commitToHistory: false,
+              };
+            },
+            contextItemLabel: "labels.paste",
           },
-          contextItemLabel: "labels.paste",
-        },
         separator,
         probablySupportsClipboardBlob && actionCopyAsPng,
         probablySupportsClipboardWriteText && actionCopyAsSvg,
