@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
+import variables from "./css/variables.module.scss";
 
 const context = React.createContext(false);
 
@@ -10,10 +11,7 @@ export const IsMobileProvider = ({
   const query = useRef<MediaQueryList>();
   if (!query.current) {
     query.current = window.matchMedia
-      ? window.matchMedia(
-          // keep up to date with _variables.scss
-          "(max-width: 600px), (max-height: 500px) and (max-width: 1000px)",
-        )
+      ? window.matchMedia(variables.isMobileQuery)
       : (({
           matches: false,
           addListener: () => {},
