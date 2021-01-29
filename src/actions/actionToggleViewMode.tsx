@@ -2,18 +2,18 @@ import { CODES, KEYS } from "../keys";
 import { register } from "./register";
 
 export const actionToggleViewMode = register({
-  name: "zenMode",
+  name: "viewMode",
   perform(elements, appState) {
-    this.checked = !this.checked;
     return {
       appState: {
         ...appState,
-        zenModeEnabled: this.checked,
+        viewModeEnabled: !this.checked!(appState),
       },
       commitToHistory: false,
     };
   },
-  checked: false,
-  contextItemLabel: "labels.readonly",
-  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.code === CODES.QUOTE,
+  checked: (appState) => appState.viewModeEnabled,
+  contextItemLabel: "labels.viewMode",
+  keyTest: (event) =>
+    !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.R,
 });

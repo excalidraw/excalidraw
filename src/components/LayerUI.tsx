@@ -61,7 +61,7 @@ interface LayerUIProps {
     canvas: HTMLCanvasElement | null,
   ) => void;
   renderCustomFooter?: (isMobile: boolean) => JSX.Element;
-  readonly?: boolean;
+  viewModeEnabled?: boolean;
 }
 
 const useOnClickOutside = (
@@ -300,7 +300,7 @@ const LayerUI = ({
   isCollaborating,
   onExportToBackend,
   renderCustomFooter,
-  readonly,
+  viewModeEnabled,
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
@@ -360,7 +360,7 @@ const LayerUI = ({
     );
   };
 
-  const renderReadonlyCanvasActions = () => {
+  const renderViewModeCanvasActions = () => {
     return (
       <Section
         heading="canvasActions"
@@ -472,10 +472,12 @@ const LayerUI = ({
             gap={4}
             className={clsx({ "disable-pointerEvents": zenModeEnabled })}
           >
-            {readonly ? renderReadonlyCanvasActions() : renderCanvasActions()}
+            {viewModeEnabled
+              ? renderViewModeCanvasActions()
+              : renderCanvasActions()}
             {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
           </Stack.Col>
-          {!readonly && (
+          {!viewModeEnabled && (
             <Section heading="shapes">
               {(heading) => (
                 <Stack.Col gap={4} align="start">
@@ -639,7 +641,7 @@ const LayerUI = ({
         canvas={canvas}
         isCollaborating={isCollaborating}
         renderCustomFooter={renderCustomFooter}
-        readonly={readonly}
+        viewModeEnabled={viewModeEnabled}
       />
     </>
   ) : (

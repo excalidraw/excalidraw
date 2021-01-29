@@ -72,7 +72,7 @@ export const getDefaultAppState = (): Omit<
     width: window.innerWidth,
     zenModeEnabled: false,
     zoom: { value: 1 as NormalizedZoomValue, translation: { x: 0, y: 0 } },
-    readonly: false,
+    viewModeEnabled: false,
   };
 };
 
@@ -152,7 +152,7 @@ const APP_STATE_STORAGE_CONF = (<
   width: { browser: false, export: false },
   zenModeEnabled: { browser: true, export: false },
   zoom: { browser: true, export: false },
-  readonly: { browser: true, export: false },
+  viewModeEnabled: { browser: true, export: false },
 });
 
 const _clearAppStateForStorage = <ExportType extends "export" | "browser">(

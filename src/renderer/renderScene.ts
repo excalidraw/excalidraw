@@ -373,7 +373,7 @@ export const renderScene = (
         sceneState.zoom,
         "mouse", // when we render we don't know which pointer type so use mouse
       );
-      if (!appState.readonly) {
+      if (!appState.viewModeEnabled) {
         renderTransformHandles(
           context,
           sceneState,

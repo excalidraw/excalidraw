@@ -181,6 +181,7 @@ import ContextMenu, { ContextMenuOption } from "./ContextMenu";
 import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
 import { Toast } from "./Toast";
+import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 
 const { history } = createHistory();
 
@@ -297,7 +298,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       offsetLeft,
       offsetTop,
       excalidrawRef,
-      readonly = false,
     } = props;
     this.state = {
       ...defaultAppState,
@@ -305,7 +305,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       width,
       height,
       ...this.getCanvasOffsets({ offsetLeft, offsetTop }),
-      readonly,
     };
     if (excalidrawRef) {
       const readyPromise =
@@ -351,11 +350,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const {
       width: canvasDOMWidth,
       height: canvasDOMHeight,
-      readonly,
+      viewModeEnabled,
     } = this.state;
     const canvasWidth = canvasDOMWidth * canvasScale;
     const canvasHeight = canvasDOMHeight * canvasScale;
-    if (readonly) {
+    if (viewModeEnabled) {
       return (
         <canvas
           id="canvas"
@@ -409,7 +408,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       height: canvasDOMHeight,
       offsetTop,
       offsetLeft,
-      readonly,
+      viewModeEnabled,
     } = this.state;
 
     const { onCollabButtonClick, onExportToBackend, renderFooter } = this.props;
@@ -419,7 +418,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     return (
       <div
-        className={clsx("excalidraw", { "excalidraw--readonly": readonly })}
+        className={clsx("excalidraw", {
+          "excalidraw--viewMode": viewModeEnabled,
+        })}
         ref={this.excalidrawContainerRef}
         style={{
           width: canvasDOMWidth,
@@ -449,7 +450,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           isCollaborating={this.props.isCollaborating || false}
           onExportToBackend={onExportToBackend}
           renderCustomFooter={renderFooter}
-          readonly={readonly}
+          viewModeEnabled={viewModeEnabled}
         />
         {this.state.showStats && (
           <Stats
@@ -513,7 +514,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             height: state.height,
             offsetTop: state.offsetTop,
             offsetLeft: state.offsetLeft,
-            readonly: state.readonly,
           }),
           () => {
             if (actionResult.syncHistory) {
@@ -648,7 +648,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           height: this.state.height,
           offsetTop: this.state.offsetTop,
           offsetLeft: this.state.offsetLeft,
-          readonly: this.state.readonly,
         },
         null,
       ),
@@ -789,7 +788,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.onGestureEnd as any,
       false,
     );
-    if (this.state.readonly) {
+    if (this.state.viewModeEnabled) {
       return;
     }
 
@@ -821,13 +820,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         height: this.props.height ?? window.innerHeight,
         ...this.getCanvasOffsets(this.props),
       });
-    }
-
-    if (prevProps.readonly !== this.props.readonly) {
-      this.setState(
-        { readonly: !!this.props.readonly },
-        this.addEventListeners,
-      );
     }
 
     document
@@ -1212,10 +1204,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.actionManager.executeAction(actionToggleStats);
   };
 
-  toggleReadonlyMode = () => {
+  toggleViewMode = () => {
     this.setState(
       {
-        readonly: !this.state.readonly,
+        viewModeEnabled: !this.state.viewModeEnabled,
       },
       this.addEventListeners,
     );
@@ -1295,7 +1287,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     if (!event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.R) {
-      this.toggleReadonlyMode();
+      this.toggleViewMode();
     }
 
     if (
@@ -1318,16 +1310,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       return;
     }
 
-    if (this.state.readonly) {
+    if (this.state.viewModeEnabled) {
       return;
     }
 
-    if (!event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.Z) {
-      this.toggleZenMode();
-    }
-    if (event[KEYS.CTRL_OR_CMD] && event.code === CODES.QUOTE) {
-      this.toggleGridMode();
-    }
     if (event[KEYS.CTRL_OR_CMD]) {
       this.setState({ isBindingEnabled: false });
     }
@@ -2142,7 +2128,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     lastPointerUp = onPointerUp;
 
-    if (!this.state.readonly) {
+    if (!this.state.viewModeEnabled) {
       window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
       window.addEventListener(EVENT.POINTER_UP, onPointerUp);
       window.addEventListener(EVENT.KEYDOWN, onKeyDown);
@@ -3705,19 +3691,21 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       options.push(actionCopyAsSvg);
     }
     if (!element) {
-      const readonlyOptions: ContextMenuOption[] = [
+      const viewModeOptions: ContextMenuOption[] = [
         ...options,
         actionToggleStats,
+        actionToggleViewMode,
       ];
 
       ContextMenu.push({
-        options: readonlyOptions,
+        options: viewModeOptions,
         top: clientY,
         left: clientX,
         actionManager: this.actionManager,
+        appState: this.state,
       });
 
-      if (this.state.readonly) {
+      if (this.state.viewModeEnabled) {
         return;
       }
 
@@ -3748,6 +3736,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           separator,
           actionToggleGridMode,
           actionToggleZenMode,
+          actionToggleViewMode,
           actionToggleStats,
         ],
         top: clientY,
@@ -3762,12 +3751,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.setState({ selectedElementIds: { [element.id]: true } });
     }
 
-    if (this.state.readonly) {
+    if (this.state.viewModeEnabled) {
       ContextMenu.push({
         options: [navigator.clipboard && actionCopy, ...options],
         top: clientY,
         left: clientX,
         actionManager: this.actionManager,
+        appState: this.state,
       });
       return;
     }
@@ -3788,8 +3778,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             contextItemLabel: "labels.paste",
           },
         _isMobile && separator,
-        probablySupportsClipboardBlob && actionCopyAsPng,
-        probablySupportsClipboardWriteText && actionCopyAsSvg,
+        ...options,
         separator,
         actionCopyStyles,
         actionPasteStyles,

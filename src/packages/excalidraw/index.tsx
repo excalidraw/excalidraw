@@ -26,7 +26,6 @@ const Excalidraw = (props: ExcalidrawProps) => {
     onExportToBackend,
     renderFooter,
     langCode = defaultLang.code,
-    readonly,
   } = props;
 
   useEffect(() => {
@@ -65,7 +64,6 @@ const Excalidraw = (props: ExcalidrawProps) => {
           onExportToBackend={onExportToBackend}
           renderFooter={renderFooter}
           langCode={langCode}
-          readonly={readonly}
         />
       </IsMobileProvider>
     </InitializeApp>

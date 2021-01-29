@@ -86,7 +86,7 @@ export type AppState = {
   zenModeEnabled: boolean;
   appearance: "light" | "dark";
   gridSize: number | null;
-  readonly: boolean;
+  viewModeEnabled: boolean;
 
   /** top-most selected groups (i.e. does not include nested groups) */
   selectedGroupIds: { [groupId: string]: boolean };
@@ -183,7 +183,6 @@ export interface ExcalidrawProps {
   ) => void;
   renderFooter?: (isMobile: boolean) => JSX.Element;
   langCode?: Language["code"];
-  readonly?: boolean;
 }
 
 export type SceneData = {
