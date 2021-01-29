@@ -33,6 +33,7 @@ import {
 import Portal from "./Portal";
 import RoomDialog from "./RoomDialog";
 import { createInverseContext } from "../../createInverseContext";
+import { UserIdleState, ScreenIdleState } from "./types";
 
 const idleDetectorSupported: boolean = "IdleDetector" in window;
 
@@ -41,8 +42,8 @@ interface CollabState {
   modalIsShown: boolean;
   errorMessage: string;
   username: string;
-  userState: string;
-  screenState: string;
+  userState: UserIdleState | "";
+  screenState: ScreenIdleState | "";
   activeRoomLink: string;
 }
 
@@ -520,7 +521,10 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       this.portal.broadcastMouseLocation(payload);
   };
 
-  onIdleStateChange = (userState: string, screenState: string) => {
+  onIdleStateChange = (
+    userState: UserIdleState | "",
+    screenState: ScreenIdleState | "",
+  ) => {
     this.setState({ userState });
     this.setState({ screenState });
     this.portal.broadcastIdleChange(userState, screenState);
