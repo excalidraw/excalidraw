@@ -1150,11 +1150,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   toggleZenMode = () => {
-    this.actionManager.executeAction(actionToggleZenMode());
+    this.actionManager.executeAction(actionToggleZenMode);
   };
 
   toggleGridMode = () => {
-    this.actionManager.executeAction(actionToggleGridMode());
+    this.actionManager.executeAction(actionToggleGridMode);
   };
 
   toggleStats = () => {
@@ -3656,13 +3656,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             separator,
           actionSelectAll,
           separator,
-          actionToggleGridMode(this.state.gridSize !== null),
-          actionToggleZenMode(this.state.zenModeEnabled),
+          actionToggleGridMode,
+          actionToggleZenMode,
           actionToggleStats,
         ],
         top: clientY,
         left: clientX,
         actionManager: this.actionManager,
+        appState: this.state,
       });
       return;
     }
@@ -3709,6 +3710,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       top: clientY,
       left: clientX,
       actionManager: this.actionManager,
+      appState: this.state,
     });
   };
 

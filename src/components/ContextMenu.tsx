@@ -11,6 +11,7 @@ import {
 } from "../actions/shortcuts";
 import { Action } from "../actions/types";
 import { ActionManager } from "../actions/manager";
+import { AppState } from "../types";
 
 type ContextMenuOption = "separator" | Action;
 
@@ -20,6 +21,7 @@ type ContextMenuProps = {
   top: number;
   left: number;
   actionManager: ActionManager;
+  appState: Readonly<AppState>;
 };
 
 const ContextMenu = ({
@@ -28,11 +30,11 @@ const ContextMenu = ({
   top,
   left,
   actionManager,
+  appState,
 }: ContextMenuProps) => {
   const isDarkTheme = !!document
     .querySelector(".excalidraw")
     ?.classList.contains("Appearance_dark");
-
   return (
     <div
       className={clsx("excalidraw", {
@@ -63,7 +65,7 @@ const ContextMenu = ({
                 <button
                   className={`context-menu-option
                   ${actionName === "deleteSelectedElements" ? "dangerous" : ""}
-                  ${option.checked ? "checkmark" : ""}`}
+                  ${option?.checked?.(appState) ? "checkmark" : ""}`}
                   onClick={() => actionManager.executeAction(option)}
                 >
                   <div className="context-menu-option__label">{label}</div>
@@ -97,6 +99,7 @@ type ContextMenuParams = {
   top: ContextMenuProps["top"];
   left: ContextMenuProps["left"];
   actionManager: ContextMenuProps["actionManager"];
+  appState: Readonly<AppState>;
 };
 
 const handleClose = () => {
@@ -119,6 +122,7 @@ export default {
           options={options}
           onCloseRequest={handleClose}
           actionManager={params.actionManager}
+          appState={params.appState}
         />,
         getContextMenuNode(),
       );
