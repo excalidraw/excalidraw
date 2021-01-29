@@ -80,9 +80,9 @@
     "gridMode": "Mode quadrícula",
     "addToLibrary": "Afegir a la biblioteca",
     "removeFromLibrary": "Eliminar de la biblioteca",
-    "libraryLoadingMessage": "Carregant la biblioteca...",
+    "libraryLoadingMessage": "Carregant la biblioteca…",
     "libraries": "Explorar biblioteques",
-    "loadingScene": "Carregant escena...",
+    "loadingScene": "Carregant escena…",
     "align": "Alinear",
     "alignTop": "Alinear a dalt",
     "alignBottom": "Alinear a baix",
@@ -91,7 +91,8 @@
     "centerVertically": "Centrar verticalment",
     "centerHorizontally": "Centrar horitzontalment",
     "distributeHorizontally": "Distribuir horitzontalment",
-    "distributeVertically": "Distribuir verticalment"
+    "distributeVertically": "Distribuir verticalment",
+    "shareIdleState": "Deixa que els altres vegin si estic actiu"
   },
   "buttons": {
     "clearReset": "Netejar el llenç",

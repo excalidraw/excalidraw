@@ -80,9 +80,9 @@
     "gridMode": "Rastermodus",
     "addToLibrary": "Zur Bibliothek hinzufügen",
     "removeFromLibrary": "Aus Bibliothek entfernen",
-    "libraryLoadingMessage": "Lade Bibliothek...",
+    "libraryLoadingMessage": "Lade Bibliothek…",
     "libraries": "Bibliotheken durchsuchen",
-    "loadingScene": "Lade Zeichnung...",
+    "loadingScene": "Lade Zeichnung…",
     "align": "Ausrichten",
     "alignTop": "Obere Kanten",
     "alignBottom": "Untere Kanten",
@@ -91,7 +91,8 @@
     "centerVertically": "Vertikal zentrieren",
     "centerHorizontally": "Horizontal zentrieren",
     "distributeHorizontally": "Horizontal verteilen",
-    "distributeVertically": "Vertikal verteilen"
+    "distributeVertically": "Vertikal verteilen",
+    "shareIdleState": "Die anderen sehen lassen, ob ich aktiv bin"
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",

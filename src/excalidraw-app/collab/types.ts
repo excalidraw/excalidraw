@@ -1,3 +1,9 @@
-export type UserIdleState = "active" | "idle";
+export enum UserIdleState {
+  Active = "active",
+  Idle = "idle",
+}
 
-export type ScreenIdleState = "locked" | "unlocked";
+export enum ScreenIdleState {
+  Locked = "locked",
+  Unlocked = "unlocked",
+}

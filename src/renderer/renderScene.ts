@@ -48,6 +48,7 @@ import {
   TransformHandleType,
 } from "../element/transformHandles";
 import { viewportCoordsToSceneCoords } from "../utils";
+import { UserIdleState, ScreenIdleState } from "../excalidraw-app/collab/types";
 
 const strokeRectWithRotation = (
   context: CanvasRenderingContext2D,
@@ -443,7 +444,12 @@ export const renderScene = (
     const globalAlpha = context.globalAlpha;
     context.strokeStyle = stroke;
     context.fillStyle = background;
-    if (isOutOfBounds) {
+
+    const screenState = sceneState.remotePointerScreenStates[clientId];
+    if (
+      isOutOfBounds ||
+      (screenState && screenState === ScreenIdleState.Locked)
+    ) {
       context.globalAlpha = 0.2;
     }
 
@@ -477,11 +483,9 @@ export const renderScene = (
 
     const username = sceneState.remotePointerUsernames[clientId];
     const userState = sceneState.remotePointerUserStates[clientId];
-    const screenState = sceneState.remotePointerScreenStates[clientId];
-    const usernameAndPotentiallyIdleState =
-      userState && screenState
-        ? `${username} (User: ${userState} | Screen: ${screenState})`
-        : username;
+    const usernameAndPotentiallyIdleState = userState
+      ? `${username} ${userState === UserIdleState.Active ? "🟢" : "💤"}`
+      : username;
 
     if (!isOutOfBounds && username) {
       const offsetX = x + width;
@@ -494,7 +498,6 @@ export const renderScene = (
 
       // Border
       context.fillStyle = stroke;
-      context.globalAlpha = globalAlpha;
       context.fillRect(
         offsetX - 1,
         offsetY - 1,
@@ -510,6 +513,7 @@ export const renderScene = (
         measureHeight + 2 * paddingVertical,
       );
       context.fillStyle = oc.white;
+
       context.fillText(
         usernameAndPotentiallyIdleState,
         offsetX + paddingHorizontal,

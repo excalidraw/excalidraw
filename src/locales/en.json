@@ -80,9 +80,9 @@
     "gridMode": "Grid mode",
     "addToLibrary": "Add to library",
     "removeFromLibrary": "Remove from library",
-    "libraryLoadingMessage": "Loading library...",
+    "libraryLoadingMessage": "Loading library…",
     "libraries": "Browse libraries",
-    "loadingScene": "Loading scene...",
+    "loadingScene": "Loading scene…",
     "align": "Align",
     "alignTop": "Align top",
     "alignBottom": "Align bottom",
@@ -92,7 +92,7 @@
     "centerHorizontally": "Center horizontally",
     "distributeHorizontally": "Distribute horizontally",
     "distributeVertically": "Distribute vertically",
-    "shareIdleState": "Let others see if I'm active."
+    "shareIdleState": "Let others see whether I'm active."
   },
   "buttons": {
     "clearReset": "Reset the canvas",
