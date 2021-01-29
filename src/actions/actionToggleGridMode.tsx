@@ -16,6 +16,5 @@ export const actionToggleGridMode = register({
   },
   checked: (appState: AppState) => appState.gridSize !== null,
   contextItemLabel: "labels.gridMode",
-  // Wrong event code
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.code === CODES.QUOTE,
 });
