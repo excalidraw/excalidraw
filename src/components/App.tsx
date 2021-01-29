@@ -1254,7 +1254,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (!event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.Z) {
       this.toggleZenMode();
     }
-
     if (event[KEYS.CTRL_OR_CMD] && event.code === CODES.QUOTE) {
       this.toggleGridMode();
     }
@@ -3663,6 +3662,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         top: clientY,
         left: clientX,
         actionManager: this.actionManager,
+        appState: this.state,
       });
       return;
     }
@@ -3709,6 +3709,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       top: clientY,
       left: clientX,
       actionManager: this.actionManager,
+      appState: this.state,
     });
   };
 

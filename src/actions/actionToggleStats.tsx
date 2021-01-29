@@ -3,15 +3,14 @@ import { register } from "./register";
 export const actionToggleStats = register({
   name: "stats",
   perform(elements, appState) {
-    this.checked = !this.checked;
     return {
       appState: {
         ...appState,
-        showStats: !appState.showStats,
+        showStats: !this.checked!(appState),
       },
       commitToHistory: false,
     };
   },
-  checked: false,
+  checked: (appState) => appState.showStats,
   contextItemLabel: "stats.title",
 });
