@@ -929,25 +929,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     copyToClipboard(this.scene.getElements(), this.state);
   };
 
-  private copyToClipboardAsPng = async () => {
-    const elements = this.scene.getElements();
-
-    const selectedElements = getSelectedElements(elements, this.state);
-    try {
-      await exportCanvas(
-        "clipboard",
-        selectedElements.length ? selectedElements : elements,
-        this.state,
-        this.canvas!,
-        this.state,
-      );
-      this.setState({ toastMessage: t("toast.copyToClipboardAsPng") });
-    } catch (error) {
-      console.error(error);
-      this.setState({ errorMessage: error.message });
-    }
-  };
-
   private static resetTapTwice() {
     didTapTwice = false;
   }
@@ -1253,12 +1234,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     if (event[KEYS.CTRL_OR_CMD]) {
       this.setState({ isBindingEnabled: false });
-    }
-
-    if (event.code === CODES.C && event.altKey && event.shiftKey) {
-      this.copyToClipboardAsPng();
-      event.preventDefault();
-      return;
     }
 
     if (this.actionManager.handleKeyDown(event)) {
