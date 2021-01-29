@@ -4,17 +4,16 @@ import { register } from "./register";
 export const actionToggleZenMode = register({
   name: "zenMode",
   perform(elements, appState) {
-    this.checked = !this.checked;
     return {
       appState: {
         ...appState,
-        zenModeEnabled: this.checked,
+        zenModeEnabled: !this.checked!(appState),
       },
       commitToHistory: false,
     };
   },
-  checked: false,
+  checked: (appState) => appState.zenModeEnabled,
   contextItemLabel: "buttons.zenMode",
-  // Wrong event code
-  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.code === CODES.QUOTE,
+  keyTest: (event) =>
+    !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.Z,
 });
