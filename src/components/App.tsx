@@ -820,7 +820,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const pointerViewportCoords: SceneState["remotePointerViewportCoords"] = {};
     const remoteSelectedElementIds: SceneState["remoteSelectedElementIds"] = {};
     const pointerUsernames: { [id: string]: string } = {};
-    const pointerIdleStates: { [id: string]: string } = {};
+    const pointerUserStates: { [id: string]: string } = {};
+    const pointerScreenStates: { [id: string]: string } = {};
     this.state.collaborators.forEach((user, socketId) => {
       if (user.selectedElementIds) {
         for (const id of Object.keys(user.selectedElementIds)) {
@@ -836,8 +837,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       if (user.username) {
         pointerUsernames[socketId] = user.username;
       }
-      if (user.idleState) {
-        pointerIdleStates[socketId] = user.idleState;
+      if (user.userState && user.screenState) {
+        pointerUserStates[socketId] = user.userState;
+        pointerScreenStates[socketId] = user.screenState;
       }
       pointerViewportCoords[socketId] = sceneCoordsToViewportCoords(
         {
@@ -873,7 +875,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         remotePointerButton: cursorButton,
         remoteSelectedElementIds,
         remotePointerUsernames: pointerUsernames,
-        remotePointerIdleStates: pointerIdleStates,
+        remotePointerUserStates: pointerUserStates,
+        remotePointerScreenStates: pointerScreenStates,
         shouldCacheIgnoreZoom: this.state.shouldCacheIgnoreZoom,
       },
       {

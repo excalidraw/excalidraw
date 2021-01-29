@@ -476,10 +476,12 @@ export const renderScene = (
     context.stroke();
 
     const username = sceneState.remotePointerUsernames[clientId];
-    const idleState = sceneState.remotePointerIdleStates[clientId];
-    const usernameAndPotentiallyIdleState = idleState
-      ? `${username} (${idleState})`
-      : username;
+    const userState = sceneState.remotePointerUserStates[clientId];
+    const screenState = sceneState.remotePointerScreenStates[clientId];
+    const usernameAndPotentiallyIdleState =
+      userState && screenState
+        ? `${username} (User: ${userState} | Screen: ${screenState})`
+        : username;
 
     if (!isOutOfBounds && username) {
       const offsetX = x + width;

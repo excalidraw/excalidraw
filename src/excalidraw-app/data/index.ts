@@ -63,7 +63,8 @@ export type SocketUpdateDataSource = {
     type: "IDLE_STATUS";
     payload: {
       socketId: string;
-      idleState: string;
+      userState: string;
+      screenState: string;
       username: string;
     };
   };

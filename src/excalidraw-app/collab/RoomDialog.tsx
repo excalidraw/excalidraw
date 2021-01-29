@@ -66,19 +66,19 @@ const RoomDialog = ({
     if ((checkbox as HTMLInputElement).checked) {
       const state = await window.IdleDetector.requestPermission();
       if (state !== "granted") {
-        console.log("Idle detection permission not granted.");
         (checkbox as HTMLInputElement).checked = false;
         idleDetectionPermissionGranted = false;
       } else {
-        console.log("Idle detection permission granted.");
         (checkbox as HTMLInputElement).checked = true;
         idleDetectionPermissionGranted = true;
       }
-      const ev = new CustomEvent("idledetectionpermissionchange", {
-        detail: { permission: idleDetectionPermissionGranted },
-      });
-      window.dispatchEvent(ev);
+    } else {
+      idleDetectionPermissionGranted = false;
     }
+    const ev = new CustomEvent("idledetectionpermissionchange", {
+      detail: { permission: idleDetectionPermissionGranted },
+    });
+    window.dispatchEvent(ev);
   };
 
   const renderRoomDialog = () => {
@@ -92,7 +92,7 @@ const RoomDialog = ({
               <input
                 id="shareIdleState"
                 type="checkbox"
-                checked={false}
+                defaultChecked={false}
                 hidden={!idleDetectorSupported}
                 onChange={onShareIdleStateChange}
               />
@@ -149,7 +149,7 @@ const RoomDialog = ({
               <input
                 id="shareIdleState"
                 type="checkbox"
-                checked={idleDetectionPermissionGranted}
+                defaultChecked={idleDetectionPermissionGranted}
                 hidden={!idleDetectorSupported}
                 onChange={onShareIdleStateChange}
               />

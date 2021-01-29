@@ -132,14 +132,14 @@ class Portal {
     }
   };
 
-  broadcastIdleChange = (idleState: string) => {
-    console.log("👉", idleState);
+  broadcastIdleChange = (userState: string, screenState: string) => {
     if (this.socket?.id) {
       const data: SocketUpdateDataSource["IDLE_STATUS"] = {
         type: "IDLE_STATUS",
         payload: {
           socketId: this.socket.id,
-          idleState,
+          userState,
+          screenState,
           username: this.collab.state.username,
         },
       };
