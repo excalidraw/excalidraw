@@ -174,6 +174,7 @@ import {
   viewportCoordsToSceneCoords,
   withBatchedUpdates,
 } from "../utils";
+import { isMobile } from "../is-mobile";
 import ContextMenu from "./ContextMenu";
 import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
@@ -1168,9 +1169,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (!this.state.showStats) {
       trackEvent("dialog", "stats");
     }
-    this.setState({
-      showStats: !this.state.showStats,
-    });
+    this.actionManager.executeAction(actionToggleStats);
   };
 
   setScrollToCenter = (remoteElements: readonly ExcalidrawElement[]) => {
@@ -3635,22 +3634,25 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     const separator = "separator";
 
+    const _isMobile = isMobile();
+
     const elements = this.scene.getElements();
     const element = this.getElementAtPosition(x, y);
     if (!element) {
       ContextMenu.push({
         options: [
-          navigator.clipboard && {
-            name: "paste",
-            perform: (elements, appStates) => {
-              this.pasteFromClipboard(null);
-              return {
-                commitToHistory: false,
-              };
+          _isMobile &&
+            navigator.clipboard && {
+              name: "paste",
+              perform: (elements, appStates) => {
+                this.pasteFromClipboard(null);
+                return {
+                  commitToHistory: false,
+                };
+              },
+              contextItemLabel: "labels.paste",
             },
-            contextItemLabel: "labels.paste",
-          },
-          separator,
+          _isMobile && navigator.clipboard && separator,
           probablySupportsClipboardBlob &&
             elements.length > 0 &&
             actionCopyAsPng,
@@ -3679,19 +3681,20 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     ContextMenu.push({
       options: [
-        actionCut,
-        navigator.clipboard && actionCopy,
-        navigator.clipboard && {
-          name: "paste",
-          perform: (elements, appStates) => {
-            this.pasteFromClipboard(null);
-            return {
-              commitToHistory: false,
-            };
+        _isMobile && actionCut,
+        _isMobile && navigator.clipboard && actionCopy,
+        _isMobile &&
+          navigator.clipboard && {
+            name: "paste",
+            perform: (elements, appStates) => {
+              this.pasteFromClipboard(null);
+              return {
+                commitToHistory: false,
+              };
+            },
+            contextItemLabel: "labels.paste",
           },
-          contextItemLabel: "labels.paste",
-        },
-        separator,
+        _isMobile && separator,
         probablySupportsClipboardBlob && actionCopyAsPng,
         probablySupportsClipboardWriteText && actionCopyAsSvg,
         separator,
