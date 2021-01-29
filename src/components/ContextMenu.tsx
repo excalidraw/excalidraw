@@ -63,9 +63,10 @@ const ContextMenu = ({
             return (
               <li key={idx} data-testid={actionName} onClick={onCloseRequest}>
                 <button
-                  className={`context-menu-option
-                  ${actionName === "deleteSelectedElements" ? "dangerous" : ""}
-                  ${option?.checked?.(appState) ? "checkmark" : ""}`}
+                  className={clsx("context-menu-option", {
+                    dangerous: actionName === "deleteSelectedElements",
+                    checkmark: option.checked?.(appState),
+                  })}
                   onClick={() => actionManager.executeAction(option)}
                 >
                   <div className="context-menu-option__label">{label}</div>
