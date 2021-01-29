@@ -1,5 +1,6 @@
 import clsx from "clsx";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect } from "react";
+import { useCallbackRefState } from "../hooks/useCallbackRefState";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
 import { KEYS } from "../keys";
@@ -7,14 +8,6 @@ import "./Dialog.scss";
 import { back, close } from "./icons";
 import { Island } from "./Island";
 import { Modal } from "./Modal";
-
-const useRefState = <T,>() => {
-  const [refValue, setRefValue] = useState<T | null>(null);
-  const refCallback = useCallback((value: T) => {
-    setRefValue(value);
-  }, []);
-  return [refValue, refCallback] as const;
-};
 
 export const Dialog = (props: {
   children: React.ReactNode;
@@ -24,7 +17,7 @@ export const Dialog = (props: {
   title: React.ReactNode;
   autofocus?: boolean;
 }) => {
-  const [islandNode, setIslandNode] = useRefState<HTMLDivElement>();
+  const [islandNode, setIslandNode] = useCallbackRefState<HTMLDivElement>();
 
   useEffect(() => {
     if (!islandNode) {

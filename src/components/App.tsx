@@ -5,7 +5,28 @@ import rough from "roughjs/bin/rough";
 import clsx from "clsx";
 
 import "../actions";
-import { actionDeleteSelected, actionFinalize } from "../actions";
+import {
+  actionAddToLibrary,
+  actionBringForward,
+  actionBringToFront,
+  actionCopy,
+  actionCopyAsPng,
+  actionCopyAsSvg,
+  actionCopyStyles,
+  actionCut,
+  actionDeleteSelected,
+  actionDuplicateSelection,
+  actionFinalize,
+  actionGroup,
+  actionPasteStyles,
+  actionSelectAll,
+  actionSendBackward,
+  actionSendToBack,
+  actionToggleGridMode,
+  actionToggleStats,
+  actionToggleZenMode,
+  actionUngroup,
+} from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
@@ -20,7 +41,6 @@ import {
 } from "../clipboard";
 import {
   APP_NAME,
-  CANVAS_ONLY_ACTIONS,
   CURSOR_TYPE,
   DEFAULT_VERTICAL_ALIGN,
   DRAGGING_THRESHOLD,
@@ -28,7 +48,6 @@ import {
   ELEMENT_TRANSLATE_AMOUNT,
   ENV,
   EVENT,
-  GRID_SIZE,
   LINE_CONFIRM_THRESHOLD,
   MIME_TYPES,
   POINTER_BUTTON,
@@ -157,6 +176,7 @@ import {
   viewportCoordsToSceneCoords,
   withBatchedUpdates,
 } from "../utils";
+import { isMobile } from "../is-mobile";
 import ContextMenu, { ContextMenuOption } from "./ContextMenu";
 import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
@@ -250,6 +270,7 @@ export type ExcalidrawImperativeAPI = {
   };
   setScrollToCenter: InstanceType<typeof App>["setScrollToCenter"];
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
+  getAppState: () => InstanceType<typeof App>["state"];
   readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
   ready: true;
 };
@@ -302,6 +323,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         },
         setScrollToCenter: this.setScrollToCenter,
         getSceneElements: this.getSceneElements,
+        getAppState: () => this.state,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -316,6 +338,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.syncActionResult,
       () => this.state,
       () => this.scene.getElementsIncludingDeleted(),
+      this,
     );
     this.actionManager.registerAll(actions);
 
@@ -973,25 +996,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
   };
 
-  private copyToClipboardAsSvg = async () => {
-    const selectedElements = getSelectedElements(
-      this.scene.getElements(),
-      this.state,
-    );
-    try {
-      await exportCanvas(
-        "clipboard-svg",
-        selectedElements.length ? selectedElements : this.scene.getElements(),
-        this.state,
-        this.canvas!,
-        this.state,
-      );
-    } catch (error) {
-      console.error(error);
-      this.setState({ errorMessage: error.message });
-    }
-  };
-
   private static resetTapTwice() {
     didTapTwice = false;
   }
@@ -1194,24 +1198,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   toggleZenMode = () => {
-    this.setState({
-      zenModeEnabled: !this.state.zenModeEnabled,
-    });
+    this.actionManager.executeAction(actionToggleZenMode);
   };
 
   toggleGridMode = () => {
-    this.setState({
-      gridSize: this.state.gridSize ? null : GRID_SIZE,
-    });
+    this.actionManager.executeAction(actionToggleGridMode);
   };
 
   toggleStats = () => {
     if (!this.state.showStats) {
       trackEvent("dialog", "stats");
     }
-    this.setState({
-      showStats: !this.state.showStats,
-    });
+    this.actionManager.executeAction(actionToggleStats);
   };
 
   toggleReadonlyMode = () => {
@@ -3683,45 +3681,41 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.state,
     );
 
+    const maybeGroupAction = actionGroup.contextItemPredicate!(
+      this.actionManager.getElementsIncludingDeleted(),
+      this.actionManager.getAppState(),
+    );
+
+    const maybeUngroupAction = actionUngroup.contextItemPredicate!(
+      this.actionManager.getElementsIncludingDeleted(),
+      this.actionManager.getAppState(),
+    );
+
+    const separator = "separator";
+
+    const _isMobile = isMobile();
+
     const elements = this.scene.getElements();
     const element = this.getElementAtPosition(x, y);
     const options: ContextMenuOption[] = [];
     if (probablySupportsClipboardBlob && elements.length > 0) {
-      options.push({
-        shortcutName: "copyAsPng",
-        label: t("labels.copyAsPng"),
-        action: this.copyToClipboardAsPng,
-      });
+      options.push(actionCopyAsPng);
     }
 
     if (probablySupportsClipboardWriteText && elements.length > 0) {
-      options.push({
-        shortcutName: "copyAsSvg",
-        label: t("labels.copyAsSvg"),
-        action: this.copyToClipboardAsSvg,
-      });
+      options.push(actionCopyAsSvg);
     }
     if (!element) {
       const readonlyOptions: ContextMenuOption[] = [
         ...options,
-        {
-          checked: this.state.showStats,
-          shortcutName: "stats",
-          label: t("stats.title"),
-          action: this.toggleStats,
-        },
-        {
-          checked: this.state.readonly,
-          shortcutName: "readonlyMode",
-          label: t("labels.readonlyMode"),
-          action: this.toggleReadonlyMode,
-        },
+        actionToggleStats,
       ];
 
       ContextMenu.push({
         options: readonlyOptions,
         top: clientY,
         left: clientX,
+        actionManager: this.actionManager,
       });
 
       if (this.state.readonly) {
@@ -3730,42 +3724,36 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
       ContextMenu.push({
         options: [
-          navigator.clipboard && {
-            shortcutName: "paste",
-            label: t("labels.paste"),
-            action: () => this.pasteFromClipboard(null),
-          },
-          ...options,
-          ...this.actionManager.getContextMenuItems((action) =>
-            CANVAS_ONLY_ACTIONS.includes(action.name),
-          ),
-          {
-            checked: this.state.gridSize !== null,
-            shortcutName: "gridMode",
-            label: t("labels.gridMode"),
-            action: this.toggleGridMode,
-          },
-          {
-            checked: this.state.zenModeEnabled,
-            shortcutName: "zenMode",
-            label: t("buttons.zenMode"),
-            action: this.toggleZenMode,
-          },
-          {
-            checked: this.state.readonly,
-            shortcutName: "readonlyMode",
-            label: t("labels.readonlyMode"),
-            action: this.toggleReadonlyMode,
-          },
-          {
-            checked: this.state.showStats,
-            shortcutName: "stats",
-            label: t("stats.title"),
-            action: this.toggleStats,
-          },
+          _isMobile &&
+            navigator.clipboard && {
+              name: "paste",
+              perform: (elements, appStates) => {
+                this.pasteFromClipboard(null);
+                return {
+                  commitToHistory: false,
+                };
+              },
+              contextItemLabel: "labels.paste",
+            },
+          _isMobile && navigator.clipboard && separator,
+          probablySupportsClipboardBlob &&
+            elements.length > 0 &&
+            actionCopyAsPng,
+          probablySupportsClipboardWriteText &&
+            elements.length > 0 &&
+            actionCopyAsSvg,
+          ((probablySupportsClipboardBlob && elements.length > 0) ||
+            (probablySupportsClipboardWriteText && elements.length > 0)) &&
+            separator,
+          actionSelectAll,
+          separator,
+          actionToggleGridMode,
+          actionToggleZenMode,
+          actionToggleStats,
         ],
         top: clientY,
         left: clientX,
+        actionManager: this.actionManager,
       });
       return;
     }
@@ -3776,44 +3764,52 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     if (this.state.readonly) {
       ContextMenu.push({
-        options: [
-          navigator.clipboard && {
-            shortcutName: "copy",
-            label: t("labels.copy"),
-            action: this.copyAll,
-          },
-          ...options,
-        ],
+        options: [navigator.clipboard && actionCopy, ...options],
         top: clientY,
         left: clientX,
+        actionManager: this.actionManager,
       });
       return;
     }
 
     ContextMenu.push({
       options: [
-        {
-          shortcutName: "cut",
-          label: t("labels.cut"),
-          action: this.cutAll,
-        },
-        navigator.clipboard && {
-          shortcutName: "copy",
-          label: t("labels.copy"),
-          action: this.copyAll,
-        },
-        navigator.clipboard && {
-          shortcutName: "paste",
-          label: t("labels.paste"),
-          action: () => this.pasteFromClipboard(null),
-        },
-        ...options,
-        ...this.actionManager.getContextMenuItems(
-          (action) => !CANVAS_ONLY_ACTIONS.includes(action.name),
-        ),
+        _isMobile && actionCut,
+        _isMobile && navigator.clipboard && actionCopy,
+        _isMobile &&
+          navigator.clipboard && {
+            name: "paste",
+            perform: (elements, appStates) => {
+              this.pasteFromClipboard(null);
+              return {
+                commitToHistory: false,
+              };
+            },
+            contextItemLabel: "labels.paste",
+          },
+        _isMobile && separator,
+        probablySupportsClipboardBlob && actionCopyAsPng,
+        probablySupportsClipboardWriteText && actionCopyAsSvg,
+        separator,
+        actionCopyStyles,
+        actionPasteStyles,
+        separator,
+        maybeGroupAction && actionGroup,
+        maybeUngroupAction && actionUngroup,
+        (maybeGroupAction || maybeUngroupAction) && separator,
+        actionAddToLibrary,
+        separator,
+        actionSendBackward,
+        actionBringForward,
+        actionSendToBack,
+        actionBringToFront,
+        separator,
+        actionDuplicateSelection,
+        actionDeleteSelected,
       ],
       top: clientY,
       left: clientX,
+      actionManager: this.actionManager,
     });
   };
 
