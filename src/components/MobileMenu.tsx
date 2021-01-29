@@ -29,7 +29,7 @@ type MobileMenuProps = {
   canvas: HTMLCanvasElement | null;
   isCollaborating: boolean;
   renderCustomFooter?: (isMobile: boolean) => JSX.Element;
-  viewModeEnabled?: boolean;
+  viewModeEnabled: boolean;
 };
 
 export const MobileMenu = ({

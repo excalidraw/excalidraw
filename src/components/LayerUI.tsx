@@ -61,7 +61,7 @@ interface LayerUIProps {
     canvas: HTMLCanvasElement | null,
   ) => void;
   renderCustomFooter?: (isMobile: boolean) => JSX.Element;
-  viewModeEnabled?: boolean;
+  viewModeEnabled: boolean;
 }
 
 const useOnClickOutside = (
@@ -552,7 +552,7 @@ const LayerUI = ({
     );
   };
 
-  const renderGithubCorner = () => {
+  const renderGitHubCorner = () => {
     return (
       <aside
         className={clsx(
@@ -649,7 +649,7 @@ const LayerUI = ({
       {dialogs}
       {renderFixedSideContainer()}
       {renderBottomAppMenu()}
-      {renderGithubCorner()}
+      {renderGitHubCorner()}
       {renderFooter()}
     </div>
   );

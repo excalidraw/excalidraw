@@ -55,7 +55,6 @@ Object {
     "id4": true,
     "id6": true,
   },
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -77,6 +76,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -514,7 +514,6 @@ Object {
     "id3": true,
     "id5": true,
   },
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -544,6 +543,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -974,7 +974,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -993,6 +992,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -1751,7 +1751,6 @@ Object {
   "previousSelectedElementIds": Object {
     "id0": true,
   },
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -1770,6 +1769,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -1955,7 +1955,6 @@ Object {
     "id0": true,
     "id3": true,
   },
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -1978,6 +1977,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -2411,7 +2411,6 @@ Object {
   "previousSelectedElementIds": Object {
     "id0": true,
   },
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -2430,6 +2429,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -2661,7 +2661,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -2679,6 +2678,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -2826,7 +2826,6 @@ Object {
   "previousSelectedElementIds": Object {
     "id2": true,
   },
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -2845,6 +2844,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -3300,7 +3300,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -3318,6 +3317,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -3609,7 +3609,6 @@ Object {
   "previousSelectedElementIds": Object {
     "id0": true,
   },
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -3628,6 +3627,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -3813,7 +3813,6 @@ Object {
     "id0": true,
     "id1": true,
   },
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -3833,6 +3832,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -4055,7 +4055,6 @@ Object {
   "previousSelectedElementIds": Object {
     "id1": true,
   },
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -4074,6 +4073,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -4306,7 +4306,6 @@ Object {
   "previousSelectedElementIds": Object {
     "id2": true,
   },
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -4326,6 +4325,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -4690,7 +4690,6 @@ Object {
     "id1": true,
     "id2": true,
   },
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -4728,6 +4727,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -4984,7 +4984,6 @@ Object {
     "id1": true,
     "id2": true,
   },
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -5000,6 +4999,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -5288,7 +5288,6 @@ Object {
   "previousSelectedElementIds": Object {
     "id0": true,
   },
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -5326,6 +5325,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -5495,7 +5495,6 @@ Object {
   "previousSelectedElementIds": Object {
     "id0": true,
   },
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -5511,6 +5510,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -5656,7 +5656,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -5674,6 +5673,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -6112,7 +6112,6 @@ Object {
     "id1": true,
     "id2": true,
   },
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -6133,6 +6132,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -6425,7 +6425,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -6443,6 +6442,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -8462,7 +8462,6 @@ Object {
     "id2": true,
     "id3": true,
   },
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -8481,6 +8480,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -8822,7 +8822,6 @@ Object {
     "id0": true,
     "id2": true,
   },
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -8843,6 +8842,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -9076,7 +9076,6 @@ Object {
     "id0": true,
     "id2": true,
   },
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -9095,6 +9094,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -9328,7 +9328,6 @@ Object {
     "id0": true,
     "id2": true,
   },
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -9348,6 +9347,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -9639,7 +9639,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -9657,6 +9656,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -9802,7 +9802,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -9820,6 +9819,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -9965,7 +9965,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -9983,6 +9982,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -10128,7 +10128,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -10146,6 +10145,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -10321,7 +10321,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -10339,6 +10338,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -10514,7 +10514,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -10532,6 +10531,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -10707,7 +10707,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -10725,6 +10724,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -10900,7 +10900,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -10918,6 +10917,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -11063,7 +11063,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -11081,6 +11080,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -11226,7 +11226,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -11244,6 +11243,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -11419,7 +11419,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -11437,6 +11436,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -11582,7 +11582,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -11600,6 +11599,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -11780,7 +11780,6 @@ Object {
     "id2": true,
     "id3": true,
   },
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -11804,6 +11803,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -12493,7 +12493,6 @@ Object {
     "id0": true,
     "id3": true,
   },
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -12512,6 +12511,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -12742,7 +12742,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": -6,
   "scrollY": 0,
@@ -12760,6 +12759,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -12843,7 +12843,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -12859,6 +12858,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -12942,7 +12942,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -12960,6 +12959,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -13105,7 +13105,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -13123,6 +13122,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -13412,7 +13412,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -13430,6 +13429,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -13719,7 +13719,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -13737,6 +13736,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": "Copied styles.",
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -13882,7 +13882,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -13898,6 +13897,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -14077,7 +14077,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -14095,6 +14094,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -14327,7 +14327,6 @@ Object {
   "previousSelectedElementIds": Object {
     "id1": true,
   },
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -14349,6 +14348,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -14648,7 +14648,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -14666,6 +14665,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": "Copied styles.",
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -15486,7 +15486,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -15504,6 +15503,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -15793,7 +15793,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -15811,6 +15810,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -16102,7 +16102,6 @@ Object {
   "previousSelectedElementIds": Object {
     "id1": true,
   },
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -16122,6 +16121,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -16480,7 +16480,6 @@ Object {
   "previousSelectedElementIds": Object {
     "id0": true,
   },
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -16499,6 +16498,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -16649,7 +16649,6 @@ Object {
     "id2": true,
     "id3": true,
   },
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -16671,6 +16670,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -16966,7 +16966,6 @@ Object {
   "previousSelectedElementIds": Object {
     "id0": true,
   },
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -16985,6 +16984,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -17205,7 +17205,6 @@ Object {
     "id0": true,
     "id2": true,
   },
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -17226,6 +17225,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -17459,7 +17459,6 @@ Object {
     "id0": true,
     "id2": true,
   },
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -17482,6 +17481,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -17782,7 +17782,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -17798,6 +17797,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -17881,7 +17881,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -17899,6 +17898,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -18049,7 +18049,6 @@ Object {
     "id5": true,
     "id6": true,
   },
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -18073,6 +18072,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -18864,7 +18864,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 60,
   "scrollY": 60,
@@ -18880,6 +18879,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -18965,7 +18965,6 @@ Object {
   "previousSelectedElementIds": Object {
     "id0": true,
   },
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -18983,6 +18982,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -19720,7 +19720,6 @@ Object {
     "id2": true,
     "id3": true,
   },
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -19760,6 +19759,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -20122,7 +20122,6 @@ Object {
   "previousSelectedElementIds": Object {
     "id1": true,
   },
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -20162,6 +20161,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -20392,7 +20392,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 11,
   "scrollY": -5,
@@ -20410,6 +20409,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -20493,7 +20493,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -20511,6 +20510,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -20990,7 +20990,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -21006,6 +21005,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
@@ -21089,7 +21089,6 @@ Object {
     "shown": false,
   },
   "previousSelectedElementIds": Object {},
-  "readonly": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -21105,6 +21104,7 @@ Object {
   "suggestedBindings": Array [],
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
   "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
