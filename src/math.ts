@@ -147,13 +147,31 @@ export const centerPoint = (a: Point, b: Point): Point => {
 // to be considered a loop
 export const isPathALoop = (
   points: ExcalidrawLinearElement["points"],
+  /** supply if you want the loop detection to account for current zoom */
+  zoomValue?: number,
 ): boolean => {
   if (points.length >= 3) {
+    zoomValue = zoomValue ?? 1;
+
     const [firstPoint, lastPoint] = [points[0], points[points.length - 1]];
-    return (
-      distance2d(firstPoint[0], firstPoint[1], lastPoint[0], lastPoint[1]) <=
-      LINE_CONFIRM_THRESHOLD
+    const distance = distance2d(
+      firstPoint[0],
+      firstPoint[1],
+      lastPoint[0],
+      lastPoint[1],
     );
+
+    // Adjusting LINE_CONFIRM_THRESHOLD to current zoom so that when zoomed in
+    // really close we make the threshold smaller, and vice versa.
+    // The formulas are a result of curve-fitting target values.
+    const k = 3 - 2 * Math.pow(zoomValue, 0.05);
+    const threshold =
+      (LINE_CONFIRM_THRESHOLD / Math.log1p(zoomValue * k)) *
+      // multiplying by log reciprocal will cancel it out when zoomValue
+      // is 100%, so that threshold always results in LINE_CONFIRM_THRESHOLD
+      (Math.log1p(1 * k) / 1);
+
+    return distance <= threshold;
   }
   return false;
 };
