@@ -1,6 +1,6 @@
 {
-  "name": "@excalidraw/excalidraw",
-  "version": "0.2.1",
+  "name": "aakansha-excalidraw",
+  "version": "0.3.0-view1",
   "main": "dist/excalidraw.min.js",
   "files": [
     "dist/*"

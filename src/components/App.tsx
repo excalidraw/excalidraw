@@ -829,6 +829,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
     }
 
+    if (prevProps.viewModeEnabled !== this.props.viewModeEnabled) {
+      this.setState({ viewModeEnabled: !!this.props.viewModeEnabled });
+    }
+
     document
       .querySelector(".excalidraw")
       ?.classList.toggle("Appearance_dark", this.state.appearance === "dark");
