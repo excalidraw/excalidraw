@@ -833,7 +833,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     if (prevProps.viewModeEnabled !== this.props.viewModeEnabled) {
-      this.setState({ viewModeEnabled: !!this.props.viewModeEnabled });
+      this.setState(
+        { viewModeEnabled: !!this.props.viewModeEnabled },
+        this.addEventListeners,
+      );
+    }
+
+    if (prevState.viewModeEnabled !== this.state.viewModeEnabled) {
+      this.addEventListeners();
     }
 
     document
