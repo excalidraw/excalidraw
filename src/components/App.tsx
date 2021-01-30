@@ -147,7 +147,6 @@ import {
   getSelectedElements,
   isOverScrollBars,
   isSomeElementSelected,
-  normalizeScroll,
 } from "../scene";
 import Scene from "../scene/Scene";
 import { SceneState, ScrollBars } from "../scene/types";
@@ -1745,8 +1744,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       const scaleFactor = distance / gesture.initialDistance;
 
       this.setState(({ zoom, scrollX, scrollY, offsetLeft, offsetTop }) => ({
-        scrollX: normalizeScroll(scrollX + deltaX / zoom.value),
-        scrollY: normalizeScroll(scrollY + deltaY / zoom.value),
+        scrollX: scrollX + deltaX / zoom.value,
+        scrollY: scrollY + deltaY / zoom.value,
         zoom: getNewZoom(
           getNormalizedZoom(initialScale * scaleFactor),
           zoom,
@@ -2157,12 +2156,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
 
       this.setState({
-        scrollX: normalizeScroll(
-          this.state.scrollX - deltaX / this.state.zoom.value,
-        ),
-        scrollY: normalizeScroll(
-          this.state.scrollY - deltaY / this.state.zoom.value,
-        ),
+        scrollX: this.state.scrollX - deltaX / this.state.zoom.value,
+        scrollY: this.state.scrollY - deltaY / this.state.zoom.value,
       });
     });
     const teardown = withBatchedUpdates(
@@ -2976,9 +2971,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       const x = event.clientX;
       const dx = x - pointerDownState.lastCoords.x;
       this.setState({
-        scrollX: normalizeScroll(
-          this.state.scrollX - dx / this.state.zoom.value,
-        ),
+        scrollX: this.state.scrollX - dx / this.state.zoom.value,
       });
       pointerDownState.lastCoords.x = x;
       return true;
@@ -2988,9 +2981,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       const y = event.clientY;
       const dy = y - pointerDownState.lastCoords.y;
       this.setState({
-        scrollY: normalizeScroll(
-          this.state.scrollY - dy / this.state.zoom.value,
-        ),
+        scrollY: this.state.scrollY - dy / this.state.zoom.value,
       });
       pointerDownState.lastCoords.y = y;
       return true;
@@ -3741,14 +3732,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (event.shiftKey) {
       this.setState(({ zoom, scrollX }) => ({
         // on Mac, shift+wheel tends to result in deltaX
-        scrollX: normalizeScroll(scrollX - (deltaY || deltaX) / zoom.value),
+        scrollX: scrollX - (deltaY || deltaX) / zoom.value,
       }));
       return;
     }
 
     this.setState(({ zoom, scrollX, scrollY }) => ({
-      scrollX: normalizeScroll(scrollX - deltaX / zoom.value),
-      scrollY: normalizeScroll(scrollY - deltaY / zoom.value),
+      scrollX: scrollX - deltaX / zoom.value,
+      scrollY: scrollY - deltaY / zoom.value,
     }));
   });
 
