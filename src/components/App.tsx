@@ -419,7 +419,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     return (
       <div
         className={clsx("excalidraw", {
-          "excalidraw--viewMode": viewModeEnabled,
+          "excalidraw--view-mode": viewModeEnabled,
         })}
         ref={this.excalidrawContainerRef}
         style={{
