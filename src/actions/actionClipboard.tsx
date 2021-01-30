@@ -5,6 +5,7 @@ import { actionDeleteSelected } from "./actionDeleteSelected";
 import { getSelectedElements } from "../scene/selection";
 import { exportCanvas } from "../data/index";
 import { getNonDeletedElements } from "../element";
+import { t } from "../i18n";
 
 export const actionCopy = register({
   name: "copy",
@@ -91,6 +92,10 @@ export const actionCopyAsPng = register({
         appState,
       );
       return {
+        appState: {
+          ...appState,
+          toastMessage: t("toast.copyToClipboardAsPng"),
+        },
         commitToHistory: false,
       };
     } catch (error) {
@@ -105,4 +110,5 @@ export const actionCopyAsPng = register({
     }
   },
   contextItemLabel: "labels.copyAsPng",
+  keyTest: (event) => event.code === CODES.C && event.altKey && event.shiftKey,
 });
