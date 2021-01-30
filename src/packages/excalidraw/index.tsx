@@ -92,7 +92,6 @@ const areEqual = (
 
 Excalidraw.defaultProps = {
   lanCode: defaultLang.code,
-  viewModeEnabled: false,
 };
 
 const forwardedRefComp = forwardRef<

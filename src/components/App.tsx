@@ -507,10 +507,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         if (actionResult.commitToHistory) {
           history.resumeRecording();
         }
-        const viewModeEnabled =
-          this.props.viewModeEnabled ||
-          actionResult?.appState?.viewModeEnabled ||
-          false;
+
+        let viewModeEnabled = actionResult?.appState?.viewModeEnabled || false;
+
+        if (typeof this.props.viewModeEnabled !== "undefined") {
+          viewModeEnabled = this.props.viewModeEnabled;
+        }
+
         this.setState(
           (state) => ({
             ...actionResult.appState,
@@ -3665,7 +3668,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         actionToggleStats,
       ];
 
-      if (!this.props.viewModeEnabled) {
+      if (typeof this.props.viewModeEnabled === "undefined") {
         viewModeOptions.push(actionToggleViewMode);
       }
 
@@ -3708,7 +3711,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           separator,
           actionToggleGridMode,
           actionToggleZenMode,
-          actionToggleViewMode,
+          typeof this.props.viewModeEnabled === "undefined" &&
+            actionToggleViewMode,
           actionToggleStats,
         ],
         top: clientY,

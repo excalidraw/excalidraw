@@ -7,11 +7,11 @@ import {
   ActionResult,
 } from "./types";
 import { ExcalidrawElement } from "../element/types";
-import { AppState } from "../types";
+import { AppState, ExcalidrawProps } from "../types";
 
 // This is the <App> component, but for now we don't care about anything but its
 // `canvas` state.
-type App = { canvas: HTMLCanvasElement | null };
+type App = { canvas: HTMLCanvasElement | null; props: ExcalidrawProps };
 
 export class ActionManager implements ActionsManagerInterface {
   actions = {} as ActionsManagerInterface["actions"];
@@ -66,7 +66,6 @@ export class ActionManager implements ActionsManagerInterface {
     if (data.length === 0) {
       return false;
     }
-
     const { viewModeEnabled } = this.getAppState();
     if (viewModeEnabled) {
       if (data[0].name !== "viewMode") {
