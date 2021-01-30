@@ -3,6 +3,7 @@ import { getDefaultAppState } from "../appState";
 import { ColorPicker } from "../components/ColorPicker";
 import { resetZoom, trash, zoomIn, zoomOut } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
+import { ZOOM_STEP } from "../constants";
 import { getCommonBounds, getNonDeletedElements } from "../element";
 import { newElementWith } from "../element/mutateElement";
 import { ExcalidrawElement } from "../element/types";
@@ -74,8 +75,6 @@ export const actionClearCanvas = register({
     />
   ),
 });
-
-const ZOOM_STEP = 0.1;
 
 export const actionZoomIn = register({
   name: "zoomIn",
