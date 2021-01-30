@@ -1,4 +1,4 @@
-import { Point } from "./types";
+import { NormalizedZoomValue, Point, Zoom } from "./types";
 import { LINE_CONFIRM_THRESHOLD } from "./constants";
 import { ExcalidrawLinearElement } from "./element/types";
 
@@ -148,11 +148,9 @@ export const centerPoint = (a: Point, b: Point): Point => {
 export const isPathALoop = (
   points: ExcalidrawLinearElement["points"],
   /** supply if you want the loop detection to account for current zoom */
-  zoomValue?: number,
+  zoomValue: Zoom["value"] = 1 as NormalizedZoomValue,
 ): boolean => {
   if (points.length >= 3) {
-    zoomValue = zoomValue ?? 1;
-
     const [firstPoint, lastPoint] = [points[0], points[points.length - 1]];
     const distance = distance2d(
       firstPoint[0],
