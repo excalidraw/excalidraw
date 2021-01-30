@@ -57,7 +57,7 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   zenMode: [getShortcutKey("Alt+Z")],
   stats: [],
   addToLibrary: [],
-  viewMode: [getShortcutKey("Alt+r")],
+  viewMode: [getShortcutKey("Alt+R")],
 };
 
 export const getShortcutFromShortcutName = (name: ShortcutName) => {
