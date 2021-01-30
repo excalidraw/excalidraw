@@ -1,9 +1,11 @@
 import { CODES, KEYS } from "../keys";
 import { register } from "./register";
+import { trackEvent } from "../analytics";
 
 export const actionToggleViewMode = register({
   name: "viewMode",
   perform(elements, appState) {
+    trackEvent("contextmenu", "viewMode");
     return {
       appState: {
         ...appState,

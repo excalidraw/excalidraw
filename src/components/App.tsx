@@ -1185,24 +1185,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.actionManager.executeAction(actionToggleZenMode);
   };
 
-  toggleGridMode = () => {
-    this.actionManager.executeAction(actionToggleGridMode);
-  };
-
   toggleStats = () => {
     if (!this.state.showStats) {
       trackEvent("dialog", "stats");
     }
     this.actionManager.executeAction(actionToggleStats);
-  };
-
-  toggleViewMode = () => {
-    this.setState(
-      {
-        viewModeEnabled: !this.state.viewModeEnabled,
-      },
-      this.addEventListeners,
-    );
   };
 
   setScrollToCenter = (remoteElements: readonly ExcalidrawElement[]) => {
