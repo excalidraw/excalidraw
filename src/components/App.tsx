@@ -298,6 +298,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       offsetLeft,
       offsetTop,
       excalidrawRef,
+      viewModeEnabled = false,
     } = props;
     this.state = {
       ...defaultAppState,
@@ -305,6 +306,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       width,
       height,
       ...this.getCanvasOffsets({ offsetLeft, offsetTop }),
+      viewModeEnabled,
     };
     if (excalidrawRef) {
       const readyPromise =
@@ -505,6 +507,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         if (actionResult.commitToHistory) {
           history.resumeRecording();
         }
+        const viewModeEnabled =
+          this.props.viewModeEnabled ||
+          actionResult?.appState?.viewModeEnabled ||
+          false;
         this.setState(
           (state) => ({
             ...actionResult.appState,
@@ -514,6 +520,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             height: state.height,
             offsetTop: state.offsetTop,
             offsetLeft: state.offsetLeft,
+            viewModeEnabled,
           }),
           () => {
             if (actionResult.syncHistory) {
@@ -1267,10 +1274,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
     }
 
-    if (!event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.R) {
-      this.toggleViewMode();
-    }
-
     if (
       (isWritableElement(event.target) && event.key !== KEYS.ESCAPE) ||
       // case: using arrows to move between buttons
@@ -1285,16 +1288,16 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
     }
 
+    if (this.actionManager.handleKeyDown(event)) {
+      return;
+    }
+
     if (this.state.viewModeEnabled) {
       return;
     }
 
     if (event[KEYS.CTRL_OR_CMD]) {
       this.setState({ isBindingEnabled: false });
-    }
-
-    if (this.actionManager.handleKeyDown(event)) {
-      return;
     }
 
     if (event.code === CODES.NINE) {
@@ -3669,8 +3672,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       const viewModeOptions: ContextMenuOption[] = [
         ...options,
         actionToggleStats,
-        actionToggleViewMode,
       ];
+
+      if (!this.props.viewModeEnabled) {
+        viewModeOptions.push(actionToggleViewMode);
+      }
 
       ContextMenu.push({
         options: viewModeOptions,

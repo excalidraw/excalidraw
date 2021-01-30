@@ -67,6 +67,13 @@ export class ActionManager implements ActionsManagerInterface {
       return false;
     }
 
+    const { viewModeEnabled } = this.getAppState();
+    if (viewModeEnabled) {
+      if (data[0].name !== "viewMode") {
+        return false;
+      }
+    }
+
     event.preventDefault();
     this.updater(
       data[0].perform(
