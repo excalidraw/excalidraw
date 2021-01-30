@@ -52,6 +52,7 @@ import {
   TAP_TWICE_TIMEOUT,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
   TOUCH_CTX_MENU_TIMEOUT,
+  ZOOM_STEP,
 } from "../constants";
 import { loadFromBlob } from "../data";
 import { isValidLibrary } from "../data/json";
@@ -3709,9 +3710,15 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         }, 1000);
       }
 
+      let newZoom = this.state.zoom.value - delta / 100;
+      // increase zoom steps the more zoomed-in we are (applies to >100% only)
+      newZoom += Math.log10(Math.max(1, this.state.zoom.value)) * -sign;
+      // round to nearest step
+      newZoom = Math.round(newZoom * ZOOM_STEP * 100) / (ZOOM_STEP * 100);
+
       this.setState(({ zoom, offsetLeft, offsetTop }) => ({
         zoom: getNewZoom(
-          getNormalizedZoom(zoom.value - delta / 100),
+          getNormalizedZoom(newZoom),
           zoom,
           { left: offsetLeft, top: offsetTop },
           {
