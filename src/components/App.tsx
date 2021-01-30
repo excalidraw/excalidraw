@@ -55,7 +55,7 @@ import {
   TEXT_TO_CENTER_SNAP_THRESHOLD,
   TOUCH_CTX_MENU_TIMEOUT,
 } from "../constants";
-import { exportCanvas, loadFromBlob } from "../data";
+import { loadFromBlob } from "../data";
 import { isValidLibrary } from "../data/json";
 import { Library } from "../data/library";
 import { restore } from "../data/restore";
@@ -969,25 +969,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     copyToClipboard(this.scene.getElements(), this.state);
   };
 
-  private copyToClipboardAsPng = async () => {
-    const elements = this.scene.getElements();
-
-    const selectedElements = getSelectedElements(elements, this.state);
-    try {
-      await exportCanvas(
-        "clipboard",
-        selectedElements.length ? selectedElements : elements,
-        this.state,
-        this.canvas!,
-        this.state,
-      );
-      this.setState({ toastMessage: t("toast.copyToClipboardAsPng") });
-    } catch (error) {
-      console.error(error);
-      this.setState({ errorMessage: error.message });
-    }
-  };
-
   private static resetTapTwice() {
     didTapTwice = false;
   }
@@ -1302,12 +1283,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.setState({
         showHelpDialog: true,
       });
-    }
-
-    if (event.code === CODES.C && event.altKey && event.shiftKey) {
-      this.copyToClipboardAsPng();
-      event.preventDefault();
-      return;
     }
 
     if (this.state.viewModeEnabled) {
