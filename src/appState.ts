@@ -5,7 +5,7 @@ import {
   DEFAULT_TEXT_ALIGN,
 } from "./constants";
 import { t } from "./i18n";
-import { AppState, FlooredNumber, NormalizedZoomValue } from "./types";
+import { AppState, NormalizedZoomValue } from "./types";
 import { getDateTime } from "./utils";
 
 export const getDefaultAppState = (): Omit<
@@ -56,8 +56,8 @@ export const getDefaultAppState = (): Omit<
     previousSelectedElementIds: {},
     resizingElement: null,
     scrolledOutside: false,
-    scrollX: 0 as FlooredNumber,
-    scrollY: 0 as FlooredNumber,
+    scrollX: 0,
+    scrollY: 0,
     selectedElementIds: {},
     selectedGroupIds: {},
     selectionElement: null,

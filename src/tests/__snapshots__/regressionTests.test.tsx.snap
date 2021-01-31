@@ -12705,7 +12705,7 @@ Object {
   },
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
-  "scrollX": -6,
+  "scrollX": -5.416666666666667,
   "scrollY": 0,
   "scrolledOutside": false,
   "selectedElementIds": Object {
@@ -12725,7 +12725,7 @@ Object {
   "zenModeEnabled": false,
   "zoom": Object {
     "translation": Object {
-      "x": 0.3333333333333357,
+      "x": 0.4166666666666714,
       "y": 0,
     },
     "value": 1,
@@ -20330,7 +20330,7 @@ Object {
   },
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
-  "scrollX": 11,
+  "scrollX": 11.046099290780141,
   "scrollY": -5,
   "scrolledOutside": false,
   "selectedElementIds": Object {
@@ -20350,7 +20350,7 @@ Object {
   "zenModeEnabled": false,
   "zoom": Object {
     "translation": Object {
-      "x": -60.420000000000016,
+      "x": -59.425,
       "y": -48.66347517730496,
     },
     "value": 1.99,

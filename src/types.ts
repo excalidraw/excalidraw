@@ -21,7 +21,6 @@ import type { ResolvablePromise } from "./utils";
 import { Spreadsheet } from "./charts";
 import { Language } from "./i18n";
 
-export type FlooredNumber = number & { _brand: "FlooredNumber" };
 export type Point = Readonly<RoughPoint>;
 
 export type Collaborator = {
@@ -68,8 +67,8 @@ export type AppState = {
   currentItemEndArrowhead: Arrowhead | null;
   currentItemLinearStrokeSharpness: ExcalidrawElement["strokeSharpness"];
   viewBackgroundColor: string;
-  scrollX: FlooredNumber;
-  scrollY: FlooredNumber;
+  scrollX: number;
+  scrollY: number;
   cursorButton: "up" | "down";
   scrolledOutside: boolean;
   name: string;
