@@ -27,6 +27,7 @@ Please add the latest change on the top under the correct section.
 
 ### Fixes
 
+- Fix UI pointer-events not disabled when dragging on canvas [#2856](https://github.com/excalidraw/excalidraw/pull/2856).
 - Fix remote pointers not accounting for offset [#2855](https://github.com/excalidraw/excalidraw/pull/2855).
 
 ## 0.2.1
