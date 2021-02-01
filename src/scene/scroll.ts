@@ -1,4 +1,4 @@
-import { AppState, FlooredNumber, PointerCoords, Zoom } from "../types";
+import { AppState, PointerCoords, Zoom } from "../types";
 import { ExcalidrawElement } from "../element/types";
 import { getCommonBounds, getClosestElementBounds } from "../element";
 
@@ -6,9 +6,6 @@ import {
   sceneCoordsToViewportCoords,
   viewportCoordsToSceneCoords,
 } from "../utils";
-
-export const normalizeScroll = (pos: number) =>
-  Math.floor(pos) as FlooredNumber;
 
 const isOutsideViewPort = (
   appState: AppState,
@@ -40,16 +37,14 @@ export const centerScrollOn = ({
   zoom: Zoom;
 }) => {
   return {
-    scrollX: normalizeScroll(
+    scrollX:
       (viewportDimensions.width / 2) * (1 / zoom.value) -
-        scenePoint.x -
-        zoom.translation.x * (1 / zoom.value),
-    ),
-    scrollY: normalizeScroll(
+      scenePoint.x -
+      zoom.translation.x * (1 / zoom.value),
+    scrollY:
       (viewportDimensions.height / 2) * (1 / zoom.value) -
-        scenePoint.y -
-        zoom.translation.y * (1 / zoom.value),
-    ),
+      scenePoint.y -
+      zoom.translation.y * (1 / zoom.value),
   };
 };
 
@@ -57,11 +52,11 @@ export const calculateScrollCenter = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   canvas: HTMLCanvasElement | null,
-): { scrollX: FlooredNumber; scrollY: FlooredNumber } => {
+): { scrollX: number; scrollY: number } => {
   if (!elements.length) {
     return {
-      scrollX: normalizeScroll(0),
-      scrollY: normalizeScroll(0),
+      scrollX: 0,
+      scrollY: 0,
     };
   }
   let [x1, y1, x2, y2] = getCommonBounds(elements);

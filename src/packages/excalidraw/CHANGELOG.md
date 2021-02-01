@@ -12,6 +12,31 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
+## [Unreleased]
+
+## Excalidraw API
+
+- Expose `getAppState` on `excalidrawRef` [#2834](https://github.com/excalidraw/excalidraw/pull/2834).
+
+## Excalidraw Library
+
+### Features
+
+- Remove `copy`, `cut`, and `paste` actions from contextmenu [#2872](https://github.com/excalidraw/excalidraw/pull/2872)
+- Support `Ctrl-Y` shortcut to redo on Windows [#2831](https://github.com/excalidraw/excalidraw/pull/2831).
+
+### Fixes
+
+- Fix remote pointers not accounting for offset [#2855](https://github.com/excalidraw/excalidraw/pull/2855).
+
+## 0.2.1
+
+## Excalidraw API
+
+### Build
+
+- Bundle css files with js [#2819](https://github.com/excalidraw/excalidraw/pull/2819). The host would not need to import css files separately.
+
 ## 0.2.0
 
 ## Excalidraw API

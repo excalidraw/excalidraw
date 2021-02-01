@@ -21,7 +21,6 @@ import type { ResolvablePromise } from "./utils";
 import { Spreadsheet } from "./charts";
 import { Language } from "./i18n";
 
-export type FlooredNumber = number & { _brand: "FlooredNumber" };
 export type Point = Readonly<RoughPoint>;
 
 export type Collaborator = {
@@ -68,8 +67,8 @@ export type AppState = {
   currentItemEndArrowhead: Arrowhead | null;
   currentItemLinearStrokeSharpness: ExcalidrawElement["strokeSharpness"];
   viewBackgroundColor: string;
-  scrollX: FlooredNumber;
-  scrollY: FlooredNumber;
+  scrollX: number;
+  scrollY: number;
   cursorButton: "up" | "down";
   scrolledOutside: boolean;
   name: string;
@@ -98,7 +97,7 @@ export type AppState = {
   offsetLeft: number;
 
   isLibraryOpen: boolean;
-  fileHandle: import("browser-nativefs").FileSystemHandle | null;
+  fileHandle: import("browser-fs-access").FileSystemHandle | null;
   collaborators: Map<string, Collaborator>;
   showStats: boolean;
   currentChartType: ChartType;
@@ -146,10 +145,7 @@ export type LibraryItems = readonly LibraryItem[];
 // NOTE ready/readyPromise props are optional for host apps' sake (our own
 // implem guarantees existence)
 export type ExcalidrawAPIRefValue =
-  | (ExcalidrawImperativeAPI & {
-      readyPromise?: ResolvablePromise<ExcalidrawImperativeAPI>;
-      ready?: true;
-    })
+  | ExcalidrawImperativeAPI
   | {
       readyPromise?: ResolvablePromise<ExcalidrawImperativeAPI>;
       ready?: false;

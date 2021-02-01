@@ -1,6 +1,7 @@
 import LanguageDetector from "i18next-browser-languagedetector";
 import React, {
   useCallback,
+  useContext,
   useEffect,
   useLayoutEffect,
   useRef,
@@ -17,12 +18,13 @@ import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
 } from "../element/types";
+import { useCallbackRefState } from "../hooks/useCallbackRefState";
 import { Language, t } from "../i18n";
 import Excalidraw, {
   defaultLang,
   languages,
 } from "../packages/excalidraw/index";
-import { AppState, ExcalidrawAPIRefValue } from "../types";
+import { AppState } from "../types";
 import {
   debounce,
   getVersion,
@@ -30,7 +32,11 @@ import {
   resolvablePromise,
 } from "../utils";
 import { SAVE_TO_LOCAL_STORAGE_TIMEOUT } from "./app_constants";
-import CollabWrapper, { CollabAPI } from "./collab/CollabWrapper";
+import CollabWrapper, {
+  CollabAPI,
+  CollabContext,
+  CollabContextConsumer,
+} from "./collab/CollabWrapper";
 import { LanguageList } from "./components/LanguageList";
 import { exportToBackend, getCollaborationLinkData, loadScene } from "./data";
 import { loadFromFirebase } from "./data/firebase";
@@ -48,15 +54,6 @@ languageDetector.init({
   },
   checkWhitelist: false,
 });
-
-const excalidrawRef: React.MutableRefObject<
-  MarkRequired<ExcalidrawAPIRefValue, "ready" | "readyPromise">
-> = {
-  current: {
-    readyPromise: resolvablePromise(),
-    ready: false,
-  },
-};
 
 const saveDebounced = debounce(
   (elements: readonly ExcalidrawElement[], state: AppState) => {
@@ -191,7 +188,7 @@ const initializeScene = async (opts: {
   return null;
 };
 
-const ExcalidrawWrapper = (props: { collab: CollabAPI }) => {
+const ExcalidrawWrapper = () => {
   // dimensions
   // ---------------------------------------------------------------------------
 
@@ -226,35 +223,40 @@ const ExcalidrawWrapper = (props: { collab: CollabAPI }) => {
     initialStatePromiseRef.current.promise = resolvablePromise<ImportedDataState | null>();
   }
 
-  const { collab } = props;
-
   useEffect(() => {
     // Delayed so that the app has a time to load the latest SW
     setTimeout(() => {
       trackEvent("load", "version", getVersion());
     }, VERSION_TIMEOUT);
+  }, []);
 
-    excalidrawRef.current!.readyPromise.then((excalidrawApi) => {
-      initializeScene({
-        resetScene: excalidrawApi.resetScene,
-        initializeSocketClient: collab.initializeSocketClient,
-      }).then((scene) => {
-        initialStatePromiseRef.current.promise.resolve(scene);
-      });
+  const [
+    excalidrawAPI,
+    excalidrawRefCallback,
+  ] = useCallbackRefState<ExcalidrawImperativeAPI>();
+
+  const collabAPI = useContext(CollabContext)?.api;
+
+  useEffect(() => {
+    if (!collabAPI || !excalidrawAPI) {
+      return;
+    }
+
+    initializeScene({
+      resetScene: excalidrawAPI.resetScene,
+      initializeSocketClient: collabAPI.initializeSocketClient,
+    }).then((scene) => {
+      initialStatePromiseRef.current.promise.resolve(scene);
     });
 
     const onHashChange = (_: HashChangeEvent) => {
-      const api = excalidrawRef.current!;
-      if (!api.ready) {
-        return;
-      }
       if (window.location.hash.length > 1) {
         initializeScene({
-          resetScene: api.resetScene,
-          initializeSocketClient: collab.initializeSocketClient,
+          resetScene: excalidrawAPI.resetScene,
+          initializeSocketClient: collabAPI.initializeSocketClient,
         }).then((scene) => {
           if (scene) {
-            api.updateScene(scene);
+            excalidrawAPI.updateScene(scene);
           }
         });
       }
@@ -273,7 +275,7 @@ const ExcalidrawWrapper = (props: { collab: CollabAPI }) => {
       window.removeEventListener(EVENT.BLUR, onBlur, false);
       clearTimeout(titleTimeout);
     };
-  }, [collab.initializeSocketClient]);
+  }, [collabAPI, excalidrawAPI]);
 
   useEffect(() => {
     languageDetector.cacheUserLanguage(langCode);
@@ -284,8 +286,8 @@ const ExcalidrawWrapper = (props: { collab: CollabAPI }) => {
     appState: AppState,
   ) => {
     saveDebounced(elements, appState);
-    if (collab.isCollaborating) {
-      collab.broadcastElements(elements, appState);
+    if (collabAPI?.isCollaborating) {
+      collabAPI.broadcastElements(elements);
     }
   };
 
@@ -343,19 +345,20 @@ const ExcalidrawWrapper = (props: { collab: CollabAPI }) => {
   return (
     <>
       <Excalidraw
-        ref={excalidrawRef}
+        ref={excalidrawRefCallback}
         onChange={onChange}
         width={dimensions.width}
         height={dimensions.height}
         initialData={initialStatePromiseRef.current.promise}
-        user={{ name: collab.username }}
-        onCollabButtonClick={collab.onCollabButtonClick}
-        isCollaborating={collab.isCollaborating}
-        onPointerUpdate={collab.onPointerUpdate}
+        user={{ name: collabAPI?.username }}
+        onCollabButtonClick={collabAPI?.onCollabButtonClick}
+        isCollaborating={collabAPI?.isCollaborating}
+        onPointerUpdate={collabAPI?.onPointerUpdate}
         onExportToBackend={onExportToBackend}
         renderFooter={renderFooter}
         langCode={langCode}
       />
+      {excalidrawAPI && <CollabWrapper excalidrawAPI={excalidrawAPI} />}
       {errorMessage && (
         <ErrorDialog
           message={errorMessage}
@@ -369,13 +372,9 @@ const ExcalidrawWrapper = (props: { collab: CollabAPI }) => {
 export default function ExcalidrawApp() {
   return (
     <TopErrorBoundary>
-      <CollabWrapper
-        excalidrawRef={
-          excalidrawRef as React.MutableRefObject<ExcalidrawImperativeAPI>
-        }
-      >
-        {(collab) => <ExcalidrawWrapper collab={collab} />}
-      </CollabWrapper>
+      <CollabContextConsumer>
+        <ExcalidrawWrapper />
+      </CollabContextConsumer>
     </TopErrorBoundary>
   );
 }

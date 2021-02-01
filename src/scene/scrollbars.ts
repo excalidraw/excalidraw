@@ -1,6 +1,6 @@
 import { ExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element";
-import { FlooredNumber, Zoom } from "../types";
+import { Zoom } from "../types";
 import { ScrollBars } from "./types";
 import { getGlobalCSSVariable } from "../utils";
 import { getLanguage } from "../i18n";
@@ -18,8 +18,8 @@ export const getScrollBars = (
     scrollY,
     zoom,
   }: {
-    scrollX: FlooredNumber;
-    scrollY: FlooredNumber;
+    scrollX: number;
+    scrollY: number;
     zoom: Zoom;
   },
 ): ScrollBars => {

@@ -199,24 +199,26 @@
   "errorDialog": {
     "title": "오류"
   },
-  "shortcutsDialog": {
-    "title": "키보드 단축키",
-    "shapes": "모양",
-    "or": "또는",
-    "click": "클릭",
-    "drag": "드래그",
-    "curvedArrow": "곡선 화살표",
-    "curvedLine": "곡선",
-    "editor": "편집",
-    "view": "보기",
-    "blog": "블로그 읽어보기",
-    "howto": "가이드 참고하기",
-    "github": "이슈 제보하기",
-    "textNewLine": "줄바꿈 (텍스트)",
-    "textFinish": "편집 완료 (텍스트)",
-    "zoomToFit": "모든 요소가 보이도록 확대/축소",
-    "zoomToSelection": "선택 영역으로 확대/축소",
-    "preventBinding": "화살표가 붙지 않게 하기"
+  "helpDialog": {
+    "blog": "",
+    "click": "",
+    "curvedArrow": "",
+    "curvedLine": "",
+    "documentation": "",
+    "drag": "",
+    "editor": "",
+    "github": "",
+    "howto": "",
+    "or": "",
+    "preventBinding": "",
+    "shapes": "",
+    "shortcuts": "",
+    "textFinish": "",
+    "textNewLine": "",
+    "title": "",
+    "view": "",
+    "zoomToFit": "",
+    "zoomToSelection": ""
   },
   "encrypted": {
     "tooltip": "그림은 종단 간 암호화되므로 Excalidraw의 서버는 절대로 내용을 알 수 없습니다."
@@ -232,5 +234,9 @@
     "title": "덕후들을 위한 통계",
     "total": "합계",
     "width": "너비"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboardAsPng": ""
   }
 }

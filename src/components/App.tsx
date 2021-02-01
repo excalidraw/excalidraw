@@ -3,7 +3,28 @@ import React from "react";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
 import "../actions";
-import { actionDeleteSelected, actionFinalize } from "../actions";
+import {
+  actionAddToLibrary,
+  actionBringForward,
+  actionBringToFront,
+  actionCopy,
+  actionCopyAsPng,
+  actionCopyAsSvg,
+  actionCopyStyles,
+  actionCut,
+  actionDeleteSelected,
+  actionDuplicateSelection,
+  actionFinalize,
+  actionGroup,
+  actionPasteStyles,
+  actionSelectAll,
+  actionSendBackward,
+  actionSendToBack,
+  actionToggleGridMode,
+  actionToggleStats,
+  actionToggleZenMode,
+  actionUngroup,
+} from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
@@ -18,7 +39,6 @@ import {
 } from "../clipboard";
 import {
   APP_NAME,
-  CANVAS_ONLY_ACTIONS,
   CURSOR_TYPE,
   DEFAULT_VERTICAL_ALIGN,
   DRAGGING_THRESHOLD,
@@ -26,15 +46,15 @@ import {
   ELEMENT_TRANSLATE_AMOUNT,
   ENV,
   EVENT,
-  GRID_SIZE,
   LINE_CONFIRM_THRESHOLD,
   MIME_TYPES,
   POINTER_BUTTON,
   TAP_TWICE_TIMEOUT,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
   TOUCH_CTX_MENU_TIMEOUT,
+  ZOOM_STEP,
 } from "../constants";
-import { exportCanvas, loadFromBlob } from "../data";
+import { loadFromBlob } from "../data";
 import { isValidLibrary } from "../data/json";
 import { Library } from "../data/library";
 import { restore } from "../data/restore";
@@ -127,7 +147,6 @@ import {
   getSelectedElements,
   isOverScrollBars,
   isSomeElementSelected,
-  normalizeScroll,
 } from "../scene";
 import Scene from "../scene/Scene";
 import { SceneState, ScrollBars } from "../scene/types";
@@ -155,6 +174,7 @@ import {
   viewportCoordsToSceneCoords,
   withBatchedUpdates,
 } from "../utils";
+import { isMobile } from "../is-mobile";
 import ContextMenu from "./ContextMenu";
 import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
@@ -248,6 +268,7 @@ export type ExcalidrawImperativeAPI = {
   };
   setScrollToCenter: InstanceType<typeof App>["setScrollToCenter"];
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
+  getAppState: () => InstanceType<typeof App>["state"];
   readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
   ready: true;
 };
@@ -298,6 +319,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         },
         setScrollToCenter: this.setScrollToCenter,
         getSceneElements: this.getSceneElements,
+        getAppState: () => this.state,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -312,6 +334,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.syncActionResult,
       () => this.state,
       () => this.scene.getElementsIncludingDeleted(),
+      this,
     );
     this.actionManager.registerAll(actions);
 
@@ -906,44 +929,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     copyToClipboard(this.scene.getElements(), this.state);
   };
 
-  private copyToClipboardAsPng = async () => {
-    const elements = this.scene.getElements();
-
-    const selectedElements = getSelectedElements(elements, this.state);
-    try {
-      await exportCanvas(
-        "clipboard",
-        selectedElements.length ? selectedElements : elements,
-        this.state,
-        this.canvas!,
-        this.state,
-      );
-      this.setState({ toastMessage: t("toast.copyToClipboardAsPng") });
-    } catch (error) {
-      console.error(error);
-      this.setState({ errorMessage: error.message });
-    }
-  };
-
-  private copyToClipboardAsSvg = async () => {
-    const selectedElements = getSelectedElements(
-      this.scene.getElements(),
-      this.state,
-    );
-    try {
-      await exportCanvas(
-        "clipboard-svg",
-        selectedElements.length ? selectedElements : this.scene.getElements(),
-        this.state,
-        this.canvas!,
-        this.state,
-      );
-    } catch (error) {
-      console.error(error);
-      this.setState({ errorMessage: error.message });
-    }
-  };
-
   private static resetTapTwice() {
     didTapTwice = false;
   }
@@ -1146,24 +1131,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   toggleZenMode = () => {
-    this.setState({
-      zenModeEnabled: !this.state.zenModeEnabled,
-    });
+    this.actionManager.executeAction(actionToggleZenMode);
   };
 
   toggleGridMode = () => {
-    this.setState({
-      gridSize: this.state.gridSize ? null : GRID_SIZE,
-    });
+    this.actionManager.executeAction(actionToggleGridMode);
   };
 
   toggleStats = () => {
     if (!this.state.showStats) {
       trackEvent("dialog", "stats");
     }
-    this.setState({
-      showStats: !this.state.showStats,
-    });
+    this.actionManager.executeAction(actionToggleStats);
   };
 
   setScrollToCenter = (remoteElements: readonly ExcalidrawElement[]) => {
@@ -1253,21 +1232,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
     }
 
-    if (!event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.Z) {
-      this.toggleZenMode();
-    }
-
-    if (event[KEYS.CTRL_OR_CMD] && event.code === CODES.QUOTE) {
-      this.toggleGridMode();
-    }
     if (event[KEYS.CTRL_OR_CMD]) {
       this.setState({ isBindingEnabled: false });
-    }
-
-    if (event.code === CODES.C && event.altKey && event.shiftKey) {
-      this.copyToClipboardAsPng();
-      event.preventDefault();
-      return;
     }
 
     if (this.actionManager.handleKeyDown(event)) {
@@ -1778,8 +1744,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       const scaleFactor = distance / gesture.initialDistance;
 
       this.setState(({ zoom, scrollX, scrollY, offsetLeft, offsetTop }) => ({
-        scrollX: normalizeScroll(scrollX + deltaX / zoom.value),
-        scrollY: normalizeScroll(scrollY + deltaY / zoom.value),
+        scrollX: scrollX + deltaX / zoom.value,
+        scrollY: scrollY + deltaY / zoom.value,
         zoom: getNewZoom(
           getNormalizedZoom(initialScale * scaleFactor),
           zoom,
@@ -2190,12 +2156,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
 
       this.setState({
-        scrollX: normalizeScroll(
-          this.state.scrollX - deltaX / this.state.zoom.value,
-        ),
-        scrollY: normalizeScroll(
-          this.state.scrollY - deltaY / this.state.zoom.value,
-        ),
+        scrollX: this.state.scrollX - deltaX / this.state.zoom.value,
+        scrollY: this.state.scrollY - deltaY / this.state.zoom.value,
       });
     });
     const teardown = withBatchedUpdates(
@@ -3009,9 +2971,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       const x = event.clientX;
       const dx = x - pointerDownState.lastCoords.x;
       this.setState({
-        scrollX: normalizeScroll(
-          this.state.scrollX - dx / this.state.zoom.value,
-        ),
+        scrollX: this.state.scrollX - dx / this.state.zoom.value,
       });
       pointerDownState.lastCoords.x = x;
       return true;
@@ -3021,9 +2981,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       const y = event.clientY;
       const dy = y - pointerDownState.lastCoords.y;
       this.setState({
-        scrollY: normalizeScroll(
-          this.state.scrollY - dy / this.state.zoom.value,
-        ),
+        scrollY: this.state.scrollY - dy / this.state.zoom.value,
       });
       pointerDownState.lastCoords.y = y;
       return true;
@@ -3616,52 +3574,56 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.state,
     );
 
+    const maybeGroupAction = actionGroup.contextItemPredicate!(
+      this.actionManager.getElementsIncludingDeleted(),
+      this.actionManager.getAppState(),
+    );
+
+    const maybeUngroupAction = actionUngroup.contextItemPredicate!(
+      this.actionManager.getElementsIncludingDeleted(),
+      this.actionManager.getAppState(),
+    );
+
+    const separator = "separator";
+
+    const _isMobile = isMobile();
+
     const elements = this.scene.getElements();
     const element = this.getElementAtPosition(x, y);
     if (!element) {
       ContextMenu.push({
         options: [
-          navigator.clipboard && {
-            shortcutName: "paste",
-            label: t("labels.paste"),
-            action: () => this.pasteFromClipboard(null),
-          },
+          _isMobile &&
+            navigator.clipboard && {
+              name: "paste",
+              perform: (elements, appStates) => {
+                this.pasteFromClipboard(null);
+                return {
+                  commitToHistory: false,
+                };
+              },
+              contextItemLabel: "labels.paste",
+            },
+          _isMobile && navigator.clipboard && separator,
           probablySupportsClipboardBlob &&
-            elements.length > 0 && {
-              shortcutName: "copyAsPng",
-              label: t("labels.copyAsPng"),
-              action: this.copyToClipboardAsPng,
-            },
+            elements.length > 0 &&
+            actionCopyAsPng,
           probablySupportsClipboardWriteText &&
-            elements.length > 0 && {
-              shortcutName: "copyAsSvg",
-              label: t("labels.copyAsSvg"),
-              action: this.copyToClipboardAsSvg,
-            },
-          ...this.actionManager.getContextMenuItems((action) =>
-            CANVAS_ONLY_ACTIONS.includes(action.name),
-          ),
-          {
-            checked: this.state.gridSize !== null,
-            shortcutName: "gridMode",
-            label: t("labels.gridMode"),
-            action: this.toggleGridMode,
-          },
-          {
-            checked: this.state.zenModeEnabled,
-            shortcutName: "zenMode",
-            label: t("buttons.zenMode"),
-            action: this.toggleZenMode,
-          },
-          {
-            checked: this.state.showStats,
-            shortcutName: "stats",
-            label: t("stats.title"),
-            action: this.toggleStats,
-          },
+            elements.length > 0 &&
+            actionCopyAsSvg,
+          ((probablySupportsClipboardBlob && elements.length > 0) ||
+            (probablySupportsClipboardWriteText && elements.length > 0)) &&
+            separator,
+          actionSelectAll,
+          separator,
+          actionToggleGridMode,
+          actionToggleZenMode,
+          actionToggleStats,
         ],
         top: clientY,
         left: clientX,
+        actionManager: this.actionManager,
+        appState: this.state,
       });
       return;
     }
@@ -3672,37 +3634,43 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     ContextMenu.push({
       options: [
-        {
-          shortcutName: "cut",
-          label: t("labels.cut"),
-          action: this.cutAll,
-        },
-        navigator.clipboard && {
-          shortcutName: "copy",
-          label: t("labels.copy"),
-          action: this.copyAll,
-        },
-        navigator.clipboard && {
-          shortcutName: "paste",
-          label: t("labels.paste"),
-          action: () => this.pasteFromClipboard(null),
-        },
-        probablySupportsClipboardBlob && {
-          shortcutName: "copyAsPng",
-          label: t("labels.copyAsPng"),
-          action: this.copyToClipboardAsPng,
-        },
-        probablySupportsClipboardWriteText && {
-          shortcutName: "copyAsSvg",
-          label: t("labels.copyAsSvg"),
-          action: this.copyToClipboardAsSvg,
-        },
-        ...this.actionManager.getContextMenuItems(
-          (action) => !CANVAS_ONLY_ACTIONS.includes(action.name),
-        ),
+        _isMobile && actionCut,
+        _isMobile && navigator.clipboard && actionCopy,
+        _isMobile &&
+          navigator.clipboard && {
+            name: "paste",
+            perform: (elements, appStates) => {
+              this.pasteFromClipboard(null);
+              return {
+                commitToHistory: false,
+              };
+            },
+            contextItemLabel: "labels.paste",
+          },
+        _isMobile && separator,
+        probablySupportsClipboardBlob && actionCopyAsPng,
+        probablySupportsClipboardWriteText && actionCopyAsSvg,
+        separator,
+        actionCopyStyles,
+        actionPasteStyles,
+        separator,
+        maybeGroupAction && actionGroup,
+        maybeUngroupAction && actionUngroup,
+        (maybeGroupAction || maybeUngroupAction) && separator,
+        actionAddToLibrary,
+        separator,
+        actionSendBackward,
+        actionBringForward,
+        actionSendToBack,
+        actionBringToFront,
+        separator,
+        actionDuplicateSelection,
+        actionDeleteSelected,
       ],
       top: clientY,
       left: clientX,
+      actionManager: this.actionManager,
+      appState: this.state,
     });
   };
 
@@ -3733,9 +3701,15 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         }, 1000);
       }
 
+      let newZoom = this.state.zoom.value - delta / 100;
+      // increase zoom steps the more zoomed-in we are (applies to >100% only)
+      newZoom += Math.log10(Math.max(1, this.state.zoom.value)) * -sign;
+      // round to nearest step
+      newZoom = Math.round(newZoom * ZOOM_STEP * 100) / (ZOOM_STEP * 100);
+
       this.setState(({ zoom, offsetLeft, offsetTop }) => ({
         zoom: getNewZoom(
-          getNormalizedZoom(zoom.value - delta / 100),
+          getNormalizedZoom(newZoom),
           zoom,
           { left: offsetLeft, top: offsetTop },
           {
@@ -3758,14 +3732,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (event.shiftKey) {
       this.setState(({ zoom, scrollX }) => ({
         // on Mac, shift+wheel tends to result in deltaX
-        scrollX: normalizeScroll(scrollX - (deltaY || deltaX) / zoom.value),
+        scrollX: scrollX - (deltaY || deltaX) / zoom.value,
       }));
       return;
     }
 
     this.setState(({ zoom, scrollX, scrollY }) => ({
-      scrollX: normalizeScroll(scrollX - deltaX / zoom.value),
-      scrollY: normalizeScroll(scrollY - deltaY / zoom.value),
+      scrollX: scrollX - deltaX / zoom.value,
+      scrollY: scrollY - deltaY / zoom.value,
     }));
   });
 

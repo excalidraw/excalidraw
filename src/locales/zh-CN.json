@@ -60,10 +60,10 @@
     "extraBold": "超粗",
     "architect": "朴素",
     "artist": "艺术",
-    "cartoonist": "漫画师",
+    "cartoonist": "漫画家",
     "fileTitle": "文件标题",
     "colorPicker": "调色盘",
-    "canvasBackground": "Canvas 背景",
+    "canvasBackground": "画布背景",
     "drawingCanvas": "绘制 Canvas",
     "layers": "图层",
     "actions": "操作",
@@ -128,10 +128,10 @@
     "clearReset": "这将会清除整个 画板。您是否要继续?",
     "couldNotCreateShareableLink": "无法创建共享链接",
     "couldNotCreateShareableLinkTooBig": "无法创建可共享链接：画布过大",
-    "couldNotLoadInvalidFile": "无法加载错误文件",
-    "importBackendFailed": "从后端导入失败",
-    "cannotExportEmptyCanvas": "无法导出空画布。",
-    "couldNotCopyToClipboard": "无法复制到剪贴板。请尝试使用 Chrome 浏览器。",
+    "couldNotLoadInvalidFile": "无法加载无效的文件",
+    "importBackendFailed": "从后端导入失败。",
+    "cannotExportEmptyCanvas": "无法导出空白画布。",
+    "couldNotCopyToClipboard": "无法复制到剪贴板，请尝试使用 Chrome 浏览器。",
     "decryptFailed": "无法解密数据。",
     "uploadedSecurly": "上传已被端到端加密保护，这意味着 Excalidraw 的服务器和第三方都无法读取内容。",
     "loadSceneOverridePrompt": "加载外部绘图将取代您现有的内容。您想要继续吗？",
@@ -199,24 +199,26 @@
   "errorDialog": {
     "title": "错误"
   },
-  "shortcutsDialog": {
-    "title": "快捷键列表",
-    "shapes": "形状",
-    "or": "或",
-    "click": "点击",
-    "drag": "拖动",
-    "curvedArrow": "曲线（带有箭头）",
-    "curvedLine": "曲线（无箭头）",
-    "editor": "编辑器",
-    "view": "视图",
+  "helpDialog": {
     "blog": "浏览我们的博客",
-    "howto": "跟随我们的指南",
-    "github": "发现问题？请提出来",
+    "click": "单击",
+    "curvedArrow": "曲线箭头",
+    "curvedLine": "曲线",
+    "documentation": "文档",
+    "drag": "拖动",
+    "editor": "编辑器",
+    "github": "提交问题",
+    "howto": "帮助文档",
+    "or": "或",
+    "preventBinding": "禁用箭头吸附",
+    "shapes": "形状",
+    "shortcuts": "快捷键列表",
+    "textFinish": "完成文本编辑",
     "textNewLine": "文本换行",
-    "textFinish": "完成编辑文本",
+    "title": "帮助",
+    "view": "视图",
     "zoomToFit": "缩放以适应所有元素",
-    "zoomToSelection": "缩放至选择部分",
-    "preventBinding": "防止箭头吸附"
+    "zoomToSelection": "缩放到选区"
   },
   "encrypted": {
     "tooltip": "您的绘图采用的端到端加密，其内容对于Excalidraw服务器是不可见的。"
@@ -232,5 +234,9 @@
     "title": "详细统计信息",
     "total": "总计",
     "width": "宽度"
+  },
+  "toast": {
+    "copyStyles": "复制样式",
+    "copyToClipboardAsPng": "复制为 PNG 到剪贴板"
   }
 }

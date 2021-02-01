@@ -2,3 +2,7 @@
 
 // Keep up to date with is-mobile.tsx
 $is-mobile-query: "(max-width: 600px), (max-height: 500px) and (max-width: 1000px)";
+
+:export {
+  isMobileQuery: unquote($is-mobile-query);
+}
