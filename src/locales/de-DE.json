@@ -91,7 +91,8 @@
     "centerVertically": "Vertikal zentrieren",
     "centerHorizontally": "Horizontal zentrieren",
     "distributeHorizontally": "Horizontal verteilen",
-    "distributeVertically": "Vertikal verteilen"
+    "distributeVertically": "Vertikal verteilen",
+    "viewMode": ""
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
