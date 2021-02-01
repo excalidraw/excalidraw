@@ -91,7 +91,8 @@
     "centerVertically": "Κέντρο κάθετα",
     "centerHorizontally": "Κέντρο οριζόντια",
     "distributeHorizontally": "Οριζόντια κατανομή",
-    "distributeVertically": "Κατακόρυφη κατανομή"
+    "distributeVertically": "Κατακόρυφη κατανομή",
+    "viewMode": ""
   },
   "buttons": {
     "clearReset": "Επαναφορά του καμβά",
