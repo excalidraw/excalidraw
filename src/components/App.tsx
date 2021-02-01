@@ -2167,7 +2167,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         gesture.pointers.size === 0 &&
         (event.button === POINTER_BUTTON.WHEEL ||
           (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
-          (event.button === POINTER_BUTTON.MAIN && this.state.viewModeEnabled))
+          (Object.keys(this.state.selectedElementIds).length === 0 &&
+            this.state.viewModeEnabled))
       )
     ) {
       return false;
