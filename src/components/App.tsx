@@ -363,7 +363,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           style={{
             width: canvasDOMWidth,
             height: canvasDOMHeight,
-            cursor: "not-allowed",
+            cursor: "grabbing",
           }}
           width={canvasWidth}
           height={canvasHeight}
@@ -2166,7 +2166,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       !(
         gesture.pointers.size === 0 &&
         (event.button === POINTER_BUTTON.WHEEL ||
-          (event.button === POINTER_BUTTON.MAIN && isHoldingSpace))
+          (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
+          (event.button === POINTER_BUTTON.MAIN && this.state.viewModeEnabled))
       )
     ) {
       return false;
