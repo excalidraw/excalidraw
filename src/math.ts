@@ -167,7 +167,7 @@ export const isPathALoop = (
       (LINE_CONFIRM_THRESHOLD / Math.log1p(zoomValue * k)) *
       // multiplying by log reciprocal will cancel it out when zoomValue
       // is 100%, so that threshold always results in LINE_CONFIRM_THRESHOLD
-      (Math.log1p(1 * k) / 1);
+      Math.log1p(k);
 
     return distance <= threshold;
   }
