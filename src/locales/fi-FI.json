@@ -92,7 +92,7 @@
     "centerHorizontally": "Keskitä vaakasuunnassa",
     "distributeHorizontally": "Jaa vaakasuunnassa",
     "distributeVertically": "Jaa pystysuunnassa",
-    "viewMode": ""
+    "viewMode": "Katselutila"
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
