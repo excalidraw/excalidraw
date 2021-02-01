@@ -5,7 +5,7 @@ import { trackEvent } from "../analytics";
 export const actionToggleViewMode = register({
   name: "viewMode",
   perform(elements, appState) {
-    trackEvent("contextmenu", "viewMode");
+    trackEvent("view", "mode", "view");
     return {
       appState: {
         ...appState,
