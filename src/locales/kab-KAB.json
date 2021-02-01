@@ -50,8 +50,8 @@
     "large": "Ameqran",
     "veryLarge": "Meqqer aṭas",
     "solid": "Aččuran",
-    "hachure": "",
-    "crossHatch": "",
+    "hachure": "Azerreg",
+    "crossHatch": "Azerreg anmidag",
     "thin": "Arqaq",
     "bold": "Azuran",
     "left": "Azelmaḍ",
@@ -94,13 +94,13 @@
     "distributeVertically": ""
   },
   "buttons": {
-    "clearReset": "",
+    "clearReset": "Ales awennez n teɣzut n usuneɣ",
     "export": "Sifeḍ",
     "exportToPng": "Sifeḍ ɣer PNG",
     "exportToSvg": "Sifeḍ ɣer SVG",
     "copyToClipboard": "Nɣel ɣer tecfawit",
     "copyPngToClipboard": "Nɣel PNG ɣer tecfawit",
-    "scale": "",
+    "scale": "Taskala",
     "save": "Sekles",
     "saveAs": "Sekles am",
     "load": "Sali-d",
@@ -121,7 +121,7 @@
     "fullScreen": "Agdil aččuran",
     "darkMode": "Askar imsulles",
     "lightMode": "Askar afaw",
-    "zenMode": "",
+    "zenMode": "Askar Zen",
     "exitZenMode": ""
   },
   "alerts": {
