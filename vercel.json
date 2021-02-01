@@ -21,11 +21,5 @@
         }
       ]
     }
-  ],
-  "redirects": [
-    {
-      "source": "/([^.]+)",
-      "destination": "/"
-    }
   ]
 }
