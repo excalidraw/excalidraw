@@ -282,7 +282,7 @@
     pointer-events: none !important;
   }
 
-  .App-menu_top > * {
+  .layer-ui__wrapper:not(.disable-pointerEvents) .App-menu_top > * {
     pointer-events: all;
   }
 
@@ -323,7 +323,7 @@
     }
   }
 
-  .App-menu_bottom > * {
+  .layer-ui__wrapper:not(.disable-pointerEvents) .App-menu_bottom > * {
     pointer-events: all;
   }
 

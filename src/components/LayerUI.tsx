@@ -602,7 +602,11 @@ const LayerUI = ({
       />
     </>
   ) : (
-    <div className="layer-ui__wrapper">
+    <div
+      className={clsx("layer-ui__wrapper", {
+        "disable-pointerEvents": appState.cursorButton === "down",
+      })}
+    >
       {dialogs}
       {renderFixedSideContainer()}
       {renderBottomAppMenu()}
