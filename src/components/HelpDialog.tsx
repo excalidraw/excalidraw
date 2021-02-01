@@ -227,6 +227,10 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                   label={t("labels.gridMode")}
                   shortcuts={[getShortcutKey("CtrlOrCmd+'")]}
                 />
+                <Shortcut
+                  label={t("labels.viewMode")}
+                  shortcuts={[getShortcutKey("Alt+R")]}
+                />
               </ShortcutIsland>
             </Column>
             <Column>

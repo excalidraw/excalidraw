@@ -61,6 +61,7 @@ interface LayerUIProps {
     canvas: HTMLCanvasElement | null,
   ) => void;
   renderCustomFooter?: (isMobile: boolean) => JSX.Element;
+  viewModeEnabled: boolean;
 }
 
 const useOnClickOutside = (
@@ -299,6 +300,7 @@ const LayerUI = ({
   isCollaborating,
   onExportToBackend,
   renderCustomFooter,
+  viewModeEnabled,
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
@@ -358,6 +360,28 @@ const LayerUI = ({
     );
   };
 
+  const renderViewModeCanvasActions = () => {
+    return (
+      <Section
+        heading="canvasActions"
+        className={clsx("zen-mode-transition", {
+          "transition-left": zenModeEnabled,
+        })}
+      >
+        {/* the zIndex ensures this menu has higher stacking order,
+         see https://github.com/excalidraw/excalidraw/pull/1445 */}
+        <Island padding={2} style={{ zIndex: 1 }}>
+          <Stack.Col gap={4}>
+            <Stack.Row gap={1} justifyContent="space-between">
+              {actionManager.renderAction("saveScene")}
+              {actionManager.renderAction("saveAsScene")}
+              {renderExportDialog()}
+            </Stack.Row>
+          </Stack.Col>
+        </Island>
+      </Section>
+    );
+  };
   const renderCanvasActions = () => (
     <Section
       heading="canvasActions"
@@ -448,38 +472,42 @@ const LayerUI = ({
             gap={4}
             className={clsx({ "disable-pointerEvents": zenModeEnabled })}
           >
-            {renderCanvasActions()}
+            {viewModeEnabled
+              ? renderViewModeCanvasActions()
+              : renderCanvasActions()}
             {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
           </Stack.Col>
-          <Section heading="shapes">
-            {(heading) => (
-              <Stack.Col gap={4} align="start">
-                <Stack.Row gap={1}>
-                  <Island
-                    padding={1}
-                    className={clsx({ "zen-mode": zenModeEnabled })}
-                  >
-                    <HintViewer appState={appState} elements={elements} />
-                    {heading}
-                    <Stack.Row gap={1}>
-                      <ShapesSwitcher
-                        elementType={appState.elementType}
-                        setAppState={setAppState}
-                        isLibraryOpen={appState.isLibraryOpen}
-                      />
-                    </Stack.Row>
-                  </Island>
-                  <LockIcon
-                    zenModeEnabled={zenModeEnabled}
-                    checked={appState.elementLocked}
-                    onChange={onLockToggle}
-                    title={t("toolBar.lock")}
-                  />
-                </Stack.Row>
-                {libraryMenu}
-              </Stack.Col>
-            )}
-          </Section>
+          {!viewModeEnabled && (
+            <Section heading="shapes">
+              {(heading) => (
+                <Stack.Col gap={4} align="start">
+                  <Stack.Row gap={1}>
+                    <Island
+                      padding={1}
+                      className={clsx({ "zen-mode": zenModeEnabled })}
+                    >
+                      <HintViewer appState={appState} elements={elements} />
+                      {heading}
+                      <Stack.Row gap={1}>
+                        <ShapesSwitcher
+                          elementType={appState.elementType}
+                          setAppState={setAppState}
+                          isLibraryOpen={appState.isLibraryOpen}
+                        />
+                      </Stack.Row>
+                    </Island>
+                    <LockIcon
+                      zenModeEnabled={zenModeEnabled}
+                      checked={appState.elementLocked}
+                      onChange={onLockToggle}
+                      title={t("toolBar.lock")}
+                    />
+                  </Stack.Row>
+                  {libraryMenu}
+                </Stack.Col>
+              )}
+            </Section>
+          )}
           <UserList
             className={clsx("zen-mode-transition", {
               "transition-right": zenModeEnabled,
@@ -524,6 +552,20 @@ const LayerUI = ({
     );
   };
 
+  const renderGitHubCorner = () => {
+    return (
+      <aside
+        className={clsx(
+          "layer-ui__wrapper__github-corner zen-mode-transition",
+          {
+            "transition-right": zenModeEnabled,
+          },
+        )}
+      >
+        <GitHubCorner appearance={appState.appearance} />
+      </aside>
+    );
+  };
   const renderFooter = () => (
     <footer role="contentinfo" className="layer-ui__wrapper__footer">
       <div
@@ -599,6 +641,7 @@ const LayerUI = ({
         canvas={canvas}
         isCollaborating={isCollaborating}
         renderCustomFooter={renderCustomFooter}
+        viewModeEnabled={viewModeEnabled}
       />
     </>
   ) : (
@@ -610,18 +653,7 @@ const LayerUI = ({
       {dialogs}
       {renderFixedSideContainer()}
       {renderBottomAppMenu()}
-      {
-        <aside
-          className={clsx(
-            "layer-ui__wrapper__github-corner zen-mode-transition",
-            {
-              "transition-right": zenModeEnabled,
-            },
-          )}
-        >
-          <GitHubCorner appearance={appState.appearance} />
-        </aside>
-      }
+      {renderGitHubCorner()}
       {renderFooter()}
     </div>
   );
