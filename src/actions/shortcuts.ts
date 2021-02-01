@@ -22,7 +22,8 @@ export type ShortcutName =
   | "gridMode"
   | "zenMode"
   | "stats"
-  | "addToLibrary";
+  | "addToLibrary"
+  | "viewMode";
 
 const shortcutMap: Record<ShortcutName, string[]> = {
   cut: [getShortcutKey("CtrlOrCmd+X")],
@@ -56,6 +57,7 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   zenMode: [getShortcutKey("Alt+Z")],
   stats: [],
   addToLibrary: [],
+  viewMode: [getShortcutKey("Alt+R")],
 };
 
 export const getShortcutFromShortcutName = (name: ShortcutName) => {

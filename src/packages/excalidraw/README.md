@@ -138,6 +138,7 @@ export default function App() {
 | [`onExportToBackend`](#onExportToBackend) | Function |  | Callback triggered when link button is clicked on export dialog |
 | [`langCode`](#langCode) | string | `en` | Language code string |
 | [`renderFooter `](#renderFooter) | Function |  | Function that renders custom UI footer |
+| [`viewModeEnabled`](#viewModeEnabled) | boolean | false | This implies if the app is in view mode. |
 
 ### `Extra API's`
 
@@ -330,3 +331,7 @@ import { defaultLang, languages } from "@excalidraw/excalidraw";
 #### `renderFooter`
 
 A function that renders (returns JSX) custom UI footer. For example, you can use this to render a language picker that was previously being rendered by Excalidraw itself (for now, you'll need to implement your own language picker).
+
+#### `viewModeEnabled`
+
+This prop indicates if the app is in `view mode`. When this prop is used, the `view mode` will not show up in context menu is so it is fully controlled by host. Also the value of this prop if passed will be used over the value of `intialData.appState.viewModeEnabled`

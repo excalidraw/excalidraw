@@ -373,12 +373,14 @@ export const renderScene = (
         sceneState.zoom,
         "mouse", // when we render we don't know which pointer type so use mouse
       );
-      renderTransformHandles(
-        context,
-        sceneState,
-        transformHandles,
-        locallySelectedElements[0].angle,
-      );
+      if (!appState.viewModeEnabled) {
+        renderTransformHandles(
+          context,
+          sceneState,
+          transformHandles,
+          locallySelectedElements[0].angle,
+        );
+      }
     } else if (locallySelectedElements.length > 1 && !appState.isRotating) {
       const dashedLinePadding = 4 / sceneState.zoom.value;
       context.fillStyle = oc.white;

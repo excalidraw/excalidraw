@@ -13,7 +13,7 @@ import { Action } from "../actions/types";
 import { ActionManager } from "../actions/manager";
 import { AppState } from "../types";
 
-type ContextMenuOption = "separator" | Action;
+export type ContextMenuOption = "separator" | Action;
 
 type ContextMenuProps = {
   options: ContextMenuOption[];

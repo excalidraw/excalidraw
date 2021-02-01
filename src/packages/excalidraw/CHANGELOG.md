@@ -16,12 +16,16 @@ Please add the latest change on the top under the correct section.
 
 ## Excalidraw API
 
+### Features
+
+- Add `viewModeEnabled` prop which enabled the view mode [#2840](https://github.com/excalidraw/excalidraw/pull/2840). When this prop is used, the view mode will not show up in context menu is so it is fully controlled by host.
 - Expose `getAppState` on `excalidrawRef` [#2834](https://github.com/excalidraw/excalidraw/pull/2834).
 
 ## Excalidraw Library
 
 ### Features
 
+- Add view mode [#2840](https://github.com/excalidraw/excalidraw/pull/2840).
 - Remove `copy`, `cut`, and `paste` actions from contextmenu [#2872](https://github.com/excalidraw/excalidraw/pull/2872)
 - Support `Ctrl-Y` shortcut to redo on Windows [#2831](https://github.com/excalidraw/excalidraw/pull/2831).
 

@@ -492,6 +492,13 @@
     pointer-events: none !important;
   }
 
+  &.excalidraw--view-mode {
+    .App-menu {
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+
   @media print {
     .App-bottom-bar,
     .FixedSideContainer,
