@@ -40,7 +40,7 @@
     "onlySelected": "Tafrayt kan",
     "withBackground": "S ugilal",
     "exportEmbedScene": "Seddu asayes deg ufaylu yettwasifḍen",
-    "exportEmbedScene_details": "",
+    "exportEmbedScene_details": "Asayes ad yettwasekles deg ufaylu n usifeḍ PNG/SVG akken akken ad yili wamek ara d-yettwarr seg-s usayes. Ayagi ad isimɣur tiddi n ufaylu n usifeḍ.",
     "addWatermark": "Seddu \"Yettwaxdem s Excalidraw\"",
     "handDrawn": "Asuneɣ s ufus",
     "normal": "Amagnu",
@@ -92,7 +92,7 @@
     "centerHorizontally": "Di tlemmast s uglawi",
     "distributeHorizontally": "",
     "distributeVertically": "",
-    "viewMode": ""
+    "viewMode": "Askar n tmuɣli"
   },
   "buttons": {
     "clearReset": "Ales awennez n teɣzut n usuneɣ",
@@ -134,7 +134,7 @@
     "cannotExportEmptyCanvas": "D awezɣi asifeḍ n teɣzut n usuneɣ tilemt.",
     "couldNotCopyToClipboard": "D awezɣi anɣal ɣer tecfawit. Eɛreḍ ad tesqedceḍ iminig Chrome.",
     "decryptFailed": "D awezɣi tukksa n uwgelhen i yisefka.",
-    "uploadedSecurly": "",
+    "uploadedSecurly": "Asili yettwasɣelles s uwgelhen ixef s ixef, ayagi yebɣa ad d-yini belli aqeddac n Excalidraw akked medden ur zmiren ara ad ɣren agbur.",
     "loadSceneOverridePrompt": "Asali n wunuɣ uffiɣ ad isemselsi agbur-inek (m) yellan. Tebɣiḍ ad tkemmeleḍ?",
     "errorLoadingLibrary": "Teḍra-d tuccḍa deg usali n temkarḍit n wis kraḍ.",
     "confirmAddLibrary": "Ayagi adirnu talɣa (win) {{numShapes}} ɣer temkarḍit-inek (m). Tetḥeqqeḍ?",
