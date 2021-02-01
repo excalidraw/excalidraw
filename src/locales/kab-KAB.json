@@ -147,15 +147,15 @@
     "diamond": "",
     "ellipse": "Taglayt",
     "arrow": "Taneccabt",
-    "line": "",
-    "text": "",
-    "library": "",
-    "lock": ""
+    "line": "Izirig",
+    "text": "Aḍris",
+    "library": "Tamkarḍit",
+    "lock": "Eǧǧ afecku n tefrayt yermed mbaɛd asuneɣ"
   },
   "headings": {
-    "canvasActions": "",
-    "selectedShapeActions": "",
-    "shapes": ""
+    "canvasActions": "Tigawin n teɣzut n usuneɣ",
+    "selectedShapeActions": "Tigawin n talɣa yettwafernen",
+    "shapes": "Talɣiwin"
   },
   "hints": {
     "linearElement": "",
@@ -165,8 +165,8 @@
     "lockAngle": "",
     "resize": "",
     "rotate": "",
-    "lineEditor_info": "",
-    "lineEditor_pointSelected": "",
+    "lineEditor_info": "Ssit snat n tikkal neɣ ssed taqeffalt Kcem akken ad tẓergeḍ tinqiḍin",
+    "lineEditor_pointSelected": "Ssed taqeffalt kkes akken ad tekkseḍ tanqiḍt, CtrlOrCmd+D akken ad tsiselgeḍ, neɣ zuɣer akken ad tesmuttiḍ",
     "lineEditor_nothingSelected": ""
   },
   "canvasError": {
@@ -185,12 +185,12 @@
     "openIssueMessage_pre": "",
     "openIssueMessage_button": "",
     "openIssueMessage_post": "",
-    "sceneContent": ""
+    "sceneContent": "Agbur n usayes:"
   },
   "roomDialog": {
     "desc_intro": "",
     "desc_privacy": "",
-    "button_startSession": "",
+    "button_startSession": "Bdu tiɣimit",
     "button_stopSession": "",
     "desc_inProgressIntro": "",
     "desc_shareLink": "",
