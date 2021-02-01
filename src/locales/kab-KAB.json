@@ -26,7 +26,7 @@
     "strokeStyle_dotted": "S tenqiḍin",
     "sloppiness": "",
     "opacity": "Tiḍullest",
-    "textAlign": "",
+    "textAlign": "Areyyec n uḍris",
     "edges": "Leryuf",
     "sharp": "Yemsed",
     "round": "Imdewer",
@@ -38,7 +38,7 @@
     "fontSize": "Tiddi n tsefsit",
     "fontFamily": "Tawacult n tsefsiyin",
     "onlySelected": "Tafrayt kan",
-    "withBackground": "",
+    "withBackground": "S ugilal",
     "exportEmbedScene": "Seddu asayes deg ufaylu yettwasifḍen",
     "exportEmbedScene_details": "",
     "addWatermark": "Seddu \"Yettwaxdem s Excalidraw\"",
@@ -88,10 +88,11 @@
     "alignBottom": "Areyyec ukessar",
     "alignLeft": "Reyyec s azelmaḍ",
     "alignRight": "Areyyec s ayfus",
-    "centerVertically": "",
-    "centerHorizontally": "",
+    "centerVertically": "Di tlemmast s ibeddi",
+    "centerHorizontally": "Di tlemmast s uglawi",
     "distributeHorizontally": "",
-    "distributeVertically": ""
+    "distributeVertically": "",
+    "viewMode": ""
   },
   "buttons": {
     "clearReset": "Ales awennez n teɣzut n usuneɣ",
@@ -167,33 +168,33 @@
     "rotate": "",
     "lineEditor_info": "Ssit snat n tikkal neɣ ssed taqeffalt Kcem akken ad tẓergeḍ tinqiḍin",
     "lineEditor_pointSelected": "Ssed taqeffalt kkes akken ad tekkseḍ tanqiḍt, CtrlOrCmd+D akken ad tsiselgeḍ, neɣ zuɣer akken ad tesmuttiḍ",
-    "lineEditor_nothingSelected": ""
+    "lineEditor_nothingSelected": "Fren tanqiḍt ara tesmuttiḍ neɣ ara tekkseḍ, neɣ ṭṭef taqeffalt Alt akken ad ternuḍ tinqiḍin timaynutin"
   },
   "canvasError": {
-    "cannotShowPreview": "",
-    "canvasTooBig": "",
-    "canvasTooBigTip": ""
+    "cannotShowPreview": "Ulamek abeqqeḍ n teskant",
+    "canvasTooBig": "Taɣzut n usuneɣ tezmer ad tili temeqqer aṭas.",
+    "canvasTooBigTip": "Tixidest: eɛreḍ ad tesqerbeḍ ciṭ iferdisen yembaɛaden."
   },
   "errorSplash": {
-    "headingMain_pre": "",
-    "headingMain_button": "",
-    "clearCanvasMessage": "",
-    "clearCanvasMessage_button": "",
-    "clearCanvasCaveat": "",
-    "trackedToSentry_pre": "",
-    "trackedToSentry_post": "",
+    "headingMain_pre": "Teḍra-d tuccḍa. Eɛreḍ ",
+    "headingMain_button": "asali n usebter tikkelt-nniḍen.",
+    "clearCanvasMessage": "Ma yella tulsa n usali ur tefri ara ugur, eɛreḍ ",
+    "clearCanvasMessage_button": "asfaḍ n teɣzut n usuneɣ.",
+    "clearCanvasCaveat": " Ayagi ad d-iglu s usṛuḥu n umahil ",
+    "trackedToSentry_pre": "Tuccḍa akked umesmagi ",
+    "trackedToSentry_post": " tettwasekles deg unagraw-nneɣ.",
     "openIssueMessage_pre": "",
-    "openIssueMessage_button": "",
-    "openIssueMessage_post": "",
+    "openIssueMessage_button": "afecku n weḍfar n yibugen.",
+    "openIssueMessage_post": " Ma ulac uɣilif seddu talɣut ukessar-agi s wenɣal akked usenṭeḍ di GitHub issue.",
     "sceneContent": "Agbur n usayes:"
   },
   "roomDialog": {
-    "desc_intro": "",
+    "desc_intro": "Tzemreḍ ad d-teɛerḍeḍ medden ɣer usayes-inek (m) amiran akken ad ttekkin yid-k.",
     "desc_privacy": "",
     "button_startSession": "Bdu tiɣimit",
     "button_stopSession": "Ḥbes tiɣimit",
     "desc_inProgressIntro": "",
-    "desc_shareLink": "",
+    "desc_shareLink": "Bḍu aseɣwen-agi akked medden ukud tebɣiḍ ad temɛawaneḍ:",
     "desc_exitSession": ""
   },
   "errorDialog": {
@@ -201,7 +202,7 @@
   },
   "helpDialog": {
     "blog": "Ɣeṛ ablug-nneɣ",
-    "click": "",
+    "click": "ssit",
     "curvedArrow": "Taneccabt izelgen",
     "curvedLine": "Izirig izelgen",
     "documentation": "",
@@ -230,7 +231,7 @@
     "height": "Tattayt",
     "scene": "Asayes",
     "selected": "Yettwafren",
-    "storage": "",
+    "storage": "Aḥraz",
     "title": "",
     "total": "",
     "width": "Tehri"
