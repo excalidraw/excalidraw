@@ -136,15 +136,15 @@
     "uploadedSecurly": "",
     "loadSceneOverridePrompt": "Asali n wunuɣ uffiɣ ad isemselsi agbur-inek (m) yellan. Tebɣiḍ ad tkemmeleḍ?",
     "errorLoadingLibrary": "Teḍra-d tuccḍa deg usali n temkarḍit n wis kraḍ.",
-    "confirmAddLibrary": "",
+    "confirmAddLibrary": "Ayagi adirnu talɣa (win) {{numShapes}} ɣer temkarḍit-inek (m). Tetḥeqqeḍ?",
     "imageDoesNotContainScene": "",
-    "cannotRestoreFromImage": ""
+    "cannotRestoreFromImage": "Asayes ulamek ara d-yettwarr seg ufaylu-agi n tugna"
   },
   "toolBar": {
     "selection": "Tafrayt",
     "draw": "Unuɣ ilelli",
     "rectangle": "Asrem",
-    "diamond": "",
+    "diamond": "Ameɣṛun",
     "ellipse": "Taglayt",
     "arrow": "Taneccabt",
     "line": "Izirig",
@@ -158,11 +158,11 @@
     "shapes": "Talɣiwin"
   },
   "hints": {
-    "linearElement": "",
-    "freeDraw": "",
-    "text": "",
-    "linearElementMulti": "",
-    "lockAngle": "",
+    "linearElement": "Ssit akken ad tebduḍ aṭas n tenqiḍin, zuɣer i yiwen n yizirig",
+    "freeDraw": "Ssit yerna zuɣer, serreḥ ticki tfukeḍ",
+    "text": "Tixidest: tzemreḍ daɣen ad ternuḍ aḍris s usiti snat n tikkal anida tebɣiḍ s ufecku n tefrayt",
+    "linearElementMulti": "Ssit ɣef tenqiḍt taneggarut neɣ ssed taqeffalt Escape neɣ taqeffalt Kcem akken ad tfakkeḍ",
+    "lockAngle": "Tzemreḍ ad tḥettmeḍ tiɣmert s tuṭṭfa n tqeffalt SHIFT",
     "resize": "",
     "rotate": "",
     "lineEditor_info": "Ssit snat n tikkal neɣ ssed taqeffalt Kcem akken ad tẓergeḍ tinqiḍin",
