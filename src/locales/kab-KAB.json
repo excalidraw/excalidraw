@@ -138,7 +138,7 @@
     "loadSceneOverridePrompt": "Asali n wunuɣ uffiɣ ad isemselsi agbur-inek (m) yellan. Tebɣiḍ ad tkemmeleḍ?",
     "errorLoadingLibrary": "Teḍra-d tuccḍa deg usali n temkarḍit n wis kraḍ.",
     "confirmAddLibrary": "Ayagi adirnu talɣa (win) {{numShapes}} ɣer temkarḍit-inek (m). Tetḥeqqeḍ?",
-    "imageDoesNotContainScene": "",
+    "imageDoesNotContainScene": "Taktert n tugniwin ur tettwadhel ara akka tura.\nTebɣiḍ ad tketreḍ asayes? Tugna-agi tettban-d ur tegbir ara isefka n usnas. Tesremdeḍ ayagi deg usifeḍ?",
     "cannotRestoreFromImage": "Asayes ulamek ara d-yettwarr seg ufaylu-agi n tugna"
   },
   "toolBar": {
@@ -164,8 +164,8 @@
     "text": "Tixidest: tzemreḍ daɣen ad ternuḍ aḍris s usiti snat n tikkal anida tebɣiḍ s ufecku n tefrayt",
     "linearElementMulti": "Ssit ɣef tenqiḍt taneggarut neɣ ssed taqeffalt Escape neɣ taqeffalt Kcem akken ad tfakkeḍ",
     "lockAngle": "Tzemreḍ ad tḥettmeḍ tiɣmert s tuṭṭfa n tqeffalt SHIFT",
-    "resize": "",
-    "rotate": "",
+    "resize": "Tzemreḍ ad tḥettemeḍ assaɣ s tuṭṭfa n tqeffalt SHIFT mi ara tettbeddileḍ tiddi,\nma teṭṭfeḍ ALT abeddel n tiddi ad yili si tlemmast",
+    "rotate": "Tzemreḍ ad tḥettemeḍ tiɣemmar s tuṭṭfa n SHIFT di tuzzya",
     "lineEditor_info": "Ssit snat n tikkal neɣ ssed taqeffalt Kcem akken ad tẓergeḍ tinqiḍin",
     "lineEditor_pointSelected": "Ssed taqeffalt kkes akken ad tekkseḍ tanqiḍt, CtrlOrCmd+D akken ad tsiselgeḍ, neɣ zuɣer akken ad tesmuttiḍ",
     "lineEditor_nothingSelected": "Fren tanqiḍt ara tesmuttiḍ neɣ ara tekkseḍ, neɣ ṭṭef taqeffalt Alt akken ad ternuḍ tinqiḍin timaynutin"
@@ -190,12 +190,12 @@
   },
   "roomDialog": {
     "desc_intro": "Tzemreḍ ad d-teɛerḍeḍ medden ɣer usayes-inek (m) amiran akken ad ttekkin yid-k.",
-    "desc_privacy": "",
+    "desc_privacy": "Ur tqelliq ara, tiɣimit tsseqdac awgelhen ixef s ixef, dɣa ayen ara tsunɣeḍ ad iqqim d amaẓlay. Ula d aqeddac-nneɣ ur yezmir ara ad iwali acu txeddemeḍ.",
     "button_startSession": "Bdu tiɣimit",
     "button_stopSession": "Ḥbes tiɣimit",
     "desc_inProgressIntro": "",
     "desc_shareLink": "Bḍu aseɣwen-agi akked medden ukud tebɣiḍ ad temɛawaneḍ:",
-    "desc_exitSession": ""
+    "desc_exitSession": "Aḥbas n tɣimit ad k (m) yesenser si texxamt, maca ad tizmireḍ ad tkemmeleḍ amahil s usayes, s wudem adigan. Ẓer belli ayagi ur yettḥaz ara imdanen-nniḍen, yerna ad izmiren ad kemmelen ad mɛawanen di tsuffeɣt-nnsen."
   },
   "errorDialog": {
     "title": "Tuccḍa"
@@ -208,7 +208,7 @@
     "documentation": "",
     "drag": "zuɣer",
     "editor": "Amaẓrag",
-    "github": "",
+    "github": "Tufiḍ-d ugur? Azen-aɣ-d",
     "howto": "Ḍfer imniren-nneɣ",
     "or": "neɣ",
     "preventBinding": "",
@@ -222,7 +222,7 @@
     "zoomToSelection": ""
   },
   "encrypted": {
-    "tooltip": ""
+    "tooltip": "Unuɣen-inek (m) ttuwgelhnen seg yixef s ixef dɣa iqeddacen n Excalidraw werǧin ad ten-walin. "
   },
   "stats": {
     "angle": "Tiɣmeṛt",
