@@ -18,6 +18,7 @@ const crowdinMap = {
   "id-ID": "en-id",
   "it-IT": "en-it",
   "ja-JP": "en-ja",
+  "kab-KAB": "en-kab",
   "ko-KR": "en-ko",
   "my-MM": "en-my",
   "nb-NO": "en-nb",
