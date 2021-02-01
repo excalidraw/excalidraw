@@ -91,7 +91,8 @@
     "centerVertically": "Midtstill vertikalt",
     "centerHorizontally": "Midtstill horisontalt",
     "distributeHorizontally": "Sprei horisontalt",
-    "distributeVertically": "Sprei vertikalt"
+    "distributeVertically": "Sprei vertikalt",
+    "viewMode": ""
   },
   "buttons": {
     "clearReset": "Tilbakestill lerretet",
