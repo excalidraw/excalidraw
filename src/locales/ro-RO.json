@@ -91,7 +91,8 @@
     "centerVertically": "Centrare verticală",
     "centerHorizontally": "Centrare orizontală",
     "distributeHorizontally": "Distribuie orizontal",
-    "distributeVertically": "Distribuie vertical"
+    "distributeVertically": "Distribuie vertical",
+    "viewMode": "Mod de vizualizare"
   },
   "buttons": {
     "clearReset": "Resetare pânză",

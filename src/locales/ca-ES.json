@@ -91,7 +91,8 @@
     "centerVertically": "Centrar verticalment",
     "centerHorizontally": "Centrar horitzontalment",
     "distributeHorizontally": "Distribuir horitzontalment",
-    "distributeVertically": "Distribuir verticalment"
+    "distributeVertically": "Distribuir verticalment",
+    "viewMode": ""
   },
   "buttons": {
     "clearReset": "Netejar el llenç",
