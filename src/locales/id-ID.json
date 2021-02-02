@@ -80,9 +80,9 @@
     "gridMode": "Mode grid",
     "addToLibrary": "Tambahkan ke pustaka",
     "removeFromLibrary": "Hapus dari pustaka",
-    "libraryLoadingMessage": "Memuat pustaka...",
+    "libraryLoadingMessage": "Memuat pustaka…",
     "libraries": "Telusur pustaka",
-    "loadingScene": "Memuat pemandangan...",
+    "loadingScene": "Memuat pemandangan…",
     "align": "Perataan",
     "alignTop": "Rata atas",
     "alignBottom": "Rata bawah",
@@ -92,7 +92,7 @@
     "centerHorizontally": "Pusatkan secara horizontal",
     "distributeHorizontally": "Distribusikan horizontal",
     "distributeVertically": "Distribusikan vertikal",
-    "viewMode": ""
+    "viewMode": "Mode tampilan"
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
