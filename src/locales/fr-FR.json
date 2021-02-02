@@ -80,9 +80,9 @@
     "gridMode": "Mode grille",
     "addToLibrary": "Ajouter à la bibliothèque",
     "removeFromLibrary": "Supprimer de la bibliothèque",
-    "libraryLoadingMessage": "Chargement de la bibliothèque…",
+    "libraryLoadingMessage": "Chargement de la bibliothèque...",
     "libraries": "Parcourir les bibliothèques",
-    "loadingScene": "Chargement de la scène…",
+    "loadingScene": "Chargement de la scène...",
     "align": "Aligner",
     "alignTop": "Aligner en haut",
     "alignBottom": "Aligner en bas",
@@ -92,7 +92,6 @@
     "centerHorizontally": "Centrer horizontalement",
     "distributeHorizontally": "Distribuer horizontalement",
     "distributeVertically": "Distribuer verticalement",
-    "shareIdleState": "Laisser les autres voir si je suis actif",
     "viewMode": "Mode présentation"
   },
   "buttons": {
