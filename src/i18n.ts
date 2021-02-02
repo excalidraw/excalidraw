@@ -27,6 +27,7 @@ const allLanguages: Language[] = [
   { code: "id-ID", label: "Bahasa Indonesia" },
   { code: "it-IT", label: "Italiano" },
   { code: "ja-JP", label: "日本語" },
+  { code: "kab-KAB", label: "Taqbaylit" },
   { code: "ko-KR", label: "한국어" },
   { code: "my-MM", label: "Burmese" },
   { code: "nb-NO", label: "Norsk bokmål" },
