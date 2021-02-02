@@ -458,6 +458,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           onExportToBackend={onExportToBackend}
           renderCustomFooter={renderFooter}
           viewModeEnabled={viewModeEnabled}
+          showExitZenModeBtn={
+            typeof this.props?.zenModeEnabled === "undefined" && zenModeEnabled
+          }
         />
         {this.state.showStats && (
           <Stats
