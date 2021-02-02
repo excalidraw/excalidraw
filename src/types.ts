@@ -183,6 +183,8 @@ export interface ExcalidrawProps {
   renderFooter?: (isMobile: boolean) => JSX.Element;
   langCode?: Language["code"];
   viewModeEnabled?: boolean;
+  zenModeEnabled?: boolean;
+  gridModeEnabled?: boolean;
 }
 
 export type SceneData = {
