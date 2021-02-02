@@ -89,6 +89,7 @@ const languages = {
   "id-ID": "Bahasa Indonesia",
   "it-IT": "Italiano",
   "ja-JP": "日本語",
+  "kab-KAB": "Taqbaylit",
   "ko-KR": "한국어",
   "my-MM": "Burmese",
   "nb-NO": "Norsk bokmål",
