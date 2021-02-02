@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Senṭeḍ",
-    "pasteCharts": "",
+    "pasteCharts": "Senṭeḍ udlifen",
     "selectAll": "Fren akk",
     "multiSelect": "Rnu aferdis ɣer tefrayt",
     "moveCanvas": "Smutti taɣzut n usuneɣ",
@@ -10,7 +10,7 @@
     "copyAsPng": "Nɣel ɣer tecfawit am PNG",
     "copyAsSvg": "Nɣel ɣer tecfawit am SVG",
     "bringForward": "Awi ɣer sdat",
-    "sendToBack": "",
+    "sendToBack": "Awi ɣer deffir",
     "bringToFront": "Err ɣer deffir",
     "sendBackward": "",
     "delete": "Kkes",
@@ -19,8 +19,8 @@
     "stroke": "Azizdew",
     "background": "Agilal",
     "fill": "Taččart",
-    "strokeWidth": "",
-    "strokeStyle": "",
+    "strokeWidth": "Tehri n yizirig",
+    "strokeStyle": "Aɣanib n tizirig",
     "strokeStyle_solid": "Aččuran",
     "strokeStyle_dashed": "S tjerriḍin",
     "strokeStyle_dotted": "S tenqiḍin",
@@ -205,7 +205,7 @@
     "click": "ssit",
     "curvedArrow": "Taneccabt izelgen",
     "curvedLine": "Izirig izelgen",
-    "documentation": "",
+    "documentation": "Tasemlit",
     "drag": "zuɣer",
     "editor": "Amaẓrag",
     "github": "Tufiḍ-d ugur? Azen-aɣ-d",
@@ -233,7 +233,7 @@
     "selected": "Yettwafren",
     "storage": "Aḥraz",
     "title": "",
-    "total": "",
+    "total": "Aɣrud",
     "width": "Tehri"
   },
   "toast": {
