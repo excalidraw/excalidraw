@@ -92,7 +92,8 @@
     "centerHorizontally": "Centrar horitzontalment",
     "distributeHorizontally": "Distribuir horitzontalment",
     "distributeVertically": "Distribuir verticalment",
-    "shareIdleState": "Deixa que els altres vegin si estic actiu"
+    "shareIdleState": "Deixa que els altres vegin si estic actiu",
+    "viewMode": ""
   },
   "buttons": {
     "clearReset": "Netejar el llenç",

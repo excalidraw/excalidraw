@@ -91,7 +91,8 @@
     "centerVertically": "Центрирай вертикално",
     "centerHorizontally": "Центрирай хоризонтално",
     "distributeHorizontally": "Разпредели хоризонтално",
-    "distributeVertically": "Разпредели вертикално"
+    "distributeVertically": "Разпредели вертикално",
+    "viewMode": ""
   },
   "buttons": {
     "clearReset": "Нулиране на платно",
@@ -205,14 +206,14 @@
     "curvedArrow": "",
     "curvedLine": "",
     "documentation": "",
-    "drag": "",
-    "editor": "",
+    "drag": "плъзнете",
+    "editor": "Редактор",
     "github": "",
     "howto": "",
     "or": "или",
     "preventBinding": "",
-    "shapes": "",
-    "shortcuts": "",
+    "shapes": "Фигури",
+    "shortcuts": "Клавиши за бърз достъп",
     "textFinish": "",
     "textNewLine": "",
     "title": "",

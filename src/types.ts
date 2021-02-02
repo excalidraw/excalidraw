@@ -21,7 +21,6 @@ import type { ResolvablePromise } from "./utils";
 import { Spreadsheet } from "./charts";
 import { Language } from "./i18n";
 
-export type FlooredNumber = number & { _brand: "FlooredNumber" };
 export type Point = Readonly<RoughPoint>;
 
 export type Collaborator = {
@@ -70,8 +69,8 @@ export type AppState = {
   currentItemEndArrowhead: Arrowhead | null;
   currentItemLinearStrokeSharpness: ExcalidrawElement["strokeSharpness"];
   viewBackgroundColor: string;
-  scrollX: FlooredNumber;
-  scrollY: FlooredNumber;
+  scrollX: number;
+  scrollY: number;
   cursorButton: "up" | "down";
   scrolledOutside: boolean;
   name: string;
@@ -88,6 +87,7 @@ export type AppState = {
   zenModeEnabled: boolean;
   appearance: "light" | "dark";
   gridSize: number | null;
+  viewModeEnabled: boolean;
 
   /** top-most selected groups (i.e. does not include nested groups) */
   selectedGroupIds: { [groupId: string]: boolean };
@@ -184,6 +184,7 @@ export interface ExcalidrawProps {
   ) => void;
   renderFooter?: (isMobile: boolean) => JSX.Element;
   langCode?: Language["code"];
+  viewModeEnabled?: boolean;
 }
 
 export type SceneData = {

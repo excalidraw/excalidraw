@@ -91,7 +91,8 @@
     "centerVertically": "Wyśrodkuj w pionie",
     "centerHorizontally": "Wyśrodkuj w poziomie",
     "distributeHorizontally": "Rozłóż poziomo",
-    "distributeVertically": "Rozłóż pionowo"
+    "distributeVertically": "Rozłóż pionowo",
+    "viewMode": "Tryb widoku"
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",

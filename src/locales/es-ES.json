@@ -92,7 +92,8 @@
     "centerHorizontally": "Centrar horizontalmente",
     "distributeHorizontally": "Distribuir horizontalmente",
     "distributeVertically": "Distribuir verticalmente",
-    "shareIdleState": "Deja que otros vean si estoy activo"
+    "shareIdleState": "Deja que otros vean si estoy activo",
+    "viewMode": "Modo presentación"
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",

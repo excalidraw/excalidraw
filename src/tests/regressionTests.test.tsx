@@ -623,6 +623,7 @@ describe("regression tests", () => {
       "selectAll",
       "gridMode",
       "zenMode",
+      "viewMode",
       "stats",
     ];
 

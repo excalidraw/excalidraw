@@ -5,7 +5,6 @@ import { NonDeletedExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element/bounds";
 import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
 import { distance, SVG_NS } from "../utils";
-import { normalizeScroll } from "./scroll";
 import { AppState } from "../types";
 import { t } from "../i18n";
 import { DEFAULT_FONT_FAMILY, DEFAULT_VERTICAL_ALIGN } from "../constants";
@@ -59,8 +58,8 @@ export const exportToCanvas = (
     tempCanvas,
     {
       viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
-      scrollX: normalizeScroll(-minX + exportPadding),
-      scrollY: normalizeScroll(-minY + exportPadding),
+      scrollX: -minX + exportPadding,
+      scrollY: -minY + exportPadding,
       zoom: getDefaultAppState().zoom,
       remotePointerViewportCoords: {},
       remoteSelectedElementIds: {},

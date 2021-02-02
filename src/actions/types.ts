@@ -84,7 +84,8 @@ export type ActionName =
   | "alignVerticallyCentered"
   | "alignHorizontallyCentered"
   | "distributeHorizontally"
-  | "distributeVertically";
+  | "distributeVertically"
+  | "viewMode";
 
 export interface Action {
   name: ActionName;
@@ -106,7 +107,7 @@ export interface Action {
     elements: readonly ExcalidrawElement[],
     appState: AppState,
   ) => boolean;
-  checked?: boolean;
+  checked?: (appState: Readonly<AppState>) => boolean;
 }
 
 export interface ActionsManagerInterface {
