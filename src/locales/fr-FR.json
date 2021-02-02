@@ -91,7 +91,8 @@
     "centerVertically": "Centrer verticalement",
     "centerHorizontally": "Centrer horizontalement",
     "distributeHorizontally": "Distribuer horizontalement",
-    "distributeVertically": "Distribuer verticalement"
+    "distributeVertically": "Distribuer verticalement",
+    "viewMode": "Mode présentation"
   },
   "buttons": {
     "clearReset": "Réinitialiser le canevas",
@@ -229,7 +230,7 @@
     "elements": "Éléments",
     "height": "Hauteur",
     "scene": "Scène",
-    "selected": "Sélectionné",
+    "selected": "Sélection",
     "storage": "Stockage",
     "title": "Stats pour les nerds",
     "total": "Total",

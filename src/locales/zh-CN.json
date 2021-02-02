@@ -91,7 +91,8 @@
     "centerVertically": "垂直居中",
     "centerHorizontally": "水平居中",
     "distributeHorizontally": "水平等距分布",
-    "distributeVertically": "垂直等距分布"
+    "distributeVertically": "垂直等距分布",
+    "viewMode": ""
   },
   "buttons": {
     "clearReset": "重置画布",

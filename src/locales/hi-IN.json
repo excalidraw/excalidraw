@@ -91,7 +91,8 @@
     "centerVertically": "लंबवत केन्द्रित",
     "centerHorizontally": "क्षैतिज केन्द्रित",
     "distributeHorizontally": "क्षैतिज रूप से वितरित करें",
-    "distributeVertically": "खड़ी रूप से वितरित करें"
+    "distributeVertically": "खड़ी रूप से वितरित करें",
+    "viewMode": ""
   },
   "buttons": {
     "clearReset": "कैनवास रीसेट करें",

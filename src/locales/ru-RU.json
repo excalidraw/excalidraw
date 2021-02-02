@@ -91,7 +91,8 @@
     "centerVertically": "Центрировать по вертикали",
     "centerHorizontally": "Центрировать по горизонтали",
     "distributeHorizontally": "Распределить по горизонтали",
-    "distributeVertically": "Распределить по вертикали"
+    "distributeVertically": "Распределить по вертикали",
+    "viewMode": ""
   },
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",

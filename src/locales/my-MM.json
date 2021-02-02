@@ -91,7 +91,8 @@
     "centerVertically": "ဒေါင်လိုက်အလယ်ညှိ",
     "centerHorizontally": "အလျားလိုက်အလယ်ညှိ",
     "distributeHorizontally": "အလျားလိုက်",
-    "distributeVertically": "ထောင်လိုက်"
+    "distributeVertically": "ထောင်လိုက်",
+    "viewMode": ""
   },
   "buttons": {
     "clearReset": "ကားချပ်ရှင်းလင်း",

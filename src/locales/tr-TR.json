@@ -91,7 +91,8 @@
     "centerVertically": "Dikeyde ortala",
     "centerHorizontally": "Yatayda ortala",
     "distributeHorizontally": "Yatay dağıt",
-    "distributeVertically": "Dikey dağıt"
+    "distributeVertically": "Dikey dağıt",
+    "viewMode": ""
   },
   "buttons": {
     "clearReset": "Tuvali sıfırla",

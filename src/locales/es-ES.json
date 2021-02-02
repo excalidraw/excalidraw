@@ -91,7 +91,8 @@
     "centerVertically": "Centrar verticalmente",
     "centerHorizontally": "Centrar horizontalmente",
     "distributeHorizontally": "Distribuir horizontalmente",
-    "distributeVertically": "Distribuir verticalmente"
+    "distributeVertically": "Distribuir verticalmente",
+    "viewMode": "Modo presentación"
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",

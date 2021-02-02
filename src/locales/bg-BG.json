@@ -91,7 +91,8 @@
     "centerVertically": "Центрирай вертикално",
     "centerHorizontally": "Центрирай хоризонтално",
     "distributeHorizontally": "Разпредели хоризонтално",
-    "distributeVertically": "Разпредели вертикално"
+    "distributeVertically": "Разпредели вертикално",
+    "viewMode": ""
   },
   "buttons": {
     "clearReset": "Нулиране на платно",

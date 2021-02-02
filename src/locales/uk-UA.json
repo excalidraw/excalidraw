@@ -91,7 +91,8 @@
     "centerVertically": "Центрувати по вертикалі",
     "centerHorizontally": "Центрувати по горизонталі",
     "distributeHorizontally": "Розподілити по горизонталі",
-    "distributeVertically": "Розподілити вертикально"
+    "distributeVertically": "Розподілити вертикально",
+    "viewMode": ""
   },
   "buttons": {
     "clearReset": "Очистити полотно",
