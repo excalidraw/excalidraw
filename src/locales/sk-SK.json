@@ -80,9 +80,9 @@
     "gridMode": "Režim mriežky",
     "addToLibrary": "Pridať do knižnice",
     "removeFromLibrary": "Odstrániť z knižnice",
-    "libraryLoadingMessage": "Načítavanie knižnice...",
+    "libraryLoadingMessage": "Načítavanie knižnice…",
     "libraries": "Prehliadať knižnice",
-    "loadingScene": "Načítavanie scény...",
+    "loadingScene": "Načítavanie scény…",
     "align": "Zarovnanie",
     "alignTop": "Zarovnať nahor",
     "alignBottom": "Zarovnať nadol",
@@ -92,7 +92,7 @@
     "centerHorizontally": "Zarovnať vodorovne na stred",
     "distributeHorizontally": "Rozmiestniť vodorovne",
     "distributeVertically": "Rozmiestniť zvisle",
-    "viewMode": ""
+    "viewMode": "Režim zobrazenia"
   },
   "buttons": {
     "clearReset": "Obnoviť plátno",
