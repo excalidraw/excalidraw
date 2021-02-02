@@ -863,6 +863,15 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.addEventListeners();
     }
 
+    if (prevProps.zenModeEnabled !== this.props.zenModeEnabled) {
+      this.setState({ zenModeEnabled: !!this.props.zenModeEnabled });
+    }
+
+    if (prevProps.gridModeEnabled !== this.props.gridModeEnabled) {
+      this.setState({
+        gridSize: this.props.gridModeEnabled ? GRID_SIZE : null,
+      });
+    }
     document
       .querySelector(".excalidraw")
       ?.classList.toggle("Appearance_dark", this.state.appearance === "dark");
