@@ -91,7 +91,8 @@
     "centerVertically": "Midtstill vertikalt",
     "centerHorizontally": "Midtstill horisontalt",
     "distributeHorizontally": "Sprei horisontalt",
-    "distributeVertically": "Sprei vertikalt"
+    "distributeVertically": "Sprei vertikalt",
+    "viewMode": ""
   },
   "buttons": {
     "clearReset": "Tilbakestill lerretet",
@@ -201,22 +202,22 @@
   },
   "helpDialog": {
     "blog": "",
-    "click": "",
+    "click": "klikk",
     "curvedArrow": "",
     "curvedLine": "",
     "documentation": "",
     "drag": "",
-    "editor": "",
+    "editor": "Redigering",
     "github": "",
     "howto": "",
-    "or": "",
+    "or": "eller",
     "preventBinding": "",
-    "shapes": "",
+    "shapes": "Formar",
     "shortcuts": "",
     "textFinish": "",
     "textNewLine": "",
-    "title": "",
-    "view": "",
+    "title": "Hjelp",
+    "view": "Vising",
     "zoomToFit": "",
     "zoomToSelection": ""
   },
