@@ -369,3 +369,11 @@ export const getVersion = () => {
     DEFAULT_VERSION
   );
 };
+
+export const getHumanVersion = () => {
+  const version = getVersion();
+  if (version.length === 28) {
+    return version.substr(0, 16).replace("T", " ");
+  }
+  return version;
+};

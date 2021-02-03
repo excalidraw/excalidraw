@@ -9,7 +9,7 @@ import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
 import { getTargetElements } from "../scene";
 import { AppState } from "../types";
-import { debounce, nFormatter, getVersion } from "../utils";
+import { debounce, getHumanVersion, nFormatter } from "../utils";
 import { close } from "./icons";
 import { Island } from "./Island";
 import "./Stats.scss";
@@ -161,7 +161,7 @@ export const Stats = (props: {
             </tr>
             <tr>
               <td colSpan={2} style={{ textAlign: "center" }}>
-                {getVersion()}
+                {getHumanVersion()}
               </td>
             </tr>
           </tbody>
