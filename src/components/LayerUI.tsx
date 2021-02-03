@@ -11,7 +11,7 @@ import { CLASSES } from "../constants";
 import { exportCanvas } from "../data";
 import { importLibraryFromJSON, saveLibraryAsJSON } from "../data/json";
 import { Library } from "../data/library";
-import { showSelectedShapeActions } from "../element";
+import { isTextElement, showSelectedShapeActions } from "../element";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { Language, t } from "../i18n";
 import useIsMobile from "../is-mobile";
@@ -647,7 +647,10 @@ const LayerUI = ({
   ) : (
     <div
       className={clsx("layer-ui__wrapper", {
-        "disable-pointerEvents": appState.cursorButton === "down",
+        "disable-pointerEvents":
+          appState.draggingElement ||
+          appState.resizingElement ||
+          (appState.editingElement && !isTextElement(appState.editingElement)),
       })}
     >
       {dialogs}
