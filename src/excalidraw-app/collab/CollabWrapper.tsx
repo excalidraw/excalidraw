@@ -49,7 +49,7 @@ interface CollabState {
   modalIsShown: boolean;
   errorMessage: string;
   username: string;
-  userState: UserIdleState | "";
+  userState: UserIdleState;
   activeRoomLink: string;
 }
 

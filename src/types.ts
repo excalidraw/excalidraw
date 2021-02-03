@@ -32,7 +32,7 @@ export type Collaborator = {
   button?: "up" | "down";
   selectedElementIds?: AppState["selectedElementIds"];
   username?: string | null;
-  userState?: UserIdleState | null;
+  userState?: UserIdleState;
 };
 
 export type AppState = {
