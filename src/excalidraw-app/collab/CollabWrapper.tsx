@@ -337,7 +337,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
               collaborators,
             });
             break;
-          }  
+          }
         }
       },
     );
