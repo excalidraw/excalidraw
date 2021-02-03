@@ -122,7 +122,7 @@ class Portal {
       data as SocketUpdateData,
     );
 
-    if (syncAll && this.collab.state.isCollaborating) {
+    if (syncAll && this.collab.isCollaborating) {
       await Promise.all([
         broadcastPromise,
         this.collab.saveCollabRoomToFirebase(syncableElements),
