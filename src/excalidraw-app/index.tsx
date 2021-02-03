@@ -42,7 +42,6 @@ import { exportToBackend, getCollaborationLinkData, loadScene } from "./data";
 import {
   importFromLocalStorage,
   saveToLocalStorage,
-  STORAGE_KEYS,
 } from "./data/localStorage";
 
 const languageDetector = new LanguageDetector();
