@@ -133,7 +133,7 @@ class Portal {
     }
   };
 
-  broadcastIdleChange = (userState: UserIdleState | "") => {
+  broadcastIdleChange = (userState: UserIdleState) => {
     if (this.socket?.id) {
       const data: SocketUpdateDataSource["IDLE_STATUS"] = {
         type: "IDLE_STATUS",

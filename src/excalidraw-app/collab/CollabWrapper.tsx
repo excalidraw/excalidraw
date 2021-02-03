@@ -69,18 +69,6 @@ interface Props {
   excalidrawAPI: ExcalidrawImperativeAPI;
 }
 
-declare global {
-  interface Window {
-    IdleDetector: any;
-  }
-}
-
-declare global {
-  interface WindowEventMap {
-    idledetectionpermissionchange: CustomEvent;
-  }
-}
-
 const {
   Context: CollabContext,
   Consumer: CollabContextConsumer,
@@ -103,7 +91,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       modalIsShown: false,
       errorMessage: "",
       username: importUsernameFromLocalStorage() || "",
-      userState: "",
+      userState: UserIdleState.Active,
       activeRoomLink: "",
     };
     this.portal = new Portal(this);
@@ -507,7 +495,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       this.portal.broadcastMouseLocation(payload);
   };
 
-  onIdleStateChange = (userState: UserIdleState | "") => {
+  onIdleStateChange = (userState: UserIdleState) => {
     this.setState({ userState });
     this.portal.broadcastIdleChange(userState);
   };
