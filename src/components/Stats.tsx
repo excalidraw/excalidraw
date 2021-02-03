@@ -9,7 +9,7 @@ import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
 import { getTargetElements } from "../scene";
 import { AppState } from "../types";
-import { debounce, getHumanVersion, nFormatter } from "../utils";
+import { debounce, getVersion, nFormatter } from "../utils";
 import { close } from "./icons";
 import { Island } from "./Island";
 import "./Stats.scss";
@@ -48,6 +48,14 @@ export const Stats = (props: {
 
   if (isMobile && props.appState.openMenu) {
     return null;
+  }
+
+  let version = getVersion();
+  let hash = "123456";
+
+  if (version.length > 16) {
+    hash = version.substr(21, 7);
+    version = version.substr(0, 16).replace("T", " ");
   }
 
   return (
@@ -161,7 +169,9 @@ export const Stats = (props: {
             </tr>
             <tr>
               <td colSpan={2} style={{ textAlign: "center" }}>
-                {getHumanVersion()}
+                {version}
+                <br />
+                {hash}
               </td>
             </tr>
           </tbody>
