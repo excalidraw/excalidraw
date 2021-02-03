@@ -80,9 +80,9 @@
     "gridMode": "Hálómód",
     "addToLibrary": "Hozzáadás a könyvtárhoz",
     "removeFromLibrary": "Eltávólítás a könyvtárból",
-    "libraryLoadingMessage": "Könyvtár betöltése...",
+    "libraryLoadingMessage": "Könyvtár betöltése…",
     "libraries": "Könyvtárak böngészése",
-    "loadingScene": "Jelenet betöltése...",
+    "loadingScene": "Jelenet betöltése…",
     "align": "Igazítás",
     "alignTop": "Felülre igazítás",
     "alignBottom": "Alulra igazítás",
@@ -91,7 +91,8 @@
     "centerVertically": "Függőlegesen középre igazított",
     "centerHorizontally": "Vízszintesen középre igazított",
     "distributeHorizontally": "Vízszintes elosztás",
-    "distributeVertically": "Függőleges elosztás"
+    "distributeVertically": "Függőleges elosztás",
+    "viewMode": ""
   },
   "buttons": {
     "clearReset": "Vászon törlése",
@@ -199,24 +200,26 @@
   "errorDialog": {
     "title": "Hiba"
   },
-  "shortcutsDialog": {
-    "title": "Gyorsbillentyűk",
-    "shapes": "Formák",
-    "or": "vagy",
-    "click": "klikk",
-    "drag": "húzd",
-    "curvedArrow": "Ívelt nyíl",
-    "curvedLine": "Ívelt vonal",
-    "editor": "Szerkesztő",
-    "view": "Nézet",
-    "blog": "Olvasd a blogunkat",
-    "howto": "Kövesd az útmutatóinkat",
-    "github": "Hibát találtál? Küld be",
-    "textNewLine": "Új sor hozzáadása (szöveg)",
-    "textFinish": "Szerkesztés befejezése (szöveg)",
-    "zoomToFit": "Az összes elem látótérbe hozása",
-    "zoomToSelection": "Kijelölésre nagyítás",
-    "preventBinding": "A nyíl ne ragadjon"
+  "helpDialog": {
+    "blog": "",
+    "click": "",
+    "curvedArrow": "",
+    "curvedLine": "",
+    "documentation": "",
+    "drag": "",
+    "editor": "",
+    "github": "",
+    "howto": "",
+    "or": "",
+    "preventBinding": "",
+    "shapes": "",
+    "shortcuts": "",
+    "textFinish": "",
+    "textNewLine": "",
+    "title": "",
+    "view": "",
+    "zoomToFit": "",
+    "zoomToSelection": ""
   },
   "encrypted": {
     "tooltip": "A rajzaidat végpontok közötti titkosítással tároljuk, tehát az Excalidraw szervereiről se tud más belenézni."
@@ -232,5 +235,9 @@
     "title": "Statisztikák",
     "total": "Összesen",
     "width": "Szélesség"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboardAsPng": ""
   }
 }

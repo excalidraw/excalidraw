@@ -1,0 +1,32 @@
+@import "../css/variables.module";
+
+.excalidraw {
+  .Toast {
+    animation: fade-in 0.5s;
+    background-color: var(--button-gray-1);
+    border-radius: 4px;
+    bottom: 10px;
+    box-sizing: border-box;
+    cursor: default;
+    left: 50%;
+    margin-left: -150px;
+    padding: 4px 0;
+    position: fixed;
+    text-align: center;
+    width: 300px;
+    z-index: 999999;
+  }
+
+  .Toast__message {
+    color: var(--popup-text-color);
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}

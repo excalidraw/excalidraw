@@ -80,9 +80,9 @@
     "gridMode": "Grid mode",
     "addToLibrary": "Add to library",
     "removeFromLibrary": "Remove from library",
-    "libraryLoadingMessage": "Loading library...",
+    "libraryLoadingMessage": "Loading library…",
     "libraries": "Browse libraries",
-    "loadingScene": "Loading scene...",
+    "loadingScene": "Loading scene…",
     "align": "Align",
     "alignTop": "Align top",
     "alignBottom": "Align bottom",
@@ -91,7 +91,8 @@
     "centerVertically": "Center vertically",
     "centerHorizontally": "Center horizontally",
     "distributeHorizontally": "Distribute horizontally",
-    "distributeVertically": "Distribute vertically"
+    "distributeVertically": "Distribute vertically",
+    "viewMode": "View mode"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
@@ -199,24 +200,26 @@
   "errorDialog": {
     "title": "Error"
   },
-  "shortcutsDialog": {
-    "title": "Keyboard shortcuts",
-    "shapes": "Shapes",
-    "or": "or",
+  "helpDialog": {
+    "blog": "Read our blog",
     "click": "click",
-    "drag": "drag",
     "curvedArrow": "Curved arrow",
     "curvedLine": "Curved line",
+    "documentation": "Documentation",
+    "drag": "drag",
     "editor": "Editor",
-    "view": "View",
-    "blog": "Read our blog",
-    "howto": "Follow our guides",
     "github": "Found an issue? Submit",
-    "textNewLine": "Add new line (text)",
+    "howto": "Follow our guides",
+    "or": "or",
+    "preventBinding": "Prevent arrow binding",
+    "shapes": "Shapes",
+    "shortcuts": "Keyboard shortcuts",
     "textFinish": "Finish editing (text)",
+    "textNewLine": "Add new line (text)",
+    "title": "Help",
+    "view": "View",
     "zoomToFit": "Zoom to fit all elements",
-    "zoomToSelection": "Zoom to selection",
-    "preventBinding": "Prevent arrow binding"
+    "zoomToSelection": "Zoom to selection"
   },
   "encrypted": {
     "tooltip": "Your drawings are end-to-end encrypted so Excalidraw's servers will never see them."
@@ -232,5 +235,9 @@
     "title": "Stats for nerds",
     "total": "Total",
     "width": "Width"
+  },
+  "toast": {
+    "copyStyles": "Copied styles.",
+    "copyToClipboardAsPng": "Copied to clipboard as PNG."
   }
 }

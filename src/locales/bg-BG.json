@@ -80,9 +80,9 @@
     "gridMode": "Решетъчен режим",
     "addToLibrary": "Добавяне към библиотеката",
     "removeFromLibrary": "Премахване от библиотеката",
-    "libraryLoadingMessage": "Зареждане на библиотеката...",
+    "libraryLoadingMessage": "Зареждане на библиотеката…",
     "libraries": "Разглеждане на библиотеките",
-    "loadingScene": "Зареждане на сцена...",
+    "loadingScene": "Зареждане на сцена…",
     "align": "Подравняване",
     "alignTop": "Подравняване отгоре",
     "alignBottom": "Подравняване отдолу",
@@ -91,7 +91,8 @@
     "centerVertically": "Центрирай вертикално",
     "centerHorizontally": "Центрирай хоризонтално",
     "distributeHorizontally": "Разпредели хоризонтално",
-    "distributeVertically": "Разпредели вертикално"
+    "distributeVertically": "Разпредели вертикално",
+    "viewMode": ""
   },
   "buttons": {
     "clearReset": "Нулиране на платно",
@@ -199,24 +200,26 @@
   "errorDialog": {
     "title": "Грешка"
   },
-  "shortcutsDialog": {
-    "title": "Клавиши за бърз достъп",
-    "shapes": "Фигури",
-    "or": "или",
+  "helpDialog": {
+    "blog": "",
     "click": "клик",
+    "curvedArrow": "",
+    "curvedLine": "",
+    "documentation": "",
     "drag": "плъзнете",
-    "curvedArrow": "Извита стрелка",
-    "curvedLine": "Извита линия",
     "editor": "Редактор",
+    "github": "",
+    "howto": "",
+    "or": "или",
+    "preventBinding": "",
+    "shapes": "Фигури",
+    "shortcuts": "Клавиши за бърз достъп",
+    "textFinish": "",
+    "textNewLine": "",
+    "title": "",
     "view": "Преглед",
-    "blog": "Прочетете нашия блог",
-    "howto": "Следвайте нашите ръководства",
-    "github": "Намерихте проблем? Изпратете",
-    "textNewLine": "Добавяне на нов ред (текст)",
-    "textFinish": "Завършете редактиране (текст)",
-    "zoomToFit": "Приближи докато се виждат всички елементи",
-    "zoomToSelection": "Приближи селекцията",
-    "preventBinding": "Спри прилепяне на стрелките"
+    "zoomToFit": "",
+    "zoomToSelection": "Приближи селекцията"
   },
   "encrypted": {
     "tooltip": "Вашите рисунки са криптирани от край до край, така че сървърите на Excalidraw няма да могат да ги виждат."
@@ -232,5 +235,9 @@
     "title": "Статистика за хакери",
     "total": "Общо",
     "width": "Широчина"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboardAsPng": ""
   }
 }

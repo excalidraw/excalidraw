@@ -91,7 +91,8 @@
     "centerVertically": "Verticaal Centreren",
     "centerHorizontally": "Horizontaal Centreren",
     "distributeHorizontally": "Horizontaal verspreiden",
-    "distributeVertically": "Verticaal distribueren"
+    "distributeVertically": "Verticaal distribueren",
+    "viewMode": "Weergavemodus"
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
@@ -199,24 +200,26 @@
   "errorDialog": {
     "title": "Fout"
   },
-  "shortcutsDialog": {
-    "title": "Sneltoetsen",
-    "shapes": "Vormen",
-    "or": "of",
-    "click": "klik",
-    "drag": "slepen",
-    "curvedArrow": "Gebogen pijl",
-    "curvedLine": "Gebogen lijn",
-    "editor": "Editor",
-    "view": "Weergave",
+  "helpDialog": {
     "blog": "Lees onze blog",
+    "click": "klik",
+    "curvedArrow": "Gebogen pijl",
+    "curvedLine": "Kromme lijn",
+    "documentation": "Documentatie",
+    "drag": "slepen",
+    "editor": "Editor",
+    "github": "Probleem gevonden? Verzenden",
     "howto": "Volg onze handleidingen",
-    "github": "Probleem gevonden? Stuur een nieuwe issue",
-    "textNewLine": "Nieuwe regel toevoegen (tekst)",
+    "or": "of",
+    "preventBinding": "Pijlbinding voorkomen",
+    "shapes": "Vormen",
+    "shortcuts": "Sneltoetsen",
     "textFinish": "Voltooi bewerken (tekst)",
+    "textNewLine": "Nieuwe regel toevoegen (tekst)",
+    "title": "Help",
+    "view": "Weergave",
     "zoomToFit": "Zoom in op alle elementen",
-    "zoomToSelection": "Inzoomen op selectie",
-    "preventBinding": "Pijlbinding voorkomen"
+    "zoomToSelection": "Inzoomen op selectie"
   },
   "encrypted": {
     "tooltip": "Je tekeningen zijn beveiligd met end-to-end encryptie, dus Excalidraw's servers zullen nooit zien wat je tekent."
@@ -232,5 +235,9 @@
     "title": "Statistieken voor nerds",
     "total": "Totaal",
     "width": "Breedte"
+  },
+  "toast": {
+    "copyStyles": "Stijlen gekopieerd.",
+    "copyToClipboardAsPng": "Gekopieerd naar klembord als PNG."
   }
 }

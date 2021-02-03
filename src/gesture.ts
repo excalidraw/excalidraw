@@ -1,11 +1,10 @@
 import { PointerCoords } from "./types";
-import { normalizeScroll } from "./scene";
 
 export const getCenter = (pointers: Map<number, PointerCoords>) => {
   const allCoords = Array.from(pointers.values());
   return {
-    x: normalizeScroll(sum(allCoords, (coords) => coords.x) / allCoords.length),
-    y: normalizeScroll(sum(allCoords, (coords) => coords.y) / allCoords.length),
+    x: sum(allCoords, (coords) => coords.x) / allCoords.length,
+    y: sum(allCoords, (coords) => coords.y) / allCoords.length,
   };
 };
 

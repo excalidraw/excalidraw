@@ -80,9 +80,9 @@
     "gridMode": "Režim mriežky",
     "addToLibrary": "Pridať do knižnice",
     "removeFromLibrary": "Odstrániť z knižnice",
-    "libraryLoadingMessage": "Načítavanie knižnice...",
+    "libraryLoadingMessage": "Načítavanie knižnice…",
     "libraries": "Prehliadať knižnice",
-    "loadingScene": "Načítavanie scény...",
+    "loadingScene": "Načítavanie scény…",
     "align": "Zarovnanie",
     "alignTop": "Zarovnať nahor",
     "alignBottom": "Zarovnať nadol",
@@ -91,7 +91,8 @@
     "centerVertically": "Zarovnať zvislo na stred",
     "centerHorizontally": "Zarovnať vodorovne na stred",
     "distributeHorizontally": "Rozmiestniť vodorovne",
-    "distributeVertically": "Rozmiestniť zvisle"
+    "distributeVertically": "Rozmiestniť zvisle",
+    "viewMode": "Režim zobrazenia"
   },
   "buttons": {
     "clearReset": "Obnoviť plátno",
@@ -199,24 +200,26 @@
   "errorDialog": {
     "title": "Chyba"
   },
-  "shortcutsDialog": {
-    "title": "Klávesové skratky",
-    "shapes": "Tvary",
-    "or": "alebo",
+  "helpDialog": {
+    "blog": "Prečítajte si náš blog",
     "click": "kliknutie",
-    "drag": "potiahnutie",
     "curvedArrow": "Zakrivená šípka",
     "curvedLine": "Zakrivená čiara",
+    "documentation": "Dokumentácia",
+    "drag": "potiahnutie",
     "editor": "Editovanie",
-    "view": "Zobrazenie",
-    "blog": "Prečítajte si náš blog",
-    "howto": "Postupujte podľa naších návodov",
     "github": "Objavili ste problém? Nahláste ho",
-    "textNewLine": "Vložiť nový riadok (text)",
+    "howto": "Postupujte podľa naších návodov",
+    "or": "alebo",
+    "preventBinding": "Zakázať pripájanie šípky",
+    "shapes": "Tvary",
+    "shortcuts": "Klávesové skratky",
     "textFinish": "Ukončenie editovania (text)",
+    "textNewLine": "Vložiť nový riadok (text)",
+    "title": "Pomocník",
+    "view": "Zobrazenie",
     "zoomToFit": "Priblížiť aby boli zahrnuté všetky prvky",
-    "zoomToSelection": "Priblížiť na výber",
-    "preventBinding": "Zakázať pripájanie šípky"
+    "zoomToSelection": "Priblížiť na výber"
   },
   "encrypted": {
     "tooltip": "Vaše kresby používajú end-to-end šifrovanie, takže ich Excalidraw server nedokáže prečítať."
@@ -232,5 +235,9 @@
     "title": "Štatistiky",
     "total": "Celkom",
     "width": "Šírka"
+  },
+  "toast": {
+    "copyStyles": "Štýly skopírované.",
+    "copyToClipboardAsPng": "Skopírované do schránky ako PNG."
   }
 }

@@ -6,7 +6,7 @@ import {
   GRID_SIZE,
 } from "./constants";
 import { t } from "./i18n";
-import { AppState, FlooredNumber, NormalizedZoomValue } from "./types";
+import { AppState, NormalizedZoomValue } from "./types";
 import { getDateTime } from "./utils";
 
 export const getDefaultAppState = (): Omit<
@@ -57,22 +57,24 @@ export const getDefaultAppState = (): Omit<
     previousSelectedElementIds: {},
     resizingElement: null,
     scrolledOutside: false,
-    scrollX: 0 as FlooredNumber,
-    scrollY: 0 as FlooredNumber,
+    scrollX: 0,
+    scrollY: 0,
     selectedElementIds: {},
     selectedGroupIds: {},
     selectionElement: null,
     shouldAddWatermark: false,
     shouldCacheIgnoreZoom: false,
     showGrid: false,
-    showShortcutsDialog: false,
+    showHelpDialog: false,
     showStats: false,
     startBoundElement: null,
     suggestedBindings: [],
+    toastMessage: null,
     viewBackgroundColor: oc.white,
     width: window.innerWidth,
     zenModeEnabled: false,
     zoom: { value: 1 as NormalizedZoomValue, translation: { x: 0, y: 0 } },
+    viewModeEnabled: false,
   };
 };
 
@@ -144,14 +146,16 @@ const APP_STATE_STORAGE_CONF = (<
   selectionElement: { browser: false, export: false },
   shouldAddWatermark: { browser: true, export: false },
   shouldCacheIgnoreZoom: { browser: true, export: false },
-  showShortcutsDialog: { browser: false, export: false },
+  showHelpDialog: { browser: false, export: false },
   showStats: { browser: true, export: false },
   startBoundElement: { browser: false, export: false },
   suggestedBindings: { browser: false, export: false },
+  toastMessage: { browser: false, export: false },
   viewBackgroundColor: { browser: true, export: true },
   width: { browser: false, export: false },
   zenModeEnabled: { browser: true, export: false },
   zoom: { browser: true, export: false },
+  viewModeEnabled: { browser: false, export: false },
 });
 
 const _clearAppStateForStorage = <ExportType extends "export" | "browser">(

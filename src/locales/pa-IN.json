@@ -91,7 +91,8 @@
     "centerVertically": "ਲੇਟਵੇਂ ਵਿਚਕਾਰ ਕਰੋ",
     "centerHorizontally": "ਖੜ੍ਹਵੇਂ ਵਿਚਕਾਰ ਕਰੋ",
     "distributeHorizontally": "ਖੜ੍ਹਵੇਂ ਇਕਸਾਰ ਵੰਡੋ",
-    "distributeVertically": "ਲੇਟਵੇਂ ਇਕਸਾਰ ਵੰਡੋ"
+    "distributeVertically": "ਲੇਟਵੇਂ ਇਕਸਾਰ ਵੰਡੋ",
+    "viewMode": ""
   },
   "buttons": {
     "clearReset": "ਕੈਨਵਸ ਰੀਸੈੱਟ ਕਰੋ",
@@ -199,24 +200,26 @@
   "errorDialog": {
     "title": "ਗਲਤੀ"
   },
-  "shortcutsDialog": {
-    "title": "ਕੀਬੋਰਡ ਸ਼ਾਰਟਕੱਟ",
-    "shapes": "ਆਕ੍ਰਿਤੀਆਂ",
-    "or": "ਜਾਂ",
+  "helpDialog": {
+    "blog": "ਸਾਡਾ ਬਲੌਗ ਪੜ੍ਹੋ",
     "click": "ਕਲਿੱਕ",
-    "drag": "ਘਸੀਟੋ",
     "curvedArrow": "ਵਿੰਗਾ ਤੀਰ",
     "curvedLine": "ਵਿੰਗੀ ਲਕੀਰ",
+    "documentation": "ਕਾਗਜ਼ਾਤ",
+    "drag": "ਘਸੀਟੋ",
     "editor": "ਸੋਧਕ",
-    "view": "ਦਿੱਖ",
-    "blog": "ਸਾਡਾ ਬਲੌਗ ਪੜ੍ਹੋ",
-    "howto": "ਸਾਡੀਆਂ ਗਾਈਡਾਂ ਦੀ ਪਾਲਣਾ ਕਰੋ",
     "github": "ਕੋਈ ਸਮੱਸਿਆ ਲੱਭੀ? ਜਮ੍ਹਾਂ ਕਰਵਾਓ",
-    "textNewLine": "ਨਵੀਂ ਪੰਕਤੀ ਜੋੜੋ (ਪਾਠ)",
+    "howto": "ਸਾਡੀਆਂ ਗਾਈਡਾਂ ਦੀ ਪਾਲਣਾ ਕਰੋ",
+    "or": "ਜਾਂ",
+    "preventBinding": "ਤੀਰ ਬੱਝਣਾ ਰੋਕੋ",
+    "shapes": "ਆਕ੍ਰਿਤੀਆਂ",
+    "shortcuts": "ਕੀਬੋਰਡ ਸ਼ਾਰਟਕੱਟ",
     "textFinish": "ਸੋਧ ਮੁਕੰਮਲ ਕਰੋ (ਪਾਠ)",
+    "textNewLine": "ਨਵੀਂ ਪੰਕਤੀ ਜੋੜੋ (ਪਾਠ)",
+    "title": "ਮਦਦ",
+    "view": "ਦਿੱਖ",
     "zoomToFit": "ਸਾਰੇ ਐਲੀਮੈਂਟਾਂ ਨੂੰ ਫਿੱਟ ਕਰਨ ਲਈ ਜ਼ੂਮ ਕਰੋ",
-    "zoomToSelection": "ਚੋਣ ਤੱਕ ਜ਼ੂਮ ਕਰੋ",
-    "preventBinding": "ਤੀਰ ਬੱਝਣਾ ਰੋਕੋ"
+    "zoomToSelection": "ਚੋਣ ਤੱਕ ਜ਼ੂਮ ਕਰੋ"
   },
   "encrypted": {
     "tooltip": "ਤੁਹਾਡੀ ਡਰਾਇੰਗਾਂ ਸਿਰੇ-ਤੋਂ-ਸਿਰੇ ਤੱਕ ਇਨਕਰਿਪਟ ਕੀਤੀਆਂ ਹੋਈਆਂ ਹਨ, ਇਸ ਲਈ Excalidraw ਦੇ ਸਰਵਰ ਉਹਨਾਂ ਨੂੰ ਕਦੇ ਵੀ ਨਹੀਂ ਦੇਖਣਗੇ।"
@@ -232,5 +235,9 @@
     "title": "ਪੜਾਕੂਆਂ ਲਈ ਅੰਕੜੇ",
     "total": "ਕੁੱਲ",
     "width": "ਚੌੜਾਈ"
+  },
+  "toast": {
+    "copyStyles": "ਕਾਪੀ ਕੀਤੇ ਸਟਾਇਲ।",
+    "copyToClipboardAsPng": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ PNG ਵਜੋਂ ਕਾਪੀ ਕੀਤਾ।"
   }
 }

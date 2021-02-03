@@ -26,6 +26,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     onExportToBackend,
     renderFooter,
     langCode = defaultLang.code,
+    viewModeEnabled,
   } = props;
 
   useEffect(() => {
@@ -64,6 +65,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
           onExportToBackend={onExportToBackend}
           renderFooter={renderFooter}
           langCode={langCode}
+          viewModeEnabled={viewModeEnabled}
         />
       </IsMobileProvider>
     </InitializeApp>
@@ -81,12 +83,15 @@ const areEqual = (
 
   const prevKeys = Object.keys(prevProps) as (keyof typeof prev)[];
   const nextKeys = Object.keys(nextProps) as (keyof typeof next)[];
-
   return (
     prevUser?.name === nextUser?.name &&
     prevKeys.length === nextKeys.length &&
     prevKeys.every((key) => prev[key] === next[key])
   );
+};
+
+Excalidraw.defaultProps = {
+  lanCode: defaultLang.code,
 };
 
 const forwardedRefComp = forwardRef<

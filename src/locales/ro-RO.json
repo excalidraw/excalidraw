@@ -80,9 +80,9 @@
     "gridMode": "Mod grilă",
     "addToLibrary": "Adăugare la bibliotecă",
     "removeFromLibrary": "Eliminare din bibliotecă",
-    "libraryLoadingMessage": "Se încarcă biblioteca...",
+    "libraryLoadingMessage": "Se încarcă biblioteca…",
     "libraries": "Răsfoiește bibliotecile",
-    "loadingScene": "Se încarcă scena...",
+    "loadingScene": "Se încarcă scena…",
     "align": "Aliniere",
     "alignTop": "Aliniere sus",
     "alignBottom": "Aliniere jos",
@@ -91,7 +91,8 @@
     "centerVertically": "Centrare verticală",
     "centerHorizontally": "Centrare orizontală",
     "distributeHorizontally": "Distribuie orizontal",
-    "distributeVertically": "Distribuie vertical"
+    "distributeVertically": "Distribuie vertical",
+    "viewMode": "Mod de vizualizare"
   },
   "buttons": {
     "clearReset": "Resetare pânză",
@@ -199,24 +200,26 @@
   "errorDialog": {
     "title": "Eroare"
   },
-  "shortcutsDialog": {
-    "title": "Comenzi rapide de la tastatură",
-    "shapes": "Forme",
-    "or": "sau",
+  "helpDialog": {
+    "blog": "Citește blogul nostru",
     "click": "clic",
-    "drag": "glisare",
     "curvedArrow": "Săgeată curbată",
     "curvedLine": "Linie curbată",
+    "documentation": "Documentație",
+    "drag": "glisare",
     "editor": "Editor",
-    "view": "Vizualizare",
-    "blog": "Citește blogul nostru",
-    "howto": "Urmărește ghidurile noastre",
     "github": "Ai întâmpinat o problemă? Trimite un raport",
-    "textNewLine": "Adaugă o linie nouă (text)",
+    "howto": "Urmărește ghidurile noastre",
+    "or": "sau",
+    "preventBinding": "Împiedică legarea săgeții",
+    "shapes": "Forme",
+    "shortcuts": "Comenzi rapide de la tastatură",
     "textFinish": "Finalizează editarea (text)",
-    "zoomToFit": "Apropiere/depărtare pentru a cuprinde totul",
-    "zoomToSelection": "Panoramare la selecție",
-    "preventBinding": "Împiedică legarea săgeții"
+    "textNewLine": "Adaugă o linie nouă (text)",
+    "title": "Ajutor",
+    "view": "Vizualizare",
+    "zoomToFit": "Panoramare pentru a cuprinde totul",
+    "zoomToSelection": "Panoramare la selecție"
   },
   "encrypted": {
     "tooltip": "Desenele tale sunt criptate integral, astfel că serverele Excalidraw nu le vor vedea niciodată."
@@ -232,5 +235,9 @@
     "title": "Statistici pentru pasionați",
     "total": "Total",
     "width": "Lățime"
+  },
+  "toast": {
+    "copyStyles": "Stiluri copiate.",
+    "copyToClipboardAsPng": "Copiat în memoria temporară ca PNG."
   }
 }

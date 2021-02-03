@@ -30,11 +30,11 @@
     "edges": "角",
     "sharp": "四角",
     "round": "丸",
-    "arrowheads": "",
-    "arrowhead_none": "",
-    "arrowhead_arrow": "",
-    "arrowhead_bar": "",
-    "arrowhead_dot": "",
+    "arrowheads": "線の終点",
+    "arrowhead_none": "なし",
+    "arrowhead_arrow": "矢印",
+    "arrowhead_bar": "バー",
+    "arrowhead_dot": "ドット",
     "fontSize": "フォントの大きさ",
     "fontFamily": "フォントの種類",
     "onlySelected": "選択中のみ",
@@ -80,9 +80,9 @@
     "gridMode": "",
     "addToLibrary": "ライブラリに追加",
     "removeFromLibrary": "ライブラリから削除",
-    "libraryLoadingMessage": "ライブラリを読み込み中...",
+    "libraryLoadingMessage": "ライブラリを読み込み中…",
     "libraries": "",
-    "loadingScene": "シーンを読み込み中...",
+    "loadingScene": "シーンを読み込み中…",
     "align": "整列",
     "alignTop": "上揃え",
     "alignBottom": "下揃え",
@@ -91,7 +91,8 @@
     "centerVertically": "縦方向に中央揃え",
     "centerHorizontally": "横方向に中央揃え",
     "distributeHorizontally": "",
-    "distributeVertically": ""
+    "distributeVertically": "",
+    "viewMode": ""
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",
@@ -118,9 +119,9 @@
     "redo": "やり直し",
     "roomDialog": "共同編集を開始する",
     "createNewRoom": "新しい部屋を作成する",
-    "fullScreen": "",
-    "darkMode": "",
-    "lightMode": "",
+    "fullScreen": "全画面表示",
+    "darkMode": "ダークモード",
+    "lightMode": "ライトモード",
     "zenMode": "",
     "exitZenMode": "集中モードをやめる"
   },
@@ -199,24 +200,26 @@
   "errorDialog": {
     "title": "エラー"
   },
-  "shortcutsDialog": {
-    "title": "キーボードショートカット",
-    "shapes": "図形",
-    "or": "または",
-    "click": "クリック",
-    "drag": "ドラッグ",
-    "curvedArrow": "曲がった矢印",
-    "curvedLine": "曲線",
-    "editor": "エディタ",
-    "view": "表示",
-    "blog": "公式ブログを読む",
-    "howto": "ヘルプ・マニュアル",
-    "github": "不具合報告はこちら",
-    "textNewLine": "テキストの改行",
-    "textFinish": "テキストの編集を終える",
-    "zoomToFit": "すべての図形が収まるよう拡大/縮小",
-    "zoomToSelection": "",
-    "preventBinding": "矢印を結合しない"
+  "helpDialog": {
+    "blog": "",
+    "click": "",
+    "curvedArrow": "",
+    "curvedLine": "",
+    "documentation": "",
+    "drag": "",
+    "editor": "",
+    "github": "",
+    "howto": "",
+    "or": "",
+    "preventBinding": "",
+    "shapes": "",
+    "shortcuts": "",
+    "textFinish": "",
+    "textNewLine": "",
+    "title": "",
+    "view": "",
+    "zoomToFit": "",
+    "zoomToSelection": ""
   },
   "encrypted": {
     "tooltip": "描画内容はエンドツーエンド暗号化が施されており、Excalidrawサーバーが内容を見ることはできません。"
@@ -225,12 +228,16 @@
     "angle": "",
     "element": "",
     "elements": "",
-    "height": "",
+    "height": "高さ",
     "scene": "",
     "selected": "",
     "storage": "",
     "title": "",
-    "total": "",
-    "width": ""
+    "total": "合計",
+    "width": "幅"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboardAsPng": ""
   }
 }

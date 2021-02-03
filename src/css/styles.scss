@@ -1,4 +1,4 @@
-@import "./_variables";
+@import "./variables.module";
 @import "./theme";
 
 .excalidraw {
@@ -13,7 +13,7 @@
   a {
     font-weight: 500;
     text-decoration: none;
-    color: $oc-blue-7; /* OC Blue 7 */
+    color: var(--link-color);
 
     &:hover {
       text-decoration: underline;
@@ -282,7 +282,7 @@
     pointer-events: none !important;
   }
 
-  .App-menu_top > * {
+  .layer-ui__wrapper:not(.disable-pointerEvents) .App-menu_top > * {
     pointer-events: all;
   }
 
@@ -323,7 +323,7 @@
     }
   }
 
-  .App-menu_bottom > * {
+  .layer-ui__wrapper:not(.disable-pointerEvents) .App-menu_bottom > * {
     pointer-events: all;
   }
 
@@ -431,6 +431,7 @@
     cursor: pointer;
     fill: $oc-gray-6;
     bottom: 14px;
+    width: 1.5rem;
 
     :root[dir="ltr"] & {
       right: 14px;
@@ -489,6 +490,13 @@
 
   .disable-pointerEvents {
     pointer-events: none !important;
+  }
+
+  &.excalidraw--view-mode {
+    .App-menu {
+      display: flex;
+      justify-content: space-between;
+    }
   }
 
   @media print {

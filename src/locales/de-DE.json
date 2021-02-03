@@ -80,9 +80,9 @@
     "gridMode": "Rastermodus",
     "addToLibrary": "Zur Bibliothek hinzufügen",
     "removeFromLibrary": "Aus Bibliothek entfernen",
-    "libraryLoadingMessage": "Lade Bibliothek...",
+    "libraryLoadingMessage": "Lade Bibliothek…",
     "libraries": "Bibliotheken durchsuchen",
-    "loadingScene": "Lade Zeichnung...",
+    "loadingScene": "Lade Zeichnung…",
     "align": "Ausrichten",
     "alignTop": "Obere Kanten",
     "alignBottom": "Untere Kanten",
@@ -91,7 +91,8 @@
     "centerVertically": "Vertikal zentrieren",
     "centerHorizontally": "Horizontal zentrieren",
     "distributeHorizontally": "Horizontal verteilen",
-    "distributeVertically": "Vertikal verteilen"
+    "distributeVertically": "Vertikal verteilen",
+    "viewMode": "Ansichtsmodus"
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
@@ -199,24 +200,26 @@
   "errorDialog": {
     "title": "Fehler"
   },
-  "shortcutsDialog": {
-    "title": "Tastaturkürzel",
-    "shapes": "Formen",
-    "or": "oder",
+  "helpDialog": {
+    "blog": "Lies unseren Blog",
     "click": "klicken",
-    "drag": "ziehen",
     "curvedArrow": "Gebogener Pfeil",
     "curvedLine": "Gebogene Linie",
+    "documentation": "Dokumentation",
+    "drag": "ziehen",
     "editor": "Editor",
-    "view": "Ansicht",
-    "blog": "Unseren Blog lesen",
-    "howto": "Folge unseren Anleitungen",
     "github": "Ein Problem gefunden? Informiere uns",
-    "textNewLine": "Neue Zeile hinzufügen (Text)",
+    "howto": "Folge unseren Anleitungen",
+    "or": "oder",
+    "preventBinding": "Pfeil-Bindung verhindern",
+    "shapes": "Formen",
+    "shortcuts": "Tastaturkürzel",
     "textFinish": "Bearbeiten beenden (Text)",
+    "textNewLine": "Neue Zeile hinzufügen (Text)",
+    "title": "Hilfe",
+    "view": "Ansicht",
     "zoomToFit": "Zoomen um alle Elemente einzupassen",
-    "zoomToSelection": "Zoomauswahl",
-    "preventBinding": "Pfeil-Bindung verhindern"
+    "zoomToSelection": "Auf Auswahl zoomen"
   },
   "encrypted": {
     "tooltip": "Da deine Zeichnungen Ende-zu-Ende verschlüsselt werden, sehen auch unsere Excalidraw-Server sie niemals."
@@ -232,5 +235,9 @@
     "title": "Statistiken für Nerds",
     "total": "Gesamt",
     "width": "Breite"
+  },
+  "toast": {
+    "copyStyles": "Formatierung kopiert.",
+    "copyToClipboardAsPng": "In die Zwischenablage als PNG kopiert."
   }
 }

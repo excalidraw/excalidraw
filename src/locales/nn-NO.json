@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Lim inn",
-    "pasteCharts": "Lim inn diagrammer",
+    "pasteCharts": "Lim inn diagram",
     "selectAll": "Vel alt",
     "multiSelect": "Legg til element i utval",
     "moveCanvas": "Flytt lerretet",
@@ -80,9 +80,9 @@
     "gridMode": "Rutevisning",
     "addToLibrary": "Legg til i bibliotek",
     "removeFromLibrary": "Fjern frå bibliotek",
-    "libraryLoadingMessage": "Laster bibliotek...",
+    "libraryLoadingMessage": "Laster bibliotek…",
     "libraries": "Blad gjennom bibliotek",
-    "loadingScene": "Laster scene...",
+    "loadingScene": "Laster scene…",
     "align": "Juster",
     "alignTop": "Juster til topp",
     "alignBottom": "Juster til botn",
@@ -91,7 +91,8 @@
     "centerVertically": "Midtstill vertikalt",
     "centerHorizontally": "Midtstill horisontalt",
     "distributeHorizontally": "Sprei horisontalt",
-    "distributeVertically": "Sprei vertikalt"
+    "distributeVertically": "Sprei vertikalt",
+    "viewMode": ""
   },
   "buttons": {
     "clearReset": "Tilbakestill lerretet",
@@ -199,24 +200,26 @@
   "errorDialog": {
     "title": "Feil"
   },
-  "shortcutsDialog": {
-    "title": "Tastatursnarvegar",
-    "shapes": "Figurar",
-    "or": "eller",
+  "helpDialog": {
+    "blog": "",
     "click": "klikk",
-    "drag": "drag",
-    "curvedArrow": "Boga pil",
-    "curvedLine": "Boga linje",
+    "curvedArrow": "",
+    "curvedLine": "",
+    "documentation": "",
+    "drag": "",
     "editor": "Redigering",
+    "github": "",
+    "howto": "",
+    "or": "eller",
+    "preventBinding": "",
+    "shapes": "Formar",
+    "shortcuts": "",
+    "textFinish": "",
+    "textNewLine": "",
+    "title": "Hjelp",
     "view": "Vising",
-    "blog": "Les bloggen vår",
-    "howto": "Følg vegleiinga vår",
-    "github": "Funne eit problem? Send inn",
-    "textNewLine": "Legg til ny linje (tekst)",
-    "textFinish": "Fullfør redigering (tekst)",
-    "zoomToFit": "Zoom for å sjå alle elementa",
-    "zoomToSelection": "Zoom til utval",
-    "preventBinding": "Hindre pilkobling"
+    "zoomToFit": "",
+    "zoomToSelection": ""
   },
   "encrypted": {
     "tooltip": "Teikningane dine er ende-til-ende-krypterte slik at Excalidraw sine serverar aldri får sjå dei."
@@ -232,5 +235,9 @@
     "title": "Statistikk for nerdar",
     "total": "Totalt",
     "width": "Breidde"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboardAsPng": ""
   }
 }

@@ -91,7 +91,8 @@
     "centerVertically": "Wyśrodkuj w pionie",
     "centerHorizontally": "Wyśrodkuj w poziomie",
     "distributeHorizontally": "Rozłóż poziomo",
-    "distributeVertically": "Rozłóż pionowo"
+    "distributeVertically": "Rozłóż pionowo",
+    "viewMode": "Tryb widoku"
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
@@ -135,7 +136,7 @@
     "decryptFailed": "Nie udało się odszyfrować danych.",
     "uploadedSecurly": "By zapewnić Ci prywatność, udostępnianie projektu jest zabezpieczone szyfrowaniem end-to-end, co oznacza, że poza tobą i osobą z którą podzielisz się linkiem, nikt nie ma dostępu do tego co udostępniasz.",
     "loadSceneOverridePrompt": "Wczytanie zewnętrznego rysunku zastąpi istniejącą zawartość. Czy chcesz kontynuować?",
-    "errorLoadingLibrary": "Wystąpił błąd podczas ładowania biblioteki stron trzecich.",
+    "errorLoadingLibrary": "Wystąpił błąd podczas ładowania zewnętrznej biblioteki.",
     "confirmAddLibrary": "To doda {{numShapes}} kształtów do twojej biblioteki. Jesteś pewien?",
     "imageDoesNotContainScene": "Importowanie zdjęć nie jest obecnie obsługiwane.\n\nCzy chciałeś zaimportować scenę? Ten obraz nie zawiera żadnych danych sceny. Czy włączyłeś to podczas eksportowania?",
     "cannotRestoreFromImage": "Scena nie mogła zostać przywrócona z pliku obrazu"
@@ -199,24 +200,26 @@
   "errorDialog": {
     "title": "Wystąpił błąd"
   },
-  "shortcutsDialog": {
-    "title": "Skróty klawiszowe",
-    "shapes": "Kształty",
-    "or": "lub",
-    "click": "klik",
-    "drag": "przeciągnij",
-    "curvedArrow": "Zakrzywiona strzałka",
-    "curvedLine": "Zakrzywiona linia",
-    "editor": "Edytor",
-    "view": "Widok",
-    "blog": "Przeczytaj naszego bloga",
-    "howto": "Skorzystaj z instrukcji",
-    "github": "Znalazłeś problem? Zgłoś go",
-    "textNewLine": "Dodaj nową linię (tekst)",
-    "textFinish": "Zakończ edycję (tekst)",
-    "zoomToFit": "Powiększ, aby wyświetlić wszystkie elementy",
-    "zoomToSelection": "Przybliż zaznaczenie",
-    "preventBinding": "Zablokuj przywiązanie strzałek do obiektu"
+  "helpDialog": {
+    "blog": "",
+    "click": "",
+    "curvedArrow": "",
+    "curvedLine": "",
+    "documentation": "",
+    "drag": "",
+    "editor": "",
+    "github": "",
+    "howto": "",
+    "or": "",
+    "preventBinding": "",
+    "shapes": "",
+    "shortcuts": "",
+    "textFinish": "",
+    "textNewLine": "",
+    "title": "",
+    "view": "",
+    "zoomToFit": "",
+    "zoomToSelection": ""
   },
   "encrypted": {
     "tooltip": "Twoje rysunki są zabezpieczone szyfrowaniem end-to-end, tak więc nawet w Excalidraw nie jesteśmy w stanie zobaczyć tego co tworzysz."
@@ -232,5 +235,9 @@
     "title": "Statystyki dla nerdów",
     "total": "Łącznie",
     "width": "Szerokość"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboardAsPng": ""
   }
 }

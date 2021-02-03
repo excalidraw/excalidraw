@@ -80,9 +80,9 @@
     "gridMode": "Режим сітки",
     "addToLibrary": "Додати до бібліотеки",
     "removeFromLibrary": "Видалити з бібліотеки",
-    "libraryLoadingMessage": "Завантажити бібліотеку...",
+    "libraryLoadingMessage": "Завантажити бібліотеку…",
     "libraries": "Огляд бібліотек",
-    "loadingScene": "Завантаження сцени...",
+    "loadingScene": "Завантаження сцени…",
     "align": "Вирівнювання",
     "alignTop": "Вирівняти по верхньому краю",
     "alignBottom": "Вирівняти по нижньому краю",
@@ -91,7 +91,8 @@
     "centerVertically": "Центрувати по вертикалі",
     "centerHorizontally": "Центрувати по горизонталі",
     "distributeHorizontally": "Розподілити по горизонталі",
-    "distributeVertically": "Розподілити вертикально"
+    "distributeVertically": "Розподілити вертикально",
+    "viewMode": ""
   },
   "buttons": {
     "clearReset": "Очистити полотно",
@@ -199,24 +200,26 @@
   "errorDialog": {
     "title": "Помилка"
   },
-  "shortcutsDialog": {
-    "title": "Гарячі клавіші",
-    "shapes": "Фігури",
-    "or": "або",
+  "helpDialog": {
+    "blog": "Наш блог",
     "click": "натиснути",
+    "curvedArrow": "Крива стрілка",
+    "curvedLine": "Крива лінія",
+    "documentation": "Документація",
     "drag": "перетягнути",
-    "curvedArrow": "Вигнута стрілка",
-    "curvedLine": "Вигнута лінія",
     "editor": "Редактор",
-    "view": "Вигляд",
-    "blog": "Читайте наш блог",
+    "github": "Знайшли помилку? Повідомте",
     "howto": "Дотримуйтесь наших інструкцій",
-    "github": "Знайшли помилку? Повідомте!",
-    "textNewLine": "Додати новий рядок (текст)",
+    "or": "або",
+    "preventBinding": "Запобігти зв'язування зі стрілками",
+    "shapes": "Фігури",
+    "shortcuts": "Гарячі клавіші",
     "textFinish": "Завершити редагування (текст)",
-    "zoomToFit": "Збільшити щоб умістити все",
-    "zoomToSelection": "Перейти до виділеного",
-    "preventBinding": "Запобігти зв'язування зі стрілками"
+    "textNewLine": "Додати новий рядок (текст)",
+    "title": "Допомога",
+    "view": "Вигляд",
+    "zoomToFit": "Збільшити щоб умістити всі елементи",
+    "zoomToSelection": "Наблизити вибране"
   },
   "encrypted": {
     "tooltip": "Ваші креслення захищені наскрізним шифруванням — сервери Excalidraw ніколи їх не побачать."
@@ -232,5 +235,9 @@
     "title": "Статистика",
     "total": "Всього",
     "width": "Ширина"
+  },
+  "toast": {
+    "copyStyles": "Скопійовані стилі.",
+    "copyToClipboardAsPng": "Скопійовано в буфер обміну як PNG."
   }
 }

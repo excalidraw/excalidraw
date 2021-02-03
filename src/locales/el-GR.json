@@ -80,9 +80,9 @@
     "gridMode": "Εμφάνιση σε πλέγμα",
     "addToLibrary": "Προσθήκη στη βιβλιοθήκη",
     "removeFromLibrary": "Αφαίρεση από τη βιβλιοθήκη",
-    "libraryLoadingMessage": "Φόρτωση βιβλιοθήκης...",
+    "libraryLoadingMessage": "Φόρτωση βιβλιοθήκης…",
     "libraries": "Άλλες βιβλιοθήκες",
-    "loadingScene": "Φόρτωση σκηνής...",
+    "loadingScene": "Φόρτωση σκηνής…",
     "align": "Στοίχιση",
     "alignTop": "Στοίχιση πάνω",
     "alignBottom": "Στοίχιση κάτω",
@@ -91,7 +91,8 @@
     "centerVertically": "Κέντρο κάθετα",
     "centerHorizontally": "Κέντρο οριζόντια",
     "distributeHorizontally": "Οριζόντια κατανομή",
-    "distributeVertically": "Κατακόρυφη κατανομή"
+    "distributeVertically": "Κατακόρυφη κατανομή",
+    "viewMode": "Λειτουργία προβολής"
   },
   "buttons": {
     "clearReset": "Επαναφορά του καμβά",
@@ -199,24 +200,26 @@
   "errorDialog": {
     "title": "Σφάλμα"
   },
-  "shortcutsDialog": {
-    "title": "Συντομεύσεις πληκτρολογίου",
-    "shapes": "Σχήματα",
-    "or": "ή",
+  "helpDialog": {
+    "blog": "Διαβάστε το Blog μας",
     "click": "κλικ",
-    "drag": "σύρε",
     "curvedArrow": "Κυρτό βέλος",
     "curvedLine": "Κυρτή γραμμή",
+    "documentation": "Εγχειρίδιο",
+    "drag": "σύρε",
     "editor": "Επεξεργαστής",
-    "view": "Προβολή",
-    "blog": "Διαβάστε το ιστολόγιο μας",
-    "howto": "Ακολουθήστε τους οδηγούς μας",
     "github": "Βρήκατε πρόβλημα; Υποβάλετε το",
-    "textNewLine": "Προσθήκη νέας γραμμής (κείμενο)",
+    "howto": "Ακολουθήστε τους οδηγούς μας",
+    "or": "ή",
+    "preventBinding": "Αποτροπή δέσμευσης βέλων",
+    "shapes": "Σχήματα",
+    "shortcuts": "Συντομεύσεις πληκτρολογίου",
     "textFinish": "Ολοκλήρωση επεξεργασίας (κείμενο)",
+    "textNewLine": "Προσθήκη νέας γραμμής (κείμενο)",
+    "title": "Βοήθεια",
+    "view": "Προβολή",
     "zoomToFit": "Zoom ώστε να χωρέσουν όλα τα στοιχεία",
-    "zoomToSelection": "Εστίαση στην επιλογή",
-    "preventBinding": "Αποτροπή δέσμευσης βέλων"
+    "zoomToSelection": "Ζουμ στην επιλογή"
   },
   "encrypted": {
     "tooltip": "Τα σχέδιά σου είναι κρυπτογραφημένα από άκρο σε άκρο, έτσι δεν θα έιναι ποτέ ορατά μέσα από τους διακομιστές του Excalidraw."
@@ -232,5 +235,9 @@
     "title": "Στατιστικά για σπασίκλες",
     "total": "Σύνολο ",
     "width": "Πλάτος"
+  },
+  "toast": {
+    "copyStyles": "Αντιγράφηκαν στυλ.",
+    "copyToClipboardAsPng": "Αντιγράφτηκε στο πρόχειρο ως PNG."
   }
 }

@@ -80,9 +80,9 @@
     "gridMode": "حالت شبکه ای",
     "addToLibrary": "افزودن به کتابخانه",
     "removeFromLibrary": "حذف از کتابخانه",
-    "libraryLoadingMessage": "بارگذاری کتابخانه...",
+    "libraryLoadingMessage": "بارگذاری کتابخانه…",
     "libraries": "مرور کردن کتابخانه ها",
-    "loadingScene": "باگذاری صحنه...",
+    "loadingScene": "باگذاری صحنه…",
     "align": "تراز",
     "alignTop": "تراز به بالا",
     "alignBottom": "تراز به پایین",
@@ -91,7 +91,8 @@
     "centerVertically": "وسط قرار دادن به صورت عمودی",
     "centerHorizontally": "وسط قرار دادن به صورت افقی",
     "distributeHorizontally": "توزیع کردن به صورت افقی",
-    "distributeVertically": "توزیع کردن به صورت عمودی"
+    "distributeVertically": "توزیع کردن به صورت عمودی",
+    "viewMode": ""
   },
   "buttons": {
     "clearReset": "پاکسازی بوم نقاشی",
@@ -199,24 +200,26 @@
   "errorDialog": {
     "title": "خطا"
   },
-  "shortcutsDialog": {
-    "title": "میانبرهای صفحه کلید",
-    "shapes": "شکل‌ها",
-    "or": "یا",
-    "click": "کلیک",
-    "drag": "کشیدن",
+  "helpDialog": {
+    "blog": "بلاگ ما را بخوانید",
+    "click": "",
     "curvedArrow": "فلش خمیده",
     "curvedLine": "منحنی",
+    "documentation": "مستندات",
+    "drag": "",
     "editor": "ویرایشگر",
-    "view": "نمایش",
-    "blog": "بلاگ ما را بخوانید",
-    "howto": "راهنمای ما را دنبال کنید",
     "github": "اشکالی می بینید؟ گزارش دهید",
+    "howto": "راهنمای ما را دنبال کنید",
+    "or": "یا",
+    "preventBinding": "مانع شدن از چسبیدن فلش ها",
+    "shapes": "شکل‌ها",
+    "shortcuts": "میانبرهای صفحه کلید",
+    "textFinish": "",
     "textNewLine": "یک خط جدید اضافه کنید (متن)",
-    "textFinish": "پایان ویرایش (متن)",
+    "title": "راهنما",
+    "view": "مشاهده",
     "zoomToFit": "بزرگنمایی برای دیدن تمام آیتم ها",
-    "zoomToSelection": "بزرگنمایی قسمت انتخاب شده",
-    "preventBinding": "مانع شدن از چسبیدن فلش ها"
+    "zoomToSelection": "بزرگنمایی قسمت انتخاب شده"
   },
   "encrypted": {
     "tooltip": "شما در یک محیط رمزگزاری شده دو طرفه در حال طراحی هستید پس Excalidraw هرگز طرح های شما را نمیبند."
@@ -232,5 +235,9 @@
     "title": "آمار برای نردها",
     "total": "مجموع",
     "width": "عرض"
+  },
+  "toast": {
+    "copyStyles": "کپی سبک.",
+    "copyToClipboardAsPng": "کپی در حافطه موقت به صورت PNG."
   }
 }

@@ -91,7 +91,8 @@
     "centerVertically": "Centrar verticalmente",
     "centerHorizontally": "Centrar horizontalmente",
     "distributeHorizontally": "Distribuir horizontalmente",
-    "distributeVertically": "Distribuir verticalmente"
+    "distributeVertically": "Distribuir verticalmente",
+    "viewMode": "Modo presentación"
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
@@ -199,24 +200,26 @@
   "errorDialog": {
     "title": "Error"
   },
-  "shortcutsDialog": {
-    "title": "Atajos del teclado",
-    "shapes": "Formas",
-    "or": "o",
-    "click": "clic",
-    "drag": "arrastrar",
+  "helpDialog": {
+    "blog": "Lee nuestro blog",
+    "click": "click",
     "curvedArrow": "Flecha curvada",
     "curvedLine": "Línea curva",
+    "documentation": "Documentación",
+    "drag": "arrastrar",
     "editor": "Editor",
-    "view": "Vista",
-    "blog": "Lee nuestro blog",
-    "howto": "Siga nuestras guías",
     "github": "¿Has encontrado un problema? Envíalo",
-    "textNewLine": "Añadir nueva línea (texto)",
+    "howto": "Siga nuestras guías",
+    "or": "o",
+    "preventBinding": "Evitar yuxtaposición de flechas",
+    "shapes": "Formas",
+    "shortcuts": "Atajos del teclado",
     "textFinish": "Finalizar edición (texto)",
+    "textNewLine": "Añadir nueva línea (texto)",
+    "title": "Ayuda",
+    "view": "Vista",
     "zoomToFit": "Ajustar la vista para mostrar todos los elementos",
-    "zoomToSelection": "Hacer zoom a la selección",
-    "preventBinding": "Evitar yuxtaposición de flechas"
+    "zoomToSelection": "Hacer zoom a la selección"
   },
   "encrypted": {
     "tooltip": "Tus dibujos están cifrados de punto a punto, por lo que los servidores de Excalidraw nunca los verán."
@@ -232,5 +235,9 @@
     "title": "Estadísticas para nerds",
     "total": "Total",
     "width": "Ancho"
+  },
+  "toast": {
+    "copyStyles": "Estilos copiados.",
+    "copyToClipboardAsPng": "Copiado al portapapeles como PNG."
   }
 }
