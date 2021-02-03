@@ -49,7 +49,8 @@ interface CollabState {
 type CollabInstance = InstanceType<typeof CollabWrapper>;
 
 export interface CollabAPI {
-  isCollaborating: boolean;
+  /** function so that we can access the latest value from stale callbacks */
+  isCollaborating: () => boolean;
   username: CollabState["username"];
   onPointerUpdate: CollabInstance["onPointerUpdate"];
   initializeSocketClient: CollabInstance["initializeSocketClient"];
@@ -520,13 +521,9 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   getContextValue = (): CollabAPI => {
     if (!this.contextValue) {
       this.contextValue = {} as CollabAPI;
-      Object.defineProperties(this.contextValue, {
-        isCollaborating: {
-          get: () => this.isCollaborating,
-        },
-      });
     }
 
+    this.contextValue.isCollaborating = () => this.isCollaborating;
     this.contextValue.username = this.state.username;
     this.contextValue.onPointerUpdate = this.onPointerUpdate;
     this.contextValue.initializeSocketClient = this.initializeSocketClient;

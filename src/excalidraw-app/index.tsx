@@ -206,7 +206,7 @@ function ExcalidrawWrapper() {
     elements: readonly ExcalidrawElement[],
     appState: AppState,
   ) => {
-    if (collabAPI?.isCollaborating) {
+    if (collabAPI?.isCollaborating()) {
       collabAPI.broadcastElements(elements);
     } else {
       // collab scenes are persisted to the server, so we don't have to persist
@@ -277,7 +277,7 @@ function ExcalidrawWrapper() {
         initialData={initialStatePromiseRef.current.promise}
         user={{ name: collabAPI?.username }}
         onCollabButtonClick={collabAPI?.onCollabButtonClick}
-        isCollaborating={collabAPI?.isCollaborating}
+        isCollaborating={collabAPI?.isCollaborating()}
         onPointerUpdate={collabAPI?.onPointerUpdate}
         onExportToBackend={onExportToBackend}
         renderFooter={renderFooter}
