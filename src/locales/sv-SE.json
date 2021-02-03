@@ -136,6 +136,7 @@
     "decryptFailed": "Kunde inte avkryptera data.",
     "uploadedSecurly": "Uppladdning har säkrats med kryptering från ände till ände. vilket innebär att Excalidraw server och tredje part inte kan läsa innehållet.",
     "loadSceneOverridePrompt": "Laddning av extern skiss kommer att ersätta ditt befintliga innehåll. Vill du fortsätta?",
+    "collabStopOverridePrompt": "",
     "errorLoadingLibrary": "Fel vid inläsning av tredjeparts bibliotek.",
     "confirmAddLibrary": "Detta kommer att lägga till {{numShapes}} form(er) till ditt bibliotek. Är du säker?",
     "imageDoesNotContainScene": "Importering av bilder stöds inte just nu.\n\nVill du importera en skiss? Den här bilden verkar inte innehålla någon skissdata. Har du aktiverat detta under export?",
