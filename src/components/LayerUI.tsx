@@ -626,7 +626,6 @@ const LayerUI = ({
     </>
   );
 
-  console.log("UI");
 
   return isMobile ? (
     <>
