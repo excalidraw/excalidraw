@@ -65,45 +65,6 @@ const onBlur = () => {
   saveDebounced.flush();
 };
 
-const shouldForceLoadScene = (
-  scene: ResolutionType<typeof loadScene>,
-): boolean => {
-  if (!scene.elements.length) {
-    return true;
-  }
-
-  const roomLinkData = getCollaborationLinkData(window.location.href);
-
-  if (!roomLinkData) {
-    return false;
-  }
-
-  let collabForceLoadFlag;
-  try {
-    collabForceLoadFlag = localStorage?.getItem(
-      STORAGE_KEYS.LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
-    );
-  } catch {}
-
-  if (collabForceLoadFlag) {
-    try {
-      const {
-        room: previousRoom,
-        timestamp,
-      }: { room: string; timestamp: number } = JSON.parse(collabForceLoadFlag);
-      // if loading same room as the one previously unloaded within 15sec
-      //  force reload without prompting
-      if (
-        previousRoom === roomLinkData.roomId &&
-        Date.now() - timestamp < 15000
-      ) {
-        return true;
-      }
-    } catch {}
-  }
-  return false;
-};
-
 const initializeScene = async (opts: {
   collabAPI: CollabAPI;
 }): Promise<ImportedDataState | null> => {
@@ -120,11 +81,7 @@ const initializeScene = async (opts: {
   let roomLinkData = getCollaborationLinkData(window.location.href);
   const isExternalScene = !!(id || jsonMatch || roomLinkData);
   if (isExternalScene) {
-    if (
-      roomLinkData ||
-      shouldForceLoadScene(scene) ||
-      window.confirm(t("alerts.loadSceneOverridePrompt"))
-    ) {
+    if (roomLinkData || window.confirm(t("alerts.loadSceneOverridePrompt"))) {
       // Backwards compatibility with legacy url format
       if (id) {
         scene = await loadScene(id, null, initialData);
