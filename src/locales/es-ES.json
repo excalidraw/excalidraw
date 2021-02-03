@@ -136,6 +136,7 @@
     "decryptFailed": "No se pudieron descifrar los datos.",
     "uploadedSecurly": "La carga ha sido asegurada con cifrado de principio a fin, lo que significa que el servidor de Excalidraw y terceros no pueden leer el contenido.",
     "loadSceneOverridePrompt": "Si carga este dibujo externo, reemplazará el que tiene. ¿Desea continuar?",
+    "collabStopOverridePrompt": "",
     "errorLoadingLibrary": "Se ha producido un error al cargar la biblioteca de terceros.",
     "confirmAddLibrary": "Esto añadirá {{numShapes}} forma(s) a tu biblioteca. ¿Estás seguro?",
     "imageDoesNotContainScene": "La importación de imágenes no está homologada en este momento.\n\n¿Deseas importar una escena? Esta imagen no parece contener ningún dato de escena. ¿Lo has activado durante la exportación?",
