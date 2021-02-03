@@ -1202,9 +1202,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   toggleGridMode = () => {
-    this.setState({
-      showGrid: !this.state.showGrid,
-    });
+    this.actionManager.executeAction(actionToggleGridMode);
   };
 
   toggleStats = () => {
