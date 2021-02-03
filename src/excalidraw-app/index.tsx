@@ -39,7 +39,6 @@ import CollabWrapper, {
 } from "./collab/CollabWrapper";
 import { LanguageList } from "./components/LanguageList";
 import { exportToBackend, getCollaborationLinkData, loadScene } from "./data";
-import { loadFromFirebase } from "./data/firebase";
 import {
   importFromLocalStorage,
   saveToLocalStorage,
@@ -73,13 +72,11 @@ const shouldForceLoadScene = (
     return true;
   }
 
-  const roomMatch = getCollaborationLinkData(window.location.href);
+  const roomLinkData = getCollaborationLinkData(window.location.href);
 
-  if (!roomMatch) {
+  if (!roomLinkData) {
     return false;
   }
-
-  const roomId = roomMatch[1];
 
   let collabForceLoadFlag;
   try {
@@ -96,7 +93,10 @@ const shouldForceLoadScene = (
       }: { room: string; timestamp: number } = JSON.parse(collabForceLoadFlag);
       // if loading same room as the one previously unloaded within 15sec
       //  force reload without prompting
-      if (previousRoom === roomId && Date.now() - timestamp < 15000) {
+      if (
+        previousRoom === roomLinkData.roomId &&
+        Date.now() - timestamp < 15000
+      ) {
         return true;
       }
     } catch {}
@@ -104,12 +104,9 @@ const shouldForceLoadScene = (
   return false;
 };
 
-type Scene = ImportedDataState & { commitToHistory: boolean };
-
 const initializeScene = async (opts: {
-  resetScene: ExcalidrawImperativeAPI["resetScene"];
-  initializeSocketClient: CollabAPI["initializeSocketClient"];
-}): Promise<Scene | null> => {
+  collabAPI: CollabAPI;
+}): Promise<ImportedDataState | null> => {
   const searchParams = new URLSearchParams(window.location.search);
   const id = searchParams.get("id");
   const jsonMatch = window.location.hash.match(
@@ -120,10 +117,11 @@ const initializeScene = async (opts: {
 
   let scene = await loadScene(null, null, initialData);
 
-  let isCollabScene = !!getCollaborationLinkData(window.location.href);
-  const isExternalScene = !!(id || jsonMatch || isCollabScene);
+  let roomLinkData = getCollaborationLinkData(window.location.href);
+  const isExternalScene = !!(id || jsonMatch || roomLinkData);
   if (isExternalScene) {
     if (
+      roomLinkData ||
       shouldForceLoadScene(scene) ||
       window.confirm(t("alerts.loadSceneOverridePrompt"))
     ) {
@@ -133,7 +131,7 @@ const initializeScene = async (opts: {
       } else if (jsonMatch) {
         scene = await loadScene(jsonMatch[1], jsonMatch[2], initialData);
       }
-      if (!isCollabScene) {
+      if (!roomLinkData) {
         window.history.replaceState({}, APP_NAME, window.location.origin);
       }
     } else {
@@ -150,38 +148,12 @@ const initializeScene = async (opts: {
         });
       }
 
-      isCollabScene = false;
+      roomLinkData = null;
       window.history.replaceState({}, APP_NAME, window.location.origin);
     }
   }
-  if (isCollabScene) {
-    // when joining a room we don't want user's local scene data to be merged
-    // into the remote scene
-    opts.resetScene();
-    const scenePromise = opts.initializeSocketClient();
-
-    try {
-      const [, roomId, roomKey] = getCollaborationLinkData(
-        window.location.href,
-      )!;
-      const elements = await loadFromFirebase(roomId, roomKey);
-      if (elements) {
-        return {
-          elements,
-          commitToHistory: true,
-        };
-      }
-
-      return {
-        ...(await scenePromise),
-        commitToHistory: true,
-      };
-    } catch (error) {
-      // log the error and move on. other peers will sync us the scene.
-      console.error(error);
-    }
-
-    return null;
+  if (roomLinkData) {
+    return opts.collabAPI.initializeSocketClient(roomLinkData);
   } else if (scene) {
     return scene;
   }
@@ -242,24 +214,16 @@ function ExcalidrawWrapper() {
       return;
     }
 
-    initializeScene({
-      resetScene: excalidrawAPI.resetScene,
-      initializeSocketClient: collabAPI.initializeSocketClient,
-    }).then((scene) => {
+    initializeScene({ collabAPI }).then((scene) => {
       initialStatePromiseRef.current.promise.resolve(scene);
     });
 
     const onHashChange = (_: HashChangeEvent) => {
-      if (window.location.hash.length > 1) {
-        initializeScene({
-          resetScene: excalidrawAPI.resetScene,
-          initializeSocketClient: collabAPI.initializeSocketClient,
-        }).then((scene) => {
-          if (scene) {
-            excalidrawAPI.updateScene(scene);
-          }
-        });
-      }
+      initializeScene({ collabAPI }).then((scene) => {
+        if (scene) {
+          excalidrawAPI.updateScene(scene);
+        }
+      });
     };
 
     const titleTimeout = setTimeout(
@@ -285,9 +249,10 @@ function ExcalidrawWrapper() {
     elements: readonly ExcalidrawElement[],
     appState: AppState,
   ) => {
-    saveDebounced(elements, appState);
     if (collabAPI?.isCollaborating) {
       collabAPI.broadcastElements(elements);
+    } else {
+      saveDebounced(elements, appState);
     }
   };
 
