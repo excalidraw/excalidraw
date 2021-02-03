@@ -626,7 +626,6 @@ const LayerUI = ({
     </>
   );
 
-
   return isMobile ? (
     <>
       {dialogs}
