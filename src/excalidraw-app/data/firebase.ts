@@ -148,6 +148,7 @@ export const saveToFirebase = async (
 export const loadFromFirebase = async (
   roomId: string,
   roomKey: string,
+  socket: SocketIOClient.Socket | null,
 ): Promise<readonly ExcalidrawElement[] | null> => {
   const firebase = await getFirebase();
   const db = firebase.firestore();
@@ -160,5 +161,12 @@ export const loadFromFirebase = async (
   const storedScene = doc.data() as FirebaseStoredScene;
   const ciphertext = storedScene.ciphertext.toUint8Array();
   const iv = storedScene.iv.toUint8Array();
-  return restoreElements(await decryptElements(roomKey, iv, ciphertext));
+
+  const elements = await decryptElements(roomKey, iv, ciphertext);
+
+  if (socket) {
+    firebaseSceneVersionCache.set(socket, getSceneVersion(elements));
+  }
+
+  return restoreElements(elements);
 };

@@ -134,17 +134,27 @@ export const decryptAESGEM = async (
 };
 
 export const getCollaborationLinkData = (link: string) => {
-  if (link.length === 0) {
-    return;
-  }
   const hash = new URL(link).hash;
-  return hash.match(/^#room=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/);
+  const match = hash.match(/^#room=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/);
+  return match ? { roomId: match[1], roomKey: match[2] } : null;
 };
 
-export const generateCollaborationLink = async () => {
-  const id = await generateRandomID();
-  const key = await generateEncryptionKey();
-  return `${window.location.origin}${window.location.pathname}#room=${id},${key}`;
+export const generateCollaborationLinkData = async () => {
+  const roomId = await generateRandomID();
+  const roomKey = await generateEncryptionKey();
+
+  if (!roomKey) {
+    throw new Error("Couldn't generate room key");
+  }
+
+  return { roomId, roomKey };
+};
+
+export const getCollaborationLink = (data: {
+  roomId: string;
+  roomKey: string;
+}) => {
+  return `${window.location.origin}${window.location.pathname}#room=${data.roomId},${data.roomKey}`;
 };
 
 export const getImportedKey = (key: string, usage: KeyUsage) =>
