@@ -4,7 +4,7 @@ import { ImportedDataState } from "../../data/types";
 import { ExcalidrawElement } from "../../element/types";
 import { t } from "../../i18n";
 import { AppState } from "../../types";
-import { UserIdleState, ScreenIdleState } from "../collab/types";
+import { UserIdleState } from "../collab/types";
 
 const byteToHex = (byte: number): string => `0${byte.toString(16)}`.slice(-2);
 
@@ -65,7 +65,6 @@ export type SocketUpdateDataSource = {
     payload: {
       socketId: string;
       userState: UserIdleState | "";
-      screenState: ScreenIdleState | "";
       username: string;
     };
   };

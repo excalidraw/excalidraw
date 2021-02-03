@@ -33,9 +33,12 @@ import {
 import Portal from "./Portal";
 import RoomDialog from "./RoomDialog";
 import { createInverseContext } from "../../createInverseContext";
-import { UserIdleState, ScreenIdleState } from "./types";
+import { UserIdleState } from "./types";
 
-const idleDetectorSupported: boolean = "IdleDetector" in window;
+// Report a user inactive after IDLE_THRESHOLD milliseconds
+const IDLE_THRESHOLD = 60_000;
+// Report a user active each ACTIVE_THRESHOLD milliseconds
+const ACTIVE_THRESHOLD = 3_000;
 
 interface CollabState {
   isCollaborating: boolean;
@@ -43,7 +46,6 @@ interface CollabState {
   errorMessage: string;
   username: string;
   userState: UserIdleState | "";
-  screenState: ScreenIdleState | "";
   activeRoomLink: string;
 }
 
@@ -53,7 +55,6 @@ export interface CollabAPI {
   isCollaborating: CollabState["isCollaborating"];
   username: CollabState["username"];
   userState: CollabState["userState"];
-  screenState: CollabState["screenState"];
   onPointerUpdate: CollabInstance["onPointerUpdate"];
   initializeSocketClient: CollabInstance["initializeSocketClient"];
   onCollabButtonClick: CollabInstance["onCollabButtonClick"];
@@ -90,8 +91,6 @@ export { CollabContext, CollabContextConsumer };
 
 class CollabWrapper extends PureComponent<Props, CollabState> {
   portal: Portal;
-  idleController: AbortController | null;
-  idleUpdateInterval: number | null;
   excalidrawAPI: Props["excalidrawAPI"];
   private socketInitializationTimer?: NodeJS.Timeout;
   private lastBroadcastedOrReceivedSceneVersion: number = -1;
@@ -105,32 +104,10 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       errorMessage: "",
       username: importUsernameFromLocalStorage() || "",
       userState: "",
-      screenState: "",
       activeRoomLink: "",
     };
     this.portal = new Portal(this);
     this.excalidrawAPI = props.excalidrawAPI;
-    this.idleController = null;
-    this.idleUpdateInterval = null;
-    if (idleDetectorSupported) {
-      window.addEventListener(
-        "idledetectionpermissionchange",
-        (event: CustomEvent) => {
-          if (event.detail.permission) {
-            this.initializeIdleDetector();
-            return;
-          }
-          if (this.idleController) {
-            this.idleController.abort();
-            this.onIdleStateChange("", "");
-            if (this.idleUpdateInterval) {
-              window.clearInterval(this.idleUpdateInterval);
-              this.idleUpdateInterval = null;
-            }
-          }
-        },
-      );
-    }
   }
 
   componentDidMount() {
@@ -321,16 +298,10 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
               break;
             }
             case "IDLE_STATUS": {
-              const {
-                userState,
-                screenState,
-                socketId,
-                username,
-              } = decryptedData.payload;
+              const { userState, socketId, username } = decryptedData.payload;
               const collaborators = new Map(this.collaborators);
               const user = collaborators.get(socketId) || {}!;
               user.userState = userState;
-              user.screenState = screenState;
               user.username = username;
               this.excalidrawAPI.updateScene({
                 collaborators,
@@ -451,35 +422,50 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     this.excalidrawAPI.history.clear();
   };
 
-  private initializeIdleDetector = async () => {
-    if (!idleDetectorSupported) {
-      return;
-    }
-    try {
-      this.idleController = new AbortController();
+  private initializeIdleDetector = () => {
+    let intervalId: number | null = null;
+    let timeoutId: number | null = null;
 
-      const idleDetector = new window.IdleDetector();
-      idleDetector.addEventListener("change", () => {
-        const userState = idleDetector.userState;
-        const screenState = idleDetector.screenState;
-        this.onIdleStateChange(userState, screenState);
-      });
+    const reportIdle = () => {
+      this.onIdleStateChange(UserIdleState.Idle);
+      if (intervalId) {
+        window.clearInterval(intervalId);
+        intervalId = null;
+      }
+    };
 
-      await idleDetector.start({
-        threshold: 60_000,
-        signal: this.idleController.signal,
-      });
-      this.idleUpdateInterval = window.setInterval(() => {
-        this.onIdleStateChange(
-          idleDetector.userState,
-          idleDetector.screenState,
-        );
-      }, 1_000);
-    } catch (err) {
-      // Deal with initialization errors like permission denied,
-      // running outside of top-level frame, etc.
-      console.error(err.name, err.message);
-    }
+    const reportActive = () => {
+      this.onIdleStateChange(UserIdleState.Active);
+    };
+
+    document.addEventListener("pointermove", () => {
+      if (timeoutId) {
+        window.clearTimeout(timeoutId);
+        timeoutId = null;
+      }
+      timeoutId = window.setTimeout(reportIdle, IDLE_THRESHOLD);
+      if (!intervalId) {
+        intervalId = window.setInterval(reportActive, ACTIVE_THRESHOLD);
+      }
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        if (timeoutId) {
+          window.clearTimeout(timeoutId);
+          timeoutId = null;
+        }
+        if (intervalId) {
+          window.clearInterval(intervalId);
+          intervalId = null;
+        }
+        this.onIdleStateChange(UserIdleState.Idle);
+      } else {
+        timeoutId = window.setTimeout(reportIdle, IDLE_THRESHOLD);
+        intervalId = window.setInterval(reportActive, ACTIVE_THRESHOLD);
+        this.onIdleStateChange(UserIdleState.Active);
+      }
+    });
   };
 
   setCollaborators(sockets: string[]) {
@@ -521,13 +507,9 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       this.portal.broadcastMouseLocation(payload);
   };
 
-  onIdleStateChange = (
-    userState: UserIdleState | "",
-    screenState: ScreenIdleState | "",
-  ) => {
+  onIdleStateChange = (userState: UserIdleState | "") => {
     this.setState({ userState });
-    this.setState({ screenState });
-    this.portal.broadcastIdleChange(userState, screenState);
+    this.portal.broadcastIdleChange(userState);
   };
 
   broadcastElements = (elements: readonly ExcalidrawElement[]) => {

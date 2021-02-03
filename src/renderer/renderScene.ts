@@ -48,7 +48,7 @@ import {
   TransformHandleType,
 } from "../element/transformHandles";
 import { viewportCoordsToSceneCoords } from "../utils";
-import { UserIdleState, ScreenIdleState } from "../excalidraw-app/collab/types";
+import { UserIdleState } from "../excalidraw-app/collab/types";
 
 const strokeRectWithRotation = (
   context: CanvasRenderingContext2D,
@@ -447,11 +447,8 @@ export const renderScene = (
     context.strokeStyle = stroke;
     context.fillStyle = background;
 
-    const screenState = sceneState.remotePointerScreenStates[clientId];
-    if (
-      isOutOfBounds ||
-      (screenState && screenState === ScreenIdleState.Locked)
-    ) {
+    const userState = sceneState.remotePointerUserStates[clientId];
+    if (isOutOfBounds || userState === UserIdleState.Idle) {
       context.globalAlpha = 0.2;
     }
 
@@ -484,7 +481,6 @@ export const renderScene = (
     context.stroke();
 
     const username = sceneState.remotePointerUsernames[clientId];
-    const userState = sceneState.remotePointerUserStates[clientId];
     const usernameAndPotentiallyIdleState = userState
       ? `${username} ${userState === UserIdleState.Active ? "🟢" : "💤"}`
       : username;

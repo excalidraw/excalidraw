@@ -13,7 +13,6 @@ export type SceneState = {
   remoteSelectedElementIds: { [elementId: string]: string[] };
   remotePointerUsernames: { [id: string]: string };
   remotePointerUserStates: { [id: string]: string };
-  remotePointerScreenStates: { [id: string]: string };
 };
 
 export type SceneScroll = {

@@ -32,7 +32,6 @@ export type Collaborator = {
   selectedElementIds?: AppState["selectedElementIds"];
   username?: string | null;
   userState?: string | null;
-  screenState?: string | null;
 };
 
 export type AppState = {
