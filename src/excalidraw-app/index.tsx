@@ -209,6 +209,9 @@ function ExcalidrawWrapper() {
     if (collabAPI?.isCollaborating) {
       collabAPI.broadcastElements(elements);
     } else {
+      // collab scenes are persisted to the server, so we don't have to persist
+      // them locally, which has the added benefit of not overwriting whatever
+      // the user was working on before joining
       saveDebounced(elements, appState);
     }
   };
