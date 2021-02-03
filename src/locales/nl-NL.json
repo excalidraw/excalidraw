@@ -136,6 +136,7 @@
     "decryptFailed": "Kan gegevens niet decoderen.",
     "uploadedSecurly": "De upload is beveiligd met end-to-end encryptie, wat betekent dat de Excalidraw server en derden de inhoud niet kunnen lezen.",
     "loadSceneOverridePrompt": "Het laden van externe tekening zal uw bestaande inhoud vervangen. Wil je doorgaan?",
+    "collabStopOverridePrompt": "",
     "errorLoadingLibrary": "Bij het laden van de externe bibliotheek is een fout opgetreden.",
     "confirmAddLibrary": "Hiermee worden {{numShapes}} vorm(n) aan uw bibliotheek toegevoegd. Ben je het zeker?",
     "imageDoesNotContainScene": "Afbeeldingen importeren wordt op dit moment niet ondersteund.\n\nWil je een scène importeren? Deze afbeelding lijkt geen scène gegevens te bevatten. Heb je dit geactiveerd tijdens het exporteren?",
