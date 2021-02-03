@@ -1,6 +1,6 @@
 name: Cancel previous runs
 
-on: push
+on: [push, pull_request]
 
 jobs:
   cancel:
