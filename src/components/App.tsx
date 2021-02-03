@@ -1823,10 +1823,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (isHoldingSpace || isPanning || isDraggingScrollBar) {
       return;
     }
+
     const isPointerOverScrollBars = isOverScrollBars(
       currentScrollBars,
-      event.clientX,
-      event.clientY,
+      event.clientX - this.state.offsetLeft,
+      event.clientY - this.state.offsetTop,
     );
     const isOverScrollBar = isPointerOverScrollBars.isOverEither;
     if (!this.state.draggingElement && !this.state.multiElement) {
@@ -2282,8 +2283,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       ),
       scrollbars: isOverScrollBars(
         currentScrollBars,
-        event.clientX,
-        event.clientY,
+        event.clientX - this.state.offsetLeft,
+        event.clientY - this.state.offsetTop,
       ),
       // we need to duplicate because we'll be updating this state
       lastCoords: { ...origin },
