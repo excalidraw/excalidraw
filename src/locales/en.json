@@ -235,6 +235,7 @@
     "title": "Stats for nerds",
     "total": "Total",
     "version": "Version",
+    "versionCopy": "Click to copy",
     "width": "Width"
   },
   "toast": {

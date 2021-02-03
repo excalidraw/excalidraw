@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { copyTextToSystemClipboard } from "../clipboard";
 import { getCommonBounds } from "../element/bounds";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import {
@@ -51,7 +52,7 @@ export const Stats = (props: {
   }
 
   let version = getVersion();
-  let hash = "123456";
+  let hash = "1234567";
 
   if (version.length > 16) {
     hash = version.substr(21, 7);
@@ -168,7 +169,12 @@ export const Stats = (props: {
               <th colSpan={2}>{t("stats.version")}</th>
             </tr>
             <tr>
-              <td colSpan={2} style={{ textAlign: "center" }}>
+              <td
+                colSpan={2}
+                style={{ textAlign: "center", cursor: "pointer" }}
+                onClick={() => copyTextToSystemClipboard(getVersion())}
+                title={t("stats.versionCopy")}
+              >
                 {version}
                 <br />
                 {hash}
