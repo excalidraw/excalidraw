@@ -234,6 +234,7 @@
     "storage": "Storage",
     "title": "Stats for nerds",
     "total": "Total",
+    "version": "Version",
     "width": "Width"
   },
   "toast": {
