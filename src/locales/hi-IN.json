@@ -236,13 +236,13 @@
     "title": "बेवकूफ के लिए आँकड़े",
     "total": "कुल",
     "version": "संस्करण",
-    "versionCopy": "",
-    "versionNotAvailable": "",
+    "versionCopy": "काॅपी करने के लिए क्लिक करें",
+    "versionNotAvailable": "संस्करण उपलब्ध नहीं है",
     "width": "चौड़ाई"
   },
   "toast": {
-    "copyStyles": "",
-    "copyToClipboard": "",
-    "copyToClipboardAsPng": ""
+    "copyStyles": "काॅपी कीए स्टाइल",
+    "copyToClipboard": "क्लिपबोर्ड में कॉपी कीए",
+    "copyToClipboardAsPng": "क्लिपबोर्ड में PNG के रूप में कॉपी किए"
   }
 }
