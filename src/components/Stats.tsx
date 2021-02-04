@@ -185,7 +185,7 @@ export const Stats = (props: {
                     });
                   } catch {}
                 }}
-                title={t("stats.versionCopy")}
+                title={t("toast.copyToClipboard")}
               >
                 {timestamp}
                 <br />
