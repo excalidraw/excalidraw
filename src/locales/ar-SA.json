@@ -235,10 +235,14 @@
     "storage": "التخزين",
     "title": "إحصائيات للمهووسين",
     "total": "المجموع",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "العرض"
   },
   "toast": {
     "copyStyles": "",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": ""
   }
 }
