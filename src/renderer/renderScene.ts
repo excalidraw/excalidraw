@@ -448,7 +448,7 @@ export const renderScene = (
     context.fillStyle = background;
 
     const userState = sceneState.remotePointerUserStates[clientId];
-    if (isOutOfBounds || userState === UserIdleState.Away) {
+    if (isOutOfBounds || userState === UserIdleState.AWAY) {
       context.globalAlpha = 0.2;
     }
 
@@ -482,9 +482,9 @@ export const renderScene = (
 
     const username = sceneState.remotePointerUsernames[clientId];
     const usernameAndIdleState = `${username ? `${username} ` : ""}${
-      userState === UserIdleState.Away
+      userState === UserIdleState.AWAY
         ? "⚫️"
-        : userState === UserIdleState.Idle
+        : userState === UserIdleState.IDLE
         ? "💤"
         : "🟢"
     }`;

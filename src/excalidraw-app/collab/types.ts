@@ -1,5 +1,5 @@
 export enum UserIdleState {
-  Active = "active",
-  Idle = "idle",
-  Away = "away",
+  ACTIVE = "active",
+  AWAY = "away",
+  IDLE = "idle",
 }

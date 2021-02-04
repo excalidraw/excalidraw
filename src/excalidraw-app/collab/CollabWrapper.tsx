@@ -39,11 +39,7 @@ import RoomDialog from "./RoomDialog";
 import { createInverseContext } from "../../createInverseContext";
 import { t } from "../../i18n";
 import { UserIdleState } from "./types";
-
-// Report a user inactive after IDLE_THRESHOLD milliseconds
-const IDLE_THRESHOLD = 60_000;
-// Report a user active each ACTIVE_THRESHOLD milliseconds
-const ACTIVE_THRESHOLD = 3_000;
+import { IDLE_THRESHOLD, ACTIVE_THRESHOLD } from "../../constants";
 
 interface CollabState {
   modalIsShown: boolean;
@@ -97,7 +93,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       modalIsShown: false,
       errorMessage: "",
       username: importUsernameFromLocalStorage() || "",
-      userState: UserIdleState.Active,
+      userState: UserIdleState.ACTIVE,
       activeRoomLink: "",
     };
     this.portal = new Portal(this);
@@ -454,7 +450,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     let timeoutId: number | null = null;
 
     const reportIdle = () => {
-      this.onIdleStateChange(UserIdleState.Idle);
+      this.onIdleStateChange(UserIdleState.IDLE);
       if (intervalId) {
         window.clearInterval(intervalId);
         intervalId = null;
@@ -462,7 +458,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     };
 
     const reportActive = () => {
-      this.onIdleStateChange(UserIdleState.Active);
+      this.onIdleStateChange(UserIdleState.ACTIVE);
     };
 
     document.addEventListener("pointermove", () => {
@@ -486,11 +482,11 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
           window.clearInterval(intervalId);
           intervalId = null;
         }
-        this.onIdleStateChange(UserIdleState.Away);
+        this.onIdleStateChange(UserIdleState.AWAY);
       } else {
         timeoutId = window.setTimeout(reportIdle, IDLE_THRESHOLD);
         intervalId = window.setInterval(reportActive, ACTIVE_THRESHOLD);
-        this.onIdleStateChange(UserIdleState.Active);
+        this.onIdleStateChange(UserIdleState.ACTIVE);
       }
     });
   };
