@@ -92,7 +92,13 @@
     "centerHorizontally": "Center horizontally",
     "distributeHorizontally": "Distribute horizontally",
     "distributeVertically": "Distribute vertically",
-    "viewMode": "View mode"
+    "viewMode": "View mode",
+    "shift": "Shift",
+    "enter": "Enter",
+    "space": "Space",
+    "up": "Up",
+    "down": "Down",
+    "wheel": "Wheel"
   },
   "buttons": {
     "clearReset": "Reset the canvas",

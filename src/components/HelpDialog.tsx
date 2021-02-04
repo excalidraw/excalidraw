@@ -154,21 +154,21 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                 <Shortcut label={t("toolBar.line")} shortcuts={["P", "6"]} />
                 <Shortcut
                   label={t("toolBar.draw")}
-                  shortcuts={["Shift+P", "7"]}
+                  shortcuts={[`${t("labels.shift")}+P`, "7"]}
                 />
                 <Shortcut label={t("toolBar.text")} shortcuts={["T", "8"]} />
                 <Shortcut
                   label={t("helpDialog.textNewLine")}
                   shortcuts={[
-                    getShortcutKey("Enter"),
-                    getShortcutKey("Shift+Enter"),
+                    getShortcutKey(`${t("labels.enter")}`),
+                    getShortcutKey(`${t("labels.shift")}+${t("labels.enter")}`),
                   ]}
                 />
                 <Shortcut
                   label={t("helpDialog.textFinish")}
                   shortcuts={[
                     getShortcutKey("Esc"),
-                    getShortcutKey("CtrlOrCmd+Enter"),
+                    getShortcutKey(`CtrlOrCmd+${t("labels.enter")}`),
                   ]}
                 />
                 <Shortcut
@@ -212,11 +212,11 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                 />
                 <Shortcut
                   label={t("helpDialog.zoomToFit")}
-                  shortcuts={["Shift+1"]}
+                  shortcuts={[`${t("labels.shift")}+1`]}
                 />
                 <Shortcut
                   label={t("helpDialog.zoomToSelection")}
-                  shortcuts={["Shift+2"]}
+                  shortcuts={[`${t("labels.shift")}+2`]}
                 />
                 <Shortcut label={t("buttons.fullScreen")} shortcuts={["F"]} />
                 <Shortcut
@@ -241,13 +241,21 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                 />
                 <Shortcut
                   label={t("labels.multiSelect")}
-                  shortcuts={[getShortcutKey(`Shift+${t("helpDialog.click")}`)]}
+                  shortcuts={[
+                    getShortcutKey(
+                      `${t("labels.shift")}+${t("helpDialog.click")}`,
+                    ),
+                  ]}
                 />
                 <Shortcut
                   label={t("labels.moveCanvas")}
                   shortcuts={[
-                    getShortcutKey(`Space+${t("helpDialog.drag")}`),
-                    getShortcutKey(`Wheel+${t("helpDialog.drag")}`),
+                    getShortcutKey(
+                      `${t("labels.space")}+${t("helpDialog.drag")}`,
+                    ),
+                    getShortcutKey(
+                      `${t("labels.wheel")}+${t("helpDialog.drag")}`,
+                    ),
                   ]}
                   isOr={true}
                 />
@@ -265,7 +273,7 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                 />
                 <Shortcut
                   label={t("labels.copyAsPng")}
-                  shortcuts={[getShortcutKey("Shift+Alt+C")]}
+                  shortcuts={[getShortcutKey(`${t("labels.shift")}+Alt+C`)]}
                 />
                 <Shortcut
                   label={t("labels.copyStyles")}
@@ -277,14 +285,14 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                 />
                 <Shortcut
                   label={t("labels.delete")}
-                  shortcuts={[getShortcutKey("Del")]}
+                  shortcuts={[getShortcutKey(`${t("labels.delete")}`)]}
                 />
                 <Shortcut
                   label={t("labels.sendToBack")}
                   shortcuts={[
                     isDarwin
                       ? getShortcutKey("CtrlOrCmd+Alt+[")
-                      : getShortcutKey("CtrlOrCmd+Shift+["),
+                      : getShortcutKey(`CtrlOrCmd+${t("labels.shift")}+[`),
                   ]}
                 />
                 <Shortcut
@@ -292,7 +300,7 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                   shortcuts={[
                     isDarwin
                       ? getShortcutKey("CtrlOrCmd+Alt+]")
-                      : getShortcutKey("CtrlOrCmd+Shift+]"),
+                      : getShortcutKey(`CtrlOrCmd+${t("labels.shift")}+]`),
                   ]}
                 />
                 <Shortcut
@@ -305,19 +313,34 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                 />
                 <Shortcut
                   label={t("labels.alignTop")}
-                  shortcuts={[getShortcutKey("CtrlOrCmd+Shift+Up")]}
+                  shortcuts={[
+                    getShortcutKey(
+                      `CtrlOrCmd+${t("labels.shift")}+${t("labels.up")}`,
+                    ),
+                  ]}
                 />
                 <Shortcut
                   label={t("labels.alignBottom")}
-                  shortcuts={[getShortcutKey("CtrlOrCmd+Shift+Down")]}
+                  shortcuts={[
+                    getShortcutKey(`
+                    CtrlOrCmd+${t("labels.shift")}+${t("labels.down")}`),
+                  ]}
                 />
                 <Shortcut
                   label={t("labels.alignLeft")}
-                  shortcuts={[getShortcutKey("CtrlOrCmd+Shift+Left")]}
+                  shortcuts={[
+                    getShortcutKey(
+                      `CtrlOrCmd+${t("labels.shift")}+${t("labels.left")}`,
+                    ),
+                  ]}
                 />
                 <Shortcut
                   label={t("labels.alignRight")}
-                  shortcuts={[getShortcutKey("CtrlOrCmd+Shift+Right")]}
+                  shortcuts={[
+                    getShortcutKey(
+                      `CtrlOrCmd+${t("labels.shift")}+${t("labels.right")}`,
+                    ),
+                  ]}
                 />
                 <Shortcut
                   label={t("labels.duplicateSelection")}
@@ -336,9 +359,9 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                     isWindows
                       ? [
                           getShortcutKey("CtrlOrCmd+Y"),
-                          getShortcutKey("CtrlOrCmd+Shift+Z"),
+                          getShortcutKey(`CtrlOrCmd+${t("labels.shift")}+Z`),
                         ]
-                      : [getShortcutKey("CtrlOrCmd+Shift+Z")]
+                      : [getShortcutKey(`CtrlOrCmd+${t("labels.shift")}+Z`)]
                   }
                 />
                 <Shortcut
@@ -347,7 +370,9 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                 />
                 <Shortcut
                   label={t("labels.ungroup")}
-                  shortcuts={[getShortcutKey("CtrlOrCmd+Shift+G")]}
+                  shortcuts={[
+                    getShortcutKey(`CtrlOrCmd+${t("labels.shift")}+G`),
+                  ]}
                 />
               </ShortcutIsland>
             </Column>
