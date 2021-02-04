@@ -235,10 +235,14 @@
     "storage": "သိုလှောင်ခန်း",
     "title": "အက္ခရာများအတွက်အချက်အလက်များ",
     "total": "စုစုပေါင်း",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "အကျယ်"
   },
   "toast": {
     "copyStyles": "",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": ""
   }
 }
