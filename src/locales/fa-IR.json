@@ -80,9 +80,9 @@
     "gridMode": "حالت شبکه ای",
     "addToLibrary": "افزودن به کتابخانه",
     "removeFromLibrary": "حذف از کتابخانه",
-    "libraryLoadingMessage": "بارگذاری کتابخانه...",
+    "libraryLoadingMessage": "بارگذاری کتابخانه…",
     "libraries": "مرور کردن کتابخانه ها",
-    "loadingScene": "باگذاری صحنه...",
+    "loadingScene": "باگذاری صحنه…",
     "align": "تراز",
     "alignTop": "تراز به بالا",
     "alignBottom": "تراز به پایین",
@@ -91,7 +91,8 @@
     "centerVertically": "وسط قرار دادن به صورت عمودی",
     "centerHorizontally": "وسط قرار دادن به صورت افقی",
     "distributeHorizontally": "توزیع کردن به صورت افقی",
-    "distributeVertically": "توزیع کردن به صورت عمودی"
+    "distributeVertically": "توزیع کردن به صورت عمودی",
+    "viewMode": ""
   },
   "buttons": {
     "clearReset": "پاکسازی بوم نقاشی",
@@ -135,6 +136,7 @@
     "decryptFailed": "رمزگشایی داده ها امکان پذیر نیست.",
     "uploadedSecurly": "آپلود با رمزگذاری دو طرفه انجام میشود، به این معنی که سرور Excalidraw و اشخاص ثالث نمی توانند مطالب شما را بخوانند.",
     "loadSceneOverridePrompt": "بارگزاری یک طرح خارجی محتوای فعلی رو از بین میبرد. آیا میخواهید ادامه دهید؟",
+    "collabStopOverridePrompt": "",
     "errorLoadingLibrary": "خطایی در بارگذاری کتابخانه ثالث وجود داشت.",
     "confirmAddLibrary": "{{numShapes}} از اشکال به کتابخانه شما اضافه خواهد شد. مطمئن هستید؟",
     "imageDoesNotContainScene": "وارد کردن تصویر در این لحظه امکان پذیر نمی باشد.\nآیا مایل به وارد کردن یک صحنه هستید؟ این تصویر به نظر می رسد که فاقد هرگونه اطلاعاتی مربوط به صحنه باشد. آیا این گزینه را در زمان وارد کردن تصویر فعال کرده اید؟",
@@ -200,25 +202,25 @@
     "title": "خطا"
   },
   "helpDialog": {
-    "blog": "",
+    "blog": "بلاگ ما را بخوانید",
     "click": "",
-    "curvedArrow": "",
-    "curvedLine": "",
-    "documentation": "",
+    "curvedArrow": "فلش خمیده",
+    "curvedLine": "منحنی",
+    "documentation": "مستندات",
     "drag": "",
-    "editor": "",
-    "github": "",
-    "howto": "",
-    "or": "",
-    "preventBinding": "",
-    "shapes": "",
-    "shortcuts": "",
+    "editor": "ویرایشگر",
+    "github": "اشکالی می بینید؟ گزارش دهید",
+    "howto": "راهنمای ما را دنبال کنید",
+    "or": "یا",
+    "preventBinding": "مانع شدن از چسبیدن فلش ها",
+    "shapes": "شکل‌ها",
+    "shortcuts": "میانبرهای صفحه کلید",
     "textFinish": "",
-    "textNewLine": "",
-    "title": "",
-    "view": "",
-    "zoomToFit": "",
-    "zoomToSelection": ""
+    "textNewLine": "یک خط جدید اضافه کنید (متن)",
+    "title": "راهنما",
+    "view": "مشاهده",
+    "zoomToFit": "بزرگنمایی برای دیدن تمام آیتم ها",
+    "zoomToSelection": "بزرگنمایی قسمت انتخاب شده"
   },
   "encrypted": {
     "tooltip": "شما در یک محیط رمزگزاری شده دو طرفه در حال طراحی هستید پس Excalidraw هرگز طرح های شما را نمیبند."
@@ -233,10 +235,14 @@
     "storage": "حافظه",
     "title": "آمار برای نردها",
     "total": "مجموع",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "عرض"
   },
   "toast": {
-    "copyStyles": "",
-    "copyToClipboardAsPng": ""
+    "copyStyles": "کپی سبک.",
+    "copyToClipboard": "",
+    "copyToClipboardAsPng": "کپی در حافطه موقت به صورت PNG."
   }
 }

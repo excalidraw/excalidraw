@@ -31,9 +31,6 @@ import React, { useEffect, useState, createRef } from "react";
 import Excalidraw from "@excalidraw/excalidraw";
 import InitialData from "./initialData";
 
-import "@excalidraw/excalidraw/dist/excalidraw.min.css";
-import "@excalidraw/excalidraw/dist/fonts.min.css";
-
 import "./styles.css";
 
 export default function App() {
@@ -141,6 +138,7 @@ export default function App() {
 | [`onExportToBackend`](#onExportToBackend) | Function |  | Callback triggered when link button is clicked on export dialog |
 | [`langCode`](#langCode) | string | `en` | Language code string |
 | [`renderFooter `](#renderFooter) | Function |  | Function that renders custom UI footer |
+| [`viewModeEnabled`](#viewModeEnabled) | boolean | false | This implies if the app is in view mode. |
 
 ### `Extra API's`
 
@@ -150,7 +148,7 @@ export default function App() {
 
 <pre>
 import { getSceneVersion } from "@excalidraw/excalidraw";
-getSceneVersion(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement []</a>)
+getSceneVersion(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>)
 </pre>
 
 This function returns the current scene version.
@@ -160,7 +158,7 @@ This function returns the current scene version.
 **_Signature_**
 
 <pre>
-getSyncableElements(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement []</a>):<a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement []</a>
+getSyncableElements(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>):<a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>
 </pre>
 
 **How to use**
@@ -176,7 +174,7 @@ This function returns all the deleted elements of the scene.
 **_Signature_**
 
 <pre>
-getElementsMap(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement []</a>): {[id: string]: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement</a>}
+getElementsMap(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>): {[id: string]: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement</a>}
 </pre>
 
 **How to use**
@@ -223,7 +221,7 @@ This helps to load Excalidraw with `initialData`. It must be an object or a [pro
 
 | name | type |
 | --- | --- |
-| elements | [ExcalidrawElement []](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78) |
+| elements | [ExcalidrawElement[]](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78) |
 | appState | [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37) |
 
 ```json
@@ -271,8 +269,9 @@ You can pass a `ref` when you want to access some excalidraw APIs. We expose the
 | readyPromise | [resolvablePromise](https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317) | This promise will be resolved with the api once excalidraw has rendered. This will be helpful when you want do some action on the host app once this promise resolves. For this to work you will have to pass ref as shown [here](#readyPromise) |
 | updateScene | <pre>(<a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L189">sceneData</a>)) => void </pre> | updates the scene with the sceneData |
 | resetScene | `({ resetLoadingState: boolean }) => void` | Resets the scene. If `resetLoadingState` is passed as true then it will also force set the loading state to false. |
-| getSceneElementsIncludingDeleted | <pre> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement []</a></pre> | Returns all the elements including the deleted in the scene |
-| getSceneElements | <pre> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement []</a></pre> | Returns all the elements excluding the deleted in the scene |
+| getSceneElementsIncludingDeleted | <pre> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a></pre> | Returns all the elements including the deleted in the scene |
+| getSceneElements | <pre> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a></pre> | Returns all the elements excluding the deleted in the scene |
+| getAppState | <pre> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37">AppState</a></pre> | Returns current appState |
 | history | `{ clear: () => void }` | This is the history API. `history.clear()` will clear the history |
 | setScrollToCenter | <pre> (<a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>) => void </pre> | sets the elements to center |
 
@@ -327,8 +326,12 @@ import { defaultLang, languages } from "@excalidraw/excalidraw";
 | name | type |
 | --- | --- |
 | defaultLang | string |
-| languages | [Language []](https://github.com/excalidraw/excalidraw/blob/master/src/i18n.ts#L8) |
+| languages | [Language[]](https://github.com/excalidraw/excalidraw/blob/master/src/i18n.ts#L8) |
 
 #### `renderFooter`
 
 A function that renders (returns JSX) custom UI footer. For example, you can use this to render a language picker that was previously being rendered by Excalidraw itself (for now, you'll need to implement your own language picker).
+
+#### `viewModeEnabled`
+
+This prop indicates if the app is in `view mode`. When this prop is used, the `view mode` will not show up in context menu is so it is fully controlled by host. Also the value of this prop if passed will be used over the value of `intialData.appState.viewModeEnabled`

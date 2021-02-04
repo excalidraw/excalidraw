@@ -91,7 +91,8 @@
     "centerVertically": "垂直置中",
     "centerHorizontally": "水平置中",
     "distributeHorizontally": "水平分布",
-    "distributeVertically": "垂直分布"
+    "distributeVertically": "垂直分布",
+    "viewMode": "檢視模式"
   },
   "buttons": {
     "clearReset": "重置 canvas",
@@ -135,6 +136,7 @@
     "decryptFailed": "無法解密資料。",
     "uploadedSecurly": "上傳已通過 end-to-end 加密，Excalidraw 伺服器和第三方無法皆讀取其內容。",
     "loadSceneOverridePrompt": "讀取外部圖樣將取代目前的內容。是否要繼續？",
+    "collabStopOverridePrompt": "停止連線將覆蓋您先前於本機儲存的繪圖進度，是否確認？\n\n（如要保留原有的本機繪圖進度，直接關閉瀏覽器分頁即可。）",
     "errorLoadingLibrary": "載入第三方套件時出現錯誤。",
     "confirmAddLibrary": "這將會將 {{numShapes}} 個圖形加入你的資料庫，你確定嗎？",
     "imageDoesNotContainScene": "目前尚不支援載入圖片。\n您是否要載入場景？此圖片中並無任何場景資料，輸出時是否有選擇包含？",
@@ -233,10 +235,14 @@
     "storage": "儲存",
     "title": "詳細統計",
     "total": "合計",
+    "version": "版本",
+    "versionCopy": "點擊複製",
+    "versionNotAvailable": "無法取得版本",
     "width": "寬度"
   },
   "toast": {
     "copyStyles": "已複製樣式",
+    "copyToClipboard": "複製至剪貼簿。",
     "copyToClipboardAsPng": "已複製 PNG 至剪貼簿"
   }
 }

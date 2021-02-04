@@ -91,7 +91,8 @@
     "centerVertically": "लंबवत केन्द्रित",
     "centerHorizontally": "क्षैतिज केन्द्रित",
     "distributeHorizontally": "क्षैतिज रूप से वितरित करें",
-    "distributeVertically": "खड़ी रूप से वितरित करें"
+    "distributeVertically": "खड़ी रूप से वितरित करें",
+    "viewMode": ""
   },
   "buttons": {
     "clearReset": "कैनवास रीसेट करें",
@@ -135,6 +136,7 @@
     "decryptFailed": "डेटा को डिक्रिप्ट नहीं किया जा सका।",
     "uploadedSecurly": "अपलोड को एंड-टू-एंड एन्क्रिप्शन के साथ सुरक्षित किया गया है, जिसका मतलब है कि एक्सक्लूसिव सर्वर और थर्ड पार्टी कंटेंट नहीं पढ़ सकते हैं।",
     "loadSceneOverridePrompt": "लोड हो रहा है बाहरी ड्राइंग आपके मौजूदा सामग्री को बदल देगा। क्या आप जारी रखना चाहते हैं?",
+    "collabStopOverridePrompt": "",
     "errorLoadingLibrary": "लाइब्रेरी लोड करने में त्रुटि",
     "confirmAddLibrary": "लाइब्रेरी जोड़ें पुष्‍टि करें आकार संख्या",
     "imageDoesNotContainScene": "दृश्य में छवि नहीं है",
@@ -200,25 +202,25 @@
     "title": "गलती"
   },
   "helpDialog": {
-    "blog": "",
-    "click": "",
-    "curvedArrow": "",
-    "curvedLine": "",
+    "blog": "हमारा ब्लॉग पढे",
+    "click": "क्लिक करें",
+    "curvedArrow": "वक्र तीर",
+    "curvedLine": "वक्र रेखा",
     "documentation": "",
-    "drag": "",
-    "editor": "",
-    "github": "",
-    "howto": "",
-    "or": "",
-    "preventBinding": "",
-    "shapes": "",
-    "shortcuts": "",
-    "textFinish": "",
-    "textNewLine": "",
-    "title": "",
-    "view": "",
-    "zoomToFit": "",
-    "zoomToSelection": ""
+    "drag": "खींचें",
+    "editor": "संपादक",
+    "github": "मुद्दा मिला? प्रस्तुत करें",
+    "howto": "हमारे गाइड का पालन करें",
+    "or": "या",
+    "preventBinding": "तीर बंधन रोकें",
+    "shapes": "आकृतियाँ",
+    "shortcuts": "कीबोर्ड के शॉर्टकट्स",
+    "textFinish": "संपादन समाप्त करें (पाठ)",
+    "textNewLine": "नई पंक्ति जोड़ें (पाठ)",
+    "title": "मदद",
+    "view": "दृश्य",
+    "zoomToFit": "सभी तत्वों को फिट करने के लिए ज़ूम करें",
+    "zoomToSelection": "चयन तक ज़ूम करे"
   },
   "encrypted": {
     "tooltip": "आपके चित्र अंत-से-अंत एन्क्रिप्टेड हैं, इसलिए एक्सक्लूसिव्रॉव के सर्वर उन्हें कभी नहीं देखेंगे।"
@@ -233,10 +235,14 @@
     "storage": "संग्रह",
     "title": "बेवकूफ के लिए आँकड़े",
     "total": "कुल",
+    "version": "संस्करण",
+    "versionCopy": "काॅपी करने के लिए क्लिक करें",
+    "versionNotAvailable": "संस्करण उपलब्ध नहीं है",
     "width": "चौड़ाई"
   },
   "toast": {
-    "copyStyles": "",
-    "copyToClipboardAsPng": ""
+    "copyStyles": "काॅपी कीए स्टाइल",
+    "copyToClipboard": "क्लिपबोर्ड में कॉपी कीए",
+    "copyToClipboardAsPng": "क्लिपबोर्ड में PNG के रूप में कॉपी किए"
   }
 }

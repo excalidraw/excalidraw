@@ -80,9 +80,9 @@
     "gridMode": "Решетъчен режим",
     "addToLibrary": "Добавяне към библиотеката",
     "removeFromLibrary": "Премахване от библиотеката",
-    "libraryLoadingMessage": "Зареждане на библиотеката...",
+    "libraryLoadingMessage": "Зареждане на библиотеката…",
     "libraries": "Разглеждане на библиотеките",
-    "loadingScene": "Зареждане на сцена...",
+    "loadingScene": "Зареждане на сцена…",
     "align": "Подравняване",
     "alignTop": "Подравняване отгоре",
     "alignBottom": "Подравняване отдолу",
@@ -91,7 +91,8 @@
     "centerVertically": "Центрирай вертикално",
     "centerHorizontally": "Центрирай хоризонтално",
     "distributeHorizontally": "Разпредели хоризонтално",
-    "distributeVertically": "Разпредели вертикално"
+    "distributeVertically": "Разпредели вертикално",
+    "viewMode": ""
   },
   "buttons": {
     "clearReset": "Нулиране на платно",
@@ -135,6 +136,7 @@
     "decryptFailed": "Данните не можаха да се дешифрират.",
     "uploadedSecurly": "Качването е защитено с криптиране от край до край, което означава, че сървърът Excalidraw и трети страни не могат да четат съдържанието.",
     "loadSceneOverridePrompt": "Зареждането на външна рисунка ще презапише настоящото ви съдържание. Желаете ли да продължите?",
+    "collabStopOverridePrompt": "",
     "errorLoadingLibrary": "Възникна грешка при зареждането на външна библиотека.",
     "confirmAddLibrary": "Ще се добавят {{numShapes}} фигура(и) във вашата библиотека. Сигурни ли сте?",
     "imageDoesNotContainScene": "Импортирането на картинки не се поддържва в момента.\n\nИскате да импортнете сцена? Тази картинка не съдържа данни от сцена. Разрешили ли сте последното при експортирането?",
@@ -201,24 +203,24 @@
   },
   "helpDialog": {
     "blog": "",
-    "click": "",
+    "click": "клик",
     "curvedArrow": "",
     "curvedLine": "",
     "documentation": "",
-    "drag": "",
-    "editor": "",
+    "drag": "плъзнете",
+    "editor": "Редактор",
     "github": "",
     "howto": "",
-    "or": "",
+    "or": "или",
     "preventBinding": "",
-    "shapes": "",
-    "shortcuts": "",
+    "shapes": "Фигури",
+    "shortcuts": "Клавиши за бърз достъп",
     "textFinish": "",
     "textNewLine": "",
     "title": "",
-    "view": "",
+    "view": "Преглед",
     "zoomToFit": "",
-    "zoomToSelection": ""
+    "zoomToSelection": "Приближи селекцията"
   },
   "encrypted": {
     "tooltip": "Вашите рисунки са криптирани от край до край, така че сървърите на Excalidraw няма да могат да ги виждат."
@@ -233,10 +235,14 @@
     "storage": "Съхранение на данни",
     "title": "Статистика за хакери",
     "total": "Общо",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "Широчина"
   },
   "toast": {
     "copyStyles": "",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": ""
   }
 }

@@ -19,17 +19,17 @@
     ]
   },
   "dependencies": {
-    "@sentry/browser": "5.30.0",
-    "@sentry/integrations": "5.30.0",
+    "@sentry/browser": "6.0.3",
+    "@sentry/integrations": "6.0.3",
     "@testing-library/jest-dom": "5.11.9",
     "@testing-library/react": "11.2.3",
     "@types/jest": "26.0.20",
     "@types/react": "17.0.0",
     "@types/react-dom": "17.0.0",
     "@types/socket.io-client": "1.4.35",
-    "browser-nativefs": "0.12.0",
+    "browser-fs-access": "0.13.0",
     "clsx": "1.1.1",
-    "firebase": "8.2.3",
+    "firebase": "8.2.5",
     "i18next-browser-languagedetector": "6.0.1",
     "lodash.throttle": "4.1.1",
     "nanoid": "3.1.20",
@@ -51,9 +51,9 @@
   "devDependencies": {
     "@types/lodash.throttle": "4.1.6",
     "@types/pako": "1.0.1",
-    "eslint-config-prettier": "7.1.0",
+    "eslint-config-prettier": "7.2.0",
     "eslint-plugin-prettier": "3.3.1",
-    "firebase-tools": "9.2.1",
+    "firebase-tools": "9.2.2",
     "husky": "4.3.8",
     "jest-canvas-mock": "2.3.0",
     "lint-staged": "10.5.3",
@@ -72,7 +72,7 @@
   },
   "jest": {
     "transformIgnorePatterns": [
-      "node_modules/(?!(roughjs|points-on-curve|path-data-parser|points-on-path|browser-nativefs)/)"
+      "node_modules/(?!(roughjs|points-on-curve|path-data-parser|points-on-path|browser-fs-access)/)"
     ],
     "resetMocks": false
   },

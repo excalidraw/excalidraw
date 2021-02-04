@@ -1,6 +1,6 @@
 import React from "react";
 import { t } from "../i18n";
-import { isDarwin } from "../keys";
+import { isDarwin, isWindows } from "../keys";
 import { Dialog } from "./Dialog";
 import { getShortcutKey } from "../utils";
 import "./HelpDialog.scss";
@@ -227,6 +227,10 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                   label={t("labels.gridMode")}
                   shortcuts={[getShortcutKey("CtrlOrCmd+'")]}
                 />
+                <Shortcut
+                  label={t("labels.viewMode")}
+                  shortcuts={[getShortcutKey("Alt+R")]}
+                />
               </ShortcutIsland>
             </Column>
             <Column>
@@ -328,7 +332,14 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                 />
                 <Shortcut
                   label={t("buttons.redo")}
-                  shortcuts={[getShortcutKey("CtrlOrCmd+Shift+Z")]}
+                  shortcuts={
+                    isWindows
+                      ? [
+                          getShortcutKey("CtrlOrCmd+Y"),
+                          getShortcutKey("CtrlOrCmd+Shift+Z"),
+                        ]
+                      : [getShortcutKey("CtrlOrCmd+Shift+Z")]
+                  }
                 />
                 <Shortcut
                   label={t("labels.group")}

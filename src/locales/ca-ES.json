@@ -80,9 +80,9 @@
     "gridMode": "Mode quadrícula",
     "addToLibrary": "Afegir a la biblioteca",
     "removeFromLibrary": "Eliminar de la biblioteca",
-    "libraryLoadingMessage": "Carregant la biblioteca...",
+    "libraryLoadingMessage": "Carregant la biblioteca…",
     "libraries": "Explorar biblioteques",
-    "loadingScene": "Carregant escena...",
+    "loadingScene": "Carregant escena…",
     "align": "Alinear",
     "alignTop": "Alinear a dalt",
     "alignBottom": "Alinear a baix",
@@ -91,7 +91,8 @@
     "centerVertically": "Centrar verticalment",
     "centerHorizontally": "Centrar horitzontalment",
     "distributeHorizontally": "Distribuir horitzontalment",
-    "distributeVertically": "Distribuir verticalment"
+    "distributeVertically": "Distribuir verticalment",
+    "viewMode": ""
   },
   "buttons": {
     "clearReset": "Netejar el llenç",
@@ -135,6 +136,7 @@
     "decryptFailed": "No s'ha pogut desencriptar.",
     "uploadedSecurly": "La càrrega s'ha assegurat amb xifratge punta a punta, cosa que significa que el servidor Excalidraw i tercers no poden llegir el contingut.",
     "loadSceneOverridePrompt": "Si carregas aquest dibuix extern, substituirá el que tens. Vols continuar?",
+    "collabStopOverridePrompt": "",
     "errorLoadingLibrary": "S'ha produït un error en carregar la biblioteca de tercers.",
     "confirmAddLibrary": "Això afegirà {{numShapes}} forma(es) a la vostra biblioteca. Estàs segur?",
     "imageDoesNotContainScene": "En aquest moment no s’admet la importació d’imatges.\n\nVolies importar una escena? Sembla que aquesta imatge no conté cap dada d’escena. Ho has activat durant l'exportació?",
@@ -233,10 +235,14 @@
     "storage": "Emmagatzematge",
     "title": "Estadístiques per nerds",
     "total": "Total",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "Amplada"
   },
   "toast": {
     "copyStyles": "",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": ""
   }
 }

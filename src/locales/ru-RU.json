@@ -80,9 +80,9 @@
     "gridMode": "Сетка",
     "addToLibrary": "Добавить в библиотеку",
     "removeFromLibrary": "Удалить из библиотеки",
-    "libraryLoadingMessage": "Загрузка библиотеки...",
+    "libraryLoadingMessage": "Загрузка библиотеки…",
     "libraries": "Просмотреть библиотеки",
-    "loadingScene": "Загрузка сцены...",
+    "loadingScene": "Загрузка сцены…",
     "align": "Выровнять",
     "alignTop": "Выровнять по верхнему краю",
     "alignBottom": "Выровнять по нижнему краю",
@@ -91,7 +91,8 @@
     "centerVertically": "Центрировать по вертикали",
     "centerHorizontally": "Центрировать по горизонтали",
     "distributeHorizontally": "Распределить по горизонтали",
-    "distributeVertically": "Распределить по вертикали"
+    "distributeVertically": "Распределить по вертикали",
+    "viewMode": "Вид"
   },
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",
@@ -135,6 +136,7 @@
     "decryptFailed": "Не удалось расшифровать данные.",
     "uploadedSecurly": "Загружаемые данные защищена сквозным шифрованием, что означает, что сервер Excalidraw и третьи стороны не могут прочитать содержимое.",
     "loadSceneOverridePrompt": "Загрузка рисунка приведёт к замене имеющегося содержимого. Вы хотите продолжить?",
+    "collabStopOverridePrompt": "",
     "errorLoadingLibrary": "Произошла ошибка при загрузке сторонней библиотеки.",
     "confirmAddLibrary": "Будет добавлено {{numShapes}} фигур в вашу библиотеку. Продолжить?",
     "imageDoesNotContainScene": "Импорт изображений не поддерживается в данный момент.\n\nХотите импортировать сцену? Данное изображение не содержит данных о сцене. Было ли включено это во время экспорта?",
@@ -200,25 +202,25 @@
     "title": "Ошибка"
   },
   "helpDialog": {
-    "blog": "",
-    "click": "",
-    "curvedArrow": "",
-    "curvedLine": "",
-    "documentation": "",
-    "drag": "",
-    "editor": "",
-    "github": "",
-    "howto": "",
-    "or": "",
-    "preventBinding": "",
-    "shapes": "",
-    "shortcuts": "",
-    "textFinish": "",
-    "textNewLine": "",
-    "title": "",
-    "view": "",
-    "zoomToFit": "",
-    "zoomToSelection": ""
+    "blog": "Прочитайте наш блог",
+    "click": "нажать",
+    "curvedArrow": "Изогнутая стрелка",
+    "curvedLine": "Изогнутая линия",
+    "documentation": "Документация",
+    "drag": "перетащить",
+    "editor": "Редактор",
+    "github": "Нашли проблему? Отправьте",
+    "howto": "Следуйте нашим инструкциям",
+    "or": "или",
+    "preventBinding": "Предотвращать привязку стрелок",
+    "shapes": "Фигуры",
+    "shortcuts": "Горячие клавиши",
+    "textFinish": "Закончить редактирование (текст)",
+    "textNewLine": "Добавить новую строку (текст)",
+    "title": "Помощь",
+    "view": "Просмотр",
+    "zoomToFit": "Отмастштабировать, чтобы поместились все элементы",
+    "zoomToSelection": "Увеличить до выделенного"
   },
   "encrypted": {
     "tooltip": "Ваши данные защищены сквозным (End-to-end) шифрованием. Серверы Excalidraw никогда не получат доступ к ним."
@@ -233,10 +235,14 @@
     "storage": "Хранилище",
     "title": "Статистика для ботаников",
     "total": "Всего",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "Ширина"
   },
   "toast": {
     "copyStyles": "Скопированы стили.",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": "Скопировано в буфер обмена в формате PNG."
   }
 }

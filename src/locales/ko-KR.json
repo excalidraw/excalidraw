@@ -80,9 +80,9 @@
     "gridMode": "격자 방식",
     "addToLibrary": "라이브러리에 추가",
     "removeFromLibrary": "라이브러리에서 제거",
-    "libraryLoadingMessage": "라이브러리 불러오는 중...",
+    "libraryLoadingMessage": "라이브러리 불러오는 중…",
     "libraries": "라이브러리 찾기",
-    "loadingScene": "화면 불러오는 중...",
+    "loadingScene": "화면 불러오는 중…",
     "align": "정렬",
     "alignTop": "상단 정렬",
     "alignBottom": "하단 정렬",
@@ -91,7 +91,8 @@
     "centerVertically": "수직으로 중앙 정렬",
     "centerHorizontally": "수평으로 중앙 정렬",
     "distributeHorizontally": "수평으로 분배",
-    "distributeVertically": "수직으로 분배"
+    "distributeVertically": "수직으로 분배",
+    "viewMode": ""
   },
   "buttons": {
     "clearReset": "캔버스 초기화",
@@ -135,6 +136,7 @@
     "decryptFailed": "데이터를 복호화하지 못했습니다.",
     "uploadedSecurly": "업로드는 종단 간 암호화로 보호되므로 Excalidraw 서버 및 타사가 콘텐츠를 읽을 수 없습니다.",
     "loadSceneOverridePrompt": "외부 파일을 불러 오면 기존 콘텐츠가 대체됩니다. 계속 진행할까요?",
+    "collabStopOverridePrompt": "",
     "errorLoadingLibrary": "외부 라이브러리를 불러오는 중에 문제가 발생했습니다.",
     "confirmAddLibrary": "{{numShapes}}개의 모양이 라이브러리에 추가됩니다. 계속하시겠어요?",
     "imageDoesNotContainScene": "이미지에서 불러오기는 현재 지원되지 않습니다.\n\n화면을 불러오려고 하셨나요? 이미지에 화면 정보가 없는 것 같습니다. 내보낼 때 화면을 포함했나요?",
@@ -233,10 +235,14 @@
     "storage": "저장공간",
     "title": "덕후들을 위한 통계",
     "total": "합계",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "너비"
   },
   "toast": {
     "copyStyles": "",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": ""
   }
 }

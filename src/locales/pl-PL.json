@@ -80,9 +80,9 @@
     "gridMode": "Tryb siatki",
     "addToLibrary": "Dodaj do biblioteki",
     "removeFromLibrary": "Usuń z biblioteki",
-    "libraryLoadingMessage": "Wczytywanie biblioteki...",
+    "libraryLoadingMessage": "Ładowanie biblioteki…",
     "libraries": "Przeglądaj biblioteki",
-    "loadingScene": "Ładowanie sceny...",
+    "loadingScene": "Ładowanie sceny…",
     "align": "Wyrównaj",
     "alignTop": "Wyrównaj do góry",
     "alignBottom": "Wyrównaj do dołu",
@@ -91,7 +91,8 @@
     "centerVertically": "Wyśrodkuj w pionie",
     "centerHorizontally": "Wyśrodkuj w poziomie",
     "distributeHorizontally": "Rozłóż poziomo",
-    "distributeVertically": "Rozłóż pionowo"
+    "distributeVertically": "Rozłóż pionowo",
+    "viewMode": "Tryb widoku"
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
@@ -135,6 +136,7 @@
     "decryptFailed": "Nie udało się odszyfrować danych.",
     "uploadedSecurly": "By zapewnić Ci prywatność, udostępnianie projektu jest zabezpieczone szyfrowaniem end-to-end, co oznacza, że poza tobą i osobą z którą podzielisz się linkiem, nikt nie ma dostępu do tego co udostępniasz.",
     "loadSceneOverridePrompt": "Wczytanie zewnętrznego rysunku zastąpi istniejącą zawartość. Czy chcesz kontynuować?",
+    "collabStopOverridePrompt": "",
     "errorLoadingLibrary": "Wystąpił błąd podczas ładowania zewnętrznej biblioteki.",
     "confirmAddLibrary": "To doda {{numShapes}} kształtów do twojej biblioteki. Jesteś pewien?",
     "imageDoesNotContainScene": "Importowanie zdjęć nie jest obecnie obsługiwane.\n\nCzy chciałeś zaimportować scenę? Ten obraz nie zawiera żadnych danych sceny. Czy włączyłeś to podczas eksportowania?",
@@ -233,10 +235,14 @@
     "storage": "Pamięć",
     "title": "Statystyki dla nerdów",
     "total": "Łącznie",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "Szerokość"
   },
   "toast": {
     "copyStyles": "",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": ""
   }
 }

@@ -80,9 +80,9 @@
     "gridMode": "Rutevisning",
     "addToLibrary": "Legg til i bibliotek",
     "removeFromLibrary": "Fjern fra bibliotek",
-    "libraryLoadingMessage": "Laster bibliotek...",
+    "libraryLoadingMessage": "Laster bibliotek…",
     "libraries": "Bla gjennom biblioteker",
-    "loadingScene": "Laster inn scene...",
+    "loadingScene": "Laster inn scene…",
     "align": "Juster",
     "alignTop": "Juster øverst",
     "alignBottom": "Juster nederst",
@@ -91,7 +91,8 @@
     "centerVertically": "Midtstill vertikalt",
     "centerHorizontally": "Midtstill horisontalt",
     "distributeHorizontally": "Distribuer horisontalt",
-    "distributeVertically": "Distribuer vertikalt"
+    "distributeVertically": "Distribuer vertikalt",
+    "viewMode": "Visningsmodus"
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
@@ -135,6 +136,7 @@
     "decryptFailed": "Kunne ikke dekryptere data.",
     "uploadedSecurly": "Opplastingen er kryptert og kan ikke leses av Excalidraw-serveren eller tredjeparter.",
     "loadSceneOverridePrompt": "Å laste inn ekstern tegning vil erstatte det eksisterende innholdet. Ønsker du å fortsette?",
+    "collabStopOverridePrompt": "Hvis du slutter økten, overskrives din forrige, lokalt lagrede tegning. Er du sikker?\n\n(Hvis du ønsker å beholde din lokale tegning, bare lukk nettleserfanen i stedet.)",
     "errorLoadingLibrary": "Det oppstod en feil under lasting av tredjepartsbiblioteket.",
     "confirmAddLibrary": "Dette vil legge til {{numShapes}} figur(er) i biblioteket ditt. Er du sikker?",
     "imageDoesNotContainScene": "Importering av bilder støttes ikke for øyeblikket.\n\nVil du importere en scene? Dette bildet ser ikke ut til å inneholde noen scene-data. Har du aktivert dette under eksporten?",
@@ -233,10 +235,14 @@
     "storage": "Lagring",
     "title": "Statistikk for nerder",
     "total": "Totalt",
+    "version": "Versjon",
+    "versionCopy": "Klikk for å kopiere",
+    "versionNotAvailable": "Versjon ikke tilgjengelig",
     "width": "Bredde"
   },
   "toast": {
     "copyStyles": "Kopierte stiler.",
+    "copyToClipboard": "Kopiert til utklippstavlen.",
     "copyToClipboardAsPng": "Kopiert til utklippstavlen som PNG."
   }
 }
