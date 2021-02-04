@@ -235,10 +235,14 @@
     "storage": "Lagring",
     "title": "Statistikk for nerder",
     "total": "Totalt",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "Bredde"
   },
   "toast": {
     "copyStyles": "Kopierte stiler.",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": "Kopiert til utklippstavlen som PNG."
   }
 }
