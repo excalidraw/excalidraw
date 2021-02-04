@@ -1,6 +1,10 @@
 name: Cancel previous runs
 
-on: pull_request
+on:
+  push:
+    branches:
+      - master
+  pull_request:
 
 jobs:
   cancel:
