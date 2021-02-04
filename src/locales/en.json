@@ -236,6 +236,8 @@
     "total": "Total",
     "version": "Version",
     "versionCopy": "Click to copy",
+    "versionCopied": "Version copied to clipboard",
+    "versionNotAvailable": "Version not available",
     "width": "Width"
   },
   "toast": {

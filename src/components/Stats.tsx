@@ -61,7 +61,7 @@ export const Stats = (props: {
     timestamp = version.slice(0, 16).replace("T", " ");
     hash = version.slice(21);
   } else {
-    timestamp = "Version not available";
+    timestamp = t("stats.versionNotAvailable");
   }
 
   return (
@@ -181,7 +181,7 @@ export const Stats = (props: {
                   try {
                     await copyTextToSystemClipboard(getVersion());
                     props.setAppState({
-                      toastMessage: "copied to clipboard",
+                      toastMessage: t("stats.versionCopied"),
                     });
                   } catch {}
                 }}
