@@ -46,7 +46,7 @@ export const MobileMenu = ({
   renderCustomFooter,
   viewModeEnabled,
 }: MobileMenuProps) => {
-  const renderFixedSideContainer = () => {
+  const renderToolbar = () => {
     return (
       <FixedSideContainer side="top" className="App-top-bar">
         <Section heading="shapes">
@@ -136,7 +136,7 @@ export const MobileMenu = ({
   };
   return (
     <>
-      {!viewModeEnabled && renderFixedSideContainer()}
+      {!viewModeEnabled && renderToolbar()}
       <div
         className="App-bottom-bar"
         style={{
