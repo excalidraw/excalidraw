@@ -235,10 +235,14 @@
     "storage": "Speicher",
     "title": "Statistiken für Nerds",
     "total": "Gesamt",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "Breite"
   },
   "toast": {
     "copyStyles": "Formatierung kopiert.",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": "In die Zwischenablage als PNG kopiert."
   }
 }
