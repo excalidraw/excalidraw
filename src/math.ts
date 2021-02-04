@@ -161,15 +161,7 @@ export const isPathALoop = (
 
     // Adjusting LINE_CONFIRM_THRESHOLD to current zoom so that when zoomed in
     // really close we make the threshold smaller, and vice versa.
-    // The formulas are a result of curve-fitting target values.
-    const k = 3 - 2 * Math.pow(zoomValue, 0.05);
-    const threshold =
-      (LINE_CONFIRM_THRESHOLD / Math.log1p(zoomValue * k)) *
-      // multiplying by log reciprocal will cancel it out when zoomValue
-      // is 100%, so that threshold always results in LINE_CONFIRM_THRESHOLD
-      Math.log1p(k);
-
-    return distance <= threshold;
+    return distance <= LINE_CONFIRM_THRESHOLD / zoomValue;
   }
   return false;
 };
