@@ -82,7 +82,7 @@
     "removeFromLibrary": "Ta bort från bibliotek",
     "libraryLoadingMessage": "Laddar bibliotek…",
     "libraries": "Bläddra i bibliotek",
-    "loadingScene": "Laddar scen…",
+    "loadingScene": "Laddar skiss…",
     "align": "Justera",
     "alignTop": "Justera överkant",
     "alignBottom": "Justera underkant",
@@ -136,6 +136,7 @@
     "decryptFailed": "Kunde inte avkryptera data.",
     "uploadedSecurly": "Uppladdning har säkrats med kryptering från ände till ände. vilket innebär att Excalidraw server och tredje part inte kan läsa innehållet.",
     "loadSceneOverridePrompt": "Laddning av extern skiss kommer att ersätta ditt befintliga innehåll. Vill du fortsätta?",
+    "collabStopOverridePrompt": "Att stoppa sessionen kommer att skriva över din föregående, lokalt lagrade skiss. Är du säker?\n\n(Om du vill behålla din lokala skiss, stäng bara webbläsarfliken istället.)",
     "errorLoadingLibrary": "Fel vid inläsning av tredjeparts bibliotek.",
     "confirmAddLibrary": "Detta kommer att lägga till {{numShapes}} form(er) till ditt bibliotek. Är du säker?",
     "imageDoesNotContainScene": "Importering av bilder stöds inte just nu.\n\nVill du importera en skiss? Den här bilden verkar inte innehålla någon skissdata. Har du aktiverat detta under export?",
@@ -234,10 +235,14 @@
     "storage": "Lagring",
     "title": "Statistik för nördar",
     "total": "Totalt",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "Bredd"
   },
   "toast": {
     "copyStyles": "Kopierade stilar.",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": "Kopierat till urklipp som PNG."
   }
 }

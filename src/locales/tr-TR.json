@@ -80,7 +80,7 @@
     "gridMode": "Izgara modu",
     "addToLibrary": "Kütüphaneye ekle",
     "removeFromLibrary": "Kütüphaneden kaldır",
-    "libraryLoadingMessage": "Kütüphane yükleniyor...",
+    "libraryLoadingMessage": "Kütüphane yükleniyor…",
     "libraries": "Kütüphanelere gözat",
     "loadingScene": "Çalışma alanı yükleniyor…",
     "align": "Hizala",
@@ -136,6 +136,7 @@
     "decryptFailed": "Şifrelenmiş veri çözümlenemedi.",
     "uploadedSecurly": "Yükleme uçtan uca şifreleme ile korunmaktadır. Excalidraw sunucusu ve üçüncül şahıslar içeriği okuyamayacaktır.",
     "loadSceneOverridePrompt": "Harici çizimler yüklemek mevcut olan içeriği değiştirecektir. Devam etmek istiyor musunuz?",
+    "collabStopOverridePrompt": "",
     "errorLoadingLibrary": "Üçüncü taraf kitaplığı yüklerken bir hata oluştu.",
     "confirmAddLibrary": "Bu, kitaplığınıza {{numShapes}} tane şekil ekleyecek. Emin misiniz?",
     "imageDoesNotContainScene": "Resim ekleme şuan için desteklenmiyor.\nBir sahneyi içeri aktarmak mı istediniz? Bu dosya herhangi bir sahne içeriyor gibi durmuyor. Çıktı alırken sahneyi dahil ettiniz mi?",
@@ -234,10 +235,14 @@
     "storage": "Depolama",
     "title": "İnekler için istatistikler",
     "total": "Toplam",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "Genişlik"
   },
   "toast": {
     "copyStyles": "",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": ""
   }
 }

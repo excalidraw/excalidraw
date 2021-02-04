@@ -136,6 +136,7 @@
     "decryptFailed": "Nepodarilo sa rozšifrovať údaje.",
     "uploadedSecurly": "Nahratie je zabezpečené end-to-end šifrovaním, takže Excalidraw server a tretie strany nedokážu prečítať jeho obsah.",
     "loadSceneOverridePrompt": "Nahratie externej kresby nahradí existujúci obsah. Prajete si pokračovať?",
+    "collabStopOverridePrompt": "Ukončenie schôdze nahradí vašu predchádzajúcu lokálne uloženú scénu. Ste si istý?\n\n(Ak si chcete ponechať lokálnu scénu, jednoducho iba zavrite kartu prehliadača.)",
     "errorLoadingLibrary": "Nepodarilo sa načítať externú knižnicu.",
     "confirmAddLibrary": "Týmto sa pridá {{numShapes}} tvar(ov) do vašej knižnice. Ste si istí?",
     "imageDoesNotContainScene": "Importovanie obrázku v tomto momente nie je možné.\n\nChceli ste importovať scénu? Tento obrázok neobsahuje žiadne údaje scény. Povolili ste túto možnosť počas exportovania?",
@@ -234,10 +235,14 @@
     "storage": "Úložisko",
     "title": "Štatistiky",
     "total": "Celkom",
+    "version": "Verzia",
+    "versionCopy": "Kliknutím skopírujete",
+    "versionNotAvailable": "Verzia nie je k dispozícii",
     "width": "Šírka"
   },
   "toast": {
     "copyStyles": "Štýly skopírované.",
+    "copyToClipboard": "Skopírované do schránky.",
     "copyToClipboardAsPng": "Skopírované do schránky ako PNG."
   }
 }

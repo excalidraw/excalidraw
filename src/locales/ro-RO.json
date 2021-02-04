@@ -136,6 +136,7 @@
     "decryptFailed": "Datele nu au putut fi decriptate.",
     "uploadedSecurly": "Încărcarea a fost securizată prin criptare integrală, însemnând că serverul Excalidraw și terții nu pot citi conținutul.",
     "loadSceneOverridePrompt": "Încărcarea desenului extern va înlocui conținutul existent. Dorești să continui?",
+    "collabStopOverridePrompt": "Oprirea sesiunii va suprascrie desenul anterior stocat local. Confirmi alegerea?\n\n(Dacă vrei să păstrezi desenul local, pur și simplu închide fila navigatorului în schimb.)",
     "errorLoadingLibrary": "A apărut o eroare la încărcarea bibliotecii terțe.",
     "confirmAddLibrary": "Această acțiune va adăuga {{numShapes}} formă(e) la biblioteca ta. Confirmi?",
     "imageDoesNotContainScene": "Importarea imaginilor nu este acceptată în acest moment.\n\nVoiai să imporți o scenă? Această imagine nu pare să conțină date de scenă. Ai activat această opțiune pe durata exportării?",
@@ -234,10 +235,14 @@
     "storage": "Stocare",
     "title": "Statistici pentru pasionați",
     "total": "Total",
+    "version": "Versiune",
+    "versionCopy": "Clic pentru copiere",
+    "versionNotAvailable": "Versiune indisponibilă",
     "width": "Lățime"
   },
   "toast": {
     "copyStyles": "Stiluri copiate.",
+    "copyToClipboard": "Copiat în memoria temporară.",
     "copyToClipboardAsPng": "Copiat în memoria temporară ca PNG."
   }
 }
