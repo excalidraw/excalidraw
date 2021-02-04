@@ -235,10 +235,14 @@
     "storage": "저장공간",
     "title": "덕후들을 위한 통계",
     "total": "합계",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "너비"
   },
   "toast": {
     "copyStyles": "",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": ""
   }
 }
