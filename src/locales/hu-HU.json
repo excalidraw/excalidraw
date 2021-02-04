@@ -235,10 +235,14 @@
     "storage": "Tárhely",
     "title": "Statisztikák",
     "total": "Összesen",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "Szélesség"
   },
   "toast": {
     "copyStyles": "",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": ""
   }
 }
