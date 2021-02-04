@@ -235,14 +235,14 @@
     "storage": "Almacenamiento",
     "title": "Estadísticas para nerds",
     "total": "Total",
-    "version": "",
-    "versionCopy": "",
-    "versionNotAvailable": "",
+    "version": "Versión",
+    "versionCopy": "Click para copiar",
+    "versionNotAvailable": "Versión no disponible",
     "width": "Ancho"
   },
   "toast": {
     "copyStyles": "Estilos copiados.",
-    "copyToClipboard": "",
+    "copyToClipboard": "Copiado en el portapapeles.",
     "copyToClipboardAsPng": "Copiado al portapapeles como PNG."
   }
 }
