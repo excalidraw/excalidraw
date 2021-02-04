@@ -242,7 +242,7 @@
   },
   "toast": {
     "copyStyles": "Stijlen gekopieerd.",
-    "copyToClipboard": "",
+    "copyToClipboard": "Gekopieerd naar het klembord.",
     "copyToClipboardAsPng": "Gekopieerd naar klembord als PNG."
   }
 }
