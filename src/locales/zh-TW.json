@@ -235,14 +235,14 @@
     "storage": "儲存",
     "title": "詳細統計",
     "total": "合計",
-    "version": "",
-    "versionCopy": "",
-    "versionNotAvailable": "",
+    "version": "版本",
+    "versionCopy": "點擊複製",
+    "versionNotAvailable": "無法取得版本",
     "width": "寬度"
   },
   "toast": {
     "copyStyles": "已複製樣式",
-    "copyToClipboard": "",
+    "copyToClipboard": "複製至剪貼簿。",
     "copyToClipboardAsPng": "已複製 PNG 至剪貼簿"
   }
 }
