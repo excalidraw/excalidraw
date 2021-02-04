@@ -235,10 +235,14 @@
     "storage": "אחסון",
     "title": "סטטיסטיקות לחנונים",
     "total": "סה״כ",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "רוחב"
   },
   "toast": {
     "copyStyles": "",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": ""
   }
 }
