@@ -235,10 +235,14 @@
     "storage": "存储",
     "title": "详细统计信息",
     "total": "总计",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "宽度"
   },
   "toast": {
     "copyStyles": "复制样式",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": "复制为 PNG 到剪贴板"
   }
 }
