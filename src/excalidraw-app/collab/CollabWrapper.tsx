@@ -38,11 +38,14 @@ import Portal from "./Portal";
 import RoomDialog from "./RoomDialog";
 import { createInverseContext } from "../../createInverseContext";
 import { t } from "../../i18n";
+import { UserIdleState } from "./types";
+import { IDLE_THRESHOLD, ACTIVE_THRESHOLD } from "../../constants";
 
 interface CollabState {
   modalIsShown: boolean;
   errorMessage: string;
   username: string;
+  userState: UserIdleState;
   activeRoomLink: string;
 }
 
@@ -52,6 +55,7 @@ export interface CollabAPI {
   /** function so that we can access the latest value from stale callbacks */
   isCollaborating: () => boolean;
   username: CollabState["username"];
+  userState: CollabState["userState"];
   onPointerUpdate: CollabInstance["onPointerUpdate"];
   initializeSocketClient: CollabInstance["initializeSocketClient"];
   onCollabButtonClick: CollabInstance["onCollabButtonClick"];
@@ -78,6 +82,8 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   portal: Portal;
   excalidrawAPI: Props["excalidrawAPI"];
   isCollaborating: boolean = false;
+  activeIntervalId: number | null;
+  idleTimeoutId: number | null;
 
   private socketInitializationTimer?: NodeJS.Timeout;
   private lastBroadcastedOrReceivedSceneVersion: number = -1;
@@ -89,10 +95,13 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       modalIsShown: false,
       errorMessage: "",
       username: importUsernameFromLocalStorage() || "",
+      userState: UserIdleState.ACTIVE,
       activeRoomLink: "",
     };
     this.portal = new Portal(this);
     this.excalidrawAPI = props.excalidrawAPI;
+    this.activeIntervalId = null;
+    this.idleTimeoutId = null;
   }
 
   componentDidMount() {
@@ -116,6 +125,19 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   componentWillUnmount() {
     window.removeEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
     window.removeEventListener(EVENT.UNLOAD, this.onUnload);
+    window.removeEventListener(EVENT.POINTER_MOVE, this.onPointerMove);
+    window.removeEventListener(
+      EVENT.VISIBILITY_CHANGE,
+      this.onVisibilityChange,
+    );
+    if (this.activeIntervalId) {
+      window.clearInterval(this.activeIntervalId);
+      this.activeIntervalId = null;
+    }
+    if (this.idleTimeoutId) {
+      window.clearTimeout(this.idleTimeoutId);
+      this.idleTimeoutId = null;
+    }
   }
 
   private onUnload = () => {
@@ -318,6 +340,17 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
             });
             break;
           }
+          case "IDLE_STATUS": {
+            const { userState, socketId, username } = decryptedData.payload;
+            const collaborators = new Map(this.collaborators);
+            const user = collaborators.get(socketId) || {}!;
+            user.userState = userState;
+            user.username = username;
+            this.excalidrawAPI.updateScene({
+              collaborators,
+            });
+            break;
+          }
         }
       },
     );
@@ -329,6 +362,8 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       this.initializeSocket();
       scenePromise.resolve(null);
     });
+
+    this.initializeIdleDetector();
 
     this.setState({
       activeRoomLink: window.location.href,
@@ -398,7 +433,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     // Avoid broadcasting to the rest of the collaborators the scene
     // we just received!
     // Note: this needs to be set before updating the scene as it
-    // syncronously calls render.
+    // synchronously calls render.
     this.setLastBroadcastedOrReceivedSceneVersion(getSceneVersion(newElements));
 
     return newElements as ReconciledElements;
@@ -425,6 +460,58 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     // undo, a user makes a change, and then try to redo, your element(s) will be lost. However,
     // right now we think this is the right tradeoff.
     this.excalidrawAPI.history.clear();
+  };
+
+  private onPointerMove = () => {
+    if (this.idleTimeoutId) {
+      window.clearTimeout(this.idleTimeoutId);
+      this.idleTimeoutId = null;
+    }
+    this.idleTimeoutId = window.setTimeout(this.reportIdle, IDLE_THRESHOLD);
+    if (!this.activeIntervalId) {
+      this.activeIntervalId = window.setInterval(
+        this.reportActive,
+        ACTIVE_THRESHOLD,
+      );
+    }
+  };
+
+  private onVisibilityChange = () => {
+    if (document.hidden) {
+      if (this.idleTimeoutId) {
+        window.clearTimeout(this.idleTimeoutId);
+        this.idleTimeoutId = null;
+      }
+      if (this.activeIntervalId) {
+        window.clearInterval(this.activeIntervalId);
+        this.activeIntervalId = null;
+      }
+      this.onIdleStateChange(UserIdleState.AWAY);
+    } else {
+      this.idleTimeoutId = window.setTimeout(this.reportIdle, IDLE_THRESHOLD);
+      this.activeIntervalId = window.setInterval(
+        this.reportActive,
+        ACTIVE_THRESHOLD,
+      );
+      this.onIdleStateChange(UserIdleState.ACTIVE);
+    }
+  };
+
+  private reportIdle = () => {
+    this.onIdleStateChange(UserIdleState.IDLE);
+    if (this.activeIntervalId) {
+      window.clearInterval(this.activeIntervalId);
+      this.activeIntervalId = null;
+    }
+  };
+
+  private reportActive = () => {
+    this.onIdleStateChange(UserIdleState.ACTIVE);
+  };
+
+  private initializeIdleDetector = () => {
+    document.addEventListener(EVENT.POINTER_MOVE, this.onPointerMove);
+    document.addEventListener(EVENT.VISIBILITY_CHANGE, this.onVisibilityChange);
   };
 
   setCollaborators(sockets: string[]) {
@@ -464,6 +551,11 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     payload.pointersMap.size < 2 &&
       this.portal.socket &&
       this.portal.broadcastMouseLocation(payload);
+  };
+
+  onIdleStateChange = (userState: UserIdleState) => {
+    this.setState({ userState });
+    this.portal.broadcastIdleChange(userState);
   };
 
   broadcastElements = (elements: readonly ExcalidrawElement[]) => {
