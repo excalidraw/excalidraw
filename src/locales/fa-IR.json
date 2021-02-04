@@ -235,10 +235,14 @@
     "storage": "حافظه",
     "title": "آمار برای نردها",
     "total": "مجموع",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "عرض"
   },
   "toast": {
     "copyStyles": "کپی سبک.",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": "کپی در حافطه موقت به صورت PNG."
   }
 }
