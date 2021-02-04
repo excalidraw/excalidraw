@@ -235,10 +235,14 @@
     "storage": "Хранилище",
     "title": "Статистика для ботаников",
     "total": "Всего",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "Ширина"
   },
   "toast": {
     "copyStyles": "Скопированы стили.",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": "Скопировано в буфер обмена в формате PNG."
   }
 }
