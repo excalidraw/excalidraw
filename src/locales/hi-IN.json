@@ -235,10 +235,14 @@
     "storage": "संग्रह",
     "title": "बेवकूफ के लिए आँकड़े",
     "total": "कुल",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "चौड़ाई"
   },
   "toast": {
     "copyStyles": "",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": ""
   }
 }
