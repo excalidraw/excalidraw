@@ -226,6 +226,8 @@
 
   .App-top-bar {
     z-index: var(--zIndex-layerUI);
+    display: flex;
+    justify-content: center;
   }
 
   .App-bottom-bar {
