@@ -235,14 +235,14 @@
     "storage": "Χώρος",
     "title": "Στατιστικά για σπασίκλες",
     "total": "Σύνολο ",
-    "version": "",
-    "versionCopy": "",
-    "versionNotAvailable": "",
+    "version": "Έκδοση",
+    "versionCopy": "Κάνε κλικ για αντιγραφή",
+    "versionNotAvailable": "Έκδοση μη διαθέσιμη",
     "width": "Πλάτος"
   },
   "toast": {
     "copyStyles": "Αντιγράφηκαν στυλ.",
-    "copyToClipboard": "",
+    "copyToClipboard": "Αντιγράφηκε στο πρόχειρο.",
     "copyToClipboardAsPng": "Αντιγράφτηκε στο πρόχειρο ως PNG."
   }
 }
