@@ -235,10 +235,14 @@
     "storage": "Emmagatzematge",
     "title": "Estadístiques per nerds",
     "total": "Total",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "Amplada"
   },
   "toast": {
     "copyStyles": "",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": ""
   }
 }
