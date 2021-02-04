@@ -20,6 +20,7 @@ import { ExcalidrawImperativeAPI } from "./components/App";
 import type { ResolvablePromise } from "./utils";
 import { Spreadsheet } from "./charts";
 import { Language } from "./i18n";
+import { UserIdleState } from "./excalidraw-app/collab/types";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -31,6 +32,7 @@ export type Collaborator = {
   button?: "up" | "down";
   selectedElementIds?: AppState["selectedElementIds"];
   username?: string | null;
+  userState?: UserIdleState;
 };
 
 export type AppState = {

@@ -883,6 +883,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const pointerViewportCoords: SceneState["remotePointerViewportCoords"] = {};
     const remoteSelectedElementIds: SceneState["remoteSelectedElementIds"] = {};
     const pointerUsernames: { [id: string]: string } = {};
+    const pointerUserStates: { [id: string]: string } = {};
     this.state.collaborators.forEach((user, socketId) => {
       if (user.selectedElementIds) {
         for (const id of Object.keys(user.selectedElementIds)) {
@@ -897,6 +898,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
       if (user.username) {
         pointerUsernames[socketId] = user.username;
+      }
+      if (user.userState) {
+        pointerUserStates[socketId] = user.userState;
       }
       pointerViewportCoords[socketId] = sceneCoordsToViewportCoords(
         {
@@ -932,6 +936,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         remotePointerButton: cursorButton,
         remoteSelectedElementIds,
         remotePointerUsernames: pointerUsernames,
+        remotePointerUserStates: pointerUserStates,
         shouldCacheIgnoreZoom: this.state.shouldCacheIgnoreZoom,
       },
       {
@@ -1824,10 +1829,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (isHoldingSpace || isPanning || isDraggingScrollBar) {
       return;
     }
+
     const isPointerOverScrollBars = isOverScrollBars(
       currentScrollBars,
-      event.clientX,
-      event.clientY,
+      event.clientX - this.state.offsetLeft,
+      event.clientY - this.state.offsetTop,
     );
     const isOverScrollBar = isPointerOverScrollBars.isOverEither;
     if (!this.state.draggingElement && !this.state.multiElement) {
@@ -2283,8 +2289,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       ),
       scrollbars: isOverScrollBars(
         currentScrollBars,
-        event.clientX,
-        event.clientY,
+        event.clientX - this.state.offsetLeft,
+        event.clientY - this.state.offsetTop,
       ),
       // we need to duplicate because we'll be updating this state
       lastCoords: { ...origin },
