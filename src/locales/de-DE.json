@@ -136,6 +136,7 @@
     "decryptFailed": "Daten konnten nicht entschlüsselt werden.",
     "uploadedSecurly": "Der Upload wurde mit Ende-zu-Ende-Verschlüsselung gespeichert. Weder Excalidraw noch Dritte können den Inhalt einsehen.",
     "loadSceneOverridePrompt": "Das Laden der externen Zeichnung ersetzt den vorhandenen Inhalt. Möchtest Du fortfahren?",
+    "collabStopOverridePrompt": "Das Stoppen der Sitzung wird Deine vorherige, lokal gespeicherte Zeichnung überschreiben. Bist Du sicher?\n\n(Wenn Du Deine lokale Zeichnung behalten möchtest, schließe einfach stattdessen den Browser-Tab.)",
     "errorLoadingLibrary": "Beim Laden der Drittanbieter-Bibliothek ist ein Fehler aufgetreten.",
     "confirmAddLibrary": "Dieses fügt {{numShapes}} Form(en) zu deiner Bibliothek hinzu. Bist du sicher?",
     "imageDoesNotContainScene": "Das Importieren von Bildern wird derzeit nicht unterstützt.\n\nMöchtest du eine Szene importieren? Dieses Bild scheint keine Zeichnungsdaten zu enthalten. Hast du dies beim Exportieren aktiviert?",
@@ -234,10 +235,14 @@
     "storage": "Speicher",
     "title": "Statistiken für Nerds",
     "total": "Gesamt",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "Breite"
   },
   "toast": {
     "copyStyles": "Formatierung kopiert.",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": "In die Zwischenablage als PNG kopiert."
   }
 }
