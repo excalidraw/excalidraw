@@ -1,6 +1,12 @@
 @import "./variables.module";
 @import "./theme";
 
+:root {
+  --zIndex-canvas: 1;
+  --zIndex-wysiwyg: 2;
+  --zIndex-layerUI: 3;
+}
+
 .excalidraw {
   color: var(--text-color-primary);
   display: flex;
@@ -30,6 +36,8 @@
     image-rendering: pixelated; // chromium
     // NOTE: must be declared *after* the above
     image-rendering: -moz-crisp-edges; // FF
+
+    z-index: var(--zIndex-canvas);
   }
 
   &.Appearance_dark {
@@ -214,6 +222,10 @@
         opacity: 1;
       }
     }
+  }
+
+  .App-top-bar {
+    z-index: var(--zIndex-layerUI);
   }
 
   .App-bottom-bar {
