@@ -46,6 +46,7 @@ export enum EVENT {
   TOUCH_START = "touchstart",
   TOUCH_END = "touchend",
   HASHCHANGE = "hashchange",
+  VISIBILITY_CHANGE = "visibilitychange",
 }
 
 export const ENV = {
@@ -93,3 +94,8 @@ export const TOAST_TIMEOUT = 5000;
 export const VERSION_TIMEOUT = 30000;
 
 export const ZOOM_STEP = 0.1;
+
+// Report a user inactive after IDLE_THRESHOLD milliseconds
+export const IDLE_THRESHOLD = 60_000;
+// Report a user active each ACTIVE_THRESHOLD milliseconds
+export const ACTIVE_THRESHOLD = 3_000;
