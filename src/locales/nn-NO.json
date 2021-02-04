@@ -235,10 +235,14 @@
     "storage": "Lagring",
     "title": "Statistikk for nerdar",
     "total": "Totalt",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "Breidde"
   },
   "toast": {
     "copyStyles": "",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": ""
   }
 }
