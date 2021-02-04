@@ -104,8 +104,8 @@ export const textWysiwyg = ({
     overflow: "hidden",
     // prevent line wrapping (`whitespace: nowrap` doesn't work on FF)
     whiteSpace: "pre",
-    // must be non-zero because in darkMode canvas becomes a stacking context
-    zIndex: 1,
+    // must be specified because in dark mode canvas creates a stacking context
+    zIndex: "var(--zIndex-wysiwyg)",
   });
 
   updateWysiwygStyle();
