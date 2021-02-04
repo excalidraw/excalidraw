@@ -242,7 +242,7 @@
   },
   "toast": {
     "copyStyles": "Copied styles.",
-    "copyToClipboard": "Copied to clipboard",
+    "copyToClipboard": "Copied to clipboard.",
     "copyToClipboardAsPng": "Copied to clipboard as PNG."
   }
 }
