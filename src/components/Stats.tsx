@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { copyTextToSystemClipboard } from "../clipboard";
+import { DEFAULT_VERSION } from "../constants";
 import { getCommonBounds } from "../element/bounds";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import {
@@ -56,11 +57,11 @@ export const Stats = (props: {
   let hash;
   let timestamp;
 
-  if (version.length > 16) {
+  if (version !== DEFAULT_VERSION) {
     timestamp = version.slice(0, 16).replace("T", " ");
     hash = version.slice(21);
   } else {
-    timestamp = "Version data not available";
+    timestamp = "Version not available";
   }
 
   return (
