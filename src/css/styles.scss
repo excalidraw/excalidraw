@@ -224,6 +224,10 @@
     }
   }
 
+  .App-top-bar {
+    z-index: var(--zIndex-layerUI);
+  }
+
   .App-bottom-bar {
     position: absolute;
     top: 0;
