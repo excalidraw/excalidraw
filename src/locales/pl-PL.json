@@ -235,10 +235,14 @@
     "storage": "Pamięć",
     "title": "Statystyki dla nerdów",
     "total": "Łącznie",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "Szerokość"
   },
   "toast": {
     "copyStyles": "",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": ""
   }
 }
