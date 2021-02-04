@@ -235,10 +235,14 @@
     "storage": "ਸਟੋਰੇਜ",
     "title": "ਪੜਾਕੂਆਂ ਲਈ ਅੰਕੜੇ",
     "total": "ਕੁੱਲ",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "ਚੌੜਾਈ"
   },
   "toast": {
     "copyStyles": "ਕਾਪੀ ਕੀਤੇ ਸਟਾਇਲ।",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ PNG ਵਜੋਂ ਕਾਪੀ ਕੀਤਾ।"
   }
 }
