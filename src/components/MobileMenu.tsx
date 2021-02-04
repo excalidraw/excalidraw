@@ -48,7 +48,7 @@ export const MobileMenu = ({
 }: MobileMenuProps) => {
   const renderFixedSideContainer = () => {
     return (
-      <FixedSideContainer side="top">
+      <FixedSideContainer side="top" className="App-top-bar">
         <Section heading="shapes">
           {(heading) => (
             <Stack.Col gap={4} align="center">
