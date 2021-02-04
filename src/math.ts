@@ -151,13 +151,8 @@ export const isPathALoop = (
   zoomValue: Zoom["value"] = 1 as NormalizedZoomValue,
 ): boolean => {
   if (points.length >= 3) {
-    const [firstPoint, lastPoint] = [points[0], points[points.length - 1]];
-    const distance = distance2d(
-      firstPoint[0],
-      firstPoint[1],
-      lastPoint[0],
-      lastPoint[1],
-    );
+    const [first, last] = [points[0], points[points.length - 1]];
+    const distance = distance2d(first[0], first[1], last[0], last[1]);
 
     // Adjusting LINE_CONFIRM_THRESHOLD to current zoom so that when zoomed in
     // really close we make the threshold smaller, and vice versa.
