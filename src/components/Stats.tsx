@@ -26,6 +26,7 @@ const getStorageSizes = debounce((cb: (sizes: StorageSizes) => void) => {
 
 export const Stats = (props: {
   appState: AppState;
+  setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
   onClose: () => void;
 }) => {
@@ -51,12 +52,15 @@ export const Stats = (props: {
     return null;
   }
 
-  let version = getVersion();
-  let hash = "1234567";
+  const version = getVersion();
+  let hash;
+  let timestamp;
 
   if (version.length > 16) {
-    hash = version.substr(21, 7);
-    version = version.substr(0, 16).replace("T", " ");
+    timestamp = version.slice(0, 16).replace("T", " ");
+    hash = version.slice(21);
+  } else {
+    timestamp = "Version data not available";
   }
 
   return (
@@ -172,10 +176,17 @@ export const Stats = (props: {
               <td
                 colSpan={2}
                 style={{ textAlign: "center", cursor: "pointer" }}
-                onClick={() => copyTextToSystemClipboard(getVersion())}
+                onClick={async () => {
+                  try {
+                    await copyTextToSystemClipboard(getVersion());
+                    props.setAppState({
+                      toastMessage: "copied to clipboard",
+                    });
+                  } catch {}
+                }}
                 title={t("stats.versionCopy")}
               >
-                {version}
+                {timestamp}
                 <br />
                 {hash}
               </td>
