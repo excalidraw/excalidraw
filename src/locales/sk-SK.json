@@ -235,10 +235,14 @@
     "storage": "Úložisko",
     "title": "Štatistiky",
     "total": "Celkom",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "Šírka"
   },
   "toast": {
     "copyStyles": "Štýly skopírované.",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": "Skopírované do schránky ako PNG."
   }
 }
