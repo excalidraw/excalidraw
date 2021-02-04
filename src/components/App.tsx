@@ -457,6 +457,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         {this.state.showStats && (
           <Stats
             appState={this.state}
+            setAppState={this.setAppState}
             elements={this.scene.getElements()}
             onClose={this.toggleStats}
           />
