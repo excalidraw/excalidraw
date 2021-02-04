@@ -181,11 +181,11 @@ export const Stats = (props: {
                   try {
                     await copyTextToSystemClipboard(getVersion());
                     props.setAppState({
-                      toastMessage: t("stats.versionCopied"),
+                      toastMessage: t("toast.copyToClipboard"),
                     });
                   } catch {}
                 }}
-                title={t("toast.copyToClipboard")}
+                title={t("stats.versionCopy")}
               >
                 {timestamp}
                 <br />
