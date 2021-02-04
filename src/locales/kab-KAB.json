@@ -235,10 +235,14 @@
     "storage": "Aḥraz",
     "title": "",
     "total": "Aɣrud",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "Tehri"
   },
   "toast": {
     "copyStyles": "Iɣunab yettwaneɣlen.",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": "Yettwanɣel ɣer tecfawit am PNG."
   }
 }
