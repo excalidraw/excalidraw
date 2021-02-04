@@ -36,7 +36,7 @@ export const exportToCanvas = (
     const tempCanvas = document.createElement("canvas");
     tempCanvas.width = width * scale;
     tempCanvas.height = height * scale;
-    return { canvas: tempCanvas, scale: 1 };
+    return { canvas: tempCanvas, scale };
   },
 ) => {
   const sceneElements = getElementsAndWatermark(elements, shouldAddWatermark);
