@@ -235,10 +235,14 @@
     "storage": "Сховище",
     "title": "Статистика",
     "total": "Всього",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "Ширина"
   },
   "toast": {
     "copyStyles": "Скопійовані стилі.",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": "Скопійовано в буфер обміну як PNG."
   }
 }
