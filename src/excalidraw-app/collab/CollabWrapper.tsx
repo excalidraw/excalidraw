@@ -486,7 +486,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
           window.clearInterval(intervalId);
           intervalId = null;
         }
-        this.onIdleStateChange(UserIdleState.Idle);
+        this.onIdleStateChange(UserIdleState.Away);
       } else {
         timeoutId = window.setTimeout(reportIdle, IDLE_THRESHOLD);
         intervalId = window.setInterval(reportActive, ACTIVE_THRESHOLD);

@@ -448,7 +448,7 @@ export const renderScene = (
     context.fillStyle = background;
 
     const userState = sceneState.remotePointerUserStates[clientId];
-    if (isOutOfBounds || userState === UserIdleState.Idle) {
+    if (isOutOfBounds || userState === UserIdleState.Away) {
       context.globalAlpha = 0.2;
     }
 
@@ -481,16 +481,20 @@ export const renderScene = (
     context.stroke();
 
     const username = sceneState.remotePointerUsernames[clientId];
-    const usernameAndPotentiallyIdleState = userState
-      ? `${username} ${userState === UserIdleState.Active ? "🟢" : "💤"}`
-      : username;
+    const usernameAndIdleState = `${username ? `${username} ` : ""}${
+      userState === UserIdleState.Away
+        ? "⚫️"
+        : userState === UserIdleState.Idle
+        ? "💤"
+        : "🟢"
+    }`;
 
-    if (!isOutOfBounds && username) {
+    if (!isOutOfBounds && usernameAndIdleState) {
       const offsetX = x + width;
       const offsetY = y + height;
       const paddingHorizontal = 4;
       const paddingVertical = 4;
-      const measure = context.measureText(usernameAndPotentiallyIdleState);
+      const measure = context.measureText(usernameAndIdleState);
       const measureHeight =
         measure.actualBoundingBoxDescent + measure.actualBoundingBoxAscent;
 
@@ -513,7 +517,7 @@ export const renderScene = (
       context.fillStyle = oc.white;
 
       context.fillText(
-        usernameAndPotentiallyIdleState,
+        usernameAndIdleState,
         offsetX + paddingHorizontal,
         offsetY + paddingVertical + measure.actualBoundingBoxAscent,
       );
