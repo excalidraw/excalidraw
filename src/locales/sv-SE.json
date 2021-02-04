@@ -235,10 +235,14 @@
     "storage": "Lagring",
     "title": "Statistik för nördar",
     "total": "Totalt",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "Bredd"
   },
   "toast": {
     "copyStyles": "Kopierade stilar.",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": "Kopierat till urklipp som PNG."
   }
 }
