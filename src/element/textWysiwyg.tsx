@@ -160,7 +160,7 @@ export const textWysiwyg = ({
 
     unbindUpdate();
 
-    document.body.removeChild(editable);
+    editable.remove();
   };
 
   const rebindBlur = () => {
@@ -206,7 +206,9 @@ export const textWysiwyg = ({
     passive: false,
     capture: true,
   });
-  document.body.appendChild(editable);
+  document
+    .querySelector(".excalidraw-textEditorContainer")!
+    .appendChild(editable);
   editable.focus();
   editable.select();
 };

@@ -454,6 +454,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           renderCustomFooter={renderFooter}
           viewModeEnabled={viewModeEnabled}
         />
+        <div className="excalidraw-textEditorContainer" />
         {this.state.showStats && (
           <Stats
             appState={this.state}
