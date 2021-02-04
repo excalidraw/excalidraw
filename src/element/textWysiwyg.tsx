@@ -89,9 +89,6 @@ export const textWysiwyg = ({
   editable.dataset.type = "wysiwyg";
   // prevent line wrapping on Safari
   editable.wrap = "off";
-  editable.className = `excalidraw ${
-    appState.appearance === "dark" ? "Appearance_dark" : ""
-  }`;
 
   Object.assign(editable.style, {
     position: "fixed",
@@ -107,6 +104,8 @@ export const textWysiwyg = ({
     overflow: "hidden",
     // prevent line wrapping (`whitespace: nowrap` doesn't work on FF)
     whiteSpace: "pre",
+    // must be specified because in dark mode canvas creates a stacking context
+    zIndex: "var(--zIndex-wysiwyg)",
   });
 
   updateWysiwygStyle();
