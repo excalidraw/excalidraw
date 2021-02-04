@@ -235,10 +235,14 @@
     "storage": "",
     "title": "",
     "total": "合計",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "幅"
   },
   "toast": {
     "copyStyles": "",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": ""
   }
 }
