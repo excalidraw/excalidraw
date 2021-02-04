@@ -235,10 +235,14 @@
     "storage": "Penyimpanan",
     "title": "Statistik untuk nerd",
     "total": "Total",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "Lebar"
   },
   "toast": {
     "copyStyles": "Gaya tersalin.",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": "Tersalin ke clipboard sebagai PNG."
   }
 }
