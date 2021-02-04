@@ -235,14 +235,14 @@
     "storage": "Stocare",
     "title": "Statistici pentru pasionați",
     "total": "Total",
-    "version": "",
-    "versionCopy": "",
-    "versionNotAvailable": "",
+    "version": "Versiune",
+    "versionCopy": "Clic pentru copiere",
+    "versionNotAvailable": "Versiune indisponibilă",
     "width": "Lățime"
   },
   "toast": {
     "copyStyles": "Stiluri copiate.",
-    "copyToClipboard": "",
+    "copyToClipboard": "Copiat în memoria temporară.",
     "copyToClipboardAsPng": "Copiat în memoria temporară ca PNG."
   }
 }
