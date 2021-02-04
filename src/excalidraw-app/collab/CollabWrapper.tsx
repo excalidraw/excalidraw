@@ -82,6 +82,8 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   portal: Portal;
   excalidrawAPI: Props["excalidrawAPI"];
   isCollaborating: boolean = false;
+  activeIntervalId: number | null;
+  idleTimeoutId: number | null;
 
   private socketInitializationTimer?: NodeJS.Timeout;
   private lastBroadcastedOrReceivedSceneVersion: number = -1;
@@ -98,6 +100,8 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     };
     this.portal = new Portal(this);
     this.excalidrawAPI = props.excalidrawAPI;
+    this.activeIntervalId = null;
+    this.idleTimeoutId = null;
   }
 
   componentDidMount() {
@@ -121,6 +125,19 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   componentWillUnmount() {
     window.removeEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
     window.removeEventListener(EVENT.UNLOAD, this.onUnload);
+    window.removeEventListener(EVENT.POINTER_MOVE, this.onPointerMove);
+    window.removeEventListener(
+      EVENT.VISIBILITY_CHANGE,
+      this.onVisibilityChange,
+    );
+    if (this.activeIntervalId) {
+      window.clearInterval(this.activeIntervalId);
+      this.activeIntervalId = null;
+    }
+    if (this.idleTimeoutId) {
+      window.clearTimeout(this.idleTimeoutId);
+      this.idleTimeoutId = null;
+    }
   }
 
   private onUnload = () => {
@@ -445,50 +462,56 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     this.excalidrawAPI.history.clear();
   };
 
-  private initializeIdleDetector = () => {
-    let intervalId: number | null = null;
-    let timeoutId: number | null = null;
+  private onPointerMove = () => {
+    if (this.idleTimeoutId) {
+      window.clearTimeout(this.idleTimeoutId);
+      this.idleTimeoutId = null;
+    }
+    this.idleTimeoutId = window.setTimeout(this.reportIdle, IDLE_THRESHOLD);
+    if (!this.activeIntervalId) {
+      this.activeIntervalId = window.setInterval(
+        this.reportActive,
+        ACTIVE_THRESHOLD,
+      );
+    }
+  };
 
-    const reportIdle = () => {
-      this.onIdleStateChange(UserIdleState.IDLE);
-      if (intervalId) {
-        window.clearInterval(intervalId);
-        intervalId = null;
+  private onVisibilityChange = () => {
+    if (document.hidden) {
+      if (this.idleTimeoutId) {
+        window.clearTimeout(this.idleTimeoutId);
+        this.idleTimeoutId = null;
       }
-    };
-
-    const reportActive = () => {
+      if (this.activeIntervalId) {
+        window.clearInterval(this.activeIntervalId);
+        this.activeIntervalId = null;
+      }
+      this.onIdleStateChange(UserIdleState.AWAY);
+    } else {
+      this.idleTimeoutId = window.setTimeout(this.reportIdle, IDLE_THRESHOLD);
+      this.activeIntervalId = window.setInterval(
+        this.reportActive,
+        ACTIVE_THRESHOLD,
+      );
       this.onIdleStateChange(UserIdleState.ACTIVE);
-    };
+    }
+  };
 
-    document.addEventListener("pointermove", () => {
-      if (timeoutId) {
-        window.clearTimeout(timeoutId);
-        timeoutId = null;
-      }
-      timeoutId = window.setTimeout(reportIdle, IDLE_THRESHOLD);
-      if (!intervalId) {
-        intervalId = window.setInterval(reportActive, ACTIVE_THRESHOLD);
-      }
-    });
+  private reportIdle = () => {
+    this.onIdleStateChange(UserIdleState.IDLE);
+    if (this.activeIntervalId) {
+      window.clearInterval(this.activeIntervalId);
+      this.activeIntervalId = null;
+    }
+  };
 
-    document.addEventListener("visibilitychange", () => {
-      if (document.hidden) {
-        if (timeoutId) {
-          window.clearTimeout(timeoutId);
-          timeoutId = null;
-        }
-        if (intervalId) {
-          window.clearInterval(intervalId);
-          intervalId = null;
-        }
-        this.onIdleStateChange(UserIdleState.AWAY);
-      } else {
-        timeoutId = window.setTimeout(reportIdle, IDLE_THRESHOLD);
-        intervalId = window.setInterval(reportActive, ACTIVE_THRESHOLD);
-        this.onIdleStateChange(UserIdleState.ACTIVE);
-      }
-    });
+  private reportActive = () => {
+    this.onIdleStateChange(UserIdleState.ACTIVE);
+  };
+
+  private initializeIdleDetector = () => {
+    document.addEventListener(EVENT.POINTER_MOVE, this.onPointerMove);
+    document.addEventListener(EVENT.VISIBILITY_CHANGE, this.onVisibilityChange);
   };
 
   setCollaborators(sockets: string[]) {
