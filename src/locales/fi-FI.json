@@ -235,14 +235,14 @@
     "storage": "Tallennustila",
     "title": "Nörttien tilastot",
     "total": "Yhteensä",
-    "version": "",
-    "versionCopy": "",
-    "versionNotAvailable": "",
+    "version": "Versio",
+    "versionCopy": "Klikkaa kopioidaksesi",
+    "versionNotAvailable": "Versio ei saatavilla",
     "width": "Leveys"
   },
   "toast": {
     "copyStyles": "Tyylit kopioitu.",
-    "copyToClipboard": "",
+    "copyToClipboard": "Kopioitu leikepöydälle.",
     "copyToClipboardAsPng": "Kopioitu leikepöydälle PNG-tiedostona."
   }
 }
