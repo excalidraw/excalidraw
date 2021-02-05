@@ -77,7 +77,7 @@
     "group": "그룹 생성",
     "ungroup": "그룹 해제",
     "collaborators": "공동 작업자",
-    "gridMode": "격자 방식",
+    "showGrid": "",
     "addToLibrary": "라이브러리에 추가",
     "removeFromLibrary": "라이브러리에서 제거",
     "libraryLoadingMessage": "라이브러리 불러오는 중…",
