@@ -77,7 +77,7 @@
     "group": "Kelompokan pilihan",
     "ungroup": "Pisahkan pilihan",
     "collaborators": "Kolaborator",
-    "gridMode": "Mode grid",
+    "showGrid": "",
     "addToLibrary": "Tambahkan ke pustaka",
     "removeFromLibrary": "Hapus dari pustaka",
     "libraryLoadingMessage": "Memuat pustaka…",
