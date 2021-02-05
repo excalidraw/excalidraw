@@ -451,7 +451,7 @@ export const renderScene = (
 
     const userState = sceneState.remotePointerUserStates[clientId];
     if (isOutOfBounds || userState === UserIdleState.AWAY) {
-      context.globalAlpha = 0.2;
+      context.globalAlpha = 0.48;
     }
 
     if (
