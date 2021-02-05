@@ -11,7 +11,7 @@ import { CLASSES } from "../constants";
 import { exportCanvas } from "../data";
 import { importLibraryFromJSON, saveLibraryAsJSON } from "../data/json";
 import { Library } from "../data/library";
-import { showSelectedShapeActions } from "../element";
+import { isTextElement, showSelectedShapeActions } from "../element";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { Language, t } from "../i18n";
 import useIsMobile from "../is-mobile";
@@ -513,17 +513,18 @@ const LayerUI = ({
               "transition-right": zenModeEnabled,
             })}
           >
-            {Array.from(appState.collaborators)
-              // Collaborator is either not initialized or is actually the current user.
-              .filter(([_, client]) => Object.keys(client).length !== 0)
-              .map(([clientId, client]) => (
-                <Tooltip
-                  label={client.username || "Unknown user"}
-                  key={clientId}
-                >
-                  {actionManager.renderAction("goToCollaborator", clientId)}
-                </Tooltip>
-              ))}
+            {appState.collaborators.size > 0 &&
+              Array.from(appState.collaborators)
+                // Collaborator is either not initialized or is actually the current user.
+                .filter(([_, client]) => Object.keys(client).length !== 0)
+                .map(([clientId, client]) => (
+                  <Tooltip
+                    label={client.username || "Unknown user"}
+                    key={clientId}
+                  >
+                    {actionManager.renderAction("goToCollaborator", clientId)}
+                  </Tooltip>
+                ))}
           </UserList>
         </div>
       </FixedSideContainer>
@@ -647,7 +648,10 @@ const LayerUI = ({
   ) : (
     <div
       className={clsx("layer-ui__wrapper", {
-        "disable-pointerEvents": appState.cursorButton === "down",
+        "disable-pointerEvents":
+          appState.draggingElement ||
+          appState.resizingElement ||
+          (appState.editingElement && !isTextElement(appState.editingElement)),
       })}
     >
       {dialogs}

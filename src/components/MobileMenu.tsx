@@ -46,9 +46,9 @@ export const MobileMenu = ({
   renderCustomFooter,
   viewModeEnabled,
 }: MobileMenuProps) => {
-  const renderFixedSideContainer = () => {
+  const renderToolbar = () => {
     return (
-      <FixedSideContainer side="top">
+      <FixedSideContainer side="top" className="App-top-bar">
         <Section heading="shapes">
           {(heading) => (
             <Stack.Col gap={4} align="center">
@@ -136,7 +136,7 @@ export const MobileMenu = ({
   };
   return (
     <>
-      {!viewModeEnabled && renderFixedSideContainer()}
+      {!viewModeEnabled && renderToolbar()}
       <div
         className="App-bottom-bar"
         style={{
@@ -152,24 +152,26 @@ export const MobileMenu = ({
                 <Stack.Col gap={4}>
                   {renderCanvasActions()}
                   {renderCustomFooter?.(true)}
-                  <fieldset>
-                    <legend>{t("labels.collaborators")}</legend>
-                    <UserList mobile>
-                      {Array.from(appState.collaborators)
-                        // Collaborator is either not initialized or is actually the current user.
-                        .filter(
-                          ([_, client]) => Object.keys(client).length !== 0,
-                        )
-                        .map(([clientId, client]) => (
-                          <React.Fragment key={clientId}>
-                            {actionManager.renderAction(
-                              "goToCollaborator",
-                              clientId,
-                            )}
-                          </React.Fragment>
-                        ))}
-                    </UserList>
-                  </fieldset>
+                  {appState.collaborators.size > 0 && (
+                    <fieldset>
+                      <legend>{t("labels.collaborators")}</legend>
+                      <UserList mobile>
+                        {Array.from(appState.collaborators)
+                          // Collaborator is either not initialized or is actually the current user.
+                          .filter(
+                            ([_, client]) => Object.keys(client).length !== 0,
+                          )
+                          .map(([clientId, client]) => (
+                            <React.Fragment key={clientId}>
+                              {actionManager.renderAction(
+                                "goToCollaborator",
+                                clientId,
+                              )}
+                            </React.Fragment>
+                          ))}
+                      </UserList>
+                    </fieldset>
+                  )}
                 </Stack.Col>
               </div>
             </Section>

@@ -80,9 +80,9 @@
     "gridMode": "Hálómód",
     "addToLibrary": "Hozzáadás a könyvtárhoz",
     "removeFromLibrary": "Eltávólítás a könyvtárból",
-    "libraryLoadingMessage": "Könyvtár betöltése...",
+    "libraryLoadingMessage": "Könyvtár betöltése…",
     "libraries": "Könyvtárak böngészése",
-    "loadingScene": "Jelenet betöltése...",
+    "loadingScene": "Jelenet betöltése…",
     "align": "Igazítás",
     "alignTop": "Felülre igazítás",
     "alignBottom": "Alulra igazítás",
@@ -136,6 +136,7 @@
     "decryptFailed": "Nem sikerült visszafejteni a titkosított adatot.",
     "uploadedSecurly": "A feltöltést végpontok közötti titkosítással biztosítottuk, ami azt jelenti, hogy egy harmadik fél nem tudja megnézni a tartalmát, beleértve az Excalidraw szervereit is.",
     "loadSceneOverridePrompt": "A betöltött külső rajz felül fogja írnia meglévőt. Szeretnéd folytatni?",
+    "collabStopOverridePrompt": "",
     "errorLoadingLibrary": "Hibába ütközött a harmarmadik féltől származó könyvtár betöltése.",
     "confirmAddLibrary": "Ez a művelet {{numShapes}} formát fog hozzáadni a könyvtáradhoz. Biztos vagy benne?",
     "imageDoesNotContainScene": "Képek importálása egyelőre nem támogatott.\n\nEgy jelenetet szeretnél betölteni? Úgy tűnik ez a kép fájl nem tartalmazza a szükséges adatokat. Exportáláskor ezt egy külön opcióval lehet beállítani.",
@@ -234,10 +235,14 @@
     "storage": "Tárhely",
     "title": "Statisztikák",
     "total": "Összesen",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "Szélesség"
   },
   "toast": {
     "copyStyles": "",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": ""
   }
 }

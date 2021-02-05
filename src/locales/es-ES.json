@@ -80,9 +80,9 @@
     "gridMode": "Modo cuadrícula",
     "addToLibrary": "Añadir a la biblioteca",
     "removeFromLibrary": "Eliminar de la biblioteca",
-    "libraryLoadingMessage": "Cargando biblioteca...",
+    "libraryLoadingMessage": "Cargando librería…",
     "libraries": "Explorar bibliotecas",
-    "loadingScene": "Cargando escena...",
+    "loadingScene": "Cargando escena…",
     "align": "Alinear",
     "alignTop": "Alineación superior",
     "alignBottom": "Alineación inferior",
@@ -136,6 +136,7 @@
     "decryptFailed": "No se pudieron descifrar los datos.",
     "uploadedSecurly": "La carga ha sido asegurada con cifrado de principio a fin, lo que significa que el servidor de Excalidraw y terceros no pueden leer el contenido.",
     "loadSceneOverridePrompt": "Si carga este dibujo externo, reemplazará el que tiene. ¿Desea continuar?",
+    "collabStopOverridePrompt": "Detener la sesión sobrescribirá su dibujo anterior almacenado en local. ¿Estás seguro?\n\n(Si quieres mantener tu dibujo en local, simplemente cierre la pestaña del navegador en su lugar.)",
     "errorLoadingLibrary": "Se ha producido un error al cargar la biblioteca de terceros.",
     "confirmAddLibrary": "Esto añadirá {{numShapes}} forma(s) a tu biblioteca. ¿Estás seguro?",
     "imageDoesNotContainScene": "La importación de imágenes no está homologada en este momento.\n\n¿Deseas importar una escena? Esta imagen no parece contener ningún dato de escena. ¿Lo has activado durante la exportación?",
@@ -234,10 +235,14 @@
     "storage": "Almacenamiento",
     "title": "Estadísticas para nerds",
     "total": "Total",
+    "version": "Versión",
+    "versionCopy": "Clic para copiar",
+    "versionNotAvailable": "Versión no disponible",
     "width": "Ancho"
   },
   "toast": {
     "copyStyles": "Estilos copiados.",
+    "copyToClipboard": "Copiado en el portapapeles.",
     "copyToClipboardAsPng": "Copiado al portapapeles como PNG."
   }
 }

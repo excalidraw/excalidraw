@@ -9,6 +9,7 @@ import CollabWrapper from "./CollabWrapper";
 import { getSyncableElements } from "../../packages/excalidraw/index";
 import { ExcalidrawElement } from "../../element/types";
 import { BROADCAST, SCENE } from "../app_constants";
+import { UserIdleState } from "./types";
 
 class Portal {
   collab: CollabWrapper;
@@ -122,13 +123,30 @@ class Portal {
       data as SocketUpdateData,
     );
 
-    if (syncAll && this.collab.state.isCollaborating) {
+    if (syncAll && this.collab.isCollaborating) {
       await Promise.all([
         broadcastPromise,
         this.collab.saveCollabRoomToFirebase(syncableElements),
       ]);
     } else {
       await broadcastPromise;
+    }
+  };
+
+  broadcastIdleChange = (userState: UserIdleState) => {
+    if (this.socket?.id) {
+      const data: SocketUpdateDataSource["IDLE_STATUS"] = {
+        type: "IDLE_STATUS",
+        payload: {
+          socketId: this.socket.id,
+          userState,
+          username: this.collab.state.username,
+        },
+      };
+      return this._broadcastSocketData(
+        data as SocketUpdateData,
+        true, // volatile
+      );
     }
   };
 

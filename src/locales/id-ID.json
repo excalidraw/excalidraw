@@ -80,9 +80,9 @@
     "gridMode": "Mode grid",
     "addToLibrary": "Tambahkan ke pustaka",
     "removeFromLibrary": "Hapus dari pustaka",
-    "libraryLoadingMessage": "Memuat pustaka...",
+    "libraryLoadingMessage": "Memuat pustaka…",
     "libraries": "Telusur pustaka",
-    "loadingScene": "Memuat pemandangan...",
+    "loadingScene": "Memuat pemandangan…",
     "align": "Perataan",
     "alignTop": "Rata atas",
     "alignBottom": "Rata bawah",
@@ -92,7 +92,7 @@
     "centerHorizontally": "Pusatkan secara horizontal",
     "distributeHorizontally": "Distribusikan horizontal",
     "distributeVertically": "Distribusikan vertikal",
-    "viewMode": ""
+    "viewMode": "Mode tampilan"
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
@@ -136,6 +136,7 @@
     "decryptFailed": "Tidak dapat mengdekripsi data.",
     "uploadedSecurly": "Pengunggahan ini telah diamankan menggunakan enkripsi end-to-end, artinya server Excalidraw dan pihak ketiga tidak data membaca nya",
     "loadSceneOverridePrompt": "Memuat gambar external akan mengganti konten Anda yang ada. Apakah Anda ingin melanjutkan?",
+    "collabStopOverridePrompt": "",
     "errorLoadingLibrary": "Terdapat kesalahan dalam memuat pustaka pihak ketiga.",
     "confirmAddLibrary": "Ini akan menambahkan {{numShapes}} bentuk ke pustaka Anda. Anda yakin?",
     "imageDoesNotContainScene": "Mengimpor gambar tidak didukung saat ini.\n\nApakah Anda ingin impor pemandangan? Gambar ini tidak berisi data pemandangan. Sudah ka Anda aktifkan ini ketika ekspor?",
@@ -234,10 +235,14 @@
     "storage": "Penyimpanan",
     "title": "Statistik untuk nerd",
     "total": "Total",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "Lebar"
   },
   "toast": {
     "copyStyles": "Gaya tersalin.",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": "Tersalin ke clipboard sebagai PNG."
   }
 }

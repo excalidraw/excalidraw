@@ -80,9 +80,9 @@
     "gridMode": "Сетка",
     "addToLibrary": "Добавить в библиотеку",
     "removeFromLibrary": "Удалить из библиотеки",
-    "libraryLoadingMessage": "Загрузка библиотеки...",
+    "libraryLoadingMessage": "Загрузка библиотеки…",
     "libraries": "Просмотреть библиотеки",
-    "loadingScene": "Загрузка сцены...",
+    "loadingScene": "Загрузка сцены…",
     "align": "Выровнять",
     "alignTop": "Выровнять по верхнему краю",
     "alignBottom": "Выровнять по нижнему краю",
@@ -92,7 +92,7 @@
     "centerHorizontally": "Центрировать по горизонтали",
     "distributeHorizontally": "Распределить по горизонтали",
     "distributeVertically": "Распределить по вертикали",
-    "viewMode": ""
+    "viewMode": "Вид"
   },
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",
@@ -136,6 +136,7 @@
     "decryptFailed": "Не удалось расшифровать данные.",
     "uploadedSecurly": "Загружаемые данные защищена сквозным шифрованием, что означает, что сервер Excalidraw и третьи стороны не могут прочитать содержимое.",
     "loadSceneOverridePrompt": "Загрузка рисунка приведёт к замене имеющегося содержимого. Вы хотите продолжить?",
+    "collabStopOverridePrompt": "",
     "errorLoadingLibrary": "Произошла ошибка при загрузке сторонней библиотеки.",
     "confirmAddLibrary": "Будет добавлено {{numShapes}} фигур в вашу библиотеку. Продолжить?",
     "imageDoesNotContainScene": "Импорт изображений не поддерживается в данный момент.\n\nХотите импортировать сцену? Данное изображение не содержит данных о сцене. Было ли включено это во время экспорта?",
@@ -234,10 +235,14 @@
     "storage": "Хранилище",
     "title": "Статистика для ботаников",
     "total": "Всего",
+    "version": "",
+    "versionCopy": "Копировать",
+    "versionNotAvailable": "",
     "width": "Ширина"
   },
   "toast": {
     "copyStyles": "Скопированы стили.",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": "Скопировано в буфер обмена в формате PNG."
   }
 }

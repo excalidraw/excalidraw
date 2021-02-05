@@ -80,9 +80,9 @@
     "gridMode": "Modo grade",
     "addToLibrary": "Adicionar à biblioteca",
     "removeFromLibrary": "Remover da biblioteca",
-    "libraryLoadingMessage": "Carregando biblioteca...",
+    "libraryLoadingMessage": "Carregando biblioteca…",
     "libraries": "Procurar bibliotecas",
-    "loadingScene": "Carregando cena...",
+    "loadingScene": "Carregando cena…",
     "align": "Alinhamento",
     "alignTop": "Alinhar ao topo",
     "alignBottom": "Alinhar ao fundo",
@@ -136,6 +136,7 @@
     "decryptFailed": "Não foi possível descriptografar os dados.",
     "uploadedSecurly": "O upload foi protegido com criptografia de ponta a ponta, o que significa que o servidor do Excalidraw e terceiros não podem ler o conteúdo.",
     "loadSceneOverridePrompt": "Carregar um desenho externo substituirá o seu conteúdo existente. Deseja continuar?",
+    "collabStopOverridePrompt": "",
     "errorLoadingLibrary": "Houve um erro ao carregar a biblioteca de terceiros.",
     "confirmAddLibrary": "Isso adicionará {{numShapes}} forma(s) à sua biblioteca. Tem certeza?",
     "imageDoesNotContainScene": "A importação de imagens não é suportada no momento.\n\nVocê deseja importar uma cena? Esta imagem parece não conter dados de cena. Você ativou isto durante a exportação?",
@@ -234,10 +235,14 @@
     "storage": "Armazenamento",
     "title": "Estatísticas para nerds",
     "total": "Total",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "Largura"
   },
   "toast": {
     "copyStyles": "Estilos copiados.",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": "Copiado para o clipboard como PNG."
   }
 }
