@@ -77,7 +77,7 @@
     "group": "図形のグループ化",
     "ungroup": "グループ化を解除",
     "collaborators": "共同編集者",
-    "showGrid": "",
+    "gridMode": "",
     "addToLibrary": "ライブラリに追加",
     "removeFromLibrary": "ライブラリから削除",
     "libraryLoadingMessage": "ライブラリを読み込み中…",

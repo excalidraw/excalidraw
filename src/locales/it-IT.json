@@ -77,7 +77,7 @@
     "group": "Crea gruppo da selezione",
     "ungroup": "Dividi gruppo da selezione",
     "collaborators": "Collaboratori",
-    "showGrid": "Modalità griglia",
+    "gridMode": "Modalità griglia",
     "addToLibrary": "Aggiungi alla libreria",
     "removeFromLibrary": "Rimuovi dalla libreria",
     "libraryLoadingMessage": "Caricamento libreria…",
