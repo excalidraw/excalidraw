@@ -3462,7 +3462,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         await import(
           /* webpackChunkName: "pixelated-image" */ "../data/pixelated-image"
         )
-      ).pixelateImage(file, 20, event.clientX, event.clientY);
+      ).pixelateImage(file, 20, 1200, event.clientX, event.clientY);
 
       const nextElements = [
         ...this.scene.getElementsIncludingDeleted(),

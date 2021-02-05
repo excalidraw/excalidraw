@@ -35,6 +35,7 @@ const commonProps = {
 export const pixelateImage = async (
   blob: Blob,
   cellSize: number,
+  suggestedMaxShapeCount: number,
   x: number,
   y: number,
 ) => {
@@ -44,8 +45,20 @@ export const pixelateImage = async (
 
     // initialize canvas for pixelation
     const { width, height } = image;
-    const canvasWidth = Math.floor(width / cellSize);
-    const canvasHeight = Math.floor(height / cellSize);
+    let canvasWidth = Math.floor(width / cellSize);
+    let canvasHeight = Math.floor(height / cellSize);
+    const shapeCount = canvasHeight * canvasWidth;
+    if (shapeCount > suggestedMaxShapeCount) {
+      canvasWidth = Math.floor(
+        canvasWidth * (suggestedMaxShapeCount / shapeCount),
+      );
+      canvasHeight = Math.floor(
+        canvasHeight * (suggestedMaxShapeCount / shapeCount),
+      );
+    }
+    const xOffset = x - (canvasWidth * cellSize) / 2;
+    const yOffset = y - (canvasHeight * cellSize) / 2;
+
     const canvas =
       "OffscreenCanvas" in window
         ? new OffscreenCanvas(canvasWidth, canvasHeight)
@@ -76,8 +89,8 @@ export const pixelateImage = async (
             groupIds: [groupId],
             ...commonProps,
             type: "rectangle",
-            x: x + col * cellSize,
-            y: y + row * cellSize,
+            x: xOffset + col * cellSize,
+            y: yOffset + row * cellSize,
             width: cellSize,
             height: cellSize,
           });
@@ -85,6 +98,7 @@ export const pixelateImage = async (
         }
       }
     }
+
     return shapes;
   } finally {
     URL.revokeObjectURL(url);
