@@ -77,7 +77,7 @@
     "group": "אחד לקבוצה",
     "ungroup": "פרק קבוצה",
     "collaborators": "שותפים",
-    "gridMode": "מצב רשת",
+    "showGrid": "מצב רשת",
     "addToLibrary": "הוסף לספריה",
     "removeFromLibrary": "הסר מספריה",
     "libraryLoadingMessage": "טוען ספריה…",

@@ -77,7 +77,7 @@
     "group": "Zgrupuj wybrane",
     "ungroup": "Rozgrupuj wybrane",
     "collaborators": "Współtwórcy",
-    "gridMode": "Tryb siatki",
+    "showGrid": "Tryb siatki",
     "addToLibrary": "Dodaj do biblioteki",
     "removeFromLibrary": "Usuń z biblioteki",
     "libraryLoadingMessage": "Ładowanie biblioteki…",

@@ -77,7 +77,7 @@
     "group": "Agrupar selección",
     "ungroup": "Desagrupar selección",
     "collaborators": "Colaboradores",
-    "gridMode": "Modo cuadrícula",
+    "showGrid": "Modo cuadrícula",
     "addToLibrary": "Añadir a la biblioteca",
     "removeFromLibrary": "Eliminar de la biblioteca",
     "libraryLoadingMessage": "Cargando librería…",

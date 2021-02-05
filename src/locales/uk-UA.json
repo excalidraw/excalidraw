@@ -77,7 +77,7 @@
     "group": "Групувати виділене",
     "ungroup": "Розгрупувати виділене",
     "collaborators": "Співавтори",
-    "gridMode": "Режим сітки",
+    "showGrid": "Режим сітки",
     "addToLibrary": "Додати до бібліотеки",
     "removeFromLibrary": "Видалити з бібліотеки",
     "libraryLoadingMessage": "Завантажити бібліотеку…",

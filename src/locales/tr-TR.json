@@ -77,7 +77,7 @@
     "group": "Seçimi grup yap",
     "ungroup": "Seçilen grubu dağıt",
     "collaborators": "Ortaklar",
-    "gridMode": "Izgara modu",
+    "showGrid": "Izgara modu",
     "addToLibrary": "Kütüphaneye ekle",
     "removeFromLibrary": "Kütüphaneden kaldır",
     "libraryLoadingMessage": "Kütüphane yükleniyor…",

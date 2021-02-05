@@ -77,7 +77,7 @@
     "group": "Ryhmitä valinta",
     "ungroup": "Pura valittu ryhmä",
     "collaborators": "Yhteistyökumppanit",
-    "gridMode": "Ruudukkotila",
+    "showGrid": "Ruudukkotila",
     "addToLibrary": "Lisää kirjastoon",
     "removeFromLibrary": "Poista kirjastosta",
     "libraryLoadingMessage": "Ladataan kirjastoa…",

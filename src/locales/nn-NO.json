@@ -77,7 +77,7 @@
     "group": "Grupper utval",
     "ungroup": "Avgrupper utval",
     "collaborators": "Samarbeidarar",
-    "gridMode": "Rutevisning",
+    "showGrid": "Rutevisning",
     "addToLibrary": "Legg til i bibliotek",
     "removeFromLibrary": "Fjern frå bibliotek",
     "libraryLoadingMessage": "Laster bibliotek…",
