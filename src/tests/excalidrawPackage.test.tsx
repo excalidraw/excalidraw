@@ -28,7 +28,7 @@ describe("<Excalidraw/>", () => {
       ).toBe(1);
     });
 
-    it("should not show exit zen mode button and zen mode option in context menu when zenModeEnabled is not undefined", async () => {
+    it("should not show exit zen mode button and zen mode option in context menu when zenModeEnabled is set", async () => {
       const { container } = await render(<Excalidraw zenModeEnabled={true} />);
       expect(
         container.getElementsByClassName("disable-zen-mode--visible").length,
