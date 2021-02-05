@@ -174,6 +174,19 @@ const renderLinearPointHandles = (
   context.strokeStyle = origStrokeStyle;
 };
 
+// From https://github.com/Modernizr/Modernizr/blob/master/feature-detects/emoji.js
+const supportsEmoji = () => {
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  const backingStoreRatio = ctx.backingStorePixelRatio || 1;
+  const offset = 12 * backingStoreRatio;
+  ctx.fillStyle = "#f00";
+  ctx.textBaseline = "top";
+  ctx.font = "32px Arial";
+  ctx.fillText("\ud83d\udc28", 0, 0); // U+1F428 KOALA
+  return ctx.getImageData(offset, offset, 1, 1).data[0] !== 0;
+};
+
 export const renderScene = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
@@ -481,13 +494,24 @@ export const renderScene = (
     context.stroke();
 
     const username = sceneState.remotePointerUsernames[clientId];
-    const usernameAndIdleState = `${username ? `${username} ` : ""}${
-      userState === UserIdleState.AWAY
-        ? "⚫️"
-        : userState === UserIdleState.IDLE
-        ? "💤"
-        : "🟢"
-    }`;
+    let usernameAndIdleState;
+    if (supportsEmoji) {
+      usernameAndIdleState = `${username ? `${username} ` : ""}${
+        userState === UserIdleState.AWAY
+          ? "⚫️"
+          : userState === UserIdleState.IDLE
+          ? "💤"
+          : "🟢"
+      }`;
+    } else {
+      usernameAndIdleState = `${username ? `${username} ` : ""}${
+        userState === UserIdleState.AWAY
+          ? `(${UserIdleState.AWAY})`
+          : userState === UserIdleState.IDLE
+          ? `(${UserIdleState.IDLE})`
+          : ""
+      }`;
+    }
 
     if (!isOutOfBounds && usernameAndIdleState) {
       const offsetX = x + width;
