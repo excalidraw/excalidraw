@@ -310,7 +310,7 @@ export const renderScene = (
       if (sceneState.remoteSelectedElementIds[element.id]) {
         selectionColors.push(
           ...sceneState.remoteSelectedElementIds[element.id].map((socketId) => {
-            const { background } = getClientColors(socketId);
+            const { background } = getClientColors(socketId, appState);
             return background;
           }),
         );
@@ -438,7 +438,7 @@ export const renderScene = (
     y = Math.max(y, 0);
     y = Math.min(y, normalizedCanvasHeight - height);
 
-    const { background, stroke } = getClientColors(clientId);
+    const { background, stroke } = getClientColors(clientId, appState);
 
     const strokeStyle = context.strokeStyle;
     const fillStyle = context.fillStyle;
