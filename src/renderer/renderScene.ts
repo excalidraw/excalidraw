@@ -504,11 +504,11 @@ export const renderScene = (
           : "🟢"
       }`;
     } else {
-      usernameAndIdleState = `${username ? `${username} ` : ""}${
+      usernameAndIdleState = `${username ? `${username}` : ""}${
         userState === UserIdleState.AWAY
-          ? `(${UserIdleState.AWAY})`
+          ? ` (${UserIdleState.AWAY})`
           : userState === UserIdleState.IDLE
-          ? `(${UserIdleState.IDLE})`
+          ? ` (${UserIdleState.IDLE})`
           : ""
       }`;
     }
