@@ -152,7 +152,7 @@ export const MobileMenu = ({
                 <Stack.Col gap={4}>
                   {renderCanvasActions()}
                   {renderCustomFooter?.(true)}
-                  {appState.collaborators.size && (
+                  {appState.collaborators.size > 0 && (
                     <fieldset>
                       <legend>{t("labels.collaborators")}</legend>
                       <UserList mobile>
