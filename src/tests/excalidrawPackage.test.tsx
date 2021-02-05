@@ -13,6 +13,8 @@ describe("<Excalidraw/>", () => {
       expect(
         container.getElementsByClassName("disable-zen-mode--visible").length,
       ).toBe(0);
+      expect(h.state.zenModeEnabled).toBe(false);
+
       fireEvent.contextMenu(GlobalTestState.canvas, {
         button: 2,
         clientX: 1,
@@ -31,7 +33,7 @@ describe("<Excalidraw/>", () => {
       expect(
         container.getElementsByClassName("disable-zen-mode--visible").length,
       ).toBe(0);
-      expect(h.state.zenModeEnabled).toBe(false);
+      expect(h.state.zenModeEnabled).toBe(true);
 
       fireEvent.contextMenu(GlobalTestState.canvas, {
         button: 2,
@@ -50,6 +52,8 @@ describe("<Excalidraw/>", () => {
   describe("Test gridModeEnabled prop", () => {
     it('should show grid mode in context menu when gridModeEnabled is "undefined"', async () => {
       const { container } = await render(<Excalidraw />);
+      expect(h.state.gridSize).toBe(null);
+
       expect(
         container.getElementsByClassName("disable-zen-mode--visible").length,
       ).toBe(0);
