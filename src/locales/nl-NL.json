@@ -235,9 +235,9 @@
     "storage": "Opslag",
     "title": "Statistieken voor nerds",
     "total": "Totaal",
-    "version": "",
-    "versionCopy": "",
-    "versionNotAvailable": "",
+    "version": "Versie",
+    "versionCopy": "Klik om te kopiëren",
+    "versionNotAvailable": "Versie niet beschikbaar",
     "width": "Breedte"
   },
   "toast": {
