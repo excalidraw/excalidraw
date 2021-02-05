@@ -77,7 +77,7 @@
     "group": "Δημιουργία ομάδας από επιλογή",
     "ungroup": "Κατάργηση ομάδας από επιλογή",
     "collaborators": "Συνεργάτες",
-    "gridMode": "Εμφάνιση σε πλέγμα",
+    "showGrid": "",
     "addToLibrary": "Προσθήκη στη βιβλιοθήκη",
     "removeFromLibrary": "Αφαίρεση από τη βιβλιοθήκη",
     "libraryLoadingMessage": "Φόρτωση βιβλιοθήκης…",
