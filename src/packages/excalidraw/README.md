@@ -340,7 +340,7 @@ This prop indicates if the app is in `view mode`. When this prop is used, the `v
 
 #### `zenModeEnabled`
 
-This prop indicates if` zen mode` is enabled. When this prop is used, the `zen mode` will not show up in the context menu is so it is fully controlled by the host. The `Exit zen mode` button will also not show up if this prop is true. Also, the value of this prop if passed will be used over the value of `intialData.appState.zenModeEnabled`
+This prop indicates if `zen mode` is enabled. When this prop is used, the `zen mode` will not show up in the context menu is so it is fully controlled by the host. The `Exit zen mode` button will also not show up if this prop is true. Also, the value of this prop if passed will be used over the value of `intialData.appState.zenModeEnabled`
 
 #### `gridModeEnabled`
 
