@@ -235,14 +235,14 @@
     "storage": "Opslag",
     "title": "Statistieken voor nerds",
     "total": "Totaal",
-    "version": "",
-    "versionCopy": "",
-    "versionNotAvailable": "",
+    "version": "Versie",
+    "versionCopy": "Klik om te kopiëren",
+    "versionNotAvailable": "Versie niet beschikbaar",
     "width": "Breedte"
   },
   "toast": {
     "copyStyles": "Stijlen gekopieerd.",
-    "copyToClipboard": "",
+    "copyToClipboard": "Gekopieerd naar het klembord.",
     "copyToClipboardAsPng": "Gekopieerd naar klembord als PNG."
   }
 }
