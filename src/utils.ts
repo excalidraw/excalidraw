@@ -369,3 +369,18 @@ export const getVersion = () => {
     DEFAULT_VERSION
   );
 };
+
+// From https://github.com/Modernizr/Modernizr/blob/master/feature-detects/emoji.js
+export const supportsEmoji = () => {
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    return false;
+  }
+  const offset = 12;
+  ctx.fillStyle = "#f00";
+  ctx.textBaseline = "top";
+  ctx.font = "32px Arial";
+  ctx.fillText("\ud83d\udc28", 0, 0); // U+1F428 KOALA
+  return ctx.getImageData(offset, offset, 1, 1).data[0] !== 0;
+};
