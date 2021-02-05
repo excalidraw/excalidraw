@@ -47,8 +47,10 @@ import {
   TransformHandles,
   TransformHandleType,
 } from "../element/transformHandles";
-import { viewportCoordsToSceneCoords } from "../utils";
+import { viewportCoordsToSceneCoords, supportsEmoji } from "../utils";
 import { UserIdleState } from "../excalidraw-app/collab/types";
+
+const hasEmojiSupport = supportsEmoji();
 
 const strokeRectWithRotation = (
   context: CanvasRenderingContext2D,
@@ -449,7 +451,7 @@ export const renderScene = (
 
     const userState = sceneState.remotePointerUserStates[clientId];
     if (isOutOfBounds || userState === UserIdleState.AWAY) {
-      context.globalAlpha = 0.2;
+      context.globalAlpha = 0.48;
     }
 
     if (
@@ -481,13 +483,24 @@ export const renderScene = (
     context.stroke();
 
     const username = sceneState.remotePointerUsernames[clientId];
-    const usernameAndIdleState = `${username ? `${username} ` : ""}${
-      userState === UserIdleState.AWAY
-        ? "⚫️"
-        : userState === UserIdleState.IDLE
-        ? "💤"
-        : "🟢"
-    }`;
+    let usernameAndIdleState;
+    if (hasEmojiSupport) {
+      usernameAndIdleState = `${username ? `${username} ` : ""}${
+        userState === UserIdleState.AWAY
+          ? "⚫️"
+          : userState === UserIdleState.IDLE
+          ? "💤"
+          : "🟢"
+      }`;
+    } else {
+      usernameAndIdleState = `${username ? `${username}` : ""}${
+        userState === UserIdleState.AWAY
+          ? ` (${UserIdleState.AWAY})`
+          : userState === UserIdleState.IDLE
+          ? ` (${UserIdleState.IDLE})`
+          : ""
+      }`;
+    }
 
     if (!isOutOfBounds && usernameAndIdleState) {
       const offsetX = x + width;
