@@ -170,9 +170,6 @@ export interface ExcalidrawProps {
     appState: AppState,
   ) => void;
   initialData?: ImportedDataState | null | Promise<ImportedDataState | null>;
-  user?: {
-    name?: string | null;
-  };
   excalidrawRef?: ForwardRef<ExcalidrawAPIRefValue>;
   onCollabButtonClick?: () => void;
   isCollaborating?: boolean;
