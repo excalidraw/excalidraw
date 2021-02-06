@@ -138,7 +138,9 @@ export default function App() {
 | [`onExportToBackend`](#onExportToBackend) | Function |  | Callback triggered when link button is clicked on export dialog |
 | [`langCode`](#langCode) | string | `en` | Language code string |
 | [`renderFooter `](#renderFooter) | Function |  | Function that renders custom UI footer |
-| [`viewModeEnabled`](#viewModeEnabled) | boolean | false | This implies if the app is in view mode. |
+| [`viewModeEnabled`](#viewModeEnabled) | boolean |  | This implies if the app is in view mode. |
+| [`zenModeEnabled`](#zenModeEnabled) | boolean |  | This implies if the zen mode is enabled |
+| [`gridModeEnabled`](#gridModeEnabled) | boolean |  | This implies if the grid mode is enabled |
 
 ### `Extra API's`
 
@@ -334,4 +336,12 @@ A function that renders (returns JSX) custom UI footer. For example, you can use
 
 #### `viewModeEnabled`
 
-This prop indicates if the app is in `view mode`. When this prop is used, the `view mode` will not show up in context menu is so it is fully controlled by host. Also the value of this prop if passed will be used over the value of `intialData.appState.viewModeEnabled`
+This prop indicates whether the app is in `view mode`. When supplied, the value takes precedence over `intialData.appState.viewModeEnabled`, the `view mode` will be fully controlled by the host app, and users won't be able to toggle it from within the app.
+
+#### `zenModeEnabled`
+
+This prop indicates whether the app is in `zen mode`. When supplied, the value takes precedence over `intialData.appState.zenModeEnabled`, the `zen mode` will be fully controlled by the host app, and users won't be able to toggle it from within the app.
+
+#### `gridModeEnabled`
+
+This prop indicates whether the shows the grid. When supplied, the value takes precedence over `intialData.appState.gridModeEnabled`, the grid will be fully controlled by the host app, and users won't be able to toggle it from within the app.

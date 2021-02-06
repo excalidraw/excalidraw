@@ -27,6 +27,8 @@ const Excalidraw = (props: ExcalidrawProps) => {
     renderFooter,
     langCode = defaultLang.code,
     viewModeEnabled,
+    zenModeEnabled,
+    gridModeEnabled,
   } = props;
 
   useEffect(() => {
@@ -66,6 +68,8 @@ const Excalidraw = (props: ExcalidrawProps) => {
           renderFooter={renderFooter}
           langCode={langCode}
           viewModeEnabled={viewModeEnabled}
+          zenModeEnabled={zenModeEnabled}
+          gridModeEnabled={gridModeEnabled}
         />
       </IsMobileProvider>
     </InitializeApp>
