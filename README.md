@@ -24,7 +24,9 @@ Read the latest news and updates on our [blog](https://blog.excalidraw.com). A g
 
 If you like the project, you can become a sponsor at [Open Collective](https://opencollective.com/excalidraw).
 
-<a href="https://opencollective.com/excalidraw#category-CONTRIBUTE" target="_blank"><img src="https://opencollective.com/excalidraw/tiers/sponsors.svg?avatarHeight=70&width=600"/></a>
+<a href="https://opencollective.com/excalidraw#category-CONTRIBUTE" target="_blank"><img src="https://opencollective.com/excalidraw/tiers/sponsors.svg?avatarHeight=64"/></a>
+
+<a href="https://opencollective.com/excalidraw#category-CONTRIBUTE" target="_blank"><img src="https://opencollective.com/excalidraw/tiers/backers.svg?avatarHeight=32"/></a>
 
 ## Documentation
 
