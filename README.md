@@ -130,4 +130,4 @@ And the main source of inspiration for starting the project is the awesome [Zwib
 
 If you like the project and your company is using it you can become a contributor from [Open Collective](https://opencollective.com/excalidraw).
 
-<img src="https://opencollective.com/excalidraw/tiers/sponsors.svg?avatarHeight=70&width=600"/>
+<a href="https://opencollective.com/excalidraw#category-CONTRIBUTE" target="_blank"><img src="https://opencollective.com/excalidraw/tiers/sponsors.svg?avatarHeight=70&width=600"/></a>
