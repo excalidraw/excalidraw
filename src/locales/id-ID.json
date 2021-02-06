@@ -136,7 +136,7 @@
     "decryptFailed": "Tidak dapat mengdekripsi data.",
     "uploadedSecurly": "Pengunggahan ini telah diamankan menggunakan enkripsi end-to-end, artinya server Excalidraw dan pihak ketiga tidak data membaca nya",
     "loadSceneOverridePrompt": "Memuat gambar external akan mengganti konten Anda yang ada. Apakah Anda ingin melanjutkan?",
-    "collabStopOverridePrompt": "",
+    "collabStopOverridePrompt": "Menghentikan sesi akan menimpa gambar Anda yang tersimpan secara lokal. Anda yakin?\n\n(Jika Anda ingin menyimpan gambar lokal Anda, gantinya cukup tutup tab browser.)",
     "errorLoadingLibrary": "Terdapat kesalahan dalam memuat pustaka pihak ketiga.",
     "confirmAddLibrary": "Ini akan menambahkan {{numShapes}} bentuk ke pustaka Anda. Anda yakin?",
     "imageDoesNotContainScene": "Mengimpor gambar tidak didukung saat ini.\n\nApakah Anda ingin impor pemandangan? Gambar ini tidak berisi data pemandangan. Sudah ka Anda aktifkan ini ketika ekspor?",
@@ -235,14 +235,14 @@
     "storage": "Penyimpanan",
     "title": "Statistik untuk nerd",
     "total": "Total",
-    "version": "",
-    "versionCopy": "",
-    "versionNotAvailable": "",
+    "version": "Versi",
+    "versionCopy": "Klik untuk salin",
+    "versionNotAvailable": "Versi tidak tersedia",
     "width": "Lebar"
   },
   "toast": {
     "copyStyles": "Gaya tersalin.",
-    "copyToClipboard": "",
+    "copyToClipboard": "Tersalin ke papan klip.",
     "copyToClipboardAsPng": "Tersalin ke clipboard sebagai PNG."
   }
 }
