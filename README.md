@@ -126,7 +126,6 @@ Pull requests are welcome. For major changes, please [open an issue](https://git
 
 And the main source of inspiration for starting the project is the awesome [Zwibbler](https://zwibbler.com/demo/) app.
 
-
 ## We accept donations
 
 If you like the project and your company is using it you can become a contributor from [Open Collective](https://opencollective.com/excalidraw).
