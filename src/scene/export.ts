@@ -29,14 +29,14 @@ export const exportToCanvas = (
     viewBackgroundColor: string;
     shouldAddWatermark: boolean;
   },
-  createCanvas: (width: number, height: number) => HTMLCanvasElement = (
-    width,
-    height,
-  ) => {
+  createCanvas: (
+    width: number,
+    height: number,
+  ) => { canvas: HTMLCanvasElement; scale: number } = (width, height) => {
     const tempCanvas = document.createElement("canvas");
     tempCanvas.width = width * scale;
     tempCanvas.height = height * scale;
-    return tempCanvas;
+    return { canvas: tempCanvas, scale };
   },
 ) => {
   const sceneElements = getElementsAndWatermark(elements, shouldAddWatermark);
@@ -47,13 +47,16 @@ export const exportToCanvas = (
     shouldAddWatermark,
   );
 
-  const tempCanvas = createCanvas(width, height);
+  const { canvas: tempCanvas, scale: newScale = scale } = createCanvas(
+    width,
+    height,
+  );
 
   renderScene(
     sceneElements,
     appState,
     null,
-    scale,
+    newScale,
     rough.canvas(tempCanvas),
     tempCanvas,
     {
@@ -65,6 +68,7 @@ export const exportToCanvas = (
       remoteSelectedElementIds: {},
       shouldCacheIgnoreZoom: false,
       remotePointerUsernames: {},
+      remotePointerUserStates: {},
     },
     {
       renderScrollbars: false,

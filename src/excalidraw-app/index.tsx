@@ -39,11 +39,9 @@ import CollabWrapper, {
 } from "./collab/CollabWrapper";
 import { LanguageList } from "./components/LanguageList";
 import { exportToBackend, getCollaborationLinkData, loadScene } from "./data";
-import { loadFromFirebase } from "./data/firebase";
 import {
   importFromLocalStorage,
   saveToLocalStorage,
-  STORAGE_KEYS,
 } from "./data/localStorage";
 
 const languageDetector = new LanguageDetector();
@@ -66,50 +64,9 @@ const onBlur = () => {
   saveDebounced.flush();
 };
 
-const shouldForceLoadScene = (
-  scene: ResolutionType<typeof loadScene>,
-): boolean => {
-  if (!scene.elements.length) {
-    return true;
-  }
-
-  const roomMatch = getCollaborationLinkData(window.location.href);
-
-  if (!roomMatch) {
-    return false;
-  }
-
-  const roomId = roomMatch[1];
-
-  let collabForceLoadFlag;
-  try {
-    collabForceLoadFlag = localStorage?.getItem(
-      STORAGE_KEYS.LOCAL_STORAGE_KEY_COLLAB_FORCE_FLAG,
-    );
-  } catch {}
-
-  if (collabForceLoadFlag) {
-    try {
-      const {
-        room: previousRoom,
-        timestamp,
-      }: { room: string; timestamp: number } = JSON.parse(collabForceLoadFlag);
-      // if loading same room as the one previously unloaded within 15sec
-      //  force reload without prompting
-      if (previousRoom === roomId && Date.now() - timestamp < 15000) {
-        return true;
-      }
-    } catch {}
-  }
-  return false;
-};
-
-type Scene = ImportedDataState & { commitToHistory: boolean };
-
 const initializeScene = async (opts: {
-  resetScene: ExcalidrawImperativeAPI["resetScene"];
-  initializeSocketClient: CollabAPI["initializeSocketClient"];
-}): Promise<Scene | null> => {
+  collabAPI: CollabAPI;
+}): Promise<ImportedDataState | null> => {
   const searchParams = new URLSearchParams(window.location.search);
   const id = searchParams.get("id");
   const jsonMatch = window.location.hash.match(
@@ -120,11 +77,15 @@ const initializeScene = async (opts: {
 
   let scene = await loadScene(null, null, initialData);
 
-  let isCollabScene = !!getCollaborationLinkData(window.location.href);
-  const isExternalScene = !!(id || jsonMatch || isCollabScene);
+  let roomLinkData = getCollaborationLinkData(window.location.href);
+  const isExternalScene = !!(id || jsonMatch || roomLinkData);
   if (isExternalScene) {
     if (
-      shouldForceLoadScene(scene) ||
+      // don't prompt if scene is empty
+      !scene.elements.length ||
+      // don't prompt for collab scenes because we don't override local storage
+      roomLinkData ||
+      // otherwise, prompt whether user wants to override current scene
       window.confirm(t("alerts.loadSceneOverridePrompt"))
     ) {
       // Backwards compatibility with legacy url format
@@ -133,7 +94,7 @@ const initializeScene = async (opts: {
       } else if (jsonMatch) {
         scene = await loadScene(jsonMatch[1], jsonMatch[2], initialData);
       }
-      if (!isCollabScene) {
+      if (!roomLinkData) {
         window.history.replaceState({}, APP_NAME, window.location.origin);
       }
     } else {
@@ -150,38 +111,12 @@ const initializeScene = async (opts: {
         });
       }
 
-      isCollabScene = false;
+      roomLinkData = null;
       window.history.replaceState({}, APP_NAME, window.location.origin);
     }
   }
-  if (isCollabScene) {
-    // when joining a room we don't want user's local scene data to be merged
-    // into the remote scene
-    opts.resetScene();
-    const scenePromise = opts.initializeSocketClient();
-
-    try {
-      const [, roomId, roomKey] = getCollaborationLinkData(
-        window.location.href,
-      )!;
-      const elements = await loadFromFirebase(roomId, roomKey);
-      if (elements) {
-        return {
-          elements,
-          commitToHistory: true,
-        };
-      }
-
-      return {
-        ...(await scenePromise),
-        commitToHistory: true,
-      };
-    } catch (error) {
-      // log the error and move on. other peers will sync us the scene.
-      console.error(error);
-    }
-
-    return null;
+  if (roomLinkData) {
+    return opts.collabAPI.initializeSocketClient(roomLinkData);
   } else if (scene) {
     return scene;
   }
@@ -242,24 +177,16 @@ function ExcalidrawWrapper() {
       return;
     }
 
-    initializeScene({
-      resetScene: excalidrawAPI.resetScene,
-      initializeSocketClient: collabAPI.initializeSocketClient,
-    }).then((scene) => {
+    initializeScene({ collabAPI }).then((scene) => {
       initialStatePromiseRef.current.promise.resolve(scene);
     });
 
     const onHashChange = (_: HashChangeEvent) => {
-      if (window.location.hash.length > 1) {
-        initializeScene({
-          resetScene: excalidrawAPI.resetScene,
-          initializeSocketClient: collabAPI.initializeSocketClient,
-        }).then((scene) => {
-          if (scene) {
-            excalidrawAPI.updateScene(scene);
-          }
-        });
-      }
+      initializeScene({ collabAPI }).then((scene) => {
+        if (scene) {
+          excalidrawAPI.updateScene(scene);
+        }
+      });
     };
 
     const titleTimeout = setTimeout(
@@ -285,9 +212,13 @@ function ExcalidrawWrapper() {
     elements: readonly ExcalidrawElement[],
     appState: AppState,
   ) => {
-    saveDebounced(elements, appState);
-    if (collabAPI?.isCollaborating) {
+    if (collabAPI?.isCollaborating()) {
       collabAPI.broadcastElements(elements);
+    } else {
+      // collab scenes are persisted to the server, so we don't have to persist
+      // them locally, which has the added benefit of not overwriting whatever
+      // the user was working on before joining
+      saveDebounced(elements, appState);
     }
   };
 
@@ -352,7 +283,7 @@ function ExcalidrawWrapper() {
         initialData={initialStatePromiseRef.current.promise}
         user={{ name: collabAPI?.username }}
         onCollabButtonClick={collabAPI?.onCollabButtonClick}
-        isCollaborating={collabAPI?.isCollaborating}
+        isCollaborating={collabAPI?.isCollaborating()}
         onPointerUpdate={collabAPI?.onPointerUpdate}
         onExportToBackend={onExportToBackend}
         renderFooter={renderFooter}

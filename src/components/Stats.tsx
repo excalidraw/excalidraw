@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { copyTextToSystemClipboard } from "../clipboard";
+import { DEFAULT_VERSION } from "../constants";
 import { getCommonBounds } from "../element/bounds";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import {
@@ -9,7 +11,7 @@ import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
 import { getTargetElements } from "../scene";
 import { AppState } from "../types";
-import { debounce, nFormatter } from "../utils";
+import { debounce, getVersion, nFormatter } from "../utils";
 import { close } from "./icons";
 import { Island } from "./Island";
 import "./Stats.scss";
@@ -25,6 +27,7 @@ const getStorageSizes = debounce((cb: (sizes: StorageSizes) => void) => {
 
 export const Stats = (props: {
   appState: AppState;
+  setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
   onClose: () => void;
 }) => {
@@ -48,6 +51,17 @@ export const Stats = (props: {
 
   if (isMobile && props.appState.openMenu) {
     return null;
+  }
+
+  const version = getVersion();
+  let hash;
+  let timestamp;
+
+  if (version !== DEFAULT_VERSION) {
+    timestamp = version.slice(0, 16).replace("T", " ");
+    hash = version.slice(21);
+  } else {
+    timestamp = t("stats.versionNotAvailable");
   }
 
   return (
@@ -156,6 +170,28 @@ export const Stats = (props: {
                 </td>
               </tr>
             )}
+            <tr>
+              <th colSpan={2}>{t("stats.version")}</th>
+            </tr>
+            <tr>
+              <td
+                colSpan={2}
+                style={{ textAlign: "center", cursor: "pointer" }}
+                onClick={async () => {
+                  try {
+                    await copyTextToSystemClipboard(getVersion());
+                    props.setAppState({
+                      toastMessage: t("toast.copyToClipboard"),
+                    });
+                  } catch {}
+                }}
+                title={t("stats.versionCopy")}
+              >
+                {timestamp}
+                <br />
+                {hash}
+              </td>
+            </tr>
           </tbody>
         </table>
       </Island>
