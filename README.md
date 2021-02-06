@@ -91,7 +91,7 @@ git clone https://github.com/excalidraw/excalidraw.git
 #### Commands
 
 | Command               | Description                       |
-|-----------------------|-----------------------------------|
+| --------------------- | --------------------------------- |
 | `npm install`         | Install the dependencies          |
 | `npm start`           | Run the project                   |
 | `npm run fix`         | Reformat all files with Prettier  |
