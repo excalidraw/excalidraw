@@ -33,6 +33,10 @@ export type Collaborator = {
   selectedElementIds?: AppState["selectedElementIds"];
   username?: string | null;
   userState?: UserIdleState;
+  color?: {
+    background: string;
+    stroke: string;
+  };
 };
 
 export type AppState = {
@@ -166,9 +170,6 @@ export interface ExcalidrawProps {
     appState: AppState,
   ) => void;
   initialData?: ImportedDataState | null | Promise<ImportedDataState | null>;
-  user?: {
-    name?: string | null;
-  };
   excalidrawRef?: ForwardRef<ExcalidrawAPIRefValue>;
   onCollabButtonClick?: () => void;
   isCollaborating?: boolean;

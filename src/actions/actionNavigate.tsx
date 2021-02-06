@@ -42,7 +42,7 @@ export const actionGoToCollaborator = register({
       return null;
     }
 
-    const { background, stroke } = getClientColors(clientId);
+    const { background, stroke } = getClientColors(clientId, appState);
     const shortName = getClientInitials(collaborator.username);
 
     return (
