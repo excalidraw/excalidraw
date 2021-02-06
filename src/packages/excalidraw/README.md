@@ -336,12 +336,12 @@ A function that renders (returns JSX) custom UI footer. For example, you can use
 
 #### `viewModeEnabled`
 
-This prop indicates if the app is in `view mode`. When this prop is used, the `view mode` will not show up in context menu is so it is fully controlled by host. Also the value of this prop if passed will be used over the value of `intialData.appState.viewModeEnabled`
+This prop indicates whether the app is in `view mode`. When supplied, the value takes precedence over `intialData.appState.viewModeEnabled`, the `view mode` will be fully controlled by the host app, and users won't be able to toggle it from within the app.
 
 #### `zenModeEnabled`
 
-This prop indicates if `zen mode` is enabled. When this prop is used, the `zen mode` will not show up in the context menu is so it is fully controlled by the host. The `Exit zen mode` button will also not show up if this prop is true. Also, the value of this prop if passed will be used over the value of `intialData.appState.zenModeEnabled`
+This prop indicates whether the app is in `zen mode`. When supplied, the value takes precedence over `intialData.appState.zenModeEnabled`, the `zen mode` will be fully controlled by the host app, and users won't be able to toggle it from within the app.
 
 #### `gridModeEnabled`
 
-This prop indicates if `grid mode` is enabled. When this prop is used, the `grid mode` will not show up in the context menu is so it is fully controlled by the host. Also, the value of this prop if passed will be used over the value of `intialData.appState.gridModeEnabled`
+This prop indicates whether the shows the grid. When supplied, the value takes precedence over `intialData.appState.gridModeEnabled`, the grid will be fully controlled by the host app, and users won't be able to toggle it from within the app.
