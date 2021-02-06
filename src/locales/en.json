@@ -238,7 +238,10 @@
     "version": "Version",
     "versionCopy": "Click to copy",
     "versionNotAvailable": "Version not available",
-    "width": "Width"
+    "width": "Width",
+    "collaboration": "Collaboration",
+    "networkSpeed": "Network Speed",
+    "collaborators": "Collaborators"
   },
   "toast": {
     "copyStyles": "Copied styles.",

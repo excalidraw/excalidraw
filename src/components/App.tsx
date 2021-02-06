@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Point, simplify } from "points-on-curve";
 import React from "react";
 import { RoughCanvas } from "roughjs/bin/canvas";
@@ -182,6 +183,7 @@ import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
+import { getNetworkSpeed } from "../networkStats";
 
 const { history } = createHistory();
 
@@ -461,6 +463,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             setAppState={this.setAppState}
             elements={this.scene.getElements()}
             onClose={this.toggleStats}
+            isCollaborating={this.props.isCollaborating}
           />
         )}
         {this.state.toastMessage !== null && (
@@ -845,6 +848,21 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.addEventListeners();
     }
 
+    if (
+      prevState.showStats !== this.state.showStats ||
+      prevProps.isCollaborating !== this.props.isCollaborating
+    ) {
+      if (this.state.showStats && this.props.isCollaborating) {
+        this.calculateNetStats();
+        navigator.connection.addEventListener("change", this.calculateNetStats);
+      } else {
+        navigator.connection.removeEventListener(
+          "change",
+          this.calculateNetStats,
+        );
+      }
+    }
+
     document
       .querySelector(".excalidraw")
       ?.classList.toggle("Appearance_dark", this.state.appearance === "dark");
@@ -970,6 +988,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
   }
 
+  private calculateNetStats = async () => {
+    const speed = await getNetworkSpeed();
+    const networkSpeed = speed === -1 ? "Error!" : speed;
+    this.setState({ networkSpeed });
+  };
   // Copy/paste
 
   private onCut = withBatchedUpdates((event: ClipboardEvent) => {
