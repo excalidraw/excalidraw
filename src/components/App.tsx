@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Point, simplify } from "points-on-curve";
 import React from "react";
 import { RoughCanvas } from "roughjs/bin/canvas";
@@ -854,9 +853,15 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     ) {
       if (this.state.showStats && this.props.isCollaborating) {
         this.calculateNetStats();
-        navigator.connection.addEventListener("change", this.calculateNetStats);
+
+        // @ts-ignore
+        navigator?.connection?.addEventListener(
+          "change",
+          this.calculateNetStats,
+        );
       } else {
-        navigator.connection.removeEventListener(
+        // @ts-ignore
+        navigator?.connection?.removeEventListener(
           "change",
           this.calculateNetStats,
         );
@@ -990,7 +995,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private calculateNetStats = async () => {
     const speed = await getNetworkSpeed();
-    const networkSpeed = speed === -1 ? "Error!" : speed;
+    const networkSpeed = speed === "-1" ? "Error!" : speed;
     this.setState({ networkSpeed });
   };
   // Copy/paste

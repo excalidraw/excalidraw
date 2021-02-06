@@ -30,7 +30,7 @@ export const Stats = (props: {
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
   onClose: () => void;
-  isCollaborating: boolean;
+  isCollaborating?: boolean;
 }) => {
   const isMobile = useIsMobile();
   const [storageSizes, setStorageSizes] = useState<StorageSizes>({

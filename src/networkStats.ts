@@ -14,7 +14,7 @@ const calculateSpeed = (startTime: number, endTime: number) => {
   return `${speed.toFixed(2)} ${suffix[index]}`;
 };
 
-const processImage = () => {
+const processImage = (): Promise<string> => {
   return new Promise((resolve, reject) => {
     const image = new Image();
     let endTime: number;
@@ -25,13 +25,13 @@ const processImage = () => {
     };
 
     image.onerror = () => {
-      resolve(-1);
+      resolve("-1");
     };
 
     const startTime = new Date().getTime();
     image.src = `${IMAGE_URL}?t=${startTime}`; // start time acts as a cache buster so everytime new url is requested
   });
 };
-export const getNetworkSpeed = async () => {
+export const getNetworkSpeed = async (): Promise<string> => {
   return await processImage();
 };
