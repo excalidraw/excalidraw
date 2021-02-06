@@ -77,7 +77,7 @@
     "group": "Segrew tafrayt",
     "ungroup": "Kkess asegrew i tefrayt",
     "collaborators": "Imɛiwnen",
-    "showGrid": "",
+    "showGrid": "Beqqeḍ aferrug",
     "addToLibrary": "Rnu ɣer temkarḍit",
     "removeFromLibrary": "Kkes si temkarḍit",
     "libraryLoadingMessage": "Asali n temkarḍit…",
@@ -130,7 +130,7 @@
     "couldNotCreateShareableLink": "D awezɣi asnulfu n useɣwen n beṭṭu.",
     "couldNotCreateShareableLinkTooBig": "D awezɣi asnulfu n useɣwen n beṭṭu. Asayes ɣezzif aṭas",
     "couldNotLoadInvalidFile": "D awezɣi asali n ufaylu armeɣtu",
-    "importBackendFailed": "",
+    "importBackendFailed": "Takterḍ seg uɣawas n deffir ur teddi ara.",
     "cannotExportEmptyCanvas": "D awezɣi asifeḍ n teɣzut n usuneɣ tilemt.",
     "couldNotCopyToClipboard": "D awezɣi anɣal ɣer tecfawit. Eɛreḍ ad tesqedceḍ iminig Chrome.",
     "decryptFailed": "D awezɣi tukksa n uwgelhen i yisefka.",
@@ -184,7 +184,7 @@
     "clearCanvasCaveat": " Ayagi ad d-iglu s usṛuḥu n umahil ",
     "trackedToSentry_pre": "Tuccḍa akked umesmagi ",
     "trackedToSentry_post": " tettwasekles deg unagraw-nneɣ.",
-    "openIssueMessage_pre": "",
+    "openIssueMessage_pre": "Nḥuder aṭas akken ur nseddu ara talɣut n usayes-inek (m) di tuccḍa. Ma yella asayes-inek (m) mačči d amaẓlay, ttxil-k (m) xemmem ad ḍefreḍ ",
     "openIssueMessage_button": "afecku n weḍfar n yibugen.",
     "openIssueMessage_post": " Ma ulac uɣilif seddu talɣut ukessar-agi s wenɣal akked usenṭeḍ di GitHub issue.",
     "sceneContent": "Agbur n usayes:"
@@ -242,7 +242,7 @@
   },
   "toast": {
     "copyStyles": "Iɣunab yettwaneɣlen.",
-    "copyToClipboard": "",
+    "copyToClipboard": "Yettwaɣel ɣer tecfawit.",
     "copyToClipboardAsPng": "Yettwanɣel ɣer tecfawit am PNG."
   }
 }
