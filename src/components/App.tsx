@@ -51,6 +51,7 @@ import {
   GRID_SIZE,
   LINE_CONFIRM_THRESHOLD,
   MIME_TYPES,
+  NETWORK_SPEED_THRESHOLD,
   POINTER_BUTTON,
   TAP_TWICE_TIMEOUT,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
@@ -290,6 +291,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     height: window.innerHeight,
   };
   private scene: Scene;
+  private netStatsIntervalId?: any;
   constructor(props: ExcalidrawProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
@@ -750,6 +752,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.removeEventListeners();
     this.scene.destroy();
     clearTimeout(touchTimeout);
+    clearTimeout(this.netStatsIntervalId);
     touchTimeout = 0;
   }
 
@@ -894,6 +897,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           "change",
           this.calculateNetStats,
         );
+        clearTimeout(this.netStatsIntervalId);
       }
     }
 
@@ -1023,9 +1027,17 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   }
 
   private calculateNetStats = async () => {
+    if (!this.state.showStats || !this.props.isCollaborating) {
+      clearTimeout(this.netStatsIntervalId);
+      return;
+    }
     const speed = await getNetworkSpeed();
     const networkSpeed = speed === "-1" ? "Error!" : speed;
     this.setState({ networkSpeed });
+    this.netStatsIntervalId = setTimeout(
+      this.calculateNetStats,
+      NETWORK_SPEED_THRESHOLD,
+    );
   };
   // Copy/paste
 
