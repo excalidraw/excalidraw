@@ -171,6 +171,21 @@ export const Stats = (props: {
                 </td>
               </tr>
             )}
+            {props.isCollaborating ? (
+              <>
+                <tr>
+                  <th colSpan={2}>{t("stats.collaboration")}</th>
+                </tr>
+                <tr>
+                  <td>{t("stats.collaborators")}</td>
+                  <td>{props.appState.collaborators.size}</td>
+                </tr>
+                <tr>
+                  <td>{t("stats.networkSpeed")}</td>
+                  <td>{props.appState.networkSpeed}</td>
+                </tr>
+              </>
+            ) : null}
             <tr>
               <th colSpan={2}>{t("stats.version")}</th>
             </tr>
@@ -193,21 +208,6 @@ export const Stats = (props: {
                 {hash}
               </td>
             </tr>
-            {props.isCollaborating ? (
-              <>
-                <tr>
-                  <th colSpan={2}>{t("stats.collaboration")}</th>
-                </tr>
-                <tr>
-                  <td>{t("stats.collaborators")}</td>
-                  <td>{props.appState.collaborators.size}</td>
-                </tr>
-                <tr>
-                  <td>{t("stats.networkSpeed")}</td>
-                  <td>{props.appState.networkSpeed}</td>
-                </tr>
-              </>
-            ) : null}
           </tbody>
         </table>
       </Island>
