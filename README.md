@@ -20,6 +20,12 @@ Go to [excalidraw.com](https://excalidraw.com) to start sketching.
 
 Read the latest news and updates on our [blog](https://blog.excalidraw.com). A good start is to see all the updates of [One Year of Excalidraw](https://blog.excalidraw.com/one-year-of-excalidraw/).
 
+## We accept donations
+
+If you like the project and your company is using it you can become a contributor from [open collective](https://opencollective.com/excalidraw).
+
+<a href="https://opencollective.com/excalidraw#category-CONTRIBUTE" target="_blank"><img src="https://opencollective.com/excalidraw/tiers/sponsors.svg?avatarHeight=70&width=600"/></a>
+
 ## Documentation
 
 ### Shortcuts
@@ -126,9 +132,3 @@ Pull requests are welcome. For major changes, please [open an issue](https://git
 - [Vercel](https://vercel.com)
 
 And the main source of inspiration for starting the project is the awesome [Zwibbler](https://zwibbler.com/demo/) app.
-
-## We accept donations
-
-If you like the project and your company is using it you can become a contributor from [open collective](https://opencollective.com/excalidraw).
-
-<a href="https://opencollective.com/excalidraw#category-CONTRIBUTE" target="_blank"><img src="https://opencollective.com/excalidraw/tiers/sponsors.svg?avatarHeight=70&width=600"/></a>
