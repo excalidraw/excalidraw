@@ -11,6 +11,7 @@
       <img src="https://badges.crowdin.net/excalidraw/localized.svg">
     </a>
   </p>
+  <p>Ask questions or hang out on our <a target="_blank" href="https://discord.gg/UexuTaE">discord.gg/UexuTaE</a>.</p>
 </div>
 
 ## Try it now
@@ -18,6 +19,14 @@
 Go to [excalidraw.com](https://excalidraw.com) to start sketching.
 
 Read the latest news and updates on our [blog](https://blog.excalidraw.com). A good start is to see all the updates of [One Year of Excalidraw](https://blog.excalidraw.com/one-year-of-excalidraw/).
+
+## We accept donations
+
+If you like the project, you can become a sponsor at [Open Collective](https://opencollective.com/excalidraw).
+
+<a href="https://opencollective.com/excalidraw#category-CONTRIBUTE" target="_blank"><img src="https://opencollective.com/excalidraw/tiers/sponsors.svg?avatarHeight=64"/></a>
+
+<a href="https://opencollective.com/excalidraw#category-CONTRIBUTE" target="_blank"><img src="https://opencollective.com/excalidraw/tiers/backers.svg?avatarHeight=32"/></a>
 
 ## Documentation
 
