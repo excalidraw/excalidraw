@@ -8,11 +8,11 @@
     "cut": "Изрежи",
     "copy": "Копирай",
     "copyAsPng": "Копиране в клипборда",
-    "copyAsSvg": "Копиране в клипборда",
-    "bringForward": "Преместване на~пред",
+    "copyAsSvg": "Копирано в клипборда като SVG",
+    "bringForward": "Преместване напред",
     "sendToBack": "Изнасяне назад",
-    "bringToFront": "~Изнасяне отпред",
-    "sendBackward": "Изпрати назад",
+    "bringToFront": "Изнасяне отпред",
+    "sendBackward": "Изпрати отзад",
     "delete": "Изтрий",
     "copyStyles": "Копирайте стилове",
     "pasteStyles": "Постави стилове",
@@ -236,13 +236,13 @@
     "title": "Статистика за хакери",
     "total": "Общо",
     "version": "Версия",
-    "versionCopy": "",
-    "versionNotAvailable": "",
+    "versionCopy": "Настисни за да копираш",
+    "versionNotAvailable": "Версията не е налична",
     "width": "Широчина"
   },
   "toast": {
-    "copyStyles": "",
-    "copyToClipboard": "",
-    "copyToClipboardAsPng": ""
+    "copyStyles": "Копирани стилове.",
+    "copyToClipboard": "Копирано в клипборда.",
+    "copyToClipboardAsPng": "Копирано в клипборда като PNG."
   }
 }
