@@ -80,7 +80,14 @@ const initializeScene = async (opts: {
   let roomLinkData = getCollaborationLinkData(window.location.href);
   const isExternalScene = !!(id || jsonMatch || roomLinkData);
   if (isExternalScene) {
-    if (roomLinkData || window.confirm(t("alerts.loadSceneOverridePrompt"))) {
+    if (
+      // don't prompt if scene is empty
+      !scene.elements.length ||
+      // don't prompt for collab scenes because we don't override local storage
+      roomLinkData ||
+      // otherwise, prompt whether user wants to override current scene
+      window.confirm(t("alerts.loadSceneOverridePrompt"))
+    ) {
       // Backwards compatibility with legacy url format
       if (id) {
         scene = await loadScene(id, null, initialData);

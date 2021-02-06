@@ -48,6 +48,7 @@ import {
   ELEMENT_TRANSLATE_AMOUNT,
   ENV,
   EVENT,
+  GRID_SIZE,
   LINE_CONFIRM_THRESHOLD,
   MIME_TYPES,
   POINTER_BUTTON,
@@ -300,6 +301,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       offsetTop,
       excalidrawRef,
       viewModeEnabled = false,
+      zenModeEnabled = false,
+      gridModeEnabled = false,
     } = props;
     this.state = {
       ...defaultAppState,
@@ -308,6 +311,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       height,
       ...this.getCanvasOffsets({ offsetLeft, offsetTop }),
       viewModeEnabled,
+      zenModeEnabled,
+      gridSize: gridModeEnabled ? GRID_SIZE : null,
     };
     if (excalidrawRef) {
       const readyPromise =
@@ -454,6 +459,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           onExportToBackend={onExportToBackend}
           renderCustomFooter={renderFooter}
           viewModeEnabled={viewModeEnabled}
+          showExitZenModeBtn={
+            typeof this.props?.zenModeEnabled === "undefined" && zenModeEnabled
+          }
         />
         <div className="excalidraw-textEditorContainer" />
         {this.state.showStats && (
@@ -513,9 +521,19 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         }
 
         let viewModeEnabled = actionResult?.appState?.viewModeEnabled || false;
+        let zenModeEnabled = actionResult?.appState?.zenModeEnabled || false;
+        let gridSize = actionResult?.appState?.gridSize || null;
 
         if (typeof this.props.viewModeEnabled !== "undefined") {
           viewModeEnabled = this.props.viewModeEnabled;
+        }
+
+        if (typeof this.props.zenModeEnabled !== "undefined") {
+          zenModeEnabled = this.props.zenModeEnabled;
+        }
+
+        if (typeof this.props.gridModeEnabled !== "undefined") {
+          gridSize = this.props.gridModeEnabled ? GRID_SIZE : null;
         }
 
         this.setState(
@@ -528,6 +546,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             offsetTop: state.offsetTop,
             offsetLeft: state.offsetLeft,
             viewModeEnabled,
+            zenModeEnabled,
+            gridSize,
           }),
           () => {
             if (actionResult.syncHistory) {
@@ -847,6 +867,15 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.addEventListeners();
     }
 
+    if (prevProps.zenModeEnabled !== this.props.zenModeEnabled) {
+      this.setState({ zenModeEnabled: !!this.props.zenModeEnabled });
+    }
+
+    if (prevProps.gridModeEnabled !== this.props.gridModeEnabled) {
+      this.setState({
+        gridSize: this.props.gridModeEnabled ? GRID_SIZE : null,
+      });
+    }
     if (
       prevState.showStats !== this.state.showStats ||
       prevProps.isCollaborating !== this.props.isCollaborating
@@ -3745,8 +3774,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             separator,
           actionSelectAll,
           separator,
-          actionToggleGridMode,
-          actionToggleZenMode,
+          typeof this.props.gridModeEnabled === "undefined" &&
+            actionToggleGridMode,
+          typeof this.props.zenModeEnabled === "undefined" &&
+            actionToggleZenMode,
           typeof this.props.viewModeEnabled === "undefined" &&
             actionToggleViewMode,
           actionToggleStats,

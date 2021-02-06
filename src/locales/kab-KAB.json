@@ -136,6 +136,7 @@
     "decryptFailed": "D awezɣi tukksa n uwgelhen i yisefka.",
     "uploadedSecurly": "Asili yettwasɣelles s uwgelhen ixef s ixef, ayagi yebɣa ad d-yini belli aqeddac n Excalidraw akked medden ur zmiren ara ad ɣren agbur.",
     "loadSceneOverridePrompt": "Asali n wunuɣ uffiɣ ad isemselsi agbur-inek (m) yellan. Tebɣiḍ ad tkemmeleḍ?",
+    "collabStopOverridePrompt": "",
     "errorLoadingLibrary": "Teḍra-d tuccḍa deg usali n temkarḍit n wis kraḍ.",
     "confirmAddLibrary": "Ayagi adirnu talɣa (win) {{numShapes}} ɣer temkarḍit-inek (m). Tetḥeqqeḍ?",
     "imageDoesNotContainScene": "Taktert n tugniwin ur tettwadhel ara akka tura.\nTebɣiḍ ad tketreḍ asayes? Tugna-agi tettban-d ur tegbir ara isefka n usnas. Tesremdeḍ ayagi deg usifeḍ?",
@@ -234,10 +235,14 @@
     "storage": "Aḥraz",
     "title": "",
     "total": "Aɣrud",
+    "version": "Alqem",
+    "versionCopy": "Sit ad tneɣleḍ",
+    "versionNotAvailable": "Ur inuḥ ulqem",
     "width": "Tehri"
   },
   "toast": {
     "copyStyles": "Iɣunab yettwaneɣlen.",
+    "copyToClipboard": "",
     "copyToClipboardAsPng": "Yettwanɣel ɣer tecfawit am PNG."
   }
 }
