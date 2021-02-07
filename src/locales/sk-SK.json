@@ -243,6 +243,8 @@
   "toast": {
     "copyStyles": "Štýly skopírované.",
     "copyToClipboard": "Skopírované do schránky.",
-    "copyToClipboardAsPng": "Skopírované do schránky ako PNG."
+    "copyToClipboardAsPng": "Skopírované do schránky ako PNG.",
+    "fileSaved": "",
+    "fileSavedToFilename": ""
   }
 }
