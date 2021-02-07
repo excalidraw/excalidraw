@@ -7,6 +7,7 @@ import { register } from "./register";
 import { allowFullScreen, exitFullScreen, isFullScreen } from "../utils";
 import { CODES, KEYS } from "../keys";
 import { HelpIcon } from "../components/HelpIcon";
+import { MiniMap } from "../components/MiniMap";
 
 export const actionToggleCanvasMenu = register({
   name: "toggleCanvasMenu",
@@ -83,4 +84,22 @@ export const actionShortcuts = register({
     <HelpIcon title={t("helpDialog.title")} onClick={updateData} />
   ),
   keyTest: (event) => event.key === KEYS.QUESTION_MARK,
+});
+
+export const actionMinimap = register({
+  name: "toggleMinimap",
+  perform: (_elements, appState) => {
+    return {
+      appState: {
+        ...appState,
+        isMinimapEnabled: !appState.isMinimapEnabled,
+      },
+      commitToHistory: false,
+    };
+  },
+  PanelComponent: ({ appState, elements }) =>
+    appState.isMinimapEnabled ? (
+      <MiniMap appState={appState} elements={getNonDeletedElements(elements)} />
+    ) : null,
+  keyTest: (event) => event.key === KEYS.M,
 });

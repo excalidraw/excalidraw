@@ -41,7 +41,6 @@ import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { Tooltip } from "./Tooltip";
 import { UserList } from "./UserList";
-import { MiniMap } from "./MiniMap";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -603,7 +602,7 @@ const LayerUI = ({
       >
         {renderCustomFooter?.(false)}
         {actionManager.renderAction("toggleShortcuts")}
-        <MiniMap appState={appState} elements={elements} />
+        {actionManager.renderAction("toggleMinimap")}
       </div>
       <button
         className={clsx("disable-zen-mode", {

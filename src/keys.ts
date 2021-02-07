@@ -43,6 +43,7 @@ export const KEYS = {
   D: "d",
   E: "e",
   L: "l",
+  M: "m",
   O: "o",
   P: "p",
   Q: "q",

@@ -44,6 +44,7 @@ export {
   actionToggleEditMenu,
   actionFullScreen,
   actionShortcuts,
+  actionMinimap,
 } from "./actionMenu";
 
 export { actionGroup, actionUngroup } from "./actionGroup";
