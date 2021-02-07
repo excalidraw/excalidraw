@@ -243,6 +243,8 @@
   "toast": {
     "copyStyles": "Копирани стилове.",
     "copyToClipboard": "Копирано в клипборда.",
-    "copyToClipboardAsPng": "Копирано в клипборда като PNG."
+    "copyToClipboardAsPng": "Копирано в клипборда като PNG.",
+    "fileSaved": "",
+    "fileSavedToFilename": ""
   }
 }
