@@ -1,5 +1,5 @@
-const IMAGE_URL = `${process.env.REACT_APP_SOCKET_SERVER_URL}/test128.png`;
-const IMAGE_SIZE_BYTES = 35747;
+const IMAGE_URL = `${process.env.REACT_APP_SOCKET_SERVER_URL}/test256.png`;
+const IMAGE_SIZE_BYTES = 141978;
 
 const calculateSpeed = (startTime: number, endTime: number) => {
   const duration = (endTime - startTime) / 1000;
