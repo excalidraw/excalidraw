@@ -76,7 +76,7 @@
     "madeWithExcalidraw": "Made with Excalidraw",
     "group": "Auswahl gruppieren",
     "ungroup": "Gruppierung aufheben",
-    "collaborators": "Mitarbeitende",
+    "collaborators": "Kollaboratoren",
     "showGrid": "Raster anzeigen",
     "addToLibrary": "Zur Bibliothek hinzufügen",
     "removeFromLibrary": "Aus Bibliothek entfernen",
@@ -244,7 +244,7 @@
     "copyStyles": "Formatierung kopiert.",
     "copyToClipboard": "In die Zwischenablage kopiert.",
     "copyToClipboardAsPng": "In die Zwischenablage als PNG kopiert.",
-    "fileSaved": "",
-    "fileSavedToFilename": ""
+    "fileSaved": "Datei gespeichert.",
+    "fileSavedToFilename": "Als {filename} gespeichert"
   }
 }
