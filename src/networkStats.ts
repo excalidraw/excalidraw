@@ -1,5 +1,19 @@
 const IMAGE_URL = `${process.env.REACT_APP_SOCKET_SERVER_URL}/test256.png`;
 const IMAGE_SIZE_BITS = 141978 * 8;
+const AVERAGE_MAX = 4;
+
+const speedHistory: number[] = [];
+
+const pushSpeed = (speed: number): void => {
+  speedHistory.push(speed);
+  if (speedHistory.length > AVERAGE_MAX) {
+    speedHistory.shift();
+  }
+};
+
+const getAverageSpeed = (): number => {
+  return speedHistory.reduce((a, b) => a + b) / speedHistory.length;
+};
 
 const getSpeedBits = (
   imageSize: number,
@@ -20,7 +34,8 @@ const processImage = (): Promise<number> => {
     image.onload = () => {
       endTime = new Date().getTime();
       const speed = getSpeedBits(IMAGE_SIZE_BITS, startTime, endTime);
-      resolve(speed);
+      pushSpeed(speed);
+      resolve(getAverageSpeed());
     };
 
     image.onerror = () => {
@@ -31,6 +46,7 @@ const processImage = (): Promise<number> => {
     image.src = `${IMAGE_URL}?t=${startTime}`;
   });
 };
+
 export const getNetworkSpeed = async (): Promise<number> => {
   return await processImage();
 };
