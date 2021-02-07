@@ -243,6 +243,8 @@
   "toast": {
     "copyStyles": "Kopierade stilar.",
     "copyToClipboard": "Kopierad till urklipp.",
-    "copyToClipboardAsPng": "Kopierat till urklipp som PNG."
+    "copyToClipboardAsPng": "Kopierat till urklipp som PNG.",
+    "fileSaved": "",
+    "fileSavedToFilename": ""
   }
 }
