@@ -243,6 +243,8 @@
   "toast": {
     "copyStyles": "已複製樣式",
     "copyToClipboard": "複製至剪貼簿。",
-    "copyToClipboardAsPng": "已複製 PNG 至剪貼簿"
+    "copyToClipboardAsPng": "已複製 PNG 至剪貼簿",
+    "fileSaved": "",
+    "fileSavedToFilename": ""
   }
 }
