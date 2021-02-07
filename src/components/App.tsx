@@ -884,16 +884,21 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       prevState.showStats !== this.state.showStats ||
       prevProps.isCollaborating !== this.props.isCollaborating
     ) {
+      const navigator: Navigator & {
+        connection?: {
+          addEventListener: Function;
+          removeEventListener: Function;
+        };
+      } = window.navigator;
+
       if (this.state.showStats && this.props.isCollaborating) {
         this.calculateNetStats();
 
-        // @ts-ignore
         navigator?.connection?.addEventListener(
           "change",
           this.calculateNetStats,
         );
       } else {
-        // @ts-ignore
         navigator?.connection?.removeEventListener(
           "change",
           this.calculateNetStats,
