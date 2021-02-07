@@ -1,33 +1,16 @@
 import "./MiniMap.scss";
 
 import React, { useEffect, useRef } from "react";
-import { unmountComponentAtNode, render } from "react-dom";
-import { canvasToBlob } from "../data/blob";
 import { getCommonBounds } from "../element";
 import { NonDeletedExcalidrawElement } from "../element/types";
-import { CanvasError } from "../errors";
 import { exportToCanvas } from "../scene/export";
 import { AppState } from "../types";
 import { distance, viewportCoordsToSceneCoords } from "../utils";
-import { ErrorCanvasPreview } from "./ExportDialog";
 import { Island } from "./Island";
 
 const RATIO = 1.2;
 const MINIMAP_HEIGHT = 150;
 const MINIMAP_WIDTH = MINIMAP_HEIGHT * RATIO;
-
-const renderPreview = (
-  content: HTMLCanvasElement | Error,
-  previewNode: HTMLDivElement,
-) => {
-  unmountComponentAtNode(previewNode);
-  previewNode.innerHTML = "";
-  if (content instanceof HTMLCanvasElement) {
-    previewNode.appendChild(content);
-  } else {
-    render(<ErrorCanvasPreview />, previewNode);
-  }
-};
 
 const MinimapViewport = ({
   elements,
@@ -40,10 +23,11 @@ const MinimapViewport = ({
     return null;
   }
 
-  const [minX, minY, canvasWidth, canvasHeight] = getCanvasSize(elements);
+  const [minX, minY, maxX, maxY] = getCommonBounds(elements);
+
   const minimapScale = Math.min(
-    MINIMAP_WIDTH / canvasWidth,
-    MINIMAP_HEIGHT / canvasHeight,
+    MINIMAP_WIDTH / distance(minX, maxX),
+    MINIMAP_HEIGHT / distance(minY, maxY),
   );
 
   const leftTop = viewportCoordsToSceneCoords(
@@ -60,6 +44,20 @@ const MinimapViewport = ({
   const width = (rightBot.x - leftTop.x) * minimapScale;
   const height = (rightBot.y - leftTop.y) * minimapScale;
 
+  // Set viewport boundaries
+  const viewportTop = Math.min(Math.max(0, top), MINIMAP_HEIGHT);
+  const viewportLeft = Math.min(Math.max(0, left), MINIMAP_WIDTH);
+  const viewportWidth = Math.min(
+    MINIMAP_WIDTH - viewportLeft,
+    width,
+    width + left,
+  );
+  const viewportHeight = Math.min(
+    MINIMAP_HEIGHT - viewportTop,
+    height,
+    height + top,
+  );
+
   return (
     <div
       style={{
@@ -67,23 +65,13 @@ const MinimapViewport = ({
         boxSizing: "border-box",
         position: "absolute",
         pointerEvents: "none",
-        top: Math.max(0, top),
-        left: Math.max(0, left),
-        width: Math.min(MINIMAP_WIDTH - Math.max(0, left), width),
-        height: Math.min(MINIMAP_HEIGHT - Math.max(0, top), height),
+        top: viewportTop,
+        left: viewportLeft,
+        width: viewportWidth,
+        height: viewportHeight,
       }}
     />
   );
-};
-
-const getCanvasSize = (
-  elements: readonly NonDeletedExcalidrawElement[],
-): [number, number, number, number] => {
-  const [minX, minY, maxX, maxY] = getCommonBounds(elements);
-  const width = distance(minX, maxX);
-  const height = distance(minY, maxY);
-
-  return [minX, minY, width, height];
 };
 
 export function MiniMap({
@@ -93,20 +81,16 @@ export function MiniMap({
   appState: AppState;
   elements: readonly NonDeletedExcalidrawElement[];
 }) {
-  const previewRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const appStateRef = useRef<AppState>(appState);
   appStateRef.current = appState;
 
   useEffect(() => {
-    const previewNode = previewRef.current;
-    if (!previewNode) {
+    const canvasNode = canvasRef.current;
+    if (!canvasNode) {
       return;
     }
-    if (elements.length === 0) {
-      unmountComponentAtNode(previewNode);
-      previewNode.innerHTML = "";
-    }
-    const canvas = exportToCanvas(
+    exportToCanvas(
       elements,
       appStateRef.current,
       {
@@ -115,26 +99,16 @@ export function MiniMap({
         shouldAddWatermark: false,
       },
       (width, height) => {
-        const tempCanvas = document.createElement("canvas");
         const scale = Math.min(MINIMAP_WIDTH / width, MINIMAP_HEIGHT / height);
-        tempCanvas.width = width * scale;
-        tempCanvas.height = height * scale;
+        canvasNode.width = width * scale;
+        canvasNode.height = height * scale;
 
         return {
-          canvas: tempCanvas,
+          canvas: canvasNode,
           scale,
         };
       },
     );
-
-    canvasToBlob(canvas)
-      .then(() => {
-        renderPreview(canvas, previewNode);
-      })
-      .catch((error) => {
-        console.error(error);
-        renderPreview(new CanvasError(), previewNode);
-      });
   }, [elements]);
 
   return (
@@ -147,7 +121,7 @@ export function MiniMap({
           backgroundColor: appState.viewBackgroundColor,
         }}
       >
-        <div ref={previewRef} />
+        <canvas ref={canvasRef} />
         <MinimapViewport elements={elements} appState={appState} />
       </div>
     </Island>
