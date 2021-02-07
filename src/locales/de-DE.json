@@ -243,6 +243,8 @@
   "toast": {
     "copyStyles": "Formatierung kopiert.",
     "copyToClipboard": "In die Zwischenablage kopiert.",
-    "copyToClipboardAsPng": "In die Zwischenablage als PNG kopiert."
+    "copyToClipboardAsPng": "In die Zwischenablage als PNG kopiert.",
+    "fileSaved": "",
+    "fileSavedToFilename": ""
   }
 }
