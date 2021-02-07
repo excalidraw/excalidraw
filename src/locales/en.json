@@ -227,9 +227,12 @@
   },
   "stats": {
     "angle": "Angle",
+    "collaboration": "Collaboration",
+    "collaborators": "Collaborators",
     "element": "Element",
     "elements": "Elements",
     "height": "Height",
+    "networkSpeed": "Network speed",
     "scene": "Scene",
     "selected": "Selected",
     "storage": "Storage",
@@ -238,10 +241,7 @@
     "version": "Version",
     "versionCopy": "Click to copy",
     "versionNotAvailable": "Version not available",
-    "width": "Width",
-    "collaboration": "Collaboration",
-    "networkSpeed": "Network Speed",
-    "collaborators": "Collaborators"
+    "width": "Width"
   },
   "toast": {
     "copyStyles": "Copied styles.",

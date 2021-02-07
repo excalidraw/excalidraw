@@ -1,16 +1,17 @@
-const IMAGE_URL = "https://portal.excalidraw.com/test128.png";
-const IMAGE_SIZE = 35747; // in bytes
+const IMAGE_URL = `${process.env.REACT_APP_SOCKET_SERVER_URL}/test128.png`;
+const IMAGE_SIZE_BYTES = 35747;
+
 const calculateSpeed = (startTime: number, endTime: number) => {
   const duration = (endTime - startTime) / 1000;
-  const imageSizeInBits = IMAGE_SIZE * 8;
+  const imageSizeInBits = IMAGE_SIZE_BYTES * 8;
   let speed = imageSizeInBits / duration;
-  const suffix = ["bps", "kbps", "mbps", "gbps"];
+  const suffix = ["B/s", "kB/s", "MB/s", "GB/s"];
   let index = 0;
-  while (speed > 1024) {
+  while (speed > 1000) {
     index++;
-    speed = speed / 1024;
+    speed = speed / 1000;
   }
-  return `${speed.toFixed(2)} ${suffix[index]}`;
+  return `${speed.toFixed(index > 1 ? 1 : 0)} ${suffix[index]}`;
 };
 
 const processImage = (): Promise<string> => {
@@ -28,7 +29,7 @@ const processImage = (): Promise<string> => {
     };
 
     const startTime = new Date().getTime();
-    image.src = `${IMAGE_URL}?t=${startTime}`; // start time acts as a cache buster so everytime new url is requested
+    image.src = `${IMAGE_URL}?t=${startTime}`;
   });
 };
 export const getNetworkSpeed = async (): Promise<string> => {
