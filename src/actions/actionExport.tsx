@@ -96,9 +96,24 @@ export const actionChangeShouldAddWatermark = register({
 export const actionSaveScene = register({
   name: "saveScene",
   perform: async (elements, appState, value) => {
+    const fileHandleExists = !!appState.fileHandle;
     try {
       const { fileHandle } = await saveAsJSON(elements, appState);
-      return { commitToHistory: false, appState: { ...appState, fileHandle } };
+      return {
+        commitToHistory: false,
+        appState: {
+          ...appState,
+          fileHandle,
+          toastMessage: fileHandleExists
+            ? fileHandle.name
+              ? t("toast.fileSavedToFilename").replace(
+                  "{filename}",
+                  `"${fileHandle.name}"`,
+                )
+              : t("toast.fileSaved")
+            : null,
+        },
+      };
     } catch (error) {
       if (error?.name !== "AbortError") {
         console.error(error);
