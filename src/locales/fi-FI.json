@@ -243,6 +243,8 @@
   "toast": {
     "copyStyles": "Tyylit kopioitu.",
     "copyToClipboard": "Kopioitu leikepöydälle.",
-    "copyToClipboardAsPng": "Kopioitu leikepöydälle PNG-tiedostona."
+    "copyToClipboardAsPng": "Kopioitu leikepöydälle PNG-tiedostona.",
+    "fileSaved": "",
+    "fileSavedToFilename": ""
   }
 }
