@@ -243,6 +243,8 @@
   "toast": {
     "copyStyles": "Gaya tersalin.",
     "copyToClipboard": "Tersalin ke papan klip.",
-    "copyToClipboardAsPng": "Tersalin ke clipboard sebagai PNG."
+    "copyToClipboardAsPng": "Tersalin ke clipboard sebagai PNG.",
+    "fileSaved": "",
+    "fileSavedToFilename": ""
   }
 }
