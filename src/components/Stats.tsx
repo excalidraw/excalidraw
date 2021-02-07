@@ -11,7 +11,7 @@ import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
 import { getTargetElements } from "../scene";
 import { AppState } from "../types";
-import { debounce, getVersion, nFormatter } from "../utils";
+import { debounce, formatSpeed, getVersion, nFormatter } from "../utils";
 import { close } from "./icons";
 import { Island } from "./Island";
 import "./Stats.scss";
@@ -182,7 +182,13 @@ export const Stats = (props: {
                 </tr>
                 <tr>
                   <td>{t("stats.speed")}</td>
-                  <td>{props.appState.networkSpeed}</td>
+                  <td>
+                    {props.appState.networkSpeed === 0
+                      ? "…"
+                      : props.appState.networkSpeed > 0
+                      ? formatSpeed(props.appState.networkSpeed)
+                      : t("stats.error")}
+                  </td>
                 </tr>
               </>
             ) : null}

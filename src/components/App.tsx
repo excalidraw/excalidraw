@@ -1032,7 +1032,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       return;
     }
     const speed = await getNetworkSpeed();
-    const networkSpeed = speed === "-1" ? "Error!" : speed;
+    const networkSpeed = speed;
     this.setState({ networkSpeed });
     if (this.netStatsIntervalId) {
       clearTimeout(this.netStatsIntervalId);

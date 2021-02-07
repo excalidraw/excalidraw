@@ -363,6 +363,17 @@ export const nFormatter = (num: number, digits: number): string => {
   );
 };
 
+export const formatSpeed = (speed: number): string => {
+  // source: en.wikipedia.org/wiki/Data-rate_units#Conversion_table
+  const suffix = ["B/s", "kB/s", "MB/s", "GB/s"];
+  let index = 0;
+  while (speed > 1000) {
+    index++;
+    speed = speed / 1000;
+  }
+  return `${speed.toFixed(index > 1 ? 1 : 0)} ${suffix[index]}`;
+};
+
 export const getVersion = () => {
   return (
     document.querySelector<HTMLMetaElement>('meta[name="version"]')?.content ||

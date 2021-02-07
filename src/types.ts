@@ -88,7 +88,7 @@ export type AppState = {
   appearance: "light" | "dark";
   gridSize: number | null;
   viewModeEnabled: boolean;
-  networkSpeed: string;
+  networkSpeed: number;
 
   /** top-most selected groups (i.e. does not include nested groups) */
   selectedGroupIds: { [groupId: string]: boolean };
