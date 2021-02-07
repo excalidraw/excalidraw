@@ -244,7 +244,7 @@
     "copyStyles": "Kopierte stiler.",
     "copyToClipboard": "Kopiert til utklippstavlen.",
     "copyToClipboardAsPng": "Kopiert til utklippstavlen som PNG.",
-    "fileSaved": "",
-    "fileSavedToFilename": ""
+    "fileSaved": "Fil lagret.",
+    "fileSavedToFilename": "Lagret til {filename}"
   }
 }
