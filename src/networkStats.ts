@@ -1,6 +1,5 @@
-const IMAGE_URL =
-  "https://user-images.githubusercontent.com/11256141/107128597-feb46700-68e4-11eb-80f7-1d259cc0151f.png";
-const IMAGE_SIZE = 2666; // in bytes
+const IMAGE_URL = "https://portal.excalidraw.com/test128.png";
+const IMAGE_SIZE = 35747; // in bytes
 const calculateSpeed = (startTime: number, endTime: number) => {
   const duration = (endTime - startTime) / 1000;
   const imageSizeInBits = IMAGE_SIZE * 8;
