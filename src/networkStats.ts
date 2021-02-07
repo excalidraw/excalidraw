@@ -5,6 +5,7 @@ const calculateSpeed = (startTime: number, endTime: number) => {
   const duration = (endTime - startTime) / 1000;
   const imageSizeInBits = IMAGE_SIZE_BYTES * 8;
   let speed = imageSizeInBits / duration;
+  // source: en.wikipedia.org/wiki/Data-rate_units#Conversion_table
   const suffix = ["B/s", "kB/s", "MB/s", "GB/s"];
   let index = 0;
   while (speed > 1000) {
