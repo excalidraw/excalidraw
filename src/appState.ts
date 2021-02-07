@@ -74,7 +74,7 @@ export const getDefaultAppState = (): Omit<
     zoom: { value: 1 as NormalizedZoomValue, translation: { x: 0, y: 0 } },
     viewModeEnabled: false,
     networkSpeed: 0,
-    ping: "…",
+    networkPing: 0,
   };
 };
 
@@ -156,7 +156,7 @@ const APP_STATE_STORAGE_CONF = (<
   zoom: { browser: true, export: false },
   viewModeEnabled: { browser: false, export: false },
   networkSpeed: { browser: false, export: false },
-  ping: { browser: false, export: false },
+  networkPing: { browser: false, export: false },
 });
 
 const _clearAppStateForStorage = <ExportType extends "export" | "browser">(

@@ -292,7 +292,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
   private scene: Scene;
   private networkSpeedIntervalId?: any;
-  private pingIntervalId?: any;
+  private networkPingIntervalId?: any;
   constructor(props: ExcalidrawProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
@@ -1028,21 +1028,24 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   }
 
   private calculateNetStats = () => {
-    this.checkPing();
+    this.checkNetworkPing();
     this.checkNetworkSpeed();
   };
 
-  private checkPing = async () => {
+  private checkNetworkPing = async () => {
     if (!this.state.showStats || !this.props.isCollaborating) {
-      clearTimeout(this.pingIntervalId);
+      clearTimeout(this.networkPingIntervalId);
       return;
     }
-    const ping = await simulatePing();
-    this.setState({ ping });
-    if (this.pingIntervalId) {
-      clearTimeout(this.pingIntervalId);
+    const networkPing = await simulatePing();
+    this.setState({ networkPing });
+    if (this.networkPingIntervalId) {
+      clearTimeout(this.networkPingIntervalId);
     }
-    this.pingIntervalId = setTimeout(this.checkPing, NETWORK_SPEED_TIMEOUT_MS);
+    this.networkPingIntervalId = setTimeout(
+      this.checkNetworkPing,
+      NETWORK_SPEED_TIMEOUT_MS,
+    );
   };
 
   private checkNetworkSpeed = async () => {

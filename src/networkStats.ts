@@ -59,9 +59,8 @@ export const simulatePing = async () => {
       method: "HEAD",
     });
     const endTime = new Date().getTime();
-    const delay = endTime - startTime;
-    return delay < 1000 ? `${delay} ms` : `${(delay / 1000).toFixed(1)} s`;
+    return endTime - startTime;
   } catch (e) {
-    return "Error!";
+    return -1;
   }
 };

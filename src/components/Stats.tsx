@@ -11,7 +11,13 @@ import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
 import { getTargetElements } from "../scene";
 import { AppState } from "../types";
-import { debounce, formatSpeedBits, getVersion, nFormatter } from "../utils";
+import {
+  debounce,
+  formatSpeedBits,
+  formatTime,
+  getVersion,
+  nFormatter,
+} from "../utils";
 import { close } from "./icons";
 import { Island } from "./Island";
 import "./Stats.scss";
@@ -182,7 +188,13 @@ export const Stats = (props: {
                 </tr>
                 <tr>
                   <td>{t("stats.ping")}</td>
-                  <td>{props.appState.ping}</td>
+                  <td>
+                    {props.appState.networkPing === 0
+                      ? "…"
+                      : props.appState.networkPing > 0
+                      ? formatTime(props.appState.networkPing)
+                      : t("stats.error")}
+                  </td>
                 </tr>
                 <tr>
                   <td>{t("stats.speed")}</td>

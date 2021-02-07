@@ -89,7 +89,7 @@ export type AppState = {
   gridSize: number | null;
   viewModeEnabled: boolean;
   networkSpeed: number;
-  ping: string;
+  networkPing: number;
 
   /** top-most selected groups (i.e. does not include nested groups) */
   selectedGroupIds: { [groupId: string]: boolean };

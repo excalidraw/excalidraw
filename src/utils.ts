@@ -381,6 +381,9 @@ export const getVersion = () => {
   );
 };
 
+export const formatTime = (time: number): string => {
+  return time < 1000 ? `${time} ms` : `${(time / 1000).toFixed(1)} s`;
+};
 // Adapted from https://github.com/Modernizr/Modernizr/blob/master/feature-detects/emoji.js
 export const supportsEmoji = () => {
   const canvas = document.createElement("canvas");
