@@ -386,6 +386,11 @@ export const formatTime = (mseconds: number): string => {
     ? `${mseconds} ms`
     : `${(mseconds / 1000).toFixed(1)} s`;
 };
+
+export const getAverage = (arr: Array<number>): number => {
+  return arr.reduce((sum, currentVal) => sum + currentVal) / arr.length;
+};
+
 // Adapted from https://github.com/Modernizr/Modernizr/blob/master/feature-detects/emoji.js
 export const supportsEmoji = () => {
   const canvas = document.createElement("canvas");

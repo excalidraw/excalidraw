@@ -1,3 +1,5 @@
+import { getAverage } from "./utils";
+
 const IMAGE_URL = `${process.env.REACT_APP_SOCKET_SERVER_URL}/test256.png`;
 const IMAGE_SIZE_BITS = 141978 * 8;
 const AVERAGE_MAX = 4;
@@ -9,10 +11,6 @@ const pushSpeed = (speed: number): void => {
   if (speedHistory.length > AVERAGE_MAX) {
     speedHistory.shift();
   }
-};
-
-const getAverageSpeed = (): number => {
-  return speedHistory.reduce((a, b) => a + b) / speedHistory.length;
 };
 
 const getSpeedBits = (
@@ -35,7 +33,7 @@ const processImage = (): Promise<number> => {
       endTime = new Date().getTime();
       const speed = getSpeedBits(IMAGE_SIZE_BITS, startTime, endTime);
       pushSpeed(speed);
-      resolve(getAverageSpeed());
+      resolve(getAverage(speedHistory));
     };
 
     image.onerror = () => {
