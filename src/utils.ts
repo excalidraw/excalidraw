@@ -365,7 +365,7 @@ export const nFormatter = (num: number, digits: number): string => {
 
 export const formatSpeedBits = (speed: number): string => {
   // source: https://en.wikipedia.org/wiki/Data-rate_units#Conversion_table
-  const suffix = ["bit/s", "kbit/s", "Mbit/s", "Gbit/s"];
+  const suffix = ["bps", "kbps", "Mbps", "Gbps"];
   let index = 0;
   while (speed > 1000) {
     index++;
