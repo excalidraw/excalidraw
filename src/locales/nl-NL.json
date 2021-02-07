@@ -243,6 +243,8 @@
   "toast": {
     "copyStyles": "Stijlen gekopieerd.",
     "copyToClipboard": "Gekopieerd naar het klembord.",
-    "copyToClipboardAsPng": "Gekopieerd naar klembord als PNG."
+    "copyToClipboardAsPng": "Gekopieerd naar klembord als PNG.",
+    "fileSaved": "",
+    "fileSavedToFilename": ""
   }
 }
