@@ -243,6 +243,8 @@
   "toast": {
     "copyStyles": "Stili copiati.",
     "copyToClipboard": "Copiato negli appunti.",
-    "copyToClipboardAsPng": "Copiato negli appunti come PNG."
+    "copyToClipboardAsPng": "Copiato negli appunti come PNG.",
+    "fileSaved": "",
+    "fileSavedToFilename": ""
   }
 }
