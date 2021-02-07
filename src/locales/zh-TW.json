@@ -77,7 +77,7 @@
     "group": "建立群組",
     "ungroup": "取消群組",
     "collaborators": "協作者",
-    "gridMode": "網格模式",
+    "showGrid": "顯示格線",
     "addToLibrary": "加入資料庫",
     "removeFromLibrary": "從資料庫中移除",
     "libraryLoadingMessage": "資料庫讀取中…",

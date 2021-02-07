@@ -77,7 +77,7 @@
     "group": "Csoportosítás",
     "ungroup": "Csoportbontás",
     "collaborators": "Közreműködők",
-    "gridMode": "Hálómód",
+    "showGrid": "",
     "addToLibrary": "Hozzáadás a könyvtárhoz",
     "removeFromLibrary": "Eltávólítás a könyvtárból",
     "libraryLoadingMessage": "Könyvtár betöltése…",
