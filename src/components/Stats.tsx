@@ -181,7 +181,7 @@ export const Stats = (props: {
                   <td>{props.appState.collaborators.size}</td>
                 </tr>
                 <tr>
-                  <td>{t("stats.networkSpeed")}</td>
+                  <td>{t("stats.speed")}</td>
                   <td>{props.appState.networkSpeed}</td>
                 </tr>
               </>
