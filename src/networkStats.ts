@@ -1,7 +1,7 @@
 const IMAGE_URL = `${process.env.REACT_APP_SOCKET_SERVER_URL}/test256.png`;
-const IMAGE_SIZE_BYTES = 141978;
+const IMAGE_SIZE_BITS = 141978 * 8;
 
-const getSpeed = (
+const getSpeedBits = (
   imageSize: number,
   startTime: number,
   endTime: number,
@@ -19,7 +19,7 @@ const processImage = (): Promise<number> => {
     let endTime: number;
     image.onload = () => {
       endTime = new Date().getTime();
-      const speed = getSpeed(IMAGE_SIZE_BYTES, startTime, endTime);
+      const speed = getSpeedBits(IMAGE_SIZE_BITS, startTime, endTime);
       resolve(speed);
     };
 

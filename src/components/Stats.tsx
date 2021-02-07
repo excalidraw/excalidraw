@@ -11,7 +11,7 @@ import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
 import { getTargetElements } from "../scene";
 import { AppState } from "../types";
-import { debounce, formatSpeedBytes, getVersion, nFormatter } from "../utils";
+import { debounce, formatSpeedBits, getVersion, nFormatter } from "../utils";
 import { close } from "./icons";
 import { Island } from "./Island";
 import "./Stats.scss";
@@ -186,7 +186,7 @@ export const Stats = (props: {
                     {props.appState.networkSpeed === 0
                       ? "…"
                       : props.appState.networkSpeed > 0
-                      ? formatSpeedBytes(props.appState.networkSpeed)
+                      ? formatSpeedBits(props.appState.networkSpeed)
                       : t("stats.error")}
                   </td>
                 </tr>
