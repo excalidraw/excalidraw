@@ -243,6 +243,8 @@
   "toast": {
     "copyStyles": "Iɣunab yettwaneɣlen.",
     "copyToClipboard": "Yettwaɣel ɣer tecfawit.",
-    "copyToClipboardAsPng": "Yettwanɣel ɣer tecfawit am PNG."
+    "copyToClipboardAsPng": "Yettwanɣel ɣer tecfawit am PNG.",
+    "fileSaved": "",
+    "fileSavedToFilename": ""
   }
 }
