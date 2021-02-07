@@ -8,7 +8,7 @@ export const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
 export const ELEMENT_TRANSLATE_AMOUNT = 1;
 export const TEXT_TO_CENTER_SNAP_THRESHOLD = 30;
 export const SHIFT_LOCKING_ANGLE = Math.PI / 12;
-export const NETWORK_SPEED_THRESHOLD = 15000;
+export const NETWORK_SPEED_THRESHOLD = 5000;
 
 export const CURSOR_TYPE = {
   TEXT: "text",
