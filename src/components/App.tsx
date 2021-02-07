@@ -183,6 +183,7 @@ import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
+import { isMathMode, getFontString } from "../mathmode";
 
 const { history } = createHistory();
 
@@ -577,7 +578,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private onFontLoaded = () => {
     this.scene.getElementsIncludingDeleted().forEach((element) => {
-      if (isTextElement(element)) {
+      if (isTextElement(element) && !isMathMode(getFontString(element))) {
         invalidateShapeForElement(element);
       }
     });
@@ -752,9 +753,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   }
 
   private onResize = withBatchedUpdates(() => {
-    this.scene
-      .getElementsIncludingDeleted()
-      .forEach((element) => invalidateShapeForElement(element));
+    this.scene.getElementsIncludingDeleted().forEach((element) => {
+      if (!(isTextElement(element) && isMathMode(getFontString(element)))) {
+        invalidateShapeForElement(element);
+      }
+    });
     this.setState({});
   });
 

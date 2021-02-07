@@ -22,7 +22,7 @@ import { isLinearElement, isTextElement } from "./typeChecks";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
 import { getCursorForResizingElement } from "./resizeTest";
-import { measureText, getFontString } from "../utils";
+import { measureMath, getFontString } from "../mathmode";
 import { updateBoundElements } from "./binding";
 import {
   TransformHandleType,
@@ -274,7 +274,7 @@ const measureFontSizeFromWH = (
   if (nextFontSize < MIN_FONT_SIZE) {
     return null;
   }
-  const metrics = measureText(
+  const metrics = measureMath(
     element.text,
     getFontString({ fontSize: nextFontSize, fontFamily: element.fontFamily }),
   );

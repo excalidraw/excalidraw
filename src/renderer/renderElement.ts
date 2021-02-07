@@ -27,6 +27,13 @@ import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
 import { Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
+import {
+  drawHtmlOnCanvas,
+  encapsulateHtml,
+  isMathMode,
+  markupText,
+  measureMarkup,
+} from "../mathmode";
 
 const defaultAppState = getDefaultAppState();
 
@@ -94,7 +101,7 @@ const generateElementCanvas = (
   );
 
   const rc = rough.canvas(canvas);
-  drawElementOnCanvas(element, rc, context);
+  drawElementOnCanvas(element, rc, context, zoom);
   context.translate(
     -(CANVAS_PADDING * zoom.value),
     -(CANVAS_PADDING * zoom.value),
@@ -116,6 +123,7 @@ const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
+  zoom: Zoom,
 ) => {
   context.globalAlpha = element.opacity / 100;
   switch (element.type) {
@@ -150,22 +158,49 @@ const drawElementOnCanvas = (
         const textAlign = context.textAlign;
         context.textAlign = element.textAlign as CanvasTextAlign;
 
-        // Canvas does not support multiline text by default
-        const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
-        const lineHeight = element.height / lines.length;
-        const verticalOffset = element.height - element.baseline;
-        const horizontalOffset =
-          element.textAlign === "center"
-            ? element.width / 2
-            : element.textAlign === "right"
-            ? element.width
-            : 0;
-        for (let index = 0; index < lines.length; index++) {
-          context.fillText(
-            lines[index],
-            horizontalOffset,
-            (index + 1) * lineHeight - verticalOffset,
+        if (isMathMode(getFontString(element))) {
+          const htmlString = markupText(element.text);
+
+          const scaledPadding = CANVAS_PADDING * Math.pow(zoom.value, 2);
+          const scaledFontSize =
+            element.fontSize * zoom.value * window.devicePixelRatio;
+          const scaledFontString = getFontString({
+            fontSize: scaledFontSize,
+            fontFamily: element.fontFamily,
+          });
+          const scaledMetrics = measureMarkup(htmlString, scaledFontString);
+
+          drawHtmlOnCanvas(
+            context,
+            htmlString,
+            scaledPadding,
+            scaledPadding,
+            scaledMetrics.width,
+            scaledMetrics.height,
+            scaledFontSize,
+            getFontFamilyString(element),
+            element.strokeColor,
+            element.textAlign,
           );
+        } else {
+          // Canvas does not support multiline text by default
+          const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
+          const lineHeight = element.height / lines.length;
+          const verticalOffset = element.height - element.baseline;
+          const horizontalOffset =
+            element.textAlign === "center"
+              ? element.width / 2
+              : element.textAlign === "right"
+              ? element.width
+              : 0;
+
+          for (let index = 0; index < lines.length; index++) {
+            context.fillText(
+              lines[index],
+              horizontalOffset,
+              (index + 1) * lineHeight - verticalOffset,
+            );
+          }
         }
         context.fillStyle = fillStyle;
         context.font = font;
@@ -526,7 +561,7 @@ export const renderElement = (
         context.translate(cx, cy);
         context.rotate(element.angle);
         context.translate(-shiftX, -shiftY);
-        drawElementOnCanvas(element, rc, context);
+        drawElementOnCanvas(element, rc, context, sceneState.zoom);
         context.translate(shiftX, shiftY);
         context.rotate(-element.angle);
         context.translate(-cx, -cy);
@@ -621,34 +656,49 @@ export const renderElementToSvg = (
             offsetY || 0
           }) rotate(${degree} ${cx} ${cy})`,
         );
-        const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
-        const lineHeight = element.height / lines.length;
-        const verticalOffset = element.height - element.baseline;
-        const horizontalOffset =
-          element.textAlign === "center"
-            ? element.width / 2
-            : element.textAlign === "right"
-            ? element.width
-            : 0;
-        const direction = isRTL(element.text) ? "rtl" : "ltr";
-        const textAnchor =
-          element.textAlign === "center"
-            ? "middle"
-            : element.textAlign === "right" || direction === "rtl"
-            ? "end"
-            : "start";
-        for (let i = 0; i < lines.length; i++) {
-          const text = svgRoot.ownerDocument!.createElementNS(SVG_NS, "text");
-          text.textContent = lines[i];
-          text.setAttribute("x", `${horizontalOffset}`);
-          text.setAttribute("y", `${(i + 1) * lineHeight - verticalOffset}`);
-          text.setAttribute("font-family", getFontFamilyString(element));
-          text.setAttribute("font-size", `${element.fontSize}px`);
-          text.setAttribute("fill", element.strokeColor);
-          text.setAttribute("text-anchor", textAnchor);
-          text.setAttribute("style", "white-space: pre;");
-          text.setAttribute("direction", direction);
-          node.appendChild(text);
+        if (isMathMode(getFontString(element))) {
+          const svg = svgRoot.ownerDocument!.createElementNS(SVG_NS, "svg");
+          const htmlString = markupText(element.text);
+          const metrics = measureMarkup(htmlString, getFontString(element));
+          svg.setAttribute("width", `${metrics.width}`);
+          svg.setAttribute("height", `${metrics.height}`);
+          svg.innerHTML = encapsulateHtml(
+            element.fontSize,
+            getFontFamilyString(element),
+            element.textAlign,
+            htmlString,
+          );
+          node.appendChild(svg);
+        } else {
+          const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
+          const lineHeight = element.height / lines.length;
+          const verticalOffset = element.height - element.baseline;
+          const horizontalOffset =
+            element.textAlign === "center"
+              ? element.width / 2
+              : element.textAlign === "right"
+              ? element.width
+              : 0;
+          const direction = isRTL(element.text) ? "rtl" : "ltr";
+          const textAnchor =
+            element.textAlign === "center"
+              ? "middle"
+              : element.textAlign === "right" || direction === "rtl"
+              ? "end"
+              : "start";
+          for (let i = 0; i < lines.length; i++) {
+            const text = svgRoot.ownerDocument!.createElementNS(SVG_NS, "text");
+            text.textContent = lines[i];
+            text.setAttribute("x", `${horizontalOffset}`);
+            text.setAttribute("y", `${(i + 1) * lineHeight - verticalOffset}`);
+            text.setAttribute("font-family", getFontFamilyString(element));
+            text.setAttribute("font-size", `${element.fontSize}px`);
+            text.setAttribute("fill", element.strokeColor);
+            text.setAttribute("text-anchor", textAnchor);
+            text.setAttribute("style", "white-space: pre;");
+            text.setAttribute("direction", direction);
+            node.appendChild(text);
+          }
         }
         svgRoot.appendChild(node);
       } else {

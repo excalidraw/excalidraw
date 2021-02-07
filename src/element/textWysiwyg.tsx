@@ -5,6 +5,7 @@ import { isTextElement } from "./typeChecks";
 import { CLASSES } from "../constants";
 import { ExcalidrawElement } from "./types";
 import { AppState } from "../types";
+import { measureText } from "../utils";
 
 const normalizeText = (text: string) => {
   return (
@@ -58,22 +59,21 @@ export const textWysiwyg = ({
       editable.value = updatedElement.text;
 
       const lines = updatedElement.text.replace(/\r\n?/g, "\n").split("\n");
-      const lineHeight = updatedElement.height / lines.length;
+      const metrics = measureText(
+        updatedElement.text,
+        getFontString(updatedElement),
+      );
+      const lineHeight = metrics.height / lines.length;
 
       Object.assign(editable.style, {
         font: getFontString(updatedElement),
         // must be defined *after* font ¯\_(ツ)_/¯
         lineHeight: `${lineHeight}px`,
-        width: `${updatedElement.width}px`,
-        height: `${updatedElement.height}px`,
+        width: `${metrics.width}px`,
+        height: `${metrics.height}px`,
         left: `${viewportX}px`,
         top: `${viewportY}px`,
-        transform: getTransform(
-          updatedElement.width,
-          updatedElement.height,
-          angle,
-          appState,
-        ),
+        transform: getTransform(metrics.width, metrics.height, angle, appState),
         textAlign,
         color: updatedElement.strokeColor,
         opacity: updatedElement.opacity / 100,
