@@ -243,6 +243,8 @@
   "toast": {
     "copyStyles": "Скопированы стили.",
     "copyToClipboard": "",
-    "copyToClipboardAsPng": "Скопировано в буфер обмена в формате PNG."
+    "copyToClipboardAsPng": "Скопировано в буфер обмена в формате PNG.",
+    "fileSaved": "",
+    "fileSavedToFilename": ""
   }
 }
