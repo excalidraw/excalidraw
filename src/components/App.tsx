@@ -184,7 +184,7 @@ import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
-import { getNetworkSpeed, simulatePing } from "../networkStats";
+import { getNetworkSpeed, getNetworkPing } from "../networkStats";
 
 const { history } = createHistory();
 
@@ -1037,7 +1037,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       clearTimeout(this.networkPingIntervalId);
       return;
     }
-    const networkPing = await simulatePing();
+    const networkPing = await getNetworkPing();
     this.setState({ networkPing });
     if (this.networkPingIntervalId) {
       clearTimeout(this.networkPingIntervalId);

@@ -51,7 +51,7 @@ export const getNetworkSpeed = async (): Promise<number> => {
   return await processImage();
 };
 
-export const simulatePing = async () => {
+export const getNetworkPing = async () => {
   const startTime = new Date().getTime();
   try {
     await fetch(process.env.REACT_APP_SOCKET_SERVER_URL, {
