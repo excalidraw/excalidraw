@@ -77,7 +77,7 @@
     "group": "گروهبندی انتخابها",
     "ungroup": "حذف گروهبندی انتخابها",
     "collaborators": "همکاران",
-    "gridMode": "حالت شبکه ای",
+    "showGrid": "",
     "addToLibrary": "افزودن به کتابخانه",
     "removeFromLibrary": "حذف از کتابخانه",
     "libraryLoadingMessage": "بارگذاری کتابخانه…",

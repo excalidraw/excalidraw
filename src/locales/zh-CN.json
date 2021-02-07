@@ -77,7 +77,7 @@
     "group": "组选",
     "ungroup": "取消组选",
     "collaborators": "协作者",
-    "gridMode": "网格模式",
+    "showGrid": "",
     "addToLibrary": "添加到库中",
     "removeFromLibrary": "从库中移除",
     "libraryLoadingMessage": "正在加载库…",
