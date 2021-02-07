@@ -51,7 +51,7 @@ import {
   GRID_SIZE,
   LINE_CONFIRM_THRESHOLD,
   MIME_TYPES,
-  NETWORK_SPEED_TIMEOUT_MS,
+  NETWORK_TIMEOUT_MS,
   POINTER_BUTTON,
   TAP_TWICE_TIMEOUT,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
@@ -1044,7 +1044,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
     this.networkPingIntervalId = setTimeout(
       this.checkNetworkPing,
-      NETWORK_SPEED_TIMEOUT_MS,
+      NETWORK_TIMEOUT_MS,
     );
   };
 
@@ -1060,7 +1060,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
     this.networkSpeedIntervalId = setTimeout(
       this.checkNetworkSpeed,
-      NETWORK_SPEED_TIMEOUT_MS,
+      NETWORK_TIMEOUT_MS,
     );
   };
   // Copy/paste
