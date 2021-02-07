@@ -51,7 +51,7 @@ import {
   GRID_SIZE,
   LINE_CONFIRM_THRESHOLD,
   MIME_TYPES,
-  NETWORK_SPEED_THRESHOLD,
+  NETWORK_SPEED_TIMEOUT_MS,
   POINTER_BUTTON,
   TAP_TWICE_TIMEOUT,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
@@ -1036,7 +1036,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.setState({ networkSpeed });
     this.netStatsIntervalId = setTimeout(
       this.calculateNetStats,
-      NETWORK_SPEED_THRESHOLD,
+      NETWORK_SPEED_TIMEOUT_MS,
     );
   };
 
