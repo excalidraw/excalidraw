@@ -184,7 +184,7 @@ import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
-import { getNetworkSpeed } from "../networkStats";
+import { getNetworkSpeed, simulatePing } from "../networkStats";
 
 const { history } = createHistory();
 
@@ -291,7 +291,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     height: window.innerHeight,
   };
   private scene: Scene;
-  private netStatsIntervalId?: any;
+  private networkSpeedIntervalId?: any;
+  private pingIntervalId?: any;
   constructor(props: ExcalidrawProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
@@ -752,7 +753,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.removeEventListeners();
     this.scene.destroy();
     clearTimeout(touchTimeout);
-    clearTimeout(this.netStatsIntervalId);
+    clearTimeout(this.networkSpeedIntervalId);
     touchTimeout = 0;
   }
 
@@ -897,7 +898,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           "change",
           this.calculateNetStats,
         );
-        clearTimeout(this.netStatsIntervalId);
+        clearTimeout(this.networkSpeedIntervalId);
       }
     }
 
@@ -1026,23 +1027,39 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
   }
 
-  private calculateNetStats = async () => {
+  private calculateNetStats = () => {
+    this.checkPing();
+    this.checkNetworkSpeed();
+  };
+
+  private checkPing = async () => {
     if (!this.state.showStats || !this.props.isCollaborating) {
-      clearTimeout(this.netStatsIntervalId);
+      clearTimeout(this.pingIntervalId);
       return;
     }
-    const speed = await getNetworkSpeed();
-    const networkSpeed = speed;
-    this.setState({ networkSpeed });
-    if (this.netStatsIntervalId) {
-      clearTimeout(this.netStatsIntervalId);
+    const ping = await simulatePing();
+    this.setState({ ping });
+    if (this.pingIntervalId) {
+      clearTimeout(this.pingIntervalId);
     }
-    this.netStatsIntervalId = setTimeout(
-      this.calculateNetStats,
+    this.pingIntervalId = setTimeout(this.checkPing, NETWORK_SPEED_TIMEOUT_MS);
+  };
+
+  private checkNetworkSpeed = async () => {
+    if (!this.state.showStats || !this.props.isCollaborating) {
+      clearTimeout(this.networkSpeedIntervalId);
+      return;
+    }
+    const networkSpeed = await getNetworkSpeed();
+    this.setState({ networkSpeed });
+    if (this.networkSpeedIntervalId) {
+      clearTimeout(this.networkSpeedIntervalId);
+    }
+    this.networkSpeedIntervalId = setTimeout(
+      this.checkNetworkSpeed,
       NETWORK_SPEED_TIMEOUT_MS,
     );
   };
-
   // Copy/paste
 
   private onCut = withBatchedUpdates((event: ClipboardEvent) => {

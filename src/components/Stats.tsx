@@ -181,6 +181,10 @@ export const Stats = (props: {
                   <td>{props.appState.collaborators.size}</td>
                 </tr>
                 <tr>
+                  <td>{t("stats.ping")}</td>
+                  <td>{props.appState.ping}</td>
+                </tr>
+                <tr>
                   <td>{t("stats.speed")}</td>
                   <td>
                     {props.appState.networkSpeed === 0

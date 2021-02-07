@@ -50,3 +50,18 @@ const processImage = (): Promise<number> => {
 export const getNetworkSpeed = async (): Promise<number> => {
   return await processImage();
 };
+
+export const simulatePing = async () => {
+  const startTime = new Date().getTime();
+  try {
+    await fetch(process.env.REACT_APP_SOCKET_SERVER_URL, {
+      mode: "no-cors",
+      method: "HEAD",
+    });
+    const endTime = new Date().getTime();
+    const delay = endTime - startTime;
+    return delay < 1000 ? `${delay} ms` : `${(delay / 1000).toFixed(1)} s`;
+  } catch (e) {
+    return "Error!";
+  }
+};
