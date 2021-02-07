@@ -60,7 +60,7 @@ export const simulatePing = async () => {
     });
     const endTime = new Date().getTime();
     return endTime - startTime;
-  } catch (e) {
+  } catch (error) {
     return -1;
   }
 };
