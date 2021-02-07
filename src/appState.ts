@@ -73,7 +73,7 @@ export const getDefaultAppState = (): Omit<
     zenModeEnabled: false,
     zoom: { value: 1 as NormalizedZoomValue, translation: { x: 0, y: 0 } },
     viewModeEnabled: false,
-    networkSpeed: "calculating...",
+    networkSpeed: "…",
   };
 };
 

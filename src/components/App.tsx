@@ -1039,6 +1039,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       NETWORK_SPEED_THRESHOLD,
     );
   };
+
   // Copy/paste
 
   private onCut = withBatchedUpdates((event: ClipboardEvent) => {
