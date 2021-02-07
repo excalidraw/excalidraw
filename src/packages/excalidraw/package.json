@@ -60,7 +60,7 @@
     "ts-loader": "8.0.14",
     "webpack": "5.21.1",
     "webpack-bundle-analyzer": "4.4.0",
-    "webpack-cli": "4.4.0"
+    "webpack-cli": "4.5.0"
   },
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
   "repository": "https://github.com/excalidraw/excalidraw",
