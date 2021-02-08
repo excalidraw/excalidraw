@@ -61,6 +61,7 @@ let currentLangData = {};
 export const setLanguage = async (lang: Language) => {
   currentLang = lang;
   document.documentElement.dir = currentLang.rtl ? "rtl" : "ltr";
+  document.documentElement.lang = currentLang.code;
 
   currentLangData = await import(
     /* webpackChunkName: "i18n-[request]" */ `./locales/${currentLang.code}.json`
