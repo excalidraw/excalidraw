@@ -35,7 +35,6 @@ Make sure the title starts with a semantic prefix:
 
 - **feat**: A new feature
 - **fix**: A bug fix
-- **improvement**: An improvement to a current feature
 - **docs**: Documentation only changes
 - **style**: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
 - **refactor**: A code change that neither fixes a bug nor adds a feature
