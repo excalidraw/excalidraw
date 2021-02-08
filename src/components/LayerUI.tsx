@@ -27,7 +27,7 @@ import { ExportCB, ExportDialog } from "./ExportDialog";
 import { FixedSideContainer } from "./FixedSideContainer";
 import { GitHubCorner } from "./GitHubCorner";
 import { HintViewer } from "./HintViewer";
-import { exportFile, load, shield } from "./icons";
+import { exportFile, load, shield, trash } from "./icons";
 import { Island } from "./Island";
 import "./LayerUI.scss";
 import { LibraryUnit } from "./LibraryUnit";
@@ -100,6 +100,7 @@ const LibraryMenuItems = ({
   onInsertShape,
   pendingElements,
   setAppState,
+  setLibraryItems,
 }: {
   library: LibraryItems;
   pendingElements: LibraryItem;
@@ -107,6 +108,7 @@ const LibraryMenuItems = ({
   onInsertShape: (elements: LibraryItem) => void;
   onAddToLibrary: (elements: LibraryItem) => void;
   setAppState: React.Component<any, AppState>["setState"];
+  setLibraryItems: (libraries: LibraryItems) => void;
 }) => {
   const isMobile = useIsMobile();
   const numCells = library.length + (pendingElements.length > 0 ? 1 : 0);
@@ -148,6 +150,19 @@ const LibraryMenuItems = ({
             .catch((error) => {
               setAppState({ errorMessage: error.message });
             });
+        }}
+      />
+      <ToolButton
+        key="reset"
+        type="button"
+        title={t("buttons.resetLibraries")}
+        aria-label={t("buttons.resetLibraries")}
+        icon={trash}
+        onClick={() => {
+          if (window.confirm(t("alerts.resetLibraries"))) {
+            Library.resetLibrary();
+            setLibraryItems([]);
+          }
         }}
       />
 
@@ -281,6 +296,7 @@ const LibraryMenu = ({
           onInsertShape={onInsertShape}
           pendingElements={pendingElements}
           setAppState={setAppState}
+          setLibraryItems={setLibraryItems}
         />
       )}
     </Island>

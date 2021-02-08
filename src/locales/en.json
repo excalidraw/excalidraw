@@ -117,6 +117,7 @@
     "edit": "Edit",
     "undo": "Undo",
     "redo": "Redo",
+    "resetLibraries": "Reset libraries",
     "roomDialog": "Start live collaboration",
     "createNewRoom": "Create new room",
     "fullScreen": "Full screen",
@@ -140,7 +141,8 @@
     "errorLoadingLibrary": "There was an error loading the third party library.",
     "confirmAddLibrary": "This will add {{numShapes}} shape(s) to your library. Are you sure?",
     "imageDoesNotContainScene": "Importing images isn't supported at the moment.\n\nDid you want to import a scene? This image does not seem to contain any scene data. Have you enabled this during export?",
-    "cannotRestoreFromImage": "Scene couldn't be restored from this image file"
+    "cannotRestoreFromImage": "Scene couldn't be restored from this image file",
+    "resetLibraries": "This will clear all your libraries. Are you sure?"
   },
   "toolBar": {
     "selection": "Selection",
