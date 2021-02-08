@@ -19,7 +19,7 @@
 ### Option 2 - CodeSandbox
 
 1. Go to https://codesandbox.io/s/github/excalidraw/excalidraw
-1. Connect your Github account
+1. Connect your GitHub account
 1. Go to Git tab on left side
 1. Tap on `Fork Sandbox`
 1. Write your code
