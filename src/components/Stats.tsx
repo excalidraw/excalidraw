@@ -37,6 +37,7 @@ export const Stats = (props: {
   elements: readonly NonDeletedExcalidrawElement[];
   onClose: () => void;
   isCollaborating?: boolean;
+  shouldEnableNetworkStats: boolean;
 }) => {
   const isMobile = useIsMobile();
   const [storageSizes, setStorageSizes] = useState<StorageSizes>({
@@ -177,7 +178,7 @@ export const Stats = (props: {
                 </td>
               </tr>
             )}
-            {props.isCollaborating ? (
+            {props.shouldEnableNetworkStats && props.isCollaborating ? (
               <>
                 <tr>
                   <th colSpan={2}>{t("stats.collaboration")}</th>

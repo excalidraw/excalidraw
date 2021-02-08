@@ -207,6 +207,9 @@ const gesture: Gesture = {
   initialScale: null,
 };
 
+const shouldEnableNetworkStats = !!(
+  typeof process !== "undefined" && process.env?.REACT_APP_SOCKET_SERVER_URL
+);
 export type PointerDownState = Readonly<{
   // The first position at which pointerDown happened
   origin: Readonly<{ x: number; y: number }>;
@@ -474,6 +477,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             elements={this.scene.getElements()}
             onClose={this.toggleStats}
             isCollaborating={this.props.isCollaborating}
+            shouldEnableNetworkStats={shouldEnableNetworkStats}
           />
         )}
         {this.state.toastMessage !== null && (
@@ -881,8 +885,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
     }
     if (
-      prevState.showStats !== this.state.showStats ||
-      prevProps.isCollaborating !== this.props.isCollaborating
+      shouldEnableNetworkStats &&
+      (prevState.showStats !== this.state.showStats ||
+        prevProps.isCollaborating !== this.props.isCollaborating)
     ) {
       const navigator: Navigator & {
         connection?: {
