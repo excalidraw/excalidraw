@@ -244,7 +244,7 @@
     "copyStyles": "Kopierade stilar.",
     "copyToClipboard": "Kopierad till urklipp.",
     "copyToClipboardAsPng": "Kopierat till urklipp som PNG.",
-    "fileSaved": "",
-    "fileSavedToFilename": ""
+    "fileSaved": "Fil sparad.",
+    "fileSavedToFilename": "Sparad till {filename}"
   }
 }
