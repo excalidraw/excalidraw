@@ -244,7 +244,7 @@
     "copyStyles": "Gaya tersalin.",
     "copyToClipboard": "Tersalin ke papan klip.",
     "copyToClipboardAsPng": "Tersalin ke clipboard sebagai PNG.",
-    "fileSaved": "",
-    "fileSavedToFilename": ""
+    "fileSaved": "File tersimpan.",
+    "fileSavedToFilename": "Disimpan ke {filename}"
   }
 }
