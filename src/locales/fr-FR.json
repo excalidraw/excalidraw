@@ -244,7 +244,7 @@
     "copyStyles": "Styles copiés.",
     "copyToClipboard": "Copié vers le presse-papiers.",
     "copyToClipboardAsPng": "Copié vers le presse-papier en PNG.",
-    "fileSaved": "",
-    "fileSavedToFilename": ""
+    "fileSaved": "Fichier enregistré.",
+    "fileSavedToFilename": "Enregistré sous {filename}"
   }
 }
