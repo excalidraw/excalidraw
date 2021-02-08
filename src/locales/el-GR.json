@@ -245,6 +245,6 @@
     "copyToClipboard": "Αντιγράφηκε στο πρόχειρο.",
     "copyToClipboardAsPng": "Αντιγράφτηκε στο πρόχειρο ως PNG.",
     "fileSaved": "Το αρχείο αποθηκεύτηκε.",
-    "fileSavedToFilename": ""
+    "fileSavedToFilename": "Αποθηκεύτηκε στο {filename}"
   }
 }
