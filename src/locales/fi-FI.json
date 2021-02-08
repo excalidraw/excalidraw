@@ -244,7 +244,7 @@
     "copyStyles": "Tyylit kopioitu.",
     "copyToClipboard": "Kopioitu leikepöydälle.",
     "copyToClipboardAsPng": "Kopioitu leikepöydälle PNG-tiedostona.",
-    "fileSaved": "",
-    "fileSavedToFilename": ""
+    "fileSaved": "Tiedosto tallennettu.",
+    "fileSavedToFilename": "Tallennettu kohteeseen {filename}"
   }
 }
