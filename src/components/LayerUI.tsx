@@ -108,7 +108,7 @@ const LibraryMenuItems = ({
   onInsertShape: (elements: LibraryItem) => void;
   onAddToLibrary: (elements: LibraryItem) => void;
   setAppState: React.Component<any, AppState>["setState"];
-  setLibraryItems: (libraries: LibraryItems) => void;
+  setLibraryItems: (library: LibraryItems) => void;
 }) => {
   const isMobile = useIsMobile();
   const numCells = library.length + (pendingElements.length > 0 ? 1 : 0);
@@ -155,11 +155,11 @@ const LibraryMenuItems = ({
       <ToolButton
         key="reset"
         type="button"
-        title={t("buttons.resetLibraries")}
-        aria-label={t("buttons.resetLibraries")}
+        title={t("buttons.resetLibrary")}
+        aria-label={t("buttons.resetLibrary")}
         icon={trash}
         onClick={() => {
-          if (window.confirm(t("alerts.resetLibraries"))) {
+          if (window.confirm(t("alerts.resetLibrary"))) {
             Library.resetLibrary();
             setLibraryItems([]);
           }
