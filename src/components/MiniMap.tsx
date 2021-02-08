@@ -58,6 +58,15 @@ const MinimapViewport = ({
     height + top,
   );
 
+  if (
+    Number.isNaN(viewportTop) ||
+    Number.isNaN(viewportLeft) ||
+    Number.isNaN(viewportWidth) ||
+    Number.isNaN(viewportHeight)
+  ) {
+    return null;
+  }
+
   return (
     <div
       style={{
