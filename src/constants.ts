@@ -11,7 +11,7 @@ export const SHIFT_LOCKING_ANGLE = Math.PI / 12;
 export const CURSOR_TYPE = {
   TEXT: "text",
   CROSSHAIR: "crosshair",
-  GRABBING: "grabbing",
+  GRAB: "grab",
   POINTER: "pointer",
   MOVE: "move",
   AUTO: "",

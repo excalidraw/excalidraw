@@ -368,7 +368,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           style={{
             width: canvasDOMWidth,
             height: canvasDOMHeight,
-            cursor: "grabbing",
+            cursor: "grab",
           }}
           width={canvasWidth}
           height={canvasHeight}
@@ -1429,7 +1429,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
     if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
       isHoldingSpace = true;
-      document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
+      document.documentElement.style.cursor = CURSOR_TYPE.GRAB;
     }
   });
 
@@ -2214,7 +2214,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     let nextPastePrevented = false;
     const isLinux = /Linux/.test(window.navigator.platform);
 
-    document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
+    document.documentElement.style.cursor = CURSOR_TYPE.GRAB;
     let { clientX: lastX, clientY: lastY } = event;
     const onPointerMove = withBatchedUpdates((event: PointerEvent) => {
       const deltaX = lastX - event.clientX;
