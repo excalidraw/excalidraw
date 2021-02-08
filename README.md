@@ -2,7 +2,7 @@
   <a href="https://excalidraw.com">
     <img width="540" src="./public/og-image-sm.png" alt="Excalidraw logo: Sketch handrawn like diagrams." />
   </a>
-  <h3>Virtual whiteboard for sketching hand-drawn like diagrams.<br>Collaborative and end to end encrypted.</h3>
+  <h3>Virtual whiteboard for sketching hand-drawn like diagrams.<br>Collaborative and end-to-end encrypted.</h3>
   <p>
     <a href="https://twitter.com/Excalidraw">
       <img alt="Follow Excalidraw on Twitter" src="https://img.shields.io/twitter/follow/excalidraw.svg?label=follow+excalidraw&style=social&logo=twitter">
@@ -50,7 +50,7 @@ Translations will be available on the app if they exceed a certain threshold of 
 
 ### Create a collaboration session manually
 
-In order to create a session manually you just need to generate a link of this form:
+In order to create a session manually, you just need to generate a link of this form:
 
 ```
 https://excalidraw.com/#room=[0-9a-f]{20},[a-zA-Z0-9_-]{22}
@@ -70,12 +70,12 @@ The second set of digits is the encryption key. The Excalidraw server doesn’t 
 
 Find a growing list of libraries containing assets for your drawings at [libraries.excalidraw.com](https://libraries.excalidraw.com).
 
-## Developement
+## Development
 
 ### Code Sandbox
 
 - Go to https://codesandbox.io/s/github/excalidraw/excalidraw
-  - You may need to sign in with Github and reload the page
+  - You may need to sign in with GitHub and reload the page
 - You can start coding instantly, and even send PRs from there!
 
 ### Local Installation
@@ -101,15 +101,15 @@ git clone https://github.com/excalidraw/excalidraw.git
 
 #### Docker Compose
 
-You can use docker-compose to work on excalidraw locally if you don't want to setup a Node.js env.
+You can use docker-compose to work on Excalidraw locally if you don't want to setup a Node.js env.
 
 ```sh
 docker-compose up --build -d
 ```
 
-### Self hosting
+### Self-hosting
 
-We publish a Docker image with the Excalidraw client at [excalidraw/excalidraw](https://hub.docker.com/r/excalidraw/excalidraw). You can use it to self host your own client under your own domain, on Kubernetes, AWS ECS, etc.
+We publish a Docker image with the Excalidraw client at [excalidraw/excalidraw](https://hub.docker.com/r/excalidraw/excalidraw). You can use it to self-host your own client under your own domain, on Kubernetes, AWS ECS, etc.
 
 ```sh
 docker build -t excalidraw/excalidraw .
@@ -120,7 +120,7 @@ The Docker image is free of analytics and other tracking libraries.
 
 **At the moment, self-hosting your own instance doesn't support sharing or collaboration features.**
 
-We are working towards providing a full-fledged solution for self hosting your own Excalidraw.
+We are working towards providing a full-fledged solution for self-hosting your own Excalidraw.
 
 ## Contributing
 
