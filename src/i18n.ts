@@ -67,15 +67,6 @@ export const setLanguage = async (lang: Language) => {
   );
 };
 
-export const setLanguageFirstTime = async (lang: Language) => {
-  currentLang = lang;
-  document.documentElement.dir = currentLang.rtl ? "rtl" : "ltr";
-
-  currentLangData = await import(
-    /* webpackChunkName: "i18n-[request]" */ `./locales/${currentLang.code}.json`
-  );
-};
-
 export const getLanguage = () => currentLang;
 
 const findPartsForData = (data: any, parts: string[]) => {
