@@ -99,7 +99,7 @@ export const actionMinimap = register({
   },
   PanelComponent: ({ appState, elements }) =>
     appState.isMinimapEnabled ? (
-      <MiniMap appState={appState} elements={getNonDeletedElements(elements)} />
+      <MiniMap appState={appState} elements={elements} />
     ) : null,
   keyTest: (event) => event.key === KEYS.M,
 });

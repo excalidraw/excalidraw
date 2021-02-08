@@ -1,8 +1,8 @@
 import "./MiniMap.scss";
 
-import React, { useEffect, useRef } from "react";
-import { getCommonBounds } from "../element";
-import { NonDeletedExcalidrawElement } from "../element/types";
+import React, { useEffect, useRef, useMemo } from "react";
+import { getCommonBounds, getNonDeletedElements } from "../element";
+import { ExcalidrawElement } from "../element/types";
 import { exportToCanvas } from "../scene/export";
 import { AppState } from "../types";
 import { distance, viewportCoordsToSceneCoords } from "../utils";
@@ -16,14 +16,13 @@ const MinimapViewport = ({
   elements,
   appState,
 }: {
-  elements: readonly NonDeletedExcalidrawElement[];
+  elements: readonly ExcalidrawElement[];
   appState: AppState;
 }) => {
-  if (elements.length === 0) {
-    return null;
-  }
-
-  const [minX, minY, maxX, maxY] = getCommonBounds(elements);
+  const [minX, minY, maxX, maxY] = useMemo(
+    () => getCommonBounds(getNonDeletedElements(elements)),
+    [elements],
+  );
 
   const minimapScale = Math.min(
     MINIMAP_WIDTH / distance(minX, maxX),
@@ -88,7 +87,7 @@ export function MiniMap({
   elements,
 }: {
   appState: AppState;
-  elements: readonly NonDeletedExcalidrawElement[];
+  elements: readonly ExcalidrawElement[];
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const appStateRef = useRef<AppState>(appState);
@@ -99,8 +98,9 @@ export function MiniMap({
     if (!canvasNode) {
       return;
     }
+
     exportToCanvas(
-      elements,
+      getNonDeletedElements(elements),
       appStateRef.current,
       {
         exportBackground: true,
@@ -127,6 +127,7 @@ export function MiniMap({
           width: MINIMAP_WIDTH,
           height: MINIMAP_HEIGHT,
           position: "relative",
+          overflow: "hidden",
           backgroundColor: appState.viewBackgroundColor,
         }}
       >
