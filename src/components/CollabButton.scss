@@ -4,7 +4,8 @@
   .CollabButton.is-collaborating {
     background-color: var(--button-special-active-background-color);
 
-    .ToolIcon__icon svg {
+    .ToolIcon__icon svg,
+    .ToolIcon__label {
       color: var(--icon-green-fill-color);
     }
   }
