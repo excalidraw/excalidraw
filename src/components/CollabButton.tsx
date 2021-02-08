@@ -25,8 +25,8 @@ const CollabButton = ({
         onClick={onClick}
         icon={users}
         type="button"
-        title={t("buttons.roomDialog")}
-        aria-label={t("buttons.roomDialog")}
+        title={t("labels.liveCollaboration")}
+        aria-label={t("labels.liveCollaboration")}
         showAriaLabel={useIsMobile()}
       >
         {collaboratorCount > 0 && (
