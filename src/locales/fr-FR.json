@@ -117,7 +117,7 @@
     "edit": "Modifier",
     "undo": "Annuler",
     "redo": "Rétablir",
-    "resetLibrary": "",
+    "resetLibrary": "Réinitialiser la bibliothèque",
     "createNewRoom": "Créer une nouvelle salle",
     "fullScreen": "Plein écran",
     "darkMode": "Mode sombre",
@@ -141,7 +141,7 @@
     "confirmAddLibrary": "Cela va ajouter {{numShapes}} forme(s) à votre bibliothèque. Êtes-vous sûr·e ?",
     "imageDoesNotContainScene": "L'importation d'images n'est pas prise en charge pour le moment.\n\nVouliez-vous importer une scène ? Cette image ne semble pas contenir de données de scène. Avez-vous activé cette option lors de l'exportation ?",
     "cannotRestoreFromImage": "Impossible de restaurer la scène depuis ce fichier image",
-    "resetLibrary": ""
+    "resetLibrary": "Cela va effacer votre bibliothèque. Êtes-vous sûr·e ?"
   },
   "toolBar": {
     "selection": "Sélection",
