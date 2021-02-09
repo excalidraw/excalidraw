@@ -117,6 +117,7 @@
     "edit": "編集",
     "undo": "元に戻す",
     "redo": "やり直し",
+    "resetLibrary": "",
     "createNewRoom": "新しい部屋を作成する",
     "fullScreen": "全画面表示",
     "darkMode": "ダークモード",
@@ -139,7 +140,8 @@
     "errorLoadingLibrary": "サードパーティライブラリの読み込み中にエラーが発生しました。",
     "confirmAddLibrary": "{{numShapes}} 個の図形をライブラリに追加します。よろしいですか？",
     "imageDoesNotContainScene": "",
-    "cannotRestoreFromImage": "このイメージファイルからシーンを復元できませんでした"
+    "cannotRestoreFromImage": "このイメージファイルからシーンを復元できませんでした",
+    "resetLibrary": ""
   },
   "toolBar": {
     "selection": "選択",
