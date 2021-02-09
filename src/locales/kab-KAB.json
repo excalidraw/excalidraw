@@ -117,6 +117,7 @@
     "edit": "Ẓreg",
     "undo": "Sefsex",
     "redo": "Err-d",
+    "resetLibrary": "",
     "createNewRoom": "Snulfu-d taxxamt tamaynutt",
     "fullScreen": "Agdil aččuran",
     "darkMode": "Askar imsulles",
@@ -139,7 +140,8 @@
     "errorLoadingLibrary": "Teḍra-d tuccḍa deg usali n temkarḍit n wis kraḍ.",
     "confirmAddLibrary": "Ayagi adirnu talɣa (win) {{numShapes}} ɣer temkarḍit-inek (m). Tetḥeqqeḍ?",
     "imageDoesNotContainScene": "Taktert n tugniwin ur tettwadhel ara akka tura.\nTebɣiḍ ad tketreḍ asayes? Tugna-agi tettban-d ur tegbir ara isefka n usnas. Tesremdeḍ ayagi deg usifeḍ?",
-    "cannotRestoreFromImage": "Asayes ulamek ara d-yettwarr seg ufaylu-agi n tugna"
+    "cannotRestoreFromImage": "Asayes ulamek ara d-yettwarr seg ufaylu-agi n tugna",
+    "resetLibrary": ""
   },
   "toolBar": {
     "selection": "Tafrayt",
