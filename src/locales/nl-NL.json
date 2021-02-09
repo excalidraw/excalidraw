@@ -117,6 +117,7 @@
     "edit": "Bewerken",
     "undo": "Ongedaan maken",
     "redo": "Herstel ongedaan maken",
+    "resetLibrary": "",
     "createNewRoom": "Creëer live-samenwerkingssessie",
     "fullScreen": "Volledig scherm",
     "darkMode": "Donkere modus",
@@ -139,7 +140,8 @@
     "errorLoadingLibrary": "Bij het laden van de externe bibliotheek is een fout opgetreden.",
     "confirmAddLibrary": "Hiermee worden {{numShapes}} vorm(n) aan uw bibliotheek toegevoegd. Ben je het zeker?",
     "imageDoesNotContainScene": "Afbeeldingen importeren wordt op dit moment niet ondersteund.\n\nWil je een scène importeren? Deze afbeelding lijkt geen scène gegevens te bevatten. Heb je dit geactiveerd tijdens het exporteren?",
-    "cannotRestoreFromImage": "Scène kan niet worden hersteld vanuit dit afbeeldingsbestand"
+    "cannotRestoreFromImage": "Scène kan niet worden hersteld vanuit dit afbeeldingsbestand",
+    "resetLibrary": ""
   },
   "toolBar": {
     "selection": "Selectie",
