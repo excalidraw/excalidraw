@@ -117,6 +117,7 @@
     "edit": "編輯",
     "undo": "復原",
     "redo": "重做",
+    "resetLibrary": "",
     "createNewRoom": "建立新協作會議室",
     "fullScreen": "全螢幕",
     "darkMode": "深色模式",
@@ -139,7 +140,8 @@
     "errorLoadingLibrary": "載入第三方套件時出現錯誤。",
     "confirmAddLibrary": "這將會將 {{numShapes}} 個圖形加入你的資料庫，你確定嗎？",
     "imageDoesNotContainScene": "目前尚不支援載入圖片。\n您是否要載入場景？此圖片中並無任何場景資料，輸出時是否有選擇包含？",
-    "cannotRestoreFromImage": "無法由此檔案回復場景。"
+    "cannotRestoreFromImage": "無法由此檔案回復場景。",
+    "resetLibrary": ""
   },
   "toolBar": {
     "selection": "選取",
