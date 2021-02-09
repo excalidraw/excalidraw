@@ -117,6 +117,7 @@
     "edit": "Muokkaa",
     "undo": "Kumoa",
     "redo": "Tee uudelleen",
+    "resetLibrary": "",
     "createNewRoom": "Luo huone",
     "fullScreen": "Koko näyttö",
     "darkMode": "Tumma tila",
@@ -139,7 +140,8 @@
     "errorLoadingLibrary": "Kolmannen osapuolen kirjastoa ladattaessa tapahtui virhe.",
     "confirmAddLibrary": "Tämä lisää {{numShapes}} muotoa kirjastoosi. Oletko varma?",
     "imageDoesNotContainScene": "Kuvien lisääminen ei ole tällä hetkellä mahdollista.\n\nHaluatko tuoda piirroksen? Tämä kuva ei näytä sisältävän tarvittavia tietoja. Oletko ottanut piirrostietojen tallennuksen käyttöön viennin aikana?",
-    "cannotRestoreFromImage": "Teosta ei voitu palauttaa tästä kuvatiedostosta"
+    "cannotRestoreFromImage": "Teosta ei voitu palauttaa tästä kuvatiedostosta",
+    "resetLibrary": ""
   },
   "toolBar": {
     "selection": "Valinta",
