@@ -95,7 +95,6 @@ export default function App() {
     excalidrawRef.current.updateScene(sceneData);
   };
 
-  const { width, height } = dimensions;
   return (
     <div className="App">
       <div className="button-wrapper">
@@ -138,8 +137,8 @@ export default function App() {
       <div className="excalidraw-wrapper">
         <Excalidraw
           ref={excalidrawRef}
-          width={width}
-          height={height}
+          width={dimensions.width}
+          height={dimensions.height}
           initialData={InitialData}
           onChange={onChange}
           user={{ name: "Excalidraw User" }}
