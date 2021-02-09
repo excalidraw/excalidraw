@@ -117,7 +117,7 @@
     "edit": "Redigera",
     "undo": "Ångra",
     "redo": "Gör om",
-    "resetLibrary": "",
+    "resetLibrary": "Återställ bibliotek",
     "createNewRoom": "Skapa ett nytt rum",
     "fullScreen": "Helskärm",
     "darkMode": "Mörkt läge",
@@ -141,7 +141,7 @@
     "confirmAddLibrary": "Detta kommer att lägga till {{numShapes}} form(er) till ditt bibliotek. Är du säker?",
     "imageDoesNotContainScene": "Importering av bilder stöds inte just nu.\n\nVill du importera en skiss? Den här bilden verkar inte innehålla någon skissdata. Har du aktiverat detta under export?",
     "cannotRestoreFromImage": "Skiss kunde inte återställas från denna bildfil",
-    "resetLibrary": ""
+    "resetLibrary": "Detta kommer att rensa ditt bibliotek. Är du säker?"
   },
   "toolBar": {
     "selection": "Markering",
