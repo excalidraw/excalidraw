@@ -141,6 +141,11 @@ export const textWysiwyg = ({
     cleanup();
   };
 
+  const handleResize = () => {
+    updateWysiwygStyle();
+    handleSubmit();
+  };
+
   const cleanup = () => {
     if (isDestroyed) {
       return;
@@ -151,7 +156,7 @@ export const textWysiwyg = ({
     editable.oninput = null;
     editable.onkeydown = null;
 
-    window.removeEventListener("resize", updateWysiwygStyle);
+    window.removeEventListener("resize", handleResize);
     window.removeEventListener("wheel", stopEvent, true);
     window.removeEventListener("pointerdown", onPointerDown);
     window.removeEventListener("pointerup", rebindBlur);
@@ -199,7 +204,7 @@ export const textWysiwyg = ({
   editable.onblur = handleSubmit;
   // reposition wysiwyg in case of window resize. Happens on mobile when
   // device keyboard is opened.
-  window.addEventListener("resize", updateWysiwygStyle);
+  window.addEventListener("resize", handleResize);
   window.addEventListener("pointerdown", onPointerDown);
   window.addEventListener("wheel", stopEvent, {
     passive: false,
