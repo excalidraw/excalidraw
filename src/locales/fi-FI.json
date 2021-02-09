@@ -68,7 +68,7 @@
     "layers": "Tasot",
     "actions": "Toiminnot",
     "language": "Kieli",
-    "liveCollaboration": "",
+    "liveCollaboration": "Live-yhteistyö",
     "duplicateSelection": "Monista",
     "untitled": "Nimetön",
     "name": "Nimi",
@@ -117,7 +117,7 @@
     "edit": "Muokkaa",
     "undo": "Kumoa",
     "redo": "Tee uudelleen",
-    "resetLibrary": "",
+    "resetLibrary": "Tyhjennä kirjasto",
     "createNewRoom": "Luo huone",
     "fullScreen": "Koko näyttö",
     "darkMode": "Tumma tila",
@@ -141,7 +141,7 @@
     "confirmAddLibrary": "Tämä lisää {{numShapes}} muotoa kirjastoosi. Oletko varma?",
     "imageDoesNotContainScene": "Kuvien lisääminen ei ole tällä hetkellä mahdollista.\n\nHaluatko tuoda piirroksen? Tämä kuva ei näytä sisältävän tarvittavia tietoja. Oletko ottanut piirrostietojen tallennuksen käyttöön viennin aikana?",
     "cannotRestoreFromImage": "Teosta ei voitu palauttaa tästä kuvatiedostosta",
-    "resetLibrary": ""
+    "resetLibrary": "Tämä tyhjentää kirjastosi. Oletko varma?"
   },
   "toolBar": {
     "selection": "Valinta",
