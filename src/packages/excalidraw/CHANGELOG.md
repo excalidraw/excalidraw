@@ -12,7 +12,7 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
-## [Unreleased]
+## 0.3.0
 
 ## Excalidraw API
 
@@ -27,14 +27,55 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
+- Add the ability to clear library [#2997](https"//github.com/excalidraw/excaidraw/pull/2997)
+- Updates to Collaboration and RTL UX [#2994](https"//github.com/excalidraw/excaidraw/pull/2994)
+- show toast when saving to existing file [#2988](https"//github.com/excalidraw/excaidraw/pull/2988)
+- support supplying custom scale when exporting canvas [#2904](https"//github.com/excalidraw/excaidraw/pull/2904)
+- Show version in the stats dialog [#2908](https"//github.com/excalidraw/excaidraw/pull/2908)
+- Add idle detection to collaboration feature [#2877](https"//github.com/excalidraw/excaidraw/pull/2877)
+- add view mode in Excalidraw [#2840](https"//github.com/excalidraw/excaidraw/pull/2840)
+- increase max zoom [#2881](https"//github.com/excalidraw/excaidraw/pull/2881)
+- Remove copy & paste from context menu on desktop [#2872](https"//github.com/excalidraw/excaidraw/pull/2872)
+- Add separators on context menu [#2659](https"//github.com/excalidraw/excaidraw/pull/2659)
+- add ctrl-y to redo [#2831](https"//github.com/excalidraw/excaidraw/pull/2831)
 - Add view mode [#2840](https://github.com/excalidraw/excalidraw/pull/2840).
 - Remove `copy`, `cut`, and `paste` actions from contextmenu [#2872](https://github.com/excalidraw/excalidraw/pull/2872)
 - Support `Ctrl-Y` shortcut to redo on Windows [#2831](https://github.com/excalidraw/excalidraw/pull/2831).
 
 ### Fixes
 
+- Update the `lang` attribute with the current lang. [#2995](https"//github.com/excalidraw/excaidraw/pull/2995)
+- Rename 'Grid mode' to 'Show grid' [#2944](https"//github.com/excalidraw/excaidraw/pull/2944)
+- Deal with users on systems that don't handle emoji [#2941](https"//github.com/excalidraw/excaidraw/pull/2941)
+- mobile toolbar tooltip regression [#2939](https"//github.com/excalidraw/excaidraw/pull/2939)
+- hide collaborator list on mobile if empty [#2938](https"//github.com/excalidraw/excaidraw/pull/2938)
+- toolbar unnecessarily eats too much width [#2924](https"//github.com/excalidraw/excaidraw/pull/2924)
+- mistakenly hardcoding scale [#2925](https"//github.com/excalidraw/excaidraw/pull/2925)
+- text editor not visible in dark mode [#2920](https"//github.com/excalidraw/excaidraw/pull/2920)
+- incorrect z-index of text editor [#2914](https"//github.com/excalidraw/excaidraw/pull/2914)
+- make scrollbars draggable when offsets are set [#2916](https"//github.com/excalidraw/excaidraw/pull/2916)
+- pointer-events being disabled on free-draw [#2912](https"//github.com/excalidraw/excaidraw/pull/2912)
+- track zenmode and grid mode usage [#2900](https"//github.com/excalidraw/excaidraw/pull/2900)
+- disable UI pointer-events on canvas drag [#2856](https"//github.com/excalidraw/excaidraw/pull/2856)
+- stop flooring scroll positions [#2883](https"//github.com/excalidraw/excaidraw/pull/2883)
+- Apply initialData appState for zenmode and grid stats and refactor check param for actions [#2871](https"//github.com/excalidraw/excaidraw/pull/2871)
+- Show correct state of Nerd stats in context menu when nerd stats dialog closed [#2874](https"//github.com/excalidraw/excaidraw/pull/2874)
+- remote pointers not accounting for offset [#2855](https"//github.com/excalidraw/excaidraw/pull/2855)
+- toggle help dialog when "shift+?" is pressed [#2828](https"//github.com/excalidraw/excaidraw/pull/2828)
+- add safe check for process so Excalidraw can be loaded via script [#2824](https"//github.com/excalidraw/excaidraw/pull/2824)
 - Fix UI pointer-events not disabled when dragging on canvas [#2856](https://github.com/excalidraw/excalidraw/pull/2856).
 - Fix remote pointers not accounting for offset [#2855](https://github.com/excalidraw/excalidraw/pull/2855).
+
+### Refactor
+
+- remove duplicate key handling [#2878](https"//github.com/excalidraw/excaidraw/pull/2878)
+- reuse scss variables in js for SSOT [#2867](https"//github.com/excalidraw/excaidraw/pull/2867)
+- Rename browser-nativefs to browser-fs-access [#2862](https"//github.com/excalidraw/excaidraw/pull/2862)
+- rewrite collabWrapper to remove TDZs and simplify [#2834](https"//github.com/excalidraw/excaidraw/pull/2834)
+
+### Chore
+
+- Use `Sentence case` for `Live collaboration`
 
 ## 0.2.1
 
