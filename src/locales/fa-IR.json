@@ -68,7 +68,7 @@
     "layers": "لایه ها",
     "actions": "عملیات",
     "language": "زبان",
-    "createRoom": "اشتراک گذاری جلسه همکاری زنده",
+    "liveCollaboration": "",
     "duplicateSelection": "تکرار",
     "untitled": "بدون عنوان",
     "name": "نام",
@@ -117,7 +117,6 @@
     "edit": "ویرایش",
     "undo": "بازگرد",
     "redo": "از سر",
-    "roomDialog": "همکاری آنلاین را شروع کنید",
     "createNewRoom": "ایجاد یک اتاق جدید",
     "fullScreen": "تمام‌صفحه",
     "darkMode": "حالت تیره",
@@ -243,6 +242,8 @@
   "toast": {
     "copyStyles": "کپی سبک.",
     "copyToClipboard": "",
-    "copyToClipboardAsPng": "کپی در حافطه موقت به صورت PNG."
+    "copyToClipboardAsPng": "کپی در حافطه موقت به صورت PNG.",
+    "fileSaved": "",
+    "fileSavedToFilename": ""
   }
 }

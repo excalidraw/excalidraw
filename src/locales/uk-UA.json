@@ -68,7 +68,7 @@
     "layers": "Шари",
     "actions": "Дії",
     "language": "Мова",
-    "createRoom": "Поділитися сесією для спільної роботи",
+    "liveCollaboration": "Спільна співпраця",
     "duplicateSelection": "Дублювати",
     "untitled": "Без назви",
     "name": "Ім’я",
@@ -77,7 +77,7 @@
     "group": "Групувати виділене",
     "ungroup": "Розгрупувати виділене",
     "collaborators": "Співавтори",
-    "showGrid": "",
+    "showGrid": "Показати сітку",
     "addToLibrary": "Додати до бібліотеки",
     "removeFromLibrary": "Видалити з бібліотеки",
     "libraryLoadingMessage": "Завантажити бібліотеку…",
@@ -92,7 +92,7 @@
     "centerHorizontally": "Центрувати по горизонталі",
     "distributeHorizontally": "Розподілити по горизонталі",
     "distributeVertically": "Розподілити вертикально",
-    "viewMode": ""
+    "viewMode": "Режим перегляду"
   },
   "buttons": {
     "clearReset": "Очистити полотно",
@@ -117,7 +117,6 @@
     "edit": "Редагувати",
     "undo": "Відмінити",
     "redo": "Повторити",
-    "roomDialog": "Відкрити сесію спільної роботи",
     "createNewRoom": "Створити нову кімнату",
     "fullScreen": "Повноекранний режим",
     "darkMode": "Темний режим",
@@ -136,7 +135,7 @@
     "decryptFailed": "Не вдалося розшифрувати дані.",
     "uploadedSecurly": "Це завантаження було захищене наскрізним шифруванням, а це означає що сервер Excalidraw та інші не зможуть прочитати вміст.",
     "loadSceneOverridePrompt": "Завантаження зовнішнього креслення замінить ваш наявний контент. Продовжити?",
-    "collabStopOverridePrompt": "",
+    "collabStopOverridePrompt": "Зупинка сесії перезапише ваш попередній, локально збережений малюнок. Ви впевнені?\n\n(Якщо ви хочете зберегти локальний малюнок, просто закрийте замість нього вкладку браузера.)",
     "errorLoadingLibrary": "Помилка при завантаженні сторонньої бібліотеки.",
     "confirmAddLibrary": "Це призведе до додавання {{numShapes}} фігур до вашої бібліотеки. Ви впевнені?",
     "imageDoesNotContainScene": "Імпортування зображень на даний момент не підтримується.\n\nЧи хочете ви імпортувати сцену? Це зображення не містить ніяких даних сцен. Ви увімкнули це під час експорту?",
@@ -235,14 +234,16 @@
     "storage": "Сховище",
     "title": "Статистика",
     "total": "Всього",
-    "version": "",
-    "versionCopy": "",
-    "versionNotAvailable": "",
+    "version": "Версія",
+    "versionCopy": "Натисніть, щоб скопіювати",
+    "versionNotAvailable": "Версія недоступна",
     "width": "Ширина"
   },
   "toast": {
     "copyStyles": "Скопійовані стилі.",
-    "copyToClipboard": "",
-    "copyToClipboardAsPng": "Скопійовано в буфер обміну як PNG."
+    "copyToClipboard": "Скопіювати до буферу обміну.",
+    "copyToClipboardAsPng": "Скопійовано в буфер обміну як PNG.",
+    "fileSaved": "Файл збережено.",
+    "fileSavedToFilename": "Збережено в {filename}"
   }
 }

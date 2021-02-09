@@ -68,7 +68,7 @@
     "layers": "Camadas",
     "actions": "Ações",
     "language": "Idioma",
-    "createRoom": "Compartilhar uma sessão de colaboração ao vivo",
+    "liveCollaboration": "",
     "duplicateSelection": "Duplicar",
     "untitled": "Sem título",
     "name": "Nome",
@@ -117,7 +117,6 @@
     "edit": "Editar",
     "undo": "Desfazer",
     "redo": "Refazer",
-    "roomDialog": "Iniciar colaboração ao vivo",
     "createNewRoom": "Criar nova sala",
     "fullScreen": "Tela cheia",
     "darkMode": "Modo escuro",
@@ -243,6 +242,8 @@
   "toast": {
     "copyStyles": "Estilos copiados.",
     "copyToClipboard": "",
-    "copyToClipboardAsPng": "Copiado para o clipboard como PNG."
+    "copyToClipboardAsPng": "Copiado para o clipboard como PNG.",
+    "fileSaved": "",
+    "fileSavedToFilename": ""
   }
 }

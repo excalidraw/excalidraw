@@ -68,7 +68,7 @@
     "layers": "Στρώματα",
     "actions": "Ενέργειες",
     "language": "Γλώσσα",
-    "createRoom": "Έναρξη ζωντανής συνεδρίας",
+    "liveCollaboration": "",
     "duplicateSelection": "Δημιουργία αντιγράφου",
     "untitled": "Χωρίς τίτλο",
     "name": "Όνομα",
@@ -117,7 +117,6 @@
     "edit": "Επεξεργασία",
     "undo": "Αναίρεση",
     "redo": "Επαναφορά",
-    "roomDialog": "Έναρξη ζωντανής συνεργασίας",
     "createNewRoom": "Δημιουργία νέου χώρου",
     "fullScreen": "Πλήρης οθόνη",
     "darkMode": "Σκοτεινή λειτουργία",
@@ -243,6 +242,8 @@
   "toast": {
     "copyStyles": "Αντιγράφηκαν στυλ.",
     "copyToClipboard": "Αντιγράφηκε στο πρόχειρο.",
-    "copyToClipboardAsPng": "Αντιγράφτηκε στο πρόχειρο ως PNG."
+    "copyToClipboardAsPng": "Αντιγράφτηκε στο πρόχειρο ως PNG.",
+    "fileSaved": "Το αρχείο αποθηκεύτηκε.",
+    "fileSavedToFilename": "Αποθηκεύτηκε στο {filename}"
   }
 }

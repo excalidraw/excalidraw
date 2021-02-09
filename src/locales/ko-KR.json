@@ -68,7 +68,7 @@
     "layers": "레이어",
     "actions": "동작",
     "language": "언어",
-    "createRoom": "실시간 협업 세션 공유",
+    "liveCollaboration": "",
     "duplicateSelection": "복제",
     "untitled": "제목 없음",
     "name": "이름",
@@ -117,7 +117,6 @@
     "edit": "수정",
     "undo": "실행 취소",
     "redo": "다시 실행",
-    "roomDialog": "실시간 협업 시작하기",
     "createNewRoom": "방 만들기",
     "fullScreen": "전체화면",
     "darkMode": "다크 모드",
@@ -243,6 +242,8 @@
   "toast": {
     "copyStyles": "스타일 복사.",
     "copyToClipboard": "클립보드로 복사.",
-    "copyToClipboardAsPng": "클립보드로 PNG 이미지 복사."
+    "copyToClipboardAsPng": "클립보드로 PNG 이미지 복사.",
+    "fileSaved": "",
+    "fileSavedToFilename": ""
   }
 }

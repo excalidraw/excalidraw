@@ -68,7 +68,7 @@
     "layers": "שכבות",
     "actions": "פעולות",
     "language": "שפה",
-    "createRoom": "התחל שיתוף פעולה חי",
+    "liveCollaboration": "",
     "duplicateSelection": "שכפל",
     "untitled": "ללא כותרת",
     "name": "שם",
@@ -117,7 +117,6 @@
     "edit": "ערוך",
     "undo": "בטל",
     "redo": "בצע מחדש",
-    "roomDialog": "התחל שיתוף חי",
     "createNewRoom": "צור חדר",
     "fullScreen": "מסך מלא",
     "darkMode": "מצב כהה",
@@ -243,6 +242,8 @@
   "toast": {
     "copyStyles": "",
     "copyToClipboard": "",
-    "copyToClipboardAsPng": ""
+    "copyToClipboardAsPng": "",
+    "fileSaved": "",
+    "fileSavedToFilename": ""
   }
 }
