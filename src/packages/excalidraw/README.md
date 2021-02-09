@@ -50,14 +50,14 @@ export default function App() {
   const [zenModeEnabled, setZenModeEnabled] = useState(false);
   const [gridModeEnabled, setGridModeEnabled] = useState(false);
 
-  const onResize = () => {
-    setDimensions({
-      width: window.innerWidth,
-      height: window.innerHeight,
-    });
-  };
-
   useEffect(() => {
+    const onResize = () => {
+      setDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
     window.addEventListener("resize", onResize);
 
     return () => window.removeEventListener("resize", onResize);
