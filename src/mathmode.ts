@@ -1,26 +1,50 @@
+// Some imports
 import { FontString } from "./element/types";
 import { measureText } from "./utils";
+
+// MathJax components we use
 import { AsciiMath } from "mathjax-full/js/input/asciimath.js";
 import { SVG } from "mathjax-full/js/output/svg.js";
 import { liteAdaptor } from "mathjax-full/js/adaptors/liteAdaptor.js";
 import { HTMLDocument } from "mathjax-full/js/handlers/html/HTMLDocument.js";
+
+// Types needed to lazy-load MathJax
+import { LiteElement } from "mathjax-full/js/adaptors/lite/Element.js";
+import { LiteText } from "mathjax-full/js/adaptors/lite/Text.js";
+import { LiteDocument } from "mathjax-full/js/adaptors/lite/Document.js";
+import { LiteAdaptor } from "mathjax-full/js/adaptors/liteAdaptor.js";
+
+// For caching the SVGs
 import { StringMap } from "mathjax-full/js/output/common/Wrapper";
 
-const asciimath = new AsciiMath({});
-const svg = new SVG();
-const adaptor = liteAdaptor();
-const html = new HTMLDocument("", adaptor, {
-  InputJax: asciimath,
-  OutputJax: svg,
-});
+const mathJax = {} as {
+  adaptor: LiteAdaptor;
+  html: HTMLDocument<LiteElement | LiteText, LiteText, LiteDocument>;
+};
 
+const loadMathJax = () => {
+  if (mathJax.adaptor === undefined || mathJax.html === undefined) {
+    const asciimath = new AsciiMath({});
+    const svg = new SVG({ fontCache: "local" });
+    const adaptor = liteAdaptor();
+    const html = new HTMLDocument("", adaptor, {
+      InputJax: asciimath,
+      OutputJax: svg,
+    });
+    mathJax.adaptor = adaptor;
+    mathJax.html = html;
+  }
+};
+
+// Cache the SVGs from MathJax
 const mathJaxSvgCache = {} as StringMap;
 
 const asciimath2Svg = (text: string) => {
   if (mathJaxSvgCache[text]) {
     return mathJaxSvgCache[text];
   }
-  const htmlString = adaptor.innerHTML(html.convert(text));
+  loadMathJax();
+  const htmlString = mathJax.adaptor.innerHTML(mathJax.html.convert(text));
   mathJaxSvgCache[text] = htmlString;
   return htmlString;
 };
@@ -90,6 +114,11 @@ export const encapsulateHtml = (
   return svgString;
 };
 
+// Cache the images rendered from the HTML
+const canvasImageCache = {} as {
+  [key: string]: HTMLImageElement;
+};
+
 export const drawHtmlOnCanvas = (
   context: CanvasRenderingContext2D,
   htmlString: String,
@@ -109,18 +138,26 @@ export const drawHtmlOnCanvas = (
     htmlString,
   )}</svg>`;
 
-  const DOMURL = window.URL || window.webkitURL || window;
+  const oldImage = canvasImageCache[data] ? canvasImageCache[data] : undefined;
+  if (oldImage !== undefined) {
+    context.drawImage(oldImage, 0, 0);
+  } else {
+    const DOMURL = window.URL || window.webkitURL || window;
 
-  const img = new Image();
-  const svg = new Blob([data], { type: "image/svg+xml;charset=utf-8" });
-  const url = DOMURL.createObjectURL(svg);
+    const img = new Image();
+    const svg = new Blob([data], { type: "image/svg+xml;charset=utf-8" });
+    const url = DOMURL.createObjectURL(svg);
 
-  img.onload = function () {
-    context.drawImage(img, x, y);
-    DOMURL.revokeObjectURL(url);
-  };
+    const oldOnload = img.onload;
+    img.onload = function () {
+      context.drawImage(img, x, y);
+      DOMURL.revokeObjectURL(url);
+    };
 
-  img.src = url;
+    img.src = url;
+    img.onload = oldOnload;
+    canvasImageCache[data] = img;
+  }
 };
 
 export const isMathMode = (fontString: FontString) => {

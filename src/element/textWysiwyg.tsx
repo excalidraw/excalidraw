@@ -50,10 +50,6 @@ export const textWysiwyg = ({
   const updateWysiwygStyle = () => {
     const updatedElement = Scene.getScene(element)?.getElement(id);
     if (updatedElement && isTextElement(updatedElement)) {
-      const [viewportX, viewportY] = getViewportCoords(
-        updatedElement.x,
-        updatedElement.y,
-      );
       const { textAlign, angle } = updatedElement;
 
       editable.value = updatedElement.text;
@@ -65,6 +61,16 @@ export const textWysiwyg = ({
       );
       const lineHeight = metrics.height / lines.length;
 
+      const offsetX =
+        textAlign === "right"
+          ? updatedElement.width - metrics.width
+          : textAlign === "center"
+          ? (updatedElement.width - metrics.width) / 2
+          : 0;
+      const [viewportX, viewportY] = getViewportCoords(
+        updatedElement.x + offsetX,
+        updatedElement.y,
+      );
       Object.assign(editable.style, {
         font: getFontString(updatedElement),
         // must be defined *after* font ¯\_(ツ)_/¯
