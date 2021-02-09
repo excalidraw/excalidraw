@@ -117,7 +117,7 @@
     "edit": "Edit",
     "undo": "Anulare",
     "redo": "Refacere",
-    "resetLibrary": "",
+    "resetLibrary": "Resetare bibliotecă",
     "createNewRoom": "Creare cameră nouă",
     "fullScreen": "Ecran complet",
     "darkMode": "Mod întunecat",
@@ -141,7 +141,7 @@
     "confirmAddLibrary": "Această acțiune va adăuga {{numShapes}} formă(e) la biblioteca ta. Confirmi?",
     "imageDoesNotContainScene": "Importarea imaginilor nu este acceptată în acest moment.\n\nVoiai să imporți o scenă? Această imagine nu pare să conțină date de scenă. Ai activat această opțiune pe durata exportării?",
     "cannotRestoreFromImage": "Scena nu a putut fi restaurată din acest fișier de imagine",
-    "resetLibrary": ""
+    "resetLibrary": "Această opțiune va elimina conținutul din bibliotecă. Confirmi?"
   },
   "toolBar": {
     "selection": "Selecție",
