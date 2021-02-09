@@ -36,19 +36,30 @@ import "./styles.css";
 export default function App() {
   const excalidrawRef = createRef();
 
+  const onChange = (elements, state) => {
+    console.log(excalidrawRef.current);
+    console.log("Elements :", elements, "State : ", state);
+  };
+
   const [dimensions, setDimensions] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
   });
 
+  const [viewModeEnabled, setViewModeEnabled] = useState(false);
+  const [zenModeEnabled, setZenModeEnabled] = useState(false);
+  const [gridModeEnabled, setGridModeEnabled] = useState(false);
+
+  const onResize = () => {
+    setDimensions({
+      width: window.innerWidth,
+      height: window.innerHeight,
+    });
+  };
+
   useEffect(() => {
-    const onResize = () => {
-      setDimensions({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    };
     window.addEventListener("resize", onResize);
+
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
@@ -84,32 +95,61 @@ export default function App() {
     excalidrawRef.current.updateScene(sceneData);
   };
 
+  const { width, height } = dimensions;
   return (
     <div className="App">
-      <button className="update-scene" onClick={updateScene}>
-        Update Scene
-      </button>
-      <button
-        className="reset-scene"
-        onClick={() => {
-          excalidrawRef.current.resetScene();
-        }}
-      >
-        Reset Scene
-      </button>
+      <div className="button-wrapper">
+        <button className="update-scene" onClick={updateScene}>
+          Update Scene
+        </button>
+        <button
+          className="reset-scene"
+          onClick={() => {
+            excalidrawRef.current.resetScene();
+          }}
+        >
+          Reset Scene
+        </button>
+        <label>
+          <input
+            type="checkbox"
+            checked={viewModeEnabled}
+            onChange={() => setViewModeEnabled(!viewModeEnabled)}
+          />
+          View mode
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={zenModeEnabled}
+            onChange={() => setZenModeEnabled(!zenModeEnabled)}
+          />
+          Zen mode
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={gridModeEnabled}
+            onChange={() => setGridModeEnabled(!gridModeEnabled)}
+          />
+          Grid mode
+        </label>
+      </div>
       <div className="excalidraw-wrapper">
         <Excalidraw
           ref={excalidrawRef}
-          width={dimensions.width}
-          height={dimensions.height}
+          width={width}
+          height={height}
           initialData={InitialData}
-          onChange={(elements, state) => {
-            console.log("Latest elements:", elements, "Latest state:", state);
-          }}
-          onPointerUpdate={(pointerData) => console.log(pointerData)}
-          onCollabButtonClick={() => {
-            window.alert("You clicked on collab button");
-          }}
+          onChange={onChange}
+          user={{ name: "Excalidraw User" }}
+          onPointerUpdate={(payload) => console.log(payload)}
+          onCollabButtonClick={() =>
+            window.alert("You clicked on collab button")
+          }
+          viewModeEnabled={viewModeEnabled}
+          zenModeEnabled={zenModeEnabled}
+          gridModeEnabled={gridModeEnabled}
         />
       </div>
     </div>
