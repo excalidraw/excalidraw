@@ -68,7 +68,7 @@
     "layers": "Warstwy",
     "actions": "Akcje",
     "language": "Język",
-    "createRoom": "Udostępnij sesję współpracy na żywo",
+    "liveCollaboration": "",
     "duplicateSelection": "Powiel",
     "untitled": "Bez tytułu",
     "name": "Nazwa",
@@ -117,7 +117,6 @@
     "edit": "Edytuj",
     "undo": "Cofnij",
     "redo": "Przywróć",
-    "roomDialog": "Utwórz nową sesję współpracy na żywo",
     "createNewRoom": "Utwórz nowy pokój",
     "fullScreen": "Pełny ekran",
     "darkMode": "Ciemny motyw",
@@ -243,6 +242,8 @@
   "toast": {
     "copyStyles": "",
     "copyToClipboard": "",
-    "copyToClipboardAsPng": ""
+    "copyToClipboardAsPng": "",
+    "fileSaved": "",
+    "fileSavedToFilename": ""
   }
 }

@@ -68,7 +68,7 @@
     "layers": "ਪਰਤਾਂ",
     "actions": "ਕਾਰਵਾਈਆਂ",
     "language": "ਭਾਸ਼ਾ",
-    "createRoom": "ਲਾਇਵ ਸਹਿਯੋਗ ਇਜਲਾਸ ਸਾਂਝਾ ਕਰੋ",
+    "liveCollaboration": "",
     "duplicateSelection": "ਡੁਪਲੀਕੇਟ ਬਣਾਓ",
     "untitled": "ਬੇ-ਸਿਰਨਾਵਾਂ",
     "name": "ਨਾਂ",
@@ -77,7 +77,7 @@
     "group": "ਚੋਣ ਦਾ ਗਰੁੱਪ ਬਣਾਓ",
     "ungroup": "ਚੋਣ ਦਾ ਗਰੁੱਪ ਤੋੜੋ",
     "collaborators": "ਸਹਿਯੋਗੀ",
-    "showGrid": "",
+    "showGrid": "ਜਾਲੀ ਦਿਖਾਓ",
     "addToLibrary": "ਲਾਇਬ੍ਰੇਰੀ ਵਿੱਚ ਜੋੜੋ",
     "removeFromLibrary": "ਲਾਇਬ੍ਰੇਰੀ 'ਚੋਂ ਹਟਾਓ",
     "libraryLoadingMessage": "ਲਾਇਬ੍ਰੇਰੀ ਲੋਡ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ…",
@@ -117,7 +117,6 @@
     "edit": "ਸੋਧੋ",
     "undo": "ਅਣਕੀਤਾ ਕਰੋ",
     "redo": "ਮੁੜ-ਕਰੋ",
-    "roomDialog": "ਲਾਇਵ ਸਹਿਯੋਗ ਸ਼ੁਰੂ ਕਰੋ",
     "createNewRoom": "ਨਵਾਂ ਕਮਰਾ ਬਣਾਓ",
     "fullScreen": "ਪੂਰੀ ਸਕਰੀਨ",
     "darkMode": "ਡਾਰਕ ਮੋਡ",
@@ -243,6 +242,8 @@
   "toast": {
     "copyStyles": "ਕਾਪੀ ਕੀਤੇ ਸਟਾਇਲ।",
     "copyToClipboard": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ ਕਾਪੀ ਕੀਤਾ।",
-    "copyToClipboardAsPng": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ PNG ਵਜੋਂ ਕਾਪੀ ਕੀਤਾ।"
+    "copyToClipboardAsPng": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ PNG ਵਜੋਂ ਕਾਪੀ ਕੀਤਾ।",
+    "fileSaved": "ਫਾਈਲ ਸਾਂਭੀ ਗਈ।",
+    "fileSavedToFilename": "{filename} ਵਿੱਚ ਸਾਂਭੀ"
   }
 }

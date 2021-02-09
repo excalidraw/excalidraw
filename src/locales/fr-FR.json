@@ -68,7 +68,7 @@
     "layers": "Calques",
     "actions": "Actions",
     "language": "Langue",
-    "createRoom": "Partager une session de collaboration en direct",
+    "liveCollaboration": "Collaboration en direct",
     "duplicateSelection": "Dupliquer",
     "untitled": "Sans-titre",
     "name": "Nom",
@@ -117,7 +117,6 @@
     "edit": "Modifier",
     "undo": "Annuler",
     "redo": "Rétablir",
-    "roomDialog": "Démarrer la collaboration en direct",
     "createNewRoom": "Créer une nouvelle salle",
     "fullScreen": "Plein écran",
     "darkMode": "Mode sombre",
@@ -243,6 +242,8 @@
   "toast": {
     "copyStyles": "Styles copiés.",
     "copyToClipboard": "Copié vers le presse-papiers.",
-    "copyToClipboardAsPng": "Copié vers le presse-papier en PNG."
+    "copyToClipboardAsPng": "Copié vers le presse-papier en PNG.",
+    "fileSaved": "Fichier enregistré.",
+    "fileSavedToFilename": "Enregistré sous {filename}"
   }
 }

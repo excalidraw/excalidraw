@@ -68,7 +68,7 @@
     "layers": "Lagen",
     "actions": "Acties",
     "language": "Taal",
-    "createRoom": "Deel een live-samenwerkingssessie",
+    "liveCollaboration": "Live Samenwerking",
     "duplicateSelection": "Dupliceer",
     "untitled": "Naamloos",
     "name": "Naam",
@@ -77,7 +77,7 @@
     "group": "Groeperen",
     "ungroup": "Groep opheffen",
     "collaborators": "Deelnemers",
-    "showGrid": "",
+    "showGrid": "Raster weergeven",
     "addToLibrary": "Voeg toe aan bibliotheek",
     "removeFromLibrary": "Verwijder uit bibliotheek",
     "libraryLoadingMessage": "Bibliotheek laden…",
@@ -117,7 +117,6 @@
     "edit": "Bewerken",
     "undo": "Ongedaan maken",
     "redo": "Herstel ongedaan maken",
-    "roomDialog": "Live-samenwerkingssessie starten",
     "createNewRoom": "Creëer live-samenwerkingssessie",
     "fullScreen": "Volledig scherm",
     "darkMode": "Donkere modus",
@@ -243,6 +242,8 @@
   "toast": {
     "copyStyles": "Stijlen gekopieerd.",
     "copyToClipboard": "Gekopieerd naar het klembord.",
-    "copyToClipboardAsPng": "Gekopieerd naar klembord als PNG."
+    "copyToClipboardAsPng": "Gekopieerd naar klembord als PNG.",
+    "fileSaved": "Bestand opgeslagen.",
+    "fileSavedToFilename": "Opgeslagen als {filename}"
   }
 }

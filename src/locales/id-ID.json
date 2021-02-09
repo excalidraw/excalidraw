@@ -68,7 +68,7 @@
     "layers": "Lapisan",
     "actions": "Aksi",
     "language": "Bahasa",
-    "createRoom": "Bagikan sesi kolaborasi langsung",
+    "liveCollaboration": "",
     "duplicateSelection": "Duplikat",
     "untitled": "Tanpa judul",
     "name": "Nama",
@@ -117,7 +117,6 @@
     "edit": "Edit",
     "undo": "Urungkan",
     "redo": "Ulangi",
-    "roomDialog": "Mulai kolaborasi langsung",
     "createNewRoom": "Buat ruang baru",
     "fullScreen": "Layar penuh",
     "darkMode": "Mode gelap",
@@ -243,6 +242,8 @@
   "toast": {
     "copyStyles": "Gaya tersalin.",
     "copyToClipboard": "Tersalin ke papan klip.",
-    "copyToClipboardAsPng": "Tersalin ke clipboard sebagai PNG."
+    "copyToClipboardAsPng": "Tersalin ke clipboard sebagai PNG.",
+    "fileSaved": "File tersimpan.",
+    "fileSavedToFilename": "Disimpan ke {filename}"
   }
 }
