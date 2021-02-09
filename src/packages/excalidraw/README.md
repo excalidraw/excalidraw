@@ -155,6 +155,19 @@ export default function App() {
 
 [![Edit excalidraw](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/excalidraw-ehlz3?fontsize=14&hidenavigation=1&theme=dark)
 
+Since Excalidraw doesn't support server side rendering yet so you will have to make sure the component is rendered once host is mounted.
+
+```js
+import { useState, useEffect } from "react";
+export default function IndexPage() {
+  const [Comp, setComp] = useState(null);
+  useEffect(() => {
+    import("@excalidraw/excalidraw").then((comp) => setComp(comp.default));
+  });
+  return <>{Comp && <Comp />}</>;
+}
+```
+
 ### Props
 
 | Name | Type | Default | Description |
