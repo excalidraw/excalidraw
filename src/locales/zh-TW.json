@@ -68,7 +68,7 @@
     "layers": "圖層",
     "actions": "動作",
     "language": "語言",
-    "createRoom": "建立新協作會議室",
+    "liveCollaboration": "",
     "duplicateSelection": "複製",
     "untitled": "無標題",
     "name": "名稱",
@@ -117,7 +117,6 @@
     "edit": "編輯",
     "undo": "復原",
     "redo": "重做",
-    "roomDialog": "開始即時協作",
     "createNewRoom": "建立新協作會議室",
     "fullScreen": "全螢幕",
     "darkMode": "深色模式",
@@ -243,6 +242,8 @@
   "toast": {
     "copyStyles": "已複製樣式",
     "copyToClipboard": "複製至剪貼簿。",
-    "copyToClipboardAsPng": "已複製 PNG 至剪貼簿"
+    "copyToClipboardAsPng": "已複製 PNG 至剪貼簿",
+    "fileSaved": "已儲存檔案。",
+    "fileSavedToFilename": "儲存為 {filename}"
   }
 }

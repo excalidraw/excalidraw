@@ -68,7 +68,7 @@
     "layers": "レイヤー",
     "actions": "操作",
     "language": "言語",
-    "createRoom": "共同編集セッションの共有",
+    "liveCollaboration": "",
     "duplicateSelection": "複製",
     "untitled": "",
     "name": "名前",
@@ -117,7 +117,6 @@
     "edit": "編集",
     "undo": "元に戻す",
     "redo": "やり直し",
-    "roomDialog": "共同編集を開始する",
     "createNewRoom": "新しい部屋を作成する",
     "fullScreen": "全画面表示",
     "darkMode": "ダークモード",
@@ -243,6 +242,8 @@
   "toast": {
     "copyStyles": "",
     "copyToClipboard": "",
-    "copyToClipboardAsPng": ""
+    "copyToClipboardAsPng": "",
+    "fileSaved": "",
+    "fileSavedToFilename": ""
   }
 }

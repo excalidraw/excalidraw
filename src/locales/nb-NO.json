@@ -68,7 +68,7 @@
     "layers": "Lag",
     "actions": "Handlinger",
     "language": "Språk",
-    "createRoom": "Del en sanntids-samarbeidsøkt",
+    "liveCollaboration": "Direkte samarbeid",
     "duplicateSelection": "Dupliser",
     "untitled": "Uten navn",
     "name": "Navn",
@@ -117,7 +117,6 @@
     "edit": "Rediger",
     "undo": "Angre",
     "redo": "Gjør om",
-    "roomDialog": "Start sanntids-samarbeid",
     "createNewRoom": "Opprett et nytt rom",
     "fullScreen": "Fullskjerm",
     "darkMode": "Mørk modus",
@@ -243,6 +242,8 @@
   "toast": {
     "copyStyles": "Kopierte stiler.",
     "copyToClipboard": "Kopiert til utklippstavlen.",
-    "copyToClipboardAsPng": "Kopiert til utklippstavlen som PNG."
+    "copyToClipboardAsPng": "Kopiert til utklippstavlen som PNG.",
+    "fileSaved": "Fil lagret.",
+    "fileSavedToFilename": "Lagret til {filename}"
   }
 }

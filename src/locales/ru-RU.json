@@ -68,7 +68,7 @@
     "layers": "Слои",
     "actions": "Действия",
     "language": "Язык",
-    "createRoom": "Начать сеанс совместной работы",
+    "liveCollaboration": "",
     "duplicateSelection": "Дубликат",
     "untitled": "Безымянный",
     "name": "Имя",
@@ -77,7 +77,7 @@
     "group": "Сгруппировать выделение",
     "ungroup": "Разделить выделение",
     "collaborators": "Участники",
-    "showGrid": "",
+    "showGrid": "Показать сетку",
     "addToLibrary": "Добавить в библиотеку",
     "removeFromLibrary": "Удалить из библиотеки",
     "libraryLoadingMessage": "Загрузка библиотеки…",
@@ -117,7 +117,6 @@
     "edit": "Изменить",
     "undo": "Шаг назад",
     "redo": "Шаг вперед",
-    "roomDialog": "Начать совместную работу",
     "createNewRoom": "Создать новую комнату",
     "fullScreen": "Полный экран",
     "darkMode": "Темная тема",
@@ -243,6 +242,8 @@
   "toast": {
     "copyStyles": "Скопированы стили.",
     "copyToClipboard": "",
-    "copyToClipboardAsPng": "Скопировано в буфер обмена в формате PNG."
+    "copyToClipboardAsPng": "Скопировано в буфер обмена в формате PNG.",
+    "fileSaved": "Файл сохранён.",
+    "fileSavedToFilename": "Сохранено в {filename}"
   }
 }

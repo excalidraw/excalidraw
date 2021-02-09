@@ -68,7 +68,7 @@
     "layers": "परतें",
     "actions": "कार्रवाई",
     "language": "भाषा",
-    "createRoom": "अधिवेशन",
+    "liveCollaboration": "",
     "duplicateSelection": "डुप्लिकेट",
     "untitled": "अशीर्षित",
     "name": "नाम",
@@ -117,7 +117,6 @@
     "edit": "संशोधन करें",
     "undo": "पूर्ववत् करें",
     "redo": "फिर से करें",
-    "roomDialog": "लाइव सहयोग शुरू करें",
     "createNewRoom": "एक नया कमरा बनाएं",
     "fullScreen": "पूरी स्क्रीन",
     "darkMode": "डार्क मोड",
@@ -243,6 +242,8 @@
   "toast": {
     "copyStyles": "काॅपी कीए स्टाइल",
     "copyToClipboard": "क्लिपबोर्ड में कॉपी कीए",
-    "copyToClipboardAsPng": "क्लिपबोर्ड में PNG के रूप में कॉपी किए"
+    "copyToClipboardAsPng": "क्लिपबोर्ड में PNG के रूप में कॉपी किए",
+    "fileSaved": "",
+    "fileSavedToFilename": ""
   }
 }

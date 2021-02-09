@@ -68,7 +68,7 @@
     "layers": "Lager",
     "actions": "Åtgärder",
     "language": "Språk",
-    "createRoom": "Dela en live-samarbetssession",
+    "liveCollaboration": "Samarbeta live",
     "duplicateSelection": "Duplicera",
     "untitled": "Namnlös",
     "name": "Namn",
@@ -117,7 +117,6 @@
     "edit": "Redigera",
     "undo": "Ångra",
     "redo": "Gör om",
-    "roomDialog": "Starta live-samarbete",
     "createNewRoom": "Skapa ett nytt rum",
     "fullScreen": "Helskärm",
     "darkMode": "Mörkt läge",
@@ -243,6 +242,8 @@
   "toast": {
     "copyStyles": "Kopierade stilar.",
     "copyToClipboard": "Kopierad till urklipp.",
-    "copyToClipboardAsPng": "Kopierat till urklipp som PNG."
+    "copyToClipboardAsPng": "Kopierat till urklipp som PNG.",
+    "fileSaved": "Fil sparad.",
+    "fileSavedToFilename": "Sparad till {filename}"
   }
 }

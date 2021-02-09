@@ -68,7 +68,7 @@
     "layers": "Ebenen",
     "actions": "Aktionen",
     "language": "Sprache",
-    "createRoom": "Live-Kollaborationssitzung teilen",
+    "liveCollaboration": "Live-Zusammenarbeit",
     "duplicateSelection": "Duplizieren",
     "untitled": "Unbenannt",
     "name": "Name",
@@ -76,7 +76,7 @@
     "madeWithExcalidraw": "Made with Excalidraw",
     "group": "Auswahl gruppieren",
     "ungroup": "Gruppierung aufheben",
-    "collaborators": "Mitarbeitende",
+    "collaborators": "Kollaboratoren",
     "showGrid": "Raster anzeigen",
     "addToLibrary": "Zur Bibliothek hinzufügen",
     "removeFromLibrary": "Aus Bibliothek entfernen",
@@ -101,7 +101,7 @@
     "exportToSvg": "Als SVG exportieren",
     "copyToClipboard": "In Zwischenablage kopieren",
     "copyPngToClipboard": "PNG in die Zwischenablage kopieren",
-    "scale": "Skalieren",
+    "scale": "Skalierung",
     "save": "Speichern",
     "saveAs": "Speichern unter",
     "load": "Laden",
@@ -117,7 +117,6 @@
     "edit": "Bearbeiten",
     "undo": "Rückgängig machen",
     "redo": "Wiederholen",
-    "roomDialog": "Live-Kollaborationssitzung starten",
     "createNewRoom": "Neuen Raum erstellen",
     "fullScreen": "Vollbildanzeige",
     "darkMode": "Dunkles Design",
@@ -243,6 +242,8 @@
   "toast": {
     "copyStyles": "Formatierung kopiert.",
     "copyToClipboard": "In die Zwischenablage kopiert.",
-    "copyToClipboardAsPng": "In die Zwischenablage als PNG kopiert."
+    "copyToClipboardAsPng": "In die Zwischenablage als PNG kopiert.",
+    "fileSaved": "Datei gespeichert.",
+    "fileSavedToFilename": "Als {filename} gespeichert"
   }
 }
