@@ -117,7 +117,7 @@
     "edit": "Rediger",
     "undo": "Angre",
     "redo": "Gjør om",
-    "resetLibrary": "",
+    "resetLibrary": "Nullstill bibliotek",
     "createNewRoom": "Opprett et nytt rom",
     "fullScreen": "Fullskjerm",
     "darkMode": "Mørk modus",
@@ -141,7 +141,7 @@
     "confirmAddLibrary": "Dette vil legge til {{numShapes}} figur(er) i biblioteket ditt. Er du sikker?",
     "imageDoesNotContainScene": "Importering av bilder støttes ikke for øyeblikket.\n\nVil du importere en scene? Dette bildet ser ikke ut til å inneholde noen scene-data. Har du aktivert dette under eksporten?",
     "cannotRestoreFromImage": "Scenen kunne ikke gjenopprettes fra denne bildefilen",
-    "resetLibrary": ""
+    "resetLibrary": "Dette vil tømme biblioteket ditt. Er du sikker?"
   },
   "toolBar": {
     "selection": "Velg",
