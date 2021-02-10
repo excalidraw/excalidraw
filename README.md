@@ -28,10 +28,6 @@ If you like the project, you can become a sponsor at [Open Collective](https://o
 
 <a href="https://opencollective.com/excalidraw#category-CONTRIBUTE" target="_blank"><img src="https://opencollective.com/excalidraw/tiers/backers.svg?avatarHeight=32"/></a>
 
-## Embed Excalidraw in your App?
-
-Try out [`@excalidraw/excalidraw`](https://www.npmjs.com/package/@excalidraw/excalidraw). This package allows you to easily embed Excalidraw as a React component into your apps.
-
 ## Documentation
 
 ### Shortcuts
@@ -73,6 +69,10 @@ The second set of digits is the encryption key. The Excalidraw server doesn’t 
 ## Shape libraries
 
 Find a growing list of libraries containing assets for your drawings at [libraries.excalidraw.com](https://libraries.excalidraw.com).
+
+## Embed Excalidraw in your App?
+
+Try out [`@excalidraw/excalidraw`](https://www.npmjs.com/package/@excalidraw/excalidraw). This package allows you to easily embed Excalidraw as a React component into your apps.
 
 ## Development
 
