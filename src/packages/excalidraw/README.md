@@ -18,13 +18,23 @@ yarn add react react-dom @excalidraw/excalidraw
 
 After installation you will see a folder `excalidraw-assets` in `dist` directory which contains the assets needed for this app.
 
-Move the folder `excalidraw-assets` to the path where your assets are served. In the example its served from `public/excalidraw-assets`
+Move the folder `excalidraw-assets` to the path where your assets are served.
+
+By default it will try to load the files from `{rootUrl}/excalidraw-assets/`
+
+With **Webpack**, if you want to load the files from different path you can use <pre><a href="https://webpack.js.org/guides/public-path/#on-the-fly">`__webpack_public_path__`</a></pre>.
+
+With **create-react-app**, the assets can be served from `public/static/js/excalidraw-assets`since CRA tries to load the assets from `{rootUrl}/static/js` path by default.
+
+You can update the value of `PUBLIC_URL` if you want to serve it from a different URL.
 
 ### Demo
 
 [Try here](https://codesandbox.io/s/excalidraw-ehlz3).
 
 ### Usage
+
+1. If you are using a Web bundler (for instance, Webpack), you can import it as an ES6 module as shown below
 
 ```js
 import React, { useEffect, useState, createRef } from "react";
@@ -118,6 +128,55 @@ export default function App() {
 ```
 
 [![Edit excalidraw](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/excalidraw-ehlz3?fontsize=14&hidenavigation=1&theme=dark)
+
+2. To use it in a browser directly:
+
+You will need to make sure `react`, `react-dom` is available as shown below.
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Excalidraw in browser</title>
+    <meta charset="UTF-8" />
+    <script src="https://unpkg.com/react@16.14.0/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16.13.1/umd/react-dom.development.js"></script>
+    <script
+      type="text/javascript"
+      src="https://unpkg.com/@excalidraw/excalidraw@0.2.2/dist/excalidraw.min.js"
+    ></script>
+  </head>
+
+  <body>
+    <div class="container">
+      <h4>Excalidraw Embed Example</h4>
+      <div id="app"></div>
+    </div>
+
+    <script type="text/javascript" src="src/index.js"></script>
+  </body>
+</html>
+```
+
+```js
+import "./styles.css";
+
+const excalidrawWrapper = document.getElementById("app");
+
+const props = {
+  onChange: (data, appState) => {
+    console.log(data, appState);
+  },
+};
+
+/*eslint-disable */
+ReactDOM.render(
+  React.createElement(Excalidraw.default, props),
+  excalidrawWrapper,
+);
+```
+
+[![Edit excalidraw-in-browser](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/excalidraw-in-browser-tlqom?fontsize=14&hidenavigation=1&theme=dark)
 
 ### Props
 
