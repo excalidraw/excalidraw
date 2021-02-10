@@ -4,6 +4,7 @@ import { measureText } from "./utils";
 
 // MathJax components we use
 import { AsciiMath } from "mathjax-full/js/input/asciimath.js";
+import { TeX } from "mathjax-full/js/input/tex.js";
 import { SVG } from "mathjax-full/js/output/svg.js";
 import { liteAdaptor } from "mathjax-full/js/adaptors/liteAdaptor.js";
 import { HTMLDocument } from "mathjax-full/js/handlers/html/HTMLDocument.js";
@@ -17,36 +18,60 @@ import { LiteAdaptor } from "mathjax-full/js/adaptors/liteAdaptor.js";
 // For caching the SVGs
 import { StringMap } from "mathjax-full/js/output/common/Wrapper";
 
+let _useTex = true;
+
+export const setUseTex = (useTex: boolean) => {
+  _useTex = useTex;
+};
+
+export const getUseTex = (): boolean => {
+  return _useTex;
+};
+
 const mathJax = {} as {
   adaptor: LiteAdaptor;
-  html: HTMLDocument<LiteElement | LiteText, LiteText, LiteDocument>;
+  amHtml: HTMLDocument<LiteElement | LiteText, LiteText, LiteDocument>;
+  texHtml: HTMLDocument<LiteElement | LiteText, LiteText, LiteDocument>;
 };
 
 const loadMathJax = () => {
-  if (mathJax.adaptor === undefined || mathJax.html === undefined) {
+  if (
+    mathJax.adaptor === undefined ||
+    mathJax.amHtml === undefined ||
+    mathJax.texHtml === undefined
+  ) {
     const asciimath = new AsciiMath({});
+    const tex = new TeX({});
     const svg = new SVG({ fontCache: "local" });
-    const adaptor = liteAdaptor();
-    const html = new HTMLDocument("", adaptor, {
+    mathJax.adaptor = liteAdaptor();
+    mathJax.amHtml = new HTMLDocument("", mathJax.adaptor, {
       InputJax: asciimath,
       OutputJax: svg,
     });
-    mathJax.adaptor = adaptor;
-    mathJax.html = html;
+    mathJax.texHtml = new HTMLDocument("", mathJax.adaptor, {
+      InputJax: tex,
+      OutputJax: svg,
+    });
   }
 };
 
 // Cache the SVGs from MathJax
 const mathJaxSvgCache = {} as StringMap;
 
-const asciimath2Svg = (text: string) => {
+const math2Svg = (text: string) => {
   if (mathJaxSvgCache[text]) {
     return mathJaxSvgCache[text];
   }
   loadMathJax();
-  const htmlString = mathJax.adaptor.innerHTML(mathJax.html.convert(text));
-  mathJaxSvgCache[text] = htmlString;
-  return htmlString;
+  try {
+    const htmlString = mathJax.adaptor.innerHTML(
+      _useTex ? mathJax.texHtml.convert(text) : mathJax.amHtml.convert(text),
+    );
+    mathJaxSvgCache[text] = htmlString;
+    return htmlString;
+  } catch {
+    return text;
+  }
 };
 
 export { getFontString } from "./utils";
@@ -56,10 +81,10 @@ export const markupText = (text: string) => {
   let htmlString = "";
   for (let index = 0; index < lines.length; index++) {
     htmlString += `<p style="margin: 0px;">`;
-    const lineArray = lines[index].split("`");
+    const lineArray = lines[index].split(_useTex ? "$$" : "`");
     for (let i = 0; i < lineArray.length; i++) {
       if (i % 2 === 1) {
-        htmlString += asciimath2Svg(lineArray[i]);
+        htmlString += math2Svg(lineArray[i]);
       } else {
         htmlString += lineArray[i];
       }

@@ -160,10 +160,12 @@ export const actionLoadScene = register({
       const {
         elements: loadedElements,
         appState: loadedAppState,
+        useTex: loadedUseTex,
       } = await loadFromJSON(appState);
       return {
         elements: loadedElements,
         appState: loadedAppState,
+        useTex: loadedUseTex,
         commitToHistory: true,
       };
     } catch (error) {
@@ -173,6 +175,7 @@ export const actionLoadScene = register({
       return {
         elements,
         appState: { ...appState, errorMessage: error.message },
+        useTex: true,
         commitToHistory: false,
       };
     }

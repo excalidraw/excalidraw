@@ -183,7 +183,7 @@ import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
-import { isMathMode, getFontString } from "../mathmode";
+import { isMathMode, getFontString, getUseTex, setUseTex } from "../mathmode";
 
 const { history } = createHistory();
 
@@ -578,7 +578,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private onFontLoaded = () => {
     this.scene.getElementsIncludingDeleted().forEach((element) => {
-      if (isTextElement(element) && !isMathMode(getFontString(element))) {
+      if (isTextElement(element)) {
         invalidateShapeForElement(element);
       }
     });
@@ -1099,6 +1099,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         });
       } else if (data.elements) {
         this.addElementsFromPasteOrLibrary(data.elements);
+        if (data.useTex !== undefined) {
+          setUseTex(data.useTex);
+        }
       } else if (data.text) {
         this.addTextFromPaste(data.text);
       }
@@ -1314,6 +1317,20 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
     }
 
+    if (
+      event.key.toLowerCase() === KEYS.T &&
+      event.shiftKey &&
+      !(this.state.editingElement && isTextElement(this.state.editingElement))
+    ) {
+      setUseTex(!getUseTex());
+      this.scene.getElementsIncludingDeleted().forEach((element) => {
+        if (isTextElement(element) && isMathMode(getFontString(element))) {
+          invalidateShapeForElement(element);
+        }
+      });
+      this.setState({});
+      window.alert(t("alerts.tex", { useTex: `${getUseTex()}` }));
+    }
     if (
       (isWritableElement(event.target) && event.key !== KEYS.ESCAPE) ||
       // case: using arrows to move between buttons

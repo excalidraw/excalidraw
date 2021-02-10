@@ -7,6 +7,7 @@ export interface DataState {
   source?: string;
   elements: readonly ExcalidrawElement[];
   appState: MarkOptional<AppState, "offsetTop" | "offsetLeft">;
+  useTex: boolean;
 }
 
 export interface ImportedDataState {
@@ -15,6 +16,7 @@ export interface ImportedDataState {
   source?: string;
   elements?: DataState["elements"] | null;
   appState?: Partial<DataState["appState"]> | null;
+  useTex?: boolean;
 }
 
 export interface LibraryData {
@@ -22,4 +24,5 @@ export interface LibraryData {
   version?: number;
   source?: string;
   library?: LibraryItems;
+  useTex?: boolean;
 }

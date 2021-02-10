@@ -1,3 +1,4 @@
+import { getUseTex } from "../mathmode";
 import { fileOpen, fileSave } from "browser-fs-access";
 import { cleanAppStateForExport } from "../appState";
 import { MIME_TYPES } from "../constants";
@@ -18,6 +19,7 @@ export const serializeAsJSON = (
       source: window.location.origin,
       elements: clearElementsForExport(elements),
       appState: cleanAppStateForExport(appState),
+      useTex: getUseTex(),
     },
     null,
     2,
@@ -69,6 +71,7 @@ export const saveLibraryAsJSON = async () => {
       type: "excalidrawlib",
       version: 1,
       library,
+      useTex: getUseTex(),
     },
     null,
     2,

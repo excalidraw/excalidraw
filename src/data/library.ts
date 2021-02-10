@@ -1,3 +1,4 @@
+import { setUseTex } from "../mathmode";
 import { loadLibraryFromBlob } from "./blob";
 import { LibraryItems, LibraryItem } from "../types";
 import { restoreElements } from "./restore";
@@ -55,6 +56,7 @@ export class Library {
     }, [] as (readonly NonDeleted<ExcalidrawElement>[])[]);
 
     Library.saveLibrary([...existingLibraryItems, ...filtered]);
+    setUseTex(libraryFile.useTex !== undefined ? libraryFile.useTex : true);
   }
 
   static loadLibrary = (): Promise<LibraryItems> => {
