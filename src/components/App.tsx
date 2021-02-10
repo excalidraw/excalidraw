@@ -3700,14 +3700,15 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       options.push(actionCopyAsSvg);
     }
     if (!element) {
-      const viewModeOptions: ContextMenuOption[] = [
+      const viewModeOptions = [
         ...options,
+        typeof this.props.gridModeEnabled === "undefined" &&
+          actionToggleGridMode,
+        typeof this.props.zenModeEnabled === "undefined" && actionToggleZenMode,
+        typeof this.props.viewModeEnabled === "undefined" &&
+          actionToggleViewMode,
         actionToggleStats,
       ];
-
-      if (typeof this.props.viewModeEnabled === "undefined") {
-        viewModeOptions.push(actionToggleViewMode);
-      }
 
       ContextMenu.push({
         options: viewModeOptions,
