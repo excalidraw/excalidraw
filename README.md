@@ -70,7 +70,7 @@ The second set of digits is the encryption key. The Excalidraw server doesn’t 
 
 Find a growing list of libraries containing assets for your drawings at [libraries.excalidraw.com](https://libraries.excalidraw.com).
 
-## Embed Excalidraw in your App?
+## Embedding Excalidraw in your App?
 
 Try out [`@excalidraw/excalidraw`](https://www.npmjs.com/package/@excalidraw/excalidraw). This package allows you to easily embed Excalidraw as a React component into your apps.
 
