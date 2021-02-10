@@ -9,7 +9,7 @@ export type ShortcutName =
   | "copyStyles"
   | "pasteStyles"
   | "selectAll"
-  | "delete"
+  | "deleteSelectedElements"
   | "duplicateSelection"
   | "sendBackward"
   | "bringForward"
@@ -22,7 +22,8 @@ export type ShortcutName =
   | "gridMode"
   | "zenMode"
   | "stats"
-  | "addToLibrary";
+  | "addToLibrary"
+  | "viewMode";
 
 const shortcutMap: Record<ShortcutName, string[]> = {
   cut: [getShortcutKey("CtrlOrCmd+X")],
@@ -31,7 +32,7 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   copyStyles: [getShortcutKey("CtrlOrCmd+Alt+C")],
   pasteStyles: [getShortcutKey("CtrlOrCmd+Alt+V")],
   selectAll: [getShortcutKey("CtrlOrCmd+A")],
-  delete: [getShortcutKey("Del")],
+  deleteSelectedElements: [getShortcutKey("Del")],
   duplicateSelection: [
     getShortcutKey("CtrlOrCmd+D"),
     getShortcutKey(`Alt+${t("helpDialog.drag")}`),
@@ -56,6 +57,7 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   zenMode: [getShortcutKey("Alt+Z")],
   stats: [],
   addToLibrary: [],
+  viewMode: [getShortcutKey("Alt+R")],
 };
 
 export const getShortcutFromShortcutName = (name: ShortcutName) => {

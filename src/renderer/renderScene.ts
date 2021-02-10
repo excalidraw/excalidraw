@@ -47,7 +47,10 @@ import {
   TransformHandles,
   TransformHandleType,
 } from "../element/transformHandles";
-import { viewportCoordsToSceneCoords } from "../utils";
+import { viewportCoordsToSceneCoords, supportsEmoji } from "../utils";
+import { UserIdleState } from "../excalidraw-app/collab/types";
+
+const hasEmojiSupport = supportsEmoji();
 
 const strokeRectWithRotation = (
   context: CanvasRenderingContext2D,
@@ -310,7 +313,7 @@ export const renderScene = (
       if (sceneState.remoteSelectedElementIds[element.id]) {
         selectionColors.push(
           ...sceneState.remoteSelectedElementIds[element.id].map((socketId) => {
-            const { background } = getClientColors(socketId);
+            const { background } = getClientColors(socketId, appState);
             return background;
           }),
         );
@@ -373,12 +376,14 @@ export const renderScene = (
         sceneState.zoom,
         "mouse", // when we render we don't know which pointer type so use mouse
       );
-      renderTransformHandles(
-        context,
-        sceneState,
-        transformHandles,
-        locallySelectedElements[0].angle,
-      );
+      if (!appState.viewModeEnabled) {
+        renderTransformHandles(
+          context,
+          sceneState,
+          transformHandles,
+          locallySelectedElements[0].angle,
+        );
+      }
     } else if (locallySelectedElements.length > 1 && !appState.isRotating) {
       const dashedLinePadding = 4 / sceneState.zoom.value;
       context.fillStyle = oc.white;
@@ -436,15 +441,17 @@ export const renderScene = (
     y = Math.max(y, 0);
     y = Math.min(y, normalizedCanvasHeight - height);
 
-    const { background, stroke } = getClientColors(clientId);
+    const { background, stroke } = getClientColors(clientId, appState);
 
     const strokeStyle = context.strokeStyle;
     const fillStyle = context.fillStyle;
     const globalAlpha = context.globalAlpha;
     context.strokeStyle = stroke;
     context.fillStyle = background;
-    if (isOutOfBounds) {
-      context.globalAlpha = 0.2;
+
+    const userState = sceneState.remotePointerUserStates[clientId];
+    if (isOutOfBounds || userState === UserIdleState.AWAY) {
+      context.globalAlpha = 0.48;
     }
 
     if (
@@ -476,19 +483,36 @@ export const renderScene = (
     context.stroke();
 
     const username = sceneState.remotePointerUsernames[clientId];
+    let usernameAndIdleState;
+    if (hasEmojiSupport) {
+      usernameAndIdleState = `${username ? `${username} ` : ""}${
+        userState === UserIdleState.AWAY
+          ? "⚫️"
+          : userState === UserIdleState.IDLE
+          ? "💤"
+          : "🟢"
+      }`;
+    } else {
+      usernameAndIdleState = `${username ? `${username}` : ""}${
+        userState === UserIdleState.AWAY
+          ? ` (${UserIdleState.AWAY})`
+          : userState === UserIdleState.IDLE
+          ? ` (${UserIdleState.IDLE})`
+          : ""
+      }`;
+    }
 
-    if (!isOutOfBounds && username) {
+    if (!isOutOfBounds && usernameAndIdleState) {
       const offsetX = x + width;
       const offsetY = y + height;
       const paddingHorizontal = 4;
       const paddingVertical = 4;
-      const measure = context.measureText(username);
+      const measure = context.measureText(usernameAndIdleState);
       const measureHeight =
         measure.actualBoundingBoxDescent + measure.actualBoundingBoxAscent;
 
       // Border
       context.fillStyle = stroke;
-      context.globalAlpha = globalAlpha;
       context.fillRect(
         offsetX - 1,
         offsetY - 1,
@@ -504,8 +528,9 @@ export const renderScene = (
         measureHeight + 2 * paddingVertical,
       );
       context.fillStyle = oc.white;
+
       context.fillText(
-        username,
+        usernameAndIdleState,
         offsetX + paddingHorizontal,
         offsetY + paddingVertical + measure.actualBoundingBoxAscent,
       );

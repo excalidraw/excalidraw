@@ -116,7 +116,6 @@ export default function App() {
           onChange={(elements, state) => {
             console.log("Latest elements:", elements, "Latest state:", state);
           }}
-          user={{ name: "Excalidraw User" }}
           onPointerUpdate={(pointerData) => console.log(pointerData)}
           onCollabButtonClick={() => {
             window.alert("You clicked on collab button");
@@ -189,7 +188,6 @@ ReactDOM.render(
 | [`offsetTop`](#offsetTop) | Number | `0` | top position relative to which Excalidraw should render |
 | [`onChange`](#onChange) | Function |  | This callback is triggered whenever the component updates due to any change. This callback will receive the excalidraw elements and the current app state. |
 | [`initialData`](#initialData) | <pre>{elements?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>, appState?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37">AppState<a> } </pre> | null | The initial data with which app loads. |
-| [`user`](#user) | `{ name?: string }` |  | User details. The name refers to the name of the user to be shown |
 | [`excalidrawRef`](#excalidrawRef) | [`createRef`](https://reactjs.org/docs/refs-and-the-dom.html#creating-refs) or [`callbackRef`](https://reactjs.org/docs/refs-and-the-dom.html#callback-refs) or <pre>{ current: { readyPromise: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317">resolvablePromise</a> } }</pre> |  | Ref to be passed to Excalidraw |
 | [`onCollabButtonClick`](#onCollabButtonClick) | Function |  | Callback to be triggered when the collab button is clicked |
 | [`isCollaborating`](#isCollaborating) | `boolean` |  | This implies if the app is in collaboration mode |
@@ -197,6 +195,9 @@ ReactDOM.render(
 | [`onExportToBackend`](#onExportToBackend) | Function |  | Callback triggered when link button is clicked on export dialog |
 | [`langCode`](#langCode) | string | `en` | Language code string |
 | [`renderFooter `](#renderFooter) | Function |  | Function that renders custom UI footer |
+| [`viewModeEnabled`](#viewModeEnabled) | boolean |  | This implies if the app is in view mode. |
+| [`zenModeEnabled`](#zenModeEnabled) | boolean |  | This implies if the zen mode is enabled |
+| [`gridModeEnabled`](#gridModeEnabled) | boolean |  | This implies if the grid mode is enabled |
 
 ### `Extra API's`
 
@@ -313,10 +314,6 @@ This helps to load Excalidraw with `initialData`. It must be an object or a [pro
 
 You might want to use this when you want to load excalidraw with some initial elements and app state.
 
-#### `user`
-
-This is the user name which shows during collaboration. Defaults to `{name: ''}`.
-
 #### `excalidrawRef`
 
 You can pass a `ref` when you want to access some excalidraw APIs. We expose the below APIs:
@@ -325,7 +322,7 @@ You can pass a `ref` when you want to access some excalidraw APIs. We expose the
 | --- | --- | --- |
 | ready | `boolean` | This is set to true once Excalidraw is rendered |
 | readyPromise | [resolvablePromise](https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317) | This promise will be resolved with the api once excalidraw has rendered. This will be helpful when you want do some action on the host app once this promise resolves. For this to work you will have to pass ref as shown [here](#readyPromise) |
-| updateScene | <pre>(<a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L189">sceneData</a>)) => void </pre> | updates the scene with the sceneData |
+| updateScene | <pre>(<a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L192">sceneData</a>)) => void </pre> | updates the scene with the sceneData |
 | resetScene | `({ resetLoadingState: boolean }) => void` | Resets the scene. If `resetLoadingState` is passed as true then it will also force set the loading state to false. |
 | getSceneElementsIncludingDeleted | <pre> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a></pre> | Returns all the elements including the deleted in the scene |
 | getSceneElements | <pre> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a></pre> | Returns all the elements excluding the deleted in the scene |
@@ -389,3 +386,15 @@ import { defaultLang, languages } from "@excalidraw/excalidraw";
 #### `renderFooter`
 
 A function that renders (returns JSX) custom UI footer. For example, you can use this to render a language picker that was previously being rendered by Excalidraw itself (for now, you'll need to implement your own language picker).
+
+#### `viewModeEnabled`
+
+This prop indicates whether the app is in `view mode`. When supplied, the value takes precedence over `intialData.appState.viewModeEnabled`, the `view mode` will be fully controlled by the host app, and users won't be able to toggle it from within the app.
+
+#### `zenModeEnabled`
+
+This prop indicates whether the app is in `zen mode`. When supplied, the value takes precedence over `intialData.appState.zenModeEnabled`, the `zen mode` will be fully controlled by the host app, and users won't be able to toggle it from within the app.
+
+#### `gridModeEnabled`
+
+This prop indicates whether the shows the grid. When supplied, the value takes precedence over `intialData.appState.gridModeEnabled`, the grid will be fully controlled by the host app, and users won't be able to toggle it from within the app.

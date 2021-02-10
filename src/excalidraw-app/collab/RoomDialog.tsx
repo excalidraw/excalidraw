@@ -119,7 +119,11 @@ const RoomDialog = ({
     );
   };
   return (
-    <Dialog small onCloseRequest={handleClose} title={t("labels.createRoom")}>
+    <Dialog
+      small
+      onCloseRequest={handleClose}
+      title={t("labels.liveCollaboration")}
+    >
       {renderRoomDialog()}
     </Dialog>
   );

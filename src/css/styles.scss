@@ -1,5 +1,11 @@
-@import "./_variables";
+@import "./variables.module";
 @import "./theme";
+
+:root {
+  --zIndex-canvas: 1;
+  --zIndex-wysiwyg: 2;
+  --zIndex-layerUI: 3;
+}
 
 .excalidraw {
   color: var(--text-color-primary);
@@ -30,6 +36,8 @@
     image-rendering: pixelated; // chromium
     // NOTE: must be declared *after* the above
     image-rendering: -moz-crisp-edges; // FF
+
+    z-index: var(--zIndex-canvas);
   }
 
   &.Appearance_dark {
@@ -216,6 +224,13 @@
     }
   }
 
+  .App-top-bar {
+    z-index: var(--zIndex-layerUI);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
   .App-bottom-bar {
     position: absolute;
     top: 0;
@@ -282,7 +297,7 @@
     pointer-events: none !important;
   }
 
-  .App-menu_top > * {
+  .layer-ui__wrapper:not(.disable-pointerEvents) .App-menu_top > * {
     pointer-events: all;
   }
 
@@ -323,7 +338,7 @@
     }
   }
 
-  .App-menu_bottom > * {
+  .layer-ui__wrapper:not(.disable-pointerEvents) .App-menu_bottom > * {
     pointer-events: all;
   }
 
@@ -490,6 +505,13 @@
 
   .disable-pointerEvents {
     pointer-events: none !important;
+  }
+
+  &.excalidraw--view-mode {
+    .App-menu {
+      display: flex;
+      justify-content: space-between;
+    }
   }
 
   @media print {

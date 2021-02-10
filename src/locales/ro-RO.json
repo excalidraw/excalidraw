@@ -68,7 +68,7 @@
     "layers": "Straturi",
     "actions": "Acțiuni",
     "language": "Limbă",
-    "createRoom": "Invită la o sesiune de colaborare în direct",
+    "liveCollaboration": "Colaborare în direct",
     "duplicateSelection": "Duplicare",
     "untitled": "Nedenumit",
     "name": "Nume",
@@ -77,12 +77,12 @@
     "group": "Grupare selecție",
     "ungroup": "Degrupare selecție",
     "collaborators": "Colaboratori",
-    "gridMode": "Mod grilă",
+    "showGrid": "Afișare grilă",
     "addToLibrary": "Adăugare la bibliotecă",
     "removeFromLibrary": "Eliminare din bibliotecă",
-    "libraryLoadingMessage": "Se încarcă biblioteca...",
+    "libraryLoadingMessage": "Se încarcă biblioteca…",
     "libraries": "Răsfoiește bibliotecile",
-    "loadingScene": "Se încarcă scena...",
+    "loadingScene": "Se încarcă scena…",
     "align": "Aliniere",
     "alignTop": "Aliniere sus",
     "alignBottom": "Aliniere jos",
@@ -91,7 +91,8 @@
     "centerVertically": "Centrare verticală",
     "centerHorizontally": "Centrare orizontală",
     "distributeHorizontally": "Distribuie orizontal",
-    "distributeVertically": "Distribuie vertical"
+    "distributeVertically": "Distribuie vertical",
+    "viewMode": "Mod de vizualizare"
   },
   "buttons": {
     "clearReset": "Resetare pânză",
@@ -116,7 +117,6 @@
     "edit": "Edit",
     "undo": "Anulare",
     "redo": "Refacere",
-    "roomDialog": "Colaborare în direct",
     "createNewRoom": "Creare cameră nouă",
     "fullScreen": "Ecran complet",
     "darkMode": "Mod întunecat",
@@ -135,6 +135,7 @@
     "decryptFailed": "Datele nu au putut fi decriptate.",
     "uploadedSecurly": "Încărcarea a fost securizată prin criptare integrală, însemnând că serverul Excalidraw și terții nu pot citi conținutul.",
     "loadSceneOverridePrompt": "Încărcarea desenului extern va înlocui conținutul existent. Dorești să continui?",
+    "collabStopOverridePrompt": "Oprirea sesiunii va suprascrie desenul anterior stocat local. Confirmi alegerea?\n\n(Dacă vrei să păstrezi desenul local, pur și simplu închide fila navigatorului în schimb.)",
     "errorLoadingLibrary": "A apărut o eroare la încărcarea bibliotecii terțe.",
     "confirmAddLibrary": "Această acțiune va adăuga {{numShapes}} formă(e) la biblioteca ta. Confirmi?",
     "imageDoesNotContainScene": "Importarea imaginilor nu este acceptată în acest moment.\n\nVoiai să imporți o scenă? Această imagine nu pare să conțină date de scenă. Ai activat această opțiune pe durata exportării?",
@@ -233,10 +234,16 @@
     "storage": "Stocare",
     "title": "Statistici pentru pasionați",
     "total": "Total",
+    "version": "Versiune",
+    "versionCopy": "Clic pentru copiere",
+    "versionNotAvailable": "Versiune indisponibilă",
     "width": "Lățime"
   },
   "toast": {
     "copyStyles": "Stiluri copiate.",
-    "copyToClipboardAsPng": "Copiat în memoria temporară ca PNG."
+    "copyToClipboard": "Copiat în memoria temporară.",
+    "copyToClipboardAsPng": "Copiat în memoria temporară ca PNG.",
+    "fileSaved": "Fișier salvat.",
+    "fileSavedToFilename": "Salvat în {filename}"
   }
 }

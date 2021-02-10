@@ -68,7 +68,7 @@
     "layers": "Ebenen",
     "actions": "Aktionen",
     "language": "Sprache",
-    "createRoom": "Live-Kollaborationssitzung teilen",
+    "liveCollaboration": "Live-Zusammenarbeit",
     "duplicateSelection": "Duplizieren",
     "untitled": "Unbenannt",
     "name": "Name",
@@ -76,13 +76,13 @@
     "madeWithExcalidraw": "Made with Excalidraw",
     "group": "Auswahl gruppieren",
     "ungroup": "Gruppierung aufheben",
-    "collaborators": "Mitarbeitende",
-    "gridMode": "Rastermodus",
+    "collaborators": "Kollaboratoren",
+    "showGrid": "Raster anzeigen",
     "addToLibrary": "Zur Bibliothek hinzufügen",
     "removeFromLibrary": "Aus Bibliothek entfernen",
-    "libraryLoadingMessage": "Lade Bibliothek...",
+    "libraryLoadingMessage": "Lade Bibliothek…",
     "libraries": "Bibliotheken durchsuchen",
-    "loadingScene": "Lade Zeichnung...",
+    "loadingScene": "Lade Zeichnung…",
     "align": "Ausrichten",
     "alignTop": "Obere Kanten",
     "alignBottom": "Untere Kanten",
@@ -91,7 +91,8 @@
     "centerVertically": "Vertikal zentrieren",
     "centerHorizontally": "Horizontal zentrieren",
     "distributeHorizontally": "Horizontal verteilen",
-    "distributeVertically": "Vertikal verteilen"
+    "distributeVertically": "Vertikal verteilen",
+    "viewMode": "Ansichtsmodus"
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
@@ -100,7 +101,7 @@
     "exportToSvg": "Als SVG exportieren",
     "copyToClipboard": "In Zwischenablage kopieren",
     "copyPngToClipboard": "PNG in die Zwischenablage kopieren",
-    "scale": "Skalieren",
+    "scale": "Skalierung",
     "save": "Speichern",
     "saveAs": "Speichern unter",
     "load": "Laden",
@@ -116,7 +117,6 @@
     "edit": "Bearbeiten",
     "undo": "Rückgängig machen",
     "redo": "Wiederholen",
-    "roomDialog": "Live-Kollaborationssitzung starten",
     "createNewRoom": "Neuen Raum erstellen",
     "fullScreen": "Vollbildanzeige",
     "darkMode": "Dunkles Design",
@@ -135,6 +135,7 @@
     "decryptFailed": "Daten konnten nicht entschlüsselt werden.",
     "uploadedSecurly": "Der Upload wurde mit Ende-zu-Ende-Verschlüsselung gespeichert. Weder Excalidraw noch Dritte können den Inhalt einsehen.",
     "loadSceneOverridePrompt": "Das Laden der externen Zeichnung ersetzt den vorhandenen Inhalt. Möchtest Du fortfahren?",
+    "collabStopOverridePrompt": "Das Stoppen der Sitzung wird Deine vorherige, lokal gespeicherte Zeichnung überschreiben. Bist Du sicher?\n\n(Wenn Du Deine lokale Zeichnung behalten möchtest, schließe einfach stattdessen den Browser-Tab.)",
     "errorLoadingLibrary": "Beim Laden der Drittanbieter-Bibliothek ist ein Fehler aufgetreten.",
     "confirmAddLibrary": "Dieses fügt {{numShapes}} Form(en) zu deiner Bibliothek hinzu. Bist du sicher?",
     "imageDoesNotContainScene": "Das Importieren von Bildern wird derzeit nicht unterstützt.\n\nMöchtest du eine Szene importieren? Dieses Bild scheint keine Zeichnungsdaten zu enthalten. Hast du dies beim Exportieren aktiviert?",
@@ -233,10 +234,16 @@
     "storage": "Speicher",
     "title": "Statistiken für Nerds",
     "total": "Gesamt",
+    "version": "Version",
+    "versionCopy": "Zum Kopieren klicken",
+    "versionNotAvailable": "Version nicht verfügbar",
     "width": "Breite"
   },
   "toast": {
     "copyStyles": "Formatierung kopiert.",
-    "copyToClipboardAsPng": "In die Zwischenablage als PNG kopiert."
+    "copyToClipboard": "In die Zwischenablage kopiert.",
+    "copyToClipboardAsPng": "In die Zwischenablage als PNG kopiert.",
+    "fileSaved": "Datei gespeichert.",
+    "fileSavedToFilename": "Als {filename} gespeichert"
   }
 }

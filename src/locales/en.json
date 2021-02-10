@@ -68,7 +68,7 @@
     "layers": "Layers",
     "actions": "Actions",
     "language": "Language",
-    "createRoom": "Share a live-collaboration session",
+    "liveCollaboration": "Live collaboration",
     "duplicateSelection": "Duplicate",
     "untitled": "Untitled",
     "name": "Name",
@@ -77,12 +77,12 @@
     "group": "Group selection",
     "ungroup": "Ungroup selection",
     "collaborators": "Collaborators",
-    "gridMode": "Grid mode",
+    "showGrid": "Show grid",
     "addToLibrary": "Add to library",
     "removeFromLibrary": "Remove from library",
-    "libraryLoadingMessage": "Loading library...",
+    "libraryLoadingMessage": "Loading library…",
     "libraries": "Browse libraries",
-    "loadingScene": "Loading scene...",
+    "loadingScene": "Loading scene…",
     "align": "Align",
     "alignTop": "Align top",
     "alignBottom": "Align bottom",
@@ -91,7 +91,8 @@
     "centerVertically": "Center vertically",
     "centerHorizontally": "Center horizontally",
     "distributeHorizontally": "Distribute horizontally",
-    "distributeVertically": "Distribute vertically"
+    "distributeVertically": "Distribute vertically",
+    "viewMode": "View mode"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
@@ -116,7 +117,7 @@
     "edit": "Edit",
     "undo": "Undo",
     "redo": "Redo",
-    "roomDialog": "Start live collaboration",
+    "resetLibrary": "Reset library",
     "createNewRoom": "Create new room",
     "fullScreen": "Full screen",
     "darkMode": "Dark mode",
@@ -135,10 +136,12 @@
     "decryptFailed": "Couldn't decrypt data.",
     "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content.",
     "loadSceneOverridePrompt": "Loading external drawing will replace your existing content. Do you wish to continue?",
+    "collabStopOverridePrompt": "Stopping the session will overwrite your previous, locally stored drawing. Are you sure?\n\n(If you want to keep your local drawing, simply close the browser tab instead.)",
     "errorLoadingLibrary": "There was an error loading the third party library.",
     "confirmAddLibrary": "This will add {{numShapes}} shape(s) to your library. Are you sure?",
     "imageDoesNotContainScene": "Importing images isn't supported at the moment.\n\nDid you want to import a scene? This image does not seem to contain any scene data. Have you enabled this during export?",
-    "cannotRestoreFromImage": "Scene couldn't be restored from this image file"
+    "cannotRestoreFromImage": "Scene couldn't be restored from this image file",
+    "resetLibrary": "This will clear your library. Are you sure?"
   },
   "toolBar": {
     "selection": "Selection",
@@ -233,10 +236,16 @@
     "storage": "Storage",
     "title": "Stats for nerds",
     "total": "Total",
+    "version": "Version",
+    "versionCopy": "Click to copy",
+    "versionNotAvailable": "Version not available",
     "width": "Width"
   },
   "toast": {
     "copyStyles": "Copied styles.",
-    "copyToClipboardAsPng": "Copied to clipboard as PNG."
+    "copyToClipboard": "Copied to clipboard.",
+    "copyToClipboardAsPng": "Copied to clipboard as PNG.",
+    "fileSaved": "File saved.",
+    "fileSavedToFilename": "Saved to {filename}"
   }
 }

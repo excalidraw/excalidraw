@@ -19,9 +19,9 @@
       }
 
       a {
-        margin-left: auto;
+        margin-inline-start: auto;
         // 17px for scrollbar (needed for overlay scrollbars on Big Sur?) + 1px extra
-        padding-right: 18px;
+        padding-inline-end: 18px;
         white-space: nowrap;
       }
     }
@@ -38,6 +38,8 @@
   }
 
   .layer-ui__wrapper {
+    z-index: var(--zIndex-layerUI);
+
     .encrypted-icon {
       position: relative;
       margin-inline-start: 15px;

@@ -68,7 +68,7 @@
     "layers": "Vrstvy",
     "actions": "Akcie",
     "language": "Jazyk",
-    "createRoom": "Zdieľajte živú spoluprácu",
+    "liveCollaboration": "",
     "duplicateSelection": "Duplikovať",
     "untitled": "Bez názvu",
     "name": "Meno",
@@ -77,12 +77,12 @@
     "group": "Zoskupiť",
     "ungroup": "Zrušiť zoskupenie",
     "collaborators": "Spolupracovníci",
-    "gridMode": "Režim mriežky",
+    "showGrid": "Zobraziť mriežku",
     "addToLibrary": "Pridať do knižnice",
     "removeFromLibrary": "Odstrániť z knižnice",
-    "libraryLoadingMessage": "Načítavanie knižnice...",
+    "libraryLoadingMessage": "Načítavanie knižnice…",
     "libraries": "Prehliadať knižnice",
-    "loadingScene": "Načítavanie scény...",
+    "loadingScene": "Načítavanie scény…",
     "align": "Zarovnanie",
     "alignTop": "Zarovnať nahor",
     "alignBottom": "Zarovnať nadol",
@@ -91,7 +91,8 @@
     "centerVertically": "Zarovnať zvislo na stred",
     "centerHorizontally": "Zarovnať vodorovne na stred",
     "distributeHorizontally": "Rozmiestniť vodorovne",
-    "distributeVertically": "Rozmiestniť zvisle"
+    "distributeVertically": "Rozmiestniť zvisle",
+    "viewMode": "Režim zobrazenia"
   },
   "buttons": {
     "clearReset": "Obnoviť plátno",
@@ -116,7 +117,6 @@
     "edit": "Upraviť",
     "undo": "Späť",
     "redo": "Znova",
-    "roomDialog": "Začať živú spoluprácu",
     "createNewRoom": "Vytvoriť novú miestnosť",
     "fullScreen": "Celá obrazovka",
     "darkMode": "Tmavý režim",
@@ -135,6 +135,7 @@
     "decryptFailed": "Nepodarilo sa rozšifrovať údaje.",
     "uploadedSecurly": "Nahratie je zabezpečené end-to-end šifrovaním, takže Excalidraw server a tretie strany nedokážu prečítať jeho obsah.",
     "loadSceneOverridePrompt": "Nahratie externej kresby nahradí existujúci obsah. Prajete si pokračovať?",
+    "collabStopOverridePrompt": "Ukončenie schôdze nahradí vašu predchádzajúcu lokálne uloženú scénu. Ste si istý?\n\n(Ak si chcete ponechať lokálnu scénu, jednoducho iba zavrite kartu prehliadača.)",
     "errorLoadingLibrary": "Nepodarilo sa načítať externú knižnicu.",
     "confirmAddLibrary": "Týmto sa pridá {{numShapes}} tvar(ov) do vašej knižnice. Ste si istí?",
     "imageDoesNotContainScene": "Importovanie obrázku v tomto momente nie je možné.\n\nChceli ste importovať scénu? Tento obrázok neobsahuje žiadne údaje scény. Povolili ste túto možnosť počas exportovania?",
@@ -233,10 +234,16 @@
     "storage": "Úložisko",
     "title": "Štatistiky",
     "total": "Celkom",
+    "version": "Verzia",
+    "versionCopy": "Kliknutím skopírujete",
+    "versionNotAvailable": "Verzia nie je k dispozícii",
     "width": "Šírka"
   },
   "toast": {
     "copyStyles": "Štýly skopírované.",
-    "copyToClipboardAsPng": "Skopírované do schránky ako PNG."
+    "copyToClipboard": "Skopírované do schránky.",
+    "copyToClipboardAsPng": "Skopírované do schránky ako PNG.",
+    "fileSaved": "",
+    "fileSavedToFilename": ""
   }
 }

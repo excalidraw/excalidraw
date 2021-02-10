@@ -68,7 +68,7 @@
     "layers": "အလွှာများ",
     "actions": "လုပ်ဆောင်ချက်များ",
     "language": "ဘာသာစကား",
-    "createRoom": "တိုက်ရိုက်ပူးပေါင်းဆောင်ရွက်ရန်အဖွဲ့ဖွဲ့",
+    "liveCollaboration": "",
     "duplicateSelection": "ပွား",
     "untitled": "အမည်မရှိ",
     "name": "အမည်",
@@ -77,12 +77,12 @@
     "group": "အုပ်စုဖွဲ့",
     "ungroup": "အုပ်စုဖျက်သိမ်း",
     "collaborators": "ပူးပေါင်းပါဝင်သူများ",
-    "gridMode": "",
+    "showGrid": "",
     "addToLibrary": "မှတ်တမ်းတင်",
     "removeFromLibrary": "မှတ်တမ်းမှထုတ်",
-    "libraryLoadingMessage": "မှတ်တမ်းအား တင်သွင်းနေသည်...",
+    "libraryLoadingMessage": "မှတ်တမ်းအား တင်သွင်းနေသည်…",
     "libraries": "စာကြည့်တိုက်တွင်ရှာဖွေပါ",
-    "loadingScene": "မြင်ကွင်းဖော်နေသည်...",
+    "loadingScene": "မြင်ကွင်းဖော်နေသည်…",
     "align": "ချိန်ညှိ",
     "alignTop": "ထိပ်ညှိ",
     "alignBottom": "အခြေညှိ",
@@ -91,7 +91,8 @@
     "centerVertically": "ဒေါင်လိုက်အလယ်ညှိ",
     "centerHorizontally": "အလျားလိုက်အလယ်ညှိ",
     "distributeHorizontally": "အလျားလိုက်",
-    "distributeVertically": "ထောင်လိုက်"
+    "distributeVertically": "ထောင်လိုက်",
+    "viewMode": ""
   },
   "buttons": {
     "clearReset": "ကားချပ်ရှင်းလင်း",
@@ -116,7 +117,6 @@
     "edit": "ပြင်ဆင်",
     "undo": "ပြန်ထား",
     "redo": "ထပ်လုပ်",
-    "roomDialog": "တိုက်ရိုက်ပူးပေါင်းမှုစတင်",
     "createNewRoom": "အခန်းသစ်ဖွဲ့",
     "fullScreen": "",
     "darkMode": "",
@@ -135,6 +135,7 @@
     "decryptFailed": "အချက်အလက်ဖော်ယူ၍မရပါ။",
     "uploadedSecurly": "တင်သွင်းအချက်အလက်များအား နှစ်ဘက်စွန်းတိုင်လျှို့ဝှက်စနစ်အသုံးပြု၍လုံခြုံစွာထိန်းသိမ်းထားပါသဖြင့် Excalidraw ဆာဗာနှင့်ဆက်စပ်အဖွဲ့အစည်းများပင်လျှင်မဖတ်ရှုနိုင်ပါ။",
     "loadSceneOverridePrompt": "လက်ရှိရေးဆွဲထားသမျှအား ပြင်ပမှတင်သွင်းသောပုံနှင့်အစားထိုးပါမည်။ ဆက်လက်ဆောင်ရွက်လိုပါသလား။",
+    "collabStopOverridePrompt": "",
     "errorLoadingLibrary": "ပြင်ပမှမှတ်တမ်းအားတင်သွင်းရာတွင်အမှားအယွင်းရှိနေသည်။",
     "confirmAddLibrary": "{{numShapes}} ခုသောပုံသဏ္ဌာန်အားမှတ်တမ်းတင်ပါမည်။ အတည်ပြုပါ။",
     "imageDoesNotContainScene": "",
@@ -233,10 +234,16 @@
     "storage": "သိုလှောင်ခန်း",
     "title": "အက္ခရာများအတွက်အချက်အလက်များ",
     "total": "စုစုပေါင်း",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "အကျယ်"
   },
   "toast": {
     "copyStyles": "",
-    "copyToClipboardAsPng": ""
+    "copyToClipboard": "",
+    "copyToClipboardAsPng": "",
+    "fileSaved": "",
+    "fileSavedToFilename": ""
   }
 }

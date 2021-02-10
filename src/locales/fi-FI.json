@@ -68,7 +68,7 @@
     "layers": "Tasot",
     "actions": "Toiminnot",
     "language": "Kieli",
-    "createRoom": "Jaa yhteistyöistunto",
+    "liveCollaboration": "",
     "duplicateSelection": "Monista",
     "untitled": "Nimetön",
     "name": "Nimi",
@@ -77,12 +77,12 @@
     "group": "Ryhmitä valinta",
     "ungroup": "Pura valittu ryhmä",
     "collaborators": "Yhteistyökumppanit",
-    "gridMode": "Ruudukkotila",
+    "showGrid": "Näytä ruudukko",
     "addToLibrary": "Lisää kirjastoon",
     "removeFromLibrary": "Poista kirjastosta",
-    "libraryLoadingMessage": "Ladataan kirjastoa...",
+    "libraryLoadingMessage": "Ladataan kirjastoa…",
     "libraries": "Selaa kirjastoja",
-    "loadingScene": "Ladataan työtä...",
+    "loadingScene": "Ladataan työtä…",
     "align": "Tasaa",
     "alignTop": "Tasaa ylös",
     "alignBottom": "Tasaa alas",
@@ -91,7 +91,8 @@
     "centerVertically": "Keskitä pystysuunnassa",
     "centerHorizontally": "Keskitä vaakasuunnassa",
     "distributeHorizontally": "Jaa vaakasuunnassa",
-    "distributeVertically": "Jaa pystysuunnassa"
+    "distributeVertically": "Jaa pystysuunnassa",
+    "viewMode": "Katselutila"
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
@@ -116,7 +117,6 @@
     "edit": "Muokkaa",
     "undo": "Kumoa",
     "redo": "Tee uudelleen",
-    "roomDialog": "Aloita live-yhteistyö",
     "createNewRoom": "Luo huone",
     "fullScreen": "Koko näyttö",
     "darkMode": "Tumma tila",
@@ -135,6 +135,7 @@
     "decryptFailed": "Salauksen purkaminen epäonnistui.",
     "uploadedSecurly": "Lähetys on turvattu päästä päähän salauksella. Excalidrawin palvelin ja kolmannet osapuolet eivät voi lukea sisältöä.",
     "loadSceneOverridePrompt": "Ulkopuolisen piirroksen lataaminen korvaa nykyisen sisältösi. Haluatko jatkaa?",
+    "collabStopOverridePrompt": "Istunnon lopettaminen korvaa aiemman, paikallisesti tallennetun piirustuksen. Oletko varma?\n\n(Jos haluat pitää paikallisen piirustuksen, sulje selaimen välilehti sen sijaan.)",
     "errorLoadingLibrary": "Kolmannen osapuolen kirjastoa ladattaessa tapahtui virhe.",
     "confirmAddLibrary": "Tämä lisää {{numShapes}} muotoa kirjastoosi. Oletko varma?",
     "imageDoesNotContainScene": "Kuvien lisääminen ei ole tällä hetkellä mahdollista.\n\nHaluatko tuoda piirroksen? Tämä kuva ei näytä sisältävän tarvittavia tietoja. Oletko ottanut piirrostietojen tallennuksen käyttöön viennin aikana?",
@@ -233,10 +234,16 @@
     "storage": "Tallennustila",
     "title": "Nörttien tilastot",
     "total": "Yhteensä",
+    "version": "Versio",
+    "versionCopy": "Klikkaa kopioidaksesi",
+    "versionNotAvailable": "Versio ei saatavilla",
     "width": "Leveys"
   },
   "toast": {
     "copyStyles": "Tyylit kopioitu.",
-    "copyToClipboardAsPng": "Kopioitu leikepöydälle PNG-tiedostona."
+    "copyToClipboard": "Kopioitu leikepöydälle.",
+    "copyToClipboardAsPng": "Kopioitu leikepöydälle PNG-tiedostona.",
+    "fileSaved": "Tiedosto tallennettu.",
+    "fileSavedToFilename": "Tallennettu kohteeseen {filename}"
   }
 }

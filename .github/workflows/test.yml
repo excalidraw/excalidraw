@@ -1,10 +1,6 @@
 name: Tests
 
-on:
-  push:
-    branches:
-      - master
-  pull_request:
+on: pull_request
 
 jobs:
   test:
@@ -13,14 +9,12 @@ jobs:
     steps:
       - uses: actions/checkout@v1
 
-      - name: Setup Node.js 12.x
+      - name: Setup Node.js 14.x
         uses: actions/setup-node@v1
         with:
-          node-version: 12.x
+          node-version: 14.x
 
       - name: Install and test
         run: |
           npm ci
           npm run test:app
-        env:
-          CI: true

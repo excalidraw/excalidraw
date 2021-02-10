@@ -68,7 +68,7 @@
     "layers": "الطبقات",
     "actions": "الإجراءات",
     "language": "اللغة",
-    "createRoom": "مشاركة الجلسة مباشرة",
+    "liveCollaboration": "",
     "duplicateSelection": "تكرار",
     "untitled": "غير معنون",
     "name": "الاسم",
@@ -77,12 +77,12 @@
     "group": "تحديد مجموعة",
     "ungroup": "إلغاء تحديد مجموعة",
     "collaborators": "المتعاونون",
-    "gridMode": "وضع الشبكة",
+    "showGrid": "",
     "addToLibrary": "أضف إلى المكتبة",
     "removeFromLibrary": "حذف من المكتبة",
-    "libraryLoadingMessage": "جارٍ تحميل المكتبة...",
+    "libraryLoadingMessage": "جارٍ تحميل المكتبة…",
     "libraries": "تصفح المكتبات",
-    "loadingScene": "جاري تحميل المشهد...",
+    "loadingScene": "جاري تحميل المشهد…",
     "align": "محاذاة",
     "alignTop": "محاذاة إلى اﻷعلى",
     "alignBottom": "محاذاة إلى اﻷسفل",
@@ -91,7 +91,8 @@
     "centerVertically": "توسيط عمودي",
     "centerHorizontally": "توسيط أفقي",
     "distributeHorizontally": "التوزيع الأفقي",
-    "distributeVertically": "التوزيع عمودياً"
+    "distributeVertically": "التوزيع عمودياً",
+    "viewMode": ""
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
@@ -116,7 +117,6 @@
     "edit": "تعديل",
     "undo": "تراجع",
     "redo": "إعادة تنفيذ",
-    "roomDialog": "بدء المشاركة الحية",
     "createNewRoom": "إنشاء غرفة جديدة",
     "fullScreen": "شاشة كاملة",
     "darkMode": "الوضع المظلم",
@@ -135,6 +135,7 @@
     "decryptFailed": "تعذر فك تشفير البيانات.",
     "uploadedSecurly": "تم تأمين التحميل بتشفير النهاية إلى النهاية، مما يعني أن خادوم Excalidraw والأطراف الثالثة لا يمكنها قراءة المحتوى.",
     "loadSceneOverridePrompt": "تحميل الرسم الخارجي سيحل محل المحتوى الموجود لديك. هل ترغب في المتابعة؟",
+    "collabStopOverridePrompt": "",
     "errorLoadingLibrary": "حصل خطأ أثناء تحميل مكتبة الطرف الثالث.",
     "confirmAddLibrary": "هذا سيضيف {{numShapes}} شكل إلى مكتبتك. هل أنت متأكد؟",
     "imageDoesNotContainScene": "استيراد الصور غير مدعوم في الوقت الراهن.\n\nهل تريد استيراد مشهد؟ لا يبدو أن هذه الصورة تحتوي على أي بيانات مشهد. هل قمت بسماح هذا أثناء التصدير؟",
@@ -233,10 +234,16 @@
     "storage": "التخزين",
     "title": "إحصائيات للمهووسين",
     "total": "المجموع",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "العرض"
   },
   "toast": {
     "copyStyles": "",
-    "copyToClipboardAsPng": ""
+    "copyToClipboard": "",
+    "copyToClipboardAsPng": "",
+    "fileSaved": "",
+    "fileSavedToFilename": ""
   }
 }
