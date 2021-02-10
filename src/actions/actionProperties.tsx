@@ -1,7 +1,6 @@
 import React from "react";
 import { AppState } from "../../src/types";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
-import { ButtonSelect } from "../components/ButtonSelect";
 import { ColorPicker } from "../components/ColorPicker";
 import { IconPicker } from "../components/IconPicker";
 import {
@@ -28,6 +27,9 @@ import {
   FontFamilyHandDrawnIcon,
   FontFamilyNormalIcon,
   FontFamilyCodeIcon,
+  TextAlignLeftIcon,
+  TextAlignCenterIcon,
+  TextAlignRightIcon,
 } from "../components/icons";
 import { DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE } from "../constants";
 import {
@@ -541,12 +543,24 @@ export const actionChangeTextAlign = register({
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.textAlign")}</legend>
-      <ButtonSelect<TextAlign | false>
+      <ButtonIconSelect<TextAlign | false>
         group="text-align"
         options={[
-          { value: "left", text: t("labels.left") },
-          { value: "center", text: t("labels.center") },
-          { value: "right", text: t("labels.right") },
+          {
+            value: "left",
+            text: t("labels.left"),
+            icon: <TextAlignLeftIcon appearance={appState.appearance} />,
+          },
+          {
+            value: "center",
+            text: t("labels.center"),
+            icon: <TextAlignCenterIcon appearance={appState.appearance} />,
+          },
+          {
+            value: "right",
+            text: t("labels.right"),
+            icon: <TextAlignRightIcon appearance={appState.appearance} />,
+          },
         ]}
         value={getFormValue(
           elements,
