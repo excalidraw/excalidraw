@@ -117,6 +117,7 @@
     "edit": "संशोधन करें",
     "undo": "पूर्ववत् करें",
     "redo": "फिर से करें",
+    "resetLibrary": "",
     "createNewRoom": "एक नया कमरा बनाएं",
     "fullScreen": "पूरी स्क्रीन",
     "darkMode": "डार्क मोड",
@@ -139,7 +140,8 @@
     "errorLoadingLibrary": "लाइब्रेरी लोड करने में त्रुटि",
     "confirmAddLibrary": "लाइब्रेरी जोड़ें पुष्‍टि करें आकार संख्या",
     "imageDoesNotContainScene": "दृश्य में छवि नहीं है",
-    "cannotRestoreFromImage": "छवि फ़ाइल बहाल दृश्य नहीं है"
+    "cannotRestoreFromImage": "छवि फ़ाइल बहाल दृश्य नहीं है",
+    "resetLibrary": ""
   },
   "toolBar": {
     "selection": "चयन",

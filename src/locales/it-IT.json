@@ -68,7 +68,7 @@
     "layers": "Livelli",
     "actions": "Azioni",
     "language": "Lingua",
-    "liveCollaboration": "",
+    "liveCollaboration": "Collaborazione live",
     "duplicateSelection": "Duplica",
     "untitled": "Senza titolo",
     "name": "Nome",
@@ -117,6 +117,7 @@
     "edit": "Modifica",
     "undo": "Annulla",
     "redo": "Ripeti",
+    "resetLibrary": "Ripristina libreria",
     "createNewRoom": "Crea nuova stanza",
     "fullScreen": "Schermo intero",
     "darkMode": "Tema scuro",
@@ -139,7 +140,8 @@
     "errorLoadingLibrary": "Si è verificato un errore nel caricamento della libreria di terze parti.",
     "confirmAddLibrary": "Questo aggiungerà {{numShapes}} forma(e) alla tua libreria. Sei sicuro?",
     "imageDoesNotContainScene": "L'importazione di immagini al momento non è supportata.\n\nVuoi importare una scena? Questa immagine non sembra contenere alcun dato di scena. Hai abilitato questa opzione durante l'esportazione?",
-    "cannotRestoreFromImage": "Impossibile ripristinare la scena da questo file immagine"
+    "cannotRestoreFromImage": "Impossibile ripristinare la scena da questo file immagine",
+    "resetLibrary": "Questa azione cancellerà l'intera libreria. Sei sicuro?"
   },
   "toolBar": {
     "selection": "Selezione",

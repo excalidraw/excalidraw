@@ -117,6 +117,7 @@
     "edit": "编辑",
     "undo": "撤销",
     "redo": "重做",
+    "resetLibrary": "",
     "createNewRoom": "新建会议室",
     "fullScreen": "全屏",
     "darkMode": "暗色主题",
@@ -139,7 +140,8 @@
     "errorLoadingLibrary": "加载第三方库时出错。",
     "confirmAddLibrary": "这将添加 {{numShapes}} 个形状到您的库。您确定吗？",
     "imageDoesNotContainScene": "当前不支持导入图片。\n\n您想要导入画布数据吗？此图像似乎不包含任何画布数据。您是否在导出过程中启用了嵌入画布的选项？",
-    "cannotRestoreFromImage": "无法从此图像文件恢复画布"
+    "cannotRestoreFromImage": "无法从此图像文件恢复画布",
+    "resetLibrary": ""
   },
   "toolBar": {
     "selection": "选择",
