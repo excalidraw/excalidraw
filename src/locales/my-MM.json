@@ -117,6 +117,7 @@
     "edit": "ပြင်ဆင်",
     "undo": "ပြန်ထား",
     "redo": "ထပ်လုပ်",
+    "resetLibrary": "",
     "createNewRoom": "အခန်းသစ်ဖွဲ့",
     "fullScreen": "",
     "darkMode": "",
@@ -139,7 +140,8 @@
     "errorLoadingLibrary": "ပြင်ပမှမှတ်တမ်းအားတင်သွင်းရာတွင်အမှားအယွင်းရှိနေသည်။",
     "confirmAddLibrary": "{{numShapes}} ခုသောပုံသဏ္ဌာန်အားမှတ်တမ်းတင်ပါမည်။ အတည်ပြုပါ။",
     "imageDoesNotContainScene": "",
-    "cannotRestoreFromImage": "ဤပုံဖြင့်မြင်ကွင်းပြန်လည်မရယူနိုင်ပါ။"
+    "cannotRestoreFromImage": "ဤပုံဖြင့်မြင်ကွင်းပြန်လည်မရယူနိုင်ပါ။",
+    "resetLibrary": ""
   },
   "toolBar": {
     "selection": "ရွေးချယ်",

@@ -117,6 +117,7 @@
     "edit": "Rediger",
     "undo": "Angre",
     "redo": "Gjer om",
+    "resetLibrary": "",
     "createNewRoom": "Lag nytt rom",
     "fullScreen": "Fullskjerm",
     "darkMode": "Mørk modus",
@@ -139,7 +140,8 @@
     "errorLoadingLibrary": "Det oppstod ein feil under lastinga av tredjepartsbibliotek.",
     "confirmAddLibrary": "Dette vil legge til {{numShapes}} form(er) i biblioteket ditt. Er du sikker?",
     "imageDoesNotContainScene": "Importering av bilder støttes ikkje for p. t.\n\nVil du importere ein scene? Dette bildet ser ikkje ut til å inneholde noen scene-data. Har du aktivert dette under eksporten?",
-    "cannotRestoreFromImage": "Scena kunne ikkje gjenopprettast frå denne biletfila"
+    "cannotRestoreFromImage": "Scena kunne ikkje gjenopprettast frå denne biletfila",
+    "resetLibrary": ""
   },
   "toolBar": {
     "selection": "Vel",

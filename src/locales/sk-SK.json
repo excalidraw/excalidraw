@@ -68,7 +68,7 @@
     "layers": "Vrstvy",
     "actions": "Akcie",
     "language": "Jazyk",
-    "liveCollaboration": "",
+    "liveCollaboration": "Živá spolupráca",
     "duplicateSelection": "Duplikovať",
     "untitled": "Bez názvu",
     "name": "Meno",
@@ -117,6 +117,7 @@
     "edit": "Upraviť",
     "undo": "Späť",
     "redo": "Znova",
+    "resetLibrary": "Obnoviť knižnicu",
     "createNewRoom": "Vytvoriť novú miestnosť",
     "fullScreen": "Celá obrazovka",
     "darkMode": "Tmavý režim",
@@ -139,7 +140,8 @@
     "errorLoadingLibrary": "Nepodarilo sa načítať externú knižnicu.",
     "confirmAddLibrary": "Týmto sa pridá {{numShapes}} tvar(ov) do vašej knižnice. Ste si istí?",
     "imageDoesNotContainScene": "Importovanie obrázku v tomto momente nie je možné.\n\nChceli ste importovať scénu? Tento obrázok neobsahuje žiadne údaje scény. Povolili ste túto možnosť počas exportovania?",
-    "cannotRestoreFromImage": "Nepodarilo sa obnoviť scénu z tohto obrázkového súboru"
+    "cannotRestoreFromImage": "Nepodarilo sa obnoviť scénu z tohto obrázkového súboru",
+    "resetLibrary": "Týmto vyprázdnite vašu knižnicu. Ste si istý?"
   },
   "toolBar": {
     "selection": "Výber",
@@ -243,7 +245,7 @@
     "copyStyles": "Štýly skopírované.",
     "copyToClipboard": "Skopírované do schránky.",
     "copyToClipboardAsPng": "Skopírované do schránky ako PNG.",
-    "fileSaved": "",
-    "fileSavedToFilename": ""
+    "fileSaved": "Súbor uložený.",
+    "fileSavedToFilename": "Uložený ako {filename}"
   }
 }

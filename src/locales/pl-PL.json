@@ -117,6 +117,7 @@
     "edit": "Edytuj",
     "undo": "Cofnij",
     "redo": "Przywróć",
+    "resetLibrary": "",
     "createNewRoom": "Utwórz nowy pokój",
     "fullScreen": "Pełny ekran",
     "darkMode": "Ciemny motyw",
@@ -139,7 +140,8 @@
     "errorLoadingLibrary": "Wystąpił błąd podczas ładowania zewnętrznej biblioteki.",
     "confirmAddLibrary": "To doda {{numShapes}} kształtów do twojej biblioteki. Jesteś pewien?",
     "imageDoesNotContainScene": "Importowanie zdjęć nie jest obecnie obsługiwane.\n\nCzy chciałeś zaimportować scenę? Ten obraz nie zawiera żadnych danych sceny. Czy włączyłeś to podczas eksportowania?",
-    "cannotRestoreFromImage": "Scena nie mogła zostać przywrócona z pliku obrazu"
+    "cannotRestoreFromImage": "Scena nie mogła zostać przywrócona z pliku obrazu",
+    "resetLibrary": ""
   },
   "toolBar": {
     "selection": "Zaznaczenie",

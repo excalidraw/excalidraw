@@ -117,6 +117,7 @@
     "edit": "수정",
     "undo": "실행 취소",
     "redo": "다시 실행",
+    "resetLibrary": "",
     "createNewRoom": "방 만들기",
     "fullScreen": "전체화면",
     "darkMode": "다크 모드",
@@ -139,7 +140,8 @@
     "errorLoadingLibrary": "외부 라이브러리를 불러오는 중에 문제가 발생했습니다.",
     "confirmAddLibrary": "{{numShapes}}개의 모양이 라이브러리에 추가됩니다. 계속하시겠어요?",
     "imageDoesNotContainScene": "이미지에서 불러오기는 현재 지원되지 않습니다.\n\n화면을 불러오려고 하셨나요? 이미지에 화면 정보가 없는 것 같습니다. 내보낼 때 화면을 포함했나요?",
-    "cannotRestoreFromImage": "이미지 파일에서 화면을 복구할 수 없었습니다"
+    "cannotRestoreFromImage": "이미지 파일에서 화면을 복구할 수 없었습니다",
+    "resetLibrary": ""
   },
   "toolBar": {
     "selection": "선택",
