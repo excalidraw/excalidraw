@@ -68,7 +68,7 @@
     "layers": "圖層",
     "actions": "動作",
     "language": "語言",
-    "liveCollaboration": "",
+    "liveCollaboration": "即時協作",
     "duplicateSelection": "複製",
     "untitled": "無標題",
     "name": "名稱",
@@ -117,6 +117,7 @@
     "edit": "編輯",
     "undo": "復原",
     "redo": "重做",
+    "resetLibrary": "重設資料庫",
     "createNewRoom": "建立新協作會議室",
     "fullScreen": "全螢幕",
     "darkMode": "深色模式",
@@ -139,7 +140,8 @@
     "errorLoadingLibrary": "載入第三方套件時出現錯誤。",
     "confirmAddLibrary": "這將會將 {{numShapes}} 個圖形加入你的資料庫，你確定嗎？",
     "imageDoesNotContainScene": "目前尚不支援載入圖片。\n您是否要載入場景？此圖片中並無任何場景資料，輸出時是否有選擇包含？",
-    "cannotRestoreFromImage": "無法由此檔案回復場景。"
+    "cannotRestoreFromImage": "無法由此檔案回復場景。",
+    "resetLibrary": "這會清除您的資料庫，是否確定？"
   },
   "toolBar": {
     "selection": "選取",
