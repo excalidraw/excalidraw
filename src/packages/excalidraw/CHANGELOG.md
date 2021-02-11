@@ -48,6 +48,7 @@ Please add the latest change on the top under the correct section.
 
 ### Fixes
 
+- Refresh wysiwyg position on canvas resize [#3008](https"//github.com/excalidraw/excaidraw/pull/3008)
 - Update the `lang` attribute with the current lang. [#2995](https"//github.com/excalidraw/excaidraw/pull/2995)
 - Rename 'Grid mode' to 'Show grid' [#2944](https"//github.com/excalidraw/excaidraw/pull/2944)
 - Deal with users on systems that don't handle emoji [#2941](https"//github.com/excalidraw/excaidraw/pull/2941)
