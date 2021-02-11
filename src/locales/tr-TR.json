@@ -117,6 +117,7 @@
     "edit": "Düzenle",
     "undo": "Geri Al",
     "redo": "Yeniden yap",
+    "resetLibrary": "",
     "createNewRoom": "Yeni oda oluştur",
     "fullScreen": "Tam ekran",
     "darkMode": "Koyu tema",
@@ -139,7 +140,8 @@
     "errorLoadingLibrary": "Üçüncü taraf kitaplığı yüklerken bir hata oluştu.",
     "confirmAddLibrary": "Bu, kitaplığınıza {{numShapes}} tane şekil ekleyecek. Emin misiniz?",
     "imageDoesNotContainScene": "Resim ekleme şuan için desteklenmiyor.\nBir sahneyi içeri aktarmak mı istediniz? Bu dosya herhangi bir sahne içeriyor gibi durmuyor. Çıktı alırken sahneyi dahil ettiniz mi?",
-    "cannotRestoreFromImage": "Sahne bu dosyadan oluşturulamıyor"
+    "cannotRestoreFromImage": "Sahne bu dosyadan oluşturulamıyor",
+    "resetLibrary": ""
   },
   "toolBar": {
     "selection": "Seçme",

@@ -117,6 +117,7 @@
     "edit": "Editar",
     "undo": "Desfer",
     "redo": "Refer",
+    "resetLibrary": "",
     "createNewRoom": "Crear sala nova",
     "fullScreen": "Pantalla completa",
     "darkMode": "Mode fosc",
@@ -139,7 +140,8 @@
     "errorLoadingLibrary": "S'ha produït un error en carregar la biblioteca de tercers.",
     "confirmAddLibrary": "Això afegirà {{numShapes}} forma(es) a la vostra biblioteca. Estàs segur?",
     "imageDoesNotContainScene": "En aquest moment no s’admet la importació d’imatges.\n\nVolies importar una escena? Sembla que aquesta imatge no conté cap dada d’escena. Ho has activat durant l'exportació?",
-    "cannotRestoreFromImage": "L’escena no s’ha pogut restaurar des d’aquest fitxer d’imatge"
+    "cannotRestoreFromImage": "L’escena no s’ha pogut restaurar des d’aquest fitxer d’imatge",
+    "resetLibrary": ""
   },
   "toolBar": {
     "selection": "Selecció",

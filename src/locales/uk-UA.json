@@ -68,7 +68,7 @@
     "layers": "Шари",
     "actions": "Дії",
     "language": "Мова",
-    "liveCollaboration": "Спільна співпраця",
+    "liveCollaboration": "",
     "duplicateSelection": "Дублювати",
     "untitled": "Без назви",
     "name": "Ім’я",
@@ -117,6 +117,7 @@
     "edit": "Редагувати",
     "undo": "Відмінити",
     "redo": "Повторити",
+    "resetLibrary": "",
     "createNewRoom": "Створити нову кімнату",
     "fullScreen": "Повноекранний режим",
     "darkMode": "Темний режим",
@@ -139,7 +140,8 @@
     "errorLoadingLibrary": "Помилка при завантаженні сторонньої бібліотеки.",
     "confirmAddLibrary": "Це призведе до додавання {{numShapes}} фігур до вашої бібліотеки. Ви впевнені?",
     "imageDoesNotContainScene": "Імпортування зображень на даний момент не підтримується.\n\nЧи хочете ви імпортувати сцену? Це зображення не містить ніяких даних сцен. Ви увімкнули це під час експорту?",
-    "cannotRestoreFromImage": "Сцена не може бути відновлена з цього файлу зображення"
+    "cannotRestoreFromImage": "Сцена не може бути відновлена з цього файлу зображення",
+    "resetLibrary": ""
   },
   "toolBar": {
     "selection": "Виділення",
