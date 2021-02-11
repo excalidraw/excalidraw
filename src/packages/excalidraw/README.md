@@ -51,6 +51,10 @@ export default function App() {
     height: window.innerHeight,
   });
 
+  const [viewModeEnabled, setViewModeEnabled] = useState(false);
+  const [zenModeEnabled, setZenModeEnabled] = useState(false);
+  const [gridModeEnabled, setGridModeEnabled] = useState(false);
+
   useEffect(() => {
     const onResize = () => {
       setDimensions({
@@ -58,7 +62,9 @@ export default function App() {
         height: window.innerHeight,
       });
     };
+
     window.addEventListener("resize", onResize);
+
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
@@ -96,30 +102,60 @@ export default function App() {
 
   return (
     <div className="App">
-      <button className="update-scene" onClick={updateScene}>
-        Update Scene
-      </button>
-      <button
-        className="reset-scene"
-        onClick={() => {
-          excalidrawRef.current.resetScene();
-        }}
-      >
-        Reset Scene
-      </button>
+      <div className="button-wrapper">
+        <button className="update-scene" onClick={updateScene}>
+          Update Scene
+        </button>
+        <button
+          className="reset-scene"
+          onClick={() => {
+            excalidrawRef.current.resetScene();
+          }}
+        >
+          Reset Scene
+        </button>
+        <label>
+          <input
+            type="checkbox"
+            checked={viewModeEnabled}
+            onChange={() => setViewModeEnabled(!viewModeEnabled)}
+          />
+          View mode
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={zenModeEnabled}
+            onChange={() => setZenModeEnabled(!zenModeEnabled)}
+          />
+          Zen mode
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={gridModeEnabled}
+            onChange={() => setGridModeEnabled(!gridModeEnabled)}
+          />
+          Grid mode
+        </label>
+      </div>
       <div className="excalidraw-wrapper">
         <Excalidraw
           ref={excalidrawRef}
           width={dimensions.width}
           height={dimensions.height}
           initialData={InitialData}
-          onChange={(elements, state) => {
-            console.log("Latest elements:", elements, "Latest state:", state);
-          }}
-          onPointerUpdate={(pointerData) => console.log(pointerData)}
-          onCollabButtonClick={() => {
-            window.alert("You clicked on collab button");
-          }}
+          onChange={(elements, state) =>
+            console.log("Elements :", elements, "State : ", state)
+          }
+          user={{ name: "Excalidraw User" }}
+          onPointerUpdate={(payload) => console.log(payload)}
+          onCollabButtonClick={() =>
+            window.alert("You clicked on collab button")
+          }
+          viewModeEnabled={viewModeEnabled}
+          zenModeEnabled={zenModeEnabled}
+          gridModeEnabled={gridModeEnabled}
         />
       </div>
     </div>
@@ -177,6 +213,19 @@ ReactDOM.render(
 ```
 
 [![Edit excalidraw-in-browser](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/excalidraw-in-browser-tlqom?fontsize=14&hidenavigation=1&theme=dark)
+
+Since Excalidraw doesn't support server side rendering yet so you will have to make sure the component is rendered once host is mounted.
+
+```js
+import { useState, useEffect } from "react";
+export default function IndexPage() {
+  const [Comp, setComp] = useState(null);
+  useEffect(() => {
+    import("@excalidraw/excalidraw").then((comp) => setComp(comp.default));
+  });
+  return <>{Comp && <Comp />}</>;
+}
+```
 
 ### Props
 
