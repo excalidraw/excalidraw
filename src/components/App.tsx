@@ -1551,6 +1551,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     textWysiwyg({
       id: element.id,
       appState: this.state,
+      canvas: this.canvas,
       getViewportCoords: (x, y) => {
         const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
           {
