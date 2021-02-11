@@ -38,6 +38,7 @@ export const textWysiwyg = ({
   onSubmit,
   getViewportCoords,
   element,
+  canvas,
 }: {
   id: ExcalidrawElement["id"];
   appState: AppState;
@@ -45,6 +46,7 @@ export const textWysiwyg = ({
   onSubmit: (text: string) => void;
   getViewportCoords: (x: number, y: number) => [number, number];
   element: ExcalidrawElement;
+  canvas: HTMLCanvasElement | null;
 }) => {
   const updateWysiwygStyle = () => {
     const updatedElement = Scene.getScene(element)?.getElement(id);
@@ -151,6 +153,10 @@ export const textWysiwyg = ({
     editable.oninput = null;
     editable.onkeydown = null;
 
+    if (observer) {
+      observer.disconnect();
+    }
+
     window.removeEventListener("resize", updateWysiwygStyle);
     window.removeEventListener("wheel", stopEvent, true);
     window.removeEventListener("pointerdown", onPointerDown);
@@ -197,9 +203,19 @@ export const textWysiwyg = ({
   let isDestroyed = false;
 
   editable.onblur = handleSubmit;
-  // reposition wysiwyg in case of window resize. Happens on mobile when
-  // device keyboard is opened.
-  window.addEventListener("resize", updateWysiwygStyle);
+
+  // reposition wysiwyg in case of canvas is resized. Using ResizeObserver
+  // is preferred so we catch changes from host, where window may not resize.
+  let observer: ResizeObserver | null = null;
+  if (canvas && "ResizeObserver" in window) {
+    observer = new window.ResizeObserver(() => {
+      updateWysiwygStyle();
+    });
+    observer.observe(canvas);
+  } else {
+    window.addEventListener("resize", updateWysiwygStyle);
+  }
+
   window.addEventListener("pointerdown", onPointerDown);
   window.addEventListener("wheel", stopEvent, {
     passive: false,
