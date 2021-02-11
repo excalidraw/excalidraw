@@ -90,8 +90,8 @@
     "alignRight": "右揃え",
     "centerVertically": "縦方向に中央揃え",
     "centerHorizontally": "横方向に中央揃え",
-    "distributeHorizontally": "",
-    "distributeVertically": "",
+    "distributeHorizontally": "水平方向に分散配置",
+    "distributeVertically": "垂直方向に分散配置",
     "viewMode": "閲覧モード"
   },
   "buttons": {
