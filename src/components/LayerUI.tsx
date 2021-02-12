@@ -41,6 +41,7 @@ import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { Tooltip } from "./Tooltip";
 import { UserList } from "./UserList";
+import { FontList } from "./FontList";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -585,6 +586,17 @@ const LayerUI = ({
       </aside>
     );
   };
+
+  const renderFont = () => {
+    return (
+      <FontList
+        onChange={(value) => {
+          console.info("New Font", value);
+        }}
+      />
+    );
+  };
+
   const renderFooter = () => (
     <footer role="contentinfo" className="layer-ui__wrapper__footer">
       <div
@@ -677,6 +689,7 @@ const LayerUI = ({
       {renderBottomAppMenu()}
       {renderGitHubCorner()}
       {renderFooter()}
+      {renderFont()}
     </div>
   );
 };
