@@ -81,6 +81,7 @@ const languages = {
   "bg-BG": "Български",
   "ca-ES": "Català",
   "de-DE": "Deutsch",
+  "da-DK": "Dansk",
   "el-GR": "Ελληνικά",
   "es-ES": "Español",
   "fa-IR": "فارسی",
