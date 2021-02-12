@@ -68,7 +68,7 @@
     "layers": "Warstwy",
     "actions": "Akcje",
     "language": "Język",
-    "liveCollaboration": "",
+    "liveCollaboration": "Współpraca na żywo",
     "duplicateSelection": "Powiel",
     "untitled": "Bez tytułu",
     "name": "Nazwa",
@@ -205,15 +205,15 @@
   "helpDialog": {
     "blog": "Przeczytaj na naszym blogu",
     "click": "kliknięcie",
-    "curvedArrow": "",
+    "curvedArrow": "Zakrzywiona strzałka",
     "curvedLine": "",
     "documentation": "Dokumentacja",
-    "drag": "",
+    "drag": "przeciągnij",
     "editor": "Edytor",
-    "github": "",
+    "github": "Znalazłeś problem? Prześlij",
     "howto": "Skorzystaj z instrukcji",
     "or": "lub",
-    "preventBinding": "",
+    "preventBinding": "Zapobiegaj wiązaniu strzałek",
     "shapes": "Kształty",
     "shortcuts": "Skróty klawiszowe",
     "textFinish": "Zakończ edycję (tekst)",
@@ -221,7 +221,7 @@
     "title": "Pomoc",
     "view": "Widok",
     "zoomToFit": "Powiększ, aby wyświetlić wszystkie elementy",
-    "zoomToSelection": ""
+    "zoomToSelection": "Przybliż do zaznaczenia"
   },
   "encrypted": {
     "tooltip": "Twoje rysunki są zabezpieczone szyfrowaniem end-to-end, tak więc nawet w Excalidraw nie jesteśmy w stanie zobaczyć tego co tworzysz."
@@ -236,16 +236,16 @@
     "storage": "Pamięć",
     "title": "Statystyki dla nerdów",
     "total": "Łącznie",
-    "version": "",
-    "versionCopy": "",
+    "version": "Wersja",
+    "versionCopy": "Kliknij, aby skopiować",
     "versionNotAvailable": "",
     "width": "Szerokość"
   },
   "toast": {
-    "copyStyles": "",
-    "copyToClipboard": "",
-    "copyToClipboardAsPng": "",
-    "fileSaved": "",
-    "fileSavedToFilename": ""
+    "copyStyles": "Skopiowano style.",
+    "copyToClipboard": "Skopiowano do schowka.",
+    "copyToClipboardAsPng": "Skopiowano do schowka jako PNG.",
+    "fileSaved": "Zapisano plik.",
+    "fileSavedToFilename": "Zapisano jako {filename}"
   }
 }
