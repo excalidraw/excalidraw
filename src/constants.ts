@@ -99,3 +99,9 @@ export const ZOOM_STEP = 0.1;
 export const IDLE_THRESHOLD = 60_000;
 // Report a user active each ACTIVE_THRESHOLD milliseconds
 export const ACTIVE_THRESHOLD = 3_000;
+
+export const MODES = {
+  VIEW: "viewMode",
+  ZEN: "zenMode",
+  GRID: "gridMode",
+};

@@ -8,6 +8,7 @@ import {
 } from "./types";
 import { ExcalidrawElement } from "../element/types";
 import { AppState, ExcalidrawProps } from "../types";
+import { MODES } from "../constants";
 
 // This is the <App> component, but for now we don't care about anything but its
 // `canvas` state.
@@ -68,7 +69,7 @@ export class ActionManager implements ActionsManagerInterface {
     }
     const { viewModeEnabled } = this.getAppState();
     if (viewModeEnabled) {
-      if (data[0].name !== "viewMode") {
+      if (!Object.values(MODES).includes(data[0].name)) {
         return false;
       }
     }
