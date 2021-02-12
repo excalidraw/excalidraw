@@ -28,6 +28,7 @@ import rough from "roughjs/bin/rough";
 import { Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
 import {
+  containsMath,
   drawHtmlOnCanvas,
   encapsulateHtml,
   isMathMode,
@@ -143,22 +144,7 @@ const drawElementOnCanvas = (
     }
     default: {
       if (isTextElement(element)) {
-        const rtl = isRTL(element.text);
-        const shouldTemporarilyAttach = rtl && !context.canvas.isConnected;
-        if (shouldTemporarilyAttach) {
-          // to correctly render RTL text mixed with LTR, we have to append it
-          // to the DOM
-          document.body.appendChild(context.canvas);
-        }
-        context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
-        const font = context.font;
-        context.font = getFontString(element);
-        const fillStyle = context.fillStyle;
-        context.fillStyle = element.strokeColor;
-        const textAlign = context.textAlign;
-        context.textAlign = element.textAlign as CanvasTextAlign;
-
-        if (isMathMode(getFontString(element))) {
+        if (isMathMode(getFontString(element)) && containsMath(element.text)) {
           const htmlString = markupText(element.text);
 
           const scaledPadding = CANVAS_PADDING * Math.pow(zoom.value, 2);
@@ -183,6 +169,21 @@ const drawElementOnCanvas = (
             element.textAlign,
           );
         } else {
+          const rtl = isRTL(element.text);
+          const shouldTemporarilyAttach = rtl && !context.canvas.isConnected;
+          if (shouldTemporarilyAttach) {
+            // to correctly render RTL text mixed with LTR, we have to append it
+            // to the DOM
+            document.body.appendChild(context.canvas);
+          }
+          context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
+          const font = context.font;
+          context.font = getFontString(element);
+          const fillStyle = context.fillStyle;
+          context.fillStyle = element.strokeColor;
+          const textAlign = context.textAlign;
+          context.textAlign = element.textAlign as CanvasTextAlign;
+
           // Canvas does not support multiline text by default
           const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
           const lineHeight = element.height / lines.length;
@@ -201,12 +202,12 @@ const drawElementOnCanvas = (
               (index + 1) * lineHeight - verticalOffset,
             );
           }
-        }
-        context.fillStyle = fillStyle;
-        context.font = font;
-        context.textAlign = textAlign;
-        if (shouldTemporarilyAttach) {
-          context.canvas.remove();
+          context.fillStyle = fillStyle;
+          context.font = font;
+          context.textAlign = textAlign;
+          if (shouldTemporarilyAttach) {
+            context.canvas.remove();
+          }
         }
       } else {
         throw new Error(`Unimplemented type ${element.type}`);
@@ -656,7 +657,7 @@ export const renderElementToSvg = (
             offsetY || 0
           }) rotate(${degree} ${cx} ${cy})`,
         );
-        if (isMathMode(getFontString(element))) {
+        if (isMathMode(getFontString(element)) && containsMath(element.text)) {
           const svg = svgRoot.ownerDocument!.createElementNS(SVG_NS, "svg");
           const htmlString = markupText(element.text);
           const metrics = measureMarkup(htmlString, getFontString(element));

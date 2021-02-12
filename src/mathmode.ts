@@ -185,14 +185,20 @@ export const drawHtmlOnCanvas = (
   }
 };
 
+export const containsMath = (text: string) => {
+  const delimiter = (_useTex ? "\\$\\$" : "`") as string;
+  return text.search(delimiter) >= 0;
+};
+
 export const isMathMode = (fontString: FontString) => {
   return fontString.search("Helvetica") >= 0;
 };
 
 export const measureMath = (text: string, fontString: FontString) => {
   const htmlString = markupText(text);
-  const metrics = isMathMode(fontString)
-    ? measureMarkup(htmlString, fontString)
-    : measureText(text, fontString);
+  const metrics =
+    isMathMode(fontString) && containsMath(text)
+      ? measureMarkup(htmlString, fontString)
+      : measureText(text, fontString);
   return metrics;
 };
