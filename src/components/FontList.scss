@@ -1,8 +1,18 @@
+@import "../css/variables.module";
+
 .excalidraw {
   .FontList {
     position: absolute;
-    right: 48px;
+    right: 8px;
     top: 8px;
     font-size: 16px;
+    border: 2px solid $oc-orange-8;
+    border-radius: 5px;
+    padding: 4px;
+    background-color: $oc-orange-1;
+
+    &:focus {
+      outline: none;
+    }
   }
 }

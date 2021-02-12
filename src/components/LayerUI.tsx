@@ -25,7 +25,8 @@ import CollabButton from "./CollabButton";
 import { ErrorDialog } from "./ErrorDialog";
 import { ExportCB, ExportDialog } from "./ExportDialog";
 import { FixedSideContainer } from "./FixedSideContainer";
-import { GitHubCorner } from "./GitHubCorner";
+import { FontList } from "./FontList";
+import { HelpDialog } from "./HelpDialog";
 import { HintViewer } from "./HintViewer";
 import { exportFile, load, shield, trash } from "./icons";
 import { Island } from "./Island";
@@ -36,12 +37,10 @@ import { LockIcon } from "./LockIcon";
 import { MobileMenu } from "./MobileMenu";
 import { PasteChartDialog } from "./PasteChartDialog";
 import { Section } from "./Section";
-import { HelpDialog } from "./HelpDialog";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { Tooltip } from "./Tooltip";
 import { UserList } from "./UserList";
-import { FontList } from "./FontList";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -572,21 +571,6 @@ const LayerUI = ({
     );
   };
 
-  const renderGitHubCorner = () => {
-    return (
-      <aside
-        className={clsx(
-          "layer-ui__wrapper__github-corner zen-mode-transition",
-          {
-            "transition-right": zenModeEnabled,
-          },
-        )}
-      >
-        <GitHubCorner appearance={appState.appearance} />
-      </aside>
-    );
-  };
-
   const renderFont = () => {
     return (
       <FontList
@@ -687,7 +671,6 @@ const LayerUI = ({
       {dialogs}
       {renderFixedSideContainer()}
       {renderBottomAppMenu()}
-      {renderGitHubCorner()}
       {renderFooter()}
       {renderFont()}
     </div>
