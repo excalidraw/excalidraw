@@ -5,6 +5,7 @@ const FONTS = [
   { name: "Caveat", path: "/fonts/Caveat-VariableFont_wght.ttf" },
   { name: "GelPen", path: "/fonts/GelPenLight.ttf" },
   { name: "Swagger", path: "/fonts/swaggerlight.ttf" },
+  { name: "Fewriter", path: "/fonts/fewriter_memesbruh03.ttf" },
 ];
 
 export const FontList = ({
