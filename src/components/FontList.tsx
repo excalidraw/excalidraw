@@ -2,6 +2,7 @@ import "./FontList.scss";
 
 const FONTS = [
   { name: "BLOKLETTERS", path: "/fonts/Blokletters-Potlood.ttf" },
+  { name: "Caveat", path: "/fonts/Caveat-VariableFont_wght.ttf" },
   { name: "GelPen", path: "/fonts/GelPenLight.ttf" },
   { name: "Swagger", path: "/fonts/swaggerlight.ttf" },
 ];
