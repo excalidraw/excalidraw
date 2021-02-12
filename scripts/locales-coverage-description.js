@@ -7,7 +7,7 @@ const crowdinMap = {
   "bg-BG": "en-bg",
   "ca-ES": "en-ca",
   "de-DE": "en-de",
-  "dk-DK": "en-da",
+  "da-DK": "en-da",
   "el-GR": "en-el",
   "es-ES": "en-es",
   "fa-IR": "en-fa",
