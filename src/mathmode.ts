@@ -139,11 +139,6 @@ export const encapsulateHtml = (
   return svgString;
 };
 
-// Cache the images rendered from the HTML
-const canvasImageCache = {} as {
-  [key: string]: HTMLImageElement;
-};
-
 export const drawHtmlOnCanvas = (
   context: CanvasRenderingContext2D,
   htmlString: String,
@@ -163,26 +158,18 @@ export const drawHtmlOnCanvas = (
     htmlString,
   )}</svg>`;
 
-  const oldImage = canvasImageCache[data] ? canvasImageCache[data] : undefined;
-  if (oldImage !== undefined) {
-    context.drawImage(oldImage, 0, 0);
-  } else {
-    const DOMURL = window.URL || window.webkitURL || window;
+  const DOMURL = window.URL || window.webkitURL || window;
 
-    const img = new Image();
-    const svg = new Blob([data], { type: "image/svg+xml;charset=utf-8" });
-    const url = DOMURL.createObjectURL(svg);
+  const img = new Image();
+  const svg = new Blob([data], { type: "image/svg+xml;charset=utf-8" });
+  const url = DOMURL.createObjectURL(svg);
 
-    const oldOnload = img.onload;
-    img.onload = function () {
-      context.drawImage(img, x, y);
-      DOMURL.revokeObjectURL(url);
-    };
+  img.onload = function () {
+    context.drawImage(img, x, y);
+    DOMURL.revokeObjectURL(url);
+  };
 
-    img.src = url;
-    img.onload = oldOnload;
-    canvasImageCache[data] = img;
-  }
+  img.src = url;
 };
 
 export const containsMath = (text: string) => {
