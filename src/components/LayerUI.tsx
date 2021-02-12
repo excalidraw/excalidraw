@@ -41,6 +41,7 @@ import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { Tooltip } from "./Tooltip";
 import { UserList } from "./UserList";
+import { FONT_FAMILY } from "../constants";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -576,6 +577,8 @@ const LayerUI = ({
       <FontList
         onChange={(value) => {
           console.info("New Font", value);
+          // @ts-ignore
+          FONT_FAMILY[1] = value.name;
         }}
       />
     );
