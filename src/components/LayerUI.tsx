@@ -671,8 +671,8 @@ const LayerUI = ({
       {dialogs}
       {renderFixedSideContainer()}
       {renderBottomAppMenu()}
-      {renderFooter()}
       {renderFont()}
+      {renderFooter()}
     </div>
   );
 };
