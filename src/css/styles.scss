@@ -433,7 +433,7 @@
 
   .scroll-back-to-content {
     color: var(--popup-text-color);
-    position: fixed;
+    position: absolute;
     left: 50%;
     bottom: 30px;
     transform: translateX(-50%);

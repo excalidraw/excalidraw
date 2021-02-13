@@ -603,18 +603,6 @@ const LayerUI = ({
       >
         {t("buttons.exitZenMode")}
       </button>
-      {appState.scrolledOutside && (
-        <button
-          className="scroll-back-to-content"
-          onClick={() => {
-            setAppState({
-              ...calculateScrollCenter(elements, appState, canvas),
-            });
-          }}
-        >
-          {t("buttons.scrollBackToContent")}
-        </button>
-      )}
     </footer>
   );
 
@@ -677,6 +665,18 @@ const LayerUI = ({
       {renderBottomAppMenu()}
       {renderGitHubCorner()}
       {renderFooter()}
+      {appState.scrolledOutside && (
+        <button
+          className="scroll-back-to-content"
+          onClick={() => {
+            setAppState({
+              ...calculateScrollCenter(elements, appState, canvas),
+            });
+          }}
+        >
+          {t("buttons.scrollBackToContent")}
+        </button>
+      )}
     </div>
   );
 };
