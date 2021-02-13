@@ -47,6 +47,7 @@ export enum EVENT {
   TOUCH_END = "touchend",
   HASHCHANGE = "hashchange",
   VISIBILITY_CHANGE = "visibilitychange",
+  SCROLL = "scroll",
 }
 
 export const ENV = {

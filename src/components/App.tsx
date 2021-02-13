@@ -826,6 +826,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     document.addEventListener(EVENT.PASTE, this.pasteFromClipboard);
     document.addEventListener(EVENT.CUT, this.onCut);
+    document.addEventListener(EVENT.SCROLL, this.onScroll);
 
     window.addEventListener(EVENT.RESIZE, this.onResize, false);
     window.addEventListener(EVENT.UNLOAD, this.onUnload, false);
@@ -998,6 +999,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       );
     }
   }
+
+  private onScroll = debounce(() => {
+    this.setState({ ...this.getCanvasOffsets() });
+  }, 500);
 
   // Copy/paste
 
