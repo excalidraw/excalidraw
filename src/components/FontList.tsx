@@ -28,7 +28,7 @@ export const FontList = ({
   <select
     className="FontList"
     onChange={({ target }) => {
-      const meta = FONTS.find((f) => f.path === target.value)!;
+      const meta = FONTS.find((f) => f.name === target.value)!;
       if (meta.path) {
         style.textContent = css(meta);
       }
@@ -36,7 +36,7 @@ export const FontList = ({
     }}
   >
     {FONTS.map((font) => (
-      <option key={font.name} value={font.path}>
+      <option key={font.name} value={font.name}>
         {font.name}
       </option>
     ))}

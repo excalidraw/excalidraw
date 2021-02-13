@@ -438,6 +438,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       >
         <LayerUI
           canvas={this.canvas}
+          onFontLoaded={this.onFontLoaded}
           appState={this.state}
           setAppState={this.setAppState}
           actionManager={this.actionManager}

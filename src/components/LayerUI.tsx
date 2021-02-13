@@ -64,6 +64,7 @@ interface LayerUIProps {
   ) => void;
   renderCustomFooter?: (isMobile: boolean) => JSX.Element;
   viewModeEnabled: boolean;
+  onFontLoaded(): void;
 }
 
 const useOnClickOutside = (
@@ -320,6 +321,7 @@ const LayerUI = ({
   onExportToBackend,
   renderCustomFooter,
   viewModeEnabled,
+  onFontLoaded,
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
@@ -579,6 +581,7 @@ const LayerUI = ({
           console.info("New Font", value);
           // @ts-ignore
           FONT_FAMILY[1] = value.name;
+          onFontLoaded();
         }}
       />
     );
