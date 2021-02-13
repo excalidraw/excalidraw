@@ -18,7 +18,7 @@ import useIsMobile from "../is-mobile";
 import { calculateScrollCenter, getSelectedElements } from "../scene";
 import { ExportType } from "../scene/types";
 import { AppState, LibraryItem, LibraryItems } from "../types";
-import { getFontFamilyString, getFontString, muteFSAbortError } from "../utils";
+import { getFontString, muteFSAbortError } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher, ZoomActions } from "./Actions";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 import CollabButton from "./CollabButton";
@@ -42,7 +42,6 @@ import { ToolButton } from "./ToolButton";
 import { Tooltip } from "./Tooltip";
 import { UserList } from "./UserList";
 import { FONT_FAMILY } from "../constants";
-import { mutateElement } from "../element/mutateElement";
 
 interface LayerUIProps {
   actionManager: ActionManager;
