@@ -442,7 +442,13 @@ const LayerUI = ({
         "transition-left": zenModeEnabled,
       })}
     >
-      <Island className={CLASSES.SHAPE_ACTIONS_MENU} padding={2}>
+      <Island
+        className={CLASSES.SHAPE_ACTIONS_MENU}
+        padding={2}
+        style={{
+          maxHeight: `${appState.height - 200}px`,
+        }}
+      >
         <SelectedShapeActions
           appState={appState}
           elements={elements}
