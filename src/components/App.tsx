@@ -438,7 +438,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       >
         <LayerUI
           canvas={this.canvas}
-          onFontLoaded={this.onFontLoaded}
           appState={this.state}
           setAppState={this.setAppState}
           actionManager={this.actionManager}
@@ -804,7 +803,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.updateCurrentCursorPosition,
     );
     // rerender text elements on font load to fix #637 && #1553
-    document.fonts?.addEventListener?.("loadingdone", this.onFontLoaded);
+    document.fonts?.addEventListener?.("loadingdone", () => {
+      this.onFontLoaded();
+    });
     // Safari-only desktop pinch zoom
     document.addEventListener(
       EVENT.GESTURE_START,

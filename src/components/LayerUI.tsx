@@ -18,7 +18,7 @@ import useIsMobile from "../is-mobile";
 import { calculateScrollCenter, getSelectedElements } from "../scene";
 import { ExportType } from "../scene/types";
 import { AppState, LibraryItem, LibraryItems } from "../types";
-import { muteFSAbortError } from "../utils";
+import { getFontFamilyString, getFontString, muteFSAbortError } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher, ZoomActions } from "./Actions";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 import CollabButton from "./CollabButton";
@@ -42,6 +42,7 @@ import { ToolButton } from "./ToolButton";
 import { Tooltip } from "./Tooltip";
 import { UserList } from "./UserList";
 import { FONT_FAMILY } from "../constants";
+import { mutateElement } from "../element/mutateElement";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -64,7 +65,6 @@ interface LayerUIProps {
   ) => void;
   renderCustomFooter?: (isMobile: boolean) => JSX.Element;
   viewModeEnabled: boolean;
-  onFontLoaded(): void;
 }
 
 const useOnClickOutside = (
@@ -321,7 +321,6 @@ const LayerUI = ({
   onExportToBackend,
   renderCustomFooter,
   viewModeEnabled,
-  onFontLoaded,
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
@@ -581,7 +580,8 @@ const LayerUI = ({
           console.info("New Font", value);
           // @ts-ignore
           FONT_FAMILY[1] = value.name;
-          onFontLoaded();
+          // @ts-ignore
+          document.fonts.load(getFontString({ fontSize: 1, fontFamily: 1 }));
         }}
       />
     );
