@@ -129,7 +129,7 @@ export class LinearElementEditor {
       isDragging &&
       (activePointIndex === 0 || activePointIndex === element.points.length - 1)
     ) {
-      if (isPathALoop(element.points)) {
+      if (isPathALoop(element.points, appState.zoom.value)) {
         LinearElementEditor.movePoint(
           element,
           activePointIndex,
