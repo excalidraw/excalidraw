@@ -7,12 +7,11 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { trackEvent } from "../analytics";
 import { getDefaultAppState } from "../appState";
 import { ExcalidrawImperativeAPI } from "../components/App";
 import { ErrorDialog } from "../components/ErrorDialog";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
-import { APP_NAME, EVENT, TITLE_TIMEOUT, VERSION_TIMEOUT } from "../constants";
+import { APP_NAME, EVENT, TITLE_TIMEOUT } from "../constants";
 import { ImportedDataState } from "../data/types";
 import {
   ExcalidrawElement,
@@ -25,12 +24,7 @@ import Excalidraw, {
   languages,
 } from "../packages/excalidraw/index";
 import { AppState } from "../types";
-import {
-  debounce,
-  getVersion,
-  ResolvablePromise,
-  resolvablePromise,
-} from "../utils";
+import { debounce, ResolvablePromise, resolvablePromise } from "../utils";
 import { SAVE_TO_LOCAL_STORAGE_TIMEOUT } from "./app_constants";
 import CollabWrapper, {
   CollabAPI,
@@ -157,13 +151,6 @@ function ExcalidrawWrapper() {
   if (!initialStatePromiseRef.current.promise) {
     initialStatePromiseRef.current.promise = resolvablePromise<ImportedDataState | null>();
   }
-
-  useEffect(() => {
-    // Delayed so that the app has a time to load the latest SW
-    setTimeout(() => {
-      trackEvent("load", "version", getVersion());
-    }, VERSION_TIMEOUT);
-  }, []);
 
   const [
     excalidrawAPI,
