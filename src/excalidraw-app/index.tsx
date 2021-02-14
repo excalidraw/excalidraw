@@ -43,6 +43,7 @@ import {
   importFromLocalStorage,
   saveToLocalStorage,
 } from "./data/localStorage";
+import initialData from "./collab/initialData";
 
 const languageDetector = new LanguageDetector();
 languageDetector.init({
@@ -178,7 +179,8 @@ function ExcalidrawWrapper() {
     }
 
     initializeScene({ collabAPI }).then((scene) => {
-      initialStatePromiseRef.current.promise.resolve(scene);
+      // @ts-ignore
+      initialStatePromiseRef.current.promise.resolve(initialData);
     });
 
     const onHashChange = (_: HashChangeEvent) => {
