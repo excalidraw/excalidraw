@@ -2,6 +2,7 @@
   "extends": ["prettier", "react-app"],
   "plugins": ["prettier"],
   "rules": {
+    "@typescript-eslint/no-unused-vars": "warn",
     "curly": "warn",
     "dot-notation": "warn",
     "import/no-anonymous-default-export": "off",
@@ -22,7 +23,6 @@
     ],
     "no-unneeded-ternary": "warn",
     "no-unused-expressions": "warn",
-    "no-unused-vars": "warn",
     "no-useless-return": "warn",
     "no-var": "warn",
     "object-shorthand": "warn",
