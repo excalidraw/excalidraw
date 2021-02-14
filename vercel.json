@@ -3,12 +3,7 @@
     {
       "src": "/(.*)",
       "dest": "/",
-      "status": 301
-    }
-  ],
-  "headers": [
-    {
-      "source": "/(.*)",
+      "status": 301,
       "headers": [
         {
           "key": "Access-Control-Allow-Origin",
