@@ -4,7 +4,6 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
 import clsx from "clsx";
 
-import "../actions";
 import {
   actionAddToLibrary,
   actionBringForward,
