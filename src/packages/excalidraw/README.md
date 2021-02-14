@@ -37,11 +37,11 @@ You can update the value of `PUBLIC_URL` if you want to serve it from a differen
 1. If you are using a Web bundler (for instance, Webpack), you can import it as an ES6 module as shown below
 
 ```js
-import React, { useEffect, useState, createRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Excalidraw from "@excalidraw/excalidraw";
 import InitialData from "./initialData";
 
-import "./styles.css";
+import "./styles.scss";
 
 export default function App() {
   const excalidrawRef = useRef(null);
