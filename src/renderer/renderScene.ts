@@ -49,6 +49,7 @@ import {
 } from "../element/transformHandles";
 import { viewportCoordsToSceneCoords, supportsEmoji } from "../utils";
 import { UserIdleState } from "../excalidraw-app/collab/types";
+import { isMobile } from "../is-mobile";
 
 const hasEmojiSupport = supportsEmoji();
 
@@ -186,7 +187,7 @@ export const renderScene = (
   sceneState: SceneState,
   // extra options, currently passed by export helper
   {
-    renderScrollbars = true,
+    renderScrollbars = !isMobile(),
     renderSelection = true,
     // Whether to employ render optimizations to improve performance.
     // Should not be turned on for export operations and similar, because it
