@@ -2,11 +2,12 @@ import "./FontList.scss";
 
 const FONTS = [
   { name: "Virgil" },
+  { name: "Architects Daughter", path: "/fonts/ArchitectsDaughter.ttf" },
   { name: "BLOKLETTERS", path: "/fonts/Blokletters-Potlood.ttf" },
   { name: "Caveat", path: "/fonts/Caveat-VariableFont_wght.ttf" },
+  { name: "Fewriter", path: "/fonts/fewriter_memesbruh03.ttf" },
   { name: "GelPen", path: "/fonts/GelPenLight.ttf" },
   { name: "Swagger", path: "/fonts/swaggerlight.ttf" },
-  { name: "Fewriter", path: "/fonts/fewriter_memesbruh03.ttf" },
 ];
 
 const css = ({ name, path }: typeof FONTS[number]) => /* CSS */ `
