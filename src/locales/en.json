@@ -68,7 +68,7 @@
     "layers": "Layers",
     "actions": "Actions",
     "language": "Language",
-    "createRoom": "Share a live-collaboration session",
+    "liveCollaboration": "Live collaboration",
     "duplicateSelection": "Duplicate",
     "untitled": "Untitled",
     "name": "Name",
@@ -117,7 +117,7 @@
     "edit": "Edit",
     "undo": "Undo",
     "redo": "Redo",
-    "roomDialog": "Start live collaboration",
+    "resetLibrary": "Reset library",
     "createNewRoom": "Create new room",
     "fullScreen": "Full screen",
     "darkMode": "Dark mode",
@@ -140,7 +140,8 @@
     "errorLoadingLibrary": "There was an error loading the third party library.",
     "confirmAddLibrary": "This will add {{numShapes}} shape(s) to your library. Are you sure?",
     "imageDoesNotContainScene": "Importing images isn't supported at the moment.\n\nDid you want to import a scene? This image does not seem to contain any scene data. Have you enabled this during export?",
-    "cannotRestoreFromImage": "Scene couldn't be restored from this image file"
+    "cannotRestoreFromImage": "Scene couldn't be restored from this image file",
+    "resetLibrary": "This will clear your library. Are you sure?"
   },
   "toolBar": {
     "selection": "Selection",
@@ -243,6 +244,8 @@
   "toast": {
     "copyStyles": "Copied styles.",
     "copyToClipboard": "Copied to clipboard.",
-    "copyToClipboardAsPng": "Copied to clipboard as PNG."
+    "copyToClipboardAsPng": "Copied to clipboard as PNG.",
+    "fileSaved": "File saved.",
+    "fileSavedToFilename": "Saved to {filename}"
   }
 }

@@ -68,7 +68,7 @@
     "layers": "Lager",
     "actions": "Åtgärder",
     "language": "Språk",
-    "createRoom": "Dela en live-samarbetssession",
+    "liveCollaboration": "Samarbeta live",
     "duplicateSelection": "Duplicera",
     "untitled": "Namnlös",
     "name": "Namn",
@@ -77,7 +77,7 @@
     "group": "Gruppera markering",
     "ungroup": "Avgruppera markering",
     "collaborators": "Medarbetare",
-    "gridMode": "Rutnätsläge",
+    "showGrid": "Visa rutnät",
     "addToLibrary": "Lägg till i biblioteket",
     "removeFromLibrary": "Ta bort från bibliotek",
     "libraryLoadingMessage": "Laddar bibliotek…",
@@ -117,7 +117,7 @@
     "edit": "Redigera",
     "undo": "Ångra",
     "redo": "Gör om",
-    "roomDialog": "Starta live-samarbete",
+    "resetLibrary": "Återställ bibliotek",
     "createNewRoom": "Skapa ett nytt rum",
     "fullScreen": "Helskärm",
     "darkMode": "Mörkt läge",
@@ -140,7 +140,8 @@
     "errorLoadingLibrary": "Fel vid inläsning av tredjeparts bibliotek.",
     "confirmAddLibrary": "Detta kommer att lägga till {{numShapes}} form(er) till ditt bibliotek. Är du säker?",
     "imageDoesNotContainScene": "Importering av bilder stöds inte just nu.\n\nVill du importera en skiss? Den här bilden verkar inte innehålla någon skissdata. Har du aktiverat detta under export?",
-    "cannotRestoreFromImage": "Skiss kunde inte återställas från denna bildfil"
+    "cannotRestoreFromImage": "Skiss kunde inte återställas från denna bildfil",
+    "resetLibrary": "Detta kommer att rensa ditt bibliotek. Är du säker?"
   },
   "toolBar": {
     "selection": "Markering",
@@ -243,6 +244,8 @@
   "toast": {
     "copyStyles": "Kopierade stilar.",
     "copyToClipboard": "Kopierad till urklipp.",
-    "copyToClipboardAsPng": "Kopierat till urklipp som PNG."
+    "copyToClipboardAsPng": "Kopierat till urklipp som PNG.",
+    "fileSaved": "Fil sparad.",
+    "fileSavedToFilename": "Sparad till {filename}"
   }
 }

@@ -68,7 +68,7 @@
     "layers": "لایه ها",
     "actions": "عملیات",
     "language": "زبان",
-    "createRoom": "اشتراک گذاری جلسه همکاری زنده",
+    "liveCollaboration": "",
     "duplicateSelection": "تکرار",
     "untitled": "بدون عنوان",
     "name": "نام",
@@ -77,7 +77,7 @@
     "group": "گروهبندی انتخابها",
     "ungroup": "حذف گروهبندی انتخابها",
     "collaborators": "همکاران",
-    "gridMode": "حالت شبکه ای",
+    "showGrid": "",
     "addToLibrary": "افزودن به کتابخانه",
     "removeFromLibrary": "حذف از کتابخانه",
     "libraryLoadingMessage": "بارگذاری کتابخانه…",
@@ -117,7 +117,7 @@
     "edit": "ویرایش",
     "undo": "بازگرد",
     "redo": "از سر",
-    "roomDialog": "همکاری آنلاین را شروع کنید",
+    "resetLibrary": "",
     "createNewRoom": "ایجاد یک اتاق جدید",
     "fullScreen": "تمام‌صفحه",
     "darkMode": "حالت تیره",
@@ -140,7 +140,8 @@
     "errorLoadingLibrary": "خطایی در بارگذاری کتابخانه ثالث وجود داشت.",
     "confirmAddLibrary": "{{numShapes}} از اشکال به کتابخانه شما اضافه خواهد شد. مطمئن هستید؟",
     "imageDoesNotContainScene": "وارد کردن تصویر در این لحظه امکان پذیر نمی باشد.\nآیا مایل به وارد کردن یک صحنه هستید؟ این تصویر به نظر می رسد که فاقد هرگونه اطلاعاتی مربوط به صحنه باشد. آیا این گزینه را در زمان وارد کردن تصویر فعال کرده اید؟",
-    "cannotRestoreFromImage": "صحنه را نمی توان از این فایل تصویری بازیابی کرد"
+    "cannotRestoreFromImage": "صحنه را نمی توان از این فایل تصویری بازیابی کرد",
+    "resetLibrary": ""
   },
   "toolBar": {
     "selection": "گزینش",
@@ -243,6 +244,8 @@
   "toast": {
     "copyStyles": "کپی سبک.",
     "copyToClipboard": "",
-    "copyToClipboardAsPng": "کپی در حافطه موقت به صورت PNG."
+    "copyToClipboardAsPng": "کپی در حافطه موقت به صورت PNG.",
+    "fileSaved": "",
+    "fileSavedToFilename": ""
   }
 }

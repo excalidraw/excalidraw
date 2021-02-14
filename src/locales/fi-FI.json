@@ -68,7 +68,7 @@
     "layers": "Tasot",
     "actions": "Toiminnot",
     "language": "Kieli",
-    "createRoom": "Jaa yhteistyöistunto",
+    "liveCollaboration": "Live-yhteistyö",
     "duplicateSelection": "Monista",
     "untitled": "Nimetön",
     "name": "Nimi",
@@ -77,7 +77,7 @@
     "group": "Ryhmitä valinta",
     "ungroup": "Pura valittu ryhmä",
     "collaborators": "Yhteistyökumppanit",
-    "gridMode": "Ruudukkotila",
+    "showGrid": "Näytä ruudukko",
     "addToLibrary": "Lisää kirjastoon",
     "removeFromLibrary": "Poista kirjastosta",
     "libraryLoadingMessage": "Ladataan kirjastoa…",
@@ -117,7 +117,7 @@
     "edit": "Muokkaa",
     "undo": "Kumoa",
     "redo": "Tee uudelleen",
-    "roomDialog": "Aloita live-yhteistyö",
+    "resetLibrary": "Tyhjennä kirjasto",
     "createNewRoom": "Luo huone",
     "fullScreen": "Koko näyttö",
     "darkMode": "Tumma tila",
@@ -140,7 +140,8 @@
     "errorLoadingLibrary": "Kolmannen osapuolen kirjastoa ladattaessa tapahtui virhe.",
     "confirmAddLibrary": "Tämä lisää {{numShapes}} muotoa kirjastoosi. Oletko varma?",
     "imageDoesNotContainScene": "Kuvien lisääminen ei ole tällä hetkellä mahdollista.\n\nHaluatko tuoda piirroksen? Tämä kuva ei näytä sisältävän tarvittavia tietoja. Oletko ottanut piirrostietojen tallennuksen käyttöön viennin aikana?",
-    "cannotRestoreFromImage": "Teosta ei voitu palauttaa tästä kuvatiedostosta"
+    "cannotRestoreFromImage": "Teosta ei voitu palauttaa tästä kuvatiedostosta",
+    "resetLibrary": "Tämä tyhjentää kirjastosi. Oletko varma?"
   },
   "toolBar": {
     "selection": "Valinta",
@@ -243,6 +244,8 @@
   "toast": {
     "copyStyles": "Tyylit kopioitu.",
     "copyToClipboard": "Kopioitu leikepöydälle.",
-    "copyToClipboardAsPng": "Kopioitu leikepöydälle PNG-tiedostona."
+    "copyToClipboardAsPng": "Kopioitu leikepöydälle PNG-tiedostona.",
+    "fileSaved": "Tiedosto tallennettu.",
+    "fileSavedToFilename": "Tallennettu kohteeseen {filename}"
   }
 }

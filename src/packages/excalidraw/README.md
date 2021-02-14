@@ -18,13 +18,23 @@ yarn add react react-dom @excalidraw/excalidraw
 
 After installation you will see a folder `excalidraw-assets` in `dist` directory which contains the assets needed for this app.
 
-Move the folder `excalidraw-assets` to the path where your assets are served. In the example its served from `public/excalidraw-assets`
+Move the folder `excalidraw-assets` to the path where your assets are served.
+
+By default it will try to load the files from `{rootUrl}/excalidraw-assets/`
+
+With **Webpack**, if you want to load the files from different path you can use <pre><a href="https://webpack.js.org/guides/public-path/#on-the-fly">`__webpack_public_path__`</a></pre>.
+
+With **create-react-app**, the assets can be served from `public/static/js/excalidraw-assets`since CRA tries to load the assets from `{rootUrl}/static/js` path by default.
+
+You can update the value of `PUBLIC_URL` if you want to serve it from a different URL.
 
 ### Demo
 
 [Try here](https://codesandbox.io/s/excalidraw-ehlz3).
 
 ### Usage
+
+1. If you are using a Web bundler (for instance, Webpack), you can import it as an ES6 module as shown below
 
 ```js
 import React, { useEffect, useState, createRef } from "react";
@@ -41,6 +51,10 @@ export default function App() {
     height: window.innerHeight,
   });
 
+  const [viewModeEnabled, setViewModeEnabled] = useState(false);
+  const [zenModeEnabled, setZenModeEnabled] = useState(false);
+  const [gridModeEnabled, setGridModeEnabled] = useState(false);
+
   useEffect(() => {
     const onResize = () => {
       setDimensions({
@@ -48,7 +62,9 @@ export default function App() {
         height: window.innerHeight,
       });
     };
+
     window.addEventListener("resize", onResize);
+
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
@@ -86,31 +102,60 @@ export default function App() {
 
   return (
     <div className="App">
-      <button className="update-scene" onClick={updateScene}>
-        Update Scene
-      </button>
-      <button
-        className="reset-scene"
-        onClick={() => {
-          excalidrawRef.current.resetScene();
-        }}
-      >
-        Reset Scene
-      </button>
+      <div className="button-wrapper">
+        <button className="update-scene" onClick={updateScene}>
+          Update Scene
+        </button>
+        <button
+          className="reset-scene"
+          onClick={() => {
+            excalidrawRef.current.resetScene();
+          }}
+        >
+          Reset Scene
+        </button>
+        <label>
+          <input
+            type="checkbox"
+            checked={viewModeEnabled}
+            onChange={() => setViewModeEnabled(!viewModeEnabled)}
+          />
+          View mode
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={zenModeEnabled}
+            onChange={() => setZenModeEnabled(!zenModeEnabled)}
+          />
+          Zen mode
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={gridModeEnabled}
+            onChange={() => setGridModeEnabled(!gridModeEnabled)}
+          />
+          Grid mode
+        </label>
+      </div>
       <div className="excalidraw-wrapper">
         <Excalidraw
           ref={excalidrawRef}
           width={dimensions.width}
           height={dimensions.height}
           initialData={InitialData}
-          onChange={(elements, state) => {
-            console.log("Latest elements:", elements, "Latest state:", state);
-          }}
+          onChange={(elements, state) =>
+            console.log("Elements :", elements, "State : ", state)
+          }
           user={{ name: "Excalidraw User" }}
-          onPointerUpdate={(pointerData) => console.log(pointerData)}
-          onCollabButtonClick={() => {
-            window.alert("You clicked on collab button");
-          }}
+          onPointerUpdate={(payload) => console.log(payload)}
+          onCollabButtonClick={() =>
+            window.alert("You clicked on collab button")
+          }
+          viewModeEnabled={viewModeEnabled}
+          zenModeEnabled={zenModeEnabled}
+          gridModeEnabled={gridModeEnabled}
         />
       </div>
     </div>
@@ -119,6 +164,68 @@ export default function App() {
 ```
 
 [![Edit excalidraw](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/excalidraw-ehlz3?fontsize=14&hidenavigation=1&theme=dark)
+
+2. To use it in a browser directly:
+
+You will need to make sure `react`, `react-dom` is available as shown below.
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Excalidraw in browser</title>
+    <meta charset="UTF-8" />
+    <script src="https://unpkg.com/react@16.14.0/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16.13.1/umd/react-dom.development.js"></script>
+    <script
+      type="text/javascript"
+      src="https://unpkg.com/@excalidraw/excalidraw@0.2.2/dist/excalidraw.min.js"
+    ></script>
+  </head>
+
+  <body>
+    <div class="container">
+      <h4>Excalidraw Embed Example</h4>
+      <div id="app"></div>
+    </div>
+
+    <script type="text/javascript" src="src/index.js"></script>
+  </body>
+</html>
+```
+
+```js
+import "./styles.css";
+
+const excalidrawWrapper = document.getElementById("app");
+
+const props = {
+  onChange: (data, appState) => {
+    console.log(data, appState);
+  },
+};
+
+/*eslint-disable */
+ReactDOM.render(
+  React.createElement(Excalidraw.default, props),
+  excalidrawWrapper,
+);
+```
+
+[![Edit excalidraw-in-browser](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/excalidraw-in-browser-tlqom?fontsize=14&hidenavigation=1&theme=dark)
+
+Since Excalidraw doesn't support server side rendering yet so you will have to make sure the component is rendered once host is mounted.
+
+```js
+import { useState, useEffect } from "react";
+export default function IndexPage() {
+  const [Comp, setComp] = useState(null);
+  useEffect(() => {
+    import("@excalidraw/excalidraw").then((comp) => setComp(comp.default));
+  });
+  return <>{Comp && <Comp />}</>;
+}
+```
 
 ### Props
 
@@ -130,7 +237,6 @@ export default function App() {
 | [`offsetTop`](#offsetTop) | Number | `0` | top position relative to which Excalidraw should render |
 | [`onChange`](#onChange) | Function |  | This callback is triggered whenever the component updates due to any change. This callback will receive the excalidraw elements and the current app state. |
 | [`initialData`](#initialData) | <pre>{elements?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>, appState?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37">AppState<a> } </pre> | null | The initial data with which app loads. |
-| [`user`](#user) | `{ name?: string }` |  | User details. The name refers to the name of the user to be shown |
 | [`excalidrawRef`](#excalidrawRef) | [`createRef`](https://reactjs.org/docs/refs-and-the-dom.html#creating-refs) or [`callbackRef`](https://reactjs.org/docs/refs-and-the-dom.html#callback-refs) or <pre>{ current: { readyPromise: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317">resolvablePromise</a> } }</pre> |  | Ref to be passed to Excalidraw |
 | [`onCollabButtonClick`](#onCollabButtonClick) | Function |  | Callback to be triggered when the collab button is clicked |
 | [`isCollaborating`](#isCollaborating) | `boolean` |  | This implies if the app is in collaboration mode |
@@ -138,7 +244,9 @@ export default function App() {
 | [`onExportToBackend`](#onExportToBackend) | Function |  | Callback triggered when link button is clicked on export dialog |
 | [`langCode`](#langCode) | string | `en` | Language code string |
 | [`renderFooter `](#renderFooter) | Function |  | Function that renders custom UI footer |
-| [`viewModeEnabled`](#viewModeEnabled) | boolean | false | This implies if the app is in view mode. |
+| [`viewModeEnabled`](#viewModeEnabled) | boolean |  | This implies if the app is in view mode. |
+| [`zenModeEnabled`](#zenModeEnabled) | boolean |  | This implies if the zen mode is enabled |
+| [`gridModeEnabled`](#gridModeEnabled) | boolean |  | This implies if the grid mode is enabled |
 
 ### `Extra API's`
 
@@ -255,10 +363,6 @@ This helps to load Excalidraw with `initialData`. It must be an object or a [pro
 
 You might want to use this when you want to load excalidraw with some initial elements and app state.
 
-#### `user`
-
-This is the user name which shows during collaboration. Defaults to `{name: ''}`.
-
 #### `excalidrawRef`
 
 You can pass a `ref` when you want to access some excalidraw APIs. We expose the below APIs:
@@ -267,7 +371,7 @@ You can pass a `ref` when you want to access some excalidraw APIs. We expose the
 | --- | --- | --- |
 | ready | `boolean` | This is set to true once Excalidraw is rendered |
 | readyPromise | [resolvablePromise](https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317) | This promise will be resolved with the api once excalidraw has rendered. This will be helpful when you want do some action on the host app once this promise resolves. For this to work you will have to pass ref as shown [here](#readyPromise) |
-| updateScene | <pre>(<a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L189">sceneData</a>)) => void </pre> | updates the scene with the sceneData |
+| updateScene | <pre>(<a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L192">sceneData</a>)) => void </pre> | updates the scene with the sceneData |
 | resetScene | `({ resetLoadingState: boolean }) => void` | Resets the scene. If `resetLoadingState` is passed as true then it will also force set the loading state to false. |
 | getSceneElementsIncludingDeleted | <pre> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a></pre> | Returns all the elements including the deleted in the scene |
 | getSceneElements | <pre> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a></pre> | Returns all the elements excluding the deleted in the scene |
@@ -334,4 +438,12 @@ A function that renders (returns JSX) custom UI footer. For example, you can use
 
 #### `viewModeEnabled`
 
-This prop indicates if the app is in `view mode`. When this prop is used, the `view mode` will not show up in context menu is so it is fully controlled by host. Also the value of this prop if passed will be used over the value of `intialData.appState.viewModeEnabled`
+This prop indicates whether the app is in `view mode`. When supplied, the value takes precedence over `intialData.appState.viewModeEnabled`, the `view mode` will be fully controlled by the host app, and users won't be able to toggle it from within the app.
+
+#### `zenModeEnabled`
+
+This prop indicates whether the app is in `zen mode`. When supplied, the value takes precedence over `intialData.appState.zenModeEnabled`, the `zen mode` will be fully controlled by the host app, and users won't be able to toggle it from within the app.
+
+#### `gridModeEnabled`
+
+This prop indicates whether the shows the grid. When supplied, the value takes precedence over `intialData.appState.gridModeEnabled`, the grid will be fully controlled by the host app, and users won't be able to toggle it from within the app.

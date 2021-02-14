@@ -68,7 +68,7 @@
     "layers": "圖層",
     "actions": "動作",
     "language": "語言",
-    "createRoom": "建立新協作會議室",
+    "liveCollaboration": "即時協作",
     "duplicateSelection": "複製",
     "untitled": "無標題",
     "name": "名稱",
@@ -77,7 +77,7 @@
     "group": "建立群組",
     "ungroup": "取消群組",
     "collaborators": "協作者",
-    "gridMode": "網格模式",
+    "showGrid": "顯示格線",
     "addToLibrary": "加入資料庫",
     "removeFromLibrary": "從資料庫中移除",
     "libraryLoadingMessage": "資料庫讀取中…",
@@ -117,7 +117,7 @@
     "edit": "編輯",
     "undo": "復原",
     "redo": "重做",
-    "roomDialog": "開始即時協作",
+    "resetLibrary": "重設資料庫",
     "createNewRoom": "建立新協作會議室",
     "fullScreen": "全螢幕",
     "darkMode": "深色模式",
@@ -140,7 +140,8 @@
     "errorLoadingLibrary": "載入第三方套件時出現錯誤。",
     "confirmAddLibrary": "這將會將 {{numShapes}} 個圖形加入你的資料庫，你確定嗎？",
     "imageDoesNotContainScene": "目前尚不支援載入圖片。\n您是否要載入場景？此圖片中並無任何場景資料，輸出時是否有選擇包含？",
-    "cannotRestoreFromImage": "無法由此檔案回復場景。"
+    "cannotRestoreFromImage": "無法由此檔案回復場景。",
+    "resetLibrary": "這會清除您的資料庫，是否確定？"
   },
   "toolBar": {
     "selection": "選取",
@@ -243,6 +244,8 @@
   "toast": {
     "copyStyles": "已複製樣式",
     "copyToClipboard": "複製至剪貼簿。",
-    "copyToClipboardAsPng": "已複製 PNG 至剪貼簿"
+    "copyToClipboardAsPng": "已複製 PNG 至剪貼簿",
+    "fileSaved": "已儲存檔案。",
+    "fileSavedToFilename": "儲存為 {filename}"
   }
 }

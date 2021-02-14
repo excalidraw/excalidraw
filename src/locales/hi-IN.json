@@ -68,7 +68,7 @@
     "layers": "परतें",
     "actions": "कार्रवाई",
     "language": "भाषा",
-    "createRoom": "अधिवेशन",
+    "liveCollaboration": "",
     "duplicateSelection": "डुप्लिकेट",
     "untitled": "अशीर्षित",
     "name": "नाम",
@@ -77,7 +77,7 @@
     "group": "समूह चयन",
     "ungroup": "समूह चयन असमूहीकृत करें",
     "collaborators": "सहयोगी",
-    "gridMode": "ग्रिड मॉड",
+    "showGrid": "",
     "addToLibrary": "लाइब्रेरी से जोड़ें",
     "removeFromLibrary": "लाइब्रेरी से निकालें",
     "libraryLoadingMessage": "लाइब्रेरी खुल रही है",
@@ -117,7 +117,7 @@
     "edit": "संशोधन करें",
     "undo": "पूर्ववत् करें",
     "redo": "फिर से करें",
-    "roomDialog": "लाइव सहयोग शुरू करें",
+    "resetLibrary": "",
     "createNewRoom": "एक नया कमरा बनाएं",
     "fullScreen": "पूरी स्क्रीन",
     "darkMode": "डार्क मोड",
@@ -140,7 +140,8 @@
     "errorLoadingLibrary": "लाइब्रेरी लोड करने में त्रुटि",
     "confirmAddLibrary": "लाइब्रेरी जोड़ें पुष्‍टि करें आकार संख्या",
     "imageDoesNotContainScene": "दृश्य में छवि नहीं है",
-    "cannotRestoreFromImage": "छवि फ़ाइल बहाल दृश्य नहीं है"
+    "cannotRestoreFromImage": "छवि फ़ाइल बहाल दृश्य नहीं है",
+    "resetLibrary": ""
   },
   "toolBar": {
     "selection": "चयन",
@@ -243,6 +244,8 @@
   "toast": {
     "copyStyles": "काॅपी कीए स्टाइल",
     "copyToClipboard": "क्लिपबोर्ड में कॉपी कीए",
-    "copyToClipboardAsPng": "क्लिपबोर्ड में PNG के रूप में कॉपी किए"
+    "copyToClipboardAsPng": "क्लिपबोर्ड में PNG के रूप में कॉपी किए",
+    "fileSaved": "",
+    "fileSavedToFilename": ""
   }
 }

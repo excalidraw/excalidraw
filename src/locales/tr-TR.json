@@ -68,7 +68,7 @@
     "layers": "Katmanlar",
     "actions": "Eylemler",
     "language": "Dil",
-    "createRoom": "Ortak çalışma ortamını paylaş",
+    "liveCollaboration": "",
     "duplicateSelection": "Çoğalt",
     "untitled": "Adsız",
     "name": "İsim",
@@ -77,7 +77,7 @@
     "group": "Seçimi grup yap",
     "ungroup": "Seçilen grubu dağıt",
     "collaborators": "Ortaklar",
-    "gridMode": "Izgara modu",
+    "showGrid": "",
     "addToLibrary": "Kütüphaneye ekle",
     "removeFromLibrary": "Kütüphaneden kaldır",
     "libraryLoadingMessage": "Kütüphane yükleniyor…",
@@ -117,7 +117,7 @@
     "edit": "Düzenle",
     "undo": "Geri Al",
     "redo": "Yeniden yap",
-    "roomDialog": "Ortak çalışma ortamı yarat",
+    "resetLibrary": "",
     "createNewRoom": "Yeni oda oluştur",
     "fullScreen": "Tam ekran",
     "darkMode": "Koyu tema",
@@ -140,7 +140,8 @@
     "errorLoadingLibrary": "Üçüncü taraf kitaplığı yüklerken bir hata oluştu.",
     "confirmAddLibrary": "Bu, kitaplığınıza {{numShapes}} tane şekil ekleyecek. Emin misiniz?",
     "imageDoesNotContainScene": "Resim ekleme şuan için desteklenmiyor.\nBir sahneyi içeri aktarmak mı istediniz? Bu dosya herhangi bir sahne içeriyor gibi durmuyor. Çıktı alırken sahneyi dahil ettiniz mi?",
-    "cannotRestoreFromImage": "Sahne bu dosyadan oluşturulamıyor"
+    "cannotRestoreFromImage": "Sahne bu dosyadan oluşturulamıyor",
+    "resetLibrary": ""
   },
   "toolBar": {
     "selection": "Seçme",
@@ -243,6 +244,8 @@
   "toast": {
     "copyStyles": "",
     "copyToClipboard": "",
-    "copyToClipboardAsPng": ""
+    "copyToClipboardAsPng": "",
+    "fileSaved": "",
+    "fileSavedToFilename": ""
   }
 }

@@ -68,7 +68,7 @@
     "layers": "Capas",
     "actions": "Acciones",
     "language": "Idioma",
-    "createRoom": "Compartir una sesión de colaboración en vivo",
+    "liveCollaboration": "Colaboración en directo",
     "duplicateSelection": "Duplicar",
     "untitled": "Sin título",
     "name": "Nombre",
@@ -77,7 +77,7 @@
     "group": "Agrupar selección",
     "ungroup": "Desagrupar selección",
     "collaborators": "Colaboradores",
-    "gridMode": "Modo cuadrícula",
+    "showGrid": "Mostrar cuadrícula",
     "addToLibrary": "Añadir a la biblioteca",
     "removeFromLibrary": "Eliminar de la biblioteca",
     "libraryLoadingMessage": "Cargando librería…",
@@ -117,7 +117,7 @@
     "edit": "Editar",
     "undo": "Deshacer",
     "redo": "Rehacer",
-    "roomDialog": "Iniciar colaboración en vivo",
+    "resetLibrary": "Resetear librería",
     "createNewRoom": "Crear nueva sala",
     "fullScreen": "Pantalla completa",
     "darkMode": "Modo oscuro",
@@ -140,7 +140,8 @@
     "errorLoadingLibrary": "Se ha producido un error al cargar la biblioteca de terceros.",
     "confirmAddLibrary": "Esto añadirá {{numShapes}} forma(s) a tu biblioteca. ¿Estás seguro?",
     "imageDoesNotContainScene": "La importación de imágenes no está homologada en este momento.\n\n¿Deseas importar una escena? Esta imagen no parece contener ningún dato de escena. ¿Lo has activado durante la exportación?",
-    "cannotRestoreFromImage": "No se pudo restaurar la escena desde este archivo de imagen"
+    "cannotRestoreFromImage": "No se pudo restaurar la escena desde este archivo de imagen",
+    "resetLibrary": "Esto eliminará tu librería. ¿Estás seguro?"
   },
   "toolBar": {
     "selection": "Selección",
@@ -243,6 +244,8 @@
   "toast": {
     "copyStyles": "Estilos copiados.",
     "copyToClipboard": "Copiado en el portapapeles.",
-    "copyToClipboardAsPng": "Copiado al portapapeles como PNG."
+    "copyToClipboardAsPng": "Copiado al portapapeles como PNG.",
+    "fileSaved": "Archivo guardado.",
+    "fileSavedToFilename": "Guardado en {filename}"
   }
 }
