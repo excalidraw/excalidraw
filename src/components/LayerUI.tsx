@@ -18,7 +18,7 @@ import useIsMobile from "../is-mobile";
 import { calculateScrollCenter, getSelectedElements } from "../scene";
 import { ExportType } from "../scene/types";
 import { AppState, LibraryItem, LibraryItems, SceneData } from "../types";
-import { getFontString, muteFSAbortError } from "../utils";
+import { muteFSAbortError } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher, ZoomActions } from "./Actions";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 import CollabButton from "./CollabButton";
@@ -65,7 +65,8 @@ interface LayerUIProps {
   ) => void;
   renderCustomFooter?: (isMobile: boolean) => JSX.Element;
   viewModeEnabled: boolean;
-  onLoadFontTest: (scene: SceneData) => void;
+  onUpdateFontTest: () => void;
+  onLoadFontSceneTest: (scene: SceneData) => void;
 }
 
 const useOnClickOutside = (
@@ -323,7 +324,8 @@ const LayerUI = ({
   renderCustomFooter,
   viewModeEnabled,
 
-  onLoadFontTest,
+  onUpdateFontTest,
+  onLoadFontSceneTest,
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
@@ -591,7 +593,7 @@ const LayerUI = ({
           console.info("New Font", value);
           // @ts-ignore
           FONT_FAMILY[1] = value.name;
-          document.fonts?.load?.(getFontString({ fontSize: 1, fontFamily: 1 }));
+          onUpdateFontTest();
         }}
       />
     );
@@ -602,7 +604,7 @@ const LayerUI = ({
       <button
         className="btn-load-test"
         // @ts-ignore
-        onClick={() => onLoadFontTest(testData)}
+        onClick={() => onLoadFontSceneTest(testData)}
       >
         {"Load test scene"}
       </button>
