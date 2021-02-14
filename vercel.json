@@ -1,11 +1,6 @@
 {
   "routes": [
     {
-      "src": "/(.+)",
-      "dest": "/",
-      "status": 301
-    },
-    {
       "src": "/",
       "headers": {
         "Access-Control-Allow-Origin": "*",
@@ -13,6 +8,14 @@
         "Feature-Policy": "*",
         "Referrer-Policy": "origin"
       }
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.+)",
+      "dest": "/",
+      "status": 301
     }
   ]
 }
