@@ -3,7 +3,10 @@
     {
       "src": "/(.+)",
       "dest": "/",
-      "status": 301,
+      "status": 301
+    },
+    {
+      "src": "/",
       "headers": {
         "Access-Control-Allow-Origin": "*",
         "X-Content-Type-Options": "nosniff",
