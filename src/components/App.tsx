@@ -579,11 +579,15 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   private onFontLoaded = () => {
-    this.scene.getElementsIncludingDeleted().forEach((element) => {
-      if (isTextElement(element)) {
-        invalidateShapeForElement(element);
-      }
-    });
+    this.scene.replaceAllElements([
+      ...this.scene.getElementsIncludingDeleted().map((element) => {
+        if (isTextElement(element)) {
+          invalidateShapeForElement(element);
+          return updateTextElement(element, { text: element.text });
+        }
+        return element;
+      }),
+    ]);
     this.onSceneUpdated();
   };
 
