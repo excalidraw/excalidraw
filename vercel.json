@@ -2,6 +2,7 @@
   "routes": [
     {
       "src": "/",
+      "dest": "/",
       "headers": {
         "Access-Control-Allow-Origin": "*",
         "X-Content-Type-Options": "nosniff",
@@ -11,6 +12,7 @@
     },
     {
       "src": "/#json=.*",
+      "dest": "/",
       "headers": {
         "Access-Control-Allow-Origin": "*",
         "X-Content-Type-Options": "nosniff",
