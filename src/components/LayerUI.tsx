@@ -583,8 +583,7 @@ const LayerUI = ({
           console.info("New Font", value);
           // @ts-ignore
           FONT_FAMILY[1] = value.name;
-          // @ts-ignore
-          document.fonts.load(getFontString({ fontSize: 1, fontFamily: 1 }));
+          document.fonts?.load?.(getFontString({ fontSize: 1, fontFamily: 1 }));
         }}
       />
     );

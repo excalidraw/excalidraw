@@ -2,6 +2,7 @@
 interface Document {
   fonts?: {
     ready?: Promise<void>;
+    load?: (fontString: string) => Promise<void>;
     addEventListener?(
       type: "loading" | "loadingdone" | "loadingerror",
       listener: (this: Document, ev: Event) => any,

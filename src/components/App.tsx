@@ -164,6 +164,7 @@ import {
 import {
   debounce,
   distance,
+  getFontString,
   isInputLike,
   isToolIcon,
   isWritableElement,
@@ -461,7 +462,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             typeof this.props?.zenModeEnabled === "undefined" && zenModeEnabled
           }
           onLoadFontTest={(scene) => {
-            this.updateScene(scene);
+            document.fonts?.load?.(
+              getFontString({ fontSize: 1, fontFamily: 1 }),
+            );
+            this.onFontLoaded();
             this.setScrollToCenter(scene.elements!);
           }}
         />
