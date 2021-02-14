@@ -1,7 +1,7 @@
 {
   "routes": [
     {
-      "src": "/(.*)",
+      "src": "/(.+)",
       "dest": "/",
       "status": 301,
       "headers": {
