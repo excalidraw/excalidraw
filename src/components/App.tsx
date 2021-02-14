@@ -461,6 +461,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           showExitZenModeBtn={
             typeof this.props?.zenModeEnabled === "undefined" && zenModeEnabled
           }
+          onLoadFontTest={(scene) => {
+            this.updateScene(scene);
+            this.setScrollToCenter(scene.elements!);
+          }}
         />
         <div className="excalidraw-textEditorContainer" />
         {this.state.showStats && (

@@ -17,7 +17,7 @@ import { Language, t } from "../i18n";
 import useIsMobile from "../is-mobile";
 import { calculateScrollCenter, getSelectedElements } from "../scene";
 import { ExportType } from "../scene/types";
-import { AppState, LibraryItem, LibraryItems } from "../types";
+import { AppState, LibraryItem, LibraryItems, SceneData } from "../types";
 import { getFontString, muteFSAbortError } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher, ZoomActions } from "./Actions";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
@@ -42,6 +42,7 @@ import { ToolButton } from "./ToolButton";
 import { Tooltip } from "./Tooltip";
 import { UserList } from "./UserList";
 import { FONT_FAMILY } from "../constants";
+import testData from "../testData";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -64,6 +65,7 @@ interface LayerUIProps {
   ) => void;
   renderCustomFooter?: (isMobile: boolean) => JSX.Element;
   viewModeEnabled: boolean;
+  onLoadFontTest: (scene: SceneData) => void;
 }
 
 const useOnClickOutside = (
@@ -320,6 +322,8 @@ const LayerUI = ({
   onExportToBackend,
   renderCustomFooter,
   viewModeEnabled,
+
+  onLoadFontTest,
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
@@ -586,6 +590,18 @@ const LayerUI = ({
     );
   };
 
+  const renderLoadTestButton = () => {
+    return (
+      <button
+        className="font-test-btn"
+        // @ts-ignore
+        onClick={() => onLoadFontTest(testData)}
+      >
+        {t("buttons.loadFontTest")}
+      </button>
+    );
+  };
+
   const renderFooter = () => (
     <footer role="contentinfo" className="layer-ui__wrapper__footer">
       <div
@@ -676,6 +692,7 @@ const LayerUI = ({
       {dialogs}
       {renderFixedSideContainer()}
       {renderBottomAppMenu()}
+      {renderLoadTestButton()}
       {renderFont()}
       {renderFooter()}
     </div>
