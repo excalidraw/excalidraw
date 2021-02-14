@@ -9,6 +9,7 @@ const FONTS = [
   { name: "Fewriter", path: "/fonts/fewriter_memesbruh03.ttf" },
   { name: "GelPen", path: "/fonts/GelPenLight.ttf" },
   { name: "Swagger", path: "/fonts/swaggerlight.ttf" },
+  { name: "Xarrovv", path: "/fonts/Xarrovv.otf" },
 ];
 
 const css = ({ name, path }: typeof FONTS[number]) => /* CSS */ `
