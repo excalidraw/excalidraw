@@ -446,6 +446,8 @@ const LayerUI = ({
         className={CLASSES.SHAPE_ACTIONS_MENU}
         padding={2}
         style={{
+          // we want to make sure this doesn't overflow so substracting 200
+          // which is approximately height of zoom footer and top left menu items with some buffer
           maxHeight: `${appState.height - 200}px`,
         }}
       >

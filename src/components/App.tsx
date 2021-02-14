@@ -52,6 +52,7 @@ import {
   LINE_CONFIRM_THRESHOLD,
   MIME_TYPES,
   POINTER_BUTTON,
+  SCROLL_TIMEOUT,
   TAP_TWICE_TIMEOUT,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
   TOUCH_CTX_MENU_TIMEOUT,
@@ -1002,7 +1003,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private onScroll = debounce(() => {
     this.setState({ ...this.getCanvasOffsets() });
-  }, 500);
+  }, SCROLL_TIMEOUT);
 
   // Copy/paste
 
