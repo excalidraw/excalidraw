@@ -43,6 +43,7 @@ import { Tooltip } from "./Tooltip";
 import { UserList } from "./UserList";
 import { FONT_FAMILY } from "../constants";
 import testData from "../testData";
+import { trackEvent } from "../analytics";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -590,7 +591,7 @@ const LayerUI = ({
     return (
       <FontList
         onChange={(value) => {
-          console.info("New Font", value);
+          trackEvent("fonts", value.name);
           // @ts-ignore
           FONT_FAMILY[1] = value.name;
           onUpdateFontTest();
