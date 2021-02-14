@@ -62,9 +62,6 @@
     "prettier": "2.2.1",
     "rewire": "5.0.0"
   },
-  "engines": {
-    "node": ">=12.0.0"
-  },
   "homepage": ".",
   "husky": {
     "hooks": {
