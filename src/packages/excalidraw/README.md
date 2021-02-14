@@ -37,18 +37,18 @@ You can update the value of `PUBLIC_URL` if you want to serve it from a differen
 1. If you are using a Web bundler (for instance, Webpack), you can import it as an ES6 module as shown below
 
 ```js
-import React, { useEffect, useState, createRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Excalidraw from "@excalidraw/excalidraw";
 import InitialData from "./initialData";
 
-import "./styles.css";
+import "./styles.scss";
 
 export default function App() {
-  const excalidrawRef = createRef();
-
+  const excalidrawRef = useRef(null);
+  const excalidrawWrapperRef = useRef(null);
   const [dimensions, setDimensions] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
+    width: undefined,
+    height: undefined,
   });
 
   const [viewModeEnabled, setViewModeEnabled] = useState(false);
@@ -56,17 +56,21 @@ export default function App() {
   const [gridModeEnabled, setGridModeEnabled] = useState(false);
 
   useEffect(() => {
+    setDimensions({
+      width: excalidrawWrapperRef.current.getBoundingClientRect().width,
+      height: excalidrawWrapperRef.current.getBoundingClientRect().height,
+    });
     const onResize = () => {
       setDimensions({
-        width: window.innerWidth,
-        height: window.innerHeight,
+        width: excalidrawWrapperRef.current.getBoundingClientRect().width,
+        height: excalidrawWrapperRef.current.getBoundingClientRect().height,
       });
     };
 
     window.addEventListener("resize", onResize);
 
     return () => window.removeEventListener("resize", onResize);
-  }, []);
+  }, [excalidrawWrapperRef]);
 
   const updateScene = () => {
     const sceneData = {
@@ -102,6 +106,7 @@ export default function App() {
 
   return (
     <div className="App">
+      <h1> Excalidraw Example</h1>
       <div className="button-wrapper">
         <button className="update-scene" onClick={updateScene}>
           Update Scene
@@ -139,7 +144,7 @@ export default function App() {
           Grid mode
         </label>
       </div>
-      <div className="excalidraw-wrapper">
+      <div className="excalidraw-wrapper" ref={excalidrawWrapperRef}>
         <Excalidraw
           ref={excalidrawRef}
           width={dimensions.width}
@@ -148,7 +153,6 @@ export default function App() {
           onChange={(elements, state) =>
             console.log("Elements :", elements, "State : ", state)
           }
-          user={{ name: "Excalidraw User" }}
           onPointerUpdate={(payload) => console.log(payload)}
           onCollabButtonClick={() =>
             window.alert("You clicked on collab button")

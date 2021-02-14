@@ -51,6 +51,7 @@ import {
   LINE_CONFIRM_THRESHOLD,
   MIME_TYPES,
   POINTER_BUTTON,
+  SCROLL_TIMEOUT,
   TAP_TWICE_TIMEOUT,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
   TOUCH_CTX_MENU_TIMEOUT,
@@ -825,6 +826,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     document.addEventListener(EVENT.PASTE, this.pasteFromClipboard);
     document.addEventListener(EVENT.CUT, this.onCut);
+    document.addEventListener(EVENT.SCROLL, this.onScroll);
 
     window.addEventListener(EVENT.RESIZE, this.onResize, false);
     window.addEventListener(EVENT.UNLOAD, this.onUnload, false);
@@ -997,6 +999,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       );
     }
   }
+
+  private onScroll = debounce(() => {
+    this.setState({ ...this.getCanvasOffsets() });
+  }, SCROLL_TIMEOUT);
 
   // Copy/paste
 

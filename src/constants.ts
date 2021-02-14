@@ -47,6 +47,7 @@ export enum EVENT {
   TOUCH_END = "touchend",
   HASHCHANGE = "hashchange",
   VISIBILITY_CHANGE = "visibilitychange",
+  SCROLL = "scroll",
 }
 
 export const ENV = {
@@ -92,6 +93,7 @@ export const TOUCH_CTX_MENU_TIMEOUT = 500;
 export const TITLE_TIMEOUT = 10000;
 export const TOAST_TIMEOUT = 5000;
 export const VERSION_TIMEOUT = 30000;
+export const SCROLL_TIMEOUT = 500;
 
 export const ZOOM_STEP = 0.1;
 
