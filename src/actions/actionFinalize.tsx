@@ -83,7 +83,7 @@ export const actionFinalize = register({
       // If the multi point line closes the loop,
       // set the last point to first point.
       // This ensures that loop remains closed at different scales.
-      const isLoop = isPathALoop(multiPointElement.points);
+      const isLoop = isPathALoop(multiPointElement.points, appState.zoom.value);
       if (
         multiPointElement.type === "line" ||
         multiPointElement.type === "draw"
