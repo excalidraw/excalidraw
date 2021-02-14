@@ -461,8 +461,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           showExitZenModeBtn={
             typeof this.props?.zenModeEnabled === "undefined" && zenModeEnabled
           }
-          onLoadFontTest={(scene) => {
-            document.fonts?.load?.(
+          onLoadFontTest={async (scene) => {
+            await document.fonts?.load?.(
               getFontString({ fontSize: 1, fontFamily: 1 }),
             );
             this.onFontLoaded();
