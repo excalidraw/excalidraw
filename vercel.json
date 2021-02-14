@@ -10,6 +10,15 @@
       }
     },
     {
+      "src": "/#json=.*",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "X-Content-Type-Options": "nosniff",
+        "Feature-Policy": "*",
+        "Referrer-Policy": "origin"
+      }
+    },
+    {
       "handle": "filesystem"
     },
     {
