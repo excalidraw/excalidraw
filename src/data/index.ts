@@ -66,7 +66,7 @@ export const exportCanvas = async (
     }
   }
 
-  const tempCanvas = exportToCanvas(elements, appState, {
+  const tempCanvas = await exportToCanvas(elements, appState, {
     exportBackground,
     viewBackgroundColor,
     exportPadding,

@@ -503,6 +503,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         return;
       }
 
+      if (actionResult.useTex !== undefined) {
+        setUseTex(actionResult.useTex);
+      }
+
       let editingElement: AppState["editingElement"] | null = null;
       if (actionResult.elements) {
         actionResult.elements.forEach((element) => {
@@ -559,6 +563,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               history.setCurrentState(
                 this.state,
                 this.scene.getElementsIncludingDeleted(),
+                getUseTex(),
               );
             }
           },
@@ -632,6 +637,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         isLoading: opts?.resetLoadingState ? false : state.isLoading,
         appearance: this.state.appearance,
       }));
+      setUseTex(true);
       this.resetHistory();
     },
   );
@@ -647,7 +653,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           const blob: Blob = await fileHandle.getFile();
           blob.handle = fileHandle;
           loadFromBlob(blob, this.state)
-            .then(({ elements, appState }) =>
+            .then(({ elements, appState, useTex }) =>
               this.syncActionResult({
                 elements,
                 appState: {
@@ -655,6 +661,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
                   isLoading: false,
                 },
                 commitToHistory: true,
+                useTex,
               }),
             )
             .catch((error) => {
@@ -760,13 +767,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private onResize = withBatchedUpdates(() => {
     this.scene.getElementsIncludingDeleted().forEach((element) => {
-      if (
-        !(
-          isTextElement(element) &&
-          isMathMode(getFontString(element)) &&
-          containsMath(element.text)
-        )
-      ) {
+      if (!isTextElement(element)) {
         invalidateShapeForElement(element);
       }
     });
@@ -957,7 +958,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       cursorButton[socketId] = user.button;
     });
     const elements = this.scene.getElements();
-    const { atLeastOneVisibleElement, scrollBars } = renderScene(
+    const { atLeastOneVisibleElement, scrollBars, promises } = renderScene(
       elements.filter((element) => {
         // don't render text element that's being currently edited (it's
         // rendered on remote only)
@@ -988,6 +989,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         renderOptimizations: true,
       },
     );
+    promises?.forEach((promise: Promise<void> | undefined) => {
+      promise?.then(() => {
+        this.setState({});
+      });
+    });
     if (scrollBars) {
       currentScrollBars = scrollBars;
     }
@@ -1000,7 +1006,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.setState({ scrolledOutside });
     }
 
-    history.record(this.state, this.scene.getElementsIncludingDeleted());
+    history.record(
+      this.state,
+      this.scene.getElementsIncludingDeleted(),
+      getUseTex(),
+    );
 
     // Do not notify consumers if we're still loading the scene. Among other
     // potential issues, this fixes a case where the tab isn't focused during
@@ -1280,6 +1290,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.setState({
         viewBackgroundColor: sceneData.appState.viewBackgroundColor,
       });
+    }
+
+    if (sceneData.useTex !== undefined) {
+      setUseTex(sceneData.useTex);
     }
 
     if (sceneData.elements) {
@@ -3524,7 +3538,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     try {
       const file = event.dataTransfer.files[0];
       if (file?.type === "image/png" || file?.type === "image/svg+xml") {
-        const { elements, appState } = await loadFromBlob(file, this.state);
+        const { elements, appState, useTex } = await loadFromBlob(
+          file,
+          this.state,
+        );
         this.syncActionResult({
           elements,
           appState: {
@@ -3532,6 +3549,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             isLoading: false,
           },
           commitToHistory: true,
+          useTex,
         });
         return;
       }
@@ -3573,7 +3591,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         }
       }
       loadFromBlob(file, this.state)
-        .then(({ elements, appState }) =>
+        .then(({ elements, appState, useTex }) =>
           this.syncActionResult({
             elements,
             appState: {
@@ -3581,6 +3599,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               isLoading: false,
             },
             commitToHistory: true,
+            useTex,
           }),
         )
         .catch((error) => {
@@ -3762,7 +3781,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           _isMobile &&
             navigator.clipboard && {
               name: "paste",
-              perform: (elements, appStates) => {
+              perform: (elements, appStates, useTex) => {
                 this.pasteFromClipboard(null);
                 return {
                   commitToHistory: false,
@@ -3820,7 +3839,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         _isMobile &&
           navigator.clipboard && {
             name: "paste",
-            perform: (elements, appStates) => {
+            perform: (elements, appStates, useTex) => {
               this.pasteFromClipboard(null);
               return {
                 commitToHistory: false,

@@ -262,8 +262,18 @@ export const renderScene = (
     }),
   );
 
+  const promises = [] as Promise<void>[];
   visibleElements.forEach((element) => {
-    renderElement(element, rc, context, renderOptimizations, sceneState);
+    const promise = renderElement(
+      element,
+      rc,
+      context,
+      renderOptimizations,
+      sceneState,
+    );
+    if (promise !== undefined) {
+      promises.push(promise);
+    }
   });
 
   if (appState.editingLinearElement) {
@@ -574,7 +584,11 @@ export const renderScene = (
 
   context.scale(1 / scale, 1 / scale);
 
-  return { atLeastOneVisibleElement: visibleElements.length > 0, scrollBars };
+  return {
+    atLeastOneVisibleElement: visibleElements.length > 0,
+    scrollBars,
+    promises,
+  };
 };
 
 const renderTransformHandles = (

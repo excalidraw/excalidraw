@@ -40,7 +40,7 @@ const loadMathJax = () => {
     mathJax.amHtml === undefined ||
     mathJax.texHtml === undefined
   ) {
-    const asciimath = new AsciiMath({});
+    const asciimath = new AsciiMath({ displaystyle: false });
     const tex = new TeX({});
     const svg = new SVG({ fontCache: "local" });
     mathJax.adaptor = liteAdaptor();
@@ -64,8 +64,11 @@ const math2Svg = (text: string) => {
   }
   loadMathJax();
   try {
+    const userOptions = { display: false };
     const htmlString = mathJax.adaptor.innerHTML(
-      _useTex ? mathJax.texHtml.convert(text) : mathJax.amHtml.convert(text),
+      _useTex
+        ? mathJax.texHtml.convert(text, userOptions)
+        : mathJax.amHtml.convert(text, userOptions),
     );
     mathJaxSvgCache[text] = htmlString;
     return htmlString;
@@ -158,18 +161,21 @@ export const drawHtmlOnCanvas = (
     htmlString,
   )}</svg>`;
 
-  const DOMURL = window.URL || window.webkitURL || window;
+  return new Promise<void>((resolve) => {
+    const DOMURL = window.URL || window.webkitURL || window;
 
-  const img = new Image();
-  const svg = new Blob([data], { type: "image/svg+xml;charset=utf-8" });
-  const url = DOMURL.createObjectURL(svg);
+    const img = new Image();
+    const svg = new Blob([data], { type: "image/svg+xml;charset=utf-8" });
+    const url = DOMURL.createObjectURL(svg);
 
-  img.onload = function () {
-    context.drawImage(img, x, y);
-    DOMURL.revokeObjectURL(url);
-  };
+    img.onload = function () {
+      context.drawImage(img, x, y);
+      DOMURL.revokeObjectURL(url);
+      resolve();
+    };
 
-  img.src = url;
+    img.src = url;
+  });
 };
 
 export const containsMath = (text: string) => {

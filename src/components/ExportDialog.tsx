@@ -103,14 +103,16 @@ const ExportModal = ({
 
       // if converting to blob fails, there's some problem that will
       // likely prevent preview and export (e.g. canvas too big)
-      canvasToBlob(canvas)
-        .then(() => {
-          renderPreview(canvas, previewNode);
-        })
-        .catch((error) => {
-          console.error(error);
-          renderPreview(new CanvasError(), previewNode);
-        });
+      canvas.then((canvas) => {
+        canvasToBlob(canvas)
+          .then(() => {
+            renderPreview(canvas, previewNode);
+          })
+          .catch((error) => {
+            console.error(error);
+            renderPreview(new CanvasError(), previewNode);
+          });
+      });
     } catch (error) {
       console.error(error);
       renderPreview(new CanvasError(), previewNode);

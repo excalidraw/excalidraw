@@ -15,6 +15,7 @@ const writeData = (
   prevElements: readonly ExcalidrawElement[],
   appState: AppState,
   updater: () => HistoryEntry | null,
+  useTex: boolean,
 ): ActionResult => {
   const commitToHistory = false;
   if (
@@ -54,6 +55,7 @@ const writeData = (
       appState: { ...appState, ...data.appState },
       commitToHistory,
       syncHistory: true,
+      useTex: useTex || data.useTex,
     };
   }
   return { commitToHistory };
@@ -63,8 +65,8 @@ type ActionCreator = (history: SceneHistory) => Action;
 
 export const createUndoAction: ActionCreator = (history) => ({
   name: "undo",
-  perform: (elements, appState) =>
-    writeData(elements, appState, () => history.undoOnce()),
+  perform: (elements, appState, useTex) =>
+    writeData(elements, appState, () => history.undoOnce(), useTex),
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] &&
     event.key.toLowerCase() === KEYS.Z &&
@@ -82,8 +84,8 @@ export const createUndoAction: ActionCreator = (history) => ({
 
 export const createRedoAction: ActionCreator = (history) => ({
   name: "redo",
-  perform: (elements, appState) =>
-    writeData(elements, appState, () => history.redoOnce()),
+  perform: (elements, appState, useTex) =>
+    writeData(elements, appState, () => history.redoOnce(), useTex),
   keyTest: (event) =>
     (event[KEYS.CTRL_OR_CMD] &&
       event.shiftKey &&

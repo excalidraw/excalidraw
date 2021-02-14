@@ -54,7 +54,10 @@ export interface ExcalidrawElementWithCanvas {
 const generateElementCanvas = (
   element: NonDeletedExcalidrawElement,
   zoom: Zoom,
-): ExcalidrawElementWithCanvas => {
+): {
+  elementWithCanvas: ExcalidrawElementWithCanvas;
+  promise: Promise<void> | undefined;
+} => {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
 
@@ -102,7 +105,7 @@ const generateElementCanvas = (
   );
 
   const rc = rough.canvas(canvas);
-  drawElementOnCanvas(element, rc, context, zoom);
+  const promise = drawElementOnCanvas(element, rc, context, zoom);
   context.translate(
     -(CANVAS_PADDING * zoom.value),
     -(CANVAS_PADDING * zoom.value),
@@ -112,11 +115,14 @@ const generateElementCanvas = (
     1 / (window.devicePixelRatio * zoom.value),
   );
   return {
-    element,
-    canvas,
-    canvasZoom: zoom.value,
-    canvasOffsetX,
-    canvasOffsetY,
+    elementWithCanvas: {
+      element,
+      canvas,
+      canvasZoom: zoom.value,
+      canvasOffsetX,
+      canvasOffsetY,
+    },
+    promise,
   };
 };
 
@@ -126,6 +132,7 @@ const drawElementOnCanvas = (
   context: CanvasRenderingContext2D,
   zoom: Zoom,
 ) => {
+  let promise;
   context.globalAlpha = element.opacity / 100;
   switch (element.type) {
     case "rectangle":
@@ -144,6 +151,13 @@ const drawElementOnCanvas = (
     }
     default: {
       if (isTextElement(element)) {
+        const rtl = isRTL(element.text);
+        const shouldTemporarilyAttach = rtl && !context.canvas.isConnected;
+        if (shouldTemporarilyAttach) {
+          // to correctly render RTL text mixed with LTR, we have to append it
+          // to the DOM
+          document.body.appendChild(context.canvas);
+        }
         if (isMathMode(getFontString(element)) && containsMath(element.text)) {
           const htmlString = markupText(element.text);
 
@@ -156,7 +170,7 @@ const drawElementOnCanvas = (
           });
           const scaledMetrics = measureMarkup(htmlString, scaledFontString);
 
-          drawHtmlOnCanvas(
+          promise = drawHtmlOnCanvas(
             context,
             htmlString,
             scaledPadding,
@@ -169,13 +183,6 @@ const drawElementOnCanvas = (
             element.textAlign,
           );
         } else {
-          const rtl = isRTL(element.text);
-          const shouldTemporarilyAttach = rtl && !context.canvas.isConnected;
-          if (shouldTemporarilyAttach) {
-            // to correctly render RTL text mixed with LTR, we have to append it
-            // to the DOM
-            document.body.appendChild(context.canvas);
-          }
           context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
           const font = context.font;
           context.font = getFontString(element);
@@ -205,9 +212,9 @@ const drawElementOnCanvas = (
           context.fillStyle = fillStyle;
           context.font = font;
           context.textAlign = textAlign;
-          if (shouldTemporarilyAttach) {
-            context.canvas.remove();
-          }
+        }
+        if (shouldTemporarilyAttach) {
+          context.canvas.remove();
         }
       } else {
         throw new Error(`Unimplemented type ${element.type}`);
@@ -215,11 +222,15 @@ const drawElementOnCanvas = (
     }
   }
   context.globalAlpha = 1;
+  return promise;
 };
 
 const elementWithCanvasCache = new WeakMap<
   ExcalidrawElement,
-  ExcalidrawElementWithCanvas
+  {
+    elementWithCanvas: ExcalidrawElementWithCanvas;
+    promise: Promise<void> | undefined;
+  }
 >();
 
 const shapeCache = new WeakMap<
@@ -474,14 +485,18 @@ const generateElementWithCanvas = (
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
   const shouldRegenerateBecauseZoom =
     prevElementWithCanvas &&
-    prevElementWithCanvas.canvasZoom !== zoom.value &&
+    prevElementWithCanvas.elementWithCanvas &&
+    prevElementWithCanvas.elementWithCanvas.canvasZoom !== zoom.value &&
     !sceneState?.shouldCacheIgnoreZoom;
   if (!prevElementWithCanvas || shouldRegenerateBecauseZoom) {
     const elementWithCanvas = generateElementCanvas(element, zoom);
     elementWithCanvasCache.set(element, elementWithCanvas);
     return elementWithCanvas;
   }
-  return prevElementWithCanvas;
+  return {
+    elementWithCanvas: prevElementWithCanvas.elementWithCanvas,
+    promise: undefined,
+  };
 };
 
 const drawElementFromCanvas = (
@@ -552,20 +567,68 @@ export const renderElement = (
           element,
           sceneState,
         );
-        drawElementFromCanvas(elementWithCanvas, rc, context, sceneState);
+        if (elementWithCanvas.promise !== undefined) {
+          return elementWithCanvas.promise.then(() => {
+            drawElementFromCanvas(
+              elementWithCanvas.elementWithCanvas,
+              rc,
+              context,
+              sceneState,
+            );
+          });
+        }
+        drawElementFromCanvas(
+          elementWithCanvas.elementWithCanvas,
+          rc,
+          context,
+          sceneState,
+        );
       } else {
-        const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-        const cx = (x1 + x2) / 2 + sceneState.scrollX;
-        const cy = (y1 + y2) / 2 + sceneState.scrollY;
-        const shiftX = (x2 - x1) / 2 - (element.x - x1);
-        const shiftY = (y2 - y1) / 2 - (element.y - y1);
-        context.translate(cx, cy);
-        context.rotate(element.angle);
-        context.translate(-shiftX, -shiftY);
-        drawElementOnCanvas(element, rc, context, sceneState.zoom);
-        context.translate(shiftX, shiftY);
-        context.rotate(-element.angle);
-        context.translate(-cx, -cy);
+        return new Promise<void>((resolve) => {
+          const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+          const cx = (x1 + x2) / 2 + sceneState.scrollX;
+          const cy = (y1 + y2) / 2 + sceneState.scrollY;
+          const shiftX = (x2 - x1) / 2 - (element.x - x1);
+          const shiftY = (y2 - y1) / 2 - (element.y - y1);
+          if (
+            isTextElement(element) &&
+            isMathMode(getFontString(element)) &&
+            containsMath(element.text)
+          ) {
+            const tempCanvas = document.createElement("canvas");
+            tempCanvas.width =
+              element.width * window.devicePixelRatio * sceneState.zoom.value +
+              CANVAS_PADDING * sceneState.zoom.value * 2;
+            tempCanvas.height =
+              element.height * window.devicePixelRatio * sceneState.zoom.value +
+              CANVAS_PADDING * sceneState.zoom.value * 2;
+
+            const tempContext = tempCanvas.getContext("2d");
+            const promise =
+              tempContext !== null
+                ? drawElementOnCanvas(element, rc, tempContext, sceneState.zoom)
+                : undefined;
+            promise?.then(() => {
+              context.translate(cx, cy);
+              context.rotate(element.angle);
+              context.translate(-shiftX, -shiftY);
+              context.drawImage(tempCanvas, 0, 0);
+              context.translate(shiftX, shiftY);
+              context.rotate(-element.angle);
+              context.translate(-cx, -cy);
+              resolve();
+            });
+          } else {
+            context.translate(cx, cy);
+            context.rotate(element.angle);
+            context.translate(-shiftX, -shiftY);
+            drawElementOnCanvas(element, rc, context, sceneState.zoom);
+            context.translate(shiftX, shiftY);
+            context.rotate(-element.angle);
+            context.translate(-cx, -cy);
+            resolve();
+          }
+        });
       }
       break;
     }
