@@ -48,6 +48,7 @@ export type ActionName =
   | "changeOpacity"
   | "changeFontSize"
   | "toggleCanvasMenu"
+  | "toggleAutoSave"
   | "toggleEditMenu"
   | "undo"
   | "redo"

@@ -78,6 +78,7 @@
     "ungroup": "Ungroup selection",
     "collaborators": "Collaborators",
     "showGrid": "Show grid",
+    "toggleAutoSave": "Auto save",
     "addToLibrary": "Add to library",
     "removeFromLibrary": "Remove from library",
     "libraryLoadingMessage": "Loading library…",

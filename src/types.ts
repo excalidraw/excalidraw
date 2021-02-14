@@ -40,6 +40,7 @@ export type Collaborator = {
 };
 
 export type AppState = {
+  autoSave: boolean;
   isLoading: boolean;
   errorMessage: string | null;
   draggingElement: NonDeletedExcalidrawElement | null;

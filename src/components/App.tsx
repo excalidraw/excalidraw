@@ -21,6 +21,7 @@ import {
   actionSelectAll,
   actionSendBackward,
   actionSendToBack,
+  actionToggleAutoSave,
   actionToggleGridMode,
   actionToggleStats,
   actionToggleZenMode,
@@ -52,13 +53,14 @@ import {
   MIME_TYPES,
   POINTER_BUTTON,
   SCROLL_TIMEOUT,
+  AUTO_SAVE_TIMEOUT,
   TAP_TWICE_TIMEOUT,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
   TOUCH_CTX_MENU_TIMEOUT,
   ZOOM_STEP,
 } from "../constants";
 import { loadFromBlob } from "../data";
-import { isValidLibrary } from "../data/json";
+import { saveAsJSON, isValidLibrary } from "../data/json";
 import { Library } from "../data/library";
 import { restore } from "../data/restore";
 import {
@@ -879,6 +881,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       .querySelector(".excalidraw")
       ?.classList.toggle("Appearance_dark", this.state.appearance === "dark");
 
+    if (this.state.autoSave) {
+      this.saveLocalSceneDebounced(
+        this.scene.getElementsIncludingDeleted(),
+        this.state,
+      );
+    }
+
     if (
       this.state.editingLinearElement &&
       !this.state.selectedElementIds[this.state.editingLinearElement.elementId]
@@ -1003,6 +1012,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   private onScroll = debounce(() => {
     this.setState({ ...this.getCanvasOffsets() });
   }, SCROLL_TIMEOUT);
+
+  private saveLocalSceneDebounced = debounce(
+    (elements: readonly ExcalidrawElement[], state: AppState) => {
+      saveAsJSON(elements, state);
+    },
+    AUTO_SAVE_TIMEOUT,
+  );
 
   // Copy/paste
 
@@ -3716,6 +3732,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         typeof this.props.zenModeEnabled === "undefined" && actionToggleZenMode,
         typeof this.props.viewModeEnabled === "undefined" &&
           actionToggleViewMode,
+        actionToggleAutoSave,
         actionToggleStats,
       ];
 
@@ -3762,6 +3779,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             actionToggleZenMode,
           typeof this.props.viewModeEnabled === "undefined" &&
             actionToggleViewMode,
+          actionToggleAutoSave,
+          separator,
           actionToggleStats,
         ],
         top: clientY,
