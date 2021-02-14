@@ -8,7 +8,7 @@
 }
 
 .excalidraw {
-  color: var(--primary-text-color);
+  color: var(--text-primary-color);
   display: flex;
   position: fixed;
   top: 0;
@@ -72,7 +72,7 @@
       margin-top: 0.333rem;
       margin-bottom: 0.333rem;
       font-size: 0.75rem;
-      color: var(--primary-text-color);
+      color: var(--text-primary-color);
       font-weight: bold;
       display: block;
     }

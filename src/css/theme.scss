@@ -25,7 +25,6 @@
   --popup-secondary-bg-color: #{$oc-gray-1};
   --popup-text-color: #{$oc-black};
   --popup-text-inverted-color: #{$oc-white};
-  --primary-text-color: #{$oc-gray-8};
   --sab: env(safe-area-inset-bottom);
   --sal: env(safe-area-inset-left);
   --sar: env(safe-area-inset-right);
@@ -33,6 +32,7 @@
   --select-highlight-color: #{$oc-blue-5};
   --shadow-island: 0 1px 5px #{transparentize($oc-black, 0.85)};
   --space-factor: 0.25rem;
+  --text-primary-color: #{$oc-gray-8};
 }
 
 .excalidraw {
@@ -68,8 +68,8 @@
     --popup-secondary-bg-color: #222;
     --popup-text-color: #{$oc-gray-4};
     --popup-text-inverted-color: #2c2c2c;
-    --primary-text-color: #{$oc-gray-4};
     --select-highlight-color: #{$oc-blue-4};
     --shadow-island: 0 1px 5px #{transparentize($oc-black, 0.7)};
+    --text-primary-color: #{$oc-gray-4};
   }
 }
