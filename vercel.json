@@ -4,24 +4,12 @@
       "src": "/(.*)",
       "dest": "/",
       "status": 301,
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "Feature-Policy",
-          "value": "*"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "origin"
-        }
-      ]
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "X-Content-Type-Options": "nosniff",
+        "Feature-Policy": "*",
+        "Referrer-Policy": "origin"
+      }
     }
   ]
 }
