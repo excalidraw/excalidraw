@@ -3,26 +3,30 @@
 .excalidraw {
   .FontList {
     position: absolute;
-    right: 8px;
+    right: 160px;
     top: 8px;
     font-size: 16px;
     border: 2px solid $oc-orange-8;
     border-radius: 5px;
     padding: 4px;
     background-color: $oc-orange-1;
-
+    height: 32px;
     &:focus {
       outline: none;
     }
   }
 
-  .font-test-btn {
-    padding: 10px;
+  .btn-load-test {
     position: absolute;
-    top: 2px;
-    right: 165px;
-    margin: 5px;
-    background: cadetblue;
-    color: white;
+    padding: 4px 12px;
+    font-size: 16px;
+    top: 6px;
+    right: 8px;
+    background-color: $oc-lime-1;
+    border: 2px solid $oc-lime-8;
+    height: 32px;
+    &:hover {
+      background-color: $oc-lime-3;
+    }
   }
 }

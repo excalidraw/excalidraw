@@ -593,11 +593,11 @@ const LayerUI = ({
   const renderLoadTestButton = () => {
     return (
       <button
-        className="font-test-btn"
+        className="btn-load-test"
         // @ts-ignore
         onClick={() => onLoadFontTest(testData)}
       >
-        {t("buttons.loadFontTest")}
+        {"Load test scene"}
       </button>
     );
   };

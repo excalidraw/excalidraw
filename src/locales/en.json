@@ -123,8 +123,7 @@
     "darkMode": "Dark mode",
     "lightMode": "Light mode",
     "zenMode": "Zen mode",
-    "exitZenMode": "Exit zen mode",
-    "loadFontTest": "Load Font Test"
+    "exitZenMode": "Exit zen mode"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",
