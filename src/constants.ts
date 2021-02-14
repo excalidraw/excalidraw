@@ -108,4 +108,5 @@ export const MODES = {
   GRID: "gridMode",
 };
 
+// Should be in sync with value in theme.scss
 export const APPEARANCE_FILTER = "invert(93%) hue-rotate(180deg)";
