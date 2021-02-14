@@ -185,6 +185,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -221,6 +222,7 @@ Object {
           "y": 0,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -280,6 +282,7 @@ Object {
           "y": 30,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -362,6 +365,7 @@ Object {
           "y": 60,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -451,6 +455,7 @@ Object {
           "y": 60,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -652,6 +657,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -688,6 +694,7 @@ Object {
           "y": 0,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -747,6 +754,7 @@ Object {
           "y": 110,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -829,6 +837,7 @@ Object {
           "y": 220,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -917,6 +926,7 @@ Object {
           "y": 220,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -1105,6 +1115,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -1141,6 +1152,7 @@ Object {
           "y": 0,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -1200,6 +1212,7 @@ Object {
           "y": 0,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -1266,6 +1279,7 @@ Object {
           "y": 0,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -1330,6 +1344,7 @@ Object {
           "y": 0,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -1416,6 +1431,7 @@ Object {
           "y": 0,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -1510,6 +1526,7 @@ Object {
           "y": 0,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -1601,6 +1618,7 @@ Object {
           "y": 0,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -1692,6 +1710,7 @@ Object {
           "y": 0,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -1822,6 +1841,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -1858,6 +1878,7 @@ Object {
           "y": 0,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -1895,6 +1916,7 @@ Object {
           "y": 25,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -2086,6 +2108,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -2122,6 +2145,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -2181,6 +2205,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -2263,6 +2288,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -2352,6 +2378,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -2508,6 +2535,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -2544,6 +2572,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -2604,6 +2633,7 @@ Object {
           "y": 20,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -2731,6 +2761,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -2767,6 +2798,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -2949,6 +2981,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -2983,6 +3016,7 @@ Object {
           "y": 100,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -3019,6 +3053,7 @@ Object {
           "y": 100,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -3078,6 +3113,7 @@ Object {
           "y": 100,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -3160,6 +3196,7 @@ Object {
           "y": 300,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -3243,6 +3280,7 @@ Object {
           "y": 300,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -3370,6 +3408,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -3406,6 +3445,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -3442,6 +3482,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -3478,6 +3519,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -3514,6 +3556,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -3550,6 +3593,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -3680,6 +3724,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -3716,6 +3761,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -3753,6 +3799,7 @@ Object {
           "y": 20,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -3885,6 +3932,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -3921,6 +3969,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -3958,6 +4007,7 @@ Object {
           "y": 20,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -3996,6 +4046,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -4152,6 +4203,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -4188,6 +4240,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -4247,6 +4300,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -4430,6 +4484,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -4466,6 +4521,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -4525,6 +4581,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -4607,6 +4664,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -4806,6 +4864,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -4842,6 +4901,7 @@ Object {
           "y": 0,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -4901,6 +4961,7 @@ Object {
           "y": 110,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -5078,6 +5139,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -5112,6 +5174,7 @@ Object {
           "y": 0,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -5148,6 +5211,7 @@ Object {
           "y": 0,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -5207,6 +5271,7 @@ Object {
           "y": 110,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -5378,6 +5443,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -5414,6 +5480,7 @@ Object {
           "y": 0,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -5563,6 +5630,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -5599,6 +5667,7 @@ Object {
           "y": 0,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -5784,6 +5853,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -5820,6 +5890,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -5879,6 +5950,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -5961,6 +6033,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -6051,6 +6124,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -6211,6 +6285,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -6247,6 +6322,7 @@ Object {
           "y": 0,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -6306,6 +6382,7 @@ Object {
           "y": 110,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -6368,6 +6445,7 @@ Object {
           "y": 135,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -6766,6 +6844,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -6802,6 +6881,7 @@ Object {
           "y": -10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -6861,6 +6941,7 @@ Object {
           "y": -10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -6943,6 +7024,7 @@ Object {
           "y": -10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -7063,6 +7145,7 @@ Object {
           "y": -10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -7221,6 +7304,7 @@ Object {
           "y": -10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -7420,6 +7504,7 @@ Object {
           "y": -10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -7623,6 +7708,7 @@ Object {
           "y": -10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -7867,6 +7953,7 @@ Object {
           "y": -10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -8115,6 +8202,7 @@ Object {
           "y": -10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -8401,6 +8489,7 @@ Object {
           "y": -10,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -8585,6 +8674,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -8621,6 +8711,7 @@ Object {
           "y": 0,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -8680,6 +8771,7 @@ Object {
           "y": 110,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -8762,6 +8854,7 @@ Object {
           "y": 310,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -8921,6 +9014,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -8957,6 +9051,7 @@ Object {
           "y": 0,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -9016,6 +9111,7 @@ Object {
           "y": 500,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -9173,6 +9269,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -9209,6 +9306,7 @@ Object {
           "y": 0,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -9268,6 +9366,7 @@ Object {
           "y": 500,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -9426,6 +9525,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -9462,6 +9562,7 @@ Object {
           "y": 0,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -9521,6 +9622,7 @@ Object {
           "y": 500,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -9582,6 +9684,7 @@ Object {
           "y": 500,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -9709,6 +9812,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -9745,6 +9849,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -9872,6 +9977,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -9908,6 +10014,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -10035,6 +10142,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -10071,6 +10179,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -10213,6 +10322,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -10264,6 +10374,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -10406,6 +10517,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -10457,6 +10569,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -10599,6 +10712,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -10650,6 +10764,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -10792,6 +10907,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -10843,6 +10959,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -10970,6 +11087,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -11006,6 +11124,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -11133,6 +11252,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -11169,6 +11289,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -11311,6 +11432,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -11362,6 +11484,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -11489,6 +11612,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -11525,6 +11649,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -11667,6 +11792,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -11718,6 +11844,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -11998,6 +12125,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -12034,6 +12162,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -12093,6 +12222,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -12175,6 +12305,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -12266,6 +12397,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -12433,6 +12565,7 @@ Object {
           "y": 20,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -12590,6 +12723,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -12626,6 +12760,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -12685,6 +12820,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -12786,6 +12922,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
   ],
 }
@@ -12885,6 +13022,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
   ],
 }
@@ -13012,6 +13150,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -13048,6 +13187,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -13201,6 +13341,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -13237,6 +13378,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -13296,6 +13438,7 @@ Object {
           "y": 40,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -13355,6 +13498,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -13508,6 +13652,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -13544,6 +13689,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -13603,6 +13749,7 @@ Object {
           "y": 40,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -13662,6 +13809,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -13789,6 +13937,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -13825,6 +13974,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -13950,6 +14100,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -13986,6 +14137,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -14020,6 +14172,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -14173,6 +14326,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -14209,6 +14363,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -14268,6 +14423,7 @@ Object {
           "y": 20,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -14431,6 +14587,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -14467,6 +14624,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -14526,6 +14684,7 @@ Object {
           "y": 40,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -14591,6 +14750,7 @@ Object {
           "y": 40,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -14744,6 +14904,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -14780,6 +14941,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -14839,6 +15001,7 @@ Object {
           "y": 40,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -14898,6 +15061,7 @@ Object {
           "y": 40,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -14957,6 +15121,7 @@ Object {
           "y": 40,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -15016,6 +15181,7 @@ Object {
           "y": 40,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -15075,6 +15241,7 @@ Object {
           "y": 40,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -15134,6 +15301,7 @@ Object {
           "y": 40,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -15193,6 +15361,7 @@ Object {
           "y": 40,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -15252,6 +15421,7 @@ Object {
           "y": 40,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -15311,6 +15481,7 @@ Object {
           "y": 40,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -15370,6 +15541,7 @@ Object {
           "y": 40,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -15429,6 +15601,7 @@ Object {
           "y": 40,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -15582,6 +15755,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -15618,6 +15792,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -15677,6 +15852,7 @@ Object {
           "y": 40,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -15736,6 +15912,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -15889,6 +16066,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -15925,6 +16103,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -15984,6 +16163,7 @@ Object {
           "y": 40,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -16043,6 +16223,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -16200,6 +16381,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -16236,6 +16418,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -16295,6 +16478,7 @@ Object {
           "y": 40,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -16360,6 +16544,7 @@ Object {
           "y": 40,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -16421,6 +16606,7 @@ Object {
           "y": 40,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -16551,6 +16737,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -16587,6 +16774,7 @@ Object {
           "y": 0,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -16749,6 +16937,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -16785,6 +16974,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -16844,6 +17034,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -16907,6 +17098,7 @@ Object {
           "y": 20,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -17037,6 +17229,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -17073,6 +17266,7 @@ Object {
           "y": 0,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -17109,6 +17303,7 @@ Object {
           "y": 0,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -17145,6 +17340,7 @@ Object {
           "y": 0,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -17304,6 +17500,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -17340,6 +17537,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -17399,6 +17597,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -17564,6 +17763,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -17600,6 +17800,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -17659,6 +17860,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -17725,6 +17927,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -17824,6 +18027,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
   ],
 }
@@ -17951,6 +18155,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -17987,6 +18192,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -18215,6 +18421,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -18251,6 +18458,7 @@ Object {
           "y": 0,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -18310,6 +18518,7 @@ Object {
           "y": 0,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -18376,6 +18585,7 @@ Object {
           "y": 0,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -18462,6 +18672,7 @@ Object {
           "y": 50,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -18571,6 +18782,7 @@ Object {
           "y": 50,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -18687,6 +18899,7 @@ Object {
           "y": 50,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -18807,6 +19020,7 @@ Object {
           "y": 50,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -18906,6 +19120,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
   ],
 }
@@ -19095,6 +19310,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -19131,6 +19347,7 @@ Object {
           "y": 0,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -19190,6 +19407,7 @@ Object {
           "y": 100,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -19272,6 +19490,7 @@ Object {
           "y": 200,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -19362,6 +19581,7 @@ Object {
           "y": 200,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -19452,6 +19672,7 @@ Object {
           "y": 200,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -19544,6 +19765,7 @@ Object {
           "y": 200,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -19637,6 +19859,7 @@ Object {
           "y": 200,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -19864,6 +20087,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -19900,6 +20124,7 @@ Object {
           "y": 0,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -19959,6 +20184,7 @@ Object {
           "y": 110,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -20041,6 +20267,7 @@ Object {
           "y": 310,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -20240,6 +20467,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -20276,6 +20504,7 @@ Object {
           "y": 0,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -20335,6 +20564,7 @@ Object {
           "y": 20,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -20436,6 +20666,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
   ],
 }
@@ -20726,6 +20957,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -20826,6 +21058,7 @@ Object {
           "y": 10,
         },
       ],
+      "useTex": true,
     },
   ],
   "stateHistory": Array [
@@ -20838,6 +21071,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -20874,6 +21108,7 @@ Object {
           "y": -10,
         },
       ],
+      "useTex": true,
     },
     Object {
       "appState": Object {
@@ -20933,6 +21168,7 @@ Object {
           "y": 0,
         },
       ],
+      "useTex": true,
     },
   ],
 }
@@ -21032,6 +21268,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
   ],
 }
@@ -21131,6 +21368,7 @@ Object {
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
+      "useTex": true,
     },
   ],
 }
