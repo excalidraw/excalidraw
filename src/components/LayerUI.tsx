@@ -447,7 +447,15 @@ const LayerUI = ({
         "transition-left": zenModeEnabled,
       })}
     >
-      <Island className={CLASSES.SHAPE_ACTIONS_MENU} padding={2}>
+      <Island
+        className={CLASSES.SHAPE_ACTIONS_MENU}
+        padding={2}
+        style={{
+          // we want to make sure this doesn't overflow so substracting 200
+          // which is approximately height of zoom footer and top left menu items with some buffer
+          maxHeight: `${appState.height - 200}px`,
+        }}
+      >
         <SelectedShapeActions
           appState={appState}
           elements={elements}
@@ -619,18 +627,6 @@ const LayerUI = ({
       >
         {t("buttons.exitZenMode")}
       </button>
-      {appState.scrolledOutside && (
-        <button
-          className="scroll-back-to-content"
-          onClick={() => {
-            setAppState({
-              ...calculateScrollCenter(elements, appState, canvas),
-            });
-          }}
-        >
-          {t("buttons.scrollBackToContent")}
-        </button>
-      )}
     </footer>
   );
 
@@ -694,6 +690,18 @@ const LayerUI = ({
       {renderLoadTestButton()}
       {renderFont()}
       {renderFooter()}
+      {appState.scrolledOutside && (
+        <button
+          className="scroll-back-to-content"
+          onClick={() => {
+            setAppState({
+              ...calculateScrollCenter(elements, appState, canvas),
+            });
+          }}
+        >
+          {t("buttons.scrollBackToContent")}
+        </button>
+      )}
     </div>
   );
 };
