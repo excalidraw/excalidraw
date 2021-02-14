@@ -7,7 +7,11 @@ import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
 import { distance, SVG_NS } from "../utils";
 import { AppState } from "../types";
 import { t } from "../i18n";
-import { DEFAULT_FONT_FAMILY, DEFAULT_VERTICAL_ALIGN } from "../constants";
+import {
+  DEFAULT_FONT_FAMILY,
+  DEFAULT_VERTICAL_ALIGN,
+  APPEARANCE_FILTER,
+} from "../constants";
 import { getDefaultAppState } from "../appState";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
@@ -61,6 +65,8 @@ export const exportToCanvas = (
     tempCanvas,
     {
       viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
+      appearanceFilter:
+        appState.appearance === "dark" ? APPEARANCE_FILTER : null,
       scrollX: -minX + exportPadding,
       scrollY: -minY + exportPadding,
       zoom: getDefaultAppState().zoom,
@@ -87,6 +93,7 @@ export const exportToSvg = (
     exportBackground,
     exportPadding = 10,
     viewBackgroundColor,
+    appearanceFilter,
     scale = 1,
     shouldAddWatermark,
     metadata = "",
@@ -95,6 +102,7 @@ export const exportToSvg = (
     exportPadding?: number;
     scale?: number;
     viewBackgroundColor: string;
+    appearanceFilter?: string | null;
     shouldAddWatermark: boolean;
     metadata?: string;
   },
@@ -114,6 +122,9 @@ export const exportToSvg = (
   svgRoot.setAttribute("viewBox", `0 0 ${width} ${height}`);
   svgRoot.setAttribute("width", `${width * scale}`);
   svgRoot.setAttribute("height", `${height * scale}`);
+  if (appearanceFilter) {
+    svgRoot.setAttribute("filter", appearanceFilter);
+  }
 
   svgRoot.innerHTML = `
   ${SVG_EXPORT_TAG}

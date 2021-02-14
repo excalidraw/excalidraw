@@ -107,3 +107,5 @@ export const MODES = {
   ZEN: "zenMode",
   GRID: "gridMode",
 };
+
+export const APPEARANCE_FILTER = "invert(93%) hue-rotate(180deg)";

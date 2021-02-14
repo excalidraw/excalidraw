@@ -221,6 +221,9 @@ export const renderScene = (
     if (hasTransparence) {
       context.clearRect(0, 0, normalizedCanvasWidth, normalizedCanvasHeight);
     }
+    if (sceneState.appearanceFilter) {
+      context.filter = sceneState.appearanceFilter;
+    }
     const fillStyle = context.fillStyle;
     context.fillStyle = sceneState.viewBackgroundColor;
     context.fillRect(0, 0, normalizedCanvasWidth, normalizedCanvasHeight);
