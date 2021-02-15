@@ -184,6 +184,8 @@ import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import {
+  measureMath,
+  inverseContainsMath,
   containsMath,
   isMathMode,
   getFontString,
@@ -1353,9 +1355,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         if (
           isTextElement(element) &&
           isMathMode(getFontString(element)) &&
-          containsMath(element.text)
+          (containsMath(element.text) || inverseContainsMath(element.text))
         ) {
           invalidateShapeForElement(element);
+          const metrics = measureMath(element.text, getFontString(element));
+          mutateElement(element, metrics);
         }
       });
       this.setState({});

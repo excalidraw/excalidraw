@@ -183,6 +183,11 @@ export const containsMath = (text: string) => {
   return text.search(delimiter) >= 0;
 };
 
+export const inverseContainsMath = (text: string) => {
+  const delimiter = (!_useTex ? "\\$\\$" : "`") as string;
+  return text.search(delimiter) >= 0;
+};
+
 export const isMathMode = (fontString: FontString) => {
   return fontString.search("Helvetica") >= 0;
 };
