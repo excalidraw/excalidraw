@@ -141,7 +141,7 @@ export const restoreElements = (
   }, [] as ExcalidrawElement[]);
 };
 
-const restoreAppState = (
+export const restoreAppState = (
   appState: ImportedDataState["appState"],
   localAppState: Partial<AppState> | null,
 ): AppState => {
