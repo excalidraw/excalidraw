@@ -177,6 +177,22 @@ export const getImportedKey = (key: string, usage: KeyUsage) =>
     [usage],
   );
 
+const decryptImported = async (
+  iv: ArrayBuffer,
+  encrypted: ArrayBuffer,
+  privateKey: string,
+): Promise<ArrayBuffer> => {
+  const key = await getImportedKey(privateKey, "decrypt");
+  return window.crypto.subtle.decrypt(
+    {
+      name: "AES-GCM",
+      iv,
+    },
+    key,
+    encrypted,
+  );
+};
+
 const importFromBackend = async (
   id: string | null,
   privateKey?: string | null,
@@ -185,6 +201,7 @@ const importFromBackend = async (
     const response = await fetch(
       privateKey ? `${BACKEND_V2_GET}${id}` : `${BACKEND_GET}${id}.json`,
     );
+
     if (!response.ok) {
       window.alert(t("alerts.importBackendFailed"));
       return {};
@@ -192,19 +209,19 @@ const importFromBackend = async (
     let data: ImportedDataState;
     if (privateKey) {
       const buffer = await response.arrayBuffer();
-      // Response contains both the IV (fixed length) and encrypted data
-      const iv = buffer.slice(0, IV_LENGTH_BYTES);
-      const encrypted = buffer.slice(IV_LENGTH_BYTES, buffer.byteLength);
 
-      const key = await getImportedKey(privateKey, "decrypt");
-      const decrypted = await window.crypto.subtle.decrypt(
-        {
-          name: "AES-GCM",
-          iv,
-        },
-        key,
-        encrypted,
-      );
+      let decrypted: ArrayBuffer;
+      try {
+        // Buffer should contain both the IV (fixed length) and encrypted data
+        const iv = buffer.slice(0, IV_LENGTH_BYTES);
+        const encrypted = buffer.slice(IV_LENGTH_BYTES, buffer.byteLength);
+        decrypted = await decryptImported(iv, encrypted, privateKey);
+      } catch (error) {
+        // Fixed IV (old format, backward compatibility)
+        const fixedIv = new Uint8Array(IV_LENGTH_BYTES);
+        decrypted = await decryptImported(fixedIv, buffer, privateKey);
+      }
+
       // We need to convert the decrypted array buffer to a string
       const string = new window.TextDecoder("utf-8").decode(
         new Uint8Array(decrypted) as any,
