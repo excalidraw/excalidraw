@@ -452,6 +452,8 @@ import { getElementsMap } from "@excalidraw/excalidraw";
 
 This function returns an object where each element is mapped to its id.
 
+**_The below api's will be available in [next version](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/CHANGELOG.md#unreleased)_**
+
 #### `restoreAppState`
 
 **_Signature_**
