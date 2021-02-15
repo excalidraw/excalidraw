@@ -252,51 +252,6 @@ export default function IndexPage() {
 | [`zenModeEnabled`](#zenModeEnabled) | boolean |  | This implies if the zen mode is enabled |
 | [`gridModeEnabled`](#gridModeEnabled) | boolean |  | This implies if the grid mode is enabled |
 
-### `Extra API's`
-
-#### `getSceneVersion`
-
-**How to use**
-
-<pre>
-import { getSceneVersion } from "@excalidraw/excalidraw";
-getSceneVersion(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>)
-</pre>
-
-This function returns the current scene version.
-
-#### `getSyncableElements`
-
-**_Signature_**
-
-<pre>
-getSyncableElements(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>):<a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>
-</pre>
-
-**How to use**
-
-```js
-import { getSyncableElements } from "@excalidraw/excalidraw";
-```
-
-This function returns all the deleted elements of the scene.
-
-### `getElementMap`
-
-**_Signature_**
-
-<pre>
-getElementsMap(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>): {[id: string]: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement</a>}
-</pre>
-
-**How to use**
-
-```js
-import { getElementsMap } from "@excalidraw/excalidraw";
-```
-
-This function returns an object where each element is mapped to its id.
-
 #### `width`
 
 This props defines the `width` of the Excalidraw component. Defaults to `window.innerWidth` if not passed.
@@ -451,3 +406,96 @@ This prop indicates whether the app is in `zen mode`. When supplied, the value t
 #### `gridModeEnabled`
 
 This prop indicates whether the shows the grid. When supplied, the value takes precedence over `intialData.appState.gridModeEnabled`, the grid will be fully controlled by the host app, and users won't be able to toggle it from within the app.
+
+### Extra API's
+
+#### `getSceneVersion`
+
+**How to use**
+
+<pre>
+import { getSceneVersion } from "@excalidraw/excalidraw";
+getSceneVersion(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>)
+</pre>
+
+This function returns the current scene version.
+
+#### `getSyncableElements`
+
+**_Signature_**
+
+<pre>
+getSyncableElements(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>):<a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>
+</pre>
+
+**How to use**
+
+```js
+import { getSyncableElements } from "@excalidraw/excalidraw";
+```
+
+This function returns all the deleted elements of the scene.
+
+### `getElementMap`
+
+**_Signature_**
+
+<pre>
+getElementsMap(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>): {[id: string]: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement</a>}
+</pre>
+
+**How to use**
+
+```js
+import { getElementsMap } from "@excalidraw/excalidraw";
+```
+
+This function returns an object where each element is mapped to its id.
+
+### `restoreAppState`
+
+**_Signature_**
+
+<pre>
+restoreAppState(appState:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L17">ImportedDataState["appState"]</a>, localAppState: Partial<<a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37">AppState</a>> | null): <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37">AppState</a>
+</pre>
+
+**_How to use_**
+
+```js
+import { restoreAppState } from "@excalidraw/excalidraw";
+```
+
+This function will make sure all the keys have appropriate values in [appState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37) and if any key is missing, it will be set to default value. If you pass `localAppState`, `localAppState` value will be preferred over the `appState` passed in params.
+
+### `restoreElements`
+
+**_Signature_**
+
+<pre>
+restoreElements(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L16">ImportedDataState["elements"]</a>): <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>
+</pre>
+
+**_How to use_**
+
+```js
+import { restoreElements } from "@excalidraw/excalidraw";
+```
+
+This function will make sure all properties of element is correctly set and if any attribute is missing, it will be set to default value.
+
+### `restore`
+
+**_Signature_**
+
+<pre>
+restoreElements(data:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L12">ImportedDataState</a>): <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L4">DataState</a>
+</pre>
+
+**_How to use_**
+
+```js
+import { restore } from "@excalidraw/excalidraw";
+```
+
+This function makes sure elements and state is set to appropriate values and set to default value if not present. It is combination of [restoreElements](#restoreElements) and [restoreAppState](#restoreAppState)
