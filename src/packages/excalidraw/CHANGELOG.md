@@ -14,6 +14,8 @@ Please add the latest change on the top under the correct section.
 
 ## [Unreleased]
 
+## Excalidraw API
+
 ### Features
 
 - Export [`restore`](https://github.com/excalidraw/excalidraw/blob/master/src/data/restore.ts#L182), [`restoreAppState`](https://github.com/excalidraw/excalidraw/blob/master/src/data/restore.ts#L144) and [`restoreElements`](https://github.com/excalidraw/excalidraw/blob/master/src/data/restore.ts#L128) to host

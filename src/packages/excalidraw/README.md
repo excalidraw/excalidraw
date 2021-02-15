@@ -436,7 +436,7 @@ import { getSyncableElements } from "@excalidraw/excalidraw";
 
 This function returns all the deleted elements of the scene.
 
-### `getElementMap`
+#### `getElementMap`
 
 **_Signature_**
 
@@ -452,7 +452,7 @@ import { getElementsMap } from "@excalidraw/excalidraw";
 
 This function returns an object where each element is mapped to its id.
 
-### `restoreAppState`
+#### `restoreAppState`
 
 **_Signature_**
 
@@ -468,7 +468,7 @@ import { restoreAppState } from "@excalidraw/excalidraw";
 
 This function will make sure all the keys have appropriate values in [appState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37) and if any key is missing, it will be set to default value. If you pass `localAppState`, `localAppState` value will be preferred over the `appState` passed in params.
 
-### `restoreElements`
+#### `restoreElements`
 
 **_Signature_**
 
@@ -484,7 +484,7 @@ import { restoreElements } from "@excalidraw/excalidraw";
 
 This function will make sure all properties of element is correctly set and if any attribute is missing, it will be set to default value.
 
-### `restore`
+#### `restore`
 
 **_Signature_**
 
