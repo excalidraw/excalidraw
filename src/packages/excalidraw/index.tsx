@@ -106,3 +106,4 @@ export {
   getElementMap,
 } from "../../element";
 export { defaultLang, languages } from "../../i18n";
+export { restore, restoreAppState, restoreElements } from "../../data/restore";
