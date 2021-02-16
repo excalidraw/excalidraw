@@ -1,8 +1,13 @@
 @import "../css/variables.module";
 
 .excalidraw {
+  &.excalidraw-modal-container {
+    position: absolute;
+    z-index: 10;
+  }
+
   .Modal {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     right: 0;
@@ -15,7 +20,7 @@
   }
 
   .Modal__background {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     right: 0;
@@ -82,7 +87,7 @@
     }
 
     .Modal__content {
-      position: fixed;
+      position: absolute;
       top: 0;
       left: 0;
       right: 0;

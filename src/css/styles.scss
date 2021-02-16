@@ -10,7 +10,6 @@
 .excalidraw {
   color: var(--text-primary-color);
   display: flex;
-  position: fixed;
   top: 0;
   bottom: 0;
   left: 0;
@@ -362,7 +361,6 @@
 
   .App-menu__left {
     overflow-y: auto;
-    max-height: calc(100vh - 236px);
   }
 
   .dropdown-select {
@@ -434,7 +432,7 @@
 
   .scroll-back-to-content {
     color: var(--popup-text-color);
-    position: fixed;
+    position: absolute;
     left: 50%;
     bottom: 30px;
     transform: translateX(-50%);

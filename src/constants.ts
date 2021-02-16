@@ -2,8 +2,8 @@ import { FontFamily } from "./element/types";
 
 export const APP_NAME = "Excalidraw";
 
-export const DRAGGING_THRESHOLD = 10; // 10px
-export const LINE_CONFIRM_THRESHOLD = 10; // 10px
+export const DRAGGING_THRESHOLD = 10; // px
+export const LINE_CONFIRM_THRESHOLD = 8; // px
 export const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
 export const ELEMENT_TRANSLATE_AMOUNT = 1;
 export const TEXT_TO_CENTER_SNAP_THRESHOLD = 30;
@@ -47,6 +47,7 @@ export enum EVENT {
   TOUCH_END = "touchend",
   HASHCHANGE = "hashchange",
   VISIBILITY_CHANGE = "visibilitychange",
+  SCROLL = "scroll",
 }
 
 export const ENV = {
@@ -92,6 +93,7 @@ export const TOUCH_CTX_MENU_TIMEOUT = 500;
 export const TITLE_TIMEOUT = 10000;
 export const TOAST_TIMEOUT = 5000;
 export const VERSION_TIMEOUT = 30000;
+export const SCROLL_TIMEOUT = 500;
 
 export const ZOOM_STEP = 0.1;
 
