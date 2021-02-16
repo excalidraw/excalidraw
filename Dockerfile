@@ -3,7 +3,7 @@ FROM node:14-alpine AS build
 WORKDIR /opt/node_app
 
 COPY package.json yarn.lock ./
-RUN yarn
+RUN yarn --ignore-optional
 
 ARG NODE_ENV=production
 
