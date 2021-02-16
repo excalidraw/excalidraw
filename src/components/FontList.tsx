@@ -3,7 +3,7 @@ import "./FontList.scss";
 const FONTS = [
   { name: "Virgil" },
   { name: "Architects Daughter", path: "/fonts/ArchitectsDaughter.ttf" },
-  { name: "BLOKLETTERS", path: "/fonts/Blokletters-Potlood.ttf" },
+  { name: "Blokletters", path: "/fonts/Blokletters-Potlood.ttf" },
   { name: "Caveat", path: "/fonts/Caveat-VariableFont_wght.ttf" },
   { name: "Comic Relief", path: "/fonts/ComicRelief.ttf" },
   { name: "Fewriter", path: "/fonts/fewriter_memesbruh03.ttf" },
