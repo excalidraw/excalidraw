@@ -73,7 +73,7 @@
     &__footer {
       position: absolute;
       z-index: 100;
-      bottom: 0px;
+      bottom: 0;
 
       :root[dir="ltr"] & {
         right: 0;
@@ -94,7 +94,7 @@
       }
 
       :root[dir="ltr"] &.transition-right {
-        transform: translate(999px, 0px);
+        transform: translate(999px, 0);
       }
 
       :root[dir="rtl"] &.transition-left {

@@ -4,13 +4,13 @@
   .context-menu {
     position: relative;
     border-radius: 4px;
-    box-shadow: 0px 3px 10px transparentize($oc-black, 0.8);
+    box-shadow: 0 3px 10px transparentize($oc-black, 0.8);
     padding: 0;
     list-style: none;
     user-select: none;
     margin: -0.25rem 0 0 0.125rem;
     padding: 0.5rem 0;
-    background-color: var(--popup-secondary-background-color);
+    background-color: var(--popup-secondary-bg-color);
     border: 1px solid var(--button-gray-3);
     cursor: default;
   }
@@ -61,12 +61,12 @@
   }
 
   .context-menu-option:hover {
-    color: var(--popup-background-color);
+    color: var(--popup-bg-color);
     background-color: var(--select-highlight-color);
 
     &.dangerous {
       .context-menu-option__label {
-        color: var(--popup-background-color);
+        color: var(--popup-bg-color);
       }
       background-color: $oc-red-6;
     }
