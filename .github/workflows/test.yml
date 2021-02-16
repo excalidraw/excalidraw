@@ -16,5 +16,5 @@ jobs:
 
       - name: Install and test
         run: |
-          npm ci
-          npm run test:app
+          yarn
+          yarn test:app

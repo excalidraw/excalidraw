@@ -16,7 +16,7 @@ jobs:
 
       - name: Install and lint
         run: |
-          npm ci
-          npm run test:other
-          npm run test:code
-          npm run test:typecheck
+          yarn
+          yarn test:other
+          yarn test:code
+          yarn test:typecheck
