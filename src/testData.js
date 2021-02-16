@@ -28,7 +28,7 @@ export default {
       fontSize: 20,
       fontFamily: 1,
       text:
-        "Latin\nPack my box with five dozen liquor jugs\nPACK MY BOX WITH FIVE DOZEN LIQUOR JUGS\npack my box with five dozen liquor jugs\n\n[ ] ( ) < > ? ! . , ; ' \" @ # $ € % ^ & * ~ ` / \\\n0 1 2 3 4 5 6 7 8 9",
+        "Latin\nPack my box with five dozen liquor jugs\nPACK MY BOX WITH FIVE DOZEN LIQUOR JUGS\npack my box with five dozen liquor jugs\nVocê faz parte do meu coração.\nUn Cœur. Un maïs\n\n\n[ ] ( ) < > ? ! . , ; ' \" @ # $ € % ^ & * ~ ` / \\\n0 1 2 3 4 5 6 7 8 9",
       baseline: 168,
       textAlign: "center",
       verticalAlign: "top",
