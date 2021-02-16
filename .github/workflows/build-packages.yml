@@ -26,8 +26,8 @@ jobs:
 
       - name: Build @excalidraw/excalidraw
         run: |
-          yarn --cwd src/packages/excalidraw pack
+          yarn --cwd src/packages/excalidraw run pack
 
       - name: Build @excalidraw/utils
         run: |
-          yarn --cwd src/packages/utils pack
+          yarn --cwd src/packages/utils run pack

@@ -8,7 +8,7 @@ RUN npm i --no-optional
 ARG NODE_ENV=production
 
 COPY . .
-RUN npm run build:app:docker
+RUN yarn build:app:docker
 
 FROM nginx:1.17-alpine
 
