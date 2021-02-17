@@ -92,7 +92,7 @@
     "centerHorizontally": "מרכז אופקית",
     "distributeHorizontally": "חלוקה אופקית",
     "distributeVertically": "חלוקה אנכית",
-    "viewMode": ""
+    "viewMode": "מצב תצוגה"
   },
   "buttons": {
     "clearReset": "אפס את הלוח",
@@ -117,7 +117,7 @@
     "edit": "ערוך",
     "undo": "בטל",
     "redo": "בצע מחדש",
-    "resetLibrary": "",
+    "resetLibrary": "איפוס ספריה",
     "createNewRoom": "צור חדר",
     "fullScreen": "מסך מלא",
     "darkMode": "מצב כהה",
@@ -203,25 +203,25 @@
     "title": "שגיאה"
   },
   "helpDialog": {
-    "blog": "",
-    "click": "",
+    "blog": "קרא את הבלוג שלנו",
+    "click": "קליק",
     "curvedArrow": "",
     "curvedLine": "",
-    "documentation": "",
-    "drag": "",
-    "editor": "",
-    "github": "",
-    "howto": "",
-    "or": "",
+    "documentation": "תיעוד",
+    "drag": "לגרור",
+    "editor": "עורך",
+    "github": "מצאת בעיה? דווח",
+    "howto": "עקוב אחר המדריכים שלנו",
+    "or": "או",
     "preventBinding": "",
-    "shapes": "",
-    "shortcuts": "",
-    "textFinish": "",
-    "textNewLine": "",
-    "title": "",
-    "view": "",
+    "shapes": "צורות",
+    "shortcuts": "קיצורי מקלדת",
+    "textFinish": "סיים עריכה (טקסט)",
+    "textNewLine": "הוסף שורה חדשה (טקסט)",
+    "title": "עזרה",
+    "view": "תצוגה",
     "zoomToFit": "",
-    "zoomToSelection": ""
+    "zoomToSelection": "התמקד בבחירה"
   },
   "encrypted": {
     "tooltip": "הרישומים שלך מוצפנים מקצה לקצה כך שהשרתים של Excalidraw לא יראו אותם לעולם."
@@ -237,15 +237,15 @@
     "title": "סטטיסטיקות לחנונים",
     "total": "סה״כ",
     "version": "",
-    "versionCopy": "",
+    "versionCopy": "לחץ להעתקה",
     "versionNotAvailable": "",
     "width": "רוחב"
   },
   "toast": {
-    "copyStyles": "",
+    "copyStyles": "העתק סגנונות.",
     "copyToClipboard": "",
     "copyToClipboardAsPng": "",
-    "fileSaved": "",
+    "fileSaved": "קובץ נשמר.",
     "fileSavedToFilename": ""
   }
 }
