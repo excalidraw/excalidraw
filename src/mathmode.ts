@@ -1,6 +1,8 @@
 // Some imports
 import { FontString } from "./element/types";
 import { measureText } from "./utils";
+import { ExcalidrawTextElement } from "./element/types";
+import { mutateElement } from "./element/mutateElement";
 
 // MathJax components we use
 import { AsciiMath } from "mathjax-full/js/input/asciimath.js";
@@ -58,7 +60,7 @@ const loadMathJax = () => {
 // Cache the SVGs from MathJax
 const mathJaxSvgCache = {} as StringMap;
 
-const math2Svg = (text: string) => {
+const math2Svg = (text: string, useTex: boolean) => {
   if (mathJaxSvgCache[text]) {
     return mathJaxSvgCache[text];
   }
@@ -66,7 +68,7 @@ const math2Svg = (text: string) => {
   try {
     const userOptions = { display: false };
     const htmlString = mathJax.adaptor.innerHTML(
-      _useTex
+      useTex
         ? mathJax.texHtml.convert(text, userOptions)
         : mathJax.amHtml.convert(text, userOptions),
     );
@@ -79,15 +81,15 @@ const math2Svg = (text: string) => {
 
 export { getFontString } from "./utils";
 
-export const markupText = (text: string) => {
+export const markupText = (text: string, useTex: boolean) => {
   const lines = text.replace(/\r\n?/g, "\n").split("\n");
   let htmlString = "";
   for (let index = 0; index < lines.length; index++) {
     htmlString += `<p style="margin: 0px;">`;
-    const lineArray = lines[index].split(_useTex ? "$$" : "`");
+    const lineArray = lines[index].split(useTex ? "$$" : "`");
     for (let i = 0; i < lineArray.length; i++) {
       if (i % 2 === 1) {
-        htmlString += math2Svg(lineArray[i]);
+        htmlString += math2Svg(lineArray[i], useTex);
       } else {
         htmlString += lineArray[i];
       }
@@ -178,13 +180,8 @@ export const drawHtmlOnCanvas = (
   });
 };
 
-export const containsMath = (text: string) => {
-  const delimiter = (_useTex ? "\\$\\$" : "`") as string;
-  return text.search(delimiter) >= 0;
-};
-
-export const inverseContainsMath = (text: string) => {
-  const delimiter = (!_useTex ? "\\$\\$" : "`") as string;
+export const containsMath = (text: string, useTex: boolean) => {
+  const delimiter = (useTex ? "\\$\\$" : "`") as string;
   return text.search(delimiter) >= 0;
 };
 
@@ -192,11 +189,19 @@ export const isMathMode = (fontString: FontString) => {
   return fontString.search("Helvetica") >= 0;
 };
 
-export const measureMath = (text: string, fontString: FontString) => {
-  const htmlString = markupText(text);
+export const measureMath = (
+  text: string,
+  fontString: FontString,
+  useTex: boolean,
+) => {
+  const htmlString = markupText(text, useTex);
   const metrics =
-    isMathMode(fontString) && containsMath(text)
+    isMathMode(fontString) && containsMath(text, useTex)
       ? measureMarkup(htmlString, fontString)
       : measureText(text, fontString);
   return metrics;
+};
+
+export const toggleUseTex = (element: ExcalidrawTextElement) => {
+  mutateElement(element, { useTex: !element.useTex });
 };

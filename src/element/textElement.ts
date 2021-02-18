@@ -3,7 +3,11 @@ import { ExcalidrawTextElement } from "./types";
 import { mutateElement } from "./mutateElement";
 
 export const redrawTextBoundingBox = (element: ExcalidrawTextElement) => {
-  const metrics = measureMath(element.text, getFontString(element));
+  const metrics = measureMath(
+    element.text,
+    getFontString(element),
+    element.useTex,
+  );
   mutateElement(element, {
     width: metrics.width,
     height: metrics.height,

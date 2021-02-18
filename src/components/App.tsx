@@ -185,12 +185,12 @@ import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import {
   measureMath,
-  inverseContainsMath,
   containsMath,
   isMathMode,
   getFontString,
   getUseTex,
   setUseTex,
+  toggleUseTex,
 } from "../mathmode";
 
 const { history } = createHistory();
@@ -1333,25 +1333,72 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
     }
 
+    // If the keystroke is the Text-tool digit with the Shift key and
+    // we are not in text-editing/entry mode, proceed to toggle useTex.
+    const intKey = ")!@#$%^&*(".indexOf(event.key);
     if (
-      event.key.toLowerCase() === KEYS.T &&
+      intKey >= 0 &&
+      findShapeByKey(intKey.toString()) === "text" &&
       event.shiftKey &&
       !(this.state.editingElement && isTextElement(this.state.editingElement))
     ) {
-      setUseTex(!getUseTex());
-      this.scene.getElementsIncludingDeleted().forEach((element) => {
-        if (
-          isTextElement(element) &&
-          isMathMode(getFontString(element)) &&
-          (containsMath(element.text) || inverseContainsMath(element.text))
-        ) {
-          invalidateShapeForElement(element);
-          const metrics = measureMath(element.text, getFontString(element));
-          mutateElement(element, metrics);
+      const selectedElements = getSelectedElements(
+        this.scene.getElements(),
+        this.state,
+      );
+      // Require the "Control" key to toggle Latex/AsciiMath so no one
+      // toggles by accidentally typing "Shift 8" (i.e. '*') without
+      // being in text-editing/entry mode.
+      if (event.ctrlKey) {
+        history.resumeRecording();
+        let rerenderScene = false;
+        selectedElements.forEach((element) => {
+          // Only operate on selected elements which are text elements in
+          // math made containing math content.
+          if (
+            isTextElement(element) &&
+            isMathMode(getFontString(element)) &&
+            (containsMath(element.text, element.useTex) ||
+              containsMath(element.text, !element.useTex))
+          ) {
+            toggleUseTex(element);
+            // Mark the element for re-rendering
+            invalidateShapeForElement(element);
+            // Update the width/height of the element
+            const metrics = measureMath(
+              element.text,
+              getFontString(element),
+              element.useTex,
+            );
+            mutateElement(element, metrics);
+            // Tell the app to re-render the scene
+            rerenderScene = true;
+            // if only one element is selected, use the element's updated
+            // useTex value to set the default value for new text elements
+            if (selectedElements.length === 1) {
+              setUseTex(element.useTex);
+            }
+          }
+        });
+        if (rerenderScene) {
+          // Only re-render the scene once
+          this.setState({});
         }
-      });
-      this.setState({});
-      window.alert(t("alerts.tex", { useTex: `${getUseTex()}` }));
+      } else if (selectedElements.length < 2) {
+        // Only report anything if at most one element is selected, to avoid confusion.
+        // If only one element is selected and that element is a text element,
+        // then report that element's useTex value; otherwise report the default
+        // value for new text elements.
+        const usingTex =
+          selectedElements.length === 1 && isTextElement(selectedElements[0])
+            ? selectedElements[0].useTex
+            : getUseTex();
+        if (usingTex) {
+          window.alert(t("alerts.useTexTrue"));
+        } else {
+          window.alert(t("alerts.useTexFalse"));
+        }
+      }
     }
     if (
       (isWritableElement(event.target) && event.key !== KEYS.ESCAPE) ||

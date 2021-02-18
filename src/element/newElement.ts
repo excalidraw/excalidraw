@@ -1,3 +1,4 @@
+import { getUseTex } from "../mathmode";
 import {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -111,9 +112,11 @@ export const newTextElement = (
     fontFamily: FontFamily;
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
+    useTex?: boolean;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
-  const metrics = measureMath(opts.text, getFontString(opts));
+  const useTex = opts.useTex !== undefined ? opts.useTex : getUseTex();
+  const metrics = measureMath(opts.text, getFontString(opts), useTex);
   const offsets = getTextElementPositionOffsets(opts, metrics);
   const textElement = newElementWith(
     {
@@ -128,6 +131,7 @@ export const newTextElement = (
       width: metrics.width,
       height: metrics.height,
       baseline: metrics.baseline,
+      useTex,
     },
     {},
   );
@@ -148,14 +152,18 @@ const getAdjustedDimensions = (
     width: nextWidth,
     height: nextHeight,
     baseline: nextBaseline,
-  } = measureMath(nextText, getFontString(element));
+  } = measureMath(nextText, getFontString(element), element.useTex);
   const { textAlign, verticalAlign } = element;
 
   let x: number;
   let y: number;
 
   if (textAlign === "center" && verticalAlign === "middle") {
-    const prevMetrics = measureMath(element.text, getFontString(element));
+    const prevMetrics = measureMath(
+      element.text,
+      getFontString(element),
+      element.useTex,
+    );
     const offsets = getTextElementPositionOffsets(element, {
       width: nextWidth - prevMetrics.width,
       height: nextHeight - prevMetrics.height,

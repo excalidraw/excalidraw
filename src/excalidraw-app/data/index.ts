@@ -42,12 +42,14 @@ export type SocketUpdateDataSource = {
     type: "SCENE_INIT";
     payload: {
       elements: readonly ExcalidrawElement[];
+      useTex: boolean;
     };
   };
   SCENE_UPDATE: {
     type: "SCENE_UPDATE";
     payload: {
       elements: readonly ExcalidrawElement[];
+      useTex: boolean;
     };
   };
   MOUSE_LOCATION: {

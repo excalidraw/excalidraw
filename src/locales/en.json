@@ -126,7 +126,8 @@
     "exitZenMode": "Exit zen mode"
   },
   "alerts": {
-    "tex": "Using Latex for math mode: {{useTex}}.",
+    "useTexTrue": "Using Latex for math mode.",
+    "useTexFalse": "Using AsciiMath for math mode.",
     "clearReset": "This will clear the whole canvas. Are you sure?",
     "couldNotCreateShareableLink": "Couldn't create shareable link.",
     "couldNotCreateShareableLinkTooBig": "Couldn't create shareable link: the scene is too big",

@@ -1,3 +1,4 @@
+import { setUseTex } from "../../mathmode";
 import throttle from "lodash.throttle";
 import React, { PureComponent } from "react";
 import { ExcalidrawImperativeAPI } from "../../components/App";
@@ -305,6 +306,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
               const reconciledElements = this.reconcileElements(remoteElements);
               this.handleRemoteSceneUpdate(reconciledElements, {
                 init: true,
+                useTex: decryptedData.payload.useTex,
               });
               // noop if already resolved via init from firebase
               scenePromise.resolve({ elements: reconciledElements });
@@ -314,6 +316,9 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
           case SCENE.UPDATE:
             this.handleRemoteSceneUpdate(
               this.reconcileElements(decryptedData.payload.elements),
+              {
+                useTex: decryptedData.payload.useTex,
+              },
             );
             break;
           case "MOUSE_LOCATION": {
@@ -444,8 +449,10 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     {
       init = false,
       initFromSnapshot = false,
-    }: { init?: boolean; initFromSnapshot?: boolean } = {},
+      useTex = true,
+    }: { init?: boolean; initFromSnapshot?: boolean; useTex?: boolean } = {},
   ) => {
+    setUseTex(useTex);
     if (init || initFromSnapshot) {
       this.excalidrawAPI.setScrollToCenter(elements);
     }

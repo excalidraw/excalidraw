@@ -1,3 +1,4 @@
+import { getUseTex } from "../../mathmode";
 import {
   encryptAESGEM,
   SocketUpdateData,
@@ -109,6 +110,7 @@ class Portal {
       type: sceneType,
       payload: {
         elements: syncableElements,
+        useTex: getUseTex(),
       },
     };
 

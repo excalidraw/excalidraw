@@ -158,25 +158,23 @@ const drawElementOnCanvas = (
           // to the DOM
           document.body.appendChild(context.canvas);
         }
-        if (isMathMode(getFontString(element)) && containsMath(element.text)) {
-          const htmlString = markupText(element.text);
+        if (
+          isMathMode(getFontString(element)) &&
+          containsMath(element.text, element.useTex)
+        ) {
+          const htmlString = markupText(element.text, element.useTex);
 
           const scaledPadding = CANVAS_PADDING * Math.pow(zoom.value, 2);
           const scaledFontSize =
             element.fontSize * zoom.value * window.devicePixelRatio;
-          const scaledFontString = getFontString({
-            fontSize: scaledFontSize,
-            fontFamily: element.fontFamily,
-          });
-          const scaledMetrics = measureMarkup(htmlString, scaledFontString);
 
           promise = drawHtmlOnCanvas(
             context,
             htmlString,
             scaledPadding,
             scaledPadding,
-            scaledMetrics.width,
-            scaledMetrics.height,
+            context.canvas.width,
+            context.canvas.height,
             scaledFontSize,
             getFontFamilyString(element),
             element.strokeColor,
@@ -593,7 +591,7 @@ export const renderElement = (
           if (
             isTextElement(element) &&
             isMathMode(getFontString(element)) &&
-            containsMath(element.text)
+            containsMath(element.text, element.useTex)
           ) {
             const tempCanvas = document.createElement("canvas");
             tempCanvas.width =
@@ -720,12 +718,16 @@ export const renderElementToSvg = (
             offsetY || 0
           }) rotate(${degree} ${cx} ${cy})`,
         );
-        if (isMathMode(getFontString(element)) && containsMath(element.text)) {
+        if (
+          isMathMode(getFontString(element)) &&
+          containsMath(element.text, element.useTex)
+        ) {
           const svg = svgRoot.ownerDocument!.createElementNS(SVG_NS, "svg");
-          const htmlString = markupText(element.text);
+          const htmlString = markupText(element.text, element.useTex);
           const metrics = measureMarkup(htmlString, getFontString(element));
           svg.setAttribute("width", `${metrics.width}`);
           svg.setAttribute("height", `${metrics.height}`);
+          svg.setAttribute("color", `${element.strokeColor}`);
           svg.innerHTML = encapsulateHtml(
             element.fontSize,
             getFontFamilyString(element),
