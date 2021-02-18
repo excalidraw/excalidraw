@@ -86,6 +86,12 @@ Try out [`@excalidraw/excalidraw`](https://www.npmjs.com/package/@excalidraw/exc
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
+#### Requirements
+
+- [Node.js](https://nodejs.org/en/)
+- [Yarn](https://yarnpkg.com/getting-started/install)
+- [Git](https://git-scm.com/downloads)
+
 #### Clone the repo
 
 ```bash
