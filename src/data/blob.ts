@@ -106,7 +106,6 @@ export const loadFromBlob = async (
             ? calculateScrollCenter(data.elements || [], localAppState, null)
             : {}),
         },
-        useTex: data.useTex !== undefined ? data.useTex : true,
       },
       localAppState,
     );

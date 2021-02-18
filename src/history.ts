@@ -6,7 +6,6 @@ import { deepCopyElement } from "./element/newElement";
 export interface HistoryEntry {
   appState: ReturnType<typeof clearAppStatePropertiesForHistory>;
   elements: ExcalidrawElement[];
-  useTex: boolean;
 }
 
 interface DehydratedExcalidrawElement {
@@ -17,7 +16,6 @@ interface DehydratedExcalidrawElement {
 interface DehydratedHistoryEntry {
   appState: string;
   elements: DehydratedExcalidrawElement[];
-  useTex: boolean;
 }
 
 const clearAppStatePropertiesForHistory = (appState: AppState) => {
@@ -40,7 +38,6 @@ export class SceneHistory {
   private hydrateHistoryEntry({
     appState,
     elements,
-    useTex,
   }: DehydratedHistoryEntry): HistoryEntry {
     return {
       appState: JSON.parse(appState),
@@ -55,14 +52,12 @@ export class SceneHistory {
         }
         return element;
       }),
-      useTex,
     };
   }
 
   private dehydrateHistoryEntry({
     appState,
     elements,
-    useTex,
   }: HistoryEntry): DehydratedHistoryEntry {
     return {
       appState: JSON.stringify(appState),
@@ -79,7 +74,6 @@ export class SceneHistory {
           versionNonce: element.versionNonce,
         };
       }),
-      useTex,
     };
   }
 
@@ -105,7 +99,6 @@ export class SceneHistory {
   private generateEntry = (
     appState: AppState,
     elements: readonly ExcalidrawElement[],
-    useTex: boolean,
   ): DehydratedHistoryEntry =>
     this.dehydrateHistoryEntry({
       appState: clearAppStatePropertiesForHistory(appState),
@@ -138,7 +131,6 @@ export class SceneHistory {
         }
         return elements;
       }, [] as Mutable<typeof elements>),
-      useTex,
     });
 
   shouldCreateEntry(nextEntry: HistoryEntry): boolean {
@@ -166,10 +158,6 @@ export class SceneHistory {
       }
     }
 
-    if (nextEntry.useTex !== lastEntry.useTex) {
-      return true;
-    }
-
     // note: this is safe because entry's appState is guaranteed no excess props
     let key: keyof typeof nextEntry.appState;
     for (key in nextEntry.appState) {
@@ -192,12 +180,8 @@ export class SceneHistory {
     return false;
   }
 
-  pushEntry(
-    appState: AppState,
-    elements: readonly ExcalidrawElement[],
-    useTex: boolean,
-  ) {
-    const newEntryDehydrated = this.generateEntry(appState, elements, useTex);
+  pushEntry(appState: AppState, elements: readonly ExcalidrawElement[]) {
+    const newEntryDehydrated = this.generateEntry(appState, elements);
     const newEntry: HistoryEntry = this.hydrateHistoryEntry(newEntryDehydrated);
 
     if (newEntry) {
@@ -257,13 +241,9 @@ export class SceneHistory {
    *  because the action potentially mutates appState/elements before storing
    *  it.
    */
-  setCurrentState(
-    appState: AppState,
-    elements: readonly ExcalidrawElement[],
-    useTex: boolean,
-  ) {
+  setCurrentState(appState: AppState, elements: readonly ExcalidrawElement[]) {
     this.lastEntry = this.hydrateHistoryEntry(
-      this.generateEntry(appState, elements, useTex),
+      this.generateEntry(appState, elements),
     );
   }
 
@@ -272,13 +252,9 @@ export class SceneHistory {
     this.recording = true;
   }
 
-  record(
-    state: AppState,
-    elements: readonly ExcalidrawElement[],
-    useTex: boolean,
-  ) {
+  record(state: AppState, elements: readonly ExcalidrawElement[]) {
     if (this.recording) {
-      this.pushEntry(state, elements, useTex);
+      this.pushEntry(state, elements);
       this.recording = false;
     }
   }

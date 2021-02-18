@@ -1,4 +1,3 @@
-import { getUseTex } from "./mathmode";
 import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -15,7 +14,6 @@ type ElementsClipboard = {
   type: typeof TYPE_ELEMENTS;
   created: number;
   elements: ExcalidrawElement[];
-  useTex: boolean;
 };
 
 let CLIPBOARD = "";
@@ -48,7 +46,6 @@ export const copyToClipboard = async (
     type: TYPE_ELEMENTS,
     created: Date.now(),
     elements: getSelectedElements(elements, appState),
-    useTex: getUseTex(),
   };
   const json = JSON.stringify(contents);
   CLIPBOARD = json;
@@ -113,7 +110,6 @@ export const parseClipboard = async (
   elements?: readonly ExcalidrawElement[];
   text?: string;
   errorMessage?: string;
-  useTex?: boolean;
 }> => {
   const systemClipboard = await getSystemClipboard(event);
 
@@ -141,10 +137,7 @@ export const parseClipboard = async (
       (!appClipboardData?.created ||
         appClipboardData.created < systemClipboardData.created)
     ) {
-      return {
-        elements: systemClipboardData.elements,
-        useTex: systemClipboardData.useTex,
-      };
+      return { elements: systemClipboardData.elements };
     }
     // in-app clipboard is newer than system clipboard
     return appClipboardData;

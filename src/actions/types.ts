@@ -9,7 +9,6 @@ export type ActionResult =
       appState?: MarkOptional<AppState, "offsetTop" | "offsetLeft"> | null;
       commitToHistory: boolean;
       syncHistory?: boolean;
-      useTex?: boolean;
     }
   | false;
 

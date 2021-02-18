@@ -192,6 +192,5 @@ export const restore = (
   return {
     elements: restoreElements(data?.elements),
     appState: restoreAppState(data?.appState, localAppState || null),
-    useTex: data && data.useTex !== undefined ? data.useTex : true,
   };
 };
