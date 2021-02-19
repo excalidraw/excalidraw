@@ -76,6 +76,9 @@
     "transformIgnorePatterns": [
       "node_modules/(?!(roughjs|points-on-curve|path-data-parser|points-on-path|browser-fs-access)/)"
     ],
+    "moduleNameMapper": {
+      "^worker-loader!.+": "<rootDir>/src/__mocks__/worker-mock.js"
+    },
     "resetMocks": false
   },
   "name": "excalidraw",
