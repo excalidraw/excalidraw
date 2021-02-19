@@ -181,14 +181,18 @@ function ExcalidrawWrapper() {
     }
 
     initializeScene({ collabAPI }).then((scene) => {
-      setViewModeEnabled(!!scene?.appState?.viewModeEnabled);
+      if (scene?.appState?.viewModeEnabled) {
+        setViewModeEnabled(true);
+      }
       initialStatePromiseRef.current.promise.resolve(scene);
     });
 
     const onHashChange = (_: HashChangeEvent) => {
       initializeScene({ collabAPI }).then((scene) => {
         if (scene) {
-          setViewModeEnabled(!!scene.appState?.viewModeEnabled);
+          if (scene?.appState?.viewModeEnabled) {
+            setViewModeEnabled(true);
+          }
           excalidrawAPI.updateScene(scene);
         }
       });
@@ -282,7 +286,6 @@ function ExcalidrawWrapper() {
     },
     [langCode],
   );
-
   return (
     <>
       <Excalidraw
@@ -297,7 +300,7 @@ function ExcalidrawWrapper() {
         onExportToBackend={onExportToBackend}
         renderFooter={renderFooter}
         langCode={langCode}
-        viewModeEnabled={viewModeEnabled}
+        viewModeEnabled={viewModeEnabled ? viewModeEnabled : undefined}
       />
       {excalidrawAPI && <CollabWrapper excalidrawAPI={excalidrawAPI} />}
       {errorMessage && (
