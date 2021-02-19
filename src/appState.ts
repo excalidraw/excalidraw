@@ -42,7 +42,7 @@ export const getDefaultAppState = (): Omit<
     exportEmbedScene: false,
     fileHandle: null,
     gridSize: null,
-    height: window.innerHeight,
+    height: globalThis.innerHeight,
     isBindingEnabled: true,
     isLibraryOpen: false,
     isLoading: false,
@@ -69,10 +69,11 @@ export const getDefaultAppState = (): Omit<
     suggestedBindings: [],
     toastMessage: null,
     viewBackgroundColor: oc.white,
-    width: window.innerWidth,
+    width: globalThis.innerWidth,
     zenModeEnabled: false,
     zoom: { value: 1 as NormalizedZoomValue, translation: { x: 0, y: 0 } },
     viewModeEnabled: false,
+    isMinimapEnabled: false,
   };
 };
 
@@ -153,6 +154,7 @@ const APP_STATE_STORAGE_CONF = (<
   zenModeEnabled: { browser: true, export: false },
   zoom: { browser: true, export: false },
   viewModeEnabled: { browser: false, export: false },
+  isMinimapEnabled: { browser: true, export: false },
 });
 
 const _clearAppStateForStorage = <ExportType extends "export" | "browser">(

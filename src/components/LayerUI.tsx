@@ -602,6 +602,7 @@ const LayerUI = ({
       >
         {renderCustomFooter?.(false)}
         {actionManager.renderAction("toggleShortcuts")}
+        {actionManager.renderAction("toggleMinimap")}
       </div>
       <button
         className={clsx("disable-zen-mode", {

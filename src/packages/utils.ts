@@ -48,6 +48,9 @@ export const exportToBlob = (
   },
 ): Promise<Blob | null> => {
   const canvas = exportToCanvas(opts);
+  if (canvas instanceof OffscreenCanvas) {
+    return Promise.resolve(null);
+  }
 
   let { mimeType = "image/png", quality } = opts;
 

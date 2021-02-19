@@ -9,7 +9,7 @@
  * @param {Number} radius The corner radius
  */
 export const roundRect = (
-  context: CanvasRenderingContext2D,
+  context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
   x: number,
   y: number,
   width: number,

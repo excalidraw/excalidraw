@@ -115,7 +115,7 @@ const generateElementCanvas = (
 const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
-  context: CanvasRenderingContext2D,
+  context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
 ) => {
   context.globalAlpha = element.opacity / 100;
   switch (element.type) {
@@ -136,13 +136,16 @@ const drawElementOnCanvas = (
     default: {
       if (isTextElement(element)) {
         const rtl = isRTL(element.text);
-        const shouldTemporarilyAttach = rtl && !context.canvas.isConnected;
-        if (shouldTemporarilyAttach) {
-          // to correctly render RTL text mixed with LTR, we have to append it
-          // to the DOM
-          document.body.appendChild(context.canvas);
+        let shouldTemporarilyAttach = false;
+        if (!(context instanceof OffscreenCanvasRenderingContext2D)) {
+          shouldTemporarilyAttach = rtl && !context.canvas.isConnected;
+          if (shouldTemporarilyAttach) {
+            // to correctly render RTL text mixed with LTR, we have to append it
+            // to the DOM
+            document.body.appendChild(context.canvas);
+          }
+          context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
         }
-        context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
         const font = context.font;
         context.font = getFontString(element);
         const fillStyle = context.fillStyle;
@@ -170,7 +173,10 @@ const drawElementOnCanvas = (
         context.fillStyle = fillStyle;
         context.font = font;
         context.textAlign = textAlign;
-        if (shouldTemporarilyAttach) {
+        if (
+          shouldTemporarilyAttach &&
+          !(context instanceof OffscreenCanvasRenderingContext2D)
+        ) {
           context.canvas.remove();
         }
       } else {
@@ -451,7 +457,7 @@ const generateElementWithCanvas = (
 const drawElementFromCanvas = (
   elementWithCanvas: ExcalidrawElementWithCanvas,
   rc: RoughCanvas,
-  context: CanvasRenderingContext2D,
+  context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
   sceneState: SceneState,
 ) => {
   const element = elementWithCanvas.element;
@@ -482,7 +488,7 @@ const drawElementFromCanvas = (
 export const renderElement = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
-  context: CanvasRenderingContext2D,
+  context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
   renderOptimizations: boolean,
   sceneState: SceneState,
 ) => {

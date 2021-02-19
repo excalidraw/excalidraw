@@ -53,7 +53,7 @@ import { UserIdleState } from "../excalidraw-app/collab/types";
 const hasEmojiSupport = supportsEmoji();
 
 const strokeRectWithRotation = (
-  context: CanvasRenderingContext2D,
+  context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
   x: number,
   y: number,
   width: number,
@@ -74,7 +74,7 @@ const strokeRectWithRotation = (
 };
 
 const strokeDiamondWithRotation = (
-  context: CanvasRenderingContext2D,
+  context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
   width: number,
   height: number,
   cx: number,
@@ -95,7 +95,7 @@ const strokeDiamondWithRotation = (
 };
 
 const strokeEllipseWithRotation = (
-  context: CanvasRenderingContext2D,
+  context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
   width: number,
   height: number,
   cx: number,
@@ -108,7 +108,7 @@ const strokeEllipseWithRotation = (
 };
 
 const fillCircle = (
-  context: CanvasRenderingContext2D,
+  context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
   cx: number,
   cy: number,
   radius: number,
@@ -120,7 +120,7 @@ const fillCircle = (
 };
 
 const strokeGrid = (
-  context: CanvasRenderingContext2D,
+  context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
   gridSize: number,
   offsetX: number,
   offsetY: number,
@@ -143,7 +143,7 @@ const strokeGrid = (
 };
 
 const renderLinearPointHandles = (
-  context: CanvasRenderingContext2D,
+  context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
   appState: AppState,
   sceneState: SceneState,
   element: NonDeleted<ExcalidrawLinearElement>,
@@ -182,7 +182,7 @@ export const renderScene = (
   selectionElement: NonDeletedExcalidrawElement | null,
   scale: number,
   rc: RoughCanvas,
-  canvas: HTMLCanvasElement,
+  canvas: HTMLCanvasElement | OffscreenCanvas,
   sceneState: SceneState,
   // extra options, currently passed by export helper
   {
@@ -573,7 +573,7 @@ export const renderScene = (
 };
 
 const renderTransformHandles = (
-  context: CanvasRenderingContext2D,
+  context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
   sceneState: SceneState,
   transformHandles: TransformHandles,
   angle: number,
@@ -609,7 +609,7 @@ const renderTransformHandles = (
 };
 
 const renderSelectionBorder = (
-  context: CanvasRenderingContext2D,
+  context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
   sceneState: SceneState,
   elementProperties: {
     angle: number;
@@ -671,7 +671,7 @@ const renderSelectionBorder = (
 };
 
 const renderBindingHighlight = (
-  context: CanvasRenderingContext2D,
+  context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
   sceneState: SceneState,
   suggestedBinding: SuggestedBinding,
 ) => {
@@ -693,7 +693,7 @@ const renderBindingHighlight = (
 };
 
 const renderBindingHighlightForBindableElement = (
-  context: CanvasRenderingContext2D,
+  context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
   element: ExcalidrawBindableElement,
 ) => {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
@@ -748,7 +748,7 @@ const renderBindingHighlightForBindableElement = (
 };
 
 const renderBindingHighlightForSuggestedPointBinding = (
-  context: CanvasRenderingContext2D,
+  context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
   suggestedBinding: SuggestedPointBinding,
 ) => {
   const [element, startOrEnd, bindableElement] = suggestedBinding;

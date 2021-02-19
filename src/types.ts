@@ -117,6 +117,7 @@ export type AppState = {
         shown: true;
         data: Spreadsheet;
       };
+  isMinimapEnabled: boolean;
 };
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };

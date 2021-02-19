@@ -101,6 +101,10 @@ const ExportModal = ({
         shouldAddWatermark,
       });
 
+      if (canvas instanceof OffscreenCanvas) {
+        return;
+      }
+
       // if converting to blob fails, there's some problem that will
       // likely prevent preview and export (e.g. canvas too big)
       canvasToBlob(canvas)
