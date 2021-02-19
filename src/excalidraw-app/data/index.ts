@@ -251,6 +251,7 @@ export const loadScene = async (
 export const exportToBackend = async (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
+  viewonly: boolean,
 ) => {
   const json = serializeAsJSON(elements, appState);
   const encoded = new TextEncoder().encode(json);
@@ -288,9 +289,13 @@ export const exportToBackend = async (
     const json = await response.json();
     if (json.id) {
       const url = new URL(window.location.href);
+      url.hash = "#";
+      if (viewonly) {
+        url.hash = `${url.hash}viewonly=true&`;
+      }
       // We need to store the key (and less importantly the id) as hash instead
       // of queryParam in order to never send it to the server
-      url.hash = `json=${json.id},${exportedKey.k!}`;
+      url.hash = `${url.hash}json=${json.id},${exportedKey.k!}`;
       const urlString = url.toString();
       window.prompt(`🔒${t("alerts.uploadedSecurly")}`, urlString);
     } else if (json.error_class === "RequestTooLargeError") {

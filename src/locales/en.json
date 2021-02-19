@@ -106,6 +106,7 @@
     "saveAs": "Save as",
     "load": "Load",
     "getShareableLink": "Get shareable link",
+    "getViewonlyShareableLink": "Get View only shareable link",
     "close": "Close",
     "selectLanguage": "Select language",
     "scrollBackToContent": "Scroll back to content",

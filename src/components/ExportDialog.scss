@@ -66,4 +66,10 @@
       overflow-y: auto;
     }
   }
+
+  .shareable-link--viewonly {
+    svg {
+      width: 1.5em;
+    }
+  }
 }

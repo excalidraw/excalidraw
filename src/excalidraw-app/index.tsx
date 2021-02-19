@@ -70,9 +70,8 @@ const initializeScene = async (opts: {
   const searchParams = new URLSearchParams(window.location.search);
   const id = searchParams.get("id");
   const jsonMatch = window.location.hash.match(
-    /^#json=([0-9]+),([a-zA-Z0-9_-]+)$/,
+    /json=([0-9]+),([a-zA-Z0-9_-]+)/,
   );
-
   const initialData = importFromLocalStorage();
 
   let scene = await loadScene(null, null, initialData);
@@ -93,6 +92,10 @@ const initializeScene = async (opts: {
         scene = await loadScene(id, null, initialData);
       } else if (jsonMatch) {
         scene = await loadScene(jsonMatch[1], jsonMatch[2], initialData);
+      }
+      const isViewModeEnabled = !!window.location.hash.match(/#viewonly=true/);
+      if (isViewModeEnabled) {
+        scene.appState.viewModeEnabled = true;
       }
       if (!roomLinkData) {
         window.history.replaceState({}, APP_NAME, window.location.origin);
@@ -134,6 +137,7 @@ function ExcalidrawWrapper() {
   const [errorMessage, setErrorMessage] = useState("");
   const currentLangCode = languageDetector.detect() || defaultLang.code;
   const [langCode, setLangCode] = useState(currentLangCode);
+  const [viewModeEnabled, setViewModeEnabled] = useState(false);
 
   useLayoutEffect(() => {
     const onResize = () => {
@@ -157,7 +161,6 @@ function ExcalidrawWrapper() {
   if (!initialStatePromiseRef.current.promise) {
     initialStatePromiseRef.current.promise = resolvablePromise<ImportedDataState | null>();
   }
-
   useEffect(() => {
     // Delayed so that the app has a time to load the latest SW
     setTimeout(() => {
@@ -178,12 +181,14 @@ function ExcalidrawWrapper() {
     }
 
     initializeScene({ collabAPI }).then((scene) => {
+      setViewModeEnabled(!!scene?.appState?.viewModeEnabled);
       initialStatePromiseRef.current.promise.resolve(scene);
     });
 
     const onHashChange = (_: HashChangeEvent) => {
       initializeScene({ collabAPI }).then((scene) => {
         if (scene) {
+          setViewModeEnabled(!!scene.appState?.viewModeEnabled);
           excalidrawAPI.updateScene(scene);
         }
       });
@@ -224,6 +229,7 @@ function ExcalidrawWrapper() {
 
   const onExportToBackend = async (
     exportedElements: readonly NonDeletedExcalidrawElement[],
+    viewonly: boolean,
     appState: AppState,
     canvas: HTMLCanvasElement | null,
   ) => {
@@ -232,12 +238,16 @@ function ExcalidrawWrapper() {
     }
     if (canvas) {
       try {
-        await exportToBackend(exportedElements, {
-          ...appState,
-          viewBackgroundColor: appState.exportBackground
-            ? appState.viewBackgroundColor
-            : getDefaultAppState().viewBackgroundColor,
-        });
+        await exportToBackend(
+          exportedElements,
+          {
+            ...appState,
+            viewBackgroundColor: appState.exportBackground
+              ? appState.viewBackgroundColor
+              : getDefaultAppState().viewBackgroundColor,
+          },
+          viewonly,
+        );
       } catch (error) {
         if (error.name !== "AbortError") {
           const { width, height } = canvas;
@@ -287,6 +297,7 @@ function ExcalidrawWrapper() {
         onExportToBackend={onExportToBackend}
         renderFooter={renderFooter}
         langCode={langCode}
+        viewModeEnabled={viewModeEnabled}
       />
       {excalidrawAPI && <CollabWrapper excalidrawAPI={excalidrawAPI} />}
       {errorMessage && (

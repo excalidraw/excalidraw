@@ -12,7 +12,7 @@ import { exportToCanvas, getExportSize } from "../scene/export";
 import { AppState } from "../types";
 import { Dialog } from "./Dialog";
 import "./ExportDialog.scss";
-import { clipboard, exportFile, link } from "./icons";
+import { clipboard, exportFile, eyeIcon, link } from "./icons";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 
@@ -66,7 +66,10 @@ const ExportModal = ({
   onExportToPng: ExportCB;
   onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
-  onExportToBackend?: ExportCB;
+  onExportToBackend?: (
+    elements: readonly NonDeletedExcalidrawElement[],
+    viewonly: boolean,
+  ) => void;
   onCloseRequest: () => void;
 }) => {
   const someElementIsSelected = isSomeElementSelected(elements, appState);
@@ -155,13 +158,23 @@ const ExportModal = ({
               />
             )}
             {onExportToBackend && (
-              <ToolButton
-                type="button"
-                icon={link}
-                title={t("buttons.getShareableLink")}
-                aria-label={t("buttons.getShareableLink")}
-                onClick={() => onExportToBackend(exportedElements)}
-              />
+              <>
+                <ToolButton
+                  type="button"
+                  icon={link}
+                  title={t("buttons.getShareableLink")}
+                  aria-label={t("buttons.getShareableLink")}
+                  onClick={() => onExportToBackend(exportedElements, false)}
+                />
+                <ToolButton
+                  type="button"
+                  icon={eyeIcon}
+                  className="shareable-link--viewonly"
+                  title={t("buttons.getViewonlyShareableLink")}
+                  aria-label={t("buttons.getShareableLink")}
+                  onClick={() => onExportToBackend(exportedElements, true)}
+                />
+              </>
             )}
           </Stack.Row>
           <div className="ExportDialog__name">
@@ -236,7 +249,10 @@ export const ExportDialog = ({
   onExportToPng: ExportCB;
   onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
-  onExportToBackend?: ExportCB;
+  onExportToBackend?: (
+    elements: readonly NonDeletedExcalidrawElement[],
+    viewonly: boolean,
+  ) => void;
 }) => {
   const [modalIsShown, setModalIsShown] = useState(false);
   const triggerButton = useRef<HTMLButtonElement>(null);

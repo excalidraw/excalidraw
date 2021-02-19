@@ -58,6 +58,7 @@ interface LayerUIProps {
   isCollaborating: boolean;
   onExportToBackend?: (
     exportedElements: readonly NonDeletedExcalidrawElement[],
+    viewonly: boolean,
     appState: AppState,
     canvas: HTMLCanvasElement | null,
   ) => void;
@@ -368,9 +369,9 @@ const LayerUI = ({
         onExportToClipboard={createExporter("clipboard")}
         onExportToBackend={
           onExportToBackend
-            ? (elements) => {
+            ? (elements, viewonly) => {
                 onExportToBackend &&
-                  onExportToBackend(elements, appState, canvas);
+                  onExportToBackend(elements, viewonly, appState, canvas);
               }
             : undefined
         }
