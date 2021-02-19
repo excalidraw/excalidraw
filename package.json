@@ -60,7 +60,8 @@
     "lint-staged": "10.5.4",
     "pepjs": "0.5.3",
     "prettier": "2.2.1",
-    "rewire": "5.0.0"
+    "rewire": "5.0.0",
+    "worker-loader": "3.0.8"
   },
   "engines": {
     "node": ">=12.0.0"

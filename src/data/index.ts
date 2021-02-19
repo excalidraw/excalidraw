@@ -73,6 +73,11 @@ export const exportCanvas = async (
     scale,
     shouldAddWatermark,
   });
+
+  if (tempCanvas instanceof OffscreenCanvas) {
+    return;
+  }
+
   tempCanvas.style.display = "none";
   document.body.appendChild(tempCanvas);
 

@@ -1,12 +1,13 @@
 import "./MiniMap.scss";
 
-import React, { useEffect, useRef, useMemo } from "react";
+import React, { useEffect, useRef, useMemo, useState } from "react";
 import { getCommonBounds, getNonDeletedElements } from "../element";
 import { ExcalidrawElement } from "../element/types";
-import { exportToCanvas } from "../scene/export";
 import { AppState } from "../types";
 import { distance, viewportCoordsToSceneCoords } from "../utils";
 import { Island } from "./Island";
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import MinimapWorker from "worker-loader!../renderer/minimapWorker";
 
 const RATIO = 1.2;
 const MINIMAP_HEIGHT = 150;
@@ -89,36 +90,47 @@ export function MiniMap({
   appState: AppState;
   elements: readonly ExcalidrawElement[];
 }) {
+  const [minimapWorker] = useState(() => new MinimapWorker());
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const appStateRef = useRef<AppState>(appState);
+  const elementsRef = useRef(elements);
+  elementsRef.current = elements;
+  const appStateRef = useRef(appState);
   appStateRef.current = appState;
 
   useEffect(() => {
-    const canvasNode = canvasRef.current;
-    if (!canvasNode) {
+    const canvas = canvasRef.current;
+    if (!canvas) {
       return;
     }
 
-    exportToCanvas(
-      getNonDeletedElements(elements),
-      appStateRef.current,
-      {
-        exportBackground: true,
-        viewBackgroundColor: appStateRef.current.viewBackgroundColor,
-        shouldAddWatermark: false,
-      },
-      (width, height) => {
-        const scale = Math.min(MINIMAP_WIDTH / width, MINIMAP_HEIGHT / height);
-        canvasNode.width = width * scale;
-        canvasNode.height = height * scale;
+    const offscreenCanvas = canvas.transferControlToOffscreen();
 
-        return {
-          canvas: canvasNode,
-          scale,
-        };
-      },
-    );
-  }, [elements]);
+    minimapWorker.postMessage({ type: "INIT", canvas: offscreenCanvas }, [
+      offscreenCanvas,
+    ]);
+
+    minimapWorker.postMessage({
+      type: "DRAW",
+      elements: elementsRef.current,
+      appState: appStateRef.current,
+      width: MINIMAP_WIDTH,
+      height: MINIMAP_HEIGHT,
+    });
+
+    setInterval(() => {
+      minimapWorker.postMessage({
+        type: "DRAW",
+        elements: elementsRef.current,
+        appState: appStateRef.current,
+        width: MINIMAP_WIDTH,
+        height: MINIMAP_HEIGHT,
+      });
+    }, 1000);
+
+    return () => {
+      minimapWorker.terminate();
+    };
+  }, [minimapWorker]);
 
   return (
     <Island padding={1} className="MiniMap">

@@ -1,5 +1,7 @@
-export const isDarwin = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform);
-export const isWindows = /^Win/.test(window.navigator.platform);
+export const isDarwin = /Mac|iPod|iPhone|iPad/.test(
+  globalThis.navigator.platform,
+);
+export const isWindows = /^Win/.test(globalThis.navigator.platform);
 
 export const CODES = {
   EQUAL: "Equal",

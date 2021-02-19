@@ -32,7 +32,10 @@ export const exportToCanvas = (
   createCanvas: (
     width: number,
     height: number,
-  ) => { canvas: HTMLCanvasElement; scale: number } = (width, height) => {
+  ) => { canvas: HTMLCanvasElement | OffscreenCanvas; scale: number } = (
+    width,
+    height,
+  ) => {
     const tempCanvas = document.createElement("canvas");
     tempCanvas.width = width * scale;
     tempCanvas.height = height * scale;
@@ -57,7 +60,7 @@ export const exportToCanvas = (
     appState,
     null,
     newScale,
-    rough.canvas(tempCanvas),
+    rough.canvas((tempCanvas as unknown) as HTMLCanvasElement),
     tempCanvas,
     {
       viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
