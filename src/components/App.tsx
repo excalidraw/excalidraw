@@ -972,6 +972,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       },
       {
         renderOptimizations: true,
+        renderScrollbars: !isMobile(),
       },
     );
     if (scrollBars) {
