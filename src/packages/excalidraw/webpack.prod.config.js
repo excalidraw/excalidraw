@@ -14,6 +14,7 @@ module.exports = {
     libraryTarget: "umd",
     filename: "[name].js",
     chunkFilename: "excalidraw-assets/[name].js",
+    publicPath: "",
   },
   resolve: {
     extensions: [".js", ".ts", ".tsx", ".css", ".scss"],

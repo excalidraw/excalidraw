@@ -12,6 +12,7 @@ interface Document {
 interface Window {
   ClipboardItem: any;
   __EXCALIDRAW_SHA__: string | undefined;
+  EXCALIDRAW_ASSET_PATH: string | undefined;
   gtag: Function;
 }
 
@@ -88,3 +89,4 @@ interface Blob {
   handle?: import("browser-fs-acces").FileSystemHandle;
   name?: string;
 }
+declare let __webpack_public_path__: string;
