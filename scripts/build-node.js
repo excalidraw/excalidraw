@@ -5,7 +5,7 @@
 
 // In order to run:
 //   npm install canvas # please do not check it in
-//   npm run build-node
+//   yarn build-node
 //   node build/static/js/build-node.js
 //   open test.png
 

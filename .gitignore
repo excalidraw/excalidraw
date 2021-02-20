@@ -16,7 +16,7 @@ firebase
 logs
 node_modules
 npm-debug.log*
+package-lock.json
 static
 yarn-debug.log*
 yarn-error.log*
-yarn.lock
