@@ -86,6 +86,12 @@ Try out [`@excalidraw/excalidraw`](https://www.npmjs.com/package/@excalidraw/exc
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
+#### Requirements
+
+- [Node.js](https://nodejs.org/en/)
+- [Yarn](https://yarnpkg.com/getting-started/install)
+- [Git](https://git-scm.com/downloads)
+
 #### Clone the repo
 
 ```bash
@@ -94,14 +100,14 @@ git clone https://github.com/excalidraw/excalidraw.git
 
 #### Commands
 
-| Command               | Description                       |
-| --------------------- | --------------------------------- |
-| `npm install`         | Install the dependencies          |
-| `npm start`           | Run the project                   |
-| `npm run fix`         | Reformat all files with Prettier  |
-| `npm test`            | Run tests                         |
-| `npm run test:update` | Update test snapshots             |
-| `npm run test:code`   | Test for formatting with Prettier |
+| Command            | Description                       |
+| ------------------ | --------------------------------- |
+| `yarn`             | Install the dependencies          |
+| `yarn start`       | Run the project                   |
+| `yarn fix`         | Reformat all files with Prettier  |
+| `yarn test`        | Run tests                         |
+| `yarn test:update` | Update test snapshots             |
+| `yarn test:code`   | Test for formatting with Prettier |
 
 #### Docker Compose
 

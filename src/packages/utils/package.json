@@ -55,6 +55,6 @@
   "scripts": {
     "build:umd": "cross-env NODE_ENV=production webpack --config webpack.prod.config.js",
     "build:umd:withAnalyzer": "cross-env NODE_ENV=production ANALYZER=true webpack --config webpack.prod.config.js",
-    "pack": "npm run build:umd && npm pack"
+    "pack": "yarn build:umd && npm pack"
   }
 }

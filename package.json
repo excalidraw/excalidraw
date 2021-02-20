@@ -63,7 +63,7 @@
     "rewire": "5.0.0"
   },
   "engines": {
-    "node": ">=12.0.0"
+    "node": ">=14.0.0"
   },
   "homepage": ".",
   "husky": {
@@ -84,22 +84,22 @@
     "build:app:docker": "REACT_APP_DISABLE_SENTRY=true react-scripts build",
     "build:app": "REACT_APP_GIT_SHA=$VERCEL_GIT_COMMIT_SHA react-scripts build",
     "build:version": "node ./scripts/build-version.js",
-    "build": "npm run build:app && npm run build:version",
+    "build": "yarn build:app && yarn build:version",
     "eject": "react-scripts eject",
-    "fix:code": "npm run test:code -- --fix",
-    "fix:other": "npm run prettier -- --write",
-    "fix": "npm run fix:other && npm run fix:code",
+    "fix:code": "yarn test:code -- --fix",
+    "fix:other": "yarn prettier -- --write",
+    "fix": "yarn fix:other && yarn fix:code",
     "locales-coverage": "node scripts/build-locales-coverage.js",
     "locales-coverage:description": "node scripts/locales-coverage-description.js",
     "prettier": "prettier \"**/*.{css,scss,json,md,html,yml}\" --ignore-path=.eslintignore",
     "start": "react-scripts start",
-    "test:all": "npm run test:typecheck && npm run test:code && npm run test:other && npm run test:app -- --watchAll=false",
+    "test:all": "yarn test:typecheck && yarn test:code && yarn test:other && yarn test:app -- --watchAll=false",
     "test:app": "react-scripts test --passWithNoTests",
     "test:code": "eslint --max-warnings=0 --ignore-path .gitignore --ext .js,.ts,.tsx .",
     "test:debug": "react-scripts --inspect-brk test --runInBand --no-cache",
-    "test:other": "npm run prettier -- --list-different",
+    "test:other": "yarn prettier -- --list-different",
     "test:typecheck": "tsc",
-    "test:update": "npm run test:app -- --updateSnapshot --watchAll=false",
-    "test": "npm run test:app"
+    "test:update": "yarn test:app -- --updateSnapshot --watchAll=false",
+    "test": "yarn test:app"
   }
 }
