@@ -3,7 +3,7 @@ name: Build locales coverage
 on:
   push:
     branches:
-      - "l10n_master"
+      - l10n_master
 
 jobs:
   locales:

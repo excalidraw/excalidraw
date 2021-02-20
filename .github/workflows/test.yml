@@ -5,16 +5,13 @@ on: pull_request
 jobs:
   test:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v1
-
       - name: Setup Node.js 14.x
         uses: actions/setup-node@v1
         with:
           node-version: 14.x
-
       - name: Install and test
         run: |
-          yarn
+          yarn --frozen-lockfile
           yarn test:app

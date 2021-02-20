@@ -12,22 +12,18 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
-
       - name: Setup Node.js 14.x
         uses: actions/setup-node@v1
         with:
           node-version: 14.x
-
       - name: Install dependencies
         run: |
-          yarn
+          yarn --frozen-lockfile
           yarn --cwd src/packages/excalidraw
           yarn --cwd src/packages/utils
-
       - name: Build @excalidraw/excalidraw
         run: |
           yarn --cwd src/packages/excalidraw run pack
-
       - name: Build @excalidraw/utils
         run: |
           yarn --cwd src/packages/utils run pack
