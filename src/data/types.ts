@@ -7,6 +7,7 @@ export interface DataState {
   source?: string;
   elements: readonly ExcalidrawElement[];
   appState: MarkOptional<AppState, "offsetTop" | "offsetLeft">;
+  scrollToCenter: boolean;
 }
 
 export interface ImportedDataState {
@@ -15,6 +16,7 @@ export interface ImportedDataState {
   source?: string;
   elements?: DataState["elements"] | null;
   appState?: Partial<DataState["appState"]> | null;
+  scrollToCenter?: boolean;
 }
 
 export interface LibraryData {
