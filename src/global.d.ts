@@ -89,4 +89,3 @@ interface Blob {
   handle?: import("browser-fs-acces").FileSystemHandle;
   name?: string;
 }
-declare let __webpack_public_path__: string;
