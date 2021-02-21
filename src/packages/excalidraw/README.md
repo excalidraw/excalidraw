@@ -286,11 +286,11 @@ Here you can try saving the data to your backend or local storage for example.
 
 This helps to load Excalidraw with `initialData`. It must be an object or a [promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise) which resolves to an object containing the below optional fields.
 
-| Name | Type |
-| --- | --- |
-| `elements` | [ExcalidrawElement[]](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78) |
-| `appState` | [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37) |
-| `scrollToCenter` | boolean |
+| Name | Type | Descrption |
+| --- | --- | --- |
+| `elements` | [ExcalidrawElement[]](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78) | The elements with which Excalidraw should be mounted. |
+| `appState` | [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37) | The App state with which Excalidraw should be mounted. |
+| `scrollToCenter` | boolean | This attribute implies whether to scroll to center once Excalidraw is mounted. By default it will not scroll to center |
 
 ```json
 {
