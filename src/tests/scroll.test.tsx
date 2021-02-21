@@ -30,6 +30,7 @@ describe("appState", () => {
               height: ELEM_HEIGHT,
             }),
           ],
+          scrollToCenter: true,
         }}
       />,
     );
