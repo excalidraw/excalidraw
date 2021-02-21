@@ -189,13 +189,8 @@ export const restore = (
    */
   localAppState: Partial<AppState> | null | undefined,
 ): DataState => {
-  let scrollToCenter = true;
-  if (typeof data?.scrollToCenter !== "undefined") {
-    scrollToCenter = data.scrollToCenter;
-  }
   return {
     elements: restoreElements(data?.elements),
     appState: restoreAppState(data?.appState, localAppState || null),
-    scrollToCenter,
   };
 };
