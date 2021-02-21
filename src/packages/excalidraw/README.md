@@ -288,9 +288,9 @@ This helps to load Excalidraw with `initialData`. It must be an object or a [pro
 
 | Name | Type | Default |
 | --- | --- | --- |
-| elements | [ExcalidrawElement[]](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78) |  |
-| appState | [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37) |  |
-| scrollToCenter | boolean | true |
+| `elements` | [ExcalidrawElement[]](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78) |  |
+| `appState` | [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37) |  |
+| `scrollToCenter` | boolean | true |
 
 ```json
 {
