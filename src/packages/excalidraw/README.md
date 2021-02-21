@@ -286,11 +286,11 @@ Here you can try saving the data to your backend or local storage for example.
 
 This helps to load Excalidraw with `initialData`. It must be an object or a [promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise) which resolves to an object containing the below optional fields.
 
-| Name | Type | Default |
-| --- | --- | --- |
-| `elements` | [ExcalidrawElement[]](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78) |  |
-| `appState` | [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37) |  |
-| `scrollToCenter` | boolean | true |
+| Name | Type |
+| --- | --- |
+| `elements` | [ExcalidrawElement[]](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78) |
+| `appState` | [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37) |
+| `scrollToCenter` | boolean |
 
 ```json
 {

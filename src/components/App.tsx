@@ -674,8 +674,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       ...scene.appState,
       isLoading: false,
     };
-    const { scrollToCenter = true } = initialData || {};
-    if (scrollToCenter) {
+    if (initialData?.scrollToCenter) {
       scene.appState = {
         ...scene.appState,
         ...calculateScrollCenter(
