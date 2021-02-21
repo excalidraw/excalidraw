@@ -256,6 +256,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
         if (elements) {
           scenePromise.resolve({
             elements,
+            scrollToCenter: true,
           });
         }
       } catch (error) {
@@ -307,7 +308,10 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
                 init: true,
               });
               // noop if already resolved via init from firebase
-              scenePromise.resolve({ elements: reconciledElements });
+              scenePromise.resolve({
+                elements: reconciledElements,
+                scrollToCenter: true,
+              });
             }
             break;
           }
