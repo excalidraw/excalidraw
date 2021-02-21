@@ -18,6 +18,8 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
+- Add support for scrollToCenter in initialData so host can control whether to scroll to center on mount [#3070](https://github.com/excalidraw/excalidraw/pull/3070).
+
 - Export [`restore`](https://github.com/excalidraw/excalidraw/blob/master/src/data/restore.ts#L182), [`restoreAppState`](https://github.com/excalidraw/excalidraw/blob/master/src/data/restore.ts#L144) and [`restoreElements`](https://github.com/excalidraw/excalidraw/blob/master/src/data/restore.ts#L128) to host
 
 ### Fixes
