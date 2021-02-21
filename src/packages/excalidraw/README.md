@@ -290,7 +290,7 @@ This helps to load Excalidraw with `initialData`. It must be an object or a [pro
 | --- | --- | --- |
 | `elements` | [ExcalidrawElement[]](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78) | The elements with which Excalidraw should be mounted. |
 | `appState` | [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37) | The App state with which Excalidraw should be mounted. |
-| `scrollToCenter` | boolean | This attribute implies whether to scroll to center once Excalidraw is mounted. By default it will not scroll to center |
+| `scrollToCenter` | boolean | This attribute implies whether to scroll to the center once Excalidraw is mounted. By default, it will not scroll to the center. |
 
 ```json
 {
