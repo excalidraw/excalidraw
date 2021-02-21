@@ -20,13 +20,9 @@ After installation you will see a folder `excalidraw-assets` in `dist` directory
 
 Move the folder `excalidraw-assets` to the path where your assets are served.
 
-By default it will try to load the files from `{rootUrl}/excalidraw-assets/`
+By default it will try to load the files from `https://unpkg.com/@excalidraw/excalidraw/{currentVersion}/dist/`
 
-With **Webpack**, if you want to load the files from different path you can use <pre><a href="https://webpack.js.org/guides/public-path/#on-the-fly">`__webpack_public_path__`</a></pre>.
-
-With **create-react-app**, the assets can be served from `public/static/js/excalidraw-assets`since CRA tries to load the assets from `{rootUrl}/static/js` path by default.
-
-You can update the value of `PUBLIC_URL` if you want to serve it from a different URL.
+If you want to load assets from a different path you can set a variable `window.EXCALIDRAW_ASSET_PATH` to the url from where you want to load the assets.
 
 ### Demo
 
