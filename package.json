@@ -54,7 +54,7 @@
     "@types/resize-observer-browser": "0.1.5",
     "eslint-config-prettier": "7.2.0",
     "eslint-plugin-prettier": "3.3.1",
-    "firebase-tools": "9.3.0",
+    "firebase-tools": "9.4.0",
     "husky": "4.3.8",
     "jest-canvas-mock": "2.3.1",
     "lint-staged": "10.5.4",
