@@ -85,7 +85,8 @@ export type ActionName =
   | "alignHorizontallyCentered"
   | "distributeHorizontally"
   | "distributeVertically"
-  | "viewMode";
+  | "viewMode"
+  | "exportWithDarkMode";
 
 export interface Action {
   name: ActionName;

@@ -49,6 +49,7 @@ import {
 } from "../element/transformHandles";
 import { viewportCoordsToSceneCoords, supportsEmoji } from "../utils";
 import { UserIdleState } from "../excalidraw-app/collab/types";
+import { APPEARANCE_FILTER } from "../constants";
 
 const hasEmojiSupport = supportsEmoji();
 
@@ -221,8 +222,8 @@ export const renderScene = (
     if (hasTransparence) {
       context.clearRect(0, 0, normalizedCanvasWidth, normalizedCanvasHeight);
     }
-    if (sceneState.appearanceFilter) {
-      context.filter = sceneState.appearanceFilter;
+    if (sceneState.exportWithDarkMode) {
+      context.filter = APPEARANCE_FILTER;
     }
     const fillStyle = context.fillStyle;
     context.fillStyle = sceneState.viewBackgroundColor;

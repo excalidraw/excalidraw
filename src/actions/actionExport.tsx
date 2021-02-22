@@ -204,3 +204,30 @@ export const actionLoadScene = register({
     />
   ),
 });
+
+export const actionExportWithDarkMode = register({
+  name: "exportWithDarkMode",
+  perform: (_elements, appState, value) => {
+    return {
+      appState: { ...appState, exportWithDarkMode: value },
+      commitToHistory: false,
+    };
+  },
+  PanelComponent: ({ appState, updateData }) => (
+    <label
+      style={{
+        display: "flex",
+        justifyContent: "flex-end",
+        marginTop: "-32px",
+        marginBottom: "10px",
+      }}
+    >
+      <input
+        type="checkbox"
+        checked={appState.exportWithDarkMode}
+        onChange={(event) => updateData(event.target.checked)}
+      />{" "}
+      {t("labels.exportWithDarkMode")}
+    </label>
+  ),
+});

@@ -10,7 +10,6 @@ import { ExportType } from "../scene/types";
 import { AppState } from "../types";
 import { canvasToBlob } from "./blob";
 import { serializeAsJSON } from "./json";
-import { APPEARANCE_FILTER } from "../constants";
 
 export { loadFromBlob } from "./blob";
 export { loadFromJSON, saveAsJSON } from "./json";
@@ -42,8 +41,7 @@ export const exportCanvas = async (
   if (type === "svg" || type === "clipboard-svg") {
     const tempSvg = exportToSvg(elements, {
       exportBackground,
-      appearanceFilter:
-        appState.appearance === "dark" ? APPEARANCE_FILTER : null,
+      exportWithDarkMode: appState.exportWithDarkMode,
       viewBackgroundColor,
       exportPadding,
       scale,

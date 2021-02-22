@@ -128,6 +128,7 @@ const ExportModal = ({
   return (
     <div className="ExportDialog">
       <div className="ExportDialog__preview" ref={previewRef} />
+      {actionManager.renderAction("exportWithDarkMode")}
       <Stack.Col gap={2} align="center">
         <div className="ExportDialog__actions">
           <Stack.Row gap={2}>

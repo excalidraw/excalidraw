@@ -65,8 +65,7 @@ export const exportToCanvas = (
     tempCanvas,
     {
       viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
-      appearanceFilter:
-        appState.appearance === "dark" ? APPEARANCE_FILTER : null,
+      exportWithDarkMode: appState.exportWithDarkMode,
       scrollX: -minX + exportPadding,
       scrollY: -minY + exportPadding,
       zoom: getDefaultAppState().zoom,
@@ -93,7 +92,7 @@ export const exportToSvg = (
     exportBackground,
     exportPadding = 10,
     viewBackgroundColor,
-    appearanceFilter,
+    exportWithDarkMode,
     scale = 1,
     shouldAddWatermark,
     metadata = "",
@@ -102,7 +101,7 @@ export const exportToSvg = (
     exportPadding?: number;
     scale?: number;
     viewBackgroundColor: string;
-    appearanceFilter?: string | null;
+    exportWithDarkMode?: boolean;
     shouldAddWatermark: boolean;
     metadata?: string;
   },
@@ -122,8 +121,8 @@ export const exportToSvg = (
   svgRoot.setAttribute("viewBox", `0 0 ${width} ${height}`);
   svgRoot.setAttribute("width", `${width * scale}`);
   svgRoot.setAttribute("height", `${height * scale}`);
-  if (appearanceFilter) {
-    svgRoot.setAttribute("filter", appearanceFilter);
+  if (exportWithDarkMode) {
+    svgRoot.setAttribute("filter", APPEARANCE_FILTER);
   }
 
   svgRoot.innerHTML = `
