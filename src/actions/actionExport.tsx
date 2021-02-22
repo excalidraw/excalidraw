@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { trackEvent } from "../analytics";
 import { load, questionCircle, save, saveAs } from "../components/icons";
 import { ProjectName } from "../components/ProjectName";
@@ -6,9 +6,13 @@ import { ToolButton } from "../components/ToolButton";
 import "../components/ToolIcon.scss";
 import { Tooltip } from "../components/Tooltip";
 import { loadFromJSON, saveAsJSON } from "../data";
+import { serializeAsJSON } from "../data/json";
+import { getNonDeletedElements } from "../element";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
 import { KEYS } from "../keys";
+import { getSelectedElements } from "../scene";
+import { nFormatter } from "../utils";
 import { register } from "./register";
 
 export const actionChangeProjectName = register({
@@ -46,6 +50,26 @@ export const actionChangeExportBackground = register({
   ),
 });
 
+export const actionChangeExportSelected = register({
+  name: "changeExportSelected",
+  perform: (_elements, appState, value) => {
+    return {
+      appState: { ...appState, exportSelected: value },
+      commitToHistory: false,
+    };
+  },
+  PanelComponent: ({ appState, updateData }) => (
+    <label>
+      <input
+        type="checkbox"
+        checked={appState.exportSelected}
+        onChange={(event) => updateData(event.target.checked)}
+      />{" "}
+      {t("labels.onlySelected")}
+    </label>
+  ),
+});
+
 export const actionChangeExportEmbedScene = register({
   name: "changeExportEmbedScene",
   perform: (_elements, appState, value) => {
@@ -54,23 +78,71 @@ export const actionChangeExportEmbedScene = register({
       commitToHistory: false,
     };
   },
-  PanelComponent: ({ appState, updateData }) => (
-    <label style={{ display: "flex" }}>
-      <input
-        type="checkbox"
-        checked={appState.exportEmbedScene}
-        onChange={(event) => updateData(event.target.checked)}
-      />{" "}
-      {t("labels.exportEmbedScene")}
-      <Tooltip
-        label={t("labels.exportEmbedScene_details")}
-        position="above"
-        long={true}
-      >
-        <div className="TooltipIcon">{questionCircle}</div>
-      </Tooltip>
-    </label>
-  ),
+  PanelComponent: ({ elements, appState, updateData }) => {
+    const [increasedPngSize, setPngIncreasedSize] = useState(0);
+    const [increasedSvgSize, setSvgIncreasedSize] = useState(0);
+    if (appState.exportEmbedScene) {
+      import(/* webpackChunkName: "image" */ "../data/image").then(
+        async (_) => {
+          const nonDeletedElements = getNonDeletedElements(elements);
+          const selectedElements = getSelectedElements(
+            nonDeletedElements,
+            appState,
+          );
+          const incPng = await _.getPngMetatdataSize({
+            metadata: serializeAsJSON(
+              appState.exportSelected ? selectedElements : elements,
+              appState,
+            ),
+          });
+          setPngIncreasedSize(incPng);
+          const incSvg = await _.getSvgMetatdataSize({
+            text: serializeAsJSON(
+              appState.exportSelected ? selectedElements : elements,
+              appState,
+            ),
+          });
+          setSvgIncreasedSize(incSvg);
+        },
+      );
+    }
+
+    return (
+      <label style={{ display: "flex" }}>
+        <input
+          type="checkbox"
+          checked={appState.exportEmbedScene}
+          onChange={(event) => updateData(event.target.checked)}
+        />{" "}
+        {t("labels.exportEmbedScene")}
+        {appState.exportEmbedScene && (
+          <Tooltip
+            label={`PNG: +${nFormatter(
+              increasedPngSize,
+              1,
+            )}, SVG: +${nFormatter(increasedSvgSize, 1)}`}
+            position="above"
+          >
+            {
+              <div style={{ color: "gray", paddingLeft: 3 }}>
+                {`(${t("labels.average")}: +${nFormatter(
+                  (increasedPngSize + increasedSvgSize) / 2,
+                  1,
+                )})`}
+              </div>
+            }
+          </Tooltip>
+        )}
+        <Tooltip
+          label={t("labels.exportEmbedScene_details")}
+          position="above"
+          long={true}
+        >
+          <div className="TooltipIcon">{questionCircle}</div>
+        </Tooltip>
+      </label>
+    );
+  },
 });
 
 export const actionChangeShouldAddWatermark = register({

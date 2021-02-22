@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
+import { actionChangeExportSelected } from "../actions/actionExport";
 import { ActionsManagerInterface } from "../actions/types";
 import { probablySupportsClipboardBlob } from "../clipboard";
 import { canvasToBlob } from "../data/blob";
@@ -71,7 +72,6 @@ const ExportModal = ({
 }) => {
   const someElementIsSelected = isSomeElementSelected(elements, appState);
   const [scale, setScale] = useState(defaultScale);
-  const [exportSelected, setExportSelected] = useState(someElementIsSelected);
   const previewRef = useRef<HTMLDivElement>(null);
   const {
     exportBackground,
@@ -79,13 +79,17 @@ const ExportModal = ({
     shouldAddWatermark,
   } = appState;
 
-  const exportedElements = exportSelected
+  const exportedElements = appState.exportSelected
     ? getSelectedElements(elements, appState)
     : elements;
 
   useEffect(() => {
-    setExportSelected(someElementIsSelected);
-  }, [someElementIsSelected]);
+    actionChangeExportSelected.perform(
+      elements,
+      appState,
+      someElementIsSelected,
+    );
+  }, [appState, elements, someElementIsSelected]);
 
   useEffect(() => {
     const previewNode = previewRef.current;
@@ -199,18 +203,7 @@ const ExportModal = ({
         </div>
         {actionManager.renderAction("changeExportBackground")}
         {someElementIsSelected && (
-          <div>
-            <label>
-              <input
-                type="checkbox"
-                checked={exportSelected}
-                onChange={(event) =>
-                  setExportSelected(event.currentTarget.checked)
-                }
-              />{" "}
-              {t("labels.onlySelected")}
-            </label>
-          </div>
+          <div>{actionManager.renderAction("changeExportSelected")}</div>
         )}
         {actionManager.renderAction("changeExportEmbedScene")}
         {actionManager.renderAction("changeShouldAddWatermark")}
