@@ -5,6 +5,7 @@ import { ProjectName } from "../components/ProjectName";
 import { ToolButton } from "../components/ToolButton";
 import "../components/ToolIcon.scss";
 import { Tooltip } from "../components/Tooltip";
+import { DarkModeToggle, Appearence } from "../components/DarkModeToggle";
 import { loadFromJSON, saveAsJSON } from "../data";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
@@ -214,20 +215,20 @@ export const actionExportWithDarkMode = register({
     };
   },
   PanelComponent: ({ appState, updateData }) => (
-    <label
+    <div
       style={{
         display: "flex",
         justifyContent: "flex-end",
-        marginTop: "-32px",
+        marginTop: "-45px",
         marginBottom: "10px",
       }}
     >
-      <input
-        type="checkbox"
-        checked={appState.exportWithDarkMode}
-        onChange={(event) => updateData(event.target.checked)}
-      />{" "}
-      {t("labels.exportWithDarkMode")}
-    </label>
+      <DarkModeToggle
+        value={appState.exportWithDarkMode ? "dark" : "light"}
+        onChange={(appearance: Appearence) => {
+          updateData(appearance === "dark");
+        }}
+      />
+    </div>
   ),
 });
