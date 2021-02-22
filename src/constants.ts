@@ -1,4 +1,5 @@
 import { FontFamily } from "./element/types";
+import cssVariables from "./css/variables.module.scss";
 
 export const APP_NAME = "Excalidraw";
 
@@ -108,5 +109,4 @@ export const MODES = {
   GRID: "gridMode",
 };
 
-// Should be in sync with value in theme.scss
-export const APPEARANCE_FILTER = "invert(93%) hue-rotate(180deg)";
+export const APPEARANCE_FILTER = cssVariables.appearanceFilter;
