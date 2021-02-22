@@ -18,7 +18,7 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
-- Expose `window.EXCALIDRAW_ASSET_PATH` which host can use to load assets from a different URL. By default it will be loaded from `https://unpkg.com/@excalidraw/excalidraw{currentVersion}/dist/`.
+- Expose `window.EXCALIDRAW_ASSET_PATH` which host can use to load assets from a different URL. By default it will be loaded from `https://unpkg.com/@excalidraw/excalidraw{currentVersion}/dist/`[#3068](https://github.com/excalidraw/excalidraw/pull/3068).
 
   Also now the assets will have a hash in filename so cache bursting can easily happen with version bump.
 
