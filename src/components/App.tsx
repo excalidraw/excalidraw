@@ -672,19 +672,24 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     scene.appState = {
       ...scene.appState,
-      ...calculateScrollCenter(
-        scene.elements,
-        {
-          ...scene.appState,
-          width: this.state.width,
-          height: this.state.height,
-          offsetTop: this.state.offsetTop,
-          offsetLeft: this.state.offsetLeft,
-        },
-        null,
-      ),
       isLoading: false,
     };
+    if (initialData?.scrollToCenter) {
+      scene.appState = {
+        ...scene.appState,
+        ...calculateScrollCenter(
+          scene.elements,
+          {
+            ...scene.appState,
+            width: this.state.width,
+            height: this.state.height,
+            offsetTop: this.state.offsetTop,
+            offsetLeft: this.state.offsetLeft,
+          },
+          null,
+        ),
+      };
+    }
 
     this.resetHistory();
     this.syncActionResult({
@@ -972,6 +977,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       },
       {
         renderOptimizations: true,
+        renderScrollbars: !isMobile(),
       },
     );
     if (scrollBars) {
