@@ -93,7 +93,7 @@
     "distributeHorizontally": "Distribute horizontally",
     "distributeVertically": "Distribute vertically",
     "viewMode": "View mode",
-    "exportWithDarkMode": "Export with dark mode"
+    "toggleExportColorScheme": "Toggle export color scheme"
   },
   "buttons": {
     "clearReset": "Reset the canvas",

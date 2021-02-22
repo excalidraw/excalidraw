@@ -10,12 +10,15 @@ export type Appearence = "light" | "dark";
 export const DarkModeToggle = (props: {
   value: Appearence;
   onChange: (value: Appearence) => void;
+  title?: string;
 }) => {
   return (
     <label
       className={`ToolIcon ToolIcon_type_floating ToolIcon_size_M`}
       title={
-        props.value === "dark" ? t("buttons.lightMode") : t("buttons.darkMode")
+        props.title || props.value === "dark"
+          ? t("buttons.lightMode")
+          : t("buttons.darkMode")
       }
     >
       <input
@@ -26,7 +29,7 @@ export const DarkModeToggle = (props: {
         }
         checked={props.value === "dark"}
         aria-label={
-          props.value === "dark"
+          props.title || props.value === "dark"
             ? t("buttons.lightMode")
             : t("buttons.darkMode")
         }

@@ -228,6 +228,7 @@ export const actionExportWithDarkMode = register({
         onChange={(appearance: Appearence) => {
           updateData(appearance === "dark");
         }}
+        title={t("labels.toggleExportColorScheme")}
       />
     </div>
   ),
