@@ -1373,8 +1373,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             mutateElement(element, metrics);
             // Tell the app to re-render the scene
             rerenderScene = true;
-            // if only one element is selected, use the element's updated
-            // useTex value to set the default value for new text elements
+            // If only one element is selected, use the element's updated
+            // useTex value to set the default value for new text elements.
             if (selectedElements.length === 1) {
               setUseTex(element.useTex);
             }

@@ -167,14 +167,19 @@ const drawElementOnCanvas = (
           const scaledPadding = CANVAS_PADDING * Math.pow(zoom.value, 2);
           const scaledFontSize =
             element.fontSize * zoom.value * window.devicePixelRatio;
+          const scaledFontString = getFontString({
+            fontSize: scaledFontSize,
+            fontFamily: element.fontFamily,
+          });
+          const scaledMetrics = measureMarkup(htmlString, scaledFontString);
 
           promise = drawHtmlOnCanvas(
             context,
             htmlString,
             scaledPadding,
             scaledPadding,
-            context.canvas.width,
-            context.canvas.height,
+            scaledMetrics.width,
+            scaledMetrics.height,
             scaledFontSize,
             getFontFamilyString(element),
             element.strokeColor,

@@ -3,6 +3,7 @@ import { FontString } from "./element/types";
 import { measureText } from "./utils";
 import { ExcalidrawTextElement } from "./element/types";
 import { mutateElement } from "./element/mutateElement";
+import sanitizeHtml from "sanitize-html";
 
 // MathJax components we use
 import { AsciiMath } from "mathjax-full/js/input/asciimath.js";
@@ -85,17 +86,17 @@ export const markupText = (text: string, useTex: boolean) => {
   const lines = text.replace(/\r\n?/g, "\n").split("\n");
   let htmlString = "";
   for (let index = 0; index < lines.length; index++) {
-    htmlString += `<p style="margin: 0px;">`;
+    htmlString += `<p style="margin: 0px; white-space: pre;">`;
     const lineArray = lines[index].split(useTex ? "$$" : "`");
     for (let i = 0; i < lineArray.length; i++) {
       if (i % 2 === 1) {
         htmlString += math2Svg(lineArray[i], useTex);
       } else {
-        htmlString += lineArray[i];
+        htmlString += sanitizeHtml(lineArray[i], { allowedTags: [] });
       }
     }
     if (lines[index] === "") {
-      htmlString += `<span style="display: inline-block; overflow: hidden; width: 1px; height: 1px;"></span>`;
+      htmlString += `\n`;
     }
     htmlString += `</p>`;
   }
