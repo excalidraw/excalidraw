@@ -68,7 +68,7 @@
     "layers": "الطبقات",
     "actions": "الإجراءات",
     "language": "اللغة",
-    "createRoom": "مشاركة الجلسة مباشرة",
+    "liveCollaboration": "",
     "duplicateSelection": "تكرار",
     "untitled": "غير معنون",
     "name": "الاسم",
@@ -77,7 +77,7 @@
     "group": "تحديد مجموعة",
     "ungroup": "إلغاء تحديد مجموعة",
     "collaborators": "المتعاونون",
-    "gridMode": "وضع الشبكة",
+    "showGrid": "",
     "addToLibrary": "أضف إلى المكتبة",
     "removeFromLibrary": "حذف من المكتبة",
     "libraryLoadingMessage": "جارٍ تحميل المكتبة…",
@@ -117,7 +117,7 @@
     "edit": "تعديل",
     "undo": "تراجع",
     "redo": "إعادة تنفيذ",
-    "roomDialog": "بدء المشاركة الحية",
+    "resetLibrary": "",
     "createNewRoom": "إنشاء غرفة جديدة",
     "fullScreen": "شاشة كاملة",
     "darkMode": "الوضع المظلم",
@@ -140,7 +140,8 @@
     "errorLoadingLibrary": "حصل خطأ أثناء تحميل مكتبة الطرف الثالث.",
     "confirmAddLibrary": "هذا سيضيف {{numShapes}} شكل إلى مكتبتك. هل أنت متأكد؟",
     "imageDoesNotContainScene": "استيراد الصور غير مدعوم في الوقت الراهن.\n\nهل تريد استيراد مشهد؟ لا يبدو أن هذه الصورة تحتوي على أي بيانات مشهد. هل قمت بسماح هذا أثناء التصدير؟",
-    "cannotRestoreFromImage": "تعذر استعادة المشهد من ملف الصورة"
+    "cannotRestoreFromImage": "تعذر استعادة المشهد من ملف الصورة",
+    "resetLibrary": ""
   },
   "toolBar": {
     "selection": "تحديد",
@@ -243,6 +244,8 @@
   "toast": {
     "copyStyles": "",
     "copyToClipboard": "",
-    "copyToClipboardAsPng": ""
+    "copyToClipboardAsPng": "",
+    "fileSaved": "",
+    "fileSavedToFilename": ""
   }
 }

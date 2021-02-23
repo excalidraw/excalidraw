@@ -1,5 +1,6 @@
 import fallbackLangData from "./locales/en.json";
 import percentages from "./locales/percentages.json";
+import { ENV } from "./constants";
 
 const COMPLETION_THRESHOLD = 85;
 
@@ -55,25 +56,33 @@ export const languages: Language[] = allLanguages
       COMPLETION_THRESHOLD,
   );
 
+const TEST_LANG_CODE = "__test__";
+if (process.env.NODE_ENV === ENV.DEVELOPMENT) {
+  languages.unshift(
+    { code: TEST_LANG_CODE, label: "test language" },
+    {
+      code: `${TEST_LANG_CODE}.rtl`,
+      label: "\u{202a}test language (rtl)\u{202c}",
+      rtl: true,
+    },
+  );
+}
+
 let currentLang: Language = defaultLang;
 let currentLangData = {};
 
 export const setLanguage = async (lang: Language) => {
   currentLang = lang;
   document.documentElement.dir = currentLang.rtl ? "rtl" : "ltr";
+  document.documentElement.lang = currentLang.code;
 
-  currentLangData = await import(
-    /* webpackChunkName: "i18n-[request]" */ `./locales/${currentLang.code}.json`
-  );
-};
-
-export const setLanguageFirstTime = async (lang: Language) => {
-  currentLang = lang;
-  document.documentElement.dir = currentLang.rtl ? "rtl" : "ltr";
-
-  currentLangData = await import(
-    /* webpackChunkName: "i18n-[request]" */ `./locales/${currentLang.code}.json`
-  );
+  if (lang.code.startsWith(TEST_LANG_CODE)) {
+    currentLangData = {};
+  } else {
+    currentLangData = await import(
+      /* webpackChunkName: "i18n-[request]" */ `./locales/${currentLang.code}.json`
+    );
+  }
 };
 
 export const getLanguage = () => currentLang;
@@ -93,6 +102,13 @@ const findPartsForData = (data: any, parts: string[]) => {
 };
 
 export const t = (path: string, replacement?: { [key: string]: string }) => {
+  if (currentLang.code.startsWith(TEST_LANG_CODE)) {
+    const name = replacement
+      ? `${path}(${JSON.stringify(replacement).slice(1, -1)})`
+      : path;
+    return `\u{202a}[[${name}]]\u{202c}`;
+  }
+
   const parts = path.split(".");
   let translation =
     findPartsForData(currentLangData, parts) ||

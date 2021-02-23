@@ -68,7 +68,7 @@
     "layers": "Calques",
     "actions": "Actions",
     "language": "Langue",
-    "createRoom": "Partager une session de collaboration en direct",
+    "liveCollaboration": "Collaboration en direct",
     "duplicateSelection": "Dupliquer",
     "untitled": "Sans-titre",
     "name": "Nom",
@@ -77,7 +77,7 @@
     "group": "Grouper la sélection",
     "ungroup": "Dégrouper la sélection",
     "collaborators": "Collaborateurs",
-    "gridMode": "Mode grille",
+    "showGrid": "Afficher la grille",
     "addToLibrary": "Ajouter à la bibliothèque",
     "removeFromLibrary": "Supprimer de la bibliothèque",
     "libraryLoadingMessage": "Chargement de la bibliothèque…",
@@ -117,7 +117,7 @@
     "edit": "Modifier",
     "undo": "Annuler",
     "redo": "Rétablir",
-    "roomDialog": "Démarrer la collaboration en direct",
+    "resetLibrary": "Réinitialiser la bibliothèque",
     "createNewRoom": "Créer une nouvelle salle",
     "fullScreen": "Plein écran",
     "darkMode": "Mode sombre",
@@ -140,7 +140,8 @@
     "errorLoadingLibrary": "Une erreur s'est produite lors du chargement de la bibliothèque tierce.",
     "confirmAddLibrary": "Cela va ajouter {{numShapes}} forme(s) à votre bibliothèque. Êtes-vous sûr·e ?",
     "imageDoesNotContainScene": "L'importation d'images n'est pas prise en charge pour le moment.\n\nVouliez-vous importer une scène ? Cette image ne semble pas contenir de données de scène. Avez-vous activé cette option lors de l'exportation ?",
-    "cannotRestoreFromImage": "Impossible de restaurer la scène depuis ce fichier image"
+    "cannotRestoreFromImage": "Impossible de restaurer la scène depuis ce fichier image",
+    "resetLibrary": "Cela va effacer votre bibliothèque. Êtes-vous sûr·e ?"
   },
   "toolBar": {
     "selection": "Sélection",
@@ -243,6 +244,8 @@
   "toast": {
     "copyStyles": "Styles copiés.",
     "copyToClipboard": "Copié vers le presse-papiers.",
-    "copyToClipboardAsPng": "Copié vers le presse-papier en PNG."
+    "copyToClipboardAsPng": "Copié vers le presse-papier en PNG.",
+    "fileSaved": "Fichier enregistré.",
+    "fileSavedToFilename": "Enregistré sous {filename}"
   }
 }

@@ -27,7 +27,7 @@ import { ExportCB, ExportDialog } from "./ExportDialog";
 import { FixedSideContainer } from "./FixedSideContainer";
 import { GitHubCorner } from "./GitHubCorner";
 import { HintViewer } from "./HintViewer";
-import { exportFile, load, shield } from "./icons";
+import { exportFile, load, shield, trash } from "./icons";
 import { Island } from "./Island";
 import "./LayerUI.scss";
 import { LibraryUnit } from "./LibraryUnit";
@@ -100,6 +100,7 @@ const LibraryMenuItems = ({
   onInsertShape,
   pendingElements,
   setAppState,
+  setLibraryItems,
 }: {
   library: LibraryItems;
   pendingElements: LibraryItem;
@@ -107,6 +108,7 @@ const LibraryMenuItems = ({
   onInsertShape: (elements: LibraryItem) => void;
   onAddToLibrary: (elements: LibraryItem) => void;
   setAppState: React.Component<any, AppState>["setState"];
+  setLibraryItems: (library: LibraryItems) => void;
 }) => {
   const isMobile = useIsMobile();
   const numCells = library.length + (pendingElements.length > 0 ? 1 : 0);
@@ -148,6 +150,19 @@ const LibraryMenuItems = ({
             .catch((error) => {
               setAppState({ errorMessage: error.message });
             });
+        }}
+      />
+      <ToolButton
+        key="reset"
+        type="button"
+        title={t("buttons.resetLibrary")}
+        aria-label={t("buttons.resetLibrary")}
+        icon={trash}
+        onClick={() => {
+          if (window.confirm(t("alerts.resetLibrary"))) {
+            Library.resetLibrary();
+            setLibraryItems([]);
+          }
         }}
       />
 
@@ -281,6 +296,7 @@ const LibraryMenu = ({
           onInsertShape={onInsertShape}
           pendingElements={pendingElements}
           setAppState={setAppState}
+          setLibraryItems={setLibraryItems}
         />
       )}
     </Island>
@@ -426,7 +442,15 @@ const LayerUI = ({
         "transition-left": zenModeEnabled,
       })}
     >
-      <Island className={CLASSES.SHAPE_ACTIONS_MENU} padding={2}>
+      <Island
+        className={CLASSES.SHAPE_ACTIONS_MENU}
+        padding={2}
+        style={{
+          // we want to make sure this doesn't overflow so substracting 200
+          // which is approximately height of zoom footer and top left menu items with some buffer
+          maxHeight: `${appState.height - 200}px`,
+        }}
+      >
         <SelectedShapeActions
           appState={appState}
           elements={elements}
@@ -587,18 +611,6 @@ const LayerUI = ({
       >
         {t("buttons.exitZenMode")}
       </button>
-      {appState.scrolledOutside && (
-        <button
-          className="scroll-back-to-content"
-          onClick={() => {
-            setAppState({
-              ...calculateScrollCenter(elements, appState, canvas),
-            });
-          }}
-        >
-          {t("buttons.scrollBackToContent")}
-        </button>
-      )}
     </footer>
   );
 
@@ -661,6 +673,18 @@ const LayerUI = ({
       {renderBottomAppMenu()}
       {renderGitHubCorner()}
       {renderFooter()}
+      {appState.scrolledOutside && (
+        <button
+          className="scroll-back-to-content"
+          onClick={() => {
+            setAppState({
+              ...calculateScrollCenter(elements, appState, canvas),
+            });
+          }}
+        >
+          {t("buttons.scrollBackToContent")}
+        </button>
+      )}
     </div>
   );
 };

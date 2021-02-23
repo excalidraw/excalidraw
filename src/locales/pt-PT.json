@@ -68,7 +68,7 @@
     "layers": "Camadas",
     "actions": "Ações",
     "language": "Idioma",
-    "createRoom": "Compartilhar uma sessão de colaboração ao vivo",
+    "liveCollaboration": "",
     "duplicateSelection": "Duplicar",
     "untitled": "Sem título",
     "name": "Nome",
@@ -77,7 +77,7 @@
     "group": "Agrupar seleção",
     "ungroup": "Desagrupar seleção",
     "collaborators": "Colaboradores",
-    "gridMode": "Modo grade",
+    "showGrid": "",
     "addToLibrary": "Adicionar à biblioteca",
     "removeFromLibrary": "Remover da biblioteca",
     "libraryLoadingMessage": "Carregando biblioteca…",
@@ -117,7 +117,7 @@
     "edit": "Editar",
     "undo": "Desfazer",
     "redo": "Refazer",
-    "roomDialog": "Iniciar colaboração ao vivo",
+    "resetLibrary": "",
     "createNewRoom": "Criar nova sala",
     "fullScreen": "Tela cheia",
     "darkMode": "Modo escuro",
@@ -140,7 +140,8 @@
     "errorLoadingLibrary": "Houve um erro ao carregar a biblioteca de terceiros.",
     "confirmAddLibrary": "Isso adicionará {{numShapes}} forma(s) à sua biblioteca. Tem certeza?",
     "imageDoesNotContainScene": "A importação de imagens não é suportada no momento.\n\nVocê deseja importar uma cena? Esta imagem parece não conter dados de cena. Você ativou isto durante a exportação?",
-    "cannotRestoreFromImage": "Não foi possível restaurar a cena deste arquivo de imagem"
+    "cannotRestoreFromImage": "Não foi possível restaurar a cena deste arquivo de imagem",
+    "resetLibrary": ""
   },
   "toolBar": {
     "selection": "Seleção",
@@ -243,6 +244,8 @@
   "toast": {
     "copyStyles": "Estilos copiados.",
     "copyToClipboard": "",
-    "copyToClipboardAsPng": "Copiado para o clipboard como PNG."
+    "copyToClipboardAsPng": "Copiado para o clipboard como PNG.",
+    "fileSaved": "",
+    "fileSavedToFilename": ""
   }
 }

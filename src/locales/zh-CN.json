@@ -68,7 +68,7 @@
     "layers": "图层",
     "actions": "操作",
     "language": "语言",
-    "createRoom": "分享实时协作会议",
+    "liveCollaboration": "",
     "duplicateSelection": "复制",
     "untitled": "无标题",
     "name": "名字",
@@ -77,7 +77,7 @@
     "group": "组选",
     "ungroup": "取消组选",
     "collaborators": "协作者",
-    "gridMode": "网格模式",
+    "showGrid": "",
     "addToLibrary": "添加到库中",
     "removeFromLibrary": "从库中移除",
     "libraryLoadingMessage": "正在加载库…",
@@ -117,7 +117,7 @@
     "edit": "编辑",
     "undo": "撤销",
     "redo": "重做",
-    "roomDialog": "开始实时协作",
+    "resetLibrary": "",
     "createNewRoom": "新建会议室",
     "fullScreen": "全屏",
     "darkMode": "暗色主题",
@@ -140,7 +140,8 @@
     "errorLoadingLibrary": "加载第三方库时出错。",
     "confirmAddLibrary": "这将添加 {{numShapes}} 个形状到您的库。您确定吗？",
     "imageDoesNotContainScene": "当前不支持导入图片。\n\n您想要导入画布数据吗？此图像似乎不包含任何画布数据。您是否在导出过程中启用了嵌入画布的选项？",
-    "cannotRestoreFromImage": "无法从此图像文件恢复画布"
+    "cannotRestoreFromImage": "无法从此图像文件恢复画布",
+    "resetLibrary": ""
   },
   "toolBar": {
     "selection": "选择",
@@ -243,6 +244,8 @@
   "toast": {
     "copyStyles": "复制样式",
     "copyToClipboard": "",
-    "copyToClipboardAsPng": "复制为 PNG 到剪贴板"
+    "copyToClipboardAsPng": "复制为 PNG 到剪贴板",
+    "fileSaved": "",
+    "fileSavedToFilename": ""
   }
 }

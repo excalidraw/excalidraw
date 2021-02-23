@@ -2,9 +2,9 @@
 
 .excalidraw {
   .color-picker {
-    background: var(--popup-background-color);
-    border: 0px solid transparentize($oc-white, 0.75);
-    box-shadow: transparentize($oc-black, 0.75) 0px 1px 4px;
+    background: var(--popup-bg-color);
+    border: 0 solid transparentize($oc-white, 0.75);
+    box-shadow: transparentize($oc-black, 0.75) 0 1px 4px;
     border-radius: 4px;
     position: absolute;
 
@@ -24,11 +24,11 @@
   }
 
   .color-picker-triangle {
-    width: 0px;
-    height: 0px;
+    width: 0;
+    height: 0;
     border-style: solid;
-    border-width: 0px 9px 10px;
-    border-color: transparent transparent var(--popup-background-color);
+    border-width: 0 9px 10px;
+    border-color: transparent transparent var(--popup-bg-color);
     position: absolute;
     top: -10px;
 
@@ -84,12 +84,12 @@
 
   .color-picker-transparent {
     border-radius: 4px;
-    box-shadow: transparentize($oc-black, 0.9) 0px 0px 0px 1px inset;
+    box-shadow: transparentize($oc-black, 0.9) 0 0 0 1px inset;
     position: absolute;
-    top: 0px;
-    right: 0px;
-    bottom: 0px;
-    left: 0px;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
   }
 
   .color-picker-transparent,
@@ -104,11 +104,11 @@
     width: 1.875rem;
 
     :root[dir="ltr"] & {
-      border-radius: 4px 0px 0px 4px;
+      border-radius: 4px 0 0 4px;
     }
 
     :root[dir="rtl"] & {
-      border-radius: 0px 4px 4px 0px;
+      border-radius: 0 4px 4px 0;
     }
 
     color: var(--input-label-color);
@@ -144,7 +144,7 @@
   }
 
   .color-input-container:focus-within .color-picker-hash::after {
-    background: var(--input-background-color);
+    background: var(--input-bg-color);
 
     :root[dir="ltr"] & {
       right: -2px;
@@ -163,19 +163,19 @@
     width: 12ch; /* length of `transparent` + 1 */
     margin: 0;
     font-size: 1rem;
-    background-color: var(--input-background-color);
-    color: var(--text-color-primary);
-    border: 0px;
+    background-color: var(--input-bg-color);
+    color: var(--text-primary-color);
+    border: 0;
     outline: none;
     height: 1.75em;
-    box-shadow: var(--input-border-color) 0px 0px 0px 1px inset;
+    box-shadow: var(--input-border-color) 0 0 0 1px inset;
 
     :root[dir="ltr"] & {
-      border-radius: 0px 4px 4px 0px;
+      border-radius: 0 4px 4px 0;
     }
 
     :root[dir="rtl"] & {
-      border-radius: 4px 0px 0px 4px;
+      border-radius: 4px 0 0 4px;
     }
 
     float: left;
@@ -228,7 +228,7 @@
   }
 
   .color-picker-type-elementBackground .color-picker-keybinding {
-    color: #fff;
+    color: $oc-white;
   }
 
   .color-picker-swatch[aria-label="transparent"] .color-picker-keybinding {
@@ -241,10 +241,10 @@
 
   &.Appearance_dark {
     .color-picker-type-elementBackground .color-picker-keybinding {
-      color: #000;
+      color: $oc-black;
     }
     .color-picker-swatch[aria-label="transparent"] .color-picker-keybinding {
-      color: #000;
+      color: $oc-black;
     }
   }
 }

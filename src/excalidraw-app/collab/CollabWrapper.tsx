@@ -257,6 +257,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
         if (elements) {
           scenePromise.resolve({
             elements,
+            scrollToCenter: true,
           });
         }
       } catch (error) {
@@ -309,7 +310,10 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
                 useTex: decryptedData.payload.useTex,
               });
               // noop if already resolved via init from firebase
-              scenePromise.resolve({ elements: reconciledElements });
+              scenePromise.resolve({
+                elements: reconciledElements,
+                scrollToCenter: true,
+              });
             }
             break;
           }

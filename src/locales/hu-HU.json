@@ -68,7 +68,7 @@
     "layers": "Rétegek",
     "actions": "Műveletek",
     "language": "Nyelv",
-    "createRoom": "Élő együttmüködés megosztása",
+    "liveCollaboration": "",
     "duplicateSelection": "Duplikálás",
     "untitled": "Névtelen",
     "name": "Név",
@@ -77,7 +77,7 @@
     "group": "Csoportosítás",
     "ungroup": "Csoportbontás",
     "collaborators": "Közreműködők",
-    "gridMode": "Hálómód",
+    "showGrid": "",
     "addToLibrary": "Hozzáadás a könyvtárhoz",
     "removeFromLibrary": "Eltávólítás a könyvtárból",
     "libraryLoadingMessage": "Könyvtár betöltése…",
@@ -117,7 +117,7 @@
     "edit": "Szerkesztés",
     "undo": "Vissza",
     "redo": "Újra",
-    "roomDialog": "Élő együttműködés indítása",
+    "resetLibrary": "",
     "createNewRoom": "Új szoba létrehozása",
     "fullScreen": "Teljes képernyő",
     "darkMode": "Sötét mód",
@@ -140,7 +140,8 @@
     "errorLoadingLibrary": "Hibába ütközött a harmarmadik féltől származó könyvtár betöltése.",
     "confirmAddLibrary": "Ez a művelet {{numShapes}} formát fog hozzáadni a könyvtáradhoz. Biztos vagy benne?",
     "imageDoesNotContainScene": "Képek importálása egyelőre nem támogatott.\n\nEgy jelenetet szeretnél betölteni? Úgy tűnik ez a kép fájl nem tartalmazza a szükséges adatokat. Exportáláskor ezt egy külön opcióval lehet beállítani.",
-    "cannotRestoreFromImage": "A jelenet visszaállítása nem sikerült ebből a kép fájlból"
+    "cannotRestoreFromImage": "A jelenet visszaállítása nem sikerült ebből a kép fájlból",
+    "resetLibrary": ""
   },
   "toolBar": {
     "selection": "Kijelölés",
@@ -243,6 +244,8 @@
   "toast": {
     "copyStyles": "",
     "copyToClipboard": "",
-    "copyToClipboardAsPng": ""
+    "copyToClipboardAsPng": "",
+    "fileSaved": "",
+    "fileSavedToFilename": ""
   }
 }

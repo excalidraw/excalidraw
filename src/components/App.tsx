@@ -4,7 +4,6 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
 import clsx from "clsx";
 
-import "../actions";
 import {
   actionAddToLibrary,
   actionBringForward,
@@ -52,6 +51,7 @@ import {
   LINE_CONFIRM_THRESHOLD,
   MIME_TYPES,
   POINTER_BUTTON,
+  SCROLL_TIMEOUT,
   TAP_TWICE_TIMEOUT,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
   TOUCH_CTX_MENU_TIMEOUT,
@@ -681,19 +681,24 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     scene.appState = {
       ...scene.appState,
-      ...calculateScrollCenter(
-        scene.elements,
-        {
-          ...scene.appState,
-          width: this.state.width,
-          height: this.state.height,
-          offsetTop: this.state.offsetTop,
-          offsetLeft: this.state.offsetLeft,
-        },
-        null,
-      ),
       isLoading: false,
     };
+    if (initialData?.scrollToCenter) {
+      scene.appState = {
+        ...scene.appState,
+        ...calculateScrollCenter(
+          scene.elements,
+          {
+            ...scene.appState,
+            width: this.state.width,
+            height: this.state.height,
+            offsetTop: this.state.offsetTop,
+            offsetLeft: this.state.offsetLeft,
+          },
+          null,
+        ),
+      };
+    }
 
     this.resetHistory();
     this.syncActionResult({
@@ -843,6 +848,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     document.addEventListener(EVENT.PASTE, this.pasteFromClipboard);
     document.addEventListener(EVENT.CUT, this.onCut);
+    document.addEventListener(EVENT.SCROLL, this.onScroll);
 
     window.addEventListener(EVENT.RESIZE, this.onResize, false);
     window.addEventListener(EVENT.UNLOAD, this.onUnload, false);
@@ -988,6 +994,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       },
       {
         renderOptimizations: true,
+        renderScrollbars: !isMobile(),
       },
     );
     promises?.forEach((promise: Promise<void> | undefined) => {
@@ -1020,6 +1027,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       );
     }
   }
+
+  private onScroll = debounce(() => {
+    this.setState({ ...this.getCanvasOffsets() });
+  }, SCROLL_TIMEOUT);
 
   // Copy/paste
 
@@ -1640,6 +1651,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     textWysiwyg({
       id: element.id,
       appState: this.state,
+      canvas: this.canvas,
       getViewportCoords: (x, y) => {
         const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
           {
@@ -2046,7 +2058,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           points: points.slice(0, -1),
         });
       } else {
-        if (isPathALoop(points)) {
+        if (isPathALoop(points, this.state.zoom.value)) {
           document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
         }
         // update last uncommitted point
@@ -2718,7 +2730,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       const { multiElement } = this.state;
 
       // finalize if completing a loop
-      if (multiElement.type === "line" && isPathALoop(multiElement.points)) {
+      if (
+        multiElement.type === "line" &&
+        isPathALoop(multiElement.points, this.state.zoom.value)
+      ) {
         mutateElement(multiElement, {
           lastCommittedPoint:
             multiElement.points[multiElement.points.length - 1],
@@ -3789,14 +3804,15 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       options.push(actionCopyAsSvg);
     }
     if (!element) {
-      const viewModeOptions: ContextMenuOption[] = [
+      const viewModeOptions = [
         ...options,
+        typeof this.props.gridModeEnabled === "undefined" &&
+          actionToggleGridMode,
+        typeof this.props.zenModeEnabled === "undefined" && actionToggleZenMode,
+        typeof this.props.viewModeEnabled === "undefined" &&
+          actionToggleViewMode,
         actionToggleStats,
       ];
-
-      if (typeof this.props.viewModeEnabled === "undefined") {
-        viewModeOptions.push(actionToggleViewMode);
-      }
 
       ContextMenu.push({
         options: viewModeOptions,

@@ -68,7 +68,7 @@
     "layers": "Lagen",
     "actions": "Acties",
     "language": "Taal",
-    "createRoom": "Deel een live-samenwerkingssessie",
+    "liveCollaboration": "Live Samenwerking",
     "duplicateSelection": "Dupliceer",
     "untitled": "Naamloos",
     "name": "Naam",
@@ -77,7 +77,7 @@
     "group": "Groeperen",
     "ungroup": "Groep opheffen",
     "collaborators": "Deelnemers",
-    "gridMode": "Rasterweergave",
+    "showGrid": "Raster weergeven",
     "addToLibrary": "Voeg toe aan bibliotheek",
     "removeFromLibrary": "Verwijder uit bibliotheek",
     "libraryLoadingMessage": "Bibliotheek laden…",
@@ -117,7 +117,7 @@
     "edit": "Bewerken",
     "undo": "Ongedaan maken",
     "redo": "Herstel ongedaan maken",
-    "roomDialog": "Live-samenwerkingssessie starten",
+    "resetLibrary": "Bibliotheek Resetten",
     "createNewRoom": "Creëer live-samenwerkingssessie",
     "fullScreen": "Volledig scherm",
     "darkMode": "Donkere modus",
@@ -140,7 +140,8 @@
     "errorLoadingLibrary": "Bij het laden van de externe bibliotheek is een fout opgetreden.",
     "confirmAddLibrary": "Hiermee worden {{numShapes}} vorm(n) aan uw bibliotheek toegevoegd. Ben je het zeker?",
     "imageDoesNotContainScene": "Afbeeldingen importeren wordt op dit moment niet ondersteund.\n\nWil je een scène importeren? Deze afbeelding lijkt geen scène gegevens te bevatten. Heb je dit geactiveerd tijdens het exporteren?",
-    "cannotRestoreFromImage": "Scène kan niet worden hersteld vanuit dit afbeeldingsbestand"
+    "cannotRestoreFromImage": "Scène kan niet worden hersteld vanuit dit afbeeldingsbestand",
+    "resetLibrary": "Dit zal je bibliotheek wissen. Weet je het zeker?"
   },
   "toolBar": {
     "selection": "Selectie",
@@ -243,6 +244,8 @@
   "toast": {
     "copyStyles": "Stijlen gekopieerd.",
     "copyToClipboard": "Gekopieerd naar het klembord.",
-    "copyToClipboardAsPng": "Gekopieerd naar klembord als PNG."
+    "copyToClipboardAsPng": "Gekopieerd naar klembord als PNG.",
+    "fileSaved": "Bestand opgeslagen.",
+    "fileSavedToFilename": "Opgeslagen als {filename}"
   }
 }

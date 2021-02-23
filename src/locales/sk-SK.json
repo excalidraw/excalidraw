@@ -68,7 +68,7 @@
     "layers": "Vrstvy",
     "actions": "Akcie",
     "language": "Jazyk",
-    "createRoom": "Zdieľajte živú spoluprácu",
+    "liveCollaboration": "Živá spolupráca",
     "duplicateSelection": "Duplikovať",
     "untitled": "Bez názvu",
     "name": "Meno",
@@ -77,7 +77,7 @@
     "group": "Zoskupiť",
     "ungroup": "Zrušiť zoskupenie",
     "collaborators": "Spolupracovníci",
-    "gridMode": "Režim mriežky",
+    "showGrid": "Zobraziť mriežku",
     "addToLibrary": "Pridať do knižnice",
     "removeFromLibrary": "Odstrániť z knižnice",
     "libraryLoadingMessage": "Načítavanie knižnice…",
@@ -117,7 +117,7 @@
     "edit": "Upraviť",
     "undo": "Späť",
     "redo": "Znova",
-    "roomDialog": "Začať živú spoluprácu",
+    "resetLibrary": "Obnoviť knižnicu",
     "createNewRoom": "Vytvoriť novú miestnosť",
     "fullScreen": "Celá obrazovka",
     "darkMode": "Tmavý režim",
@@ -140,7 +140,8 @@
     "errorLoadingLibrary": "Nepodarilo sa načítať externú knižnicu.",
     "confirmAddLibrary": "Týmto sa pridá {{numShapes}} tvar(ov) do vašej knižnice. Ste si istí?",
     "imageDoesNotContainScene": "Importovanie obrázku v tomto momente nie je možné.\n\nChceli ste importovať scénu? Tento obrázok neobsahuje žiadne údaje scény. Povolili ste túto možnosť počas exportovania?",
-    "cannotRestoreFromImage": "Nepodarilo sa obnoviť scénu z tohto obrázkového súboru"
+    "cannotRestoreFromImage": "Nepodarilo sa obnoviť scénu z tohto obrázkového súboru",
+    "resetLibrary": "Týmto vyprázdnite vašu knižnicu. Ste si istý?"
   },
   "toolBar": {
     "selection": "Výber",
@@ -243,6 +244,8 @@
   "toast": {
     "copyStyles": "Štýly skopírované.",
     "copyToClipboard": "Skopírované do schránky.",
-    "copyToClipboardAsPng": "Skopírované do schránky ako PNG."
+    "copyToClipboardAsPng": "Skopírované do schránky ako PNG.",
+    "fileSaved": "Súbor uložený.",
+    "fileSavedToFilename": "Uložený ako {filename}"
   }
 }

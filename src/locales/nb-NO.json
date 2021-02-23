@@ -68,7 +68,7 @@
     "layers": "Lag",
     "actions": "Handlinger",
     "language": "Språk",
-    "createRoom": "Del en sanntids-samarbeidsøkt",
+    "liveCollaboration": "Sanntids-samarbeid",
     "duplicateSelection": "Dupliser",
     "untitled": "Uten navn",
     "name": "Navn",
@@ -77,7 +77,7 @@
     "group": "Gruppér utvalg",
     "ungroup": "Avgruppér utvalg",
     "collaborators": "Samarbeidspartnere",
-    "gridMode": "Rutevisning",
+    "showGrid": "Vis rutenett",
     "addToLibrary": "Legg til i bibliotek",
     "removeFromLibrary": "Fjern fra bibliotek",
     "libraryLoadingMessage": "Laster bibliotek…",
@@ -117,7 +117,7 @@
     "edit": "Rediger",
     "undo": "Angre",
     "redo": "Gjør om",
-    "roomDialog": "Start sanntids-samarbeid",
+    "resetLibrary": "Nullstill bibliotek",
     "createNewRoom": "Opprett et nytt rom",
     "fullScreen": "Fullskjerm",
     "darkMode": "Mørk modus",
@@ -140,7 +140,8 @@
     "errorLoadingLibrary": "Det oppstod en feil under lasting av tredjepartsbiblioteket.",
     "confirmAddLibrary": "Dette vil legge til {{numShapes}} figur(er) i biblioteket ditt. Er du sikker?",
     "imageDoesNotContainScene": "Importering av bilder støttes ikke for øyeblikket.\n\nVil du importere en scene? Dette bildet ser ikke ut til å inneholde noen scene-data. Har du aktivert dette under eksporten?",
-    "cannotRestoreFromImage": "Scenen kunne ikke gjenopprettes fra denne bildefilen"
+    "cannotRestoreFromImage": "Scenen kunne ikke gjenopprettes fra denne bildefilen",
+    "resetLibrary": "Dette vil tømme biblioteket ditt. Er du sikker?"
   },
   "toolBar": {
     "selection": "Velg",
@@ -243,6 +244,8 @@
   "toast": {
     "copyStyles": "Kopierte stiler.",
     "copyToClipboard": "Kopiert til utklippstavlen.",
-    "copyToClipboardAsPng": "Kopiert til utklippstavlen som PNG."
+    "copyToClipboardAsPng": "Kopiert til utklippstavlen som PNG.",
+    "fileSaved": "Fil lagret.",
+    "fileSavedToFilename": "Lagret til {filename}"
   }
 }

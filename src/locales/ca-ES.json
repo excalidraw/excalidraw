@@ -68,7 +68,7 @@
     "layers": "Capes",
     "actions": "Accions",
     "language": "Llengua",
-    "createRoom": "Compartir una sessió de col·laboració en directe",
+    "liveCollaboration": "",
     "duplicateSelection": "Duplicar",
     "untitled": "Sense títol",
     "name": "Nom",
@@ -77,7 +77,7 @@
     "group": "Agrupar la selecció",
     "ungroup": "Desagrupar la selecció",
     "collaborators": "Col·laboradors",
-    "gridMode": "Mode quadrícula",
+    "showGrid": "",
     "addToLibrary": "Afegir a la biblioteca",
     "removeFromLibrary": "Eliminar de la biblioteca",
     "libraryLoadingMessage": "Carregant la biblioteca…",
@@ -117,7 +117,7 @@
     "edit": "Editar",
     "undo": "Desfer",
     "redo": "Refer",
-    "roomDialog": "Començar col·laboració en directe",
+    "resetLibrary": "",
     "createNewRoom": "Crear sala nova",
     "fullScreen": "Pantalla completa",
     "darkMode": "Mode fosc",
@@ -140,7 +140,8 @@
     "errorLoadingLibrary": "S'ha produït un error en carregar la biblioteca de tercers.",
     "confirmAddLibrary": "Això afegirà {{numShapes}} forma(es) a la vostra biblioteca. Estàs segur?",
     "imageDoesNotContainScene": "En aquest moment no s’admet la importació d’imatges.\n\nVolies importar una escena? Sembla que aquesta imatge no conté cap dada d’escena. Ho has activat durant l'exportació?",
-    "cannotRestoreFromImage": "L’escena no s’ha pogut restaurar des d’aquest fitxer d’imatge"
+    "cannotRestoreFromImage": "L’escena no s’ha pogut restaurar des d’aquest fitxer d’imatge",
+    "resetLibrary": ""
   },
   "toolBar": {
     "selection": "Selecció",
@@ -243,6 +244,8 @@
   "toast": {
     "copyStyles": "",
     "copyToClipboard": "",
-    "copyToClipboardAsPng": ""
+    "copyToClipboardAsPng": "",
+    "fileSaved": "",
+    "fileSavedToFilename": ""
   }
 }

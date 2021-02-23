@@ -13,8 +13,8 @@ module.exports = {
     library: "Excalidraw",
     libraryTarget: "umd",
     filename: "[name].js",
-    publicPath: "/",
-    chunkFilename: "excalidraw-assets/[name].js",
+    chunkFilename: "excalidraw-assets/[name]-[contenthash].js",
+    publicPath: "",
   },
   resolve: {
     extensions: [".js", ".ts", ".tsx", ".css", ".scss"],

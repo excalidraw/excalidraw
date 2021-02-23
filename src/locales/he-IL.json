@@ -68,7 +68,7 @@
     "layers": "שכבות",
     "actions": "פעולות",
     "language": "שפה",
-    "createRoom": "התחל שיתוף פעולה חי",
+    "liveCollaboration": "",
     "duplicateSelection": "שכפל",
     "untitled": "ללא כותרת",
     "name": "שם",
@@ -77,7 +77,7 @@
     "group": "אחד לקבוצה",
     "ungroup": "פרק קבוצה",
     "collaborators": "שותפים",
-    "gridMode": "מצב רשת",
+    "showGrid": "",
     "addToLibrary": "הוסף לספריה",
     "removeFromLibrary": "הסר מספריה",
     "libraryLoadingMessage": "טוען ספריה…",
@@ -117,7 +117,7 @@
     "edit": "ערוך",
     "undo": "בטל",
     "redo": "בצע מחדש",
-    "roomDialog": "התחל שיתוף חי",
+    "resetLibrary": "",
     "createNewRoom": "צור חדר",
     "fullScreen": "מסך מלא",
     "darkMode": "מצב כהה",
@@ -140,7 +140,8 @@
     "errorLoadingLibrary": "קרתה שגיאה בטעינת הספריה החיצונית.",
     "confirmAddLibrary": "הפעולה תוסיף {{numShapes}} צורה(ות) לספריה שלך. האם אתה בטוח?",
     "imageDoesNotContainScene": "אין תמיכה בייבוא תמונות כעת.\n\nהאם אתה רוצה לייבא תצוגה? התמונה הזאת אינה מכילה מידע על תצוגה. האם הפעלת את האפשרות הזאת בזמן הוצאת המידע?",
-    "cannotRestoreFromImage": "לא הצלחנו לשחזר את התצוגה מקובץ התמונה"
+    "cannotRestoreFromImage": "לא הצלחנו לשחזר את התצוגה מקובץ התמונה",
+    "resetLibrary": ""
   },
   "toolBar": {
     "selection": "בחירה",
@@ -243,6 +244,8 @@
   "toast": {
     "copyStyles": "",
     "copyToClipboard": "",
-    "copyToClipboardAsPng": ""
+    "copyToClipboardAsPng": "",
+    "fileSaved": "",
+    "fileSavedToFilename": ""
   }
 }

@@ -34,27 +34,27 @@
     ]
   },
   "devDependencies": {
-    "@babel/core": "7.12.10",
-    "@babel/plugin-transform-arrow-functions": "7.12.1",
-    "@babel/plugin-transform-async-to-generator": "7.12.1",
+    "@babel/core": "7.12.17",
+    "@babel/plugin-transform-arrow-functions": "7.12.13",
+    "@babel/plugin-transform-async-to-generator": "7.12.13",
     "@babel/plugin-transform-runtime": "^7.12.10",
-    "@babel/plugin-transform-typescript": "7.12.1",
-    "@babel/preset-env": "7.12.11",
-    "@babel/preset-typescript": "7.12.7",
+    "@babel/plugin-transform-typescript": "7.12.17",
+    "@babel/preset-env": "7.12.17",
+    "@babel/preset-typescript": "7.12.17",
     "babel-loader": "8.2.2",
     "babel-plugin-transform-class-properties": "6.24.1",
     "cross-env": "7.0.3",
     "file-loader": "6.2.0",
-    "ts-loader": "8.0.14",
-    "webpack": "5.19.0",
+    "ts-loader": "8.0.17",
+    "webpack": "5.23.0",
     "webpack-bundle-analyzer": "4.4.0",
-    "webpack-cli": "4.4.0"
+    "webpack-cli": "4.5.0"
   },
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
   "repository": "https://github.com/excalidraw/excalidraw",
   "scripts": {
     "build:umd": "cross-env NODE_ENV=production webpack --config webpack.prod.config.js",
     "build:umd:withAnalyzer": "cross-env NODE_ENV=production ANALYZER=true webpack --config webpack.prod.config.js",
-    "pack": "npm run build:umd && npm pack"
+    "pack": "yarn build:umd && npm pack"
   }
 }

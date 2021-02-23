@@ -1,4 +1,5 @@
 import React, { useEffect, forwardRef } from "react";
+import "./publicPath";
 
 import { InitializeApp } from "../../components/InitializeApp";
 import App from "../../components/App";
@@ -106,3 +107,4 @@ export {
   getElementMap,
 } from "../../element";
 export { defaultLang, languages } from "../../i18n";
+export { restore, restoreAppState, restoreElements } from "../../data/restore";
