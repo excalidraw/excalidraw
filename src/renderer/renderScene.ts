@@ -212,6 +212,10 @@ export const renderScene = (
   const normalizedCanvasWidth = canvas.width / scale;
   const normalizedCanvasHeight = canvas.height / scale;
 
+  if (sceneState.exportWithDarkMode) {
+    context.filter = APPEARANCE_FILTER;
+  }
+
   // Paint background
   if (typeof sceneState.viewBackgroundColor === "string") {
     const hasTransparence =
@@ -221,9 +225,6 @@ export const renderScene = (
       /(hsla|rgba)\(/.test(sceneState.viewBackgroundColor);
     if (hasTransparence) {
       context.clearRect(0, 0, normalizedCanvasWidth, normalizedCanvasHeight);
-    }
-    if (sceneState.exportWithDarkMode) {
-      context.filter = APPEARANCE_FILTER;
     }
     const fillStyle = context.fillStyle;
     context.fillStyle = sceneState.viewBackgroundColor;
