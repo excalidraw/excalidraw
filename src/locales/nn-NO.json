@@ -92,7 +92,8 @@
     "centerHorizontally": "Midtstill horisontalt",
     "distributeHorizontally": "Sprei horisontalt",
     "distributeVertically": "Sprei vertikalt",
-    "viewMode": ""
+    "viewMode": "",
+    "toggleExportColorScheme": ""
   },
   "buttons": {
     "clearReset": "Tilbakestill lerretet",
