@@ -52,7 +52,7 @@
     "@types/lodash.throttle": "4.1.6",
     "@types/pako": "1.0.1",
     "@types/resize-observer-browser": "0.1.5",
-    "eslint-config-prettier": "7.2.0",
+    "eslint-config-prettier": "8.0.0",
     "eslint-plugin-prettier": "3.3.1",
     "firebase-tools": "9.5.0",
     "husky": "4.3.8",
