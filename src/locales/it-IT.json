@@ -92,7 +92,8 @@
     "centerHorizontally": "Centra orizzontalmente",
     "distributeHorizontally": "Distribuisci orizzontalmente",
     "distributeVertically": "Distribuisci verticalmente",
-    "viewMode": "Modalità visualizzazione"
+    "viewMode": "Modalità visualizzazione",
+    "toggleExportColorScheme": ""
   },
   "buttons": {
     "clearReset": "Svuota la tela",
