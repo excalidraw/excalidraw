@@ -48,7 +48,7 @@
     "@babel/plugin-transform-typescript": "7.13.0",
     "@babel/preset-env": "7.12.17",
     "@babel/preset-react": "7.12.13",
-    "@babel/preset-typescript": "7.12.17",
+    "@babel/preset-typescript": "7.13.0",
     "babel-loader": "8.2.2",
     "babel-plugin-transform-class-properties": "6.24.1",
     "cross-env": "7.0.3",
