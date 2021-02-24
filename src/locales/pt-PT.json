@@ -93,7 +93,7 @@
     "distributeHorizontally": "Distribuir horizontalmente",
     "distributeVertically": "Distribuir verticalmente",
     "viewMode": "Modo de visualização",
-    "toggleExportColorScheme": ""
+    "toggleExportColorScheme": "Alternar esquema de cores de exportação"
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
