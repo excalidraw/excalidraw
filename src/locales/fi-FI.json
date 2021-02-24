@@ -93,7 +93,7 @@
     "distributeHorizontally": "Jaa vaakasuunnassa",
     "distributeVertically": "Jaa pystysuunnassa",
     "viewMode": "Katselutila",
-    "toggleExportColorScheme": ""
+    "toggleExportColorScheme": "Vaihda viennin väriteema"
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
