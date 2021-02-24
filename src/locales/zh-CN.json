@@ -92,7 +92,8 @@
     "centerHorizontally": "水平居中",
     "distributeHorizontally": "水平等距分布",
     "distributeVertically": "垂直等距分布",
-    "viewMode": "查看模式"
+    "viewMode": "查看模式",
+    "toggleExportColorScheme": ""
   },
   "buttons": {
     "clearReset": "重置画布",
