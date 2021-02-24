@@ -92,7 +92,8 @@
     "centerHorizontally": "Di tlemmast s uglawi",
     "distributeHorizontally": "Freq s uglawi",
     "distributeVertically": "Freq s yibeddi",
-    "viewMode": "Askar n tmuɣli"
+    "viewMode": "Askar n tmuɣli",
+    "toggleExportColorScheme": ""
   },
   "buttons": {
     "clearReset": "Ales awennez n teɣzut n usuneɣ",
