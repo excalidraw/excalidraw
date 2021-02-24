@@ -93,7 +93,7 @@
     "distributeHorizontally": "Fördela horisontellt",
     "distributeVertically": "Fördela vertikalt",
     "viewMode": "Visningsläge",
-    "toggleExportColorScheme": ""
+    "toggleExportColorScheme": "Växla färgschema för export"
   },
   "buttons": {
     "clearReset": "Återställ canvasen",
