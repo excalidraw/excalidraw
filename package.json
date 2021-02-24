@@ -42,7 +42,7 @@
     "pwacompat": "2.0.17",
     "react": "17.0.1",
     "react-dom": "17.0.1",
-    "react-scripts": "4.0.2",
+    "react-scripts": "4.0.3",
     "roughjs": "4.3.1",
     "sass": "1.32.8",
     "socket.io-client": "2.3.1",
