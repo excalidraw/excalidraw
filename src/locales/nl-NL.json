@@ -93,7 +93,7 @@
     "distributeHorizontally": "Horizontaal verspreiden",
     "distributeVertically": "Verticaal distribueren",
     "viewMode": "Weergavemodus",
-    "toggleExportColorScheme": ""
+    "toggleExportColorScheme": "Kleurenschema exporteren aan/uit"
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
