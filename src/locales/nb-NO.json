@@ -93,7 +93,7 @@
     "distributeHorizontally": "Distribuer horisontalt",
     "distributeVertically": "Distribuer vertikalt",
     "viewMode": "Visningsmodus",
-    "toggleExportColorScheme": ""
+    "toggleExportColorScheme": "Veksle eksport av fargepalett"
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
