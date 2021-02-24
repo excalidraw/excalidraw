@@ -92,7 +92,8 @@
     "centerHorizontally": "Wyśrodkuj w poziomie",
     "distributeHorizontally": "Rozłóż poziomo",
     "distributeVertically": "Rozłóż pionowo",
-    "viewMode": "Tryb widoku"
+    "viewMode": "Tryb widoku",
+    "toggleExportColorScheme": ""
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
