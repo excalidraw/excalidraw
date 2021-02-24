@@ -92,7 +92,8 @@
     "centerHorizontally": "Keskitä vaakasuunnassa",
     "distributeHorizontally": "Jaa vaakasuunnassa",
     "distributeVertically": "Jaa pystysuunnassa",
-    "viewMode": "Katselutila"
+    "viewMode": "Katselutila",
+    "toggleExportColorScheme": ""
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
