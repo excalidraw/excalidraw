@@ -93,7 +93,7 @@
     "distributeHorizontally": "Distribuisci orizzontalmente",
     "distributeVertically": "Distribuisci verticalmente",
     "viewMode": "Modalità visualizzazione",
-    "toggleExportColorScheme": ""
+    "toggleExportColorScheme": "Cambia lo schema di colori in esportazione"
   },
   "buttons": {
     "clearReset": "Svuota la tela",
