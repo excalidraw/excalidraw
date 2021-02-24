@@ -93,7 +93,7 @@
     "distributeHorizontally": "Распределить по горизонтали",
     "distributeVertically": "Распределить по вертикали",
     "viewMode": "Вид",
-    "toggleExportColorScheme": ""
+    "toggleExportColorScheme": "Экспортировать цветовую схему"
   },
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",
