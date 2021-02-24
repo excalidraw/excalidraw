@@ -92,7 +92,8 @@
     "centerHorizontally": "Centrera horisontellt",
     "distributeHorizontally": "Fördela horisontellt",
     "distributeVertically": "Fördela vertikalt",
-    "viewMode": "Visningsläge"
+    "viewMode": "Visningsläge",
+    "toggleExportColorScheme": ""
   },
   "buttons": {
     "clearReset": "Återställ canvasen",
