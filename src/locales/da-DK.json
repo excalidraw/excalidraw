@@ -92,7 +92,8 @@
     "centerHorizontally": "",
     "distributeHorizontally": "",
     "distributeVertically": "",
-    "viewMode": ""
+    "viewMode": "",
+    "toggleExportColorScheme": ""
   },
   "buttons": {
     "clearReset": "",
