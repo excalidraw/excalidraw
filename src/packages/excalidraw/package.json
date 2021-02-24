@@ -45,7 +45,7 @@
     "@babel/plugin-transform-arrow-functions": "7.12.13",
     "@babel/plugin-transform-async-to-generator": "7.12.13",
     "@babel/plugin-transform-runtime": "7.12.17",
-    "@babel/plugin-transform-typescript": "7.12.17",
+    "@babel/plugin-transform-typescript": "7.13.0",
     "@babel/preset-env": "7.12.17",
     "@babel/preset-react": "7.12.13",
     "@babel/preset-typescript": "7.12.17",
