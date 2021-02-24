@@ -92,7 +92,8 @@
     "centerHorizontally": "Pusatkan secara horizontal",
     "distributeHorizontally": "Distribusikan horizontal",
     "distributeVertically": "Distribusikan vertikal",
-    "viewMode": "Mode tampilan"
+    "viewMode": "Mode tampilan",
+    "toggleExportColorScheme": ""
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
