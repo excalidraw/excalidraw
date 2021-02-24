@@ -92,7 +92,8 @@
     "centerHorizontally": "水平置中",
     "distributeHorizontally": "水平分布",
     "distributeVertically": "垂直分布",
-    "viewMode": "檢視模式"
+    "viewMode": "檢視模式",
+    "toggleExportColorScheme": ""
   },
   "buttons": {
     "clearReset": "重置 canvas",
