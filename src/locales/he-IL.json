@@ -92,7 +92,8 @@
     "centerHorizontally": "מרכז אופקית",
     "distributeHorizontally": "חלוקה אופקית",
     "distributeVertically": "חלוקה אנכית",
-    "viewMode": "מצב תצוגה"
+    "viewMode": "מצב תצוגה",
+    "toggleExportColorScheme": ""
   },
   "buttons": {
     "clearReset": "אפס את הלוח",
