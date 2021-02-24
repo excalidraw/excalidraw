@@ -93,7 +93,7 @@
     "distributeHorizontally": "水平分布",
     "distributeVertically": "垂直分布",
     "viewMode": "檢視模式",
-    "toggleExportColorScheme": ""
+    "toggleExportColorScheme": "切換輸出配色"
   },
   "buttons": {
     "clearReset": "重置 canvas",
