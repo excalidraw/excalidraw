@@ -1,10 +1,15 @@
-@import "./_variables";
+@import "./variables.module";
 @import "./theme";
 
+:root {
+  --zIndex-canvas: 1;
+  --zIndex-wysiwyg: 2;
+  --zIndex-layerUI: 3;
+}
+
 .excalidraw {
-  color: var(--text-color-primary);
+  color: var(--text-primary-color);
   display: flex;
-  position: fixed;
   top: 0;
   bottom: 0;
   left: 0;
@@ -13,7 +18,7 @@
   a {
     font-weight: 500;
     text-decoration: none;
-    color: $oc-blue-7; /* OC Blue 7 */
+    color: var(--link-color);
 
     &:hover {
       text-decoration: underline;
@@ -30,6 +35,8 @@
     image-rendering: pixelated; // chromium
     // NOTE: must be declared *after* the above
     image-rendering: -moz-crisp-edges; // FF
+
+    z-index: var(--zIndex-canvas);
   }
 
   &.Appearance_dark {
@@ -43,10 +50,10 @@
   }
 
   .FixedSideContainer {
-    padding-top: var(--sat, 0px);
-    padding-right: var(--sar, 0px);
-    padding-bottom: var(--sab, 0px);
-    padding-left: var(--sal, 0px);
+    padding-top: var(--sat, 0);
+    padding-right: var(--sar, 0);
+    padding-bottom: var(--sab, 0);
+    padding-left: var(--sal, 0);
   }
 
   .panelRow {
@@ -64,7 +71,7 @@
       margin-top: 0.333rem;
       margin-bottom: 0.333rem;
       font-size: 0.75rem;
-      color: var(--text-color-primary);
+      color: var(--text-primary-color);
       font-weight: bold;
       display: block;
     }
@@ -216,6 +223,13 @@
     }
   }
 
+  .App-top-bar {
+    z-index: var(--zIndex-layerUI);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
   .App-bottom-bar {
     position: absolute;
     top: 0;
@@ -223,10 +237,10 @@
     left: 0;
     right: 0;
     --bar-padding: calc(4 * var(--space-factor));
-    padding-top: #{"max(var(--bar-padding), var(--sat, 0px))"};
-    padding-right: var(--sar, 0px);
-    padding-bottom: var(--sab, 0px);
-    padding-left: var(--sal, 0px);
+    padding-top: #{"max(var(--bar-padding), var(--sat,0))"};
+    padding-right: var(--sar, 0);
+    padding-bottom: var(--sab, 0);
+    padding-left: var(--sal, 0);
     z-index: 4;
     display: flex;
     align-items: flex-end;
@@ -243,7 +257,7 @@
       pointer-events: initial;
 
       .panelColumn {
-        padding: 8px 8px 0px 8px;
+        padding: 8px 8px 0 8px;
       }
     }
   }
@@ -282,7 +296,7 @@
     pointer-events: none !important;
   }
 
-  .App-menu_top > * {
+  .layer-ui__wrapper:not(.disable-pointerEvents) .App-menu_top > * {
     pointer-events: all;
   }
 
@@ -323,7 +337,7 @@
     }
   }
 
-  .App-menu_bottom > * {
+  .layer-ui__wrapper:not(.disable-pointerEvents) .App-menu_bottom > * {
     pointer-events: all;
   }
 
@@ -347,7 +361,6 @@
 
   .App-menu__left {
     overflow-y: auto;
-    max-height: calc(100vh - 236px);
   }
 
   .dropdown-select {
@@ -419,7 +432,7 @@
 
   .scroll-back-to-content {
     color: var(--popup-text-color);
-    position: fixed;
+    position: absolute;
     left: 50%;
     bottom: 30px;
     transform: translateX(-50%);
@@ -431,6 +444,7 @@
     cursor: pointer;
     fill: $oc-gray-6;
     bottom: 14px;
+    width: 1.5rem;
 
     :root[dir="ltr"] & {
       right: 14px;
@@ -441,12 +455,12 @@
     }
   }
 
-  @media #{$media-query} {
+  @media #{$is-mobile-query} {
     aside {
       display: none;
     }
     .scroll-back-to-content {
-      bottom: calc(80px + var(--sab, 0px));
+      bottom: calc(80px + var(--sab, 0));
       z-index: -1;
     }
   }
@@ -489,6 +503,13 @@
 
   .disable-pointerEvents {
     pointer-events: none !important;
+  }
+
+  &.excalidraw--view-mode {
+    .App-menu {
+      display: flex;
+      justify-content: space-between;
+    }
   }
 
   @media print {

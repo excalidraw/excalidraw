@@ -1,8 +1,13 @@
-@import "../css/_variables";
+@import "../css/variables.module";
 
 .excalidraw {
+  &.excalidraw-modal-container {
+    position: absolute;
+    z-index: 10;
+  }
+
   .Modal {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     right: 0;
@@ -15,7 +20,7 @@
   }
 
   .Modal__background {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     right: 0;
@@ -30,18 +35,26 @@
     z-index: 2;
     width: 100%;
     max-width: var(--max-width);
+    max-height: 100%;
 
     opacity: 0;
     transform: translateY(10px);
     animation: Modal__content_fade-in 0.1s ease-out 0.05s forwards;
     position: relative;
+    overflow-y: auto;
 
     // for modals, reset blurry bg
-    background: var(--bg-color-island);
+    background: var(--island-bg-color);
     backdrop-filter: none;
 
-    @media #{$media-query} {
+    border: 1px solid var(--dialog-border-color);
+    box-shadow: 0 2px 10px transparentize($oc-black, 0.75);
+    border-radius: 6px;
+
+    @media #{$is-mobile-query} {
       max-width: 100%;
+      border: 0;
+      border-radius: 0;
     }
   }
 
@@ -68,19 +81,13 @@
     }
   }
 
-  .Modal__close--floating {
-    position: absolute;
-    right: calc(var(--space-factor) * 5);
-    top: calc(var(--space-factor) * 5);
-  }
-
-  @media #{$media-query} {
+  @media #{$is-mobile-query} {
     .Modal {
       padding: 0;
     }
 
     .Modal__content {
-      position: fixed;
+      position: absolute;
       top: 0;
       left: 0;
       right: 0;

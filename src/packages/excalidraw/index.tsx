@@ -1,4 +1,5 @@
 import React, { useEffect, forwardRef } from "react";
+import "./publicPath";
 
 import { InitializeApp } from "../../components/InitializeApp";
 import App from "../../components/App";
@@ -8,7 +9,7 @@ import "../../css/styles.scss";
 
 import { ExcalidrawAPIRefValue, ExcalidrawProps } from "../../types";
 import { IsMobileProvider } from "../../is-mobile";
-import { noop } from "../../utils";
+import { defaultLang } from "../../i18n";
 
 const Excalidraw = (props: ExcalidrawProps) => {
   const {
@@ -18,11 +19,16 @@ const Excalidraw = (props: ExcalidrawProps) => {
     offsetTop,
     onChange,
     initialData,
-    user,
     excalidrawRef,
-    onCollabButtonClick = noop,
+    onCollabButtonClick,
     isCollaborating,
     onPointerUpdate,
+    onExportToBackend,
+    renderFooter,
+    langCode = defaultLang.code,
+    viewModeEnabled,
+    zenModeEnabled,
+    gridModeEnabled,
   } = props;
 
   useEffect(() => {
@@ -44,7 +50,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
   }, []);
 
   return (
-    <InitializeApp>
+    <InitializeApp langCode={langCode}>
       <IsMobileProvider>
         <App
           width={width}
@@ -53,11 +59,16 @@ const Excalidraw = (props: ExcalidrawProps) => {
           offsetTop={offsetTop}
           onChange={onChange}
           initialData={initialData}
-          user={user}
           excalidrawRef={excalidrawRef}
           onCollabButtonClick={onCollabButtonClick}
           isCollaborating={isCollaborating}
           onPointerUpdate={onPointerUpdate}
+          onExportToBackend={onExportToBackend}
+          renderFooter={renderFooter}
+          langCode={langCode}
+          viewModeEnabled={viewModeEnabled}
+          zenModeEnabled={zenModeEnabled}
+          gridModeEnabled={gridModeEnabled}
         />
       </IsMobileProvider>
     </InitializeApp>
@@ -70,17 +81,19 @@ const areEqual = (
   prevProps: PublicExcalidrawProps,
   nextProps: PublicExcalidrawProps,
 ) => {
-  const { initialData: prevInitialData, user: prevUser, ...prev } = prevProps;
-  const { initialData: nextInitialData, user: nextUser, ...next } = nextProps;
+  const { initialData: prevInitialData, ...prev } = prevProps;
+  const { initialData: nextInitialData, ...next } = nextProps;
 
   const prevKeys = Object.keys(prevProps) as (keyof typeof prev)[];
   const nextKeys = Object.keys(nextProps) as (keyof typeof next)[];
-
   return (
-    prevUser?.name === nextUser?.name &&
     prevKeys.length === nextKeys.length &&
     prevKeys.every((key) => prev[key] === next[key])
   );
+};
+
+Excalidraw.defaultProps = {
+  lanCode: defaultLang.code,
 };
 
 const forwardedRefComp = forwardRef<
@@ -93,3 +106,5 @@ export {
   getSyncableElements,
   getElementMap,
 } from "../../element";
+export { defaultLang, languages } from "../../i18n";
+export { restore, restoreAppState, restoreElements } from "../../data/restore";

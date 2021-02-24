@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
 import { ActionsManagerInterface } from "../actions/types";
-import { EVENT_DIALOG, trackEvent } from "../analytics";
 import { probablySupportsClipboardBlob } from "../clipboard";
 import { canvasToBlob } from "../data/blob";
 import { NonDeletedExcalidrawElement } from "../element/types";
@@ -19,6 +18,9 @@ import { ToolButton } from "./ToolButton";
 
 const scales = [1, 2, 3];
 const defaultScale = scales.includes(devicePixelRatio) ? devicePixelRatio : 1;
+
+const supportsContextFilters =
+  "filter" in document.createElement("canvas").getContext("2d")!;
 
 export const ErrorCanvasPreview = () => {
   return (
@@ -67,7 +69,7 @@ const ExportModal = ({
   onExportToPng: ExportCB;
   onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
-  onExportToBackend: ExportCB;
+  onExportToBackend?: ExportCB;
   onCloseRequest: () => void;
 }) => {
   const someElementIsSelected = isSomeElementSelected(elements, appState);
@@ -129,6 +131,8 @@ const ExportModal = ({
   return (
     <div className="ExportDialog">
       <div className="ExportDialog__preview" ref={previewRef} />
+      {supportsContextFilters &&
+        actionManager.renderAction("exportWithDarkMode")}
       <Stack.Col gap={2} align="center">
         <div className="ExportDialog__actions">
           <Stack.Row gap={2}>
@@ -155,13 +159,15 @@ const ExportModal = ({
                 onClick={() => onExportToClipboard(exportedElements, scale)}
               />
             )}
-            <ToolButton
-              type="button"
-              icon={link}
-              title={t("buttons.getShareableLink")}
-              aria-label={t("buttons.getShareableLink")}
-              onClick={() => onExportToBackend(exportedElements)}
-            />
+            {onExportToBackend && (
+              <ToolButton
+                type="button"
+                icon={link}
+                title={t("buttons.getShareableLink")}
+                aria-label={t("buttons.getShareableLink")}
+                onClick={() => onExportToBackend(exportedElements)}
+              />
+            )}
           </Stack.Row>
           <div className="ExportDialog__name">
             {actionManager.renderAction("changeProjectName")}
@@ -235,7 +241,7 @@ export const ExportDialog = ({
   onExportToPng: ExportCB;
   onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
-  onExportToBackend: ExportCB;
+  onExportToBackend?: ExportCB;
 }) => {
   const [modalIsShown, setModalIsShown] = useState(false);
   const triggerButton = useRef<HTMLButtonElement>(null);
@@ -249,7 +255,6 @@ export const ExportDialog = ({
     <>
       <ToolButton
         onClick={() => {
-          trackEvent(EVENT_DIALOG, "export");
           setModalIsShown(true);
         }}
         icon={exportFile}
@@ -260,11 +265,7 @@ export const ExportDialog = ({
         ref={triggerButton}
       />
       {modalIsShown && (
-        <Dialog
-          maxWidth={800}
-          onCloseRequest={handleClose}
-          title={t("buttons.export")}
-        >
+        <Dialog onCloseRequest={handleClose} title={t("buttons.export")}>
           <ExportModal
             elements={elements}
             appState={appState}

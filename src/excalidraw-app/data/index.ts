@@ -1,14 +1,16 @@
-import { t } from "../../i18n";
-import { ExcalidrawElement } from "../../element/types";
-import { AppState } from "../../types";
-import { ImportedDataState } from "../../data/types";
+import { serializeAsJSON } from "../../data/json";
 import { restore } from "../../data/restore";
-import { EVENT_ACTION, trackEvent } from "../../analytics";
+import { ImportedDataState } from "../../data/types";
+import { ExcalidrawElement } from "../../element/types";
+import { t } from "../../i18n";
+import { AppState } from "../../types";
+import { UserIdleState } from "../collab/types";
 
 const byteToHex = (byte: number): string => `0${byte.toString(16)}`.slice(-2);
 
 const BACKEND_GET = process.env.REACT_APP_BACKEND_V1_GET_URL;
 const BACKEND_V2_GET = process.env.REACT_APP_BACKEND_V2_GET_URL;
+const BACKEND_V2_POST = process.env.REACT_APP_BACKEND_V2_POST_URL;
 
 const generateRandomID = async () => {
   const arr = new Uint8Array(10);
@@ -55,6 +57,14 @@ export type SocketUpdateDataSource = {
       pointer: { x: number; y: number };
       button: "down" | "up";
       selectedElementIds: AppState["selectedElementIds"];
+      username: string;
+    };
+  };
+  IDLE_STATUS: {
+    type: "IDLE_STATUS";
+    payload: {
+      socketId: string;
+      userState: UserIdleState;
       username: string;
     };
   };
@@ -124,17 +134,27 @@ export const decryptAESGEM = async (
 };
 
 export const getCollaborationLinkData = (link: string) => {
-  if (link.length === 0) {
-    return;
-  }
   const hash = new URL(link).hash;
-  return hash.match(/^#room=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/);
+  const match = hash.match(/^#room=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/);
+  return match ? { roomId: match[1], roomKey: match[2] } : null;
 };
 
-export const generateCollaborationLink = async () => {
-  const id = await generateRandomID();
-  const key = await generateEncryptionKey();
-  return `${window.location.origin}${window.location.pathname}#room=${id},${key}`;
+export const generateCollaborationLinkData = async () => {
+  const roomId = await generateRandomID();
+  const roomKey = await generateEncryptionKey();
+
+  if (!roomKey) {
+    throw new Error("Couldn't generate room key");
+  }
+
+  return { roomId, roomKey };
+};
+
+export const getCollaborationLink = (data: {
+  roomId: string;
+  roomKey: string;
+}) => {
+  return `${window.location.origin}${window.location.pathname}#room=${data.roomId},${data.roomKey}`;
 };
 
 export const getImportedKey = (key: string, usage: KeyUsage) =>
@@ -190,7 +210,6 @@ const importFromBackend = async (
       data = await response.json();
     }
 
-    trackEvent(EVENT_ACTION, "import");
     return {
       elements: data.elements || null,
       appState: data.appState || null,
@@ -227,4 +246,60 @@ export const loadScene = async (
     appState: data.appState,
     commitToHistory: false,
   };
+};
+
+export const exportToBackend = async (
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+) => {
+  const json = serializeAsJSON(elements, appState);
+  const encoded = new TextEncoder().encode(json);
+
+  const key = await window.crypto.subtle.generateKey(
+    {
+      name: "AES-GCM",
+      length: 128,
+    },
+    true, // extractable
+    ["encrypt", "decrypt"],
+  );
+  // The iv is set to 0. We are never going to reuse the same key so we don't
+  // need to have an iv. (I hope that's correct...)
+  const iv = new Uint8Array(12);
+  // We use symmetric encryption. AES-GCM is the recommended algorithm and
+  // includes checks that the ciphertext has not been modified by an attacker.
+  const encrypted = await window.crypto.subtle.encrypt(
+    {
+      name: "AES-GCM",
+      iv,
+    },
+    key,
+    encoded,
+  );
+  // We use jwk encoding to be able to extract just the base64 encoded key.
+  // We will hardcode the rest of the attributes when importing back the key.
+  const exportedKey = await window.crypto.subtle.exportKey("jwk", key);
+
+  try {
+    const response = await fetch(BACKEND_V2_POST, {
+      method: "POST",
+      body: encrypted,
+    });
+    const json = await response.json();
+    if (json.id) {
+      const url = new URL(window.location.href);
+      // We need to store the key (and less importantly the id) as hash instead
+      // of queryParam in order to never send it to the server
+      url.hash = `json=${json.id},${exportedKey.k!}`;
+      const urlString = url.toString();
+      window.prompt(`🔒${t("alerts.uploadedSecurly")}`, urlString);
+    } else if (json.error_class === "RequestTooLargeError") {
+      window.alert(t("alerts.couldNotCreateShareableLinkTooBig"));
+    } else {
+      window.alert(t("alerts.couldNotCreateShareableLink"));
+    }
+  } catch (error) {
+    console.error(error);
+    window.alert(t("alerts.couldNotCreateShareableLink"));
+  }
 };

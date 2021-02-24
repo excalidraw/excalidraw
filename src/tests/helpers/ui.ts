@@ -170,6 +170,12 @@ export class Pointer {
     this.click(element.x, element.y);
     this.reset();
   }
+
+  doubleClickOn(element: ExcalidrawElement) {
+    this.reset();
+    this.doubleClick(element.x, element.y);
+    this.reset();
+  }
 }
 
 const mouse = new Pointer("mouse");
@@ -179,16 +185,27 @@ export class UI {
     fireEvent.click(GlobalTestState.renderResult.getByToolName(toolName));
   };
 
+  /**
+   * Creates an Excalidraw element, and returns a proxy that wraps it so that
+   * accessing props will return the latest ones from the object existing in
+   * the app's elements array. This is because across the app lifecycle we tend
+   * to recreate element objects and the returned reference will become stale.
+   *
+   * If you need to get the actual element, not the proxy, call `get()` method
+   * on the proxy object.
+   */
   static createElement<T extends ToolName>(
     type: T,
     {
-      x = 0,
-      y = 0,
+      position = 0,
+      x = position,
+      y = position,
       size = 10,
       width = size,
       height = width,
       angle = 0,
     }: {
+      position?: number;
       x?: number;
       y?: number;
       size?: number;
@@ -196,20 +213,50 @@ export class UI {
       height?: number;
       angle?: number;
     } = {},
-  ): T extends "arrow" | "line" | "draw"
+  ): (T extends "arrow" | "line" | "draw"
     ? ExcalidrawLinearElement
     : T extends "text"
     ? ExcalidrawTextElement
-    : ExcalidrawElement {
+    : ExcalidrawElement) & {
+    /** Returns the actual, current element from the elements array, instead
+        of the proxy */
+    get(): T extends "arrow" | "line" | "draw"
+      ? ExcalidrawLinearElement
+      : T extends "text"
+      ? ExcalidrawTextElement
+      : ExcalidrawElement;
+  } {
     UI.clickTool(type);
     mouse.reset();
     mouse.down(x, y);
     mouse.reset();
     mouse.up(x + (width ?? height ?? size), y + (height ?? size));
+
+    const origElement = h.elements[h.elements.length - 1] as any;
+
     if (angle !== 0) {
-      mutateElement(h.elements[h.elements.length - 1], { angle });
+      mutateElement(origElement, { angle });
     }
-    return h.elements[h.elements.length - 1] as any;
+
+    return new Proxy(
+      {},
+      {
+        get(target, prop) {
+          const currentElement = h.elements.find(
+            (element) => element.id === origElement.id,
+          ) as any;
+          if (prop === "get") {
+            if (currentElement.hasOwnProperty("get")) {
+              throw new Error(
+                "trying to get `get` test property, but ExcalidrawElement seems to define its own",
+              );
+            }
+            return () => currentElement;
+          }
+          return currentElement[prop];
+        },
+      },
+    ) as any;
   }
 
   static group(elements: ExcalidrawElement[]) {

@@ -1,4 +1,3 @@
-import { EVENT_IO, trackEvent } from "../analytics";
 import { cleanAppStateForExport } from "../appState";
 import { MIME_TYPES } from "../constants";
 import { clearElementsForExport } from "../element";
@@ -9,7 +8,7 @@ import { AppState } from "../types";
 import { restore } from "./restore";
 import { ImportedDataState, LibraryData } from "./types";
 
-export const parseFileContents = async (blob: Blob | File) => {
+const parseFileContents = async (blob: Blob | File) => {
   let contents: string;
 
   if (blob.type === "image/png") {
@@ -111,7 +110,6 @@ export const loadFromBlob = async (
       localAppState,
     );
 
-    trackEvent(EVENT_IO, "load", getMimeType(blob));
     return result;
   } catch (error) {
     console.error(error.message);

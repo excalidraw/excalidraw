@@ -1,12 +1,21 @@
-@import "../css/_variables";
+@import "../css/variables.module";
 
 .excalidraw {
+  .Dialog {
+    user-select: text;
+    cursor: auto;
+  }
+
   .Dialog__title {
     display: grid;
     align-items: center;
     margin-top: 0;
     grid-template-columns: 1fr calc(var(--space-factor) * 7);
     grid-gap: var(--metric);
+    padding: calc(var(--space-factor) * 2);
+    text-align: center;
+    font-variant: small-caps;
+    font-size: 1.2em;
   }
 
   .Dialog__titleContent {
@@ -18,7 +27,11 @@
     margin: 0;
   }
 
-  @media #{$media-query} {
+  .Dialog__content {
+    padding: 0 16px 16px;
+  }
+
+  @media #{$is-mobile-query} {
     .Dialog {
       --metric: calc(var(--space-factor) * 4);
       --inset-left: #{"max(var(--metric), var(--sal))"};
@@ -30,14 +43,9 @@
           var(--space-factor) * 7
         );
       position: sticky;
-      top: calc(-1 * var(--metric));
-      margin: calc(-1 * var(--inset-right));
-      margin-top: calc(-1 * var(--metric));
-      margin-bottom: var(--metric);
+      top: 0;
       padding: calc(var(--space-factor) * 2);
-      padding-left: var(--inset-left);
-      padding-right: var(--inset-right);
-      background: var(--bg-color-island);
+      background: var(--island-bg-color);
       font-size: 1.25em;
 
       box-sizing: border-box;

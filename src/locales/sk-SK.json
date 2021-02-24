@@ -1,9 +1,11 @@
 {
   "labels": {
     "paste": "Vložiť",
+    "pasteCharts": "Vložiť grafy",
     "selectAll": "Vybrať všetko",
     "multiSelect": "Pridať prvok do výberu",
     "moveCanvas": "Pohyb plátna",
+    "cut": "Vystrihnúť",
     "copy": "Kopírovať",
     "copyAsPng": "Kopírovať do schránky ako PNG",
     "copyAsSvg": "Kopírovať do schránky ako SVG",
@@ -13,7 +15,7 @@
     "sendBackward": "Presunúť o úroveň dozadu",
     "delete": "Vymazať",
     "copyStyles": "Kopírovať štýly",
-    "pasteStyles": "Prilepiť štýly",
+    "pasteStyles": "Vložiť štýly",
     "stroke": "Obrys",
     "background": "Pozadie",
     "fill": "Výplň",
@@ -28,6 +30,11 @@
     "edges": "Okraje",
     "sharp": "Ostré",
     "round": "Zaokrúhlené",
+    "arrowheads": "Zakončenie šípky",
+    "arrowhead_none": "Žiadne",
+    "arrowhead_arrow": "Šípka",
+    "arrowhead_bar": "Čiara",
+    "arrowhead_dot": "Bod",
     "fontSize": "Veľkosť písma",
     "fontFamily": "Písmo",
     "onlySelected": "Iba vybrané",
@@ -61,7 +68,7 @@
     "layers": "Vrstvy",
     "actions": "Akcie",
     "language": "Jazyk",
-    "createRoom": "Zdieľajte živú spoluprácu",
+    "liveCollaboration": "Živá spolupráca",
     "duplicateSelection": "Duplikovať",
     "untitled": "Bez názvu",
     "name": "Meno",
@@ -70,11 +77,12 @@
     "group": "Zoskupiť",
     "ungroup": "Zrušiť zoskupenie",
     "collaborators": "Spolupracovníci",
-    "toggleGridMode": "Prepnúť mriežku",
+    "showGrid": "Zobraziť mriežku",
     "addToLibrary": "Pridať do knižnice",
     "removeFromLibrary": "Odstrániť z knižnice",
-    "libraryLoadingMessage": "Načítavanie knižnice...",
-    "loadingScene": "Načítavanie scény...",
+    "libraryLoadingMessage": "Načítavanie knižnice…",
+    "libraries": "Prehliadať knižnice",
+    "loadingScene": "Načítavanie scény…",
     "align": "Zarovnanie",
     "alignTop": "Zarovnať nahor",
     "alignBottom": "Zarovnať nadol",
@@ -83,7 +91,8 @@
     "centerVertically": "Zarovnať zvislo na stred",
     "centerHorizontally": "Zarovnať vodorovne na stred",
     "distributeHorizontally": "Rozmiestniť vodorovne",
-    "distributeVertically": "Rozmiestniť zvisle"
+    "distributeVertically": "Rozmiestniť zvisle",
+    "viewMode": "Režim zobrazenia"
   },
   "buttons": {
     "clearReset": "Obnoviť plátno",
@@ -108,11 +117,12 @@
     "edit": "Upraviť",
     "undo": "Späť",
     "redo": "Znova",
-    "roomDialog": "Začať živú spoluprácu",
+    "resetLibrary": "Obnoviť knižnicu",
     "createNewRoom": "Vytvoriť novú miestnosť",
-    "toggleFullScreen": "Prepnúť režim celej obrazovky",
-    "toggleDarkMode": "Prepnúť tmavý režim",
-    "toggleZenMode": "Prepnúť režim zen",
+    "fullScreen": "Celá obrazovka",
+    "darkMode": "Tmavý režim",
+    "lightMode": "Svetlý režim",
+    "zenMode": "Režim zen",
     "exitZenMode": "Zrušiť režim zen"
   },
   "alerts": {
@@ -126,10 +136,12 @@
     "decryptFailed": "Nepodarilo sa rozšifrovať údaje.",
     "uploadedSecurly": "Nahratie je zabezpečené end-to-end šifrovaním, takže Excalidraw server a tretie strany nedokážu prečítať jeho obsah.",
     "loadSceneOverridePrompt": "Nahratie externej kresby nahradí existujúci obsah. Prajete si pokračovať?",
+    "collabStopOverridePrompt": "Ukončenie schôdze nahradí vašu predchádzajúcu lokálne uloženú scénu. Ste si istý?\n\n(Ak si chcete ponechať lokálnu scénu, jednoducho iba zavrite kartu prehliadača.)",
     "errorLoadingLibrary": "Nepodarilo sa načítať externú knižnicu.",
     "confirmAddLibrary": "Týmto sa pridá {{numShapes}} tvar(ov) do vašej knižnice. Ste si istí?",
-    "imageDoesNotContainScene": "Obrázkový súbor neobsahuje údaje scény. Povolili ste ich pri exportovaní?",
-    "cannotRestoreFromImage": "Nepodarilo sa obnoviť scénu z tohto obrázkového súboru"
+    "imageDoesNotContainScene": "Importovanie obrázku v tomto momente nie je možné.\n\nChceli ste importovať scénu? Tento obrázok neobsahuje žiadne údaje scény. Povolili ste túto možnosť počas exportovania?",
+    "cannotRestoreFromImage": "Nepodarilo sa obnoviť scénu z tohto obrázkového súboru",
+    "resetLibrary": "Týmto vyprázdnite vašu knižnicu. Ste si istý?"
   },
   "toolBar": {
     "selection": "Výber",
@@ -153,6 +165,7 @@
     "freeDraw": "Kliknite a ťahajte, pustite na ukončenie",
     "text": "Tip: text môžete pridať aj dvojklikom kdekoľvek, ak je zvolený nástroj výber",
     "linearElementMulti": "Kliknite na počiatočný bod alebo stlačte Escape alebo Enter na ukončenie",
+    "lockAngle": "Počas rotácie obmedzíte uhol podržaním SHIFT",
     "resize": "Počas zmeny veľkosti zachováte proporcie podržaním SHIFT,\\npodržaním ALT meníte veľkosť so zachovaním stredu",
     "rotate": "Počas rotácie obmedzíte uhol podržaním SHIFT",
     "lineEditor_info": "Použite dvojklik alebo stlačte Enter na editáciu bodov",
@@ -189,29 +202,50 @@
   "errorDialog": {
     "title": "Chyba"
   },
-  "shortcutsDialog": {
-    "title": "Klávesové skratky",
-    "shapes": "Tvary",
-    "or": "alebo",
+  "helpDialog": {
+    "blog": "Prečítajte si náš blog",
     "click": "kliknutie",
-    "drag": "potiahnutie",
     "curvedArrow": "Zakrivená šípka",
     "curvedLine": "Zakrivená čiara",
+    "documentation": "Dokumentácia",
+    "drag": "potiahnutie",
     "editor": "Editovanie",
-    "view": "Zobrazenie",
-    "blog": "Prečítajte si náš blog",
-    "howto": "Postupujte podľa naších návodov",
     "github": "Objavili ste problém? Nahláste ho",
-    "textNewLine": "Vložiť nový riadok (text)",
+    "howto": "Postupujte podľa naších návodov",
+    "or": "alebo",
+    "preventBinding": "Zakázať pripájanie šípky",
+    "shapes": "Tvary",
+    "shortcuts": "Klávesové skratky",
     "textFinish": "Ukončenie editovania (text)",
+    "textNewLine": "Vložiť nový riadok (text)",
+    "title": "Pomocník",
+    "view": "Zobrazenie",
     "zoomToFit": "Priblížiť aby boli zahrnuté všetky prvky",
-    "preventBinding": "Zakázať pripájanie šípky"
+    "zoomToSelection": "Priblížiť na výber"
   },
   "encrypted": {
     "tooltip": "Vaše kresby používajú end-to-end šifrovanie, takže ich Excalidraw server nedokáže prečítať."
   },
-  "charts": {
-    "noNumericColumn": "Prilepili ste tabuľku bez číselného stĺpca.",
-    "tooManyColumns": "Prilepili ste tabuľku s viac ako dvoma stĺpcami."
+  "stats": {
+    "angle": "Uhol",
+    "element": "Prvok",
+    "elements": "Prvky",
+    "height": "Výška",
+    "scene": "Scéna",
+    "selected": "Vybrané",
+    "storage": "Úložisko",
+    "title": "Štatistiky",
+    "total": "Celkom",
+    "version": "Verzia",
+    "versionCopy": "Kliknutím skopírujete",
+    "versionNotAvailable": "Verzia nie je k dispozícii",
+    "width": "Šírka"
+  },
+  "toast": {
+    "copyStyles": "Štýly skopírované.",
+    "copyToClipboard": "Skopírované do schránky.",
+    "copyToClipboardAsPng": "Skopírované do schránky ako PNG.",
+    "fileSaved": "Súbor uložený.",
+    "fileSavedToFilename": "Uložený ako {filename}"
   }
 }

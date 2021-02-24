@@ -1,9 +1,11 @@
 {
   "labels": {
     "paste": "Liitä",
+    "pasteCharts": "Liitä kaaviot",
     "selectAll": "Valitse kaikki",
     "multiSelect": "Lisää kohde valintaan",
     "moveCanvas": "Siirrä piirtoaluetta",
+    "cut": "Leikkaa",
     "copy": "Kopioi",
     "copyAsPng": "Kopioi leikepöydälle PNG-tiedostona",
     "copyAsSvg": "Kopioi leikepöydälle SVG-tiedostona",
@@ -28,6 +30,11 @@
     "edges": "Reunat",
     "sharp": "Terävä",
     "round": "Pyöreä",
+    "arrowheads": "Nuolenkärjet",
+    "arrowhead_none": "Ei mitään",
+    "arrowhead_arrow": "Nuoli",
+    "arrowhead_bar": "Tasapää",
+    "arrowhead_dot": "Piste",
     "fontSize": "Kirjasinkoko",
     "fontFamily": "Kirjasintyyppi",
     "onlySelected": "Vain valitut",
@@ -61,7 +68,7 @@
     "layers": "Tasot",
     "actions": "Toiminnot",
     "language": "Kieli",
-    "createRoom": "Jaa yhteistyöistunto",
+    "liveCollaboration": "Live-yhteistyö",
     "duplicateSelection": "Monista",
     "untitled": "Nimetön",
     "name": "Nimi",
@@ -70,11 +77,12 @@
     "group": "Ryhmitä valinta",
     "ungroup": "Pura valittu ryhmä",
     "collaborators": "Yhteistyökumppanit",
-    "toggleGridMode": "Ruudukko päälle/pois",
+    "showGrid": "Näytä ruudukko",
     "addToLibrary": "Lisää kirjastoon",
     "removeFromLibrary": "Poista kirjastosta",
-    "libraryLoadingMessage": "Ladataan kirjastoa...",
-    "loadingScene": "Ladataan työtä...",
+    "libraryLoadingMessage": "Ladataan kirjastoa…",
+    "libraries": "Selaa kirjastoja",
+    "loadingScene": "Ladataan työtä…",
     "align": "Tasaa",
     "alignTop": "Tasaa ylös",
     "alignBottom": "Tasaa alas",
@@ -83,7 +91,8 @@
     "centerVertically": "Keskitä pystysuunnassa",
     "centerHorizontally": "Keskitä vaakasuunnassa",
     "distributeHorizontally": "Jaa vaakasuunnassa",
-    "distributeVertically": "Jaa pystysuunnassa"
+    "distributeVertically": "Jaa pystysuunnassa",
+    "viewMode": "Katselutila"
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
@@ -108,11 +117,12 @@
     "edit": "Muokkaa",
     "undo": "Kumoa",
     "redo": "Tee uudelleen",
-    "roomDialog": "Aloita live-yhteistyö",
+    "resetLibrary": "Tyhjennä kirjasto",
     "createNewRoom": "Luo huone",
-    "toggleFullScreen": "Koko näytön tila päälle/pois",
-    "toggleDarkMode": "Pimeä tila päälle/pois",
-    "toggleZenMode": "Zen-tila päälle",
+    "fullScreen": "Koko näyttö",
+    "darkMode": "Tumma tila",
+    "lightMode": "Vaalea tila",
+    "zenMode": "Zen-tila",
     "exitZenMode": "Poistu zen-tilasta"
   },
   "alerts": {
@@ -126,10 +136,12 @@
     "decryptFailed": "Salauksen purkaminen epäonnistui.",
     "uploadedSecurly": "Lähetys on turvattu päästä päähän salauksella. Excalidrawin palvelin ja kolmannet osapuolet eivät voi lukea sisältöä.",
     "loadSceneOverridePrompt": "Ulkopuolisen piirroksen lataaminen korvaa nykyisen sisältösi. Haluatko jatkaa?",
+    "collabStopOverridePrompt": "Istunnon lopettaminen korvaa aiemman, paikallisesti tallennetun piirustuksen. Oletko varma?\n\n(Jos haluat pitää paikallisen piirustuksen, sulje selaimen välilehti sen sijaan.)",
     "errorLoadingLibrary": "Kolmannen osapuolen kirjastoa ladattaessa tapahtui virhe.",
     "confirmAddLibrary": "Tämä lisää {{numShapes}} muotoa kirjastoosi. Oletko varma?",
-    "imageDoesNotContainScene": "Kuvatiedosto ei sisällä teostietoja. Valitsitko sisällyttää ne tallennusvaiheessa?",
-    "cannotRestoreFromImage": "Teosta ei voitu palauttaa tästä kuvatiedostosta"
+    "imageDoesNotContainScene": "Kuvien lisääminen ei ole tällä hetkellä mahdollista.\n\nHaluatko tuoda piirroksen? Tämä kuva ei näytä sisältävän tarvittavia tietoja. Oletko ottanut piirrostietojen tallennuksen käyttöön viennin aikana?",
+    "cannotRestoreFromImage": "Teosta ei voitu palauttaa tästä kuvatiedostosta",
+    "resetLibrary": "Tämä tyhjentää kirjastosi. Oletko varma?"
   },
   "toolBar": {
     "selection": "Valinta",
@@ -153,6 +165,7 @@
     "freeDraw": "Paina ja raahaa, päästä irti kun olet valmis",
     "text": "Vinkki: voit myös lisätä tekstiä kaksoisnapsauttamalla mihin tahansa valintatyökalulla",
     "linearElementMulti": "Klikkaa viimeistä pistettä, paina Escape tai paina Enter lopettaaksesi",
+    "lockAngle": "Voit rajoittaa kulmaa pitämällä SHIFT pohjassa",
     "resize": "Voit rajoittaa mittasuhteet pitämällä SHIFT pohjassa kun muutat kokoa, pidä ALT pohjassa muuttaaksesi kokoa keskipisteen suhteen",
     "rotate": "Voit rajoittaa kulman pitämällä SHIFT pohjassa pyörittäessäsi",
     "lineEditor_info": "Kaksoisnapauta tai paina Enter muokataksesi pisteitä",
@@ -189,29 +202,50 @@
   "errorDialog": {
     "title": "Virhe"
   },
-  "shortcutsDialog": {
-    "title": "Pikanäppäimet",
-    "shapes": "Muodot",
-    "or": "tai",
+  "helpDialog": {
+    "blog": "Lue blogiamme",
     "click": "klikkaa",
-    "drag": "vedä",
     "curvedArrow": "Kaareva nuoli",
     "curvedLine": "Kaareva viiva",
-    "editor": "Editori",
-    "view": "Näkymä",
-    "blog": "Lue blogiamme",
-    "howto": "Seuraa oppaitamme",
+    "documentation": "Käyttöohjeet",
+    "drag": "vedä",
+    "editor": "Muokkausohjelma",
     "github": "Löysitkö ongelman? Kerro meille",
-    "textNewLine": "Lisää uusi rivi (teksti)",
+    "howto": "Seuraa oppaitamme",
+    "or": "tai",
+    "preventBinding": "Estä nuolten kiinnitys",
+    "shapes": "Muodot",
+    "shortcuts": "Pikanäppäimet",
     "textFinish": "Lopeta muokkaus (teksti)",
-    "zoomToFit": "Zoomaa kaikki elementit näkyviin",
-    "preventBinding": "Estä nuolten sitominen"
+    "textNewLine": "Lisää uusi rivi (teksti)",
+    "title": "Ohjeet",
+    "view": "Näkymä",
+    "zoomToFit": "Näytä kaikki elementit",
+    "zoomToSelection": "Näytä valinta"
   },
   "encrypted": {
     "tooltip": "Piirroksesi ovat päästä päähän salattuja, joten Excalidrawin palvelimet eivät koskaan näe niitä."
   },
-  "charts": {
-    "noNumericColumn": "Liitit taulukon ilman lukuja sisältävää saraketta.",
-    "tooManyColumns": "Liitit taulukon, jossa on enemmän kuin kaksi saraketta."
+  "stats": {
+    "angle": "Kulma",
+    "element": "Elementti",
+    "elements": "Elementit",
+    "height": "Korkeus",
+    "scene": "Teos",
+    "selected": "Valitut",
+    "storage": "Tallennustila",
+    "title": "Nörttien tilastot",
+    "total": "Yhteensä",
+    "version": "Versio",
+    "versionCopy": "Klikkaa kopioidaksesi",
+    "versionNotAvailable": "Versio ei saatavilla",
+    "width": "Leveys"
+  },
+  "toast": {
+    "copyStyles": "Tyylit kopioitu.",
+    "copyToClipboard": "Kopioitu leikepöydälle.",
+    "copyToClipboardAsPng": "Kopioitu leikepöydälle PNG-tiedostona.",
+    "fileSaved": "Tiedosto tallennettu.",
+    "fileSavedToFilename": "Tallennettu kohteeseen {filename}"
   }
 }

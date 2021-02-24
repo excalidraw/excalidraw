@@ -1,9 +1,11 @@
 {
   "labels": {
     "paste": "Incolla",
+    "pasteCharts": "Incolla grafici",
     "selectAll": "Seleziona tutto",
     "multiSelect": "Aggiungi elemento alla selezione",
     "moveCanvas": "Sposta tela",
+    "cut": "Taglia",
     "copy": "Copia",
     "copyAsPng": "Copia negli appunti come PNG",
     "copyAsSvg": "Copia negli appunti come SVG",
@@ -28,10 +30,15 @@
     "edges": "Bordi",
     "sharp": "Acuto",
     "round": "Rotondo",
+    "arrowheads": "Punta della freccia",
+    "arrowhead_none": "Nessuno",
+    "arrowhead_arrow": "Freccia",
+    "arrowhead_bar": "Barra",
+    "arrowhead_dot": "Punto",
     "fontSize": "Dimensione carattere",
     "fontFamily": "Carattere",
     "onlySelected": "Solo selezionati",
-    "withBackground": "Con Sfondo",
+    "withBackground": "Con sfondo",
     "exportEmbedScene": "Incorpora la scena nel file esportato",
     "exportEmbedScene_details": "I dati della scena saranno salvati nel file PNG/SVG esportato in modo che la scena possa essere ripristinata da esso.\nQuesto aumenterà la dimensione del file esportato.",
     "addWatermark": "Aggiungi \"Creato con Excalidraw\"",
@@ -61,7 +68,7 @@
     "layers": "Livelli",
     "actions": "Azioni",
     "language": "Lingua",
-    "createRoom": "Condividi una sessione di collaborazione in diretta",
+    "liveCollaboration": "Collaborazione live",
     "duplicateSelection": "Duplica",
     "untitled": "Senza titolo",
     "name": "Nome",
@@ -70,11 +77,12 @@
     "group": "Crea gruppo da selezione",
     "ungroup": "Dividi gruppo da selezione",
     "collaborators": "Collaboratori",
-    "toggleGridMode": "Attiva/disattiva modalità quadrícula",
-    "addToLibrary": "Aggiungi alla biblioteca",
-    "removeFromLibrary": "Rimuovi dalla biblioteca",
-    "libraryLoadingMessage": "Caricamento della biblioteca...",
-    "loadingScene": "Caricamento della scena...",
+    "showGrid": "Visualizza griglia",
+    "addToLibrary": "Aggiungi alla libreria",
+    "removeFromLibrary": "Rimuovi dalla libreria",
+    "libraryLoadingMessage": "Caricamento libreria…",
+    "libraries": "Sfoglia librerie",
+    "loadingScene": "Caricamento della scena…",
     "align": "Allinea",
     "alignTop": "Allinea in alto",
     "alignBottom": "Allinea in basso",
@@ -83,7 +91,8 @@
     "centerVertically": "Centra Verticalmente",
     "centerHorizontally": "Centra orizzontalmente",
     "distributeHorizontally": "Distribuisci orizzontalmente",
-    "distributeVertically": "Distribuisci verticalmente"
+    "distributeVertically": "Distribuisci verticalmente",
+    "viewMode": "Modalità visualizzazione"
   },
   "buttons": {
     "clearReset": "Svuota la tela",
@@ -108,15 +117,16 @@
     "edit": "Modifica",
     "undo": "Annulla",
     "redo": "Ripeti",
-    "roomDialog": "Inizia collaborazione in diretta",
+    "resetLibrary": "Ripristina libreria",
     "createNewRoom": "Crea nuova stanza",
-    "toggleFullScreen": "Attiva/Disattiva schermo intero",
-    "toggleDarkMode": "Attiva tema scuro",
-    "toggleZenMode": "Attiva/Disattiva modalità zen",
+    "fullScreen": "Schermo intero",
+    "darkMode": "Tema scuro",
+    "lightMode": "Tema chiaro",
+    "zenMode": "Modalità Zen",
     "exitZenMode": "Uscire dalla modalità zen"
   },
   "alerts": {
-    "clearReset": "Questo cancellerà l'intera tela. Sei sicuro?",
+    "clearReset": "Questa azione cancellerà l'intera tela. Sei sicuro?",
     "couldNotCreateShareableLink": "Non riesco a creare un link condivisibile.",
     "couldNotCreateShareableLinkTooBig": "Impossibile creare il link condivisibile: la scena è troppo grande",
     "couldNotLoadInvalidFile": "Impossibile caricare un file no valido",
@@ -126,10 +136,12 @@
     "decryptFailed": "Impossibile decriptare i dati.",
     "uploadedSecurly": "L'upload è stato protetto con la crittografia end-to-end, il che significa che il server Excalidraw e terze parti non possono leggere il contenuto.",
     "loadSceneOverridePrompt": "Se carichi questo disegno esterno, sostituirà quello che hai. Vuoi continuare?",
+    "collabStopOverridePrompt": "Interrompere la sessione sovrascriverà il precedente disegno memorizzato localmente. Sei sicuro?\n\n(Se vuoi mantenere il tuo disegno locale, chiudi semplicemente la scheda del browser.)",
     "errorLoadingLibrary": "Si è verificato un errore nel caricamento della libreria di terze parti.",
-    "confirmAddLibrary": "Questo aggiungerà {{numShapes}} forma(e) alla tua biblioteca. Sei sicuro?",
-    "imageDoesNotContainScene": "Il file immagine non contiene dati di scena. È stato abilitato durante l'esportazione?",
-    "cannotRestoreFromImage": "Impossibile ripristinare la scena da questo file immagine"
+    "confirmAddLibrary": "Questo aggiungerà {{numShapes}} forma(e) alla tua libreria. Sei sicuro?",
+    "imageDoesNotContainScene": "L'importazione di immagini al momento non è supportata.\n\nVuoi importare una scena? Questa immagine non sembra contenere alcun dato di scena. Hai abilitato questa opzione durante l'esportazione?",
+    "cannotRestoreFromImage": "Impossibile ripristinare la scena da questo file immagine",
+    "resetLibrary": "Questa azione cancellerà l'intera libreria. Sei sicuro?"
   },
   "toolBar": {
     "selection": "Selezione",
@@ -140,7 +152,7 @@
     "arrow": "Freccia",
     "line": "Linea",
     "text": "Testo",
-    "library": "Biblioteca",
+    "library": "Libreria",
     "lock": "Mantieni lo strumento selezionato attivo dopo aver disegnato"
   },
   "headings": {
@@ -153,7 +165,8 @@
     "freeDraw": "Clicca e trascina, rilascia quando avrai finito",
     "text": "Suggerimento: puoi anche aggiungere del testo facendo doppio clic ovunque con lo strumento di selezione",
     "linearElementMulti": "Clicca sull'ultimo punto o premi Esc o Invio per finire",
-    "resize": "Per vincolare le proporzioni, tenir premuto MAIUSC durante il ridimensionamento;\nper ridimensionare dal centro, tenir premuto ALT",
+    "lockAngle": "Puoi limitare l'angolo tenendo premuto SHIFT",
+    "resize": "Per vincolare le proporzioni, tieni premuto MAIUSC durante il ridimensionamento;\nper ridimensionare dal centro, tieni premuto ALT",
     "rotate": "Puoi mantenere gli angoli tenendo premuto SHIFT durante la rotazione",
     "lineEditor_info": "Fai doppio click o premi invio per modificare i punti",
     "lineEditor_pointSelected": "Premere Elimina per rimuovere il punto, CtrlOrCmd+D per duplicare o trascinare per spostare",
@@ -189,29 +202,50 @@
   "errorDialog": {
     "title": "Errore"
   },
-  "shortcutsDialog": {
-    "title": "Scorciatoie da tastiera",
-    "shapes": "Forme",
-    "or": "oppure",
+  "helpDialog": {
+    "blog": "Leggi il nostro blog",
     "click": "click",
-    "drag": "trascina",
     "curvedArrow": "Freccia curva",
     "curvedLine": "Linea curva",
+    "documentation": "Documentazione",
+    "drag": "trascina",
     "editor": "Editor",
-    "view": "Vista",
-    "blog": "Leggi il nostro blog",
+    "github": "Trovato un problema? Segnalalo",
     "howto": "Segui le nostre guide",
-    "github": "Hai trovato un problema? Segnalalo",
+    "or": "oppure",
+    "preventBinding": "Impedisci legame della freccia",
+    "shapes": "Forme",
+    "shortcuts": "Scorciatoie da tastiera",
+    "textFinish": "Termina la modifica (testo)",
     "textNewLine": "Aggiungi nuova riga (testo)",
-    "textFinish": "Completa la modifica (testo)",
+    "title": "Guida",
+    "view": "Vista",
     "zoomToFit": "Adatta zoom per mostrare tutti gli elementi",
-    "preventBinding": "Prevenire l'associazione freccia"
+    "zoomToSelection": "Zoom alla selezione"
   },
   "encrypted": {
     "tooltip": "I tuoi disegni sono crittografati end-to-end in modo che i server di Excalidraw non li possano mai vedere."
   },
-  "charts": {
-    "noNumericColumn": "Hai incollato un foglio di calcolo senza una colonna numerica.",
-    "tooManyColumns": "Hai incollato un foglio di calcolo con più di due colonne."
+  "stats": {
+    "angle": "Angolo",
+    "element": "Elemento",
+    "elements": "Elementi",
+    "height": "Altezza",
+    "scene": "Scena",
+    "selected": "Selezionato",
+    "storage": "Memoria",
+    "title": "Statistiche per nerd",
+    "total": "Totale",
+    "version": "Versione",
+    "versionCopy": "Clicca per copiare",
+    "versionNotAvailable": "Versione non disponibile",
+    "width": "Larghezza"
+  },
+  "toast": {
+    "copyStyles": "Stili copiati.",
+    "copyToClipboard": "Copiato negli appunti.",
+    "copyToClipboardAsPng": "Copiato negli appunti come PNG.",
+    "fileSaved": "File salvato.",
+    "fileSavedToFilename": "Salvato in {filename}"
   }
 }

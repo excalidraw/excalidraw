@@ -1,4 +1,7 @@
-@import "../css/_variables";
+@import "../css/variables.module";
+
+// this is loosely based on the longest hint text
+$wide-viewport-width: 1000px;
 
 .excalidraw {
   .HintViewer {
@@ -16,17 +19,14 @@
     color: $oc-gray-6;
     font-size: 0.8rem;
 
-    @media (min-width: 1200px) {
-      white-space: pre;
-    }
-
-    @media #{$media-query} {
+    @media #{$is-mobile-query} {
       position: static;
+      padding-right: 2em;
     }
 
     > span {
       padding: 0.2rem 0.4rem;
-      background-color: var(--overlay-background-color);
+      background-color: var(--overlay-bg-color);
       border-radius: 4px;
     }
   }

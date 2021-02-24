@@ -1,8 +1,7 @@
-import { AppState } from "./types";
 import { ExcalidrawElement } from "./element/types";
 import { getElementsInGroup } from "./groups";
-import { findLastIndex, findIndex } from "./utils";
-import { trackEvent, EVENT_LAYER } from "./analytics";
+import { AppState } from "./types";
+import { findIndex, findLastIndex } from "./utils";
 
 /**
  * Returns indices of elements to move based on selected elements.
@@ -176,7 +175,6 @@ const shiftElements = (
           ];
   });
 
-  trackEvent(EVENT_LAYER, "move", direction === "left" ? "down" : "up");
   return elements;
 };
 
@@ -234,7 +232,6 @@ const shiftElementsToEnd = (
   const leadingElements = elements.slice(0, leadingIndex);
   const trailingElements = elements.slice(trailingIndex + 1);
 
-  trackEvent(EVENT_LAYER, "move", direction === "left" ? "back" : "front");
   return direction === "left"
     ? [
         ...leadingElements,

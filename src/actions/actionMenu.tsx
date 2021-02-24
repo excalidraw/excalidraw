@@ -7,7 +7,6 @@ import { register } from "./register";
 import { allowFullScreen, exitFullScreen, isFullScreen } from "../utils";
 import { CODES, KEYS } from "../keys";
 import { HelpIcon } from "../components/HelpIcon";
-import { EVENT_DIALOG, trackEvent } from "../analytics";
 
 export const actionToggleCanvasMenu = register({
   name: "toggleCanvasMenu",
@@ -72,17 +71,16 @@ export const actionFullScreen = register({
 export const actionShortcuts = register({
   name: "toggleShortcuts",
   perform: (_elements, appState) => {
-    trackEvent(EVENT_DIALOG, "shortcuts");
     return {
       appState: {
         ...appState,
-        showShortcutsDialog: true,
+        showHelpDialog: !appState.showHelpDialog,
       },
       commitToHistory: false,
     };
   },
   PanelComponent: ({ updateData }) => (
-    <HelpIcon title={t("shortcutsDialog.title")} onClick={updateData} />
+    <HelpIcon title={t("helpDialog.title")} onClick={updateData} />
   ),
   keyTest: (event) => event.key === KEYS.QUESTION_MARK,
 });

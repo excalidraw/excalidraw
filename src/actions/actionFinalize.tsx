@@ -83,7 +83,7 @@ export const actionFinalize = register({
       // If the multi point line closes the loop,
       // set the last point to first point.
       // This ensures that loop remains closed at different scales.
-      const isLoop = isPathALoop(multiPointElement.points);
+      const isLoop = isPathALoop(multiPointElement.points, appState.zoom.value);
       if (
         multiPointElement.type === "line" ||
         multiPointElement.type === "draw"
@@ -118,11 +118,14 @@ export const actionFinalize = register({
         );
       }
 
-      if (!appState.elementLocked) {
+      if (!appState.elementLocked && appState.elementType !== "draw") {
         appState.selectedElementIds[multiPointElement.id] = true;
       }
     }
-    if (!appState.elementLocked || !multiPointElement) {
+    if (
+      (!appState.elementLocked && appState.elementType !== "draw") ||
+      !multiPointElement
+    ) {
       resetCursor();
     }
     return {
@@ -130,7 +133,8 @@ export const actionFinalize = register({
       appState: {
         ...appState,
         elementType:
-          appState.elementLocked && multiPointElement
+          (appState.elementLocked || appState.elementType === "draw") &&
+          multiPointElement
             ? appState.elementType
             : "selection",
         draggingElement: null,
@@ -139,7 +143,9 @@ export const actionFinalize = register({
         startBoundElement: null,
         suggestedBindings: [],
         selectedElementIds:
-          multiPointElement && !appState.elementLocked
+          multiPointElement &&
+          !appState.elementLocked &&
+          appState.elementType !== "draw"
             ? {
                 ...appState.selectedElementIds,
                 [multiPointElement.id]: true,

@@ -67,3 +67,15 @@ export {
 } from "./actionDistribute";
 
 export { actionFlipHorizontal, actionFlipVertical } from "./actionFlip";
+
+export {
+  actionCopy,
+  actionCut,
+  actionCopyAsPng,
+  actionCopyAsSvg,
+} from "./actionClipboard";
+
+export { actionToggleGridMode } from "./actionToggleGridMode";
+export { actionToggleZenMode } from "./actionToggleZenMode";
+
+export { actionToggleStats } from "./actionToggleStats";

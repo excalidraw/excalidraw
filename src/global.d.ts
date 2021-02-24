@@ -12,6 +12,7 @@ interface Document {
 interface Window {
   ClipboardItem: any;
   __EXCALIDRAW_SHA__: string | undefined;
+  EXCALIDRAW_ASSET_PATH: string | undefined;
   gtag: Function;
 }
 
@@ -85,6 +86,6 @@ type ForwardRef<T, P = any> = Parameters<
 // --------------------------------------------------------------------------—
 
 interface Blob {
-  handle?: import("browser-nativefs").FileSystemHandle;
+  handle?: import("browser-fs-acces").FileSystemHandle;
   name?: string;
 }

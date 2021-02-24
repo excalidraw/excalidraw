@@ -1,12 +1,14 @@
 import colors from "./colors";
 import {
   CURSOR_TYPE,
+  DEFAULT_VERSION,
   FONT_FAMILY,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 import { FontFamily, FontString } from "./element/types";
 import { Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
+import { isDarwin } from "./keys";
 
 export const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -179,15 +181,18 @@ export const allowFullScreen = () =>
 export const exitFullScreen = () => document.exitFullscreen();
 
 export const getShortcutKey = (shortcut: string): string => {
-  const isMac = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform);
-  if (isMac) {
-    return `${shortcut
+  shortcut = shortcut
+    .replace(/\bAlt\b/i, "Alt")
+    .replace(/\bShift\b/i, "Shift")
+    .replace(/\b(Enter|Return)\b/i, "Enter")
+    .replace(/\bDel\b/i, "Delete");
+
+  if (isDarwin) {
+    return shortcut
       .replace(/\bCtrlOrCmd\b/i, "Cmd")
-      .replace(/\bAlt\b/i, "Option")
-      .replace(/\bDel\b/i, "Delete")
-      .replace(/\b(Enter|Return)\b/i, "Enter")}`;
+      .replace(/\bAlt\b/i, "Option");
   }
-  return `${shortcut.replace(/\bCtrlOrCmd\b/i, "Ctrl")}`;
+  return shortcut.replace(/\bCtrlOrCmd\b/i, "Ctrl");
 };
 
 export const viewportCoordsToSceneCoords = (
@@ -310,8 +315,6 @@ export const isTransparent = (color: string) => {
   );
 };
 
-export const noop = () => ({});
-
 export type ResolvablePromise<T> = Promise<T> & {
   resolve: [T] extends [undefined] ? (value?: T) => void : (value: T) => void;
   reject: (error: Error) => void;
@@ -358,4 +361,28 @@ export const nFormatter = (num: number, digits: number): string => {
   return (
     (num / si[index].value).toFixed(digits).replace(rx, "$1") + si[index].symbol
   );
+};
+
+export const getVersion = () => {
+  return (
+    document.querySelector<HTMLMetaElement>('meta[name="version"]')?.content ||
+    DEFAULT_VERSION
+  );
+};
+
+// Adapted from https://github.com/Modernizr/Modernizr/blob/master/feature-detects/emoji.js
+export const supportsEmoji = () => {
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    return false;
+  }
+  const offset = 12;
+  ctx.fillStyle = "#f00";
+  ctx.textBaseline = "top";
+  ctx.font = "32px Arial";
+  // Modernizr used 🐨, but it is sort of supported on Windows 7.
+  // Luckily 😀 isn't supported.
+  ctx.fillText("😀", 0, 0);
+  return ctx.getImageData(offset, offset, 1, 1).data[0] !== 0;
 };

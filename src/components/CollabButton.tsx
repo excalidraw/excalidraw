@@ -6,7 +6,6 @@ import useIsMobile from "../is-mobile";
 import { users } from "./icons";
 
 import "./CollabButton.scss";
-import { EVENT_DIALOG, trackEvent } from "../analytics";
 
 const CollabButton = ({
   isCollaborating,
@@ -23,14 +22,11 @@ const CollabButton = ({
         className={clsx("CollabButton", {
           "is-collaborating": isCollaborating,
         })}
-        onClick={() => {
-          trackEvent(EVENT_DIALOG, "collaboration");
-          onClick();
-        }}
+        onClick={onClick}
         icon={users}
         type="button"
-        title={t("buttons.roomDialog")}
-        aria-label={t("buttons.roomDialog")}
+        title={t("labels.liveCollaboration")}
+        aria-label={t("labels.liveCollaboration")}
         showAriaLabel={useIsMobile()}
       >
         {collaboratorCount > 0 && (

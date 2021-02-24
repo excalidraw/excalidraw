@@ -9,7 +9,7 @@ export type ShortcutName =
   | "copyStyles"
   | "pasteStyles"
   | "selectAll"
-  | "delete"
+  | "deleteSelectedElements"
   | "duplicateSelection"
   | "sendBackward"
   | "bringForward"
@@ -19,9 +19,11 @@ export type ShortcutName =
   | "copyAsSvg"
   | "group"
   | "ungroup"
-  | "toggleGridMode"
-  | "toggleStats"
+  | "gridMode"
+  | "zenMode"
+  | "stats"
   | "addToLibrary"
+  | "viewMode"
   | "flipHorizontal"
   | "flipVertical";
 
@@ -32,10 +34,10 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   copyStyles: [getShortcutKey("CtrlOrCmd+Alt+C")],
   pasteStyles: [getShortcutKey("CtrlOrCmd+Alt+V")],
   selectAll: [getShortcutKey("CtrlOrCmd+A")],
-  delete: [getShortcutKey("Del")],
+  deleteSelectedElements: [getShortcutKey("Del")],
   duplicateSelection: [
     getShortcutKey("CtrlOrCmd+D"),
-    getShortcutKey(`Alt+${t("shortcutsDialog.drag")}`),
+    getShortcutKey(`Alt+${t("helpDialog.drag")}`),
   ],
   sendBackward: [getShortcutKey("CtrlOrCmd+[")],
   bringForward: [getShortcutKey("CtrlOrCmd+]")],
@@ -53,11 +55,13 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   copyAsSvg: [],
   group: [getShortcutKey("CtrlOrCmd+G")],
   ungroup: [getShortcutKey("CtrlOrCmd+Shift+G")],
-  toggleGridMode: [getShortcutKey("CtrlOrCmd+'")],
-  toggleStats: [],
+  gridMode: [getShortcutKey("CtrlOrCmd+'")],
+  zenMode: [getShortcutKey("Alt+Z")],
+  stats: [],
   addToLibrary: [],
   flipHorizontal: [getShortcutKey("Shift+H")],
   flipVertical: [getShortcutKey("Shift+V")],
+  viewMode: [getShortcutKey("Alt+R")],
 };
 
 export const getShortcutFromShortcutName = (name: ShortcutName) => {

@@ -1,4 +1,6 @@
 @import "open-color/open-color.scss";
+@import "../css/variables.module";
+
 .excalidraw {
   .ToolIcon {
     display: inline-flex;
@@ -140,6 +142,7 @@
     user-select: none;
   }
 
+  // shrink shape icons on small viewports to make them fit
   @media (max-width: 425px) {
     .Shape .ToolIcon__icon {
       width: 2rem;
@@ -151,6 +154,8 @@
     }
   }
 
+  // move the lock button out of the way on small viewports
+  // it begins to collide with the GitHub icon before we switch to mobile mode
   @media (max-width: 760px) {
     .ToolIcon.ToolIcon__lock {
       display: inline-block;
@@ -160,6 +165,7 @@
 
       margin-left: 0;
       border-radius: 20px 0 0 20px;
+      z-index: 1;
 
       background-color: var(--button-gray-1);
 
@@ -178,6 +184,17 @@
       svg {
         position: static;
       }
+    }
+  }
+
+  .TooltipIcon {
+    width: 0.9em;
+    height: 0.9em;
+    margin-left: 5px;
+    margin-top: 1px;
+
+    @media #{$is-mobile-query} {
+      display: none;
     }
   }
 

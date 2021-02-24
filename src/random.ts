@@ -1,5 +1,5 @@
 import { Random } from "roughjs/bin/math";
-import nanoid from "nanoid";
+import { nanoid } from "nanoid";
 
 let random = new Random(Date.now());
 let testIdBase = 0;

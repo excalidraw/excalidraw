@@ -1,181 +1,188 @@
+import { Point, simplify } from "points-on-curve";
 import React from "react";
-
-import rough from "roughjs/bin/rough";
 import { RoughCanvas } from "roughjs/bin/canvas";
-import { simplify, Point } from "points-on-curve";
+import rough from "roughjs/bin/rough";
+import clsx from "clsx";
 
 import {
-  newElement,
-  newTextElement,
-  duplicateElement,
-  isInvisiblySmallElement,
-  isTextElement,
-  textWysiwyg,
-  getCommonBounds,
-  getCursorForResizingElement,
-  getPerfectElementSize,
-  getNormalizedDimensions,
-  newLinearElement,
-  transformElements,
-  getElementWithTransformHandleType,
-  getResizeOffsetXY,
-  getResizeArrowDirection,
-  getTransformHandleTypeFromCoords,
-  isNonDeletedElement,
-  updateTextElement,
-  dragSelectedElements,
-  getDragOffsetXY,
-  dragNewElement,
-  hitTest,
-  isHittingElementBoundingBoxWithoutHittingElement,
-  getNonDeletedElements,
-} from "../element";
-import {
-  getElementsWithinSelection,
-  isOverScrollBars,
-  getElementsAtPosition,
-  getElementContainingPosition,
-  getNormalizedZoom,
-  getSelectedElements,
-  isSomeElementSelected,
-  calculateScrollCenter,
-} from "../scene";
-import { loadFromBlob, exportCanvas } from "../data";
-
-import { renderScene } from "../renderer";
-import {
-  AppState,
-  GestureEvent,
-  Gesture,
-  ExcalidrawProps,
-  SceneData,
-} from "../types";
-import {
-  ExcalidrawElement,
-  ExcalidrawTextElement,
-  NonDeleted,
-  ExcalidrawGenericElement,
-  ExcalidrawLinearElement,
-  ExcalidrawBindableElement,
-} from "../element/types";
-
-import { distance2d, isPathALoop, getGridPoint } from "../math";
-
-import {
-  isWritableElement,
-  isInputLike,
-  isToolIcon,
-  debounce,
-  distance,
-  resetCursor,
-  viewportCoordsToSceneCoords,
-  sceneCoordsToViewportCoords,
-  setCursorForShape,
-  tupleToCoors,
-  ResolvablePromise,
-  resolvablePromise,
-  withBatchedUpdates,
-} from "../utils";
-import {
-  KEYS,
-  isArrowKey,
-  getResizeCenterPointKey,
-  getResizeWithSidesSameLengthKey,
-  getRotateWithDiscreteAngleKey,
-  CODES,
-} from "../keys";
-
-import { findShapeByKey } from "../shapes";
-import { createHistory, SceneHistory } from "../history";
-
-import ContextMenu from "./ContextMenu";
-
+  actionAddToLibrary,
+  actionBringForward,
+  actionBringToFront,
+  actionCopy,
+  actionCopyAsPng,
+  actionCopyAsSvg,
+  actionCopyStyles,
+  actionCut,
+  actionDeleteSelected,
+  actionDuplicateSelection,
+  actionFinalize,
+  actionGroup,
+  actionPasteStyles,
+  actionSelectAll,
+  actionSendBackward,
+  actionSendToBack,
+  actionToggleGridMode,
+  actionToggleStats,
+  actionToggleZenMode,
+  actionUngroup,
+} from "../actions";
+import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
-import "../actions";
 import { actions } from "../actions/register";
-
 import { ActionResult } from "../actions/types";
+import { trackEvent } from "../analytics";
 import { getDefaultAppState } from "../appState";
-import { t, getLanguage } from "../i18n";
-
 import {
   copyToClipboard,
   parseClipboard,
   probablySupportsClipboardBlob,
   probablySupportsClipboardWriteText,
 } from "../clipboard";
-import { normalizeScroll } from "../scene";
-import { getCenter, getDistance } from "../gesture";
-import { createUndoAction, createRedoAction } from "../actions/actionHistory";
-
 import {
+  APP_NAME,
   CURSOR_TYPE,
+  DEFAULT_VERTICAL_ALIGN,
+  DRAGGING_THRESHOLD,
   ELEMENT_SHIFT_TRANSLATE_AMOUNT,
   ELEMENT_TRANSLATE_AMOUNT,
-  POINTER_BUTTON,
-  DRAGGING_THRESHOLD,
-  TEXT_TO_CENTER_SNAP_THRESHOLD,
-  LINE_CONFIRM_THRESHOLD,
-  EVENT,
   ENV,
-  CANVAS_ONLY_ACTIONS,
-  DEFAULT_VERTICAL_ALIGN,
+  EVENT,
   GRID_SIZE,
+  LINE_CONFIRM_THRESHOLD,
   MIME_TYPES,
+  POINTER_BUTTON,
+  SCROLL_TIMEOUT,
   TAP_TWICE_TIMEOUT,
+  TEXT_TO_CENTER_SNAP_THRESHOLD,
   TOUCH_CTX_MENU_TIMEOUT,
+  ZOOM_STEP,
 } from "../constants";
-
-import LayerUI from "./LayerUI";
-import { ScrollBars, SceneState } from "../scene/types";
-import { mutateElement } from "../element/mutateElement";
-import { invalidateShapeForElement } from "../renderer/renderElement";
-import {
-  isLinearElement,
-  isLinearElementType,
-  isBindingElement,
-  isBindingElementType,
-} from "../element/typeChecks";
-import { actionFinalize, actionDeleteSelected } from "../actions";
-
-import { LinearElementEditor } from "../element/linearElementEditor";
-import {
-  getSelectedGroupIds,
-  isSelectedViaGroup,
-  selectGroupsForSelectedElements,
-  isElementInGroup,
-  getSelectedGroupIdForElement,
-  getElementsInGroup,
-  editGroupForSelectedElement,
-} from "../groups";
-import { Library } from "../data/library";
-import Scene from "../scene/Scene";
-import {
-  getHoveredElementForBinding,
-  maybeBindLinearElement,
-  getEligibleElementsForBinding,
-  bindOrUnbindSelectedElements,
-  unbindLinearElements,
-  fixBindingsAfterDuplication,
-  fixBindingsAfterDeletion,
-  isLinearElementSimpleAndAlreadyBound,
-  isBindingEnabled,
-  updateBoundElements,
-  shouldEnableBindingForPointerEvent,
-} from "../element/binding";
-import { MaybeTransformHandleType } from "../element/transformHandles";
-import { deepCopyElement } from "../element/newElement";
-import { renderSpreadsheet } from "../charts";
+import { loadFromBlob } from "../data";
 import { isValidLibrary } from "../data/json";
-import { getNewZoom } from "../scene/zoom";
+import { Library } from "../data/library";
 import { restore } from "../data/restore";
 import {
-  EVENT_DIALOG,
-  EVENT_LIBRARY,
-  EVENT_SHAPE,
-  trackEvent,
-} from "../analytics";
+  dragNewElement,
+  dragSelectedElements,
+  duplicateElement,
+  getCommonBounds,
+  getCursorForResizingElement,
+  getDragOffsetXY,
+  getElementWithTransformHandleType,
+  getNonDeletedElements,
+  getNormalizedDimensions,
+  getPerfectElementSize,
+  getResizeArrowDirection,
+  getResizeOffsetXY,
+  getTransformHandleTypeFromCoords,
+  hitTest,
+  isHittingElementBoundingBoxWithoutHittingElement,
+  isInvisiblySmallElement,
+  isNonDeletedElement,
+  isTextElement,
+  newElement,
+  newLinearElement,
+  newTextElement,
+  textWysiwyg,
+  transformElements,
+  updateTextElement,
+} from "../element";
+import {
+  bindOrUnbindSelectedElements,
+  fixBindingsAfterDeletion,
+  fixBindingsAfterDuplication,
+  getEligibleElementsForBinding,
+  getHoveredElementForBinding,
+  isBindingEnabled,
+  isLinearElementSimpleAndAlreadyBound,
+  maybeBindLinearElement,
+  shouldEnableBindingForPointerEvent,
+  unbindLinearElements,
+  updateBoundElements,
+} from "../element/binding";
+import { LinearElementEditor } from "../element/linearElementEditor";
+import { mutateElement } from "../element/mutateElement";
+import { deepCopyElement } from "../element/newElement";
+import { MaybeTransformHandleType } from "../element/transformHandles";
+import {
+  isBindingElement,
+  isBindingElementType,
+  isLinearElement,
+  isLinearElementType,
+} from "../element/typeChecks";
+import {
+  ExcalidrawBindableElement,
+  ExcalidrawElement,
+  ExcalidrawGenericElement,
+  ExcalidrawLinearElement,
+  ExcalidrawTextElement,
+  NonDeleted,
+} from "../element/types";
+import { getCenter, getDistance } from "../gesture";
+import {
+  editGroupForSelectedElement,
+  getElementsInGroup,
+  getSelectedGroupIdForElement,
+  getSelectedGroupIds,
+  isElementInGroup,
+  isSelectedViaGroup,
+  selectGroupsForSelectedElements,
+} from "../groups";
+import { createHistory, SceneHistory } from "../history";
+import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
+import {
+  CODES,
+  getResizeCenterPointKey,
+  getResizeWithSidesSameLengthKey,
+  getRotateWithDiscreteAngleKey,
+  isArrowKey,
+  KEYS,
+} from "../keys";
+import { distance2d, getGridPoint, isPathALoop } from "../math";
+import { renderScene } from "../renderer";
+import { invalidateShapeForElement } from "../renderer/renderElement";
+import {
+  calculateScrollCenter,
+  getElementContainingPosition,
+  getElementsAtPosition,
+  getElementsWithinSelection,
+  getNormalizedZoom,
+  getSelectedElements,
+  isOverScrollBars,
+  isSomeElementSelected,
+} from "../scene";
+import Scene from "../scene/Scene";
+import { SceneState, ScrollBars } from "../scene/types";
+import { getNewZoom } from "../scene/zoom";
+import { findShapeByKey } from "../shapes";
+import {
+  AppState,
+  ExcalidrawProps,
+  Gesture,
+  GestureEvent,
+  SceneData,
+} from "../types";
+import {
+  debounce,
+  distance,
+  isInputLike,
+  isToolIcon,
+  isWritableElement,
+  resetCursor,
+  ResolvablePromise,
+  resolvablePromise,
+  sceneCoordsToViewportCoords,
+  setCursorForShape,
+  tupleToCoors,
+  viewportCoordsToSceneCoords,
+  withBatchedUpdates,
+} from "../utils";
+import { isMobile } from "../is-mobile";
+import ContextMenu, { ContextMenuOption } from "./ContextMenu";
+import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
+import { Toast } from "./Toast";
+import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 
 const { history } = createHistory();
 
@@ -265,6 +272,7 @@ export type ExcalidrawImperativeAPI = {
   };
   setScrollToCenter: InstanceType<typeof App>["setScrollToCenter"];
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
+  getAppState: () => InstanceType<typeof App>["state"];
   readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
   ready: true;
 };
@@ -291,6 +299,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       offsetLeft,
       offsetTop,
       excalidrawRef,
+      viewModeEnabled = false,
+      zenModeEnabled = false,
+      gridModeEnabled = false,
     } = props;
     this.state = {
       ...defaultAppState,
@@ -298,6 +309,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       width,
       height,
       ...this.getCanvasOffsets({ offsetLeft, offsetTop }),
+      viewModeEnabled,
+      zenModeEnabled,
+      gridSize: gridModeEnabled ? GRID_SIZE : null,
     };
     if (excalidrawRef) {
       const readyPromise =
@@ -315,6 +329,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         },
         setScrollToCenter: this.setScrollToCenter,
         getSceneElements: this.getSceneElements,
+        getAppState: () => this.state,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -329,11 +344,68 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.syncActionResult,
       () => this.state,
       () => this.scene.getElementsIncludingDeleted(),
+      this,
     );
     this.actionManager.registerAll(actions);
 
     this.actionManager.registerAction(createUndoAction(history));
     this.actionManager.registerAction(createRedoAction(history));
+  }
+
+  private renderCanvas() {
+    const canvasScale = window.devicePixelRatio;
+    const {
+      width: canvasDOMWidth,
+      height: canvasDOMHeight,
+      viewModeEnabled,
+    } = this.state;
+    const canvasWidth = canvasDOMWidth * canvasScale;
+    const canvasHeight = canvasDOMHeight * canvasScale;
+    if (viewModeEnabled) {
+      return (
+        <canvas
+          id="canvas"
+          style={{
+            width: canvasDOMWidth,
+            height: canvasDOMHeight,
+            cursor: "grabbing",
+          }}
+          width={canvasWidth}
+          height={canvasHeight}
+          ref={this.handleCanvasRef}
+          onContextMenu={this.handleCanvasContextMenu}
+          onPointerMove={this.handleCanvasPointerMove}
+          onPointerUp={this.removePointer}
+          onPointerCancel={this.removePointer}
+          onTouchMove={this.handleTouchMove}
+          onPointerDown={this.handleCanvasPointerDown}
+        >
+          {t("labels.drawingCanvas")}
+        </canvas>
+      );
+    }
+    return (
+      <canvas
+        id="canvas"
+        style={{
+          width: canvasDOMWidth,
+          height: canvasDOMHeight,
+        }}
+        width={canvasWidth}
+        height={canvasHeight}
+        ref={this.handleCanvasRef}
+        onContextMenu={this.handleCanvasContextMenu}
+        onPointerDown={this.handleCanvasPointerDown}
+        onDoubleClick={this.handleCanvasDoubleClick}
+        onPointerMove={this.handleCanvasPointerMove}
+        onPointerUp={this.removePointer}
+        onPointerCancel={this.removePointer}
+        onTouchMove={this.handleTouchMove}
+        onDrop={this.handleCanvasOnDrop}
+      >
+        {t("labels.drawingCanvas")}
+      </canvas>
+    );
   }
 
   public render() {
@@ -343,20 +415,19 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       height: canvasDOMHeight,
       offsetTop,
       offsetLeft,
+      viewModeEnabled,
     } = this.state;
 
-    const { onCollabButtonClick } = this.props;
-    const canvasScale = window.devicePixelRatio;
-
-    const canvasWidth = canvasDOMWidth * canvasScale;
-    const canvasHeight = canvasDOMHeight * canvasScale;
+    const { onCollabButtonClick, onExportToBackend, renderFooter } = this.props;
 
     const DEFAULT_PASTE_X = canvasDOMWidth / 2;
     const DEFAULT_PASTE_Y = canvasDOMHeight / 2;
 
     return (
       <div
-        className="excalidraw"
+        className={clsx("excalidraw", {
+          "excalidraw--view-mode": viewModeEnabled,
+        })}
         ref={this.excalidrawContainerRef}
         style={{
           width: canvasDOMWidth,
@@ -373,7 +444,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           elements={this.scene.getElements()}
           onCollabButtonClick={onCollabButtonClick}
           onLockToggle={this.toggleLock}
-          onInsertShape={(elements) =>
+          onInsertElements={(elements) =>
             this.addElementsFromPasteOrLibrary(
               elements,
               DEFAULT_PASTE_X,
@@ -382,38 +453,31 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           }
           zenModeEnabled={zenModeEnabled}
           toggleZenMode={this.toggleZenMode}
-          lng={getLanguage().lng}
+          langCode={getLanguage().code}
           isCollaborating={this.props.isCollaborating || false}
+          onExportToBackend={onExportToBackend}
+          renderCustomFooter={renderFooter}
+          viewModeEnabled={viewModeEnabled}
+          showExitZenModeBtn={
+            typeof this.props?.zenModeEnabled === "undefined" && zenModeEnabled
+          }
         />
+        <div className="excalidraw-textEditorContainer" />
         {this.state.showStats && (
           <Stats
             appState={this.state}
+            setAppState={this.setAppState}
             elements={this.scene.getElements()}
             onClose={this.toggleStats}
           />
         )}
-        <main>
-          <canvas
-            id="canvas"
-            style={{
-              width: canvasDOMWidth,
-              height: canvasDOMHeight,
-            }}
-            width={canvasWidth}
-            height={canvasHeight}
-            ref={this.handleCanvasRef}
-            onContextMenu={this.handleCanvasContextMenu}
-            onPointerDown={this.handleCanvasPointerDown}
-            onDoubleClick={this.handleCanvasDoubleClick}
-            onPointerMove={this.handleCanvasPointerMove}
-            onPointerUp={this.removePointer}
-            onPointerCancel={this.removePointer}
-            onTouchMove={this.handleTouchMove}
-            onDrop={this.handleCanvasOnDrop}
-          >
-            {t("labels.drawingCanvas")}
-          </canvas>
-        </main>
+        {this.state.toastMessage !== null && (
+          <Toast
+            message={this.state.toastMessage}
+            clearToast={this.clearToast}
+          />
+        )}
+        <main>{this.renderCanvas()}</main>
       </div>
     );
   }
@@ -453,6 +517,23 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         if (actionResult.commitToHistory) {
           history.resumeRecording();
         }
+
+        let viewModeEnabled = actionResult?.appState?.viewModeEnabled || false;
+        let zenModeEnabled = actionResult?.appState?.zenModeEnabled || false;
+        let gridSize = actionResult?.appState?.gridSize || null;
+
+        if (typeof this.props.viewModeEnabled !== "undefined") {
+          viewModeEnabled = this.props.viewModeEnabled;
+        }
+
+        if (typeof this.props.zenModeEnabled !== "undefined") {
+          zenModeEnabled = this.props.zenModeEnabled;
+        }
+
+        if (typeof this.props.gridModeEnabled !== "undefined") {
+          gridSize = this.props.gridModeEnabled ? GRID_SIZE : null;
+        }
+
         this.setState(
           (state) => ({
             ...actionResult.appState,
@@ -462,6 +543,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             height: state.height,
             offsetTop: state.offsetTop,
             offsetLeft: state.offsetLeft,
+            viewModeEnabled,
+            zenModeEnabled,
+            gridSize,
           }),
           () => {
             if (actionResult.syncHistory) {
@@ -501,7 +585,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   private importLibraryFromUrl = async (url: string) => {
-    window.history.replaceState({}, "Excalidraw", window.location.origin);
+    window.history.replaceState({}, APP_NAME, window.location.origin);
     try {
       const request = await fetch(url);
       const blob = await request.blob();
@@ -515,7 +599,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         )
       ) {
         await Library.importLibrary(blob);
-        trackEvent(EVENT_LIBRARY, "import");
         this.setState({
           isLibraryOpen: true,
         });
@@ -589,17 +672,24 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     scene.appState = {
       ...scene.appState,
-      ...calculateScrollCenter(
-        scene.elements,
-        {
-          ...scene.appState,
-          offsetTop: this.state.offsetTop,
-          offsetLeft: this.state.offsetLeft,
-        },
-        null,
-      ),
       isLoading: false,
     };
+    if (initialData?.scrollToCenter) {
+      scene.appState = {
+        ...scene.appState,
+        ...calculateScrollCenter(
+          scene.elements,
+          {
+            ...scene.appState,
+            width: this.state.width,
+            height: this.state.height,
+            offsetTop: this.state.offsetTop,
+            offsetLeft: this.state.offsetLeft,
+          },
+          null,
+        ),
+      };
+    }
 
     this.resetHistory();
     this.syncActionResult({
@@ -643,7 +733,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     this.scene.addCallback(this.onSceneUpdated);
-
     this.addEventListeners();
 
     // optim to avoid extra render on init
@@ -710,25 +799,16 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   }
 
   private addEventListeners() {
+    this.removeEventListeners();
     document.addEventListener(EVENT.COPY, this.onCopy);
-    document.addEventListener(EVENT.PASTE, this.pasteFromClipboard);
-    document.addEventListener(EVENT.CUT, this.onCut);
-
     document.addEventListener(EVENT.KEYDOWN, this.onKeyDown, false);
     document.addEventListener(EVENT.KEYUP, this.onKeyUp, { passive: true });
     document.addEventListener(
       EVENT.MOUSE_MOVE,
       this.updateCurrentCursorPosition,
     );
-    window.addEventListener(EVENT.RESIZE, this.onResize, false);
-    window.addEventListener(EVENT.UNLOAD, this.onUnload, false);
-    window.addEventListener(EVENT.BLUR, this.onBlur, false);
-    window.addEventListener(EVENT.DRAG_OVER, this.disableEvent, false);
-    window.addEventListener(EVENT.DROP, this.disableEvent, false);
-
     // rerender text elements on font load to fix #637 && #1553
     document.fonts?.addEventListener?.("loadingdone", this.onFontLoaded);
-
     // Safari-only desktop pinch zoom
     document.addEventListener(
       EVENT.GESTURE_START,
@@ -745,9 +825,26 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.onGestureEnd as any,
       false,
     );
+    if (this.state.viewModeEnabled) {
+      return;
+    }
+
+    document.addEventListener(EVENT.PASTE, this.pasteFromClipboard);
+    document.addEventListener(EVENT.CUT, this.onCut);
+    document.addEventListener(EVENT.SCROLL, this.onScroll);
+
+    window.addEventListener(EVENT.RESIZE, this.onResize, false);
+    window.addEventListener(EVENT.UNLOAD, this.onUnload, false);
+    window.addEventListener(EVENT.BLUR, this.onBlur, false);
+    window.addEventListener(EVENT.DRAG_OVER, this.disableEvent, false);
+    window.addEventListener(EVENT.DROP, this.disableEvent, false);
   }
 
   componentDidUpdate(prevProps: ExcalidrawProps, prevState: AppState) {
+    if (prevProps.langCode !== this.props.langCode) {
+      this.updateLanguage();
+    }
+
     if (
       prevProps.width !== this.props.width ||
       prevProps.height !== this.props.height ||
@@ -763,6 +860,26 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
     }
 
+    if (prevProps.viewModeEnabled !== this.props.viewModeEnabled) {
+      this.setState(
+        { viewModeEnabled: !!this.props.viewModeEnabled },
+        this.addEventListeners,
+      );
+    }
+
+    if (prevState.viewModeEnabled !== this.state.viewModeEnabled) {
+      this.addEventListeners();
+    }
+
+    if (prevProps.zenModeEnabled !== this.props.zenModeEnabled) {
+      this.setState({ zenModeEnabled: !!this.props.zenModeEnabled });
+    }
+
+    if (prevProps.gridModeEnabled !== this.props.gridModeEnabled) {
+      this.setState({
+        gridSize: this.props.gridModeEnabled ? GRID_SIZE : null,
+      });
+    }
     document
       .querySelector(".excalidraw")
       ?.classList.toggle("Appearance_dark", this.state.appearance === "dark");
@@ -802,6 +919,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const pointerViewportCoords: SceneState["remotePointerViewportCoords"] = {};
     const remoteSelectedElementIds: SceneState["remoteSelectedElementIds"] = {};
     const pointerUsernames: { [id: string]: string } = {};
+    const pointerUserStates: { [id: string]: string } = {};
     this.state.collaborators.forEach((user, socketId) => {
       if (user.selectedElementIds) {
         for (const id of Object.keys(user.selectedElementIds)) {
@@ -816,6 +934,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
       if (user.username) {
         pointerUsernames[socketId] = user.username;
+      }
+      if (user.userState) {
+        pointerUserStates[socketId] = user.userState;
       }
       pointerViewportCoords[socketId] = sceneCoordsToViewportCoords(
         {
@@ -851,10 +972,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         remotePointerButton: cursorButton,
         remoteSelectedElementIds,
         remotePointerUsernames: pointerUsernames,
+        remotePointerUserStates: pointerUserStates,
         shouldCacheIgnoreZoom: this.state.shouldCacheIgnoreZoom,
       },
       {
         renderOptimizations: true,
+        renderScrollbars: !isMobile(),
       },
     );
     if (scrollBars) {
@@ -871,8 +994,21 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     history.record(this.state, this.scene.getElementsIncludingDeleted());
 
-    this.props.onChange?.(this.scene.getElementsIncludingDeleted(), this.state);
+    // Do not notify consumers if we're still loading the scene. Among other
+    // potential issues, this fixes a case where the tab isn't focused during
+    // init, which would trigger onChange with empty elements, which would then
+    // override whatever is in localStorage currently.
+    if (!this.state.isLoading) {
+      this.props.onChange?.(
+        this.scene.getElementsIncludingDeleted(),
+        this.state,
+      );
+    }
   }
+
+  private onScroll = debounce(() => {
+    this.setState({ ...this.getCanvasOffsets() });
+  }, SCROLL_TIMEOUT);
 
   // Copy/paste
 
@@ -899,43 +1035,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private copyAll = () => {
     copyToClipboard(this.scene.getElements(), this.state);
-  };
-
-  private copyToClipboardAsPng = async () => {
-    const elements = this.scene.getElements();
-
-    const selectedElements = getSelectedElements(elements, this.state);
-    try {
-      await exportCanvas(
-        "clipboard",
-        selectedElements.length ? selectedElements : elements,
-        this.state,
-        this.canvas!,
-        this.state,
-      );
-    } catch (error) {
-      console.error(error);
-      this.setState({ errorMessage: error.message });
-    }
-  };
-
-  private copyToClipboardAsSvg = async () => {
-    const selectedElements = getSelectedElements(
-      this.scene.getElements(),
-      this.state,
-    );
-    try {
-      await exportCanvas(
-        "clipboard-svg",
-        selectedElements.length ? selectedElements : this.scene.getElements(),
-        this.state,
-        this.canvas!,
-        this.state,
-      );
-    } catch (error) {
-      console.error(error);
-      this.setState({ errorMessage: error.message });
-    }
   };
 
   private static resetTapTwice() {
@@ -1000,9 +1099,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       if (data.errorMessage) {
         this.setState({ errorMessage: data.errorMessage });
       } else if (data.spreadsheet) {
-        this.addElementsFromPasteOrLibrary(
-          renderSpreadsheet(data.spreadsheet, cursorX, cursorY),
-        );
+        this.setState({
+          pasteDialog: {
+            data: data.spreadsheet,
+            shown: true,
+          },
+        });
       } else if (data.elements) {
         this.addElementsFromPasteOrLibrary(data.elements);
       } else if (data.text) {
@@ -1127,7 +1229,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   toggleLock = () => {
     this.setState((prevState) => {
-      trackEvent(EVENT_SHAPE, "lock", !prevState.elementLocked ? "on" : "off");
       return {
         elementLocked: !prevState.elementLocked,
         elementType: prevState.elementLocked
@@ -1138,24 +1239,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   toggleZenMode = () => {
-    this.setState({
-      zenModeEnabled: !this.state.zenModeEnabled,
-    });
-  };
-
-  toggleGridMode = () => {
-    this.setState({
-      gridSize: this.state.gridSize ? null : GRID_SIZE,
-    });
+    this.actionManager.executeAction(actionToggleZenMode);
   };
 
   toggleStats = () => {
     if (!this.state.showStats) {
-      trackEvent(EVENT_DIALOG, "stats");
+      trackEvent("dialog", "stats");
     }
-    this.setState({
-      showStats: !this.state.showStats,
-    });
+    this.actionManager.executeAction(actionToggleStats);
   };
 
   setScrollToCenter = (remoteElements: readonly ExcalidrawElement[]) => {
@@ -1166,6 +1257,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         this.canvas,
       ),
     });
+  };
+
+  clearToast = () => {
+    this.setState({ toastMessage: null });
   };
 
   public updateScene = withBatchedUpdates((sceneData: SceneData) => {
@@ -1237,35 +1332,23 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     if (event.key === KEYS.QUESTION_MARK) {
       this.setState({
-        showShortcutsDialog: true,
+        showHelpDialog: true,
       });
-    }
-
-    if (!event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.Z) {
-      this.toggleZenMode();
-    }
-
-    if (event[KEYS.CTRL_OR_CMD] && event.code === CODES.QUOTE) {
-      this.toggleGridMode();
-    }
-    if (event[KEYS.CTRL_OR_CMD]) {
-      this.setState({ isBindingEnabled: false });
-    }
-
-    if (event.code === CODES.C && event.altKey && event.shiftKey) {
-      this.copyToClipboardAsPng();
-      event.preventDefault();
-      return;
     }
 
     if (this.actionManager.handleKeyDown(event)) {
       return;
     }
 
+    if (this.state.viewModeEnabled) {
+      return;
+    }
+
+    if (event[KEYS.CTRL_OR_CMD]) {
+      this.setState({ isBindingEnabled: false });
+    }
+
     if (event.code === CODES.NINE) {
-      if (!this.state.isLibraryOpen) {
-        trackEvent(EVENT_DIALOG, "library");
-      }
       this.setState({ isLibraryOpen: !this.state.isLibraryOpen });
     }
 
@@ -1350,7 +1433,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     ) {
       const shape = findShapeByKey(event.key);
       if (shape) {
-        trackEvent(EVENT_SHAPE, shape, "shortcut");
         this.selectShapeTool(shape);
       } else if (event.key === KEYS.Q) {
         this.toggleLock();
@@ -1423,13 +1505,27 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private onGestureChange = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
-    this.setState(({ zoom }) => ({
-      zoom: getNewZoom(
-        getNormalizedZoom(gesture.initialScale! * event.scale),
-        zoom,
-        { x: cursorX, y: cursorY },
-      ),
-    }));
+
+    // onGestureChange only has zoom factor but not the center.
+    // If we're on iPad or iPhone, then we recognize multi-touch and will
+    // zoom in at the right location on the touchMove handler already.
+    // On Macbook, we don't have those events so will zoom in at the
+    // current location instead.
+    if (gesture.pointers.size === 2) {
+      return;
+    }
+
+    const initialScale = gesture.initialScale;
+    if (initialScale) {
+      this.setState(({ zoom, offsetLeft, offsetTop }) => ({
+        zoom: getNewZoom(
+          getNormalizedZoom(initialScale * event.scale),
+          zoom,
+          { left: offsetLeft, top: offsetTop },
+          { x: cursorX, y: cursorY },
+        ),
+      }));
+    }
   });
 
   private onGestureEnd = withBatchedUpdates((event: GestureEvent) => {
@@ -1466,6 +1562,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     textWysiwyg({
       id: element.id,
       appState: this.state,
+      canvas: this.canvas,
       getViewportCoords: (x, y) => {
         const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
           {
@@ -1720,7 +1817,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     resetCursor();
 
     if (!event[KEYS.CTRL_OR_CMD]) {
-      trackEvent(EVENT_SHAPE, "text", "double-click");
       this.startTextEditing({
         sceneX,
         sceneY,
@@ -1741,21 +1837,28 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
     }
 
-    if (gesture.pointers.size === 2) {
+    const initialScale = gesture.initialScale;
+    if (
+      gesture.pointers.size === 2 &&
+      gesture.lastCenter &&
+      initialScale &&
+      gesture.initialDistance
+    ) {
       const center = getCenter(gesture.pointers);
-      const deltaX = center.x - gesture.lastCenter!.x;
-      const deltaY = center.y - gesture.lastCenter!.y;
+      const deltaX = center.x - gesture.lastCenter.x;
+      const deltaY = center.y - gesture.lastCenter.y;
       gesture.lastCenter = center;
 
       const distance = getDistance(Array.from(gesture.pointers.values()));
-      const scaleFactor = distance / gesture.initialDistance!;
+      const scaleFactor = distance / gesture.initialDistance;
 
-      this.setState(({ zoom, scrollX, scrollY }) => ({
-        scrollX: normalizeScroll(scrollX + deltaX / zoom.value),
-        scrollY: normalizeScroll(scrollY + deltaY / zoom.value),
+      this.setState(({ zoom, scrollX, scrollY, offsetLeft, offsetTop }) => ({
+        scrollX: scrollX + deltaX / zoom.value,
+        scrollY: scrollY + deltaY / zoom.value,
         zoom: getNewZoom(
-          getNormalizedZoom(gesture.initialScale! * scaleFactor),
+          getNormalizedZoom(initialScale * scaleFactor),
           zoom,
+          { left: offsetLeft, top: offsetTop },
           center,
         ),
         shouldCacheIgnoreZoom: true,
@@ -1768,10 +1871,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (isHoldingSpace || isPanning || isDraggingScrollBar) {
       return;
     }
+
     const isPointerOverScrollBars = isOverScrollBars(
       currentScrollBars,
-      event.clientX,
-      event.clientY,
+      event.clientX - this.state.offsetLeft,
+      event.clientY - this.state.offsetTop,
     );
     const isOverScrollBar = isPointerOverScrollBars.isOverEither;
     if (!this.state.draggingElement && !this.state.multiElement) {
@@ -1865,7 +1969,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           points: points.slice(0, -1),
         });
       } else {
-        if (isPathALoop(points)) {
+        if (isPathALoop(points, this.state.zoom.value)) {
           document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
         }
         // update last uncommitted point
@@ -2052,14 +2156,16 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     lastPointerUp = onPointerUp;
 
-    window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
-    window.addEventListener(EVENT.POINTER_UP, onPointerUp);
-    window.addEventListener(EVENT.KEYDOWN, onKeyDown);
-    window.addEventListener(EVENT.KEYUP, onKeyUp);
-    pointerDownState.eventListeners.onMove = onPointerMove;
-    pointerDownState.eventListeners.onUp = onPointerUp;
-    pointerDownState.eventListeners.onKeyUp = onKeyUp;
-    pointerDownState.eventListeners.onKeyDown = onKeyDown;
+    if (!this.state.viewModeEnabled) {
+      window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
+      window.addEventListener(EVENT.POINTER_UP, onPointerUp);
+      window.addEventListener(EVENT.KEYDOWN, onKeyDown);
+      window.addEventListener(EVENT.KEYUP, onKeyUp);
+      pointerDownState.eventListeners.onMove = onPointerMove;
+      pointerDownState.eventListeners.onUp = onPointerUp;
+      pointerDownState.eventListeners.onKeyUp = onKeyUp;
+      pointerDownState.eventListeners.onKeyDown = onKeyDown;
+    }
   };
 
   private maybeOpenContextMenuAfterPointerDownOnTouchDevices = (
@@ -2109,7 +2215,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       !(
         gesture.pointers.size === 0 &&
         (event.button === POINTER_BUTTON.WHEEL ||
-          (event.button === POINTER_BUTTON.MAIN && isHoldingSpace))
+          (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
+          this.state.viewModeEnabled)
       )
     ) {
       return false;
@@ -2162,12 +2269,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
 
       this.setState({
-        scrollX: normalizeScroll(
-          this.state.scrollX - deltaX / this.state.zoom.value,
-        ),
-        scrollY: normalizeScroll(
-          this.state.scrollY - deltaY / this.state.zoom.value,
-        ),
+        scrollX: this.state.scrollX - deltaX / this.state.zoom.value,
+        scrollY: this.state.scrollY - deltaY / this.state.zoom.value,
       });
     });
     const teardown = withBatchedUpdates(
@@ -2228,8 +2331,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       ),
       scrollbars: isOverScrollBars(
         currentScrollBars,
-        event.clientX,
-        event.clientY,
+        event.clientX - this.state.offsetLeft,
+        event.clientY - this.state.offsetTop,
       ),
       // we need to duplicate because we'll be updating this state
       lastCoords: { ...origin },
@@ -2437,8 +2540,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           // otherwise, it will trigger selection based on current
           // state of the box
           if (!this.state.selectedElementIds[hitElement.id]) {
-            // if we are currently editing a group, treat all selections outside of the group
-            // as exiting editing mode.
+            // if we are currently editing a group, exiting editing mode and deselect the group.
             if (
               this.state.editingGroupId &&
               !isElementInGroup(hitElement, this.state.editingGroupId)
@@ -2448,7 +2550,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
                 selectedGroupIds: {},
                 editingGroupId: null,
               });
-              return true;
             }
 
             // Add hit element to selection. At this point if we're not holding
@@ -2540,7 +2641,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       const { multiElement } = this.state;
 
       // finalize if completing a loop
-      if (multiElement.type === "line" && isPathALoop(multiElement.points)) {
+      if (
+        multiElement.type === "line" &&
+        isPathALoop(multiElement.points, this.state.zoom.value)
+      ) {
         mutateElement(multiElement, {
           lastCommittedPoint:
             multiElement.points[multiElement.points.length - 1],
@@ -2586,9 +2690,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       );
 
       /* If arrow is pre-arrowheads, it will have undefined for both start and end arrowheads.
-			 If so, we want it to be null for start and "arrow" for end. If the linear item is not 
-			 an arrow, we want it to be null for both. Otherwise, we want it to use the 
-			 values from appState. */
+      If so, we want it to be null for start and "arrow" for end. If the linear item is not
+      an arrow, we want it to be null for both. Otherwise, we want it to use the
+      values from appState. */
 
       const { currentItemStartArrowhead, currentItemEndArrowhead } = this.state;
       const [startArrowhead, endArrowhead] =
@@ -2983,9 +3087,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       const x = event.clientX;
       const dx = x - pointerDownState.lastCoords.x;
       this.setState({
-        scrollX: normalizeScroll(
-          this.state.scrollX - dx / this.state.zoom.value,
-        ),
+        scrollX: this.state.scrollX - dx / this.state.zoom.value,
       });
       pointerDownState.lastCoords.x = x;
       return true;
@@ -2995,9 +3097,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       const y = event.clientY;
       const dy = y - pointerDownState.lastCoords.y;
       this.setState({
-        scrollY: normalizeScroll(
-          this.state.scrollY - dy / this.state.zoom.value,
-        ),
+        scrollY: this.state.scrollY - dy / this.state.zoom.value,
       });
       pointerDownState.lastCoords.y = y;
       return true;
@@ -3115,7 +3215,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             );
           }
           this.setState({ suggestedBindings: [], startBoundElement: null });
-          if (!elementLocked) {
+          if (!elementLocked && elementType !== "draw") {
             resetCursor();
             this.setState((prevState) => ({
               draggingElement: null,
@@ -3262,7 +3362,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         return;
       }
 
-      if (!elementLocked && draggingElement) {
+      if (!elementLocked && elementType !== "draw" && draggingElement) {
         this.setState((prevState) => ({
           selectedElementIds: {
             ...prevState.selectedElementIds,
@@ -3286,7 +3386,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         );
       }
 
-      if (!elementLocked) {
+      if (!elementLocked && elementType !== "draw") {
         resetCursor();
         this.setState({
           draggingElement: null,
@@ -3561,9 +3661,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       transformElements(
         pointerDownState,
         transformHandleType,
-        (newTransformHandle) => {
-          pointerDownState.resize.handleType = newTransformHandle;
-        },
         selectedElements,
         pointerDownState.resize.arrowDirection,
         getRotateWithDiscreteAngleKey(event),
@@ -3593,44 +3690,90 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.state,
     );
 
+    const maybeGroupAction = actionGroup.contextItemPredicate!(
+      this.actionManager.getElementsIncludingDeleted(),
+      this.actionManager.getAppState(),
+    );
+
+    const maybeUngroupAction = actionUngroup.contextItemPredicate!(
+      this.actionManager.getElementsIncludingDeleted(),
+      this.actionManager.getAppState(),
+    );
+
+    const separator = "separator";
+
+    const _isMobile = isMobile();
+
     const elements = this.scene.getElements();
     const element = this.getElementAtPosition(x, y);
+    const options: ContextMenuOption[] = [];
+    if (probablySupportsClipboardBlob && elements.length > 0) {
+      options.push(actionCopyAsPng);
+    }
+
+    if (probablySupportsClipboardWriteText && elements.length > 0) {
+      options.push(actionCopyAsSvg);
+    }
     if (!element) {
+      const viewModeOptions = [
+        ...options,
+        typeof this.props.gridModeEnabled === "undefined" &&
+          actionToggleGridMode,
+        typeof this.props.zenModeEnabled === "undefined" && actionToggleZenMode,
+        typeof this.props.viewModeEnabled === "undefined" &&
+          actionToggleViewMode,
+        actionToggleStats,
+      ];
+
+      ContextMenu.push({
+        options: viewModeOptions,
+        top: clientY,
+        left: clientX,
+        actionManager: this.actionManager,
+        appState: this.state,
+      });
+
+      if (this.state.viewModeEnabled) {
+        return;
+      }
+
       ContextMenu.push({
         options: [
-          navigator.clipboard && {
-            shortcutName: "paste",
-            label: t("labels.paste"),
-            action: () => this.pasteFromClipboard(null),
-          },
+          _isMobile &&
+            navigator.clipboard && {
+              name: "paste",
+              perform: (elements, appStates) => {
+                this.pasteFromClipboard(null);
+                return {
+                  commitToHistory: false,
+                };
+              },
+              contextItemLabel: "labels.paste",
+            },
+          _isMobile && navigator.clipboard && separator,
           probablySupportsClipboardBlob &&
-            elements.length > 0 && {
-              shortcutName: "copyAsPng",
-              label: t("labels.copyAsPng"),
-              action: this.copyToClipboardAsPng,
-            },
+            elements.length > 0 &&
+            actionCopyAsPng,
           probablySupportsClipboardWriteText &&
-            elements.length > 0 && {
-              shortcutName: "copyAsSvg",
-              label: t("labels.copyAsSvg"),
-              action: this.copyToClipboardAsSvg,
-            },
-          ...this.actionManager.getContextMenuItems((action) =>
-            CANVAS_ONLY_ACTIONS.includes(action.name),
-          ),
-          {
-            shortcutName: "toggleGridMode",
-            label: t("labels.toggleGridMode"),
-            action: this.toggleGridMode,
-          },
-          {
-            shortcutName: "toggleStats",
-            label: t("labels.toggleStats"),
-            action: this.toggleStats,
-          },
+            elements.length > 0 &&
+            actionCopyAsSvg,
+          ((probablySupportsClipboardBlob && elements.length > 0) ||
+            (probablySupportsClipboardWriteText && elements.length > 0)) &&
+            separator,
+          actionSelectAll,
+          separator,
+          typeof this.props.gridModeEnabled === "undefined" &&
+            actionToggleGridMode,
+          typeof this.props.zenModeEnabled === "undefined" &&
+            actionToggleZenMode,
+          typeof this.props.viewModeEnabled === "undefined" &&
+            actionToggleViewMode,
+          actionToggleStats,
         ],
         top: clientY,
         left: clientX,
+        actionManager: this.actionManager,
+        appState: this.state,
       });
       return;
     }
@@ -3639,39 +3782,55 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.setState({ selectedElementIds: { [element.id]: true } });
     }
 
+    if (this.state.viewModeEnabled) {
+      ContextMenu.push({
+        options: [navigator.clipboard && actionCopy, ...options],
+        top: clientY,
+        left: clientX,
+        actionManager: this.actionManager,
+        appState: this.state,
+      });
+      return;
+    }
+
     ContextMenu.push({
       options: [
-        {
-          shortcutName: "cut",
-          label: t("labels.cut"),
-          action: this.cutAll,
-        },
-        navigator.clipboard && {
-          shortcutName: "copy",
-          label: t("labels.copy"),
-          action: this.copyAll,
-        },
-        navigator.clipboard && {
-          shortcutName: "paste",
-          label: t("labels.paste"),
-          action: () => this.pasteFromClipboard(null),
-        },
-        probablySupportsClipboardBlob && {
-          shortcutName: "copyAsPng",
-          label: t("labels.copyAsPng"),
-          action: this.copyToClipboardAsPng,
-        },
-        probablySupportsClipboardWriteText && {
-          shortcutName: "copyAsSvg",
-          label: t("labels.copyAsSvg"),
-          action: this.copyToClipboardAsSvg,
-        },
-        ...this.actionManager.getContextMenuItems(
-          (action) => !CANVAS_ONLY_ACTIONS.includes(action.name),
-        ),
+        _isMobile && actionCut,
+        _isMobile && navigator.clipboard && actionCopy,
+        _isMobile &&
+          navigator.clipboard && {
+            name: "paste",
+            perform: (elements, appStates) => {
+              this.pasteFromClipboard(null);
+              return {
+                commitToHistory: false,
+              };
+            },
+            contextItemLabel: "labels.paste",
+          },
+        _isMobile && separator,
+        ...options,
+        separator,
+        actionCopyStyles,
+        actionPasteStyles,
+        separator,
+        maybeGroupAction && actionGroup,
+        maybeUngroupAction && actionUngroup,
+        (maybeGroupAction || maybeUngroupAction) && separator,
+        actionAddToLibrary,
+        separator,
+        actionSendBackward,
+        actionBringForward,
+        actionSendToBack,
+        actionBringToFront,
+        separator,
+        actionDuplicateSelection,
+        actionDeleteSelected,
       ],
       top: clientY,
       left: clientX,
+      actionManager: this.actionManager,
+      appState: this.state,
     });
   };
 
@@ -3702,11 +3861,22 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         }, 1000);
       }
 
-      this.setState(({ zoom }) => ({
-        zoom: getNewZoom(getNormalizedZoom(zoom.value - delta / 100), zoom, {
-          x: cursorX,
-          y: cursorY,
-        }),
+      let newZoom = this.state.zoom.value - delta / 100;
+      // increase zoom steps the more zoomed-in we are (applies to >100% only)
+      newZoom += Math.log10(Math.max(1, this.state.zoom.value)) * -sign;
+      // round to nearest step
+      newZoom = Math.round(newZoom * ZOOM_STEP * 100) / (ZOOM_STEP * 100);
+
+      this.setState(({ zoom, offsetLeft, offsetTop }) => ({
+        zoom: getNewZoom(
+          getNormalizedZoom(newZoom),
+          zoom,
+          { left: offsetLeft, top: offsetTop },
+          {
+            x: cursorX,
+            y: cursorY,
+          },
+        ),
         selectedElementIds: {},
         previousSelectedElementIds:
           Object.keys(selectedElementIds).length !== 0
@@ -3722,14 +3892,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (event.shiftKey) {
       this.setState(({ zoom, scrollX }) => ({
         // on Mac, shift+wheel tends to result in deltaX
-        scrollX: normalizeScroll(scrollX - (deltaY || deltaX) / zoom.value),
+        scrollX: scrollX - (deltaY || deltaX) / zoom.value,
       }));
       return;
     }
 
     this.setState(({ zoom, scrollX, scrollY }) => ({
-      scrollX: normalizeScroll(scrollX - deltaX / zoom.value),
-      scrollY: normalizeScroll(scrollY - deltaY / zoom.value),
+      scrollX: scrollX - deltaX / zoom.value,
+      scrollY: scrollY - deltaY / zoom.value,
     }));
   });
 
@@ -3789,7 +3959,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   private resetShouldCacheIgnoreZoomDebounced = debounce(() => {
-    this.setState({ shouldCacheIgnoreZoom: false });
+    if (!this.unmounted) {
+      this.setState({ shouldCacheIgnoreZoom: false });
+    }
   }, 300);
 
   private getCanvasOffsets(offsets?: {
@@ -3820,6 +3992,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         typeof offsets?.offsetLeft === "number" ? offsets.offsetLeft : 0,
       offsetTop: typeof offsets?.offsetTop === "number" ? offsets.offsetTop : 0,
     };
+  }
+
+  private async updateLanguage() {
+    const currentLang =
+      languages.find((lang) => lang.code === this.props.langCode) ||
+      defaultLang;
+    await setLanguage(currentLang);
+    this.setAppState({});
   }
 }
 

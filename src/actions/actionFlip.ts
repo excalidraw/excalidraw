@@ -5,12 +5,12 @@ import { mutateElement } from "../element/mutateElement";
 import { ExcalidrawElement, NonDeleted } from "../element/types";
 import {
   normalizeAngle,
-  resizeSingleGenericElement,
-  resizeSingleNonGenericElement,
+  resizeSingleElement,
+  reshapeSingleTwoPointElement,
 } from "../element/resizeElements";
 import { AppState } from "../types";
 import { getTransformHandles } from "../element/transformHandles";
-import { isGenericElement, isLinearElement } from "../element/typeChecks";
+import { isLinearElement } from "../element/typeChecks";
 
 const enableActionFlipHorizontal = (
   elements: readonly ExcalidrawElement[],
@@ -44,7 +44,6 @@ export const actionFlipHorizontal = register({
     };
   },
   keyTest: (event) => event.shiftKey && event.code === "KeyH",
-  contextMenuOrder: 8,
   contextItemLabel: "labels.flipHorizontal",
   contextItemPredicate: (elements, appState) =>
     enableActionFlipHorizontal(elements, appState),
@@ -60,7 +59,6 @@ export const actionFlipVertical = register({
     };
   },
   keyTest: (event) => event.shiftKey && event.code === "KeyV",
-  contextMenuOrder: 8,
   contextItemLabel: "labels.flipVertical",
   contextItemPredicate: (elements, appState) =>
     enableActionFlipVertical(elements, appState),
@@ -142,21 +140,20 @@ const flipElementHorizontally = (
     newNCoordsX = nHandle[0] + 2 * xHandleDistance;
   }
 
-  if (isGenericElement(element)) {
-    resizeSingleGenericElement(
+  if (isLinearElement(element) && element.points.length === 2) {
+    reshapeSingleTwoPointElement(
       element,
-      false,
-      element,
-      usingNWHandle ? "nw" : "ne",
+      "origin",
       false,
       newNCoordsX,
       newNCoordsY,
     );
   } else {
-    resizeSingleNonGenericElement(
+    resizeSingleElement(
+      element,
+      false,
       element,
       usingNWHandle ? "nw" : "ne",
-      false,
       false,
       newNCoordsX,
       newNCoordsY,

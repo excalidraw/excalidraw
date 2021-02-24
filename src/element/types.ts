@@ -1,6 +1,7 @@
 import { Point } from "../types";
 import { FONT_FAMILY } from "../constants";
 
+export type ChartType = "bar" | "line";
 export type FillStyle = "hachure" | "cross-hatch" | "solid";
 export type FontFamily = keyof typeof FONT_FAMILY;
 export type FontString = string & { _brand: "fontString" };
@@ -26,11 +27,21 @@ type _ExcalidrawElementBase = Readonly<{
   width: number;
   height: number;
   angle: number;
+  /** Random integer used to seed shape generation so that the roughjs shape
+      doesn't differ across renders. */
   seed: number;
+  /** Integer that is sequentially incremented on each change. Used to reconcile
+      elements during collaboration or when saving to server. */
   version: number;
+  /** Random integer that is regenerated on each change.
+      Used for deterministic reconciliation of updates during collaboration,
+      in case the versions (see above) are identical. */
   versionNonce: number;
   isDeleted: boolean;
+  /** List of groups the element belongs to.
+      Ordered from deepest to shallowest. */
   groupIds: readonly GroupId[];
+  /** Ids of (linear) elements that are bound to this element. */
   boundElementIds: readonly ExcalidrawLinearElement["id"][] | null;
 }>;
 

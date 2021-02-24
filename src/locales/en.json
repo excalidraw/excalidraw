@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Paste",
+    "pasteCharts": "Paste charts",
     "selectAll": "Select all",
     "multiSelect": "Add element to selection",
     "moveCanvas": "Move canvas",
@@ -37,7 +38,7 @@
     "fontSize": "Font size",
     "fontFamily": "Font family",
     "onlySelected": "Only selected",
-    "withBackground": "With Background",
+    "withBackground": "With background",
     "exportEmbedScene": "Embed scene into exported file",
     "exportEmbedScene_details": "Scene data will be saved into the exported PNG/SVG file so that the scene can be restored from it.\nWill increase exported file size.",
     "addWatermark": "Add \"Made with Excalidraw\"",
@@ -67,7 +68,7 @@
     "layers": "Layers",
     "actions": "Actions",
     "language": "Language",
-    "createRoom": "Share a live-collaboration session",
+    "liveCollaboration": "Live collaboration",
     "duplicateSelection": "Duplicate",
     "untitled": "Untitled",
     "name": "Name",
@@ -76,13 +77,12 @@
     "group": "Group selection",
     "ungroup": "Ungroup selection",
     "collaborators": "Collaborators",
-    "toggleGridMode": "Toggle grid mode",
-    "toggleStats": "Toggle stats for nerds",
+    "showGrid": "Show grid",
     "addToLibrary": "Add to library",
     "removeFromLibrary": "Remove from library",
-    "libraryLoadingMessage": "Loading library...",
+    "libraryLoadingMessage": "Loading library…",
     "libraries": "Browse libraries",
-    "loadingScene": "Loading scene...",
+    "loadingScene": "Loading scene…",
     "align": "Align",
     "alignTop": "Align top",
     "alignBottom": "Align bottom",
@@ -93,7 +93,9 @@
     "distributeHorizontally": "Distribute horizontally",
     "distributeVertically": "Distribute vertically",
     "flipHorizontal": "Flip horizontal",
-    "flipVertical": "Flip vertical"
+    "flipVertical": "Flip vertical",
+    "viewMode": "View mode",
+    "toggleExportColorScheme": "Toggle export color scheme"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
@@ -118,11 +120,12 @@
     "edit": "Edit",
     "undo": "Undo",
     "redo": "Redo",
-    "roomDialog": "Start live collaboration",
+    "resetLibrary": "Reset library",
     "createNewRoom": "Create new room",
-    "toggleFullScreen": "Toggle full screen",
-    "toggleDarkMode": "Toggle dark mode",
-    "toggleZenMode": "Toggle zen mode",
+    "fullScreen": "Full screen",
+    "darkMode": "Dark mode",
+    "lightMode": "Light mode",
+    "zenMode": "Zen mode",
     "exitZenMode": "Exit zen mode"
   },
   "alerts": {
@@ -136,10 +139,12 @@
     "decryptFailed": "Couldn't decrypt data.",
     "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content.",
     "loadSceneOverridePrompt": "Loading external drawing will replace your existing content. Do you wish to continue?",
+    "collabStopOverridePrompt": "Stopping the session will overwrite your previous, locally stored drawing. Are you sure?\n\n(If you want to keep your local drawing, simply close the browser tab instead.)",
     "errorLoadingLibrary": "There was an error loading the third party library.",
     "confirmAddLibrary": "This will add {{numShapes}} shape(s) to your library. Are you sure?",
-    "imageDoesNotContainScene": "Image file doesn't contain scene data. Have you enabled this during export?",
-    "cannotRestoreFromImage": "Scene couldn't be restored from this image file"
+    "imageDoesNotContainScene": "Importing images isn't supported at the moment.\n\nDid you want to import a scene? This image does not seem to contain any scene data. Have you enabled this during export?",
+    "cannotRestoreFromImage": "Scene couldn't be restored from this image file",
+    "resetLibrary": "This will clear your library. Are you sure?"
   },
   "toolBar": {
     "selection": "Selection",
@@ -163,6 +168,7 @@
     "freeDraw": "Click and drag, release when you're finished",
     "text": "Tip: you can also add text by double-clicking anywhere with the selection tool",
     "linearElementMulti": "Click on last point or press Escape or Enter to finish",
+    "lockAngle": "You can constrain angle by holding SHIFT",
     "resize": "You can constrain proportions by holding SHIFT while resizing,\nhold ALT to resize from the center",
     "rotate": "You can constrain angles by holding SHIFT while rotating",
     "lineEditor_info": "Double-click or press Enter to edit points",
@@ -199,23 +205,26 @@
   "errorDialog": {
     "title": "Error"
   },
-  "shortcutsDialog": {
-    "title": "Keyboard shortcuts",
-    "shapes": "Shapes",
-    "or": "or",
+  "helpDialog": {
+    "blog": "Read our blog",
     "click": "click",
-    "drag": "drag",
     "curvedArrow": "Curved arrow",
     "curvedLine": "Curved line",
+    "documentation": "Documentation",
+    "drag": "drag",
     "editor": "Editor",
-    "view": "View",
-    "blog": "Read our blog",
-    "howto": "Follow our guides",
     "github": "Found an issue? Submit",
-    "textNewLine": "Add new line (text)",
+    "howto": "Follow our guides",
+    "or": "or",
+    "preventBinding": "Prevent arrow binding",
+    "shapes": "Shapes",
+    "shortcuts": "Keyboard shortcuts",
     "textFinish": "Finish editing (text)",
+    "textNewLine": "Add new line (text)",
+    "title": "Help",
+    "view": "View",
     "zoomToFit": "Zoom to fit all elements",
-    "preventBinding": "Prevent arrow binding"
+    "zoomToSelection": "Zoom to selection"
   },
   "encrypted": {
     "tooltip": "Your drawings are end-to-end encrypted so Excalidraw's servers will never see them."
@@ -230,6 +239,16 @@
     "storage": "Storage",
     "title": "Stats for nerds",
     "total": "Total",
+    "version": "Version",
+    "versionCopy": "Click to copy",
+    "versionNotAvailable": "Version not available",
     "width": "Width"
+  },
+  "toast": {
+    "copyStyles": "Copied styles.",
+    "copyToClipboard": "Copied to clipboard.",
+    "copyToClipboardAsPng": "Copied to clipboard as PNG.",
+    "fileSaved": "File saved.",
+    "fileSavedToFilename": "Saved to {filename}"
   }
 }
