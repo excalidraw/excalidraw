@@ -92,7 +92,8 @@
     "centerHorizontally": "横方向に中央揃え",
     "distributeHorizontally": "水平方向に分散配置",
     "distributeVertically": "垂直方向に分散配置",
-    "viewMode": "閲覧モード"
+    "viewMode": "閲覧モード",
+    "toggleExportColorScheme": ""
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",
