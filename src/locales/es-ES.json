@@ -92,7 +92,8 @@
     "centerHorizontally": "Centrar horizontalmente",
     "distributeHorizontally": "Distribuir horizontalmente",
     "distributeVertically": "Distribuir verticalmente",
-    "viewMode": "Modo presentación"
+    "viewMode": "Modo presentación",
+    "toggleExportColorScheme": ""
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
