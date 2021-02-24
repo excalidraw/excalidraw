@@ -5,7 +5,7 @@ updates:
     schedule:
       interval: weekly
       day: sunday
-      time: 01:00
+      time: "01:00"
     reviewers:
       - lipis
     assignees:
@@ -16,7 +16,7 @@ updates:
     schedule:
       interval: weekly
       day: sunday
-      time: 01:00
+      time: "01:00"
     reviewers:
       - ad1992
     assignees:
@@ -27,8 +27,7 @@ updates:
     schedule:
       interval: weekly
       day: sunday
-      time: 01:00
-    open-pull-requests-limit: 99
+      time: "01:00"
     reviewers:
       - ad1992
     assignees:
