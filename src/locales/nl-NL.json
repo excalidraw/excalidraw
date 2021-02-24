@@ -92,7 +92,8 @@
     "centerHorizontally": "Horizontaal Centreren",
     "distributeHorizontally": "Horizontaal verspreiden",
     "distributeVertically": "Verticaal distribueren",
-    "viewMode": "Weergavemodus"
+    "viewMode": "Weergavemodus",
+    "toggleExportColorScheme": ""
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
