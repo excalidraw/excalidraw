@@ -92,7 +92,8 @@
     "centerHorizontally": "Center horizontally",
     "distributeHorizontally": "Distribute horizontally",
     "distributeVertically": "Distribute vertically",
-    "viewMode": "View mode"
+    "viewMode": "View mode",
+    "toggleExportColorScheme": "Toggle export color scheme"
   },
   "buttons": {
     "clearReset": "Reset the canvas",

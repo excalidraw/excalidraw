@@ -1,4 +1,5 @@
 import { FontFamily } from "./element/types";
+import cssVariables from "./css/variables.module.scss";
 
 export const APP_NAME = "Excalidraw";
 
@@ -107,3 +108,5 @@ export const MODES = {
   ZEN: "zenMode",
   GRID: "gridMode",
 };
+
+export const APPEARANCE_FILTER = cssVariables.appearanceFilter;
