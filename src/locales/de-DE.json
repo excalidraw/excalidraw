@@ -93,7 +93,7 @@
     "distributeHorizontally": "Horizontal verteilen",
     "distributeVertically": "Vertikal verteilen",
     "viewMode": "Ansichtsmodus",
-    "toggleExportColorScheme": ""
+    "toggleExportColorScheme": "Farbschema für Export umschalten"
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
