@@ -3,7 +3,7 @@ name: Build locales coverage
 on:
   push:
     branches:
-      - "l10n_master"
+      - l10n_master
 
 jobs:
   locales:
@@ -15,13 +15,13 @@ jobs:
           token: ${{ secrets.PUSH_TRANSLATIONS_COVERAGE_PAT }}
 
       - name: Setup Node.js 14.x
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
         with:
           node-version: 14.x
 
       - name: Create report file
         run: |
-          npm run locales-coverage
+          yarn locales-coverage
           FILE_CHANGED=$(git diff src/locales/percentages.json)
           if [ ! -z "${FILE_CHANGED}" ]; then
             git config --global user.name 'Excalidraw Bot'
@@ -33,7 +33,7 @@ jobs:
       - name: Construct comment body
         id: getCommentBody
         run: |
-          body=$(npm run locales-coverage:description | grep '^[^>]')
+          body=$(yarn locales-coverage:description | grep '^[^>]')
           body="${body//'%'/'%25'}"
           body="${body//$'\n'/'%0A'}"
           body="${body//$'\r'/'%0D'}"

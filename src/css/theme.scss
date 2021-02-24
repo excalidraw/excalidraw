@@ -1,43 +1,44 @@
 @import "open-color/open-color.scss";
+@import "./variables.module.scss";
 
 :root {
-  --bg-color-island: rgba(255, 255, 255, 0.9);
-  --popup-background-color: #{$oc-white};
-  --space-factor: 0.25rem;
+  --appearance-filter: none;
+  --button-destructive-bg-color: #{$oc-red-1};
+  --button-destructive-color: #{$oc-red-9};
   --button-gray-1: #{$oc-gray-2};
   --button-gray-2: #{$oc-gray-4};
   --button-gray-3: #{$oc-gray-5};
-  --input-border-color: #{$oc-gray-3};
-  --input-background-color: #{$oc-white};
-  --input-hover-background-color: #{$oc-gray-1};
-  --input-label-color: #{$oc-gray-7};
+  --button-special-active-bg-color: #{$oc-green-0};
+  --dialog-border-color: #{$oc-gray-6};
+  --dropdown-icon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="292.4" height="292.4" viewBox="0 0 292 292"><path d="M287 197L159 69c-4-3-8-5-13-5s-9 2-13 5L5 197c-3 4-5 8-5 13s2 9 5 13c4 4 8 5 13 5h256c5 0 9-1 13-5s5-8 5-13-1-9-5-13z"/></svg>');
+  --focus-highlight-color: #{$oc-blue-2};
   --icon-fill-color: #{$oc-black};
   --icon-green-fill-color: #{$oc-green-9};
+  --input-bg-color: #{$oc-white};
+  --input-border-color: #{$oc-gray-3};
+  --input-hover-bg-color: #{$oc-gray-1};
+  --input-label-color: #{$oc-gray-7};
+  --island-bg-color: rgba(255, 255, 255, 0.9);
   --keybinding-color: #{$oc-gray-5};
-  --sat: env(safe-area-inset-top);
+  --link-color: #{$oc-blue-7};
+  --overlay-bg-color: #{transparentize($oc-white, 0.12)};
+  --popup-bg-color: #{$oc-white};
+  --popup-secondary-bg-color: #{$oc-gray-1};
+  --popup-text-color: #{$oc-black};
+  --popup-text-inverted-color: #{$oc-white};
   --sab: env(safe-area-inset-bottom);
   --sal: env(safe-area-inset-left);
   --sar: env(safe-area-inset-right);
-  --text-color-primary: #{$oc-gray-8};
-  --shadow-island: 0 1px 5px #{transparentize($oc-black, 0.85)};
-  --overlay-background-color: #{transparentize($oc-white, 0.12)};
-  --dropdown-icon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="292.4" height="292.4" viewBox="0 0 292 292"><path d="M287 197L159 69c-4-3-8-5-13-5s-9 2-13 5L5 197c-3 4-5 8-5 13s2 9 5 13c4 4 8 5 13 5h256c5 0 9-1 13-5s5-8 5-13-1-9-5-13z"/></svg>');
-  --focus-highlight-color: #{$oc-blue-2};
+  --sat: env(safe-area-inset-top);
   --select-highlight-color: #{$oc-blue-5};
-  --appearance-filter: none;
-  --button-special-active-background-color: #{$oc-green-0};
-  --button-destructive-color: #{$oc-red-9};
-  --button-destructive-background-color: #{$oc-red-1};
-  --popup-secondary-background-color: #{$oc-gray-1};
-  --popup-text-color: #{$oc-black};
-  --popup-text-inverted-color: #{$oc-white};
-  --dialog-border: #{$oc-gray-6};
-  --link-color: #{$oc-blue-7};
+  --shadow-island: 0 1px 5px #{transparentize($oc-black, 0.85)};
+  --space-factor: 0.25rem;
+  --text-primary-color: #{$oc-gray-8};
 }
 
 .excalidraw {
   &.Appearance_dark {
-    background: #000;
+    background: $oc-black;
 
     &.Appearance_dark-background-none {
       background: none;
@@ -45,31 +46,31 @@
   }
 
   &.Appearance_dark {
-    --text-color-primary: #{$oc-gray-4};
-    --bg-color-island: #1e1e1e;
-    --popup-background-color: #2c2c2c;
+    --appearance-filter: #{$appearance-filter};
+    --button-destructive-bg-color: #5a0000;
+    --button-destructive-color: #{$oc-red-3};
     --button-gray-1: #363636;
     --button-gray-2: #272727;
     --button-gray-3: #222;
-    --input-border-color: #2e2e2e;
-    --input-background-color: #121212;
-    --input-hover-background-color: #181818;
-    --input-label-color: #{$oc-gray-2};
-    --icon-fill-color: #{$oc-gray-4};
-    --icon-green-fill-color: #{$oc-green-4};
-    --keybinding-color: #{$oc-gray-6};
-    --shadow-island: 0 1px 5px #{transparentize($oc-black, 0.7)};
-    --overlay-background-color: rgba(30, 30, 30, 0.88);
+    --button-special-active-bg-color: #204624;
+    --dialog-border-color: #{$oc-gray-9};
     --dropdown-icon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="292.4" height="292.4" viewBox="0 0 292 292"><path fill="%23ced4da" d="M287 197L159 69c-4-3-8-5-13-5s-9 2-13 5L5 197c-3 4-5 8-5 13s2 9 5 13c4 4 8 5 13 5h256c5 0 9-1 13-5s5-8 5-13-1-9-5-13z"/></svg>');
     --focus-highlight-color: #{$oc-blue-6};
-    --select-highlight-color: #{$oc-blue-4};
-    --appearance-filter: invert(93%) hue-rotate(180deg);
-    --button-special-active-background-color: #204624;
-    --button-destructive-color: #{$oc-red-3};
-    --button-destructive-background-color: #5a0000;
-    --popup-secondary-background-color: #222;
+    --icon-fill-color: #{$oc-gray-4};
+    --icon-green-fill-color: #{$oc-green-4};
+    --input-bg-color: #121212;
+    --input-border-color: #2e2e2e;
+    --input-hover-bg-color: #181818;
+    --input-label-color: #{$oc-gray-2};
+    --island-bg-color: #1e1e1e;
+    --keybinding-color: #{$oc-gray-6};
+    --overlay-bg-color: #{transparentize($oc-gray-8, 0.88)};
+    --popup-bg-color: #2c2c2c;
+    --popup-secondary-bg-color: #222;
     --popup-text-color: #{$oc-gray-4};
     --popup-text-inverted-color: #2c2c2c;
-    --dialog-border: #{$oc-gray-9};
+    --select-highlight-color: #{$oc-blue-4};
+    --shadow-island: 0 1px 5px #{transparentize($oc-black, 0.7)};
+    --text-primary-color: #{$oc-gray-4};
   }
 }

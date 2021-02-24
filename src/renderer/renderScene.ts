@@ -49,6 +49,7 @@ import {
 } from "../element/transformHandles";
 import { viewportCoordsToSceneCoords, supportsEmoji } from "../utils";
 import { UserIdleState } from "../excalidraw-app/collab/types";
+import { APPEARANCE_FILTER } from "../constants";
 
 const hasEmojiSupport = supportsEmoji();
 
@@ -210,6 +211,10 @@ export const renderScene = (
   // When doing calculations based on canvas width we should used normalized one
   const normalizedCanvasWidth = canvas.width / scale;
   const normalizedCanvasHeight = canvas.height / scale;
+
+  if (sceneState.exportWithDarkMode) {
+    context.filter = APPEARANCE_FILTER;
+  }
 
   // Paint background
   if (typeof sceneState.viewBackgroundColor === "string") {
@@ -483,24 +488,19 @@ export const renderScene = (
     context.stroke();
 
     const username = sceneState.remotePointerUsernames[clientId];
-    let usernameAndIdleState;
-    if (hasEmojiSupport) {
-      usernameAndIdleState = `${username ? `${username} ` : ""}${
-        userState === UserIdleState.AWAY
-          ? "⚫️"
-          : userState === UserIdleState.IDLE
-          ? "💤"
-          : "🟢"
-      }`;
-    } else {
-      usernameAndIdleState = `${username ? `${username}` : ""}${
-        userState === UserIdleState.AWAY
-          ? ` (${UserIdleState.AWAY})`
-          : userState === UserIdleState.IDLE
-          ? ` (${UserIdleState.IDLE})`
-          : ""
-      }`;
+
+    let idleState = "";
+    if (userState === UserIdleState.AWAY) {
+      idleState = hasEmojiSupport ? "⚫️" : ` (${UserIdleState.AWAY})`;
+    } else if (userState === UserIdleState.IDLE) {
+      idleState = hasEmojiSupport ? "💤" : ` (${UserIdleState.IDLE})`;
+    } else if (userState === UserIdleState.ACTIVE) {
+      idleState = hasEmojiSupport ? "🟢" : "";
     }
+
+    const usernameAndIdleState = `${
+      username ? `${username} ` : ""
+    }${idleState}`;
 
     if (!isOutOfBounds && usernameAndIdleState) {
       const offsetX = x + width;

@@ -2,18 +2,18 @@
 
 .excalidraw {
   .TextInput {
-    color: var(--text-color-primary);
+    color: var(--text-primary-color);
     display: inline-block;
     border: 1.5px solid var(--button-gray-1);
     line-height: 1;
     padding: 0.75rem;
     white-space: nowrap;
     border-radius: var(--space-factor);
-    background-color: var(--input-background-color);
+    background-color: var(--input-bg-color);
 
     &:not(:focus) {
       &:hover {
-        background-color: var(--input-hover-background-color);
+        background-color: var(--input-hover-bg-color);
       }
     }
 

@@ -1,8 +1,13 @@
 @import "../css/variables.module";
 
 .excalidraw {
+  &.excalidraw-modal-container {
+    position: absolute;
+    z-index: 10;
+  }
+
   .Modal {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     right: 0;
@@ -15,7 +20,7 @@
   }
 
   .Modal__background {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     right: 0;
@@ -39,10 +44,10 @@
     overflow-y: auto;
 
     // for modals, reset blurry bg
-    background: var(--bg-color-island);
+    background: var(--island-bg-color);
     backdrop-filter: none;
 
-    border: 1px solid var(--dialog-border);
+    border: 1px solid var(--dialog-border-color);
     box-shadow: 0 2px 10px transparentize($oc-black, 0.75);
     border-radius: 6px;
 
@@ -82,7 +87,7 @@
     }
 
     .Modal__content {
-      position: fixed;
+      position: absolute;
       top: 0;
       left: 0;
       right: 0;

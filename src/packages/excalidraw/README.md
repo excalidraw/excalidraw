@@ -20,13 +20,9 @@ After installation you will see a folder `excalidraw-assets` in `dist` directory
 
 Move the folder `excalidraw-assets` to the path where your assets are served.
 
-By default it will try to load the files from `{rootUrl}/excalidraw-assets/`
+By default it will try to load the files from `https://unpkg.com/@excalidraw/excalidraw/{currentVersion}/dist/`
 
-With **Webpack**, if you want to load the files from different path you can use <pre><a href="https://webpack.js.org/guides/public-path/#on-the-fly">`__webpack_public_path__`</a></pre>.
-
-With **create-react-app**, the assets can be served from `public/static/js/excalidraw-assets`since CRA tries to load the assets from `{rootUrl}/static/js` path by default.
-
-You can update the value of `PUBLIC_URL` if you want to serve it from a different URL.
+If you want to load assets from a different path you can set a variable `window.EXCALIDRAW_ASSET_PATH` to the url from where you want to load the assets.
 
 ### Demo
 
@@ -37,18 +33,18 @@ You can update the value of `PUBLIC_URL` if you want to serve it from a differen
 1. If you are using a Web bundler (for instance, Webpack), you can import it as an ES6 module as shown below
 
 ```js
-import React, { useEffect, useState, createRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Excalidraw from "@excalidraw/excalidraw";
 import InitialData from "./initialData";
 
-import "./styles.css";
+import "./styles.scss";
 
 export default function App() {
-  const excalidrawRef = createRef();
-
+  const excalidrawRef = useRef(null);
+  const excalidrawWrapperRef = useRef(null);
   const [dimensions, setDimensions] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
+    width: undefined,
+    height: undefined,
   });
 
   const [viewModeEnabled, setViewModeEnabled] = useState(false);
@@ -56,17 +52,21 @@ export default function App() {
   const [gridModeEnabled, setGridModeEnabled] = useState(false);
 
   useEffect(() => {
+    setDimensions({
+      width: excalidrawWrapperRef.current.getBoundingClientRect().width,
+      height: excalidrawWrapperRef.current.getBoundingClientRect().height,
+    });
     const onResize = () => {
       setDimensions({
-        width: window.innerWidth,
-        height: window.innerHeight,
+        width: excalidrawWrapperRef.current.getBoundingClientRect().width,
+        height: excalidrawWrapperRef.current.getBoundingClientRect().height,
       });
     };
 
     window.addEventListener("resize", onResize);
 
     return () => window.removeEventListener("resize", onResize);
-  }, []);
+  }, [excalidrawWrapperRef]);
 
   const updateScene = () => {
     const sceneData = {
@@ -102,6 +102,7 @@ export default function App() {
 
   return (
     <div className="App">
+      <h1> Excalidraw Example</h1>
       <div className="button-wrapper">
         <button className="update-scene" onClick={updateScene}>
           Update Scene
@@ -139,7 +140,7 @@ export default function App() {
           Grid mode
         </label>
       </div>
-      <div className="excalidraw-wrapper">
+      <div className="excalidraw-wrapper" ref={excalidrawWrapperRef}>
         <Excalidraw
           ref={excalidrawRef}
           width={dimensions.width}
@@ -148,7 +149,6 @@ export default function App() {
           onChange={(elements, state) =>
             console.log("Elements :", elements, "State : ", state)
           }
-          user={{ name: "Excalidraw User" }}
           onPointerUpdate={(payload) => console.log(payload)}
           onCollabButtonClick={() =>
             window.alert("You clicked on collab button")
@@ -248,51 +248,6 @@ export default function IndexPage() {
 | [`zenModeEnabled`](#zenModeEnabled) | boolean |  | This implies if the zen mode is enabled |
 | [`gridModeEnabled`](#gridModeEnabled) | boolean |  | This implies if the grid mode is enabled |
 
-### `Extra API's`
-
-#### `getSceneVersion`
-
-**How to use**
-
-<pre>
-import { getSceneVersion } from "@excalidraw/excalidraw";
-getSceneVersion(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>)
-</pre>
-
-This function returns the current scene version.
-
-#### `getSyncableElements`
-
-**_Signature_**
-
-<pre>
-getSyncableElements(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>):<a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>
-</pre>
-
-**How to use**
-
-```js
-import { getSyncableElements } from "@excalidraw/excalidraw";
-```
-
-This function returns all the deleted elements of the scene.
-
-### `getElementMap`
-
-**_Signature_**
-
-<pre>
-getElementsMap(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>): {[id: string]: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement</a>}
-</pre>
-
-**How to use**
-
-```js
-import { getElementsMap } from "@excalidraw/excalidraw";
-```
-
-This function returns an object where each element is mapped to its id.
-
 #### `width`
 
 This props defines the `width` of the Excalidraw component. Defaults to `window.innerWidth` if not passed.
@@ -327,10 +282,11 @@ Here you can try saving the data to your backend or local storage for example.
 
 This helps to load Excalidraw with `initialData`. It must be an object or a [promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise) which resolves to an object containing the below optional fields.
 
-| name | type |
-| --- | --- |
-| elements | [ExcalidrawElement[]](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78) |
-| appState | [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37) |
+| Name | Type | Descrption |
+| --- | --- | --- |
+| `elements` | [ExcalidrawElement[]](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78) | The elements with which Excalidraw should be mounted. |
+| `appState` | [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37) | The App state with which Excalidraw should be mounted. |
+| `scrollToCenter` | boolean | This attribute implies whether to scroll to the nearest element to center once Excalidraw is mounted. By default, it will not scroll the nearest element to the center. Make sure you pass `initialData.appState.scrollX` and `initialData.appState.scrollY` when `scrollToCenter` is false so that scroll positions are retained |
 
 ```json
 {
@@ -447,3 +403,98 @@ This prop indicates whether the app is in `zen mode`. When supplied, the value t
 #### `gridModeEnabled`
 
 This prop indicates whether the shows the grid. When supplied, the value takes precedence over `intialData.appState.gridModeEnabled`, the grid will be fully controlled by the host app, and users won't be able to toggle it from within the app.
+
+### Extra API's
+
+#### `getSceneVersion`
+
+**How to use**
+
+<pre>
+import { getSceneVersion } from "@excalidraw/excalidraw";
+getSceneVersion(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>)
+</pre>
+
+This function returns the current scene version.
+
+#### `getSyncableElements`
+
+**_Signature_**
+
+<pre>
+getSyncableElements(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>):<a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>
+</pre>
+
+**How to use**
+
+```js
+import { getSyncableElements } from "@excalidraw/excalidraw";
+```
+
+This function returns all the deleted elements of the scene.
+
+#### `getElementMap`
+
+**_Signature_**
+
+<pre>
+getElementsMap(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>): {[id: string]: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement</a>}
+</pre>
+
+**How to use**
+
+```js
+import { getElementsMap } from "@excalidraw/excalidraw";
+```
+
+This function returns an object where each element is mapped to its id.
+
+**_The below api's will be available in [next version](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/CHANGELOG.md#unreleased)_**
+
+#### `restoreAppState`
+
+**_Signature_**
+
+<pre>
+restoreAppState(appState:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L17">ImportedDataState["appState"]</a>, localAppState: Partial<<a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37">AppState</a>> | null): <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37">AppState</a>
+</pre>
+
+**_How to use_**
+
+```js
+import { restoreAppState } from "@excalidraw/excalidraw";
+```
+
+This function will make sure all the keys have appropriate values in [appState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37) and if any key is missing, it will be set to default value. If you pass `localAppState`, `localAppState` value will be preferred over the `appState` passed in params.
+
+#### `restoreElements`
+
+**_Signature_**
+
+<pre>
+restoreElements(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L16">ImportedDataState["elements"]</a>): <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>
+</pre>
+
+**_How to use_**
+
+```js
+import { restoreElements } from "@excalidraw/excalidraw";
+```
+
+This function will make sure all properties of element is correctly set and if any attribute is missing, it will be set to default value.
+
+#### `restore`
+
+**_Signature_**
+
+<pre>
+restoreElements(data:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L12">ImportedDataState</a>): <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L4">DataState</a>
+</pre>
+
+**_How to use_**
+
+```js
+import { restore } from "@excalidraw/excalidraw";
+```
+
+This function makes sure elements and state is set to appropriate values and set to default value if not present. It is combination of [restoreElements](#restoreElements) and [restoreAppState](#restoreAppState)
