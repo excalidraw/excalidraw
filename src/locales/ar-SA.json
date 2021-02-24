@@ -92,7 +92,8 @@
     "centerHorizontally": "توسيط أفقي",
     "distributeHorizontally": "التوزيع الأفقي",
     "distributeVertically": "التوزيع عمودياً",
-    "viewMode": ""
+    "viewMode": "",
+    "toggleExportColorScheme": ""
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
