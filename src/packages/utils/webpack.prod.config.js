@@ -13,13 +13,18 @@ module.exports = {
     libraryTarget: "umd",
   },
   resolve: {
-    extensions: [".tsx", ".ts", ".js"],
+    extensions: [".tsx", ".ts", ".js", ".css", ".scss"],
   },
   optimization: {
     runtimeChunk: false,
   },
   module: {
     rules: [
+      {
+        test: /\.(sa|sc|c)ss$/,
+        exclude: /node_modules/,
+        use: ["style-loader", { loader: "css-loader" }, "sass-loader"],
+      },
       {
         test: /\.(ts|tsx|js)$/,
         use: [
