@@ -49,6 +49,7 @@
     "typescript": "4.1.5"
   },
   "devDependencies": {
+    "@excalidraw/prettier-config": "1.0.1",
     "@types/lodash.throttle": "4.1.6",
     "@types/pako": "1.0.1",
     "@types/resize-observer-browser": "0.1.5",
@@ -78,6 +79,7 @@
     "resetMocks": false
   },
   "name": "excalidraw",
+  "prettier": "@excalidraw/prettier-config",
   "private": true,
   "scripts": {
     "build-node": "node ./scripts/build-node.js",

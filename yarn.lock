@@ -1285,6 +1285,11 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
+"@excalidraw/prettier-config@1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@excalidraw/prettier-config/-/prettier-config-1.0.1.tgz#e7dd900993fe2f4442196805c124b43d9e361be5"
+  integrity sha512-AktpMzImIKlIfd0WYfuMcBovPL8C56LZdMqc7om05l8F3AjH0lffUctqQr3uu9e3t8NIZM7tEIZsiqZ+XO0fRQ==
+
 "@firebase/analytics-types@0.4.0":
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/@firebase/analytics-types/-/analytics-types-0.4.0.tgz#d6716f9fa36a6e340bc0ecfe68af325aa6f60508"
