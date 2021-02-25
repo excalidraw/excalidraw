@@ -9,7 +9,7 @@ import {
 } from "../excalidraw-app/data/localStorage";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
-import { getTargetElements } from "../scene";
+import { getTargetElements, getSelectedPoint } from "../scene";
 import { AppState } from "../types";
 import { debounce, getVersion, nFormatter } from "../utils";
 import { close } from "./icons";
@@ -47,6 +47,7 @@ export const Stats = (props: {
 
   const boundingBox = getCommonBounds(props.elements);
   const selectedElements = getTargetElements(props.elements, props.appState);
+  const selectedPoint = getSelectedPoint(props.elements, props.appState);
   const selectedBoundingBox = getCommonBounds(selectedElements);
 
   if (isMobile && props.appState.openMenu) {
@@ -169,6 +170,21 @@ export const Stats = (props: {
                   )}°`}
                 </td>
               </tr>
+            )}
+            {selectedElements.length === 1 && selectedPoint && (
+              <>
+                <tr>
+                  <th colSpan={2}>{t("stats.point")}</th>
+                </tr>
+                <tr>
+                  <td>{"x"}</td>
+                  <td>{Math.round(selectedPoint[0])}</td>
+                </tr>
+                <tr>
+                  <td>{"y"}</td>
+                  <td>{Math.round(selectedPoint[1])}</td>
+                </tr>
+              </>
             )}
             <tr>
               <th colSpan={2}>{t("stats.version")}</th>

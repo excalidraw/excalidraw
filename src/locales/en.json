@@ -240,7 +240,8 @@
     "version": "Version",
     "versionCopy": "Click to copy",
     "versionNotAvailable": "Version not available",
-    "width": "Width"
+    "width": "Width",
+    "point": "Point"
   },
   "toast": {
     "copyStyles": "Copied styles.",
