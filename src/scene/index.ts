@@ -5,6 +5,7 @@ export {
   getCommonAttributeOfSelectedElements,
   getSelectedElements,
   getTargetElements,
+  getSelectedPoint,
 } from "./selection";
 export { calculateScrollCenter } from "./scroll";
 export {
