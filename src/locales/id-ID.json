@@ -68,7 +68,7 @@
     "layers": "Lapisan",
     "actions": "Aksi",
     "language": "Bahasa",
-    "liveCollaboration": "",
+    "liveCollaboration": "Kolaborasi langsung",
     "duplicateSelection": "Duplikat",
     "untitled": "Tanpa judul",
     "name": "Nama",
@@ -93,7 +93,7 @@
     "distributeHorizontally": "Distribusikan horizontal",
     "distributeVertically": "Distribusikan vertikal",
     "viewMode": "Mode tampilan",
-    "toggleExportColorScheme": ""
+    "toggleExportColorScheme": "Ubah skema warna ekspor"
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
@@ -118,7 +118,7 @@
     "edit": "Edit",
     "undo": "Urungkan",
     "redo": "Ulangi",
-    "resetLibrary": "",
+    "resetLibrary": "Reset pustaka",
     "createNewRoom": "Buat ruang baru",
     "fullScreen": "Layar penuh",
     "darkMode": "Mode gelap",
@@ -142,7 +142,7 @@
     "confirmAddLibrary": "Ini akan menambahkan {{numShapes}} bentuk ke pustaka Anda. Anda yakin?",
     "imageDoesNotContainScene": "Mengimpor gambar tidak didukung saat ini.\n\nApakah Anda ingin impor pemandangan? Gambar ini tidak berisi data pemandangan. Sudah ka Anda aktifkan ini ketika ekspor?",
     "cannotRestoreFromImage": "Pemandangan tidak dapat dipulihkan dari file gambar ini",
-    "resetLibrary": ""
+    "resetLibrary": "Ini akan menghapus pustaka Anda. Anda yakin?"
   },
   "toolBar": {
     "selection": "Pilihan",
