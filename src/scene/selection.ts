@@ -73,10 +73,7 @@ export const getSelectedPoint = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
 ) => {
-  if (
-    appState.editingLinearElement &&
-    appState.editingLinearElement.activePointIndex != null
-  ) {
+  if (appState.editingLinearElement?.activePointIndex != null) {
     const selectedElements = getSelectedElements(elements, appState);
 
     if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
