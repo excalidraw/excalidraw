@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { render } from "./test-utils";
 import App from "../components/App";
-import { setLanguage } from "../i18n";
+import { defaultLang, setLanguage } from "../i18n";
 import { UI, Pointer } from "./helpers/ui";
 import { API } from "./helpers/api";
 import { actionFlipHorizontal, actionFlipVertical } from "../actions";
@@ -16,7 +16,7 @@ beforeEach(async () => {
   ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
   mouse.reset();
 
-  await setLanguage("en.json");
+  await setLanguage(defaultLang);
   render(<App />);
 });
 
@@ -70,12 +70,12 @@ const createAndSelectOneLine = (angle: number = 0) => {
   });
 };
 
-const createAndSelectOneDraw = (angle: number = 0) => {
-  UI.createElement("draw", {
+const createAndReturnOneDraw = (angle: number = 0) => {
+  return UI.createElement("draw", {
     x: 0,
     y: 0,
-    width: 100,
-    height: 50,
+    width: 50,
+    height: 100,
     angle,
   });
 };
@@ -539,105 +539,77 @@ it("flips a rotated line vertically correctly", () => {
 // Draw element
 
 it("flips an unrotated drawing horizontally correctly", () => {
-  createAndSelectOneDraw();
+  const draw = createAndReturnOneDraw();
+  // select draw, since not done automatically
+  h.state.selectedElementIds[draw.id] = true;
 
-  expect(API.getSelectedElements()[0].x).toEqual(0);
-
-  expect(API.getSelectedElements()[0].y).toEqual(0);
-
-  const originalWidth = API.getSelectedElements()[0].width;
-  const originalHeight = API.getSelectedElements()[0].height;
+  const originalWidth = draw.width;
+  const originalHeight = draw.height;
 
   h.app.actionManager.executeAction(actionFlipHorizontal);
 
-  // Check if x position did not change
-  expect(API.getSelectedElements()[0].x).toEqual(0);
-
-  expect(API.getSelectedElements()[0].y).toEqual(0);
-
   // Check if width and height did not change
-  expect(API.getSelectedElements()[0].width).toEqual(originalWidth);
+  expect(draw.width).toEqual(originalWidth);
 
-  expect(API.getSelectedElements()[0].height).toEqual(originalHeight);
+  expect(draw.height).toEqual(originalHeight);
 });
 
 it("flips an unrotated drawing vertically correctly", () => {
-  createAndSelectOneDraw();
+  const draw = createAndReturnOneDraw();
+  // select draw, since not done automatically
+  h.state.selectedElementIds[draw.id] = true;
 
-  expect(API.getSelectedElements()[0].x).toEqual(0);
-
-  expect(API.getSelectedElements()[0].y).toEqual(0);
-
-  const originalWidth = API.getSelectedElements()[0].width;
-  const originalHeight = API.getSelectedElements()[0].height;
+  const originalWidth = draw.width;
+  const originalHeight = draw.height;
 
   h.app.actionManager.executeAction(actionFlipVertical);
 
-  // Check if x position did not change
-  expect(API.getSelectedElements()[0].x).toEqual(0);
-
-  expect(API.getSelectedElements()[0].y).toEqual(0);
-
   // Check if width and height did not change
-  expect(API.getSelectedElements()[0].width).toEqual(originalWidth);
+  expect(draw.width).toEqual(originalWidth);
 
-  expect(API.getSelectedElements()[0].height).toEqual(originalHeight);
+  expect(draw.height).toEqual(originalHeight);
 });
 
 it("flips a rotated drawing horizontally correctly", () => {
   const originalAngle = Math.PI / 4;
   const expectedAngle = (7 * Math.PI) / 4;
 
-  createAndSelectOneDraw(originalAngle);
+  const draw = createAndReturnOneDraw(originalAngle);
+  // select draw, since not done automatically
+  h.state.selectedElementIds[draw.id] = true;
 
-  expect(API.getSelectedElements()[0].x).toEqual(0);
-
-  expect(API.getSelectedElements()[0].y).toEqual(0);
-
-  const originalWidth = API.getSelectedElements()[0].width;
-  const originalHeight = API.getSelectedElements()[0].height;
+  const originalWidth = draw.width;
+  const originalHeight = draw.height;
 
   h.app.actionManager.executeAction(actionFlipHorizontal);
 
-  // Check if x position did not change
-  expect(API.getSelectedElements()[0].x).toEqual(0);
-
-  expect(API.getSelectedElements()[0].y).toEqual(0);
-
   // Check if width and height did not change
-  expect(API.getSelectedElements()[0].width).toEqual(originalWidth);
+  expect(draw.width).toEqual(originalWidth);
 
-  expect(API.getSelectedElements()[0].height).toEqual(originalHeight);
+  expect(draw.height).toEqual(originalHeight);
 
   // Check angle
-  expect(API.getSelectedElements()[0].angle).toBeCloseTo(expectedAngle);
+  expect(draw.angle).toBeCloseTo(expectedAngle);
 });
 
 it("flips a rotated drawing vertically correctly", () => {
   const originalAngle = Math.PI / 4;
   const expectedAngle = (3 * Math.PI) / 4;
 
-  createAndSelectOneDraw(originalAngle);
+  const draw = createAndReturnOneDraw(originalAngle);
+  // select draw, since not done automatically
+  h.state.selectedElementIds[draw.id] = true;
 
-  expect(API.getSelectedElements()[0].x).toEqual(0);
-
-  expect(API.getSelectedElements()[0].y).toEqual(0);
-
-  const originalWidth = API.getSelectedElements()[0].width;
-  const originalHeight = API.getSelectedElements()[0].height;
+  const originalWidth = draw.width;
+  const originalHeight = draw.height;
 
   h.app.actionManager.executeAction(actionFlipVertical);
 
-  // Check if x position did not change
-  expect(API.getSelectedElements()[0].x).toEqual(0);
-
-  expect(API.getSelectedElements()[0].y).toEqual(0);
-
   // Check if width and height did not change
-  expect(API.getSelectedElements()[0].width).toEqual(originalWidth);
+  expect(API.getSelectedElement().width).toEqual(originalWidth);
 
-  expect(API.getSelectedElements()[0].height).toEqual(originalHeight);
+  expect(API.getSelectedElement().height).toEqual(originalHeight);
 
   // Check angle
-  expect(API.getSelectedElements()[0].angle).toBeCloseTo(expectedAngle);
+  expect(API.getSelectedElement().angle).toBeCloseTo(expectedAngle);
 });

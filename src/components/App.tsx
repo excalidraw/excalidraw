@@ -16,6 +16,8 @@ import {
   actionDeleteSelected,
   actionDuplicateSelection,
   actionFinalize,
+  actionFlipHorizontal,
+  actionFlipVertical,
   actionGroup,
   actionPasteStyles,
   actionSelectAll,
@@ -3700,6 +3702,16 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.actionManager.getAppState(),
     );
 
+    const maybeFlipHorizontal = actionFlipHorizontal.contextItemPredicate!(
+      this.actionManager.getElementsIncludingDeleted(),
+      this.actionManager.getAppState(),
+    );
+
+    const maybeFlipVertical = actionFlipVertical.contextItemPredicate!(
+      this.actionManager.getElementsIncludingDeleted(),
+      this.actionManager.getAppState(),
+    );
+
     const separator = "separator";
 
     const _isMobile = isMobile();
@@ -3824,6 +3836,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         actionSendToBack,
         actionBringToFront,
         separator,
+        maybeFlipHorizontal && actionFlipHorizontal,
+        maybeFlipVertical && actionFlipVertical,
+        (maybeFlipHorizontal || maybeFlipVertical) && separator,
         actionDuplicateSelection,
         actionDeleteSelected,
       ],

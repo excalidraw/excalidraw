@@ -11,6 +11,8 @@ import {
 import { AppState } from "../types";
 import { getTransformHandles } from "../element/transformHandles";
 import { isLinearElement } from "../element/typeChecks";
+import { updateBoundElements } from "../element/binding";
+import { LinearElementEditor } from "../element/linearElementEditor";
 
 const enableActionFlipHorizontal = (
   elements: readonly ExcalidrawElement[],
@@ -116,48 +118,63 @@ const flipElementHorizontally = (
   // Flip unrotated by pulling TransformHandle to opposite side
   const transformHandles = getTransformHandles(element, appState.zoom);
   let usingNWHandle = true;
+  let newNCoordsX = 0;
   let nHandle = transformHandles.nw;
-  let sHandle = transformHandles.se;
-  let xHandleDistance = 0;
-  let [newNCoordsX, newNCoordsY] = [0, 0];
+  const sHandle = transformHandles.se;
   if (!nHandle || !sHandle) {
-    // Check if we can use ne and sw handles
+    // Use ne handle instead
     usingNWHandle = false;
     nHandle = transformHandles.ne;
-    sHandle = transformHandles.sw;
+    nHandle = transformHandles.sw;
     if (!nHandle || !sHandle) {
       mutateElement(element, {
         angle: originalAngle,
       });
       return;
     }
-    [newNCoordsX, newNCoordsY] = [nHandle[0], nHandle[1]];
-    xHandleDistance = Math.abs(nHandle[0] - sHandle[0]);
-    newNCoordsX = nHandle[0] - 2 * xHandleDistance;
-  } else {
-    [newNCoordsX, newNCoordsY] = [nHandle[0], nHandle[1]];
-    xHandleDistance = Math.abs(nHandle[0] - sHandle[0]);
-    newNCoordsX = nHandle[0] + 2 * xHandleDistance;
   }
 
   if (isLinearElement(element) && element.points.length === 2) {
+    // calculate new x-coord for transformation
+    newNCoordsX =
+      element.points[0][0] < element.points[1][0]
+        ? element.x + 2 * width
+        : element.x - 2 * width;
     reshapeSingleTwoPointElement(
       element,
       "origin",
       false,
       newNCoordsX,
-      newNCoordsY,
+      element.y,
     );
+    LinearElementEditor.normalizePoints(element);
+  } else if (isLinearElement(element)) {
+    if (element.points.length > 1) {
+      for (let i = 1; i < element.points.length; i++) {
+        LinearElementEditor.movePoint(element, i, [
+          -element.points[i][0],
+          element.points[i][1],
+        ]);
+      }
+      LinearElementEditor.normalizePoints(element);
+    }
   } else {
+    // calculate new x-coord for transformation
+    newNCoordsX = usingNWHandle ? element.x + 2 * width : element.x - 2 * width;
     resizeSingleElement(
       element,
-      false,
+      true,
       element,
       usingNWHandle ? "nw" : "ne",
       false,
       newNCoordsX,
-      newNCoordsY,
+      element.y,
     );
+    // fix the size to account for handle sizes
+    mutateElement(element, {
+      width,
+      height,
+    });
   }
 
   // Rotate by (360 degrees - original angle)
@@ -167,24 +184,16 @@ const flipElementHorizontally = (
     angle = normalizeAngle(angle + 2 * Math.PI);
   }
   mutateElement(element, {
-    width,
-    height,
     angle,
   });
 
-  if (element.width < 0) {
-    mutateElement(element, { width: -width });
-  }
-  if (element.height < 0) {
-    mutateElement(element, { height: -height });
-  }
-  // Move back to original spot
-  if (isLinearElement(element) && element.type !== "draw") {
-    const newX = usingNWHandle
-      ? originalX - xHandleDistance
-      : originalX + xHandleDistance;
+  updateBoundElements(element);
+
+  // Move back to original spot to appear "flipped in place"
+  if (isLinearElement(element) && element.points.length === 2) {
+    const displacement = usingNWHandle ? -width : width;
     mutateElement(element, {
-      x: newX,
+      x: originalX + displacement,
       y: originalY,
     });
   } else {
