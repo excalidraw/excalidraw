@@ -232,6 +232,7 @@
     "element": "Element",
     "elements": "Elements",
     "height": "Height",
+    "point": "Point",
     "scene": "Scene",
     "selected": "Selected",
     "storage": "Storage",
@@ -240,8 +241,7 @@
     "version": "Version",
     "versionCopy": "Click to copy",
     "versionNotAvailable": "Version not available",
-    "width": "Width",
-    "point": "Point"
+    "width": "Width"
   },
   "toast": {
     "copyStyles": "Copied styles.",
