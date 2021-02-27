@@ -76,6 +76,11 @@ const flipSelectedElements = (
     appState,
   );
 
+  // remove once we allow for groups of elements to be flipped
+  if (selectedElements.length > 1) {
+    return elements;
+  }
+
   const updatedElements = flipElements(
     selectedElements,
     appState,
@@ -120,13 +125,11 @@ const flipElementHorizontally = (
   let usingNWHandle = true;
   let newNCoordsX = 0;
   let nHandle = transformHandles.nw;
-  const sHandle = transformHandles.se;
-  if (!nHandle || !sHandle) {
+  if (!nHandle) {
     // Use ne handle instead
     usingNWHandle = false;
     nHandle = transformHandles.ne;
-    nHandle = transformHandles.sw;
-    if (!nHandle || !sHandle) {
+    if (!nHandle) {
       mutateElement(element, {
         angle: originalAngle,
       });
@@ -134,22 +137,24 @@ const flipElementHorizontally = (
     }
   }
 
-  if (isLinearElement(element) && element.points.length === 2) {
-    // calculate new x-coord for transformation
-    newNCoordsX =
-      element.points[0][0] < element.points[1][0]
-        ? element.x + 2 * width
-        : element.x - 2 * width;
-    reshapeSingleTwoPointElement(
-      element,
-      "origin",
-      false,
-      newNCoordsX,
-      element.y,
-    );
-    LinearElementEditor.normalizePoints(element);
-  } else if (isLinearElement(element)) {
-    if (element.points.length > 1) {
+  if (isLinearElement(element)) {
+    if (element.points.length === 2) {
+      // reuse usingNWHandle to tell us which way we are flipping
+      usingNWHandle = element.points[0][0] < element.points[1][0];
+      // calculate new x-coord for transformation
+      newNCoordsX =
+        element.points[0][0] < element.points[1][0]
+          ? element.x + 2 * width
+          : element.x - 2 * width;
+      reshapeSingleTwoPointElement(
+        element,
+        "origin",
+        false,
+        newNCoordsX,
+        element.y,
+      );
+    } else {
+      // drawings and 3+ point lines
       for (let i = 1; i < element.points.length; i++) {
         LinearElementEditor.movePoint(element, i, [
           -element.points[i][0],
@@ -168,7 +173,7 @@ const flipElementHorizontally = (
       usingNWHandle ? "nw" : "ne",
       false,
       newNCoordsX,
-      element.y,
+      nHandle[1],
     );
     // fix the size to account for handle sizes
     mutateElement(element, {
@@ -191,7 +196,7 @@ const flipElementHorizontally = (
 
   // Move back to original spot to appear "flipped in place"
   if (isLinearElement(element) && element.points.length === 2) {
-    const displacement = usingNWHandle ? -width : width;
+    const displacement = usingNWHandle ? width : -width;
     mutateElement(element, {
       x: originalX + displacement,
       y: originalY,
