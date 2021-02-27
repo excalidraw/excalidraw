@@ -93,7 +93,7 @@
     "distributeHorizontally": "Freq s uglawi",
     "distributeVertically": "Freq s yibeddi",
     "viewMode": "Askar n tmuɣli",
-    "toggleExportColorScheme": ""
+    "toggleExportColorScheme": "Sermed/sens asifeḍ usentel n yini"
   },
   "buttons": {
     "clearReset": "Ales awennez n teɣzut n usuneɣ",
@@ -118,7 +118,7 @@
     "edit": "Ẓreg",
     "undo": "Sefsex",
     "redo": "Err-d",
-    "resetLibrary": "",
+    "resetLibrary": "Ales awennez n temkarḍit",
     "createNewRoom": "Snulfu-d taxxamt tamaynutt",
     "fullScreen": "Agdil aččuran",
     "darkMode": "Askar imsulles",
@@ -142,7 +142,7 @@
     "confirmAddLibrary": "Ayagi adirnu talɣa (win) {{numShapes}} ɣer temkarḍit-inek (m). Tetḥeqqeḍ?",
     "imageDoesNotContainScene": "Taktert n tugniwin ur tettwadhel ara akka tura.\nTebɣiḍ ad tketreḍ asayes? Tugna-agi tettban-d ur tegbir ara isefka n usnas. Tesremdeḍ ayagi deg usifeḍ?",
     "cannotRestoreFromImage": "Asayes ulamek ara d-yettwarr seg ufaylu-agi n tugna",
-    "resetLibrary": ""
+    "resetLibrary": "Ayagi ad isfeḍ tamkarḍit-inek•m. Tetḥeqqeḍ?"
   },
   "toolBar": {
     "selection": "Tafrayt",
@@ -246,7 +246,7 @@
     "copyStyles": "Iɣunab yettwaneɣlen.",
     "copyToClipboard": "Yettwaɣel ɣer tecfawit.",
     "copyToClipboardAsPng": "Yettwanɣel ɣer tecfawit am PNG.",
-    "fileSaved": "",
-    "fileSavedToFilename": ""
+    "fileSaved": "Afaylu yettwasekles.",
+    "fileSavedToFilename": "Yettwasekles di {filename}"
   }
 }
