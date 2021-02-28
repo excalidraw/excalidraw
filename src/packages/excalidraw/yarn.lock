@@ -2019,10 +2019,10 @@ mimic-fn@^2.1.0:
   resolved "https://registry.yarnpkg.com/mimic-fn/-/mimic-fn-2.1.0.tgz#7ed2c2ccccaf84d3ffcb7a69b57711fc2083401b"
   integrity sha512-OqbOk5oEQeAZ8WXWydlu9HJjz9WVdEIvamMCcXmuqUYjTknH/sqsWvhQ3vgwKFRR1HpjvNBKQ37nbJgYzGqGcg==
 
-mini-css-extract-plugin@1.3.8:
-  version "1.3.8"
-  resolved "https://registry.yarnpkg.com/mini-css-extract-plugin/-/mini-css-extract-plugin-1.3.8.tgz#639047b78c2ee728704285aa468d2a5a8d91d566"
-  integrity sha512-u+2kVov/Gcs74iz+x3phEBWMAGw2djjnKfYez+Pl/b5dyXL7aM4Lp5QQtIq16CDwRHT/woUJki49gBNMhfm1eA==
+mini-css-extract-plugin@1.3.9:
+  version "1.3.9"
+  resolved "https://registry.yarnpkg.com/mini-css-extract-plugin/-/mini-css-extract-plugin-1.3.9.tgz#47a32132b0fd97a119acd530e8421e8f6ab16d5e"
+  integrity sha512-Ac4s+xhVbqlyhXS5J/Vh/QXUz3ycXlCqoCPpg0vdfhsIBH9eg/It/9L1r1XhSCH737M1lqcWnMuWL13zcygn5A==
   dependencies:
     loader-utils "^2.0.0"
     schema-utils "^3.0.0"
