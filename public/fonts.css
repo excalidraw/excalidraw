@@ -1,7 +1,7 @@
-/* http://www.eaglefonts.com/fg-virgil-ttf-131249.htm */
+/* https://github.com/excalidraw/virgil */
 @font-face {
   font-family: "Virgil";
-  src: url("Virgil.woff2");
+  src: url("https://virgil.excalidraw.com/Virgil.woff2");
   font-display: swap;
 }
 

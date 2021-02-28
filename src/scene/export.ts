@@ -132,7 +132,7 @@ export const exportToSvg = (
     <style>
       @font-face {
         font-family: "Virgil";
-        src: url("https://excalidraw.com/Virgil.woff2");
+        src: url("https://virgil.excalidraw.com/Virgil.woff2");
       }
       @font-face {
         font-family: "Cascadia";
