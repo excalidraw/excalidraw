@@ -50,7 +50,7 @@
   },
   "devDependencies": {
     "@babel/eslint-parser": "7.13.8",
-    "@excalidraw/eslint-config": "0.0.7-beta",
+    "@excalidraw/eslint-config": "0.0.8-beta",
     "@excalidraw/prettier-config": "1.0.2",
     "@types/lodash.throttle": "4.1.6",
     "@types/pako": "1.0.1",

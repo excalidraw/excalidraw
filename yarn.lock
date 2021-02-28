@@ -1316,10 +1316,10 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@excalidraw/eslint-config@0.0.7-beta":
-  version "0.0.7-beta"
-  resolved "https://registry.yarnpkg.com/@excalidraw/eslint-config/-/eslint-config-0.0.7-beta.tgz#7c76de46075d2c3c7dcc53c1cf4b694d625f0096"
-  integrity sha512-wq6P/AGtfFUrIFpQez3VcgkQdkwqZRzFiKgH3LKNWlNgRE7M2iDRCsLOPJVA6JMGIW5EkMSOooC1/G77VDkVIQ==
+"@excalidraw/eslint-config@0.0.8-beta":
+  version "0.0.8-beta"
+  resolved "https://registry.yarnpkg.com/@excalidraw/eslint-config/-/eslint-config-0.0.8-beta.tgz#b8c034913812fcd8c333e1c482acab0c57ba7594"
+  integrity sha512-p6Iu+IwwjusYJ2ExuxdytckNtspqrsk7lyFidy8IHU0x/7n5IVEQoSSMhVQPaQBgSf0BFwWguvikjlfDfy9lDQ==
 
 "@excalidraw/prettier-config@1.0.2":
   version "1.0.2"
