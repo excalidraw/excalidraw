@@ -92,7 +92,8 @@
     "centerHorizontally": "Центрувати по горизонталі",
     "distributeHorizontally": "Розподілити по горизонталі",
     "distributeVertically": "Розподілити вертикально",
-    "viewMode": "Режим перегляду"
+    "viewMode": "Режим перегляду",
+    "toggleExportColorScheme": ""
   },
   "buttons": {
     "clearReset": "Очистити полотно",

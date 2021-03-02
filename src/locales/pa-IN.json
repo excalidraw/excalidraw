@@ -92,7 +92,8 @@
     "centerHorizontally": "ਖੜ੍ਹਵੇਂ ਵਿਚਕਾਰ ਕਰੋ",
     "distributeHorizontally": "ਖੜ੍ਹਵੇਂ ਇਕਸਾਰ ਵੰਡੋ",
     "distributeVertically": "ਲੇਟਵੇਂ ਇਕਸਾਰ ਵੰਡੋ",
-    "viewMode": "ਦੇਖੋ ਮੋਡ"
+    "viewMode": "ਦੇਖੋ ਮੋਡ",
+    "toggleExportColorScheme": ""
   },
   "buttons": {
     "clearReset": "ਕੈਨਵਸ ਰੀਸੈੱਟ ਕਰੋ",

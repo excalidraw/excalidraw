@@ -92,7 +92,8 @@
     "centerHorizontally": "Центрирай хоризонтално",
     "distributeHorizontally": "Разпредели хоризонтално",
     "distributeVertically": "Разпредели вертикално",
-    "viewMode": "Изглед"
+    "viewMode": "Изглед",
+    "toggleExportColorScheme": ""
   },
   "buttons": {
     "clearReset": "Нулиране на платно",

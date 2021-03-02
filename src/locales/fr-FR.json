@@ -92,7 +92,8 @@
     "centerHorizontally": "Centrer horizontalement",
     "distributeHorizontally": "Distribuer horizontalement",
     "distributeVertically": "Distribuer verticalement",
-    "viewMode": "Mode présentation"
+    "viewMode": "Mode présentation",
+    "toggleExportColorScheme": "Activer/Désactiver l'export du thème de couleur"
   },
   "buttons": {
     "clearReset": "Réinitialiser le canevas",

@@ -92,7 +92,8 @@
     "centerHorizontally": "Κέντρο οριζόντια",
     "distributeHorizontally": "Οριζόντια κατανομή",
     "distributeVertically": "Κατακόρυφη κατανομή",
-    "viewMode": "Λειτουργία προβολής"
+    "viewMode": "Λειτουργία προβολής",
+    "toggleExportColorScheme": ""
   },
   "buttons": {
     "clearReset": "Επαναφορά του καμβά",
