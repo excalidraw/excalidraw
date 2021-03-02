@@ -94,7 +94,14 @@ export const actionCopyAsPng = register({
       return {
         appState: {
           ...appState,
-          toastMessage: t("toast.copyToClipboardAsPng"),
+          toastMessage: t("toast.copyToClipboardAsPng", {
+            exportSelection: selectedElements.length
+              ? t("toast.selection")
+              : t("toast.canvas"),
+            exportColorScheme: appState.exportWithDarkMode
+              ? t("buttons.darkMode").toLowerCase()
+              : t("buttons.lightMode").toLowerCase(),
+          }),
         },
         commitToHistory: false,
       };
