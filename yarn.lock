@@ -1285,6 +1285,11 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
+"@excalidraw/eslint-config@1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@excalidraw/eslint-config/-/eslint-config-1.0.0.tgz#1cc527a88cfe20fd730496c1b631c3aecf9c825e"
+  integrity sha512-5SQFsQXO4vzny7OFSJr/DDPr1Mzeh6w0uwmZ0Fk2qjBcS5nhPtnx5KOTRPmpc6Hf5Ao57WK/MKI4lhCzw66V/A==
+
 "@excalidraw/prettier-config@1.0.2":
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/@excalidraw/prettier-config/-/prettier-config-1.0.2.tgz#b7c061c99cee2f78b9ca470ea1fbd602683bba65"
