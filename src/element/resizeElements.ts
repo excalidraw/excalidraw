@@ -104,12 +104,6 @@ export const transformElements = (
       );
     }
 
-    // update cursor
-    // document.documentElement.style.cursor = getCursorForResizingElement({
-    //   element,
-    //   transformHandleType,
-    // });
-
     return true;
   } else if (selectedElements.length > 1) {
     if (transformHandleType === "rotation") {
