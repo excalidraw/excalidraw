@@ -92,7 +92,8 @@
     "centerHorizontally": "Yatayda ortala",
     "distributeHorizontally": "Yatay dağıt",
     "distributeVertically": "Dikey dağıt",
-    "viewMode": ""
+    "viewMode": "",
+    "toggleExportColorScheme": ""
   },
   "buttons": {
     "clearReset": "Tuvali sıfırla",
