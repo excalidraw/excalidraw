@@ -57,6 +57,7 @@ export type AppState = {
   elementLocked: boolean;
   exportBackground: boolean;
   exportEmbedScene: boolean;
+  exportWithDarkMode: boolean;
   shouldAddWatermark: boolean;
   currentItemStrokeColor: string;
   currentItemBackgroundColor: string;

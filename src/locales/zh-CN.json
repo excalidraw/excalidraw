@@ -68,7 +68,7 @@
     "layers": "图层",
     "actions": "操作",
     "language": "语言",
-    "liveCollaboration": "",
+    "liveCollaboration": "实时协作",
     "duplicateSelection": "复制",
     "untitled": "无标题",
     "name": "名字",
@@ -77,7 +77,7 @@
     "group": "组选",
     "ungroup": "取消组选",
     "collaborators": "协作者",
-    "showGrid": "",
+    "showGrid": "显示网格",
     "addToLibrary": "添加到库中",
     "removeFromLibrary": "从库中移除",
     "libraryLoadingMessage": "正在加载库…",
@@ -92,7 +92,8 @@
     "centerHorizontally": "水平居中",
     "distributeHorizontally": "水平等距分布",
     "distributeVertically": "垂直等距分布",
-    "viewMode": "查看模式"
+    "viewMode": "查看模式",
+    "toggleExportColorScheme": "切换导出配色方案"
   },
   "buttons": {
     "clearReset": "重置画布",
@@ -117,7 +118,7 @@
     "edit": "编辑",
     "undo": "撤销",
     "redo": "重做",
-    "resetLibrary": "",
+    "resetLibrary": "重置资源库",
     "createNewRoom": "新建会议室",
     "fullScreen": "全屏",
     "darkMode": "暗色主题",
@@ -141,7 +142,7 @@
     "confirmAddLibrary": "这将添加 {{numShapes}} 个形状到您的库。您确定吗？",
     "imageDoesNotContainScene": "当前不支持导入图片。\n\n您想要导入画布数据吗？此图像似乎不包含任何画布数据。您是否在导出过程中启用了嵌入画布的选项？",
     "cannotRestoreFromImage": "无法从此图像文件恢复画布",
-    "resetLibrary": ""
+    "resetLibrary": "这将会清除你的资源库。你确定这么做吗？"
   },
   "toolBar": {
     "selection": "选择",
@@ -236,16 +237,16 @@
     "storage": "存储",
     "title": "详细统计信息",
     "total": "总计",
-    "version": "",
-    "versionCopy": "",
-    "versionNotAvailable": "",
+    "version": "版本",
+    "versionCopy": "点击复制",
+    "versionNotAvailable": "版本不可用",
     "width": "宽度"
   },
   "toast": {
     "copyStyles": "复制样式",
-    "copyToClipboard": "",
+    "copyToClipboard": "已复制到剪切板。",
     "copyToClipboardAsPng": "复制为 PNG 到剪贴板",
-    "fileSaved": "",
-    "fileSavedToFilename": ""
+    "fileSaved": "文件已保存。",
+    "fileSavedToFilename": "保存到 {filename}"
   }
 }

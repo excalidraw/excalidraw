@@ -13,7 +13,7 @@ module.exports = {
     libraryTarget: "umd",
   },
   resolve: {
-    extensions: [".tsx", ".ts", ".js"],
+    extensions: [".tsx", ".ts", ".js", ".css", ".scss"],
     fallback: { path: require.resolve("path-browserify") },
   },
   optimization: {
@@ -21,6 +21,11 @@ module.exports = {
   },
   module: {
     rules: [
+      {
+        test: /\.(sa|sc|c)ss$/,
+        exclude: /node_modules/,
+        use: ["style-loader", { loader: "css-loader" }, "sass-loader"],
+      },
       {
         test: /\.(ts|tsx|js)$/,
         use: [

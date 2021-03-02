@@ -49,6 +49,7 @@ import {
 } from "../element/transformHandles";
 import { viewportCoordsToSceneCoords, supportsEmoji } from "../utils";
 import { UserIdleState } from "../excalidraw-app/collab/types";
+import { APPEARANCE_FILTER } from "../constants";
 
 const hasEmojiSupport = supportsEmoji();
 
@@ -210,6 +211,10 @@ export const renderScene = (
   // When doing calculations based on canvas width we should used normalized one
   const normalizedCanvasWidth = canvas.width / scale;
   const normalizedCanvasHeight = canvas.height / scale;
+
+  if (sceneState.exportWithDarkMode) {
+    context.filter = APPEARANCE_FILTER;
+  }
 
   // Paint background
   if (typeof sceneState.viewBackgroundColor === "string") {

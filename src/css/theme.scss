@@ -1,4 +1,5 @@
 @import "open-color/open-color.scss";
+@import "./variables.module.scss";
 
 :root {
   --appearance-filter: none;
@@ -45,7 +46,7 @@
   }
 
   &.Appearance_dark {
-    --appearance-filter: invert(93%) hue-rotate(180deg);
+    --appearance-filter: #{$appearance-filter};
     --button-destructive-bg-color: #5a0000;
     --button-destructive-color: #{$oc-red-3};
     --button-gray-1: #363636;

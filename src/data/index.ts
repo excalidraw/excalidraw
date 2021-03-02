@@ -41,6 +41,7 @@ export const exportCanvas = async (
   if (type === "svg" || type === "clipboard-svg") {
     const tempSvg = exportToSvg(elements, {
       exportBackground,
+      exportWithDarkMode: appState.exportWithDarkMode,
       viewBackgroundColor,
       exportPadding,
       scale,
