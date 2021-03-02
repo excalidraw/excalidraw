@@ -4,3 +4,4 @@ package-lock.json
 .vscode/
 firebase/
 dist/
+public/workbox
