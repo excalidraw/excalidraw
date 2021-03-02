@@ -17,7 +17,11 @@
  * See https://goo.gl/2aRDsh
  */
 
-importScripts("/workbox-sw.js");
+importScripts("/workbox/workbox-sw.js");
+
+workbox.setConfig({
+  modulePathPrefix: "/workbox/workbox/",
+});
 
 self.addEventListener("message", (event) => {
   if (event.data && event.data.type === "SKIP_WAITING") {
