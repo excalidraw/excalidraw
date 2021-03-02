@@ -92,7 +92,8 @@
     "centerHorizontally": "Centrar horitzontalment",
     "distributeHorizontally": "Distribuir horitzontalment",
     "distributeVertically": "Distribuir verticalment",
-    "viewMode": ""
+    "viewMode": "",
+    "toggleExportColorScheme": ""
   },
   "buttons": {
     "clearReset": "Netejar el llenç",

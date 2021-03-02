@@ -92,7 +92,8 @@
     "centerHorizontally": "Vízszintesen középre igazított",
     "distributeHorizontally": "Vízszintes elosztás",
     "distributeVertically": "Függőleges elosztás",
-    "viewMode": ""
+    "viewMode": "",
+    "toggleExportColorScheme": ""
   },
   "buttons": {
     "clearReset": "Vászon törlése",

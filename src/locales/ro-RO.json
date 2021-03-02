@@ -92,7 +92,8 @@
     "centerHorizontally": "Centrare orizontală",
     "distributeHorizontally": "Distribuie orizontal",
     "distributeVertically": "Distribuie vertical",
-    "viewMode": "Mod de vizualizare"
+    "viewMode": "Mod de vizualizare",
+    "toggleExportColorScheme": "Comutare schemă de culori de export"
   },
   "buttons": {
     "clearReset": "Resetare pânză",

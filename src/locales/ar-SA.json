@@ -68,7 +68,7 @@
     "layers": "الطبقات",
     "actions": "الإجراءات",
     "language": "اللغة",
-    "liveCollaboration": "",
+    "liveCollaboration": "بدء المشاركة الحية",
     "duplicateSelection": "تكرار",
     "untitled": "غير معنون",
     "name": "الاسم",
@@ -92,7 +92,8 @@
     "centerHorizontally": "توسيط أفقي",
     "distributeHorizontally": "التوزيع الأفقي",
     "distributeVertically": "التوزيع عمودياً",
-    "viewMode": ""
+    "viewMode": "",
+    "toggleExportColorScheme": ""
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",

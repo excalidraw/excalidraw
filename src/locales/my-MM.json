@@ -92,7 +92,8 @@
     "centerHorizontally": "အလျားလိုက်အလယ်ညှိ",
     "distributeHorizontally": "အလျားလိုက်",
     "distributeVertically": "ထောင်လိုက်",
-    "viewMode": ""
+    "viewMode": "",
+    "toggleExportColorScheme": ""
   },
   "buttons": {
     "clearReset": "ကားချပ်ရှင်းလင်း",
