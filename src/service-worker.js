@@ -20,7 +20,7 @@
 importScripts("/workbox/workbox-sw.js");
 
 workbox.setConfig({
-  modulePathPrefix: "/workbox/workbox/",
+  modulePathPrefix: "/workbox/",
 });
 
 self.addEventListener("message", (event) => {
