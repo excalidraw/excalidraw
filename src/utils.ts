@@ -88,21 +88,36 @@ export const getFontString = ({
 };
 
 // https://github.com/grassator/canvas-text-editor/blob/master/lib/FontMetrics.js
-export const measureText = (text: string, font: FontString) => {
+export const measureText = (
+  text: string,
+  font: FontString,
+  hasMarkup?: boolean,
+) => {
   const line = document.createElement("div");
   const body = document.body;
   line.style.position = "absolute";
   line.style.whiteSpace = "pre";
   line.style.font = font;
   body.appendChild(line);
-  line.innerText = text
-    .split("\n")
-    // replace empty lines with single space because leading/trailing empty
-    // lines would be stripped from computation
-    .map((x) => x || " ")
-    .join("\n");
-  const width = line.offsetWidth;
-  const height = line.offsetHeight;
+  if (hasMarkup !== undefined && hasMarkup === true) {
+    line.innerHTML = text;
+  } else {
+    line.innerText = text
+      .split("\n")
+      // replace empty lines with single space because leading/trailing empty
+      // lines would be stripped from computation
+      .map((x) => x || " ")
+      .join("\n");
+  }
+  const cStyle = window.getComputedStyle(line);
+  const width =
+    hasMarkup !== undefined && hasMarkup === true
+      ? parseFloat(cStyle.width)
+      : line.offsetWidth;
+  const height =
+    hasMarkup !== undefined && hasMarkup === true
+      ? parseFloat(cStyle.height)
+      : line.offsetHeight;
   // Now creating 1px sized item that will be aligned to baseline
   // to calculate baseline shift
   const span = document.createElement("span");

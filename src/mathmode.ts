@@ -1,6 +1,11 @@
 // Some imports
-import { FontString } from "./element/types";
-import { measureText } from "./utils";
+import { FontFamily, FontString } from "./element/types";
+import {
+  getFontString,
+  getFontFamilyString,
+  isRTL,
+  measureText,
+} from "./utils";
 import { ExcalidrawTextElement } from "./element/types";
 import { mutateElement } from "./element/mutateElement";
 import sanitizeHtml from "sanitize-html";
@@ -59,11 +64,12 @@ const loadMathJax = () => {
 };
 
 // Cache the SVGs from MathJax
-const mathJaxSvgCache = {} as StringMap;
+const mathJaxSvgCacheAM = {} as StringMap;
+const mathJaxSvgCacheTex = {} as StringMap;
 
 const math2Svg = (text: string, useTex: boolean) => {
-  if (mathJaxSvgCache[text]) {
-    return mathJaxSvgCache[text];
+  if (useTex ? mathJaxSvgCacheTex[text] : mathJaxSvgCacheAM[text]) {
+    return useTex ? mathJaxSvgCacheTex[text] : mathJaxSvgCacheAM[text];
   }
   loadMathJax();
   try {
@@ -73,7 +79,11 @@ const math2Svg = (text: string, useTex: boolean) => {
         ? mathJax.texHtml.convert(text, userOptions)
         : mathJax.amHtml.convert(text, userOptions),
     );
-    mathJaxSvgCache[text] = htmlString;
+    if (useTex) {
+      mathJaxSvgCacheTex[text] = htmlString;
+    } else {
+      mathJaxSvgCacheAM[text] = htmlString;
+    }
     return htmlString;
   } catch {
     return text;
@@ -85,99 +95,200 @@ export { getFontString } from "./utils";
 export const markupText = (text: string, useTex: boolean) => {
   const lines = text.replace(/\r\n?/g, "\n").split("\n");
   let htmlString = "";
+  const htmlLines = [];
+  const outputs = [] as Array<string>[];
   for (let index = 0; index < lines.length; index++) {
-    htmlString += `<p style="margin: 0px; white-space: pre;">`;
+    htmlLines.push("");
+    outputs.push([]);
     const lineArray = lines[index].split(useTex ? "$$" : "`");
     for (let i = 0; i < lineArray.length; i++) {
       if (i % 2 === 1) {
-        htmlString += math2Svg(lineArray[i], useTex);
+        const svgString = math2Svg(lineArray[i], useTex);
+        htmlLines[index] += svgString;
+        outputs[index].push(svgString);
       } else {
-        htmlString += sanitizeHtml(lineArray[i], { allowedTags: [] });
+        const htmlCleaned = sanitizeHtml(lineArray[i], { allowedTags: [] });
+        htmlLines[index] += htmlCleaned;
+        outputs[index].push(htmlCleaned);
       }
     }
     if (lines[index] === "") {
-      htmlString += `\n`;
+      htmlLines[index] += `\n`;
     }
-    htmlString += `</p>`;
+    htmlString += `<p style="margin: 0px; white-space: pre; direction: ${
+      isRTL(lines[index]) ? "rtl" : "ltr"
+    };">${htmlLines[index]}</p>`;
   }
-  return htmlString;
+  return { htmlString, htmlLines, outputs };
 };
 
-export const measureMarkup = (htmlString: string, font: FontString) => {
-  const div = document.createElement("div");
-  div.style.font = font;
-  div.style.position = "absolute";
-  div.style.whiteSpace = "pre";
-  div.innerHTML = htmlString;
-  document.body.appendChild(div);
-  const cStyle = window.getComputedStyle(div);
-  const width = parseFloat(cStyle.width);
-  const height = parseFloat(cStyle.height);
-  // Now creating 1px sized item that will be aligned to baseline
-  // to calculate baseline shift
-  const span = document.createElement("span");
-  span.style.display = "inline-block";
-  span.style.overflow = "hidden";
-  span.style.width = "1px";
-  span.style.height = "1px";
-  div.appendChild(span);
-  // Baseline is important for positioning text on canvas
-  const baseline = span.offsetTop + span.offsetHeight;
-  document.body.removeChild(div);
-
-  return { width, height, baseline };
-};
-
-export const encapsulateHtml = (
-  fontSize: Number,
-  fontFamily: String,
-  textAlign: CanvasTextAlign,
-  htmlString: String,
-) => {
-  const svgString =
-    `<foreignObject width="100%" height="100%">` +
-    `<div xmlns="http://www.w3.org/1999/xhtml" style="` +
-    `text-align: ${textAlign}; ` +
-    `font-family: ${fontFamily}; ` +
-    `font-size: ${fontSize}px;` +
-    `">${htmlString}</div>` +
-    `</foreignObject>`;
-  return svgString;
-};
-
-export const drawHtmlOnCanvas = (
-  context: CanvasRenderingContext2D,
-  htmlString: String,
-  x: number,
-  y: number,
-  width: Number,
-  height: Number,
-  fontSize: Number,
-  fontFamily: String,
+const getCacheKey = (
+  text: string,
+  fontSize: number,
+  fontFamily: FontFamily,
   strokeColor: String,
   textAlign: CanvasTextAlign,
+  opacity: Number,
+  useTex: boolean,
 ) => {
-  const data = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" color="${strokeColor}">${encapsulateHtml(
+  const key = `${text}, ${fontSize}, ${getFontFamilyString({
+    fontFamily,
+  })}, ${strokeColor}, ${textAlign}, ${opacity}, ${useTex}`;
+  return key;
+};
+
+const svgCache = {} as { [key: string]: SVGSVGElement };
+
+export const createSvg = (
+  text: string,
+  fontSize: number,
+  fontFamily: FontFamily,
+  strokeColor: String,
+  textAlign: CanvasTextAlign,
+  opacity: Number,
+  useTex: boolean,
+) => {
+  const key = getCacheKey(
+    text,
     fontSize,
     fontFamily,
+    strokeColor,
     textAlign,
-    htmlString,
-  )}</svg>`;
+    opacity,
+    useTex,
+  );
 
+  if (svgCache[key]) {
+    return svgCache[key];
+  }
+  const mathLines = text.replace(/\r\n?/g, "\n").split("\n");
+  const markup = markupText(text, useTex);
+  const svgRoot = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  const node = svgRoot.ownerDocument.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "g",
+  );
+  node.setAttribute("font-family", `${getFontFamilyString({ fontFamily })}`);
+  node.setAttribute("font-size", `${fontSize}px`);
+  node.setAttribute("color", `${strokeColor}`);
+  node.setAttribute("stroke-opacity", `${opacity}`);
+  node.setAttribute("fill-opacity", `${opacity}`);
+  svgRoot.appendChild(node);
+
+  const fontString = getFontString({
+    fontSize,
+    fontFamily,
+  });
+  const imageMetrics = measureText(markup.htmlString, fontString, true);
+  let y = 0;
+  for (let index = 0; index < markup.htmlLines.length; index++) {
+    const lineMetrics = measureText(markup.htmlLines[index], fontString, true);
+    let x =
+      textAlign === "right"
+        ? imageMetrics.width - lineMetrics.width
+        : textAlign === "center"
+        ? (imageMetrics.width - lineMetrics.width) / 2
+        : 0;
+    y += lineMetrics.height;
+    const rtl = isRTL(mathLines[index]);
+    for (
+      let i = rtl ? markup.outputs[index].length - 1 : 0;
+      rtl ? i >= 0 : i < markup.outputs[index].length;
+      i += rtl ? -1 : 1
+    ) {
+      let childNode = {} as Element;
+      if (i % 2 === 1) {
+        const tempDiv = svgRoot.ownerDocument.createElement("div");
+        tempDiv.innerHTML = markup.outputs[index][i];
+        childNode = tempDiv.children[0];
+      } else {
+        const text = svgRoot.ownerDocument.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "text",
+        );
+        text.setAttribute("style", "white-space: pre;");
+        text.setAttribute("fill", `${strokeColor}`);
+        text.setAttribute("direction", `${rtl ? "rtl" : "ltr"}`);
+        text.setAttribute("text-anchor", `${rtl ? "end" : "start"}`);
+        text.textContent = markup.outputs[index][i];
+        childNode = text;
+      }
+      childNode.setAttribute("x", `${x}`);
+      x += measureText(markup.outputs[index][i], fontString, i % 2 === 1).width;
+      const yOffset =
+        lineMetrics.height - lineMetrics.baseline * (i % 2 === 1 ? 0 : 1);
+      childNode.setAttribute("y", `${y - yOffset}`);
+      node.appendChild(childNode);
+    }
+  }
+  svgRoot.setAttribute("version", "1.1");
+  svgRoot.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+  svgRoot.setAttribute(
+    "viewBox",
+    `0 0 ${imageMetrics.width + 5} ${imageMetrics.height + 5}`,
+  );
+  svgRoot.setAttribute("width", `${imageMetrics.width + 5}`);
+  svgRoot.setAttribute("height", `${imageMetrics.height + 5}`);
+  svgCache[key] = svgRoot;
+  return svgRoot;
+};
+
+const imageCache = {} as { [key: string]: HTMLImageElement };
+
+export const drawMathOnCanvas = (
+  context: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  text: string,
+  fontSize: number,
+  fontFamily: FontFamily,
+  strokeColor: String,
+  textAlign: CanvasTextAlign,
+  opacity: Number,
+  useTex: boolean,
+) => {
+  const key = getCacheKey(
+    text,
+    fontSize,
+    fontFamily,
+    strokeColor,
+    textAlign,
+    opacity,
+    useTex,
+  );
   return new Promise<void>((resolve) => {
-    const DOMURL = window.URL || window.webkitURL || window;
-
-    const img = new Image();
-    const svg = new Blob([data], { type: "image/svg+xml;charset=utf-8" });
-    const url = DOMURL.createObjectURL(svg);
-
-    img.onload = function () {
-      context.drawImage(img, x, y);
-      DOMURL.revokeObjectURL(url);
+    if (imageCache[key] && imageCache[key] !== undefined) {
+      context.drawImage(imageCache[key], 0, 0);
       resolve();
-    };
-
-    img.src = url;
+    } else {
+      const img = new Image();
+      const svgString = createSvg(
+        text,
+        fontSize,
+        fontFamily,
+        strokeColor,
+        textAlign,
+        opacity,
+        useTex,
+      ).outerHTML;
+      const svg = new Blob([svgString], {
+        type: "image/svg+xml;charset=utf-8",
+      });
+      const reader = new FileReader();
+      reader.addEventListener(
+        "load",
+        () => {
+          img.src = reader.result as string;
+          img.onload = function () {
+            context.drawImage(img, x, y);
+            imageCache[key] = img;
+            resolve();
+          };
+        },
+        false,
+      );
+      reader.readAsDataURL(svg);
+    }
   });
 };
 
@@ -195,11 +306,11 @@ export const measureMath = (
   fontString: FontString,
   useTex: boolean,
 ) => {
-  const htmlString = markupText(text, useTex);
+  const markup = markupText(text, useTex);
   const metrics =
     isMathMode(fontString) && containsMath(text, useTex)
-      ? measureMarkup(htmlString, fontString)
-      : measureText(text, fontString);
+      ? measureText(markup.htmlString, fontString, true)
+      : measureText(text, fontString, false);
   return metrics;
 };
 

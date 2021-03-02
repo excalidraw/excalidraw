@@ -28,12 +28,10 @@ import rough from "roughjs/bin/rough";
 import { Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
 import {
+  createSvg,
   containsMath,
-  drawHtmlOnCanvas,
-  encapsulateHtml,
+  drawMathOnCanvas,
   isMathMode,
-  markupText,
-  measureMarkup,
 } from "../mathmode";
 
 const defaultAppState = getDefaultAppState();
@@ -162,28 +160,18 @@ const drawElementOnCanvas = (
           isMathMode(getFontString(element)) &&
           containsMath(element.text, element.useTex)
         ) {
-          const htmlString = markupText(element.text, element.useTex);
-
-          const scaledPadding = CANVAS_PADDING * Math.pow(zoom.value, 2);
-          const scaledFontSize =
-            element.fontSize * zoom.value * window.devicePixelRatio;
-          const scaledFontString = getFontString({
-            fontSize: scaledFontSize,
-            fontFamily: element.fontFamily,
-          });
-          const scaledMetrics = measureMarkup(htmlString, scaledFontString);
-
-          promise = drawHtmlOnCanvas(
+          const scaledPadding = CANVAS_PADDING * zoom.value;
+          promise = drawMathOnCanvas(
             context,
-            htmlString,
             scaledPadding,
             scaledPadding,
-            scaledMetrics.width,
-            scaledMetrics.height,
-            scaledFontSize,
-            getFontFamilyString(element),
+            element.text,
+            element.fontSize,
+            element.fontFamily,
             element.strokeColor,
             element.textAlign,
+            element.opacity / 100,
+            element.useTex,
           );
         } else {
           context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
@@ -727,17 +715,14 @@ export const renderElementToSvg = (
           isMathMode(getFontString(element)) &&
           containsMath(element.text, element.useTex)
         ) {
-          const svg = svgRoot.ownerDocument!.createElementNS(SVG_NS, "svg");
-          const htmlString = markupText(element.text, element.useTex);
-          const metrics = measureMarkup(htmlString, getFontString(element));
-          svg.setAttribute("width", `${metrics.width}`);
-          svg.setAttribute("height", `${metrics.height}`);
-          svg.setAttribute("color", `${element.strokeColor}`);
-          svg.innerHTML = encapsulateHtml(
+          const svg = createSvg(
+            element.text,
             element.fontSize,
-            getFontFamilyString(element),
+            element.fontFamily,
+            element.strokeColor,
             element.textAlign,
-            htmlString,
+            element.opacity / 100,
+            element.useTex,
           );
           node.appendChild(svg);
         } else {
