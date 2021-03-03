@@ -245,8 +245,10 @@
   "toast": {
     "copyStyles": "Αντιγράφηκαν στυλ.",
     "copyToClipboard": "Αντιγράφηκε στο πρόχειρο.",
-    "copyToClipboardAsPng": "Αντιγράφτηκε στο πρόχειρο ως PNG.",
+    "copyToClipboardAsPng": "",
     "fileSaved": "Το αρχείο αποθηκεύτηκε.",
-    "fileSavedToFilename": "Αποθηκεύτηκε στο {filename}"
+    "fileSavedToFilename": "Αποθηκεύτηκε στο {filename}",
+    "canvas": "",
+    "selection": ""
   }
 }
