@@ -245,8 +245,10 @@
   "toast": {
     "copyStyles": "Stiluri copiate.",
     "copyToClipboard": "Copiat în memoria temporară.",
-    "copyToClipboardAsPng": "Copiat în memoria temporară ca PNG.",
+    "copyToClipboardAsPng": "",
     "fileSaved": "Fișier salvat.",
-    "fileSavedToFilename": "Salvat în {filename}"
+    "fileSavedToFilename": "Salvat în {filename}",
+    "canvas": "",
+    "selection": ""
   }
 }
