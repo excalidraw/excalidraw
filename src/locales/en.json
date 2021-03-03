@@ -245,8 +245,10 @@
   "toast": {
     "copyStyles": "Copied styles.",
     "copyToClipboard": "Copied to clipboard.",
-    "copyToClipboardAsPng": "Copied to clipboard as PNG.",
+    "copyToClipboardAsPng": "Copied {{exportSelection}} to clipboard as PNG\n({{exportColorScheme}})",
     "fileSaved": "File saved.",
-    "fileSavedToFilename": "Saved to {filename}"
+    "fileSavedToFilename": "Saved to {filename}",
+    "canvas": "canvas",
+    "selection": "selection"
   }
 }
