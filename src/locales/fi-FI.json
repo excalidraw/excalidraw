@@ -245,8 +245,10 @@
   "toast": {
     "copyStyles": "Tyylit kopioitu.",
     "copyToClipboard": "Kopioitu leikepöydälle.",
-    "copyToClipboardAsPng": "Kopioitu leikepöydälle PNG-tiedostona.",
+    "copyToClipboardAsPng": "",
     "fileSaved": "Tiedosto tallennettu.",
-    "fileSavedToFilename": "Tallennettu kohteeseen {filename}"
+    "fileSavedToFilename": "Tallennettu kohteeseen {filename}",
+    "canvas": "",
+    "selection": ""
   }
 }
