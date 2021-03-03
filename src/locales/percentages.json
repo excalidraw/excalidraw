@@ -7,7 +7,7 @@
   "en": 100,
   "es-ES": 98,
   "fa-IR": 91,
-  "fi-FI": 98,
+  "fi-FI": 100,
   "fr-FR": 99,
   "he-IL": 92,
   "hi-IN": 94,
@@ -19,12 +19,12 @@
   "ko-KR": 95,
   "my-MM": 78,
   "nb-NO": 100,
-  "nl-NL": 98,
+  "nl-NL": 99,
   "nn-NO": 86,
   "oc-FR": 46,
   "pa-IN": 97,
   "pl-PL": 98,
-  "pt-BR": 98,
+  "pt-BR": 100,
   "pt-PT": 98,
   "ro-RO": 100,
   "ru-RU": 98,
@@ -33,5 +33,5 @@
   "tr-TR": 84,
   "uk-UA": 97,
   "zh-CN": 98,
-  "zh-TW": 98
+  "zh-TW": 100
 }
