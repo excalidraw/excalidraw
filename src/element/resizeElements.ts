@@ -21,7 +21,6 @@ import {
 import { isLinearElement, isTextElement } from "./typeChecks";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
-import { getCursorForResizingElement } from "./resizeTest";
 import { measureText, getFontString } from "../utils";
 import { updateBoundElements } from "./binding";
 import {
@@ -104,13 +103,6 @@ export const transformElements = (
         pointerY,
       );
     }
-
-    // update cursor
-    // FIXME it is not very nice to have this here
-    document.documentElement.style.cursor = getCursorForResizingElement({
-      element,
-      transformHandleType,
-    });
 
     return true;
   } else if (selectedElements.length > 1) {
