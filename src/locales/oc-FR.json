@@ -119,7 +119,7 @@
     "undo": "Anullar",
     "redo": "Restablir",
     "resetLibrary": "",
-    "createNewRoom": "",
+    "createNewRoom": "Crear sala novèla",
     "fullScreen": "Ecran complèt",
     "darkMode": "Mòde escur",
     "lightMode": "Mòde clar",
@@ -150,16 +150,16 @@
     "rectangle": "Rectangle",
     "diamond": "",
     "ellipse": "",
-    "arrow": "",
+    "arrow": "Sageta",
     "line": "Linha",
     "text": "Tèxt",
     "library": "Bibliotèca",
     "lock": ""
   },
   "headings": {
-    "canvasActions": "",
+    "canvasActions": "Accions del canabàs",
     "selectedShapeActions": "",
-    "shapes": ""
+    "shapes": "Formas"
   },
   "hints": {
     "linearElement": "",
@@ -175,29 +175,29 @@
   },
   "canvasError": {
     "cannotShowPreview": "Afichatge impossible de l’apercebut",
-    "canvasTooBig": "",
+    "canvasTooBig": "Lo canabàs pòt èsser tròp grand.",
     "canvasTooBigTip": ""
   },
   "errorSplash": {
-    "headingMain_pre": "",
+    "headingMain_pre": "Una error s’es producha. Ensajatz ",
     "headingMain_button": "recargament de la pagina.",
     "clearCanvasMessage": "Se recargar fonciona pas, ensajatz ",
     "clearCanvasMessage_button": "d’escafar los canabasses.",
-    "clearCanvasCaveat": "",
+    "clearCanvasCaveat": " Menarà a una pèrda del trabalh ",
     "trackedToSentry_pre": "",
     "trackedToSentry_post": "",
     "openIssueMessage_pre": "",
-    "openIssueMessage_button": "",
+    "openIssueMessage_button": "traçadors d’avarias.",
     "openIssueMessage_post": "",
-    "sceneContent": ""
+    "sceneContent": "Contengut de la scèna :"
   },
   "roomDialog": {
     "desc_intro": "",
-    "desc_privacy": "",
+    "desc_privacy": "Vos en fagatz pas, la session utiliza lo chiframent del cap a la fin, çò que dessenetz demorarà privat. Mai nòstres servidors poiràn pas veire vòstra creacion.",
     "button_startSession": "Començar la session",
     "button_stopSession": "Arrestar la session",
-    "desc_inProgressIntro": "",
-    "desc_shareLink": "",
+    "desc_inProgressIntro": "La session de collaboracion es ara en cors.",
+    "desc_shareLink": "Partejatz aqueste ligam amb lo monde amb qui volètz collaborar :",
     "desc_exitSession": ""
   },
   "errorDialog": {
@@ -205,50 +205,50 @@
   },
   "helpDialog": {
     "blog": "Legir vòstre blog",
-    "click": "",
+    "click": "clic",
     "curvedArrow": "",
     "curvedLine": "",
     "documentation": "Documentacion",
     "drag": "",
     "editor": "Editor",
-    "github": "",
-    "howto": "",
-    "or": "",
+    "github": "Problèma trobat ? Senhalatz-lo",
+    "howto": "Seguissètz nòstras guidas",
+    "or": "o",
     "preventBinding": "",
-    "shapes": "",
-    "shortcuts": "",
-    "textFinish": "",
-    "textNewLine": "",
+    "shapes": "Formas",
+    "shortcuts": "Acorchis clavièr",
+    "textFinish": "Terminar l’edicion (tèxt)",
+    "textNewLine": "Apondre linha novèl (tèxt)",
     "title": "Ajuda",
     "view": "Vista",
-    "zoomToFit": "",
-    "zoomToSelection": ""
+    "zoomToFit": "Zoomar per veire totes los elements",
+    "zoomToSelection": "Zoomar la seleccion"
   },
   "encrypted": {
     "tooltip": ""
   },
   "stats": {
-    "angle": "",
+    "angle": "Angle",
     "element": "Element",
     "elements": "Elements",
     "height": "Nautor",
-    "scene": "",
-    "selected": "",
-    "storage": "",
-    "title": "",
-    "total": "",
+    "scene": "Scèna",
+    "selected": "Seleccionat",
+    "storage": "Emmagazinatge",
+    "title": "Estatisticas pels nerds",
+    "total": "Total",
     "version": "Version",
-    "versionCopy": "",
-    "versionNotAvailable": "",
+    "versionCopy": "Clicar per copiar",
+    "versionNotAvailable": "Version pas disponibla",
     "width": "Largor"
   },
   "toast": {
-    "copyStyles": "",
-    "copyToClipboard": "",
-    "copyToClipboardAsPng": "",
-    "fileSaved": "",
-    "fileSavedToFilename": "",
-    "canvas": "",
-    "selection": ""
+    "copyStyles": "Estiles copiats.",
+    "copyToClipboard": "Copiats al quichapapièrs.",
+    "copyToClipboardAsPng": "{{exportSelection}} copiat coma PNG ({{exportColorScheme}})",
+    "fileSaved": "Fichièr enregistrat.",
+    "fileSavedToFilename": "Enregistrat jos {filename}",
+    "canvas": "canabàs",
+    "selection": "seleccion"
   }
 }
