@@ -245,10 +245,10 @@
   "toast": {
     "copyStyles": "Styles copiés.",
     "copyToClipboard": "Copié vers le presse-papiers.",
-    "copyToClipboardAsPng": "",
+    "copyToClipboardAsPng": "{{exportSelection}} copié dans le presse-papiers en PNG\n({{exportColorScheme}})",
     "fileSaved": "Fichier enregistré.",
     "fileSavedToFilename": "Enregistré sous {filename}",
-    "canvas": "",
+    "canvas": "canevas",
     "selection": "sélection"
   }
 }
