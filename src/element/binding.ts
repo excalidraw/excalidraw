@@ -183,7 +183,9 @@ const bindLinearElement = (
   });
   mutateElement(hoveredElement, {
     boundElementIds: [
-      ...new Set([...(hoveredElement.boundElementIds ?? []), linearElement.id]),
+      ...Array.from(
+        new Set([...(hoveredElement.boundElementIds ?? []), linearElement.id]),
+      ),
     ],
   });
 };
