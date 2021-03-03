@@ -245,10 +245,10 @@
   "toast": {
     "copyStyles": "Stijlen gekopieerd.",
     "copyToClipboard": "Gekopieerd naar het klembord.",
-    "copyToClipboardAsPng": "",
+    "copyToClipboardAsPng": "{{exportSelection}} naar klembord gekopieerd als PNG\n({{exportColorScheme}})",
     "fileSaved": "Bestand opgeslagen.",
     "fileSavedToFilename": "Opgeslagen als {filename}",
-    "canvas": "",
-    "selection": ""
+    "canvas": "canvas",
+    "selection": "selectie"
   }
 }
