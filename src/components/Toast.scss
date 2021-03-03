@@ -19,6 +19,7 @@
 
   .Toast__message {
     color: var(--popup-text-color);
+    white-space: pre-wrap;
   }
 
   @keyframes fade-in {
