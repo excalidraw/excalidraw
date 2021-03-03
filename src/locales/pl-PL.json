@@ -245,8 +245,10 @@
   "toast": {
     "copyStyles": "Skopiowano style.",
     "copyToClipboard": "Skopiowano do schowka.",
-    "copyToClipboardAsPng": "Skopiowano do schowka jako PNG.",
+    "copyToClipboardAsPng": "",
     "fileSaved": "Zapisano plik.",
-    "fileSavedToFilename": "Zapisano jako {filename}"
+    "fileSavedToFilename": "Zapisano jako {filename}",
+    "canvas": "",
+    "selection": ""
   }
 }
