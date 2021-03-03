@@ -516,6 +516,7 @@ const LayerUI = ({
                       {heading}
                       <Stack.Row gap={1}>
                         <ShapesSwitcher
+                          canvas={canvas}
                           elementType={appState.elementType}
                           setAppState={setAppState}
                           isLibraryOpen={appState.isLibraryOpen}
