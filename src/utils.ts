@@ -161,10 +161,9 @@ export const removeSelection = () => {
 export const distance = (x: number, y: number) => Math.abs(x - y);
 
 export const resetCursor = (canvas: HTMLCanvasElement | null) => {
-  if (!canvas) {
-    return;
+  if (canvas) {
+    canvas.style.cursor = "";
   }
-  canvas.style.cursor = "";
 };
 
 export const setCursor = (canvas: HTMLCanvasElement | null, cursor: string) => {
