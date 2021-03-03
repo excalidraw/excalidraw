@@ -245,10 +245,10 @@
   "toast": {
     "copyStyles": "Tyylit kopioitu.",
     "copyToClipboard": "Kopioitu leikepöydälle.",
-    "copyToClipboardAsPng": "",
+    "copyToClipboardAsPng": "Kopioitu {{exportSelection}} leikepöydälle PNG:nä\n({{exportColorScheme}})",
     "fileSaved": "Tiedosto tallennettu.",
     "fileSavedToFilename": "Tallennettu kohteeseen {filename}",
-    "canvas": "",
-    "selection": ""
+    "canvas": "piirtoalue",
+    "selection": "valinta"
   }
 }
