@@ -132,7 +132,7 @@
     "couldNotCreateShareableLinkTooBig": "",
     "couldNotLoadInvalidFile": "",
     "importBackendFailed": "",
-    "cannotExportEmptyCanvas": "",
+    "cannotExportEmptyCanvas": "Impossible d’exportar los canabasses voids.",
     "couldNotCopyToClipboard": "",
     "decryptFailed": "Deschiframent impossible de las donadas.",
     "uploadedSecurly": "",
@@ -146,10 +146,10 @@
   },
   "toolBar": {
     "selection": "Seleccion",
-    "draw": "",
+    "draw": "Dessenh liure",
     "rectangle": "Rectangle",
-    "diamond": "",
-    "ellipse": "",
+    "diamond": "Lausange",
+    "ellipse": "Ellipsa",
     "arrow": "Sageta",
     "line": "Linha",
     "text": "Tèxt",
@@ -206,15 +206,15 @@
   "helpDialog": {
     "blog": "Legir vòstre blog",
     "click": "clic",
-    "curvedArrow": "",
-    "curvedLine": "",
+    "curvedArrow": "Sageta corba",
+    "curvedLine": "Linha corba",
     "documentation": "Documentacion",
-    "drag": "",
+    "drag": "lisar",
     "editor": "Editor",
     "github": "Problèma trobat ? Senhalatz-lo",
     "howto": "Seguissètz nòstras guidas",
     "or": "o",
-    "preventBinding": "",
+    "preventBinding": "Empachar la fixacion de sagetas",
     "shapes": "Formas",
     "shortcuts": "Acorchis clavièr",
     "textFinish": "Terminar l’edicion (tèxt)",
@@ -225,7 +225,7 @@
     "zoomToSelection": "Zoomar la seleccion"
   },
   "encrypted": {
-    "tooltip": ""
+    "tooltip": "Vòstres dessenhs son chifrats del cap a la fin en consequéncia los servidors d’Excalidraw los veiràn pas jamai."
   },
   "stats": {
     "angle": "Angle",
