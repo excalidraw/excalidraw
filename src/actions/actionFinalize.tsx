@@ -18,7 +18,7 @@ import { isBindingElement } from "../element/typeChecks";
 
 export const actionFinalize = register({
   name: "finalize",
-  perform: (elements, appState) => {
+  perform: (elements, appState, _, { canvas }) => {
     if (appState.editingLinearElement) {
       const {
         elementId,
@@ -126,7 +126,7 @@ export const actionFinalize = register({
       (!appState.elementLocked && appState.elementType !== "draw") ||
       !multiPointElement
     ) {
-      resetCursor();
+      resetCursor(canvas);
     }
     return {
       elements: newElements,
