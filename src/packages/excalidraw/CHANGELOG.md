@@ -24,14 +24,14 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
-- Add export info on copy PNG to clipboard toast message [#3159](https://github.com/excalidraw/excalidraw/pull/3159)
-- Use the latest version of Virgil [#3124](https://github.com/excalidraw/excalidraw/pull/3124)
-- Support exporting with dark mode [#3046](https://github.com/excalidraw/excalidraw/pull/3046)
+- Add export info on copy PNG to clipboard toast message [#3159](https://github.com/excalidraw/excalidraw/pull/3159).
+- Use the latest version of Virgil [#3124](https://github.com/excalidraw/excalidraw/pull/3124).
+- Support exporting with dark mode [#3046](https://github.com/excalidraw/excalidraw/pull/3046).
 
 ### Fixes
 
-- Cursor being leaked outside of canvas [#3161](https://github.com/excalidraw/excalidraw/pull/3161)
-- Hide scrollbars in zenMode [#3144](https://github.com/excalidraw/excalidraw/pull/3144)
+- Cursor being leaked outside of canvas [#3161](https://github.com/excalidraw/excalidraw/pull/3161).
+- Hide scrollbars in zenMode [#3144](https://github.com/excalidraw/excalidraw/pull/3144).
 
 ## 0.4.0
 
