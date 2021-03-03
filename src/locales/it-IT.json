@@ -245,10 +245,10 @@
   "toast": {
     "copyStyles": "Stili copiati.",
     "copyToClipboard": "Copiato negli appunti.",
-    "copyToClipboardAsPng": "",
+    "copyToClipboardAsPng": "{{exportSelection}} copiato negli appunti come PNG\n({{exportColorScheme}})",
     "fileSaved": "File salvato.",
     "fileSavedToFilename": "Salvato in {filename}",
-    "canvas": "",
-    "selection": ""
+    "canvas": "tela",
+    "selection": "selezione"
   }
 }
