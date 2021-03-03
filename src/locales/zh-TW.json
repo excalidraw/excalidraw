@@ -245,10 +245,10 @@
   "toast": {
     "copyStyles": "已複製樣式",
     "copyToClipboard": "複製至剪貼簿。",
-    "copyToClipboardAsPng": "",
+    "copyToClipboardAsPng": "以 PNG 格式將 {{exportSelection}} 複製至剪貼簿\n({{exportColorScheme}})",
     "fileSaved": "已儲存檔案。",
     "fileSavedToFilename": "儲存為 {filename}",
-    "canvas": "",
-    "selection": ""
+    "canvas": "畫布",
+    "selection": "已選項目"
   }
 }
