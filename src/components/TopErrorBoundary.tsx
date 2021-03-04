@@ -1,6 +1,5 @@
 import React from "react";
 import * as Sentry from "@sentry/browser";
-import { resetCursor } from "../utils";
 import { t } from "../i18n";
 
 interface TopErrorBoundaryState {
@@ -24,7 +23,6 @@ export class TopErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, errorInfo: any) {
-    resetCursor();
     const _localStorage: any = {};
     for (const [key, value] of Object.entries({ ...localStorage })) {
       try {
@@ -56,7 +54,11 @@ export class TopErrorBoundary extends React.Component<
   private async createGithubIssue() {
     let body = "";
     try {
-      const templateStrFn = (await import("../bug-issue-template")).default;
+      const templateStrFn = (
+        await import(
+          /* webpackChunkName: "bug-issue-template" */ "../bug-issue-template"
+        )
+      ).default;
       body = encodeURIComponent(templateStrFn(this.state.sentryEventId));
     } catch (error) {
       console.error(error);
@@ -69,7 +71,7 @@ export class TopErrorBoundary extends React.Component<
 
   private errorSplash() {
     return (
-      <div className="ErrorSplash">
+      <div className="ErrorSplash excalidraw">
         <div className="ErrorSplash-messageContainer">
           <div className="ErrorSplash-paragraph bigger align-center">
             {t("errorSplash.headingMain_pre")}

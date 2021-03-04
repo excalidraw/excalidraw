@@ -5,13 +5,13 @@
 
 // In order to run:
 //   npm install canvas # please do not check it in
-//   npm run build-node
+//   yarn build-node
 //   node build/static/js/build-node.js
 //   open test.png
 
-var rewire = require("rewire");
-var defaults = rewire("react-scripts/scripts/build.js");
-var config = defaults.__get__("config");
+const rewire = require("rewire");
+const defaults = rewire("react-scripts/scripts/build.js");
+const config = defaults.__get__("config");
 
 // Disable multiple chunks
 config.optimization.runtimeChunk = false;
@@ -29,7 +29,7 @@ config.entry = "./src/index-node";
 // By default, webpack is going to replace the require of the canvas.node file
 // to just a string with the path of the canvas.node file. We need to tell
 // webpack to avoid rewriting that dependency.
-config.externals = function (context, request, callback) {
+config.externals = (context, request, callback) => {
   if (/\.node$/.test(request)) {
     return callback(
       null,

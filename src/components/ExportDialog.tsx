@@ -1,23 +1,51 @@
-import "./ExportDialog.scss";
-
-import React, { useState, useEffect, useRef } from "react";
-
-import { ToolButton } from "./ToolButton";
-import { clipboard, exportFile, link } from "./icons";
-import { NonDeletedExcalidrawElement } from "../element/types";
-import { AppState } from "../types";
-import { exportToCanvas } from "../scene/export";
+import React, { useEffect, useRef, useState } from "react";
+import { render, unmountComponentAtNode } from "react-dom";
 import { ActionsManagerInterface } from "../actions/types";
-import Stack from "./Stack";
-import { t } from "../i18n";
-
 import { probablySupportsClipboardBlob } from "../clipboard";
-import { getSelectedElements, isSomeElementSelected } from "../scene";
+import { canvasToBlob } from "../data/blob";
+import { NonDeletedExcalidrawElement } from "../element/types";
+import { CanvasError } from "../errors";
+import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
+import { getSelectedElements, isSomeElementSelected } from "../scene";
+import { exportToCanvas, getExportSize } from "../scene/export";
+import { AppState } from "../types";
 import { Dialog } from "./Dialog";
+import "./ExportDialog.scss";
+import { clipboard, exportFile, link } from "./icons";
+import Stack from "./Stack";
+import { ToolButton } from "./ToolButton";
 
 const scales = [1, 2, 3];
 const defaultScale = scales.includes(devicePixelRatio) ? devicePixelRatio : 1;
+
+const supportsContextFilters =
+  "filter" in document.createElement("canvas").getContext("2d")!;
+
+export const ErrorCanvasPreview = () => {
+  return (
+    <div>
+      <h3>{t("canvasError.cannotShowPreview")}</h3>
+      <p>
+        <span>{t("canvasError.canvasTooBig")}</span>
+      </p>
+      <em>({t("canvasError.canvasTooBigTip")})</em>
+    </div>
+  );
+};
+
+const renderPreview = (
+  content: HTMLCanvasElement | Error,
+  previewNode: HTMLDivElement,
+) => {
+  unmountComponentAtNode(previewNode);
+  previewNode.innerHTML = "";
+  if (content instanceof HTMLCanvasElement) {
+    previewNode.appendChild(content);
+  } else {
+    render(<ErrorCanvasPreview />, previewNode);
+  }
+};
 
 export type ExportCB = (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -41,7 +69,7 @@ const ExportModal = ({
   onExportToPng: ExportCB;
   onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
-  onExportToBackend: ExportCB;
+  onExportToBackend?: ExportCB;
   onCloseRequest: () => void;
 }) => {
   const someElementIsSelected = isSomeElementSelected(elements, appState);
@@ -64,17 +92,32 @@ const ExportModal = ({
 
   useEffect(() => {
     const previewNode = previewRef.current;
-    const canvas = exportToCanvas(exportedElements, appState, {
-      exportBackground,
-      viewBackgroundColor,
-      exportPadding,
-      scale,
-      shouldAddWatermark,
-    });
-    previewNode?.appendChild(canvas);
-    return () => {
-      previewNode?.removeChild(canvas);
-    };
+    if (!previewNode) {
+      return;
+    }
+    try {
+      const canvas = exportToCanvas(exportedElements, appState, {
+        exportBackground,
+        viewBackgroundColor,
+        exportPadding,
+        scale,
+        shouldAddWatermark,
+      });
+
+      // if converting to blob fails, there's some problem that will
+      // likely prevent preview and export (e.g. canvas too big)
+      canvasToBlob(canvas)
+        .then(() => {
+          renderPreview(canvas, previewNode);
+        })
+        .catch((error) => {
+          console.error(error);
+          renderPreview(new CanvasError(), previewNode);
+        });
+    } catch (error) {
+      console.error(error);
+      renderPreview(new CanvasError(), previewNode);
+    }
   }, [
     appState,
     exportedElements,
@@ -87,7 +130,9 @@ const ExportModal = ({
 
   return (
     <div className="ExportDialog">
-      <div className="ExportDialog__preview" ref={previewRef}></div>
+      <div className="ExportDialog__preview" ref={previewRef} />
+      {supportsContextFilters &&
+        actionManager.renderAction("exportWithDarkMode")}
       <Stack.Col gap={2} align="center">
         <div className="ExportDialog__actions">
           <Stack.Row gap={2}>
@@ -114,31 +159,47 @@ const ExportModal = ({
                 onClick={() => onExportToClipboard(exportedElements, scale)}
               />
             )}
-            <ToolButton
-              type="button"
-              icon={link}
-              title={t("buttons.getShareableLink")}
-              aria-label={t("buttons.getShareableLink")}
-              onClick={() => onExportToBackend(exportedElements)}
-            />
+            {onExportToBackend && (
+              <ToolButton
+                type="button"
+                icon={link}
+                title={t("buttons.getShareableLink")}
+                aria-label={t("buttons.getShareableLink")}
+                onClick={() => onExportToBackend(exportedElements)}
+              />
+            )}
           </Stack.Row>
           <div className="ExportDialog__name">
             {actionManager.renderAction("changeProjectName")}
           </div>
           <Stack.Row gap={2}>
-            {scales.map((s) => (
-              <ToolButton
-                key={s}
-                size="s"
-                type="radio"
-                icon={`x${s}`}
-                name="export-canvas-scale"
-                aria-label={`Scale ${s} x`}
-                id="export-canvas-scale"
-                checked={s === scale}
-                onChange={() => setScale(s)}
-              />
-            ))}
+            {scales.map((s) => {
+              const [width, height] = getExportSize(
+                exportedElements,
+                exportPadding,
+                shouldAddWatermark,
+                s,
+              );
+
+              const scaleButtonTitle = `${t(
+                "buttons.scale",
+              )} ${s}x (${width}x${height})`;
+
+              return (
+                <ToolButton
+                  key={s}
+                  size="s"
+                  type="radio"
+                  icon={`${s}x`}
+                  name="export-canvas-scale"
+                  title={scaleButtonTitle}
+                  aria-label={scaleButtonTitle}
+                  id="export-canvas-scale"
+                  checked={s === scale}
+                  onChange={() => setScale(s)}
+                />
+              );
+            })}
           </Stack.Row>
         </div>
         {actionManager.renderAction("changeExportBackground")}
@@ -156,6 +217,7 @@ const ExportModal = ({
             </label>
           </div>
         )}
+        {actionManager.renderAction("changeExportEmbedScene")}
         {actionManager.renderAction("changeShouldAddWatermark")}
       </Stack.Col>
     </div>
@@ -179,7 +241,7 @@ export const ExportDialog = ({
   onExportToPng: ExportCB;
   onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
-  onExportToBackend: ExportCB;
+  onExportToBackend?: ExportCB;
 }) => {
   const [modalIsShown, setModalIsShown] = useState(false);
   const triggerButton = useRef<HTMLButtonElement>(null);
@@ -192,7 +254,9 @@ export const ExportDialog = ({
   return (
     <>
       <ToolButton
-        onClick={() => setModalIsShown(true)}
+        onClick={() => {
+          setModalIsShown(true);
+        }}
         icon={exportFile}
         type="button"
         aria-label={t("buttons.export")}
@@ -201,11 +265,7 @@ export const ExportDialog = ({
         ref={triggerButton}
       />
       {modalIsShown && (
-        <Dialog
-          maxWidth={800}
-          onCloseRequest={handleClose}
-          title={t("buttons.export")}
-        >
+        <Dialog onCloseRequest={handleClose} title={t("buttons.export")}>
           <ExportModal
             elements={elements}
             appState={appState}

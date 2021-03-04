@@ -1,13 +1,15 @@
 import {
   ExcalidrawElement,
+  ExcalidrawLinearElement,
   ExcalidrawTextElement,
+  Arrowhead,
   NonDeletedExcalidrawElement,
 } from "../element/types";
 import { isTextElement, isLinearElement } from "../element/typeChecks";
 import {
   getDiamondPoints,
-  getArrowPoints,
   getElementAbsoluteCoords,
+  getArrowheadPoints,
 } from "../element/bounds";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { Drawable, Options } from "roughjs/bin/core";
@@ -23,6 +25,10 @@ import {
 } from "../utils";
 import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
+import { Zoom } from "../types";
+import { getDefaultAppState } from "../appState";
+
+const defaultAppState = getDefaultAppState();
 
 const CANVAS_PADDING = 20;
 
@@ -32,14 +38,14 @@ const DASHARRAY_DOTTED = [3, 6];
 export interface ExcalidrawElementWithCanvas {
   element: ExcalidrawElement | ExcalidrawTextElement;
   canvas: HTMLCanvasElement;
-  canvasZoom: number;
+  canvasZoom: Zoom["value"];
   canvasOffsetX: number;
   canvasOffsetY: number;
 }
 
 const generateElementCanvas = (
   element: NonDeletedExcalidrawElement,
-  zoom: number,
+  zoom: Zoom,
 ): ExcalidrawElementWithCanvas => {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
@@ -50,37 +56,60 @@ const generateElementCanvas = (
   if (isLinearElement(element)) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
     canvas.width =
-      distance(x1, x2) * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
+      distance(x1, x2) * window.devicePixelRatio * zoom.value +
+      CANVAS_PADDING * zoom.value * 2;
     canvas.height =
-      distance(y1, y2) * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
+      distance(y1, y2) * window.devicePixelRatio * zoom.value +
+      CANVAS_PADDING * zoom.value * 2;
 
     canvasOffsetX =
       element.x > x1
-        ? Math.floor(distance(element.x, x1)) * window.devicePixelRatio
+        ? Math.floor(distance(element.x, x1)) *
+          window.devicePixelRatio *
+          zoom.value
         : 0;
+
     canvasOffsetY =
       element.y > y1
-        ? Math.floor(distance(element.y, y1)) * window.devicePixelRatio
+        ? Math.floor(distance(element.y, y1)) *
+          window.devicePixelRatio *
+          zoom.value
         : 0;
-    context.translate(canvasOffsetX * zoom, canvasOffsetY * zoom);
+
+    context.translate(canvasOffsetX, canvasOffsetY);
   } else {
     canvas.width =
-      element.width * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
+      element.width * window.devicePixelRatio * zoom.value +
+      CANVAS_PADDING * zoom.value * 2;
     canvas.height =
-      element.height * window.devicePixelRatio * zoom + CANVAS_PADDING * 2;
+      element.height * window.devicePixelRatio * zoom.value +
+      CANVAS_PADDING * zoom.value * 2;
   }
 
-  context.translate(CANVAS_PADDING, CANVAS_PADDING);
-  context.scale(window.devicePixelRatio * zoom, window.devicePixelRatio * zoom);
+  context.translate(CANVAS_PADDING * zoom.value, CANVAS_PADDING * zoom.value);
+
+  context.scale(
+    window.devicePixelRatio * zoom.value,
+    window.devicePixelRatio * zoom.value,
+  );
 
   const rc = rough.canvas(canvas);
   drawElementOnCanvas(element, rc, context);
-  context.translate(-CANVAS_PADDING, -CANVAS_PADDING);
-  context.scale(
-    1 / (window.devicePixelRatio * zoom),
-    1 / (window.devicePixelRatio * zoom),
+  context.translate(
+    -(CANVAS_PADDING * zoom.value),
+    -(CANVAS_PADDING * zoom.value),
   );
-  return { element, canvas, canvasZoom: zoom, canvasOffsetX, canvasOffsetY };
+  context.scale(
+    1 / (window.devicePixelRatio * zoom.value),
+    1 / (window.devicePixelRatio * zoom.value),
+  );
+  return {
+    element,
+    canvas,
+    canvasZoom: zoom.value,
+    canvasOffsetX,
+    canvasOffsetY,
+  };
 };
 
 const drawElementOnCanvas = (
@@ -110,7 +139,7 @@ const drawElementOnCanvas = (
         const shouldTemporarilyAttach = rtl && !context.canvas.isConnected;
         if (shouldTemporarilyAttach) {
           // to correctly render RTL text mixed with LTR, we have to append it
-          //  to the DOM
+          // to the DOM
           document.body.appendChild(context.canvas);
         }
         context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
@@ -131,11 +160,11 @@ const drawElementOnCanvas = (
             : element.textAlign === "right"
             ? element.width
             : 0;
-        for (let i = 0; i < lines.length; i++) {
+        for (let index = 0; index < lines.length; index++) {
           context.fillText(
-            lines[i],
+            lines[index],
             horizontalOffset,
-            (i + 1) * lineHeight - verticalOffset,
+            (index + 1) * lineHeight - verticalOffset,
           );
         }
         context.fillStyle = fillStyle;
@@ -178,17 +207,17 @@ export const generateRoughOptions = (element: ExcalidrawElement): Options => {
         ? DASHARRAY_DOTTED
         : undefined,
     // for non-solid strokes, disable multiStroke because it tends to make
-    //  dashes/dots overlay each other
+    // dashes/dots overlay each other
     disableMultiStroke: element.strokeStyle !== "solid",
     // for non-solid strokes, increase the width a bit to make it visually
-    //  similar to solid strokes, because we're also disabling multiStroke
+    // similar to solid strokes, because we're also disabling multiStroke
     strokeWidth:
       element.strokeStyle !== "solid"
         ? element.strokeWidth + 0.5
         : element.strokeWidth,
     // when increasing strokeWidth, we must explicitly set fillWeight and
-    //  hachureGap because if not specified, roughjs uses strokeWidth to
-    //  calculate them (and we don't want the fills to be modified)
+    // hachureGap because if not specified, roughjs uses strokeWidth to
+    // calculate them (and we don't want the fills to be modified)
     fillWeight: element.strokeWidth / 2,
     hachureGap: element.strokeWidth * 4,
     roughness: element.roughness,
@@ -318,22 +347,75 @@ const generateElementShape = (
 
         // add lines only in arrow
         if (element.type === "arrow") {
-          const arrowPoints = getArrowPoints(element, shape);
-          if (arrowPoints) {
-            const [x2, y2, x3, y3, x4, y4] = arrowPoints;
-            // for dotted arrows caps, reduce gap to make it more legible
+          const { startArrowhead = null, endArrowhead = "arrow" } = element;
+
+          function getArrowheadShapes(
+            element: ExcalidrawLinearElement,
+            shape: Drawable[],
+            position: "start" | "end",
+            arrowhead: Arrowhead,
+          ) {
+            const arrowheadPoints = getArrowheadPoints(
+              element,
+              shape,
+              position,
+              arrowhead,
+            );
+
+            if (arrowheadPoints === null) {
+              return [];
+            }
+
+            // Other arrowheads here...
+            if (arrowhead === "dot") {
+              const [x, y, r] = arrowheadPoints;
+
+              return [
+                generator.circle(x, y, r, {
+                  ...options,
+                  fill: element.strokeColor,
+                  fillStyle: "solid",
+                }),
+              ];
+            }
+
+            // Arrow arrowheads
+            const [x2, y2, x3, y3, x4, y4] = arrowheadPoints;
             if (element.strokeStyle === "dotted") {
+              // for dotted arrows caps, reduce gap to make it more legible
               options.strokeLineDash = [3, 4];
-              // for solid/dashed, keep solid arrow cap
             } else {
+              // for solid/dashed, keep solid arrow cap
               delete options.strokeLineDash;
             }
-            shape.push(
-              ...[
-                generator.line(x3, y3, x2, y2, options),
-                generator.line(x4, y4, x2, y2, options),
-              ],
+            return [
+              generator.line(x3, y3, x2, y2, options),
+              generator.line(x4, y4, x2, y2, options),
+            ];
+          }
+
+          if (startArrowhead !== null) {
+            const shapes = getArrowheadShapes(
+              element,
+              shape,
+              "start",
+              startArrowhead,
             );
+            shape.push(...shapes);
+          }
+
+          if (endArrowhead !== null) {
+            if (endArrowhead === undefined) {
+              // Hey, we have an old arrow here!
+            }
+
+            const shapes = getArrowheadShapes(
+              element,
+              shape,
+              "end",
+              endArrowhead,
+            );
+            shape.push(...shapes);
           }
         }
         break;
@@ -352,11 +434,11 @@ const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,
   sceneState?: SceneState,
 ) => {
-  const zoom = sceneState ? sceneState.zoom : 1;
+  const zoom: Zoom = sceneState ? sceneState.zoom : defaultAppState.zoom;
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
   const shouldRegenerateBecauseZoom =
     prevElementWithCanvas &&
-    prevElementWithCanvas.canvasZoom !== zoom &&
+    prevElementWithCanvas.canvasZoom !== zoom.value &&
     !sceneState?.shouldCacheIgnoreZoom;
   if (!prevElementWithCanvas || shouldRegenerateBecauseZoom) {
     const elementWithCanvas = generateElementCanvas(element, zoom);
@@ -382,9 +464,11 @@ const drawElementFromCanvas = (
   context.drawImage(
     elementWithCanvas.canvas!,
     (-(x2 - x1) / 2) * window.devicePixelRatio -
-      CANVAS_PADDING / elementWithCanvas.canvasZoom,
+      (CANVAS_PADDING * elementWithCanvas.canvasZoom) /
+        elementWithCanvas.canvasZoom,
     (-(y2 - y1) / 2) * window.devicePixelRatio -
-      CANVAS_PADDING / elementWithCanvas.canvasZoom,
+      (CANVAS_PADDING * elementWithCanvas.canvasZoom) /
+        elementWithCanvas.canvasZoom,
     elementWithCanvas.canvas!.width / elementWithCanvas.canvasZoom,
     elementWithCanvas.canvas!.height / elementWithCanvas.canvasZoom,
   );

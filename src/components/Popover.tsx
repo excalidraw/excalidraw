@@ -1,5 +1,5 @@
 import React, { useLayoutEffect, useRef, useEffect } from "react";
-import "./Popover.css";
+import "./Popover.scss";
 import { unstable_batchedUpdates } from "react-dom";
 
 type Props = {
@@ -49,7 +49,7 @@ export const Popover = ({
   }, [onCloseRequest]);
 
   return (
-    <div className="popover" style={{ top: top, left: left }} ref={popoverRef}>
+    <div className="popover" style={{ top, left }} ref={popoverRef}>
       {children}
     </div>
   );

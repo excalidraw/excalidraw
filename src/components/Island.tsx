@@ -1,6 +1,7 @@
 import "./Island.scss";
 
 import React from "react";
+import clsx from "clsx";
 
 type IslandProps = {
   children: React.ReactNode;
@@ -12,8 +13,8 @@ type IslandProps = {
 export const Island = React.forwardRef<HTMLDivElement, IslandProps>(
   ({ children, padding, className, style }, ref) => (
     <div
-      className={`${className ?? ""} Island`}
-      style={{ "--padding": padding, ...style } as React.CSSProperties}
+      className={clsx("Island", className)}
+      style={{ "--padding": padding, ...style }}
       ref={ref}
     >
       {children}

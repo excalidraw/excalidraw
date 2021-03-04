@@ -1,22 +1,33 @@
-@import "../css/_variables";
+@import "../css/variables.module";
 
-.HintViewer {
-  color: $oc-gray-6;
-  font-size: 0.8rem;
-  left: 50%;
-  pointer-events: none;
-  position: absolute;
-  top: 54px;
-  transform: translateX(calc(-50% - 16px)); /* 16px is half of lock icon */
-  padding: 0.2rem 0.4rem;
-  white-space: pre;
-  text-align: center;
-  background-color: var(--overlay-background-color);
-  border-radius: 4px;
+// this is loosely based on the longest hint text
+$wide-viewport-width: 1000px;
 
-  @media #{$media-query} {
-    position: static;
-    transform: none;
-    margin-top: 0.5rem;
+.excalidraw {
+  .HintViewer {
+    pointer-events: none;
+    box-sizing: border-box;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    left: 0;
+    top: 100%;
+    max-width: 100%;
+    width: 100%;
+    margin-top: 6px;
+    text-align: center;
+    color: $oc-gray-6;
+    font-size: 0.8rem;
+
+    @media #{$is-mobile-query} {
+      position: static;
+      padding-right: 2em;
+    }
+
+    > span {
+      padding: 0.2rem 0.4rem;
+      background-color: var(--overlay-bg-color);
+      border-radius: 4px;
+    }
   }
 }

@@ -25,10 +25,10 @@ const getTransform = (
   const { zoom, offsetTop, offsetLeft } = appState;
   const degree = (180 * angle) / Math.PI;
   // offsets must be multiplied by 2 to account for the division by 2 of
-  //  the whole expression afterwards
-  return `translate(${((width - offsetLeft * 2) * (zoom - 1)) / 2}px, ${
-    ((height - offsetTop * 2) * (zoom - 1)) / 2
-  }px) scale(${zoom}) rotate(${degree}deg)`;
+  // the whole expression afterwards
+  return `translate(${((width - offsetLeft * 2) * (zoom.value - 1)) / 2}px, ${
+    ((height - offsetTop * 2) * (zoom.value - 1)) / 2
+  }px) scale(${zoom.value}) rotate(${degree}deg)`;
 };
 
 export const textWysiwyg = ({
@@ -38,6 +38,7 @@ export const textWysiwyg = ({
   onSubmit,
   getViewportCoords,
   element,
+  canvas,
 }: {
   id: ExcalidrawElement["id"];
   appState: AppState;
@@ -45,8 +46,9 @@ export const textWysiwyg = ({
   onSubmit: (text: string) => void;
   getViewportCoords: (x: number, y: number) => [number, number];
   element: ExcalidrawElement;
+  canvas: HTMLCanvasElement | null;
 }) => {
-  function updateWysiwygStyle() {
+  const updateWysiwygStyle = () => {
     const updatedElement = Scene.getScene(element)?.getElement(id);
     if (updatedElement && isTextElement(updatedElement)) {
       const [viewportX, viewportY] = getViewportCoords(
@@ -74,13 +76,13 @@ export const textWysiwyg = ({
           angle,
           appState,
         ),
-        textAlign: textAlign,
+        textAlign,
         color: updatedElement.strokeColor,
         opacity: updatedElement.opacity / 100,
         filter: "var(--appearance-filter)",
       });
     }
-  }
+  };
 
   const editable = document.createElement("textarea");
 
@@ -104,6 +106,8 @@ export const textWysiwyg = ({
     overflow: "hidden",
     // prevent line wrapping (`whitespace: nowrap` doesn't work on FF)
     whiteSpace: "pre",
+    // must be specified because in dark mode canvas creates a stacking context
+    zIndex: "var(--zIndex-wysiwyg)",
   });
 
   updateWysiwygStyle();
@@ -149,6 +153,10 @@ export const textWysiwyg = ({
     editable.oninput = null;
     editable.onkeydown = null;
 
+    if (observer) {
+      observer.disconnect();
+    }
+
     window.removeEventListener("resize", updateWysiwygStyle);
     window.removeEventListener("wheel", stopEvent, true);
     window.removeEventListener("pointerdown", onPointerDown);
@@ -157,13 +165,13 @@ export const textWysiwyg = ({
 
     unbindUpdate();
 
-    document.body.removeChild(editable);
+    editable.remove();
   };
 
   const rebindBlur = () => {
     window.removeEventListener("pointerup", rebindBlur);
     // deferred to guard against focus traps on various UIs that steal focus
-    //  upon pointerUp
+    // upon pointerUp
     setTimeout(() => {
       editable.onblur = handleSubmit;
       // case: clicking on the same property → no change → no update → no focus
@@ -181,7 +189,7 @@ export const textWysiwyg = ({
       editable.onblur = null;
       window.addEventListener("pointerup", rebindBlur);
       // handle edge-case where pointerup doesn't fire e.g. due to user
-      //  alt-tabbing away
+      // alt-tabbing away
       window.addEventListener("blur", handleSubmit);
     }
   };
@@ -195,15 +203,27 @@ export const textWysiwyg = ({
   let isDestroyed = false;
 
   editable.onblur = handleSubmit;
-  // reposition wysiwyg in case of window resize. Happens on mobile when
-  //  device keyboard is opened.
-  window.addEventListener("resize", updateWysiwygStyle);
+
+  // reposition wysiwyg in case of canvas is resized. Using ResizeObserver
+  // is preferred so we catch changes from host, where window may not resize.
+  let observer: ResizeObserver | null = null;
+  if (canvas && "ResizeObserver" in window) {
+    observer = new window.ResizeObserver(() => {
+      updateWysiwygStyle();
+    });
+    observer.observe(canvas);
+  } else {
+    window.addEventListener("resize", updateWysiwygStyle);
+  }
+
   window.addEventListener("pointerdown", onPointerDown);
   window.addEventListener("wheel", stopEvent, {
     passive: false,
     capture: true,
   });
-  document.body.appendChild(editable);
+  document
+    .querySelector(".excalidraw-textEditorContainer")!
+    .appendChild(editable);
   editable.focus();
   editable.select();
 };

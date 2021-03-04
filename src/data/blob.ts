@@ -1,65 +1,149 @@
-import { getDefaultAppState, cleanAppStateForExport } from "../appState";
-import { restore } from "./restore";
+import { cleanAppStateForExport } from "../appState";
+import { MIME_TYPES } from "../constants";
+import { clearElementsForExport } from "../element";
+import { CanvasError } from "../errors";
 import { t } from "../i18n";
-import { AppState } from "../types";
-import { LibraryData } from "./types";
 import { calculateScrollCenter } from "../scene";
+import { AppState } from "../types";
+import { restore } from "./restore";
+import { ImportedDataState, LibraryData } from "./types";
 
-const loadFileContents = async (blob: any) => {
+const parseFileContents = async (blob: Blob | File) => {
   let contents: string;
-  if ("text" in Blob) {
-    contents = await blob.text();
+
+  if (blob.type === "image/png") {
+    try {
+      return await (
+        await import(/* webpackChunkName: "image" */ "./image")
+      ).decodePngMetadata(blob);
+    } catch (error) {
+      if (error.message === "INVALID") {
+        throw new Error(t("alerts.imageDoesNotContainScene"));
+      } else {
+        throw new Error(t("alerts.cannotRestoreFromImage"));
+      }
+    }
   } else {
-    contents = await new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.readAsText(blob, "utf8");
-      reader.onloadend = () => {
-        if (reader.readyState === FileReader.DONE) {
-          resolve(reader.result as string);
+    if ("text" in Blob) {
+      contents = await blob.text();
+    } else {
+      contents = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsText(blob, "utf8");
+        reader.onloadend = () => {
+          if (reader.readyState === FileReader.DONE) {
+            resolve(reader.result as string);
+          }
+        };
+      });
+    }
+    if (blob.type === "image/svg+xml") {
+      try {
+        return await (
+          await import(/* webpackChunkName: "image" */ "./image")
+        ).decodeSvgMetadata({
+          svg: contents,
+        });
+      } catch (error) {
+        if (error.message === "INVALID") {
+          throw new Error(t("alerts.imageDoesNotContainScene"));
+        } else {
+          throw new Error(t("alerts.cannotRestoreFromImage"));
         }
-      };
-    });
+      }
+    }
   }
   return contents;
 };
 
-/**
- * @param blob
- * @param appState if provided, used for centering scroll to restored scene
- */
-export const loadFromBlob = async (blob: any, appState?: AppState) => {
-  if (blob.handle) {
-    (window as any).handle = blob.handle;
+export const getMimeType = (blob: Blob | string): string => {
+  let name: string;
+  if (typeof blob === "string") {
+    name = blob;
+  } else {
+    if (blob.type) {
+      return blob.type;
+    }
+    name = blob.name || "";
   }
+  if (/\.(excalidraw|json)$/.test(name)) {
+    return "application/json";
+  } else if (/\.png$/.test(name)) {
+    return "image/png";
+  } else if (/\.jpe?g$/.test(name)) {
+    return "image/jpeg";
+  } else if (/\.svg$/.test(name)) {
+    return "image/svg+xml";
+  }
+  return "";
+};
 
-  const contents = await loadFileContents(blob);
-  const defaultAppState = getDefaultAppState();
-  let elements = [];
-  let _appState = appState || defaultAppState;
+export const loadFromBlob = async (
+  blob: Blob,
+  /** @see restore.localAppState */
+  localAppState: AppState | null,
+) => {
+  const contents = await parseFileContents(blob);
   try {
-    const data = JSON.parse(contents);
+    const data: ImportedDataState = JSON.parse(contents);
     if (data.type !== "excalidraw") {
       throw new Error(t("alerts.couldNotLoadInvalidFile"));
     }
-    elements = data.elements || [];
-    _appState = {
-      ...defaultAppState,
-      appearance: _appState.appearance,
-      ...cleanAppStateForExport(data.appState as Partial<AppState>),
-      ...(appState ? calculateScrollCenter(elements, appState, null) : {}),
-    };
-  } catch {
+    const result = restore(
+      {
+        elements: clearElementsForExport(data.elements || []),
+        appState: {
+          appearance: localAppState?.appearance,
+          fileHandle:
+            blob.handle &&
+            ["application/json", MIME_TYPES.excalidraw].includes(
+              getMimeType(blob),
+            )
+              ? blob.handle
+              : null,
+          ...cleanAppStateForExport(data.appState || {}),
+          ...(localAppState
+            ? calculateScrollCenter(data.elements || [], localAppState, null)
+            : {}),
+        },
+      },
+      localAppState,
+    );
+
+    return result;
+  } catch (error) {
+    console.error(error.message);
     throw new Error(t("alerts.couldNotLoadInvalidFile"));
   }
-
-  return restore(elements, _appState);
 };
 
-export const loadLibraryFromBlob = async (blob: any) => {
-  const contents = await loadFileContents(blob);
+export const loadLibraryFromBlob = async (blob: Blob) => {
+  const contents = await parseFileContents(blob);
   const data: LibraryData = JSON.parse(contents);
   if (data.type !== "excalidrawlib") {
     throw new Error(t("alerts.couldNotLoadInvalidFile"));
   }
   return data;
+};
+
+export const canvasToBlob = async (
+  canvas: HTMLCanvasElement,
+): Promise<Blob> => {
+  return new Promise((resolve, reject) => {
+    try {
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          return reject(
+            new CanvasError(
+              t("canvasError.canvasTooBig"),
+              "CANVAS_POSSIBLY_TOO_BIG",
+            ),
+          );
+        }
+        resolve(blob);
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
 };

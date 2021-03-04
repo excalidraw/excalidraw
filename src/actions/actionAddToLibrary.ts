@@ -2,7 +2,7 @@ import { register } from "./register";
 import { getSelectedElements } from "../scene";
 import { getNonDeletedElements } from "../element";
 import { deepCopyElement } from "../element/newElement";
-import { loadLibrary, saveLibrary } from "../data/localStorage";
+import { Library } from "../data/library";
 
 export const actionAddToLibrary = register({
   name: "addToLibrary",
@@ -12,12 +12,10 @@ export const actionAddToLibrary = register({
       appState,
     );
 
-    loadLibrary().then((items) => {
-      saveLibrary([...items, selectedElements.map(deepCopyElement)]);
+    Library.loadLibrary().then((items) => {
+      Library.saveLibrary([...items, selectedElements.map(deepCopyElement)]);
     });
-
     return false;
   },
-  contextMenuOrder: 6,
   contextItemLabel: "labels.addToLibrary",
 });

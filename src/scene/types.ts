@@ -1,22 +1,24 @@
 import { ExcalidrawTextElement } from "../element/types";
-import { FlooredNumber } from "../types";
+import { Zoom } from "../types";
 
 export type SceneState = {
-  scrollX: FlooredNumber;
-  scrollY: FlooredNumber;
+  scrollX: number;
+  scrollY: number;
   // null indicates transparent bg
   viewBackgroundColor: string | null;
-  zoom: number;
+  exportWithDarkMode?: boolean;
+  zoom: Zoom;
   shouldCacheIgnoreZoom: boolean;
   remotePointerViewportCoords: { [id: string]: { x: number; y: number } };
   remotePointerButton?: { [id: string]: string | undefined };
   remoteSelectedElementIds: { [elementId: string]: string[] };
   remotePointerUsernames: { [id: string]: string };
+  remotePointerUserStates: { [id: string]: string };
 };
 
 export type SceneScroll = {
-  scrollX: FlooredNumber;
-  scrollY: FlooredNumber;
+  scrollX: number;
+  scrollY: number;
 };
 
 export interface Scene {

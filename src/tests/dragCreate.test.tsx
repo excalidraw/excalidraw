@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import App from "../components/App";
+import ExcalidrawApp from "../excalidraw-app";
 import * as Renderer from "../renderer/renderScene";
 import { KEYS } from "../keys";
 import { render, fireEvent } from "./test-utils";
@@ -20,8 +20,8 @@ beforeEach(() => {
 const { h } = window;
 
 describe("add element to the scene when pointer dragging long enough", () => {
-  it("rectangle", () => {
-    const { getByToolName, container } = render(<App />);
+  it("rectangle", async () => {
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
     const tool = getByToolName("rectangle");
     fireEvent.click(tool);
@@ -37,7 +37,7 @@ describe("add element to the scene when pointer dragging long enough", () => {
     // finish (position does not matter)
     fireEvent.pointerUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(5);
+    expect(renderScene).toHaveBeenCalledTimes(7);
     expect(h.state.selectionElement).toBeNull();
 
     expect(h.elements.length).toEqual(1);
@@ -51,8 +51,8 @@ describe("add element to the scene when pointer dragging long enough", () => {
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
 
-  it("ellipse", () => {
-    const { getByToolName, container } = render(<App />);
+  it("ellipse", async () => {
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
     const tool = getByToolName("ellipse");
     fireEvent.click(tool);
@@ -68,7 +68,7 @@ describe("add element to the scene when pointer dragging long enough", () => {
     // finish (position does not matter)
     fireEvent.pointerUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(5);
+    expect(renderScene).toHaveBeenCalledTimes(7);
     expect(h.state.selectionElement).toBeNull();
 
     expect(h.elements.length).toEqual(1);
@@ -82,8 +82,8 @@ describe("add element to the scene when pointer dragging long enough", () => {
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
 
-  it("diamond", () => {
-    const { getByToolName, container } = render(<App />);
+  it("diamond", async () => {
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
     const tool = getByToolName("diamond");
     fireEvent.click(tool);
@@ -99,7 +99,7 @@ describe("add element to the scene when pointer dragging long enough", () => {
     // finish (position does not matter)
     fireEvent.pointerUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(5);
+    expect(renderScene).toHaveBeenCalledTimes(7);
     expect(h.state.selectionElement).toBeNull();
 
     expect(h.elements.length).toEqual(1);
@@ -113,8 +113,8 @@ describe("add element to the scene when pointer dragging long enough", () => {
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
 
-  it("arrow", () => {
-    const { getByToolName, container } = render(<App />);
+  it("arrow", async () => {
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
     const tool = getByToolName("arrow");
     fireEvent.click(tool);
@@ -130,7 +130,7 @@ describe("add element to the scene when pointer dragging long enough", () => {
     // finish (position does not matter)
     fireEvent.pointerUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(5);
+    expect(renderScene).toHaveBeenCalledTimes(7);
     expect(h.state.selectionElement).toBeNull();
 
     expect(h.elements.length).toEqual(1);
@@ -148,8 +148,8 @@ describe("add element to the scene when pointer dragging long enough", () => {
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
 
-  it("line", () => {
-    const { getByToolName, container } = render(<App />);
+  it("line", async () => {
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
     const tool = getByToolName("line");
     fireEvent.click(tool);
@@ -165,7 +165,7 @@ describe("add element to the scene when pointer dragging long enough", () => {
     // finish (position does not matter)
     fireEvent.pointerUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(5);
+    expect(renderScene).toHaveBeenCalledTimes(7);
     expect(h.state.selectionElement).toBeNull();
 
     expect(h.elements.length).toEqual(1);
@@ -184,8 +184,8 @@ describe("add element to the scene when pointer dragging long enough", () => {
 });
 
 describe("do not add element to the scene if size is too small", () => {
-  it("rectangle", () => {
-    const { getByToolName, container } = render(<App />);
+  it("rectangle", async () => {
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
     const tool = getByToolName("rectangle");
     fireEvent.click(tool);
@@ -198,13 +198,13 @@ describe("do not add element to the scene if size is too small", () => {
     // finish (position does not matter)
     fireEvent.pointerUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(4);
+    expect(renderScene).toHaveBeenCalledTimes(6);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(0);
   });
 
-  it("ellipse", () => {
-    const { getByToolName, container } = render(<App />);
+  it("ellipse", async () => {
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
     const tool = getByToolName("ellipse");
     fireEvent.click(tool);
@@ -217,13 +217,13 @@ describe("do not add element to the scene if size is too small", () => {
     // finish (position does not matter)
     fireEvent.pointerUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(4);
+    expect(renderScene).toHaveBeenCalledTimes(6);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(0);
   });
 
-  it("diamond", () => {
-    const { getByToolName, container } = render(<App />);
+  it("diamond", async () => {
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
     const tool = getByToolName("diamond");
     fireEvent.click(tool);
@@ -236,13 +236,13 @@ describe("do not add element to the scene if size is too small", () => {
     // finish (position does not matter)
     fireEvent.pointerUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(4);
+    expect(renderScene).toHaveBeenCalledTimes(6);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(0);
   });
 
-  it("arrow", () => {
-    const { getByToolName, container } = render(<App />);
+  it("arrow", async () => {
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
     const tool = getByToolName("arrow");
     fireEvent.click(tool);
@@ -258,13 +258,13 @@ describe("do not add element to the scene if size is too small", () => {
     // we need to finalize it because arrows and lines enter multi-mode
     fireEvent.keyDown(document, { key: KEYS.ENTER });
 
-    expect(renderScene).toHaveBeenCalledTimes(5);
+    expect(renderScene).toHaveBeenCalledTimes(7);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(0);
   });
 
-  it("line", () => {
-    const { getByToolName, container } = render(<App />);
+  it("line", async () => {
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
     const tool = getByToolName("line");
     fireEvent.click(tool);
@@ -280,7 +280,7 @@ describe("do not add element to the scene if size is too small", () => {
     // we need to finalize it because arrows and lines enter multi-mode
     fireEvent.keyDown(document, { key: KEYS.ENTER });
 
-    expect(renderScene).toHaveBeenCalledTimes(5);
+    expect(renderScene).toHaveBeenCalledTimes(7);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(0);
   });

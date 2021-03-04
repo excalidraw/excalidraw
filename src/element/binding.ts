@@ -21,6 +21,7 @@ import { mutateElement } from "./mutateElement";
 import Scene from "../scene/Scene";
 import { LinearElementEditor } from "./linearElementEditor";
 import { tupleToCoors } from "../utils";
+import { KEYS } from "../keys";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -31,6 +32,12 @@ export type SuggestedPointBinding = [
   "start" | "end" | "both",
   NonDeleted<ExcalidrawBindableElement>,
 ];
+
+export const shouldEnableBindingForPointerEvent = (
+  event: React.PointerEvent<HTMLCanvasElement>,
+) => {
+  return !event[KEYS.CTRL_OR_CMD];
+};
 
 export const isBindingEnabled = (appState: AppState): boolean => {
   return appState.isBindingEnabled;
@@ -175,9 +182,9 @@ const bindLinearElement = (
     } as PointBinding,
   });
   mutateElement(hoveredElement, {
-    boundElementIds: [
-      ...new Set([...(hoveredElement.boundElementIds ?? []), linearElement.id]),
-    ],
+    boundElementIds: Array.from(
+      new Set([...(hoveredElement.boundElementIds ?? []), linearElement.id]),
+    ),
   });
 };
 

@@ -10,10 +10,15 @@ import { t } from "../i18n";
 import { getShortcutKey } from "../utils";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { mutateElement } from "../element/mutateElement";
-import { selectGroupsForSelectedElements } from "../groups";
+import {
+  selectGroupsForSelectedElements,
+  getSelectedGroupForElement,
+  getElementsInGroup,
+} from "../groups";
 import { AppState } from "../types";
 import { fixBindingsAfterDuplication } from "../element/binding";
 import { ActionResult } from "./types";
+import { GRID_SIZE } from "../constants";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
@@ -59,7 +64,7 @@ export const actionDuplicateSelection = register({
     };
   },
   contextItemLabel: "labels.duplicateSelection",
-  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === "d",
+  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.D,
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
       type="button"
@@ -82,28 +87,53 @@ const duplicateElements = (
   const newElements: ExcalidrawElement[] = [];
   const oldElements: ExcalidrawElement[] = [];
   const oldIdToDuplicatedId = new Map();
-  const finalElements = elements.reduce(
-    (acc: Array<ExcalidrawElement>, element: ExcalidrawElement) => {
-      if (appState.selectedElementIds[element.id]) {
-        const newElement = duplicateElement(
-          appState.editingGroupId,
-          groupIdMap,
-          element,
-          {
-            x: element.x + 10,
-            y: element.y + 10,
-          },
-        );
-        oldIdToDuplicatedId.set(element.id, newElement.id);
-        oldElements.push(element);
-        newElements.push(newElement);
-        return acc.concat([element, newElement]);
+
+  const duplicateAndOffsetElement = (element: ExcalidrawElement) => {
+    const newElement = duplicateElement(
+      appState.editingGroupId,
+      groupIdMap,
+      element,
+      {
+        x: element.x + GRID_SIZE / 2,
+        y: element.y + GRID_SIZE / 2,
+      },
+    );
+    oldIdToDuplicatedId.set(element.id, newElement.id);
+    oldElements.push(element);
+    newElements.push(newElement);
+    return newElement;
+  };
+
+  const finalElements: ExcalidrawElement[] = [];
+
+  let index = 0;
+  while (index < elements.length) {
+    const element = elements[index];
+    if (appState.selectedElementIds[element.id]) {
+      if (element.groupIds.length) {
+        const groupId = getSelectedGroupForElement(appState, element);
+        // if group selected, duplicate it atomically
+        if (groupId) {
+          const groupElements = getElementsInGroup(elements, groupId);
+          finalElements.push(
+            ...groupElements,
+            ...groupElements.map((element) =>
+              duplicateAndOffsetElement(element),
+            ),
+          );
+          index = index + groupElements.length;
+          continue;
+        }
       }
-      return acc.concat(element);
-    },
-    [],
-  );
+      finalElements.push(element, duplicateAndOffsetElement(element));
+    } else {
+      finalElements.push(element);
+    }
+    index++;
+  }
+
   fixBindingsAfterDuplication(finalElements, oldElements, oldIdToDuplicatedId);
+
   return {
     elements: finalElements,
     appState: selectGroupsForSelectedElements(

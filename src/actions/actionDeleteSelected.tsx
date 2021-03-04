@@ -31,10 +31,10 @@ const deleteSelectedElements = (
   };
 };
 
-function handleGroupEditingState(
+const handleGroupEditingState = (
   appState: AppState,
   elements: readonly ExcalidrawElement[],
-): AppState {
+): AppState => {
   if (appState.editingGroupId) {
     const siblingElements = getElementsInGroup(
       getNonDeletedElements(elements),
@@ -48,7 +48,7 @@ function handleGroupEditingState(
     }
   }
   return appState;
-}
+};
 
 export const actionDeleteSelected = register({
   name: "deleteSelectedElements",
@@ -98,7 +98,7 @@ export const actionDeleteSelected = register({
       LinearElementEditor.movePoint(element, activePointIndex, "delete");
 
       return {
-        elements: elements,
+        elements,
         appState: {
           ...appState,
           editingLinearElement: {
@@ -136,7 +136,6 @@ export const actionDeleteSelected = register({
     };
   },
   contextItemLabel: "labels.delete",
-  contextMenuOrder: 3,
   keyTest: (event) => event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE,
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton

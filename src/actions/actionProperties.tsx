@@ -1,30 +1,53 @@
 import React from "react";
-import {
-  ExcalidrawElement,
-  ExcalidrawTextElement,
-  TextAlign,
-  FontFamily,
-} from "../element/types";
-import {
-  getCommonAttributeOfSelectedElements,
-  isSomeElementSelected,
-  getTargetElement,
-  canChangeSharpness,
-} from "../scene";
+import { AppState } from "../../src/types";
+import { ButtonIconSelect } from "../components/ButtonIconSelect";
 import { ButtonSelect } from "../components/ButtonSelect";
+import { ColorPicker } from "../components/ColorPicker";
+import { IconPicker } from "../components/IconPicker";
 import {
+  ArrowheadArrowIcon,
+  ArrowheadBarIcon,
+  ArrowheadDotIcon,
+  ArrowheadNoneIcon,
+  EdgeRoundIcon,
+  EdgeSharpIcon,
+  FillCrossHatchIcon,
+  FillHachureIcon,
+  FillSolidIcon,
+  SloppinessArchitectIcon,
+  SloppinessArtistIcon,
+  SloppinessCartoonistIcon,
+  StrokeStyleDashedIcon,
+  StrokeStyleDottedIcon,
+  StrokeStyleSolidIcon,
+  StrokeWidthIcon,
+} from "../components/icons";
+import { DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE } from "../constants";
+import {
+  getNonDeletedElements,
   isTextElement,
   redrawTextBoundingBox,
-  getNonDeletedElements,
 } from "../element";
-import { isLinearElement, isLinearElementType } from "../element/typeChecks";
-import { ColorPicker } from "../components/ColorPicker";
-import { AppState } from "../../src/types";
-import { t } from "../i18n";
-import { register } from "./register";
 import { newElementWith } from "../element/mutateElement";
-import { DEFAULT_FONT_SIZE, DEFAULT_FONT_FAMILY } from "../constants";
+import { isLinearElement, isLinearElementType } from "../element/typeChecks";
+import {
+  Arrowhead,
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  ExcalidrawTextElement,
+  FontFamily,
+  TextAlign,
+} from "../element/types";
+import { getLanguage, t } from "../i18n";
 import { randomInteger } from "../random";
+import {
+  canChangeSharpness,
+  canHaveArrowheads,
+  getCommonAttributeOfSelectedElements,
+  getTargetElements,
+  isSomeElementSelected,
+} from "../scene";
+import { register } from "./register";
 
 const changeProperty = (
   elements: readonly ExcalidrawElement[],
@@ -141,11 +164,23 @@ export const actionChangeFillStyle = register({
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.fill")}</legend>
-      <ButtonSelect
+      <ButtonIconSelect
         options={[
-          { value: "hachure", text: t("labels.hachure") },
-          { value: "cross-hatch", text: t("labels.crossHatch") },
-          { value: "solid", text: t("labels.solid") },
+          {
+            value: "hachure",
+            text: t("labels.hachure"),
+            icon: <FillHachureIcon appearance={appState.appearance} />,
+          },
+          {
+            value: "cross-hatch",
+            text: t("labels.crossHatch"),
+            icon: <FillCrossHatchIcon appearance={appState.appearance} />,
+          },
+          {
+            value: "solid",
+            text: t("labels.solid"),
+            icon: <FillSolidIcon appearance={appState.appearance} />,
+          },
         ]}
         group="fill"
         value={getFormValue(
@@ -178,12 +213,39 @@ export const actionChangeStrokeWidth = register({
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.strokeWidth")}</legend>
-      <ButtonSelect
+      <ButtonIconSelect
         group="stroke-width"
         options={[
-          { value: 1, text: t("labels.thin") },
-          { value: 2, text: t("labels.bold") },
-          { value: 4, text: t("labels.extraBold") },
+          {
+            value: 1,
+            text: t("labels.thin"),
+            icon: (
+              <StrokeWidthIcon
+                appearance={appState.appearance}
+                strokeWidth={2}
+              />
+            ),
+          },
+          {
+            value: 2,
+            text: t("labels.bold"),
+            icon: (
+              <StrokeWidthIcon
+                appearance={appState.appearance}
+                strokeWidth={6}
+              />
+            ),
+          },
+          {
+            value: 4,
+            text: t("labels.extraBold"),
+            icon: (
+              <StrokeWidthIcon
+                appearance={appState.appearance}
+                strokeWidth={10}
+              />
+            ),
+          },
         ]}
         value={getFormValue(
           elements,
@@ -214,12 +276,24 @@ export const actionChangeSloppiness = register({
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.sloppiness")}</legend>
-      <ButtonSelect
+      <ButtonIconSelect
         group="sloppiness"
         options={[
-          { value: 0, text: t("labels.architect") },
-          { value: 1, text: t("labels.artist") },
-          { value: 2, text: t("labels.cartoonist") },
+          {
+            value: 0,
+            text: t("labels.architect"),
+            icon: <SloppinessArchitectIcon appearance={appState.appearance} />,
+          },
+          {
+            value: 1,
+            text: t("labels.artist"),
+            icon: <SloppinessArtistIcon appearance={appState.appearance} />,
+          },
+          {
+            value: 2,
+            text: t("labels.cartoonist"),
+            icon: <SloppinessCartoonistIcon appearance={appState.appearance} />,
+          },
         ]}
         value={getFormValue(
           elements,
@@ -249,12 +323,24 @@ export const actionChangeStrokeStyle = register({
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.strokeStyle")}</legend>
-      <ButtonSelect
+      <ButtonIconSelect
         group="strokeStyle"
         options={[
-          { value: "solid", text: t("labels.strokeStyle_solid") },
-          { value: "dashed", text: t("labels.strokeStyle_dashed") },
-          { value: "dotted", text: t("labels.strokeStyle_dotted") },
+          {
+            value: "solid",
+            text: t("labels.strokeStyle_solid"),
+            icon: <StrokeStyleSolidIcon appearance={appState.appearance} />,
+          },
+          {
+            value: "dashed",
+            text: t("labels.strokeStyle_dashed"),
+            icon: <StrokeStyleDashedIcon appearance={appState.appearance} />,
+          },
+          {
+            value: "dotted",
+            text: t("labels.strokeStyle_dotted"),
+            icon: <StrokeStyleDottedIcon appearance={appState.appearance} />,
+          },
         ]}
         value={getFormValue(
           elements,
@@ -457,12 +543,12 @@ export const actionChangeTextAlign = register({
 export const actionChangeSharpness = register({
   name: "changeSharpness",
   perform: (elements, appState, value) => {
-    const targetElements = getTargetElement(
+    const targetElements = getTargetElements(
       getNonDeletedElements(elements),
       appState,
     );
     const shouldUpdateForNonLinearElements = targetElements.length
-      ? targetElements.every((e) => !isLinearElement(e))
+      ? targetElements.every((el) => !isLinearElement(el))
       : !isLinearElementType(appState.elementType);
     const shouldUpdateForLinearElements = targetElements.length
       ? targetElements.every(isLinearElement)
@@ -488,11 +574,19 @@ export const actionChangeSharpness = register({
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.edges")}</legend>
-      <ButtonSelect
+      <ButtonIconSelect
         group="edges"
         options={[
-          { value: "sharp", text: t("labels.sharp") },
-          { value: "round", text: t("labels.round") },
+          {
+            value: "sharp",
+            text: t("labels.sharp"),
+            icon: <EdgeSharpIcon appearance={appState.appearance} />,
+          },
+          {
+            value: "round",
+            text: t("labels.round"),
+            icon: <EdgeRoundIcon appearance={appState.appearance} />,
+          },
         ]}
         value={getFormValue(
           elements,
@@ -508,4 +602,162 @@ export const actionChangeSharpness = register({
       />
     </fieldset>
   ),
+});
+
+export const actionChangeArrowhead = register({
+  name: "changeArrowhead",
+  perform: (
+    elements,
+    appState,
+    value: { position: "start" | "end"; type: Arrowhead },
+  ) => {
+    return {
+      elements: changeProperty(elements, appState, (el) => {
+        if (isLinearElement(el)) {
+          const { position, type } = value;
+
+          if (position === "start") {
+            const element: ExcalidrawLinearElement = newElementWith(el, {
+              startArrowhead: type,
+            });
+            return element;
+          } else if (position === "end") {
+            const element: ExcalidrawLinearElement = newElementWith(el, {
+              endArrowhead: type,
+            });
+            return element;
+          }
+        }
+
+        return el;
+      }),
+      appState: {
+        ...appState,
+        [value.position === "start"
+          ? "currentItemStartArrowhead"
+          : "currentItemEndArrowhead"]: value.type,
+      },
+      commitToHistory: true,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData }) => {
+    const isRTL = getLanguage().rtl;
+
+    return (
+      <fieldset>
+        <legend>{t("labels.arrowheads")}</legend>
+        <div className="iconSelectList">
+          <IconPicker
+            label="arrowhead_start"
+            options={[
+              {
+                value: null,
+                text: t("labels.arrowhead_none"),
+                icon: <ArrowheadNoneIcon appearance={appState.appearance} />,
+                keyBinding: "q",
+              },
+              {
+                value: "arrow",
+                text: t("labels.arrowhead_arrow"),
+                icon: (
+                  <ArrowheadArrowIcon
+                    appearance={appState.appearance}
+                    flip={!isRTL}
+                  />
+                ),
+                keyBinding: "w",
+              },
+              {
+                value: "bar",
+                text: t("labels.arrowhead_bar"),
+                icon: (
+                  <ArrowheadBarIcon
+                    appearance={appState.appearance}
+                    flip={!isRTL}
+                  />
+                ),
+                keyBinding: "e",
+              },
+              {
+                value: "dot",
+                text: t("labels.arrowhead_dot"),
+                icon: (
+                  <ArrowheadDotIcon
+                    appearance={appState.appearance}
+                    flip={!isRTL}
+                  />
+                ),
+                keyBinding: "r",
+              },
+            ]}
+            value={getFormValue<Arrowhead | null>(
+              elements,
+              appState,
+              (element) =>
+                isLinearElement(element) && canHaveArrowheads(element.type)
+                  ? element.startArrowhead
+                  : appState.currentItemStartArrowhead,
+              appState.currentItemStartArrowhead,
+            )}
+            onChange={(value) => updateData({ position: "start", type: value })}
+          />
+          <IconPicker
+            label="arrowhead_end"
+            group="arrowheads"
+            options={[
+              {
+                value: null,
+                text: t("labels.arrowhead_none"),
+                keyBinding: "q",
+                icon: <ArrowheadNoneIcon appearance={appState.appearance} />,
+              },
+              {
+                value: "arrow",
+                text: t("labels.arrowhead_arrow"),
+                keyBinding: "w",
+                icon: (
+                  <ArrowheadArrowIcon
+                    appearance={appState.appearance}
+                    flip={isRTL}
+                  />
+                ),
+              },
+              {
+                value: "bar",
+                text: t("labels.arrowhead_bar"),
+                keyBinding: "e",
+                icon: (
+                  <ArrowheadBarIcon
+                    appearance={appState.appearance}
+                    flip={isRTL}
+                  />
+                ),
+              },
+              {
+                value: "dot",
+                text: t("labels.arrowhead_dot"),
+                keyBinding: "r",
+                icon: (
+                  <ArrowheadDotIcon
+                    appearance={appState.appearance}
+                    flip={isRTL}
+                  />
+                ),
+              },
+            ]}
+            value={getFormValue<Arrowhead | null>(
+              elements,
+              appState,
+              (element) =>
+                isLinearElement(element) && canHaveArrowheads(element.type)
+                  ? element.endArrowhead
+                  : appState.currentItemEndArrowhead,
+              appState.currentItemEndArrowhead,
+            )}
+            onChange={(value) => updateData({ position: "end", type: value })}
+          />
+        </div>
+      </fieldset>
+    );
+  },
 });

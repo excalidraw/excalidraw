@@ -1,9 +1,9 @@
 import React from "react";
-import { Avatar } from "../components/Avatar";
-import { register } from "./register";
 import { getClientColors, getClientInitials } from "../clients";
+import { Avatar } from "../components/Avatar";
+import { centerScrollOn } from "../scene/scroll";
 import { Collaborator } from "../types";
-import { normalizeScroll } from "../scene";
+import { register } from "./register";
 
 export const actionGoToCollaborator = register({
   name: "goToCollaborator",
@@ -16,8 +16,14 @@ export const actionGoToCollaborator = register({
     return {
       appState: {
         ...appState,
-        scrollX: normalizeScroll(appState.width / 2 - point.x),
-        scrollY: normalizeScroll(appState.height / 2 - point.y),
+        ...centerScrollOn({
+          scenePoint: point,
+          viewportDimensions: {
+            width: appState.width,
+            height: appState.height,
+          },
+          zoom: appState.zoom,
+        }),
         // Close mobile menu
         openMenu: appState.openMenu === "canvas" ? null : appState.openMenu,
       },
@@ -26,7 +32,6 @@ export const actionGoToCollaborator = register({
   },
   PanelComponent: ({ appState, updateData, id }) => {
     const clientId = id;
-
     if (!clientId) {
       return null;
     }
@@ -37,12 +42,13 @@ export const actionGoToCollaborator = register({
       return null;
     }
 
-    const { background } = getClientColors(clientId);
+    const { background, stroke } = getClientColors(clientId, appState);
     const shortName = getClientInitials(collaborator.username);
 
     return (
       <Avatar
         color={background}
+        border={stroke}
         onClick={() => updateData(collaborator.pointer)}
       >
         {shortName}

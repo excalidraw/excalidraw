@@ -1,17 +1,21 @@
 import React from "react";
-import { ColorPicker } from "../components/ColorPicker";
 import { getDefaultAppState } from "../appState";
-import { trash, zoomIn, zoomOut, resetZoom } from "../components/icons";
+import { ColorPicker } from "../components/ColorPicker";
+import { resetZoom, trash, zoomIn, zoomOut } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
-import { t } from "../i18n";
-import { getNormalizedZoom, normalizeScroll } from "../scene";
-import { KEYS } from "../keys";
-import { getShortcutKey } from "../utils";
-import useIsMobile from "../is-mobile";
-import { register } from "./register";
+import { ZOOM_STEP } from "../constants";
+import { getCommonBounds, getNonDeletedElements } from "../element";
 import { newElementWith } from "../element/mutateElement";
-import { AppState, FlooredNumber } from "../types";
-import { getCommonBounds } from "../element";
+import { ExcalidrawElement } from "../element/types";
+import { t } from "../i18n";
+import useIsMobile from "../is-mobile";
+import { CODES, KEYS } from "../keys";
+import { getNormalizedZoom, getSelectedElements } from "../scene";
+import { centerScrollOn } from "../scene/scroll";
+import { getNewZoom } from "../scene/zoom";
+import { AppState, NormalizedZoomValue } from "../types";
+import { getShortcutKey } from "../utils";
+import { register } from "./register";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -45,7 +49,13 @@ export const actionClearCanvas = register({
       appState: {
         ...getDefaultAppState(),
         appearance: appState.appearance,
-        username: appState.username,
+        elementLocked: appState.elementLocked,
+        exportBackground: appState.exportBackground,
+        exportEmbedScene: appState.exportEmbedScene,
+        gridSize: appState.gridSize,
+        shouldAddWatermark: appState.shouldAddWatermark,
+        showStats: appState.showStats,
+        pasteDialog: appState.pasteDialog,
       },
       commitToHistory: true,
     };
@@ -59,8 +69,6 @@ export const actionClearCanvas = register({
       showAriaLabel={useIsMobile()}
       onClick={() => {
         if (window.confirm(t("alerts.clearReset"))) {
-          // TODO: Make this part of `AppState`.
-          (window as any).handle = null;
           updateData(null);
         }
       }}
@@ -68,25 +76,19 @@ export const actionClearCanvas = register({
   ),
 });
 
-const ZOOM_STEP = 0.1;
-
-const KEY_CODES = {
-  MINUS: "Minus",
-  EQUAL: "Equal",
-  ONE: "Digit1",
-  ZERO: "Digit0",
-  NUM_SUBTRACT: "NumpadSubtract",
-  NUM_ADD: "NumpadAdd",
-  NUM_ZERO: "Numpad0",
-};
-
 export const actionZoomIn = register({
   name: "zoomIn",
   perform: (_elements, appState) => {
+    const zoom = getNewZoom(
+      getNormalizedZoom(appState.zoom.value + ZOOM_STEP),
+      appState.zoom,
+      { left: appState.offsetLeft, top: appState.offsetTop },
+      { x: appState.width / 2, y: appState.height / 2 },
+    );
     return {
       appState: {
         ...appState,
-        zoom: getNormalizedZoom(appState.zoom + ZOOM_STEP),
+        zoom,
       },
       commitToHistory: false,
     };
@@ -103,17 +105,24 @@ export const actionZoomIn = register({
     />
   ),
   keyTest: (event) =>
-    (event.code === KEY_CODES.EQUAL || event.code === KEY_CODES.NUM_ADD) &&
+    (event.code === CODES.EQUAL || event.code === CODES.NUM_ADD) &&
     (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
 });
 
 export const actionZoomOut = register({
   name: "zoomOut",
   perform: (_elements, appState) => {
+    const zoom = getNewZoom(
+      getNormalizedZoom(appState.zoom.value - ZOOM_STEP),
+      appState.zoom,
+      { left: appState.offsetLeft, top: appState.offsetTop },
+      { x: appState.width / 2, y: appState.height / 2 },
+    );
+
     return {
       appState: {
         ...appState,
-        zoom: getNormalizedZoom(appState.zoom - ZOOM_STEP),
+        zoom,
       },
       commitToHistory: false,
     };
@@ -130,7 +139,7 @@ export const actionZoomOut = register({
     />
   ),
   keyTest: (event) =>
-    (event.code === KEY_CODES.MINUS || event.code === KEY_CODES.NUM_SUBTRACT) &&
+    (event.code === CODES.MINUS || event.code === CODES.NUM_SUBTRACT) &&
     (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
 });
 
@@ -140,7 +149,15 @@ export const actionResetZoom = register({
     return {
       appState: {
         ...appState,
-        zoom: 1,
+        zoom: getNewZoom(
+          1 as NormalizedZoomValue,
+          appState.zoom,
+          { left: appState.offsetLeft, top: appState.offsetTop },
+          {
+            x: appState.width / 2,
+            y: appState.height / 2,
+          },
+        ),
       },
       commitToHistory: false,
     };
@@ -157,73 +174,86 @@ export const actionResetZoom = register({
     />
   ),
   keyTest: (event) =>
-    (event.code === KEY_CODES.ZERO || event.code === KEY_CODES.NUM_ZERO) &&
+    (event.code === CODES.ZERO || event.code === CODES.NUM_ZERO) &&
     (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
 });
 
-const calculateZoom = (
-  commonBounds: number[],
-  currentZoom: number,
-  {
-    scrollX,
-    scrollY,
-  }: {
-    scrollX: FlooredNumber;
-    scrollY: FlooredNumber;
-  },
-): number => {
-  const { innerWidth, innerHeight } = window;
-  const [x, y] = commonBounds;
-  const zoomX = -innerWidth / (2 * scrollX + 2 * x - innerWidth);
-  const zoomY = -innerHeight / (2 * scrollY + 2 * y - innerHeight);
-  const margin = 0.01;
-  let newZoom;
-
-  if (zoomX < zoomY) {
-    newZoom = zoomX - margin;
-  } else if (zoomY <= zoomX) {
-    newZoom = zoomY - margin;
-  } else {
-    newZoom = currentZoom;
-  }
-
-  if (newZoom <= 0.1) {
-    return 0.1;
-  }
-  if (newZoom >= 1) {
-    return 1;
-  }
-
-  return newZoom;
+const zoomValueToFitBoundsOnViewport = (
+  bounds: [number, number, number, number],
+  viewportDimensions: { width: number; height: number },
+) => {
+  const [x1, y1, x2, y2] = bounds;
+  const commonBoundsWidth = x2 - x1;
+  const zoomValueForWidth = viewportDimensions.width / commonBoundsWidth;
+  const commonBoundsHeight = y2 - y1;
+  const zoomValueForHeight = viewportDimensions.height / commonBoundsHeight;
+  const smallestZoomValue = Math.min(zoomValueForWidth, zoomValueForHeight);
+  const zoomAdjustedToSteps =
+    Math.floor(smallestZoomValue / ZOOM_STEP) * ZOOM_STEP;
+  const clampedZoomValueToFitElements = Math.min(
+    Math.max(zoomAdjustedToSteps, ZOOM_STEP),
+    1,
+  );
+  return clampedZoomValueToFitElements as NormalizedZoomValue;
 };
+
+const zoomToFitElements = (
+  elements: readonly ExcalidrawElement[],
+  appState: Readonly<AppState>,
+  zoomToSelection: boolean,
+) => {
+  const nonDeletedElements = getNonDeletedElements(elements);
+  const selectedElements = getSelectedElements(nonDeletedElements, appState);
+
+  const commonBounds =
+    zoomToSelection && selectedElements.length > 0
+      ? getCommonBounds(selectedElements)
+      : getCommonBounds(nonDeletedElements);
+
+  const zoomValue = zoomValueToFitBoundsOnViewport(commonBounds, {
+    width: appState.width,
+    height: appState.height,
+  });
+  const newZoom = getNewZoom(zoomValue, appState.zoom, {
+    left: appState.offsetLeft,
+    top: appState.offsetTop,
+  });
+
+  const [x1, y1, x2, y2] = commonBounds;
+  const centerX = (x1 + x2) / 2;
+  const centerY = (y1 + y2) / 2;
+  return {
+    appState: {
+      ...appState,
+      ...centerScrollOn({
+        scenePoint: { x: centerX, y: centerY },
+        viewportDimensions: {
+          width: appState.width,
+          height: appState.height,
+        },
+        zoom: newZoom,
+      }),
+      zoom: newZoom,
+    },
+    commitToHistory: false,
+  };
+};
+
+export const actionZoomToSelected = register({
+  name: "zoomToSelection",
+  perform: (elements, appState) => zoomToFitElements(elements, appState, true),
+  keyTest: (event) =>
+    event.code === CODES.TWO &&
+    event.shiftKey &&
+    !event.altKey &&
+    !event[KEYS.CTRL_OR_CMD],
+});
 
 export const actionZoomToFit = register({
   name: "zoomToFit",
-  perform: (elements, appState) => {
-    const nonDeletedElements = elements.filter((element) => !element.isDeleted);
-    const commonBounds = getCommonBounds(nonDeletedElements);
-    const [x1, y1, x2, y2] = commonBounds;
-    const centerX = (x1 + x2) / 2;
-    const centerY = (y1 + y2) / 2;
-    const scrollX = normalizeScroll(appState.width / 2 - centerX);
-    const scrollY = normalizeScroll(appState.height / 2 - centerY);
-    const zoom = calculateZoom(commonBounds, appState.zoom, {
-      scrollX,
-      scrollY,
-    });
-
-    return {
-      appState: {
-        ...appState,
-        scrollX,
-        scrollY,
-        zoom,
-      },
-      commitToHistory: false,
-    };
-  },
+  perform: (elements, appState) => zoomToFitElements(elements, appState, false),
   keyTest: (event) =>
-    event.code === KEY_CODES.ONE &&
+    event.code === CODES.ONE &&
     event.shiftKey &&
     !event.altKey &&
     !event[KEYS.CTRL_OR_CMD],

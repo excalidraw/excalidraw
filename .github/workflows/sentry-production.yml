@@ -1,4 +1,4 @@
-name: New Sentry Production Release
+name: New Sentry production release
 
 on:
   push:
@@ -6,27 +6,23 @@ on:
       - master
 
 jobs:
-  release:
+  sentry:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1.0.0
-
-      - name: Setup Node.js 12.x
-        uses: actions/setup-node@v1
+      - uses: actions/checkout@v2
+      - name: Setup Node.js 14.x
+        uses: actions/setup-node@v2
         with:
-          node-version: 12.x
-
+          node-version: 14.x
       - name: Install and build
         run: |
-          npm ci
-          npm run build:app
+          yarn --frozen-lockfile
+          yarn build:app
         env:
           CI: true
-
       - name: Install Sentry
         run: |
           curl -sL https://sentry.io/get-cli/ | bash
-
       - name: Create new Sentry release
         run: |
           export SENTRY_RELEASE=$(sentry-cli releases propose-version)

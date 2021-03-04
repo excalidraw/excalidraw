@@ -1,11 +1,11 @@
-import { ToolName } from "../queries/toolQueries";
-import { fireEvent, GlobalTestState } from "../test-utils";
-import { KEYS, Key } from "../../keys";
 import {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
 } from "../../element/types";
+import { CODES } from "../../keys";
+import { ToolName } from "../queries/toolQueries";
+import { fireEvent, GlobalTestState } from "../test-utils";
 import { API } from "./api";
 
 const { h } = window;
@@ -14,11 +14,13 @@ let altKey = false;
 let shiftKey = false;
 let ctrlKey = false;
 
+export type KeyboardModifiers = {
+  alt?: boolean;
+  shift?: boolean;
+  ctrl?: boolean;
+};
 export class Keyboard {
-  static withModifierKeys = (
-    modifiers: { alt?: boolean; shift?: boolean; ctrl?: boolean },
-    cb: () => void,
-  ) => {
+  static withModifierKeys = (modifiers: KeyboardModifiers, cb: () => void) => {
     const prevAltKey = altKey;
     const prevShiftKey = shiftKey;
     const prevCtrlKey = ctrlKey;
@@ -36,30 +38,12 @@ export class Keyboard {
     }
   };
 
-  static hotkeyDown = (hotkey: Key) => {
-    const key = KEYS[hotkey];
-    if (typeof key !== "string") {
-      throw new Error("must provide a hotkey, not a key code");
-    }
-    Keyboard.keyDown(key);
-  };
-
-  static hotkeyUp = (hotkey: Key) => {
-    const key = KEYS[hotkey];
-    if (typeof key !== "string") {
-      throw new Error("must provide a hotkey, not a key code");
-    }
-    Keyboard.keyUp(key);
-  };
-
   static keyDown = (key: string) => {
     fireEvent.keyDown(document, {
       key,
       ctrlKey,
       shiftKey,
       altKey,
-      keyCode: key.toUpperCase().charCodeAt(0),
-      which: key.toUpperCase().charCodeAt(0),
     });
   };
 
@@ -69,19 +53,35 @@ export class Keyboard {
       ctrlKey,
       shiftKey,
       altKey,
-      keyCode: key.toUpperCase().charCodeAt(0),
-      which: key.toUpperCase().charCodeAt(0),
     });
-  };
-
-  static hotkeyPress = (key: Key) => {
-    Keyboard.hotkeyDown(key);
-    Keyboard.hotkeyUp(key);
   };
 
   static keyPress = (key: string) => {
     Keyboard.keyDown(key);
     Keyboard.keyUp(key);
+  };
+
+  static codeDown = (code: string) => {
+    fireEvent.keyDown(document, {
+      code,
+      ctrlKey,
+      shiftKey,
+      altKey,
+    });
+  };
+
+  static codeUp = (code: string) => {
+    fireEvent.keyUp(document, {
+      code,
+      ctrlKey,
+      shiftKey,
+      altKey,
+    });
+  };
+
+  static codePress = (code: string) => {
+    Keyboard.codeDown(code);
+    Keyboard.codeUp(code);
   };
 }
 
@@ -169,6 +169,12 @@ export class Pointer {
     this.click(element.x, element.y);
     this.reset();
   }
+
+  doubleClickOn(element: ExcalidrawElement) {
+    this.reset();
+    this.doubleClick(element.x, element.y);
+    this.reset();
+  }
 }
 
 const mouse = new Pointer("mouse");
@@ -178,38 +184,78 @@ export class UI {
     fireEvent.click(GlobalTestState.renderResult.getByToolName(toolName));
   };
 
+  /**
+   * Creates an Excalidraw element, and returns a proxy that wraps it so that
+   * accessing props will return the latest ones from the object existing in
+   * the app's elements array. This is because across the app lifecycle we tend
+   * to recreate element objects and the returned reference will become stale.
+   *
+   * If you need to get the actual element, not the proxy, call `get()` method
+   * on the proxy object.
+   */
   static createElement<T extends ToolName>(
     type: T,
     {
-      x = 0,
-      y = 0,
+      position = 0,
+      x = position,
+      y = position,
       size = 10,
       width = size,
       height = width,
     }: {
+      position?: number;
       x?: number;
       y?: number;
       size?: number;
       width?: number;
       height?: number;
-    },
-  ): T extends "arrow" | "line" | "draw"
+    } = {},
+  ): (T extends "arrow" | "line" | "draw"
     ? ExcalidrawLinearElement
     : T extends "text"
     ? ExcalidrawTextElement
-    : ExcalidrawElement {
+    : ExcalidrawElement) & {
+    /** Returns the actual, current element from the elements array, instead
+        of the proxy */
+    get(): T extends "arrow" | "line" | "draw"
+      ? ExcalidrawLinearElement
+      : T extends "text"
+      ? ExcalidrawTextElement
+      : ExcalidrawElement;
+  } {
     UI.clickTool(type);
     mouse.reset();
     mouse.down(x, y);
     mouse.reset();
     mouse.up(x + (width ?? height ?? size), y + (height ?? size));
-    return h.elements[h.elements.length - 1] as any;
+
+    const origElement = h.elements[h.elements.length - 1] as any;
+
+    return new Proxy(
+      {},
+      {
+        get(target, prop) {
+          const currentElement = h.elements.find(
+            (element) => element.id === origElement.id,
+          ) as any;
+          if (prop === "get") {
+            if (currentElement.hasOwnProperty("get")) {
+              throw new Error(
+                "trying to get `get` test property, but ExcalidrawElement seems to define its own",
+              );
+            }
+            return () => currentElement;
+          }
+          return currentElement[prop];
+        },
+      },
+    ) as any;
   }
 
   static group(elements: ExcalidrawElement[]) {
     mouse.select(elements);
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress("g");
+      Keyboard.codePress(CODES.G);
     });
   }
 }

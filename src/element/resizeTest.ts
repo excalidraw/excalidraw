@@ -12,7 +12,7 @@ import {
   TransformHandle,
   MaybeTransformHandleType,
 } from "./transformHandles";
-import { AppState } from "../types";
+import { AppState, Zoom } from "../types";
 
 const isInsideTransformHandle = (
   transformHandle: TransformHandle,
@@ -29,7 +29,7 @@ export const resizeTest = (
   appState: AppState,
   x: number,
   y: number,
-  zoom: number,
+  zoom: Zoom,
   pointerType: PointerType,
 ): MaybeTransformHandleType => {
   if (!appState.selectedElementIds[element.id]) {
@@ -70,7 +70,7 @@ export const getElementWithTransformHandleType = (
   appState: AppState,
   scenePointerX: number,
   scenePointerY: number,
-  zoom: number,
+  zoom: Zoom,
   pointerType: PointerType,
 ) => {
   return elements.reduce((result, element) => {
@@ -93,7 +93,7 @@ export const getTransformHandleTypeFromCoords = (
   [x1, y1, x2, y2]: readonly [number, number, number, number],
   scenePointerX: number,
   scenePointerY: number,
-  zoom: number,
+  zoom: Zoom,
   pointerType: PointerType,
 ): MaybeTransformHandleType => {
   const transformHandles = getTransformHandlesFromCoords(
@@ -172,58 +172,4 @@ export const getCursorForResizingElement = (resizingElement: {
   }
 
   return cursor ? `${cursor}-resize` : "";
-};
-
-export const normalizeTransformHandleType = (
-  element: ExcalidrawElement,
-  transformHandleType: TransformHandleType,
-): TransformHandleType => {
-  if (element.width >= 0 && element.height >= 0) {
-    return transformHandleType;
-  }
-
-  if (element.width < 0 && element.height < 0) {
-    switch (transformHandleType) {
-      case "nw":
-        return "se";
-      case "ne":
-        return "sw";
-      case "se":
-        return "nw";
-      case "sw":
-        return "ne";
-    }
-  } else if (element.width < 0) {
-    switch (transformHandleType) {
-      case "nw":
-        return "ne";
-      case "ne":
-        return "nw";
-      case "se":
-        return "sw";
-      case "sw":
-        return "se";
-      case "e":
-        return "w";
-      case "w":
-        return "e";
-    }
-  } else {
-    switch (transformHandleType) {
-      case "nw":
-        return "sw";
-      case "ne":
-        return "se";
-      case "se":
-        return "ne";
-      case "sw":
-        return "nw";
-      case "n":
-        return "s";
-      case "s":
-        return "n";
-    }
-  }
-
-  return transformHandleType;
 };

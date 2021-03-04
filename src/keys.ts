@@ -1,40 +1,75 @@
 export const isDarwin = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform);
+export const isWindows = /^Win/.test(window.navigator.platform);
+
+export const CODES = {
+  EQUAL: "Equal",
+  MINUS: "Minus",
+  NUM_ADD: "NumpadAdd",
+  NUM_SUBTRACT: "NumpadSubtract",
+  NUM_ZERO: "Numpad0",
+  BRACKET_RIGHT: "BracketRight",
+  BRACKET_LEFT: "BracketLeft",
+  ONE: "Digit1",
+  TWO: "Digit2",
+  NINE: "Digit9",
+  QUOTE: "Quote",
+  ZERO: "Digit0",
+  C: "KeyC",
+  G: "KeyG",
+  F: "KeyF",
+  H: "KeyH",
+  V: "KeyV",
+  X: "KeyX",
+  Z: "KeyZ",
+  R: "KeyR",
+} as const;
 
 export const KEYS = {
+  ARROW_DOWN: "ArrowDown",
   ARROW_LEFT: "ArrowLeft",
   ARROW_RIGHT: "ArrowRight",
-  ARROW_DOWN: "ArrowDown",
   ARROW_UP: "ArrowUp",
+  BACKSPACE: "Backspace",
+  ALT: "Alt",
+  CTRL_OR_CMD: isDarwin ? "metaKey" : "ctrlKey",
+  DELETE: "Delete",
   ENTER: "Enter",
   ESCAPE: "Escape",
-  DELETE: "Delete",
-  BACKSPACE: "Backspace",
-  CTRL_OR_CMD: isDarwin ? "metaKey" : "ctrlKey",
-  TAB: "Tab",
-  SPACE: " ",
   QUESTION_MARK: "?",
-  F_KEY_CODE: 70,
-  ALT_KEY_CODE: 18,
-  Z_KEY_CODE: 90,
-  GRID_KEY_CODE: 222,
-  G_KEY_CODE: 71,
-  C_KEY_CODE: 67,
-  V_KEY_CODE: 86,
+  SPACE: " ",
+  TAB: "Tab",
+
+  A: "a",
+  D: "d",
+  E: "e",
+  L: "l",
+  O: "o",
+  P: "p",
+  Q: "q",
+  R: "r",
+  S: "s",
+  T: "t",
+  V: "v",
+  X: "x",
+  Y: "y",
+  Z: "z",
 } as const;
 
 export type Key = keyof typeof KEYS;
 
-export const isArrowKey = (keyCode: string) =>
-  keyCode === KEYS.ARROW_LEFT ||
-  keyCode === KEYS.ARROW_RIGHT ||
-  keyCode === KEYS.ARROW_DOWN ||
-  keyCode === KEYS.ARROW_UP;
+export const isArrowKey = (key: string) =>
+  key === KEYS.ARROW_LEFT ||
+  key === KEYS.ARROW_RIGHT ||
+  key === KEYS.ARROW_DOWN ||
+  key === KEYS.ARROW_UP;
 
 export const getResizeCenterPointKey = (event: MouseEvent | KeyboardEvent) =>
-  event.altKey || event.which === KEYS.ALT_KEY_CODE;
+  event.altKey;
 
-export const getResizeWithSidesSameLengthKey = (event: MouseEvent) =>
-  event.shiftKey;
+export const getResizeWithSidesSameLengthKey = (
+  event: MouseEvent | KeyboardEvent,
+) => event.shiftKey;
 
-export const getRotateWithDiscreteAngleKey = (event: MouseEvent) =>
-  event.shiftKey;
+export const getRotateWithDiscreteAngleKey = (
+  event: MouseEvent | KeyboardEvent,
+) => event.shiftKey;

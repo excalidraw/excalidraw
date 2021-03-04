@@ -18,7 +18,7 @@ import { isBindingElement } from "../element/typeChecks";
 
 export const actionFinalize = register({
   name: "finalize",
-  perform: (elements, appState) => {
+  perform: (elements, appState, _, { canvas }) => {
     if (appState.editingLinearElement) {
       const {
         elementId,
@@ -83,7 +83,7 @@ export const actionFinalize = register({
       // If the multi point line closes the loop,
       // set the last point to first point.
       // This ensures that loop remains closed at different scales.
-      const isLoop = isPathALoop(multiPointElement.points);
+      const isLoop = isPathALoop(multiPointElement.points, appState.zoom.value);
       if (
         multiPointElement.type === "line" ||
         multiPointElement.type === "draw"
@@ -92,8 +92,8 @@ export const actionFinalize = register({
           const linePoints = multiPointElement.points;
           const firstPoint = linePoints[0];
           mutateElement(multiPointElement, {
-            points: linePoints.map((point, i) =>
-              i === linePoints.length - 1
+            points: linePoints.map((point, index) =>
+              index === linePoints.length - 1
                 ? ([firstPoint[0], firstPoint[1]] as const)
                 : point,
             ),
@@ -118,19 +118,23 @@ export const actionFinalize = register({
         );
       }
 
-      if (!appState.elementLocked) {
+      if (!appState.elementLocked && appState.elementType !== "draw") {
         appState.selectedElementIds[multiPointElement.id] = true;
       }
     }
-    if (!appState.elementLocked || !multiPointElement) {
-      resetCursor();
+    if (
+      (!appState.elementLocked && appState.elementType !== "draw") ||
+      !multiPointElement
+    ) {
+      resetCursor(canvas);
     }
     return {
       elements: newElements,
       appState: {
         ...appState,
         elementType:
-          appState.elementLocked && multiPointElement
+          (appState.elementLocked || appState.elementType === "draw") &&
+          multiPointElement
             ? appState.elementType
             : "selection",
         draggingElement: null,
@@ -139,7 +143,9 @@ export const actionFinalize = register({
         startBoundElement: null,
         suggestedBindings: [],
         selectedElementIds:
-          multiPointElement && !appState.elementLocked
+          multiPointElement &&
+          !appState.elementLocked &&
+          appState.elementType !== "draw"
             ? {
                 ...appState.selectedElementIds,
                 [multiPointElement.id]: true,

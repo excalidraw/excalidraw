@@ -44,7 +44,7 @@ export const hitTest = (
   y: number,
 ): boolean => {
   // How many pixels off the shape boundary we still consider a hit
-  const threshold = 10 / appState.zoom;
+  const threshold = 10 / appState.zoom.value;
   const point: Point = [x, y];
 
   if (isElementSelected(appState, element)) {
@@ -60,7 +60,7 @@ export const isHittingElementBoundingBoxWithoutHittingElement = (
   x: number,
   y: number,
 ): boolean => {
-  const threshold = 10 / appState.zoom;
+  const threshold = 10 / appState.zoom.value;
 
   return (
     !isHittingElementNotConsideringBoundingBox(element, appState, [x, y]) &&
@@ -73,7 +73,7 @@ const isHittingElementNotConsideringBoundingBox = (
   appState: AppState,
   point: Point,
 ): boolean => {
-  const threshold = 10 / appState.zoom;
+  const threshold = 10 / appState.zoom.value;
 
   const check =
     element.type === "text"
@@ -133,7 +133,7 @@ export const maxBindingGap = (
   const shapeRatio = element.type === "diamond" ? 1 / Math.sqrt(2) : 1;
   const smallerDimension = shapeRatio * Math.min(elementWidth, elementHeight);
   // We make the bindable boundary bigger for bigger elements
-  return Math.max(15, Math.min(0.25 * smallerDimension, 80));
+  return Math.max(16, Math.min(0.25 * smallerDimension, 32));
 };
 
 type HitTestArgs = {
@@ -199,11 +199,10 @@ const distanceToRectangle = (
   point: Point,
 ): number => {
   const [, pointRel, hwidth, hheight] = pointRelativeToElement(element, point);
-  const nearSide =
-    GAPoint.distanceToLine(pointRel, GALine.vector(hwidth, hheight)) > 0
-      ? GALine.equation(0, 1, -hheight)
-      : GALine.equation(1, 0, -hwidth);
-  return GAPoint.distanceToLine(pointRel, nearSide);
+  return Math.max(
+    GAPoint.distanceToLine(pointRel, GALine.equation(0, 1, -hheight)),
+    GAPoint.distanceToLine(pointRel, GALine.equation(1, 0, -hwidth)),
+  );
 };
 
 const distanceToDiamond = (

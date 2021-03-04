@@ -8,6 +8,7 @@ import {
   FontFamily,
   GroupId,
   VerticalAlign,
+  Arrowhead,
 } from "../element/types";
 import { measureText, getFontString } from "../utils";
 import { randomInteger, randomId } from "../random";
@@ -82,7 +83,7 @@ export const newElement = (
   _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
 
 /** computes element x/y offset based on textAlign/verticalAlign */
-function getTextElementPositionOffsets(
+const getTextElementPositionOffsets = (
   opts: {
     textAlign: ExcalidrawTextElement["textAlign"];
     verticalAlign: ExcalidrawTextElement["verticalAlign"];
@@ -91,7 +92,7 @@ function getTextElementPositionOffsets(
     width: number;
     height: number;
   },
-) {
+) => {
   return {
     x:
       opts.textAlign === "center"
@@ -101,7 +102,7 @@ function getTextElementPositionOffsets(
         : 0,
     y: opts.verticalAlign === "middle" ? metrics.height / 2 : 0,
   };
-}
+};
 
 export const newTextElement = (
   opts: {
@@ -148,10 +149,10 @@ const getAdjustedDimensions = (
     height: nextHeight,
     baseline: nextBaseline,
   } = measureText(nextText, getFontString(element));
-
   const { textAlign, verticalAlign } = element;
 
-  let x, y;
+  let x: number;
+  let y: number;
 
   if (textAlign === "center" && verticalAlign === "middle") {
     const prevMetrics = measureText(element.text, getFontString(element));
@@ -214,19 +215,24 @@ export const updateTextElement = (
 export const newLinearElement = (
   opts: {
     type: ExcalidrawLinearElement["type"];
+    startArrowhead: Arrowhead | null;
+    endArrowhead: Arrowhead | null;
+    points?: ExcalidrawLinearElement["points"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawLinearElement> => {
   return {
     ..._newElementBase<ExcalidrawLinearElement>(opts.type, opts),
-    points: [],
+    points: opts.points || [],
     lastCommittedPoint: null,
     startBinding: null,
     endBinding: null,
+    startArrowhead: opts.startArrowhead,
+    endArrowhead: opts.endArrowhead,
   };
 };
 
 // Simplified deep clone for the purpose of cloning ExcalidrawElement only
-//  (doesn't clone Date, RegExp, Map, Set, Typed arrays etc.)
+// (doesn't clone Date, RegExp, Map, Set, Typed arrays etc.)
 //
 // Adapted from https://github.com/lukeed/klona
 export const deepCopyElement = (val: any, depth: number = 0) => {
@@ -284,7 +290,7 @@ export const duplicateElement = <TElement extends Mutable<ExcalidrawElement>>(
   overrides?: Partial<TElement>,
 ): TElement => {
   let copy: TElement = deepCopyElement(element);
-  copy.id = randomId();
+  copy.id = process.env.NODE_ENV === "test" ? `${copy.id}_copy` : randomId();
   copy.seed = randomInteger();
   copy.groupIds = getNewGroupIdsForDuplication(
     copy.groupIds,

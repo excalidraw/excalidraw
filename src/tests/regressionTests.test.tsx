@@ -1,23 +1,24 @@
-import { reseed } from "../random";
+import { queryAllByText, queryByText } from "@testing-library/react";
 import React from "react";
 import ReactDOM from "react-dom";
+import { copiedStyles } from "../actions/actionStyles";
+import { ShortcutName } from "../actions/shortcuts";
+import { ExcalidrawElement } from "../element/types";
+import { CODES, KEYS } from "../keys";
+import ExcalidrawApp from "../excalidraw-app";
+import { reseed } from "../random";
 import * as Renderer from "../renderer/renderScene";
+import { setDateTimeForTests } from "../utils";
+import { API } from "./helpers/api";
+import { Keyboard, Pointer, UI } from "./helpers/ui";
 import {
-  waitFor,
-  render,
-  screen,
   fireEvent,
   GlobalTestState,
+  render,
+  screen,
+  waitFor,
 } from "./test-utils";
-import App from "../components/App";
-import { setLanguage } from "../i18n";
-import { setDateTimeForTests } from "../utils";
-import { ExcalidrawElement } from "../element/types";
-import { getTransformHandles as _getTransformHandles } from "../element";
-import { queryByText } from "@testing-library/react";
-import { copiedStyles } from "../actions/actionStyles";
-import { UI, Pointer, Keyboard } from "./helpers/ui";
-import { API } from "./helpers/api";
+import { defaultLang } from "../i18n";
 
 const { h } = window;
 
@@ -41,27 +42,6 @@ const clickLabeledElement = (label: string) => {
     throw new Error(`No labeled element found: ${label}`);
   }
   fireEvent.click(element);
-};
-
-type HandlerRectanglesRet = keyof ReturnType<typeof _getTransformHandles>;
-const getTransformHandles = (pointerType: "mouse" | "touch" | "pen") => {
-  const rects = _getTransformHandles(
-    API.getSelectedElement(),
-    h.state.zoom,
-    pointerType,
-  ) as {
-    [T in HandlerRectanglesRet]: [number, number, number, number];
-  };
-
-  const rv: { [K in keyof typeof rects]: [number, number] } = {} as any;
-
-  for (const handlePos in rects) {
-    const [x, y, width, height] = rects[handlePos as keyof typeof rects];
-
-    rv[handlePos as keyof typeof rects] = [x + width / 2, y + height / 2];
-  }
-
-  return rv;
 };
 
 /**
@@ -95,8 +75,7 @@ beforeEach(async () => {
   finger1.reset();
   finger2.reset();
 
-  await setLanguage("en.json");
-  render(<App />);
+  await render(<ExcalidrawApp />);
 });
 
 afterEach(() => {
@@ -129,13 +108,13 @@ describe("regression tests", () => {
     mouse.click(40, -10);
     mouse.click(50, 10);
     mouse.click(30, 10);
-    Keyboard.hotkeyPress("ENTER");
+    Keyboard.keyPress(KEYS.ENTER);
 
     UI.clickTool("line");
     mouse.click(40, -20);
     mouse.click(50, 10);
     mouse.click(30, 10);
-    Keyboard.hotkeyPress("ENTER");
+    Keyboard.keyPress(KEYS.ENTER);
 
     UI.clickTool("draw");
     mouse.down(40, -20);
@@ -171,26 +150,29 @@ describe("regression tests", () => {
     expect(API.getSelectedElement().id).not.toEqual(prevSelectedId);
   });
 
-  for (const [keys, shape] of [
-    ["2r", "rectangle"],
-    ["3d", "diamond"],
-    ["4e", "ellipse"],
-    ["5a", "arrow"],
-    ["6l", "line"],
-    ["7x", "draw"],
-  ] as [string, ExcalidrawElement["type"]][]) {
+  for (const [keys, shape, shouldSelect] of [
+    [`2${KEYS.R}`, "rectangle", true],
+    [`3${KEYS.D}`, "diamond", true],
+    [`4${KEYS.E}`, "ellipse", true],
+    [`5${KEYS.A}`, "arrow", true],
+    [`6${KEYS.L}`, "line", true],
+    [`7${KEYS.X}`, "draw", false],
+  ] as [string, ExcalidrawElement["type"], boolean][]) {
     for (const key of keys) {
-      it(`hotkey ${key} selects ${shape} tool`, () => {
+      it(`key ${key} selects ${shape} tool`, () => {
         Keyboard.keyPress(key);
+
+        expect(h.state.elementType).toBe(shape);
 
         mouse.down(10, 10);
         mouse.up(10, 10);
 
-        expect(API.getSelectedElement().type).toBe(shape);
+        if (shouldSelect) {
+          expect(API.getSelectedElement().type).toBe(shape);
+        }
       });
     }
   }
-
   it("change the properties of a shape", () => {
     UI.clickTool("rectangle");
     mouse.down(10, 10);
@@ -202,66 +184,6 @@ describe("regression tests", () => {
     clickLabeledElement("#5f3dc4");
     expect(API.getSelectedElement().backgroundColor).toBe("#fa5252");
     expect(API.getSelectedElement().strokeColor).toBe("#5f3dc4");
-  });
-
-  it("resize an element, trying every resize handle", () => {
-    UI.clickTool("rectangle");
-    mouse.down(10, 10);
-    mouse.up(10, 10);
-
-    const transformHandles = getTransformHandles("mouse");
-    delete transformHandles.rotation; // exclude rotation handle
-    for (const handlePos in transformHandles) {
-      const [x, y] = transformHandles[
-        handlePos as keyof typeof transformHandles
-      ];
-      const { width: prevWidth, height: prevHeight } = API.getSelectedElement();
-      mouse.restorePosition(x, y);
-      mouse.down();
-      mouse.up(-5, -5);
-
-      const {
-        width: nextWidthNegative,
-        height: nextHeightNegative,
-      } = API.getSelectedElement();
-      expect(
-        prevWidth !== nextWidthNegative || prevHeight !== nextHeightNegative,
-      ).toBeTruthy();
-      checkpoint(`resize handle ${handlePos} (-5, -5)`);
-
-      mouse.down();
-      mouse.up(5, 5);
-
-      const { width, height } = API.getSelectedElement();
-      expect(width).toBe(prevWidth);
-      expect(height).toBe(prevHeight);
-      checkpoint(`unresize handle ${handlePos} (-5, -5)`);
-
-      mouse.restorePosition(x, y);
-      mouse.down();
-      mouse.up(5, 5);
-
-      const {
-        width: nextWidthPositive,
-        height: nextHeightPositive,
-      } = API.getSelectedElement();
-      expect(
-        prevWidth !== nextWidthPositive || prevHeight !== nextHeightPositive,
-      ).toBeTruthy();
-      checkpoint(`resize handle ${handlePos} (+5, +5)`);
-
-      mouse.down();
-      mouse.up(-5, -5);
-
-      const {
-        width: finalWidth,
-        height: finalHeight,
-      } = API.getSelectedElement();
-      expect(finalWidth).toBe(prevWidth);
-      expect(finalHeight).toBe(prevHeight);
-
-      checkpoint(`unresize handle ${handlePos} (+5, +5)`);
-    }
   });
 
   it("click on an element and drag it", () => {
@@ -363,15 +285,15 @@ describe("regression tests", () => {
   });
 
   it("pinch-to-zoom works", () => {
-    expect(h.state.zoom).toBe(1);
+    expect(h.state.zoom.value).toBe(1);
     finger1.down(50, 50);
     finger2.down(60, 50);
     finger1.move(-10, 0);
-    expect(h.state.zoom).toBeGreaterThan(1);
-    const zoomed = h.state.zoom;
+    expect(h.state.zoom.value).toBeGreaterThan(1);
+    const zoomed = h.state.zoom.value;
     finger1.move(5, 0);
     finger2.move(-5, 0);
-    expect(h.state.zoom).toBeLessThan(zoomed);
+    expect(h.state.zoom.value).toBeLessThan(zoomed);
   });
 
   it("two-finger scroll works", () => {
@@ -396,10 +318,10 @@ describe("regression tests", () => {
 
   it("spacebar + drag scrolls the canvas", () => {
     const { scrollX: startScrollX, scrollY: startScrollY } = h.state;
-    Keyboard.hotkeyDown("SPACE");
+    Keyboard.keyDown(KEYS.SPACE);
     mouse.down(50, 50);
     mouse.up(60, 60);
-    Keyboard.hotkeyUp("SPACE");
+    Keyboard.keyUp(KEYS.SPACE);
     const { scrollX, scrollY } = h.state;
     expect(scrollX).not.toEqual(startScrollX);
     expect(scrollY).not.toEqual(startScrollY);
@@ -409,12 +331,12 @@ describe("regression tests", () => {
     UI.clickTool("rectangle");
     mouse.down(10, 10);
     mouse.up(10, 10);
-    Keyboard.hotkeyPress("ARROW_LEFT");
-    Keyboard.hotkeyPress("ARROW_LEFT");
-    Keyboard.hotkeyPress("ARROW_RIGHT");
-    Keyboard.hotkeyPress("ARROW_UP");
-    Keyboard.hotkeyPress("ARROW_UP");
-    Keyboard.hotkeyPress("ARROW_DOWN");
+    Keyboard.keyPress(KEYS.ARROW_LEFT);
+    Keyboard.keyPress(KEYS.ARROW_LEFT);
+    Keyboard.keyPress(KEYS.ARROW_RIGHT);
+    Keyboard.keyPress(KEYS.ARROW_UP);
+    Keyboard.keyPress(KEYS.ARROW_UP);
+    Keyboard.keyPress(KEYS.ARROW_DOWN);
     expect(h.elements[0].x).toBe(9);
     expect(h.elements[0].y).toBe(9);
   });
@@ -432,29 +354,26 @@ describe("regression tests", () => {
     mouse.click(60, -10);
     mouse.click(60, 10);
     mouse.click(40, 10);
-    Keyboard.hotkeyPress("ENTER");
+    Keyboard.keyPress(KEYS.ENTER);
 
     expect(h.elements.filter((element) => !element.isDeleted).length).toBe(3);
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress("z");
-      Keyboard.keyPress("z");
+      Keyboard.keyPress(KEYS.Z);
+      Keyboard.keyPress(KEYS.Z);
     });
     expect(h.elements.filter((element) => !element.isDeleted).length).toBe(2);
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress("z");
+      Keyboard.keyPress(KEYS.Z);
     });
     expect(h.elements.filter((element) => !element.isDeleted).length).toBe(1);
     Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
-      Keyboard.keyPress("z");
+      Keyboard.keyPress(KEYS.Z);
     });
     expect(h.elements.filter((element) => !element.isDeleted).length).toBe(2);
   });
 
   it("noop interaction after undo shouldn't create history entry", () => {
-    // NOTE: this will fail if this test case is run in isolation. There's
-    //  some leaking state or race conditions in initialization/teardown
-    //  (couldn't figure out)
-    expect(API.getStateHistory().length).toBe(0);
+    expect(API.getStateHistory().length).toBe(1);
 
     UI.clickTool("rectangle");
     mouse.down(10, 10);
@@ -468,65 +387,65 @@ describe("regression tests", () => {
 
     const secondElementEndPoint = mouse.getPosition();
 
-    expect(API.getStateHistory().length).toBe(2);
+    expect(API.getStateHistory().length).toBe(3);
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress("z");
+      Keyboard.keyPress(KEYS.Z);
     });
 
-    expect(API.getStateHistory().length).toBe(1);
+    expect(API.getStateHistory().length).toBe(2);
 
     // clicking an element shouldn't add to history
     mouse.restorePosition(...firstElementEndPoint);
     mouse.click();
-    expect(API.getStateHistory().length).toBe(1);
+    expect(API.getStateHistory().length).toBe(2);
 
     Keyboard.withModifierKeys({ shift: true, ctrl: true }, () => {
-      Keyboard.keyPress("z");
+      Keyboard.keyPress(KEYS.Z);
     });
 
-    expect(API.getStateHistory().length).toBe(2);
+    expect(API.getStateHistory().length).toBe(3);
 
     // clicking an element shouldn't add to history
     mouse.click();
-    expect(API.getStateHistory().length).toBe(2);
+    expect(API.getStateHistory().length).toBe(3);
 
     const firstSelectedElementId = API.getSelectedElement().id;
 
     // same for clicking the element just redo-ed
     mouse.restorePosition(...secondElementEndPoint);
     mouse.click();
-    expect(API.getStateHistory().length).toBe(2);
+    expect(API.getStateHistory().length).toBe(3);
 
     expect(API.getSelectedElement().id).not.toEqual(firstSelectedElementId);
   });
 
   it("zoom hotkeys", () => {
-    expect(h.state.zoom).toBe(1);
-    fireEvent.keyDown(document, { code: "Equal", ctrlKey: true });
-    fireEvent.keyUp(document, { code: "Equal", ctrlKey: true });
-    expect(h.state.zoom).toBeGreaterThan(1);
-    fireEvent.keyDown(document, { code: "Minus", ctrlKey: true });
-    fireEvent.keyUp(document, { code: "Minus", ctrlKey: true });
-    expect(h.state.zoom).toBe(1);
+    expect(h.state.zoom.value).toBe(1);
+    fireEvent.keyDown(document, { code: CODES.EQUAL, ctrlKey: true });
+    fireEvent.keyUp(document, { code: CODES.EQUAL, ctrlKey: true });
+    expect(h.state.zoom.value).toBeGreaterThan(1);
+    fireEvent.keyDown(document, { code: CODES.MINUS, ctrlKey: true });
+    fireEvent.keyUp(document, { code: CODES.MINUS, ctrlKey: true });
+    expect(h.state.zoom.value).toBe(1);
   });
 
   it("rerenders UI on language change", async () => {
     // select rectangle tool to show properties menu
     UI.clickTool("rectangle");
-    // english lang should display `hachure` label
-    expect(screen.queryByText(/hachure/i)).not.toBeNull();
+    // english lang should display `thin` label
+    expect(screen.queryByTitle(/thin/i)).not.toBeNull();
     fireEvent.change(document.querySelector(".dropdown-select__language")!, {
       target: { value: "de-DE" },
     });
-    // switching to german, `hachure` label should no longer exist
-    await waitFor(() => expect(screen.queryByText(/hachure/i)).toBeNull());
+    // switching to german, `thin` label should no longer exist
+    await waitFor(() => expect(screen.queryByTitle(/thin/i)).toBeNull());
     // reset language
     fireEvent.change(document.querySelector(".dropdown-select__language")!, {
-      target: { value: "en" },
+      target: { value: defaultLang.code },
     });
     // switching back to English
-    await waitFor(() => expect(screen.queryByText(/hachure/i)).not.toBeNull());
+    await waitFor(() => expect(screen.queryByTitle(/thin/i)).not.toBeNull());
   });
 
   it("make a group and duplicate it", () => {
@@ -555,7 +474,7 @@ describe("regression tests", () => {
     }
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress("g");
+      Keyboard.codePress(CODES.G);
     });
 
     for (const element of h.elements) {
@@ -593,8 +512,8 @@ describe("regression tests", () => {
     mouse.up(10, 10);
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress("a");
-      Keyboard.keyPress("g");
+      Keyboard.keyPress(KEYS.A);
+      Keyboard.codePress(CODES.G);
     });
 
     expect(API.getSelectedElements().length).toBe(3);
@@ -631,7 +550,7 @@ describe("regression tests", () => {
       mouse.click();
     });
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress("g");
+      Keyboard.codePress(CODES.G);
     });
 
     expect(h.elements.map((element) => element.id)).toEqual([
@@ -642,64 +561,46 @@ describe("regression tests", () => {
   });
 
   it("supports nested groups", () => {
-    const positions: number[][] = [];
-
-    UI.clickTool("rectangle");
-    mouse.down(10, 10);
-    mouse.up(10, 10);
-    positions.push(mouse.getPosition());
-
-    UI.clickTool("rectangle");
-    mouse.down(10, -10);
-    mouse.up(10, 10);
-    positions.push(mouse.getPosition());
-
-    UI.clickTool("rectangle");
-    mouse.down(10, -10);
-    mouse.up(10, 10);
-    positions.push(mouse.getPosition());
+    const rectA = UI.createElement("rectangle", { position: 0, size: 50 });
+    const rectB = UI.createElement("rectangle", { position: 100, size: 50 });
+    const rectC = UI.createElement("rectangle", { position: 200, size: 50 });
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress("a");
-      Keyboard.keyPress("g");
+      Keyboard.keyPress(KEYS.A);
+      Keyboard.codePress(CODES.G);
     });
 
-    mouse.doubleClick();
+    mouse.doubleClickOn(rectC);
     Keyboard.withModifierKeys({ shift: true }, () => {
-      mouse.restorePosition(...positions[0]);
-      mouse.click();
+      mouse.clickOn(rectA);
     });
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress("g");
+      Keyboard.codePress(CODES.G);
     });
 
-    const groupIds = h.elements[2].groupIds;
-    expect(groupIds.length).toBe(2);
-    expect(h.elements[1].groupIds).toEqual(groupIds);
-    expect(h.elements[0].groupIds).toEqual(groupIds.slice(1));
+    expect(rectC.groupIds.length).toBe(2);
+    expect(rectA.groupIds).toEqual(rectC.groupIds);
+    expect(rectB.groupIds).toEqual(rectA.groupIds.slice(1));
 
-    mouse.click(50, 50);
+    mouse.click(0, 100);
     expect(API.getSelectedElements().length).toBe(0);
-    mouse.restorePosition(...positions[0]);
-    mouse.click();
+
+    mouse.clickOn(rectA);
     expect(API.getSelectedElements().length).toBe(3);
     expect(h.state.editingGroupId).toBe(null);
 
-    mouse.doubleClick();
+    mouse.doubleClickOn(rectA);
     expect(API.getSelectedElements().length).toBe(2);
-    expect(h.state.editingGroupId).toBe(groupIds[1]);
+    expect(h.state.editingGroupId).toBe(rectA.groupIds[1]);
 
-    mouse.doubleClick();
+    mouse.doubleClickOn(rectA);
     expect(API.getSelectedElements().length).toBe(1);
-    expect(h.state.editingGroupId).toBe(groupIds[0]);
+    expect(h.state.editingGroupId).toBe(rectA.groupIds[0]);
 
-    // click out of the group
-    mouse.restorePosition(...positions[1]);
-    mouse.click();
-    expect(API.getSelectedElements().length).toBe(0);
-    mouse.click();
+    // click outside current (sub)group
+    mouse.clickOn(rectB);
     expect(API.getSelectedElements().length).toBe(3);
-    mouse.doubleClick();
+    mouse.doubleClickOn(rectB);
     expect(API.getSelectedElements().length).toBe(1);
   });
 
@@ -717,12 +618,22 @@ describe("regression tests", () => {
       clientY: 1,
     });
     const contextMenu = document.querySelector(".context-menu");
-    const options = contextMenu?.querySelectorAll(".context-menu-option");
-    const expectedOptions = ["Select all", "Toggle grid mode"];
+    const contextMenuOptions = document.querySelectorAll(".context-menu li");
+    const expectedShortcutNames: ShortcutName[] = [
+      "selectAll",
+      "gridMode",
+      "zenMode",
+      "viewMode",
+      "stats",
+    ];
 
     expect(contextMenu).not.toBeNull();
-    expect(options?.length).toBe(2);
-    expect(options?.item(0).textContent).toBe(expectedOptions[0]);
+    expect(contextMenuOptions.length).toBe(expectedShortcutNames.length);
+    expectedShortcutNames.forEach((shortcutName) => {
+      expect(
+        contextMenu?.querySelector(`li[data-testid="${shortcutName}"]`),
+      ).not.toBeNull();
+    });
   });
 
   it("shows context menu for element", () => {
@@ -736,23 +647,25 @@ describe("regression tests", () => {
       clientY: 1,
     });
     const contextMenu = document.querySelector(".context-menu");
-    const options = contextMenu?.querySelectorAll(".context-menu-option");
-    const expectedOptions = [
-      "Copy styles",
-      "Paste styles",
-      "Delete",
-      "Add to library",
-      "Send backward",
-      "Bring forward",
-      "Send to back",
-      "Bring to front",
-      "Duplicate",
+    const contextMenuOptions = document.querySelectorAll(".context-menu li");
+    const expectedShortcutNames: ShortcutName[] = [
+      "copyStyles",
+      "pasteStyles",
+      "deleteSelectedElements",
+      "addToLibrary",
+      "sendBackward",
+      "bringForward",
+      "sendToBack",
+      "bringToFront",
+      "duplicateSelection",
     ];
 
     expect(contextMenu).not.toBeNull();
-    expect(contextMenu?.children.length).toBe(9);
-    options?.forEach((opt, i) => {
-      expect(opt.textContent).toBe(expectedOptions[i]);
+    expect(contextMenuOptions.length).toBe(expectedShortcutNames.length);
+    expectedShortcutNames.forEach((shortcutName) => {
+      expect(
+        contextMenu?.querySelector(`li[data-testid="${shortcutName}"]`),
+      ).not.toBeNull();
     });
   });
 
@@ -778,24 +691,26 @@ describe("regression tests", () => {
     });
 
     const contextMenu = document.querySelector(".context-menu");
-    const options = contextMenu?.querySelectorAll(".context-menu-option");
-    const expectedOptions = [
-      "Copy styles",
-      "Paste styles",
-      "Delete",
-      "Group selection",
-      "Add to library",
-      "Send backward",
-      "Bring forward",
-      "Send to back",
-      "Bring to front",
-      "Duplicate",
+    const contextMenuOptions = document.querySelectorAll(".context-menu li");
+    const expectedShortcutNames: ShortcutName[] = [
+      "copyStyles",
+      "pasteStyles",
+      "deleteSelectedElements",
+      "group",
+      "addToLibrary",
+      "sendBackward",
+      "bringForward",
+      "sendToBack",
+      "bringToFront",
+      "duplicateSelection",
     ];
 
     expect(contextMenu).not.toBeNull();
-    expect(contextMenu?.children.length).toBe(10);
-    options?.forEach((opt, i) => {
-      expect(opt.textContent).toBe(expectedOptions[i]);
+    expect(contextMenuOptions.length).toBe(expectedShortcutNames.length);
+    expectedShortcutNames.forEach((shortcutName) => {
+      expect(
+        contextMenu?.querySelector(`li[data-testid="${shortcutName}"]`),
+      ).not.toBeNull();
     });
   });
 
@@ -815,7 +730,7 @@ describe("regression tests", () => {
     });
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress("g");
+      Keyboard.codePress(CODES.G);
     });
 
     fireEvent.contextMenu(GlobalTestState.canvas, {
@@ -825,24 +740,26 @@ describe("regression tests", () => {
     });
 
     const contextMenu = document.querySelector(".context-menu");
-    const options = contextMenu?.querySelectorAll(".context-menu-option");
-    const expectedOptions = [
-      "Copy styles",
-      "Paste styles",
-      "Delete",
-      "Ungroup selection",
-      "Add to library",
-      "Send backward",
-      "Bring forward",
-      "Send to back",
-      "Bring to front",
-      "Duplicate",
+    const contextMenuOptions = document.querySelectorAll(".context-menu li");
+    const expectedShortcutNames: ShortcutName[] = [
+      "copyStyles",
+      "pasteStyles",
+      "deleteSelectedElements",
+      "ungroup",
+      "addToLibrary",
+      "sendBackward",
+      "bringForward",
+      "sendToBack",
+      "bringToFront",
+      "duplicateSelection",
     ];
 
     expect(contextMenu).not.toBeNull();
-    expect(contextMenu?.children.length).toBe(10);
-    options?.forEach((opt, i) => {
-      expect(opt.textContent).toBe(expectedOptions[i]);
+    expect(contextMenuOptions.length).toBe(expectedShortcutNames.length);
+    expectedShortcutNames.forEach((shortcutName) => {
+      expect(
+        contextMenu?.querySelector(`li[data-testid="${shortcutName}"]`),
+      ).not.toBeNull();
     });
   });
 
@@ -879,13 +796,13 @@ describe("regression tests", () => {
     clickLabeledElement("Background");
     clickLabeledElement("#e64980");
     // Fill style
-    fireEvent.click(screen.getByLabelText("Cross-hatch"));
+    fireEvent.click(screen.getByTitle("Cross-hatch"));
     // Stroke width
-    fireEvent.click(screen.getByLabelText("Bold"));
+    fireEvent.click(screen.getByTitle("Bold"));
     // Stroke style
-    fireEvent.click(screen.getByLabelText("Dotted"));
+    fireEvent.click(screen.getByTitle("Dotted"));
     // Roughness
-    fireEvent.click(screen.getByLabelText("Cartoonist"));
+    fireEvent.click(screen.getByTitle("Cartoonist"));
     // Opacity
     fireEvent.change(screen.getByLabelText("Opacity"), {
       target: { value: "60" },
@@ -935,7 +852,7 @@ describe("regression tests", () => {
       clientY: 1,
     });
     const contextMenu = document.querySelector(".context-menu");
-    fireEvent.click(queryByText(contextMenu as HTMLElement, "Delete")!);
+    fireEvent.click(queryAllByText(contextMenu as HTMLElement, "Delete")[0]);
     expect(API.getSelectedElements()).toHaveLength(0);
     expect(h.elements[0].isDeleted).toBe(true);
   });
@@ -1108,7 +1025,7 @@ describe("regression tests", () => {
     });
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress("g");
+      Keyboard.codePress(CODES.G);
     });
 
     fireEvent.contextMenu(GlobalTestState.canvas, {
@@ -1504,8 +1421,8 @@ describe("regression tests", () => {
     UI.group([rect3, rect4]);
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress("a");
-      Keyboard.keyPress("g");
+      Keyboard.keyPress(KEYS.A);
+      Keyboard.codePress(CODES.G);
     });
 
     const selectedGroupIds_prev = h.state.selectedGroupIds;
@@ -1548,6 +1465,21 @@ describe("regression tests", () => {
     });
     assertSelectedElements(rect3);
   });
+
+  it("should show fill icons when element has non transparent background", () => {
+    UI.clickTool("rectangle");
+    expect(screen.queryByText(/fill/i)).not.toBeNull();
+    mouse.down();
+    mouse.up(10, 10);
+    expect(screen.queryByText(/fill/i)).toBeNull();
+
+    clickLabeledElement("Background");
+    clickLabeledElement("#fa5252");
+    // select rectangle
+    mouse.reset();
+    mouse.click();
+    expect(screen.queryByText(/fill/i)).not.toBeNull();
+  });
 });
 
 it(
@@ -1571,7 +1503,7 @@ it(
     expect(API.getSelectedElements().length).toBe(3);
 
     // clicking on first rectangle that is part of the group should select
-    //  that group (exclusively)
+    // that group (exclusively)
     mouse.clickOn(rect1);
     expect(API.getSelectedElements().length).toBe(2);
     expect(Object.keys(h.state.selectedGroupIds).length).toBe(1);
@@ -1596,8 +1528,7 @@ it(
     mouse.up(100, 100);
 
     // Select first rectangle while keeping third one selected.
-    // Third rectangle is selected because it was the last element
-    //  to be created.
+    // Third rectangle is selected because it was the last element to be created.
     mouse.reset();
     Keyboard.withModifierKeys({ shift: true }, () => {
       mouse.click();
@@ -1605,7 +1536,7 @@ it(
 
     // Create group with first and third rectangle
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress("g");
+      Keyboard.codePress(CODES.G);
     });
 
     expect(API.getSelectedElements().length).toBe(2);
@@ -1618,8 +1549,7 @@ it(
     });
     expect(API.getSelectedElements().length).toBe(3);
 
-    // pointer down o first rectangle that is
-    // part of the group
+    // Pointer down o first rectangle that is part of the group
     mouse.reset();
     Keyboard.withModifierKeys({ shift: true }, () => {
       mouse.down();

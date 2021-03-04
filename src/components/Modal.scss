@@ -1,84 +1,97 @@
-@import "../css/_variables";
+@import "../css/variables.module";
 
-.Modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: auto;
-  padding: calc(var(--space-factor) * 10);
-}
-
-.Modal__background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1;
-  background-color: transparentize($oc-black, 0.7);
-  backdrop-filter: blur(2px);
-}
-
-.Modal__content {
-  position: relative;
-  z-index: 2;
-  width: 100%;
-  max-width: var(--max-width);
-
-  opacity: 0;
-  transform: translateY(10px);
-  animation: Modal__content_fade-in 0.1s ease-out 0.05s forwards;
-  position: relative;
-
-  // for modals, reset blurry bg
-  background: var(--bg-color-island);
-  backdrop-filter: none;
-
-  @media #{$media-query} {
-    max-width: 100%;
+.excalidraw {
+  &.excalidraw-modal-container {
+    position: absolute;
+    z-index: 10;
   }
-}
 
-@keyframes Modal__content_fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-.Modal__close {
-  width: calc(var(--space-factor) * 7);
-  height: calc(var(--space-factor) * 7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  svg {
-    height: calc(var(--space-factor) * 5);
-  }
-}
-.Modal__close--floating {
-  position: absolute;
-  right: calc(var(--space-factor) * 5);
-  top: calc(var(--space-factor) * 5);
-}
-
-@media #{$media-query} {
   .Modal {
-    padding: 0;
-  }
-  .Modal__content {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: auto;
+    padding: calc(var(--space-factor) * 10);
+  }
+
+  .Modal__background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    background-color: transparentize($oc-black, 0.7);
+    backdrop-filter: blur(2px);
+  }
+
+  .Modal__content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: var(--max-width);
+    max-height: 100%;
+
+    opacity: 0;
+    transform: translateY(10px);
+    animation: Modal__content_fade-in 0.1s ease-out 0.05s forwards;
+    position: relative;
+    overflow-y: auto;
+
+    // for modals, reset blurry bg
+    background: var(--island-bg-color);
+    backdrop-filter: none;
+
+    border: 1px solid var(--dialog-border-color);
+    box-shadow: 0 2px 10px transparentize($oc-black, 0.75);
+    border-radius: 6px;
+
+    @media #{$is-mobile-query} {
+      max-width: 100%;
+      border: 0;
+      border-radius: 0;
+    }
+  }
+
+  @keyframes Modal__content_fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .Modal__close {
+    width: calc(var(--space-factor) * 7);
+    height: calc(var(--space-factor) * 7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+      height: calc(var(--space-factor) * 5);
+    }
+  }
+
+  @media #{$is-mobile-query} {
+    .Modal {
+      padding: 0;
+    }
+
+    .Modal__content {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
   }
 }

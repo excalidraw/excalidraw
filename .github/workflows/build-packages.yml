@@ -1,0 +1,29 @@
+name: Build packages
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  packages:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Node.js 14.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+      - name: Install dependencies
+        run: |
+          yarn --frozen-lockfile
+          yarn --cwd src/packages/excalidraw
+          yarn --cwd src/packages/utils
+      - name: Build @excalidraw/excalidraw
+        run: |
+          yarn --cwd src/packages/excalidraw run pack
+      - name: Build @excalidraw/utils
+        run: |
+          yarn --cwd src/packages/utils run pack

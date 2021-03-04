@@ -14,7 +14,7 @@
       "sizes": "256x256"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
   "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#ffffff",
@@ -25,5 +25,6 @@
         "application/vnd.excalidraw+json": [".excalidraw"]
       }
     }
-  ]
+  ],
+  "capture_links": "new_client"
 }

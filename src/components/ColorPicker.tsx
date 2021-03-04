@@ -2,7 +2,7 @@ import React from "react";
 import { Popover } from "./Popover";
 
 import "./ColorPicker.scss";
-import { KEYS } from "../keys";
+import { isArrowKey, KEYS } from "../keys";
 import { t, getLanguage } from "../i18n";
 import { isWritableElement } from "../utils";
 import colors from "../colors";
@@ -59,12 +59,13 @@ const Picker = ({
   const colorInput = React.useRef<HTMLInputElement>();
 
   React.useEffect(() => {
-    // After the component is first mounted
-    // focus on first input
+    // After the component is first mounted focus on first input
     if (activeItem.current) {
       activeItem.current.focus();
     } else if (colorInput.current) {
       colorInput.current.focus();
+    } else if (gallery.current) {
+      gallery.current.focus();
     }
   }, []);
 
@@ -76,18 +77,11 @@ const Picker = ({
           colorInput.current?.focus();
           event.preventDefault();
         }
-      } else {
-        if (activeElement === colorInput.current) {
-          firstItem.current?.focus();
-          event.preventDefault();
-        }
+      } else if (activeElement === colorInput.current) {
+        firstItem.current?.focus();
+        event.preventDefault();
       }
-    } else if (
-      event.key === KEYS.ARROW_RIGHT ||
-      event.key === KEYS.ARROW_LEFT ||
-      event.key === KEYS.ARROW_UP ||
-      event.key === KEYS.ARROW_DOWN
-    ) {
+    } else if (isArrowKey(event.key)) {
       const { activeElement } = document;
       const isRTL = getLanguage().rtl;
       const index = Array.prototype.indexOf.call(
@@ -140,6 +134,7 @@ const Picker = ({
             gallery.current = el;
           }
         }}
+        tabIndex={0}
       >
         {colors.map((_color, i) => (
           <button
@@ -257,11 +252,7 @@ export const ColorPicker = ({
         <button
           className="color-picker-label-swatch"
           aria-label={label}
-          style={
-            color
-              ? ({ "--swatch-color": color } as React.CSSProperties)
-              : undefined
-          }
+          style={color ? { "--swatch-color": color } : undefined}
           onClick={() => setActive(!isActive)}
           ref={pickerButton}
         />

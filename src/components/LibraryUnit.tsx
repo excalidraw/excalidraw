@@ -1,11 +1,13 @@
-import React, { useRef, useEffect, useState } from "react";
-import { exportToSvg } from "../scene/export";
+import clsx from "clsx";
+import oc from "open-color";
+import React, { useEffect, useRef, useState } from "react";
 import { close } from "../components/icons";
-
-import "./LibraryUnit.scss";
+import { MIME_TYPES } from "../constants";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
+import { exportToSvg } from "../scene/export";
 import { LibraryItem } from "../types";
+import "./LibraryUnit.scss";
 
 // fa-plus
 const PLUS_ICON = (
@@ -36,7 +38,7 @@ export const LibraryUnit = ({
     }
     const svg = exportToSvg(elementsToRender, {
       exportBackground: false,
-      viewBackgroundColor: "#fff",
+      viewBackgroundColor: oc.white,
       shouldAddWatermark: false,
     });
     for (const child of ref.current!.children) {
@@ -62,23 +64,23 @@ export const LibraryUnit = ({
 
   return (
     <div
-      className={`library-unit ${
-        elements || pendingElements ? "library-unit__active" : ""
-      }`}
+      className={clsx("library-unit", {
+        "library-unit__active": elements || pendingElements,
+      })}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
-        className={`library-unit__dragger ${
-          !!pendingElements ? "library-unit__pulse" : ""
-        }`}
+        className={clsx("library-unit__dragger", {
+          "library-unit__pulse": !!pendingElements,
+        })}
         ref={ref}
         draggable={!!elements}
         onClick={!!elements || !!pendingElements ? onClick : undefined}
         onDragStart={(event) => {
           setIsHovered(false);
           event.dataTransfer.setData(
-            "application/vnd.excalidrawlib+json",
+            MIME_TYPES.excalidrawlib,
             JSON.stringify(elements),
           );
         }}

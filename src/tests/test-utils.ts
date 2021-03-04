@@ -5,9 +5,14 @@ import {
   queries,
   RenderResult,
   RenderOptions,
+  waitFor,
 } from "@testing-library/react";
 
 import * as toolQueries from "./queries/toolQueries";
+import { ImportedDataState } from "../data/types";
+import { STORAGE_KEYS } from "../excalidraw-app/data/localStorage";
+
+import { SceneData } from "../types";
 
 const customQueries = {
   ...queries,
@@ -16,17 +21,40 @@ const customQueries = {
 
 type TestRenderFn = (
   ui: React.ReactElement,
-  options?: Omit<RenderOptions, "queries">,
-) => RenderResult<typeof customQueries>;
+  options?: Omit<
+    RenderOptions & { localStorageData?: ImportedDataState },
+    "queries"
+  >,
+) => Promise<RenderResult<typeof customQueries>>;
 
-const renderApp: TestRenderFn = (ui, options) => {
+const renderApp: TestRenderFn = async (ui, options) => {
+  if (options?.localStorageData) {
+    initLocalStorage(options.localStorageData);
+    delete options.localStorageData;
+  }
+
   const renderResult = render(ui, {
     queries: customQueries,
     ...options,
   });
 
   GlobalTestState.renderResult = renderResult;
-  GlobalTestState.canvas = renderResult.container.querySelector("canvas")!;
+
+  Object.defineProperty(GlobalTestState, "canvas", {
+    // must be a getter because at the time of ExcalidrawApp render the
+    // child App component isn't likely mounted yet (and thus canvas not
+    // present in DOM)
+    get() {
+      return renderResult.container.querySelector("canvas")!;
+    },
+  });
+
+  await waitFor(() => {
+    const canvas = renderResult.container.querySelector("canvas");
+    if (!canvas) {
+      throw new Error("not initialized yet");
+    }
+  });
 
   return renderResult;
 };
@@ -49,7 +77,28 @@ export class GlobalTestState {
    */
   static renderResult: RenderResult<typeof customQueries> = null!;
   /**
-   * automatically updated on each call to render()
+   * retrieves canvas for currently rendered app instance
    */
-  static canvas: HTMLCanvasElement = null!;
+  static get canvas(): HTMLCanvasElement {
+    return null!;
+  }
 }
+
+const initLocalStorage = (data: ImportedDataState) => {
+  if (data.elements) {
+    localStorage.setItem(
+      STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
+      JSON.stringify(data.elements),
+    );
+  }
+  if (data.appState) {
+    localStorage.setItem(
+      STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
+      JSON.stringify(data.appState),
+    );
+  }
+};
+
+export const updateSceneData = (data: SceneData) => {
+  (window.h.collab as any).excalidrawAPI.updateScene(data);
+};

@@ -6,18 +6,21 @@ import { Line, Direction, Point } from "./ga";
  * vector `(x, y)`.
  */
 
-export function from(point: Point): Point {
-  return [0, 0, 0, 0, point[4], point[5], 0, 0];
-}
+export const from = (point: Point): Point => [
+  0,
+  0,
+  0,
+  0,
+  point[4],
+  point[5],
+  0,
+  0,
+];
 
-export function fromTo(from: Point, to: Point): Direction {
-  return GA.inormalized([0, 0, 0, 0, to[4] - from[4], to[5] - from[5], 0, 0]);
-}
+export const fromTo = (from: Point, to: Point): Direction =>
+  GA.inormalized([0, 0, 0, 0, to[4] - from[4], to[5] - from[5], 0, 0]);
 
-export function orthogonal(direction: Direction): Direction {
-  return GA.inormalized([0, 0, 0, 0, -direction[5], direction[4], 0, 0]);
-}
+export const orthogonal = (direction: Direction): Direction =>
+  GA.inormalized([0, 0, 0, 0, -direction[5], direction[4], 0, 0]);
 
-export function orthogonalToLine(line: Line): Direction {
-  return GA.mul(line, GA.I);
-}
+export const orthogonalToLine = (line: Line): Direction => GA.mul(line, GA.I);

@@ -1,7 +1,16 @@
 import { Point } from "../types";
 import { FONT_FAMILY } from "../constants";
 
+export type ChartType = "bar" | "line";
+export type FillStyle = "hachure" | "cross-hatch" | "solid";
+export type FontFamily = keyof typeof FONT_FAMILY;
+export type FontString = string & { _brand: "fontString" };
 export type GroupId = string;
+export type PointerType = "mouse" | "pen" | "touch";
+export type StrokeSharpness = "round" | "sharp";
+export type StrokeStyle = "solid" | "dashed" | "dotted";
+export type TextAlign = "left" | "center" | "right";
+export type VerticalAlign = "top" | "middle";
 
 type _ExcalidrawElementBase = Readonly<{
   id: string;
@@ -9,20 +18,30 @@ type _ExcalidrawElementBase = Readonly<{
   y: number;
   strokeColor: string;
   backgroundColor: string;
-  fillStyle: string;
+  fillStyle: FillStyle;
   strokeWidth: number;
-  strokeStyle: "solid" | "dashed" | "dotted";
-  strokeSharpness: "round" | "sharp";
+  strokeStyle: StrokeStyle;
+  strokeSharpness: StrokeSharpness;
   roughness: number;
   opacity: number;
   width: number;
   height: number;
   angle: number;
+  /** Random integer used to seed shape generation so that the roughjs shape
+      doesn't differ across renders. */
   seed: number;
+  /** Integer that is sequentially incremented on each change. Used to reconcile
+      elements during collaboration or when saving to server. */
   version: number;
+  /** Random integer that is regenerated on each change.
+      Used for deterministic reconciliation of updates during collaboration,
+      in case the versions (see above) are identical. */
   versionNonce: number;
   isDeleted: boolean;
+  /** List of groups the element belongs to.
+      Ordered from deepest to shallowest. */
   groupIds: readonly GroupId[];
+  /** Ids of (linear) elements that are bound to this element. */
   boundElementIds: readonly ExcalidrawLinearElement["id"][] | null;
 }>;
 
@@ -90,19 +109,15 @@ export type PointBinding = {
   gap: number;
 };
 
+export type Arrowhead = "arrow" | "bar" | "dot";
+
 export type ExcalidrawLinearElement = _ExcalidrawElementBase &
   Readonly<{
-    type: "arrow" | "line" | "draw";
+    type: "line" | "draw" | "arrow";
     points: readonly Point[];
     lastCommittedPoint: Point | null;
     startBinding: PointBinding | null;
     endBinding: PointBinding | null;
+    startArrowhead: Arrowhead | null;
+    endArrowhead: Arrowhead | null;
   }>;
-
-export type PointerType = "mouse" | "pen" | "touch";
-
-export type TextAlign = "left" | "center" | "right";
-export type VerticalAlign = "top" | "middle";
-
-export type FontFamily = keyof typeof FONT_FAMILY;
-export type FontString = string & { _brand: "fontString" };

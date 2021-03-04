@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { render, fireEvent } from "./test-utils";
-import App from "../components/App";
+import ExcalidrawApp from "../excalidraw-app";
 import * as Renderer from "../renderer/renderScene";
 import { KEYS } from "../keys";
 import { ExcalidrawLinearElement } from "../element/types";
@@ -20,8 +20,8 @@ beforeEach(() => {
 const { h } = window;
 
 describe("remove shape in non linear elements", () => {
-  it("rectangle", () => {
-    const { getByToolName, container } = render(<App />);
+  it("rectangle", async () => {
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
     const tool = getByToolName("rectangle");
     fireEvent.click(tool);
@@ -30,12 +30,12 @@ describe("remove shape in non linear elements", () => {
     fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
     fireEvent.pointerUp(canvas, { clientX: 30, clientY: 30 });
 
-    expect(renderScene).toHaveBeenCalledTimes(4);
+    expect(renderScene).toHaveBeenCalledTimes(6);
     expect(h.elements.length).toEqual(0);
   });
 
-  it("ellipse", () => {
-    const { getByToolName, container } = render(<App />);
+  it("ellipse", async () => {
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
     const tool = getByToolName("ellipse");
     fireEvent.click(tool);
@@ -44,12 +44,12 @@ describe("remove shape in non linear elements", () => {
     fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
     fireEvent.pointerUp(canvas, { clientX: 30, clientY: 30 });
 
-    expect(renderScene).toHaveBeenCalledTimes(4);
+    expect(renderScene).toHaveBeenCalledTimes(6);
     expect(h.elements.length).toEqual(0);
   });
 
-  it("diamond", () => {
-    const { getByToolName, container } = render(<App />);
+  it("diamond", async () => {
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
     const tool = getByToolName("diamond");
     fireEvent.click(tool);
@@ -58,14 +58,14 @@ describe("remove shape in non linear elements", () => {
     fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
     fireEvent.pointerUp(canvas, { clientX: 30, clientY: 30 });
 
-    expect(renderScene).toHaveBeenCalledTimes(4);
+    expect(renderScene).toHaveBeenCalledTimes(6);
     expect(h.elements.length).toEqual(0);
   });
 });
 
 describe("multi point mode in linear elements", () => {
-  it("arrow", () => {
-    const { getByToolName, container } = render(<App />);
+  it("arrow", async () => {
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
     const tool = getByToolName("arrow");
     fireEvent.click(tool);
@@ -88,7 +88,7 @@ describe("multi point mode in linear elements", () => {
     fireEvent.pointerUp(canvas);
     fireEvent.keyDown(document, { key: KEYS.ENTER });
 
-    expect(renderScene).toHaveBeenCalledTimes(11);
+    expect(renderScene).toHaveBeenCalledTimes(13);
     expect(h.elements.length).toEqual(1);
 
     const element = h.elements[0] as ExcalidrawLinearElement;
@@ -105,8 +105,8 @@ describe("multi point mode in linear elements", () => {
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
 
-  it("line", () => {
-    const { getByToolName, container } = render(<App />);
+  it("line", async () => {
+    const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
     const tool = getByToolName("line");
     fireEvent.click(tool);
@@ -129,7 +129,7 @@ describe("multi point mode in linear elements", () => {
     fireEvent.pointerUp(canvas);
     fireEvent.keyDown(document, { key: KEYS.ENTER });
 
-    expect(renderScene).toHaveBeenCalledTimes(11);
+    expect(renderScene).toHaveBeenCalledTimes(13);
     expect(h.elements.length).toEqual(1);
 
     const element = h.elements[0] as ExcalidrawLinearElement;

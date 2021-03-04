@@ -1,6 +1,7 @@
-import "./FixedSideContainer.css";
+import "./FixedSideContainer.scss";
 
 import React from "react";
+import clsx from "clsx";
 
 type FixedSideContainerProps = {
   children: React.ReactNode;
@@ -14,7 +15,11 @@ export const FixedSideContainer = ({
   className,
 }: FixedSideContainerProps) => (
   <div
-    className={`FixedSideContainer FixedSideContainer_side_${side} ${className}`}
+    className={clsx(
+      "FixedSideContainer",
+      `FixedSideContainer_side_${side}`,
+      className,
+    )}
   >
     {children}
   </div>

@@ -2,11 +2,11 @@ import { GroupId, ExcalidrawElement, NonDeleted } from "./element/types";
 import { AppState } from "./types";
 import { getSelectedElements } from "./scene";
 
-export function selectGroup(
+export const selectGroup = (
   groupId: GroupId,
   appState: AppState,
   elements: readonly NonDeleted<ExcalidrawElement>[],
-): AppState {
+): AppState => {
   const elementsInGroup = elements.filter((element) =>
     element.groupIds.includes(groupId),
   );
@@ -35,35 +35,38 @@ export function selectGroup(
       ),
     },
   };
-}
+};
 
 /**
  * If the element's group is selected, don't render an individual
  * selection border around it.
  */
-export function isSelectedViaGroup(
+export const isSelectedViaGroup = (
   appState: AppState,
   element: ExcalidrawElement,
-) {
-  return !!element.groupIds
+) => getSelectedGroupForElement(appState, element) != null;
+
+export const getSelectedGroupForElement = (
+  appState: AppState,
+  element: ExcalidrawElement,
+) =>
+  element.groupIds
     .filter((groupId) => groupId !== appState.editingGroupId)
     .find((groupId) => appState.selectedGroupIds[groupId]);
-}
 
-export function getSelectedGroupIds(appState: AppState): GroupId[] {
-  return Object.entries(appState.selectedGroupIds)
+export const getSelectedGroupIds = (appState: AppState): GroupId[] =>
+  Object.entries(appState.selectedGroupIds)
     .filter(([groupId, isSelected]) => isSelected)
     .map(([groupId, isSelected]) => groupId);
-}
 
 /**
  * When you select an element, you often want to actually select the whole group it's in, unless
  * you're currently editing that group.
  */
-export function selectGroupsForSelectedElements(
+export const selectGroupsForSelectedElements = (
   appState: AppState,
   elements: readonly NonDeleted<ExcalidrawElement>[],
-): AppState {
+): AppState => {
   let nextAppState = { ...appState };
 
   const selectedElements = getSelectedElements(elements, appState);
@@ -84,7 +87,7 @@ export function selectGroupsForSelectedElements(
   }
 
   return nextAppState;
-}
+};
 
 export const editGroupForSelectedElement = (
   appState: AppState,
@@ -100,47 +103,42 @@ export const editGroupForSelectedElement = (
   };
 };
 
-export function isElementInGroup(element: ExcalidrawElement, groupId: string) {
-  return element.groupIds.includes(groupId);
-}
+export const isElementInGroup = (element: ExcalidrawElement, groupId: string) =>
+  element.groupIds.includes(groupId);
 
-export function getElementsInGroup(
+export const getElementsInGroup = (
   elements: readonly ExcalidrawElement[],
   groupId: string,
-) {
-  return elements.filter((element) => isElementInGroup(element, groupId));
-}
+) => elements.filter((element) => isElementInGroup(element, groupId));
 
-export function getSelectedGroupIdForElement(
+export const getSelectedGroupIdForElement = (
   element: ExcalidrawElement,
   selectedGroupIds: { [groupId: string]: boolean },
-) {
-  return element.groupIds.find((groupId) => selectedGroupIds[groupId]);
-}
+) => element.groupIds.find((groupId) => selectedGroupIds[groupId]);
 
-export function getNewGroupIdsForDuplication(
+export const getNewGroupIdsForDuplication = (
   groupIds: ExcalidrawElement["groupIds"],
   editingGroupId: AppState["editingGroupId"],
   mapper: (groupId: GroupId) => GroupId,
-) {
+) => {
   const copy = [...groupIds];
   const positionOfEditingGroupId = editingGroupId
     ? groupIds.indexOf(editingGroupId)
     : -1;
   const endIndex =
     positionOfEditingGroupId > -1 ? positionOfEditingGroupId : groupIds.length;
-  for (let i = 0; i < endIndex; i++) {
-    copy[i] = mapper(copy[i]);
+  for (let index = 0; index < endIndex; index++) {
+    copy[index] = mapper(copy[index]);
   }
 
   return copy;
-}
+};
 
-export function addToGroup(
+export const addToGroup = (
   prevGroupIds: ExcalidrawElement["groupIds"],
   newGroupId: GroupId,
   editingGroupId: AppState["editingGroupId"],
-) {
+) => {
   // insert before the editingGroupId, or push to the end.
   const groupIds = [...prevGroupIds];
   const positionOfEditingGroupId = editingGroupId
@@ -150,11 +148,9 @@ export function addToGroup(
     positionOfEditingGroupId > -1 ? positionOfEditingGroupId : groupIds.length;
   groupIds.splice(positionToInsert, 0, newGroupId);
   return groupIds;
-}
+};
 
-export function removeFromSelectedGroups(
+export const removeFromSelectedGroups = (
   groupIds: ExcalidrawElement["groupIds"],
   selectedGroupIds: { [groupId: string]: boolean },
-) {
-  return groupIds.filter((groupId) => !selectedGroupIds[groupId]);
-}
+) => groupIds.filter((groupId) => !selectedGroupIds[groupId]);

@@ -13,12 +13,6 @@
 
     <meta name="theme-color" content="#000" />
 
-    <!-- Origin Trial token for the Native File System API v2 https://developers.chrome.com/origintrials/#/view_trial/4019462667428167681 (Sept. 17) -->
-    <meta
-      http-equiv="origin-trial"
-      content="AvrWnomgCvP/38JBjki43o3fhzZWLBnKD20EQuUw9R09iyDLv3DH3MYfDLVOxNwQYPixxFUYCrXKa8No27rZPg8AAABZeyJvcmlnaW4iOiJodHRwczovL2V4Y2FsaWRyYXcuY29tOjQ0MyIsImZlYXR1cmUiOiJOYXRpdmVGaWxlU3lzdGVtMiIsImV4cGlyeSI6MTYwMDMyNjMyOX0="
-    />
-
     <!-- General tags -->
     <meta
       name="description"
@@ -61,9 +55,12 @@
     <meta name="twitter:image" content="https://excalidraw.com/og-image.png" />
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
 
+    <!-- Excalidraw version -->
+    <meta name="version" content="{version}" />
+
     <link
       rel="preload"
-      href="FG_Virgil.woff2"
+      href="Virgil.woff2"
       as="font"
       type="font/woff2"
       crossorigin="anonymous"
@@ -85,13 +82,17 @@
     <link
       rel="manifest"
       href="manifest.json"
-      style="--pwacompat-splash-font: 24px Virgil;"
+      style="--pwacompat-splash-font: 24px Virgil"
     />
 
-    <% if (process.env.REACT_APP_INCLUDE_GTAG === 'true') { %>
+    <link rel="stylesheet" href="fonts.css" type="text/css" />
+    <script>
+      window.EXCALIDRAW_ASSET_PATH = "/";
+    </script>
+    <% if (process.env.REACT_APP_GOOGLE_ANALYTICS_ID) { %>
     <script
       async
-      src="https://www.googletagmanager.com/gtag/js?id=UA-387204-13"
+      src="https://www.googletagmanager.com/gtag/js?id=%REACT_APP_GOOGLE_ANALYTICS_ID%"
     ></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -99,24 +100,23 @@
         dataLayer.push(arguments);
       }
       gtag("js", new Date());
-      gtag("config", "UA-387204-13");
+      gtag("config", "%REACT_APP_GOOGLE_ANALYTICS_ID%");
     </script>
     <% } %>
 
     <!-- FIXME: remove this when we update CRA (fix SW caching) -->
     <style>
-      /* http://www.eaglefonts.com/fg-virgil-ttf-131249.htm */
-      @font-face {
-        font-family: "Virgil";
-        src: url("/FG_Virgil.woff2");
-        font-display: swap;
-      }
-
-      /* https://github.com/microsoft/cascadia-code */
-      @font-face {
-        font-family: "Cascadia";
-        src: url("/Cascadia.woff2");
-        font-display: swap;
+      body {
+        margin: 0;
+        --ui-font: system-ui, BlinkMacSystemFont, -apple-system, Segoe UI,
+          Roboto, Helvetica, Arial, sans-serif;
+        font-family: var(--ui-font);
+        -webkit-text-size-adjust: 100%;
+        -webkit-user-select: none;
+        user-select: none;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
       }
 
       .visually-hidden {
@@ -152,9 +152,7 @@
   </head>
 
   <body>
-    <noscript>
-      You need to enable JavaScript to run this app.
-    </noscript>
+    <noscript> You need to enable JavaScript to run this app. </noscript>
     <header>
       <h1 class="visually-hidden">Excalidraw</h1>
     </header>

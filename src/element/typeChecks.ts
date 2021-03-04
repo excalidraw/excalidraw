@@ -3,7 +3,20 @@ import {
   ExcalidrawTextElement,
   ExcalidrawLinearElement,
   ExcalidrawBindableElement,
+  ExcalidrawGenericElement,
 } from "./types";
+
+export const isGenericElement = (
+  element: ExcalidrawElement | null,
+): element is ExcalidrawGenericElement => {
+  return (
+    element != null &&
+    (element.type === "selection" ||
+      element.type === "rectangle" ||
+      element.type === "diamond" ||
+      element.type === "ellipse")
+  );
+};
 
 export const isTextElement = (
   element: ExcalidrawElement | null,

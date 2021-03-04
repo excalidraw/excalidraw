@@ -8,15 +8,20 @@ import {
   FontFamily,
   GroupId,
   ExcalidrawBindableElement,
+  Arrowhead,
+  ChartType,
 } from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
-import { SocketUpdateDataSource } from "./data";
 import { LinearElementEditor } from "./element/linearElementEditor";
 import { SuggestedBinding } from "./element/binding";
-import { DataState } from "./data/types";
+import { ImportedDataState } from "./data/types";
+import { ExcalidrawImperativeAPI } from "./components/App";
+import type { ResolvablePromise } from "./utils";
+import { Spreadsheet } from "./charts";
+import { Language } from "./i18n";
+import { UserIdleState } from "./excalidraw-app/collab/types";
 
-export type FlooredNumber = number & { _brand: "FlooredNumber" };
 export type Point = Readonly<RoughPoint>;
 
 export type Collaborator = {
@@ -27,6 +32,11 @@ export type Collaborator = {
   button?: "up" | "down";
   selectedElementIds?: AppState["selectedElementIds"];
   username?: string | null;
+  userState?: UserIdleState;
+  color?: {
+    background: string;
+    stroke: string;
+  };
 };
 
 export type AppState = {
@@ -40,16 +50,18 @@ export type AppState = {
   startBoundElement: NonDeleted<ExcalidrawBindableElement> | null;
   suggestedBindings: SuggestedBinding[];
   // element being edited, but not necessarily added to elements array yet
-  //  (e.g. text element when typing into the input)
+  // (e.g. text element when typing into the input)
   editingElement: NonDeletedExcalidrawElement | null;
   editingLinearElement: LinearElementEditor | null;
   elementType: typeof SHAPES[number]["value"];
   elementLocked: boolean;
   exportBackground: boolean;
+  exportEmbedScene: boolean;
+  exportWithDarkMode: boolean;
   shouldAddWatermark: boolean;
   currentItemStrokeColor: string;
   currentItemBackgroundColor: string;
-  currentItemFillStyle: string;
+  currentItemFillStyle: ExcalidrawElement["fillStyle"];
   currentItemStrokeWidth: number;
   currentItemStrokeStyle: ExcalidrawElement["strokeStyle"];
   currentItemRoughness: number;
@@ -58,30 +70,29 @@ export type AppState = {
   currentItemFontSize: number;
   currentItemTextAlign: TextAlign;
   currentItemStrokeSharpness: ExcalidrawElement["strokeSharpness"];
+  currentItemStartArrowhead: Arrowhead | null;
+  currentItemEndArrowhead: Arrowhead | null;
   currentItemLinearStrokeSharpness: ExcalidrawElement["strokeSharpness"];
   viewBackgroundColor: string;
-  scrollX: FlooredNumber;
-  scrollY: FlooredNumber;
-  cursorX: number;
-  cursorY: number;
+  scrollX: number;
+  scrollY: number;
   cursorButton: "up" | "down";
   scrolledOutside: boolean;
   name: string;
-  username: string;
-  isCollaborating: boolean;
   isResizing: boolean;
   isRotating: boolean;
-  zoom: number;
+  zoom: Zoom;
   openMenu: "canvas" | "shape" | null;
   lastPointerDownWith: PointerType;
   selectedElementIds: { [id: string]: boolean };
   previousSelectedElementIds: { [id: string]: boolean };
-  collaborators: Map<string, Collaborator>;
   shouldCacheIgnoreZoom: boolean;
-  showShortcutsDialog: boolean;
+  showHelpDialog: boolean;
+  toastMessage: string | null;
   zenModeEnabled: boolean;
   appearance: "light" | "dark";
   gridSize: number | null;
+  viewModeEnabled: boolean;
 
   /** top-most selected groups (i.e. does not include nested groups) */
   selectedGroupIds: { [groupId: string]: boolean };
@@ -94,7 +105,30 @@ export type AppState = {
   offsetLeft: number;
 
   isLibraryOpen: boolean;
+  fileHandle: import("browser-fs-access").FileSystemHandle | null;
+  collaborators: Map<string, Collaborator>;
+  showStats: boolean;
+  currentChartType: ChartType;
+  pasteDialog:
+    | {
+        shown: false;
+        data: null;
+      }
+    | {
+        shown: true;
+        data: Spreadsheet;
+      };
 };
+
+export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
+
+export type Zoom = Readonly<{
+  value: NormalizedZoomValue;
+  translation: Readonly<{
+    x: number;
+    y: number;
+  }>;
+}>;
 
 export type PointerCoords = Readonly<{
   x: number;
@@ -113,23 +147,53 @@ export declare class GestureEvent extends UIEvent {
   readonly scale: number;
 }
 
-export type SocketUpdateData = SocketUpdateDataSource[keyof SocketUpdateDataSource] & {
-  _brand: "socketUpdateData";
-};
-
-export type LibraryItem = NonDeleted<ExcalidrawElement>[];
+export type LibraryItem = readonly NonDeleted<ExcalidrawElement>[];
 export type LibraryItems = readonly LibraryItem[];
 
+// NOTE ready/readyPromise props are optional for host apps' sake (our own
+// implem guarantees existence)
+export type ExcalidrawAPIRefValue =
+  | ExcalidrawImperativeAPI
+  | {
+      readyPromise?: ResolvablePromise<ExcalidrawImperativeAPI>;
+      ready?: false;
+    };
+
 export interface ExcalidrawProps {
-  width: number;
-  height: number;
+  width?: number;
+  height?: number;
+  /** if not supplied, calculated by Excalidraw */
+  offsetLeft?: number;
+  /** if not supplied, calculated by Excalidraw */
+  offsetTop?: number;
   onChange?: (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
   ) => void;
-  initialData?: DataState;
-  user?: {
-    name?: string | null;
-  };
-  onUsernameChange?: (username: string) => void;
+  initialData?: ImportedDataState | null | Promise<ImportedDataState | null>;
+  excalidrawRef?: ForwardRef<ExcalidrawAPIRefValue>;
+  onCollabButtonClick?: () => void;
+  isCollaborating?: boolean;
+  onPointerUpdate?: (payload: {
+    pointer: { x: number; y: number };
+    button: "down" | "up";
+    pointersMap: Gesture["pointers"];
+  }) => void;
+  onExportToBackend?: (
+    exportedElements: readonly NonDeletedExcalidrawElement[],
+    appState: AppState,
+    canvas: HTMLCanvasElement | null,
+  ) => void;
+  renderFooter?: (isMobile: boolean) => JSX.Element;
+  langCode?: Language["code"];
+  viewModeEnabled?: boolean;
+  zenModeEnabled?: boolean;
+  gridModeEnabled?: boolean;
 }
+
+export type SceneData = {
+  elements?: ImportedDataState["elements"];
+  appState?: ImportedDataState["appState"];
+  collaborators?: Map<string, Collaborator>;
+  commitToHistory?: boolean;
+};

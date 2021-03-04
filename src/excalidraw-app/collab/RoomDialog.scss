@@ -1,0 +1,77 @@
+@import "../../css/variables.module";
+
+.excalidraw {
+  .RoomDialog-linkContainer {
+    display: flex;
+    margin: 1.5em 0;
+  }
+
+  .RoomDialog-link {
+    color: var(--text-primary-color);
+    min-width: 0;
+    flex: 1 1 auto;
+    margin-inline-start: 1em;
+    display: inline-block;
+    cursor: pointer;
+    border: none;
+    height: 2.5rem;
+    line-height: 2.5rem;
+    padding: 0 0.5rem;
+    white-space: nowrap;
+    border-radius: var(--space-factor);
+    background-color: var(--button-gray-1);
+  }
+
+  .RoomDialog-emoji {
+    font-family: sans-serif;
+  }
+
+  .RoomDialog-usernameContainer {
+    display: flex;
+    margin: 1.5em 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    @media #{$is-mobile-query} {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+
+  @media #{$is-mobile-query} {
+    .RoomDialog-usernameLabel {
+      font-weight: bold;
+    }
+  }
+
+  .RoomDialog-username {
+    background-color: var(--input-bg-color);
+    border-color: var(--input-border-color);
+    appearance: none;
+    min-width: 0;
+    flex: 1 1 auto;
+    margin-inline-start: 1em;
+    @media #{$is-mobile-query} {
+      margin-top: 0.5em;
+      margin-inline-start: 0;
+    }
+    height: 2.5rem;
+    font-size: 1em;
+    line-height: 1.5;
+    padding: 0 0.5rem;
+  }
+
+  .RoomDialog-sessionStartButtonContainer {
+    display: flex;
+    justify-content: center;
+  }
+
+  .Modal .RoomDialog-stopSession {
+    background-color: var(--button-destructive-bg-color);
+
+    .ToolIcon__label,
+    .ToolIcon__icon svg {
+      color: var(--button-destructive-color);
+    }
+  }
+}

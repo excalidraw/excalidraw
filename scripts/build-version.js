@@ -2,36 +2,60 @@
 
 const fs = require("fs");
 const path = require("path");
-const asar = require("asar");
+const versionFile = path.join("build", "version.json");
+const indexFile = path.join("build", "index.html");
 
-const zero = (digit) => `0${digit}`.slice(-2);
+const versionDate = (date) => date.toISOString().replace(".000", "");
 
-const versionDate = (date) => {
-  const date_ = `${date.getFullYear()}-${zero(date.getMonth() + 1)}-${zero(
-    date.getDate(),
-  )}`;
-  const time = `${zero(date.getHours())}-${zero(date.getMinutes())}-${zero(
-    date.getSeconds(),
-  )}`;
-  return `${date_}-${time}`;
+const commitHash = () => {
+  try {
+    return require("child_process")
+      .execSync("git rev-parse --short HEAD")
+      .toString()
+      .trim();
+  } catch {
+    return "none";
+  }
 };
 
-const now = new Date();
+const commitDate = (hash) => {
+  try {
+    const unix = require("child_process")
+      .execSync(`git show -s --format=%ct ${hash}`)
+      .toString()
+      .trim();
+    const date = new Date(parseInt(unix) * 1000);
+    return versionDate(date);
+  } catch {
+    return versionDate(new Date());
+  }
+};
+
+const getFullVersion = () => {
+  const hash = commitHash();
+  return `${commitDate(hash)}-${hash}`;
+};
 
 const data = JSON.stringify(
   {
-    asar: `excalidraw.asar`,
-    version: versionDate(now),
+    version: getFullVersion(),
   },
   undefined,
   2,
 );
 
-fs.writeFileSync(path.join("build", "version.json"), data);
+fs.writeFileSync(versionFile, data);
 
-(async () => {
-  const src = "build/";
-  const dest = path.join("build", `excalidraw.asar`);
+// https://stackoverflow.com/a/14181136/8418
+fs.readFile(indexFile, "utf8", (error, data) => {
+  if (error) {
+    return console.error(error);
+  }
+  const result = data.replace(/{version}/g, getFullVersion());
 
-  await asar.createPackage(src, dest);
-})();
+  fs.writeFile(indexFile, result, "utf8", (error) => {
+    if (error) {
+      return console.error(error);
+    }
+  });
+});

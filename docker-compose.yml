@@ -6,12 +6,10 @@ services:
       context: .
       args:
         - NODE_ENV=development
-      target: deps
     container_name: excalidraw
     ports:
-      - "3000:3000"
+      - "3000:80"
     restart: on-failure
-    command: npm run start
     stdin_open: true
     healthcheck:
       disable: true
@@ -20,7 +18,7 @@ services:
     volumes:
       - ./:/opt/node_app/app:delegated
       - ./package.json:/opt/node_app/package.json
-      - ./package-lock.lock:/opt/node_app/package-lock.lock
+      - ./yarn.lock:/opt/node_app/yarn.lock
       - notused:/opt/node_app/app/node_modules
 
 volumes:

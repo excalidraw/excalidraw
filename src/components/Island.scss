@@ -1,14 +1,16 @@
-.Island {
-  --padding: 0;
-  background-color: var(--bg-color-island);
-  backdrop-filter: saturate(100%) blur(10px);
-  box-shadow: var(--shadow-island);
-  border-radius: var(--border-radius-m);
-  padding: calc(var(--padding) * var(--space-factor));
-  position: relative;
-  transition: box-shadow 0.5s ease-in-out;
+.excalidraw {
+  .Island {
+    --padding: 0;
+    background-color: var(--island-bg-color);
+    backdrop-filter: saturate(100%) blur(10px);
+    box-shadow: var(--shadow-island);
+    border-radius: 4px;
+    padding: calc(var(--padding) * var(--space-factor));
+    position: relative;
+    transition: box-shadow 0.5s ease-in-out;
 
-  &.zen-mode {
-    box-shadow: none;
+    &.zen-mode {
+      box-shadow: none;
+    }
   }
 }

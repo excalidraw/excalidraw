@@ -1,7 +1,8 @@
 import "./Modal.scss";
 
-import React, { useEffect, useState } from "react";
+import React, { useState, useLayoutEffect } from "react";
 import { createPortal } from "react-dom";
+import clsx from "clsx";
 import { KEYS } from "../keys";
 
 export const Modal = (props: {
@@ -13,15 +14,20 @@ export const Modal = (props: {
 }) => {
   const modalRoot = useBodyRoot();
 
+  if (!modalRoot) {
+    return null;
+  }
+
   const handleKeydown = (event: React.KeyboardEvent) => {
     if (event.key === KEYS.ESCAPE) {
       event.nativeEvent.stopImmediatePropagation();
       props.onCloseRequest();
     }
   };
+
   return createPortal(
     <div
-      className={`Modal ${props.className ?? ""}`}
+      className={clsx("Modal", props.className)}
       role="dialog"
       aria-modal="true"
       onKeyDown={handleKeydown}
@@ -30,13 +36,7 @@ export const Modal = (props: {
       <div className="Modal__background" onClick={props.onCloseRequest}></div>
       <div
         className="Modal__content"
-        style={
-          {
-            "--max-width": `${props.maxWidth}px`,
-            maxHeight: "100%",
-            overflowY: "scroll",
-          } as any
-        }
+        style={{ "--max-width": `${props.maxWidth}px` }}
       >
         {props.children}
       </div>
@@ -46,16 +46,28 @@ export const Modal = (props: {
 };
 
 const useBodyRoot = () => {
-  const createDiv = () => {
+  const [div, setDiv] = useState<HTMLDivElement | null>(null);
+
+  useLayoutEffect(() => {
+    const isDarkTheme = !!document
+      .querySelector(".excalidraw")
+      ?.classList.contains("Appearance_dark");
     const div = document.createElement("div");
+
+    div.classList.add("excalidraw", "excalidraw-modal-container");
+
+    if (isDarkTheme) {
+      div.classList.add("Appearance_dark");
+      div.classList.add("Appearance_dark-background-none");
+    }
     document.body.appendChild(div);
-    return div;
-  };
-  const [div] = useState(createDiv);
-  useEffect(() => {
+
+    setDiv(div);
+
     return () => {
       document.body.removeChild(div);
     };
-  }, [div]);
+  }, []);
+
   return div;
 };

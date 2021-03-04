@@ -1,0 +1,43 @@
+import React from "react";
+import { render, waitFor } from "./test-utils";
+import ExcalidrawApp from "../excalidraw-app";
+import { API } from "./helpers/api";
+import { MIME_TYPES } from "../constants";
+import { LibraryItem } from "../types";
+
+const { h } = window;
+
+describe("library", () => {
+  beforeEach(async () => {
+    h.library.resetLibrary();
+    await render(<ExcalidrawApp />);
+  });
+
+  it("import library via drag&drop", async () => {
+    expect(await h.library.loadLibrary()).toEqual([]);
+    await API.drop(
+      await API.loadFile("./fixtures/fixture_library.excalidrawlib"),
+    );
+    await waitFor(async () => {
+      expect(await h.library.loadLibrary()).toEqual([
+        [expect.objectContaining({ id: "A" })],
+      ]);
+    });
+  });
+
+  // NOTE: mocked to test logic, not actual drag&drop via UI
+  it("drop library item onto canvas", async () => {
+    expect(h.elements).toEqual([]);
+    const libraryItems: LibraryItem = JSON.parse(
+      await API.readFile("./fixtures/fixture_library.excalidrawlib", "utf8"),
+    ).library[0];
+    await API.drop(
+      new Blob([JSON.stringify(libraryItems)], {
+        type: MIME_TYPES.excalidrawlib,
+      }),
+    );
+    await waitFor(() => {
+      expect(h.elements).toEqual([expect.objectContaining({ id: "A_copy" })]);
+    });
+  });
+});

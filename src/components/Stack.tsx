@@ -1,6 +1,7 @@
-import "./Stack.css";
+import "./Stack.scss";
 
 import React from "react";
+import clsx from "clsx";
 
 type StackProps = {
   children: React.ReactNode;
@@ -8,6 +9,7 @@ type StackProps = {
   align?: "start" | "center" | "end" | "baseline";
   justifyContent?: "center" | "space-around" | "space-between";
   className?: string | boolean;
+  style?: React.CSSProperties;
 };
 
 const RowStack = ({
@@ -16,17 +18,17 @@ const RowStack = ({
   align,
   justifyContent,
   className,
+  style,
 }: StackProps) => {
   return (
     <div
-      className={`Stack Stack_horizontal ${className || ""}`}
-      style={
-        {
-          "--gap": gap,
-          alignItems: align,
-          justifyContent,
-        } as React.CSSProperties
-      }
+      className={clsx("Stack Stack_horizontal", className)}
+      style={{
+        "--gap": gap,
+        alignItems: align,
+        justifyContent,
+        ...style,
+      }}
     >
       {children}
     </div>
@@ -42,14 +44,12 @@ const ColStack = ({
 }: StackProps) => {
   return (
     <div
-      className={`Stack Stack_vertical ${className || ""}`}
-      style={
-        {
-          "--gap": gap,
-          justifyItems: align,
-          justifyContent,
-        } as React.CSSProperties
-      }
+      className={clsx("Stack Stack_vertical", className)}
+      style={{
+        "--gap": gap,
+        justifyItems: align,
+        justifyContent,
+      }}
     >
       {children}
     </div>

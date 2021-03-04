@@ -5,21 +5,42 @@ import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
 import Scene from "../scene/Scene";
 import { NonDeletedExcalidrawElement } from "./types";
+import { PointerDownState } from "../components/App";
 
 export const dragSelectedElements = (
+  pointerDownState: PointerDownState,
   selectedElements: NonDeletedExcalidrawElement[],
   pointerX: number,
   pointerY: number,
   scene: Scene,
+  lockDirection: boolean = false,
+  distanceX: number = 0,
+  distanceY: number = 0,
 ) => {
   const [x1, y1] = getCommonBounds(selectedElements);
   const offset = { x: pointerX - x1, y: pointerY - y1 };
   selectedElements.forEach((element) => {
+    let x: number;
+    let y: number;
+    if (lockDirection) {
+      const lockX = lockDirection && distanceX < distanceY;
+      const lockY = lockDirection && distanceX > distanceY;
+      const original = pointerDownState.originalElements.get(element.id);
+      x = lockX && original ? original.x : element.x + offset.x;
+      y = lockY && original ? original.y : element.y + offset.y;
+    } else {
+      x = element.x + offset.x;
+      y = element.y + offset.y;
+    }
+
     mutateElement(element, {
-      x: element.x + offset.x,
-      y: element.y + offset.y,
+      x,
+      y,
     });
-    updateBoundElements(element, { simultaneouslyUpdated: selectedElements });
+
+    updateBoundElements(element, {
+      simultaneouslyUpdated: selectedElements,
+    });
   });
 };
 
@@ -70,8 +91,8 @@ export const dragNewElement = (
     mutateElement(draggingElement, {
       x: newX,
       y: newY,
-      width: width,
-      height: height,
+      width,
+      height,
     });
   }
 };

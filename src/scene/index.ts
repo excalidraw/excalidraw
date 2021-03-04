@@ -4,16 +4,17 @@ export {
   getElementsWithinSelection,
   getCommonAttributeOfSelectedElements,
   getSelectedElements,
-  getTargetElement,
+  getTargetElements,
 } from "./selection";
-export { normalizeScroll, calculateScrollCenter } from "./scroll";
+export { calculateScrollCenter } from "./scroll";
 export {
   hasBackground,
   hasStroke,
+  canHaveArrowheads,
   canChangeSharpness,
   getElementAtPosition,
   getElementContainingPosition,
   hasText,
   getElementsAtPosition,
 } from "./comparisons";
-export { getZoomOrigin, getNormalizedZoom } from "./zoom";
+export { getNormalizedZoom, getNewZoom } from "./zoom";

@@ -1,6 +1,7 @@
-import "./UserList.css";
+import "./UserList.scss";
 
 import React from "react";
+import clsx from "clsx";
 
 type UserListProps = {
   children: React.ReactNode;
@@ -9,15 +10,9 @@ type UserListProps = {
 };
 
 export const UserList = ({ children, className, mobile }: UserListProps) => {
-  let compClassName = "UserList";
-
-  if (className) {
-    compClassName += ` ${className}`;
-  }
-
-  if (mobile) {
-    compClassName += " UserList_mobile";
-  }
-
-  return <div className={compClassName}>{children}</div>;
+  return (
+    <div className={clsx("UserList", className, { UserList_mobile: mobile })}>
+      {children}
+    </div>
+  );
 };
