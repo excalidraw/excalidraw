@@ -3690,10 +3690,10 @@ brorand@^1.0.1, brorand@^1.1.0:
   resolved "https://registry.yarnpkg.com/brorand/-/brorand-1.1.0.tgz#12c25efe40a45e3c323eb8675a0a0ce57b22371f"
   integrity sha1-EsJe/kCkXjwyPrhnWgoM5XsiNx8=
 
-browser-fs-access@0.14.0:
-  version "0.14.0"
-  resolved "https://registry.yarnpkg.com/browser-fs-access/-/browser-fs-access-0.14.0.tgz#11951fc121f7e0959a8c1f551dff10e6a127abec"
-  integrity sha512-zemiAFe1u0zUQz5bPmMz/dSctbyeIqlQFJkD6eCCQczUeMscj2/msROVOQXRHEeZE2fT4jQ1u9xxXtwyVEFFcQ==
+browser-fs-access@0.13.1:
+  version "0.13.1"
+  resolved "https://registry.yarnpkg.com/browser-fs-access/-/browser-fs-access-0.13.1.tgz#41da8f61dcc6f7597b76cbaa0f96c9eeedf7d25d"
+  integrity sha512-62bg/rd018yTHMmt0nvJ8W5aJ5+2MvpxCEsgpw9wbsGiEJqs1M+HgvTHSJjyef+vEfJxDFht3ykBFQ5BiFPIbA==
 
 browser-process-hrtime@^1.0.0:
   version "1.0.0"
