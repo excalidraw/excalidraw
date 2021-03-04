@@ -154,7 +154,7 @@
     "line": "Linha",
     "text": "Tèxt",
     "library": "Bibliotèca",
-    "lock": ""
+    "lock": "Mantenir activa l’aisina aprèp dessenhar"
   },
   "headings": {
     "canvasActions": "Accions del canabàs",
@@ -169,7 +169,7 @@
     "lockAngle": "",
     "resize": "",
     "rotate": "",
-    "lineEditor_info": "",
+    "lineEditor_info": "Doble-clicatz o quichatz Entrada per modificar los punts",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": ""
   },
