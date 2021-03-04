@@ -139,7 +139,7 @@
     "loadSceneOverridePrompt": "Cargar un dessenh extèrn remplaçarà vòstre contengut existent. Volètz contunhar ?",
     "collabStopOverridePrompt": "",
     "errorLoadingLibrary": "Una error s’es producha en cargant una bibliotèca tèrça.",
-    "confirmAddLibrary": "",
+    "confirmAddLibrary": "Apondrà {{numShapes}} forma(s) a vòstra bibliotèca. Confirmatz ?",
     "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "",
     "resetLibrary": "Aquò suprimirà vòstra bibliotèca. Ne sètz vertadièrament ?"
@@ -162,10 +162,10 @@
     "shapes": "Formas"
   },
   "hints": {
-    "linearElement": "",
-    "freeDraw": "",
-    "text": "",
-    "linearElementMulti": "",
+    "linearElement": "Clicatz per començar mantun punt, lisatz per una sola linha",
+    "freeDraw": "Clicatz e lisatz, relargatz un còp acabat",
+    "text": "Astúcia : podètz tanben apondre de tèxt en doble clicant ont que siá amb l’aisina de seleccion",
+    "linearElementMulti": "Clicatz sul darrièr punt o quichatz Ecap o Entrada per acabar",
     "lockAngle": "",
     "resize": "",
     "rotate": "",
