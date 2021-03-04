@@ -1974,19 +1974,15 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           setCursor(this.canvas, CURSOR_TYPE.POINTER);
         }
         // update last uncommitted point
-        const lastUncommittedPoint = () => {
-          if (!this.state.gridSize) {
-            return points.slice(0, -1);
-          }
-          return points
-            .slice(0, -1)
-            .map((point) =>
-              getGridPoint(point[0], point[1], this.state.gridSize),
-            );
-        };
         mutateElement(multiElement, {
           points: [
-            ...lastUncommittedPoint(),
+            ...(!this.state.gridSize
+              ? points.slice(0, -1)
+              : points
+                  .slice(0, -1)
+                  .map((point) =>
+                    getGridPoint(point[0], point[1], this.state.gridSize),
+                  )),
             [scenePointerX - rx, scenePointerY - ry],
           ],
         });
