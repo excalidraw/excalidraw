@@ -237,8 +237,8 @@
     "storage": "Emmagatzematge",
     "title": "Estadístiques per nerds",
     "total": "Total",
-    "version": "",
-    "versionCopy": "",
+    "version": "Versió",
+    "versionCopy": "Feu clic per a copiar",
     "versionNotAvailable": "",
     "width": "Amplada"
   },
