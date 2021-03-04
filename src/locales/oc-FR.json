@@ -60,11 +60,11 @@
     "extraBold": "Espesàs",
     "architect": "Arquitècte",
     "artist": "Artista",
-    "cartoonist": "",
+    "cartoonist": "Dessenhaire",
     "fileTitle": "Títol del fichièr",
     "colorPicker": "Selector de color",
     "canvasBackground": "Rèireplan del canabàs",
-    "drawingCanvas": "",
+    "drawingCanvas": "Zòna de dessenh",
     "layers": "Calques",
     "actions": "Accions",
     "language": "Lenga",
@@ -129,16 +129,16 @@
   "alerts": {
     "clearReset": "Aquò suprimirà lo canabàs complèt. O volètz vertadièrament ?",
     "couldNotCreateShareableLink": "Creacion impossibla del ligam de partatge.",
-    "couldNotCreateShareableLinkTooBig": "",
-    "couldNotLoadInvalidFile": "",
-    "importBackendFailed": "",
+    "couldNotCreateShareableLinkTooBig": "Creacion impossibla del ligam de partatge : la scèna es tròp granda",
+    "couldNotLoadInvalidFile": "Cargament impossible d’un fichièr invalid",
+    "importBackendFailed": "Importacion fracassada.",
     "cannotExportEmptyCanvas": "Impossible d’exportar los canabasses voids.",
-    "couldNotCopyToClipboard": "",
+    "couldNotCopyToClipboard": "Còpia impossibla al quichapapièrs. Ensajatz d’utilizar lo navegador Chrome.",
     "decryptFailed": "Deschiframent impossible de las donadas.",
     "uploadedSecurly": "",
-    "loadSceneOverridePrompt": "",
+    "loadSceneOverridePrompt": "Cargar un dessenh extèrn remplaçarà vòstre contengut existent. Volètz contunhar ?",
     "collabStopOverridePrompt": "",
-    "errorLoadingLibrary": "",
+    "errorLoadingLibrary": "Una error s’es producha en cargant una bibliotèca tèrça.",
     "confirmAddLibrary": "",
     "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "",
@@ -158,7 +158,7 @@
   },
   "headings": {
     "canvasActions": "Accions del canabàs",
-    "selectedShapeActions": "",
+    "selectedShapeActions": "Accions per la forma seleccionada",
     "shapes": "Formas"
   },
   "hints": {
@@ -176,7 +176,7 @@
   "canvasError": {
     "cannotShowPreview": "Afichatge impossible de l’apercebut",
     "canvasTooBig": "Lo canabàs pòt èsser tròp grand.",
-    "canvasTooBigTip": ""
+    "canvasTooBigTip": "Astúcia : ensajatz de sarrar los elements mai alonhats."
   },
   "errorSplash": {
     "headingMain_pre": "Una error s’es producha. Ensajatz ",
@@ -184,15 +184,15 @@
     "clearCanvasMessage": "Se recargar fonciona pas, ensajatz ",
     "clearCanvasMessage_button": "d’escafar los canabasses.",
     "clearCanvasCaveat": " Menarà a una pèrda del trabalh ",
-    "trackedToSentry_pre": "",
-    "trackedToSentry_post": "",
+    "trackedToSentry_pre": "Error amb l’identificant ",
+    "trackedToSentry_post": " es estada enregistrada sus nòstre sistèma.",
     "openIssueMessage_pre": "",
     "openIssueMessage_button": "traçadors d’avarias.",
     "openIssueMessage_post": "",
     "sceneContent": "Contengut de la scèna :"
   },
   "roomDialog": {
-    "desc_intro": "",
+    "desc_intro": "Podètz convidar lo monde a vòstra scèna actuala per participar amb vos.",
     "desc_privacy": "Vos en fagatz pas, la session utiliza lo chiframent del cap a la fin, çò que dessenetz demorarà privat. Mai nòstres servidors poiràn pas veire vòstra creacion.",
     "button_startSession": "Començar la session",
     "button_stopSession": "Arrestar la session",
