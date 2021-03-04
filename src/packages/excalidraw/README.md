@@ -187,7 +187,7 @@ You will need to make sure `react`, `react-dom` is available as shown below.
   <body>
     <div class="container">
       <h1>Excalidraw Embed Example</h1>
-      <div id="app" className="App"></div>
+      <div id="app"></div>
     </div>
     <script type="text/javascript" src="src/index.js"></script>
   </body>
