@@ -214,15 +214,15 @@
     "github": "Hi heu trobat un problema? Informeu-ne",
     "howto": "Seguiu les nostres guies",
     "or": "o",
-    "preventBinding": "",
-    "shapes": "",
-    "shortcuts": "",
-    "textFinish": "",
-    "textNewLine": "",
-    "title": "",
-    "view": "",
-    "zoomToFit": "",
-    "zoomToSelection": ""
+    "preventBinding": "Prevenir vinculació de la fletxa",
+    "shapes": "Formes",
+    "shortcuts": "Dreceres de teclat",
+    "textFinish": "Acaba d'editar (text)",
+    "textNewLine": "Afegeix línea nova (text)",
+    "title": "Ajuda",
+    "view": "Visualització",
+    "zoomToFit": "Zoom per veure tots els elements",
+    "zoomToSelection": "Zoom per veure la selecció"
   },
   "encrypted": {
     "tooltip": "Els vostres dibuixos estan xifrats de punta a punta de manera que els servidors d’Excalidraw no els veuran mai."
