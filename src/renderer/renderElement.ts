@@ -52,6 +52,7 @@ export interface ExcalidrawElementWithCanvas {
 const generateElementCanvas = (
   element: NonDeletedExcalidrawElement,
   zoom: Zoom,
+  scale: number,
 ): {
   elementWithCanvas: ExcalidrawElementWithCanvas;
   promise: Promise<void> | undefined;
@@ -95,6 +96,15 @@ const generateElementCanvas = (
       CANVAS_PADDING * zoom.value * 2;
   }
 
+  if (
+    isTextElement(element) &&
+    isMathMode(getFontString(element)) &&
+    containsMath(element.text, element.useTex)
+  ) {
+    canvas.width *= scale;
+    canvas.height *= scale;
+    context.scale(scale, scale);
+  }
   context.translate(CANVAS_PADDING * zoom.value, CANVAS_PADDING * zoom.value);
 
   context.scale(
@@ -112,6 +122,13 @@ const generateElementCanvas = (
     1 / (window.devicePixelRatio * zoom.value),
     1 / (window.devicePixelRatio * zoom.value),
   );
+  if (
+    isTextElement(element) &&
+    isMathMode(getFontString(element)) &&
+    containsMath(element.text, element.useTex)
+  ) {
+    context.scale(1 / scale, 1 / scale);
+  }
   return {
     elementWithCanvas: {
       element,
@@ -470,6 +487,7 @@ const generateElementShape = (
 
 const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,
+  scale: number,
   sceneState?: SceneState,
 ) => {
   const zoom: Zoom = sceneState ? sceneState.zoom : defaultAppState.zoom;
@@ -480,7 +498,7 @@ const generateElementWithCanvas = (
     prevElementWithCanvas.elementWithCanvas.canvasZoom !== zoom.value &&
     !sceneState?.shouldCacheIgnoreZoom;
   if (!prevElementWithCanvas || shouldRegenerateBecauseZoom) {
-    const elementWithCanvas = generateElementCanvas(element, zoom);
+    const elementWithCanvas = generateElementCanvas(element, zoom, scale);
     elementWithCanvasCache.set(element, elementWithCanvas);
     return elementWithCanvas;
   }
@@ -495,11 +513,13 @@ const drawElementFromCanvas = (
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   sceneState: SceneState,
+  scale: number,
 ) => {
   const element = elementWithCanvas.element;
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const cx = ((x1 + x2) / 2 + sceneState.scrollX) * window.devicePixelRatio;
   const cy = ((y1 + y2) / 2 + sceneState.scrollY) * window.devicePixelRatio;
+  context.scale(scale, scale);
   context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
   context.translate(cx, cy);
   context.rotate(element.angle);
@@ -517,6 +537,7 @@ const drawElementFromCanvas = (
   context.rotate(-element.angle);
   context.translate(-cx, -cy);
   context.scale(window.devicePixelRatio, window.devicePixelRatio);
+  context.scale(1 / scale, 1 / scale);
 
   // Clear the nested element we appended to the DOM
 };
@@ -527,6 +548,7 @@ export const renderElement = (
   context: CanvasRenderingContext2D,
   renderOptimizations: boolean,
   sceneState: SceneState,
+  scale: number,
 ) => {
   const generator = rc.generator;
   switch (element.type) {
@@ -556,6 +578,7 @@ export const renderElement = (
       if (renderOptimizations) {
         const elementWithCanvas = generateElementWithCanvas(
           element,
+          scale,
           sceneState,
         );
         if (elementWithCanvas.promise !== undefined) {
@@ -565,6 +588,7 @@ export const renderElement = (
               rc,
               context,
               sceneState,
+              scale,
             );
           });
         }
@@ -573,6 +597,7 @@ export const renderElement = (
           rc,
           context,
           sceneState,
+          1,
         );
       } else {
         return new Promise<void>((resolve) => {
@@ -593,6 +618,8 @@ export const renderElement = (
             tempCanvas.height =
               element.height * window.devicePixelRatio * sceneState.zoom.value +
               CANVAS_PADDING * sceneState.zoom.value * 2;
+            tempCanvas.width *= scale;
+            tempCanvas.height *= scale;
 
             const tempContext = tempCanvas.getContext("2d");
             const promise =
@@ -600,6 +627,7 @@ export const renderElement = (
                 ? drawElementOnCanvas(element, rc, tempContext, sceneState.zoom)
                 : undefined;
             promise?.then(() => {
+              context.scale(scale, scale);
               context.translate(cx, cy);
               context.rotate(element.angle);
               context.translate(-shiftX, -shiftY);
@@ -607,6 +635,7 @@ export const renderElement = (
               context.translate(shiftX, shiftY);
               context.rotate(-element.angle);
               context.translate(-cx, -cy);
+              context.scale(1 / scale, 1 / scale);
               resolve();
             });
           } else {

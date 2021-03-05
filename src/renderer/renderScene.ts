@@ -275,6 +275,7 @@ export const renderScene = (
       context,
       renderOptimizations,
       sceneState,
+      scale,
     );
     if (promise !== undefined) {
       promises.push(promise);
@@ -298,6 +299,7 @@ export const renderScene = (
       context,
       renderOptimizations,
       sceneState,
+      scale,
     );
   }
 
