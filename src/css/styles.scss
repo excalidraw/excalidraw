@@ -9,6 +9,7 @@
 
 .excalidraw {
   position: relative;
+  overflow: hidden;
   color: var(--text-primary-color);
   display: flex;
   top: 0;
