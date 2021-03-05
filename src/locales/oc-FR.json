@@ -137,10 +137,10 @@
     "decryptFailed": "Deschiframent impossible de las donadas.",
     "uploadedSecurly": "Lo telecargament es estat securizat amb un chiframent del cap a la fin, significa que los servidors d’Excalidraw o que quina tèrça part que siá pòdon pas legir lo contengut.",
     "loadSceneOverridePrompt": "Cargar un dessenh extèrn remplaçarà vòstre contengut existent. Volètz contunhar ?",
-    "collabStopOverridePrompt": "",
+    "collabStopOverridePrompt": "Arrestar la session remplaçarà vòstre precedent dessenh gardat localament. O volètz vertadièrament ?\n\n(Se volètz gardar vòstre dessenh local, tampatz simplament l’onglet del navegador a la plaça)",
     "errorLoadingLibrary": "Una error s’es producha en cargant una bibliotèca tèrça.",
     "confirmAddLibrary": "Apondrà {{numShapes}} forma(s) a vòstra bibliotèca. Confirmatz ?",
-    "imageDoesNotContainScene": "",
+    "imageDoesNotContainScene": "L’importacion d’imatge es pas encara presa en carga pel moment.\n\nVoliatz importar una scèna ? Aqueste imatge sembla pas conténer cap de donada de scèna. Aviatz activar aquò pendent l’export ?",
     "cannotRestoreFromImage": "Restauracion impossibla de la scèna a partir del fichièr imatge",
     "resetLibrary": "Aquò suprimirà vòstra bibliotèca. Ne sètz vertadièrament ?"
   },
@@ -171,7 +171,7 @@
     "rotate": "Podètz restrénger los angles en mantenent MAJ pendent la rotacion",
     "lineEditor_info": "Doble-clicatz o quichatz Entrada per modificar los punts",
     "lineEditor_pointSelected": "Quichatz Suprimir per suprimir lo punt, Ctrl o Cmd+D per lo duplicar, o fasètz lisar per lo desplaçar",
-    "lineEditor_nothingSelected": ""
+    "lineEditor_nothingSelected": "Seleccionatz un punt de desplaçar o suprimir, o mantenètz Alt e clicatz per apondre punts novèls"
   },
   "canvasError": {
     "cannotShowPreview": "Afichatge impossible de l’apercebut",
