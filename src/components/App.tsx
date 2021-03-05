@@ -414,8 +414,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       zenModeEnabled,
       width: canvasDOMWidth,
       height: canvasDOMHeight,
-      offsetTop,
-      offsetLeft,
       viewModeEnabled,
     } = this.state;
 
@@ -430,59 +428,53 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           "excalidraw--view-mode": viewModeEnabled,
         })}
         ref={this.excalidrawContainerRef}
+        style={{
+          width: canvasDOMWidth,
+          height: canvasDOMHeight,
+        }}
       >
-        <div
-          style={{
-            width: canvasDOMWidth,
-            height: canvasDOMHeight,
-            top: offsetTop,
-            left: offsetLeft,
-          }}
-        >
-          <LayerUI
-            canvas={this.canvas}
+        <LayerUI
+          canvas={this.canvas}
+          appState={this.state}
+          setAppState={this.setAppState}
+          actionManager={this.actionManager}
+          elements={this.scene.getElements()}
+          onCollabButtonClick={onCollabButtonClick}
+          onLockToggle={this.toggleLock}
+          onInsertElements={(elements) =>
+            this.addElementsFromPasteOrLibrary(
+              elements,
+              DEFAULT_PASTE_X,
+              DEFAULT_PASTE_Y,
+            )
+          }
+          zenModeEnabled={zenModeEnabled}
+          toggleZenMode={this.toggleZenMode}
+          langCode={getLanguage().code}
+          isCollaborating={this.props.isCollaborating || false}
+          onExportToBackend={onExportToBackend}
+          renderCustomFooter={renderFooter}
+          viewModeEnabled={viewModeEnabled}
+          showExitZenModeBtn={
+            typeof this.props?.zenModeEnabled === "undefined" && zenModeEnabled
+          }
+        />
+        <div className="excalidraw-textEditorContainer" />
+        {this.state.showStats && (
+          <Stats
             appState={this.state}
             setAppState={this.setAppState}
-            actionManager={this.actionManager}
             elements={this.scene.getElements()}
-            onCollabButtonClick={onCollabButtonClick}
-            onLockToggle={this.toggleLock}
-            onInsertElements={(elements) =>
-              this.addElementsFromPasteOrLibrary(
-                elements,
-                DEFAULT_PASTE_X,
-                DEFAULT_PASTE_Y,
-              )
-            }
-            zenModeEnabled={zenModeEnabled}
-            toggleZenMode={this.toggleZenMode}
-            langCode={getLanguage().code}
-            isCollaborating={this.props.isCollaborating || false}
-            onExportToBackend={onExportToBackend}
-            renderCustomFooter={renderFooter}
-            viewModeEnabled={viewModeEnabled}
-            showExitZenModeBtn={
-              typeof this.props?.zenModeEnabled === "undefined" &&
-              zenModeEnabled
-            }
+            onClose={this.toggleStats}
           />
-          <div className="excalidraw-textEditorContainer" />
-          {this.state.showStats && (
-            <Stats
-              appState={this.state}
-              setAppState={this.setAppState}
-              elements={this.scene.getElements()}
-              onClose={this.toggleStats}
-            />
-          )}
-          {this.state.toastMessage !== null && (
-            <Toast
-              message={this.state.toastMessage}
-              clearToast={this.clearToast}
-            />
-          )}
-          <main>{this.renderCanvas()}</main>
-        </div>
+        )}
+        {this.state.toastMessage !== null && (
+          <Toast
+            message={this.state.toastMessage}
+            clearToast={this.clearToast}
+          />
+        )}
+        <main>{this.renderCanvas()}</main>
       </div>
     );
   }
