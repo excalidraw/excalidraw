@@ -167,7 +167,7 @@
     "text": "Astúcia : podètz tanben apondre de tèxt en doble clicant ont que siá amb l’aisina de seleccion",
     "linearElementMulti": "Clicatz sul darrièr punt o quichatz Ecap o Entrada per acabar",
     "lockAngle": "Podètz restrénger l’angle en mantenent MAJ",
-    "resize": "",
+    "resize": "Podètz servar las proporcions en mantenent la tòca MAJ pendent lo redimensionament,\nmantenètz la tòca ALT per redimensionar a partir del centre",
     "rotate": "Podètz restrénger los angles en mantenent MAJ pendent la rotacion",
     "lineEditor_info": "Doble-clicatz o quichatz Entrada per modificar los punts",
     "lineEditor_pointSelected": "Quichatz Suprimir per suprimir lo punt, Ctrl o Cmd+D per lo duplicar, o fasètz lisar per lo desplaçar",
@@ -186,7 +186,7 @@
     "clearCanvasCaveat": " Menarà a una pèrda del trabalh ",
     "trackedToSentry_pre": "Error amb l’identificant ",
     "trackedToSentry_post": " es estada enregistrada sus nòstre sistèma.",
-    "openIssueMessage_pre": "",
+    "openIssueMessage_pre": "Èrem plan prudents per inclure pas d’informacions de la scèna vòstra sus l’error. Se vòstra scèna es pas privada, volgatz considerar de perseguir sus nòstre ",
     "openIssueMessage_button": "traçadors d’avarias.",
     "openIssueMessage_post": " Volgatz inclure las informacions çai-jos en las copiant e pegant a l’issue GitHub.",
     "sceneContent": "Contengut de la scèna :"
