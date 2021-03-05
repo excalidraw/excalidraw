@@ -245,8 +245,10 @@
   "toast": {
     "copyStyles": "ਕਾਪੀ ਕੀਤੇ ਸਟਾਇਲ।",
     "copyToClipboard": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ ਕਾਪੀ ਕੀਤਾ।",
-    "copyToClipboardAsPng": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ PNG ਵਜੋਂ ਕਾਪੀ ਕੀਤਾ।",
+    "copyToClipboardAsPng": "",
     "fileSaved": "ਫਾਈਲ ਸਾਂਭੀ ਗਈ।",
-    "fileSavedToFilename": "{filename} ਵਿੱਚ ਸਾਂਭੀ"
+    "fileSavedToFilename": "{filename} ਵਿੱਚ ਸਾਂਭੀ",
+    "canvas": "",
+    "selection": ""
   }
 }

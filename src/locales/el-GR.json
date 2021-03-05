@@ -93,7 +93,7 @@
     "distributeHorizontally": "Οριζόντια κατανομή",
     "distributeVertically": "Κατακόρυφη κατανομή",
     "viewMode": "Λειτουργία προβολής",
-    "toggleExportColorScheme": ""
+    "toggleExportColorScheme": "Εναλλαγή εξαγωγής θέματος χρωμάτων"
   },
   "buttons": {
     "clearReset": "Επαναφορά του καμβά",
@@ -245,8 +245,10 @@
   "toast": {
     "copyStyles": "Αντιγράφηκαν στυλ.",
     "copyToClipboard": "Αντιγράφηκε στο πρόχειρο.",
-    "copyToClipboardAsPng": "Αντιγράφτηκε στο πρόχειρο ως PNG.",
+    "copyToClipboardAsPng": "Αντιγράφηκε {{exportSelection}} στο πρόχειρο ως PNG\n({{exportColorScheme}})",
     "fileSaved": "Το αρχείο αποθηκεύτηκε.",
-    "fileSavedToFilename": "Αποθηκεύτηκε στο {filename}"
+    "fileSavedToFilename": "Αποθηκεύτηκε στο {filename}",
+    "canvas": "καμβάς",
+    "selection": "επιλογή"
   }
 }

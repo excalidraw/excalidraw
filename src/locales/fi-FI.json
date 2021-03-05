@@ -9,10 +9,10 @@
     "copy": "Kopioi",
     "copyAsPng": "Kopioi leikepöydälle PNG-tiedostona",
     "copyAsSvg": "Kopioi leikepöydälle SVG-tiedostona",
-    "bringForward": "Siirrä eteenpäin",
+    "bringForward": "Tuo eteenpäin",
     "sendToBack": "Vie taakse",
     "bringToFront": "Tuo eteen",
-    "sendBackward": "Siirrä taaksepäin",
+    "sendBackward": "Vie taaksepäin",
     "delete": "Poista",
     "copyStyles": "Kopioi tyyli",
     "pasteStyles": "Liitä tyyli",
@@ -29,7 +29,7 @@
     "textAlign": "Tekstin tasaus",
     "edges": "Reunat",
     "sharp": "Terävä",
-    "round": "Pyöreä",
+    "round": "Pyöristetty",
     "arrowheads": "Nuolenkärjet",
     "arrowhead_none": "Ei mitään",
     "arrowhead_arrow": "Nuoli",
@@ -110,9 +110,9 @@
     "close": "Sulje",
     "selectLanguage": "Valitse kieli",
     "scrollBackToContent": "Näytä sisältö",
-    "zoomIn": "Zoomaa sisään",
-    "zoomOut": "Zoomaa ulos",
-    "resetZoom": "Nollaa zoomaus",
+    "zoomIn": "Lähennä",
+    "zoomOut": "Loitonna",
+    "resetZoom": "Nollaa suurennuksen taso",
     "menu": "Valikko",
     "done": "Valmis",
     "edit": "Muokkaa",
@@ -129,20 +129,20 @@
   "alerts": {
     "clearReset": "Tämä tyhjentää koko piirtoalueen. Jatketaanko?",
     "couldNotCreateShareableLink": "Jaettavan linkin luominen epäonnistui.",
-    "couldNotCreateShareableLinkTooBig": "Jaettavaa linkkiä ei voitu luoda: teos on liian suuri",
+    "couldNotCreateShareableLinkTooBig": "Jaettavaa linkkiä ei voitu luoda: piirtoalue on liian suuri",
     "couldNotLoadInvalidFile": "Virheellistä tiedostoa ei voitu avata",
     "importBackendFailed": "Palvelimelta tuonti epäonnistui.",
     "cannotExportEmptyCanvas": "Tyhjää piirtoaluetta ei voi viedä.",
     "couldNotCopyToClipboard": "Leikepöydälle kopiointi epäonnistui. Kokeile Chrome-selainta.",
     "decryptFailed": "Salauksen purkaminen epäonnistui.",
-    "uploadedSecurly": "Lähetys on turvattu päästä päähän salauksella. Excalidrawin palvelin ja kolmannet osapuolet eivät voi lukea sisältöä.",
-    "loadSceneOverridePrompt": "Ulkopuolisen piirroksen lataaminen korvaa nykyisen sisältösi. Haluatko jatkaa?",
-    "collabStopOverridePrompt": "Istunnon lopettaminen korvaa aiemman, paikallisesti tallennetun piirustuksen. Oletko varma?\n\n(Jos haluat pitää paikallisen piirustuksen, sulje selaimen välilehti sen sijaan.)",
-    "errorLoadingLibrary": "Kolmannen osapuolen kirjastoa ladattaessa tapahtui virhe.",
-    "confirmAddLibrary": "Tämä lisää {{numShapes}} muotoa kirjastoosi. Oletko varma?",
+    "uploadedSecurly": "Lähetys on turvattu päästä-päähän-salauksella. Excalidrawin palvelin ja kolmannet osapuolet eivät voi lukea sisältöä.",
+    "loadSceneOverridePrompt": "Ulkopuolisen piirroksen lataaminen korvaa nykyisen sisältösi. Jatketaanko?",
+    "collabStopOverridePrompt": "Istunnon lopettaminen korvaa aiemman, paikallisesti tallennetun piirustuksen. Jatketaanko?\n\n(Jos haluat säilyttää paikallisesti tallennetun piirustuksen, sulje selaimen välilehti lopettamisen sijaan.)",
+    "errorLoadingLibrary": "Virhe ladattaessa kolmannen osapuolen kirjastoa.",
+    "confirmAddLibrary": "Tämä lisää {{numShapes}} muotoa kirjastoosi. Jatketaanko?",
     "imageDoesNotContainScene": "Kuvien lisääminen ei ole tällä hetkellä mahdollista.\n\nHaluatko tuoda piirroksen? Tämä kuva ei näytä sisältävän tarvittavia tietoja. Oletko ottanut piirrostietojen tallennuksen käyttöön viennin aikana?",
     "cannotRestoreFromImage": "Teosta ei voitu palauttaa tästä kuvatiedostosta",
-    "resetLibrary": "Tämä tyhjentää kirjastosi. Oletko varma?"
+    "resetLibrary": "Tämä tyhjentää kirjastosi. Jatketaanko?"
   },
   "toolBar": {
     "selection": "Valinta",
@@ -165,13 +165,13 @@
     "linearElement": "Klikkaa piirtääksesi useampi piste, raahaa piirtääksesi yksittäinen viiva",
     "freeDraw": "Paina ja raahaa, päästä irti kun olet valmis",
     "text": "Vinkki: voit myös lisätä tekstiä kaksoisnapsauttamalla mihin tahansa valintatyökalulla",
-    "linearElementMulti": "Klikkaa viimeistä pistettä, paina Escape tai paina Enter lopettaaksesi",
-    "lockAngle": "Voit rajoittaa kulmaa pitämällä SHIFT pohjassa",
-    "resize": "Voit rajoittaa mittasuhteet pitämällä SHIFT pohjassa kun muutat kokoa, pidä ALT pohjassa muuttaaksesi kokoa keskipisteen suhteen",
+    "linearElementMulti": "Lopeta klikkaamalla viimeistä pistettä, painamalla Escape- tai Enter-näppäintä",
+    "lockAngle": "Voit rajoittaa kulmaa pitämällä SHIFT-näppäintä alaspainettuna",
+    "resize": "Voit rajoittaa mittasuhteet pitämällä SHIFT-näppäintä alaspainettuna kun muutat kokoa, pidä ALT-näppäintä alaspainettuna muuttaaksesi kokoa keskipisteen suhteen",
     "rotate": "Voit rajoittaa kulman pitämällä SHIFT pohjassa pyörittäessäsi",
     "lineEditor_info": "Kaksoisnapauta tai paina Enter muokataksesi pisteitä",
-    "lineEditor_pointSelected": "Paina Delete poistaaksesi pisteen, CtrlOrCmd+D monistaaksesi, tai raahaa liikuttaaksesi",
-    "lineEditor_nothingSelected": "Valitse liikutettava tai poistettava piste, tai pidä Alt pohjassa ja napauta lisätäksesi uusia pisteitä"
+    "lineEditor_pointSelected": "Paina Delete poistaaksesi pisteen, Ctrl tai Cmd+D monistaaksesi, tai raahaa liikuttaaksesi",
+    "lineEditor_nothingSelected": "Valitse liikutettava tai poistettava piste, tai pidä ALT-näppäintä alaspainettuna ja napsauta lisätäksesi uusia pisteitä"
   },
   "canvasError": {
     "cannotShowPreview": "Esikatselua ei voitu näyttää",
@@ -181,19 +181,19 @@
   "errorSplash": {
     "headingMain_pre": "Tapahtui virhe. Yritä ",
     "headingMain_button": "sivun lataamista uudelleen.",
-    "clearCanvasMessage": "Jos lataaminen uudelleen ei auta, yritä ",
+    "clearCanvasMessage": "Mikäli sivun lataaminen uudelleen ei auta, yritä ",
     "clearCanvasMessage_button": "tyhjentää piirtoalue.",
     "clearCanvasCaveat": " Tämä johtaa työn menetykseen ",
     "trackedToSentry_pre": "Virhe tunnisteella ",
     "trackedToSentry_post": " tallennettiin järjestelmäämme.",
-    "openIssueMessage_pre": "Olimme varovaisia emmekä sisällyttäneet tietoa piirroksestasi virheeseen. Jos piirroksesi ei ole yksityinen, harkitsethan kertovasi meille ",
+    "openIssueMessage_pre": "Olimme varovaisia emmekä sisällyttäneet tietoa piirroksestasi virheeseen. Mikäli piirroksesi ei ole yksityinen, harkitsethan kertovasi meille ",
     "openIssueMessage_button": "virheenseurantajärjestelmässämme.",
     "openIssueMessage_post": " Sisällytä alla olevat tiedot kopioimalla ne GitHub-ongelmaan.",
     "sceneContent": "Piirroksen tiedot:"
   },
   "roomDialog": {
     "desc_intro": "Voit kutsua ihmisiä piirrokseesi tekemään yhteistyötä kanssasi.",
-    "desc_privacy": "Älä huoli, istunto käyttää päästä päähän salausta, joten mitä tahansa piirrätkin, se pysyy salassa. Edes palvelimemme ei näe mitä keksit.",
+    "desc_privacy": "Älä huoli, istunto käyttää päästä-päähän-salausta, joten mitä tahansa piirrätkin, se pysyy salassa. Edes palvelimemme eivät näe mitä keksit.",
     "button_startSession": "Aloita istunto",
     "button_stopSession": "Lopeta istunto",
     "desc_inProgressIntro": "Jaettu istunto on nyt käynnissä.",
@@ -225,7 +225,7 @@
     "zoomToSelection": "Näytä valinta"
   },
   "encrypted": {
-    "tooltip": "Piirroksesi ovat päästä päähän salattuja, joten Excalidrawin palvelimet eivät koskaan näe niitä."
+    "tooltip": "Piirroksesi ovat päästä-päähän-salattuja, joten Excalidrawin palvelimet eivät koskaan näe niitä."
   },
   "stats": {
     "angle": "Kulma",
@@ -235,7 +235,7 @@
     "scene": "Teos",
     "selected": "Valitut",
     "storage": "Tallennustila",
-    "title": "Nörttien tilastot",
+    "title": "Tilastoja nörteille",
     "total": "Yhteensä",
     "version": "Versio",
     "versionCopy": "Klikkaa kopioidaksesi",
@@ -243,10 +243,12 @@
     "width": "Leveys"
   },
   "toast": {
-    "copyStyles": "Tyylit kopioitu.",
-    "copyToClipboard": "Kopioitu leikepöydälle.",
-    "copyToClipboardAsPng": "Kopioitu leikepöydälle PNG-tiedostona.",
+    "copyStyles": "Tyylit kopioitiin.",
+    "copyToClipboard": "Kopioitiin leikepöydälle.",
+    "copyToClipboardAsPng": "Kopioitiin {{exportSelection}} leikepöydälle PNG:nä\n({{exportColorScheme}})",
     "fileSaved": "Tiedosto tallennettu.",
-    "fileSavedToFilename": "Tallennettu kohteeseen {filename}"
+    "fileSavedToFilename": "Tallennettiin kohteeseen {filename}",
+    "canvas": "piirtoalue",
+    "selection": "valinta"
   }
 }
