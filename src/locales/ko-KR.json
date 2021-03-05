@@ -245,8 +245,10 @@
   "toast": {
     "copyStyles": "스타일 복사.",
     "copyToClipboard": "클립보드로 복사.",
-    "copyToClipboardAsPng": "클립보드로 PNG 이미지 복사.",
+    "copyToClipboardAsPng": "",
     "fileSaved": "",
-    "fileSavedToFilename": ""
+    "fileSavedToFilename": "",
+    "canvas": "",
+    "selection": ""
   }
 }

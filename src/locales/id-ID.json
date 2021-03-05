@@ -245,8 +245,10 @@
   "toast": {
     "copyStyles": "Gaya tersalin.",
     "copyToClipboard": "Tersalin ke papan klip.",
-    "copyToClipboardAsPng": "Tersalin ke clipboard sebagai PNG.",
+    "copyToClipboardAsPng": "Tersalin {{exportSelection}} ke clipboard sebagai PNG\n({{exportColorScheme}})",
     "fileSaved": "File tersimpan.",
-    "fileSavedToFilename": "Disimpan ke {filename}"
+    "fileSavedToFilename": "Disimpan ke {filename}",
+    "canvas": "kanvas",
+    "selection": "pilihan"
   }
 }
