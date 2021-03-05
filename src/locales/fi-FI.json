@@ -193,7 +193,7 @@
   },
   "roomDialog": {
     "desc_intro": "Voit kutsua ihmisiä piirrokseesi tekemään yhteistyötä kanssasi.",
-    "desc_privacy": "Älä huoli, istunto käyttää päästä päähän salausta, joten mitä tahansa piirrätkin, se pysyy salassa. Edes palvelimemme ei näe mitä keksit.",
+    "desc_privacy": "Älä huoli, istunto käyttää päästä-päähän-salausta, joten mitä tahansa piirrätkin, se pysyy salassa. Edes palvelimemme eivät näe mitä keksit.",
     "button_startSession": "Aloita istunto",
     "button_stopSession": "Lopeta istunto",
     "desc_inProgressIntro": "Jaettu istunto on nyt käynnissä.",
@@ -225,7 +225,7 @@
     "zoomToSelection": "Näytä valinta"
   },
   "encrypted": {
-    "tooltip": "Piirroksesi ovat päästä päähän salattuja, joten Excalidrawin palvelimet eivät koskaan näe niitä."
+    "tooltip": "Piirroksesi ovat päästä-päähän-salattuja, joten Excalidrawin palvelimet eivät koskaan näe niitä."
   },
   "stats": {
     "angle": "Kulma",
@@ -235,7 +235,7 @@
     "scene": "Teos",
     "selected": "Valitut",
     "storage": "Tallennustila",
-    "title": "Nörttien tilastot",
+    "title": "Tilastoja nörteille",
     "total": "Yhteensä",
     "version": "Versio",
     "versionCopy": "Klikkaa kopioidaksesi",
@@ -243,8 +243,8 @@
     "width": "Leveys"
   },
   "toast": {
-    "copyStyles": "Tyylit kopioitu.",
-    "copyToClipboard": "Kopioitu leikepöydälle.",
+    "copyStyles": "Tyylit kopioitiin.",
+    "copyToClipboard": "Kopioitiin leikepöydälle.",
     "copyToClipboardAsPng": "Kopioitu {{exportSelection}} leikepöydälle PNG:nä\n({{exportColorScheme}})",
     "fileSaved": "Tiedosto tallennettu.",
     "fileSavedToFilename": "Tallennettu kohteeseen {filename}",
