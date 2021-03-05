@@ -245,8 +245,10 @@
   "toast": {
     "copyStyles": "Formatierung kopiert.",
     "copyToClipboard": "In die Zwischenablage kopiert.",
-    "copyToClipboardAsPng": "In die Zwischenablage als PNG kopiert.",
+    "copyToClipboardAsPng": "{{exportSelection}} als PNG in die Zwischenablage kopiert\n({{exportColorScheme}})",
     "fileSaved": "Datei gespeichert.",
-    "fileSavedToFilename": "Als {filename} gespeichert"
+    "fileSavedToFilename": "Als {filename} gespeichert",
+    "canvas": "Leinwand",
+    "selection": "Auswahl"
   }
 }

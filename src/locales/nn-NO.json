@@ -247,6 +247,8 @@
     "copyToClipboard": "",
     "copyToClipboardAsPng": "",
     "fileSaved": "",
-    "fileSavedToFilename": ""
+    "fileSavedToFilename": "",
+    "canvas": "",
+    "selection": ""
   }
 }
