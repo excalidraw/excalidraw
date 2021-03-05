@@ -139,6 +139,7 @@ const getCacheKey = (
 
 const svgCache = {} as { [key: string]: SVGSVGElement };
 
+export const SVG_PADDING = 5;
 export const createSvg = (
   text: string,
   fontSize: number,
@@ -196,11 +197,12 @@ export const createSvg = (
       rtl ? i >= 0 : i < markup.outputs[index].length;
       i += rtl ? -1 : 1
     ) {
-      let childNode = {} as Element;
-      if (i % 2 === 1) {
+      let childNode = {} as SVGSVGElement | SVGTextElement;
+      const childIsSvg = i % 2 === 1;
+      if (childIsSvg) {
         const tempDiv = svgRoot.ownerDocument.createElement("div");
         tempDiv.innerHTML = markup.outputs[index][i];
-        childNode = tempDiv.children[0];
+        childNode = tempDiv.children[0] as SVGSVGElement;
       } else {
         const text = svgRoot.ownerDocument.createElementNS(
           "http://www.w3.org/2000/svg",
@@ -213,10 +215,37 @@ export const createSvg = (
         text.textContent = markup.outputs[index][i];
         childNode = text;
       }
+      const childMetrics = measureText(
+        markup.outputs[index][i],
+        fontString,
+        childIsSvg,
+      );
       childNode.setAttribute("x", `${x}`);
-      x += measureText(markup.outputs[index][i], fontString, i % 2 === 1).width;
+      x += childMetrics.width;
+      // For some reason, childMetrics.height might not match the height
+      // of the MathJax SVG. So we calculate it directly from the "height"
+      // attribute, which is given in "ex" CSS units. If anything goes
+      // wrong, fall back to a value of 0 for childHeight.
+      let childHeight;
+      const tCtx = document.createElement("canvas").getContext("2d");
+      if (tCtx !== null && childNode.hasAttribute("height")) {
+        tCtx.font = fontString;
+        childHeight = childNode.getAttribute("height");
+        if (childHeight === null) {
+          childHeight = "0";
+        }
+        childHeight =
+          parseFloat(childHeight) *
+          (tCtx !== null ? tCtx.measureText("x").actualBoundingBoxAscent : 0);
+      } else {
+        childHeight = 0;
+      }
+      // If i % 2 === 0, then childNode is an SVGTextElement, not an SVGSVGElement.
+      const svgVerticalOffset = childIsSvg
+        ? Math.min(childHeight, childMetrics.baseline)
+        : 0;
       const yOffset =
-        lineMetrics.height - lineMetrics.baseline * (i % 2 === 1 ? 0 : 1);
+        lineMetrics.height - (lineMetrics.baseline - svgVerticalOffset);
       childNode.setAttribute("y", `${y - yOffset}`);
       node.appendChild(childNode);
     }
@@ -225,10 +254,10 @@ export const createSvg = (
   svgRoot.setAttribute("xmlns", "http://www.w3.org/2000/svg");
   svgRoot.setAttribute(
     "viewBox",
-    `0 0 ${imageMetrics.width + 5} ${imageMetrics.height + 5}`,
+    `0 0 ${imageMetrics.width + SVG_PADDING} ${imageMetrics.height}`,
   );
-  svgRoot.setAttribute("width", `${imageMetrics.width + 5}`);
-  svgRoot.setAttribute("height", `${imageMetrics.height + 5}`);
+  svgRoot.setAttribute("width", `${imageMetrics.width + SVG_PADDING}`);
+  svgRoot.setAttribute("height", `${imageMetrics.height}`);
   svgCache[key] = svgRoot;
   return svgRoot;
 };
@@ -311,6 +340,13 @@ export const measureMath = (
     isMathMode(fontString) && containsMath(text, useTex)
       ? measureText(markup.htmlString, fontString, true)
       : measureText(text, fontString, false);
+  if (isMathMode(fontString) && containsMath(text, useTex)) {
+    return {
+      width: metrics.width + SVG_PADDING,
+      height: metrics.height,
+      baseline: metrics.baseline,
+    };
+  }
   return metrics;
 };
 
