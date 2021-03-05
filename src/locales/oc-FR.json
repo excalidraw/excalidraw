@@ -40,7 +40,7 @@
     "onlySelected": "Seleccion sonque",
     "withBackground": "Inclure rèireplan",
     "exportEmbedScene": "Integrar la scèna al fichièr d’expo",
-    "exportEmbedScene_details": "",
+    "exportEmbedScene_details": "Las donadas de scèna seràn enregistradas dins lo fichièr PNG/SVG exportat, per que la scèna pòsca èsser restaurada a partir d’aqueste fichièr.\nAumentarà la talha del fichièr exportat.",
     "addWatermark": "Apondre « Fabricat amb Excalidraw »",
     "handDrawn": "A la man levada",
     "normal": "Normala",
@@ -135,13 +135,13 @@
     "cannotExportEmptyCanvas": "Impossible d’exportar los canabasses voids.",
     "couldNotCopyToClipboard": "Còpia impossibla al quichapapièrs. Ensajatz d’utilizar lo navegador Chrome.",
     "decryptFailed": "Deschiframent impossible de las donadas.",
-    "uploadedSecurly": "",
+    "uploadedSecurly": "Lo telecargament es estat securizat amb un chiframent del cap a la fin, significa que los servidors d’Excalidraw o que quina tèrça part que siá pòdon pas legir lo contengut.",
     "loadSceneOverridePrompt": "Cargar un dessenh extèrn remplaçarà vòstre contengut existent. Volètz contunhar ?",
     "collabStopOverridePrompt": "",
     "errorLoadingLibrary": "Una error s’es producha en cargant una bibliotèca tèrça.",
     "confirmAddLibrary": "Apondrà {{numShapes}} forma(s) a vòstra bibliotèca. Confirmatz ?",
     "imageDoesNotContainScene": "",
-    "cannotRestoreFromImage": "",
+    "cannotRestoreFromImage": "Restauracion impossibla de la scèna a partir del fichièr imatge",
     "resetLibrary": "Aquò suprimirà vòstra bibliotèca. Ne sètz vertadièrament ?"
   },
   "toolBar": {
@@ -166,11 +166,11 @@
     "freeDraw": "Clicatz e lisatz, relargatz un còp acabat",
     "text": "Astúcia : podètz tanben apondre de tèxt en doble clicant ont que siá amb l’aisina de seleccion",
     "linearElementMulti": "Clicatz sul darrièr punt o quichatz Ecap o Entrada per acabar",
-    "lockAngle": "",
+    "lockAngle": "Podètz restrénger l’angle en mantenent MAJ",
     "resize": "",
-    "rotate": "",
+    "rotate": "Podètz restrénger los angles en mantenent MAJ pendent la rotacion",
     "lineEditor_info": "Doble-clicatz o quichatz Entrada per modificar los punts",
-    "lineEditor_pointSelected": "",
+    "lineEditor_pointSelected": "Quichatz Suprimir per suprimir lo punt, Ctrl o Cmd+D per lo duplicar, o fasètz lisar per lo desplaçar",
     "lineEditor_nothingSelected": ""
   },
   "canvasError": {
@@ -188,7 +188,7 @@
     "trackedToSentry_post": " es estada enregistrada sus nòstre sistèma.",
     "openIssueMessage_pre": "",
     "openIssueMessage_button": "traçadors d’avarias.",
-    "openIssueMessage_post": "",
+    "openIssueMessage_post": " Volgatz inclure las informacions çai-jos en las copiant e pegant a l’issue GitHub.",
     "sceneContent": "Contengut de la scèna :"
   },
   "roomDialog": {
@@ -198,7 +198,7 @@
     "button_stopSession": "Arrestar la session",
     "desc_inProgressIntro": "La session de collaboracion es ara en cors.",
     "desc_shareLink": "Partejatz aqueste ligam amb lo monde amb qui volètz collaborar :",
-    "desc_exitSession": ""
+    "desc_exitSession": "Arrestar la session vos desconnectarà de la sala, mas poiretz contunhar de trabalhar a la scèna, en local. Notatz qu’aquò afectarà pas los autres, e poiràn collaborar a lor version."
   },
   "errorDialog": {
     "title": "Error"
