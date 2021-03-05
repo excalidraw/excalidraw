@@ -1304,10 +1304,16 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       history.resumeRecording();
     }
 
-    // currently we only support syncing background color
+    // currently we only support syncing background color and appearance
     if (sceneData.appState?.viewBackgroundColor) {
       this.setState({
         viewBackgroundColor: sceneData.appState.viewBackgroundColor,
+      });
+    }
+
+    if (sceneData.appState?.appearance) {
+      this.setState({
+        appearance: sceneData.appState.appearance,
       });
     }
 
