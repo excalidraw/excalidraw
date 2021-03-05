@@ -46,7 +46,6 @@
     "cross-env": "7.0.3",
     "css-loader": "5.1.0",
     "file-loader": "6.2.0",
-    "path-browserify": "1.0.1",
     "sass-loader": "11.0.1",
     "ts-loader": "8.0.17",
     "webpack": "5.24.2",

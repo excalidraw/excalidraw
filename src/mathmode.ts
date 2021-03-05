@@ -8,7 +8,6 @@ import {
 } from "./utils";
 import { ExcalidrawTextElement } from "./element/types";
 import { mutateElement } from "./element/mutateElement";
-import sanitizeHtml from "sanitize-html";
 
 // MathJax components we use
 import { AsciiMath } from "mathjax-full/js/input/asciimath.js";
@@ -107,9 +106,8 @@ export const markupText = (text: string, useTex: boolean) => {
         htmlLines[index] += svgString;
         outputs[index].push(svgString);
       } else {
-        const htmlCleaned = sanitizeHtml(lineArray[i], { allowedTags: [] });
-        htmlLines[index] += htmlCleaned;
-        outputs[index].push(htmlCleaned);
+        htmlLines[index] += lineArray[i];
+        outputs[index].push(lineArray[i]);
       }
     }
     if (lines[index] === "") {
