@@ -248,7 +248,7 @@
     "copyToClipboardAsPng": "",
     "fileSaved": "Súbor uložený.",
     "fileSavedToFilename": "Uložený ako {filename}",
-    "canvas": "",
-    "selection": ""
+    "canvas": "plátno",
+    "selection": "výber"
   }
 }
