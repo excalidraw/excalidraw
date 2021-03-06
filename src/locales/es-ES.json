@@ -245,8 +245,10 @@
   "toast": {
     "copyStyles": "Estilos copiados.",
     "copyToClipboard": "Copiado en el portapapeles.",
-    "copyToClipboardAsPng": "Copiado al portapapeles como PNG.",
+    "copyToClipboardAsPng": "Copiado {{exportSelection}} al portapapeles como PNG\n({{exportColorScheme}})",
     "fileSaved": "Archivo guardado.",
-    "fileSavedToFilename": "Guardado en {filename}"
+    "fileSavedToFilename": "Guardado en {filename}",
+    "canvas": "lienzo",
+    "selection": "selección"
   }
 }

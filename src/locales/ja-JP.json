@@ -245,8 +245,10 @@
   "toast": {
     "copyStyles": "スタイルをコピー",
     "copyToClipboard": "クリップボードにコピー",
-    "copyToClipboardAsPng": "PNG形式でクリップボードにコピー",
+    "copyToClipboardAsPng": "",
     "fileSaved": "ファイルを保存しました",
-    "fileSavedToFilename": "{filename} に保存しました"
+    "fileSavedToFilename": "{filename} に保存しました",
+    "canvas": "",
+    "selection": ""
   }
 }

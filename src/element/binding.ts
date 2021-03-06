@@ -182,9 +182,9 @@ const bindLinearElement = (
     } as PointBinding,
   });
   mutateElement(hoveredElement, {
-    boundElementIds: [
-      ...new Set([...(hoveredElement.boundElementIds ?? []), linearElement.id]),
-    ],
+    boundElementIds: Array.from(
+      new Set([...(hoveredElement.boundElementIds ?? []), linearElement.id]),
+    ),
   });
 };
 
