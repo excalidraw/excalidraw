@@ -245,8 +245,10 @@
   "toast": {
     "copyStyles": "Kopierte stiler.",
     "copyToClipboard": "Kopiert til utklippstavlen.",
-    "copyToClipboardAsPng": "Kopiert til utklippstavlen som PNG.",
+    "copyToClipboardAsPng": "Kopierte {{exportSelection}} til utklippstavlen som PNG\n({{exportColorScheme}})",
     "fileSaved": "Fil lagret.",
-    "fileSavedToFilename": "Lagret til {filename}"
+    "fileSavedToFilename": "Lagret til {filename}",
+    "canvas": "lerret",
+    "selection": "utvalg"
   }
 }

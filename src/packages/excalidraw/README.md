@@ -177,39 +177,168 @@ You will need to make sure `react`, `react-dom` is available as shown below.
     <meta charset="UTF-8" />
     <script src="https://unpkg.com/react@16.14.0/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@16.13.1/umd/react-dom.development.js"></script>
+
     <script
       type="text/javascript"
-      src="https://unpkg.com/@excalidraw/excalidraw@0.2.2/dist/excalidraw.min.js"
+      src="https://unpkg.com/@excalidraw/excalidraw@0.4.1/dist/excalidraw.min.js"
     ></script>
   </head>
 
   <body>
     <div class="container">
-      <h4>Excalidraw Embed Example</h4>
+      <h1>Excalidraw Embed Example</h1>
       <div id="app"></div>
     </div>
-
     <script type="text/javascript" src="src/index.js"></script>
   </body>
 </html>
 ```
 
 ```js
+/*eslint-disable */
 import "./styles.css";
+import InitialData from "./initialData";
+
+const App = () => {
+  const excalidrawRef = React.useRef(null);
+  const excalidrawWrapperRef = React.useRef(null);
+  const [dimensions, setDimensions] = React.useState({
+    width: undefined,
+    height: undefined,
+  });
+
+  const [viewModeEnabled, setViewModeEnabled] = React.useState(false);
+  const [zenModeEnabled, setZenModeEnabled] = React.useState(false);
+  const [gridModeEnabled, setGridModeEnabled] = React.useState(false);
+
+  React.useEffect(() => {
+    setDimensions({
+      width: excalidrawWrapperRef.current.getBoundingClientRect().width,
+      height: excalidrawWrapperRef.current.getBoundingClientRect().height,
+    });
+    const onResize = () => {
+      setDimensions({
+        width: excalidrawWrapperRef.current.getBoundingClientRect().width,
+        height: excalidrawWrapperRef.current.getBoundingClientRect().height,
+      });
+    };
+
+    window.addEventListener("resize", onResize);
+
+    return () => window.removeEventListener("resize", onResize);
+  }, [excalidrawWrapperRef]);
+
+  const updateScene = () => {
+    const sceneData = {
+      elements: [
+        {
+          type: "rectangle",
+          version: 141,
+          versionNonce: 361174001,
+          isDeleted: false,
+          id: "oDVXy8D6rom3H1-LLH2-f",
+          fillStyle: "hachure",
+          strokeWidth: 1,
+          strokeStyle: "solid",
+          roughness: 1,
+          opacity: 100,
+          angle: 0,
+          x: 100.50390625,
+          y: 93.67578125,
+          strokeColor: "#c92a2a",
+          backgroundColor: "transparent",
+          width: 186.47265625,
+          height: 141.9765625,
+          seed: 1968410350,
+          groupIds: [],
+        },
+      ],
+      appState: {
+        viewBackgroundColor: "#edf2ff",
+      },
+    };
+    excalidrawRef.current.updateScene(sceneData);
+  };
+
+  return React.createElement(
+    React.Fragment,
+    null,
+    React.createElement(
+      "div",
+      { className: "button-wrapper" },
+      React.createElement(
+        "button",
+        {
+          className: "update-scene",
+          onClick: updateScene,
+        },
+        "Update Scene",
+      ),
+      React.createElement(
+        "button",
+        {
+          className: "reset-scene",
+          onClick: () => excalidrawRef.current.resetScene(),
+        },
+        "Reset Scene",
+      ),
+      React.createElement(
+        "label",
+        null,
+        React.createElement("input", {
+          type: "checkbox",
+          checked: viewModeEnabled,
+          onChange: () => setViewModeEnabled(!viewModeEnabled),
+        }),
+        "View mode",
+      ),
+      React.createElement(
+        "label",
+        null,
+        React.createElement("input", {
+          type: "checkbox",
+          checked: zenModeEnabled,
+          onChange: () => setZenModeEnabled(!zenModeEnabled),
+        }),
+        "Zen mode",
+      ),
+      React.createElement(
+        "label",
+        null,
+        React.createElement("input", {
+          type: "checkbox",
+          checked: gridModeEnabled,
+          onChange: () => setGridModeEnabled(!gridModeEnabled),
+        }),
+        "Grid mode",
+      ),
+    ),
+    React.createElement(
+      "div",
+      {
+        className: "excalidraw-wrapper",
+        ref: excalidrawWrapperRef,
+      },
+      React.createElement(Excalidraw.default, {
+        ref: excalidrawRef,
+        width: dimensions.width,
+        height: dimensions.height,
+        initialData: InitialData,
+        onChange: (elements, state) =>
+          console.log("Elements :", elements, "State : ", state),
+        onPointerUpdate: (payload) => console.log(payload),
+        onCollabButtonClick: () => window.alert("You clicked on collab button"),
+        viewModeEnabled: viewModeEnabled,
+        zenModeEnabled: zenModeEnabled,
+        gridModeEnabled: gridModeEnabled,
+      }),
+    ),
+  );
+};
 
 const excalidrawWrapper = document.getElementById("app");
 
-const props = {
-  onChange: (data, appState) => {
-    console.log(data, appState);
-  },
-};
-
-/*eslint-disable */
-ReactDOM.render(
-  React.createElement(Excalidraw.default, props),
-  excalidrawWrapper,
-);
+ReactDOM.render(React.createElement(App), excalidrawWrapper);
 ```
 
 [![Edit excalidraw-in-browser](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/excalidraw-in-browser-tlqom?fontsize=14&hidenavigation=1&theme=dark)
@@ -237,7 +366,7 @@ export default function IndexPage() {
 | [`offsetTop`](#offsetTop) | Number | `0` | top position relative to which Excalidraw should render |
 | [`onChange`](#onChange) | Function |  | This callback is triggered whenever the component updates due to any change. This callback will receive the excalidraw elements and the current app state. |
 | [`initialData`](#initialData) | <pre>{elements?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>, appState?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37">AppState<a> } </pre> | null | The initial data with which app loads. |
-| [`excalidrawRef`](#excalidrawRef) | [`createRef`](https://reactjs.org/docs/refs-and-the-dom.html#creating-refs) or [`callbackRef`](https://reactjs.org/docs/refs-and-the-dom.html#callback-refs) or <pre>{ current: { readyPromise: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317">resolvablePromise</a> } }</pre> |  | Ref to be passed to Excalidraw |
+| [`ref`](#ref) | [`createRef`](https://reactjs.org/docs/refs-and-the-dom.html#creating-refs) or [`callbackRef`](https://reactjs.org/docs/refs-and-the-dom.html#callback-refs) or <pre>{ current: { readyPromise: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317">resolvablePromise</a> } }</pre> |  | Ref to be passed to Excalidraw |
 | [`onCollabButtonClick`](#onCollabButtonClick) | Function |  | Callback to be triggered when the collab button is clicked |
 | [`isCollaborating`](#isCollaborating) | `boolean` |  | This implies if the app is in collaboration mode |
 | [`onPointerUpdate`](#onPointerUpdate) | Function |  | Callback triggered when mouse pointer is updated. |
@@ -319,7 +448,7 @@ This helps to load Excalidraw with `initialData`. It must be an object or a [pro
 
 You might want to use this when you want to load excalidraw with some initial elements and app state.
 
-#### `excalidrawRef`
+#### `ref`
 
 You can pass a `ref` when you want to access some excalidraw APIs. We expose the below APIs:
 

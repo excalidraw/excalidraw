@@ -247,6 +247,8 @@
     "copyToClipboard": "",
     "copyToClipboardAsPng": "",
     "fileSaved": "קובץ נשמר.",
-    "fileSavedToFilename": ""
+    "fileSavedToFilename": "",
+    "canvas": "",
+    "selection": ""
   }
 }
