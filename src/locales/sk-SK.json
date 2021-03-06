@@ -245,10 +245,10 @@
   "toast": {
     "copyStyles": "Štýly skopírované.",
     "copyToClipboard": "Skopírované do schránky.",
-    "copyToClipboardAsPng": "",
+    "copyToClipboardAsPng": "Kopírovanie {{exportSelection}} do schránky ako PNG prebehlo úspešne\n({{exportColorScheme}})",
     "fileSaved": "Súbor uložený.",
     "fileSavedToFilename": "Uložený ako {filename}",
-    "canvas": "plátno",
-    "selection": "výber"
+    "canvas": "plátna",
+    "selection": "výberu"
   }
 }
