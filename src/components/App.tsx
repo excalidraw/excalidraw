@@ -414,8 +414,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       zenModeEnabled,
       width: canvasDOMWidth,
       height: canvasDOMHeight,
-      offsetTop,
-      offsetLeft,
       viewModeEnabled,
     } = this.state;
 
@@ -433,8 +431,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         style={{
           width: canvasDOMWidth,
           height: canvasDOMHeight,
-          top: offsetTop,
-          left: offsetLeft,
         }}
       >
         <LayerUI
