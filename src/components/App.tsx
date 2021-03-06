@@ -1009,13 +1009,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private onScroll = debounce(() => {
     const { offsetTop, offsetLeft } = this.getCanvasOffsets();
-    if (
-      this.state.offsetLeft === offsetLeft &&
-      this.state.offsetTop === offsetTop
-    ) {
-      return;
-    }
-    this.setState({ offsetTop, offsetLeft });
+    this.setState((state) => {
+      if (state.offsetLeft === offsetLeft && state.offsetTop === offsetTop) {
+        return null;
+      }
+      return { offsetTop, offsetLeft };
+    });
   }, SCROLL_TIMEOUT);
 
   // Copy/paste
