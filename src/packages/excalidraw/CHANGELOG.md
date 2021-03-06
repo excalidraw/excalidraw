@@ -18,7 +18,7 @@ Please add the latest change on the top under the correct section.
 
 ### Fixes
 
-- Reduce the scroll debounce timeout to 100ms so offsets gets updated faster when container scrolled.
+- Reduce the scroll debounce timeout to `100ms` so `offsets` gets updated faster if changed when container scrolled [#3182](https://github.com/excalidraw/excalidraw/pull/3182).
 
 ---
 
