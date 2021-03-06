@@ -12,6 +12,16 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
+## Unreleased
+
+## Excalidraw API
+
+### Fixes
+
+- Reduce the scroll debounce timeout to 100ms so offsets gets updated faster when container scrolled.
+
+---
+
 ## 0.4.1
 
 ## Excalidraw API
