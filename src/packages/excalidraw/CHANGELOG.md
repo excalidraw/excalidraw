@@ -12,6 +12,16 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
+## Unreleased
+
+## Excalidraw API
+
+### Fixes
+
+- Scope css variables so that host css vars don't clash with excalidraw[#3199](https://github.com/excalidraw/excalidraw/pull/3199).
+
+---
+
 ## 0.4.2
 
 ## Excalidraw API
