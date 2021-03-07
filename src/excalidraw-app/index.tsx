@@ -73,7 +73,7 @@ const initializeScene = async (opts: {
   const jsonBackendMatch = window.location.hash.match(
     /^#json=([0-9]+),([a-zA-Z0-9_-]+)$/,
   );
-  const jsonUrlMatch = window.location.hash.match(/^#url=(.*)$/);
+  const externalUrlMatch = window.location.hash.match(/^#url=(.*)$/);
 
   const initialData = importFromLocalStorage();
 
@@ -125,14 +125,13 @@ const initializeScene = async (opts: {
       roomLinkData = null;
       window.history.replaceState({}, APP_NAME, window.location.origin);
     }
-  } else if (jsonUrlMatch) {
+  } else if (externalUrlMatch) {
     window.history.replaceState({}, APP_NAME, window.location.origin);
 
-    const url = jsonUrlMatch[1];
+    const url = externalUrlMatch[1];
     try {
       const request = await fetch(window.decodeURIComponent(url));
-      const blob = await request.blob();
-      const scene = await loadFromBlob(blob, null);
+      const scene = await loadFromBlob(await request.blob(), null);
       if (
         !scene.elements.length ||
         window.confirm(t("alerts.loadSceneOverridePrompt"))
