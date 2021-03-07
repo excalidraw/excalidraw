@@ -6,6 +6,7 @@ import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 import { loadFromBlob } from "./blob";
 import { Library } from "./library";
+import { ImportedDataState } from "./types";
 
 export const serializeAsJSON = (
   elements: readonly ExcalidrawElement[],
@@ -51,6 +52,19 @@ export const loadFromJSON = async (localAppState: AppState) => {
     mimeTypes: ["application/json", "image/png", "image/svg+xml"],
   });
   return loadFromBlob(blob, localAppState);
+};
+
+export const isValidExcalidrawData = (data?: {
+  type?: any;
+  elements?: any;
+  appState?: any;
+}): data is ImportedDataState => {
+  return (
+    data?.type === "excalidraw" &&
+    (!data.elements ||
+      (Array.isArray(data.elements) &&
+        (!data.appState || typeof data.appState === "object")))
+  );
 };
 
 export const isValidLibrary = (json: any) => {
