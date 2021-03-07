@@ -18,6 +18,7 @@ Please add the latest change on the top under the correct section.
 
 ### Fixes
 
+- Position text editor absolute and fix the offsets so it doesn't remain fixed when container is scrolled[#3200](https://github.com/excalidraw/excalidraw/pull/3200).
 - Scope css variables so that host css vars don't clash with excalidraw[#3199](https://github.com/excalidraw/excalidraw/pull/3199).
 
 ---
