@@ -532,18 +532,22 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         }
 
         this.setState(
-          (state) => ({
-            ...actionResult.appState,
-            editingElement:
-              editingElement || actionResult.appState?.editingElement || null,
-            width: state.width,
-            height: state.height,
-            offsetTop: state.offsetTop,
-            offsetLeft: state.offsetLeft,
-            viewModeEnabled,
-            zenModeEnabled,
-            gridSize,
-          }),
+          (state) => {
+            // using Object.assign instead of spread to fool TS 4.2.2+ into
+            // regarding the resulting type as not containing undefined
+            // (which the following expression will never contain)
+            return Object.assign(actionResult.appState || {}, {
+              editingElement:
+                editingElement || actionResult.appState?.editingElement || null,
+              width: state.width,
+              height: state.height,
+              offsetTop: state.offsetTop,
+              offsetLeft: state.offsetLeft,
+              viewModeEnabled,
+              zenModeEnabled,
+              gridSize,
+            });
+          },
           () => {
             if (actionResult.syncHistory) {
               history.setCurrentState(

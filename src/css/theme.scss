@@ -1,7 +1,7 @@
 @import "open-color/open-color.scss";
 @import "./variables.module.scss";
 
-:root {
+.excalidraw {
   --appearance-filter: none;
   --button-destructive-bg-color: #{$oc-red-1};
   --button-destructive-color: #{$oc-red-9};
@@ -34,9 +34,7 @@
   --shadow-island: 0 1px 5px #{transparentize($oc-black, 0.85)};
   --space-factor: 0.25rem;
   --text-primary-color: #{$oc-gray-8};
-}
 
-.excalidraw {
   &.Appearance_dark {
     background: $oc-black;
 
