@@ -44,7 +44,7 @@
     "babel-loader": "8.2.2",
     "babel-plugin-transform-class-properties": "6.24.1",
     "cross-env": "7.0.3",
-    "css-loader": "5.1.0",
+    "css-loader": "5.1.1",
     "file-loader": "6.2.0",
     "sass-loader": "11.0.1",
     "ts-loader": "8.0.17",
