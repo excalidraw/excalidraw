@@ -131,12 +131,12 @@ const initializeScene = async (opts: {
     const url = externalUrlMatch[1];
     try {
       const request = await fetch(window.decodeURIComponent(url));
-      const scene = await loadFromBlob(await request.blob(), null);
+      const data = await loadFromBlob(await request.blob(), null);
       if (
         !scene.elements.length ||
         window.confirm(t("alerts.loadSceneOverridePrompt"))
       ) {
-        return scene;
+        return data;
       }
     } catch (error) {
       return {
