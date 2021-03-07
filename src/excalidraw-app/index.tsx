@@ -125,6 +125,8 @@ const initializeScene = async (opts: {
       window.history.replaceState({}, APP_NAME, window.location.origin);
     }
   } else if (jsonUrlMatch) {
+    window.history.replaceState({}, APP_NAME, window.location.origin);
+
     const url = jsonUrlMatch[1];
     try {
       const request = await fetch(window.decodeURIComponent(url));
