@@ -14,7 +14,6 @@ import { ErrorDialog } from "../components/ErrorDialog";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
 import { APP_NAME, EVENT, TITLE_TIMEOUT, VERSION_TIMEOUT } from "../constants";
 import { loadFromBlob } from "../data/blob";
-import { isValidExcalidrawData } from "../data/json";
 import { DataState, ImportedDataState } from "../data/types";
 import {
   ExcalidrawElement,
