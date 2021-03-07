@@ -93,7 +93,7 @@ export const textWysiwyg = ({
   editable.wrap = "off";
 
   Object.assign(editable.style, {
-    position: "fixed",
+    position: "absolute",
     display: "inline-block",
     minHeight: "1em",
     backfaceVisibility: "hidden",

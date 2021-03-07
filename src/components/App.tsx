@@ -1578,7 +1578,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           },
           this.state,
         );
-        return [viewportX, viewportY];
+        return [
+          viewportX - this.state.offsetLeft,
+          viewportY - this.state.offsetTop,
+        ];
       },
       onChange: withBatchedUpdates((text) => {
         updateElement(text);
