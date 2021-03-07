@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Lim inn",
+    "pasteCharts": "Lim inn diagram",
     "selectAll": "Vel alt",
     "multiSelect": "Legg til element i utval",
     "moveCanvas": "Flytt lerretet",
@@ -39,7 +40,7 @@
     "onlySelected": "Kun valde",
     "withBackground": "Med bakgrunn",
     "exportEmbedScene": "Bygg scena inn i eksportert fil",
-    "exportEmbedScene_details": "Scenedataa vert lagra i den eksporterte PNG- eller SVG-fila slik at scena kan bli gjenopprettast frå den. Dette vil auke eksportert filstorleik.",
+    "exportEmbedScene_details": "Scenedata vert lagra i den eksporterte PNG- eller SVG-fila slik at scena kan bli gjenopprettast frå den. Dette vil auke eksportert filstorleik.",
     "addWatermark": "Legg til «Laga med Excalidraw»",
     "handDrawn": "Handteikna",
     "normal": "Normal",
@@ -67,7 +68,7 @@
     "layers": "Lag",
     "actions": "Handlingar",
     "language": "Språk",
-    "createRoom": "Del ei sanntids-samarbeidsøkt",
+    "liveCollaboration": "",
     "duplicateSelection": "Dupliser",
     "untitled": "Utan namn",
     "name": "Namn",
@@ -76,12 +77,12 @@
     "group": "Grupper utval",
     "ungroup": "Avgrupper utval",
     "collaborators": "Samarbeidarar",
-    "gridMode": "",
+    "showGrid": "",
     "addToLibrary": "Legg til i bibliotek",
     "removeFromLibrary": "Fjern frå bibliotek",
-    "libraryLoadingMessage": "Laster bibliotek...",
+    "libraryLoadingMessage": "Laster bibliotek…",
     "libraries": "Blad gjennom bibliotek",
-    "loadingScene": "Laster scene...",
+    "loadingScene": "Laster scene…",
     "align": "Juster",
     "alignTop": "Juster til topp",
     "alignBottom": "Juster til botn",
@@ -90,7 +91,9 @@
     "centerVertically": "Midtstill vertikalt",
     "centerHorizontally": "Midtstill horisontalt",
     "distributeHorizontally": "Sprei horisontalt",
-    "distributeVertically": "Sprei vertikalt"
+    "distributeVertically": "Sprei vertikalt",
+    "viewMode": "",
+    "toggleExportColorScheme": ""
   },
   "buttons": {
     "clearReset": "Tilbakestill lerretet",
@@ -115,12 +118,12 @@
     "edit": "Rediger",
     "undo": "Angre",
     "redo": "Gjer om",
-    "roomDialog": "Start sanntids-samarbeid",
+    "resetLibrary": "",
     "createNewRoom": "Lag nytt rom",
-    "fullScreen": "",
-    "darkMode": "",
-    "lightMode": "",
-    "zenMode": "",
+    "fullScreen": "Fullskjerm",
+    "darkMode": "Mørk modus",
+    "lightMode": "Lys modus",
+    "zenMode": "Zen-modus",
     "exitZenMode": "Avslutt zen-modus"
   },
   "alerts": {
@@ -134,10 +137,12 @@
     "decryptFailed": "Kunne ikkje dekryptere data.",
     "uploadedSecurly": "Opplastinga er kryptert og er ikkje mogleg å lese av Excalidraw-serveren eller tredjepartar.",
     "loadSceneOverridePrompt": "Innlasting av ekstern teikning erstattar ditt eksisterande innhald. Ynskjer du å fortsette?",
+    "collabStopOverridePrompt": "",
     "errorLoadingLibrary": "Det oppstod ein feil under lastinga av tredjepartsbibliotek.",
     "confirmAddLibrary": "Dette vil legge til {{numShapes}} form(er) i biblioteket ditt. Er du sikker?",
-    "imageDoesNotContainScene": "",
-    "cannotRestoreFromImage": "Scena kunne ikkje gjenopprettast frå denne biletfila"
+    "imageDoesNotContainScene": "Importering av bilder støttes ikkje for p. t.\n\nVil du importere ein scene? Dette bildet ser ikkje ut til å inneholde noen scene-data. Har du aktivert dette under eksporten?",
+    "cannotRestoreFromImage": "Scena kunne ikkje gjenopprettast frå denne biletfila",
+    "resetLibrary": ""
   },
   "toolBar": {
     "selection": "Vel",
@@ -161,7 +166,7 @@
     "freeDraw": "Klikk og drag, slepp når du er ferdig",
     "text": "Tips: du kan òg leggje til tekst ved å dobbeltklikke kor som helst med utvalgsverktyet",
     "linearElementMulti": "Klikk på siste punkt eller trykk Escape eller Enter for å fullføre",
-    "lockAngle": "",
+    "lockAngle": "Du kan begrense vinkelen ved å holde nede SKIFT",
     "resize": "Du kan halde fram med forholdet ved å trykke SHIFT medan du endrar storleik,\ntrykk ALT for å endre storleiken frå midten",
     "rotate": "Du kan låse vinklane ved å halde SHIFT medan du roterer",
     "lineEditor_info": "Dobbeltklikk eller trykk Enter for å redigere punkt",
@@ -198,24 +203,26 @@
   "errorDialog": {
     "title": "Feil"
   },
-  "shortcutsDialog": {
-    "title": "Tastatursnarvegar",
-    "shapes": "Figurar",
-    "or": "eller",
+  "helpDialog": {
+    "blog": "",
     "click": "klikk",
-    "drag": "drag",
-    "curvedArrow": "Boga pil",
-    "curvedLine": "Boga linje",
+    "curvedArrow": "",
+    "curvedLine": "",
+    "documentation": "",
+    "drag": "",
     "editor": "Redigering",
+    "github": "",
+    "howto": "",
+    "or": "eller",
+    "preventBinding": "",
+    "shapes": "Formar",
+    "shortcuts": "",
+    "textFinish": "",
+    "textNewLine": "",
+    "title": "Hjelp",
     "view": "Vising",
-    "blog": "Les bloggen vår",
-    "howto": "Følg vegleiinga vår",
-    "github": "Funne eit problem? Send inn",
-    "textNewLine": "Legg til ny linje (tekst)",
-    "textFinish": "Fullfør redigering (tekst)",
-    "zoomToFit": "Zoom for å sjå alle elementa",
-    "zoomToSelection": "Zoom til utval",
-    "preventBinding": "Hindre pilkobling"
+    "zoomToFit": "",
+    "zoomToSelection": ""
   },
   "encrypted": {
     "tooltip": "Teikningane dine er ende-til-ende-krypterte slik at Excalidraw sine serverar aldri får sjå dei."
@@ -230,6 +237,18 @@
     "storage": "Lagring",
     "title": "Statistikk for nerdar",
     "total": "Totalt",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "Breidde"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboard": "",
+    "copyToClipboardAsPng": "",
+    "fileSaved": "",
+    "fileSavedToFilename": "",
+    "canvas": "",
+    "selection": ""
   }
 }

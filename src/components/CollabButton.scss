@@ -1,10 +1,11 @@
-@import "../css/_variables";
+@import "../css/variables.module";
 
 .excalidraw {
   .CollabButton.is-collaborating {
-    background-color: var(--button-special-active-background-color);
+    background-color: var(--button-special-active-bg-color);
 
-    .ToolIcon__icon svg {
+    .ToolIcon__icon svg,
+    .ToolIcon__label {
       color: var(--icon-green-fill-color);
     }
   }

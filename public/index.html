@@ -57,9 +57,10 @@
 
     <!-- Excalidraw version -->
     <meta name="version" content="{version}" />
+
     <link
       rel="preload"
-      href="FG_Virgil.woff2"
+      href="Virgil.woff2"
       as="font"
       type="font/woff2"
       crossorigin="anonymous"
@@ -85,7 +86,9 @@
     />
 
     <link rel="stylesheet" href="fonts.css" type="text/css" />
-
+    <script>
+      window.EXCALIDRAW_ASSET_PATH = "/";
+    </script>
     <% if (process.env.REACT_APP_GOOGLE_ANALYTICS_ID) { %>
     <script
       async

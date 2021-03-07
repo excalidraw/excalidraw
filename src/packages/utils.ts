@@ -36,7 +36,7 @@ export const exportToCanvas = ({
       canvas.width = ret.width;
       canvas.height = ret.height;
 
-      return canvas;
+      return { canvas, scale: ret.scale };
     },
   );
 };

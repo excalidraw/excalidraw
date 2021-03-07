@@ -1,6 +1,6 @@
 {
   "name": "@excalidraw/excalidraw",
-  "version": "0.1.1",
+  "version": "0.4.2",
   "main": "dist/excalidraw.min.js",
   "files": [
     "dist/*"
@@ -41,26 +41,26 @@
     "react-dom": "^17.0.1"
   },
   "devDependencies": {
-    "@babel/core": "7.12.10",
-    "@babel/plugin-transform-arrow-functions": "7.12.1",
-    "@babel/plugin-transform-async-to-generator": "7.12.1",
-    "@babel/plugin-transform-runtime": "7.12.10",
-    "@babel/plugin-transform-typescript": "7.12.1",
-    "@babel/preset-env": "7.12.11",
-    "@babel/preset-react": "7.12.10",
-    "@babel/preset-typescript": "7.12.7",
+    "@babel/core": "7.13.8",
+    "@babel/plugin-transform-arrow-functions": "7.13.0",
+    "@babel/plugin-transform-async-to-generator": "7.13.0",
+    "@babel/plugin-transform-runtime": "7.13.9",
+    "@babel/plugin-transform-typescript": "7.13.0",
+    "@babel/preset-env": "7.13.9",
+    "@babel/preset-react": "7.12.13",
+    "@babel/preset-typescript": "7.13.0",
     "babel-loader": "8.2.2",
     "babel-plugin-transform-class-properties": "6.24.1",
     "cross-env": "7.0.3",
-    "css-loader": "5.0.1",
+    "css-loader": "5.1.1",
     "file-loader": "6.2.0",
-    "mini-css-extract-plugin": "1.3.3",
-    "sass-loader": "10.1.0",
-    "terser-webpack-plugin": "5.0.3",
-    "ts-loader": "8.0.13",
-    "webpack": "5.11.1",
-    "webpack-bundle-analyzer": "4.3.0",
-    "webpack-cli": "4.3.1"
+    "mini-css-extract-plugin": "1.3.9",
+    "sass-loader": "11.0.1",
+    "terser-webpack-plugin": "5.1.1",
+    "ts-loader": "8.0.17",
+    "webpack": "5.24.3",
+    "webpack-bundle-analyzer": "4.4.0",
+    "webpack-cli": "4.5.0"
   },
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
   "repository": "https://github.com/excalidraw/excalidraw",
@@ -68,6 +68,6 @@
   "scripts": {
     "build:umd": "cross-env NODE_ENV=production webpack --config webpack.prod.config.js",
     "build:umd:withAnalyzer": "cross-env NODE_ENV=production ANALYZER=true webpack --config webpack.prod.config.js",
-    "pack": "npm run build:umd && npm pack"
+    "pack": "yarn build:umd && yarn pack"
   }
 }

@@ -47,7 +47,11 @@ import {
   TransformHandles,
   TransformHandleType,
 } from "../element/transformHandles";
-import { viewportCoordsToSceneCoords } from "../utils";
+import { viewportCoordsToSceneCoords, supportsEmoji } from "../utils";
+import { UserIdleState } from "../excalidraw-app/collab/types";
+import { APPEARANCE_FILTER } from "../constants";
+
+const hasEmojiSupport = supportsEmoji();
 
 const strokeRectWithRotation = (
   context: CanvasRenderingContext2D,
@@ -208,6 +212,10 @@ export const renderScene = (
   const normalizedCanvasWidth = canvas.width / scale;
   const normalizedCanvasHeight = canvas.height / scale;
 
+  if (sceneState.exportWithDarkMode) {
+    context.filter = APPEARANCE_FILTER;
+  }
+
   // Paint background
   if (typeof sceneState.viewBackgroundColor === "string") {
     const hasTransparence =
@@ -310,7 +318,7 @@ export const renderScene = (
       if (sceneState.remoteSelectedElementIds[element.id]) {
         selectionColors.push(
           ...sceneState.remoteSelectedElementIds[element.id].map((socketId) => {
-            const { background } = getClientColors(socketId);
+            const { background } = getClientColors(socketId, appState);
             return background;
           }),
         );
@@ -373,12 +381,14 @@ export const renderScene = (
         sceneState.zoom,
         "mouse", // when we render we don't know which pointer type so use mouse
       );
-      renderTransformHandles(
-        context,
-        sceneState,
-        transformHandles,
-        locallySelectedElements[0].angle,
-      );
+      if (!appState.viewModeEnabled) {
+        renderTransformHandles(
+          context,
+          sceneState,
+          transformHandles,
+          locallySelectedElements[0].angle,
+        );
+      }
     } else if (locallySelectedElements.length > 1 && !appState.isRotating) {
       const dashedLinePadding = 4 / sceneState.zoom.value;
       context.fillStyle = oc.white;
@@ -418,7 +428,9 @@ export const renderScene = (
   // Paint remote pointers
   for (const clientId in sceneState.remotePointerViewportCoords) {
     let { x, y } = sceneState.remotePointerViewportCoords[clientId];
-    const username = sceneState.remotePointerUsernames[clientId];
+
+    x -= appState.offsetLeft;
+    y -= appState.offsetTop;
 
     const width = 9;
     const height = 14;
@@ -434,15 +446,17 @@ export const renderScene = (
     y = Math.max(y, 0);
     y = Math.min(y, normalizedCanvasHeight - height);
 
-    const { background, stroke } = getClientColors(clientId);
+    const { background, stroke } = getClientColors(clientId, appState);
 
     const strokeStyle = context.strokeStyle;
     const fillStyle = context.fillStyle;
     const globalAlpha = context.globalAlpha;
     context.strokeStyle = stroke;
     context.fillStyle = background;
-    if (isOutOfBounds) {
-      context.globalAlpha = 0.2;
+
+    const userState = sceneState.remotePointerUserStates[clientId];
+    if (isOutOfBounds || userState === UserIdleState.AWAY) {
+      context.globalAlpha = 0.48;
     }
 
     if (
@@ -473,18 +487,32 @@ export const renderScene = (
     context.fill();
     context.stroke();
 
-    if (!isOutOfBounds && username) {
+    const username = sceneState.remotePointerUsernames[clientId];
+
+    let idleState = "";
+    if (userState === UserIdleState.AWAY) {
+      idleState = hasEmojiSupport ? "⚫️" : ` (${UserIdleState.AWAY})`;
+    } else if (userState === UserIdleState.IDLE) {
+      idleState = hasEmojiSupport ? "💤" : ` (${UserIdleState.IDLE})`;
+    } else if (userState === UserIdleState.ACTIVE) {
+      idleState = hasEmojiSupport ? "🟢" : "";
+    }
+
+    const usernameAndIdleState = `${
+      username ? `${username} ` : ""
+    }${idleState}`;
+
+    if (!isOutOfBounds && usernameAndIdleState) {
       const offsetX = x + width;
       const offsetY = y + height;
       const paddingHorizontal = 4;
       const paddingVertical = 4;
-      const measure = context.measureText(username);
+      const measure = context.measureText(usernameAndIdleState);
       const measureHeight =
         measure.actualBoundingBoxDescent + measure.actualBoundingBoxAscent;
 
       // Border
       context.fillStyle = stroke;
-      context.globalAlpha = globalAlpha;
       context.fillRect(
         offsetX - 1,
         offsetY - 1,
@@ -500,8 +528,9 @@ export const renderScene = (
         measureHeight + 2 * paddingVertical,
       );
       context.fillStyle = oc.white;
+
       context.fillText(
-        username,
+        usernameAndIdleState,
         offsetX + paddingHorizontal,
         offsetY + paddingVertical + measure.actualBoundingBoxAscent,
       );

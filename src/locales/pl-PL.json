@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Wklej",
+    "pasteCharts": "Wklej wykresy",
     "selectAll": "Zaznacz wszystko",
     "multiSelect": "Dodaj element do zaznaczenia",
     "moveCanvas": "Przesuń obszar roboczy",
@@ -32,12 +33,12 @@
     "arrowheads": "Groty",
     "arrowhead_none": "Brak",
     "arrowhead_arrow": "Strzałka",
-    "arrowhead_bar": "",
+    "arrowhead_bar": "Kreska",
     "arrowhead_dot": "Kropka",
     "fontSize": "Rozmiar tekstu",
     "fontFamily": "Krój pisma",
     "onlySelected": "Tylko wybrane",
-    "withBackground": "",
+    "withBackground": "Z tłem",
     "exportEmbedScene": "Osadź scenę w eksportowanym pliku",
     "exportEmbedScene_details": "Dane sceny zostaną zapisane w eksportowanym pliku PNG/SVG tak, aby scena mogła zostać z niego przywrócona.\nZwiększy to rozmiar eksportowanego pliku.",
     "addWatermark": "Dodaj \"Zrobione w Excalidraw\"",
@@ -67,7 +68,7 @@
     "layers": "Warstwy",
     "actions": "Akcje",
     "language": "Język",
-    "createRoom": "Udostępnij sesję współpracy na żywo",
+    "liveCollaboration": "Współpraca na żywo",
     "duplicateSelection": "Powiel",
     "untitled": "Bez tytułu",
     "name": "Nazwa",
@@ -76,12 +77,12 @@
     "group": "Zgrupuj wybrane",
     "ungroup": "Rozgrupuj wybrane",
     "collaborators": "Współtwórcy",
-    "gridMode": "Tryb siatki",
+    "showGrid": "Pokaż siatkę",
     "addToLibrary": "Dodaj do biblioteki",
     "removeFromLibrary": "Usuń z biblioteki",
-    "libraryLoadingMessage": "Wczytywanie biblioteki...",
+    "libraryLoadingMessage": "Wczytywanie biblioteki…",
     "libraries": "Przeglądaj biblioteki",
-    "loadingScene": "Ładowanie sceny...",
+    "loadingScene": "Wczytywanie sceny…",
     "align": "Wyrównaj",
     "alignTop": "Wyrównaj do góry",
     "alignBottom": "Wyrównaj do dołu",
@@ -90,7 +91,9 @@
     "centerVertically": "Wyśrodkuj w pionie",
     "centerHorizontally": "Wyśrodkuj w poziomie",
     "distributeHorizontally": "Rozłóż poziomo",
-    "distributeVertically": "Rozłóż pionowo"
+    "distributeVertically": "Rozłóż pionowo",
+    "viewMode": "Tryb widoku",
+    "toggleExportColorScheme": ""
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
@@ -99,7 +102,7 @@
     "exportToSvg": "Zapisz jako SVG",
     "copyToClipboard": "Skopiuj do schowka",
     "copyPngToClipboard": "Skopiuj do schowka jako plik PNG",
-    "scale": "",
+    "scale": "Skala",
     "save": "Zapisz",
     "saveAs": "Zapisz jako",
     "load": "Otwórz",
@@ -115,18 +118,18 @@
     "edit": "Edytuj",
     "undo": "Cofnij",
     "redo": "Przywróć",
-    "roomDialog": "Utwórz nową sesję współpracy na żywo",
+    "resetLibrary": "Resetuj bibliotekę",
     "createNewRoom": "Utwórz nowy pokój",
-    "fullScreen": "",
-    "darkMode": "",
-    "lightMode": "",
-    "zenMode": "",
+    "fullScreen": "Pełny ekran",
+    "darkMode": "Ciemny motyw",
+    "lightMode": "Jasny motyw",
+    "zenMode": "Tryb Zen",
     "exitZenMode": "Wyjdź z trybu Zen"
   },
   "alerts": {
     "clearReset": "To spowoduje usunięcie wszystkiego z dokumentu. Czy chcesz kontynuować?",
     "couldNotCreateShareableLink": "Wystąpił błąd przy generowaniu linka do udostępniania.",
-    "couldNotCreateShareableLinkTooBig": "Nie można utworzyć udostępnialnego linku: scena jest za duża",
+    "couldNotCreateShareableLinkTooBig": "Nie można utworzyć linku do udostępnienia: scena jest za duża",
     "couldNotLoadInvalidFile": "Nie udało się otworzyć pliku. Wybrany plik jest nieprawidłowy.",
     "importBackendFailed": "Wystąpił błąd podczas importowania pliku.",
     "cannotExportEmptyCanvas": "Najpierw musisz coś narysować, aby zapisać dokument.",
@@ -134,10 +137,12 @@
     "decryptFailed": "Nie udało się odszyfrować danych.",
     "uploadedSecurly": "By zapewnić Ci prywatność, udostępnianie projektu jest zabezpieczone szyfrowaniem end-to-end, co oznacza, że poza tobą i osobą z którą podzielisz się linkiem, nikt nie ma dostępu do tego co udostępniasz.",
     "loadSceneOverridePrompt": "Wczytanie zewnętrznego rysunku zastąpi istniejącą zawartość. Czy chcesz kontynuować?",
-    "errorLoadingLibrary": "Wystąpił błąd podczas ładowania biblioteki stron trzecich.",
+    "collabStopOverridePrompt": "Zatrzymanie sesji nadpisze poprzedni, zapisany lokalnie rysunk. Jesteś pewien?\n\n(Jeśli chcesz zachować swój lokalny rysunek, po prostu zamknij zakładkę przeglądarki.)",
+    "errorLoadingLibrary": "Wystąpił błąd podczas wczytywania zewnętrznej biblioteki.",
     "confirmAddLibrary": "To doda {{numShapes}} kształtów do twojej biblioteki. Jesteś pewien?",
-    "imageDoesNotContainScene": "",
-    "cannotRestoreFromImage": "Scena nie mogła zostać przywrócona z pliku obrazu"
+    "imageDoesNotContainScene": "Importowanie zdjęć nie jest obecnie obsługiwane.\n\nCzy chciałeś zaimportować scenę? Ten obraz nie zawiera żadnych danych sceny. Czy włączyłeś to podczas eksportowania?",
+    "cannotRestoreFromImage": "Scena nie mogła zostać przywrócona z pliku obrazu",
+    "resetLibrary": "To wyczyści twoją bibliotekę. Jesteś pewien?"
   },
   "toolBar": {
     "selection": "Zaznaczenie",
@@ -161,7 +166,7 @@
     "freeDraw": "Naciśnij i przeciągnij by rysować, puść kiedy skończysz",
     "text": "Wskazówka: możesz również dodać tekst klikając dwukrotnie gdziekolwiek za pomocą narzędzia zaznaczania",
     "linearElementMulti": "Aby zakończyć krzywą, ponownie kliknij w ostatni punkt, bądź naciśnij Esc albo Enter",
-    "lockAngle": "",
+    "lockAngle": "Możesz ograniczyć kąt trzymając SHIFT",
     "resize": "Możesz zachować proporcję trzymająć wcisnięty SHIFT, przytrzymaj ALT by zmienić rozmiar względem środka",
     "rotate": "Możesz obracać element w równych odstępach trzymając wciśnięty SHIFT",
     "lineEditor_info": "Kliknij dwukrotnie lub naciśnij Enter, aby edytować punkty",
@@ -169,8 +174,8 @@
     "lineEditor_nothingSelected": "Naciśnij w punkt by go edytować, przytrzymaj Alt i naciśnij by dodać nowy punkt"
   },
   "canvasError": {
-    "cannotShowPreview": "Nie można pokazać podglądu",
-    "canvasTooBig": "Płótno może być za duże.",
+    "cannotShowPreview": "Nie można wyświetlić podglądu",
+    "canvasTooBig": "Obszar roboczy może być za duży.",
     "canvasTooBigTip": "Wskazówka: spróbuj nieco zbliżyć najdalej wysunięte elementy."
   },
   "errorSplash": {
@@ -198,24 +203,26 @@
   "errorDialog": {
     "title": "Wystąpił błąd"
   },
-  "shortcutsDialog": {
-    "title": "Skróty klawiszowe",
-    "shapes": "Kształty",
-    "or": "lub",
-    "click": "klik",
-    "drag": "przeciągnij",
+  "helpDialog": {
+    "blog": "Przeczytaj na naszym blogu",
+    "click": "kliknięcie",
     "curvedArrow": "Zakrzywiona strzałka",
     "curvedLine": "Zakrzywiona linia",
+    "documentation": "Dokumentacja",
+    "drag": "przeciągnij",
     "editor": "Edytor",
-    "view": "Widok",
-    "blog": "Przeczytaj naszego bloga",
+    "github": "Znalazłeś problem? Prześlij",
     "howto": "Skorzystaj z instrukcji",
-    "github": "Znalazłeś problem? Zgłoś go",
-    "textNewLine": "Dodaj nową linię (tekst)",
+    "or": "lub",
+    "preventBinding": "Zapobiegaj wiązaniu strzałek",
+    "shapes": "Kształty",
+    "shortcuts": "Skróty klawiszowe",
     "textFinish": "Zakończ edycję (tekst)",
+    "textNewLine": "Dodaj nową linię (tekst)",
+    "title": "Pomoc",
+    "view": "Widok",
     "zoomToFit": "Powiększ, aby wyświetlić wszystkie elementy",
-    "zoomToSelection": "Przybliż zaznaczenie",
-    "preventBinding": "Zablokuj przywiązanie strzałek do obiektu"
+    "zoomToSelection": "Przybliż do zaznaczenia"
   },
   "encrypted": {
     "tooltip": "Twoje rysunki są zabezpieczone szyfrowaniem end-to-end, tak więc nawet w Excalidraw nie jesteśmy w stanie zobaczyć tego co tworzysz."
@@ -229,7 +236,19 @@
     "selected": "Zaznaczenie",
     "storage": "Pamięć",
     "title": "Statystyki dla nerdów",
-    "total": "Suma",
+    "total": "Łącznie",
+    "version": "Wersja",
+    "versionCopy": "Kliknij, aby skopiować",
+    "versionNotAvailable": "Wersja niedostępna",
     "width": "Szerokość"
+  },
+  "toast": {
+    "copyStyles": "Skopiowano style.",
+    "copyToClipboard": "Skopiowano do schowka.",
+    "copyToClipboardAsPng": "",
+    "fileSaved": "Zapisano plik.",
+    "fileSavedToFilename": "Zapisano jako {filename}",
+    "canvas": "",
+    "selection": ""
   }
 }

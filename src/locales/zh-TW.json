@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "貼上",
+    "pasteCharts": "貼上圖表",
     "selectAll": "全選",
     "multiSelect": "將物件加入選取範圍",
     "moveCanvas": "移動畫布",
@@ -67,7 +68,7 @@
     "layers": "圖層",
     "actions": "動作",
     "language": "語言",
-    "createRoom": "建立新協作會議室",
+    "liveCollaboration": "即時協作",
     "duplicateSelection": "複製",
     "untitled": "無標題",
     "name": "名稱",
@@ -76,11 +77,11 @@
     "group": "建立群組",
     "ungroup": "取消群組",
     "collaborators": "協作者",
-    "gridMode": "網格模式",
+    "showGrid": "顯示格線",
     "addToLibrary": "加入資料庫",
     "removeFromLibrary": "從資料庫中移除",
     "libraryLoadingMessage": "資料庫讀取中…",
-    "libraries": "",
+    "libraries": "瀏覽資料庫",
     "loadingScene": "場景讀取中…",
     "align": "對齊",
     "alignTop": "對齊頂部",
@@ -90,7 +91,9 @@
     "centerVertically": "垂直置中",
     "centerHorizontally": "水平置中",
     "distributeHorizontally": "水平分布",
-    "distributeVertically": "垂直分布"
+    "distributeVertically": "垂直分布",
+    "viewMode": "檢視模式",
+    "toggleExportColorScheme": "切換輸出配色"
   },
   "buttons": {
     "clearReset": "重置 canvas",
@@ -115,7 +118,7 @@
     "edit": "編輯",
     "undo": "復原",
     "redo": "重做",
-    "roomDialog": "開始即時協作",
+    "resetLibrary": "重設資料庫",
     "createNewRoom": "建立新協作會議室",
     "fullScreen": "全螢幕",
     "darkMode": "深色模式",
@@ -134,10 +137,12 @@
     "decryptFailed": "無法解密資料。",
     "uploadedSecurly": "上傳已通過 end-to-end 加密，Excalidraw 伺服器和第三方無法皆讀取其內容。",
     "loadSceneOverridePrompt": "讀取外部圖樣將取代目前的內容。是否要繼續？",
+    "collabStopOverridePrompt": "停止連線將覆蓋您先前於本機儲存的繪圖進度，是否確認？\n\n（如要保留原有的本機繪圖進度，直接關閉瀏覽器分頁即可。）",
     "errorLoadingLibrary": "載入第三方套件時出現錯誤。",
     "confirmAddLibrary": "這將會將 {{numShapes}} 個圖形加入你的資料庫，你確定嗎？",
     "imageDoesNotContainScene": "目前尚不支援載入圖片。\n您是否要載入場景？此圖片中並無任何場景資料，輸出時是否有選擇包含？",
-    "cannotRestoreFromImage": "無法由此檔案回復場景。"
+    "cannotRestoreFromImage": "無法由此檔案回復場景。",
+    "resetLibrary": "這會清除您的資料庫，是否確定？"
   },
   "toolBar": {
     "selection": "選取",
@@ -198,24 +203,26 @@
   "errorDialog": {
     "title": "錯誤"
   },
-  "shortcutsDialog": {
-    "title": "鍵盤快速鍵",
-    "shapes": "形狀",
-    "or": "或",
-    "click": "點擊",
-    "drag": "拖曳",
-    "curvedArrow": "箭頭曲線",
-    "curvedLine": "曲線",
-    "editor": "編輯器",
-    "view": "檢視",
+  "helpDialog": {
     "blog": "閱讀部落格",
-    "howto": "官方指南",
-    "github": "發現問題？回報 issue",
-    "textNewLine": "換行（文字）",
-    "textFinish": "完成編輯（文字）",
+    "click": "點擊",
+    "curvedArrow": "曲箭頭",
+    "curvedLine": "曲線",
+    "documentation": "文件",
+    "drag": "拖曳",
+    "editor": "編輯器",
+    "github": "發現異常？回報問題",
+    "howto": "參照我們的說明",
+    "or": "或",
+    "preventBinding": "避免箭號連結",
+    "shapes": "形狀",
+    "shortcuts": "鍵盤快速鍵",
+    "textFinish": "完成編輯 (文字)",
+    "textNewLine": "換行 (文字)",
+    "title": "說明",
+    "view": "檢視",
     "zoomToFit": "放大至填滿畫面",
-    "zoomToSelection": "縮放至選取區",
-    "preventBinding": "防止箭頭綁定"
+    "zoomToSelection": "縮放至選取區"
   },
   "encrypted": {
     "tooltip": "你的作品已使用 end-to-end 方式加密，Excalidraw 的伺服器也無法取得其內容。"
@@ -230,6 +237,18 @@
     "storage": "儲存",
     "title": "詳細統計",
     "total": "合計",
+    "version": "版本",
+    "versionCopy": "點擊複製",
+    "versionNotAvailable": "無法取得版本",
     "width": "寬度"
+  },
+  "toast": {
+    "copyStyles": "已複製樣式",
+    "copyToClipboard": "複製至剪貼簿。",
+    "copyToClipboardAsPng": "以 PNG 格式將 {{exportSelection}} 複製至剪貼簿\n({{exportColorScheme}})",
+    "fileSaved": "已儲存檔案。",
+    "fileSavedToFilename": "儲存為 {filename}",
+    "canvas": "畫布",
+    "selection": "已選項目"
   }
 }

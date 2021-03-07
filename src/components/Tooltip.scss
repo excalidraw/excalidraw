@@ -1,4 +1,4 @@
-@import "../css/_variables";
+@import "../css/variables.module";
 .excalidraw {
   .Tooltip {
     position: relative;
@@ -48,15 +48,7 @@
     }
   }
 
-  // the following 3 rules ensure that the tooltip doesn't show (nor affect
-  // the cursor) when you drag over when you draw on canvas, but at the same
-  // time it still works when clicking on the link/shield
-
-  body:active & .Tooltip:not(:hover) {
-    pointer-events: none;
-  }
-
-  body:not(:active) & .Tooltip:hover .Tooltip__label {
+  .Tooltip:hover .Tooltip__label {
     visibility: visible;
   }
 

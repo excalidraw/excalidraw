@@ -3,14 +3,16 @@ import {
   Action,
   ActionsManagerInterface,
   UpdaterFn,
-  ActionFilterFn,
   ActionName,
   ActionResult,
 } from "./types";
 import { ExcalidrawElement } from "../element/types";
-import { AppState } from "../types";
-import { t } from "../i18n";
-import { ShortcutName } from "./shortcuts";
+import { AppState, ExcalidrawProps } from "../types";
+import { MODES } from "../constants";
+
+// This is the <App> component, but for now we don't care about anything but its
+// `canvas` state.
+type App = { canvas: HTMLCanvasElement | null; props: ExcalidrawProps };
 
 export class ActionManager implements ActionsManagerInterface {
   actions = {} as ActionsManagerInterface["actions"];
@@ -18,13 +20,14 @@ export class ActionManager implements ActionsManagerInterface {
   updater: (actionResult: ActionResult | Promise<ActionResult>) => void;
 
   getAppState: () => Readonly<AppState>;
-
   getElementsIncludingDeleted: () => readonly ExcalidrawElement[];
+  app: App;
 
   constructor(
     updater: UpdaterFn,
     getAppState: () => AppState,
     getElementsIncludingDeleted: () => readonly ExcalidrawElement[],
+    app: App,
   ) {
     this.updater = (actionResult) => {
       if (actionResult && "then" in actionResult) {
@@ -37,6 +40,7 @@ export class ActionManager implements ActionsManagerInterface {
     };
     this.getAppState = getAppState;
     this.getElementsIncludingDeleted = getElementsIncludingDeleted;
+    this.app = app;
   }
 
   registerAction(action: Action) {
@@ -63,6 +67,12 @@ export class ActionManager implements ActionsManagerInterface {
     if (data.length === 0) {
       return false;
     }
+    const { viewModeEnabled } = this.getAppState();
+    if (viewModeEnabled) {
+      if (!Object.values(MODES).includes(data[0].name)) {
+        return false;
+      }
+    }
 
     event.preventDefault();
     this.updater(
@@ -70,6 +80,7 @@ export class ActionManager implements ActionsManagerInterface {
         this.getElementsIncludingDeleted(),
         this.getAppState(),
         null,
+        this.app,
       ),
     );
     return true;
@@ -81,41 +92,9 @@ export class ActionManager implements ActionsManagerInterface {
         this.getElementsIncludingDeleted(),
         this.getAppState(),
         null,
+        this.app,
       ),
     );
-  }
-
-  getContextMenuItems(actionFilter: ActionFilterFn = (action) => action) {
-    return Object.values(this.actions)
-      .filter(actionFilter)
-      .filter((action) => "contextItemLabel" in action)
-      .filter((action) =>
-        action.contextItemPredicate
-          ? action.contextItemPredicate(
-              this.getElementsIncludingDeleted(),
-              this.getAppState(),
-            )
-          : true,
-      )
-      .sort(
-        (a, b) =>
-          (a.contextMenuOrder !== undefined ? a.contextMenuOrder : 999) -
-          (b.contextMenuOrder !== undefined ? b.contextMenuOrder : 999),
-      )
-      .map((action) => ({
-        // take last bit of the label  "labels.<shortcutName>"
-        shortcutName: action.contextItemLabel?.split(".").pop() as ShortcutName,
-        label: action.contextItemLabel ? t(action.contextItemLabel) : "",
-        action: () => {
-          this.updater(
-            action.perform(
-              this.getElementsIncludingDeleted(),
-              this.getAppState(),
-              null,
-            ),
-          );
-        },
-      }));
   }
 
   // Id is an attribute that we can use to pass in data like keys.
@@ -132,6 +111,7 @@ export class ActionManager implements ActionsManagerInterface {
             this.getElementsIncludingDeleted(),
             this.getAppState(),
             formState,
+            this.app,
           ),
         );
       };

@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Lim inn",
+    "pasteCharts": "Lim inn diagrammer",
     "selectAll": "Velg alt",
     "multiSelect": "Legg til element i utvalg",
     "moveCanvas": "Flytt lerretet",
@@ -67,7 +68,7 @@
     "layers": "Lag",
     "actions": "Handlinger",
     "language": "Språk",
-    "createRoom": "Del en sanntids-samarbeidsøkt",
+    "liveCollaboration": "Sanntids-samarbeid",
     "duplicateSelection": "Dupliser",
     "untitled": "Uten navn",
     "name": "Navn",
@@ -76,12 +77,12 @@
     "group": "Gruppér utvalg",
     "ungroup": "Avgruppér utvalg",
     "collaborators": "Samarbeidspartnere",
-    "gridMode": "Rutevisning",
+    "showGrid": "Vis rutenett",
     "addToLibrary": "Legg til i bibliotek",
     "removeFromLibrary": "Fjern fra bibliotek",
-    "libraryLoadingMessage": "Laster bibliotek...",
+    "libraryLoadingMessage": "Laster bibliotek…",
     "libraries": "Bla gjennom biblioteker",
-    "loadingScene": "Laster inn scene...",
+    "loadingScene": "Laster inn scene…",
     "align": "Juster",
     "alignTop": "Juster øverst",
     "alignBottom": "Juster nederst",
@@ -90,7 +91,9 @@
     "centerVertically": "Midtstill vertikalt",
     "centerHorizontally": "Midtstill horisontalt",
     "distributeHorizontally": "Distribuer horisontalt",
-    "distributeVertically": "Distribuer vertikalt"
+    "distributeVertically": "Distribuer vertikalt",
+    "viewMode": "Visningsmodus",
+    "toggleExportColorScheme": "Veksle eksport av fargepalett"
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
@@ -115,7 +118,7 @@
     "edit": "Rediger",
     "undo": "Angre",
     "redo": "Gjør om",
-    "roomDialog": "Start sanntids-samarbeid",
+    "resetLibrary": "Nullstill bibliotek",
     "createNewRoom": "Opprett et nytt rom",
     "fullScreen": "Fullskjerm",
     "darkMode": "Mørk modus",
@@ -134,10 +137,12 @@
     "decryptFailed": "Kunne ikke dekryptere data.",
     "uploadedSecurly": "Opplastingen er kryptert og kan ikke leses av Excalidraw-serveren eller tredjeparter.",
     "loadSceneOverridePrompt": "Å laste inn ekstern tegning vil erstatte det eksisterende innholdet. Ønsker du å fortsette?",
+    "collabStopOverridePrompt": "Hvis du slutter økten, overskrives din forrige, lokalt lagrede tegning. Er du sikker?\n\n(Hvis du ønsker å beholde din lokale tegning, bare lukk nettleserfanen i stedet.)",
     "errorLoadingLibrary": "Det oppstod en feil under lasting av tredjepartsbiblioteket.",
     "confirmAddLibrary": "Dette vil legge til {{numShapes}} figur(er) i biblioteket ditt. Er du sikker?",
     "imageDoesNotContainScene": "Importering av bilder støttes ikke for øyeblikket.\n\nVil du importere en scene? Dette bildet ser ikke ut til å inneholde noen scene-data. Har du aktivert dette under eksporten?",
-    "cannotRestoreFromImage": "Scenen kunne ikke gjenopprettes fra denne bildefilen"
+    "cannotRestoreFromImage": "Scenen kunne ikke gjenopprettes fra denne bildefilen",
+    "resetLibrary": "Dette vil tømme biblioteket ditt. Er du sikker?"
   },
   "toolBar": {
     "selection": "Velg",
@@ -198,24 +203,26 @@
   "errorDialog": {
     "title": "Feil"
   },
-  "shortcutsDialog": {
-    "title": "Tastatursnarveier",
-    "shapes": "Figurer",
-    "or": "eller",
+  "helpDialog": {
+    "blog": "Les bloggen vår",
     "click": "klikk",
-    "drag": "dra",
     "curvedArrow": "Buet pil",
     "curvedLine": "Buet linje",
-    "editor": "Redigering",
-    "view": "Visning",
-    "blog": "Les bloggen vår",
-    "howto": "Følg våre veiledninger",
+    "documentation": "Dokumentasjon",
+    "drag": "dra",
+    "editor": "Redigeringsvisning",
     "github": "Funnet et problem? Send inn",
-    "textNewLine": "Legg til ny linje (tekst)",
+    "howto": "Følg våre veiledninger",
+    "or": "eller",
+    "preventBinding": "Forhindre pilbinding",
+    "shapes": "Former",
+    "shortcuts": "Tastatursnarveier",
     "textFinish": "Fullfør redigering (tekst)",
-    "zoomToFit": "Zoom for å passe alle elementene",
-    "zoomToSelection": "Zoom til utvalg",
-    "preventBinding": "Forhindre pilbinding"
+    "textNewLine": "Legg til ny linje (tekst)",
+    "title": "Hjelp",
+    "view": "Vis",
+    "zoomToFit": "Zoom for å se alle elementer",
+    "zoomToSelection": "Zoom til utvalg"
   },
   "encrypted": {
     "tooltip": "Dine tegninger er ende-til-ende-krypterte slik at Excalidraw sine servere aldri vil se dem."
@@ -230,6 +237,18 @@
     "storage": "Lagring",
     "title": "Statistikk for nerder",
     "total": "Totalt",
+    "version": "Versjon",
+    "versionCopy": "Klikk for å kopiere",
+    "versionNotAvailable": "Versjon ikke tilgjengelig",
     "width": "Bredde"
+  },
+  "toast": {
+    "copyStyles": "Kopierte stiler.",
+    "copyToClipboard": "Kopiert til utklippstavlen.",
+    "copyToClipboardAsPng": "Kopierte {{exportSelection}} til utklippstavlen som PNG\n({{exportColorScheme}})",
+    "fileSaved": "Fil lagret.",
+    "fileSavedToFilename": "Lagret til {filename}",
+    "canvas": "lerret",
+    "selection": "utvalg"
   }
 }

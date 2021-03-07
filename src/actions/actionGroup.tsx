@@ -125,7 +125,6 @@ export const actionGroup = register({
       commitToHistory: true,
     };
   },
-  contextMenuOrder: 4,
   contextItemLabel: "labels.group",
   contextItemPredicate: (elements, appState) =>
     enableActionGroup(elements, appState),
@@ -174,7 +173,6 @@ export const actionUngroup = register({
   },
   keyTest: (event) =>
     event.shiftKey && event[KEYS.CTRL_OR_CMD] && event.code === CODES.G,
-  contextMenuOrder: 5,
   contextItemLabel: "labels.ungroup",
   contextItemPredicate: (elements, appState) =>
     getSelectedGroupIds(appState).length > 0,

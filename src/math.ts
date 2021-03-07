@@ -1,4 +1,4 @@
-import { Point } from "./types";
+import { NormalizedZoomValue, Point, Zoom } from "./types";
 import { LINE_CONFIRM_THRESHOLD } from "./constants";
 import { ExcalidrawLinearElement } from "./element/types";
 
@@ -68,64 +68,6 @@ export const adjustXYWithRotation = (
     y += deltaY2 * (1 - cos);
   }
   return [x, y];
-};
-
-export const getFlipAdjustment = (
-  side: "n" | "s" | "w" | "e" | "nw" | "ne" | "sw" | "se",
-  nextWidth: number,
-  nextHeight: number,
-  nextX1: number,
-  nextY1: number,
-  nextX2: number,
-  nextY2: number,
-  finalX1: number,
-  finalY1: number,
-  finalX2: number,
-  finalY2: number,
-  needsRotation: boolean,
-  angle: number,
-): [number, number] => {
-  const cos = Math.cos(angle);
-  const sin = Math.sin(angle);
-  let flipDiffX = 0;
-  let flipDiffY = 0;
-  if (nextWidth < 0) {
-    if (side === "e" || side === "ne" || side === "se") {
-      if (needsRotation) {
-        flipDiffX += (finalX2 - nextX1) * cos;
-        flipDiffY += (finalX2 - nextX1) * sin;
-      } else {
-        flipDiffX += finalX2 - nextX1;
-      }
-    }
-    if (side === "w" || side === "nw" || side === "sw") {
-      if (needsRotation) {
-        flipDiffX += (finalX1 - nextX2) * cos;
-        flipDiffY += (finalX1 - nextX2) * sin;
-      } else {
-        flipDiffX += finalX1 - nextX2;
-      }
-    }
-  }
-  if (nextHeight < 0) {
-    if (side === "s" || side === "se" || side === "sw") {
-      if (needsRotation) {
-        flipDiffY += (finalY2 - nextY1) * cos;
-        flipDiffX += (finalY2 - nextY1) * -sin;
-      } else {
-        flipDiffY += finalY2 - nextY1;
-      }
-    }
-    if (side === "n" || side === "ne" || side === "nw") {
-      if (needsRotation) {
-        flipDiffY += (finalY1 - nextY2) * cos;
-        flipDiffX += (finalY1 - nextY2) * -sin;
-      } else {
-        flipDiffY += finalY1 - nextY2;
-      }
-    }
-  }
-  return [flipDiffX, flipDiffY];
 };
 
 export const getPointOnAPath = (point: Point, path: Point[]) => {
@@ -205,13 +147,16 @@ export const centerPoint = (a: Point, b: Point): Point => {
 // to be considered a loop
 export const isPathALoop = (
   points: ExcalidrawLinearElement["points"],
+  /** supply if you want the loop detection to account for current zoom */
+  zoomValue: Zoom["value"] = 1 as NormalizedZoomValue,
 ): boolean => {
   if (points.length >= 3) {
-    const [firstPoint, lastPoint] = [points[0], points[points.length - 1]];
-    return (
-      distance2d(firstPoint[0], firstPoint[1], lastPoint[0], lastPoint[1]) <=
-      LINE_CONFIRM_THRESHOLD
-    );
+    const [first, last] = [points[0], points[points.length - 1]];
+    const distance = distance2d(first[0], first[1], last[0], last[1]);
+
+    // Adjusting LINE_CONFIRM_THRESHOLD to current zoom so that when zoomed in
+    // really close we make the threshold smaller, and vice versa.
+    return distance <= LINE_CONFIRM_THRESHOLD / zoomValue;
   }
   return false;
 };

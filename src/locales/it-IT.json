@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Incolla",
+    "pasteCharts": "Incolla grafici",
     "selectAll": "Seleziona tutto",
     "multiSelect": "Aggiungi elemento alla selezione",
     "moveCanvas": "Sposta tela",
@@ -67,7 +68,7 @@
     "layers": "Livelli",
     "actions": "Azioni",
     "language": "Lingua",
-    "createRoom": "Condividi una sessione di collaborazione in diretta",
+    "liveCollaboration": "Collaborazione live",
     "duplicateSelection": "Duplica",
     "untitled": "Senza titolo",
     "name": "Nome",
@@ -76,12 +77,12 @@
     "group": "Crea gruppo da selezione",
     "ungroup": "Dividi gruppo da selezione",
     "collaborators": "Collaboratori",
-    "gridMode": "Modalità griglia",
-    "addToLibrary": "Aggiungi alla biblioteca",
-    "removeFromLibrary": "Rimuovi dalla biblioteca",
-    "libraryLoadingMessage": "Caricamento della biblioteca...",
+    "showGrid": "Visualizza griglia",
+    "addToLibrary": "Aggiungi alla libreria",
+    "removeFromLibrary": "Rimuovi dalla libreria",
+    "libraryLoadingMessage": "Caricamento libreria…",
     "libraries": "Sfoglia librerie",
-    "loadingScene": "Caricamento della scena...",
+    "loadingScene": "Caricamento della scena…",
     "align": "Allinea",
     "alignTop": "Allinea in alto",
     "alignBottom": "Allinea in basso",
@@ -90,7 +91,9 @@
     "centerVertically": "Centra Verticalmente",
     "centerHorizontally": "Centra orizzontalmente",
     "distributeHorizontally": "Distribuisci orizzontalmente",
-    "distributeVertically": "Distribuisci verticalmente"
+    "distributeVertically": "Distribuisci verticalmente",
+    "viewMode": "Modalità visualizzazione",
+    "toggleExportColorScheme": "Cambia lo schema di colori in esportazione"
   },
   "buttons": {
     "clearReset": "Svuota la tela",
@@ -115,7 +118,7 @@
     "edit": "Modifica",
     "undo": "Annulla",
     "redo": "Ripeti",
-    "roomDialog": "Inizia collaborazione in diretta",
+    "resetLibrary": "Ripristina libreria",
     "createNewRoom": "Crea nuova stanza",
     "fullScreen": "Schermo intero",
     "darkMode": "Tema scuro",
@@ -134,10 +137,12 @@
     "decryptFailed": "Impossibile decriptare i dati.",
     "uploadedSecurly": "L'upload è stato protetto con la crittografia end-to-end, il che significa che il server Excalidraw e terze parti non possono leggere il contenuto.",
     "loadSceneOverridePrompt": "Se carichi questo disegno esterno, sostituirà quello che hai. Vuoi continuare?",
+    "collabStopOverridePrompt": "Interrompere la sessione sovrascriverà il precedente disegno memorizzato localmente. Sei sicuro?\n\n(Se vuoi mantenere il tuo disegno locale, chiudi semplicemente la scheda del browser.)",
     "errorLoadingLibrary": "Si è verificato un errore nel caricamento della libreria di terze parti.",
-    "confirmAddLibrary": "Questo aggiungerà {{numShapes}} forma(e) alla tua biblioteca. Sei sicuro?",
+    "confirmAddLibrary": "Questo aggiungerà {{numShapes}} forma(e) alla tua libreria. Sei sicuro?",
     "imageDoesNotContainScene": "L'importazione di immagini al momento non è supportata.\n\nVuoi importare una scena? Questa immagine non sembra contenere alcun dato di scena. Hai abilitato questa opzione durante l'esportazione?",
-    "cannotRestoreFromImage": "Impossibile ripristinare la scena da questo file immagine"
+    "cannotRestoreFromImage": "Impossibile ripristinare la scena da questo file immagine",
+    "resetLibrary": "Questa azione cancellerà l'intera libreria. Sei sicuro?"
   },
   "toolBar": {
     "selection": "Selezione",
@@ -148,7 +153,7 @@
     "arrow": "Freccia",
     "line": "Linea",
     "text": "Testo",
-    "library": "Biblioteca",
+    "library": "Libreria",
     "lock": "Mantieni lo strumento selezionato attivo dopo aver disegnato"
   },
   "headings": {
@@ -162,7 +167,7 @@
     "text": "Suggerimento: puoi anche aggiungere del testo facendo doppio clic ovunque con lo strumento di selezione",
     "linearElementMulti": "Clicca sull'ultimo punto o premi Esc o Invio per finire",
     "lockAngle": "Puoi limitare l'angolo tenendo premuto SHIFT",
-    "resize": "Per vincolare le proporzioni, tenir premuto MAIUSC durante il ridimensionamento;\nper ridimensionare dal centro, tenir premuto ALT",
+    "resize": "Per vincolare le proporzioni, tieni premuto MAIUSC durante il ridimensionamento;\nper ridimensionare dal centro, tieni premuto ALT",
     "rotate": "Puoi mantenere gli angoli tenendo premuto SHIFT durante la rotazione",
     "lineEditor_info": "Fai doppio click o premi invio per modificare i punti",
     "lineEditor_pointSelected": "Premere Elimina per rimuovere il punto, CtrlOrCmd+D per duplicare o trascinare per spostare",
@@ -198,24 +203,26 @@
   "errorDialog": {
     "title": "Errore"
   },
-  "shortcutsDialog": {
-    "title": "Scorciatoie da tastiera",
-    "shapes": "Forme",
-    "or": "oppure",
+  "helpDialog": {
+    "blog": "Leggi il nostro blog",
     "click": "click",
-    "drag": "trascina",
     "curvedArrow": "Freccia curva",
     "curvedLine": "Linea curva",
+    "documentation": "Documentazione",
+    "drag": "trascina",
     "editor": "Editor",
-    "view": "Vista",
-    "blog": "Leggi il nostro blog",
+    "github": "Trovato un problema? Segnalalo",
     "howto": "Segui le nostre guide",
-    "github": "Hai trovato un problema? Segnalalo",
+    "or": "oppure",
+    "preventBinding": "Impedisci legame della freccia",
+    "shapes": "Forme",
+    "shortcuts": "Scorciatoie da tastiera",
+    "textFinish": "Termina la modifica (testo)",
     "textNewLine": "Aggiungi nuova riga (testo)",
-    "textFinish": "Completa la modifica (testo)",
+    "title": "Guida",
+    "view": "Vista",
     "zoomToFit": "Adatta zoom per mostrare tutti gli elementi",
-    "zoomToSelection": "Zoom alla selezione",
-    "preventBinding": "Prevenire l'associazione freccia"
+    "zoomToSelection": "Zoom alla selezione"
   },
   "encrypted": {
     "tooltip": "I tuoi disegni sono crittografati end-to-end in modo che i server di Excalidraw non li possano mai vedere."
@@ -230,6 +237,18 @@
     "storage": "Memoria",
     "title": "Statistiche per nerd",
     "total": "Totale",
+    "version": "Versione",
+    "versionCopy": "Clicca per copiare",
+    "versionNotAvailable": "Versione non disponibile",
     "width": "Larghezza"
+  },
+  "toast": {
+    "copyStyles": "Stili copiati.",
+    "copyToClipboard": "Copiato negli appunti.",
+    "copyToClipboardAsPng": "{{exportSelection}} copiato negli appunti come PNG\n({{exportColorScheme}})",
+    "fileSaved": "File salvato.",
+    "fileSavedToFilename": "Salvato in {filename}",
+    "canvas": "tela",
+    "selection": "selezione"
   }
 }

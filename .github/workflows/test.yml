@@ -1,26 +1,17 @@
 name: Tests
 
-on:
-  push:
-    branches:
-      - master
-  pull_request:
+on: pull_request
 
 jobs:
   test:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v1
-
-      - name: Setup Node.js 12.x
-        uses: actions/setup-node@v1
+      - uses: actions/checkout@v2
+      - name: Setup Node.js 14.x
+        uses: actions/setup-node@v2
         with:
-          node-version: 12.x
-
+          node-version: 14.x
       - name: Install and test
         run: |
-          npm ci
-          npm run test:app
-        env:
-          CI: true
+          yarn --frozen-lockfile
+          yarn test:app

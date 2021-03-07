@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Einfügen",
+    "pasteCharts": "Diagramme einfügen",
     "selectAll": "Alle auswählen",
     "multiSelect": "Element zur Auswahl hinzufügen",
     "moveCanvas": "Leinwand verschieben",
@@ -67,7 +68,7 @@
     "layers": "Ebenen",
     "actions": "Aktionen",
     "language": "Sprache",
-    "createRoom": "Live-Kollaborationssitzung teilen",
+    "liveCollaboration": "Live-Zusammenarbeit",
     "duplicateSelection": "Duplizieren",
     "untitled": "Unbenannt",
     "name": "Name",
@@ -75,13 +76,13 @@
     "madeWithExcalidraw": "Made with Excalidraw",
     "group": "Auswahl gruppieren",
     "ungroup": "Gruppierung aufheben",
-    "collaborators": "Mitarbeitende",
-    "gridMode": "Rastermodus",
+    "collaborators": "Kollaboratoren",
+    "showGrid": "Raster anzeigen",
     "addToLibrary": "Zur Bibliothek hinzufügen",
     "removeFromLibrary": "Aus Bibliothek entfernen",
-    "libraryLoadingMessage": "Lade Bibliothek...",
+    "libraryLoadingMessage": "Lade Bibliothek…",
     "libraries": "Bibliotheken durchsuchen",
-    "loadingScene": "Lade Zeichnung...",
+    "loadingScene": "Lade Zeichnung…",
     "align": "Ausrichten",
     "alignTop": "Obere Kanten",
     "alignBottom": "Untere Kanten",
@@ -90,7 +91,9 @@
     "centerVertically": "Vertikal zentrieren",
     "centerHorizontally": "Horizontal zentrieren",
     "distributeHorizontally": "Horizontal verteilen",
-    "distributeVertically": "Vertikal verteilen"
+    "distributeVertically": "Vertikal verteilen",
+    "viewMode": "Ansichtsmodus",
+    "toggleExportColorScheme": "Farbschema für Export umschalten"
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
@@ -99,7 +102,7 @@
     "exportToSvg": "Als SVG exportieren",
     "copyToClipboard": "In Zwischenablage kopieren",
     "copyPngToClipboard": "PNG in die Zwischenablage kopieren",
-    "scale": "Skalieren",
+    "scale": "Skalierung",
     "save": "Speichern",
     "saveAs": "Speichern unter",
     "load": "Laden",
@@ -115,7 +118,7 @@
     "edit": "Bearbeiten",
     "undo": "Rückgängig machen",
     "redo": "Wiederholen",
-    "roomDialog": "Live-Kollaborationssitzung starten",
+    "resetLibrary": "Bibliothek zurücksetzen",
     "createNewRoom": "Neuen Raum erstellen",
     "fullScreen": "Vollbildanzeige",
     "darkMode": "Dunkles Design",
@@ -134,10 +137,12 @@
     "decryptFailed": "Daten konnten nicht entschlüsselt werden.",
     "uploadedSecurly": "Der Upload wurde mit Ende-zu-Ende-Verschlüsselung gespeichert. Weder Excalidraw noch Dritte können den Inhalt einsehen.",
     "loadSceneOverridePrompt": "Das Laden der externen Zeichnung ersetzt den vorhandenen Inhalt. Möchtest Du fortfahren?",
+    "collabStopOverridePrompt": "Das Stoppen der Sitzung wird Deine vorherige, lokal gespeicherte Zeichnung überschreiben. Bist Du sicher?\n\n(Wenn Du Deine lokale Zeichnung behalten möchtest, schließe einfach stattdessen den Browser-Tab.)",
     "errorLoadingLibrary": "Beim Laden der Drittanbieter-Bibliothek ist ein Fehler aufgetreten.",
     "confirmAddLibrary": "Dieses fügt {{numShapes}} Form(en) zu deiner Bibliothek hinzu. Bist du sicher?",
     "imageDoesNotContainScene": "Das Importieren von Bildern wird derzeit nicht unterstützt.\n\nMöchtest du eine Szene importieren? Dieses Bild scheint keine Zeichnungsdaten zu enthalten. Hast du dies beim Exportieren aktiviert?",
-    "cannotRestoreFromImage": "Die Zeichnung konnte aus dieser Bilddatei nicht wiederhergestellt werden"
+    "cannotRestoreFromImage": "Die Zeichnung konnte aus dieser Bilddatei nicht wiederhergestellt werden",
+    "resetLibrary": "Dieses löscht deine Bibliothek. Bist du sicher?"
   },
   "toolBar": {
     "selection": "Auswahl",
@@ -198,24 +203,26 @@
   "errorDialog": {
     "title": "Fehler"
   },
-  "shortcutsDialog": {
-    "title": "Tastaturkürzel",
-    "shapes": "Formen",
-    "or": "oder",
+  "helpDialog": {
+    "blog": "Lies unseren Blog",
     "click": "klicken",
-    "drag": "ziehen",
     "curvedArrow": "Gebogener Pfeil",
     "curvedLine": "Gebogene Linie",
+    "documentation": "Dokumentation",
+    "drag": "ziehen",
     "editor": "Editor",
-    "view": "Ansicht",
-    "blog": "Unseren Blog lesen",
-    "howto": "Folge unseren Anleitungen",
     "github": "Ein Problem gefunden? Informiere uns",
-    "textNewLine": "Neue Zeile hinzufügen (Text)",
+    "howto": "Folge unseren Anleitungen",
+    "or": "oder",
+    "preventBinding": "Pfeil-Bindung verhindern",
+    "shapes": "Formen",
+    "shortcuts": "Tastaturkürzel",
     "textFinish": "Bearbeiten beenden (Text)",
+    "textNewLine": "Neue Zeile hinzufügen (Text)",
+    "title": "Hilfe",
+    "view": "Ansicht",
     "zoomToFit": "Zoomen um alle Elemente einzupassen",
-    "zoomToSelection": "Zoomauswahl",
-    "preventBinding": "Pfeil-Bindung verhindern"
+    "zoomToSelection": "Auf Auswahl zoomen"
   },
   "encrypted": {
     "tooltip": "Da deine Zeichnungen Ende-zu-Ende verschlüsselt werden, sehen auch unsere Excalidraw-Server sie niemals."
@@ -230,6 +237,18 @@
     "storage": "Speicher",
     "title": "Statistiken für Nerds",
     "total": "Gesamt",
+    "version": "Version",
+    "versionCopy": "Zum Kopieren klicken",
+    "versionNotAvailable": "Version nicht verfügbar",
     "width": "Breite"
+  },
+  "toast": {
+    "copyStyles": "Formatierung kopiert.",
+    "copyToClipboard": "In die Zwischenablage kopiert.",
+    "copyToClipboardAsPng": "{{exportSelection}} als PNG in die Zwischenablage kopiert\n({{exportColorScheme}})",
+    "fileSaved": "Datei gespeichert.",
+    "fileSavedToFilename": "Als {filename} gespeichert",
+    "canvas": "Leinwand",
+    "selection": "Auswahl"
   }
 }

@@ -68,7 +68,7 @@
     "layers": "Layers",
     "actions": "Actions",
     "language": "Language",
-    "createRoom": "Share a live-collaboration session",
+    "liveCollaboration": "Live collaboration",
     "duplicateSelection": "Duplicate",
     "untitled": "Untitled",
     "name": "Name",
@@ -77,12 +77,12 @@
     "group": "Group selection",
     "ungroup": "Ungroup selection",
     "collaborators": "Collaborators",
-    "gridMode": "Grid mode",
+    "showGrid": "Show grid",
     "addToLibrary": "Add to library",
     "removeFromLibrary": "Remove from library",
-    "libraryLoadingMessage": "Loading library...",
+    "libraryLoadingMessage": "Loading library…",
     "libraries": "Browse libraries",
-    "loadingScene": "Loading scene...",
+    "loadingScene": "Loading scene…",
     "align": "Align",
     "alignTop": "Align top",
     "alignBottom": "Align bottom",
@@ -91,7 +91,9 @@
     "centerVertically": "Center vertically",
     "centerHorizontally": "Center horizontally",
     "distributeHorizontally": "Distribute horizontally",
-    "distributeVertically": "Distribute vertically"
+    "distributeVertically": "Distribute vertically",
+    "viewMode": "View mode",
+    "toggleExportColorScheme": "Toggle export color scheme"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
@@ -116,7 +118,7 @@
     "edit": "Edit",
     "undo": "Undo",
     "redo": "Redo",
-    "roomDialog": "Start live collaboration",
+    "resetLibrary": "Reset library",
     "createNewRoom": "Create new room",
     "fullScreen": "Full screen",
     "darkMode": "Dark mode",
@@ -135,11 +137,13 @@
     "decryptFailed": "Couldn't decrypt data.",
     "uploadedSecurly": "The upload has been secured with end-to-end encryption, which means that Excalidraw server and third parties can't read the content.",
     "loadSceneOverridePrompt": "Loading external drawing will replace your existing content. Do you wish to continue?",
+    "collabStopOverridePrompt": "Stopping the session will overwrite your previous, locally stored drawing. Are you sure?\n\n(If you want to keep your local drawing, simply close the browser tab instead.)",
     "errorLoadingLibrary": "There was an error loading the third party library.",
     "confirmAddLibrary": "This will add {{numShapes}} shape(s) to your library. Are you sure?",
     "imageDoesNotContainScene": "Importing images isn't supported at the moment.\n\nDid you want to import a scene? This image does not seem to contain any scene data. Have you enabled this during export?",
     "cannotRestoreFromImage": "Scene couldn't be restored from this image file",
-    "invalidSceneUrl": "URL supplied doesn't contain valid Excalidraw JSON data"
+    "invalidSceneUrl": "URL supplied doesn't contain valid Excalidraw JSON data",
+    "resetLibrary": "This will clear your library. Are you sure?"
   },
   "toolBar": {
     "selection": "Selection",
@@ -200,24 +204,26 @@
   "errorDialog": {
     "title": "Error"
   },
-  "shortcutsDialog": {
-    "title": "Keyboard shortcuts",
-    "shapes": "Shapes",
-    "or": "or",
+  "helpDialog": {
+    "blog": "Read our blog",
     "click": "click",
-    "drag": "drag",
     "curvedArrow": "Curved arrow",
     "curvedLine": "Curved line",
+    "documentation": "Documentation",
+    "drag": "drag",
     "editor": "Editor",
-    "view": "View",
-    "blog": "Read our blog",
-    "howto": "Follow our guides",
     "github": "Found an issue? Submit",
-    "textNewLine": "Add new line (text)",
+    "howto": "Follow our guides",
+    "or": "or",
+    "preventBinding": "Prevent arrow binding",
+    "shapes": "Shapes",
+    "shortcuts": "Keyboard shortcuts",
     "textFinish": "Finish editing (text)",
+    "textNewLine": "Add new line (text)",
+    "title": "Help",
+    "view": "View",
     "zoomToFit": "Zoom to fit all elements",
-    "zoomToSelection": "Zoom to selection",
-    "preventBinding": "Prevent arrow binding"
+    "zoomToSelection": "Zoom to selection"
   },
   "encrypted": {
     "tooltip": "Your drawings are end-to-end encrypted so Excalidraw's servers will never see them."
@@ -232,6 +238,18 @@
     "storage": "Storage",
     "title": "Stats for nerds",
     "total": "Total",
+    "version": "Version",
+    "versionCopy": "Click to copy",
+    "versionNotAvailable": "Version not available",
     "width": "Width"
+  },
+  "toast": {
+    "copyStyles": "Copied styles.",
+    "copyToClipboard": "Copied to clipboard.",
+    "copyToClipboardAsPng": "Copied {{exportSelection}} to clipboard as PNG\n({{exportColorScheme}})",
+    "fileSaved": "File saved.",
+    "fileSavedToFilename": "Saved to {filename}",
+    "canvas": "canvas",
+    "selection": "selection"
   }
 }

@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "ထား",
+    "pasteCharts": "",
     "selectAll": "အကုန်ရွေး",
     "multiSelect": "ရွေးထားသည့်ထဲပုံထည့်",
     "moveCanvas": "ကားချပ်ရွှေ့",
@@ -33,7 +34,7 @@
     "arrowhead_none": "ဘာမျှမရှိ",
     "arrowhead_arrow": "မြှား",
     "arrowhead_bar": "",
-    "arrowhead_dot": "",
+    "arrowhead_dot": "အစက်",
     "fontSize": "စာလုံးအရွယ်",
     "fontFamily": "စာလုံးပုံစံ",
     "onlySelected": "ရွေးထားသလောက်",
@@ -67,7 +68,7 @@
     "layers": "အလွှာများ",
     "actions": "လုပ်ဆောင်ချက်များ",
     "language": "ဘာသာစကား",
-    "createRoom": "တိုက်ရိုက်ပူးပေါင်းဆောင်ရွက်ရန်အဖွဲ့ဖွဲ့",
+    "liveCollaboration": "",
     "duplicateSelection": "ပွား",
     "untitled": "အမည်မရှိ",
     "name": "အမည်",
@@ -76,12 +77,12 @@
     "group": "အုပ်စုဖွဲ့",
     "ungroup": "အုပ်စုဖျက်သိမ်း",
     "collaborators": "ပူးပေါင်းပါဝင်သူများ",
-    "gridMode": "",
+    "showGrid": "",
     "addToLibrary": "မှတ်တမ်းတင်",
     "removeFromLibrary": "မှတ်တမ်းမှထုတ်",
-    "libraryLoadingMessage": "မှတ်တမ်းအား တင်သွင်းနေသည်...",
+    "libraryLoadingMessage": "မှတ်တမ်းအား တင်သွင်းနေသည်…",
     "libraries": "စာကြည့်တိုက်တွင်ရှာဖွေပါ",
-    "loadingScene": "မြင်ကွင်းဖော်နေသည်...",
+    "loadingScene": "မြင်ကွင်းဖော်နေသည်…",
     "align": "ချိန်ညှိ",
     "alignTop": "ထိပ်ညှိ",
     "alignBottom": "အခြေညှိ",
@@ -90,7 +91,9 @@
     "centerVertically": "ဒေါင်လိုက်အလယ်ညှိ",
     "centerHorizontally": "အလျားလိုက်အလယ်ညှိ",
     "distributeHorizontally": "အလျားလိုက်",
-    "distributeVertically": "ထောင်လိုက်"
+    "distributeVertically": "ထောင်လိုက်",
+    "viewMode": "",
+    "toggleExportColorScheme": ""
   },
   "buttons": {
     "clearReset": "ကားချပ်ရှင်းလင်း",
@@ -115,7 +118,7 @@
     "edit": "ပြင်ဆင်",
     "undo": "ပြန်ထား",
     "redo": "ထပ်လုပ်",
-    "roomDialog": "တိုက်ရိုက်ပူးပေါင်းမှုစတင်",
+    "resetLibrary": "",
     "createNewRoom": "အခန်းသစ်ဖွဲ့",
     "fullScreen": "",
     "darkMode": "",
@@ -134,10 +137,12 @@
     "decryptFailed": "အချက်အလက်ဖော်ယူ၍မရပါ။",
     "uploadedSecurly": "တင်သွင်းအချက်အလက်များအား နှစ်ဘက်စွန်းတိုင်လျှို့ဝှက်စနစ်အသုံးပြု၍လုံခြုံစွာထိန်းသိမ်းထားပါသဖြင့် Excalidraw ဆာဗာနှင့်ဆက်စပ်အဖွဲ့အစည်းများပင်လျှင်မဖတ်ရှုနိုင်ပါ။",
     "loadSceneOverridePrompt": "လက်ရှိရေးဆွဲထားသမျှအား ပြင်ပမှတင်သွင်းသောပုံနှင့်အစားထိုးပါမည်။ ဆက်လက်ဆောင်ရွက်လိုပါသလား။",
+    "collabStopOverridePrompt": "",
     "errorLoadingLibrary": "ပြင်ပမှမှတ်တမ်းအားတင်သွင်းရာတွင်အမှားအယွင်းရှိနေသည်။",
     "confirmAddLibrary": "{{numShapes}} ခုသောပုံသဏ္ဌာန်အားမှတ်တမ်းတင်ပါမည်။ အတည်ပြုပါ။",
     "imageDoesNotContainScene": "",
-    "cannotRestoreFromImage": "ဤပုံဖြင့်မြင်ကွင်းပြန်လည်မရယူနိုင်ပါ။"
+    "cannotRestoreFromImage": "ဤပုံဖြင့်မြင်ကွင်းပြန်လည်မရယူနိုင်ပါ။",
+    "resetLibrary": ""
   },
   "toolBar": {
     "selection": "ရွေးချယ်",
@@ -198,24 +203,26 @@
   "errorDialog": {
     "title": "ချို့ယွင်းချက်"
   },
-  "shortcutsDialog": {
-    "title": "ကီးဘုတ်ရှော့ကတ်များ",
-    "shapes": "ပုံသဏ္ဌာန်",
-    "or": "(သို့)",
-    "click": "ကလစ်နှိပ်",
-    "drag": "တရွတ်ဆွဲ",
-    "curvedArrow": "မြှားကွေး",
-    "curvedLine": "မျဉ်းကွေး",
-    "editor": "တည်းဖြတ်",
-    "view": "မြင်ကွင်း",
-    "blog": "ဘလော့ဂ်တွင်လေ့လာပါ",
-    "howto": "အညွှန်း",
-    "github": "ချို့ယွင်းမှုအတွက်အသိပေးရန်",
-    "textNewLine": "စာသားဖြည့်သွင်း",
-    "textFinish": "စာသားဖြည့်သွင်းပြီး",
-    "zoomToFit": "ကားချပ်အပြည့်ဖေါ်",
-    "zoomToSelection": "",
-    "preventBinding": "မြှားများမပေါင်းစေရန်"
+  "helpDialog": {
+    "blog": "",
+    "click": "",
+    "curvedArrow": "",
+    "curvedLine": "",
+    "documentation": "",
+    "drag": "",
+    "editor": "",
+    "github": "",
+    "howto": "",
+    "or": "",
+    "preventBinding": "",
+    "shapes": "",
+    "shortcuts": "",
+    "textFinish": "",
+    "textNewLine": "",
+    "title": "",
+    "view": "",
+    "zoomToFit": "",
+    "zoomToSelection": ""
   },
   "encrypted": {
     "tooltip": "ရေးဆွဲထားသောပုံများအား နှစ်ဘက်စွန်းတိုင်လျှို့ဝှက်ထားသဖြင့် Excalidraw ၏ဆာဗာများပင်လျှင်မြင်တွေ့ရမည်မဟုတ်ပါ။"
@@ -230,6 +237,18 @@
     "storage": "သိုလှောင်ခန်း",
     "title": "အက္ခရာများအတွက်အချက်အလက်များ",
     "total": "စုစုပေါင်း",
+    "version": "",
+    "versionCopy": "",
+    "versionNotAvailable": "",
     "width": "အကျယ်"
+  },
+  "toast": {
+    "copyStyles": "",
+    "copyToClipboard": "",
+    "copyToClipboardAsPng": "",
+    "fileSaved": "",
+    "fileSavedToFilename": "",
+    "canvas": "",
+    "selection": ""
   }
 }

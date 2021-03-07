@@ -20,8 +20,8 @@ import { ExcalidrawImperativeAPI } from "./components/App";
 import type { ResolvablePromise } from "./utils";
 import { Spreadsheet } from "./charts";
 import { Language } from "./i18n";
+import { UserIdleState } from "./excalidraw-app/collab/types";
 
-export type FlooredNumber = number & { _brand: "FlooredNumber" };
 export type Point = Readonly<RoughPoint>;
 
 export type Collaborator = {
@@ -32,6 +32,11 @@ export type Collaborator = {
   button?: "up" | "down";
   selectedElementIds?: AppState["selectedElementIds"];
   username?: string | null;
+  userState?: UserIdleState;
+  color?: {
+    background: string;
+    stroke: string;
+  };
 };
 
 export type AppState = {
@@ -52,6 +57,7 @@ export type AppState = {
   elementLocked: boolean;
   exportBackground: boolean;
   exportEmbedScene: boolean;
+  exportWithDarkMode: boolean;
   shouldAddWatermark: boolean;
   currentItemStrokeColor: string;
   currentItemBackgroundColor: string;
@@ -68,8 +74,8 @@ export type AppState = {
   currentItemEndArrowhead: Arrowhead | null;
   currentItemLinearStrokeSharpness: ExcalidrawElement["strokeSharpness"];
   viewBackgroundColor: string;
-  scrollX: FlooredNumber;
-  scrollY: FlooredNumber;
+  scrollX: number;
+  scrollY: number;
   cursorButton: "up" | "down";
   scrolledOutside: boolean;
   name: string;
@@ -81,10 +87,12 @@ export type AppState = {
   selectedElementIds: { [id: string]: boolean };
   previousSelectedElementIds: { [id: string]: boolean };
   shouldCacheIgnoreZoom: boolean;
-  showShortcutsDialog: boolean;
+  showHelpDialog: boolean;
+  toastMessage: string | null;
   zenModeEnabled: boolean;
   appearance: "light" | "dark";
   gridSize: number | null;
+  viewModeEnabled: boolean;
 
   /** top-most selected groups (i.e. does not include nested groups) */
   selectedGroupIds: { [groupId: string]: boolean };
@@ -97,7 +105,7 @@ export type AppState = {
   offsetLeft: number;
 
   isLibraryOpen: boolean;
-  fileHandle: import("browser-nativefs").FileSystemHandle | null;
+  fileHandle: import("browser-fs-access").FileSystemHandle | null;
   collaborators: Map<string, Collaborator>;
   showStats: boolean;
   currentChartType: ChartType;
@@ -145,10 +153,7 @@ export type LibraryItems = readonly LibraryItem[];
 // NOTE ready/readyPromise props are optional for host apps' sake (our own
 // implem guarantees existence)
 export type ExcalidrawAPIRefValue =
-  | (ExcalidrawImperativeAPI & {
-      readyPromise?: ResolvablePromise<ExcalidrawImperativeAPI>;
-      ready?: true;
-    })
+  | ExcalidrawImperativeAPI
   | {
       readyPromise?: ResolvablePromise<ExcalidrawImperativeAPI>;
       ready?: false;
@@ -166,9 +171,6 @@ export interface ExcalidrawProps {
     appState: AppState,
   ) => void;
   initialData?: ImportedDataState | null | Promise<ImportedDataState | null>;
-  user?: {
-    name?: string | null;
-  };
   excalidrawRef?: ForwardRef<ExcalidrawAPIRefValue>;
   onCollabButtonClick?: () => void;
   isCollaborating?: boolean;
@@ -184,6 +186,9 @@ export interface ExcalidrawProps {
   ) => void;
   renderFooter?: (isMobile: boolean) => JSX.Element;
   langCode?: Language["code"];
+  viewModeEnabled?: boolean;
+  zenModeEnabled?: boolean;
+  gridModeEnabled?: boolean;
 }
 
 export type SceneData = {

@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Plakken",
+    "pasteCharts": "Plak grafieken",
     "selectAll": "Alles selecteren",
     "multiSelect": "Voeg element toe aan selectie",
     "moveCanvas": "Canvas verplaatsen",
@@ -67,7 +68,7 @@
     "layers": "Lagen",
     "actions": "Acties",
     "language": "Taal",
-    "createRoom": "Deel een live-samenwerkingssessie",
+    "liveCollaboration": "Live Samenwerking",
     "duplicateSelection": "Dupliceer",
     "untitled": "Naamloos",
     "name": "Naam",
@@ -76,12 +77,12 @@
     "group": "Groeperen",
     "ungroup": "Groep opheffen",
     "collaborators": "Deelnemers",
-    "gridMode": "Rasterweergave",
+    "showGrid": "Raster weergeven",
     "addToLibrary": "Voeg toe aan bibliotheek",
     "removeFromLibrary": "Verwijder uit bibliotheek",
-    "libraryLoadingMessage": "Bibliotheek laden...",
+    "libraryLoadingMessage": "Bibliotheek laden…",
     "libraries": "Blader door bibliotheken",
-    "loadingScene": "Scène laden...",
+    "loadingScene": "Scène laden…",
     "align": "Uitlijnen",
     "alignTop": "Boven uitlijnen",
     "alignBottom": "Onder uitlijnen",
@@ -90,7 +91,9 @@
     "centerVertically": "Verticaal Centreren",
     "centerHorizontally": "Horizontaal Centreren",
     "distributeHorizontally": "Horizontaal verspreiden",
-    "distributeVertically": "Verticaal distribueren"
+    "distributeVertically": "Verticaal distribueren",
+    "viewMode": "Weergavemodus",
+    "toggleExportColorScheme": "Kleurenschema exporteren aan/uit"
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
@@ -115,7 +118,7 @@
     "edit": "Bewerken",
     "undo": "Ongedaan maken",
     "redo": "Herstel ongedaan maken",
-    "roomDialog": "Live-samenwerkingssessie starten",
+    "resetLibrary": "Bibliotheek Resetten",
     "createNewRoom": "Creëer live-samenwerkingssessie",
     "fullScreen": "Volledig scherm",
     "darkMode": "Donkere modus",
@@ -134,10 +137,12 @@
     "decryptFailed": "Kan gegevens niet decoderen.",
     "uploadedSecurly": "De upload is beveiligd met end-to-end encryptie, wat betekent dat de Excalidraw server en derden de inhoud niet kunnen lezen.",
     "loadSceneOverridePrompt": "Het laden van externe tekening zal uw bestaande inhoud vervangen. Wil je doorgaan?",
+    "collabStopOverridePrompt": "",
     "errorLoadingLibrary": "Bij het laden van de externe bibliotheek is een fout opgetreden.",
     "confirmAddLibrary": "Hiermee worden {{numShapes}} vorm(n) aan uw bibliotheek toegevoegd. Ben je het zeker?",
     "imageDoesNotContainScene": "Afbeeldingen importeren wordt op dit moment niet ondersteund.\n\nWil je een scène importeren? Deze afbeelding lijkt geen scène gegevens te bevatten. Heb je dit geactiveerd tijdens het exporteren?",
-    "cannotRestoreFromImage": "Scène kan niet worden hersteld vanuit dit afbeeldingsbestand"
+    "cannotRestoreFromImage": "Scène kan niet worden hersteld vanuit dit afbeeldingsbestand",
+    "resetLibrary": "Dit zal je bibliotheek wissen. Weet je het zeker?"
   },
   "toolBar": {
     "selection": "Selectie",
@@ -198,24 +203,26 @@
   "errorDialog": {
     "title": "Fout"
   },
-  "shortcutsDialog": {
-    "title": "Sneltoetsen",
-    "shapes": "Vormen",
-    "or": "of",
-    "click": "klik",
-    "drag": "slepen",
-    "curvedArrow": "Gebogen pijl",
-    "curvedLine": "Gebogen lijn",
-    "editor": "Editor",
-    "view": "Weergave",
+  "helpDialog": {
     "blog": "Lees onze blog",
+    "click": "klik",
+    "curvedArrow": "Gebogen pijl",
+    "curvedLine": "Kromme lijn",
+    "documentation": "Documentatie",
+    "drag": "slepen",
+    "editor": "Editor",
+    "github": "Probleem gevonden? Verzenden",
     "howto": "Volg onze handleidingen",
-    "github": "Probleem gevonden? Stuur een nieuwe issue",
-    "textNewLine": "Nieuwe regel toevoegen (tekst)",
+    "or": "of",
+    "preventBinding": "Pijlbinding voorkomen",
+    "shapes": "Vormen",
+    "shortcuts": "Sneltoetsen",
     "textFinish": "Voltooi bewerken (tekst)",
+    "textNewLine": "Nieuwe regel toevoegen (tekst)",
+    "title": "Help",
+    "view": "Weergave",
     "zoomToFit": "Zoom in op alle elementen",
-    "zoomToSelection": "Inzoomen op selectie",
-    "preventBinding": "Pijlbinding voorkomen"
+    "zoomToSelection": "Inzoomen op selectie"
   },
   "encrypted": {
     "tooltip": "Je tekeningen zijn beveiligd met end-to-end encryptie, dus Excalidraw's servers zullen nooit zien wat je tekent."
@@ -230,6 +237,18 @@
     "storage": "Opslag",
     "title": "Statistieken voor nerds",
     "total": "Totaal",
+    "version": "Versie",
+    "versionCopy": "Klik om te kopiëren",
+    "versionNotAvailable": "Versie niet beschikbaar",
     "width": "Breedte"
+  },
+  "toast": {
+    "copyStyles": "Stijlen gekopieerd.",
+    "copyToClipboard": "Gekopieerd naar het klembord.",
+    "copyToClipboardAsPng": "{{exportSelection}} naar klembord gekopieerd als PNG\n({{exportColorScheme}})",
+    "fileSaved": "Bestand opgeslagen.",
+    "fileSavedToFilename": "Opgeslagen als {filename}",
+    "canvas": "canvas",
+    "selection": "selectie"
   }
 }

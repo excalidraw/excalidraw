@@ -4,25 +4,28 @@ const THRESSHOLD = 85;
 
 const crowdinMap = {
   "ar-SA": "en-ar",
-  "el-GR": "en-el",
-  "fi-FI": "en-fi",
-  "ja-JP": "en-ja",
   "bg-BG": "en-bg",
   "ca-ES": "en-ca",
   "de-DE": "en-de",
+  "el-GR": "en-el",
   "es-ES": "en-es",
   "fa-IR": "en-fa",
+  "fi-FI": "en-fi",
   "fr-FR": "en-fr",
   "he-IL": "en-he",
   "hi-IN": "en-hi",
   "hu-HU": "en-hu",
   "id-ID": "en-id",
   "it-IT": "en-it",
+  "ja-JP": "en-ja",
+  "kab-KAB": "en-kab",
   "ko-KR": "en-ko",
   "my-MM": "en-my",
   "nb-NO": "en-nb",
   "nl-NL": "en-nl",
   "nn-NO": "en-nnno",
+  "oc-FR": "en-oc",
+  "pa-IN": "en-pain",
   "pl-PL": "en-pl",
   "pt-BR": "en-ptbr",
   "pt-PT": "en-pt",
@@ -39,7 +42,7 @@ const crowdinMap = {
 const flags = {
   "ar-SA": "🇸🇦",
   "bg-BG": "🇧🇬",
-  "ca-ES": "🇪🇸",
+  "ca-ES": "🏳",
   "de-DE": "🇩🇪",
   "el-GR": "🇬🇷",
   "es-ES": "🇪🇸",
@@ -52,11 +55,14 @@ const flags = {
   "id-ID": "🇮🇩",
   "it-IT": "🇮🇹",
   "ja-JP": "🇯🇵",
+  "kab-KAB": "🏳",
   "ko-KR": "🇰🇷",
   "my-MM": "🇲🇲",
   "nb-NO": "🇳🇴",
   "nl-NL": "🇳🇱",
   "nn-NO": "🇳🇴",
+  "oc-FR": "🏳",
+  "pa-IN": "🇮🇳",
   "pl-PL": "🇵🇱",
   "pt-BR": "🇧🇷",
   "pt-PT": "🇵🇹",
@@ -73,7 +79,7 @@ const flags = {
 const languages = {
   "ar-SA": "العربية",
   "bg-BG": "Български",
-  "ca-ES": "Catalan",
+  "ca-ES": "Català",
   "de-DE": "Deutsch",
   "el-GR": "Ελληνικά",
   "es-ES": "Español",
@@ -86,11 +92,14 @@ const languages = {
   "id-ID": "Bahasa Indonesia",
   "it-IT": "Italiano",
   "ja-JP": "日本語",
+  "kab-KAB": "Taqbaylit",
   "ko-KR": "한국어",
   "my-MM": "Burmese",
   "nb-NO": "Norsk bokmål",
   "nl-NL": "Nederlands",
   "nn-NO": "Norsk nynorsk",
+  "oc-FR": "Occitan",
+  "pa-IN": "ਪੰਜਾਬੀ",
   "pl-PL": "Polski",
   "pt-BR": "Português Brasileiro",
   "pt-PT": "Português",
@@ -134,7 +143,7 @@ const printRow = (id, locale, coverage) => {
   } else {
     result += `${boldIf(language, isOver)} | `;
   }
-  result += `${coverage === 100 ? "✅" : boldIf(coverage, isOver)} |`;
+  result += `${coverage === 100 ? "💯" : boldIf(coverage, isOver)} |`;
   return result;
 };
 

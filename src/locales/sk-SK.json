@@ -1,6 +1,7 @@
 {
   "labels": {
     "paste": "Vložiť",
+    "pasteCharts": "Vložiť grafy",
     "selectAll": "Vybrať všetko",
     "multiSelect": "Pridať prvok do výberu",
     "moveCanvas": "Pohyb plátna",
@@ -14,7 +15,7 @@
     "sendBackward": "Presunúť o úroveň dozadu",
     "delete": "Vymazať",
     "copyStyles": "Kopírovať štýly",
-    "pasteStyles": "Prilepiť štýly",
+    "pasteStyles": "Vložiť štýly",
     "stroke": "Obrys",
     "background": "Pozadie",
     "fill": "Výplň",
@@ -67,7 +68,7 @@
     "layers": "Vrstvy",
     "actions": "Akcie",
     "language": "Jazyk",
-    "createRoom": "Zdieľajte živú spoluprácu",
+    "liveCollaboration": "Živá spolupráca",
     "duplicateSelection": "Duplikovať",
     "untitled": "Bez názvu",
     "name": "Meno",
@@ -76,12 +77,12 @@
     "group": "Zoskupiť",
     "ungroup": "Zrušiť zoskupenie",
     "collaborators": "Spolupracovníci",
-    "gridMode": "Režim mriežky",
+    "showGrid": "Zobraziť mriežku",
     "addToLibrary": "Pridať do knižnice",
     "removeFromLibrary": "Odstrániť z knižnice",
-    "libraryLoadingMessage": "Načítavanie knižnice...",
+    "libraryLoadingMessage": "Načítavanie knižnice…",
     "libraries": "Prehliadať knižnice",
-    "loadingScene": "Načítavanie scény...",
+    "loadingScene": "Načítavanie scény…",
     "align": "Zarovnanie",
     "alignTop": "Zarovnať nahor",
     "alignBottom": "Zarovnať nadol",
@@ -90,7 +91,9 @@
     "centerVertically": "Zarovnať zvislo na stred",
     "centerHorizontally": "Zarovnať vodorovne na stred",
     "distributeHorizontally": "Rozmiestniť vodorovne",
-    "distributeVertically": "Rozmiestniť zvisle"
+    "distributeVertically": "Rozmiestniť zvisle",
+    "viewMode": "Režim zobrazenia",
+    "toggleExportColorScheme": "Prepnúť exportovanie farebnej schémy"
   },
   "buttons": {
     "clearReset": "Obnoviť plátno",
@@ -115,7 +118,7 @@
     "edit": "Upraviť",
     "undo": "Späť",
     "redo": "Znova",
-    "roomDialog": "Začať živú spoluprácu",
+    "resetLibrary": "Obnoviť knižnicu",
     "createNewRoom": "Vytvoriť novú miestnosť",
     "fullScreen": "Celá obrazovka",
     "darkMode": "Tmavý režim",
@@ -134,10 +137,12 @@
     "decryptFailed": "Nepodarilo sa rozšifrovať údaje.",
     "uploadedSecurly": "Nahratie je zabezpečené end-to-end šifrovaním, takže Excalidraw server a tretie strany nedokážu prečítať jeho obsah.",
     "loadSceneOverridePrompt": "Nahratie externej kresby nahradí existujúci obsah. Prajete si pokračovať?",
+    "collabStopOverridePrompt": "Ukončenie schôdze nahradí vašu predchádzajúcu lokálne uloženú scénu. Ste si istý?\n\n(Ak si chcete ponechať lokálnu scénu, jednoducho iba zavrite kartu prehliadača.)",
     "errorLoadingLibrary": "Nepodarilo sa načítať externú knižnicu.",
     "confirmAddLibrary": "Týmto sa pridá {{numShapes}} tvar(ov) do vašej knižnice. Ste si istí?",
     "imageDoesNotContainScene": "Importovanie obrázku v tomto momente nie je možné.\n\nChceli ste importovať scénu? Tento obrázok neobsahuje žiadne údaje scény. Povolili ste túto možnosť počas exportovania?",
-    "cannotRestoreFromImage": "Nepodarilo sa obnoviť scénu z tohto obrázkového súboru"
+    "cannotRestoreFromImage": "Nepodarilo sa obnoviť scénu z tohto obrázkového súboru",
+    "resetLibrary": "Týmto vyprázdnite vašu knižnicu. Ste si istý?"
   },
   "toolBar": {
     "selection": "Výber",
@@ -198,24 +203,26 @@
   "errorDialog": {
     "title": "Chyba"
   },
-  "shortcutsDialog": {
-    "title": "Klávesové skratky",
-    "shapes": "Tvary",
-    "or": "alebo",
+  "helpDialog": {
+    "blog": "Prečítajte si náš blog",
     "click": "kliknutie",
-    "drag": "potiahnutie",
     "curvedArrow": "Zakrivená šípka",
     "curvedLine": "Zakrivená čiara",
+    "documentation": "Dokumentácia",
+    "drag": "potiahnutie",
     "editor": "Editovanie",
-    "view": "Zobrazenie",
-    "blog": "Prečítajte si náš blog",
-    "howto": "Postupujte podľa naších návodov",
     "github": "Objavili ste problém? Nahláste ho",
-    "textNewLine": "Vložiť nový riadok (text)",
+    "howto": "Postupujte podľa naších návodov",
+    "or": "alebo",
+    "preventBinding": "Zakázať pripájanie šípky",
+    "shapes": "Tvary",
+    "shortcuts": "Klávesové skratky",
     "textFinish": "Ukončenie editovania (text)",
+    "textNewLine": "Vložiť nový riadok (text)",
+    "title": "Pomocník",
+    "view": "Zobrazenie",
     "zoomToFit": "Priblížiť aby boli zahrnuté všetky prvky",
-    "zoomToSelection": "Priblížiť na výber",
-    "preventBinding": "Zakázať pripájanie šípky"
+    "zoomToSelection": "Priblížiť na výber"
   },
   "encrypted": {
     "tooltip": "Vaše kresby používajú end-to-end šifrovanie, takže ich Excalidraw server nedokáže prečítať."
@@ -230,6 +237,18 @@
     "storage": "Úložisko",
     "title": "Štatistiky",
     "total": "Celkom",
+    "version": "Verzia",
+    "versionCopy": "Kliknutím skopírujete",
+    "versionNotAvailable": "Verzia nie je k dispozícii",
     "width": "Šírka"
+  },
+  "toast": {
+    "copyStyles": "Štýly skopírované.",
+    "copyToClipboard": "Skopírované do schránky.",
+    "copyToClipboardAsPng": "",
+    "fileSaved": "Súbor uložený.",
+    "fileSavedToFilename": "Uložený ako {filename}",
+    "canvas": "",
+    "selection": ""
   }
 }

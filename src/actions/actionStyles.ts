@@ -4,6 +4,7 @@ import {
   redrawTextBoundingBox,
 } from "../element";
 import { CODES, KEYS } from "../keys";
+import { t } from "../i18n";
 import { register } from "./register";
 import { mutateElement, newElementWith } from "../element/mutateElement";
 import {
@@ -23,13 +24,16 @@ export const actionCopyStyles = register({
       copiedStyles = JSON.stringify(element);
     }
     return {
+      appState: {
+        ...appState,
+        toastMessage: t("toast.copyStyles"),
+      },
       commitToHistory: false,
     };
   },
   contextItemLabel: "labels.copyStyles",
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.C,
-  contextMenuOrder: 0,
 });
 
 export const actionPasteStyles = register({
@@ -69,5 +73,4 @@ export const actionPasteStyles = register({
   contextItemLabel: "labels.pasteStyles",
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.V,
-  contextMenuOrder: 1,
 });

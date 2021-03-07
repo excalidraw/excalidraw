@@ -5,11 +5,11 @@ import { ProjectName } from "../components/ProjectName";
 import { ToolButton } from "../components/ToolButton";
 import "../components/ToolIcon.scss";
 import { Tooltip } from "../components/Tooltip";
+import { DarkModeToggle, Appearence } from "../components/DarkModeToggle";
 import { loadFromJSON, saveAsJSON } from "../data";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
 import { KEYS } from "../keys";
-import { muteFSAbortError } from "../utils";
 import { register } from "./register";
 
 export const actionChangeProjectName = register({
@@ -97,9 +97,24 @@ export const actionChangeShouldAddWatermark = register({
 export const actionSaveScene = register({
   name: "saveScene",
   perform: async (elements, appState, value) => {
+    const fileHandleExists = !!appState.fileHandle;
     try {
       const { fileHandle } = await saveAsJSON(elements, appState);
-      return { commitToHistory: false, appState: { ...appState, fileHandle } };
+      return {
+        commitToHistory: false,
+        appState: {
+          ...appState,
+          fileHandle,
+          toastMessage: fileHandleExists
+            ? fileHandle.name
+              ? t("toast.fileSavedToFilename").replace(
+                  "{filename}",
+                  `"${fileHandle.name}"`,
+                )
+              : t("toast.fileSaved")
+            : null,
+        },
+      };
     } catch (error) {
       if (error?.name !== "AbortError") {
         console.error(error);
@@ -156,18 +171,29 @@ export const actionSaveAsScene = register({
 
 export const actionLoadScene = register({
   name: "loadScene",
-  perform: (
-    elements,
-    appState,
-    { elements: loadedElements, appState: loadedAppState, error },
-  ) => ({
-    elements: loadedElements,
-    appState: {
-      ...loadedAppState,
-      errorMessage: error,
-    },
-    commitToHistory: true,
-  }),
+  perform: async (elements, appState) => {
+    try {
+      const {
+        elements: loadedElements,
+        appState: loadedAppState,
+      } = await loadFromJSON(appState);
+      return {
+        elements: loadedElements,
+        appState: loadedAppState,
+        commitToHistory: true,
+      };
+    } catch (error) {
+      if (error?.name === "AbortError") {
+        return false;
+      }
+      return {
+        elements,
+        appState: { ...appState, errorMessage: error.message },
+        commitToHistory: false,
+      };
+    }
+  },
+  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.O,
   PanelComponent: ({ updateData, appState }) => (
     <ToolButton
       type="button"
@@ -175,16 +201,35 @@ export const actionLoadScene = register({
       title={t("buttons.load")}
       aria-label={t("buttons.load")}
       showAriaLabel={useIsMobile()}
-      onClick={() => {
-        loadFromJSON(appState)
-          .then(({ elements, appState }) => {
-            updateData({ elements, appState });
-          })
-          .catch(muteFSAbortError)
-          .catch((error) => {
-            updateData({ error: error.message });
-          });
-      }}
+      onClick={updateData}
     />
+  ),
+});
+
+export const actionExportWithDarkMode = register({
+  name: "exportWithDarkMode",
+  perform: (_elements, appState, value) => {
+    return {
+      appState: { ...appState, exportWithDarkMode: value },
+      commitToHistory: false,
+    };
+  },
+  PanelComponent: ({ appState, updateData }) => (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "flex-end",
+        marginTop: "-45px",
+        marginBottom: "10px",
+      }}
+    >
+      <DarkModeToggle
+        value={appState.exportWithDarkMode ? "dark" : "light"}
+        onChange={(appearance: Appearence) => {
+          updateData(appearance === "dark");
+        }}
+        title={t("labels.toggleExportColorScheme")}
+      />
+    </div>
   ),
 });

@@ -1,28 +1,22 @@
 name: Lint
 
-on:
-  push:
-    branches:
-      - master
-  pull_request:
+on: pull_request
 
 jobs:
   lint:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
 
-      - name: Setup Node.js 12.x
-        uses: actions/setup-node@v1
+      - name: Setup Node.js 14.x
+        uses: actions/setup-node@v2
         with:
-          node-version: 12.x
+          node-version: 14.x
 
       - name: Install and lint
         run: |
-          npm ci
-          npm run test:other
-          npm run test:code
-          npm run test:typecheck
-        env:
-          CI: true
+          yarn --frozen-lockfile
+          yarn test:other
+          yarn test:code
+          yarn test:typecheck

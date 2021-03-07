@@ -5,10 +5,13 @@ import { NonDeletedExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element/bounds";
 import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
 import { distance, SVG_NS } from "../utils";
-import { normalizeScroll } from "./scroll";
 import { AppState } from "../types";
 import { t } from "../i18n";
-import { DEFAULT_FONT_FAMILY, DEFAULT_VERTICAL_ALIGN } from "../constants";
+import {
+  DEFAULT_FONT_FAMILY,
+  DEFAULT_VERTICAL_ALIGN,
+  APPEARANCE_FILTER,
+} from "../constants";
 import { getDefaultAppState } from "../appState";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
@@ -30,14 +33,14 @@ export const exportToCanvas = (
     viewBackgroundColor: string;
     shouldAddWatermark: boolean;
   },
-  createCanvas: (width: number, height: number) => HTMLCanvasElement = (
-    width,
-    height,
-  ) => {
+  createCanvas: (
+    width: number,
+    height: number,
+  ) => { canvas: HTMLCanvasElement; scale: number } = (width, height) => {
     const tempCanvas = document.createElement("canvas");
     tempCanvas.width = width * scale;
     tempCanvas.height = height * scale;
-    return tempCanvas;
+    return { canvas: tempCanvas, scale };
   },
 ) => {
   const sceneElements = getElementsAndWatermark(elements, shouldAddWatermark);
@@ -48,24 +51,29 @@ export const exportToCanvas = (
     shouldAddWatermark,
   );
 
-  const tempCanvas = createCanvas(width, height);
+  const { canvas: tempCanvas, scale: newScale = scale } = createCanvas(
+    width,
+    height,
+  );
 
   renderScene(
     sceneElements,
     appState,
     null,
-    scale,
+    newScale,
     rough.canvas(tempCanvas),
     tempCanvas,
     {
       viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
-      scrollX: normalizeScroll(-minX + exportPadding),
-      scrollY: normalizeScroll(-minY + exportPadding),
+      exportWithDarkMode: appState.exportWithDarkMode,
+      scrollX: -minX + exportPadding,
+      scrollY: -minY + exportPadding,
       zoom: getDefaultAppState().zoom,
       remotePointerViewportCoords: {},
       remoteSelectedElementIds: {},
       shouldCacheIgnoreZoom: false,
       remotePointerUsernames: {},
+      remotePointerUserStates: {},
     },
     {
       renderScrollbars: false,
@@ -84,6 +92,7 @@ export const exportToSvg = (
     exportBackground,
     exportPadding = 10,
     viewBackgroundColor,
+    exportWithDarkMode,
     scale = 1,
     shouldAddWatermark,
     metadata = "",
@@ -92,6 +101,7 @@ export const exportToSvg = (
     exportPadding?: number;
     scale?: number;
     viewBackgroundColor: string;
+    exportWithDarkMode?: boolean;
     shouldAddWatermark: boolean;
     metadata?: string;
   },
@@ -111,6 +121,9 @@ export const exportToSvg = (
   svgRoot.setAttribute("viewBox", `0 0 ${width} ${height}`);
   svgRoot.setAttribute("width", `${width * scale}`);
   svgRoot.setAttribute("height", `${height * scale}`);
+  if (exportWithDarkMode) {
+    svgRoot.setAttribute("filter", APPEARANCE_FILTER);
+  }
 
   svgRoot.innerHTML = `
   ${SVG_EXPORT_TAG}
@@ -119,7 +132,7 @@ export const exportToSvg = (
     <style>
       @font-face {
         font-family: "Virgil";
-        src: url("https://excalidraw.com/FG_Virgil.woff2");
+        src: url("https://excalidraw.com/Virgil.woff2");
       }
       @font-face {
         font-family: "Cascadia";

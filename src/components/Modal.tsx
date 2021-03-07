@@ -54,7 +54,7 @@ const useBodyRoot = () => {
       ?.classList.contains("Appearance_dark");
     const div = document.createElement("div");
 
-    div.classList.add("excalidraw");
+    div.classList.add("excalidraw", "excalidraw-modal-container");
 
     if (isDarkTheme) {
       div.classList.add("Appearance_dark");
