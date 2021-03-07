@@ -13,6 +13,7 @@ import { ExcalidrawImperativeAPI } from "../components/App";
 import { ErrorDialog } from "../components/ErrorDialog";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
 import { APP_NAME, EVENT, TITLE_TIMEOUT, VERSION_TIMEOUT } from "../constants";
+import { loadFromBlob } from "../data/blob";
 import { isValidExcalidrawData } from "../data/json";
 import { DataState, ImportedDataState } from "../data/types";
 import {
@@ -131,19 +132,20 @@ const initializeScene = async (opts: {
     const url = jsonUrlMatch[1];
     try {
       const request = await fetch(window.decodeURIComponent(url));
-      const data = await request.json();
-      if (!isValidExcalidrawData(data)) {
-        window.alert(t("alerts.invalidSceneUrl"));
-      }
+      const blob = await request.blob();
+      const scene = await loadFromBlob(blob, null);
       if (
         !scene.elements.length ||
         window.confirm(t("alerts.loadSceneOverridePrompt"))
       ) {
-        return data;
+        return scene;
       }
     } catch (error) {
-      window.alert(t("alerts.invalidSceneUrl"));
-      console.error(error);
+      return {
+        appState: {
+          errorMessage: t("alerts.invalidSceneUrl"),
+        },
+      };
     }
   }
 
