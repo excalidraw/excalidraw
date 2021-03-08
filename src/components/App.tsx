@@ -2109,13 +2109,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     this.updateGestureOnPointerDown(event);
 
-    // Preventing the event above disables default behavior
-    // of defocusing potentially focused element, which is what we
-    // want when clicking inside the canvas.
-    if (document.activeElement instanceof HTMLElement) {
-      document.activeElement.blur();
-    }
-
     // don't select while panning
     if (gesture.pointers.size > 1) {
       return;
