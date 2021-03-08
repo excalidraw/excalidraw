@@ -142,6 +142,7 @@
     "confirmAddLibrary": "這將會將 {{numShapes}} 個圖形加入你的資料庫，你確定嗎？",
     "imageDoesNotContainScene": "目前尚不支援載入圖片。\n您是否要載入場景？此圖片中並無任何場景資料，輸出時是否有選擇包含？",
     "cannotRestoreFromImage": "無法由此檔案回復場景。",
+    "invalidSceneUrl": "",
     "resetLibrary": "這會清除您的資料庫，是否確定？"
   },
   "toolBar": {
