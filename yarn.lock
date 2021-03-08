@@ -2001,13 +2001,13 @@
     "@sentry/utils" "6.2.1"
     tslib "^1.9.3"
 
-"@sentry/integrations@6.2.0":
-  version "6.2.0"
-  resolved "https://registry.yarnpkg.com/@sentry/integrations/-/integrations-6.2.0.tgz#f3952cb07fd86aa1ea3923d51049fc4875b634a9"
-  integrity sha512-gvAhP61qs2fog2xCTDs94ZT8cZbWEjFZmOWfT1VXlZDIVopIporj5Qe6IgrLTiCWL61Yko5h5nFnPZ4mpjf+0w==
+"@sentry/integrations@6.2.1":
+  version "6.2.1"
+  resolved "https://registry.yarnpkg.com/@sentry/integrations/-/integrations-6.2.1.tgz#caa9b49de29523698668d45827633be86b2268ff"
+  integrity sha512-UBvuil/b9M5HGH6aBDzTiIVRsmpC/wqwDKy28IO05XLdalmKgJ9C1EQhoyN6xw+1lINpXXFtfq4NhfgZgWbc7Q==
   dependencies:
-    "@sentry/types" "6.2.0"
-    "@sentry/utils" "6.2.0"
+    "@sentry/types" "6.2.1"
+    "@sentry/utils" "6.2.1"
     localforage "^1.8.1"
     tslib "^1.9.3"
 
@@ -2020,23 +2020,10 @@
     "@sentry/types" "6.2.1"
     tslib "^1.9.3"
 
-"@sentry/types@6.2.0":
-  version "6.2.0"
-  resolved "https://registry.yarnpkg.com/@sentry/types/-/types-6.2.0.tgz#ca020ff42913c6b9f88a9d0c375b5ee3965a2590"
-  integrity sha512-vN4P/a+QqAuVfWFB9G3nQ7d6bgnM9jd/RLVi49owMuqvM24pv5mTQHUk2Hk4S3k7ConrHFl69E7xH6Dv5VpQnQ==
-
 "@sentry/types@6.2.1":
   version "6.2.1"
   resolved "https://registry.yarnpkg.com/@sentry/types/-/types-6.2.1.tgz#28c946230b2023f72307b65606d32052ad9e5353"
   integrity sha512-h0OV1QT+fv5ojfK5/+iEXClu33HirmvbjcQC2jf05IHj9yXIOWy6EB10S8nBjuLiiFqQiAQYj3FN9Ip4eN8NJA==
-
-"@sentry/utils@6.2.0":
-  version "6.2.0"
-  resolved "https://registry.yarnpkg.com/@sentry/utils/-/utils-6.2.0.tgz#39c81ad5ba92cec54d690e3fa8ea4e777d8e9c2b"
-  integrity sha512-YToUC7xYf2E/pIluI7upYTlj8fKXOtdwoOBkcQZifHgX/dP+qDaHibbBFe5PyZwdmU2UiLnWFsBr0gjo0QFo1g==
-  dependencies:
-    "@sentry/types" "6.2.0"
-    tslib "^1.9.3"
 
 "@sentry/utils@6.2.1":
   version "6.2.1"
