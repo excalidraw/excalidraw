@@ -13,6 +13,7 @@ import { ExcalidrawImperativeAPI } from "../components/App";
 import { ErrorDialog } from "../components/ErrorDialog";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
 import { APP_NAME, EVENT, TITLE_TIMEOUT, VERSION_TIMEOUT } from "../constants";
+import { loadFromBlob } from "../data/blob";
 import { DataState, ImportedDataState } from "../data/types";
 import {
   ExcalidrawElement,
@@ -69,9 +70,10 @@ const initializeScene = async (opts: {
 }): Promise<ImportedDataState | null> => {
   const searchParams = new URLSearchParams(window.location.search);
   const id = searchParams.get("id");
-  const jsonMatch = window.location.hash.match(
+  const jsonBackendMatch = window.location.hash.match(
     /^#json=([0-9]+),([a-zA-Z0-9_-]+)$/,
   );
+  const externalUrlMatch = window.location.hash.match(/^#url=(.*)$/);
 
   const initialData = importFromLocalStorage();
 
@@ -82,7 +84,7 @@ const initializeScene = async (opts: {
   );
 
   let roomLinkData = getCollaborationLinkData(window.location.href);
-  const isExternalScene = !!(id || jsonMatch || roomLinkData);
+  const isExternalScene = !!(id || jsonBackendMatch || roomLinkData);
   if (isExternalScene) {
     if (
       // don't prompt if scene is empty
@@ -95,8 +97,12 @@ const initializeScene = async (opts: {
       // Backwards compatibility with legacy url format
       if (id) {
         scene = await loadScene(id, null, initialData);
-      } else if (jsonMatch) {
-        scene = await loadScene(jsonMatch[1], jsonMatch[2], initialData);
+      } else if (jsonBackendMatch) {
+        scene = await loadScene(
+          jsonBackendMatch[1],
+          jsonBackendMatch[2],
+          initialData,
+        );
       }
       scene.scrollToCenter = true;
       if (!roomLinkData) {
@@ -119,7 +125,28 @@ const initializeScene = async (opts: {
       roomLinkData = null;
       window.history.replaceState({}, APP_NAME, window.location.origin);
     }
+  } else if (externalUrlMatch) {
+    window.history.replaceState({}, APP_NAME, window.location.origin);
+
+    const url = externalUrlMatch[1];
+    try {
+      const request = await fetch(window.decodeURIComponent(url));
+      const data = await loadFromBlob(await request.blob(), null);
+      if (
+        !scene.elements.length ||
+        window.confirm(t("alerts.loadSceneOverridePrompt"))
+      ) {
+        return data;
+      }
+    } catch (error) {
+      return {
+        appState: {
+          errorMessage: t("alerts.invalidSceneUrl"),
+        },
+      };
+    }
   }
+
   if (roomLinkData) {
     return opts.collabAPI.initializeSocketClient(roomLinkData);
   } else if (scene) {
