@@ -766,10 +766,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   });
 
   private removeEventListeners() {
-    this.excalidrawContainerRef.current!.removeEventListener(
-      EVENT.COPY,
-      this.onCopy,
-    );
+    document.removeEventListener(EVENT.COPY, this.onCopy);
     document.removeEventListener(EVENT.PASTE, this.pasteFromClipboard);
     document.removeEventListener(EVENT.CUT, this.onCut);
 
@@ -807,10 +804,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.removeEventListeners();
     document.addEventListener(EVENT.MOUSE_DOWN, this.onMouseDown, false);
 
-    this.excalidrawContainerRef.current!.addEventListener(
-      EVENT.COPY,
-      this.onCopy,
-    );
+    document.addEventListener(EVENT.COPY, this.onCopy);
     document.addEventListener(EVENT.KEYDOWN, this.onKeyDown);
     document.addEventListener(EVENT.KEYUP, this.onKeyUp, { passive: true });
     document.addEventListener(
@@ -1037,6 +1031,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   });
 
   private onCopy = withBatchedUpdates((event: ClipboardEvent) => {
+    if (this.lastMouseDownTarget !== this.canvas) {
+      return;
+    }
     if (isWritableElement(event.target)) {
       return;
     }
