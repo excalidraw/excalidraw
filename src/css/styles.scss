@@ -31,6 +31,8 @@
 
   canvas {
     touch-action: none;
+    // reset use-select so that clicking on canvas deselects selection
+    // outside the Excalidraw component
     user-select: text;
 
     // following props improve blurriness at certain devicePixelRatios.
