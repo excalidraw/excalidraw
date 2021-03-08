@@ -290,7 +290,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     height: window.innerHeight,
   };
   private scene: Scene;
-  private lastMouseDownTarget: EventTarget | null = null;
+  private lastPointerDownTarget: EventTarget | null = null;
   constructor(props: ExcalidrawProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
@@ -805,7 +805,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     document.addEventListener(EVENT.COPY, this.onCopy);
     document.addEventListener(EVENT.KEYDOWN, this.onKeyDown, false);
     document.addEventListener(EVENT.KEYUP, this.onKeyUp, { passive: true });
-    document.addEventListener(EVENT.MOUSE_DOWN, this.onMouseDown, false);
+    document.addEventListener(EVENT.POINTER_DOWN, this.onPointerDown, false);
     document.addEventListener(
       EVENT.MOUSE_MOVE,
       this.updateCurrentCursorPosition,
@@ -1030,7 +1030,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   });
 
   private onCopy = withBatchedUpdates((event: ClipboardEvent) => {
-    if (this.lastMouseDownTarget !== this.canvas) {
+    if (this.lastPointerDownTarget !== this.canvas) {
       return;
     }
     if (isWritableElement(event.target)) {
@@ -1489,8 +1489,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
   });
 
-  private onMouseDown = (event: MouseEvent) => {
-    this.lastMouseDownTarget = event.target;
+  private onPointerDown = (event: MouseEvent) => {
+    this.lastPointerDownTarget = event.target;
   };
   private selectShapeTool(elementType: AppState["elementType"]) {
     if (!isHoldingSpace) {
@@ -2092,7 +2092,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
-    this.lastMouseDownTarget = event.target;
+    this.lastPointerDownTarget = event.target;
     event.persist();
 
     this.maybeOpenContextMenuAfterPointerDownOnTouchDevices(event);
