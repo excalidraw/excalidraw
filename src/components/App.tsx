@@ -1312,10 +1312,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   // Input handling
 
   private onKeyDown = withBatchedUpdates((event: KeyboardEvent) => {
-    const isCopyEvent = event[KEYS.CTRL_OR_CMD] && event.key === KEYS.C;
-    if (isCopyEvent) {
-      return;
-    }
     // normalize `event.key` when CapsLock is pressed #2372
     if (
       "Proxy" in window &&
