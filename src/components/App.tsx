@@ -802,11 +802,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private addEventListeners() {
     this.removeEventListeners();
-    document.addEventListener(EVENT.MOUSE_DOWN, this.onMouseDown, false);
-
-    document.addEventListener(EVENT.COPY, this.onCopy);
+    document.addEventListener(EVENT.COPY, this.onCopy, false);
     document.addEventListener(EVENT.KEYDOWN, this.onKeyDown);
     document.addEventListener(EVENT.KEYUP, this.onKeyUp, { passive: true });
+    document.addEventListener(EVENT.MOUSE_DOWN, this.onMouseDown, false);
     document.addEventListener(
       EVENT.MOUSE_MOVE,
       this.updateCurrentCursorPosition,
