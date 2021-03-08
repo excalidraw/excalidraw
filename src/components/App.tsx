@@ -1310,9 +1310,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   // Input handling
 
   private onKeyDown = withBatchedUpdates((event: KeyboardEvent) => {
-    // Allow copy only when inside canvas
-    const isCopyEvent = event[KEYS.CTRL_OR_CMD] && event.code === CODES.C;
-    if (isCopyEvent && this.lastMouseDownTarget !== this.canvas) {
+    const isCopyEvent = event[KEYS.CTRL_OR_CMD] && event.key === KEYS.C;
+    if (isCopyEvent) {
       return;
     }
     // normalize `event.key` when CapsLock is pressed #2372
