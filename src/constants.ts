@@ -31,6 +31,7 @@ export enum EVENT {
   KEYDOWN = "keydown",
   KEYUP = "keyup",
   MOUSE_MOVE = "mousemove",
+  MOUSE_DOWN = "mousedown",
   RESIZE = "resize",
   UNLOAD = "unload",
   BLUR = "blur",

@@ -290,6 +290,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     height: window.innerHeight,
   };
   private scene: Scene;
+  private lastMouseDownTarget: EventTarget | null = null;
   constructor(props: ExcalidrawProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
@@ -765,7 +766,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   });
 
   private removeEventListeners() {
-    document.removeEventListener(EVENT.COPY, this.onCopy);
+    this.excalidrawContainerRef.current!.removeEventListener(
+      EVENT.COPY,
+      this.onCopy,
+    );
     document.removeEventListener(EVENT.PASTE, this.pasteFromClipboard);
     document.removeEventListener(EVENT.CUT, this.onCut);
 
@@ -801,8 +805,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private addEventListeners() {
     this.removeEventListeners();
-    document.addEventListener(EVENT.COPY, this.onCopy);
-    document.addEventListener(EVENT.KEYDOWN, this.onKeyDown, false);
+    document.addEventListener(EVENT.MOUSE_DOWN, this.onMouseDown, false);
+
+    this.excalidrawContainerRef.current!.addEventListener(
+      EVENT.COPY,
+      this.onCopy,
+    );
+    document.addEventListener(EVENT.KEYDOWN, this.onKeyDown);
     document.addEventListener(EVENT.KEYUP, this.onKeyUp, { passive: true });
     document.addEventListener(
       EVENT.MOUSE_MOVE,
@@ -1305,6 +1314,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   // Input handling
 
   private onKeyDown = withBatchedUpdates((event: KeyboardEvent) => {
+    // Allow copy only when inside canvas
+    const isCopyEvent = event[KEYS.CTRL_OR_CMD] && event.code === CODES.C;
+    if (isCopyEvent && this.lastMouseDownTarget !== this.canvas) {
+      return;
+    }
     // normalize `event.key` when CapsLock is pressed #2372
     if (
       "Proxy" in window &&
@@ -1480,6 +1494,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
   });
 
+  private onMouseDown = (event: MouseEvent) => {
+    this.lastMouseDownTarget = event.target;
+  };
   private selectShapeTool(elementType: AppState["elementType"]) {
     if (!isHoldingSpace) {
       setCursorForShape(this.canvas, elementType);
@@ -2080,6 +2097,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
+    this.lastMouseDownTarget = event.target;
     event.persist();
 
     this.maybeOpenContextMenuAfterPointerDownOnTouchDevices(event);
