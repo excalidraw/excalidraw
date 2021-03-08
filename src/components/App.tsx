@@ -2109,8 +2109,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     this.updateGestureOnPointerDown(event);
 
-    // fixes pointermove causing selection of UI texts #32
-    event.preventDefault();
     // Preventing the event above disables default behavior
     // of defocusing potentially focused element, which is what we
     // want when clicking inside the canvas.

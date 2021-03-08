@@ -17,6 +17,8 @@
   left: 0;
   right: 0;
 
+  user-select: none;
+
   a {
     font-weight: 500;
     text-decoration: none;
@@ -29,7 +31,7 @@
 
   canvas {
     touch-action: none;
-    user-select: none;
+    user-select: text;
 
     // following props improve blurriness at certain devicePixelRatios.
     // AFAIK it doesn't affect export (in fact, export seems sharp either way).
