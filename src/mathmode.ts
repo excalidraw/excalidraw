@@ -91,33 +91,25 @@ const math2Svg = (text: string, useTex: boolean) => {
 
 export { getFontString } from "./utils";
 
-export const markupText = (text: string, useTex: boolean) => {
+const markupText = (text: string, useTex: boolean) => {
   const lines = text.replace(/\r\n?/g, "\n").split("\n");
-  let htmlString = "";
-  const htmlLines = [];
   const outputs = [] as Array<string>[];
   for (let index = 0; index < lines.length; index++) {
-    htmlLines.push("");
     outputs.push([]);
     const lineArray = lines[index].split(useTex ? "$$" : "`");
     for (let i = 0; i < lineArray.length; i++) {
       if (i % 2 === 1) {
         const svgString = math2Svg(lineArray[i], useTex);
-        htmlLines[index] += svgString;
         outputs[index].push(svgString);
       } else {
-        htmlLines[index] += lineArray[i];
         outputs[index].push(lineArray[i]);
       }
     }
-    if (lines[index] === "") {
-      htmlLines[index] += `\n`;
+    if (lineArray.length === 0) {
+      outputs[index].push("");
     }
-    htmlString += `<p style="margin: 0px; white-space: pre; direction: ${
-      isRTL(lines[index]) ? "rtl" : "ltr"
-    };">${htmlLines[index]}</p>`;
   }
-  return { htmlString, htmlLines, outputs };
+  return outputs;
 };
 
 const getCacheKey = (
@@ -135,9 +127,123 @@ const getCacheKey = (
   return key;
 };
 
+const metricsCache = {} as {
+  [key: string]: {
+    outputMetrics: Array<{ width: number; height: number; baseline: number }>[];
+    lineMetrics: Array<{ width: number; height: number; baseline: number }>;
+    imageMetrics: { width: number; height: number; baseline: number };
+  };
+};
+
+const measureOutputs = (outputs: string[][], fontString: FontString) => {
+  let key = fontString as string;
+  for (let index = 0; index < outputs.length; index++) {
+    for (let i = 0; i < outputs[index].length; i++) {
+      key += outputs[index][i] === "" ? " " : outputs[index][i];
+    }
+  }
+  const cKey = key;
+  if (metricsCache[cKey]) {
+    return metricsCache[cKey];
+  }
+  const tDiv = document.createElement("div");
+  const tCtx = document.createElement("canvas").getContext("2d");
+  if (tCtx !== null) {
+    tCtx.font = fontString;
+  }
+  const exSize = tCtx ? tCtx.measureText("x").actualBoundingBoxAscent : 1;
+  const outputMetrics = [] as Array<{
+    width: number;
+    height: number;
+    baseline: number;
+  }>[];
+  const lineMetrics = [];
+  let imageWidth = 0;
+  let imageHeight = 0;
+  let imageBaseline = 0;
+  for (let index = 0; index < outputs.length; index++) {
+    outputMetrics.push([]);
+    let lineWidth = 0;
+    let lineHeight = 0;
+    let lineBaseline = 0;
+    for (let i = 0; i < outputs[index].length; i++) {
+      if (i % 2 === 1) {
+        //svg
+        tDiv.innerHTML = outputs[index][i];
+        const cNode = tDiv.children[0];
+        // For some reason, the width/height/baseline metrics gotten from
+        // window.getComputedStyle() might not match the width and height
+        // of the MathJax SVG. So we calculate these directly from the SVG
+        // attributes, which are given in "ex" CSS units. If anything goes
+        // wrong, fall back to a value of 0.
+        let cWidth;
+        let cHeight;
+        let cBaseline;
+        if (cNode.hasAttribute("width")) {
+          cWidth = cNode.getAttribute("width");
+          if (cWidth === null) {
+            cWidth = "0";
+          }
+          cWidth = parseFloat(cWidth) * exSize;
+        } else {
+          cWidth = 0;
+        }
+        if (cNode.hasAttribute("height")) {
+          cHeight = cNode.getAttribute("height");
+          if (cHeight === null) {
+            cHeight = "0";
+          }
+          cHeight = parseFloat(cHeight) * exSize;
+        } else {
+          cHeight = 0;
+        }
+        if (cNode.hasAttribute("style")) {
+          cBaseline = cNode.getAttribute("style");
+          if (cBaseline === null) {
+            cBaseline = "vertical-align: 0ex;";
+          }
+          cBaseline =
+            parseFloat(cBaseline.split(":")[1].split(";")[0]) * exSize;
+        } else {
+          cBaseline = 0;
+        }
+        outputMetrics[index].push({
+          width: cWidth,
+          height: cHeight,
+          baseline: cHeight + cBaseline,
+        });
+      } else {
+        outputMetrics[index].push(measureText(outputs[index][i], fontString));
+      }
+      lineWidth +=
+        outputs[index][i] === "" && outputs[index].length > 1
+          ? 0
+          : outputMetrics[index][i].width;
+      lineHeight = Math.max(lineHeight, outputMetrics[index][i].height);
+      if (lineHeight === outputMetrics[index][i].height) {
+        lineBaseline = outputMetrics[index][i].baseline;
+      }
+    }
+    imageWidth = Math.max(imageWidth, lineWidth);
+    imageBaseline = imageHeight + lineBaseline;
+    imageHeight += lineHeight;
+    lineMetrics.push({
+      width: lineWidth,
+      height: lineHeight,
+      baseline: lineBaseline,
+    });
+  }
+  const imageMetrics = {
+    width: imageWidth,
+    height: imageHeight,
+    baseline: imageBaseline,
+  };
+  metricsCache[cKey] = { outputMetrics, lineMetrics, imageMetrics };
+  return metricsCache[cKey];
+};
+
 const svgCache = {} as { [key: string]: SVGSVGElement };
 
-export const SVG_PADDING = 5;
 export const createSvg = (
   text: string,
   fontSize: number,
@@ -161,7 +267,7 @@ export const createSvg = (
     return svgCache[key];
   }
   const mathLines = text.replace(/\r\n?/g, "\n").split("\n");
-  const markup = markupText(text, useTex);
+  const processed = markupText(text, useTex);
   const svgRoot = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   const node = svgRoot.ownerDocument.createElementNS(
     "http://www.w3.org/2000/svg",
@@ -178,10 +284,11 @@ export const createSvg = (
     fontSize,
     fontFamily,
   });
-  const imageMetrics = measureText(markup.htmlString, fontString, true);
+  const metrics = measureOutputs(processed, fontString);
+  const imageMetrics = metrics.imageMetrics;
   let y = 0;
-  for (let index = 0; index < markup.htmlLines.length; index++) {
-    const lineMetrics = measureText(markup.htmlLines[index], fontString, true);
+  for (let index = 0; index < processed.length; index++) {
+    const lineMetrics = metrics.lineMetrics[index];
     let x =
       textAlign === "right"
         ? imageMetrics.width - lineMetrics.width
@@ -191,15 +298,15 @@ export const createSvg = (
     y += lineMetrics.height;
     const rtl = isRTL(mathLines[index]);
     for (
-      let i = rtl ? markup.outputs[index].length - 1 : 0;
-      rtl ? i >= 0 : i < markup.outputs[index].length;
+      let i = rtl ? processed[index].length - 1 : 0;
+      rtl ? i >= 0 : i < processed[index].length;
       i += rtl ? -1 : 1
     ) {
       let childNode = {} as SVGSVGElement | SVGTextElement;
       const childIsSvg = i % 2 === 1;
       if (childIsSvg) {
         const tempDiv = svgRoot.ownerDocument.createElement("div");
-        tempDiv.innerHTML = markup.outputs[index][i];
+        tempDiv.innerHTML = processed[index][i];
         childNode = tempDiv.children[0] as SVGSVGElement;
       } else {
         const text = svgRoot.ownerDocument.createElementNS(
@@ -210,37 +317,19 @@ export const createSvg = (
         text.setAttribute("fill", `${strokeColor}`);
         text.setAttribute("direction", `${rtl ? "rtl" : "ltr"}`);
         text.setAttribute("text-anchor", `${rtl ? "end" : "start"}`);
-        text.textContent = markup.outputs[index][i];
+        text.textContent = processed[index][i];
         childNode = text;
       }
-      const childMetrics = measureText(
-        markup.outputs[index][i],
-        fontString,
-        childIsSvg,
-      );
+      const childMetrics = metrics.outputMetrics[index][i];
       childNode.setAttribute("x", `${x}`);
-      x += childMetrics.width;
-      // For some reason, childMetrics.height might not match the height
-      // of the MathJax SVG. So we calculate it directly from the "height"
-      // attribute, which is given in "ex" CSS units. If anything goes
-      // wrong, fall back to a value of 0 for childHeight.
-      let childHeight;
-      const tCtx = document.createElement("canvas").getContext("2d");
-      if (tCtx !== null && childNode.hasAttribute("height")) {
-        tCtx.font = fontString;
-        childHeight = childNode.getAttribute("height");
-        if (childHeight === null) {
-          childHeight = "0";
-        }
-        childHeight =
-          parseFloat(childHeight) *
-          (tCtx !== null ? tCtx.measureText("x").actualBoundingBoxAscent : 0);
-      } else {
-        childHeight = 0;
-      }
+      // Don't offset x when we have an empty string.
+      x +=
+        processed[index][i] === "" && processed[index].length > 0
+          ? 0
+          : childMetrics.width;
       // If i % 2 === 0, then childNode is an SVGTextElement, not an SVGSVGElement.
       const svgVerticalOffset = childIsSvg
-        ? Math.min(childHeight, childMetrics.baseline)
+        ? Math.min(childMetrics.height, childMetrics.baseline)
         : 0;
       const yOffset =
         lineMetrics.height - (lineMetrics.baseline - svgVerticalOffset);
@@ -252,9 +341,9 @@ export const createSvg = (
   svgRoot.setAttribute("xmlns", "http://www.w3.org/2000/svg");
   svgRoot.setAttribute(
     "viewBox",
-    `0 0 ${imageMetrics.width + SVG_PADDING} ${imageMetrics.height}`,
+    `0 0 ${imageMetrics.width} ${imageMetrics.height}`,
   );
-  svgRoot.setAttribute("width", `${imageMetrics.width + SVG_PADDING}`);
+  svgRoot.setAttribute("width", `${imageMetrics.width}`);
   svgRoot.setAttribute("height", `${imageMetrics.height}`);
   svgCache[key] = svgRoot;
   return svgRoot;
@@ -333,14 +422,13 @@ export const measureMath = (
   fontString: FontString,
   useTex: boolean,
 ) => {
-  const markup = markupText(text, useTex);
   const metrics =
     isMathMode(fontString) && containsMath(text, useTex)
-      ? measureText(markup.htmlString, fontString, true)
-      : measureText(text, fontString, false);
+      ? measureOutputs(markupText(text, useTex), fontString).imageMetrics
+      : measureText(text, fontString);
   if (isMathMode(fontString) && containsMath(text, useTex)) {
     return {
-      width: metrics.width + SVG_PADDING,
+      width: metrics.width,
       height: metrics.height,
       baseline: metrics.baseline,
     };
