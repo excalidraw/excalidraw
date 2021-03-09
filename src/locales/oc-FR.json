@@ -142,7 +142,7 @@
     "confirmAddLibrary": "Apondrà {{numShapes}} forma(s) a vòstra bibliotèca. Confirmatz ?",
     "imageDoesNotContainScene": "L’importacion d’imatge es pas encara presa en carga pel moment.\n\nVoliatz importar una scèna ? Aqueste imatge sembla pas conténer cap de donada de scèna. Aviatz activar aquò pendent l’export ?",
     "cannotRestoreFromImage": "Restauracion impossibla de la scèna a partir del fichièr imatge",
-    "invalidSceneUrl": "",
+    "invalidSceneUrl": "Importacion impossibla de la scèna a partir de l’URL provesida. Es siá mal formatada o siá conten pas cap de donada JSON Excalidraw valida.",
     "resetLibrary": "Aquò suprimirà vòstra bibliotèca. Ne sètz vertadièrament ?"
   },
   "toolBar": {
