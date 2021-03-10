@@ -93,7 +93,8 @@
     "distributeHorizontally": "Distribute horizontally",
     "distributeVertically": "Distribute vertically",
     "viewMode": "View mode",
-    "toggleExportColorScheme": "Toggle export color scheme"
+    "toggleExportColorScheme": "Toggle export color scheme",
+    "share": "Share"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
@@ -199,7 +200,8 @@
     "button_stopSession": "Stop session",
     "desc_inProgressIntro": "Live-collaboration session is now in progress.",
     "desc_shareLink": "Share this link with anyone you want to collaborate with:",
-    "desc_exitSession": "Stopping the session will disconnect you from the room, but you'll be able to continue working with the scene, locally. Note that this won't affect other people, and they'll still be able to collaborate on their version."
+    "desc_exitSession": "Stopping the session will disconnect you from the room, but you'll be able to continue working with the scene, locally. Note that this won't affect other people, and they'll still be able to collaborate on their version.",
+    "shareTitle": "Join live collaboration on Excalidraw"
   },
   "errorDialog": {
     "title": "Error"
