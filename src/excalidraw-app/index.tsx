@@ -121,7 +121,6 @@ const initializeScene = async (opts: {
     }
   }
   if (roomLinkData) {
-    trackEvent("share", "session join");
     return opts.collabAPI.initializeSocketClient(roomLinkData);
   } else if (scene) {
     return scene;

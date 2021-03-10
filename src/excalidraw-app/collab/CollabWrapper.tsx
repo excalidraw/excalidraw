@@ -189,7 +189,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   };
 
   openPortal = async () => {
-    trackEvent("share", "session start");
+    trackEvent("share", "room creation");
     return this.initializeSocketClient(null);
   };
 
@@ -198,7 +198,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     if (window.confirm(t("alerts.collabStopOverridePrompt"))) {
       window.history.pushState({}, APP_NAME, window.location.origin);
       this.destroySocketClient();
-      trackEvent("share", "session close");
+      trackEvent("share", "room close");
     }
   };
 
