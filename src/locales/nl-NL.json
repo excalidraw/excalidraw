@@ -142,6 +142,7 @@
     "confirmAddLibrary": "Hiermee worden {{numShapes}} vorm(n) aan uw bibliotheek toegevoegd. Ben je het zeker?",
     "imageDoesNotContainScene": "Afbeeldingen importeren wordt op dit moment niet ondersteund.\n\nWil je een scène importeren? Deze afbeelding lijkt geen scène gegevens te bevatten. Heb je dit geactiveerd tijdens het exporteren?",
     "cannotRestoreFromImage": "Scène kan niet worden hersteld vanuit dit afbeeldingsbestand",
+    "invalidSceneUrl": "Kan scène niet importeren vanuit de opgegeven URL. Het is onjuist of bevat geen geldige Excalidraw JSON-gegevens.",
     "resetLibrary": "Dit zal je bibliotheek wissen. Weet je het zeker?"
   },
   "toolBar": {

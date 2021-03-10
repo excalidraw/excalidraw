@@ -142,6 +142,7 @@
     "confirmAddLibrary": "هذا سيضيف {{numShapes}} شكل إلى مكتبتك. هل أنت متأكد؟",
     "imageDoesNotContainScene": "استيراد الصور غير مدعوم في الوقت الراهن.\n\nهل تريد استيراد مشهد؟ لا يبدو أن هذه الصورة تحتوي على أي بيانات مشهد. هل قمت بسماح هذا أثناء التصدير؟",
     "cannotRestoreFromImage": "تعذر استعادة المشهد من ملف الصورة",
+    "invalidSceneUrl": "",
     "resetLibrary": ""
   },
   "toolBar": {

@@ -142,6 +142,7 @@
     "confirmAddLibrary": "Dette vil legge til {{numShapes}} figur(er) i biblioteket ditt. Er du sikker?",
     "imageDoesNotContainScene": "Importering av bilder støttes ikke for øyeblikket.\n\nVil du importere en scene? Dette bildet ser ikke ut til å inneholde noen scene-data. Har du aktivert dette under eksporten?",
     "cannotRestoreFromImage": "Scenen kunne ikke gjenopprettes fra denne bildefilen",
+    "invalidSceneUrl": "Kunne ikke importere scene fra den oppgitte URL-en. Den er enten ødelagt, eller inneholder ikke gyldig Excalidraw JSON-data.",
     "resetLibrary": "Dette vil tømme biblioteket ditt. Er du sikker?"
   },
   "toolBar": {

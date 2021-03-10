@@ -142,6 +142,7 @@
     "confirmAddLibrary": "Ini akan menambahkan {{numShapes}} bentuk ke pustaka Anda. Anda yakin?",
     "imageDoesNotContainScene": "Mengimpor gambar tidak didukung saat ini.\n\nApakah Anda ingin impor pemandangan? Gambar ini tidak berisi data pemandangan. Sudah ka Anda aktifkan ini ketika ekspor?",
     "cannotRestoreFromImage": "Pemandangan tidak dapat dipulihkan dari file gambar ini",
+    "invalidSceneUrl": "",
     "resetLibrary": "Ini akan menghapus pustaka Anda. Anda yakin?"
   },
   "toolBar": {

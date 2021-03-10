@@ -142,6 +142,7 @@
     "confirmAddLibrary": "Tämä lisää {{numShapes}} muotoa kirjastoosi. Jatketaanko?",
     "imageDoesNotContainScene": "Kuvien lisääminen ei ole tällä hetkellä mahdollista.\n\nHaluatko tuoda piirroksen? Tämä kuva ei näytä sisältävän tarvittavia tietoja. Oletko ottanut piirrostietojen tallennuksen käyttöön viennin aikana?",
     "cannotRestoreFromImage": "Teosta ei voitu palauttaa tästä kuvatiedostosta",
+    "invalidSceneUrl": "Teosta ei voitu tuoda annetusta URL-osoitteesta. Tallenne on vioittunut, tai osoitteessa ei ole Excalidraw JSON-dataa.",
     "resetLibrary": "Tämä tyhjentää kirjastosi. Jatketaanko?"
   },
   "toolBar": {

@@ -142,6 +142,7 @@
     "confirmAddLibrary": "To doda {{numShapes}} kształtów do twojej biblioteki. Jesteś pewien?",
     "imageDoesNotContainScene": "Importowanie zdjęć nie jest obecnie obsługiwane.\n\nCzy chciałeś zaimportować scenę? Ten obraz nie zawiera żadnych danych sceny. Czy włączyłeś to podczas eksportowania?",
     "cannotRestoreFromImage": "Scena nie mogła zostać przywrócona z pliku obrazu",
+    "invalidSceneUrl": "",
     "resetLibrary": "To wyczyści twoją bibliotekę. Jesteś pewien?"
   },
   "toolBar": {
