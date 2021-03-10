@@ -396,7 +396,7 @@ export const drawMathOnCanvas = (
         () => {
           img.src = reader.result as string;
           img.onload = function () {
-            context.drawImage(img, x, y);
+            context.drawImage(img, 0, 0);
             imageCache[key] = img;
             resolve();
           };

@@ -114,20 +114,28 @@ const generateElementCanvas = (
 
   const rc = rough.canvas(canvas);
   const promise = drawElementOnCanvas(element, rc, context, zoom);
-  context.translate(
-    -(CANVAS_PADDING * zoom.value),
-    -(CANVAS_PADDING * zoom.value),
-  );
-  context.scale(
-    1 / (window.devicePixelRatio * zoom.value),
-    1 / (window.devicePixelRatio * zoom.value),
-  );
-  if (
-    isTextElement(element) &&
-    isMathMode(getFontString(element)) &&
-    containsMath(element.text, element.useTex)
-  ) {
-    context.scale(1 / scale, 1 / scale);
+  const finishGeneration = function () {
+    context.translate(
+      -(CANVAS_PADDING * zoom.value),
+      -(CANVAS_PADDING * zoom.value),
+    );
+    context.scale(
+      1 / (window.devicePixelRatio * zoom.value),
+      1 / (window.devicePixelRatio * zoom.value),
+    );
+    if (
+      isTextElement(element) &&
+      isMathMode(getFontString(element)) &&
+      containsMath(element.text, element.useTex)
+    ) {
+      context.scale(1 / scale, 1 / scale);
+    }
+  };
+
+  if (promise) {
+    promise.then(() => finishGeneration());
+  } else {
+    finishGeneration();
   }
   return {
     elementWithCanvas: {
