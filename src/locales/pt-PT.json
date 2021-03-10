@@ -142,6 +142,7 @@
     "confirmAddLibrary": "Isso adicionará {{numShapes}} forma(s) à sua biblioteca. Tem certeza?",
     "imageDoesNotContainScene": "A importação de imagens não é suportada no momento.\n\nVocê deseja importar uma cena? Esta imagem parece não conter dados de cena. Você ativou isto durante a exportação?",
     "cannotRestoreFromImage": "Não foi possível restaurar a cena deste arquivo de imagem",
+    "invalidSceneUrl": "",
     "resetLibrary": "Isto irá limpar a sua biblioteca. Tem a certeza?"
   },
   "toolBar": {

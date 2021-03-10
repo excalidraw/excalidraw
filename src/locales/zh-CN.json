@@ -142,6 +142,7 @@
     "confirmAddLibrary": "这将添加 {{numShapes}} 个形状到您的库。您确定吗？",
     "imageDoesNotContainScene": "当前不支持导入图片。\n\n您想要导入画布数据吗？此图像似乎不包含任何画布数据。您是否在导出过程中启用了嵌入画布的选项？",
     "cannotRestoreFromImage": "无法从此图像文件恢复画布",
+    "invalidSceneUrl": "",
     "resetLibrary": "这将会清除你的资源库。你确定这么做吗？"
   },
   "toolBar": {

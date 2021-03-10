@@ -142,6 +142,7 @@
     "confirmAddLibrary": "लाइब्रेरी जोड़ें पुष्‍टि करें आकार संख्या",
     "imageDoesNotContainScene": "दृश्य में छवि नहीं है",
     "cannotRestoreFromImage": "छवि फ़ाइल बहाल दृश्य नहीं है",
+    "invalidSceneUrl": "",
     "resetLibrary": ""
   },
   "toolBar": {

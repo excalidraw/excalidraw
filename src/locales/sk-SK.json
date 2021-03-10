@@ -142,6 +142,7 @@
     "confirmAddLibrary": "Týmto sa pridá {{numShapes}} tvar(ov) do vašej knižnice. Ste si istí?",
     "imageDoesNotContainScene": "Importovanie obrázku v tomto momente nie je možné.\n\nChceli ste importovať scénu? Tento obrázok neobsahuje žiadne údaje scény. Povolili ste túto možnosť počas exportovania?",
     "cannotRestoreFromImage": "Nepodarilo sa obnoviť scénu z tohto obrázkového súboru",
+    "invalidSceneUrl": "",
     "resetLibrary": "Týmto vyprázdnite vašu knižnicu. Ste si istý?"
   },
   "toolBar": {
@@ -245,10 +246,10 @@
   "toast": {
     "copyStyles": "Štýly skopírované.",
     "copyToClipboard": "Skopírované do schránky.",
-    "copyToClipboardAsPng": "",
+    "copyToClipboardAsPng": "Kopírovanie {{exportSelection}} do schránky ako PNG prebehlo úspešne\n({{exportColorScheme}})",
     "fileSaved": "Súbor uložený.",
     "fileSavedToFilename": "Uložený ako {filename}",
-    "canvas": "",
-    "selection": ""
+    "canvas": "plátna",
+    "selection": "výberu"
   }
 }

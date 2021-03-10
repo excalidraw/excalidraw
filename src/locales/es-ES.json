@@ -142,6 +142,7 @@
     "confirmAddLibrary": "Esto añadirá {{numShapes}} forma(s) a tu biblioteca. ¿Estás seguro?",
     "imageDoesNotContainScene": "La importación de imágenes no está homologada en este momento.\n\n¿Deseas importar una escena? Esta imagen no parece contener ningún dato de escena. ¿Lo has activado durante la exportación?",
     "cannotRestoreFromImage": "No se pudo restaurar la escena desde este archivo de imagen",
+    "invalidSceneUrl": "No se ha podido importar la escena desde la URL proporcionada. Está mal formada, o no contiene datos de Excalidraw JSON válidos.",
     "resetLibrary": "Esto eliminará tu librería. ¿Estás seguro?"
   },
   "toolBar": {
