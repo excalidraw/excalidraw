@@ -1,11 +1,12 @@
-import { measureMath, getFontString } from "../mathmode";
+import { measureMath } from "../mathmode";
 import { ExcalidrawTextElement } from "./types";
 import { mutateElement } from "./mutateElement";
 
 export const redrawTextBoundingBox = (element: ExcalidrawTextElement) => {
   const metrics = measureMath(
     element.text,
-    getFontString(element),
+    element.fontSize,
+    element.fontFamily,
     element.useTex,
   );
   mutateElement(element, {

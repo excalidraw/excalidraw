@@ -121,7 +121,7 @@ const getCacheKey = (
   opacity: Number,
   useTex: boolean,
 ) => {
-  const key = `${text}, ${fontSize}, ${getFontFamilyString({
+  const key = `${text}, ${getFontFamilyString({
     fontFamily,
   })}, ${strokeColor}, ${textAlign}, ${opacity}, ${useTex}`;
   return key;
@@ -244,6 +244,9 @@ const measureOutputs = (outputs: string[][], fontString: FontString) => {
 
 const svgCache = {} as { [key: string]: SVGSVGElement };
 
+// Use a power-of-two font size to generate the SVG.
+const fontSizePoT = 128;
+
 export const createSvg = (
   text: string,
   fontSize: number,
@@ -263,29 +266,35 @@ export const createSvg = (
     useTex,
   );
 
-  if (svgCache[key]) {
-    return svgCache[key];
-  }
   const mathLines = text.replace(/\r\n?/g, "\n").split("\n");
   const processed = markupText(text, useTex);
+
+  const scale = fontSize / fontSizePoT;
+  const fontString = getFontString({
+    fontSize: fontSizePoT,
+    fontFamily,
+  });
+  const metrics = measureOutputs(processed, fontString);
+  const imageMetrics = metrics.imageMetrics;
+
+  if (svgCache[key]) {
+    const svgRoot = svgCache[key];
+    svgRoot.setAttribute("width", `${scale * imageMetrics.width}`);
+    svgRoot.setAttribute("height", `${scale * imageMetrics.height}`);
+    return svgRoot;
+  }
   const svgRoot = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   const node = svgRoot.ownerDocument.createElementNS(
     "http://www.w3.org/2000/svg",
     "g",
   );
   node.setAttribute("font-family", `${getFontFamilyString({ fontFamily })}`);
-  node.setAttribute("font-size", `${fontSize}px`);
+  node.setAttribute("font-size", `${fontSizePoT}px`);
   node.setAttribute("color", `${strokeColor}`);
   node.setAttribute("stroke-opacity", `${opacity}`);
   node.setAttribute("fill-opacity", `${opacity}`);
   svgRoot.appendChild(node);
 
-  const fontString = getFontString({
-    fontSize,
-    fontFamily,
-  });
-  const metrics = measureOutputs(processed, fontString);
-  const imageMetrics = metrics.imageMetrics;
   let y = 0;
   for (let index = 0; index < processed.length; index++) {
     const lineMetrics = metrics.lineMetrics[index];
@@ -303,6 +312,7 @@ export const createSvg = (
       i += rtl ? -1 : 1
     ) {
       let childNode = {} as SVGSVGElement | SVGTextElement;
+      // If i % 2 === 0, then childNode is an SVGTextElement, not an SVGSVGElement.
       const childIsSvg = i % 2 === 1;
       if (childIsSvg) {
         const tempDiv = svgRoot.ownerDocument.createElement("div");
@@ -327,7 +337,6 @@ export const createSvg = (
         processed[index][i] === "" && processed[index].length > 0
           ? 0
           : childMetrics.width;
-      // If i % 2 === 0, then childNode is an SVGTextElement, not an SVGSVGElement.
       const svgVerticalOffset = childIsSvg
         ? Math.min(childMetrics.height, childMetrics.baseline)
         : 0;
@@ -346,10 +355,16 @@ export const createSvg = (
   svgRoot.setAttribute("width", `${imageMetrics.width}`);
   svgRoot.setAttribute("height", `${imageMetrics.height}`);
   svgCache[key] = svgRoot;
+  // Now that we have cached the base SVG, scale it appropriately.
+  svgRoot.setAttribute("width", `${scale * imageMetrics.width}`);
+  svgRoot.setAttribute("height", `${scale * imageMetrics.height}`);
   return svgRoot;
 };
 
 const imageCache = {} as { [key: string]: HTMLImageElement };
+const imageMetricsCache = {} as {
+  [key: string]: { width: number; height: number; baseline: number };
+};
 
 export const drawMathOnCanvas = (
   context: CanvasRenderingContext2D,
@@ -372,9 +387,21 @@ export const drawMathOnCanvas = (
     opacity,
     useTex,
   );
+
+  if (!(imageMetricsCache[key] && imageMetricsCache[key] !== undefined)) {
+    imageMetricsCache[key] = measureOutputs(
+      markupText(text, useTex),
+      getFontString({ fontSize: fontSizePoT, fontFamily }),
+    ).imageMetrics;
+  }
+  const imageMetrics = imageMetricsCache[key];
+  const scale = fontSize / fontSizePoT;
+  const imgKey = `${key}, ${scale * imageMetrics.width}, ${
+    scale * imageMetrics.height
+  }`;
   return new Promise<void>((resolve) => {
-    if (imageCache[key] && imageCache[key] !== undefined) {
-      context.drawImage(imageCache[key], 0, 0);
+    if (imageCache[imgKey] && imageCache[imgKey] !== undefined) {
+      context.drawImage(imageCache[imgKey], 0, 0);
       resolve();
     } else {
       const img = new Image();
@@ -397,7 +424,7 @@ export const drawMathOnCanvas = (
           img.src = reader.result as string;
           img.onload = function () {
             context.drawImage(img, 0, 0);
-            imageCache[key] = img;
+            imageCache[imgKey] = img;
             resolve();
           };
         },
@@ -419,18 +446,25 @@ export const isMathMode = (fontString: FontString) => {
 
 export const measureMath = (
   text: string,
-  fontString: FontString,
+  fontSize: number,
+  fontFamily: FontFamily,
   useTex: boolean,
 ) => {
+  const scale = fontSize / fontSizePoT;
+  const fontStringPoT = getFontString({
+    fontSize: fontSizePoT,
+    fontFamily,
+  });
+  const fontString = getFontString({ fontSize, fontFamily });
   const metrics =
-    isMathMode(fontString) && containsMath(text, useTex)
-      ? measureOutputs(markupText(text, useTex), fontString).imageMetrics
+    isMathMode(fontStringPoT) && containsMath(text, useTex)
+      ? measureOutputs(markupText(text, useTex), fontStringPoT).imageMetrics
       : measureText(text, fontString);
-  if (isMathMode(fontString) && containsMath(text, useTex)) {
+  if (isMathMode(fontStringPoT) && containsMath(text, useTex)) {
     return {
-      width: metrics.width,
-      height: metrics.height,
-      baseline: metrics.baseline,
+      width: metrics.width * scale,
+      height: metrics.height * scale,
+      baseline: metrics.baseline * scale,
     };
   }
   return metrics;

@@ -1379,7 +1379,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             // Update the width/height of the element
             const metrics = measureMath(
               element.text,
-              getFontString(element),
+              element.fontSize,
+              element.fontFamily,
               element.useTex,
             );
             mutateElement(element, metrics);

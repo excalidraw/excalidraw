@@ -11,7 +11,7 @@ import {
   VerticalAlign,
   Arrowhead,
 } from "../element/types";
-import { measureMath, getFontString } from "../mathmode";
+import { measureMath } from "../mathmode";
 import { randomInteger, randomId } from "../random";
 import { newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
@@ -116,7 +116,12 @@ export const newTextElement = (
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const useTex = opts.useTex !== undefined ? opts.useTex : getUseTex();
-  const metrics = measureMath(opts.text, getFontString(opts), useTex);
+  const metrics = measureMath(
+    opts.text,
+    opts.fontSize,
+    opts.fontFamily,
+    useTex,
+  );
   const offsets = getTextElementPositionOffsets(opts, metrics);
   const textElement = newElementWith(
     {
@@ -152,7 +157,12 @@ const getAdjustedDimensions = (
     width: nextWidth,
     height: nextHeight,
     baseline: nextBaseline,
-  } = measureMath(nextText, getFontString(element), element.useTex);
+  } = measureMath(
+    nextText,
+    element.fontSize,
+    element.fontFamily,
+    element.useTex,
+  );
   const { textAlign, verticalAlign } = element;
 
   let x: number;
@@ -161,7 +171,8 @@ const getAdjustedDimensions = (
   if (textAlign === "center" && verticalAlign === "middle") {
     const prevMetrics = measureMath(
       element.text,
-      getFontString(element),
+      element.fontSize,
+      element.fontFamily,
       element.useTex,
     );
     const offsets = getTextElementPositionOffsets(element, {

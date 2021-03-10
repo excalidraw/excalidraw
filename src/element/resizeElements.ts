@@ -21,7 +21,7 @@ import {
 import { isLinearElement, isTextElement } from "./typeChecks";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
-import { measureMath, getFontString } from "../mathmode";
+import { measureMath } from "../mathmode";
 import { updateBoundElements } from "./binding";
 import {
   TransformHandleType,
@@ -268,7 +268,8 @@ const measureFontSizeFromWH = (
   }
   const metrics = measureMath(
     element.text,
-    getFontString({ fontSize: nextFontSize, fontFamily: element.fontFamily }),
+    nextFontSize,
+    element.fontFamily,
     element.useTex,
   );
   return {

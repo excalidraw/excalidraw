@@ -103,7 +103,6 @@ const generateElementCanvas = (
   ) {
     canvas.width *= scale;
     canvas.height *= scale;
-    context.scale(scale, scale);
   }
   context.translate(CANVAS_PADDING * zoom.value, CANVAS_PADDING * zoom.value);
 
@@ -113,7 +112,7 @@ const generateElementCanvas = (
   );
 
   const rc = rough.canvas(canvas);
-  const promise = drawElementOnCanvas(element, rc, context, zoom);
+  const promise = drawElementOnCanvas(element, rc, context, zoom, scale);
   const finishGeneration = function () {
     context.translate(
       -(CANVAS_PADDING * zoom.value),
@@ -123,13 +122,6 @@ const generateElementCanvas = (
       1 / (window.devicePixelRatio * zoom.value),
       1 / (window.devicePixelRatio * zoom.value),
     );
-    if (
-      isTextElement(element) &&
-      isMathMode(getFontString(element)) &&
-      containsMath(element.text, element.useTex)
-    ) {
-      context.scale(1 / scale, 1 / scale);
-    }
   };
 
   if (promise) {
@@ -154,6 +146,7 @@ const drawElementOnCanvas = (
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   zoom: Zoom,
+  scale: number,
 ) => {
   let promise;
   context.globalAlpha = element.opacity / 100;
@@ -191,7 +184,7 @@ const drawElementOnCanvas = (
             scaledPadding,
             scaledPadding,
             element.text,
-            element.fontSize,
+            element.fontSize * scale,
             element.fontFamily,
             element.strokeColor,
             element.textAlign,
@@ -525,9 +518,16 @@ const drawElementFromCanvas = (
 ) => {
   const element = elementWithCanvas.element;
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-  const cx = ((x1 + x2) / 2 + sceneState.scrollX) * window.devicePixelRatio;
-  const cy = ((y1 + y2) / 2 + sceneState.scrollY) * window.devicePixelRatio;
-  context.scale(scale, scale);
+  const condScale =
+    isTextElement(element) &&
+    isMathMode(getFontString(element)) &&
+    containsMath(element.text, element.useTex)
+      ? scale
+      : 1;
+  const cx =
+    ((x1 + x2) / 2 + sceneState.scrollX) * window.devicePixelRatio * condScale;
+  const cy =
+    ((y1 + y2) / 2 + sceneState.scrollY) * window.devicePixelRatio * condScale;
   context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
   context.translate(cx, cy);
   context.rotate(element.angle);
@@ -545,7 +545,6 @@ const drawElementFromCanvas = (
   context.rotate(-element.angle);
   context.translate(-cx, -cy);
   context.scale(window.devicePixelRatio, window.devicePixelRatio);
-  context.scale(1 / scale, 1 / scale);
 
   // Clear the nested element we appended to the DOM
 };
@@ -632,25 +631,29 @@ export const renderElement = (
             const tempContext = tempCanvas.getContext("2d");
             const promise =
               tempContext !== null
-                ? drawElementOnCanvas(element, rc, tempContext, sceneState.zoom)
+                ? drawElementOnCanvas(
+                    element,
+                    rc,
+                    tempContext,
+                    sceneState.zoom,
+                    scale,
+                  )
                 : undefined;
             promise?.then(() => {
-              context.scale(scale, scale);
-              context.translate(cx, cy);
+              context.translate(cx * scale, cy * scale);
               context.rotate(element.angle);
-              context.translate(-shiftX, -shiftY);
+              context.translate(-shiftX * scale, -shiftY * scale);
               context.drawImage(tempCanvas, 0, 0);
-              context.translate(shiftX, shiftY);
+              context.translate(shiftX * scale, shiftY * scale);
               context.rotate(-element.angle);
-              context.translate(-cx, -cy);
-              context.scale(1 / scale, 1 / scale);
+              context.translate(-cx * scale, -cy * scale);
               resolve();
             });
           } else {
             context.translate(cx, cy);
             context.rotate(element.angle);
             context.translate(-shiftX, -shiftY);
-            drawElementOnCanvas(element, rc, context, sceneState.zoom);
+            drawElementOnCanvas(element, rc, context, sceneState.zoom, 1);
             context.translate(shiftX, shiftY);
             context.rotate(-element.angle);
             context.translate(-cx, -cy);
