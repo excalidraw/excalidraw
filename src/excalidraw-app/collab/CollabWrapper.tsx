@@ -198,7 +198,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     if (window.confirm(t("alerts.collabStopOverridePrompt"))) {
       window.history.pushState({}, APP_NAME, window.location.origin);
       this.destroySocketClient();
-      trackEvent("share", "room close");
+      trackEvent("share", "room closed");
     }
   };
 
