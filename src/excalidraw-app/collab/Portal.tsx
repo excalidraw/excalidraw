@@ -10,6 +10,7 @@ import { getSyncableElements } from "../../packages/excalidraw/index";
 import { ExcalidrawElement } from "../../element/types";
 import { BROADCAST, SCENE } from "../app_constants";
 import { UserIdleState } from "./types";
+import { trackEvent } from "../../analytics";
 
 class Portal {
   collab: CollabWrapper;
@@ -32,6 +33,7 @@ class Portal {
     this.socket.on("init-room", () => {
       if (this.socket) {
         this.socket.emit("join-room", this.roomId);
+        trackEvent("share", "room joined");
       }
     });
     this.socket.on("new-user", async (_socketId: string) => {
