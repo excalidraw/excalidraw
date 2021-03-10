@@ -80,19 +80,6 @@ export const textWysiwyg = ({
         color: updatedElement.strokeColor,
         opacity: updatedElement.opacity / 100,
         filter: "var(--appearance-filter)",
-        maxWidth: `${
-          appState.offsetLeft +
-          appState.width -
-          viewportX -
-          // margin-right of parent if any
-          Number(
-            getComputedStyle(
-              document.querySelector(".excalidraw")!.parentNode as Element,
-            ).marginRight.slice(0, -2),
-          ) -
-          // padding of layer ui footer
-          8
-        }px`,
       });
     }
   };
@@ -106,7 +93,7 @@ export const textWysiwyg = ({
   editable.wrap = "off";
 
   Object.assign(editable.style, {
-    position: "absolute",
+    position: "fixed",
     display: "inline-block",
     minHeight: "1em",
     backfaceVisibility: "hidden",
