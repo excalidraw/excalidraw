@@ -142,6 +142,7 @@
     "confirmAddLibrary": "Bu, kitaplığınıza {{numShapes}} tane şekil ekleyecek. Emin misiniz?",
     "imageDoesNotContainScene": "Resim ekleme şuan için desteklenmiyor.\nBir sahneyi içeri aktarmak mı istediniz? Bu dosya herhangi bir sahne içeriyor gibi durmuyor. Çıktı alırken sahneyi dahil ettiniz mi?",
     "cannotRestoreFromImage": "Sahne bu dosyadan oluşturulamıyor",
+    "invalidSceneUrl": "",
     "resetLibrary": ""
   },
   "toolBar": {

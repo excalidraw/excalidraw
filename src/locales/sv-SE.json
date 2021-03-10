@@ -142,6 +142,7 @@
     "confirmAddLibrary": "Detta kommer att lägga till {{numShapes}} form(er) till ditt bibliotek. Är du säker?",
     "imageDoesNotContainScene": "Importering av bilder stöds inte just nu.\n\nVill du importera en skiss? Den här bilden verkar inte innehålla någon skissdata. Har du aktiverat detta under export?",
     "cannotRestoreFromImage": "Skiss kunde inte återställas från denna bildfil",
+    "invalidSceneUrl": "Det gick inte att importera skiss från den angivna webbadressen. Antingen har den fel format, eller så innehåller den ingen giltig Excalidraw JSON data.",
     "resetLibrary": "Detta kommer att rensa ditt bibliotek. Är du säker?"
   },
   "toolBar": {
