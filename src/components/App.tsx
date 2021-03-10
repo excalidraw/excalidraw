@@ -1832,8 +1832,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     resetCursor(this.canvas);
-
-    if (!event[KEYS.CTRL_OR_CMD]) {
+    if (!event[KEYS.CTRL_OR_CMD] && !this.state.viewModeEnabled) {
       this.startTextEditing({
         sceneX,
         sceneY,
