@@ -11,6 +11,7 @@ import {
 import { ToolButton } from "../../components/ToolButton";
 import { t } from "../../i18n";
 import "./RoomDialog.scss";
+import Stack from "../../components/Stack";
 
 const RoomDialog = ({
   handleClose,
@@ -52,7 +53,7 @@ const RoomDialog = ({
         url: activeRoomLink,
       });
     } catch (error) {
-      setErrorMessage(error.message);
+      // Just ignore.
     }
   };
 
@@ -88,15 +89,16 @@ const RoomDialog = ({
             <p>{t("roomDialog.desc_inProgressIntro")}</p>
             <p>{t("roomDialog.desc_shareLink")}</p>
             <div className="RoomDialog-linkContainer">
-              {navigator.share ? (
-                <ToolButton
-                  type="button"
-                  icon={isAppleBrowser ? shareIOS : share}
-                  title={t("labels.share")}
-                  aria-label={t("labels.share")}
-                  onClick={shareRoomLink}
-                />
-              ) : (
+              <Stack.Row gap={2}>
+                {"share" in navigator ? (
+                  <ToolButton
+                    type="button"
+                    icon={isAppleBrowser ? shareIOS : share}
+                    title={t("labels.share")}
+                    aria-label={t("labels.share")}
+                    onClick={shareRoomLink}
+                  />
+                ) : null}
                 <ToolButton
                   type="button"
                   icon={clipboard}
@@ -104,7 +106,7 @@ const RoomDialog = ({
                   aria-label={t("labels.copy")}
                   onClick={copyRoomLink}
                 />
-              )}
+              </Stack.Row>
               <input
                 value={activeRoomLink}
                 readOnly={true}
