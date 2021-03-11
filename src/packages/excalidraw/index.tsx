@@ -29,6 +29,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     viewModeEnabled,
     zenModeEnabled,
     gridModeEnabled,
+    libraryReturnUrl,
   } = props;
 
   useEffect(() => {
@@ -69,6 +70,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
           viewModeEnabled={viewModeEnabled}
           zenModeEnabled={zenModeEnabled}
           gridModeEnabled={gridModeEnabled}
+          libraryReturnUrl={libraryReturnUrl}
         />
       </IsMobileProvider>
     </InitializeApp>
