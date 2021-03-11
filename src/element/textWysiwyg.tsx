@@ -22,14 +22,18 @@ const getTransform = (
   height: number,
   angle: number,
   appState: AppState,
+  maxWidth: number,
 ) => {
   const { zoom, offsetTop, offsetLeft } = appState;
   const degree = (180 * angle) / Math.PI;
   // offsets must be multiplied by 2 to account for the division by 2 of
   // the whole expression afterwards
-  return `translate(${((width - offsetLeft * 2) * (zoom.value - 1)) / 2}px, ${
-    ((height - offsetTop * 2) * (zoom.value - 1)) / 2
-  }px) scale(${zoom.value}) rotate(${degree}deg)`;
+  let translateX = ((width - offsetLeft * 2) * (zoom.value - 1)) / 2;
+  const translateY = ((height - offsetTop * 2) * (zoom.value - 1)) / 2;
+  if (width > maxWidth && zoom.value !== 1) {
+    translateX = (maxWidth / 2) * (zoom.value - 1);
+  }
+  return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
 };
 
 export const textWysiwyg = ({
@@ -73,6 +77,16 @@ export const textWysiwyg = ({
         updatedElement.x + offsetX,
         updatedElement.y,
       );
+      const maxWidth =
+        (appState.offsetLeft + appState.width - viewportX - 8) /
+          appState.zoom.value -
+        // margin-right of parent if any
+        Number(
+          getComputedStyle(
+            document.querySelector(".excalidraw")!.parentNode as Element,
+          ).marginRight.slice(0, -2),
+        );
+
       Object.assign(editable.style, {
         font: getFontString(updatedElement),
         // must be defined *after* font ¯\_(ツ)_/¯
@@ -81,11 +95,18 @@ export const textWysiwyg = ({
         height: `${metrics.height}px`,
         left: `${viewportX}px`,
         top: `${viewportY}px`,
-        transform: getTransform(metrics.width, metrics.height, angle, appState),
+        transform: getTransform(
+          metrics.width,
+          metrics.height,
+          angle,
+          appState,
+          maxWidth,
+        ),
         textAlign,
         color: updatedElement.strokeColor,
         opacity: updatedElement.opacity / 100,
         filter: "var(--appearance-filter)",
+        maxWidth: `${maxWidth}px`,
       });
     }
   };
@@ -99,7 +120,7 @@ export const textWysiwyg = ({
   editable.wrap = "off";
 
   Object.assign(editable.style, {
-    position: "fixed",
+    position: "absolute",
     display: "inline-block",
     minHeight: "1em",
     backfaceVisibility: "hidden",

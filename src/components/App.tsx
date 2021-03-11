@@ -423,8 +423,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       zenModeEnabled,
       width: canvasDOMWidth,
       height: canvasDOMHeight,
-      offsetTop,
-      offsetLeft,
       viewModeEnabled,
     } = this.state;
 
@@ -442,8 +440,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         style={{
           width: canvasDOMWidth,
           height: canvasDOMHeight,
-          top: offsetTop,
-          left: offsetLeft,
         }}
       >
         <LayerUI
@@ -545,18 +541,22 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         }
 
         this.setState(
-          (state) => ({
-            ...actionResult.appState,
-            editingElement:
-              editingElement || actionResult.appState?.editingElement || null,
-            width: state.width,
-            height: state.height,
-            offsetTop: state.offsetTop,
-            offsetLeft: state.offsetLeft,
-            viewModeEnabled,
-            zenModeEnabled,
-            gridSize,
-          }),
+          (state) => {
+            // using Object.assign instead of spread to fool TS 4.2.2+ into
+            // regarding the resulting type as not containing undefined
+            // (which the following expression will never contain)
+            return Object.assign(actionResult.appState || {}, {
+              editingElement:
+                editingElement || actionResult.appState?.editingElement || null,
+              width: state.width,
+              height: state.height,
+              offsetTop: state.offsetTop,
+              offsetLeft: state.offsetLeft,
+              viewModeEnabled,
+              zenModeEnabled,
+              gridSize,
+            });
+          },
           () => {
             if (actionResult.syncHistory) {
               history.setCurrentState(
@@ -1030,7 +1030,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   }
 
   private onScroll = debounce(() => {
-    this.setState({ ...this.getCanvasOffsets() });
+    const { offsetTop, offsetLeft } = this.getCanvasOffsets();
+    this.setState((state) => {
+      if (state.offsetLeft === offsetLeft && state.offsetTop === offsetTop) {
+        return null;
+      }
+      return { offsetTop, offsetLeft };
+    });
   }, SCROLL_TIMEOUT);
 
   // Copy/paste
@@ -1044,6 +1050,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   });
 
   private onCopy = withBatchedUpdates((event: ClipboardEvent) => {
+    const activeSelection = document.getSelection();
+    if (
+      activeSelection?.anchorNode &&
+      !this.excalidrawContainerRef.current!.contains(activeSelection.anchorNode)
+    ) {
+      return;
+    }
     if (isWritableElement(event.target)) {
       return;
     }
@@ -1662,7 +1675,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           },
           this.state,
         );
-        return [viewportX, viewportY];
+        return [
+          viewportX - this.state.offsetLeft,
+          viewportY - this.state.offsetTop,
+        ];
       },
       onChange: withBatchedUpdates((text) => {
         updateElement(text);
@@ -3644,7 +3660,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           // This will only work as of Chrome 86,
           // but can be safely ignored on older releases.
           const item = event.dataTransfer.items[0];
-          // TODO: Make this part of `AppState`.
           (file as any).handle = await (item as any).getAsFileSystemHandle();
         } catch (error) {
           console.warn(error.name, error.message);

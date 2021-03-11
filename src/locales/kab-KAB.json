@@ -142,6 +142,7 @@
     "confirmAddLibrary": "Ayagi adirnu talɣa (win) {{numShapes}} ɣer temkarḍit-inek (m). Tetḥeqqeḍ?",
     "imageDoesNotContainScene": "Taktert n tugniwin ur tettwadhel ara akka tura.\nTebɣiḍ ad tketreḍ asayes? Tugna-agi tettban-d ur tegbir ara isefka n usnas. Tesremdeḍ ayagi deg usifeḍ?",
     "cannotRestoreFromImage": "Asayes ulamek ara d-yettwarr seg ufaylu-agi n tugna",
+    "invalidSceneUrl": "",
     "resetLibrary": "Ayagi ad isfeḍ tamkarḍit-inek•m. Tetḥeqqeḍ?"
   },
   "toolBar": {
@@ -245,10 +246,10 @@
   "toast": {
     "copyStyles": "Iɣunab yettwaneɣlen.",
     "copyToClipboard": "Yettwaɣel ɣer tecfawit.",
-    "copyToClipboardAsPng": "",
+    "copyToClipboardAsPng": "{{exportSelection}} yettwanɣel ɣer tecfawit am PNG\n({{exportColorScheme}})",
     "fileSaved": "Afaylu yettwasekles.",
     "fileSavedToFilename": "Yettwasekles di {filename}",
-    "canvas": "",
-    "selection": ""
+    "canvas": "taɣzut n usuneɣ",
+    "selection": "tafrayt"
   }
 }

@@ -142,6 +142,7 @@
     "confirmAddLibrary": "Будет добавлено {{numShapes}} фигур в вашу библиотеку. Продолжить?",
     "imageDoesNotContainScene": "Импорт изображений не поддерживается в данный момент.\n\nХотите импортировать сцену? Данное изображение не содержит данных о сцене. Было ли включено это во время экспорта?",
     "cannotRestoreFromImage": "Сцена не может быть восстановлена из этого изображения",
+    "invalidSceneUrl": "Невозможно импортировать сцену с предоставленного URL. Неверный формат, или не содержит верных Excalidraw JSON данных.",
     "resetLibrary": "Это очистит вашу библиотеку. Вы уверены?"
   },
   "toolBar": {
@@ -245,10 +246,10 @@
   "toast": {
     "copyStyles": "Скопированы стили.",
     "copyToClipboard": "Скопировано в буфер обмена.",
-    "copyToClipboardAsPng": "",
+    "copyToClipboardAsPng": "{{exportSelection}} скопировано как PNG ({{exportColorScheme}})",
     "fileSaved": "Файл сохранён.",
     "fileSavedToFilename": "Сохранено в {filename}",
-    "canvas": "",
-    "selection": ""
+    "canvas": "холст",
+    "selection": "выделение"
   }
 }
