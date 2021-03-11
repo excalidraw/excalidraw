@@ -93,7 +93,8 @@
     "distributeHorizontally": "Distribuir horitzontalment",
     "distributeVertically": "Distribuir verticalment",
     "viewMode": "Mode de visualització",
-    "toggleExportColorScheme": ""
+    "toggleExportColorScheme": "",
+    "share": ""
   },
   "buttons": {
     "clearReset": "Netejar el llenç",
@@ -199,7 +200,8 @@
     "button_stopSession": "Aturar sessió",
     "desc_inProgressIntro": "La sessió de col·laboració en directe està en marxa.",
     "desc_shareLink": "Comparteix aquest enllaç amb qualsevol persona amb qui vulguis col·laborar:",
-    "desc_exitSession": "Si aturas la sessió, et desconectarás de la sala, però podrás continuar treballant amb el dibuix localment. Tingues en compte que això no afectarà a altres persones, i encara podran col·laborar en la seva versió."
+    "desc_exitSession": "Si aturas la sessió, et desconectarás de la sala, però podrás continuar treballant amb el dibuix localment. Tingues en compte que això no afectarà a altres persones, i encara podran col·laborar en la seva versió.",
+    "shareTitle": ""
   },
   "errorDialog": {
     "title": "Error"
