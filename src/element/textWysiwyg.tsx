@@ -26,11 +26,9 @@ const getTransform = (
   const { zoom, offsetTop, offsetLeft } = appState;
   const degree = (180 * angle) / Math.PI;
   if (width > maxWidth && zoom.value !== 1) {
-    let translateX = 8;
-    if (zoom.value < 1) {
-      translateX = (maxWidth / 2) * (zoom.value - 1);
-    }
-    return `translate(${translateX}px,0px) scale(${zoom.value}) rotate(${degree}deg)`;
+    const translateY = ((height - offsetTop * 2) * (zoom.value - 1)) / 2;
+    const translateX = (maxWidth / 2) * (zoom.value - 1);
+    return `translate(${translateX}px,${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
   }
   // offsets must be multiplied by 2 to account for the division by 2 of
   // the whole expression afterwards
@@ -70,16 +68,15 @@ export const textWysiwyg = ({
       const lines = updatedElement.text.replace(/\r\n?/g, "\n").split("\n");
       const lineHeight = updatedElement.height / lines.length;
       const maxWidth =
-        (appState.offsetLeft + appState.width - viewportX) /
+        (appState.offsetLeft + appState.width - viewportX - 8) /
           appState.zoom.value -
-        // padding of layer ui footer
-        0 -
         // margin-right of parent if any
         Number(
           getComputedStyle(
             document.querySelector(".excalidraw")!.parentNode as Element,
           ).marginRight.slice(0, -2),
         );
+
       Object.assign(editable.style, {
         font: getFontString(updatedElement),
         // must be defined *after* font ¯\_(ツ)_/¯
