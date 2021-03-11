@@ -21,9 +21,17 @@ const getTransform = (
   height: number,
   angle: number,
   appState: AppState,
+  maxWidth: number,
 ) => {
   const { zoom, offsetTop, offsetLeft } = appState;
   const degree = (180 * angle) / Math.PI;
+  if (width > maxWidth && zoom.value !== 1) {
+    let translateX = 8;
+    if (zoom.value < 1) {
+      translateX = (maxWidth / 2) * (zoom.value - 1);
+    }
+    return `translate(${translateX}px,0px) scale(${zoom.value}) rotate(${degree}deg)`;
+  }
   // offsets must be multiplied by 2 to account for the division by 2 of
   // the whole expression afterwards
   return `translate(${((width - offsetLeft * 2) * (zoom.value - 1)) / 2}px, ${
@@ -61,7 +69,17 @@ export const textWysiwyg = ({
 
       const lines = updatedElement.text.replace(/\r\n?/g, "\n").split("\n");
       const lineHeight = updatedElement.height / lines.length;
-
+      const maxWidth =
+        (appState.offsetLeft + appState.width - viewportX) /
+          appState.zoom.value -
+        // padding of layer ui footer
+        0 -
+        // margin-right of parent if any
+        Number(
+          getComputedStyle(
+            document.querySelector(".excalidraw")!.parentNode as Element,
+          ).marginRight.slice(0, -2),
+        );
       Object.assign(editable.style, {
         font: getFontString(updatedElement),
         // must be defined *after* font ¯\_(ツ)_/¯
@@ -75,24 +93,13 @@ export const textWysiwyg = ({
           updatedElement.height,
           angle,
           appState,
+          maxWidth,
         ),
         textAlign,
         color: updatedElement.strokeColor,
         opacity: updatedElement.opacity / 100,
         filter: "var(--appearance-filter)",
-        maxWidth: `${
-          appState.offsetLeft +
-          appState.width -
-          viewportX -
-          // margin-right of parent if any
-          Number(
-            getComputedStyle(
-              document.querySelector(".excalidraw")!.parentNode as Element,
-            ).marginRight.slice(0, -2),
-          ) -
-          // padding of layer ui footer
-          8
-        }px`,
+        maxWidth: `${maxWidth}px`,
       });
     }
   };
