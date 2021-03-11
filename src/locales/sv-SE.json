@@ -94,7 +94,7 @@
     "distributeVertically": "Fördela vertikalt",
     "viewMode": "Visningsläge",
     "toggleExportColorScheme": "Växla färgschema för export",
-    "share": ""
+    "share": "Dela"
   },
   "buttons": {
     "clearReset": "Återställ canvasen",
@@ -201,7 +201,7 @@
     "desc_inProgressIntro": "Nu pågår en live-samarbetssession.",
     "desc_shareLink": "Dela denna länk med någon du vill samarbeta med:",
     "desc_exitSession": "Att avbryta sessionen kommer att koppla bort dig från rummet, men du kommer att kunna fortsätta arbeta med skissen, lokalt. Observera att detta inte påverkar andra människor, och de kommer fortfarande att kunna samarbeta på deras version.",
-    "shareTitle": ""
+    "shareTitle": "Delta i en live-samarbetssession på Excalidraw"
   },
   "errorDialog": {
     "title": "Fel"
