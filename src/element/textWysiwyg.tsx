@@ -25,13 +25,13 @@ const getTransform = (
 ) => {
   const { zoom, offsetTop, offsetLeft } = appState;
   const degree = (180 * angle) / Math.PI;
+  // offsets must be multiplied by 2 to account for the division by 2 of
+  // the whole expression afterwards
   let translateX = ((width - offsetLeft * 2) * (zoom.value - 1)) / 2;
   const translateY = ((height - offsetTop * 2) * (zoom.value - 1)) / 2;
   if (width > maxWidth && zoom.value !== 1) {
     translateX = (maxWidth / 2) * (zoom.value - 1);
   }
-  // offsets must be multiplied by 2 to account for the division by 2 of
-  // the whole expression afterwards
   return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
 };
 
