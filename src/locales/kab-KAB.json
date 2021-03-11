@@ -93,7 +93,8 @@
     "distributeHorizontally": "Freq s uglawi",
     "distributeVertically": "Freq s yibeddi",
     "viewMode": "Askar n tmuɣli",
-    "toggleExportColorScheme": "Sermed/sens asifeḍ usentel n yini"
+    "toggleExportColorScheme": "Sermed/sens asifeḍ usentel n yini",
+    "share": ""
   },
   "buttons": {
     "clearReset": "Ales awennez n teɣzut n usuneɣ",
@@ -199,7 +200,8 @@
     "button_stopSession": "Ḥbes tiɣimit",
     "desc_inProgressIntro": "Tiɣimit n umɛawen s srid tetteddu akka tura.",
     "desc_shareLink": "Bḍu aseɣwen-agi akked medden ukud tebɣiḍ ad temɛawaneḍ:",
-    "desc_exitSession": "Aḥbas n tɣimit ad k (m) yesenser si texxamt, maca ad tizmireḍ ad tkemmeleḍ amahil s usayes, s wudem adigan. Ẓer belli ayagi ur yettḥaz ara imdanen-nniḍen, yerna ad izmiren ad kemmelen ad mɛawanen di tsuffeɣt-nnsen."
+    "desc_exitSession": "Aḥbas n tɣimit ad k (m) yesenser si texxamt, maca ad tizmireḍ ad tkemmeleḍ amahil s usayes, s wudem adigan. Ẓer belli ayagi ur yettḥaz ara imdanen-nniḍen, yerna ad izmiren ad kemmelen ad mɛawanen di tsuffeɣt-nnsen.",
+    "shareTitle": ""
   },
   "errorDialog": {
     "title": "Tuccḍa"
