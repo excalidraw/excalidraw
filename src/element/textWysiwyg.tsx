@@ -25,16 +25,14 @@ const getTransform = (
 ) => {
   const { zoom, offsetTop, offsetLeft } = appState;
   const degree = (180 * angle) / Math.PI;
+  let translateX = ((width - offsetLeft * 2) * (zoom.value - 1)) / 2;
+  const translateY = ((height - offsetTop * 2) * (zoom.value - 1)) / 2;
   if (width > maxWidth && zoom.value !== 1) {
-    const translateY = ((height - offsetTop * 2) * (zoom.value - 1)) / 2;
-    const translateX = (maxWidth / 2) * (zoom.value - 1);
-    return `translate(${translateX}px,${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
+    translateX = (maxWidth / 2) * (zoom.value - 1);
   }
   // offsets must be multiplied by 2 to account for the division by 2 of
   // the whole expression afterwards
-  return `translate(${((width - offsetLeft * 2) * (zoom.value - 1)) / 2}px, ${
-    ((height - offsetTop * 2) * (zoom.value - 1)) / 2
-  }px) scale(${zoom.value}) rotate(${degree}deg)`;
+  return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
 };
 
 export const textWysiwyg = ({
