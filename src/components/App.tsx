@@ -303,11 +303,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       viewModeEnabled = false,
       zenModeEnabled = false,
       gridModeEnabled = false,
-      appearance = defaultAppState.appearance,
+      theme = defaultAppState.appearance,
     } = props;
     this.state = {
       ...defaultAppState,
-      appearance,
+      appearance: theme,
       isLoading: true,
       width,
       height,
@@ -460,11 +460,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           showExitZenModeBtn={
             typeof this.props?.zenModeEnabled === "undefined" && zenModeEnabled
           }
-<<<<<<< HEAD
           libraryReturnUrl={this.props.libraryReturnUrl}
-=======
-          showAppearanceBtn={typeof this.props?.appearance === "undefined"}
->>>>>>> hide appearance button when prop is not set
         />
         <div className="excalidraw-textEditorContainer" />
         {this.state.showStats && (
@@ -539,8 +535,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           gridSize = this.props.gridModeEnabled ? GRID_SIZE : null;
         }
 
-        if (typeof this.props.appearance !== "undefined") {
-          appearance = this.props.appearance;
+        if (typeof this.props.theme !== "undefined") {
+          appearance = this.props.theme;
         }
 
         this.setState(
@@ -894,11 +890,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.setState({ zenModeEnabled: !!this.props.zenModeEnabled });
     }
 
-    if (
-      prevProps.appearance !== this.props.appearance &&
-      this.props.appearance
-    ) {
-      this.setState({ appearance: this.props.appearance });
+    if (prevProps.theme !== this.props.theme && this.props.theme) {
+      this.setState({ appearance: this.props.theme });
     }
 
     if (prevProps.gridModeEnabled !== this.props.gridModeEnabled) {

@@ -190,7 +190,7 @@ export interface ExcalidrawProps {
   zenModeEnabled?: boolean;
   gridModeEnabled?: boolean;
   libraryReturnUrl?: string;
-  appearance?: 'dark' | 'light';
+  theme?: "dark" | "light";
 }
 
 export type SceneData = {
