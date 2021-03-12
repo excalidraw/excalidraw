@@ -62,7 +62,6 @@ export const saveToLocalStorage = (
 export const importFromLocalStorage = () => {
   let savedElements = null;
   let savedState = null;
-
   try {
     savedElements = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS);
     savedState = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_APP_STATE);
@@ -95,6 +94,7 @@ export const importFromLocalStorage = () => {
       // Do nothing because appState is already null
     }
   }
+
   return { elements, appState };
 };
 

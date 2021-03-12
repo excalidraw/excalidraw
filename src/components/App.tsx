@@ -303,9 +303,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       viewModeEnabled = false,
       zenModeEnabled = false,
       gridModeEnabled = false,
+      appearance = defaultAppState.appearance,
     } = props;
+
     this.state = {
       ...defaultAppState,
+      appearance,
       isLoading: true,
       width,
       height,
@@ -519,6 +522,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         let viewModeEnabled = actionResult?.appState?.viewModeEnabled || false;
         let zenModeEnabled = actionResult?.appState?.zenModeEnabled || false;
         let gridSize = actionResult?.appState?.gridSize || null;
+        let appearance = actionResult?.appState?.appearance || "light";
 
         if (typeof this.props.viewModeEnabled !== "undefined") {
           viewModeEnabled = this.props.viewModeEnabled;
@@ -530,6 +534,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
         if (typeof this.props.gridModeEnabled !== "undefined") {
           gridSize = this.props.gridModeEnabled ? GRID_SIZE : null;
+        }
+
+        if (typeof this.props.appearance !== "undefined") {
+          appearance = this.props.appearance;
         }
 
         this.setState(
@@ -547,6 +555,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               viewModeEnabled,
               zenModeEnabled,
               gridSize,
+              appearance,
             });
           },
           () => {
@@ -880,6 +889,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     if (prevProps.zenModeEnabled !== this.props.zenModeEnabled) {
       this.setState({ zenModeEnabled: !!this.props.zenModeEnabled });
+    }
+
+    if (
+      prevProps.appearance !== this.props.appearance &&
+      this.props.appearance
+    ) {
+      this.setState({ appearance: this.props.appearance });
     }
 
     if (prevProps.gridModeEnabled !== this.props.gridModeEnabled) {
@@ -1304,16 +1320,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       history.resumeRecording();
     }
 
-    // currently we only support syncing background color and appearance
+    // currently we only support syncing background color
     if (sceneData.appState?.viewBackgroundColor) {
       this.setState({
         viewBackgroundColor: sceneData.appState.viewBackgroundColor,
-      });
-    }
-
-    if (sceneData.appState?.appearance) {
-      this.setState({
-        appearance: sceneData.appState.appearance,
       });
     }
 
