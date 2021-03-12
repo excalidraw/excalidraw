@@ -590,7 +590,7 @@ const LayerUI = ({
           },
         )}
       >
-        <GitHubCorner appearance={appState.appearance} />
+        <GitHubCorner theme={appState.theme} />
       </aside>
     );
   };

@@ -169,17 +169,17 @@ export const actionChangeFillStyle = register({
           {
             value: "hachure",
             text: t("labels.hachure"),
-            icon: <FillHachureIcon appearance={appState.appearance} />,
+            icon: <FillHachureIcon theme={appState.theme} />,
           },
           {
             value: "cross-hatch",
             text: t("labels.crossHatch"),
-            icon: <FillCrossHatchIcon appearance={appState.appearance} />,
+            icon: <FillCrossHatchIcon theme={appState.theme} />,
           },
           {
             value: "solid",
             text: t("labels.solid"),
-            icon: <FillSolidIcon appearance={appState.appearance} />,
+            icon: <FillSolidIcon theme={appState.theme} />,
           },
         ]}
         group="fill"
@@ -219,32 +219,17 @@ export const actionChangeStrokeWidth = register({
           {
             value: 1,
             text: t("labels.thin"),
-            icon: (
-              <StrokeWidthIcon
-                appearance={appState.appearance}
-                strokeWidth={2}
-              />
-            ),
+            icon: <StrokeWidthIcon theme={appState.theme} strokeWidth={2} />,
           },
           {
             value: 2,
             text: t("labels.bold"),
-            icon: (
-              <StrokeWidthIcon
-                appearance={appState.appearance}
-                strokeWidth={6}
-              />
-            ),
+            icon: <StrokeWidthIcon theme={appState.theme} strokeWidth={6} />,
           },
           {
             value: 4,
             text: t("labels.extraBold"),
-            icon: (
-              <StrokeWidthIcon
-                appearance={appState.appearance}
-                strokeWidth={10}
-              />
-            ),
+            icon: <StrokeWidthIcon theme={appState.theme} strokeWidth={10} />,
           },
         ]}
         value={getFormValue(
@@ -282,17 +267,17 @@ export const actionChangeSloppiness = register({
           {
             value: 0,
             text: t("labels.architect"),
-            icon: <SloppinessArchitectIcon appearance={appState.appearance} />,
+            icon: <SloppinessArchitectIcon theme={appState.theme} />,
           },
           {
             value: 1,
             text: t("labels.artist"),
-            icon: <SloppinessArtistIcon appearance={appState.appearance} />,
+            icon: <SloppinessArtistIcon theme={appState.theme} />,
           },
           {
             value: 2,
             text: t("labels.cartoonist"),
-            icon: <SloppinessCartoonistIcon appearance={appState.appearance} />,
+            icon: <SloppinessCartoonistIcon theme={appState.theme} />,
           },
         ]}
         value={getFormValue(
@@ -329,17 +314,17 @@ export const actionChangeStrokeStyle = register({
           {
             value: "solid",
             text: t("labels.strokeStyle_solid"),
-            icon: <StrokeStyleSolidIcon appearance={appState.appearance} />,
+            icon: <StrokeStyleSolidIcon theme={appState.theme} />,
           },
           {
             value: "dashed",
             text: t("labels.strokeStyle_dashed"),
-            icon: <StrokeStyleDashedIcon appearance={appState.appearance} />,
+            icon: <StrokeStyleDashedIcon theme={appState.theme} />,
           },
           {
             value: "dotted",
             text: t("labels.strokeStyle_dotted"),
-            icon: <StrokeStyleDottedIcon appearance={appState.appearance} />,
+            icon: <StrokeStyleDottedIcon theme={appState.theme} />,
           },
         ]}
         value={getFormValue(
@@ -580,12 +565,12 @@ export const actionChangeSharpness = register({
           {
             value: "sharp",
             text: t("labels.sharp"),
-            icon: <EdgeSharpIcon appearance={appState.appearance} />,
+            icon: <EdgeSharpIcon theme={appState.theme} />,
           },
           {
             value: "round",
             text: t("labels.round"),
-            icon: <EdgeRoundIcon appearance={appState.appearance} />,
+            icon: <EdgeRoundIcon theme={appState.theme} />,
           },
         ]}
         value={getFormValue(
@@ -653,40 +638,27 @@ export const actionChangeArrowhead = register({
               {
                 value: null,
                 text: t("labels.arrowhead_none"),
-                icon: <ArrowheadNoneIcon appearance={appState.appearance} />,
+                icon: <ArrowheadNoneIcon theme={appState.theme} />,
                 keyBinding: "q",
               },
               {
                 value: "arrow",
                 text: t("labels.arrowhead_arrow"),
                 icon: (
-                  <ArrowheadArrowIcon
-                    appearance={appState.appearance}
-                    flip={!isRTL}
-                  />
+                  <ArrowheadArrowIcon theme={appState.theme} flip={!isRTL} />
                 ),
                 keyBinding: "w",
               },
               {
                 value: "bar",
                 text: t("labels.arrowhead_bar"),
-                icon: (
-                  <ArrowheadBarIcon
-                    appearance={appState.appearance}
-                    flip={!isRTL}
-                  />
-                ),
+                icon: <ArrowheadBarIcon theme={appState.theme} flip={!isRTL} />,
                 keyBinding: "e",
               },
               {
                 value: "dot",
                 text: t("labels.arrowhead_dot"),
-                icon: (
-                  <ArrowheadDotIcon
-                    appearance={appState.appearance}
-                    flip={!isRTL}
-                  />
-                ),
+                icon: <ArrowheadDotIcon theme={appState.theme} flip={!isRTL} />,
                 keyBinding: "r",
               },
             ]}
@@ -709,40 +681,27 @@ export const actionChangeArrowhead = register({
                 value: null,
                 text: t("labels.arrowhead_none"),
                 keyBinding: "q",
-                icon: <ArrowheadNoneIcon appearance={appState.appearance} />,
+                icon: <ArrowheadNoneIcon theme={appState.theme} />,
               },
               {
                 value: "arrow",
                 text: t("labels.arrowhead_arrow"),
                 keyBinding: "w",
                 icon: (
-                  <ArrowheadArrowIcon
-                    appearance={appState.appearance}
-                    flip={isRTL}
-                  />
+                  <ArrowheadArrowIcon theme={appState.theme} flip={isRTL} />
                 ),
               },
               {
                 value: "bar",
                 text: t("labels.arrowhead_bar"),
                 keyBinding: "e",
-                icon: (
-                  <ArrowheadBarIcon
-                    appearance={appState.appearance}
-                    flip={isRTL}
-                  />
-                ),
+                icon: <ArrowheadBarIcon theme={appState.theme} flip={isRTL} />,
               },
               {
                 value: "dot",
                 text: t("labels.arrowhead_dot"),
                 keyBinding: "r",
-                icon: (
-                  <ArrowheadDotIcon
-                    appearance={appState.appearance}
-                    flip={isRTL}
-                  />
-                ),
+                icon: <ArrowheadDotIcon theme={appState.theme} flip={isRTL} />,
               },
             ]}
             value={getFormValue<Arrowhead | null>(

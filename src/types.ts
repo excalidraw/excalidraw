@@ -90,7 +90,7 @@ export type AppState = {
   showHelpDialog: boolean;
   toastMessage: string | null;
   zenModeEnabled: boolean;
-  appearance: "light" | "dark";
+  theme: "light" | "dark";
   gridSize: number | null;
   viewModeEnabled: boolean;
 
