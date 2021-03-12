@@ -137,5 +137,13 @@
         transition-delay: 0.8s;
       }
     }
+
+    .toggle-appearance {
+      visibility: hidden;
+
+      &--visible {
+        visibility: visible;
+      }
+    }
   }
 }

@@ -461,7 +461,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           showExitZenModeBtn={
             typeof this.props?.zenModeEnabled === "undefined" && zenModeEnabled
           }
+<<<<<<< HEAD
           libraryReturnUrl={this.props.libraryReturnUrl}
+=======
+          showAppearanceBtn={typeof this.props?.appearance === "undefined"}
+>>>>>>> hide appearance button when prop is not set
         />
         <div className="excalidraw-textEditorContainer" />
         {this.state.showStats && (

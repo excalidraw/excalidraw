@@ -319,8 +319,6 @@ function ExcalidrawWrapper() {
         onExportToBackend={onExportToBackend}
         renderFooter={renderFooter}
         langCode={langCode}
-        appearance="dark"
-        zenModeEnabled
       />
       {excalidrawAPI && <CollabWrapper excalidrawAPI={excalidrawAPI} />}
       {errorMessage && (
