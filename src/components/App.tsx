@@ -305,7 +305,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       gridModeEnabled = false,
       appearance = defaultAppState.appearance,
     } = props;
-
     this.state = {
       ...defaultAppState,
       appearance,
