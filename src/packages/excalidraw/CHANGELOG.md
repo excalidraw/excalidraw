@@ -12,7 +12,7 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
-## Unreleased
+## 0.4.3
 
 ## Excalidraw API
 
@@ -25,6 +25,7 @@ Please add the latest change on the top under the correct section.
 
 ## Excalidraw Library
 
+- Apply correct translation when text editor overflows when zoom not 100% [#3225](https://github.com/excalidraw/excalidraw/pull/3225)
 - Don't overflow text beyond width of Excalidraw [#3215](https://github.com/excalidraw/excalidraw/pull/3215).
 
 ---
