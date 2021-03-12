@@ -49,7 +49,10 @@ workbox.routing.registerRoute(
 );
 
 self.addEventListener("fetch", (event) => {
-  if (event.request.url.endsWith("/web-share-target")) {
+  if (
+    event.request.method === "POST" &&
+    event.request.url.endsWith("/web-share-target")
+  ) {
     return event.respondWith(
       (async () => {
         const formData = await event.request.formData();
