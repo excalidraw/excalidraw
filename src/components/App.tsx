@@ -747,6 +747,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         this.initializeScene();
       });
     }
+
+    if (window.location.search.includes("share-target")) {
+      this.restoreFileFromShare();
+    }
   }
 
   public componentWillUnmount() {
@@ -1275,6 +1279,20 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   clearToast = () => {
     this.setState({ toastMessage: null });
+  };
+
+  restoreFileFromShare = async () => {
+    const keys = await caches.keys();
+    const mediaCache = await caches.open(
+      keys.filter((key) => key.startsWith("media"))[0],
+    );
+
+    const file = await mediaCache.match("shared-file");
+    if (file) {
+      const blob = await file.blob();
+      this.loadFileToCanvas(blob);
+      await mediaCache.delete("shared-file");
+    }
   };
 
   public updateScene = withBatchedUpdates((sceneData: SceneData) => {
@@ -3575,20 +3593,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           console.warn(error.name, error.message);
         }
       }
-      loadFromBlob(file, this.state)
-        .then(({ elements, appState }) =>
-          this.syncActionResult({
-            elements,
-            appState: {
-              ...(appState || this.state),
-              isLoading: false,
-            },
-            commitToHistory: true,
-          }),
-        )
-        .catch((error) => {
-          this.setState({ isLoading: false, errorMessage: error.message });
-        });
+      this.loadFileToCanvas(file);
     } else if (
       file?.type === MIME_TYPES.excalidrawlib ||
       file?.name.endsWith(".excalidrawlib")
@@ -3606,6 +3611,23 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         errorMessage: t("alerts.couldNotLoadInvalidFile"),
       });
     }
+  };
+
+  loadFileToCanvas = (file: Blob) => {
+    loadFromBlob(file, this.state)
+      .then(({ elements, appState }) =>
+        this.syncActionResult({
+          elements,
+          appState: {
+            ...(appState || this.state),
+            isLoading: false,
+          },
+          commitToHistory: true,
+        }),
+      )
+      .catch((error) => {
+        this.setState({ isLoading: false, errorMessage: error.message });
+      });
   };
 
   private handleCanvasContextMenu = (

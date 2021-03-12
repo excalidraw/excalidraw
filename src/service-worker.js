@@ -48,23 +48,19 @@ workbox.routing.registerRoute(
   }),
 );
 
-self.addEventListener("activate", () => {
-  self.clients.claim();
-});
-
 self.addEventListener("fetch", (event) => {
-  if (event.request.method !== "POST") {
-    return;
+  if (event.request.url.endsWith("/web-share-target")) {
+    return event.respondWith(
+      (async () => {
+        const formData = await event.request.formData();
+        const file = formData.get("file");
+        const keys = await caches.keys();
+        const mediaCache = await caches.open(
+          keys.filter((key) => key.startsWith("media"))[0],
+        );
+        await mediaCache.put("shared-file", new Response(file));
+        return Response.redirect("./?web-share-target", 303);
+      })(),
+    );
   }
-
-  event.respondWith(Response.redirect("/"));
-
-  event.waitUntil(
-    (async function () {
-      const data = await event.request.formData();
-      const client = await self.clients.get(event.resultingClientId);
-      const file = data.get("file");
-      client.postMessage({ file });
-    })(),
-  );
 });
