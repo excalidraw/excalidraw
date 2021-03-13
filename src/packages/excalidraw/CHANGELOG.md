@@ -25,8 +25,8 @@ Please add the latest change on the top under the correct section.
 - Rename appearance to theme [#3237](https://github.com/excalidraw/excalidraw/pull/3237).
   #### BREAKING CHANGE
   - Since `appState.appearance` is renamed to `appState.theme` so wherever `appState.appearance` including `initialData.appState.appearance` should be renamed to `appState.theme` and `initialData.appState.theme` respectively.
-  - The class `Appearance_dark` is renamed to `theme_dark`.
-  - The class `Appearance_dark-background-none` is renamed to `theme_dark-background-none`.
+  - The class `Appearance_dark` is renamed to `theme--dark`.
+  - The class `Appearance_dark-background-none` is renamed to `theme--dark-background-none`.
 
 ---
 

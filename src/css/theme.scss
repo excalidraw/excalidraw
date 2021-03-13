@@ -35,15 +35,15 @@
   --space-factor: 0.25rem;
   --text-primary-color: #{$oc-gray-8};
 
-  &.theme_dark {
+  &.theme--dark {
     background: $oc-black;
 
-    &.theme_dark-background-none {
+    &.theme--dark-background-none {
       background: none;
     }
   }
 
-  &.theme_dark {
+  &.theme--dark {
     --theme-filter: #{$theme-filter};
     --button-destructive-bg-color: #5a0000;
     --button-destructive-color: #{$oc-red-3};

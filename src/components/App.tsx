@@ -884,7 +884,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
     document
       .querySelector(".excalidraw")
-      ?.classList.toggle("theme_dark", this.state.theme === "dark");
+      ?.classList.toggle("theme--dark", this.state.theme === "dark");
 
     if (
       this.state.editingLinearElement &&
