@@ -51,7 +51,7 @@ export const getDefaultAppState = (): Omit<
     isRotating: false,
     lastPointerDownWith: "mouse",
     multiElement: null,
-    name: `${t("labels.untitled")}-${getDateTime()}.excalidraw`,
+    name: `${t("labels.untitled")}-${getDateTime()}`,
     openMenu: null,
     pasteDialog: { shown: false, data: null },
     previousSelectedElementIds: {},
