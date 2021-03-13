@@ -458,6 +458,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           showExitZenModeBtn={
             typeof this.props?.zenModeEnabled === "undefined" && zenModeEnabled
           }
+          libraryReturnUrl={this.props.libraryReturnUrl}
         />
         <div className="excalidraw-textEditorContainer" />
         {this.state.showStats && (
@@ -588,7 +589,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   private importLibraryFromUrl = async (url: string) => {
     window.history.replaceState({}, APP_NAME, window.location.origin);
     try {
-      const request = await fetch(url);
+      const request = await fetch(decodeURIComponent(url));
       const blob = await request.blob();
       const json = JSON.parse(await blob.text());
       if (!isValidLibrary(json)) {
