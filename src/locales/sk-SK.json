@@ -94,7 +94,7 @@
     "distributeVertically": "Rozmiestniť zvisle",
     "viewMode": "Režim zobrazenia",
     "toggleExportColorScheme": "Prepnúť exportovanie farebnej schémy",
-    "share": ""
+    "share": "Zdieľať"
   },
   "buttons": {
     "clearReset": "Obnoviť plátno",
@@ -201,7 +201,7 @@
     "desc_inProgressIntro": "Práve prebieha živá schôdza.",
     "desc_shareLink": "Zdieľajte tento odkaz s osobou, s ktorou chcete spolupracovať:",
     "desc_exitSession": "Ukončenie schôdze vás odpojí z miestnosti, avšak naďalej budete môcť pokračovať v práci na scéne lokálne. Toto neovplyvní ostatných spolupracovníkov a stále budú môcť spolupracovať na ich verzii.",
-    "shareTitle": ""
+    "shareTitle": "Pripojiť sa k živej schôdzi na Excalidraw"
   },
   "errorDialog": {
     "title": "Chyba"
