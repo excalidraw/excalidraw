@@ -48,7 +48,17 @@ export const saveAsJSON = async (
 export const loadFromJSON = async (localAppState: AppState) => {
   const blob = await fileOpen({
     description: "Excalidraw files",
+    // ToDo: Be over-permissive until https://bugs.webkit.org/show_bug.cgi?id=34442
+    // gets resolved. Else, iOS users cannot open `.excalidraw` files.
+    /*
     extensions: [".json", ".excalidraw", ".png", ".svg"],
+    mimeTypes: [
+      MIME_TYPES.excalidraw,
+      "application/json",
+      "image/png",
+      "image/svg+xml",
+    ],
+    */
   });
   return loadFromBlob(blob, localAppState);
 };
@@ -100,7 +110,11 @@ export const saveLibraryAsJSON = async () => {
 export const importLibraryFromJSON = async () => {
   const blob = await fileOpen({
     description: "Excalidraw library files",
+    // ToDo: Be over-permissive until https://bugs.webkit.org/show_bug.cgi?id=34442
+    // gets resolved. Else, iOS users cannot open `.excalidraw` files.
+    /*
     extensions: [".json", ".excalidrawlib"],
+    */
   });
   Library.importLibrary(blob);
 };
