@@ -34,11 +34,11 @@ const ContextMenu = ({
 }: ContextMenuProps) => {
   const isDarkTheme = !!document
     .querySelector(".excalidraw")
-    ?.classList.contains("Appearance_dark");
+    ?.classList.contains("theme--dark");
   return (
     <div
       className={clsx("excalidraw", {
-        "Appearance_dark Appearance_dark-background-none": isDarkTheme,
+        "theme--dark theme--dark-background-none": isDarkTheme,
       })}
     >
       <Popover

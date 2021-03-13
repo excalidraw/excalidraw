@@ -38,7 +38,7 @@ export const actionSendBackward = register({
       onClick={() => updateData(null)}
       title={`${t("labels.sendBackward")} — ${getShortcutKey("CtrlOrCmd+[")}`}
     >
-      <SendBackwardIcon appearance={appState.appearance} />
+      <SendBackwardIcon theme={appState.theme} />
     </button>
   ),
 });
@@ -65,7 +65,7 @@ export const actionBringForward = register({
       onClick={() => updateData(null)}
       title={`${t("labels.bringForward")} — ${getShortcutKey("CtrlOrCmd+]")}`}
     >
-      <BringForwardIcon appearance={appState.appearance} />
+      <BringForwardIcon theme={appState.theme} />
     </button>
   ),
 });
@@ -99,7 +99,7 @@ export const actionSendToBack = register({
           : getShortcutKey("CtrlOrCmd+Shift+[")
       }`}
     >
-      <SendToBackIcon appearance={appState.appearance} />
+      <SendToBackIcon theme={appState.theme} />
     </button>
   ),
 });
@@ -133,7 +133,7 @@ export const actionBringToFront = register({
           : getShortcutKey("CtrlOrCmd+Shift+]")
       }`}
     >
-      <BringToFrontIcon appearance={appState.appearance} />
+      <BringToFrontIcon theme={appState.theme} />
     </button>
   ),
 });

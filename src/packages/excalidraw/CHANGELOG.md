@@ -20,9 +20,17 @@ Please add the latest change on the top under the correct section.
 
 - Support `libraryReturnUrl` prop to indicate what URL to install libraries to [#3227](https://github.com/excalidraw/excalidraw/pull/3227).
 
+### Refactor
+
+- Rename appearance to theme [#3237](https://github.com/excalidraw/excalidraw/pull/3237).
+  #### BREAKING CHANGE
+  - Since `appState.appearance` is renamed to `appState.theme` so wherever `appState.appearance` including `initialData.appState.appearance` should be renamed to `appState.theme` and `initialData.appState.theme` respectively. If the `appearance` was persisted earlier, now it needs to passed as `theme`.
+  - The class `Appearance_dark` is renamed to `theme--dark`.
+  - The class `Appearance_dark-background-none` is renamed to `theme--dark-background-none`.
+
 ---
 
-## 0.4.3
+## 0.4.3 (2021-03-12)
 
 ## Excalidraw API
 

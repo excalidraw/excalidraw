@@ -10,7 +10,7 @@ import { t } from "../i18n";
 import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_VERTICAL_ALIGN,
-  APPEARANCE_FILTER,
+  THEME_FILTER,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
 
@@ -122,7 +122,7 @@ export const exportToSvg = (
   svgRoot.setAttribute("width", `${width * scale}`);
   svgRoot.setAttribute("height", `${height * scale}`);
   if (exportWithDarkMode) {
-    svgRoot.setAttribute("filter", APPEARANCE_FILTER);
+    svgRoot.setAttribute("filter", THEME_FILTER);
   }
 
   svgRoot.innerHTML = `

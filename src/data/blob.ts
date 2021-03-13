@@ -94,7 +94,7 @@ export const loadFromBlob = async (
       {
         elements: clearElementsForExport(data.elements || []),
         appState: {
-          appearance: localAppState?.appearance,
+          theme: localAppState?.theme,
           fileHandle:
             blob.handle &&
             ["application/json", MIME_TYPES.excalidraw].includes(
