@@ -93,7 +93,7 @@ export const textWysiwyg = ({
         textAlign,
         color: updatedElement.strokeColor,
         opacity: updatedElement.opacity / 100,
-        filter: "var(--appearance-filter)",
+        filter: "var(--theme-filter)",
         maxWidth: `${maxWidth}px`,
       });
     }

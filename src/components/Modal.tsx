@@ -51,14 +51,14 @@ const useBodyRoot = () => {
   useLayoutEffect(() => {
     const isDarkTheme = !!document
       .querySelector(".excalidraw")
-      ?.classList.contains("Appearance_dark");
+      ?.classList.contains("theme--dark");
     const div = document.createElement("div");
 
     div.classList.add("excalidraw", "excalidraw-modal-container");
 
     if (isDarkTheme) {
-      div.classList.add("Appearance_dark");
-      div.classList.add("Appearance_dark-background-none");
+      div.classList.add("theme--dark");
+      div.classList.add("theme--dark-background-none");
     }
     document.body.appendChild(div);
 
