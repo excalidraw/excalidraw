@@ -35,7 +35,7 @@
       "files": [
         {
           "name": "file",
-          "accept": ["application/json", ".excalidraw", "application/vnd.excalidraw+json"]
+          "accept": ["application/vnd.excalidraw+json", "application/json", ".excalidraw"]
         }
       ]
     }

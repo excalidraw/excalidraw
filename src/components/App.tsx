@@ -739,13 +739,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const searchParams = new URLSearchParams(window.location.search.slice(1));
 
     if (searchParams.has("web-share-target")) {
+      // Obtain a file that was shared via the Web Share Target API.
       this.restoreFileFromShare();
-    }
-    // optim to avoid extra render on init
-    else if (
+    } else if (
       typeof this.props.offsetLeft === "number" &&
       typeof this.props.offsetTop === "number"
     ) {
+      // Optimization to avoid extra render on init.
       this.initializeScene();
     } else {
       this.setState(this.getCanvasOffsets(this.props), () => {
