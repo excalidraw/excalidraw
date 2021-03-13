@@ -736,8 +736,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.scene.addCallback(this.onSceneUpdated);
     this.addEventListeners();
 
+    const searchParams = new URLSearchParams(window.location.search.slice(1));
+
+    if (searchParams.has("web-share-target")) {
+      this.restoreFileFromShare();
+    }
     // optim to avoid extra render on init
-    if (
+    else if (
       typeof this.props.offsetLeft === "number" &&
       typeof this.props.offsetTop === "number"
     ) {
@@ -746,11 +751,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.setState(this.getCanvasOffsets(this.props), () => {
         this.initializeScene();
       });
-    }
-
-    const searchParams = new URLSearchParams(window.location.search.slice(1));
-    if (searchParams.has("web-share-target")) {
-      this.restoreFileFromShare();
     }
   }
 
