@@ -41,13 +41,13 @@
     z-index: var(--zIndex-canvas);
   }
 
-  &.Appearance_dark {
+  &.theme--dark {
     // The percentage is inspired by
     // https://material.io/design/color/dark-theme.html#properties, which
     // recommends surface color of #121212, 93% yields #111111 for #FFF
 
     canvas {
-      filter: var(--appearance-filter);
+      filter: var(--theme-filter);
     }
   }
 

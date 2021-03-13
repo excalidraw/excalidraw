@@ -16,9 +16,9 @@ export const BackgroundPickerAndDarkModeToggle = ({
     {actionManager.renderAction("changeViewBackgroundColor")}
     <div style={{ marginInlineStart: "0.25rem" }}>
       <DarkModeToggle
-        value={appState.appearance}
-        onChange={(appearance) => {
-          setAppState({ appearance });
+        value={appState.theme}
+        onChange={(theme) => {
+          setAppState({ theme });
         }}
       />
     </div>

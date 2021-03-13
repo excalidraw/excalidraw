@@ -16,7 +16,7 @@
   }
 
   .library-unit__dragger > svg {
-    filter: var(--appearance-filter);
+    filter: var(--theme-filter);
     flex-grow: 1;
     max-height: 100%;
     max-width: 100%;

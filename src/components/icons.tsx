@@ -11,12 +11,12 @@ import React from "react";
 import oc from "open-color";
 import clsx from "clsx";
 
-const activeElementColor = (appearance: "light" | "dark") =>
-  appearance === "light" ? oc.orange[4] : oc.orange[9];
-const iconFillColor = (appearance: "light" | "dark") =>
-  appearance === "light" ? oc.black : oc.gray[4];
-const handlerColor = (appearance: "light" | "dark") =>
-  appearance === "light" ? oc.white : "#1e1e1e";
+const activeElementColor = (theme: "light" | "dark") =>
+  theme === "light" ? oc.orange[4] : oc.orange[9];
+const iconFillColor = (theme: "light" | "dark") =>
+  theme === "light" ? oc.black : oc.gray[4];
+const handlerColor = (theme: "light" | "dark") =>
+  theme === "light" ? oc.white : "#1e1e1e";
 
 type Opts = {
   width?: number;
@@ -136,19 +136,19 @@ export const resetZoom = createIcon(
 );
 
 export const BringForwardIcon = React.memo(
-  ({ appearance }: { appearance: "light" | "dark" }) =>
+  ({ theme }: { theme: "light" | "dark" }) =>
     createIcon(
       <>
         <path
           d="M22 9.556C22 8.696 21.303 8 20.444 8H16v8H8v4.444C8 21.304 8.697 22 9.556 22h10.888c.86 0 1.556-.697 1.556-1.556V9.556z"
-          fill={iconFillColor(appearance)}
-          stroke={iconFillColor(appearance)}
+          fill={iconFillColor(theme)}
+          stroke={iconFillColor(theme)}
           strokeWidth="2"
         />
         <path
           d="M16 3.556C16 2.696 15.303 2 14.444 2H3.556C2.696 2 2 2.697 2 3.556v10.888C2 15.304 2.697 16 3.556 16h10.888c.86 0 1.556-.697 1.556-1.556V3.556z"
-          fill={activeElementColor(appearance)}
-          stroke={activeElementColor(appearance)}
+          fill={activeElementColor(theme)}
+          stroke={activeElementColor(theme)}
           strokeWidth="2"
         />
       </>,
@@ -157,19 +157,19 @@ export const BringForwardIcon = React.memo(
 );
 
 export const SendBackwardIcon = React.memo(
-  ({ appearance }: { appearance: "light" | "dark" }) =>
+  ({ theme }: { theme: "light" | "dark" }) =>
     createIcon(
       <>
         <path
           d="M16 3.556C16 2.696 15.303 2 14.444 2H3.556C2.696 2 2 2.697 2 3.556v10.888C2 15.304 2.697 16 3.556 16h10.888c.86 0 1.556-.697 1.556-1.556V3.556z"
-          fill={activeElementColor(appearance)}
-          stroke={activeElementColor(appearance)}
+          fill={activeElementColor(theme)}
+          stroke={activeElementColor(theme)}
           strokeWidth="2"
         />
         <path
           d="M22 9.556C22 8.696 21.303 8 20.444 8H9.556C8.696 8 8 8.697 8 9.556v10.888C8 21.304 8.697 22 9.556 22h10.888c.86 0 1.556-.697 1.556-1.556V9.556z"
-          fill={iconFillColor(appearance)}
-          stroke={iconFillColor(appearance)}
+          fill={iconFillColor(theme)}
+          stroke={iconFillColor(theme)}
           strokeWidth="2"
         />
       </>,
@@ -178,19 +178,19 @@ export const SendBackwardIcon = React.memo(
 );
 
 export const BringToFrontIcon = React.memo(
-  ({ appearance }: { appearance: "light" | "dark" }) =>
+  ({ theme }: { theme: "light" | "dark" }) =>
     createIcon(
       <>
         <path
           d="M13 21a1 1 0 001 1h7a1 1 0 001-1v-7a1 1 0 00-1-1h-3v5h-5v3zM11 3a1 1 0 00-1-1H3a1 1 0 00-1 1v7a1 1 0 001 1h3V6h5V3z"
-          fill={iconFillColor(appearance)}
-          stroke={iconFillColor(appearance)}
+          fill={iconFillColor(theme)}
+          stroke={iconFillColor(theme)}
           strokeWidth="2"
         />
         <path
           d="M18 7.333C18 6.597 17.403 6 16.667 6H7.333C6.597 6 6 6.597 6 7.333v9.334C6 17.403 6.597 18 7.333 18h9.334c.736 0 1.333-.597 1.333-1.333V7.333z"
-          fill={activeElementColor(appearance)}
-          stroke={activeElementColor(appearance)}
+          fill={activeElementColor(theme)}
+          stroke={activeElementColor(theme)}
           strokeWidth="2"
         />
       </>,
@@ -199,20 +199,20 @@ export const BringToFrontIcon = React.memo(
 );
 
 export const SendToBackIcon = React.memo(
-  ({ appearance }: { appearance: "light" | "dark" }) =>
+  ({ theme }: { theme: "light" | "dark" }) =>
     createIcon(
       <>
         <path
           d="M18 7.333C18 6.597 17.403 6 16.667 6H7.333C6.597 6 6 6.597 6 7.333v9.334C6 17.403 6.597 18 7.333 18h9.334c.736 0 1.333-.597 1.333-1.333V7.333z"
-          fill={activeElementColor(appearance)}
-          stroke={activeElementColor(appearance)}
+          fill={activeElementColor(theme)}
+          stroke={activeElementColor(theme)}
           strokeLinejoin="round"
           strokeWidth="2"
         />
         <path
           d="M11 3a1 1 0 00-1-1H3a1 1 0 00-1 1v7a1 1 0 001 1h8V3zM22 14a1 1 0 00-1-1h-7a1 1 0 00-1 1v7a1 1 0 001 1h8v-8z"
-          fill={iconFillColor(appearance)}
-          stroke={iconFillColor(appearance)}
+          fill={iconFillColor(theme)}
+          stroke={iconFillColor(theme)}
           strokeLinejoin="round"
           strokeWidth="2"
         />
@@ -228,20 +228,20 @@ export const SendToBackIcon = React.memo(
 // that would make them lie about their function.
 //
 export const AlignTopIcon = React.memo(
-  ({ appearance }: { appearance: "light" | "dark" }) =>
+  ({ theme }: { theme: "light" | "dark" }) =>
     createIcon(
       <>
         <path
           d="M 2,5 H 22"
-          fill={iconFillColor(appearance)}
-          stroke={iconFillColor(appearance)}
+          fill={iconFillColor(theme)}
+          stroke={iconFillColor(theme)}
           strokeWidth="2"
           strokeLinecap="round"
         />
         <path
           d="M 6,7 C 5.446,7 5,7.446 5,8 v 9.999992 c 0,0.554 0.446,1 1,1 h 3.0000001 c 0.554,0 0.9999999,-0.446 0.9999999,-1 V 8 C 10,7.446 9.5540001,7 9.0000001,7 Z m 9,0 c -0.554,0 -1,0.446 -1,1 v 5.999992 c 0,0.554 0.446,1 1,1 h 3 c 0.554,0 1,-0.446 1,-1 V 8 C 19,7.446 18.554,7 18,7 Z"
-          fill={activeElementColor(appearance)}
-          stroke={activeElementColor(appearance)}
+          fill={activeElementColor(theme)}
+          stroke={activeElementColor(theme)}
           strokeWidth="2"
         />
       </>,
@@ -250,20 +250,20 @@ export const AlignTopIcon = React.memo(
 );
 
 export const AlignBottomIcon = React.memo(
-  ({ appearance }: { appearance: "light" | "dark" }) =>
+  ({ theme }: { theme: "light" | "dark" }) =>
     createIcon(
       <>
         <path
           d="M 2,19 H 22"
-          fill={iconFillColor(appearance)}
-          stroke={iconFillColor(appearance)}
+          fill={iconFillColor(theme)}
+          stroke={iconFillColor(theme)}
           strokeWidth="2"
           strokeLinecap="round"
         />
         <path
           d="m 6,16.999992 c -0.554,0 -1,-0.446 -1,-1 V 6 C 5,5.446 5.446,5 6,5 H 9.0000001 C 9.5540001,5 10,5.446 10,6 v 9.999992 c 0,0.554 -0.4459999,1 -0.9999999,1 z m 9,0 c -0.554,0 -1,-0.446 -1,-1 V 10 c 0,-0.554 0.446,-1 1,-1 h 3 c 0.554,0 1,0.446 1,1 v 5.999992 c 0,0.554 -0.446,1 -1,1 z"
-          fill={activeElementColor(appearance)}
-          stroke={activeElementColor(appearance)}
+          fill={activeElementColor(theme)}
+          stroke={activeElementColor(theme)}
           strokeWidth="2"
         />
       </>,
@@ -272,20 +272,20 @@ export const AlignBottomIcon = React.memo(
 );
 
 export const AlignLeftIcon = React.memo(
-  ({ appearance }: { appearance: "light" | "dark" }) =>
+  ({ theme }: { theme: "light" | "dark" }) =>
     createIcon(
       <>
         <path
           d="M 5,2 V 22"
-          fill={iconFillColor(appearance)}
-          stroke={iconFillColor(appearance)}
+          fill={iconFillColor(theme)}
+          stroke={iconFillColor(theme)}
           strokeWidth="2"
           strokeLinecap="round"
         />
         <path
           d="m 7.000004,5.999996 c 0,-0.554 0.446,-1 1,-1 h 9.999992 c 0.554,0 1,0.446 1,1 v 3.0000001 c 0,0.554 -0.446,0.9999999 -1,0.9999999 H 8.000004 c -0.554,0 -1,-0.4459999 -1,-0.9999999 z m 0,9 c 0,-0.554 0.446,-1 1,-1 h 5.999992 c 0.554,0 1,0.446 1,1 v 3 c 0,0.554 -0.446,1 -1,1 H 8.000004 c -0.554,0 -1,-0.446 -1,-1 z"
-          fill={activeElementColor(appearance)}
-          stroke={activeElementColor(appearance)}
+          fill={activeElementColor(theme)}
+          stroke={activeElementColor(theme)}
           strokeWidth="2"
         />
       </>,
@@ -294,20 +294,20 @@ export const AlignLeftIcon = React.memo(
 );
 
 export const AlignRightIcon = React.memo(
-  ({ appearance }: { appearance: "light" | "dark" }) =>
+  ({ theme }: { theme: "light" | "dark" }) =>
     createIcon(
       <>
         <path
           d="M 19,2 V 22"
-          fill={iconFillColor(appearance)}
-          stroke={iconFillColor(appearance)}
+          fill={iconFillColor(theme)}
+          stroke={iconFillColor(theme)}
           strokeWidth="2"
           strokeLinecap="round"
         />
         <path
           d="m 16.999996,5.999996 c 0,-0.554 -0.446,-1 -1,-1 H 6.000004 c -0.554,0 -1,0.446 -1,1 v 3.0000001 c 0,0.554 0.446,0.9999999 1,0.9999999 h 9.999992 c 0.554,0 1,-0.4459999 1,-0.9999999 z m 0,9 c 0,-0.554 -0.446,-1 -1,-1 h -5.999992 c -0.554,0 -1,0.446 -1,1 v 3 c 0,0.554 0.446,1 1,1 h 5.999992 c 0.554,0 1,-0.446 1,-1 z"
-          fill={activeElementColor(appearance)}
-          stroke={activeElementColor(appearance)}
+          fill={activeElementColor(theme)}
+          stroke={activeElementColor(theme)}
           strokeWidth="2"
         />
       </>,
@@ -316,20 +316,20 @@ export const AlignRightIcon = React.memo(
 );
 
 export const DistributeHorizontallyIcon = React.memo(
-  ({ appearance }: { appearance: "light" | "dark" }) =>
+  ({ theme }: { theme: "light" | "dark" }) =>
     createIcon(
       <>
         <path d="M5 5V19Z" fill="black" />
         <path
           d="M19 5V19M5 5V19"
-          stroke={iconFillColor(appearance)}
+          stroke={iconFillColor(theme)}
           strokeWidth="2"
           strokeLinecap="round"
         />
         <path
           d="M15 9C15.554 9 16 9.446 16 10V14C16 14.554 15.554 15 15 15H9C8.446 15 8 14.554 8 14V10C8 9.446 8.446 9 9 9H15Z"
-          fill={activeElementColor(appearance)}
-          stroke={activeElementColor(appearance)}
+          fill={activeElementColor(theme)}
+          stroke={activeElementColor(theme)}
           strokeWidth="2"
         />
       </>,
@@ -346,20 +346,20 @@ export const DistributeHorizontallyIcon = React.memo(
 ></svg>;
 
 export const DistributeVerticallyIcon = React.memo(
-  ({ appearance }: { appearance: "light" | "dark" }) =>
+  ({ theme }: { theme: "light" | "dark" }) =>
     createIcon(
       <>
         <path
           d="M5 5L19 5M5 19H19"
-          fill={iconFillColor(appearance)}
-          stroke={iconFillColor(appearance)}
+          fill={iconFillColor(theme)}
+          stroke={iconFillColor(theme)}
           strokeWidth="2"
           strokeLinecap="round"
         />
         <path
           d="M15 9C15.554 9 16 9.446 16 10V14C16 14.554 15.554 15 15 15H9C8.446 15 8 14.554 8 14V10C8 9.446 8.446 9 9 9H15Z"
-          fill={activeElementColor(appearance)}
-          stroke={activeElementColor(appearance)}
+          fill={activeElementColor(theme)}
+          stroke={activeElementColor(theme)}
           strokeWidth="2"
         />
       </>,
@@ -368,19 +368,19 @@ export const DistributeVerticallyIcon = React.memo(
 );
 
 export const CenterVerticallyIcon = React.memo(
-  ({ appearance }: { appearance: "light" | "dark" }) =>
+  ({ theme }: { theme: "light" | "dark" }) =>
     createIcon(
       <>
         <path
           d="m 5.000004,16.999996 c 0,0.554 0.446,1 1,1 h 3 c 0.554,0 1,-0.446 1,-1 v -10 c 0,-0.554 -0.446,-1 -1,-1 h -3 c -0.554,0 -1,0.446 -1,1 z m 9,-2 c 0,0.554 0.446,1 1,1 h 3 c 0.554,0 1,-0.446 1,-1 v -6 c 0,-0.554 -0.446,-1 -1,-1 h -3 c -0.554,0 -1,0.446 -1,1 z"
-          fill={activeElementColor(appearance)}
-          stroke={activeElementColor(appearance)}
+          fill={activeElementColor(theme)}
+          stroke={activeElementColor(theme)}
           strokeWidth="2"
         />
         <path
           d="M 2,12 H 22"
-          fill={iconFillColor(appearance)}
-          stroke={iconFillColor(appearance)}
+          fill={iconFillColor(theme)}
+          stroke={iconFillColor(theme)}
           strokeWidth="2"
           strokeDasharray="1, 2.8"
           strokeLinecap="round"
@@ -391,19 +391,19 @@ export const CenterVerticallyIcon = React.memo(
 );
 
 export const CenterHorizontallyIcon = React.memo(
-  ({ appearance }: { appearance: "light" | "dark" }) =>
+  ({ theme }: { theme: "light" | "dark" }) =>
     createIcon(
       <>
         <path
           d="M 7 5 C 6.446 5 6 5.446 6 6 L 6 9 C 6 9.554 6.446 10 7 10 L 17 10 C 17.554 10 18 9.554 18 9 L 18 6 C 18 5.446 17.554 5 17 5 L 7 5 z M 9 14 C 8.446 14 8 14.446 8 15 L 8 18 C 8 18.554 8.446 19 9 19 L 15 19 C 15.554 19 16 18.554 16 18 L 16 15 C 16 14.446 15.554 14 15 14 L 9 14 z "
-          fill={activeElementColor(appearance)}
-          stroke={activeElementColor(appearance)}
+          fill={activeElementColor(theme)}
+          stroke={activeElementColor(theme)}
           strokeWidth="2"
         />
         <path
           d="M 12,2 V 22"
-          fill={iconFillColor(appearance)}
-          stroke={iconFillColor(appearance)}
+          fill={iconFillColor(theme)}
+          stroke={iconFillColor(theme)}
           strokeWidth="2"
           strokeDasharray="1, 2.8"
           strokeLinecap="round"
@@ -448,77 +448,76 @@ export const shield = createIcon(
   { width: 24 },
 );
 
-export const GroupIcon = React.memo(
-  ({ appearance }: { appearance: "light" | "dark" }) =>
-    createIcon(
-      <>
-        <path d="M25 26H111V111H25" fill={iconFillColor(appearance)} />
-        <path
-          d="M25 111C25 80.2068 25 49.4135 25 26M25 26C48.6174 26 72.2348 26 111 26H25ZM25 26C53.3671 26 81.7343 26 111 26H25ZM111 26C111 52.303 111 78.606 111 111V26ZM111 26C111 51.2947 111 76.5893 111 111V26ZM111 111C87.0792 111 63.1585 111 25 111H111ZM111 111C87.4646 111 63.9293 111 25 111H111ZM25 111C25 81.1514 25 51.3028 25 26V111Z"
-          stroke={iconFillColor(appearance)}
-          strokeWidth="2"
-        />
-        <path d="M100 100H160V160H100" fill={iconFillColor(appearance)} />
-        <path
-          d="M100 160C100 144.106 100 128.211 100 100M100 100C117.706 100 135.412 100 160 100H100ZM100 100C114.214 100 128.428 100 160 100H100ZM160 100C160 120.184 160 140.369 160 160V100ZM160 100C160 113.219 160 126.437 160 160V100ZM160 160C145.534 160 131.068 160 100 160H160ZM160 160C143.467 160 126.934 160 100 160H160ZM100 160C100 143.661 100 127.321 100 100V160Z"
-          stroke={iconFillColor(appearance)}
-          strokeWidth="2"
-        />
-        <rect
-          x="2.5"
-          y="2.5"
-          width="30"
-          height="30"
-          fill={handlerColor(appearance)}
-          stroke={iconFillColor(appearance)}
-          strokeWidth="6"
-        />
-        <rect
-          x="2.5"
-          y="149.5"
-          width="30"
-          height="30"
-          fill={handlerColor(appearance)}
-          stroke={iconFillColor(appearance)}
-          strokeWidth="6"
-        />
-        <rect
-          x="147.5"
-          y="149.5"
-          width="30"
-          height="30"
-          fill={handlerColor(appearance)}
-          stroke={iconFillColor(appearance)}
-          strokeWidth="6"
-        />
-        <rect
-          x="147.5"
-          y="2.5"
-          width="30"
-          height="30"
-          fill={handlerColor(appearance)}
-          stroke={iconFillColor(appearance)}
-          strokeWidth="6"
-        />
-      </>,
-      { width: 182, height: 182, mirror: true },
-    ),
+export const GroupIcon = React.memo(({ theme }: { theme: "light" | "dark" }) =>
+  createIcon(
+    <>
+      <path d="M25 26H111V111H25" fill={iconFillColor(theme)} />
+      <path
+        d="M25 111C25 80.2068 25 49.4135 25 26M25 26C48.6174 26 72.2348 26 111 26H25ZM25 26C53.3671 26 81.7343 26 111 26H25ZM111 26C111 52.303 111 78.606 111 111V26ZM111 26C111 51.2947 111 76.5893 111 111V26ZM111 111C87.0792 111 63.1585 111 25 111H111ZM111 111C87.4646 111 63.9293 111 25 111H111ZM25 111C25 81.1514 25 51.3028 25 26V111Z"
+        stroke={iconFillColor(theme)}
+        strokeWidth="2"
+      />
+      <path d="M100 100H160V160H100" fill={iconFillColor(theme)} />
+      <path
+        d="M100 160C100 144.106 100 128.211 100 100M100 100C117.706 100 135.412 100 160 100H100ZM100 100C114.214 100 128.428 100 160 100H100ZM160 100C160 120.184 160 140.369 160 160V100ZM160 100C160 113.219 160 126.437 160 160V100ZM160 160C145.534 160 131.068 160 100 160H160ZM160 160C143.467 160 126.934 160 100 160H160ZM100 160C100 143.661 100 127.321 100 100V160Z"
+        stroke={iconFillColor(theme)}
+        strokeWidth="2"
+      />
+      <rect
+        x="2.5"
+        y="2.5"
+        width="30"
+        height="30"
+        fill={handlerColor(theme)}
+        stroke={iconFillColor(theme)}
+        strokeWidth="6"
+      />
+      <rect
+        x="2.5"
+        y="149.5"
+        width="30"
+        height="30"
+        fill={handlerColor(theme)}
+        stroke={iconFillColor(theme)}
+        strokeWidth="6"
+      />
+      <rect
+        x="147.5"
+        y="149.5"
+        width="30"
+        height="30"
+        fill={handlerColor(theme)}
+        stroke={iconFillColor(theme)}
+        strokeWidth="6"
+      />
+      <rect
+        x="147.5"
+        y="2.5"
+        width="30"
+        height="30"
+        fill={handlerColor(theme)}
+        stroke={iconFillColor(theme)}
+        strokeWidth="6"
+      />
+    </>,
+    { width: 182, height: 182, mirror: true },
+  ),
 );
 
 export const UngroupIcon = React.memo(
-  ({ appearance }: { appearance: "light" | "dark" }) =>
+  ({ theme }: { theme: "light" | "dark" }) =>
     createIcon(
       <>
-        <path d="M25 26H111V111H25" fill={iconFillColor(appearance)} />
+        <path d="M25 26H111V111H25" fill={iconFillColor(theme)} />
         <path
           d="M25 111C25 80.2068 25 49.4135 25 26M25 26C48.6174 26 72.2348 26 111 26H25ZM25 26C53.3671 26 81.7343 26 111 26H25ZM111 26C111 52.303 111 78.606 111 111V26ZM111 26C111 51.2947 111 76.5893 111 111V26ZM111 111C87.0792 111 63.1585 111 25 111H111ZM111 111C87.4646 111 63.9293 111 25 111H111ZM25 111C25 81.1514 25 51.3028 25 26V111Z"
-          stroke={iconFillColor(appearance)}
+          stroke={iconFillColor(theme)}
           strokeWidth="2"
         />
-        <path d="M100 100H160V160H100" fill={iconFillColor(appearance)} />
+        <path d="M100 100H160V160H100" fill={iconFillColor(theme)} />
         <path
           d="M100 160C100 144.106 100 128.211 100 100M100 100C117.706 100 135.412 100 160 100H100ZM100 100C114.214 100 128.428 100 160 100H100ZM160 100C160 120.184 160 140.369 160 160V100ZM160 100C160 113.219 160 126.437 160 160V100ZM160 160C145.534 160 131.068 160 100 160H160ZM160 160C143.467 160 126.934 160 100 160H160ZM100 160C100 143.661 100 127.321 100 100V160Z"
-          stroke={iconFillColor(appearance)}
+          stroke={iconFillColor(theme)}
           strokeWidth="2"
         />
         <rect
@@ -526,8 +525,8 @@ export const UngroupIcon = React.memo(
           y="2.5"
           width="30"
           height="30"
-          fill={handlerColor(appearance)}
-          stroke={iconFillColor(appearance)}
+          fill={handlerColor(theme)}
+          stroke={iconFillColor(theme)}
           strokeWidth="6"
         />
         <rect
@@ -535,8 +534,8 @@ export const UngroupIcon = React.memo(
           y="149.5"
           width="30"
           height="30"
-          fill={handlerColor(appearance)}
-          stroke={iconFillColor(appearance)}
+          fill={handlerColor(theme)}
+          stroke={iconFillColor(theme)}
           strokeWidth="6"
         />
         <rect
@@ -544,8 +543,8 @@ export const UngroupIcon = React.memo(
           y="149.5"
           width="30"
           height="30"
-          fill={handlerColor(appearance)}
-          stroke={iconFillColor(appearance)}
+          fill={handlerColor(theme)}
+          stroke={iconFillColor(theme)}
           strokeWidth="6"
         />
         <rect
@@ -553,8 +552,8 @@ export const UngroupIcon = React.memo(
           y="78.5"
           width="30"
           height="30"
-          fill={handlerColor(appearance)}
-          stroke={iconFillColor(appearance)}
+          fill={handlerColor(theme)}
+          stroke={iconFillColor(theme)}
           strokeWidth="6"
         />
         <rect
@@ -562,8 +561,8 @@ export const UngroupIcon = React.memo(
           y="2.5"
           width="30"
           height="30"
-          fill={handlerColor(appearance)}
-          stroke={iconFillColor(appearance)}
+          fill={handlerColor(theme)}
+          stroke={iconFillColor(theme)}
           strokeWidth="6"
         />
         <rect
@@ -571,8 +570,8 @@ export const UngroupIcon = React.memo(
           y="102.5"
           width="30"
           height="30"
-          fill={handlerColor(appearance)}
-          stroke={iconFillColor(appearance)}
+          fill={handlerColor(theme)}
+          stroke={iconFillColor(theme)}
           strokeWidth="6"
         />
       </>,
@@ -581,22 +580,22 @@ export const UngroupIcon = React.memo(
 );
 
 export const FillHachureIcon = React.memo(
-  ({ appearance }: { appearance: "light" | "dark" }) =>
+  ({ theme }: { theme: "light" | "dark" }) =>
     createIcon(
       <path
         fillRule="evenodd"
         clipRule="evenodd"
         d="M20.101 16H28.0934L36 8.95989V4H33.5779L20.101 16ZM30.5704 4L17.0935 16H9.10101L22.5779 4H30.5704ZM19.5704 4L6.09349 16H4V10.7475L11.5779 4H19.5704ZM8.57036 4H4V8.06952L8.57036 4ZM36 11.6378L31.101 16H36V11.6378ZM2 2V18H38V2H2Z"
-        fill={iconFillColor(appearance)}
+        fill={iconFillColor(theme)}
       />,
       { width: 40, height: 20 },
     ),
 );
 
 export const FillCrossHatchIcon = React.memo(
-  ({ appearance }: { appearance: "light" | "dark" }) =>
+  ({ theme }: { theme: "light" | "dark" }) =>
     createIcon(
-      <g fill={iconFillColor(appearance)} fillRule="evenodd" clipRule="evenodd">
+      <g fill={iconFillColor(theme)} fillRule="evenodd" clipRule="evenodd">
         <path d="M20.101 16H28.0934L36 8.95989V4H33.5779L20.101 16ZM30.5704 4L17.0935 16H9.10101L22.5779 4H30.5704ZM19.5704 4L6.09349 16H4V10.7475L11.5779 4H19.5704ZM8.57036 4H4V8.06952L8.57036 4ZM36 11.6378L31.101 16H36V11.6378ZM2 2V18H38V2H2Z" />
         <path d="M14.0001 18L3.00006 4.00002L4.5727 2.76438L15.5727 16.7644L14.0001 18ZM25.0001 18L14.0001 4.00002L15.5727 2.76438L26.5727 16.7644L25.0001 18ZM36.0001 18L25.0001 4.00002L26.5727 2.76438L37.5727 16.7644L36.0001 18Z" />
       </g>,
@@ -605,25 +604,19 @@ export const FillCrossHatchIcon = React.memo(
 );
 
 export const FillSolidIcon = React.memo(
-  ({ appearance }: { appearance: "light" | "dark" }) =>
-    createIcon(<path d="M2 2H38V18H2V2Z" fill={iconFillColor(appearance)} />, {
+  ({ theme }: { theme: "light" | "dark" }) =>
+    createIcon(<path d="M2 2H38V18H2V2Z" fill={iconFillColor(theme)} />, {
       width: 40,
       height: 20,
     }),
 );
 
 export const StrokeWidthIcon = React.memo(
-  ({
-    appearance,
-    strokeWidth,
-  }: {
-    appearance: "light" | "dark";
-    strokeWidth: number;
-  }) =>
+  ({ theme, strokeWidth }: { theme: "light" | "dark"; strokeWidth: number }) =>
     createIcon(
       <path
         d="M6 10H34"
-        stroke={iconFillColor(appearance)}
+        stroke={iconFillColor(theme)}
         strokeWidth={strokeWidth}
         fill="none"
       />,
@@ -632,11 +625,11 @@ export const StrokeWidthIcon = React.memo(
 );
 
 export const StrokeStyleSolidIcon = React.memo(
-  ({ appearance }: { appearance: "light" | "dark" }) =>
+  ({ theme }: { theme: "light" | "dark" }) =>
     createIcon(
       <path
         d="M6 10H34"
-        stroke={iconFillColor(appearance)}
+        stroke={iconFillColor(theme)}
         strokeWidth={2}
         fill="none"
       />,
@@ -648,11 +641,11 @@ export const StrokeStyleSolidIcon = React.memo(
 );
 
 export const StrokeStyleDashedIcon = React.memo(
-  ({ appearance }: { appearance: "light" | "dark" }) =>
+  ({ theme }: { theme: "light" | "dark" }) =>
     createIcon(
       <path
         d="M6 10H34"
-        stroke={iconFillColor(appearance)}
+        stroke={iconFillColor(theme)}
         strokeWidth={2.5}
         strokeDasharray={"10, 8"}
         fill="none"
@@ -662,11 +655,11 @@ export const StrokeStyleDashedIcon = React.memo(
 );
 
 export const StrokeStyleDottedIcon = React.memo(
-  ({ appearance }: { appearance: "light" | "dark" }) =>
+  ({ theme }: { theme: "light" | "dark" }) =>
     createIcon(
       <path
         d="M6 10H34"
-        stroke={iconFillColor(appearance)}
+        stroke={iconFillColor(theme)}
         strokeWidth={2.5}
         strokeDasharray={"4, 4"}
         fill="none"
@@ -676,11 +669,11 @@ export const StrokeStyleDottedIcon = React.memo(
 );
 
 export const SloppinessArchitectIcon = React.memo(
-  ({ appearance }: { appearance: "light" | "dark" }) =>
+  ({ theme }: { theme: "light" | "dark" }) =>
     createIcon(
       <path
         d="M3.00098 16.1691C6.28774 13.9744 19.6399 2.8905 22.7215 3.00082C25.8041 3.11113 19.1158 15.5488 21.4962 16.8309C23.8757 18.1131 34.4155 11.7148 37.0001 10.6919"
-        stroke={iconFillColor(appearance)}
+        stroke={iconFillColor(theme)}
         strokeWidth={2}
         fill="none"
       />,
@@ -689,11 +682,11 @@ export const SloppinessArchitectIcon = React.memo(
 );
 
 export const SloppinessArtistIcon = React.memo(
-  ({ appearance }: { appearance: "light" | "dark" }) =>
+  ({ theme }: { theme: "light" | "dark" }) =>
     createIcon(
       <path
         d="M3 17C6.68158 14.8752 16.1296 9.09849 22.0648 6.54922C28 3.99995 22.2896 13.3209 25 14C27.7104 14.6791 36.3757 9.6471 36.3757 9.6471M6.40706 15C13 11.1918 20.0468 1.51045 23.0234 3.0052C26 4.49995 20.457 12.8659 22.7285 16.4329C25 20 36.3757 13 36.3757 13"
-        stroke={iconFillColor(appearance)}
+        stroke={iconFillColor(theme)}
         strokeWidth={2}
         fill="none"
       />,
@@ -702,11 +695,11 @@ export const SloppinessArtistIcon = React.memo(
 );
 
 export const SloppinessCartoonistIcon = React.memo(
-  ({ appearance }: { appearance: "light" | "dark" }) =>
+  ({ theme }: { theme: "light" | "dark" }) =>
     createIcon(
       <path
         d="M3 15.6468C6.93692 13.5378 22.5544 2.81528 26.6206 3.00242C30.6877 3.18956 25.6708 15.3346 27.4009 16.7705C29.1309 18.2055 35.4001 12.4762 37 11.6177M3.97143 10.4917C6.61158 9.24563 16.3706 2.61886 19.8104 3.01724C23.2522 3.41472 22.0773 12.2013 24.6181 12.8783C27.1598 13.5536 33.3179 8.04068 35.0571 7.07244"
-        stroke={iconFillColor(appearance)}
+        stroke={iconFillColor(theme)}
         strokeWidth={2}
         fill="none"
       />,
@@ -715,11 +708,11 @@ export const SloppinessCartoonistIcon = React.memo(
 );
 
 export const EdgeSharpIcon = React.memo(
-  ({ appearance }: { appearance: "light" | "dark" }) =>
+  ({ theme }: { theme: "light" | "dark" }) =>
     createIcon(
       <path
         d="M10 17L10 5L35 5"
-        stroke={iconFillColor(appearance)}
+        stroke={iconFillColor(theme)}
         strokeWidth={2}
         fill="none"
       />,
@@ -728,11 +721,11 @@ export const EdgeSharpIcon = React.memo(
 );
 
 export const EdgeRoundIcon = React.memo(
-  ({ appearance }: { appearance: "light" | "dark" }) =>
+  ({ theme }: { theme: "light" | "dark" }) =>
     createIcon(
       <path
         d="M10 17V15C10 8 13 5 21 5L33.5 5"
-        stroke={iconFillColor(appearance)}
+        stroke={iconFillColor(theme)}
         strokeWidth={2}
         fill="none"
       />,
@@ -741,11 +734,11 @@ export const EdgeRoundIcon = React.memo(
 );
 
 export const ArrowheadNoneIcon = React.memo(
-  ({ appearance }: { appearance: "light" | "dark" }) =>
+  ({ theme }: { theme: "light" | "dark" }) =>
     createIcon(
       <path
         d="M6 10H34"
-        stroke={iconFillColor(appearance)}
+        stroke={iconFillColor(theme)}
         strokeWidth={2}
         fill="none"
       />,
@@ -757,17 +750,11 @@ export const ArrowheadNoneIcon = React.memo(
 );
 
 export const ArrowheadArrowIcon = React.memo(
-  ({
-    appearance,
-    flip = false,
-  }: {
-    appearance: "light" | "dark";
-    flip?: boolean;
-  }) =>
+  ({ theme, flip = false }: { theme: "light" | "dark"; flip?: boolean }) =>
     createIcon(
       <g
         transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
-        stroke={iconFillColor(appearance)}
+        stroke={iconFillColor(theme)}
         strokeWidth={2}
         fill="none"
       >
@@ -779,17 +766,11 @@ export const ArrowheadArrowIcon = React.memo(
 );
 
 export const ArrowheadDotIcon = React.memo(
-  ({
-    appearance,
-    flip = false,
-  }: {
-    appearance: "light" | "dark";
-    flip?: boolean;
-  }) =>
+  ({ theme, flip = false }: { theme: "light" | "dark"; flip?: boolean }) =>
     createIcon(
       <g
-        stroke={iconFillColor(appearance)}
-        fill={iconFillColor(appearance)}
+        stroke={iconFillColor(theme)}
+        fill={iconFillColor(theme)}
         transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
       >
         <path d="M32 10L6 10" strokeWidth={2} />
@@ -800,18 +781,12 @@ export const ArrowheadDotIcon = React.memo(
 );
 
 export const ArrowheadBarIcon = React.memo(
-  ({
-    appearance,
-    flip = false,
-  }: {
-    appearance: "light" | "dark";
-    flip?: boolean;
-  }) =>
+  ({ theme, flip = false }: { theme: "light" | "dark"; flip?: boolean }) =>
     createIcon(
       <g transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}>
         <path
           d="M34 10H5.99996M34 10L34 5M34 10L34 15"
-          stroke={iconFillColor(appearance)}
+          stroke={iconFillColor(theme)}
           strokeWidth={2}
           fill="none"
         />

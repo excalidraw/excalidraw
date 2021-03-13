@@ -625,7 +625,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.setState((state) => ({
         ...getDefaultAppState(),
         isLoading: opts?.resetLoadingState ? false : state.isLoading,
-        appearance: this.state.appearance,
+        theme: this.state.theme,
       }));
       this.resetHistory();
     },
@@ -884,7 +884,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
     document
       .querySelector(".excalidraw")
-      ?.classList.toggle("Appearance_dark", this.state.appearance === "dark");
+      ?.classList.toggle("theme--dark", this.state.theme === "dark");
 
     if (
       this.state.editingLinearElement &&

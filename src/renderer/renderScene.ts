@@ -49,7 +49,7 @@ import {
 } from "../element/transformHandles";
 import { viewportCoordsToSceneCoords, supportsEmoji } from "../utils";
 import { UserIdleState } from "../excalidraw-app/collab/types";
-import { APPEARANCE_FILTER } from "../constants";
+import { THEME_FILTER } from "../constants";
 
 const hasEmojiSupport = supportsEmoji();
 
@@ -213,7 +213,7 @@ export const renderScene = (
   const normalizedCanvasHeight = canvas.height / scale;
 
   if (sceneState.exportWithDarkMode) {
-    context.filter = APPEARANCE_FILTER;
+    context.filter = THEME_FILTER;
   }
 
   // Paint background

@@ -109,4 +109,4 @@ export const MODES = {
   GRID: "gridMode",
 };
 
-export const APPEARANCE_FILTER = cssVariables.appearanceFilter;
+export const THEME_FILTER = cssVariables.themeFilter;

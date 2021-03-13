@@ -225,8 +225,8 @@ export const actionExportWithDarkMode = register({
     >
       <DarkModeToggle
         value={appState.exportWithDarkMode ? "dark" : "light"}
-        onChange={(appearance: Appearence) => {
-          updateData(appearance === "dark");
+        onChange={(theme: Appearence) => {
+          updateData(theme === "dark");
         }}
         title={t("labels.toggleExportColorScheme")}
       />
