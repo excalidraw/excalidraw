@@ -14,6 +14,8 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+## Excalidraw API
+
 ### Features
 
 - Support `libraryReturnUrl` prop to indicate what URL to install libraries to [#3227](https://github.com/excalidraw/excalidraw/pull/3227).
