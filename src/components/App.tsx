@@ -748,7 +748,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
     }
 
-    if (window.location.search.includes("share-target")) {
+    const searchParams = new URLSearchParams(window.location.search.slice(1));
+    if (searchParams.has("web-share-target")) {
       this.restoreFileFromShare();
     }
   }
@@ -1282,16 +1283,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   restoreFileFromShare = async () => {
-    const keys = await caches.keys();
-    const mediaCache = await caches.open(
-      keys.filter((key) => key.startsWith("media"))[0],
-    );
+    try {
+      const webShareTargetCache = await caches.open("web-share-target");
 
-    const file = await mediaCache.match("shared-file");
-    if (file) {
-      const blob = await file.blob();
-      this.loadFileToCanvas(blob);
-      await mediaCache.delete("shared-file");
+      const file = await webShareTargetCache.match("shared-file");
+      if (file) {
+        const blob = await file.blob();
+        this.loadFileToCanvas(blob);
+        await webShareTargetCache.delete("shared-file");
+        window.history.replaceState(null, APP_NAME, window.location.pathname);
+      }
+    } catch (error) {
+      this.setState({ errorMessage: error.message });
     }
   };
 

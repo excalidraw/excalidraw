@@ -57,12 +57,9 @@ self.addEventListener("fetch", (event) => {
       (async () => {
         const formData = await event.request.formData();
         const file = formData.get("file");
-        const keys = await caches.keys();
-        const mediaCache = await caches.open(
-          keys.filter((key) => key.startsWith("media"))[0],
-        );
-        await mediaCache.put("shared-file", new Response(file));
-        return Response.redirect("./?web-share-target", 303);
+        const webShareTargetCache = await caches.open("web-share-target");
+        await webShareTargetCache.put("shared-file", new Response(file));
+        return Response.redirect("/?web-share-target", 303);
       })(),
     );
   }
