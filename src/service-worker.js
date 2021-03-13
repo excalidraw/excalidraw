@@ -47,3 +47,20 @@ workbox.routing.registerRoute(
     plugins: [new workbox.expiration.Plugin({ maxEntries: 10 })],
   }),
 );
+
+self.addEventListener("fetch", (event) => {
+  if (
+    event.request.method === "POST" &&
+    event.request.url.endsWith("/web-share-target")
+  ) {
+    return event.respondWith(
+      (async () => {
+        const formData = await event.request.formData();
+        const file = formData.get("file");
+        const webShareTargetCache = await caches.open("web-share-target");
+        await webShareTargetCache.put("shared-file", new Response(file));
+        return Response.redirect("/?web-share-target", 303);
+      })(),
+    );
+  }
+});
