@@ -88,22 +88,20 @@ const generateElementCanvas = (
 
     context.translate(canvasOffsetX, canvasOffsetY);
   } else {
+    const dprMultiplier =
+      isTextElement(element) &&
+      isMathMode(getFontString(element)) &&
+      containsMath(element.text, element.useTex)
+        ? scale * Math.max(window.devicePixelRatio, 1 / window.devicePixelRatio)
+        : window.devicePixelRatio;
     canvas.width =
-      element.width * window.devicePixelRatio * zoom.value +
+      element.width * dprMultiplier * zoom.value +
       CANVAS_PADDING * zoom.value * 2;
     canvas.height =
-      element.height * window.devicePixelRatio * zoom.value +
+      element.height * dprMultiplier * zoom.value +
       CANVAS_PADDING * zoom.value * 2;
   }
 
-  if (
-    isTextElement(element) &&
-    isMathMode(getFontString(element)) &&
-    containsMath(element.text, element.useTex)
-  ) {
-    canvas.width *= scale;
-    canvas.height *= scale;
-  }
   context.translate(CANVAS_PADDING * zoom.value, CANVAS_PADDING * zoom.value);
 
   context.scale(
@@ -114,13 +112,13 @@ const generateElementCanvas = (
   const rc = rough.canvas(canvas);
   const promise = drawElementOnCanvas(element, rc, context, zoom, scale);
   const finishGeneration = function () {
-    context.translate(
-      -(CANVAS_PADDING * zoom.value),
-      -(CANVAS_PADDING * zoom.value),
-    );
     context.scale(
       1 / (window.devicePixelRatio * zoom.value),
       1 / (window.devicePixelRatio * zoom.value),
+    );
+    context.translate(
+      -(CANVAS_PADDING * zoom.value),
+      -(CANVAS_PADDING * zoom.value),
     );
   };
 
@@ -618,17 +616,22 @@ export const renderElement = (
             isMathMode(getFontString(element)) &&
             containsMath(element.text, element.useTex)
           ) {
+            const dprMultiplier =
+              scale *
+              Math.max(window.devicePixelRatio, 1 / window.devicePixelRatio);
             const tempCanvas = document.createElement("canvas");
             tempCanvas.width =
-              element.width * window.devicePixelRatio * sceneState.zoom.value +
-              CANVAS_PADDING * sceneState.zoom.value * 2;
+              element.width * dprMultiplier * sceneState.zoom.value;
             tempCanvas.height =
-              element.height * window.devicePixelRatio * sceneState.zoom.value +
-              CANVAS_PADDING * sceneState.zoom.value * 2;
-            tempCanvas.width *= scale;
-            tempCanvas.height *= scale;
+              element.height * dprMultiplier * sceneState.zoom.value;
 
             const tempContext = tempCanvas.getContext("2d");
+
+            tempContext?.scale(
+              window.devicePixelRatio * sceneState.zoom.value,
+              window.devicePixelRatio * sceneState.zoom.value,
+            );
+
             const promise =
               tempContext !== null
                 ? drawElementOnCanvas(

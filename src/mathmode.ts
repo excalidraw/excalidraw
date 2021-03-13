@@ -114,7 +114,6 @@ const markupText = (text: string, useTex: boolean) => {
 
 const getCacheKey = (
   text: string,
-  fontSize: number,
   fontFamily: FontFamily,
   strokeColor: String,
   textAlign: CanvasTextAlign,
@@ -258,7 +257,6 @@ export const createSvg = (
 ) => {
   const key = getCacheKey(
     text,
-    fontSize,
     fontFamily,
     strokeColor,
     textAlign,
@@ -366,6 +364,10 @@ const imageMetricsCache = {} as {
   [key: string]: { width: number; height: number; baseline: number };
 };
 
+const getRenderDims = (width: number, height: number) => {
+  return [width / window.devicePixelRatio, height / window.devicePixelRatio];
+};
+
 export const drawMathOnCanvas = (
   context: CanvasRenderingContext2D,
   x: number,
@@ -380,7 +382,6 @@ export const drawMathOnCanvas = (
 ) => {
   const key = getCacheKey(
     text,
-    fontSize,
     fontFamily,
     strokeColor,
     textAlign,
@@ -401,7 +402,12 @@ export const drawMathOnCanvas = (
   }`;
   return new Promise<void>((resolve) => {
     if (imageCache[imgKey] && imageCache[imgKey] !== undefined) {
-      context.drawImage(imageCache[imgKey], 0, 0);
+      const img = imageCache[imgKey];
+      const [width, height] = getRenderDims(
+        img.naturalWidth,
+        img.naturalHeight,
+      );
+      context.drawImage(img, 0, 0, width, height);
       resolve();
     } else {
       const img = new Image();
@@ -423,7 +429,11 @@ export const drawMathOnCanvas = (
         () => {
           img.src = reader.result as string;
           img.onload = function () {
-            context.drawImage(img, 0, 0);
+            const [width, height] = getRenderDims(
+              img.naturalWidth,
+              img.naturalHeight,
+            );
+            context.drawImage(img, 0, 0, width, height);
             imageCache[imgKey] = img;
             resolve();
           };
