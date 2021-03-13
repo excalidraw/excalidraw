@@ -30,13 +30,13 @@ export const saveAsJSON = async (
 ) => {
   const serialized = serializeAsJSON(elements, appState);
   const blob = new Blob([serialized], {
-    type: "application/json",
+    type: MIME_TYPES.excalidraw,
   });
 
   const fileHandle = await fileSave(
     blob,
     {
-      fileName: appState.name,
+      fileName: `${appState.name}.excalidraw`,
       description: "Excalidraw file",
       extensions: [".excalidraw"],
     },
