@@ -667,10 +667,11 @@ This function returns the canvas with the exported elements, appState and dimens
 **_Signature_**
 
 <pre>
-exportToBlob(opts: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/packages/utils.ts#L10">ExportOpts</a> & {
-    mimeType?: string;
-    quality?: number;
-  })
+exportToBlob(
+  opts: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/packages/utils.ts#L10">ExportOpts</a> & {
+  mimeType?: string,
+  quality?: number;
+})
 </pre>
 
 | Name | Type | Default | Description |
@@ -693,8 +694,12 @@ This function will return a promise which resolves the a [blob](https://develope
 **_Signature_**
 
 <pre>
-exportToSvg({ elements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>, appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L42">AppState</a>, exportPadding?: number,
-  metadata?: string,}
+exportToSvg({
+  elements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>,
+  appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L42">AppState</a>,
+  exportPadding?: number,
+  metadata?: string,
+}
 </pre>
 
 | Name | Type | Default | Description |
