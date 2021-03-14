@@ -8,11 +8,8 @@ import { SVG_EXPORT_TAG } from "./scene/export";
 import { tryParseSpreadsheet, Spreadsheet, VALID_SPREADSHEET } from "./charts";
 import { canvasToBlob } from "./data/blob";
 
-const TYPE_ELEMENTS = "excalidraw/elements";
-
 type ElementsClipboard = {
-  type: typeof TYPE_ELEMENTS;
-  created: number;
+  type: "excalidraw/clipboard";
   elements: ExcalidrawElement[];
 };
 
@@ -31,8 +28,13 @@ export const probablySupportsClipboardBlob =
   "ClipboardItem" in window &&
   "toBlob" in HTMLCanvasElement.prototype;
 
-const isElementsClipboard = (contents: any): contents is ElementsClipboard => {
-  if (contents?.type === TYPE_ELEMENTS) {
+const clipboardContainsElements = (
+  contents: any,
+): contents is { elements: ExcalidrawElement[] } => {
+  if (
+    ["excalidraw", "excalidraw/clipboard"].includes(contents?.type) &&
+    Array.isArray(contents.elements)
+  ) {
     return true;
   }
   return false;
@@ -43,8 +45,7 @@ export const copyToClipboard = async (
   appState: AppState,
 ) => {
   const contents: ElementsClipboard = {
-    type: TYPE_ELEMENTS,
-    created: Date.now(),
+    type: "excalidraw/clipboard",
     elements: getSelectedElements(elements, appState),
   };
   const json = JSON.stringify(contents);
@@ -131,15 +132,9 @@ export const parseClipboard = async (
 
   try {
     const systemClipboardData = JSON.parse(systemClipboard);
-    // system clipboard elements are newer than in-app clipboard
-    if (
-      isElementsClipboard(systemClipboardData) &&
-      (!appClipboardData?.created ||
-        appClipboardData.created < systemClipboardData.created)
-    ) {
+    if (clipboardContainsElements(systemClipboardData)) {
       return { elements: systemClipboardData.elements };
     }
-    // in-app clipboard is newer than system clipboard
     return appClipboardData;
   } catch {
     // system clipboard doesn't contain excalidraw elements → return plaintext
