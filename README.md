@@ -105,7 +105,7 @@ git clone https://github.com/excalidraw/excalidraw.git
 #### Commands
 
 | Command            | Description                       |
-|--------------------|-----------------------------------|
+| ------------------ | --------------------------------- |
 | `yarn`             | Install the dependencies          |
 | `yarn start`       | Run the project                   |
 | `yarn fix`         | Reformat all files with Prettier  |
