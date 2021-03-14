@@ -1,5 +1,4 @@
 import { cleanAppStateForExport } from "../appState";
-import { MIME_TYPES } from "../constants";
 import { clearElementsForExport } from "../element";
 import { CanvasError } from "../errors";
 import { t } from "../i18n";
@@ -95,13 +94,7 @@ export const loadFromBlob = async (
         elements: clearElementsForExport(data.elements || []),
         appState: {
           theme: localAppState?.theme,
-          fileHandle:
-            blob.handle &&
-            ["application/json", MIME_TYPES.excalidraw].includes(
-              getMimeType(blob),
-            )
-              ? blob.handle
-              : null,
+          fileHandle: blob.handle ?? null,
           ...cleanAppStateForExport(data.appState || {}),
           ...(localAppState
             ? calculateScrollCenter(data.elements || [], localAppState, null)
