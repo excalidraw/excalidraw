@@ -20,7 +20,7 @@ export const DarkModeToggle = (props: {
 
   return (
     <label
-      className="ToolIcon ToolIcon_type_floating ToolIcon_size_M"
+      className="ToolIcon ToolIcon_type_floating ToolIcon_size_M toggle-dark-mode"
       title={title}
     >
       <input

@@ -86,4 +86,24 @@ describe("<Excalidraw/>", () => {
       expect(h.state.gridSize).toBe(null);
     });
   });
+
+  describe("Test theme prop", () => {
+    it('should show the dark mode toggle when the theme prop is "undefined"', async () => {
+      const { container } = await render(<Excalidraw />);
+      expect(h.state.theme).toBe("light");
+
+      expect(container.getElementsByClassName("toggle-dark-mode").length).toBe(
+        1,
+      );
+    });
+
+    it('should not show the dark mode toggle when the theme prop is not "undefined"', async () => {
+      const { container } = await render(<Excalidraw theme="dark" />);
+      expect(h.state.theme).toBe("dark");
+
+      expect(container.getElementsByClassName("toggle-dark-mode").length).toBe(
+        0,
+      );
+    });
+  });
 });
