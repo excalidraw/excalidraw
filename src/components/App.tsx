@@ -303,11 +303,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       viewModeEnabled = false,
       zenModeEnabled = false,
       gridModeEnabled = false,
-      theme = defaultAppState.appearance,
+      theme = defaultAppState.theme,
     } = props;
     this.state = {
       ...defaultAppState,
-      appearance: theme,
+      theme,
       isLoading: true,
       width,
       height,
@@ -460,6 +460,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           showExitZenModeBtn={
             typeof this.props?.zenModeEnabled === "undefined" && zenModeEnabled
           }
+          showThemeBtn={typeof this.props?.theme === "undefined"}
           libraryReturnUrl={this.props.libraryReturnUrl}
         />
         <div className="excalidraw-textEditorContainer" />
@@ -521,7 +522,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         let viewModeEnabled = actionResult?.appState?.viewModeEnabled || false;
         let zenModeEnabled = actionResult?.appState?.zenModeEnabled || false;
         let gridSize = actionResult?.appState?.gridSize || null;
-        let appearance = actionResult?.appState?.appearance || "light";
+        let theme = actionResult?.appState?.theme || "light";
 
         if (typeof this.props.viewModeEnabled !== "undefined") {
           viewModeEnabled = this.props.viewModeEnabled;
@@ -536,7 +537,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         }
 
         if (typeof this.props.theme !== "undefined") {
-          appearance = this.props.theme;
+          theme = this.props.theme;
         }
 
         this.setState(
@@ -554,7 +555,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               viewModeEnabled,
               zenModeEnabled,
               gridSize,
-              appearance,
+              theme,
             });
           },
           () => {
@@ -891,7 +892,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     if (prevProps.theme !== this.props.theme && this.props.theme) {
-      this.setState({ appearance: this.props.theme });
+      this.setState({ theme: this.props.theme });
     }
 
     if (prevProps.gridModeEnabled !== this.props.gridModeEnabled) {
