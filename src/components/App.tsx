@@ -3580,9 +3580,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     const file = event.dataTransfer?.files[0];
     if (
-      file?.type === "application/json" ||
-      file?.name.endsWith(".excalidraw")
+      file?.type === MIME_TYPES.excalidrawlib ||
+      file?.name?.endsWith(".excalidrawlib")
     ) {
+      Library.importLibrary(file)
+        .then(() => {
+          this.setState({ isLibraryOpen: false });
+        })
+        .catch((error) =>
+          this.setState({ isLoading: false, errorMessage: error.message }),
+        );
+      // default: assume an Excalidraw file regardless of extension/MimeType
+    } else {
       this.setState({ isLoading: true });
       if (
         "chooseFileSystemEntries" in window ||
@@ -3597,23 +3606,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           console.warn(error.name, error.message);
         }
       }
-      this.loadFileToCanvas(file);
-    } else if (
-      file?.type === MIME_TYPES.excalidrawlib ||
-      file?.name.endsWith(".excalidrawlib")
-    ) {
-      Library.importLibrary(file)
-        .then(() => {
-          this.setState({ isLibraryOpen: false });
-        })
-        .catch((error) =>
-          this.setState({ isLoading: false, errorMessage: error.message }),
-        );
-    } else {
-      this.setState({
-        isLoading: false,
-        errorMessage: t("alerts.couldNotLoadInvalidFile"),
-      });
+      await this.loadFileToCanvas(file);
     }
   };
 
