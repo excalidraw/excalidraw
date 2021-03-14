@@ -7,9 +7,10 @@ import { AppState } from "./types";
 import { SVG_EXPORT_TAG } from "./scene/export";
 import { tryParseSpreadsheet, Spreadsheet, VALID_SPREADSHEET } from "./charts";
 import { canvasToBlob } from "./data/blob";
+import { EXPORT_DATA_TYPES } from "./constants";
 
 type ElementsClipboard = {
-  type: "excalidraw/clipboard";
+  type: typeof EXPORT_DATA_TYPES.excalidrawClipboard;
   elements: ExcalidrawElement[];
 };
 
@@ -32,7 +33,10 @@ const clipboardContainsElements = (
   contents: any,
 ): contents is { elements: ExcalidrawElement[] } => {
   if (
-    ["excalidraw", "excalidraw/clipboard"].includes(contents?.type) &&
+    [
+      EXPORT_DATA_TYPES.excalidraw,
+      EXPORT_DATA_TYPES.excalidrawClipboard,
+    ].includes(contents?.type) &&
     Array.isArray(contents.elements)
   ) {
     return true;
@@ -45,7 +49,7 @@ export const copyToClipboard = async (
   appState: AppState,
 ) => {
   const contents: ElementsClipboard = {
-    type: "excalidraw/clipboard",
+    type: EXPORT_DATA_TYPES.excalidrawClipboard,
     elements: getSelectedElements(elements, appState),
   };
   const json = JSON.stringify(contents);
