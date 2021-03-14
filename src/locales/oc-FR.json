@@ -94,7 +94,7 @@
     "distributeVertically": "Distribuir verticalament",
     "viewMode": "Mòde de vista",
     "toggleExportColorScheme": "Alternar l’esquèma de color d’expòrt",
-    "share": ""
+    "share": "Partejar"
   },
   "buttons": {
     "clearReset": "Reïnicializar lo canabàs",
@@ -201,7 +201,7 @@
     "desc_inProgressIntro": "La session de collaboracion es ara en cors.",
     "desc_shareLink": "Partejatz aqueste ligam amb lo monde amb qui volètz collaborar :",
     "desc_exitSession": "Arrestar la session vos desconnectarà de la sala, mas poiretz contunhar de trabalhar a la scèna, en local. Notatz qu’aquò afectarà pas los autres, e poiràn collaborar a lor version.",
-    "shareTitle": ""
+    "shareTitle": "Rejonhètz una session collaborativa sus Excalidraw"
   },
   "errorDialog": {
     "title": "Error"
