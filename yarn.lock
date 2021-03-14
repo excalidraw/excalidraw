@@ -5548,9 +5548,9 @@ find-versions@^4.0.0:
   dependencies:
     semver-regex "^3.1.2"
 
-firebase-tools@9.5.0:
-  version "9.5.0"
-  resolved "https://registry.npmjs.org/firebase-tools/-/firebase-tools-9.5.0.tgz"
+firebase-tools@9.6.1:
+  version "9.6.1"
+  resolved "https://registry.yarnpkg.com/firebase-tools/-/firebase-tools-9.6.1.tgz#1528437f904e957378bc397d629e26942677ad17"
   dependencies:
     "@google-cloud/pubsub" "^2.7.0"
     "@types/archiver" "^5.1.0"
