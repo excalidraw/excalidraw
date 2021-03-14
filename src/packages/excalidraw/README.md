@@ -646,10 +646,10 @@ This function makes sure elements and state is set to appropriate values and set
 </pre>
 
 | Name | Type | Default | Description |
-| --- | --- | --- | --- | --- |
+| --- | --- | --- | --- |
 | elements | [Excalidraw Element []](https://github.com/excalidraw/excalidraw/blob/master/src/element/types) |  | The elements to be exported to canvas |
 | appState | [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/packages/utils.ts#L12) | [defaultAppState](https://github.com/excalidraw/excalidraw/blob/master/src/appState.ts#L11) | The app state of the scene |
-| getDimensions | `(width: number, height: number) => {width: number, height: number, scale: number}` | `(width, height) => ({ width, height, scale: 1 })` |  | A function which returns the width, height and scale with which canvas is to be exported. |
+| getDimensions | `(width: number, height: number) => {width: number, height: number, scale: number)` | `(width, height) => ({ width, height, scale: 1 })` | A function which returns the width, height and scale with which canvas is to be exported. |
 
 **How to use**
 
