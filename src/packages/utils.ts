@@ -1,3 +1,4 @@
+import oc from "open-color";
 import {
   exportToCanvas as _exportToCanvas,
   exportToSvg as _exportToSvg,
@@ -26,7 +27,7 @@ export const exportToCanvas = ({
     { ...appState, offsetTop: 0, offsetLeft: 0 },
     {
       exportBackground: appState.exportBackground ?? true,
-      viewBackgroundColor: appState.viewBackgroundColor ?? "#FFF",
+      viewBackgroundColor: appState.viewBackgroundColor ?? oc.white,
       shouldAddWatermark: appState.shouldAddWatermark ?? false,
     },
     (width: number, height: number) => {
