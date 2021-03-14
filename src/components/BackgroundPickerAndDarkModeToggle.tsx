@@ -7,23 +7,24 @@ export const BackgroundPickerAndDarkModeToggle = ({
   appState,
   setAppState,
   actionManager,
-  showAppearanceBtn,
+  showThemeBtn,
 }: {
   actionManager: ActionManager;
   appState: AppState;
   setAppState: React.Component<any, AppState>["setState"];
-  showAppearanceBtn: boolean;
+  showThemeBtn: boolean;
 }) => (
   <div style={{ display: "flex" }}>
     {actionManager.renderAction("changeViewBackgroundColor")}
-    <div style={{ marginInlineStart: "0.25rem" }}>
-      <DarkModeToggle
-        value={appState.theme}
-        onChange={(theme) => {
-          setAppState({ theme });
-        }}
-        showAppearanceBtn={showAppearanceBtn}
-      />
-    </div>
+    {showThemeBtn && (
+      <div style={{ marginInlineStart: "0.25rem" }}>
+        <DarkModeToggle
+          value={appState.theme}
+          onChange={(theme) => {
+            setAppState({ theme });
+          }}
+        />
+      </div>
+    )}
   </div>
 );

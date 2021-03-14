@@ -1,4 +1,3 @@
-import clsx from "clsx";
 import "./ToolIcon.scss";
 
 import React from "react";
@@ -10,7 +9,6 @@ export type Appearence = "light" | "dark";
 // but this could be added in the future.
 export const DarkModeToggle = (props: {
   value: Appearence;
-  showAppearanceBtn: boolean;
   onChange: (value: Appearence) => void;
   title?: string;
 }) => {
@@ -22,13 +20,7 @@ export const DarkModeToggle = (props: {
 
   return (
     <label
-      className={clsx(
-        "ToolIcon ToolIcon_type_floating ToolIcon_size_M",
-        "toggle-appearance",
-        {
-          "toggle-appearance--visible": props.showAppearanceBtn,
-        },
-      )}
+      className="ToolIcon ToolIcon_type_floating ToolIcon_size_M"
       title={title}
     >
       <input
