@@ -19,6 +19,7 @@ Please add the latest change on the top under the correct section.
 ### Features
 
 - Support `libraryReturnUrl` prop to indicate what URL to install libraries to [#3227](https://github.com/excalidraw/excalidraw/pull/3227).
+- Support a `theme` prop to incidicate the Excalidraw component's theme. [#3228](https://github.com/excalidraw/excalidraw/pull/3228).
 
 ### Refactor
 
