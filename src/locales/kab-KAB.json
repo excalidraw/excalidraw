@@ -94,7 +94,7 @@
     "distributeVertically": "Freq s yibeddi",
     "viewMode": "Askar n tmuɣli",
     "toggleExportColorScheme": "Sermed/sens asifeḍ usentel n yini",
-    "share": ""
+    "share": "Bḍu"
   },
   "buttons": {
     "clearReset": "Ales awennez n teɣzut n usuneɣ",
@@ -143,7 +143,7 @@
     "confirmAddLibrary": "Ayagi adirnu talɣa (win) {{numShapes}} ɣer temkarḍit-inek (m). Tetḥeqqeḍ?",
     "imageDoesNotContainScene": "Taktert n tugniwin ur tettwadhel ara akka tura.\nTebɣiḍ ad tketreḍ asayes? Tugna-agi tettban-d ur tegbir ara isefka n usnas. Tesremdeḍ ayagi deg usifeḍ?",
     "cannotRestoreFromImage": "Asayes ulamek ara d-yettwarr seg ufaylu-agi n tugna",
-    "invalidSceneUrl": "",
+    "invalidSceneUrl": "Ulamek taktert n usayes seg URL i d-ittunefken. Ahat mačči d tameɣtut neɣ ur tegbir ara isefka JSON n Excalidraw.",
     "resetLibrary": "Ayagi ad isfeḍ tamkarḍit-inek•m. Tetḥeqqeḍ?"
   },
   "toolBar": {
@@ -201,7 +201,7 @@
     "desc_inProgressIntro": "Tiɣimit n umɛawen s srid tetteddu akka tura.",
     "desc_shareLink": "Bḍu aseɣwen-agi akked medden ukud tebɣiḍ ad temɛawaneḍ:",
     "desc_exitSession": "Aḥbas n tɣimit ad k (m) yesenser si texxamt, maca ad tizmireḍ ad tkemmeleḍ amahil s usayes, s wudem adigan. Ẓer belli ayagi ur yettḥaz ara imdanen-nniḍen, yerna ad izmiren ad kemmelen ad mɛawanen di tsuffeɣt-nnsen.",
-    "shareTitle": ""
+    "shareTitle": "Rnu ɣer tɣimit n umɛiwen s srid n Excalidraw"
   },
   "errorDialog": {
     "title": "Tuccḍa"
