@@ -633,7 +633,7 @@ This function makes sure elements and state is set to appropriate values and set
 
 **_The below API's will be available in [next version](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/CHANGELOG.md#unreleased)_**
 
-<details>
+<details id="export-utils">
 <summary><strong>Export utilities</strong></summary>
 
 #### `exportToCanvas`
