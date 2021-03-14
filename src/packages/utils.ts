@@ -86,5 +86,8 @@ export const exportToSvg = ({
     ...appState,
     exportPadding,
     metadata,
+    exportBackground: appState.exportBackground ?? true,
+    viewBackgroundColor: appState.viewBackgroundColor ?? oc.white,
+    shouldAddWatermark: appState.shouldAddWatermark ?? false,
   });
 };

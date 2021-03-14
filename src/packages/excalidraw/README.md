@@ -651,15 +651,6 @@ This function makes sure elements and state is set to appropriate values and set
 | appState | [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/packages/utils.ts#L12) | [defaultAppState](https://github.com/excalidraw/excalidraw/blob/master/src/appState.ts#L11) | The app state of the scene |
 | getDimensions | `(width: number, height: number) => {width: number, height: number, scale: number}` | `(width, height) => ({ width, height, scale: 1 })` |  | A function which returns the width, height and scale with which canvas is to be exported. |
 
-As you can see if you don't pass appState, defaultAppState will be used so you might need to update the below attributes in appState depending upon requirement
-
-| Name | Type | Default | Description |
-| --- | --- | --- | --- |
-| exportBackground | boolean | true | Indicates whether background should be exported |
-| viewBackgroundColor | string | "#fff" | The default background color |
-| shouldAddWatermark | boolean | false | Indicates whether watermark should be exported |
-| exportWithDarkMode | boolean | false | Indicates whether to export with dark mode |
-
 **How to use**
 
 ```js
@@ -709,3 +700,16 @@ exportToSvg({ elements: <a href="https://github.com/excalidraw/excalidraw/blob/m
 | appState | [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L42) | [defaultAppState](https://github.com/excalidraw/excalidraw/blob/master/src/appState.ts#L11) | The app state of the scene |
 | exportPadding | number | 10 | The padding to be added on canvas |
 | metadata | string | ' ' | The metadata to be embedded in svg |
+
+This function returns a svg with the exported elements.
+
+##### Additional attributes for export\* API's
+
+For all export API's ss you can see if you don't pass appState, `defaultAppState` will be used so you might need to update the below attributes in appState depending upon requirement
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| exportBackground | boolean | true | Indicates whether background should be exported |
+| viewBackgroundColor | string | "#fff" | The default background color |
+| shouldAddWatermark | boolean | false | Indicates whether watermark should be exported |
+| exportWithDarkMode | boolean | false | Indicates whether to export with dark mode |
