@@ -30,7 +30,7 @@ If you like the project, you can become a sponsor at [Open Collective](https://o
 
 Last but not least, these companies are sponsoring Excalidraw by offering their services:
 
-[![Vercel](./images/vercel.svg)](https://vercel.com) [![Sentry](./images/sentry.svg)](https://sentry.io)
+[![Vercel](./.github/assets/vercel.svg)](https://vercel.com) [![Sentry](./.github/assets/sentry.svg)](https://sentry.io)
 
 ## Documentation
 
@@ -105,7 +105,7 @@ git clone https://github.com/excalidraw/excalidraw.git
 #### Commands
 
 | Command            | Description                       |
-| ------------------ | --------------------------------- |
+|--------------------|-----------------------------------|
 | `yarn`             | Install the dependencies          |
 | `yarn start`       | Run the project                   |
 | `yarn fix`         | Reformat all files with Prettier  |
