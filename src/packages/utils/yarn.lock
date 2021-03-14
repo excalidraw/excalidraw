@@ -60,10 +60,10 @@
     "@babel/helper-explode-assignable-expression" "^7.12.13"
     "@babel/types" "^7.12.13"
 
-"@babel/helper-compilation-targets@^7.13.0", "@babel/helper-compilation-targets@^7.13.8":
-  version "7.13.8"
-  resolved "https://registry.yarnpkg.com/@babel/helper-compilation-targets/-/helper-compilation-targets-7.13.8.tgz#02bdb22783439afb11b2f009814bdd88384bd468"
-  integrity sha512-pBljUGC1y3xKLn1nrx2eAhurLMA8OqBtBP/JwG4U8skN7kf8/aqwwxpV1N6T0e7r6+7uNitIa/fUxPFagSXp3A==
+"@babel/helper-compilation-targets@^7.13.0", "@babel/helper-compilation-targets@^7.13.10", "@babel/helper-compilation-targets@^7.13.8":
+  version "7.13.10"
+  resolved "https://registry.yarnpkg.com/@babel/helper-compilation-targets/-/helper-compilation-targets-7.13.10.tgz#1310a1678cb8427c07a753750da4f8ce442bdd0c"
+  integrity sha512-/Xju7Qg1GQO4mHZ/Kcs6Au7gfafgZnwm+a7sy/ow/tV1sHeraRUHbjdat8/UvDor4Tez+siGKDk6zIKtCPKVJA==
   dependencies:
     "@babel/compat-data" "^7.13.8"
     "@babel/helper-validator-option" "^7.12.17"
@@ -744,13 +744,13 @@
     "@babel/helper-create-regexp-features-plugin" "^7.12.13"
     "@babel/helper-plugin-utils" "^7.12.13"
 
-"@babel/preset-env@7.13.9":
-  version "7.13.9"
-  resolved "https://registry.yarnpkg.com/@babel/preset-env/-/preset-env-7.13.9.tgz#3ee5f233316b10d066d7f379c6d1e13a96853654"
-  integrity sha512-mcsHUlh2rIhViqMG823JpscLMesRt3QbMsv1+jhopXEb3W2wXvQ9QoiOlZI9ZbR3XqPtaFpZwEZKYqGJnGMZTQ==
+"@babel/preset-env@7.13.10":
+  version "7.13.10"
+  resolved "https://registry.yarnpkg.com/@babel/preset-env/-/preset-env-7.13.10.tgz#b5cde31d5fe77ab2a6ab3d453b59041a1b3a5252"
+  integrity sha512-nOsTScuoRghRtUsRr/c69d042ysfPHcu+KOB4A9aAO9eJYqrkat+LF8G1yp1HD18QiwixT2CisZTr/0b3YZPXQ==
   dependencies:
     "@babel/compat-data" "^7.13.8"
-    "@babel/helper-compilation-targets" "^7.13.8"
+    "@babel/helper-compilation-targets" "^7.13.10"
     "@babel/helper-plugin-utils" "^7.13.0"
     "@babel/helper-validator-option" "^7.12.17"
     "@babel/plugin-proposal-async-generator-functions" "^7.13.8"
