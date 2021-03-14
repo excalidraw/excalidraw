@@ -18,6 +18,7 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
+- Export API's to export the drawing to canvas, svg and blob [#3258](https://github.com/excalidraw/excalidraw/pull/3258). For more info you can check the [readme]()
 - Support `libraryReturnUrl` prop to indicate what URL to install libraries to [#3227](https://github.com/excalidraw/excalidraw/pull/3227).
 
 ### Refactor

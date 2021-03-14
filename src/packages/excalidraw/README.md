@@ -633,6 +633,9 @@ This function makes sure elements and state is set to appropriate values and set
 
 **_The below API's will be available in [next version](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/CHANGELOG.md#unreleased)_**
 
+<details>
+<summary><strong>Export utilities</strong></summary>
+
 #### `exportToCanvas`
 
 **_Signature_**
@@ -713,3 +716,5 @@ For all export API's ss you can see if you don't pass appState, `defaultAppState
 | viewBackgroundColor | string | "#fff" | The default background color |
 | shouldAddWatermark | boolean | false | Indicates whether watermark should be exported |
 | exportWithDarkMode | boolean | false | Indicates whether to export with dark mode |
+
+</details>
