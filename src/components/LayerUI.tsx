@@ -53,6 +53,7 @@ interface LayerUIProps {
   onInsertElements: (elements: readonly NonDeletedExcalidrawElement[]) => void;
   zenModeEnabled: boolean;
   showExitZenModeBtn: boolean;
+  showThemeBtn: boolean;
   toggleZenMode: () => void;
   langCode: Language["code"];
   isCollaborating: boolean;
@@ -325,6 +326,7 @@ const LayerUI = ({
   onInsertElements,
   zenModeEnabled,
   showExitZenModeBtn,
+  showThemeBtn,
   toggleZenMode,
   isCollaborating,
   onExportToBackend,
@@ -441,6 +443,7 @@ const LayerUI = ({
             actionManager={actionManager}
             appState={appState}
             setAppState={setAppState}
+            showThemeBtn={showThemeBtn}
           />
         </Stack.Col>
       </Island>
@@ -671,6 +674,7 @@ const LayerUI = ({
         isCollaborating={isCollaborating}
         renderCustomFooter={renderCustomFooter}
         viewModeEnabled={viewModeEnabled}
+        showThemeBtn={showThemeBtn}
       />
     </>
   ) : (

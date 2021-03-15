@@ -303,9 +303,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       viewModeEnabled = false,
       zenModeEnabled = false,
       gridModeEnabled = false,
+      theme = defaultAppState.theme,
     } = props;
     this.state = {
       ...defaultAppState,
+      theme,
       isLoading: true,
       width,
       height,
@@ -458,6 +460,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           showExitZenModeBtn={
             typeof this.props?.zenModeEnabled === "undefined" && zenModeEnabled
           }
+          showThemeBtn={typeof this.props?.theme === "undefined"}
           libraryReturnUrl={this.props.libraryReturnUrl}
         />
         <div className="excalidraw-textEditorContainer" />
@@ -519,6 +522,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         let viewModeEnabled = actionResult?.appState?.viewModeEnabled || false;
         let zenModeEnabled = actionResult?.appState?.zenModeEnabled || false;
         let gridSize = actionResult?.appState?.gridSize || null;
+        let theme = actionResult?.appState?.theme || "light";
 
         if (typeof this.props.viewModeEnabled !== "undefined") {
           viewModeEnabled = this.props.viewModeEnabled;
@@ -530,6 +534,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
         if (typeof this.props.gridModeEnabled !== "undefined") {
           gridSize = this.props.gridModeEnabled ? GRID_SIZE : null;
+        }
+
+        if (typeof this.props.theme !== "undefined") {
+          theme = this.props.theme;
         }
 
         this.setState(
@@ -547,6 +555,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               viewModeEnabled,
               zenModeEnabled,
               gridSize,
+              theme,
             });
           },
           () => {
@@ -880,6 +889,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     if (prevProps.zenModeEnabled !== this.props.zenModeEnabled) {
       this.setState({ zenModeEnabled: !!this.props.zenModeEnabled });
+    }
+
+    if (prevProps.theme !== this.props.theme && this.props.theme) {
+      this.setState({ theme: this.props.theme });
     }
 
     if (prevProps.gridModeEnabled !== this.props.gridModeEnabled) {
