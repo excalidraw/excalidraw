@@ -94,7 +94,7 @@
     "distributeVertically": "Distribuir verticalment",
     "viewMode": "Mode de visualització",
     "toggleExportColorScheme": "",
-    "share": ""
+    "share": "Compartir"
   },
   "buttons": {
     "clearReset": "Netejar el llenç",
@@ -247,7 +247,7 @@
   },
   "toast": {
     "copyStyles": "",
-    "copyToClipboard": "",
+    "copyToClipboard": "S'ha copiat al porta-retalls.",
     "copyToClipboardAsPng": "",
     "fileSaved": "",
     "fileSavedToFilename": "",
