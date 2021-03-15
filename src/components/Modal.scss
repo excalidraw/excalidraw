@@ -50,6 +50,7 @@
     border: 1px solid var(--dialog-border-color);
     box-shadow: 0 2px 10px transparentize($oc-black, 0.75);
     border-radius: 6px;
+    box-sizing: border-box;
 
     @media #{$is-mobile-query} {
       max-width: 100%;

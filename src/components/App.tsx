@@ -303,9 +303,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       viewModeEnabled = false,
       zenModeEnabled = false,
       gridModeEnabled = false,
+      theme = defaultAppState.theme,
     } = props;
     this.state = {
       ...defaultAppState,
+      theme,
       isLoading: true,
       width,
       height,
@@ -458,6 +460,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           showExitZenModeBtn={
             typeof this.props?.zenModeEnabled === "undefined" && zenModeEnabled
           }
+          showThemeBtn={typeof this.props?.theme === "undefined"}
           libraryReturnUrl={this.props.libraryReturnUrl}
         />
         <div className="excalidraw-textEditorContainer" />
@@ -519,6 +522,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         let viewModeEnabled = actionResult?.appState?.viewModeEnabled || false;
         let zenModeEnabled = actionResult?.appState?.zenModeEnabled || false;
         let gridSize = actionResult?.appState?.gridSize || null;
+        let theme = actionResult?.appState?.theme || "light";
 
         if (typeof this.props.viewModeEnabled !== "undefined") {
           viewModeEnabled = this.props.viewModeEnabled;
@@ -530,6 +534,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
         if (typeof this.props.gridModeEnabled !== "undefined") {
           gridSize = this.props.gridModeEnabled ? GRID_SIZE : null;
+        }
+
+        if (typeof this.props.theme !== "undefined") {
+          theme = this.props.theme;
         }
 
         this.setState(
@@ -547,6 +555,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               viewModeEnabled,
               zenModeEnabled,
               gridSize,
+              theme,
             });
           },
           () => {
@@ -737,11 +746,16 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.scene.addCallback(this.onSceneUpdated);
     this.addEventListeners();
 
-    // optim to avoid extra render on init
-    if (
+    const searchParams = new URLSearchParams(window.location.search.slice(1));
+
+    if (searchParams.has("web-share-target")) {
+      // Obtain a file that was shared via the Web Share Target API.
+      this.restoreFileFromShare();
+    } else if (
       typeof this.props.offsetLeft === "number" &&
       typeof this.props.offsetTop === "number"
     ) {
+      // Optimization to avoid extra render on init.
       this.initializeScene();
     } else {
       this.setState(this.getCanvasOffsets(this.props), () => {
@@ -875,6 +889,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     if (prevProps.zenModeEnabled !== this.props.zenModeEnabled) {
       this.setState({ zenModeEnabled: !!this.props.zenModeEnabled });
+    }
+
+    if (prevProps.theme !== this.props.theme && this.props.theme) {
+      this.setState({ theme: this.props.theme });
     }
 
     if (prevProps.gridModeEnabled !== this.props.gridModeEnabled) {
@@ -1276,6 +1294,22 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   clearToast = () => {
     this.setState({ toastMessage: null });
+  };
+
+  restoreFileFromShare = async () => {
+    try {
+      const webShareTargetCache = await caches.open("web-share-target");
+
+      const file = await webShareTargetCache.match("shared-file");
+      if (file) {
+        const blob = await file.blob();
+        this.loadFileToCanvas(blob);
+        await webShareTargetCache.delete("shared-file");
+        window.history.replaceState(null, APP_NAME, window.location.pathname);
+      }
+    } catch (error) {
+      this.setState({ errorMessage: error.message });
+    }
   };
 
   public updateScene = withBatchedUpdates((sceneData: SceneData) => {
@@ -3576,20 +3610,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           console.warn(error.name, error.message);
         }
       }
-      loadFromBlob(file, this.state)
-        .then(({ elements, appState }) =>
-          this.syncActionResult({
-            elements,
-            appState: {
-              ...(appState || this.state),
-              isLoading: false,
-            },
-            commitToHistory: true,
-          }),
-        )
-        .catch((error) => {
-          this.setState({ isLoading: false, errorMessage: error.message });
-        });
+      this.loadFileToCanvas(file);
     } else if (
       file?.type === MIME_TYPES.excalidrawlib ||
       file?.name.endsWith(".excalidrawlib")
@@ -3607,6 +3628,23 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         errorMessage: t("alerts.couldNotLoadInvalidFile"),
       });
     }
+  };
+
+  loadFileToCanvas = (file: Blob) => {
+    loadFromBlob(file, this.state)
+      .then(({ elements, appState }) =>
+        this.syncActionResult({
+          elements,
+          appState: {
+            ...(appState || this.state),
+            isLoading: false,
+          },
+          commitToHistory: true,
+        }),
+      )
+      .catch((error) => {
+        this.setState({ isLoading: false, errorMessage: error.message });
+      });
   };
 
   private handleCanvasContextMenu = (
