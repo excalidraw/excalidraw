@@ -249,9 +249,9 @@
     "copyStyles": "",
     "copyToClipboard": "S'ha copiat al porta-retalls.",
     "copyToClipboardAsPng": "",
-    "fileSaved": "",
+    "fileSaved": "S'ha desat el fitxer.",
     "fileSavedToFilename": "",
-    "canvas": "",
-    "selection": ""
+    "canvas": "el llenç",
+    "selection": "la selecció"
   }
 }
