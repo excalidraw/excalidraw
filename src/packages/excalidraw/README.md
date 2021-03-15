@@ -541,7 +541,7 @@ If supplied, this URL will be used when user tries to install a library from [li
 
 ### `theme`
 
-Tthis prop controls Excalidraw's theme. When supplied, the value takes precedence over `intialData.appState.theme`, the theme will be fully controlled by the host app, and users won't be able to toggle it from within the app.
+This prop controls Excalidraw's theme. When supplied, the value takes precedence over `intialData.appState.theme`, the theme will be fully controlled by the host app, and users won't be able to toggle it from within the app.
 
 ### Extra API's
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { fireEvent, GlobalTestState, render } from "./test-utils";
 import Excalidraw from "../packages/excalidraw/index";
-import { queryByText } from "@testing-library/react";
+import { queryByText, queryByTestId } from "@testing-library/react";
 import { GRID_SIZE } from "../constants";
 
 const { h } = window;
@@ -92,18 +92,16 @@ describe("<Excalidraw/>", () => {
       const { container } = await render(<Excalidraw />);
       expect(h.state.theme).toBe("light");
 
-      expect(container.getElementsByClassName("toggle-dark-mode").length).toBe(
-        1,
-      );
+      const darkModeToggle = queryByTestId(container, "toggle-dark-mode");
+
+      expect(darkModeToggle).toBeTruthy();
     });
 
     it('should not show the dark mode toggle when the theme prop is not "undefined"', async () => {
       const { container } = await render(<Excalidraw theme="dark" />);
       expect(h.state.theme).toBe("dark");
 
-      expect(container.getElementsByClassName("toggle-dark-mode").length).toBe(
-        0,
-      );
+      expect(queryByTestId(container, "toggle-dark-mode")).toBe(null);
     });
   });
 });
