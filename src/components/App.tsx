@@ -271,7 +271,7 @@ export type ExcalidrawImperativeAPI = {
   history: {
     clear: InstanceType<typeof App>["resetHistory"];
   };
-  setScrollToCenter: InstanceType<typeof App>["setScrollToCenter"];
+  setScrollToContent: InstanceType<typeof App>["setScrollToContent"];
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
   getAppState: () => InstanceType<typeof App>["state"];
   readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
@@ -330,7 +330,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         history: {
           clear: this.resetHistory,
         },
-        setScrollToCenter: this.setScrollToCenter,
+        setScrollToContent: this.setScrollToContent,
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
       } as const;
@@ -685,7 +685,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       ...scene.appState,
       isLoading: false,
     };
-    if (initialData?.scrollToCenter) {
+    if (initialData?.scrollToContent) {
       scene.appState = {
         ...scene.appState,
         ...calculateScrollCenter(
@@ -1282,7 +1282,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.actionManager.executeAction(actionToggleStats);
   };
 
-  setScrollToCenter = (remoteElements: readonly ExcalidrawElement[]) => {
+  setScrollToContent = (remoteElements: readonly ExcalidrawElement[]) => {
     this.setState({
       ...calculateScrollCenter(
         getNonDeletedElements(remoteElements),

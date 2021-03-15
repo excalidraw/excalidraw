@@ -77,7 +77,7 @@ const initializeScene = async (opts: {
 
   const initialData = importFromLocalStorage();
 
-  let scene: DataState & { scrollToCenter?: boolean } = await loadScene(
+  let scene: DataState & { scrollToContent?: boolean } = await loadScene(
     null,
     null,
     initialData,
@@ -104,7 +104,7 @@ const initializeScene = async (opts: {
           initialData,
         );
       }
-      scene.scrollToCenter = true;
+      scene.scrollToContent = true;
       if (!roomLinkData) {
         window.history.replaceState({}, APP_NAME, window.location.origin);
       }
