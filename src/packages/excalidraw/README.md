@@ -677,7 +677,7 @@ exportToBlob(
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | mimeType | string | "image/png" | Indicates the image format |
-| quality | number | 0.8 | A value between 0 and 1 indicating the image quality. If the `mimeType` is passed as `image/jpg` / `image/jpeg` the default value will be set to `0.92` |
+| quality | number | 0.92 | A value between 0 and 1 indicating the [image quality](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob#parameters). Applies only to `image/jpeg`/`image/webp` MIME types. |
 
 The other params are same as described in #exportToCanvas.
 
@@ -687,7 +687,7 @@ The other params are same as described in #exportToCanvas.
 import { exportToBlob } from "@excalidraw/excalidraw";
 ```
 
-This function will return a promise which resolves the a [blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob). It internally uses [canvas.ToBlob](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob).
+Returns a promise which resolves with a [blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob). It internally uses [canvas.ToBlob](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob).
 
 #### `exportToSvg`
 
@@ -711,7 +711,7 @@ exportToSvg({
 
 This function returns a svg with the exported elements.
 
-##### Additional attributes for export\* API's
+##### Additional attributes for `export\*` APIs
 
 For all export API's ss you can see if you don't pass appState, `defaultAppState` will be used so you might need to update the below attributes in appState depending upon requirement
 
