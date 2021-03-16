@@ -17,6 +17,13 @@
   left: 0;
   right: 0;
 
+  // serves 2 purposes:
+  // 1. prevent selecting text outside the component when double-clicking or
+  //    dragging inside it (e.g. on canvas)
+  // 2. prevent selecting UI, both from the inside, and from outside the
+  //    component (e.g. if you select text in a sidebar)
+  user-select: none;
+
   a {
     font-weight: 500;
     text-decoration: none;
@@ -29,7 +36,6 @@
 
   canvas {
     touch-action: none;
-    user-select: none;
 
     // following props improve blurriness at certain devicePixelRatios.
     // AFAIK it doesn't affect export (in fact, export seems sharp either way).

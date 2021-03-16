@@ -1105,7 +1105,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   private onTapEnd = (event: TouchEvent) => {
-    event.preventDefault();
     if (event.touches.length > 0) {
       this.setState({
         previousSelectedElementIds: {},
@@ -1631,10 +1630,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           updateBoundElements(element);
         }
       }),
-      onSubmit: withBatchedUpdates((text) => {
+      onSubmit: withBatchedUpdates(({ text, viaKeyboard }) => {
         const isDeleted = !text.trim();
         updateElement(text, isDeleted);
-        if (!isDeleted) {
+        // select the created text element only if submitting via keyboard
+        // (when submitting via click it should act as signal to deselect)
+        if (!isDeleted && viaKeyboard) {
           this.setState((prevState) => ({
             selectedElementIds: {
               ...prevState.selectedElementIds,
@@ -2150,15 +2151,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     this.updateGestureOnPointerDown(event);
-
-    // fixes pointermove causing selection of UI texts #32
-    event.preventDefault();
-    // Preventing the event above disables default behavior
-    // of defocusing potentially focused element, which is what we
-    // want when clicking inside the canvas.
-    if (document.activeElement instanceof HTMLElement) {
-      document.activeElement.blur();
-    }
 
     // don't select while panning
     if (gesture.pointers.size > 1) {
