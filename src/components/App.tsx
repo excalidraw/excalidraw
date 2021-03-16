@@ -274,7 +274,7 @@ export type ExcalidrawImperativeAPI = {
   setScrollToContent: InstanceType<typeof App>["setScrollToContent"];
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
   getAppState: () => InstanceType<typeof App>["state"];
-  getCanvasOffsets: InstanceType<typeof App>["getCanvasOffsets"];
+  setCanvasOffsets: InstanceType<typeof App>["setCanvasOffsets"];
   readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
   ready: true;
 };
@@ -332,7 +332,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         setScrollToContent: this.setScrollToContent,
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
-        getCanvasOffsets: this.getCanvasOffsets,
+        setCanvasOffsets: this.setCanvasOffsets,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -4009,6 +4009,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
   }, 300);
 
+  private setCanvasOffsets() {
+    this.setState({ ...this.getCanvasOffsets() });
+  }
   private getCanvasOffsets(): Pick<AppState, "offsetTop" | "offsetLeft"> {
     if (this.excalidrawContainerRef?.current?.parentElement) {
       const parentElement = this.excalidrawContainerRef.current.parentElement;
