@@ -22,6 +22,7 @@ import {
   StrokeStyleSolidIcon,
   StrokeWidthIcon,
 } from "../components/icons";
+import { OpacitySlider } from "../components/OpacitySlider";
 import { DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE } from "../constants";
 import {
   getNonDeletedElements,
@@ -353,38 +354,34 @@ export const actionChangeOpacity = register({
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => (
-    <label className="control-label">
-      {t("labels.opacity")}
-      <input
-        type="range"
-        min="0"
-        max="100"
-        step="10"
-        onChange={(event) => updateData(+event.target.value)}
-        onWheel={(event) => {
-          event.stopPropagation();
-          const target = event.target as HTMLInputElement;
-          const STEP = 10;
-          const MAX = 100;
-          const MIN = 0;
-          const value = +target.value;
+    <OpacitySlider
+      onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+        updateData(+event.target.value)
+      }
+      onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
+        event.stopPropagation();
 
-          if (event.deltaY < 0 && value < MAX) {
-            updateData(value + STEP);
-          } else if (event.deltaY > 0 && value > MIN) {
-            updateData(value - STEP);
-          }
-        }}
-        value={
-          getFormValue(
-            elements,
-            appState,
-            (element) => element.opacity,
-            appState.currentItemOpacity,
-          ) ?? undefined
+        const target = event.target as HTMLInputElement;
+        const STEP = 10;
+        const MAX = 100;
+        const MIN = 0;
+        const value = +target.value;
+
+        if (event.deltaY < 0 && value < MAX) {
+          updateData(value + STEP);
+        } else if (event.deltaY > 0 && value > MIN) {
+          updateData(value - STEP);
         }
-      />
-    </label>
+      }}
+      value={
+        getFormValue(
+          elements,
+          appState,
+          (element) => element.opacity,
+          appState.currentItemOpacity,
+        ) ?? undefined
+      }
+    />
   ),
 });
 
