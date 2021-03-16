@@ -94,7 +94,8 @@
     "distributeVertically": "Distribute vertically",
     "viewMode": "View mode",
     "toggleExportColorScheme": "Toggle export color scheme",
-    "share": "Share"
+    "share": "Share",
+    "adjustOpacity": "Adjust element opacity"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
