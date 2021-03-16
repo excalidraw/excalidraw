@@ -6,10 +6,11 @@ import { getDefaultAppState } from "../appState";
 import { AppState } from "../types";
 import { ExcalidrawElement } from "../element/types";
 import { getNonDeletedElements } from "../element";
+import { restore } from "../data/restore";
 
 type ExportOpts = {
   elements: readonly ExcalidrawElement[];
-  appState?: Omit<AppState, "offsetTop" | "offsetLeft">;
+  appState?: Partial<Omit<AppState, "offsetTop" | "offsetLeft">>;
   getDimensions: (
     width: number,
     height: number,
@@ -18,17 +19,22 @@ type ExportOpts = {
 
 export const exportToCanvas = ({
   elements,
-  appState = getDefaultAppState(),
+  appState,
   getDimensions = (width, height) => ({ width, height, scale: 1 }),
 }: ExportOpts) => {
+  const { elements: restoredElements, appState: restoredAppState } = restore(
+    { elements, appState },
+    null,
+  );
+  const {
+    exportBackground,
+    viewBackgroundColor,
+    shouldAddWatermark,
+  } = restoredAppState;
   return _exportToCanvas(
-    getNonDeletedElements(elements),
-    { ...appState, offsetTop: 0, offsetLeft: 0 },
-    {
-      exportBackground: appState.exportBackground ?? true,
-      viewBackgroundColor: appState.viewBackgroundColor ?? "#FFF",
-      shouldAddWatermark: appState.shouldAddWatermark ?? false,
-    },
+    getNonDeletedElements(restoredElements),
+    { ...restoredAppState, offsetTop: 0, offsetLeft: 0 },
+    { exportBackground, viewBackgroundColor, shouldAddWatermark },
     (width: number, height: number) => {
       const canvas = document.createElement("canvas");
       const ret = getDimensions(width, height);
@@ -81,8 +87,12 @@ export const exportToSvg = ({
   exportPadding?: number;
   metadata?: string;
 }): SVGSVGElement => {
-  return _exportToSvg(getNonDeletedElements(elements), {
-    ...appState,
+  const { elements: restoredElements, appState: restoredAppState } = restore(
+    { elements, appState },
+    null,
+  );
+  return _exportToSvg(getNonDeletedElements(restoredElements), {
+    ...restoredAppState,
     exportPadding,
     metadata,
   });
