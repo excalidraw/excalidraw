@@ -1589,10 +1589,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           updateBoundElements(element);
         }
       }),
-      onSubmit: withBatchedUpdates((text) => {
+      onSubmit: withBatchedUpdates(({ text, viaKeyboard }) => {
         const isDeleted = !text.trim();
         updateElement(text, isDeleted);
-        if (!isDeleted) {
+        // select the created text element only if submitting via keyboard
+        // (when submitting via click it should act as signal to deselect)
+        if (!isDeleted && viaKeyboard) {
           this.setState((prevState) => ({
             selectedElementIds: {
               ...prevState.selectedElementIds,
@@ -2120,21 +2122,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     if (this.handleDraggingScrollBar(event, pointerDownState)) {
       return;
-    }
-
-    // this branch must be executed before `clearSelectionIfNotUsingSelection()`
-    // below (not entirely sure why)
-    if (this.state.elementType === "text") {
-      // when creating text, we must prevent default otherwise the wysiwyg
-      // would get blurred (submitted) right away
-      event.preventDefault();
-    }
-    // Since we potentially prevent default above, we must manually blur any
-    // active inputs (e.g. wysiwyg) when clicking on canvas.
-    // For some reason, this must also be done so as to not select the text
-    // element when confirming it by clicking outside.
-    if (document.activeElement instanceof HTMLElement) {
-      document.activeElement.blur();
     }
 
     this.clearSelectionIfNotUsingSelection();
