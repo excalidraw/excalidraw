@@ -24,7 +24,7 @@ Please add the latest change on the top under the correct section.
 ### Refactor
 
 - #### BREAKING CHANGE
-  - Rename prop `initialData.scrollToCenter` and `setScrollToCenter` API exposed via ref to `initialData.scrollToContent` and `setScrollToContent` respectively.
+  - Rename prop `initialData.scrollToCenter` and `setScrollToCenter` API exposed via ref to `initialData.scrollToContent` and `setScrollToContent` respectively[#3261](https://github.com/excalidraw/excalidraw/pull/3261).
 - Rename appearance to theme [#3237](https://github.com/excalidraw/excalidraw/pull/3237).
   #### BREAKING CHANGE
   - Since `appState.appearance` is renamed to `appState.theme` so wherever `appState.appearance` including `initialData.appState.appearance` should be renamed to `appState.theme` and `initialData.appState.theme` respectively. If the `appearance` was persisted earlier, now it needs to passed as `theme`.
