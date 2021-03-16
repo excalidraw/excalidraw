@@ -711,7 +711,7 @@ exportToSvg({
 | elements | [Excalidraw Element []](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78) |  | The elements to exported as svg |
 | appState | [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L42) | [defaultAppState](https://github.com/excalidraw/excalidraw/blob/master/src/appState.ts#L11) | The app state of the scene |
 | exportPadding | number | 10 | The padding to be added on canvas |
-| metadata | string | ' ' | The metadata to be embedded in svg |
+| metadata | string | '' | The metadata to be embedded in svg |
 
 This function returns a svg with the exported elements.
 
@@ -720,7 +720,7 @@ This function returns a svg with the exported elements.
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | exportBackground | boolean | true | Indicates whether background should be exported |
-| viewBackgroundColor | string | "#fff" | The default background color |
+| viewBackgroundColor | string | #fff | The default background color |
 | shouldAddWatermark | boolean | false | Indicates whether watermark should be exported |
 | exportWithDarkMode | boolean | false | Indicates whether to export with dark mode |
 
