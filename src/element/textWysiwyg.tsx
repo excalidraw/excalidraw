@@ -210,8 +210,13 @@ export const textWysiwyg = ({
     editable.focus();
   });
 
+  // ---------------------------------------------------------------------------
+
   let isDestroyed = false;
 
+  // select on init (focusing is done separately inside the bindBlurEvent()
+  // because we need to happen *after* the blur event from `pointerdown`)
+  editable.select();
   bindBlurEvent();
 
   // reposition wysiwyg in case of canvas is resized. Using ResizeObserver
@@ -234,6 +239,4 @@ export const textWysiwyg = ({
   document
     .querySelector(".excalidraw-textEditorContainer")!
     .appendChild(editable);
-  editable.focus();
-  editable.select();
 };
