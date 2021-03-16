@@ -681,10 +681,9 @@ exportToBlob(
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
+| opts |  |  | This param is passed to `exportToCanvas`. You can refer to [`exportToCanvas`](#exportToCanvas) |
 | mimeType | string | "image/png" | Indicates the image format |
 | quality | number | 0.92 | A value between 0 and 1 indicating the [image quality](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob#parameters). Applies only to `image/jpeg`/`image/webp` MIME types. |
-
-The other params are same as described in #exportToCanvas.
 
 **How to use**
 
@@ -716,9 +715,7 @@ exportToSvg({
 
 This function returns a svg with the exported elements.
 
-##### Additional attributes for `export\*` APIs
-
-For all export API's ss you can see if you don't pass appState, `defaultAppState` will be used so you might need to update the below attributes in appState depending upon requirement
+##### Additional attributes of appState for `export\*` APIs
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
