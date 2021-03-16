@@ -251,7 +251,7 @@
     "copyToClipboardAsPng": "",
     "fileSaved": "文件已保存。",
     "fileSavedToFilename": "保存到 {filename}",
-    "canvas": "",
+    "canvas": "画布",
     "selection": ""
   }
 }
