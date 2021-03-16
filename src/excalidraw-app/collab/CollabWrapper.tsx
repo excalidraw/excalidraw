@@ -259,7 +259,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
         if (elements) {
           scenePromise.resolve({
             elements,
-            scrollToCenter: true,
+            scrollToContent: true,
           });
         }
       } catch (error) {
@@ -313,7 +313,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
               // noop if already resolved via init from firebase
               scenePromise.resolve({
                 elements: reconciledElements,
-                scrollToCenter: true,
+                scrollToContent: true,
               });
             }
             break;
@@ -454,7 +454,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     }: { init?: boolean; initFromSnapshot?: boolean } = {},
   ) => {
     if (init || initFromSnapshot) {
-      this.excalidrawAPI.setScrollToCenter(elements);
+      this.excalidrawAPI.setScrollToContent(elements);
     }
 
     this.excalidrawAPI.updateScene({

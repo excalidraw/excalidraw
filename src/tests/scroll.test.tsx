@@ -6,7 +6,7 @@ import { API } from "./helpers/api";
 const { h } = window;
 
 describe("appState", () => {
-  it("scroll-to-center on init works with non-zero offsets", async () => {
+  it("scroll-to-content on init works with non-zero offsets", async () => {
     const WIDTH = 600;
     const HEIGHT = 700;
     const OFFSET_LEFT = 200;
@@ -30,7 +30,7 @@ describe("appState", () => {
               height: ELEM_HEIGHT,
             }),
           ],
-          scrollToCenter: true,
+          scrollToContent: true,
         }}
       />,
     );
