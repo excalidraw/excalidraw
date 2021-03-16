@@ -2122,6 +2122,21 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       return;
     }
 
+    // this branch must be executed before `clearSelectionIfNotUsingSelection()`
+    // below (not entirely sure why)
+    if (this.state.elementType === "text") {
+      // when creating text, we must prevent default otherwise the wysiwyg
+      // would get blurred (submitted) right away
+      event.preventDefault();
+    }
+    // Since we potentially prevent default above, we must manually blur any
+    // active inputs (e.g. wysiwyg) when clicking on canvas.
+    // For some reason, this must also be done so as to not select the text
+    // element when confirming it by clicking outside.
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+
     this.clearSelectionIfNotUsingSelection();
     this.updateBindingEnabledOnPointerMove(event);
 
