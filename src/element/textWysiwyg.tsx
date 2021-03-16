@@ -215,7 +215,7 @@ export const textWysiwyg = ({
   let isDestroyed = false;
 
   // select on init (focusing is done separately inside the bindBlurEvent()
-  // because we need to happen *after* the blur event from `pointerdown`)
+  // because we need it to happen *after* the blur event from `pointerdown`)
   editable.select();
   bindBlurEvent();
 
