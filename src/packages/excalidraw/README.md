@@ -636,7 +636,7 @@ import { restore } from "@excalidraw/excalidraw";
 
 This function makes sure elements and state is set to appropriate values and set to default value if not present. It is combination of [restoreElements](#restoreElements) and [restoreAppState](#restoreAppState)
 
-**_The below API's will be available in [next version](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/CHANGELOG.md#unreleased)_**
+**_The below APIs will be available in [next version](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/CHANGELOG.md#unreleased)_**
 
 <details id="export-utils">
 <summary><strong>Export utilities</strong></summary>
