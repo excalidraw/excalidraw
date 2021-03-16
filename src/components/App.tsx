@@ -1079,7 +1079,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   private onTapEnd = (event: TouchEvent) => {
-    event.preventDefault();
     if (event.touches.length > 0) {
       this.setState({
         previousSelectedElementIds: {},
