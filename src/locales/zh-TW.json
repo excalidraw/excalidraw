@@ -93,7 +93,8 @@
     "distributeHorizontally": "水平分布",
     "distributeVertically": "垂直分布",
     "viewMode": "檢視模式",
-    "toggleExportColorScheme": "切換輸出配色"
+    "toggleExportColorScheme": "切換輸出配色",
+    "share": "共享"
   },
   "buttons": {
     "clearReset": "重置 canvas",
@@ -199,7 +200,8 @@
     "button_stopSession": "停止連線",
     "desc_inProgressIntro": "即時協作連線正在進行中。",
     "desc_shareLink": "將此連結分享給欲協作的對象：",
-    "desc_exitSession": "停止連線將中斷你與協作會議室的連結，但你仍可於本機編輯此作品。意指停止連線後你的編輯不會被先前共同協作的人看見，且他們可繼續共同協作另一個版本。"
+    "desc_exitSession": "停止連線將中斷你與協作會議室的連結，但你仍可於本機編輯此作品。意指停止連線後你的編輯不會被先前共同協作的人看見，且他們可繼續共同協作另一個版本。",
+    "shareTitle": "加入 Excalidraw 上的即時協作會議室"
   },
   "errorDialog": {
     "title": "錯誤"

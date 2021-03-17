@@ -93,7 +93,8 @@
     "distributeHorizontally": "수평으로 분배",
     "distributeVertically": "수직으로 분배",
     "viewMode": "보기 모드",
-    "toggleExportColorScheme": ""
+    "toggleExportColorScheme": "",
+    "share": ""
   },
   "buttons": {
     "clearReset": "캔버스 초기화",
@@ -199,7 +200,8 @@
     "button_stopSession": "세션 중단",
     "desc_inProgressIntro": "실시간 협업 세션이 진행 중입니다.",
     "desc_shareLink": "공동 작업자에게 이 링크를 공유하세요.",
-    "desc_exitSession": "세션을 중단하면 연결은 끊어지나 작업을 이어갈 수 있습니다. 이 작업은 다른 작업자에게 영향을 미치지 않으며 각자의 공동 작업은 계속 유지됩니다."
+    "desc_exitSession": "세션을 중단하면 연결은 끊어지나 작업을 이어갈 수 있습니다. 이 작업은 다른 작업자에게 영향을 미치지 않으며 각자의 공동 작업은 계속 유지됩니다.",
+    "shareTitle": ""
   },
   "errorDialog": {
     "title": "오류"

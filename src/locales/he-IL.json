@@ -93,7 +93,8 @@
     "distributeHorizontally": "חלוקה אופקית",
     "distributeVertically": "חלוקה אנכית",
     "viewMode": "מצב תצוגה",
-    "toggleExportColorScheme": ""
+    "toggleExportColorScheme": "",
+    "share": ""
   },
   "buttons": {
     "clearReset": "אפס את הלוח",
@@ -199,7 +200,8 @@
     "button_stopSession": "הפסק שיתוף",
     "desc_inProgressIntro": "שיתוף חי כרגע בפעולה.",
     "desc_shareLink": "שתף את הקישור עם כל מי שאתה מעוניין לעבוד אתו:",
-    "desc_exitSession": "עצירת השיתוף תנתק אותך מהחדר, אבל עדיין תוכל להמשיך לעבוד על הלוח, מקומית. שים לב שזה לא ישפיע על אנשים אחרים, והם עדיין יוכלו לשתף פעולה עם הגירסה שלהם."
+    "desc_exitSession": "עצירת השיתוף תנתק אותך מהחדר, אבל עדיין תוכל להמשיך לעבוד על הלוח, מקומית. שים לב שזה לא ישפיע על אנשים אחרים, והם עדיין יוכלו לשתף פעולה עם הגירסה שלהם.",
+    "shareTitle": ""
   },
   "errorDialog": {
     "title": "שגיאה"

@@ -26,7 +26,7 @@
     "@types/jest": "26.0.20",
     "@types/react": "17.0.2",
     "@types/react-dom": "17.0.1",
-    "@types/socket.io-client": "1.4.35",
+    "@types/socket.io-client": "1.4.36",
     "browser-fs-access": "0.14.2",
     "clsx": "1.1.1",
     "firebase": "8.2.10",

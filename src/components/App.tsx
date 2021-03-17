@@ -271,7 +271,7 @@ export type ExcalidrawImperativeAPI = {
   history: {
     clear: InstanceType<typeof App>["resetHistory"];
   };
-  setScrollToCenter: InstanceType<typeof App>["setScrollToCenter"];
+  setScrollToContent: InstanceType<typeof App>["setScrollToContent"];
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
   getAppState: () => InstanceType<typeof App>["state"];
   readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
@@ -303,9 +303,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       viewModeEnabled = false,
       zenModeEnabled = false,
       gridModeEnabled = false,
+      theme = defaultAppState.theme,
     } = props;
     this.state = {
       ...defaultAppState,
+      theme,
       isLoading: true,
       width,
       height,
@@ -328,7 +330,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         history: {
           clear: this.resetHistory,
         },
-        setScrollToCenter: this.setScrollToCenter,
+        setScrollToContent: this.setScrollToContent,
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
       } as const;
@@ -458,6 +460,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           showExitZenModeBtn={
             typeof this.props?.zenModeEnabled === "undefined" && zenModeEnabled
           }
+          showThemeBtn={typeof this.props?.theme === "undefined"}
           libraryReturnUrl={this.props.libraryReturnUrl}
         />
         <div className="excalidraw-textEditorContainer" />
@@ -519,6 +522,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         let viewModeEnabled = actionResult?.appState?.viewModeEnabled || false;
         let zenModeEnabled = actionResult?.appState?.zenModeEnabled || false;
         let gridSize = actionResult?.appState?.gridSize || null;
+        let theme = actionResult?.appState?.theme || "light";
 
         if (typeof this.props.viewModeEnabled !== "undefined") {
           viewModeEnabled = this.props.viewModeEnabled;
@@ -530,6 +534,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
         if (typeof this.props.gridModeEnabled !== "undefined") {
           gridSize = this.props.gridModeEnabled ? GRID_SIZE : null;
+        }
+
+        if (typeof this.props.theme !== "undefined") {
+          theme = this.props.theme;
         }
 
         this.setState(
@@ -547,6 +555,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               viewModeEnabled,
               zenModeEnabled,
               gridSize,
+              theme,
             });
           },
           () => {
@@ -676,7 +685,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       ...scene.appState,
       isLoading: false,
     };
-    if (initialData?.scrollToCenter) {
+    if (initialData?.scrollToContent) {
       scene.appState = {
         ...scene.appState,
         ...calculateScrollCenter(
@@ -880,6 +889,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     if (prevProps.zenModeEnabled !== this.props.zenModeEnabled) {
       this.setState({ zenModeEnabled: !!this.props.zenModeEnabled });
+    }
+
+    if (prevProps.theme !== this.props.theme && this.props.theme) {
+      this.setState({ theme: this.props.theme });
     }
 
     if (prevProps.gridModeEnabled !== this.props.gridModeEnabled) {
@@ -1092,7 +1105,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   private onTapEnd = (event: TouchEvent) => {
-    event.preventDefault();
     if (event.touches.length > 0) {
       this.setState({
         previousSelectedElementIds: {},
@@ -1269,7 +1281,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.actionManager.executeAction(actionToggleStats);
   };
 
-  setScrollToCenter = (remoteElements: readonly ExcalidrawElement[]) => {
+  setScrollToContent = (remoteElements: readonly ExcalidrawElement[]) => {
     this.setState({
       ...calculateScrollCenter(
         getNonDeletedElements(remoteElements),
@@ -1618,10 +1630,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           updateBoundElements(element);
         }
       }),
-      onSubmit: withBatchedUpdates((text) => {
+      onSubmit: withBatchedUpdates(({ text, viaKeyboard }) => {
         const isDeleted = !text.trim();
         updateElement(text, isDeleted);
-        if (!isDeleted) {
+        // select the created text element only if submitting via keyboard
+        // (when submitting via click it should act as signal to deselect)
+        if (!isDeleted && viaKeyboard) {
           this.setState((prevState) => ({
             selectedElementIds: {
               ...prevState.selectedElementIds,
@@ -2137,15 +2151,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     this.updateGestureOnPointerDown(event);
-
-    // fixes pointermove causing selection of UI texts #32
-    event.preventDefault();
-    // Preventing the event above disables default behavior
-    // of defocusing potentially focused element, which is what we
-    // want when clicking inside the canvas.
-    if (document.activeElement instanceof HTMLElement) {
-      document.activeElement.blur();
-    }
 
     // don't select while panning
     if (gesture.pointers.size > 1) {

@@ -2049,9 +2049,9 @@
   dependencies:
     "@types/node" "*"
 
-"@types/socket.io-client@1.4.35":
-  version "1.4.35"
-  resolved "https://registry.npmjs.org/@types/socket.io-client/-/socket.io-client-1.4.35.tgz"
+"@types/socket.io-client@1.4.36":
+  version "1.4.36"
+  resolved "https://registry.yarnpkg.com/@types/socket.io-client/-/socket.io-client-1.4.36.tgz#e4f1ca065f84c20939e9850e70222202bd76ff3f"
 
 "@types/source-list-map@*":
   version "0.1.2"

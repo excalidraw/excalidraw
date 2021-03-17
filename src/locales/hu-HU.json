@@ -93,7 +93,8 @@
     "distributeHorizontally": "Vízszintes elosztás",
     "distributeVertically": "Függőleges elosztás",
     "viewMode": "",
-    "toggleExportColorScheme": ""
+    "toggleExportColorScheme": "",
+    "share": ""
   },
   "buttons": {
     "clearReset": "Vászon törlése",
@@ -199,7 +200,8 @@
     "button_stopSession": "Munkamenet leállítása",
     "desc_inProgressIntro": "Az élő együttműködési munkamenet folyamatban van.",
     "desc_shareLink": "Ossza meg ezt a linket bárkivel, akivel együtt szeretne működni:",
-    "desc_exitSession": "Az munkamenet leállítása kilépteti önt a szobából, de folytathatja a munkát a saját gépén. Vegye figyelembe, hogy ez nem érinti más emberek munkáját és ők továbbra is együttműködhetnek a saját változatukon."
+    "desc_exitSession": "Az munkamenet leállítása kilépteti önt a szobából, de folytathatja a munkát a saját gépén. Vegye figyelembe, hogy ez nem érinti más emberek munkáját és ők továbbra is együttműködhetnek a saját változatukon.",
+    "shareTitle": ""
   },
   "errorDialog": {
     "title": "Hiba"
