@@ -40,7 +40,6 @@ export const KEYS = {
   TAB: "Tab",
 
   A: "a",
-  C: "c",
   D: "d",
   E: "e",
   L: "l",
