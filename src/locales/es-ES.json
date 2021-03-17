@@ -93,7 +93,8 @@
     "distributeHorizontally": "Distribuir horizontalmente",
     "distributeVertically": "Distribuir verticalmente",
     "viewMode": "Modo presentación",
-    "toggleExportColorScheme": "Cambiar el esquema de colores de exportación"
+    "toggleExportColorScheme": "Cambiar el esquema de colores de exportación",
+    "share": "Compartir"
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
@@ -199,7 +200,8 @@
     "button_stopSession": "Detener sesión",
     "desc_inProgressIntro": "La sesión de colaboración en vivo está ahora en progreso.",
     "desc_shareLink": "Comparte este enlace con cualquier persona con quien quieras colaborar:",
-    "desc_exitSession": "Detener la sesión te desconectará de la sala, pero podrás seguir trabajando con la escena en su computadora, esto es de modo local. Ten en cuenta que esto no afectará a otras personas, y que las mismas seguirán siendo capaces de colaborar en tu escena."
+    "desc_exitSession": "Detener la sesión te desconectará de la sala, pero podrás seguir trabajando con la escena en su computadora, esto es de modo local. Ten en cuenta que esto no afectará a otras personas, y que las mismas seguirán siendo capaces de colaborar en tu escena.",
+    "shareTitle": "Únete a una sesión colaborativa en directo en Excalidraw"
   },
   "errorDialog": {
     "title": "Error"

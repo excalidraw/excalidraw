@@ -93,7 +93,8 @@
     "distributeHorizontally": "Distribusikan horizontal",
     "distributeVertically": "Distribusikan vertikal",
     "viewMode": "Mode tampilan",
-    "toggleExportColorScheme": "Ubah skema warna ekspor"
+    "toggleExportColorScheme": "Ubah skema warna ekspor",
+    "share": "Bagikan"
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
@@ -199,7 +200,8 @@
     "button_stopSession": "Hentikan sesi",
     "desc_inProgressIntro": "Sesi kolaborasi sedang berlangsung sekarang.",
     "desc_shareLink": "Bagikan tautan ini dengan siapa pun yang Anda inginkan untuk kolaborasi bersama:",
-    "desc_exitSession": "Menghentikan sesi akan memutuskan hubungan Anda dari ruangan, tetapi Anda dapat melanjutkan bekerja dengan pemandangan Anda secara lokal. Perhatikan bahwa ini tidak memengaruhi orang lain, dan mereka masih dapat berkolaborasi pada versi mereka."
+    "desc_exitSession": "Menghentikan sesi akan memutuskan hubungan Anda dari ruangan, tetapi Anda dapat melanjutkan bekerja dengan pemandangan Anda secara lokal. Perhatikan bahwa ini tidak memengaruhi orang lain, dan mereka masih dapat berkolaborasi pada versi mereka.",
+    "shareTitle": "Gabung sesi kolaborasi langsung di Excalidraw"
   },
   "errorDialog": {
     "title": "Kesalahan"

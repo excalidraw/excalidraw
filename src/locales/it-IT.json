@@ -93,7 +93,8 @@
     "distributeHorizontally": "Distribuisci orizzontalmente",
     "distributeVertically": "Distribuisci verticalmente",
     "viewMode": "Modalità visualizzazione",
-    "toggleExportColorScheme": "Cambia lo schema di colori in esportazione"
+    "toggleExportColorScheme": "Cambia lo schema di colori in esportazione",
+    "share": "Condividi"
   },
   "buttons": {
     "clearReset": "Svuota la tela",
@@ -199,7 +200,8 @@
     "button_stopSession": "Termina sessione",
     "desc_inProgressIntro": "La sessione di collaborazione è attualmente in corso.",
     "desc_shareLink": "Condividi questo link con chiunque desideri collaborare:",
-    "desc_exitSession": "Interrompere la sessione scollegherà la tua stanza ma potrai continuare a lavorare con la scena, localmente. Tieni presente che questo non influirà sulle altre persone, e che saranno ancora in grado di collaborare alla loro versione."
+    "desc_exitSession": "Interrompere la sessione scollegherà la tua stanza ma potrai continuare a lavorare con la scena, localmente. Tieni presente che questo non influirà sulle altre persone, e che saranno ancora in grado di collaborare alla loro versione.",
+    "shareTitle": "Partecipa a una sessione di collaborazione live su Excalidraw"
   },
   "errorDialog": {
     "title": "Errore"

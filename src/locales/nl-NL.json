@@ -93,7 +93,8 @@
     "distributeHorizontally": "Horizontaal verspreiden",
     "distributeVertically": "Verticaal distribueren",
     "viewMode": "Weergavemodus",
-    "toggleExportColorScheme": "Kleurenschema exporteren aan/uit"
+    "toggleExportColorScheme": "Kleurenschema exporteren aan/uit",
+    "share": "Deel"
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
@@ -199,7 +200,8 @@
     "button_stopSession": "Sessie afbreken",
     "desc_inProgressIntro": "De live-samenwerkingssessie is nu gestart.",
     "desc_shareLink": "Deel deze link met iedereen waarmee je wil samenwerken:",
-    "desc_exitSession": "Het stoppen van de sessie zal je loskoppelen van de kamer, maar je kunt lokaal doorwerken met de scène.\nPas op: dit heeft geen invloed op andere mensen en dat zij nog steeds in staat zullen zijn om samen te werken aan hun versie."
+    "desc_exitSession": "Het stoppen van de sessie zal je loskoppelen van de kamer, maar je kunt lokaal doorwerken met de scène.\nPas op: dit heeft geen invloed op andere mensen en dat zij nog steeds in staat zullen zijn om samen te werken aan hun versie.",
+    "shareTitle": "Neem deel aan een live samenwerkingssessie op Excalidraw"
   },
   "errorDialog": {
     "title": "Fout"

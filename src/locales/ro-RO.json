@@ -93,7 +93,8 @@
     "distributeHorizontally": "Distribuie orizontal",
     "distributeVertically": "Distribuie vertical",
     "viewMode": "Mod de vizualizare",
-    "toggleExportColorScheme": "Comutare schemă de culori de export"
+    "toggleExportColorScheme": "Comutare schemă de culori de export",
+    "share": "Distribuie"
   },
   "buttons": {
     "clearReset": "Resetare pânză",
@@ -199,7 +200,8 @@
     "button_stopSession": "Oprire sesiune",
     "desc_inProgressIntro": "Sesiunea de colaborare în direct este în curs de desfășurare.",
     "desc_shareLink": "Distribuie această legătură persoanelor cu care dorești să colaborezi:",
-    "desc_exitSession": "Oprirea sesiunii te va deconecta de la sală, însă vei putea lucra în continuare, pe plan local, cu scena. Reține că această opțiune nu va afecta alte persoane, iar acestea vor putea să colaboreze în continuare pe versiunea lor."
+    "desc_exitSession": "Oprirea sesiunii te va deconecta de la sală, însă vei putea lucra în continuare, pe plan local, cu scena. Reține că această opțiune nu va afecta alte persoane, iar acestea vor putea să colaboreze în continuare pe versiunea lor.",
+    "shareTitle": "Alătură-te unei sesiuni de colaborare în direct pe Excalidraw"
   },
   "errorDialog": {
     "title": "Eroare"
