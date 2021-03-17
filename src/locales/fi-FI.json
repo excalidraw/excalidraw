@@ -93,7 +93,8 @@
     "distributeHorizontally": "Jaa vaakasuunnassa",
     "distributeVertically": "Jaa pystysuunnassa",
     "viewMode": "Katselutila",
-    "toggleExportColorScheme": "Vaihda viennin väriteema"
+    "toggleExportColorScheme": "Vaihda viennin väriteema",
+    "share": "Jaa"
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
@@ -199,7 +200,8 @@
     "button_stopSession": "Lopeta istunto",
     "desc_inProgressIntro": "Jaettu istunto on nyt käynnissä.",
     "desc_shareLink": "Jaa tämä linkki kenelle tahansa, jonka kanssa haluat tehdä yhteistyötä:",
-    "desc_exitSession": "Istunnon pysäyttäminen katkaisee yhteyden huoneeseen, mutta voit vielä jatkaa työskentelyä paikallisesti. Huomaa, että tämä ei vaikuta muihin käyttäjiin ja he voivat jatkaa oman versionsa parissa työskentelyä."
+    "desc_exitSession": "Istunnon pysäyttäminen katkaisee yhteyden huoneeseen, mutta voit vielä jatkaa työskentelyä paikallisesti. Huomaa, että tämä ei vaikuta muihin käyttäjiin ja he voivat jatkaa oman versionsa parissa työskentelyä.",
+    "shareTitle": "Liity Excalidraw live-yhteistyöistuntoon"
   },
   "errorDialog": {
     "title": "Virhe"
