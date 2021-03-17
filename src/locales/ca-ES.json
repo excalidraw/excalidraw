@@ -93,7 +93,8 @@
     "distributeHorizontally": "Distribuir horitzontalment",
     "distributeVertically": "Distribuir verticalment",
     "viewMode": "Mode de visualització",
-    "toggleExportColorScheme": ""
+    "toggleExportColorScheme": "Canvia l'esquema de colors de l'exportació",
+    "share": "Compartir"
   },
   "buttons": {
     "clearReset": "Netejar el llenç",
@@ -142,7 +143,7 @@
     "confirmAddLibrary": "Això afegirà {{numShapes}} forma(es) a la vostra biblioteca. Estàs segur?",
     "imageDoesNotContainScene": "En aquest moment no s’admet la importació d’imatges.\n\nVolies importar una escena? Sembla que aquesta imatge no conté cap dada d’escena. Ho has activat durant l'exportació?",
     "cannotRestoreFromImage": "L’escena no s’ha pogut restaurar des d’aquest fitxer d’imatge",
-    "invalidSceneUrl": "",
+    "invalidSceneUrl": "No s'ha pogut importar l'escena des de l'adreça URL proporcionada. Està malformada o no conté dades Excalidraw JSON vàlides.",
     "resetLibrary": "Tot el llenç s'esborrarà. Estàs segur?"
   },
   "toolBar": {
@@ -199,7 +200,8 @@
     "button_stopSession": "Aturar sessió",
     "desc_inProgressIntro": "La sessió de col·laboració en directe està en marxa.",
     "desc_shareLink": "Comparteix aquest enllaç amb qualsevol persona amb qui vulguis col·laborar:",
-    "desc_exitSession": "Si aturas la sessió, et desconectarás de la sala, però podrás continuar treballant amb el dibuix localment. Tingues en compte que això no afectarà a altres persones, i encara podran col·laborar en la seva versió."
+    "desc_exitSession": "Si aturas la sessió, et desconectarás de la sala, però podrás continuar treballant amb el dibuix localment. Tingues en compte que això no afectarà a altres persones, i encara podran col·laborar en la seva versió.",
+    "shareTitle": "Uniu-vos a una sessió de col·laboració en directe a Excalidraw"
   },
   "errorDialog": {
     "title": "Error"
@@ -240,16 +242,16 @@
     "total": "Total",
     "version": "Versió",
     "versionCopy": "Feu clic per a copiar",
-    "versionNotAvailable": "",
+    "versionNotAvailable": "Versió no disponible",
     "width": "Amplada"
   },
   "toast": {
-    "copyStyles": "",
-    "copyToClipboard": "",
-    "copyToClipboardAsPng": "",
-    "fileSaved": "",
-    "fileSavedToFilename": "",
-    "canvas": "",
-    "selection": ""
+    "copyStyles": "S'han copiat els estils.",
+    "copyToClipboard": "S'ha copiat al porta-retalls.",
+    "copyToClipboardAsPng": "S'ha copiat {{exportSelection}} al porta-retalls en format PNG\n({{exportColorScheme}})",
+    "fileSaved": "S'ha desat el fitxer.",
+    "fileSavedToFilename": "S'ha desat a {filename}",
+    "canvas": "el llenç",
+    "selection": "la selecció"
   }
 }

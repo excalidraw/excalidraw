@@ -93,7 +93,8 @@
     "distributeHorizontally": "水平等距分布",
     "distributeVertically": "垂直等距分布",
     "viewMode": "查看模式",
-    "toggleExportColorScheme": "切换导出配色方案"
+    "toggleExportColorScheme": "切换导出配色方案",
+    "share": "分享"
   },
   "buttons": {
     "clearReset": "重置画布",
@@ -142,7 +143,7 @@
     "confirmAddLibrary": "这将添加 {{numShapes}} 个形状到您的库。您确定吗？",
     "imageDoesNotContainScene": "当前不支持导入图片。\n\n您想要导入画布数据吗？此图像似乎不包含任何画布数据。您是否在导出过程中启用了嵌入画布的选项？",
     "cannotRestoreFromImage": "无法从此图像文件恢复画布",
-    "invalidSceneUrl": "",
+    "invalidSceneUrl": "无法从提供的 URL 导入场景。它或者格式不正确，或者不包含有效的 Excalidraw JSON 数据。",
     "resetLibrary": "这将会清除你的资源库。你确定这么做吗？"
   },
   "toolBar": {
@@ -199,7 +200,8 @@
     "button_stopSession": "结束会议",
     "desc_inProgressIntro": "实时协作会议正在进行。",
     "desc_shareLink": "分享此链接给你要协作的用户",
-    "desc_exitSession": "停止会话将中断您在与房间的连接，但您依然可以在本地继续使用画布. 请注意，这不会影响到其他用户, 他们仍可以在他们的版本上继续协作。"
+    "desc_exitSession": "停止会话将中断您在与房间的连接，但您依然可以在本地继续使用画布. 请注意，这不会影响到其他用户, 他们仍可以在他们的版本上继续协作。",
+    "shareTitle": "加入 Excalidraw 实时协作会议"
   },
   "errorDialog": {
     "title": "错误"
@@ -246,10 +248,10 @@
   "toast": {
     "copyStyles": "复制样式",
     "copyToClipboard": "已复制到剪切板。",
-    "copyToClipboardAsPng": "",
+    "copyToClipboardAsPng": "已将 {{exportSelection}} 作为 PNG 复制到剪贴板\n({{exportColorScheme}})",
     "fileSaved": "文件已保存。",
     "fileSavedToFilename": "保存到 {filename}",
-    "canvas": "",
-    "selection": ""
+    "canvas": "画布",
+    "selection": "选择项"
   }
 }
