@@ -4002,9 +4002,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
   }, 300);
 
-  private setCanvasOffsets() {
+  public setCanvasOffsets = () => {
     this.setState({ ...this.getCanvasOffsets() });
-  }
+  };
+
   private getCanvasOffsets(): Pick<AppState, "offsetTop" | "offsetLeft"> {
     if (this.excalidrawContainerRef?.current?.parentElement) {
       const parentElement = this.excalidrawContainerRef.current.parentElement;
