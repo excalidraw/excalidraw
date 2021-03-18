@@ -93,6 +93,7 @@ export type AppState = {
   theme: "light" | "dark";
   gridSize: number | null;
   viewModeEnabled: boolean;
+  customName: boolean;
 
   /** top-most selected groups (i.e. does not include nested groups) */
   selectedGroupIds: { [groupId: string]: boolean };
@@ -191,8 +192,7 @@ export interface ExcalidrawProps {
   gridModeEnabled?: boolean;
   libraryReturnUrl?: string;
   theme?: "dark" | "light";
-  exportName?: string;
-  onExportNameChange?: (name: string) => void;
+  name?: string;
 }
 
 export type SceneData = {

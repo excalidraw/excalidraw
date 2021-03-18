@@ -378,8 +378,7 @@ export default function IndexPage() {
 | [`gridModeEnabled`](#gridModeEnabled) | boolean |  | This implies if the grid mode is enabled |
 | [`libraryReturnUrl`](#libraryReturnUrl) | string |  | What URL should [libraries.excalidraw.com](https://libraries.excalidraw.com) be installed to |
 | [`theme`](#theme) | `light` or `dark` |  | The theme of the Excalidraw component |
-| [`exportName`](#exportName) | string |  | Name of the drawing |
-| [`onExportNameChange`](#onExportNameChange) | Function |  | Callback triggered when name is updated |
+| [`name`](#name) | string |  | Name of the drawing |
 
 #### `width`
 
@@ -545,13 +544,9 @@ If supplied, this URL will be used when user tries to install a library from [li
 
 This prop controls Excalidraw's theme. When supplied, the value takes precedence over `intialData.appState.theme`, the theme will be fully controlled by the host app, and users won't be able to toggle it from within the app.
 
-### `exportName`
+### `name`
 
 This prop sets the export name of the drawing. When supplied, the value takes precedence over `intialData.appState.name`.
-
-### `onExportNameChange`
-
-This callback is triggered when export name is updated.
 
 ### Extra API's
 

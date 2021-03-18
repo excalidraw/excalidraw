@@ -23,6 +23,7 @@ export const actionChangeProjectName = register({
       label={t("labels.fileTitle")}
       value={appState.name || "Unnamed"}
       onChange={(name: string) => updateData(name)}
+      customName={appState.customName}
     />
   ),
 });

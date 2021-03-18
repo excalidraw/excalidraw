@@ -304,7 +304,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       zenModeEnabled = false,
       gridModeEnabled = false,
       theme = defaultAppState.theme,
-      exportName = defaultAppState.name,
+      name,
     } = props;
     this.state = {
       ...defaultAppState,
@@ -316,7 +316,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       viewModeEnabled,
       zenModeEnabled,
       gridSize: gridModeEnabled ? GRID_SIZE : null,
-      name: exportName,
+      name: name ? name : defaultAppState.name,
+      customName: typeof name === "string",
     };
     if (excalidrawRef) {
       const readyPromise =
@@ -525,6 +526,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         let zenModeEnabled = actionResult?.appState?.zenModeEnabled || false;
         let gridSize = actionResult?.appState?.gridSize || null;
         let theme = actionResult?.appState?.theme || "light";
+        let name = actionResult?.appState?.name || this.state.name;
 
         if (typeof this.props.viewModeEnabled !== "undefined") {
           viewModeEnabled = this.props.viewModeEnabled;
@@ -540,6 +542,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
         if (typeof this.props.theme !== "undefined") {
           theme = this.props.theme;
+        }
+
+        if (typeof this.props.name !== "undefined") {
+          name = this.props.name;
         }
 
         this.setState(
@@ -558,6 +564,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               zenModeEnabled,
               gridSize,
               theme,
+              name,
+              customName: typeof this.props.name === "string",
             });
           },
           () => {
@@ -903,17 +911,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
     }
 
-    if (
-      prevProps.exportName !== this.props.exportName &&
-      this.props.exportName
-    ) {
+    if (prevProps.name !== this.props.name && this.props.name) {
       this.setState({
-        name: this.props.exportName,
+        name: this.props.name,
       });
-    }
-
-    if (this.props.onExportNameChange && prevState.name !== this.state.name) {
-      this.props.onExportNameChange(this.state.name);
     }
 
     document
