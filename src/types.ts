@@ -191,6 +191,8 @@ export interface ExcalidrawProps {
   gridModeEnabled?: boolean;
   libraryReturnUrl?: string;
   theme?: "dark" | "light";
+  exportName?: string;
+  onExportNameChange?: (name: string) => void;
 }
 
 export type SceneData = {

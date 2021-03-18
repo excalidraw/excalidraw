@@ -304,6 +304,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       zenModeEnabled = false,
       gridModeEnabled = false,
       theme = defaultAppState.theme,
+      exportName = defaultAppState.name,
     } = props;
     this.state = {
       ...defaultAppState,
@@ -315,6 +316,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       viewModeEnabled,
       zenModeEnabled,
       gridSize: gridModeEnabled ? GRID_SIZE : null,
+      name: exportName,
     };
     if (excalidrawRef) {
       const readyPromise =
@@ -900,6 +902,20 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         gridSize: this.props.gridModeEnabled ? GRID_SIZE : null,
       });
     }
+
+    if (
+      prevProps.exportName !== this.props.exportName &&
+      this.props.exportName
+    ) {
+      this.setState({
+        name: this.props.exportName,
+      });
+    }
+
+    if (this.props.onExportNameChange && prevState.name !== this.state.name) {
+      this.props.onExportNameChange(this.state.name);
+    }
+
     document
       .querySelector(".excalidraw")
       ?.classList.toggle("theme--dark", this.state.theme === "dark");
