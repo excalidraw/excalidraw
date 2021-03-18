@@ -93,7 +93,8 @@
     "distributeHorizontally": "Distribuer horisontalt",
     "distributeVertically": "Distribuer vertikalt",
     "viewMode": "Visningsmodus",
-    "toggleExportColorScheme": "Veksle eksport av fargepalett"
+    "toggleExportColorScheme": "Veksle eksport av fargepalett",
+    "share": "Del"
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
@@ -199,7 +200,8 @@
     "button_stopSession": "Stopp sesjon",
     "desc_inProgressIntro": "Sanntids-samarbeidsøkt er nå i gang.",
     "desc_shareLink": "Del denne linken med de du vil samarbeide med:",
-    "desc_exitSession": "Dersom du avslutter sesjonen blir du frakoblet rommet, men du kan fortsette å arbeide med scenen lokalt. Vær oppmerksom på at dette ikke vil påvirke andre personer, og de vil fortsatt ha mulighet til å samarbeide på deres versjon."
+    "desc_exitSession": "Dersom du avslutter sesjonen blir du frakoblet rommet, men du kan fortsette å arbeide med scenen lokalt. Vær oppmerksom på at dette ikke vil påvirke andre personer, og de vil fortsatt ha mulighet til å samarbeide på deres versjon.",
+    "shareTitle": "Bli med i en live samarbeidsøkt på Excalidraw"
   },
   "errorDialog": {
     "title": "Feil"

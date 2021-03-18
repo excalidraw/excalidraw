@@ -1037,13 +1037,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   });
 
   private onCopy = withBatchedUpdates((event: ClipboardEvent) => {
-    const activeSelection = document.getSelection();
-    if (
-      activeSelection?.anchorNode &&
-      !this.excalidrawContainerRef.current!.contains(activeSelection.anchorNode)
-    ) {
-      return;
-    }
     if (isWritableElement(event.target)) {
       return;
     }
