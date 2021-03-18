@@ -7,7 +7,7 @@ type Props = {
   value: string;
   onChange: (value: string) => void;
   label: string;
-  customName: boolean;
+  isNameEditable: boolean;
 };
 
 export class ProjectName extends Component<Props> {
@@ -44,7 +44,7 @@ export class ProjectName extends Component<Props> {
   };
 
   public render() {
-    return this.props.customName ? (
+    return this.props.isNameEditable ? (
       <span className="TextInput" aria-label={this.props.label}>
         {this.props.value}
       </span>

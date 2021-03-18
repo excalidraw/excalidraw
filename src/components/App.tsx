@@ -304,7 +304,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       zenModeEnabled = false,
       gridModeEnabled = false,
       theme = defaultAppState.theme,
-      name,
+      name = defaultAppState.name,
     } = props;
     this.state = {
       ...defaultAppState,
@@ -316,8 +316,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       viewModeEnabled,
       zenModeEnabled,
       gridSize: gridModeEnabled ? GRID_SIZE : null,
-      name: name ? name : defaultAppState.name,
-      customName: typeof name === "string",
+      name,
     };
     if (excalidrawRef) {
       const readyPromise =
@@ -565,7 +564,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               gridSize,
               theme,
               name,
-              customName: typeof this.props.name === "string",
             });
           },
           () => {
