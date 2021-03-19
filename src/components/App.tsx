@@ -1058,6 +1058,21 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   });
 
   private onCopy = withBatchedUpdates((event: ClipboardEvent) => {
+    const activeSelection = document.getSelection();
+    // if there's a selected text is outside the component, prevent our copy
+    // action
+    if (
+      activeSelection?.anchorNode &&
+      // it can happen that certain interactions will create a selection
+      // outside (or potentially inside) the component without actually
+      // selecting anything (i.e. the selection range is collapsed). Copying
+      // in such case wouldn't copy anything to the clipboard anyway, so prevent
+      // our copy handler only if the selection isn't collapsed
+      !activeSelection.isCollapsed &&
+      !this.excalidrawContainerRef.current!.contains(activeSelection.anchorNode)
+    ) {
+      return;
+    }
     if (isWritableElement(event.target)) {
       return;
     }
@@ -2128,6 +2143,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     event.persist();
+
+    // remove any active selection when we start to interact with canvas
+    // (mainly, we care about removing selection outside the component which
+    //  would prevent our copy handling otherwise)
+    const selection = document.getSelection();
+    if (selection?.anchorNode) {
+      selection.removeAllRanges();
+    }
 
     this.maybeOpenContextMenuAfterPointerDownOnTouchDevices(event);
     this.maybeCleanupAfterMissingPointerUp(event);
