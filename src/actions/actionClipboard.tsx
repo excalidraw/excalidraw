@@ -17,7 +17,8 @@ export const actionCopy = register({
     };
   },
   contextItemLabel: "labels.copy",
-  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.code === CODES.C,
+  // don't supply a shortcut since we handle this conditionally via onCopy event
+  keyTest: undefined,
 });
 
 export const actionCut = register({
