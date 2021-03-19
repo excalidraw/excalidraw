@@ -455,7 +455,7 @@ You can pass a `ref` when you want to access some excalidraw APIs. We expose the
 | getAppState | <pre> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37">AppState</a></pre> | Returns current appState |
 | history | `{ clear: () => void }` | This is the history API. `history.clear()` will clear the history |
 | setScrollToContent | <pre> (<a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>) => void </pre> | Scroll to the nearest element to center |
-| setCanvasOffsets | `() => void` | This API when triggered will update the offsets for the excalidraw component. You can trigger this API for use cases when Excalidraw dimensions /position is getting updated due to some activity in host example due to collapsing sidebar. |
+| setCanvasOffsets | `() => void` | This API when triggered will update the offsets for the Excalidraw component so that the coordinates are computed correctly for example to show cursor at right position. You can trigger this API for use cases when Excalidraw dimensions /position is getting updated due to some activity in host example due to collapsing sidebar. |
 
 #### `readyPromise`
 
