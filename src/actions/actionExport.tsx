@@ -23,7 +23,7 @@ export const actionChangeProjectName = register({
       label={t("labels.fileTitle")}
       value={appState.name || "Unnamed"}
       onChange={(name: string) => updateData(name)}
-      isNameEditable={typeof appProps.name !== "undefined"}
+      isNameEditable={typeof appProps.name === "undefined"}
     />
   ),
 });

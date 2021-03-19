@@ -3,6 +3,7 @@ import { fireEvent, GlobalTestState, render } from "./test-utils";
 import Excalidraw from "../packages/excalidraw/index";
 import { queryByText, queryByTestId } from "@testing-library/react";
 import { GRID_SIZE } from "../constants";
+import { t } from "../i18n";
 
 const { h } = window;
 
@@ -102,6 +103,29 @@ describe("<Excalidraw/>", () => {
       expect(h.state.theme).toBe("dark");
 
       expect(queryByTestId(container, "toggle-dark-mode")).toBe(null);
+    });
+  });
+
+  describe("Test name prop", () => {
+    it('should allow editing the export name when the name prop is "undefined"', async () => {
+      const { container } = await render(<Excalidraw />);
+      expect(h.state.name).toContain(`${t("labels.untitled")}`);
+
+      fireEvent.click(queryByTestId(container, "export-button")!);
+
+      const name = document.querySelector(".ExportDialog__name span");
+
+      expect(name?.hasAttribute("data-type")).toBe(true);
+    });
+
+    it('should not allow editing the export name when the name prop is not "undefined"', async () => {
+      const { container } = await render(<Excalidraw name="test" />);
+
+      fireEvent.click(queryByTestId(container, "export-button")!);
+
+      const name = document.querySelector(".ExportDialog__name span");
+
+      expect(name?.hasAttribute("data-type")).toBe(false);
     });
   });
 });

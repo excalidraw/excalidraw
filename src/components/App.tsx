@@ -905,7 +905,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       });
     }
 
-    if (prevProps.name !== this.props.name && this.props.name) {
+    if (this.props.name && prevProps.name !== this.props.name) {
       this.setState({
         name: this.props.name,
       });

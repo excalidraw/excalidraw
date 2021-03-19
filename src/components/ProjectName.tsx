@@ -45,10 +45,6 @@ export class ProjectName extends Component<Props> {
 
   public render() {
     return this.props.isNameEditable ? (
-      <span className="TextInput" aria-label={this.props.label}>
-        {this.props.value}
-      </span>
-    ) : (
       <span
         suppressContentEditableWarning
         ref={this.makeEditable}
@@ -60,6 +56,10 @@ export class ProjectName extends Component<Props> {
         onKeyDown={this.handleKeyDown}
         onFocus={this.handleFocus}
       >
+        {this.props.value}
+      </span>
+    ) : (
+      <span className="TextInput" aria-label={this.props.label}>
         {this.props.value}
       </span>
     );
