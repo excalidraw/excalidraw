@@ -112,9 +112,7 @@ describe("<Excalidraw/>", () => {
       expect(h.state.name).toContain(`${t("labels.untitled")}`);
 
       fireEvent.click(queryByTestId(container, "export-button")!);
-
       const name = document.querySelector(".ExportDialog__name span");
-
       expect(name?.hasAttribute("data-type")).toBe(true);
     });
 
@@ -122,9 +120,7 @@ describe("<Excalidraw/>", () => {
       const { container } = await render(<Excalidraw name="test" />);
 
       fireEvent.click(queryByTestId(container, "export-button")!);
-
       const name = document.querySelector(".ExportDialog__name span");
-
       expect(name?.hasAttribute("data-type")).toBe(false);
     });
   });
