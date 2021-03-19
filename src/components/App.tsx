@@ -2137,7 +2137,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     // (mainly, we care about removing selection outside the component which
     //  would prevent our copy handling otherwise)
     const selection = document.getSelection();
-    if (selection?.anchorNode && !selection?.isCollapsed) {
+    if (selection?.anchorNode) {
       selection.removeAllRanges();
     }
 
