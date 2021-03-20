@@ -36,7 +36,9 @@ export class ProjectName extends Component<Props, State> {
   public render() {
     return (
       <>
-        <label htmlFor="file-name">{this.props.label}</label>
+        <label htmlFor="file-name">
+          {`${this.props.label} ${this.props.isNameEditable ? "" : ":"}`}
+        </label>
         {this.props.isNameEditable ? (
           <input
             className="TextInput"

@@ -40,6 +40,7 @@
       overflow: hidden;
       text-align: center;
       margin-left: 8px;
+      text-overflow: ellipsis;
 
       &--readonly {
         background: none;
@@ -49,6 +50,7 @@
         }
         width: auto;
         max-width: 200px;
+        padding-left: 2px;
       }
     }
   }
