@@ -124,7 +124,7 @@ describe("<Excalidraw/>", () => {
 
       await fireEvent.click(queryByTestId(container, "export-button")!);
       const textInput = document.querySelector(
-        ".ExportDialog__name .TextInput",
+        ".ExportDialog__name .TextInput--readonly",
       );
       expect(textInput?.textContent).toEqual(name);
 
