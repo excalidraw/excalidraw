@@ -15,7 +15,6 @@ import { register } from "./register";
 export const actionChangeProjectName = register({
   name: "changeProjectName",
   perform: (_elements, appState, value) => {
-    debugger;
     trackEvent("change", "title");
     return { appState: { ...appState, name: value }, commitToHistory: false };
   },
