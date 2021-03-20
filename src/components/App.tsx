@@ -1405,7 +1405,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       return;
     }
 
-    if (event[KEYS.CTRL_OR_CMD]) {
+    if (event[KEYS.CTRL_OR_CMD] && this.state.isBindingEnabled) {
       this.setState({ isBindingEnabled: false });
     }
 
