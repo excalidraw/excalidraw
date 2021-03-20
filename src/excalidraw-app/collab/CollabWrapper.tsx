@@ -448,15 +448,8 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
   private handleRemoteSceneUpdate = (
     elements: ReconciledElements,
-    {
-      init = false,
-      initFromSnapshot = false,
-    }: { init?: boolean; initFromSnapshot?: boolean } = {},
+    { init = false }: { init?: boolean } = {},
   ) => {
-    if (init || initFromSnapshot) {
-      this.excalidrawAPI.setScrollToContent(elements);
-    }
-
     this.excalidrawAPI.updateScene({
       elements,
       commitToHistory: !!init,
