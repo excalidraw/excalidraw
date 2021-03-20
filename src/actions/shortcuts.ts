@@ -20,7 +20,6 @@ export type ShortcutName =
   | "group"
   | "ungroup"
   | "gridMode"
-  | "autoSave"
   | "zenMode"
   | "stats"
   | "addToLibrary"
@@ -52,7 +51,6 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   ],
   copyAsPng: [getShortcutKey("Shift+Alt+C")],
   copyAsSvg: [],
-  autoSave: [],
   group: [getShortcutKey("CtrlOrCmd+G")],
   ungroup: [getShortcutKey("CtrlOrCmd+Shift+G")],
   gridMode: [getShortcutKey("CtrlOrCmd+'")],

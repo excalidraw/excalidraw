@@ -624,7 +624,6 @@ describe("regression tests", () => {
       "gridMode",
       "zenMode",
       "viewMode",
-      "autoSave",
       "stats",
     ];
 

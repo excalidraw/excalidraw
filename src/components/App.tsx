@@ -3863,7 +3863,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             actionToggleZenMode,
           typeof this.props.viewModeEnabled === "undefined" &&
             actionToggleViewMode,
-          separator,
           actionToggleStats,
         ],
         top: clientY,
