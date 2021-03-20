@@ -132,7 +132,7 @@ export const debounce = <T extends any[]>(
   ret.flush = () => {
     clearTimeout(handle);
     if (lastArgs) {
-      fn(...lastArgs);
+      fn(...(lastArgs || []));
     }
   };
   ret.cancel = () => {
