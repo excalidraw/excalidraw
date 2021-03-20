@@ -18,11 +18,12 @@ export const actionChangeProjectName = register({
     trackEvent("change", "title");
     return { appState: { ...appState, name: value }, commitToHistory: false };
   },
-  PanelComponent: ({ appState, updateData }) => (
+  PanelComponent: ({ appState, updateData, appProps }) => (
     <ProjectName
       label={t("labels.fileTitle")}
       value={appState.name || "Unnamed"}
       onChange={(name: string) => updateData(name)}
+      isNameEditable={typeof appProps.name === "undefined"}
     />
   ),
 });

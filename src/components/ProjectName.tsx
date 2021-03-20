@@ -7,6 +7,7 @@ type Props = {
   value: string;
   onChange: (value: string) => void;
   label: string;
+  isNameEditable: boolean;
 };
 
 export class ProjectName extends Component<Props> {
@@ -43,7 +44,7 @@ export class ProjectName extends Component<Props> {
   };
 
   public render() {
-    return (
+    return this.props.isNameEditable ? (
       <span
         suppressContentEditableWarning
         ref={this.makeEditable}
@@ -54,6 +55,13 @@ export class ProjectName extends Component<Props> {
         onBlur={this.handleBlur}
         onKeyDown={this.handleKeyDown}
         onFocus={this.handleFocus}
+      >
+        {this.props.value}
+      </span>
+    ) : (
+      <span
+        className="TextInput TextInput--readonly"
+        aria-label={this.props.label}
       >
         {this.props.value}
       </span>
