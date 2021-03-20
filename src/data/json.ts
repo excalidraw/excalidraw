@@ -1,6 +1,6 @@
 import { fileOpen, fileSave } from "browser-fs-access";
 import { cleanAppStateForExport } from "../appState";
-import { MIME_TYPES } from "../constants";
+import { EXPORT_DATA_TYPES, MIME_TYPES } from "../constants";
 import { clearElementsForExport } from "../element";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
@@ -14,7 +14,7 @@ export const serializeAsJSON = (
 ): string =>
   JSON.stringify(
     {
-      type: "excalidraw",
+      type: EXPORT_DATA_TYPES.excalidraw,
       version: 2,
       source: window.location.origin,
       elements: clearElementsForExport(elements),
@@ -69,7 +69,7 @@ export const isValidExcalidrawData = (data?: {
   appState?: any;
 }): data is ImportedDataState => {
   return (
-    data?.type === "excalidraw" &&
+    data?.type === EXPORT_DATA_TYPES.excalidraw &&
     (!data.elements ||
       (Array.isArray(data.elements) &&
         (!data.appState || typeof data.appState === "object")))
@@ -80,7 +80,7 @@ export const isValidLibrary = (json: any) => {
   return (
     typeof json === "object" &&
     json &&
-    json.type === "excalidrawlib" &&
+    json.type === EXPORT_DATA_TYPES.excalidrawLibrary &&
     json.version === 1
   );
 };
@@ -89,7 +89,7 @@ export const saveLibraryAsJSON = async () => {
   const library = await Library.loadLibrary();
   const serialized = JSON.stringify(
     {
-      type: "excalidrawlib",
+      type: EXPORT_DATA_TYPES.excalidrawLibrary,
       version: 1,
       library,
     },
