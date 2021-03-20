@@ -7,7 +7,7 @@
   }
 
   .RoomDialog-link {
-    color: var(--text-color-primary);
+    color: var(--text-primary-color);
     min-width: 0;
     flex: 1 1 auto;
     margin-inline-start: 1em;
@@ -45,7 +45,7 @@
   }
 
   .RoomDialog-username {
-    background-color: var(--input-background-color);
+    background-color: var(--input-bg-color);
     border-color: var(--input-border-color);
     appearance: none;
     min-width: 0;
@@ -67,7 +67,7 @@
   }
 
   .Modal .RoomDialog-stopSession {
-    background-color: var(--button-destructive-background-color);
+    background-color: var(--button-destructive-bg-color);
 
     .ToolIcon__label,
     .ToolIcon__icon svg {

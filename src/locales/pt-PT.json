@@ -68,7 +68,7 @@
     "layers": "Camadas",
     "actions": "Ações",
     "language": "Idioma",
-    "liveCollaboration": "",
+    "liveCollaboration": "Colaboração ao vivo",
     "duplicateSelection": "Duplicar",
     "untitled": "Sem título",
     "name": "Nome",
@@ -77,7 +77,7 @@
     "group": "Agrupar seleção",
     "ungroup": "Desagrupar seleção",
     "collaborators": "Colaboradores",
-    "showGrid": "",
+    "showGrid": "Mostrar grelha",
     "addToLibrary": "Adicionar à biblioteca",
     "removeFromLibrary": "Remover da biblioteca",
     "libraryLoadingMessage": "Carregando biblioteca…",
@@ -92,7 +92,9 @@
     "centerHorizontally": "Centralizar horizontalmente",
     "distributeHorizontally": "Distribuir horizontalmente",
     "distributeVertically": "Distribuir verticalmente",
-    "viewMode": ""
+    "viewMode": "Modo de visualização",
+    "toggleExportColorScheme": "Alternar esquema de cores de exportação",
+    "share": ""
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
@@ -117,7 +119,7 @@
     "edit": "Editar",
     "undo": "Desfazer",
     "redo": "Refazer",
-    "resetLibrary": "",
+    "resetLibrary": "Repor a biblioteca",
     "createNewRoom": "Criar nova sala",
     "fullScreen": "Tela cheia",
     "darkMode": "Modo escuro",
@@ -136,12 +138,13 @@
     "decryptFailed": "Não foi possível descriptografar os dados.",
     "uploadedSecurly": "O upload foi protegido com criptografia de ponta a ponta, o que significa que o servidor do Excalidraw e terceiros não podem ler o conteúdo.",
     "loadSceneOverridePrompt": "Carregar um desenho externo substituirá o seu conteúdo existente. Deseja continuar?",
-    "collabStopOverridePrompt": "",
+    "collabStopOverridePrompt": "Ao interromper a sessão irá substituir o último desenho guardado. Tem a certeza?\n\n(Caso queira manter o último desenho, simplesmente feche a janela do navegador.)",
     "errorLoadingLibrary": "Houve um erro ao carregar a biblioteca de terceiros.",
     "confirmAddLibrary": "Isso adicionará {{numShapes}} forma(s) à sua biblioteca. Tem certeza?",
     "imageDoesNotContainScene": "A importação de imagens não é suportada no momento.\n\nVocê deseja importar uma cena? Esta imagem parece não conter dados de cena. Você ativou isto durante a exportação?",
     "cannotRestoreFromImage": "Não foi possível restaurar a cena deste arquivo de imagem",
-    "resetLibrary": ""
+    "invalidSceneUrl": "",
+    "resetLibrary": "Isto irá limpar a sua biblioteca. Tem a certeza?"
   },
   "toolBar": {
     "selection": "Seleção",
@@ -197,7 +200,8 @@
     "button_stopSession": "Parar sessão",
     "desc_inProgressIntro": "A sessão de colaboração ao vivo está agora em andamento.",
     "desc_shareLink": "Compartilhe este link com qualquer pessoa com quem você queira colaborar:",
-    "desc_exitSession": "Interrompendo a sessão você irá se desconectar da sala, mas você poderá continuar trabalhando com a cena localmente. Observe que isso não afetará outras pessoas, e elas ainda poderão colaborar em sua versão."
+    "desc_exitSession": "Interrompendo a sessão você irá se desconectar da sala, mas você poderá continuar trabalhando com a cena localmente. Observe que isso não afetará outras pessoas, e elas ainda poderão colaborar em sua versão.",
+    "shareTitle": ""
   },
   "errorDialog": {
     "title": "Erro"
@@ -236,16 +240,18 @@
     "storage": "Armazenamento",
     "title": "Estatísticas para nerds",
     "total": "Total",
-    "version": "",
-    "versionCopy": "",
-    "versionNotAvailable": "",
+    "version": "Versão",
+    "versionCopy": "Clique para copiar",
+    "versionNotAvailable": "Versão não disponível",
     "width": "Largura"
   },
   "toast": {
     "copyStyles": "Estilos copiados.",
-    "copyToClipboard": "",
-    "copyToClipboardAsPng": "Copiado para o clipboard como PNG.",
-    "fileSaved": "",
-    "fileSavedToFilename": ""
+    "copyToClipboard": "Copiado para a área de transferência.",
+    "copyToClipboardAsPng": "",
+    "fileSaved": "Ficheiro guardado.",
+    "fileSavedToFilename": "Guardado como {filename}",
+    "canvas": "",
+    "selection": ""
   }
 }

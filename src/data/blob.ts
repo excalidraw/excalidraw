@@ -5,8 +5,9 @@ import { CanvasError } from "../errors";
 import { t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
 import { AppState } from "../types";
+import { isValidExcalidrawData } from "./json";
 import { restore } from "./restore";
-import { ImportedDataState, LibraryData } from "./types";
+import { LibraryData } from "./types";
 
 const parseFileContents = async (blob: Blob | File) => {
   let contents: string;
@@ -85,15 +86,15 @@ export const loadFromBlob = async (
 ) => {
   const contents = await parseFileContents(blob);
   try {
-    const data: ImportedDataState = JSON.parse(contents);
-    if (data.type !== "excalidraw") {
+    const data = JSON.parse(contents);
+    if (!isValidExcalidrawData(data)) {
       throw new Error(t("alerts.couldNotLoadInvalidFile"));
     }
     const result = restore(
       {
         elements: clearElementsForExport(data.elements || []),
         appState: {
-          appearance: localAppState?.appearance,
+          theme: localAppState?.theme,
           fileHandle:
             blob.handle &&
             ["application/json", MIME_TYPES.excalidraw].includes(

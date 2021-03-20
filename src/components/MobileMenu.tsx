@@ -30,6 +30,7 @@ type MobileMenuProps = {
   isCollaborating: boolean;
   renderCustomFooter?: (isMobile: boolean) => JSX.Element;
   viewModeEnabled: boolean;
+  showThemeBtn: boolean;
 };
 
 export const MobileMenu = ({
@@ -45,6 +46,7 @@ export const MobileMenu = ({
   isCollaborating,
   renderCustomFooter,
   viewModeEnabled,
+  showThemeBtn,
 }: MobileMenuProps) => {
   const renderToolbar = () => {
     return (
@@ -57,6 +59,7 @@ export const MobileMenu = ({
                   {heading}
                   <Stack.Row gap={1}>
                     <ShapesSwitcher
+                      canvas={canvas}
                       elementType={appState.elementType}
                       setAppState={setAppState}
                       isLibraryOpen={appState.isLibraryOpen}
@@ -129,6 +132,7 @@ export const MobileMenu = ({
             actionManager={actionManager}
             appState={appState}
             setAppState={setAppState}
+            showThemeBtn={showThemeBtn}
           />
         }
       </>

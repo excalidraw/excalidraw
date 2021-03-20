@@ -5,6 +5,7 @@ import { ProjectName } from "../components/ProjectName";
 import { ToolButton } from "../components/ToolButton";
 import "../components/ToolIcon.scss";
 import { Tooltip } from "../components/Tooltip";
+import { DarkModeToggle, Appearence } from "../components/DarkModeToggle";
 import { loadFromJSON, saveAsJSON } from "../data";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
@@ -17,11 +18,12 @@ export const actionChangeProjectName = register({
     trackEvent("change", "title");
     return { appState: { ...appState, name: value }, commitToHistory: false };
   },
-  PanelComponent: ({ appState, updateData }) => (
+  PanelComponent: ({ appState, updateData, appProps }) => (
     <ProjectName
       label={t("labels.fileTitle")}
       value={appState.name || "Unnamed"}
       onChange={(name: string) => updateData(name)}
+      isNameEditable={typeof appProps.name === "undefined"}
     />
   ),
 });
@@ -202,5 +204,57 @@ export const actionLoadScene = register({
       showAriaLabel={useIsMobile()}
       onClick={updateData}
     />
+  ),
+});
+
+export const actionExportWithDarkMode = register({
+  name: "exportWithDarkMode",
+  perform: (_elements, appState, value) => {
+    return {
+      appState: { ...appState, exportWithDarkMode: value },
+      commitToHistory: false,
+    };
+  },
+  PanelComponent: ({ appState, updateData }) => (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "flex-end",
+        marginTop: "-45px",
+        marginBottom: "10px",
+      }}
+    >
+      <DarkModeToggle
+        value={appState.exportWithDarkMode ? "dark" : "light"}
+        onChange={(theme: Appearence) => {
+          updateData(theme === "dark");
+        }}
+        title={t("labels.toggleExportColorScheme")}
+      />
+    </div>
+  ),
+});
+
+export const actionToggleAutoSave = register({
+  name: "toggleAutoSave",
+  perform(elements, appState) {
+    trackEvent("toggle", "autoSave");
+    return {
+      appState: {
+        ...appState,
+        autoSave: !appState.autoSave,
+      },
+      commitToHistory: false,
+    };
+  },
+  PanelComponent: ({ appState, updateData }) => (
+    <label>
+      <input
+        type="checkbox"
+        checked={appState.autoSave}
+        onChange={(event) => updateData(event.target.checked)}
+      />{" "}
+      {t("labels.toggleAutoSave")}
+    </label>
   ),
 });

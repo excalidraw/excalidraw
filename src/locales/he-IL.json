@@ -92,7 +92,9 @@
     "centerHorizontally": "מרכז אופקית",
     "distributeHorizontally": "חלוקה אופקית",
     "distributeVertically": "חלוקה אנכית",
-    "viewMode": ""
+    "viewMode": "מצב תצוגה",
+    "toggleExportColorScheme": "",
+    "share": ""
   },
   "buttons": {
     "clearReset": "אפס את הלוח",
@@ -117,7 +119,7 @@
     "edit": "ערוך",
     "undo": "בטל",
     "redo": "בצע מחדש",
-    "resetLibrary": "",
+    "resetLibrary": "איפוס ספריה",
     "createNewRoom": "צור חדר",
     "fullScreen": "מסך מלא",
     "darkMode": "מצב כהה",
@@ -141,6 +143,7 @@
     "confirmAddLibrary": "הפעולה תוסיף {{numShapes}} צורה(ות) לספריה שלך. האם אתה בטוח?",
     "imageDoesNotContainScene": "אין תמיכה בייבוא תמונות כעת.\n\nהאם אתה רוצה לייבא תצוגה? התמונה הזאת אינה מכילה מידע על תצוגה. האם הפעלת את האפשרות הזאת בזמן הוצאת המידע?",
     "cannotRestoreFromImage": "לא הצלחנו לשחזר את התצוגה מקובץ התמונה",
+    "invalidSceneUrl": "",
     "resetLibrary": ""
   },
   "toolBar": {
@@ -197,31 +200,32 @@
     "button_stopSession": "הפסק שיתוף",
     "desc_inProgressIntro": "שיתוף חי כרגע בפעולה.",
     "desc_shareLink": "שתף את הקישור עם כל מי שאתה מעוניין לעבוד אתו:",
-    "desc_exitSession": "עצירת השיתוף תנתק אותך מהחדר, אבל עדיין תוכל להמשיך לעבוד על הלוח, מקומית. שים לב שזה לא ישפיע על אנשים אחרים, והם עדיין יוכלו לשתף פעולה עם הגירסה שלהם."
+    "desc_exitSession": "עצירת השיתוף תנתק אותך מהחדר, אבל עדיין תוכל להמשיך לעבוד על הלוח, מקומית. שים לב שזה לא ישפיע על אנשים אחרים, והם עדיין יוכלו לשתף פעולה עם הגירסה שלהם.",
+    "shareTitle": ""
   },
   "errorDialog": {
     "title": "שגיאה"
   },
   "helpDialog": {
-    "blog": "",
-    "click": "",
+    "blog": "קרא את הבלוג שלנו",
+    "click": "קליק",
     "curvedArrow": "",
     "curvedLine": "",
-    "documentation": "",
-    "drag": "",
-    "editor": "",
-    "github": "",
-    "howto": "",
-    "or": "",
+    "documentation": "תיעוד",
+    "drag": "לגרור",
+    "editor": "עורך",
+    "github": "מצאת בעיה? דווח",
+    "howto": "עקוב אחר המדריכים שלנו",
+    "or": "או",
     "preventBinding": "",
-    "shapes": "",
-    "shortcuts": "",
-    "textFinish": "",
-    "textNewLine": "",
-    "title": "",
-    "view": "",
+    "shapes": "צורות",
+    "shortcuts": "קיצורי מקלדת",
+    "textFinish": "סיים עריכה (טקסט)",
+    "textNewLine": "הוסף שורה חדשה (טקסט)",
+    "title": "עזרה",
+    "view": "תצוגה",
     "zoomToFit": "",
-    "zoomToSelection": ""
+    "zoomToSelection": "התמקד בבחירה"
   },
   "encrypted": {
     "tooltip": "הרישומים שלך מוצפנים מקצה לקצה כך שהשרתים של Excalidraw לא יראו אותם לעולם."
@@ -237,15 +241,17 @@
     "title": "סטטיסטיקות לחנונים",
     "total": "סה״כ",
     "version": "",
-    "versionCopy": "",
+    "versionCopy": "לחץ להעתקה",
     "versionNotAvailable": "",
     "width": "רוחב"
   },
   "toast": {
-    "copyStyles": "",
+    "copyStyles": "העתק סגנונות.",
     "copyToClipboard": "",
     "copyToClipboardAsPng": "",
-    "fileSaved": "",
-    "fileSavedToFilename": ""
+    "fileSaved": "קובץ נשמר.",
+    "fileSavedToFilename": "",
+    "canvas": "",
+    "selection": ""
   }
 }

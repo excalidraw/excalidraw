@@ -151,10 +151,12 @@ const LIBRARY_ICON = (
 );
 
 export const ShapesSwitcher = ({
+  canvas,
   elementType,
   setAppState,
   isLibraryOpen,
 }: {
+  canvas: HTMLCanvasElement | null;
   elementType: ExcalidrawElement["type"];
   setAppState: React.Component<any, AppState>["setState"];
   isLibraryOpen: boolean;
@@ -185,7 +187,7 @@ export const ShapesSwitcher = ({
               multiElement: null,
               selectedElementIds: {},
             });
-            setCursorForShape(value);
+            setCursorForShape(canvas, value);
             setAppState({});
           }}
         />

@@ -122,6 +122,7 @@ export class ActionManager implements ActionsManagerInterface {
           appState={this.getAppState()}
           updateData={updateData}
           id={id}
+          appProps={this.app.props}
         />
       );
     }

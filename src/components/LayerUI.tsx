@@ -17,7 +17,7 @@ import { Language, t } from "../i18n";
 import useIsMobile from "../is-mobile";
 import { calculateScrollCenter, getSelectedElements } from "../scene";
 import { ExportType } from "../scene/types";
-import { AppState, LibraryItem, LibraryItems } from "../types";
+import { AppState, ExcalidrawProps, LibraryItem, LibraryItems } from "../types";
 import { muteFSAbortError } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher, ZoomActions } from "./Actions";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
@@ -53,6 +53,7 @@ interface LayerUIProps {
   onInsertElements: (elements: readonly NonDeletedExcalidrawElement[]) => void;
   zenModeEnabled: boolean;
   showExitZenModeBtn: boolean;
+  showThemeBtn: boolean;
   toggleZenMode: () => void;
   langCode: Language["code"];
   isCollaborating: boolean;
@@ -63,6 +64,7 @@ interface LayerUIProps {
   ) => void;
   renderCustomFooter?: (isMobile: boolean) => JSX.Element;
   viewModeEnabled: boolean;
+  libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
 }
 
 const useOnClickOutside = (
@@ -101,6 +103,7 @@ const LibraryMenuItems = ({
   pendingElements,
   setAppState,
   setLibraryItems,
+  libraryReturnUrl,
 }: {
   library: LibraryItems;
   pendingElements: LibraryItem;
@@ -109,6 +112,7 @@ const LibraryMenuItems = ({
   onAddToLibrary: (elements: LibraryItem) => void;
   setAppState: React.Component<any, AppState>["setState"];
   setLibraryItems: (library: LibraryItems) => void;
+  libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
 }) => {
   const isMobile = useIsMobile();
   const numCells = library.length + (pendingElements.length > 0 ? 1 : 0);
@@ -116,6 +120,8 @@ const LibraryMenuItems = ({
   const numRows = Math.max(1, Math.ceil(numCells / CELLS_PER_ROW));
   const rows = [];
   let addedPendingElements = false;
+
+  const referrer = libraryReturnUrl || window.location.origin;
 
   rows.push(
     <div className="layer-ui__library-header">
@@ -166,7 +172,10 @@ const LibraryMenuItems = ({
         }}
       />
 
-      <a href="https://libraries.excalidraw.com" target="_excalidraw_libraries">
+      <a
+        href={`https://libraries.excalidraw.com?referrer=${referrer}`}
+        target="_excalidraw_libraries"
+      >
         {t("labels.libraries")}
       </a>
     </div>,
@@ -219,12 +228,14 @@ const LibraryMenu = ({
   pendingElements,
   onAddToLibrary,
   setAppState,
+  libraryReturnUrl,
 }: {
   pendingElements: LibraryItem;
   onClickOutside: (event: MouseEvent) => void;
   onInsertShape: (elements: LibraryItem) => void;
   onAddToLibrary: () => void;
   setAppState: React.Component<any, AppState>["setState"];
+  libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   useOnClickOutside(ref, (event) => {
@@ -297,6 +308,7 @@ const LibraryMenu = ({
           pendingElements={pendingElements}
           setAppState={setAppState}
           setLibraryItems={setLibraryItems}
+          libraryReturnUrl={libraryReturnUrl}
         />
       )}
     </Island>
@@ -314,11 +326,13 @@ const LayerUI = ({
   onInsertElements,
   zenModeEnabled,
   showExitZenModeBtn,
+  showThemeBtn,
   toggleZenMode,
   isCollaborating,
   onExportToBackend,
   renderCustomFooter,
   viewModeEnabled,
+  libraryReturnUrl,
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
@@ -429,6 +443,7 @@ const LayerUI = ({
             actionManager={actionManager}
             appState={appState}
             setAppState={setAppState}
+            showThemeBtn={showThemeBtn}
           />
         </Stack.Col>
       </Island>
@@ -482,6 +497,7 @@ const LayerUI = ({
       onInsertShape={onInsertElements}
       onAddToLibrary={deselectItems}
       setAppState={setAppState}
+      libraryReturnUrl={libraryReturnUrl}
     />
   ) : null;
 
@@ -516,6 +532,7 @@ const LayerUI = ({
                       {heading}
                       <Stack.Row gap={1}>
                         <ShapesSwitcher
+                          canvas={canvas}
                           elementType={appState.elementType}
                           setAppState={setAppState}
                           isLibraryOpen={appState.isLibraryOpen}
@@ -589,7 +606,7 @@ const LayerUI = ({
           },
         )}
       >
-        <GitHubCorner appearance={appState.appearance} />
+        <GitHubCorner theme={appState.theme} />
       </aside>
     );
   };
@@ -657,6 +674,7 @@ const LayerUI = ({
         isCollaborating={isCollaborating}
         renderCustomFooter={renderCustomFooter}
         viewModeEnabled={viewModeEnabled}
+        showThemeBtn={showThemeBtn}
       />
     </>
   ) : (
@@ -703,6 +721,7 @@ const areEqual = (prev: LayerUIProps, next: LayerUIProps) => {
 
   const keys = Object.keys(prevAppState) as (keyof Partial<AppState>)[];
   return (
+    prev.renderCustomFooter === next.renderCustomFooter &&
     prev.langCode === next.langCode &&
     prev.elements === next.elements &&
     keys.every((key) => prevAppState[key] === nextAppState[key])

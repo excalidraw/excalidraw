@@ -16,7 +16,7 @@
     max-height: 25rem;
   }
 
-  &.Appearance_dark .ExportDialog__preview canvas {
+  &.theme--dark .ExportDialog__preview canvas {
     filter: none;
   }
 
@@ -34,6 +34,17 @@
 
     .TextInput {
       height: calc(1rem - 3px);
+      width: 200px;
+      overflow: hidden;
+      text-align: center;
+
+      &--readonly {
+        background: none;
+        border: none;
+        &:hover {
+          background: none;
+        }
+      }
     }
   }
 

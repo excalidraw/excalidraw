@@ -1,4 +1,5 @@
 import { FontFamily } from "./element/types";
+import cssVariables from "./css/variables.module.scss";
 
 export const APP_NAME = "Excalidraw";
 
@@ -93,8 +94,8 @@ export const TOUCH_CTX_MENU_TIMEOUT = 500;
 export const TITLE_TIMEOUT = 10000;
 export const TOAST_TIMEOUT = 5000;
 export const VERSION_TIMEOUT = 30000;
-export const SCROLL_TIMEOUT = 500;
 export const AUTO_SAVE_TIMEOUT = 500;
+export const SCROLL_TIMEOUT = 100;
 
 export const ZOOM_STEP = 0.1;
 
@@ -108,3 +109,5 @@ export const MODES = {
   ZEN: "zenMode",
   GRID: "gridMode",
 };
+
+export const THEME_FILTER = cssVariables.themeFilter;

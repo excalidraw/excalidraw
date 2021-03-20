@@ -1,8 +1,9 @@
 import React from "react";
 import { fireEvent, GlobalTestState, render } from "./test-utils";
 import Excalidraw from "../packages/excalidraw/index";
-import { queryByText } from "@testing-library/react";
+import { queryByText, queryByTestId } from "@testing-library/react";
 import { GRID_SIZE } from "../constants";
+import { t } from "../i18n";
 
 const { h } = window;
 
@@ -84,6 +85,50 @@ describe("<Excalidraw/>", () => {
       const contextMenu = document.querySelector(".context-menu");
       expect(queryByText(contextMenu as HTMLElement, "Show grid")).toBe(null);
       expect(h.state.gridSize).toBe(null);
+    });
+  });
+
+  describe("Test theme prop", () => {
+    it('should show the dark mode toggle when the theme prop is "undefined"', async () => {
+      const { container } = await render(<Excalidraw />);
+      expect(h.state.theme).toBe("light");
+
+      const darkModeToggle = queryByTestId(container, "toggle-dark-mode");
+
+      expect(darkModeToggle).toBeTruthy();
+    });
+
+    it('should not show the dark mode toggle when the theme prop is not "undefined"', async () => {
+      const { container } = await render(<Excalidraw theme="dark" />);
+      expect(h.state.theme).toBe("dark");
+
+      expect(queryByTestId(container, "toggle-dark-mode")).toBe(null);
+    });
+  });
+
+  describe("Test name prop", () => {
+    it('should allow editing name when the name prop is "undefined"', async () => {
+      const { container } = await render(<Excalidraw />);
+
+      fireEvent.click(queryByTestId(container, "export-button")!);
+      const textInput = document.querySelector(
+        ".ExportDialog__name .TextInput",
+      );
+      expect(textInput?.textContent).toContain(`${t("labels.untitled")}`);
+      expect(textInput?.hasAttribute("data-type")).toBe(true);
+    });
+
+    it('should set the name and not allow editing when the name prop is present"', async () => {
+      const name = "test";
+      const { container } = await render(<Excalidraw name={name} />);
+
+      await fireEvent.click(queryByTestId(container, "export-button")!);
+      const textInput = document.querySelector(
+        ".ExportDialog__name .TextInput--readonly",
+      );
+      expect(textInput?.textContent).toEqual(name);
+
+      expect(textInput?.hasAttribute("data-type")).toBe(false);
     });
   });
 });

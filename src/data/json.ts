@@ -6,6 +6,7 @@ import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 import { loadFromBlob } from "./blob";
 import { Library } from "./library";
+import { ImportedDataState } from "./types";
 
 export const serializeAsJSON = (
   elements: readonly ExcalidrawElement[],
@@ -29,13 +30,13 @@ export const saveAsJSON = async (
 ) => {
   const serialized = serializeAsJSON(elements, appState);
   const blob = new Blob([serialized], {
-    type: "application/json",
+    type: MIME_TYPES.excalidraw,
   });
 
   const fileHandle = await fileSave(
     blob,
     {
-      fileName: appState.name,
+      fileName: `${appState.name}.excalidraw`,
       description: "Excalidraw file",
       extensions: [".excalidraw"],
     },
@@ -47,10 +48,32 @@ export const saveAsJSON = async (
 export const loadFromJSON = async (localAppState: AppState) => {
   const blob = await fileOpen({
     description: "Excalidraw files",
+    // ToDo: Be over-permissive until https://bugs.webkit.org/show_bug.cgi?id=34442
+    // gets resolved. Else, iOS users cannot open `.excalidraw` files.
+    /*
     extensions: [".json", ".excalidraw", ".png", ".svg"],
-    mimeTypes: ["application/json", "image/png", "image/svg+xml"],
+    mimeTypes: [
+      MIME_TYPES.excalidraw,
+      "application/json",
+      "image/png",
+      "image/svg+xml",
+    ],
+    */
   });
   return loadFromBlob(blob, localAppState);
+};
+
+export const isValidExcalidrawData = (data?: {
+  type?: any;
+  elements?: any;
+  appState?: any;
+}): data is ImportedDataState => {
+  return (
+    data?.type === "excalidraw" &&
+    (!data.elements ||
+      (Array.isArray(data.elements) &&
+        (!data.appState || typeof data.appState === "object")))
+  );
 };
 
 export const isValidLibrary = (json: any) => {
@@ -87,8 +110,11 @@ export const saveLibraryAsJSON = async () => {
 export const importLibraryFromJSON = async () => {
   const blob = await fileOpen({
     description: "Excalidraw library files",
+    // ToDo: Be over-permissive until https://bugs.webkit.org/show_bug.cgi?id=34442
+    // gets resolved. Else, iOS users cannot open `.excalidraw` files.
+    /*
     extensions: [".json", ".excalidrawlib"],
-    mimeTypes: ["application/json"],
+    */
   });
   Library.importLibrary(blob);
 };

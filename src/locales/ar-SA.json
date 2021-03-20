@@ -68,7 +68,7 @@
     "layers": "الطبقات",
     "actions": "الإجراءات",
     "language": "اللغة",
-    "liveCollaboration": "",
+    "liveCollaboration": "بدء المشاركة الحية",
     "duplicateSelection": "تكرار",
     "untitled": "غير معنون",
     "name": "الاسم",
@@ -92,7 +92,9 @@
     "centerHorizontally": "توسيط أفقي",
     "distributeHorizontally": "التوزيع الأفقي",
     "distributeVertically": "التوزيع عمودياً",
-    "viewMode": ""
+    "viewMode": "",
+    "toggleExportColorScheme": "",
+    "share": ""
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
@@ -141,6 +143,7 @@
     "confirmAddLibrary": "هذا سيضيف {{numShapes}} شكل إلى مكتبتك. هل أنت متأكد؟",
     "imageDoesNotContainScene": "استيراد الصور غير مدعوم في الوقت الراهن.\n\nهل تريد استيراد مشهد؟ لا يبدو أن هذه الصورة تحتوي على أي بيانات مشهد. هل قمت بسماح هذا أثناء التصدير؟",
     "cannotRestoreFromImage": "تعذر استعادة المشهد من ملف الصورة",
+    "invalidSceneUrl": "",
     "resetLibrary": ""
   },
   "toolBar": {
@@ -197,7 +200,8 @@
     "button_stopSession": "إيقاف الجلسة",
     "desc_inProgressIntro": "تجري الآن المشاركة الحية.",
     "desc_shareLink": "شارك هذا الرابط مع أي شخص تريده أن يشاركك الجلسة:",
-    "desc_exitSession": "إيقاف الجلسة سيؤدي إلى قطع الاتصال الخاص بك من الغرفة، ولكن ستتمكن من مواصلة العمل مع المشهد، محليا. لاحظ أن هذا لن يؤثر على الأشخاص الآخرين، و سيظلون قادرين على التعاون في إصدارهم."
+    "desc_exitSession": "إيقاف الجلسة سيؤدي إلى قطع الاتصال الخاص بك من الغرفة، ولكن ستتمكن من مواصلة العمل مع المشهد، محليا. لاحظ أن هذا لن يؤثر على الأشخاص الآخرين، و سيظلون قادرين على التعاون في إصدارهم.",
+    "shareTitle": ""
   },
   "errorDialog": {
     "title": "خطأ"
@@ -246,6 +250,8 @@
     "copyToClipboard": "",
     "copyToClipboardAsPng": "",
     "fileSaved": "",
-    "fileSavedToFilename": ""
+    "fileSavedToFilename": "",
+    "canvas": "",
+    "selection": ""
   }
 }

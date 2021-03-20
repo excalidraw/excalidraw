@@ -68,7 +68,7 @@
     "layers": "Lapisan",
     "actions": "Aksi",
     "language": "Bahasa",
-    "liveCollaboration": "",
+    "liveCollaboration": "Kolaborasi langsung",
     "duplicateSelection": "Duplikat",
     "untitled": "Tanpa judul",
     "name": "Nama",
@@ -92,7 +92,9 @@
     "centerHorizontally": "Pusatkan secara horizontal",
     "distributeHorizontally": "Distribusikan horizontal",
     "distributeVertically": "Distribusikan vertikal",
-    "viewMode": "Mode tampilan"
+    "viewMode": "Mode tampilan",
+    "toggleExportColorScheme": "Ubah skema warna ekspor",
+    "share": "Bagikan"
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
@@ -117,7 +119,7 @@
     "edit": "Edit",
     "undo": "Urungkan",
     "redo": "Ulangi",
-    "resetLibrary": "",
+    "resetLibrary": "Reset pustaka",
     "createNewRoom": "Buat ruang baru",
     "fullScreen": "Layar penuh",
     "darkMode": "Mode gelap",
@@ -141,7 +143,8 @@
     "confirmAddLibrary": "Ini akan menambahkan {{numShapes}} bentuk ke pustaka Anda. Anda yakin?",
     "imageDoesNotContainScene": "Mengimpor gambar tidak didukung saat ini.\n\nApakah Anda ingin impor pemandangan? Gambar ini tidak berisi data pemandangan. Sudah ka Anda aktifkan ini ketika ekspor?",
     "cannotRestoreFromImage": "Pemandangan tidak dapat dipulihkan dari file gambar ini",
-    "resetLibrary": ""
+    "invalidSceneUrl": "",
+    "resetLibrary": "Ini akan menghapus pustaka Anda. Anda yakin?"
   },
   "toolBar": {
     "selection": "Pilihan",
@@ -197,7 +200,8 @@
     "button_stopSession": "Hentikan sesi",
     "desc_inProgressIntro": "Sesi kolaborasi sedang berlangsung sekarang.",
     "desc_shareLink": "Bagikan tautan ini dengan siapa pun yang Anda inginkan untuk kolaborasi bersama:",
-    "desc_exitSession": "Menghentikan sesi akan memutuskan hubungan Anda dari ruangan, tetapi Anda dapat melanjutkan bekerja dengan pemandangan Anda secara lokal. Perhatikan bahwa ini tidak memengaruhi orang lain, dan mereka masih dapat berkolaborasi pada versi mereka."
+    "desc_exitSession": "Menghentikan sesi akan memutuskan hubungan Anda dari ruangan, tetapi Anda dapat melanjutkan bekerja dengan pemandangan Anda secara lokal. Perhatikan bahwa ini tidak memengaruhi orang lain, dan mereka masih dapat berkolaborasi pada versi mereka.",
+    "shareTitle": "Gabung sesi kolaborasi langsung di Excalidraw"
   },
   "errorDialog": {
     "title": "Kesalahan"
@@ -244,8 +248,10 @@
   "toast": {
     "copyStyles": "Gaya tersalin.",
     "copyToClipboard": "Tersalin ke papan klip.",
-    "copyToClipboardAsPng": "Tersalin ke clipboard sebagai PNG.",
+    "copyToClipboardAsPng": "Tersalin {{exportSelection}} ke clipboard sebagai PNG\n({{exportColorScheme}})",
     "fileSaved": "File tersimpan.",
-    "fileSavedToFilename": "Disimpan ke {filename}"
+    "fileSavedToFilename": "Disimpan ke {filename}",
+    "canvas": "kanvas",
+    "selection": "pilihan"
   }
 }

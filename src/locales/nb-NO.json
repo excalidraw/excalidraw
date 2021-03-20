@@ -92,7 +92,9 @@
     "centerHorizontally": "Midtstill horisontalt",
     "distributeHorizontally": "Distribuer horisontalt",
     "distributeVertically": "Distribuer vertikalt",
-    "viewMode": "Visningsmodus"
+    "viewMode": "Visningsmodus",
+    "toggleExportColorScheme": "Veksle eksport av fargepalett",
+    "share": "Del"
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
@@ -141,6 +143,7 @@
     "confirmAddLibrary": "Dette vil legge til {{numShapes}} figur(er) i biblioteket ditt. Er du sikker?",
     "imageDoesNotContainScene": "Importering av bilder støttes ikke for øyeblikket.\n\nVil du importere en scene? Dette bildet ser ikke ut til å inneholde noen scene-data. Har du aktivert dette under eksporten?",
     "cannotRestoreFromImage": "Scenen kunne ikke gjenopprettes fra denne bildefilen",
+    "invalidSceneUrl": "Kunne ikke importere scene fra den oppgitte URL-en. Den er enten ødelagt, eller inneholder ikke gyldig Excalidraw JSON-data.",
     "resetLibrary": "Dette vil tømme biblioteket ditt. Er du sikker?"
   },
   "toolBar": {
@@ -197,7 +200,8 @@
     "button_stopSession": "Stopp sesjon",
     "desc_inProgressIntro": "Sanntids-samarbeidsøkt er nå i gang.",
     "desc_shareLink": "Del denne linken med de du vil samarbeide med:",
-    "desc_exitSession": "Dersom du avslutter sesjonen blir du frakoblet rommet, men du kan fortsette å arbeide med scenen lokalt. Vær oppmerksom på at dette ikke vil påvirke andre personer, og de vil fortsatt ha mulighet til å samarbeide på deres versjon."
+    "desc_exitSession": "Dersom du avslutter sesjonen blir du frakoblet rommet, men du kan fortsette å arbeide med scenen lokalt. Vær oppmerksom på at dette ikke vil påvirke andre personer, og de vil fortsatt ha mulighet til å samarbeide på deres versjon.",
+    "shareTitle": "Bli med i en live samarbeidsøkt på Excalidraw"
   },
   "errorDialog": {
     "title": "Feil"
@@ -244,8 +248,10 @@
   "toast": {
     "copyStyles": "Kopierte stiler.",
     "copyToClipboard": "Kopiert til utklippstavlen.",
-    "copyToClipboardAsPng": "Kopiert til utklippstavlen som PNG.",
+    "copyToClipboardAsPng": "Kopierte {{exportSelection}} til utklippstavlen som PNG\n({{exportColorScheme}})",
     "fileSaved": "Fil lagret.",
-    "fileSavedToFilename": "Lagret til {filename}"
+    "fileSavedToFilename": "Lagret til {filename}",
+    "canvas": "lerret",
+    "selection": "utvalg"
   }
 }

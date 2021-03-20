@@ -8,12 +8,21 @@
 }
 
 .excalidraw {
-  color: var(--text-color-primary);
+  position: relative;
+  overflow: hidden;
+  color: var(--text-primary-color);
   display: flex;
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
+
+  // serves 2 purposes:
+  // 1. prevent selecting text outside the component when double-clicking or
+  //    dragging inside it (e.g. on canvas)
+  // 2. prevent selecting UI, both from the inside, and from outside the
+  //    component (e.g. if you select text in a sidebar)
+  user-select: none;
 
   a {
     font-weight: 500;
@@ -27,7 +36,6 @@
 
   canvas {
     touch-action: none;
-    user-select: none;
 
     // following props improve blurriness at certain devicePixelRatios.
     // AFAIK it doesn't affect export (in fact, export seems sharp either way).
@@ -39,21 +47,21 @@
     z-index: var(--zIndex-canvas);
   }
 
-  &.Appearance_dark {
+  &.theme--dark {
     // The percentage is inspired by
     // https://material.io/design/color/dark-theme.html#properties, which
     // recommends surface color of #121212, 93% yields #111111 for #FFF
 
     canvas {
-      filter: var(--appearance-filter);
+      filter: var(--theme-filter);
     }
   }
 
   .FixedSideContainer {
-    padding-top: var(--sat, 0px);
-    padding-right: var(--sar, 0px);
-    padding-bottom: var(--sab, 0px);
-    padding-left: var(--sal, 0px);
+    padding-top: var(--sat, 0);
+    padding-right: var(--sar, 0);
+    padding-bottom: var(--sab, 0);
+    padding-left: var(--sal, 0);
   }
 
   .panelRow {
@@ -71,7 +79,7 @@
       margin-top: 0.333rem;
       margin-bottom: 0.333rem;
       font-size: 0.75rem;
-      color: var(--text-color-primary);
+      color: var(--text-primary-color);
       font-weight: bold;
       display: block;
     }
@@ -237,10 +245,10 @@
     left: 0;
     right: 0;
     --bar-padding: calc(4 * var(--space-factor));
-    padding-top: #{"max(var(--bar-padding), var(--sat, 0px))"};
-    padding-right: var(--sar, 0px);
-    padding-bottom: var(--sab, 0px);
-    padding-left: var(--sal, 0px);
+    padding-top: #{"max(var(--bar-padding), var(--sat,0))"};
+    padding-right: var(--sar, 0);
+    padding-bottom: var(--sab, 0);
+    padding-left: var(--sal, 0);
     z-index: 4;
     display: flex;
     align-items: flex-end;
@@ -257,7 +265,7 @@
       pointer-events: initial;
 
       .panelColumn {
-        padding: 8px 8px 0px 8px;
+        padding: 8px 8px 0 8px;
       }
     }
   }
@@ -460,7 +468,7 @@
       display: none;
     }
     .scroll-back-to-content {
-      bottom: calc(80px + var(--sab, 0px));
+      bottom: calc(80px + var(--sab, 0));
       z-index: -1;
     }
   }

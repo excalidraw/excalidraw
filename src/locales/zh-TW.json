@@ -92,7 +92,9 @@
     "centerHorizontally": "水平置中",
     "distributeHorizontally": "水平分布",
     "distributeVertically": "垂直分布",
-    "viewMode": "檢視模式"
+    "viewMode": "檢視模式",
+    "toggleExportColorScheme": "切換輸出配色",
+    "share": "共享"
   },
   "buttons": {
     "clearReset": "重置 canvas",
@@ -141,6 +143,7 @@
     "confirmAddLibrary": "這將會將 {{numShapes}} 個圖形加入你的資料庫，你確定嗎？",
     "imageDoesNotContainScene": "目前尚不支援載入圖片。\n您是否要載入場景？此圖片中並無任何場景資料，輸出時是否有選擇包含？",
     "cannotRestoreFromImage": "無法由此檔案回復場景。",
+    "invalidSceneUrl": "無法由提供的 URL 匯入場景。可能是發生異常，或未包含有效的 Excalidraw JSON 資料。",
     "resetLibrary": "這會清除您的資料庫，是否確定？"
   },
   "toolBar": {
@@ -197,7 +200,8 @@
     "button_stopSession": "停止連線",
     "desc_inProgressIntro": "即時協作連線正在進行中。",
     "desc_shareLink": "將此連結分享給欲協作的對象：",
-    "desc_exitSession": "停止連線將中斷你與協作會議室的連結，但你仍可於本機編輯此作品。意指停止連線後你的編輯不會被先前共同協作的人看見，且他們可繼續共同協作另一個版本。"
+    "desc_exitSession": "停止連線將中斷你與協作會議室的連結，但你仍可於本機編輯此作品。意指停止連線後你的編輯不會被先前共同協作的人看見，且他們可繼續共同協作另一個版本。",
+    "shareTitle": "加入 Excalidraw 上的即時協作會議室"
   },
   "errorDialog": {
     "title": "錯誤"
@@ -244,8 +248,10 @@
   "toast": {
     "copyStyles": "已複製樣式",
     "copyToClipboard": "複製至剪貼簿。",
-    "copyToClipboardAsPng": "已複製 PNG 至剪貼簿",
+    "copyToClipboardAsPng": "以 PNG 格式將 {{exportSelection}} 複製至剪貼簿\n({{exportColorScheme}})",
     "fileSaved": "已儲存檔案。",
-    "fileSavedToFilename": "儲存為 {filename}"
+    "fileSavedToFilename": "儲存為 {filename}",
+    "canvas": "畫布",
+    "selection": "已選項目"
   }
 }

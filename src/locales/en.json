@@ -93,7 +93,9 @@
     "centerHorizontally": "Center horizontally",
     "distributeHorizontally": "Distribute horizontally",
     "distributeVertically": "Distribute vertically",
-    "viewMode": "View mode"
+    "viewMode": "View mode",
+    "toggleExportColorScheme": "Toggle export color scheme",
+    "share": "Share"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
@@ -142,6 +144,7 @@
     "confirmAddLibrary": "This will add {{numShapes}} shape(s) to your library. Are you sure?",
     "imageDoesNotContainScene": "Importing images isn't supported at the moment.\n\nDid you want to import a scene? This image does not seem to contain any scene data. Have you enabled this during export?",
     "cannotRestoreFromImage": "Scene couldn't be restored from this image file",
+    "invalidSceneUrl": "Couldn't import scene from the supplied URL. It's either malformed, or doesn't contain valid Excalidraw JSON data.",
     "resetLibrary": "This will clear your library. Are you sure?"
   },
   "toolBar": {
@@ -198,7 +201,8 @@
     "button_stopSession": "Stop session",
     "desc_inProgressIntro": "Live-collaboration session is now in progress.",
     "desc_shareLink": "Share this link with anyone you want to collaborate with:",
-    "desc_exitSession": "Stopping the session will disconnect you from the room, but you'll be able to continue working with the scene, locally. Note that this won't affect other people, and they'll still be able to collaborate on their version."
+    "desc_exitSession": "Stopping the session will disconnect you from the room, but you'll be able to continue working with the scene, locally. Note that this won't affect other people, and they'll still be able to collaborate on their version.",
+    "shareTitle": "Join a live collaboration session on Excalidraw"
   },
   "errorDialog": {
     "title": "Error"
@@ -245,8 +249,10 @@
   "toast": {
     "copyStyles": "Copied styles.",
     "copyToClipboard": "Copied to clipboard.",
-    "copyToClipboardAsPng": "Copied to clipboard as PNG.",
+    "copyToClipboardAsPng": "Copied {{exportSelection}} to clipboard as PNG\n({{exportColorScheme}})",
     "fileSaved": "File saved.",
-    "fileSavedToFilename": "Saved to {filename}"
+    "fileSavedToFilename": "Saved to {filename}",
+    "canvas": "canvas",
+    "selection": "selection"
   }
 }

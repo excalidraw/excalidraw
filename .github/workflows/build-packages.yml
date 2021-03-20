@@ -7,27 +7,23 @@ on:
   pull_request:
 
 jobs:
-  build:
+  packages:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v1
-
+      - uses: actions/checkout@v2
       - name: Setup Node.js 14.x
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
         with:
           node-version: 14.x
-
       - name: Install dependencies
         run: |
-          npm ci
-          npm ci --prefix src/packages/excalidraw
-          npm ci --prefix src/packages/utils
-
+          yarn --frozen-lockfile
+          yarn --cwd src/packages/excalidraw
+          yarn --cwd src/packages/utils
       - name: Build @excalidraw/excalidraw
         run: |
-          npm run pack --prefix src/packages/excalidraw
-
+          yarn --cwd src/packages/excalidraw run pack
       - name: Build @excalidraw/utils
         run: |
-          npm run pack --prefix src/packages/utils
+          yarn --cwd src/packages/utils run pack

@@ -14,7 +14,7 @@ export const getDefaultAppState = (): Omit<
 > => {
   return {
     autoSave: false,
-    appearance: "light",
+    theme: "light",
     collaborators: new Map(),
     currentChartType: "bar",
     currentItemBackgroundColor: "transparent",
@@ -41,6 +41,7 @@ export const getDefaultAppState = (): Omit<
     errorMessage: null,
     exportBackground: true,
     exportEmbedScene: false,
+    exportWithDarkMode: false,
     fileHandle: null,
     gridSize: null,
     height: window.innerHeight,
@@ -93,7 +94,7 @@ const APP_STATE_STORAGE_CONF = (<
   config: { [K in keyof T]: K extends keyof AppState ? T[K] : never },
 ) => config)({
   autoSave: { browser: true, export: false },
-  appearance: { browser: true, export: false },
+  theme: { browser: true, export: false },
   collaborators: { browser: false, export: false },
   currentChartType: { browser: true, export: false },
   currentItemBackgroundColor: { browser: true, export: false },
@@ -120,6 +121,7 @@ const APP_STATE_STORAGE_CONF = (<
   errorMessage: { browser: false, export: false },
   exportBackground: { browser: true, export: false },
   exportEmbedScene: { browser: true, export: false },
+  exportWithDarkMode: { browser: true, export: false },
   fileHandle: { browser: false, export: false },
   gridSize: { browser: true, export: true },
   height: { browser: false, export: false },

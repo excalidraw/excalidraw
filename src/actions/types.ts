@@ -1,6 +1,6 @@
 import React from "react";
 import { ExcalidrawElement } from "../element/types";
-import { AppState } from "../types";
+import { AppState, ExcalidrawProps } from "../types";
 
 /** if false, the action should be prevented */
 export type ActionResult =
@@ -86,7 +86,8 @@ export type ActionName =
   | "alignHorizontallyCentered"
   | "distributeHorizontally"
   | "distributeVertically"
-  | "viewMode";
+  | "viewMode"
+  | "exportWithDarkMode";
 
 export interface Action {
   name: ActionName;
@@ -94,6 +95,7 @@ export interface Action {
     elements: readonly ExcalidrawElement[];
     appState: AppState;
     updateData: (formData?: any) => void;
+    appProps: ExcalidrawProps;
     id?: string;
   }>;
   perform: ActionFn;

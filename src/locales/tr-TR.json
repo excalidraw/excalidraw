@@ -92,7 +92,9 @@
     "centerHorizontally": "Yatayda ortala",
     "distributeHorizontally": "Yatay dağıt",
     "distributeVertically": "Dikey dağıt",
-    "viewMode": ""
+    "viewMode": "",
+    "toggleExportColorScheme": "",
+    "share": ""
   },
   "buttons": {
     "clearReset": "Tuvali sıfırla",
@@ -141,6 +143,7 @@
     "confirmAddLibrary": "Bu, kitaplığınıza {{numShapes}} tane şekil ekleyecek. Emin misiniz?",
     "imageDoesNotContainScene": "Resim ekleme şuan için desteklenmiyor.\nBir sahneyi içeri aktarmak mı istediniz? Bu dosya herhangi bir sahne içeriyor gibi durmuyor. Çıktı alırken sahneyi dahil ettiniz mi?",
     "cannotRestoreFromImage": "Sahne bu dosyadan oluşturulamıyor",
+    "invalidSceneUrl": "",
     "resetLibrary": ""
   },
   "toolBar": {
@@ -197,7 +200,8 @@
     "button_stopSession": "Oturumu sonlandır",
     "desc_inProgressIntro": "Ortak çalışma ortamı oluşturuldu.",
     "desc_shareLink": "Bu bağlantıyı birlikte çalışacağınız kişilerle paylaşabilirsiniz:",
-    "desc_exitSession": "Çalışma ortamını kapattığınızda ortak çalışmadan ayrılmış olursunuz ancak kendi versiyonunuzda çalışmaya devam edebilirsiniz. Bu durumda ortak çalıştığınız diğer kişiler etkilenmeyecek, çalışma ortamındaki versiyon üzerinden çalışmaya devam edebilecekler."
+    "desc_exitSession": "Çalışma ortamını kapattığınızda ortak çalışmadan ayrılmış olursunuz ancak kendi versiyonunuzda çalışmaya devam edebilirsiniz. Bu durumda ortak çalıştığınız diğer kişiler etkilenmeyecek, çalışma ortamındaki versiyon üzerinden çalışmaya devam edebilecekler.",
+    "shareTitle": ""
   },
   "errorDialog": {
     "title": "Hata"
@@ -246,6 +250,8 @@
     "copyToClipboard": "",
     "copyToClipboardAsPng": "",
     "fileSaved": "",
-    "fileSavedToFilename": ""
+    "fileSavedToFilename": "",
+    "canvas": "",
+    "selection": ""
   }
 }

@@ -19,21 +19,20 @@
     ]
   },
   "dependencies": {
-    "@sentry/browser": "6.1.0",
-    "@sentry/integrations": "6.1.0",
+    "@sentry/browser": "6.2.2",
+    "@sentry/integrations": "6.2.1",
     "@testing-library/jest-dom": "5.11.9",
     "@testing-library/react": "11.2.5",
     "@types/jest": "26.0.20",
     "@types/react": "17.0.2",
     "@types/react-dom": "17.0.1",
-    "@types/socket.io-client": "1.4.35",
-    "browser-fs-access": "0.13.1",
+    "@types/socket.io-client": "1.4.36",
+    "browser-fs-access": "0.14.2",
     "clsx": "1.1.1",
-    "firebase": "8.2.7",
+    "firebase": "8.2.10",
     "i18next-browser-languagedetector": "6.0.1",
     "lodash.throttle": "4.1.1",
-    "nanoid": "3.1.20",
-    "node-sass": "4.14.1",
+    "nanoid": "3.1.21",
     "open-color": "1.8.0",
     "pako": "1.0.11",
     "png-chunk-text": "1.0.0",
@@ -43,18 +42,21 @@
     "pwacompat": "2.0.17",
     "react": "17.0.1",
     "react-dom": "17.0.1",
-    "react-scripts": "4.0.2",
+    "react-scripts": "4.0.3",
     "roughjs": "4.3.1",
+    "sass": "1.32.8",
     "socket.io-client": "2.3.1",
-    "typescript": "4.1.5"
+    "typescript": "4.2.3"
   },
   "devDependencies": {
+    "@excalidraw/eslint-config": "1.0.0",
+    "@excalidraw/prettier-config": "1.0.2",
     "@types/lodash.throttle": "4.1.6",
     "@types/pako": "1.0.1",
     "@types/resize-observer-browser": "0.1.5",
-    "eslint-config-prettier": "7.2.0",
+    "eslint-config-prettier": "8.1.0",
     "eslint-plugin-prettier": "3.3.1",
-    "firebase-tools": "9.3.0",
+    "firebase-tools": "9.6.1",
     "husky": "4.3.8",
     "jest-canvas-mock": "2.3.1",
     "lint-staged": "10.5.4",
@@ -63,7 +65,7 @@
     "rewire": "5.0.0"
   },
   "engines": {
-    "node": ">=12.0.0"
+    "node": ">=14.0.0"
   },
   "homepage": ".",
   "husky": {
@@ -78,28 +80,29 @@
     "resetMocks": false
   },
   "name": "excalidraw",
+  "prettier": "@excalidraw/prettier-config",
   "private": true,
   "scripts": {
     "build-node": "node ./scripts/build-node.js",
     "build:app:docker": "REACT_APP_DISABLE_SENTRY=true react-scripts build",
     "build:app": "REACT_APP_GIT_SHA=$VERCEL_GIT_COMMIT_SHA react-scripts build",
     "build:version": "node ./scripts/build-version.js",
-    "build": "npm run build:app && npm run build:version",
+    "build": "yarn build:app && yarn build:version",
     "eject": "react-scripts eject",
-    "fix:code": "npm run test:code -- --fix",
-    "fix:other": "npm run prettier -- --write",
-    "fix": "npm run fix:other && npm run fix:code",
+    "fix:code": "yarn test:code --fix",
+    "fix:other": "yarn prettier --write",
+    "fix": "yarn fix:other && yarn fix:code",
     "locales-coverage": "node scripts/build-locales-coverage.js",
     "locales-coverage:description": "node scripts/locales-coverage-description.js",
     "prettier": "prettier \"**/*.{css,scss,json,md,html,yml}\" --ignore-path=.eslintignore",
     "start": "react-scripts start",
-    "test:all": "npm run test:typecheck && npm run test:code && npm run test:other && npm run test:app -- --watchAll=false",
+    "test:all": "yarn test:typecheck && yarn test:code && yarn test:other && yarn test:app --watchAll=false",
     "test:app": "react-scripts test --passWithNoTests",
-    "test:code": "eslint --max-warnings=0 --ignore-path .gitignore --ext .js,.ts,.tsx .",
+    "test:code": "eslint --max-warnings=0 --ext .js,.ts,.tsx .",
     "test:debug": "react-scripts --inspect-brk test --runInBand --no-cache",
-    "test:other": "npm run prettier -- --list-different",
+    "test:other": "yarn prettier --list-different",
     "test:typecheck": "tsc",
-    "test:update": "npm run test:app -- --updateSnapshot --watchAll=false",
-    "test": "npm run test:app"
+    "test:update": "yarn test:app --updateSnapshot --watchAll=false",
+    "test": "yarn test:app"
   }
 }

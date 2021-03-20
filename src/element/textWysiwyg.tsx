@@ -21,14 +21,18 @@ const getTransform = (
   height: number,
   angle: number,
   appState: AppState,
+  maxWidth: number,
 ) => {
   const { zoom, offsetTop, offsetLeft } = appState;
   const degree = (180 * angle) / Math.PI;
   // offsets must be multiplied by 2 to account for the division by 2 of
   // the whole expression afterwards
-  return `translate(${((width - offsetLeft * 2) * (zoom.value - 1)) / 2}px, ${
-    ((height - offsetTop * 2) * (zoom.value - 1)) / 2
-  }px) scale(${zoom.value}) rotate(${degree}deg)`;
+  let translateX = ((width - offsetLeft * 2) * (zoom.value - 1)) / 2;
+  const translateY = ((height - offsetTop * 2) * (zoom.value - 1)) / 2;
+  if (width > maxWidth && zoom.value !== 1) {
+    translateX = (maxWidth / 2) * (zoom.value - 1);
+  }
+  return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
 };
 
 export const textWysiwyg = ({
@@ -43,7 +47,7 @@ export const textWysiwyg = ({
   id: ExcalidrawElement["id"];
   appState: AppState;
   onChange?: (text: string) => void;
-  onSubmit: (text: string) => void;
+  onSubmit: (data: { text: string; viaKeyboard: boolean }) => void;
   getViewportCoords: (x: number, y: number) => [number, number];
   element: ExcalidrawElement;
   canvas: HTMLCanvasElement | null;
@@ -61,6 +65,15 @@ export const textWysiwyg = ({
 
       const lines = updatedElement.text.replace(/\r\n?/g, "\n").split("\n");
       const lineHeight = updatedElement.height / lines.length;
+      const maxWidth =
+        (appState.offsetLeft + appState.width - viewportX - 8) /
+          appState.zoom.value -
+        // margin-right of parent if any
+        Number(
+          getComputedStyle(
+            document.querySelector(".excalidraw")!.parentNode as Element,
+          ).marginRight.slice(0, -2),
+        );
 
       Object.assign(editable.style, {
         font: getFontString(updatedElement),
@@ -75,11 +88,13 @@ export const textWysiwyg = ({
           updatedElement.height,
           angle,
           appState,
+          maxWidth,
         ),
         textAlign,
         color: updatedElement.strokeColor,
         opacity: updatedElement.opacity / 100,
-        filter: "var(--appearance-filter)",
+        filter: "var(--theme-filter)",
+        maxWidth: `${maxWidth}px`,
       });
     }
   };
@@ -93,7 +108,7 @@ export const textWysiwyg = ({
   editable.wrap = "off";
 
   Object.assign(editable.style, {
-    position: "fixed",
+    position: "absolute",
     display: "inline-block",
     minHeight: "1em",
     backfaceVisibility: "hidden",
@@ -121,12 +136,14 @@ export const textWysiwyg = ({
   editable.onkeydown = (event) => {
     if (event.key === KEYS.ESCAPE) {
       event.preventDefault();
+      submittedViaKeyboard = true;
       handleSubmit();
     } else if (event.key === KEYS.ENTER && event[KEYS.CTRL_OR_CMD]) {
       event.preventDefault();
       if (event.isComposing || event.keyCode === 229) {
         return;
       }
+      submittedViaKeyboard = true;
       handleSubmit();
     } else if (event.key === KEYS.ENTER && !event.altKey) {
       event.stopPropagation();
@@ -138,8 +155,14 @@ export const textWysiwyg = ({
     event.stopPropagation();
   };
 
+  // using a state variable instead of passing it to the handleSubmit callback
+  // so that we don't need to create separate a callback for event handlers
+  let submittedViaKeyboard = false;
   const handleSubmit = () => {
-    onSubmit(normalizeText(editable.value));
+    onSubmit({
+      text: normalizeText(editable.value),
+      viaKeyboard: submittedViaKeyboard,
+    });
     cleanup();
   };
 
@@ -160,7 +183,7 @@ export const textWysiwyg = ({
     window.removeEventListener("resize", updateWysiwygStyle);
     window.removeEventListener("wheel", stopEvent, true);
     window.removeEventListener("pointerdown", onPointerDown);
-    window.removeEventListener("pointerup", rebindBlur);
+    window.removeEventListener("pointerup", bindBlurEvent);
     window.removeEventListener("blur", handleSubmit);
 
     unbindUpdate();
@@ -168,10 +191,12 @@ export const textWysiwyg = ({
     editable.remove();
   };
 
-  const rebindBlur = () => {
-    window.removeEventListener("pointerup", rebindBlur);
-    // deferred to guard against focus traps on various UIs that steal focus
-    // upon pointerUp
+  const bindBlurEvent = () => {
+    window.removeEventListener("pointerup", bindBlurEvent);
+    // Deferred so that the pointerdown that initiates the wysiwyg doesn't
+    // trigger the blur on ensuing pointerup.
+    // Also to handle cases such as picking a color which would trigger a blur
+    // in that same tick.
     setTimeout(() => {
       editable.onblur = handleSubmit;
       // case: clicking on the same property → no change → no update → no focus
@@ -187,7 +212,7 @@ export const textWysiwyg = ({
       !isWritableElement(event.target)
     ) {
       editable.onblur = null;
-      window.addEventListener("pointerup", rebindBlur);
+      window.addEventListener("pointerup", bindBlurEvent);
       // handle edge-case where pointerup doesn't fire e.g. due to user
       // alt-tabbing away
       window.addEventListener("blur", handleSubmit);
@@ -200,9 +225,14 @@ export const textWysiwyg = ({
     editable.focus();
   });
 
+  // ---------------------------------------------------------------------------
+
   let isDestroyed = false;
 
-  editable.onblur = handleSubmit;
+  // select on init (focusing is done separately inside the bindBlurEvent()
+  // because we need it to happen *after* the blur event from `pointerdown`)
+  editable.select();
+  bindBlurEvent();
 
   // reposition wysiwyg in case of canvas is resized. Using ResizeObserver
   // is preferred so we catch changes from host, where window may not resize.
@@ -224,6 +254,4 @@ export const textWysiwyg = ({
   document
     .querySelector(".excalidraw-textEditorContainer")!
     .appendChild(editable);
-  editable.focus();
-  editable.select();
 };
