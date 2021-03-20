@@ -303,6 +303,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       zenModeEnabled = false,
       gridModeEnabled = false,
       theme = defaultAppState.theme,
+      name = defaultAppState.name,
     } = props;
     this.state = {
       ...defaultAppState,
@@ -314,6 +315,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       viewModeEnabled,
       zenModeEnabled,
       gridSize: gridModeEnabled ? GRID_SIZE : null,
+      name,
     };
     if (excalidrawRef) {
       const readyPromise =
@@ -523,6 +525,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         let zenModeEnabled = actionResult?.appState?.zenModeEnabled || false;
         let gridSize = actionResult?.appState?.gridSize || null;
         let theme = actionResult?.appState?.theme || "light";
+        let name = actionResult?.appState?.name || this.state.name;
 
         if (typeof this.props.viewModeEnabled !== "undefined") {
           viewModeEnabled = this.props.viewModeEnabled;
@@ -538,6 +541,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
         if (typeof this.props.theme !== "undefined") {
           theme = this.props.theme;
+        }
+
+        if (typeof this.props.name !== "undefined") {
+          name = this.props.name;
         }
 
         this.setState(
@@ -556,6 +563,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               zenModeEnabled,
               gridSize,
               theme,
+              name,
             });
           },
           () => {
@@ -890,6 +898,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         gridSize: this.props.gridModeEnabled ? GRID_SIZE : null,
       });
     }
+
+    if (this.props.name && prevProps.name !== this.props.name) {
+      this.setState({
+        name: this.props.name,
+      });
+    }
+
     document
       .querySelector(".excalidraw")
       ?.classList.toggle("theme--dark", this.state.theme === "dark");

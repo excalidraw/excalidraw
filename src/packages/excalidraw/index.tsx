@@ -29,6 +29,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     gridModeEnabled,
     libraryReturnUrl,
     theme,
+    name,
   } = props;
 
   useEffect(() => {
@@ -69,6 +70,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
           gridModeEnabled={gridModeEnabled}
           libraryReturnUrl={libraryReturnUrl}
           theme={theme}
+          name={name}
         />
       </IsMobileProvider>
     </InitializeApp>

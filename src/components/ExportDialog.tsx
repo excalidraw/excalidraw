@@ -257,6 +257,7 @@ export const ExportDialog = ({
         onClick={() => {
           setModalIsShown(true);
         }}
+        data-testid="export-button"
         icon={exportFile}
         type="button"
         aria-label={t("buttons.export")}
