@@ -911,10 +911,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       ?.classList.toggle("theme--dark", this.state.theme === "dark");
 
     if (this.state.autoSave && this.state.fileHandle) {
-      this.saveLocalSceneDebounced(
-        this.scene.getElementsIncludingDeleted(),
-        this.state,
-      );
+      try {
+        this.saveLocalSceneDebounced(
+          this.scene.getElementsIncludingDeleted(),
+          this.state,
+        );
+      } catch (error) {
+        this.setState({ autoSave: false });
+      }
     }
 
     if (
