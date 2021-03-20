@@ -59,7 +59,10 @@ export class ProjectName extends Component<Props> {
         {this.props.value}
       </span>
     ) : (
-      <span className="TextInput" aria-label={this.props.label}>
+      <span
+        className="TextInput TextInput--readonly"
+        aria-label={this.props.label}
+      >
         {this.props.value}
       </span>
     );
