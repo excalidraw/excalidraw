@@ -6,6 +6,7 @@ import { API } from "./helpers/api";
 import { getDefaultAppState } from "../appState";
 import { waitFor } from "@testing-library/react";
 import { createUndoAction, createRedoAction } from "../actions/actionHistory";
+import { EXPORT_DATA_TYPES } from "../constants";
 
 const { h } = window;
 
@@ -76,7 +77,7 @@ describe("history", () => {
       new Blob(
         [
           JSON.stringify({
-            type: "excalidraw",
+            type: EXPORT_DATA_TYPES.excalidraw,
             appState: {
               ...getDefaultAppState(),
               viewBackgroundColor: "#000",
