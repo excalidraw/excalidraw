@@ -111,11 +111,11 @@ describe("<Excalidraw/>", () => {
       const { container } = await render(<Excalidraw />);
 
       fireEvent.click(queryByTestId(container, "export-button")!);
-      const textInput = document.querySelector(
+      const textInput: HTMLInputElement | null = document.querySelector(
         ".ExportDialog__name .TextInput",
       );
-      expect(textInput?.textContent).toContain(`${t("labels.untitled")}`);
-      expect(textInput?.hasAttribute("data-type")).toBe(true);
+      expect(textInput?.value).toContain(`${t("labels.untitled")}`);
+      expect(textInput?.nodeName).toBe("INPUT");
     });
 
     it('should set the name and not allow editing when the name prop is present"', async () => {
@@ -127,8 +127,7 @@ describe("<Excalidraw/>", () => {
         ".ExportDialog__name .TextInput--readonly",
       );
       expect(textInput?.textContent).toEqual(name);
-
-      expect(textInput?.hasAttribute("data-type")).toBe(false);
+      expect(textInput?.nodeName).toBe("SPAN");
     });
   });
 });
