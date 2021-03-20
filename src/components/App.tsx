@@ -274,6 +274,7 @@ export type ExcalidrawImperativeAPI = {
   setScrollToContent: InstanceType<typeof App>["setScrollToContent"];
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
   getAppState: () => InstanceType<typeof App>["state"];
+  setCanvasOffsets: InstanceType<typeof App>["setCanvasOffsets"];
   readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
   ready: true;
 };
@@ -297,8 +298,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const {
       width = window.innerWidth,
       height = window.innerHeight,
-      offsetLeft,
-      offsetTop,
       excalidrawRef,
       viewModeEnabled = false,
       zenModeEnabled = false,
@@ -312,7 +311,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       isLoading: true,
       width,
       height,
-      ...this.getCanvasOffsets({ offsetLeft, offsetTop }),
+      ...this.getCanvasOffsets(),
       viewModeEnabled,
       zenModeEnabled,
       gridSize: gridModeEnabled ? GRID_SIZE : null,
@@ -335,6 +334,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         setScrollToContent: this.setScrollToContent,
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
+        setCanvasOffsets: this.setCanvasOffsets,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -755,14 +755,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (searchParams.has("web-share-target")) {
       // Obtain a file that was shared via the Web Share Target API.
       this.restoreFileFromShare();
-    } else if (
-      typeof this.props.offsetLeft === "number" &&
-      typeof this.props.offsetTop === "number"
-    ) {
-      // Optimization to avoid extra render on init.
-      this.initializeScene();
     } else {
-      this.setState(this.getCanvasOffsets(this.props), () => {
+      this.setState(this.getCanvasOffsets(), () => {
         this.initializeScene();
       });
     }
@@ -867,16 +861,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     if (
       prevProps.width !== this.props.width ||
-      prevProps.height !== this.props.height ||
-      (typeof this.props.offsetLeft === "number" &&
-        prevProps.offsetLeft !== this.props.offsetLeft) ||
-      (typeof this.props.offsetTop === "number" &&
-        prevProps.offsetTop !== this.props.offsetTop)
+      prevProps.height !== this.props.height
     ) {
       this.setState({
         width: this.props.width ?? window.innerWidth,
         height: this.props.height ?? window.innerHeight,
-        ...this.getCanvasOffsets(this.props),
+        ...this.getCanvasOffsets(),
       });
     }
 
@@ -4046,33 +4036,22 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
   }, 300);
 
-  private getCanvasOffsets(offsets?: {
-    offsetLeft?: number;
-    offsetTop?: number;
-  }): Pick<AppState, "offsetTop" | "offsetLeft"> {
-    if (
-      typeof offsets?.offsetLeft === "number" &&
-      typeof offsets?.offsetTop === "number"
-    ) {
-      return {
-        offsetLeft: offsets.offsetLeft,
-        offsetTop: offsets.offsetTop,
-      };
-    }
+  public setCanvasOffsets = () => {
+    this.setState({ ...this.getCanvasOffsets() });
+  };
+
+  private getCanvasOffsets(): Pick<AppState, "offsetTop" | "offsetLeft"> {
     if (this.excalidrawContainerRef?.current?.parentElement) {
       const parentElement = this.excalidrawContainerRef.current.parentElement;
       const { left, top } = parentElement.getBoundingClientRect();
       return {
-        offsetLeft:
-          typeof offsets?.offsetLeft === "number" ? offsets.offsetLeft : left,
-        offsetTop:
-          typeof offsets?.offsetTop === "number" ? offsets.offsetTop : top,
+        offsetLeft: left,
+        offsetTop: top,
       };
     }
     return {
-      offsetLeft:
-        typeof offsets?.offsetLeft === "number" ? offsets.offsetLeft : 0,
-      offsetTop: typeof offsets?.offsetTop === "number" ? offsets.offsetTop : 0,
+      offsetLeft: 0,
+      offsetTop: 0,
     };
   }
 
