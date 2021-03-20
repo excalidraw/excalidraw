@@ -12,7 +12,7 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
-## Unreleased
+## 0.5.0
 
 ## Excalidraw API
 
@@ -35,6 +35,21 @@ Please add the latest change on the top under the correct section.
   - Since `appState.appearance` is renamed to `appState.theme` so wherever `appState.appearance` including `initialData.appState.appearance` should be renamed to `appState.theme` and `initialData.appState.theme` respectively. If the `appearance` was persisted earlier, now it needs to passed as `theme`.
   - The class `Appearance_dark` is renamed to `theme--dark`.
   - The class `Appearance_dark-background-none` is renamed to `theme--dark-background-none`.
+
+## Excalidraw Library
+
+### Features
+
+- feat: Implement the Web Share Target API [#3230](https://github.com/excalidraw/excalidraw/pull/3230).
+
+### Fixes
+
+- Overflow in textinput in export dialog [#3284](https://github.com/excalidraw/excalidraw/pull/3284).
+- Bail on noop updates for newElementWith [#3279](https://github.com/excalidraw/excalidraw/pull/3279).
+- Prevent State continuously updated when holding ctrl/cmd #3283
+- Debounce flush not invoked if lastArgs not defined [#3281](https://github.com/excalidraw/excalidraw/pull/3281).
+- Stop preventing canvas pointerdown/tapend events [#3207](https://github.com/excalidraw/excalidraw/pull/3207).
+- Double scrollbar on modals [#3226](https://github.com/excalidraw/excalidraw/pull/3226).
 
 ---
 
