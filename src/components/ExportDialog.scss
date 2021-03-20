@@ -34,6 +34,14 @@
 
     .TextInput {
       height: calc(1rem - 3px);
+
+      &--readonly {
+        background: none;
+        border: none;
+        &:hover {
+          background: none;
+        }
+      }
     }
   }
 
