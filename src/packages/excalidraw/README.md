@@ -546,7 +546,7 @@ This prop controls Excalidraw's theme. When supplied, the value takes precedence
 
 ### `name`
 
-This prop sets the export name of the drawing. When supplied, the value takes precedence over `intialData.appState.name`.
+This prop sets the name of the drawing which will be used when exporting the drawing. When supplied, the value takes precedence over `intialData.appState.name`, the `name` will be fully controlled by host app and the users won't be able to edit from within Excalidraw.
 
 ### Extra API's
 

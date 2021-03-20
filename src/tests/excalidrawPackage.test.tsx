@@ -116,7 +116,7 @@ describe("<Excalidraw/>", () => {
       expect(name?.hasAttribute("data-type")).toBe(true);
     });
 
-    it('should not allow editing the export name when the name prop is not "undefined"', async () => {
+    it('should not allow editing the export name when the name prop is present"', async () => {
       const { container } = await render(<Excalidraw name="test" />);
 
       fireEvent.click(queryByTestId(container, "export-button")!);
