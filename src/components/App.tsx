@@ -525,7 +525,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         let zenModeEnabled = actionResult?.appState?.zenModeEnabled || false;
         let gridSize = actionResult?.appState?.gridSize || null;
         let theme = actionResult?.appState?.theme || "light";
-        const name = actionResult?.appState?.name || this.state.name;
+        let name = actionResult?.appState?.name || this.state.name;
 
         if (typeof this.props.viewModeEnabled !== "undefined") {
           viewModeEnabled = this.props.viewModeEnabled;
@@ -541,6 +541,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
         if (typeof this.props.theme !== "undefined") {
           theme = this.props.theme;
+        }
+
+        if (typeof this.props.name !== "undefined") {
+          name = this.props.name;
         }
 
         this.setState(

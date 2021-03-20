@@ -107,21 +107,28 @@ describe("<Excalidraw/>", () => {
   });
 
   describe("Test name prop", () => {
-    it('should allow editing the export name when the name prop is "undefined"', async () => {
+    it('should allow editing name when the name prop is "undefined"', async () => {
       const { container } = await render(<Excalidraw />);
-      expect(h.state.name).toContain(`${t("labels.untitled")}`);
 
       fireEvent.click(queryByTestId(container, "export-button")!);
-      const name = document.querySelector(".ExportDialog__name span");
-      expect(name?.hasAttribute("data-type")).toBe(true);
+      const textInput = document.querySelector(
+        ".ExportDialog__name .TextInput",
+      );
+      expect(textInput?.textContent).toContain(`${t("labels.untitled")}`);
+      expect(textInput?.hasAttribute("data-type")).toBe(true);
     });
 
-    it('should not allow editing the export name when the name prop is present"', async () => {
-      const { container } = await render(<Excalidraw name="test" />);
+    it('should set the name and not allow editing when the name prop is present"', async () => {
+      const name = "test";
+      const { container } = await render(<Excalidraw name={name} />);
 
-      fireEvent.click(queryByTestId(container, "export-button")!);
-      const name = document.querySelector(".ExportDialog__name span");
-      expect(name?.hasAttribute("data-type")).toBe(false);
+      await fireEvent.click(queryByTestId(container, "export-button")!);
+      const textInput = document.querySelector(
+        ".ExportDialog__name .TextInput",
+      );
+      expect(textInput?.textContent).toEqual(name);
+
+      expect(textInput?.hasAttribute("data-type")).toBe(false);
     });
   });
 });
