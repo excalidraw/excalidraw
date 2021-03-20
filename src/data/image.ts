@@ -2,7 +2,7 @@ import decodePng from "png-chunks-extract";
 import tEXt from "png-chunk-text";
 import encodePng from "png-chunks-encode";
 import { stringToBase64, encode, decode, base64ToString } from "./encode";
-import { MIME_TYPES } from "../constants";
+import { EXPORT_DATA_TYPES, MIME_TYPES } from "../constants";
 
 // -----------------------------------------------------------------------------
 // PNG
@@ -67,7 +67,10 @@ export const decodePngMetadata = async (blob: Blob) => {
       const encodedData = JSON.parse(metadata.text);
       if (!("encoded" in encodedData)) {
         // legacy, un-encoded scene JSON
-        if ("type" in encodedData && encodedData.type === "excalidraw") {
+        if (
+          "type" in encodedData &&
+          encodedData.type === EXPORT_DATA_TYPES.excalidraw
+        ) {
           return metadata.text;
         }
         throw new Error("FAILED");
@@ -115,7 +118,10 @@ export const decodeSvgMetadata = async ({ svg }: { svg: string }) => {
       const encodedData = JSON.parse(json);
       if (!("encoded" in encodedData)) {
         // legacy, un-encoded scene JSON
-        if ("type" in encodedData && encodedData.type === "excalidraw") {
+        if (
+          "type" in encodedData &&
+          encodedData.type === EXPORT_DATA_TYPES.excalidraw
+        ) {
           return json;
         }
         throw new Error("FAILED");
