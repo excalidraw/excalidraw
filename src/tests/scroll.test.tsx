@@ -15,26 +15,40 @@ describe("appState", () => {
     const ELEM_WIDTH = 100;
     const ELEM_HEIGHT = 60;
 
-    await render(
-      <Excalidraw
-        width={WIDTH}
-        height={HEIGHT}
-        offsetLeft={OFFSET_LEFT}
-        offsetTop={OFFSET_TOP}
-        initialData={{
-          elements: [
-            API.createElement({
-              type: "rectangle",
-              id: "A",
-              width: ELEM_WIDTH,
-              height: ELEM_HEIGHT,
-            }),
-          ],
-          scrollToContent: true,
-        }}
-      />,
-    );
+    const originalGetBoundingClientRect =
+      global.window.HTMLDivElement.prototype.getBoundingClientRect;
+    // override getBoundingClientRect as by default it will always return all values as 0 even if customized in html
+    global.window.HTMLDivElement.prototype.getBoundingClientRect = () => ({
+      top: OFFSET_TOP,
+      left: OFFSET_LEFT,
+      bottom: 10,
+      right: 10,
+      width: 100,
+      x: 10,
+      y: 20,
+      height: 100,
+      toJSON: () => {},
+    });
 
+    await render(
+      <div>
+        <Excalidraw
+          width={WIDTH}
+          height={HEIGHT}
+          initialData={{
+            elements: [
+              API.createElement({
+                type: "rectangle",
+                id: "A",
+                width: ELEM_WIDTH,
+                height: ELEM_HEIGHT,
+              }),
+            ],
+            scrollToContent: true,
+          }}
+        />
+      </div>,
+    );
     await waitFor(() => {
       expect(h.state.width).toBe(WIDTH);
       expect(h.state.height).toBe(HEIGHT);
@@ -45,5 +59,6 @@ describe("appState", () => {
       expect(h.state.scrollX).toBe(WIDTH / 2 - ELEM_WIDTH / 2);
       expect(h.state.scrollY).toBe(HEIGHT / 2 - ELEM_HEIGHT / 2);
     });
+    global.window.HTMLDivElement.prototype.getBoundingClientRect = originalGetBoundingClientRect;
   });
 });

@@ -362,8 +362,6 @@ export default function IndexPage() {
 | --- | --- | --- | --- |
 | [`width`](#width) | Number | `window.innerWidth` | The width of Excalidraw component |
 | [`height`](#height) | Number | `window.innerHeight` | The height of Excalidraw component |
-| [`offsetLeft`](#offsetLeft) | Number | `0` | left position relative to which Excalidraw should be rendered |
-| [`offsetTop`](#offsetTop) | Number | `0` | top position relative to which Excalidraw should render |
 | [`onChange`](#onChange) | Function |  | This callback is triggered whenever the component updates due to any change. This callback will receive the excalidraw elements and the current app state. |
 | [`initialData`](#initialData) | <pre>{elements?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>, appState?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37">AppState<a> } </pre> | null | The initial data with which app loads. |
 | [`ref`](#ref) | [`createRef`](https://reactjs.org/docs/refs-and-the-dom.html#creating-refs) or [`callbackRef`](https://reactjs.org/docs/refs-and-the-dom.html#callback-refs) or <pre>{ current: { readyPromise: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317">resolvablePromise</a> } }</pre> |  | Ref to be passed to Excalidraw |
@@ -386,14 +384,6 @@ This props defines the `width` of the Excalidraw component. Defaults to `window.
 #### `height`
 
 This props defines the `height` of the Excalidraw component. Defaults to `window.innerHeight` if not passed.
-
-#### `offsetLeft`
-
-This prop defines `left` position relative to which Excalidraw should be rendered. Defaults to `0` if not passed.
-
-#### `offsetTop`
-
-This prop defines `top` position relative to which Excalidraw should be rendered. Defaults to `0` if not passed.
 
 #### `onChange`
 
@@ -465,6 +455,7 @@ You can pass a `ref` when you want to access some excalidraw APIs. We expose the
 | getAppState | <pre> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37">AppState</a></pre> | Returns current appState |
 | history | `{ clear: () => void }` | This is the history API. `history.clear()` will clear the history |
 | setScrollToContent | <pre> (<a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>) => void </pre> | Scroll to the nearest element to center |
+| setCanvasOffsets | `() => void` | Updates the offsets for the Excalidraw component so that the coordinates are computed correctly (for example the cursor position). You should call this API when your app changes the dimensions/position of the Excalidraw container, such as when toggling a sidebar. You don't have to call this when the position is changed on page scroll (we handled that ourselves). |
 
 #### `readyPromise`
 
