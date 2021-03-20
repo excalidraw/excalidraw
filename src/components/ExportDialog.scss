@@ -34,6 +34,9 @@
 
     .TextInput {
       height: calc(1rem - 3px);
+      max-width: 200px;
+      overflow: hidden;
+      text-align: center;
 
       &--readonly {
         background: none;
