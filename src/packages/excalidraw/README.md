@@ -527,9 +527,9 @@ This prop indicates whether the app is in `zen mode`. When supplied, the value t
 
 This prop indicates whether the shows the grid. When supplied, the value takes precedence over `intialData.appState.gridModeEnabled`, the grid will be fully controlled by the host app, and users won't be able to toggle it from within the app.
 
-### `libraryReturnUrl`
+#### `libraryReturnUrl`
 
-If supplied, this URL will be used when user tries to install a library from [libraries.excalidraw.com](https://libraries.excalidraw.com). Default to `window.location.origin`.
+If supplied, this URL will be used when user tries to install a library from [libraries.excalidraw.com](https://libraries.excalidraw.com). Default to `window.location.origin`. To install the libraries in same tab from where it was opened, you need to set `window.name`, if its not set it will open in a new tab.
 
 ### `theme`
 
