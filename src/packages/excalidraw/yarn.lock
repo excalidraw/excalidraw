@@ -2663,10 +2663,10 @@ webpack-sources@^2.1.1:
     source-list-map "^2.0.1"
     source-map "^0.6.1"
 
-webpack@5.24.3:
-  version "5.24.3"
-  resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.24.3.tgz#6ec0f5059f8d7c7961075fa553cfce7b7928acb3"
-  integrity sha512-x7lrWZ7wlWAdyKdML6YPvfVZkhD1ICuIZGODE5SzKJjqI9A4SpqGTjGJTc6CwaHqn19gGaoOR3ONJ46nYsn9rw==
+webpack@5.27.1:
+  version "5.27.1"
+  resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.27.1.tgz#6808fb6e45e35290cdb8ae43c7a10884839a3079"
+  integrity sha512-rxIDsPZ3Apl3JcqiemiLmWH+hAq04YeOXqvCxNZOnTp8ZgM9NEPtbu4CaMfMEf9KShnx/Ym8uLGmM6P4XnwCoA==
   dependencies:
     "@types/eslint-scope" "^3.7.0"
     "@types/estree" "^0.0.46"
