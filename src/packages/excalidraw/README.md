@@ -29,7 +29,7 @@ If you want to load assets from a different path you can set a variable `window.
 [Try here](https://codesandbox.io/s/excalidraw-ehlz3).
 
 <details id="usage">
-<summary><strong style="font-size: 1.25em;">Usage</strong></summary>
+<summary><strong>Usage</strong></summary>
 
 1. If you are using a Web bundler (for instance, Webpack), you can import it as an ES6 module as shown below
 
@@ -364,7 +364,7 @@ export default function IndexPage() {
 </details>
 
 <details id="props">
-<summary><strong style="font-size: 1.25em;">Props</strong></summary>
+<summary><strong>Props</strong></summary>
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -550,7 +550,7 @@ This prop sets the name of the drawing which will be used when exporting the dra
 </details>
 
 <details id="extra-apis">
-<summary><strong style="font-size: 1.25em;">Extra API's</strong></summary>
+<summary><strong>Extra API's</strong></summary>
 
 #### `getSceneVersion`
 
