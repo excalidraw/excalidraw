@@ -531,11 +531,11 @@ This prop indicates whether the shows the grid. When supplied, the value takes p
 
 If supplied, this URL will be used when user tries to install a library from [libraries.excalidraw.com](https://libraries.excalidraw.com). Default to `window.location.origin`. To install the libraries in same tab from where it was opened, you need to set `window.name`, if its not set it will open in a new tab.
 
-### `theme`
+#### `theme`
 
 This prop controls Excalidraw's theme. When supplied, the value takes precedence over `intialData.appState.theme`, the theme will be fully controlled by the host app, and users won't be able to toggle it from within the app.
 
-### `name`
+#### `name`
 
 This prop sets the name of the drawing which will be used when exporting the drawing. When supplied, the value takes precedence over `intialData.appState.name`, the `name` will be fully controlled by host app and the users won't be able to edit from within Excalidraw.
 
