@@ -428,22 +428,22 @@ export const actionChangeFontSize = register({
           {
             value: 16,
             text: t("labels.small"),
-            icon: <FontSizeSmallIcon appearance={appState.appearance} />,
+            icon: <FontSizeSmallIcon theme={appState.theme} />,
           },
           {
             value: 20,
             text: t("labels.medium"),
-            icon: <FontSizeMediumIcon appearance={appState.appearance} />,
+            icon: <FontSizeMediumIcon theme={appState.theme} />,
           },
           {
             value: 28,
             text: t("labels.large"),
-            icon: <FontSizeLargeIcon appearance={appState.appearance} />,
+            icon: <FontSizeLargeIcon theme={appState.theme} />,
           },
           {
             value: 36,
             text: t("labels.veryLarge"),
-            icon: <FontSizeExtraLargeIcon appearance={appState.appearance} />,
+            icon: <FontSizeExtraLargeIcon theme={appState.theme} />,
           },
         ]}
         value={getFormValue(
@@ -485,17 +485,17 @@ export const actionChangeFontFamily = register({
       {
         value: 1,
         text: t("labels.handDrawn"),
-        icon: <FontFamilyHandDrawnIcon appearance={appState.appearance} />,
+        icon: <FontFamilyHandDrawnIcon theme={appState.theme} />,
       },
       {
         value: 2,
         text: t("labels.normal"),
-        icon: <FontFamilyNormalIcon appearance={appState.appearance} />,
+        icon: <FontFamilyNormalIcon theme={appState.theme} />,
       },
       {
         value: 3,
         text: t("labels.code"),
-        icon: <FontFamilyCodeIcon appearance={appState.appearance} />,
+        icon: <FontFamilyCodeIcon theme={appState.theme} />,
       },
     ];
 
@@ -549,17 +549,17 @@ export const actionChangeTextAlign = register({
           {
             value: "left",
             text: t("labels.left"),
-            icon: <TextAlignLeftIcon appearance={appState.appearance} />,
+            icon: <TextAlignLeftIcon theme={appState.theme} />,
           },
           {
             value: "center",
             text: t("labels.center"),
-            icon: <TextAlignCenterIcon appearance={appState.appearance} />,
+            icon: <TextAlignCenterIcon theme={appState.theme} />,
           },
           {
             value: "right",
             text: t("labels.right"),
-            icon: <TextAlignRightIcon appearance={appState.appearance} />,
+            icon: <TextAlignRightIcon theme={appState.theme} />,
           },
         ]}
         value={getFormValue(
