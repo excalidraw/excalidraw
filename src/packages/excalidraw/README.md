@@ -28,7 +28,8 @@ If you want to load assets from a different path you can set a variable `window.
 
 [Try here](https://codesandbox.io/s/excalidraw-ehlz3).
 
-### Usage
+<details id="usage">
+<summary><strong>Usage</strong></summary>
 
 1. If you are using a Web bundler (for instance, Webpack), you can import it as an ES6 module as shown below
 
@@ -162,6 +163,8 @@ export default function App() {
   );
 }
 ```
+
+To view the full example visit :point_down:
 
 [![Edit excalidraw](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/excalidraw-ehlz3?fontsize=14&hidenavigation=1&theme=dark)
 
@@ -341,6 +344,8 @@ const excalidrawWrapper = document.getElementById("app");
 ReactDOM.render(React.createElement(App), excalidrawWrapper);
 ```
 
+To view the full example visit :point_down:
+
 [![Edit excalidraw-in-browser](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/excalidraw-in-browser-tlqom?fontsize=14&hidenavigation=1&theme=dark)
 
 Since Excalidraw doesn't support server side rendering yet so you will have to make sure the component is rendered once host is mounted.
@@ -356,7 +361,10 @@ export default function IndexPage() {
 }
 ```
 
-### Props
+</details>
+
+<details id="props">
+<summary><strong>Props</strong></summary>
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -539,7 +547,10 @@ This prop controls Excalidraw's theme. When supplied, the value takes precedence
 
 This prop sets the name of the drawing which will be used when exporting the drawing. When supplied, the value takes precedence over `intialData.appState.name`, the `name` will be fully controlled by host app and the users won't be able to edit from within Excalidraw.
 
-### Extra API's
+</details>
+
+<details id="extra-apis">
+<summary><strong>Extra API's</strong></summary>
 
 #### `getSceneVersion`
 
@@ -583,6 +594,9 @@ import { getElementsMap } from "@excalidraw/excalidraw";
 ```
 
 This function returns an object where each element is mapped to its id.
+
+<details id="restore-utils">
+<summary><strong>Restore utilities</strong></summary>
 
 #### `restoreAppState`
 
@@ -632,7 +646,7 @@ import { restore } from "@excalidraw/excalidraw";
 
 This function makes sure elements and state is set to appropriate values and set to default value if not present. It is combination of [restoreElements](#restoreElements) and [restoreAppState](#restoreAppState)
 
-**_The below APIs will be available in [next version](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/CHANGELOG.md#unreleased)_**
+</details>
 
 <details id="export-utils">
 <summary><strong>Export utilities</strong></summary>
@@ -720,4 +734,5 @@ This function returns a svg with the exported elements.
 | shouldAddWatermark | boolean | false | Indicates whether watermark should be exported |
 | exportWithDarkMode | boolean | false | Indicates whether to export with dark mode |
 
+</details>
 </details>
