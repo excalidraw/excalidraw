@@ -3,6 +3,7 @@ import React from "react";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
 import clsx from "clsx";
+import { supported } from "browser-fs-access";
 
 import {
   actionAddToLibrary,
@@ -3609,10 +3610,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       file?.name.endsWith(".excalidraw")
     ) {
       this.setState({ isLoading: true });
-      if (
-        "chooseFileSystemEntries" in window ||
-        "showOpenFilePicker" in window
-      ) {
+      if (supported) {
         try {
           // This will only work as of Chrome 86,
           // but can be safely ignored on older releases.
