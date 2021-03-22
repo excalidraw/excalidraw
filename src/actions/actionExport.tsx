@@ -11,6 +11,7 @@ import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
 import { KEYS } from "../keys";
 import { register } from "./register";
+import { supported } from "browser-fs-access";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -164,9 +165,7 @@ export const actionSaveAsScene = register({
       title={t("buttons.saveAs")}
       aria-label={t("buttons.saveAs")}
       showAriaLabel={useIsMobile()}
-      hidden={
-        !("chooseFileSystemEntries" in window || "showOpenFilePicker" in window)
-      }
+      hidden={!supported}
       onClick={() => updateData(null)}
     />
   ),
