@@ -248,21 +248,24 @@ export const actionToggleAutoSave = register({
       commitToHistory: false,
     };
   },
-  PanelComponent: ({ appState, updateData }) => (
-    <label style={{ display: "flex" }}>
-      <input
-        type="checkbox"
-        checked={appState.autoSave}
-        onChange={(event) => updateData(event.target.checked)}
-      />{" "}
-      {t("labels.toggleAutoSave")}
-      <Tooltip
-        label={t("labels.toggleAutoSave_details")}
-        position="above"
-        long={true}
-      >
-        <div className="TooltipIcon">{questionCircle}</div>
-      </Tooltip>
-    </label>
-  ),
+  PanelComponent: ({ appState, updateData }) =>
+    supported ? (
+      <label style={{ display: "flex" }}>
+        <input
+          type="checkbox"
+          checked={appState.autoSave}
+          onChange={(event) => updateData(event.target.checked)}
+        />{" "}
+        {t("labels.toggleAutoSave")}
+        <Tooltip
+          label={t("labels.toggleAutoSave_details")}
+          position="above"
+          long={true}
+        >
+          <div className="TooltipIcon">{questionCircle}</div>
+        </Tooltip>
+      </label>
+    ) : (
+      <></>
+    ),
 });
