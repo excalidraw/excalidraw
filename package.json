@@ -23,7 +23,7 @@
     "@sentry/integrations": "6.2.1",
     "@testing-library/jest-dom": "5.11.9",
     "@testing-library/react": "11.2.5",
-    "@types/jest": "26.0.20",
+    "@types/jest": "26.0.21",
     "@types/react": "17.0.3",
     "@types/react-dom": "17.0.2",
     "@types/socket.io-client": "1.4.36",
