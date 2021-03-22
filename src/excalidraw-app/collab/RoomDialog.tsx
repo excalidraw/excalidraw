@@ -7,11 +7,26 @@ import {
   stop,
   share,
   shareIOS,
+  shareWindows,
 } from "../../components/icons";
 import { ToolButton } from "../../components/ToolButton";
 import { t } from "../../i18n";
 import "./RoomDialog.scss";
 import Stack from "../../components/Stack";
+
+const getShareIcon = () => {
+  const navigator = window.navigator as any;
+  const isAppleBrowser = /Apple/.test(navigator.vendor);
+  const isWindowsBrowser = navigator.appVersion.indexOf("Win") !== -1;
+
+  if (isAppleBrowser) {
+    return shareIOS;
+  } else if (isWindowsBrowser) {
+    return shareWindows;
+  }
+
+  return share;
+};
 
 const RoomDialog = ({
   handleClose,
@@ -31,8 +46,6 @@ const RoomDialog = ({
   setErrorMessage: (message: string) => void;
 }) => {
   const roomLinkInput = useRef<HTMLInputElement>(null);
-  const navigator = window.navigator as any;
-  const isAppleBrowser = /Apple/.test(navigator.vendor);
 
   const copyRoomLink = async () => {
     try {
@@ -93,7 +106,7 @@ const RoomDialog = ({
                 {"share" in navigator ? (
                   <ToolButton
                     type="button"
-                    icon={isAppleBrowser ? shareIOS : share}
+                    icon={getShareIcon()}
                     title={t("labels.share")}
                     aria-label={t("labels.share")}
                     onClick={shareRoomLink}

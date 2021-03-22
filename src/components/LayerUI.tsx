@@ -144,36 +144,41 @@ const LibraryMenuItems = ({
             });
         }}
       />
-      <ToolButton
-        key="export"
-        type="button"
-        title={t("buttons.export")}
-        aria-label={t("buttons.export")}
-        icon={exportFile}
-        onClick={() => {
-          saveLibraryAsJSON()
-            .catch(muteFSAbortError)
-            .catch((error) => {
-              setAppState({ errorMessage: error.message });
-            });
-        }}
-      />
-      <ToolButton
-        key="reset"
-        type="button"
-        title={t("buttons.resetLibrary")}
-        aria-label={t("buttons.resetLibrary")}
-        icon={trash}
-        onClick={() => {
-          if (window.confirm(t("alerts.resetLibrary"))) {
-            Library.resetLibrary();
-            setLibraryItems([]);
-          }
-        }}
-      />
-
+      {!!library.length && (
+        <>
+          <ToolButton
+            key="export"
+            type="button"
+            title={t("buttons.export")}
+            aria-label={t("buttons.export")}
+            icon={exportFile}
+            onClick={() => {
+              saveLibraryAsJSON()
+                .catch(muteFSAbortError)
+                .catch((error) => {
+                  setAppState({ errorMessage: error.message });
+                });
+            }}
+          />
+          <ToolButton
+            key="reset"
+            type="button"
+            title={t("buttons.resetLibrary")}
+            aria-label={t("buttons.resetLibrary")}
+            icon={trash}
+            onClick={() => {
+              if (window.confirm(t("alerts.resetLibrary"))) {
+                Library.resetLibrary();
+                setLibraryItems([]);
+              }
+            }}
+          />
+        </>
+      )}
       <a
-        href={`https://libraries.excalidraw.com?referrer=${referrer}`}
+        href={`https://libraries.excalidraw.com?target=${
+          window.name || "_blank"
+        }&referrer=${referrer}`}
         target="_excalidraw_libraries"
       >
         {t("labels.libraries")}
