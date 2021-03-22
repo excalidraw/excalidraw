@@ -454,6 +454,14 @@
     fill: $oc-gray-6;
     bottom: 14px;
     width: 1.5rem;
+    padding: 0;
+    margin: 0;
+    background: none;
+    color: var(--icon-fill-color);
+
+    &:hover {
+      background: none;
+    }
 
     :root[dir="ltr"] & {
       right: 14px;
