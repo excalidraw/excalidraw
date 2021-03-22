@@ -14,6 +14,20 @@ import { t } from "../../i18n";
 import "./RoomDialog.scss";
 import Stack from "../../components/Stack";
 
+const getShareIcon = () => {
+  const navigator = window.navigator as any;
+  const isAppleBrowser = /Apple/.test(navigator.vendor);
+  const isWindowsBrowser = navigator.appVersion.indexOf("Win") !== -1;
+
+  if (isAppleBrowser) {
+    return shareIOS;
+  } else if (isWindowsBrowser) {
+    return shareWindows;
+  }
+
+  return share;
+};
+
 const RoomDialog = ({
   handleClose,
   activeRoomLink,
@@ -32,20 +46,6 @@ const RoomDialog = ({
   setErrorMessage: (message: string) => void;
 }) => {
   const roomLinkInput = useRef<HTMLInputElement>(null);
-
-  const getShareIcon = () => {
-    const navigator = window.navigator as any;
-    const isAppleBrowser = /Apple/.test(navigator.vendor);
-    const isWindowsBrowser = navigator.appVersion.indexOf("Win") !== -1;
-
-    if (isAppleBrowser) {
-      return shareIOS;
-    } else if (isWindowsBrowser) {
-      return shareWindows;
-    }
-
-    return share;
-  };
 
   const copyRoomLink = async () => {
     try {
