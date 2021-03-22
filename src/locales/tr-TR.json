@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Yapıştır",
-    "pasteCharts": "Dairesel grafik",
+    "pasteCharts": "Grafikleri yapıştır",
     "selectAll": "Tümünü seç",
     "multiSelect": "Seçime öge ekle",
     "moveCanvas": "Tuvali taşı",
@@ -68,7 +68,7 @@
     "layers": "Katmanlar",
     "actions": "Eylemler",
     "language": "Dil",
-    "liveCollaboration": "",
+    "liveCollaboration": "Canlı ortak çalışma alanı",
     "duplicateSelection": "Çoğalt",
     "untitled": "Adsız",
     "name": "İsim",
@@ -77,7 +77,7 @@
     "group": "Seçimi grup yap",
     "ungroup": "Seçilen grubu dağıt",
     "collaborators": "Ortaklar",
-    "showGrid": "",
+    "showGrid": "Izgarayı göster",
     "addToLibrary": "Kütüphaneye ekle",
     "removeFromLibrary": "Kütüphaneden kaldır",
     "libraryLoadingMessage": "Kütüphane yükleniyor…",
@@ -94,7 +94,7 @@
     "distributeVertically": "Dikey dağıt",
     "viewMode": "",
     "toggleExportColorScheme": "",
-    "share": ""
+    "share": "Paylaş"
   },
   "buttons": {
     "clearReset": "Tuvali sıfırla",
@@ -119,7 +119,7 @@
     "edit": "Düzenle",
     "undo": "Geri Al",
     "redo": "Yeniden yap",
-    "resetLibrary": "",
+    "resetLibrary": "Kütüphaneyi sıfırla",
     "createNewRoom": "Yeni oda oluştur",
     "fullScreen": "Tam ekran",
     "darkMode": "Koyu tema",
@@ -138,13 +138,13 @@
     "decryptFailed": "Şifrelenmiş veri çözümlenemedi.",
     "uploadedSecurly": "Yükleme uçtan uca şifreleme ile korunmaktadır. Excalidraw sunucusu ve üçüncül şahıslar içeriği okuyamayacaktır.",
     "loadSceneOverridePrompt": "Harici çizimler yüklemek mevcut olan içeriği değiştirecektir. Devam etmek istiyor musunuz?",
-    "collabStopOverridePrompt": "",
+    "collabStopOverridePrompt": "Oturumu sonlandırmak daha önceki, yerel olarak kaydedilmiş çizimin üzerine kaydedilmesine sebep olacak. Emin misiniz?\n\n(Yerel çiziminizi kaybetmemek için tarayıcı sekmesini kapatabilirsiniz.)",
     "errorLoadingLibrary": "Üçüncü taraf kitaplığı yüklerken bir hata oluştu.",
     "confirmAddLibrary": "Bu, kitaplığınıza {{numShapes}} tane şekil ekleyecek. Emin misiniz?",
     "imageDoesNotContainScene": "Resim ekleme şuan için desteklenmiyor.\nBir sahneyi içeri aktarmak mı istediniz? Bu dosya herhangi bir sahne içeriyor gibi durmuyor. Çıktı alırken sahneyi dahil ettiniz mi?",
     "cannotRestoreFromImage": "Sahne bu dosyadan oluşturulamıyor",
-    "invalidSceneUrl": "",
-    "resetLibrary": ""
+    "invalidSceneUrl": "Verilen URL'den çalışma alanı yüklenemedi. Dosya bozuk olabilir veya geçerli bir Excalidraw JSON verisi bulundurmuyor olabilir.",
+    "resetLibrary": "Bu işlem kütüphanenizi sıfırlayacak. Emin misiniz?"
   },
   "toolBar": {
     "selection": "Seçme",
@@ -201,31 +201,31 @@
     "desc_inProgressIntro": "Ortak çalışma ortamı oluşturuldu.",
     "desc_shareLink": "Bu bağlantıyı birlikte çalışacağınız kişilerle paylaşabilirsiniz:",
     "desc_exitSession": "Çalışma ortamını kapattığınızda ortak çalışmadan ayrılmış olursunuz ancak kendi versiyonunuzda çalışmaya devam edebilirsiniz. Bu durumda ortak çalıştığınız diğer kişiler etkilenmeyecek, çalışma ortamındaki versiyon üzerinden çalışmaya devam edebilecekler.",
-    "shareTitle": ""
+    "shareTitle": "Excalidraw'da canlı ortak calışma oturumuna katıl"
   },
   "errorDialog": {
     "title": "Hata"
   },
   "helpDialog": {
-    "blog": "",
-    "click": "",
-    "curvedArrow": "",
-    "curvedLine": "",
-    "documentation": "",
-    "drag": "",
+    "blog": "Blog'umuzu okuyun",
+    "click": "tıkla",
+    "curvedArrow": "Eğri ok",
+    "curvedLine": "Eğri çizgi",
+    "documentation": "Dokümantasyon",
+    "drag": "sürükle",
     "editor": "",
-    "github": "",
-    "howto": "",
-    "or": "",
+    "github": "Bir hata mı buldun? Bildir",
+    "howto": "Rehberlerimizi takip edin",
+    "or": "veya",
     "preventBinding": "",
-    "shapes": "",
-    "shortcuts": "",
-    "textFinish": "",
-    "textNewLine": "",
-    "title": "",
+    "shapes": "Şekiller",
+    "shortcuts": "Klavye kısayolları",
+    "textFinish": "(Metin) düzenlemeyi bitir",
+    "textNewLine": "Yeni satır ekle (metin)",
+    "title": "Yardım",
     "view": "",
-    "zoomToFit": "",
-    "zoomToSelection": ""
+    "zoomToFit": "Tüm öğeleri sığdırmak için yakınlaştır",
+    "zoomToSelection": "Seçime yakınlaş"
   },
   "encrypted": {
     "tooltip": "Çizimleriniz uçtan-uca şifrelenmiştir, Excalidraw'ın sunucuları bile onları göremez."
@@ -240,18 +240,18 @@
     "storage": "Depolama",
     "title": "İnekler için istatistikler",
     "total": "Toplam",
-    "version": "",
-    "versionCopy": "",
-    "versionNotAvailable": "",
+    "version": "Sürüm",
+    "versionCopy": "Kopyalamak için tıkla",
+    "versionNotAvailable": "Sürüm mevcut değil",
     "width": "Genişlik"
   },
   "toast": {
-    "copyStyles": "",
-    "copyToClipboard": "",
-    "copyToClipboardAsPng": "",
-    "fileSaved": "",
-    "fileSavedToFilename": "",
-    "canvas": "",
-    "selection": ""
+    "copyStyles": "Stiller kopyalandı.",
+    "copyToClipboard": "Panoya kopyalandı.",
+    "copyToClipboardAsPng": "{{exportSelection}} panoya PNG olarak\n({{exportColorScheme}}) kopyalandı",
+    "fileSaved": "Dosya kaydedildi.",
+    "fileSavedToFilename": "{filename} kaydedildi",
+    "canvas": "tuval",
+    "selection": "seçim"
   }
 }
