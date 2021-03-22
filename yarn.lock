@@ -3135,10 +3135,10 @@
   "resolved" "https://registry.npmjs.org/brorand/-/brorand-1.1.0.tgz"
   "version" "1.1.0"
 
-"browser-fs-access@0.15.2":
-  "integrity" "sha512-rr+b3fiHpt/7YaHTMVzJMkVO3EK0LYahfFwU/p2d0ly9/mmCwyUKFP+6eco7uQtaRg/GJ/ivYE4U+ImNGfQL5w=="
-  "resolved" "https://registry.npmjs.org/browser-fs-access/-/browser-fs-access-0.15.2.tgz"
-  "version" "0.15.2"
+"browser-fs-access@0.15.3":
+  "integrity" "sha512-SVos+o5+A8zsCNAYhcj7eVf9dXUTbTjfHps5kIQ87nkCTlS2c0jEDrfqrOG+tSsSj573aa+UcLkOy3Vi0QAKwQ=="
+  "resolved" "https://registry.npmjs.org/browser-fs-access/-/browser-fs-access-0.15.3.tgz"
+  "version" "0.15.3"
 
 "browser-process-hrtime@^1.0.0":
   "resolved" "https://registry.npmjs.org/browser-process-hrtime/-/browser-process-hrtime-1.0.0.tgz"
