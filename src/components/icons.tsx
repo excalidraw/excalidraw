@@ -123,6 +123,22 @@ export const shareIOS = createIcon(
   { width: 24, height: 24 },
 );
 
+export const shareWindows = createIcon(
+  <>
+    <path
+      stroke="currentColor"
+      fill="currentColor"
+      d="M40 5.6v6.1l-4.1.7c-8.9 1.4-16.5 6.9-20.6 15C13 32 10.9 43 12.4 43c.4 0 2.4-1.3 4.4-3 5-3.9 12.1-7 18.2-7.7l5-.6v12.8l11.2-11.3L62.5 22 51.2 10.8 40-.5v6.1zm10.2 22.6L44 34.5v-6.8l-6.9.6c-3.9.3-9.8 1.7-13.2 3.1-3.5 1.4-6.5 2.4-6.7 2.2-.9-1 3-7.5 6.4-10.8C28 18.6 34.4 16 40.1 16c3.7 0 3.9-.1 3.9-3.2V9.5l6.2 6.3 6.3 6.2-6.3 6.2z"
+    />
+    <path
+      stroke="currentColor"
+      fill="currentColor"
+      d="M0 36v20h48v-6.2c0-6 0-6.1-2-4.3-1.1 1-2 2.9-2 4.2V52H4V34c0-17.3-.1-18-2-18s-2 .7-2 20z"
+    />
+  </>,
+  { width: 64, height: 64 },
+);
+
 // Icon imported form Storybook
 // Storybook is licensed under MIT https://github.com/storybookjs/storybook/blob/next/LICENSE
 export const resetZoom = createIcon(
