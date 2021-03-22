@@ -222,7 +222,8 @@
       align-items: center;
       svg {
         width: 36px;
-        height: 18px;
+        height: 14px;
+        padding: 2px;
         opacity: 0.6;
       }
       &.active svg {

@@ -607,7 +607,7 @@ describe("regression tests", () => {
   it("updates fontSize & fontFamily appState", () => {
     UI.clickTool("text");
     expect(h.state.currentItemFontFamily).toEqual(1); // Virgil
-    fireEvent.click(screen.getByText(/code/i));
+    fireEvent.click(screen.getByTitle(/code/i));
     expect(h.state.currentItemFontFamily).toEqual(3); // Cascadia
   });
 
