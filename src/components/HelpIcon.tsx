@@ -9,7 +9,13 @@ type HelpIconProps = {
 };
 
 export const HelpIcon = (props: HelpIconProps) => (
-  <label title={`${props.title} — ?`} className="help-icon">
-    <div onClick={props.onClick}>{questionCircle}</div>
-  </label>
+  <button
+    className="help-icon"
+    onClick={props.onClick}
+    type="button"
+    title={`${props.title} — ?`}
+    aria-label={props.title}
+  >
+    {questionCircle}
+  </button>
 );
