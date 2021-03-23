@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Popover } from "./Popover";
 
 import "./ColorPicker.scss";
@@ -6,6 +6,7 @@ import { isArrowKey, KEYS } from "../keys";
 import { t, getLanguage } from "../i18n";
 import { isWritableElement } from "../utils";
 import colors from "../colors";
+import { EVENT } from "../constants";
 
 const isValidColor = (color: string) => {
   const style = new Option().style;
@@ -237,14 +238,30 @@ export const ColorPicker = ({
   color,
   onChange,
   label,
+  shortcut,
 }: {
   type: "canvasBackground" | "elementBackground" | "elementStroke";
   color: string | null;
   onChange: (color: string) => void;
   label: string;
+  shortcut?: string;
 }) => {
   const [isActive, setActive] = React.useState(false);
   const pickerButton = React.useRef<HTMLButtonElement>(null);
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (!isActive && event.key === shortcut) {
+      setActive(true);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener(EVENT.KEYDOWN, handleKeyDown, false);
+
+    return () => {
+      document.removeEventListener(EVENT.KEYDOWN, handleKeyDown, false);
+    };
+  });
 
   return (
     <div>

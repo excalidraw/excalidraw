@@ -48,6 +48,7 @@ import {
   TextAlign,
 } from "../element/types";
 import { getLanguage, t } from "../i18n";
+import { KEYS } from "../keys";
 import { randomInteger } from "../random";
 import {
   canChangeSharpness,
@@ -121,6 +122,7 @@ export const actionChangeStrokeColor = register({
           appState.currentItemStrokeColor,
         )}
         onChange={updateData}
+        shortcut={KEYS.S}
       />
     </>
   ),
@@ -152,6 +154,7 @@ export const actionChangeBackgroundColor = register({
           appState.currentItemBackgroundColor,
         )}
         onChange={updateData}
+        shortcut={KEYS.G}
       />
     </>
   ),
