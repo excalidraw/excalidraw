@@ -16,6 +16,6 @@ export const HelpIcon = (props: HelpIconProps) => (
     title={`${props.title} — ?`}
     aria-label={props.title}
   >
-    <div aria-hidden="true">{questionCircle}</div>
+    {questionCircle}
   </button>
 );
