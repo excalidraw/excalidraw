@@ -5,11 +5,13 @@ import { ProjectName } from "../components/ProjectName";
 import { ToolButton } from "../components/ToolButton";
 import "../components/ToolIcon.scss";
 import { Tooltip } from "../components/Tooltip";
+import { DarkModeToggle, Appearence } from "../components/DarkModeToggle";
 import { loadFromJSON, saveAsJSON } from "../data";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
 import { KEYS } from "../keys";
 import { register } from "./register";
+import { supported } from "browser-fs-access";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -17,11 +19,14 @@ export const actionChangeProjectName = register({
     trackEvent("change", "title");
     return { appState: { ...appState, name: value }, commitToHistory: false };
   },
-  PanelComponent: ({ appState, updateData }) => (
+  PanelComponent: ({ appState, updateData, appProps }) => (
     <ProjectName
       label={t("labels.fileTitle")}
       value={appState.name || "Unnamed"}
       onChange={(name: string) => updateData(name)}
+      isNameEditable={
+        typeof appProps.name === "undefined" && !appState.viewModeEnabled
+      }
     />
   ),
 });
@@ -160,9 +165,7 @@ export const actionSaveAsScene = register({
       title={t("buttons.saveAs")}
       aria-label={t("buttons.saveAs")}
       showAriaLabel={useIsMobile()}
-      hidden={
-        !("chooseFileSystemEntries" in window || "showOpenFilePicker" in window)
-      }
+      hidden={!supported}
       onClick={() => updateData(null)}
     />
   ),
@@ -202,5 +205,33 @@ export const actionLoadScene = register({
       showAriaLabel={useIsMobile()}
       onClick={updateData}
     />
+  ),
+});
+
+export const actionExportWithDarkMode = register({
+  name: "exportWithDarkMode",
+  perform: (_elements, appState, value) => {
+    return {
+      appState: { ...appState, exportWithDarkMode: value },
+      commitToHistory: false,
+    };
+  },
+  PanelComponent: ({ appState, updateData }) => (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "flex-end",
+        marginTop: "-45px",
+        marginBottom: "10px",
+      }}
+    >
+      <DarkModeToggle
+        value={appState.exportWithDarkMode ? "dark" : "light"}
+        onChange={(theme: Appearence) => {
+          updateData(theme === "dark");
+        }}
+        title={t("labels.toggleExportColorScheme")}
+      />
+    </div>
   ),
 });

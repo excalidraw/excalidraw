@@ -61,14 +61,14 @@
     "architect": "ဗိသုကာ",
     "artist": "ပန်းချီ",
     "cartoonist": "ကာတွန်း",
-    "fileTitle": "ခေါင်းစဉ်",
+    "fileTitle": "",
     "colorPicker": "အရောင်ရွေး",
     "canvasBackground": "ကားချပ်နောက်ခံ",
     "drawingCanvas": "ပုံဆွဲကားချပ်",
     "layers": "အလွှာများ",
     "actions": "လုပ်ဆောင်ချက်များ",
     "language": "ဘာသာစကား",
-    "createRoom": "တိုက်ရိုက်ပူးပေါင်းဆောင်ရွက်ရန်အဖွဲ့ဖွဲ့",
+    "liveCollaboration": "",
     "duplicateSelection": "ပွား",
     "untitled": "အမည်မရှိ",
     "name": "အမည်",
@@ -92,7 +92,9 @@
     "centerHorizontally": "အလျားလိုက်အလယ်ညှိ",
     "distributeHorizontally": "အလျားလိုက်",
     "distributeVertically": "ထောင်လိုက်",
-    "viewMode": ""
+    "viewMode": "",
+    "toggleExportColorScheme": "",
+    "share": ""
   },
   "buttons": {
     "clearReset": "ကားချပ်ရှင်းလင်း",
@@ -117,7 +119,7 @@
     "edit": "ပြင်ဆင်",
     "undo": "ပြန်ထား",
     "redo": "ထပ်လုပ်",
-    "roomDialog": "တိုက်ရိုက်ပူးပေါင်းမှုစတင်",
+    "resetLibrary": "",
     "createNewRoom": "အခန်းသစ်ဖွဲ့",
     "fullScreen": "",
     "darkMode": "",
@@ -140,7 +142,9 @@
     "errorLoadingLibrary": "ပြင်ပမှမှတ်တမ်းအားတင်သွင်းရာတွင်အမှားအယွင်းရှိနေသည်။",
     "confirmAddLibrary": "{{numShapes}} ခုသောပုံသဏ္ဌာန်အားမှတ်တမ်းတင်ပါမည်။ အတည်ပြုပါ။",
     "imageDoesNotContainScene": "",
-    "cannotRestoreFromImage": "ဤပုံဖြင့်မြင်ကွင်းပြန်လည်မရယူနိုင်ပါ။"
+    "cannotRestoreFromImage": "ဤပုံဖြင့်မြင်ကွင်းပြန်လည်မရယူနိုင်ပါ။",
+    "invalidSceneUrl": "",
+    "resetLibrary": ""
   },
   "toolBar": {
     "selection": "ရွေးချယ်",
@@ -196,7 +200,8 @@
     "button_stopSession": "ပူးပေါင်းမှုအဆုံးသတ်",
     "desc_inProgressIntro": "တိုက်ရိုက်ပူးပေါင်းရေးဆွဲမှုများပြုလုပ်နေပါသည်။",
     "desc_shareLink": "ဤလင့်ခ်အား ပူးပေါင်းရေးဆွဲလိုသူများထံပေးပို့ပါ။ ။ ",
-    "desc_exitSession": "ပူးပေါင်းမှုရပ်တန့်ပါက အဖွဲ့အတွင်းမှထွက်ခွာသွားမည်ဖြစ်သော်လည်း မိမိမြင်ကွင်းတွင်ဆက်လက်ရေးဆွဲနိုင်ပါမည်။ အဖွဲ့အတွင်းကျန်ရှိနေခဲ့သောအခြားပါဝင်သူများသည်လည်း ဆက်လက်ပူးပေါင်းရေးဆွဲနေနိုင်ပါလိမ့်မည်။"
+    "desc_exitSession": "ပူးပေါင်းမှုရပ်တန့်ပါက အဖွဲ့အတွင်းမှထွက်ခွာသွားမည်ဖြစ်သော်လည်း မိမိမြင်ကွင်းတွင်ဆက်လက်ရေးဆွဲနိုင်ပါမည်။ အဖွဲ့အတွင်းကျန်ရှိနေခဲ့သောအခြားပါဝင်သူများသည်လည်း ဆက်လက်ပူးပေါင်းရေးဆွဲနေနိုင်ပါလိမ့်မည်။",
+    "shareTitle": ""
   },
   "errorDialog": {
     "title": "ချို့ယွင်းချက်"
@@ -243,6 +248,10 @@
   "toast": {
     "copyStyles": "",
     "copyToClipboard": "",
-    "copyToClipboardAsPng": ""
+    "copyToClipboardAsPng": "",
+    "fileSaved": "",
+    "fileSavedToFilename": "",
+    "canvas": "",
+    "selection": ""
   }
 }

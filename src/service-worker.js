@@ -17,9 +17,11 @@
  * See https://goo.gl/2aRDsh
  */
 
-importScripts(
-  "https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js",
-);
+importScripts("/workbox/workbox-sw.js");
+
+workbox.setConfig({
+  modulePathPrefix: "/workbox/",
+});
 
 self.addEventListener("message", (event) => {
   if (event.data && event.data.type === "SKIP_WAITING") {
@@ -45,3 +47,20 @@ workbox.routing.registerRoute(
     plugins: [new workbox.expiration.Plugin({ maxEntries: 10 })],
   }),
 );
+
+self.addEventListener("fetch", (event) => {
+  if (
+    event.request.method === "POST" &&
+    event.request.url.endsWith("/web-share-target")
+  ) {
+    return event.respondWith(
+      (async () => {
+        const formData = await event.request.formData();
+        const file = formData.get("file");
+        const webShareTargetCache = await caches.open("web-share-target");
+        await webShareTargetCache.put("shared-file", new Response(file));
+        return Response.redirect("/?web-share-target", 303);
+      })(),
+    );
+  }
+});

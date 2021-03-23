@@ -61,14 +61,14 @@
     "architect": "Arkitekt",
     "artist": "Kunstnar",
     "cartoonist": "Teiknar",
-    "fileTitle": "Filnamn",
+    "fileTitle": "",
     "colorPicker": "Fargeveljar",
     "canvasBackground": "Lerretsbakgrunn",
     "drawingCanvas": "Lerret",
     "layers": "Lag",
     "actions": "Handlingar",
     "language": "Språk",
-    "createRoom": "Del ei sanntids-samarbeidsøkt",
+    "liveCollaboration": "",
     "duplicateSelection": "Dupliser",
     "untitled": "Utan namn",
     "name": "Namn",
@@ -92,7 +92,9 @@
     "centerHorizontally": "Midtstill horisontalt",
     "distributeHorizontally": "Sprei horisontalt",
     "distributeVertically": "Sprei vertikalt",
-    "viewMode": ""
+    "viewMode": "",
+    "toggleExportColorScheme": "",
+    "share": ""
   },
   "buttons": {
     "clearReset": "Tilbakestill lerretet",
@@ -117,7 +119,7 @@
     "edit": "Rediger",
     "undo": "Angre",
     "redo": "Gjer om",
-    "roomDialog": "Start sanntids-samarbeid",
+    "resetLibrary": "",
     "createNewRoom": "Lag nytt rom",
     "fullScreen": "Fullskjerm",
     "darkMode": "Mørk modus",
@@ -140,7 +142,9 @@
     "errorLoadingLibrary": "Det oppstod ein feil under lastinga av tredjepartsbibliotek.",
     "confirmAddLibrary": "Dette vil legge til {{numShapes}} form(er) i biblioteket ditt. Er du sikker?",
     "imageDoesNotContainScene": "Importering av bilder støttes ikkje for p. t.\n\nVil du importere ein scene? Dette bildet ser ikkje ut til å inneholde noen scene-data. Har du aktivert dette under eksporten?",
-    "cannotRestoreFromImage": "Scena kunne ikkje gjenopprettast frå denne biletfila"
+    "cannotRestoreFromImage": "Scena kunne ikkje gjenopprettast frå denne biletfila",
+    "invalidSceneUrl": "",
+    "resetLibrary": ""
   },
   "toolBar": {
     "selection": "Vel",
@@ -196,7 +200,8 @@
     "button_stopSession": "Stopp økt",
     "desc_inProgressIntro": "Sanntids-samarbeidsøkt er no i gang.",
     "desc_shareLink": "Del denne lenka med dei du vil samarbeide med:",
-    "desc_exitSession": "Dersom du avsluttar økta blir du kopla frå rommet, men du kan halde fram med å arbeide med scena lokalt. Ver merksam på at dette ikkje vil påverke andre personar, og desse vil framleis ha moglegheit til å samarbeide på deira eigen versjon."
+    "desc_exitSession": "Dersom du avsluttar økta blir du kopla frå rommet, men du kan halde fram med å arbeide med scena lokalt. Ver merksam på at dette ikkje vil påverke andre personar, og desse vil framleis ha moglegheit til å samarbeide på deira eigen versjon.",
+    "shareTitle": ""
   },
   "errorDialog": {
     "title": "Feil"
@@ -243,6 +248,10 @@
   "toast": {
     "copyStyles": "",
     "copyToClipboard": "",
-    "copyToClipboardAsPng": ""
+    "copyToClipboardAsPng": "",
+    "fileSaved": "",
+    "fileSavedToFilename": "",
+    "canvas": "",
+    "selection": ""
   }
 }

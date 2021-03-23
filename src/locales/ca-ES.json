@@ -61,14 +61,14 @@
     "architect": "Arquitecte",
     "artist": "Artista",
     "cartoonist": "Dibuixant",
-    "fileTitle": "Títol del fitxer",
+    "fileTitle": "",
     "colorPicker": "Selector de colors",
     "canvasBackground": "Fons del llenç",
     "drawingCanvas": "Llenç de dibuix",
     "layers": "Capes",
     "actions": "Accions",
     "language": "Llengua",
-    "createRoom": "Compartir una sessió de col·laboració en directe",
+    "liveCollaboration": "Col·laboració en directe",
     "duplicateSelection": "Duplicar",
     "untitled": "Sense títol",
     "name": "Nom",
@@ -77,7 +77,7 @@
     "group": "Agrupar la selecció",
     "ungroup": "Desagrupar la selecció",
     "collaborators": "Col·laboradors",
-    "showGrid": "",
+    "showGrid": "Mostra la graella",
     "addToLibrary": "Afegir a la biblioteca",
     "removeFromLibrary": "Eliminar de la biblioteca",
     "libraryLoadingMessage": "Carregant la biblioteca…",
@@ -92,7 +92,9 @@
     "centerHorizontally": "Centrar horitzontalment",
     "distributeHorizontally": "Distribuir horitzontalment",
     "distributeVertically": "Distribuir verticalment",
-    "viewMode": ""
+    "viewMode": "Mode de visualització",
+    "toggleExportColorScheme": "Canvia l'esquema de colors de l'exportació",
+    "share": "Compartir"
   },
   "buttons": {
     "clearReset": "Netejar el llenç",
@@ -117,7 +119,7 @@
     "edit": "Editar",
     "undo": "Desfer",
     "redo": "Refer",
-    "roomDialog": "Començar col·laboració en directe",
+    "resetLibrary": "Restablir biblioteca",
     "createNewRoom": "Crear sala nova",
     "fullScreen": "Pantalla completa",
     "darkMode": "Mode fosc",
@@ -136,11 +138,13 @@
     "decryptFailed": "No s'ha pogut desencriptar.",
     "uploadedSecurly": "La càrrega s'ha assegurat amb xifratge punta a punta, cosa que significa que el servidor Excalidraw i tercers no poden llegir el contingut.",
     "loadSceneOverridePrompt": "Si carregas aquest dibuix extern, substituirá el que tens. Vols continuar?",
-    "collabStopOverridePrompt": "",
+    "collabStopOverridePrompt": "Aturar la sessió provocarà la sobreescriptura del dibuix previ, que hi ha desat en l'emmagatzematge local. N'esteu segur?\n\n(Si voleu conservar el dibuix local, tanqueu la pentanya del navegador en comptes d'aturar la sessió).",
     "errorLoadingLibrary": "S'ha produït un error en carregar la biblioteca de tercers.",
     "confirmAddLibrary": "Això afegirà {{numShapes}} forma(es) a la vostra biblioteca. Estàs segur?",
     "imageDoesNotContainScene": "En aquest moment no s’admet la importació d’imatges.\n\nVolies importar una escena? Sembla que aquesta imatge no conté cap dada d’escena. Ho has activat durant l'exportació?",
-    "cannotRestoreFromImage": "L’escena no s’ha pogut restaurar des d’aquest fitxer d’imatge"
+    "cannotRestoreFromImage": "L’escena no s’ha pogut restaurar des d’aquest fitxer d’imatge",
+    "invalidSceneUrl": "No s'ha pogut importar l'escena des de l'adreça URL proporcionada. Està malformada o no conté dades Excalidraw JSON vàlides.",
+    "resetLibrary": "Tot el llenç s'esborrarà. Estàs segur?"
   },
   "toolBar": {
     "selection": "Selecció",
@@ -196,31 +200,32 @@
     "button_stopSession": "Aturar sessió",
     "desc_inProgressIntro": "La sessió de col·laboració en directe està en marxa.",
     "desc_shareLink": "Comparteix aquest enllaç amb qualsevol persona amb qui vulguis col·laborar:",
-    "desc_exitSession": "Si aturas la sessió, et desconectarás de la sala, però podrás continuar treballant amb el dibuix localment. Tingues en compte que això no afectarà a altres persones, i encara podran col·laborar en la seva versió."
+    "desc_exitSession": "Si aturas la sessió, et desconectarás de la sala, però podrás continuar treballant amb el dibuix localment. Tingues en compte que això no afectarà a altres persones, i encara podran col·laborar en la seva versió.",
+    "shareTitle": "Uniu-vos a una sessió de col·laboració en directe a Excalidraw"
   },
   "errorDialog": {
     "title": "Error"
   },
   "helpDialog": {
-    "blog": "",
-    "click": "",
-    "curvedArrow": "",
-    "curvedLine": "",
-    "documentation": "",
-    "drag": "",
-    "editor": "",
-    "github": "",
-    "howto": "",
-    "or": "",
-    "preventBinding": "",
-    "shapes": "",
-    "shortcuts": "",
-    "textFinish": "",
-    "textNewLine": "",
-    "title": "",
-    "view": "",
-    "zoomToFit": "",
-    "zoomToSelection": ""
+    "blog": "Llegiu el nostre blog",
+    "click": "clic",
+    "curvedArrow": "Fletxa corba",
+    "curvedLine": "Línia corba",
+    "documentation": "Documentació",
+    "drag": "arrossega",
+    "editor": "Editor",
+    "github": "Hi heu trobat un problema? Informeu-ne",
+    "howto": "Seguiu les nostres guies",
+    "or": "o",
+    "preventBinding": "Prevenir vinculació de la fletxa",
+    "shapes": "Formes",
+    "shortcuts": "Dreceres de teclat",
+    "textFinish": "Acaba d'editar (text)",
+    "textNewLine": "Afegeix línea nova (text)",
+    "title": "Ajuda",
+    "view": "Visualització",
+    "zoomToFit": "Zoom per veure tots els elements",
+    "zoomToSelection": "Zoom per veure la selecció"
   },
   "encrypted": {
     "tooltip": "Els vostres dibuixos estan xifrats de punta a punta de manera que els servidors d’Excalidraw no els veuran mai."
@@ -235,14 +240,18 @@
     "storage": "Emmagatzematge",
     "title": "Estadístiques per nerds",
     "total": "Total",
-    "version": "",
-    "versionCopy": "",
-    "versionNotAvailable": "",
+    "version": "Versió",
+    "versionCopy": "Feu clic per a copiar",
+    "versionNotAvailable": "Versió no disponible",
     "width": "Amplada"
   },
   "toast": {
-    "copyStyles": "",
-    "copyToClipboard": "",
-    "copyToClipboardAsPng": ""
+    "copyStyles": "S'han copiat els estils.",
+    "copyToClipboard": "S'ha copiat al porta-retalls.",
+    "copyToClipboardAsPng": "S'ha copiat {{exportSelection}} al porta-retalls en format PNG\n({{exportColorScheme}})",
+    "fileSaved": "S'ha desat el fitxer.",
+    "fileSavedToFilename": "S'ha desat a {filename}",
+    "canvas": "el llenç",
+    "selection": "la selecció"
   }
 }

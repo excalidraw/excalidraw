@@ -61,14 +61,14 @@
     "architect": "Tervezői",
     "artist": "Művészi",
     "cartoonist": "Karikatúrás",
-    "fileTitle": "Fájl címe",
+    "fileTitle": "",
     "colorPicker": "Színválasztó",
     "canvasBackground": "Vászon háttérszíne",
     "drawingCanvas": "Rajzvászon",
     "layers": "Rétegek",
     "actions": "Műveletek",
     "language": "Nyelv",
-    "createRoom": "Élő együttmüködés megosztása",
+    "liveCollaboration": "",
     "duplicateSelection": "Duplikálás",
     "untitled": "Névtelen",
     "name": "Név",
@@ -92,7 +92,9 @@
     "centerHorizontally": "Vízszintesen középre igazított",
     "distributeHorizontally": "Vízszintes elosztás",
     "distributeVertically": "Függőleges elosztás",
-    "viewMode": ""
+    "viewMode": "",
+    "toggleExportColorScheme": "",
+    "share": ""
   },
   "buttons": {
     "clearReset": "Vászon törlése",
@@ -117,7 +119,7 @@
     "edit": "Szerkesztés",
     "undo": "Vissza",
     "redo": "Újra",
-    "roomDialog": "Élő együttműködés indítása",
+    "resetLibrary": "",
     "createNewRoom": "Új szoba létrehozása",
     "fullScreen": "Teljes képernyő",
     "darkMode": "Sötét mód",
@@ -140,7 +142,9 @@
     "errorLoadingLibrary": "Hibába ütközött a harmarmadik féltől származó könyvtár betöltése.",
     "confirmAddLibrary": "Ez a művelet {{numShapes}} formát fog hozzáadni a könyvtáradhoz. Biztos vagy benne?",
     "imageDoesNotContainScene": "Képek importálása egyelőre nem támogatott.\n\nEgy jelenetet szeretnél betölteni? Úgy tűnik ez a kép fájl nem tartalmazza a szükséges adatokat. Exportáláskor ezt egy külön opcióval lehet beállítani.",
-    "cannotRestoreFromImage": "A jelenet visszaállítása nem sikerült ebből a kép fájlból"
+    "cannotRestoreFromImage": "A jelenet visszaállítása nem sikerült ebből a kép fájlból",
+    "invalidSceneUrl": "",
+    "resetLibrary": ""
   },
   "toolBar": {
     "selection": "Kijelölés",
@@ -196,7 +200,8 @@
     "button_stopSession": "Munkamenet leállítása",
     "desc_inProgressIntro": "Az élő együttműködési munkamenet folyamatban van.",
     "desc_shareLink": "Ossza meg ezt a linket bárkivel, akivel együtt szeretne működni:",
-    "desc_exitSession": "Az munkamenet leállítása kilépteti önt a szobából, de folytathatja a munkát a saját gépén. Vegye figyelembe, hogy ez nem érinti más emberek munkáját és ők továbbra is együttműködhetnek a saját változatukon."
+    "desc_exitSession": "Az munkamenet leállítása kilépteti önt a szobából, de folytathatja a munkát a saját gépén. Vegye figyelembe, hogy ez nem érinti más emberek munkáját és ők továbbra is együttműködhetnek a saját változatukon.",
+    "shareTitle": ""
   },
   "errorDialog": {
     "title": "Hiba"
@@ -243,6 +248,10 @@
   "toast": {
     "copyStyles": "",
     "copyToClipboard": "",
-    "copyToClipboardAsPng": ""
+    "copyToClipboardAsPng": "",
+    "fileSaved": "",
+    "fileSavedToFilename": "",
+    "canvas": "",
+    "selection": ""
   }
 }

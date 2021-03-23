@@ -5,7 +5,7 @@
 ### Option 1 - Manual
 
 1. Fork and clone the repo
-1. Run `npm install` to install dependencies
+1. Run `yarn` to install dependencies
 1. Create a branch for your PR with `git checkout -b your-branch-name`
 
 > To keep `master` branch pointing to remote repository and make pull requests from branches on your fork. To do this, run:
@@ -19,7 +19,7 @@
 ### Option 2 - CodeSandbox
 
 1. Go to https://codesandbox.io/s/github/excalidraw/excalidraw
-1. Connect your Github account
+1. Connect your GitHub account
 1. Go to Git tab on left side
 1. Tap on `Fork Sandbox`
 1. Write your code
@@ -35,7 +35,6 @@ Make sure the title starts with a semantic prefix:
 
 - **feat**: A new feature
 - **fix**: A bug fix
-- **improvement**: An improvement to a current feature
 - **docs**: Documentation only changes
 - **style**: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
 - **refactor**: A code change that neither fixes a bug nor adds a feature

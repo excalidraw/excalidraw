@@ -61,14 +61,14 @@
     "architect": "건축가",
     "artist": "예술가",
     "cartoonist": "만화가",
-    "fileTitle": "파일명",
+    "fileTitle": "",
     "colorPicker": "색상 선택기",
     "canvasBackground": "캔버스 배경",
     "drawingCanvas": "캔버스 그리기",
     "layers": "레이어",
     "actions": "동작",
     "language": "언어",
-    "createRoom": "실시간 협업 세션 공유",
+    "liveCollaboration": "",
     "duplicateSelection": "복제",
     "untitled": "제목 없음",
     "name": "이름",
@@ -92,7 +92,9 @@
     "centerHorizontally": "수평으로 중앙 정렬",
     "distributeHorizontally": "수평으로 분배",
     "distributeVertically": "수직으로 분배",
-    "viewMode": "보기 모드"
+    "viewMode": "보기 모드",
+    "toggleExportColorScheme": "",
+    "share": ""
   },
   "buttons": {
     "clearReset": "캔버스 초기화",
@@ -117,7 +119,7 @@
     "edit": "수정",
     "undo": "실행 취소",
     "redo": "다시 실행",
-    "roomDialog": "실시간 협업 시작하기",
+    "resetLibrary": "",
     "createNewRoom": "방 만들기",
     "fullScreen": "전체화면",
     "darkMode": "다크 모드",
@@ -140,7 +142,9 @@
     "errorLoadingLibrary": "외부 라이브러리를 불러오는 중에 문제가 발생했습니다.",
     "confirmAddLibrary": "{{numShapes}}개의 모양이 라이브러리에 추가됩니다. 계속하시겠어요?",
     "imageDoesNotContainScene": "이미지에서 불러오기는 현재 지원되지 않습니다.\n\n화면을 불러오려고 하셨나요? 이미지에 화면 정보가 없는 것 같습니다. 내보낼 때 화면을 포함했나요?",
-    "cannotRestoreFromImage": "이미지 파일에서 화면을 복구할 수 없었습니다"
+    "cannotRestoreFromImage": "이미지 파일에서 화면을 복구할 수 없었습니다",
+    "invalidSceneUrl": "",
+    "resetLibrary": ""
   },
   "toolBar": {
     "selection": "선택",
@@ -196,7 +200,8 @@
     "button_stopSession": "세션 중단",
     "desc_inProgressIntro": "실시간 협업 세션이 진행 중입니다.",
     "desc_shareLink": "공동 작업자에게 이 링크를 공유하세요.",
-    "desc_exitSession": "세션을 중단하면 연결은 끊어지나 작업을 이어갈 수 있습니다. 이 작업은 다른 작업자에게 영향을 미치지 않으며 각자의 공동 작업은 계속 유지됩니다."
+    "desc_exitSession": "세션을 중단하면 연결은 끊어지나 작업을 이어갈 수 있습니다. 이 작업은 다른 작업자에게 영향을 미치지 않으며 각자의 공동 작업은 계속 유지됩니다.",
+    "shareTitle": ""
   },
   "errorDialog": {
     "title": "오류"
@@ -243,6 +248,10 @@
   "toast": {
     "copyStyles": "스타일 복사.",
     "copyToClipboard": "클립보드로 복사.",
-    "copyToClipboardAsPng": "클립보드로 PNG 이미지 복사."
+    "copyToClipboardAsPng": "",
+    "fileSaved": "",
+    "fileSavedToFilename": "",
+    "canvas": "",
+    "selection": ""
   }
 }

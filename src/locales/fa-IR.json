@@ -61,14 +61,14 @@
     "architect": "معمار",
     "artist": "هنرمند",
     "cartoonist": "کارتونیست",
-    "fileTitle": "عنوان فایل",
+    "fileTitle": "",
     "colorPicker": "انتخابگر رنگ",
     "canvasBackground": "بوم",
     "drawingCanvas": "بوم نقاشی",
     "layers": "لایه ها",
     "actions": "عملیات",
     "language": "زبان",
-    "createRoom": "اشتراک گذاری جلسه همکاری زنده",
+    "liveCollaboration": "",
     "duplicateSelection": "تکرار",
     "untitled": "بدون عنوان",
     "name": "نام",
@@ -92,7 +92,9 @@
     "centerHorizontally": "وسط قرار دادن به صورت افقی",
     "distributeHorizontally": "توزیع کردن به صورت افقی",
     "distributeVertically": "توزیع کردن به صورت عمودی",
-    "viewMode": ""
+    "viewMode": "",
+    "toggleExportColorScheme": "",
+    "share": ""
   },
   "buttons": {
     "clearReset": "پاکسازی بوم نقاشی",
@@ -117,7 +119,7 @@
     "edit": "ویرایش",
     "undo": "بازگرد",
     "redo": "از سر",
-    "roomDialog": "همکاری آنلاین را شروع کنید",
+    "resetLibrary": "",
     "createNewRoom": "ایجاد یک اتاق جدید",
     "fullScreen": "تمام‌صفحه",
     "darkMode": "حالت تیره",
@@ -140,7 +142,9 @@
     "errorLoadingLibrary": "خطایی در بارگذاری کتابخانه ثالث وجود داشت.",
     "confirmAddLibrary": "{{numShapes}} از اشکال به کتابخانه شما اضافه خواهد شد. مطمئن هستید؟",
     "imageDoesNotContainScene": "وارد کردن تصویر در این لحظه امکان پذیر نمی باشد.\nآیا مایل به وارد کردن یک صحنه هستید؟ این تصویر به نظر می رسد که فاقد هرگونه اطلاعاتی مربوط به صحنه باشد. آیا این گزینه را در زمان وارد کردن تصویر فعال کرده اید؟",
-    "cannotRestoreFromImage": "صحنه را نمی توان از این فایل تصویری بازیابی کرد"
+    "cannotRestoreFromImage": "صحنه را نمی توان از این فایل تصویری بازیابی کرد",
+    "invalidSceneUrl": "",
+    "resetLibrary": ""
   },
   "toolBar": {
     "selection": "گزینش",
@@ -196,7 +200,8 @@
     "button_stopSession": "پایان جلسه",
     "desc_inProgressIntro": "جلسه همکاری آنلاین در حال انجام است.",
     "desc_shareLink": "این لینک را با هر کسی که می خواهید با او همکاری کنید به اشتراک بگذارید:",
-    "desc_exitSession": "با پایان دادن جلسه، شما از اتاق حذف میکند، اما می توانید به صورت محلی کار خود را با بوم ادامه دهید. توجه داشته باشید که این مورد بر سایر افراد تأثیر نمی گذارد و همچنان می توانند در نسخه خود همکاری کنند."
+    "desc_exitSession": "با پایان دادن جلسه، شما از اتاق حذف میکند، اما می توانید به صورت محلی کار خود را با بوم ادامه دهید. توجه داشته باشید که این مورد بر سایر افراد تأثیر نمی گذارد و همچنان می توانند در نسخه خود همکاری کنند.",
+    "shareTitle": ""
   },
   "errorDialog": {
     "title": "خطا"
@@ -243,6 +248,10 @@
   "toast": {
     "copyStyles": "کپی سبک.",
     "copyToClipboard": "",
-    "copyToClipboardAsPng": "کپی در حافطه موقت به صورت PNG."
+    "copyToClipboardAsPng": "",
+    "fileSaved": "",
+    "fileSavedToFilename": "",
+    "canvas": "",
+    "selection": ""
   }
 }

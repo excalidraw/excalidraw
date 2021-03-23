@@ -2,7 +2,6 @@
 
 exports[`given element A and group of elements B and given both are selected when user clicks on B, on pointer up only elements from B should be selected: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -29,6 +28,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -74,6 +74,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -462,7 +463,6 @@ exports[`given element A and group of elements B and given both are selected whe
 
 exports[`given element A and group of elements B and given both are selected when user shift-clicks on B, on pointer up only element A should be selected: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -489,6 +489,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -541,6 +542,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -928,7 +930,6 @@ exports[`given element A and group of elements B and given both are selected whe
 
 exports[`regression tests Cmd/Ctrl-click exclusively select element under pointer: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -955,6 +956,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -990,6 +992,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -1703,7 +1706,6 @@ exports[`regression tests Cmd/Ctrl-click exclusively select element under pointe
 
 exports[`regression tests Drags selected element when hitting only bounding box and keeps element selected: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -1730,6 +1732,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -1767,6 +1770,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -1906,7 +1910,6 @@ exports[`regression tests Drags selected element when hitting only bounding box 
 
 exports[`regression tests adjusts z order when grouping: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -1933,6 +1936,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -1975,6 +1979,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -2363,7 +2368,6 @@ exports[`regression tests adjusts z order when grouping: [end of test] number of
 
 exports[`regression tests alt-drag duplicates an element: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -2390,6 +2394,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -2427,6 +2432,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -2615,7 +2621,6 @@ exports[`regression tests alt-drag duplicates an element: [end of test] number o
 
 exports[`regression tests arrow keys: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -2642,6 +2647,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -2676,6 +2682,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -2778,7 +2785,6 @@ exports[`regression tests arrow keys: [end of test] number of renders 1`] = `19`
 
 exports[`regression tests can drag element that covers another element, while another elem is selected: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -2805,6 +2811,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -2842,6 +2849,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -3254,7 +3262,6 @@ exports[`regression tests can drag element that covers another element, while an
 
 exports[`regression tests change the properties of a shape: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "#fa5252",
@@ -3281,6 +3288,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -3315,6 +3323,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -3348,8 +3357,8 @@ Object {
   "strokeStyle": "solid",
   "strokeWidth": 1,
   "type": "rectangle",
-  "version": 8,
-  "versionNonce": 1116226695,
+  "version": 4,
+  "versionNonce": 453191,
   "width": 10,
   "x": 10,
   "y": 10,
@@ -3420,7 +3429,7 @@ Object {
       "elements": Array [
         Object {
           "angle": 0,
-          "backgroundColor": "transparent",
+          "backgroundColor": "#fa5252",
           "boundElementIds": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -3466,85 +3475,13 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "seed": 337897,
-          "strokeColor": "#000000",
-          "strokeSharpness": "sharp",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "rectangle",
-          "version": 5,
-          "versionNonce": 401146281,
-          "width": 10,
-          "x": 10,
-          "y": 10,
-        },
-      ],
-    },
-    Object {
-      "appState": Object {
-        "editingGroupId": null,
-        "editingLinearElement": null,
-        "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
-          "id0": true,
-        },
-        "viewBackgroundColor": "#ffffff",
-      },
-      "elements": Array [
-        Object {
-          "angle": 0,
-          "backgroundColor": "#fa5252",
-          "boundElementIds": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [],
-          "height": 10,
-          "id": "id0",
-          "isDeleted": false,
-          "opacity": 100,
-          "roughness": 1,
-          "seed": 337897,
-          "strokeColor": "#000000",
-          "strokeSharpness": "sharp",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "rectangle",
-          "version": 6,
-          "versionNonce": 2019559783,
-          "width": 10,
-          "x": 10,
-          "y": 10,
-        },
-      ],
-    },
-    Object {
-      "appState": Object {
-        "editingGroupId": null,
-        "editingLinearElement": null,
-        "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
-          "id0": true,
-        },
-        "viewBackgroundColor": "#ffffff",
-      },
-      "elements": Array [
-        Object {
-          "angle": 0,
-          "backgroundColor": "#fa5252",
-          "boundElementIds": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [],
-          "height": 10,
-          "id": "id0",
-          "isDeleted": false,
-          "opacity": 100,
-          "roughness": 1,
-          "seed": 337897,
           "strokeColor": "#5f3dc4",
           "strokeSharpness": "sharp",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
-          "version": 8,
-          "versionNonce": 1116226695,
+          "version": 4,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -3561,7 +3498,6 @@ exports[`regression tests change the properties of a shape: [end of test] number
 
 exports[`regression tests click on an element and drag it: [dragged] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -3588,6 +3524,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -3625,6 +3562,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -3764,7 +3702,6 @@ exports[`regression tests click on an element and drag it: [dragged] number of r
 
 exports[`regression tests click on an element and drag it: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -3791,6 +3728,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -3830,6 +3768,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -4007,7 +3946,6 @@ exports[`regression tests click on an element and drag it: [end of test] number 
 
 exports[`regression tests click to select a shape: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -4034,6 +3972,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -4071,6 +4010,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -4258,7 +4198,6 @@ exports[`regression tests click to select a shape: [end of test] number of rende
 
 exports[`regression tests click-drag to select a group: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -4285,6 +4224,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -4323,6 +4263,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -4618,7 +4559,6 @@ exports[`regression tests click-drag to select a group: [end of test] number of 
 
 exports[`regression tests deselects group of selected elements on pointer down when pointer doesn't hit any element: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -4667,6 +4607,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -4725,6 +4666,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -4912,7 +4854,6 @@ exports[`regression tests deselects group of selected elements on pointer down w
 
 exports[`regression tests deselects group of selected elements on pointer up when pointer hits common bounding box without hitting any element: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -4961,6 +4902,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -4997,6 +4939,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -5218,7 +5161,6 @@ exports[`regression tests deselects group of selected elements on pointer up whe
 
 exports[`regression tests deselects selected element on pointer down when pointer doesn't hit any element: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -5267,6 +5209,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -5323,6 +5266,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -5425,7 +5369,6 @@ exports[`regression tests deselects selected element on pointer down when pointe
 
 exports[`regression tests deselects selected element, on pointer up, when click hits element bounding box but doesn't hit the element: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -5474,6 +5417,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -5508,6 +5452,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -5610,7 +5555,6 @@ exports[`regression tests deselects selected element, on pointer up, when click 
 
 exports[`regression tests double click to edit a group: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -5637,6 +5581,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -5671,6 +5616,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -6062,7 +6008,6 @@ exports[`regression tests double click to edit a group: [end of test] number of 
 
 exports[`regression tests drags selected elements from point inside common bounding box that doesn't hit any element and keeps elements selected after dragging: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -6089,6 +6034,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -6130,6 +6076,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -6379,7 +6326,6 @@ exports[`regression tests drags selected elements from point inside common bound
 
 exports[`regression tests draw every type of shape: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -6406,6 +6352,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -6440,6 +6387,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -8412,7 +8360,6 @@ exports[`regression tests draw every type of shape: [end of test] number of rend
 
 exports[`regression tests given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -8439,6 +8386,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -8478,6 +8426,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -8773,7 +8722,6 @@ exports[`regression tests given a group of selected elements with an element tha
 
 exports[`regression tests given a selected element A and a not selected element B with higher z-index than A and given B partialy overlaps A when there's a shift-click on the overlapped section B is added to the selection: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "#fa5252",
@@ -8800,6 +8748,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -8840,6 +8789,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -9027,7 +8977,6 @@ exports[`regression tests given a selected element A and a not selected element 
 
 exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when clicking intersection between A and B B should be selected on pointer up: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "#fa5252",
@@ -9054,6 +9003,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -9092,6 +9042,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -9279,7 +9230,6 @@ exports[`regression tests given selected element A with lower z-index than unsel
 
 exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when dragging on intersection between A and B A should be dragged and keep being selected: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "#fa5252",
@@ -9306,6 +9256,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -9345,6 +9296,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -9593,7 +9545,6 @@ exports[`regression tests given selected element A with lower z-index than unsel
 
 exports[`regression tests key 2 selects rectangle tool: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -9620,6 +9571,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -9654,6 +9606,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -9756,7 +9709,6 @@ exports[`regression tests key 2 selects rectangle tool: [end of test] number of 
 
 exports[`regression tests key 3 selects diamond tool: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -9783,6 +9735,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -9817,6 +9770,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -9919,7 +9873,6 @@ exports[`regression tests key 3 selects diamond tool: [end of test] number of re
 
 exports[`regression tests key 4 selects ellipse tool: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -9946,6 +9899,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -9980,6 +9934,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -10082,7 +10037,6 @@ exports[`regression tests key 4 selects ellipse tool: [end of test] number of re
 
 exports[`regression tests key 5 selects arrow tool: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -10109,6 +10063,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -10143,6 +10098,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -10275,7 +10231,6 @@ exports[`regression tests key 5 selects arrow tool: [end of test] number of rend
 
 exports[`regression tests key 6 selects line tool: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -10302,6 +10257,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -10336,6 +10292,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -10468,7 +10425,6 @@ exports[`regression tests key 6 selects line tool: [end of test] number of rende
 
 exports[`regression tests key 7 selects draw tool: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -10495,6 +10451,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -10529,6 +10486,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -10661,7 +10619,6 @@ exports[`regression tests key 7 selects draw tool: [end of test] number of rende
 
 exports[`regression tests key a selects arrow tool: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -10688,6 +10645,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -10722,6 +10680,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -10854,7 +10813,6 @@ exports[`regression tests key a selects arrow tool: [end of test] number of rend
 
 exports[`regression tests key d selects diamond tool: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -10881,6 +10839,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -10915,6 +10874,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -11017,7 +10977,6 @@ exports[`regression tests key d selects diamond tool: [end of test] number of re
 
 exports[`regression tests key e selects ellipse tool: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -11044,6 +11003,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -11078,6 +11038,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -11180,7 +11141,6 @@ exports[`regression tests key e selects ellipse tool: [end of test] number of re
 
 exports[`regression tests key l selects line tool: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -11207,6 +11167,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -11241,6 +11202,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -11373,7 +11335,6 @@ exports[`regression tests key l selects line tool: [end of test] number of rende
 
 exports[`regression tests key r selects rectangle tool: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -11400,6 +11361,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -11434,6 +11396,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -11536,7 +11499,6 @@ exports[`regression tests key r selects rectangle tool: [end of test] number of 
 
 exports[`regression tests key x selects draw tool: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -11563,6 +11525,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -11597,6 +11560,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -11729,7 +11693,6 @@ exports[`regression tests key x selects draw tool: [end of test] number of rende
 
 exports[`regression tests make a group and duplicate it: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -11756,6 +11719,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -11801,6 +11765,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -12444,7 +12409,6 @@ exports[`regression tests make a group and duplicate it: [end of test] number of
 
 exports[`regression tests noop interaction after undo shouldn't create history entry: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -12471,6 +12435,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -12509,6 +12474,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -12696,7 +12662,6 @@ exports[`regression tests noop interaction after undo shouldn't create history e
 
 exports[`regression tests pinch-to-zoom works: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -12723,6 +12688,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -12757,6 +12723,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -12797,7 +12764,6 @@ exports[`regression tests pinch-to-zoom works: [end of test] number of renders 1
 
 exports[`regression tests rerenders UI on language change: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -12824,6 +12790,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -12856,6 +12823,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -12896,7 +12864,6 @@ exports[`regression tests rerenders UI on language change: [end of test] number 
 
 exports[`regression tests selecting 'Add to library' in context menu adds element to library: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -12923,6 +12890,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -12957,6 +12925,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -13059,7 +13028,6 @@ exports[`regression tests selecting 'Add to library' in context menu adds elemen
 
 exports[`regression tests selecting 'Bring forward' in context menu brings element forward: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -13086,6 +13054,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -13120,6 +13089,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -13366,7 +13336,6 @@ exports[`regression tests selecting 'Bring forward' in context menu brings eleme
 
 exports[`regression tests selecting 'Bring to front' in context menu brings element to front: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -13393,6 +13362,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -13427,6 +13397,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -13673,7 +13644,6 @@ exports[`regression tests selecting 'Bring to front' in context menu brings elem
 
 exports[`regression tests selecting 'Copy styles' in context menu copies styles: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -13700,6 +13670,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -13734,6 +13705,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": "Copied styles.",
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -13836,7 +13808,6 @@ exports[`regression tests selecting 'Copy styles' in context menu copies styles:
 
 exports[`regression tests selecting 'Delete' in context menu deletes element: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -13863,6 +13834,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -13895,6 +13867,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -14031,7 +14004,6 @@ exports[`regression tests selecting 'Delete' in context menu deletes element: [e
 
 exports[`regression tests selecting 'Duplicate' in context menu duplicates element: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -14058,6 +14030,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -14092,6 +14065,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -14279,7 +14253,6 @@ exports[`regression tests selecting 'Duplicate' in context menu duplicates eleme
 
 exports[`regression tests selecting 'Group selection' in context menu groups selected elements: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -14306,6 +14279,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -14346,6 +14320,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -14602,7 +14577,6 @@ exports[`regression tests selecting 'Group selection' in context menu groups sel
 
 exports[`regression tests selecting 'Paste styles' in context menu pastes styles: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "#e64980",
@@ -14629,6 +14603,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -14663,6 +14638,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": "Copied styles.",
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -14697,7 +14673,7 @@ Object {
   "strokeWidth": 2,
   "type": "rectangle",
   "version": 3,
-  "versionNonce": 81784553,
+  "versionNonce": 1505387817,
   "width": 20,
   "x": 10,
   "y": 10,
@@ -14716,14 +14692,14 @@ Object {
   "isDeleted": false,
   "opacity": 60,
   "roughness": 2,
-  "seed": 23633383,
+  "seed": 238820263,
   "strokeColor": "#c92a2a",
   "strokeSharpness": "sharp",
   "strokeStyle": "dotted",
   "strokeWidth": 2,
   "type": "rectangle",
-  "version": 13,
-  "versionNonce": 915032327,
+  "version": 9,
+  "versionNonce": 1604849351,
   "width": 20,
   "x": 40,
   "y": 40,
@@ -14886,7 +14862,7 @@ Object {
           "opacity": 100,
           "roughness": 1,
           "seed": 449462985,
-          "strokeColor": "#000000",
+          "strokeColor": "#c92a2a",
           "strokeSharpness": "sharp",
           "strokeStyle": "solid",
           "strokeWidth": 1,
@@ -14935,9 +14911,68 @@ Object {
         },
         Object {
           "angle": 0,
+          "backgroundColor": "#e64980",
+          "boundElementIds": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 449462985,
+          "strokeColor": "#c92a2a",
+          "strokeSharpness": "sharp",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 4,
+          "versionNonce": 2019559783,
+          "width": 20,
+          "x": 40,
+          "y": 40,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
           "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeSharpness": "sharp",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "#e64980",
+          "boundElementIds": null,
+          "fillStyle": "cross-hatch",
           "groupIds": Array [],
           "height": 20,
           "id": "id1",
@@ -14994,9 +15029,9 @@ Object {
         },
         Object {
           "angle": 0,
-          "backgroundColor": "transparent",
+          "backgroundColor": "#e64980",
           "boundElementIds": null,
-          "fillStyle": "hachure",
+          "fillStyle": "cross-hatch",
           "groupIds": Array [],
           "height": 20,
           "id": "id1",
@@ -15007,69 +15042,10 @@ Object {
           "strokeColor": "#c92a2a",
           "strokeSharpness": "sharp",
           "strokeStyle": "solid",
-          "strokeWidth": 1,
+          "strokeWidth": 2,
           "type": "rectangle",
           "version": 6,
           "versionNonce": 1116226695,
-          "width": 20,
-          "x": 40,
-          "y": 40,
-        },
-      ],
-    },
-    Object {
-      "appState": Object {
-        "editingGroupId": null,
-        "editingLinearElement": null,
-        "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
-          "id1": true,
-        },
-        "viewBackgroundColor": "#ffffff",
-      },
-      "elements": Array [
-        Object {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElementIds": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [],
-          "height": 20,
-          "id": "id0",
-          "isDeleted": false,
-          "opacity": 100,
-          "roughness": 1,
-          "seed": 337897,
-          "strokeColor": "#000000",
-          "strokeSharpness": "sharp",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "rectangle",
-          "version": 2,
-          "versionNonce": 1278240551,
-          "width": 20,
-          "x": 10,
-          "y": 10,
-        },
-        Object {
-          "angle": 0,
-          "backgroundColor": "#e64980",
-          "boundElementIds": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [],
-          "height": 20,
-          "id": "id1",
-          "isDeleted": false,
-          "opacity": 100,
-          "roughness": 1,
-          "seed": 449462985,
-          "strokeColor": "#c92a2a",
-          "strokeSharpness": "sharp",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "rectangle",
-          "version": 8,
-          "versionNonce": 238820263,
           "width": 20,
           "x": 40,
           "y": 40,
@@ -15124,10 +15100,69 @@ Object {
           "seed": 449462985,
           "strokeColor": "#c92a2a",
           "strokeSharpness": "sharp",
+          "strokeStyle": "dotted",
+          "strokeWidth": 2,
+          "type": "rectangle",
+          "version": 7,
+          "versionNonce": 1014066025,
+          "width": 20,
+          "x": 40,
+          "y": 40,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": null,
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id1": true,
+        },
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElementIds": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeSharpness": "sharp",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
-          "version": 9,
+          "version": 2,
+          "versionNonce": 1278240551,
+          "width": 20,
+          "x": 10,
+          "y": 10,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "#e64980",
+          "boundElementIds": null,
+          "fillStyle": "cross-hatch",
+          "groupIds": Array [],
+          "height": 20,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 2,
+          "seed": 238820263,
+          "strokeColor": "#c92a2a",
+          "strokeSharpness": "sharp",
+          "strokeStyle": "dotted",
+          "strokeWidth": 2,
+          "type": "rectangle",
+          "version": 8,
           "versionNonce": 400692809,
           "width": 20,
           "x": 40,
@@ -15178,193 +15213,16 @@ Object {
           "height": 20,
           "id": "id1",
           "isDeleted": false,
-          "opacity": 100,
-          "roughness": 1,
-          "seed": 449462985,
-          "strokeColor": "#c92a2a",
-          "strokeSharpness": "sharp",
-          "strokeStyle": "solid",
-          "strokeWidth": 2,
-          "type": "rectangle",
-          "version": 10,
-          "versionNonce": 1604849351,
-          "width": 20,
-          "x": 40,
-          "y": 40,
-        },
-      ],
-    },
-    Object {
-      "appState": Object {
-        "editingGroupId": null,
-        "editingLinearElement": null,
-        "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
-          "id1": true,
-        },
-        "viewBackgroundColor": "#ffffff",
-      },
-      "elements": Array [
-        Object {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElementIds": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [],
-          "height": 20,
-          "id": "id0",
-          "isDeleted": false,
-          "opacity": 100,
-          "roughness": 1,
-          "seed": 337897,
-          "strokeColor": "#000000",
-          "strokeSharpness": "sharp",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "rectangle",
-          "version": 2,
-          "versionNonce": 1278240551,
-          "width": 20,
-          "x": 10,
-          "y": 10,
-        },
-        Object {
-          "angle": 0,
-          "backgroundColor": "#e64980",
-          "boundElementIds": null,
-          "fillStyle": "cross-hatch",
-          "groupIds": Array [],
-          "height": 20,
-          "id": "id1",
-          "isDeleted": false,
-          "opacity": 100,
-          "roughness": 1,
-          "seed": 449462985,
-          "strokeColor": "#c92a2a",
-          "strokeSharpness": "sharp",
-          "strokeStyle": "dotted",
-          "strokeWidth": 2,
-          "type": "rectangle",
-          "version": 11,
-          "versionNonce": 1505387817,
-          "width": 20,
-          "x": 40,
-          "y": 40,
-        },
-      ],
-    },
-    Object {
-      "appState": Object {
-        "editingGroupId": null,
-        "editingLinearElement": null,
-        "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
-          "id1": true,
-        },
-        "viewBackgroundColor": "#ffffff",
-      },
-      "elements": Array [
-        Object {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElementIds": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [],
-          "height": 20,
-          "id": "id0",
-          "isDeleted": false,
-          "opacity": 100,
-          "roughness": 1,
-          "seed": 337897,
-          "strokeColor": "#000000",
-          "strokeSharpness": "sharp",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "rectangle",
-          "version": 2,
-          "versionNonce": 1278240551,
-          "width": 20,
-          "x": 10,
-          "y": 10,
-        },
-        Object {
-          "angle": 0,
-          "backgroundColor": "#e64980",
-          "boundElementIds": null,
-          "fillStyle": "cross-hatch",
-          "groupIds": Array [],
-          "height": 20,
-          "id": "id1",
-          "isDeleted": false,
-          "opacity": 100,
-          "roughness": 2,
-          "seed": 23633383,
-          "strokeColor": "#c92a2a",
-          "strokeSharpness": "sharp",
-          "strokeStyle": "dotted",
-          "strokeWidth": 2,
-          "type": "rectangle",
-          "version": 12,
-          "versionNonce": 493213705,
-          "width": 20,
-          "x": 40,
-          "y": 40,
-        },
-      ],
-    },
-    Object {
-      "appState": Object {
-        "editingGroupId": null,
-        "editingLinearElement": null,
-        "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
-          "id1": true,
-        },
-        "viewBackgroundColor": "#ffffff",
-      },
-      "elements": Array [
-        Object {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElementIds": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [],
-          "height": 20,
-          "id": "id0",
-          "isDeleted": false,
-          "opacity": 100,
-          "roughness": 1,
-          "seed": 337897,
-          "strokeColor": "#000000",
-          "strokeSharpness": "sharp",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "rectangle",
-          "version": 2,
-          "versionNonce": 1278240551,
-          "width": 20,
-          "x": 10,
-          "y": 10,
-        },
-        Object {
-          "angle": 0,
-          "backgroundColor": "#e64980",
-          "boundElementIds": null,
-          "fillStyle": "cross-hatch",
-          "groupIds": Array [],
-          "height": 20,
-          "id": "id1",
-          "isDeleted": false,
           "opacity": 60,
           "roughness": 2,
-          "seed": 23633383,
+          "seed": 238820263,
           "strokeColor": "#c92a2a",
           "strokeSharpness": "sharp",
           "strokeStyle": "dotted",
           "strokeWidth": 2,
           "type": "rectangle",
-          "version": 13,
-          "versionNonce": 915032327,
+          "version": 9,
+          "versionNonce": 1604849351,
           "width": 20,
           "x": 40,
           "y": 40,
@@ -15400,7 +15258,7 @@ Object {
           "strokeWidth": 2,
           "type": "rectangle",
           "version": 3,
-          "versionNonce": 81784553,
+          "versionNonce": 1505387817,
           "width": 20,
           "x": 10,
           "y": 10,
@@ -15416,14 +15274,14 @@ Object {
           "isDeleted": false,
           "opacity": 60,
           "roughness": 2,
-          "seed": 23633383,
+          "seed": 238820263,
           "strokeColor": "#c92a2a",
           "strokeSharpness": "sharp",
           "strokeStyle": "dotted",
           "strokeWidth": 2,
           "type": "rectangle",
-          "version": 13,
-          "versionNonce": 915032327,
+          "version": 9,
+          "versionNonce": 1604849351,
           "width": 20,
           "x": 40,
           "y": 40,
@@ -15440,7 +15298,6 @@ exports[`regression tests selecting 'Paste styles' in context menu pastes styles
 
 exports[`regression tests selecting 'Send backward' in context menu sends element backward: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -15467,6 +15324,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -15501,6 +15359,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -15747,7 +15606,6 @@ exports[`regression tests selecting 'Send backward' in context menu sends elemen
 
 exports[`regression tests selecting 'Send to back' in context menu sends element to back: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -15774,6 +15632,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -15808,6 +15667,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -16054,7 +15914,6 @@ exports[`regression tests selecting 'Send to back' in context menu sends element
 
 exports[`regression tests selecting 'Ungroup selection' in context menu ungroups selected group: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -16081,6 +15940,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -16119,6 +15979,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -16432,7 +16293,6 @@ exports[`regression tests selecting 'Ungroup selection' in context menu ungroups
 
 exports[`regression tests shift click on selected element should deselect it on pointer up: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -16459,6 +16319,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -16496,6 +16357,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -16598,7 +16460,6 @@ exports[`regression tests shift click on selected element should deselect it on 
 
 exports[`regression tests shift-click to multiselect, then drag: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -16625,6 +16486,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -16668,6 +16530,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -16918,7 +16781,6 @@ exports[`regression tests shift-click to multiselect, then drag: [end of test] n
 
 exports[`regression tests should show fill icons when element has non transparent background: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "#fa5252",
@@ -16945,6 +16807,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -16982,6 +16845,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -17015,8 +16879,8 @@ Object {
   "strokeStyle": "solid",
   "strokeWidth": 1,
   "type": "rectangle",
-  "version": 5,
-  "versionNonce": 401146281,
+  "version": 3,
+  "versionNonce": 449462985,
   "width": 10,
   "x": 0,
   "y": 0,
@@ -17087,7 +16951,7 @@ Object {
       "elements": Array [
         Object {
           "angle": 0,
-          "backgroundColor": "transparent",
+          "backgroundColor": "#fa5252",
           "boundElementIds": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -17110,42 +16974,6 @@ Object {
         },
       ],
     },
-    Object {
-      "appState": Object {
-        "editingGroupId": null,
-        "editingLinearElement": null,
-        "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
-          "id0": true,
-        },
-        "viewBackgroundColor": "#ffffff",
-      },
-      "elements": Array [
-        Object {
-          "angle": 0,
-          "backgroundColor": "#fa5252",
-          "boundElementIds": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [],
-          "height": 10,
-          "id": "id0",
-          "isDeleted": false,
-          "opacity": 100,
-          "roughness": 1,
-          "seed": 337897,
-          "strokeColor": "#000000",
-          "strokeSharpness": "sharp",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "rectangle",
-          "version": 5,
-          "versionNonce": 401146281,
-          "width": 10,
-          "x": 0,
-          "y": 0,
-        },
-      ],
-    },
   ],
 }
 `;
@@ -17156,7 +16984,6 @@ exports[`regression tests should show fill icons when element has non transparen
 
 exports[`regression tests shows 'Group selection' in context menu for multiple selected elements: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -17183,6 +17010,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -17223,6 +17051,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -17410,7 +17239,6 @@ exports[`regression tests shows 'Group selection' in context menu for multiple s
 
 exports[`regression tests shows 'Ungroup selection' in context menu for group inside selected elements: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -17437,6 +17265,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -17479,6 +17308,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -17736,7 +17566,6 @@ exports[`regression tests shows 'Ungroup selection' in context menu for group in
 
 exports[`regression tests shows context menu for canvas: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -17763,6 +17592,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -17795,6 +17625,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -17835,7 +17666,6 @@ exports[`regression tests shows context menu for canvas: [end of test] number of
 
 exports[`regression tests shows context menu for element: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -17862,6 +17692,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -17896,6 +17727,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -17998,7 +17830,6 @@ exports[`regression tests shows context menu for element: [end of test] number o
 
 exports[`regression tests single-clicking on a subgroup of a selected group should not alter selection: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -18025,6 +17856,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -18070,6 +17902,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -18818,7 +18651,6 @@ exports[`regression tests single-clicking on a subgroup of a selected group shou
 
 exports[`regression tests spacebar + drag scrolls the canvas: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -18845,6 +18677,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -18877,6 +18710,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -18917,7 +18751,6 @@ exports[`regression tests spacebar + drag scrolls the canvas: [end of test] numb
 
 exports[`regression tests supports nested groups: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -18944,6 +18777,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -18980,6 +18814,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -19648,7 +19483,6 @@ exports[`regression tests supports nested groups: [end of test] number of render
 
 exports[`regression tests switches from group of selected elements to another element on pointer down: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -19697,6 +19531,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -19757,6 +19592,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -20052,7 +19888,6 @@ exports[`regression tests switches from group of selected elements to another el
 
 exports[`regression tests switches selected element on pointer down: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -20101,6 +19936,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -20159,6 +19995,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -20346,7 +20183,6 @@ exports[`regression tests switches selected element on pointer down: [end of tes
 
 exports[`regression tests two-finger scroll works: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -20373,6 +20209,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -20407,6 +20244,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -20447,7 +20285,6 @@ exports[`regression tests two-finger scroll works: [end of test] number of rende
 
 exports[`regression tests undo/redo drawing an element: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -20474,6 +20311,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -20508,6 +20346,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -20542,7 +20381,7 @@ Object {
   "strokeWidth": 1,
   "type": "rectangle",
   "version": 6,
-  "versionNonce": 1006504105,
+  "versionNonce": 760410951,
   "width": 20,
   "x": 10,
   "y": -10,
@@ -20568,7 +20407,7 @@ Object {
   "strokeWidth": 1,
   "type": "rectangle",
   "version": 6,
-  "versionNonce": 289600103,
+  "versionNonce": 1006504105,
   "width": 30,
   "x": 40,
   "y": 0,
@@ -20611,8 +20450,8 @@ Object {
   "strokeStyle": "solid",
   "strokeWidth": 1,
   "type": "arrow",
-  "version": 11,
-  "versionNonce": 1315507081,
+  "version": 9,
+  "versionNonce": 81784553,
   "width": 60,
   "x": 130,
   "y": 10,
@@ -20944,7 +20783,6 @@ exports[`regression tests undo/redo drawing an element: [end of test] number of 
 
 exports[`regression tests updates fontSize & fontFamily appState: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -20971,6 +20809,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -21003,6 +20842,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -21043,7 +20883,6 @@ exports[`regression tests updates fontSize & fontFamily appState: [end of test] 
 
 exports[`regression tests zoom hotkeys: [end of test] appState 1`] = `
 Object {
-  "appearance": "light",
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
@@ -21070,6 +20909,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
   "height": 768,
@@ -21102,6 +20942,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,

@@ -61,14 +61,14 @@
     "architect": "Arhitect",
     "artist": "Artist",
     "cartoonist": "Caricaturist",
-    "fileTitle": "Denumirea fișierului",
+    "fileTitle": "Nume de fișier",
     "colorPicker": "Selector de culoare",
     "canvasBackground": "Fundalul pânzei",
     "drawingCanvas": "Pânză pentru desenat",
     "layers": "Straturi",
     "actions": "Acțiuni",
     "language": "Limbă",
-    "createRoom": "Invită la o sesiune de colaborare în direct",
+    "liveCollaboration": "Colaborare în direct",
     "duplicateSelection": "Duplicare",
     "untitled": "Nedenumit",
     "name": "Nume",
@@ -92,7 +92,9 @@
     "centerHorizontally": "Centrare orizontală",
     "distributeHorizontally": "Distribuie orizontal",
     "distributeVertically": "Distribuie vertical",
-    "viewMode": "Mod de vizualizare"
+    "viewMode": "Mod de vizualizare",
+    "toggleExportColorScheme": "Comutare schemă de culori de export",
+    "share": "Distribuie"
   },
   "buttons": {
     "clearReset": "Resetare pânză",
@@ -117,7 +119,7 @@
     "edit": "Edit",
     "undo": "Anulare",
     "redo": "Refacere",
-    "roomDialog": "Colaborare în direct",
+    "resetLibrary": "Resetare bibliotecă",
     "createNewRoom": "Creare cameră nouă",
     "fullScreen": "Ecran complet",
     "darkMode": "Mod întunecat",
@@ -140,7 +142,9 @@
     "errorLoadingLibrary": "A apărut o eroare la încărcarea bibliotecii terțe.",
     "confirmAddLibrary": "Această acțiune va adăuga {{numShapes}} formă(e) la biblioteca ta. Confirmi?",
     "imageDoesNotContainScene": "Importarea imaginilor nu este acceptată în acest moment.\n\nVoiai să imporți o scenă? Această imagine nu pare să conțină date de scenă. Ai activat această opțiune pe durata exportării?",
-    "cannotRestoreFromImage": "Scena nu a putut fi restaurată din acest fișier de imagine"
+    "cannotRestoreFromImage": "Scena nu a putut fi restaurată din acest fișier de imagine",
+    "invalidSceneUrl": "Scena nu a putut fi importată din URL-ul furnizat. Este fie incorect formată, fie nu conține date JSON Excalidraw valide.",
+    "resetLibrary": "Această opțiune va elimina conținutul din bibliotecă. Confirmi?"
   },
   "toolBar": {
     "selection": "Selecție",
@@ -196,7 +200,8 @@
     "button_stopSession": "Oprire sesiune",
     "desc_inProgressIntro": "Sesiunea de colaborare în direct este în curs de desfășurare.",
     "desc_shareLink": "Distribuie această legătură persoanelor cu care dorești să colaborezi:",
-    "desc_exitSession": "Oprirea sesiunii te va deconecta de la sală, însă vei putea lucra în continuare, pe plan local, cu scena. Reține că această opțiune nu va afecta alte persoane, iar acestea vor putea să colaboreze în continuare pe versiunea lor."
+    "desc_exitSession": "Oprirea sesiunii te va deconecta de la sală, însă vei putea lucra în continuare, pe plan local, cu scena. Reține că această opțiune nu va afecta alte persoane, iar acestea vor putea să colaboreze în continuare pe versiunea lor.",
+    "shareTitle": "Alătură-te unei sesiuni de colaborare în direct pe Excalidraw"
   },
   "errorDialog": {
     "title": "Eroare"
@@ -243,6 +248,10 @@
   "toast": {
     "copyStyles": "Stiluri copiate.",
     "copyToClipboard": "Copiat în memoria temporară.",
-    "copyToClipboardAsPng": "Copiat în memoria temporară ca PNG."
+    "copyToClipboardAsPng": "S-a copiat {{exportSelection}} în memoria temporară sub formă de PNG\n({{exportColorScheme}})",
+    "fileSaved": "Fișier salvat.",
+    "fileSavedToFilename": "Salvat în {filename}",
+    "canvas": "pânza",
+    "selection": "selecția"
   }
 }

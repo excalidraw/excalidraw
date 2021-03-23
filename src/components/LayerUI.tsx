@@ -17,7 +17,7 @@ import { Language, t } from "../i18n";
 import useIsMobile from "../is-mobile";
 import { calculateScrollCenter, getSelectedElements } from "../scene";
 import { ExportType } from "../scene/types";
-import { AppState, LibraryItem, LibraryItems } from "../types";
+import { AppState, ExcalidrawProps, LibraryItem, LibraryItems } from "../types";
 import { muteFSAbortError } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher, ZoomActions } from "./Actions";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
@@ -27,7 +27,7 @@ import { ExportCB, ExportDialog } from "./ExportDialog";
 import { FixedSideContainer } from "./FixedSideContainer";
 import { GitHubCorner } from "./GitHubCorner";
 import { HintViewer } from "./HintViewer";
-import { exportFile, load, shield } from "./icons";
+import { exportFile, load, shield, trash } from "./icons";
 import { Island } from "./Island";
 import "./LayerUI.scss";
 import { LibraryUnit } from "./LibraryUnit";
@@ -53,6 +53,7 @@ interface LayerUIProps {
   onInsertElements: (elements: readonly NonDeletedExcalidrawElement[]) => void;
   zenModeEnabled: boolean;
   showExitZenModeBtn: boolean;
+  showThemeBtn: boolean;
   toggleZenMode: () => void;
   langCode: Language["code"];
   isCollaborating: boolean;
@@ -63,6 +64,7 @@ interface LayerUIProps {
   ) => void;
   renderCustomFooter?: (isMobile: boolean) => JSX.Element;
   viewModeEnabled: boolean;
+  libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
 }
 
 const useOnClickOutside = (
@@ -100,6 +102,8 @@ const LibraryMenuItems = ({
   onInsertShape,
   pendingElements,
   setAppState,
+  setLibraryItems,
+  libraryReturnUrl,
 }: {
   library: LibraryItems;
   pendingElements: LibraryItem;
@@ -107,6 +111,8 @@ const LibraryMenuItems = ({
   onInsertShape: (elements: LibraryItem) => void;
   onAddToLibrary: (elements: LibraryItem) => void;
   setAppState: React.Component<any, AppState>["setState"];
+  setLibraryItems: (library: LibraryItems) => void;
+  libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
 }) => {
   const isMobile = useIsMobile();
   const numCells = library.length + (pendingElements.length > 0 ? 1 : 0);
@@ -114,6 +120,8 @@ const LibraryMenuItems = ({
   const numRows = Math.max(1, Math.ceil(numCells / CELLS_PER_ROW));
   const rows = [];
   let addedPendingElements = false;
+
+  const referrer = libraryReturnUrl || window.location.origin;
 
   rows.push(
     <div className="layer-ui__library-header">
@@ -136,22 +144,43 @@ const LibraryMenuItems = ({
             });
         }}
       />
-      <ToolButton
-        key="export"
-        type="button"
-        title={t("buttons.export")}
-        aria-label={t("buttons.export")}
-        icon={exportFile}
-        onClick={() => {
-          saveLibraryAsJSON()
-            .catch(muteFSAbortError)
-            .catch((error) => {
-              setAppState({ errorMessage: error.message });
-            });
-        }}
-      />
-
-      <a href="https://libraries.excalidraw.com" target="_excalidraw_libraries">
+      {!!library.length && (
+        <>
+          <ToolButton
+            key="export"
+            type="button"
+            title={t("buttons.export")}
+            aria-label={t("buttons.export")}
+            icon={exportFile}
+            onClick={() => {
+              saveLibraryAsJSON()
+                .catch(muteFSAbortError)
+                .catch((error) => {
+                  setAppState({ errorMessage: error.message });
+                });
+            }}
+          />
+          <ToolButton
+            key="reset"
+            type="button"
+            title={t("buttons.resetLibrary")}
+            aria-label={t("buttons.resetLibrary")}
+            icon={trash}
+            onClick={() => {
+              if (window.confirm(t("alerts.resetLibrary"))) {
+                Library.resetLibrary();
+                setLibraryItems([]);
+              }
+            }}
+          />
+        </>
+      )}
+      <a
+        href={`https://libraries.excalidraw.com?target=${
+          window.name || "_blank"
+        }&referrer=${referrer}`}
+        target="_excalidraw_libraries"
+      >
         {t("labels.libraries")}
       </a>
     </div>,
@@ -204,12 +233,14 @@ const LibraryMenu = ({
   pendingElements,
   onAddToLibrary,
   setAppState,
+  libraryReturnUrl,
 }: {
   pendingElements: LibraryItem;
   onClickOutside: (event: MouseEvent) => void;
   onInsertShape: (elements: LibraryItem) => void;
   onAddToLibrary: () => void;
   setAppState: React.Component<any, AppState>["setState"];
+  libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   useOnClickOutside(ref, (event) => {
@@ -281,6 +312,8 @@ const LibraryMenu = ({
           onInsertShape={onInsertShape}
           pendingElements={pendingElements}
           setAppState={setAppState}
+          setLibraryItems={setLibraryItems}
+          libraryReturnUrl={libraryReturnUrl}
         />
       )}
     </Island>
@@ -298,11 +331,13 @@ const LayerUI = ({
   onInsertElements,
   zenModeEnabled,
   showExitZenModeBtn,
+  showThemeBtn,
   toggleZenMode,
   isCollaborating,
   onExportToBackend,
   renderCustomFooter,
   viewModeEnabled,
+  libraryReturnUrl,
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
@@ -413,6 +448,7 @@ const LayerUI = ({
             actionManager={actionManager}
             appState={appState}
             setAppState={setAppState}
+            showThemeBtn={showThemeBtn}
           />
         </Stack.Col>
       </Island>
@@ -426,7 +462,15 @@ const LayerUI = ({
         "transition-left": zenModeEnabled,
       })}
     >
-      <Island className={CLASSES.SHAPE_ACTIONS_MENU} padding={2}>
+      <Island
+        className={CLASSES.SHAPE_ACTIONS_MENU}
+        padding={2}
+        style={{
+          // we want to make sure this doesn't overflow so substracting 200
+          // which is approximately height of zoom footer and top left menu items with some buffer
+          maxHeight: `${appState.height - 200}px`,
+        }}
+      >
         <SelectedShapeActions
           appState={appState}
           elements={elements}
@@ -458,6 +502,7 @@ const LayerUI = ({
       onInsertShape={onInsertElements}
       onAddToLibrary={deselectItems}
       setAppState={setAppState}
+      libraryReturnUrl={libraryReturnUrl}
     />
   ) : null;
 
@@ -492,6 +537,7 @@ const LayerUI = ({
                       {heading}
                       <Stack.Row gap={1}>
                         <ShapesSwitcher
+                          canvas={canvas}
                           elementType={appState.elementType}
                           setAppState={setAppState}
                           isLibraryOpen={appState.isLibraryOpen}
@@ -565,7 +611,7 @@ const LayerUI = ({
           },
         )}
       >
-        <GitHubCorner appearance={appState.appearance} />
+        <GitHubCorner theme={appState.theme} />
       </aside>
     );
   };
@@ -587,18 +633,6 @@ const LayerUI = ({
       >
         {t("buttons.exitZenMode")}
       </button>
-      {appState.scrolledOutside && (
-        <button
-          className="scroll-back-to-content"
-          onClick={() => {
-            setAppState({
-              ...calculateScrollCenter(elements, appState, canvas),
-            });
-          }}
-        >
-          {t("buttons.scrollBackToContent")}
-        </button>
-      )}
     </footer>
   );
 
@@ -645,6 +679,7 @@ const LayerUI = ({
         isCollaborating={isCollaborating}
         renderCustomFooter={renderCustomFooter}
         viewModeEnabled={viewModeEnabled}
+        showThemeBtn={showThemeBtn}
       />
     </>
   ) : (
@@ -661,6 +696,18 @@ const LayerUI = ({
       {renderBottomAppMenu()}
       {renderGitHubCorner()}
       {renderFooter()}
+      {appState.scrolledOutside && (
+        <button
+          className="scroll-back-to-content"
+          onClick={() => {
+            setAppState({
+              ...calculateScrollCenter(elements, appState, canvas),
+            });
+          }}
+        >
+          {t("buttons.scrollBackToContent")}
+        </button>
+      )}
     </div>
   );
 };
@@ -679,6 +726,7 @@ const areEqual = (prev: LayerUIProps, next: LayerUIProps) => {
 
   const keys = Object.keys(prevAppState) as (keyof Partial<AppState>)[];
   return (
+    prev.renderCustomFooter === next.renderCustomFooter &&
     prev.langCode === next.langCode &&
     prev.elements === next.elements &&
     keys.every((key) => prevAppState[key] === nextAppState[key])

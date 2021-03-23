@@ -7,7 +7,7 @@
   }
 
   .RoomDialog-link {
-    color: var(--text-color-primary);
+    color: var(--text-primary-color);
     min-width: 0;
     flex: 1 1 auto;
     margin-inline-start: 1em;
@@ -32,15 +32,29 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    @media #{$is-mobile-query} {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+
+  @media #{$is-mobile-query} {
+    .RoomDialog-usernameLabel {
+      font-weight: bold;
+    }
   }
 
   .RoomDialog-username {
-    background-color: var(--input-background-color);
+    background-color: var(--input-bg-color);
     border-color: var(--input-border-color);
     appearance: none;
     min-width: 0;
     flex: 1 1 auto;
     margin-inline-start: 1em;
+    @media #{$is-mobile-query} {
+      margin-top: 0.5em;
+      margin-inline-start: 0;
+    }
     height: 2.5rem;
     font-size: 1em;
     line-height: 1.5;
@@ -53,7 +67,7 @@
   }
 
   .Modal .RoomDialog-stopSession {
-    background-color: var(--button-destructive-background-color);
+    background-color: var(--button-destructive-bg-color);
 
     .ToolIcon__label,
     .ToolIcon__icon svg {

@@ -15,6 +15,7 @@ export interface ImportedDataState {
   source?: string;
   elements?: DataState["elements"] | null;
   appState?: Partial<DataState["appState"]> | null;
+  scrollToContent?: boolean;
 }
 
 export interface LibraryData {

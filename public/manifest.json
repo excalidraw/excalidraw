@@ -26,5 +26,18 @@
       }
     }
   ],
-  "capture_links": "new_client"
+  "capture_links": "new_client",
+  "share_target": {
+    "action": "/web-share-target",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "files": [
+        {
+          "name": "file",
+          "accept": ["application/vnd.excalidraw+json", "application/json", ".excalidraw"]
+        }
+      ]
+    }
+  }
 }

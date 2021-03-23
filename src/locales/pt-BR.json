@@ -61,14 +61,14 @@
     "architect": "Arquiteto",
     "artist": "Artista",
     "cartoonist": "Cartunista",
-    "fileTitle": "Título do arquivo",
+    "fileTitle": "Nome do arquivo",
     "colorPicker": "Seletor de cores",
     "canvasBackground": "Fundo da tela",
     "drawingCanvas": "Tela de desenho",
     "layers": "Camadas",
     "actions": "Ações",
     "language": "Idioma",
-    "createRoom": "Compartilhar uma sessão de colaboração ao vivo",
+    "liveCollaboration": "Colaboração ao vivo",
     "duplicateSelection": "Duplicar",
     "untitled": "Sem título",
     "name": "Nome",
@@ -92,7 +92,9 @@
     "centerHorizontally": "Centralizar horizontalmente",
     "distributeHorizontally": "Distribuir horizontalmente",
     "distributeVertically": "Distribuir verticalmente",
-    "viewMode": "Modo de visualização"
+    "viewMode": "Modo de visualização",
+    "toggleExportColorScheme": "Alternar esquema de cores de exportação",
+    "share": "Compartilhar"
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
@@ -117,7 +119,7 @@
     "edit": "Editar",
     "undo": "Desfazer",
     "redo": "Refazer",
-    "roomDialog": "Iniciar colaboração ao vivo",
+    "resetLibrary": "Redefinir biblioteca",
     "createNewRoom": "Criar nova sala",
     "fullScreen": "Tela cheia",
     "darkMode": "Modo escuro",
@@ -140,7 +142,9 @@
     "errorLoadingLibrary": "Houve um erro ao carregar a biblioteca de terceiros.",
     "confirmAddLibrary": "Isso adicionará {{numShapes}} forma(s) à sua biblioteca. Tem certeza?",
     "imageDoesNotContainScene": "A importação de imagens não é suportada no momento.\n\nVocê deseja importar uma cena? Esta imagem parece não conter dados de cena. Você ativou isto durante a exportação?",
-    "cannotRestoreFromImage": "Não foi possível restaurar a cena deste arquivo de imagem"
+    "cannotRestoreFromImage": "Não foi possível restaurar a cena deste arquivo de imagem",
+    "invalidSceneUrl": "Não foi possível importar a cena da URL fornecida. Ela está incompleta ou não contém dados JSON válidos do Excalidraw.",
+    "resetLibrary": "Isto limpará a sua biblioteca. Você tem certeza?"
   },
   "toolBar": {
     "selection": "Seleção",
@@ -196,7 +200,8 @@
     "button_stopSession": "Parar sessão",
     "desc_inProgressIntro": "A sessão de colaboração ao vivo está agora em andamento.",
     "desc_shareLink": "Compartilhe este link com qualquer pessoa com quem você queira colaborar:",
-    "desc_exitSession": "Interrompendo a sessão você irá se desconectar da sala, mas você poderá continuar trabalhando com a cena localmente. Observe que isso não afetará outras pessoas, e elas ainda poderão colaborar em suas versões."
+    "desc_exitSession": "Interrompendo a sessão você irá se desconectar da sala, mas você poderá continuar trabalhando com a cena localmente. Observe que isso não afetará outras pessoas, e elas ainda poderão colaborar em suas versões.",
+    "shareTitle": "Participe de uma sessão ao vivo de colaboração no Excalidraw"
   },
   "errorDialog": {
     "title": "Erro"
@@ -243,6 +248,10 @@
   "toast": {
     "copyStyles": "Estilos copiados.",
     "copyToClipboard": "Copiado para área de transferência.",
-    "copyToClipboardAsPng": "Copiado para a área de transferência como PNG."
+    "copyToClipboardAsPng": "{{exportSelection}} copiado para a área de transferência como PNG ({{exportColorScheme}})",
+    "fileSaved": "Arquivo salvo.",
+    "fileSavedToFilename": "Salvo em {filename}",
+    "canvas": "tela",
+    "selection": "seleção"
   }
 }
