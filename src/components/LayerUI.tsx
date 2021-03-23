@@ -124,7 +124,7 @@ const LibraryMenuItems = ({
   const referrer = libraryReturnUrl || window.location.origin;
 
   rows.push(
-    <div className="layer-ui__library-header">
+    <div className="layer-ui__library-header" key="library-header">
       <ToolButton
         key="import"
         type="button"
