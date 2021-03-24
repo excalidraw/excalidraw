@@ -28,10 +28,12 @@ If you want to load assets from a different path you can set a variable `window.
 
 [Try here](https://codesandbox.io/s/excalidraw-ehlz3).
 
-<details id="usage">
-<summary><strong>Usage</strong></summary>
+### Usage
 
-1. If you are using a Web bundler (for instance, Webpack), you can import it as an ES6 module as shown below
+<details id="using-web-bundler">
+<summary><strong>Using Web Bundler</strong></summary>
+
+If you are using a Web bundler (for instance, Webpack), you can import it as an ES6 module as shown below
 
 ```js
 import React, { useEffect, useState, useRef } from "react";
@@ -168,7 +170,12 @@ To view the full example visit :point_down:
 
 [![Edit excalidraw](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/excalidraw-ehlz3?fontsize=14&hidenavigation=1&theme=dark)
 
-2. To use it in a browser directly:
+</details>
+
+<details id="using-in-browser">
+<summary><strong>In Browser</strong></summary>
+
+To use it in a browser directly:
 
 You will need to make sure `react`, `react-dom` is available as shown below.
 
@@ -183,7 +190,7 @@ You will need to make sure `react`, `react-dom` is available as shown below.
 
     <script
       type="text/javascript"
-      src="https://unpkg.com/@excalidraw/excalidraw@0.4.1/dist/excalidraw.min.js"
+      src="https://unpkg.com/@excalidraw/excalidraw@0.5.0/dist/excalidraw.min.js"
     ></script>
   </head>
 
@@ -362,6 +369,8 @@ export default function IndexPage() {
 ```
 
 </details>
+
+### API
 
 <details id="props">
 <summary><strong>Props</strong></summary>
