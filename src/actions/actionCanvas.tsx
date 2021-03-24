@@ -21,8 +21,8 @@ export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
   perform: (_, appState, value) => {
     return {
-      appState: { ...appState, viewBackgroundColor: value },
-      commitToHistory: true,
+      appState: { ...appState, ...value },
+      commitToHistory: !!value.viewBackgroundColor,
     };
   },
   PanelComponent: ({ appState, updateData }) => {
@@ -32,7 +32,9 @@ export const actionChangeViewBackgroundColor = register({
           label={t("labels.canvasBackground")}
           type="canvasBackground"
           color={appState.viewBackgroundColor}
-          onChange={(color) => updateData(color)}
+          onChange={(color) => updateData({ viewBackgroundColor: color })}
+          isActive={appState.showCanvasColorPicker}
+          setActive={(active) => updateData({ showCanvasColorPicker: active })}
         />
       </div>
     );

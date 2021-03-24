@@ -48,7 +48,6 @@ import {
   TextAlign,
 } from "../element/types";
 import { getLanguage, t } from "../i18n";
-import { KEYS } from "../keys";
 import { randomInteger } from "../random";
 import {
   canChangeSharpness,
@@ -100,13 +99,18 @@ export const actionChangeStrokeColor = register({
   name: "changeStrokeColor",
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, appState, (el) =>
-        newElementWith(el, {
-          strokeColor: value,
-        }),
-      ),
-      appState: { ...appState, currentItemStrokeColor: value },
-      commitToHistory: true,
+      ...(value.currentItemStrokeColor && {
+        elements: changeProperty(elements, appState, (el) =>
+          newElementWith(el, {
+            strokeColor: value.currentItemStrokeColor,
+          }),
+        ),
+      }),
+      appState: {
+        ...appState,
+        ...value,
+      },
+      commitToHistory: !!value.currentItemStrokeColor,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => (
@@ -121,8 +125,9 @@ export const actionChangeStrokeColor = register({
           (element) => element.strokeColor,
           appState.currentItemStrokeColor,
         )}
-        onChange={updateData}
-        shortcut={KEYS.S}
+        onChange={(color) => updateData({ currentItemStrokeColor: color })}
+        isActive={appState.showStrokeColorPicker}
+        setActive={(active) => updateData({ showStrokeColorPicker: active })}
       />
     </>
   ),
@@ -132,13 +137,18 @@ export const actionChangeBackgroundColor = register({
   name: "changeBackgroundColor",
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, appState, (el) =>
-        newElementWith(el, {
-          backgroundColor: value,
-        }),
-      ),
-      appState: { ...appState, currentItemBackgroundColor: value },
-      commitToHistory: true,
+      ...(value.currentItemBackgroundColor && {
+        elements: changeProperty(elements, appState, (el) =>
+          newElementWith(el, {
+            backgroundColor: value.currentItemBackgroundColor,
+          }),
+        ),
+      }),
+      appState: {
+        ...appState,
+        ...value,
+      },
+      commitToHistory: !!value.currentItemBackgroundColor,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => (
@@ -153,8 +163,11 @@ export const actionChangeBackgroundColor = register({
           (element) => element.backgroundColor,
           appState.currentItemBackgroundColor,
         )}
-        onChange={updateData}
-        shortcut={KEYS.G}
+        onChange={(color) => updateData({ currentItemBackgroundColor: color })}
+        isActive={appState.showBackgroundColorPicker}
+        setActive={(active) =>
+          updateData({ showBackgroundColorPicker: active })
+        }
       />
     </>
   ),

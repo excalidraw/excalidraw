@@ -1503,6 +1503,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       isHoldingSpace = true;
       setCursor(this.canvas, CURSOR_TYPE.GRABBING);
     }
+
+    const selectedElements = getSelectedElements(
+      this.scene.getElements(),
+      this.state,
+    );
+
+    if (selectedElements.length && event.key === KEYS.G) {
+      this.setState({ showBackgroundColorPicker: true });
+    }
+    if (selectedElements.length && event.key === KEYS.S) {
+      this.setState({ showStrokeColorPicker: true });
+    }
   });
 
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
