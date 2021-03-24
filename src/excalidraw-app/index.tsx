@@ -213,12 +213,25 @@ function ExcalidrawWrapper() {
       initialStatePromiseRef.current.promise.resolve(scene);
     });
 
-    const onHashChange = (_: HashChangeEvent) => {
-      initializeScene({ collabAPI }).then((scene) => {
-        if (scene) {
-          excalidrawAPI.updateScene(scene);
-        }
-      });
+    const onHashChange = (event: HashChangeEvent) => {
+      event.preventDefault();
+      const libraryUrl = new URLSearchParams(window.location.hash.slice(1)).get(
+        "addLibrary",
+      );
+      if (libraryUrl) {
+        // If hash changed and it contains library url, import it and replace
+        // the url to its previous state (important in case of collaboration
+        // and similar).
+        // Using history API won't trigger another hashchange.
+        window.history.replaceState({}, "", event.oldURL);
+        excalidrawAPI.importLibrary(libraryUrl);
+      } else {
+        initializeScene({ collabAPI }).then((scene) => {
+          if (scene) {
+            excalidrawAPI.updateScene(scene);
+          }
+        });
+      }
     };
 
     const titleTimeout = setTimeout(
