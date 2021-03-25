@@ -128,15 +128,16 @@ export const debounce = <T extends any[]>(
     lastArgs = args;
     clearTimeout(handle);
     handle = window.setTimeout(() => {
-      fn(...args);
       lastArgs = null;
+      fn(...args);
     }, timeout);
   };
   ret.flush = () => {
     clearTimeout(handle);
     if (lastArgs) {
-      fn(...lastArgs);
+      const _lastArgs = lastArgs;
       lastArgs = null;
+      fn(..._lastArgs);
     }
   };
   ret.cancel = () => {
