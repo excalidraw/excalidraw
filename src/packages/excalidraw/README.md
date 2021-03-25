@@ -1,6 +1,6 @@
 ### Excalidraw
 
-Excalidraw exported as a component to directly embed in your projects
+Excalidraw exported as a component to directly embed in your projects.
 
 ### Installation
 
@@ -554,6 +554,10 @@ This prop controls Excalidraw's theme. When supplied, the value takes precedence
 #### `name`
 
 This prop sets the name of the drawing which will be used when exporting the drawing. When supplied, the value takes precedence over `intialData.appState.name`, the `name` will be fully controlled by host app and the users won't be able to edit from within Excalidraw.
+
+### Does it support collaboration ?
+
+No Excalidraw package doesn't come with collaboration, since this would have different implementations on the consumer so we expose the API's which you can use to communicate with Excalidraw as mentioned above. If you are interested in understanding how Excalidraw does it you can check it [here](https://github.com/excalidraw/excalidraw/blob/master/src/excalidraw-app/index.tsx).
 
 ### Extra API's
 
