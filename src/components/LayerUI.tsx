@@ -121,7 +121,8 @@ const LibraryMenuItems = ({
   const rows = [];
   let addedPendingElements = false;
 
-  const referrer = libraryReturnUrl || window.location.origin;
+  const referrer =
+    libraryReturnUrl || window.location.origin + window.location.pathname;
 
   rows.push(
     <div className="layer-ui__library-header" key="library-header">
