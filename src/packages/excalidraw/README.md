@@ -370,10 +370,7 @@ export default function IndexPage() {
 
 </details>
 
-### API
-
-<details id="props">
-<summary><strong>Props</strong></summary>
+### Props
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -556,10 +553,7 @@ This prop controls Excalidraw's theme. When supplied, the value takes precedence
 
 This prop sets the name of the drawing which will be used when exporting the drawing. When supplied, the value takes precedence over `intialData.appState.name`, the `name` will be fully controlled by host app and the users won't be able to edit from within Excalidraw.
 
-</details>
-
-<details id="extra-apis">
-<summary><strong>Extra API's</strong></summary>
+###Extra API's
 
 #### `getSceneVersion`
 
@@ -742,6 +736,3 @@ This function returns a svg with the exported elements.
 | viewBackgroundColor | string | #fff | The default background color |
 | shouldAddWatermark | boolean | false | Indicates whether watermark should be exported |
 | exportWithDarkMode | boolean | false | Indicates whether to export with dark mode |
-
-</details>
-</details>
