@@ -631,9 +631,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         )
       ) {
         await Library.importLibrary(blob);
-        this.setState({
-          isLibraryOpen: true,
-        });
+        // hack to rerender the library items after import
+        if (this.state.isLibraryOpen) {
+          this.setState({ isLibraryOpen: false });
+        }
+        this.setState({ isLibraryOpen: true });
       }
     } catch (error) {
       window.alert(t("alerts.errorLoadingLibrary"));
