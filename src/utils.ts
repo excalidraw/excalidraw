@@ -123,7 +123,7 @@ export const debounce = <T extends any[]>(
   timeout: number,
 ) => {
   let handle = 0;
-  let lastArgs: T;
+  let lastArgs: T | null = null;
   const ret = (...args: T) => {
     lastArgs = args;
     clearTimeout(handle);
@@ -131,9 +131,13 @@ export const debounce = <T extends any[]>(
   };
   ret.flush = () => {
     clearTimeout(handle);
-    fn(...(lastArgs || []));
+    if (lastArgs) {
+      fn(...lastArgs);
+      lastArgs = null;
+    }
   };
   ret.cancel = () => {
+    lastArgs = null;
     clearTimeout(handle);
   };
   return ret;
