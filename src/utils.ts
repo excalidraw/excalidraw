@@ -127,7 +127,10 @@ export const debounce = <T extends any[]>(
   const ret = (...args: T) => {
     lastArgs = args;
     clearTimeout(handle);
-    handle = window.setTimeout(() => fn(...args), timeout);
+    handle = window.setTimeout(() => {
+      fn(...args);
+      lastArgs = null;
+    }, timeout);
   };
   ret.flush = () => {
     clearTimeout(handle);
