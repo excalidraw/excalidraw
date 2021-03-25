@@ -221,16 +221,15 @@ function ExcalidrawWrapper() {
 
     const onHashChange = (event: HashChangeEvent) => {
       event.preventDefault();
-      const libraryUrl = new URLSearchParams(window.location.hash.slice(1)).get(
-        URL_HASH_KEYS.addLibrary,
-      );
+      const hash = new URLSearchParams(window.location.hash.slice(1));
+      const libraryUrl = hash.get(URL_HASH_KEYS.addLibrary);
       if (libraryUrl) {
         // If hash changed and it contains library url, import it and replace
         // the url to its previous state (important in case of collaboration
         // and similar).
         // Using history API won't trigger another hashchange.
         window.history.replaceState({}, "", event.oldURL);
-        excalidrawAPI.importLibrary(libraryUrl);
+        excalidrawAPI.importLibrary(libraryUrl, hash.get("token"));
       } else {
         initializeScene({ collabAPI }).then((scene) => {
           if (scene) {
