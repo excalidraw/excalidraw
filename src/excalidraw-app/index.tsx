@@ -12,7 +12,13 @@ import { getDefaultAppState } from "../appState";
 import { ExcalidrawImperativeAPI } from "../components/App";
 import { ErrorDialog } from "../components/ErrorDialog";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
-import { APP_NAME, EVENT, TITLE_TIMEOUT, VERSION_TIMEOUT } from "../constants";
+import {
+  APP_NAME,
+  EVENT,
+  TITLE_TIMEOUT,
+  URL_HASH_KEYS,
+  VERSION_TIMEOUT,
+} from "../constants";
 import { loadFromBlob } from "../data/blob";
 import { DataState, ImportedDataState } from "../data/types";
 import {
@@ -216,7 +222,7 @@ function ExcalidrawWrapper() {
     const onHashChange = (event: HashChangeEvent) => {
       event.preventDefault();
       const libraryUrl = new URLSearchParams(window.location.hash.slice(1)).get(
-        "addLibrary",
+        URL_HASH_KEYS.addLibrary,
       );
       if (libraryUrl) {
         // If hash changed and it contains library url, import it and replace
