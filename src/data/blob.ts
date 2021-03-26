@@ -1,5 +1,5 @@
 import { cleanAppStateForExport } from "../appState";
-import { EXPORT_DATA_TYPES, MIME_TYPES } from "../constants";
+import { EXPORT_DATA_TYPES } from "../constants";
 import { clearElementsForExport } from "../element";
 import { CanvasError } from "../errors";
 import { t } from "../i18n";
