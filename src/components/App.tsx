@@ -2255,10 +2255,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         touchTimeout = window.setTimeout(() => {
           touchTimeout = 0;
           if (!invalidateContextMenu) {
-            this.openContextMenu({
-              clientX: event.clientX,
-              clientY: event.clientY,
-            });
+            this.handleCanvasContextMenu(event);
           }
         }, TOUCH_CTX_MENU_TIMEOUT);
       }
@@ -3660,7 +3657,19 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     event.preventDefault();
-    this.openContextMenu(event);
+
+    const { x, y } = viewportCoordsToSceneCoords(event, this.state);
+    const element = this.getElementAtPosition(x, y);
+
+    const type = element ? "element" : "canvas";
+
+    if (element && !this.state.selectedElementIds[element.id]) {
+      this.setState({ selectedElementIds: { [element.id]: true } }, () => {
+        this._openContextMenu(event, type);
+      });
+    } else {
+      this._openContextMenu(event, type);
+    }
   };
 
   private maybeDragNewGenericElement = (
@@ -3750,18 +3759,17 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     return false;
   };
 
-  private openContextMenu = ({
-    clientX,
-    clientY,
-  }: {
-    clientX: number;
-    clientY: number;
-  }) => {
-    const { x, y } = viewportCoordsToSceneCoords(
-      { clientX, clientY },
-      this.state,
-    );
-
+  /** @private use this.handleCanvasContextMenu */
+  private _openContextMenu = (
+    {
+      clientX,
+      clientY,
+    }: {
+      clientX: number;
+      clientY: number;
+    },
+    type: "canvas" | "element",
+  ) => {
     const maybeGroupAction = actionGroup.contextItemPredicate!(
       this.actionManager.getElementsIncludingDeleted(),
       this.actionManager.getAppState(),
@@ -3777,7 +3785,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const _isMobile = isMobile();
 
     const elements = this.scene.getElements();
-    const element = this.getElementAtPosition(x, y);
+
     const options: ContextMenuOption[] = [];
     if (probablySupportsClipboardBlob && elements.length > 0) {
       options.push(actionCopyAsPng);
@@ -3786,7 +3794,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (probablySupportsClipboardWriteText && elements.length > 0) {
       options.push(actionCopyAsSvg);
     }
-    if (!element) {
+    if (type === "canvas") {
       const viewModeOptions = [
         ...options,
         typeof this.props.gridModeEnabled === "undefined" &&
@@ -3848,10 +3856,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         appState: this.state,
       });
       return;
-    }
-
-    if (!this.state.selectedElementIds[element.id]) {
-      this.setState({ selectedElementIds: { [element.id]: true } });
     }
 
     if (this.state.viewModeEnabled) {
