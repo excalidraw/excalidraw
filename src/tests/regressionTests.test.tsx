@@ -653,6 +653,8 @@ describe("regression tests", () => {
       "pasteStyles",
       "deleteSelectedElements",
       "addToLibrary",
+      "flipHorizontal",
+      "flipVertical",
       "sendBackward",
       "bringForward",
       "sendToBack",
