@@ -92,6 +92,8 @@
     "centerHorizontally": "Horizontaal Centreren",
     "distributeHorizontally": "Horizontaal verspreiden",
     "distributeVertically": "Verticaal distribueren",
+    "flipHorizontal": "",
+    "flipVertical": "",
     "viewMode": "Weergavemodus",
     "toggleExportColorScheme": "Kleurenschema exporteren aan/uit",
     "share": "Deel"
