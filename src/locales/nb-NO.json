@@ -92,8 +92,8 @@
     "centerHorizontally": "Midtstill horisontalt",
     "distributeHorizontally": "Distribuer horisontalt",
     "distributeVertically": "Distribuer vertikalt",
-    "flipHorizontal": "",
-    "flipVertical": "",
+    "flipHorizontal": "Snu horisontalt",
+    "flipVertical": "Snu vertikalt",
     "viewMode": "Visningsmodus",
     "toggleExportColorScheme": "Veksle eksport av fargepalett",
     "share": "Del"
