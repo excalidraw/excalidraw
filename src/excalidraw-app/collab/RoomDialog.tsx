@@ -1,10 +1,32 @@
 import React, { useRef } from "react";
 import { copyTextToSystemClipboard } from "../../clipboard";
 import { Dialog } from "../../components/Dialog";
-import { clipboard, start, stop } from "../../components/icons";
+import {
+  clipboard,
+  start,
+  stop,
+  share,
+  shareIOS,
+  shareWindows,
+} from "../../components/icons";
 import { ToolButton } from "../../components/ToolButton";
 import { t } from "../../i18n";
 import "./RoomDialog.scss";
+import Stack from "../../components/Stack";
+
+const getShareIcon = () => {
+  const navigator = window.navigator as any;
+  const isAppleBrowser = /Apple/.test(navigator.vendor);
+  const isWindowsBrowser = navigator.appVersion.indexOf("Win") !== -1;
+
+  if (isAppleBrowser) {
+    return shareIOS;
+  } else if (isWindowsBrowser) {
+    return shareWindows;
+  }
+
+  return share;
+};
 
 const RoomDialog = ({
   handleClose,
@@ -33,6 +55,18 @@ const RoomDialog = ({
     }
     if (roomLinkInput.current) {
       roomLinkInput.current.select();
+    }
+  };
+
+  const shareRoomLink = async () => {
+    try {
+      await navigator.share({
+        title: t("roomDialog.shareTitle"),
+        text: t("roomDialog.shareTitle"),
+        url: activeRoomLink,
+      });
+    } catch (error) {
+      // Just ignore.
     }
   };
 
@@ -68,13 +102,24 @@ const RoomDialog = ({
             <p>{t("roomDialog.desc_inProgressIntro")}</p>
             <p>{t("roomDialog.desc_shareLink")}</p>
             <div className="RoomDialog-linkContainer">
-              <ToolButton
-                type="button"
-                icon={clipboard}
-                title={t("labels.copy")}
-                aria-label={t("labels.copy")}
-                onClick={copyRoomLink}
-              />
+              <Stack.Row gap={2}>
+                {"share" in navigator ? (
+                  <ToolButton
+                    type="button"
+                    icon={getShareIcon()}
+                    title={t("labels.share")}
+                    aria-label={t("labels.share")}
+                    onClick={shareRoomLink}
+                  />
+                ) : null}
+                <ToolButton
+                  type="button"
+                  icon={clipboard}
+                  title={t("labels.copy")}
+                  aria-label={t("labels.copy")}
+                  onClick={copyRoomLink}
+                />
+              </Stack.Row>
               <input
                 value={activeRoomLink}
                 readOnly={true}

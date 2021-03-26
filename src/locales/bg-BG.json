@@ -61,7 +61,7 @@
     "architect": "Архитект",
     "artist": "Художник",
     "cartoonist": "Карикатурист",
-    "fileTitle": "Заглавие на файл",
+    "fileTitle": "",
     "colorPicker": "Избор на цвят",
     "canvasBackground": "Фон на платно",
     "drawingCanvas": "Платно за рисуване",
@@ -92,7 +92,9 @@
     "centerHorizontally": "Центрирай хоризонтално",
     "distributeHorizontally": "Разпредели хоризонтално",
     "distributeVertically": "Разпредели вертикално",
-    "viewMode": "Изглед"
+    "viewMode": "Изглед",
+    "toggleExportColorScheme": "",
+    "share": ""
   },
   "buttons": {
     "clearReset": "Нулиране на платно",
@@ -141,6 +143,7 @@
     "confirmAddLibrary": "Ще се добавят {{numShapes}} фигура(и) във вашата библиотека. Сигурни ли сте?",
     "imageDoesNotContainScene": "Импортирането на картинки не се поддържва в момента.\n\nИскате да импортнете сцена? Тази картинка не съдържа данни от сцена. Разрешили ли сте последното при експортирането?",
     "cannotRestoreFromImage": "Не може да бъде възстановена сцена от този файл",
+    "invalidSceneUrl": "",
     "resetLibrary": ""
   },
   "toolBar": {
@@ -197,7 +200,8 @@
     "button_stopSession": "Стоп на сесията",
     "desc_inProgressIntro": "Сесията за сътрудничество на живо е в ход.",
     "desc_shareLink": "Споделете тази връзка с всеки, с когото искате да си сътрудничите:",
-    "desc_exitSession": "Спирането на сесията ще ви изключи от стаята, но ще можете да продължите да работите със сцената, локално. Имайте предвид, че това няма да засегне други хора и те все още ще могат да си сътрудничат с тяхната версия."
+    "desc_exitSession": "Спирането на сесията ще ви изключи от стаята, но ще можете да продължите да работите със сцената, локално. Имайте предвид, че това няма да засегне други хора и те все още ще могат да си сътрудничат с тяхната версия.",
+    "shareTitle": ""
   },
   "errorDialog": {
     "title": "Грешка"
@@ -244,8 +248,10 @@
   "toast": {
     "copyStyles": "Копирани стилове.",
     "copyToClipboard": "Копирано в клипборда.",
-    "copyToClipboardAsPng": "Копирано в клипборда като PNG.",
+    "copyToClipboardAsPng": "",
     "fileSaved": "",
-    "fileSavedToFilename": ""
+    "fileSavedToFilename": "",
+    "canvas": "",
+    "selection": ""
   }
 }

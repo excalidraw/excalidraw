@@ -3,6 +3,7 @@ import React from "react";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
 import clsx from "clsx";
+import { supported } from "browser-fs-access";
 
 import {
   actionAddToLibrary,
@@ -174,6 +175,7 @@ import {
   ResolvablePromise,
   resolvablePromise,
   sceneCoordsToViewportCoords,
+  setCursor,
   setCursorForShape,
   tupleToCoors,
   viewportCoordsToSceneCoords,
@@ -272,9 +274,10 @@ export type ExcalidrawImperativeAPI = {
   history: {
     clear: InstanceType<typeof App>["resetHistory"];
   };
-  setScrollToCenter: InstanceType<typeof App>["setScrollToCenter"];
+  setScrollToContent: InstanceType<typeof App>["setScrollToContent"];
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
   getAppState: () => InstanceType<typeof App>["state"];
+  setCanvasOffsets: InstanceType<typeof App>["setCanvasOffsets"];
   readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
   ready: true;
 };
@@ -298,22 +301,24 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const {
       width = window.innerWidth,
       height = window.innerHeight,
-      offsetLeft,
-      offsetTop,
       excalidrawRef,
       viewModeEnabled = false,
       zenModeEnabled = false,
       gridModeEnabled = false,
+      theme = defaultAppState.theme,
+      name = defaultAppState.name,
     } = props;
     this.state = {
       ...defaultAppState,
+      theme,
       isLoading: true,
       width,
       height,
-      ...this.getCanvasOffsets({ offsetLeft, offsetTop }),
+      ...this.getCanvasOffsets(),
       viewModeEnabled,
       zenModeEnabled,
       gridSize: gridModeEnabled ? GRID_SIZE : null,
+      name,
     };
     if (excalidrawRef) {
       const readyPromise =
@@ -329,9 +334,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         history: {
           clear: this.resetHistory,
         },
-        setScrollToCenter: this.setScrollToCenter,
+        setScrollToContent: this.setScrollToContent,
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
+        setCanvasOffsets: this.setCanvasOffsets,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -415,8 +421,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       zenModeEnabled,
       width: canvasDOMWidth,
       height: canvasDOMHeight,
-      offsetTop,
-      offsetLeft,
       viewModeEnabled,
     } = this.state;
 
@@ -434,8 +438,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         style={{
           width: canvasDOMWidth,
           height: canvasDOMHeight,
-          top: offsetTop,
-          left: offsetLeft,
         }}
       >
         <LayerUI
@@ -463,6 +465,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           showExitZenModeBtn={
             typeof this.props?.zenModeEnabled === "undefined" && zenModeEnabled
           }
+          showThemeBtn={typeof this.props?.theme === "undefined"}
+          libraryReturnUrl={this.props.libraryReturnUrl}
         />
         <div className="excalidraw-textEditorContainer" />
         {this.state.showStats && (
@@ -523,7 +527,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         let viewModeEnabled = actionResult?.appState?.viewModeEnabled || false;
         let zenModeEnabled = actionResult?.appState?.zenModeEnabled || false;
         let gridSize = actionResult?.appState?.gridSize || null;
-
+        let theme = actionResult?.appState?.theme || "light";
+        let name = actionResult?.appState?.name ?? this.state.name;
         if (typeof this.props.viewModeEnabled !== "undefined") {
           viewModeEnabled = this.props.viewModeEnabled;
         }
@@ -536,19 +541,33 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           gridSize = this.props.gridModeEnabled ? GRID_SIZE : null;
         }
 
+        if (typeof this.props.theme !== "undefined") {
+          theme = this.props.theme;
+        }
+
+        if (typeof this.props.name !== "undefined") {
+          name = this.props.name;
+        }
+
         this.setState(
-          (state) => ({
-            ...actionResult.appState,
-            editingElement:
-              editingElement || actionResult.appState?.editingElement || null,
-            width: state.width,
-            height: state.height,
-            offsetTop: state.offsetTop,
-            offsetLeft: state.offsetLeft,
-            viewModeEnabled,
-            zenModeEnabled,
-            gridSize,
-          }),
+          (state) => {
+            // using Object.assign instead of spread to fool TS 4.2.2+ into
+            // regarding the resulting type as not containing undefined
+            // (which the following expression will never contain)
+            return Object.assign(actionResult.appState || {}, {
+              editingElement:
+                editingElement || actionResult.appState?.editingElement || null,
+              width: state.width,
+              height: state.height,
+              offsetTop: state.offsetTop,
+              offsetLeft: state.offsetLeft,
+              viewModeEnabled,
+              zenModeEnabled,
+              gridSize,
+              theme,
+              name,
+            });
+          },
           () => {
             if (actionResult.syncHistory) {
               history.setCurrentState(
@@ -589,7 +608,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   private importLibraryFromUrl = async (url: string) => {
     window.history.replaceState({}, APP_NAME, window.location.origin);
     try {
-      const request = await fetch(url);
+      const request = await fetch(decodeURIComponent(url));
       const blob = await request.blob();
       const json = JSON.parse(await blob.text());
       if (!isValidLibrary(json)) {
@@ -625,7 +644,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.setState((state) => ({
         ...getDefaultAppState(),
         isLoading: opts?.resetLoadingState ? false : state.isLoading,
-        appearance: this.state.appearance,
+        theme: this.state.theme,
       }));
       this.resetHistory();
     },
@@ -676,7 +695,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       ...scene.appState,
       isLoading: false,
     };
-    if (initialData?.scrollToCenter) {
+    if (initialData?.scrollToContent) {
       scene.appState = {
         ...scene.appState,
         ...calculateScrollCenter(
@@ -737,14 +756,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.scene.addCallback(this.onSceneUpdated);
     this.addEventListeners();
 
-    // optim to avoid extra render on init
-    if (
-      typeof this.props.offsetLeft === "number" &&
-      typeof this.props.offsetTop === "number"
-    ) {
-      this.initializeScene();
+    const searchParams = new URLSearchParams(window.location.search.slice(1));
+
+    if (searchParams.has("web-share-target")) {
+      // Obtain a file that was shared via the Web Share Target API.
+      this.restoreFileFromShare();
     } else {
-      this.setState(this.getCanvasOffsets(this.props), () => {
+      this.setState(this.getCanvasOffsets(), () => {
         this.initializeScene();
       });
     }
@@ -849,16 +867,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     if (
       prevProps.width !== this.props.width ||
-      prevProps.height !== this.props.height ||
-      (typeof this.props.offsetLeft === "number" &&
-        prevProps.offsetLeft !== this.props.offsetLeft) ||
-      (typeof this.props.offsetTop === "number" &&
-        prevProps.offsetTop !== this.props.offsetTop)
+      prevProps.height !== this.props.height
     ) {
       this.setState({
         width: this.props.width ?? window.innerWidth,
         height: this.props.height ?? window.innerHeight,
-        ...this.getCanvasOffsets(this.props),
+        ...this.getCanvasOffsets(),
       });
     }
 
@@ -877,14 +891,25 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.setState({ zenModeEnabled: !!this.props.zenModeEnabled });
     }
 
+    if (prevProps.theme !== this.props.theme && this.props.theme) {
+      this.setState({ theme: this.props.theme });
+    }
+
     if (prevProps.gridModeEnabled !== this.props.gridModeEnabled) {
       this.setState({
         gridSize: this.props.gridModeEnabled ? GRID_SIZE : null,
       });
     }
+
+    if (this.props.name && prevProps.name !== this.props.name) {
+      this.setState({
+        name: this.props.name,
+      });
+    }
+
     document
       .querySelector(".excalidraw")
-      ?.classList.toggle("Appearance_dark", this.state.appearance === "dark");
+      ?.classList.toggle("theme--dark", this.state.theme === "dark");
 
     if (
       this.state.editingLinearElement &&
@@ -1009,7 +1034,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   }
 
   private onScroll = debounce(() => {
-    this.setState({ ...this.getCanvasOffsets() });
+    const { offsetTop, offsetLeft } = this.getCanvasOffsets();
+    this.setState((state) => {
+      if (state.offsetLeft === offsetLeft && state.offsetTop === offsetTop) {
+        return null;
+      }
+      return { offsetTop, offsetLeft };
+    });
   }, SCROLL_TIMEOUT);
 
   // Copy/paste
@@ -1023,6 +1054,21 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   });
 
   private onCopy = withBatchedUpdates((event: ClipboardEvent) => {
+    const activeSelection = document.getSelection();
+    // if there's a selected text is outside the component, prevent our copy
+    // action
+    if (
+      activeSelection?.anchorNode &&
+      // it can happen that certain interactions will create a selection
+      // outside (or potentially inside) the component without actually
+      // selecting anything (i.e. the selection range is collapsed). Copying
+      // in such case wouldn't copy anything to the clipboard anyway, so prevent
+      // our copy handler only if the selection isn't collapsed
+      !activeSelection.isCollapsed &&
+      !this.excalidrawContainerRef.current!.contains(activeSelection.anchorNode)
+    ) {
+      return;
+    }
     if (isWritableElement(event.target)) {
       return;
     }
@@ -1074,7 +1120,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   private onTapEnd = (event: TouchEvent) => {
-    event.preventDefault();
     if (event.touches.length > 0) {
       this.setState({
         previousSelectedElementIds: {},
@@ -1251,7 +1296,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.actionManager.executeAction(actionToggleStats);
   };
 
-  setScrollToCenter = (remoteElements: readonly ExcalidrawElement[]) => {
+  setScrollToContent = (remoteElements: readonly ExcalidrawElement[]) => {
     this.setState({
       ...calculateScrollCenter(
         getNonDeletedElements(remoteElements),
@@ -1263,6 +1308,22 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   clearToast = () => {
     this.setState({ toastMessage: null });
+  };
+
+  restoreFileFromShare = async () => {
+    try {
+      const webShareTargetCache = await caches.open("web-share-target");
+
+      const file = await webShareTargetCache.match("shared-file");
+      if (file) {
+        const blob = await file.blob();
+        this.loadFileToCanvas(blob);
+        await webShareTargetCache.delete("shared-file");
+        window.history.replaceState(null, APP_NAME, window.location.pathname);
+      }
+    } catch (error) {
+      this.setState({ errorMessage: error.message });
+    }
   };
 
   public updateScene = withBatchedUpdates((sceneData: SceneData) => {
@@ -1346,7 +1407,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       return;
     }
 
-    if (event[KEYS.CTRL_OR_CMD]) {
+    if (event[KEYS.CTRL_OR_CMD] && this.state.isBindingEnabled) {
       this.setState({ isBindingEnabled: false });
     }
 
@@ -1442,16 +1503,16 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
     if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
       isHoldingSpace = true;
-      document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
+      setCursor(this.canvas, CURSOR_TYPE.GRABBING);
     }
   });
 
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
     if (event.key === KEYS.SPACE) {
       if (this.state.elementType === "selection") {
-        resetCursor();
+        resetCursor(this.canvas);
       } else {
-        setCursorForShape(this.state.elementType);
+        setCursorForShape(this.canvas, this.state.elementType);
         this.setState({
           selectedElementIds: {},
           selectedGroupIds: {},
@@ -1477,7 +1538,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private selectShapeTool(elementType: AppState["elementType"]) {
     if (!isHoldingSpace) {
-      setCursorForShape(elementType);
+      setCursorForShape(this.canvas, elementType);
     }
     if (isToolIcon(document.activeElement)) {
       document.activeElement.blur();
@@ -1573,7 +1634,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           },
           this.state,
         );
-        return [viewportX, viewportY];
+        return [
+          viewportX - this.state.offsetLeft,
+          viewportY - this.state.offsetTop,
+        ];
       },
       onChange: withBatchedUpdates((text) => {
         updateElement(text);
@@ -1581,10 +1645,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           updateBoundElements(element);
         }
       }),
-      onSubmit: withBatchedUpdates((text) => {
+      onSubmit: withBatchedUpdates(({ text, viaKeyboard }) => {
         const isDeleted = !text.trim();
         updateElement(text, isDeleted);
-        if (!isDeleted) {
+        // select the created text element only if submitting via keyboard
+        // (when submitting via click it should act as signal to deselect)
+        if (!isDeleted && viaKeyboard) {
           this.setState((prevState) => ({
             selectedElementIds: {
               ...prevState.selectedElementIds,
@@ -1603,7 +1669,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           editingElement: null,
         });
         if (this.state.elementLocked) {
-          setCursorForShape(this.state.elementType);
+          setCursorForShape(this.canvas, this.state.elementType);
         }
       }),
       element,
@@ -1784,7 +1850,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       return;
     }
 
-    resetCursor();
+    resetCursor(this.canvas);
 
     const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
       event,
@@ -1816,9 +1882,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
     }
 
-    resetCursor();
-
-    if (!event[KEYS.CTRL_OR_CMD]) {
+    resetCursor(this.canvas);
+    if (!event[KEYS.CTRL_OR_CMD] && !this.state.viewModeEnabled) {
       this.startTextEditing({
         sceneX,
         sceneY,
@@ -1882,9 +1947,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const isOverScrollBar = isPointerOverScrollBars.isOverEither;
     if (!this.state.draggingElement && !this.state.multiElement) {
       if (isOverScrollBar) {
-        resetCursor();
+        resetCursor(this.canvas);
       } else {
-        setCursorForShape(this.state.elementType);
+        setCursorForShape(this.canvas, this.state.elementType);
       }
     }
 
@@ -1935,7 +2000,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       const { points, lastCommittedPoint } = multiElement;
       const lastPoint = points[points.length - 1];
 
-      setCursorForShape(this.state.elementType);
+      setCursorForShape(this.canvas, this.state.elementType);
 
       if (lastPoint === lastCommittedPoint) {
         // if we haven't yet created a temp point and we're beyond commit-zone
@@ -1952,7 +2017,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             points: [...points, [scenePointerX - rx, scenePointerY - ry]],
           });
         } else {
-          document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
+          setCursor(this.canvas, CURSOR_TYPE.POINTER);
           // in this branch, we're inside the commit zone, and no uncommitted
           // point exists. Thus do nothing (don't add/remove points).
         }
@@ -1966,13 +2031,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           lastCommittedPoint[1],
         ) < LINE_CONFIRM_THRESHOLD
       ) {
-        document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
+        setCursor(this.canvas, CURSOR_TYPE.POINTER);
         mutateElement(multiElement, {
           points: points.slice(0, -1),
         });
       } else {
         if (isPathALoop(points, this.state.zoom.value)) {
-          document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
+          setCursor(this.canvas, CURSOR_TYPE.POINTER);
         }
         // update last uncommitted point
         mutateElement(multiElement, {
@@ -2015,8 +2080,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         elementWithTransformHandleType &&
         elementWithTransformHandleType.transformHandleType
       ) {
-        document.documentElement.style.cursor = getCursorForResizingElement(
-          elementWithTransformHandleType,
+        setCursor(
+          this.canvas,
+          getCursorForResizingElement(elementWithTransformHandleType),
         );
         return;
       }
@@ -2029,9 +2095,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         event.pointerType,
       );
       if (transformHandleType) {
-        document.documentElement.style.cursor = getCursorForResizingElement({
-          transformHandleType,
-        });
+        setCursor(
+          this.canvas,
+          getCursorForResizingElement({
+            transformHandleType,
+          }),
+        );
         return;
       }
     }
@@ -2041,11 +2110,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       scenePointer.y,
     );
     if (this.state.elementType === "text") {
-      document.documentElement.style.cursor = isTextElement(hitElement)
-        ? CURSOR_TYPE.TEXT
-        : CURSOR_TYPE.CROSSHAIR;
+      setCursor(
+        this.canvas,
+        isTextElement(hitElement) ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR,
+      );
     } else if (isOverScrollBar) {
-      document.documentElement.style.cursor = CURSOR_TYPE.AUTO;
+      setCursor(this.canvas, CURSOR_TYPE.AUTO);
     } else if (
       hitElement ||
       this.isHittingCommonBoundingBoxOfSelectedElements(
@@ -2053,9 +2123,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         selectedElements,
       )
     ) {
-      document.documentElement.style.cursor = CURSOR_TYPE.MOVE;
+      setCursor(this.canvas, CURSOR_TYPE.MOVE);
     } else {
-      document.documentElement.style.cursor = CURSOR_TYPE.AUTO;
+      setCursor(this.canvas, CURSOR_TYPE.AUTO);
     }
   };
 
@@ -2068,6 +2138,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     event.persist();
+
+    // remove any active selection when we start to interact with canvas
+    // (mainly, we care about removing selection outside the component which
+    //  would prevent our copy handling otherwise)
+    const selection = document.getSelection();
+    if (selection?.anchorNode) {
+      selection.removeAllRanges();
+    }
 
     this.maybeOpenContextMenuAfterPointerDownOnTouchDevices(event);
     this.maybeCleanupAfterMissingPointerUp(event);
@@ -2095,15 +2173,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     this.updateGestureOnPointerDown(event);
-
-    // fixes pointermove causing selection of UI texts #32
-    event.preventDefault();
-    // Preventing the event above disables default behavior
-    // of defocusing potentially focused element, which is what we
-    // want when clicking inside the canvas.
-    if (document.activeElement instanceof HTMLElement) {
-      document.activeElement.blur();
-    }
 
     // don't select while panning
     if (gesture.pointers.size > 1) {
@@ -2228,7 +2297,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     let nextPastePrevented = false;
     const isLinux = /Linux/.test(window.navigator.platform);
 
-    document.documentElement.style.cursor = CURSOR_TYPE.GRABBING;
+    setCursor(this.canvas, CURSOR_TYPE.GRABBING);
     let { clientX: lastX, clientY: lastY } = event;
     const onPointerMove = withBatchedUpdates((event: PointerEvent) => {
       const deltaX = lastX - event.clientX;
@@ -2280,7 +2349,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         lastPointerUp = null;
         isPanning = false;
         if (!isHoldingSpace) {
-          setCursorForShape(this.state.elementType);
+          setCursorForShape(this.canvas, this.state.elementType);
         }
         this.setState({
           cursorButton: "up",
@@ -2396,7 +2465,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     const onPointerUp = withBatchedUpdates(() => {
       isDraggingScrollBar = false;
-      setCursorForShape(this.state.elementType);
+      setCursorForShape(this.canvas, this.state.elementType);
       lastPointerUp = null;
       this.setState({
         cursorButton: "up",
@@ -2459,9 +2528,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         );
       }
       if (pointerDownState.resize.handleType) {
-        document.documentElement.style.cursor = getCursorForResizingElement({
-          transformHandleType: pointerDownState.resize.handleType,
-        });
+        setCursor(
+          this.canvas,
+          getCursorForResizingElement({
+            transformHandleType: pointerDownState.resize.handleType,
+          }),
+        );
         pointerDownState.resize.isResizing = true;
         pointerDownState.resize.offset = tupleToCoors(
           getResizeOffsetXY(
@@ -2626,7 +2698,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       insertAtParentCenter: !event.altKey,
     });
 
-    resetCursor();
+    resetCursor(this.canvas);
     if (!this.state.elementLocked) {
       this.setState({
         elementType: "selection",
@@ -2683,7 +2755,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       mutateElement(multiElement, {
         lastCommittedPoint: multiElement.points[multiElement.points.length - 1],
       });
-      document.documentElement.style.cursor = CURSOR_TYPE.POINTER;
+      setCursor(this.canvas, CURSOR_TYPE.POINTER);
     } else {
       const [gridX, gridY] = getGridPoint(
         pointerDownState.origin.x,
@@ -3218,7 +3290,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           }
           this.setState({ suggestedBindings: [], startBoundElement: null });
           if (!elementLocked && elementType !== "draw") {
-            resetCursor();
+            resetCursor(this.canvas);
             this.setState((prevState) => ({
               draggingElement: null,
               elementType: "selection",
@@ -3389,7 +3461,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       }
 
       if (!elementLocked && elementType !== "draw") {
-        resetCursor();
+        resetCursor(this.canvas);
         this.setState({
           draggingElement: null,
           suggestedBindings: [],
@@ -3539,34 +3611,17 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       file?.name.endsWith(".excalidraw")
     ) {
       this.setState({ isLoading: true });
-      if (
-        "chooseFileSystemEntries" in window ||
-        "showOpenFilePicker" in window
-      ) {
+      if (supported) {
         try {
           // This will only work as of Chrome 86,
           // but can be safely ignored on older releases.
           const item = event.dataTransfer.items[0];
-          // TODO: Make this part of `AppState`.
           (file as any).handle = await (item as any).getAsFileSystemHandle();
         } catch (error) {
           console.warn(error.name, error.message);
         }
       }
-      loadFromBlob(file, this.state)
-        .then(({ elements, appState }) =>
-          this.syncActionResult({
-            elements,
-            appState: {
-              ...(appState || this.state),
-              isLoading: false,
-            },
-            commitToHistory: true,
-          }),
-        )
-        .catch((error) => {
-          this.setState({ isLoading: false, errorMessage: error.message });
-        });
+      this.loadFileToCanvas(file);
     } else if (
       file?.type === MIME_TYPES.excalidrawlib ||
       file?.name.endsWith(".excalidrawlib")
@@ -3584,6 +3639,23 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         errorMessage: t("alerts.couldNotLoadInvalidFile"),
       });
     }
+  };
+
+  loadFileToCanvas = (file: Blob) => {
+    loadFromBlob(file, this.state)
+      .then(({ elements, appState }) =>
+        this.syncActionResult({
+          elements,
+          appState: {
+            ...(appState || this.state),
+            isLoading: false,
+          },
+          commitToHistory: true,
+        }),
+      )
+      .catch((error) => {
+        this.setState({ isLoading: false, errorMessage: error.message });
+      });
   };
 
   private handleCanvasContextMenu = (
@@ -3979,33 +4051,22 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
   }, 300);
 
-  private getCanvasOffsets(offsets?: {
-    offsetLeft?: number;
-    offsetTop?: number;
-  }): Pick<AppState, "offsetTop" | "offsetLeft"> {
-    if (
-      typeof offsets?.offsetLeft === "number" &&
-      typeof offsets?.offsetTop === "number"
-    ) {
-      return {
-        offsetLeft: offsets.offsetLeft,
-        offsetTop: offsets.offsetTop,
-      };
-    }
+  public setCanvasOffsets = () => {
+    this.setState({ ...this.getCanvasOffsets() });
+  };
+
+  private getCanvasOffsets(): Pick<AppState, "offsetTop" | "offsetLeft"> {
     if (this.excalidrawContainerRef?.current?.parentElement) {
       const parentElement = this.excalidrawContainerRef.current.parentElement;
       const { left, top } = parentElement.getBoundingClientRect();
       return {
-        offsetLeft:
-          typeof offsets?.offsetLeft === "number" ? offsets.offsetLeft : left,
-        offsetTop:
-          typeof offsets?.offsetTop === "number" ? offsets.offsetTop : top,
+        offsetLeft: left,
+        offsetTop: top,
       };
     }
     return {
-      offsetLeft:
-        typeof offsets?.offsetLeft === "number" ? offsets.offsetLeft : 0,
-      offsetTop: typeof offsets?.offsetTop === "number" ? offsets.offsetTop : 0,
+      offsetLeft: 0,
+      offsetTop: 0,
     };
   }
 

@@ -8,12 +8,21 @@
 }
 
 .excalidraw {
+  position: relative;
+  overflow: hidden;
   color: var(--text-primary-color);
   display: flex;
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
+
+  // serves 2 purposes:
+  // 1. prevent selecting text outside the component when double-clicking or
+  //    dragging inside it (e.g. on canvas)
+  // 2. prevent selecting UI, both from the inside, and from outside the
+  //    component (e.g. if you select text in a sidebar)
+  user-select: none;
 
   a {
     font-weight: 500;
@@ -27,7 +36,6 @@
 
   canvas {
     touch-action: none;
-    user-select: none;
 
     // following props improve blurriness at certain devicePixelRatios.
     // AFAIK it doesn't affect export (in fact, export seems sharp either way).
@@ -39,13 +47,13 @@
     z-index: var(--zIndex-canvas);
   }
 
-  &.Appearance_dark {
+  &.theme--dark {
     // The percentage is inspired by
     // https://material.io/design/color/dark-theme.html#properties, which
     // recommends surface color of #121212, 93% yields #111111 for #FFF
 
     canvas {
-      filter: var(--appearance-filter);
+      filter: var(--theme-filter);
     }
   }
 
@@ -214,7 +222,8 @@
       align-items: center;
       svg {
         width: 36px;
-        height: 18px;
+        height: 14px;
+        padding: 2px;
         opacity: 0.6;
       }
       &.active svg {
@@ -445,6 +454,14 @@
     fill: $oc-gray-6;
     bottom: 14px;
     width: 1.5rem;
+    padding: 0;
+    margin: 0;
+    background: none;
+    color: var(--icon-fill-color);
+
+    &:hover {
+      background: none;
+    }
 
     :root[dir="ltr"] & {
       right: 14px;

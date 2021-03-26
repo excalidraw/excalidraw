@@ -1,6 +1,5 @@
 import React from "react";
 import * as Sentry from "@sentry/browser";
-import { resetCursor } from "../utils";
 import { t } from "../i18n";
 
 interface TopErrorBoundaryState {
@@ -24,7 +23,6 @@ export class TopErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, errorInfo: any) {
-    resetCursor();
     const _localStorage: any = {};
     for (const [key, value] of Object.entries({ ...localStorage })) {
       try {

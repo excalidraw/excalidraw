@@ -87,9 +87,30 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
 export const newElementWith = <TElement extends ExcalidrawElement>(
   element: TElement,
   updates: ElementUpdate<TElement>,
-): TElement => ({
-  ...element,
-  ...updates,
-  version: element.version + 1,
-  versionNonce: randomInteger(),
-});
+): TElement => {
+  let didChange = false;
+  for (const key in updates) {
+    const value = (updates as any)[key];
+    if (typeof value !== "undefined") {
+      if (
+        (element as any)[key] === value &&
+        // if object, always update in case its deep prop was mutated
+        (typeof value !== "object" || value === null || key === "groupIds")
+      ) {
+        continue;
+      }
+      didChange = true;
+    }
+  }
+
+  if (!didChange) {
+    return element;
+  }
+
+  return {
+    ...element,
+    ...updates,
+    version: element.version + 1,
+    versionNonce: randomInteger(),
+  };
+};

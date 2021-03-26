@@ -131,9 +131,7 @@ export const debounce = <T extends any[]>(
   };
   ret.flush = () => {
     clearTimeout(handle);
-    if (lastArgs) {
-      fn(...lastArgs);
-    }
+    fn(...(lastArgs || []));
   };
   ret.cancel = () => {
     clearTimeout(handle);
@@ -160,15 +158,29 @@ export const removeSelection = () => {
 
 export const distance = (x: number, y: number) => Math.abs(x - y);
 
-export const resetCursor = () => {
-  document.documentElement.style.cursor = "";
+export const resetCursor = (canvas: HTMLCanvasElement | null) => {
+  if (canvas) {
+    canvas.style.cursor = "";
+  }
 };
 
-export const setCursorForShape = (shape: string) => {
+export const setCursor = (canvas: HTMLCanvasElement | null, cursor: string) => {
+  if (canvas) {
+    canvas.style.cursor = cursor;
+  }
+};
+
+export const setCursorForShape = (
+  canvas: HTMLCanvasElement | null,
+  shape: string,
+) => {
+  if (!canvas) {
+    return;
+  }
   if (shape === "selection") {
-    resetCursor();
+    resetCursor(canvas);
   } else {
-    document.documentElement.style.cursor = CURSOR_TYPE.CROSSHAIR;
+    canvas.style.cursor = CURSOR_TYPE.CROSSHAIR;
   }
 };
 

@@ -90,7 +90,7 @@ export type AppState = {
   showHelpDialog: boolean;
   toastMessage: string | null;
   zenModeEnabled: boolean;
-  appearance: "light" | "dark";
+  theme: "light" | "dark";
   gridSize: number | null;
   viewModeEnabled: boolean;
 
@@ -162,10 +162,6 @@ export type ExcalidrawAPIRefValue =
 export interface ExcalidrawProps {
   width?: number;
   height?: number;
-  /** if not supplied, calculated by Excalidraw */
-  offsetLeft?: number;
-  /** if not supplied, calculated by Excalidraw */
-  offsetTop?: number;
   onChange?: (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
@@ -189,6 +185,9 @@ export interface ExcalidrawProps {
   viewModeEnabled?: boolean;
   zenModeEnabled?: boolean;
   gridModeEnabled?: boolean;
+  libraryReturnUrl?: string;
+  theme?: "dark" | "light";
+  name?: string;
 }
 
 export type SceneData = {

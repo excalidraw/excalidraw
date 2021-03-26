@@ -61,7 +61,7 @@
     "architect": "正確",
     "artist": "アート",
     "cartoonist": "漫画風",
-    "fileTitle": "ファイル名",
+    "fileTitle": "",
     "colorPicker": "色選択",
     "canvasBackground": "キャンバスの背景",
     "drawingCanvas": "キャンバスの描画",
@@ -92,7 +92,9 @@
     "centerHorizontally": "横方向に中央揃え",
     "distributeHorizontally": "水平方向に分散配置",
     "distributeVertically": "垂直方向に分散配置",
-    "viewMode": "閲覧モード"
+    "viewMode": "閲覧モード",
+    "toggleExportColorScheme": "",
+    "share": ""
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",
@@ -141,6 +143,7 @@
     "confirmAddLibrary": "{{numShapes}} 個の図形をライブラリに追加します。よろしいですか？",
     "imageDoesNotContainScene": "現在、画像のインポートはサポートされていません。\n\nシーンをインポートしようとしましたか？この画像にはシーンデータが含まれていないようです。エクスポート中に有効にしていましたか？",
     "cannotRestoreFromImage": "このイメージファイルからシーンを復元できませんでした",
+    "invalidSceneUrl": "",
     "resetLibrary": "ライブラリを消去します。本当によろしいですか？"
   },
   "toolBar": {
@@ -197,7 +200,8 @@
     "button_stopSession": "セッションを終了する",
     "desc_inProgressIntro": "共同編集セッションが有効になっています。",
     "desc_shareLink": "下記URLを共同編集したい人に共有してください：",
-    "desc_exitSession": "セッションを終了すると部屋から切断されますが、手元の環境で編集を続けることができます。変更内容は他の人には反映されません。"
+    "desc_exitSession": "セッションを終了すると部屋から切断されますが、手元の環境で編集を続けることができます。変更内容は他の人には反映されません。",
+    "shareTitle": ""
   },
   "errorDialog": {
     "title": "エラー"
@@ -244,8 +248,10 @@
   "toast": {
     "copyStyles": "スタイルをコピー",
     "copyToClipboard": "クリップボードにコピー",
-    "copyToClipboardAsPng": "PNG形式でクリップボードにコピー",
+    "copyToClipboardAsPng": "",
     "fileSaved": "ファイルを保存しました",
-    "fileSavedToFilename": "{filename} に保存しました"
+    "fileSavedToFilename": "{filename} に保存しました",
+    "canvas": "",
+    "selection": ""
   }
 }

@@ -1,25 +1,26 @@
 import "./TextInput.scss";
 
 import React, { Component } from "react";
-import { selectNode, removeSelection } from "../utils";
 
 type Props = {
   value: string;
   onChange: (value: string) => void;
   label: string;
+  isNameEditable: boolean;
 };
 
-export class ProjectName extends Component<Props> {
-  private handleFocus = (event: React.FocusEvent<HTMLElement>) => {
-    selectNode(event.currentTarget);
+type State = {
+  fileName: string;
+};
+export class ProjectName extends Component<Props, State> {
+  state = {
+    fileName: this.props.value,
   };
-
-  private handleBlur = (event: React.FocusEvent<HTMLElement>) => {
-    const value = event.currentTarget.innerText.trim();
+  private handleBlur = (event: any) => {
+    const value = event.target.value;
     if (value !== this.props.value) {
       this.props.onChange(value);
     }
-    removeSelection();
   };
 
   private handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
@@ -31,32 +32,30 @@ export class ProjectName extends Component<Props> {
       event.currentTarget.blur();
     }
   };
-  private makeEditable = (editable: HTMLSpanElement | null) => {
-    if (!editable) {
-      return;
-    }
-    try {
-      editable.contentEditable = "plaintext-only";
-    } catch {
-      editable.contentEditable = "true";
-    }
-  };
 
   public render() {
     return (
-      <span
-        suppressContentEditableWarning
-        ref={this.makeEditable}
-        data-type="wysiwyg"
-        className="TextInput"
-        role="textbox"
-        aria-label={this.props.label}
-        onBlur={this.handleBlur}
-        onKeyDown={this.handleKeyDown}
-        onFocus={this.handleFocus}
-      >
-        {this.props.value}
-      </span>
+      <>
+        <label htmlFor="file-name">
+          {`${this.props.label}${this.props.isNameEditable ? "" : ":"}`}
+        </label>
+        {this.props.isNameEditable ? (
+          <input
+            className="TextInput"
+            onBlur={this.handleBlur}
+            onKeyDown={this.handleKeyDown}
+            id="file-name"
+            value={this.state.fileName}
+            onChange={(event) =>
+              this.setState({ fileName: event.target.value })
+            }
+          />
+        ) : (
+          <span className="TextInput TextInput--readonly" id="file-name">
+            {this.props.value}
+          </span>
+        )}
+      </>
     );
   }
 }

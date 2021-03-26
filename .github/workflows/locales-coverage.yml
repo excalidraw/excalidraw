@@ -33,7 +33,7 @@ jobs:
       - name: Construct comment body
         id: getCommentBody
         run: |
-          body=$(yarn locales-coverage:description | grep '^[^>]')
+          body=$(npm run locales-coverage:description | grep '^[^>]')
           body="${body//'%'/'%25'}"
           body="${body//$'\n'/'%0A'}"
           body="${body//$'\r'/'%0D'}"

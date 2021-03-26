@@ -40,6 +40,7 @@ import { createInverseContext } from "../../createInverseContext";
 import { t } from "../../i18n";
 import { UserIdleState } from "./types";
 import { IDLE_THRESHOLD, ACTIVE_THRESHOLD } from "../../constants";
+import { trackEvent } from "../../analytics";
 
 interface CollabState {
   modalIsShown: boolean;
@@ -188,6 +189,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   };
 
   openPortal = async () => {
+    trackEvent("share", "room creation");
     return this.initializeSocketClient(null);
   };
 
@@ -196,6 +198,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     if (window.confirm(t("alerts.collabStopOverridePrompt"))) {
       window.history.pushState({}, APP_NAME, window.location.origin);
       this.destroySocketClient();
+      trackEvent("share", "room closed");
     }
   };
 
@@ -256,7 +259,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
         if (elements) {
           scenePromise.resolve({
             elements,
-            scrollToCenter: true,
+            scrollToContent: true,
           });
         }
       } catch (error) {
@@ -310,7 +313,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
               // noop if already resolved via init from firebase
               scenePromise.resolve({
                 elements: reconciledElements,
-                scrollToCenter: true,
+                scrollToContent: true,
               });
             }
             break;
@@ -445,15 +448,8 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
   private handleRemoteSceneUpdate = (
     elements: ReconciledElements,
-    {
-      init = false,
-      initFromSnapshot = false,
-    }: { init?: boolean; initFromSnapshot?: boolean } = {},
+    { init = false }: { init?: boolean } = {},
   ) => {
-    if (init || initFromSnapshot) {
-      this.excalidrawAPI.setScrollToCenter(elements);
-    }
-
     this.excalidrawAPI.updateScene({
       elements,
       commitToHistory: !!init,

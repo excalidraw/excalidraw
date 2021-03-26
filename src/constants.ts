@@ -84,9 +84,15 @@ export const MIME_TYPES = {
   excalidrawlib: "application/vnd.excalidrawlib+json",
 };
 
+export const EXPORT_DATA_TYPES = {
+  excalidraw: "excalidraw",
+  excalidrawClipboard: "excalidraw/clipboard",
+  excalidrawLibrary: "excalidrawlib",
+} as const;
+
 export const STORAGE_KEYS = {
   LOCAL_STORAGE_LIBRARY: "excalidraw-library",
-};
+} as const;
 
 // time in milliseconds
 export const TAP_TWICE_TIMEOUT = 300;
@@ -94,7 +100,7 @@ export const TOUCH_CTX_MENU_TIMEOUT = 500;
 export const TITLE_TIMEOUT = 10000;
 export const TOAST_TIMEOUT = 5000;
 export const VERSION_TIMEOUT = 30000;
-export const SCROLL_TIMEOUT = 500;
+export const SCROLL_TIMEOUT = 100;
 
 export const ZOOM_STEP = 0.1;
 
@@ -109,4 +115,4 @@ export const MODES = {
   GRID: "gridMode",
 };
 
-export const APPEARANCE_FILTER = cssVariables.appearanceFilter;
+export const THEME_FILTER = cssVariables.themeFilter;

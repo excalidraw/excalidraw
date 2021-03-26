@@ -1,8 +1,8 @@
 @import "open-color/open-color.scss";
 @import "./variables.module.scss";
 
-:root {
-  --appearance-filter: none;
+.excalidraw {
+  --theme-filter: none;
   --button-destructive-bg-color: #{$oc-red-1};
   --button-destructive-color: #{$oc-red-9};
   --button-gray-1: #{$oc-gray-2};
@@ -34,19 +34,17 @@
   --shadow-island: 0 1px 5px #{transparentize($oc-black, 0.85)};
   --space-factor: 0.25rem;
   --text-primary-color: #{$oc-gray-8};
-}
 
-.excalidraw {
-  &.Appearance_dark {
+  &.theme--dark {
     background: $oc-black;
 
-    &.Appearance_dark-background-none {
+    &.theme--dark-background-none {
       background: none;
     }
   }
 
-  &.Appearance_dark {
-    --appearance-filter: #{$appearance-filter};
+  &.theme--dark {
+    --theme-filter: #{$theme-filter};
     --button-destructive-bg-color: #5a0000;
     --button-destructive-color: #{$oc-red-3};
     --button-gray-1: #363636;
