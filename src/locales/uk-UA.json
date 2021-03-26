@@ -92,6 +92,8 @@
     "centerHorizontally": "Центрувати по горизонталі",
     "distributeHorizontally": "Розподілити по горизонталі",
     "distributeVertically": "Розподілити вертикально",
+    "flipHorizontal": "",
+    "flipVertical": "",
     "viewMode": "Режим перегляду",
     "toggleExportColorScheme": "Переключити колірну схему експорту",
     "share": "Поділитися"

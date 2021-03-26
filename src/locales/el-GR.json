@@ -61,7 +61,7 @@
     "architect": "Αρχιτέκτονας",
     "artist": "Καλλιτέχνης",
     "cartoonist": "Σκιτσογράφος",
-    "fileTitle": "",
+    "fileTitle": "Όνομα αρχείου",
     "colorPicker": "Επιλογή Χρώματος",
     "canvasBackground": "Φόντο καμβά",
     "drawingCanvas": "Σχεδίαση καμβά",
@@ -92,6 +92,8 @@
     "centerHorizontally": "Κέντρο οριζόντια",
     "distributeHorizontally": "Οριζόντια κατανομή",
     "distributeVertically": "Κατακόρυφη κατανομή",
+    "flipHorizontal": "",
+    "flipVertical": "",
     "viewMode": "Λειτουργία προβολής",
     "toggleExportColorScheme": "Εναλλαγή εξαγωγής θέματος χρωμάτων",
     "share": "Κοινοποίηση"
