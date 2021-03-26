@@ -1,6 +1,6 @@
 ### Excalidraw
 
-Excalidraw exported as a component to directly embed in your projects
+Excalidraw exported as a component to directly embed in your projects.
 
 ### Installation
 
@@ -28,10 +28,13 @@ If you want to load assets from a different path you can set a variable `window.
 
 [Try here](https://codesandbox.io/s/excalidraw-ehlz3).
 
-<details id="usage">
-<summary><strong>Usage</strong></summary>
+### Usage
 
-1. If you are using a Web bundler (for instance, Webpack), you can import it as an ES6 module as shown below
+#### Using Web Bundler
+
+If you are using a Web bundler (for instance, Webpack), you can import it as an ES6 module as shown below
+
+<details><summary><strong>View Example</strong></summary>
 
 ```js
 import React, { useEffect, useState, useRef } from "react";
@@ -168,9 +171,28 @@ To view the full example visit :point_down:
 
 [![Edit excalidraw](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/excalidraw-ehlz3?fontsize=14&hidenavigation=1&theme=dark)
 
-2. To use it in a browser directly:
+Since Excalidraw doesn't support server side rendering yet so you will have to make sure the component is rendered once host is mounted.
+
+```js
+import { useState, useEffect } from "react";
+export default function IndexPage() {
+  const [Comp, setComp] = useState(null);
+  useEffect(() => {
+    import("@excalidraw/excalidraw").then((comp) => setComp(comp.default));
+  });
+  return <>{Comp && <Comp />}</>;
+}
+```
+
+</details>
+
+#### In Browser
+
+To use it in a browser directly:
 
 You will need to make sure `react`, `react-dom` is available as shown below.
+
+<details><summary><strong>View Example</strong></summary>
 
 ```html
 <!DOCTYPE html>
@@ -183,7 +205,7 @@ You will need to make sure `react`, `react-dom` is available as shown below.
 
     <script
       type="text/javascript"
-      src="https://unpkg.com/@excalidraw/excalidraw@0.4.1/dist/excalidraw.min.js"
+      src="https://unpkg.com/@excalidraw/excalidraw@0.5.0/dist/excalidraw.min.js"
     ></script>
   </head>
 
@@ -348,23 +370,9 @@ To view the full example visit :point_down:
 
 [![Edit excalidraw-in-browser](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/excalidraw-in-browser-tlqom?fontsize=14&hidenavigation=1&theme=dark)
 
-Since Excalidraw doesn't support server side rendering yet so you will have to make sure the component is rendered once host is mounted.
-
-```js
-import { useState, useEffect } from "react";
-export default function IndexPage() {
-  const [Comp, setComp] = useState(null);
-  useEffect(() => {
-    import("@excalidraw/excalidraw").then((comp) => setComp(comp.default));
-  });
-  return <>{Comp && <Comp />}</>;
-}
-```
-
 </details>
 
-<details id="props">
-<summary><strong>Props</strong></summary>
+### Props
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -537,7 +545,7 @@ This prop indicates whether the shows the grid. When supplied, the value takes p
 
 #### `libraryReturnUrl`
 
-If supplied, this URL will be used when user tries to install a library from [libraries.excalidraw.com](https://libraries.excalidraw.com). Default to `window.location.origin`. To install the libraries in the same tab from which it was opened, you need to set `window.name` (to any alphanumeric string) — if it's not set it will open in a new tab.
+If supplied, this URL will be used when user tries to install a library from [libraries.excalidraw.com](https://libraries.excalidraw.com). Defaults to `window.location.origin + window.location.pathname`. To install the libraries in the same tab from which it was opened, you need to set `window.name` (to any alphanumeric string) — if it's not set it will open in a new tab.
 
 #### `theme`
 
@@ -547,10 +555,11 @@ This prop controls Excalidraw's theme. When supplied, the value takes precedence
 
 This prop sets the name of the drawing which will be used when exporting the drawing. When supplied, the value takes precedence over `intialData.appState.name`, the `name` will be fully controlled by host app and the users won't be able to edit from within Excalidraw.
 
-</details>
+### Does it support collaboration ?
 
-<details id="extra-apis">
-<summary><strong>Extra API's</strong></summary>
+No Excalidraw package doesn't come with collaboration, since this would have different implementations on the consumer so we expose the API's which you can use to communicate with Excalidraw as mentioned above. If you are interested in understanding how Excalidraw does it you can check it [here](https://github.com/excalidraw/excalidraw/blob/master/src/excalidraw-app/index.tsx).
+
+### Extra API's
 
 #### `getSceneVersion`
 
@@ -595,8 +604,7 @@ import { getElementsMap } from "@excalidraw/excalidraw";
 
 This function returns an object where each element is mapped to its id.
 
-<details id="restore-utils">
-<summary><strong>Restore utilities</strong></summary>
+### Restore utilities
 
 #### `restoreAppState`
 
@@ -646,10 +654,7 @@ import { restore } from "@excalidraw/excalidraw";
 
 This function makes sure elements and state is set to appropriate values and set to default value if not present. It is combination of [restoreElements](#restoreElements) and [restoreAppState](#restoreAppState)
 
-</details>
-
-<details id="export-utils">
-<summary><strong>Export utilities</strong></summary>
+### Export utilities
 
 #### `exportToCanvas`
 
@@ -733,6 +738,3 @@ This function returns a svg with the exported elements.
 | viewBackgroundColor | string | #fff | The default background color |
 | shouldAddWatermark | boolean | false | Indicates whether watermark should be exported |
 | exportWithDarkMode | boolean | false | Indicates whether to export with dark mode |
-
-</details>
-</details>
