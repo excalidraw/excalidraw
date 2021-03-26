@@ -3,11 +3,7 @@ import { getSelectedElements } from "../scene";
 import { getElementMap, getNonDeletedElements } from "../element";
 import { mutateElement } from "../element/mutateElement";
 import { ExcalidrawElement, NonDeleted } from "../element/types";
-import {
-  normalizeAngle,
-  resizeSingleElement,
-  reshapeSingleTwoPointElement,
-} from "../element/resizeElements";
+import { normalizeAngle, resizeSingleElement } from "../element/resizeElements";
 import { AppState } from "../types";
 import { getTransformHandles } from "../element/transformHandles";
 import { isLinearElement } from "../element/typeChecks";
@@ -98,7 +94,7 @@ const flipElements = (
   flipDirection: "horizontal" | "vertical",
 ): ExcalidrawElement[] => {
   for (let i = 0; i < elements.length; i++) {
-    flipElementHorizontally(elements[i], appState);
+    flipElement(elements[i], appState);
     // If vertical flip, rotate an extra 180
     if (flipDirection === "vertical") {
       rotateElement(elements[i], Math.PI);
@@ -107,7 +103,7 @@ const flipElements = (
   return elements;
 };
 
-const flipElementHorizontally = (
+const flipElement = (
   element: NonDeleted<ExcalidrawElement>,
   appState: AppState,
 ) => {
@@ -116,6 +112,14 @@ const flipElementHorizontally = (
   const width = element.width;
   const height = element.height;
   const originalAngle = normalizeAngle(element.angle);
+
+  let finalOffsetX = 0;
+  if (isLinearElement(element)) {
+    finalOffsetX =
+      element.points.reduce((max, point) => Math.max(max, point[0]), 0) * 2 -
+      element.width;
+  }
+
   // Rotate back to zero, if necessary
   mutateElement(element, {
     angle: normalizeAngle(0),
@@ -138,31 +142,13 @@ const flipElementHorizontally = (
   }
 
   if (isLinearElement(element)) {
-    if (element.points.length === 2) {
-      // reuse usingNWHandle to tell us which way we are flipping
-      usingNWHandle = element.points[0][0] < element.points[1][0];
-      // calculate new x-coord for transformation
-      newNCoordsX =
-        element.points[0][0] < element.points[1][0]
-          ? element.x + 2 * width
-          : element.x - 2 * width;
-      reshapeSingleTwoPointElement(
-        element,
-        "origin",
-        false,
-        newNCoordsX,
-        element.y,
-      );
-    } else {
-      // drawings and 3+ point lines
-      for (let i = 1; i < element.points.length; i++) {
-        LinearElementEditor.movePoint(element, i, [
-          -element.points[i][0],
-          element.points[i][1],
-        ]);
-      }
-      LinearElementEditor.normalizePoints(element);
+    for (let i = 1; i < element.points.length; i++) {
+      LinearElementEditor.movePoint(element, i, [
+        -element.points[i][0],
+        element.points[i][1],
+      ]);
     }
+    LinearElementEditor.normalizePoints(element);
   } else {
     // calculate new x-coord for transformation
     newNCoordsX = usingNWHandle ? element.x + 2 * width : element.x - 2 * width;
@@ -195,18 +181,10 @@ const flipElementHorizontally = (
   updateBoundElements(element);
 
   // Move back to original spot to appear "flipped in place"
-  if (isLinearElement(element) && element.points.length === 2) {
-    const displacement = usingNWHandle ? width : -width;
-    mutateElement(element, {
-      x: originalX + displacement,
-      y: originalY,
-    });
-  } else {
-    mutateElement(element, {
-      x: originalX,
-      y: originalY,
-    });
-  }
+  mutateElement(element, {
+    x: originalX + finalOffsetX,
+    y: originalY,
+  });
 };
 
 const rotateElement = (element: ExcalidrawElement, rotationAngle: number) => {
