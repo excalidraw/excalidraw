@@ -33,7 +33,7 @@ export { actionFinalize } from "./actionFinalize";
 export {
   actionChangeProjectName,
   actionChangeExportBackground,
-  actionToggleAutoSave,
+  actionToggleAutosave,
   actionSaveScene,
   actionSaveAsScene,
   actionLoadScene,

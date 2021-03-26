@@ -910,7 +910,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       .querySelector(".excalidraw")
       ?.classList.toggle("theme--dark", this.state.theme === "dark");
 
-    if (this.state.autoSave && this.state.fileHandle && supported) {
+    if (this.state.autosave && this.state.fileHandle && supported) {
       this.saveLocalSceneDebounced(
         this.scene.getElementsIncludingDeleted(),
         this.state,
@@ -1051,14 +1051,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private saveLocalSceneDebounced = debounce(
     async (elements: readonly ExcalidrawElement[], state: AppState) => {
-      if (this.state.autoSave && this.state.fileHandle && supported) {
+      if (this.state.autosave && this.state.fileHandle && supported) {
         try {
           await saveAsJSON(elements, state);
         } catch (error) {
           // shouldn't (almost) ever happen, so let's log it
           console.error(error);
           this.setState({
-            autoSave: false,
+            autosave: false,
             errorMessage: t("toast.autosaveFailed"),
           });
         }
