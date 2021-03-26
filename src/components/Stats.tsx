@@ -120,31 +120,17 @@ export const Stats = (props: {
               <>
                 <tr>
                   <td>{"x"}</td>
-                  <td>
-                    {Math.round(
-                      selectedElements.length === 1
-                        ? selectedElements[0].x
-                        : selectedBoundingBox[0],
-                    )}
-                  </td>
+                  <td>{Math.round(selectedBoundingBox[0])}</td>
                 </tr>
                 <tr>
                   <td>{"y"}</td>
-                  <td>
-                    {Math.round(
-                      selectedElements.length === 1
-                        ? selectedElements[0].y
-                        : selectedBoundingBox[1],
-                    )}
-                  </td>
+                  <td>{Math.round(selectedBoundingBox[1])}</td>
                 </tr>
                 <tr>
                   <td>{t("stats.width")}</td>
                   <td>
                     {Math.round(
-                      selectedElements.length === 1
-                        ? selectedElements[0].width
-                        : selectedBoundingBox[2] - selectedBoundingBox[0],
+                      selectedBoundingBox[2] - selectedBoundingBox[0],
                     )}
                   </td>
                 </tr>
@@ -152,9 +138,7 @@ export const Stats = (props: {
                   <td>{t("stats.height")}</td>
                   <td>
                     {Math.round(
-                      selectedElements.length === 1
-                        ? selectedElements[0].height
-                        : selectedBoundingBox[3] - selectedBoundingBox[1],
+                      selectedBoundingBox[3] - selectedBoundingBox[1],
                     )}
                   </td>
                 </tr>
