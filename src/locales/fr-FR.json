@@ -92,6 +92,8 @@
     "centerHorizontally": "Centrer horizontalement",
     "distributeHorizontally": "Distribuer horizontalement",
     "distributeVertically": "Distribuer verticalement",
+    "flipHorizontal": "Retourner horizontalement",
+    "flipVertical": "Retourner verticalement",
     "viewMode": "Mode présentation",
     "toggleExportColorScheme": "Activer/Désactiver l'export du thème de couleur",
     "share": "Partager"

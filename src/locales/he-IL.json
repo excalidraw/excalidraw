@@ -92,6 +92,8 @@
     "centerHorizontally": "מרכז אופקית",
     "distributeHorizontally": "חלוקה אופקית",
     "distributeVertically": "חלוקה אנכית",
+    "flipHorizontal": "",
+    "flipVertical": "",
     "viewMode": "מצב תצוגה",
     "toggleExportColorScheme": "",
     "share": ""

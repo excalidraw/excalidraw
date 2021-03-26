@@ -92,6 +92,8 @@
     "centerHorizontally": "Центрирай хоризонтално",
     "distributeHorizontally": "Разпредели хоризонтално",
     "distributeVertically": "Разпредели вертикално",
+    "flipHorizontal": "",
+    "flipVertical": "",
     "viewMode": "Изглед",
     "toggleExportColorScheme": "",
     "share": ""

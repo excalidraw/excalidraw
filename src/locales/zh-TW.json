@@ -92,6 +92,8 @@
     "centerHorizontally": "水平置中",
     "distributeHorizontally": "水平分布",
     "distributeVertically": "垂直分布",
+    "flipHorizontal": "水平翻轉",
+    "flipVertical": "垂直翻轉",
     "viewMode": "檢視模式",
     "toggleExportColorScheme": "切換輸出配色",
     "share": "共享"

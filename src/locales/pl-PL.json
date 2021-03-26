@@ -92,6 +92,8 @@
     "centerHorizontally": "Wyśrodkuj w poziomie",
     "distributeHorizontally": "Rozłóż poziomo",
     "distributeVertically": "Rozłóż pionowo",
+    "flipHorizontal": "",
+    "flipVertical": "",
     "viewMode": "Tryb widoku",
     "toggleExportColorScheme": "",
     "share": ""
