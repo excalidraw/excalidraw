@@ -85,6 +85,8 @@ export type ActionName =
   | "alignHorizontallyCentered"
   | "distributeHorizontally"
   | "distributeVertically"
+  | "flipHorizontal"
+  | "flipVertical"
   | "viewMode"
   | "exportWithDarkMode";
 

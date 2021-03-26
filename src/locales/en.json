@@ -92,6 +92,8 @@
     "centerHorizontally": "Center horizontally",
     "distributeHorizontally": "Distribute horizontally",
     "distributeVertically": "Distribute vertically",
+    "flipHorizontal": "Flip horizontal",
+    "flipVertical": "Flip vertical",
     "viewMode": "View mode",
     "toggleExportColorScheme": "Toggle export color scheme",
     "share": "Share"
