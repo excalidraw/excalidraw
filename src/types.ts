@@ -162,10 +162,6 @@ export type ExcalidrawAPIRefValue =
 export interface ExcalidrawProps {
   width?: number;
   height?: number;
-  /** if not supplied, calculated by Excalidraw */
-  offsetLeft?: number;
-  /** if not supplied, calculated by Excalidraw */
-  offsetTop?: number;
   onChange?: (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
@@ -190,6 +186,8 @@ export interface ExcalidrawProps {
   zenModeEnabled?: boolean;
   gridModeEnabled?: boolean;
   libraryReturnUrl?: string;
+  theme?: "dark" | "light";
+  name?: string;
 }
 
 export type SceneData = {

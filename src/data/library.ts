@@ -4,9 +4,11 @@ import { restoreElements } from "./restore";
 import { STORAGE_KEYS } from "../constants";
 import { getNonDeletedElements } from "../element";
 import { NonDeleted, ExcalidrawElement } from "../element/types";
+import { nanoid } from "nanoid";
 
 export class Library {
   private static libraryCache: LibraryItems | null = null;
+  public static csrfToken = nanoid();
 
   static resetLibrary = () => {
     Library.libraryCache = null;

@@ -23,7 +23,9 @@ export type ShortcutName =
   | "zenMode"
   | "stats"
   | "addToLibrary"
-  | "viewMode";
+  | "viewMode"
+  | "flipHorizontal"
+  | "flipVertical";
 
 const shortcutMap: Record<ShortcutName, string[]> = {
   cut: [getShortcutKey("CtrlOrCmd+X")],
@@ -57,6 +59,8 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   zenMode: [getShortcutKey("Alt+Z")],
   stats: [],
   addToLibrary: [],
+  flipHorizontal: [getShortcutKey("Shift+H")],
+  flipVertical: [getShortcutKey("Shift+V")],
   viewMode: [getShortcutKey("Alt+R")],
 };
 

@@ -53,6 +53,7 @@ interface LayerUIProps {
   onInsertElements: (elements: readonly NonDeletedExcalidrawElement[]) => void;
   zenModeEnabled: boolean;
   showExitZenModeBtn: boolean;
+  showThemeBtn: boolean;
   toggleZenMode: () => void;
   langCode: Language["code"];
   isCollaborating: boolean;
@@ -120,10 +121,11 @@ const LibraryMenuItems = ({
   const rows = [];
   let addedPendingElements = false;
 
-  const referrer = libraryReturnUrl || window.location.origin;
+  const referrer =
+    libraryReturnUrl || window.location.origin + window.location.pathname;
 
   rows.push(
-    <div className="layer-ui__library-header">
+    <div className="layer-ui__library-header" key="library-header">
       <ToolButton
         key="import"
         type="button"
@@ -143,36 +145,41 @@ const LibraryMenuItems = ({
             });
         }}
       />
-      <ToolButton
-        key="export"
-        type="button"
-        title={t("buttons.export")}
-        aria-label={t("buttons.export")}
-        icon={exportFile}
-        onClick={() => {
-          saveLibraryAsJSON()
-            .catch(muteFSAbortError)
-            .catch((error) => {
-              setAppState({ errorMessage: error.message });
-            });
-        }}
-      />
-      <ToolButton
-        key="reset"
-        type="button"
-        title={t("buttons.resetLibrary")}
-        aria-label={t("buttons.resetLibrary")}
-        icon={trash}
-        onClick={() => {
-          if (window.confirm(t("alerts.resetLibrary"))) {
-            Library.resetLibrary();
-            setLibraryItems([]);
-          }
-        }}
-      />
-
+      {!!library.length && (
+        <>
+          <ToolButton
+            key="export"
+            type="button"
+            title={t("buttons.export")}
+            aria-label={t("buttons.export")}
+            icon={exportFile}
+            onClick={() => {
+              saveLibraryAsJSON()
+                .catch(muteFSAbortError)
+                .catch((error) => {
+                  setAppState({ errorMessage: error.message });
+                });
+            }}
+          />
+          <ToolButton
+            key="reset"
+            type="button"
+            title={t("buttons.resetLibrary")}
+            aria-label={t("buttons.resetLibrary")}
+            icon={trash}
+            onClick={() => {
+              if (window.confirm(t("alerts.resetLibrary"))) {
+                Library.resetLibrary();
+                setLibraryItems([]);
+              }
+            }}
+          />
+        </>
+      )}
       <a
-        href={`https://libraries.excalidraw.com?referrer=${referrer}`}
+        href={`https://libraries.excalidraw.com?target=${
+          window.name || "_blank"
+        }&referrer=${referrer}&useHash=true&token=${Library.csrfToken}`}
         target="_excalidraw_libraries"
       >
         {t("labels.libraries")}
@@ -325,6 +332,7 @@ const LayerUI = ({
   onInsertElements,
   zenModeEnabled,
   showExitZenModeBtn,
+  showThemeBtn,
   toggleZenMode,
   isCollaborating,
   onExportToBackend,
@@ -441,6 +449,7 @@ const LayerUI = ({
             actionManager={actionManager}
             appState={appState}
             setAppState={setAppState}
+            showThemeBtn={showThemeBtn}
           />
         </Stack.Col>
       </Island>
@@ -671,6 +680,7 @@ const LayerUI = ({
         isCollaborating={isCollaborating}
         renderCustomFooter={renderCustomFooter}
         viewModeEnabled={viewModeEnabled}
+        showThemeBtn={showThemeBtn}
       />
     </>
   ) : (

@@ -1,4 +1,5 @@
 import { cleanAppStateForExport } from "../appState";
+import { EXPORT_DATA_TYPES, MIME_TYPES } from "../constants";
 import { clearElementsForExport } from "../element";
 import { CanvasError } from "../errors";
 import { t } from "../i18n";
@@ -114,7 +115,7 @@ export const loadFromBlob = async (
 export const loadLibraryFromBlob = async (blob: Blob) => {
   const contents = await parseFileContents(blob);
   const data: LibraryData = JSON.parse(contents);
-  if (data.type !== "excalidrawlib") {
+  if (data.type !== EXPORT_DATA_TYPES.excalidrawLibrary) {
     throw new Error(t("alerts.couldNotLoadInvalidFile"));
   }
   return data;

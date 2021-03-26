@@ -68,7 +68,7 @@
     "layers": "Шари",
     "actions": "Дії",
     "language": "Мова",
-    "liveCollaboration": "",
+    "liveCollaboration": "Спільна співпраця",
     "duplicateSelection": "Дублювати",
     "untitled": "Без назви",
     "name": "Ім’я",
@@ -93,7 +93,8 @@
     "distributeHorizontally": "Розподілити по горизонталі",
     "distributeVertically": "Розподілити вертикально",
     "viewMode": "Режим перегляду",
-    "toggleExportColorScheme": ""
+    "toggleExportColorScheme": "Переключити колірну схему експорту",
+    "share": "Поділитися"
   },
   "buttons": {
     "clearReset": "Очистити полотно",
@@ -118,7 +119,7 @@
     "edit": "Редагувати",
     "undo": "Відмінити",
     "redo": "Повторити",
-    "resetLibrary": "",
+    "resetLibrary": "Очистити бібліотеку",
     "createNewRoom": "Створити нову кімнату",
     "fullScreen": "Повноекранний режим",
     "darkMode": "Темний режим",
@@ -142,8 +143,8 @@
     "confirmAddLibrary": "Це призведе до додавання {{numShapes}} фігур до вашої бібліотеки. Ви впевнені?",
     "imageDoesNotContainScene": "Імпортування зображень на даний момент не підтримується.\n\nЧи хочете ви імпортувати сцену? Це зображення не містить ніяких даних сцен. Ви увімкнули це під час експорту?",
     "cannotRestoreFromImage": "Сцена не може бути відновлена з цього файлу зображення",
-    "invalidSceneUrl": "",
-    "resetLibrary": ""
+    "invalidSceneUrl": "Не вдалося імпортувати сцену з наданого URL. Він або недоформований, або не містить дійсних даних Excalidraw JSON.",
+    "resetLibrary": "Це призведе до очищення бібліотеки. Ви впевнені?"
   },
   "toolBar": {
     "selection": "Виділення",
@@ -199,7 +200,8 @@
     "button_stopSession": "Закрити сесію",
     "desc_inProgressIntro": "Сесія спільної роботи над кресленням триває.",
     "desc_shareLink": "Поділіться цим посиланням з будь-ким для спільної роботи:",
-    "desc_exitSession": "Зупинка сесії відключить вас від кімнати, але ви зможете продовжити роботу з полотном локально. Зверніть увагу, що це не вплине на інших людей, і вони все одно зможуть працювати над їх версією."
+    "desc_exitSession": "Зупинка сесії відключить вас від кімнати, але ви зможете продовжити роботу з полотном локально. Зверніть увагу, що це не вплине на інших людей, і вони все одно зможуть працювати над їх версією.",
+    "shareTitle": "Приєднатися до сеансу спільної роботи на Excalidraw"
   },
   "errorDialog": {
     "title": "Помилка"
@@ -246,10 +248,10 @@
   "toast": {
     "copyStyles": "Скопійовані стилі.",
     "copyToClipboard": "Скопіювати до буферу обміну.",
-    "copyToClipboardAsPng": "",
+    "copyToClipboardAsPng": "Скопійовано {{exportSelection}} до буфера обміну як PNG\n({{exportColorScheme}})",
     "fileSaved": "Файл збережено.",
     "fileSavedToFilename": "Збережено в {filename}",
-    "canvas": "",
-    "selection": ""
+    "canvas": "полотно",
+    "selection": "виділення"
   }
 }

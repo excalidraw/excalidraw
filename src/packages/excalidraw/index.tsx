@@ -15,8 +15,6 @@ const Excalidraw = (props: ExcalidrawProps) => {
   const {
     width,
     height,
-    offsetLeft,
-    offsetTop,
     onChange,
     initialData,
     excalidrawRef,
@@ -30,6 +28,8 @@ const Excalidraw = (props: ExcalidrawProps) => {
     zenModeEnabled,
     gridModeEnabled,
     libraryReturnUrl,
+    theme,
+    name,
   } = props;
 
   useEffect(() => {
@@ -56,8 +56,6 @@ const Excalidraw = (props: ExcalidrawProps) => {
         <App
           width={width}
           height={height}
-          offsetLeft={offsetLeft}
-          offsetTop={offsetTop}
           onChange={onChange}
           initialData={initialData}
           excalidrawRef={excalidrawRef}
@@ -71,6 +69,8 @@ const Excalidraw = (props: ExcalidrawProps) => {
           zenModeEnabled={zenModeEnabled}
           gridModeEnabled={gridModeEnabled}
           libraryReturnUrl={libraryReturnUrl}
+          theme={theme}
+          name={name}
         />
       </IsMobileProvider>
     </InitializeApp>
@@ -110,3 +110,8 @@ export {
 } from "../../element";
 export { defaultLang, languages } from "../../i18n";
 export { restore, restoreAppState, restoreElements } from "../../data/restore";
+export {
+  exportToCanvas,
+  exportToBlob,
+  exportToSvg,
+} from "../../packages/utils";
