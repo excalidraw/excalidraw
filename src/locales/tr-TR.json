@@ -92,6 +92,8 @@
     "centerHorizontally": "Yatayda ortala",
     "distributeHorizontally": "Yatay dağıt",
     "distributeVertically": "Dikey dağıt",
+    "flipHorizontal": "",
+    "flipVertical": "",
     "viewMode": "",
     "toggleExportColorScheme": "",
     "share": "Paylaş"
