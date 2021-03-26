@@ -1,8 +1,9 @@
 const path = require("path");
+const webpack = require("webpack");
 
 module.exports = {
   mode: "development",
-  devtool: "inline-source-map",
+  devtool: false,
   entry: {
     "excalidraw.development": "./entry.js",
   },
@@ -62,6 +63,7 @@ module.exports = {
       },
     },
   },
+  plugins: [new webpack.EvalSourceMapDevToolPlugin({ exclude: /vendor/ })],
   externals: {
     react: {
       root: "React",
