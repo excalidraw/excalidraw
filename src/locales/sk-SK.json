@@ -92,6 +92,8 @@
     "centerHorizontally": "Zarovnať vodorovne na stred",
     "distributeHorizontally": "Rozmiestniť vodorovne",
     "distributeVertically": "Rozmiestniť zvisle",
+    "flipHorizontal": "",
+    "flipVertical": "",
     "viewMode": "Režim zobrazenia",
     "toggleExportColorScheme": "Prepnúť exportovanie farebnej schémy",
     "share": "Zdieľať"

@@ -92,6 +92,8 @@
     "centerHorizontally": "横方向に中央揃え",
     "distributeHorizontally": "水平方向に分散配置",
     "distributeVertically": "垂直方向に分散配置",
+    "flipHorizontal": "",
+    "flipVertical": "",
     "viewMode": "閲覧モード",
     "toggleExportColorScheme": "",
     "share": ""

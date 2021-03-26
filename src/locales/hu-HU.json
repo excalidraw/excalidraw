@@ -92,6 +92,8 @@
     "centerHorizontally": "Vízszintesen középre igazított",
     "distributeHorizontally": "Vízszintes elosztás",
     "distributeVertically": "Függőleges elosztás",
+    "flipHorizontal": "",
+    "flipVertical": "",
     "viewMode": "",
     "toggleExportColorScheme": "",
     "share": ""

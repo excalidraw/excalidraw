@@ -92,6 +92,8 @@
     "centerHorizontally": "Centra orizzontalmente",
     "distributeHorizontally": "Distribuisci orizzontalmente",
     "distributeVertically": "Distribuisci verticalmente",
+    "flipHorizontal": "Capovolgi orizzontalmente",
+    "flipVertical": "Capovolgi verticalmente",
     "viewMode": "Modalità visualizzazione",
     "toggleExportColorScheme": "Cambia lo schema di colori in esportazione",
     "share": "Condividi"

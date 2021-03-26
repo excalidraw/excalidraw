@@ -92,6 +92,8 @@
     "centerHorizontally": "وسط قرار دادن به صورت افقی",
     "distributeHorizontally": "توزیع کردن به صورت افقی",
     "distributeVertically": "توزیع کردن به صورت عمودی",
+    "flipHorizontal": "",
+    "flipVertical": "",
     "viewMode": "",
     "toggleExportColorScheme": "",
     "share": ""

@@ -92,6 +92,8 @@
     "centerHorizontally": "Centralizar horizontalmente",
     "distributeHorizontally": "Distribuir horizontalmente",
     "distributeVertically": "Distribuir verticalmente",
+    "flipHorizontal": "Inverter horizontalmente",
+    "flipVertical": "Inverter verticalmente",
     "viewMode": "Modo de visualização",
     "toggleExportColorScheme": "Alternar esquema de cores de exportação",
     "share": "Compartilhar"

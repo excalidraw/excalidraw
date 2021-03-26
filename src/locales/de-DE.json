@@ -92,6 +92,8 @@
     "centerHorizontally": "Horizontal zentrieren",
     "distributeHorizontally": "Horizontal verteilen",
     "distributeVertically": "Vertikal verteilen",
+    "flipHorizontal": "Horizontal spiegeln",
+    "flipVertical": "Vertikal spiegeln",
     "viewMode": "Ansichtsmodus",
     "toggleExportColorScheme": "Farbschema für Export umschalten",
     "share": "Teilen"

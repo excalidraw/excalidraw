@@ -92,6 +92,8 @@
     "centerHorizontally": "Центрировать по горизонтали",
     "distributeHorizontally": "Распределить по горизонтали",
     "distributeVertically": "Распределить по вертикали",
+    "flipHorizontal": "",
+    "flipVertical": "",
     "viewMode": "Вид",
     "toggleExportColorScheme": "Экспортировать цветовую схему",
     "share": "Поделиться"

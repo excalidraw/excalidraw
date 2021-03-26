@@ -92,6 +92,8 @@
     "centerHorizontally": "အလျားလိုက်အလယ်ညှိ",
     "distributeHorizontally": "အလျားလိုက်",
     "distributeVertically": "ထောင်လိုက်",
+    "flipHorizontal": "",
+    "flipVertical": "",
     "viewMode": "",
     "toggleExportColorScheme": "",
     "share": ""

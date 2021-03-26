@@ -92,6 +92,8 @@
     "centerHorizontally": "Keskitä vaakasuunnassa",
     "distributeHorizontally": "Jaa vaakasuunnassa",
     "distributeVertically": "Jaa pystysuunnassa",
+    "flipHorizontal": "",
+    "flipVertical": "",
     "viewMode": "Katselutila",
     "toggleExportColorScheme": "Vaihda viennin väriteema",
     "share": "Jaa"
