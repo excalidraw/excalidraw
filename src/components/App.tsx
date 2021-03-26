@@ -609,7 +609,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.onSceneUpdated();
   };
 
-  private importLibraryFromUrl = async (url: string) => {
+  private importLibraryFromUrl = async (url: string, token?: string | null) => {
     if (window.location.hash.includes(URL_HASH_KEYS.addLibrary)) {
       const hash = new URLSearchParams(window.location.hash.slice(1));
       hash.delete(URL_HASH_KEYS.addLibrary);
@@ -628,6 +628,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         throw new Error();
       }
       if (
+        token === Library.csrfToken ||
         window.confirm(
           t("alerts.confirmAddLibrary", { numShapes: json.library.length }),
         )
