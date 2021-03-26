@@ -178,13 +178,13 @@ const flipElement = (
     angle,
   });
 
-  updateBoundElements(element);
-
   // Move back to original spot to appear "flipped in place"
   mutateElement(element, {
     x: originalX + finalOffsetX,
     y: originalY,
   });
+
+  updateBoundElements(element);
 };
 
 const rotateElement = (element: ExcalidrawElement, rotationAngle: number) => {
