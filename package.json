@@ -27,7 +27,7 @@
     "@types/react": "17.0.3",
     "@types/react-dom": "17.0.2",
     "@types/socket.io-client": "1.4.36",
-    "browser-fs-access": "0.15.3",
+    "browser-fs-access": "0.16.0",
     "clsx": "1.1.1",
     "firebase": "8.2.10",
     "i18next-browser-languagedetector": "6.0.1",
