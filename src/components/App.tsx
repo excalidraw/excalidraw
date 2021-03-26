@@ -911,14 +911,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       ?.classList.toggle("theme--dark", this.state.theme === "dark");
 
     if (this.state.autoSave && this.state.fileHandle && supported) {
-      try {
-        this.saveLocalSceneDebounced(
-          this.scene.getElementsIncludingDeleted(),
-          this.state,
-        );
-      } catch (error) {
-        this.setState({ autoSave: false });
-      }
+      this.saveLocalSceneDebounced(
+        this.scene.getElementsIncludingDeleted(),
+        this.state,
+      );
     }
 
     if (
@@ -1054,8 +1050,19 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   }, SCROLL_TIMEOUT);
 
   private saveLocalSceneDebounced = debounce(
-    (elements: readonly ExcalidrawElement[], state: AppState) => {
-      saveAsJSON(elements, state);
+    async (elements: readonly ExcalidrawElement[], state: AppState) => {
+      if (this.state.autoSave && this.state.fileHandle && supported) {
+        try {
+          await saveAsJSON(elements, state);
+        } catch (error) {
+          // shouldn't (almost) ever happen, so let's log it
+          console.error(error);
+          this.setState({
+            autoSave: false,
+            errorMessage: t("toast.autosaveFailed"),
+          });
+        }
+      }
     },
     AUTO_SAVE_TIMEOUT,
   );
