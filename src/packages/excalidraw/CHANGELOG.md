@@ -18,6 +18,8 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
+- #### BREAKING CHANGE
+  Use `location.hash` when importing libraries to fix installation issues. This will require host apps to add a `hashchange` listener and call the newly exposed `excalidrawAPI.importLibrary(url)` API when applicable [#3320](https://github.com/excalidraw/excalidraw/pull/3320).
 - Append `location.pathname` to `libraryReturnUrl` default url [#3325](https://github.com/excalidraw/excalidraw/pull/3325).
 
 ## 0.5.0 (2021-03-21)

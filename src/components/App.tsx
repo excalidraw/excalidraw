@@ -58,6 +58,8 @@ import {
   TAP_TWICE_TIMEOUT,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
   TOUCH_CTX_MENU_TIMEOUT,
+  URL_HASH_KEYS,
+  URL_QUERY_KEYS,
   ZOOM_STEP,
 } from "../constants";
 import { loadFromBlob } from "../data";
@@ -278,6 +280,7 @@ export type ExcalidrawImperativeAPI = {
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
   getAppState: () => InstanceType<typeof App>["state"];
   setCanvasOffsets: InstanceType<typeof App>["setCanvasOffsets"];
+  importLibrary: InstanceType<typeof App>["importLibraryFromUrl"];
   readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
   ready: true;
 };
@@ -338,6 +341,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
         setCanvasOffsets: this.setCanvasOffsets,
+        importLibrary: this.importLibraryFromUrl,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -606,7 +610,16 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   };
 
   private importLibraryFromUrl = async (url: string) => {
-    window.history.replaceState({}, APP_NAME, window.location.origin);
+    if (window.location.hash.includes(URL_HASH_KEYS.addLibrary)) {
+      const hash = new URLSearchParams(window.location.hash.slice(1));
+      hash.delete(URL_HASH_KEYS.addLibrary);
+      window.history.replaceState({}, APP_NAME, `#${hash.toString()}`);
+    } else if (window.location.search.includes(URL_QUERY_KEYS.addLibrary)) {
+      const query = new URLSearchParams(window.location.search);
+      query.delete(URL_QUERY_KEYS.addLibrary);
+      window.history.replaceState({}, APP_NAME, `?${query.toString()}`);
+    }
+
     try {
       const request = await fetch(decodeURIComponent(url));
       const blob = await request.blob();
@@ -620,9 +633,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         )
       ) {
         await Library.importLibrary(blob);
-        this.setState({
-          isLibraryOpen: true,
-        });
+        // hack to rerender the library items after import
+        if (this.state.isLibraryOpen) {
+          this.setState({ isLibraryOpen: false });
+        }
+        this.setState({ isLibraryOpen: true });
       }
     } catch (error) {
       window.alert(t("alerts.errorLoadingLibrary"));
@@ -718,12 +733,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       commitToHistory: true,
     });
 
-    const addToLibraryUrl = new URLSearchParams(window.location.search).get(
-      "addLibrary",
-    );
+    const libraryUrl =
+      // current
+      new URLSearchParams(window.location.hash.slice(1)).get(
+        URL_HASH_KEYS.addLibrary,
+      ) ||
+      // legacy, kept for compat reasons
+      new URLSearchParams(window.location.search).get(
+        URL_QUERY_KEYS.addLibrary,
+      );
 
-    if (addToLibraryUrl) {
-      await this.importLibraryFromUrl(addToLibraryUrl);
+    if (libraryUrl) {
+      await this.importLibraryFromUrl(libraryUrl);
     }
   };
 
