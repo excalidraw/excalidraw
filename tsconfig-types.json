@@ -1,0 +1,16 @@
+{
+  "include": ["src/packages/excalidraw"],
+  "compilerOptions": {
+    "allowJs": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "src/packages/excalidraw/dist/types",
+    "jsx": "react-jsx",
+    "target": "es5",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true
+  }
+}
