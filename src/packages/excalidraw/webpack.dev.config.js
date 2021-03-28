@@ -1,19 +1,18 @@
 const path = require("path");
-const TerserPlugin = require("terser-webpack-plugin");
-const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
-  .BundleAnalyzerPlugin;
+const webpack = require("webpack");
 
 module.exports = {
-  mode: "production",
+  mode: "development",
+  devtool: false,
   entry: {
-    "excalidraw.production.min": "./entry.js",
+    "excalidraw.development": "./entry.js",
   },
   output: {
     path: path.resolve(__dirname, "dist"),
     library: "Excalidraw",
     libraryTarget: "umd",
     filename: "[name].js",
-    chunkFilename: "excalidraw-assets/[name]-[contenthash].js",
+    chunkFilename: "excalidraw-assets-dev/[name]-[contenthash].js",
     publicPath: "",
   },
   resolve: {
@@ -24,13 +23,7 @@ module.exports = {
       {
         test: /\.(sa|sc|c)ss$/,
         exclude: /node_modules/,
-        use: [
-          "style-loader",
-          {
-            loader: "css-loader",
-          },
-          "sass-loader",
-        ],
+        use: ["style-loader", { loader: "css-loader" }, "sass-loader"],
       },
       {
         test: /\.(ts|tsx|js|jsx|mjs)$/,
@@ -40,24 +33,7 @@ module.exports = {
             loader: "ts-loader",
             options: {
               transpileOnly: true,
-              configFile: path.resolve(__dirname, "../tsconfig.prod.json"),
-            },
-          },
-          {
-            loader: "babel-loader",
-            options: {
-              presets: [
-                "@babel/preset-env",
-                "@babel/preset-react",
-                "@babel/preset-typescript",
-              ],
-              plugins: [
-                "@babel/plugin-proposal-object-rest-spread",
-                "@babel/plugin-transform-arrow-functions",
-                "transform-class-properties",
-                "@babel/plugin-transform-async-to-generator",
-                "@babel/plugin-transform-runtime",
-              ],
+              configFile: path.resolve(__dirname, "../tsconfig.dev.json"),
             },
           },
         ],
@@ -69,7 +45,7 @@ module.exports = {
             loader: "file-loader",
             options: {
               name: "[name].[ext]",
-              outputPath: "excalidraw-assets",
+              outputPath: "excalidraw-assets-dev",
             },
           },
         ],
@@ -77,12 +53,6 @@ module.exports = {
     ],
   },
   optimization: {
-    minimize: true,
-    minimizer: [
-      new TerserPlugin({
-        test: /\.js($|\?)/i,
-      }),
-    ],
     splitChunks: {
       chunks: "async",
       cacheGroups: {
@@ -93,9 +63,7 @@ module.exports = {
       },
     },
   },
-  plugins: [
-    ...(process.env.ANALYZER === "true" ? [new BundleAnalyzerPlugin()] : []),
-  ],
+  plugins: [new webpack.EvalSourceMapDevToolPlugin({ exclude: /vendor/ })],
   externals: {
     react: {
       root: "React",
