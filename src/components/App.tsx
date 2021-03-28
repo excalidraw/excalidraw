@@ -4111,9 +4111,6 @@ declare global {
       history: SceneHistory;
       app: InstanceType<typeof App>;
       library: typeof Library;
-      collab: InstanceType<
-        typeof import("../excalidraw-app/collab/CollabWrapper").default
-      >;
     };
   }
 }
