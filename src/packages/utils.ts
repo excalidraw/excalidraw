@@ -81,7 +81,6 @@ export const exportToBlob = (
 export const exportToSvg = ({
   elements,
   appState = getDefaultAppState(),
-  // getDimensions = (width, height) => ({ width, height, scale: 1 }),
   exportPadding,
   metadata,
 }: Omit<ExportOpts, "getDimensions"> & {
