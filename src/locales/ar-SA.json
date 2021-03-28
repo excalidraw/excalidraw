@@ -92,6 +92,8 @@
     "centerHorizontally": "توسيط أفقي",
     "distributeHorizontally": "التوزيع الأفقي",
     "distributeVertically": "التوزيع عمودياً",
+    "flipHorizontal": "",
+    "flipVertical": "",
     "viewMode": "نمط العرض",
     "toggleExportColorScheme": "",
     "share": "مشاركة"

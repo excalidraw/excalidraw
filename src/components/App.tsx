@@ -17,6 +17,8 @@ import {
   actionDeleteSelected,
   actionDuplicateSelection,
   actionFinalize,
+  actionFlipHorizontal,
+  actionFlipVertical,
   actionGroup,
   actionPasteStyles,
   actionSelectAll,
@@ -56,6 +58,8 @@ import {
   TAP_TWICE_TIMEOUT,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
   TOUCH_CTX_MENU_TIMEOUT,
+  URL_HASH_KEYS,
+  URL_QUERY_KEYS,
   ZOOM_STEP,
 } from "../constants";
 import { loadFromBlob } from "../data";
@@ -276,6 +280,7 @@ export type ExcalidrawImperativeAPI = {
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
   getAppState: () => InstanceType<typeof App>["state"];
   setCanvasOffsets: InstanceType<typeof App>["setCanvasOffsets"];
+  importLibrary: InstanceType<typeof App>["importLibraryFromUrl"];
   readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
   ready: true;
 };
@@ -336,6 +341,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
         setCanvasOffsets: this.setCanvasOffsets,
+        importLibrary: this.importLibraryFromUrl,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -603,8 +609,17 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.onSceneUpdated();
   };
 
-  private importLibraryFromUrl = async (url: string) => {
-    window.history.replaceState({}, APP_NAME, window.location.origin);
+  private importLibraryFromUrl = async (url: string, token?: string | null) => {
+    if (window.location.hash.includes(URL_HASH_KEYS.addLibrary)) {
+      const hash = new URLSearchParams(window.location.hash.slice(1));
+      hash.delete(URL_HASH_KEYS.addLibrary);
+      window.history.replaceState({}, APP_NAME, `#${hash.toString()}`);
+    } else if (window.location.search.includes(URL_QUERY_KEYS.addLibrary)) {
+      const query = new URLSearchParams(window.location.search);
+      query.delete(URL_QUERY_KEYS.addLibrary);
+      window.history.replaceState({}, APP_NAME, `?${query.toString()}`);
+    }
+
     try {
       const request = await fetch(decodeURIComponent(url));
       const blob = await request.blob();
@@ -613,14 +628,17 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         throw new Error();
       }
       if (
+        token === Library.csrfToken ||
         window.confirm(
           t("alerts.confirmAddLibrary", { numShapes: json.library.length }),
         )
       ) {
         await Library.importLibrary(blob);
-        this.setState({
-          isLibraryOpen: true,
-        });
+        // hack to rerender the library items after import
+        if (this.state.isLibraryOpen) {
+          this.setState({ isLibraryOpen: false });
+        }
+        this.setState({ isLibraryOpen: true });
       }
     } catch (error) {
       window.alert(t("alerts.errorLoadingLibrary"));
@@ -716,12 +734,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       commitToHistory: true,
     });
 
-    const addToLibraryUrl = new URLSearchParams(window.location.search).get(
-      "addLibrary",
-    );
+    const libraryUrl =
+      // current
+      new URLSearchParams(window.location.hash.slice(1)).get(
+        URL_HASH_KEYS.addLibrary,
+      ) ||
+      // legacy, kept for compat reasons
+      new URLSearchParams(window.location.search).get(
+        URL_QUERY_KEYS.addLibrary,
+      );
 
-    if (addToLibraryUrl) {
-      await this.importLibraryFromUrl(addToLibraryUrl);
+    if (libraryUrl) {
+      await this.importLibraryFromUrl(libraryUrl);
     }
   };
 
@@ -2255,10 +2279,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         touchTimeout = window.setTimeout(() => {
           touchTimeout = 0;
           if (!invalidateContextMenu) {
-            this.openContextMenu({
-              clientX: event.clientX,
-              clientY: event.clientY,
-            });
+            this.handleCanvasContextMenu(event);
           }
         }, TOUCH_CTX_MENU_TIMEOUT);
       }
@@ -3605,9 +3626,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     const file = event.dataTransfer?.files[0];
     if (
-      file?.type === "application/json" ||
-      file?.name.endsWith(".excalidraw")
+      file?.type === MIME_TYPES.excalidrawlib ||
+      file?.name?.endsWith(".excalidrawlib")
     ) {
+      Library.importLibrary(file)
+        .then(() => {
+          this.setState({ isLibraryOpen: false });
+        })
+        .catch((error) =>
+          this.setState({ isLoading: false, errorMessage: error.message }),
+        );
+      // default: assume an Excalidraw file regardless of extension/MimeType
+    } else {
       this.setState({ isLoading: true });
       if (supported) {
         try {
@@ -3619,23 +3649,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           console.warn(error.name, error.message);
         }
       }
-      this.loadFileToCanvas(file);
-    } else if (
-      file?.type === MIME_TYPES.excalidrawlib ||
-      file?.name.endsWith(".excalidrawlib")
-    ) {
-      Library.importLibrary(file)
-        .then(() => {
-          this.setState({ isLibraryOpen: false });
-        })
-        .catch((error) =>
-          this.setState({ isLoading: false, errorMessage: error.message }),
-        );
-    } else {
-      this.setState({
-        isLoading: false,
-        errorMessage: t("alerts.couldNotLoadInvalidFile"),
-      });
+      await this.loadFileToCanvas(file);
     }
   };
 
@@ -3660,7 +3674,19 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     event.preventDefault();
-    this.openContextMenu(event);
+
+    const { x, y } = viewportCoordsToSceneCoords(event, this.state);
+    const element = this.getElementAtPosition(x, y);
+
+    const type = element ? "element" : "canvas";
+
+    if (element && !this.state.selectedElementIds[element.id]) {
+      this.setState({ selectedElementIds: { [element.id]: true } }, () => {
+        this._openContextMenu(event, type);
+      });
+    } else {
+      this._openContextMenu(event, type);
+    }
   };
 
   private maybeDragNewGenericElement = (
@@ -3750,18 +3776,17 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     return false;
   };
 
-  private openContextMenu = ({
-    clientX,
-    clientY,
-  }: {
-    clientX: number;
-    clientY: number;
-  }) => {
-    const { x, y } = viewportCoordsToSceneCoords(
-      { clientX, clientY },
-      this.state,
-    );
-
+  /** @private use this.handleCanvasContextMenu */
+  private _openContextMenu = (
+    {
+      clientX,
+      clientY,
+    }: {
+      clientX: number;
+      clientY: number;
+    },
+    type: "canvas" | "element",
+  ) => {
     const maybeGroupAction = actionGroup.contextItemPredicate!(
       this.actionManager.getElementsIncludingDeleted(),
       this.actionManager.getAppState(),
@@ -3772,12 +3797,22 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.actionManager.getAppState(),
     );
 
+    const maybeFlipHorizontal = actionFlipHorizontal.contextItemPredicate!(
+      this.actionManager.getElementsIncludingDeleted(),
+      this.actionManager.getAppState(),
+    );
+
+    const maybeFlipVertical = actionFlipVertical.contextItemPredicate!(
+      this.actionManager.getElementsIncludingDeleted(),
+      this.actionManager.getAppState(),
+    );
+
     const separator = "separator";
 
     const _isMobile = isMobile();
 
     const elements = this.scene.getElements();
-    const element = this.getElementAtPosition(x, y);
+
     const options: ContextMenuOption[] = [];
     if (probablySupportsClipboardBlob && elements.length > 0) {
       options.push(actionCopyAsPng);
@@ -3786,7 +3821,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (probablySupportsClipboardWriteText && elements.length > 0) {
       options.push(actionCopyAsSvg);
     }
-    if (!element) {
+    if (type === "canvas") {
       const viewModeOptions = [
         ...options,
         typeof this.props.gridModeEnabled === "undefined" &&
@@ -3850,10 +3885,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       return;
     }
 
-    if (!this.state.selectedElementIds[element.id]) {
-      this.setState({ selectedElementIds: { [element.id]: true } });
-    }
-
     if (this.state.viewModeEnabled) {
       ContextMenu.push({
         options: [navigator.clipboard && actionCopy, ...options],
@@ -3896,6 +3927,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         actionSendToBack,
         actionBringToFront,
         separator,
+        maybeFlipHorizontal && actionFlipHorizontal,
+        maybeFlipVertical && actionFlipVertical,
+        (maybeFlipHorizontal || maybeFlipVertical) && separator,
         actionDuplicateSelection,
         actionDeleteSelected,
       ],

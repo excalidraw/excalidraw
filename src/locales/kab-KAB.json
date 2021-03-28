@@ -61,7 +61,7 @@
     "architect": "Amasdag",
     "artist": "Anaẓur",
     "cartoonist": "",
-    "fileTitle": "",
+    "fileTitle": "Isem n ufaylu",
     "colorPicker": "Amafran n yini",
     "canvasBackground": "Agilal n teɣzut n usuneɣ",
     "drawingCanvas": "Taɣzut n usuneɣ",
@@ -92,6 +92,8 @@
     "centerHorizontally": "Di tlemmast s uglawi",
     "distributeHorizontally": "Freq s uglawi",
     "distributeVertically": "Freq s yibeddi",
+    "flipHorizontal": "",
+    "flipVertical": "",
     "viewMode": "Askar n tmuɣli",
     "toggleExportColorScheme": "Sermed/sens asifeḍ usentel n yini",
     "share": "Bḍu"

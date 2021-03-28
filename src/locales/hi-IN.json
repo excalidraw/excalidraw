@@ -61,7 +61,7 @@
     "architect": "वास्तुकार",
     "artist": "कलाकार",
     "cartoonist": "व्यंग्य चित्रकार",
-    "fileTitle": "",
+    "fileTitle": "फ़ाइल का नाम",
     "colorPicker": "रंग चयन",
     "canvasBackground": "कैनवास बैकग्राउंड",
     "drawingCanvas": "कैनवास बना रहे हैं",
@@ -92,6 +92,8 @@
     "centerHorizontally": "क्षैतिज केन्द्रित",
     "distributeHorizontally": "क्षैतिज रूप से वितरित करें",
     "distributeVertically": "खड़ी रूप से वितरित करें",
+    "flipHorizontal": "",
+    "flipVertical": "",
     "viewMode": "",
     "toggleExportColorScheme": "",
     "share": ""

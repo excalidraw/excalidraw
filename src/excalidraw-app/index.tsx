@@ -12,7 +12,13 @@ import { getDefaultAppState } from "../appState";
 import { ExcalidrawImperativeAPI } from "../components/App";
 import { ErrorDialog } from "../components/ErrorDialog";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
-import { APP_NAME, EVENT, TITLE_TIMEOUT, VERSION_TIMEOUT } from "../constants";
+import {
+  APP_NAME,
+  EVENT,
+  TITLE_TIMEOUT,
+  URL_HASH_KEYS,
+  VERSION_TIMEOUT,
+} from "../constants";
 import { loadFromBlob } from "../data/blob";
 import { DataState, ImportedDataState } from "../data/types";
 import {
@@ -213,12 +219,24 @@ function ExcalidrawWrapper() {
       initialStatePromiseRef.current.promise.resolve(scene);
     });
 
-    const onHashChange = (_: HashChangeEvent) => {
-      initializeScene({ collabAPI }).then((scene) => {
-        if (scene) {
-          excalidrawAPI.updateScene(scene);
-        }
-      });
+    const onHashChange = (event: HashChangeEvent) => {
+      event.preventDefault();
+      const hash = new URLSearchParams(window.location.hash.slice(1));
+      const libraryUrl = hash.get(URL_HASH_KEYS.addLibrary);
+      if (libraryUrl) {
+        // If hash changed and it contains library url, import it and replace
+        // the url to its previous state (important in case of collaboration
+        // and similar).
+        // Using history API won't trigger another hashchange.
+        window.history.replaceState({}, "", event.oldURL);
+        excalidrawAPI.importLibrary(libraryUrl, hash.get("token"));
+      } else {
+        initializeScene({ collabAPI }).then((scene) => {
+          if (scene) {
+            excalidrawAPI.updateScene(scene);
+          }
+        });
+      }
     };
 
     const titleTimeout = setTimeout(

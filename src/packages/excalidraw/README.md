@@ -473,6 +473,7 @@ You can pass a `ref` when you want to access some excalidraw APIs. We expose the
 | history | `{ clear: () => void }` | This is the history API. `history.clear()` will clear the history |
 | setScrollToContent | <pre> (<a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>) => void </pre> | Scroll to the nearest element to center |
 | setCanvasOffsets | `() => void` | Updates the offsets for the Excalidraw component so that the coordinates are computed correctly (for example the cursor position). You should call this API when your app changes the dimensions/position of the Excalidraw container, such as when toggling a sidebar. You don't have to call this when the position is changed on page scroll (we handled that ourselves). |
+| importLibrary | `(url: string, token?: string) => void` | Imports library from given URL. You should call this on `hashchange`, passing the `addLibrary` value if you detect it. Optionally pass a CSRF `token` to skip prompting during installation (retrievable via `token` key from the url coming from [https://libraries.excalidraw.com](https://libraries.excalidraw.com/)). |
 
 #### `readyPromise`
 

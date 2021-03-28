@@ -179,7 +179,7 @@ const LibraryMenuItems = ({
       <a
         href={`https://libraries.excalidraw.com?target=${
           window.name || "_blank"
-        }&referrer=${referrer}`}
+        }&referrer=${referrer}&useHash=true&token=${Library.csrfToken}`}
         target="_excalidraw_libraries"
       >
         {t("labels.libraries")}
