@@ -1,5 +1,5 @@
 {
-  "include": ["src/packages/excalidraw"],
+  "include": ["src/packages/excalidraw", "src/global.d.ts"],
   "compilerOptions": {
     "allowJs": true,
     "declaration": true,
@@ -7,6 +7,7 @@
     "outDir": "src/packages/excalidraw/dist/types",
     "jsx": "react-jsx",
     "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
