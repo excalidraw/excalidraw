@@ -89,3 +89,5 @@ interface Blob {
   handle?: import("browser-fs-acces").FileSystemHandle;
   name?: string;
 }
+
+declare module "*.scss";
