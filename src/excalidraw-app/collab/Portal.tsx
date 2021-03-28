@@ -9,7 +9,7 @@ import CollabWrapper from "./CollabWrapper";
 import { getSyncableElements } from "../../packages/excalidraw/index";
 import { ExcalidrawElement } from "../../element/types";
 import { BROADCAST, SCENE } from "../app_constants";
-import { UserIdleState } from "./types";
+import { UserIdleState } from "../../types";
 import { trackEvent } from "../../analytics";
 
 class Portal {

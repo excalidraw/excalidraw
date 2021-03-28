@@ -60,7 +60,7 @@ describe("collaboration", () => {
       ]);
       expect(API.getStateHistory().length).toBe(1);
     });
-    h.collab.openPortal();
+    window.collab.openPortal();
     await waitFor(() => {
       expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]);
       expect(API.getStateHistory().length).toBe(1);

@@ -20,7 +20,6 @@ import { ExcalidrawImperativeAPI } from "./components/App";
 import type { ResolvablePromise } from "./utils";
 import { Spreadsheet } from "./charts";
 import { Language } from "./i18n";
-import { UserIdleState } from "./excalidraw-app/collab/types";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -196,3 +195,9 @@ export type SceneData = {
   collaborators?: Map<string, Collaborator>;
   commitToHistory?: boolean;
 };
+
+export enum UserIdleState {
+  ACTIVE = "active",
+  AWAY = "away",
+  IDLE = "idle",
+}
