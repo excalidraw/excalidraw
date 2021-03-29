@@ -18,6 +18,7 @@ const diagramFactory = ({ overrides = {}, elementOverrides = {} } = {}) => ({
 
 describe("exportToCanvas", () => {
   const EXPORT_PADDING = 10;
+
   it("with default arguments", () => {
     const canvas = utils.exportToCanvas({
       ...diagramFactory({ elementOverrides: { width: 100, height: 100 } }),
@@ -87,6 +88,7 @@ describe("exportToSvg", () => {
 
     expect(svgElement).toMatchSnapshot();
   });
+
   it("with exportPadding and metadata", () => {
     const svgElement = utils.exportToSvg({
       ...diagramFactory({ elementOverrides: { width: 100, height: 100 } }),
