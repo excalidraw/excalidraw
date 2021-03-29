@@ -379,6 +379,7 @@ export const drawMathOnCanvas = (
   textAlign: CanvasTextAlign,
   opacity: Number,
   useTex: boolean,
+  refresh?: () => void,
 ) => {
   const key = getCacheKey(
     text,
@@ -400,49 +401,47 @@ export const drawMathOnCanvas = (
   const imgKey = `${key}, ${scale * imageMetrics.width}, ${
     scale * imageMetrics.height
   }`;
-  return new Promise<void>((resolve) => {
-    if (imageCache[imgKey] && imageCache[imgKey] !== undefined) {
-      const img = imageCache[imgKey];
-      const [width, height] = getRenderDims(
-        img.naturalWidth,
-        img.naturalHeight,
-      );
-      context.drawImage(img, 0, 0, width, height);
-      resolve();
-    } else {
-      const img = new Image();
-      const svgString = createSvg(
-        text,
-        fontSize,
-        fontFamily,
-        strokeColor,
-        textAlign,
-        opacity,
-        useTex,
-      ).outerHTML;
-      const svg = new Blob([svgString], {
-        type: "image/svg+xml;charset=utf-8",
-      });
-      const reader = new FileReader();
-      reader.addEventListener(
-        "load",
-        () => {
-          img.src = reader.result as string;
-          img.onload = function () {
-            const [width, height] = getRenderDims(
-              img.naturalWidth,
-              img.naturalHeight,
-            );
-            context.drawImage(img, 0, 0, width, height);
-            imageCache[imgKey] = img;
-            resolve();
-          };
-        },
-        false,
-      );
-      reader.readAsDataURL(svg);
-    }
-  });
+  if (imageCache[imgKey] && imageCache[imgKey] !== undefined) {
+    const img = imageCache[imgKey];
+    const [width, height] = getRenderDims(img.naturalWidth, img.naturalHeight);
+    context.drawImage(img, 0, 0, width, height);
+  } else {
+    const img = new Image();
+    const svgString = createSvg(
+      text,
+      fontSize,
+      fontFamily,
+      strokeColor,
+      textAlign,
+      opacity,
+      useTex,
+    ).outerHTML;
+    const svg = new Blob([svgString], {
+      type: "image/svg+xml;charset=utf-8",
+    });
+    const transformMatrix = context.getTransform();
+    const reader = new FileReader();
+    reader.addEventListener(
+      "load",
+      () => {
+        img.onload = function () {
+          const [width, height] = getRenderDims(
+            img.naturalWidth,
+            img.naturalHeight,
+          );
+          context.setTransform(transformMatrix);
+          context.drawImage(img, 0, 0, width, height);
+          imageCache[imgKey] = img;
+          if (refresh) {
+            refresh();
+          }
+        };
+        img.src = reader.result as string;
+      },
+      false,
+    );
+    reader.readAsDataURL(svg);
+  }
 };
 
 export const containsMath = (text: string, useTex: boolean) => {

@@ -53,10 +53,8 @@ const generateElementCanvas = (
   element: NonDeletedExcalidrawElement,
   zoom: Zoom,
   scale: number,
-): {
-  elementWithCanvas: ExcalidrawElementWithCanvas;
-  promise: Promise<void> | undefined;
-} => {
+  refresh?: () => void,
+): ExcalidrawElementWithCanvas => {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
 
@@ -110,32 +108,22 @@ const generateElementCanvas = (
   );
 
   const rc = rough.canvas(canvas);
-  const promise = drawElementOnCanvas(element, rc, context, zoom, scale);
-  const finishGeneration = function () {
-    context.scale(
-      1 / (window.devicePixelRatio * zoom.value),
-      1 / (window.devicePixelRatio * zoom.value),
-    );
-    context.translate(
-      -(CANVAS_PADDING * zoom.value),
-      -(CANVAS_PADDING * zoom.value),
-    );
-  };
+  drawElementOnCanvas(element, rc, context, zoom, scale, refresh);
+  context.scale(
+    1 / (window.devicePixelRatio * zoom.value),
+    1 / (window.devicePixelRatio * zoom.value),
+  );
+  context.translate(
+    -(CANVAS_PADDING * zoom.value),
+    -(CANVAS_PADDING * zoom.value),
+  );
 
-  if (promise) {
-    promise.then(() => finishGeneration());
-  } else {
-    finishGeneration();
-  }
   return {
-    elementWithCanvas: {
-      element,
-      canvas,
-      canvasZoom: zoom.value,
-      canvasOffsetX,
-      canvasOffsetY,
-    },
-    promise,
+    element,
+    canvas,
+    canvasZoom: zoom.value,
+    canvasOffsetX,
+    canvasOffsetY,
   };
 };
 
@@ -145,8 +133,8 @@ const drawElementOnCanvas = (
   context: CanvasRenderingContext2D,
   zoom: Zoom,
   scale: number,
+  refresh?: () => void,
 ) => {
-  let promise;
   context.globalAlpha = element.opacity / 100;
   switch (element.type) {
     case "rectangle":
@@ -177,7 +165,7 @@ const drawElementOnCanvas = (
           containsMath(element.text, element.useTex)
         ) {
           const scaledPadding = CANVAS_PADDING * zoom.value;
-          promise = drawMathOnCanvas(
+          drawMathOnCanvas(
             context,
             scaledPadding,
             scaledPadding,
@@ -188,6 +176,7 @@ const drawElementOnCanvas = (
             element.textAlign,
             element.opacity / 100,
             element.useTex,
+            refresh,
           );
         } else {
           context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
@@ -208,7 +197,6 @@ const drawElementOnCanvas = (
               : element.textAlign === "right"
               ? element.width
               : 0;
-
           for (let index = 0; index < lines.length; index++) {
             context.fillText(
               lines[index],
@@ -229,15 +217,11 @@ const drawElementOnCanvas = (
     }
   }
   context.globalAlpha = 1;
-  return promise;
 };
 
 const elementWithCanvasCache = new WeakMap<
   ExcalidrawElement,
-  {
-    elementWithCanvas: ExcalidrawElementWithCanvas;
-    promise: Promise<void> | undefined;
-  }
+  ExcalidrawElementWithCanvas
 >();
 
 const shapeCache = new WeakMap<
@@ -488,23 +472,25 @@ const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,
   scale: number,
   sceneState?: SceneState,
+  refresh?: () => void,
 ) => {
   const zoom: Zoom = sceneState ? sceneState.zoom : defaultAppState.zoom;
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
   const shouldRegenerateBecauseZoom =
     prevElementWithCanvas &&
-    prevElementWithCanvas.elementWithCanvas &&
-    prevElementWithCanvas.elementWithCanvas.canvasZoom !== zoom.value &&
+    prevElementWithCanvas.canvasZoom !== zoom.value &&
     !sceneState?.shouldCacheIgnoreZoom;
   if (!prevElementWithCanvas || shouldRegenerateBecauseZoom) {
-    const elementWithCanvas = generateElementCanvas(element, zoom, scale);
+    const elementWithCanvas = generateElementCanvas(
+      element,
+      zoom,
+      scale,
+      refresh,
+    );
     elementWithCanvasCache.set(element, elementWithCanvas);
     return elementWithCanvas;
   }
-  return {
-    elementWithCanvas: prevElementWithCanvas.elementWithCanvas,
-    promise: undefined,
-  };
+  return prevElementWithCanvas;
 };
 
 const drawElementFromCanvas = (
@@ -554,6 +540,7 @@ export const renderElement = (
   renderOptimizations: boolean,
   sceneState: SceneState,
   scale: number,
+  refresh?: () => void,
 ) => {
   const generator = rc.generator;
   switch (element.type) {
@@ -585,84 +572,28 @@ export const renderElement = (
           element,
           scale,
           sceneState,
+          refresh,
         );
-        if (elementWithCanvas.promise !== undefined) {
-          return elementWithCanvas.promise.then(() => {
-            drawElementFromCanvas(
-              elementWithCanvas.elementWithCanvas,
-              rc,
-              context,
-              sceneState,
-              scale,
-            );
-          });
-        }
         drawElementFromCanvas(
-          elementWithCanvas.elementWithCanvas,
+          elementWithCanvas,
           rc,
           context,
           sceneState,
-          1,
+          scale,
         );
       } else {
-        return new Promise<void>((resolve) => {
-          const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-          const cx = (x1 + x2) / 2 + sceneState.scrollX;
-          const cy = (y1 + y2) / 2 + sceneState.scrollY;
-          const shiftX = (x2 - x1) / 2 - (element.x - x1);
-          const shiftY = (y2 - y1) / 2 - (element.y - y1);
-          if (
-            isTextElement(element) &&
-            isMathMode(getFontString(element)) &&
-            containsMath(element.text, element.useTex)
-          ) {
-            const dprMultiplier =
-              scale *
-              Math.max(window.devicePixelRatio, 1 / window.devicePixelRatio);
-            const tempCanvas = document.createElement("canvas");
-            tempCanvas.width =
-              element.width * dprMultiplier * sceneState.zoom.value;
-            tempCanvas.height =
-              element.height * dprMultiplier * sceneState.zoom.value;
-
-            const tempContext = tempCanvas.getContext("2d");
-
-            tempContext?.scale(
-              window.devicePixelRatio * sceneState.zoom.value,
-              window.devicePixelRatio * sceneState.zoom.value,
-            );
-
-            const promise =
-              tempContext !== null
-                ? drawElementOnCanvas(
-                    element,
-                    rc,
-                    tempContext,
-                    sceneState.zoom,
-                    scale,
-                  )
-                : undefined;
-            promise?.then(() => {
-              context.translate(cx * scale, cy * scale);
-              context.rotate(element.angle);
-              context.translate(-shiftX * scale, -shiftY * scale);
-              context.drawImage(tempCanvas, 0, 0);
-              context.translate(shiftX * scale, shiftY * scale);
-              context.rotate(-element.angle);
-              context.translate(-cx * scale, -cy * scale);
-              resolve();
-            });
-          } else {
-            context.translate(cx, cy);
-            context.rotate(element.angle);
-            context.translate(-shiftX, -shiftY);
-            drawElementOnCanvas(element, rc, context, sceneState.zoom, 1);
-            context.translate(shiftX, shiftY);
-            context.rotate(-element.angle);
-            context.translate(-cx, -cy);
-            resolve();
-          }
-        });
+        const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+        const cx = (x1 + x2) / 2 + sceneState.scrollX;
+        const cy = (y1 + y2) / 2 + sceneState.scrollY;
+        const shiftX = (x2 - x1) / 2 - (element.x - x1);
+        const shiftY = (y2 - y1) / 2 - (element.y - y1);
+        context.translate(cx, cy);
+        context.rotate(element.angle);
+        context.translate(-shiftX, -shiftY);
+        drawElementOnCanvas(element, rc, context, sceneState.zoom, 1, refresh);
+        context.translate(shiftX, shiftY);
+        context.rotate(-element.angle);
+        context.translate(-cx, -cy);
       }
       break;
     }

@@ -56,7 +56,7 @@ export const exportToCanvas = (
     height,
   );
 
-  const { promises } = renderScene(
+  renderScene(
     sceneElements,
     appState,
     null,
@@ -83,21 +83,7 @@ export const exportToCanvas = (
     },
   );
 
-  if (promises !== undefined && promises.length > 0) {
-    return new Promise<HTMLCanvasElement>((resolve) => {
-      promises?.forEach((value) => {
-        value.then(() => {
-          promises.splice(promises.indexOf(value), 1);
-          if (promises.length === 0) {
-            resolve(tempCanvas);
-          }
-        });
-      });
-    });
-  }
-  return new Promise<HTMLCanvasElement>((resolve) => {
-    resolve(tempCanvas);
-  });
+  return tempCanvas;
 };
 
 export const exportToSvg = (

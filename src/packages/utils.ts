@@ -68,15 +68,13 @@ export const exportToBlob = (
   quality = quality ? quality : /image\/jpe?g/.test(mimeType) ? 0.92 : 0.8;
 
   return new Promise((resolve) => {
-    canvas.then((canvas) => {
-      canvas.toBlob(
-        (blob: Blob | null) => {
-          resolve(blob);
-        },
-        mimeType,
-        quality,
-      );
-    });
+    canvas.toBlob(
+      (blob: Blob | null) => {
+        resolve(blob);
+      },
+      mimeType,
+      quality,
+    );
   });
 };
 

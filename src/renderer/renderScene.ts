@@ -194,11 +194,13 @@ export const renderScene = (
     // doesn't guarantee pixel-perfect output.
     renderOptimizations = false,
     renderGrid = true,
+    refresh = () => {},
   }: {
     renderScrollbars?: boolean;
     renderSelection?: boolean;
     renderOptimizations?: boolean;
     renderGrid?: boolean;
+    refresh?: () => void;
   } = {},
 ) => {
   if (!canvas) {
@@ -267,19 +269,16 @@ export const renderScene = (
     }),
   );
 
-  const promises = [] as Promise<void>[];
   visibleElements.forEach((element) => {
-    const promise = renderElement(
+    renderElement(
       element,
       rc,
       context,
       renderOptimizations,
       sceneState,
       scale,
+      refresh,
     );
-    if (promise !== undefined) {
-      promises.push(promise);
-    }
   });
 
   if (appState.editingLinearElement) {
@@ -586,11 +585,7 @@ export const renderScene = (
 
   context.scale(1 / scale, 1 / scale);
 
-  return {
-    atLeastOneVisibleElement: visibleElements.length > 0,
-    scrollBars,
-    promises,
-  };
+  return { atLeastOneVisibleElement: visibleElements.length > 0, scrollBars };
 };
 
 const renderTransformHandles = (

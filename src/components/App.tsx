@@ -1021,8 +1021,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       );
       cursorButton[socketId] = user.button;
     });
+    const refresh = () => {
+      this.setState({});
+    };
     const elements = this.scene.getElements();
-    const { atLeastOneVisibleElement, scrollBars, promises } = renderScene(
+    const { atLeastOneVisibleElement, scrollBars } = renderScene(
       elements.filter((element) => {
         // don't render text element that's being currently edited (it's
         // rendered on remote only)
@@ -1052,13 +1055,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       {
         renderOptimizations: true,
         renderScrollbars: !isMobile(),
+        refresh,
       },
     );
-    promises?.forEach((promise: Promise<void> | undefined) => {
-      promise?.then(() => {
-        this.setState({});
-      });
-    });
     if (scrollBars) {
       currentScrollBars = scrollBars;
     }
