@@ -281,6 +281,7 @@ export type ExcalidrawImperativeAPI = {
   getAppState: () => InstanceType<typeof App>["state"];
   setCanvasOffsets: InstanceType<typeof App>["setCanvasOffsets"];
   importLibrary: InstanceType<typeof App>["importLibraryFromUrl"];
+  setToastMessage: InstanceType<typeof App>["setToastMessage"];
   readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
   ready: true;
 };
@@ -342,6 +343,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         getAppState: () => this.state,
         setCanvasOffsets: this.setCanvasOffsets,
         importLibrary: this.importLibraryFromUrl,
+        setToastMessage: this.setToastMessage,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -428,7 +430,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       viewModeEnabled,
     } = this.state;
 
-    const { onCollabButtonClick, onExportToBackend, renderFooter } = this.props;
+    const {
+      onCollabButtonClick,
+      onExportToBackend,
+      renderFooter,
+      renderCustomStats,
+    } = this.props;
 
     const DEFAULT_PASTE_X = canvasDOMWidth / 2;
     const DEFAULT_PASTE_Y = canvasDOMHeight / 2;
@@ -479,6 +486,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             setAppState={this.setAppState}
             elements={this.scene.getElements()}
             onClose={this.toggleStats}
+            renderCustomStats={renderCustomStats}
           />
         )}
         {this.state.toastMessage !== null && (
@@ -1330,6 +1338,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   clearToast = () => {
     this.setState({ toastMessage: null });
+  };
+
+  setToastMessage = (toastMessage: string) => {
+    this.setState({ toastMessage });
   };
 
   restoreFileFromShare = async () => {

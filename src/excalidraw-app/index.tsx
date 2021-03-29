@@ -50,6 +50,7 @@ import {
   importFromLocalStorage,
   saveToLocalStorage,
 } from "./data/localStorage";
+import CustomStats from "./CustomStats";
 
 const languageDetector = new LanguageDetector();
 languageDetector.init({
@@ -323,6 +324,14 @@ const ExcalidrawWrapper = () => {
     [langCode],
   );
 
+  const renderCustomStats = () => {
+    return (
+      <CustomStats
+        setToastMessage={(message) => excalidrawAPI!.setToastMessage(message)}
+      />
+    );
+  };
+
   return (
     <>
       <Excalidraw
@@ -337,6 +346,7 @@ const ExcalidrawWrapper = () => {
         onExportToBackend={onExportToBackend}
         renderFooter={renderFooter}
         langCode={langCode}
+        renderCustomStats={renderCustomStats}
       />
       {excalidrawAPI && <CollabWrapper excalidrawAPI={excalidrawAPI} />}
       {errorMessage && (

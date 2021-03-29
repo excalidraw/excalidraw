@@ -187,6 +187,10 @@ export interface ExcalidrawProps {
   libraryReturnUrl?: string;
   theme?: "dark" | "light";
   name?: string;
+  renderCustomStats?: (
+    elements: readonly NonDeletedExcalidrawElement[],
+    appState: AppState,
+  ) => JSX.Element;
 }
 
 export type SceneData = {
