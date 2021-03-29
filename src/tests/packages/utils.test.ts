@@ -110,9 +110,6 @@ describe("exportToSvg", () => {
       }),
     });
 
-    expect(svgElement).toHaveAttribute("height", "120");
-    expect(svgElement).toHaveAttribute("width", "120");
-    expect(svgElement).toHaveAttribute("viewBox", "0 0 120 120");
     expect(svgElement).toMatchSnapshot();
   });
   it("with exportPadding and metadata", () => {
