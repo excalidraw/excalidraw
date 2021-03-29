@@ -161,7 +161,7 @@ const initializeScene = async (opts: {
   return null;
 };
 
-function ExcalidrawWrapper() {
+const ExcalidrawWrapper = () => {
   // dimensions
   // ---------------------------------------------------------------------------
 
@@ -347,9 +347,9 @@ function ExcalidrawWrapper() {
       )}
     </>
   );
-}
+};
 
-export default function ExcalidrawApp() {
+const ExcalidrawApp = () => {
   return (
     <TopErrorBoundary>
       <CollabContextConsumer>
@@ -357,4 +357,6 @@ export default function ExcalidrawApp() {
       </CollabContextConsumer>
     </TopErrorBoundary>
   );
-}
+};
+
+export default ExcalidrawApp;
