@@ -11,7 +11,7 @@ import { restore } from "../data/restore";
 type ExportOpts = {
   elements: readonly ExcalidrawElement[];
   appState?: Partial<Omit<AppState, "offsetTop" | "offsetLeft">>;
-  getDimensions: (
+  getDimensions?: (
     width: number,
     height: number,
   ) => { width: number; height: number; scale: number };

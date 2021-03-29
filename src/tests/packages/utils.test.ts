@@ -46,7 +46,6 @@ describe("exportToCanvas", () => {
   test("with default arguments", () => {
     const canvas = utils.exportToCanvas({
       ...diagramFactory({ elementOverrides: { width: 100, height: 100 } }),
-      getDimensions: (width, height) => ({ width, height, scale: 1 }),
     });
 
     expect(canvas.width).toBe(100 + 2 * EXPORT_PADDING);
@@ -77,7 +76,6 @@ describe("exportToBlob", () => {
     it("should default to image/png", async () => {
       const blob = await utils.exportToBlob({
         ...diagramFactory(),
-        getDimensions: (width, height) => ({ width, height, scale: 1 }),
       });
       expect(blob?.type).toBe("image/png");
     });
@@ -88,7 +86,6 @@ describe("exportToBlob", () => {
 
       await utils.exportToBlob({
         ...diagramFactory(),
-        getDimensions: (width, height) => ({ width, height, scale: 1 }),
         mimeType: "image/png",
         quality: 1,
       });
