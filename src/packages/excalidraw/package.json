@@ -2,9 +2,10 @@
   "name": "@excalidraw/excalidraw",
   "version": "0.5.0",
   "main": "main.js",
-  "types": "dist/types/packages/excalidraw/index.d.ts",
+  "types": "types/packages/excalidraw/index.d.ts",
   "files": [
-    "dist/*"
+    "dist/*",
+    "types/*"
   ],
   "publishConfig": {
     "access": "public"

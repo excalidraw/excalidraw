@@ -4,7 +4,7 @@
     "allowJs": true,
     "declaration": true,
     "emitDeclarationOnly": true,
-    "outDir": "src/packages/excalidraw/dist/types",
+    "outDir": "src/packages/excalidraw/types",
     "jsx": "react-jsx",
     "target": "es6",
     "lib": ["dom", "dom.iterable", "esnext"],
