@@ -4,6 +4,7 @@ import {
 } from "../element/types";
 import { getElementAbsoluteCoords, getElementBounds } from "../element";
 import { AppState } from "../types";
+import { isLinearElement } from "../element/typeChecks";
 
 export const getElementsWithinSelection = (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -67,3 +68,20 @@ export const getTargetElements = (
   appState.editingElement
     ? [appState.editingElement]
     : getSelectedElements(elements, appState);
+
+export const getSelectedPoint = (
+  elements: readonly NonDeletedExcalidrawElement[],
+  appState: AppState,
+) => {
+  if (appState.editingLinearElement?.activePointIndex != null) {
+    const selectedElements = getSelectedElements(elements, appState);
+
+    if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
+      return selectedElements[0].points[
+        appState.editingLinearElement.activePointIndex
+      ];
+    }
+  }
+
+  return null;
+};
