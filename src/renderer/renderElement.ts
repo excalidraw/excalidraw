@@ -698,7 +698,12 @@ export const renderElementToSvg = (
             element.opacity / 100,
             element.useTex,
           );
-          node.appendChild(svg);
+          const tempSvg = svgRoot.ownerDocument!.createElementNS(SVG_NS, "svg");
+          tempSvg.innerHTML = svg.innerHTML;
+          tempSvg.setAttribute("width", svg.getAttribute("width")!);
+          tempSvg.setAttribute("height", svg.getAttribute("height")!);
+          tempSvg.setAttribute("viewBox", svg.getAttribute("viewBox")!);
+          node.appendChild(tempSvg);
         } else {
           const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
           const lineHeight = element.height / lines.length;
