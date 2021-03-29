@@ -281,6 +281,7 @@ export type ExcalidrawImperativeAPI = {
   getAppState: () => InstanceType<typeof App>["state"];
   setCanvasOffsets: InstanceType<typeof App>["setCanvasOffsets"];
   importLibrary: InstanceType<typeof App>["importLibraryFromUrl"];
+  updateToastMessage: InstanceType<typeof App>["updateToastMessage"];
   readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
   ready: true;
 };
@@ -342,6 +343,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         getAppState: () => this.state,
         setCanvasOffsets: this.setCanvasOffsets,
         importLibrary: this.importLibraryFromUrl,
+        updateToastMessage: this.updateToastMessage,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -1336,6 +1338,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   clearToast = () => {
     this.setState({ toastMessage: null });
+  };
+
+  updateToastMessage = (toastMessage: string) => {
+    this.setState({ toastMessage });
   };
 
   restoreFileFromShare = async () => {

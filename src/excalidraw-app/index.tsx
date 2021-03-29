@@ -51,7 +51,6 @@ import {
   saveToLocalStorage,
 } from "./data/localStorage";
 import CustomStats from "./CustomStats";
-import { Toast } from "../components/Toast";
 
 const languageDetector = new LanguageDetector();
 languageDetector.init({
@@ -174,7 +173,6 @@ function ExcalidrawWrapper() {
   const [errorMessage, setErrorMessage] = useState("");
   const currentLangCode = languageDetector.detect() || defaultLang.code;
   const [langCode, setLangCode] = useState(currentLangCode);
-  const [toastMessage, setToastMessage] = useState("");
 
   useLayoutEffect(() => {
     const onResize = () => {
@@ -326,11 +324,14 @@ function ExcalidrawWrapper() {
     [langCode],
   );
 
-  const renderCustomStats = (
-    elements: readonly NonDeletedExcalidrawElement[],
-    appState: AppState,
-  ) => {
-    return <CustomStats setToastMessage={setToastMessage} />;
+  const renderCustomStats = () => {
+    return (
+      <CustomStats
+        setToastMessage={(message) =>
+          excalidrawAPI!.updateToastMessage(message)
+        }
+      />
+    );
   };
 
   return (
@@ -355,9 +356,6 @@ function ExcalidrawWrapper() {
           message={errorMessage}
           onClose={() => setErrorMessage("")}
         />
-      )}
-      {toastMessage && (
-        <Toast message={toastMessage} clearToast={() => setToastMessage("")} />
       )}
     </>
   );
