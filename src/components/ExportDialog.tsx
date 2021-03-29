@@ -6,7 +6,7 @@ import { canvasToBlob } from "../data/blob";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { CanvasError } from "../errors";
 import { t } from "../i18n";
-import useIsMobile from "../is-mobile";
+import { useIsMobile } from "../is-mobile";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { exportToCanvas, getExportSize } from "../scene/export";
 import { AppState } from "../types";
@@ -259,6 +259,7 @@ export const ExportDialog = ({
         onClick={() => {
           setModalIsShown(true);
         }}
+        data-testid="export-button"
         icon={exportFile}
         type="button"
         aria-label={t("buttons.export")}

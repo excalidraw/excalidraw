@@ -3,8 +3,7 @@ import { restore } from "../../data/restore";
 import { ImportedDataState } from "../../data/types";
 import { ExcalidrawElement } from "../../element/types";
 import { t } from "../../i18n";
-import { AppState } from "../../types";
-import { UserIdleState } from "../collab/types";
+import { AppState, UserIdleState } from "../../types";
 
 const byteToHex = (byte: number): string => `0${byte.toString(16)}`.slice(-2);
 
@@ -82,8 +81,10 @@ export type SocketUpdateData = SocketUpdateDataSource[keyof SocketUpdateDataSour
   _brand: "socketUpdateData";
 };
 
+const IV_LENGTH_BYTES = 12; // 96 bits
+
 export const createIV = () => {
-  const arr = new Uint8Array(12);
+  const arr = new Uint8Array(IV_LENGTH_BYTES);
   return window.crypto.getRandomValues(arr);
 };
 
@@ -177,6 +178,22 @@ export const getImportedKey = (key: string, usage: KeyUsage) =>
     [usage],
   );
 
+const decryptImported = async (
+  iv: ArrayBuffer,
+  encrypted: ArrayBuffer,
+  privateKey: string,
+): Promise<ArrayBuffer> => {
+  const key = await getImportedKey(privateKey, "decrypt");
+  return window.crypto.subtle.decrypt(
+    {
+      name: "AES-GCM",
+      iv,
+    },
+    key,
+    encrypted,
+  );
+};
+
 const importFromBackend = async (
   id: string | null,
   privateKey?: string | null,
@@ -185,6 +202,7 @@ const importFromBackend = async (
     const response = await fetch(
       privateKey ? `${BACKEND_V2_GET}${id}` : `${BACKEND_GET}${id}.json`,
     );
+
     if (!response.ok) {
       window.alert(t("alerts.importBackendFailed"));
       return {};
@@ -192,16 +210,19 @@ const importFromBackend = async (
     let data: ImportedDataState;
     if (privateKey) {
       const buffer = await response.arrayBuffer();
-      const key = await getImportedKey(privateKey, "decrypt");
-      const iv = new Uint8Array(12);
-      const decrypted = await window.crypto.subtle.decrypt(
-        {
-          name: "AES-GCM",
-          iv,
-        },
-        key,
-        buffer,
-      );
+
+      let decrypted: ArrayBuffer;
+      try {
+        // Buffer should contain both the IV (fixed length) and encrypted data
+        const iv = buffer.slice(0, IV_LENGTH_BYTES);
+        const encrypted = buffer.slice(IV_LENGTH_BYTES, buffer.byteLength);
+        decrypted = await decryptImported(iv, encrypted, privateKey);
+      } catch (error) {
+        // Fixed IV (old format, backward compatibility)
+        const fixedIv = new Uint8Array(IV_LENGTH_BYTES);
+        decrypted = await decryptImported(fixedIv, buffer, privateKey);
+      }
+
       // We need to convert the decrypted array buffer to a string
       const string = new window.TextDecoder("utf-8").decode(
         new Uint8Array(decrypted) as any,
@@ -265,9 +286,8 @@ export const exportToBackend = async (
     true, // extractable
     ["encrypt", "decrypt"],
   );
-  // The iv is set to 0. We are never going to reuse the same key so we don't
-  // need to have an iv. (I hope that's correct...)
-  const iv = new Uint8Array(12);
+
+  const iv = createIV();
   // We use symmetric encryption. AES-GCM is the recommended algorithm and
   // includes checks that the ciphertext has not been modified by an attacker.
   const encrypted = await window.crypto.subtle.encrypt(
@@ -278,6 +298,11 @@ export const exportToBackend = async (
     key,
     encoded,
   );
+
+  // Concatenate IV with encrypted data (IV does not have to be secret).
+  const payloadBlob = new Blob([iv.buffer, encrypted]);
+  const payload = await new Response(payloadBlob).arrayBuffer();
+
   // We use jwk encoding to be able to extract just the base64 encoded key.
   // We will hardcode the rest of the attributes when importing back the key.
   const exportedKey = await window.crypto.subtle.exportKey("jwk", key);
@@ -285,7 +310,7 @@ export const exportToBackend = async (
   try {
     const response = await fetch(BACKEND_V2_POST, {
       method: "POST",
-      body: encrypted,
+      body: payload,
     });
     const json = await response.json();
     if (json.id) {

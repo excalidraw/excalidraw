@@ -73,7 +73,7 @@
     box-sizing: border-box;
     border: 1px solid #ddd;
     background-color: currentColor !important;
-    filter: var(--appearance-filter);
+    filter: var(--theme-filter);
 
     &:focus {
       /* TODO: only show the border when the color is too light to see as a shadow */
@@ -192,7 +192,7 @@
     position: relative;
     overflow: hidden;
     background-color: transparent !important;
-    filter: var(--appearance-filter);
+    filter: var(--theme-filter);
 
     &:after {
       content: "";
@@ -239,7 +239,7 @@
     color: #d4d4d4;
   }
 
-  &.Appearance_dark {
+  &.theme--dark {
     .color-picker-type-elementBackground .color-picker-keybinding {
       color: $oc-black;
     }

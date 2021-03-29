@@ -39,7 +39,7 @@ import Portal from "./Portal";
 import RoomDialog from "./RoomDialog";
 import { createInverseContext } from "../../createInverseContext";
 import { t } from "../../i18n";
-import { UserIdleState } from "./types";
+import { UserIdleState } from "../../types";
 import { IDLE_THRESHOLD, ACTIVE_THRESHOLD } from "../../constants";
 import { trackEvent } from "../../analytics";
 
@@ -114,8 +114,8 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       process.env.NODE_ENV === ENV.TEST ||
       process.env.NODE_ENV === ENV.DEVELOPMENT
     ) {
-      window.h = window.h || ({} as Window["h"]);
-      Object.defineProperties(window.h, {
+      window.collab = window.collab || ({} as Window["collab"]);
+      Object.defineProperties(window, {
         collab: {
           configurable: true,
           value: this,
@@ -260,7 +260,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
         if (elements) {
           scenePromise.resolve({
             elements,
-            scrollToCenter: true,
+            scrollToContent: true,
           });
         }
       } catch (error) {
@@ -315,7 +315,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
               // noop if already resolved via init from firebase
               scenePromise.resolve({
                 elements: reconciledElements,
-                scrollToCenter: true,
+                scrollToContent: true,
               });
             }
             break;
@@ -455,15 +455,10 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     elements: ReconciledElements,
     {
       init = false,
-      initFromSnapshot = false,
       useTex = true,
-    }: { init?: boolean; initFromSnapshot?: boolean; useTex?: boolean } = {},
+    }: { init?: boolean; useTex?: boolean } = {},
   ) => {
     setUseTex(useTex);
-    if (init || initFromSnapshot) {
-      this.excalidrawAPI.setScrollToCenter(elements);
-    }
-
     this.excalidrawAPI.updateScene({
       elements,
       commitToHistory: !!init,
@@ -670,6 +665,19 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       </>
     );
   }
+}
+
+declare global {
+  interface Window {
+    collab: InstanceType<typeof CollabWrapper>;
+  }
+}
+
+if (
+  process.env.NODE_ENV === ENV.TEST ||
+  process.env.NODE_ENV === ENV.DEVELOPMENT
+) {
+  window.collab = window.collab || ({} as Window["collab"]);
 }
 
 export default CollabWrapper;

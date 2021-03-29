@@ -1,5 +1,5 @@
 import { cleanAppStateForExport } from "../appState";
-import { MIME_TYPES } from "../constants";
+import { EXPORT_DATA_TYPES } from "../constants";
 import { clearElementsForExport } from "../element";
 import { CanvasError } from "../errors";
 import { t } from "../i18n";
@@ -94,14 +94,8 @@ export const loadFromBlob = async (
       {
         elements: clearElementsForExport(data.elements || []),
         appState: {
-          appearance: localAppState?.appearance,
-          fileHandle:
-            blob.handle &&
-            ["application/json", MIME_TYPES.excalidraw].includes(
-              getMimeType(blob),
-            )
-              ? blob.handle
-              : null,
+          theme: localAppState?.theme,
+          fileHandle: blob.handle ?? null,
           ...cleanAppStateForExport(data.appState || {}),
           ...(localAppState
             ? calculateScrollCenter(data.elements || [], localAppState, null)
@@ -121,7 +115,7 @@ export const loadFromBlob = async (
 export const loadLibraryFromBlob = async (blob: Blob) => {
   const contents = await parseFileContents(blob);
   const data: LibraryData = JSON.parse(contents);
-  if (data.type !== "excalidrawlib") {
+  if (data.type !== EXPORT_DATA_TYPES.excalidrawLibrary) {
     throw new Error(t("alerts.couldNotLoadInvalidFile"));
   }
   return data;

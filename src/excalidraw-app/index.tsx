@@ -12,7 +12,13 @@ import { getDefaultAppState } from "../appState";
 import { ExcalidrawImperativeAPI } from "../components/App";
 import { ErrorDialog } from "../components/ErrorDialog";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
-import { APP_NAME, EVENT, TITLE_TIMEOUT, VERSION_TIMEOUT } from "../constants";
+import {
+  APP_NAME,
+  EVENT,
+  TITLE_TIMEOUT,
+  URL_HASH_KEYS,
+  VERSION_TIMEOUT,
+} from "../constants";
 import { loadFromBlob } from "../data/blob";
 import { DataState, ImportedDataState } from "../data/types";
 import {
@@ -44,6 +50,7 @@ import {
   importFromLocalStorage,
   saveToLocalStorage,
 } from "./data/localStorage";
+import CustomStats from "./CustomStats";
 
 const languageDetector = new LanguageDetector();
 languageDetector.init({
@@ -77,7 +84,7 @@ const initializeScene = async (opts: {
 
   const initialData = importFromLocalStorage();
 
-  let scene: DataState & { scrollToCenter?: boolean } = await loadScene(
+  let scene: DataState & { scrollToContent?: boolean } = await loadScene(
     null,
     null,
     initialData,
@@ -104,7 +111,7 @@ const initializeScene = async (opts: {
           initialData,
         );
       }
-      scene.scrollToCenter = true;
+      scene.scrollToContent = true;
       if (!roomLinkData) {
         window.history.replaceState({}, APP_NAME, window.location.origin);
       }
@@ -155,7 +162,7 @@ const initializeScene = async (opts: {
   return null;
 };
 
-function ExcalidrawWrapper() {
+const ExcalidrawWrapper = () => {
   // dimensions
   // ---------------------------------------------------------------------------
 
@@ -213,12 +220,24 @@ function ExcalidrawWrapper() {
       initialStatePromiseRef.current.promise.resolve(scene);
     });
 
-    const onHashChange = (_: HashChangeEvent) => {
-      initializeScene({ collabAPI }).then((scene) => {
-        if (scene) {
-          excalidrawAPI.updateScene(scene);
-        }
-      });
+    const onHashChange = (event: HashChangeEvent) => {
+      event.preventDefault();
+      const hash = new URLSearchParams(window.location.hash.slice(1));
+      const libraryUrl = hash.get(URL_HASH_KEYS.addLibrary);
+      if (libraryUrl) {
+        // If hash changed and it contains library url, import it and replace
+        // the url to its previous state (important in case of collaboration
+        // and similar).
+        // Using history API won't trigger another hashchange.
+        window.history.replaceState({}, "", event.oldURL);
+        excalidrawAPI.importLibrary(libraryUrl, hash.get("token"));
+      } else {
+        initializeScene({ collabAPI }).then((scene) => {
+          if (scene) {
+            excalidrawAPI.updateScene(scene);
+          }
+        });
+      }
     };
 
     const titleTimeout = setTimeout(
@@ -305,6 +324,14 @@ function ExcalidrawWrapper() {
     [langCode],
   );
 
+  const renderCustomStats = () => {
+    return (
+      <CustomStats
+        setToastMessage={(message) => excalidrawAPI!.setToastMessage(message)}
+      />
+    );
+  };
+
   return (
     <>
       <Excalidraw
@@ -319,6 +346,7 @@ function ExcalidrawWrapper() {
         onExportToBackend={onExportToBackend}
         renderFooter={renderFooter}
         langCode={langCode}
+        renderCustomStats={renderCustomStats}
       />
       {excalidrawAPI && <CollabWrapper excalidrawAPI={excalidrawAPI} />}
       {errorMessage && (
@@ -329,9 +357,9 @@ function ExcalidrawWrapper() {
       )}
     </>
   );
-}
+};
 
-export default function ExcalidrawApp() {
+const ExcalidrawApp = () => {
   return (
     <TopErrorBoundary>
       <CollabContextConsumer>
@@ -339,4 +367,6 @@ export default function ExcalidrawApp() {
       </CollabContextConsumer>
     </TopErrorBoundary>
   );
-}
+};
+
+export default ExcalidrawApp;

@@ -8,9 +8,10 @@ import { Tooltip } from "../components/Tooltip";
 import { DarkModeToggle, Appearence } from "../components/DarkModeToggle";
 import { loadFromJSON, saveAsJSON } from "../data";
 import { t } from "../i18n";
-import useIsMobile from "../is-mobile";
+import { useIsMobile } from "../is-mobile";
 import { KEYS } from "../keys";
 import { register } from "./register";
+import { supported } from "browser-fs-access";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -18,11 +19,14 @@ export const actionChangeProjectName = register({
     trackEvent("change", "title");
     return { appState: { ...appState, name: value }, commitToHistory: false };
   },
-  PanelComponent: ({ appState, updateData }) => (
+  PanelComponent: ({ appState, updateData, appProps }) => (
     <ProjectName
       label={t("labels.fileTitle")}
       value={appState.name || "Unnamed"}
       onChange={(name: string) => updateData(name)}
+      isNameEditable={
+        typeof appProps.name === "undefined" && !appState.viewModeEnabled
+      }
     />
   ),
 });
@@ -161,9 +165,7 @@ export const actionSaveAsScene = register({
       title={t("buttons.saveAs")}
       aria-label={t("buttons.saveAs")}
       showAriaLabel={useIsMobile()}
-      hidden={
-        !("chooseFileSystemEntries" in window || "showOpenFilePicker" in window)
-      }
+      hidden={!supported}
       onClick={() => updateData(null)}
     />
   ),
@@ -225,8 +227,8 @@ export const actionExportWithDarkMode = register({
     >
       <DarkModeToggle
         value={appState.exportWithDarkMode ? "dark" : "light"}
-        onChange={(appearance: Appearence) => {
-          updateData(appearance === "dark");
+        onChange={(theme: Appearence) => {
+          updateData(theme === "dark");
         }}
         title={t("labels.toggleExportColorScheme")}
       />

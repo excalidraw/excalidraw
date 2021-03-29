@@ -51,8 +51,7 @@
       name="twitter:description"
       content="Excalidraw is a whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them."
     />
-    <!-- OG tags require absolute url for images -->
-    <meta name="twitter:image" content="https://excalidraw.com/og-image.png" />
+
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
 
     <!-- Excalidraw version -->
@@ -88,6 +87,8 @@
     <link rel="stylesheet" href="fonts.css" type="text/css" />
     <script>
       window.EXCALIDRAW_ASSET_PATH = "/";
+      // setting this so that libraries installation reuses this window tab.
+      window.name = "_excalidraw";
     </script>
     <% if (process.env.REACT_APP_GOOGLE_ANALYTICS_ID) { %>
     <script
@@ -112,8 +113,7 @@
           Roboto, Helvetica, Arial, sans-serif;
         font-family: var(--ui-font);
         -webkit-text-size-adjust: 100%;
-        -webkit-user-select: none;
-        user-select: none;
+
         width: 100vw;
         height: 100vh;
       }

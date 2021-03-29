@@ -122,12 +122,12 @@ describe("resize rectangle ellipses and diamond elements", () => {
   );
 });
 
-function resize(
+const resize = (
   element: ExcalidrawElement,
   handleDir: TransformHandleDirection,
   mouseMove: [number, number],
   keyboardModifiers: KeyboardModifiers = {},
-) {
+) => {
   mouse.select(element);
   const handle = getTransformHandles(element, h.state.zoom, "mouse")[
     handleDir
@@ -140,4 +140,4 @@ function resize(
     mouse.move(mouseMove[0], mouseMove[1]);
     mouse.up();
   });
-}
+};

@@ -20,7 +20,6 @@ import { ExcalidrawImperativeAPI } from "./components/App";
 import type { ResolvablePromise } from "./utils";
 import { Spreadsheet } from "./charts";
 import { Language } from "./i18n";
-import { UserIdleState } from "./excalidraw-app/collab/types";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -90,7 +89,7 @@ export type AppState = {
   showHelpDialog: boolean;
   toastMessage: string | null;
   zenModeEnabled: boolean;
-  appearance: "light" | "dark";
+  theme: "light" | "dark";
   gridSize: number | null;
   viewModeEnabled: boolean;
 
@@ -162,10 +161,6 @@ export type ExcalidrawAPIRefValue =
 export interface ExcalidrawProps {
   width?: number;
   height?: number;
-  /** if not supplied, calculated by Excalidraw */
-  offsetLeft?: number;
-  /** if not supplied, calculated by Excalidraw */
-  offsetTop?: number;
   onChange?: (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
@@ -189,6 +184,13 @@ export interface ExcalidrawProps {
   viewModeEnabled?: boolean;
   zenModeEnabled?: boolean;
   gridModeEnabled?: boolean;
+  libraryReturnUrl?: string;
+  theme?: "dark" | "light";
+  name?: string;
+  renderCustomStats?: (
+    elements: readonly NonDeletedExcalidrawElement[],
+    appState: AppState,
+  ) => JSX.Element;
 }
 
 export type SceneData = {
@@ -198,3 +200,9 @@ export type SceneData = {
   commitToHistory?: boolean;
   useTex?: boolean;
 };
+
+export enum UserIdleState {
+  ACTIVE = "active",
+  AWAY = "away",
+  IDLE = "idle",
+}

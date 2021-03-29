@@ -8,7 +8,7 @@ import { getCommonBounds, getNonDeletedElements } from "../element";
 import { newElementWith } from "../element/mutateElement";
 import { ExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
-import useIsMobile from "../is-mobile";
+import { useIsMobile } from "../is-mobile";
 import { CODES, KEYS } from "../keys";
 import { getNormalizedZoom, getSelectedElements } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
@@ -48,7 +48,7 @@ export const actionClearCanvas = register({
       ),
       appState: {
         ...getDefaultAppState(),
-        appearance: appState.appearance,
+        theme: appState.theme,
         elementLocked: appState.elementLocked,
         exportBackground: appState.exportBackground,
         exportEmbedScene: appState.exportEmbedScene,

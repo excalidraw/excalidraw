@@ -3,6 +3,7 @@ import { render, waitFor } from "./test-utils";
 import ExcalidrawApp from "../excalidraw-app";
 import { API } from "./helpers/api";
 import { getDefaultAppState } from "../appState";
+import { EXPORT_DATA_TYPES } from "../constants";
 
 const { h } = window;
 
@@ -29,7 +30,7 @@ describe("appState", () => {
       new Blob(
         [
           JSON.stringify({
-            type: "excalidraw",
+            type: EXPORT_DATA_TYPES.excalidraw,
             appState: {
               viewBackgroundColor: "#000",
             },
