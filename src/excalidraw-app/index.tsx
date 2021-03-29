@@ -50,6 +50,7 @@ import {
   importFromLocalStorage,
   saveToLocalStorage,
 } from "./data/localStorage";
+import CustomStats from "./CustomStats";
 
 const languageDetector = new LanguageDetector();
 languageDetector.init({
@@ -161,7 +162,7 @@ const initializeScene = async (opts: {
   return null;
 };
 
-function ExcalidrawWrapper() {
+const ExcalidrawWrapper = () => {
   // dimensions
   // ---------------------------------------------------------------------------
 
@@ -323,6 +324,14 @@ function ExcalidrawWrapper() {
     [langCode],
   );
 
+  const renderCustomStats = () => {
+    return (
+      <CustomStats
+        setToastMessage={(message) => excalidrawAPI!.setToastMessage(message)}
+      />
+    );
+  };
+
   return (
     <>
       <Excalidraw
@@ -337,6 +346,7 @@ function ExcalidrawWrapper() {
         onExportToBackend={onExportToBackend}
         renderFooter={renderFooter}
         langCode={langCode}
+        renderCustomStats={renderCustomStats}
       />
       {excalidrawAPI && <CollabWrapper excalidrawAPI={excalidrawAPI} />}
       {errorMessage && (
@@ -347,9 +357,9 @@ function ExcalidrawWrapper() {
       )}
     </>
   );
-}
+};
 
-export default function ExcalidrawApp() {
+const ExcalidrawApp = () => {
   return (
     <TopErrorBoundary>
       <CollabContextConsumer>
@@ -357,4 +367,6 @@ export default function ExcalidrawApp() {
       </CollabContextConsumer>
     </TopErrorBoundary>
   );
-}
+};
+
+export default ExcalidrawApp;
