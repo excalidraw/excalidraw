@@ -31,6 +31,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     theme,
     name,
     renderCustomStats,
+    canvasActions,
   } = props;
 
   useEffect(() => {
@@ -73,6 +74,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
           theme={theme}
           name={name}
           renderCustomStats={renderCustomStats}
+          canvasActions={canvasActions}
         />
       </IsMobileProvider>
     </InitializeApp>

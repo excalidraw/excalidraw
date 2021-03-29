@@ -92,6 +92,7 @@ export type AppState = {
   theme: "light" | "dark";
   gridSize: number | null;
   viewModeEnabled: boolean;
+  canvasActions: CanvasActionsState;
 
   /** top-most selected groups (i.e. does not include nested groups) */
   selectedGroupIds: { [groupId: string]: boolean };
@@ -191,6 +192,7 @@ export interface ExcalidrawProps {
     elements: readonly NonDeletedExcalidrawElement[],
     appState: AppState,
   ) => JSX.Element;
+  canvasActions?: CanvasActions;
 }
 
 export type SceneData = {
@@ -205,3 +207,12 @@ export enum UserIdleState {
   AWAY = "away",
   IDLE = "idle",
 }
+
+export type CanvasActionsState = Required<CanvasActions>;
+
+export type CanvasActions = {
+  saveScene?: boolean;
+  saveAsScene?: boolean;
+  clearCanvas?: boolean;
+  export?: boolean;
+};

@@ -358,6 +358,10 @@ const LayerUI = ({
   );
 
   const renderExportDialog = () => {
+    if (!appState.canvasActions.export) {
+      return null;
+    }
+
     const createExporter = (type: ExportType): ExportCB => async (
       exportedElements,
       scale,

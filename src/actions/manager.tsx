@@ -56,6 +56,7 @@ export class ActionManager implements ActionsManagerInterface {
       .sort((a, b) => (b.keyPriority || 0) - (a.keyPriority || 0))
       .filter(
         (action) =>
+          this.showAllowAction(action.name) &&
           action.keyTest &&
           action.keyTest(
             event,
@@ -97,12 +98,31 @@ export class ActionManager implements ActionsManagerInterface {
     );
   }
 
+  showAllowAction = (name: ActionName) => {
+    const canvasActions = this.getAppState().canvasActions;
+
+    if (canvasActions) {
+      switch (name) {
+        case "saveScene":
+        case "saveAsScene":
+        case "clearCanvas":
+          return canvasActions[name];
+      }
+    }
+
+    return true;
+  };
+
   // Id is an attribute that we can use to pass in data like keys.
   // This is needed for dynamically generated action components
   // like the user list. We can use this key to extract more
   // data from app state. This is an alternative to generic prop hell!
   renderAction = (name: ActionName, id?: string) => {
-    if (this.actions[name] && "PanelComponent" in this.actions[name]) {
+    if (
+      this.actions[name] &&
+      "PanelComponent" in this.actions[name] &&
+      this.showAllowAction(name)
+    ) {
       const action = this.actions[name];
       const PanelComponent = action.PanelComponent!;
       const updateData = (formState?: any) => {
