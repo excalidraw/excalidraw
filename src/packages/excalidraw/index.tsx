@@ -30,6 +30,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     libraryReturnUrl,
     theme,
     name,
+    renderCustomStats,
   } = props;
 
   useEffect(() => {
@@ -71,6 +72,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
           libraryReturnUrl={libraryReturnUrl}
           theme={theme}
           name={name}
+          renderCustomStats={renderCustomStats}
         />
       </IsMobileProvider>
     </InitializeApp>

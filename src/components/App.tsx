@@ -428,7 +428,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       viewModeEnabled,
     } = this.state;
 
-    const { onCollabButtonClick, onExportToBackend, renderFooter } = this.props;
+    const {
+      onCollabButtonClick,
+      onExportToBackend,
+      renderFooter,
+      renderCustomStats,
+    } = this.props;
 
     const DEFAULT_PASTE_X = canvasDOMWidth / 2;
     const DEFAULT_PASTE_Y = canvasDOMHeight / 2;
@@ -479,6 +484,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             setAppState={this.setAppState}
             elements={this.scene.getElements()}
             onClose={this.toggleStats}
+            renderCustomStats={renderCustomStats}
           />
         )}
         {this.state.toastMessage !== null && (
