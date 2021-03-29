@@ -453,10 +453,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
   private handleRemoteSceneUpdate = (
     elements: ReconciledElements,
-    {
-      init = false,
-      useTex = true,
-    }: { init?: boolean; useTex?: boolean } = {},
+    { init = false, useTex = true }: { init?: boolean; useTex?: boolean } = {},
   ) => {
     setUseTex(useTex);
     this.excalidrawAPI.updateScene({

@@ -178,7 +178,7 @@ const measureOutputs = (outputs: string[][], fontString: FontString) => {
         let cWidth;
         let cHeight;
         let cBaseline;
-        if (cNode.hasAttribute("width")) {
+        if (cNode && cNode.hasAttribute("width")) {
           cWidth = cNode.getAttribute("width");
           if (cWidth === null) {
             cWidth = "0";
@@ -187,7 +187,7 @@ const measureOutputs = (outputs: string[][], fontString: FontString) => {
         } else {
           cWidth = 0;
         }
-        if (cNode.hasAttribute("height")) {
+        if (cNode && cNode.hasAttribute("height")) {
           cHeight = cNode.getAttribute("height");
           if (cHeight === null) {
             cHeight = "0";
@@ -196,7 +196,7 @@ const measureOutputs = (outputs: string[][], fontString: FontString) => {
         } else {
           cHeight = 0;
         }
-        if (cNode.hasAttribute("style")) {
+        if (cNode && cNode.hasAttribute("style")) {
           cBaseline = cNode.getAttribute("style");
           if (cBaseline === null) {
             cBaseline = "vertical-align: 0ex;";
