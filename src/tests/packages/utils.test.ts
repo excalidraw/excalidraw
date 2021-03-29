@@ -43,7 +43,7 @@ const diagramFactory = ({ overrides = {}, elementOverrides = {} } = {}) => ({
 
 describe("exportToCanvas", () => {
   const EXPORT_PADDING = 10;
-  test("with default arguments", () => {
+  it("with default arguments", () => {
     const canvas = utils.exportToCanvas({
       ...diagramFactory({ elementOverrides: { width: 100, height: 100 } }),
     });
@@ -51,7 +51,8 @@ describe("exportToCanvas", () => {
     expect(canvas.width).toBe(100 + 2 * EXPORT_PADDING);
     expect(canvas.height).toBe(100 + 2 * EXPORT_PADDING);
   });
-  test("when custom width and height", () => {
+
+  it("when custom width and height", () => {
     const canvas = utils.exportToCanvas({
       ...diagramFactory({ elementOverrides: { width: 100, height: 100 } }),
       getDimensions: () => ({ width: 200, height: 200, scale: 1 }),
@@ -61,6 +62,7 @@ describe("exportToCanvas", () => {
     expect(canvas.height).toBe(200);
   });
 });
+
 describe("exportToBlob", () => {
   describe("mime type", () => {
     afterEach(jest.restoreAllMocks);
@@ -73,12 +75,14 @@ describe("exportToBlob", () => {
       });
       expect(blob?.type).toBe("image/jpeg");
     });
+
     it("should default to image/png", async () => {
       const blob = await utils.exportToBlob({
         ...diagramFactory(),
       });
       expect(blob?.type).toBe("image/png");
     });
+
     it("should warn when using quality with image/png", async () => {
       const consoleSpy = jest
         .spyOn(console, "warn")
@@ -98,24 +102,26 @@ describe("exportToBlob", () => {
 });
 
 describe("exportToSvg", () => {
-  test("with default arguments", () => {
+  it("with default arguments", () => {
     const svgElement = utils.exportToSvg({
       ...diagramFactory({
         overrides: { appState: void 0 },
         elementOverrides: { width: 100, height: 100 },
       }),
     });
+
     expect(svgElement).toHaveAttribute("height", "120");
     expect(svgElement).toHaveAttribute("width", "120");
     expect(svgElement).toHaveAttribute("viewBox", "0 0 120 120");
     expect(svgElement).toMatchSnapshot();
   });
-  test("with exportPadding and metadata", () => {
+  it("with exportPadding and metadata", () => {
     const svgElement = utils.exportToSvg({
       ...diagramFactory({ elementOverrides: { width: 100, height: 100 } }),
       exportPadding: 0,
       metadata: "some metadata",
     });
+
     expect(svgElement.innerHTML).toMatch(/some metadata/);
     expect(svgElement).toHaveAttribute("height", "100");
     expect(svgElement).toHaveAttribute("width", "100");
