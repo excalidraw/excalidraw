@@ -1,4 +1,7 @@
+import { NonDeletedExcalidrawElement } from "../element/types";
+import * as exportUtils from "../scene/export";
 import * as utils from "../utils";
+import { diamondFixture, ellipseFixture } from "./fixtures/elementFixture";
 
 describe("Test isTransparent", () => {
   it("should return true when color is rgb transparent", () => {
@@ -9,5 +12,103 @@ describe("Test isTransparent", () => {
 
   it("should return false when color is not transparent", () => {
     expect(utils.isTransparent("#ced4da")).toEqual(false);
+  });
+});
+
+describe("exportToSvg", () => {
+  const ELEMENT_HEIGHT = 100;
+  const ELEMENT_WIDTH = 100;
+  const ELEMENTS = [
+    { ...diamondFixture, height: ELEMENT_HEIGHT, width: ELEMENT_WIDTH },
+    { ...ellipseFixture, height: ELEMENT_HEIGHT, width: ELEMENT_WIDTH },
+  ] as NonDeletedExcalidrawElement[];
+
+  it("with default arguments", () => {
+    const svgElement = exportUtils.exportToSvg(ELEMENTS, {
+      exportBackground: false,
+      viewBackgroundColor: "#ffffff",
+      shouldAddWatermark: false,
+    });
+
+    expect(svgElement).toMatchSnapshot();
+  });
+
+  it("with background color", () => {
+    const BACKGROUND_COLOR = "#abcdef";
+
+    const svgElement = exportUtils.exportToSvg(ELEMENTS, {
+      exportBackground: true,
+      viewBackgroundColor: BACKGROUND_COLOR,
+      shouldAddWatermark: false,
+    });
+
+    expect(svgElement.querySelector("rect")).toHaveAttribute(
+      "fill",
+      BACKGROUND_COLOR,
+    );
+  });
+
+  it("with watermark", () => {
+    const svgElement = exportUtils.exportToSvg(ELEMENTS, {
+      exportBackground: false,
+      viewBackgroundColor: "#ffffff",
+      shouldAddWatermark: true,
+    });
+
+    expect(svgElement.querySelector("text")?.textContent).toMatchInlineSnapshot(
+      `"Made with Excalidraw"`,
+    );
+  });
+
+  it("with dark mode", () => {
+    const svgElement = exportUtils.exportToSvg(ELEMENTS, {
+      exportBackground: false,
+      viewBackgroundColor: "#ffffff",
+      exportWithDarkMode: true,
+      shouldAddWatermark: false,
+    });
+
+    expect(svgElement.getAttribute("filter")).toMatchInlineSnapshot(
+      `"themeFilter"`,
+    );
+  });
+
+  it("with exportPadding, metadata", () => {
+    const svgElement = exportUtils.exportToSvg(ELEMENTS, {
+      exportBackground: true,
+      exportPadding: 0,
+      viewBackgroundColor: "#ffffff",
+      shouldAddWatermark: false,
+      metadata: "some metadata",
+    });
+
+    expect(svgElement.innerHTML).toMatch(/some metadata/);
+    expect(svgElement).toHaveAttribute("height", ELEMENT_HEIGHT.toString());
+    expect(svgElement).toHaveAttribute("width", ELEMENT_WIDTH.toString());
+    expect(svgElement).toHaveAttribute(
+      "viewBox",
+      `0 0 ${ELEMENT_WIDTH} ${ELEMENT_HEIGHT}`,
+    );
+  });
+
+  it("with scale", () => {
+    const SCALE = 2;
+
+    const svgElement = exportUtils.exportToSvg(ELEMENTS, {
+      exportBackground: true,
+      exportPadding: 0,
+      viewBackgroundColor: "#ffffff",
+      scale: SCALE,
+      shouldAddWatermark: false,
+    });
+
+    expect(svgElement).toHaveAttribute(
+      "height",
+      (ELEMENT_HEIGHT * SCALE).toString(),
+    );
+    expect(svgElement).toHaveAttribute(
+      "width",
+      (ELEMENT_WIDTH * SCALE).toString(),
+    );
   });
 });

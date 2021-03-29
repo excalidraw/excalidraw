@@ -4,7 +4,7 @@ import {
   rectangleFixture,
 } from "./elementFixture";
 
-const diagramFixture = {
+export const diagramFixture = {
   type: "excalidraw",
   version: 2,
   source: "https://excalidraw.com",
@@ -14,5 +14,18 @@ const diagramFixture = {
     gridSize: null,
   },
 };
+
+export const diagramFactory = ({
+  overrides = {},
+  elementOverrides = {},
+} = {}) => ({
+  ...diagramFixture,
+  elements: [
+    { ...diamondFixture, ...elementOverrides },
+    { ...ellipseFixture, ...elementOverrides },
+    { ...rectangleFixture, ...elementOverrides },
+  ],
+  ...overrides,
+});
 
 export default diagramFixture;
