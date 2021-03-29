@@ -6,7 +6,7 @@ import { canvasToBlob } from "../data/blob";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { CanvasError } from "../errors";
 import { t } from "../i18n";
-import useIsMobile from "../is-mobile";
+import { useIsMobile } from "../is-mobile";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { exportToCanvas, getExportSize } from "../scene/export";
 import { AppState } from "../types";

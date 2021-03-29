@@ -8,7 +8,7 @@ import {
   getTotalStorageSize,
 } from "../excalidraw-app/data/localStorage";
 import { t } from "../i18n";
-import useIsMobile from "../is-mobile";
+import { useIsMobile } from "../is-mobile";
 import { getTargetElements } from "../scene";
 import { AppState } from "../types";
 import { debounce, getVersion, nFormatter } from "../utils";

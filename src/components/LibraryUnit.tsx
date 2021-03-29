@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { close } from "../components/icons";
 import { MIME_TYPES } from "../constants";
 import { t } from "../i18n";
-import useIsMobile from "../is-mobile";
+import { useIsMobile } from "../is-mobile";
 import { exportToSvg } from "../scene/export";
 import { LibraryItem } from "../types";
 import "./LibraryUnit.scss";

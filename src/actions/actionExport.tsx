@@ -8,7 +8,7 @@ import { Tooltip } from "../components/Tooltip";
 import { DarkModeToggle, Appearence } from "../components/DarkModeToggle";
 import { loadFromJSON, saveAsJSON } from "../data";
 import { t } from "../i18n";
-import useIsMobile from "../is-mobile";
+import { useIsMobile } from "../is-mobile";
 import { KEYS } from "../keys";
 import { register } from "./register";
 import { supported } from "browser-fs-access";
