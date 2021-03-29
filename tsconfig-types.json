@@ -6,12 +6,13 @@
     "emitDeclarationOnly": true,
     "outDir": "src/packages/excalidraw/dist/types",
     "jsx": "react-jsx",
-    "target": "es5",
+    "target": "es6",
     "lib": ["dom", "dom.iterable", "esnext"],
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "strict": true
   }
 }
