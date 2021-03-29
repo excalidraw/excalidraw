@@ -405,6 +405,7 @@ To view the full example visit :point_down:
 | [`onExportToBackend`](#onExportToBackend) | Function |  | Callback triggered when link button is clicked on export dialog |
 | [`langCode`](#langCode) | string | `en` | Language code string |
 | [`renderFooter `](#renderFooter) | Function |  | Function that renders custom UI footer |
+| [`renderCustomStats`](#renderCustomStats) | Function |  | Function that can be used to render custom stats on the stats dialog. |
 | [`viewModeEnabled`](#viewModeEnabled) | boolean |  | This implies if the app is in view mode. |
 | [`zenModeEnabled`](#zenModeEnabled) | boolean |  | This implies if the zen mode is enabled |
 | [`gridModeEnabled`](#gridModeEnabled) | boolean |  | This implies if the grid mode is enabled |
@@ -492,6 +493,7 @@ You can pass a `ref` when you want to access some excalidraw APIs. We expose the
 | setScrollToContent | <pre> (<a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>) => void </pre> | Scroll to the nearest element to center |
 | setCanvasOffsets | `() => void` | Updates the offsets for the Excalidraw component so that the coordinates are computed correctly (for example the cursor position). You should call this API when your app changes the dimensions/position of the Excalidraw container, such as when toggling a sidebar. You don't have to call this when the position is changed on page scroll (we handled that ourselves). |
 | importLibrary | `(url: string, token?: string) => void` | Imports library from given URL. You should call this on `hashchange`, passing the `addLibrary` value if you detect it. Optionally pass a CSRF `token` to skip prompting during installation (retrievable via `token` key from the url coming from [https://libraries.excalidraw.com](https://libraries.excalidraw.com/)). |
+| setToastMessage | `(message: string) => void` | This API can be used to show the toast with custom message. |
 
 #### `readyPromise`
 
@@ -549,6 +551,10 @@ import { defaultLang, languages } from "@excalidraw/excalidraw";
 #### `renderFooter`
 
 A function that renders (returns JSX) custom UI footer. For example, you can use this to render a language picker that was previously being rendered by Excalidraw itself (for now, you'll need to implement your own language picker).
+
+#### `renderCustomStats`
+
+A function that can be used to render custom stats (returns JSX) in the nerd stats dialog. For example you can use this prop to render the size of the elements in the storage.
 
 #### `viewModeEnabled`
 
