@@ -1,5 +1,12 @@
 import * as utils from "../../packages/utils";
 import { diagramFactory } from "../fixtures/diagramFixture";
+import * as mockedSceneExportUtils from "../../scene/export";
+
+jest.mock("../../scene/export", () => ({
+  __esmodule: true,
+  ...jest.requireActual("../../scene/export"),
+  exportToSvg: jest.fn(),
+}));
 
 describe("exportToCanvas", () => {
   const EXPORT_PADDING = 10;
@@ -63,26 +70,52 @@ describe("exportToBlob", () => {
 });
 
 describe("exportToSvg", () => {
+  const mockedExportUtil = mockedSceneExportUtils.exportToSvg as jest.Mock;
+  const passedElements = () => mockedExportUtil.mock.calls[0][0];
+  const passedOptions = () => mockedExportUtil.mock.calls[0][1];
+
+  afterEach(jest.resetAllMocks);
+
   it("with default arguments", () => {
-    //TODO:
-    // const svgElement = utils.exportToSvg({
-    //   ...diagramFactory({
-    //     overrides: { appState: void 0 },
-    //     elementOverrides: { width: 100, height: 100 },
-    //   }),
-    // });
-    // expect(svgElement).toMatchSnapshot();
+    utils.exportToSvg({
+      ...diagramFactory({
+        overrides: { appState: void 0 },
+      }),
+    });
+
+    const passedOptionsWhenDefault = {
+      ...passedOptions(),
+      // To avoid varying snapshots
+      name: "name",
+    };
+
+    expect(passedElements().length).toBe(3);
+    expect(passedOptionsWhenDefault).toMatchSnapshot();
+  });
+
+  it("with deleted elements", () => {
+    utils.exportToSvg({
+      ...diagramFactory({
+        overrides: { appState: void 0 },
+        elementOverrides: { isDeleted: true },
+      }),
+    });
+
+    expect(passedElements().length).toBe(0);
   });
 
   it("with exportPadding and metadata", () => {
-    // const svgElement = utils.exportToSvg({
-    //   ...diagramFactory({ elementOverrides: { width: 100, height: 100 } }),
-    //   exportPadding: 0,
-    //   metadata: "some metadata",
-    // });
-    // expect(svgElement.innerHTML).toMatch(/some metadata/);
-    // expect(svgElement).toHaveAttribute("height", "100");
-    // expect(svgElement).toHaveAttribute("width", "100");
-    // expect(svgElement).toHaveAttribute("viewBox", "0 0 100 100");
+    const METADATA = "some metada";
+
+    utils.exportToSvg({
+      ...diagramFactory({ overrides: { appState: { name: "diagram name" } } }),
+      exportPadding: 0,
+      metadata: METADATA,
+    });
+
+    expect(passedElements().length).toBe(3);
+    expect(passedOptions()).toEqual(
+      expect.objectContaining({ exportPadding: 0, metadata: METADATA }),
+    );
   });
 });
