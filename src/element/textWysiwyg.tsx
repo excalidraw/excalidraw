@@ -61,7 +61,9 @@ export const textWysiwyg = ({
       );
       const { textAlign, angle } = updatedElement;
 
-      editable.value = updatedElement.text;
+      if (editable.innerText !== updatedElement.text) {
+        editable.innerText = updatedElement.text;
+      }
 
       const lines = updatedElement.text.replace(/\r\n?/g, "\n").split("\n");
       const lineHeight = updatedElement.height / lines.length;
@@ -99,13 +101,12 @@ export const textWysiwyg = ({
     }
   };
 
-  const editable = document.createElement("textarea");
+  const editable = document.createElement("div");
 
+  editable.contentEditable = "true";
   editable.dir = "auto";
   editable.tabIndex = 0;
   editable.dataset.type = "wysiwyg";
-  // prevent line wrapping on Safari
-  editable.wrap = "off";
 
   Object.assign(editable.style, {
     position: "absolute",
@@ -129,7 +130,7 @@ export const textWysiwyg = ({
 
   if (onChange) {
     editable.oninput = () => {
-      onChange(normalizeText(editable.value));
+      onChange(normalizeText(editable.innerText));
     };
   }
 
@@ -160,7 +161,7 @@ export const textWysiwyg = ({
   let submittedViaKeyboard = false;
   const handleSubmit = () => {
     onSubmit({
-      text: normalizeText(editable.value),
+      text: normalizeText(editable.innerText),
       viaKeyboard: submittedViaKeyboard,
     });
     cleanup();
@@ -230,9 +231,6 @@ export const textWysiwyg = ({
 
   let isDestroyed = false;
 
-  // select on init (focusing is done separately inside the bindBlurEvent()
-  // because we need it to happen *after* the blur event from `pointerdown`)
-  editable.select();
   bindBlurEvent();
 
   // reposition wysiwyg in case of canvas is resized. Using ResizeObserver
@@ -255,4 +253,19 @@ export const textWysiwyg = ({
   document
     .querySelector(".excalidraw-textEditorContainer")!
     .appendChild(editable);
+
+  // select on init (focusing is done separately inside the bindBlurEvent()
+  // because we need it to happen *after* the blur event from `pointerdown`)
+  // Needs to happen after DOM update, otherwise the range cannot be selected.
+  setTimeout(() => {
+    selectAllText(editable);
+  }, 1);
 };
+
+function selectAllText(element: HTMLElement) {
+  const range = document.createRange();
+  range.selectNodeContents(element);
+  const selection = window.getSelection()!;
+  selection.removeAllRanges();
+  selection.addRange(range);
+}
