@@ -61,6 +61,12 @@ export type ExcalidrawEllipseElement = _ExcalidrawElementBase & {
   type: "ellipse";
 };
 
+export type ExcalidrawImageElement = _ExcalidrawElementBase &
+  Readonly<{
+    type: "image";
+    imageData: string;
+  }>;
+
 /**
  * These are elements that don't have any additional properties.
  */
@@ -78,7 +84,8 @@ export type ExcalidrawGenericElement =
 export type ExcalidrawElement =
   | ExcalidrawGenericElement
   | ExcalidrawTextElement
-  | ExcalidrawLinearElement;
+  | ExcalidrawLinearElement
+  | ExcalidrawImageElement;
 
 export type NonDeleted<TElement extends ExcalidrawElement> = TElement & {
   isDeleted: false;
@@ -101,7 +108,8 @@ export type ExcalidrawBindableElement =
   | ExcalidrawRectangleElement
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement
-  | ExcalidrawTextElement;
+  | ExcalidrawTextElement
+  | ExcalidrawImageElement;
 
 export type PointBinding = {
   elementId: ExcalidrawBindableElement["id"];

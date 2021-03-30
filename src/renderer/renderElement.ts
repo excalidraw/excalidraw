@@ -133,6 +133,20 @@ const drawElementOnCanvas = (
       });
       break;
     }
+    case "image": {
+      const img = new Image();
+      img.onload = function () {
+        context.drawImage(
+          img,
+          20 /* hardcoded for the selection box*/,
+          20,
+          element.width,
+          element.height,
+        );
+      };
+      img.src = element.imageData;
+      break;
+    }
     default: {
       if (isTextElement(element)) {
         const rtl = isRTL(element.text);
@@ -425,6 +439,11 @@ const generateElementShape = (
         shape = [];
         break;
       }
+      case "image": {
+        // just to ensure we don't regenerate element.canvas on rerenders
+        shape = [];
+        break;
+      }
     }
     shapeCache.set(element, shape);
   }
@@ -509,6 +528,7 @@ export const renderElement = (
     case "line":
     case "draw":
     case "arrow":
+    case "image":
     case "text": {
       generateElementShape(element, generator);
       if (renderOptimizations) {

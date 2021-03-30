@@ -16,6 +16,7 @@ import {
   ExcalidrawTextElement,
   ExcalidrawEllipseElement,
   NonDeleted,
+  ExcalidrawImageElement,
 } from "./types";
 
 import { getElementAbsoluteCoords, getCurvePathOps, Bounds } from "./bounds";
@@ -34,7 +35,7 @@ const isElementDraggableFromInside = (
   if (element.type === "line" || element.type === "draw") {
     return isDraggableFromInside && isPathALoop(element.points);
   }
-  return isDraggableFromInside;
+  return isDraggableFromInside || element.type === "image";
 };
 
 export const hitTest = (
@@ -169,6 +170,7 @@ export const distanceToBindableElement = (
 ): number => {
   switch (element.type) {
     case "rectangle":
+    case "image":
     case "text":
       return distanceToRectangle(element, point);
     case "diamond":
@@ -195,7 +197,10 @@ const isOutsideCheck = (distance: number, threshold: number): boolean => {
 };
 
 const distanceToRectangle = (
-  element: ExcalidrawRectangleElement | ExcalidrawTextElement,
+  element:
+    | ExcalidrawRectangleElement
+    | ExcalidrawTextElement
+    | ExcalidrawImageElement,
   point: Point,
 ): number => {
   const [, pointRel, hwidth, hheight] = pointRelativeToElement(element, point);

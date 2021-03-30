@@ -4,6 +4,7 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
 import clsx from "clsx";
 import { supported } from "browser-fs-access";
+import { fileOpen } from "browser-nativefs";
 
 import {
   actionAddToLibrary,
@@ -88,6 +89,7 @@ import {
   newElement,
   newLinearElement,
   newTextElement,
+  newImageElement,
   textWysiwyg,
   transformElements,
   updateTextElement,
@@ -120,6 +122,7 @@ import {
   ExcalidrawElement,
   ExcalidrawGenericElement,
   ExcalidrawLinearElement,
+  ExcalidrawImageElement,
   ExcalidrawTextElement,
   NonDeleted,
 } from "../element/types";
@@ -2241,6 +2244,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         this.state.elementType,
         pointerDownState,
       );
+    } else if (this.state.elementType === "image") {
+      this.handleImageElementOnPointerDown(
+        event,
+        this.state.elementType,
+        pointerDownState,
+      );
     } else {
       this.createGenericElementOnPointerDown(
         this.state.elementType,
@@ -2737,6 +2746,52 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
   };
 
+  private handleImageElementOnPointerDown = (
+    event: React.PointerEvent<HTMLCanvasElement>,
+    elementType: ExcalidrawImageElement["type"],
+    pointerDownState: PointerDownState,
+  ): void => {
+    const [gridX, gridY] = getGridPoint(
+      pointerDownState.origin.x,
+      pointerDownState.origin.y,
+      this.state.gridSize,
+    );
+
+    const element = newImageElement({
+      type: elementType,
+      x: gridX,
+      y: gridY,
+      strokeColor: this.state.currentItemStrokeColor,
+      backgroundColor: this.state.currentItemBackgroundColor,
+      fillStyle: this.state.currentItemFillStyle,
+      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeStyle: this.state.currentItemStrokeStyle,
+      roughness: this.state.currentItemRoughness,
+      opacity: this.state.currentItemOpacity,
+      strokeSharpness: this.state.currentItemLinearStrokeSharpness,
+    });
+    this.setState((prevState) => ({
+      selectedElementIds: {
+        ...prevState.selectedElementIds,
+        [element.id]: true,
+      },
+    }));
+    const boundElement = getHoveredElementForBinding(
+      pointerDownState.origin,
+      this.scene,
+    );
+    this.scene.replaceAllElements([
+      ...this.scene.getElementsIncludingDeleted(),
+      element,
+    ]);
+    this.setState({
+      draggingElement: element,
+      editingElement: element,
+      startBoundElement: boundElement,
+      suggestedBindings: [],
+    });
+  };
+
   private handleLinearElementOnPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
     elementType: ExcalidrawLinearElement["type"],
@@ -3213,7 +3268,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   private onPointerUpFromPointerDownHandler(
     pointerDownState: PointerDownState,
   ): (event: PointerEvent) => void {
-    return withBatchedUpdates((childEvent: PointerEvent) => {
+    return withBatchedUpdates(async (childEvent: PointerEvent) => {
       const {
         draggingElement,
         resizingElement,
@@ -3274,6 +3329,24 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         EVENT.KEYUP,
         pointerDownState.eventListeners.onKeyUp!,
       );
+
+      if (draggingElement?.type === "image") {
+        const selectedFile = await fileOpen({
+          description: "Image",
+          extensions: ["jpg", "jpeg", "png"],
+          mimeTypes: ["image/jpeg", "image/png"],
+        });
+
+        const reader = new FileReader();
+        reader.onload = () => {
+          mutateElement(draggingElement, {
+            imageData: reader.result as string,
+          });
+          this.actionManager.executeAction(actionFinalize);
+        };
+        reader.readAsDataURL(selectedFile);
+        return;
+      }
 
       if (draggingElement?.type === "draw") {
         this.actionManager.executeAction(actionFinalize);
