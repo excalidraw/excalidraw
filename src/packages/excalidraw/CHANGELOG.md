@@ -18,6 +18,7 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
+- Export types for the package so now it can be used with typescript[#3337](https://github.com/excalidraw/excalidraw/pull/3337).
 - Add `renderCustomStats` prop to render extra stats on host, and expose `setToastMessage` API via refs which can be used to show toast with custom message [#3360](https://github.com/excalidraw/excalidraw/pull/3360).
 - Support passing a CSRF token when importing libraries to prevent prompting before installation. The token is passed from [https://libraries.excalidraw.com](https://libraries.excalidraw.com/) using the `token` URL key [#3329](https://github.com/excalidraw/excalidraw/pull/3329).
 - #### BREAKING CHANGE

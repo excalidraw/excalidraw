@@ -171,6 +171,8 @@ To view the full example visit :point_down:
 
 [![Edit excalidraw](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/excalidraw-ehlz3?fontsize=14&hidenavigation=1&theme=dark)
 
+</details>
+
 Since Excalidraw doesn't support server side rendering yet so you will have to make sure the component is rendered once host is mounted.
 
 ```js
@@ -184,7 +186,7 @@ export default function IndexPage() {
 }
 ```
 
-</details>
+We also export the types, you can view [example for typescript](https://codesandbox.io/s/excalidraw-types-9h2dm)
 
 #### In Browser
 
