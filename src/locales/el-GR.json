@@ -92,8 +92,8 @@
     "centerHorizontally": "Κέντρο οριζόντια",
     "distributeHorizontally": "Οριζόντια κατανομή",
     "distributeVertically": "Κατακόρυφη κατανομή",
-    "flipHorizontal": "",
-    "flipVertical": "",
+    "flipHorizontal": "Οριζόντια αναστροφή",
+    "flipVertical": "Κατακόρυφη αναστροφή",
     "viewMode": "Λειτουργία προβολής",
     "toggleExportColorScheme": "Εναλλαγή εξαγωγής θέματος χρωμάτων",
     "share": "Κοινοποίηση"

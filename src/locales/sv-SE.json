@@ -92,8 +92,8 @@
     "centerHorizontally": "Centrera horisontellt",
     "distributeHorizontally": "Fördela horisontellt",
     "distributeVertically": "Fördela vertikalt",
-    "flipHorizontal": "",
-    "flipVertical": "",
+    "flipHorizontal": "Vänd horisontellt",
+    "flipVertical": "Vänd vertikalt",
     "viewMode": "Visningsläge",
     "toggleExportColorScheme": "Växla färgschema för export",
     "share": "Dela"

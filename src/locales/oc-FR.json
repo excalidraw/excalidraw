@@ -92,8 +92,8 @@
     "centerHorizontally": "Centrar orizontalament",
     "distributeHorizontally": "Distribuir orizontalament",
     "distributeVertically": "Distribuir verticalament",
-    "flipHorizontal": "",
-    "flipVertical": "",
+    "flipHorizontal": "Virar orizontalament",
+    "flipVertical": "Virar verticalament",
     "viewMode": "Mòde de vista",
     "toggleExportColorScheme": "Alternar l’esquèma de color d’expòrt",
     "share": "Partejar"
