@@ -186,7 +186,7 @@ export default function IndexPage() {
 }
 ```
 
-We also export the types, you can view [example for typescript](https://codesandbox.io/s/excalidraw-types-9h2dm)
+The `types` are available at `@excalidraw/excalidraw/types`, you can view [example for typescript](https://codesandbox.io/s/excalidraw-types-9h2dm)
 
 #### In Browser
 
