@@ -23,12 +23,14 @@ describe("exportToSvg", () => {
     { ...ellipseFixture, height: ELEMENT_HEIGHT, width: ELEMENT_WIDTH },
   ] as NonDeletedExcalidrawElement[];
 
+  const DEFAULT_OPTIONS = {
+    exportBackground: false,
+    viewBackgroundColor: "#ffffff",
+    shouldAddWatermark: false,
+  };
+
   it("with default arguments", () => {
-    const svgElement = exportUtils.exportToSvg(ELEMENTS, {
-      exportBackground: false,
-      viewBackgroundColor: "#ffffff",
-      shouldAddWatermark: false,
-    });
+    const svgElement = exportUtils.exportToSvg(ELEMENTS, DEFAULT_OPTIONS);
 
     expect(svgElement).toMatchSnapshot();
   });
@@ -37,9 +39,9 @@ describe("exportToSvg", () => {
     const BACKGROUND_COLOR = "#abcdef";
 
     const svgElement = exportUtils.exportToSvg(ELEMENTS, {
+      ...DEFAULT_OPTIONS,
       exportBackground: true,
       viewBackgroundColor: BACKGROUND_COLOR,
-      shouldAddWatermark: false,
     });
 
     expect(svgElement.querySelector("rect")).toHaveAttribute(
@@ -50,8 +52,7 @@ describe("exportToSvg", () => {
 
   it("with watermark", () => {
     const svgElement = exportUtils.exportToSvg(ELEMENTS, {
-      exportBackground: false,
-      viewBackgroundColor: "#ffffff",
+      ...DEFAULT_OPTIONS,
       shouldAddWatermark: true,
     });
 
@@ -62,10 +63,8 @@ describe("exportToSvg", () => {
 
   it("with dark mode", () => {
     const svgElement = exportUtils.exportToSvg(ELEMENTS, {
-      exportBackground: false,
-      viewBackgroundColor: "#ffffff",
+      ...DEFAULT_OPTIONS,
       exportWithDarkMode: true,
-      shouldAddWatermark: false,
     });
 
     expect(svgElement.getAttribute("filter")).toMatchInlineSnapshot(
@@ -75,10 +74,8 @@ describe("exportToSvg", () => {
 
   it("with exportPadding, metadata", () => {
     const svgElement = exportUtils.exportToSvg(ELEMENTS, {
-      exportBackground: true,
+      ...DEFAULT_OPTIONS,
       exportPadding: 0,
-      viewBackgroundColor: "#ffffff",
-      shouldAddWatermark: false,
       metadata: "some metadata",
     });
 
@@ -95,11 +92,9 @@ describe("exportToSvg", () => {
     const SCALE = 2;
 
     const svgElement = exportUtils.exportToSvg(ELEMENTS, {
-      exportBackground: true,
+      ...DEFAULT_OPTIONS,
       exportPadding: 0,
-      viewBackgroundColor: "#ffffff",
       scale: SCALE,
-      shouldAddWatermark: false,
     });
 
     expect(svgElement).toHaveAttribute(
