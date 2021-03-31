@@ -230,7 +230,8 @@
     "zoomToSelection": "Zoomar la seleccion"
   },
   "encrypted": {
-    "tooltip": "Vòstres dessenhs son chifrats del cap a la fin en consequéncia los servidors d’Excalidraw los veiràn pas jamai."
+    "tooltip": "Vòstres dessenhs son chifrats del cap a la fin en consequéncia los servidors d’Excalidraw los veiràn pas jamai.",
+    "link": ""
   },
   "stats": {
     "angle": "Angle",
