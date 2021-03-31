@@ -298,6 +298,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     height: window.innerHeight,
   };
   private scene: Scene;
+  private resizeObserverContainer: ResizeObserver | undefined;
   constructor(props: ExcalidrawProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
@@ -786,6 +787,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.scene.addCallback(this.onSceneUpdated);
     this.addEventListeners();
 
+    this.resizeObserverContainer = new ResizeObserver(() =>
+      this.setCanvasOffsets(),
+    );
+    if (this.excalidrawContainerRef?.current?.parentElement) {
+      this.resizeObserverContainer.observe(
+        this.excalidrawContainerRef.current.parentElement,
+      );
+    }
     const searchParams = new URLSearchParams(window.location.search.slice(1));
 
     if (searchParams.has("web-share-target")) {
@@ -799,6 +808,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   }
 
   public componentWillUnmount() {
+    this.resizeObserverContainer?.disconnect();
     this.unmounted = true;
     this.removeEventListeners();
     this.scene.destroy();
