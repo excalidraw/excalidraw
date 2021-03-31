@@ -230,7 +230,8 @@
     "zoomToSelection": "Perbesar ke seleksi"
   },
   "encrypted": {
-    "tooltip": "Gambar anda terenkripsi end-to-end sehingga server Excalidraw tidak akan pernah dapat melihatnya."
+    "tooltip": "Gambar anda terenkripsi end-to-end sehingga server Excalidraw tidak akan pernah dapat melihatnya.",
+    "link": ""
   },
   "stats": {
     "angle": "Sudut",
