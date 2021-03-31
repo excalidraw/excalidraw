@@ -787,11 +787,14 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.scene.addCallback(this.onSceneUpdated);
     this.addEventListeners();
 
-    this.resizeObserverContainer = new ResizeObserver(() =>
-      this.setCanvasOffsets(),
-    );
-    if (this.excalidrawContainerRef?.current?.parentElement) {
-      this.resizeObserverContainer.observe(
+    if (
+      "ResizeObserver" in window &&
+      this.excalidrawContainerRef?.current?.parentElement
+    ) {
+      this.resizeObserverContainer = new ResizeObserver(() =>
+        this.setCanvasOffsets(),
+      );
+      this.resizeObserverContainer?.observe(
         this.excalidrawContainerRef.current.parentElement,
       );
     }
