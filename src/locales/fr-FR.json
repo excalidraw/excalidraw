@@ -230,7 +230,8 @@
     "zoomToSelection": "Zoomer sur la sélection"
   },
   "encrypted": {
-    "tooltip": "Vos dessins sont chiffrés de bout en bout, les serveurs d'Excalidraw ne les verront jamais."
+    "tooltip": "Vos dessins sont chiffrés de bout en bout, les serveurs d'Excalidraw ne les verront jamais.",
+    "link": ""
   },
   "stats": {
     "angle": "Angle",
