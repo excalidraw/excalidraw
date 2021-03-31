@@ -99,14 +99,15 @@ export class ActionManager implements ActionsManagerInterface {
   }
 
   showAllowAction = (name: ActionName) => {
-    const canvasActions = this.getAppState().canvasActions;
+    const canvasActions = this.app.props.canvasActions;
 
     if (canvasActions) {
       switch (name) {
         case "saveScene":
         case "saveAsScene":
         case "clearCanvas":
-          return canvasActions[name];
+        case "loadScene":
+          return canvasActions[name] !== false;
       }
     }
 

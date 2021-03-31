@@ -92,7 +92,6 @@ export type AppState = {
   theme: "light" | "dark";
   gridSize: number | null;
   viewModeEnabled: boolean;
-  canvasActions: CanvasActionsState;
 
   /** top-most selected groups (i.e. does not include nested groups) */
   selectedGroupIds: { [groupId: string]: boolean };
@@ -208,11 +207,10 @@ export enum UserIdleState {
   IDLE = "idle",
 }
 
-export type CanvasActionsState = Required<CanvasActions>;
-
 export type CanvasActions = {
-  saveScene?: boolean;
-  saveAsScene?: boolean;
   clearCanvas?: boolean;
   export?: boolean;
+  loadScene?: boolean;
+  saveAsScene?: boolean;
+  saveScene?: boolean;
 };

@@ -311,7 +311,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       gridModeEnabled = false,
       theme = defaultAppState.theme,
       name = defaultAppState.name,
-      canvasActions = {},
     } = props;
     this.state = {
       ...defaultAppState,
@@ -324,10 +323,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       zenModeEnabled,
       gridSize: gridModeEnabled ? GRID_SIZE : null,
       name,
-      canvasActions: {
-        ...defaultAppState.canvasActions,
-        ...canvasActions,
-      },
     };
     if (excalidrawRef) {
       const readyPromise =
@@ -483,6 +478,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           }
           showThemeBtn={typeof this.props?.theme === "undefined"}
           libraryReturnUrl={this.props.libraryReturnUrl}
+          canvasActions={this.props.canvasActions}
         />
         <div className="excalidraw-textEditorContainer" />
         {this.state.showStats && (
@@ -546,8 +542,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         let gridSize = actionResult?.appState?.gridSize || null;
         let theme = actionResult?.appState?.theme || "light";
         let name = actionResult?.appState?.name ?? this.state.name;
-        let canvasActions =
-          actionResult?.appState?.canvasActions ?? this.state.canvasActions;
         if (typeof this.props.viewModeEnabled !== "undefined") {
           viewModeEnabled = this.props.viewModeEnabled;
         }
@@ -568,10 +562,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           name = this.props.name;
         }
 
-        if (typeof this.props.canvasActions !== "undefined") {
-          canvasActions = { ...canvasActions, ...this.props.canvasActions };
-        }
-
         this.setState(
           (state) => {
             // using Object.assign instead of spread to fool TS 4.2.2+ into
@@ -589,7 +579,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
               gridSize,
               theme,
               name,
-              canvasActions,
             });
           },
           () => {
@@ -946,18 +935,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (this.props.name && prevProps.name !== this.props.name) {
       this.setState({
         name: this.props.name,
-      });
-    }
-
-    if (
-      this.props.canvasActions &&
-      prevProps.canvasActions !== this.props.canvasActions
-    ) {
-      this.setState({
-        canvasActions: {
-          ...getDefaultAppState().canvasActions,
-          ...this.props.canvasActions,
-        },
       });
     }
 
