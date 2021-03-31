@@ -39,5 +39,37 @@
         }
       ]
     }
-  }
+  },
+  "screenshots": [
+    {
+      "src": "/screenshots/screenshot-1.png",
+      "type": "image/png",
+      "sizes": "462x945"
+    },
+    {
+      "src": "/screenshots/screenshot-2.png",
+      "type": "image/png",
+      "sizes": "462x945"
+    },
+    {
+      "src": "/screenshots/screenshot-3.png",
+      "type": "image/png",
+      "sizes": "462x945"
+    },
+    {
+      "src": "/screenshots/screenshot-4.png",
+      "type": "image/png",
+      "sizes": "462x945"
+    },
+    {
+      "src": "/screenshots/screenshot-5.png",
+      "type": "image/png",
+      "sizes": "462x945"
+    },
+    {
+      "src": "/screenshots/screenshot-6.png",
+      "type": "image/png",
+      "sizes": "462x945"
+    }
+  ]
 }
