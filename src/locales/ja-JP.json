@@ -230,7 +230,8 @@
     "zoomToSelection": "選択要素にズーム"
   },
   "encrypted": {
-    "tooltip": "描画内容はエンドツーエンド暗号化が施されており、Excalidrawサーバーが内容を見ることはできません。"
+    "tooltip": "描画内容はエンドツーエンド暗号化が施されており、Excalidrawサーバーが内容を見ることはできません。",
+    "link": ""
   },
   "stats": {
     "angle": "角度",
