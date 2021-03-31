@@ -230,7 +230,8 @@
     "zoomToSelection": "Auf Auswahl zoomen"
   },
   "encrypted": {
-    "tooltip": "Da deine Zeichnungen Ende-zu-Ende verschlüsselt werden, sehen auch unsere Excalidraw-Server sie niemals."
+    "tooltip": "Da deine Zeichnungen Ende-zu-Ende verschlüsselt werden, sehen auch unsere Excalidraw-Server sie niemals.",
+    "link": ""
   },
   "stats": {
     "angle": "Winkel",
