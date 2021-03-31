@@ -231,7 +231,7 @@
   },
   "encrypted": {
     "tooltip": "Vòstres dessenhs son chifrats del cap a la fin en consequéncia los servidors d’Excalidraw los veiràn pas jamai.",
-    "link": ""
+    "link": "Article de blòg sul chiframent del cap a la fin dins Excalidraw"
   },
   "stats": {
     "angle": "Angle",
