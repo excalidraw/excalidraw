@@ -18,7 +18,7 @@ const enableActionFlipHorizontal = (
     getNonDeletedElements(elements),
     appState,
   );
-  return eligibleElements.length === 1 && eligibleElements[0].type !== "text";
+  return eligibleElements.length >= 1 && eligibleElements[0].type !== "text";
 };
 
 const enableActionFlipVertical = (
@@ -29,7 +29,7 @@ const enableActionFlipVertical = (
     getNonDeletedElements(elements),
     appState,
   );
-  return eligibleElements.length === 1;
+  return eligibleElements.length >= 1;
 };
 
 export const actionFlipHorizontal = register({
@@ -71,11 +71,6 @@ const flipSelectedElements = (
     getNonDeletedElements(elements),
     appState,
   );
-
-  // remove once we allow for groups of elements to be flipped
-  if (selectedElements.length > 1) {
-    return elements;
-  }
 
   const updatedElements = flipElements(
     selectedElements,
