@@ -350,6 +350,7 @@ const LayerUI = ({
       href="https://blog.excalidraw.com/end-to-end-encryption/"
       target="_blank"
       rel="noopener noreferrer"
+      aria-label={t("encrypted.link")}
     >
       <Tooltip label={t("encrypted.tooltip")} position="above" long={true}>
         {shield}
