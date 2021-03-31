@@ -231,7 +231,7 @@
   },
   "encrypted": {
     "tooltip": "Dine tegninger er ende-til-ende-krypterte slik at Excalidraw sine servere aldri vil se dem.",
-    "link": ""
+    "link": "Blogginnlegg om ende-til-ende-kryptering i Excalidraw"
   },
   "stats": {
     "angle": "Vinkel",
