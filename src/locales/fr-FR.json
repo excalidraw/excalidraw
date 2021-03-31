@@ -231,7 +231,7 @@
   },
   "encrypted": {
     "tooltip": "Vos dessins sont chiffrés de bout en bout, les serveurs d'Excalidraw ne les verront jamais.",
-    "link": ""
+    "link": "Article de blog sur le chiffrement de bout en bout dans Excalidraw"
   },
   "stats": {
     "angle": "Angle",
