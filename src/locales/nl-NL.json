@@ -231,7 +231,7 @@
   },
   "encrypted": {
     "tooltip": "Je tekeningen zijn beveiligd met end-to-end encryptie, dus Excalidraw's servers zullen nooit zien wat je tekent.",
-    "link": ""
+    "link": "Blog post over end-to-end versleuteling in Excalidraw"
   },
   "stats": {
     "angle": "Hoek",
