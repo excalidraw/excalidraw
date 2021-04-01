@@ -61,7 +61,7 @@
     "architect": "Arquitecte",
     "artist": "Artista",
     "cartoonist": "Dibuixant",
-    "fileTitle": "",
+    "fileTitle": "Nom del fitxer",
     "colorPicker": "Selector de colors",
     "canvasBackground": "Fons del llenç",
     "drawingCanvas": "Llenç de dibuix",
@@ -92,8 +92,8 @@
     "centerHorizontally": "Centrar horitzontalment",
     "distributeHorizontally": "Distribuir horitzontalment",
     "distributeVertically": "Distribuir verticalment",
-    "flipHorizontal": "",
-    "flipVertical": "",
+    "flipHorizontal": "Capgira horitzontalment",
+    "flipVertical": "Capgira verticalment",
     "viewMode": "Mode de visualització",
     "toggleExportColorScheme": "Canvia l'esquema de colors de l'exportació",
     "share": "Compartir"
@@ -231,7 +231,7 @@
   },
   "encrypted": {
     "tooltip": "Els vostres dibuixos estan xifrats de punta a punta de manera que els servidors d’Excalidraw no els veuran mai.",
-    "link": ""
+    "link": "Article del blog sobre encriptació d'extrem a extrem a Excalidraw"
   },
   "stats": {
     "angle": "Angle",
