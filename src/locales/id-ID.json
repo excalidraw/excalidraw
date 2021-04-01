@@ -92,8 +92,8 @@
     "centerHorizontally": "Pusatkan secara horizontal",
     "distributeHorizontally": "Distribusikan horizontal",
     "distributeVertically": "Distribusikan vertikal",
-    "flipHorizontal": "",
-    "flipVertical": "",
+    "flipHorizontal": "Balikkan horizontal",
+    "flipVertical": "Balikkan vertikal",
     "viewMode": "Mode tampilan",
     "toggleExportColorScheme": "Ubah skema warna ekspor",
     "share": "Bagikan"
@@ -230,7 +230,8 @@
     "zoomToSelection": "Perbesar ke seleksi"
   },
   "encrypted": {
-    "tooltip": "Gambar anda terenkripsi end-to-end sehingga server Excalidraw tidak akan pernah dapat melihatnya."
+    "tooltip": "Gambar anda terenkripsi end-to-end sehingga server Excalidraw tidak akan pernah dapat melihatnya.",
+    "link": "Pos blog tentang enkripsi ujung ke ujung di Excalidraw"
   },
   "stats": {
     "angle": "Sudut",
