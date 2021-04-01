@@ -478,11 +478,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           }
           showThemeBtn={typeof this.props?.theme === "undefined"}
           libraryReturnUrl={this.props.libraryReturnUrl}
-          showExport={
-            this.props.UIOptions
-              ? this.props.UIOptions.canvasActions.export
-              : true
-          }
+          UIOptions={this.props.UIOptions}
         />
         <div className="excalidraw-textEditorContainer" />
         {this.state.showStats && (

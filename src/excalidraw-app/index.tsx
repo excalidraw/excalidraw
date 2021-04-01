@@ -18,7 +18,7 @@ import {
   TITLE_TIMEOUT,
   URL_HASH_KEYS,
   VERSION_TIMEOUT,
-  UI_OPTIONS,
+  DEFAULT_UI_OPTIONS,
 } from "../constants";
 import { loadFromBlob } from "../data/blob";
 import { DataState, ImportedDataState } from "../data/types";
@@ -348,7 +348,7 @@ const ExcalidrawWrapper = () => {
         renderFooter={renderFooter}
         langCode={langCode}
         renderCustomStats={renderCustomStats}
-        UIOptions={UI_OPTIONS}
+        UIOptions={DEFAULT_UI_OPTIONS}
       />
       {excalidrawAPI && <CollabWrapper excalidrawAPI={excalidrawAPI} />}
       {errorMessage && (

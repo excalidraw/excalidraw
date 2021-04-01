@@ -207,14 +207,14 @@ export enum UserIdleState {
   IDLE = "idle",
 }
 
-export type UIOptions = {
-  canvasActions: CanvasActions;
-};
-
-export type CanvasActions = {
+type CanvasActions = {
   clearCanvas: boolean;
   export: boolean;
   loadScene: boolean;
   saveAsScene: boolean;
   saveScene: boolean;
+};
+
+export type UIOptions = {
+  canvasActions: CanvasActions;
 };

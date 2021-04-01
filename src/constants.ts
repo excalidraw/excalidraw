@@ -1,5 +1,6 @@
 import { FontFamily } from "./element/types";
 import cssVariables from "./css/variables.module.scss";
+import { UIOptions } from "./types";
 
 export const APP_NAME = "Excalidraw";
 
@@ -125,14 +126,12 @@ export const URL_HASH_KEYS = {
   addLibrary: "addLibrary",
 } as const;
 
-export const CANVAS_ACTIONS = {
-  clearCanvas: true,
-  export: true,
-  loadScene: true,
-  saveAsScene: true,
-  saveScene: true,
-};
-
-export const UI_OPTIONS = {
-  canvasActions: CANVAS_ACTIONS,
+export const DEFAULT_UI_OPTIONS: UIOptions = {
+  canvasActions: {
+    clearCanvas: true,
+    export: true,
+    loadScene: true,
+    saveAsScene: true,
+    saveScene: true,
+  },
 };

@@ -10,7 +10,7 @@ import "../../css/styles.scss";
 import { ExcalidrawAPIRefValue, ExcalidrawProps } from "../../types";
 import { IsMobileProvider } from "../../is-mobile";
 import { defaultLang } from "../../i18n";
-import { CANVAS_ACTIONS } from "../../constants";
+import { DEFAULT_UI_OPTIONS } from "../../constants";
 
 const Excalidraw = (props: ExcalidrawProps) => {
   const {
@@ -34,10 +34,12 @@ const Excalidraw = (props: ExcalidrawProps) => {
     renderCustomStats,
   } = props;
 
+  const canvasActions = props.UIOptions?.canvasActions;
+
   const UIOptions = {
     canvasActions: {
-      ...CANVAS_ACTIONS,
-      ...(props.UIOptions?.canvasActions || {}),
+      ...DEFAULT_UI_OPTIONS.canvasActions,
+      ...canvasActions,
     },
   };
 
@@ -107,7 +109,7 @@ const areEqual = (
 
 Excalidraw.defaultProps = {
   lanCode: defaultLang.code,
-  UIOptions: {},
+  UIOptions: DEFAULT_UI_OPTIONS,
 };
 
 const forwardedRefComp = forwardRef<
