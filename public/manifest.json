@@ -42,32 +42,32 @@
   },
   "screenshots": [
     {
-      "src": "/screenshots/screenshot-1.png",
+      "src": "/screenshots/virtual-whiteboard.png",
       "type": "image/png",
       "sizes": "462x945"
     },
     {
-      "src": "/screenshots/screenshot-2.png",
+      "src": "/screenshots/wireframe.png",
       "type": "image/png",
       "sizes": "462x945"
     },
     {
-      "src": "/screenshots/screenshot-3.png",
+      "src": "/screenshots/illustration.png",
       "type": "image/png",
       "sizes": "462x945"
     },
     {
-      "src": "/screenshots/screenshot-4.png",
+      "src": "/screenshots/shapes.png",
       "type": "image/png",
       "sizes": "462x945"
     },
     {
-      "src": "/screenshots/screenshot-5.png",
+      "src": "/screenshots/collaboration.png",
       "type": "image/png",
       "sizes": "462x945"
     },
     {
-      "src": "/screenshots/screenshot-6.png",
+      "src": "/screenshots/export.png",
       "type": "image/png",
       "sizes": "462x945"
     }
