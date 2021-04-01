@@ -20,7 +20,8 @@ import { ExportType } from "../scene/types";
 import { AppState, ExcalidrawProps, LibraryItem, LibraryItems } from "../types";
 import { muteFSAbortError } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher, ZoomActions } from "./Actions";
-import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
+import { BackgroundPicker } from "./BackgroundPicker";
+import { DarkModeToggle } from "./DarkModeToggle";
 import CollabButton from "./CollabButton";
 import { ErrorDialog } from "./ErrorDialog";
 import { ExportCB, ExportDialog } from "./ExportDialog";
@@ -399,28 +400,6 @@ const LayerUI = ({
     );
   };
 
-  const renderViewModeCanvasActions = () => {
-    return (
-      <Section
-        heading="canvasActions"
-        className={clsx("zen-mode-transition", {
-          "transition-left": zenModeEnabled,
-        })}
-      >
-        {/* the zIndex ensures this menu has higher stacking order,
-         see https://github.com/excalidraw/excalidraw/pull/1445 */}
-        <Island padding={2} style={{ zIndex: 1 }}>
-          <Stack.Col gap={4}>
-            <Stack.Row gap={1} justifyContent="space-between">
-              {actionManager.renderAction("saveScene")}
-              {actionManager.renderAction("saveAsScene")}
-              {renderExportDialog()}
-            </Stack.Row>
-          </Stack.Col>
-        </Island>
-      </Section>
-    );
-  };
   const renderCanvasActions = () => (
     <Section
       heading="canvasActions"
@@ -434,9 +413,6 @@ const LayerUI = ({
         <Stack.Col gap={4}>
           <Stack.Row gap={1} justifyContent="space-between">
             {actionManager.renderAction("loadScene")}
-            {actionManager.renderAction("saveScene")}
-            {actionManager.renderAction("saveAsScene")}
-            {renderExportDialog()}
             {actionManager.renderAction("clearCanvas")}
             {onCollabButtonClick && (
               <CollabButton
@@ -445,13 +421,18 @@ const LayerUI = ({
                 onClick={onCollabButtonClick}
               />
             )}
+            {showThemeBtn && (
+              <div style={{ marginInlineStart: "0.25rem" }}>
+                <DarkModeToggle
+                  value={appState.theme}
+                  onChange={(theme) => {
+                    setAppState({ theme });
+                  }}
+                />
+              </div>
+            )}
           </Stack.Row>
-          <BackgroundPickerAndDarkModeToggle
-            actionManager={actionManager}
-            appState={appState}
-            setAppState={setAppState}
-            showThemeBtn={showThemeBtn}
-          />
+          <BackgroundPicker actionManager={actionManager} />
         </Stack.Col>
       </Island>
     </Section>
@@ -521,9 +502,7 @@ const LayerUI = ({
             gap={4}
             className={clsx({ "disable-pointerEvents": zenModeEnabled })}
           >
-            {viewModeEnabled
-              ? renderViewModeCanvasActions()
-              : renderCanvasActions()}
+            {!viewModeEnabled && renderCanvasActions()}
             {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
           </Stack.Col>
           {!viewModeEnabled && (
@@ -581,11 +560,11 @@ const LayerUI = ({
     );
   };
 
-  const renderBottomAppMenu = () => {
+  const renderBottomMiddleAppMenu = () => {
     return (
       <div
-        className={clsx("App-menu App-menu_bottom zen-mode-transition", {
-          "App-menu_bottom--transition-left": zenModeEnabled,
+        className={clsx("App-menu App-menu_bottom-left zen-mode-transition", {
+          "App-menu_bottom-left--transition-left": zenModeEnabled,
         })}
       >
         <Stack.Col gap={2}>
@@ -599,6 +578,25 @@ const LayerUI = ({
             {renderEncryptedIcon()}
           </Section>
         </Stack.Col>
+      </div>
+    );
+  };
+
+  const renderBottomAppMenu = () => {
+    return (
+      <div
+        // zen-mode-transition
+        className={clsx("App-menu App-menu_bottom")}
+      >
+        <Section heading="fileActions">
+          <Island padding={1}>
+            <Stack.Row gap={3} justifyContent="space-between">
+              {actionManager.renderAction("saveScene")}
+              {actionManager.renderAction("saveAsScene")}
+              {renderExportDialog()}
+            </Stack.Row>
+          </Island>
+        </Section>
       </div>
     );
   };
@@ -695,6 +693,7 @@ const LayerUI = ({
     >
       {dialogs}
       {renderFixedSideContainer()}
+      {renderBottomMiddleAppMenu()}
       {renderBottomAppMenu()}
       {renderGitHubCorner()}
       {renderFooter()}

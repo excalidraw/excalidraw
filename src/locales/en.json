@@ -162,6 +162,7 @@
   },
   "headings": {
     "canvasActions": "Canvas actions",
+    "fileActions": "File actions",
     "selectedShapeActions": "Selected shape actions",
     "shapes": "Shapes"
   },

@@ -105,10 +105,10 @@
         transform: translate(-999px, 0);
       }
 
-      :root[dir="ltr"] &.App-menu_bottom--transition-left {
+      :root[dir="ltr"] &.App-menu_bottom-left--transition-left {
         transform: translate(-92px, 0);
       }
-      :root[dir="rtl"] &.App-menu_bottom--transition-left {
+      :root[dir="rtl"] &.App-menu_bottom-left--transition-left {
         transform: translate(92px, 0);
       }
     }

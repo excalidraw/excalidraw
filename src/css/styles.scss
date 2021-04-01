@@ -317,15 +317,22 @@
     justify-self: flex-end;
   }
 
-  .App-menu_bottom {
+  .App-menu_bottom,
+  .App-menu_bottom-left {
     position: absolute;
-    bottom: 0;
-    grid-template-columns: 1fr auto 1fr;
+    bottom: 0.25rem;
     grid-gap: 4px;
     align-items: flex-start;
     cursor: default;
     pointer-events: none !important;
     z-index: 100;
+  }
+  .App-menu_bottom {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .App-menu_bottom-left {
+    grid-template-columns: 1fr auto 1fr;
 
     :root[dir="ltr"] & {
       left: 0.25rem;
@@ -346,15 +353,16 @@
     }
   }
 
+  .layer-ui__wrapper:not(.disable-pointerEvents) .App-menu_bottom-left > *,
   .layer-ui__wrapper:not(.disable-pointerEvents) .App-menu_bottom > * {
     pointer-events: all;
   }
 
-  .App-menu_bottom > *:first-child {
+  .App-menu_bottom-left > *:first-child {
     justify-self: flex-start;
   }
 
-  .App-menu_bottom > *:last-child {
+  .App-menu_bottom-left > *:last-child {
     justify-self: flex-end;
   }
 
