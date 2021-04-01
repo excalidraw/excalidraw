@@ -298,7 +298,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     height: window.innerHeight,
   };
   private scene: Scene;
-  private resizeObserverContainer: ResizeObserver | undefined;
+  private resizeObserver: ResizeObserver | undefined;
   constructor(props: ExcalidrawProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
@@ -791,10 +791,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       "ResizeObserver" in window &&
       this.excalidrawContainerRef?.current?.parentElement
     ) {
-      this.resizeObserverContainer = new ResizeObserver(() =>
-        this.setCanvasOffsets(),
-      );
-      this.resizeObserverContainer?.observe(
+      this.resizeObserver = new ResizeObserver(() => this.setCanvasOffsets());
+      this.resizeObserver?.observe(
         this.excalidrawContainerRef.current.parentElement,
       );
     }
@@ -811,7 +809,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   }
 
   public componentWillUnmount() {
-    this.resizeObserverContainer?.disconnect();
+    this.resizeObserver?.disconnect();
     this.unmounted = true;
     this.removeEventListeners();
     this.scene.destroy();
