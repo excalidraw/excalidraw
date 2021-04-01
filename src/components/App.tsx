@@ -447,10 +447,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           "excalidraw--view-mode": viewModeEnabled,
         })}
         ref={this.excalidrawContainerRef}
-        style={{
-          width: canvasDOMWidth,
-          height: canvasDOMHeight,
-        }}
       >
         <LayerUI
           canvas={this.canvas}
@@ -787,14 +783,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.scene.addCallback(this.onSceneUpdated);
     this.addEventListeners();
 
-    if (
-      "ResizeObserver" in window &&
-      this.excalidrawContainerRef?.current?.parentElement
-    ) {
+    if ("ResizeObserver" in window && this.excalidrawContainerRef?.current) {
       this.resizeObserver = new ResizeObserver(() => this.setCanvasOffsets());
-      this.resizeObserver?.observe(
-        this.excalidrawContainerRef.current.parentElement,
-      );
+      this.resizeObserver?.observe(this.excalidrawContainerRef.current);
     }
     const searchParams = new URLSearchParams(window.location.search.slice(1));
 
@@ -802,9 +793,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       // Obtain a file that was shared via the Web Share Target API.
       this.restoreFileFromShare();
     } else {
-      this.setState(this.getCanvasOffsets(), () => {
-        this.initializeScene();
-      });
+      this.updateDOMRect();
     }
   }
 
@@ -4093,13 +4082,34 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
   }, 300);
 
+  private updateDOMRect = () => {
+    if (this.excalidrawContainerRef?.current) {
+      const parentElement = this.excalidrawContainerRef.current;
+      const {
+        width,
+        height,
+        left: offsetLeft,
+        top: offsetTop,
+      } = parentElement.getBoundingClientRect();
+      this.setState(
+        {
+          width,
+          height,
+          offsetLeft,
+          offsetTop,
+        },
+        () => this.initializeScene(),
+      );
+    }
+  };
+
   public setCanvasOffsets = () => {
     this.setState({ ...this.getCanvasOffsets() });
   };
 
   private getCanvasOffsets(): Pick<AppState, "offsetTop" | "offsetLeft"> {
-    if (this.excalidrawContainerRef?.current?.parentElement) {
-      const parentElement = this.excalidrawContainerRef.current.parentElement;
+    if (this.excalidrawContainerRef?.current) {
+      const parentElement = this.excalidrawContainerRef.current;
       const { left, top } = parentElement.getBoundingClientRect();
       return {
         offsetLeft: left,
