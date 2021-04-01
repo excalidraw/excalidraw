@@ -230,7 +230,8 @@
     "zoomToSelection": "Panoramare la selecție"
   },
   "encrypted": {
-    "tooltip": "Desenele tale sunt criptate integral, astfel că serverele Excalidraw nu le vor vedea niciodată."
+    "tooltip": "Desenele tale sunt criptate integral, astfel că serverele Excalidraw nu le vor vedea niciodată.",
+    "link": "Articol de blog pe criptarea integrală din Excalidraw"
   },
   "stats": {
     "angle": "Unghi",

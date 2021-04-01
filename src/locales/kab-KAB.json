@@ -92,8 +92,8 @@
     "centerHorizontally": "Di tlemmast s uglawi",
     "distributeHorizontally": "Freq s uglawi",
     "distributeVertically": "Freq s yibeddi",
-    "flipHorizontal": "",
-    "flipVertical": "",
+    "flipHorizontal": "Tuttya taglawant",
+    "flipVertical": "Tuttya tubdidt",
     "viewMode": "Askar n tmuɣli",
     "toggleExportColorScheme": "Sermed/sens asifeḍ usentel n yini",
     "share": "Bḍu"
@@ -230,7 +230,8 @@
     "zoomToSelection": "Simɣur ɣer tefrayt"
   },
   "encrypted": {
-    "tooltip": "Unuɣen-inek (m) ttuwgelhnen seg yixef s ixef dɣa iqeddacen n Excalidraw werǧin ad ten-walin. "
+    "tooltip": "Unuɣen-inek (m) ttuwgelhnen seg yixef s ixef dɣa iqeddacen n Excalidraw werǧin ad ten-walin. ",
+    "link": "Amagrad ɣef uwgelhen ixef s ixef di Excalidraw"
   },
   "stats": {
     "angle": "Tiɣmeṛt",

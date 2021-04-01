@@ -230,7 +230,8 @@
     "zoomToSelection": "Seçime yakınlaş"
   },
   "encrypted": {
-    "tooltip": "Çizimleriniz uçtan-uca şifrelenmiştir, Excalidraw'ın sunucuları bile onları göremez."
+    "tooltip": "Çizimleriniz uçtan-uca şifrelenmiştir, Excalidraw'ın sunucuları bile onları göremez.",
+    "link": ""
   },
   "stats": {
     "angle": "Açı",
