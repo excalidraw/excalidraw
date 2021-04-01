@@ -230,7 +230,8 @@
     "zoomToSelection": "선택 영역으로 확대/축소"
   },
   "encrypted": {
-    "tooltip": "그림은 종단 간 암호화되므로 Excalidraw의 서버는 절대로 내용을 알 수 없습니다."
+    "tooltip": "그림은 종단 간 암호화되므로 Excalidraw의 서버는 절대로 내용을 알 수 없습니다.",
+    "link": ""
   },
   "stats": {
     "angle": "각도",

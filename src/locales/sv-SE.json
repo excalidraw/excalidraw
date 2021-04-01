@@ -230,7 +230,8 @@
     "zoomToSelection": "Zooma till markering"
   },
   "encrypted": {
-    "tooltip": "Dina skisser är krypterade från ände till ände så Excalidraws servrar kommer aldrig att se dem."
+    "tooltip": "Dina skisser är krypterade från ände till ände så Excalidraws servrar kommer aldrig att se dem.",
+    "link": "Blogginlägg om kryptering från ände till ände i Excalidraw"
   },
   "stats": {
     "angle": "Vinkel",

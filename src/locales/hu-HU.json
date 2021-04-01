@@ -230,7 +230,8 @@
     "zoomToSelection": ""
   },
   "encrypted": {
-    "tooltip": "A rajzaidat végpontok közötti titkosítással tároljuk, tehát az Excalidraw szervereiről se tud más belenézni."
+    "tooltip": "A rajzaidat végpontok közötti titkosítással tároljuk, tehát az Excalidraw szervereiről se tud más belenézni.",
+    "link": ""
   },
   "stats": {
     "angle": "Szög",

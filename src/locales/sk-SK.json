@@ -230,7 +230,8 @@
     "zoomToSelection": "Priblížiť na výber"
   },
   "encrypted": {
-    "tooltip": "Vaše kresby používajú end-to-end šifrovanie, takže ich Excalidraw server nedokáže prečítať."
+    "tooltip": "Vaše kresby používajú end-to-end šifrovanie, takže ich Excalidraw server nedokáže prečítať.",
+    "link": ""
   },
   "stats": {
     "angle": "Uhol",
