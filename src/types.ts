@@ -191,7 +191,7 @@ export interface ExcalidrawProps {
     elements: readonly NonDeletedExcalidrawElement[],
     appState: AppState,
   ) => JSX.Element;
-  canvasActions?: CanvasActions;
+  UIOptions?: UIOptions;
 }
 
 export type SceneData = {
@@ -207,10 +207,14 @@ export enum UserIdleState {
   IDLE = "idle",
 }
 
+export type UIOptions = {
+  canvasActions: CanvasActions;
+};
+
 export type CanvasActions = {
-  clearCanvas?: boolean;
-  export?: boolean;
-  loadScene?: boolean;
-  saveAsScene?: boolean;
-  saveScene?: boolean;
+  clearCanvas: boolean;
+  export: boolean;
+  loadScene: boolean;
+  saveAsScene: boolean;
+  saveScene: boolean;
 };

@@ -99,7 +99,7 @@ export class ActionManager implements ActionsManagerInterface {
   }
 
   showAllowAction = (name: ActionName) => {
-    const canvasActions = this.app.props.canvasActions;
+    const canvasActions = this.app.props?.UIOptions?.canvasActions;
 
     if (canvasActions) {
       switch (name) {
@@ -107,7 +107,7 @@ export class ActionManager implements ActionsManagerInterface {
         case "saveAsScene":
         case "clearCanvas":
         case "loadScene":
-          return canvasActions[name] !== false;
+          return canvasActions[name];
       }
     }
 

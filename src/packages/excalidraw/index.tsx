@@ -10,6 +10,7 @@ import "../../css/styles.scss";
 import { ExcalidrawAPIRefValue, ExcalidrawProps } from "../../types";
 import { IsMobileProvider } from "../../is-mobile";
 import { defaultLang } from "../../i18n";
+import { CANVAS_ACTIONS } from "../../constants";
 
 const Excalidraw = (props: ExcalidrawProps) => {
   const {
@@ -31,8 +32,14 @@ const Excalidraw = (props: ExcalidrawProps) => {
     theme,
     name,
     renderCustomStats,
-    canvasActions,
   } = props;
+
+  const UIOptions = {
+    canvasActions: {
+      ...CANVAS_ACTIONS,
+      ...(props.UIOptions?.canvasActions || {}),
+    },
+  };
 
   useEffect(() => {
     // Block pinch-zooming on iOS outside of the content area
@@ -74,7 +81,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
           theme={theme}
           name={name}
           renderCustomStats={renderCustomStats}
-          canvasActions={canvasActions}
+          UIOptions={UIOptions}
         />
       </IsMobileProvider>
     </InitializeApp>
@@ -100,6 +107,7 @@ const areEqual = (
 
 Excalidraw.defaultProps = {
   lanCode: defaultLang.code,
+  UIOptions: {},
 };
 
 const forwardedRefComp = forwardRef<
