@@ -128,6 +128,7 @@ export const URL_HASH_KEYS = {
 
 export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
   canvasActions: {
+    changeViewBackgroundColor: true,
     clearCanvas: true,
     export: true,
     loadScene: true,

@@ -208,6 +208,7 @@ export enum UserIdleState {
 }
 
 type CanvasActions = {
+  changeViewBackgroundColor?: boolean;
   clearCanvas?: boolean;
   export?: boolean;
   loadScene?: boolean;

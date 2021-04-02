@@ -33,6 +33,7 @@ export const actionChangeViewBackgroundColor = register({
           type="canvasBackground"
           color={appState.viewBackgroundColor}
           onChange={(color) => updateData(color)}
+          data-testid="canvas-background-picker"
         />
       </div>
     );
