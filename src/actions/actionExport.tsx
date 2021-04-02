@@ -1,7 +1,5 @@
 import React from "react";
-import { trackEvent } from "../analytics";
 import { load, questionCircle, save, saveAs } from "../components/icons";
-import { ProjectName } from "../components/ProjectName";
 import { ToolButton } from "../components/ToolButton";
 import "../components/ToolIcon.scss";
 import { Tooltip } from "../components/Tooltip";
@@ -12,24 +10,6 @@ import { useIsMobile } from "../is-mobile";
 import { KEYS } from "../keys";
 import { register } from "./register";
 import { supported } from "browser-fs-access";
-
-export const actionChangeProjectName = register({
-  name: "changeProjectName",
-  perform: (_elements, appState, value) => {
-    trackEvent("change", "title");
-    return { appState: { ...appState, name: value }, commitToHistory: false };
-  },
-  PanelComponent: ({ appState, updateData, appProps }) => (
-    <ProjectName
-      label={t("labels.fileTitle")}
-      value={appState.name || "Unnamed"}
-      onChange={(name: string) => updateData(name)}
-      isNameEditable={
-        typeof appProps.name === "undefined" && !appState.viewModeEnabled
-      }
-    />
-  ),
-});
 
 export const actionChangeExportBackground = register({
   name: "changeExportBackground",
