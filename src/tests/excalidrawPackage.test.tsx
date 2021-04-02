@@ -130,4 +130,66 @@ describe("<Excalidraw/>", () => {
       expect(textInput?.nodeName).toBe("SPAN");
     });
   });
+
+  describe("Test UIOptions prop", () => {
+    it('should not hide any UI element when the UIOptions prop is "undefined"', async () => {
+      const { container } = await render(<Excalidraw />);
+
+      expect(queryByTestId(container, "clear-canvas-button")).toBeTruthy();
+      expect(queryByTestId(container, "export-button")).toBeTruthy();
+      expect(queryByTestId(container, "load-button")).toBeTruthy();
+      expect(queryByTestId(container, "save-as-button")).toBeTruthy();
+      expect(queryByTestId(container, "save-button")).toBeTruthy();
+    });
+
+    it('should not hide any UI element when canvasActions is "undefined"', async () => {
+      const { container } = await render(<Excalidraw UIOptions={{}} />);
+
+      expect(queryByTestId(container, "clear-canvas-button")).toBeTruthy();
+      expect(queryByTestId(container, "export-button")).toBeTruthy();
+      expect(queryByTestId(container, "load-button")).toBeTruthy();
+      expect(queryByTestId(container, "save-as-button")).toBeTruthy();
+      expect(queryByTestId(container, "save-button")).toBeTruthy();
+    });
+
+    it("should hide clear canvas button when clearCanvas is false", async () => {
+      const { container } = await render(
+        <Excalidraw UIOptions={{ canvasActions: { clearCanvas: false } }} />,
+      );
+
+      expect(queryByTestId(container, "clear-canvas-button")).toBeNull();
+    });
+
+    it("should hide export button when export is false", async () => {
+      const { container } = await render(
+        <Excalidraw UIOptions={{ canvasActions: { export: false } }} />,
+      );
+
+      expect(queryByTestId(container, "export-button")).toBeNull();
+    });
+
+    it("should hide load button when loadScene is false", async () => {
+      const { container } = await render(
+        <Excalidraw UIOptions={{ canvasActions: { loadScene: false } }} />,
+      );
+
+      expect(queryByTestId(container, "load-button")).toBeNull();
+    });
+
+    it("should hide save as button when saveAsScene is false", async () => {
+      const { container } = await render(
+        <Excalidraw UIOptions={{ canvasActions: { saveAsScene: false } }} />,
+      );
+
+      expect(queryByTestId(container, "save-as-button")).toBeNull();
+    });
+
+    it("should hide save button when saveScene is false", async () => {
+      const { container } = await render(
+        <Excalidraw UIOptions={{ canvasActions: { saveScene: false } }} />,
+      );
+
+      expect(queryByTestId(container, "save-button")).toBeNull();
+    });
+  });
 });

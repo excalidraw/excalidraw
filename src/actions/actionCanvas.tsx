@@ -72,6 +72,7 @@ export const actionClearCanvas = register({
           updateData(null);
         }
       }}
+      data-testid="clear-canvas-button"
     />
   ),
 });
