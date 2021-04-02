@@ -38,7 +38,7 @@
     "fontSize": "Talha poliça",
     "fontFamily": "Familha de poliça",
     "onlySelected": "Seleccion sonque",
-    "withBackground": "Inclure rèireplan",
+    "withBackground": "Inclure lo rèireplan",
     "exportEmbedScene": "Integrar la scèna al fichièr d’expo",
     "exportEmbedScene_details": "Las donadas de scèna seràn enregistradas dins lo fichièr PNG/SVG exportat, per que la scèna pòsca èsser restaurada a partir d’aqueste fichièr.\nAumentarà la talha del fichièr exportat.",
     "addWatermark": "Apondre « Fabricat amb Excalidraw »",
@@ -92,8 +92,8 @@
     "centerHorizontally": "Centrar orizontalament",
     "distributeHorizontally": "Distribuir orizontalament",
     "distributeVertically": "Distribuir verticalament",
-    "flipHorizontal": "",
-    "flipVertical": "",
+    "flipHorizontal": "Virar orizontalament",
+    "flipVertical": "Virar verticalament",
     "viewMode": "Mòde de vista",
     "toggleExportColorScheme": "Alternar l’esquèma de color d’expòrt",
     "share": "Partejar"
@@ -101,8 +101,8 @@
   "buttons": {
     "clearReset": "Reïnicializar lo canabàs",
     "export": "Exportar",
-    "exportToPng": "Export en PNG",
-    "exportToSvg": "Export en SVG",
+    "exportToPng": "Exportar en PNG",
+    "exportToSvg": "Exportar en SVG",
     "copyToClipboard": "Copiar al quichapapièrs",
     "copyPngToClipboard": "Copiar PNG al quichapapièrs",
     "scale": "Escala",
@@ -230,7 +230,8 @@
     "zoomToSelection": "Zoomar la seleccion"
   },
   "encrypted": {
-    "tooltip": "Vòstres dessenhs son chifrats del cap a la fin en consequéncia los servidors d’Excalidraw los veiràn pas jamai."
+    "tooltip": "Vòstres dessenhs son chifrats del cap a la fin en consequéncia los servidors d’Excalidraw los veiràn pas jamai.",
+    "link": "Article de blòg sul chiframent del cap a la fin dins Excalidraw"
   },
   "stats": {
     "angle": "Angle",

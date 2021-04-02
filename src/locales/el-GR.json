@@ -92,8 +92,8 @@
     "centerHorizontally": "Κέντρο οριζόντια",
     "distributeHorizontally": "Οριζόντια κατανομή",
     "distributeVertically": "Κατακόρυφη κατανομή",
-    "flipHorizontal": "",
-    "flipVertical": "",
+    "flipHorizontal": "Οριζόντια αναστροφή",
+    "flipVertical": "Κατακόρυφη αναστροφή",
     "viewMode": "Λειτουργία προβολής",
     "toggleExportColorScheme": "Εναλλαγή εξαγωγής θέματος χρωμάτων",
     "share": "Κοινοποίηση"
@@ -230,7 +230,8 @@
     "zoomToSelection": "Ζουμ στην επιλογή"
   },
   "encrypted": {
-    "tooltip": "Τα σχέδιά σου είναι κρυπτογραφημένα από άκρο σε άκρο, έτσι δεν θα είναι ποτέ ορατά μέσα από τους διακομιστές του Excalidraw."
+    "tooltip": "Τα σχέδιά σου είναι κρυπτογραφημένα από άκρο σε άκρο, έτσι δεν θα είναι ποτέ ορατά μέσα από τους διακομιστές του Excalidraw.",
+    "link": ""
   },
   "stats": {
     "angle": "Γωνία",

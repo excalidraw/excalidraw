@@ -92,8 +92,8 @@
     "centerHorizontally": "Центрувати по горизонталі",
     "distributeHorizontally": "Розподілити по горизонталі",
     "distributeVertically": "Розподілити вертикально",
-    "flipHorizontal": "",
-    "flipVertical": "",
+    "flipHorizontal": "Віддзеркалити горизонтально",
+    "flipVertical": "Віддзеркалити вертикально",
     "viewMode": "Режим перегляду",
     "toggleExportColorScheme": "Переключити колірну схему експорту",
     "share": "Поділитися"
@@ -230,7 +230,8 @@
     "zoomToSelection": "Наблизити вибране"
   },
   "encrypted": {
-    "tooltip": "Ваші креслення захищені наскрізним шифруванням — сервери Excalidraw ніколи їх не побачать."
+    "tooltip": "Ваші креслення захищені наскрізним шифруванням — сервери Excalidraw ніколи їх не побачать.",
+    "link": ""
   },
   "stats": {
     "angle": "Кут",

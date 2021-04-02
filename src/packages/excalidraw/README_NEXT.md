@@ -171,6 +171,8 @@ To view the full example visit :point_down:
 
 [![Edit excalidraw](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/excalidraw-ehlz3?fontsize=14&hidenavigation=1&theme=dark)
 
+</details>
+
 Since Excalidraw doesn't support server side rendering yet so you will have to make sure the component is rendered once host is mounted.
 
 ```js
@@ -184,7 +186,7 @@ export default function IndexPage() {
 }
 ```
 
-</details>
+The `types` are available at `@excalidraw/excalidraw/types`, you can view [example for typescript](https://codesandbox.io/s/excalidraw-types-9h2dm)
 
 #### In Browser
 
@@ -491,7 +493,7 @@ You can pass a `ref` when you want to access some excalidraw APIs. We expose the
 | getAppState | <pre> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37">AppState</a></pre> | Returns current appState |
 | history | `{ clear: () => void }` | This is the history API. `history.clear()` will clear the history |
 | setScrollToContent | <pre> (<a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>) => void </pre> | Scroll to the nearest element to center |
-| setCanvasOffsets | `() => void` | Updates the offsets for the Excalidraw component so that the coordinates are computed correctly (for example the cursor position). You should call this API when your app changes the dimensions/position of the Excalidraw container, such as when toggling a sidebar. You don't have to call this when the position is changed on page scroll (we handled that ourselves). |
+| setCanvasOffsets | `() => void` | Updates the offsets for the Excalidraw component so that the coordinates are computed correctly (for example the cursor position). You don't have to call this when the position is changed on page scroll or when the excalidraw container resizes (we handle that ourselves). For any other cases if the position of excalidraw is updated (example due to scroll on parent container and not page scroll) you should call this API. |
 | importLibrary | `(url: string, token?: string) => void` | Imports library from given URL. You should call this on `hashchange`, passing the `addLibrary` value if you detect it. Optionally pass a CSRF `token` to skip prompting during installation (retrievable via `token` key from the url coming from [https://libraries.excalidraw.com](https://libraries.excalidraw.com/)). |
 | setToastMessage | `(message: string) => void` | This API can be used to show the toast with custom message. |
 

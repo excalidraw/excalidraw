@@ -230,7 +230,8 @@
     "zoomToSelection": "Ampliar a seleção"
   },
   "encrypted": {
-    "tooltip": "Seus desenhos são criptografados de ponta a ponta, então os servidores do Excalidraw nunca os verão."
+    "tooltip": "Seus desenhos são criptografados de ponta a ponta, então os servidores do Excalidraw nunca os verão.",
+    "link": "Postagem de blog com uma criptografia de ponta a ponta no Excalidraw"
   },
   "stats": {
     "angle": "Ângulo",

@@ -295,6 +295,7 @@ class App extends React.Component<AppProps, AppState> {
     UIOptions: DEFAULT_UI_OPTIONS,
   };
   private scene: Scene;
+  private resizeObserver: ResizeObserver | undefined;
   constructor(props: AppProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
@@ -784,6 +785,15 @@ class App extends React.Component<AppProps, AppState> {
     this.scene.addCallback(this.onSceneUpdated);
     this.addEventListeners();
 
+    if (
+      "ResizeObserver" in window &&
+      this.excalidrawContainerRef?.current?.parentElement
+    ) {
+      this.resizeObserver = new ResizeObserver(() => this.setCanvasOffsets());
+      this.resizeObserver?.observe(
+        this.excalidrawContainerRef.current.parentElement,
+      );
+    }
     const searchParams = new URLSearchParams(window.location.search.slice(1));
 
     if (searchParams.has("web-share-target")) {
@@ -797,6 +807,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   public componentWillUnmount() {
+    this.resizeObserver?.disconnect();
     this.unmounted = true;
     this.removeEventListeners();
     this.scene.destroy();
