@@ -202,6 +202,14 @@ describe("<Excalidraw/>", () => {
 
         expect(queryByTestId(container, "canvas-background-picker")).toBeNull();
       });
+
+      it("should hide the dark mode toggle when theme is false", async () => {
+        const { container } = await render(
+          <Excalidraw UIOptions={{ canvasActions: { theme: false } }} />,
+        );
+
+        expect(queryByTestId(container, "toggle-dark-mode")).toBeNull();
+      });
     });
   });
 });

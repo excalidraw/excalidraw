@@ -214,6 +214,7 @@ type CanvasActions = {
   loadScene?: boolean;
   saveAsScene?: boolean;
   saveScene?: boolean;
+  theme?: boolean;
 };
 
 export type UIOptions = {
@@ -222,12 +223,6 @@ export type UIOptions = {
 
 export type AppProps = ExcalidrawProps & {
   UIOptions: {
-    canvasActions: {
-      clearCanvas: boolean;
-      export: boolean;
-      loadScene: boolean;
-      saveAsScene: boolean;
-      saveScene: boolean;
-    };
+    canvasActions: Required<CanvasActions>;
   };
 };

@@ -474,7 +474,10 @@ class App extends React.Component<AppProps, AppState> {
           showExitZenModeBtn={
             typeof this.props?.zenModeEnabled === "undefined" && zenModeEnabled
           }
-          showThemeBtn={typeof this.props?.theme === "undefined"}
+          showThemeBtn={
+            typeof this.props?.theme === "undefined" &&
+            this.props.UIOptions.canvasActions.theme
+          }
           libraryReturnUrl={this.props.libraryReturnUrl}
           UIOptions={this.props.UIOptions}
         />

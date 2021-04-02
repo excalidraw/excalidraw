@@ -134,5 +134,6 @@ export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
     loadScene: true,
     saveAsScene: true,
     saveScene: true,
+    theme: true,
   },
 };
