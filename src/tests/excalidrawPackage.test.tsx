@@ -133,16 +133,24 @@ describe("<Excalidraw/>", () => {
 
   describe("Test UIOptions prop", () => {
     it('should not hide any UI element when the UIOptions prop is "undefined"', async () => {
-      const { container } = await render(<Excalidraw />);
+      await render(<Excalidraw />);
 
-      expect(container).toMatchSnapshot();
+      const canvasActions = document.querySelector(
+        'section[aria-labelledby="canvasActions-title"]',
+      );
+
+      expect(canvasActions).toMatchSnapshot();
     });
 
     describe("Test canvasActions", () => {
       it('should not hide any UI element when canvasActions is "undefined"', async () => {
-        const { container } = await render(<Excalidraw UIOptions={{}} />);
+        await render(<Excalidraw UIOptions={{}} />);
 
-        expect(container).toMatchSnapshot();
+        const canvasActions = document.querySelector(
+          'section[aria-labelledby="canvasActions-title"]',
+        );
+
+        expect(canvasActions).toMatchSnapshot();
       });
 
       it("should hide clear canvas button when clearCanvas is false", async () => {
