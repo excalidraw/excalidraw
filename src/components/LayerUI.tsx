@@ -42,6 +42,7 @@ import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { Tooltip } from "./Tooltip";
 import { UserList } from "./UserList";
+import { FileName } from "./FIleName";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -591,8 +592,15 @@ const LayerUI = ({
         <Section heading="fileActions">
           <Island padding={1}>
             <Stack.Row gap={3} justifyContent="space-between">
-              {actionManager.renderAction("saveScene")}
-              {actionManager.renderAction("saveAsScene")}
+              {appState.fileHandle ? (
+                <>
+                  {actionManager.renderAction("saveAsScene")}
+                  {actionManager.renderAction("saveScene")}
+                  <FileName fileHandle={appState.fileHandle} />
+                </>
+              ) : (
+                actionManager.renderAction("saveAsScene")
+              )}
               {renderExportDialog()}
             </Stack.Row>
           </Island>

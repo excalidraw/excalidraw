@@ -331,6 +331,7 @@
     left: 50%;
     transform: translateX(-50%);
   }
+
   .App-menu_bottom-left {
     grid-template-columns: 1fr auto 1fr;
 
@@ -350,6 +351,18 @@
 
     section {
       display: flex;
+    }
+  }
+
+  .App-menu_file-name {
+    display: flex;
+    align-items: center;
+
+    svg {
+      width: 1.15em;
+      margin-inline-end: 0.3em;
+      transform: scaleY(0.9);
+      cursor: copy;
     }
   }
 
