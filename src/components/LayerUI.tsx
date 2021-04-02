@@ -18,11 +18,11 @@ import { useIsMobile } from "../is-mobile";
 import { calculateScrollCenter, getSelectedElements } from "../scene";
 import { ExportType } from "../scene/types";
 import {
+  AppProps,
   AppState,
   ExcalidrawProps,
   LibraryItem,
   LibraryItems,
-  UIOptions,
 } from "../types";
 import { muteFSAbortError } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher, ZoomActions } from "./Actions";
@@ -71,7 +71,7 @@ interface LayerUIProps {
   renderCustomFooter?: (isMobile: boolean) => JSX.Element;
   viewModeEnabled: boolean;
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
-  UIOptions?: UIOptions;
+  UIOptions: AppProps["UIOptions"];
 }
 
 const useOnClickOutside = (
@@ -366,7 +366,7 @@ const LayerUI = ({
   );
 
   const renderExportDialog = () => {
-    if (UIOptions ? !UIOptions.canvasActions.export : false) {
+    if (!UIOptions.canvasActions.export) {
       return null;
     }
 

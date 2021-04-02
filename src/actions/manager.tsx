@@ -8,7 +8,7 @@ import {
 } from "./types";
 import { ExcalidrawElement } from "../element/types";
 import { AppState, ExcalidrawProps } from "../types";
-import { DEFAULT_UI_OPTIONS, MODES } from "../constants";
+import { MODES } from "../constants";
 
 // This is the <App> component, but for now we don't care about anything but its
 // `canvas` state.
@@ -57,7 +57,7 @@ export class ActionManager implements ActionsManagerInterface {
       .sort((a, b) => (b.keyPriority || 0) - (a.keyPriority || 0))
       .filter(
         (action) =>
-          (action.name in DEFAULT_UI_OPTIONS.canvasActions
+          (action.name in canvasActions
             ? canvasActions[action.name as keyof typeof canvasActions]
             : true) &&
           action.keyTest &&
@@ -111,7 +111,7 @@ export class ActionManager implements ActionsManagerInterface {
     if (
       this.actions[name] &&
       "PanelComponent" in this.actions[name] &&
-      (name in DEFAULT_UI_OPTIONS.canvasActions
+      (name in canvasActions
         ? canvasActions[name as keyof typeof canvasActions]
         : true)
     ) {

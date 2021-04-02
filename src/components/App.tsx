@@ -44,6 +44,7 @@ import {
 import {
   APP_NAME,
   CURSOR_TYPE,
+  DEFAULT_UI_OPTIONS,
   DEFAULT_VERTICAL_ALIGN,
   DRAGGING_THRESHOLD,
   ELEMENT_SHIFT_TRANSLATE_AMOUNT,
@@ -160,13 +161,7 @@ import Scene from "../scene/Scene";
 import { SceneState, ScrollBars } from "../scene/types";
 import { getNewZoom } from "../scene/zoom";
 import { findShapeByKey } from "../shapes";
-import {
-  AppState,
-  ExcalidrawProps,
-  Gesture,
-  GestureEvent,
-  SceneData,
-} from "../types";
+import { AppProps, AppState, Gesture, GestureEvent, SceneData } from "../types";
 import {
   debounce,
   distance,
@@ -286,19 +281,21 @@ export type ExcalidrawImperativeAPI = {
   ready: true;
 };
 
-class App extends React.Component<ExcalidrawProps, AppState> {
+class App extends React.Component<AppProps, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
   unmounted: boolean = false;
   actionManager: ActionManager;
   private excalidrawContainerRef = React.createRef<HTMLDivElement>();
 
-  public static defaultProps: Partial<ExcalidrawProps> = {
+  public static defaultProps: Partial<AppProps> = {
     width: window.innerWidth,
     height: window.innerHeight,
+    // needed for tests to pass since we directly render App in many tests
+    UIOptions: DEFAULT_UI_OPTIONS,
   };
   private scene: Scene;
-  constructor(props: ExcalidrawProps) {
+  constructor(props: AppProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
 
@@ -891,7 +888,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     window.addEventListener(EVENT.DROP, this.disableEvent, false);
   }
 
-  componentDidUpdate(prevProps: ExcalidrawProps, prevState: AppState) {
+  componentDidUpdate(prevProps: AppProps, prevState: AppState) {
     if (prevProps.langCode !== this.props.langCode) {
       this.updateLanguage();
     }

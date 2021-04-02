@@ -208,13 +208,25 @@ export enum UserIdleState {
 }
 
 type CanvasActions = {
-  clearCanvas: boolean;
-  export: boolean;
-  loadScene: boolean;
-  saveAsScene: boolean;
-  saveScene: boolean;
+  clearCanvas?: boolean;
+  export?: boolean;
+  loadScene?: boolean;
+  saveAsScene?: boolean;
+  saveScene?: boolean;
 };
 
 export type UIOptions = {
-  canvasActions: CanvasActions;
+  canvasActions?: CanvasActions;
+};
+
+export type AppProps = ExcalidrawProps & {
+  UIOptions: {
+    canvasActions: {
+      clearCanvas: boolean;
+      export: boolean;
+      loadScene: boolean;
+      saveAsScene: boolean;
+      saveScene: boolean;
+    };
+  };
 };
