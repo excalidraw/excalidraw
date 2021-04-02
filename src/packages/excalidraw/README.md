@@ -560,7 +560,7 @@ This prop sets the name of the drawing which will be used when exporting the dra
 
 This prop can be used to hide UI elements shown in the table below.
 
-| Attribute                                 | Hides                   |
+| Attribute                                 | Element                 |
 | ----------------------------------------- | ----------------------- |
 | `canvasActions.changeViewBackgroundColor` | Background color picker |
 | `canvasActions.clearCanvas`               | Clear canvas button     |
