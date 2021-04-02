@@ -231,6 +231,7 @@ export const actionExportWithDarkMode = register({
           updateData(theme === "dark");
         }}
         title={t("labels.toggleExportColorScheme")}
+        floating
       />
     </div>
   ),

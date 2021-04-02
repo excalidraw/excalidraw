@@ -413,7 +413,6 @@ const LayerUI = ({
       <Island padding={2} style={{ zIndex: 1 }}>
         <Stack.Col gap={4}>
           <Stack.Row gap={1} justifyContent="space-between">
-            {actionManager.renderAction("loadScene")}
             {actionManager.renderAction("clearCanvas")}
             {onCollabButtonClick && (
               <CollabButton
@@ -590,17 +589,16 @@ const LayerUI = ({
         className={clsx("App-menu App-menu_bottom")}
       >
         <Section heading="fileActions">
-          <Island padding={1}>
+          <Island padding={2}>
             <Stack.Row gap={3} justifyContent="space-between">
-              {appState.fileHandle ? (
+              {actionManager.renderAction("loadScene")}
+              {appState.fileHandle && (
                 <>
-                  {actionManager.renderAction("saveAsScene")}
                   {actionManager.renderAction("saveScene")}
                   <FileName fileHandle={appState.fileHandle} />
                 </>
-              ) : (
-                actionManager.renderAction("saveAsScene")
               )}
+              {actionManager.renderAction("saveAsScene")}
               {renderExportDialog()}
             </Stack.Row>
           </Island>

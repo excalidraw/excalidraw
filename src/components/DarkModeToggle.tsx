@@ -2,6 +2,7 @@ import "./ToolIcon.scss";
 
 import React from "react";
 import { t } from "../i18n";
+import clsx from "clsx";
 
 export type Appearence = "light" | "dark";
 
@@ -11,6 +12,7 @@ export const DarkModeToggle = (props: {
   value: Appearence;
   onChange: (value: Appearence) => void;
   title?: string;
+  floating?: boolean;
 }) => {
   const title = props.title
     ? props.title
@@ -20,7 +22,9 @@ export const DarkModeToggle = (props: {
 
   return (
     <label
-      className="ToolIcon ToolIcon_type_floating ToolIcon_size_M"
+      className={clsx("ToolIcon ToolIcon_size_M", {
+        ToolIcon_type_floating: props.floating,
+      })}
       data-testid="toggle-dark-mode"
       title={title}
     >
