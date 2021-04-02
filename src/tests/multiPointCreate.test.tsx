@@ -20,6 +20,26 @@ beforeEach(() => {
 const { h } = window;
 
 describe("remove shape in non linear elements", () => {
+  const originalGetBoundingClientRect =
+    global.window.HTMLDivElement.prototype.getBoundingClientRect;
+  beforeAll(() => {
+    // override getBoundingClientRect as by default it will always return all values as 0 even if customized in html
+    global.window.HTMLDivElement.prototype.getBoundingClientRect = () => ({
+      top: 10,
+      left: 20,
+      bottom: 10,
+      right: 10,
+      width: 100,
+      x: 10,
+      y: 20,
+      height: 100,
+      toJSON: () => {},
+    });
+  });
+
+  afterAll(() => {
+    global.window.HTMLDivElement.prototype.getBoundingClientRect = originalGetBoundingClientRect;
+  });
   it("rectangle", async () => {
     const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
@@ -88,7 +108,7 @@ describe("multi point mode in linear elements", () => {
     fireEvent.pointerUp(canvas);
     fireEvent.keyDown(document, { key: KEYS.ENTER });
 
-    expect(renderScene).toHaveBeenCalledTimes(13);
+    expect(renderScene).toHaveBeenCalledTimes(14);
     expect(h.elements.length).toEqual(1);
 
     const element = h.elements[0] as ExcalidrawLinearElement;
@@ -129,7 +149,7 @@ describe("multi point mode in linear elements", () => {
     fireEvent.pointerUp(canvas);
     fireEvent.keyDown(document, { key: KEYS.ENTER });
 
-    expect(renderScene).toHaveBeenCalledTimes(13);
+    expect(renderScene).toHaveBeenCalledTimes(14);
     expect(h.elements.length).toEqual(1);
 
     const element = h.elements[0] as ExcalidrawLinearElement;

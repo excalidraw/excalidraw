@@ -7,8 +7,8 @@ const { h } = window;
 
 describe("appState", () => {
   it("scroll-to-content on init works with non-zero offsets", async () => {
-    const WIDTH = 600;
-    const HEIGHT = 700;
+    const WIDTH = 200;
+    const HEIGHT = 100;
     const OFFSET_LEFT = 200;
     const OFFSET_TOP = 100;
 
@@ -23,7 +23,7 @@ describe("appState", () => {
       left: OFFSET_LEFT,
       bottom: 10,
       right: 10,
-      width: 100,
+      width: 200,
       x: 10,
       y: 20,
       height: 100,
@@ -33,8 +33,6 @@ describe("appState", () => {
     await render(
       <div>
         <Excalidraw
-          width={WIDTH}
-          height={HEIGHT}
           initialData={{
             elements: [
               API.createElement({
@@ -50,8 +48,8 @@ describe("appState", () => {
       </div>,
     );
     await waitFor(() => {
-      expect(h.state.width).toBe(WIDTH);
-      expect(h.state.height).toBe(HEIGHT);
+      expect(h.state.width).toBe(200);
+      expect(h.state.height).toBe(100);
       expect(h.state.offsetLeft).toBe(OFFSET_LEFT);
       expect(h.state.offsetTop).toBe(OFFSET_TOP);
 

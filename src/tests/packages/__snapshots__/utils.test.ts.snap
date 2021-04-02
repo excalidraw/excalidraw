@@ -32,7 +32,7 @@ Object {
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
-  "height": 768,
+  "height": 0,
   "isBindingEnabled": true,
   "isLibraryOpen": false,
   "isLoading": false,
@@ -67,7 +67,7 @@ Object {
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
-  "width": 1024,
+  "width": 0,
   "zenModeEnabled": false,
   "zoom": Object {
     "translation": Object {
