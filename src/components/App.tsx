@@ -4084,13 +4084,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private updateDOMRect = (cb?: () => void) => {
     if (this.excalidrawContainerRef?.current) {
-      const parentElement = this.excalidrawContainerRef.current;
+      const excalidrawContainer = this.excalidrawContainerRef.current;
       const {
         width,
         height,
         left: offsetLeft,
         top: offsetTop,
-      } = parentElement.getBoundingClientRect();
+      } = excalidrawContainer.getBoundingClientRect();
       this.setState(
         {
           width,
@@ -4109,8 +4109,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   private getCanvasOffsets(): Pick<AppState, "offsetTop" | "offsetLeft"> {
     if (this.excalidrawContainerRef?.current) {
-      const parentElement = this.excalidrawContainerRef.current;
-      const { left, top } = parentElement.getBoundingClientRect();
+      const excalidrawContainer = this.excalidrawContainerRef.current;
+      const { left, top } = excalidrawContainer.getBoundingClientRect();
       return {
         offsetLeft: left,
         offsetTop: top,
