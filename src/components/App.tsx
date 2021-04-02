@@ -784,7 +784,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.addEventListeners();
 
     if ("ResizeObserver" in window && this.excalidrawContainerRef?.current) {
-      this.resizeObserver = new ResizeObserver(() => this.setCanvasOffsets());
+      this.resizeObserver = new ResizeObserver(() => this.updateDOMRect());
       this.resizeObserver?.observe(this.excalidrawContainerRef.current);
     }
     const searchParams = new URLSearchParams(window.location.search.slice(1));
@@ -793,7 +793,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       // Obtain a file that was shared via the Web Share Target API.
       this.restoreFileFromShare();
     } else {
-      this.updateDOMRect();
+      this.updateDOMRect(this.initializeScene);
     }
   }
 
@@ -4082,7 +4082,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
   }, 300);
 
-  private updateDOMRect = () => {
+  private updateDOMRect = (cb?: () => void) => {
     if (this.excalidrawContainerRef?.current) {
       const parentElement = this.excalidrawContainerRef.current;
       const {
@@ -4098,7 +4098,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           offsetLeft,
           offsetTop,
         },
-        () => this.initializeScene(),
+        () => cb && cb(),
       );
     }
   };
