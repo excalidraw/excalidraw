@@ -13,8 +13,6 @@ import { defaultLang } from "../../i18n";
 
 const Excalidraw = (props: ExcalidrawProps) => {
   const {
-    width,
-    height,
     onChange,
     initialData,
     excalidrawRef,
@@ -55,8 +53,6 @@ const Excalidraw = (props: ExcalidrawProps) => {
     <InitializeApp langCode={langCode}>
       <IsMobileProvider>
         <App
-          width={width}
-          height={height}
           onChange={onChange}
           initialData={initialData}
           excalidrawRef={excalidrawRef}

@@ -293,10 +293,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   actionManager: ActionManager;
   private excalidrawContainerRef = React.createRef<HTMLDivElement>();
 
-  public static defaultProps: Partial<ExcalidrawProps> = {
-    width: window.innerWidth,
-    height: window.innerHeight,
-  };
   private scene: Scene;
   private resizeObserver: ResizeObserver | undefined;
   constructor(props: ExcalidrawProps) {
@@ -304,8 +300,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     const defaultAppState = getDefaultAppState();
 
     const {
-      width = window.innerWidth,
-      height = window.innerHeight,
       excalidrawRef,
       viewModeEnabled = false,
       zenModeEnabled = false,
@@ -317,8 +311,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       ...defaultAppState,
       theme,
       isLoading: true,
-      width,
-      height,
       ...this.getCanvasOffsets(),
       viewModeEnabled,
       zenModeEnabled,
@@ -893,17 +885,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   componentDidUpdate(prevProps: ExcalidrawProps, prevState: AppState) {
     if (prevProps.langCode !== this.props.langCode) {
       this.updateLanguage();
-    }
-
-    if (
-      prevProps.width !== this.props.width ||
-      prevProps.height !== this.props.height
-    ) {
-      this.setState({
-        width: this.props.width ?? window.innerWidth,
-        height: this.props.height ?? window.innerHeight,
-        ...this.getCanvasOffsets(),
-      });
     }
 
     if (prevProps.viewModeEnabled !== this.props.viewModeEnabled) {
