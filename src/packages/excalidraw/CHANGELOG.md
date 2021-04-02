@@ -18,6 +18,7 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
+- Add `UIOptions` prop to support hiding background color picker, clear canvas, export, load, save, save as & dark mode toggle [#3364](https://github.com/excalidraw/excalidraw/pull/3364)
 - Calculate offsets when excalidraw container resizes using resize observer api [#3374](https://github.com/excalidraw/excalidraw/pull/3374).
 - Export types for the package so now it can be used with typescript [#3337](https://github.com/excalidraw/excalidraw/pull/3337). The types are available at `@excalidraw/excalirdraw/types`.
 - Add `renderCustomStats` prop to render extra stats on host, and expose `setToastMessage` API via refs which can be used to show toast with custom message [#3360](https://github.com/excalidraw/excalidraw/pull/3360).
