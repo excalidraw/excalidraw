@@ -1,6 +1,6 @@
 import React from "react";
 import {
-  fakeDOMRect,
+  fakeBoundingClientRect,
   originalGetBoundingClientRect,
   render,
   waitFor,
@@ -20,7 +20,7 @@ describe("appState", () => {
     const ELEM_WIDTH = 100;
     const ELEM_HEIGHT = 60;
 
-    global.window.HTMLDivElement.prototype.getBoundingClientRect = fakeDOMRect;
+    global.window.HTMLDivElement.prototype.getBoundingClientRect = fakeBoundingClientRect;
 
     await render(
       <div>

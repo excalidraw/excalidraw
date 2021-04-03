@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import {
   render,
   fireEvent,
-  fakeDOMRect,
+  fakeBoundingClientRect,
   originalGetBoundingClientRect,
 } from "./test-utils";
 import ExcalidrawApp from "../excalidraw-app";
@@ -84,7 +84,7 @@ describe("selection element", () => {
 describe("select single element on the scene", () => {
   beforeAll(() => {
     // override getBoundingClientRect as by default it will always return all values as 0 even if customized in html
-    global.window.HTMLDivElement.prototype.getBoundingClientRect = fakeDOMRect;
+    global.window.HTMLDivElement.prototype.getBoundingClientRect = fakeBoundingClientRect;
   });
 
   afterAll(() => {

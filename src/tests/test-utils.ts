@@ -103,7 +103,7 @@ export const updateSceneData = (data: SceneData) => {
   (window.collab as any).excalidrawAPI.updateScene(data);
 };
 
-export const fakeDOMRect = () => ({
+export const fakeBoundingClientRect = () => ({
   top: 10,
   left: 20,
   bottom: 10,
