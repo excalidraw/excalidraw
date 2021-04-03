@@ -18,7 +18,7 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
-- Calculate `width/height` of canvas based on excalidraw container & also resize and update offsets whenever the dimensions of excalidraw container gets updated [#3379](https://github.com/excalidraw/excalidraw/pull/3379).
+- Calculate `width/height` of canvas based on excalidraw container & also resize and update offsets whenever the dimensions of excalidraw container gets updated [#3379](https://github.com/excalidraw/excalidraw/pull/3379). You also don't need to add a resize handler anymore for excalidraw as its handled now in excalidraw itself.
   #### BREAKING CHANGE
   - `width/height` props have been removed since now the it gets calculated based on excalidraw container.
 - Calculate offsets when excalidraw container resizes using resize observer api [#3374](https://github.com/excalidraw/excalidraw/pull/3374).
