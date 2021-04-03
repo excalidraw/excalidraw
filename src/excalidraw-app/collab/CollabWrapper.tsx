@@ -248,8 +248,6 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     this.portal.open(socketIOClient(SOCKET_SERVER), roomId, roomKey);
 
     if (existingRoomLinkData) {
-      this.excalidrawAPI.resetScene();
-
       try {
         const elements = await loadFromFirebase(
           roomId,

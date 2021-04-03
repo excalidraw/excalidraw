@@ -316,6 +316,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       zenModeEnabled,
       gridSize: gridModeEnabled ? GRID_SIZE : null,
       name,
+      width: 0,
+      height: 0,
     };
     if (excalidrawRef) {
       const readyPromise =
@@ -549,7 +551,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         if (typeof this.props.name !== "undefined") {
           name = this.props.name;
         }
-
         this.setState(
           (state) => {
             // using Object.assign instead of spread to fool TS 4.2.2+ into
@@ -558,10 +559,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             return Object.assign(actionResult.appState || {}, {
               editingElement:
                 editingElement || actionResult.appState?.editingElement || null,
-              width: state.width,
-              height: state.height,
-              offsetTop: state.offsetTop,
-              offsetLeft: state.offsetLeft,
               viewModeEnabled,
               zenModeEnabled,
               gridSize,
@@ -694,7 +691,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (!this.state.isLoading) {
       this.setState({ isLoading: true });
     }
-
     let initialData = null;
     try {
       initialData = (await this.props.initialData) || null;
@@ -703,7 +699,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     const scene = restore(initialData, null);
-
     scene.appState = {
       ...scene.appState,
       isLoading: false,
@@ -776,7 +771,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.addEventListeners();
 
     if ("ResizeObserver" in window && this.excalidrawContainerRef?.current) {
-      this.resizeObserver = new ResizeObserver((entries: any) => {
+      this.resizeObserver = new ResizeObserver(() => {
         this.updateDOMRect();
       });
       this.resizeObserver?.observe(this.excalidrawContainerRef.current);
@@ -4098,7 +4093,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           offsetLeft,
           offsetTop,
         },
-        () => cb && cb(),
+        () => {
+          cb && cb();
+        },
       );
     }
   };
