@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import ExcalidrawApp from "../excalidraw-app";
 import * as Renderer from "../renderer/renderScene";
 import { KEYS } from "../keys";
-import { render, fireEvent } from "./test-utils";
+import { render, fireEvent, fakeDOMRect } from "./test-utils";
 import { ExcalidrawLinearElement } from "../element/types";
 import { reseed } from "../random";
 
@@ -184,26 +184,11 @@ describe("add element to the scene when pointer dragging long enough", () => {
 });
 
 describe("do not add element to the scene if size is too small", () => {
-  const originalGetBoundingClientRect =
-    global.window.HTMLDivElement.prototype.getBoundingClientRect;
   beforeAll(() => {
     // override getBoundingClientRect as by default it will always return all values as 0 even if customized in html
-    global.window.HTMLDivElement.prototype.getBoundingClientRect = () => ({
-      top: 10,
-      left: 20,
-      bottom: 10,
-      right: 10,
-      width: 100,
-      x: 10,
-      y: 20,
-      height: 100,
-      toJSON: () => {},
-    });
+    global.window.HTMLDivElement.prototype.getBoundingClientRect = fakeDOMRect;
   });
 
-  afterAll(() => {
-    global.window.HTMLDivElement.prototype.getBoundingClientRect = originalGetBoundingClientRect;
-  });
   it("rectangle", async () => {
     const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool

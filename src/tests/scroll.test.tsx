@@ -1,5 +1,10 @@
 import React from "react";
-import { render, waitFor } from "./test-utils";
+import {
+  fakeDOMRect,
+  originalGetBoundingClientRect,
+  render,
+  waitFor,
+} from "./test-utils";
 import Excalidraw from "../packages/excalidraw/index";
 import { API } from "./helpers/api";
 
@@ -9,26 +14,13 @@ describe("appState", () => {
   it("scroll-to-content on init works with non-zero offsets", async () => {
     const WIDTH = 200;
     const HEIGHT = 100;
-    const OFFSET_LEFT = 200;
-    const OFFSET_TOP = 100;
+    const OFFSET_LEFT = 20;
+    const OFFSET_TOP = 10;
 
     const ELEM_WIDTH = 100;
     const ELEM_HEIGHT = 60;
 
-    const originalGetBoundingClientRect =
-      global.window.HTMLDivElement.prototype.getBoundingClientRect;
-    // override getBoundingClientRect as by default it will always return all values as 0 even if customized in html
-    global.window.HTMLDivElement.prototype.getBoundingClientRect = () => ({
-      top: OFFSET_TOP,
-      left: OFFSET_LEFT,
-      bottom: 10,
-      right: 10,
-      width: 200,
-      x: 10,
-      y: 20,
-      height: 100,
-      toJSON: () => {},
-    });
+    global.window.HTMLDivElement.prototype.getBoundingClientRect = fakeDOMRect;
 
     await render(
       <div>

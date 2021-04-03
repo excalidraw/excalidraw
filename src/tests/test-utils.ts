@@ -102,3 +102,18 @@ const initLocalStorage = (data: ImportedDataState) => {
 export const updateSceneData = (data: SceneData) => {
   (window.collab as any).excalidrawAPI.updateScene(data);
 };
+
+export const fakeDOMRect = () => ({
+  top: 10,
+  left: 20,
+  bottom: 10,
+  right: 10,
+  width: 200,
+  x: 10,
+  y: 20,
+  height: 100,
+  toJSON: () => {},
+});
+
+export const originalGetBoundingClientRect =
+  global.window.HTMLDivElement.prototype.getBoundingClientRect;
