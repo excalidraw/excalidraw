@@ -3,7 +3,12 @@ import ReactDOM from "react-dom";
 import ExcalidrawApp from "../excalidraw-app";
 import * as Renderer from "../renderer/renderScene";
 import { KEYS } from "../keys";
-import { render, fireEvent, fakeBoundingClientRect } from "./test-utils";
+import {
+  render,
+  fireEvent,
+  mockBoundingClientRect,
+  restoreOriginalGetBoundingClientRect,
+} from "./test-utils";
 import { ExcalidrawLinearElement } from "../element/types";
 import { reseed } from "../random";
 
@@ -185,8 +190,10 @@ describe("add element to the scene when pointer dragging long enough", () => {
 
 describe("do not add element to the scene if size is too small", () => {
   beforeAll(() => {
-    // override getBoundingClientRect as by default it will always return all values as 0 even if customized in html
-    global.window.HTMLDivElement.prototype.getBoundingClientRect = fakeBoundingClientRect;
+    mockBoundingClientRect();
+  });
+  afterAll(() => {
+    restoreOriginalGetBoundingClientRect();
   });
 
   it("rectangle", async () => {

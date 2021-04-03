@@ -3,8 +3,8 @@ import ReactDOM from "react-dom";
 import {
   render,
   fireEvent,
-  fakeBoundingClientRect,
-  originalGetBoundingClientRect,
+  mockBoundingClientRect,
+  restoreOriginalGetBoundingClientRect,
 } from "./test-utils";
 import ExcalidrawApp from "../excalidraw-app";
 import * as Renderer from "../renderer/renderScene";
@@ -83,13 +83,13 @@ describe("selection element", () => {
 
 describe("select single element on the scene", () => {
   beforeAll(() => {
-    // override getBoundingClientRect as by default it will always return all values as 0 even if customized in html
-    global.window.HTMLDivElement.prototype.getBoundingClientRect = fakeBoundingClientRect;
+    mockBoundingClientRect();
   });
 
   afterAll(() => {
-    global.window.HTMLDivElement.prototype.getBoundingClientRect = originalGetBoundingClientRect;
+    restoreOriginalGetBoundingClientRect();
   });
+
   it("rectangle", async () => {
     const { getByToolName, container } = await render(<ExcalidrawApp />);
     const canvas = container.querySelector("canvas")!;

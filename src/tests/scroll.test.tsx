@@ -1,8 +1,8 @@
 import React from "react";
 import {
-  fakeBoundingClientRect,
-  originalGetBoundingClientRect,
+  mockBoundingClientRect,
   render,
+  restoreOriginalGetBoundingClientRect,
   waitFor,
 } from "./test-utils";
 import Excalidraw from "../packages/excalidraw/index";
@@ -20,7 +20,7 @@ describe("appState", () => {
     const ELEM_WIDTH = 100;
     const ELEM_HEIGHT = 60;
 
-    global.window.HTMLDivElement.prototype.getBoundingClientRect = fakeBoundingClientRect;
+    mockBoundingClientRect();
 
     await render(
       <div>
@@ -49,6 +49,6 @@ describe("appState", () => {
       expect(h.state.scrollX).toBe(WIDTH / 2 - ELEM_WIDTH / 2);
       expect(h.state.scrollY).toBe(HEIGHT / 2 - ELEM_HEIGHT / 2);
     });
-    global.window.HTMLDivElement.prototype.getBoundingClientRect = originalGetBoundingClientRect;
+    restoreOriginalGetBoundingClientRect();
   });
 });

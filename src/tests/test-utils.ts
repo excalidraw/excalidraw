@@ -103,17 +103,24 @@ export const updateSceneData = (data: SceneData) => {
   (window.collab as any).excalidrawAPI.updateScene(data);
 };
 
-export const fakeBoundingClientRect = () => ({
-  top: 10,
-  left: 20,
-  bottom: 10,
-  right: 10,
-  width: 200,
-  x: 10,
-  y: 20,
-  height: 100,
-  toJSON: () => {},
-});
-
-export const originalGetBoundingClientRect =
+const originalGetBoundingClientRect =
   global.window.HTMLDivElement.prototype.getBoundingClientRect;
+
+export const mockBoundingClientRect = () => {
+  // override getBoundingClientRect as by default it will always return all values as 0 even if customized in html
+  global.window.HTMLDivElement.prototype.getBoundingClientRect = () => ({
+    top: 10,
+    left: 20,
+    bottom: 10,
+    right: 10,
+    width: 200,
+    x: 10,
+    y: 20,
+    height: 100,
+    toJSON: () => {},
+  });
+};
+
+export const restoreOriginalGetBoundingClientRect = () => {
+  global.window.HTMLDivElement.prototype.getBoundingClientRect = originalGetBoundingClientRect;
+};
