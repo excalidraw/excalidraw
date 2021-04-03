@@ -393,7 +393,6 @@ To view the full example visit :point_down:
 | [`libraryReturnUrl`](#libraryReturnUrl) | string |  | What URL should [libraries.excalidraw.com](https://libraries.excalidraw.com) be installed to |
 | [`theme`](#theme) | `light` or `dark` |  | The theme of the Excalidraw component |
 | [`name`](#name) | string |  | Name of the drawing |
-| [`UIOptions`](#UIOptions) | <pre>{ <br> canvasActions?: { <br> changeViewBackgroundColor?: boolean,<br> clearCanvas?: boolean,<br> export?: boolean,<br> loadScene?: boolean,<br> saveAsScene?: boolean,<br> saveScene?: boolean,<br> theme?: boolean <br> }<br>}</pre> |  | To hide certain UI elements |
 
 #### `width`
 
@@ -555,20 +554,6 @@ This prop controls Excalidraw's theme. When supplied, the value takes precedence
 #### `name`
 
 This prop sets the name of the drawing which will be used when exporting the drawing. When supplied, the value takes precedence over `intialData.appState.name`, the `name` will be fully controlled by host app and the users won't be able to edit from within Excalidraw.
-
-### `UIOptions`
-
-This prop can be used to hide UI elements shown in the table below.
-
-| Attribute                                 | Element                 |
-| ----------------------------------------- | ----------------------- |
-| `canvasActions.changeViewBackgroundColor` | Background color picker |
-| `canvasActions.clearCanvas`               | Clear canvas button     |
-| `canvasActions.export`                    | Export button           |
-| `canvasActions.loadScene`                 | Load button             |
-| `canvasActions.saveAsScene`               | Save as button          |
-| `canvasActions.saveScene`                 | Save button             |
-| `canvasActions.theme`                     | Dark mode toggle        |
 
 ### Does it support collaboration ?
 
