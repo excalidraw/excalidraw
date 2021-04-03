@@ -365,6 +365,8 @@ To view the full example visit :point_down:
 | [`theme`](#theme) | `light` or `dark` |  | The theme of the Excalidraw component |
 | [`name`](#name) | string |  | Name of the drawing |
 
+Excalidraw takes `100%` of `width` and `height` of the containing block so you need to make sure the container in which you are rendering Excalidraw has non zero dimensions (It should have non zero width and height so Excalidraw can inherit from the containing block).
+
 #### `onChange`
 
 Every time component updates, this callback if passed will get triggered and has the below signature.
