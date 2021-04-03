@@ -776,7 +776,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.addEventListeners();
 
     if ("ResizeObserver" in window && this.excalidrawContainerRef?.current) {
-      this.resizeObserver = new ResizeObserver(() => this.updateDOMRect());
+      this.resizeObserver = new ResizeObserver((entries: any) => {
+        this.updateDOMRect();
+      });
       this.resizeObserver?.observe(this.excalidrawContainerRef.current);
     }
     const searchParams = new URLSearchParams(window.location.search.slice(1));
@@ -4072,6 +4074,23 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         left: offsetLeft,
         top: offsetTop,
       } = excalidrawContainer.getBoundingClientRect();
+      const {
+        width: currentWidth,
+        height: currentHeight,
+        offsetTop: currentOffsetTop,
+        offsetLeft: currentOffsetLeft,
+      } = this.state;
+      if (
+        width === currentWidth &&
+        height === currentHeight &&
+        offsetLeft === currentOffsetLeft &&
+        offsetTop === currentOffsetTop
+      ) {
+        if (cb) {
+          cb();
+        }
+        return;
+      }
       this.setState(
         {
           width,
