@@ -47,6 +47,7 @@
     image-rendering: -moz-crisp-edges; // FF
 
     z-index: var(--zIndex-canvas);
+    position: absolute;
   }
 
   &.theme--dark {
