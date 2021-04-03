@@ -203,7 +203,7 @@ describe("<Excalidraw/>", () => {
         expect(queryByTestId(container, "canvas-background-picker")).toBeNull();
       });
 
-      it("should hide the dark mode toggle when theme is false", async () => {
+      it("should hide the theme toggle when theme is false", async () => {
         const { container } = await render(
           <Excalidraw UIOptions={{ canvasActions: { theme: false } }} />,
         );
