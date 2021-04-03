@@ -298,7 +298,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
   constructor(props: ExcalidrawProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
-
     const {
       excalidrawRef,
       viewModeEnabled = false,
@@ -316,8 +315,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       zenModeEnabled,
       gridSize: gridModeEnabled ? GRID_SIZE : null,
       name,
-      width: 0,
-      height: 0,
+      width: window.innerWidth,
+      height: window.innerHeight,
     };
     if (excalidrawRef) {
       const readyPromise =
@@ -4075,6 +4074,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         offsetTop: currentOffsetTop,
         offsetLeft: currentOffsetLeft,
       } = this.state;
+
       if (
         width === currentWidth &&
         height === currentHeight &&
@@ -4086,6 +4086,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         }
         return;
       }
+
       this.setState(
         {
           width,
