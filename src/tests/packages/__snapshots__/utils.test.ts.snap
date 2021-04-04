@@ -32,7 +32,6 @@ Object {
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
-  "height": 768,
   "isBindingEnabled": true,
   "isLibraryOpen": false,
   "isLoading": false,
@@ -42,8 +41,6 @@ Object {
   "metadata": undefined,
   "multiElement": null,
   "name": "name",
-  "offsetLeft": 0,
-  "offsetTop": 0,
   "openMenu": null,
   "pasteDialog": Object {
     "data": null,
@@ -67,7 +64,6 @@ Object {
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
-  "width": 1024,
   "zenModeEnabled": false,
   "zoom": Object {
     "translation": Object {
