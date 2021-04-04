@@ -76,14 +76,19 @@ const ContextMenu = ({
   );
 };
 
-let contextMenuNode: HTMLDivElement | null = null;
+const contextMenuNodeByContainer = new WeakMap<HTMLElement, HTMLDivElement>();
+
 const getContextMenuNode = (container: HTMLElement): HTMLDivElement => {
+  let contextMenuNode = contextMenuNodeByContainer.get(container);
   if (contextMenuNode) {
     return contextMenuNode;
   }
-  const div = document.createElement("div");
-  container.querySelector(".excalidraw-contextMenuContainer")!.appendChild(div);
-  return (contextMenuNode = div);
+  contextMenuNode = document.createElement("div");
+  container
+    .querySelector(".excalidraw-contextMenuContainer")!
+    .appendChild(contextMenuNode);
+  contextMenuNodeByContainer.set(container, contextMenuNode);
+  return contextMenuNode;
 };
 
 type ContextMenuParams = {
@@ -95,11 +100,12 @@ type ContextMenuParams = {
   container: HTMLElement;
 };
 
-const handleClose = () => {
+const handleClose = (container: HTMLElement) => {
+  const contextMenuNode = contextMenuNodeByContainer.get(container);
   if (contextMenuNode) {
     unmountComponentAtNode(contextMenuNode);
     contextMenuNode.remove();
-    contextMenuNode = null;
+    contextMenuNodeByContainer.delete(container);
   }
 };
 
@@ -117,7 +123,7 @@ export default {
           top={params.top}
           left={params.left}
           options={options}
-          onCloseRequest={handleClose}
+          onCloseRequest={() => handleClose(params.container)}
           actionManager={params.actionManager}
           appState={params.appState}
         />,
