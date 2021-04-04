@@ -274,7 +274,7 @@ export type ExcalidrawImperativeAPI = {
   setScrollToContent: InstanceType<typeof App>["setScrollToContent"];
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
   getAppState: () => InstanceType<typeof App>["state"];
-  setCanvasOffsets: InstanceType<typeof App>["setCanvasOffsets"];
+  refresh: InstanceType<typeof App>["refresh"];
   importLibrary: InstanceType<typeof App>["importLibraryFromUrl"];
   setToastMessage: InstanceType<typeof App>["setToastMessage"];
   readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
@@ -335,7 +335,7 @@ class App extends React.Component<AppProps, AppState> {
         setScrollToContent: this.setScrollToContent,
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
-        setCanvasOffsets: this.setCanvasOffsets,
+        refresh: this.refresh,
         importLibrary: this.importLibraryFromUrl,
         setToastMessage: this.setToastMessage,
       } as const;
@@ -4107,7 +4107,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  public setCanvasOffsets = () => {
+  public refresh = () => {
     this.setState({ ...this.getCanvasOffsets() });
   };
 
