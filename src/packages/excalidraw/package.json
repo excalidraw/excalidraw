@@ -1,6 +1,6 @@
 {
-  "name": "aakansha-excalidraw",
-  "version": "0.6.0-fin",
+  "name": "@excalidraw/excalidraw",
+  "version": "0.6.0",
   "main": "main.js",
   "types": "types/packages/excalidraw/index.d.ts",
   "files": [
