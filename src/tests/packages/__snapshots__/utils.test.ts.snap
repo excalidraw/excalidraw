@@ -2,6 +2,7 @@
 
 exports[`exportToSvg with default arguments 1`] = `
 Object {
+  "autosave": false,
   "collaborators": Map {},
   "currentChartType": "bar",
   "currentItemBackgroundColor": "transparent",
