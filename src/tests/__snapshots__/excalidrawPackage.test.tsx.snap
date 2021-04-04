@@ -1,0 +1,439 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should not hide any UI element when canvasActions is "undefined" 1`] = `
+<section
+  aria-labelledby="canvasActions-title"
+  class="zen-mode-transition"
+>
+  <h2
+    class="visually-hidden"
+    id="canvasActions-title"
+  >
+    Canvas actions
+  </h2>
+  <div
+    class="Island"
+    style="--padding: 2; z-index: 1;"
+  >
+    <div
+      class="Stack Stack_vertical"
+      style="--gap: 4;"
+    >
+      <div
+        class="Stack Stack_horizontal"
+        style="--gap: 1; justify-content: space-between;"
+      >
+        <button
+          aria-label="Load"
+          class="ToolIcon_type_button ToolIcon_size_m ToolIcon_type_button--show ToolIcon"
+          data-testid="load-button"
+          title="Load"
+          type="button"
+        >
+          <div
+            aria-hidden="true"
+            class="ToolIcon__icon"
+          >
+            <svg
+              aria-hidden="true"
+              class="rtl-mirror"
+              focusable="false"
+              role="img"
+              viewBox="0 0 576 512"
+            >
+              <path
+                d="M572.694 292.093L500.27 416.248A63.997 63.997 0 0 1 444.989 448H45.025c-18.523 0-30.064-20.093-20.731-36.093l72.424-124.155A64 64 0 0 1 152 256h399.964c18.523 0 30.064 20.093 20.73 36.093zM152 224h328v-48c0-26.51-21.49-48-48-48H272l-64-64H48C21.49 64 0 85.49 0 112v278.046l69.077-118.418C86.214 242.25 117.989 224 152 224z"
+                fill="currentColor"
+              />
+            </svg>
+          </div>
+        </button>
+        <button
+          aria-label="Save"
+          class="ToolIcon_type_button ToolIcon_size_m ToolIcon_type_button--show ToolIcon"
+          data-testid="save-button"
+          title="Save"
+          type="button"
+        >
+          <div
+            aria-hidden="true"
+            class="ToolIcon__icon"
+          >
+            <svg
+              aria-hidden="true"
+              class=""
+              focusable="false"
+              role="img"
+              viewBox="0 0 448 512"
+            >
+              <path
+                d="M433.941 129.941l-83.882-83.882A48 48 0 0 0 316.118 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V163.882a48 48 0 0 0-14.059-33.941zM224 416c-35.346 0-64-28.654-64-64 0-35.346 28.654-64 64-64s64 28.654 64 64c0 35.346-28.654 64-64 64zm96-304.52V212c0 6.627-5.373 12-12 12H76c-6.627 0-12-5.373-12-12V108c0-6.627 5.373-12 12-12h228.52c3.183 0 6.235 1.264 8.485 3.515l3.48 3.48A11.996 11.996 0 0 1 320 111.48z"
+                fill="currentColor"
+              />
+            </svg>
+          </div>
+        </button>
+        <button
+          aria-label="Save as"
+          class="ToolIcon_type_button ToolIcon_size_m ToolIcon_type_button--hide"
+          data-testid="save-as-button"
+          hidden=""
+          title="Save as"
+          type="button"
+        >
+          <div
+            aria-hidden="true"
+            class="ToolIcon__icon"
+          >
+            <svg
+              aria-hidden="true"
+              class=""
+              focusable="false"
+              role="img"
+              viewBox="0 0 448 512"
+            >
+              <path
+                d="M252 54L203 8a28 27 0 00-20-8H28C12 0 0 12 0 27v195c0 15 12 26 28 26h204c15 0 28-11 28-26V73a28 27 0 00-8-19zM130 213c-21 0-37-16-37-36 0-19 16-35 37-35 20 0 37 16 37 35 0 20-17 36-37 36zm56-169v56c0 4-4 6-7 6H44c-4 0-7-2-7-6V42c0-4 3-7 7-7h133l4 2 3 2a7 7 0 012 5z M296 201l87 95-188 205-78 9c-10 1-19-8-18-20l9-84zm141-14l-41-44a31 31 0 00-46 0l-38 41 87 95 38-42c13-14 13-36 0-50z"
+                fill="currentColor"
+              />
+            </svg>
+          </div>
+        </button>
+        <button
+          aria-label="Export"
+          class="ToolIcon_type_button ToolIcon_size_m ToolIcon_type_button--show ToolIcon"
+          data-testid="export-button"
+          title="Export"
+          type="button"
+        >
+          <div
+            aria-hidden="true"
+            class="ToolIcon__icon"
+          >
+            <svg
+              aria-hidden="true"
+              class="rtl-mirror"
+              focusable="false"
+              role="img"
+              viewBox="0 0 576 512"
+            >
+              <path
+                d="M384 121.9c0-6.3-2.5-12.4-7-16.9L279.1 7c-4.5-4.5-10.6-7-17-7H256v128h128zM571 308l-95.7-96.4c-10.1-10.1-27.4-3-27.4 11.3V288h-64v64h64v65.2c0 14.3 17.3 21.4 27.4 11.3L571 332c6.6-6.6 6.6-17.4 0-24zm-379 28v-32c0-8.8 7.2-16 16-16h176V160H248c-13.2 0-24-10.8-24-24V0H24C10.7 0 0 10.7 0 24v464c0 13.3 10.7 24 24 24h336c13.3 0 24-10.7 24-24V352H208c-8.8 0-16-7.2-16-16z"
+                fill="currentColor"
+              />
+            </svg>
+          </div>
+        </button>
+        <button
+          aria-label="Reset the canvas"
+          class="ToolIcon_type_button ToolIcon_size_m ToolIcon_type_button--show ToolIcon"
+          data-testid="clear-canvas-button"
+          title="Reset the canvas"
+          type="button"
+        >
+          <div
+            aria-hidden="true"
+            class="ToolIcon__icon"
+          >
+            <svg
+              aria-hidden="true"
+              class=""
+              focusable="false"
+              role="img"
+              viewBox="0 0 448 512"
+            >
+              <path
+                d="M32 464a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zM432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z"
+                fill="currentColor"
+              />
+            </svg>
+          </div>
+        </button>
+      </div>
+      <div
+        style="display: flex;"
+      >
+        <div
+          style="position: relative;"
+        >
+          <div>
+            <div
+              class="color-picker-control-container"
+            >
+              <button
+                aria-label="Canvas background"
+                class="color-picker-label-swatch"
+                style="--swatch-color: #ffffff;"
+              />
+              <label
+                class="color-input-container"
+              >
+                <div
+                  class="color-picker-hash"
+                >
+                  #
+                </div>
+                <input
+                  aria-label="Canvas background"
+                  class="color-picker-input"
+                  spellcheck="false"
+                  value="ffffff"
+                />
+              </label>
+            </div>
+          </div>
+        </div>
+        <div
+          style="margin-inline-start: 0.25rem;"
+        >
+          <label
+            class="ToolIcon ToolIcon_type_floating ToolIcon_size_M"
+            data-testid="toggle-dark-mode"
+            title="Dark mode"
+          >
+            <input
+              aria-label="Dark mode"
+              class="ToolIcon_type_checkbox ToolIcon_toggle_opaque"
+              type="checkbox"
+            />
+            <div
+              class="ToolIcon__icon"
+            >
+              <svg
+                class="rtl-mirror"
+                height="512"
+                viewBox="0 0 512 512"
+                width="512"
+              >
+                <path
+                  d="M283.211 512c78.962 0 151.079-35.925 198.857-94.792 7.068-8.708-.639-21.43-11.562-19.35-124.203 23.654-238.262-71.576-238.262-196.954 0-72.222 38.662-138.635 101.498-174.394 9.686-5.512 7.25-20.197-3.756-22.23A258.156 258.156 0 0 0 283.211 0c-141.309 0-256 114.511-256 256 0 141.309 114.511 256 256 256z"
+                  fill="currentColor"
+                />
+              </svg>
+            </div>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+`;
+
+exports[`<Excalidraw/> Test UIOptions prop should not hide any UI element when the UIOptions prop is "undefined" 1`] = `
+<section
+  aria-labelledby="canvasActions-title"
+  class="zen-mode-transition"
+>
+  <h2
+    class="visually-hidden"
+    id="canvasActions-title"
+  >
+    Canvas actions
+  </h2>
+  <div
+    class="Island"
+    style="--padding: 2; z-index: 1;"
+  >
+    <div
+      class="Stack Stack_vertical"
+      style="--gap: 4;"
+    >
+      <div
+        class="Stack Stack_horizontal"
+        style="--gap: 1; justify-content: space-between;"
+      >
+        <button
+          aria-label="Load"
+          class="ToolIcon_type_button ToolIcon_size_m ToolIcon_type_button--show ToolIcon"
+          data-testid="load-button"
+          title="Load"
+          type="button"
+        >
+          <div
+            aria-hidden="true"
+            class="ToolIcon__icon"
+          >
+            <svg
+              aria-hidden="true"
+              class="rtl-mirror"
+              focusable="false"
+              role="img"
+              viewBox="0 0 576 512"
+            >
+              <path
+                d="M572.694 292.093L500.27 416.248A63.997 63.997 0 0 1 444.989 448H45.025c-18.523 0-30.064-20.093-20.731-36.093l72.424-124.155A64 64 0 0 1 152 256h399.964c18.523 0 30.064 20.093 20.73 36.093zM152 224h328v-48c0-26.51-21.49-48-48-48H272l-64-64H48C21.49 64 0 85.49 0 112v278.046l69.077-118.418C86.214 242.25 117.989 224 152 224z"
+                fill="currentColor"
+              />
+            </svg>
+          </div>
+        </button>
+        <button
+          aria-label="Save"
+          class="ToolIcon_type_button ToolIcon_size_m ToolIcon_type_button--show ToolIcon"
+          data-testid="save-button"
+          title="Save"
+          type="button"
+        >
+          <div
+            aria-hidden="true"
+            class="ToolIcon__icon"
+          >
+            <svg
+              aria-hidden="true"
+              class=""
+              focusable="false"
+              role="img"
+              viewBox="0 0 448 512"
+            >
+              <path
+                d="M433.941 129.941l-83.882-83.882A48 48 0 0 0 316.118 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V163.882a48 48 0 0 0-14.059-33.941zM224 416c-35.346 0-64-28.654-64-64 0-35.346 28.654-64 64-64s64 28.654 64 64c0 35.346-28.654 64-64 64zm96-304.52V212c0 6.627-5.373 12-12 12H76c-6.627 0-12-5.373-12-12V108c0-6.627 5.373-12 12-12h228.52c3.183 0 6.235 1.264 8.485 3.515l3.48 3.48A11.996 11.996 0 0 1 320 111.48z"
+                fill="currentColor"
+              />
+            </svg>
+          </div>
+        </button>
+        <button
+          aria-label="Save as"
+          class="ToolIcon_type_button ToolIcon_size_m ToolIcon_type_button--hide"
+          data-testid="save-as-button"
+          hidden=""
+          title="Save as"
+          type="button"
+        >
+          <div
+            aria-hidden="true"
+            class="ToolIcon__icon"
+          >
+            <svg
+              aria-hidden="true"
+              class=""
+              focusable="false"
+              role="img"
+              viewBox="0 0 448 512"
+            >
+              <path
+                d="M252 54L203 8a28 27 0 00-20-8H28C12 0 0 12 0 27v195c0 15 12 26 28 26h204c15 0 28-11 28-26V73a28 27 0 00-8-19zM130 213c-21 0-37-16-37-36 0-19 16-35 37-35 20 0 37 16 37 35 0 20-17 36-37 36zm56-169v56c0 4-4 6-7 6H44c-4 0-7-2-7-6V42c0-4 3-7 7-7h133l4 2 3 2a7 7 0 012 5z M296 201l87 95-188 205-78 9c-10 1-19-8-18-20l9-84zm141-14l-41-44a31 31 0 00-46 0l-38 41 87 95 38-42c13-14 13-36 0-50z"
+                fill="currentColor"
+              />
+            </svg>
+          </div>
+        </button>
+        <button
+          aria-label="Export"
+          class="ToolIcon_type_button ToolIcon_size_m ToolIcon_type_button--show ToolIcon"
+          data-testid="export-button"
+          title="Export"
+          type="button"
+        >
+          <div
+            aria-hidden="true"
+            class="ToolIcon__icon"
+          >
+            <svg
+              aria-hidden="true"
+              class="rtl-mirror"
+              focusable="false"
+              role="img"
+              viewBox="0 0 576 512"
+            >
+              <path
+                d="M384 121.9c0-6.3-2.5-12.4-7-16.9L279.1 7c-4.5-4.5-10.6-7-17-7H256v128h128zM571 308l-95.7-96.4c-10.1-10.1-27.4-3-27.4 11.3V288h-64v64h64v65.2c0 14.3 17.3 21.4 27.4 11.3L571 332c6.6-6.6 6.6-17.4 0-24zm-379 28v-32c0-8.8 7.2-16 16-16h176V160H248c-13.2 0-24-10.8-24-24V0H24C10.7 0 0 10.7 0 24v464c0 13.3 10.7 24 24 24h336c13.3 0 24-10.7 24-24V352H208c-8.8 0-16-7.2-16-16z"
+                fill="currentColor"
+              />
+            </svg>
+          </div>
+        </button>
+        <button
+          aria-label="Reset the canvas"
+          class="ToolIcon_type_button ToolIcon_size_m ToolIcon_type_button--show ToolIcon"
+          data-testid="clear-canvas-button"
+          title="Reset the canvas"
+          type="button"
+        >
+          <div
+            aria-hidden="true"
+            class="ToolIcon__icon"
+          >
+            <svg
+              aria-hidden="true"
+              class=""
+              focusable="false"
+              role="img"
+              viewBox="0 0 448 512"
+            >
+              <path
+                d="M32 464a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zM432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z"
+                fill="currentColor"
+              />
+            </svg>
+          </div>
+        </button>
+      </div>
+      <div
+        style="display: flex;"
+      >
+        <div
+          style="position: relative;"
+        >
+          <div>
+            <div
+              class="color-picker-control-container"
+            >
+              <button
+                aria-label="Canvas background"
+                class="color-picker-label-swatch"
+                style="--swatch-color: #ffffff;"
+              />
+              <label
+                class="color-input-container"
+              >
+                <div
+                  class="color-picker-hash"
+                >
+                  #
+                </div>
+                <input
+                  aria-label="Canvas background"
+                  class="color-picker-input"
+                  spellcheck="false"
+                  value="ffffff"
+                />
+              </label>
+            </div>
+          </div>
+        </div>
+        <div
+          style="margin-inline-start: 0.25rem;"
+        >
+          <label
+            class="ToolIcon ToolIcon_type_floating ToolIcon_size_M"
+            data-testid="toggle-dark-mode"
+            title="Dark mode"
+          >
+            <input
+              aria-label="Dark mode"
+              class="ToolIcon_type_checkbox ToolIcon_toggle_opaque"
+              type="checkbox"
+            />
+            <div
+              class="ToolIcon__icon"
+            >
+              <svg
+                class="rtl-mirror"
+                height="512"
+                viewBox="0 0 512 512"
+                width="512"
+              >
+                <path
+                  d="M283.211 512c78.962 0 151.079-35.925 198.857-94.792 7.068-8.708-.639-21.43-11.562-19.35-124.203 23.654-238.262-71.576-238.262-196.954 0-72.222 38.662-138.635 101.498-174.394 9.686-5.512 7.25-20.197-3.756-22.23A258.156 258.156 0 0 0 283.211 0c-141.309 0-256 114.511-256 256 0 141.309 114.511 256 256 256z"
+                  fill="currentColor"
+                />
+              </svg>
+            </div>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+`;
