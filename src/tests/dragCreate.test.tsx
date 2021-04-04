@@ -3,7 +3,12 @@ import ReactDOM from "react-dom";
 import ExcalidrawApp from "../excalidraw-app";
 import * as Renderer from "../renderer/renderScene";
 import { KEYS } from "../keys";
-import { render, fireEvent } from "./test-utils";
+import {
+  render,
+  fireEvent,
+  mockBoundingClientRect,
+  restoreOriginalGetBoundingClientRect,
+} from "./test-utils";
 import { ExcalidrawLinearElement } from "../element/types";
 import { reseed } from "../random";
 
@@ -37,7 +42,7 @@ describe("add element to the scene when pointer dragging long enough", () => {
     // finish (position does not matter)
     fireEvent.pointerUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(7);
+    expect(renderScene).toHaveBeenCalledTimes(8);
     expect(h.state.selectionElement).toBeNull();
 
     expect(h.elements.length).toEqual(1);
@@ -68,7 +73,7 @@ describe("add element to the scene when pointer dragging long enough", () => {
     // finish (position does not matter)
     fireEvent.pointerUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(7);
+    expect(renderScene).toHaveBeenCalledTimes(8);
     expect(h.state.selectionElement).toBeNull();
 
     expect(h.elements.length).toEqual(1);
@@ -99,7 +104,7 @@ describe("add element to the scene when pointer dragging long enough", () => {
     // finish (position does not matter)
     fireEvent.pointerUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(7);
+    expect(renderScene).toHaveBeenCalledTimes(8);
     expect(h.state.selectionElement).toBeNull();
 
     expect(h.elements.length).toEqual(1);
@@ -130,7 +135,7 @@ describe("add element to the scene when pointer dragging long enough", () => {
     // finish (position does not matter)
     fireEvent.pointerUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(7);
+    expect(renderScene).toHaveBeenCalledTimes(8);
     expect(h.state.selectionElement).toBeNull();
 
     expect(h.elements.length).toEqual(1);
@@ -165,7 +170,7 @@ describe("add element to the scene when pointer dragging long enough", () => {
     // finish (position does not matter)
     fireEvent.pointerUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(7);
+    expect(renderScene).toHaveBeenCalledTimes(8);
     expect(h.state.selectionElement).toBeNull();
 
     expect(h.elements.length).toEqual(1);
@@ -184,6 +189,13 @@ describe("add element to the scene when pointer dragging long enough", () => {
 });
 
 describe("do not add element to the scene if size is too small", () => {
+  beforeAll(() => {
+    mockBoundingClientRect();
+  });
+  afterAll(() => {
+    restoreOriginalGetBoundingClientRect();
+  });
+
   it("rectangle", async () => {
     const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool

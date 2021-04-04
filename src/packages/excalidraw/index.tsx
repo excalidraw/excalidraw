@@ -14,8 +14,6 @@ import { DEFAULT_UI_OPTIONS } from "../../constants";
 
 const Excalidraw = (props: ExcalidrawProps) => {
   const {
-    width,
-    height,
     onChange,
     initialData,
     excalidrawRef,
@@ -65,8 +63,6 @@ const Excalidraw = (props: ExcalidrawProps) => {
     <InitializeApp langCode={langCode}>
       <IsMobileProvider>
         <App
-          width={width}
-          height={height}
           onChange={onChange}
           initialData={initialData}
           excalidrawRef={excalidrawRef}

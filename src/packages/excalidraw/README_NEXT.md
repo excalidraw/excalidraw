@@ -45,32 +45,11 @@ import "./styles.scss";
 
 export default function App() {
   const excalidrawRef = useRef(null);
-  const excalidrawWrapperRef = useRef(null);
-  const [dimensions, setDimensions] = useState({
-    width: undefined,
-    height: undefined,
-  });
 
   const [viewModeEnabled, setViewModeEnabled] = useState(false);
   const [zenModeEnabled, setZenModeEnabled] = useState(false);
   const [gridModeEnabled, setGridModeEnabled] = useState(false);
 
-  useEffect(() => {
-    setDimensions({
-      width: excalidrawWrapperRef.current.getBoundingClientRect().width,
-      height: excalidrawWrapperRef.current.getBoundingClientRect().height,
-    });
-    const onResize = () => {
-      setDimensions({
-        width: excalidrawWrapperRef.current.getBoundingClientRect().width,
-        height: excalidrawWrapperRef.current.getBoundingClientRect().height,
-      });
-    };
-
-    window.addEventListener("resize", onResize);
-
-    return () => window.removeEventListener("resize", onResize);
-  }, [excalidrawWrapperRef]);
 
   const updateScene = () => {
     const sceneData = {
@@ -144,13 +123,11 @@ export default function App() {
           Grid mode
         </label>
       </div>
-      <div className="excalidraw-wrapper" ref={excalidrawWrapperRef}>
+      <div className="excalidraw-wrapper">
         <Excalidraw
           ref={excalidrawRef}
-          width={dimensions.width}
-          height={dimensions.height}
           initialData={InitialData}
-          onChange={(elements, state) =>
+          onChange={(elements, state) => {
             console.log("Elements :", elements, "State : ", state)
           }
           onPointerUpdate={(payload) => console.log(payload)}
@@ -246,32 +223,10 @@ import InitialData from "./initialData";
 
 const App = () => {
   const excalidrawRef = React.useRef(null);
-  const excalidrawWrapperRef = React.useRef(null);
-  const [dimensions, setDimensions] = React.useState({
-    width: undefined,
-    height: undefined,
-  });
 
   const [viewModeEnabled, setViewModeEnabled] = React.useState(false);
   const [zenModeEnabled, setZenModeEnabled] = React.useState(false);
   const [gridModeEnabled, setGridModeEnabled] = React.useState(false);
-
-  React.useEffect(() => {
-    setDimensions({
-      width: excalidrawWrapperRef.current.getBoundingClientRect().width,
-      height: excalidrawWrapperRef.current.getBoundingClientRect().height,
-    });
-    const onResize = () => {
-      setDimensions({
-        width: excalidrawWrapperRef.current.getBoundingClientRect().width,
-        height: excalidrawWrapperRef.current.getBoundingClientRect().height,
-      });
-    };
-
-    window.addEventListener("resize", onResize);
-
-    return () => window.removeEventListener("resize", onResize);
-  }, [excalidrawWrapperRef]);
 
   const updateScene = () => {
     const sceneData = {
@@ -365,9 +320,6 @@ const App = () => {
         ref: excalidrawWrapperRef,
       },
       React.createElement(Excalidraw.default, {
-        ref: excalidrawRef,
-        width: dimensions.width,
-        height: dimensions.height,
         initialData: InitialData,
         onChange: (elements, state) =>
           console.log("Elements :", elements, "State : ", state),
@@ -396,8 +348,6 @@ To view the full example visit :point_down:
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| [`width`](#width) | Number | `window.innerWidth` | The width of Excalidraw component |
-| [`height`](#height) | Number | `window.innerHeight` | The height of Excalidraw component |
 | [`onChange`](#onChange) | Function |  | This callback is triggered whenever the component updates due to any change. This callback will receive the excalidraw elements and the current app state. |
 | [`initialData`](#initialData) | <pre>{elements?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>, appState?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37">AppState<a> } </pre> | null | The initial data with which app loads. |
 | [`ref`](#ref) | [`createRef`](https://reactjs.org/docs/refs-and-the-dom.html#creating-refs) or [`callbackRef`](https://reactjs.org/docs/refs-and-the-dom.html#callback-refs) or <pre>{ current: { readyPromise: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317">resolvablePromise</a> } }</pre> |  | Ref to be passed to Excalidraw |
@@ -416,13 +366,9 @@ To view the full example visit :point_down:
 | [`name`](#name) | string |  | Name of the drawing |
 | [`UIOptions`](#UIOptions) | <pre>{ <br> canvasActions?: { <br> changeViewBackgroundColor?: boolean,<br> clearCanvas?: boolean,<br> export?: boolean,<br> loadScene?: boolean,<br> saveAsScene?: boolean,<br> saveScene?: boolean,<br> theme?: boolean <br> }<br>}</pre> |  | To hide certain UI elements |
 
-#### `width`
+### Dimensions of Excalidraw
 
-This props defines the `width` of the Excalidraw component. Defaults to `window.innerWidth` if not passed.
-
-#### `height`
-
-This props defines the `height` of the Excalidraw component. Defaults to `window.innerHeight` if not passed.
+Excalidraw takes `100%` of `width` and `height` of the containing block so you need to make sure the container in which you are rendering Excalidraw has non zero dimensions (It should have non zero width and height so Excalidraw can match the dimensions of the containing block). This is to make sure you don't have to worry about updating the offsets of dimensions when resizing Excalidraw.
 
 #### `onChange`
 

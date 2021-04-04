@@ -289,20 +289,16 @@ class App extends React.Component<AppProps, AppState> {
   private excalidrawContainerRef = React.createRef<HTMLDivElement>();
 
   public static defaultProps: Partial<AppProps> = {
-    width: window.innerWidth,
-    height: window.innerHeight,
     // needed for tests to pass since we directly render App in many tests
     UIOptions: DEFAULT_UI_OPTIONS,
   };
+
   private scene: Scene;
   private resizeObserver: ResizeObserver | undefined;
   constructor(props: AppProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
-
     const {
-      width = window.innerWidth,
-      height = window.innerHeight,
       excalidrawRef,
       viewModeEnabled = false,
       zenModeEnabled = false,
@@ -314,13 +310,13 @@ class App extends React.Component<AppProps, AppState> {
       ...defaultAppState,
       theme,
       isLoading: true,
-      width,
-      height,
       ...this.getCanvasOffsets(),
       viewModeEnabled,
       zenModeEnabled,
       gridSize: gridModeEnabled ? GRID_SIZE : null,
       name,
+      width: window.innerWidth,
+      height: window.innerHeight,
     };
     if (excalidrawRef) {
       const readyPromise =
@@ -444,10 +440,6 @@ class App extends React.Component<AppProps, AppState> {
           "excalidraw--view-mode": viewModeEnabled,
         })}
         ref={this.excalidrawContainerRef}
-        style={{
-          width: canvasDOMWidth,
-          height: canvasDOMHeight,
-        }}
       >
         <LayerUI
           canvas={this.canvas}
@@ -562,7 +554,6 @@ class App extends React.Component<AppProps, AppState> {
         if (typeof this.props.name !== "undefined") {
           name = this.props.name;
         }
-
         this.setState(
           (state) => {
             // using Object.assign instead of spread to fool TS 4.2.2+ into
@@ -571,10 +562,6 @@ class App extends React.Component<AppProps, AppState> {
             return Object.assign(actionResult.appState || {}, {
               editingElement:
                 editingElement || actionResult.appState?.editingElement || null,
-              width: state.width,
-              height: state.height,
-              offsetTop: state.offsetTop,
-              offsetLeft: state.offsetLeft,
               viewModeEnabled,
               zenModeEnabled,
               gridSize,
@@ -707,7 +694,6 @@ class App extends React.Component<AppProps, AppState> {
     if (!this.state.isLoading) {
       this.setState({ isLoading: true });
     }
-
     let initialData = null;
     try {
       initialData = (await this.props.initialData) || null;
@@ -716,7 +702,6 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const scene = restore(initialData, null);
-
     scene.appState = {
       ...scene.appState,
       isLoading: false,
@@ -788,14 +773,11 @@ class App extends React.Component<AppProps, AppState> {
     this.scene.addCallback(this.onSceneUpdated);
     this.addEventListeners();
 
-    if (
-      "ResizeObserver" in window &&
-      this.excalidrawContainerRef?.current?.parentElement
-    ) {
-      this.resizeObserver = new ResizeObserver(() => this.setCanvasOffsets());
-      this.resizeObserver?.observe(
-        this.excalidrawContainerRef.current.parentElement,
-      );
+    if ("ResizeObserver" in window && this.excalidrawContainerRef?.current) {
+      this.resizeObserver = new ResizeObserver(() => {
+        this.updateDOMRect();
+      });
+      this.resizeObserver?.observe(this.excalidrawContainerRef.current);
     }
     const searchParams = new URLSearchParams(window.location.search.slice(1));
 
@@ -803,9 +785,7 @@ class App extends React.Component<AppProps, AppState> {
       // Obtain a file that was shared via the Web Share Target API.
       this.restoreFileFromShare();
     } else {
-      this.setState(this.getCanvasOffsets(), () => {
-        this.initializeScene();
-      });
+      this.updateDOMRect(this.initializeScene);
     }
   }
 
@@ -905,17 +885,6 @@ class App extends React.Component<AppProps, AppState> {
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
     if (prevProps.langCode !== this.props.langCode) {
       this.updateLanguage();
-    }
-
-    if (
-      prevProps.width !== this.props.width ||
-      prevProps.height !== this.props.height
-    ) {
-      this.setState({
-        width: this.props.width ?? window.innerWidth,
-        height: this.props.height ?? window.innerHeight,
-        ...this.getCanvasOffsets(),
-      });
     }
 
     if (prevProps.viewModeEnabled !== this.props.viewModeEnabled) {
@@ -4094,14 +4063,56 @@ class App extends React.Component<AppProps, AppState> {
     }
   }, 300);
 
+  private updateDOMRect = (cb?: () => void) => {
+    if (this.excalidrawContainerRef?.current) {
+      const excalidrawContainer = this.excalidrawContainerRef.current;
+      const {
+        width,
+        height,
+        left: offsetLeft,
+        top: offsetTop,
+      } = excalidrawContainer.getBoundingClientRect();
+      const {
+        width: currentWidth,
+        height: currentHeight,
+        offsetTop: currentOffsetTop,
+        offsetLeft: currentOffsetLeft,
+      } = this.state;
+
+      if (
+        width === currentWidth &&
+        height === currentHeight &&
+        offsetLeft === currentOffsetLeft &&
+        offsetTop === currentOffsetTop
+      ) {
+        if (cb) {
+          cb();
+        }
+        return;
+      }
+
+      this.setState(
+        {
+          width,
+          height,
+          offsetLeft,
+          offsetTop,
+        },
+        () => {
+          cb && cb();
+        },
+      );
+    }
+  };
+
   public setCanvasOffsets = () => {
     this.setState({ ...this.getCanvasOffsets() });
   };
 
   private getCanvasOffsets(): Pick<AppState, "offsetTop" | "offsetLeft"> {
-    if (this.excalidrawContainerRef?.current?.parentElement) {
-      const parentElement = this.excalidrawContainerRef.current.parentElement;
-      const { left, top } = parentElement.getBoundingClientRect();
+    if (this.excalidrawContainerRef?.current) {
+      const excalidrawContainer = this.excalidrawContainerRef.current;
+      const { left, top } = excalidrawContainer.getBoundingClientRect();
       return {
         offsetLeft: left,
         offsetTop: top,
