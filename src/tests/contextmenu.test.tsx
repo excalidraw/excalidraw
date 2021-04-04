@@ -18,6 +18,7 @@ import { CODES } from "../keys";
 import { ShortcutName } from "../actions/shortcuts";
 import { copiedStyles } from "../actions/actionStyles";
 import { API } from "./helpers/api";
+import { setDateTimeForTests } from "../utils";
 
 const checkpoint = (name: string) => {
   expect(renderScene.mock.calls.length).toMatchSnapshot(
@@ -59,6 +60,12 @@ const { h } = window;
 
 describe("contextMenu element", () => {
   beforeEach(async () => {
+    localStorage.clear();
+    renderScene.mockClear();
+    h.history.clear();
+    reseed(7);
+    setDateTimeForTests("201933152653");
+
     await render(<ExcalidrawApp />);
   });
 
