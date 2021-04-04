@@ -33,6 +33,7 @@ export const actionChangeViewBackgroundColor = register({
           type="canvasBackground"
           color={appState.viewBackgroundColor}
           onChange={(color) => updateData(color)}
+          data-testid="canvas-background-picker"
         />
       </div>
     );
@@ -72,6 +73,7 @@ export const actionClearCanvas = register({
           updateData(null);
         }
       }}
+      data-testid="clear-canvas-button"
     />
   ),
 });
