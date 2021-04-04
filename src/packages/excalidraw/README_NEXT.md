@@ -364,6 +364,7 @@ To view the full example visit :point_down:
 | [`libraryReturnUrl`](#libraryReturnUrl) | string |  | What URL should [libraries.excalidraw.com](https://libraries.excalidraw.com) be installed to |
 | [`theme`](#theme) | `light` or `dark` |  | The theme of the Excalidraw component |
 | [`name`](#name) | string |  | Name of the drawing |
+| [`UIOptions`](#UIOptions) | <pre>{ canvasActions: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L208"> CanvasActions<a/> }</pre> | [DEFAULT UI OPTIONS](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L129) | To customise UI options. Currently we support customising [`canvas actions`](#canvasActions) |
 
 ### Dimensions of Excalidraw
 
@@ -527,6 +528,26 @@ This prop controls Excalidraw's theme. When supplied, the value takes precedence
 #### `name`
 
 This prop sets the name of the drawing which will be used when exporting the drawing. When supplied, the value takes precedence over `intialData.appState.name`, the `name` will be fully controlled by host app and the users won't be able to edit from within Excalidraw.
+
+### `UIOptions`
+
+This prop can be used to customise UI of Excalidraw. Currently we support customising only [`canvasActions`](#canvasActions). It accepts the below parameters
+
+<pre>
+{ canvasActions: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L208"> CanvasActions<a/> }
+</pre>
+
+#### canvasActions
+
+| Attribute | Type | Default | Description |
+| --- | --- | --- | --- |
+| `changeViewBackgroundColor` | boolean | true | Implies whether to show `Background color picker` |
+| `clearCanvas` | boolean | true | Implies whether to show `Clear canvas button` |
+| `export` | boolean | true | Implies whether to show `Export button` |
+| `loadScene` | boolean | true | Implies whether to show `Load button` |
+| `saveAsScene` | boolean | true | Implies whether to show `Save as button` |
+| `saveScene` | boolean | true | Implies whether to show `Save button` |
+| `theme` | boolean | true | Implies whether to show `Theme toggle` |
 
 ### Does it support collaboration ?
 

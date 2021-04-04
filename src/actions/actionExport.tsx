@@ -136,6 +136,7 @@ export const actionSaveScene = register({
       aria-label={t("buttons.save")}
       showAriaLabel={useIsMobile()}
       onClick={() => updateData(null)}
+      data-testid="save-button"
     />
   ),
 });
@@ -167,6 +168,7 @@ export const actionSaveAsScene = register({
       showAriaLabel={useIsMobile()}
       hidden={!supported}
       onClick={() => updateData(null)}
+      data-testid="save-as-button"
     />
   ),
 });
@@ -204,6 +206,7 @@ export const actionLoadScene = register({
       aria-label={t("buttons.load")}
       showAriaLabel={useIsMobile()}
       onClick={updateData}
+      data-testid="load-button"
     />
   ),
 });
