@@ -924,7 +924,7 @@ class App extends React.Component<AppProps, AppState> {
       ?.classList.toggle("theme--dark", this.state.theme === "dark");
 
     if (this.state.autosave && this.state.fileHandle && supported) {
-      this.saveLocalSceneDebounced(
+      this.autosaveLocalSceneDebounced(
         this.scene.getElementsIncludingDeleted(),
         this.state,
       );
@@ -1062,18 +1062,31 @@ class App extends React.Component<AppProps, AppState> {
     });
   }, SCROLL_TIMEOUT);
 
-  private saveLocalSceneDebounced = debounce(
+  private autosaveLocalSceneDebounced = debounce(
     async (elements: readonly ExcalidrawElement[], state: AppState) => {
       if (this.state.autosave && this.state.fileHandle && supported) {
         try {
-          await saveAsJSON(elements, state);
+          await saveAsJSON(
+            elements,
+            state,
+            // only if fileHandle valid
+            true,
+          );
         } catch (error) {
-          // shouldn't (almost) ever happen, so let's log it
-          console.error(error);
           this.setState({
             autosave: false,
-            errorMessage: t("toast.autosaveFailed"),
+            toastMessage:
+              error.name === "NotAllowedError"
+                ? t("toast.autosaveFailed_notAllowed")
+                : error.name === "NotFoundError"
+                ? t("toast.autosaveFailed_notFound")
+                : t("toast.autosaveFailed"),
           });
+
+          // shouldn't happen, so let's log it
+          if (!["NotAllowedError", "NotFoundError"].includes(error.name)) {
+            console.error(error);
+          }
         }
       }
     },

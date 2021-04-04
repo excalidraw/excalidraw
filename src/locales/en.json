@@ -251,6 +251,8 @@
     "width": "Width"
   },
   "toast": {
+    "autosaveFailed_notAllowed": "Autosave was disabled.",
+    "autosaveFailed_notFound": "Autosave failed.\nIt seems the file no longer exists.",
     "autosaveFailed": "Autosave failed.",
     "copyStyles": "Copied styles.",
     "copyToClipboard": "Copied to clipboard.",
