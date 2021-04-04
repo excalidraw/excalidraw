@@ -32,56 +32,47 @@ const ContextMenu = ({
   actionManager,
   appState,
 }: ContextMenuProps) => {
-  const isDarkTheme = !!document
-    .querySelector(".excalidraw")
-    ?.classList.contains("theme--dark");
   return (
-    <div
-      className={clsx("excalidraw", {
-        "theme--dark theme--dark-background-none": isDarkTheme,
-      })}
+    <Popover
+      onCloseRequest={onCloseRequest}
+      top={top}
+      left={left}
+      fitInViewport={true}
     >
-      <Popover
-        onCloseRequest={onCloseRequest}
-        top={top}
-        left={left}
-        fitInViewport={true}
+      <ul
+        className="context-menu"
+        onContextMenu={(event) => event.preventDefault()}
       >
-        <ul
-          className="context-menu"
-          onContextMenu={(event) => event.preventDefault()}
-        >
-          {options.map((option, idx) => {
-            if (option === "separator") {
-              return <hr key={idx} className="context-menu-option-separator" />;
-            }
+        {options.map((option, idx) => {
+          if (option === "separator") {
+            return <hr key={idx} className="context-menu-option-separator" />;
+          }
 
-            const actionName = option.name;
-            const label = option.contextItemLabel
-              ? t(option.contextItemLabel)
-              : "";
-            return (
-              <li key={idx} data-testid={actionName} onClick={onCloseRequest}>
-                <button
-                  className={clsx("context-menu-option", {
-                    dangerous: actionName === "deleteSelectedElements",
-                    checkmark: option.checked?.(appState),
-                  })}
-                  onClick={() => actionManager.executeAction(option)}
-                >
-                  <div className="context-menu-option__label">{label}</div>
-                  <kbd className="context-menu-option__shortcut">
-                    {actionName
-                      ? getShortcutFromShortcutName(actionName as ShortcutName)
-                      : ""}
-                  </kbd>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      </Popover>
-    </div>
+          const actionName = option.name;
+          const label = option.contextItemLabel
+            ? t(option.contextItemLabel)
+            : "";
+          return (
+            <li key={idx} data-testid={actionName} onClick={onCloseRequest}>
+              <button
+                className={clsx("context-menu-option", {
+                  dangerous: actionName === "deleteSelectedElements",
+                  checkmark: option.checked?.(appState),
+                })}
+                onClick={() => actionManager.executeAction(option)}
+              >
+                <div className="context-menu-option__label">{label}</div>
+                <kbd className="context-menu-option__shortcut">
+                  {actionName
+                    ? getShortcutFromShortcutName(actionName as ShortcutName)
+                    : ""}
+                </kbd>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </Popover>
   );
 };
 
@@ -91,7 +82,7 @@ const getContextMenuNode = (): HTMLDivElement => {
     return contextMenuNode;
   }
   const div = document.createElement("div");
-  document.body.appendChild(div);
+  document.querySelector(".excalidraw-contextMenuContainer")!.appendChild(div);
   return (contextMenuNode = div);
 };
 
