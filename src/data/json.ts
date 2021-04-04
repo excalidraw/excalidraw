@@ -116,5 +116,5 @@ export const importLibraryFromJSON = async () => {
     extensions: [".json", ".excalidrawlib"],
     */
   });
-  Library.importLibrary(blob);
+  await Library.importLibrary(blob);
 };
