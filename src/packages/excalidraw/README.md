@@ -16,9 +16,9 @@ or via yarn
 yarn add react react-dom @excalidraw/excalidraw
 ```
 
-After installation you will see a folder `excalidraw-assets` and `excalidraw-dev-assets` in `dist` directory which contains the assets needed for this app in prod and dev mode respectively.
+After installation you will see a folder `excalidraw-assets` and `excalidraw-assets-dev` in `dist` directory which contains the assets needed for this app in prod and dev mode respectively.
 
-Move the folder `excalidraw-assets` and `excalidraw-dev-assets` to the path where your assets are served.
+Move the folder `excalidraw-assets` and `excalidraw-assets-dev` to the path where your assets are served.
 
 By default it will try to load the files from `https://unpkg.com/@excalidraw/excalidraw/{currentVersion}/dist/`
 
