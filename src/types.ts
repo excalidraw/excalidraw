@@ -159,8 +159,6 @@ export type ExcalidrawAPIRefValue =
     };
 
 export interface ExcalidrawProps {
-  width?: number;
-  height?: number;
   onChange?: (
     elements: readonly ExcalidrawElement[],
     appState: AppState,

@@ -63,6 +63,8 @@ const canvas = exportToCanvas(
     ...getDefaultAppState(),
     offsetTop: 0,
     offsetLeft: 0,
+    width: 0,
+    height: 0,
   },
   {
     exportBackground: true,
