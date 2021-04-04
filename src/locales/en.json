@@ -78,7 +78,7 @@
     "ungroup": "Ungroup selection",
     "collaborators": "Collaborators",
     "showGrid": "Show grid",
-    "toggleAutosave": "Autosave",
+    "toggleAutosave": "Autosave to current file",
     "toggleAutosave_details": "Automatically save changes when working on an existing file.",
     "addToLibrary": "Add to library",
     "removeFromLibrary": "Remove from library",
