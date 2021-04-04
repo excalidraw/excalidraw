@@ -36,7 +36,7 @@ Please add the latest change on the top under the correct section.
   #### BREAKING CHANGE
   - If you are using script tag to embed excalidraw then the name of the file will have to be updated to `excalidraw.production.min.js` instead of `excalidraw.min.js`. If you want to use dev build you can use `excalidraw.development.js`
 
-### Fix
+### Refactor
 
 #### BREAKING CHANGE
 
