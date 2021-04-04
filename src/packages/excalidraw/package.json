@@ -59,7 +59,7 @@
     "mini-css-extract-plugin": "1.4.0",
     "sass-loader": "11.0.1",
     "terser-webpack-plugin": "5.1.1",
-    "ts-loader": "8.0.18",
+    "ts-loader": "8.1.0",
     "typescript": "4.2.3",
     "webpack": "5.30.0",
     "webpack-bundle-analyzer": "4.4.0",
