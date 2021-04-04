@@ -76,13 +76,13 @@ const ContextMenu = ({
   );
 };
 
-let contextMenuNode: HTMLDivElement;
-const getContextMenuNode = (): HTMLDivElement => {
+let contextMenuNode: HTMLDivElement | null = null;
+const getContextMenuNode = (container: HTMLElement): HTMLDivElement => {
   if (contextMenuNode) {
     return contextMenuNode;
   }
   const div = document.createElement("div");
-  document.querySelector(".excalidraw-contextMenuContainer")!.appendChild(div);
+  container.querySelector(".excalidraw-contextMenuContainer")!.appendChild(div);
   return (contextMenuNode = div);
 };
 
@@ -92,10 +92,15 @@ type ContextMenuParams = {
   left: ContextMenuProps["left"];
   actionManager: ContextMenuProps["actionManager"];
   appState: Readonly<AppState>;
+  container: HTMLElement;
 };
 
 const handleClose = () => {
-  unmountComponentAtNode(getContextMenuNode());
+  if (contextMenuNode) {
+    unmountComponentAtNode(contextMenuNode);
+    contextMenuNode.remove();
+    contextMenuNode = null;
+  }
 };
 
 export default {
@@ -116,7 +121,7 @@ export default {
           actionManager={params.actionManager}
           appState={params.appState}
         />,
-        getContextMenuNode(),
+        getContextMenuNode(params.container),
       );
     }
   },
