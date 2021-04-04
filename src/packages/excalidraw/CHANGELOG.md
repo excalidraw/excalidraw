@@ -36,6 +36,12 @@ Please add the latest change on the top under the correct section.
   #### BREAKING CHANGE
   - If you are using script tag to embed excalidraw then the name of the file will have to be updated to `excalidraw.production.min.js` instead of `excalidraw.min.js`. If you want to use dev build you can use `excalidraw.development.js`
 
+### Fix
+
+#### BREAKING CHANGE
+
+- Rename the API `setCanvasOffsets` via `ref` to `refresh`[#3398](https://github.com/excalidraw/excalidraw/pull/3398).
+
 ---
 
 ## 0.5.0 (2021-03-21)
