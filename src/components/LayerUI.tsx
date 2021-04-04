@@ -142,9 +142,9 @@ const LibraryMenuItems = ({
         onClick={() => {
           importLibraryFromJSON()
             .then(() => {
-              // Maybe we should close and open the menu so that the items get updated.
-              // But for now we just close the menu.
+              // Close and then open to get the libraries updated
               setAppState({ isLibraryOpen: false });
+              setAppState({ isLibraryOpen: true });
             })
             .catch(muteFSAbortError)
             .catch((error) => {
