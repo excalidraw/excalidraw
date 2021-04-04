@@ -3624,7 +3624,9 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       Library.importLibrary(file)
         .then(() => {
+          // Close and then open to get the libraries updated
           this.setState({ isLibraryOpen: false });
+          this.setState({ isLibraryOpen: true });
         })
         .catch((error) =>
           this.setState({ isLoading: false, errorMessage: error.message }),
