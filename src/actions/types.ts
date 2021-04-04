@@ -6,7 +6,10 @@ import { AppState, ExcalidrawProps } from "../types";
 export type ActionResult =
   | {
       elements?: readonly ExcalidrawElement[] | null;
-      appState?: MarkOptional<AppState, "offsetTop" | "offsetLeft"> | null;
+      appState?: MarkOptional<
+        AppState,
+        "offsetTop" | "offsetLeft" | "width" | "height"
+      > | null;
       commitToHistory: boolean;
       syncHistory?: boolean;
     }
@@ -86,6 +89,8 @@ export type ActionName =
   | "alignHorizontallyCentered"
   | "distributeHorizontally"
   | "distributeVertically"
+  | "flipHorizontal"
+  | "flipVertical"
   | "viewMode"
   | "exportWithDarkMode";
 

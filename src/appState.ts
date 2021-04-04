@@ -10,7 +10,7 @@ import { getDateTime } from "./utils";
 
 export const getDefaultAppState = (): Omit<
   AppState,
-  "offsetTop" | "offsetLeft"
+  "offsetTop" | "offsetLeft" | "width" | "height"
 > => {
   return {
     autosave: false,
@@ -44,7 +44,6 @@ export const getDefaultAppState = (): Omit<
     exportWithDarkMode: false,
     fileHandle: null,
     gridSize: null,
-    height: window.innerHeight,
     isBindingEnabled: true,
     isLibraryOpen: false,
     isLoading: false,
@@ -71,7 +70,6 @@ export const getDefaultAppState = (): Omit<
     suggestedBindings: [],
     toastMessage: null,
     viewBackgroundColor: oc.white,
-    width: window.innerWidth,
     zenModeEnabled: false,
     zoom: { value: 1 as NormalizedZoomValue, translation: { x: 0, y: 0 } },
     viewModeEnabled: false,

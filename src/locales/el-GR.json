@@ -61,7 +61,7 @@
     "architect": "Αρχιτέκτονας",
     "artist": "Καλλιτέχνης",
     "cartoonist": "Σκιτσογράφος",
-    "fileTitle": "Τίτλος αρχείου",
+    "fileTitle": "Όνομα αρχείου",
     "colorPicker": "Επιλογή Χρώματος",
     "canvasBackground": "Φόντο καμβά",
     "drawingCanvas": "Σχεδίαση καμβά",
@@ -92,9 +92,11 @@
     "centerHorizontally": "Κέντρο οριζόντια",
     "distributeHorizontally": "Οριζόντια κατανομή",
     "distributeVertically": "Κατακόρυφη κατανομή",
+    "flipHorizontal": "Οριζόντια αναστροφή",
+    "flipVertical": "Κατακόρυφη αναστροφή",
     "viewMode": "Λειτουργία προβολής",
     "toggleExportColorScheme": "Εναλλαγή εξαγωγής θέματος χρωμάτων",
-    "share": ""
+    "share": "Κοινοποίηση"
   },
   "buttons": {
     "clearReset": "Επαναφορά του καμβά",
@@ -228,7 +230,8 @@
     "zoomToSelection": "Ζουμ στην επιλογή"
   },
   "encrypted": {
-    "tooltip": "Τα σχέδιά σου είναι κρυπτογραφημένα από άκρο σε άκρο, έτσι δεν θα είναι ποτέ ορατά μέσα από τους διακομιστές του Excalidraw."
+    "tooltip": "Τα σχέδιά σου είναι κρυπτογραφημένα από άκρο σε άκρο, έτσι δεν θα είναι ποτέ ορατά μέσα από τους διακομιστές του Excalidraw.",
+    "link": ""
   },
   "stats": {
     "angle": "Γωνία",

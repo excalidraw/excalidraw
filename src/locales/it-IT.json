@@ -61,7 +61,7 @@
     "architect": "Architetto",
     "artist": "Artista",
     "cartoonist": "Fumettista",
-    "fileTitle": "Titolo del file",
+    "fileTitle": "Nome del file",
     "colorPicker": "Selettore colore",
     "canvasBackground": "Sfondo tela",
     "drawingCanvas": "Area di disegno",
@@ -92,6 +92,8 @@
     "centerHorizontally": "Centra orizzontalmente",
     "distributeHorizontally": "Distribuisci orizzontalmente",
     "distributeVertically": "Distribuisci verticalmente",
+    "flipHorizontal": "Capovolgi orizzontalmente",
+    "flipVertical": "Capovolgi verticalmente",
     "viewMode": "Modalità visualizzazione",
     "toggleExportColorScheme": "Cambia lo schema di colori in esportazione",
     "share": "Condividi"
@@ -228,7 +230,8 @@
     "zoomToSelection": "Zoom alla selezione"
   },
   "encrypted": {
-    "tooltip": "I tuoi disegni sono crittografati end-to-end in modo che i server di Excalidraw non li possano mai vedere."
+    "tooltip": "I tuoi disegni sono crittografati end-to-end in modo che i server di Excalidraw non li possano mai vedere.",
+    "link": "Articolo del blog sulla crittografia end-to-end di Excalidraw"
   },
   "stats": {
     "angle": "Angolo",

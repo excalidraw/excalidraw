@@ -11,7 +11,7 @@ import { restore } from "../data/restore";
 type ExportOpts = {
   elements: readonly ExcalidrawElement[];
   appState?: Partial<Omit<AppState, "offsetTop" | "offsetLeft">>;
-  getDimensions: (
+  getDimensions?: (
     width: number,
     height: number,
   ) => { width: number; height: number; scale: number };
@@ -33,7 +33,7 @@ export const exportToCanvas = ({
   } = restoredAppState;
   return _exportToCanvas(
     getNonDeletedElements(restoredElements),
-    { ...restoredAppState, offsetTop: 0, offsetLeft: 0 },
+    { ...restoredAppState, offsetTop: 0, offsetLeft: 0, width: 0, height: 0 },
     { exportBackground, viewBackgroundColor, shouldAddWatermark },
     (width: number, height: number) => {
       const canvas = document.createElement("canvas");
@@ -83,7 +83,7 @@ export const exportToSvg = ({
   appState = getDefaultAppState(),
   exportPadding,
   metadata,
-}: ExportOpts & {
+}: Omit<ExportOpts, "getDimensions"> & {
   exportPadding?: number;
   metadata?: string;
 }): SVGSVGElement => {

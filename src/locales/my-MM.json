@@ -61,7 +61,7 @@
     "architect": "ဗိသုကာ",
     "artist": "ပန်းချီ",
     "cartoonist": "ကာတွန်း",
-    "fileTitle": "ခေါင်းစဉ်",
+    "fileTitle": "",
     "colorPicker": "အရောင်ရွေး",
     "canvasBackground": "ကားချပ်နောက်ခံ",
     "drawingCanvas": "ပုံဆွဲကားချပ်",
@@ -92,6 +92,8 @@
     "centerHorizontally": "အလျားလိုက်အလယ်ညှိ",
     "distributeHorizontally": "အလျားလိုက်",
     "distributeVertically": "ထောင်လိုက်",
+    "flipHorizontal": "",
+    "flipVertical": "",
     "viewMode": "",
     "toggleExportColorScheme": "",
     "share": ""
@@ -228,7 +230,8 @@
     "zoomToSelection": ""
   },
   "encrypted": {
-    "tooltip": "ရေးဆွဲထားသောပုံများအား နှစ်ဘက်စွန်းတိုင်လျှို့ဝှက်ထားသဖြင့် Excalidraw ၏ဆာဗာများပင်လျှင်မြင်တွေ့ရမည်မဟုတ်ပါ။"
+    "tooltip": "ရေးဆွဲထားသောပုံများအား နှစ်ဘက်စွန်းတိုင်လျှို့ဝှက်ထားသဖြင့် Excalidraw ၏ဆာဗာများပင်လျှင်မြင်တွေ့ရမည်မဟုတ်ပါ။",
+    "link": ""
   },
   "stats": {
     "angle": "ထောင့်",

@@ -16,6 +16,8 @@
   bottom: 0;
   left: 0;
   right: 0;
+  height: 100%;
+  width: 100%;
 
   // serves 2 purposes:
   // 1. prevent selecting text outside the component when double-clicking or
@@ -45,6 +47,12 @@
     image-rendering: -moz-crisp-edges; // FF
 
     z-index: var(--zIndex-canvas);
+  }
+
+  #canvas {
+    // Remove the main canvas from document flow to avoid resizeObserver
+    // feedback loop (see https://github.com/excalidraw/excalidraw/pull/3379)
+    position: absolute;
   }
 
   &.theme--dark {
@@ -454,6 +462,14 @@
     fill: $oc-gray-6;
     bottom: 14px;
     width: 1.5rem;
+    padding: 0;
+    margin: 0;
+    background: none;
+    color: var(--icon-fill-color);
+
+    &:hover {
+      background: none;
+    }
 
     :root[dir="ltr"] & {
       right: 14px;

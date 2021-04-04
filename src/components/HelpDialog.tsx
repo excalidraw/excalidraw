@@ -349,6 +349,14 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                   label={t("labels.ungroup")}
                   shortcuts={[getShortcutKey("CtrlOrCmd+Shift+G")]}
                 />
+                <Shortcut
+                  label={t("labels.flipHorizontal")}
+                  shortcuts={[getShortcutKey("Shift+H")]}
+                />
+                <Shortcut
+                  label={t("labels.flipVertical")}
+                  shortcuts={[getShortcutKey("Shift+V")]}
+                />
               </ShortcutIsland>
             </Column>
           </Columns>

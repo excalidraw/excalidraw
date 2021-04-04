@@ -1,5 +1,6 @@
 import { FontFamily } from "./element/types";
 import cssVariables from "./css/variables.module.scss";
+import { AppProps } from "./types";
 
 export const APP_NAME = "Excalidraw";
 
@@ -117,3 +118,23 @@ export const MODES = {
 };
 
 export const THEME_FILTER = cssVariables.themeFilter;
+
+export const URL_QUERY_KEYS = {
+  addLibrary: "addLibrary",
+} as const;
+
+export const URL_HASH_KEYS = {
+  addLibrary: "addLibrary",
+} as const;
+
+export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
+  canvasActions: {
+    changeViewBackgroundColor: true,
+    clearCanvas: true,
+    export: true,
+    loadScene: true,
+    saveAsScene: true,
+    saveScene: true,
+    theme: true,
+  },
+};

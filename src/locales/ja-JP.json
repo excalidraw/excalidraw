@@ -92,6 +92,8 @@
     "centerHorizontally": "横方向に中央揃え",
     "distributeHorizontally": "水平方向に分散配置",
     "distributeVertically": "垂直方向に分散配置",
+    "flipHorizontal": "水平方向に反転",
+    "flipVertical": "垂直方向に反転",
     "viewMode": "閲覧モード",
     "toggleExportColorScheme": "",
     "share": ""
@@ -201,7 +203,7 @@
     "desc_inProgressIntro": "共同編集セッションが有効になっています。",
     "desc_shareLink": "下記URLを共同編集したい人に共有してください：",
     "desc_exitSession": "セッションを終了すると部屋から切断されますが、手元の環境で編集を続けることができます。変更内容は他の人には反映されません。",
-    "shareTitle": ""
+    "shareTitle": "Excalidrawのライブコラボレーションセッションに参加する"
   },
   "errorDialog": {
     "title": "エラー"
@@ -228,7 +230,8 @@
     "zoomToSelection": "選択要素にズーム"
   },
   "encrypted": {
-    "tooltip": "描画内容はエンドツーエンド暗号化が施されており、Excalidrawサーバーが内容を見ることはできません。"
+    "tooltip": "描画内容はエンドツーエンド暗号化が施されており、Excalidrawサーバーが内容を見ることはできません。",
+    "link": "Excalidrawのエンドツーエンド暗号化に関するブログ記事"
   },
   "stats": {
     "angle": "角度",
@@ -251,7 +254,7 @@
     "copyToClipboardAsPng": "",
     "fileSaved": "ファイルを保存しました",
     "fileSavedToFilename": "{filename} に保存しました",
-    "canvas": "",
+    "canvas": "キャンバス",
     "selection": ""
   }
 }

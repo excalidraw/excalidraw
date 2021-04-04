@@ -61,7 +61,7 @@
     "architect": "Arquitecto",
     "artist": "Artista",
     "cartoonist": "Caricatura",
-    "fileTitle": "Título del archivo",
+    "fileTitle": "Nombre del archivo",
     "colorPicker": "Selector de color",
     "canvasBackground": "Fondo del lienzo",
     "drawingCanvas": "Lienzo de dibujo",
@@ -92,6 +92,8 @@
     "centerHorizontally": "Centrar horizontalmente",
     "distributeHorizontally": "Distribuir horizontalmente",
     "distributeVertically": "Distribuir verticalmente",
+    "flipHorizontal": "Girar horizontalmente",
+    "flipVertical": "Girar verticalmente",
     "viewMode": "Modo presentación",
     "toggleExportColorScheme": "Cambiar el esquema de colores de exportación",
     "share": "Compartir"
@@ -228,7 +230,8 @@
     "zoomToSelection": "Hacer zoom a la selección"
   },
   "encrypted": {
-    "tooltip": "Tus dibujos están cifrados de punto a punto, por lo que los servidores de Excalidraw nunca los verán."
+    "tooltip": "Tus dibujos están cifrados de punto a punto, por lo que los servidores de Excalidraw nunca los verán.",
+    "link": ""
   },
   "stats": {
     "angle": "Ángulo",

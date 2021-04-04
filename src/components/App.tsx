@@ -17,6 +17,8 @@ import {
   actionDeleteSelected,
   actionDuplicateSelection,
   actionFinalize,
+  actionFlipHorizontal,
+  actionFlipVertical,
   actionGroup,
   actionPasteStyles,
   actionSelectAll,
@@ -42,6 +44,7 @@ import {
 import {
   APP_NAME,
   CURSOR_TYPE,
+  DEFAULT_UI_OPTIONS,
   DEFAULT_VERTICAL_ALIGN,
   DRAGGING_THRESHOLD,
   ELEMENT_SHIFT_TRANSLATE_AMOUNT,
@@ -57,6 +60,8 @@ import {
   TAP_TWICE_TIMEOUT,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
   TOUCH_CTX_MENU_TIMEOUT,
+  URL_HASH_KEYS,
+  URL_QUERY_KEYS,
   ZOOM_STEP,
 } from "../constants";
 import { loadFromBlob } from "../data";
@@ -157,13 +162,7 @@ import Scene from "../scene/Scene";
 import { SceneState, ScrollBars } from "../scene/types";
 import { getNewZoom } from "../scene/zoom";
 import { findShapeByKey } from "../shapes";
-import {
-  AppState,
-  ExcalidrawProps,
-  Gesture,
-  GestureEvent,
-  SceneData,
-} from "../types";
+import { AppProps, AppState, Gesture, GestureEvent, SceneData } from "../types";
 import {
   debounce,
   distance,
@@ -277,29 +276,30 @@ export type ExcalidrawImperativeAPI = {
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
   getAppState: () => InstanceType<typeof App>["state"];
   setCanvasOffsets: InstanceType<typeof App>["setCanvasOffsets"];
+  importLibrary: InstanceType<typeof App>["importLibraryFromUrl"];
+  setToastMessage: InstanceType<typeof App>["setToastMessage"];
   readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
   ready: true;
 };
 
-class App extends React.Component<ExcalidrawProps, AppState> {
+class App extends React.Component<AppProps, AppState> {
   canvas: HTMLCanvasElement | null = null;
   rc: RoughCanvas | null = null;
   unmounted: boolean = false;
   actionManager: ActionManager;
   private excalidrawContainerRef = React.createRef<HTMLDivElement>();
 
-  public static defaultProps: Partial<ExcalidrawProps> = {
-    width: window.innerWidth,
-    height: window.innerHeight,
+  public static defaultProps: Partial<AppProps> = {
+    // needed for tests to pass since we directly render App in many tests
+    UIOptions: DEFAULT_UI_OPTIONS,
   };
+
   private scene: Scene;
-  constructor(props: ExcalidrawProps) {
+  private resizeObserver: ResizeObserver | undefined;
+  constructor(props: AppProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
-
     const {
-      width = window.innerWidth,
-      height = window.innerHeight,
       excalidrawRef,
       viewModeEnabled = false,
       zenModeEnabled = false,
@@ -311,13 +311,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       ...defaultAppState,
       theme,
       isLoading: true,
-      width,
-      height,
       ...this.getCanvasOffsets(),
       viewModeEnabled,
       zenModeEnabled,
       gridSize: gridModeEnabled ? GRID_SIZE : null,
       name,
+      width: window.innerWidth,
+      height: window.innerHeight,
     };
     if (excalidrawRef) {
       const readyPromise =
@@ -337,6 +337,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
         setCanvasOffsets: this.setCanvasOffsets,
+        importLibrary: this.importLibraryFromUrl,
+        setToastMessage: this.setToastMessage,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -423,7 +425,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       viewModeEnabled,
     } = this.state;
 
-    const { onCollabButtonClick, onExportToBackend, renderFooter } = this.props;
+    const {
+      onCollabButtonClick,
+      onExportToBackend,
+      renderFooter,
+      renderCustomStats,
+    } = this.props;
 
     const DEFAULT_PASTE_X = canvasDOMWidth / 2;
     const DEFAULT_PASTE_Y = canvasDOMHeight / 2;
@@ -434,10 +441,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           "excalidraw--view-mode": viewModeEnabled,
         })}
         ref={this.excalidrawContainerRef}
-        style={{
-          width: canvasDOMWidth,
-          height: canvasDOMHeight,
-        }}
       >
         <LayerUI
           canvas={this.canvas}
@@ -464,8 +467,12 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           showExitZenModeBtn={
             typeof this.props?.zenModeEnabled === "undefined" && zenModeEnabled
           }
-          showThemeBtn={typeof this.props?.theme === "undefined"}
+          showThemeBtn={
+            typeof this.props?.theme === "undefined" &&
+            this.props.UIOptions.canvasActions.theme
+          }
           libraryReturnUrl={this.props.libraryReturnUrl}
+          UIOptions={this.props.UIOptions}
         />
         <div className="excalidraw-textEditorContainer" />
         {this.state.showStats && (
@@ -474,6 +481,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             setAppState={this.setAppState}
             elements={this.scene.getElements()}
             onClose={this.toggleStats}
+            renderCustomStats={renderCustomStats}
           />
         )}
         {this.state.toastMessage !== null && (
@@ -547,7 +555,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         if (typeof this.props.name !== "undefined") {
           name = this.props.name;
         }
-
         this.setState(
           (state) => {
             // using Object.assign instead of spread to fool TS 4.2.2+ into
@@ -556,10 +563,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             return Object.assign(actionResult.appState || {}, {
               editingElement:
                 editingElement || actionResult.appState?.editingElement || null,
-              width: state.width,
-              height: state.height,
-              offsetTop: state.offsetTop,
-              offsetLeft: state.offsetLeft,
               viewModeEnabled,
               zenModeEnabled,
               gridSize,
@@ -604,8 +607,17 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.onSceneUpdated();
   };
 
-  private importLibraryFromUrl = async (url: string) => {
-    window.history.replaceState({}, APP_NAME, window.location.origin);
+  private importLibraryFromUrl = async (url: string, token?: string | null) => {
+    if (window.location.hash.includes(URL_HASH_KEYS.addLibrary)) {
+      const hash = new URLSearchParams(window.location.hash.slice(1));
+      hash.delete(URL_HASH_KEYS.addLibrary);
+      window.history.replaceState({}, APP_NAME, `#${hash.toString()}`);
+    } else if (window.location.search.includes(URL_QUERY_KEYS.addLibrary)) {
+      const query = new URLSearchParams(window.location.search);
+      query.delete(URL_QUERY_KEYS.addLibrary);
+      window.history.replaceState({}, APP_NAME, `?${query.toString()}`);
+    }
+
     try {
       const request = await fetch(decodeURIComponent(url));
       const blob = await request.blob();
@@ -614,14 +626,17 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         throw new Error();
       }
       if (
+        token === Library.csrfToken ||
         window.confirm(
           t("alerts.confirmAddLibrary", { numShapes: json.library.length }),
         )
       ) {
         await Library.importLibrary(blob);
-        this.setState({
-          isLibraryOpen: true,
-        });
+        // hack to rerender the library items after import
+        if (this.state.isLibraryOpen) {
+          this.setState({ isLibraryOpen: false });
+        }
+        this.setState({ isLibraryOpen: true });
       }
     } catch (error) {
       window.alert(t("alerts.errorLoadingLibrary"));
@@ -680,7 +695,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (!this.state.isLoading) {
       this.setState({ isLoading: true });
     }
-
     let initialData = null;
     try {
       initialData = (await this.props.initialData) || null;
@@ -689,7 +703,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     const scene = restore(initialData, null);
-
     scene.appState = {
       ...scene.appState,
       isLoading: false,
@@ -717,12 +730,18 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       commitToHistory: true,
     });
 
-    const addToLibraryUrl = new URLSearchParams(window.location.search).get(
-      "addLibrary",
-    );
+    const libraryUrl =
+      // current
+      new URLSearchParams(window.location.hash.slice(1)).get(
+        URL_HASH_KEYS.addLibrary,
+      ) ||
+      // legacy, kept for compat reasons
+      new URLSearchParams(window.location.search).get(
+        URL_QUERY_KEYS.addLibrary,
+      );
 
-    if (addToLibraryUrl) {
-      await this.importLibraryFromUrl(addToLibraryUrl);
+    if (libraryUrl) {
+      await this.importLibraryFromUrl(libraryUrl);
     }
   };
 
@@ -755,19 +774,24 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.scene.addCallback(this.onSceneUpdated);
     this.addEventListeners();
 
+    if ("ResizeObserver" in window && this.excalidrawContainerRef?.current) {
+      this.resizeObserver = new ResizeObserver(() => {
+        this.updateDOMRect();
+      });
+      this.resizeObserver?.observe(this.excalidrawContainerRef.current);
+    }
     const searchParams = new URLSearchParams(window.location.search.slice(1));
 
     if (searchParams.has("web-share-target")) {
       // Obtain a file that was shared via the Web Share Target API.
       this.restoreFileFromShare();
     } else {
-      this.setState(this.getCanvasOffsets(), () => {
-        this.initializeScene();
-      });
+      this.updateDOMRect(this.initializeScene);
     }
   }
 
   public componentWillUnmount() {
+    this.resizeObserver?.disconnect();
     this.unmounted = true;
     this.removeEventListeners();
     this.scene.destroy();
@@ -859,20 +883,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     window.addEventListener(EVENT.DROP, this.disableEvent, false);
   }
 
-  componentDidUpdate(prevProps: ExcalidrawProps, prevState: AppState) {
+  componentDidUpdate(prevProps: AppProps, prevState: AppState) {
     if (prevProps.langCode !== this.props.langCode) {
       this.updateLanguage();
-    }
-
-    if (
-      prevProps.width !== this.props.width ||
-      prevProps.height !== this.props.height
-    ) {
-      this.setState({
-        width: this.props.width ?? window.innerWidth,
-        height: this.props.height ?? window.innerHeight,
-        ...this.getCanvasOffsets(),
-      });
     }
 
     if (prevProps.viewModeEnabled !== this.props.viewModeEnabled) {
@@ -1332,6 +1345,10 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
   clearToast = () => {
     this.setState({ toastMessage: null });
+  };
+
+  setToastMessage = (toastMessage: string) => {
+    this.setState({ toastMessage });
   };
 
   restoreFileFromShare = async () => {
@@ -1907,8 +1924,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
 
     resetCursor(this.canvas);
-
-    if (!event[KEYS.CTRL_OR_CMD]) {
+    if (!event[KEYS.CTRL_OR_CMD] && !this.state.viewModeEnabled) {
       this.startTextEditing({
         sceneX,
         sceneY,
@@ -2282,10 +2298,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         touchTimeout = window.setTimeout(() => {
           touchTimeout = 0;
           if (!invalidateContextMenu) {
-            this.openContextMenu({
-              clientX: event.clientX,
-              clientY: event.clientY,
-            });
+            this.handleCanvasContextMenu(event);
           }
         }, TOUCH_CTX_MENU_TIMEOUT);
       }
@@ -3632,9 +3645,20 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     const file = event.dataTransfer?.files[0];
     if (
-      file?.type === "application/json" ||
-      file?.name.endsWith(".excalidraw")
+      file?.type === MIME_TYPES.excalidrawlib ||
+      file?.name?.endsWith(".excalidrawlib")
     ) {
+      Library.importLibrary(file)
+        .then(() => {
+          // Close and then open to get the libraries updated
+          this.setState({ isLibraryOpen: false });
+          this.setState({ isLibraryOpen: true });
+        })
+        .catch((error) =>
+          this.setState({ isLoading: false, errorMessage: error.message }),
+        );
+      // default: assume an Excalidraw file regardless of extension/MimeType
+    } else {
       this.setState({ isLoading: true });
       if (supported) {
         try {
@@ -3646,23 +3670,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
           console.warn(error.name, error.message);
         }
       }
-      this.loadFileToCanvas(file);
-    } else if (
-      file?.type === MIME_TYPES.excalidrawlib ||
-      file?.name.endsWith(".excalidrawlib")
-    ) {
-      Library.importLibrary(file)
-        .then(() => {
-          this.setState({ isLibraryOpen: false });
-        })
-        .catch((error) =>
-          this.setState({ isLoading: false, errorMessage: error.message }),
-        );
-    } else {
-      this.setState({
-        isLoading: false,
-        errorMessage: t("alerts.couldNotLoadInvalidFile"),
-      });
+      await this.loadFileToCanvas(file);
     }
   };
 
@@ -3687,7 +3695,19 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     event.preventDefault();
-    this.openContextMenu(event);
+
+    const { x, y } = viewportCoordsToSceneCoords(event, this.state);
+    const element = this.getElementAtPosition(x, y);
+
+    const type = element ? "element" : "canvas";
+
+    if (element && !this.state.selectedElementIds[element.id]) {
+      this.setState({ selectedElementIds: { [element.id]: true } }, () => {
+        this._openContextMenu(event, type);
+      });
+    } else {
+      this._openContextMenu(event, type);
+    }
   };
 
   private maybeDragNewGenericElement = (
@@ -3777,18 +3797,17 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     return false;
   };
 
-  private openContextMenu = ({
-    clientX,
-    clientY,
-  }: {
-    clientX: number;
-    clientY: number;
-  }) => {
-    const { x, y } = viewportCoordsToSceneCoords(
-      { clientX, clientY },
-      this.state,
-    );
-
+  /** @private use this.handleCanvasContextMenu */
+  private _openContextMenu = (
+    {
+      clientX,
+      clientY,
+    }: {
+      clientX: number;
+      clientY: number;
+    },
+    type: "canvas" | "element",
+  ) => {
     const maybeGroupAction = actionGroup.contextItemPredicate!(
       this.actionManager.getElementsIncludingDeleted(),
       this.actionManager.getAppState(),
@@ -3799,12 +3818,22 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.actionManager.getAppState(),
     );
 
+    const maybeFlipHorizontal = actionFlipHorizontal.contextItemPredicate!(
+      this.actionManager.getElementsIncludingDeleted(),
+      this.actionManager.getAppState(),
+    );
+
+    const maybeFlipVertical = actionFlipVertical.contextItemPredicate!(
+      this.actionManager.getElementsIncludingDeleted(),
+      this.actionManager.getAppState(),
+    );
+
     const separator = "separator";
 
     const _isMobile = isMobile();
 
     const elements = this.scene.getElements();
-    const element = this.getElementAtPosition(x, y);
+
     const options: ContextMenuOption[] = [];
     if (probablySupportsClipboardBlob && elements.length > 0) {
       options.push(actionCopyAsPng);
@@ -3813,7 +3842,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     if (probablySupportsClipboardWriteText && elements.length > 0) {
       options.push(actionCopyAsSvg);
     }
-    if (!element) {
+    if (type === "canvas") {
       const viewModeOptions = [
         ...options,
         typeof this.props.gridModeEnabled === "undefined" &&
@@ -3877,10 +3906,6 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       return;
     }
 
-    if (!this.state.selectedElementIds[element.id]) {
-      this.setState({ selectedElementIds: { [element.id]: true } });
-    }
-
     if (this.state.viewModeEnabled) {
       ContextMenu.push({
         options: [navigator.clipboard && actionCopy, ...options],
@@ -3923,6 +3948,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         actionSendToBack,
         actionBringToFront,
         separator,
+        maybeFlipHorizontal && actionFlipHorizontal,
+        maybeFlipVertical && actionFlipVertical,
+        (maybeFlipHorizontal || maybeFlipVertical) && separator,
         actionDuplicateSelection,
         actionDeleteSelected,
       ],
@@ -4063,14 +4091,56 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     }
   }, 300);
 
+  private updateDOMRect = (cb?: () => void) => {
+    if (this.excalidrawContainerRef?.current) {
+      const excalidrawContainer = this.excalidrawContainerRef.current;
+      const {
+        width,
+        height,
+        left: offsetLeft,
+        top: offsetTop,
+      } = excalidrawContainer.getBoundingClientRect();
+      const {
+        width: currentWidth,
+        height: currentHeight,
+        offsetTop: currentOffsetTop,
+        offsetLeft: currentOffsetLeft,
+      } = this.state;
+
+      if (
+        width === currentWidth &&
+        height === currentHeight &&
+        offsetLeft === currentOffsetLeft &&
+        offsetTop === currentOffsetTop
+      ) {
+        if (cb) {
+          cb();
+        }
+        return;
+      }
+
+      this.setState(
+        {
+          width,
+          height,
+          offsetLeft,
+          offsetTop,
+        },
+        () => {
+          cb && cb();
+        },
+      );
+    }
+  };
+
   public setCanvasOffsets = () => {
     this.setState({ ...this.getCanvasOffsets() });
   };
 
   private getCanvasOffsets(): Pick<AppState, "offsetTop" | "offsetLeft"> {
-    if (this.excalidrawContainerRef?.current?.parentElement) {
-      const parentElement = this.excalidrawContainerRef.current.parentElement;
-      const { left, top } = parentElement.getBoundingClientRect();
+    if (this.excalidrawContainerRef?.current) {
+      const excalidrawContainer = this.excalidrawContainerRef.current;
+      const { left, top } = excalidrawContainer.getBoundingClientRect();
       return {
         offsetLeft: left,
         offsetTop: top,
@@ -4104,9 +4174,6 @@ declare global {
       history: SceneHistory;
       app: InstanceType<typeof App>;
       library: typeof Library;
-      collab: InstanceType<
-        typeof import("../excalidraw-app/collab/CollabWrapper").default
-      >;
     };
   }
 }

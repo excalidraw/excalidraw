@@ -61,7 +61,7 @@
     "architect": "건축가",
     "artist": "예술가",
     "cartoonist": "만화가",
-    "fileTitle": "파일명",
+    "fileTitle": "",
     "colorPicker": "색상 선택기",
     "canvasBackground": "캔버스 배경",
     "drawingCanvas": "캔버스 그리기",
@@ -92,6 +92,8 @@
     "centerHorizontally": "수평으로 중앙 정렬",
     "distributeHorizontally": "수평으로 분배",
     "distributeVertically": "수직으로 분배",
+    "flipHorizontal": "",
+    "flipVertical": "",
     "viewMode": "보기 모드",
     "toggleExportColorScheme": "",
     "share": ""
@@ -228,7 +230,8 @@
     "zoomToSelection": "선택 영역으로 확대/축소"
   },
   "encrypted": {
-    "tooltip": "그림은 종단 간 암호화되므로 Excalidraw의 서버는 절대로 내용을 알 수 없습니다."
+    "tooltip": "그림은 종단 간 암호화되므로 Excalidraw의 서버는 절대로 내용을 알 수 없습니다.",
+    "link": ""
   },
   "stats": {
     "angle": "각도",

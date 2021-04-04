@@ -8,7 +8,7 @@ import { getCommonBounds, getNonDeletedElements } from "../element";
 import { newElementWith } from "../element/mutateElement";
 import { ExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
-import useIsMobile from "../is-mobile";
+import { useIsMobile } from "../is-mobile";
 import { CODES, KEYS } from "../keys";
 import { getNormalizedZoom, getSelectedElements } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
@@ -33,6 +33,7 @@ export const actionChangeViewBackgroundColor = register({
           type="canvasBackground"
           color={appState.viewBackgroundColor}
           onChange={(color) => updateData(color)}
+          data-testid="canvas-background-picker"
         />
       </div>
     );
@@ -72,6 +73,7 @@ export const actionClearCanvas = register({
           updateData(null);
         }
       }}
+      data-testid="clear-canvas-button"
     />
   ),
 });

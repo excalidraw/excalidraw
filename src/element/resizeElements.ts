@@ -31,7 +31,7 @@ import {
 import { PointerDownState } from "../components/App";
 import { Point } from "../types";
 
-const normalizeAngle = (angle: number): number => {
+export const normalizeAngle = (angle: number): number => {
   if (angle >= 2 * Math.PI) {
     return angle - 2 * Math.PI;
   }
@@ -181,7 +181,7 @@ const getPerfectElementSizeWithRotation = (
   return rotate(size.width, size.height, 0, 0, -angle);
 };
 
-const reshapeSingleTwoPointElement = (
+export const reshapeSingleTwoPointElement = (
   element: NonDeleted<ExcalidrawLinearElement>,
   resizeArrowDirection: "origin" | "end",
   isRotateWithDiscreteAngle: boolean,
@@ -378,7 +378,7 @@ const resizeSingleTextElement = (
   }
 };
 
-const resizeSingleElement = (
+export const resizeSingleElement = (
   stateAtResizeStart: NonDeletedExcalidrawElement,
   shouldKeepSidesRatio: boolean,
   element: NonDeletedExcalidrawElement,

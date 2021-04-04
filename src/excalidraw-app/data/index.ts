@@ -3,8 +3,7 @@ import { restore } from "../../data/restore";
 import { ImportedDataState } from "../../data/types";
 import { ExcalidrawElement } from "../../element/types";
 import { t } from "../../i18n";
-import { AppState } from "../../types";
-import { UserIdleState } from "../collab/types";
+import { AppState, UserIdleState } from "../../types";
 
 const byteToHex = (byte: number): string => `0${byte.toString(16)}`.slice(-2);
 

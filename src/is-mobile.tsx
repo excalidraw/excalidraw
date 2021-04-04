@@ -34,7 +34,4 @@ export const IsMobileProvider = ({
 };
 
 export const isMobile = () => getIsMobileMatcher().matches;
-
-export default function useIsMobile() {
-  return useContext(context);
-}
+export const useIsMobile = () => useContext(context);

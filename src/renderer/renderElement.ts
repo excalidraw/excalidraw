@@ -349,12 +349,12 @@ const generateElementShape = (
         if (element.type === "arrow") {
           const { startArrowhead = null, endArrowhead = "arrow" } = element;
 
-          function getArrowheadShapes(
+          const getArrowheadShapes = (
             element: ExcalidrawLinearElement,
             shape: Drawable[],
             position: "start" | "end",
             arrowhead: Arrowhead,
-          ) {
+          ) => {
             const arrowheadPoints = getArrowheadPoints(
               element,
               shape,
@@ -392,7 +392,7 @@ const generateElementShape = (
               generator.line(x3, y3, x2, y2, options),
               generator.line(x4, y4, x2, y2, options),
             ];
-          }
+          };
 
           if (startArrowhead !== null) {
             const shapes = getArrowheadShapes(

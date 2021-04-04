@@ -92,6 +92,8 @@
     "centerHorizontally": "Horizontal zentrieren",
     "distributeHorizontally": "Horizontal verteilen",
     "distributeVertically": "Vertikal verteilen",
+    "flipHorizontal": "Horizontal spiegeln",
+    "flipVertical": "Vertikal spiegeln",
     "viewMode": "Ansichtsmodus",
     "toggleExportColorScheme": "Farbschema für Export umschalten",
     "share": "Teilen"
@@ -228,7 +230,8 @@
     "zoomToSelection": "Auf Auswahl zoomen"
   },
   "encrypted": {
-    "tooltip": "Da deine Zeichnungen Ende-zu-Ende verschlüsselt werden, sehen auch unsere Excalidraw-Server sie niemals."
+    "tooltip": "Da deine Zeichnungen Ende-zu-Ende verschlüsselt werden, sehen auch unsere Excalidraw-Server sie niemals.",
+    "link": "Blogbeitrag über Ende-zu-Ende-Verschlüsselung in Excalidraw"
   },
   "stats": {
     "angle": "Winkel",

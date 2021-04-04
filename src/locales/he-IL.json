@@ -61,7 +61,7 @@
     "architect": "ארכיטקט",
     "artist": "אמן",
     "cartoonist": "קריקטוריסט",
-    "fileTitle": "כותרת הקובץ",
+    "fileTitle": "",
     "colorPicker": "בחירת צבע",
     "canvasBackground": "רקע הלוח",
     "drawingCanvas": "לוח ציור",
@@ -92,6 +92,8 @@
     "centerHorizontally": "מרכז אופקית",
     "distributeHorizontally": "חלוקה אופקית",
     "distributeVertically": "חלוקה אנכית",
+    "flipHorizontal": "",
+    "flipVertical": "",
     "viewMode": "מצב תצוגה",
     "toggleExportColorScheme": "",
     "share": ""
@@ -228,7 +230,8 @@
     "zoomToSelection": "התמקד בבחירה"
   },
   "encrypted": {
-    "tooltip": "הרישומים שלך מוצפנים מקצה לקצה כך שהשרתים של Excalidraw לא יראו אותם לעולם."
+    "tooltip": "הרישומים שלך מוצפנים מקצה לקצה כך שהשרתים של Excalidraw לא יראו אותם לעולם.",
+    "link": ""
   },
   "stats": {
     "angle": "זווית",

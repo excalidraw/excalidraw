@@ -61,7 +61,7 @@
     "architect": "精確",
     "artist": "藝術",
     "cartoonist": "卡通",
-    "fileTitle": "檔案標題",
+    "fileTitle": "檔案名稱",
     "colorPicker": "色彩選擇工具",
     "canvasBackground": "Canvas 背景",
     "drawingCanvas": "繪圖 canvas",
@@ -92,6 +92,8 @@
     "centerHorizontally": "水平置中",
     "distributeHorizontally": "水平分布",
     "distributeVertically": "垂直分布",
+    "flipHorizontal": "水平翻轉",
+    "flipVertical": "垂直翻轉",
     "viewMode": "檢視模式",
     "toggleExportColorScheme": "切換輸出配色",
     "share": "共享"
@@ -228,7 +230,8 @@
     "zoomToSelection": "縮放至選取區"
   },
   "encrypted": {
-    "tooltip": "你的作品已使用 end-to-end 方式加密，Excalidraw 的伺服器也無法取得其內容。"
+    "tooltip": "你的作品已使用 end-to-end 方式加密，Excalidraw 的伺服器也無法取得其內容。",
+    "link": ""
   },
   "stats": {
     "angle": "角度",

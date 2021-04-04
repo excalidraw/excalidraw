@@ -6,7 +6,7 @@ const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
 module.exports = {
   mode: "production",
   entry: {
-    "excalidraw.min": "./entry.js",
+    "excalidraw.production.min": "./entry.js",
   },
   output: {
     path: path.resolve(__dirname, "dist"),
@@ -24,7 +24,13 @@ module.exports = {
       {
         test: /\.(sa|sc|c)ss$/,
         exclude: /node_modules/,
-        use: ["style-loader", { loader: "css-loader" }, "sass-loader"],
+        use: [
+          "style-loader",
+          {
+            loader: "css-loader",
+          },
+          "sass-loader",
+        ],
       },
       {
         test: /\.(ts|tsx|js|jsx|mjs)$/,

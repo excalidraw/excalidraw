@@ -61,7 +61,7 @@
     "architect": "معمار",
     "artist": "هنرمند",
     "cartoonist": "کارتونیست",
-    "fileTitle": "عنوان فایل",
+    "fileTitle": "",
     "colorPicker": "انتخابگر رنگ",
     "canvasBackground": "بوم",
     "drawingCanvas": "بوم نقاشی",
@@ -92,6 +92,8 @@
     "centerHorizontally": "وسط قرار دادن به صورت افقی",
     "distributeHorizontally": "توزیع کردن به صورت افقی",
     "distributeVertically": "توزیع کردن به صورت عمودی",
+    "flipHorizontal": "",
+    "flipVertical": "",
     "viewMode": "",
     "toggleExportColorScheme": "",
     "share": ""
@@ -228,7 +230,8 @@
     "zoomToSelection": "بزرگنمایی قسمت انتخاب شده"
   },
   "encrypted": {
-    "tooltip": "شما در یک محیط رمزگزاری شده دو طرفه در حال طراحی هستید پس Excalidraw هرگز طرح های شما را نمیبند."
+    "tooltip": "شما در یک محیط رمزگزاری شده دو طرفه در حال طراحی هستید پس Excalidraw هرگز طرح های شما را نمیبند.",
+    "link": ""
   },
   "stats": {
     "angle": "زاویه",

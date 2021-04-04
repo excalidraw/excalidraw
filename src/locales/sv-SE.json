@@ -61,7 +61,7 @@
     "architect": "Arkitekt",
     "artist": "Artist",
     "cartoonist": "Serietecknare",
-    "fileTitle": "Filtitel",
+    "fileTitle": "Filnamn",
     "colorPicker": "Färgväljare",
     "canvasBackground": "Canvas-bakgrund",
     "drawingCanvas": "Ritar canvas",
@@ -92,6 +92,8 @@
     "centerHorizontally": "Centrera horisontellt",
     "distributeHorizontally": "Fördela horisontellt",
     "distributeVertically": "Fördela vertikalt",
+    "flipHorizontal": "Vänd horisontellt",
+    "flipVertical": "Vänd vertikalt",
     "viewMode": "Visningsläge",
     "toggleExportColorScheme": "Växla färgschema för export",
     "share": "Dela"
@@ -228,7 +230,8 @@
     "zoomToSelection": "Zooma till markering"
   },
   "encrypted": {
-    "tooltip": "Dina skisser är krypterade från ände till ände så Excalidraws servrar kommer aldrig att se dem."
+    "tooltip": "Dina skisser är krypterade från ände till ände så Excalidraws servrar kommer aldrig att se dem.",
+    "link": "Blogginlägg om kryptering från ände till ände i Excalidraw"
   },
   "stats": {
     "angle": "Vinkel",

@@ -76,6 +76,7 @@ beforeEach(async () => {
   finger2.reset();
 
   await render(<ExcalidrawApp />);
+  h.setState({ height: 768, width: 1024 });
 });
 
 afterEach(() => {
@@ -653,6 +654,8 @@ describe("regression tests", () => {
       "pasteStyles",
       "deleteSelectedElements",
       "addToLibrary",
+      "flipHorizontal",
+      "flipVertical",
       "sendBackward",
       "bringForward",
       "sendToBack",
