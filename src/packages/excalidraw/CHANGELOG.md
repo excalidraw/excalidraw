@@ -40,7 +40,7 @@ Please add the latest change on the top under the correct section.
 
 #### BREAKING CHANGE
 
-- Rename the API `setCanvasOffsets` via `ref` to `refresh`[#3398](https://github.com/excalidraw/excalidraw/pull/3398).
+- Rename the API `setCanvasOffsets` exposed via [`ref`](https://github.com/excalidraw/excalidraw/blob/master/src/components/App.tsx#L265) to `refresh` [#3398](https://github.com/excalidraw/excalidraw/pull/3398).
 
 ---
 
