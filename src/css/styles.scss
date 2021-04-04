@@ -47,9 +47,11 @@
     image-rendering: -moz-crisp-edges; // FF
 
     z-index: var(--zIndex-canvas);
+  }
 
-    // Remove canvas from document flow to avoid resizeObserver feedback loop
-    // (see https://github.com/excalidraw/excalidraw/pull/3379)
+  #canvas {
+    // Remove the main canvas from document flow to avoid resizeObserver
+    // feedback loop (see https://github.com/excalidraw/excalidraw/pull/3379)
     position: absolute;
   }
 
