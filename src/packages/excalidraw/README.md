@@ -367,7 +367,7 @@ To view the full example visit :point_down:
 
 ### Dimensions of Excalidraw
 
-Excalidraw takes `100%` of `width` and `height` of the containing block so you need to make sure the container in which you are rendering Excalidraw has non zero dimensions (It should have non zero width and height so Excalidraw can match the dimensions of the containing block). This is to make sure you don't have to worry about updating the offsets of dimensions when resizing Excalidraw.
+Excalidraw takes `100%` of `width` and `height` of the containing block so make sure the container in which you render Excalidraw has non zero dimensions.
 
 #### `onChange`
 
