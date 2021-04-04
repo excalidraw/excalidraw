@@ -12,7 +12,7 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
-## Unreleased
+## 0.6.0 (2021-04-04)
 
 ## Excalidraw API
 
