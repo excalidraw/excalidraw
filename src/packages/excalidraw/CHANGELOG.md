@@ -6,7 +6,6 @@ The change should be grouped under one of the below section and must contain PR 
 - Features: For new features.
 - Fixes: For bug fixes.
 - Chore: Changes for non src files example package.json.
-- Improvements: For any improvements.
 - Refactor: For any refactoring.
 
 Please add the latest change on the top under the correct section.
@@ -18,21 +17,21 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
-- Add `UIOptions` prop to customise `canvas actions` which includes customising `background color picker`, `clear canvas`, `export`, `load`, `save`, `save as` & `theme toggle` [#3364](https://github.com/excalidraw/excalidraw/pull/3364).
+- Add `UIOptions` prop to customise `canvas actions` which includes customising `background color picker`, `clear canvas`, `export`, `load`, `save`, `save as` & `theme toggle` [#3364](https://github.com/excalidraw/excalidraw/pull/3364). Check the [readme](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#uioptions) for more details.
 - Calculate `width/height` of canvas based on excalidraw component (".excalidraw" selector) & also resize and update offsets whenever the dimensions of excalidraw component gets updated [#3379](https://github.com/excalidraw/excalidraw/pull/3379). You also don't need to add a resize handler anymore for excalidraw as its handled now in excalidraw itself.
   #### BREAKING CHANGE
   - `width/height` props have been removed. Instead now it takes `100%` of `width` and `height` of the container so you need to make sure the container in which you are rendering Excalidraw has non zero dimensions (It should have non zero width and height so Excalidraw can match the dimensions of containing block)
 - Calculate offsets when excalidraw container resizes using resize observer api [#3374](https://github.com/excalidraw/excalidraw/pull/3374).
-- Export types for the package so now it can be used with typescript [#3337](https://github.com/excalidraw/excalidraw/pull/3337). The types are available at `@excalidraw/excalirdraw/types`.
+- Export types for the package so now it can be used with typescript [#3337](https://github.com/excalidraw/excalidraw/pull/3337). The types are available at `@excalidraw/excalidraw/types`.
 - Add `renderCustomStats` prop to render extra stats on host, and expose `setToastMessage` API via refs which can be used to show toast with custom message [#3360](https://github.com/excalidraw/excalidraw/pull/3360).
 - Support passing a CSRF token when importing libraries to prevent prompting before installation. The token is passed from [https://libraries.excalidraw.com](https://libraries.excalidraw.com/) using the `token` URL key [#3329](https://github.com/excalidraw/excalidraw/pull/3329).
 - #### BREAKING CHANGE
-  Use `location.hash` when importing libraries to fix installation issues. This will require host apps to add a `hashchange` listener and call the newly exposed `excalidrawAPI.importLibrary(url)` API when applicable [#3320](https://github.com/excalidraw/excalidraw/pull/3320).
+  Use `location.hash` when importing libraries to fix installation issues. This will require host apps to add a `hashchange` listener and call the newly exposed `excalidrawAPI.importLibrary(url)` API when applicable [#3320](https://github.com/excalidraw/excalidraw/pull/3320). Check the [readme](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#importlibrary) for more details.
 - Append `location.pathname` to `libraryReturnUrl` default url [#3325](https://github.com/excalidraw/excalidraw/pull/3325).
 
 ### Build
 
-- Expose separate builds for dev and prod and support source maps in dev build [#3330](https://github.com/excalidraw/excalidraw/pull/3330).
+- Expose separate builds for dev and prod and support source maps in dev build [#3330](https://github.com/excalidraw/excalidraw/pull/3330). Check the [readme](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#installation) for more details.
   #### BREAKING CHANGE
   - If you are using script tag to embed excalidraw then the name of the file will have to be updated to `excalidraw.production.min.js` instead of `excalidraw.min.js`. If you want to use dev build you can use `excalidraw.development.js`
 
@@ -41,6 +40,33 @@ Please add the latest change on the top under the correct section.
 #### BREAKING CHANGE
 
 - Rename the API `setCanvasOffsets` exposed via [`ref`](https://github.com/excalidraw/excalidraw/blob/master/src/components/App.tsx#L265) to `refresh` [#3398](https://github.com/excalidraw/excalidraw/pull/3398).
+
+## Excalidraw Library
+
+### Features
+
+- Reopen library menu on import from file [#3383](https://github.com/excalidraw/excalidraw/pull/3383).
+- Don't unnecessarily prompt when installing libraries [#3329](https://github.com/excalidraw/excalidraw/pull/3329).
+- Add option to flip single element on the context menu [#2520](https://github.com/excalidraw/excalidraw/pull/2520).
+- Replace fontSize and fontFamily text with icons [#2857](https://github.com/excalidraw/excalidraw/pull/2857).
+
+### Fixes
+
+- Export dialog canvas positioning [#3397](https://github.com/excalidraw/excalidraw/pull/3397).
+- Don't share collab types with core [#3353](https://github.com/excalidraw/excalidraw/pull/3353).
+- Support d&d of files without extension [#3168](https://github.com/excalidraw/excalidraw/pull/3168).
+- Positions stats for linear elements [#3331](https://github.com/excalidraw/excalidraw/pull/3331).
+- Debounce.flush invokes func even if never queued before [#3326](https://github.com/excalidraw/excalidraw/pull/3326).
+- State selection state on opening contextMenu [#3333](https://github.com/excalidraw/excalidraw/pull/3333).
+- Add unique key for library header to resolve dev warnings [#3316](https://github.com/excalidraw/excalidraw/pull/3316).
+- disallow create text in viewMode on mobile [#3219](https://github.com/excalidraw/excalidraw/pull/3219).
+- Make help toggle tabbable [#3310](https://github.com/excalidraw/excalidraw/pull/3310)
+- Show Windows share icon for Windows users [#3306](https://github.com/excalidraw/excalidraw/pull/3306).
+- Don't scroll to content on INIT websocket message [#3291](https://github.com/excalidraw/excalidraw/pull/3291).
+
+### Refactor
+
+- Use arrow function where possible [#3315](https://github.com/excalidraw/excalidraw/pull/3315).
 
 ---
 
