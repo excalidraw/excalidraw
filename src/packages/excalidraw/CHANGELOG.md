@@ -46,8 +46,8 @@ Please add the latest change on the top under the correct section.
 ### Features
 
 - Reopen library menu on import from file [#3383](https://github.com/excalidraw/excalidraw/pull/3383)
-- Don't unnecessarily prompt when installing libraries (#3329)(https://github.com/excalidraw/excalidraw/pull/3329)
-- Add option to flip single element on the context menu (#2520)(https://github.com/excalidraw/excalidraw/pull/2520)
+- Don't unnecessarily prompt when installing libraries [#3329](https://github.com/excalidraw/excalidraw/pull/3329)
+- Add option to flip single element on the context menu [#2520](https://github.com/excalidraw/excalidraw/pull/2520)
 - Replace fontSize and fontFamily text with icons [#2857](https://github.com/excalidraw/excalidraw/pull/2857)
 
 ### Fixes
