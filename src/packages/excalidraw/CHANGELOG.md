@@ -6,7 +6,6 @@ The change should be grouped under one of the below section and must contain PR 
 - Features: For new features.
 - Fixes: For bug fixes.
 - Chore: Changes for non src files example package.json.
-- Improvements: For any improvements.
 - Refactor: For any refactoring.
 
 Please add the latest change on the top under the correct section.
@@ -46,18 +45,18 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
-- reopen library menu on import from file [#3383](https://github.com/excalidraw/excalidraw/pull/3383)
-- don't unnecessarily prompt when installing libraries (#3329)(https://github.com/excalidraw/excalidraw/pull/3329)
+- Reopen library menu on import from file [#3383](https://github.com/excalidraw/excalidraw/pull/3383)
+- Don't unnecessarily prompt when installing libraries (#3329)(https://github.com/excalidraw/excalidraw/pull/3329)
 - Add option to flip single element on the context menu (#2520)(https://github.com/excalidraw/excalidraw/pull/2520)
 - Replace fontSize and fontFamily text with icons [#2857](https://github.com/excalidraw/excalidraw/pull/2857)
 
 ### Fixes
 
-- export dialog canvas positioning [#3397](https://github.com/excalidraw/excalidraw/pull/3397)
-- Don't share collab types with core [#3353](https://github.com/excalidraw/excalidraw/pull/3353)
-- support d&d of files without extension (#3168)(https://github.com/excalidraw/excalidraw/pull/3168).
-- positions stats for linear elements [#3331](https://github.com/excalidraw/excalidraw/pull/3331).
-- debounce.flush invokes func even if never queued before (#3326)(https://github.com/excalidraw/excalidraw/pull/3326).
+- Export dialog canvas positioning [#3397](https://github.com/excalidraw/excalidraw/pull/3397).
+- Don't share collab types with core [#3353](https://github.com/excalidraw/excalidraw/pull/3353).
+- Support d&d of files without extension [#3168](https://github.com/excalidraw/excalidraw/pull/3168).
+- Positions stats for linear elements [#3331](https://github.com/excalidraw/excalidraw/pull/3331).
+- Debounce.flush invokes func even if never queued before [#3326](https://github.com/excalidraw/excalidraw/pull/3326).
 - State selection state on opening contextMenu [#3333](https://github.com/excalidraw/excalidraw/pull/3333).
 - Add unique key for library header to resolve dev warnings [#3316](https://github.com/excalidraw/excalidraw/pull/3316).
 - disallow create text in viewMode on mobile [#3219](https://github.com/excalidraw/excalidraw/pull/3219).
@@ -67,7 +66,7 @@ Please add the latest change on the top under the correct section.
 
 ### Refactor
 
-- Use arrow function where possible (#3315)
+- Use arrow function where possible [#3315](https://github.com/excalidraw/excalidraw/pull/3315).
 
 ---
 
