@@ -112,6 +112,43 @@ const generateElementCanvas = (
   };
 };
 
+const drawImagePlaceholder = (
+  element: NonDeletedExcalidrawElement,
+  rc: RoughCanvas,
+  context: CanvasRenderingContext2D,
+) => {
+  const opts = generateRoughOptions(element);
+  opts.fillStyle = "cross-hatch";
+  opts.fill = "#868e96";
+  const shape = rc.generator.rectangle(
+    0,
+    0,
+    element.width,
+    element.height,
+    opts,
+  );
+  rc.draw(shape);
+
+  //draw ??? in the middle
+  const text = "???";
+  const lineHeight = 20;
+  const lineWidth = 50;
+  context.canvas.setAttribute("dir", "ltr");
+  const font = context.font;
+  context.font = getFontString({ fontSize: 32, fontFamily: 2 });
+  const fillStyle = context.fillStyle;
+  context.fillStyle = "#FF0000";
+  context.fillText(
+    text,
+    (element.width - lineWidth) / 2,
+    (element.height + lineHeight) / 2,
+  );
+
+  //revert
+  context.fillStyle = fillStyle;
+  context.font = font;
+};
+
 const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
@@ -134,17 +171,18 @@ const drawElementOnCanvas = (
       break;
     }
     case "image": {
-      const img = new Image();
-      img.onload = function () {
+      const img = element.image as HTMLImageElement;
+      if (img != null) {
         context.drawImage(
           img,
-          20 /* hardcoded for the selection box*/,
-          20,
+          0 /* hardcoded for the selection box*/,
+          0,
           element.width,
           element.height,
         );
-      };
-      img.src = element.imageData;
+      } else {
+        drawImagePlaceholder(element, rc, context);
+      }
       break;
     }
     default: {
@@ -241,6 +279,7 @@ export const generateRoughOptions = (element: ExcalidrawElement): Options => {
   switch (element.type) {
     case "rectangle":
     case "diamond":
+    case "image":
     case "ellipse": {
       options.fillStyle = element.fillStyle;
       options.fill =
@@ -283,6 +322,7 @@ const generateElementShape = (
 
     switch (element.type) {
       case "rectangle":
+        // case "image":
         if (element.strokeSharpness === "round") {
           const w = element.width;
           const h = element.height;

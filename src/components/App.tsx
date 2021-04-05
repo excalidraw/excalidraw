@@ -2770,16 +2770,16 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       opacity: this.state.currentItemOpacity,
       strokeSharpness: this.state.currentItemLinearStrokeSharpness,
     });
-    this.setState((prevState) => ({
-      selectedElementIds: {
-        ...prevState.selectedElementIds,
-        [element.id]: true,
-      },
-    }));
-    const boundElement = getHoveredElementForBinding(
-      pointerDownState.origin,
-      this.scene,
-    );
+    // this.setState((prevState) => ({
+    //   selectedElementIds: {
+    //     ...prevState.selectedElementIds,
+    //     [element.id]: true,
+    //   },
+    // }));
+    // const boundElement = getHoveredElementForBinding(
+    //   pointerDownState.origin,
+    //   this.scene,
+    // );
     this.scene.replaceAllElements([
       ...this.scene.getElementsIncludingDeleted(),
       element,
@@ -2787,8 +2787,7 @@ class App extends React.Component<ExcalidrawProps, AppState> {
     this.setState({
       draggingElement: element,
       editingElement: element,
-      startBoundElement: boundElement,
-      suggestedBindings: [],
+      multiElement: null,
     });
   };
 
@@ -3333,12 +3332,19 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       if (draggingElement?.type === "image") {
         const selectedFile = await fileOpen({
           description: "Image",
-          extensions: ["jpg", "jpeg", "png"],
+          extensions: [".jpg", ".jpeg", ".png"],
           mimeTypes: ["image/jpeg", "image/png"],
         });
 
         const reader = new FileReader();
         reader.onload = () => {
+          const image = new Image();
+          image.onload = () => {
+            mutateElement(draggingElement, {
+              image,
+            });
+          };
+          image.src = reader.result as string;
           mutateElement(draggingElement, {
             imageData: reader.result as string,
           });

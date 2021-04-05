@@ -147,6 +147,7 @@ type HitTestArgs = {
 const hitTestPointAgainstElement = (args: HitTestArgs): boolean => {
   switch (args.element.type) {
     case "rectangle":
+    case "image":
     case "text":
     case "diamond":
     case "ellipse":
@@ -397,6 +398,7 @@ export const determineFocusDistance = (
   const nabs = Math.abs(n);
   switch (element.type) {
     case "rectangle":
+    case "image":
     case "text":
       return c / (hwidth * (nabs + q * mabs));
     case "diamond":
@@ -427,6 +429,7 @@ export const determineFocusPoint = (
   let point;
   switch (element.type) {
     case "rectangle":
+    case "image":
     case "text":
     case "diamond":
       point = findFocusPointForRectangulars(element, focus, adjecentPointRel);
@@ -476,6 +479,7 @@ const getSortedElementLineIntersections = (
   let intersections: GA.Point[];
   switch (element.type) {
     case "rectangle":
+    case "image":
     case "text":
     case "diamond":
       const corners = getCorners(element);
@@ -509,6 +513,7 @@ const getSortedElementLineIntersections = (
 const getCorners = (
   element:
     | ExcalidrawRectangleElement
+    | ExcalidrawImageElement
     | ExcalidrawDiamondElement
     | ExcalidrawTextElement,
   scale: number = 1,
@@ -517,6 +522,7 @@ const getCorners = (
   const hy = (scale * element.height) / 2;
   switch (element.type) {
     case "rectangle":
+    case "image":
     case "text":
       return [
         GA.point(hx, hy),
@@ -658,6 +664,7 @@ export const findFocusPointForEllipse = (
 export const findFocusPointForRectangulars = (
   element:
     | ExcalidrawRectangleElement
+    | ExcalidrawImageElement
     | ExcalidrawDiamondElement
     | ExcalidrawTextElement,
   // Between -1 and 1 for how far away should the focus point be relative

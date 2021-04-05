@@ -7,6 +7,7 @@ import { AppState, NormalizedZoomValue } from "../types";
 import { DataState, ImportedDataState } from "./types";
 import { isInvisiblySmallElement, getNormalizedDimensions } from "../element";
 import { isLinearElementType } from "../element/typeChecks";
+import { mutateElement } from "../element/mutateElement";
 import { randomId } from "../random";
 import {
   FONT_FAMILY,
@@ -86,6 +87,24 @@ const restoreElement = (
         baseline: element.baseline,
         textAlign: element.textAlign || DEFAULT_TEXT_ALIGN,
         verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,
+      });
+    case "image":
+      const image = new Image();
+      image.onload = () => {
+        // console.log("[restore] Update the IMAGE element ....");
+        mutateElement(element, {
+          image,
+        });
+        // console.log("[restore] Re-render please ....");
+        // console.log(element);
+      };
+      // console.log("[restore] image object ....", element.id);
+      image.src = element.imageData as string;
+      // console.log("org:", element);
+
+      return restoreElementWithProperties(element, {
+        imageData: element.imageData,
+        image: null,
       });
     case "draw":
     case "line":

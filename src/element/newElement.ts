@@ -233,11 +233,14 @@ export const newLinearElement = (
 };
 
 export const newImageElement = (
-  opts: ElementConstructorOpts,
+  opts: {
+    type: ExcalidrawImageElement["type"];
+  } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawImageElement> => {
   return {
     ..._newElementBase<ExcalidrawImageElement>("image", opts),
     imageData: "",
+    image: null,
   };
 };
 
