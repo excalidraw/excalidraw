@@ -409,7 +409,6 @@ class App extends React.Component<AppProps, AppState> {
         onPointerUp={this.removePointer}
         onPointerCancel={this.removePointer}
         onTouchMove={this.handleTouchMove}
-        onDrop={this.handleCanvasOnDrop}
       >
         {t("labels.drawingCanvas")}
       </canvas>
@@ -440,6 +439,7 @@ class App extends React.Component<AppProps, AppState> {
           "excalidraw--view-mode": viewModeEnabled,
         })}
         ref={this.excalidrawContainerRef}
+        onDrop={this.handleAppOnDrop}
       >
         <LayerUI
           canvas={this.canvas}
@@ -3583,9 +3583,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private handleCanvasOnDrop = async (
-    event: React.DragEvent<HTMLCanvasElement>,
-  ) => {
+  private handleAppOnDrop = async (event: React.DragEvent<HTMLDivElement>) => {
     try {
       const file = event.dataTransfer.files[0];
       if (file?.type === "image/png" || file?.type === "image/svg+xml") {
