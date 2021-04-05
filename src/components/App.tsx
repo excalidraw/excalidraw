@@ -474,6 +474,7 @@ class App extends React.Component<AppProps, AppState> {
           UIOptions={this.props.UIOptions}
         />
         <div className="excalidraw-textEditorContainer" />
+        <div className="excalidraw-contextMenuContainer" />
         {this.state.showStats && (
           <Stats
             appState={this.state}
@@ -3675,12 +3676,20 @@ class App extends React.Component<AppProps, AppState> {
 
     const type = element ? "element" : "canvas";
 
+    const container = this.excalidrawContainerRef.current!;
+    const {
+      top: offsetTop,
+      left: offsetLeft,
+    } = container.getBoundingClientRect();
+    const left = event.clientX - offsetLeft;
+    const top = event.clientY - offsetTop;
+
     if (element && !this.state.selectedElementIds[element.id]) {
       this.setState({ selectedElementIds: { [element.id]: true } }, () => {
-        this._openContextMenu(event, type);
+        this._openContextMenu({ top, left }, type);
       });
     } else {
-      this._openContextMenu(event, type);
+      this._openContextMenu({ top, left }, type);
     }
   };
 
@@ -3774,11 +3783,11 @@ class App extends React.Component<AppProps, AppState> {
   /** @private use this.handleCanvasContextMenu */
   private _openContextMenu = (
     {
-      clientX,
-      clientY,
+      left,
+      top,
     }: {
-      clientX: number;
-      clientY: number;
+      left: number;
+      top: number;
     },
     type: "canvas" | "element",
   ) => {
@@ -3829,10 +3838,11 @@ class App extends React.Component<AppProps, AppState> {
 
       ContextMenu.push({
         options: viewModeOptions,
-        top: clientY,
-        left: clientX,
+        top,
+        left,
         actionManager: this.actionManager,
         appState: this.state,
+        container: this.excalidrawContainerRef.current!,
       });
 
       if (this.state.viewModeEnabled) {
@@ -3872,10 +3882,11 @@ class App extends React.Component<AppProps, AppState> {
             actionToggleViewMode,
           actionToggleStats,
         ],
-        top: clientY,
-        left: clientX,
+        top,
+        left,
         actionManager: this.actionManager,
         appState: this.state,
+        container: this.excalidrawContainerRef.current!,
       });
       return;
     }
@@ -3883,10 +3894,11 @@ class App extends React.Component<AppProps, AppState> {
     if (this.state.viewModeEnabled) {
       ContextMenu.push({
         options: [navigator.clipboard && actionCopy, ...options],
-        top: clientY,
-        left: clientX,
+        top,
+        left,
         actionManager: this.actionManager,
         appState: this.state,
+        container: this.excalidrawContainerRef.current!,
       });
       return;
     }
@@ -3928,10 +3940,11 @@ class App extends React.Component<AppProps, AppState> {
         actionDuplicateSelection,
         actionDeleteSelected,
       ],
-      top: clientY,
-      left: clientX,
+      top,
+      left,
       actionManager: this.actionManager,
       appState: this.state,
+      container: this.excalidrawContainerRef.current!,
     });
   };
 
