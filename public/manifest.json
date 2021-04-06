@@ -39,5 +39,37 @@
         }
       ]
     }
-  }
+  },
+  "screenshots": [
+    {
+      "src": "/screenshots/virtual-whiteboard.png",
+      "type": "image/png",
+      "sizes": "462x945"
+    },
+    {
+      "src": "/screenshots/wireframe.png",
+      "type": "image/png",
+      "sizes": "462x945"
+    },
+    {
+      "src": "/screenshots/illustration.png",
+      "type": "image/png",
+      "sizes": "462x945"
+    },
+    {
+      "src": "/screenshots/shapes.png",
+      "type": "image/png",
+      "sizes": "462x945"
+    },
+    {
+      "src": "/screenshots/collaboration.png",
+      "type": "image/png",
+      "sizes": "462x945"
+    },
+    {
+      "src": "/screenshots/export.png",
+      "type": "image/png",
+      "sizes": "462x945"
+    }
+  ]
 }
