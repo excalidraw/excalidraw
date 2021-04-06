@@ -3584,11 +3584,40 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private handleCanvasImageDrop = async (
+    event: React.DragEvent<HTMLCanvasElement>,
+    file: File,
+  ) => {
+    try {
+      const shapes = await (
+        await import(
+          /* webpackChunkName: "pixelated-image" */ "../data/pixelated-image"
+        )
+      ).pixelateImage(file, 20, 1200, event.clientX, event.clientY);
+
+      const nextElements = [
+        ...this.scene.getElementsIncludingDeleted(),
+        ...shapes,
+      ];
+
+      this.scene.replaceAllElements(nextElements);
+    } catch (error) {
+      return this.setState({
+        isLoading: false,
+        errorMessage: error.message,
+      });
+    }
+  };
+
   private handleCanvasOnDrop = async (
     event: React.DragEvent<HTMLCanvasElement>,
   ) => {
+    let imageFile: File | null = null;
     try {
       const file = event.dataTransfer.files[0];
+      if (file?.type.indexOf("image/") === 0) {
+        imageFile = file;
+      }
       if (file?.type === "image/png" || file?.type === "image/svg+xml") {
         const { elements, appState } = await loadFromBlob(file, this.state);
         this.syncActionResult({
@@ -3600,8 +3629,13 @@ class App extends React.Component<AppProps, AppState> {
           commitToHistory: true,
         });
         return;
+      } else if (imageFile) {
+        return await this.handleCanvasImageDrop(event, imageFile);
       }
     } catch (error) {
+      if (imageFile) {
+        return await this.handleCanvasImageDrop(event, imageFile);
+      }
       return this.setState({
         isLoading: false,
         errorMessage: error.message,
