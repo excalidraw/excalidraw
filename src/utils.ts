@@ -422,5 +422,5 @@ export const getNearestScrollableContainer = (
   ) {
     return parent!;
   }
-  return getNearestScrollableContainer(parent!.parentElement);
+  return getNearestScrollableContainer(parent!);
 };
