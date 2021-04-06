@@ -15,7 +15,8 @@ import CollabButton from "./CollabButton";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 import { LockIcon } from "./LockIcon";
 import { UserList } from "./UserList";
-import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
+import { BackgroundPicker } from "./BackgroundPicker";
+import { DarkModeToggle } from "./DarkModeToggle";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -127,14 +128,17 @@ export const MobileMenu = ({
             onClick={onCollabButtonClick}
           />
         )}
-        {
-          <BackgroundPickerAndDarkModeToggle
-            actionManager={actionManager}
-            appState={appState}
-            setAppState={setAppState}
-            showThemeBtn={showThemeBtn}
-          />
-        }
+        <BackgroundPicker actionManager={actionManager} />
+        {showThemeBtn && (
+          <div style={{ marginInlineStart: "0.25rem" }}>
+            <DarkModeToggle
+              value={appState.theme}
+              onChange={(theme) => {
+                setAppState({ theme });
+              }}
+            />
+          </div>
+        )}
       </>
     );
   };

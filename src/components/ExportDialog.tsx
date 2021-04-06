@@ -12,7 +12,7 @@ import { exportToCanvas, getExportSize } from "../scene/export";
 import { AppState } from "../types";
 import { Dialog } from "./Dialog";
 import "./ExportDialog.scss";
-import { clipboard, exportFile, link } from "./icons";
+import { clipboard, exportFile } from "./icons";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 
@@ -60,7 +60,6 @@ const ExportModal = ({
   onExportToPng,
   onExportToSvg,
   onExportToClipboard,
-  onExportToBackend,
 }: {
   appState: AppState;
   elements: readonly NonDeletedExcalidrawElement[];
@@ -69,7 +68,6 @@ const ExportModal = ({
   onExportToPng: ExportCB;
   onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
-  onExportToBackend?: ExportCB;
   onCloseRequest: () => void;
 }) => {
   const someElementIsSelected = isSomeElementSelected(elements, appState);
@@ -159,19 +157,7 @@ const ExportModal = ({
                 onClick={() => onExportToClipboard(exportedElements, scale)}
               />
             )}
-            {onExportToBackend && (
-              <ToolButton
-                type="button"
-                icon={link}
-                title={t("buttons.getShareableLink")}
-                aria-label={t("buttons.getShareableLink")}
-                onClick={() => onExportToBackend(exportedElements)}
-              />
-            )}
           </Stack.Row>
-          <div className="ExportDialog__name">
-            {actionManager.renderAction("changeProjectName")}
-          </div>
           <Stack.Row gap={2}>
             {scales.map((s) => {
               const [width, height] = getExportSize(
@@ -232,7 +218,6 @@ export const ExportDialog = ({
   onExportToPng,
   onExportToSvg,
   onExportToClipboard,
-  onExportToBackend,
 }: {
   appState: AppState;
   elements: readonly NonDeletedExcalidrawElement[];
@@ -241,7 +226,6 @@ export const ExportDialog = ({
   onExportToPng: ExportCB;
   onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
-  onExportToBackend?: ExportCB;
 }) => {
   const [modalIsShown, setModalIsShown] = useState(false);
   const triggerButton = useRef<HTMLButtonElement>(null);
@@ -275,7 +259,6 @@ export const ExportDialog = ({
             onExportToPng={onExportToPng}
             onExportToSvg={onExportToSvg}
             onExportToClipboard={onExportToClipboard}
-            onExportToBackend={onExportToBackend}
             onCloseRequest={handleClose}
           />
         </Dialog>
