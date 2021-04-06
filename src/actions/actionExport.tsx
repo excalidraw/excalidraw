@@ -252,7 +252,7 @@ export const actionToggleAutosave = register({
     };
   },
   PanelComponent: ({ appState, updateData }) =>
-    supported ? (
+    supported && appState.fileHandle ? (
       <label style={{ display: "flex" }}>
         <input
           type="checkbox"
