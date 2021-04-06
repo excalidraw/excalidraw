@@ -125,6 +125,7 @@ export const exportToSvg = (
     svgRoot.setAttribute("filter", THEME_FILTER);
   }
 
+
   svgRoot.innerHTML = `
   ${SVG_EXPORT_TAG}
   ${metadata}
@@ -137,6 +138,10 @@ export const exportToSvg = (
       @font-face {
         font-family: "Cascadia";
         src: url("https://excalidraw.com/Cascadia.woff2");
+      }
+      @font-face {
+        font-family: "Zhiyongshoushu";
+        src: url("Zhiyongshoushu.woff2"");
       }
     </style>
   </defs>

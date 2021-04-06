@@ -62,7 +62,7 @@ export const CLASSES = {
 
 // 1-based in case we ever do `if(element.fontFamily)`
 export const FONT_FAMILY = {
-  1: "Virgil",
+  1: "Virgil,Zhiyongshoushu",
   2: "Helvetica",
   3: "Cascadia",
 } as const;
