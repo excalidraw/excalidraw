@@ -406,3 +406,21 @@ export const supportsEmoji = () => {
   ctx.fillText("😀", 0, 0);
   return ctx.getImageData(offset, offset, 1, 1).data[0] !== 0;
 };
+
+export const getNearestScrollableContainer = (
+  element: HTMLElement | null,
+): HTMLElement => {
+  if (!element || element === document.body) {
+    return document.body;
+  }
+  const parent = element.parentElement;
+  const { overflowY } = window.getComputedStyle(parent!);
+  const hasScrollableContent = parent!.scrollHeight > parent!.clientHeight;
+  if (
+    hasScrollableContent &&
+    (overflowY === "auto" || overflowY === "scroll")
+  ) {
+    return parent!;
+  }
+  return getNearestScrollableContainer(parent!.parentElement);
+};
