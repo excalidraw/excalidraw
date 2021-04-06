@@ -28,14 +28,7 @@ export const ErrorDialog = ({
           onCloseRequest={handleClose}
           title={t("errorDialog.title")}
         >
-          <div>
-            {message.split("\n").map((line) => (
-              <>
-                {line}
-                <br />
-              </>
-            ))}
-          </div>
+          <div style={{ whiteSpace: "pre-wrap" }}>{message}</div>
         </Dialog>
       )}
     </>
