@@ -95,7 +95,7 @@ export const loadFromBlob = async (
         elements: clearElementsForExport(data.elements || []),
         appState: {
           theme: localAppState?.theme,
-          fileHandle: blob.handle ?? null,
+          fileHandle: (!blob.type.startsWith("image/") && blob.handle) || null,
           ...cleanAppStateForExport(data.appState || {}),
           ...(localAppState
             ? calculateScrollCenter(data.elements || [], localAppState, null)
