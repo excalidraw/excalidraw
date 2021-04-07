@@ -43,6 +43,7 @@ import {
 } from "../clipboard";
 import {
   APP_NAME,
+  COMPUTE_NEAREST_SCROLL_TIMEOUT,
   CURSOR_TYPE,
   DEFAULT_UI_OPTIONS,
   DEFAULT_VERTICAL_ALIGN,
@@ -772,9 +773,7 @@ class App extends React.Component<AppProps, AppState> {
         },
       });
     }
-    this.nearestScrollableContainer = getNearestScrollableContainer(
-      this.excalidrawContainerRef.current!,
-    );
+
     this.scene.addCallback(this.onSceneUpdated);
     this.addEventListeners();
 
@@ -814,7 +813,7 @@ class App extends React.Component<AppProps, AppState> {
     document.removeEventListener(EVENT.COPY, this.onCopy);
     document.removeEventListener(EVENT.PASTE, this.pasteFromClipboard);
     document.removeEventListener(EVENT.CUT, this.onCut);
-    this.nearestScrollableContainer!.removeEventListener(
+    this.nearestScrollableContainer?.removeEventListener(
       EVENT.SCROLL,
       this.onScroll,
     );
@@ -882,11 +881,15 @@ class App extends React.Component<AppProps, AppState> {
 
     document.addEventListener(EVENT.PASTE, this.pasteFromClipboard);
     document.addEventListener(EVENT.CUT, this.onCut);
-
-    this.nearestScrollableContainer!.addEventListener(
-      EVENT.SCROLL,
-      this.onScroll,
-    );
+    setTimeout(() => {
+      this.nearestScrollableContainer = getNearestScrollableContainer(
+        this.excalidrawContainerRef.current!,
+      );
+      this.nearestScrollableContainer.addEventListener(
+        EVENT.SCROLL,
+        this.onScroll,
+      );
+    }, COMPUTE_NEAREST_SCROLL_TIMEOUT);
 
     window.addEventListener(EVENT.RESIZE, this.onResize, false);
     window.addEventListener(EVENT.UNLOAD, this.onUnload, false);
