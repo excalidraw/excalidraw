@@ -147,7 +147,22 @@ export const textWysiwyg = ({
       handleSubmit();
     } else if (event.key === KEYS.ENTER && !event.altKey) {
       event.stopPropagation();
+    } else if (event.key === KEYS.TAB) {
+      event.preventDefault();
+      insertTab();
     }
+  };
+
+  const insertTab = () => {
+    const { selectionStart, selectionEnd, value } = editable;
+    const startValue = value.substring(0, selectionStart);
+    const endValue = value.substring(selectionEnd);
+    editable.value = `${startValue}\t${endValue}`;
+
+    editable.selectionStart = editable.selectionEnd = selectionStart + 1;
+
+    // We must send an input event to resize the element
+    editable.dispatchEvent(new Event("input"));
   };
 
   const stopEvent = (event: Event) => {
