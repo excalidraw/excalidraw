@@ -773,7 +773,7 @@ class App extends React.Component<AppProps, AppState> {
       });
     }
     this.nearestScrollableContainer = getNearestScrollableContainer(
-      this.excalidrawContainerRef.current,
+      this.excalidrawContainerRef.current!,
     );
     this.scene.addCallback(this.onSceneUpdated);
     this.addEventListeners();
