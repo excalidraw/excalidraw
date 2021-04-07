@@ -408,19 +408,22 @@ export const supportsEmoji = () => {
 };
 
 export const getNearestScrollableContainer = (
-  element: HTMLElement | null,
+  element: HTMLElement,
 ): HTMLElement => {
-  if (!element || element === document.body) {
-    return document.body;
+  let parent = element.parentElement;
+  while (parent) {
+    if (parent === document.body) {
+      return document.body;
+    }
+    const { overflowY } = window.getComputedStyle(parent);
+    const hasScrollableContent = parent.scrollHeight > parent.clientHeight;
+    if (
+      hasScrollableContent &&
+      (overflowY === "auto" || overflowY === "scroll")
+    ) {
+      return parent;
+    }
+    parent = parent.parentElement;
   }
-  const parent = element.parentElement;
-  const { overflowY } = window.getComputedStyle(parent!);
-  const hasScrollableContent = parent!.scrollHeight > parent!.clientHeight;
-  if (
-    hasScrollableContent &&
-    (overflowY === "auto" || overflowY === "scroll")
-  ) {
-    return parent!;
-  }
-  return getNearestScrollableContainer(parent!);
+  return document.body;
 };
