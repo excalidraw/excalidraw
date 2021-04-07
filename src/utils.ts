@@ -409,11 +409,11 @@ export const supportsEmoji = () => {
 
 export const getNearestScrollableContainer = (
   element: HTMLElement,
-): HTMLElement => {
+): HTMLElement | Document => {
   let parent = element.parentElement;
   while (parent) {
     if (parent === document.body) {
-      return document.body;
+      return document;
     }
     const { overflowY } = window.getComputedStyle(parent);
     const hasScrollableContent = parent.scrollHeight > parent.clientHeight;
@@ -425,5 +425,5 @@ export const getNearestScrollableContainer = (
     }
     parent = parent.parentElement;
   }
-  return document.body;
+  return document;
 };

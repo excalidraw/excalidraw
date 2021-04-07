@@ -296,7 +296,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private scene: Scene;
   private resizeObserver: ResizeObserver | undefined;
-  private nearestScrollableContainer: HTMLElement | undefined;
+  private nearestScrollableContainer: HTMLElement | Document | undefined;
   constructor(props: AppProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
