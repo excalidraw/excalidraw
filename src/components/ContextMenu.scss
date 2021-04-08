@@ -76,7 +76,7 @@
     z-index: 1;
   }
 
-  @media #{$is-mobile-query} {
+  @include isMobile {
     .context-menu-option {
       display: block;
 

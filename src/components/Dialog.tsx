@@ -2,7 +2,7 @@ import clsx from "clsx";
 import React, { useEffect } from "react";
 import { useCallbackRefState } from "../hooks/useCallbackRefState";
 import { t } from "../i18n";
-import { useIsMobile } from "../is-mobile";
+import { useIsMobile } from "../components/App";
 import { KEYS } from "../keys";
 import "./Dialog.scss";
 import { back, close } from "./icons";
