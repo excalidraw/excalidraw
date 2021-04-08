@@ -55,7 +55,7 @@
     }
   }
 
-  @media #{$is-mobile-query} {
+  @include isMobile {
     .ExportDialog {
       display: flex;
       flex-direction: column;

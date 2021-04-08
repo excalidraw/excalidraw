@@ -8,7 +8,7 @@ import { getCommonBounds, getNonDeletedElements } from "../element";
 import { newElementWith } from "../element/mutateElement";
 import { ExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
-import { useIsMobile } from "../is-mobile";
+import { useIsMobile } from "../components/App";
 import { CODES, KEYS } from "../keys";
 import { getNormalizedZoom, getSelectedElements } from "../scene";
 import { centerScrollOn } from "../scene/scroll";

@@ -1,10 +1,13 @@
 @import "open-color/open-color.scss";
 
-// keep up to date with is-mobile.tsx
-$is-mobile-query: "(max-width: 600px), (max-height: 500px) and (max-width: 1000px)";
+@mixin isMobile() {
+  @at-root .excalidraw--mobile#{&} {
+    @content;
+  }
+}
+
 $theme-filter: "invert(93%) hue-rotate(180deg)";
 
 :export {
-  isMobileQuery: unquote($is-mobile-query);
   themeFilter: unquote($theme-filter);
 }
