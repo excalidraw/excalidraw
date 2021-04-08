@@ -2788,16 +2788,6 @@ class App extends React.Component<AppProps, AppState> {
       opacity: this.state.currentItemOpacity,
       strokeSharpness: this.state.currentItemLinearStrokeSharpness,
     });
-    // this.setState((prevState) => ({
-    //   selectedElementIds: {
-    //     ...prevState.selectedElementIds,
-    //     [element.id]: true,
-    //   },
-    // }));
-    // const boundElement = getHoveredElementForBinding(
-    //   pointerDownState.origin,
-    //   this.scene,
-    // );
     this.scene.replaceAllElements([
       ...this.scene.getElementsIncludingDeleted(),
       element,
