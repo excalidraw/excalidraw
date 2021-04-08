@@ -15,7 +15,7 @@ Please add the latest change on the top under the correct section.
 
 ## Excalidraw Library
 
-#### Breaking change
+### Features
 
 - App now breaks into mobile view using the component dimensions, not viewport dimensions. This fixes a case where the app would break sooner than necessary when the component's size is smaller than viewport [#3414](https://github.com/excalidraw/excalidraw/pull/3414).
 
