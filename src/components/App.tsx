@@ -805,17 +805,12 @@ class App extends React.Component<AppProps, AppState> {
     } else {
       const isMobileQuery = `(max-width: ${MQ_MAX_WIDTH_PORTRAIT}px), (max-height: ${MQ_MAX_HEIGHT_LANDSCAPE}px) and (max-width: ${MQ_MAX_WIDTH_LANDSCAPE}px)`;
 
-      const matchMedia = window.matchMedia
-        ? window.matchMedia(isMobileQuery)
-        : (({
-            matches: false,
-            addListener: () => {},
-            removeListener: () => {},
-          } as any) as MediaQueryList);
-
-      const handler = () => (this.isMobile = matchMedia.matches);
-      matchMedia.addListener(handler);
-      this.detachIsMobileMqHandler = () => matchMedia.removeListener(handler);
+      if (window.matchMedia) {
+        const mediaQuery = window.matchMedia(isMobileQuery);
+        const handler = () => (this.isMobile = mediaQuery.matches);
+        mediaQuery.addListener(handler);
+        this.detachIsMobileMqHandler = () => mediaQuery.removeListener(handler);
+      }
     }
 
     const searchParams = new URLSearchParams(window.location.search.slice(1));
