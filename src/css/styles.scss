@@ -480,7 +480,7 @@
     }
   }
 
-  @media #{$is-mobile-query} {
+  @include isMobile {
     aside {
       display: none;
     }

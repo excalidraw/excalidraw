@@ -1,5 +1,5 @@
 import { Point, simplify } from "points-on-curve";
-import React from "react";
+import React, { useContext } from "react";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
 import clsx from "clsx";
@@ -54,6 +54,9 @@ import {
   GRID_SIZE,
   LINE_CONFIRM_THRESHOLD,
   MIME_TYPES,
+  MQ_MAX_HEIGHT_LANDSCAPE,
+  MQ_MAX_WIDTH_LANDSCAPE,
+  MQ_MAX_WIDTH_PORTRAIT,
   POINTER_BUTTON,
   SCROLL_TIMEOUT,
   TAP_TWICE_TIMEOUT,
@@ -178,12 +181,14 @@ import {
   viewportCoordsToSceneCoords,
   withBatchedUpdates,
 } from "../utils";
-import { isMobile } from "../is-mobile";
 import ContextMenu, { ContextMenuOption } from "./ContextMenu";
 import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
+
+export const IsMobileContext = React.createContext(false);
+export const useIsMobile = () => useContext(IsMobileContext);
 
 const { history } = createHistory();
 
@@ -286,6 +291,9 @@ class App extends React.Component<AppProps, AppState> {
   rc: RoughCanvas | null = null;
   unmounted: boolean = false;
   actionManager: ActionManager;
+  isMobile = false;
+  detachIsMobileMqHandler?: () => void;
+
   private excalidrawContainerRef = React.createRef<HTMLDivElement>();
 
   public static defaultProps: Partial<AppProps> = {
@@ -437,60 +445,64 @@ class App extends React.Component<AppProps, AppState> {
       <div
         className={clsx("excalidraw", {
           "excalidraw--view-mode": viewModeEnabled,
+          "excalidraw--mobile": this.isMobile,
         })}
         ref={this.excalidrawContainerRef}
         onDrop={this.handleAppOnDrop}
       >
-        <LayerUI
-          canvas={this.canvas}
-          appState={this.state}
-          setAppState={this.setAppState}
-          actionManager={this.actionManager}
-          elements={this.scene.getElements()}
-          onCollabButtonClick={onCollabButtonClick}
-          onLockToggle={this.toggleLock}
-          onInsertElements={(elements) =>
-            this.addElementsFromPasteOrLibrary(
-              elements,
-              DEFAULT_PASTE_X,
-              DEFAULT_PASTE_Y,
-            )
-          }
-          zenModeEnabled={zenModeEnabled}
-          toggleZenMode={this.toggleZenMode}
-          langCode={getLanguage().code}
-          isCollaborating={this.props.isCollaborating || false}
-          onExportToBackend={onExportToBackend}
-          renderCustomFooter={renderFooter}
-          viewModeEnabled={viewModeEnabled}
-          showExitZenModeBtn={
-            typeof this.props?.zenModeEnabled === "undefined" && zenModeEnabled
-          }
-          showThemeBtn={
-            typeof this.props?.theme === "undefined" &&
-            this.props.UIOptions.canvasActions.theme
-          }
-          libraryReturnUrl={this.props.libraryReturnUrl}
-          UIOptions={this.props.UIOptions}
-        />
-        <div className="excalidraw-textEditorContainer" />
-        <div className="excalidraw-contextMenuContainer" />
-        {this.state.showStats && (
-          <Stats
+        <IsMobileContext.Provider value={this.isMobile}>
+          <LayerUI
+            canvas={this.canvas}
             appState={this.state}
             setAppState={this.setAppState}
+            actionManager={this.actionManager}
             elements={this.scene.getElements()}
-            onClose={this.toggleStats}
-            renderCustomStats={renderCustomStats}
+            onCollabButtonClick={onCollabButtonClick}
+            onLockToggle={this.toggleLock}
+            onInsertElements={(elements) =>
+              this.addElementsFromPasteOrLibrary(
+                elements,
+                DEFAULT_PASTE_X,
+                DEFAULT_PASTE_Y,
+              )
+            }
+            zenModeEnabled={zenModeEnabled}
+            toggleZenMode={this.toggleZenMode}
+            langCode={getLanguage().code}
+            isCollaborating={this.props.isCollaborating || false}
+            onExportToBackend={onExportToBackend}
+            renderCustomFooter={renderFooter}
+            viewModeEnabled={viewModeEnabled}
+            showExitZenModeBtn={
+              typeof this.props?.zenModeEnabled === "undefined" &&
+              zenModeEnabled
+            }
+            showThemeBtn={
+              typeof this.props?.theme === "undefined" &&
+              this.props.UIOptions.canvasActions.theme
+            }
+            libraryReturnUrl={this.props.libraryReturnUrl}
+            UIOptions={this.props.UIOptions}
           />
-        )}
-        {this.state.toastMessage !== null && (
-          <Toast
-            message={this.state.toastMessage}
-            clearToast={this.clearToast}
-          />
-        )}
-        <main>{this.renderCanvas()}</main>
+          <div className="excalidraw-textEditorContainer" />
+          <div className="excalidraw-contextMenuContainer" />
+          {this.state.showStats && (
+            <Stats
+              appState={this.state}
+              setAppState={this.setAppState}
+              elements={this.scene.getElements()}
+              onClose={this.toggleStats}
+              renderCustomStats={renderCustomStats}
+            />
+          )}
+          {this.state.toastMessage !== null && (
+            <Toast
+              message={this.state.toastMessage}
+              clearToast={this.clearToast}
+            />
+          )}
+          <main>{this.renderCanvas()}</main>
+        </IsMobileContext.Provider>
       </div>
     );
   }
@@ -776,10 +788,36 @@ class App extends React.Component<AppProps, AppState> {
 
     if ("ResizeObserver" in window && this.excalidrawContainerRef?.current) {
       this.resizeObserver = new ResizeObserver(() => {
+        // compute isMobile state
+        // ---------------------------------------------------------------------
+        const {
+          width,
+          height,
+        } = this.excalidrawContainerRef.current!.getBoundingClientRect();
+        this.isMobile =
+          width < MQ_MAX_WIDTH_PORTRAIT ||
+          (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE);
+        // refresh offsets
+        // ---------------------------------------------------------------------
         this.updateDOMRect();
       });
       this.resizeObserver?.observe(this.excalidrawContainerRef.current);
+    } else {
+      const isMobileQuery = `(max-width: ${MQ_MAX_WIDTH_PORTRAIT}px), (max-height: ${MQ_MAX_HEIGHT_LANDSCAPE}px) and (max-width: ${MQ_MAX_WIDTH_LANDSCAPE}px)`;
+
+      const matchMedia = window.matchMedia
+        ? window.matchMedia(isMobileQuery)
+        : (({
+            matches: false,
+            addListener: () => {},
+            removeListener: () => {},
+          } as any) as MediaQueryList);
+
+      const handler = () => (this.isMobile = matchMedia.matches);
+      matchMedia.addListener(handler);
+      this.detachIsMobileMqHandler = () => matchMedia.removeListener(handler);
     }
+
     const searchParams = new URLSearchParams(window.location.search.slice(1));
 
     if (searchParams.has("web-share-target")) {
@@ -839,6 +877,8 @@ class App extends React.Component<AppProps, AppState> {
       this.onGestureEnd as any,
       false,
     );
+
+    this.detachIsMobileMqHandler?.();
   }
 
   private addEventListeners() {
@@ -1016,7 +1056,7 @@ class App extends React.Component<AppProps, AppState> {
       },
       {
         renderOptimizations: true,
-        renderScrollbars: !isMobile(),
+        renderScrollbars: !this.isMobile,
       },
     );
     if (scrollBars) {
@@ -3811,8 +3851,6 @@ class App extends React.Component<AppProps, AppState> {
 
     const separator = "separator";
 
-    const _isMobile = isMobile();
-
     const elements = this.scene.getElements();
 
     const options: ContextMenuOption[] = [];
@@ -3849,7 +3887,7 @@ class App extends React.Component<AppProps, AppState> {
 
       ContextMenu.push({
         options: [
-          _isMobile &&
+          this.isMobile &&
             navigator.clipboard && {
               name: "paste",
               perform: (elements, appStates) => {
@@ -3860,7 +3898,7 @@ class App extends React.Component<AppProps, AppState> {
               },
               contextItemLabel: "labels.paste",
             },
-          _isMobile && navigator.clipboard && separator,
+          this.isMobile && navigator.clipboard && separator,
           probablySupportsClipboardBlob &&
             elements.length > 0 &&
             actionCopyAsPng,
@@ -3903,9 +3941,9 @@ class App extends React.Component<AppProps, AppState> {
 
     ContextMenu.push({
       options: [
-        _isMobile && actionCut,
-        _isMobile && navigator.clipboard && actionCopy,
-        _isMobile &&
+        this.isMobile && actionCut,
+        this.isMobile && navigator.clipboard && actionCopy,
+        this.isMobile &&
           navigator.clipboard && {
             name: "paste",
             perform: (elements, appStates) => {
@@ -3916,7 +3954,7 @@ class App extends React.Component<AppProps, AppState> {
             },
             contextItemLabel: "labels.paste",
           },
-        _isMobile && separator,
+        this.isMobile && separator,
         ...options,
         separator,
         actionCopyStyles,

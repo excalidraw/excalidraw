@@ -111,7 +111,7 @@
     :root[dir="rtl"] & {
       left: 2px;
     }
-    @media #{$is-mobile-query} {
+    @include isMobile {
       display: none;
     }
   }

@@ -31,7 +31,7 @@
     padding: 0 16px 16px;
   }
 
-  @media #{$is-mobile-query} {
+  @include isMobile {
     .Dialog {
       --metric: calc(var(--space-factor) * 4);
       --inset-left: #{"max(var(--metric), var(--sal))"};

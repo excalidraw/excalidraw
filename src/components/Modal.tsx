@@ -1,9 +1,10 @@
 import "./Modal.scss";
 
-import React, { useState, useLayoutEffect } from "react";
+import React, { useState, useLayoutEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import clsx from "clsx";
 import { KEYS } from "../keys";
+import { useIsMobile } from "../components/App";
 
 export const Modal = (props: {
   className?: string;
@@ -48,6 +49,16 @@ export const Modal = (props: {
 const useBodyRoot = () => {
   const [div, setDiv] = useState<HTMLDivElement | null>(null);
 
+  const isMobile = useIsMobile();
+  const isMobileRef = useRef(isMobile);
+  isMobileRef.current = isMobile;
+
+  useLayoutEffect(() => {
+    if (div) {
+      div.classList.toggle("excalidraw--mobile", isMobile);
+    }
+  }, [div, isMobile]);
+
   useLayoutEffect(() => {
     const isDarkTheme = !!document
       .querySelector(".excalidraw")
@@ -55,6 +66,7 @@ const useBodyRoot = () => {
     const div = document.createElement("div");
 
     div.classList.add("excalidraw", "excalidraw-modal-container");
+    div.classList.toggle("excalidraw-modal-container", isMobileRef.current);
 
     if (isDarkTheme) {
       div.classList.add("theme--dark");

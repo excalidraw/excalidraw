@@ -32,13 +32,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    @media #{$is-mobile-query} {
+    @include isMobile {
       flex-direction: column;
       align-items: stretch;
     }
   }
 
-  @media #{$is-mobile-query} {
+  @include isMobile {
     .RoomDialog-usernameLabel {
       font-weight: bold;
     }
@@ -51,7 +51,7 @@
     min-width: 0;
     flex: 1 1 auto;
     margin-inline-start: 1em;
-    @media #{$is-mobile-query} {
+    @include isMobile {
       margin-top: 0.5em;
       margin-inline-start: 0;
     }
