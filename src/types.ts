@@ -159,8 +159,6 @@ export type ExcalidrawAPIRefValue =
     };
 
 export interface ExcalidrawProps {
-  width?: number;
-  height?: number;
   onChange?: (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
@@ -191,6 +189,7 @@ export interface ExcalidrawProps {
     elements: readonly NonDeletedExcalidrawElement[],
     appState: AppState,
   ) => JSX.Element;
+  UIOptions?: UIOptions;
 }
 
 export type SceneData = {
@@ -205,3 +204,23 @@ export enum UserIdleState {
   AWAY = "away",
   IDLE = "idle",
 }
+
+type CanvasActions = {
+  changeViewBackgroundColor?: boolean;
+  clearCanvas?: boolean;
+  export?: boolean;
+  loadScene?: boolean;
+  saveAsScene?: boolean;
+  saveScene?: boolean;
+  theme?: boolean;
+};
+
+export type UIOptions = {
+  canvasActions?: CanvasActions;
+};
+
+export type AppProps = ExcalidrawProps & {
+  UIOptions: {
+    canvasActions: Required<CanvasActions>;
+  };
+};

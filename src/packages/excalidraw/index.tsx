@@ -8,13 +8,11 @@ import "../../css/app.scss";
 import "../../css/styles.scss";
 
 import { ExcalidrawAPIRefValue, ExcalidrawProps } from "../../types";
-import { IsMobileProvider } from "../../is-mobile";
 import { defaultLang } from "../../i18n";
+import { DEFAULT_UI_OPTIONS } from "../../constants";
 
 const Excalidraw = (props: ExcalidrawProps) => {
   const {
-    width,
-    height,
     onChange,
     initialData,
     excalidrawRef,
@@ -32,6 +30,15 @@ const Excalidraw = (props: ExcalidrawProps) => {
     name,
     renderCustomStats,
   } = props;
+
+  const canvasActions = props.UIOptions?.canvasActions;
+
+  const UIOptions = {
+    canvasActions: {
+      ...DEFAULT_UI_OPTIONS.canvasActions,
+      ...canvasActions,
+    },
+  };
 
   useEffect(() => {
     // Block pinch-zooming on iOS outside of the content area
@@ -53,28 +60,25 @@ const Excalidraw = (props: ExcalidrawProps) => {
 
   return (
     <InitializeApp langCode={langCode}>
-      <IsMobileProvider>
-        <App
-          width={width}
-          height={height}
-          onChange={onChange}
-          initialData={initialData}
-          excalidrawRef={excalidrawRef}
-          onCollabButtonClick={onCollabButtonClick}
-          isCollaborating={isCollaborating}
-          onPointerUpdate={onPointerUpdate}
-          onExportToBackend={onExportToBackend}
-          renderFooter={renderFooter}
-          langCode={langCode}
-          viewModeEnabled={viewModeEnabled}
-          zenModeEnabled={zenModeEnabled}
-          gridModeEnabled={gridModeEnabled}
-          libraryReturnUrl={libraryReturnUrl}
-          theme={theme}
-          name={name}
-          renderCustomStats={renderCustomStats}
-        />
-      </IsMobileProvider>
+      <App
+        onChange={onChange}
+        initialData={initialData}
+        excalidrawRef={excalidrawRef}
+        onCollabButtonClick={onCollabButtonClick}
+        isCollaborating={isCollaborating}
+        onPointerUpdate={onPointerUpdate}
+        onExportToBackend={onExportToBackend}
+        renderFooter={renderFooter}
+        langCode={langCode}
+        viewModeEnabled={viewModeEnabled}
+        zenModeEnabled={zenModeEnabled}
+        gridModeEnabled={gridModeEnabled}
+        libraryReturnUrl={libraryReturnUrl}
+        theme={theme}
+        name={name}
+        renderCustomStats={renderCustomStats}
+        UIOptions={UIOptions}
+      />
     </InitializeApp>
   );
 };
@@ -98,6 +102,7 @@ const areEqual = (
 
 Excalidraw.defaultProps = {
   lanCode: defaultLang.code,
+  UIOptions: DEFAULT_UI_OPTIONS,
 };
 
 const forwardedRefComp = forwardRef<

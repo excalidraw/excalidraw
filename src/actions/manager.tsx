@@ -7,12 +7,12 @@ import {
   ActionResult,
 } from "./types";
 import { ExcalidrawElement } from "../element/types";
-import { AppState, ExcalidrawProps } from "../types";
+import { AppProps, AppState } from "../types";
 import { MODES } from "../constants";
 
 // This is the <App> component, but for now we don't care about anything but its
 // `canvas` state.
-type App = { canvas: HTMLCanvasElement | null; props: ExcalidrawProps };
+type App = { canvas: HTMLCanvasElement | null; props: AppProps };
 
 export class ActionManager implements ActionsManagerInterface {
   actions = {} as ActionsManagerInterface["actions"];
@@ -52,10 +52,14 @@ export class ActionManager implements ActionsManagerInterface {
   }
 
   handleKeyDown(event: KeyboardEvent) {
+    const canvasActions = this.app.props.UIOptions.canvasActions;
     const data = Object.values(this.actions)
       .sort((a, b) => (b.keyPriority || 0) - (a.keyPriority || 0))
       .filter(
         (action) =>
+          (action.name in canvasActions
+            ? canvasActions[action.name as keyof typeof canvasActions]
+            : true) &&
           action.keyTest &&
           action.keyTest(
             event,
@@ -102,7 +106,15 @@ export class ActionManager implements ActionsManagerInterface {
   // like the user list. We can use this key to extract more
   // data from app state. This is an alternative to generic prop hell!
   renderAction = (name: ActionName, id?: string) => {
-    if (this.actions[name] && "PanelComponent" in this.actions[name]) {
+    const canvasActions = this.app.props.UIOptions.canvasActions;
+
+    if (
+      this.actions[name] &&
+      "PanelComponent" in this.actions[name] &&
+      (name in canvasActions
+        ? canvasActions[name as keyof typeof canvasActions]
+        : true)
+    ) {
       const action = this.actions[name];
       const PanelComponent = action.PanelComponent!;
       const updateData = (formState?: any) => {

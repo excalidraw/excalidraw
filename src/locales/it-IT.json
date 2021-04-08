@@ -230,7 +230,8 @@
     "zoomToSelection": "Zoom alla selezione"
   },
   "encrypted": {
-    "tooltip": "I tuoi disegni sono crittografati end-to-end in modo che i server di Excalidraw non li possano mai vedere."
+    "tooltip": "I tuoi disegni sono crittografati end-to-end in modo che i server di Excalidraw non li possano mai vedere.",
+    "link": "Articolo del blog sulla crittografia end-to-end di Excalidraw"
   },
   "stats": {
     "angle": "Angolo",

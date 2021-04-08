@@ -230,7 +230,8 @@
     "zoomToSelection": "Zoom per veure la selecció"
   },
   "encrypted": {
-    "tooltip": "Els vostres dibuixos estan xifrats de punta a punta de manera que els servidors d’Excalidraw no els veuran mai."
+    "tooltip": "Els vostres dibuixos estan xifrats de punta a punta de manera que els servidors d’Excalidraw no els veuran mai.",
+    "link": ""
   },
   "stats": {
     "angle": "Angle",

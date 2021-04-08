@@ -155,7 +155,7 @@ export const restoreElements = (
 export const restoreAppState = (
   appState: ImportedDataState["appState"],
   localAppState: Partial<AppState> | null,
-): AppState => {
+): DataState["appState"] => {
   appState = appState || {};
 
   const defaultAppState = getDefaultAppState();
@@ -177,8 +177,6 @@ export const restoreAppState = (
 
   return {
     ...nextAppState,
-    offsetLeft: appState.offsetLeft || 0,
-    offsetTop: appState.offsetTop || 0,
     // Migrates from previous version where appState.zoom was a number
     zoom:
       typeof appState.zoom === "number"

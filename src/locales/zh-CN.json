@@ -230,7 +230,8 @@
     "zoomToSelection": "缩放到选区"
   },
   "encrypted": {
-    "tooltip": "您的绘图采用的端到端加密，其内容对于Excalidraw服务器是不可见的。"
+    "tooltip": "您的绘图采用的端到端加密，其内容对于Excalidraw服务器是不可见的。",
+    "link": ""
   },
   "stats": {
     "angle": "角度",

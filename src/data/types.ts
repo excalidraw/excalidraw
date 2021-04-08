@@ -6,7 +6,7 @@ export interface DataState {
   version?: string;
   source?: string;
   elements: readonly ExcalidrawElement[];
-  appState: MarkOptional<AppState, "offsetTop" | "offsetLeft">;
+  appState: Omit<AppState, "offsetTop" | "offsetLeft" | "width" | "height">;
 }
 
 export interface ImportedDataState {
