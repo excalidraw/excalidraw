@@ -137,3 +137,7 @@ export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
     theme: true,
   },
 };
+
+export const MQ_MAX_WIDTH_PORTRAIT = 730;
+export const MQ_MAX_WIDTH_LANDSCAPE = 1000;
+export const MQ_MAX_HEIGHT_LANDSCAPE = 500;

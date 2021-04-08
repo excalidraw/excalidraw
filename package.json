@@ -19,18 +19,18 @@
     ]
   },
   "dependencies": {
-    "@sentry/browser": "6.2.2",
-    "@sentry/integrations": "6.2.1",
+    "@sentry/browser": "6.2.5",
+    "@sentry/integrations": "6.2.5",
     "@testing-library/jest-dom": "5.11.10",
-    "@testing-library/react": "11.2.5",
+    "@testing-library/react": "11.2.6",
     "@types/jest": "26.0.22",
     "@types/react": "17.0.3",
-    "@types/react-dom": "17.0.2",
+    "@types/react-dom": "17.0.3",
     "@types/socket.io-client": "1.4.36",
-    "browser-fs-access": "0.16.2",
+    "browser-fs-access": "0.16.4",
     "clsx": "1.1.1",
-    "firebase": "8.2.10",
-    "i18next-browser-languagedetector": "6.0.1",
+    "firebase": "8.3.2",
+    "i18next-browser-languagedetector": "6.1.0",
     "lodash.throttle": "4.1.1",
     "nanoid": "3.1.22",
     "open-color": "1.8.0",
@@ -46,7 +46,7 @@
     "roughjs": "4.3.1",
     "sass": "1.32.8",
     "socket.io-client": "2.3.1",
-    "typescript": "4.2.3"
+    "typescript": "4.2.4"
   },
   "devDependencies": {
     "@excalidraw/eslint-config": "1.0.0",
@@ -56,7 +56,7 @@
     "@types/resize-observer-browser": "0.1.5",
     "eslint-config-prettier": "8.1.0",
     "eslint-plugin-prettier": "3.3.1",
-    "firebase-tools": "9.6.1",
+    "firebase-tools": "9.9.0",
     "husky": "4.3.8",
     "jest-canvas-mock": "2.3.1",
     "lint-staged": "10.5.4",
