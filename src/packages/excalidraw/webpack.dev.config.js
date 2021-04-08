@@ -17,6 +17,9 @@ module.exports = {
   },
   resolve: {
     extensions: [".js", ".ts", ".tsx", ".css", ".scss"],
+    fallback: {
+      crypto: require.resolve("crypto-browserify"),
+    },
   },
   module: {
     rules: [

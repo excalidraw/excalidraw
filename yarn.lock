@@ -3221,11 +3221,6 @@ browser-fs-access@0.16.4:
   resolved "https://registry.yarnpkg.com/browser-fs-access/-/browser-fs-access-0.16.4.tgz#5dbb85671b1199d74581db98d2975c2fc3a5c708"
   integrity sha512-c1A9Y3pHJTKPYFjwL5SXX3MZ0BQcK7He7l0csclr80SEADIFOUHUM5oJBdg49XUdlLmIFiWiE3tbr/5KcD5TsQ==
 
-browser-nativefs@0.12.0:
-  version "0.12.0"
-  resolved "https://registry.yarnpkg.com/browser-nativefs/-/browser-nativefs-0.12.0.tgz#4e2a5fd5ee0ebe5b988166e26fc41fd356927091"
-  integrity sha512-ZCHJcQI6bBm9YjB+6wMT1nWg+/mnWnz7r3gJ8sx7RjgLtWROFq+BuD12cAncD6y45MIbUqFM8eMKXoHXOxSFxA==
-
 browser-process-hrtime@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/browser-process-hrtime/-/browser-process-hrtime-1.0.0.tgz"
@@ -4134,9 +4129,10 @@ cross-spawn@^6.0.0, cross-spawn@^6.0.5:
     shebang-command "^1.2.0"
     which "^1.2.9"
 
-crypto-browserify@^3.11.0:
+crypto-browserify@3.12.0, crypto-browserify@^3.11.0:
   version "3.12.0"
-  resolved "https://registry.npmjs.org/crypto-browserify/-/crypto-browserify-3.12.0.tgz"
+  resolved "https://registry.yarnpkg.com/crypto-browserify/-/crypto-browserify-3.12.0.tgz#396cf9f3137f03e4b8e532c58f698254e00f80ec"
+  integrity sha512-fz4spIh+znjO2VjL+IdhEpRJ3YN6sMzITSBijk6FK2UvTqruSQW+/cCZTSNsMiZNvUeq0CqurF+dAbyiGOY6Wg==
   dependencies:
     browserify-cipher "^1.0.0"
     browserify-sign "^4.0.0"
