@@ -335,6 +335,9 @@ export const isTransparent = (color: string) => {
   );
 };
 
+// From https://github.com/microsoft/TypeScript/issues/28105
+export type Awaited<T> = T extends Promise<infer U> ? U : never;
+
 export type ResolvablePromise<T> = Promise<T> & {
   resolve: [T] extends [undefined] ? (value?: T) => void : (value: T) => void;
   reject: (error: Error) => void;
