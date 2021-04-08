@@ -298,6 +298,7 @@ class App extends React.Component<AppProps, AppState> {
   private scene: Scene;
   private resizeObserver: ResizeObserver | undefined;
   private nearestScrollableContainer: HTMLElement | Document | undefined;
+  private nearestScrollableContainerTimeoutId: NodeJS.Timeout | undefined;
   constructor(props: AppProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
@@ -800,6 +801,9 @@ class App extends React.Component<AppProps, AppState> {
     this.scene.destroy();
     clearTimeout(touchTimeout);
     touchTimeout = 0;
+    if (this.nearestScrollableContainerTimeoutId) {
+      clearTimeout(this.nearestScrollableContainerTimeoutId);
+    }
   }
 
   private onResize = withBatchedUpdates(() => {
@@ -881,16 +885,17 @@ class App extends React.Component<AppProps, AppState> {
 
     document.addEventListener(EVENT.PASTE, this.pasteFromClipboard);
     document.addEventListener(EVENT.CUT, this.onCut);
-    setTimeout(() => {
-      this.nearestScrollableContainer = getNearestScrollableContainer(
-        this.excalidrawContainerRef.current!,
-      );
-      this.nearestScrollableContainer.addEventListener(
-        EVENT.SCROLL,
-        this.onScroll,
-      );
-    }, COMPUTE_NEAREST_SCROLL_TIMEOUT);
-
+    if (this.props.detectNearestScroll) {
+      this.nearestScrollableContainerTimeoutId = setTimeout(() => {
+        this.nearestScrollableContainer = getNearestScrollableContainer(
+          this.excalidrawContainerRef.current!,
+        );
+        this.nearestScrollableContainer.addEventListener(
+          EVENT.SCROLL,
+          this.onScroll,
+        );
+      }, COMPUTE_NEAREST_SCROLL_TIMEOUT);
+    }
     window.addEventListener(EVENT.RESIZE, this.onResize, false);
     window.addEventListener(EVENT.UNLOAD, this.onUnload, false);
     window.addEventListener(EVENT.BLUR, this.onBlur, false);
