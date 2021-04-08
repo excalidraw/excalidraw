@@ -19,7 +19,7 @@ $wide-viewport-width: 1000px;
     color: $oc-gray-6;
     font-size: 0.8rem;
 
-    @media #{$is-mobile-query} {
+    @include isMobile {
       position: static;
       padding-right: 2em;
     }
