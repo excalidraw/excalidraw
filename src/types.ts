@@ -17,9 +17,10 @@ import { LinearElementEditor } from "./element/linearElementEditor";
 import { SuggestedBinding } from "./element/binding";
 import { ImportedDataState } from "./data/types";
 import { ExcalidrawImperativeAPI } from "./components/App";
-import type { ResolvablePromise } from "./utils";
+import type { ResolvablePromise, Awaited } from "./utils";
 import { Spreadsheet } from "./charts";
 import { Language } from "./i18n";
+import { parseClipboard } from "./clipboard";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -177,6 +178,14 @@ export interface ExcalidrawProps {
     appState: AppState,
     canvas: HTMLCanvasElement | null,
   ) => void;
+  /**
+   * Paste from clipboard.
+   *
+   * Returns `true` to prevent default.
+   */
+  onPasteFromClipboard?: (
+    data: Awaited<ReturnType<typeof parseClipboard>>,
+  ) => boolean;
   renderFooter?: (isMobile: boolean) => JSX.Element;
   langCode?: Language["code"];
   viewModeEnabled?: boolean;
