@@ -185,6 +185,7 @@ export interface ExcalidrawProps {
    */
   onPasteFromClipboard?: (
     data: Awaited<ReturnType<typeof parseClipboard>>,
+    event: ClipboardEvent | null,
   ) => boolean;
   renderFooter?: (isMobile: boolean) => JSX.Element;
   langCode?: Language["code"];

@@ -1189,7 +1189,7 @@ class App extends React.Component<AppProps, AppState> {
       }
       const data = await parseClipboard(event);
       if (this.props.onPasteFromClipboard) {
-        if (this.props.onPasteFromClipboard(data)) {
+        if (this.props.onPasteFromClipboard(data, event)) {
           return;
         }
       }
