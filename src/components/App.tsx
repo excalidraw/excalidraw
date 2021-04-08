@@ -786,27 +786,28 @@ class App extends React.Component<AppProps, AppState> {
     this.scene.addCallback(this.onSceneUpdated);
     this.addEventListeners();
 
-    if ("ResizeObserver" in window && this.excalidrawContainerRef?.current) {
-      this.resizeObserver = new ResizeObserver(() => {
-        // compute isMobile state
-        // ---------------------------------------------------------------------
-        const {
-          width,
-          height,
-        } = this.excalidrawContainerRef.current!.getBoundingClientRect();
-        this.isMobile =
-          width < MQ_MAX_WIDTH_PORTRAIT ||
-          (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE);
-        // refresh offsets
-        // ---------------------------------------------------------------------
-        this.updateDOMRect();
-      });
-      this.resizeObserver?.observe(this.excalidrawContainerRef.current);
-    } else {
-      const isMobileQuery = `(max-width: ${MQ_MAX_WIDTH_PORTRAIT}px), (max-height: ${MQ_MAX_HEIGHT_LANDSCAPE}px) and (max-width: ${MQ_MAX_WIDTH_LANDSCAPE}px)`;
-
-      if (window.matchMedia) {
-        const mediaQuery = window.matchMedia(isMobileQuery);
+    if (this.excalidrawContainerRef?.current) {
+      if ("ResizeObserver" in window) {
+        this.resizeObserver = new ResizeObserver(() => {
+          // compute isMobile state
+          // ---------------------------------------------------------------------
+          const {
+            width,
+            height,
+          } = this.excalidrawContainerRef.current!.getBoundingClientRect();
+          this.isMobile =
+            width < MQ_MAX_WIDTH_PORTRAIT ||
+            (height < MQ_MAX_HEIGHT_LANDSCAPE &&
+              width < MQ_MAX_WIDTH_LANDSCAPE);
+          // refresh offsets
+          // ---------------------------------------------------------------------
+          this.updateDOMRect();
+        });
+        this.resizeObserver?.observe(this.excalidrawContainerRef.current);
+      } else if (window.matchMedia) {
+        const mediaQuery = window.matchMedia(
+          `(max-width: ${MQ_MAX_WIDTH_PORTRAIT}px), (max-height: ${MQ_MAX_HEIGHT_LANDSCAPE}px) and (max-width: ${MQ_MAX_WIDTH_LANDSCAPE}px)`,
+        );
         const handler = () => (this.isMobile = mediaQuery.matches);
         mediaQuery.addListener(handler);
         this.detachIsMobileMqHandler = () => mediaQuery.removeListener(handler);
