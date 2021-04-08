@@ -364,6 +364,7 @@ To view the full example visit :point_down:
 | [`theme`](#theme) | `light` or `dark` |  | The theme of the Excalidraw component |
 | [`name`](#name) | string |  | Name of the drawing |
 | [`UIOptions`](#UIOptions) | <pre>{ canvasActions: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L208"> CanvasActions<a/> }</pre> | [DEFAULT UI OPTIONS](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L129) | To customise UI options. Currently we support customising [`canvas actions`](#canvasActions) |
+| [`detectScroll`](#detectScroll) | boolean | true | This implies whether to update the offsets when nearest ancestor is scrolled. |
 
 ### Dimensions of Excalidraw
 
@@ -573,6 +574,10 @@ useEffect(() => {
 ```
 
 Try out the [Demo](#Demo) to see it in action.
+
+### detectScroll
+
+This implies whether offsets should be updated when scrolling for the Excalidraw component so that the coordinates are computed correctly (for example the cursor position). This will only take into consideration the **nearest scrollable ancestor**.
 
 ### Extra API's
 
