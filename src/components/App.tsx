@@ -3,8 +3,7 @@ import React, { useContext } from "react";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
 import clsx from "clsx";
-import { supported } from "browser-fs-access";
-import { fileOpen } from "browser-nativefs";
+import { fileOpen, supported } from "browser-fs-access";
 
 import {
   actionAddToLibrary,
