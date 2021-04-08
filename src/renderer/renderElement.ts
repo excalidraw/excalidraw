@@ -26,6 +26,7 @@ import {
 } from "../utils";
 import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
+import Scene from "../scene/Scene";
 import { Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
 import * as crypto from "crypto";
@@ -261,6 +262,8 @@ export const loadImage = async (element: ExcalidrawImageElement) => {
     image.onload = () => {
       //TODO: count how many images has been loaded
       //TODO: limit the size of the imageCache
+      invalidateShapeForElement(element);
+      Scene.getScene(element)?.informMutation();
     };
     image.src = element.imageData;
     imageCache.set(imageId, image);
