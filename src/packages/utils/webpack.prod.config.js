@@ -16,6 +16,7 @@ module.exports = {
     extensions: [".tsx", ".ts", ".js", ".css", ".scss"],
     fallback: {
       crypto: require.resolve("crypto-browserify"),
+      stream: require.resolve("stream-browserify"),
     },
   },
   optimization: {
