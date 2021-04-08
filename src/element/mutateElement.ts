@@ -77,8 +77,6 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
     typeof image != "undefined" ||
     typeof points !== "undefined"
   ) {
-    // console.log("invalidate");
-
     invalidateShapeForElement(element);
   }
 

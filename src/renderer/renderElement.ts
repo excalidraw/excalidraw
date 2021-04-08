@@ -4,6 +4,7 @@ import {
   ExcalidrawTextElement,
   Arrowhead,
   NonDeletedExcalidrawElement,
+  ExcalidrawImageElement,
 } from "../element/types";
 import { isTextElement, isLinearElement } from "../element/typeChecks";
 import {
@@ -27,6 +28,7 @@ import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
 import { Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
+import * as crypto from "crypto";
 
 const defaultAppState = getDefaultAppState();
 
@@ -171,7 +173,7 @@ const drawElementOnCanvas = (
       break;
     }
     case "image": {
-      const img = element.image as HTMLImageElement;
+      const img = getImage(element);
       if (img != null) {
         context.drawImage(
           img,
@@ -242,6 +244,28 @@ const shapeCache = new WeakMap<
   ExcalidrawElement,
   Drawable | Drawable[] | null
 >();
+
+const imageCache = new Map<string, HTMLImageElement | null>();
+
+export const convertStringToHash = (data: string) =>
+  crypto.createHash("md5").update(data).digest("hex");
+
+export const getImage = (element: ExcalidrawImageElement) =>
+  imageCache.get(element.imageId);
+
+export const loadImage = async (element: ExcalidrawImageElement) => {
+  const imageId = element.imageId;
+  const imageHTMLElement = imageCache.get(imageId);
+  if (imageHTMLElement == null) {
+    const image = new Image();
+    image.onload = () => {
+      //TODO: count how many images has been loaded
+      //TODO: limit the size of the imageCache
+    };
+    image.src = element.imageData;
+    imageCache.set(imageId, image);
+  }
+};
 
 export const getShapeForElement = (element: ExcalidrawElement) =>
   shapeCache.get(element);

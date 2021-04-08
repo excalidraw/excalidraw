@@ -148,7 +148,11 @@ import {
 } from "../keys";
 import { distance2d, getGridPoint, isPathALoop } from "../math";
 import { renderScene } from "../renderer";
-import { invalidateShapeForElement } from "../renderer/renderElement";
+import {
+  invalidateShapeForElement,
+  convertStringToHash,
+  loadImage,
+} from "../renderer/renderElement";
 import {
   calculateScrollCenter,
   getElementContainingPosition,
@@ -3338,16 +3342,13 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
         const reader = new FileReader();
         reader.onload = () => {
-          const image = new Image();
-          image.onload = () => {
-            mutateElement(draggingElement, {
-              image,
-            });
-          };
-          image.src = reader.result as string;
+          const imageData = reader.result as string;
+          const imageId = convertStringToHash(imageData);
           mutateElement(draggingElement, {
-            imageData: reader.result as string,
+            imageData,
+            imageId,
           });
+          loadImage(draggingElement);
           this.actionManager.executeAction(actionFinalize);
         };
         reader.readAsDataURL(selectedFile);

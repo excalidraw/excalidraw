@@ -7,7 +7,6 @@ import { AppState, NormalizedZoomValue } from "../types";
 import { DataState, ImportedDataState } from "./types";
 import { isInvisiblySmallElement, getNormalizedDimensions } from "../element";
 import { isLinearElementType } from "../element/typeChecks";
-import { mutateElement } from "../element/mutateElement";
 import { randomId } from "../random";
 import {
   FONT_FAMILY,
@@ -16,6 +15,7 @@ import {
   DEFAULT_VERTICAL_ALIGN,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
+import { loadImage, convertStringToHash } from "../renderer/renderElement";
 
 const getFontFamilyByName = (fontFamilyName: string): FontFamily => {
   for (const [id, fontFamilyString] of Object.entries(FONT_FAMILY)) {
@@ -89,23 +89,15 @@ const restoreElement = (
         verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,
       });
     case "image":
-      const image = new Image();
-      image.onload = () => {
-        // console.log("[restore] Update the IMAGE element ....");
-        mutateElement(element, {
-          image,
-        });
-        // console.log("[restore] Re-render please ....");
-        // console.log(element);
-      };
-      // console.log("[restore] image object ....", element.id);
-      image.src = element.imageData as string;
-      // console.log("org:", element);
+      const imageData = element.imageData;
+      const imageId = convertStringToHash(imageData);
 
-      return restoreElementWithProperties(element, {
-        imageData: element.imageData,
-        image: null,
+      const result = restoreElementWithProperties(element, {
+        imageData,
+        imageId,
       });
+      loadImage(result);
+      return result;
     case "draw":
     case "line":
     case "arrow": {

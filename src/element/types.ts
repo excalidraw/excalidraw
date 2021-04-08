@@ -65,7 +65,7 @@ export type ExcalidrawImageElement = _ExcalidrawElementBase &
   Readonly<{
     type: "image";
     imageData: string;
-    image: HTMLImageElement | null;
+    imageId: string;
   }>;
 
 /**
