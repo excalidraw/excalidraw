@@ -885,7 +885,7 @@ class App extends React.Component<AppProps, AppState> {
 
     document.addEventListener(EVENT.PASTE, this.pasteFromClipboard);
     document.addEventListener(EVENT.CUT, this.onCut);
-    if (this.props.detectNearestScroll) {
+    if (this.props.detectScroll) {
       this.nearestScrollableContainerTimeoutId = setTimeout(() => {
         this.nearestScrollableContainer = getNearestScrollableContainer(
           this.excalidrawContainerRef.current!,

@@ -190,7 +190,7 @@ export interface ExcalidrawProps {
     appState: AppState,
   ) => JSX.Element;
   UIOptions?: UIOptions;
-  detectNearestScroll?: boolean;
+  detectScroll?: boolean;
 }
 
 export type SceneData = {
@@ -224,5 +224,5 @@ export type AppProps = ExcalidrawProps & {
   UIOptions: {
     canvasActions: Required<CanvasActions>;
   };
-  detectNearestScroll: boolean;
+  detectScroll: boolean;
 };

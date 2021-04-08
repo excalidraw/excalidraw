@@ -30,7 +30,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     theme,
     name,
     renderCustomStats,
-    detectNearestScroll = true,
+    detectScroll = true,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -81,7 +81,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
           name={name}
           renderCustomStats={renderCustomStats}
           UIOptions={UIOptions}
-          detectNearestScroll={detectNearestScroll}
+          detectScroll={detectScroll}
         />
       </IsMobileProvider>
     </InitializeApp>
