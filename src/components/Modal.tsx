@@ -66,7 +66,7 @@ const useBodyRoot = () => {
     const div = document.createElement("div");
 
     div.classList.add("excalidraw", "excalidraw-modal-container");
-    div.classList.toggle("excalidraw-modal-container", isMobileRef.current);
+    div.classList.toggle("excalidraw--mobile", isMobileRef.current);
 
     if (isDarkTheme) {
       div.classList.add("theme--dark");
