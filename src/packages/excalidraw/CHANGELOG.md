@@ -13,11 +13,10 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
-## Excalidrw API
-
-### Features
+## Excalidraw API
 
 - Add scroll listener to the nearest scrollable container and allow consumer to disable it [#3408](https://github.com/excalidraw/excalidraw/pull/3408). By default scroll listener will be added to the nearest scrollable container so offsets get updated when position gets updated due to scroll. This behaviour can be disabled by setting `detectScroll` to false.
+- Add `onPaste` prop to handle custom clipboard behaviours [#3420](https://github.com/excalidraw/excalidraw/pull/3420).
 
 ## Excalidraw Library
 

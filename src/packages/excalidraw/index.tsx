@@ -29,6 +29,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     theme,
     name,
     renderCustomStats,
+    onPaste,
     detectScroll = true,
   } = props;
 
@@ -79,6 +80,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
         name={name}
         renderCustomStats={renderCustomStats}
         UIOptions={UIOptions}
+        onPaste={onPaste}
         detectScroll={detectScroll}
       />
     </InitializeApp>
