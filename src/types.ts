@@ -20,6 +20,7 @@ import { ExcalidrawImperativeAPI } from "./components/App";
 import type { ResolvablePromise } from "./utils";
 import { Spreadsheet } from "./charts";
 import { Language } from "./i18n";
+import { ClipboardData } from "./clipboard";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -177,6 +178,10 @@ export interface ExcalidrawProps {
     appState: AppState,
     canvas: HTMLCanvasElement | null,
   ) => void;
+  onPaste?: (
+    data: ClipboardData,
+    event: ClipboardEvent | null,
+  ) => Promise<boolean> | boolean;
   renderFooter?: (isMobile: boolean) => JSX.Element;
   langCode?: Language["code"];
   viewModeEnabled?: boolean;

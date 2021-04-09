@@ -14,6 +14,13 @@ type ElementsClipboard = {
   elements: ExcalidrawElement[];
 };
 
+export interface ClipboardData {
+  spreadsheet?: Spreadsheet;
+  elements?: readonly ExcalidrawElement[];
+  text?: string;
+  errorMessage?: string;
+}
+
 let CLIPBOARD = "";
 let PREFER_APP_CLIPBOARD = false;
 
@@ -110,12 +117,7 @@ const getSystemClipboard = async (
  */
 export const parseClipboard = async (
   event: ClipboardEvent | null,
-): Promise<{
-  spreadsheet?: Spreadsheet;
-  elements?: readonly ExcalidrawElement[];
-  text?: string;
-  errorMessage?: string;
-}> => {
+): Promise<ClipboardData> => {
   const systemClipboard = await getSystemClipboard(event);
 
   // if system clipboard empty, couldn't be resolved, or contains previously

@@ -29,6 +29,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     theme,
     name,
     renderCustomStats,
+    onPaste,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -78,6 +79,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
         name={name}
         renderCustomStats={renderCustomStats}
         UIOptions={UIOptions}
+        onPaste={onPaste}
       />
     </InitializeApp>
   );

@@ -364,6 +364,7 @@ To view the full example visit :point_down:
 | [`theme`](#theme) | `light` or `dark` |  | The theme of the Excalidraw component |
 | [`name`](#name) | string |  | Name of the drawing |
 | [`UIOptions`](#UIOptions) | <pre>{ canvasActions: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L208"> CanvasActions<a/> }</pre> | [DEFAULT UI OPTIONS](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L129) | To customise UI options. Currently we support customising [`canvas actions`](#canvasActions) |
+| [`onPaste`](#onPaste) | <pre>(data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/clipboard.ts#L17">ClipboardData</a>, event: ClipboardEvent &#124; null) => boolean</pre> |  | Callback to be triggered if passed when the something is pasted in to the scene |
 
 ### Dimensions of Excalidraw
 
@@ -528,7 +529,7 @@ This prop controls Excalidraw's theme. When supplied, the value takes precedence
 
 This prop sets the name of the drawing which will be used when exporting the drawing. When supplied, the value takes precedence over `intialData.appState.name`, the `name` will be fully controlled by host app and the users won't be able to edit from within Excalidraw.
 
-### `UIOptions`
+#### `UIOptions`
 
 This prop can be used to customise UI of Excalidraw. Currently we support customising only [`canvasActions`](#canvasActions). It accepts the below parameters
 
@@ -536,7 +537,7 @@ This prop can be used to customise UI of Excalidraw. Currently we support custom
 { canvasActions: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L208"> CanvasActions<a/> }
 </pre>
 
-#### canvasActions
+##### canvasActions
 
 | Attribute | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -547,6 +548,18 @@ This prop can be used to customise UI of Excalidraw. Currently we support custom
 | `saveAsScene` | boolean | true | Implies whether to show `Save as button` |
 | `saveScene` | boolean | true | Implies whether to show `Save button` |
 | `theme` | boolean | true | Implies whether to show `Theme toggle` |
+
+#### `onPaste`
+
+This callback is triggered if passed when something is pasted into the scene. You can use this callback in case you want to do something additional when the paste event occurs.
+
+<pre>
+(data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/clipboard.ts#L17">ClipboardData</a>, event: ClipboardEvent &#124; null) => boolean
+</pre>
+
+This callback must return a `boolean` value or a [promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise) which resolves to a boolean value.
+
+In case you want to prevent the excalidraw paste action you must return `true`, it will stop the native excalidraw clipboard management flow (nothing will be pasted into the scene).
 
 ### Does it support collaboration ?
 
