@@ -30,6 +30,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     name,
     renderCustomStats,
     onPaste,
+    detectScroll = true,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -80,6 +81,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
         renderCustomStats={renderCustomStats}
         UIOptions={UIOptions}
         onPaste={onPaste}
+        detectScroll={detectScroll}
       />
     </InitializeApp>
   );
@@ -100,11 +102,6 @@ const areEqual = (
     prevKeys.length === nextKeys.length &&
     prevKeys.every((key) => prev[key] === next[key])
   );
-};
-
-Excalidraw.defaultProps = {
-  lanCode: defaultLang.code,
-  UIOptions: DEFAULT_UI_OPTIONS,
 };
 
 const forwardedRefComp = forwardRef<

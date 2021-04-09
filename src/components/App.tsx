@@ -168,6 +168,7 @@ import { AppProps, AppState, Gesture, GestureEvent, SceneData } from "../types";
 import {
   debounce,
   distance,
+  getNearestScrollableContainer,
   isInputLike,
   isToolIcon,
   isWritableElement,
@@ -303,6 +304,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private scene: Scene;
   private resizeObserver: ResizeObserver | undefined;
+  private nearestScrollableContainer: HTMLElement | Document | undefined;
   constructor(props: AppProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
@@ -841,6 +843,10 @@ class App extends React.Component<AppProps, AppState> {
     document.removeEventListener(EVENT.COPY, this.onCopy);
     document.removeEventListener(EVENT.PASTE, this.pasteFromClipboard);
     document.removeEventListener(EVENT.CUT, this.onCut);
+    this.nearestScrollableContainer?.removeEventListener(
+      EVENT.SCROLL,
+      this.onScroll,
+    );
 
     document.removeEventListener(EVENT.KEYDOWN, this.onKeyDown, false);
     document.removeEventListener(
@@ -907,8 +913,15 @@ class App extends React.Component<AppProps, AppState> {
 
     document.addEventListener(EVENT.PASTE, this.pasteFromClipboard);
     document.addEventListener(EVENT.CUT, this.onCut);
-    document.addEventListener(EVENT.SCROLL, this.onScroll);
-
+    if (this.props.detectScroll) {
+      this.nearestScrollableContainer = getNearestScrollableContainer(
+        this.excalidrawContainerRef.current!,
+      );
+      this.nearestScrollableContainer.addEventListener(
+        EVENT.SCROLL,
+        this.onScroll,
+      );
+    }
     window.addEventListener(EVENT.RESIZE, this.onResize, false);
     window.addEventListener(EVENT.UNLOAD, this.onUnload, false);
     window.addEventListener(EVENT.BLUR, this.onBlur, false);
