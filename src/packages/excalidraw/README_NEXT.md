@@ -351,7 +351,6 @@ To view the full example visit :point_down:
 | [`initialData`](#initialData) | <pre>{elements?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>, appState?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37">AppState<a> } </pre> | null | The initial data with which app loads. |
 | [`ref`](#ref) | [`createRef`](https://reactjs.org/docs/refs-and-the-dom.html#creating-refs) or [`callbackRef`](https://reactjs.org/docs/refs-and-the-dom.html#callback-refs) or <pre>{ current: { readyPromise: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317">resolvablePromise</a> } }</pre> |  | Ref to be passed to Excalidraw |
 | [`onCollabButtonClick`](#onCollabButtonClick) | Function |  | Callback to be triggered when the collab button is clicked |
-| [`onPaste`](#onPaste) | Function |  | Callback to be triggered when the something is pasted to the scene |
 | [`isCollaborating`](#isCollaborating) | `boolean` |  | This implies if the app is in collaboration mode |
 | [`onPointerUpdate`](#onPointerUpdate) | Function |  | Callback triggered when mouse pointer is updated. |
 | [`onExportToBackend`](#onExportToBackend) | Function |  | Callback triggered when link button is clicked on export dialog |
@@ -365,6 +364,7 @@ To view the full example visit :point_down:
 | [`theme`](#theme) | `light` or `dark` |  | The theme of the Excalidraw component |
 | [`name`](#name) | string |  | Name of the drawing |
 | [`UIOptions`](#UIOptions) | <pre>{ canvasActions: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L208"> CanvasActions<a/> }</pre> | [DEFAULT UI OPTIONS](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L129) | To customise UI options. Currently we support customising [`canvas actions`](#canvasActions) |
+| [`onPaste`](#onPaste) | <pre>(data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/clipboard.ts#L17">ClipboardData</a>, event: ClipboardEvent &#124; null) => boolean</pre> |  | Callback to be triggered if passed when the something is pasted in to the scene |
 
 ### Dimensions of Excalidraw
 
@@ -454,12 +454,6 @@ const excalidrawRef = { current: { readyPromise: <a href="https://github.com/exc
 
 This callback is triggered when clicked on the collab button in excalidraw. If not supplied, the collab dialog button is not rendered.
 
-#### `onPaste`
-
-This callback is triggered when something is pasted to the scene. This callback need to return a `boolean` to prevent or not the current clipboard management flow.
-
-Returning `true` will stop the native excalidraw clipboard management flow (nothing insert to the scene).
-
 #### `isCollaborating`
 
 This prop indicates if the app is in collaboration mode.
@@ -535,7 +529,7 @@ This prop controls Excalidraw's theme. When supplied, the value takes precedence
 
 This prop sets the name of the drawing which will be used when exporting the drawing. When supplied, the value takes precedence over `intialData.appState.name`, the `name` will be fully controlled by host app and the users won't be able to edit from within Excalidraw.
 
-### `UIOptions`
+#### `UIOptions`
 
 This prop can be used to customise UI of Excalidraw. Currently we support customising only [`canvasActions`](#canvasActions). It accepts the below parameters
 
@@ -543,7 +537,7 @@ This prop can be used to customise UI of Excalidraw. Currently we support custom
 { canvasActions: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L208"> CanvasActions<a/> }
 </pre>
 
-#### canvasActions
+##### canvasActions
 
 | Attribute | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -554,6 +548,18 @@ This prop can be used to customise UI of Excalidraw. Currently we support custom
 | `saveAsScene` | boolean | true | Implies whether to show `Save as button` |
 | `saveScene` | boolean | true | Implies whether to show `Save button` |
 | `theme` | boolean | true | Implies whether to show `Theme toggle` |
+
+#### `onPaste`
+
+This callback is triggered if passed when something is pasted into the scene. You can use this callback in case you want to do something additional when the paste event occurs.
+
+<pre>
+(data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/clipboard.ts#L17">ClipboardData</a>, event: ClipboardEvent &#124; null) => boolean
+</pre>
+
+This callback must return a `boolean` value or a [promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise) which resolves to a boolean value.
+
+In case you want to prevent the excalidraw paste action you must return `true`, it will stop the native excalidraw clipboard management flow (nothing will be pasted into the scene).
 
 ### Does it support collaboration ?
 

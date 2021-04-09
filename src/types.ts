@@ -178,11 +178,6 @@ export interface ExcalidrawProps {
     appState: AppState,
     canvas: HTMLCanvasElement | null,
   ) => void;
-  /**
-   * Paste from clipboard.
-   *
-   * Returns `true` to prevent default.
-   */
   onPaste?: (
     data: ClipboardData,
     event: ClipboardEvent | null,
