@@ -1188,6 +1188,11 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
       const data = await parseClipboard(event);
+      if (this.props.onPaste) {
+        if (await this.props.onPaste(data, event)) {
+          return;
+        }
+      }
       if (data.errorMessage) {
         this.setState({ errorMessage: data.errorMessage });
       } else if (data.spreadsheet) {
