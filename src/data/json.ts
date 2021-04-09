@@ -6,13 +6,17 @@ import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 import { loadFromBlob } from "./blob";
 import { Library } from "./library";
-import { DataState, ImportedDataState, LibraryData } from "./types";
+import {
+  ExportedDataState,
+  ImportedDataState,
+  ExportedLibraryData,
+} from "./types";
 
 export const serializeAsJSON = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ): string => {
-  const data: DataState = {
+  const data: ExportedDataState = {
     type: EXPORT_DATA_TYPES.excalidraw,
     version: 2,
     source: EXPORT_SOURCE,
@@ -86,7 +90,7 @@ export const isValidLibrary = (json: any) => {
 
 export const saveLibraryAsJSON = async () => {
   const library = await Library.loadLibrary();
-  const data: LibraryData = {
+  const data: ExportedLibraryData = {
     type: EXPORT_DATA_TYPES.excalidrawLibrary,
     version: 1,
     source: EXPORT_SOURCE,

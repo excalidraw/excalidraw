@@ -2,7 +2,7 @@ import { ExcalidrawElement } from "../element/types";
 import { AppState, LibraryItems } from "../types";
 import type { cleanAppStateForExport } from "../appState";
 
-export interface DataState {
+export interface ExportedDataState {
   type: string;
   version: number;
   source: string;
@@ -19,11 +19,11 @@ export interface ImportedDataState {
   scrollToContent?: boolean;
 }
 
-export interface LibraryData {
+export interface ExportedLibraryData {
   type: string;
   version: number;
   source: string;
   library: LibraryItems;
 }
 
-export interface ImportedLibraryData extends Partial<LibraryData> {}
+export interface ImportedLibraryData extends Partial<ExportedLibraryData> {}
