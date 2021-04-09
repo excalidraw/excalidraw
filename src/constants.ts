@@ -91,6 +91,8 @@ export const EXPORT_DATA_TYPES = {
   excalidrawLibrary: "excalidrawlib",
 } as const;
 
+export const EXPORT_SOURCE = window.location.origin;
+
 export const STORAGE_KEYS = {
   LOCAL_STORAGE_LIBRARY: "excalidraw-library",
 } as const;
