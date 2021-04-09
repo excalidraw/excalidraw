@@ -18,6 +18,7 @@ Please add the latest change on the top under the correct section.
 ### Features
 
 - App now breaks into mobile view using the component dimensions, not viewport dimensions. This fixes a case where the app would break sooner than necessary when the component's size is smaller than viewport [#3414](https://github.com/excalidraw/excalidraw/pull/3414).
+- Add `onPaste` props to handle custom clipboard behaviours [#3420](https://github.com/excalidraw/excalidraw/pull/3420)
 
 ## 0.6.0 (2021-04-04)
 

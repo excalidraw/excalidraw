@@ -351,6 +351,7 @@ To view the full example visit :point_down:
 | [`initialData`](#initialData) | <pre>{elements?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>, appState?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37">AppState<a> } </pre> | null | The initial data with which app loads. |
 | [`ref`](#ref) | [`createRef`](https://reactjs.org/docs/refs-and-the-dom.html#creating-refs) or [`callbackRef`](https://reactjs.org/docs/refs-and-the-dom.html#callback-refs) or <pre>{ current: { readyPromise: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317">resolvablePromise</a> } }</pre> |  | Ref to be passed to Excalidraw |
 | [`onCollabButtonClick`](#onCollabButtonClick) | Function |  | Callback to be triggered when the collab button is clicked |
+| [`onPaste`](#onPaste) | Function |  | Callback to be triggered when the something is pasted to the scene |
 | [`isCollaborating`](#isCollaborating) | `boolean` |  | This implies if the app is in collaboration mode |
 | [`onPointerUpdate`](#onPointerUpdate) | Function |  | Callback triggered when mouse pointer is updated. |
 | [`onExportToBackend`](#onExportToBackend) | Function |  | Callback triggered when link button is clicked on export dialog |
@@ -452,6 +453,12 @@ const excalidrawRef = { current: { readyPromise: <a href="https://github.com/exc
 #### `onCollabButtonClick`
 
 This callback is triggered when clicked on the collab button in excalidraw. If not supplied, the collab dialog button is not rendered.
+
+#### `onPaste`
+
+This callback is triggered when something is pasted to the scene. This callback need to return a `boolean` to prevent or not the current clipboard management flow.
+
+Returning `true` will stop the native excalidraw clipboard management flow (nothing insert to the scene).
 
 #### `isCollaborating`
 
