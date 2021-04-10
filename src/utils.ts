@@ -428,7 +428,7 @@ export const getNearestScrollableContainer = (
   return document;
 };
 
-export const focusNearestTabbableParent = (element: HTMLInputElement) => {
+export const focusNearestParent = (element: HTMLInputElement) => {
   let parent = element.parentElement;
   while (parent) {
     if (parent.tabIndex > -1) {

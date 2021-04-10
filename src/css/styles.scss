@@ -19,6 +19,10 @@
   height: 100%;
   width: 100%;
 
+  &:focus {
+    outline: none;
+  }
+
   // serves 2 purposes:
   // 1. prevent selecting text outside the component when double-clicking or
   //    dragging inside it (e.g. on canvas)
