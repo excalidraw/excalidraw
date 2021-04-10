@@ -18,6 +18,12 @@ Please add the latest change on the top under the correct section.
 - Recompute offsets on `scroll` of the nearest scrollable container [#3408](https://github.com/excalidraw/excalidraw/pull/3408). This can be disabled by setting [`detectScroll`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#detectScroll) to `false`.
 - Add `onPaste` prop to handle custom clipboard behaviours [#3420](https://github.com/excalidraw/excalidraw/pull/3420).
 
+## Types
+
+- Renamed the following types in case you depend on them (via [#3427](https://github.com/excalidraw/excalidraw/pull/3427)):
+  - `DataState` → `ExportedDataState`
+  - `LibraryData` → `ExportedLibraryData`
+
 ## Excalidraw Library
 
 ### Features

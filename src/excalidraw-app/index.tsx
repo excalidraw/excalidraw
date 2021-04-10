@@ -19,7 +19,7 @@ import {
   VERSION_TIMEOUT,
 } from "../constants";
 import { loadFromBlob } from "../data/blob";
-import { DataState, ImportedDataState } from "../data/types";
+import { ImportedDataState } from "../data/types";
 import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -50,6 +50,7 @@ import {
   saveToLocalStorage,
 } from "./data/localStorage";
 import CustomStats from "./CustomStats";
+import { RestoredDataState } from "../data/restore";
 
 const languageDetector = new LanguageDetector();
 languageDetector.init({
@@ -81,13 +82,11 @@ const initializeScene = async (opts: {
   );
   const externalUrlMatch = window.location.hash.match(/^#url=(.*)$/);
 
-  const initialData = importFromLocalStorage();
+  const localDataState = importFromLocalStorage();
 
-  let scene: DataState & { scrollToContent?: boolean } = await loadScene(
-    null,
-    null,
-    initialData,
-  );
+  let scene: RestoredDataState & {
+    scrollToContent?: boolean;
+  } = await loadScene(null, null, localDataState);
 
   let roomLinkData = getCollaborationLinkData(window.location.href);
   const isExternalScene = !!(id || jsonBackendMatch || roomLinkData);
@@ -102,12 +101,12 @@ const initializeScene = async (opts: {
     ) {
       // Backwards compatibility with legacy url format
       if (id) {
-        scene = await loadScene(id, null, initialData);
+        scene = await loadScene(id, null, localDataState);
       } else if (jsonBackendMatch) {
         scene = await loadScene(
           jsonBackendMatch[1],
           jsonBackendMatch[2],
-          initialData,
+          localDataState,
         );
       }
       scene.scrollToContent = true;
