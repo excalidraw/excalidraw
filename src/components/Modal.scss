@@ -1,9 +1,13 @@
 @import "../css/variables.module";
 
 .excalidraw {
-  &.excalidraw-modal-container {
-    position: absolute;
-    z-index: 10;
+  .excalidraw-modal-container {
+    &--visible {
+      position: absolute;
+      z-index: 10;
+      width: 100%;
+      height: 100%;
+    }
   }
 
   .Modal {

@@ -489,6 +489,7 @@ class App extends React.Component<AppProps, AppState> {
           />
           <div className="excalidraw-textEditorContainer" />
           <div className="excalidraw-contextMenuContainer" />
+          <div className="excalidraw-modal-container" />
           {this.state.showStats && (
             <Stats
               appState={this.state}
