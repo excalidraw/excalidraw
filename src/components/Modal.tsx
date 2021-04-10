@@ -65,21 +65,20 @@ const useBodyRoot = () => {
       .querySelector(".excalidraw")
       ?.classList.contains("theme--dark");
     const div = document.createElement("div");
-    const container = document.querySelector(".excalidraw-modal-container")!;
-    container.classList.add("excalidraw-modal-container--visible");
+
+    div.classList.add("excalidraw", "excalidraw-modal-container");
     div.classList.toggle("excalidraw--mobile", isMobileRef.current);
 
     if (isDarkTheme) {
       div.classList.add("theme--dark");
       div.classList.add("theme--dark-background-none");
     }
-    container.appendChild(div);
+    document.body.appendChild(div);
 
     setDiv(div);
 
     return () => {
-      container.classList.remove("excalidraw-modal-container--visible");
-      container!.removeChild(div);
+      document.body.removeChild(div);
     };
   }, []);
 
