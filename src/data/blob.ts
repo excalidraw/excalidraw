@@ -7,7 +7,7 @@ import { calculateScrollCenter } from "../scene";
 import { AppState } from "../types";
 import { isValidExcalidrawData } from "./json";
 import { restore } from "./restore";
-import { LibraryData } from "./types";
+import { ImportedLibraryData } from "./types";
 
 const parseFileContents = async (blob: Blob | File) => {
   let contents: string;
@@ -114,7 +114,7 @@ export const loadFromBlob = async (
 
 export const loadLibraryFromBlob = async (blob: Blob) => {
   const contents = await parseFileContents(blob);
-  const data: LibraryData = JSON.parse(contents);
+  const data: ImportedLibraryData = JSON.parse(contents);
   if (data.type !== EXPORT_DATA_TYPES.excalidrawLibrary) {
     throw new Error(t("alerts.couldNotLoadInvalidFile"));
   }
