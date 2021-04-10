@@ -15,11 +15,13 @@ export type ActionResult =
     }
   | false;
 
+type AppAPI = { canvas: HTMLCanvasElement | null; focusContainer(): void };
+
 type ActionFn = (
   elements: readonly ExcalidrawElement[],
   appState: Readonly<AppState>,
   formData: any,
-  app: { canvas: HTMLCanvasElement | null },
+  app: AppAPI,
 ) => ActionResult | Promise<ActionResult>;
 
 export type UpdaterFn = (res: ActionResult) => void;

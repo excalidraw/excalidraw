@@ -159,11 +159,14 @@ export const textWysiwyg = ({
   // so that we don't need to create separate a callback for event handlers
   let submittedViaKeyboard = false;
   const handleSubmit = () => {
+    // cleanup must be run before onSubmit otherwise when app blurs the wysiwyg
+    // it'd get stuck in an infinite loop of blur→onSubmit after we re-focus the
+    // wysiwyg on update
+    cleanup();
     onSubmit({
       text: normalizeText(editable.value),
       viaKeyboard: submittedViaKeyboard,
     });
-    cleanup();
   };
 
   const cleanup = () => {

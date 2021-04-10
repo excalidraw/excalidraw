@@ -38,6 +38,7 @@ export const Modal = (props: {
       <div
         className="Modal__content"
         style={{ "--max-width": `${props.maxWidth}px` }}
+        tabIndex={0}
       >
         {props.children}
       </div>

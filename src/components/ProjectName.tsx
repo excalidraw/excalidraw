@@ -17,6 +17,14 @@ export class ProjectName extends Component<Props, State> {
     fileName: this.props.value,
   };
   private handleBlur = (event: any) => {
+    let parent = (event.target as HTMLInputElement).parentElement;
+    while (parent) {
+      if (parent.tabIndex > -1) {
+        parent.focus();
+        break;
+      }
+      parent = parent.parentElement;
+    }
     const value = event.target.value;
     if (value !== this.props.value) {
       this.props.onChange(value);

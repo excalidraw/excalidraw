@@ -510,6 +510,10 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
+  public focusContainer = () => {
+    this.excalidrawContainerRef.current?.focus();
+  };
+
   public getSceneElementsIncludingDeleted = () => {
     return this.scene.getElementsIncludingDeleted();
   };
@@ -788,6 +792,10 @@ class App extends React.Component<AppProps, AppState> {
 
     this.scene.addCallback(this.onSceneUpdated);
     this.addEventListeners();
+
+    if (this.excalidrawContainerRef.current) {
+      this.focusContainer();
+    }
 
     if ("ResizeObserver" in window && this.excalidrawContainerRef?.current) {
       this.resizeObserver = new ResizeObserver(() => {
@@ -1617,7 +1625,7 @@ class App extends React.Component<AppProps, AppState> {
       setCursorForShape(this.canvas, elementType);
     }
     if (isToolIcon(document.activeElement)) {
-      document.activeElement.blur();
+      this.focusContainer();
     }
     if (!isLinearElementType(elementType)) {
       this.setState({ suggestedBindings: [] });
@@ -1747,6 +1755,8 @@ class App extends React.Component<AppProps, AppState> {
         if (this.state.elementLocked) {
           setCursorForShape(this.canvas, this.state.elementType);
         }
+
+        this.focusContainer();
       }),
       element,
     });
