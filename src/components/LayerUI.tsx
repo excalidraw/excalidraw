@@ -660,7 +660,15 @@ const LayerUI = ({
         />
       )}
       {appState.showHelpDialog && (
-        <HelpDialog onClose={() => setAppState({ showHelpDialog: false })} />
+        <HelpDialog
+          onClose={() => {
+            const helpIcon = document.querySelector(
+              ".help-icon",
+            )! as HTMLElement;
+            helpIcon.focus();
+            setAppState({ showHelpDialog: false });
+          }}
+        />
       )}
       {appState.pasteDialog.shown && (
         <PasteChartDialog
