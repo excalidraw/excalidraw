@@ -4,7 +4,7 @@ import {
   ExcalidrawSelectionElement,
 } from "../element/types";
 import { AppState, NormalizedZoomValue } from "../types";
-import { DataState, ImportedDataState } from "./types";
+import { ImportedDataState } from "./types";
 import { isInvisiblySmallElement, getNormalizedDimensions } from "../element";
 import { isLinearElementType } from "../element/typeChecks";
 import { randomId } from "../random";
@@ -15,6 +15,16 @@ import {
   DEFAULT_VERTICAL_ALIGN,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
+
+type RestoredAppState = Omit<
+  AppState,
+  "offsetTop" | "offsetLeft" | "width" | "height"
+>;
+
+export type RestoredDataState = {
+  elements: ExcalidrawElement[];
+  appState: RestoredAppState;
+};
 
 const getFontFamilyByName = (fontFamilyName: string): FontFamily => {
   for (const [id, fontFamilyString] of Object.entries(FONT_FAMILY)) {
@@ -144,7 +154,7 @@ export const restoreElements = (
 export const restoreAppState = (
   appState: ImportedDataState["appState"],
   localAppState: Partial<AppState> | null,
-): DataState["appState"] => {
+): RestoredAppState => {
   appState = appState || {};
 
   const defaultAppState = getDefaultAppState();
@@ -186,7 +196,7 @@ export const restore = (
    * Supply `null` if you can't get access to it.
    */
   localAppState: Partial<AppState> | null | undefined,
-): DataState => {
+): RestoredDataState => {
   return {
     elements: restoreElements(data?.elements),
     appState: restoreAppState(data?.appState, localAppState || null),

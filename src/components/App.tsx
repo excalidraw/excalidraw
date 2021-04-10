@@ -714,6 +714,13 @@ class App extends React.Component<AppProps, AppState> {
       initialData = (await this.props.initialData) || null;
     } catch (error) {
       console.error(error);
+      initialData = {
+        appState: {
+          errorMessage:
+            error.message ||
+            "Encountered an error during importing or restoring scene data",
+        },
+      };
     }
 
     const scene = restore(initialData, null);
