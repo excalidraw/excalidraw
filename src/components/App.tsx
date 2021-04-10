@@ -452,6 +452,7 @@ class App extends React.Component<AppProps, AppState> {
         ref={this.excalidrawContainerRef}
         onDrop={this.handleAppOnDrop}
         tabIndex={0}
+        onKeyDown={this.onKeyDown}
       >
         <IsMobileContext.Provider value={this.isMobile}>
           <LayerUI
@@ -857,11 +858,6 @@ class App extends React.Component<AppProps, AppState> {
       this.onScroll,
     );
 
-    this.excalidrawContainerRef.current!.removeEventListener(
-      EVENT.KEYDOWN,
-      this.onKeyDown,
-      false,
-    );
     document.removeEventListener(
       EVENT.MOUSE_MOVE,
       this.updateCurrentCursorPosition,
@@ -896,11 +892,6 @@ class App extends React.Component<AppProps, AppState> {
   private addEventListeners() {
     this.removeEventListeners();
     document.addEventListener(EVENT.COPY, this.onCopy);
-    this.excalidrawContainerRef.current!.addEventListener(
-      EVENT.KEYDOWN,
-      this.onKeyDown,
-      false,
-    );
     document.addEventListener(EVENT.KEYUP, this.onKeyUp, { passive: true });
     document.addEventListener(
       EVENT.MOUSE_MOVE,
@@ -1444,7 +1435,7 @@ class App extends React.Component<AppProps, AppState> {
 
   // Input handling
 
-  private onKeyDown = withBatchedUpdates((event: KeyboardEvent) => {
+  private onKeyDown = withBatchedUpdates((event: React.KeyboardEvent) => {
     // normalize `event.key` when CapsLock is pressed #2372
     if (
       "Proxy" in window &&
