@@ -1,6 +1,7 @@
 import "./TextInput.scss";
 
 import React, { Component } from "react";
+import { focusNearestTabbableParent } from "../utils";
 
 type Props = {
   value: string;
@@ -17,14 +18,7 @@ export class ProjectName extends Component<Props, State> {
     fileName: this.props.value,
   };
   private handleBlur = (event: any) => {
-    let parent = (event.target as HTMLInputElement).parentElement;
-    while (parent) {
-      if (parent.tabIndex > -1) {
-        parent.focus();
-        break;
-      }
-      parent = parent.parentElement;
-    }
+    focusNearestTabbableParent(event.target);
     const value = event.target.value;
     if (value !== this.props.value) {
       this.props.onChange(value);
