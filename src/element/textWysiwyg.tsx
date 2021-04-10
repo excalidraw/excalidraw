@@ -149,20 +149,60 @@ export const textWysiwyg = ({
       event.stopPropagation();
     } else if (event.key === KEYS.TAB) {
       event.preventDefault();
-      insertTab();
+      if (event.shiftKey) {
+        removeTab();
+      } else {
+        insertTab();
+      }
+      // We must send an input event to resize the element
+      editable.dispatchEvent(new Event("input"));
     }
   };
 
+  const tab = "    ";
   const insertTab = () => {
-    const { selectionStart, selectionEnd, value } = editable;
-    const startValue = value.substring(0, selectionStart);
-    const endValue = value.substring(selectionEnd);
-    editable.value = `${startValue}\t${endValue}`;
+    const { selectionStart, value } = editable;
+    const startLinePosition = getStartLinePosition();
+    const startValue = value.substring(0, startLinePosition);
+    const endValue = value.substring(startLinePosition);
+    editable.value = `${startValue}${tab}${endValue}`;
 
-    editable.selectionStart = editable.selectionEnd = selectionStart + 1;
+    editable.selectionStart = editable.selectionEnd =
+      selectionStart + tab.length;
+  };
 
-    // We must send an input event to resize the element
-    editable.dispatchEvent(new Event("input"));
+  const removeTab = () => {
+    const { selectionStart, value } = editable;
+    const startLinePosition = getStartLinePosition();
+    const hasTab =
+      value.substring(startLinePosition, startLinePosition + tab.length) ===
+      tab;
+
+    if (!hasTab) {
+      return;
+    }
+
+    const startValue = value.substring(0, startLinePosition);
+    const endValue = value.substring(startLinePosition + tab.length);
+
+    // Delete a tab from the line
+    editable.value = `${startValue}${endValue}`;
+
+    editable.selectionStart = editable.selectionEnd =
+      selectionStart - tab.length;
+  };
+
+  const getStartLinePosition = () => {
+    // We are looking for the closet line break from the cursor position
+    const startLinePosition = `${editable.value}`
+      .substr(0, editable.selectionStart)
+      .split("")
+      .reverse()
+      .findIndex((character) => character === "\n");
+
+    return startLinePosition === -1
+      ? 0
+      : editable.selectionStart - startLinePosition;
   };
 
   const stopEvent = (event: Event) => {
