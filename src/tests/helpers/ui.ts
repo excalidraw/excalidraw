@@ -40,7 +40,7 @@ export class Keyboard {
   };
 
   static keyDown = (key: string) => {
-    fireEvent.keyDown(document, {
+    fireEvent.keyDown(document.querySelector(".excalidraw")!, {
       key,
       ctrlKey,
       shiftKey,
@@ -49,7 +49,7 @@ export class Keyboard {
   };
 
   static keyUp = (key: string) => {
-    fireEvent.keyUp(document, {
+    fireEvent.keyUp(document.querySelector(".excalidraw")!, {
       key,
       ctrlKey,
       shiftKey,
@@ -63,7 +63,7 @@ export class Keyboard {
   };
 
   static codeDown = (code: string) => {
-    fireEvent.keyDown(document, {
+    fireEvent.keyDown(document.querySelector(".excalidraw")!, {
       code,
       ctrlKey,
       shiftKey,
@@ -72,7 +72,7 @@ export class Keyboard {
   };
 
   static codeUp = (code: string) => {
-    fireEvent.keyUp(document, {
+    fireEvent.keyUp(document.querySelector(".excalidraw")!, {
       code,
       ctrlKey,
       shiftKey,

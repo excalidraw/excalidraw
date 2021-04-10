@@ -451,6 +451,7 @@ class App extends React.Component<AppProps, AppState> {
         })}
         ref={this.excalidrawContainerRef}
         onDrop={this.handleAppOnDrop}
+        tabIndex={0}
       >
         <IsMobileContext.Provider value={this.isMobile}>
           <LayerUI
@@ -848,7 +849,11 @@ class App extends React.Component<AppProps, AppState> {
       this.onScroll,
     );
 
-    document.removeEventListener(EVENT.KEYDOWN, this.onKeyDown, false);
+    this.excalidrawContainerRef.current!.removeEventListener(
+      EVENT.KEYDOWN,
+      this.onKeyDown,
+      false,
+    );
     document.removeEventListener(
       EVENT.MOUSE_MOVE,
       this.updateCurrentCursorPosition,
@@ -883,7 +888,11 @@ class App extends React.Component<AppProps, AppState> {
   private addEventListeners() {
     this.removeEventListeners();
     document.addEventListener(EVENT.COPY, this.onCopy);
-    document.addEventListener(EVENT.KEYDOWN, this.onKeyDown, false);
+    this.excalidrawContainerRef.current!.addEventListener(
+      EVENT.KEYDOWN,
+      this.onKeyDown,
+      false,
+    );
     document.addEventListener(EVENT.KEYUP, this.onKeyUp, { passive: true });
     document.addEventListener(
       EVENT.MOUSE_MOVE,
