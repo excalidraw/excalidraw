@@ -161,48 +161,85 @@ export const textWysiwyg = ({
 
   const tab = "    ";
   const insertTab = () => {
-    const { selectionStart, value } = editable;
-    const startLinePosition = getStartLinePosition();
-    const startValue = value.substring(0, startLinePosition);
-    const endValue = value.substring(startLinePosition);
-    editable.value = `${startValue}${tab}${endValue}`;
+    const { selectionStart, selectionEnd } = editable;
+    const startLinePositions = getStartLinePositions();
+    startLinePositions.forEach((startLinePosition) => {
+      const startValue = editable.value.substring(0, startLinePosition);
+      const endValue = editable.value.substring(startLinePosition);
 
-    editable.selectionStart = editable.selectionEnd =
-      selectionStart + tab.length;
+      editable.value = `${startValue}${tab}${endValue}`;
+    });
+
+    editable.selectionStart = selectionStart + tab.length;
+    editable.selectionEnd =
+      selectionEnd + tab.length * startLinePositions.length;
   };
 
   const removeTab = () => {
-    const { selectionStart, value } = editable;
-    const startLinePosition = getStartLinePosition();
-    const hasTab =
-      value.substring(startLinePosition, startLinePosition + tab.length) ===
-      tab;
+    const { selectionStart, selectionEnd, value } = editable;
+    const startLinePositions = getStartLinePositions();
+    const removedTabs: number[] = [];
 
-    if (!hasTab) {
-      return;
+    startLinePositions.forEach((startLinePosition) => {
+      const hasTab =
+        value.substring(startLinePosition, startLinePosition + tab.length) ===
+        tab;
+
+      if (!hasTab) {
+        return;
+      }
+
+      const startValue = editable.value.substring(0, startLinePosition);
+      const endValue = editable.value.substring(startLinePosition + tab.length);
+
+      // Delete a tab from the line
+      editable.value = `${startValue}${endValue}`;
+      removedTabs.push(startLinePosition);
+    });
+
+    if (removedTabs.length) {
+      if (selectionStart > removedTabs[removedTabs.length - 1]) {
+        editable.selectionStart = Math.max(
+          selectionStart - tab.length,
+          removedTabs[removedTabs.length - 1],
+        );
+      } else {
+        // If the cursor is before the first tab removed, ex:
+        // Line| #1
+        //     Line #2
+        // Lin|e #3
+        // we should reset the selectionStart to his initial value.
+        editable.selectionStart = selectionStart;
+      }
+      editable.selectionEnd = Math.max(
+        editable.selectionStart,
+        selectionEnd - tab.length * removedTabs.length,
+      );
     }
-
-    const startValue = value.substring(0, startLinePosition);
-    const endValue = value.substring(startLinePosition + tab.length);
-
-    // Delete a tab from the line
-    editable.value = `${startValue}${endValue}`;
-
-    editable.selectionStart = editable.selectionEnd =
-      selectionStart - tab.length;
   };
 
-  const getStartLinePosition = () => {
-    // We are looking for the closet line break from the cursor position
-    const startLinePosition = `${editable.value}`
-      .substr(0, editable.selectionStart)
-      .split("")
-      .reverse()
-      .findIndex((character) => character === "\n");
+  const getStartLinePositions = () => {
+    const { selectionStart, selectionEnd, value } = editable;
+    // We are looking for the closet line breaks from the cursor position
+    const inversedValue = value.substr(0, selectionEnd).split("").reverse();
 
-    return startLinePosition === -1
-      ? 0
-      : editable.selectionStart - startLinePosition;
+    const characterCount = selectionEnd - selectionStart;
+    const startLinePositions = [];
+    let index = 0;
+    let currentCharacter = "";
+
+    while (
+      index <= characterCount ||
+      (currentCharacter !== "\n" && currentCharacter !== undefined)
+    ) {
+      currentCharacter = inversedValue[index];
+      if (currentCharacter === "\n" || currentCharacter === undefined) {
+        startLinePositions.push(selectionEnd - index);
+      }
+      index++;
+    }
+
+    return startLinePositions;
   };
 
   const stopEvent = (event: Event) => {
