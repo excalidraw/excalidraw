@@ -107,7 +107,7 @@ export interface Action {
   perform: ActionFn;
   keyPriority?: number;
   keyTest?: (
-    event: React.KeyboardEvent,
+    event: React.KeyboardEvent | KeyboardEvent,
     appState: AppState,
     elements: readonly ExcalidrawElement[],
   ) => boolean;
@@ -122,6 +122,6 @@ export interface Action {
 export interface ActionsManagerInterface {
   actions: Record<ActionName, Action>;
   registerAction: (action: Action) => void;
-  handleKeyDown: (event: React.KeyboardEvent) => boolean;
+  handleKeyDown: (event: React.KeyboardEvent | KeyboardEvent) => boolean;
   renderAction: (name: ActionName) => React.ReactElement | null;
 }

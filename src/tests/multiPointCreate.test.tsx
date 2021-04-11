@@ -99,7 +99,7 @@ describe("multi point mode in linear elements", () => {
     // done
     fireEvent.pointerDown(canvas);
     fireEvent.pointerUp(canvas);
-    fireEvent.keyDown(document.querySelector(".excalidraw")!, {
+    fireEvent.keyDown(document, {
       key: KEYS.ENTER,
     });
 
@@ -142,7 +142,7 @@ describe("multi point mode in linear elements", () => {
     // done
     fireEvent.pointerDown(canvas);
     fireEvent.pointerUp(canvas);
-    fireEvent.keyDown(document.querySelector(".excalidraw")!, {
+    fireEvent.keyDown(document, {
       key: KEYS.ENTER,
     });
 

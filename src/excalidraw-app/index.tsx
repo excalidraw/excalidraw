@@ -325,6 +325,7 @@ const ExcalidrawWrapper = () => {
         langCode={langCode}
         renderCustomStats={renderCustomStats}
         detectScroll={false}
+        bindKeyGlobally={true}
       />
       {excalidrawAPI && <CollabWrapper excalidrawAPI={excalidrawAPI} />}
       {errorMessage && (

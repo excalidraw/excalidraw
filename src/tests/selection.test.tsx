@@ -100,7 +100,7 @@ describe("select single element on the scene", () => {
       fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
       fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
       fireEvent.pointerUp(canvas);
-      fireEvent.keyDown(document.querySelector(".excalidraw")!, {
+      fireEvent.keyDown(document, {
         key: KEYS.ESCAPE,
       });
     }
@@ -129,7 +129,7 @@ describe("select single element on the scene", () => {
       fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
       fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
       fireEvent.pointerUp(canvas);
-      fireEvent.keyDown(document.querySelector(".excalidraw")!, {
+      fireEvent.keyDown(document, {
         key: KEYS.ESCAPE,
       });
     }
@@ -158,7 +158,7 @@ describe("select single element on the scene", () => {
       fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
       fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
       fireEvent.pointerUp(canvas);
-      fireEvent.keyDown(document.querySelector(".excalidraw")!, {
+      fireEvent.keyDown(document, {
         key: KEYS.ESCAPE,
       });
     }
@@ -187,7 +187,7 @@ describe("select single element on the scene", () => {
       fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
       fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
       fireEvent.pointerUp(canvas);
-      fireEvent.keyDown(document.querySelector(".excalidraw")!, {
+      fireEvent.keyDown(document, {
         key: KEYS.ESCAPE,
       });
     }
@@ -228,7 +228,7 @@ describe("select single element on the scene", () => {
       fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
       fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
       fireEvent.pointerUp(canvas);
-      fireEvent.keyDown(document.querySelector(".excalidraw")!, {
+      fireEvent.keyDown(document, {
         key: KEYS.ESCAPE,
       });
     }

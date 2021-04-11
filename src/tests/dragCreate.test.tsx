@@ -269,7 +269,7 @@ describe("Test dragCreate", () => {
       fireEvent.pointerUp(canvas);
 
       // we need to finalize it because arrows and lines enter multi-mode
-      fireEvent.keyDown(document.querySelector(".excalidraw")!, {
+      fireEvent.keyDown(document, {
         key: KEYS.ENTER,
       });
 
@@ -293,7 +293,7 @@ describe("Test dragCreate", () => {
       fireEvent.pointerUp(canvas);
 
       // we need to finalize it because arrows and lines enter multi-mode
-      fireEvent.keyDown(document.querySelector(".excalidraw")!, {
+      fireEvent.keyDown(document, {
         key: KEYS.ENTER,
       });
 

@@ -55,7 +55,7 @@ export class ActionManager implements ActionsManagerInterface {
     actions.forEach((action) => this.registerAction(action));
   }
 
-  handleKeyDown(event: React.KeyboardEvent) {
+  handleKeyDown(event: React.KeyboardEvent | KeyboardEvent) {
     const canvasActions = this.app.props.UIOptions.canvasActions;
     const data = Object.values(this.actions)
       .sort((a, b) => (b.keyPriority || 0) - (a.keyPriority || 0))
