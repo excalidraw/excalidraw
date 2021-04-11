@@ -366,6 +366,7 @@ To view the full example visit :point_down:
 | [`UIOptions`](#UIOptions) | <pre>{ canvasActions: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L208"> CanvasActions<a/> }</pre> | [DEFAULT UI OPTIONS](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L129) | To customise UI options. Currently we support customising [`canvas actions`](#canvasActions) |
 | [`onPaste`](#onPaste) | <pre>(data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/clipboard.ts#L17">ClipboardData</a>, event: ClipboardEvent &#124; null) => boolean</pre> |  | Callback to be triggered if passed when the something is pasted in to the scene |
 | [`detectScroll`](#detectScroll) | boolean | true | Indicates whether to update the offsets when nearest ancestor is scrolled. |
+| [`detectPosition`](#detectPosition) | boolean | false | Indicates whether to update the offsets when position of the Excalidraw component is updated. |
 
 ### Dimensions of Excalidraw
 
@@ -441,8 +442,8 @@ You can pass a `ref` when you want to access some excalidraw APIs. We expose the
 | getAppState | <pre> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37">AppState</a></pre> | Returns current appState |
 | history | `{ clear: () => void }` | This is the history API. `history.clear()` will clear the history |
 | setScrollToContent | <pre> (<a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>) => void </pre> | Scroll to the nearest element to center |
-| refresh | `() => void` | Updates the offsets for the Excalidraw component so that the coordinates are computed correctly (for example the cursor position). You don't have to call this when the position is changed on page scroll or when the excalidraw container resizes (we handle that ourselves). For any other cases if the position of excalidraw is updated (example due to scroll on parent container and not page scroll) you should call this API. |
-| [importLibrary](#importlibrary) | `(url: string, token?: string) => void` | Imports library from given URL |
+| [`refresh`](#refresh) | `() => void` | Updates the offsets for the Excalidraw component. |
+| [`importLibrary`](#importlibrary) | `(url: string, token?: string) => void` | Imports library from given URL. |
 | setToastMessage | `(message: string) => void` | This API can be used to show the toast with custom message. |
 
 #### `readyPromise`
@@ -566,6 +567,10 @@ In case you want to prevent the excalidraw paste action you must return `true`, 
 
 No Excalidraw package doesn't come with collaboration, since this would have different implementations on the consumer so we expose the API's which you can use to communicate with Excalidraw as mentioned above. If you are interested in understanding how Excalidraw does it you can check it [here](https://github.com/excalidraw/excalidraw/blob/master/src/excalidraw-app/index.tsx).
 
+### refresh
+
+Updates the offsets for the Excalidraw component so that the coordinates are computed correctly (for example the cursor position). You don't have to call this when the position is changed on page scroll or when the excalidraw container resizes (we handle that ourselves). For any other cases if the position of excalidraw is updated (example due to scroll on parent container and not page scroll) you can use [detectPosition](#detectposition) or handle it manually by calling this API.
+
 ### importLibrary
 
 Imports library from given URL. You should call this on `hashchange`, passing the `addLibrary` value if you detect it as shown below. Optionally pass a CSRF `token` to skip prompting during installation (retrievable via `token` key from the url coming from [https://libraries.excalidraw.com](https://libraries.excalidraw.com/)).
@@ -590,7 +595,15 @@ Try out the [Demo](#Demo) to see it in action.
 
 ### detectScroll
 
-Indicates whether Excalidraw should listen for `scroll` event on the nearest scrollable container in the DOM tree and recompute the coordinates (e.g. to correctly handle the cursor) when the component's position changes. You can disable this when you either know this doesn't affect your app or you want to take care of it yourself (calling the [`refresh()`](#ref) method).
+Indicates whether Excalidraw should listen for `scroll` event on the nearest scrollable container in the DOM tree and recompute the coordinates (e.g. to correctly handle the cursor) when the component's position changes. You can disable this when you either know this doesn't affect your app or you want to take care of it yourself (calling the [`refresh()`](#refresh) method).
+
+### detectPosition
+
+Indicates whether the coordinates should be recomputed (eg to correctly handle the cursor) when the component's position changes. This will be disabled by default.
+
+Resizing and handling nearest scrollable parent ([detectScroll](#detectScroll)) is already handled so if there is any other case where position gets updated is where you will want to enable this prop (eg multiple scroll containers, or position updating due to addition/removal of elements in flex container).
+
+You might want to disable [detectScroll](#detectScroll) when you enable this prop.
 
 ### Extra API's
 
