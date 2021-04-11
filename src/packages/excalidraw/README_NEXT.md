@@ -569,7 +569,7 @@ No Excalidraw package doesn't come with collaboration, since this would have dif
 
 ### refresh
 
-Updates the offsets for the Excalidraw component so that the coordinates are computed correctly (for example the cursor position). You don't have to call this when the position is changed on page scroll or when the excalidraw container resizes (we handle that ourselves). For any other cases if the position of excalidraw is updated (example due to scroll on parent container and not page scroll) you can use [detectPosition](#detectposition) or handle it manually by calling this API.
+Updates the offsets for the Excalidraw component so that the coordinates are computed correctly (for example the cursor position). You don't have to call this when the position is changed due to scrolling on nearest scrollable parent or when the excalidraw container resizes (we handle that ourselves). For any other cases if the position of excalidraw is updated (example due to multiple scroll or add / removal of elements in flex container) you can use [detectPosition](#detectposition) or handle it manually by calling this API.
 
 ### importLibrary
 

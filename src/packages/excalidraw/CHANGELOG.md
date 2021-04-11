@@ -15,7 +15,7 @@ Please add the latest change on the top under the correct section.
 
 ## Excalidraw API
 
-- Add detectPosition prop to enable detecting position update of the component [#3428](https://github.com/excalidraw/excalidraw/pull/3428).
+- Enable detecting position update of the component and recompute offsets when position is updated [#3428](https://github.com/excalidraw/excalidraw/pull/3428). You can enable this by setting [`detectPosition`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#detectPosition) to `true`.
 - Recompute offsets on `scroll` of the nearest scrollable container [#3408](https://github.com/excalidraw/excalidraw/pull/3408). This can be disabled by setting [`detectScroll`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#detectScroll) to `false`.
 - Add `onPaste` prop to handle custom clipboard behaviours [#3420](https://github.com/excalidraw/excalidraw/pull/3420).
 
