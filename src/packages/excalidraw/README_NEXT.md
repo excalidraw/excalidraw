@@ -365,8 +365,8 @@ To view the full example visit :point_down:
 | [`name`](#name) | string |  | Name of the drawing |
 | [`UIOptions`](#UIOptions) | <pre>{ canvasActions: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L208"> CanvasActions<a/> }</pre> | [DEFAULT UI OPTIONS](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L129) | To customise UI options. Currently we support customising [`canvas actions`](#canvasActions) |
 | [`onPaste`](#onPaste) | <pre>(data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/clipboard.ts#L17">ClipboardData</a>, event: ClipboardEvent &#124; null) => boolean</pre> |  | Callback to be triggered if passed when the something is pasted in to the scene |
-| [`detectScroll`](#detectScroll) | boolean | true | Indicates whether to update the offsets when nearest ancestor is scrolled. |
-| [`detectPosition`](#detectPosition) | boolean | false | Indicates whether to update the offsets when position of the Excalidraw component is updated. |
+| [`detectScroll`](#detectScroll) | boolean | true | Indicates whether to recompute the offsets when nearest ancestor is scrolled. |
+| [`detectPosition`](#detectPosition) | boolean | false | Indicates whether to recompute the offsets when position of the Excalidraw component is updated. |
 
 ### Dimensions of Excalidraw
 
@@ -442,7 +442,7 @@ You can pass a `ref` when you want to access some excalidraw APIs. We expose the
 | getAppState | <pre> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37">AppState</a></pre> | Returns current appState |
 | history | `{ clear: () => void }` | This is the history API. `history.clear()` will clear the history |
 | setScrollToContent | <pre> (<a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>) => void </pre> | Scroll to the nearest element to center |
-| [`refresh`](#refresh) | `() => void` | Updates the offsets for the Excalidraw component. |
+| [`refresh`](#refresh) | `() => void` | Recomputes the offsets for the Excalidraw component. |
 | [`importLibrary`](#importlibrary) | `(url: string, token?: string) => void` | Imports library from given URL. |
 | setToastMessage | `(message: string) => void` | This API can be used to show the toast with custom message. |
 
@@ -569,7 +569,7 @@ No Excalidraw package doesn't come with collaboration, since this would have dif
 
 ### refresh
 
-Updates the offsets for the Excalidraw component so that the coordinates are computed correctly (for example the cursor position). You don't have to call this when the position is changed due to scrolling on nearest scrollable parent or when the excalidraw container resizes (we handle that ourselves). For any other cases if the position of excalidraw is updated (example due to multiple scroll or add / removal of elements in flex container) you can use [detectPosition](#detectposition) or handle it manually by calling this API.
+Recomputes the offsets for the Excalidraw component so that the coordinates are computed correctly (for example the cursor position). You don't have to call this when the position is changed due to scrolling on the nearest scrollable parent or when the excalidraw container resizes (we handle that ourselves). For any other cases if the position of excalidraw is updated (for example due to multiple scrolls or add / removal of elements in flex container) you can use [detectPosition](#detectposition) or handle it manually by calling this API.
 
 ### importLibrary
 
