@@ -70,10 +70,9 @@ export const textWysiwyg = ({
           appState.zoom.value -
         // margin-right of parent if any
         Number(
-          getComputedStyle(document.parentNode as Element).marginRight.slice(
-            0,
-            -2,
-          ),
+          getComputedStyle(
+            document.querySelector(".excalidraw")!.parentNode as Element,
+          ).marginRight.slice(0, -2),
         );
 
       Object.assign(editable.style, {
