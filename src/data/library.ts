@@ -13,6 +13,7 @@ export class Library {
   static resetLibrary = () => {
     Library.libraryCache = null;
     localStorage.removeItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY);
+    document.querySelector<HTMLElement>(".excalidraw")!.focus();
   };
 
   /** imports library (currently merges, removing duplicates) */

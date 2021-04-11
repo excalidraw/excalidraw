@@ -661,6 +661,8 @@ class App extends React.Component<AppProps, AppState> {
     } catch (error) {
       window.alert(t("alerts.errorLoadingLibrary"));
       console.error(error);
+    } finally {
+      this.focusContainer();
     }
   };
 
