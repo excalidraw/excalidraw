@@ -445,7 +445,7 @@ class App extends React.Component<AppProps, AppState> {
 
     return (
       <div
-        className={clsx("excalidraw", {
+        className={clsx("excalidraw excalidraw-container", {
           "excalidraw--view-mode": viewModeEnabled,
           "excalidraw--mobile": this.isMobile,
         })}

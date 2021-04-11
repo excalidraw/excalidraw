@@ -440,5 +440,5 @@ export const focusNearestParent = (element: HTMLInputElement) => {
 };
 
 export const focusContainer = () => {
-  document.querySelector<HTMLElement>(".excalidraw")?.focus();
+  document.querySelector<HTMLElement>(".excalidraw-container")?.focus();
 };
