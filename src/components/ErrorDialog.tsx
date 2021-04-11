@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { t } from "../i18n";
 
 import { Dialog } from "./Dialog";
+import { focusContainer } from "../utils";
 
 export const ErrorDialog = ({
   message,
@@ -18,7 +19,7 @@ export const ErrorDialog = ({
     if (onClose) {
       onClose();
     }
-    document.querySelector<HTMLElement>(".excalidraw")!.focus();
+    focusContainer();
   }, [onClose]);
 
   return (
