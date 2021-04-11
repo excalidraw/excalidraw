@@ -569,7 +569,7 @@ No Excalidraw package doesn't come with collaboration, since this would have dif
 
 ### refresh
 
-Recomputes the offsets for the Excalidraw component so that the coordinates are computed correctly (for example the cursor position). You don't have to call this when the position is changed due to scrolling on the nearest scrollable parent or when the excalidraw container resizes (we handle that ourselves). For any other cases if the position of excalidraw is updated (for example due to multiple scrolls or add / removal of elements in flex container) you can use [detectPosition](#detectposition) or handle it manually by calling this API.
+Recomputes the offsets for the Excalidraw component so that the coordinates are computed correctly (for example the cursor position). You don't have to call this when the position is changed due to scrolling on the nearest scrollable parent or when the excalidraw container resizes (we handle that ourselves). For any other cases if the position of excalidraw is updated (for example due to multiple scrolls or add / removal of elements in flex container) you can enable [`detectPosition`](#detectposition) or handle it manually by calling this API.
 
 ### importLibrary
 
@@ -599,7 +599,7 @@ Indicates whether Excalidraw should listen for `scroll` event on the nearest scr
 
 ### detectPosition
 
-Indicates whether the coordinates should be recomputed (eg to correctly handle the cursor) when the component's position changes. This will be disabled by default.
+Indicates whether the coordinates should be recomputed (e.g. to correctly handle the cursor) when the component's position changes. This is disabled by default.
 
 Resizing and handling nearest scrollable parent ([detectScroll](#detectScroll)) is already handled so if there is any other case where position gets updated is where you will want to enable this prop (eg multiple scroll containers, or position updating due to addition/removal of elements in flex container).
 
