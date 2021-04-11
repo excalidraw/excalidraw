@@ -31,7 +31,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     renderCustomStats,
     onPaste,
     detectScroll = true,
-    detectPositionChange = false,
+    detectPosition = false,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -83,7 +83,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
         UIOptions={UIOptions}
         onPaste={onPaste}
         detectScroll={detectScroll}
-        detectPositionChange={detectPositionChange}
+        detectPosition={detectPosition}
       />
     </InitializeApp>
   );

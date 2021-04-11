@@ -306,7 +306,7 @@ class App extends React.Component<AppProps, AppState> {
   private scene: Scene;
   private resizeObserver: ResizeObserver | undefined;
   private nearestScrollableContainer: HTMLElement | Document | undefined;
-  private detectPositionChangeIntervalId: NodeJS.Timeout | undefined;
+  private detectPositionIntervalId: NodeJS.Timeout | undefined;
 
   constructor(props: AppProps) {
     super(props);
@@ -791,8 +791,8 @@ class App extends React.Component<AppProps, AppState> {
     this.scene.addCallback(this.onSceneUpdated);
     this.addEventListeners();
 
-    if (this.props.detectPositionChange) {
-      this.detectPositionChangeIntervalId = setInterval(
+    if (this.props.detectPosition) {
+      this.detectPositionIntervalId = setInterval(
         this.updateOffsetsIfChanged,
         DETECT_POSITION_CHANGE_INTERVAL,
       );
@@ -839,8 +839,8 @@ class App extends React.Component<AppProps, AppState> {
     this.removeEventListeners();
     this.scene.destroy();
     clearTimeout(touchTimeout);
-    if (this.detectPositionChangeIntervalId) {
-      clearInterval(this.detectPositionChangeIntervalId);
+    if (this.detectPositionIntervalId) {
+      clearInterval(this.detectPositionIntervalId);
     }
     touchTimeout = 0;
   }
