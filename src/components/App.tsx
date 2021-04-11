@@ -89,7 +89,6 @@ import {
   newElement,
   newLinearElement,
   newTextElement,
-  textWysiwyg,
   transformElements,
   updateTextElement,
 } from "../element";
@@ -182,6 +181,7 @@ import { isMobile } from "../is-mobile";
 import ContextMenu, { ContextMenuOption } from "./ContextMenu";
 import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
+import { TextEditor } from "./TextEditor";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 
@@ -433,7 +433,6 @@ class App extends React.Component<AppProps, AppState> {
 
     const DEFAULT_PASTE_X = canvasDOMWidth / 2;
     const DEFAULT_PASTE_Y = canvasDOMHeight / 2;
-
     return (
       <div
         className={clsx("excalidraw", {
@@ -473,7 +472,14 @@ class App extends React.Component<AppProps, AppState> {
           libraryReturnUrl={this.props.libraryReturnUrl}
           UIOptions={this.props.UIOptions}
         />
-        <div className="excalidraw-textEditorContainer" />
+        <TextEditor
+          appState={this.state}
+          canvas={this.canvas}
+          element={this.state.editingElement}
+          onInitialization={this.handleTextEditorInitialization}
+          onChange={this.handleTextEditorChange}
+          onSubmit={this.handleTextEditorSubmit}
+        />
         <div className="excalidraw-contextMenuContainer" />
         {this.state.showStats && (
           <Stats
@@ -1616,80 +1622,7 @@ class App extends React.Component<AppProps, AppState> {
     gesture.initialScale = null;
   });
 
-  private handleTextWysiwyg(
-    element: ExcalidrawTextElement,
-    {
-      isExistingElement = false,
-    }: {
-      isExistingElement?: boolean;
-    },
-  ) {
-    const updateElement = (text: string, isDeleted = false) => {
-      this.scene.replaceAllElements([
-        ...this.scene.getElementsIncludingDeleted().map((_element) => {
-          if (_element.id === element.id && isTextElement(_element)) {
-            return updateTextElement(_element, {
-              text,
-              isDeleted,
-            });
-          }
-          return _element;
-        }),
-      ]);
-    };
-
-    textWysiwyg({
-      id: element.id,
-      appState: this.state,
-      canvas: this.canvas,
-      getViewportCoords: (x, y) => {
-        const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
-          {
-            sceneX: x,
-            sceneY: y,
-          },
-          this.state,
-        );
-        return [
-          viewportX - this.state.offsetLeft,
-          viewportY - this.state.offsetTop,
-        ];
-      },
-      onChange: withBatchedUpdates((text) => {
-        updateElement(text);
-        if (isNonDeletedElement(element)) {
-          updateBoundElements(element);
-        }
-      }),
-      onSubmit: withBatchedUpdates(({ text, viaKeyboard }) => {
-        const isDeleted = !text.trim();
-        updateElement(text, isDeleted);
-        // select the created text element only if submitting via keyboard
-        // (when submitting via click it should act as signal to deselect)
-        if (!isDeleted && viaKeyboard) {
-          this.setState((prevState) => ({
-            selectedElementIds: {
-              ...prevState.selectedElementIds,
-              [element.id]: true,
-            },
-          }));
-        } else {
-          fixBindingsAfterDeletion(this.scene.getElements(), [element]);
-        }
-        if (!isDeleted || isExistingElement) {
-          history.resumeRecording();
-        }
-
-        this.setState({
-          draggingElement: null,
-          editingElement: null,
-        });
-        if (this.state.elementLocked) {
-          setCursorForShape(this.canvas, this.state.elementType);
-        }
-      }),
-      element,
-    });
+  private handleTextEditorInitialization = (element: ExcalidrawTextElement) => {
     // deselect all other elements when inserting text
     this.setState({
       selectedElementIds: {},
@@ -1699,8 +1632,63 @@ class App extends React.Component<AppProps, AppState> {
 
     // do an initial update to re-initialize element position since we were
     // modifying element's x/y for sake of editor (case: syncing to remote)
-    updateElement(element.text);
-  }
+    this.updateTextElement(element, element.text);
+  };
+
+  private handleTextEditorChange = withBatchedUpdates(({ element, text }) => {
+    this.updateTextElement(element, text);
+    if (isNonDeletedElement(element)) {
+      updateBoundElements(element);
+    }
+  });
+
+  private handleTextEditorSubmit = withBatchedUpdates(
+    ({ element, text, viaKeyboard, isNewElement }) => {
+      const isDeleted = !text.trim();
+      this.updateTextElement(element, text, isDeleted);
+      // select the created text element only if submitting via keyboard
+      // (when submitting via click it should act as signal to deselect)
+      if (!isDeleted && viaKeyboard) {
+        this.setState((prevState) => ({
+          selectedElementIds: {
+            ...prevState.selectedElementIds,
+            [element.id]: true,
+          },
+        }));
+      } else {
+        fixBindingsAfterDeletion(this.scene.getElements(), [element]);
+      }
+      if (!(isDeleted && isNewElement)) {
+        history.resumeRecording();
+      }
+
+      this.setState({
+        draggingElement: null,
+        editingElement: null,
+      });
+      if (this.state.elementLocked) {
+        setCursorForShape(this.canvas, this.state.elementType);
+      }
+    },
+  );
+
+  private updateTextElement = (
+    element: ExcalidrawTextElement,
+    text: string,
+    isDeleted = false,
+  ) => {
+    this.scene.replaceAllElements([
+      ...this.scene.getElementsIncludingDeleted().map((_element) => {
+        if (_element.id === element.id && isTextElement(_element)) {
+          return updateTextElement(_element, {
+            text,
+            isDeleted,
+          });
+        }
+        return _element;
+      }),
+    ]);
+  };
 
   private getTextElementAtPosition(
     x: number,
@@ -1800,8 +1788,6 @@ class App extends React.Component<AppProps, AppState> {
             : DEFAULT_VERTICAL_ALIGN,
         });
 
-    this.setState({ editingElement: element });
-
     if (existingTextElement) {
       // if text element is no longer centered to a container, reset
       // verticalAlign to default because it's currently internal-only
@@ -1825,10 +1811,6 @@ class App extends React.Component<AppProps, AppState> {
 
     this.setState({
       editingElement: element,
-    });
-
-    this.handleTextWysiwyg(element, {
-      isExistingElement: !!existingTextElement,
     });
   };
 
