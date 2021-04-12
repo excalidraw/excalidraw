@@ -9,7 +9,28 @@ import { isTextElement } from "../element/typeChecks";
 import { CLASSES } from "../constants";
 import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 import { AppState } from "../types";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
+import {
+  BaseEditor,
+  Descendant,
+  createEditor,
+  Node,
+  Editor,
+  Transforms,
+} from "slate";
+import { Slate, Editable, withReact, ReactEditor } from "slate-react";
+
+type RootElement = { children: Text[] };
+type Text = { text: string };
+
+declare module "slate" {
+  interface CustomTypes {
+    Editor: BaseEditor & ReactEditor;
+    Element: RootElement;
+    Text: Text;
+  }
+}
 
 export const TextEditor = ({
   element,
@@ -39,7 +60,7 @@ export const TextEditor = ({
     return null;
   }
   return (
-    <TextAreaEditor
+    <SlateEditor
       key={element.id}
       appState={appState}
       canvas={canvas}
@@ -50,7 +71,7 @@ export const TextEditor = ({
   );
 };
 
-const TextAreaEditor = ({
+const SlateEditor = ({
   element,
   appState,
   canvas,
@@ -70,29 +91,26 @@ const TextAreaEditor = ({
   const [updatedElement, setUpdatedElement] = useState(element);
   const [ignoreBlur, setIgnoreBlur] = useState(true);
 
-  const editable = useRef<HTMLTextAreaElement>(null);
+  const editor = useMemo(() => withReact(createEditor()), []);
 
   const handleSubmit = useCallback(
     (viaKeyboard: boolean) => {
-      if (ignoreBlur) {
-        return;
-      }
       onSubmit({
         element,
-        // NOTE(srb): We changed this slightly, before it was giving the current
-        // textarea value, now it's giving the "committed" textElement value
-        // in practice it should not be possible to get this event before
-        // the commit?
-        text: normalizeText(editable.current!.value),
+        text: normalizeText(slateModelToString(editor.children)),
         viaKeyboard,
       });
     },
-    [element, ignoreBlur, onSubmit],
+    [element, onSubmit, editor],
   );
 
   const handleSubmitViaBlur = useCallback(() => {
+    if (ignoreBlur) {
+      return;
+    }
+
     handleSubmit(false);
-  }, [handleSubmit]);
+  }, [handleSubmit, ignoreBlur]);
 
   const handleSubmitViaKeyboard = () => {
     handleSubmit(true);
@@ -107,9 +125,9 @@ const TextAreaEditor = ({
     setTimeout(() => {
       setIgnoreBlur(false);
       // case: clicking on the same property → no change → no update → no focus
-      editable.current!.focus();
+      ReactEditor.focus(editor);
     });
-  }, []);
+  }, [editor]);
 
   const updateElementFromScene = useCallback(() => {
     const maybeUpdatedElement = Scene.getScene(element)?.getElement(element.id);
@@ -140,7 +158,7 @@ const TextAreaEditor = ({
   useEffect(() => {
     // select on init (focusing is done separately inside the bindBlurEvent()
     // because we need it to happen *after* the blur event from `pointerdown`)
-    editable.current!.select();
+    Transforms.select(editor, []);
 
     // NOTE(srb): Because this is in useEffect, and has setTimeout itself,
     // it's a bit more deferred than before
@@ -149,15 +167,18 @@ const TextAreaEditor = ({
     return () => {
       window.removeEventListener("pointerup", bindBlurEvent);
     };
-  }, [bindBlurEvent]);
+  }, [editor, bindBlurEvent]);
 
   useEffect(() => {
     // handle updates of textElement properties of editing element
     return Scene.getScene(element)!.addCallback(() => {
       updateElementFromScene();
-      editable.current!.focus();
+      try {
+        // This can throw if the component got unmounted already
+        ReactEditor.focus(editor);
+      } catch (_) {}
     });
-  }, [element, updateElementFromScene]);
+  }, [element, updateElementFromScene, editor]);
 
   useEffect(() => {
     return onWindowResize(canvas, updateElementFromScene);
@@ -203,74 +224,100 @@ const TextAreaEditor = ({
         document.querySelector(".excalidraw")!.parentNode as Element,
       ).marginRight.slice(0, -2),
     );
-
   return (
-    <textarea
-      ref={editable}
-      dir="auto"
-      tabIndex={0}
-      data-type="wysiwyg"
-      wrap="off"
-      value={updatedElement.text}
-      style={{
-        position: "absolute",
-        display: "inline-block",
-        minHeight: "1em",
-        backfaceVisibility: "hidden",
-        margin: 0,
-        padding: 0,
-        border: 0,
-        outline: 0,
-        resize: "none",
-        background: "transparent",
-        overflow: "hidden",
-        // prevent line wrapping (`whitespace: nowrap` doesn't work on FF)
-        whiteSpace: "pre",
-        // must be specified because in dark mode canvas creates a stacking context
-        zIndex: "var(--zIndex-wysiwyg)" as any,
-        font: getFontString(updatedElement),
-        // must be defined *after* font ¯\_(ツ)_/¯
-        lineHeight: `${lineHeight}px`,
-        width: `${updatedElement.width}px`,
-        height: `${updatedElement.height}px`,
-        left: `${viewportX}px`,
-        top: `${viewportY}px`,
-        transform: getTransform(
-          updatedElement.width,
-          updatedElement.height,
-          angle,
-          appState,
-          maxWidth,
-        ),
-        textAlign,
-        color: updatedElement.strokeColor,
-        opacity: updatedElement.opacity / 100,
-        filter: "var(--theme-filter)",
-        maxWidth: `${maxWidth}px`,
-      }}
-      onKeyDown={(event) => {
-        if (event.key === KEYS.ESCAPE) {
-          event.preventDefault();
-          handleSubmitViaKeyboard();
-        } else if (event.key === KEYS.ENTER && event[KEYS.CTRL_OR_CMD]) {
-          event.preventDefault();
-          if (event.nativeEvent.isComposing || event.keyCode === 229) {
-            return;
-          }
-          handleSubmitViaKeyboard();
-        } else if (event.key === KEYS.ENTER && !event.altKey) {
-          event.stopPropagation();
-        }
-      }}
-      onInput={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    <Slate
+      editor={editor}
+      value={stringToSlateModel(updatedElement.text)}
+      onChange={(value) => {
         onChange({
           element: updatedElement,
-          text: normalizeText(event.target.value),
+          text: normalizeText(slateModelToString(value)),
         });
       }}
-      onBlur={handleSubmitViaBlur}
-    />
+    >
+      {/* There's a bug in Slate preventing onBlur from firing due to
+       simultenous state.isUpdatingSelection */}
+      <div onBlur={handleSubmitViaBlur}>
+        <Editable
+          dir="auto"
+          tabIndex={0}
+          data-type="wysiwyg"
+          wrap="off"
+          value={updatedElement.text}
+          style={{
+            position: "absolute",
+            display: "inline-block",
+            minHeight: "1em",
+            backfaceVisibility: "hidden",
+            margin: 0,
+            padding: 0,
+            border: 0,
+            outline: 0,
+            resize: "none",
+            background: "transparent",
+            overflow: "hidden",
+            // prevent line wrapping (`whitespace: nowrap` doesn't work on FF)
+            whiteSpace: "pre",
+            // must be specified because in dark mode canvas creates a stacking context
+            zIndex: "var(--zIndex-wysiwyg)" as any,
+            font: getFontString(updatedElement),
+            // must be defined *after* font ¯\_(ツ)_/¯
+            lineHeight: `${lineHeight}px`,
+            width: `${updatedElement.width}px`,
+            height: `${updatedElement.height}px`,
+            left: `${viewportX}px`,
+            top: `${viewportY}px`,
+            transform: getTransform(
+              updatedElement.width,
+              updatedElement.height,
+              angle,
+              appState,
+              maxWidth,
+            ),
+            textAlign,
+            color: updatedElement.strokeColor,
+            opacity: updatedElement.opacity / 100,
+            filter: "var(--theme-filter)",
+            maxWidth: `${maxWidth}px`,
+          }}
+          onDOMBeforeInput={(event) => {
+            // Prevent the default "insert block on enter" Slate behavior,
+            // so that we only need to deal with text elements. Insert a newline
+            // character instead.
+            switch (event.inputType) {
+              case "insertLineBreak":
+              case "insertParagraph":
+                Editor.insertText(editor, "\n");
+                event.preventDefault();
+                break;
+            }
+          }}
+          onKeyDown={(event) => {
+            if (event.key === KEYS.ESCAPE) {
+              event.preventDefault();
+              handleSubmitViaKeyboard();
+            } else if (event.key === KEYS.ENTER && event[KEYS.CTRL_OR_CMD]) {
+              event.preventDefault();
+              if (event.nativeEvent.isComposing || event.keyCode === 229) {
+                return;
+              }
+              handleSubmitViaKeyboard();
+            } else if (event.key === KEYS.ENTER && !event.altKey) {
+              event.stopPropagation();
+            }
+          }}
+        />
+      </div>
+    </Slate>
   );
+};
+
+const slateModelToString = (model: Descendant[]) => {
+  return Node.string(model[0]);
+};
+
+const stringToSlateModel = (text: string) => {
+  return [{ children: [{ text }] }];
 };
 
 const onWindowResize = (
