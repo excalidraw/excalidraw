@@ -46,6 +46,7 @@ import {
   CURSOR_TYPE,
   DEFAULT_UI_OPTIONS,
   DEFAULT_VERTICAL_ALIGN,
+  DETECT_POSITION_CHANGE_INTERVAL,
   DRAGGING_THRESHOLD,
   ELEMENT_SHIFT_TRANSLATE_AMOUNT,
   ELEMENT_TRANSLATE_AMOUNT,
@@ -305,6 +306,8 @@ class App extends React.Component<AppProps, AppState> {
   private scene: Scene;
   private resizeObserver: ResizeObserver | undefined;
   private nearestScrollableContainer: HTMLElement | Document | undefined;
+  private detectPositionIntervalId: NodeJS.Timeout | undefined;
+
   constructor(props: AppProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
@@ -795,6 +798,13 @@ class App extends React.Component<AppProps, AppState> {
     this.scene.addCallback(this.onSceneUpdated);
     this.addEventListeners();
 
+    if (this.props.detectPosition) {
+      this.detectPositionIntervalId = setInterval(
+        this.updateOffsetsIfChanged,
+        DETECT_POSITION_CHANGE_INTERVAL,
+      );
+    }
+
     if ("ResizeObserver" in window && this.excalidrawContainerRef?.current) {
       this.resizeObserver = new ResizeObserver(() => {
         // compute isMobile state
@@ -836,6 +846,9 @@ class App extends React.Component<AppProps, AppState> {
     this.removeEventListeners();
     this.scene.destroy();
     clearTimeout(touchTimeout);
+    if (this.detectPositionIntervalId) {
+      clearInterval(this.detectPositionIntervalId);
+    }
     touchTimeout = 0;
   }
 
@@ -1098,7 +1111,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
-  private onScroll = debounce(() => {
+  private updateOffsetsIfChanged = () => {
     const { offsetTop, offsetLeft } = this.getCanvasOffsets();
     this.setState((state) => {
       if (state.offsetLeft === offsetLeft && state.offsetTop === offsetTop) {
@@ -1106,7 +1119,9 @@ class App extends React.Component<AppProps, AppState> {
       }
       return { offsetTop, offsetLeft };
     });
-  }, SCROLL_TIMEOUT);
+  };
+
+  private onScroll = debounce(this.updateOffsetsIfChanged, SCROLL_TIMEOUT);
 
   // Copy/paste
 
