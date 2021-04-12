@@ -487,6 +487,7 @@ class App extends React.Component<AppProps, AppState> {
             }
             libraryReturnUrl={this.props.libraryReturnUrl}
             UIOptions={this.props.UIOptions}
+            focusContainer={this.focusContainer}
           />
           <div className="excalidraw-textEditorContainer" />
           <div className="excalidraw-contextMenuContainer" />

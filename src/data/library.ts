@@ -5,7 +5,6 @@ import { STORAGE_KEYS } from "../constants";
 import { getNonDeletedElements } from "../element";
 import { NonDeleted, ExcalidrawElement } from "../element/types";
 import { nanoid } from "nanoid";
-import { focusContainer } from "../utils";
 
 export class Library {
   private static libraryCache: LibraryItems | null = null;
@@ -14,7 +13,6 @@ export class Library {
   static resetLibrary = () => {
     Library.libraryCache = null;
     localStorage.removeItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY);
-    focusContainer();
   };
 
   /** imports library (currently merges, removing duplicates) */
