@@ -198,7 +198,6 @@ export type SceneData = {
   appState?: ImportedDataState["appState"];
   collaborators?: Map<string, Collaborator>;
   commitToHistory?: boolean;
-  useTex?: boolean;
 };
 
 export enum UserIdleState {
