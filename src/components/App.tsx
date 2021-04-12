@@ -190,13 +190,11 @@ import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import {
-  measureMath,
+  actionToggleUseTex,
   containsMath,
   isMathMode,
   getFontString,
   getUseTex,
-  setUseTex,
-  toggleUseTex,
 } from "../mathmode";
 
 const { history } = createHistory();
@@ -1442,10 +1440,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
 
     // If the keystroke is the Text-tool digit with the Shift key and
     // we are not in text-editing/entry mode, proceed to toggle useTex.
-    const intKey = ")!@#$%^&*(".indexOf(event.key);
     if (
-      intKey >= 0 &&
-      findShapeByKey(intKey.toString()) === "text" &&
+      event.key.toLowerCase() === "m" &&
+      !event.ctrlKey &&
       event.shiftKey &&
       !(this.state.editingElement && isTextElement(this.state.editingElement))
     ) {
@@ -1454,45 +1451,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         this.state,
       );
       // Require the "Control" key to toggle Latex/AsciiMath so no one
-      // toggles by accidentally typing "Shift 8" (i.e. '*') without
+      // toggles by accidentally typing "Shift M" without
       // being in text-editing/entry mode.
-      if (event.ctrlKey) {
-        history.resumeRecording();
-        let rerenderScene = false;
-        selectedElements.forEach((element) => {
-          // Only operate on selected elements which are text elements in
-          // math made containing math content.
-          if (
-            isTextElement(element) &&
-            isMathMode(getFontString(element)) &&
-            (containsMath(element.text, element.useTex) ||
-              containsMath(element.text, !element.useTex))
-          ) {
-            toggleUseTex(element);
-            // Mark the element for re-rendering
-            invalidateShapeForElement(element);
-            // Update the width/height of the element
-            const metrics = measureMath(
-              element.text,
-              element.fontSize,
-              element.fontFamily,
-              element.useTex,
-            );
-            mutateElement(element, metrics);
-            // Tell the app to re-render the scene
-            rerenderScene = true;
-            // If only one element is selected, use the element's updated
-            // useTex value to set the default value for new text elements.
-            if (selectedElements.length === 1) {
-              setUseTex(element.useTex);
-            }
-          }
-        });
-        if (rerenderScene) {
-          // Only re-render the scene once
-          this.setState({});
-        }
-      } else if (selectedElements.length < 2) {
+      if (selectedElements.length < 2) {
         // Only report anything if at most one element is selected, to avoid confusion.
         // If only one element is selected and that element is a text element,
         // then report that element's useTex value; otherwise report the default
@@ -1502,9 +1463,9 @@ class App extends React.Component<ExcalidrawProps, AppState> {
             ? selectedElements[0].useTex
             : getUseTex();
         if (usingTex) {
-          window.alert(t("alerts.useTexTrue"));
+          this.setToastMessage(t("alerts.useTexTrue"));
         } else {
-          window.alert(t("alerts.useTexFalse"));
+          this.setToastMessage(t("alerts.useTexFalse"));
         }
       }
     }
@@ -3908,6 +3869,11 @@ class App extends React.Component<ExcalidrawProps, AppState> {
       this.actionManager.getAppState(),
     );
 
+    const maybeToggleUseTex = actionToggleUseTex.contextItemPredicate!(
+      this.actionManager.getElementsIncludingDeleted(),
+      this.actionManager.getAppState(),
+    );
+
     const separator = "separator";
 
     const _isMobile = isMobile();
@@ -4031,6 +3997,8 @@ class App extends React.Component<ExcalidrawProps, AppState> {
         maybeFlipHorizontal && actionFlipHorizontal,
         maybeFlipVertical && actionFlipVertical,
         (maybeFlipHorizontal || maybeFlipVertical) && separator,
+        maybeToggleUseTex && actionToggleUseTex,
+        maybeToggleUseTex && separator,
         actionDuplicateSelection,
         actionDeleteSelected,
       ],

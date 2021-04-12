@@ -25,6 +25,7 @@ import { LiteAdaptor } from "mathjax-full/js/adaptors/liteAdaptor.js";
 // For caching the SVGs
 import { StringMap } from "mathjax-full/js/output/common/Wrapper";
 
+export { actionToggleUseTex } from "./actions/actionToggleUseTex";
 let _useTex = true;
 
 export const setUseTex = (useTex: boolean) => {

@@ -49,6 +49,7 @@ export type ActionName =
   | "changeFontSize"
   | "toggleCanvasMenu"
   | "toggleEditMenu"
+  | "toggleUseTex"
   | "undo"
   | "redo"
   | "finalize"
