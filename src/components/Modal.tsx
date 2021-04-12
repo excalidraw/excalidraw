@@ -22,6 +22,7 @@ export const Modal = (props: {
   const handleKeydown = (event: React.KeyboardEvent) => {
     if (event.key === KEYS.ESCAPE) {
       event.nativeEvent.stopImmediatePropagation();
+      event.stopPropagation();
       props.onCloseRequest();
     }
   };
@@ -38,6 +39,7 @@ export const Modal = (props: {
       <div
         className="Modal__content"
         style={{ "--max-width": `${props.maxWidth}px` }}
+        tabIndex={0}
       >
         {props.children}
       </div>

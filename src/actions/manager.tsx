@@ -12,7 +12,11 @@ import { MODES } from "../constants";
 
 // This is the <App> component, but for now we don't care about anything but its
 // `canvas` state.
-type App = { canvas: HTMLCanvasElement | null; props: AppProps };
+type App = {
+  canvas: HTMLCanvasElement | null;
+  focusContainer: () => void;
+  props: AppProps;
+};
 
 export class ActionManager implements ActionsManagerInterface {
   actions = {} as ActionsManagerInterface["actions"];
@@ -51,7 +55,7 @@ export class ActionManager implements ActionsManagerInterface {
     actions.forEach((action) => this.registerAction(action));
   }
 
-  handleKeyDown(event: KeyboardEvent) {
+  handleKeyDown(event: React.KeyboardEvent | KeyboardEvent) {
     const canvasActions = this.app.props.UIOptions.canvasActions;
     const data = Object.values(this.actions)
       .sort((a, b) => (b.keyPriority || 0) - (a.keyPriority || 0))
