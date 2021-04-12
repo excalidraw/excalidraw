@@ -15,6 +15,7 @@ Please add the latest change on the top under the correct section.
 
 ## Excalidraw API
 
+- Bind the keyboard events to component and added a prop [`bindKeyGlobally`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#bindKeyGlobally) which if set to true will bind the keyboard events to document [#3430](https://github.com/excalidraw/excalidraw/pull/3430).
 - Recompute offsets on `scroll` of the nearest scrollable container [#3408](https://github.com/excalidraw/excalidraw/pull/3408). This can be disabled by setting [`detectScroll`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#detectScroll) to `false`.
 - Add `onPaste` prop to handle custom clipboard behaviours [#3420](https://github.com/excalidraw/excalidraw/pull/3420).
 
