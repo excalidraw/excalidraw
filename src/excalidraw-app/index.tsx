@@ -324,6 +324,7 @@ const ExcalidrawWrapper = () => {
         langCode={langCode}
         renderCustomStats={renderCustomStats}
         detectScroll={false}
+        handleKeyboardGlobally={true}
       />
       {excalidrawAPI && <CollabWrapper excalidrawAPI={excalidrawAPI} />}
       {errorMessage && (

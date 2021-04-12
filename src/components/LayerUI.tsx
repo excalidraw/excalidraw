@@ -72,6 +72,7 @@ interface LayerUIProps {
   viewModeEnabled: boolean;
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   UIOptions: AppProps["UIOptions"];
+  focusContainer: () => void;
 }
 
 const useOnClickOutside = (
@@ -111,6 +112,7 @@ const LibraryMenuItems = ({
   setAppState,
   setLibraryItems,
   libraryReturnUrl,
+  focusContainer,
 }: {
   library: LibraryItems;
   pendingElements: LibraryItem;
@@ -120,6 +122,7 @@ const LibraryMenuItems = ({
   setAppState: React.Component<any, AppState>["setState"];
   setLibraryItems: (library: LibraryItems) => void;
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
+  focusContainer: () => void;
 }) => {
   const isMobile = useIsMobile();
   const numCells = library.length + (pendingElements.length > 0 ? 1 : 0);
@@ -178,6 +181,7 @@ const LibraryMenuItems = ({
               if (window.confirm(t("alerts.resetLibrary"))) {
                 Library.resetLibrary();
                 setLibraryItems([]);
+                focusContainer();
               }
             }}
           />
@@ -242,6 +246,7 @@ const LibraryMenu = ({
   onAddToLibrary,
   setAppState,
   libraryReturnUrl,
+  focusContainer,
 }: {
   pendingElements: LibraryItem;
   onClickOutside: (event: MouseEvent) => void;
@@ -249,6 +254,7 @@ const LibraryMenu = ({
   onAddToLibrary: () => void;
   setAppState: React.Component<any, AppState>["setState"];
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
+  focusContainer: () => void;
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   useOnClickOutside(ref, (event) => {
@@ -322,6 +328,7 @@ const LibraryMenu = ({
           setAppState={setAppState}
           setLibraryItems={setLibraryItems}
           libraryReturnUrl={libraryReturnUrl}
+          focusContainer={focusContainer}
         />
       )}
     </Island>
@@ -347,6 +354,7 @@ const LayerUI = ({
   viewModeEnabled,
   libraryReturnUrl,
   UIOptions,
+  focusContainer,
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
@@ -517,6 +525,7 @@ const LayerUI = ({
       onAddToLibrary={deselectItems}
       setAppState={setAppState}
       libraryReturnUrl={libraryReturnUrl}
+      focusContainer={focusContainer}
     />
   ) : null;
 
@@ -660,7 +669,15 @@ const LayerUI = ({
         />
       )}
       {appState.showHelpDialog && (
-        <HelpDialog onClose={() => setAppState({ showHelpDialog: false })} />
+        <HelpDialog
+          onClose={() => {
+            const helpIcon = document.querySelector(
+              ".help-icon",
+            )! as HTMLElement;
+            helpIcon.focus();
+            setAppState({ showHelpDialog: false });
+          }}
+        />
       )}
       {appState.pasteDialog.shown && (
         <PasteChartDialog

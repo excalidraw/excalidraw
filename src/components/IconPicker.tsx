@@ -88,6 +88,7 @@ function Picker<T>({
       onClose();
     }
     event.nativeEvent.stopImmediatePropagation();
+    event.stopPropagation();
   };
 
   return (

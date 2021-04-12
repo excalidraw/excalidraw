@@ -18,6 +18,7 @@ export const ErrorDialog = ({
     if (onClose) {
       onClose();
     }
+    document.querySelector<HTMLElement>(".excalidraw-container")?.focus();
   }, [onClose]);
 
   return (

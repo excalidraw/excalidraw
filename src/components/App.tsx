@@ -445,12 +445,16 @@ class App extends React.Component<AppProps, AppState> {
 
     return (
       <div
-        className={clsx("excalidraw", {
+        className={clsx("excalidraw excalidraw-container", {
           "excalidraw--view-mode": viewModeEnabled,
           "excalidraw--mobile": this.isMobile,
         })}
         ref={this.excalidrawContainerRef}
         onDrop={this.handleAppOnDrop}
+        tabIndex={0}
+        onKeyDown={
+          this.props.handleKeyboardGlobally ? undefined : this.onKeyDown
+        }
       >
         <IsMobileContext.Provider value={this.isMobile}>
           <LayerUI
@@ -485,6 +489,7 @@ class App extends React.Component<AppProps, AppState> {
             }
             libraryReturnUrl={this.props.libraryReturnUrl}
             UIOptions={this.props.UIOptions}
+            focusContainer={this.focusContainer}
           />
           <div className="excalidraw-textEditorContainer" />
           <div className="excalidraw-contextMenuContainer" />
@@ -508,6 +513,10 @@ class App extends React.Component<AppProps, AppState> {
       </div>
     );
   }
+
+  public focusContainer = () => {
+    this.excalidrawContainerRef.current?.focus();
+  };
 
   public getSceneElementsIncludingDeleted = () => {
     return this.scene.getElementsIncludingDeleted();
@@ -655,6 +664,8 @@ class App extends React.Component<AppProps, AppState> {
     } catch (error) {
       window.alert(t("alerts.errorLoadingLibrary"));
       console.error(error);
+    } finally {
+      this.focusContainer();
     }
   };
 
@@ -795,6 +806,10 @@ class App extends React.Component<AppProps, AppState> {
     this.scene.addCallback(this.onSceneUpdated);
     this.addEventListeners();
 
+    if (this.excalidrawContainerRef.current) {
+      this.focusContainer();
+    }
+
     if ("ResizeObserver" in window && this.excalidrawContainerRef?.current) {
       this.resizeObserver = new ResizeObserver(() => {
         // compute isMobile state
@@ -854,7 +869,6 @@ class App extends React.Component<AppProps, AppState> {
       EVENT.SCROLL,
       this.onScroll,
     );
-
     document.removeEventListener(EVENT.KEYDOWN, this.onKeyDown, false);
     document.removeEventListener(
       EVENT.MOUSE_MOVE,
@@ -890,7 +904,9 @@ class App extends React.Component<AppProps, AppState> {
   private addEventListeners() {
     this.removeEventListeners();
     document.addEventListener(EVENT.COPY, this.onCopy);
-    document.addEventListener(EVENT.KEYDOWN, this.onKeyDown, false);
+    if (this.props.handleKeyboardGlobally) {
+      document.addEventListener(EVENT.KEYDOWN, this.onKeyDown, false);
+    }
     document.addEventListener(EVENT.KEYUP, this.onKeyUp, { passive: true });
     document.addEventListener(
       EVENT.MOUSE_MOVE,
@@ -1434,152 +1450,156 @@ class App extends React.Component<AppProps, AppState> {
 
   // Input handling
 
-  private onKeyDown = withBatchedUpdates((event: KeyboardEvent) => {
-    // normalize `event.key` when CapsLock is pressed #2372
-    if (
-      "Proxy" in window &&
-      ((!event.shiftKey && /^[A-Z]$/.test(event.key)) ||
-        (event.shiftKey && /^[a-z]$/.test(event.key)))
-    ) {
-      event = new Proxy(event, {
-        get(ev: any, prop) {
-          const value = ev[prop];
-          if (typeof value === "function") {
-            // fix for Proxies hijacking `this`
-            return value.bind(ev);
-          }
-          return prop === "key"
-            ? // CapsLock inverts capitalization based on ShiftKey, so invert
-              // it back
-              event.shiftKey
-              ? ev.key.toUpperCase()
-              : ev.key.toLowerCase()
-            : value;
-        },
-      });
-    }
-
-    if (
-      (isWritableElement(event.target) && event.key !== KEYS.ESCAPE) ||
-      // case: using arrows to move between buttons
-      (isArrowKey(event.key) && isInputLike(event.target))
-    ) {
-      return;
-    }
-
-    if (event.key === KEYS.QUESTION_MARK) {
-      this.setState({
-        showHelpDialog: true,
-      });
-    }
-
-    if (this.actionManager.handleKeyDown(event)) {
-      return;
-    }
-
-    if (this.state.viewModeEnabled) {
-      return;
-    }
-
-    if (event[KEYS.CTRL_OR_CMD] && this.state.isBindingEnabled) {
-      this.setState({ isBindingEnabled: false });
-    }
-
-    if (event.code === CODES.NINE) {
-      this.setState({ isLibraryOpen: !this.state.isLibraryOpen });
-    }
-
-    if (isArrowKey(event.key)) {
-      const step =
-        (this.state.gridSize &&
-          (event.shiftKey ? ELEMENT_TRANSLATE_AMOUNT : this.state.gridSize)) ||
-        (event.shiftKey
-          ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
-          : ELEMENT_TRANSLATE_AMOUNT);
-
-      const selectedElements = this.scene
-        .getElements()
-        .filter((element) => this.state.selectedElementIds[element.id]);
-
-      let offsetX = 0;
-      let offsetY = 0;
-
-      if (event.key === KEYS.ARROW_LEFT) {
-        offsetX = -step;
-      } else if (event.key === KEYS.ARROW_RIGHT) {
-        offsetX = step;
-      } else if (event.key === KEYS.ARROW_UP) {
-        offsetY = -step;
-      } else if (event.key === KEYS.ARROW_DOWN) {
-        offsetY = step;
+  private onKeyDown = withBatchedUpdates(
+    (event: React.KeyboardEvent | KeyboardEvent) => {
+      // normalize `event.key` when CapsLock is pressed #2372
+      if (
+        "Proxy" in window &&
+        ((!event.shiftKey && /^[A-Z]$/.test(event.key)) ||
+          (event.shiftKey && /^[a-z]$/.test(event.key)))
+      ) {
+        event = new Proxy(event, {
+          get(ev: any, prop) {
+            const value = ev[prop];
+            if (typeof value === "function") {
+              // fix for Proxies hijacking `this`
+              return value.bind(ev);
+            }
+            return prop === "key"
+              ? // CapsLock inverts capitalization based on ShiftKey, so invert
+                // it back
+                event.shiftKey
+                ? ev.key.toUpperCase()
+                : ev.key.toLowerCase()
+              : value;
+          },
+        });
       }
-
-      selectedElements.forEach((element) => {
-        mutateElement(element, {
-          x: element.x + offsetX,
-          y: element.y + offsetY,
-        });
-
-        updateBoundElements(element, {
-          simultaneouslyUpdated: selectedElements,
-        });
-      });
-
-      this.maybeSuggestBindingForAll(selectedElements);
-
-      event.preventDefault();
-    } else if (event.key === KEYS.ENTER) {
-      const selectedElements = getSelectedElements(
-        this.scene.getElements(),
-        this.state,
-      );
 
       if (
-        selectedElements.length === 1 &&
-        isLinearElement(selectedElements[0])
+        (isWritableElement(event.target) && event.key !== KEYS.ESCAPE) ||
+        // case: using arrows to move between buttons
+        (isArrowKey(event.key) && isInputLike(event.target))
       ) {
-        if (
-          !this.state.editingLinearElement ||
-          this.state.editingLinearElement.elementId !== selectedElements[0].id
-        ) {
-          history.resumeRecording();
-          this.setState({
-            editingLinearElement: new LinearElementEditor(
-              selectedElements[0],
-              this.scene,
-            ),
-          });
-        }
-      } else if (
-        selectedElements.length === 1 &&
-        !isLinearElement(selectedElements[0])
-      ) {
-        const selectedElement = selectedElements[0];
-        this.startTextEditing({
-          sceneX: selectedElement.x + selectedElement.width / 2,
-          sceneY: selectedElement.y + selectedElement.height / 2,
-        });
-        event.preventDefault();
         return;
       }
-    } else if (
-      !event.ctrlKey &&
-      !event.altKey &&
-      !event.metaKey &&
-      this.state.draggingElement === null
-    ) {
-      const shape = findShapeByKey(event.key);
-      if (shape) {
-        this.selectShapeTool(shape);
-      } else if (event.key === KEYS.Q) {
-        this.toggleLock();
+
+      if (event.key === KEYS.QUESTION_MARK) {
+        this.setState({
+          showHelpDialog: true,
+        });
       }
-    }
-    if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
-      isHoldingSpace = true;
-      setCursor(this.canvas, CURSOR_TYPE.GRABBING);
-    }
-  });
+
+      if (this.actionManager.handleKeyDown(event)) {
+        return;
+      }
+
+      if (this.state.viewModeEnabled) {
+        return;
+      }
+
+      if (event[KEYS.CTRL_OR_CMD] && this.state.isBindingEnabled) {
+        this.setState({ isBindingEnabled: false });
+      }
+
+      if (event.code === CODES.NINE) {
+        this.setState({ isLibraryOpen: !this.state.isLibraryOpen });
+      }
+
+      if (isArrowKey(event.key)) {
+        const step =
+          (this.state.gridSize &&
+            (event.shiftKey
+              ? ELEMENT_TRANSLATE_AMOUNT
+              : this.state.gridSize)) ||
+          (event.shiftKey
+            ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
+            : ELEMENT_TRANSLATE_AMOUNT);
+
+        const selectedElements = this.scene
+          .getElements()
+          .filter((element) => this.state.selectedElementIds[element.id]);
+
+        let offsetX = 0;
+        let offsetY = 0;
+
+        if (event.key === KEYS.ARROW_LEFT) {
+          offsetX = -step;
+        } else if (event.key === KEYS.ARROW_RIGHT) {
+          offsetX = step;
+        } else if (event.key === KEYS.ARROW_UP) {
+          offsetY = -step;
+        } else if (event.key === KEYS.ARROW_DOWN) {
+          offsetY = step;
+        }
+
+        selectedElements.forEach((element) => {
+          mutateElement(element, {
+            x: element.x + offsetX,
+            y: element.y + offsetY,
+          });
+
+          updateBoundElements(element, {
+            simultaneouslyUpdated: selectedElements,
+          });
+        });
+
+        this.maybeSuggestBindingForAll(selectedElements);
+
+        event.preventDefault();
+      } else if (event.key === KEYS.ENTER) {
+        const selectedElements = getSelectedElements(
+          this.scene.getElements(),
+          this.state,
+        );
+
+        if (
+          selectedElements.length === 1 &&
+          isLinearElement(selectedElements[0])
+        ) {
+          if (
+            !this.state.editingLinearElement ||
+            this.state.editingLinearElement.elementId !== selectedElements[0].id
+          ) {
+            history.resumeRecording();
+            this.setState({
+              editingLinearElement: new LinearElementEditor(
+                selectedElements[0],
+                this.scene,
+              ),
+            });
+          }
+        } else if (
+          selectedElements.length === 1 &&
+          !isLinearElement(selectedElements[0])
+        ) {
+          const selectedElement = selectedElements[0];
+          this.startTextEditing({
+            sceneX: selectedElement.x + selectedElement.width / 2,
+            sceneY: selectedElement.y + selectedElement.height / 2,
+          });
+          event.preventDefault();
+          return;
+        }
+      } else if (
+        !event.ctrlKey &&
+        !event.altKey &&
+        !event.metaKey &&
+        this.state.draggingElement === null
+      ) {
+        const shape = findShapeByKey(event.key);
+        if (shape) {
+          this.selectShapeTool(shape);
+        } else if (event.key === KEYS.Q) {
+          this.toggleLock();
+        }
+      }
+      if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
+        isHoldingSpace = true;
+        setCursor(this.canvas, CURSOR_TYPE.GRABBING);
+      }
+    },
+  );
 
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
     if (event.key === KEYS.SPACE) {
@@ -1615,7 +1635,7 @@ class App extends React.Component<AppProps, AppState> {
       setCursorForShape(this.canvas, elementType);
     }
     if (isToolIcon(document.activeElement)) {
-      document.activeElement.blur();
+      this.focusContainer();
     }
     if (!isLinearElementType(elementType)) {
       this.setState({ suggestedBindings: [] });
@@ -1745,6 +1765,8 @@ class App extends React.Component<AppProps, AppState> {
         if (this.state.elementLocked) {
           setCursorForShape(this.canvas, this.state.elementType);
         }
+
+        this.focusContainer();
       }),
       element,
     });

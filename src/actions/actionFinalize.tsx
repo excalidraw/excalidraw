@@ -18,7 +18,7 @@ import { isBindingElement } from "../element/typeChecks";
 
 export const actionFinalize = register({
   name: "finalize",
-  perform: (elements, appState, _, { canvas }) => {
+  perform: (elements, appState, _, { canvas, focusContainer }) => {
     if (appState.editingLinearElement) {
       const {
         elementId,
@@ -51,7 +51,7 @@ export const actionFinalize = register({
 
     let newElements = elements;
     if (window.document.activeElement instanceof HTMLElement) {
-      window.document.activeElement.blur();
+      focusContainer();
     }
 
     const multiPointElement = appState.multiElement
