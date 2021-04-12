@@ -18,7 +18,6 @@ export const Dialog = (props: {
   autofocus?: boolean;
 }) => {
   const [islandNode, setIslandNode] = useCallbackRefState<HTMLDivElement>();
-
   useEffect(() => {
     if (!islandNode) {
       return;
