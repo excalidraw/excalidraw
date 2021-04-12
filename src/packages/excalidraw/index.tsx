@@ -31,7 +31,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     renderCustomStats,
     onPaste,
     detectScroll = true,
-    bindKeyGlobally = false,
+    handleKeyboardGlobally = false,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -83,7 +83,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
         UIOptions={UIOptions}
         onPaste={onPaste}
         detectScroll={detectScroll}
-        bindKeyGlobally={bindKeyGlobally}
+        handleKeyboardGlobally={handleKeyboardGlobally}
       />
     </InitializeApp>
   );

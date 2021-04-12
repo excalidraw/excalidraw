@@ -196,7 +196,7 @@ export interface ExcalidrawProps {
   ) => JSX.Element;
   UIOptions?: UIOptions;
   detectScroll?: boolean;
-  bindKeyGlobally?: boolean;
+  handleKeyboardGlobally?: boolean;
 }
 
 export type SceneData = {
@@ -231,5 +231,5 @@ export type AppProps = ExcalidrawProps & {
     canvasActions: Required<CanvasActions>;
   };
   detectScroll: boolean;
-  bindKeyGlobally: boolean;
+  handleKeyboardGlobally: boolean;
 };

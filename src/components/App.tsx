@@ -452,7 +452,9 @@ class App extends React.Component<AppProps, AppState> {
         ref={this.excalidrawContainerRef}
         onDrop={this.handleAppOnDrop}
         tabIndex={0}
-        onKeyDown={this.props.bindKeyGlobally ? undefined : this.onKeyDown}
+        onKeyDown={
+          this.props.handleKeyboardGlobally ? undefined : this.onKeyDown
+        }
       >
         <IsMobileContext.Provider value={this.isMobile}>
           <LayerUI
@@ -895,7 +897,7 @@ class App extends React.Component<AppProps, AppState> {
   private addEventListeners() {
     this.removeEventListeners();
     document.addEventListener(EVENT.COPY, this.onCopy);
-    if (this.props.bindKeyGlobally) {
+    if (this.props.handleKeyboardGlobally) {
       document.addEventListener(EVENT.KEYDOWN, this.onKeyDown, false);
     }
     document.addEventListener(EVENT.KEYUP, this.onKeyUp, { passive: true });
