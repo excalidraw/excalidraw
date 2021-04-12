@@ -43,7 +43,7 @@
     "react-dom": "^17.0.1"
   },
   "devDependencies": {
-    "@babel/core": "7.13.14",
+    "@babel/core": "7.13.15",
     "@babel/plugin-transform-arrow-functions": "7.13.0",
     "@babel/plugin-transform-async-to-generator": "7.13.0",
     "@babel/plugin-transform-runtime": "7.13.10",
@@ -54,7 +54,7 @@
     "babel-loader": "8.2.2",
     "babel-plugin-transform-class-properties": "6.24.1",
     "cross-env": "7.0.3",
-    "css-loader": "5.2.0",
+    "css-loader": "5.2.1",
     "file-loader": "6.2.0",
     "mini-css-extract-plugin": "1.4.0",
     "sass-loader": "11.0.1",
