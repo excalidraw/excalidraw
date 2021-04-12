@@ -595,7 +595,9 @@ Indicates whether Excalidraw should listen for `scroll` event on the nearest scr
 
 ### bindKeyGlobally
 
-Indicates whether to bind keyboard events to document. By default this is false and keyboard events are bind to the excalidraw component.
+Indicates whether to bind keyboard events to `document`. Disabled by default, meaning the keyboard events are bound to the Excalidraw component. This allows for multiple Excalidraw components to live on the same page, and ensures that Excalidraw keyboard handling doesn't collide with your app's (or the browser) when the component isn't focused.
+
+Enable this if you want Excalidraw to handle keyboard even if the component isn't focused (e.g. a user is interacting with the navbar, sidebar, or similar).
 
 ### Extra API's
 
