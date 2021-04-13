@@ -28,7 +28,7 @@ Please add the latest change on the top under the correct section.
 
 ### Fixes
 
-- Apply theme to only current instance of Excalidraw, this fixes the issue where theme was always getting applied to first excalidraw instance when you have multiple excalidraw instances on the same page [#3446](https://github.com/excalidraw/excalidraw/pull/3446)
+- When switching theme, apply it only to the active Excalidraw component. This fixes a case where the theme was getting applied to the first Excalidraw component if you had multiple Excalidraw components on the same page [#3446](https://github.com/excalidraw/excalidraw/pull/3446)
 
 ## Types
 

@@ -188,9 +188,9 @@ import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 
-export const IsMobileContext = React.createContext(false);
+const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
-export const ExcalidrawContainerContext = React.createContext<HTMLDivElement | null>(
+const ExcalidrawContainerContext = React.createContext<HTMLDivElement | null>(
   null,
 );
 export const useExcalidrawContainer = () =>

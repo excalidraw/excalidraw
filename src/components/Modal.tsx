@@ -58,7 +58,7 @@ const useBodyRoot = (theme: AppState["theme"]) => {
   const isMobileRef = useRef(isMobile);
   isMobileRef.current = isMobile;
 
-  const excalidrawContainer: HTMLDivElement | null = useExcalidrawContainer();
+  const excalidrawContainer = useExcalidrawContainer();
 
   useLayoutEffect(() => {
     if (div) {
