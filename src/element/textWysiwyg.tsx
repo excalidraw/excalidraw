@@ -150,9 +150,9 @@ export const textWysiwyg = ({
     } else if (event.key === KEYS.TAB) {
       event.preventDefault();
       if (event.shiftKey) {
-        removeTab();
+        outdent();
       } else {
-        insertTab();
+        indent();
       }
       // We must send an input event to resize the element
       editable.dispatchEvent(new Event("input"));
@@ -160,7 +160,7 @@ export const textWysiwyg = ({
   };
 
   const tab = "    ";
-  const insertTab = () => {
+  const indent = () => {
     const { selectionStart, selectionEnd } = editable;
     const startLinePositions = getStartLinePositions();
     startLinePositions.forEach((startLinePosition) => {
@@ -175,7 +175,7 @@ export const textWysiwyg = ({
       selectionEnd + tab.length * startLinePositions.length;
   };
 
-  const removeTab = () => {
+  const outdent = () => {
     const { selectionStart, selectionEnd, value } = editable;
     const startLinePositions = getStartLinePositions();
     const removedTabs: number[] = [];
