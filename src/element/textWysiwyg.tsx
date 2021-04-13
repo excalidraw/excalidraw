@@ -1,4 +1,4 @@
-import { KEYS } from "../keys";
+import { CODES, KEYS } from "../keys";
 import { isWritableElement, getFontString } from "../utils";
 import Scene from "../scene/Scene";
 import { isTextElement } from "./typeChecks";
@@ -134,6 +134,7 @@ export const textWysiwyg = ({
   }
 
   editable.onkeydown = (event) => {
+    event.stopPropagation();
     if (event.key === KEYS.ESCAPE) {
       event.preventDefault();
       submittedViaKeyboard = true;
@@ -145,9 +146,116 @@ export const textWysiwyg = ({
       }
       submittedViaKeyboard = true;
       handleSubmit();
-    } else if (event.key === KEYS.ENTER && !event.altKey) {
-      event.stopPropagation();
+    } else if (
+      event.key === KEYS.TAB ||
+      (event[KEYS.CTRL_OR_CMD] &&
+        (event.code === CODES.BRACKET_LEFT ||
+          event.code === CODES.BRACKET_RIGHT))
+    ) {
+      event.preventDefault();
+      if (event.shiftKey || event.code === CODES.BRACKET_LEFT) {
+        outdent();
+      } else {
+        indent();
+      }
+      // We must send an input event to resize the element
+      editable.dispatchEvent(new Event("input"));
     }
+  };
+
+  const TAB_SIZE = 4;
+  const TAB = " ".repeat(TAB_SIZE);
+  const RE_LEADING_TAB = new RegExp(`^ {1,${TAB_SIZE}}`);
+  const indent = () => {
+    const { selectionStart, selectionEnd } = editable;
+    const linesStartIndices = getSelectedLinesStartIndices();
+
+    let value = editable.value;
+    linesStartIndices.forEach((startIndex) => {
+      const startValue = value.slice(0, startIndex);
+      const endValue = value.slice(startIndex);
+
+      value = `${startValue}${TAB}${endValue}`;
+    });
+
+    editable.value = value;
+
+    editable.selectionStart = selectionStart + TAB_SIZE;
+    editable.selectionEnd = selectionEnd + TAB_SIZE * linesStartIndices.length;
+  };
+
+  const outdent = () => {
+    const { selectionStart, selectionEnd } = editable;
+    const linesStartIndices = getSelectedLinesStartIndices();
+    const removedTabs: number[] = [];
+
+    let value = editable.value;
+    linesStartIndices.forEach((startIndex) => {
+      const tabMatch = value
+        .slice(startIndex, startIndex + TAB_SIZE)
+        .match(RE_LEADING_TAB);
+
+      if (tabMatch) {
+        const startValue = value.slice(0, startIndex);
+        const endValue = value.slice(startIndex + tabMatch[0].length);
+
+        // Delete a tab from the line
+        value = `${startValue}${endValue}`;
+        removedTabs.push(startIndex);
+      }
+    });
+
+    editable.value = value;
+
+    if (removedTabs.length) {
+      if (selectionStart > removedTabs[removedTabs.length - 1]) {
+        editable.selectionStart = Math.max(
+          selectionStart - TAB_SIZE,
+          removedTabs[removedTabs.length - 1],
+        );
+      } else {
+        // If the cursor is before the first tab removed, ex:
+        // Line| #1
+        //     Line #2
+        // Lin|e #3
+        // we should reset the selectionStart to his initial value.
+        editable.selectionStart = selectionStart;
+      }
+      editable.selectionEnd = Math.max(
+        editable.selectionStart,
+        selectionEnd - TAB_SIZE * removedTabs.length,
+      );
+    }
+  };
+
+  /**
+   * @returns indeces of start positions of selected lines, in reverse order
+   */
+  const getSelectedLinesStartIndices = () => {
+    let { selectionStart, selectionEnd, value } = editable;
+
+    // chars before selectionStart on the same line
+    const startOffset = value.slice(0, selectionStart).match(/[^\n]*$/)![0]
+      .length;
+    // put caret at the start of the line
+    selectionStart = selectionStart - startOffset;
+
+    const selected = value.slice(selectionStart, selectionEnd);
+
+    return selected
+      .split("\n")
+      .reduce(
+        (startIndices, line, idx, lines) =>
+          startIndices.concat(
+            idx
+              ? // curr line index is prev line's start + prev line's length + \n
+                startIndices[idx - 1] + lines[idx - 1].length + 1
+              : // first selected line
+                selectionStart,
+          ),
+        [] as number[],
+      )
+      .reverse();
   };
 
   const stopEvent = (event: Event) => {
