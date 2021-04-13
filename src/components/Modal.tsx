@@ -4,7 +4,8 @@ import React, { useState, useLayoutEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import clsx from "clsx";
 import { KEYS } from "../keys";
-import { useIsMobile } from "../components/App";
+import { useExcalidrawContainer, useIsMobile } from "./App";
+import { AppState } from "../types";
 
 export const Modal = (props: {
   className?: string;
@@ -12,8 +13,10 @@ export const Modal = (props: {
   maxWidth?: number;
   onCloseRequest(): void;
   labelledBy: string;
+  theme?: AppState["theme"];
 }) => {
-  const modalRoot = useBodyRoot();
+  const { theme = "light" } = props;
+  const modalRoot = useBodyRoot(theme);
 
   if (!modalRoot) {
     return null;
@@ -48,12 +51,14 @@ export const Modal = (props: {
   );
 };
 
-const useBodyRoot = () => {
+const useBodyRoot = (theme: AppState["theme"]) => {
   const [div, setDiv] = useState<HTMLDivElement | null>(null);
 
   const isMobile = useIsMobile();
   const isMobileRef = useRef(isMobile);
   isMobileRef.current = isMobile;
+
+  const excalidrawContainer = useExcalidrawContainer();
 
   useLayoutEffect(() => {
     if (div) {
@@ -62,9 +67,9 @@ const useBodyRoot = () => {
   }, [div, isMobile]);
 
   useLayoutEffect(() => {
-    const isDarkTheme = !!document
-      .querySelector(".excalidraw")
-      ?.classList.contains("theme--dark");
+    const isDarkTheme =
+      !!excalidrawContainer?.classList.contains("theme--dark") ||
+      theme === "dark";
     const div = document.createElement("div");
 
     div.classList.add("excalidraw", "excalidraw-modal-container");
@@ -81,7 +86,7 @@ const useBodyRoot = () => {
     return () => {
       document.body.removeChild(div);
     };
-  }, []);
+  }, [excalidrawContainer, theme]);
 
   return div;
 };
