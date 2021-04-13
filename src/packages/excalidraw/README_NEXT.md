@@ -626,7 +626,7 @@ getSyncableElements(elements:  <a href="https://github.com/excalidraw/excalidraw
 import { getSyncableElements } from "@excalidraw/excalidraw";
 ```
 
-This function returns all the elements including the deleted ones and excluding the elements which are are invisibly small (eg width & height are zero) hence excluded. This can be helpful when you want to sync the elements during collaboration.
+Returns all elements including deleted ones, excluding elements which are are invisibly small (e.g. width & height are zero). Useful when you want to sync elements during collaboration.
 
 #### `getElementMap`
 
