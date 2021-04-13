@@ -139,17 +139,31 @@ describe("textWysiwyg", () => {
     // expect(textarea.selectionEnd).toEqual(7);
   });
 
-  it("should remove nothing", () => {
+  it("should remove partial tabs", () => {
     const event = new KeyboardEvent("keydown", {
       key: KEYS.TAB,
       shiftKey: true,
     });
-    // cursor: "Line#1\n  Lin|e#2"
+    // cursor: "Line#1\n  Line#|2"
     textarea.value = `Line#1\n  Line#2`;
     textarea.selectionStart = 15;
     textarea.selectionEnd = 15;
     textarea.dispatchEvent(event);
 
-    expect(textarea.value).toEqual(`Line#1\n  Line#2`);
+    expect(textarea.value).toEqual(`Line#1\nLine#2`);
+  });
+
+  it("should remove nothing", () => {
+    const event = new KeyboardEvent("keydown", {
+      key: KEYS.TAB,
+      shiftKey: true,
+    });
+    // cursor: "Line#1\n  Li|ne#2"
+    textarea.value = `Line#1\nLine#2`;
+    textarea.selectionStart = 9;
+    textarea.selectionEnd = 9;
+    textarea.dispatchEvent(event);
+
+    expect(textarea.value).toEqual(`Line#1\nLine#2`);
   });
 });

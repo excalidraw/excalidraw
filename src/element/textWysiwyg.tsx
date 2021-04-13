@@ -163,7 +163,9 @@ export const textWysiwyg = ({
     }
   };
 
-  const tab = "    ";
+  const TAB_SIZE = 4;
+  const TAB = " ".repeat(TAB_SIZE);
+  const RE_LEADING_TAB = new RegExp(`^ {1,${TAB_SIZE}}`);
   const indent = () => {
     const { selectionStart, selectionEnd } = editable;
     const linesStartIndices = getSelectedLinesStartIndices();
@@ -173,14 +175,13 @@ export const textWysiwyg = ({
       const startValue = value.slice(0, startIndex);
       const endValue = value.slice(startIndex);
 
-      value = `${startValue}${tab}${endValue}`;
+      value = `${startValue}${TAB}${endValue}`;
     });
 
     editable.value = value;
 
-    editable.selectionStart = selectionStart + tab.length;
-    editable.selectionEnd =
-      selectionEnd + tab.length * linesStartIndices.length;
+    editable.selectionStart = selectionStart + TAB_SIZE;
+    editable.selectionEnd = selectionEnd + TAB_SIZE * linesStartIndices.length;
   };
 
   const outdent = () => {
@@ -190,18 +191,18 @@ export const textWysiwyg = ({
 
     let value = editable.value;
     linesStartIndices.forEach((startIndex) => {
-      const hasTab = value.slice(startIndex, startIndex + tab.length) === tab;
+      const tabMatch = value
+        .slice(startIndex, startIndex + TAB_SIZE)
+        .match(RE_LEADING_TAB);
 
-      if (!hasTab) {
-        return;
+      if (tabMatch) {
+        const startValue = value.slice(0, startIndex);
+        const endValue = value.slice(startIndex + tabMatch[0].length);
+
+        // Delete a tab from the line
+        value = `${startValue}${endValue}`;
+        removedTabs.push(startIndex);
       }
-
-      const startValue = value.slice(0, startIndex);
-      const endValue = value.slice(startIndex + tab.length);
-
-      // Delete a tab from the line
-      value = `${startValue}${endValue}`;
-      removedTabs.push(startIndex);
     });
 
     editable.value = value;
@@ -209,7 +210,7 @@ export const textWysiwyg = ({
     if (removedTabs.length) {
       if (selectionStart > removedTabs[removedTabs.length - 1]) {
         editable.selectionStart = Math.max(
-          selectionStart - tab.length,
+          selectionStart - TAB_SIZE,
           removedTabs[removedTabs.length - 1],
         );
       } else {
@@ -222,7 +223,7 @@ export const textWysiwyg = ({
       }
       editable.selectionEnd = Math.max(
         editable.selectionStart,
-        selectionEnd - tab.length * removedTabs.length,
+        selectionEnd - TAB_SIZE * removedTabs.length,
       );
     }
   };
