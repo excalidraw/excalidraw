@@ -162,40 +162,45 @@ export const textWysiwyg = ({
   const tab = "    ";
   const indent = () => {
     const { selectionStart, selectionEnd } = editable;
-    const startLinePositions = getStartLinePositions();
-    startLinePositions.forEach((startLinePosition) => {
-      const startValue = editable.value.substring(0, startLinePosition);
-      const endValue = editable.value.substring(startLinePosition);
+    const linesStartIndices = getSelectedLinesStartIndices();
 
-      editable.value = `${startValue}${tab}${endValue}`;
+    let value = editable.value;
+    linesStartIndices.forEach((startIndex) => {
+      const startValue = value.slice(0, startIndex);
+      const endValue = value.slice(startIndex);
+
+      value = `${startValue}${tab}${endValue}`;
     });
+
+    editable.value = value;
 
     editable.selectionStart = selectionStart + tab.length;
     editable.selectionEnd =
-      selectionEnd + tab.length * startLinePositions.length;
+      selectionEnd + tab.length * linesStartIndices.length;
   };
 
   const outdent = () => {
-    const { selectionStart, selectionEnd, value } = editable;
-    const startLinePositions = getStartLinePositions();
+    const { selectionStart, selectionEnd } = editable;
+    const linesStartIndices = getSelectedLinesStartIndices();
     const removedTabs: number[] = [];
 
-    startLinePositions.forEach((startLinePosition) => {
-      const hasTab =
-        value.substring(startLinePosition, startLinePosition + tab.length) ===
-        tab;
+    let value = editable.value;
+    linesStartIndices.forEach((startIndex) => {
+      const hasTab = value.slice(startIndex, startIndex + tab.length) === tab;
 
       if (!hasTab) {
         return;
       }
 
-      const startValue = editable.value.substring(0, startLinePosition);
-      const endValue = editable.value.substring(startLinePosition + tab.length);
+      const startValue = value.slice(0, startIndex);
+      const endValue = value.slice(startIndex + tab.length);
 
       // Delete a tab from the line
-      editable.value = `${startValue}${endValue}`;
-      removedTabs.push(startLinePosition);
+      value = `${startValue}${endValue}`;
+      removedTabs.push(startIndex);
     });
+
+    editable.value = value;
 
     if (removedTabs.length) {
       if (selectionStart > removedTabs[removedTabs.length - 1]) {
@@ -218,28 +223,34 @@ export const textWysiwyg = ({
     }
   };
 
-  const getStartLinePositions = () => {
-    const { selectionStart, selectionEnd, value } = editable;
-    // We are looking for the closet line breaks from the cursor position
-    const inversedValue = value.substr(0, selectionEnd).split("").reverse();
+  /**
+   * @returns indeces of start positions of selected lines, in reverse order
+   */
+  const getSelectedLinesStartIndices = () => {
+    let { selectionStart, selectionEnd, value } = editable;
 
-    const characterCount = selectionEnd - selectionStart;
-    const startLinePositions = [];
-    let index = 0;
-    let currentCharacter = "";
+    // chars before selectionStart on the same line
+    const startOffset = value.slice(0, selectionStart).match(/[^\n]*$/)![0]
+      .length;
+    // put caret at the start of the line
+    selectionStart = selectionStart - startOffset;
 
-    while (
-      index <= characterCount ||
-      (currentCharacter !== "\n" && currentCharacter !== undefined)
-    ) {
-      currentCharacter = inversedValue[index];
-      if (currentCharacter === "\n" || currentCharacter === undefined) {
-        startLinePositions.push(selectionEnd - index);
-      }
-      index++;
-    }
+    const selected = value.slice(selectionStart, selectionEnd);
 
-    return startLinePositions;
+    return selected
+      .split("\n")
+      .reduce(
+        (startIndices, line, idx, lines) =>
+          startIndices.concat(
+            idx
+              ? // curr line index is prev line's start + prev line's length + \n
+                startIndices[idx - 1] + lines[idx - 1].length + 1
+              : // first selected line
+                selectionStart,
+          ),
+        [] as number[],
+      )
+      .reverse();
   };
 
   const stopEvent = (event: Event) => {
