@@ -341,6 +341,10 @@ class App extends React.Component<AppProps, AppState> {
       height: window.innerHeight,
     };
 
+    this.excalidrawInstanceValue = {
+      current: this.excalidrawContainerRef.current,
+    };
+
     if (excalidrawRef) {
       const readyPromise =
         ("current" in excalidrawRef && excalidrawRef.current?.readyPromise) ||
