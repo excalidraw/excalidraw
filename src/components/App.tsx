@@ -189,7 +189,6 @@ import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 
 export type ExcalidrawInstanceValue = {
-  focus: () => void;
   excalidrawInstance: HTMLDivElement | null;
 };
 export const IsMobileContext = React.createContext(false);
@@ -872,7 +871,6 @@ class App extends React.Component<AppProps, AppState> {
   private getExcalidrawInstanceValue = () => {
     return {
       excalidrawInstance: this.excalidrawContainerRef.current,
-      focus: this.focusContainer,
     };
   };
   private onResize = withBatchedUpdates(() => {
