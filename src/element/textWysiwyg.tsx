@@ -1,4 +1,4 @@
-import { KEYS } from "../keys";
+import { CODES, KEYS } from "../keys";
 import { isWritableElement, getFontString } from "../utils";
 import Scene from "../scene/Scene";
 import { isTextElement } from "./typeChecks";
@@ -134,6 +134,7 @@ export const textWysiwyg = ({
   }
 
   editable.onkeydown = (event) => {
+    event.stopPropagation();
     if (event.key === KEYS.ESCAPE) {
       event.preventDefault();
       submittedViaKeyboard = true;
@@ -145,11 +146,14 @@ export const textWysiwyg = ({
       }
       submittedViaKeyboard = true;
       handleSubmit();
-    } else if (event.key === KEYS.ENTER && !event.altKey) {
-      event.stopPropagation();
-    } else if (event.key === KEYS.TAB) {
+    } else if (
+      event.key === KEYS.TAB ||
+      (event[KEYS.CTRL_OR_CMD] &&
+        (event.code === CODES.BRACKET_LEFT ||
+          event.code === CODES.BRACKET_RIGHT))
+    ) {
       event.preventDefault();
-      if (event.shiftKey) {
+      if (event.shiftKey || event.code === CODES.BRACKET_LEFT) {
         outdent();
       } else {
         indent();
