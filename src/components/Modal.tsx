@@ -58,7 +58,7 @@ const useBodyRoot = (theme: AppState["theme"]) => {
   const isMobileRef = useRef(isMobile);
   isMobileRef.current = isMobile;
 
-  const excalidrawInstance: HTMLDivElement | null = useExcalidrawContainer();
+  const excalidrawContainer: HTMLDivElement | null = useExcalidrawContainer();
 
   useLayoutEffect(() => {
     if (div) {
@@ -68,7 +68,7 @@ const useBodyRoot = (theme: AppState["theme"]) => {
 
   useLayoutEffect(() => {
     const isDarkTheme =
-      !!excalidrawInstance?.classList.contains("theme--dark") ||
+      !!excalidrawContainer?.classList.contains("theme--dark") ||
       theme === "dark";
     const div = document.createElement("div");
 
@@ -86,7 +86,7 @@ const useBodyRoot = (theme: AppState["theme"]) => {
     return () => {
       document.body.removeChild(div);
     };
-  }, [excalidrawInstance, theme]);
+  }, [excalidrawContainer, theme]);
 
   return div;
 };
