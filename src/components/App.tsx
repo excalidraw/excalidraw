@@ -189,7 +189,7 @@ import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 
 export type ExcalidrawInstanceValue = {
-  excalidrawInstance: HTMLDivElement | null;
+  current: HTMLDivElement | null;
 };
 export const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
@@ -313,6 +313,9 @@ class App extends React.Component<AppProps, AppState> {
   private scene: Scene;
   private resizeObserver: ResizeObserver | undefined;
   private nearestScrollableContainer: HTMLElement | Document | undefined;
+  private excalidrawInstanceValue: {
+    current: HTMLDivElement | null;
+  };
 
   constructor(props: AppProps) {
     super(props);
@@ -467,7 +470,7 @@ class App extends React.Component<AppProps, AppState> {
         }
       >
         <ExcalidrawInstanceContext.Provider
-          value={this.getExcalidrawInstanceValue()}
+          value={this.excalidrawInstanceValue}
         >
           <IsMobileContext.Provider value={this.isMobile}>
             <LayerUI
@@ -816,7 +819,9 @@ class App extends React.Component<AppProps, AppState> {
         },
       });
     }
-
+    this.excalidrawInstanceValue = {
+      current: this.excalidrawContainerRef.current,
+    };
     this.scene.addCallback(this.onSceneUpdated);
     this.addEventListeners();
 
@@ -868,11 +873,6 @@ class App extends React.Component<AppProps, AppState> {
     touchTimeout = 0;
   }
 
-  private getExcalidrawInstanceValue = () => {
-    return {
-      excalidrawInstance: this.excalidrawContainerRef.current,
-    };
-  };
   private onResize = withBatchedUpdates(() => {
     this.scene
       .getElementsIncludingDeleted()

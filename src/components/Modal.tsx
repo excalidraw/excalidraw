@@ -69,9 +69,8 @@ const useBodyRoot = (theme: AppState["theme"]) => {
 
   useLayoutEffect(() => {
     const isDarkTheme =
-      !!excalidrawInstance?.excalidrawInstance?.classList.contains(
-        "theme--dark",
-      ) || theme === "dark";
+      !!excalidrawInstance?.current?.classList.contains("theme--dark") ||
+      theme === "dark";
     const div = document.createElement("div");
 
     div.classList.add("excalidraw", "excalidraw-modal-container");
