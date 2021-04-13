@@ -4,8 +4,7 @@ import React, { useState, useLayoutEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import clsx from "clsx";
 import { KEYS } from "../keys";
-import { useExcalidrawInstance, useIsMobile } from "./App";
-import type { ExcalidrawInstanceValue } from "./App";
+import { useExcalidrawContainer, useIsMobile } from "./App";
 import { AppState } from "../types";
 
 export const Modal = (props: {
@@ -59,7 +58,7 @@ const useBodyRoot = (theme: AppState["theme"]) => {
   const isMobileRef = useRef(isMobile);
   isMobileRef.current = isMobile;
 
-  const excalidrawInstance: ExcalidrawInstanceValue | null = useExcalidrawInstance();
+  const excalidrawInstance: HTMLDivElement | null = useExcalidrawContainer();
 
   useLayoutEffect(() => {
     if (div) {
@@ -69,7 +68,7 @@ const useBodyRoot = (theme: AppState["theme"]) => {
 
   useLayoutEffect(() => {
     const isDarkTheme =
-      !!excalidrawInstance?.current?.classList.contains("theme--dark") ||
+      !!excalidrawInstance?.classList.contains("theme--dark") ||
       theme === "dark";
     const div = document.createElement("div");
 

@@ -188,16 +188,13 @@ import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 
-export type ExcalidrawInstanceValue = {
-  current: HTMLDivElement | null;
-};
 export const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
-export const ExcalidrawInstanceContext = React.createContext<ExcalidrawInstanceValue | null>(
+export const ExcalidrawContainerContext = React.createContext<HTMLDivElement | null>(
   null,
 );
-export const useExcalidrawInstance = () =>
-  useContext(ExcalidrawInstanceContext);
+export const useExcalidrawContainer = () =>
+  useContext(ExcalidrawContainerContext);
 
 const { history } = createHistory();
 
@@ -313,9 +310,6 @@ class App extends React.Component<AppProps, AppState> {
   private scene: Scene;
   private resizeObserver: ResizeObserver | undefined;
   private nearestScrollableContainer: HTMLElement | Document | undefined;
-  private excalidrawInstanceValue: {
-    current: HTMLDivElement | null;
-  };
 
   constructor(props: AppProps) {
     super(props);
@@ -339,10 +333,6 @@ class App extends React.Component<AppProps, AppState> {
       name,
       width: window.innerWidth,
       height: window.innerHeight,
-    };
-
-    this.excalidrawInstanceValue = {
-      current: this.excalidrawContainerRef.current,
     };
 
     if (excalidrawRef) {
@@ -473,8 +463,8 @@ class App extends React.Component<AppProps, AppState> {
           this.props.handleKeyboardGlobally ? undefined : this.onKeyDown
         }
       >
-        <ExcalidrawInstanceContext.Provider
-          value={this.excalidrawInstanceValue}
+        <ExcalidrawContainerContext.Provider
+          value={this.excalidrawContainerRef.current}
         >
           <IsMobileContext.Provider value={this.isMobile}>
             <LayerUI
@@ -530,7 +520,7 @@ class App extends React.Component<AppProps, AppState> {
             )}
             <main>{this.renderCanvas()}</main>
           </IsMobileContext.Provider>
-        </ExcalidrawInstanceContext.Provider>
+        </ExcalidrawContainerContext.Provider>
       </div>
     );
   }
@@ -823,9 +813,7 @@ class App extends React.Component<AppProps, AppState> {
         },
       });
     }
-    this.excalidrawInstanceValue = {
-      current: this.excalidrawContainerRef.current,
-    };
+
     this.scene.addCallback(this.onSceneUpdated);
     this.addEventListeners();
 
