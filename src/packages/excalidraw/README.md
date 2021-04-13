@@ -601,7 +601,7 @@ getSyncableElements(elements:  <a href="https://github.com/excalidraw/excalidraw
 import { getSyncableElements } from "@excalidraw/excalidraw";
 ```
 
-This function returns all the deleted elements of the scene.
+Returns all elements including deleted ones, excluding elements which are are invisibly small (e.g. width & height are zero). Useful when you want to sync elements during collaboration.
 
 #### `getElementMap`
 
