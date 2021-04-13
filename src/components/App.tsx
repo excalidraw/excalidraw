@@ -188,8 +188,13 @@ import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 
-export const IsMobileContext = React.createContext(false);
+const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
+const ExcalidrawContainerContext = React.createContext<HTMLDivElement | null>(
+  null,
+);
+export const useExcalidrawContainer = () =>
+  useContext(ExcalidrawContainerContext);
 
 const { history } = createHistory();
 
@@ -305,6 +310,7 @@ class App extends React.Component<AppProps, AppState> {
   private scene: Scene;
   private resizeObserver: ResizeObserver | undefined;
   private nearestScrollableContainer: HTMLElement | Document | undefined;
+
   constructor(props: AppProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
@@ -328,6 +334,7 @@ class App extends React.Component<AppProps, AppState> {
       width: window.innerWidth,
       height: window.innerHeight,
     };
+
     if (excalidrawRef) {
       const readyPromise =
         ("current" in excalidrawRef && excalidrawRef.current?.readyPromise) ||
@@ -456,60 +463,64 @@ class App extends React.Component<AppProps, AppState> {
           this.props.handleKeyboardGlobally ? undefined : this.onKeyDown
         }
       >
-        <IsMobileContext.Provider value={this.isMobile}>
-          <LayerUI
-            canvas={this.canvas}
-            appState={this.state}
-            setAppState={this.setAppState}
-            actionManager={this.actionManager}
-            elements={this.scene.getElements()}
-            onCollabButtonClick={onCollabButtonClick}
-            onLockToggle={this.toggleLock}
-            onInsertElements={(elements) =>
-              this.addElementsFromPasteOrLibrary(
-                elements,
-                DEFAULT_PASTE_X,
-                DEFAULT_PASTE_Y,
-              )
-            }
-            zenModeEnabled={zenModeEnabled}
-            toggleZenMode={this.toggleZenMode}
-            langCode={getLanguage().code}
-            isCollaborating={this.props.isCollaborating || false}
-            onExportToBackend={onExportToBackend}
-            renderCustomFooter={renderFooter}
-            viewModeEnabled={viewModeEnabled}
-            showExitZenModeBtn={
-              typeof this.props?.zenModeEnabled === "undefined" &&
-              zenModeEnabled
-            }
-            showThemeBtn={
-              typeof this.props?.theme === "undefined" &&
-              this.props.UIOptions.canvasActions.theme
-            }
-            libraryReturnUrl={this.props.libraryReturnUrl}
-            UIOptions={this.props.UIOptions}
-            focusContainer={this.focusContainer}
-          />
-          <div className="excalidraw-textEditorContainer" />
-          <div className="excalidraw-contextMenuContainer" />
-          {this.state.showStats && (
-            <Stats
+        <ExcalidrawContainerContext.Provider
+          value={this.excalidrawContainerRef.current}
+        >
+          <IsMobileContext.Provider value={this.isMobile}>
+            <LayerUI
+              canvas={this.canvas}
               appState={this.state}
               setAppState={this.setAppState}
+              actionManager={this.actionManager}
               elements={this.scene.getElements()}
-              onClose={this.toggleStats}
-              renderCustomStats={renderCustomStats}
+              onCollabButtonClick={onCollabButtonClick}
+              onLockToggle={this.toggleLock}
+              onInsertElements={(elements) =>
+                this.addElementsFromPasteOrLibrary(
+                  elements,
+                  DEFAULT_PASTE_X,
+                  DEFAULT_PASTE_Y,
+                )
+              }
+              zenModeEnabled={zenModeEnabled}
+              toggleZenMode={this.toggleZenMode}
+              langCode={getLanguage().code}
+              isCollaborating={this.props.isCollaborating || false}
+              onExportToBackend={onExportToBackend}
+              renderCustomFooter={renderFooter}
+              viewModeEnabled={viewModeEnabled}
+              showExitZenModeBtn={
+                typeof this.props?.zenModeEnabled === "undefined" &&
+                zenModeEnabled
+              }
+              showThemeBtn={
+                typeof this.props?.theme === "undefined" &&
+                this.props.UIOptions.canvasActions.theme
+              }
+              libraryReturnUrl={this.props.libraryReturnUrl}
+              UIOptions={this.props.UIOptions}
+              focusContainer={this.focusContainer}
             />
-          )}
-          {this.state.toastMessage !== null && (
-            <Toast
-              message={this.state.toastMessage}
-              clearToast={this.clearToast}
-            />
-          )}
-          <main>{this.renderCanvas()}</main>
-        </IsMobileContext.Provider>
+            <div className="excalidraw-textEditorContainer" />
+            <div className="excalidraw-contextMenuContainer" />
+            {this.state.showStats && (
+              <Stats
+                appState={this.state}
+                setAppState={this.setAppState}
+                elements={this.scene.getElements()}
+                onClose={this.toggleStats}
+                renderCustomStats={renderCustomStats}
+              />
+            )}
+            {this.state.toastMessage !== null && (
+              <Toast
+                message={this.state.toastMessage}
+                clearToast={this.clearToast}
+              />
+            )}
+            <main>{this.renderCanvas()}</main>
+          </IsMobileContext.Provider>
+        </ExcalidrawContainerContext.Provider>
       </div>
     );
   }
@@ -988,9 +999,10 @@ class App extends React.Component<AppProps, AppState> {
       });
     }
 
-    document
-      .querySelector(".excalidraw")
-      ?.classList.toggle("theme--dark", this.state.theme === "dark");
+    this.excalidrawContainerRef.current?.classList.toggle(
+      "theme--dark",
+      this.state.theme === "dark",
+    );
 
     if (
       this.state.editingLinearElement &&

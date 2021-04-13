@@ -13,6 +13,7 @@ import { ToolButton } from "../../components/ToolButton";
 import { t } from "../../i18n";
 import "./RoomDialog.scss";
 import Stack from "../../components/Stack";
+import { AppState } from "../../types";
 
 const getShareIcon = () => {
   const navigator = window.navigator as any;
@@ -36,6 +37,7 @@ const RoomDialog = ({
   onRoomCreate,
   onRoomDestroy,
   setErrorMessage,
+  theme,
 }: {
   handleClose: () => void;
   activeRoomLink: string;
@@ -44,6 +46,7 @@ const RoomDialog = ({
   onRoomCreate: () => void;
   onRoomDestroy: () => void;
   setErrorMessage: (message: string) => void;
+  theme: AppState["theme"];
 }) => {
   const roomLinkInput = useRef<HTMLInputElement>(null);
 
@@ -168,6 +171,7 @@ const RoomDialog = ({
       small
       onCloseRequest={handleClose}
       title={t("labels.liveCollaboration")}
+      theme={theme}
     >
       {renderRoomDialog()}
     </Dialog>

@@ -8,6 +8,7 @@ import "./Dialog.scss";
 import { back, close } from "./icons";
 import { Island } from "./Island";
 import { Modal } from "./Modal";
+import { AppState } from "../types";
 
 export const Dialog = (props: {
   children: React.ReactNode;
@@ -16,6 +17,7 @@ export const Dialog = (props: {
   onCloseRequest(): void;
   title: React.ReactNode;
   autofocus?: boolean;
+  theme?: AppState["theme"];
 }) => {
   const [islandNode, setIslandNode] = useCallbackRefState<HTMLDivElement>();
   useEffect(() => {
@@ -70,6 +72,7 @@ export const Dialog = (props: {
       labelledBy="dialog-title"
       maxWidth={props.small ? 550 : 800}
       onCloseRequest={props.onCloseRequest}
+      theme={props.theme}
     >
       <Island ref={setIslandNode}>
         <h2 id="dialog-title" className="Dialog__title">
