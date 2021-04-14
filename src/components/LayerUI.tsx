@@ -671,10 +671,6 @@ const LayerUI = ({
       {appState.showHelpDialog && (
         <HelpDialog
           onClose={() => {
-            const helpIcon = document.querySelector(
-              ".help-icon",
-            )! as HTMLElement;
-            helpIcon.focus();
             setAppState({ showHelpDialog: false });
           }}
         />

@@ -591,8 +591,6 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
   handleClose = () => {
     this.setState({ modalIsShown: false });
-    const collabIcon = document.querySelector(".CollabButton") as HTMLElement;
-    collabIcon.focus();
   };
 
   onUsernameChange = (username: string) => {
