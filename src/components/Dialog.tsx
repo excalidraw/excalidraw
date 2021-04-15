@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useCallbackRefState } from "../hooks/useCallbackRefState";
 import { t } from "../i18n";
 import { useIsMobile } from "../components/App";
@@ -20,6 +20,8 @@ export const Dialog = (props: {
   theme?: AppState["theme"];
 }) => {
   const [islandNode, setIslandNode] = useCallbackRefState<HTMLDivElement>();
+  const [lastActiveElement] = useState(document.activeElement);
+
   useEffect(() => {
     if (!islandNode) {
       return;
@@ -66,12 +68,17 @@ export const Dialog = (props: {
     return focusableElements ? Array.from(focusableElements) : [];
   };
 
+  const onClose = () => {
+    (lastActiveElement as HTMLElement).focus();
+    props.onCloseRequest();
+  };
+
   return (
     <Modal
       className={clsx("Dialog", props.className)}
       labelledBy="dialog-title"
       maxWidth={props.small ? 550 : 800}
-      onCloseRequest={props.onCloseRequest}
+      onCloseRequest={onClose}
       theme={props.theme}
     >
       <Island ref={setIslandNode}>
@@ -79,7 +86,7 @@ export const Dialog = (props: {
           <span className="Dialog__titleContent">{props.title}</span>
           <button
             className="Modal__close"
-            onClick={props.onCloseRequest}
+            onClick={onClose}
             aria-label={t("buttons.close")}
           >
             {useIsMobile() ? back : close}
