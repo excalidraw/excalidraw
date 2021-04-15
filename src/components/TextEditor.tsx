@@ -96,7 +96,7 @@ const SlateEditor = ({
     (viaKeyboard: boolean) => {
       onSubmit({
         element,
-        text: normalizeText(slateModelToString(editor.children)),
+        text: slateModelToString(editor.children),
         viaKeyboard,
       });
     },
@@ -204,11 +204,14 @@ const SlateEditor = ({
     <Slate
       editor={editor}
       value={stringToSlateModel(element.text)}
-      onChange={(value) => {
-        onChange({
-          element,
-          text: normalizeText(slateModelToString(value)),
-        });
+      onChange={(newValue) => {
+        const newText = slateModelToString(newValue);
+        if (newText !== element.text) {
+          onChange({
+            element,
+            text: newText,
+          });
+        }
       }}
     >
       {/* There's a bug in Slate preventing onBlur from firing due to
@@ -288,7 +291,7 @@ const SlateEditor = ({
 };
 
 const slateModelToString = (model: Descendant[]) => {
-  return Node.string(model[0]);
+  return normalizeText(Node.string(model[0]));
 };
 
 const stringToSlateModel = (text: string) => {

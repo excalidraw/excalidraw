@@ -1407,11 +1407,7 @@ class App extends React.Component<AppProps, AppState> {
       });
     }
 
-    if (
-      (isWritableElement(event.target) && event.key !== KEYS.ESCAPE) ||
-      // case: using arrows to move between buttons
-      (isArrowKey(event.key) && isInputLike(event.target))
-    ) {
+    if (shouldIgnoreKeyEvent(event)) {
       return;
     }
 
@@ -1530,6 +1526,10 @@ class App extends React.Component<AppProps, AppState> {
   });
 
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
+    if (shouldIgnoreKeyEvent(event)) {
+      return;
+    }
+
     if (event.key === KEYS.SPACE) {
       if (this.state.elementType === "selection") {
         resetCursor(this.canvas);
@@ -4134,6 +4134,14 @@ class App extends React.Component<AppProps, AppState> {
     this.setAppState({});
   }
 }
+
+const shouldIgnoreKeyEvent = (event: KeyboardEvent) => {
+  return (
+    (isWritableElement(event.target) && event.key !== KEYS.ESCAPE) ||
+    // case: using arrows to move between buttons
+    (isArrowKey(event.key) && isInputLike(event.target))
+  );
+};
 
 // -----------------------------------------------------------------------------
 // TEST HOOKS
