@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useCallbackRefState } from "../hooks/useCallbackRefState";
 import { t } from "../i18n";
 import { useIsMobile } from "../components/App";
@@ -20,17 +20,7 @@ export const Dialog = (props: {
   theme?: AppState["theme"];
 }) => {
   const [islandNode, setIslandNode] = useCallbackRefState<HTMLDivElement>();
-  const lastActiveElement = useRef<Element | null>(null);
-
-  const setLastActiveElement = () => {
-    if (!lastActiveElement.current) {
-      lastActiveElement.current = document.activeElement;
-    }
-  };
-
-  useEffect(() => {
-    setLastActiveElement();
-  }, []);
+  const [lastActiveElement] = useState(document.activeElement);
 
   useEffect(() => {
     if (!islandNode) {
@@ -79,7 +69,7 @@ export const Dialog = (props: {
   };
 
   const onClose = () => {
-    (lastActiveElement.current as HTMLElement).focus();
+    (lastActiveElement as HTMLElement).focus();
     props.onCloseRequest();
   };
 
