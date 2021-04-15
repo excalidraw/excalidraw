@@ -140,8 +140,11 @@ const Picker = ({
           <button
             className="color-picker-swatch"
             onClick={(event) => {
-              (event.currentTarget as HTMLButtonElement).focus();
-              onChange(_color);
+              // Only trigger onChange if this swatch doesn't have focus,
+              // otherwise onFocus will do it.
+              if (event.currentTarget === document.activeElement) {
+                onChange(_color);
+              }
             }}
             title={`${_color} — ${keyBindings[i].toUpperCase()}`}
             aria-label={_color}
