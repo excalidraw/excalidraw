@@ -4,7 +4,6 @@ import {
   getFontString,
   sceneCoordsToViewportCoords,
 } from "../utils";
-import Scene from "../scene/Scene";
 import { isTextElement } from "../element/typeChecks";
 import { CLASSES } from "../constants";
 import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
@@ -55,7 +54,8 @@ export const TextEditor = ({
     if (isTextElement(element)) {
       onInitialization(element);
     }
-  }, [element, onInitialization]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [element?.id, onInitialization]);
   if (!isTextElement(element)) {
     return null;
   }
@@ -88,7 +88,6 @@ const SlateEditor = ({
     viaKeyboard: boolean;
   }) => void;
 }) => {
-  const [updatedElement, setUpdatedElement] = useState(element);
   const [ignoreBlur, setIgnoreBlur] = useState(true);
 
   const editor = useMemo(() => withReact(createEditor()), []);
@@ -129,13 +128,6 @@ const SlateEditor = ({
     });
   }, [editor]);
 
-  const updateElementFromScene = useCallback(() => {
-    const maybeUpdatedElement = Scene.getScene(element)?.getElement(element.id);
-    if (maybeUpdatedElement != null && isTextElement(maybeUpdatedElement)) {
-      setUpdatedElement(maybeUpdatedElement);
-    }
-  }, [element]);
-
   // prevent blur when changing properties from the menu
   const onPointerDown = useCallback(
     (event: MouseEvent) => {
@@ -170,19 +162,8 @@ const SlateEditor = ({
   }, [editor, bindBlurEvent]);
 
   useEffect(() => {
-    // handle updates of textElement properties of editing element
-    return Scene.getScene(element)!.addCallback(() => {
-      updateElementFromScene();
-      try {
-        // This can throw if the component got unmounted already
-        ReactEditor.focus(editor);
-      } catch (_) {}
-    });
-  }, [element, updateElementFromScene, editor]);
-
-  useEffect(() => {
-    return onWindowResize(canvas, updateElementFromScene);
-  }, [canvas, updateElementFromScene]);
+    ReactEditor.focus(editor);
+  });
 
   useEffect(() => {
     window.addEventListener("pointerdown", onPointerDown);
@@ -190,11 +171,6 @@ const SlateEditor = ({
       window.removeEventListener("pointerdown", onPointerDown);
     };
   }, [onPointerDown]);
-
-  const stopEvent = useCallback((event: Event) => {
-    event.preventDefault();
-    event.stopPropagation();
-  }, []);
 
   useEffect(() => {
     window.addEventListener("wheel", stopEvent, {
@@ -204,17 +180,17 @@ const SlateEditor = ({
     return () => {
       window.removeEventListener("wheel", stopEvent, true);
     };
-  }, [stopEvent]);
+  }, []);
 
   const [viewportX, viewportY] = getViewportCoords(
     appState,
-    updatedElement.x,
-    updatedElement.y,
+    element.x,
+    element.y,
   );
-  const { textAlign, angle } = updatedElement;
+  const { textAlign, angle } = element;
 
-  const lines = updatedElement.text.replace(/\r\n?/g, "\n").split("\n");
-  const lineHeight = updatedElement.height / lines.length;
+  const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
+  const lineHeight = element.height / lines.length;
   const maxWidth =
     (appState.offsetLeft + appState.width - viewportX - 8) /
       appState.zoom.value -
@@ -227,10 +203,10 @@ const SlateEditor = ({
   return (
     <Slate
       editor={editor}
-      value={stringToSlateModel(updatedElement.text)}
+      value={stringToSlateModel(element.text)}
       onChange={(value) => {
         onChange({
-          element: updatedElement,
+          element,
           text: normalizeText(slateModelToString(value)),
         });
       }}
@@ -243,7 +219,6 @@ const SlateEditor = ({
           tabIndex={0}
           data-type="wysiwyg"
           wrap="off"
-          value={updatedElement.text}
           style={{
             position: "absolute",
             display: "inline-block",
@@ -260,23 +235,23 @@ const SlateEditor = ({
             whiteSpace: "pre",
             // must be specified because in dark mode canvas creates a stacking context
             zIndex: "var(--zIndex-wysiwyg)" as any,
-            font: getFontString(updatedElement),
+            font: getFontString(element),
             // must be defined *after* font ¯\_(ツ)_/¯
             lineHeight: `${lineHeight}px`,
-            width: `${updatedElement.width}px`,
-            height: `${updatedElement.height}px`,
+            width: `${element.width}px`,
+            height: `${element.height}px`,
             left: `${viewportX}px`,
             top: `${viewportY}px`,
             transform: getTransform(
-              updatedElement.width,
-              updatedElement.height,
+              element.width,
+              element.height,
               angle,
               appState,
               maxWidth,
             ),
             textAlign,
-            color: updatedElement.strokeColor,
-            opacity: updatedElement.opacity / 100,
+            color: element.strokeColor,
+            opacity: element.opacity / 100,
             filter: "var(--theme-filter)",
             maxWidth: `${maxWidth}px`,
           }}
@@ -320,29 +295,6 @@ const stringToSlateModel = (text: string) => {
   return [{ children: [{ text }] }];
 };
 
-const onWindowResize = (
-  canvas: HTMLCanvasElement | null,
-  callback: () => void,
-) => {
-  // reposition wysiwyg in case of canvas is resized. Using ResizeObserver
-  // is preferred so we catch changes from host, where window may not resize.
-  let observer: ResizeObserver | null = null;
-  if (canvas && "ResizeObserver" in window) {
-    observer = new window.ResizeObserver(() => {
-      callback();
-    });
-    observer.observe(canvas);
-    return () => {
-      observer?.disconnect();
-    };
-  }
-
-  window.addEventListener("resize", callback);
-  return () => {
-    window.removeEventListener("resize", callback);
-  };
-};
-
 const normalizeText = (text: string) => {
   return (
     text
@@ -381,4 +333,9 @@ const getViewportCoords = (appState: AppState, x: number, y: number) => {
     appState,
   );
   return [viewportX - appState.offsetLeft, viewportY - appState.offsetTop];
+};
+
+const stopEvent = (event: Event) => {
+  event.preventDefault();
+  event.stopPropagation();
 };

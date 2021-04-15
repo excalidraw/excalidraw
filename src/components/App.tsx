@@ -1632,11 +1632,11 @@ class App extends React.Component<AppProps, AppState> {
 
     // do an initial update to re-initialize element position since we were
     // modifying element's x/y for sake of editor (case: syncing to remote)
-    this.updateTextElement(element, element.text);
+    this.updateEditingTextElement(element, element.text);
   };
 
   private handleTextEditorChange = withBatchedUpdates(({ element, text }) => {
-    this.updateTextElement(element, text);
+    this.updateEditingTextElement(element, text);
     if (isNonDeletedElement(element)) {
       updateBoundElements(element);
     }
@@ -1645,7 +1645,7 @@ class App extends React.Component<AppProps, AppState> {
   private handleTextEditorSubmit = withBatchedUpdates(
     ({ element, text, viaKeyboard, isNewElement }) => {
       const isDeleted = !text.trim();
-      this.updateTextElement(element, text, isDeleted);
+      this.updateEditingTextElement(element, text, isDeleted);
       // select the created text element only if submitting via keyboard
       // (when submitting via click it should act as signal to deselect)
       if (!isDeleted && viaKeyboard) {
@@ -1672,22 +1672,27 @@ class App extends React.Component<AppProps, AppState> {
     },
   );
 
-  private updateTextElement = (
+  private updateEditingTextElement = (
     element: ExcalidrawTextElement,
     text: string,
     isDeleted = false,
   ) => {
+    let newElement = null;
     this.scene.replaceAllElements([
       ...this.scene.getElementsIncludingDeleted().map((_element) => {
         if (_element.id === element.id && isTextElement(_element)) {
-          return updateTextElement(_element, {
+          newElement = updateTextElement(_element, {
             text,
             isDeleted,
           });
+          return newElement;
         }
         return _element;
       }),
     ]);
+    if (newElement != null) {
+      this.setState({ editingElement: newElement });
+    }
   };
 
   private getTextElementAtPosition(
