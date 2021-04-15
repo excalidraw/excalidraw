@@ -6,7 +6,7 @@ import { canvasToBlob } from "../data/blob";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { CanvasError } from "../errors";
 import { t } from "../i18n";
-import { useIsMobile } from "../is-mobile";
+import { useIsMobile } from "../components/App";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { exportToCanvas, getExportSize } from "../scene/export";
 import { AppState } from "../types";
@@ -244,11 +244,9 @@ export const ExportDialog = ({
   onExportToBackend?: ExportCB;
 }) => {
   const [modalIsShown, setModalIsShown] = useState(false);
-  const triggerButton = useRef<HTMLButtonElement>(null);
 
   const handleClose = React.useCallback(() => {
     setModalIsShown(false);
-    triggerButton.current?.focus();
   }, []);
 
   return (
@@ -263,7 +261,6 @@ export const ExportDialog = ({
         aria-label={t("buttons.export")}
         showAriaLabel={useIsMobile()}
         title={t("buttons.export")}
-        ref={triggerButton}
       />
       {modalIsShown && (
         <Dialog onCloseRequest={handleClose} title={t("buttons.export")}>

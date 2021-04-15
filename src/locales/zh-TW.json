@@ -230,7 +230,8 @@
     "zoomToSelection": "縮放至選取區"
   },
   "encrypted": {
-    "tooltip": "你的作品已使用 end-to-end 方式加密，Excalidraw 的伺服器也無法取得其內容。"
+    "tooltip": "你的作品已使用 end-to-end 方式加密，Excalidraw 的伺服器也無法取得其內容。",
+    "link": ""
   },
   "stats": {
     "angle": "角度",

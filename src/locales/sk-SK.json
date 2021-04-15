@@ -92,8 +92,8 @@
     "centerHorizontally": "Zarovnať vodorovne na stred",
     "distributeHorizontally": "Rozmiestniť vodorovne",
     "distributeVertically": "Rozmiestniť zvisle",
-    "flipHorizontal": "",
-    "flipVertical": "",
+    "flipHorizontal": "Prevrátiť vodorovne",
+    "flipVertical": "Prevrátiť zvislo",
     "viewMode": "Režim zobrazenia",
     "toggleExportColorScheme": "Prepnúť exportovanie farebnej schémy",
     "share": "Zdieľať"
@@ -230,7 +230,8 @@
     "zoomToSelection": "Priblížiť na výber"
   },
   "encrypted": {
-    "tooltip": "Vaše kresby používajú end-to-end šifrovanie, takže ich Excalidraw server nedokáže prečítať."
+    "tooltip": "Vaše kresby používajú end-to-end šifrovanie, takže ich Excalidraw server nedokáže prečítať.",
+    "link": ""
   },
   "stats": {
     "angle": "Uhol",

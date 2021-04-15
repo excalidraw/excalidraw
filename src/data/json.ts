@@ -1,28 +1,31 @@
 import { fileOpen, fileSave } from "browser-fs-access";
 import { cleanAppStateForExport } from "../appState";
-import { EXPORT_DATA_TYPES, MIME_TYPES } from "../constants";
+import { EXPORT_DATA_TYPES, EXPORT_SOURCE, MIME_TYPES } from "../constants";
 import { clearElementsForExport } from "../element";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 import { loadFromBlob } from "./blob";
 import { Library } from "./library";
-import { ImportedDataState } from "./types";
+import {
+  ExportedDataState,
+  ImportedDataState,
+  ExportedLibraryData,
+} from "./types";
 
 export const serializeAsJSON = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
-): string =>
-  JSON.stringify(
-    {
-      type: EXPORT_DATA_TYPES.excalidraw,
-      version: 2,
-      source: window.location.origin,
-      elements: clearElementsForExport(elements),
-      appState: cleanAppStateForExport(appState),
-    },
-    null,
-    2,
-  );
+): string => {
+  const data: ExportedDataState = {
+    type: EXPORT_DATA_TYPES.excalidraw,
+    version: 2,
+    source: EXPORT_SOURCE,
+    elements: clearElementsForExport(elements),
+    appState: cleanAppStateForExport(appState),
+  };
+
+  return JSON.stringify(data, null, 2);
+};
 
 export const saveAsJSON = async (
   elements: readonly ExcalidrawElement[],
@@ -87,15 +90,13 @@ export const isValidLibrary = (json: any) => {
 
 export const saveLibraryAsJSON = async () => {
   const library = await Library.loadLibrary();
-  const serialized = JSON.stringify(
-    {
-      type: EXPORT_DATA_TYPES.excalidrawLibrary,
-      version: 1,
-      library,
-    },
-    null,
-    2,
-  );
+  const data: ExportedLibraryData = {
+    type: EXPORT_DATA_TYPES.excalidrawLibrary,
+    version: 1,
+    source: EXPORT_SOURCE,
+    library,
+  };
+  const serialized = JSON.stringify(data, null, 2);
   const fileName = "library.excalidrawlib";
   const blob = new Blob([serialized], {
     type: MIME_TYPES.excalidrawlib,
@@ -116,5 +117,5 @@ export const importLibraryFromJSON = async () => {
     extensions: [".json", ".excalidrawlib"],
     */
   });
-  Library.importLibrary(blob);
+  await Library.importLibrary(blob);
 };

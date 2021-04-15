@@ -92,8 +92,8 @@
     "centerHorizontally": "Centrar horizontalmente",
     "distributeHorizontally": "Distribuir horizontalmente",
     "distributeVertically": "Distribuir verticalmente",
-    "flipHorizontal": "",
-    "flipVertical": "",
+    "flipHorizontal": "Girar horizontalmente",
+    "flipVertical": "Girar verticalmente",
     "viewMode": "Modo presentación",
     "toggleExportColorScheme": "Cambiar el esquema de colores de exportación",
     "share": "Compartir"
@@ -230,7 +230,8 @@
     "zoomToSelection": "Hacer zoom a la selección"
   },
   "encrypted": {
-    "tooltip": "Tus dibujos están cifrados de punto a punto, por lo que los servidores de Excalidraw nunca los verán."
+    "tooltip": "Tus dibujos están cifrados de punto a punto, por lo que los servidores de Excalidraw nunca los verán.",
+    "link": ""
   },
   "stats": {
     "angle": "Ángulo",

@@ -70,7 +70,10 @@ export const actionFullScreen = register({
 
 export const actionShortcuts = register({
   name: "toggleShortcuts",
-  perform: (_elements, appState) => {
+  perform: (_elements, appState, _, { focusContainer }) => {
+    if (appState.showHelpDialog) {
+      focusContainer();
+    }
     return {
       appState: {
         ...appState,

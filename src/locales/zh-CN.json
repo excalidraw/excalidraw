@@ -25,7 +25,7 @@
     "strokeStyle_dashed": "虚线",
     "strokeStyle_dotted": "点虚线",
     "sloppiness": "边框",
-    "opacity": "透明度",
+    "opacity": "不透明度",
     "textAlign": "文本对齐",
     "edges": "边角",
     "sharp": "尖锐",
@@ -38,7 +38,7 @@
     "fontSize": "字体大小",
     "fontFamily": "字体",
     "onlySelected": "仅被选中",
-    "withBackground": "使用背景",
+    "withBackground": "包括背景",
     "exportEmbedScene": "将画布数据嵌入到导出的文件",
     "exportEmbedScene_details": "画布数据将被保存到导出的 PNG/SVG 文件，以便恢复。\n将会增加导出的文件大小。",
     "addWatermark": "添加 “使用 Excalidraw 创建” 水印",
@@ -61,7 +61,7 @@
     "architect": "朴素",
     "artist": "艺术",
     "cartoonist": "漫画家",
-    "fileTitle": "",
+    "fileTitle": "文件名",
     "colorPicker": "调色盘",
     "canvasBackground": "画布背景",
     "drawingCanvas": "绘制 Canvas",
@@ -92,8 +92,8 @@
     "centerHorizontally": "水平居中",
     "distributeHorizontally": "水平等距分布",
     "distributeVertically": "垂直等距分布",
-    "flipHorizontal": "",
-    "flipVertical": "",
+    "flipHorizontal": "水平翻转",
+    "flipVertical": "垂直翻转",
     "viewMode": "查看模式",
     "toggleExportColorScheme": "切换导出配色方案",
     "share": "分享"
@@ -130,7 +130,7 @@
     "exitZenMode": "退出禅模式"
   },
   "alerts": {
-    "clearReset": "这将会清除整个 画板。您是否要继续?",
+    "clearReset": "这将会清除整个画布。您是否要继续?",
     "couldNotCreateShareableLink": "无法创建共享链接",
     "couldNotCreateShareableLinkTooBig": "无法创建可共享链接：画布过大",
     "couldNotLoadInvalidFile": "无法加载无效的文件",
@@ -230,7 +230,8 @@
     "zoomToSelection": "缩放到选区"
   },
   "encrypted": {
-    "tooltip": "您的绘图采用的端到端加密，其内容对于Excalidraw服务器是不可见的。"
+    "tooltip": "您的绘图采用的端到端加密，其内容对于Excalidraw服务器是不可见的。",
+    "link": ""
   },
   "stats": {
     "angle": "角度",

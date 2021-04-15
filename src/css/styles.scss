@@ -16,6 +16,12 @@
   bottom: 0;
   left: 0;
   right: 0;
+  height: 100%;
+  width: 100%;
+
+  &:focus {
+    outline: none;
+  }
 
   // serves 2 purposes:
   // 1. prevent selecting text outside the component when double-clicking or
@@ -45,6 +51,12 @@
     image-rendering: -moz-crisp-edges; // FF
 
     z-index: var(--zIndex-canvas);
+  }
+
+  #canvas {
+    // Remove the main canvas from document flow to avoid resizeObserver
+    // feedback loop (see https://github.com/excalidraw/excalidraw/pull/3379)
+    position: absolute;
   }
 
   &.theme--dark {
@@ -472,7 +484,7 @@
     }
   }
 
-  @media #{$is-mobile-query} {
+  @include isMobile {
     aside {
       display: none;
     }

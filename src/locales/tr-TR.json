@@ -92,10 +92,10 @@
     "centerHorizontally": "Yatayda ortala",
     "distributeHorizontally": "Yatay dağıt",
     "distributeVertically": "Dikey dağıt",
-    "flipHorizontal": "",
-    "flipVertical": "",
-    "viewMode": "",
-    "toggleExportColorScheme": "",
+    "flipHorizontal": "Yatay döndür",
+    "flipVertical": "Dikey döndür",
+    "viewMode": "Görünüm modu",
+    "toggleExportColorScheme": "Renk şemasını dışa aktar/aktarma",
     "share": "Paylaş"
   },
   "buttons": {
@@ -215,22 +215,23 @@
     "curvedLine": "Eğri çizgi",
     "documentation": "Dokümantasyon",
     "drag": "sürükle",
-    "editor": "",
+    "editor": "Düzenleyici",
     "github": "Bir hata mı buldun? Bildir",
     "howto": "Rehberlerimizi takip edin",
     "or": "veya",
-    "preventBinding": "",
+    "preventBinding": "Ok bağlamayı önleyin",
     "shapes": "Şekiller",
     "shortcuts": "Klavye kısayolları",
     "textFinish": "(Metin) düzenlemeyi bitir",
     "textNewLine": "Yeni satır ekle (metin)",
     "title": "Yardım",
-    "view": "",
+    "view": "Görünüm",
     "zoomToFit": "Tüm öğeleri sığdırmak için yakınlaştır",
     "zoomToSelection": "Seçime yakınlaş"
   },
   "encrypted": {
-    "tooltip": "Çizimleriniz uçtan-uca şifrelenmiştir, Excalidraw'ın sunucuları bile onları göremez."
+    "tooltip": "Çizimleriniz uçtan-uca şifrelenmiştir, Excalidraw'ın sunucuları bile onları göremez.",
+    "link": ""
   },
   "stats": {
     "angle": "Açı",

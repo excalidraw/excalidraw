@@ -92,8 +92,8 @@
     "centerHorizontally": "Keskitä vaakasuunnassa",
     "distributeHorizontally": "Jaa vaakasuunnassa",
     "distributeVertically": "Jaa pystysuunnassa",
-    "flipHorizontal": "",
-    "flipVertical": "",
+    "flipHorizontal": "Käännä vaakasuunnassa",
+    "flipVertical": "Käännä pystysuunnassa",
     "viewMode": "Katselutila",
     "toggleExportColorScheme": "Vaihda viennin väriteema",
     "share": "Jaa"
@@ -230,7 +230,8 @@
     "zoomToSelection": "Näytä valinta"
   },
   "encrypted": {
-    "tooltip": "Piirroksesi ovat päästä-päähän-salattuja, joten Excalidrawin palvelimet eivät koskaan näe niitä."
+    "tooltip": "Piirroksesi ovat päästä-päähän-salattuja, joten Excalidrawin palvelimet eivät koskaan näe niitä.",
+    "link": ""
   },
   "stats": {
     "angle": "Kulma",

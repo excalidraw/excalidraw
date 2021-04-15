@@ -52,7 +52,11 @@
     border-radius: 6px;
     box-sizing: border-box;
 
-    @media #{$is-mobile-query} {
+    &:focus {
+      outline: none;
+    }
+
+    @include isMobile {
       max-width: 100%;
       border: 0;
       border-radius: 0;
@@ -82,7 +86,7 @@
     }
   }
 
-  @media #{$is-mobile-query} {
+  @include isMobile {
     .Modal {
       padding: 0;
     }

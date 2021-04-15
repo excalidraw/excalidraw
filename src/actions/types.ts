@@ -6,17 +6,22 @@ import { AppState, ExcalidrawProps } from "../types";
 export type ActionResult =
   | {
       elements?: readonly ExcalidrawElement[] | null;
-      appState?: MarkOptional<AppState, "offsetTop" | "offsetLeft"> | null;
+      appState?: MarkOptional<
+        AppState,
+        "offsetTop" | "offsetLeft" | "width" | "height"
+      > | null;
       commitToHistory: boolean;
       syncHistory?: boolean;
     }
   | false;
 
+type AppAPI = { canvas: HTMLCanvasElement | null; focusContainer(): void };
+
 type ActionFn = (
   elements: readonly ExcalidrawElement[],
   appState: Readonly<AppState>,
   formData: any,
-  app: { canvas: HTMLCanvasElement | null },
+  app: AppAPI,
 ) => ActionResult | Promise<ActionResult>;
 
 export type UpdaterFn = (res: ActionResult) => void;
@@ -103,7 +108,7 @@ export interface Action {
   perform: ActionFn;
   keyPriority?: number;
   keyTest?: (
-    event: KeyboardEvent,
+    event: React.KeyboardEvent | KeyboardEvent,
     appState: AppState,
     elements: readonly ExcalidrawElement[],
   ) => boolean;
@@ -118,6 +123,6 @@ export interface Action {
 export interface ActionsManagerInterface {
   actions: Record<ActionName, Action>;
   registerAction: (action: Action) => void;
-  handleKeyDown: (event: KeyboardEvent) => boolean;
+  handleKeyDown: (event: React.KeyboardEvent | KeyboardEvent) => boolean;
   renderAction: (name: ActionName) => React.ReactElement | null;
 }

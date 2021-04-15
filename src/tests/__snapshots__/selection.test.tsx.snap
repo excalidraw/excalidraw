@@ -36,8 +36,8 @@ Object {
   "version": 3,
   "versionNonce": 449462985,
   "width": 30,
-  "x": 30,
-  "y": 20,
+  "x": 10,
+  "y": 10,
 }
 `;
 
@@ -77,8 +77,8 @@ Object {
   "version": 3,
   "versionNonce": 449462985,
   "width": 30,
-  "x": 30,
-  "y": 20,
+  "x": 10,
+  "y": 10,
 }
 `;
 
@@ -103,8 +103,8 @@ Object {
   "version": 2,
   "versionNonce": 1278240551,
   "width": 30,
-  "x": 30,
-  "y": 20,
+  "x": 10,
+  "y": 10,
 }
 `;
 
@@ -129,8 +129,8 @@ Object {
   "version": 2,
   "versionNonce": 1278240551,
   "width": 30,
-  "x": 30,
-  "y": 20,
+  "x": 10,
+  "y": 10,
 }
 `;
 
@@ -155,7 +155,7 @@ Object {
   "version": 2,
   "versionNonce": 1278240551,
   "width": 30,
-  "x": 30,
-  "y": 20,
+  "x": 10,
+  "y": 10,
 }
 `;

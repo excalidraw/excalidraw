@@ -14,10 +14,16 @@ import { Library } from "../data/library";
 import { isTextElement, showSelectedShapeActions } from "../element";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { Language, t } from "../i18n";
-import { useIsMobile } from "../is-mobile";
+import { useIsMobile } from "../components/App";
 import { calculateScrollCenter, getSelectedElements } from "../scene";
 import { ExportType } from "../scene/types";
-import { AppState, ExcalidrawProps, LibraryItem, LibraryItems } from "../types";
+import {
+  AppProps,
+  AppState,
+  ExcalidrawProps,
+  LibraryItem,
+  LibraryItems,
+} from "../types";
 import { muteFSAbortError } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher, ZoomActions } from "./Actions";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
@@ -65,6 +71,8 @@ interface LayerUIProps {
   renderCustomFooter?: (isMobile: boolean) => JSX.Element;
   viewModeEnabled: boolean;
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
+  UIOptions: AppProps["UIOptions"];
+  focusContainer: () => void;
 }
 
 const useOnClickOutside = (
@@ -104,6 +112,7 @@ const LibraryMenuItems = ({
   setAppState,
   setLibraryItems,
   libraryReturnUrl,
+  focusContainer,
 }: {
   library: LibraryItems;
   pendingElements: LibraryItem;
@@ -113,6 +122,7 @@ const LibraryMenuItems = ({
   setAppState: React.Component<any, AppState>["setState"];
   setLibraryItems: (library: LibraryItems) => void;
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
+  focusContainer: () => void;
 }) => {
   const isMobile = useIsMobile();
   const numCells = library.length + (pendingElements.length > 0 ? 1 : 0);
@@ -135,9 +145,9 @@ const LibraryMenuItems = ({
         onClick={() => {
           importLibraryFromJSON()
             .then(() => {
-              // Maybe we should close and open the menu so that the items get updated.
-              // But for now we just close the menu.
+              // Close and then open to get the libraries updated
               setAppState({ isLibraryOpen: false });
+              setAppState({ isLibraryOpen: true });
             })
             .catch(muteFSAbortError)
             .catch((error) => {
@@ -171,6 +181,7 @@ const LibraryMenuItems = ({
               if (window.confirm(t("alerts.resetLibrary"))) {
                 Library.resetLibrary();
                 setLibraryItems([]);
+                focusContainer();
               }
             }}
           />
@@ -235,6 +246,7 @@ const LibraryMenu = ({
   onAddToLibrary,
   setAppState,
   libraryReturnUrl,
+  focusContainer,
 }: {
   pendingElements: LibraryItem;
   onClickOutside: (event: MouseEvent) => void;
@@ -242,6 +254,7 @@ const LibraryMenu = ({
   onAddToLibrary: () => void;
   setAppState: React.Component<any, AppState>["setState"];
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
+  focusContainer: () => void;
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   useOnClickOutside(ref, (event) => {
@@ -315,6 +328,7 @@ const LibraryMenu = ({
           setAppState={setAppState}
           setLibraryItems={setLibraryItems}
           libraryReturnUrl={libraryReturnUrl}
+          focusContainer={focusContainer}
         />
       )}
     </Island>
@@ -339,6 +353,8 @@ const LayerUI = ({
   renderCustomFooter,
   viewModeEnabled,
   libraryReturnUrl,
+  UIOptions,
+  focusContainer,
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
@@ -350,6 +366,7 @@ const LayerUI = ({
       href="https://blog.excalidraw.com/end-to-end-encryption/"
       target="_blank"
       rel="noopener noreferrer"
+      aria-label={t("encrypted.link")}
     >
       <Tooltip label={t("encrypted.tooltip")} position="above" long={true}>
         {shield}
@@ -358,6 +375,10 @@ const LayerUI = ({
   );
 
   const renderExportDialog = () => {
+    if (!UIOptions.canvasActions.export) {
+      return null;
+    }
+
     const createExporter = (type: ExportType): ExportCB => async (
       exportedElements,
       scale,
@@ -504,6 +525,7 @@ const LayerUI = ({
       onAddToLibrary={deselectItems}
       setAppState={setAppState}
       libraryReturnUrl={libraryReturnUrl}
+      focusContainer={focusContainer}
     />
   ) : null;
 
@@ -647,7 +669,11 @@ const LayerUI = ({
         />
       )}
       {appState.showHelpDialog && (
-        <HelpDialog onClose={() => setAppState({ showHelpDialog: false })} />
+        <HelpDialog
+          onClose={() => {
+            setAppState({ showHelpDialog: false });
+          }}
+        />
       )}
       {appState.pasteDialog.shown && (
         <PasteChartDialog

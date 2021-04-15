@@ -1,26 +1,29 @@
 import { ExcalidrawElement } from "../element/types";
 import { AppState, LibraryItems } from "../types";
+import type { cleanAppStateForExport } from "../appState";
 
-export interface DataState {
-  type?: string;
-  version?: string;
-  source?: string;
+export interface ExportedDataState {
+  type: string;
+  version: number;
+  source: string;
   elements: readonly ExcalidrawElement[];
-  appState: MarkOptional<AppState, "offsetTop" | "offsetLeft">;
+  appState: ReturnType<typeof cleanAppStateForExport>;
 }
 
 export interface ImportedDataState {
   type?: string;
-  version?: string;
+  version?: number;
   source?: string;
-  elements?: DataState["elements"] | null;
-  appState?: Partial<DataState["appState"]> | null;
+  elements?: readonly ExcalidrawElement[] | null;
+  appState?: Readonly<Partial<AppState>> | null;
   scrollToContent?: boolean;
 }
 
-export interface LibraryData {
-  type?: string;
-  version?: number;
-  source?: string;
-  library?: LibraryItems;
+export interface ExportedLibraryData {
+  type: string;
+  version: number;
+  source: string;
+  library: LibraryItems;
 }
+
+export interface ImportedLibraryData extends Partial<ExportedLibraryData> {}

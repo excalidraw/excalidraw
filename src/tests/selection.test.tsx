@@ -1,6 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { render, fireEvent } from "./test-utils";
+import {
+  render,
+  fireEvent,
+  mockBoundingClientRect,
+  restoreOriginalGetBoundingClientRect,
+} from "./test-utils";
 import ExcalidrawApp from "../excalidraw-app";
 import * as Renderer from "../renderer/renderScene";
 import { KEYS } from "../keys";
@@ -77,6 +82,14 @@ describe("selection element", () => {
 });
 
 describe("select single element on the scene", () => {
+  beforeAll(() => {
+    mockBoundingClientRect();
+  });
+
+  afterAll(() => {
+    restoreOriginalGetBoundingClientRect();
+  });
+
   it("rectangle", async () => {
     const { getByToolName, container } = await render(<ExcalidrawApp />);
     const canvas = container.querySelector("canvas")!;
@@ -87,7 +100,9 @@ describe("select single element on the scene", () => {
       fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
       fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
       fireEvent.pointerUp(canvas);
-      fireEvent.keyDown(document, { key: KEYS.ESCAPE });
+      fireEvent.keyDown(document, {
+        key: KEYS.ESCAPE,
+      });
     }
 
     const tool = getByToolName("selection");
@@ -114,7 +129,9 @@ describe("select single element on the scene", () => {
       fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
       fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
       fireEvent.pointerUp(canvas);
-      fireEvent.keyDown(document, { key: KEYS.ESCAPE });
+      fireEvent.keyDown(document, {
+        key: KEYS.ESCAPE,
+      });
     }
 
     const tool = getByToolName("selection");
@@ -141,7 +158,9 @@ describe("select single element on the scene", () => {
       fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
       fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
       fireEvent.pointerUp(canvas);
-      fireEvent.keyDown(document, { key: KEYS.ESCAPE });
+      fireEvent.keyDown(document, {
+        key: KEYS.ESCAPE,
+      });
     }
 
     const tool = getByToolName("selection");
@@ -168,7 +187,9 @@ describe("select single element on the scene", () => {
       fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
       fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
       fireEvent.pointerUp(canvas);
-      fireEvent.keyDown(document, { key: KEYS.ESCAPE });
+      fireEvent.keyDown(document, {
+        key: KEYS.ESCAPE,
+      });
     }
 
     /*
@@ -207,7 +228,9 @@ describe("select single element on the scene", () => {
       fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
       fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
       fireEvent.pointerUp(canvas);
-      fireEvent.keyDown(document, { key: KEYS.ESCAPE });
+      fireEvent.keyDown(document, {
+        key: KEYS.ESCAPE,
+      });
     }
 
     /*

@@ -245,10 +245,10 @@ const importFromBackend = async (
 export const loadScene = async (
   id: string | null,
   privateKey: string | null,
-  // Supply initialData even if importing from backend to ensure we restore
+  // Supply local state even if importing from backend to ensure we restore
   // localStorage user settings which we do not persist on server.
   // Non-optional so we don't forget to pass it even if `undefined`.
-  initialData: ImportedDataState | undefined | null,
+  localDataState: ImportedDataState | undefined | null,
 ) => {
   let data;
   if (id != null) {
@@ -256,10 +256,10 @@ export const loadScene = async (
     // extra care not to leak it
     data = restore(
       await importFromBackend(id, privateKey),
-      initialData?.appState,
+      localDataState?.appState,
     );
   } else {
-    data = restore(initialData || null, null);
+    data = restore(localDataState || null, null);
   }
 
   return {

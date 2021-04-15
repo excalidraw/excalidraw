@@ -230,7 +230,8 @@
     "zoomToSelection": "Zoom til utvalg"
   },
   "encrypted": {
-    "tooltip": "Dine tegninger er ende-til-ende-krypterte slik at Excalidraw sine servere aldri vil se dem."
+    "tooltip": "Dine tegninger er ende-til-ende-krypterte slik at Excalidraw sine servere aldri vil se dem.",
+    "link": "Blogginnlegg om ende-til-ende-kryptering i Excalidraw"
   },
   "stats": {
     "angle": "Vinkel",
