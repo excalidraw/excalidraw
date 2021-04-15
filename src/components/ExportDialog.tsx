@@ -244,11 +244,9 @@ export const ExportDialog = ({
   onExportToBackend?: ExportCB;
 }) => {
   const [modalIsShown, setModalIsShown] = useState(false);
-  const triggerButton = useRef<HTMLButtonElement>(null);
 
   const handleClose = React.useCallback(() => {
     setModalIsShown(false);
-    triggerButton.current?.focus();
   }, []);
 
   return (
@@ -263,7 +261,6 @@ export const ExportDialog = ({
         aria-label={t("buttons.export")}
         showAriaLabel={useIsMobile()}
         title={t("buttons.export")}
-        ref={triggerButton}
       />
       {modalIsShown && (
         <Dialog onCloseRequest={handleClose} title={t("buttons.export")}>
