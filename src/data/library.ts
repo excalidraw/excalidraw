@@ -6,17 +6,17 @@ import { getNonDeletedElements } from "../element";
 import { NonDeleted, ExcalidrawElement } from "../element/types";
 import { nanoid } from "nanoid";
 
-export class Library {
-  private static libraryCache: LibraryItems | null = null;
-  public static csrfToken = nanoid();
+class Library {
+  private libraryCache: LibraryItems | null = null;
+  public csrfToken = nanoid();
 
-  static resetLibrary = () => {
-    Library.libraryCache = null;
+  resetLibrary = () => {
+    this.libraryCache = null;
     localStorage.removeItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY);
   };
 
   /** imports library (currently merges, removing duplicates) */
-  static async importLibrary(blob: Blob) {
+  async importLibrary(blob: Blob) {
     const libraryFile = await loadLibraryFromBlob(blob);
     if (!libraryFile || !libraryFile.library) {
       return;
@@ -46,7 +46,7 @@ export class Library {
       });
     };
 
-    const existingLibraryItems = await Library.loadLibrary();
+    const existingLibraryItems = await this.loadLibrary();
 
     const filtered = libraryFile.library!.reduce((acc, libraryItem) => {
       const restored = getNonDeletedElements(restoreElements(libraryItem));
@@ -56,13 +56,13 @@ export class Library {
       return acc;
     }, [] as (readonly NonDeleted<ExcalidrawElement>[])[]);
 
-    Library.saveLibrary([...existingLibraryItems, ...filtered]);
+    this.saveLibrary([...existingLibraryItems, ...filtered]);
   }
 
-  static loadLibrary = (): Promise<LibraryItems> => {
+  loadLibrary = (): Promise<LibraryItems> => {
     return new Promise(async (resolve) => {
-      if (Library.libraryCache) {
-        return resolve(JSON.parse(JSON.stringify(Library.libraryCache)));
+      if (this.libraryCache) {
+        return resolve(JSON.parse(JSON.stringify(this.libraryCache)));
       }
 
       try {
@@ -76,7 +76,7 @@ export class Library {
         ) as Mutable<LibraryItems>;
 
         // clone to ensure we don't mutate the cached library elements in the app
-        Library.libraryCache = JSON.parse(JSON.stringify(items));
+        this.libraryCache = JSON.parse(JSON.stringify(items));
 
         resolve(items);
       } catch (error) {
@@ -86,17 +86,19 @@ export class Library {
     });
   };
 
-  static saveLibrary = (items: LibraryItems) => {
-    const prevLibraryItems = Library.libraryCache;
+  saveLibrary = (items: LibraryItems) => {
+    const prevLibraryItems = this.libraryCache;
     try {
       const serializedItems = JSON.stringify(items);
       // cache optimistically so that consumers have access to the latest
       // immediately
-      Library.libraryCache = JSON.parse(serializedItems);
+      this.libraryCache = JSON.parse(serializedItems);
       localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY, serializedItems);
     } catch (error) {
-      Library.libraryCache = prevLibraryItems;
+      this.libraryCache = prevLibraryItems;
       console.error(error);
     }
   };
 }
+
+export default Library;

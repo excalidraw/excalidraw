@@ -68,7 +68,7 @@ import {
 } from "../constants";
 import { loadFromBlob } from "../data";
 import { isValidLibrary } from "../data/json";
-import { Library } from "../data/library";
+import Library from "../data/library";
 import { restore } from "../data/restore";
 import {
   dragNewElement,
@@ -310,6 +310,7 @@ class App extends React.Component<AppProps, AppState> {
   private scene: Scene;
   private resizeObserver: ResizeObserver | undefined;
   private nearestScrollableContainer: HTMLElement | Document | undefined;
+  public library: Library;
 
   constructor(props: AppProps) {
     super(props);
@@ -364,6 +365,7 @@ class App extends React.Component<AppProps, AppState> {
       readyPromise.resolve(api);
     }
     this.scene = new Scene();
+    this.library = new Library();
 
     this.actionManager = new ActionManager(
       this.syncActionResult,
@@ -500,6 +502,7 @@ class App extends React.Component<AppProps, AppState> {
               libraryReturnUrl={this.props.libraryReturnUrl}
               UIOptions={this.props.UIOptions}
               focusContainer={this.focusContainer}
+              library={this.library}
             />
             <div className="excalidraw-textEditorContainer" />
             <div className="excalidraw-contextMenuContainer" />
@@ -660,12 +663,12 @@ class App extends React.Component<AppProps, AppState> {
         throw new Error();
       }
       if (
-        token === Library.csrfToken ||
+        token === this.library.csrfToken ||
         window.confirm(
           t("alerts.confirmAddLibrary", { numShapes: json.library.length }),
         )
       ) {
-        await Library.importLibrary(blob);
+        await this.library.importLibrary(blob);
         // hack to rerender the library items after import
         if (this.state.isLibraryOpen) {
           this.setState({ isLibraryOpen: false });
@@ -3713,7 +3716,8 @@ class App extends React.Component<AppProps, AppState> {
       file?.type === MIME_TYPES.excalidrawlib ||
       file?.name?.endsWith(".excalidrawlib")
     ) {
-      Library.importLibrary(file)
+      this.library
+        .importLibrary(file)
         .then(() => {
           // Close and then open to get the libraries updated
           this.setState({ isLibraryOpen: false });
@@ -4248,7 +4252,6 @@ declare global {
       setState: React.Component<any, AppState>["setState"];
       history: SceneHistory;
       app: InstanceType<typeof App>;
-      library: typeof Library;
     };
   }
 }
@@ -4272,10 +4275,6 @@ if (
     history: {
       configurable: true,
       get: () => history,
-    },
-    library: {
-      configurable: true,
-      value: Library,
     },
   });
 }
