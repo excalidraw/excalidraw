@@ -96,11 +96,34 @@ These instructions will get you a copy of the project up and running on your loc
 - [Yarn](https://yarnpkg.com/getting-started/install)
 - [Git](https://git-scm.com/downloads)
 
+make sure you have all the above dependencies in your system.
+
 #### Clone the repo
 
 ```bash
 git clone https://github.com/excalidraw/excalidraw.git
 ```
+
+#### Install the dependencies
+
+```bash
+yarn
+```
+
+#### Start the server
+
+```bash
+yarn start
+```
+
+Thats it now you can open [http://localhost:3000](http://localhost:3000) and start coding in your favorite code editor.
+
+In case you don't have a code editor, below is the list of few code editors/ IDE's which you might want to check
+
+1. [vscode](https://code.visualstudio.com/download)
+2. [sublime](https://www.sublimetext.com/)
+3. [webstorm](https://www.jetbrains.com/webstorm/)
+4. [Atom](https://atom.io/)
 
 #### Commands
 
