@@ -433,12 +433,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   public render() {
-    const {
-      zenModeEnabled,
-      width: canvasDOMWidth,
-      height: canvasDOMHeight,
-      viewModeEnabled,
-    } = this.state;
+    const { zenModeEnabled, viewModeEnabled } = this.state;
 
     const {
       onCollabButtonClick,
@@ -446,9 +441,6 @@ class App extends React.Component<AppProps, AppState> {
       renderFooter,
       renderCustomStats,
     } = this.props;
-
-    const DEFAULT_PASTE_X = canvasDOMWidth / 2;
-    const DEFAULT_PASTE_Y = canvasDOMHeight / 2;
 
     return (
       <div
@@ -476,11 +468,10 @@ class App extends React.Component<AppProps, AppState> {
               onCollabButtonClick={onCollabButtonClick}
               onLockToggle={this.toggleLock}
               onInsertElements={(elements) =>
-                this.addElementsFromPasteOrLibrary(
+                this.addElementsFromPasteOrLibrary({
                   elements,
-                  DEFAULT_PASTE_X,
-                  DEFAULT_PASTE_Y,
-                )
+                  position: "center",
+                })
               }
               zenModeEnabled={zenModeEnabled}
               toggleZenMode={this.toggleZenMode}
@@ -1251,7 +1242,10 @@ class App extends React.Component<AppProps, AppState> {
           },
         });
       } else if (data.elements) {
-        this.addElementsFromPasteOrLibrary(data.elements);
+        this.addElementsFromPasteOrLibrary({
+          elements: data.elements,
+          position: "cursor",
+        });
       } else if (data.text) {
         this.addTextFromPaste(data.text);
       }
@@ -1260,15 +1254,27 @@ class App extends React.Component<AppProps, AppState> {
     },
   );
 
-  private addElementsFromPasteOrLibrary = (
-    clipboardElements: readonly ExcalidrawElement[],
-    clientX = cursorX,
-    clientY = cursorY,
-  ) => {
-    const [minX, minY, maxX, maxY] = getCommonBounds(clipboardElements);
+  private addElementsFromPasteOrLibrary = (opts: {
+    elements: readonly ExcalidrawElement[];
+    position: { clientX: number; clientY: number } | "cursor" | "center";
+  }) => {
+    const [minX, minY, maxX, maxY] = getCommonBounds(opts.elements);
 
     const elementsCenterX = distance(minX, maxX) / 2;
     const elementsCenterY = distance(minY, maxY) / 2;
+
+    const clientX =
+      typeof opts.position === "object"
+        ? opts.position.clientX
+        : opts.position === "cursor"
+        ? cursorX
+        : this.state.width / 2 + this.state.offsetLeft;
+    const clientY =
+      typeof opts.position === "object"
+        ? opts.position.clientY
+        : opts.position === "cursor"
+        ? cursorY
+        : this.state.height / 2 + this.state.offsetTop;
 
     const { x, y } = viewportCoordsToSceneCoords(
       { clientX, clientY },
@@ -1282,7 +1288,7 @@ class App extends React.Component<AppProps, AppState> {
     const [gridX, gridY] = getGridPoint(dx, dy, this.state.gridSize);
 
     const oldIdToDuplicatedId = new Map();
-    const newElements = clipboardElements.map((element) => {
+    const newElements = opts.elements.map((element) => {
       const newElement = duplicateElement(
         this.state.editingGroupId,
         groupIdMap,
@@ -1301,7 +1307,7 @@ class App extends React.Component<AppProps, AppState> {
     ];
     fixBindingsAfterDuplication(
       nextElements,
-      clipboardElements,
+      opts.elements,
       oldIdToDuplicatedId,
     );
 
@@ -1455,8 +1461,8 @@ class App extends React.Component<AppProps, AppState> {
 
   private updateCurrentCursorPosition = withBatchedUpdates(
     (event: MouseEvent) => {
-      cursorX = event.x;
-      cursorY = event.y;
+      cursorX = event.clientX;
+      cursorY = event.clientY;
     },
   );
 
@@ -3700,11 +3706,10 @@ class App extends React.Component<AppProps, AppState> {
 
     const libraryShapes = event.dataTransfer.getData(MIME_TYPES.excalidrawlib);
     if (libraryShapes !== "") {
-      this.addElementsFromPasteOrLibrary(
-        JSON.parse(libraryShapes),
-        event.clientX,
-        event.clientY,
-      );
+      this.addElementsFromPasteOrLibrary({
+        elements: JSON.parse(libraryShapes),
+        position: event,
+      });
       return;
     }
 
