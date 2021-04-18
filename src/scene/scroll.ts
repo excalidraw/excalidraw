@@ -3,7 +3,7 @@ import { ExcalidrawElement } from "../element/types";
 import {
   getCommonBounds,
   getClosestElementBounds,
-  getNonDeletedElements,
+  getVisibleElements,
 } from "../element";
 
 import {
@@ -57,7 +57,7 @@ export const calculateScrollCenter = (
   appState: AppState,
   canvas: HTMLCanvasElement | null,
 ): { scrollX: number; scrollY: number } => {
-  elements = getNonDeletedElements(elements);
+  elements = getVisibleElements(elements);
 
   if (!elements.length) {
     return {
