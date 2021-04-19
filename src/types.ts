@@ -197,6 +197,8 @@ export interface ExcalidrawProps {
   UIOptions?: UIOptions;
   detectScroll?: boolean;
   handleKeyboardGlobally?: boolean;
+  resetLibrary?: () => void;
+  addToLibrary?: (libraryItems: LibraryItems) => void;
 }
 
 export type SceneData = {

@@ -1,18 +1,23 @@
 import { loadLibraryFromBlob } from "./blob";
 import { LibraryItems, LibraryItem } from "../types";
 import { restoreElements } from "./restore";
-import { STORAGE_KEYS } from "../constants";
 import { getNonDeletedElements } from "../element";
 import { NonDeleted, ExcalidrawElement } from "../element/types";
 import { nanoid } from "nanoid";
+import App from "../components/App";
 
 class Library {
   private libraryCache: LibraryItems | null = null;
   public csrfToken = nanoid();
+  private app: any;
+
+  constructor(app: App) {
+    this.app = app;
+  }
 
   resetLibrary = () => {
+    this.app?.props?.resetLibrary?.();
     this.libraryCache = null;
-    localStorage.removeItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY);
   };
 
   /** imports library (currently merges, removing duplicates) */
@@ -66,12 +71,12 @@ class Library {
       }
 
       try {
-        const data = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY);
-        if (!data) {
+        const libraryItems = this.app?.libraryItemsFromStorage;
+        if (!libraryItems) {
           return resolve([]);
         }
 
-        const items = (JSON.parse(data) as LibraryItems).map((elements) =>
+        const items = libraryItems.map((elements: ExcalidrawElement[]) =>
           restoreElements(elements),
         ) as Mutable<LibraryItems>;
 
@@ -87,13 +92,14 @@ class Library {
   };
 
   saveLibrary = (items: LibraryItems) => {
+    this.app?.props?.addToLibrary?.(items);
+
     const prevLibraryItems = this.libraryCache;
     try {
       const serializedItems = JSON.stringify(items);
       // cache optimistically so that consumers have access to the latest
       // immediately
       this.libraryCache = JSON.parse(serializedItems);
-      localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY, serializedItems);
     } catch (error) {
       this.libraryCache = prevLibraryItems;
       console.error(error);

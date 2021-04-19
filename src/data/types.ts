@@ -17,6 +17,7 @@ export interface ImportedDataState {
   elements?: readonly ExcalidrawElement[] | null;
   appState?: Readonly<Partial<AppState>> | null;
   scrollToContent?: boolean;
+  libraryItems?: LibraryItems;
 }
 
 export interface ExportedLibraryData {

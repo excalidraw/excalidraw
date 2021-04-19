@@ -164,7 +164,14 @@ import Scene from "../scene/Scene";
 import { SceneState, ScrollBars } from "../scene/types";
 import { getNewZoom } from "../scene/zoom";
 import { findShapeByKey } from "../shapes";
-import { AppProps, AppState, Gesture, GestureEvent, SceneData } from "../types";
+import {
+  AppProps,
+  AppState,
+  Gesture,
+  GestureEvent,
+  LibraryItems,
+  SceneData,
+} from "../types";
 import {
   debounce,
   distance,
@@ -311,6 +318,7 @@ class App extends React.Component<AppProps, AppState> {
   private resizeObserver: ResizeObserver | undefined;
   private nearestScrollableContainer: HTMLElement | Document | undefined;
   public library: Library;
+  public libraryItemsFromStorage: LibraryItems | undefined;
 
   constructor(props: AppProps) {
     super(props);
@@ -365,7 +373,7 @@ class App extends React.Component<AppProps, AppState> {
       readyPromise.resolve(api);
     }
     this.scene = new Scene();
-    this.library = new Library();
+    this.library = new Library(this);
 
     this.actionManager = new ActionManager(
       this.syncActionResult,
@@ -737,6 +745,9 @@ class App extends React.Component<AppProps, AppState> {
     let initialData = null;
     try {
       initialData = (await this.props.initialData) || null;
+      if (initialData?.libraryItems) {
+        this.libraryItemsFromStorage = initialData.libraryItems;
+      }
     } catch (error) {
       console.error(error);
       initialData = {

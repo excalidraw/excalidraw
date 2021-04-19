@@ -32,6 +32,8 @@ const Excalidraw = (props: ExcalidrawProps) => {
     onPaste,
     detectScroll = true,
     handleKeyboardGlobally = false,
+    resetLibrary,
+    addToLibrary,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -84,6 +86,8 @@ const Excalidraw = (props: ExcalidrawProps) => {
         onPaste={onPaste}
         detectScroll={detectScroll}
         handleKeyboardGlobally={handleKeyboardGlobally}
+        resetLibrary={resetLibrary}
+        addToLibrary={addToLibrary}
       />
     </InitializeApp>
   );

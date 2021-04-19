@@ -14,6 +14,7 @@ import { TopErrorBoundary } from "../components/TopErrorBoundary";
 import {
   APP_NAME,
   EVENT,
+  STORAGE_KEYS,
   TITLE_TIMEOUT,
   URL_HASH_KEYS,
   VERSION_TIMEOUT,
@@ -30,7 +31,7 @@ import Excalidraw, {
   defaultLang,
   languages,
 } from "../packages/excalidraw/index";
-import { AppState } from "../types";
+import { AppState, LibraryItems } from "../types";
 import {
   debounce,
   getVersion,
@@ -195,6 +196,18 @@ const ExcalidrawWrapper = () => {
     }
 
     initializeScene({ collabAPI }).then((scene) => {
+      if (scene) {
+        try {
+          scene.libraryItems =
+            JSON.parse(
+              localStorage.getItem(
+                STORAGE_KEYS.LOCAL_STORAGE_LIBRARY,
+              ) as string,
+            ) || [];
+        } catch (e) {
+          console.error(e);
+        }
+      }
       initialStatePromiseRef.current.promise.resolve(scene);
     });
 
@@ -310,6 +323,20 @@ const ExcalidrawWrapper = () => {
     );
   };
 
+  const resetlibrary = () => {
+    localStorage.removeItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY);
+  };
+
+  const addToLibrary = (items: LibraryItems) => {
+    try {
+      const serializedItems = JSON.stringify(items);
+      // cache optimistically so that consumers have access to the latest
+      // immediately
+      localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY, serializedItems);
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
     <>
       <Excalidraw
@@ -325,6 +352,8 @@ const ExcalidrawWrapper = () => {
         renderCustomStats={renderCustomStats}
         detectScroll={false}
         handleKeyboardGlobally={true}
+        resetLibrary={resetlibrary}
+        addToLibrary={addToLibrary}
       />
       {excalidrawAPI && <CollabWrapper excalidrawAPI={excalidrawAPI} />}
       {errorMessage && (
