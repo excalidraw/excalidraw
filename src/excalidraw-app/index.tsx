@@ -330,8 +330,6 @@ const ExcalidrawWrapper = () => {
   const addToLibrary = (items: LibraryItems) => {
     try {
       const serializedItems = JSON.stringify(items);
-      // cache optimistically so that consumers have access to the latest
-      // immediately
       localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY, serializedItems);
     } catch (error) {
       console.error(error);
