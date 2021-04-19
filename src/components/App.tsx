@@ -78,7 +78,6 @@ import {
   getCursorForResizingElement,
   getDragOffsetXY,
   getElementWithTransformHandleType,
-  getNonDeletedElements,
   getNormalizedDimensions,
   getPerfectElementSize,
   getResizeArrowDirection,
@@ -1402,11 +1401,7 @@ class App extends React.Component<AppProps, AppState> {
 
   setScrollToContent = (remoteElements: readonly ExcalidrawElement[]) => {
     this.setState({
-      ...calculateScrollCenter(
-        getNonDeletedElements(remoteElements),
-        this.state,
-        this.canvas,
-      ),
+      ...calculateScrollCenter(remoteElements, this.state, this.canvas),
     });
   };
 
