@@ -77,6 +77,11 @@ export const getElementMap = (elements: readonly ExcalidrawElement[]) =>
 export const getSceneVersion = (elements: readonly ExcalidrawElement[]) =>
   elements.reduce((acc, el) => acc + el.version, 0);
 
+export const getVisibleElements = (elements: readonly ExcalidrawElement[]) =>
+  elements.filter(
+    (el) => !el.isDeleted && !isInvisiblySmallElement(el),
+  ) as readonly NonDeletedExcalidrawElement[];
+
 export const getNonDeletedElements = (elements: readonly ExcalidrawElement[]) =>
   elements.filter(
     (element) => !element.isDeleted,
