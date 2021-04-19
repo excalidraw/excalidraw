@@ -9,14 +9,14 @@ import App from "../components/App";
 class Library {
   private libraryCache: LibraryItems | null = null;
   public csrfToken = nanoid();
-  private app: any;
+  private app: App;
 
   constructor(app: App) {
     this.app = app;
   }
 
   resetLibrary = () => {
-    this.app?.props?.resetLibrary?.();
+    this.app.props.resetLibrary?.();
     this.libraryCache = null;
   };
 
@@ -71,14 +71,14 @@ class Library {
       }
 
       try {
-        const libraryItems = this.app?.libraryItemsFromStorage;
+        const libraryItems = this.app.libraryItemsFromStorage;
         if (!libraryItems) {
           return resolve([]);
         }
 
-        const items = libraryItems.map((elements: ExcalidrawElement[]) =>
-          restoreElements(elements),
-        ) as Mutable<LibraryItems>;
+        const items = libraryItems.map(
+          (elements) => restoreElements(elements) as LibraryItem,
+        );
 
         // clone to ensure we don't mutate the cached library elements in the app
         this.libraryCache = JSON.parse(JSON.stringify(items));
@@ -91,18 +91,17 @@ class Library {
     });
   };
 
-  saveLibrary = (items: LibraryItems) => {
-    this.app?.props?.addToLibrary?.(items);
-
+  saveLibrary = async (items: LibraryItems) => {
     const prevLibraryItems = this.libraryCache;
     try {
       const serializedItems = JSON.stringify(items);
-      // cache optimistically so that consumers have access to the latest
+      // cache optimistically so that the app has access to the latest
       // immediately
       this.libraryCache = JSON.parse(serializedItems);
+      await this.app.props.addToLibrary?.(items);
     } catch (error) {
       this.libraryCache = prevLibraryItems;
-      console.error(error);
+      throw error;
     }
   };
 }

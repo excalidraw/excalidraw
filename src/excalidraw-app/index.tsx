@@ -327,13 +327,9 @@ const ExcalidrawWrapper = () => {
     localStorage.removeItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY);
   };
 
-  const addToLibrary = (items: LibraryItems) => {
-    try {
-      const serializedItems = JSON.stringify(items);
-      localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY, serializedItems);
-    } catch (error) {
-      console.error(error);
-    }
+  const addToLibrary = async (items: LibraryItems) => {
+    const serializedItems = JSON.stringify(items);
+    localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY, serializedItems);
   };
   return (
     <>

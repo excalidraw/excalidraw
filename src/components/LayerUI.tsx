@@ -303,10 +303,13 @@ const LibraryMenu = ({
     async (indexToRemove) => {
       const items = await library.loadLibrary();
       const nextItems = items.filter((_, index) => index !== indexToRemove);
-      library.saveLibrary(nextItems);
+      library.saveLibrary(nextItems).catch((error) => {
+        setLibraryItems(items);
+        setAppState({ errorMessage: error.message });
+      });
       setLibraryItems(nextItems);
     },
-    [library],
+    [library, setAppState],
   );
 
   const addToLibrary = useCallback(
@@ -314,10 +317,13 @@ const LibraryMenu = ({
       const items = await library.loadLibrary();
       const nextItems = [...items, elements];
       onAddToLibrary();
-      library.saveLibrary(nextItems);
+      library.saveLibrary(nextItems).catch((error) => {
+        setLibraryItems(items);
+        setAppState({ errorMessage: error.message });
+      });
       setLibraryItems(nextItems);
     },
-    [onAddToLibrary, library],
+    [onAddToLibrary, library, setAppState],
   );
 
   return loadingState === "preloading" ? null : (
