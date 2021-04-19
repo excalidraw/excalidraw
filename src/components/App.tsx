@@ -78,7 +78,6 @@ import {
   getCursorForResizingElement,
   getDragOffsetXY,
   getElementWithTransformHandleType,
-  getNonDeletedElements,
   getNormalizedDimensions,
   getPerfectElementSize,
   getResizeArrowDirection,
