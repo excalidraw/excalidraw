@@ -118,13 +118,6 @@ yarn start
 
 Thats it now you can open [http://localhost:3000](http://localhost:3000) and start coding in your favorite code editor.
 
-In case you don't have a code editor, below is the list of few code editors/ IDE's which you might want to check
-
-1. [vscode](https://code.visualstudio.com/download)
-2. [sublime](https://www.sublimetext.com/)
-3. [webstorm](https://www.jetbrains.com/webstorm/)
-4. [Atom](https://atom.io/)
-
 #### Commands
 
 | Command            | Description                       |
