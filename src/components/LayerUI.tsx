@@ -305,7 +305,7 @@ const LibraryMenu = ({
       const nextItems = items.filter((_, index) => index !== indexToRemove);
       library.saveLibrary(nextItems).catch((error) => {
         setLibraryItems(items);
-        setAppState({ errorMessage: error.message });
+        setAppState({ errorMessage: t("alerts.errorRemovingFromLibrary") });
       });
       setLibraryItems(nextItems);
     },
@@ -319,7 +319,7 @@ const LibraryMenu = ({
       onAddToLibrary();
       library.saveLibrary(nextItems).catch((error) => {
         setLibraryItems(items);
-        setAppState({ errorMessage: error.message });
+        setAppState({ errorMessage: t("alerts.errorAddingToLibrary") });
       });
       setLibraryItems(nextItems);
     },
