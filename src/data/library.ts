@@ -16,7 +16,7 @@ class Library {
   }
 
   resetLibrary = () => {
-    this.app.props.resetLibrary?.();
+    this.app.props.onLibraryChange?.([]);
     this.libraryCache = null;
   };
 
@@ -98,7 +98,7 @@ class Library {
       // cache optimistically so that the app has access to the latest
       // immediately
       this.libraryCache = JSON.parse(serializedItems);
-      await this.app.props.addToLibrary?.(items);
+      await this.app.props.onLibraryChange?.(items);
     } catch (error) {
       this.libraryCache = prevLibraryItems;
       throw error;

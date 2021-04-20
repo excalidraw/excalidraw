@@ -323,11 +323,11 @@ const ExcalidrawWrapper = () => {
     );
   };
 
-  const resetlibrary = () => {
-    localStorage.removeItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY);
-  };
-
-  const addToLibrary = async (items: LibraryItems) => {
+  const onLibraryChange = async (items: LibraryItems) => {
+    if (!items.length) {
+      localStorage.removeItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY);
+      return;
+    }
     const serializedItems = JSON.stringify(items);
     localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY, serializedItems);
   };
@@ -346,8 +346,7 @@ const ExcalidrawWrapper = () => {
         renderCustomStats={renderCustomStats}
         detectScroll={false}
         handleKeyboardGlobally={true}
-        resetLibrary={resetlibrary}
-        addToLibrary={addToLibrary}
+        onLibraryChange={onLibraryChange}
       />
       {excalidrawAPI && <CollabWrapper excalidrawAPI={excalidrawAPI} />}
       {errorMessage && (
