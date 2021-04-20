@@ -15,9 +15,9 @@ class Library {
     this.app = app;
   }
 
-  resetLibrary = () => {
-    this.app.props.onLibraryChange?.([]);
-    this.libraryCache = null;
+  resetLibrary = async () => {
+    await this.app.props.onLibraryChange?.([]);
+    this.libraryCache = [];
   };
 
   /** imports library (currently merges, removing duplicates) */
@@ -61,7 +61,7 @@ class Library {
       return acc;
     }, [] as (readonly NonDeleted<ExcalidrawElement>[])[]);
 
-    this.saveLibrary([...existingLibraryItems, ...filtered]);
+    await this.saveLibrary([...existingLibraryItems, ...filtered]);
   }
 
   loadLibrary = (): Promise<LibraryItems> => {
