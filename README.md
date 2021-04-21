@@ -102,6 +102,20 @@ These instructions will get you a copy of the project up and running on your loc
 git clone https://github.com/excalidraw/excalidraw.git
 ```
 
+#### Install the dependencies
+
+```bash
+yarn
+```
+
+#### Start the server
+
+```bash
+yarn start
+```
+
+Now you can open [http://localhost:3000](http://localhost:3000) and start coding in your favorite code editor.
+
 #### Commands
 
 | Command            | Description                       |
