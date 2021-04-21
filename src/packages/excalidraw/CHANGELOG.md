@@ -38,7 +38,7 @@ Please add the latest change on the top under the correct section.
 
     ```ts
     const getSyncableElements = (elements: readonly ExcalidrawElement[]) =>
-      elements.map((el) => el.isDeleted || !isInvisiblySmallElement(el));
+      elements.filter((el) => el.isDeleted || !isInvisiblySmallElement(el));
     ```
 
 ## Types
