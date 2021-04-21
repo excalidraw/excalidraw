@@ -17,6 +17,15 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
+- Don't share library & attach to the excalidraw instance [#3451](https://github.com/excalidraw/excalidraw/pull/3451).
+
+  - Added prop [onLibraryChange](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onLibraryChange) which if supplied will be called when library is updated.
+  - Added attribute `libraryItems` to prop [initialData](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#initialdata) which can be used to load excalidraw with existing library items.
+
+  #### BREAKING CHANGE
+
+  - Earlier since there was no API to control the library hence was using local storage in the consumer. Now onwards with above API support the consumer will be responsible for handling the storage for the library.
+
 - Bind the keyboard events to component and added a prop [`handleKeyboardGlobally`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#handleKeyboardGlobally) which if set to true will bind the keyboard events to document [#3430](https://github.com/excalidraw/excalidraw/pull/3430).
 
   #### BREAKING CHNAGE
