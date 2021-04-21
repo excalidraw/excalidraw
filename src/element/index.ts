@@ -58,13 +58,6 @@ export {
 } from "./sizeHelpers";
 export { showSelectedShapeActions } from "./showSelectedShapeActions";
 
-export const getSyncableElements = (
-  elements: readonly ExcalidrawElement[], // There are places in Excalidraw where synthetic invisibly small elements are added and removed.
-) =>
-  // It's probably best to keep those local otherwise there might be a race condition that
-  // gets the app into an invalid state. I've never seen it happen but I'm worried about it :)
-  elements.filter((el) => el.isDeleted || !isInvisiblySmallElement(el));
-
 export const getElementMap = (elements: readonly ExcalidrawElement[]) =>
   elements.reduce(
     (acc: { [key: string]: ExcalidrawElement }, element: ExcalidrawElement) => {

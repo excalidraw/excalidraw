@@ -629,21 +629,21 @@ getSceneVersion(elements:  <a href="https://github.com/excalidraw/excalidraw/blo
 
 This function returns the current scene version.
 
-#### `getSyncableElements`
+#### `isInvisiblySmallElement`
 
 **_Signature_**
 
 <pre>
-getSyncableElements(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>):<a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>
+isInvisiblySmallElement(element:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement</a>): boolean
 </pre>
 
 **How to use**
 
 ```js
-import { getSyncableElements } from "@excalidraw/excalidraw";
+import { isInvisiblySmallElement } from "@excalidraw/excalidraw";
 ```
 
-Returns all elements including deleted ones, excluding elements which are are invisibly small (e.g. width & height are zero). Useful when you want to sync elements during collaboration.
+Returns `true` if element is invisibly small (e.g. width & height are zero).
 
 #### `getElementMap`
 
