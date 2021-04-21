@@ -610,7 +610,7 @@ Ths callback if supplied will get triggered when the library is updated and has 
 (items: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>) => void | Promise<any>
 </pre>
 
-It is invoked with empty items when user clears the library.
+It is invoked with empty items when user clears the library. You can use this callback when you want to do something additional when library is updated for example persisting it to local storage.
 
 ### id
 
