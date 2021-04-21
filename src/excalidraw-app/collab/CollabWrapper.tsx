@@ -8,7 +8,6 @@ import { ExcalidrawElement } from "../../element/types";
 import {
   getElementMap,
   getSceneVersion,
-  getSyncableElements,
 } from "../../packages/excalidraw/index";
 import { Collaborator, Gesture } from "../../types";
 import { resolvablePromise, withBatchedUpdates } from "../../utils";
@@ -41,6 +40,7 @@ import { t } from "../../i18n";
 import { UserIdleState } from "../../types";
 import { IDLE_THRESHOLD, ACTIVE_THRESHOLD } from "../../constants";
 import { trackEvent } from "../../analytics";
+import { isInvisiblySmallElement } from "../../element";
 
 interface CollabState {
   modalIsShown: boolean;
@@ -146,7 +146,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   };
 
   private beforeUnload = withBatchedUpdates((event: BeforeUnloadEvent) => {
-    const syncableElements = getSyncableElements(
+    const syncableElements = this.getSyncableElements(
       this.getSceneElementsIncludingDeleted(),
     );
 
@@ -177,7 +177,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   });
 
   saveCollabRoomToFirebase = async (
-    syncableElements: ExcalidrawElement[] = getSyncableElements(
+    syncableElements: ExcalidrawElement[] = this.getSyncableElements(
       this.excalidrawAPI.getSceneElementsIncludingDeleted(),
     ),
   ) => {
@@ -565,7 +565,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     ) {
       this.portal.broadcastScene(
         SCENE.UPDATE,
-        getSyncableElements(elements),
+        this.getSyncableElements(elements),
         false,
       );
       this.lastBroadcastedOrReceivedSceneVersion = getSceneVersion(elements);
@@ -576,7 +576,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   queueBroadcastAllElements = throttle(() => {
     this.portal.broadcastScene(
       SCENE.UPDATE,
-      getSyncableElements(
+      this.getSyncableElements(
         this.excalidrawAPI.getSceneElementsIncludingDeleted(),
       ),
       true,
@@ -603,6 +603,9 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       modalIsShown: true,
     });
   };
+
+  getSyncableElements = (elements: readonly ExcalidrawElement[]) =>
+    elements.filter((el) => el.isDeleted || !isInvisiblySmallElement(el));
 
   /** PRIVATE. Use `this.getContextValue()` instead. */
   private contextValue: CollabAPI | null = null;

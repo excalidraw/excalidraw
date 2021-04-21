@@ -115,8 +115,8 @@ const forwardedRefComp = forwardRef<
 export default React.memo(forwardedRefComp, areEqual);
 export {
   getSceneVersion,
-  getSyncableElements,
   getElementMap,
+  isInvisiblySmallElement,
 } from "../../element";
 export { defaultLang, languages } from "../../i18n";
 export { restore, restoreAppState, restoreElements } from "../../data/restore";
