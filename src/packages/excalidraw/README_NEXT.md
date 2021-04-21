@@ -610,6 +610,8 @@ Ths callback if supplied will get triggered when the library is updated and has 
 (items: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>) => void | Promise<any>
 </pre>
 
+It is invoked with empty items when user clears the library.
+
 ### id
 
 The unique Id for the excalidraw component. This can be used to identify the excalidraw component for example importing the library items to the correct excalidraw component when you have multiple excalidraw components rendered on the same page.
