@@ -9,6 +9,7 @@ import {
 import { ExcalidrawElement } from "../element/types";
 import { AppProps, AppState } from "../types";
 import { MODES } from "../constants";
+import Library from "../data/library";
 
 // This is the <App> component, but for now we don't care about anything but its
 // `canvas` state.
@@ -16,6 +17,7 @@ type App = {
   canvas: HTMLCanvasElement | null;
   focusContainer: () => void;
   props: AppProps;
+  library: Library;
 };
 
 export class ActionManager implements ActionsManagerInterface {

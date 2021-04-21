@@ -10,7 +10,6 @@ import { ActionManager } from "../actions/manager";
 import { CLASSES } from "../constants";
 import { exportCanvas } from "../data";
 import { importLibraryFromJSON, saveLibraryAsJSON } from "../data/json";
-import { Library } from "../data/library";
 import { isTextElement, showSelectedShapeActions } from "../element";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { Language, t } from "../i18n";
@@ -47,6 +46,7 @@ import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { Tooltip } from "./Tooltip";
 import { UserList } from "./UserList";
+import Library from "../data/library";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -73,6 +73,8 @@ interface LayerUIProps {
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   UIOptions: AppProps["UIOptions"];
   focusContainer: () => void;
+  library: Library;
+  id: string;
 }
 
 const useOnClickOutside = (
@@ -104,7 +106,7 @@ const useOnClickOutside = (
 };
 
 const LibraryMenuItems = ({
-  library,
+  libraryItems,
   onRemoveFromLibrary,
   onAddToLibrary,
   onInsertShape,
@@ -113,8 +115,10 @@ const LibraryMenuItems = ({
   setLibraryItems,
   libraryReturnUrl,
   focusContainer,
+  library,
+  id,
 }: {
-  library: LibraryItems;
+  libraryItems: LibraryItems;
   pendingElements: LibraryItem;
   onRemoveFromLibrary: (index: number) => void;
   onInsertShape: (elements: LibraryItem) => void;
@@ -123,9 +127,11 @@ const LibraryMenuItems = ({
   setLibraryItems: (library: LibraryItems) => void;
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   focusContainer: () => void;
+  library: Library;
+  id: string;
 }) => {
   const isMobile = useIsMobile();
-  const numCells = library.length + (pendingElements.length > 0 ? 1 : 0);
+  const numCells = libraryItems.length + (pendingElements.length > 0 ? 1 : 0);
   const CELLS_PER_ROW = isMobile ? 4 : 6;
   const numRows = Math.max(1, Math.ceil(numCells / CELLS_PER_ROW));
   const rows = [];
@@ -143,7 +149,7 @@ const LibraryMenuItems = ({
         aria-label={t("buttons.load")}
         icon={load}
         onClick={() => {
-          importLibraryFromJSON()
+          importLibraryFromJSON(library)
             .then(() => {
               // Close and then open to get the libraries updated
               setAppState({ isLibraryOpen: false });
@@ -155,7 +161,7 @@ const LibraryMenuItems = ({
             });
         }}
       />
-      {!!library.length && (
+      {!!libraryItems.length && (
         <>
           <ToolButton
             key="export"
@@ -164,7 +170,7 @@ const LibraryMenuItems = ({
             aria-label={t("buttons.export")}
             icon={exportFile}
             onClick={() => {
-              saveLibraryAsJSON()
+              saveLibraryAsJSON(library)
                 .catch(muteFSAbortError)
                 .catch((error) => {
                   setAppState({ errorMessage: error.message });
@@ -179,7 +185,7 @@ const LibraryMenuItems = ({
             icon={trash}
             onClick={() => {
               if (window.confirm(t("alerts.resetLibrary"))) {
-                Library.resetLibrary();
+                library.resetLibrary();
                 setLibraryItems([]);
                 focusContainer();
               }
@@ -190,7 +196,7 @@ const LibraryMenuItems = ({
       <a
         href={`https://libraries.excalidraw.com?target=${
           window.name || "_blank"
-        }&referrer=${referrer}&useHash=true&token=${Library.csrfToken}`}
+        }&referrer=${referrer}&useHash=true&token=${id}`}
         target="_excalidraw_libraries"
       >
         {t("labels.libraries")}
@@ -205,13 +211,13 @@ const LibraryMenuItems = ({
       const shouldAddPendingElements: boolean =
         pendingElements.length > 0 &&
         !addedPendingElements &&
-        y + x >= library.length;
+        y + x >= libraryItems.length;
       addedPendingElements = addedPendingElements || shouldAddPendingElements;
 
       children.push(
         <Stack.Col key={x}>
           <LibraryUnit
-            elements={library[y + x]}
+            elements={libraryItems[y + x]}
             pendingElements={
               shouldAddPendingElements ? pendingElements : undefined
             }
@@ -219,7 +225,7 @@ const LibraryMenuItems = ({
             onClick={
               shouldAddPendingElements
                 ? onAddToLibrary.bind(null, pendingElements)
-                : onInsertShape.bind(null, library[y + x])
+                : onInsertShape.bind(null, libraryItems[y + x])
             }
           />
         </Stack.Col>,
@@ -247,6 +253,8 @@ const LibraryMenu = ({
   setAppState,
   libraryReturnUrl,
   focusContainer,
+  library,
+  id,
 }: {
   pendingElements: LibraryItem;
   onClickOutside: (event: MouseEvent) => void;
@@ -255,6 +263,8 @@ const LibraryMenu = ({
   setAppState: React.Component<any, AppState>["setState"];
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   focusContainer: () => void;
+  library: Library;
+  id: string;
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   useOnClickOutside(ref, (event) => {
@@ -280,7 +290,7 @@ const LibraryMenu = ({
           resolve("loading");
         }, 100);
       }),
-      Library.loadLibrary().then((items) => {
+      library.loadLibrary().then((items) => {
         setLibraryItems(items);
         setIsLoading("ready");
       }),
@@ -292,24 +302,33 @@ const LibraryMenu = ({
     return () => {
       clearTimeout(loadingTimerRef.current!);
     };
-  }, []);
+  }, [library]);
 
-  const removeFromLibrary = useCallback(async (indexToRemove) => {
-    const items = await Library.loadLibrary();
-    const nextItems = items.filter((_, index) => index !== indexToRemove);
-    Library.saveLibrary(nextItems);
-    setLibraryItems(nextItems);
-  }, []);
+  const removeFromLibrary = useCallback(
+    async (indexToRemove) => {
+      const items = await library.loadLibrary();
+      const nextItems = items.filter((_, index) => index !== indexToRemove);
+      library.saveLibrary(nextItems).catch((error) => {
+        setLibraryItems(items);
+        setAppState({ errorMessage: t("alerts.errorRemovingFromLibrary") });
+      });
+      setLibraryItems(nextItems);
+    },
+    [library, setAppState],
+  );
 
   const addToLibrary = useCallback(
     async (elements: LibraryItem) => {
-      const items = await Library.loadLibrary();
+      const items = await library.loadLibrary();
       const nextItems = [...items, elements];
       onAddToLibrary();
-      Library.saveLibrary(nextItems);
+      library.saveLibrary(nextItems).catch((error) => {
+        setLibraryItems(items);
+        setAppState({ errorMessage: t("alerts.errorAddingToLibrary") });
+      });
       setLibraryItems(nextItems);
     },
-    [onAddToLibrary],
+    [onAddToLibrary, library, setAppState],
   );
 
   return loadingState === "preloading" ? null : (
@@ -320,7 +339,7 @@ const LibraryMenu = ({
         </div>
       ) : (
         <LibraryMenuItems
-          library={libraryItems}
+          libraryItems={libraryItems}
           onRemoveFromLibrary={removeFromLibrary}
           onAddToLibrary={addToLibrary}
           onInsertShape={onInsertShape}
@@ -329,6 +348,8 @@ const LibraryMenu = ({
           setLibraryItems={setLibraryItems}
           libraryReturnUrl={libraryReturnUrl}
           focusContainer={focusContainer}
+          library={library}
+          id={id}
         />
       )}
     </Island>
@@ -355,6 +376,8 @@ const LayerUI = ({
   libraryReturnUrl,
   UIOptions,
   focusContainer,
+  library,
+  id,
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
@@ -526,6 +549,8 @@ const LayerUI = ({
       setAppState={setAppState}
       libraryReturnUrl={libraryReturnUrl}
       focusContainer={focusContainer}
+      library={library}
+      id={id}
     />
   ) : null;
 

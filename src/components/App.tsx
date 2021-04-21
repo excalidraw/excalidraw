@@ -4,6 +4,7 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
 import clsx from "clsx";
 import { supported } from "browser-fs-access";
+import { nanoid } from "nanoid";
 
 import {
   actionAddToLibrary,
@@ -68,7 +69,7 @@ import {
 } from "../constants";
 import { loadFromBlob } from "../data";
 import { isValidLibrary } from "../data/json";
-import { Library } from "../data/library";
+import Library from "../data/library";
 import { restore } from "../data/restore";
 import {
   dragNewElement,
@@ -163,7 +164,14 @@ import Scene from "../scene/Scene";
 import { SceneState, ScrollBars } from "../scene/types";
 import { getNewZoom } from "../scene/zoom";
 import { findShapeByKey } from "../shapes";
-import { AppProps, AppState, Gesture, GestureEvent, SceneData } from "../types";
+import {
+  AppProps,
+  AppState,
+  Gesture,
+  GestureEvent,
+  LibraryItems,
+  SceneData,
+} from "../types";
 import {
   debounce,
   distance,
@@ -289,6 +297,7 @@ export type ExcalidrawImperativeAPI = {
   setToastMessage: InstanceType<typeof App>["setToastMessage"];
   readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
   ready: true;
+  id: string;
 };
 
 class App extends React.Component<AppProps, AppState> {
@@ -309,6 +318,9 @@ class App extends React.Component<AppProps, AppState> {
   private scene: Scene;
   private resizeObserver: ResizeObserver | undefined;
   private nearestScrollableContainer: HTMLElement | Document | undefined;
+  public library: Library;
+  public libraryItemsFromStorage: LibraryItems | undefined;
+  private id: string;
 
   constructor(props: AppProps) {
     super(props);
@@ -334,6 +346,8 @@ class App extends React.Component<AppProps, AppState> {
       height: window.innerHeight,
     };
 
+    this.id = nanoid();
+
     if (excalidrawRef) {
       const readyPromise =
         ("current" in excalidrawRef && excalidrawRef.current?.readyPromise) ||
@@ -354,6 +368,7 @@ class App extends React.Component<AppProps, AppState> {
         refresh: this.refresh,
         importLibrary: this.importLibraryFromUrl,
         setToastMessage: this.setToastMessage,
+        id: this.id,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -363,6 +378,7 @@ class App extends React.Component<AppProps, AppState> {
       readyPromise.resolve(api);
     }
     this.scene = new Scene();
+    this.library = new Library(this);
 
     this.actionManager = new ActionManager(
       this.syncActionResult,
@@ -490,6 +506,8 @@ class App extends React.Component<AppProps, AppState> {
               libraryReturnUrl={this.props.libraryReturnUrl}
               UIOptions={this.props.UIOptions}
               focusContainer={this.focusContainer}
+              library={this.library}
+              id={this.id}
             />
             <div className="excalidraw-textEditorContainer" />
             <div className="excalidraw-contextMenuContainer" />
@@ -650,12 +668,12 @@ class App extends React.Component<AppProps, AppState> {
         throw new Error();
       }
       if (
-        token === Library.csrfToken ||
+        token === this.id ||
         window.confirm(
           t("alerts.confirmAddLibrary", { numShapes: json.library.length }),
         )
       ) {
-        await Library.importLibrary(blob);
+        await this.library.importLibrary(blob);
         // hack to rerender the library items after import
         if (this.state.isLibraryOpen) {
           this.setState({ isLibraryOpen: false });
@@ -724,6 +742,9 @@ class App extends React.Component<AppProps, AppState> {
     let initialData = null;
     try {
       initialData = (await this.props.initialData) || null;
+      if (initialData?.libraryItems) {
+        this.libraryItemsFromStorage = initialData.libraryItems;
+      }
     } catch (error) {
       console.error(error);
       initialData = {
@@ -3713,7 +3734,8 @@ class App extends React.Component<AppProps, AppState> {
       file?.type === MIME_TYPES.excalidrawlib ||
       file?.name?.endsWith(".excalidrawlib")
     ) {
-      Library.importLibrary(file)
+      this.library
+        .importLibrary(file)
         .then(() => {
           // Close and then open to get the libraries updated
           this.setState({ isLibraryOpen: false });
@@ -4248,7 +4270,6 @@ declare global {
       setState: React.Component<any, AppState>["setState"];
       history: SceneHistory;
       app: InstanceType<typeof App>;
-      library: typeof Library;
     };
   }
 }
@@ -4272,10 +4293,6 @@ if (
     history: {
       configurable: true,
       get: () => history,
-    },
-    library: {
-      configurable: true,
-      value: Library,
     },
   });
 }

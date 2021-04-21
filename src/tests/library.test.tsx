@@ -9,17 +9,17 @@ const { h } = window;
 
 describe("library", () => {
   beforeEach(async () => {
-    h.library.resetLibrary();
     await render(<ExcalidrawApp />);
+    h.app.library.resetLibrary();
   });
 
   it("import library via drag&drop", async () => {
-    expect(await h.library.loadLibrary()).toEqual([]);
+    expect(await h.app.library.loadLibrary()).toEqual([]);
     await API.drop(
       await API.loadFile("./fixtures/fixture_library.excalidrawlib"),
     );
     await waitFor(async () => {
-      expect(await h.library.loadLibrary()).toEqual([
+      expect(await h.app.library.loadLibrary()).toEqual([
         [expect.objectContaining({ id: "A" })],
       ]);
     });
