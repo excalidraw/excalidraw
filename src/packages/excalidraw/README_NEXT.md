@@ -614,7 +614,7 @@ It is invoked with empty items when user clears the library. You can use this ca
 
 ### id
 
-The unique Id for the excalidraw component. This can be used to identify the excalidraw component for example importing the library items to the correct excalidraw component when you have multiple excalidraw components rendered on the same page.
+The unique id of the excalidraw component. This can be used to identify the excalidraw component, for example importing the library items to the excalidraw component from where it was initiated when you have multiple excalidraw components rendered on the same page as shown in [multiple excalidraw demo](https://codesandbox.io/s/multiple-excalidraw-k1xx5).
 
 ### Extra API's
 
