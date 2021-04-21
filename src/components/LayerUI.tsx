@@ -74,6 +74,7 @@ interface LayerUIProps {
   UIOptions: AppProps["UIOptions"];
   focusContainer: () => void;
   library: Library;
+  id: string;
 }
 
 const useOnClickOutside = (
@@ -115,6 +116,7 @@ const LibraryMenuItems = ({
   libraryReturnUrl,
   focusContainer,
   library,
+  id,
 }: {
   libraryItems: LibraryItems;
   pendingElements: LibraryItem;
@@ -126,6 +128,7 @@ const LibraryMenuItems = ({
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   focusContainer: () => void;
   library: Library;
+  id: string;
 }) => {
   const isMobile = useIsMobile();
   const numCells = libraryItems.length + (pendingElements.length > 0 ? 1 : 0);
@@ -193,7 +196,7 @@ const LibraryMenuItems = ({
       <a
         href={`https://libraries.excalidraw.com?target=${
           window.name || "_blank"
-        }&referrer=${referrer}&useHash=true&token=${library.csrfToken}`}
+        }&referrer=${referrer}&useHash=true&token=${id}`}
         target="_excalidraw_libraries"
       >
         {t("labels.libraries")}
@@ -251,6 +254,7 @@ const LibraryMenu = ({
   libraryReturnUrl,
   focusContainer,
   library,
+  id,
 }: {
   pendingElements: LibraryItem;
   onClickOutside: (event: MouseEvent) => void;
@@ -260,6 +264,7 @@ const LibraryMenu = ({
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   focusContainer: () => void;
   library: Library;
+  id: string;
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   useOnClickOutside(ref, (event) => {
@@ -344,6 +349,7 @@ const LibraryMenu = ({
           libraryReturnUrl={libraryReturnUrl}
           focusContainer={focusContainer}
           library={library}
+          id={id}
         />
       )}
     </Island>
@@ -371,6 +377,7 @@ const LayerUI = ({
   UIOptions,
   focusContainer,
   library,
+  id,
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
@@ -543,6 +550,7 @@ const LayerUI = ({
       libraryReturnUrl={libraryReturnUrl}
       focusContainer={focusContainer}
       library={library}
+      id={id}
     />
   ) : null;
 

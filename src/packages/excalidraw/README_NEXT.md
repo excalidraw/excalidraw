@@ -447,6 +447,7 @@ You can pass a `ref` when you want to access some excalidraw APIs. We expose the
 | refresh | `() => void` | Updates the offsets for the Excalidraw component so that the coordinates are computed correctly (for example the cursor position). You don't have to call this when the position is changed on page scroll or when the excalidraw container resizes (we handle that ourselves). For any other cases if the position of excalidraw is updated (example due to scroll on parent container and not page scroll) you should call this API. |
 | [importLibrary](#importlibrary) | `(url: string, token?: string) => void` | Imports library from given URL |
 | setToastMessage | `(message: string) => void` | This API can be used to show the toast with custom message. |
+| [id](#id) | string | Unique ID for the excalidraw component. |
 
 #### `readyPromise`
 
@@ -608,6 +609,10 @@ Ths callback if supplied will get triggered when the library is updated and has 
 <pre>
 (items: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>) => void | Promise<any>
 </pre>
+
+### id
+
+The unique Id for the excalidraw component. This can be used to identify the excalidraw component for example importing the library items to the correct excalidraw component when you have multiple excalidraw components rendered on the same page.
 
 ### Extra API's
 

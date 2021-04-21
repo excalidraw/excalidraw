@@ -3,12 +3,10 @@ import { LibraryItems, LibraryItem } from "../types";
 import { restoreElements } from "./restore";
 import { getNonDeletedElements } from "../element";
 import { NonDeleted, ExcalidrawElement } from "../element/types";
-import { nanoid } from "nanoid";
 import App from "../components/App";
 
 class Library {
   private libraryCache: LibraryItems | null = null;
-  public csrfToken = nanoid();
   private app: App;
 
   constructor(app: App) {

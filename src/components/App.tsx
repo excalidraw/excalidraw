@@ -4,6 +4,7 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
 import clsx from "clsx";
 import { supported } from "browser-fs-access";
+import { nanoid } from "nanoid";
 
 import {
   actionAddToLibrary,
@@ -297,6 +298,7 @@ export type ExcalidrawImperativeAPI = {
   setToastMessage: InstanceType<typeof App>["setToastMessage"];
   readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
   ready: true;
+  id: string;
 };
 
 class App extends React.Component<AppProps, AppState> {
@@ -319,6 +321,7 @@ class App extends React.Component<AppProps, AppState> {
   private nearestScrollableContainer: HTMLElement | Document | undefined;
   public library: Library;
   public libraryItemsFromStorage: LibraryItems | undefined;
+  private id: string;
 
   constructor(props: AppProps) {
     super(props);
@@ -344,6 +347,8 @@ class App extends React.Component<AppProps, AppState> {
       height: window.innerHeight,
     };
 
+    this.id = nanoid();
+
     if (excalidrawRef) {
       const readyPromise =
         ("current" in excalidrawRef && excalidrawRef.current?.readyPromise) ||
@@ -364,6 +369,7 @@ class App extends React.Component<AppProps, AppState> {
         refresh: this.refresh,
         importLibrary: this.importLibraryFromUrl,
         setToastMessage: this.setToastMessage,
+        id: this.id,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -511,6 +517,7 @@ class App extends React.Component<AppProps, AppState> {
               UIOptions={this.props.UIOptions}
               focusContainer={this.focusContainer}
               library={this.library}
+              id={this.id}
             />
             <div className="excalidraw-textEditorContainer" />
             <div className="excalidraw-contextMenuContainer" />
@@ -671,7 +678,7 @@ class App extends React.Component<AppProps, AppState> {
         throw new Error();
       }
       if (
-        token === this.library.csrfToken ||
+        token === this.id ||
         window.confirm(
           t("alerts.confirmAddLibrary", { numShapes: json.library.length }),
         )
