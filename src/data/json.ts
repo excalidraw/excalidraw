@@ -5,12 +5,13 @@ import { clearElementsForExport } from "../element";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 import { loadFromBlob } from "./blob";
-import { Library } from "./library";
+
 import {
   ExportedDataState,
   ImportedDataState,
   ExportedLibraryData,
 } from "./types";
+import Library from "./library";
 
 export const serializeAsJSON = (
   elements: readonly ExcalidrawElement[],
@@ -88,13 +89,13 @@ export const isValidLibrary = (json: any) => {
   );
 };
 
-export const saveLibraryAsJSON = async () => {
-  const library = await Library.loadLibrary();
+export const saveLibraryAsJSON = async (library: Library) => {
+  const libraryItems = await library.loadLibrary();
   const data: ExportedLibraryData = {
     type: EXPORT_DATA_TYPES.excalidrawLibrary,
     version: 1,
     source: EXPORT_SOURCE,
-    library,
+    library: libraryItems,
   };
   const serialized = JSON.stringify(data, null, 2);
   const fileName = "library.excalidrawlib";
@@ -108,7 +109,7 @@ export const saveLibraryAsJSON = async () => {
   });
 };
 
-export const importLibraryFromJSON = async () => {
+export const importLibraryFromJSON = async (library: Library) => {
   const blob = await fileOpen({
     description: "Excalidraw library files",
     // ToDo: Be over-permissive until https://bugs.webkit.org/show_bug.cgi?id=34442
@@ -117,5 +118,5 @@ export const importLibraryFromJSON = async () => {
     extensions: [".json", ".excalidrawlib"],
     */
   });
-  await Library.importLibrary(blob);
+  await library.importLibrary(blob);
 };
