@@ -238,3 +238,37 @@ export const actionExportWithDarkMode = register({
     </div>
   ),
 });
+
+export const actionToggleAutosave = register({
+  name: "toggleAutosave",
+  perform(elements, appState) {
+    trackEvent("toggle", "autosave");
+    return {
+      appState: {
+        ...appState,
+        autosave: !appState.autosave,
+      },
+      commitToHistory: false,
+    };
+  },
+  PanelComponent: ({ appState, updateData }) =>
+    supported && appState.fileHandle ? (
+      <label style={{ display: "flex" }}>
+        <input
+          type="checkbox"
+          checked={appState.autosave}
+          onChange={(event) => updateData(event.target.checked)}
+        />{" "}
+        {t("labels.toggleAutosave")}
+        <Tooltip
+          label={t("labels.toggleAutosave_details")}
+          position="above"
+          long={true}
+        >
+          <div className="TooltipIcon">{questionCircle}</div>
+        </Tooltip>
+      </label>
+    ) : (
+      <></>
+    ),
+});

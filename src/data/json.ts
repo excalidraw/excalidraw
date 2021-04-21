@@ -30,6 +30,7 @@ export const serializeAsJSON = (
 export const saveAsJSON = async (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
+  onlyIfFileHandleValid = false,
 ) => {
   const serialized = serializeAsJSON(elements, appState);
   const blob = new Blob([serialized], {
@@ -44,6 +45,7 @@ export const saveAsJSON = async (
       extensions: [".excalidraw"],
     },
     appState.fileHandle,
+    onlyIfFileHandleValid,
   );
   return { fileHandle };
 };

@@ -59,6 +59,7 @@ import {
   MQ_MAX_WIDTH_PORTRAIT,
   POINTER_BUTTON,
   SCROLL_TIMEOUT,
+  AUTO_SAVE_TIMEOUT,
   TAP_TWICE_TIMEOUT,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
   TOUCH_CTX_MENU_TIMEOUT,
@@ -67,7 +68,7 @@ import {
   ZOOM_STEP,
 } from "../constants";
 import { loadFromBlob } from "../data";
-import { isValidLibrary } from "../data/json";
+import { saveAsJSON, isValidLibrary } from "../data/json";
 import { Library } from "../data/library";
 import { restore } from "../data/restore";
 import {
@@ -994,6 +995,13 @@ class App extends React.Component<AppProps, AppState> {
       this.state.theme === "dark",
     );
 
+    if (this.state.autosave && this.state.fileHandle && supported) {
+      this.autosaveLocalSceneDebounced(
+        this.scene.getElementsIncludingDeleted(),
+        this.state,
+      );
+    }
+
     if (
       this.state.editingLinearElement &&
       !this.state.selectedElementIds[this.state.editingLinearElement.elementId]
@@ -1125,6 +1133,37 @@ class App extends React.Component<AppProps, AppState> {
       return { offsetTop, offsetLeft };
     });
   }, SCROLL_TIMEOUT);
+
+  private autosaveLocalSceneDebounced = debounce(
+    async (elements: readonly ExcalidrawElement[], state: AppState) => {
+      if (this.state.autosave && this.state.fileHandle && supported) {
+        try {
+          await saveAsJSON(
+            elements,
+            state,
+            // only if fileHandle valid
+            true,
+          );
+        } catch (error) {
+          this.setState({
+            autosave: false,
+            toastMessage:
+              error.name === "NotAllowedError"
+                ? t("toast.autosaveFailed_notAllowed")
+                : error.name === "NotFoundError"
+                ? t("toast.autosaveFailed_notFound")
+                : t("toast.autosaveFailed"),
+          });
+
+          // shouldn't happen, so let's log it
+          if (!["NotAllowedError", "NotFoundError"].includes(error.name)) {
+            console.error(error);
+          }
+        }
+      }
+    },
+    AUTO_SAVE_TIMEOUT,
+  );
 
   // Copy/paste
 

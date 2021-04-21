@@ -202,6 +202,7 @@ const ExportModal = ({
             })}
           </Stack.Row>
         </div>
+        {actionManager.renderAction("toggleAutosave")}
         {actionManager.renderAction("changeExportBackground")}
         {someElementIsSelected && (
           <div>

@@ -78,6 +78,8 @@
     "ungroup": "Ungroup selection",
     "collaborators": "Collaborators",
     "showGrid": "Show grid",
+    "toggleAutosave": "Autosave to current file",
+    "toggleAutosave_details": "Automatically save changes when working on an existing file.",
     "addToLibrary": "Add to library",
     "removeFromLibrary": "Remove from library",
     "libraryLoadingMessage": "Loading library…",
@@ -249,6 +251,9 @@
     "width": "Width"
   },
   "toast": {
+    "autosaveFailed_notAllowed": "Autosave was disabled.",
+    "autosaveFailed_notFound": "Autosave failed.\nIt seems the file no longer exists.",
+    "autosaveFailed": "Autosave failed.",
     "copyStyles": "Copied styles.",
     "copyToClipboard": "Copied to clipboard.",
     "copyToClipboardAsPng": "Copied {{exportSelection}} to clipboard as PNG\n({{exportColorScheme}})",
