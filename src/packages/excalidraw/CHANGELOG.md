@@ -34,7 +34,7 @@ Please add the latest change on the top under the correct section.
 
 - #### BREAKING CHANGE
 
-  - Removed exposing `getSyncableElements` helper which was specific to our collab implementation [#3471](https://github.com/excalidraw/excalidraw/pull/3471). If you happened to use it, you can easily reimplement it yourself using the newly exposed `isInvisiblySmallElement` helper:
+  - Removed exposing `getSyncableElements` helper which was specific to excalidraw app collab implementation [#3471](https://github.com/excalidraw/excalidraw/pull/3471). If you happened to use it, you can easily reimplement it yourself using the newly exposed [isInvisiblySmallElement](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#isInvisiblySmallElement) helper:
 
     ```ts
     const getSyncableElements = (elements: readonly ExcalidrawElement[]) =>
