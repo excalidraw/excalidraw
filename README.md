@@ -116,7 +116,7 @@ yarn
 yarn start
 ```
 
-Thats it now you can open [http://localhost:3000](http://localhost:3000) and start coding in your favorite code editor.
+Now you can open [http://localhost:3000](http://localhost:3000) and start coding in your favorite code editor.
 
 #### Commands
 
