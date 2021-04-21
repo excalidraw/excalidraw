@@ -96,8 +96,6 @@ These instructions will get you a copy of the project up and running on your loc
 - [Yarn](https://yarnpkg.com/getting-started/install)
 - [Git](https://git-scm.com/downloads)
 
-make sure you have all the above dependencies in your system.
-
 #### Clone the repo
 
 ```bash
