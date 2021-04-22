@@ -53,7 +53,7 @@ Please add the latest change on the top under the correct section.
 
 ### Build
 
-- Add vendor prefixes to css rules [#3476].(https://github.com/excalidraw/excalidraw/pull/3476)
+- Add vendor prefixes to css rules [#3476](https://github.com/excalidraw/excalidraw/pull/3476).
 
 ## Types
 
