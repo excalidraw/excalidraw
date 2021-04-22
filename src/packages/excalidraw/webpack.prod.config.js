@@ -2,6 +2,7 @@ const path = require("path");
 const TerserPlugin = require("terser-webpack-plugin");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
   .BundleAnalyzerPlugin;
+const autoprefixer = require("autoprefixer");
 
 module.exports = {
   mode: "production",
@@ -28,6 +29,14 @@ module.exports = {
           "style-loader",
           {
             loader: "css-loader",
+          },
+          {
+            loader: "postcss-loader",
+            options: {
+              postcssOptions: {
+                plugins: [autoprefixer()],
+              },
+            },
           },
           "sass-loader",
         ],
