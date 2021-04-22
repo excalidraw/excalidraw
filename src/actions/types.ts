@@ -1,6 +1,7 @@
 import React from "react";
 import { ExcalidrawElement } from "../element/types";
 import { AppState, ExcalidrawProps } from "../types";
+import Library from "../data/library";
 
 /** if false, the action should be prevented */
 export type ActionResult =
@@ -15,7 +16,11 @@ export type ActionResult =
     }
   | false;
 
-type AppAPI = { canvas: HTMLCanvasElement | null; focusContainer(): void };
+type AppAPI = {
+  canvas: HTMLCanvasElement | null;
+  focusContainer(): void;
+  library: Library;
+};
 
 type ActionFn = (
   elements: readonly ExcalidrawElement[],

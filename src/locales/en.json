@@ -142,6 +142,8 @@
     "loadSceneOverridePrompt": "Loading external drawing will replace your existing content. Do you wish to continue?",
     "collabStopOverridePrompt": "Stopping the session will overwrite your previous, locally stored drawing. Are you sure?\n\n(If you want to keep your local drawing, simply close the browser tab instead.)",
     "errorLoadingLibrary": "There was an error loading the third party library.",
+    "errorAddingToLibrary": "Couldn't add item to the library",
+    "errorRemovingFromLibrary": "Couldn't remove item from the library",
     "confirmAddLibrary": "This will add {{numShapes}} shape(s) to your library. Are you sure?",
     "imageDoesNotContainScene": "Importing images isn't supported at the moment.\n\nDid you want to import a scene? This image does not seem to contain any scene data. Have you enabled this during export?",
     "cannotRestoreFromImage": "Scene couldn't be restored from this image file",
