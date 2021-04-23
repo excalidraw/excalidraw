@@ -1803,6 +1803,7 @@ class App extends React.Component<AppProps, AppState> {
         this.focusContainer();
       }),
       element,
+      excalidrawContainer: this.excalidrawContainerRef.current,
     });
     // deselect all other elements when inserting text
     this.setState({
