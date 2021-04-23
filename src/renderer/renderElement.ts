@@ -379,6 +379,17 @@ const generateElementShape = (
               ];
             }
 
+            // open dot arrowhead
+            if (arrowhead === "opendot") {
+              const [x, y, r] = arrowheadPoints;
+
+              return [
+                generator.circle(x, y, r, {
+                  ...options,
+                }),
+              ];
+            }
+
             // Arrow arrowheads
             const [x2, y2, x3, y3, x4, y4] = arrowheadPoints;
             if (element.strokeStyle === "dotted") {
