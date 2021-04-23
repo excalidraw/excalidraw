@@ -51,6 +51,10 @@ Please add the latest change on the top under the correct section.
       elements.filter((el) => el.isDeleted || !isInvisiblySmallElement(el));
     ```
 
+### Build
+
+- Add vendor prefixes to css rules [#3476](https://github.com/excalidraw/excalidraw/pull/3476).
+
 ## Types
 
 - Renamed the following types in case you depend on them (via [#3427](https://github.com/excalidraw/excalidraw/pull/3427)):
