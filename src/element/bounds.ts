@@ -220,7 +220,7 @@ export const getArrowheadPoints = (
 
   const length = element.points.reduce((total, [cx, cy], idx, points) => {
     const [px, py] = idx > 0 ? points[idx - 1] : [0, 0];
-    return total + Math.hypot(cx - px, cy - py);
+    return Math.hypot(cx - px, cy - py);
   }, 0);
 
   // Scale down the arrowhead until we hit a certain size so that it doesn't look weird.
