@@ -1163,22 +1163,9 @@ class App extends React.Component<AppProps, AppState> {
   });
 
   private onCopy = withBatchedUpdates((event: ClipboardEvent) => {
-    const activeSelection = document.getSelection();
-    // if there's a selected text is outside the component, prevent our copy
-    // action
-    if (
-      activeSelection?.anchorNode &&
-      // it can happen that certain interactions will create a selection
-      // outside (or potentially inside) the component without actually
-      // selecting anything (i.e. the selection range is collapsed). Copying
-      // in such case wouldn't copy anything to the clipboard anyway, so prevent
-      // our copy handler only if the selection isn't collapsed
-      !activeSelection.isCollapsed &&
-      !this.excalidrawContainerRef.current!.contains(activeSelection.anchorNode)
-    ) {
-      return;
-    }
-    if (isWritableElement(event.target)) {
+    const isExcalidrawActive =
+      document.activeElement === this.excalidrawContainerRef.current;
+    if (!isExcalidrawActive || isWritableElement(event.target)) {
       return;
     }
     this.copyAll();
