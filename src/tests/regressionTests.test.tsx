@@ -57,7 +57,6 @@ beforeEach(async () => {
 
   localStorage.clear();
   renderScene.mockClear();
-  h.history.clear();
   reseed(7);
   setDateTimeForTests("201933152653");
 

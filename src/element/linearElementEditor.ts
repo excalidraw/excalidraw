@@ -10,7 +10,7 @@ import { getElementAbsoluteCoords } from ".";
 import { getElementPointsCoords } from "./bounds";
 import { Point, AppState } from "../types";
 import { mutateElement } from "./mutateElement";
-import { SceneHistory } from "../history";
+import History from "../history";
 
 import Scene from "../scene/Scene";
 import {
@@ -167,7 +167,7 @@ export class LinearElementEditor {
     event: React.PointerEvent<HTMLCanvasElement>,
     appState: AppState,
     setState: React.Component<any, AppState>["setState"],
-    history: SceneHistory,
+    history: History,
     scenePointer: { x: number; y: number },
   ): {
     didAddPoint: boolean;
