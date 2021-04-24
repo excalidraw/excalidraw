@@ -714,9 +714,9 @@ export const actionChangeArrowhead = register({
               {
                 value: "opendot",
                 text: t("labels.arrowhead_opendot"),
-                icon:
+                icon: (
                   <ArrowheadOpenDotIcon theme={appState.theme} flip={!isRTL} />
-                ,
+                ),
                 keyBinding: "t",
               },
             ]}
@@ -765,9 +765,9 @@ export const actionChangeArrowhead = register({
                 value: "opendot",
                 text: t("labels.arrowhead_opendot"),
                 keyBinding: "t",
-                icon:
+                icon: (
                   <ArrowheadOpenDotIcon theme={appState.theme} flip={!isRTL} />
-                ,
+                ),
               },
             ]}
             value={getFormValue<Arrowhead | null>(
