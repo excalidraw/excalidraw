@@ -766,7 +766,7 @@ export const actionChangeArrowhead = register({
                 text: t("labels.arrowhead_opendot"),
                 keyBinding: "t",
                 icon: (
-                  <ArrowheadOpenDotIcon theme={appState.theme} flip={!isRTL} />
+                  <ArrowheadOpenDotIcon theme={appState.theme} flip={isRTL} />
                 ),
               },
             ]}
