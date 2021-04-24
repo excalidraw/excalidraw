@@ -224,8 +224,8 @@ export const getArrowheadPoints = (
   }, 0);
 
   // Scale down the arrowhead until we hit a certain size so that it doesn't look weird.
-  // This value is selected by minimizing a minimum size with the whole length of the
-  // arrowhead instead of last segment of the arrowhead.
+  // This value is selected by minimizing a minimum size with the last segment of the 
+  // arrowhead.
   const minSize = Math.min(size, length / 2);
   const xs = x2 - nx * minSize;
   const ys = y2 - ny * minSize;
