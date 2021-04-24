@@ -1153,8 +1153,9 @@ class App extends React.Component<AppProps, AppState> {
   // Copy/paste
 
   private onCut = withBatchedUpdates((event: ClipboardEvent) => {
-    const isExcalidrawActive =
-      document.activeElement === this.excalidrawContainerRef.current;
+    const isExcalidrawActive = this.excalidrawContainerRef.current?.contains(
+      document.activeElement,
+    );
     if (!isExcalidrawActive || isWritableElement(event.target)) {
       return;
     }
@@ -1163,8 +1164,9 @@ class App extends React.Component<AppProps, AppState> {
   });
 
   private onCopy = withBatchedUpdates((event: ClipboardEvent) => {
-    const isExcalidrawActive =
-      document.activeElement === this.excalidrawContainerRef.current;
+    const isExcalidrawActive = this.excalidrawContainerRef.current?.contains(
+      document.activeElement,
+    );
     if (!isExcalidrawActive || isWritableElement(event.target)) {
       return;
     }
@@ -1228,7 +1230,9 @@ class App extends React.Component<AppProps, AppState> {
     async (event: ClipboardEvent | null) => {
       // #686
       const target = document.activeElement;
-      const isExcalidrawActive = target === this.excalidrawContainerRef.current;
+      const isExcalidrawActive = this.excalidrawContainerRef.current?.contains(
+        target,
+      );
       if (!isExcalidrawActive) {
         return;
       }
