@@ -1153,7 +1153,9 @@ class App extends React.Component<AppProps, AppState> {
   // Copy/paste
 
   private onCut = withBatchedUpdates((event: ClipboardEvent) => {
-    if (isWritableElement(event.target)) {
+    const isExcalidrawActive =
+      document.activeElement === this.excalidrawContainerRef.current;
+    if (!isExcalidrawActive || isWritableElement(event.target)) {
       return;
     }
     this.cutAll();
@@ -1239,6 +1241,11 @@ class App extends React.Component<AppProps, AppState> {
     async (event: ClipboardEvent | null) => {
       // #686
       const target = document.activeElement;
+      const isExcalidrawActive = target === this.excalidrawContainerRef.current;
+      if (!isExcalidrawActive) {
+        return;
+      }
+
       const elementUnderCursor = document.elementFromPoint(cursorX, cursorY);
       if (
         // if no ClipboardEvent supplied, assume we're pasting via contextMenu
