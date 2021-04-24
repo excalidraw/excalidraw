@@ -28,7 +28,7 @@ const clearAppStatePropertiesForHistory = (appState: AppState) => {
   };
 };
 
-export class SceneHistory {
+class History {
   private elementCache = new Map<string, Map<number, ExcalidrawElement>>();
   private recording: boolean = true;
   private stateHistory: DehydratedHistoryEntry[] = [];
@@ -260,7 +260,4 @@ export class SceneHistory {
   }
 }
 
-export const createHistory: () => { history: SceneHistory } = () => {
-  const history = new SceneHistory();
-  return { history };
-};
+export default History;
