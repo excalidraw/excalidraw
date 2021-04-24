@@ -1421,7 +1421,9 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   scrollToContent = (
-    target: ExcalidrawElement | readonly ExcalidrawElement[],
+    target:
+      | ExcalidrawElement
+      | readonly ExcalidrawElement[] = this.scene.getElements(),
   ) => {
     this.setState({
       ...calculateScrollCenter(
