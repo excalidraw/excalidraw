@@ -93,8 +93,6 @@ Please add the latest change on the top under the correct section.
 
 - Use active Excalidraw component when editing text. This fixes a case where text editing was not working when you have multiple Excalidraw components on the same page [#3478](https://github.com/excalidraw/excalidraw/pull/3478).
 
-- Make library local to given excalidraw instance (previously, all instances on the same page shared one global library) [#3451](https://github.com/excalidraw/excalidraw/pull/3451).
-
 - Library onClick paste off-center [#3462](https://github.com/excalidraw/excalidraw/pull/3447).
 
 - Focus on last active element when dialog closes [#3447](https://github.com/excalidraw/excalidraw/pull/3447).
