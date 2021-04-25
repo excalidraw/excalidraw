@@ -17,7 +17,7 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
-- Support scrolling to center to a single Excalidraw element, or not supplying any argument at all which will default to current elements on the scene using [`scrollToContent`](https://github.com/excalidraw/excalidraw/blob/master/src/components/App.tsx#L265) [#3482](https://github.com/excalidraw/excalidraw/pull/3482).
+- [`scrollToContent`](https://github.com/excalidraw/excalidraw/blob/master/src/components/App.tsx#L265) API now supports passing just a single Excalidraw element, or none at all (which will default to current elements on the scene) [#3482](https://github.com/excalidraw/excalidraw/pull/3482).
 
   #### BREAKING CHANGE
 
@@ -53,7 +53,7 @@ Please add the latest change on the top under the correct section.
 - Make history local to a given Excalidraw instance. This fixes a case where history was getting shared when you have multiple Excalidraw components on the same page [#3481](https://github.com/excalidraw/excalidraw/pull/3481).
 - Use active Excalidraw component when editing text. This fixes a case where text editing was not working when you have multiple Excalidraw components on the same page [#3478](https://github.com/excalidraw/excalidraw/pull/3478).
 
-- Library onClick paste off-center [#3462](https://github.com/excalidraw/excalidraw/pull/3462).
+- Fix library being pasted off-center [#3462](https://github.com/excalidraw/excalidraw/pull/3462).
 
 - When switching theme, apply it only to the active Excalidraw component. This fixes a case where the theme was getting applied to the first Excalidraw component if you had multiple Excalidraw components on the same page [#3446](https://github.com/excalidraw/excalidraw/pull/3446).
 
@@ -82,7 +82,7 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
-- Support tab in text Wyswig [#3411](https://github.com/excalidraw/excalidraw/pull/3411).
+- Support tab-to-indent when editing text [#3411](https://github.com/excalidraw/excalidraw/pull/3411).
 
 - App now breaks into mobile view using the component dimensions, not viewport dimensions. This fixes a case where the app would break sooner than necessary when the component's size is smaller than viewport [#3414](https://github.com/excalidraw/excalidraw/pull/3414).
 
@@ -94,9 +94,9 @@ Please add the latest change on the top under the correct section.
 
 - Focus on last active element when dialog closes [#3447](https://github.com/excalidraw/excalidraw/pull/3447).
 
-- Incorrectly caching png file handle [#3407](https://github.com/excalidraw/excalidraw/pull/3407).
+- Fix incorrectly caching png file handle [#3407](https://github.com/excalidraw/excalidraw/pull/3407).
 
-- Popover position incorrect on Safari for non-zero offsets/scroll [#3399](https://github.com/excalidraw/excalidraw/pull/3399).
+- Fix popover position incorrect on Safari for non-zero offsets/scroll [#3399](https://github.com/excalidraw/excalidraw/pull/3399).
 
 ---
 
