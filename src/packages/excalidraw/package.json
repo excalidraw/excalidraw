@@ -1,6 +1,6 @@
 {
   "name": "@excalidraw/excalidraw",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "main": "main.js",
   "types": "types/packages/excalidraw/index.d.ts",
   "files": [
@@ -11,6 +11,11 @@
     "access": "public"
   },
   "description": "Excalidraw as a React component",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/excalidraw/excalidraw.git",
+    "directory": "src/packages/excalidraw"
+  },
   "license": "MIT",
   "keywords": [
     "excalidraw",
