@@ -126,7 +126,7 @@ export default function App() {
         <Excalidraw
           ref={excalidrawRef}
           initialData={InitialData}
-          onChange={(elements, state) => {
+          onChange={(elements, state) =>
             console.log("Elements :", elements, "State : ", state)
           }
           onPointerUpdate={(payload) => console.log(payload)}

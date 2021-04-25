@@ -126,21 +126,21 @@ export default function App() {
         <Excalidraw
           ref={excalidrawRef}
           initialData={InitialData}
-          onChange={(elements, state) => {
+          onChange={(elements, state) =>
             console.log("Elements :", elements, "State : ", state)
           }
-            onPointerUpdate={(payload) => console.log(payload)}
-            onCollabButtonClick={() =>
+          onPointerUpdate={(payload) => console.log(payload)}
+          onCollabButtonClick={() =>
             window.alert("You clicked on collab button")
           }
-            viewModeEnabled={viewModeEnabled}
-            zenModeEnabled={zenModeEnabled}
-            gridModeEnabled={gridModeEnabled}
-            />
-            </div>
-            </div>
-            );
-            }
+          viewModeEnabled={viewModeEnabled}
+          zenModeEnabled={zenModeEnabled}
+          gridModeEnabled={gridModeEnabled}
+        />
+      </div>
+    </div>
+  );
+}
 ```
 
 To view the full example visit :point_down:
