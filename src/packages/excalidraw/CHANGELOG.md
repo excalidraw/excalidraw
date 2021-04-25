@@ -55,8 +55,6 @@ Please add the latest change on the top under the correct section.
 
 - Library onClick paste off-center [#3462](https://github.com/excalidraw/excalidraw/pull/3462).
 
-- Focus on last active element when dialog closes [#3447](https://github.com/excalidraw/excalidraw/pull/3447).
-
 - When switching theme, apply it only to the active Excalidraw component. This fixes a case where the theme was getting applied to the first Excalidraw component if you had multiple Excalidraw components on the same page [#3446](https://github.com/excalidraw/excalidraw/pull/3446).
 
 ### Refactor
@@ -93,6 +91,8 @@ Please add the latest change on the top under the correct section.
 - Enable drop event on the whole component [#3406](https://github.com/excalidraw/excalidraw/pull/3406).
 
 ### Fixes
+
+- Focus on last active element when dialog closes [#3447](https://github.com/excalidraw/excalidraw/pull/3447).
 
 - Incorrectly caching png file handle [#3407](https://github.com/excalidraw/excalidraw/pull/3407).
 
