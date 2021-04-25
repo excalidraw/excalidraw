@@ -57,9 +57,11 @@ const Picker = ({
   const activeItem = React.useRef<HTMLButtonElement>();
   const gallery = React.useRef<HTMLDivElement>();
   const colorInput = React.useRef<HTMLInputElement>();
+  const isAutoFocusing = React.useRef(false);
 
   React.useEffect(() => {
     // After the component is first mounted focus on first input
+    isAutoFocusing.current = true;
     if (activeItem.current) {
       activeItem.current.focus();
     } else if (colorInput.current) {
@@ -67,6 +69,7 @@ const Picker = ({
     } else if (gallery.current) {
       gallery.current.focus();
     }
+    isAutoFocusing.current = false;
   }, []);
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
@@ -160,7 +163,9 @@ const Picker = ({
               }
             }}
             onFocus={() => {
-              onChange(_color);
+              if (!isAutoFocusing.current) {
+                onChange(_color);
+              }
             }}
           >
             {_color === "transparent" ? (
