@@ -1562,10 +1562,10 @@ cross-spawn@^7.0.1, cross-spawn@^7.0.3:
     shebang-command "^2.0.0"
     which "^2.0.1"
 
-css-loader@5.2.3:
-  version "5.2.3"
-  resolved "https://registry.yarnpkg.com/css-loader/-/css-loader-5.2.3.tgz#672074a8941e6704fe2d2114bb3b0b3f8a99247f"
-  integrity sha512-8IkpXDWwpRza3suLhmzrA2XXyz741iaDJAhiwhQUTLFoj2bZfh9RM8Mc/X2801IGEWOUIj+pShg7J3dEtd6A0A==
+css-loader@5.2.4:
+  version "5.2.4"
+  resolved "https://registry.yarnpkg.com/css-loader/-/css-loader-5.2.4.tgz#e985dcbce339812cb6104ef3670f08f9893a1536"
+  integrity sha512-OFYGyINCKkdQsTrSYxzGSFnGS4gNjcXkKkQgWxK138jgnPt+lepxdjSZNc8sHAl5vP3DhsJUxufWIjOwI8PMMw==
   dependencies:
     camelcase "^6.2.0"
     icss-utils "^5.1.0"
