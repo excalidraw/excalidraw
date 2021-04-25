@@ -287,7 +287,7 @@ export type ExcalidrawImperativeAPI = {
   history: {
     clear: InstanceType<typeof App>["resetHistory"];
   };
-  setScrollToContent: InstanceType<typeof App>["setScrollToContent"];
+  scrollToContent: InstanceType<typeof App>["scrollToContent"];
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
   getAppState: () => InstanceType<typeof App>["state"];
   refresh: InstanceType<typeof App>["refresh"];
@@ -361,7 +361,7 @@ class App extends React.Component<AppProps, AppState> {
         history: {
           clear: this.resetHistory,
         },
-        setScrollToContent: this.setScrollToContent,
+        scrollToContent: this.scrollToContent,
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
         refresh: this.refresh,
@@ -1421,9 +1421,17 @@ class App extends React.Component<AppProps, AppState> {
     this.actionManager.executeAction(actionToggleStats);
   };
 
-  setScrollToContent = (remoteElements: readonly ExcalidrawElement[]) => {
+  scrollToContent = (
+    target:
+      | ExcalidrawElement
+      | readonly ExcalidrawElement[] = this.scene.getElements(),
+  ) => {
     this.setState({
-      ...calculateScrollCenter(remoteElements, this.state, this.canvas),
+      ...calculateScrollCenter(
+        Array.isArray(target) ? target : [target],
+        this.state,
+        this.canvas,
+      ),
     });
   };
 
