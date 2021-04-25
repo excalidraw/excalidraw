@@ -11,23 +11,25 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
-## Unreleased
+## 0.7.0 (2021-04-26)
 
 ## Excalidraw API
 
 ### Features
 
-- Support scrolling to center to a single Excalidraw element, or not supplying any argument at all which will default to current elements on the scene [#3482](https://github.com/excalidraw/excalidraw/pull/3482).
+- [`scrollToContent`](https://github.com/excalidraw/excalidraw/blob/master/src/components/App.tsx#L265) API now supports passing just a single Excalidraw element, or none at all (which will default to current elements on the scene) [#3482](https://github.com/excalidraw/excalidraw/pull/3482).
 
   #### BREAKING CHANGE
 
-  - Renamed `setScrollToContent` to [`scrollToContent`](https://github.com/excalidraw/excalidraw/blob/master/src/components/App.tsx#L265)..
+  - Renamed `setScrollToContent` to [`scrollToContent`](https://github.com/excalidraw/excalidraw/blob/master/src/components/App.tsx#L265).
 
 - Make library local to given excalidraw instance (previously, all instances on the same page shared one global library) [#3451](https://github.com/excalidraw/excalidraw/pull/3451).
 
   - Added prop [onLibraryChange](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onLibraryChange) which if supplied will be called when library is updated.
+
   - Added attribute `libraryItems` to prop [initialData](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#initialdata) which can be used to load excalidraw with existing library items.
-  - Assign a [unique id](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#Id) to the excalidraw component. The id can be accessed via [`ref`](https://github.com/excalidraw/excalidraw/blob/master/src/components/App.tsx#L265).
+
+  - Assign a [unique id](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#Id) to the excalidraw component. The id can be accessed via [`ref`](https://github.com/excalidraw/excalidraw/blob/master/src/components/App.tsx#L298).
 
   #### BREAKING CHANGE
 
@@ -40,15 +42,20 @@ Please add the latest change on the top under the correct section.
   - Earlier keyboard events were bind to document but now its bind to Excalidraw component by default. So you will need to set [`handleKeyboardGlobally`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#handleKeyboardGlobally) to true if you want the previous behaviour (bind the keyboard events to document).
 
 - Recompute offsets on `scroll` of the nearest scrollable container [#3408](https://github.com/excalidraw/excalidraw/pull/3408). This can be disabled by setting [`detectScroll`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#detectScroll) to `false`.
+
 - Add `onPaste` prop to handle custom clipboard behaviours [#3420](https://github.com/excalidraw/excalidraw/pull/3420).
 
 ### Fixes
 
 - Changing z-index of elements (sorting them below/above other elements) now updates their `version` and `versionNonce` (only applies to the selected elements). This fix will allow you account for z-index changes if you're syncing just the elements that changed (and not the whole scene) [#3483](https://github.com/excalidraw/excalidraw/pull/3483).
 - Only handle cut/paste events inside excalidraw [#3484](https://github.com/excalidraw/excalidraw/pull/3484).
+
 - Make history local to a given Excalidraw instance. This fixes a case where history was getting shared when you have multiple Excalidraw components on the same page [#3481](https://github.com/excalidraw/excalidraw/pull/3481).
 - Use active Excalidraw component when editing text. This fixes a case where text editing was not working when you have multiple Excalidraw components on the same page [#3478](https://github.com/excalidraw/excalidraw/pull/3478).
-- When switching theme, apply it only to the active Excalidraw component. This fixes a case where the theme was getting applied to the first Excalidraw component if you had multiple Excalidraw components on the same page [#3446](https://github.com/excalidraw/excalidraw/pull/3446)
+
+- Fix library being pasted off-center [#3462](https://github.com/excalidraw/excalidraw/pull/3462).
+
+- When switching theme, apply it only to the active Excalidraw component. This fixes a case where the theme was getting applied to the first Excalidraw component if you had multiple Excalidraw components on the same page [#3446](https://github.com/excalidraw/excalidraw/pull/3446).
 
 ### Refactor
 
@@ -75,7 +82,23 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
+- Support tab-to-indent when editing text [#3411](https://github.com/excalidraw/excalidraw/pull/3411).
+
 - App now breaks into mobile view using the component dimensions, not viewport dimensions. This fixes a case where the app would break sooner than necessary when the component's size is smaller than viewport [#3414](https://github.com/excalidraw/excalidraw/pull/3414).
+
+- Add screenshots to manifest.json [#3369](https://github.com/excalidraw/excalidraw/pull/3369).
+
+- Enable drop event on the whole component [#3406](https://github.com/excalidraw/excalidraw/pull/3406).
+
+### Fixes
+
+- Focus on last active element when dialog closes [#3447](https://github.com/excalidraw/excalidraw/pull/3447).
+
+- Fix incorrectly caching png file handle [#3407](https://github.com/excalidraw/excalidraw/pull/3407).
+
+- Fix popover position incorrect on Safari for non-zero offsets/scroll [#3399](https://github.com/excalidraw/excalidraw/pull/3399).
+
+---
 
 ## 0.6.0 (2021-04-04)
 
