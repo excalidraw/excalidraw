@@ -61,7 +61,7 @@
     "postcss-loader": "5.2.0",
     "sass-loader": "11.0.1",
     "terser-webpack-plugin": "5.1.1",
-    "ts-loader": "8.1.0",
+    "ts-loader": "9.1.1",
     "typescript": "4.2.4",
     "webpack": "5.35.1",
     "webpack-bundle-analyzer": "4.4.1",
