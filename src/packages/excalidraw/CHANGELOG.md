@@ -17,8 +17,10 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
--  Support scrolling to center to a single Excalidraw element, or not supplying any argument at all which will default to current elements on the scene [#3482](https://github.com/excalidraw/excalidraw/pull/3482).
-#### BREAKING CHANGE
+- Support scrolling to center to a single Excalidraw element, or not supplying any argument at all which will default to current elements on the scene [#3482](https://github.com/excalidraw/excalidraw/pull/3482).
+
+  #### BREAKING CHANGE
+
   - Renamed `setScrollToContent` to [`scrollToContent`](https://github.com/excalidraw/excalidraw/blob/master/src/components/App.tsx#L265)..
 
 - Make library local to given excalidraw instance (previously, all instances on the same page shared one global library) [#3451](https://github.com/excalidraw/excalidraw/pull/3451).
