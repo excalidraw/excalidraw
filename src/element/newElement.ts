@@ -9,10 +9,11 @@ import {
   GroupId,
   VerticalAlign,
   Arrowhead,
+  TextFormat,
 } from "../element/types";
 import { measureText, getFontString } from "../utils";
 import { randomInteger, randomId } from "../random";
-import { newElementWith } from "./mutateElement";
+import { ElementUpdate, newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
 import { AppState } from "../types";
 import { getElementAbsoluteCoords } from ".";
@@ -111,6 +112,7 @@ export const newTextElement = (
     fontFamily: FontFamily;
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
+    format: TextFormat[];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const metrics = measureText(opts.text, getFontString(opts));
@@ -123,6 +125,7 @@ export const newTextElement = (
       fontFamily: opts.fontFamily,
       textAlign: opts.textAlign,
       verticalAlign: opts.verticalAlign,
+      format: opts.format,
       x: opts.x - offsets.x,
       y: opts.y - offsets.y,
       width: metrics.width,
@@ -203,12 +206,11 @@ const getAdjustedDimensions = (
 
 export const updateTextElement = (
   element: ExcalidrawTextElement,
-  { text, isDeleted }: { text: string; isDeleted?: boolean },
+  updates: ElementUpdate<ExcalidrawTextElement>,
 ): ExcalidrawTextElement => {
   return newElementWith(element, {
-    text,
-    isDeleted: isDeleted ?? element.isDeleted,
-    ...getAdjustedDimensions(element, text),
+    ...updates,
+    ...getAdjustedDimensions(element, updates.text ?? element.text),
   });
 };
 

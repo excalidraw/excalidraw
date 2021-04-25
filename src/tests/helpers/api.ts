@@ -81,6 +81,7 @@ export class API {
     verticalAlign?: T extends "text"
       ? ExcalidrawTextElement["verticalAlign"]
       : never;
+    format?: T extends "text" ? ExcalidrawTextElement["format"] : never;
   }): T extends "arrow" | "line" | "draw"
     ? ExcalidrawLinearElement
     : T extends "text"
@@ -123,6 +124,7 @@ export class API {
           fontFamily: rest.fontFamily ?? appState.currentItemFontFamily,
           textAlign: rest.textAlign ?? appState.currentItemTextAlign,
           verticalAlign: rest.verticalAlign ?? DEFAULT_VERTICAL_ALIGN,
+          format: rest.format ?? [],
         });
         break;
       case "arrow":

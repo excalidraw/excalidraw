@@ -6,7 +6,11 @@ import {
 } from "../utils";
 import { isTextElement } from "../element/typeChecks";
 import { CLASSES } from "../constants";
-import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+  TextFormat,
+} from "../element/types";
 import { AppState } from "../types";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -18,35 +22,118 @@ import {
   Editor,
   Transforms,
 } from "slate";
-import { Slate, Editable, withReact, ReactEditor } from "slate-react";
+import {
+  Slate,
+  Editable,
+  withReact,
+  ReactEditor,
+  RenderLeafProps,
+} from "slate-react";
+import { withHistory } from "slate-history";
+import { ElementUpdate } from "../element/mutateElement";
 
-type RootElement = { children: Text[] };
-type Text = { text: string };
+type CursorFormat = Omit<TextFormat, "length">;
+type SlateLineElement = { children: SlateTextElement[] };
+type SlateTextElement = { text: string } & CursorFormat;
+
+const FORMAT_PROPERTIES: { [Name in keyof CursorFormat]: true } = {
+  opacity: true,
+  strokeColor: true,
+  textAlign: true,
+};
+
+type SlateEditor = BaseEditor & ReactEditor;
 
 declare module "slate" {
   interface CustomTypes {
-    Editor: BaseEditor & ReactEditor;
-    Element: RootElement;
-    Text: Text;
+    Editor: SlateEditor;
+    Element: SlateLineElement;
+    Text: SlateTextElement;
   }
 }
+
+// We need to access the current `editor` from other places in the app, so
+// we create a global map to get a reference to the editor state.
+class TextEditors {
+  private static elementToEditor = new Map<
+    ExcalidrawTextElement["id"],
+    SlateEditor
+  >();
+
+  static setEditorForElement(
+    element: ExcalidrawTextElement,
+    editor: SlateEditor,
+  ) {
+    this.elementToEditor.set(element.id, editor);
+  }
+
+  static removeEditorForElement(element: ExcalidrawTextElement) {
+    this.elementToEditor.delete(element.id);
+  }
+
+  static getEditor(element: ExcalidrawTextElement): SlateEditor | null {
+    return this.elementToEditor.get(element.id) ?? null;
+  }
+}
+
+export const applyFormatInTextEditor = (
+  element: ExcalidrawTextElement,
+  updates: ElementUpdate<ExcalidrawTextElement>,
+): void => {
+  const editor = TextEditors.getEditor(element)!;
+
+  // Perform the update on text tick, otherwise appState changes interfere
+  // with the action
+  setTimeout(() => {
+    for (const key in updates) {
+      const value = (updates as any)[key];
+      if (typeof value !== "undefined") {
+        // console.log("adding mark", key, value);
+        // console.log(JSON.stringify(editor.selection, null, 2));
+
+        Editor.addMark(editor, key, value);
+      }
+    }
+  }, 1);
+};
+
+export const textFormatUpdates = <TElement extends ExcalidrawElement>(
+  element: TElement,
+  updates: ElementUpdate<TElement>,
+): ElementUpdate<TElement> => {
+  if (!isTextElement(element)) {
+    return updates;
+  }
+  const relevantUpdates: Partial<CursorFormat> = {};
+  for (const key in updates) {
+    if (key in FORMAT_PROPERTIES) {
+      // @ts-ignore
+      relevantUpdates[key] = updates[key];
+    }
+  }
+  return {
+    ...updates,
+    format: element.format.map((chunk) => ({ ...chunk, ...relevantUpdates })),
+  };
+};
 
 export const TextEditor = ({
   element,
   appState,
-  canvas,
   onInitialization,
   onChange,
   onSubmit,
 }: {
   element: ExcalidrawElement | null;
   appState: AppState;
-  canvas: HTMLCanvasElement | null;
   onInitialization: (element: ExcalidrawTextElement) => void;
-  onChange: (event: { element: ExcalidrawTextElement; text: string }) => void;
+  onChange: (event: {
+    element: ExcalidrawTextElement;
+    updates: ElementUpdate<ExcalidrawTextElement>;
+  }) => void;
   onSubmit: (data: {
     element: ExcalidrawTextElement;
-    text: string;
+    updates: ElementUpdate<ExcalidrawTextElement>;
     viaKeyboard: boolean;
   }) => void;
 }) => {
@@ -60,10 +147,9 @@ export const TextEditor = ({
     return null;
   }
   return (
-    <SlateEditor
+    <SlateEditorWrapper
       key={element.id}
       appState={appState}
-      canvas={canvas}
       element={element}
       onChange={onChange}
       onSubmit={onSubmit}
@@ -71,32 +157,44 @@ export const TextEditor = ({
   );
 };
 
-const SlateEditor = ({
+const SlateEditorWrapper = ({
   element,
   appState,
-  canvas,
   onChange,
   onSubmit,
 }: {
   appState: AppState;
   element: ExcalidrawTextElement;
-  canvas: HTMLCanvasElement | null;
-  onChange: (event: { element: ExcalidrawTextElement; text: string }) => void;
+  onChange: (event: {
+    element: ExcalidrawTextElement;
+    updates: ElementUpdate<ExcalidrawTextElement>;
+  }) => void;
   onSubmit: (data: {
     element: ExcalidrawTextElement;
-    text: string;
+    updates: ElementUpdate<ExcalidrawTextElement>;
     viaKeyboard: boolean;
   }) => void;
 }) => {
   const [ignoreBlur, setIgnoreBlur] = useState(true);
 
-  const editor = useMemo(() => withReact(createEditor()), []);
+  const editor = useMemo(() => withHistory(withReact(createEditor())), []);
+
+  useEffect(() => {
+    TextEditors.setEditorForElement(element, editor);
+    return () => {
+      TextEditors.removeEditorForElement(element);
+    };
+  });
 
   const handleSubmit = useCallback(
     (viaKeyboard: boolean) => {
       onSubmit({
         element,
-        text: slateModelToString(editor.children),
+        updates: slateModelAndCursorToTextElement(
+          editor.children,
+          // We don't want to preserve cursor color after editing is done
+          null,
+        ),
         viaKeyboard,
       });
     },
@@ -104,6 +202,7 @@ const SlateEditor = ({
   );
 
   const handleSubmitViaBlur = useCallback(() => {
+    window.removeEventListener("blur", handleSubmitViaBlur);
     if (ignoreBlur) {
       return;
     }
@@ -200,24 +299,34 @@ const SlateEditor = ({
         document.querySelector(".excalidraw")!.parentNode as Element,
       ).marginRight.slice(0, -2),
     );
+  const [model, cursorFormat] = textElementToSlateModelAndCursor(element);
+
   return (
     <Slate
       editor={editor}
-      value={stringToSlateModel(element.text)}
-      onChange={(newValue) => {
-        const newText = slateModelToString(newValue);
-        if (newText !== element.text) {
-          onChange({
-            element,
-            text: newText,
-          });
+      // @ts-ignore: This works, but Slate's type definition doesn't expose it
+      marks={cursorFormat}
+      value={model}
+      onChange={
+        // setValue
+        (model) => {
+          const updates = slateModelAndCursorToTextElement(
+            model,
+            Editor.marks(editor),
+          );
+          // console.log(updates);
+
+          if (hasVisibleUpdates(element, updates)) {
+            onChange({ element, updates });
+          }
         }
-      }}
+      }
     >
       {/* There's a bug in Slate preventing onBlur from firing due to
        simultenous state.isUpdatingSelection */}
       <div onBlur={handleSubmitViaBlur}>
         <Editable
+          renderLeaf={renderSlateTextElement}
           dir="auto"
           tabIndex={0}
           data-type="wysiwyg"
@@ -254,21 +363,10 @@ const SlateEditor = ({
             ),
             textAlign,
             color: element.strokeColor,
-            opacity: element.opacity / 100,
+            opacity:
+              element.format.length === 0 ? element.opacity / 100 : undefined,
             filter: "var(--theme-filter)",
             maxWidth: `${maxWidth}px`,
-          }}
-          onDOMBeforeInput={(event) => {
-            // Prevent the default "insert block on enter" Slate behavior,
-            // so that we only need to deal with text elements. Insert a newline
-            // character instead.
-            switch (event.inputType) {
-              case "insertLineBreak":
-              case "insertParagraph":
-                Editor.insertText(editor, "\n");
-                event.preventDefault();
-                break;
-            }
           }}
           onKeyDown={(event) => {
             if (event.key === KEYS.ESCAPE) {
@@ -290,12 +388,122 @@ const SlateEditor = ({
   );
 };
 
-const slateModelToString = (model: Descendant[]) => {
-  return normalizeText(Node.string(model[0]));
+const renderSlateTextElement = (props: RenderLeafProps) => {
+  return (
+    <span
+      {...props.attributes}
+      style={{
+        color: props.leaf.strokeColor,
+        opacity: props.leaf.opacity / 100,
+      }}
+    >
+      {props.children}
+    </span>
+  );
 };
 
-const stringToSlateModel = (text: string) => {
-  return [{ children: [{ text }] }];
+const hasVisibleUpdates = (
+  element: ExcalidrawTextElement,
+  updates: ElementUpdate<ExcalidrawTextElement>,
+) => {
+  if (element.text.length !== updates.text?.length) {
+    return true;
+  }
+  for (const [key, value] of Object.entries(updates)) {
+    const doesMatchElement =
+      key === "format"
+        ? areSameFormats(updates.format!, element.format)
+        : element[key as keyof ElementUpdate<ExcalidrawTextElement>] === value;
+    if (!doesMatchElement) {
+      return true;
+    }
+  }
+  return false;
+};
+
+const areSameFormats = (a: TextFormat[], b: TextFormat[]) => {
+  return (
+    a.length === b.length &&
+    a.every((formatA, i) => {
+      const formatB = b[i];
+      return (
+        formatA.length === formatB.length && isSameFormat(formatA, formatB)
+      );
+    })
+  );
+};
+
+const slateModelAndCursorToTextElement = (
+  model: Descendant[],
+  cursorFormat: CursorFormat | null,
+) => {
+  // console.log(X++, "model in", cursorFormat, model);
+  const lines = model as SlateLineElement[];
+  // console.log(lines);
+
+  const firstFormat = cursorFormat ?? lines[0].children[0];
+  const hasSingleFormat = lines.every((line) =>
+    line.children.every((format) => isSameFormat(firstFormat, format)),
+  );
+  const format = hasSingleFormat
+    ? []
+    : lines.flatMap((line) =>
+        line.children.map(({ text, ...format }) => ({
+          ...format,
+          length: text.length,
+        })),
+      );
+  const text = normalizeText(lines.map((line) => Node.string(line)).join("\n"));
+  // console.log(X++, "exc out", text, format);
+  return { ...firstFormat, text, format };
+};
+
+// let X = 0;
+
+const textElementToSlateModelAndCursor = (
+  element: ExcalidrawTextElement,
+): [Descendant[], CursorFormat | null] => {
+  // console.log(X++, "exc in", element.text, element.format);
+
+  // @ts-ignore
+  const elementFormat: CursorFormat = {};
+  Object.keys(FORMAT_PROPERTIES).forEach((key) => {
+    // @ts-ignore
+    elementFormat[key] = element[key];
+  });
+  const lines =
+    element.format.length === 0
+      ? element.text
+          .split("\n")
+          .map((line) => ({ children: [{ ...elementFormat, text: line }] }))
+      : chunkText(element.format, element.text);
+  // console.log(X++, "model out", lines, elementFormat);
+  return [lines, elementFormat];
+};
+
+const isSameFormat = (a: CursorFormat, b: CursorFormat) => {
+  return Object.keys(FORMAT_PROPERTIES).every(
+    (property) =>
+      a[property as keyof CursorFormat] === b[property as keyof CursorFormat],
+  );
+};
+
+const chunkText = (formatChunks: TextFormat[], text: string) => {
+  const lines = [];
+  let chunks = [];
+  let i = 0;
+  for (const { length, ...format } of formatChunks) {
+    const j = i + length;
+    chunks.push({ ...format, text: text.slice(i, j) });
+    i = j;
+    if (text[i] === "\n") {
+      i++;
+      lines.push({ children: chunks });
+      chunks = [];
+    }
+  }
+  lines.push({ children: chunks });
+  return lines;
 };
 
 const normalizeText = (text: string) => {

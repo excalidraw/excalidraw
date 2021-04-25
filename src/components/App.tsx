@@ -106,7 +106,7 @@ import {
   updateBoundElements,
 } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
-import { mutateElement } from "../element/mutateElement";
+import { ElementUpdate, mutateElement } from "../element/mutateElement";
 import { deepCopyElement } from "../element/newElement";
 import { MaybeTransformHandleType } from "../element/transformHandles";
 import {
@@ -474,7 +474,6 @@ class App extends React.Component<AppProps, AppState> {
         />
         <TextEditor
           appState={this.state}
-          canvas={this.canvas}
           element={this.state.editingElement}
           onInitialization={this.handleTextEditorInitialization}
           onChange={this.handleTextEditorChange}
@@ -1265,6 +1264,7 @@ class App extends React.Component<AppProps, AppState> {
       fontFamily: this.state.currentItemFontFamily,
       textAlign: this.state.currentItemTextAlign,
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
+      format: [],
     });
 
     this.scene.replaceAllElements([
@@ -1632,20 +1632,22 @@ class App extends React.Component<AppProps, AppState> {
 
     // do an initial update to re-initialize element position since we were
     // modifying element's x/y for sake of editor (case: syncing to remote)
-    this.updateEditingTextElement(element, element.text);
+    this.updateEditingTextElement(element, {});
   };
 
-  private handleTextEditorChange = withBatchedUpdates(({ element, text }) => {
-    this.updateEditingTextElement(element, text);
-    if (isNonDeletedElement(element)) {
-      updateBoundElements(element);
-    }
-  });
+  private handleTextEditorChange = withBatchedUpdates(
+    ({ element, updates }) => {
+      this.updateEditingTextElement(element, updates);
+      if (isNonDeletedElement(element)) {
+        updateBoundElements(element);
+      }
+    },
+  );
 
   private handleTextEditorSubmit = withBatchedUpdates(
-    ({ element, text, viaKeyboard, isNewElement }) => {
-      const isDeleted = !text.trim();
-      this.updateEditingTextElement(element, text, isDeleted);
+    ({ element, updates, viaKeyboard, isNewElement }) => {
+      const isDeleted = updates.text.trim() === "";
+      this.updateEditingTextElement(element, updates, isDeleted);
       // select the created text element only if submitting via keyboard
       // (when submitting via click it should act as signal to deselect)
       if (!isDeleted && viaKeyboard) {
@@ -1674,7 +1676,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private updateEditingTextElement = (
     element: ExcalidrawTextElement,
-    text: string,
+    updates: ElementUpdate<ExcalidrawTextElement>,
     isDeleted = false,
   ) => {
     let newElement = null;
@@ -1682,7 +1684,7 @@ class App extends React.Component<AppProps, AppState> {
       ...this.scene.getElementsIncludingDeleted().map((_element) => {
         if (_element.id === element.id && isTextElement(_element)) {
           newElement = updateTextElement(_element, {
-            text,
+            ...updates,
             isDeleted,
           });
           return newElement;
@@ -1791,6 +1793,7 @@ class App extends React.Component<AppProps, AppState> {
           verticalAlign: parentCenterPosition
             ? "middle"
             : DEFAULT_VERTICAL_ALIGN,
+          format: [],
         });
 
     if (existingTextElement) {

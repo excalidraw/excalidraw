@@ -5,7 +5,7 @@ import { getSizeFromPoints } from "../points";
 import { randomInteger } from "../random";
 import { Point } from "../types";
 
-type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
+export type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
   Partial<TElement>,
   "id" | "version" | "versionNonce"
 >;

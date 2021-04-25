@@ -95,7 +95,20 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     baseline: number;
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
+    format: TextFormat[];
   }>;
+
+export type TextFormat = Readonly<{
+  length: number;
+
+  /// Might be supported in the future:
+  // backgroundColor: string;
+  // fontFamily: FontFamily;
+  // fontSize: number;
+  opacity: number;
+  strokeColor: string;
+  textAlign: TextAlign;
+}>;
 
 export type ExcalidrawBindableElement =
   | ExcalidrawRectangleElement

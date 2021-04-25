@@ -143,30 +143,60 @@ const drawElementOnCanvas = (
           document.body.appendChild(context.canvas);
         }
         context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
+
         const font = context.font;
-        context.font = getFontString(element);
         const fillStyle = context.fillStyle;
-        context.fillStyle = element.strokeColor;
         const textAlign = context.textAlign;
+
+        context.font = getFontString(element);
         context.textAlign = element.textAlign as CanvasTextAlign;
 
-        // Canvas does not support multiline text by default
-        const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
-        const lineHeight = element.height / lines.length;
-        const verticalOffset = element.height - element.baseline;
-        const horizontalOffset =
-          element.textAlign === "center"
-            ? element.width / 2
-            : element.textAlign === "right"
-            ? element.width
-            : 0;
-        for (let index = 0; index < lines.length; index++) {
+        const text = element.text.replace(/\r\n?/g, "\n");
+        const lines = text.split("\n");
+        const formatChunks =
+          element.format.length === 0
+            ? lines.map((line) => ({ ...element, length: line.length }))
+            : element.format;
+
+        let from = 0;
+        let horizontalChunkOffset = 0;
+        let lineIndex = 0;
+
+        for (const format of formatChunks) {
+          const to = from + format.length;
+          context.fillStyle = format.strokeColor;
+
+          // Canvas does not support multiline text by default
+          // TODO: Replace this with fontBoundingBoxAscent + Descent
+          // ones evergreen browsers support it, to fix multiple
+          // fonts rendering.
+          const lineHeight = element.height / lines.length;
+          const verticalOffset = element.height - element.baseline;
+          const horizontalOffset =
+            element.textAlign === "center"
+              ? element.width / 2
+              : element.textAlign === "right"
+              ? element.width
+              : 0;
+
+          const textChunk = text.slice(from, to);
           context.fillText(
-            lines[index],
-            horizontalOffset,
-            (index + 1) * lineHeight - verticalOffset,
+            textChunk,
+            horizontalOffset + horizontalChunkOffset,
+            (lineIndex + 1) * lineHeight - verticalOffset,
           );
+          from = to;
+          if (text[from] !== "\n") {
+            horizontalChunkOffset += context.measureText(textChunk).width;
+          } else {
+            horizontalChunkOffset = 0;
+            while (text[from] === "\n") {
+              lineIndex++;
+              from++;
+            }
+          }
         }
+
         context.fillStyle = fillStyle;
         context.font = font;
         context.textAlign = textAlign;

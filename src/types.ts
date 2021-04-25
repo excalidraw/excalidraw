@@ -146,6 +146,11 @@ export declare class GestureEvent extends UIEvent {
   readonly scale: number;
 }
 
+export type TextSelection = {
+  anchor: number;
+  focus: number;
+};
+
 export type LibraryItem = readonly NonDeleted<ExcalidrawElement>[];
 export type LibraryItems = readonly LibraryItem[];
 

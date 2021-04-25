@@ -91,6 +91,7 @@ export class ActionManager implements ActionsManagerInterface {
   }
 
   executeAction(action: Action) {
+    console.warn("WTF");
     this.updater(
       action.perform(
         this.getElementsIncludingDeleted(),

@@ -37,7 +37,7 @@ import {
   isTextElement,
   redrawTextBoundingBox,
 } from "../element";
-import { newElementWith } from "../element/mutateElement";
+import { ElementUpdate, newElementWith } from "../element/mutateElement";
 import { isLinearElement, isLinearElementType } from "../element/typeChecks";
 import {
   Arrowhead,
@@ -57,6 +57,10 @@ import {
   isSomeElementSelected,
 } from "../scene";
 import { register } from "./register";
+import {
+  applyFormatInTextEditor,
+  textFormatUpdates,
+} from "../components/TextEditor";
 
 const changeProperty = (
   elements: readonly ExcalidrawElement[],
@@ -72,6 +76,34 @@ const changeProperty = (
     }
     return element;
   });
+};
+
+const changePropertyOrTextFormat = (
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+  propertyUpdates: ElementUpdate<ExcalidrawTextElement>,
+  appStateUpdates: Partial<AppState>,
+  afterTextElementMutation?: (element: ExcalidrawTextElement) => void,
+) => {
+  const editingElement = appState.editingElement;
+  if (isTextElement(editingElement)) {
+    applyFormatInTextEditor(editingElement, propertyUpdates);
+    if (afterTextElementMutation != null) {
+      afterTextElementMutation(editingElement);
+    }
+
+    return {
+      appState: { ...appState, ...appStateUpdates },
+      commitToHistory: true,
+    };
+  }
+  return {
+    elements: changeProperty(elements, appState, (el) =>
+      newElementWith(el, textFormatUpdates(el, propertyUpdates)),
+    ),
+    appState: { ...appState, ...appStateUpdates },
+    commitToHistory: true,
+  };
 };
 
 const getFormValue = function <T>(
@@ -98,15 +130,12 @@ const getFormValue = function <T>(
 export const actionChangeStrokeColor = register({
   name: "changeStrokeColor",
   perform: (elements, appState, value) => {
-    return {
-      elements: changeProperty(elements, appState, (el) =>
-        newElementWith(el, {
-          strokeColor: value,
-        }),
-      ),
-      appState: { ...appState, currentItemStrokeColor: value },
-      commitToHistory: true,
-    };
+    return changePropertyOrTextFormat(
+      elements,
+      appState,
+      { strokeColor: value },
+      { currentItemStrokeColor: value },
+    );
   },
   PanelComponent: ({ elements, appState, updateData }) => (
     <>
@@ -351,15 +380,12 @@ export const actionChangeStrokeStyle = register({
 export const actionChangeOpacity = register({
   name: "changeOpacity",
   perform: (elements, appState, value) => {
-    return {
-      elements: changeProperty(elements, appState, (el) =>
-        newElementWith(el, {
-          opacity: value,
-        }),
-      ),
-      appState: { ...appState, currentItemOpacity: value },
-      commitToHistory: true,
-    };
+    return changePropertyOrTextFormat(
+      elements,
+      appState,
+      { opacity: value },
+      { currentItemOpacity: value },
+    );
   },
   PanelComponent: ({ elements, appState, updateData }) => (
     <label className="control-label">
@@ -400,24 +426,15 @@ export const actionChangeOpacity = register({
 export const actionChangeFontSize = register({
   name: "changeFontSize",
   perform: (elements, appState, value) => {
-    return {
-      elements: changeProperty(elements, appState, (el) => {
-        if (isTextElement(el)) {
-          const element: ExcalidrawTextElement = newElementWith(el, {
-            fontSize: value,
-          });
-          redrawTextBoundingBox(element);
-          return element;
-        }
-
-        return el;
-      }),
-      appState: {
-        ...appState,
-        currentItemFontSize: value,
+    return changePropertyOrTextFormat(
+      elements,
+      appState,
+      { fontSize: value },
+      { currentItemFontSize: value },
+      (textElement) => {
+        redrawTextBoundingBox(textElement);
       },
-      commitToHistory: true,
-    };
+    );
   },
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
@@ -461,24 +478,15 @@ export const actionChangeFontSize = register({
 export const actionChangeFontFamily = register({
   name: "changeFontFamily",
   perform: (elements, appState, value) => {
-    return {
-      elements: changeProperty(elements, appState, (el) => {
-        if (isTextElement(el)) {
-          const element: ExcalidrawTextElement = newElementWith(el, {
-            fontFamily: value,
-          });
-          redrawTextBoundingBox(element);
-          return element;
-        }
-
-        return el;
-      }),
-      appState: {
-        ...appState,
-        currentItemFontFamily: value,
+    return changePropertyOrTextFormat(
+      elements,
+      appState,
+      { fontFamily: value },
+      { currentItemFontFamily: value },
+      (textElement) => {
+        redrawTextBoundingBox(textElement);
       },
-      commitToHistory: true,
-    };
+    );
   },
   PanelComponent: ({ elements, appState, updateData }) => {
     const options: { value: FontFamily; text: string; icon: JSX.Element }[] = [
@@ -521,24 +529,15 @@ export const actionChangeFontFamily = register({
 export const actionChangeTextAlign = register({
   name: "changeTextAlign",
   perform: (elements, appState, value) => {
-    return {
-      elements: changeProperty(elements, appState, (el) => {
-        if (isTextElement(el)) {
-          const element: ExcalidrawTextElement = newElementWith(el, {
-            textAlign: value,
-          });
-          redrawTextBoundingBox(element);
-          return element;
-        }
-
-        return el;
-      }),
-      appState: {
-        ...appState,
-        currentItemTextAlign: value,
+    return changePropertyOrTextFormat(
+      elements,
+      appState,
+      { textAlign: value },
+      { currentItemTextAlign: value },
+      (textElement) => {
+        redrawTextBoundingBox(textElement);
       },
-      commitToHistory: true,
-    };
+    );
   },
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>

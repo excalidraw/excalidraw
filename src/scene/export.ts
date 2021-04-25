@@ -183,6 +183,7 @@ const getWatermarkElement = (maxX: number, maxY: number) => {
     fontFamily: DEFAULT_FONT_FAMILY,
     textAlign: "right",
     verticalAlign: DEFAULT_VERTICAL_ALIGN,
+    format: [],
     x: maxX,
     y: maxY + WATERMARK_HEIGHT,
     strokeColor: oc.gray[5],
