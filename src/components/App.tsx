@@ -137,7 +137,7 @@ import {
   isSelectedViaGroup,
   selectGroupsForSelectedElements,
 } from "../groups";
-import { createHistory, SceneHistory } from "../history";
+import History from "../history";
 import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
 import {
   CODES,
@@ -202,8 +202,6 @@ const ExcalidrawContainerContext = React.createContext<HTMLDivElement | null>(
 );
 export const useExcalidrawContainer = () =>
   useContext(ExcalidrawContainerContext);
-
-const { history } = createHistory();
 
 let didTapTwice: boolean = false;
 let tappedTwiceTimer = 0;
@@ -289,7 +287,7 @@ export type ExcalidrawImperativeAPI = {
   history: {
     clear: InstanceType<typeof App>["resetHistory"];
   };
-  setScrollToContent: InstanceType<typeof App>["setScrollToContent"];
+  scrollToContent: InstanceType<typeof App>["scrollToContent"];
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
   getAppState: () => InstanceType<typeof App>["state"];
   refresh: InstanceType<typeof App>["refresh"];
@@ -321,6 +319,7 @@ class App extends React.Component<AppProps, AppState> {
   public library: Library;
   public libraryItemsFromStorage: LibraryItems | undefined;
   private id: string;
+  private history: History;
 
   constructor(props: AppProps) {
     super(props);
@@ -362,7 +361,7 @@ class App extends React.Component<AppProps, AppState> {
         history: {
           clear: this.resetHistory,
         },
-        setScrollToContent: this.setScrollToContent,
+        scrollToContent: this.scrollToContent,
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
         refresh: this.refresh,
@@ -379,7 +378,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     this.scene = new Scene();
     this.library = new Library(this);
-
+    this.history = new History();
     this.actionManager = new ActionManager(
       this.syncActionResult,
       () => this.state,
@@ -388,8 +387,8 @@ class App extends React.Component<AppProps, AppState> {
     );
     this.actionManager.registerAll(actions);
 
-    this.actionManager.registerAction(createUndoAction(history));
-    this.actionManager.registerAction(createRedoAction(history));
+    this.actionManager.registerAction(createUndoAction(this.history));
+    this.actionManager.registerAction(createRedoAction(this.history));
   }
 
   private renderCanvas() {
@@ -564,13 +563,13 @@ class App extends React.Component<AppProps, AppState> {
         });
         this.scene.replaceAllElements(actionResult.elements);
         if (actionResult.commitToHistory) {
-          history.resumeRecording();
+          this.history.resumeRecording();
         }
       }
 
       if (actionResult.appState || editingElement) {
         if (actionResult.commitToHistory) {
-          history.resumeRecording();
+          this.history.resumeRecording();
         }
 
         let viewModeEnabled = actionResult?.appState?.viewModeEnabled || false;
@@ -614,7 +613,7 @@ class App extends React.Component<AppProps, AppState> {
           },
           () => {
             if (actionResult.syncHistory) {
-              history.setCurrentState(
+              this.history.setCurrentState(
                 this.state,
                 this.scene.getElementsIncludingDeleted(),
               );
@@ -689,7 +688,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private resetHistory = () => {
-    history.clear();
+    this.history.clear();
   };
 
   /**
@@ -821,6 +820,10 @@ class App extends React.Component<AppProps, AppState> {
         app: {
           configurable: true,
           value: this,
+        },
+        history: {
+          configurable: true,
+          value: this.history,
         },
       });
     }
@@ -1123,7 +1126,7 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ scrolledOutside });
     }
 
-    history.record(this.state, this.scene.getElementsIncludingDeleted());
+    this.history.record(this.state, this.scene.getElementsIncludingDeleted());
 
     // Do not notify consumers if we're still loading the scene. Among other
     // potential issues, this fixes a case where the tab isn't focused during
@@ -1150,7 +1153,10 @@ class App extends React.Component<AppProps, AppState> {
   // Copy/paste
 
   private onCut = withBatchedUpdates((event: ClipboardEvent) => {
-    if (isWritableElement(event.target)) {
+    const isExcalidrawActive = this.excalidrawContainerRef.current?.contains(
+      document.activeElement,
+    );
+    if (!isExcalidrawActive || isWritableElement(event.target)) {
       return;
     }
     this.cutAll();
@@ -1158,22 +1164,10 @@ class App extends React.Component<AppProps, AppState> {
   });
 
   private onCopy = withBatchedUpdates((event: ClipboardEvent) => {
-    const activeSelection = document.getSelection();
-    // if there's a selected text is outside the component, prevent our copy
-    // action
-    if (
-      activeSelection?.anchorNode &&
-      // it can happen that certain interactions will create a selection
-      // outside (or potentially inside) the component without actually
-      // selecting anything (i.e. the selection range is collapsed). Copying
-      // in such case wouldn't copy anything to the clipboard anyway, so prevent
-      // our copy handler only if the selection isn't collapsed
-      !activeSelection.isCollapsed &&
-      !this.excalidrawContainerRef.current!.contains(activeSelection.anchorNode)
-    ) {
-      return;
-    }
-    if (isWritableElement(event.target)) {
+    const isExcalidrawActive = this.excalidrawContainerRef.current?.contains(
+      document.activeElement,
+    );
+    if (!isExcalidrawActive || isWritableElement(event.target)) {
       return;
     }
     this.copyAll();
@@ -1236,6 +1230,13 @@ class App extends React.Component<AppProps, AppState> {
     async (event: ClipboardEvent | null) => {
       // #686
       const target = document.activeElement;
+      const isExcalidrawActive = this.excalidrawContainerRef.current?.contains(
+        target,
+      );
+      if (!isExcalidrawActive) {
+        return;
+      }
+
       const elementUnderCursor = document.elementFromPoint(cursorX, cursorY);
       if (
         // if no ClipboardEvent supplied, assume we're pasting via contextMenu
@@ -1332,7 +1333,7 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     this.scene.replaceAllElements(nextElements);
-    history.resumeRecording();
+    this.history.resumeRecording();
     this.setState(
       selectGroupsForSelectedElements(
         {
@@ -1378,7 +1379,7 @@ class App extends React.Component<AppProps, AppState> {
       element,
     ]);
     this.setState({ selectedElementIds: { [element.id]: true } });
-    history.resumeRecording();
+    this.history.resumeRecording();
   }
 
   // Collaboration
@@ -1420,9 +1421,17 @@ class App extends React.Component<AppProps, AppState> {
     this.actionManager.executeAction(actionToggleStats);
   };
 
-  setScrollToContent = (remoteElements: readonly ExcalidrawElement[]) => {
+  scrollToContent = (
+    target:
+      | ExcalidrawElement
+      | readonly ExcalidrawElement[] = this.scene.getElements(),
+  ) => {
     this.setState({
-      ...calculateScrollCenter(remoteElements, this.state, this.canvas),
+      ...calculateScrollCenter(
+        Array.isArray(target) ? target : [target],
+        this.state,
+        this.canvas,
+      ),
     });
   };
 
@@ -1452,7 +1461,7 @@ class App extends React.Component<AppProps, AppState> {
 
   public updateScene = withBatchedUpdates((sceneData: SceneData) => {
     if (sceneData.commitToHistory) {
-      history.resumeRecording();
+      this.history.resumeRecording();
     }
 
     // currently we only support syncing background color
@@ -1595,7 +1604,7 @@ class App extends React.Component<AppProps, AppState> {
             !this.state.editingLinearElement ||
             this.state.editingLinearElement.elementId !== selectedElements[0].id
           ) {
-            history.resumeRecording();
+            this.history.resumeRecording();
             this.setState({
               editingLinearElement: new LinearElementEditor(
                 selectedElements[0],
@@ -1789,7 +1798,7 @@ class App extends React.Component<AppProps, AppState> {
           fixBindingsAfterDeletion(this.scene.getElements(), [element]);
         }
         if (!isDeleted || isExistingElement) {
-          history.resumeRecording();
+          this.history.resumeRecording();
         }
 
         this.setState({
@@ -1970,7 +1979,7 @@ class App extends React.Component<AppProps, AppState> {
         !this.state.editingLinearElement ||
         this.state.editingLinearElement.elementId !== selectedElements[0].id
       ) {
-        history.resumeRecording();
+        this.history.resumeRecording();
         this.setState({
           editingLinearElement: new LinearElementEditor(
             selectedElements[0],
@@ -2687,7 +2696,7 @@ class App extends React.Component<AppProps, AppState> {
             event,
             this.state,
             (appState) => this.setState(appState),
-            history,
+            this.history,
             pointerDownState.origin,
           );
           if (ret.hitElement) {
@@ -3379,7 +3388,7 @@ class App extends React.Component<AppProps, AppState> {
 
       if (isLinearElement(draggingElement)) {
         if (draggingElement!.points.length > 1) {
-          history.resumeRecording();
+          this.history.resumeRecording();
         }
         const pointerCoords = viewportCoordsToSceneCoords(
           childEvent,
@@ -3463,7 +3472,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (resizingElement) {
-        history.resumeRecording();
+        this.history.resumeRecording();
       }
 
       if (resizingElement && isInvisiblySmallElement(resizingElement)) {
@@ -3577,7 +3586,7 @@ class App extends React.Component<AppProps, AppState> {
         elementType !== "selection" ||
         isSomeElementSelected(this.scene.getElements(), this.state)
       ) {
-        history.resumeRecording();
+        this.history.resumeRecording();
       }
 
       if (pointerDownState.drag.hasOccurred || isResizing || isRotating) {
@@ -4269,8 +4278,8 @@ declare global {
       elements: readonly ExcalidrawElement[];
       state: AppState;
       setState: React.Component<any, AppState>["setState"];
-      history: SceneHistory;
       app: InstanceType<typeof App>;
+      history: History;
     };
   }
 }
@@ -4290,10 +4299,6 @@ if (
       set(elements: ExcalidrawElement[]) {
         return this.app.scene.replaceAllElements(elements);
       },
-    },
-    history: {
-      configurable: true,
-      get: () => history,
     },
   });
 }
