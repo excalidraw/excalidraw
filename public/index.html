@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Excalidraw | Hand-drawn look & feel • Collaborative • Secure</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, shrink-to-fit=no"
+    />
+    <meta name="referrer" content="origin" />
+
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <meta name="theme-color" content="#000" />
+
+    <!-- General tags -->
+    <meta
+      name="description"
+      content="Excalidraw is a virtual collaborative whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them."
+    />
+    <meta name="image" content="og-image.png" />
+
+    <!-- OpenGraph tags -->
+    <meta property="og:url" content="https://excalidraw.com" />
+    <meta property="og:site_name" content="Excalidraw" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Excalidraw" />
+    <meta
+      property="og:description"
+      content="Excalidraw is a whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them."
+    />
+    <!-- OG tags require an absolute url for images -->
+    <meta
+      property="og:image"
+      name="twitter:image"
+      content="https://excalidraw.com/og-image.png"
+    />
+    <meta
+      property="og:image:secure_url"
+      name="twitter:image"
+      content="https://excalidraw.com/og-image.png"
+    />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="669" />
+    <meta property="og:image:alt" content="Excalidraw logo with byline." />
+
+    <!-- Twitter Card tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Excalidraw" />
+    <meta
+      name="twitter:description"
+      content="Excalidraw is a whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them."
+    />
+
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+
+    <!-- Excalidraw version -->
+    <meta name="version" content="{version}" />
+
+    <link
+      rel="preload"
+      href="Virgil.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="preload"
+      href="Cascadia.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+
+    <link
+      href="%REACT_APP_SOCKET_SERVER_URL%/socket.io"
+      rel="preconnect"
+      crossorigin="anonymous"
+    />
+
+    <link
+      rel="manifest"
+      href="manifest.json"
+      style="--pwacompat-splash-font: 24px Virgil;"
+    />
+
+    <link rel="stylesheet" href="fonts.css" type="text/css" />
+    <script>
+      window.EXCALIDRAW_ASSET_PATH = "/";
+      // setting this so that libraries installation reuses this window tab.
+      window.name = "_excalidraw";
+    </script>
+    <% if (process.env.REACT_APP_GOOGLE_ANALYTICS_ID) { %>
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=%REACT_APP_GOOGLE_ANALYTICS_ID%"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "%REACT_APP_GOOGLE_ANALYTICS_ID%");
+    </script>
+    <% } %>
+
+    <!-- FIXME: remove this when we update CRA (fix SW caching) -->
+    <style>
+      body,
+      html {
+        margin: 0;
+        --ui-font: system-ui, BlinkMacSystemFont, -apple-system, Segoe UI,
+          Roboto, Helvetica, Arial, sans-serif;
+        font-family: var(--ui-font);
+        -webkit-text-size-adjust: 100%;
+
+        width: 100vw;
+        height: 100%;
+      }
+
+      .visually-hidden {
+        position: absolute !important;
+        height: 1px;
+        width: 1px;
+        overflow: hidden;
+        clip: rect(1px, 1px, 1px, 1px);
+        white-space: nowrap; /* added line */
+        user-select: none;
+      }
+
+      .LoadingMessage {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+      }
+
+      .LoadingMessage span {
+        background-color: var(--button-gray-1);
+        border-radius: 5px;
+        padding: 0.8em 1.2em;
+        color: var(--popup-text-color);
+        font-size: 1.3em;
+      }
+      #root {
+        height: 100%;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+
+        @media screen and (min-device-width: 1200px) {
+          -webkit-touch-callout: default;
+          -webkit-user-select: auto;
+          -khtml-user-select: auto;
+          -moz-user-select: auto;
+          -ms-user-select: auto;
+          user-select: auto;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <noscript> You need to enable JavaScript to run this app. </noscript>
+    <header>
+      <h1 class="visually-hidden">Excalidraw</h1>
+    </header>
+    <div id="root">
+      <div class="LoadingMessage">
+        <span>Loading scene...</span>
+      </div>
+    </div>
+  </body>
+</html>

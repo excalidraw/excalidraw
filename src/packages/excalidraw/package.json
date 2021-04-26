@@ -1,0 +1,84 @@
+{
+  "name": "@excalidraw/excalidraw",
+  "version": "0.7.0",
+  "main": "main.js",
+  "types": "types/packages/excalidraw/index.d.ts",
+  "files": [
+    "dist/*",
+    "types/*"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "description": "Excalidraw as a React component",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/excalidraw/excalidraw.git",
+    "directory": "src/packages/excalidraw"
+  },
+  "license": "MIT",
+  "keywords": [
+    "excalidraw",
+    "excalidraw-embed",
+    "react",
+    "npm",
+    "npm excalidraw"
+  ],
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not ie <= 11",
+      "not op_mini all",
+      "not safari < 12",
+      "not kaios <= 2.5",
+      "not edge < 79",
+      "not chrome < 70",
+      "not and_uc < 13",
+      "not samsung < 10"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "peerDependencies": {
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1"
+  },
+  "devDependencies": {
+    "@babel/core": "7.13.16",
+    "@babel/plugin-transform-arrow-functions": "7.13.0",
+    "@babel/plugin-transform-async-to-generator": "7.13.0",
+    "@babel/plugin-transform-runtime": "7.13.15",
+    "@babel/plugin-transform-typescript": "7.13.0",
+    "@babel/preset-env": "7.13.15",
+    "@babel/preset-react": "7.13.13",
+    "@babel/preset-typescript": "7.13.0",
+    "autoprefixer": "10.2.5",
+    "babel-loader": "8.2.2",
+    "babel-plugin-transform-class-properties": "6.24.1",
+    "cross-env": "7.0.3",
+    "css-loader": "5.2.4",
+    "file-loader": "6.2.0",
+    "mini-css-extract-plugin": "1.5.0",
+    "postcss-loader": "5.2.0",
+    "sass-loader": "11.0.1",
+    "terser-webpack-plugin": "5.1.1",
+    "ts-loader": "8.1.0",
+    "typescript": "4.2.4",
+    "webpack": "5.35.1",
+    "webpack-bundle-analyzer": "4.4.1",
+    "webpack-cli": "4.6.0"
+  },
+  "bugs": "https://github.com/excalidraw/excalidraw/issues",
+  "repository": "https://github.com/excalidraw/excalidraw",
+  "homepage": "https://github.com/excalidraw/excalidraw/tree/master/src/packages/excalidraw",
+  "scripts": {
+    "gen:types": "tsc --project ../../../tsconfig-types.json",
+    "build:umd": "cross-env NODE_ENV=production webpack --config webpack.prod.config.js && cross-env NODE_ENV=development webpack --config webpack.dev.config.js && yarn gen:types",
+    "build:umd:withAnalyzer": "cross-env NODE_ENV=production ANALYZER=true webpack --config webpack.prod.config.js",
+    "pack": "yarn build:umd && yarn pack"
+  }
+}

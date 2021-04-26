@@ -1,0 +1,74 @@
+@import "../css/variables.module";
+
+.excalidraw {
+  .Dialog {
+    user-select: text;
+    cursor: auto;
+  }
+
+  .Dialog__title {
+    display: grid;
+    align-items: center;
+    margin-top: 0;
+    grid-template-columns: 1fr calc(var(--space-factor) * 7);
+    grid-gap: var(--metric);
+    padding: calc(var(--space-factor) * 2);
+    text-align: center;
+    font-variant: small-caps;
+    font-size: 1.2em;
+  }
+
+  .Dialog__titleContent {
+    flex: 1;
+  }
+
+  .Dialog .Modal__close {
+    color: var(--icon-fill-color);
+    margin: 0;
+  }
+
+  .Dialog__content {
+    padding: 0 16px 16px;
+  }
+
+  @include isMobile {
+    .Dialog {
+      --metric: calc(var(--space-factor) * 4);
+      --inset-left: #{"max(var(--metric), var(--sal))"};
+      --inset-right: #{"max(var(--metric), var(--sar))"};
+    }
+
+    .Dialog__title {
+      grid-template-columns: calc(var(--space-factor) * 7) 1fr calc(
+          var(--space-factor) * 7
+        );
+      position: sticky;
+      top: 0;
+      padding: calc(var(--space-factor) * 2);
+      background: var(--island-bg-color);
+      font-size: 1.25em;
+
+      box-sizing: border-box;
+      border-bottom: 1px solid var(--button-gray-2);
+      z-index: 1;
+    }
+
+    .Dialog__titleContent {
+      text-align: center;
+    }
+
+    .Dialog .Island {
+      width: 100vw;
+      height: 100%;
+      box-sizing: border-box;
+      overflow-y: auto;
+      padding-left: #{"max(calc(var(--padding) * var(--space-factor)), var(--sal))"};
+      padding-right: #{"max(calc(var(--padding) * var(--space-factor)), var(--sar))"};
+      padding-bottom: #{"max(calc(var(--padding) * var(--space-factor)), var(--sab))"};
+    }
+
+    .Dialog .Modal__close {
+      order: -1;
+    }
+  }
+}

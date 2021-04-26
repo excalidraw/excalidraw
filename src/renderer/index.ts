@@ -1,0 +1,1 @@
+export { renderScene } from "./renderScene";

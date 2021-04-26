@@ -1,0 +1,13 @@
+@import "open-color/open-color.scss";
+
+@mixin isMobile() {
+  @at-root .excalidraw--mobile#{&} {
+    @content;
+  }
+}
+
+$theme-filter: "invert(93%) hue-rotate(180deg)";
+
+:export {
+  themeFilter: unquote($theme-filter);
+}

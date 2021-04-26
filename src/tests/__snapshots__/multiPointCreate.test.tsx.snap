@@ -1,0 +1,97 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`multi point mode in linear elements arrow 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElementIds": null,
+  "endArrowhead": "arrow",
+  "endBinding": null,
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 110,
+  "id": "id0",
+  "isDeleted": false,
+  "lastCommittedPoint": Array [
+    70,
+    110,
+  ],
+  "opacity": 100,
+  "points": Array [
+    Array [
+      0,
+      0,
+    ],
+    Array [
+      20,
+      30,
+    ],
+    Array [
+      70,
+      110,
+    ],
+  ],
+  "roughness": 1,
+  "seed": 337897,
+  "startArrowhead": null,
+  "startBinding": null,
+  "strokeColor": "#000000",
+  "strokeSharpness": "round",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "arrow",
+  "version": 7,
+  "versionNonce": 1150084233,
+  "width": 70,
+  "x": 30,
+  "y": 30,
+}
+`;
+
+exports[`multi point mode in linear elements line 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElementIds": null,
+  "endArrowhead": null,
+  "endBinding": null,
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 110,
+  "id": "id0",
+  "isDeleted": false,
+  "lastCommittedPoint": Array [
+    70,
+    110,
+  ],
+  "opacity": 100,
+  "points": Array [
+    Array [
+      0,
+      0,
+    ],
+    Array [
+      20,
+      30,
+    ],
+    Array [
+      70,
+      110,
+    ],
+  ],
+  "roughness": 1,
+  "seed": 337897,
+  "startArrowhead": null,
+  "startBinding": null,
+  "strokeColor": "#000000",
+  "strokeSharpness": "round",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "line",
+  "version": 7,
+  "versionNonce": 1150084233,
+  "width": 70,
+  "x": 30,
+  "y": 30,
+}
+`;

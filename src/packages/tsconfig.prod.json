@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "es2015",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "jsx": "react"
+  }
+}

@@ -1,0 +1,141 @@
+@import "open-color/open-color";
+
+.excalidraw {
+  .layer-ui__library {
+    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .layer-ui__library-header {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      margin: 2px 0;
+
+      button {
+        // 2px from the left to account for focus border of left-most button
+        margin: 0 2px;
+      }
+
+      a {
+        margin-inline-start: auto;
+        // 17px for scrollbar (needed for overlay scrollbars on Big Sur?) + 1px extra
+        padding-inline-end: 18px;
+        white-space: nowrap;
+      }
+    }
+  }
+
+  .layer-ui__library-message {
+    padding: 10px 20px;
+    max-width: 200px;
+  }
+
+  .layer-ui__library-items {
+    max-height: 50vh;
+    overflow: auto;
+  }
+
+  .layer-ui__wrapper {
+    z-index: var(--zIndex-layerUI);
+
+    .encrypted-icon {
+      position: relative;
+      margin-inline-start: 15px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: var(--space-factor);
+      color: $oc-green-9;
+
+      svg {
+        width: 1.2rem;
+        height: 1.2rem;
+      }
+    }
+
+    &__github-corner {
+      top: 0;
+
+      :root[dir="ltr"] & {
+        right: 0;
+      }
+
+      :root[dir="rtl"] & {
+        left: 0;
+      }
+
+      position: absolute;
+      width: 40px;
+    }
+
+    &__footer {
+      position: absolute;
+      z-index: 100;
+      bottom: 0;
+
+      :root[dir="ltr"] & {
+        right: 0;
+      }
+
+      :root[dir="rtl"] & {
+        left: 0;
+      }
+
+      width: 190px;
+    }
+
+    .zen-mode-transition {
+      transition: transform 0.5s ease-in-out;
+
+      :root[dir="ltr"] &.transition-left {
+        transform: translate(-999px, 0);
+      }
+
+      :root[dir="ltr"] &.transition-right {
+        transform: translate(999px, 0);
+      }
+
+      :root[dir="rtl"] &.transition-left {
+        transform: translate(999px, 0);
+      }
+
+      :root[dir="rtl"] &.transition-right {
+        transform: translate(-999px, 0);
+      }
+
+      :root[dir="ltr"] &.App-menu_bottom--transition-left {
+        transform: translate(-92px, 0);
+      }
+      :root[dir="rtl"] &.App-menu_bottom--transition-left {
+        transform: translate(92px, 0);
+      }
+    }
+
+    .disable-zen-mode {
+      height: 30px;
+      position: absolute;
+      bottom: 10px;
+      [dir="ltr"] & {
+        right: 15px;
+      }
+      [dir="rtl"] & {
+        left: 15px;
+      }
+      font-size: 10px;
+      padding: 10px;
+      font-weight: 500;
+      opacity: 0;
+      visibility: hidden;
+      transition: visibility 0s linear 0s, opacity 0.5s;
+
+      &--visible {
+        opacity: 1;
+        visibility: visible;
+        transition: visibility 0s linear 300ms, opacity 0.5s;
+        transition-delay: 0.8s;
+      }
+    }
+  }
+}

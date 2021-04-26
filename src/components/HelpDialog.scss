@@ -1,0 +1,56 @@
+@import "../css/variables.module";
+
+.excalidraw {
+  .HelpDialog h3 {
+    border-bottom: 1px solid var(--button-gray-2);
+    padding-bottom: 4px;
+  }
+
+  .HelpDialog--island {
+    border: 1px solid var(--button-gray-2);
+    margin-bottom: 16px;
+  }
+
+  .HelpDialog--island-title {
+    margin: 0;
+    padding: 4px;
+    background-color: var(--button-gray-1);
+    text-align: center;
+  }
+
+  .HelpDialog--shortcut {
+    border-top: 1px solid var(--button-gray-2);
+  }
+
+  .HelpDialog--key {
+    word-break: keep-all;
+    border: 1px solid var(--button-gray-2);
+    padding: 2px 8px;
+    margin: auto 4px;
+    background-color: var(--button-gray-1);
+    border-radius: 2px;
+    font-size: 0.8em;
+    min-height: 26px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    font-family: inherit;
+  }
+
+  .HelpDialog--header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+  }
+
+  .HelpDialog--btn {
+    border: 1px solid var(--link-color);
+    padding: 8px 32px;
+    border-radius: 4px;
+  }
+  .HelpDialog--btn:hover {
+    text-decoration: none;
+  }
+}

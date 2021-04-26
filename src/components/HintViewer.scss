@@ -1,0 +1,33 @@
+@import "../css/variables.module";
+
+// this is loosely based on the longest hint text
+$wide-viewport-width: 1000px;
+
+.excalidraw {
+  .HintViewer {
+    pointer-events: none;
+    box-sizing: border-box;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    left: 0;
+    top: 100%;
+    max-width: 100%;
+    width: 100%;
+    margin-top: 6px;
+    text-align: center;
+    color: $oc-gray-6;
+    font-size: 0.8rem;
+
+    @include isMobile {
+      position: static;
+      padding-right: 2em;
+    }
+
+    > span {
+      padding: 0.2rem 0.4rem;
+      background-color: var(--overlay-bg-color);
+      border-radius: 4px;
+    }
+  }
+}

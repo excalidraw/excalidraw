@@ -1,0 +1,169 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test dragCreate add element to the scene when pointer dragging long enough arrow 1`] = `1`;
+
+exports[`Test dragCreate add element to the scene when pointer dragging long enough arrow 2`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElementIds": null,
+  "endArrowhead": "arrow",
+  "endBinding": null,
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 50,
+  "id": "id0",
+  "isDeleted": false,
+  "lastCommittedPoint": null,
+  "opacity": 100,
+  "points": Array [
+    Array [
+      0,
+      0,
+    ],
+    Array [
+      30,
+      50,
+    ],
+  ],
+  "roughness": 1,
+  "seed": 337897,
+  "startArrowhead": null,
+  "startBinding": null,
+  "strokeColor": "#000000",
+  "strokeSharpness": "round",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "arrow",
+  "version": 3,
+  "versionNonce": 449462985,
+  "width": 30,
+  "x": 30,
+  "y": 20,
+}
+`;
+
+exports[`Test dragCreate add element to the scene when pointer dragging long enough diamond 1`] = `1`;
+
+exports[`Test dragCreate add element to the scene when pointer dragging long enough diamond 2`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElementIds": null,
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 50,
+  "id": "id0",
+  "isDeleted": false,
+  "opacity": 100,
+  "roughness": 1,
+  "seed": 337897,
+  "strokeColor": "#000000",
+  "strokeSharpness": "sharp",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "diamond",
+  "version": 2,
+  "versionNonce": 1278240551,
+  "width": 30,
+  "x": 30,
+  "y": 20,
+}
+`;
+
+exports[`Test dragCreate add element to the scene when pointer dragging long enough ellipse 1`] = `1`;
+
+exports[`Test dragCreate add element to the scene when pointer dragging long enough ellipse 2`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElementIds": null,
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 50,
+  "id": "id0",
+  "isDeleted": false,
+  "opacity": 100,
+  "roughness": 1,
+  "seed": 337897,
+  "strokeColor": "#000000",
+  "strokeSharpness": "sharp",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "ellipse",
+  "version": 2,
+  "versionNonce": 1278240551,
+  "width": 30,
+  "x": 30,
+  "y": 20,
+}
+`;
+
+exports[`Test dragCreate add element to the scene when pointer dragging long enough line 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElementIds": null,
+  "endArrowhead": null,
+  "endBinding": null,
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 50,
+  "id": "id0",
+  "isDeleted": false,
+  "lastCommittedPoint": null,
+  "opacity": 100,
+  "points": Array [
+    Array [
+      0,
+      0,
+    ],
+    Array [
+      30,
+      50,
+    ],
+  ],
+  "roughness": 1,
+  "seed": 337897,
+  "startArrowhead": null,
+  "startBinding": null,
+  "strokeColor": "#000000",
+  "strokeSharpness": "round",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "line",
+  "version": 3,
+  "versionNonce": 449462985,
+  "width": 30,
+  "x": 30,
+  "y": 20,
+}
+`;
+
+exports[`Test dragCreate add element to the scene when pointer dragging long enough rectangle 1`] = `1`;
+
+exports[`Test dragCreate add element to the scene when pointer dragging long enough rectangle 2`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElementIds": null,
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 50,
+  "id": "id0",
+  "isDeleted": false,
+  "opacity": 100,
+  "roughness": 1,
+  "seed": 337897,
+  "strokeColor": "#000000",
+  "strokeSharpness": "sharp",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "rectangle",
+  "version": 2,
+  "versionNonce": 1278240551,
+  "width": 30,
+  "x": 30,
+  "y": 20,
+}
+`;

@@ -1,0 +1,16 @@
+@import "../css/variables.module";
+
+.excalidraw {
+  .Avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 1.25rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: $oc-white;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+}
