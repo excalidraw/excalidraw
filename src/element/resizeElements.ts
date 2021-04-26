@@ -18,7 +18,11 @@ import {
   getCommonBounds,
   getResizedElementAbsoluteCoords,
 } from "./bounds";
-import { isLinearElement, isTextElement } from "./typeChecks";
+import {
+  isFreeDrawElement,
+  isLinearElement,
+  isTextElement,
+} from "./typeChecks";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
 import { measureText, getFontString } from "../utils";
@@ -245,6 +249,14 @@ const rescalePointsInElement = (
   height: number,
 ) =>
   isLinearElement(element)
+    ? {
+        points: rescalePoints(
+          0,
+          width,
+          rescalePoints(1, height, element.points),
+        ),
+      }
+    : isFreeDrawElement(element)
     ? {
         points: rescalePoints(
           0,

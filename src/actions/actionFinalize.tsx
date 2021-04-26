@@ -122,12 +122,14 @@ export const actionFinalize = register({
         appState.selectedElementIds[multiPointElement.id] = true;
       }
     }
+
     if (
       (!appState.elementLocked && appState.elementType !== "draw") ||
       !multiPointElement
     ) {
       resetCursor(canvas);
     }
+
     return {
       elements: newElements,
       appState: {

@@ -258,10 +258,7 @@ export const generateRoughOptions = (element: ExcalidrawElement): Options => {
       options.simplification = 0;
       options.bowing = 0;
       options.fillStyle = element.fillStyle;
-      options.fill =
-        element.backgroundColor === "transparent"
-          ? "#000000"
-          : element.backgroundColor;
+      options.fill = options.stroke;
       options.stroke = "transparent";
       options.curveFitting = 1;
       return options;
@@ -343,7 +340,9 @@ const generateElementShape = (
         const inputPoints = element.simulatePressure
           ? element.points
           : element.points.length
-          ? element.points.map(([x, y], i) => [x, y, element.pressures[i]])
+          ? element.points.length === 1
+            ? [element.points[0], element.points[0]]
+            : element.points.map(([x, y], i) => [x, y, element.pressures[i]])
           : [[0, 0, 0]];
 
         const points = getStroke(inputPoints as number[][], {
@@ -351,7 +350,6 @@ const generateElementShape = (
           thinning: 0.7,
           simulatePressure: element.simulatePressure,
         });
-
         const d = [];
 
         let [p0, p1] = points;
@@ -368,7 +366,6 @@ const generateElementShape = (
 
         shape = [generator.path(d.join(" "), options)];
         // shape = [generator.polygon(points as [number, number][], options)];
-
         break;
       }
       case "line":

@@ -3444,7 +3444,21 @@ class App extends React.Component<AppProps, AppState> {
       );
 
       if (draggingElement?.type === "draw") {
+        const pointerCoords = viewportCoordsToSceneCoords(
+          childEvent,
+          this.state,
+        );
+        const points = draggingElement.points;
+        const dx = pointerCoords.x - draggingElement.x;
+        const dy = pointerCoords.y - draggingElement.y;
+
+        mutateElement(draggingElement, {
+          points: [...points, [dx, dy]],
+          pressures: [...draggingElement.pressures, childEvent.pressure],
+        });
+
         this.actionManager.executeAction(actionFinalize);
+
         return;
       }
 

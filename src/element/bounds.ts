@@ -150,10 +150,10 @@ const getFreeDrawElementBounds = (
   }
 
   return [
-    minX - element.strokeWidth,
-    minY - element.strokeWidth,
-    maxX + element.strokeWidth,
-    maxY + element.strokeWidth,
+    minX - element.strokeWidth * 2,
+    minY - element.strokeWidth * 2,
+    maxX + element.strokeWidth * 2,
+    maxY + element.strokeWidth * 2,
   ];
 };
 
