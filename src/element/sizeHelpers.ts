@@ -1,12 +1,12 @@
 import { ExcalidrawElement } from "./types";
 import { mutateElement } from "./mutateElement";
-import { isLinearElement } from "./typeChecks";
+import { isFreeDrawElement, isLinearElement } from "./typeChecks";
 import { SHIFT_LOCKING_ANGLE } from "../constants";
 
 export const isInvisiblySmallElement = (
   element: ExcalidrawElement,
 ): boolean => {
-  if (isLinearElement(element)) {
+  if (isLinearElement(element) || isFreeDrawElement(element)) {
     return element.points.length < 2;
   }
   return element.width === 0 && element.height === 0;

@@ -9249,6 +9249,11 @@ pepjs@0.5.3:
   version "0.5.3"
   resolved "https://registry.npmjs.org/pepjs/-/pepjs-0.5.3.tgz"
 
+perfect-freehand@0.3.5:
+  version "0.3.5"
+  resolved "https://registry.yarnpkg.com/perfect-freehand/-/perfect-freehand-0.3.5.tgz#4204b4453dffc057edc9086996690c8d63ce9c99"
+  integrity sha512-FVMeDX//LCB1WFUZG3+Cd8oCxZSiH2l4Fm3vHQLnpbCfrM2JLk8PrJdGPwZ5TYdIrEZ1JfDuhL6AFJeurnuh4g==
+
 performance-now@^2.1.0:
   version "2.1.0"
   resolved "https://registry.npmjs.org/performance-now/-/performance-now-2.1.0.tgz"

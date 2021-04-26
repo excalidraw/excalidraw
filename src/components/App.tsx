@@ -1,4 +1,3 @@
-import { Point, simplify } from "points-on-curve";
 import React, { useContext } from "react";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
@@ -111,7 +110,7 @@ import {
 } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { mutateElement } from "../element/mutateElement";
-import { deepCopyElement } from "../element/newElement";
+import { deepCopyElement, newFreeDrawElement } from "../element/newElement";
 import { MaybeTransformHandleType } from "../element/transformHandles";
 import {
   isBindingElement,
@@ -122,6 +121,7 @@ import {
 import {
   ExcalidrawBindableElement,
   ExcalidrawElement,
+  ExcalidrawFreeDrawElement,
   ExcalidrawGenericElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
@@ -2339,10 +2339,15 @@ class App extends React.Component<AppProps, AppState> {
       return;
     } else if (
       this.state.elementType === "arrow" ||
-      this.state.elementType === "draw" ||
       this.state.elementType === "line"
     ) {
       this.handleLinearElementOnPointerDown(
+        event,
+        this.state.elementType,
+        pointerDownState,
+      );
+    } else if (this.state.elementType === "draw") {
+      this.handleFreeDrawElementOnPointerDown(
         event,
         this.state.elementType,
         pointerDownState,
@@ -2843,6 +2848,64 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private handleFreeDrawElementOnPointerDown = (
+    event: React.PointerEvent<HTMLCanvasElement>,
+    elementType: ExcalidrawFreeDrawElement["type"],
+    pointerDownState: PointerDownState,
+  ) => {
+    // Begin a mark capture. This does not have to update state yet.
+    const [gridX, gridY] = getGridPoint(
+      pointerDownState.origin.x,
+      pointerDownState.origin.y,
+      null,
+    );
+
+    const element = newFreeDrawElement({
+      type: elementType,
+      x: gridX,
+      y: gridY,
+      strokeColor: this.state.currentItemStrokeColor,
+      backgroundColor: this.state.currentItemBackgroundColor,
+      fillStyle: this.state.currentItemFillStyle,
+      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeStyle: this.state.currentItemStrokeStyle,
+      roughness: this.state.currentItemRoughness,
+      opacity: this.state.currentItemOpacity,
+      strokeSharpness: this.state.currentItemLinearStrokeSharpness,
+      simulatePressure: event.pressure === 0.5,
+    });
+
+    this.setState((prevState) => ({
+      selectedElementIds: {
+        ...prevState.selectedElementIds,
+        [element.id]: false,
+      },
+    }));
+
+    const pressures = element.simulatePressure
+      ? element.pressures
+      : [...element.pressures, event.pressure];
+
+    mutateElement(element, {
+      points: [...element.points, [0, 0]],
+      pressures,
+    });
+    const boundElement = getHoveredElementForBinding(
+      pointerDownState.origin,
+      this.scene,
+    );
+    this.scene.replaceAllElements([
+      ...this.scene.getElementsIncludingDeleted(),
+      element,
+    ]);
+    this.setState({
+      draggingElement: element,
+      editingElement: element,
+      startBoundElement: boundElement,
+      suggestedBindings: [],
+    });
+  };
+
   private handleLinearElementOnPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
     elementType: ExcalidrawLinearElement["type"],
@@ -2897,7 +2960,7 @@ class App extends React.Component<AppProps, AppState> {
       const [gridX, gridY] = getGridPoint(
         pointerDownState.origin.x,
         pointerDownState.origin.y,
-        elementType === "draw" ? null : this.state.gridSize,
+        this.state.gridSize,
       );
 
       /* If arrow is pre-arrowheads, it will have undefined for both start and end arrowheads.
@@ -3080,6 +3143,10 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
+      // TODO: Handle erasing
+
+      // if (this.state.erasingFreedrawElements) { }
+
       if (this.state.editingLinearElement) {
         const didDrag = LinearElementEditor.handlePointDragging(
           this.state,
@@ -3105,6 +3172,7 @@ class App extends React.Component<AppProps, AppState> {
       const hasHitASelectedElement = pointerDownState.hit.allHitElements.some(
         (element) => this.isASelectedElement(element),
       );
+
       if (
         hasHitASelectedElement ||
         pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
@@ -3205,18 +3273,20 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (isLinearElement(draggingElement)) {
+      if (draggingElement.type === "draw") {
+        const points = draggingElement.points;
+        const dx = pointerCoords.x - draggingElement.x;
+        const dy = pointerCoords.y - draggingElement.y;
+
+        mutateElement(draggingElement, {
+          points: [...points, [dx, dy]],
+          pressures: [...draggingElement.pressures, event.pressure],
+        });
+      } else if (isLinearElement(draggingElement)) {
         pointerDownState.drag.hasOccurred = true;
         const points = draggingElement.points;
-        let dx: number;
-        let dy: number;
-        if (draggingElement.type === "draw") {
-          dx = pointerCoords.x - draggingElement.x;
-          dy = pointerCoords.y - draggingElement.y;
-        } else {
-          dx = gridX - draggingElement.x;
-          dy = gridY - draggingElement.y;
-        }
+        let dx = gridX - draggingElement.x;
+        let dy = gridY - draggingElement.y;
 
         if (getRotateWithDiscreteAngleKey(event) && points.length === 2) {
           ({ width: dx, height: dy } = getPerfectElementSize(
@@ -3229,19 +3299,11 @@ class App extends React.Component<AppProps, AppState> {
         if (points.length === 1) {
           mutateElement(draggingElement, { points: [...points, [dx, dy]] });
         } else if (points.length > 1) {
-          if (draggingElement.type === "draw") {
-            mutateElement(draggingElement, {
-              points: simplify(
-                [...(points as Point[]), [dx, dy]],
-                0.7 / this.state.zoom.value,
-              ),
-            });
-          } else {
-            mutateElement(draggingElement, {
-              points: [...points.slice(0, -1), [dx, dy]],
-            });
-          }
+          mutateElement(draggingElement, {
+            points: [...points.slice(0, -1), [dx, dy]],
+          });
         }
+
         if (isBindingElement(draggingElement)) {
           // When creating a linear element by dragging
           this.maybeSuggestBindingForLinearElementAtCursor(
@@ -3426,7 +3488,7 @@ class App extends React.Component<AppProps, AppState> {
             );
           }
           this.setState({ suggestedBindings: [], startBoundElement: null });
-          if (!elementLocked && elementType !== "draw") {
+          if (!elementLocked) {
             resetCursor(this.canvas);
             this.setState((prevState) => ({
               draggingElement: null,

@@ -97,7 +97,21 @@ const restoreElement = (
         textAlign: element.textAlign || DEFAULT_TEXT_ALIGN,
         verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,
       });
-    case "draw":
+    case "draw": {
+      return restoreElementWithProperties(element, {
+        points:
+          // migrate old arrow model to new one
+          !Array.isArray(element.points) || element.points.length < 2
+            ? [
+                [0, 0],
+                [element.width, element.height],
+              ]
+            : element.points,
+        pressures: element.pressures,
+        simulatePressure: element.simulatePressure,
+        lastCommittedPoint: null,
+      });
+    }
     case "line":
     case "arrow": {
       const {

@@ -31,9 +31,14 @@ const isElementDraggableFromInside = (
     return false;
   }
   const isDraggableFromInside = element.backgroundColor !== "transparent";
-  if (element.type === "line" || element.type === "draw") {
+
+  // TODO: Is a free-drawn element draggable from inside?
+  if (element.type === "draw") {
+    return false;
+  } else if (element.type === "line") {
     return isDraggableFromInside && isPathALoop(element.points);
   }
+
   return isDraggableFromInside;
 };
 

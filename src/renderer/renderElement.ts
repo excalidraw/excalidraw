@@ -5,7 +5,11 @@ import {
   Arrowhead,
   NonDeletedExcalidrawElement,
 } from "../element/types";
-import { isTextElement, isLinearElement } from "../element/typeChecks";
+import {
+  isTextElement,
+  isLinearElement,
+  isFreeDrawElement,
+} from "../element/typeChecks";
 import {
   getDiamondPoints,
   getElementAbsoluteCoords,
@@ -27,6 +31,7 @@ import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
 import { Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
+import getStroke from "perfect-freehand";
 
 const defaultAppState = getDefaultAppState();
 
@@ -53,7 +58,7 @@ const generateElementCanvas = (
   let canvasOffsetX = 0;
   let canvasOffsetY = 0;
 
-  if (isLinearElement(element)) {
+  if (isLinearElement(element) || isFreeDrawElement(element)) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
     canvas.width =
       distance(x1, x2) * window.devicePixelRatio * zoom.value +
@@ -125,8 +130,8 @@ const drawElementOnCanvas = (
       rc.draw(getShapeForElement(element) as Drawable);
       break;
     }
-    case "arrow":
     case "draw":
+    case "arrow":
     case "line": {
       (getShapeForElement(element) as Drawable[]).forEach((shape) => {
         rc.draw(shape);
@@ -238,10 +243,7 @@ export const generateRoughOptions = (element: ExcalidrawElement): Options => {
       }
       return options;
     }
-    case "line":
-    case "draw": {
-      // If shape is a line and is a closed shape,
-      // fill the shape if a color is set.
+    case "line": {
       if (isPathALoop(element.points)) {
         options.fillStyle = element.fillStyle;
         options.fill =
@@ -249,6 +251,19 @@ export const generateRoughOptions = (element: ExcalidrawElement): Options => {
             ? undefined
             : element.backgroundColor;
       }
+      return options;
+    }
+    case "draw": {
+      options.roughness = 0;
+      options.simplification = 0;
+      options.bowing = 0;
+      options.fillStyle = element.fillStyle;
+      options.fill =
+        element.backgroundColor === "transparent"
+          ? "#000000"
+          : element.backgroundColor;
+      options.stroke = "transparent";
+      options.curveFitting = 1;
       return options;
     }
     case "arrow":
@@ -322,8 +337,41 @@ const generateElementShape = (
           generateRoughOptions(element),
         );
         break;
+      case "draw": {
+        const options = generateRoughOptions(element);
+
+        const inputPoints = element.simulatePressure
+          ? element.points
+          : element.points.length
+          ? element.points.map(([x, y], i) => [x, y, element.pressures[i]])
+          : [[0, 0, 0]];
+
+        const points = getStroke(inputPoints as number[][], {
+          size: element.strokeWidth * 12,
+          thinning: 0.7,
+          simulatePressure: element.simulatePressure,
+        });
+
+        const d = [];
+
+        let [p0, p1] = points;
+
+        d.push("M", p0[0], p0[1], "Q");
+
+        for (let i = 1; i < points.length; i++) {
+          d.push(p0[0], p0[1], (p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2);
+          p0 = p1;
+          p1 = points[i];
+        }
+
+        d.push("Z");
+
+        shape = [generator.path(d.join(" "), options)];
+        // shape = [generator.polygon(points as [number, number][], options)];
+
+        break;
+      }
       case "line":
-      case "draw":
       case "arrow": {
         const options = generateRoughOptions(element);
 
@@ -418,6 +466,7 @@ const generateElementShape = (
             shape.push(...shapes);
           }
         }
+
         break;
       }
       case "text": {
@@ -577,8 +626,8 @@ export const renderElementToSvg = (
       svgRoot.appendChild(node);
       break;
     }
-    case "line":
     case "draw":
+    case "line":
     case "arrow": {
       generateElementShape(element, generator);
       const group = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
@@ -596,7 +645,7 @@ export const renderElementToSvg = (
           }) rotate(${degree} ${cx} ${cy})`,
         );
         if (
-          (element.type === "line" || element.type === "draw") &&
+          element.type === "line" &&
           isPathALoop(element.points) &&
           element.backgroundColor !== "transparent"
         ) {
