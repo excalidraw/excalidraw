@@ -110,6 +110,7 @@ const restoreElement = (
         pressures: element.pressures,
         simulatePressure: element.simulatePressure,
         lastCommittedPoint: null,
+        strokeShape: element.strokeShape,
       });
     }
     case "line":

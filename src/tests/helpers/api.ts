@@ -133,6 +133,7 @@ export class API {
         element = newFreeDrawElement({
           type: type as "draw",
           simulatePressure: true,
+          strokeShape: "gel",
           ...base,
         });
         break;

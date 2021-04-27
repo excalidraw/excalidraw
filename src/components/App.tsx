@@ -2872,6 +2872,7 @@ class App extends React.Component<AppProps, AppState> {
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
       strokeSharpness: this.state.currentItemLinearStrokeSharpness,
+      strokeShape: this.state.currentItemStrokeShape,
       simulatePressure: event.pressure === 0.5,
     });
 

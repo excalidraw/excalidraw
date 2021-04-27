@@ -58,6 +58,10 @@ export const SelectedShapeActions = ({
         targetElements.some((element) => hasStrokeWidth(element.type))) &&
         renderAction("changeStrokeWidth")}
 
+      {(elementType === "draw" ||
+        targetElements.some((element) => element.type === "draw")) &&
+        renderAction("changeStrokeShape")}
+
       {(hasStrokeStyle(elementType) ||
         targetElements.some((element) => hasStrokeStyle(element.type))) && (
         <>

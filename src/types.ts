@@ -10,6 +10,7 @@ import {
   ExcalidrawBindableElement,
   Arrowhead,
   ChartType,
+  StrokeShape,
 } from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -72,6 +73,7 @@ export type AppState = {
   currentItemStrokeSharpness: ExcalidrawElement["strokeSharpness"];
   currentItemStartArrowhead: Arrowhead | null;
   currentItemEndArrowhead: Arrowhead | null;
+  currentItemStrokeShape: StrokeShape;
   currentItemLinearStrokeSharpness: ExcalidrawElement["strokeSharpness"];
   viewBackgroundColor: string;
   scrollX: number;
