@@ -4,6 +4,7 @@ import {
   ExcalidrawTextElement,
   Arrowhead,
   NonDeletedExcalidrawElement,
+  ExcalidrawFreeDrawElement,
 } from "../element/types";
 import {
   isTextElement,
@@ -130,12 +131,19 @@ const drawElementOnCanvas = (
       rc.draw(getShapeForElement(element) as Drawable);
       break;
     }
-    case "draw":
     case "arrow":
     case "line": {
       (getShapeForElement(element) as Drawable[]).forEach((shape) => {
         rc.draw(shape);
       });
+      break;
+    }
+    case "draw": {
+      // Draw directly to canvas
+      context.save();
+      context.fillStyle = element.strokeColor;
+      context.fill(getFreeDrawPath(element));
+      context.restore();
       break;
     }
     default: {
@@ -253,16 +261,6 @@ export const generateRoughOptions = (element: ExcalidrawElement): Options => {
       }
       return options;
     }
-    case "draw": {
-      options.roughness = 0;
-      options.simplification = 0;
-      options.bowing = 0;
-      options.fillStyle = element.fillStyle;
-      options.fill = options.stroke;
-      options.stroke = "transparent";
-      options.curveFitting = 1;
-      return options;
-    }
     case "arrow":
       return options;
     default: {
@@ -271,11 +269,17 @@ export const generateRoughOptions = (element: ExcalidrawElement): Options => {
   }
 };
 
+/**
+ * Generates the element's shape and puts it into the cache.
+ * @param element
+ * @param generator
+ */
 const generateElementShape = (
   element: NonDeletedExcalidrawElement,
   generator: RoughGenerator,
 ) => {
   let shape = shapeCache.get(element) || null;
+
   if (!shape) {
     elementWithCanvasCache.delete(element);
 
@@ -334,40 +338,6 @@ const generateElementShape = (
           generateRoughOptions(element),
         );
         break;
-      case "draw": {
-        const options = generateRoughOptions(element);
-
-        const inputPoints = element.simulatePressure
-          ? element.points
-          : element.points.length
-          ? element.points.length === 1
-            ? [element.points[0], element.points[0]]
-            : element.points.map(([x, y], i) => [x, y, element.pressures[i]])
-          : [[0, 0, 0]];
-
-        const points = getStroke(inputPoints as number[][], {
-          size: element.strokeWidth * 12,
-          thinning: 0.7,
-          simulatePressure: element.simulatePressure,
-        });
-        const d = [];
-
-        let [p0, p1] = points;
-
-        d.push("M", p0[0], p0[1], "Q");
-
-        for (let i = 1; i < points.length; i++) {
-          d.push(p0[0], p0[1], (p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2);
-          p0 = p1;
-          p1 = points[i];
-        }
-
-        d.push("Z");
-
-        shape = [generator.path(d.join(" "), options)];
-        // shape = [generator.polygon(points as [number, number][], options)];
-        break;
-      }
       case "line":
       case "arrow": {
         const options = generateRoughOptions(element);
@@ -466,6 +436,7 @@ const generateElementShape = (
 
         break;
       }
+      case "draw":
       case "text": {
         // just to ensure we don't regenerate element.canvas on rerenders
         shape = [];
@@ -489,6 +460,7 @@ const generateElementWithCanvas = (
   if (!prevElementWithCanvas || shouldRegenerateBecauseZoom) {
     const elementWithCanvas = generateElementCanvas(element, zoom);
     elementWithCanvasCache.set(element, elementWithCanvas);
+
     return elementWithCanvas;
   }
   return prevElementWithCanvas;
@@ -549,11 +521,11 @@ export const renderElement = (
       );
       break;
     }
+    case "draw":
     case "rectangle":
     case "diamond":
     case "ellipse":
     case "line":
-    case "draw":
     case "arrow":
     case "text": {
       generateElementShape(element, generator);
@@ -623,7 +595,6 @@ export const renderElementToSvg = (
       svgRoot.appendChild(node);
       break;
     }
-    case "draw":
     case "line":
     case "arrow": {
       generateElementShape(element, generator);
@@ -651,6 +622,25 @@ export const renderElementToSvg = (
         group.appendChild(node);
       });
       svgRoot.appendChild(group);
+      break;
+    }
+    case "draw": {
+      const opacity = element.opacity / 100;
+      const node = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
+      if (opacity !== 1) {
+        node.setAttribute("stroke-opacity", `${opacity}`);
+        node.setAttribute("fill-opacity", `${opacity}`);
+      }
+      node.setAttribute(
+        "transform",
+        `translate(${offsetX || 0} ${
+          offsetY || 0
+        }) rotate(${degree} ${cx} ${cy})`,
+      );
+      const path = svgRoot.ownerDocument!.createElementNS(SVG_NS, "path");
+      path.setAttribute("d", getFreeDrawSvgPath(element));
+      node.appendChild(path);
+      svgRoot.appendChild(node);
       break;
     }
     default: {
@@ -704,3 +694,41 @@ export const renderElementToSvg = (
     }
   }
 };
+
+function getFreeDrawPoints(element: ExcalidrawFreeDrawElement) {
+  const inputPoints = element.simulatePressure
+    ? element.points
+    : element.points.length
+    ? element.points.length === 1
+      ? [element.points[0], element.points[0]]
+      : element.points.map(([x, y], i) => [x, y, element.pressures[i]])
+    : [[0, 0, 0]];
+
+  return getStroke(inputPoints as number[][], {
+    size: element.strokeWidth * 12,
+    thinning: 0.7,
+    simulatePressure: element.simulatePressure,
+  });
+}
+
+export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
+  const path: (string | number)[] = [];
+
+  const points = getFreeDrawPoints(element);
+
+  let [p0, p1] = points;
+
+  path.push("M", p0[0], p0[1], "Q");
+
+  for (let i = 1; i < points.length; i++) {
+    path.push(p0[0], p0[1], (p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2);
+    p0 = p1;
+    p1 = points[i];
+  }
+
+  return path.join(" ");
+}
+
+export function getFreeDrawPath(element: ExcalidrawFreeDrawElement) {
+  return new Path2D(getFreeDrawSvgPath(element));
+}

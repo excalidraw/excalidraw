@@ -3278,9 +3278,13 @@ class App extends React.Component<AppProps, AppState> {
         const dx = pointerCoords.x - draggingElement.x;
         const dy = pointerCoords.y - draggingElement.y;
 
+        const pressures = draggingElement.simulatePressure
+          ? draggingElement.pressures
+          : [...draggingElement.pressures, event.pressure];
+
         mutateElement(draggingElement, {
           points: [...points, [dx, dy]],
-          pressures: [...draggingElement.pressures, event.pressure],
+          pressures,
         });
       } else if (isLinearElement(draggingElement)) {
         pointerDownState.drag.hasOccurred = true;
@@ -3449,12 +3453,18 @@ class App extends React.Component<AppProps, AppState> {
           this.state,
         );
         const points = draggingElement.points;
-        const dx = pointerCoords.x - draggingElement.x;
-        const dy = pointerCoords.y - draggingElement.y;
+        const dx = Math.floor(pointerCoords.x - draggingElement.x);
+        const dy = Math.floor(pointerCoords.y - draggingElement.y);
+
+        const pressures = draggingElement.simulatePressure
+          ? []
+          : [...draggingElement.pressures, childEvent.pressure];
 
         mutateElement(draggingElement, {
-          points: [...points, [dx, dy]],
-          pressures: [...draggingElement.pressures, childEvent.pressure],
+          points: [...points, [dx, dy]].map(
+            ([x, y]) => [Math.round(x), Math.round(y)] as const,
+          ),
+          pressures,
         });
 
         this.actionManager.executeAction(actionFinalize);
