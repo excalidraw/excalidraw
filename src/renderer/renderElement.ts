@@ -142,7 +142,7 @@ const drawElementOnCanvas = (
       // Draw directly to canvas
       context.save();
       context.fillStyle = element.strokeColor;
-      context.fill(getFreeDrawPath(element));
+      context.fill(new Path2D(getFreeDrawSvgPath(element)));
       context.restore();
       break;
     }
@@ -727,8 +727,4 @@ export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
   }
 
   return path.join(" ");
-}
-
-export function getFreeDrawPath(element: ExcalidrawFreeDrawElement) {
-  return new Path2D(getFreeDrawSvgPath(element));
 }
