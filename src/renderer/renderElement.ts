@@ -695,7 +695,7 @@ export const renderElementToSvg = (
   }
 };
 
-function getFreeDrawPoints(element: ExcalidrawFreeDrawElement) {
+export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
   const inputPoints = element.simulatePressure
     ? element.points
     : element.points.length
@@ -704,21 +704,15 @@ function getFreeDrawPoints(element: ExcalidrawFreeDrawElement) {
       : element.points.map(([x, y], i) => [x, y, element.pressures[i]])
     : [[0, 0, 0]];
 
-  return getStroke(inputPoints as number[][], {
+  const points = getStroke(inputPoints as number[][], {
     size: element.strokeWidth * 12,
     thinning: 0.7,
     simulatePressure: element.simulatePressure,
   });
-}
-
-export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
-  const path: (string | number)[] = [];
-
-  const points = getFreeDrawPoints(element);
 
   let [p0, p1] = points;
 
-  path.push("M", p0[0], p0[1], "Q");
+  const path: (string | number)[] = ["M", p0[0], p0[1], "Q"];
 
   for (let i = 1; i < points.length; i++) {
     path.push(p0[0], p0[1], (p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2);
