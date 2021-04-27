@@ -16,6 +16,7 @@ import {
   ExcalidrawTextElement,
   ExcalidrawEllipseElement,
   NonDeleted,
+  ExcalidrawFreeDrawElement,
 } from "./types";
 
 import { getElementAbsoluteCoords, getCurvePathOps, Bounds } from "./bounds";
@@ -30,12 +31,14 @@ const isElementDraggableFromInside = (
   if (element.type === "arrow") {
     return false;
   }
+
+  if (element.type === "draw") {
+    return true;
+  }
+
   const isDraggableFromInside = element.backgroundColor !== "transparent";
 
-  // TODO: Is a free-drawn element draggable from inside?
-  if (element.type === "draw") {
-    return false;
-  } else if (element.type === "line") {
+  if (element.type === "line") {
     return isDraggableFromInside && isPathALoop(element.points);
   }
 
@@ -86,6 +89,7 @@ const isHittingElementNotConsideringBoundingBox = (
       : isElementDraggableFromInside(element)
       ? isInsideCheck
       : isNearCheck;
+
   return hitTestPointAgainstElement({ element, point, threshold, check });
 };
 
@@ -156,9 +160,13 @@ const hitTestPointAgainstElement = (args: HitTestArgs): boolean => {
     case "ellipse":
       const distance = distanceToBindableElement(args.element, args.point);
       return args.check(distance, args.threshold);
+    case "draw":
+      return args.check(
+        distanceToRectangle(args.element, args.point),
+        args.threshold,
+      );
     case "arrow":
     case "line":
-    case "draw":
       return hitTestLinear(args);
     case "selection":
       console.warn(
@@ -200,7 +208,10 @@ const isOutsideCheck = (distance: number, threshold: number): boolean => {
 };
 
 const distanceToRectangle = (
-  element: ExcalidrawRectangleElement | ExcalidrawTextElement,
+  element:
+    | ExcalidrawRectangleElement
+    | ExcalidrawTextElement
+    | ExcalidrawFreeDrawElement,
   point: Point,
 ): number => {
   const [, pointRel, hwidth, hheight] = pointRelativeToElement(element, point);

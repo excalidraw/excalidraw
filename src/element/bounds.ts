@@ -135,12 +135,10 @@ const getMinMaxXYFromCurvePathOps = (
 const getFreeDrawElementBounds = (
   element: ExcalidrawFreeDrawElement,
 ): [number, number, number, number] => {
-  const [p0] = element.points;
-
-  let minX = p0[0];
-  let minY = p0[1];
-  let maxX = p0[0];
-  let maxY = p0[1];
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
 
   for (const [x, y] of element.points) {
     minX = Math.min(minX, x);
@@ -149,12 +147,7 @@ const getFreeDrawElementBounds = (
     maxY = Math.max(maxY, y);
   }
 
-  return [
-    minX - element.strokeWidth * 2,
-    minY - element.strokeWidth * 2,
-    maxX + element.strokeWidth * 2,
-    maxY + element.strokeWidth * 2,
-  ];
+  return [minX, minY, maxX, maxY];
 };
 
 const getFreeDrawElementAbsoluteCoords = (
@@ -337,24 +330,18 @@ const getLinearElementRotatedBounds = (
   return getMinMaxXYFromCurvePathOps(ops, transformXY);
 };
 
-// const boundsCache = new Map<string, [number, number, number, number]>([]);
-
+// We could cache this stuff
 export const getElementBounds = (
   element: ExcalidrawElement,
 ): [number, number, number, number] => {
   let bounds: [number, number, number, number];
 
-  // if (boundsCache.has(element.id)) {
-  //   return boundsCache.get(element.id)!;
-  // }
-
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
   if (isFreeDrawElement(element)) {
-    bounds = getFreeDrawElementBounds(element);
-  }
-  if (isLinearElement(element)) {
+    bounds = getFreeDrawElementAbsoluteCoords(element);
+  } else if (isLinearElement(element)) {
     bounds = getLinearElementRotatedBounds(element, cx, cy);
   } else if (element.type === "diamond") {
     const [x11, y11] = rotate(cx, y1, cx, cy, element.angle);
@@ -385,8 +372,6 @@ export const getElementBounds = (
     const maxY = Math.max(y11, y12, y22, y21);
     bounds = [minX, minY, maxX, maxY];
   }
-
-  // boundsCache.set(element.id, bounds);
 
   return bounds;
 };

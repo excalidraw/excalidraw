@@ -248,15 +248,7 @@ const rescalePointsInElement = (
   width: number,
   height: number,
 ) =>
-  isLinearElement(element)
-    ? {
-        points: rescalePoints(
-          0,
-          width,
-          rescalePoints(1, height, element.points),
-        ),
-      }
-    : isFreeDrawElement(element)
+  isLinearElement(element) || isFreeDrawElement(element)
     ? {
         points: rescalePoints(
           0,
@@ -416,7 +408,7 @@ export const resizeSingleElement = (
     -stateAtResizeStart.angle,
   );
 
-  //Get bounds corners rendered on screen
+  // Get bounds corners rendered on screen
   const [esx1, esy1, esx2, esy2] = getResizedElementAbsoluteCoords(
     element,
     element.width,
@@ -669,6 +661,7 @@ const resizeMultipleElements = (
           width,
           height,
         );
+
         const { x, y } = getNextXY(element, origCoords, finalCoords);
         return [...prev, { width, height, x, y, ...rescaledPoints, ...font }];
       },

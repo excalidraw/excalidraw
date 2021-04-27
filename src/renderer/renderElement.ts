@@ -36,10 +36,11 @@ import getStroke from "perfect-freehand";
 
 const defaultAppState = getDefaultAppState();
 
-const CANVAS_PADDING = 20;
-
 const DASHARRAY_DASHED = [12, 8];
 const DASHARRAY_DOTTED = [3, 6];
+
+const getCanvasPadding = (element: ExcalidrawElement) =>
+  element.type === "draw" ? element.strokeWidth * 12 : 20;
 
 export interface ExcalidrawElementWithCanvas {
   element: ExcalidrawElement | ExcalidrawTextElement;
@@ -55,6 +56,7 @@ const generateElementCanvas = (
 ): ExcalidrawElementWithCanvas => {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
+  const padding = getCanvasPadding(element);
 
   let canvasOffsetX = 0;
   let canvasOffsetY = 0;
@@ -63,10 +65,10 @@ const generateElementCanvas = (
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
     canvas.width =
       distance(x1, x2) * window.devicePixelRatio * zoom.value +
-      CANVAS_PADDING * zoom.value * 2;
+      padding * zoom.value * 2;
     canvas.height =
       distance(y1, y2) * window.devicePixelRatio * zoom.value +
-      CANVAS_PADDING * zoom.value * 2;
+      padding * zoom.value * 2;
 
     canvasOffsetX =
       element.x > x1
@@ -86,13 +88,13 @@ const generateElementCanvas = (
   } else {
     canvas.width =
       element.width * window.devicePixelRatio * zoom.value +
-      CANVAS_PADDING * zoom.value * 2;
+      padding * zoom.value * 2;
     canvas.height =
       element.height * window.devicePixelRatio * zoom.value +
-      CANVAS_PADDING * zoom.value * 2;
+      padding * zoom.value * 2;
   }
 
-  context.translate(CANVAS_PADDING * zoom.value, CANVAS_PADDING * zoom.value);
+  context.translate(padding * zoom.value, padding * zoom.value);
 
   context.scale(
     window.devicePixelRatio * zoom.value,
@@ -101,10 +103,7 @@ const generateElementCanvas = (
 
   const rc = rough.canvas(canvas);
   drawElementOnCanvas(element, rc, context);
-  context.translate(
-    -(CANVAS_PADDING * zoom.value),
-    -(CANVAS_PADDING * zoom.value),
-  );
+  context.translate(-(padding * zoom.value), -(padding * zoom.value));
   context.scale(
     1 / (window.devicePixelRatio * zoom.value),
     1 / (window.devicePixelRatio * zoom.value),
@@ -261,6 +260,7 @@ export const generateRoughOptions = (element: ExcalidrawElement): Options => {
       }
       return options;
     }
+    case "draw":
     case "arrow":
       return options;
     default: {
@@ -473,6 +473,7 @@ const drawElementFromCanvas = (
   sceneState: SceneState,
 ) => {
   const element = elementWithCanvas.element;
+  const padding = getCanvasPadding(element);
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const cx = ((x1 + x2) / 2 + sceneState.scrollX) * window.devicePixelRatio;
   const cy = ((y1 + y2) / 2 + sceneState.scrollY) * window.devicePixelRatio;
@@ -482,11 +483,9 @@ const drawElementFromCanvas = (
   context.drawImage(
     elementWithCanvas.canvas!,
     (-(x2 - x1) / 2) * window.devicePixelRatio -
-      (CANVAS_PADDING * elementWithCanvas.canvasZoom) /
-        elementWithCanvas.canvasZoom,
+      (padding * elementWithCanvas.canvasZoom) / elementWithCanvas.canvasZoom,
     (-(y2 - y1) / 2) * window.devicePixelRatio -
-      (CANVAS_PADDING * elementWithCanvas.canvasZoom) /
-        elementWithCanvas.canvasZoom,
+      (padding * elementWithCanvas.canvasZoom) / elementWithCanvas.canvasZoom,
     elementWithCanvas.canvas!.width / elementWithCanvas.canvasZoom,
     elementWithCanvas.canvas!.height / elementWithCanvas.canvasZoom,
   );
