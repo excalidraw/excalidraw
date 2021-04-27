@@ -2,7 +2,6 @@
   .Island {
     --padding: 0;
     background-color: var(--island-bg-color);
-    backdrop-filter: saturate(100%) blur(10px);
     box-shadow: var(--shadow-island);
     border-radius: 4px;
     padding: calc(var(--padding) * var(--space-factor));
