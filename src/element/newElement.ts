@@ -215,7 +215,7 @@ export const updateTextElement = (
 
 export const newFreeDrawElement = (
   opts: {
-    type: "draw";
+    type: "freedraw";
     points?: ExcalidrawFreeDrawElement["points"];
     simulatePressure: boolean;
     strokeShape: ExcalidrawFreeDrawElement["strokeShape"];

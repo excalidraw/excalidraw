@@ -41,7 +41,7 @@ const DASHARRAY_DASHED = [12, 8];
 const DASHARRAY_DOTTED = [3, 6];
 
 const getCanvasPadding = (element: ExcalidrawElement) =>
-  element.type === "draw" ? element.strokeWidth * 12 : 20;
+  element.type === "freedraw" ? element.strokeWidth * 12 : 20;
 
 export interface ExcalidrawElementWithCanvas {
   element: ExcalidrawElement | ExcalidrawTextElement;
@@ -141,20 +141,22 @@ const drawElementOnCanvas = (
       });
       break;
     }
-    case "draw": {
+    case "freedraw": {
       // Draw directly to canvas
       context.save();
       context.fillStyle = element.strokeColor;
+
+      const path = getFreeDrawPath2D(element) as Path2D;
 
       if (element.strokeShape === "gel") {
         context.lineWidth = strokeShapes.gel.size * element.strokeWidth;
         context.lineCap = "round";
         context.lineJoin = "round";
         context.strokeStyle = element.strokeColor;
-        context.stroke(new Path2D(getFreeDrawSvgPath(element)));
+        context.stroke(path);
       } else {
         context.fillStyle = element.strokeColor;
-        context.fill(new Path2D(getFreeDrawSvgPath(element)));
+        context.fill(path);
       }
 
       context.restore();
@@ -275,7 +277,7 @@ export const generateRoughOptions = (element: ExcalidrawElement): Options => {
       }
       return options;
     }
-    case "draw":
+    case "freedraw":
     case "arrow":
       return options;
     default: {
@@ -451,7 +453,11 @@ const generateElementShape = (
 
         break;
       }
-      case "draw":
+      case "freedraw": {
+        generateFreeDrawShape(element);
+        shape = [];
+        break;
+      }
       case "text": {
         // just to ensure we don't regenerate element.canvas on rerenders
         shape = [];
@@ -537,7 +543,32 @@ export const renderElement = (
       );
       break;
     }
-    case "draw":
+    case "freedraw": {
+      generateElementShape(element, generator);
+
+      if (renderOptimizations) {
+        const elementWithCanvas = generateElementWithCanvas(
+          element,
+          sceneState,
+        );
+        drawElementFromCanvas(elementWithCanvas, rc, context, sceneState);
+      } else {
+        const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+        const cx = (x1 + x2) / 2 + sceneState.scrollX;
+        const cy = (y1 + y2) / 2 + sceneState.scrollY;
+        const shiftX = (x2 - x1) / 2 - (element.x - x1);
+        const shiftY = (y2 - y1) / 2 - (element.y - y1);
+        context.translate(cx, cy);
+        context.rotate(element.angle);
+        context.translate(-shiftX, -shiftY);
+        drawElementOnCanvas(element, rc, context);
+        context.translate(shiftX, shiftY);
+        context.rotate(-element.angle);
+        context.translate(-cx, -cy);
+      }
+
+      break;
+    }
     case "rectangle":
     case "diamond":
     case "ellipse":
@@ -640,7 +671,8 @@ export const renderElementToSvg = (
       svgRoot.appendChild(group);
       break;
     }
-    case "draw": {
+    case "freedraw": {
+      generateFreeDrawShape(element);
       const opacity = element.opacity / 100;
       const node = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
       if (opacity !== 1) {
@@ -752,6 +784,19 @@ const strokeShapes: Record<
     easing: (t) => t * t,
   },
 };
+
+export const pathsCache = new WeakMap<ExcalidrawFreeDrawElement, Path2D>([]);
+
+export function generateFreeDrawShape(element: ExcalidrawFreeDrawElement) {
+  const svgPathData = getFreeDrawSvgPath(element);
+  const path = new Path2D(svgPathData);
+  pathsCache.set(element, path);
+  return path;
+}
+
+export function getFreeDrawPath2D(element: ExcalidrawFreeDrawElement) {
+  return pathsCache.get(element);
+}
 
 export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
   const inputPoints = element.simulatePressure

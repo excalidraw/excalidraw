@@ -150,7 +150,7 @@
   },
   "toolBar": {
     "selection": "Pilihan",
-    "draw": "Menggambar bebas",
+    "freedraw": "Menggambar bebas",
     "rectangle": "Persegi",
     "diamond": "Berlian",
     "ellipse": "Elips",

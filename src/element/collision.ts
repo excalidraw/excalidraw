@@ -32,7 +32,7 @@ const isElementDraggableFromInside = (
     return false;
   }
 
-  if (element.type === "draw") {
+  if (element.type === "freedraw") {
     return true;
   }
 
@@ -160,11 +160,18 @@ const hitTestPointAgainstElement = (args: HitTestArgs): boolean => {
     case "ellipse":
       const distance = distanceToBindableElement(args.element, args.point);
       return args.check(distance, args.threshold);
-    case "draw":
-      return args.check(
-        distanceToRectangle(args.element, args.point),
-        args.threshold,
-      );
+    case "freedraw": {
+      if (
+        !args.check(
+          distanceToRectangle(args.element, args.point),
+          args.threshold,
+        )
+      ) {
+        return false;
+      }
+
+      return hitTestFreeDrawElement(args.element, args.point, args.threshold);
+    }
     case "arrow":
     case "line":
       return hitTestLinear(args);
@@ -281,6 +288,49 @@ const ellipseParamsForTest = (
 
   const tangent = GALine.orthogonalThrough(pointRel, closestPoint);
   return [pointRel, tangent];
+};
+
+const hitTestFreeDrawElement = (
+  element: ExcalidrawFreeDrawElement,
+  point: Point,
+  threshold: number,
+): boolean => {
+  // Check point-distance-to-line-segment for every segment in the
+  // element's points (its input points, not its outline points).
+  // This is... okay? It's plenty fast, but the GA library may
+  // have a faster option.
+
+  const x = point[0] - element.x;
+  const y = point[1] - element.y;
+
+  let [A, B] = element.points;
+  let P: readonly [number, number];
+
+  for (let i = 1; i < element.points.length - 1; i++) {
+    const delta = [B[0] - A[0], B[1] - A[1]];
+    const length = Math.hypot(delta[1], delta[0]);
+
+    if (length > threshold / 4) {
+      const U = [delta[0] / length, delta[1] / length];
+      const C = [x - A[0], y - A[1]];
+      const d = (C[0] * U[0] + C[1] * U[1]) / Math.hypot(U[1], U[0]);
+      P = [A[0] + U[0] * d, A[1] + U[1] * d];
+
+      const da = Math.hypot(P[1] - A[1], P[0] - A[0]);
+      const db = Math.hypot(P[1] - B[1], P[0] - B[0]);
+
+      P = db < da && da > length ? B : da < db && db > length ? A : P;
+
+      if (Math.hypot(y - P[1], x - P[0]) < threshold) {
+        return true;
+      }
+    }
+
+    A = B;
+    B = element.points[i + 1];
+  }
+
+  return false;
 };
 
 const hitTestLinear = (args: HitTestArgs): boolean => {

@@ -26,7 +26,7 @@ export const getPerfectElementSize = (
   if (
     elementType === "line" ||
     elementType === "arrow" ||
-    elementType === "draw"
+    elementType === "freedraw"
   ) {
     const lockedAngle =
       Math.round(Math.atan(absHeight / absWidth) / SHIFT_LOCKING_ANGLE) *

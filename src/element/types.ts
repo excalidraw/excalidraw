@@ -127,7 +127,7 @@ export type StrokeShape = "gel" | "fountain" | "brush";
 
 export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
   Readonly<{
-    type: "draw";
+    type: "freedraw";
     points: readonly Point[];
     pressures: readonly number[];
     simulatePressure: boolean;

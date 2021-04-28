@@ -15,7 +15,7 @@ export const hasStrokeWidth = (type: string) =>
   type === "rectangle" ||
   type === "ellipse" ||
   type === "diamond" ||
-  type === "draw" ||
+  type === "freedraw" ||
   type === "arrow" ||
   type === "line";
 

@@ -2346,7 +2346,7 @@ class App extends React.Component<AppProps, AppState> {
         this.state.elementType,
         pointerDownState,
       );
-    } else if (this.state.elementType === "draw") {
+    } else if (this.state.elementType === "freedraw") {
       this.handleFreeDrawElementOnPointerDown(
         event,
         this.state.elementType,
@@ -3274,7 +3274,7 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (draggingElement.type === "draw") {
+      if (draggingElement.type === "freedraw") {
         const points = draggingElement.points;
         const dx = Math.round(pointerCoords.x - draggingElement.x);
         const dy = Math.round(pointerCoords.y - draggingElement.y);
@@ -3448,7 +3448,7 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.eventListeners.onKeyUp!,
       );
 
-      if (draggingElement?.type === "draw") {
+      if (draggingElement?.type === "freedraw") {
         const pointerCoords = viewportCoordsToSceneCoords(
           childEvent,
           this.state,
@@ -3658,7 +3658,7 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (!elementLocked && elementType !== "draw" && draggingElement) {
+      if (!elementLocked && elementType !== "freedraw" && draggingElement) {
         this.setState((prevState) => ({
           selectedElementIds: {
             ...prevState.selectedElementIds,
@@ -3682,7 +3682,7 @@ class App extends React.Component<AppProps, AppState> {
         );
       }
 
-      if (!elementLocked && elementType !== "draw") {
+      if (!elementLocked && elementType !== "freedraw") {
         resetCursor(this.canvas);
         this.setState({
           draggingElement: null,

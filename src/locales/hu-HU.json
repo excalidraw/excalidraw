@@ -150,7 +150,7 @@
   },
   "toolBar": {
     "selection": "Kijelölés",
-    "draw": "Szabadkézi rajz",
+    "freedraw": "Szabadkézi rajz",
     "rectangle": "Téglalap",
     "diamond": "Rombusz",
     "ellipse": "Ellipszis",

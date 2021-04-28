@@ -85,7 +85,7 @@ export class API {
       : never;
   }): T extends "arrow" | "line"
     ? ExcalidrawLinearElement
-    : T extends "draw"
+    : T extends "freedraw"
     ? ExcalidrawFreeDrawElement
     : T extends "text"
     ? ExcalidrawTextElement
@@ -129,9 +129,9 @@ export class API {
           verticalAlign: rest.verticalAlign ?? DEFAULT_VERTICAL_ALIGN,
         });
         break;
-      case "draw":
+      case "freedraw":
         element = newFreeDrawElement({
-          type: type as "draw",
+          type: type as "freedraw",
           simulatePressure: true,
           strokeShape: "gel",
           ...base,

@@ -150,7 +150,7 @@
   },
   "toolBar": {
     "selection": "Selecție",
-    "draw": "Desenare liberă",
+    "freedraw": "Desenare liberă",
     "rectangle": "Dreptunghi",
     "diamond": "Romb",
     "ellipse": "Elipsă",

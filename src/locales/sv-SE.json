@@ -150,7 +150,7 @@
   },
   "toolBar": {
     "selection": "Markering",
-    "draw": "Frihand",
+    "freedraw": "Frihand",
     "rectangle": "Rektangel",
     "diamond": "Diamant",
     "ellipse": "Ellips",

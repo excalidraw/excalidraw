@@ -71,7 +71,7 @@ const createAndSelectOneLine = (angle: number = 0) => {
 };
 
 const createAndReturnOneDraw = (angle: number = 0) => {
-  return UI.createElement("draw", {
+  return UI.createElement("freedraw", {
     x: 0,
     y: 0,
     width: 50,

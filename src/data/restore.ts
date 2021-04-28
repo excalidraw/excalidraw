@@ -2,6 +2,7 @@ import {
   ExcalidrawElement,
   FontFamily,
   ExcalidrawSelectionElement,
+  ExcalidrawFreeDrawElement,
 } from "../element/types";
 import { AppState, NormalizedZoomValue } from "../types";
 import { ImportedDataState } from "./types";
@@ -97,20 +98,26 @@ const restoreElement = (
         textAlign: element.textAlign || DEFAULT_TEXT_ALIGN,
         verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,
       });
-    case "draw": {
-      return restoreElementWithProperties(element, {
+    case "freedraw": {
+      if ("simulatePressure" in element) {
+        return element;
+      }
+
+      const lineToMigrate = element as ExcalidrawFreeDrawElement;
+
+      return restoreElementWithProperties(lineToMigrate, {
+        // @ts-ignore
+        type: "line",
         points:
           // migrate old arrow model to new one
-          !Array.isArray(element.points) || element.points.length < 2
+          !Array.isArray(lineToMigrate.points) ||
+          lineToMigrate.points.length < 2
             ? [
                 [0, 0],
-                [element.width, element.height],
+                [lineToMigrate.width, lineToMigrate.height],
               ]
-            : element.points,
-        pressures: element.pressures,
-        simulatePressure: element.simulatePressure,
+            : lineToMigrate.points,
         lastCommittedPoint: null,
-        strokeShape: element.strokeShape,
       });
     }
     case "line":

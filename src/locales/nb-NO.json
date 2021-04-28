@@ -150,7 +150,7 @@
   },
   "toolBar": {
     "selection": "Velg",
-    "draw": "Frihåndstegning",
+    "freedraw": "Frihåndstegning",
     "rectangle": "Rektangel",
     "diamond": "Diamant",
     "ellipse": "Ellipse",

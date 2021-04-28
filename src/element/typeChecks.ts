@@ -34,7 +34,7 @@ export const isFreeDrawElement = (
 export const isFreeDrawElementType = (
   elementType: ExcalidrawElement["type"],
 ): boolean => {
-  return elementType === "draw";
+  return elementType === "freedraw";
 };
 
 export const isLinearElement = (
@@ -47,7 +47,7 @@ export const isLinearElementType = (
   elementType: ExcalidrawElement["type"],
 ): boolean => {
   return (
-    elementType === "arrow" || elementType === "line" // || elementType === "draw"
+    elementType === "arrow" || elementType === "line" // || elementType === "freedraw"
   );
 };
 
@@ -82,7 +82,7 @@ export const isExcalidrawElement = (element: any): boolean => {
     element?.type === "rectangle" ||
     element?.type === "ellipse" ||
     element?.type === "arrow" ||
-    element?.type === "draw" ||
+    element?.type === "freedraw" ||
     element?.type === "line"
   );
 };
