@@ -7,7 +7,7 @@ const toolMap = {
   ellipse: "ellipse",
   arrow: "arrow",
   line: "line",
-  draw: "freedraw",
+  freedraw: "freedraw",
   text: "text",
 };
 

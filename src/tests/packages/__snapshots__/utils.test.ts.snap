@@ -14,6 +14,7 @@ Object {
   "currentItemRoughness": 1,
   "currentItemStartArrowhead": null,
   "currentItemStrokeColor": "#000000",
+  "currentItemStrokeShape": "gel",
   "currentItemStrokeSharpness": "sharp",
   "currentItemStrokeStyle": "solid",
   "currentItemStrokeWidth": 1,
