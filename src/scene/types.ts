@@ -25,12 +25,14 @@ export interface Scene {
   elements: ExcalidrawTextElement[];
 }
 
+export type SaveType = "png" | "svg" | "excalidraw";
+
 export type ExportType =
   | "png"
+  | "svg"
   | "clipboard"
   | "clipboard-svg"
-  | "backend"
-  | "svg";
+  | "backend";
 
 export type ScrollBars = {
   horizontal: {

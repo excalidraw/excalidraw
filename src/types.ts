@@ -21,6 +21,7 @@ import type { ResolvablePromise } from "./utils";
 import { Spreadsheet } from "./charts";
 import { Language } from "./i18n";
 import { UserIdleState } from "./excalidraw-app/collab/types";
+import { SaveType } from "./scene/types";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -106,6 +107,7 @@ export type AppState = {
 
   isLibraryOpen: boolean;
   fileHandle: import("browser-fs-access").FileSystemHandle | null;
+  saveType?: SaveType;
   collaborators: Map<string, Collaborator>;
   showStats: boolean;
   currentChartType: ChartType;

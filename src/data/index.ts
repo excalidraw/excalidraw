@@ -14,7 +14,33 @@ import { serializeAsJSON } from "./json";
 export { loadFromBlob } from "./blob";
 export { loadFromJSON, saveAsJSON } from "./json";
 
+type ExportOptions = {
+  exportBackground: boolean;
+  exportPadding?: number;
+  viewBackgroundColor: string;
+  name: string;
+  scale?: number;
+  shouldAddWatermark: boolean;
+};
+
 export const exportCanvas = async (
+  type: ExportType,
+  elements: readonly NonDeletedExcalidrawElement[],
+  appState: AppState,
+  canvas: HTMLCanvasElement,
+  options: ExportOptions,
+) => {
+  if (elements.length === 0) {
+    throw new Error(t("alerts.cannotExportEmptyCanvas"));
+  }
+  if (type === "svg" || type === "clipboard-svg") {
+    await exportToSVGForReal(type, elements, appState, canvas, options);
+  } else if (type === "png" || type === "clipboard") {
+    exportToPNGForReal(type, elements, appState, canvas, options);
+  }
+};
+
+const exportToSVGForReal = async (
   type: ExportType,
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
@@ -26,47 +52,48 @@ export const exportCanvas = async (
     name,
     scale = 1,
     shouldAddWatermark,
-  }: {
-    exportBackground: boolean;
-    exportPadding?: number;
-    viewBackgroundColor: string;
-    name: string;
-    scale?: number;
-    shouldAddWatermark: boolean;
-  },
+  }: ExportOptions,
 ) => {
-  if (elements.length === 0) {
-    throw new Error(t("alerts.cannotExportEmptyCanvas"));
-  }
-  if (type === "svg" || type === "clipboard-svg") {
-    const tempSvg = exportToSvg(elements, {
-      exportBackground,
-      exportWithDarkMode: appState.exportWithDarkMode,
-      viewBackgroundColor,
-      exportPadding,
-      scale,
-      shouldAddWatermark,
-      metadata:
-        appState.exportEmbedScene && type === "svg"
-          ? await (
-              await import(/* webpackChunkName: "image" */ "./image")
-            ).encodeSvgMetadata({
-              text: serializeAsJSON(elements, appState),
-            })
-          : undefined,
+  const tempSvg = exportToSvg(elements, {
+    exportBackground,
+    exportWithDarkMode: appState.exportWithDarkMode,
+    viewBackgroundColor,
+    exportPadding,
+    scale,
+    shouldAddWatermark,
+    metadata:
+      appState.exportEmbedScene && type === "svg"
+        ? await (
+            await import(/* webpackChunkName: "image" */ "./image")
+          ).encodeSvgMetadata({
+            text: serializeAsJSON(elements, appState),
+          })
+        : undefined,
+  });
+  if (type === "svg") {
+    await fileSave(new Blob([tempSvg.outerHTML], { type: "image/svg+xml" }), {
+      fileName: `${name}.svg`,
+      extensions: [".svg"],
     });
-    if (type === "svg") {
-      await fileSave(new Blob([tempSvg.outerHTML], { type: "image/svg+xml" }), {
-        fileName: `${name}.svg`,
-        extensions: [".svg"],
-      });
-      return;
-    } else if (type === "clipboard-svg") {
-      copyTextToSystemClipboard(tempSvg.outerHTML);
-      return;
-    }
+  } else if (type === "clipboard-svg") {
+    copyTextToSystemClipboard(tempSvg.outerHTML);
   }
+};
 
+const exportToPNGForReal = async (
+  type: ExportType,
+  elements: readonly NonDeletedExcalidrawElement[],
+  appState: AppState,
+  canvas: HTMLCanvasElement,
+  {
+    exportBackground,
+    exportPadding = 10,
+    viewBackgroundColor,
+    name,
+    scale = 1,
+    shouldAddWatermark,
+  }: ExportOptions,
+) => {
   const tempCanvas = exportToCanvas(elements, appState, {
     exportBackground,
     viewBackgroundColor,

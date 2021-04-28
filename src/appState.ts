@@ -121,6 +121,7 @@ const APP_STATE_STORAGE_CONF = (<
   exportEmbedScene: { browser: true, export: false },
   exportWithDarkMode: { browser: true, export: false },
   fileHandle: { browser: false, export: false },
+  saveType: { browser: false, export: false },
   gridSize: { browser: true, export: true },
   height: { browser: false, export: false },
   isBindingEnabled: { browser: false, export: false },

@@ -97,9 +97,12 @@ export const loadFromBlob = async (
           theme: localAppState?.theme,
           fileHandle:
             blob.handle &&
-            ["application/json", MIME_TYPES.excalidraw].includes(
-              getMimeType(blob),
-            )
+            [
+              "application/json",
+              MIME_TYPES.excalidraw,
+              "image/png",
+              "image/svg+xml",
+            ].includes(getMimeType(blob))
               ? blob.handle
               : null,
           ...cleanAppStateForExport(data.appState || {}),
