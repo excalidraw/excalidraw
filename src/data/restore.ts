@@ -2,7 +2,6 @@ import {
   ExcalidrawElement,
   FontFamily,
   ExcalidrawSelectionElement,
-  ExcalidrawFreeDrawElement,
 } from "../element/types";
 import { AppState, NormalizedZoomValue } from "../types";
 import { ImportedDataState } from "./types";
@@ -38,10 +37,12 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamily => {
 
 const restoreElementWithProperties = <T extends ExcalidrawElement>(
   element: Required<T>,
-  extra: Omit<Required<T>, keyof ExcalidrawElement>,
+  extra: Omit<Required<T>, keyof ExcalidrawElement> & {
+    type?: ExcalidrawElement["type"];
+  },
 ): T => {
   const base: Pick<T, keyof ExcalidrawElement> = {
-    type: element.type,
+    type: extra.type || element.type,
     // all elements must have version > 0 so getSceneVersion() will pick up
     // newly added elements
     version: element.version || 1,
@@ -99,27 +100,14 @@ const restoreElement = (
         verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,
       });
     case "freedraw": {
-      if ("simulatePressure" in element) {
-        return element;
-      }
-
-      const lineToMigrate = element as ExcalidrawFreeDrawElement;
-
-      return restoreElementWithProperties(lineToMigrate, {
-        // @ts-ignore
-        type: "line",
-        points:
-          // migrate old arrow model to new one
-          !Array.isArray(lineToMigrate.points) ||
-          lineToMigrate.points.length < 2
-            ? [
-                [0, 0],
-                [lineToMigrate.width, lineToMigrate.height],
-              ]
-            : lineToMigrate.points,
+      return restoreElementWithProperties(element, {
+        points: element.points,
         lastCommittedPoint: null,
+        simulatePressure: element.simulatePressure,
+        pressures: element.pressures,
       });
     }
+    case "draw":
     case "line":
     case "arrow": {
       const {
@@ -128,6 +116,7 @@ const restoreElement = (
       } = element;
 
       return restoreElementWithProperties(element, {
+        type: element.type === "draw" ? "line" : element.type,
         startBinding: element.startBinding,
         endBinding: element.endBinding,
         points:

@@ -69,7 +69,7 @@ import {
 import { loadFromBlob } from "../data";
 import { isValidLibrary } from "../data/json";
 import Library from "../data/library";
-import { restore } from "../data/restore";
+import { restore, restoreElements } from "../data/restore";
 import {
   dragNewElement,
   dragSelectedElements,
@@ -1263,8 +1263,9 @@ class App extends React.Component<AppProps, AppState> {
           },
         });
       } else if (data.elements) {
+        // TODO: Migrate elements!
         this.addElementsFromPasteOrLibrary({
-          elements: data.elements,
+          elements: restoreElements(data.elements),
           position: "cursor",
         });
       } else if (data.text) {
@@ -2876,6 +2877,7 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     this.setState((prevState) => ({
+      isFreeDrawing: true,
       selectedElementIds: {
         ...prevState.selectedElementIds,
         [element.id]: false,
@@ -3397,6 +3399,7 @@ class App extends React.Component<AppProps, AppState> {
       } = this.state;
 
       this.setState({
+        isFreeDrawing: false,
         isResizing: false,
         isRotating: false,
         resizingElement: null,
@@ -3452,6 +3455,7 @@ class App extends React.Component<AppProps, AppState> {
           childEvent,
           this.state,
         );
+
         const points = draggingElement.points;
         const dx = pointerCoords.x - draggingElement.x;
         const dy = pointerCoords.y - draggingElement.y;

@@ -134,6 +134,7 @@ const drawElementOnCanvas = (
       break;
     }
     case "arrow":
+    case "draw":
     case "line": {
       (getShapeForElement(element) as Drawable[]).forEach((shape) => {
         rc.draw(shape);
@@ -258,6 +259,7 @@ export const generateRoughOptions = (element: ExcalidrawElement): Options => {
       }
       return options;
     }
+    case "draw":
     case "line": {
       if (isPathALoop(element.points)) {
         options.fillStyle = element.fillStyle;
@@ -346,6 +348,7 @@ const generateElementShape = (
           generateRoughOptions(element),
         );
         break;
+      case "draw":
       case "line":
       case "arrow": {
         const options = generateRoughOptions(element);
@@ -563,6 +566,7 @@ export const renderElement = (
     case "rectangle":
     case "diamond":
     case "ellipse":
+    case "draw":
     case "line":
     case "arrow":
     case "text": {
@@ -633,6 +637,7 @@ export const renderElementToSvg = (
       svgRoot.appendChild(node);
       break;
     }
+    case "draw":
     case "line":
     case "arrow": {
       generateElementShape(element, generator);

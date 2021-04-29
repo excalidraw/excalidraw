@@ -252,6 +252,10 @@ class History {
     this.recording = true;
   }
 
+  pauseRecording() {
+    this.recording = true;
+  }
+
   record(state: AppState, elements: readonly ExcalidrawElement[]) {
     if (this.recording) {
       this.pushEntry(state, elements);

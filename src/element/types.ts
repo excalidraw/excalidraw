@@ -114,7 +114,7 @@ export type Arrowhead = "arrow" | "bar" | "dot";
 
 export type ExcalidrawLinearElement = _ExcalidrawElementBase &
   Readonly<{
-    type: "line" | "arrow";
+    type: "line" | "draw" | "arrow";
     points: readonly Point[];
     lastCommittedPoint: Point | null;
     startBinding: PointBinding | null;
