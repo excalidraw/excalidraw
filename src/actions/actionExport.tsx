@@ -100,19 +100,21 @@ export const actionSaveScene = register({
     const fileHandleExists = !!appState.fileHandle;
     try {
       const { fileHandle } = await saveAsJSON(elements, appState);
+      const toastMessage = fileHandleExists
+        ? fileHandle.name
+          ? t("toast.fileSavedToFilename").replace(
+              "{filename}",
+              `"${fileHandle.name}"`,
+            )
+          : t("toast.fileSaved")
+        : null;
+
       return {
         commitToHistory: false,
         appState: {
           ...appState,
           fileHandle,
-          toastMessage: fileHandleExists
-            ? fileHandle.name
-              ? t("toast.fileSavedToFilename").replace(
-                  "{filename}",
-                  `"${fileHandle.name}"`,
-                )
-              : t("toast.fileSaved")
-            : null,
+          toastMessage,
         },
       };
     } catch (error) {
