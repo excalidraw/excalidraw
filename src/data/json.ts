@@ -49,7 +49,7 @@ const serializeAsBlob = async (
         elements as NonDeletedExcalidrawElement[],
         appState,
         {
-          // FIXME: I'm not sure if we can expext these pieces of appState
+          // FIXME: I'm not sure if we can expect these pieces of appState
           // to be defined correctly at this time.
           exportBackground: appState.exportBackground,
           viewBackgroundColor: appState.viewBackgroundColor,
@@ -79,7 +79,7 @@ export const saveToFilesystem = async (
 
   // FIXME: it feel really fishy that the user can select a png file
   // at this point, and we will blindly overwrite it with json.
-  // I think it should be possible to recognise that this has happened
+  // I think it should be possible to recognize that this has happened
   // and attempt another save with actually valid png data?
   // Maybe there is another way, where we can read the file and extract
   // metadata out of it before attempting to overwrite it?
