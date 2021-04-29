@@ -56,6 +56,7 @@ export const getDefaultAppState = (): Omit<
     pasteDialog: { shown: false, data: null },
     previousSelectedElementIds: {},
     resizingElement: null,
+    saveType: "excalidraw",
     scrolledOutside: false,
     scrollX: 0,
     scrollY: 0,
