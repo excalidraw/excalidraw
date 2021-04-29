@@ -6,7 +6,7 @@ import {
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 // FIXME: rename these to exportToCanvasElement and exportToSvgElement?
-import { exportToCanvas, exportToSvg } from "../scene/export";
+import { exportToCanvas, serializeToSvg } from "../scene/export";
 import { ExportType } from "../scene/types";
 import { AppState } from "../types";
 import { canvasToBlob } from "./blob";
@@ -57,7 +57,7 @@ const exportToSVGForReal = async (
     exportEmbedScene,
   }: ExportOptions,
 ) => {
-  const tempSvg = exportToSvg(elements, {
+  const svgData = serializeToSvg(elements, {
     exportBackground,
     exportWithDarkMode: appState.exportWithDarkMode,
     viewBackgroundColor,
@@ -76,7 +76,7 @@ const exportToSVGForReal = async (
   if (type === "svg") {
     // FIXME: extract this as a shared helper?
     const fileHandle = await fileSave(
-      new Blob([tempSvg.outerHTML], { type: "image/svg+xml" }),
+      new Blob([svgData], { type: "image/svg+xml" }),
       {
         fileName: `${name}.svg`,
         extensions: [".svg"],
@@ -87,7 +87,7 @@ const exportToSVGForReal = async (
       appState.fileHandle = fileHandle;
     }
   } else if (type === "clipboard-svg") {
-    copyTextToSystemClipboard(tempSvg.outerHTML);
+    copyTextToSystemClipboard(svgData);
   }
 };
 

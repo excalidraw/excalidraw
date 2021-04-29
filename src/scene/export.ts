@@ -228,3 +228,17 @@ export const getExportSize = (
 
   return [width, height];
 };
+
+export const serializeToSvg = (
+  elements: readonly NonDeletedExcalidrawElement[],
+  // FIXME: extract a type for this, or delete exportToSvg and inline?
+  options: {
+    exportBackground: boolean;
+    exportPadding?: number;
+    scale?: number;
+    viewBackgroundColor: string;
+    exportWithDarkMode?: boolean;
+    shouldAddWatermark: boolean;
+    metadata?: string;
+  },
+): string => exportToSvg(elements, options).outerHTML;
