@@ -42,7 +42,7 @@ export const encodePngMetadata = async ({
 }: {
   blob: Blob;
   metadata: string;
-}) => {
+}): Promise<Blob> => {
   const chunks = decodePng(new Uint8Array(await blobToArrayBuffer(blob)));
 
   const metadataChunk = tEXt.encode(

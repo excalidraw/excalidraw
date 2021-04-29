@@ -1,15 +1,14 @@
 import { fileSave } from "browser-fs-access";
 import {
-  copyCanvasToClipboardAsPng,
+  copyBlobToClipboardAsPng,
   copyTextToSystemClipboard,
 } from "../clipboard";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 // FIXME: rename these to exportToCanvasElement and exportToSvgElement?
-import { exportToCanvas, serializeToSvg } from "../scene/export";
+import { serializeAsPngBlob, serializeToSvg } from "../scene/export";
 import { ExportType } from "../scene/types";
 import { AppState } from "../types";
-import { canvasToBlob } from "./blob";
 import { serializeAsJSON } from "./json";
 
 export { loadFromBlob } from "./blob";
@@ -106,19 +105,16 @@ const exportToPNGForReal = async (
     exportEmbedScene,
   }: ExportOptions,
 ) => {
-  const tempCanvas = exportToCanvas(elements, appState, {
+  let blob = await serializeAsPngBlob(elements, appState, {
     exportBackground,
     viewBackgroundColor,
     exportPadding,
     scale,
     shouldAddWatermark,
   });
-  tempCanvas.style.display = "none";
-  document.body.appendChild(tempCanvas);
 
   if (type === "png") {
     const fileName = `${name}.png`;
-    let blob = await canvasToBlob(tempCanvas);
     if (exportEmbedScene) {
       blob = await (
         await import(/* webpackChunkName: "image" */ "./image")
@@ -142,7 +138,7 @@ const exportToPNGForReal = async (
     }
   } else if (type === "clipboard") {
     try {
-      await copyCanvasToClipboardAsPng(tempCanvas);
+      await copyBlobToClipboardAsPng(blob);
     } catch (error) {
       if (error.name === "CANVAS_POSSIBLY_TOO_BIG") {
         throw error;
@@ -150,9 +146,11 @@ const exportToPNGForReal = async (
       throw new Error(t("alerts.couldNotCopyToClipboard"));
     }
   }
-
-  // clean up the DOM
-  if (tempCanvas !== canvas) {
-    tempCanvas.remove();
-  }
+  // !!! FIXME: I have no idea what this if statement was here for.
+  // !!! How could canvas === tempCanvas if we've only just created tempCanvas?
+  // !!! Can we just delete the canvas argument entirely?
+  // // clean up the DOM
+  // if (tempCanvas !== canvas) {
+  //   tempCanvas.remove();
+  // }
 };

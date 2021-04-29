@@ -13,6 +13,7 @@ import {
   THEME_FILTER,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
+import { canvasToBlob } from "../data/blob";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 const WATERMARK_HEIGHT = 16;
@@ -84,6 +85,29 @@ export const exportToCanvas = (
   );
 
   return tempCanvas;
+};
+
+export const serializeAsPngBlob = async (
+  elements: readonly NonDeletedExcalidrawElement[],
+  appState: AppState,
+  // FIXME: remove options?
+  options: {
+    exportBackground: boolean;
+    exportPadding?: number;
+    scale?: number;
+    viewBackgroundColor: string;
+    shouldAddWatermark: boolean;
+  },
+  // ??? do we need to be able to provide createCanvas for tests?
+): Promise<Blob> => {
+  const tempCanvas = exportToCanvas(elements, appState, options);
+
+  tempCanvas.style.display = "none";
+  document.body.appendChild(tempCanvas);
+  const blob = await canvasToBlob(tempCanvas);
+  tempCanvas.remove();
+
+  return blob;
 };
 
 export const exportToSvg = (

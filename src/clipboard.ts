@@ -6,7 +6,6 @@ import { getSelectedElements } from "./scene";
 import { AppState } from "./types";
 import { SVG_EXPORT_TAG } from "./scene/export";
 import { tryParseSpreadsheet, Spreadsheet, VALID_SPREADSHEET } from "./charts";
-import { canvasToBlob } from "./data/blob";
 
 const TYPE_ELEMENTS = "excalidraw/elements";
 
@@ -151,8 +150,7 @@ export const parseClipboard = async (
   }
 };
 
-export const copyCanvasToClipboardAsPng = async (canvas: HTMLCanvasElement) => {
-  const blob = await canvasToBlob(canvas);
+export const copyBlobToClipboardAsPng = async (blob: Blob) => {
   await navigator.clipboard.write([
     new window.ClipboardItem({ "image/png": blob }),
   ]);
