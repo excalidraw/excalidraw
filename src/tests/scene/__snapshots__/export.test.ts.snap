@@ -35,6 +35,7 @@ exports[`exportToSvg with default arguments 1`] = `
   
   
   <g
+    stroke-linecap="round"
     transform="translate(10 10) rotate(0 50 50)"
   >
     <path
@@ -51,6 +52,7 @@ exports[`exportToSvg with default arguments 1`] = `
     />
   </g>
   <g
+    stroke-linecap="round"
     transform="translate(10 10) rotate(0 50 50)"
   >
     <path
