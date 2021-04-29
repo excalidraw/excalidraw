@@ -420,9 +420,11 @@ const generateElementShape = (
 
             // Arrow arrowheads
             const [x2, y2, x3, y3, x4, y4] = arrowheadPoints;
+
             if (element.strokeStyle === "dotted") {
               // for dotted arrows caps, reduce gap to make it more legible
-              options.strokeLineDash = [3, 4];
+              const dash = getDashArrayDotted(element.strokeWidth - 1);
+              options.strokeLineDash = [dash[0], dash[1] - 1];
             } else {
               // for solid/dashed, keep solid arrow cap
               delete options.strokeLineDash;
