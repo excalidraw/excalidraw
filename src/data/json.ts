@@ -11,7 +11,7 @@ import { serializeAsPngBlob, serializeToSvg } from "../scene/export";
 import { AppState } from "../types";
 import { loadFromBlob } from "./blob";
 import { Library } from "./library";
-import { ImportedDataState } from "./types";
+import { DataState, ImportedDataState } from "./types";
 
 export const serializeAsJSON = (
   elements: readonly ExcalidrawElement[],
@@ -113,7 +113,9 @@ export const saveToFilesystem = async (
   return { fileHandle };
 };
 
-export const loadFromFilesystem = async (localAppState: AppState) => {
+export const loadFromFilesystem = async (
+  localAppState: AppState,
+): Promise<DataState> => {
   const blob = await fileOpen({
     description: "Excalidraw files",
     // ToDo: Be over-permissive until https://bugs.webkit.org/show_bug.cgi?id=34442
