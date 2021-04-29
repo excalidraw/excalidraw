@@ -1263,7 +1263,6 @@ class App extends React.Component<AppProps, AppState> {
           },
         });
       } else if (data.elements) {
-        // TODO: Migrate elements!
         this.addElementsFromPasteOrLibrary({
           elements: restoreElements(data.elements),
           position: "cursor",
