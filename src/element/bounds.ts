@@ -127,20 +127,15 @@ const getMinMaxXYFromCurvePathOps = (
   return [minX, minY, maxX, maxY];
 };
 
-// const coordsCache = new Map<
-//   ExcalidrawElement,
-//   [number, number, number, number]
-// >([]);
-
-const getFreeDrawElementBounds = (
-  element: ExcalidrawFreeDrawElement,
+const getBoundsFromPoints = (
+  points: ExcalidrawFreeDrawElement["points"],
 ): [number, number, number, number] => {
   let minX = Infinity;
   let minY = Infinity;
   let maxX = -Infinity;
   let maxY = -Infinity;
 
-  for (const [x, y] of element.points) {
+  for (const [x, y] of points) {
     minX = Math.min(minX, x);
     minY = Math.min(minY, y);
     maxX = Math.max(maxX, x);
@@ -149,6 +144,11 @@ const getFreeDrawElementBounds = (
 
   return [minX, minY, maxX, maxY];
 };
+const getFreeDrawElementBounds = (
+  element: ExcalidrawFreeDrawElement,
+): [number, number, number, number] => {
+  return getBoundsFromPoints(element.points);
+};
 
 const getFreeDrawElementAbsoluteCoords = (
   element: ExcalidrawFreeDrawElement,
@@ -156,8 +156,8 @@ const getFreeDrawElementAbsoluteCoords = (
   const [minX, minY, maxX, maxY] = getFreeDrawElementBounds(element);
 
   return [
-    Math.floor(minX + element.x),
-    Math.floor(minY + element.y),
+    minX + element.x,
+    minY + element.y,
     maxX + element.x,
     maxY + element.y,
   ];
@@ -413,16 +413,29 @@ export const getResizedElementAbsoluteCoords = (
     rescalePoints(1, nextHeight, element.points),
   );
 
-  const gen = rough.generator();
-  const curve =
-    element.strokeSharpness === "sharp"
-      ? gen.linearPath(
-          points as [number, number][],
-          generateRoughOptions(element),
-        )
-      : gen.curve(points as [number, number][], generateRoughOptions(element));
-  const ops = getCurvePathOps(curve);
-  const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
+  let bounds: [number, number, number, number];
+
+  if (isFreeDrawElement(element)) {
+    // Free Draw
+    bounds = getBoundsFromPoints(points);
+  } else {
+    // Line
+    const gen = rough.generator();
+    const curve =
+      element.strokeSharpness === "sharp"
+        ? gen.linearPath(
+            points as [number, number][],
+            generateRoughOptions(element),
+          )
+        : gen.curve(
+            points as [number, number][],
+            generateRoughOptions(element),
+          );
+    const ops = getCurvePathOps(curve);
+    bounds = getMinMaxXYFromCurvePathOps(ops);
+  }
+
+  const [minX, minY, maxX, maxY] = bounds;
   return [
     minX + element.x,
     minY + element.y,
