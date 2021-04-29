@@ -43,7 +43,7 @@ const getDashArrayDotted = (strokeWidth: number) => [1.5, 6 + strokeWidth];
 const getCanvasPadding = (element: ExcalidrawElement) =>
   element.type === "freedraw"
     ? (element.strokeWidth * 12) / element.strokeScale
-    : 20;
+    : 40;
 
 export interface ExcalidrawElementWithCanvas {
   element: ExcalidrawElement | ExcalidrawTextElement;
@@ -414,6 +414,7 @@ const generateElementShape = (
                   ...options,
                   fill: element.strokeColor,
                   fillStyle: "solid",
+                  stroke: "none",
                 }),
               ];
             }

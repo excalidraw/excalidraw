@@ -278,7 +278,7 @@ export const getArrowheadPoints = (
   const ys = y2 - ny * minSize;
 
   if (arrowhead === "dot") {
-    const r = Math.hypot(ys - y2, xs - x2);
+    const r = Math.hypot(ys - y2, xs - x2) + element.strokeWidth;
     return [x2, y2, r];
   }
 
