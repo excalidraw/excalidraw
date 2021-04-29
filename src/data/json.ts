@@ -7,7 +7,7 @@ import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
 } from "../element/types";
-import { serializeAsPngBlob } from "../scene/export";
+import { serializeAsPngBlob, serializeToSvg } from "../scene/export";
 import { AppState } from "../types";
 import { loadFromBlob } from "./blob";
 import { Library } from "./library";
@@ -35,8 +35,26 @@ const serializeAsBlob = async (
 ): Promise<Blob> => {
   switch (appState.saveType) {
     case "svg": {
-      // FIXME: serializeAsSvg()?
-      const serialized = serializeAsJSON(elements, appState);
+      // FIXME: rename to serializeAsSvgString()?
+      // FIXME: see notes about parameters from serializeAsPngBlob, below.
+      const serialized = serializeToSvg(
+        elements as NonDeletedExcalidrawElement[],
+        {
+          exportBackground: appState.exportBackground,
+          exportWithDarkMode: appState.exportWithDarkMode,
+          viewBackgroundColor: appState.viewBackgroundColor,
+          exportPadding: 10,
+          scale: defaultScale,
+          shouldAddWatermark: appState.shouldAddWatermark,
+          // FIXME: push this down, and pass in exportEmbedScene: bool
+          // instead, like how serializeAsPngBlob() does it.
+          metadata: await (
+            await import(/* webpackChunkName: "image" */ "./image")
+          ).encodeSvgMetadata({
+            text: serializeAsJSON(elements, appState),
+          }),
+        },
+      );
       return new Blob([serialized], {
         type: "image/svg+xml",
       });
