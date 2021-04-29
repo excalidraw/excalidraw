@@ -24,14 +24,41 @@ export const serializeAsJSON = (
     2,
   );
 
+const serializeAsBlob = (
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+): Blob => {
+  switch (appState.saveType) {
+    case "svg": {
+      // FIXME: serializeAsSvg()?
+      const serialized = serializeAsJSON(elements, appState);
+      return new Blob([serialized], {
+        type: "image/svg+xml",
+      });
+    }
+    case "png": {
+      // FIXME: serializeAsPng()?
+      const serialized = serializeAsJSON(elements, appState);
+      return new Blob([serialized], {
+        type: "image/png",
+      });
+    }
+    case "excalidraw":
+    case null:
+    case undefined: {
+      const serialized = serializeAsJSON(elements, appState);
+      return new Blob([serialized], {
+        type: MIME_TYPES.excalidraw,
+      });
+    }
+  }
+};
+
 export const saveToFilesystem = async (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ) => {
-  const serialized = serializeAsJSON(elements, appState);
-  const blob = new Blob([serialized], {
-    type: MIME_TYPES.excalidraw,
-  });
+  const blob = serializeAsBlob(elements, appState);
 
   const fileHandle = await fileSave(
     blob,
