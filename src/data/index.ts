@@ -13,7 +13,7 @@ import { canvasToBlob } from "./blob";
 import { serializeAsJSON } from "./json";
 
 export { loadFromBlob } from "./blob";
-export { loadFromJSON, saveAsJSON } from "./json";
+export { saveToFilesystem, loadFromFilesystem } from "./json";
 
 type ExportOptions = {
   exportBackground: boolean;

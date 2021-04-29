@@ -24,7 +24,7 @@ export const serializeAsJSON = (
     2,
   );
 
-export const saveAsJSON = async (
+export const saveToFilesystem = async (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ) => {
@@ -45,7 +45,7 @@ export const saveAsJSON = async (
   return { fileHandle };
 };
 
-export const loadFromJSON = async (localAppState: AppState) => {
+export const loadFromFilesystem = async (localAppState: AppState) => {
   const blob = await fileOpen({
     description: "Excalidraw files",
     // ToDo: Be over-permissive until https://bugs.webkit.org/show_bug.cgi?id=34442

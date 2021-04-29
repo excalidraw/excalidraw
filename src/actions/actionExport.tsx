@@ -6,7 +6,7 @@ import { ToolButton } from "../components/ToolButton";
 import "../components/ToolIcon.scss";
 import { Tooltip } from "../components/Tooltip";
 import { DarkModeToggle, Appearence } from "../components/DarkModeToggle";
-import { loadFromJSON, saveAsJSON } from "../data";
+import { loadFromFilesystem, saveToFilesystem } from "../data";
 import { t } from "../i18n";
 import useIsMobile from "../is-mobile";
 import { KEYS } from "../keys";
@@ -99,7 +99,7 @@ export const actionSaveScene = register({
   perform: async (elements, appState, value) => {
     const fileHandleExists = !!appState.fileHandle;
     try {
-      const { fileHandle } = await saveAsJSON(elements, appState);
+      const { fileHandle } = await saveToFilesystem(elements, appState);
       const toastMessage = fileHandleExists
         ? fileHandle.name
           ? t("toast.fileSavedToFilename").replace(
@@ -142,7 +142,7 @@ export const actionSaveAsScene = register({
   name: "saveAsScene",
   perform: async (elements, appState, value) => {
     try {
-      const { fileHandle } = await saveAsJSON(elements, {
+      const { fileHandle } = await saveToFilesystem(elements, {
         ...appState,
         fileHandle: null,
       });
@@ -178,7 +178,7 @@ export const actionLoadScene = register({
       const {
         elements: loadedElements,
         appState: loadedAppState,
-      } = await loadFromJSON(appState);
+      } = await loadFromFilesystem(appState);
       return {
         elements: loadedElements,
         appState: loadedAppState,
