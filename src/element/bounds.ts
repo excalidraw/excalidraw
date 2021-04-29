@@ -168,10 +168,6 @@ const getLinearElementAbsoluteCoords = (
 ): [number, number, number, number] => {
   let coords: [number, number, number, number];
 
-  // if (coordsCache.has(element)) {
-  //   return coordsCache.get(element)!;
-  // }
-
   if (element.points.length < 2 || !getShapeForElement(element)) {
     // XXX this is just a poor estimate and not very useful
     const { minX, minY, maxX, maxY } = element.points.reduce(
@@ -207,8 +203,6 @@ const getLinearElementAbsoluteCoords = (
       maxY + element.y,
     ];
   }
-
-  // coordsCache.set(element, coords);
 
   return coords;
 };

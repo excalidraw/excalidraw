@@ -36,8 +36,9 @@ import getFreeDrawShape from "perfect-freehand";
 
 const defaultAppState = getDefaultAppState();
 
-const DASHARRAY_DASHED = [12, 8];
-const DASHARRAY_DOTTED = [3, 6];
+const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
+
+const getDashArrayDotted = (strokeWidth: number) => [1.5, 6 + strokeWidth];
 
 const getCanvasPadding = (element: ExcalidrawElement) =>
   element.type === "freedraw" ? element.strokeWidth * 12 : 20;
@@ -130,12 +131,17 @@ const drawElementOnCanvas = (
     case "rectangle":
     case "diamond":
     case "ellipse": {
+      context.lineJoin = "round";
+      context.lineCap = "round";
       rc.draw(getShapeForElement(element) as Drawable);
       break;
     }
     case "arrow":
     case "draw":
     case "line": {
+      context.lineJoin = "round";
+      context.lineCap = "round";
+
       (getShapeForElement(element) as Drawable[]).forEach((shape) => {
         rc.draw(shape);
       });
@@ -223,9 +229,9 @@ export const generateRoughOptions = (element: ExcalidrawElement): Options => {
     seed: element.seed,
     strokeLineDash:
       element.strokeStyle === "dashed"
-        ? DASHARRAY_DASHED
+        ? getDashArrayDashed(element.strokeWidth)
         : element.strokeStyle === "dotted"
-        ? DASHARRAY_DOTTED
+        ? getDashArrayDotted(element.strokeWidth)
         : undefined,
     // for non-solid strokes, disable multiStroke because it tends to make
     // dashes/dots overlay each other
@@ -628,6 +634,7 @@ export const renderElementToSvg = (
         node.setAttribute("stroke-opacity", `${opacity}`);
         node.setAttribute("fill-opacity", `${opacity}`);
       }
+      node.setAttribute("stroke-linecap", "round");
       node.setAttribute(
         "transform",
         `translate(${offsetX || 0} ${
@@ -643,6 +650,8 @@ export const renderElementToSvg = (
       generateElementShape(element, generator);
       const group = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
       const opacity = element.opacity / 100;
+      group.setAttribute("stroke-linecap", "round");
+
       (getShapeForElement(element) as Drawable[]).forEach((shape) => {
         const node = rsvg.draw(shape);
         if (opacity !== 1) {
