@@ -5,7 +5,6 @@ import {
   Arrowhead,
   NonDeletedExcalidrawElement,
   ExcalidrawFreeDrawElement,
-  StrokeShape,
 } from "../element/types";
 import {
   isTextElement,
@@ -33,7 +32,7 @@ import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
 import { Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
-import getFreeDrawShape, { getStrokePoints } from "perfect-freehand";
+import getFreeDrawShape from "perfect-freehand";
 
 const defaultAppState = getDefaultAppState();
 
@@ -148,16 +147,8 @@ const drawElementOnCanvas = (
 
       const path = getFreeDrawPath2D(element) as Path2D;
 
-      if (element.strokeShape === "gel") {
-        context.lineWidth = strokeShapes.gel.size * element.strokeWidth;
-        context.lineCap = "round";
-        context.lineJoin = "round";
-        context.strokeStyle = element.strokeColor;
-        context.stroke(path);
-      } else {
-        context.fillStyle = element.strokeColor;
-        context.fill(path);
-      }
+      context.fillStyle = element.strokeColor;
+      context.fill(path);
 
       context.restore();
       break;
@@ -686,16 +677,9 @@ export const renderElementToSvg = (
         }) rotate(${degree} ${cx} ${cy})`,
       );
       const path = svgRoot.ownerDocument!.createElementNS(SVG_NS, "path");
-      if (element.strokeShape === "gel") {
-        node.setAttribute("stroke", element.strokeStyle);
-        node.setAttribute("fill", "none");
-        node.setAttribute("stroke-width", `${strokeShapes.gel.size}`);
-        path.setAttribute("d", getFreeDrawSvgPath(element));
-      } else {
-        node.setAttribute("stroke", "none");
-        node.setAttribute("fill", element.strokeStyle);
-        path.setAttribute("d", getFreeDrawSvgPath(element));
-      }
+      node.setAttribute("stroke", "none");
+      node.setAttribute("fill", element.strokeStyle);
+      path.setAttribute("d", getFreeDrawSvgPath(element));
       node.appendChild(path);
       svgRoot.appendChild(node);
       break;
@@ -752,39 +736,6 @@ export const renderElementToSvg = (
   }
 };
 
-const strokeShapes: Record<
-  StrokeShape,
-  {
-    streamline: number;
-    thinning: number;
-    size: number;
-    smoothing: number;
-    easing: (n: number) => number;
-  }
-> = {
-  gel: {
-    thinning: 0.3,
-    size: 3,
-    smoothing: 0.83,
-    streamline: 0.45,
-    easing: (t) => t * (2 - t),
-  },
-  fountain: {
-    thinning: 0.62,
-    size: 6,
-    smoothing: 0.5,
-    streamline: 0.3,
-    easing: (t) => t * (2 - t),
-  },
-  brush: {
-    thinning: -0.5,
-    size: 5,
-    smoothing: 0.75,
-    streamline: 0.4,
-    easing: (t) => t * t,
-  },
-};
-
 export const pathsCache = new WeakMap<ExcalidrawFreeDrawElement, Path2D>([]);
 
 export function generateFreeDrawShape(element: ExcalidrawFreeDrawElement) {
@@ -807,21 +758,15 @@ export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
       : element.points.map(([x, y], i) => [x, y, element.pressures[i]])
     : [[0, 0, 0]];
 
-  const shape = strokeShapes[element.strokeShape];
-
   const options = {
-    size: element.strokeWidth * shape.size,
-    thinning: shape.thinning,
-    streamline: shape.streamline,
-    smoothing: shape.smoothing,
-    simulatePressure: element.simulatePressure,
-    easing: shape.easing,
+    size: element.strokeWidth * 5,
+    thinning: 0.55,
+    smoothing: 0.5,
+    streamline: 0.4,
+    easing: (t: number) => t * (2 - t),
   };
 
-  const points =
-    element.strokeShape === "gel"
-      ? getStrokePoints(inputPoints as number[][], 0.32)
-      : getFreeDrawShape(inputPoints as number[][], options);
+  const points = getFreeDrawShape(inputPoints as number[][], options);
 
   let [p0, p1] = points;
 
@@ -833,7 +778,7 @@ export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
     p1 = points[i];
   }
 
-  element.strokeShape !== "gel" && path.push("Z");
+  path.push("Z");
 
   return path.join(" ");
 }

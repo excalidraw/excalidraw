@@ -30,7 +30,6 @@ import {
   TextAlignLeftIcon,
   TextAlignCenterIcon,
   TextAlignRightIcon,
-  StrokeShapeIcon,
 } from "../components/icons";
 import { DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE } from "../constants";
 import {
@@ -39,19 +38,13 @@ import {
   redrawTextBoundingBox,
 } from "../element";
 import { newElementWith } from "../element/mutateElement";
-import {
-  isFreeDrawElement,
-  isLinearElement,
-  isLinearElementType,
-} from "../element/typeChecks";
+import { isLinearElement, isLinearElementType } from "../element/typeChecks";
 import {
   Arrowhead,
   ExcalidrawElement,
-  ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
   FontFamily,
-  StrokeShape,
   TextAlign,
 } from "../element/types";
 import { getLanguage, t } from "../i18n";
@@ -253,70 +246,6 @@ export const actionChangeStrokeWidth = register({
           appState,
           (element) => element.strokeWidth,
           appState.currentItemStrokeWidth,
-        )}
-        onChange={(value) => updateData(value)}
-      />
-    </fieldset>
-  ),
-});
-
-export const actionChangeStrokeShape = register({
-  name: "changeStrokeShape",
-  perform: (elements, appState, value: StrokeShape) => {
-    return {
-      elements: changeProperty(elements, appState, (el) => {
-        if (isFreeDrawElement(el)) {
-          const element: ExcalidrawFreeDrawElement = newElementWith(el, {
-            strokeShape: value,
-          });
-
-          return element;
-        }
-        return el;
-      }),
-      appState: { ...appState, currentItemStrokeShape: value },
-      commitToHistory: true,
-    };
-  },
-  PanelComponent: ({ elements, appState, updateData }) => (
-    <fieldset>
-      <legend>{t("labels.strokeShape")}</legend>
-      <ButtonIconSelect
-        group="stroke-shape"
-        options={[
-          {
-            value: "gel",
-            text: t("labels.strokeShape_gel"),
-            icon: (
-              <StrokeShapeIcon theme={appState.theme} strokeShape={"gel"} />
-            ),
-          },
-          {
-            value: "fountain",
-            text: t("labels.strokeShape_fountain"),
-            icon: (
-              <StrokeShapeIcon
-                theme={appState.theme}
-                strokeShape={"fountain"}
-              />
-            ),
-          },
-          {
-            value: "brush",
-            text: t("labels.strokeShape_brush"),
-            icon: (
-              <StrokeShapeIcon theme={appState.theme} strokeShape={"brush"} />
-            ),
-          },
-        ]}
-        value={getFormValue(
-          elements,
-          appState,
-          (element) =>
-            isFreeDrawElement(element)
-              ? element.strokeShape
-              : appState.currentItemStrokeShape,
-          appState.currentItemStrokeShape,
         )}
         onChange={(value) => updateData(value)}
       />

@@ -123,14 +123,11 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
     endArrowhead: Arrowhead | null;
   }>;
 
-export type StrokeShape = "gel" | "fountain" | "brush";
-
 export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
   Readonly<{
     type: "freedraw";
     points: readonly Point[];
     pressures: readonly number[];
     simulatePressure: boolean;
-    strokeShape: StrokeShape;
     lastCommittedPoint: Point | null;
   }>;
