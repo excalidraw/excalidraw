@@ -129,5 +129,6 @@ export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
     points: readonly Point[];
     pressures: readonly number[];
     simulatePressure: boolean;
+    strokeScale: number;
     lastCommittedPoint: Point | null;
   }>;
