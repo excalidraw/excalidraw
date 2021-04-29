@@ -156,8 +156,8 @@ const getFreeDrawElementAbsoluteCoords = (
   const [minX, minY, maxX, maxY] = getFreeDrawElementBounds(element);
 
   return [
-    minX + element.x,
-    minY + element.y,
+    Math.floor(minX + element.x),
+    Math.floor(minY + element.y),
     maxX + element.x,
     maxY + element.y,
   ];
