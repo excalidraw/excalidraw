@@ -3275,8 +3275,8 @@ class App extends React.Component<AppProps, AppState> {
 
       if (draggingElement.type === "freedraw") {
         const points = draggingElement.points;
-        const dx = Math.round(pointerCoords.x - draggingElement.x);
-        const dy = Math.round(pointerCoords.y - draggingElement.y);
+        const dx = pointerCoords.x - draggingElement.x;
+        const dy = pointerCoords.y - draggingElement.y;
 
         const pressures = draggingElement.simulatePressure
           ? draggingElement.pressures
@@ -3453,8 +3453,8 @@ class App extends React.Component<AppProps, AppState> {
           this.state,
         );
         const points = draggingElement.points;
-        const dx = Math.round(pointerCoords.x - draggingElement.x);
-        const dy = Math.round(pointerCoords.y - draggingElement.y);
+        const dx = pointerCoords.x - draggingElement.x;
+        const dy = pointerCoords.y - draggingElement.y;
 
         const pressures = draggingElement.simulatePressure
           ? []
