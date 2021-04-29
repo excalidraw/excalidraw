@@ -63,7 +63,12 @@ const generateElementCanvas = (
   let canvasOffsetY = 0;
 
   if (isLinearElement(element) || isFreeDrawElement(element)) {
-    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+    let [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+
+    x1 = Math.floor(x1);
+    x2 = Math.ceil(x2);
+    y1 = Math.floor(y1);
+    y2 = Math.ceil(y2);
 
     canvas.width =
       distance(x1, x2) * window.devicePixelRatio * zoom.value +
@@ -496,7 +501,16 @@ const drawElementFromCanvas = (
 ) => {
   const element = elementWithCanvas.element;
   const padding = getCanvasPadding(element);
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  let [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+
+  // Free draw elements will otherwise "shuffle" as the min x and y change
+  if (isFreeDrawElement(element)) {
+    x1 = Math.floor(x1);
+    x2 = Math.ceil(x2);
+    y1 = Math.floor(y1);
+    y2 = Math.ceil(y2);
+  }
+
   const cx = ((x1 + x2) / 2 + sceneState.scrollX) * window.devicePixelRatio;
   const cy = ((y1 + y2) / 2 + sceneState.scrollY) * window.devicePixelRatio;
   context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
