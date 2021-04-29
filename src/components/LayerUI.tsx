@@ -363,6 +363,7 @@ const LayerUI = ({
           viewBackgroundColor: appState.viewBackgroundColor,
           scale,
           shouldAddWatermark: appState.shouldAddWatermark,
+          exportEmbedScene: appState.exportEmbedScene,
         })
           .catch(muteFSAbortError)
           .catch((error) => {

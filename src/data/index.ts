@@ -5,6 +5,7 @@ import {
 } from "../clipboard";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
+// FIXME: rename these to exportToCanvasElement and exportToSvgElement?
 import { exportToCanvas, exportToSvg } from "../scene/export";
 import { ExportType } from "../scene/types";
 import { AppState } from "../types";
@@ -21,6 +22,7 @@ type ExportOptions = {
   name: string;
   scale?: number;
   shouldAddWatermark: boolean;
+  exportEmbedScene: boolean;
 };
 
 export const exportCanvas = async (
@@ -52,6 +54,7 @@ const exportToSVGForReal = async (
     name,
     scale = 1,
     shouldAddWatermark,
+    exportEmbedScene,
   }: ExportOptions,
 ) => {
   const tempSvg = exportToSvg(elements, {
@@ -62,7 +65,7 @@ const exportToSVGForReal = async (
     scale,
     shouldAddWatermark,
     metadata:
-      appState.exportEmbedScene && type === "svg"
+      exportEmbedScene && type === "svg"
         ? await (
             await import(/* webpackChunkName: "image" */ "./image")
           ).encodeSvgMetadata({
@@ -71,10 +74,18 @@ const exportToSVGForReal = async (
         : undefined,
   });
   if (type === "svg") {
-    await fileSave(new Blob([tempSvg.outerHTML], { type: "image/svg+xml" }), {
-      fileName: `${name}.svg`,
-      extensions: [".svg"],
-    });
+    // FIXME: extract this as a shared helper?
+    const fileHandle = await fileSave(
+      new Blob([tempSvg.outerHTML], { type: "image/svg+xml" }),
+      {
+        fileName: `${name}.svg`,
+        extensions: [".svg"],
+      },
+      appState.saveType === "svg" ? appState.fileHandle : null,
+    );
+    if (appState.saveType === "svg") {
+      appState.fileHandle = fileHandle;
+    }
   } else if (type === "clipboard-svg") {
     copyTextToSystemClipboard(tempSvg.outerHTML);
   }
@@ -92,6 +103,7 @@ const exportToPNGForReal = async (
     name,
     scale = 1,
     shouldAddWatermark,
+    exportEmbedScene,
   }: ExportOptions,
 ) => {
   const tempCanvas = exportToCanvas(elements, appState, {
@@ -107,7 +119,7 @@ const exportToPNGForReal = async (
   if (type === "png") {
     const fileName = `${name}.png`;
     let blob = await canvasToBlob(tempCanvas);
-    if (appState.exportEmbedScene) {
+    if (exportEmbedScene) {
       blob = await (
         await import(/* webpackChunkName: "image" */ "./image")
       ).encodePngMetadata({
@@ -116,10 +128,18 @@ const exportToPNGForReal = async (
       });
     }
 
-    await fileSave(blob, {
-      fileName,
-      extensions: [".png"],
-    });
+    // FIXME: extract this as a shared helper?
+    const fileHandle = await fileSave(
+      blob,
+      {
+        fileName,
+        extensions: [".png"],
+      },
+      appState.saveType === "png" ? appState.fileHandle : null,
+    );
+    if (appState.saveType === "png") {
+      appState.fileHandle = fileHandle;
+    }
   } else if (type === "clipboard") {
     try {
       await copyCanvasToClipboardAsPng(tempCanvas);
