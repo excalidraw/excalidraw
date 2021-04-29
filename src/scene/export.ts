@@ -14,6 +14,7 @@ import {
 } from "../constants";
 import { getDefaultAppState } from "../appState";
 import { canvasToBlob } from "../data/blob";
+import { serializeAsJSON } from "../data/json";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 const WATERMARK_HEIGHT = 16;
@@ -90,13 +91,14 @@ export const exportToCanvas = (
 export const serializeAsPngBlob = async (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
-  // FIXME: remove options?
+  // FIXME: extract options type definition or inline exportToCanvas()?
   options: {
     exportBackground: boolean;
     exportPadding?: number;
     scale?: number;
     viewBackgroundColor: string;
     shouldAddWatermark: boolean;
+    exportEmbedScene: boolean;
   },
   // ??? do we need to be able to provide createCanvas for tests?
 ): Promise<Blob> => {
@@ -104,8 +106,17 @@ export const serializeAsPngBlob = async (
 
   tempCanvas.style.display = "none";
   document.body.appendChild(tempCanvas);
-  const blob = await canvasToBlob(tempCanvas);
+  let blob = await canvasToBlob(tempCanvas);
   tempCanvas.remove();
+
+  if (options.exportEmbedScene) {
+    blob = await (
+      await import(/* webpackChunkName: "image" */ "../data/image")
+    ).encodePngMetadata({
+      blob,
+      metadata: serializeAsJSON(elements, appState),
+    });
+  }
 
   return blob;
 };

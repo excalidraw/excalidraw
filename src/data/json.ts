@@ -1,8 +1,13 @@
 import { fileOpen, fileSave } from "browser-fs-access";
 import { cleanAppStateForExport } from "../appState";
+import { defaultScale } from "../components/ExportDialog";
 import { MIME_TYPES } from "../constants";
 import { clearElementsForExport } from "../element";
-import { ExcalidrawElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "../element/types";
+import { serializeAsPngBlob } from "../scene/export";
 import { AppState } from "../types";
 import { loadFromBlob } from "./blob";
 import { Library } from "./library";
@@ -24,10 +29,10 @@ export const serializeAsJSON = (
     2,
   );
 
-const serializeAsBlob = (
+const serializeAsBlob = async (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
-): Blob => {
+): Promise<Blob> => {
   switch (appState.saveType) {
     case "svg": {
       // FIXME: serializeAsSvg()?
@@ -37,11 +42,23 @@ const serializeAsBlob = (
       });
     }
     case "png": {
-      // FIXME: serializeAsPng()?
-      const serialized = serializeAsJSON(elements, appState);
-      return new Blob([serialized], {
-        type: "image/png",
-      });
+      // FIXME: I guess we should do a garbage collect in the layer above,
+      // and pass NonDeletedExcalidrawElement[] into this function?
+      // For now, I'm just going to hack it.
+      return await serializeAsPngBlob(
+        elements as NonDeletedExcalidrawElement[],
+        appState,
+        {
+          // FIXME: I'm not sure if we can expext these pieces of appState
+          // to be defined correctly at this time.
+          exportBackground: appState.exportBackground,
+          viewBackgroundColor: appState.viewBackgroundColor,
+          // FIXME: does this want to be configurable too, or loaded from disk?
+          scale: defaultScale,
+          shouldAddWatermark: appState.shouldAddWatermark,
+          exportEmbedScene: true,
+        },
+      );
     }
     case "excalidraw":
     case null:
@@ -58,8 +75,14 @@ export const saveToFilesystem = async (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ) => {
-  const blob = serializeAsBlob(elements, appState);
+  const blob = await serializeAsBlob(elements, appState);
 
+  // FIXME: it feel really fishy that the user can select a png file
+  // at this point, and we will blindly overwrite it with json.
+  // I think it should be possible to recognise that this has happened
+  // and attempt another save with actually valid png data?
+  // Maybe there is another way, where we can read the file and extract
+  // metadata out of it before attempting to overwrite it?
   const fileHandle = await fileSave(
     blob,
     {

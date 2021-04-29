@@ -105,24 +105,17 @@ const exportToPNGForReal = async (
     exportEmbedScene,
   }: ExportOptions,
 ) => {
-  let blob = await serializeAsPngBlob(elements, appState, {
+  const blob = await serializeAsPngBlob(elements, appState, {
     exportBackground,
     viewBackgroundColor,
     exportPadding,
     scale,
     shouldAddWatermark,
+    exportEmbedScene,
   });
 
   if (type === "png") {
     const fileName = `${name}.png`;
-    if (exportEmbedScene) {
-      blob = await (
-        await import(/* webpackChunkName: "image" */ "./image")
-      ).encodePngMetadata({
-        blob,
-        metadata: serializeAsJSON(elements, appState),
-      });
-    }
 
     // FIXME: extract this as a shared helper?
     const fileHandle = await fileSave(

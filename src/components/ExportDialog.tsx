@@ -17,7 +17,9 @@ import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 
 const scales = [1, 2, 3];
-const defaultScale = scales.includes(devicePixelRatio) ? devicePixelRatio : 1;
+export const defaultScale = scales.includes(devicePixelRatio)
+  ? devicePixelRatio
+  : 1;
 
 const supportsContextFilters =
   "filter" in document.createElement("canvas").getContext("2d")!;
