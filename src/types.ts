@@ -107,7 +107,7 @@ export type AppState = {
 
   isLibraryOpen: boolean;
   fileHandle: import("browser-fs-access").FileSystemHandle | null;
-  saveType?: SaveType;
+  saveType?: SaveType | null;
   collaborators: Map<string, Collaborator>;
   showStats: boolean;
   currentChartType: ChartType;

@@ -1,9 +1,9 @@
 import { cleanAppStateForExport } from "../appState";
-import { MIME_TYPES } from "../constants";
 import { clearElementsForExport } from "../element";
 import { CanvasError } from "../errors";
 import { t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
+import { SaveType } from "../scene/types";
 import { AppState } from "../types";
 import { isValidExcalidrawData } from "./json";
 import { restore } from "./restore";
@@ -79,6 +79,18 @@ export const getMimeType = (blob: Blob | string): string => {
   return "";
 };
 
+export const getSaveType = (blob: Blob | string): SaveType | null => {
+  const mime = getMimeType(blob);
+  if (mime === "application/json") {
+    return "excalidraw";
+  } else if (mime === "image/png") {
+    return "png";
+  } else if (mime === "image/svg+xml") {
+    return "svg";
+  }
+  return null;
+};
+
 export const loadFromBlob = async (
   blob: Blob,
   /** @see restore.localAppState */
@@ -96,15 +108,8 @@ export const loadFromBlob = async (
         appState: {
           theme: localAppState?.theme,
           fileHandle:
-            blob.handle &&
-            [
-              "application/json",
-              MIME_TYPES.excalidraw,
-              "image/png",
-              "image/svg+xml",
-            ].includes(getMimeType(blob))
-              ? blob.handle
-              : null,
+            blob.handle && getSaveType(blob) != null ? blob.handle : null,
+          saveType: getSaveType(blob),
           ...cleanAppStateForExport(data.appState || {}),
           ...(localAppState
             ? calculateScrollCenter(data.elements || [], localAppState, null)
