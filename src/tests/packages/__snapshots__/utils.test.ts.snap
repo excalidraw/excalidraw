@@ -33,7 +33,6 @@ Object {
   "fileHandle": null,
   "gridSize": null,
   "isBindingEnabled": true,
-  "isFreeDrawing": false,
   "isLibraryOpen": false,
   "isLoading": false,
   "isResizing": false,

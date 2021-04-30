@@ -81,7 +81,6 @@ export type AppState = {
   name: string;
   isResizing: boolean;
   isRotating: boolean;
-  isFreeDrawing: boolean;
   zoom: Zoom;
   openMenu: "canvas" | "shape" | null;
   lastPointerDownWith: PointerType;
