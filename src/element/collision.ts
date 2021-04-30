@@ -4,7 +4,7 @@ import * as GADirection from "../gadirections";
 import * as GALine from "../galines";
 import * as GATransform from "../gatransforms";
 
-import { isPathALoop, isPointInPolygon, rotate } from "../math";
+import { isPathALoop, isPointInPolygon, rotate, rotatePoint } from "../math";
 import { pointsOnBezierCurves } from "points-on-curve";
 
 import {
@@ -301,8 +301,23 @@ const hitTestFreeDrawElement = (
   // This is... okay? It's plenty fast, but the GA library may
   // have a faster option.
 
-  const x = point[0] - element.x;
-  const y = point[1] - element.y;
+  let x: number;
+  let y: number;
+
+  if (element.angle === 0) {
+    x = point[0] - element.x;
+    y = point[1] - element.y;
+  } else {
+    // Counter-rotate the point around center before testing
+    const [minX, minY, maxX, maxY] = getElementAbsoluteCoords(element);
+    const rotatedPoint = rotatePoint(
+      point,
+      [minX + (maxX - minX) / 2, minY + (maxY - minY) / 2],
+      -element.angle,
+    );
+    x = rotatedPoint[0] - element.x;
+    y = rotatedPoint[1] - element.y;
+  }
 
   let [A, B] = element.points;
   let P: readonly [number, number];
