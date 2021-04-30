@@ -41,9 +41,7 @@ const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 const getDashArrayDotted = (strokeWidth: number) => [1.5, 6 + strokeWidth];
 
 const getCanvasPadding = (element: ExcalidrawElement) =>
-  element.type === "freedraw"
-    ? (element.strokeWidth * 12) / element.strokeScale
-    : 40;
+  element.type === "freedraw" ? element.strokeWidth * 12 : 20;
 
 export interface ExcalidrawElementWithCanvas {
   element: ExcalidrawElement | ExcalidrawTextElement;
@@ -793,7 +791,7 @@ export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
 
   // Consider changing the options for simulated pressure vs real pressure
   const options = {
-    size: (element.strokeWidth * 5) / element.strokeScale,
+    size: element.strokeWidth * 5,
     thinning: 0.55,
     smoothing: 0.5,
     streamline: 0.4,

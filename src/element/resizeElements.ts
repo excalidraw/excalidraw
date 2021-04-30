@@ -12,7 +12,6 @@ import {
   ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
   NonDeleted,
-  ExcalidrawFreeDrawElement,
 } from "./types";
 import {
   getElementAbsoluteCoords,
@@ -569,20 +568,7 @@ export const resizeSingleElement = (
     updateBoundElements(element, {
       newSize: { width: resizedElement.width, height: resizedElement.height },
     });
-
-    if (isFreeDrawElement(element)) {
-      // Adjust the stroke scale, too
-      let { strokeScale } = element;
-      strokeScale =
-        (stateAtResizeStart as ExcalidrawFreeDrawElement).strokeScale /
-        Math.max(
-          resizedElement.width / stateAtResizeStart.width,
-          resizedElement.height / stateAtResizeStart.height,
-        );
-      mutateElement(element, { ...resizedElement, strokeScale });
-    } else {
-      mutateElement(element, resizedElement);
-    }
+    mutateElement(element, resizedElement);
   }
 };
 
@@ -694,18 +680,9 @@ const resizeMultipleElements = (
           }[]
         | null,
     );
-
     if (updates) {
       elements.forEach((element, index) => {
-        if (isFreeDrawElement(element)) {
-          // Scale stroke
-          mutateElement(element, {
-            ...updates[index],
-            strokeScale: element.strokeScale / scale,
-          });
-        } else {
-          mutateElement(element, updates[index]);
-        }
+        mutateElement(element, updates[index]);
       });
     }
   }

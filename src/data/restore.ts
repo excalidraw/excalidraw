@@ -105,7 +105,6 @@ const restoreElement = (
         lastCommittedPoint: null,
         simulatePressure: element.simulatePressure,
         pressures: element.pressures,
-        strokeScale: element.strokeScale || 1,
       });
     }
     case "draw":

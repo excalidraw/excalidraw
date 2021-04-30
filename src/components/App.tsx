@@ -2873,7 +2873,6 @@ class App extends React.Component<AppProps, AppState> {
       opacity: this.state.currentItemOpacity,
       strokeSharpness: this.state.currentItemLinearStrokeSharpness,
       simulatePressure: event.type !== "pen" || event.pressure === 0.5,
-      strokeScale: this.state.zoom.value,
     });
 
     this.setState((prevState) => ({
