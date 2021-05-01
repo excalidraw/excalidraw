@@ -328,8 +328,8 @@ const hitTestFreeDrawElement = (
   let [A, B] = element.points;
   let P: readonly [number, number];
 
-  // For freedraw dots dots
-  if (element.points.length === 2) {
+  // For very very short lines or dots
+  if (distance2d(A[0], A[1], B[0], B[1]) < threshold) {
     return (
       distance2d(A[0], A[1], x, y) < threshold ||
       distance2d(B[0], B[1], x, y) < threshold
