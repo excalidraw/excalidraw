@@ -136,17 +136,12 @@ const drawElementOnCanvas = (
     case "rectangle":
     case "diamond":
     case "ellipse": {
-      context.lineJoin = "round";
-      context.lineCap = "round";
       rc.draw(getShapeForElement(element) as Drawable);
       break;
     }
     case "arrow":
     case "draw":
     case "line": {
-      context.lineJoin = "round";
-      context.lineCap = "round";
-
       (getShapeForElement(element) as Drawable[]).forEach((shape) => {
         rc.draw(shape);
       });

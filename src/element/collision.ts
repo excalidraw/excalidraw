@@ -328,7 +328,7 @@ const hitTestFreeDrawElement = (
   let [A, B] = element.points;
   let P: readonly [number, number];
 
-  // For freedraw dots dots
+  // For freedraw dots
   if (element.points.length === 2) {
     return (
       distance2d(A[0], A[1], x, y) < threshold ||
