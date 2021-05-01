@@ -341,20 +341,18 @@ const hitTestFreeDrawElement = (
     const delta = [B[0] - A[0], B[1] - A[1]];
     const length = Math.hypot(delta[1], delta[0]);
 
-    if (length > threshold / 4) {
-      const U = [delta[0] / length, delta[1] / length];
-      const C = [x - A[0], y - A[1]];
-      const d = (C[0] * U[0] + C[1] * U[1]) / Math.hypot(U[1], U[0]);
-      P = [A[0] + U[0] * d, A[1] + U[1] * d];
+    const U = [delta[0] / length, delta[1] / length];
+    const C = [x - A[0], y - A[1]];
+    const d = (C[0] * U[0] + C[1] * U[1]) / Math.hypot(U[1], U[0]);
+    P = [A[0] + U[0] * d, A[1] + U[1] * d];
 
-      const da = distance2d(P[0], P[1], A[0], A[1]);
-      const db = distance2d(P[0], P[1], B[0], B[1]);
+    const da = distance2d(P[0], P[1], A[0], A[1]);
+    const db = distance2d(P[0], P[1], B[0], B[1]);
 
-      P = db < da && da > length ? B : da < db && db > length ? A : P;
+    P = db < da && da > length ? B : da < db && db > length ? A : P;
 
-      if (Math.hypot(y - P[1], x - P[0]) < threshold) {
-        return true;
-      }
+    if (Math.hypot(y - P[1], x - P[0]) < threshold) {
+      return true;
     }
 
     A = B;
