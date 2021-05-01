@@ -529,6 +529,15 @@ const drawElementFromCanvas = (
     elementWithCanvas.canvas!.width / elementWithCanvas.canvasZoom,
     elementWithCanvas.canvas!.height / elementWithCanvas.canvasZoom,
   );
+  // context.fillStyle = "rgba(0,0,0,.2)";
+  // context.fillRect(
+  //   (-(x2 - x1) / 2) * window.devicePixelRatio -
+  //     (padding * elementWithCanvas.canvasZoom) / elementWithCanvas.canvasZoom,
+  //   (-(y2 - y1) / 2) * window.devicePixelRatio -
+  //     (padding * elementWithCanvas.canvasZoom) / elementWithCanvas.canvasZoom,
+  //   elementWithCanvas.canvas!.width / elementWithCanvas.canvasZoom,
+  //   elementWithCanvas.canvas!.height / elementWithCanvas.canvasZoom,
+  // );
   context.rotate(-element.angle);
   context.translate(-cx, -cy);
   context.scale(window.devicePixelRatio, window.devicePixelRatio);

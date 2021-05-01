@@ -144,16 +144,11 @@ const getBoundsFromPoints = (
 
   return [minX, minY, maxX, maxY];
 };
-const getFreeDrawElementBounds = (
-  element: ExcalidrawFreeDrawElement,
-): [number, number, number, number] => {
-  return getBoundsFromPoints(element.points);
-};
 
 const getFreeDrawElementAbsoluteCoords = (
   element: ExcalidrawFreeDrawElement,
 ): [number, number, number, number] => {
-  const [minX, minY, maxX, maxY] = getFreeDrawElementBounds(element);
+  const [minX, minY, maxX, maxY] = getBoundsFromPoints(element.points);
 
   return [
     minX + element.x,
@@ -334,7 +329,18 @@ export const getElementBounds = (
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
   if (isFreeDrawElement(element)) {
-    bounds = getFreeDrawElementAbsoluteCoords(element);
+    const [minX, minY, maxX, maxY] = getBoundsFromPoints(
+      element.points.map(([x, y]) =>
+        rotate(x, y, cx - element.x, cy - element.y, element.angle),
+      ),
+    );
+
+    return [
+      minX + element.x,
+      minY + element.y,
+      maxX + element.x,
+      maxY + element.y,
+    ];
   } else if (isLinearElement(element)) {
     bounds = getLinearElementRotatedBounds(element, cx, cy);
   } else if (element.type === "diamond") {
