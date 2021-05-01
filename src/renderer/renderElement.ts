@@ -784,9 +784,7 @@ export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
   const inputPoints = element.simulatePressure
     ? element.points
     : element.points.length
-    ? element.points.length < 4
-      ? [element.points[0], element.points[0]]
-      : element.points.map(([x, y], i) => [x, y, element.pressures[i]])
+    ? element.points.map(([x, y], i) => [x, y, element.pressures[i]])
     : [[0, 0, 0]];
 
   // Consider changing the options for simulated pressure vs real pressure
@@ -796,21 +794,24 @@ export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
     smoothing: 0.5,
     streamline: 0.4,
     easing: (t: number) => t * (2 - t),
+    last: true,
   };
 
   const points = getFreeDrawShape(inputPoints as number[][], options);
+  const d: (string | number)[] = [];
 
-  let [p0, p1] = points;
+  let p0 = points[points.length - 3];
+  let p1 = points[points.length - 2];
 
-  const path: (string | number)[] = ["M", p0[0], p0[1], "Q"];
+  d.push("M", p0[0], p0[1], "Q");
 
-  for (let i = 1; i < points.length; i++) {
-    path.push(p0[0], p0[1], (p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2);
+  for (let i = 0; i < points.length; i++) {
+    d.push(p0[0], p0[1], (p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2);
     p0 = p1;
     p1 = points[i];
   }
 
-  path.push("Z");
+  d.push("Z");
 
-  return path.join(" ");
+  return d.join(" ");
 }

@@ -2876,7 +2876,6 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     this.setState((prevState) => ({
-      isFreeDrawing: true,
       selectedElementIds: {
         ...prevState.selectedElementIds,
         [element.id]: false,
@@ -3144,10 +3143,6 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
-      // TODO: Handle erasing
-
-      // if (this.state.erasingFreedrawElements) { }
-
       if (this.state.editingLinearElement) {
         const didDrag = LinearElementEditor.handlePointDragging(
           this.state,
@@ -3398,7 +3393,6 @@ class App extends React.Component<AppProps, AppState> {
       } = this.state;
 
       this.setState({
-        isFreeDrawing: false,
         isResizing: false,
         isRotating: false,
         resizingElement: null,
@@ -3456,8 +3450,14 @@ class App extends React.Component<AppProps, AppState> {
         );
 
         const points = draggingElement.points;
-        const dx = pointerCoords.x - draggingElement.x;
-        const dy = pointerCoords.y - draggingElement.y;
+        let dx = pointerCoords.x - draggingElement.x;
+        let dy = pointerCoords.y - draggingElement.y;
+
+        // Allows dots to avoid being flagged as infinitely small
+        if (dx === points[0][0] && dy === points[0][1]) {
+          dy += 0.0001;
+          dx += 0.0001;
+        }
 
         const pressures = draggingElement.simulatePressure
           ? []

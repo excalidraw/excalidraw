@@ -4,7 +4,13 @@ import * as GADirection from "../gadirections";
 import * as GALine from "../galines";
 import * as GATransform from "../gatransforms";
 
-import { isPathALoop, isPointInPolygon, rotate, rotatePoint } from "../math";
+import {
+  distance2d,
+  rotatePoint,
+  isPathALoop,
+  isPointInPolygon,
+  rotate,
+} from "../math";
 import { pointsOnBezierCurves } from "points-on-curve";
 
 import {
@@ -322,6 +328,15 @@ const hitTestFreeDrawElement = (
   let [A, B] = element.points;
   let P: readonly [number, number];
 
+  // For freedraw dots dots
+  if (element.points.length === 2) {
+    return (
+      distance2d(A[0], A[1], x, y) < threshold ||
+      distance2d(B[0], B[1], x, y) < threshold
+    );
+  }
+
+  // For freedraw lines
   for (let i = 1; i < element.points.length - 1; i++) {
     const delta = [B[0] - A[0], B[1] - A[1]];
     const length = Math.hypot(delta[1], delta[0]);
@@ -332,8 +347,8 @@ const hitTestFreeDrawElement = (
       const d = (C[0] * U[0] + C[1] * U[1]) / Math.hypot(U[1], U[0]);
       P = [A[0] + U[0] * d, A[1] + U[1] * d];
 
-      const da = Math.hypot(P[1] - A[1], P[0] - A[0]);
-      const db = Math.hypot(P[1] - B[1], P[0] - B[0]);
+      const da = distance2d(P[0], P[1], A[0], A[1]);
+      const db = distance2d(P[0], P[1], B[0], B[1]);
 
       P = db < da && da > length ? B : da < db && db > length ? A : P;
 
