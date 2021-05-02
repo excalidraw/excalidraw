@@ -147,8 +147,8 @@
     "confirmAddLibrary": "Dette vil legge til {{numShapes}} form(er) i biblioteket ditt. Er du sikker?",
     "imageDoesNotContainScene": "Importering av bilder støttes ikkje for p. t.\n\nVil du importere ein scene? Dette bildet ser ikkje ut til å inneholde noen scene-data. Har du aktivert dette under eksporten?",
     "cannotRestoreFromImage": "Scena kunne ikkje gjenopprettast frå denne biletfila",
-    "invalidSceneUrl": "",
-    "resetLibrary": ""
+    "invalidSceneUrl": "Kunne ikkje hente noko scene frå den URL-en. Ho er anten øydelagd eller inneheld ikkje gyldig Excalidraw JSON-data.",
+    "resetLibrary": "Dette vil fjerne alt innhald frå biblioteket. Er du sikker?"
   },
   "toolBar": {
     "selection": "Vel",
@@ -205,35 +205,35 @@
     "desc_inProgressIntro": "Sanntids-samarbeidsøkt er no i gang.",
     "desc_shareLink": "Del denne lenka med dei du vil samarbeide med:",
     "desc_exitSession": "Dersom du avsluttar økta blir du kopla frå rommet, men du kan halde fram med å arbeide med scena lokalt. Ver merksam på at dette ikkje vil påverke andre personar, og desse vil framleis ha moglegheit til å samarbeide på deira eigen versjon.",
-    "shareTitle": ""
+    "shareTitle": "Bli med på eit sanntidssamarbeid på Excalidraw"
   },
   "errorDialog": {
     "title": "Feil"
   },
   "helpDialog": {
-    "blog": "",
+    "blog": "Les bloggen vår",
     "click": "klikk",
-    "curvedArrow": "",
-    "curvedLine": "",
-    "documentation": "",
-    "drag": "",
+    "curvedArrow": "Boga pil",
+    "curvedLine": "Boga linje",
+    "documentation": "Dokumentasjon",
+    "drag": "drag",
     "editor": "Redigering",
-    "github": "",
-    "howto": "",
+    "github": "Funne eit problem? Send inn",
+    "howto": "Følg vegleiinga vår",
     "or": "eller",
-    "preventBinding": "",
+    "preventBinding": "Hindre pilkopling",
     "shapes": "Formar",
-    "shortcuts": "",
-    "textFinish": "",
-    "textNewLine": "",
+    "shortcuts": "Tastatursnarvegar",
+    "textFinish": "Fullfør redigering (tekst)",
+    "textNewLine": "Legg til ny linje (tekst)",
     "title": "Hjelp",
     "view": "Vising",
-    "zoomToFit": "",
-    "zoomToSelection": ""
+    "zoomToFit": "Zoom for å sjå alle elementa",
+    "zoomToSelection": "Zoom til utval"
   },
   "encrypted": {
     "tooltip": "Teikningane dine er ende-til-ende-krypterte slik at Excalidraw sine serverar aldri får sjå dei.",
-    "link": ""
+    "link": "Blogginnlegg om ende-til-ende-kryptering i Excalidraw"
   },
   "stats": {
     "angle": "Vinkel",
@@ -245,18 +245,18 @@
     "storage": "Lagring",
     "title": "Statistikk for nerdar",
     "total": "Totalt",
-    "version": "",
-    "versionCopy": "",
-    "versionNotAvailable": "",
+    "version": "Versjon",
+    "versionCopy": "Klikk for å kopiere",
+    "versionNotAvailable": "Versjonen er ikkje tilgjengeleg",
     "width": "Breidde"
   },
   "toast": {
-    "copyStyles": "",
-    "copyToClipboard": "",
-    "copyToClipboardAsPng": "",
-    "fileSaved": "",
-    "fileSavedToFilename": "",
-    "canvas": "",
-    "selection": ""
+    "copyStyles": "Kopierte stilane.",
+    "copyToClipboard": "Kopiert til utklippstavla.",
+    "copyToClipboardAsPng": "Kopierte {{exportSelection}} til utklippstavla som PNG\n({{exportColorScheme}})",
+    "fileSaved": "Fila er lagra.",
+    "fileSavedToFilename": "Lagra som {filename}",
+    "canvas": "lerret",
+    "selection": "val"
   }
 }
