@@ -58,6 +58,9 @@ declare module "png-chunk-text" {
   ): { name: "tEXt"; data: Uint8Array };
   function decode(data: Uint8Array): { keyword: string; text: string };
 }
+declare module "png-chunk-phys" {
+  function writePngDpi(data: Uint8Array, dpi: number): Uint8Array;
+}
 declare module "png-chunks-encode" {
   function encode(chunks: TEXtChunk[]): Uint8Array;
   export = encode;

@@ -80,12 +80,15 @@ export const exportCanvas = async (
   if (type === "png") {
     const fileName = `${name}.png`;
     let blob = await canvasToBlob(tempCanvas);
-    if (appState.exportEmbedScene) {
+    if (appState.exportEmbedScene || scale > 1) {
       blob = await (
         await import(/* webpackChunkName: "image" */ "./image")
       ).encodePngMetadata({
         blob,
-        metadata: serializeAsJSON(elements, appState),
+        metadata: appState.exportEmbedScene
+          ? serializeAsJSON(elements, appState)
+          : undefined,
+        scale,
       });
     }
 
