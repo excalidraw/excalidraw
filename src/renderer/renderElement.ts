@@ -524,15 +524,6 @@ const drawElementFromCanvas = (
     elementWithCanvas.canvas!.width / elementWithCanvas.canvasZoom,
     elementWithCanvas.canvas!.height / elementWithCanvas.canvasZoom,
   );
-  // context.fillStyle = "rgba(0,0,0,.2)";
-  // context.fillRect(
-  //   (-(x2 - x1) / 2) * window.devicePixelRatio -
-  //     (padding * elementWithCanvas.canvasZoom) / elementWithCanvas.canvasZoom,
-  //   (-(y2 - y1) / 2) * window.devicePixelRatio -
-  //     (padding * elementWithCanvas.canvasZoom) / elementWithCanvas.canvasZoom,
-  //   elementWithCanvas.canvas!.width / elementWithCanvas.canvasZoom,
-  //   elementWithCanvas.canvas!.height / elementWithCanvas.canvasZoom,
-  // );
   context.rotate(-element.angle);
   context.translate(-cx, -cy);
   context.scale(window.devicePixelRatio, window.devicePixelRatio);
@@ -793,8 +784,9 @@ export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
 
   // Consider changing the options for simulated pressure vs real pressure
   const options = {
+    simulatePressure: element.simulatePressure,
     size: element.strokeWidth * 6,
-    thinning: element.simulatePressure ? 0.4 : 55,
+    thinning: element.simulatePressure ? 0.4 : 0.55,
     smoothing: 0.5,
     streamline: 0.4,
     easing: (t: number) => t * (2 - t),
