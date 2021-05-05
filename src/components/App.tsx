@@ -2887,9 +2887,10 @@ class App extends React.Component<AppProps, AppState> {
       : [...element.pressures, event.pressure];
 
     mutateElement(element, {
-      points: [...element.points, [0, 0]],
+      points: [[0, 0]],
       pressures,
     });
+
     const boundElement = getHoveredElementForBinding(
       pointerDownState.origin,
       this.scene,

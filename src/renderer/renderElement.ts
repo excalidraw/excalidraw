@@ -786,9 +786,9 @@ export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
   const options = {
     simulatePressure: element.simulatePressure,
     size: element.strokeWidth * 6,
-    thinning: element.simulatePressure ? 0.4 : 0.65,
+    thinning: 0.5,
     smoothing: 0.5,
-    streamline: 0.4,
+    streamline: 0.5,
     easing: (t: number) => t * (2 - t),
     last: true,
   };
@@ -796,8 +796,7 @@ export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
   const points = getFreeDrawShape(inputPoints as number[][], options);
   const d: (string | number)[] = [];
 
-  let p0 = points[points.length - 3];
-  let p1 = points[points.length - 2];
+  let [p0, p1] = points;
 
   d.push("M", p0[0], p0[1], "Q");
 
@@ -806,6 +805,9 @@ export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
     p0 = p1;
     p1 = points[i];
   }
+
+  p1 = points[0];
+  d.push(p0[0], p0[1], (p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2);
 
   d.push("Z");
 
