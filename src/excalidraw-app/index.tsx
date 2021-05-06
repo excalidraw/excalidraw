@@ -52,6 +52,7 @@ import {
 } from "./data/localStorage";
 import CustomStats from "./CustomStats";
 import { RestoredDataState } from "../data/restore";
+import { GitHubCorner } from "./components/GitHubCorner";
 
 const languageDetector = new LanguageDetector();
 languageDetector.init({
@@ -290,6 +291,17 @@ const ExcalidrawWrapper = () => {
     }
   };
 
+  const renderTopRight = useCallback(
+    (isMobile: boolean, appState: AppState) => {
+      return (
+        <div>
+          <GitHubCorner theme={appState.theme} dir={document.dir} />
+        </div>
+      );
+    },
+    [],
+  );
+
   const renderFooter = useCallback(
     (isMobile: boolean) => {
       const renderLanguageList = () => (
@@ -331,6 +343,7 @@ const ExcalidrawWrapper = () => {
     const serializedItems = JSON.stringify(items);
     localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY, serializedItems);
   };
+
   return (
     <>
       <Excalidraw
@@ -341,6 +354,7 @@ const ExcalidrawWrapper = () => {
         isCollaborating={collabAPI?.isCollaborating()}
         onPointerUpdate={collabAPI?.onPointerUpdate}
         onExportToBackend={onExportToBackend}
+        renderTopRight={renderTopRight}
         renderFooter={renderFooter}
         langCode={langCode}
         renderCustomStats={renderCustomStats}

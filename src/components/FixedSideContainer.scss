@@ -1,6 +1,5 @@
 .excalidraw {
   .FixedSideContainer {
-    --margin: 0.25rem;
     position: absolute;
     pointer-events: none;
   }
@@ -10,9 +9,9 @@
   }
 
   .FixedSideContainer_side_top {
-    left: var(--margin);
-    top: var(--margin);
-    right: var(--margin);
+    left: var(--space-factor);
+    top: var(--space-factor);
+    right: var(--space-factor);
     z-index: 2;
   }
 
@@ -23,16 +22,16 @@
 
 /* TODO: if these are used, make sure to implement RTL support
 .FixedSideContainer_side_left {
-  left: var(--margin);
-  top: var(--margin);
-  bottom: var(--margin);
+  left: var(--space-factor);
+  top: var(--space-factor);
+  bottom: var(--space-factor);
   z-index: 1;
 }
 
 .FixedSideContainer_side_right {
-  right: var(--margin);
-  top: var(--margin);
-  bottom: var(--margin);
+  right: var(--space-factor);
+  top: var(--space-factor);
+  bottom: var(--space-factor);
   z-index: 3;
 }
 */
