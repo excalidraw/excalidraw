@@ -500,20 +500,6 @@
     }
   }
 
-  .github-corner {
-    position: absolute;
-    top: 0;
-    z-index: 2;
-
-    :root[dir="ltr"] & {
-      right: 0;
-    }
-
-    :root[dir="rtl"] & {
-      left: 0;
-    }
-  }
-
   .zen-mode-visibility {
     visibility: visible;
     opacity: 1;

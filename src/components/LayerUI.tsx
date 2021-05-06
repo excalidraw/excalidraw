@@ -30,7 +30,6 @@ import CollabButton from "./CollabButton";
 import { ErrorDialog } from "./ErrorDialog";
 import { ExportCB, ExportDialog } from "./ExportDialog";
 import { FixedSideContainer } from "./FixedSideContainer";
-import { GitHubCorner } from "./GitHubCorner";
 import { HintViewer } from "./HintViewer";
 import { exportFile, load, shield, trash } from "./icons";
 import { Island } from "./Island";
@@ -68,6 +67,7 @@ interface LayerUIProps {
     appState: AppState,
     canvas: HTMLCanvasElement | null,
   ) => void;
+  renderTopRight?: (isMobile: boolean, appState: AppState) => JSX.Element;
   renderCustomFooter?: (isMobile: boolean) => JSX.Element;
   viewModeEnabled: boolean;
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
@@ -371,6 +371,7 @@ const LayerUI = ({
   toggleZenMode,
   isCollaborating,
   onExportToBackend,
+  renderTopRight,
   renderCustomFooter,
   viewModeEnabled,
   libraryReturnUrl,
@@ -604,24 +605,30 @@ const LayerUI = ({
               )}
             </Section>
           )}
-          <UserList
-            className={clsx("zen-mode-transition", {
-              "transition-right": zenModeEnabled,
-            })}
+          <div
+            className={clsx(
+              "layer-ui__wrapper__top-right zen-mode-transition",
+              {
+                "transition-right": zenModeEnabled,
+              },
+            )}
           >
-            {appState.collaborators.size > 0 &&
-              Array.from(appState.collaborators)
-                // Collaborator is either not initialized or is actually the current user.
-                .filter(([_, client]) => Object.keys(client).length !== 0)
-                .map(([clientId, client]) => (
-                  <Tooltip
-                    label={client.username || "Unknown user"}
-                    key={clientId}
-                  >
-                    {actionManager.renderAction("goToCollaborator", clientId)}
-                  </Tooltip>
-                ))}
-          </UserList>
+            <UserList>
+              {appState.collaborators.size > 0 &&
+                Array.from(appState.collaborators)
+                  // Collaborator is either not initialized or is actually the current user.
+                  .filter(([_, client]) => Object.keys(client).length !== 0)
+                  .map(([clientId, client]) => (
+                    <Tooltip
+                      label={client.username || "Unknown user"}
+                      key={clientId}
+                    >
+                      {actionManager.renderAction("goToCollaborator", clientId)}
+                    </Tooltip>
+                  ))}
+            </UserList>
+            {renderTopRight?.(isMobile, appState)}
+          </div>
         </div>
       </FixedSideContainer>
     );
@@ -649,20 +656,6 @@ const LayerUI = ({
     );
   };
 
-  const renderGitHubCorner = () => {
-    return (
-      <aside
-        className={clsx(
-          "layer-ui__wrapper__github-corner zen-mode-transition",
-          {
-            "transition-right": zenModeEnabled,
-          },
-        )}
-      >
-        <GitHubCorner theme={appState.theme} />
-      </aside>
-    );
-  };
   const renderFooter = () => (
     <footer role="contentinfo" className="layer-ui__wrapper__footer">
       <div
@@ -746,7 +739,6 @@ const LayerUI = ({
       {dialogs}
       {renderFixedSideContainer()}
       {renderBottomAppMenu()}
-      {renderGitHubCorner()}
       {renderFooter()}
       {appState.scrolledOutside && (
         <button

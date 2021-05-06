@@ -11,6 +11,14 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
+## Unreleased
+
+## Excalidraw API
+
+- Add support to render custom UI in the top right corner via [`renderTopRight`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#renderTopRight) prop [#3539](https://github.com/excalidraw/excalidraw/pull/3539).
+
+  This also removes the GitHub icon, keeping it local to the https://excalidraw.com app.
+
 ## 0.7.0 (2021-04-26)
 
 ## Excalidraw API
