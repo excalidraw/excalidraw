@@ -158,6 +158,7 @@
     "ellipse": "Ellipszis",
     "arrow": "Nyíl",
     "line": "Vonal",
+    "freedraw": "",
     "text": "Szöveg",
     "library": "Könyvtár",
     "lock": "Rajzolás után az aktív eszközt tartsa kijelölve"
