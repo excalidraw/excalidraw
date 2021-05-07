@@ -158,6 +158,7 @@
     "ellipse": "Ellips",
     "arrow": "Pil",
     "line": "Linje",
+    "freedraw": "",
     "text": "Text",
     "library": "Bibliotek",
     "lock": "Håll valt verktyg aktivt efter ritande"
