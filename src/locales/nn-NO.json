@@ -158,6 +158,7 @@
     "ellipse": "Ellipse",
     "arrow": "Pil",
     "line": "Linje",
+    "freedraw": "",
     "text": "Tekst",
     "library": "Bibliotek",
     "lock": "Hald fram med valt verktøy"
