@@ -158,6 +158,7 @@
     "ellipse": "Elipse",
     "arrow": "Flecha",
     "line": "Linha",
+    "freedraw": "",
     "text": "Texto",
     "library": "Biblioteca",
     "lock": "Manter ativa a ferramenta selecionada após desenhar"
