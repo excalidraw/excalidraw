@@ -158,6 +158,7 @@
     "ellipse": "椭圆",
     "arrow": "箭头",
     "line": "线条",
+    "freedraw": "",
     "text": "文字",
     "library": "库",
     "lock": "绘制后保持所选的工具栏状态"
