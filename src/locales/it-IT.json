@@ -158,6 +158,7 @@
     "ellipse": "Ellisse",
     "arrow": "Freccia",
     "line": "Linea",
+    "freedraw": "",
     "text": "Testo",
     "library": "Libreria",
     "lock": "Mantieni lo strumento selezionato attivo dopo aver disegnato"
