@@ -158,6 +158,7 @@
     "ellipse": "Elipsa",
     "arrow": "Šípka",
     "line": "Čiara",
+    "freedraw": "",
     "text": "Text",
     "library": "Knižnica",
     "lock": "Nechať zvolený nástroj aktívny po skončení kreslenia"
