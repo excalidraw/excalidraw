@@ -158,6 +158,7 @@
     "ellipse": "橢圓",
     "arrow": "箭頭",
     "line": "線條",
+    "freedraw": "",
     "text": "文字",
     "library": "資料庫",
     "lock": "可連續使用選取的工具"
