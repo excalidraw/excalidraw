@@ -158,6 +158,7 @@
     "ellipse": "타원",
     "arrow": "화살표",
     "line": "선",
+    "freedraw": "",
     "text": "텍스트",
     "library": "라이브러리",
     "lock": "선택된 도구 유지하기"
