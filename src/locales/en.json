@@ -158,6 +158,7 @@
     "ellipse": "Ellipse",
     "arrow": "Arrow",
     "line": "Line",
+    "freedraw": "Draw",
     "text": "Text",
     "library": "Library",
     "lock": "Keep selected tool active after drawing"
