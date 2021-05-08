@@ -96,7 +96,8 @@
     "flipVertical": "Balikkan vertikal",
     "viewMode": "Mode tampilan",
     "toggleExportColorScheme": "Ubah skema warna ekspor",
-    "share": "Bagikan"
+    "share": "Bagikan",
+    "toggleTheme": ""
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
