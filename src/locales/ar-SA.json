@@ -96,7 +96,8 @@
     "flipVertical": "",
     "viewMode": "نمط العرض",
     "toggleExportColorScheme": "",
-    "share": "مشاركة"
+    "share": "مشاركة",
+    "toggleTheme": ""
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
