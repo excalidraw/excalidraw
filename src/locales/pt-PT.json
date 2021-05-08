@@ -96,7 +96,8 @@
     "flipVertical": "Inverter verticalmente",
     "viewMode": "Modo de visualização",
     "toggleExportColorScheme": "Alternar esquema de cores de exportação",
-    "share": "Partilhar"
+    "share": "Partilhar",
+    "toggleTheme": ""
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
