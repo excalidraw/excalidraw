@@ -96,7 +96,8 @@
     "flipVertical": "垂直翻转",
     "viewMode": "查看模式",
     "toggleExportColorScheme": "切换导出配色方案",
-    "share": "分享"
+    "share": "分享",
+    "toggleTheme": ""
   },
   "buttons": {
     "clearReset": "重置画布",
