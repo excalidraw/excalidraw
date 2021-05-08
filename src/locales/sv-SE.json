@@ -96,7 +96,8 @@
     "flipVertical": "Vänd vertikalt",
     "viewMode": "Visningsläge",
     "toggleExportColorScheme": "Växla färgschema för export",
-    "share": "Dela"
+    "share": "Dela",
+    "toggleTheme": ""
   },
   "buttons": {
     "clearReset": "Återställ canvasen",
