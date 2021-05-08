@@ -97,7 +97,7 @@
     "viewMode": "Mòde de vista",
     "toggleExportColorScheme": "Alternar l’esquèma de color d’expòrt",
     "share": "Partejar",
-    "toggleTheme": ""
+    "toggleTheme": "Alternar tèma"
   },
   "buttons": {
     "clearReset": "Reïnicializar lo canabàs",
@@ -159,7 +159,7 @@
     "ellipse": "Ellipsa",
     "arrow": "Sageta",
     "line": "Linha",
-    "freedraw": "",
+    "freedraw": "Dessenhar",
     "text": "Tèxt",
     "library": "Bibliotèca",
     "lock": "Mantenir activa l’aisina aprèp dessenhar"
