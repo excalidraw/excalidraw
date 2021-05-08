@@ -96,7 +96,8 @@
     "flipVertical": "Girar verticalmente",
     "viewMode": "Modo presentación",
     "toggleExportColorScheme": "Cambiar el esquema de colores de exportación",
-    "share": "Compartir"
+    "share": "Compartir",
+    "toggleTheme": ""
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
