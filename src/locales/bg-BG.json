@@ -96,7 +96,8 @@
     "flipVertical": "",
     "viewMode": "Изглед",
     "toggleExportColorScheme": "",
-    "share": ""
+    "share": "",
+    "toggleTheme": ""
   },
   "buttons": {
     "clearReset": "Нулиране на платно",
