@@ -97,7 +97,7 @@
     "viewMode": "檢視模式",
     "toggleExportColorScheme": "切換輸出配色",
     "share": "共享",
-    "toggleTheme": ""
+    "toggleTheme": "切換主題"
   },
   "buttons": {
     "clearReset": "重置 canvas",
