@@ -96,7 +96,8 @@
     "flipVertical": "Віддзеркалити вертикально",
     "viewMode": "Режим перегляду",
     "toggleExportColorScheme": "Переключити колірну схему експорту",
-    "share": "Поділитися"
+    "share": "Поділитися",
+    "toggleTheme": ""
   },
   "buttons": {
     "clearReset": "Очистити полотно",
