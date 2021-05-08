@@ -96,7 +96,8 @@
     "flipVertical": "",
     "viewMode": "Tryb widoku",
     "toggleExportColorScheme": "",
-    "share": ""
+    "share": "",
+    "toggleTheme": ""
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
