@@ -96,7 +96,8 @@
     "flipVertical": "垂直方向に反転",
     "viewMode": "閲覧モード",
     "toggleExportColorScheme": "",
-    "share": ""
+    "share": "",
+    "toggleTheme": ""
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",
