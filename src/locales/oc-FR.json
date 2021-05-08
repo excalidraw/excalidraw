@@ -96,7 +96,8 @@
     "flipVertical": "Virar verticalament",
     "viewMode": "Mòde de vista",
     "toggleExportColorScheme": "Alternar l’esquèma de color d’expòrt",
-    "share": "Partejar"
+    "share": "Partejar",
+    "toggleTheme": ""
   },
   "buttons": {
     "clearReset": "Reïnicializar lo canabàs",
