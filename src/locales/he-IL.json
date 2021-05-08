@@ -96,7 +96,8 @@
     "flipVertical": "",
     "viewMode": "מצב תצוגה",
     "toggleExportColorScheme": "",
-    "share": ""
+    "share": "",
+    "toggleTheme": ""
   },
   "buttons": {
     "clearReset": "אפס את הלוח",
