@@ -96,7 +96,8 @@
     "flipVertical": "Vipp loddrett",
     "viewMode": "Visningsmodus",
     "toggleExportColorScheme": "Veksle eksport av fargepalett",
-    "share": "Del"
+    "share": "Del",
+    "toggleTheme": ""
   },
   "buttons": {
     "clearReset": "Tilbakestill lerretet",
