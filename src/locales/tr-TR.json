@@ -96,7 +96,8 @@
     "flipVertical": "Dikey döndür",
     "viewMode": "Görünüm modu",
     "toggleExportColorScheme": "Renk şemasını dışa aktar/aktarma",
-    "share": "Paylaş"
+    "share": "Paylaş",
+    "toggleTheme": ""
   },
   "buttons": {
     "clearReset": "Tuvali sıfırla",
