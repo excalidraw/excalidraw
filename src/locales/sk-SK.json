@@ -96,7 +96,8 @@
     "flipVertical": "Prevrátiť zvislo",
     "viewMode": "Režim zobrazenia",
     "toggleExportColorScheme": "Prepnúť exportovanie farebnej schémy",
-    "share": "Zdieľať"
+    "share": "Zdieľať",
+    "toggleTheme": ""
   },
   "buttons": {
     "clearReset": "Obnoviť plátno",
