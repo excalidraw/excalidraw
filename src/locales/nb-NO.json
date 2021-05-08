@@ -96,7 +96,8 @@
     "flipVertical": "Snu vertikalt",
     "viewMode": "Visningsmodus",
     "toggleExportColorScheme": "Veksle eksport av fargepalett",
-    "share": "Del"
+    "share": "Del",
+    "toggleTheme": ""
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
