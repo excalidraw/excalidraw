@@ -96,7 +96,8 @@
     "flipVertical": "Κατακόρυφη αναστροφή",
     "viewMode": "Λειτουργία προβολής",
     "toggleExportColorScheme": "Εναλλαγή εξαγωγής θέματος χρωμάτων",
-    "share": "Κοινοποίηση"
+    "share": "Κοινοποίηση",
+    "toggleTheme": ""
   },
   "buttons": {
     "clearReset": "Επαναφορά του καμβά",
