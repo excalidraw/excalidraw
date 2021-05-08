@@ -96,7 +96,8 @@
     "flipVertical": "Käännä pystysuunnassa",
     "viewMode": "Katselutila",
     "toggleExportColorScheme": "Vaihda viennin väriteema",
-    "share": "Jaa"
+    "share": "Jaa",
+    "toggleTheme": ""
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
