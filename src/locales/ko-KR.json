@@ -96,7 +96,8 @@
     "flipVertical": "",
     "viewMode": "보기 모드",
     "toggleExportColorScheme": "",
-    "share": ""
+    "share": "",
+    "toggleTheme": ""
   },
   "buttons": {
     "clearReset": "캔버스 초기화",
