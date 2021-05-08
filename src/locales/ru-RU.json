@@ -96,7 +96,8 @@
     "flipVertical": "",
     "viewMode": "Вид",
     "toggleExportColorScheme": "Экспортировать цветовую схему",
-    "share": "Поделиться"
+    "share": "Поделиться",
+    "toggleTheme": ""
   },
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",
