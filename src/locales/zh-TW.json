@@ -96,7 +96,8 @@
     "flipVertical": "垂直翻轉",
     "viewMode": "檢視模式",
     "toggleExportColorScheme": "切換輸出配色",
-    "share": "共享"
+    "share": "共享",
+    "toggleTheme": ""
   },
   "buttons": {
     "clearReset": "重置 canvas",
