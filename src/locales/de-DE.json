@@ -96,7 +96,8 @@
     "flipVertical": "Vertikal spiegeln",
     "viewMode": "Ansichtsmodus",
     "toggleExportColorScheme": "Exportfarbschema umschalten",
-    "share": "Teilen"
+    "share": "Teilen",
+    "toggleTheme": ""
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
