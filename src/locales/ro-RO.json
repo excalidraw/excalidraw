@@ -96,7 +96,8 @@
     "flipVertical": "Răsturnare verticală",
     "viewMode": "Mod de vizualizare",
     "toggleExportColorScheme": "Comutare schemă de culori de export",
-    "share": "Distribuie"
+    "share": "Distribuie",
+    "toggleTheme": ""
   },
   "buttons": {
     "clearReset": "Resetare pânză",
