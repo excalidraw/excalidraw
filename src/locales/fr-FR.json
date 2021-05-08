@@ -97,7 +97,7 @@
     "viewMode": "Mode présentation",
     "toggleExportColorScheme": "Activer/Désactiver l'export du thème de couleur",
     "share": "Partager",
-    "toggleTheme": ""
+    "toggleTheme": "Changer le thème"
   },
   "buttons": {
     "clearReset": "Réinitialiser le canevas",
