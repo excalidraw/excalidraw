@@ -97,7 +97,7 @@
     "viewMode": "Modo presentación",
     "toggleExportColorScheme": "Cambiar el esquema de colores de exportación",
     "share": "Compartir",
-    "toggleTheme": ""
+    "toggleTheme": "Alternar tema"
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
@@ -159,7 +159,7 @@
     "ellipse": "Elipse",
     "arrow": "Flecha",
     "line": "Línea",
-    "freedraw": "",
+    "freedraw": "Dibujar",
     "text": "Texto",
     "library": "Biblioteca",
     "lock": "Mantener la herramienta seleccionada activa después de dibujar"
