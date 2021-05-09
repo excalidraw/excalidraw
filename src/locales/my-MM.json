@@ -20,6 +20,10 @@
     "background": "နောက်ခံ",
     "fill": "ဖြည့်",
     "strokeWidth": "မျဉ်းအထူ",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "မျဉ်းပုံစံ",
     "strokeStyle_solid": "အပြည့်",
     "strokeStyle_dashed": "မျဉ်းပြတ်",
@@ -153,7 +157,6 @@
   },
   "toolBar": {
     "selection": "ရွေးချယ်",
-    "draw": "အလွတ်ရေးဆွဲ",
     "rectangle": "စတုဂံ",
     "diamond": "စိန်",
     "ellipse": "အဝိုင်း",
