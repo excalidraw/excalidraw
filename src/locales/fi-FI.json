@@ -20,6 +20,10 @@
     "background": "Tausta",
     "fill": "Täyttö",
     "strokeWidth": "Viivan leveys",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "Viivan tyyli",
     "strokeStyle_solid": "Yhtenäinen",
     "strokeStyle_dashed": "Katkoviiva",
@@ -153,7 +157,6 @@
   },
   "toolBar": {
     "selection": "Valinta",
-    "draw": "Vapaa piirto",
     "rectangle": "Suorakulmio",
     "diamond": "Vinoneliö",
     "ellipse": "Soikio",
