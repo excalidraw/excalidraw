@@ -20,6 +20,10 @@
     "background": "背景",
     "fill": "填充",
     "strokeWidth": "描边宽度",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "描边 (样式)",
     "strokeStyle_solid": "实线",
     "strokeStyle_dashed": "虚线",
@@ -153,7 +157,6 @@
   },
   "toolBar": {
     "selection": "选择",
-    "draw": "自由书写",
     "rectangle": "矩形",
     "diamond": "菱形",
     "ellipse": "椭圆",
