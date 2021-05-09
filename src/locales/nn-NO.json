@@ -20,6 +20,10 @@
     "background": "Bakgrunn",
     "fill": "Fyll",
     "strokeWidth": "Strekbreidd",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "Strekstil",
     "strokeStyle_solid": "Solid",
     "strokeStyle_dashed": "Stipla",
@@ -153,7 +157,6 @@
   },
   "toolBar": {
     "selection": "Vel",
-    "draw": "Frihandsteikning",
     "rectangle": "Rektangel",
     "diamond": "Diamant",
     "ellipse": "Ellipse",
