@@ -20,6 +20,10 @@
     "background": "ਬੈਕਗਰਾਉਂਡ",
     "fill": "ਭਰਨਾ",
     "strokeWidth": "ਰੇਖਾ ਦੀ ਚੌੜਾਈ",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "ਰੇਖਾ ਦਾ ਸਟਾਇਲ",
     "strokeStyle_solid": "ਠੋਸ",
     "strokeStyle_dashed": "ਡੈਸ਼ ਵਾਲੀ",
@@ -153,7 +157,6 @@
   },
   "toolBar": {
     "selection": "ਚੋਣਕਾਰ",
-    "draw": "ਖੁੱਲ੍ਹੀ ਵਾਹੀ",
     "rectangle": "ਆਇਤ",
     "diamond": "ਹੀਰਾ",
     "ellipse": "ਅੰਡਾਕਾਰ",
