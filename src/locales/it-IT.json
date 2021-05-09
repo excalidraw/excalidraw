@@ -20,6 +20,10 @@
     "background": "Sfondo",
     "fill": "Riempimento",
     "strokeWidth": "Spessore del tratto",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "Stile del tratto",
     "strokeStyle_solid": "Pieno",
     "strokeStyle_dashed": "Tratteggiato",
@@ -153,7 +157,6 @@
   },
   "toolBar": {
     "selection": "Selezione",
-    "draw": "Disegno libero",
     "rectangle": "Rettangolo",
     "diamond": "Rombo",
     "ellipse": "Ellisse",
