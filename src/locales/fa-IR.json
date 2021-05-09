@@ -20,6 +20,10 @@
     "background": "پس زمینه",
     "fill": "رنگ آمیزی",
     "strokeWidth": "ضخامت خط",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "استایل خط",
     "strokeStyle_solid": "یکدست",
     "strokeStyle_dashed": "خط چین",
@@ -153,7 +157,6 @@
   },
   "toolBar": {
     "selection": "گزینش",
-    "draw": "طراحی آزاد",
     "rectangle": "مستطیل",
     "diamond": "لوزی",
     "ellipse": "بیضی",
