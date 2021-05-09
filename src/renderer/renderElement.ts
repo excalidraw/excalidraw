@@ -206,7 +206,7 @@ const drawElementOnCanvas = (
           context.canvas.remove();
         }
       } else {
-        throw new Error(`Unimplemented type ${element.type}`);
+        console.error(`Unimplemented type ${element.type}`);
       }
     }
   }
