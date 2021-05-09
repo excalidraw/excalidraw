@@ -20,6 +20,10 @@
     "background": "배경색",
     "fill": "채우기",
     "strokeWidth": "선 굵기",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "선",
     "strokeStyle_solid": "실선",
     "strokeStyle_dashed": "파선",
@@ -153,7 +157,6 @@
   },
   "toolBar": {
     "selection": "선택",
-    "draw": "자유롭게 그리기",
     "rectangle": "사각형",
     "diamond": "다이아몬드",
     "ellipse": "타원",
