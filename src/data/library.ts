@@ -2,7 +2,6 @@ import { loadLibraryFromBlob } from "./blob";
 import { LibraryItems, LibraryItem } from "../types";
 import { restoreElements } from "./restore";
 import { getNonDeletedElements } from "../element";
-import { NonDeleted, ExcalidrawElement } from "../element/types";
 import App from "../components/App";
 
 class Library {
@@ -16,6 +15,11 @@ class Library {
   resetLibrary = async () => {
     await this.app.props.onLibraryChange?.([]);
     this.libraryCache = [];
+  };
+
+  restoreLibraryItem = (libraryItem: LibraryItem): LibraryItem | null => {
+    const elements = getNonDeletedElements(restoreElements(libraryItem));
+    return elements.length ? elements : null;
   };
 
   /** imports library (currently merges, removing duplicates) */
@@ -52,12 +56,12 @@ class Library {
     const existingLibraryItems = await this.loadLibrary();
 
     const filtered = libraryFile.library!.reduce((acc, libraryItem) => {
-      const restored = getNonDeletedElements(restoreElements(libraryItem));
-      if (isUniqueitem(existingLibraryItems, restored)) {
-        acc.push(restored);
+      const restoredItem = this.restoreLibraryItem(libraryItem);
+      if (restoredItem && isUniqueitem(existingLibraryItems, restoredItem)) {
+        acc.push(restoredItem);
       }
       return acc;
-    }, [] as (readonly NonDeleted<ExcalidrawElement>[])[]);
+    }, [] as Mutable<LibraryItems>);
 
     await this.saveLibrary([...existingLibraryItems, ...filtered]);
   }
@@ -74,9 +78,13 @@ class Library {
           return resolve([]);
         }
 
-        const items = libraryItems.map(
-          (elements) => restoreElements(elements) as LibraryItem,
-        );
+        const items = libraryItems.reduce((acc, item) => {
+          const restoredItem = this.restoreLibraryItem(item);
+          if (restoredItem) {
+            acc.push(item);
+          }
+          return acc;
+        }, [] as Mutable<LibraryItems>);
 
         // clone to ensure we don't mutate the cached library elements in the app
         this.libraryCache = JSON.parse(JSON.stringify(items));
