@@ -20,6 +20,10 @@
     "background": "Фон",
     "fill": "Заливка",
     "strokeWidth": "Толщина штриха",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "Стиль обводки",
     "strokeStyle_solid": "Сплошная",
     "strokeStyle_dashed": "Пунктирная",
@@ -153,7 +157,6 @@
   },
   "toolBar": {
     "selection": "Выделение области",
-    "draw": "Свободное рисование",
     "rectangle": "Прямоугольник",
     "diamond": "Ромб",
     "ellipse": "Эллипс",
