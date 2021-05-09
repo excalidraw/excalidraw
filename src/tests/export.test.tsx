@@ -47,6 +47,7 @@ describe("export", () => {
     const pngBlobEmbedded = await encodePngMetadata({
       blob: pngBlob,
       metadata: serializeAsJSON(testElements, h.state),
+      scale: 2,
     });
     API.drop(pngBlobEmbedded);
 
