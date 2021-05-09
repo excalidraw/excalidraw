@@ -20,6 +20,10 @@
     "background": "Kolor wypełnienia",
     "fill": "Wypełnienie",
     "strokeWidth": "Grubość obramowania",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "Styl obrysu",
     "strokeStyle_solid": "Pełny",
     "strokeStyle_dashed": "Kreskowany",
@@ -153,7 +157,6 @@
   },
   "toolBar": {
     "selection": "Zaznaczenie",
-    "draw": "Swobodne rysowanie",
     "rectangle": "Prostokąt",
     "diamond": "Romb",
     "ellipse": "Elipsa",
