@@ -20,6 +20,10 @@
     "background": "Bakgrund",
     "fill": "Fyllnad",
     "strokeWidth": "Linjebredd",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "Linjestil",
     "strokeStyle_solid": "Solid",
     "strokeStyle_dashed": "Streckad",
@@ -153,7 +157,6 @@
   },
   "toolBar": {
     "selection": "Markering",
-    "draw": "Frihand",
     "rectangle": "Rektangel",
     "diamond": "Diamant",
     "ellipse": "Ellips",
