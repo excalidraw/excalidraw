@@ -20,6 +20,10 @@
     "background": "Pozadie",
     "fill": "Výplň",
     "strokeWidth": "Hrúbka obrysu",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "Štýl obrysu",
     "strokeStyle_solid": "Plný",
     "strokeStyle_dashed": "Čiarkovaný",
@@ -153,7 +157,6 @@
   },
   "toolBar": {
     "selection": "Výber",
-    "draw": "Voľné kreslenie",
     "rectangle": "Obdĺžnik",
     "diamond": "Diamant",
     "ellipse": "Elipsa",
