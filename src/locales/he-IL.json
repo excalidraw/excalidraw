@@ -20,6 +20,10 @@
     "background": "רקע",
     "fill": "מילוי",
     "strokeWidth": "עובי קו מתאר",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "סגנון קו המתאר",
     "strokeStyle_solid": "מלא",
     "strokeStyle_dashed": "מקווקו",
@@ -153,7 +157,6 @@
   },
   "toolBar": {
     "selection": "בחירה",
-    "draw": "ציור חופשי",
     "rectangle": "מרובע",
     "diamond": "מעוין",
     "ellipse": "אליפסה",
