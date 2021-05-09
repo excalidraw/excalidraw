@@ -20,6 +20,10 @@
     "background": "Fundal",
     "fill": "Umplere",
     "strokeWidth": "Lățimea conturului",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "Stilul conturului",
     "strokeStyle_solid": "Neîntrerupt",
     "strokeStyle_dashed": "Liniuțe",
@@ -153,7 +157,6 @@
   },
   "toolBar": {
     "selection": "Selecție",
-    "draw": "Desenare liberă",
     "rectangle": "Dreptunghi",
     "diamond": "Romb",
     "ellipse": "Elipsă",
