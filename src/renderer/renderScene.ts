@@ -201,11 +201,12 @@ export const renderScene = (
     renderGrid?: boolean;
   } = {},
 ) => {
-  if (!canvas) {
+  if (canvas === null) {
     return { atLeastOneVisibleElement: false };
   }
 
   const context = canvas.getContext("2d")!;
+
   context.scale(scale, scale);
 
   // When doing calculations based on canvas width we should used normalized one

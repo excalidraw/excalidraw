@@ -152,7 +152,7 @@
   },
   "toolBar": {
     "selection": "Селекция",
-    "draw": "Рисуване",
+    "freedraw": "Рисуване",
     "rectangle": "Правоъгълник",
     "diamond": "Диамант",
     "ellipse": "Елипс",
