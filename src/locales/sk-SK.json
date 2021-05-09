@@ -20,7 +20,7 @@
     "background": "Pozadie",
     "fill": "Výplň",
     "strokeWidth": "Hrúbka obrysu",
-    "strokeShape": "",
+    "strokeShape": "Tvar obrysu",
     "strokeShape_gel": "",
     "strokeShape_fountain": "",
     "strokeShape_brush": "",
