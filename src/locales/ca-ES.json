@@ -20,6 +20,10 @@
     "background": "Color del fons",
     "fill": "Estil del fons",
     "strokeWidth": "Amplada del traç",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "Estil del traç",
     "strokeStyle_solid": "Sòlid",
     "strokeStyle_dashed": "Guions",
@@ -153,7 +157,6 @@
   },
   "toolBar": {
     "selection": "Selecció",
-    "draw": "Dibuix lliure",
     "rectangle": "Rectangle",
     "diamond": "Rombe",
     "ellipse": "El·lipse",
