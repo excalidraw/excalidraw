@@ -20,6 +20,10 @@
     "background": "Latar",
     "fill": "Isian",
     "strokeWidth": "Lebar guratan",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "Gaya guratan",
     "strokeStyle_solid": "Padat",
     "strokeStyle_dashed": "Putus-putus",
@@ -153,7 +157,6 @@
   },
   "toolBar": {
     "selection": "Pilihan",
-    "draw": "Menggambar bebas",
     "rectangle": "Persegi",
     "diamond": "Berlian",
     "ellipse": "Elips",
