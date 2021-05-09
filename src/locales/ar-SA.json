@@ -20,6 +20,10 @@
     "background": "الخلفية",
     "fill": "التعبئة",
     "strokeWidth": "حجم الحدود",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "نمط الحدود",
     "strokeStyle_solid": "صلبة",
     "strokeStyle_dashed": "متقطع",
@@ -153,7 +157,6 @@
   },
   "toolBar": {
     "selection": "تحديد",
-    "draw": "الكتابة الحرة",
     "rectangle": "مستطيل",
     "diamond": "مضلع",
     "ellipse": "دائرة",
