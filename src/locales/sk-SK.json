@@ -101,7 +101,7 @@
     "viewMode": "Režim zobrazenia",
     "toggleExportColorScheme": "Prepnúť exportovanie farebnej schémy",
     "share": "Zdieľať",
-    "toggleTheme": ""
+    "toggleTheme": "Prepnúť tému"
   },
   "buttons": {
     "clearReset": "Obnoviť plátno",
@@ -162,7 +162,7 @@
     "ellipse": "Elipsa",
     "arrow": "Šípka",
     "line": "Čiara",
-    "freedraw": "",
+    "freedraw": "Kresliť",
     "text": "Text",
     "library": "Knižnica",
     "lock": "Nechať zvolený nástroj aktívny po skončení kreslenia"
