@@ -20,6 +20,10 @@
     "background": "Fundo",
     "fill": "Preenchimento",
     "strokeWidth": "Espessura do traço",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "Estilo de traço",
     "strokeStyle_solid": "Sólido",
     "strokeStyle_dashed": "Tracejado",
@@ -153,7 +157,6 @@
   },
   "toolBar": {
     "selection": "Seleção",
-    "draw": "Desenho livre",
     "rectangle": "Retângulo",
     "diamond": "Losango",
     "ellipse": "Elipse",
