@@ -20,6 +20,10 @@
     "background": "Háttér",
     "fill": "Kitöltés",
     "strokeWidth": "Körvonal vastagsága",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "Körvonal stílusa",
     "strokeStyle_solid": "Kitöltött",
     "strokeStyle_dashed": "Szaggatott",
@@ -153,7 +157,6 @@
   },
   "toolBar": {
     "selection": "Kijelölés",
-    "draw": "Szabadkézi rajz",
     "rectangle": "Téglalap",
     "diamond": "Rombusz",
     "ellipse": "Ellipszis",
