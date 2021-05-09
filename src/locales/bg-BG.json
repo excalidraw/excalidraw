@@ -20,6 +20,10 @@
     "background": "Фон",
     "fill": "Наситеност",
     "strokeWidth": "Ширина на щриха",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "Стил на линия",
     "strokeStyle_solid": "Плътен",
     "strokeStyle_dashed": "Пунктир",
@@ -153,7 +157,6 @@
   },
   "toolBar": {
     "selection": "Селекция",
-    "draw": "Рисуване",
     "rectangle": "Правоъгълник",
     "diamond": "Диамант",
     "ellipse": "Елипс",
