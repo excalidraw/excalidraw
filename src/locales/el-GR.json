@@ -20,6 +20,10 @@
     "background": "Φόντο",
     "fill": "Γέμισμα",
     "strokeWidth": "Πάχος μολυβιάς",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "Στυλ περιγράμματος",
     "strokeStyle_solid": "Συμπαγής",
     "strokeStyle_dashed": "Διακεκομμένη με παύλες",
@@ -153,7 +157,6 @@
   },
   "toolBar": {
     "selection": "Επιλογή",
-    "draw": "Ελεύθερο σχέδιο",
     "rectangle": "Ορθογώνιο",
     "diamond": "Ρόμβος",
     "ellipse": "Έλλειψη",
