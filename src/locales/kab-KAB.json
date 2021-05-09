@@ -20,6 +20,10 @@
     "background": "Agilal",
     "fill": "Taččart",
     "strokeWidth": "Tehri n yizirig",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "Aɣanib n tizirig",
     "strokeStyle_solid": "Aččuran",
     "strokeStyle_dashed": "S tjerriḍin",
@@ -153,7 +157,6 @@
   },
   "toolBar": {
     "selection": "Tafrayt",
-    "draw": "Unuɣ ilelli",
     "rectangle": "Asrem",
     "diamond": "Ameɣṛun",
     "ellipse": "Taglayt",
