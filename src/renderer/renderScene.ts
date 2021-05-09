@@ -269,7 +269,11 @@ export const renderScene = (
   );
 
   visibleElements.forEach((element) => {
-    renderElement(element, rc, context, renderOptimizations, sceneState);
+    try {
+      renderElement(element, rc, context, renderOptimizations, sceneState);
+    } catch (error) {
+      console.error(error);
+    }
   });
 
   if (appState.editingLinearElement) {
@@ -283,13 +287,17 @@ export const renderScene = (
 
   // Paint selection element
   if (selectionElement) {
-    renderElement(
-      selectionElement,
-      rc,
-      context,
-      renderOptimizations,
-      sceneState,
-    );
+    try {
+      renderElement(
+        selectionElement,
+        rc,
+        context,
+        renderOptimizations,
+        sceneState,
+      );
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   if (isBindingEnabled(appState)) {
@@ -834,13 +842,17 @@ export const renderSceneToSvg = (
   // render elements
   elements.forEach((element) => {
     if (!element.isDeleted) {
-      renderElementToSvg(
-        element,
-        rsvg,
-        svgRoot,
-        element.x + offsetX,
-        element.y + offsetY,
-      );
+      try {
+        renderElementToSvg(
+          element,
+          rsvg,
+          svgRoot,
+          element.x + offsetX,
+          element.y + offsetY,
+        );
+      } catch (error) {
+        console.error(error);
+      }
     }
   });
 };
