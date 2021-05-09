@@ -37,10 +37,12 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamily => {
 
 const restoreElementWithProperties = <T extends ExcalidrawElement>(
   element: Required<T>,
-  extra: Omit<Required<T>, keyof ExcalidrawElement>,
+  extra: Omit<Required<T>, keyof ExcalidrawElement> & {
+    type?: ExcalidrawElement["type"];
+  },
 ): T => {
   const base: Pick<T, keyof ExcalidrawElement> = {
-    type: element.type,
+    type: extra.type || element.type,
     // all elements must have version > 0 so getSceneVersion() will pick up
     // newly added elements
     version: element.version || 1,
@@ -97,6 +99,14 @@ const restoreElement = (
         textAlign: element.textAlign || DEFAULT_TEXT_ALIGN,
         verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,
       });
+    case "freedraw": {
+      return restoreElementWithProperties(element, {
+        points: element.points,
+        lastCommittedPoint: null,
+        simulatePressure: element.simulatePressure,
+        pressures: element.pressures,
+      });
+    }
     case "draw":
     case "line":
     case "arrow": {
@@ -106,6 +116,7 @@ const restoreElement = (
       } = element;
 
       return restoreElementWithProperties(element, {
+        type: element.type === "draw" ? "line" : element.type,
         startBinding: element.startBinding,
         endBinding: element.endBinding,
         points:

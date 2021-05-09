@@ -152,7 +152,7 @@
   },
   "toolBar": {
     "selection": "ရွေးချယ်",
-    "draw": "အလွတ်ရေးဆွဲ",
+    "freedraw": "အလွတ်ရေးဆွဲ",
     "rectangle": "စတုဂံ",
     "diamond": "စိန်",
     "ellipse": "အဝိုင်း",

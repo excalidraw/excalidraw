@@ -152,7 +152,7 @@
   },
   "toolBar": {
     "selection": "Zaznaczenie",
-    "draw": "Swobodne rysowanie",
+    "freedraw": "Swobodne rysowanie",
     "rectangle": "Prostokąt",
     "diamond": "Romb",
     "ellipse": "Elipsa",

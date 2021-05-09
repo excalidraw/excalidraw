@@ -225,7 +225,7 @@ export const getTransformHandles = (
   if (
     element.type === "arrow" ||
     element.type === "line" ||
-    element.type === "draw"
+    element.type === "freedraw"
   ) {
     if (element.points.length === 2) {
       // only check the last point because starting point is always (0,0)

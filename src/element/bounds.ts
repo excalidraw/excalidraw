@@ -1,4 +1,9 @@
-import { ExcalidrawElement, ExcalidrawLinearElement, Arrowhead } from "./types";
+import {
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  Arrowhead,
+  ExcalidrawFreeDrawElement,
+} from "./types";
 import { distance2d, rotate } from "../math";
 import rough from "roughjs/bin/rough";
 import { Drawable, Op } from "roughjs/bin/core";
@@ -7,7 +12,7 @@ import {
   getShapeForElement,
   generateRoughOptions,
 } from "../renderer/renderElement";
-import { isLinearElement } from "./typeChecks";
+import { isFreeDrawElement, isLinearElement } from "./typeChecks";
 import { rescalePoints } from "../points";
 
 // x and y position of top left corner, x and y position of bottom right corner
@@ -18,7 +23,9 @@ export type Bounds = readonly [number, number, number, number];
 export const getElementAbsoluteCoords = (
   element: ExcalidrawElement,
 ): Bounds => {
-  if (isLinearElement(element)) {
+  if (isFreeDrawElement(element)) {
+    return getFreeDrawElementAbsoluteCoords(element);
+  } else if (isLinearElement(element)) {
     return getLinearElementAbsoluteCoords(element);
   }
   return [
@@ -120,9 +127,42 @@ const getMinMaxXYFromCurvePathOps = (
   return [minX, minY, maxX, maxY];
 };
 
+const getBoundsFromPoints = (
+  points: ExcalidrawFreeDrawElement["points"],
+): [number, number, number, number] => {
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+
+  for (const [x, y] of points) {
+    minX = Math.min(minX, x);
+    minY = Math.min(minY, y);
+    maxX = Math.max(maxX, x);
+    maxY = Math.max(maxY, y);
+  }
+
+  return [minX, minY, maxX, maxY];
+};
+
+const getFreeDrawElementAbsoluteCoords = (
+  element: ExcalidrawFreeDrawElement,
+): [number, number, number, number] => {
+  const [minX, minY, maxX, maxY] = getBoundsFromPoints(element.points);
+
+  return [
+    minX + element.x,
+    minY + element.y,
+    maxX + element.x,
+    maxY + element.y,
+  ];
+};
+
 const getLinearElementAbsoluteCoords = (
   element: ExcalidrawLinearElement,
 ): [number, number, number, number] => {
+  let coords: [number, number, number, number];
+
   if (element.points.length < 2 || !getShapeForElement(element)) {
     // XXX this is just a poor estimate and not very useful
     const { minX, minY, maxX, maxY } = element.points.reduce(
@@ -137,7 +177,21 @@ const getLinearElementAbsoluteCoords = (
       },
       { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity },
     );
-    return [
+    coords = [
+      minX + element.x,
+      minY + element.y,
+      maxX + element.x,
+      maxY + element.y,
+    ];
+  } else {
+    const shape = getShapeForElement(element) as Drawable[];
+
+    // first element is always the curve
+    const ops = getCurvePathOps(shape[0]);
+
+    const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
+
+    coords = [
       minX + element.x,
       minY + element.y,
       maxX + element.x,
@@ -145,19 +199,7 @@ const getLinearElementAbsoluteCoords = (
     ];
   }
 
-  const shape = getShapeForElement(element) as Drawable[];
-
-  // first element is always the curve
-  const ops = getCurvePathOps(shape[0]);
-
-  const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
-
-  return [
-    minX + element.x,
-    minY + element.y,
-    maxX + element.x,
-    maxY + element.y,
-  ];
+  return coords;
 };
 
 export const getArrowheadPoints = (
@@ -231,7 +273,7 @@ export const getArrowheadPoints = (
   const ys = y2 - ny * minSize;
 
   if (arrowhead === "dot") {
-    const r = Math.hypot(ys - y2, xs - x2);
+    const r = Math.hypot(ys - y2, xs - x2) + element.strokeWidth;
     return [x2, y2, r];
   }
 
@@ -277,16 +319,31 @@ const getLinearElementRotatedBounds = (
   return getMinMaxXYFromCurvePathOps(ops, transformXY);
 };
 
+// We could cache this stuff
 export const getElementBounds = (
   element: ExcalidrawElement,
 ): [number, number, number, number] => {
+  let bounds: [number, number, number, number];
+
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
-  if (isLinearElement(element)) {
-    return getLinearElementRotatedBounds(element, cx, cy);
-  }
-  if (element.type === "diamond") {
+  if (isFreeDrawElement(element)) {
+    const [minX, minY, maxX, maxY] = getBoundsFromPoints(
+      element.points.map(([x, y]) =>
+        rotate(x, y, cx - element.x, cy - element.y, element.angle),
+      ),
+    );
+
+    return [
+      minX + element.x,
+      minY + element.y,
+      maxX + element.x,
+      maxY + element.y,
+    ];
+  } else if (isLinearElement(element)) {
+    bounds = getLinearElementRotatedBounds(element, cx, cy);
+  } else if (element.type === "diamond") {
     const [x11, y11] = rotate(cx, y1, cx, cy, element.angle);
     const [x12, y12] = rotate(cx, y2, cx, cy, element.angle);
     const [x22, y22] = rotate(x1, cy, cx, cy, element.angle);
@@ -295,26 +352,28 @@ export const getElementBounds = (
     const minY = Math.min(y11, y12, y22, y21);
     const maxX = Math.max(x11, x12, x22, x21);
     const maxY = Math.max(y11, y12, y22, y21);
-    return [minX, minY, maxX, maxY];
-  }
-  if (element.type === "ellipse") {
+    bounds = [minX, minY, maxX, maxY];
+  } else if (element.type === "ellipse") {
     const w = (x2 - x1) / 2;
     const h = (y2 - y1) / 2;
     const cos = Math.cos(element.angle);
     const sin = Math.sin(element.angle);
     const ww = Math.hypot(w * cos, h * sin);
     const hh = Math.hypot(h * cos, w * sin);
-    return [cx - ww, cy - hh, cx + ww, cy + hh];
+    bounds = [cx - ww, cy - hh, cx + ww, cy + hh];
+  } else {
+    const [x11, y11] = rotate(x1, y1, cx, cy, element.angle);
+    const [x12, y12] = rotate(x1, y2, cx, cy, element.angle);
+    const [x22, y22] = rotate(x2, y2, cx, cy, element.angle);
+    const [x21, y21] = rotate(x2, y1, cx, cy, element.angle);
+    const minX = Math.min(x11, x12, x22, x21);
+    const minY = Math.min(y11, y12, y22, y21);
+    const maxX = Math.max(x11, x12, x22, x21);
+    const maxY = Math.max(y11, y12, y22, y21);
+    bounds = [minX, minY, maxX, maxY];
   }
-  const [x11, y11] = rotate(x1, y1, cx, cy, element.angle);
-  const [x12, y12] = rotate(x1, y2, cx, cy, element.angle);
-  const [x22, y22] = rotate(x2, y2, cx, cy, element.angle);
-  const [x21, y21] = rotate(x2, y1, cx, cy, element.angle);
-  const minX = Math.min(x11, x12, x22, x21);
-  const minY = Math.min(y11, y12, y22, y21);
-  const maxX = Math.max(x11, x12, x22, x21);
-  const maxY = Math.max(y11, y12, y22, y21);
-  return [minX, minY, maxX, maxY];
+
+  return bounds;
 };
 
 export const getCommonBounds = (
@@ -345,7 +404,7 @@ export const getResizedElementAbsoluteCoords = (
   nextWidth: number,
   nextHeight: number,
 ): [number, number, number, number] => {
-  if (!isLinearElement(element)) {
+  if (!(isLinearElement(element) || isFreeDrawElement(element))) {
     return [
       element.x,
       element.y,
@@ -360,16 +419,29 @@ export const getResizedElementAbsoluteCoords = (
     rescalePoints(1, nextHeight, element.points),
   );
 
-  const gen = rough.generator();
-  const curve =
-    element.strokeSharpness === "sharp"
-      ? gen.linearPath(
-          points as [number, number][],
-          generateRoughOptions(element),
-        )
-      : gen.curve(points as [number, number][], generateRoughOptions(element));
-  const ops = getCurvePathOps(curve);
-  const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
+  let bounds: [number, number, number, number];
+
+  if (isFreeDrawElement(element)) {
+    // Free Draw
+    bounds = getBoundsFromPoints(points);
+  } else {
+    // Line
+    const gen = rough.generator();
+    const curve =
+      element.strokeSharpness === "sharp"
+        ? gen.linearPath(
+            points as [number, number][],
+            generateRoughOptions(element),
+          )
+        : gen.curve(
+            points as [number, number][],
+            generateRoughOptions(element),
+          );
+    const ops = getCurvePathOps(curve);
+    bounds = getMinMaxXYFromCurvePathOps(ops);
+  }
+
+  const [minX, minY, maxX, maxY] = bounds;
   return [
     minX + element.x,
     minY + element.y,

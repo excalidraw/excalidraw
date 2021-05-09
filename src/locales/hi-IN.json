@@ -152,7 +152,7 @@
   },
   "toolBar": {
     "selection": "चयन",
-    "draw": "मुफ्त ड्रा",
+    "freedraw": "मुफ्त ड्रा",
     "rectangle": "आयात",
     "diamond": "तिर्यग्वर्ग",
     "ellipse": "दीर्घवृत्त",

@@ -9,7 +9,8 @@ export {
 export { calculateScrollCenter } from "./scroll";
 export {
   hasBackground,
-  hasStroke,
+  hasStrokeWidth,
+  hasStrokeStyle,
   canHaveArrowheads,
   canChangeSharpness,
   getElementAtPosition,

@@ -6,7 +6,7 @@ import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { normalizeAngle, resizeSingleElement } from "../element/resizeElements";
 import { AppState } from "../types";
 import { getTransformHandles } from "../element/transformHandles";
-import { isLinearElement } from "../element/typeChecks";
+import { isFreeDrawElement, isLinearElement } from "../element/typeChecks";
 import { updateBoundElements } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
 
@@ -114,7 +114,7 @@ const flipElement = (
   const originalAngle = normalizeAngle(element.angle);
 
   let finalOffsetX = 0;
-  if (isLinearElement(element)) {
+  if (isLinearElement(element) || isFreeDrawElement(element)) {
     finalOffsetX =
       element.points.reduce((max, point) => Math.max(max, point[0]), 0) * 2 -
       element.width;

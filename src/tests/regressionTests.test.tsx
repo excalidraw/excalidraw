@@ -106,7 +106,7 @@ describe("regression tests", () => {
     mouse.click(30, 10);
     Keyboard.keyPress(KEYS.ENTER);
 
-    UI.clickTool("draw");
+    UI.clickTool("freedraw");
     mouse.down(40, -20);
     mouse.up(50, 10);
 
@@ -118,7 +118,7 @@ describe("regression tests", () => {
       "line",
       "arrow",
       "line",
-      "draw",
+      "freedraw",
     ]);
   });
 
@@ -146,7 +146,7 @@ describe("regression tests", () => {
     [`4${KEYS.E}`, "ellipse", true],
     [`5${KEYS.A}`, "arrow", true],
     [`6${KEYS.L}`, "line", true],
-    [`7${KEYS.X}`, "draw", false],
+    [`7${KEYS.X}`, "freedraw", false],
   ] as [string, ExcalidrawElement["type"], boolean][]) {
     for (const key of keys) {
       it(`key ${key} selects ${shape} tool`, () => {

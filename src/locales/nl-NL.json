@@ -152,7 +152,7 @@
   },
   "toolBar": {
     "selection": "Selectie",
-    "draw": "Vrij tekenen",
+    "freedraw": "Vrij tekenen",
     "rectangle": "Rechthoek",
     "diamond": "Ruit",
     "ellipse": "Ovaal",

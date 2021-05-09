@@ -152,7 +152,7 @@
   },
   "toolBar": {
     "selection": "选择",
-    "draw": "自由书写",
+    "freedraw": "自由书写",
     "rectangle": "矩形",
     "diamond": "菱形",
     "ellipse": "椭圆",

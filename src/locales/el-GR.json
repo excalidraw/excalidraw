@@ -152,7 +152,7 @@
   },
   "toolBar": {
     "selection": "Επιλογή",
-    "draw": "Ελεύθερο σχέδιο",
+    "freedraw": "Ελεύθερο σχέδιο",
     "rectangle": "Ορθογώνιο",
     "diamond": "Ρόμβος",
     "ellipse": "Έλλειψη",

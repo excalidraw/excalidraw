@@ -152,7 +152,7 @@
   },
   "toolBar": {
     "selection": "تحديد",
-    "draw": "الكتابة الحرة",
+    "freedraw": "الكتابة الحرة",
     "rectangle": "مستطيل",
     "diamond": "مضلع",
     "ellipse": "دائرة",

@@ -9,7 +9,8 @@ import {
   canHaveArrowheads,
   getTargetElements,
   hasBackground,
-  hasStroke,
+  hasStrokeStyle,
+  hasStrokeWidth,
   hasText,
 } from "../scene";
 import { SHAPES } from "../shapes";
@@ -53,10 +54,17 @@ export const SelectedShapeActions = ({
       {showChangeBackgroundIcons && renderAction("changeBackgroundColor")}
       {showFillIcons && renderAction("changeFillStyle")}
 
-      {(hasStroke(elementType) ||
-        targetElements.some((element) => hasStroke(element.type))) && (
+      {(hasStrokeWidth(elementType) ||
+        targetElements.some((element) => hasStrokeWidth(element.type))) &&
+        renderAction("changeStrokeWidth")}
+
+      {(elementType === "freedraw" ||
+        targetElements.some((element) => element.type === "freedraw")) &&
+        renderAction("changeStrokeShape")}
+
+      {(hasStrokeStyle(elementType) ||
+        targetElements.some((element) => hasStrokeStyle(element.type))) && (
         <>
-          {renderAction("changeStrokeWidth")}
           {renderAction("changeStrokeStyle")}
           {renderAction("changeSloppiness")}
         </>

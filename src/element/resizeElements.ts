@@ -18,7 +18,11 @@ import {
   getCommonBounds,
   getResizedElementAbsoluteCoords,
 } from "./bounds";
-import { isLinearElement, isTextElement } from "./typeChecks";
+import {
+  isFreeDrawElement,
+  isLinearElement,
+  isTextElement,
+} from "./typeChecks";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
 import { measureText, getFontString } from "../utils";
@@ -244,7 +248,7 @@ const rescalePointsInElement = (
   width: number,
   height: number,
 ) =>
-  isLinearElement(element)
+  isLinearElement(element) || isFreeDrawElement(element)
     ? {
         points: rescalePoints(
           0,
@@ -404,7 +408,7 @@ export const resizeSingleElement = (
     -stateAtResizeStart.angle,
   );
 
-  //Get bounds corners rendered on screen
+  // Get bounds corners rendered on screen
   const [esx1, esy1, esx2, esy2] = getResizedElementAbsoluteCoords(
     element,
     element.width,
@@ -644,11 +648,14 @@ const resizeMultipleElements = (
           font = { fontSize: nextFont.size, baseline: nextFont.baseline };
         }
         const origCoords = getElementAbsoluteCoords(element);
+
         const rescaledPoints = rescalePointsInElement(element, width, height);
+
         updateBoundElements(element, {
           newSize: { width, height },
           simultaneouslyUpdated: elements,
         });
+
         const finalCoords = getResizedElementAbsoluteCoords(
           {
             ...element,
@@ -657,6 +664,7 @@ const resizeMultipleElements = (
           width,
           height,
         );
+
         const { x, y } = getNextXY(element, origCoords, finalCoords);
         return [...prev, { width, height, x, y, ...rescaledPoints, ...font }];
       },

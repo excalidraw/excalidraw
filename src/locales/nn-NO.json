@@ -152,7 +152,7 @@
   },
   "toolBar": {
     "selection": "Vel",
-    "draw": "Frihandsteikning",
+    "freedraw": "Frihandsteikning",
     "rectangle": "Rektangel",
     "diamond": "Diamant",
     "ellipse": "Ellipse",

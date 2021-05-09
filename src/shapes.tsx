@@ -80,7 +80,7 @@ export const SHAPES = [
         ></path>
       </svg>
     ),
-    value: "draw",
+    value: "freedraw",
     key: KEYS.X,
   },
   {

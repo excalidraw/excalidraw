@@ -6280,7 +6280,7 @@ Object {
   "editingGroupId": null,
   "editingLinearElement": null,
   "elementLocked": false,
-  "elementType": "draw",
+  "elementType": "freedraw",
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
@@ -6596,8 +6596,6 @@ Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElementIds": null,
-  "endArrowhead": null,
-  "endBinding": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -6614,18 +6612,26 @@ Object {
       50,
       10,
     ],
+    Array [
+      50,
+      10,
+    ],
+  ],
+  "pressures": Array [
+    0,
+    0,
+    0,
   ],
   "roughness": 1,
   "seed": 941653321,
-  "startArrowhead": null,
-  "startBinding": null,
+  "simulatePressure": false,
   "strokeColor": "#000000",
   "strokeSharpness": "round",
   "strokeStyle": "solid",
   "strokeWidth": 1,
-  "type": "draw",
-  "version": 3,
-  "versionNonce": 1402203177,
+  "type": "freedraw",
+  "version": 4,
+  "versionNonce": 1359939303,
   "width": 50,
   "x": 550,
   "y": -10,
@@ -8246,8 +8252,6 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
-          "endArrowhead": null,
-          "endBinding": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -8264,18 +8268,26 @@ Object {
               50,
               10,
             ],
+            Array [
+              50,
+              10,
+            ],
+          ],
+          "pressures": Array [
+            0,
+            0,
+            0,
           ],
           "roughness": 1,
           "seed": 941653321,
-          "startArrowhead": null,
-          "startBinding": null,
+          "simulatePressure": false,
           "strokeColor": "#000000",
           "strokeSharpness": "round",
           "strokeStyle": "solid",
           "strokeWidth": 1,
-          "type": "draw",
-          "version": 3,
-          "versionNonce": 1402203177,
+          "type": "freedraw",
+          "version": 4,
+          "versionNonce": 1359939303,
           "width": 50,
           "x": 550,
           "y": -10,
@@ -10355,7 +10367,7 @@ exports[`regression tests key 6 selects line tool: [end of test] number of eleme
 
 exports[`regression tests key 6 selects line tool: [end of test] number of renders 1`] = `8`;
 
-exports[`regression tests key 7 selects draw tool: [end of test] appState 1`] = `
+exports[`regression tests key 7 selects freedraw tool: [end of test] appState 1`] = `
 Object {
   "collaborators": Map {},
   "currentChartType": "bar",
@@ -10379,7 +10391,7 @@ Object {
   "editingGroupId": null,
   "editingLinearElement": null,
   "elementLocked": false,
-  "elementType": "draw",
+  "elementType": "freedraw",
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
@@ -10434,13 +10446,11 @@ Object {
 }
 `;
 
-exports[`regression tests key 7 selects draw tool: [end of test] element 0 1`] = `
+exports[`regression tests key 7 selects freedraw tool: [end of test] element 0 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElementIds": null,
-  "endArrowhead": null,
-  "endBinding": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -10457,25 +10467,33 @@ Object {
       10,
       10,
     ],
+    Array [
+      10,
+      10,
+    ],
+  ],
+  "pressures": Array [
+    0,
+    0,
+    0,
   ],
   "roughness": 1,
   "seed": 337897,
-  "startArrowhead": null,
-  "startBinding": null,
+  "simulatePressure": false,
   "strokeColor": "#000000",
   "strokeSharpness": "round",
   "strokeStyle": "solid",
   "strokeWidth": 1,
-  "type": "draw",
-  "version": 3,
-  "versionNonce": 449462985,
+  "type": "freedraw",
+  "version": 4,
+  "versionNonce": 453191,
   "width": 10,
   "x": 10,
   "y": 10,
 }
 `;
 
-exports[`regression tests key 7 selects draw tool: [end of test] history 1`] = `
+exports[`regression tests key 7 selects freedraw tool: [end of test] history 1`] = `
 Object {
   "recording": false,
   "redoStack": Array [],
@@ -10505,8 +10523,6 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
-          "endArrowhead": null,
-          "endBinding": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -10523,18 +10539,26 @@ Object {
               10,
               10,
             ],
+            Array [
+              10,
+              10,
+            ],
+          ],
+          "pressures": Array [
+            0,
+            0,
+            0,
           ],
           "roughness": 1,
           "seed": 337897,
-          "startArrowhead": null,
-          "startBinding": null,
+          "simulatePressure": false,
           "strokeColor": "#000000",
           "strokeSharpness": "round",
           "strokeStyle": "solid",
           "strokeWidth": 1,
-          "type": "draw",
-          "version": 3,
-          "versionNonce": 449462985,
+          "type": "freedraw",
+          "version": 4,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -10545,9 +10569,9 @@ Object {
 }
 `;
 
-exports[`regression tests key 7 selects draw tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests key 7 selects freedraw tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests key 7 selects draw tool: [end of test] number of renders 1`] = `8`;
+exports[`regression tests key 7 selects freedraw tool: [end of test] number of renders 1`] = `8`;
 
 exports[`regression tests key a selects arrow tool: [end of test] appState 1`] = `
 Object {
@@ -11429,7 +11453,7 @@ exports[`regression tests key r selects rectangle tool: [end of test] number of 
 
 exports[`regression tests key r selects rectangle tool: [end of test] number of renders 1`] = `8`;
 
-exports[`regression tests key x selects draw tool: [end of test] appState 1`] = `
+exports[`regression tests key x selects freedraw tool: [end of test] appState 1`] = `
 Object {
   "collaborators": Map {},
   "currentChartType": "bar",
@@ -11453,7 +11477,7 @@ Object {
   "editingGroupId": null,
   "editingLinearElement": null,
   "elementLocked": false,
-  "elementType": "draw",
+  "elementType": "freedraw",
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
@@ -11508,13 +11532,11 @@ Object {
 }
 `;
 
-exports[`regression tests key x selects draw tool: [end of test] element 0 1`] = `
+exports[`regression tests key x selects freedraw tool: [end of test] element 0 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElementIds": null,
-  "endArrowhead": null,
-  "endBinding": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
   "height": 10,
@@ -11531,25 +11553,33 @@ Object {
       10,
       10,
     ],
+    Array [
+      10,
+      10,
+    ],
+  ],
+  "pressures": Array [
+    0,
+    0,
+    0,
   ],
   "roughness": 1,
   "seed": 337897,
-  "startArrowhead": null,
-  "startBinding": null,
+  "simulatePressure": false,
   "strokeColor": "#000000",
   "strokeSharpness": "round",
   "strokeStyle": "solid",
   "strokeWidth": 1,
-  "type": "draw",
-  "version": 3,
-  "versionNonce": 449462985,
+  "type": "freedraw",
+  "version": 4,
+  "versionNonce": 453191,
   "width": 10,
   "x": 10,
   "y": 10,
 }
 `;
 
-exports[`regression tests key x selects draw tool: [end of test] history 1`] = `
+exports[`regression tests key x selects freedraw tool: [end of test] history 1`] = `
 Object {
   "recording": false,
   "redoStack": Array [],
@@ -11579,8 +11609,6 @@ Object {
           "angle": 0,
           "backgroundColor": "transparent",
           "boundElementIds": null,
-          "endArrowhead": null,
-          "endBinding": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
           "height": 10,
@@ -11597,18 +11625,26 @@ Object {
               10,
               10,
             ],
+            Array [
+              10,
+              10,
+            ],
+          ],
+          "pressures": Array [
+            0,
+            0,
+            0,
           ],
           "roughness": 1,
           "seed": 337897,
-          "startArrowhead": null,
-          "startBinding": null,
+          "simulatePressure": false,
           "strokeColor": "#000000",
           "strokeSharpness": "round",
           "strokeStyle": "solid",
           "strokeWidth": 1,
-          "type": "draw",
-          "version": 3,
-          "versionNonce": 449462985,
+          "type": "freedraw",
+          "version": 4,
+          "versionNonce": 453191,
           "width": 10,
           "x": 10,
           "y": 10,
@@ -11619,9 +11655,9 @@ Object {
 }
 `;
 
-exports[`regression tests key x selects draw tool: [end of test] number of elements 1`] = `1`;
+exports[`regression tests key x selects freedraw tool: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests key x selects draw tool: [end of test] number of renders 1`] = `8`;
+exports[`regression tests key x selects freedraw tool: [end of test] number of renders 1`] = `8`;
 
 exports[`regression tests make a group and duplicate it: [end of test] appState 1`] = `
 Object {

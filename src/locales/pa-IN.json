@@ -152,7 +152,7 @@
   },
   "toolBar": {
     "selection": "ਚੋਣਕਾਰ",
-    "draw": "ਖੁੱਲ੍ਹੀ ਵਾਹੀ",
+    "freedraw": "ਖੁੱਲ੍ਹੀ ਵਾਹੀ",
     "rectangle": "ਆਇਤ",
     "diamond": "ਹੀਰਾ",
     "ellipse": "ਅੰਡਾਕਾਰ",

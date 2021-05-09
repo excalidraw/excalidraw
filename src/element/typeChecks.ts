@@ -4,6 +4,7 @@ import {
   ExcalidrawLinearElement,
   ExcalidrawBindableElement,
   ExcalidrawGenericElement,
+  ExcalidrawFreeDrawElement,
 } from "./types";
 
 export const isGenericElement = (
@@ -24,6 +25,18 @@ export const isTextElement = (
   return element != null && element.type === "text";
 };
 
+export const isFreeDrawElement = (
+  element?: ExcalidrawElement | null,
+): element is ExcalidrawFreeDrawElement => {
+  return element != null && isFreeDrawElementType(element.type);
+};
+
+export const isFreeDrawElementType = (
+  elementType: ExcalidrawElement["type"],
+): boolean => {
+  return elementType === "freedraw";
+};
+
 export const isLinearElement = (
   element?: ExcalidrawElement | null,
 ): element is ExcalidrawLinearElement => {
@@ -34,7 +47,7 @@ export const isLinearElementType = (
   elementType: ExcalidrawElement["type"],
 ): boolean => {
   return (
-    elementType === "arrow" || elementType === "line" || elementType === "draw"
+    elementType === "arrow" || elementType === "line" // || elementType === "freedraw"
   );
 };
 
@@ -69,7 +82,7 @@ export const isExcalidrawElement = (element: any): boolean => {
     element?.type === "rectangle" ||
     element?.type === "ellipse" ||
     element?.type === "arrow" ||
-    element?.type === "draw" ||
+    element?.type === "freedraw" ||
     element?.type === "line"
   );
 };

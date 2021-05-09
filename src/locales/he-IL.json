@@ -152,7 +152,7 @@
   },
   "toolBar": {
     "selection": "בחירה",
-    "draw": "ציור חופשי",
+    "freedraw": "ציור חופשי",
     "rectangle": "מרובע",
     "diamond": "מעוין",
     "ellipse": "אליפסה",

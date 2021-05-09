@@ -152,7 +152,7 @@
   },
   "toolBar": {
     "selection": "選取",
-    "draw": "繪圖",
+    "freedraw": "繪圖",
     "rectangle": "長方形",
     "diamond": "菱形",
     "ellipse": "橢圓",

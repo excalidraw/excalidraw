@@ -152,7 +152,7 @@
   },
   "toolBar": {
     "selection": "Valinta",
-    "draw": "Vapaa piirto",
+    "freedraw": "Vapaa piirto",
     "rectangle": "Suorakulmio",
     "diamond": "Vinoneliö",
     "ellipse": "Soikio",
