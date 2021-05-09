@@ -44,7 +44,6 @@
 
     // for modals, reset blurry bg
     background: var(--island-bg-color);
-    backdrop-filter: none;
 
     border: 1px solid var(--dialog-border-color);
     box-shadow: 0 2px 10px transparentize($oc-black, 0.75);

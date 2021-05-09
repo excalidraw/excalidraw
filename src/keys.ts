@@ -15,6 +15,7 @@ export const CODES = {
   QUOTE: "Quote",
   ZERO: "Digit0",
   C: "KeyC",
+  D: "KeyD",
   G: "KeyG",
   F: "KeyF",
   H: "KeyH",

@@ -161,6 +161,20 @@ const initializeScene = async (opts: {
   return null;
 };
 
+const PlusLinkJSX = (
+  <p style={{ direction: "ltr", unicodeBidi: "embed" }}>
+    Introducing Excalidraw+
+    <br />
+    <a
+      href="https://plus.excalidraw.com/?utm_source=excalidraw&utm_medium=banner&utm_campaign=launch"
+      target="_blank"
+      rel="noreferrer"
+    >
+      Try out now!
+    </a>
+  </p>
+);
+
 const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const currentLangCode = languageDetector.detect() || defaultLang.code;
@@ -290,6 +304,25 @@ const ExcalidrawWrapper = () => {
     }
   };
 
+  const renderTopRight = useCallback(
+    (isMobile: boolean, appState: AppState) => {
+      return (
+        <div
+          style={{
+            width: "24ch",
+            fontSize: "0.7em",
+            textAlign: "center",
+          }}
+        >
+          {/* <GitHubCorner theme={appState.theme} dir={document.dir} /> */}
+          {/* FIXME remove after 2021-05-20 */}
+          {PlusLinkJSX}
+        </div>
+      );
+    },
+    [],
+  );
+
   const renderFooter = useCallback(
     (isMobile: boolean) => {
       const renderLanguageList = () => (
@@ -303,11 +336,35 @@ const ExcalidrawWrapper = () => {
         />
       );
       if (isMobile) {
+        const isTinyDevice = window.innerWidth < 362;
         return (
-          <fieldset>
-            <legend>{t("labels.language")}</legend>
-            {renderLanguageList()}
-          </fieldset>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: isTinyDevice ? "column" : "row",
+            }}
+          >
+            <fieldset>
+              <legend>{t("labels.language")}</legend>
+              {renderLanguageList()}
+            </fieldset>
+            {/* FIXME remove after 2021-05-20 */}
+            <div
+              style={{
+                width: "24ch",
+                fontSize: "0.7em",
+                textAlign: "center",
+                marginTop: isTinyDevice ? 16 : undefined,
+                marginLeft: "auto",
+                marginRight: isTinyDevice ? "auto" : undefined,
+                padding: "4px 2px",
+                border: "1px dashed #aaa",
+                borderRadius: 12,
+              }}
+            >
+              {PlusLinkJSX}
+            </div>
+          </div>
         );
       }
       return renderLanguageList();
@@ -331,6 +388,7 @@ const ExcalidrawWrapper = () => {
     const serializedItems = JSON.stringify(items);
     localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY, serializedItems);
   };
+
   return (
     <>
       <Excalidraw
@@ -341,6 +399,7 @@ const ExcalidrawWrapper = () => {
         isCollaborating={collabAPI?.isCollaborating()}
         onPointerUpdate={collabAPI?.onPointerUpdate}
         onExportToBackend={onExportToBackend}
+        renderTopRight={renderTopRight}
         renderFooter={renderFooter}
         langCode={langCode}
         renderCustomStats={renderCustomStats}
