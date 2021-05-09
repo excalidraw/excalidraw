@@ -20,6 +20,10 @@
     "background": "Rèireplan",
     "fill": "Empliment",
     "strokeWidth": "Largor de contorn",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "Estil de contorn",
     "strokeStyle_solid": "Solide",
     "strokeStyle_dashed": "Tiret",
@@ -153,7 +157,6 @@
   },
   "toolBar": {
     "selection": "Seleccion",
-    "draw": "Dessenh liure",
     "rectangle": "Rectangle",
     "diamond": "Lausange",
     "ellipse": "Ellipsa",
