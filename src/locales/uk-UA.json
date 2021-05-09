@@ -20,6 +20,10 @@
     "background": "Тло",
     "fill": "Заповнити",
     "strokeWidth": "Товщина контуру",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "Стиль контуру",
     "strokeStyle_solid": "Суцільний",
     "strokeStyle_dashed": "Пунктир",
@@ -153,7 +157,6 @@
   },
   "toolBar": {
     "selection": "Виділення",
-    "draw": "Вільне креслення",
     "rectangle": "Прямокутник",
     "diamond": "Ромб",
     "ellipse": "Еліпс",
