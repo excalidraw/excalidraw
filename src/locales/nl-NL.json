@@ -20,6 +20,10 @@
     "background": "Achtergrond",
     "fill": "Invulling",
     "strokeWidth": "Lijnbreedte",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "Lijnstijl",
     "strokeStyle_solid": "Ononderbroken",
     "strokeStyle_dashed": "Gestreept",
@@ -153,7 +157,6 @@
   },
   "toolBar": {
     "selection": "Selectie",
-    "draw": "Vrij tekenen",
     "rectangle": "Rechthoek",
     "diamond": "Ruit",
     "ellipse": "Ovaal",
