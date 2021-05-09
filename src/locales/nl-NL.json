@@ -20,7 +20,7 @@
     "background": "Achtergrond",
     "fill": "Invulling",
     "strokeWidth": "Lijnbreedte",
-    "strokeShape": "",
+    "strokeShape": "Lijnstijl",
     "strokeShape_gel": "",
     "strokeShape_fountain": "",
     "strokeShape_brush": "",
