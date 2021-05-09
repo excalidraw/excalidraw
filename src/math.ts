@@ -249,6 +249,7 @@ const doSegmentsIntersect = (p1: Point, q1: Point, p2: Point, q2: Point) => {
   return false;
 };
 
+// TODO: Rounding this point causes some shake when free drawing
 export const getGridPoint = (
   x: number,
   y: number,

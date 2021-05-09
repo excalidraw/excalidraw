@@ -152,7 +152,7 @@
   },
   "toolBar": {
     "selection": "گزینش",
-    "draw": "طراحی آزاد",
+    "freedraw": "طراحی آزاد",
     "rectangle": "مستطیل",
     "diamond": "لوزی",
     "ellipse": "بیضی",

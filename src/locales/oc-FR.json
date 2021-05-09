@@ -152,7 +152,7 @@
   },
   "toolBar": {
     "selection": "Seleccion",
-    "draw": "Dessenh liure",
+    "freedraw": "Dessenh liure",
     "rectangle": "Rectangle",
     "diamond": "Lausange",
     "ellipse": "Ellipsa",

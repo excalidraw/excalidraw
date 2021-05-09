@@ -152,7 +152,7 @@
   },
   "toolBar": {
     "selection": "선택",
-    "draw": "자유롭게 그리기",
+    "freedraw": "자유롭게 그리기",
     "rectangle": "사각형",
     "diamond": "다이아몬드",
     "ellipse": "타원",
