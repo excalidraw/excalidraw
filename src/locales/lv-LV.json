@@ -20,6 +20,10 @@
     "background": "",
     "fill": "",
     "strokeWidth": "",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "",
     "strokeStyle_solid": "",
     "strokeStyle_dashed": "",
@@ -153,7 +157,6 @@
   },
   "toolBar": {
     "selection": "",
-    "draw": "",
     "rectangle": "",
     "diamond": "",
     "ellipse": "",
