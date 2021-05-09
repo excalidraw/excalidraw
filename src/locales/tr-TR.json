@@ -20,6 +20,10 @@
     "background": "Arka plan",
     "fill": "Doldur",
     "strokeWidth": "Kontur genişliği",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "Kontur stili",
     "strokeStyle_solid": "Dolu",
     "strokeStyle_dashed": "Kesik çizgili",
@@ -153,7 +157,6 @@
   },
   "toolBar": {
     "selection": "Seçme",
-    "draw": "Serbest çizim",
     "rectangle": "Dikdörtgen",
     "diamond": "Elmas",
     "ellipse": "Elips",
