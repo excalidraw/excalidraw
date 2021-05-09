@@ -1281,7 +1281,8 @@ class App extends React.Component<AppProps, AppState> {
     elements: readonly ExcalidrawElement[];
     position: { clientX: number; clientY: number } | "cursor" | "center";
   }) => {
-    const [minX, minY, maxX, maxY] = getCommonBounds(opts.elements);
+    const elements = restoreElements(opts.elements);
+    const [minX, minY, maxX, maxY] = getCommonBounds(elements);
 
     const elementsCenterX = distance(minX, maxX) / 2;
     const elementsCenterY = distance(minY, maxY) / 2;
@@ -1311,7 +1312,7 @@ class App extends React.Component<AppProps, AppState> {
     const [gridX, gridY] = getGridPoint(dx, dy, this.state.gridSize);
 
     const oldIdToDuplicatedId = new Map();
-    const newElements = opts.elements.map((element) => {
+    const newElements = elements.map((element) => {
       const newElement = duplicateElement(
         this.state.editingGroupId,
         groupIdMap,
@@ -1328,11 +1329,7 @@ class App extends React.Component<AppProps, AppState> {
       ...this.scene.getElementsIncludingDeleted(),
       ...newElements,
     ];
-    fixBindingsAfterDuplication(
-      nextElements,
-      opts.elements,
-      oldIdToDuplicatedId,
-    );
+    fixBindingsAfterDuplication(nextElements, elements, oldIdToDuplicatedId);
 
     this.scene.replaceAllElements(nextElements);
     this.history.resumeRecording();
