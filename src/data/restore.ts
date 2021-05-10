@@ -21,6 +21,20 @@ type RestoredAppState = Omit<
   "offsetTop" | "offsetLeft" | "width" | "height"
 >;
 
+export const AllowedExcalidrawElementTypes: Record<
+  ExcalidrawElement["type"],
+  true
+> = {
+  selection: true,
+  text: true,
+  rectangle: true,
+  diamond: true,
+  ellipse: true,
+  line: true,
+  arrow: true,
+  freedraw: true,
+};
+
 export type RestoredDataState = {
   elements: ExcalidrawElement[];
   appState: RestoredAppState;
@@ -107,7 +121,6 @@ const restoreElement = (
         pressures: element.pressures,
       });
     }
-    case "draw":
     case "line":
     case "arrow": {
       const {
@@ -116,7 +129,10 @@ const restoreElement = (
       } = element;
 
       return restoreElementWithProperties(element, {
-        type: element.type === "draw" ? "line" : element.type,
+        type:
+          (element.type as ExcalidrawElement["type"] | "draw") === "draw"
+            ? "line"
+            : element.type,
         startBinding: element.startBinding,
         endBinding: element.endBinding,
         points:
@@ -187,6 +203,9 @@ export const restoreAppState = (
 
   return {
     ...nextAppState,
+    elementType: AllowedExcalidrawElementTypes[nextAppState.elementType]
+      ? nextAppState.elementType
+      : "selection",
     // Migrates from previous version where appState.zoom was a number
     zoom:
       typeof appState.zoom === "number"

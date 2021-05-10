@@ -180,7 +180,6 @@ const hitTestPointAgainstElement = (args: HitTestArgs): boolean => {
     }
     case "arrow":
     case "line":
-    case "draw":
       return hitTestLinear(args);
     case "selection":
       console.warn(
