@@ -6,7 +6,8 @@ import { getShortcutKey } from "../utils";
 import "./HelpDialog.scss";
 
 const Header = () => (
-  <div className="HelpDialog--header">
+  <div></div>
+  /*  <div className="HelpDialog--header">
     <a
       className="HelpDialog--btn"
       href="https://github.com/excalidraw/excalidraw#documentation"
@@ -31,7 +32,7 @@ const Header = () => (
     >
       {t("helpDialog.github")}
     </a>
-  </div>
+  </div>  */
 );
 
 const Section = (props: { title: string; children: React.ReactNode }) => (

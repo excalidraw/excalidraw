@@ -166,7 +166,7 @@ export interface ExcalidrawProps {
   ) => void;
   initialData?: ImportedDataState | null | Promise<ImportedDataState | null>;
   excalidrawRef?: ForwardRef<ExcalidrawAPIRefValue>;
-  onCollabButtonClick?: () => void;
+  /* onCollabButtonClick?: () => void; */
   isCollaborating?: boolean;
   onPointerUpdate?: (payload: {
     pointer: { x: number; y: number };

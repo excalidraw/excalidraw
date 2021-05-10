@@ -450,7 +450,7 @@ class App extends React.Component<AppProps, AppState> {
     const { zenModeEnabled, viewModeEnabled } = this.state;
 
     const {
-      onCollabButtonClick,
+      /* onCollabButtonClick, */
       onExportToBackend,
       renderTopRight,
       renderFooter,
@@ -480,7 +480,7 @@ class App extends React.Component<AppProps, AppState> {
               setAppState={this.setAppState}
               actionManager={this.actionManager}
               elements={this.scene.getElements()}
-              onCollabButtonClick={onCollabButtonClick}
+              /* onCollabButtonClick={onCollabButtonClick} */
               onLockToggle={this.toggleLock}
               onInsertElements={(elements) =>
                 this.addElementsFromPasteOrLibrary({
