@@ -122,6 +122,9 @@ const restoreElement = (
       });
     }
     case "line":
+    // @ts-ignore LEGACY type
+    // eslint-disable-next-line no-fallthrough
+    case "draw":
     case "arrow": {
       const {
         startArrowhead = null,
