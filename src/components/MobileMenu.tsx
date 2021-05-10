@@ -11,7 +11,7 @@ import { HintViewer } from "./HintViewer";
 import { calculateScrollCenter } from "../scene";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { Section } from "./Section";
-import CollabButton from "./CollabButton";
+/* import CollabButton from "./CollabButton"; */
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 import { LockIcon } from "./LockIcon";
 import { UserList } from "./UserList";
@@ -24,7 +24,7 @@ type MobileMenuProps = {
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
   libraryMenu: JSX.Element | null;
-  onCollabButtonClick?: () => void;
+  /* onCollabButtonClick?: () => void; */
   onLockToggle: () => void;
   canvas: HTMLCanvasElement | null;
   isCollaborating: boolean;
@@ -40,7 +40,7 @@ export const MobileMenu = ({
   actionManager,
   exportButton,
   setAppState,
-  onCollabButtonClick,
+  /*   onCollabButtonClick, */
   onLockToggle,
   canvas,
   isCollaborating,
@@ -120,13 +120,13 @@ export const MobileMenu = ({
         {actionManager.renderAction("saveAsScene")}
         {exportButton}
         {actionManager.renderAction("clearCanvas")}
-        {onCollabButtonClick && (
+        {/* {onCollabButtonClick && (
           <CollabButton
             isCollaborating={isCollaborating}
             collaboratorCount={appState.collaborators.size}
             onClick={onCollabButtonClick}
           />
-        )}
+        )} */}
         {
           <BackgroundPickerAndDarkModeToggle
             actionManager={actionManager}
