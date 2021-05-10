@@ -14,6 +14,19 @@ yarn add @excalidraw/utils
 
 ## API
 
+### `serializeAsJSON`
+
+**_Signature_**
+
+<pre>
+serializeAsJSON({
+  elements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>,
+  appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L42">AppState</a>,
+}): string
+</pre>
+
+Takes the scene state and returns a JSON string. Deleted `elements` are removed from the resulting JSON, as well as most properties from `AppState` (see [`serializeAsJSON()`](https://github.com/excalidraw/excalidraw/blob/master/src/data/json.ts#L16) source for details).
+
 ### `exportToBlob` (async)
 
 Export an Excalidraw diagram to a [Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob).
