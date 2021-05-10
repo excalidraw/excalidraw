@@ -142,6 +142,8 @@
     "loadSceneOverridePrompt": "A betöltött külső rajz felül fogja írnia meglévőt. Szeretnéd folytatni?",
     "collabStopOverridePrompt": "",
     "errorLoadingLibrary": "Hibába ütközött a harmarmadik féltől származó könyvtár betöltése.",
+    "errorAddingToLibrary": "",
+    "errorRemovingFromLibrary": "",
     "confirmAddLibrary": "Ez a művelet {{numShapes}} formát fog hozzáadni a könyvtáradhoz. Biztos vagy benne?",
     "imageDoesNotContainScene": "Képek importálása egyelőre nem támogatott.\n\nEgy jelenetet szeretnél betölteni? Úgy tűnik ez a kép fájl nem tartalmazza a szükséges adatokat. Exportáláskor ezt egy külön opcióval lehet beállítani.",
     "cannotRestoreFromImage": "A jelenet visszaállítása nem sikerült ebből a kép fájlból",
@@ -150,7 +152,7 @@
   },
   "toolBar": {
     "selection": "Kijelölés",
-    "draw": "Szabadkézi rajz",
+    "freedraw": "Szabadkézi rajz",
     "rectangle": "Téglalap",
     "diamond": "Rombusz",
     "ellipse": "Ellipszis",

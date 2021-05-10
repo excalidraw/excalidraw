@@ -9,22 +9,25 @@ export const hasBackground = (type: string) =>
   type === "rectangle" ||
   type === "ellipse" ||
   type === "diamond" ||
-  type === "draw" ||
   type === "line";
 
-export const hasStroke = (type: string) =>
+export const hasStrokeWidth = (type: string) =>
+  type === "rectangle" ||
+  type === "ellipse" ||
+  type === "diamond" ||
+  type === "freedraw" ||
+  type === "arrow" ||
+  type === "line";
+
+export const hasStrokeStyle = (type: string) =>
   type === "rectangle" ||
   type === "ellipse" ||
   type === "diamond" ||
   type === "arrow" ||
-  type === "draw" ||
   type === "line";
 
 export const canChangeSharpness = (type: string) =>
-  type === "rectangle" ||
-  type === "arrow" ||
-  type === "draw" ||
-  type === "line";
+  type === "rectangle" || type === "arrow" || type === "line";
 
 export const hasText = (type: string) => type === "text";
 

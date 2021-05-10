@@ -142,6 +142,8 @@
     "loadSceneOverridePrompt": "بارگزاری یک طرح خارجی محتوای فعلی رو از بین میبرد. آیا میخواهید ادامه دهید؟",
     "collabStopOverridePrompt": "",
     "errorLoadingLibrary": "خطایی در بارگذاری کتابخانه ثالث وجود داشت.",
+    "errorAddingToLibrary": "",
+    "errorRemovingFromLibrary": "",
     "confirmAddLibrary": "{{numShapes}} از اشکال به کتابخانه شما اضافه خواهد شد. مطمئن هستید؟",
     "imageDoesNotContainScene": "وارد کردن تصویر در این لحظه امکان پذیر نمی باشد.\nآیا مایل به وارد کردن یک صحنه هستید؟ این تصویر به نظر می رسد که فاقد هرگونه اطلاعاتی مربوط به صحنه باشد. آیا این گزینه را در زمان وارد کردن تصویر فعال کرده اید؟",
     "cannotRestoreFromImage": "صحنه را نمی توان از این فایل تصویری بازیابی کرد",
@@ -150,7 +152,7 @@
   },
   "toolBar": {
     "selection": "گزینش",
-    "draw": "طراحی آزاد",
+    "freedraw": "طراحی آزاد",
     "rectangle": "مستطیل",
     "diamond": "لوزی",
     "ellipse": "بیضی",

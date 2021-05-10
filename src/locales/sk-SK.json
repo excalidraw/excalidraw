@@ -142,6 +142,8 @@
     "loadSceneOverridePrompt": "Nahratie externej kresby nahradí existujúci obsah. Prajete si pokračovať?",
     "collabStopOverridePrompt": "Ukončenie schôdze nahradí vašu predchádzajúcu lokálne uloženú scénu. Ste si istý?\n\n(Ak si chcete ponechať lokálnu scénu, jednoducho iba zavrite kartu prehliadača.)",
     "errorLoadingLibrary": "Nepodarilo sa načítať externú knižnicu.",
+    "errorAddingToLibrary": "Nepodarilo sa pridať položku do knižnice",
+    "errorRemovingFromLibrary": "Nepodarilo sa odstrániť položku z knižnice",
     "confirmAddLibrary": "Týmto sa pridá {{numShapes}} tvar(ov) do vašej knižnice. Ste si istí?",
     "imageDoesNotContainScene": "Importovanie obrázku v tomto momente nie je možné.\n\nChceli ste importovať scénu? Tento obrázok neobsahuje žiadne údaje scény. Povolili ste túto možnosť počas exportovania?",
     "cannotRestoreFromImage": "Nepodarilo sa obnoviť scénu z tohto obrázkového súboru",
@@ -150,7 +152,7 @@
   },
   "toolBar": {
     "selection": "Výber",
-    "draw": "Voľné kreslenie",
+    "freedraw": "Voľné kreslenie",
     "rectangle": "Obdĺžnik",
     "diamond": "Diamant",
     "ellipse": "Elipsa",

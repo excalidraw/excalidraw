@@ -142,6 +142,8 @@
     "loadSceneOverridePrompt": "Laddning av extern skiss kommer att ersätta ditt befintliga innehåll. Vill du fortsätta?",
     "collabStopOverridePrompt": "Att stoppa sessionen kommer att skriva över din föregående, lokalt lagrade skiss. Är du säker?\n\n(Om du vill behålla din lokala skiss, stäng bara webbläsarfliken istället.)",
     "errorLoadingLibrary": "Fel vid inläsning av tredjeparts bibliotek.",
+    "errorAddingToLibrary": "Kunde inte lägga till objekt i biblioteket",
+    "errorRemovingFromLibrary": "Kunde inte ta bort objekt från biblioteket",
     "confirmAddLibrary": "Detta kommer att lägga till {{numShapes}} form(er) till ditt bibliotek. Är du säker?",
     "imageDoesNotContainScene": "Importering av bilder stöds inte just nu.\n\nVill du importera en skiss? Den här bilden verkar inte innehålla någon skissdata. Har du aktiverat detta under export?",
     "cannotRestoreFromImage": "Skiss kunde inte återställas från denna bildfil",
@@ -150,7 +152,7 @@
   },
   "toolBar": {
     "selection": "Markering",
-    "draw": "Frihand",
+    "freedraw": "Frihand",
     "rectangle": "Rektangel",
     "diamond": "Diamant",
     "ellipse": "Ellips",

@@ -142,6 +142,8 @@
     "loadSceneOverridePrompt": "Si carregas aquest dibuix extern, substituirá el que tens. Vols continuar?",
     "collabStopOverridePrompt": "Aturar la sessió provocarà la sobreescriptura del dibuix previ, que hi ha desat en l'emmagatzematge local. N'esteu segur?\n\n(Si voleu conservar el dibuix local, tanqueu la pentanya del navegador en comptes d'aturar la sessió).",
     "errorLoadingLibrary": "S'ha produït un error en carregar la biblioteca de tercers.",
+    "errorAddingToLibrary": "",
+    "errorRemovingFromLibrary": "",
     "confirmAddLibrary": "Això afegirà {{numShapes}} forma(es) a la vostra biblioteca. Estàs segur?",
     "imageDoesNotContainScene": "En aquest moment no s’admet la importació d’imatges.\n\nVolies importar una escena? Sembla que aquesta imatge no conté cap dada d’escena. Ho has activat durant l'exportació?",
     "cannotRestoreFromImage": "L’escena no s’ha pogut restaurar des d’aquest fitxer d’imatge",
@@ -150,7 +152,7 @@
   },
   "toolBar": {
     "selection": "Selecció",
-    "draw": "Dibuix lliure",
+    "freedraw": "Dibuix lliure",
     "rectangle": "Rectangle",
     "diamond": "Rombe",
     "ellipse": "El·lipse",

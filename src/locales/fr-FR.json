@@ -142,6 +142,8 @@
     "loadSceneOverridePrompt": "Le chargement d'un dessin externe remplacera votre contenu actuel. Souhaitez-vous continuer ?",
     "collabStopOverridePrompt": "Arrêter la session écrasera votre précédent dessin stocké localement. Êtes-vous sûr·e ?\n\n(Si vous voulez garder votre dessin local, fermez simplement l'onglet du navigateur à la place.)",
     "errorLoadingLibrary": "Une erreur s'est produite lors du chargement de la bibliothèque tierce.",
+    "errorAddingToLibrary": "Impossible d'ajouter l'élément à la bibliothèque",
+    "errorRemovingFromLibrary": "Impossible de retirer l'élément de la bibliothèque",
     "confirmAddLibrary": "Cela va ajouter {{numShapes}} forme(s) à votre bibliothèque. Êtes-vous sûr·e ?",
     "imageDoesNotContainScene": "L'importation d'images n'est pas prise en charge pour le moment.\n\nVouliez-vous importer une scène ? Cette image ne semble pas contenir de données de scène. Avez-vous activé cette option lors de l'exportation ?",
     "cannotRestoreFromImage": "Impossible de restaurer la scène depuis ce fichier image",
@@ -150,7 +152,7 @@
   },
   "toolBar": {
     "selection": "Sélection",
-    "draw": "Dessin libre",
+    "freedraw": "Dessin libre",
     "rectangle": "Rectangle",
     "diamond": "Losange",
     "ellipse": "Ellipse",

@@ -20,6 +20,10 @@
     "background": "Background",
     "fill": "Fill",
     "strokeWidth": "Stroke width",
+    "strokeShape": "Stroke shape",
+    "strokeShape_gel": "Gel pen",
+    "strokeShape_fountain": "Fountain pen",
+    "strokeShape_brush": "Brush pen",
     "strokeStyle": "Stroke style",
     "strokeStyle_solid": "Solid",
     "strokeStyle_dashed": "Dashed",
@@ -96,7 +100,8 @@
     "flipVertical": "Flip vertical",
     "viewMode": "View mode",
     "toggleExportColorScheme": "Toggle export color scheme",
-    "share": "Share"
+    "share": "Share",
+    "toggleTheme": "Toggle theme"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
@@ -152,12 +157,12 @@
   },
   "toolBar": {
     "selection": "Selection",
-    "draw": "Free draw",
     "rectangle": "Rectangle",
     "diamond": "Diamond",
     "ellipse": "Ellipse",
     "arrow": "Arrow",
     "line": "Line",
+    "freedraw": "Draw",
     "text": "Text",
     "library": "Library",
     "lock": "Keep selected tool active after drawing"

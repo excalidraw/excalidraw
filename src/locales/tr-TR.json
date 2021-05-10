@@ -142,6 +142,8 @@
     "loadSceneOverridePrompt": "Harici çizimler yüklemek mevcut olan içeriği değiştirecektir. Devam etmek istiyor musunuz?",
     "collabStopOverridePrompt": "Oturumu sonlandırmak daha önceki, yerel olarak kaydedilmiş çizimin üzerine kaydedilmesine sebep olacak. Emin misiniz?\n\n(Yerel çiziminizi kaybetmemek için tarayıcı sekmesini kapatabilirsiniz.)",
     "errorLoadingLibrary": "Üçüncü taraf kitaplığı yüklerken bir hata oluştu.",
+    "errorAddingToLibrary": "Öğe kütüphaneye eklenemedi",
+    "errorRemovingFromLibrary": "Öğe kütüphaneden silinemedi",
     "confirmAddLibrary": "Bu, kitaplığınıza {{numShapes}} tane şekil ekleyecek. Emin misiniz?",
     "imageDoesNotContainScene": "Resim ekleme şuan için desteklenmiyor.\nBir sahneyi içeri aktarmak mı istediniz? Bu dosya herhangi bir sahne içeriyor gibi durmuyor. Çıktı alırken sahneyi dahil ettiniz mi?",
     "cannotRestoreFromImage": "Sahne bu dosyadan oluşturulamıyor",
@@ -150,7 +152,7 @@
   },
   "toolBar": {
     "selection": "Seçme",
-    "draw": "Serbest çizim",
+    "freedraw": "Serbest çizim",
     "rectangle": "Dikdörtgen",
     "diamond": "Elmas",
     "ellipse": "Elips",

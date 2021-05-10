@@ -142,6 +142,8 @@
     "loadSceneOverridePrompt": "Carregar um desenho externo substituirá o seu conteúdo existente. Deseja continuar?",
     "collabStopOverridePrompt": "Ao interromper a sessão irá substituir o último desenho guardado. Tem a certeza?\n\n(Caso queira manter o último desenho, simplesmente feche a janela do navegador.)",
     "errorLoadingLibrary": "Houve um erro ao carregar a biblioteca de terceiros.",
+    "errorAddingToLibrary": "",
+    "errorRemovingFromLibrary": "",
     "confirmAddLibrary": "Isso adicionará {{numShapes}} forma(s) à sua biblioteca. Tem certeza?",
     "imageDoesNotContainScene": "A importação de imagens não é suportada no momento.\n\nVocê deseja importar uma cena? Esta imagem parece não conter dados de cena. Você ativou isto durante a exportação?",
     "cannotRestoreFromImage": "Não foi possível restaurar a cena deste arquivo de imagem",
@@ -150,7 +152,7 @@
   },
   "toolBar": {
     "selection": "Seleção",
-    "draw": "Desenho livre",
+    "freedraw": "Desenho livre",
     "rectangle": "Retângulo",
     "diamond": "Losango",
     "ellipse": "Elipse",

@@ -142,6 +142,8 @@
     "loadSceneOverridePrompt": "लोड हो रहा है बाहरी ड्राइंग आपके मौजूदा सामग्री को बदल देगा। क्या आप जारी रखना चाहते हैं?",
     "collabStopOverridePrompt": "",
     "errorLoadingLibrary": "लाइब्रेरी लोड करने में त्रुटि",
+    "errorAddingToLibrary": "",
+    "errorRemovingFromLibrary": "",
     "confirmAddLibrary": "लाइब्रेरी जोड़ें पुष्‍टि करें आकार संख्या",
     "imageDoesNotContainScene": "दृश्य में छवि नहीं है",
     "cannotRestoreFromImage": "छवि फ़ाइल बहाल दृश्य नहीं है",
@@ -150,7 +152,7 @@
   },
   "toolBar": {
     "selection": "चयन",
-    "draw": "मुफ्त ड्रा",
+    "freedraw": "मुफ्त ड्रा",
     "rectangle": "आयात",
     "diamond": "तिर्यग्वर्ग",
     "ellipse": "दीर्घवृत्त",

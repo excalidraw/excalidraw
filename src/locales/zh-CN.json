@@ -142,6 +142,8 @@
     "loadSceneOverridePrompt": "加载外部绘图将取代您现有的内容。您想要继续吗？",
     "collabStopOverridePrompt": "停止会话将覆盖您先前本地存储的绘图。 您确定吗？\n\n(如果您想保持本地绘图，只需关闭浏览器选项卡。)",
     "errorLoadingLibrary": "加载第三方库时出错。",
+    "errorAddingToLibrary": "无法将项目添加到库中",
+    "errorRemovingFromLibrary": "无法从库中移除项目",
     "confirmAddLibrary": "这将添加 {{numShapes}} 个形状到您的库。您确定吗？",
     "imageDoesNotContainScene": "当前不支持导入图片。\n\n您想要导入画布数据吗？此图像似乎不包含任何画布数据。您是否在导出过程中启用了嵌入画布的选项？",
     "cannotRestoreFromImage": "无法从此图像文件恢复画布",
@@ -150,7 +152,7 @@
   },
   "toolBar": {
     "selection": "选择",
-    "draw": "自由书写",
+    "freedraw": "自由书写",
     "rectangle": "矩形",
     "diamond": "菱形",
     "ellipse": "椭圆",
@@ -231,7 +233,7 @@
   },
   "encrypted": {
     "tooltip": "您的绘图采用的端到端加密，其内容对于Excalidraw服务器是不可见的。",
-    "link": ""
+    "link": "Excalidraw 中关于端到端加密的博客"
   },
   "stats": {
     "angle": "角度",

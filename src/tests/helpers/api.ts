@@ -3,6 +3,7 @@ import {
   ExcalidrawGenericElement,
   ExcalidrawTextElement,
   ExcalidrawLinearElement,
+  ExcalidrawFreeDrawElement,
 } from "../../element/types";
 import { newElement, newTextElement, newLinearElement } from "../../element";
 import { DEFAULT_VERTICAL_ALIGN } from "../../constants";
@@ -12,6 +13,7 @@ import fs from "fs";
 import util from "util";
 import path from "path";
 import { getMimeType } from "../../data/blob";
+import { newFreeDrawElement } from "../../element/newElement";
 
 const readFile = util.promisify(fs.readFile);
 
@@ -81,8 +83,10 @@ export class API {
     verticalAlign?: T extends "text"
       ? ExcalidrawTextElement["verticalAlign"]
       : never;
-  }): T extends "arrow" | "line" | "draw"
+  }): T extends "arrow" | "line"
     ? ExcalidrawLinearElement
+    : T extends "freedraw"
+    ? ExcalidrawFreeDrawElement
     : T extends "text"
     ? ExcalidrawTextElement
     : ExcalidrawGenericElement => {
@@ -125,11 +129,17 @@ export class API {
           verticalAlign: rest.verticalAlign ?? DEFAULT_VERTICAL_ALIGN,
         });
         break;
+      case "freedraw":
+        element = newFreeDrawElement({
+          type: type as "freedraw",
+          simulatePressure: true,
+          ...base,
+        });
+        break;
       case "arrow":
       case "line":
-      case "draw":
         element = newLinearElement({
-          type: type as "arrow" | "line" | "draw",
+          type: type as "arrow" | "line",
           startArrowhead: null,
           endArrowhead: null,
           ...base,

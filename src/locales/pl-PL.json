@@ -142,6 +142,8 @@
     "loadSceneOverridePrompt": "Wczytanie zewnętrznego rysunku zastąpi istniejącą zawartość. Czy chcesz kontynuować?",
     "collabStopOverridePrompt": "Zatrzymanie sesji nadpisze poprzedni, zapisany lokalnie rysunk. Jesteś pewien?\n\n(Jeśli chcesz zachować swój lokalny rysunek, po prostu zamknij zakładkę przeglądarki.)",
     "errorLoadingLibrary": "Wystąpił błąd podczas wczytywania zewnętrznej biblioteki.",
+    "errorAddingToLibrary": "",
+    "errorRemovingFromLibrary": "",
     "confirmAddLibrary": "To doda {{numShapes}} kształtów do twojej biblioteki. Jesteś pewien?",
     "imageDoesNotContainScene": "Importowanie zdjęć nie jest obecnie obsługiwane.\n\nCzy chciałeś zaimportować scenę? Ten obraz nie zawiera żadnych danych sceny. Czy włączyłeś to podczas eksportowania?",
     "cannotRestoreFromImage": "Scena nie mogła zostać przywrócona z pliku obrazu",
@@ -150,7 +152,7 @@
   },
   "toolBar": {
     "selection": "Zaznaczenie",
-    "draw": "Swobodne rysowanie",
+    "freedraw": "Swobodne rysowanie",
     "rectangle": "Prostokąt",
     "diamond": "Romb",
     "ellipse": "Elipsa",

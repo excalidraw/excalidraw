@@ -142,6 +142,8 @@
     "loadSceneOverridePrompt": "外部図面を読み込むと、既存のコンテンツが置き換わります。続行しますか？",
     "collabStopOverridePrompt": "セッションを停止すると、ローカルに保存されている図が上書きされます。 本当によろしいですか？\n\n(ローカルの図を保持したい場合は、セッションを停止せずにブラウザタブを閉じてください。)",
     "errorLoadingLibrary": "サードパーティライブラリの読み込み中にエラーが発生しました。",
+    "errorAddingToLibrary": "",
+    "errorRemovingFromLibrary": "",
     "confirmAddLibrary": "{{numShapes}} 個の図形をライブラリに追加します。よろしいですか？",
     "imageDoesNotContainScene": "現在、画像のインポートはサポートされていません。\n\nシーンをインポートしようとしましたか？この画像にはシーンデータが含まれていないようです。エクスポート中に有効にしていましたか？",
     "cannotRestoreFromImage": "このイメージファイルからシーンを復元できませんでした",
@@ -150,7 +152,7 @@
   },
   "toolBar": {
     "selection": "選択",
-    "draw": "手書き",
+    "freedraw": "手書き",
     "rectangle": "矩形",
     "diamond": "ひし形",
     "ellipse": "楕円",

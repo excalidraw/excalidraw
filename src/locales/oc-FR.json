@@ -142,6 +142,8 @@
     "loadSceneOverridePrompt": "Cargar un dessenh extèrn remplaçarà vòstre contengut existent. Volètz contunhar ?",
     "collabStopOverridePrompt": "Arrestar la session remplaçarà vòstre precedent dessenh gardat localament. O volètz vertadièrament ?\n\n(Se volètz gardar vòstre dessenh local, tampatz simplament l’onglet del navegador a la plaça)",
     "errorLoadingLibrary": "Una error s’es producha en cargant una bibliotèca tèrça.",
+    "errorAddingToLibrary": "Apondon impossible de l’element a la bibliotèca",
+    "errorRemovingFromLibrary": "Supression impossibla de l’element a la bibliotèca",
     "confirmAddLibrary": "Apondrà {{numShapes}} forma(s) a vòstra bibliotèca. Confirmatz ?",
     "imageDoesNotContainScene": "L’importacion d’imatge es pas encara presa en carga pel moment.\n\nVoliatz importar una scèna ? Aqueste imatge sembla pas conténer cap de donada de scèna. Aviatz activar aquò pendent l’export ?",
     "cannotRestoreFromImage": "Restauracion impossibla de la scèna a partir del fichièr imatge",
@@ -150,7 +152,7 @@
   },
   "toolBar": {
     "selection": "Seleccion",
-    "draw": "Dessenh liure",
+    "freedraw": "Dessenh liure",
     "rectangle": "Rectangle",
     "diamond": "Lausange",
     "ellipse": "Ellipsa",

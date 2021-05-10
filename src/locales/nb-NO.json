@@ -142,6 +142,8 @@
     "loadSceneOverridePrompt": "Å laste inn ekstern tegning vil erstatte det eksisterende innholdet. Ønsker du å fortsette?",
     "collabStopOverridePrompt": "Hvis du slutter økten, overskrives din forrige, lokalt lagrede tegning. Er du sikker?\n\n(Hvis du ønsker å beholde din lokale tegning, bare lukk nettleserfanen i stedet.)",
     "errorLoadingLibrary": "Det oppstod en feil under lasting av tredjepartsbiblioteket.",
+    "errorAddingToLibrary": "Kunne ikke legge element i biblioteket",
+    "errorRemovingFromLibrary": "Kunne ikke fjerne element fra biblioteket",
     "confirmAddLibrary": "Dette vil legge til {{numShapes}} figur(er) i biblioteket ditt. Er du sikker?",
     "imageDoesNotContainScene": "Importering av bilder støttes ikke for øyeblikket.\n\nVil du importere en scene? Dette bildet ser ikke ut til å inneholde noen scene-data. Har du aktivert dette under eksporten?",
     "cannotRestoreFromImage": "Scenen kunne ikke gjenopprettes fra denne bildefilen",
@@ -150,7 +152,7 @@
   },
   "toolBar": {
     "selection": "Velg",
-    "draw": "Frihåndstegning",
+    "freedraw": "Frihåndstegning",
     "rectangle": "Rektangel",
     "diamond": "Diamant",
     "ellipse": "Ellipse",

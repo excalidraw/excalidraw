@@ -142,6 +142,8 @@
     "loadSceneOverridePrompt": "Asali n wunuɣ uffiɣ ad isemselsi agbur-inek (m) yellan. Tebɣiḍ ad tkemmeleḍ?",
     "collabStopOverridePrompt": "Aḥbas n tɣimit ad yesefsex unuɣ-inek (m) yettwaḥerzen yakan s wudem adigan. Tetḥeqqeḍ?\n(Ma tebɣiḍ ad teǧǧeḍ unuɣ-inek (m) adigan, mdel iccer n yiminig, deg umḍiq.)",
     "errorLoadingLibrary": "Teḍra-d tuccḍa deg usali n temkarḍit n wis kraḍ.",
+    "errorAddingToLibrary": "Ulamek ara yettwarnu uferdis ɣer temkarḍit",
+    "errorRemovingFromLibrary": "Ulamek ara yettwakkes uferdis si temkarḍit",
     "confirmAddLibrary": "Ayagi adirnu talɣa (win) {{numShapes}} ɣer temkarḍit-inek (m). Tetḥeqqeḍ?",
     "imageDoesNotContainScene": "Taktert n tugniwin ur tettwadhel ara akka tura.\nTebɣiḍ ad tketreḍ asayes? Tugna-agi tettban-d ur tegbir ara isefka n usnas. Tesremdeḍ ayagi deg usifeḍ?",
     "cannotRestoreFromImage": "Asayes ulamek ara d-yettwarr seg ufaylu-agi n tugna",
@@ -150,7 +152,7 @@
   },
   "toolBar": {
     "selection": "Tafrayt",
-    "draw": "Unuɣ ilelli",
+    "freedraw": "Unuɣ ilelli",
     "rectangle": "Asrem",
     "diamond": "Ameɣṛun",
     "ellipse": "Taglayt",
