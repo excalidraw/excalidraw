@@ -229,7 +229,10 @@ export const getShapeForElement = (element: ExcalidrawElement) =>
 export const invalidateShapeForElement = (element: ExcalidrawElement) =>
   shapeCache.delete(element);
 
-export const generateRoughOptions = (element: ExcalidrawElement): Options => {
+export const generateRoughOptions = (
+  element: ExcalidrawElement,
+  continuousPath = false,
+): Options => {
   const options: Options = {
     seed: element.seed,
     strokeLineDash:
@@ -254,6 +257,7 @@ export const generateRoughOptions = (element: ExcalidrawElement): Options => {
     hachureGap: element.strokeWidth * 4,
     roughness: element.roughness,
     stroke: element.strokeColor,
+    preserveVertices: continuousPath,
   };
 
   switch (element.type) {
@@ -316,7 +320,7 @@ const generateElementShape = (
             } Q ${w} ${h}, ${w - r} ${h} L ${r} ${h} Q 0 ${h}, 0 ${
               h - r
             } L 0 ${r} Q 0 0, ${r} 0`,
-            generateRoughOptions(element),
+            generateRoughOptions(element, true),
           );
         } else {
           shape = generator.rectangle(
