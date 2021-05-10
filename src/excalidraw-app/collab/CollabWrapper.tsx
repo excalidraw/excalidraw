@@ -59,7 +59,7 @@ export interface CollabAPI {
   userState: CollabState["userState"];
   onPointerUpdate: CollabInstance["onPointerUpdate"];
   initializeSocketClient: CollabInstance["initializeSocketClient"];
-  onCollabButtonClick: CollabInstance["onCollabButtonClick"];
+  /* onCollabButtonClick: CollabInstance["onCollabButtonClick"]; */
   broadcastElements: CollabInstance["broadcastElements"];
 }
 
@@ -598,11 +598,11 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     saveUsernameToLocalStorage(username);
   };
 
-  onCollabButtonClick = () => {
+  /* onCollabButtonClick = () => {
     this.setState({
       modalIsShown: true,
     });
-  };
+  }; */
 
   getSyncableElements = (elements: readonly ExcalidrawElement[]) =>
     elements.filter((el) => el.isDeleted || !isInvisiblySmallElement(el));
@@ -620,7 +620,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     this.contextValue.username = this.state.username;
     this.contextValue.onPointerUpdate = this.onPointerUpdate;
     this.contextValue.initializeSocketClient = this.initializeSocketClient;
-    this.contextValue.onCollabButtonClick = this.onCollabButtonClick;
+    /* this.contextValue.onCollabButtonClick = this.onCollabButtonClick; */
     this.contextValue.broadcastElements = this.broadcastElements;
     return this.contextValue;
   };

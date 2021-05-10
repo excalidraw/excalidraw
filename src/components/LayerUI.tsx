@@ -26,7 +26,7 @@ import {
 import { muteFSAbortError } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher, ZoomActions } from "./Actions";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
-import CollabButton from "./CollabButton";
+/* import CollabButton from "./CollabButton"; */
 import { ErrorDialog } from "./ErrorDialog";
 import { ExportCB, ExportDialog } from "./ExportDialog";
 import { FixedSideContainer } from "./FixedSideContainer";
@@ -53,7 +53,7 @@ interface LayerUIProps {
   canvas: HTMLCanvasElement | null;
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
-  onCollabButtonClick?: () => void;
+  /* onCollabButtonClick?: () => void; */
   onLockToggle: () => void;
   onInsertElements: (elements: readonly NonDeletedExcalidrawElement[]) => void;
   zenModeEnabled: boolean;
@@ -362,7 +362,7 @@ const LayerUI = ({
   setAppState,
   canvas,
   elements,
-  onCollabButtonClick,
+  /* onCollabButtonClick, */
   onLockToggle,
   onInsertElements,
   zenModeEnabled,
@@ -482,13 +482,13 @@ const LayerUI = ({
             {actionManager.renderAction("saveAsScene")}
             {renderExportDialog()}
             {actionManager.renderAction("clearCanvas")}
-            {onCollabButtonClick && (
+            {/* {onCollabButtonClick && (
               <CollabButton
                 isCollaborating={isCollaborating}
                 collaboratorCount={appState.collaborators.size}
                 onClick={onCollabButtonClick}
               />
-            )}
+            )} */}
           </Stack.Row>
           <BackgroundPickerAndDarkModeToggle
             actionManager={actionManager}
@@ -718,7 +718,7 @@ const LayerUI = ({
         libraryMenu={libraryMenu}
         exportButton={renderExportDialog()}
         setAppState={setAppState}
-        onCollabButtonClick={onCollabButtonClick}
+        /* onCollabButtonClick={onCollabButtonClick} */
         onLockToggle={onLockToggle}
         canvas={canvas}
         isCollaborating={isCollaborating}

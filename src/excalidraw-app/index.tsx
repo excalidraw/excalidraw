@@ -162,7 +162,8 @@ const initializeScene = async (opts: {
 };
 
 const PlusLinkJSX = (
-  <p style={{ direction: "ltr", unicodeBidi: "embed" }}>
+  <p></p>
+  /*  <p style={{ direction: "ltr", unicodeBidi: "embed" }}>
     Introducing Excalidraw+
     <br />
     <a
@@ -172,7 +173,7 @@ const PlusLinkJSX = (
     >
       Try out now!
     </a>
-  </p>
+  </p> */
 );
 
 const ExcalidrawWrapper = () => {
@@ -395,7 +396,7 @@ const ExcalidrawWrapper = () => {
         ref={excalidrawRefCallback}
         onChange={onChange}
         initialData={initialStatePromiseRef.current.promise}
-        onCollabButtonClick={collabAPI?.onCollabButtonClick}
+        /* onCollabButtonClick={collabAPI?.onCollabButtonClick} */
         isCollaborating={collabAPI?.isCollaborating()}
         onPointerUpdate={collabAPI?.onPointerUpdate}
         onExportToBackend={onExportToBackend}

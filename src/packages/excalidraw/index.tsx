@@ -16,7 +16,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     onChange,
     initialData,
     excalidrawRef,
-    onCollabButtonClick,
+    /* onCollabButtonClick, */
     isCollaborating,
     onPointerUpdate,
     onExportToBackend,
@@ -69,7 +69,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
         onChange={onChange}
         initialData={initialData}
         excalidrawRef={excalidrawRef}
-        onCollabButtonClick={onCollabButtonClick}
+        /* onCollabButtonClick={onCollabButtonClick} */
         isCollaborating={isCollaborating}
         onPointerUpdate={onPointerUpdate}
         onExportToBackend={onExportToBackend}
