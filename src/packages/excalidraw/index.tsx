@@ -127,3 +127,4 @@ export {
   exportToBlob,
   exportToSvg,
 } from "../../packages/utils";
+export { serializeAsJSON } from "../../data/json";

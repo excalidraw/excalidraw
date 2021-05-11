@@ -716,6 +716,19 @@ import { restore } from "@excalidraw/excalidraw";
 
 This function makes sure elements and state is set to appropriate values and set to default value if not present. It is combination of [restoreElements](#restoreElements) and [restoreAppState](#restoreAppState)
 
+#### `serializeAsJSON`
+
+**_Signature_**
+
+<pre>
+serializeAsJSON({
+  elements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>,
+  appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L42">AppState</a>,
+}): string
+</pre>
+
+Takes the scene elements and state and returns a JSON string. Deleted `elements`as well as most properties from `AppState` are removed from the resulting JSON. (see [`serializeAsJSON()`](https://github.com/excalidraw/excalidraw/blob/master/src/data/json.ts#L16) source for details).
+
 ### Export utilities
 
 #### `exportToCanvas`
@@ -780,7 +793,7 @@ exportToSvg({
   appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L42">AppState</a>,
   exportPadding?: number,
   metadata?: string,
-}
+})
 </pre>
 
 | Name | Type | Default | Description |
