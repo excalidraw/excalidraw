@@ -97,3 +97,5 @@ export const exportToSvg = ({
     metadata,
   });
 };
+
+export { serializeAsJSON } from "../data/json";
