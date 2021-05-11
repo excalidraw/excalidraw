@@ -152,7 +152,7 @@
   },
   "toolBar": {
     "selection": "Seçme",
-    "draw": "Serbest çizim",
+    "freedraw": "Serbest çizim",
     "rectangle": "Dikdörtgen",
     "diamond": "Elmas",
     "ellipse": "Elips",

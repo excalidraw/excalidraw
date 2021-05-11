@@ -213,14 +213,14 @@ export class UI {
       height?: number;
       angle?: number;
     } = {},
-  ): (T extends "arrow" | "line" | "draw"
+  ): (T extends "arrow" | "line" | "freedraw"
     ? ExcalidrawLinearElement
     : T extends "text"
     ? ExcalidrawTextElement
     : ExcalidrawElement) & {
     /** Returns the actual, current element from the elements array, instead
         of the proxy */
-    get(): T extends "arrow" | "line" | "draw"
+    get(): T extends "arrow" | "line" | "freedraw"
       ? ExcalidrawLinearElement
       : T extends "text"
       ? ExcalidrawTextElement

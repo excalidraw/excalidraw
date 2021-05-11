@@ -52,6 +52,7 @@ export type ActionName =
   | "changeBackgroundColor"
   | "changeFillStyle"
   | "changeStrokeWidth"
+  | "changeStrokeShape"
   | "changeSloppiness"
   | "changeStrokeStyle"
   | "changeArrowhead"
@@ -98,7 +99,8 @@ export type ActionName =
   | "flipHorizontal"
   | "flipVertical"
   | "viewMode"
-  | "exportWithDarkMode";
+  | "exportWithDarkMode"
+  | "toggleTheme";
 
 export interface Action {
   name: ActionName;

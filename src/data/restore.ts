@@ -21,6 +21,20 @@ type RestoredAppState = Omit<
   "offsetTop" | "offsetLeft" | "width" | "height"
 >;
 
+export const AllowedExcalidrawElementTypes: Record<
+  ExcalidrawElement["type"],
+  true
+> = {
+  selection: true,
+  text: true,
+  rectangle: true,
+  diamond: true,
+  ellipse: true,
+  line: true,
+  arrow: true,
+  freedraw: true,
+};
+
 export type RestoredDataState = {
   elements: ExcalidrawElement[];
   appState: RestoredAppState;
@@ -37,10 +51,12 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamily => {
 
 const restoreElementWithProperties = <T extends ExcalidrawElement>(
   element: Required<T>,
-  extra: Omit<Required<T>, keyof ExcalidrawElement>,
+  extra: Omit<Required<T>, keyof ExcalidrawElement> & {
+    type?: ExcalidrawElement["type"];
+  },
 ): T => {
   const base: Pick<T, keyof ExcalidrawElement> = {
-    type: element.type,
+    type: extra.type || element.type,
     // all elements must have version > 0 so getSceneVersion() will pick up
     // newly added elements
     version: element.version || 1,
@@ -97,8 +113,18 @@ const restoreElement = (
         textAlign: element.textAlign || DEFAULT_TEXT_ALIGN,
         verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,
       });
-    case "draw":
+    case "freedraw": {
+      return restoreElementWithProperties(element, {
+        points: element.points,
+        lastCommittedPoint: null,
+        simulatePressure: element.simulatePressure,
+        pressures: element.pressures,
+      });
+    }
     case "line":
+    // @ts-ignore LEGACY type
+    // eslint-disable-next-line no-fallthrough
+    case "draw":
     case "arrow": {
       const {
         startArrowhead = null,
@@ -106,6 +132,10 @@ const restoreElement = (
       } = element;
 
       return restoreElementWithProperties(element, {
+        type:
+          (element.type as ExcalidrawElement["type"] | "draw") === "draw"
+            ? "line"
+            : element.type,
         startBinding: element.startBinding,
         endBinding: element.endBinding,
         points:
@@ -176,6 +206,9 @@ export const restoreAppState = (
 
   return {
     ...nextAppState,
+    elementType: AllowedExcalidrawElementTypes[nextAppState.elementType]
+      ? nextAppState.elementType
+      : "selection",
     // Migrates from previous version where appState.zoom was a number
     zoom:
       typeof appState.zoom === "number"

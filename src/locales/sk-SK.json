@@ -152,7 +152,7 @@
   },
   "toolBar": {
     "selection": "Výber",
-    "draw": "Voľné kreslenie",
+    "freedraw": "Voľné kreslenie",
     "rectangle": "Obdĺžnik",
     "diamond": "Diamant",
     "ellipse": "Elipsa",

@@ -16,6 +16,7 @@ export const CODES = {
   ZERO: "Digit0",
   SLASH: "Slash",
   C: "KeyC",
+  D: "KeyD",
   G: "KeyG",
   F: "KeyF",
   H: "KeyH",

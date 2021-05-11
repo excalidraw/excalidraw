@@ -23,7 +23,7 @@ const getHints = ({ appState, elements }: Hint) => {
     return t("hints.linearElementMulti");
   }
 
-  if (elementType === "draw") {
+  if (elementType === "freedraw") {
     return t("hints.freeDraw");
   }
 
