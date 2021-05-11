@@ -44,7 +44,7 @@ import { HelpDialog } from "./HelpDialog";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { Tooltip } from "./Tooltip";
-import { UserList } from "./UserList";
+/* import { UserList } from "./UserList"; */
 import Library from "../data/library";
 
 interface LayerUIProps {
@@ -613,7 +613,7 @@ const LayerUI = ({
               },
             )}
           >
-            <UserList>
+            {/* <UserList>
               {appState.collaborators.size > 0 &&
                 Array.from(appState.collaborators)
                   // Collaborator is either not initialized or is actually the current user.
@@ -626,7 +626,7 @@ const LayerUI = ({
                       {actionManager.renderAction("goToCollaborator", clientId)}
                     </Tooltip>
                   ))}
-            </UserList>
+            </UserList> */}
             {renderTopRight?.(isMobile, appState)}
           </div>
         </div>

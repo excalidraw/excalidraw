@@ -29,7 +29,7 @@ import { useCallbackRefState } from "../hooks/useCallbackRefState";
 import { Language, t } from "../i18n";
 import Excalidraw, {
   defaultLang,
-  languages,
+  /* languages, */
 } from "../packages/excalidraw/index";
 import { AppState, LibraryItems } from "../types";
 import {
@@ -44,7 +44,7 @@ import CollabWrapper, {
   CollabContext,
   CollabContextConsumer,
 } from "./collab/CollabWrapper";
-import { LanguageList } from "./components/LanguageList";
+/* import { LanguageList } from "./components/LanguageList"; */
 import { exportToBackend, getCollaborationLinkData, loadScene } from "./data";
 import {
   importFromLocalStorage,
@@ -179,7 +179,7 @@ const PlusLinkJSX = (
 const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const currentLangCode = languageDetector.detect() || defaultLang.code;
-  const [langCode, setLangCode] = useState(currentLangCode);
+  const [langCode /* , setLangCode */] = useState(currentLangCode);
 
   // initial state
   // ---------------------------------------------------------------------------
@@ -324,7 +324,7 @@ const ExcalidrawWrapper = () => {
     [],
   );
 
-  const renderFooter = useCallback(
+  /*   const renderFooter = useCallback(
     (isMobile: boolean) => {
       const renderLanguageList = () => (
         <LanguageList
@@ -349,7 +349,6 @@ const ExcalidrawWrapper = () => {
               <legend>{t("labels.language")}</legend>
               {renderLanguageList()}
             </fieldset>
-            {/* FIXME remove after 2021-05-20 */}
             <div
               style={{
                 width: "24ch",
@@ -371,7 +370,7 @@ const ExcalidrawWrapper = () => {
       return renderLanguageList();
     },
     [langCode],
-  );
+  ); */
 
   const renderCustomStats = () => {
     return (
@@ -401,7 +400,7 @@ const ExcalidrawWrapper = () => {
         onPointerUpdate={collabAPI?.onPointerUpdate}
         onExportToBackend={onExportToBackend}
         renderTopRight={renderTopRight}
-        renderFooter={renderFooter}
+        /* renderFooter={renderFooter} */
         langCode={langCode}
         renderCustomStats={renderCustomStats}
         detectScroll={false}
