@@ -708,7 +708,7 @@ export const renderElementToSvg = (
       );
       const path = svgRoot.ownerDocument!.createElementNS(SVG_NS, "path");
       node.setAttribute("stroke", "none");
-      node.setAttribute("fill", element.strokeStyle);
+      node.setAttribute("fill", element.strokeColor);
       path.setAttribute("d", getFreeDrawSvgPath(element));
       node.appendChild(path);
       svgRoot.appendChild(node);
