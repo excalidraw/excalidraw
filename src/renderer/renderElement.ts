@@ -623,6 +623,22 @@ export const renderElement = (
   }
 };
 
+const roughSVGDrawWithPrecision = (
+  rsvg: RoughSVG,
+  drawable: Drawable,
+  precision?: number,
+) => {
+  if (typeof precision === "undefined") {
+    return rsvg.draw(drawable);
+  }
+  const pshape: Drawable = {
+    sets: drawable.sets,
+    shape: drawable.shape,
+    options: { ...drawable.options, fixedDecimalPlaceDigits: precision },
+  };
+  return rsvg.draw(pshape);
+};
+
 export const renderElementToSvg = (
   element: NonDeletedExcalidrawElement,
   rsvg: RoughSVG,
@@ -645,7 +661,11 @@ export const renderElementToSvg = (
     case "diamond":
     case "ellipse": {
       generateElementShape(element, generator);
-      const node = rsvg.draw(getShapeForElement(element) as Drawable);
+      const node = roughSVGDrawWithPrecision(
+        rsvg,
+        getShapeForElement(element) as Drawable,
+        2,
+      );
       const opacity = element.opacity / 100;
       if (opacity !== 1) {
         node.setAttribute("stroke-opacity", `${opacity}`);
@@ -669,7 +689,7 @@ export const renderElementToSvg = (
       group.setAttribute("stroke-linecap", "round");
 
       (getShapeForElement(element) as Drawable[]).forEach((shape) => {
-        const node = rsvg.draw(shape);
+        const node = roughSVGDrawWithPrecision(rsvg, shape, 2);
         if (opacity !== 1) {
           node.setAttribute("stroke-opacity", `${opacity}`);
           node.setAttribute("fill-opacity", `${opacity}`);
