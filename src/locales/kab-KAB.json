@@ -23,7 +23,7 @@
     "strokeShape": "",
     "strokeShape_gel": "",
     "strokeShape_fountain": "",
-    "strokeShape_brush": "",
+    "strokeShape_brush": "Amfezzu",
     "strokeStyle": "Aɣanib n tizirig",
     "strokeStyle_solid": "Aččuran",
     "strokeStyle_dashed": "S tjerriḍin",
@@ -101,7 +101,7 @@
     "viewMode": "Askar n tmuɣli",
     "toggleExportColorScheme": "Sermed/sens asifeḍ usentel n yini",
     "share": "Bḍu",
-    "toggleTheme": ""
+    "toggleTheme": "Snifel asentel"
   },
   "buttons": {
     "clearReset": "Ales awennez n teɣzut n usuneɣ",
@@ -162,7 +162,7 @@
     "ellipse": "Taglayt",
     "arrow": "Taneccabt",
     "line": "Izirig",
-    "freedraw": "",
+    "freedraw": "Suneɣ",
     "text": "Aḍris",
     "library": "Tamkarḍit",
     "lock": "Eǧǧ afecku n tefrayt yermed mbaɛd asuneɣ"
