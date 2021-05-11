@@ -33,6 +33,7 @@ import rough from "roughjs/bin/rough";
 import { Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
 import getFreeDrawShape from "perfect-freehand";
+import { MAX_DECIMALS_FOR_SVG_EXPORT } from "../constants";
 
 const defaultAppState = getDefaultAppState();
 
@@ -664,7 +665,7 @@ export const renderElementToSvg = (
       const node = roughSVGDrawWithPrecision(
         rsvg,
         getShapeForElement(element) as Drawable,
-        2,
+        MAX_DECIMALS_FOR_SVG_EXPORT,
       );
       const opacity = element.opacity / 100;
       if (opacity !== 1) {
@@ -689,7 +690,11 @@ export const renderElementToSvg = (
       group.setAttribute("stroke-linecap", "round");
 
       (getShapeForElement(element) as Drawable[]).forEach((shape) => {
-        const node = roughSVGDrawWithPrecision(rsvg, shape, 2);
+        const node = roughSVGDrawWithPrecision(
+          rsvg,
+          shape,
+          MAX_DECIMALS_FOR_SVG_EXPORT,
+        );
         if (opacity !== 1) {
           node.setAttribute("stroke-opacity", `${opacity}`);
           node.setAttribute("fill-opacity", `${opacity}`);
