@@ -218,13 +218,25 @@ export const getArrowheadPoints = (
     dot: 15,
   }[arrowhead]; // pixels (will differ for each arrowhead)
 
-  const [cx, cy] = element.points[element.points.length - 1];
-  const [px, py] =
-    element.points.length > 1
-      ? element.points[element.points.length - 2]
-      : [0, 0];
+  let length = 0;
 
-  const length = Math.hypot(cx - px, cy - py);
+  if (arrowhead === "arrow") {
+    // Length for -> arrows is based on the length of the last section
+    const [cx, cy] = element.points[element.points.length - 1];
+    const [px, py] =
+      element.points.length > 1
+        ? element.points[element.points.length - 2]
+        : [0, 0];
+
+    length = Math.hypot(cx - px, cy - py);
+  } else {
+    // Length for other arrowhead types is based on the total length of the line
+    for (let i = 0; i < element.points.length; i++) {
+      const [px, py] = element.points[i - 1] || [0, 0];
+      const [cx, cy] = element.points[i];
+      length += Math.hypot(cx - px, cy - py);
+    }
+  }
 
   // Scale down the arrowhead until we hit a certain size so that it doesn't look weird.
   // This value is selected by minimizing a minimum size with the last segment of the arrowhead
