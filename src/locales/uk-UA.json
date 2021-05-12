@@ -20,10 +20,10 @@
     "background": "Тло",
     "fill": "Заповнити",
     "strokeWidth": "Товщина контуру",
-    "strokeShape": "",
-    "strokeShape_gel": "",
-    "strokeShape_fountain": "",
-    "strokeShape_brush": "",
+    "strokeShape": "Форма обведення",
+    "strokeShape_gel": "Гельручка",
+    "strokeShape_fountain": "Перо",
+    "strokeShape_brush": "Пензель",
     "strokeStyle": "Стиль контуру",
     "strokeStyle_solid": "Суцільний",
     "strokeStyle_dashed": "Пунктир",
@@ -101,7 +101,7 @@
     "viewMode": "Режим перегляду",
     "toggleExportColorScheme": "Переключити колірну схему експорту",
     "share": "Поділитися",
-    "toggleTheme": ""
+    "toggleTheme": "Перемкнути тему"
   },
   "buttons": {
     "clearReset": "Очистити полотно",
@@ -162,7 +162,7 @@
     "ellipse": "Еліпс",
     "arrow": "Стрілка",
     "line": "Лінія",
-    "freedraw": "",
+    "freedraw": "Малювати",
     "text": "Текст",
     "library": "Бібліотека",
     "lock": "Залишити обраний інструмент після креслення"
