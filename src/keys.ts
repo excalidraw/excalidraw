@@ -14,6 +14,7 @@ export const CODES = {
   NINE: "Digit9",
   QUOTE: "Quote",
   ZERO: "Digit0",
+  SLASH: "Slash",
   C: "KeyC",
   D: "KeyD",
   G: "KeyG",
