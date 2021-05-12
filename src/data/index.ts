@@ -18,7 +18,6 @@ export const exportCanvas = async (
   type: ExportType,
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
-  canvas: HTMLCanvasElement,
   {
     exportBackground,
     exportPadding = 10,
@@ -77,10 +76,7 @@ export const exportCanvas = async (
   tempCanvas.style.display = "none";
   document.body.appendChild(tempCanvas);
   let blob = await canvasToBlob(tempCanvas);
-  // clean up the DOM
-  if (tempCanvas !== canvas) {
-    tempCanvas.remove();
-  }
+  tempCanvas.remove();
 
   if (type === "png") {
     const fileName = `${name}.png`;
