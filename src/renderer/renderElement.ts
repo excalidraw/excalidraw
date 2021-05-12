@@ -33,6 +33,7 @@ import rough from "roughjs/bin/rough";
 import { Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
 import getFreeDrawShape from "perfect-freehand";
+import { MAX_DECIMALS_FOR_SVG_EXPORT } from "../constants";
 
 const defaultAppState = getDefaultAppState();
 
@@ -142,7 +143,6 @@ const drawElementOnCanvas = (
       break;
     }
     case "arrow":
-    case "draw":
     case "line": {
       context.lineJoin = "round";
       context.lineCap = "round";
@@ -229,7 +229,10 @@ export const getShapeForElement = (element: ExcalidrawElement) =>
 export const invalidateShapeForElement = (element: ExcalidrawElement) =>
   shapeCache.delete(element);
 
-export const generateRoughOptions = (element: ExcalidrawElement): Options => {
+export const generateRoughOptions = (
+  element: ExcalidrawElement,
+  continuousPath = false,
+): Options => {
   const options: Options = {
     seed: element.seed,
     strokeLineDash:
@@ -254,6 +257,7 @@ export const generateRoughOptions = (element: ExcalidrawElement): Options => {
     hachureGap: element.strokeWidth * 4,
     roughness: element.roughness,
     stroke: element.strokeColor,
+    preserveVertices: continuousPath,
   };
 
   switch (element.type) {
@@ -270,7 +274,6 @@ export const generateRoughOptions = (element: ExcalidrawElement): Options => {
       }
       return options;
     }
-    case "draw":
     case "line": {
       if (isPathALoop(element.points)) {
         options.fillStyle = element.fillStyle;
@@ -316,7 +319,7 @@ const generateElementShape = (
             } Q ${w} ${h}, ${w - r} ${h} L ${r} ${h} Q 0 ${h}, 0 ${
               h - r
             } L 0 ${r} Q 0 0, ${r} 0`,
-            generateRoughOptions(element),
+            generateRoughOptions(element, true),
           );
         } else {
           shape = generator.rectangle(
@@ -359,7 +362,6 @@ const generateElementShape = (
           generateRoughOptions(element),
         );
         break;
-      case "draw":
       case "line":
       case "arrow": {
         const options = generateRoughOptions(element);
@@ -589,7 +591,6 @@ export const renderElement = (
     case "rectangle":
     case "diamond":
     case "ellipse":
-    case "draw":
     case "line":
     case "arrow":
     case "text": {
@@ -623,6 +624,22 @@ export const renderElement = (
   }
 };
 
+const roughSVGDrawWithPrecision = (
+  rsvg: RoughSVG,
+  drawable: Drawable,
+  precision?: number,
+) => {
+  if (typeof precision === "undefined") {
+    return rsvg.draw(drawable);
+  }
+  const pshape: Drawable = {
+    sets: drawable.sets,
+    shape: drawable.shape,
+    options: { ...drawable.options, fixedDecimalPlaceDigits: precision },
+  };
+  return rsvg.draw(pshape);
+};
+
 export const renderElementToSvg = (
   element: NonDeletedExcalidrawElement,
   rsvg: RoughSVG,
@@ -645,7 +662,11 @@ export const renderElementToSvg = (
     case "diamond":
     case "ellipse": {
       generateElementShape(element, generator);
-      const node = rsvg.draw(getShapeForElement(element) as Drawable);
+      const node = roughSVGDrawWithPrecision(
+        rsvg,
+        getShapeForElement(element) as Drawable,
+        MAX_DECIMALS_FOR_SVG_EXPORT,
+      );
       const opacity = element.opacity / 100;
       if (opacity !== 1) {
         node.setAttribute("stroke-opacity", `${opacity}`);
@@ -661,7 +682,6 @@ export const renderElementToSvg = (
       svgRoot.appendChild(node);
       break;
     }
-    case "draw":
     case "line":
     case "arrow": {
       generateElementShape(element, generator);
@@ -670,7 +690,11 @@ export const renderElementToSvg = (
       group.setAttribute("stroke-linecap", "round");
 
       (getShapeForElement(element) as Drawable[]).forEach((shape) => {
-        const node = rsvg.draw(shape);
+        const node = roughSVGDrawWithPrecision(
+          rsvg,
+          shape,
+          MAX_DECIMALS_FOR_SVG_EXPORT,
+        );
         if (opacity !== 1) {
           node.setAttribute("stroke-opacity", `${opacity}`);
           node.setAttribute("fill-opacity", `${opacity}`);
@@ -709,7 +733,7 @@ export const renderElementToSvg = (
       );
       const path = svgRoot.ownerDocument!.createElementNS(SVG_NS, "path");
       node.setAttribute("stroke", "none");
-      node.setAttribute("fill", element.strokeStyle);
+      node.setAttribute("fill", element.strokeColor);
       path.setAttribute("d", getFreeDrawSvgPath(element));
       node.appendChild(path);
       svgRoot.appendChild(node);
