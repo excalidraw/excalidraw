@@ -1463,10 +1463,10 @@ class App extends React.Component<AppProps, AppState> {
       this.history.resumeRecording();
     }
 
-    // currently we only support syncing background color
-    if (sceneData.appState?.viewBackgroundColor) {
+    if (sceneData.appState) {
       this.setState({
-        viewBackgroundColor: sceneData.appState.viewBackgroundColor,
+        ...this.state,
+        ...sceneData.appState,
       });
     }
 
