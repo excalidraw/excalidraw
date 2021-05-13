@@ -452,7 +452,7 @@ class App extends React.Component<AppProps, AppState> {
     const {
       onCollabButtonClick,
       onExportToBackend,
-      renderTopRight,
+      renderTopRightUI,
       renderFooter,
       renderCustomStats,
     } = this.props;
@@ -493,7 +493,7 @@ class App extends React.Component<AppProps, AppState> {
               langCode={getLanguage().code}
               isCollaborating={this.props.isCollaborating || false}
               onExportToBackend={onExportToBackend}
-              renderTopRight={renderTopRight}
+              renderTopRightUI={renderTopRightUI}
               renderCustomFooter={renderFooter}
               viewModeEnabled={viewModeEnabled}
               showExitZenModeBtn={
