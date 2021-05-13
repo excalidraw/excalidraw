@@ -21,9 +21,9 @@
     "fill": "填充",
     "strokeWidth": "描边宽度",
     "strokeShape": "",
-    "strokeShape_gel": "",
+    "strokeShape_gel": "中性笔",
     "strokeShape_fountain": "钢笔",
-    "strokeShape_brush": "",
+    "strokeShape_brush": "墨笔",
     "strokeStyle": "描边 (样式)",
     "strokeStyle_solid": "实线",
     "strokeStyle_dashed": "虚线",
@@ -101,7 +101,7 @@
     "viewMode": "查看模式",
     "toggleExportColorScheme": "切换导出配色方案",
     "share": "分享",
-    "toggleTheme": ""
+    "toggleTheme": "切换主题"
   },
   "buttons": {
     "clearReset": "重置画布",
