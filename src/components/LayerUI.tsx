@@ -67,7 +67,7 @@ interface LayerUIProps {
     appState: AppState,
     canvas: HTMLCanvasElement | null,
   ) => void;
-  renderTopRight?: (isMobile: boolean, appState: AppState) => JSX.Element;
+  renderTopRightUI?: (isMobile: boolean, appState: AppState) => JSX.Element;
   renderCustomFooter?: (isMobile: boolean) => JSX.Element;
   viewModeEnabled: boolean;
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
@@ -371,7 +371,7 @@ const LayerUI = ({
   toggleZenMode,
   isCollaborating,
   onExportToBackend,
-  renderTopRight,
+  renderTopRightUI,
   renderCustomFooter,
   viewModeEnabled,
   libraryReturnUrl,
@@ -627,7 +627,7 @@ const LayerUI = ({
                     </Tooltip>
                   ))}
             </UserList>
-            {renderTopRight?.(isMobile, appState)}
+            {renderTopRightUI?.(isMobile, appState)}
           </div>
         </div>
       </FixedSideContainer>

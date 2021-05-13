@@ -182,7 +182,7 @@ export interface ExcalidrawProps {
     data: ClipboardData,
     event: ClipboardEvent | null,
   ) => Promise<boolean> | boolean;
-  renderTopRight?: (isMobile: boolean, appState: AppState) => JSX.Element;
+  renderTopRightUI?: (isMobile: boolean, appState: AppState) => JSX.Element;
   renderFooter?: (isMobile: boolean) => JSX.Element;
   langCode?: Language["code"];
   viewModeEnabled?: boolean;

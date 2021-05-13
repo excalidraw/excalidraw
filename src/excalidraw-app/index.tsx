@@ -304,7 +304,7 @@ const ExcalidrawWrapper = () => {
     }
   };
 
-  const renderTopRight = useCallback(
+  const renderTopRightUI = useCallback(
     (isMobile: boolean, appState: AppState) => {
       return (
         <div
@@ -399,7 +399,7 @@ const ExcalidrawWrapper = () => {
         isCollaborating={collabAPI?.isCollaborating()}
         onPointerUpdate={collabAPI?.onPointerUpdate}
         onExportToBackend={onExportToBackend}
-        renderTopRight={renderTopRight}
+        renderTopRightUI={renderTopRightUI}
         renderFooter={renderFooter}
         langCode={langCode}
         renderCustomStats={renderCustomStats}
