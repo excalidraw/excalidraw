@@ -50,7 +50,6 @@ export const actionCopyAsSvg = register({
           ? selectedElements
           : getNonDeletedElements(elements),
         appState,
-        app.canvas,
         appState,
       );
       return {
@@ -89,7 +88,6 @@ export const actionCopyAsPng = register({
           ? selectedElements
           : getNonDeletedElements(elements),
         appState,
-        app.canvas,
         appState,
       );
       return {
