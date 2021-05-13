@@ -18,7 +18,9 @@ Please add the latest change on the top under the correct section.
 ### Features
 
 - Expose [`serializeAsJSON`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#serializeAsJSON) helper that we use when saving Excalidraw scene to a file [#3538](https://github.com/excalidraw/excalidraw/pull/3538).
-- Add support to render custom UI in the top right corner via [`renderTopRightUI`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#renderTopRightUI) prop. Earlier this prop was named `renderTopRight` [#3539](https://github.com/excalidraw/excalidraw/pull/3539) & later renamed to `renderTopRightUi` [#3572](https://github.com/excalidraw/excalidraw/pull/3572).
+- Add support to render custom UI in the top right corner via [`renderTopRightUI`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#renderTopRightUI) prop.
+
+  Earlier this prop was named `renderTopRight` in [#3539](https://github.com/excalidraw/excalidraw/pull/3539) & later renamed to `renderTopRightUI` in [#3572](https://github.com/excalidraw/excalidraw/pull/3572).
 
   This also removes the GitHub icon, keeping it local to the https://excalidraw.com app.
 
