@@ -7,6 +7,7 @@ import "../components/ToolIcon.scss";
 import { Tooltip } from "../components/Tooltip";
 import { DarkModeToggle, Appearence } from "../components/DarkModeToggle";
 import { loadFromJSON, saveAsJSON } from "../data";
+import { resaveAsImageWithScene } from "../data/resave";
 import { t } from "../i18n";
 import { useIsMobile } from "../components/App";
 import { KEYS } from "../keys";
@@ -128,8 +129,13 @@ export const actionSaveToActiveFile = register({
   name: "saveToActiveFile",
   perform: async (elements, appState, value) => {
     const fileHandleExists = !!appState.fileHandle;
+
     try {
-      const { fileHandle } = await saveAsJSON(elements, appState);
+      const { fileHandle } =
+        fileHandleExists && appState.saveType != null
+          ? await resaveAsImageWithScene(elements, appState)
+          : await saveAsJSON(elements, appState);
+
       return {
         commitToHistory: false,
         appState: {
