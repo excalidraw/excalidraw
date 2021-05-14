@@ -338,6 +338,7 @@
     cursor: default;
     pointer-events: none !important;
     z-index: 100;
+    width: 100%;
 
     :root[dir="ltr"] & {
       left: 0.25rem;
