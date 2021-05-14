@@ -51,7 +51,7 @@ import {
   saveToLocalStorage,
 } from "./data/localStorage";
 import CustomStats from "./CustomStats";
-import { RestoredDataState } from "../data/restore";
+import { restoreAppState, RestoredDataState } from "../data/restore";
 
 const languageDetector = new LanguageDetector();
 languageDetector.init({
@@ -239,7 +239,10 @@ const ExcalidrawWrapper = () => {
       } else {
         initializeScene({ collabAPI }).then((scene) => {
           if (scene) {
-            excalidrawAPI.updateScene(scene);
+            excalidrawAPI.updateScene({
+              ...scene,
+              appState: restoreAppState(scene.appState, null),
+            });
           }
         });
       }
