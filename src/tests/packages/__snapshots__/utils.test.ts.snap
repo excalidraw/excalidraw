@@ -29,6 +29,7 @@ Object {
   "exportBackground": true,
   "exportEmbedScene": false,
   "exportPadding": undefined,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,

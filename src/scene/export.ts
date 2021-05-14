@@ -16,11 +16,9 @@ export const exportToCanvas = (
     exportBackground,
     exportPadding = 10,
     viewBackgroundColor,
-    scale = 1,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
-    scale?: number;
     viewBackgroundColor: string;
   },
   createCanvas: (
@@ -28,17 +26,17 @@ export const exportToCanvas = (
     height: number,
   ) => { canvas: HTMLCanvasElement; scale: number } = (width, height) => {
     const tempCanvas = document.createElement("canvas");
-    tempCanvas.width = width * scale;
-    tempCanvas.height = height * scale;
-    return { canvas: tempCanvas, scale };
+    tempCanvas.width = width * appState.exportScale;
+    tempCanvas.height = height * appState.exportScale;
+    return { canvas: tempCanvas, scale: appState.exportScale };
   },
 ) => {
   const [minX, minY, width, height] = getCanvasSize(elements, exportPadding);
 
-  const { canvas: tempCanvas, scale: newScale = scale } = createCanvas(
-    width,
-    height,
-  );
+  const {
+    canvas: tempCanvas,
+    scale: newScale = appState.exportScale,
+  } = createCanvas(width, height);
 
   renderScene(
     elements,
@@ -77,12 +75,12 @@ export const exportToSvg = (
     exportPadding = 10,
     viewBackgroundColor,
     exportWithDarkMode,
-    scale = 1,
+    exportScale = 1,
     metadata = "",
   }: {
     exportBackground: boolean;
     exportPadding?: number;
-    scale?: number;
+    exportScale?: number;
     viewBackgroundColor: string;
     exportWithDarkMode?: boolean;
     metadata?: string;
@@ -95,8 +93,8 @@ export const exportToSvg = (
   svgRoot.setAttribute("version", "1.1");
   svgRoot.setAttribute("xmlns", SVG_NS);
   svgRoot.setAttribute("viewBox", `0 0 ${width} ${height}`);
-  svgRoot.setAttribute("width", `${width * scale}`);
-  svgRoot.setAttribute("height", `${height * scale}`);
+  svgRoot.setAttribute("width", `${width * exportScale}`);
+  svgRoot.setAttribute("height", `${height * exportScale}`);
   if (exportWithDarkMode) {
     svgRoot.setAttribute("filter", THEME_FILTER);
   }

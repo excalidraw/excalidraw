@@ -8,6 +8,11 @@ import { t } from "./i18n";
 import { AppState, NormalizedZoomValue } from "./types";
 import { getDateTime } from "./utils";
 
+export const EXPORT_SCALES = [1, 2, 3];
+const defaultExportScale = EXPORT_SCALES.includes(devicePixelRatio)
+  ? devicePixelRatio
+  : 1;
+
 export const getDefaultAppState = (): Omit<
   AppState,
   "offsetTop" | "offsetLeft" | "width" | "height"
@@ -39,6 +44,7 @@ export const getDefaultAppState = (): Omit<
     elementType: "selection",
     errorMessage: null,
     exportBackground: true,
+    exportScale: defaultExportScale,
     exportEmbedScene: false,
     exportWithDarkMode: false,
     fileHandle: null,
@@ -116,6 +122,7 @@ const APP_STATE_STORAGE_CONF = (<
   errorMessage: { browser: false, export: false },
   exportBackground: { browser: true, export: false },
   exportEmbedScene: { browser: true, export: false },
+  exportScale: { browser: true, export: true },
   exportWithDarkMode: { browser: true, export: false },
   fileHandle: { browser: false, export: false },
   gridSize: { browser: true, export: true },

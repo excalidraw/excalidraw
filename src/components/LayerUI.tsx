@@ -412,13 +412,11 @@ const LayerUI = ({
 
     const createExporter = (type: ExportType): ExportCB => async (
       exportedElements,
-      scale,
     ) => {
       await exportCanvas(type, exportedElements, appState, {
         exportBackground: appState.exportBackground,
         name: appState.name,
         viewBackgroundColor: appState.viewBackgroundColor,
-        scale,
       })
         .catch(muteFSAbortError)
         .catch((error) => {
