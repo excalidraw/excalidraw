@@ -52,7 +52,6 @@ import {
 } from "./data/localStorage";
 import CustomStats from "./CustomStats";
 import { restoreAppState, RestoredDataState } from "../data/restore";
-import clsx from "clsx";
 import { Tooltip } from "../components/Tooltip";
 import { shield } from "../components/icons";
 
@@ -335,9 +334,7 @@ const ExcalidrawWrapper = () => {
     (isMobile: boolean, appState: AppState) => {
       const renderEncryptedIcon = () => (
         <a
-          className={clsx("encrypted-icon tooltip zen-mode-visibility", {
-            "zen-mode-visibility--hidden": appState.zenModeEnabled,
-          })}
+          className="encrypted-icon tooltip"
           href="https://blog.excalidraw.com/end-to-end-encryption/"
           target="_blank"
           rel="noopener noreferrer"

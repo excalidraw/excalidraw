@@ -618,44 +618,57 @@ const LayerUI = ({
 
   const renderBottomAppMenu = () => {
     return (
-      <footer role="contentinfo" className="layer-ui__wrapper__footer">
-        <div className="App-menu App-menu_bottom zen-mode-transition">
-          <div
-            className={clsx("zen-mode-transition", {
-              "App-menu_bottom--transition-left": zenModeEnabled,
-            })}
-          >
-            <Stack.Col gap={2}>
-              <Section heading="canvasActions">
-                <Island padding={1}>
-                  <ZoomActions
-                    renderAction={actionManager.renderAction}
-                    zoom={appState.zoom}
-                  />
-                </Island>
-              </Section>
-            </Stack.Col>
-          </div>
-          <div
-            className={clsx(
-              "zen-mode-transition layer-ui__wrapper__footer-right",
-              {
-                "transition-right disable-pointerEvents": zenModeEnabled,
-              },
-            )}
-          >
-            {renderCustomFooter?.(false, appState)}
-            {actionManager.renderAction("toggleShortcuts")}
-          </div>
-          <button
-            className={clsx("disable-zen-mode", {
-              "disable-zen-mode--visible": showExitZenModeBtn,
-            })}
-            onClick={toggleZenMode}
-          >
-            {t("buttons.exitZenMode")}
-          </button>
+      <footer
+        role="contentinfo"
+        className="layer-ui__wrapper__footer App-menu App-menu_bottom"
+      >
+        <div
+          className={clsx(
+            "layer-ui__wrapper__footer-left zen-mode-transition",
+            {
+              "layer-ui__wrapper__footer-left--transition-left": zenModeEnabled,
+            },
+          )}
+        >
+          <Stack.Col gap={2}>
+            <Section heading="canvasActions">
+              <Island padding={1}>
+                <ZoomActions
+                  renderAction={actionManager.renderAction}
+                  zoom={appState.zoom}
+                />
+              </Island>
+            </Section>
+          </Stack.Col>
         </div>
+        <div
+          className={clsx(
+            "layer-ui__wrapper__footer-center zen-mode-transition",
+            {
+              "layer-ui__wrapper__footer-left--transition-bottom": zenModeEnabled,
+            },
+          )}
+        >
+          {renderCustomFooter?.(false, appState)}
+        </div>
+        <div
+          className={clsx(
+            "layer-ui__wrapper__footer-right zen-mode-transition",
+            {
+              "transition-right disable-pointerEvents": zenModeEnabled,
+            },
+          )}
+        >
+          {actionManager.renderAction("toggleShortcuts")}
+        </div>
+        <button
+          className={clsx("disable-zen-mode", {
+            "disable-zen-mode--visible": showExitZenModeBtn,
+          })}
+          onClick={toggleZenMode}
+        >
+          {t("buttons.exitZenMode")}
+        </button>
       </footer>
     );
   };
