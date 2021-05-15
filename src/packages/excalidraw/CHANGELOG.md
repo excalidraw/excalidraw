@@ -15,6 +15,8 @@ Please add the latest change on the top under the correct section.
 
 ## Excalidraw API
 
+**_These section lists the updates which may affect your integration, so it is recommended to go through this when upgrading the version_**
+
 ### Features
 
 - Support updating any `appState` properties in [`updateScene`](https://github.com/excalidraw/excalidraw/blob/master/src/components/App.tsx#L282) API. Earlier only `appState.viewBackgroundColor` was supported, now any attribute can be updated with this API.
@@ -30,6 +32,8 @@ Please add the latest change on the top under the correct section.
   Now `appState` is also passed to [`renderFooter`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#renderFooter) prop.
 
 ## Excalidraw Library
+
+**_These section lists the updates made to the excalidraw library and will not affect the integration_**
 
 ### Features
 
