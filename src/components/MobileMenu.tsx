@@ -62,7 +62,6 @@ export const MobileMenu = ({
                       canvas={canvas}
                       elementType={appState.elementType}
                       setAppState={setAppState}
-                      isLibraryOpen={appState.isLibraryOpen}
                     />
                   </Stack.Row>
                 </Island>
