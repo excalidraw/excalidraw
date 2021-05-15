@@ -42,7 +42,6 @@ Please add the latest change on the top under the correct section.
 ### Fixes
 
 - Exporting freedraw with color to svg [#3565](https://github.com/excalidraw/excalidraw/pull/3565).
-- No migrating `draw` lines correctly
 - Handle render errors [#3557](https://github.com/excalidraw/excalidraw/pull/3557).
 - Restore on paste or lib import [#3558](https://github.com/excalidraw/excalidraw/pull/3558).
 - Improve mobile user experience [#3508](https://github.com/excalidraw/excalidraw/pull/3508).
