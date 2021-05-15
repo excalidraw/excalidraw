@@ -331,7 +331,7 @@ const ExcalidrawWrapper = () => {
   );
 
   const renderFooter = useCallback(
-    (isMobile: boolean, appState: AppState) => {
+    (isMobile: boolean) => {
       const renderEncryptedIcon = () => (
         <a
           className="encrypted-icon tooltip"
