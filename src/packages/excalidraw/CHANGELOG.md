@@ -15,7 +15,7 @@ Please add the latest change on the top under the correct section.
 
 ## Excalidraw API
 
-**_These section lists the updates which may affect your integration, so it is recommended to go through this when upgrading the version_**
+**_These section lists the updates which may affect your integration, so it is recommended to go through this when upgrading the version._**
 
 ### Features
 
@@ -33,7 +33,7 @@ Please add the latest change on the top under the correct section.
 
 ## Excalidraw Library
 
-**_These section lists the updates made to the excalidraw library and will not affect the integration_**
+**_These section lists the updates made to the excalidraw library and will not affect the integration._**
 
 ### Features
 
