@@ -28,7 +28,7 @@ type MobileMenuProps = {
   onLockToggle: () => void;
   canvas: HTMLCanvasElement | null;
   isCollaborating: boolean;
-  renderCustomFooter?: (isMobile: boolean) => JSX.Element;
+  renderCustomFooter?: (isMobile: boolean, appState: AppState) => JSX.Element;
   viewModeEnabled: boolean;
   showThemeBtn: boolean;
 };
@@ -155,7 +155,7 @@ export const MobileMenu = ({
               <div className="panelColumn">
                 <Stack.Col gap={4}>
                   {renderCanvasActions()}
-                  {renderCustomFooter?.(true)}
+                  {renderCustomFooter?.(true, appState)}
                   {appState.collaborators.size > 0 && (
                     <fieldset>
                       <legend>{t("labels.collaborators")}</legend>

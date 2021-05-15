@@ -332,8 +332,8 @@
   .App-menu_bottom {
     position: absolute;
     bottom: 0;
-    grid-template-columns: 1fr auto 1fr;
-    grid-gap: 4px;
+    grid-template-columns: min-content auto min-content;
+    grid-gap: 15px;
     align-items: flex-start;
     cursor: default;
     pointer-events: none !important;
@@ -419,13 +419,11 @@
     }
 
     &.dropdown-select--floating {
-      position: absolute;
       margin: 0.5em;
     }
   }
 
   .dropdown-select__language.dropdown-select--floating {
-    position: absolute;
     bottom: 10px;
 
     :root[dir="ltr"] & {
@@ -461,13 +459,12 @@
   }
 
   .help-icon {
-    position: absolute;
     cursor: pointer;
     fill: $oc-gray-6;
-    bottom: 14px;
     width: 1.5rem;
     padding: 0;
     margin: 0;
+    margin-top: 5px;
     background: none;
     color: var(--icon-fill-color);
 
@@ -476,11 +473,11 @@
     }
 
     :root[dir="ltr"] & {
-      right: 14px;
+      margin-right: 14px;
     }
 
     :root[dir="rtl"] & {
-      left: 14px;
+      margin-left: 14px;
     }
   }
 
