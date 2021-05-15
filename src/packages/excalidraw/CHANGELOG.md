@@ -43,7 +43,6 @@ Please add the latest change on the top under the correct section.
 
 - Exporting freedraw with color to svg [#3565](https://github.com/excalidraw/excalidraw/pull/3565).
 - No migrating `draw` lines correctly
-- Remove `draw` element from codebase [#3559](https://github.com/excalidraw/excalidraw/pull/3559).
 - Handle render errors [#3557](https://github.com/excalidraw/excalidraw/pull/3557).
 - Restore on paste or lib import [#3558](https://github.com/excalidraw/excalidraw/pull/3558).
 - Improve mobile user experience [#3508](https://github.com/excalidraw/excalidraw/pull/3508).
