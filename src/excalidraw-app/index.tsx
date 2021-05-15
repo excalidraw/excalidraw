@@ -52,6 +52,10 @@ import {
 } from "./data/localStorage";
 import CustomStats from "./CustomStats";
 import { restoreAppState, RestoredDataState } from "../data/restore";
+import { Tooltip } from "../components/Tooltip";
+import { shield } from "../components/icons";
+
+import "./index.scss";
 
 const languageDetector = new LanguageDetector();
 languageDetector.init({
@@ -328,6 +332,20 @@ const ExcalidrawWrapper = () => {
 
   const renderFooter = useCallback(
     (isMobile: boolean) => {
+      const renderEncryptedIcon = () => (
+        <a
+          className="encrypted-icon tooltip"
+          href="https://blog.excalidraw.com/end-to-end-encryption/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={t("encrypted.link")}
+        >
+          <Tooltip label={t("encrypted.tooltip")} position="above" long={true}>
+            {shield}
+          </Tooltip>
+        </a>
+      );
+
       const renderLanguageList = () => (
         <LanguageList
           onChange={(langCode) => {
@@ -370,7 +388,12 @@ const ExcalidrawWrapper = () => {
           </div>
         );
       }
-      return renderLanguageList();
+      return (
+        <>
+          {renderEncryptedIcon()}
+          {renderLanguageList()}
+        </>
+      );
     },
     [langCode],
   );
