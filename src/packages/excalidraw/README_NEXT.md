@@ -173,7 +173,7 @@ For development use :point_down:
 ```js
 <script
   type="text/javascript"
-  src="https://unpkg.com/@excalidraw/excalidraw@0.7.0/dist/excalidraw.development.js"
+  src="https://unpkg.com/@excalidraw/excalidraw@0.8.0/dist/excalidraw.development.js"
 ></script>
 ```
 
@@ -182,7 +182,7 @@ For production use :point_down:
 ```js
 <script
   type="text/javascript"
-  src="https://unpkg.com/@excalidraw/excalidraw@0.7.0/dist/excalidraw.production.min.js"
+  src="https://unpkg.com/@excalidraw/excalidraw@0.8.0/dist/excalidraw.production.min.js"
 ></script>
 ```
 
@@ -201,7 +201,7 @@ You will need to make sure `react`, `react-dom` is available as shown in the bel
 
     <script
       type="text/javascript"
-      src="https://unpkg.com/@excalidraw/excalidraw@0.7.0/dist/excalidraw.development.js"
+      src="https://unpkg.com/@excalidraw/excalidraw@0.8.0/dist/excalidraw.development.js"
     ></script>
   </head>
 

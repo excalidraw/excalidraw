@@ -11,9 +11,11 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
-## Unreleased
+## 0.8.0 (2021-05-15)
 
 ## Excalidraw API
+
+**_These section lists the updates which may affect your integration, so it is recommended to go through this when upgrading the version._**
 
 ### Features
 
@@ -28,6 +30,33 @@ Please add the latest change on the top under the correct section.
 - The encryption shield icon is now removed from excalidraw package as it was specific to excalidraw app and is now rendered via [`renderFooter`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#renderFooter) prop. In case you were hiding this icon earlier, you need not do that anymore [#3577](https://github.com/excalidraw/excalidraw/pull/3577).
 
   Now `appState` is also passed to [`renderFooter`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#renderFooter) prop.
+
+## Excalidraw Library
+
+**_These section lists the updates made to the excalidraw library and will not affect the integration._**
+
+### Features
+
+- Shortcut key for nerd stats [#3552](https://github.com/excalidraw/excalidraw/pull/3552).
+- Better rendering of curved rectangles [#3562](https://github.com/excalidraw/excalidraw/pull/3562).
+- Improved freedraw [#3512](https://github.com/excalidraw/excalidraw/pull/3512).
+- Add shortcut for dark mode [#3543](https://github.com/excalidraw/excalidraw/pull/3543).
+- Adds rounded icons, joins and caps.[#3521](https://github.com/excalidraw/excalidraw/pull/3521).
+
+### Fixes
+
+- Exporting freedraw with color to svg [#3565](https://github.com/excalidraw/excalidraw/pull/3565).
+- Handle render errors [#3557](https://github.com/excalidraw/excalidraw/pull/3557).
+- Restore on paste or lib import [#3558](https://github.com/excalidraw/excalidraw/pull/3558).
+- Improve mobile user experience [#3508](https://github.com/excalidraw/excalidraw/pull/3508).
+- Prevent selecting `.visually-hidden` elements [#3501](https://github.com/excalidraw/excalidraw/pull/3501).
+
+### Perf
+
+- Reduce SVG export size by more than half by reducing precision to 2 decimal places [#3567](https://github.com/excalidraw/excalidraw/pull/3567).
+- Remove `backdrop-filter` to improve perf [#3506](https://github.com/excalidraw/excalidraw/pull/3506)
+
+---
 
 ## 0.7.0 (2021-04-26)
 
