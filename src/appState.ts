@@ -3,12 +3,12 @@ import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   DEFAULT_TEXT_ALIGN,
+  EXPORT_SCALES,
 } from "./constants";
 import { t } from "./i18n";
 import { AppState, NormalizedZoomValue } from "./types";
 import { getDateTime } from "./utils";
 
-export const EXPORT_SCALES = [1, 2, 3];
 const defaultExportScale = EXPORT_SCALES.includes(devicePixelRatio)
   ? devicePixelRatio
   : 1;

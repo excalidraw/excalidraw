@@ -14,7 +14,7 @@ import { register } from "./register";
 import { supported as fsSupported } from "browser-fs-access";
 import { CheckboxItem } from "../components/CheckboxItem";
 import { getExportSize } from "../scene/export";
-import { EXPORT_SCALES } from "../appState";
+import { EXPORT_SCALES } from "../constants";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { getNonDeletedElements } from "../element";
 

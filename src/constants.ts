@@ -144,3 +144,5 @@ export const MQ_MAX_WIDTH_LANDSCAPE = 1000;
 export const MQ_MAX_HEIGHT_LANDSCAPE = 500;
 
 export const MAX_DECIMALS_FOR_SVG_EXPORT = 2;
+
+export const EXPORT_SCALES = [1, 2, 3];
