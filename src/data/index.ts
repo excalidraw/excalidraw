@@ -3,6 +3,7 @@ import {
   copyBlobToClipboardAsPng,
   copyTextToSystemClipboard,
 } from "../clipboard";
+import { DEFAULT_EXPORT_PADDING } from "../constants";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { exportToCanvas, exportToSvg } from "../scene/export";
@@ -20,7 +21,7 @@ export const exportCanvas = async (
   appState: AppState,
   {
     exportBackground,
-    exportPadding = 10,
+    exportPadding = DEFAULT_EXPORT_PADDING,
     viewBackgroundColor,
     name,
   }: {

@@ -18,9 +18,7 @@ import "./ExportDialog.scss";
 import { supported as fsSupported } from "browser-fs-access";
 import OpenColor from "open-color";
 import { CheckboxItem } from "./CheckboxItem";
-
-const scales = [1, 2, 3];
-const defaultScale = scales.includes(devicePixelRatio) ? devicePixelRatio : 1;
+import { DEFAULT_EXPORT_PADDING } from "../constants";
 
 const supportsContextFilters =
   "filter" in document.createElement("canvas").getContext("2d")!;
@@ -81,6 +79,7 @@ const ExportButton: React.FC<{
 const ImageExportModal = ({
   elements,
   appState,
+  exportPadding = DEFAULT_EXPORT_PADDING,
   actionManager,
   onExportToPng,
   onExportToSvg,
@@ -117,7 +116,7 @@ const ImageExportModal = ({
       const canvas = exportToCanvas(exportedElements, appState, {
         exportBackground,
         viewBackgroundColor,
-        exportPadding: 10,
+        exportPadding,
       });
 
       // if converting to blob fails, there's some problem that will
@@ -134,7 +133,13 @@ const ImageExportModal = ({
       console.error(error);
       renderPreview(new CanvasError(), previewNode);
     }
-  }, [appState, exportedElements, exportBackground, viewBackgroundColor]);
+  }, [
+    appState,
+    exportedElements,
+    exportBackground,
+    exportPadding,
+    viewBackgroundColor,
+  ]);
 
   return (
     <div className="ExportDialog">
@@ -214,6 +219,7 @@ const ImageExportModal = ({
 export const ImageExportDialog = ({
   elements,
   appState,
+  exportPadding = DEFAULT_EXPORT_PADDING,
   actionManager,
   onExportToPng,
   onExportToSvg,
@@ -221,6 +227,7 @@ export const ImageExportDialog = ({
 }: {
   appState: AppState;
   elements: readonly NonDeletedExcalidrawElement[];
+  exportPadding?: number;
   actionManager: ActionsManagerInterface;
   onExportToPng: ExportCB;
   onExportToSvg: ExportCB;
@@ -250,6 +257,7 @@ export const ImageExportDialog = ({
           <ImageExportModal
             elements={elements}
             appState={appState}
+            exportPadding={exportPadding}
             actionManager={actionManager}
             onExportToPng={onExportToPng}
             onExportToSvg={onExportToSvg}

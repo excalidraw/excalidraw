@@ -4,7 +4,7 @@ import { getCommonBounds } from "../element/bounds";
 import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
 import { distance, SVG_NS } from "../utils";
 import { AppState } from "../types";
-import { THEME_FILTER } from "../constants";
+import { DEFAULT_EXPORT_PADDING, THEME_FILTER } from "../constants";
 import { getDefaultAppState } from "../appState";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
@@ -14,7 +14,7 @@ export const exportToCanvas = (
   appState: AppState,
   {
     exportBackground,
-    exportPadding = 10,
+    exportPadding = DEFAULT_EXPORT_PADDING,
     viewBackgroundColor,
   }: {
     exportBackground: boolean;
@@ -72,7 +72,7 @@ export const exportToSvg = (
   elements: readonly NonDeletedExcalidrawElement[],
   {
     exportBackground,
-    exportPadding = 10,
+    exportPadding = DEFAULT_EXPORT_PADDING,
     viewBackgroundColor,
     exportWithDarkMode,
     exportScale = 1,

@@ -14,11 +14,9 @@ import { register } from "./register";
 import { supported as fsSupported } from "browser-fs-access";
 import { CheckboxItem } from "../components/CheckboxItem";
 import { getExportSize } from "../scene/export";
-import { EXPORT_SCALES } from "../constants";
+import { DEFAULT_EXPORT_PADDING, EXPORT_SCALES } from "../constants";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { getNonDeletedElements } from "../element";
-
-const exportPadding = 10;
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -58,7 +56,7 @@ export const actionChangeExportScale = register({
         {EXPORT_SCALES.map((s) => {
           const [width, height] = getExportSize(
             exportedElements,
-            exportPadding,
+            DEFAULT_EXPORT_PADDING,
             s,
           );
 
