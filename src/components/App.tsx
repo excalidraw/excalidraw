@@ -259,6 +259,7 @@ export type PointerDownState = Readonly<{
     hasBeenDuplicated: boolean;
     hasHitCommonBoundingBoxOfSelectedElements: boolean;
   };
+  withCmdOrCtrl: boolean;
   drag: {
     // Might change during the pointer interation
     hasOccurred: boolean;
@@ -2542,6 +2543,7 @@ class App extends React.Component<AppProps, AppState> {
 
     return {
       origin,
+      withCmdOrCtrl: event[KEYS.CTRL_OR_CMD],
       originInGrid: tupleToCoors(
         getGridPoint(origin.x, origin.y, this.state.gridSize),
       ),
@@ -3184,7 +3186,7 @@ class App extends React.Component<AppProps, AppState> {
           this.scene.getElements(),
           this.state,
         );
-        if (selectedElements.length > 0) {
+        if (selectedElements.length > 0 && !pointerDownState.withCmdOrCtrl) {
           const [dragX, dragY] = getGridPoint(
             pointerCoords.x - pointerDownState.drag.offset.x,
             pointerCoords.y - pointerDownState.drag.offset.y,
@@ -3326,11 +3328,25 @@ class App extends React.Component<AppProps, AppState> {
       if (this.state.elementType === "selection") {
         const elements = this.scene.getElements();
         if (!event.shiftKey && isSomeElementSelected(elements, this.state)) {
-          this.setState({
-            selectedElementIds: {},
-            selectedGroupIds: {},
-            editingGroupId: null,
-          });
+          if (pointerDownState.withCmdOrCtrl && pointerDownState.hit.element) {
+            this.setState((prevState) =>
+              selectGroupsForSelectedElements(
+                {
+                  ...prevState,
+                  selectedElementIds: {
+                    [pointerDownState.hit.element!.id]: true,
+                  },
+                },
+                this.scene.getElements(),
+              ),
+            );
+          } else {
+            this.setState({
+              selectedElementIds: {},
+              selectedGroupIds: {},
+              editingGroupId: null,
+            });
+          }
         }
         const elementsWithinSelection = getElementsWithinSelection(
           elements,
@@ -3346,6 +3362,12 @@ class App extends React.Component<AppProps, AppState> {
                   map[element.id] = true;
                   return map;
                 }, {} as any),
+                ...(pointerDownState.hit.element
+                  ? {
+                      [pointerDownState.hit.element
+                        .id]: !elementsWithinSelection.length,
+                    }
+                  : null),
               },
             },
             this.scene.getElements(),
