@@ -10,6 +10,9 @@ import ExcalidrawApp from "../excalidraw-app";
 import * as Renderer from "../renderer/renderScene";
 import { KEYS } from "../keys";
 import { reseed } from "../random";
+import { API } from "./helpers/api";
+import { Keyboard, Pointer } from "./helpers/ui";
+import { getSelectedElements } from "../scene";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
@@ -22,6 +25,130 @@ beforeEach(() => {
 });
 
 const { h } = window;
+
+const mouse = new Pointer("mouse");
+
+const assertSelectedIds = (ids: string[]) => {
+  expect(
+    getSelectedElements(h.app.getSceneElements(), h.state).map((el) => el.id),
+  ).toEqual(ids);
+};
+
+describe("inner box-selection", () => {
+  beforeEach(async () => {
+    await render(<ExcalidrawApp />);
+  });
+  it("selecting elements visually nested inside another", async () => {
+    const rect1 = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 300,
+      height: 300,
+      backgroundColor: "red",
+      fillStyle: "solid",
+    });
+    const rect2 = API.createElement({
+      type: "rectangle",
+      x: 50,
+      y: 50,
+      width: 50,
+      height: 50,
+    });
+    const rect3 = API.createElement({
+      type: "rectangle",
+      x: 150,
+      y: 150,
+      width: 50,
+      height: 50,
+    });
+    h.elements = [rect1, rect2, rect3];
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      mouse.downAt(40, 40);
+      mouse.moveTo(290, 290);
+      mouse.up();
+
+      assertSelectedIds([rect2.id, rect3.id]);
+    });
+  });
+
+  it("selecting grouped elements visually nested inside another", async () => {
+    const rect1 = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 300,
+      height: 300,
+      backgroundColor: "red",
+      fillStyle: "solid",
+    });
+    const rect2 = API.createElement({
+      type: "rectangle",
+      x: 50,
+      y: 50,
+      width: 50,
+      height: 50,
+      groupIds: ["A"],
+    });
+    const rect3 = API.createElement({
+      type: "rectangle",
+      x: 150,
+      y: 150,
+      width: 50,
+      height: 50,
+      groupIds: ["A"],
+    });
+    h.elements = [rect1, rect2, rect3];
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      mouse.downAt(40, 40);
+      mouse.moveTo(rect2.x + rect2.width + 10, rect2.y + rect2.height + 10);
+      mouse.up();
+
+      assertSelectedIds([rect2.id, rect3.id]);
+      expect(h.state.selectedGroupIds).toEqual({ A: true });
+    });
+  });
+
+  it("selecting & deselecting grouped elements visually nested inside another", async () => {
+    const rect1 = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 300,
+      height: 300,
+      backgroundColor: "red",
+      fillStyle: "solid",
+    });
+    const rect2 = API.createElement({
+      type: "rectangle",
+      x: 50,
+      y: 50,
+      width: 50,
+      height: 50,
+      groupIds: ["A"],
+    });
+    const rect3 = API.createElement({
+      type: "rectangle",
+      x: 150,
+      y: 150,
+      width: 50,
+      height: 50,
+      groupIds: ["A"],
+    });
+    h.elements = [rect1, rect2, rect3];
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      mouse.downAt(rect2.x - 20, rect2.x - 20);
+      mouse.moveTo(rect2.x + rect2.width + 10, rect2.y + rect2.height + 10);
+      assertSelectedIds([rect2.id, rect3.id]);
+      expect(h.state.selectedGroupIds).toEqual({ A: true });
+      mouse.moveTo(rect2.x - 10, rect2.y - 10);
+      assertSelectedIds([rect1.id]);
+      expect(h.state.selectedGroupIds).toEqual({});
+      mouse.up();
+    });
+  });
+});
 
 describe("selection element", () => {
   it("create selection element on pointer down", async () => {
