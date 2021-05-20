@@ -122,6 +122,9 @@ export class Pointer {
     };
   }
 
+  // incremental (moving by deltas)
+  // ---------------------------------------------------------------------------
+
   move(dx: number, dy: number) {
     if (dx !== 0 || dy !== 0) {
       this.clientX += dx;
@@ -149,6 +152,39 @@ export class Pointer {
     this.move(dx, dy);
     fireEvent.doubleClick(GlobalTestState.canvas, this.getEvent());
   }
+
+  // absolute coords
+  // ---------------------------------------------------------------------------
+
+  moveTo(x: number, y: number) {
+    this.clientX = x;
+    this.clientY = y;
+    fireEvent.pointerMove(GlobalTestState.canvas, this.getEvent());
+  }
+
+  downAt(x = this.clientX, y = this.clientY) {
+    this.clientX = x;
+    this.clientY = y;
+    fireEvent.pointerDown(GlobalTestState.canvas, this.getEvent());
+  }
+
+  upAt(x = this.clientX, y = this.clientY) {
+    this.clientX = x;
+    this.clientY = y;
+    fireEvent.pointerUp(GlobalTestState.canvas, this.getEvent());
+  }
+
+  clickAt(x: number, y: number) {
+    this.downAt(x, y);
+    this.upAt();
+  }
+
+  doubleClickAt(x: number, y: number) {
+    this.moveTo(x, y);
+    fireEvent.doubleClick(GlobalTestState.canvas, this.getEvent());
+  }
+
+  // ---------------------------------------------------------------------------
 
   select(
     /** if multiple elements supplied, they're shift-selected */

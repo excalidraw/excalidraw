@@ -67,9 +67,13 @@ export const selectGroupsForSelectedElements = (
   appState: AppState,
   elements: readonly NonDeleted<ExcalidrawElement>[],
 ): AppState => {
-  let nextAppState = { ...appState };
+  let nextAppState: AppState = { ...appState, selectedGroupIds: {} };
 
   const selectedElements = getSelectedElements(elements, appState);
+
+  if (!selectedElements.length) {
+    return { ...nextAppState, editingGroupId: null };
+  }
 
   for (const selectedElement of selectedElements) {
     let groupIds = selectedElement.groupIds;
