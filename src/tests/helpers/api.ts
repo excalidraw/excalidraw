@@ -57,6 +57,7 @@ export class API {
     width = 100,
     height = width,
     isDeleted = false,
+    groupIds = [],
     ...rest
   }: {
     type: T;
@@ -66,6 +67,7 @@ export class API {
     width?: number;
     id?: string;
     isDeleted?: boolean;
+    groupIds?: string[];
     // generic element props
     strokeColor?: ExcalidrawGenericElement["strokeColor"];
     backgroundColor?: ExcalidrawGenericElement["backgroundColor"];
@@ -151,6 +153,9 @@ export class API {
     }
     if (isDeleted) {
       element.isDeleted = isDeleted;
+    }
+    if (groupIds) {
+      element.groupIds = groupIds;
     }
     return element as any;
   };
