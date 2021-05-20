@@ -123,16 +123,16 @@
     "resetZoom": "Resetovat přiblížení",
     "menu": "Menu",
     "done": "Hotovo",
-    "edit": "",
-    "undo": "",
-    "redo": "",
+    "edit": "Upravit",
+    "undo": "Zpět",
+    "redo": "Znovu",
     "resetLibrary": "",
-    "createNewRoom": "",
-    "fullScreen": "",
-    "darkMode": "",
+    "createNewRoom": "Vytvořit novou místnost",
+    "fullScreen": "Celá obrazovka",
+    "darkMode": "Tmavý režim",
     "lightMode": "Světlý režim",
     "zenMode": "Zen mód",
-    "exitZenMode": ""
+    "exitZenMode": "Opustit zen mód"
   },
   "alerts": {
     "clearReset": "",
@@ -217,15 +217,15 @@
   },
   "helpDialog": {
     "blog": "",
-    "click": "",
+    "click": "kliknutí",
     "curvedArrow": "",
     "curvedLine": "",
     "documentation": "",
-    "drag": "",
+    "drag": "tažení",
     "editor": "",
     "github": "",
     "howto": "",
-    "or": "",
+    "or": "nebo",
     "preventBinding": "",
     "shapes": "",
     "shortcuts": "",
@@ -261,7 +261,7 @@
     "copyToClipboardAsPng": "",
     "fileSaved": "",
     "fileSavedToFilename": "",
-    "canvas": "",
-    "selection": ""
+    "canvas": "plátno",
+    "selection": "výběr"
   }
 }
