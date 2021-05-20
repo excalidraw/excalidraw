@@ -2261,11 +2261,12 @@ class App extends React.Component<AppProps, AppState> {
     } else if (isOverScrollBar) {
       setCursor(this.canvas, CURSOR_TYPE.AUTO);
     } else if (
-      hitElement ||
-      this.isHittingCommonBoundingBoxOfSelectedElements(
-        scenePointer,
-        selectedElements,
-      )
+      !event[KEYS.CTRL_OR_CMD] &&
+      (hitElement ||
+        this.isHittingCommonBoundingBoxOfSelectedElements(
+          scenePointer,
+          selectedElements,
+        ))
     ) {
       setCursor(this.canvas, CURSOR_TYPE.MOVE);
     } else {
