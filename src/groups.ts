@@ -71,6 +71,10 @@ export const selectGroupsForSelectedElements = (
 
   const selectedElements = getSelectedElements(elements, appState);
 
+  if (!selectedElements.length) {
+    return { ...nextAppState, editingGroupId: null };
+  }
+
   for (const selectedElement of selectedElements) {
     let groupIds = selectedElement.groupIds;
     if (appState.editingGroupId) {
