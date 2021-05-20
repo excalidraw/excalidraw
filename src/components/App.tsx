@@ -2261,6 +2261,7 @@ class App extends React.Component<AppProps, AppState> {
     } else if (isOverScrollBar) {
       setCursor(this.canvas, CURSOR_TYPE.AUTO);
     } else if (
+      // if using cmd/ctrl, we're not dragging
       !event[KEYS.CTRL_OR_CMD] &&
       (hitElement ||
         this.isHittingCommonBoundingBoxOfSelectedElements(
@@ -3187,6 +3188,8 @@ class App extends React.Component<AppProps, AppState> {
           this.scene.getElements(),
           this.state,
         );
+        // prevent dragging even if we're no longer holding cmd/ctrl otherwise
+        // it would have weird results (stuff jumping all over the screen)
         if (selectedElements.length > 0 && !pointerDownState.withCmdOrCtrl) {
           const [dragX, dragY] = getGridPoint(
             pointerCoords.x - pointerDownState.drag.offset.x,
@@ -3365,6 +3368,8 @@ class App extends React.Component<AppProps, AppState> {
                 }, {} as any),
                 ...(pointerDownState.hit.element
                   ? {
+                      // if using ctrl/cmd, select the hitElement only if we
+                      // haven't box-selected anything else
                       [pointerDownState.hit.element
                         .id]: !elementsWithinSelection.length,
                     }
