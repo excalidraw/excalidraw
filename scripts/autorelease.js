@@ -24,8 +24,6 @@ exec(`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
     return file.indexOf("src") >= 0 && !filesToIgnoreRegex.test(file);
   });
 
-  console.log(excalidrawPackageFiles, "excalidrawPackageFiles", changedFiles);
-
   if (!excalidrawPackageFiles.length) {
     process.exit(0);
   }
