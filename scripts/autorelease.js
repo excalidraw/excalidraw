@@ -35,16 +35,11 @@ exec(`git show --name-only ${commitHash}`, async (error, stdout, stderr) => {
     "utf8",
   );
 
-  console.log("pkg updated");
   try {
     execSync(`yarn  --frozen-lockfile`);
     execSync(`yarn --frozen-lockfile`, { cwd: excalidrawDir });
-    console.log("pkg install");
     execSync(`yarn run build:umd`, { cwd: excalidrawDir });
-    console.log("pkg build");
-
     execSync(`yarn --cwd ${excalidrawDir} publish`);
-    console.log("publish");
   } catch (e) {
     console.error(e);
   }
