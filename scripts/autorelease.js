@@ -43,8 +43,8 @@ exec(`git show --name-only ${commitHash}`, async (error, stdout, stderr) => {
     execSync(`yarn run build:umd`, { cwd: excalidrawDir });
     console.log("pkg build");
 
-    // execSync(`yarn --cwd ${excalidrawDir} publish`);
-    // console.log("publish");
+    execSync(`yarn --cwd ${excalidrawDir} publish`);
+    console.log("publish");
   } catch (e) {
     console.error(e);
   }
