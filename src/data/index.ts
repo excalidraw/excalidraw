@@ -1,6 +1,6 @@
 import { fileSave } from "browser-fs-access";
 import {
-  copyCanvasToClipboardAsPng,
+  copyBlobToClipboardAsPng,
   copyTextToSystemClipboard,
 } from "../clipboard";
 import { NonDeletedExcalidrawElement } from "../element/types";
@@ -18,7 +18,6 @@ export const exportCanvas = async (
   type: ExportType,
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
-  canvas: HTMLCanvasElement,
   {
     exportBackground,
     exportPadding = 10,
@@ -76,10 +75,11 @@ export const exportCanvas = async (
   });
   tempCanvas.style.display = "none";
   document.body.appendChild(tempCanvas);
+  let blob = await canvasToBlob(tempCanvas);
+  tempCanvas.remove();
 
   if (type === "png") {
     const fileName = `${name}.png`;
-    let blob = await canvasToBlob(tempCanvas);
     if (appState.exportEmbedScene) {
       blob = await (
         await import(/* webpackChunkName: "image" */ "./image")
@@ -95,17 +95,12 @@ export const exportCanvas = async (
     });
   } else if (type === "clipboard") {
     try {
-      await copyCanvasToClipboardAsPng(tempCanvas);
+      await copyBlobToClipboardAsPng(blob);
     } catch (error) {
       if (error.name === "CANVAS_POSSIBLY_TOO_BIG") {
         throw error;
       }
       throw new Error(t("alerts.couldNotCopyToClipboard"));
     }
-  }
-
-  // clean up the DOM
-  if (tempCanvas !== canvas) {
-    tempCanvas.remove();
   }
 };

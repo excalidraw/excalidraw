@@ -142,3 +142,5 @@ export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
 export const MQ_MAX_WIDTH_PORTRAIT = 730;
 export const MQ_MAX_WIDTH_LANDSCAPE = 1000;
 export const MQ_MAX_HEIGHT_LANDSCAPE = 500;
+
+export const MAX_DECIMALS_FOR_SVG_EXPORT = 2;

@@ -3,6 +3,7 @@ import {
   ExcalidrawGenericElement,
   ExcalidrawTextElement,
   ExcalidrawLinearElement,
+  ExcalidrawFreeDrawElement,
 } from "../../element/types";
 import { newElement, newTextElement, newLinearElement } from "../../element";
 import { DEFAULT_VERTICAL_ALIGN } from "../../constants";
@@ -12,6 +13,7 @@ import fs from "fs";
 import util from "util";
 import path from "path";
 import { getMimeType } from "../../data/blob";
+import { newFreeDrawElement } from "../../element/newElement";
 
 const readFile = util.promisify(fs.readFile);
 
@@ -55,6 +57,7 @@ export class API {
     width = 100,
     height = width,
     isDeleted = false,
+    groupIds = [],
     ...rest
   }: {
     type: T;
@@ -64,6 +67,7 @@ export class API {
     width?: number;
     id?: string;
     isDeleted?: boolean;
+    groupIds?: string[];
     // generic element props
     strokeColor?: ExcalidrawGenericElement["strokeColor"];
     backgroundColor?: ExcalidrawGenericElement["backgroundColor"];
@@ -81,8 +85,10 @@ export class API {
     verticalAlign?: T extends "text"
       ? ExcalidrawTextElement["verticalAlign"]
       : never;
-  }): T extends "arrow" | "line" | "draw"
+  }): T extends "arrow" | "line"
     ? ExcalidrawLinearElement
+    : T extends "freedraw"
+    ? ExcalidrawFreeDrawElement
     : T extends "text"
     ? ExcalidrawTextElement
     : ExcalidrawGenericElement => {
@@ -125,11 +131,17 @@ export class API {
           verticalAlign: rest.verticalAlign ?? DEFAULT_VERTICAL_ALIGN,
         });
         break;
+      case "freedraw":
+        element = newFreeDrawElement({
+          type: type as "freedraw",
+          simulatePressure: true,
+          ...base,
+        });
+        break;
       case "arrow":
       case "line":
-      case "draw":
         element = newLinearElement({
-          type: type as "arrow" | "line" | "draw",
+          type: type as "arrow" | "line",
           startArrowhead: null,
           endArrowhead: null,
           ...base,
@@ -141,6 +153,9 @@ export class API {
     }
     if (isDeleted) {
       element.isDeleted = isDeleted;
+    }
+    if (groupIds) {
+      element.groupIds = groupIds;
     }
     return element as any;
   };

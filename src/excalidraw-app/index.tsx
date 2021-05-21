@@ -51,7 +51,11 @@ import {
   saveToLocalStorage,
 } from "./data/localStorage";
 import CustomStats from "./CustomStats";
-import { RestoredDataState } from "../data/restore";
+import { restoreAppState, RestoredDataState } from "../data/restore";
+import { Tooltip } from "../components/Tooltip";
+import { shield } from "../components/icons";
+
+import "./index.scss";
 
 const languageDetector = new LanguageDetector();
 languageDetector.init({
@@ -239,7 +243,10 @@ const ExcalidrawWrapper = () => {
       } else {
         initializeScene({ collabAPI }).then((scene) => {
           if (scene) {
-            excalidrawAPI.updateScene(scene);
+            excalidrawAPI.updateScene({
+              ...scene,
+              appState: restoreAppState(scene.appState, null),
+            });
           }
         });
       }
@@ -304,7 +311,7 @@ const ExcalidrawWrapper = () => {
     }
   };
 
-  const renderTopRight = useCallback(
+  const renderTopRightUI = useCallback(
     (isMobile: boolean, appState: AppState) => {
       return (
         <div
@@ -325,6 +332,20 @@ const ExcalidrawWrapper = () => {
 
   const renderFooter = useCallback(
     (isMobile: boolean) => {
+      const renderEncryptedIcon = () => (
+        <a
+          className="encrypted-icon tooltip"
+          href="https://blog.excalidraw.com/end-to-end-encryption/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={t("encrypted.link")}
+        >
+          <Tooltip label={t("encrypted.tooltip")} position="above" long={true}>
+            {shield}
+          </Tooltip>
+        </a>
+      );
+
       const renderLanguageList = () => (
         <LanguageList
           onChange={(langCode) => {
@@ -367,7 +388,12 @@ const ExcalidrawWrapper = () => {
           </div>
         );
       }
-      return renderLanguageList();
+      return (
+        <>
+          {renderEncryptedIcon()}
+          {renderLanguageList()}
+        </>
+      );
     },
     [langCode],
   );
@@ -399,7 +425,7 @@ const ExcalidrawWrapper = () => {
         isCollaborating={collabAPI?.isCollaborating()}
         onPointerUpdate={collabAPI?.onPointerUpdate}
         onExportToBackend={onExportToBackend}
-        renderTopRight={renderTopRight}
+        renderTopRightUI={renderTopRightUI}
         renderFooter={renderFooter}
         langCode={langCode}
         renderCustomStats={renderCustomStats}
