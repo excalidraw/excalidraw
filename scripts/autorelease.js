@@ -10,7 +10,8 @@ const getShortCommitHash = () => {
 };
 
 const commitHash = getShortCommitHash();
-exec(`git show --name-only ${commitHash}`, async (error, stdout, stderr) => {
+// get files changed between prev and head commit
+exec(`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
   if (error || stderr) {
     console.error(error);
     process.exit(1);
