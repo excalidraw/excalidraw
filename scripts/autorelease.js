@@ -23,6 +23,8 @@ exec(`git show --name-only ${commitHash}`, async (error, stdout, stderr) => {
     return file.indexOf("src") >= 0 && !filesToIgnoreRegex.test(file);
   });
 
+  console.log(excalidrawPackageFiles, "excalidrawPackageFiles", changedFiles);
+
   if (!excalidrawPackageFiles.length) {
     process.exit(0);
   }
