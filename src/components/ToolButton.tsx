@@ -66,14 +66,16 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
         onClick={props.onClick}
         ref={innerRef}
       >
-        <div className="ToolIcon__icon" aria-hidden="true">
-          {props.icon || props.label}
-          {props.keyBindingLabel && (
-            <span className="ToolIcon__keybinding">
-              {props.keyBindingLabel}
-            </span>
-          )}
-        </div>
+        {(props.icon || props.label) && (
+          <div className="ToolIcon__icon" aria-hidden="true">
+            {props.icon || props.label}
+            {props.keyBindingLabel && (
+              <span className="ToolIcon__keybinding">
+                {props.keyBindingLabel}
+              </span>
+            )}
+          </div>
+        )}
         {props.showAriaLabel && (
           <div className="ToolIcon__label">{props["aria-label"]}</div>
         )}

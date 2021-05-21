@@ -6,15 +6,16 @@ import { canvasToBlob } from "../data/blob";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { CanvasError } from "../errors";
 import { t } from "../i18n";
-import { useIsMobile } from "../components/App";
+import { useIsMobile } from "./App";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { exportToCanvas, getExportSize } from "../scene/export";
 import { AppState } from "../types";
 import { Dialog } from "./Dialog";
-import "./ExportDialog.scss";
-import { clipboard, exportFile, link } from "./icons";
+import { clipboard, exportImage } from "./icons";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
+
+import "./ExportDialog.scss";
 
 const scales = [1, 2, 3];
 const defaultScale = scales.includes(devicePixelRatio) ? devicePixelRatio : 1;
@@ -52,7 +53,7 @@ export type ExportCB = (
   scale?: number,
 ) => void;
 
-const ExportModal = ({
+const CanvasExportModal = ({
   elements,
   appState,
   exportPadding = 10,
@@ -60,7 +61,6 @@ const ExportModal = ({
   onExportToPng,
   onExportToSvg,
   onExportToClipboard,
-  onExportToBackend,
 }: {
   appState: AppState;
   elements: readonly NonDeletedExcalidrawElement[];
@@ -69,7 +69,6 @@ const ExportModal = ({
   onExportToPng: ExportCB;
   onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
-  onExportToBackend?: ExportCB;
   onCloseRequest: () => void;
 }) => {
   const someElementIsSelected = isSomeElementSelected(elements, appState);
@@ -159,15 +158,6 @@ const ExportModal = ({
                 onClick={() => onExportToClipboard(exportedElements, scale)}
               />
             )}
-            {onExportToBackend && (
-              <ToolButton
-                type="button"
-                icon={link}
-                title={t("buttons.getShareableLink")}
-                aria-label={t("buttons.getShareableLink")}
-                onClick={() => onExportToBackend(exportedElements)}
-              />
-            )}
           </Stack.Row>
           <div className="ExportDialog__name">
             {actionManager.renderAction("changeProjectName")}
@@ -224,7 +214,7 @@ const ExportModal = ({
   );
 };
 
-export const ExportDialog = ({
+export const CanvasExportDialog = ({
   elements,
   appState,
   exportPadding = 10,
@@ -232,7 +222,6 @@ export const ExportDialog = ({
   onExportToPng,
   onExportToSvg,
   onExportToClipboard,
-  onExportToBackend,
 }: {
   appState: AppState;
   elements: readonly NonDeletedExcalidrawElement[];
@@ -241,7 +230,6 @@ export const ExportDialog = ({
   onExportToPng: ExportCB;
   onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
-  onExportToBackend?: ExportCB;
 }) => {
   const [modalIsShown, setModalIsShown] = useState(false);
 
@@ -256,15 +244,15 @@ export const ExportDialog = ({
           setModalIsShown(true);
         }}
         data-testid="export-button"
-        icon={exportFile}
+        icon={exportImage}
         type="button"
-        aria-label={t("buttons.export")}
+        aria-label={t("buttons.exportCanvas")}
         showAriaLabel={useIsMobile()}
-        title={t("buttons.export")}
+        title={t("buttons.exportCanvas")}
       />
       {modalIsShown && (
-        <Dialog onCloseRequest={handleClose} title={t("buttons.export")}>
-          <ExportModal
+        <Dialog onCloseRequest={handleClose} title={t("buttons.exportCanvas")}>
+          <CanvasExportModal
             elements={elements}
             appState={appState}
             exportPadding={exportPadding}
@@ -272,7 +260,6 @@ export const ExportDialog = ({
             onExportToPng={onExportToPng}
             onExportToSvg={onExportToSvg}
             onExportToClipboard={onExportToClipboard}
-            onExportToBackend={onExportToBackend}
             onCloseRequest={handleClose}
           />
         </Dialog>
