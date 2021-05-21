@@ -26,6 +26,7 @@ exec(`git show --name-only ${commitHash}`, async (error, stdout, stderr) => {
   if (!excalidrawPackageFiles.length) {
     process.exit(0);
   }
+
   pkg.version = `${pkg.version}-${commitHash}`;
   pkg.name = "aakansha-excalidraw";
   await fs.writeFileSync(
@@ -33,12 +34,16 @@ exec(`git show --name-only ${commitHash}`, async (error, stdout, stderr) => {
     JSON.stringify(pkg, null, 2),
     "utf8",
   );
+
   console.log("pkg updated");
+  try {
+    execSync(`yarn --frozen-lockfile --cwd ${excalidrawDir}`);
+    execSync(`yarn --cwd ${excalidrawDir} run build:umd`);
+    console.log("pkg build");
 
-  execSync(`yarn --frozen-lockfile --cwd ${excalidrawDir}`);
-  execSync(`yarn --cwd ${excalidrawDir} run build:umd`);
-  console.log("pkg build");
-
-  execSync(`yarn --cwd ${excalidrawDir} publish`);
-  console.log("publish");
+    execSync(`yarn --cwd ${excalidrawDir} publish`);
+    console.log("publish");
+  } catch (e) {
+    console.error(e);
+  }
 });
