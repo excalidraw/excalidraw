@@ -37,13 +37,14 @@ exec(`git show --name-only ${commitHash}`, async (error, stdout, stderr) => {
 
   console.log("pkg updated");
   try {
-    execSync(`yarn --frozen-lockfile --cwd ${excalidrawDir}`);
+    execSync(`yarn  --frozen-lockfile`);
+    execSync(`yarn --frozen-lockfile`, { cwd: excalidrawDir });
     console.log("pkg install");
-    execSync(`yarn --cwd ${excalidrawDir} run build:umd`);
+    execSync(`yarn run build:umd`, { cwd: excalidrawDir });
     console.log("pkg build");
 
-    execSync(`yarn --cwd ${excalidrawDir} publish`);
-    console.log("publish");
+    // execSync(`yarn --cwd ${excalidrawDir} publish`);
+    // console.log("publish");
   } catch (e) {
     console.error(e);
   }
