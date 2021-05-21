@@ -9,7 +9,6 @@ const getShortCommitHash = () => {
   return execSync("git rev-parse --short HEAD").toString().trim();
 };
 
-const commitHash = getShortCommitHash();
 // get files changed between prev and head commit
 exec(`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
   if (error || stderr) {
@@ -28,7 +27,7 @@ exec(`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
     process.exit(0);
   }
 
-  pkg.version = `${pkg.version}-${commitHash}`;
+  pkg.version = `${pkg.version}-${getShortCommitHash()}`;
   pkg.name = "aakansha-excalidraw";
   await fs.writeFileSync(
     excalidrawPackage,
