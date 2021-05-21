@@ -12,6 +12,7 @@ exec(
   "git diff origin/master --cached --name-only",
   async (error, stdout, stderr) => {
     if (error || stderr) {
+      console.error(error);
       process.exit(1);
     }
 
@@ -32,8 +33,12 @@ exec(
       JSON.stringify(pkg, null, 2),
       "utf8",
     );
+    console.log("pkg updated");
 
     execSync(`yarn --cwd ${excalidrawDir} build:umd`);
+    console.log("pkg build");
+
     execSync(`yarn --cwd ${excalidrawDir} publish`);
+    console.log("publish");
   },
 );
