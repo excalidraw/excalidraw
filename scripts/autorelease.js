@@ -8,37 +8,36 @@ const pkg = require(excalidrawPackage);
 const getShortCommitHash = () => {
   return execSync("git rev-parse --short HEAD").toString().trim();
 };
-exec(
-  "git diff origin/master --cached --name-only",
-  async (error, stdout, stderr) => {
-    if (error || stderr) {
-      console.error(error);
-      process.exit(1);
-    }
 
-    const changedFiles = stdout.trim().split("\n");
-    const filesToIgnoreRegex = /src\/excalidraw-app|packages\/utils/;
+const commitHash = getShortCommitHash();
+exec(`git show --name-only ${commitHash}`, async (error, stdout, stderr) => {
+  if (error || stderr) {
+    console.error(error);
+    process.exit(1);
+  }
 
-    const excalidrawPackageFiles = changedFiles.filter((file) => {
-      return file.indexOf("src") >= 0 && !filesToIgnoreRegex.test(file);
-    });
+  const changedFiles = stdout.trim().split("\n");
+  const filesToIgnoreRegex = /src\/excalidraw-app|packages\/utils/;
 
-    if (!excalidrawPackageFiles.length) {
-      process.exit(0);
-    }
-    pkg.version = `${pkg.version}-${getShortCommitHash()}`;
-    pkg.name = "aakansha-excalidraw";
-    await fs.writeFileSync(
-      excalidrawPackage,
-      JSON.stringify(pkg, null, 2),
-      "utf8",
-    );
-    console.log("pkg updated");
+  const excalidrawPackageFiles = changedFiles.filter((file) => {
+    return file.indexOf("src") >= 0 && !filesToIgnoreRegex.test(file);
+  });
 
-    execSync(`yarn --cwd ${excalidrawDir} build:umd`);
-    console.log("pkg build");
+  if (!excalidrawPackageFiles.length) {
+    process.exit(0);
+  }
+  pkg.version = `${pkg.version}-${commitHash}`;
+  pkg.name = "aakansha-excalidraw";
+  await fs.writeFileSync(
+    excalidrawPackage,
+    JSON.stringify(pkg, null, 2),
+    "utf8",
+  );
+  console.log("pkg updated");
 
-    execSync(`yarn --cwd ${excalidrawDir} publish`);
-    console.log("publish");
-  },
-);
+  execSync(`yarn --cwd ${excalidrawDir} build:umd`);
+  console.log("pkg build");
+
+  execSync(`yarn --cwd ${excalidrawDir} publish`);
+  console.log("publish");
+});
