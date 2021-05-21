@@ -36,7 +36,7 @@ exec(`git show --name-only ${commitHash}`, async (error, stdout, stderr) => {
   console.log("pkg updated");
 
   execSync(`yarn --frozen-lockfile --cwd ${excalidrawDir}`);
-  execSync(`yarn --cwd ${excalidrawDir} build:umd`);
+  execSync(`yarn --cwd ${excalidrawDir} run build:umd`);
   console.log("pkg build");
 
   execSync(`yarn --cwd ${excalidrawDir} publish`);
