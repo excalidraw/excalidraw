@@ -102,10 +102,10 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should not hide an
           </div>
         </button>
         <button
-          aria-label="Export to image"
+          aria-label="Save as image"
           class="ToolIcon_type_button ToolIcon_size_m ToolIcon_type_button--show ToolIcon"
           data-testid="image-export-button"
-          title="Export to image"
+          title="Save as image"
           type="button"
         >
           <div
@@ -301,10 +301,10 @@ exports[`<Excalidraw/> Test UIOptions prop should not hide any UI element when t
           </div>
         </button>
         <button
-          aria-label="Export to image"
+          aria-label="Save as image"
           class="ToolIcon_type_button ToolIcon_size_m ToolIcon_type_button--show ToolIcon"
           data-testid="image-export-button"
-          title="Export to image"
+          title="Save as image"
           type="button"
         >
           <div
