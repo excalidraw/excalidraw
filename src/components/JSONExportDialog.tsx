@@ -11,7 +11,7 @@ import { actionSaveAsScene } from "../actions/actionExport";
 import { Card } from "./Card";
 
 import "./ExportDialog.scss";
-import { supported } from "browser-fs-access";
+import { supported as fsSupported } from "browser-fs-access";
 
 export type ExportCB = (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -38,7 +38,7 @@ const JSONExportModal = ({
           <h2>Save to disk</h2>
           <div className="Card-details">
             Export the scene data to a file from which you can import later.
-            {!supported && actionManager.renderAction("changeProjectName")}
+            {!fsSupported && actionManager.renderAction("changeProjectName")}
           </div>
           <ToolButton
             className="Card-button"

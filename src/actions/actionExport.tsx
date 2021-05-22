@@ -11,7 +11,7 @@ import { t } from "../i18n";
 import { useIsMobile } from "../components/App";
 import { KEYS } from "../keys";
 import { register } from "./register";
-import { supported } from "browser-fs-access";
+import { supported as fsSupported } from "browser-fs-access";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -166,7 +166,7 @@ export const actionSaveAsScene = register({
       title={t("buttons.saveAs")}
       aria-label={t("buttons.saveAs")}
       showAriaLabel={useIsMobile()}
-      hidden={!supported}
+      hidden={!fsSupported}
       onClick={() => updateData(null)}
       data-testid="save-as-button"
     />

@@ -16,6 +16,7 @@ import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 
 import "./ExportDialog.scss";
+import { supported as fsSupported } from "browser-fs-access";
 
 const scales = [1, 2, 3];
 const defaultScale = scales.includes(devicePixelRatio) ? devicePixelRatio : 1;
@@ -159,7 +160,7 @@ const ImageExportModal = ({
               />
             )}
           </Stack.Row>
-          {actionManager.renderAction("changeProjectName")}
+          {!fsSupported && actionManager.renderAction("changeProjectName")}
           <Stack.Row gap={2}>
             {scales.map((s) => {
               const [width, height] = getExportSize(
