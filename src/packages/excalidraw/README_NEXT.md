@@ -1,6 +1,8 @@
 ## Note
 
-This is an unstable release and not recommended for production. If you don't want to wait for the stable release and try out the unreleased changes you can use this. For stable release please use [@excalidraw/excalidraw](https://www.npmjs.com/package/@excalidraw/excalidraw).
+This is an unstable release and not recommended for production. If you don't want to wait for the stable release and try out the unreleased changes you can use this.
+
+For stable release please use [@excalidraw/excalidraw](https://www.npmjs.com/package/@excalidraw/excalidraw).
 
 ### Excalidraw
 
