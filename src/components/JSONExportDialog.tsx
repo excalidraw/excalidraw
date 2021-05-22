@@ -35,16 +35,16 @@ const JSONExportModal = ({
       <div className="ExportDialog-cards">
         <Card color="lime">
           <div className="Card-icon">{exportToFileIcon}</div>
-          <h2>Save to disk</h2>
+          <h2>{t("exportDialog.disk_title")}</h2>
           <div className="Card-details">
-            Export the scene data to a file from which you can import later.
+            {t("exportDialog.disk_details")}
             {!fsSupported && actionManager.renderAction("changeProjectName")}
           </div>
           <ToolButton
             className="Card-button"
             type="button"
-            title={"Save to file"}
-            aria-label={"Save to file"}
+            title={t("exportDialog.disk_button")}
+            aria-label={t("exportDialog.disk_button")}
             showAriaLabel={true}
             onClick={() => {
               actionManager.executeAction(actionSaveAsScene);
@@ -54,13 +54,13 @@ const JSONExportModal = ({
         {onExportToBackend && (
           <Card color="pink">
             <div className="Card-icon">{link}</div>
-            <h2>Shareable link</h2>
-            <div className="Card-details">Export as a read-only link.</div>
+            <h2>{t("exportDialog.link_title")}</h2>
+            <div className="Card-details">{t("exportDialog.link_details")}</div>
             <ToolButton
               className="Card-button"
               type="button"
-              title={"Export to Link"}
-              aria-label={"Export to Link"}
+              title={t("exportDialog.link_button")}
+              aria-label={t("exportDialog.link_button")}
               showAriaLabel={true}
               onClick={() => onExportToBackend(elements)}
             />

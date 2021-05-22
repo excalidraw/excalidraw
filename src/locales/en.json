@@ -217,6 +217,14 @@
   "errorDialog": {
     "title": "Error"
   },
+  "exportDialog": {
+    "disk_title": "Save to disk",
+    "disk_details": "Export the scene data to a file from which you can import later.",
+    "disk_button": "Save to file",
+    "link_title": "Shareable link",
+    "link_details": "Export as a read-only link.",
+    "link_button": "Export to Link"
+  },
   "helpDialog": {
     "blog": "Read our blog",
     "click": "click",
