@@ -11,6 +11,7 @@
     background-color: var(--button-gray-1);
     -webkit-tap-highlight-color: transparent;
     border-radius: var(--space-factor);
+    user-select: none;
   }
 
   .ToolIcon__icon {
@@ -184,17 +185,6 @@
       svg {
         position: static;
       }
-    }
-  }
-
-  .TooltipIcon {
-    width: 0.9em;
-    height: 0.9em;
-    margin-left: 5px;
-    margin-top: 1px;
-
-    @include isMobile {
-      display: none;
     }
   }
 

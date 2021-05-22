@@ -12,6 +12,7 @@ import { useIsMobile } from "../components/App";
 import { KEYS } from "../keys";
 import { register } from "./register";
 import { supported as fsSupported } from "browser-fs-access";
+import { CheckboxItem } from "../components/CheckboxItem";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -40,14 +41,12 @@ export const actionChangeExportBackground = register({
     };
   },
   PanelComponent: ({ appState, updateData }) => (
-    <label>
-      <input
-        type="checkbox"
-        checked={appState.exportBackground}
-        onChange={(event) => updateData(event.target.checked)}
-      />{" "}
+    <CheckboxItem
+      checked={appState.exportBackground}
+      onChange={(checked) => updateData(checked)}
+    >
       {t("labels.withBackground")}
-    </label>
+    </CheckboxItem>
   ),
 });
 
@@ -60,21 +59,19 @@ export const actionChangeExportEmbedScene = register({
     };
   },
   PanelComponent: ({ appState, updateData }) => (
-    <label style={{ display: "flex" }}>
-      <input
-        type="checkbox"
-        checked={appState.exportEmbedScene}
-        onChange={(event) => updateData(event.target.checked)}
-      />{" "}
+    <CheckboxItem
+      checked={appState.exportEmbedScene}
+      onChange={(checked) => updateData(checked)}
+    >
       {t("labels.exportEmbedScene")}
       <Tooltip
         label={t("labels.exportEmbedScene_details")}
         position="above"
         long={true}
       >
-        <div className="TooltipIcon">{questionCircle}</div>
+        <div className="Tooltip-icon">{questionCircle}</div>
       </Tooltip>
-    </label>
+    </CheckboxItem>
   ),
 });
 
@@ -87,14 +84,12 @@ export const actionChangeShouldAddWatermark = register({
     };
   },
   PanelComponent: ({ appState, updateData }) => (
-    <label>
-      <input
-        type="checkbox"
-        checked={appState.shouldAddWatermark}
-        onChange={(event) => updateData(event.target.checked)}
-      />{" "}
+    <CheckboxItem
+      checked={appState.shouldAddWatermark}
+      onChange={(checked) => updateData(checked)}
+    >
       {t("labels.addWatermark")}
-    </label>
+    </CheckboxItem>
   ),
 });
 
