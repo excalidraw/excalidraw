@@ -261,7 +261,7 @@
     "copyToClipboardAsPng": "",
     "fileSaved": "ਫਾਈਲ ਸਾਂਭੀ ਗਈ।",
     "fileSavedToFilename": "{filename} ਵਿੱਚ ਸਾਂਭੀ",
-    "canvas": "",
-    "selection": ""
+    "canvas": "ਕੈਨਵਸ",
+    "selection": "ਚੋਣ"
   }
 }
