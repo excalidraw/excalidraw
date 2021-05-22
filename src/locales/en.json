@@ -106,7 +106,7 @@
   "buttons": {
     "clearReset": "Reset the canvas",
     "exportJSON": "Export to file",
-    "exportCanvas": "Export to image",
+    "exportImage": "Save as image",
     "export": "Export",
     "exportToPng": "Export to PNG",
     "exportToSvg": "Export to SVG",

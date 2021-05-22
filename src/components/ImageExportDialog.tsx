@@ -245,12 +245,12 @@ export const ImageExportDialog = ({
         data-testid="image-export-button"
         icon={exportImage}
         type="button"
-        aria-label={t("buttons.exportCanvas")}
+        aria-label={t("buttons.exportImage")}
         showAriaLabel={useIsMobile()}
-        title={t("buttons.exportCanvas")}
+        title={t("buttons.exportImage")}
       />
       {modalIsShown && (
-        <Dialog onCloseRequest={handleClose} title={t("buttons.exportCanvas")}>
+        <Dialog onCloseRequest={handleClose} title={t("buttons.exportImage")}>
           <ImageExportModal
             elements={elements}
             appState={appState}
