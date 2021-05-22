@@ -1,3 +1,13 @@
+<!-- stable-readme-start-->
+
+## Note
+
+**This is an unstable release and not recommended for production. If you don't want to wait for the stable release and try out the unreleased changes you can use this.**
+
+For stable release please use [@excalidraw/excalidraw](https://www.npmjs.com/package/@excalidraw/excalidraw).
+
+<!-- stable-readme-end-->
+
 ### Excalidraw
 
 Excalidraw exported as a component to directly embed in your projects.
@@ -7,20 +17,20 @@ Excalidraw exported as a component to directly embed in your projects.
 You can use npm
 
 ```
-npm install react react-dom @excalidraw/excalidraw
+npm install react react-dom @excalidraw/excalidraw-next
 ```
 
 or via yarn
 
 ```
-yarn add react react-dom @excalidraw/excalidraw
+yarn add react react-dom @excalidraw/excalidraw-next
 ```
 
 After installation you will see a folder `excalidraw-assets` and `excalidraw-assets-dev` in `dist` directory which contains the assets needed for this app in prod and dev mode respectively.
 
 Move the folder `excalidraw-assets` and `excalidraw-assets-dev` to the path where your assets are served.
 
-By default it will try to load the files from `https://unpkg.com/@excalidraw/excalidraw/{currentVersion}/dist/`
+By default it will try to load the files from `https://unpkg.com/@excalidraw/excalidraw-next/dist/`
 
 If you want to load assets from a different path you can set a variable `window.EXCALIDRAW_ASSET_PATH` depending on environment (for example if you have different URL's for dev and prod) to the url from where you want to load the assets.
 
@@ -38,7 +48,7 @@ If you are using a Web bundler (for instance, Webpack), you can import it as an 
 
 ```js
 import React, { useEffect, useState, useRef } from "react";
-import Excalidraw from "@excalidraw/excalidraw";
+import Excalidraw from "@excalidraw/excalidraw-next";
 import InitialData from "./initialData";
 
 import "./styles.scss";
@@ -156,13 +166,13 @@ import { useState, useEffect } from "react";
 export default function IndexPage() {
   const [Comp, setComp] = useState(null);
   useEffect(() => {
-    import("@excalidraw/excalidraw").then((comp) => setComp(comp.default));
+    import("@excalidraw/excalidraw-next").then((comp) => setComp(comp.default));
   });
   return <>{Comp && <Comp />}</>;
 }
 ```
 
-The `types` are available at `@excalidraw/excalidraw/types`, you can view [example for typescript](https://codesandbox.io/s/excalidraw-types-9h2dm)
+The `types` are available at `@excalidraw/excalidraw-next/types`, you can view [example for typescript](https://codesandbox.io/s/excalidraw-types-9h2dm)
 
 #### In Browser
 
@@ -173,7 +183,7 @@ For development use :point_down:
 ```js
 <script
   type="text/javascript"
-  src="https://unpkg.com/@excalidraw/excalidraw@0.8.0/dist/excalidraw.development.js"
+  src="https://unpkg.com/@excalidraw/excalidraw-next/dist/excalidraw.development.js"
 ></script>
 ```
 
@@ -182,7 +192,7 @@ For production use :point_down:
 ```js
 <script
   type="text/javascript"
-  src="https://unpkg.com/@excalidraw/excalidraw@0.8.0/dist/excalidraw.production.min.js"
+  src="https://unpkg.com/@excalidraw/excalidraw-next/dist/excalidraw.production.min.js"
 ></script>
 ```
 
@@ -201,7 +211,7 @@ You will need to make sure `react`, `react-dom` is available as shown in the bel
 
     <script
       type="text/javascript"
-      src="https://unpkg.com/@excalidraw/excalidraw@0.8.0/dist/excalidraw.development.js"
+      src="https://unpkg.com/@excalidraw/excalidraw-next/dist/excalidraw.development.js"
     ></script>
   </head>
 
@@ -495,7 +505,7 @@ This callback is triggered when the shareable-link button is clicked in the expo
 Determines the language of the UI. It should be one of the [available language codes](https://github.com/excalidraw/excalidraw/blob/master/src/i18n.ts#L14). Defaults to `en` (English). We also export default language and supported languages which you can import as shown below.
 
 ```js
-import { defaultLang, languages } from "@excalidraw/excalidraw";
+import { defaultLang, languages } from "@excalidraw/excalidraw-next";
 ```
 
 | name | type |
@@ -636,7 +646,7 @@ The unique id of the excalidraw component. This can be used to identify the exca
 **How to use**
 
 <pre>
-import { getSceneVersion } from "@excalidraw/excalidraw";
+import { getSceneVersion } from "@excalidraw/excalidraw-next";
 getSceneVersion(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>)
 </pre>
 
@@ -653,7 +663,7 @@ isInvisiblySmallElement(element:  <a href="https://github.com/excalidraw/excalid
 **How to use**
 
 ```js
-import { isInvisiblySmallElement } from "@excalidraw/excalidraw";
+import { isInvisiblySmallElement } from "@excalidraw/excalidraw-next";
 ```
 
 Returns `true` if element is invisibly small (e.g. width & height are zero).
@@ -669,7 +679,7 @@ getElementsMap(elements:  <a href="https://github.com/excalidraw/excalidraw/blob
 **How to use**
 
 ```js
-import { getElementsMap } from "@excalidraw/excalidraw";
+import { getElementsMap } from "@excalidraw/excalidraw-next";
 ```
 
 This function returns an object where each element is mapped to its id.
@@ -687,7 +697,7 @@ restoreAppState(appState:  <a href="https://github.com/excalidraw/excalidraw/blo
 **_How to use_**
 
 ```js
-import { restoreAppState } from "@excalidraw/excalidraw";
+import { restoreAppState } from "@excalidraw/excalidraw-next";
 ```
 
 This function will make sure all the keys have appropriate values in [appState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L42) and if any key is missing, it will be set to default value. If you pass `localAppState`, `localAppState` value will be preferred over the `appState` passed in params.
@@ -703,7 +713,7 @@ restoreElements(elements:  <a href="https://github.com/excalidraw/excalidraw/blo
 **_How to use_**
 
 ```js
-import { restoreElements } from "@excalidraw/excalidraw";
+import { restoreElements } from "@excalidraw/excalidraw-next";
 ```
 
 This function will make sure all properties of element is correctly set and if any attribute is missing, it will be set to default value.
@@ -719,7 +729,7 @@ restoreElements(data:  <a href="https://github.com/excalidraw/excalidraw/blob/ma
 **_How to use_**
 
 ```js
-import { restore } from "@excalidraw/excalidraw";
+import { restore } from "@excalidraw/excalidraw-next";
 ```
 
 This function makes sure elements and state is set to appropriate values and set to default value if not present. It is combination of [restoreElements](#restoreElements) and [restoreAppState](#restoreAppState)
@@ -760,7 +770,7 @@ Takes the scene elements and state and returns a JSON string. Deleted `elements`
 **How to use**
 
 ```js
-import { exportToCanvas } from "@excalidraw/excalidraw";
+import { exportToCanvas } from "@excalidraw/excalidraw-next";
 ```
 
 This function returns the canvas with the exported elements, appState and dimensions.
@@ -786,7 +796,7 @@ exportToBlob(
 **How to use**
 
 ```js
-import { exportToBlob } from "@excalidraw/excalidraw";
+import { exportToBlob } from "@excalidraw/excalidraw-next";
 ```
 
 Returns a promise which resolves with a [blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob). It internally uses [canvas.ToBlob](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob).
