@@ -242,7 +242,7 @@ export const ImageExportDialog = ({
         onClick={() => {
           setModalIsShown(true);
         }}
-        data-testid="export-button"
+        data-testid="image-export-button"
         icon={exportImage}
         type="button"
         aria-label={t("buttons.exportCanvas")}

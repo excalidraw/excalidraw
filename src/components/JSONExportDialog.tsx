@@ -94,7 +94,7 @@ export const JSONExportDialog = ({
         onClick={() => {
           setModalIsShown(true);
         }}
-        data-testid="export-button"
+        data-testid="json-export-button"
         icon={save}
         type="button"
         aria-label={t("buttons.export")}
