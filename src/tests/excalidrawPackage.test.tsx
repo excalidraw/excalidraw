@@ -112,7 +112,7 @@ describe("<Excalidraw/>", () => {
 
       fireEvent.click(queryByTestId(container, "export-button")!);
       const textInput: HTMLInputElement | null = document.querySelector(
-        ".ExportDialog__name .TextInput",
+        ".ExportDialog .ProjectName .TextInput",
       );
       expect(textInput?.value).toContain(`${t("labels.untitled")}`);
       expect(textInput?.nodeName).toBe("INPUT");
@@ -124,7 +124,7 @@ describe("<Excalidraw/>", () => {
 
       await fireEvent.click(queryByTestId(container, "export-button")!);
       const textInput = document.querySelector(
-        ".ExportDialog__name .TextInput--readonly",
+        ".ExportDialog .ProjectName .TextInput--readonly",
       );
       expect(textInput?.textContent).toEqual(name);
       expect(textInput?.nodeName).toBe("SPAN");

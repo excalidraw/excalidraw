@@ -159,9 +159,7 @@ const ImageExportModal = ({
               />
             )}
           </Stack.Row>
-          <div className="ExportDialog__name">
-            {actionManager.renderAction("changeProjectName")}
-          </div>
+          {actionManager.renderAction("changeProjectName")}
           <Stack.Row gap={2}>
             {scales.map((s) => {
               const [width, height] = getExportSize(
