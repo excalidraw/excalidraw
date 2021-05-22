@@ -4,7 +4,7 @@
 
 For stable release please use [@excalidraw/excalidraw](https://www.npmjs.com/package/@excalidraw/excalidraw).
 
-<!-- stable-readme-end-->
+<!-- stable-readme-start-->
 
 ### Excalidraw
 
@@ -830,4 +830,4 @@ This function returns a svg with the exported elements.
 | shouldAddWatermark | boolean | false | Indicates whether watermark should be exported |
 | exportWithDarkMode | boolean | false | Indicates whether to export with dark mode |
 
- <!-- stable-readme-start-->
+ <!-- stable-readme-end-->
