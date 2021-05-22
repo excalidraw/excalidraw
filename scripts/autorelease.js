@@ -9,6 +9,17 @@ const getShortCommitHash = () => {
   return execSync("git rev-parse --short HEAD").toString().trim();
 };
 
+const publish = () => {
+  try {
+    execSync(`yarn  --frozen-lockfile`);
+    execSync(`yarn --frozen-lockfile`, { cwd: excalidrawDir });
+    execSync(`yarn run build:umd`, { cwd: excalidrawDir });
+    execSync(`yarn --cwd ${excalidrawDir} publish`);
+  } catch (e) {
+    console.error(e);
+  }
+};
+
 // get files changed between prev and head commit
 exec(`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
   if (error || stderr) {
@@ -27,20 +38,14 @@ exec(`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
     process.exit(0);
   }
 
+  // update package.json
   pkg.version = `${pkg.version}-${getShortCommitHash()}`;
   pkg.name = "aakansha-excalidraw";
-  await fs.writeFileSync(
-    excalidrawPackage,
-    JSON.stringify(pkg, null, 2),
-    "utf8",
-  );
+  fs.writeFileSync(excalidrawPackage, JSON.stringify(pkg, null, 2), "utf8");
 
-  try {
-    execSync(`yarn  --frozen-lockfile`);
-    execSync(`yarn --frozen-lockfile`, { cwd: excalidrawDir });
-    execSync(`yarn run build:umd`, { cwd: excalidrawDir });
-    execSync(`yarn --cwd ${excalidrawDir} publish`);
-  } catch (e) {
-    console.error(e);
-  }
+  // update readme
+  const data = fs.readFileSync(`${excalidrawDir}/README_NEXT.md`, "utf8");
+  fs.writeFileSync(`${excalidrawDir}/README.md`, data, "utf8");
+
+  publish();
 });
