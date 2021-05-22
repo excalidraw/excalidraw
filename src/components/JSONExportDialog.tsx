@@ -12,18 +12,6 @@ import { Card } from "./Card";
 
 import "./ExportDialog.scss";
 
-export const ErrorCanvasPreview = () => {
-  return (
-    <div>
-      <h3>{t("canvasError.cannotShowPreview")}</h3>
-      <p>
-        <span>{t("canvasError.canvasTooBig")}</span>
-      </p>
-      <em>({t("canvasError.canvasTooBigTip")})</em>
-    </div>
-  );
-};
-
 export type ExportCB = (
   elements: readonly NonDeletedExcalidrawElement[],
   scale?: number,
