@@ -53,7 +53,7 @@ export type ExportCB = (
   scale?: number,
 ) => void;
 
-const CanvasExportModal = ({
+const ImageExportModal = ({
   elements,
   appState,
   exportPadding = 10,
@@ -214,7 +214,7 @@ const CanvasExportModal = ({
   );
 };
 
-export const CanvasExportDialog = ({
+export const ImageExportDialog = ({
   elements,
   appState,
   exportPadding = 10,
@@ -252,7 +252,7 @@ export const CanvasExportDialog = ({
       />
       {modalIsShown && (
         <Dialog onCloseRequest={handleClose} title={t("buttons.exportCanvas")}>
-          <CanvasExportModal
+          <ImageExportModal
             elements={elements}
             appState={appState}
             exportPadding={exportPadding}

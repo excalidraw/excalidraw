@@ -28,7 +28,7 @@ import { SelectedShapeActions, ShapesSwitcher, ZoomActions } from "./Actions";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 import CollabButton from "./CollabButton";
 import { ErrorDialog } from "./ErrorDialog";
-import { ExportCB, CanvasExportDialog } from "./CanvasExportDialog";
+import { ExportCB, ImageExportDialog } from "./ImageExportDialog";
 import { FixedSideContainer } from "./FixedSideContainer";
 import { HintViewer } from "./HintViewer";
 import { exportFile, load, trash } from "./icons";
@@ -405,7 +405,7 @@ const LayerUI = ({
     );
   };
 
-  const renderCanvasExportDialog = () => {
+  const renderImageExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
       return null;
     }
@@ -429,7 +429,7 @@ const LayerUI = ({
     };
 
     return (
-      <CanvasExportDialog
+      <ImageExportDialog
         elements={elements}
         appState={appState}
         actionManager={actionManager}
@@ -458,7 +458,7 @@ const LayerUI = ({
           <Stack.Col gap={4}>
             <Stack.Row gap={1} justifyContent="space-between">
               {renderJSONExportDialog()}
-              {renderCanvasExportDialog()}
+              {renderImageExportDialog()}
             </Stack.Row>
           </Stack.Col>
         </Island>
@@ -481,7 +481,7 @@ const LayerUI = ({
             <Separator />
             {actionManager.renderAction("loadScene")}
             {renderJSONExportDialog()}
-            {renderCanvasExportDialog()}
+            {renderImageExportDialog()}
             <Separator />
             {onCollabButtonClick && (
               <CollabButton
