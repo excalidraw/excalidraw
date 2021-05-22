@@ -1,10 +1,12 @@
+<!-- stable-readme-start-->
+
 ## Note
 
 **This is an unstable release and not recommended for production. If you don't want to wait for the stable release and try out the unreleased changes you can use this.**
 
 For stable release please use [@excalidraw/excalidraw](https://www.npmjs.com/package/@excalidraw/excalidraw).
 
-<!-- stable-readme-start-->
+<!-- stable-readme-end-->
 
 ### Excalidraw
 
@@ -829,5 +831,3 @@ This function returns a svg with the exported elements.
 | viewBackgroundColor | string | #fff | The default background color |
 | shouldAddWatermark | boolean | false | Indicates whether watermark should be exported |
 | exportWithDarkMode | boolean | false | Indicates whether to export with dark mode |
-
- <!-- stable-readme-end-->
