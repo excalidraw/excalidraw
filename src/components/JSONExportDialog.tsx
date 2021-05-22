@@ -29,8 +29,6 @@ const JSONExportModal = ({
   onExportToBackend?: ExportCB;
   onCloseRequest: () => void;
 }) => {
-  const exportedElements = elements;
-
   return (
     <div className="ExportDialog">
       <div
@@ -68,7 +66,7 @@ const JSONExportModal = ({
               title={"Export to Link"}
               aria-label={"Export to Link"}
               showAriaLabel={true}
-              onClick={() => onExportToBackend(exportedElements)}
+              onClick={() => onExportToBackend(elements)}
             />
           </Card>
         )}
