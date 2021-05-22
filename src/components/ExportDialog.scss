@@ -64,11 +64,24 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     justify-items: center;
+    row-gap: 2em;
+
+    @media (max-width: 460px) {
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      .Card-details {
+        min-height: 40px;
+      }
+    }
 
     .ProjectName {
-      margin: 1em 0;
+      width: fit-content;
+      margin: 1em auto;
       align-items: flex-start;
       flex-direction: column;
+
+      .TextInput {
+        width: auto;
+      }
     }
 
     .ProjectName-label {
