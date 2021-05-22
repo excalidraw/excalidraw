@@ -40,7 +40,7 @@ exec(`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
 
   // update package.json
   pkg.version = `${pkg.version}-${getShortCommitHash()}`;
-  pkg.name = "aakansha-excalidraw";
+  pkg.name = "@excalidraw/excalidraw-next";
   fs.writeFileSync(excalidrawPackage, JSON.stringify(pkg, null, 2), "utf8");
 
   // update readme
