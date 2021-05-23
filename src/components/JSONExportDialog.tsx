@@ -5,7 +5,7 @@ import { t } from "../i18n";
 import { useIsMobile } from "./App";
 import { AppState } from "../types";
 import { Dialog } from "./Dialog";
-import { exportToFileIcon, link, save } from "./icons";
+import { exportFile, exportToFileIcon, link } from "./icons";
 import { ToolButton } from "./ToolButton";
 import { actionSaveAsScene } from "../actions/actionExport";
 import { Card } from "./Card";
@@ -95,7 +95,7 @@ export const JSONExportDialog = ({
           setModalIsShown(true);
         }}
         data-testid="json-export-button"
-        icon={save}
+        icon={exportFile}
         type="button"
         aria-label={t("buttons.export")}
         showAriaLabel={useIsMobile()}
