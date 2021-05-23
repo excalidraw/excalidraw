@@ -125,11 +125,10 @@ export const actionSaveScene = register({
     event.key === KEYS.S && event[KEYS.CTRL_OR_CMD] && !event.shiftKey,
   PanelComponent: ({ updateData }) => (
     <ToolButton
-      type="button"
+      type="icon"
       icon={save}
       title={t("buttons.save")}
       aria-label={t("buttons.save")}
-      showAriaLabel={useIsMobile()}
       onClick={() => updateData(null)}
       data-testid="save-button"
     />

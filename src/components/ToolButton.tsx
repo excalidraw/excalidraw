@@ -30,8 +30,12 @@ type ToolButtonProps =
       onClick?(): void;
     })
   | (ToolButtonBaseProps & {
+      type: "icon";
+      children?: React.ReactNode;
+      onClick?(): void;
+    })
+  | (ToolButtonBaseProps & {
       type: "radio";
-
       checked: boolean;
       onChange?(): void;
     });
@@ -43,7 +47,7 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
   React.useImperativeHandle(ref, () => innerRef.current);
   const sizeCn = `ToolIcon_size_${props.size || DEFAULT_SIZE}`;
 
-  if (props.type === "button") {
+  if (props.type === "button" || props.type === "icon") {
     return (
       <button
         className={clsx(
@@ -56,6 +60,7 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
           {
             ToolIcon: !props.hidden,
             "ToolIcon--selected": props.selected,
+            "ToolIcon--plain": props.type === "icon",
           },
         )}
         data-testid={props["data-testid"]}

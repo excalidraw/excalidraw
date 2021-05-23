@@ -14,6 +14,14 @@
     user-select: none;
   }
 
+  .ToolIcon--plain {
+    background-color: transparent;
+    .ToolIcon__icon {
+      width: 2rem;
+      height: 2rem;
+    }
+  }
+
   .ToolIcon__icon {
     width: 2.5rem;
     height: 2.5rem;
