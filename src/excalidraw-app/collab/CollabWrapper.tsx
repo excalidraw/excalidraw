@@ -217,7 +217,11 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   };
 
   private initializeSocketClient = async (
-    existingRoomLinkData: null | { roomId: string; roomKey: string },
+    existingRoomLinkData: null | {
+      roomId: string;
+      roomKey: string;
+      userName: string;
+    },
   ): Promise<ImportedDataState | null> => {
     if (this.portal.socket) {
       return null;
@@ -225,9 +229,10 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
     let roomId;
     let roomKey;
+    let userName = "";
 
     if (existingRoomLinkData) {
-      ({ roomId, roomKey } = existingRoomLinkData);
+      ({ roomId, roomKey, userName } = existingRoomLinkData);
     } else {
       ({ roomId, roomKey } = await generateCollaborationLinkData());
       window.history.pushState(
@@ -245,7 +250,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       /* webpackChunkName: "socketIoClient" */ "socket.io-client"
     );
 
-    this.portal.open(socketIOClient(SOCKET_SERVER), roomId, roomKey);
+    this.portal.open(socketIOClient(SOCKET_SERVER), roomId, roomKey, userName);
 
     if (existingRoomLinkData) {
       this.excalidrawAPI.resetScene();
@@ -530,6 +535,10 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       this.excalidrawAPI.updateScene({ collaborators });
     });
   }
+  setUserName = (username: string) => {
+    this.setState({ username });
+    saveUsernameToLocalStorage(username);
+  };
 
   public setLastBroadcastedOrReceivedSceneVersion = (version: number) => {
     this.lastBroadcastedOrReceivedSceneVersion = version;
@@ -592,7 +601,6 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   handleClose = () => {
     this.setState({ modalIsShown: false });
   };
-
   onUsernameChange = (username: string) => {
     this.setState({ username });
     saveUsernameToLocalStorage(username);

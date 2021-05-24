@@ -3,7 +3,6 @@ import {
   SocketUpdateData,
   SocketUpdateDataSource,
 } from "../data";
-
 import CollabWrapper from "./CollabWrapper";
 
 import { ExcalidrawElement } from "../../element/types";
@@ -17,17 +16,23 @@ class Portal {
   socketInitialized: boolean = false; // we don't want the socket to emit any updates until it is fully initialized
   roomId: string | null = null;
   roomKey: string | null = null;
+  userName: string | null = null;
   broadcastedElementVersions: Map<string, number> = new Map();
 
   constructor(collab: CollabWrapper) {
     this.collab = collab;
   }
 
-  open(socket: SocketIOClient.Socket, id: string, key: string) {
+  open(
+    socket: SocketIOClient.Socket,
+    id: string,
+    key: string,
+    _userName: string,
+  ) {
     this.socket = socket;
     this.roomId = id;
     this.roomKey = key;
-
+    this.userName = _userName;
     // Initialize socket listeners
     this.socket.on("init-room", () => {
       if (this.socket) {
@@ -46,6 +51,11 @@ class Portal {
     });
     this.socket.on("room-user-change", (clients: string[]) => {
       this.collab.setCollaborators(clients);
+      let name = "?";
+      if (this.userName) {
+        name = this.userName;
+      }
+      this.collab.setUserName(name);
     });
   }
 
