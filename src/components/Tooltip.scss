@@ -1,5 +1,5 @@
 @import "../css/variables.module";
-.ExcalidrawTooltip {
+.excalidraw-tooltip {
   position: absolute;
   z-index: 1000;
 
@@ -19,7 +19,7 @@
 
   display: none;
 
-  &.is-shown {
+  &.excalidraw-tooltip--visible {
     display: block;
   }
 }

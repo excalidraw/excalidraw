@@ -4,14 +4,14 @@ import React, { useEffect } from "react";
 
 const getTooltipDiv = () => {
   const existingDiv = document.querySelector<HTMLDivElement>(
-    ".ExcalidrawTooltip",
+    ".excalidraw-tooltip",
   );
   if (existingDiv) {
     return existingDiv;
   }
   const div = document.createElement("div");
   document.body.appendChild(div);
-  div.classList.add("ExcalidrawTooltip");
+  div.classList.add("excalidraw-tooltip");
   return div;
 };
 
@@ -21,7 +21,7 @@ const updateTooltip = (
   label: string,
   long: boolean,
 ) => {
-  tooltip.classList.add("is-shown");
+  tooltip.classList.add("excalidraw-tooltip--visible");
   tooltip.style.minWidth = long ? "50ch" : "10ch";
   tooltip.style.maxWidth = long ? "50ch" : "15ch";
 
@@ -68,7 +68,8 @@ type TooltipProps = {
 
 export const Tooltip = ({ children, label, long = false }: TooltipProps) => {
   useEffect(() => {
-    return () => getTooltipDiv().classList.remove("is-shown");
+    return () =>
+      getTooltipDiv().classList.remove("excalidraw-tooltip--visible");
   }, []);
 
   return (
@@ -81,7 +82,9 @@ export const Tooltip = ({ children, label, long = false }: TooltipProps) => {
           long,
         )
       }
-      onPointerLeave={() => getTooltipDiv().classList.remove("is-shown")}
+      onPointerLeave={() =>
+        getTooltipDiv().classList.remove("excalidraw-tooltip--visible")
+      }
     >
       {children}
     </div>
