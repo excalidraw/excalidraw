@@ -415,26 +415,31 @@ export class LinearElementEditor {
     return [rotatedX - element.x, rotatedY - element.y];
   }
 
-  // element-mutating methods
-  // ---------------------------------------------------------------------------
-
   /**
    * Normalizes line points so that the start point is at [0,0]. This is
-   *  expected in various parts of the codebase.
+   * expected in various parts of the codebase. Also returns new x/y to account
+   * for the potential normalization.
    */
-  static normalizePoints(element: NonDeleted<ExcalidrawLinearElement>) {
+  static getNormalizedPoints(element: ExcalidrawLinearElement) {
     const { points } = element;
 
     const offsetX = points[0][0];
     const offsetY = points[0][1];
 
-    mutateElement(element, {
+    return {
       points: points.map((point, _idx) => {
         return [point[0] - offsetX, point[1] - offsetY] as const;
       }),
       x: element.x + offsetX,
       y: element.y + offsetY,
-    });
+    };
+  }
+
+  // element-mutating methods
+  // ---------------------------------------------------------------------------
+
+  static normalizePoints(element: NonDeleted<ExcalidrawLinearElement>) {
+    mutateElement(element, LinearElementEditor.getNormalizedPoints(element));
   }
 
   static movePointByOffset(
