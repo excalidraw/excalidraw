@@ -136,8 +136,11 @@ export const decryptAESGEM = async (
 
 export const getCollaborationLinkData = (link: string) => {
   const hash = new URL(link).hash;
+  const search = new URL(link).searchParams;
+  let name = search.get("name");
   const match = hash.match(/^#room=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/);
-  return match ? { roomId: match[1], roomKey: match[2] } : null;
+  name = name ? name.substring(0, name.length - 1) : "?";
+  return match ? { roomId: match[1], roomKey: match[2], userName: name } : null;
 };
 
 export const generateCollaborationLinkData = async () => {
