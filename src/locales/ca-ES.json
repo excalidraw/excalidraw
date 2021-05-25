@@ -42,8 +42,8 @@
     "fontSize": "Mida de lletra",
     "fontFamily": "Tipus de lletra",
     "onlySelected": "Només seleccionats",
-    "withBackground": "Amb fons",
-    "exportEmbedScene": "Incrustar escena al fitxer exportat",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "Les dades de l’escena es desaran al fitxer PNG/SVG de manera que es pugui restaurar l’escena.\nAugmentarà la mida del fitxer exportat.",
     "addWatermark": "Afegir \"Fet amb Excalidraw\"",
     "handDrawn": "Dibuixat a mà",
@@ -105,13 +105,15 @@
   },
   "buttons": {
     "clearReset": "Netejar el llenç",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "Exportar",
     "exportToPng": "Exportar a PNG",
     "exportToSvg": "Exportar a SNG",
     "copyToClipboard": "Copiar al porta-retalls",
     "copyPngToClipboard": "Copiar PNG al porta-retalls",
     "scale": "Escala",
-    "save": "Desar",
+    "save": "",
     "saveAs": "Desar com",
     "load": "Carregar",
     "getShareableLink": "Obtenir enllaç per compartir",
@@ -214,6 +216,14 @@
   },
   "errorDialog": {
     "title": "Error"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "Llegiu el nostre blog",
