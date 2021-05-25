@@ -42,8 +42,8 @@
     "fontSize": "字体大小",
     "fontFamily": "字体",
     "onlySelected": "仅被选中",
-    "withBackground": "包括背景",
-    "exportEmbedScene": "将画布数据嵌入到导出的文件",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "画布数据将被保存到导出的 PNG/SVG 文件，以便恢复。\n将会增加导出的文件大小。",
     "addWatermark": "添加 “使用 Excalidraw 创建” 水印",
     "handDrawn": "手写",
@@ -105,13 +105,15 @@
   },
   "buttons": {
     "clearReset": "重置画布",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "导出",
     "exportToPng": "导出为 PNG",
     "exportToSvg": "导出为 SVG",
     "copyToClipboard": "复制到剪贴板",
     "copyPngToClipboard": "复制 PNG 到剪切板",
     "scale": "缩放",
-    "save": "保存",
+    "save": "",
     "saveAs": "保存为",
     "load": "载入文件",
     "getShareableLink": "获取共享链接",
@@ -214,6 +216,14 @@
   },
   "errorDialog": {
     "title": "错误"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "浏览我们的博客",
