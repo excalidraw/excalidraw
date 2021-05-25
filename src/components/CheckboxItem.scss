@@ -15,7 +15,7 @@
       box-shadow: 0 0 0 2px #{$oc-blue-4};
     }
 
-    &:hover:not(.is-checked) .Checkbox-box {
+    &:hover:not(.is-checked) .Checkbox-box:not(:focus) {
       svg {
         display: block;
         opacity: 0.3;
