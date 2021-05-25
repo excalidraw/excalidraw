@@ -23,3 +23,17 @@
     display: block;
   }
 }
+
+.excalidraw {
+  .Tooltip-icon {
+    width: 0.9em;
+    height: 0.9em;
+    margin-left: 5px;
+    margin-top: 1px;
+    display: flex;
+
+    @include isMobile {
+      display: none;
+    }
+  }
+}

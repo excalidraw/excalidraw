@@ -131,4 +131,5 @@ export interface ActionsManagerInterface {
   registerAction: (action: Action) => void;
   handleKeyDown: (event: React.KeyboardEvent | KeyboardEvent) => boolean;
   renderAction: (name: ActionName) => React.ReactElement | null;
+  executeAction: (action: Action) => void;
 }

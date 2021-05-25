@@ -28,7 +28,7 @@ import { SelectedShapeActions, ShapesSwitcher, ZoomActions } from "./Actions";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 import CollabButton from "./CollabButton";
 import { ErrorDialog } from "./ErrorDialog";
-import { ExportCB, ExportDialog } from "./ExportDialog";
+import { ExportCB, ImageExportDialog } from "./ImageExportDialog";
 import { FixedSideContainer } from "./FixedSideContainer";
 import { HintViewer } from "./HintViewer";
 import { exportFile, load, trash } from "./icons";
@@ -46,6 +46,7 @@ import { ToolButton } from "./ToolButton";
 import { Tooltip } from "./Tooltip";
 import { UserList } from "./UserList";
 import Library from "../data/library";
+import { JSONExportDialog } from "./JSONExportDialog";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -382,7 +383,29 @@ const LayerUI = ({
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
-  const renderExportDialog = () => {
+  const renderJSONExportDialog = () => {
+    if (!UIOptions.canvasActions.export) {
+      return null;
+    }
+
+    return (
+      <JSONExportDialog
+        elements={elements}
+        appState={appState}
+        actionManager={actionManager}
+        onExportToBackend={
+          onExportToBackend
+            ? (elements) => {
+                onExportToBackend &&
+                  onExportToBackend(elements, appState, canvas);
+              }
+            : undefined
+        }
+      />
+    );
+  };
+
+  const renderImageExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
       return null;
     }
@@ -406,23 +429,19 @@ const LayerUI = ({
     };
 
     return (
-      <ExportDialog
+      <ImageExportDialog
         elements={elements}
         appState={appState}
         actionManager={actionManager}
         onExportToPng={createExporter("png")}
         onExportToSvg={createExporter("svg")}
         onExportToClipboard={createExporter("clipboard")}
-        onExportToBackend={
-          onExportToBackend
-            ? (elements) => {
-                onExportToBackend &&
-                  onExportToBackend(elements, appState, canvas);
-              }
-            : undefined
-        }
       />
     );
+  };
+
+  const Separator = () => {
+    return <div style={{ width: ".625em" }} />;
   };
 
   const renderViewModeCanvasActions = () => {
@@ -438,9 +457,8 @@ const LayerUI = ({
         <Island padding={2} style={{ zIndex: 1 }}>
           <Stack.Col gap={4}>
             <Stack.Row gap={1} justifyContent="space-between">
-              {actionManager.renderAction("saveScene")}
-              {actionManager.renderAction("saveAsScene")}
-              {renderExportDialog()}
+              {renderJSONExportDialog()}
+              {renderImageExportDialog()}
             </Stack.Row>
           </Stack.Col>
         </Island>
@@ -459,11 +477,12 @@ const LayerUI = ({
       <Island padding={2} style={{ zIndex: 1 }}>
         <Stack.Col gap={4}>
           <Stack.Row gap={1} justifyContent="space-between">
-            {actionManager.renderAction("loadScene")}
-            {actionManager.renderAction("saveScene")}
-            {actionManager.renderAction("saveAsScene")}
-            {renderExportDialog()}
             {actionManager.renderAction("clearCanvas")}
+            <Separator />
+            {actionManager.renderAction("loadScene")}
+            {renderJSONExportDialog()}
+            {renderImageExportDialog()}
+            <Separator />
             {onCollabButtonClick && (
               <CollabButton
                 isCollaborating={isCollaborating}
@@ -712,7 +731,8 @@ const LayerUI = ({
         elements={elements}
         actionManager={actionManager}
         libraryMenu={libraryMenu}
-        exportButton={renderExportDialog()}
+        renderJSONExportDialog={renderJSONExportDialog}
+        renderImageExportDialog={renderImageExportDialog}
         setAppState={setAppState}
         onCollabButtonClick={onCollabButtonClick}
         onLockToggle={onLockToggle}
