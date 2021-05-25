@@ -1,49 +1,53 @@
-.Card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+@import "../css/variables.module";
 
-  max-width: 290px;
-
-  margin: 1em;
-
-  text-align: center;
-
-  .Card-icon {
-    font-size: 2.6em;
+.excalidraw {
+  .Card {
     display: flex;
-    flex: 0 0 auto;
-    padding: 1.4rem;
-    border-radius: 50%;
-    background: var(--card-color);
-    color: #fff;
+    flex-direction: column;
+    align-items: center;
 
-    svg {
-      width: 2.8rem;
-      height: 2.8rem;
-    }
-  }
+    max-width: 290px;
 
-  .Card-details {
-    font-size: 0.96em;
-    min-height: 90px;
-    padding: 0 1em;
-    margin-bottom: auto;
-  }
+    margin: 1em;
 
-  & .Card-button.ToolIcon_type_button {
-    height: 2.5rem;
-    margin-top: 1em;
-    margin-bottom: 0.3em;
-    background-color: var(--card-color);
-    &:hover {
-      background-color: var(--card-color-darker);
+    text-align: center;
+
+    .Card-icon {
+      font-size: 2.6em;
+      display: flex;
+      flex: 0 0 auto;
+      padding: 1.4rem;
+      border-radius: 50%;
+      background: var(--card-color);
+      color: $oc-white;
+
+      svg {
+        width: 2.8rem;
+        height: 2.8rem;
+      }
     }
-    &:active {
-      background-color: var(--card-color-darkest);
+
+    .Card-details {
+      font-size: 0.96em;
+      min-height: 90px;
+      padding: 0 1em;
+      margin-bottom: auto;
     }
-    .ToolIcon__label {
-      color: #fff;
+
+    & .Card-button.ToolIcon_type_button {
+      height: 2.5rem;
+      margin-top: 1em;
+      margin-bottom: 0.3em;
+      background-color: var(--card-color);
+      &:hover {
+        background-color: var(--card-color-darker);
+      }
+      &:active {
+        background-color: var(--card-color-darkest);
+      }
+      .ToolIcon__label {
+        color: $oc-white;
+      }
     }
   }
 }
