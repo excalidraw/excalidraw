@@ -42,8 +42,8 @@
     "fontSize": "Betűméret",
     "fontFamily": "Betűkészlet család",
     "onlySelected": "Csak a kijelölt",
-    "withBackground": "Háttérrel",
-    "exportEmbedScene": "Jelenet beágyazása az exportált fájlba",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "A jelenetet leíró adatok hozzá lesznek adva a PNG/SVG fájlhoz, így a jelenetet vissza lehet majd tölteni belőle. Ez megnöveli a fájl méretét.",
     "addWatermark": "Add hozzá, hogy \"Excalidraw-val készült\"",
     "handDrawn": "Kézzel rajzolt",
@@ -105,13 +105,15 @@
   },
   "buttons": {
     "clearReset": "Vászon törlése",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "Exportálás",
     "exportToPng": "Exportálás PNG-be",
     "exportToSvg": "Exportálás SVG-be",
     "copyToClipboard": "Vágólapra másolás",
     "copyPngToClipboard": "PNG másolása a vágólapra",
     "scale": "Nagyítás",
-    "save": "Mentés",
+    "save": "",
     "saveAs": "Mentés másként",
     "load": "Betöltés",
     "getShareableLink": "Megosztható link létrehozása",
@@ -214,6 +216,14 @@
   },
   "errorDialog": {
     "title": "Hiba"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "",
