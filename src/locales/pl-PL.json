@@ -42,8 +42,8 @@
     "fontSize": "Rozmiar tekstu",
     "fontFamily": "Krój pisma",
     "onlySelected": "Tylko wybrane",
-    "withBackground": "Z tłem",
-    "exportEmbedScene": "Osadź scenę w eksportowanym pliku",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "Dane sceny zostaną zapisane w eksportowanym pliku PNG/SVG tak, aby scena mogła zostać z niego przywrócona.\nZwiększy to rozmiar eksportowanego pliku.",
     "addWatermark": "Dodaj \"Zrobione w Excalidraw\"",
     "handDrawn": "Odręczny",
@@ -105,13 +105,15 @@
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "Zapisz jako",
     "exportToPng": "Zapisz jako PNG",
     "exportToSvg": "Zapisz jako SVG",
     "copyToClipboard": "Skopiuj do schowka",
     "copyPngToClipboard": "Skopiuj do schowka jako plik PNG",
     "scale": "Skala",
-    "save": "Zapisz",
+    "save": "",
     "saveAs": "Zapisz jako",
     "load": "Otwórz",
     "getShareableLink": "Udostępnij",
@@ -214,6 +216,14 @@
   },
   "errorDialog": {
     "title": "Wystąpił błąd"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "Przeczytaj na naszym blogu",
