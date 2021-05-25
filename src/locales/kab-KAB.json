@@ -42,8 +42,8 @@
     "fontSize": "Tiddi n tsefsit",
     "fontFamily": "Tawacult n tsefsiyin",
     "onlySelected": "Tafrayt kan",
-    "withBackground": "",
-    "exportEmbedScene": "",
+    "withBackground": "Agilal",
+    "exportEmbedScene": "Sleɣ asayes",
     "exportEmbedScene_details": "Asayes ad yettwasekles deg ufaylu n usifeḍ PNG/SVG akken akken ad yili wamek ara d-yettwarr seg-s usayes. Ayagi ad isimɣur tiddi n ufaylu n usifeḍ.",
     "addWatermark": "Seddu \"Yettwaxdem s Excalidraw\"",
     "handDrawn": "Asuneɣ s ufus",
@@ -105,15 +105,15 @@
   },
   "buttons": {
     "clearReset": "Ales awennez n teɣzut n usuneɣ",
-    "exportJSON": "",
-    "exportImage": "",
+    "exportJSON": "Sifeḍ afaylu",
+    "exportImage": "Sekles am tugna",
     "export": "Sifeḍ",
     "exportToPng": "Sifeḍ ɣer PNG",
     "exportToSvg": "Sifeḍ ɣer SVG",
     "copyToClipboard": "Nɣel ɣer tecfawit",
     "copyPngToClipboard": "Nɣel PNG ɣer tecfawit",
     "scale": "Taskala",
-    "save": "",
+    "save": "Sekles deg ufaylu amiran",
     "saveAs": "Sekles am",
     "load": "Sali-d",
     "getShareableLink": "Awi-d aseɣwen n beṭṭu",
@@ -218,12 +218,12 @@
     "title": "Tuccḍa"
   },
   "exportDialog": {
-    "disk_title": "",
-    "disk_details": "",
-    "disk_button": "",
-    "link_title": "",
-    "link_details": "",
-    "link_button": ""
+    "disk_title": "Sekles deg uḍebsi",
+    "disk_details": "Sekles isefka n usayes deg ufaylu ansi ara tizmireḍ ad d-tketreḍ areḍqal.",
+    "disk_button": "Sekles deg ufaylu",
+    "link_title": "Aseɣwen n beṭṭu",
+    "link_details": "Sifeḍ am useɣwen n tɣuri kan.",
+    "link_button": "Sifeḍ deg useɣwen"
   },
   "helpDialog": {
     "blog": "Ɣeṛ ablug-nneɣ",
