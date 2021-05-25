@@ -42,8 +42,8 @@
     "fontSize": "Ukuran font",
     "fontFamily": "Jenis font",
     "onlySelected": "Hanya yang Dipilih",
-    "withBackground": "",
-    "exportEmbedScene": "",
+    "withBackground": "Latar",
+    "exportEmbedScene": "Sematkan pemandangan",
     "exportEmbedScene_details": "Data pemandangan akan disimpan dalam file PNG/SVG yang diekspor, sehingga pemandangan itu dapat dipulihkan darinya.\nAkan membesarkan ukuran file yang diekspor.",
     "addWatermark": "Tambahkan \"Dibuat dengan Excalidraw\"",
     "handDrawn": "Tulisan tangan",
@@ -105,15 +105,15 @@
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
-    "exportJSON": "",
-    "exportImage": "",
+    "exportJSON": "Ekspor ke file",
+    "exportImage": "Simpan gambar",
     "export": "Ekspor",
     "exportToPng": "Ekspor ke PNG",
     "exportToSvg": "Ekspor ke SVG",
     "copyToClipboard": "Salin ke Papan Klip",
     "copyPngToClipboard": "Salin PNG ke papan klip",
     "scale": "Skala",
-    "save": "",
+    "save": "Simpan ke file sekarang",
     "saveAs": "Simpan sebagai",
     "load": "Muat",
     "getShareableLink": "Buat Tautan yang Bisa Dibagian",
@@ -218,12 +218,12 @@
     "title": "Kesalahan"
   },
   "exportDialog": {
-    "disk_title": "",
-    "disk_details": "",
-    "disk_button": "",
-    "link_title": "",
-    "link_details": "",
-    "link_button": ""
+    "disk_title": "Simpan ke disk",
+    "disk_details": "Ekspor data pemandangan ke file yang mana Anda dapat impor nanti.",
+    "disk_button": "Simpan ke file",
+    "link_title": "Tautan",
+    "link_details": "Ekspor sebagai tautan yang hanya dibaca.",
+    "link_button": "Ekspor ke tautan"
   },
   "helpDialog": {
     "blog": "Baca blog kami",
