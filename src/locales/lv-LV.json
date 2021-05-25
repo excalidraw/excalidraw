@@ -42,7 +42,7 @@
     "fontSize": "Teksta lielums",
     "fontFamily": "Fontu saime",
     "onlySelected": "Tikai iezīmētais",
-    "withBackground": "Ar fonu",
+    "withBackground": "",
     "exportEmbedScene": "",
     "exportEmbedScene_details": "",
     "addWatermark": "",
@@ -105,6 +105,8 @@
   },
   "buttons": {
     "clearReset": "",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "",
     "exportToPng": "",
     "exportToSvg": "",
@@ -214,6 +216,14 @@
   },
   "errorDialog": {
     "title": ""
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "",
