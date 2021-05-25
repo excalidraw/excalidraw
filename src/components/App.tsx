@@ -2280,115 +2280,119 @@ class App extends React.Component<AppProps, AppState> {
     invalidateContextMenu = true;
   };
 
-  private handleCanvasPointerDown = (
-    event: React.PointerEvent<HTMLCanvasElement>,
-  ) => {
-    event.persist();
+  private handleCanvasPointerDown = withBatchedUpdates(
+    (event: React.PointerEvent<HTMLCanvasElement>) => {
+      event.persist();
 
-    // remove any active selection when we start to interact with canvas
-    // (mainly, we care about removing selection outside the component which
-    //  would prevent our copy handling otherwise)
-    const selection = document.getSelection();
-    if (selection?.anchorNode) {
-      selection.removeAllRanges();
-    }
+      if (this.state.openMenu === "canvas") {
+        this.setState({ openMenu: null });
+      }
 
-    this.maybeOpenContextMenuAfterPointerDownOnTouchDevices(event);
-    this.maybeCleanupAfterMissingPointerUp(event);
+      // remove any active selection when we start to interact with canvas
+      // (mainly, we care about removing selection outside the component which
+      //  would prevent our copy handling otherwise)
+      const selection = document.getSelection();
+      if (selection?.anchorNode) {
+        selection.removeAllRanges();
+      }
 
-    if (isPanning) {
-      return;
-    }
+      this.maybeOpenContextMenuAfterPointerDownOnTouchDevices(event);
+      this.maybeCleanupAfterMissingPointerUp(event);
 
-    this.setState({
-      lastPointerDownWith: event.pointerType,
-      cursorButton: "down",
-    });
-    this.savePointer(event.clientX, event.clientY, "down");
+      if (isPanning) {
+        return;
+      }
 
-    if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
-      return;
-    }
+      this.setState({
+        lastPointerDownWith: event.pointerType,
+        cursorButton: "down",
+      });
+      this.savePointer(event.clientX, event.clientY, "down");
 
-    // only handle left mouse button or touch
-    if (
-      event.button !== POINTER_BUTTON.MAIN &&
-      event.button !== POINTER_BUTTON.TOUCH
-    ) {
-      return;
-    }
+      if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
+        return;
+      }
 
-    this.updateGestureOnPointerDown(event);
+      // only handle left mouse button or touch
+      if (
+        event.button !== POINTER_BUTTON.MAIN &&
+        event.button !== POINTER_BUTTON.TOUCH
+      ) {
+        return;
+      }
 
-    // don't select while panning
-    if (gesture.pointers.size > 1) {
-      return;
-    }
+      this.updateGestureOnPointerDown(event);
 
-    // State for the duration of a pointer interaction, which starts with a
-    // pointerDown event, ends with a pointerUp event (or another pointerDown)
-    const pointerDownState = this.initialPointerDownState(event);
+      // don't select while panning
+      if (gesture.pointers.size > 1) {
+        return;
+      }
 
-    if (this.handleDraggingScrollBar(event, pointerDownState)) {
-      return;
-    }
+      // State for the duration of a pointer interaction, which starts with a
+      // pointerDown event, ends with a pointerUp event (or another pointerDown)
+      const pointerDownState = this.initialPointerDownState(event);
 
-    this.clearSelectionIfNotUsingSelection();
-    this.updateBindingEnabledOnPointerMove(event);
+      if (this.handleDraggingScrollBar(event, pointerDownState)) {
+        return;
+      }
 
-    if (this.handleSelectionOnPointerDown(event, pointerDownState)) {
-      return;
-    }
+      this.clearSelectionIfNotUsingSelection();
+      this.updateBindingEnabledOnPointerMove(event);
 
-    if (this.state.elementType === "text") {
-      this.handleTextOnPointerDown(event, pointerDownState);
-      return;
-    } else if (
-      this.state.elementType === "arrow" ||
-      this.state.elementType === "line"
-    ) {
-      this.handleLinearElementOnPointerDown(
-        event,
-        this.state.elementType,
+      if (this.handleSelectionOnPointerDown(event, pointerDownState)) {
+        return;
+      }
+
+      if (this.state.elementType === "text") {
+        this.handleTextOnPointerDown(event, pointerDownState);
+        return;
+      } else if (
+        this.state.elementType === "arrow" ||
+        this.state.elementType === "line"
+      ) {
+        this.handleLinearElementOnPointerDown(
+          event,
+          this.state.elementType,
+          pointerDownState,
+        );
+      } else if (this.state.elementType === "freedraw") {
+        this.handleFreeDrawElementOnPointerDown(
+          event,
+          this.state.elementType,
+          pointerDownState,
+        );
+      } else {
+        this.createGenericElementOnPointerDown(
+          this.state.elementType,
+          pointerDownState,
+        );
+      }
+
+      const onPointerMove = this.onPointerMoveFromPointerDownHandler(
         pointerDownState,
       );
-    } else if (this.state.elementType === "freedraw") {
-      this.handleFreeDrawElementOnPointerDown(
-        event,
-        this.state.elementType,
+
+      const onPointerUp = this.onPointerUpFromPointerDownHandler(
         pointerDownState,
       );
-    } else {
-      this.createGenericElementOnPointerDown(
-        this.state.elementType,
-        pointerDownState,
-      );
-    }
 
-    const onPointerMove = this.onPointerMoveFromPointerDownHandler(
-      pointerDownState,
-    );
+      const onKeyDown = this.onKeyDownFromPointerDownHandler(pointerDownState);
+      const onKeyUp = this.onKeyUpFromPointerDownHandler(pointerDownState);
 
-    const onPointerUp = this.onPointerUpFromPointerDownHandler(
-      pointerDownState,
-    );
+      lastPointerUp = onPointerUp;
 
-    const onKeyDown = this.onKeyDownFromPointerDownHandler(pointerDownState);
-    const onKeyUp = this.onKeyUpFromPointerDownHandler(pointerDownState);
-
-    lastPointerUp = onPointerUp;
-
-    if (!this.state.viewModeEnabled) {
-      window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
-      window.addEventListener(EVENT.POINTER_UP, onPointerUp);
-      window.addEventListener(EVENT.KEYDOWN, onKeyDown);
-      window.addEventListener(EVENT.KEYUP, onKeyUp);
-      pointerDownState.eventListeners.onMove = onPointerMove;
-      pointerDownState.eventListeners.onUp = onPointerUp;
-      pointerDownState.eventListeners.onKeyUp = onKeyUp;
-      pointerDownState.eventListeners.onKeyDown = onKeyDown;
-    }
-  };
+      if (!this.state.viewModeEnabled) {
+        window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
+        window.addEventListener(EVENT.POINTER_UP, onPointerUp);
+        window.addEventListener(EVENT.KEYDOWN, onKeyDown);
+        window.addEventListener(EVENT.KEYUP, onKeyUp);
+        pointerDownState.eventListeners.onMove = onPointerMove;
+        pointerDownState.eventListeners.onUp = onPointerUp;
+        pointerDownState.eventListeners.onKeyUp = onKeyUp;
+        pointerDownState.eventListeners.onKeyDown = onKeyDown;
+      }
+    },
+  );
 
   private maybeOpenContextMenuAfterPointerDownOnTouchDevices = (
     event: React.PointerEvent<HTMLCanvasElement>,
