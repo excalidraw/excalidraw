@@ -42,8 +42,8 @@
     "fontSize": "Yazı tipi boyutu",
     "fontFamily": "Yazı tipi ailesi",
     "onlySelected": "Sadece seçilen",
-    "withBackground": "Arka planla beraber",
-    "exportEmbedScene": "Sahneyi çıktı dosyasına dahil et",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "Sahne datası, daha sonra geri kullanılabilmesi için çıktı alınan PNG/SVG dosyasına dahil edicelek. Bu işlem dosya boyutunu arttıracaktır.",
     "addWatermark": "\"Excalidraw ile yapıldı\" yazısını ekle",
     "handDrawn": "El-yazısı",
@@ -105,13 +105,15 @@
   },
   "buttons": {
     "clearReset": "Tuvali sıfırla",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "Dışa aktar",
     "exportToPng": "PNG olarak dışa aktar",
     "exportToSvg": "SVG olarak dışa aktar",
     "copyToClipboard": "Panoya kopyala",
     "copyPngToClipboard": "PNG'yi panoya kopyala",
     "scale": "Ölçek",
-    "save": "Kaydet",
+    "save": "",
     "saveAs": "Farklı kaydet",
     "load": "Yükle",
     "getShareableLink": "Paylaşılabilir bağlantı al",
@@ -214,6 +216,14 @@
   },
   "errorDialog": {
     "title": "Hata"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "Blog'umuzu okuyun",
