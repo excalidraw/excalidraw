@@ -42,8 +42,8 @@
     "fontSize": "Ukuran font",
     "fontFamily": "Jenis font",
     "onlySelected": "Hanya yang Dipilih",
-    "withBackground": "Dengan latar",
-    "exportEmbedScene": "Sematkan pemandangan ke dalam file yang diekspor",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "Data pemandangan akan disimpan dalam file PNG/SVG yang diekspor, sehingga pemandangan itu dapat dipulihkan darinya.\nAkan membesarkan ukuran file yang diekspor.",
     "addWatermark": "Tambahkan \"Dibuat dengan Excalidraw\"",
     "handDrawn": "Tulisan tangan",
@@ -105,13 +105,15 @@
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "Ekspor",
     "exportToPng": "Ekspor ke PNG",
     "exportToSvg": "Ekspor ke SVG",
     "copyToClipboard": "Salin ke Papan Klip",
     "copyPngToClipboard": "Salin PNG ke papan klip",
     "scale": "Skala",
-    "save": "Simpan",
+    "save": "",
     "saveAs": "Simpan sebagai",
     "load": "Muat",
     "getShareableLink": "Buat Tautan yang Bisa Dibagian",
@@ -214,6 +216,14 @@
   },
   "errorDialog": {
     "title": "Kesalahan"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "Baca blog kami",
