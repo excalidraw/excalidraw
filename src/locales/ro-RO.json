@@ -42,8 +42,8 @@
     "fontSize": "Dimensiune font",
     "fontFamily": "Familia de fonturi",
     "onlySelected": "Numai selecția",
-    "withBackground": "Cu fundal",
-    "exportEmbedScene": "Încorporează scena în fișierul exportat",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "Datele scenei vor fi salvate în fișierul PNG/SVG exportat, astfel că scena va putea fi restaurată din acesta.\nVa crește dimensiunea fișierului exportat.",
     "addWatermark": "Adaugă „Realizat cu Excalidraw”",
     "handDrawn": "Scris de mână",
@@ -105,13 +105,15 @@
   },
   "buttons": {
     "clearReset": "Resetare pânză",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "Exportare",
     "exportToPng": "Exportare ca PNG",
     "exportToSvg": "Exportare ca SVG",
     "copyToClipboard": "Copiere în memoria temporară",
     "copyPngToClipboard": "Copiere PNG în memoria temporară",
     "scale": "Scală",
-    "save": "Salvare",
+    "save": "",
     "saveAs": "Salvare ca",
     "load": "Încărcare",
     "getShareableLink": "Legătură partajabilă",
@@ -214,6 +216,14 @@
   },
   "errorDialog": {
     "title": "Eroare"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "Citește blogul nostru",
