@@ -42,8 +42,8 @@
     "fontSize": "Μέγεθος γραμματοσειράς",
     "fontFamily": "Γραμματοσειρά",
     "onlySelected": "Μόνο τα Επιλεγμένα",
-    "withBackground": "Με φόντο",
-    "exportEmbedScene": "Ενσωμάτωση της σκηνής στο αρχείο προς εξαγωγή",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "Τα δεδομένα σκηνής θα αποθηκευτούν στο αρχείο PNG/SVG προς εξαγωγή ώστε η σκηνή να είναι δυνατό να αποκατασταθεί από αυτό.\nΘα αυξήσει το μέγεθος του αρχείου προς εξαγωγή.",
     "addWatermark": "Προσθήκη \"Φτιαγμένο με Excalidraw\"",
     "handDrawn": "Σχεδιασμένο στο χέρι",
@@ -105,13 +105,15 @@
   },
   "buttons": {
     "clearReset": "Επαναφορά του καμβά",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "Εξαγωγή",
     "exportToPng": "Εξαγωγή σε PNG",
     "exportToSvg": "Εξαγωγή σε SVG",
     "copyToClipboard": "Αντιγραφή στο πρόχειρο",
     "copyPngToClipboard": "Αντιγραφή PNG στο πρόχειρο",
     "scale": "Κλίμακα",
-    "save": "Αποθήκευση",
+    "save": "",
     "saveAs": "Αποθήκευση ως",
     "load": "Άνοιγμα",
     "getShareableLink": "Δημόσιος σύνδεσμος",
@@ -214,6 +216,14 @@
   },
   "errorDialog": {
     "title": "Σφάλμα"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "Διαβάστε το Blog μας",
