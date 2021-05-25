@@ -42,8 +42,8 @@
     "fontSize": "Skriftstørrelse",
     "fontFamily": "Fontfamilie",
     "onlySelected": "Kun valgte",
-    "withBackground": "Med bakgrunn",
-    "exportEmbedScene": "Bygg inn scenen i den eksporterte filen",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "Scenedata vil bli lagret i den eksporterte PNG/SVG-filen, slik at scenen kan gjenopprettes fra den.\nDet vil øke den eksporterte filstørrelsen.",
     "addWatermark": "Legg til \"Laget med Excalidraw\"",
     "handDrawn": "Håndtegnet",
@@ -105,13 +105,15 @@
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "Eksporter",
     "exportToPng": "Eksporter til PNG",
     "exportToSvg": "Eksporter til SVG",
     "copyToClipboard": "Kopier til utklippstavle",
     "copyPngToClipboard": "Kopier PNG til utklippstavlen",
     "scale": "Skalering",
-    "save": "Lagre",
+    "save": "",
     "saveAs": "Lagre som",
     "load": "Åpne",
     "getShareableLink": "Få delingslenke",
@@ -214,6 +216,14 @@
   },
   "errorDialog": {
     "title": "Feil"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "Les bloggen vår",
