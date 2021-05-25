@@ -72,7 +72,7 @@ const ExportButton: React.FC<{
       }}
       title={title}
       aria-label={title}
-      onClick={() => onClick()}
+      onClick={onClick}
     >
       {children}
     </button>
