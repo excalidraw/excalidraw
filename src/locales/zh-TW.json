@@ -42,8 +42,8 @@
     "fontSize": "字型大小",
     "fontFamily": "字體",
     "onlySelected": "僅選取物件",
-    "withBackground": "包含背景",
-    "exportEmbedScene": "在輸出的檔案中嵌入場景",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "用於回復場景的場景資料會被包含在輸出的 PNG/SVG 檔案中。\n會增加輸出的檔案大小。",
     "addWatermark": "加上 \"Made with Excalidraw\"",
     "handDrawn": "手寫",
@@ -105,13 +105,15 @@
   },
   "buttons": {
     "clearReset": "重置 canvas",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "輸出",
     "exportToPng": "輸出成 PNG",
     "exportToSvg": "輸出成 SVG",
     "copyToClipboard": "複製至剪貼簿",
     "copyPngToClipboard": "複製 PNG 至剪貼簿",
     "scale": "縮放比例",
-    "save": "儲存",
+    "save": "",
     "saveAs": "儲存為",
     "load": "載入",
     "getShareableLink": "取得共享連結",
@@ -214,6 +216,14 @@
   },
   "errorDialog": {
     "title": "錯誤"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "閱讀部落格",
