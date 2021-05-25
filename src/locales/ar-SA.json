@@ -42,8 +42,8 @@
     "fontSize": "حجم الخط",
     "fontFamily": "نوع الخط",
     "onlySelected": "المحدد فقط",
-    "withBackground": "مع الخلفية",
-    "exportEmbedScene": "تضمين المشهد في ملف التصدير",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "سيتم حفظ بيانات المشهد في ملف PNG/SVG المصدّر بحيث يمكن استعادة المشهد منه.\nسيزيد حجم الملف المصدر.",
     "addWatermark": "إضافة \"مصنوعة بواسطة Excalidraw\"",
     "handDrawn": "رسم باليد",
@@ -105,13 +105,15 @@
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "تصدير",
     "exportToPng": "تصدير بصيغة PNG",
     "exportToSvg": "تصدير بصيغة SVG",
     "copyToClipboard": "نسخ إلى الحافظة",
     "copyPngToClipboard": "نسخ الـ PNG إلى الحافظة",
     "scale": "مقاس",
-    "save": "حفظ",
+    "save": "",
     "saveAs": "حفظ كـ",
     "load": "تحميل",
     "getShareableLink": "احصل على رابط المشاركة",
@@ -214,6 +216,14 @@
   },
   "errorDialog": {
     "title": "خطأ"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "",
