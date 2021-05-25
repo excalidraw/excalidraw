@@ -42,8 +42,8 @@
     "fontSize": "Taille de la police",
     "fontFamily": "Police",
     "onlySelected": "Uniquement la sélection",
-    "withBackground": "Avec arrière-plan",
-    "exportEmbedScene": "Intégrer la scène au fichier exporté",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "Les données de scène seront enregistrées dans le fichier PNG/SVG exporté, afin que la scène puisse être restaurée à partir de celui-ci.\nCela augmentera la taille du fichier exporté.",
     "addWatermark": "Ajouter \"Fait avec Excalidraw\"",
     "handDrawn": "À main levée",
@@ -105,13 +105,15 @@
   },
   "buttons": {
     "clearReset": "Réinitialiser le canevas",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "Exporter",
     "exportToPng": "Exporter en PNG",
     "exportToSvg": "Exporter en SVG",
     "copyToClipboard": "Copier dans le presse-papier",
     "copyPngToClipboard": "Copier le PNG vers le presse-papier",
     "scale": "Échelle",
-    "save": "Sauvegarder",
+    "save": "",
     "saveAs": "Enregistrer sous",
     "load": "Ouvrir",
     "getShareableLink": "Obtenir un lien de partage",
@@ -214,6 +216,14 @@
   },
   "errorDialog": {
     "title": "Erreur"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "Lire notre blog",
