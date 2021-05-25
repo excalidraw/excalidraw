@@ -42,8 +42,8 @@
     "fontSize": "Schriftgröße",
     "fontFamily": "Schriftfamilie",
     "onlySelected": "Nur ausgewählte",
-    "withBackground": "Mit Hintergrund",
-    "exportEmbedScene": "Zeichnung in exportierte Datei einbetten",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "Die Zeichnungsdaten werden in der exportierten PNG/SVG-Datei gespeichert, sodass das Dokument später weiter bearbeitet werden kann. \nDieses wird die exportierte Datei vergrößern.",
     "addWatermark": "\"Made with Excalidraw\" hinzufügen",
     "handDrawn": "Handgezeichnet",
@@ -105,13 +105,15 @@
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "Exportieren",
     "exportToPng": "Als PNG exportieren",
     "exportToSvg": "Als SVG exportieren",
     "copyToClipboard": "In Zwischenablage kopieren",
     "copyPngToClipboard": "PNG in die Zwischenablage kopieren",
     "scale": "Skalierung",
-    "save": "Speichern",
+    "save": "",
     "saveAs": "Speichern unter",
     "load": "Laden",
     "getShareableLink": "Teilbaren Link erhalten",
@@ -214,6 +216,14 @@
   },
   "errorDialog": {
     "title": "Fehler"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "Lies unseren Blog",
