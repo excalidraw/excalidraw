@@ -42,8 +42,8 @@
     "fontSize": "ਫੌਂਟ ਅਕਾਰ",
     "fontFamily": "ਫੌਂਟ ਪਰਿਵਾਰ",
     "onlySelected": "ਸਿਰਫ ਚੁਣੇ ਹੋਏ ਹੀ",
-    "withBackground": "ਬੈਕਗਰਾਉਂਂਡ ਨਾਲ",
-    "exportEmbedScene": "ਦ੍ਰਿਸ਼ ਨੂੰ ਨਿਰਯਾਤ ਕੀਤੀ ਫਾਈਲ ਵਿੱਚ ਮੜ੍ਹੋ",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "ਦ੍ਰਿਸ਼ ਦਾ ਡਾਟਾ ਨਿਰਯਾਤ ਕੀਤੀ PNG/SVG ਫਾਈਲ ਵਿੱਚ ਸਾਂਭ ਦਿੱਤਾ ਜਾਵੇਗਾ ਤਾਂ ਜੋ ਇਸ ਵਿੱਚੋਂ ਦ੍ਰਿਸ਼ ਨੂੰ ਬਹਾਲ ਕੀਤਾ ਜਾ ਸਕੇ। ਇਹ ਨਿਰਯਾਤ ਕੀਤੀ ਜਾਣ ਵਾਲੀ ਫਾਈਲ ਦਾ ਅਕਾਰ ਵਧਾ ਦੇਵੇਗਾ।",
     "addWatermark": "\"Excalidraw ਨਾਲ ਬਣਾਇਆ\" ਜੋੜੋ",
     "handDrawn": "ਹੱਥਲਿਖਤ",
@@ -105,13 +105,15 @@
   },
   "buttons": {
     "clearReset": "ਕੈਨਵਸ ਰੀਸੈੱਟ ਕਰੋ",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "ਨਿਰਯਾਤ",
     "exportToPng": "PNG ਵਿੱਚ ਨਿਰਯਾਤ ਕਰੋ",
     "exportToSvg": "SVG ਵਿੱਚ ਨਿਰਯਾਤ ਕਰੋ",
     "copyToClipboard": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ ਕਾਪੀ ਕਰੋ",
     "copyPngToClipboard": "PNG ਨੂੰ ਕਲਿੱਪਬੋਰਡ 'ਤੇ ਕਾਪੀ ਕਰੋ",
     "scale": "ਪੈਮਾਇਸ਼",
-    "save": "ਸਾਂਭੋ",
+    "save": "",
     "saveAs": "ਇਸ ਵਜੋਂ ਸਾਂਭੋ",
     "load": "ਲੋਡ ਕਰੋ",
     "getShareableLink": "ਸਾਂਝੀ ਕਰਨ ਵਾਲੀ ਲਿੰਕ ਲਵੋ",
@@ -214,6 +216,14 @@
   },
   "errorDialog": {
     "title": "ਗਲਤੀ"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "ਸਾਡਾ ਬਲੌਗ ਪੜ੍ਹੋ",
