@@ -104,6 +104,7 @@
     "test:other": "yarn prettier --list-different",
     "test:typecheck": "tsc",
     "test:update": "yarn test:app --updateSnapshot --watchAll=false",
-    "test": "yarn test:app"
+    "test": "yarn test:app",
+    "autorelease": "node scripts/autorelease.js"
   }
 }

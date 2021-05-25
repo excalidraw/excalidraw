@@ -24,6 +24,10 @@ By default it will try to load the files from `https://unpkg.com/@excalidraw/exc
 
 If you want to load assets from a different path you can set a variable `window.EXCALIDRAW_ASSET_PATH` depending on environment (for example if you have different URL's for dev and prod) to the url from where you want to load the assets.
 
+#### Note
+
+**If you don't want to wait for the next stable release and try out the unreleased changes you can use [@excalidraw/excalidraw-next](https://www.npmjs.com/package/@excalidraw/excalidraw-next).**
+
 ### Demo
 
 [Try here](https://codesandbox.io/s/excalidraw-ehlz3).
