@@ -42,8 +42,8 @@
     "fontSize": "اندازه قلم",
     "fontFamily": "نوع قلم",
     "onlySelected": "فقط انتخاب شده ها",
-    "withBackground": "با پس زمینه",
-    "exportEmbedScene": "قرار دادن صحنه در فایل خروجی",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "متحوای صحنه به فایل خروجی SVG/PNG اضافه خواهد شد برای بازیابی صحنه به آن اضافه خواهد شد.\nباعث افزایش حجم فایل خروجی میشود.",
     "addWatermark": "\"ساخته شده با Excalidraw\" را اضافه کن",
     "handDrawn": "دست نویس",
@@ -105,13 +105,15 @@
   },
   "buttons": {
     "clearReset": "پاکسازی بوم نقاشی",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "تبدیل",
     "exportToPng": "تبدیل به PNG",
     "exportToSvg": "تبدیل به SVG",
     "copyToClipboard": "کپی در حافظه موقت",
     "copyPngToClipboard": "کپی PNG در حافظه موقت",
     "scale": "مقیاس",
-    "save": "ذخیره",
+    "save": "",
     "saveAs": "ذخیره با نام",
     "load": "بارگذاری",
     "getShareableLink": "دریافت لینک قابل اشتراک",
@@ -214,6 +216,14 @@
   },
   "errorDialog": {
     "title": "خطا"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "بلاگ ما را بخوانید",
