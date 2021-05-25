@@ -340,7 +340,7 @@ const ExcalidrawWrapper = () => {
           rel="noopener noreferrer"
           aria-label={t("encrypted.link")}
         >
-          <Tooltip label={t("encrypted.tooltip")} position="above" long={true}>
+          <Tooltip label={t("encrypted.tooltip")} long={true}>
             {shield}
           </Tooltip>
         </a>

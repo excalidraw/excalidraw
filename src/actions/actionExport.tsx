@@ -67,11 +67,7 @@ export const actionChangeExportEmbedScene = register({
         onChange={(event) => updateData(event.target.checked)}
       />{" "}
       {t("labels.exportEmbedScene")}
-      <Tooltip
-        label={t("labels.exportEmbedScene_details")}
-        position="above"
-        long={true}
-      >
+      <Tooltip label={t("labels.exportEmbedScene_details")} long={true}>
         <div className="TooltipIcon">{questionCircle}</div>
       </Tooltip>
     </label>
