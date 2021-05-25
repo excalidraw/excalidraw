@@ -42,8 +42,8 @@
     "fontSize": "Розмір шрифту",
     "fontFamily": "Шрифт",
     "onlySelected": "Тільки вибране",
-    "withBackground": "З фоном",
-    "exportEmbedScene": "Вставити сцену в експортований файл",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "Дані сцени будуть збережені в експортований файл PNG/SVG. Ця сцена може бути відновленна з нього, однак це збільшить розмір експортованого файлу.",
     "addWatermark": "Додати «Накреслене в Excalidraw»",
     "handDrawn": "Рукописний",
@@ -105,13 +105,15 @@
   },
   "buttons": {
     "clearReset": "Очистити полотно",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "Експортувати",
     "exportToPng": "Експортувати в PNG",
     "exportToSvg": "Експортувати в SVG",
     "copyToClipboard": "Скопіювати до буферу обміну",
     "copyPngToClipboard": "Скопіювати PNG до буферу обміну",
     "scale": "Масштаб",
-    "save": "Зберегти",
+    "save": "",
     "saveAs": "Зберегти як",
     "load": "Завантажити",
     "getShareableLink": "Отримати посилання",
@@ -214,6 +216,14 @@
   },
   "errorDialog": {
     "title": "Помилка"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "Наш блог",
