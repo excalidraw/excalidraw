@@ -110,9 +110,9 @@ describe("<Excalidraw/>", () => {
     it('should allow editing name when the name prop is "undefined"', async () => {
       const { container } = await render(<Excalidraw />);
 
-      fireEvent.click(queryByTestId(container, "export-button")!);
+      fireEvent.click(queryByTestId(container, "image-export-button")!);
       const textInput: HTMLInputElement | null = document.querySelector(
-        ".ExportDialog__name .TextInput",
+        ".ExportDialog .ProjectName .TextInput",
       );
       expect(textInput?.value).toContain(`${t("labels.untitled")}`);
       expect(textInput?.nodeName).toBe("INPUT");
@@ -122,9 +122,9 @@ describe("<Excalidraw/>", () => {
       const name = "test";
       const { container } = await render(<Excalidraw name={name} />);
 
-      await fireEvent.click(queryByTestId(container, "export-button")!);
+      await fireEvent.click(queryByTestId(container, "image-export-button")!);
       const textInput = document.querySelector(
-        ".ExportDialog__name .TextInput--readonly",
+        ".ExportDialog .ProjectName .TextInput--readonly",
       );
       expect(textInput?.textContent).toEqual(name);
       expect(textInput?.nodeName).toBe("SPAN");
@@ -166,7 +166,8 @@ describe("<Excalidraw/>", () => {
           <Excalidraw UIOptions={{ canvasActions: { export: false } }} />,
         );
 
-        expect(queryByTestId(container, "export-button")).toBeNull();
+        expect(queryByTestId(container, "json-export-button")).toBeNull();
+        expect(queryByTestId(container, "image-export-button")).toBeNull();
       });
 
       it("should hide load button when loadScene is false", async () => {
