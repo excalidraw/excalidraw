@@ -42,8 +42,8 @@
     "fontSize": "フォントの大きさ",
     "fontFamily": "フォントの種類",
     "onlySelected": "選択中のみ",
-    "withBackground": "背景を含める",
-    "exportEmbedScene": "エクスポートされたファイルにシーンを埋め込みます",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "シーンデータはエクスポートされたPNG/SVGファイルに保存され、シーンを復元することができます。\nエクスポートされたファイルのサイズは増加します。",
     "addWatermark": "\"Made with Excalidraw\"と表示",
     "handDrawn": "手描き風",
@@ -105,13 +105,15 @@
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "エクスポート",
     "exportToPng": "PNG にエクスポート",
     "exportToSvg": "SVG にエクスポート",
     "copyToClipboard": "クリップボードにコピー",
     "copyPngToClipboard": "クリップボードにPNGをコピー",
     "scale": "スケール",
-    "save": "保存",
+    "save": "",
     "saveAs": "名前を付けて保存",
     "load": "読み込み...",
     "getShareableLink": "共有URLの取得",
@@ -214,6 +216,14 @@
   },
   "errorDialog": {
     "title": "エラー"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "公式ブログを読む",
