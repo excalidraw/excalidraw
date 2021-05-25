@@ -43,7 +43,7 @@
     "fontFamily": "စာလုံးပုံစံ",
     "onlySelected": "ရွေးထားသလောက်",
     "withBackground": "",
-    "exportEmbedScene": "မြင်ကွင်းပါမြှုပ်နှံ၍ထုတ်ပါ",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "ထုတ်ယူလိုက်သော PNG/SVG ထဲမြင်ကွင်းအချက်အလက်များပါဝင်သဖြင့် ပြန်လည်ရယူနိုင်သော်လည်း ဖိုင်အရွယ်အစားကြီးပါမည်။",
     "addWatermark": "\"Excalidraw ဖြင့်ဖန်တီးသည်။\" စာသားထည့်",
     "handDrawn": "လက်ရေး",
@@ -105,13 +105,15 @@
   },
   "buttons": {
     "clearReset": "ကားချပ်ရှင်းလင်း",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "ထုတ်",
     "exportToPng": "PNG ထုတ်",
     "exportToSvg": "SVG ထုတ်",
     "copyToClipboard": "ကူးယူ",
     "copyPngToClipboard": "PNG ကူးယူ",
     "scale": "စကေး",
-    "save": "သိမ်း",
+    "save": "",
     "saveAs": "ပြောင်းသိမ်း",
     "load": "တင်သွင်း",
     "getShareableLink": "မျှဝေရန် လင့်ခ်ရယူ",
@@ -214,6 +216,14 @@
   },
   "errorDialog": {
     "title": "ချို့ယွင်းချက်"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "",
