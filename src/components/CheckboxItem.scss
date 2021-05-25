@@ -9,6 +9,8 @@
     cursor: pointer;
     user-select: none;
 
+    -webkit-tap-highlight-color: transparent;
+
     &:hover:not(.is-checked) .Checkbox-box:not(:focus) {
       box-shadow: 0 0 0 2px #{$oc-blue-4};
     }
