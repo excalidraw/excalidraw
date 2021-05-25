@@ -42,8 +42,8 @@
     "fontSize": "फ़ॉन्ट का आकार",
     "fontFamily": "फ़ॉन्ट का परिवार",
     "onlySelected": "केवल चयनित",
-    "withBackground": "बैकग्राउंड के साथ",
-    "exportEmbedScene": "निर्यात एम्बेड दृश्य",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "निर्यात एम्बेड दृश्य विवरण",
     "addWatermark": "ऐड \"मेड विथ एक्सकैलिडराव\"",
     "handDrawn": "हाथ से बनाया हुआ",
@@ -105,13 +105,15 @@
   },
   "buttons": {
     "clearReset": "कैनवास रीसेट करें",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "निर्यात",
     "exportToPng": "पीएनजी के रूप में निर्यात करे",
     "exportToSvg": "Svg के रूप में निर्यात करे",
     "copyToClipboard": "क्लिपबोर्ड पर प्रतिलिपि बनाएँ",
     "copyPngToClipboard": "क्लिपबोर्ड पर कॉपी करें,पीएनजी के रूप में",
     "scale": "पैमाना",
-    "save": "सहेजें",
+    "save": "",
     "saveAs": "सेव करे इस तरह",
     "load": "लोड करें",
     "getShareableLink": "साझा करने योग्य लिंक प्राप्त करें",
@@ -214,6 +216,14 @@
   },
   "errorDialog": {
     "title": "गलती"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "हमारा ब्लॉग पढे",
