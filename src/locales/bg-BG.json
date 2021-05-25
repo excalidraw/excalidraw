@@ -42,8 +42,8 @@
     "fontSize": "Размер на шрифта",
     "fontFamily": "Семейство шрифтове",
     "onlySelected": "Само избраното",
-    "withBackground": "С фон",
-    "exportEmbedScene": "Вгради сцената във файл",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "Данните от сцената ще бъдат екпортирани в PNG/SVG файл, за да може сцената да бъде възстановена от него.\nТова ще увеличи размера на файла.",
     "addWatermark": "Добави \"Направено с Excalidraw\"",
     "handDrawn": "Нарисувано на ръка",
@@ -105,13 +105,15 @@
   },
   "buttons": {
     "clearReset": "Нулиране на платно",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "Експортиране",
     "exportToPng": "Изнасяне в PNG",
     "exportToSvg": "Изнасяне в SVG",
     "copyToClipboard": "Копиране в клипборда",
     "copyPngToClipboard": "Копирай PNG в клипборда",
     "scale": "Мащаб",
-    "save": "Запази",
+    "save": "",
     "saveAs": "Запиши като",
     "load": "Зареждане",
     "getShareableLink": "Получаване на връзка за споделяне",
@@ -214,6 +216,14 @@
   },
   "errorDialog": {
     "title": "Грешка"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "Прочетете нашия блог",
