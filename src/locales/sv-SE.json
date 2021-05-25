@@ -222,8 +222,8 @@
     "disk_details": "Exportera scendata till en fil som du kan importera från senare.",
     "disk_button": "Spara till fil",
     "link_title": "Delbar länk",
-    "link_details": "",
-    "link_button": ""
+    "link_details": "Exportera som en skrivskyddad länk.",
+    "link_button": "Exportera till länk"
   },
   "helpDialog": {
     "blog": "Läs vår blogg",
