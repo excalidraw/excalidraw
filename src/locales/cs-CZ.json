@@ -42,7 +42,7 @@
     "fontSize": "Velikost písma",
     "fontFamily": "Písmo",
     "onlySelected": "Pouze vybrané",
-    "withBackground": "S pozadím",
+    "withBackground": "",
     "exportEmbedScene": "",
     "exportEmbedScene_details": "",
     "addWatermark": "",
@@ -105,13 +105,15 @@
   },
   "buttons": {
     "clearReset": "",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "Exportovat",
     "exportToPng": "Exportovat do PNG",
     "exportToSvg": "Exportovat do SVG",
     "copyToClipboard": "Kopírovat do schránky",
     "copyPngToClipboard": "Kopírovat PNG do schránky",
     "scale": "Měřítko",
-    "save": "Uložit",
+    "save": "",
     "saveAs": "Uložit jako",
     "load": "Nahrát",
     "getShareableLink": "Získat odkaz pro sdílení",
@@ -214,6 +216,14 @@
   },
   "errorDialog": {
     "title": ""
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "",
