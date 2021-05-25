@@ -182,30 +182,30 @@ const ImageExportModal = ({
       </div>
       <div style={{ display: "flex", alignItems: "center", marginTop: ".6em" }}>
         <Stack.Row gap={2} justifyContent={"center"}>
-          {scales.map((s) => {
+          {scales.map((_scale) => {
             const [width, height] = getExportSize(
               exportedElements,
               exportPadding,
               shouldAddWatermark,
-              s,
+              _scale,
             );
 
             const scaleButtonTitle = `${t(
               "buttons.scale",
-            )} ${s}x (${width}x${height})`;
+            )} ${_scale}x (${width}x${height})`;
 
             return (
               <ToolButton
-                key={s}
+                key={_scale}
                 size="s"
                 type="radio"
-                icon={`${s}x`}
+                icon={`${_scale}x`}
                 name="export-canvas-scale"
                 title={scaleButtonTitle}
                 aria-label={scaleButtonTitle}
                 id="export-canvas-scale"
-                checked={s === scale}
-                onChange={() => setScale(s)}
+                checked={_scale === scale}
+                onChange={() => setScale(_scale)}
               />
             );
           })}
