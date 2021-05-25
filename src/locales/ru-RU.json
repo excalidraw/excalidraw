@@ -42,8 +42,8 @@
     "fontSize": "Размер шрифта",
     "fontFamily": "Семейство шрифтов",
     "onlySelected": "Только выбранные",
-    "withBackground": "С фоном",
-    "exportEmbedScene": "Встроить информацию о сцене в экспортируемый файл",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "Сцена будет сохранена в PNG/SVG файл так, чтобы всю сцену можно будет восстановить из этого файла. Это увеличит размер файла.",
     "addWatermark": "Добавить «Создано в Excalidraw»",
     "handDrawn": "От руки",
@@ -105,13 +105,15 @@
   },
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "Экспортировать",
     "exportToPng": "Экспорт в PNG",
     "exportToSvg": "Экспорт в SVG",
     "copyToClipboard": "Скопировать в буфер обмена",
     "copyPngToClipboard": "Скопировать PNG в буфер обмена",
     "scale": "Масштаб",
-    "save": "Сохранить",
+    "save": "",
     "saveAs": "Сохранить как",
     "load": "Загрузить",
     "getShareableLink": "Получить доступ по ссылке",
@@ -214,6 +216,14 @@
   },
   "errorDialog": {
     "title": "Ошибка"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "Прочитайте наш блог",
