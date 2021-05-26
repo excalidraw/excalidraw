@@ -219,11 +219,11 @@
   },
   "exportDialog": {
     "disk_title": "儲存至硬碟",
-    "disk_details": "",
-    "disk_button": "",
-    "link_title": "",
-    "link_details": "",
-    "link_button": ""
+    "disk_details": "將場景匯出為可供匯入之檔案",
+    "disk_button": "儲存至檔案",
+    "link_title": "可共享連結",
+    "link_details": "匯出為唯讀連結",
+    "link_button": "匯出為連結"
   },
   "helpDialog": {
     "blog": "閱讀部落格",
