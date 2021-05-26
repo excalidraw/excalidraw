@@ -116,7 +116,7 @@
     "save": "Salvare în fișierul curent",
     "saveAs": "Salvare ca",
     "load": "Încărcare",
-    "getShareableLink": "Legătură partajabilă",
+    "getShareableLink": "Obține URL partajabil",
     "close": "Închidere",
     "selectLanguage": "Selectare limbă",
     "scrollBackToContent": "Derulare înapoi la conținut",
@@ -138,8 +138,8 @@
   },
   "alerts": {
     "clearReset": "Această opțiune va șterge întreaga pânză. Confirmi?",
-    "couldNotCreateShareableLink": "Legătura partajabilă nu a putut fi creată.",
-    "couldNotCreateShareableLinkTooBig": "Nu s-a putut crea o legătură partajabilă: scena este prea mare",
+    "couldNotCreateShareableLink": "Nu s-a putut crea un URL partajabil.",
+    "couldNotCreateShareableLinkTooBig": "Nu s-a putut crea un URL partajabil: scena este prea mare",
     "couldNotLoadInvalidFile": "Fișierul invalid nu a putut fi încărcat",
     "importBackendFailed": "Importarea de la nivel de server a eșuat.",
     "cannotExportEmptyCanvas": "Nu se poate exporta pânza goală.",
@@ -210,7 +210,7 @@
     "button_startSession": "Pornire sesiune",
     "button_stopSession": "Oprire sesiune",
     "desc_inProgressIntro": "Sesiunea de colaborare în direct este în curs de desfășurare.",
-    "desc_shareLink": "Distribuie această legătură persoanelor cu care dorești să colaborezi:",
+    "desc_shareLink": "Distribuie acest URL persoanelor cu care dorești să colaborezi:",
     "desc_exitSession": "Oprirea sesiunii te va deconecta de la sală, însă vei putea lucra în continuare, pe plan local, cu scena. Reține că această opțiune nu va afecta alte persoane, iar acestea vor putea să colaboreze în continuare pe versiunea lor.",
     "shareTitle": "Alătură-te unei sesiuni de colaborare în direct pe Excalidraw"
   },
@@ -222,8 +222,8 @@
     "disk_details": "Exportă datele scenei pe un fișier din care poți importa mai târziu.",
     "disk_button": "Salvare în fișier",
     "link_title": "URL partajabil",
-    "link_details": "",
-    "link_button": ""
+    "link_details": "Exportă ca URL doar în citire.",
+    "link_button": "Exportare în URL"
   },
   "helpDialog": {
     "blog": "Citește blogul nostru",
