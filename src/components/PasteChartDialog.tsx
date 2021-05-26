@@ -38,7 +38,6 @@ const ChartPreviewBtn = (props: {
     const svg = exportToSvg(elements, {
       exportBackground: false,
       viewBackgroundColor: oc.white,
-      shouldAddWatermark: false,
     });
 
     const previewNode = previewRef.current!;

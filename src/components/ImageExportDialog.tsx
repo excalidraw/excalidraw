@@ -101,11 +101,7 @@ const ImageExportModal = ({
   const [scale, setScale] = useState(defaultScale);
   const [exportSelected, setExportSelected] = useState(someElementIsSelected);
   const previewRef = useRef<HTMLDivElement>(null);
-  const {
-    exportBackground,
-    viewBackgroundColor,
-    shouldAddWatermark,
-  } = appState;
+  const { exportBackground, viewBackgroundColor } = appState;
 
   const exportedElements = exportSelected
     ? getSelectedElements(elements, appState)
@@ -126,7 +122,6 @@ const ImageExportModal = ({
         viewBackgroundColor,
         exportPadding,
         scale,
-        shouldAddWatermark,
       });
 
       // if converting to blob fails, there's some problem that will
@@ -150,7 +145,6 @@ const ImageExportModal = ({
     exportPadding,
     viewBackgroundColor,
     scale,
-    shouldAddWatermark,
   ]);
 
   return (
@@ -186,7 +180,6 @@ const ImageExportModal = ({
             const [width, height] = getExportSize(
               exportedElements,
               exportPadding,
-              shouldAddWatermark,
               _scale,
             );
 

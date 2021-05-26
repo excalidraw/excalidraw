@@ -39,7 +39,6 @@ export const LibraryUnit = ({
     const svg = exportToSvg(elementsToRender, {
       exportBackground: false,
       viewBackgroundColor: oc.white,
-      shouldAddWatermark: false,
     });
     for (const child of ref.current!.children) {
       if (child.tagName !== "svg") {

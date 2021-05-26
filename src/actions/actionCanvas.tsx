@@ -55,7 +55,6 @@ export const actionClearCanvas = register({
         exportBackground: appState.exportBackground,
         exportEmbedScene: appState.exportEmbedScene,
         gridSize: appState.gridSize,
-        shouldAddWatermark: appState.shouldAddWatermark,
         showStats: appState.showStats,
         pasteDialog: appState.pasteDialog,
       },

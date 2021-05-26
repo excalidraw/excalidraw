@@ -71,24 +71,6 @@ export const actionChangeExportEmbedScene = register({
   ),
 });
 
-export const actionChangeShouldAddWatermark = register({
-  name: "changeShouldAddWatermark",
-  perform: (_elements, appState, value) => {
-    return {
-      appState: { ...appState, shouldAddWatermark: value },
-      commitToHistory: false,
-    };
-  },
-  PanelComponent: ({ appState, updateData }) => (
-    <CheckboxItem
-      checked={appState.shouldAddWatermark}
-      onChange={(checked) => updateData(checked)}
-    >
-      {t("labels.addWatermark")}
-    </CheckboxItem>
-  ),
-});
-
 export const actionSaveScene = register({
   name: "saveScene",
   perform: async (elements, appState, value) => {

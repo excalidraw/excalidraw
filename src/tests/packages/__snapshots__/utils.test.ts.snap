@@ -54,7 +54,6 @@ Object {
   "selectedElementIds": Object {},
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,

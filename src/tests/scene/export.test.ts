@@ -13,7 +13,6 @@ describe("exportToSvg", () => {
   const DEFAULT_OPTIONS = {
     exportBackground: false,
     viewBackgroundColor: "#ffffff",
-    shouldAddWatermark: false,
   };
 
   it("with default arguments", () => {
@@ -34,17 +33,6 @@ describe("exportToSvg", () => {
     expect(svgElement.querySelector("rect")).toHaveAttribute(
       "fill",
       BACKGROUND_COLOR,
-    );
-  });
-
-  it("with watermark", () => {
-    const svgElement = exportUtils.exportToSvg(ELEMENTS, {
-      ...DEFAULT_OPTIONS,
-      shouldAddWatermark: true,
-    });
-
-    expect(svgElement.querySelector("text")?.textContent).toMatchInlineSnapshot(
-      `"Made with Excalidraw"`,
     );
   });
 
