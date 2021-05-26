@@ -2,16 +2,20 @@
 
 .excalidraw {
   .Checkbox {
-    margin: 3px 0.3em;
+    margin: 4px 0.3em;
     display: flex;
     align-items: center;
 
     cursor: pointer;
     user-select: none;
 
-    &:hover:not(.is-checked) .Checkbox-box {
-      box-shadow: 0 0 0 2px #{$oc-blue-4};
+    -webkit-tap-highlight-color: transparent;
 
+    &:hover:not(.is-checked) .Checkbox-box:not(:focus) {
+      box-shadow: 0 0 0 2px #{$oc-blue-4};
+    }
+
+    &:hover:not(.is-checked) .Checkbox-box:not(:focus) {
       svg {
         display: block;
         opacity: 0.3;
