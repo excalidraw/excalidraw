@@ -108,7 +108,7 @@
     }
     &:active {
       background-color: var(--button-color-darkest);
-      box-shadow: 0 3px 5px -1px rgb(0 0 0 / 20%), 0 6px 10px 0 rgb(0 0 0 / 14%);
+      box-shadow: none;
     }
 
     svg {
