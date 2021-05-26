@@ -46,7 +46,7 @@ export const exportCanvas = async (
       exportEmbedScene: appState.exportEmbedScene && type === "svg",
     });
     if (type === "svg") {
-      await fileSave(
+      const newFileHandle = await fileSave(
         new Blob([tempSvg.outerHTML], { type: "image/svg+xml" }),
         {
           fileName: `${name}.svg`,
@@ -54,7 +54,7 @@ export const exportCanvas = async (
         },
         fileHandle,
       );
-      return;
+      return { fileHandle: newFileHandle };
     } else if (type === "clipboard-svg") {
       await copyTextToSystemClipboard(tempSvg.outerHTML);
       return;
@@ -82,7 +82,7 @@ export const exportCanvas = async (
       });
     }
 
-    await fileSave(
+    const newFileHandle = await fileSave(
       blob,
       {
         fileName,
@@ -90,6 +90,7 @@ export const exportCanvas = async (
       },
       fileHandle,
     );
+    return { fileHandle: newFileHandle };
   } else if (type === "clipboard") {
     try {
       await copyBlobToClipboardAsPng(blob);

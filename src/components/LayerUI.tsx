@@ -412,6 +412,15 @@ const LayerUI = ({
         name: appState.name,
         viewBackgroundColor: appState.viewBackgroundColor,
       })
+        .then((response) => {
+          if (
+            (type === "png" || type === "svg") &&
+            appState.exportEmbedScene &&
+            response?.fileHandle
+          ) {
+            setAppState({ fileHandle: response.fileHandle, saveType: type });
+          }
+        })
         .catch(muteFSAbortError)
         .catch((error) => {
           console.error(error);
