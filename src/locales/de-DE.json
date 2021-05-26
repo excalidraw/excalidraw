@@ -219,11 +219,11 @@
   },
   "exportDialog": {
     "disk_title": "Auf Festplatte speichern",
-    "disk_details": "",
-    "disk_button": "",
-    "link_title": "",
-    "link_details": "",
-    "link_button": ""
+    "disk_details": "Exportiere die Zeichnungsdaten in eine Datei, die Du später importieren kannst.",
+    "disk_button": "In Datei speichern",
+    "link_title": "Teilbarer Link",
+    "link_details": "Als schreibgeschützten Link exportieren.",
+    "link_button": "Als Link exportieren"
   },
   "helpDialog": {
     "blog": "Lies unseren Blog",
