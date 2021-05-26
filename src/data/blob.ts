@@ -5,6 +5,7 @@ import { ExcalidrawElement } from "../element/types";
 import { CanvasError } from "../errors";
 import { t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
+import { SaveType } from "../scene/types";
 import { AppState } from "../types";
 import { isValidExcalidrawData } from "./json";
 import { restore } from "./restore";
@@ -80,6 +81,16 @@ export const getMimeType = (blob: Blob | string): string => {
   return "";
 };
 
+export const getSaveType = (blob: Blob | string): SaveType | null => {
+  const mime = getMimeType(blob);
+  if (mime === "image/png") {
+    return "png";
+  } else if (mime === "image/svg+xml") {
+    return "svg";
+  }
+  return null;
+};
+
 export const loadFromBlob = async (
   blob: Blob,
   /** @see restore.localAppState */
@@ -97,7 +108,8 @@ export const loadFromBlob = async (
         elements: clearElementsForExport(data.elements || []),
         appState: {
           theme: localAppState?.theme,
-          fileHandle: (!blob.type.startsWith("image/") && blob.handle) || null,
+          fileHandle: blob.handle || null,
+          saveType: getSaveType(blob),
           ...cleanAppStateForExport(data.appState || {}),
           ...(localAppState
             ? calculateScrollCenter(data.elements || [], localAppState, null)
