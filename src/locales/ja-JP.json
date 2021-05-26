@@ -42,7 +42,7 @@
     "fontSize": "フォントの大きさ",
     "fontFamily": "フォントの種類",
     "onlySelected": "選択中のみ",
-    "withBackground": "",
+    "withBackground": "背景",
     "exportEmbedScene": "",
     "exportEmbedScene_details": "シーンデータはエクスポートされたPNG/SVGファイルに保存され、シーンを復元することができます。\nエクスポートされたファイルのサイズは増加します。",
     "addWatermark": "\"Made with Excalidraw\"と表示",
@@ -105,15 +105,15 @@
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",
-    "exportJSON": "",
-    "exportImage": "",
+    "exportJSON": "ファイルへエクスポート",
+    "exportImage": "画像として保存",
     "export": "エクスポート",
     "exportToPng": "PNG にエクスポート",
     "exportToSvg": "SVG にエクスポート",
     "copyToClipboard": "クリップボードにコピー",
     "copyPngToClipboard": "クリップボードにPNGをコピー",
     "scale": "スケール",
-    "save": "",
+    "save": "現在のファイルに保存",
     "saveAs": "名前を付けて保存",
     "load": "読み込み...",
     "getShareableLink": "共有URLの取得",
@@ -218,12 +218,12 @@
     "title": "エラー"
   },
   "exportDialog": {
-    "disk_title": "",
-    "disk_details": "",
-    "disk_button": "",
-    "link_title": "",
-    "link_details": "",
-    "link_button": ""
+    "disk_title": "ディスクに保存",
+    "disk_details": "シーンデータを後からインポートできるファイルにエクスポートします。",
+    "disk_button": "ファイルへ保存",
+    "link_title": "共有可能なリンク",
+    "link_details": "読み取り専用リンクとしてエクスポート",
+    "link_button": "リンクとしてエクスポート"
   },
   "helpDialog": {
     "blog": "公式ブログを読む",
