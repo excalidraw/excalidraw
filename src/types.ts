@@ -58,7 +58,6 @@ export type AppState = {
   exportBackground: boolean;
   exportEmbedScene: boolean;
   exportWithDarkMode: boolean;
-  shouldAddWatermark: boolean;
   currentItemStrokeColor: string;
   currentItemBackgroundColor: string;
   currentItemFillStyle: ExcalidrawElement["fillStyle"];

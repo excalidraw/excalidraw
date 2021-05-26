@@ -829,5 +829,4 @@ This function returns a svg with the exported elements.
 | --- | --- | --- | --- |
 | exportBackground | boolean | true | Indicates whether background should be exported |
 | viewBackgroundColor | string | #fff | The default background color |
-| shouldAddWatermark | boolean | false | Indicates whether watermark should be exported |
 | exportWithDarkMode | boolean | false | Indicates whether to export with dark mode |
