@@ -1646,16 +1646,19 @@ class App extends React.Component<AppProps, AppState> {
         setCursor(this.canvas, CURSOR_TYPE.GRABBING);
       }
 
-      const selectedElements = getSelectedElements(
-        this.scene.getElements(),
-        this.state,
-      );
-
-      if (selectedElements.length && event.key === KEYS.G) {
-        this.setState({ showBackgroundColorPicker: true });
-      }
-      if (selectedElements.length && event.key === KEYS.S) {
-        this.setState({ showStrokeColorPicker: true });
+      if (event.key === KEYS.G || event.key === KEYS.S) {
+        const selectedElements = getSelectedElements(
+          this.scene.getElements(),
+          this.state,
+        );
+        if (selectedElements.length) {
+          if (event.key === KEYS.G) {
+            this.setState({ showBackgroundColorPicker: true });
+          }
+          if (event.key === KEYS.S) {
+            this.setState({ showStrokeColorPicker: true });
+          }
+        }
       }
     },
   );
