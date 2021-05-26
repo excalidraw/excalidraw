@@ -100,8 +100,8 @@
     "flipVertical": "垂直方向に反転",
     "viewMode": "閲覧モード",
     "toggleExportColorScheme": "",
-    "share": "",
-    "toggleTheme": ""
+    "share": "共有",
+    "toggleTheme": "テーマの切り替え"
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",
@@ -149,12 +149,12 @@
     "loadSceneOverridePrompt": "外部図面を読み込むと、既存のコンテンツが置き換わります。続行しますか？",
     "collabStopOverridePrompt": "セッションを停止すると、ローカルに保存されている図が上書きされます。 本当によろしいですか？\n\n(ローカルの図を保持したい場合は、セッションを停止せずにブラウザタブを閉じてください。)",
     "errorLoadingLibrary": "サードパーティライブラリの読み込み中にエラーが発生しました。",
-    "errorAddingToLibrary": "",
-    "errorRemovingFromLibrary": "",
+    "errorAddingToLibrary": "アイテムをライブラリに追加できませんでした",
+    "errorRemovingFromLibrary": "ライブラリからアイテムを削除できませんでした",
     "confirmAddLibrary": "{{numShapes}} 個の図形をライブラリに追加します。よろしいですか？",
     "imageDoesNotContainScene": "現在、画像のインポートはサポートされていません。\n\nシーンをインポートしようとしましたか？この画像にはシーンデータが含まれていないようです。エクスポート中に有効にしていましたか？",
     "cannotRestoreFromImage": "このイメージファイルからシーンを復元できませんでした",
-    "invalidSceneUrl": "",
+    "invalidSceneUrl": "指定された URL からシーンをインポートできませんでした。不正な形式であるか、有効な Excalidraw JSON データが含まれていません。",
     "resetLibrary": "ライブラリを消去します。本当によろしいですか？"
   },
   "toolBar": {
@@ -268,10 +268,10 @@
   "toast": {
     "copyStyles": "スタイルをコピー",
     "copyToClipboard": "クリップボードにコピー",
-    "copyToClipboardAsPng": "",
+    "copyToClipboardAsPng": "{{exportSelection}} を PNG 形式でクリップボードにコピーしました\n({{exportColorScheme}})",
     "fileSaved": "ファイルを保存しました",
     "fileSavedToFilename": "{filename} に保存しました",
     "canvas": "キャンバス",
-    "selection": ""
+    "selection": "選択"
   }
 }
