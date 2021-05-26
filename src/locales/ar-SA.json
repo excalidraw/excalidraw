@@ -61,7 +61,7 @@
     "architect": "معماري",
     "artist": "رسام",
     "cartoonist": "كرتوني",
-    "fileTitle": "",
+    "fileTitle": "عنوان الملف",
     "colorPicker": "اختيار الألوان",
     "canvasBackground": "خلفية اللوحة",
     "drawingCanvas": "لوحة الرسم",
@@ -69,7 +69,7 @@
     "actions": "الإجراءات",
     "language": "اللغة",
     "liveCollaboration": "بدء المشاركة الحية",
-    "duplicateSelection": "تكرار",
+    "duplicateSelection": "تكرار العنصر المحدد",
     "untitled": "غير معنون",
     "name": "الاسم",
     "yourName": "اسمك",
@@ -92,8 +92,8 @@
     "centerHorizontally": "توسيط أفقي",
     "distributeHorizontally": "التوزيع الأفقي",
     "distributeVertically": "التوزيع عمودياً",
-    "flipHorizontal": "",
-    "flipVertical": "",
+    "flipHorizontal": "قلب عامودي",
+    "flipVertical": "قلب أفقي",
     "viewMode": "نمط العرض",
     "toggleExportColorScheme": "",
     "share": "مشاركة"
@@ -205,35 +205,35 @@
     "desc_inProgressIntro": "تجري الآن المشاركة الحية.",
     "desc_shareLink": "شارك هذا الرابط مع أي شخص تريده أن يشاركك الجلسة:",
     "desc_exitSession": "إيقاف الجلسة سيؤدي إلى قطع الاتصال الخاص بك من الغرفة، ولكن ستتمكن من مواصلة العمل مع المشهد، محليا. لاحظ أن هذا لن يؤثر على الأشخاص الآخرين، و سيظلون قادرين على التعاون في إصدارهم.",
-    "shareTitle": ""
+    "shareTitle": "شارك العنوان"
   },
   "errorDialog": {
     "title": "خطأ"
   },
   "helpDialog": {
-    "blog": "",
-    "click": "",
-    "curvedArrow": "",
-    "curvedLine": "",
-    "documentation": "",
+    "blog": "مدونة",
+    "click": "إضغط",
+    "curvedArrow": "سهم مائل",
+    "curvedLine": "خط مائل",
+    "documentation": "دليل الإستخدام",
     "drag": "اسحب",
     "editor": "المحرر",
     "github": "عثرت على مشكلة؟ إرسال",
-    "howto": "",
-    "or": "",
+    "howto": "كيف يعمل",
+    "or": "أو",
     "preventBinding": "",
-    "shapes": "",
-    "shortcuts": "",
+    "shapes": "شكل",
+    "shortcuts": "إختصار",
     "textFinish": "",
     "textNewLine": "",
-    "title": "",
-    "view": "",
-    "zoomToFit": "",
-    "zoomToSelection": ""
+    "title": "عنوان",
+    "view": "عرض",
+    "zoomToFit": "تكبير للملائمة",
+    "zoomToSelection": "تكبير للعنصر المحدد"
   },
   "encrypted": {
     "tooltip": "رسوماتك مشفرة من النهاية إلى النهاية حتى أن خوادم Excalidraw لن تراها أبدا.",
-    "link": ""
+    "link": "رابط"
   },
   "stats": {
     "angle": "الزاوية",
@@ -245,18 +245,18 @@
     "storage": "التخزين",
     "title": "إحصائيات للمهووسين",
     "total": "المجموع",
-    "version": "",
-    "versionCopy": "",
-    "versionNotAvailable": "",
+    "version": "الإصدار",
+    "versionCopy": "نسخة الإصدار",
+    "versionNotAvailable": "النسخة غير متوفرة",
     "width": "العرض"
   },
   "toast": {
-    "copyStyles": "",
-    "copyToClipboard": "",
-    "copyToClipboardAsPng": "",
-    "fileSaved": "",
-    "fileSavedToFilename": "",
-    "canvas": "",
-    "selection": ""
+    "copyStyles": "نسخ النمط",
+    "copyToClipboard": "نسخ إلى الحافظة",
+    "copyToClipboardAsPng": "نسخ إلى الحافظة بصيغة PNG",
+    "fileSaved": "تم حفظ الملف",
+    "fileSavedToFilename": "تم حفظ الملف بإسم",
+    "canvas": "لوحة الرسم",
+    "selection": "تحديد"
   }
 }
