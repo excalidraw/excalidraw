@@ -20,7 +20,8 @@ import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkMode
 type MobileMenuProps = {
   appState: AppState;
   actionManager: ActionManager;
-  exportButton: React.ReactNode;
+  renderJSONExportDialog: () => React.ReactNode;
+  renderImageExportDialog: () => React.ReactNode;
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
   libraryMenu: JSX.Element | null;
@@ -28,7 +29,7 @@ type MobileMenuProps = {
   onLockToggle: () => void;
   canvas: HTMLCanvasElement | null;
   isCollaborating: boolean;
-  renderCustomFooter?: (isMobile: boolean) => JSX.Element;
+  renderCustomFooter?: (isMobile: boolean, appState: AppState) => JSX.Element;
   viewModeEnabled: boolean;
   showThemeBtn: boolean;
 };
@@ -38,7 +39,8 @@ export const MobileMenu = ({
   elements,
   libraryMenu,
   actionManager,
-  exportButton,
+  renderJSONExportDialog,
+  renderImageExportDialog,
   setAppState,
   onCollabButtonClick,
   onLockToggle,
@@ -107,19 +109,17 @@ export const MobileMenu = ({
     if (viewModeEnabled) {
       return (
         <>
-          {actionManager.renderAction("saveScene")}
-          {actionManager.renderAction("saveAsScene")}
-          {exportButton}
+          {renderJSONExportDialog()}
+          {renderImageExportDialog()}
         </>
       );
     }
     return (
       <>
-        {actionManager.renderAction("loadScene")}
-        {actionManager.renderAction("saveScene")}
-        {actionManager.renderAction("saveAsScene")}
-        {exportButton}
         {actionManager.renderAction("clearCanvas")}
+        {actionManager.renderAction("loadScene")}
+        {renderJSONExportDialog()}
+        {renderImageExportDialog()}
         {onCollabButtonClick && (
           <CollabButton
             isCollaborating={isCollaborating}
@@ -155,7 +155,7 @@ export const MobileMenu = ({
               <div className="panelColumn">
                 <Stack.Col gap={4}>
                   {renderCanvasActions()}
-                  {renderCustomFooter?.(true)}
+                  {renderCustomFooter?.(true, appState)}
                   {appState.collaborators.size > 0 && (
                     <fieldset>
                       <legend>{t("labels.collaborators")}</legend>

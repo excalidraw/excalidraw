@@ -26,6 +26,7 @@ export {
   actionZoomOut,
   actionResetZoom,
   actionZoomToFit,
+  actionToggleTheme,
 } from "./actionCanvas";
 
 export { actionFinalize } from "./actionFinalize";
@@ -65,6 +66,8 @@ export {
   distributeHorizontally,
   distributeVertically,
 } from "./actionDistribute";
+
+export { actionFlipHorizontal, actionFlipVertical } from "./actionFlip";
 
 export {
   actionCopy,

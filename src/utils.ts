@@ -123,17 +123,25 @@ export const debounce = <T extends any[]>(
   timeout: number,
 ) => {
   let handle = 0;
-  let lastArgs: T;
+  let lastArgs: T | null = null;
   const ret = (...args: T) => {
     lastArgs = args;
     clearTimeout(handle);
-    handle = window.setTimeout(() => fn(...args), timeout);
+    handle = window.setTimeout(() => {
+      lastArgs = null;
+      fn(...args);
+    }, timeout);
   };
   ret.flush = () => {
     clearTimeout(handle);
-    fn(...(lastArgs || []));
+    if (lastArgs) {
+      const _lastArgs = lastArgs;
+      lastArgs = null;
+      fn(..._lastArgs);
+    }
   };
   ret.cancel = () => {
+    lastArgs = null;
     clearTimeout(handle);
   };
   return ret;
@@ -397,4 +405,36 @@ export const supportsEmoji = () => {
   // Luckily 😀 isn't supported.
   ctx.fillText("😀", 0, 0);
   return ctx.getImageData(offset, offset, 1, 1).data[0] !== 0;
+};
+
+export const getNearestScrollableContainer = (
+  element: HTMLElement,
+): HTMLElement | Document => {
+  let parent = element.parentElement;
+  while (parent) {
+    if (parent === document.body) {
+      return document;
+    }
+    const { overflowY } = window.getComputedStyle(parent);
+    const hasScrollableContent = parent.scrollHeight > parent.clientHeight;
+    if (
+      hasScrollableContent &&
+      (overflowY === "auto" || overflowY === "scroll")
+    ) {
+      return parent;
+    }
+    parent = parent.parentElement;
+  }
+  return document;
+};
+
+export const focusNearestParent = (element: HTMLInputElement) => {
+  let parent = element.parentElement;
+  while (parent) {
+    if (parent.tabIndex > -1) {
+      parent.focus();
+      return;
+    }
+    parent = parent.parentElement;
+  }
 };

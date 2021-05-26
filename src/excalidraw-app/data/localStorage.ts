@@ -101,7 +101,7 @@ export const importFromLocalStorage = () => {
 export const getElementsStorageSize = () => {
   try {
     const elements = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS);
-    const elementsSize = elements ? JSON.stringify(elements).length : 0;
+    const elementsSize = elements?.length || 0;
     return elementsSize;
   } catch (error) {
     console.error(error);
@@ -117,9 +117,9 @@ export const getTotalStorageSize = () => {
       APP_STORAGE_KEYS.LOCAL_STORAGE_LIBRARY,
     );
 
-    const appStateSize = appState ? JSON.stringify(appState).length : 0;
-    const collabSize = collab ? JSON.stringify(collab).length : 0;
-    const librarySize = library ? JSON.stringify(library).length : 0;
+    const appStateSize = appState?.length || 0;
+    const collabSize = collab?.length || 0;
+    const librarySize = library?.length || 0;
 
     return appStateSize + collabSize + librarySize + getElementsStorageSize();
   } catch (error) {

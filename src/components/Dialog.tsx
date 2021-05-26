@@ -1,13 +1,14 @@
 import clsx from "clsx";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useCallbackRefState } from "../hooks/useCallbackRefState";
 import { t } from "../i18n";
-import useIsMobile from "../is-mobile";
+import { useIsMobile } from "../components/App";
 import { KEYS } from "../keys";
 import "./Dialog.scss";
 import { back, close } from "./icons";
 import { Island } from "./Island";
 import { Modal } from "./Modal";
+import { AppState } from "../types";
 
 export const Dialog = (props: {
   children: React.ReactNode;
@@ -16,8 +17,10 @@ export const Dialog = (props: {
   onCloseRequest(): void;
   title: React.ReactNode;
   autofocus?: boolean;
+  theme?: AppState["theme"];
 }) => {
   const [islandNode, setIslandNode] = useCallbackRefState<HTMLDivElement>();
+  const [lastActiveElement] = useState(document.activeElement);
 
   useEffect(() => {
     if (!islandNode) {
@@ -65,19 +68,25 @@ export const Dialog = (props: {
     return focusableElements ? Array.from(focusableElements) : [];
   };
 
+  const onClose = () => {
+    (lastActiveElement as HTMLElement).focus();
+    props.onCloseRequest();
+  };
+
   return (
     <Modal
       className={clsx("Dialog", props.className)}
       labelledBy="dialog-title"
       maxWidth={props.small ? 550 : 800}
-      onCloseRequest={props.onCloseRequest}
+      onCloseRequest={onClose}
+      theme={props.theme}
     >
       <Island ref={setIslandNode}>
         <h2 id="dialog-title" className="Dialog__title">
           <span className="Dialog__titleContent">{props.title}</span>
           <button
             className="Modal__close"
-            onClick={props.onCloseRequest}
+            onClick={onClose}
             aria-label={t("buttons.close")}
           >
             {useIsMobile() ? back : close}

@@ -3,7 +3,6 @@ import React, {
   useCallback,
   useContext,
   useEffect,
-  useLayoutEffect,
   useRef,
   useState,
 } from "react";
@@ -12,9 +11,16 @@ import { getDefaultAppState } from "../appState";
 import { ExcalidrawImperativeAPI } from "../components/App";
 import { ErrorDialog } from "../components/ErrorDialog";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
-import { APP_NAME, EVENT, TITLE_TIMEOUT, VERSION_TIMEOUT } from "../constants";
+import {
+  APP_NAME,
+  EVENT,
+  STORAGE_KEYS,
+  TITLE_TIMEOUT,
+  URL_HASH_KEYS,
+  VERSION_TIMEOUT,
+} from "../constants";
 import { loadFromBlob } from "../data/blob";
-import { DataState, ImportedDataState } from "../data/types";
+import { ImportedDataState } from "../data/types";
 import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -25,7 +31,7 @@ import Excalidraw, {
   defaultLang,
   languages,
 } from "../packages/excalidraw/index";
-import { AppState } from "../types";
+import { AppState, LibraryItems } from "../types";
 import {
   debounce,
   getVersion,
@@ -44,6 +50,12 @@ import {
   importFromLocalStorage,
   saveToLocalStorage,
 } from "./data/localStorage";
+import CustomStats from "./CustomStats";
+import { restoreAppState, RestoredDataState } from "../data/restore";
+import { Tooltip } from "../components/Tooltip";
+import { shield } from "../components/icons";
+
+import "./index.scss";
 
 const languageDetector = new LanguageDetector();
 languageDetector.init({
@@ -75,13 +87,11 @@ const initializeScene = async (opts: {
   );
   const externalUrlMatch = window.location.hash.match(/^#url=(.*)$/);
 
-  const initialData = importFromLocalStorage();
+  const localDataState = importFromLocalStorage();
 
-  let scene: DataState & { scrollToContent?: boolean } = await loadScene(
-    null,
-    null,
-    initialData,
-  );
+  let scene: RestoredDataState & {
+    scrollToContent?: boolean;
+  } = await loadScene(null, null, localDataState);
 
   let roomLinkData = getCollaborationLinkData(window.location.href);
   const isExternalScene = !!(id || jsonBackendMatch || roomLinkData);
@@ -96,12 +106,12 @@ const initializeScene = async (opts: {
     ) {
       // Backwards compatibility with legacy url format
       if (id) {
-        scene = await loadScene(id, null, initialData);
+        scene = await loadScene(id, null, localDataState);
       } else if (jsonBackendMatch) {
         scene = await loadScene(
           jsonBackendMatch[1],
           jsonBackendMatch[2],
-          initialData,
+          localDataState,
         );
       }
       scene.scrollToContent = true;
@@ -155,30 +165,24 @@ const initializeScene = async (opts: {
   return null;
 };
 
-function ExcalidrawWrapper() {
-  // dimensions
-  // ---------------------------------------------------------------------------
+const PlusLinkJSX = (
+  <p style={{ direction: "ltr", unicodeBidi: "embed" }}>
+    Introducing Excalidraw+
+    <br />
+    <a
+      href="https://plus.excalidraw.com/?utm_source=excalidraw&utm_medium=banner&utm_campaign=launch"
+      target="_blank"
+      rel="noreferrer"
+    >
+      Try out now!
+    </a>
+  </p>
+);
 
-  const [dimensions, setDimensions] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
-  });
+const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const currentLangCode = languageDetector.detect() || defaultLang.code;
   const [langCode, setLangCode] = useState(currentLangCode);
-
-  useLayoutEffect(() => {
-    const onResize = () => {
-      setDimensions({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    };
-
-    window.addEventListener("resize", onResize);
-
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
 
   // initial state
   // ---------------------------------------------------------------------------
@@ -210,15 +214,42 @@ function ExcalidrawWrapper() {
     }
 
     initializeScene({ collabAPI }).then((scene) => {
+      if (scene) {
+        try {
+          scene.libraryItems =
+            JSON.parse(
+              localStorage.getItem(
+                STORAGE_KEYS.LOCAL_STORAGE_LIBRARY,
+              ) as string,
+            ) || [];
+        } catch (e) {
+          console.error(e);
+        }
+      }
       initialStatePromiseRef.current.promise.resolve(scene);
     });
 
-    const onHashChange = (_: HashChangeEvent) => {
-      initializeScene({ collabAPI }).then((scene) => {
-        if (scene) {
-          excalidrawAPI.updateScene(scene);
-        }
-      });
+    const onHashChange = (event: HashChangeEvent) => {
+      event.preventDefault();
+      const hash = new URLSearchParams(window.location.hash.slice(1));
+      const libraryUrl = hash.get(URL_HASH_KEYS.addLibrary);
+      if (libraryUrl) {
+        // If hash changed and it contains library url, import it and replace
+        // the url to its previous state (important in case of collaboration
+        // and similar).
+        // Using history API won't trigger another hashchange.
+        window.history.replaceState({}, "", event.oldURL);
+        excalidrawAPI.importLibrary(libraryUrl, hash.get("token"));
+      } else {
+        initializeScene({ collabAPI }).then((scene) => {
+          if (scene) {
+            excalidrawAPI.updateScene({
+              ...scene,
+              appState: restoreAppState(scene.appState, null),
+            });
+          }
+        });
+      }
     };
 
     const titleTimeout = setTimeout(
@@ -280,8 +311,41 @@ function ExcalidrawWrapper() {
     }
   };
 
+  const renderTopRightUI = useCallback(
+    (isMobile: boolean, appState: AppState) => {
+      return (
+        <div
+          style={{
+            width: "24ch",
+            fontSize: "0.7em",
+            textAlign: "center",
+          }}
+        >
+          {/* <GitHubCorner theme={appState.theme} dir={document.dir} /> */}
+          {/* FIXME remove after 2021-05-20 */}
+          {PlusLinkJSX}
+        </div>
+      );
+    },
+    [],
+  );
+
   const renderFooter = useCallback(
     (isMobile: boolean) => {
+      const renderEncryptedIcon = () => (
+        <a
+          className="encrypted-icon tooltip"
+          href="https://blog.excalidraw.com/end-to-end-encryption/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={t("encrypted.link")}
+        >
+          <Tooltip label={t("encrypted.tooltip")} long={true}>
+            {shield}
+          </Tooltip>
+        </a>
+      );
+
       const renderLanguageList = () => (
         <LanguageList
           onChange={(langCode) => {
@@ -293,32 +357,81 @@ function ExcalidrawWrapper() {
         />
       );
       if (isMobile) {
+        const isTinyDevice = window.innerWidth < 362;
         return (
-          <fieldset>
-            <legend>{t("labels.language")}</legend>
-            {renderLanguageList()}
-          </fieldset>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: isTinyDevice ? "column" : "row",
+            }}
+          >
+            <fieldset>
+              <legend>{t("labels.language")}</legend>
+              {renderLanguageList()}
+            </fieldset>
+            {/* FIXME remove after 2021-05-20 */}
+            <div
+              style={{
+                width: "24ch",
+                fontSize: "0.7em",
+                textAlign: "center",
+                marginTop: isTinyDevice ? 16 : undefined,
+                marginLeft: "auto",
+                marginRight: isTinyDevice ? "auto" : undefined,
+                padding: "4px 2px",
+                border: "1px dashed #aaa",
+                borderRadius: 12,
+              }}
+            >
+              {PlusLinkJSX}
+            </div>
+          </div>
         );
       }
-      return renderLanguageList();
+      return (
+        <>
+          {renderEncryptedIcon()}
+          {renderLanguageList()}
+        </>
+      );
     },
     [langCode],
   );
+
+  const renderCustomStats = () => {
+    return (
+      <CustomStats
+        setToastMessage={(message) => excalidrawAPI!.setToastMessage(message)}
+      />
+    );
+  };
+
+  const onLibraryChange = async (items: LibraryItems) => {
+    if (!items.length) {
+      localStorage.removeItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY);
+      return;
+    }
+    const serializedItems = JSON.stringify(items);
+    localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY, serializedItems);
+  };
 
   return (
     <>
       <Excalidraw
         ref={excalidrawRefCallback}
         onChange={onChange}
-        width={dimensions.width}
-        height={dimensions.height}
         initialData={initialStatePromiseRef.current.promise}
         onCollabButtonClick={collabAPI?.onCollabButtonClick}
         isCollaborating={collabAPI?.isCollaborating()}
         onPointerUpdate={collabAPI?.onPointerUpdate}
         onExportToBackend={onExportToBackend}
+        renderTopRightUI={renderTopRightUI}
         renderFooter={renderFooter}
         langCode={langCode}
+        renderCustomStats={renderCustomStats}
+        detectScroll={false}
+        handleKeyboardGlobally={true}
+        onLibraryChange={onLibraryChange}
       />
       {excalidrawAPI && <CollabWrapper excalidrawAPI={excalidrawAPI} />}
       {errorMessage && (
@@ -329,9 +442,9 @@ function ExcalidrawWrapper() {
       )}
     </>
   );
-}
+};
 
-export default function ExcalidrawApp() {
+const ExcalidrawApp = () => {
   return (
     <TopErrorBoundary>
       <CollabContextConsumer>
@@ -339,4 +452,6 @@ export default function ExcalidrawApp() {
       </CollabContextConsumer>
     </TopErrorBoundary>
   );
-}
+};
+
+export default ExcalidrawApp;

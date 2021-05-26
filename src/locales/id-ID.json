@@ -92,6 +92,8 @@
     "centerHorizontally": "Pusatkan secara horizontal",
     "distributeHorizontally": "Distribusikan horizontal",
     "distributeVertically": "Distribusikan vertikal",
+    "flipHorizontal": "Balikkan horizontal",
+    "flipVertical": "Balikkan vertikal",
     "viewMode": "Mode tampilan",
     "toggleExportColorScheme": "Ubah skema warna ekspor",
     "share": "Bagikan"
@@ -140,6 +142,8 @@
     "loadSceneOverridePrompt": "Memuat gambar external akan mengganti konten Anda yang ada. Apakah Anda ingin melanjutkan?",
     "collabStopOverridePrompt": "Menghentikan sesi akan menimpa gambar Anda yang tersimpan secara lokal. Anda yakin?\n\n(Jika Anda ingin menyimpan gambar lokal Anda, gantinya cukup tutup tab browser.)",
     "errorLoadingLibrary": "Terdapat kesalahan dalam memuat pustaka pihak ketiga.",
+    "errorAddingToLibrary": "Tidak dapat menambahkan item ke pustaka",
+    "errorRemovingFromLibrary": "Tidak dapat membuang item dari pustaka",
     "confirmAddLibrary": "Ini akan menambahkan {{numShapes}} bentuk ke pustaka Anda. Anda yakin?",
     "imageDoesNotContainScene": "Mengimpor gambar tidak didukung saat ini.\n\nApakah Anda ingin impor pemandangan? Gambar ini tidak berisi data pemandangan. Sudah ka Anda aktifkan ini ketika ekspor?",
     "cannotRestoreFromImage": "Pemandangan tidak dapat dipulihkan dari file gambar ini",
@@ -148,7 +152,7 @@
   },
   "toolBar": {
     "selection": "Pilihan",
-    "draw": "Menggambar bebas",
+    "freedraw": "Menggambar bebas",
     "rectangle": "Persegi",
     "diamond": "Berlian",
     "ellipse": "Elips",
@@ -228,7 +232,8 @@
     "zoomToSelection": "Perbesar ke seleksi"
   },
   "encrypted": {
-    "tooltip": "Gambar anda terenkripsi end-to-end sehingga server Excalidraw tidak akan pernah dapat melihatnya."
+    "tooltip": "Gambar anda terenkripsi end-to-end sehingga server Excalidraw tidak akan pernah dapat melihatnya.",
+    "link": "Pos blog tentang enkripsi ujung ke ujung di Excalidraw"
   },
   "stats": {
     "angle": "Sudut",

@@ -1,6 +1,6 @@
 import { fileSave } from "browser-fs-access";
 import {
-  copyCanvasToClipboardAsPng,
+  copyBlobToClipboardAsPng,
   copyTextToSystemClipboard,
 } from "../clipboard";
 import { NonDeletedExcalidrawElement } from "../element/types";
@@ -18,21 +18,18 @@ export const exportCanvas = async (
   type: ExportType,
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
-  canvas: HTMLCanvasElement,
   {
     exportBackground,
     exportPadding = 10,
     viewBackgroundColor,
     name,
     scale = 1,
-    shouldAddWatermark,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
     name: string;
     scale?: number;
-    shouldAddWatermark: boolean;
   },
 ) => {
   if (elements.length === 0) {
@@ -45,7 +42,6 @@ export const exportCanvas = async (
       viewBackgroundColor,
       exportPadding,
       scale,
-      shouldAddWatermark,
       metadata:
         appState.exportEmbedScene && type === "svg"
           ? await (
@@ -72,14 +68,14 @@ export const exportCanvas = async (
     viewBackgroundColor,
     exportPadding,
     scale,
-    shouldAddWatermark,
   });
   tempCanvas.style.display = "none";
   document.body.appendChild(tempCanvas);
+  let blob = await canvasToBlob(tempCanvas);
+  tempCanvas.remove();
 
   if (type === "png") {
     const fileName = `${name}.png`;
-    let blob = await canvasToBlob(tempCanvas);
     if (appState.exportEmbedScene) {
       blob = await (
         await import(/* webpackChunkName: "image" */ "./image")
@@ -95,17 +91,12 @@ export const exportCanvas = async (
     });
   } else if (type === "clipboard") {
     try {
-      await copyCanvasToClipboardAsPng(tempCanvas);
+      await copyBlobToClipboardAsPng(blob);
     } catch (error) {
       if (error.name === "CANVAS_POSSIBLY_TOO_BIG") {
         throw error;
       }
       throw new Error(t("alerts.couldNotCopyToClipboard"));
     }
-  }
-
-  // clean up the DOM
-  if (tempCanvas !== canvas) {
-    tempCanvas.remove();
   }
 };

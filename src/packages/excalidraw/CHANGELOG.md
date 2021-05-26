@@ -6,11 +6,216 @@ The change should be grouped under one of the below section and must contain PR 
 - Features: For new features.
 - Fixes: For bug fixes.
 - Chore: Changes for non src files example package.json.
-- Improvements: For any improvements.
 - Refactor: For any refactoring.
 
 Please add the latest change on the top under the correct section.
 -->
+
+## Unreleased
+
+## Excalidraw API
+
+### Refactor
+
+#### BREAKING CHANGE
+
+- Removed `shouldAddWatermark: boolean` attribute from options for [export](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#export-utilities) APIs [#3639](https://github.com/excalidraw/excalidraw/pull/3639).
+- Removed `appState.shouldAddWatermark` so in case you were passing `shouldAddWatermark` in [initialData.AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L42) it will not work anymore.
+
+## 0.8.0 (2021-05-15)
+
+## Excalidraw API
+
+**_These section lists the updates which may affect your integration, so it is recommended to go through this when upgrading the version._**
+
+### Features
+
+- Support updating any `appState` properties in [`updateScene`](https://github.com/excalidraw/excalidraw/blob/master/src/components/App.tsx#L282) API. Earlier only `appState.viewBackgroundColor` was supported, now any attribute can be updated with this API.
+- Expose [`serializeAsJSON`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#serializeAsJSON) helper that we use when saving Excalidraw scene to a file [#3538](https://github.com/excalidraw/excalidraw/pull/3538).
+- Add support to render custom UI in the top right corner via [`renderTopRightUI`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#renderTopRightUI) prop [#3539](https://github.com/excalidraw/excalidraw/pull/3539), [#3572](https://github.com/excalidraw/excalidraw/pull/3572) .
+
+  This also removes the GitHub icon, keeping it local to the https://excalidraw.com app.
+
+### Fixes
+
+- The encryption shield icon is now removed from excalidraw package as it was specific to excalidraw app and is now rendered via [`renderFooter`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#renderFooter) prop. In case you were hiding this icon earlier, you need not do that anymore [#3577](https://github.com/excalidraw/excalidraw/pull/3577).
+
+  Now `appState` is also passed to [`renderFooter`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#renderFooter) prop.
+
+## Excalidraw Library
+
+**_These section lists the updates made to the excalidraw library and will not affect the integration._**
+
+### Features
+
+- Shortcut key for nerd stats [#3552](https://github.com/excalidraw/excalidraw/pull/3552).
+- Better rendering of curved rectangles [#3562](https://github.com/excalidraw/excalidraw/pull/3562).
+- Improved freedraw [#3512](https://github.com/excalidraw/excalidraw/pull/3512).
+- Add shortcut for dark mode [#3543](https://github.com/excalidraw/excalidraw/pull/3543).
+- Adds rounded icons, joins and caps.[#3521](https://github.com/excalidraw/excalidraw/pull/3521).
+
+### Fixes
+
+- Exporting freedraw with color to svg [#3565](https://github.com/excalidraw/excalidraw/pull/3565).
+- Handle render errors [#3557](https://github.com/excalidraw/excalidraw/pull/3557).
+- Restore on paste or lib import [#3558](https://github.com/excalidraw/excalidraw/pull/3558).
+- Improve mobile user experience [#3508](https://github.com/excalidraw/excalidraw/pull/3508).
+- Prevent selecting `.visually-hidden` elements [#3501](https://github.com/excalidraw/excalidraw/pull/3501).
+
+### Perf
+
+- Reduce SVG export size by more than half by reducing precision to 2 decimal places [#3567](https://github.com/excalidraw/excalidraw/pull/3567).
+- Remove `backdrop-filter` to improve perf [#3506](https://github.com/excalidraw/excalidraw/pull/3506)
+
+---
+
+## 0.7.0 (2021-04-26)
+
+## Excalidraw API
+
+### Features
+
+- [`scrollToContent`](https://github.com/excalidraw/excalidraw/blob/master/src/components/App.tsx#L265) API now supports passing just a single Excalidraw element, or none at all (which will default to current elements on the scene) [#3482](https://github.com/excalidraw/excalidraw/pull/3482).
+
+  #### BREAKING CHANGE
+
+  - Renamed `setScrollToContent` to [`scrollToContent`](https://github.com/excalidraw/excalidraw/blob/master/src/components/App.tsx#L265).
+
+- Make library local to given excalidraw instance (previously, all instances on the same page shared one global library) [#3451](https://github.com/excalidraw/excalidraw/pull/3451).
+
+  - Added prop [onLibraryChange](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onLibraryChange) which if supplied will be called when library is updated.
+
+  - Added attribute `libraryItems` to prop [initialData](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#initialdata) which can be used to load excalidraw with existing library items.
+
+  - Assign a [unique id](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#Id) to the excalidraw component. The id can be accessed via [`ref`](https://github.com/excalidraw/excalidraw/blob/master/src/components/App.tsx#L298).
+
+  #### BREAKING CHANGE
+
+  - From now on the host application is responsible for [persisting the library](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onLibraryChange) to LocalStorage (or elsewhere), and [importing it on mount](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#initialdata).
+
+- Bind the keyboard events to component and added a prop [`handleKeyboardGlobally`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#handleKeyboardGlobally) which if set to true will bind the keyboard events to document [#3430](https://github.com/excalidraw/excalidraw/pull/3430).
+
+  #### BREAKING CHANGE
+
+  - Earlier keyboard events were bind to document but now its bind to Excalidraw component by default. So you will need to set [`handleKeyboardGlobally`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#handleKeyboardGlobally) to true if you want the previous behaviour (bind the keyboard events to document).
+
+- Recompute offsets on `scroll` of the nearest scrollable container [#3408](https://github.com/excalidraw/excalidraw/pull/3408). This can be disabled by setting [`detectScroll`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#detectScroll) to `false`.
+
+- Add `onPaste` prop to handle custom clipboard behaviours [#3420](https://github.com/excalidraw/excalidraw/pull/3420).
+
+### Fixes
+
+- Changing z-index of elements (sorting them below/above other elements) now updates their `version` and `versionNonce` (only applies to the selected elements). This fix will allow you account for z-index changes if you're syncing just the elements that changed (and not the whole scene) [#3483](https://github.com/excalidraw/excalidraw/pull/3483).
+- Only handle cut/paste events inside excalidraw [#3484](https://github.com/excalidraw/excalidraw/pull/3484).
+
+- Make history local to a given Excalidraw instance. This fixes a case where history was getting shared when you have multiple Excalidraw components on the same page [#3481](https://github.com/excalidraw/excalidraw/pull/3481).
+- Use active Excalidraw component when editing text. This fixes a case where text editing was not working when you have multiple Excalidraw components on the same page [#3478](https://github.com/excalidraw/excalidraw/pull/3478).
+
+- Fix library being pasted off-center [#3462](https://github.com/excalidraw/excalidraw/pull/3462).
+
+- When switching theme, apply it only to the active Excalidraw component. This fixes a case where the theme was getting applied to the first Excalidraw component if you had multiple Excalidraw components on the same page [#3446](https://github.com/excalidraw/excalidraw/pull/3446).
+
+### Refactor
+
+- #### BREAKING CHANGE
+
+  - Removed exposing `getSyncableElements` helper which was specific to excalidraw app collab implementation [#3471](https://github.com/excalidraw/excalidraw/pull/3471). If you happened to use it, you can easily reimplement it yourself using the newly exposed [isInvisiblySmallElement](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#isInvisiblySmallElement) helper:
+
+    ```ts
+    const getSyncableElements = (elements: readonly ExcalidrawElement[]) =>
+      elements.filter((el) => el.isDeleted || !isInvisiblySmallElement(el));
+    ```
+
+### Build
+
+- Add vendor prefixes to css rules [#3476](https://github.com/excalidraw/excalidraw/pull/3476).
+
+## Types
+
+- Renamed the following types in case you depend on them (via [#3427](https://github.com/excalidraw/excalidraw/pull/3427)):
+  - `DataState` → `ExportedDataState`
+  - `LibraryData` → `ExportedLibraryData`
+
+## Excalidraw Library
+
+### Features
+
+- Support tab-to-indent when editing text [#3411](https://github.com/excalidraw/excalidraw/pull/3411).
+
+- App now breaks into mobile view using the component dimensions, not viewport dimensions. This fixes a case where the app would break sooner than necessary when the component's size is smaller than viewport [#3414](https://github.com/excalidraw/excalidraw/pull/3414).
+
+- Add screenshots to manifest.json [#3369](https://github.com/excalidraw/excalidraw/pull/3369).
+
+- Enable drop event on the whole component [#3406](https://github.com/excalidraw/excalidraw/pull/3406).
+
+### Fixes
+
+- Focus on last active element when dialog closes [#3447](https://github.com/excalidraw/excalidraw/pull/3447).
+
+- Fix incorrectly caching png file handle [#3407](https://github.com/excalidraw/excalidraw/pull/3407).
+
+- Fix popover position incorrect on Safari for non-zero offsets/scroll [#3399](https://github.com/excalidraw/excalidraw/pull/3399).
+
+---
+
+## 0.6.0 (2021-04-04)
+
+## Excalidraw API
+
+### Features
+
+- Add `UIOptions` prop to customise `canvas actions` which includes customising `background color picker`, `clear canvas`, `export`, `load`, `save`, `save as` & `theme toggle` [#3364](https://github.com/excalidraw/excalidraw/pull/3364). Check the [readme](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#uioptions) for more details.
+- Calculate `width/height` of canvas based on excalidraw component (".excalidraw" selector) & also resize and update offsets whenever the dimensions of excalidraw component gets updated [#3379](https://github.com/excalidraw/excalidraw/pull/3379). You also don't need to add a resize handler anymore for excalidraw as its handled now in excalidraw itself.
+  #### BREAKING CHANGE
+  - `width/height` props have been removed. Instead now it takes `100%` of `width` and `height` of the container so you need to make sure the container in which you are rendering Excalidraw has non zero dimensions (It should have non zero width and height so Excalidraw can match the dimensions of containing block)
+- Calculate offsets when excalidraw container resizes using resize observer api [#3374](https://github.com/excalidraw/excalidraw/pull/3374).
+- Export types for the package so now it can be used with typescript [#3337](https://github.com/excalidraw/excalidraw/pull/3337). The types are available at `@excalidraw/excalidraw/types`.
+- Add `renderCustomStats` prop to render extra stats on host, and expose `setToastMessage` API via refs which can be used to show toast with custom message [#3360](https://github.com/excalidraw/excalidraw/pull/3360).
+- Support passing a CSRF token when importing libraries to prevent prompting before installation. The token is passed from [https://libraries.excalidraw.com](https://libraries.excalidraw.com/) using the `token` URL key [#3329](https://github.com/excalidraw/excalidraw/pull/3329).
+- #### BREAKING CHANGE
+  Use `location.hash` when importing libraries to fix installation issues. This will require host apps to add a `hashchange` listener and call the newly exposed `excalidrawAPI.importLibrary(url)` API when applicable [#3320](https://github.com/excalidraw/excalidraw/pull/3320). Check the [readme](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#importlibrary) for more details.
+- Append `location.pathname` to `libraryReturnUrl` default url [#3325](https://github.com/excalidraw/excalidraw/pull/3325).
+
+### Build
+
+- Expose separate builds for dev and prod and support source maps in dev build [#3330](https://github.com/excalidraw/excalidraw/pull/3330). Check the [readme](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#installation) for more details.
+  #### BREAKING CHANGE
+  - If you are using script tag to embed excalidraw then the name of the file will have to be updated to `excalidraw.production.min.js` instead of `excalidraw.min.js`. If you want to use dev build you can use `excalidraw.development.js`
+
+### Refactor
+
+#### BREAKING CHANGE
+
+- Rename the API `setCanvasOffsets` exposed via [`ref`](https://github.com/excalidraw/excalidraw/blob/master/src/components/App.tsx#L265) to `refresh` [#3398](https://github.com/excalidraw/excalidraw/pull/3398).
+
+## Excalidraw Library
+
+### Features
+
+- Reopen library menu on import from file [#3383](https://github.com/excalidraw/excalidraw/pull/3383).
+- Don't unnecessarily prompt when installing libraries [#3329](https://github.com/excalidraw/excalidraw/pull/3329).
+- Add option to flip single element on the context menu [#2520](https://github.com/excalidraw/excalidraw/pull/2520).
+- Replace fontSize and fontFamily text with icons [#2857](https://github.com/excalidraw/excalidraw/pull/2857).
+
+### Fixes
+
+- Export dialog canvas positioning [#3397](https://github.com/excalidraw/excalidraw/pull/3397).
+- Don't share collab types with core [#3353](https://github.com/excalidraw/excalidraw/pull/3353).
+- Support d&d of files without extension [#3168](https://github.com/excalidraw/excalidraw/pull/3168).
+- Positions stats for linear elements [#3331](https://github.com/excalidraw/excalidraw/pull/3331).
+- Debounce.flush invokes func even if never queued before [#3326](https://github.com/excalidraw/excalidraw/pull/3326).
+- State selection state on opening contextMenu [#3333](https://github.com/excalidraw/excalidraw/pull/3333).
+- Add unique key for library header to resolve dev warnings [#3316](https://github.com/excalidraw/excalidraw/pull/3316).
+- disallow create text in viewMode on mobile [#3219](https://github.com/excalidraw/excalidraw/pull/3219).
+- Make help toggle tabbable [#3310](https://github.com/excalidraw/excalidraw/pull/3310)
+- Show Windows share icon for Windows users [#3306](https://github.com/excalidraw/excalidraw/pull/3306).
+- Don't scroll to content on INIT websocket message [#3291](https://github.com/excalidraw/excalidraw/pull/3291).
+
+### Refactor
+
+- Use arrow function where possible [#3315](https://github.com/excalidraw/excalidraw/pull/3315).
+
+---
 
 ## 0.5.0 (2021-03-21)
 

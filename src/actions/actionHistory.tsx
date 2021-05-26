@@ -3,7 +3,7 @@ import React from "react";
 import { undo, redo } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
-import { SceneHistory, HistoryEntry } from "../history";
+import History, { HistoryEntry } from "../history";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 import { isWindows, KEYS } from "../keys";
@@ -59,7 +59,7 @@ const writeData = (
   return { commitToHistory };
 };
 
-type ActionCreator = (history: SceneHistory) => Action;
+type ActionCreator = (history: History) => Action;
 
 export const createUndoAction: ActionCreator = (history) => ({
   name: "undo",

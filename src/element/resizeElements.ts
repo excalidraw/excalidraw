@@ -18,7 +18,11 @@ import {
   getCommonBounds,
   getResizedElementAbsoluteCoords,
 } from "./bounds";
-import { isLinearElement, isTextElement } from "./typeChecks";
+import {
+  isFreeDrawElement,
+  isLinearElement,
+  isTextElement,
+} from "./typeChecks";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
 import { measureText, getFontString } from "../utils";
@@ -31,7 +35,7 @@ import {
 import { PointerDownState } from "../components/App";
 import { Point } from "../types";
 
-const normalizeAngle = (angle: number): number => {
+export const normalizeAngle = (angle: number): number => {
   if (angle >= 2 * Math.PI) {
     return angle - 2 * Math.PI;
   }
@@ -181,7 +185,7 @@ const getPerfectElementSizeWithRotation = (
   return rotate(size.width, size.height, 0, 0, -angle);
 };
 
-const reshapeSingleTwoPointElement = (
+export const reshapeSingleTwoPointElement = (
   element: NonDeleted<ExcalidrawLinearElement>,
   resizeArrowDirection: "origin" | "end",
   isRotateWithDiscreteAngle: boolean,
@@ -244,7 +248,7 @@ const rescalePointsInElement = (
   width: number,
   height: number,
 ) =>
-  isLinearElement(element)
+  isLinearElement(element) || isFreeDrawElement(element)
     ? {
         points: rescalePoints(
           0,
@@ -378,7 +382,7 @@ const resizeSingleTextElement = (
   }
 };
 
-const resizeSingleElement = (
+export const resizeSingleElement = (
   stateAtResizeStart: NonDeletedExcalidrawElement,
   shouldKeepSidesRatio: boolean,
   element: NonDeletedExcalidrawElement,
@@ -404,7 +408,7 @@ const resizeSingleElement = (
     -stateAtResizeStart.angle,
   );
 
-  //Get bounds corners rendered on screen
+  // Get bounds corners rendered on screen
   const [esx1, esy1, esx2, esy2] = getResizedElementAbsoluteCoords(
     element,
     element.width,
@@ -644,11 +648,14 @@ const resizeMultipleElements = (
           font = { fontSize: nextFont.size, baseline: nextFont.baseline };
         }
         const origCoords = getElementAbsoluteCoords(element);
+
         const rescaledPoints = rescalePointsInElement(element, width, height);
+
         updateBoundElements(element, {
           newSize: { width, height },
           simultaneouslyUpdated: elements,
         });
+
         const finalCoords = getResizedElementAbsoluteCoords(
           {
             ...element,
@@ -657,6 +664,7 @@ const resizeMultipleElements = (
           width,
           height,
         );
+
         const { x, y } = getNextXY(element, origCoords, finalCoords);
         return [...prev, { width, height, x, y, ...rescaledPoints, ...font }];
       },

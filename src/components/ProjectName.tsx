@@ -1,6 +1,9 @@
 import "./TextInput.scss";
 
 import React, { Component } from "react";
+import { focusNearestParent } from "../utils";
+
+import "./ProjectName.scss";
 
 type Props = {
   value: string;
@@ -17,6 +20,7 @@ export class ProjectName extends Component<Props, State> {
     fileName: this.props.value,
   };
   private handleBlur = (event: any) => {
+    focusNearestParent(event.target);
     const value = event.target.value;
     if (value !== this.props.value) {
       this.props.onChange(value);
@@ -35,8 +39,8 @@ export class ProjectName extends Component<Props, State> {
 
   public render() {
     return (
-      <>
-        <label htmlFor="file-name">
+      <div className="ProjectName">
+        <label className="ProjectName-label" htmlFor="filename">
           {`${this.props.label}${this.props.isNameEditable ? "" : ":"}`}
         </label>
         {this.props.isNameEditable ? (
@@ -44,18 +48,18 @@ export class ProjectName extends Component<Props, State> {
             className="TextInput"
             onBlur={this.handleBlur}
             onKeyDown={this.handleKeyDown}
-            id="file-name"
+            id="filename"
             value={this.state.fileName}
             onChange={(event) =>
               this.setState({ fileName: event.target.value })
             }
           />
         ) : (
-          <span className="TextInput TextInput--readonly" id="file-name">
+          <span className="TextInput TextInput--readonly" id="filename">
             {this.props.value}
           </span>
         )}
-      </>
+      </div>
     );
   }
 }

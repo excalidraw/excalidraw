@@ -19,8 +19,8 @@
     "stroke": "Contorn",
     "background": "Rèireplan",
     "fill": "Empliment",
-    "strokeWidth": "Largor del contorn",
-    "strokeStyle": "Estil del contorn",
+    "strokeWidth": "Largor de contorn",
+    "strokeStyle": "Estil de contorn",
     "strokeStyle_solid": "Solide",
     "strokeStyle_dashed": "Tiret",
     "strokeStyle_dotted": "Puntilhat",
@@ -38,7 +38,7 @@
     "fontSize": "Talha poliça",
     "fontFamily": "Familha de poliça",
     "onlySelected": "Seleccion sonque",
-    "withBackground": "Inclure rèireplan",
+    "withBackground": "Inclure lo rèireplan",
     "exportEmbedScene": "Integrar la scèna al fichièr d’expo",
     "exportEmbedScene_details": "Las donadas de scèna seràn enregistradas dins lo fichièr PNG/SVG exportat, per que la scèna pòsca èsser restaurada a partir d’aqueste fichièr.\nAumentarà la talha del fichièr exportat.",
     "addWatermark": "Apondre « Fabricat amb Excalidraw »",
@@ -92,6 +92,8 @@
     "centerHorizontally": "Centrar orizontalament",
     "distributeHorizontally": "Distribuir orizontalament",
     "distributeVertically": "Distribuir verticalament",
+    "flipHorizontal": "Virar orizontalament",
+    "flipVertical": "Virar verticalament",
     "viewMode": "Mòde de vista",
     "toggleExportColorScheme": "Alternar l’esquèma de color d’expòrt",
     "share": "Partejar"
@@ -99,8 +101,8 @@
   "buttons": {
     "clearReset": "Reïnicializar lo canabàs",
     "export": "Exportar",
-    "exportToPng": "Export en PNG",
-    "exportToSvg": "Export en SVG",
+    "exportToPng": "Exportar en PNG",
+    "exportToSvg": "Exportar en SVG",
     "copyToClipboard": "Copiar al quichapapièrs",
     "copyPngToClipboard": "Copiar PNG al quichapapièrs",
     "scale": "Escala",
@@ -140,6 +142,8 @@
     "loadSceneOverridePrompt": "Cargar un dessenh extèrn remplaçarà vòstre contengut existent. Volètz contunhar ?",
     "collabStopOverridePrompt": "Arrestar la session remplaçarà vòstre precedent dessenh gardat localament. O volètz vertadièrament ?\n\n(Se volètz gardar vòstre dessenh local, tampatz simplament l’onglet del navegador a la plaça)",
     "errorLoadingLibrary": "Una error s’es producha en cargant una bibliotèca tèrça.",
+    "errorAddingToLibrary": "Apondon impossible de l’element a la bibliotèca",
+    "errorRemovingFromLibrary": "Supression impossibla de l’element a la bibliotèca",
     "confirmAddLibrary": "Apondrà {{numShapes}} forma(s) a vòstra bibliotèca. Confirmatz ?",
     "imageDoesNotContainScene": "L’importacion d’imatge es pas encara presa en carga pel moment.\n\nVoliatz importar una scèna ? Aqueste imatge sembla pas conténer cap de donada de scèna. Aviatz activar aquò pendent l’export ?",
     "cannotRestoreFromImage": "Restauracion impossibla de la scèna a partir del fichièr imatge",
@@ -148,7 +152,7 @@
   },
   "toolBar": {
     "selection": "Seleccion",
-    "draw": "Dessenh liure",
+    "freedraw": "Dessenh liure",
     "rectangle": "Rectangle",
     "diamond": "Lausange",
     "ellipse": "Ellipsa",
@@ -228,7 +232,8 @@
     "zoomToSelection": "Zoomar la seleccion"
   },
   "encrypted": {
-    "tooltip": "Vòstres dessenhs son chifrats del cap a la fin en consequéncia los servidors d’Excalidraw los veiràn pas jamai."
+    "tooltip": "Vòstres dessenhs son chifrats del cap a la fin en consequéncia los servidors d’Excalidraw los veiràn pas jamai.",
+    "link": "Article de blòg sul chiframent del cap a la fin dins Excalidraw"
   },
   "stats": {
     "angle": "Angle",

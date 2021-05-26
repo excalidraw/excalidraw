@@ -2,11 +2,12 @@ const path = require("path");
 const TerserPlugin = require("terser-webpack-plugin");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
   .BundleAnalyzerPlugin;
+const autoprefixer = require("autoprefixer");
 
 module.exports = {
   mode: "production",
   entry: {
-    "excalidraw.min": "./entry.js",
+    "excalidraw.production.min": "./entry.js",
   },
   output: {
     path: path.resolve(__dirname, "dist"),
@@ -24,7 +25,21 @@ module.exports = {
       {
         test: /\.(sa|sc|c)ss$/,
         exclude: /node_modules/,
-        use: ["style-loader", { loader: "css-loader" }, "sass-loader"],
+        use: [
+          "style-loader",
+          {
+            loader: "css-loader",
+          },
+          {
+            loader: "postcss-loader",
+            options: {
+              postcssOptions: {
+                plugins: [autoprefixer()],
+              },
+            },
+          },
+          "sass-loader",
+        ],
       },
       {
         test: /\.(ts|tsx|js|jsx|mjs)$/,

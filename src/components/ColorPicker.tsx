@@ -115,6 +115,7 @@ const Picker = ({
       onClose();
     }
     event.nativeEvent.stopImmediatePropagation();
+    event.stopPropagation();
   };
 
   return (

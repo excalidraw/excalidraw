@@ -61,7 +61,7 @@
     "architect": "正確",
     "artist": "アート",
     "cartoonist": "漫画風",
-    "fileTitle": "",
+    "fileTitle": "ファイル名",
     "colorPicker": "色選択",
     "canvasBackground": "キャンバスの背景",
     "drawingCanvas": "キャンバスの描画",
@@ -92,6 +92,8 @@
     "centerHorizontally": "横方向に中央揃え",
     "distributeHorizontally": "水平方向に分散配置",
     "distributeVertically": "垂直方向に分散配置",
+    "flipHorizontal": "水平方向に反転",
+    "flipVertical": "垂直方向に反転",
     "viewMode": "閲覧モード",
     "toggleExportColorScheme": "",
     "share": ""
@@ -140,6 +142,8 @@
     "loadSceneOverridePrompt": "外部図面を読み込むと、既存のコンテンツが置き換わります。続行しますか？",
     "collabStopOverridePrompt": "セッションを停止すると、ローカルに保存されている図が上書きされます。 本当によろしいですか？\n\n(ローカルの図を保持したい場合は、セッションを停止せずにブラウザタブを閉じてください。)",
     "errorLoadingLibrary": "サードパーティライブラリの読み込み中にエラーが発生しました。",
+    "errorAddingToLibrary": "",
+    "errorRemovingFromLibrary": "",
     "confirmAddLibrary": "{{numShapes}} 個の図形をライブラリに追加します。よろしいですか？",
     "imageDoesNotContainScene": "現在、画像のインポートはサポートされていません。\n\nシーンをインポートしようとしましたか？この画像にはシーンデータが含まれていないようです。エクスポート中に有効にしていましたか？",
     "cannotRestoreFromImage": "このイメージファイルからシーンを復元できませんでした",
@@ -148,7 +152,7 @@
   },
   "toolBar": {
     "selection": "選択",
-    "draw": "手書き",
+    "freedraw": "手書き",
     "rectangle": "矩形",
     "diamond": "ひし形",
     "ellipse": "楕円",
@@ -201,7 +205,7 @@
     "desc_inProgressIntro": "共同編集セッションが有効になっています。",
     "desc_shareLink": "下記URLを共同編集したい人に共有してください：",
     "desc_exitSession": "セッションを終了すると部屋から切断されますが、手元の環境で編集を続けることができます。変更内容は他の人には反映されません。",
-    "shareTitle": ""
+    "shareTitle": "Excalidrawのライブコラボレーションセッションに参加する"
   },
   "errorDialog": {
     "title": "エラー"
@@ -228,7 +232,8 @@
     "zoomToSelection": "選択要素にズーム"
   },
   "encrypted": {
-    "tooltip": "描画内容はエンドツーエンド暗号化が施されており、Excalidrawサーバーが内容を見ることはできません。"
+    "tooltip": "描画内容はエンドツーエンド暗号化が施されており、Excalidrawサーバーが内容を見ることはできません。",
+    "link": "Excalidrawのエンドツーエンド暗号化に関するブログ記事"
   },
   "stats": {
     "angle": "角度",
@@ -251,7 +256,7 @@
     "copyToClipboardAsPng": "",
     "fileSaved": "ファイルを保存しました",
     "fileSavedToFilename": "{filename} に保存しました",
-    "canvas": "",
+    "canvas": "キャンバス",
     "selection": ""
   }
 }

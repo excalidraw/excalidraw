@@ -25,7 +25,7 @@
     "strokeStyle_dashed": "虚线",
     "strokeStyle_dotted": "点虚线",
     "sloppiness": "边框",
-    "opacity": "透明度",
+    "opacity": "不透明度",
     "textAlign": "文本对齐",
     "edges": "边角",
     "sharp": "尖锐",
@@ -38,7 +38,7 @@
     "fontSize": "字体大小",
     "fontFamily": "字体",
     "onlySelected": "仅被选中",
-    "withBackground": "使用背景",
+    "withBackground": "包括背景",
     "exportEmbedScene": "将画布数据嵌入到导出的文件",
     "exportEmbedScene_details": "画布数据将被保存到导出的 PNG/SVG 文件，以便恢复。\n将会增加导出的文件大小。",
     "addWatermark": "添加 “使用 Excalidraw 创建” 水印",
@@ -61,7 +61,7 @@
     "architect": "朴素",
     "artist": "艺术",
     "cartoonist": "漫画家",
-    "fileTitle": "",
+    "fileTitle": "文件名",
     "colorPicker": "调色盘",
     "canvasBackground": "画布背景",
     "drawingCanvas": "绘制 Canvas",
@@ -92,6 +92,8 @@
     "centerHorizontally": "水平居中",
     "distributeHorizontally": "水平等距分布",
     "distributeVertically": "垂直等距分布",
+    "flipHorizontal": "水平翻转",
+    "flipVertical": "垂直翻转",
     "viewMode": "查看模式",
     "toggleExportColorScheme": "切换导出配色方案",
     "share": "分享"
@@ -128,7 +130,7 @@
     "exitZenMode": "退出禅模式"
   },
   "alerts": {
-    "clearReset": "这将会清除整个 画板。您是否要继续?",
+    "clearReset": "这将会清除整个画布。您是否要继续?",
     "couldNotCreateShareableLink": "无法创建共享链接",
     "couldNotCreateShareableLinkTooBig": "无法创建可共享链接：画布过大",
     "couldNotLoadInvalidFile": "无法加载无效的文件",
@@ -140,6 +142,8 @@
     "loadSceneOverridePrompt": "加载外部绘图将取代您现有的内容。您想要继续吗？",
     "collabStopOverridePrompt": "停止会话将覆盖您先前本地存储的绘图。 您确定吗？\n\n(如果您想保持本地绘图，只需关闭浏览器选项卡。)",
     "errorLoadingLibrary": "加载第三方库时出错。",
+    "errorAddingToLibrary": "无法将项目添加到库中",
+    "errorRemovingFromLibrary": "无法从库中移除项目",
     "confirmAddLibrary": "这将添加 {{numShapes}} 个形状到您的库。您确定吗？",
     "imageDoesNotContainScene": "当前不支持导入图片。\n\n您想要导入画布数据吗？此图像似乎不包含任何画布数据。您是否在导出过程中启用了嵌入画布的选项？",
     "cannotRestoreFromImage": "无法从此图像文件恢复画布",
@@ -148,7 +152,7 @@
   },
   "toolBar": {
     "selection": "选择",
-    "draw": "自由书写",
+    "freedraw": "自由书写",
     "rectangle": "矩形",
     "diamond": "菱形",
     "ellipse": "椭圆",
@@ -228,7 +232,8 @@
     "zoomToSelection": "缩放到选区"
   },
   "encrypted": {
-    "tooltip": "您的绘图采用的端到端加密，其内容对于Excalidraw服务器是不可见的。"
+    "tooltip": "您的绘图采用的端到端加密，其内容对于Excalidraw服务器是不可见的。",
+    "link": "Excalidraw 中关于端到端加密的博客"
   },
   "stats": {
     "angle": "角度",

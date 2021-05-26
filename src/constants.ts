@@ -1,5 +1,6 @@
 import { FontFamily } from "./element/types";
 import cssVariables from "./css/variables.module.scss";
+import { AppProps } from "./types";
 
 export const APP_NAME = "Excalidraw";
 
@@ -90,6 +91,8 @@ export const EXPORT_DATA_TYPES = {
   excalidrawLibrary: "excalidrawlib",
 } as const;
 
+export const EXPORT_SOURCE = window.location.origin;
+
 export const STORAGE_KEYS = {
   LOCAL_STORAGE_LIBRARY: "excalidraw-library",
 } as const;
@@ -101,7 +104,6 @@ export const TITLE_TIMEOUT = 10000;
 export const TOAST_TIMEOUT = 5000;
 export const VERSION_TIMEOUT = 30000;
 export const SCROLL_TIMEOUT = 100;
-
 export const ZOOM_STEP = 0.1;
 
 // Report a user inactive after IDLE_THRESHOLD milliseconds
@@ -116,3 +118,29 @@ export const MODES = {
 };
 
 export const THEME_FILTER = cssVariables.themeFilter;
+
+export const URL_QUERY_KEYS = {
+  addLibrary: "addLibrary",
+} as const;
+
+export const URL_HASH_KEYS = {
+  addLibrary: "addLibrary",
+} as const;
+
+export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
+  canvasActions: {
+    changeViewBackgroundColor: true,
+    clearCanvas: true,
+    export: true,
+    loadScene: true,
+    saveAsScene: true,
+    saveScene: true,
+    theme: true,
+  },
+};
+
+export const MQ_MAX_WIDTH_PORTRAIT = 730;
+export const MQ_MAX_WIDTH_LANDSCAPE = 1000;
+export const MQ_MAX_HEIGHT_LANDSCAPE = 500;
+
+export const MAX_DECIMALS_FOR_SVG_EXPORT = 2;

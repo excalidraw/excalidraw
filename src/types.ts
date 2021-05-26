@@ -20,7 +20,7 @@ import { ExcalidrawImperativeAPI } from "./components/App";
 import type { ResolvablePromise } from "./utils";
 import { Spreadsheet } from "./charts";
 import { Language } from "./i18n";
-import { UserIdleState } from "./excalidraw-app/collab/types";
+import { ClipboardData } from "./clipboard";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -58,7 +58,6 @@ export type AppState = {
   exportBackground: boolean;
   exportEmbedScene: boolean;
   exportWithDarkMode: boolean;
-  shouldAddWatermark: boolean;
   currentItemStrokeColor: string;
   currentItemBackgroundColor: string;
   currentItemFillStyle: ExcalidrawElement["fillStyle"];
@@ -163,8 +162,6 @@ export type ExcalidrawAPIRefValue =
     };
 
 export interface ExcalidrawProps {
-  width?: number;
-  height?: number;
   onChange?: (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
@@ -183,7 +180,12 @@ export interface ExcalidrawProps {
     appState: AppState,
     canvas: HTMLCanvasElement | null,
   ) => void;
-  renderFooter?: (isMobile: boolean) => JSX.Element;
+  onPaste?: (
+    data: ClipboardData,
+    event: ClipboardEvent | null,
+  ) => Promise<boolean> | boolean;
+  renderTopRightUI?: (isMobile: boolean, appState: AppState) => JSX.Element;
+  renderFooter?: (isMobile: boolean, appState: AppState) => JSX.Element;
   langCode?: Language["code"];
   viewModeEnabled?: boolean;
   zenModeEnabled?: boolean;
@@ -191,6 +193,14 @@ export interface ExcalidrawProps {
   libraryReturnUrl?: string;
   theme?: "dark" | "light";
   name?: string;
+  renderCustomStats?: (
+    elements: readonly NonDeletedExcalidrawElement[],
+    appState: AppState,
+  ) => JSX.Element;
+  UIOptions?: UIOptions;
+  detectScroll?: boolean;
+  handleKeyboardGlobally?: boolean;
+  onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
 }
 
 export type SceneData = {
@@ -198,4 +208,32 @@ export type SceneData = {
   appState?: ImportedDataState["appState"];
   collaborators?: Map<string, Collaborator>;
   commitToHistory?: boolean;
+};
+
+export enum UserIdleState {
+  ACTIVE = "active",
+  AWAY = "away",
+  IDLE = "idle",
+}
+
+type CanvasActions = {
+  changeViewBackgroundColor?: boolean;
+  clearCanvas?: boolean;
+  export?: boolean;
+  loadScene?: boolean;
+  saveAsScene?: boolean;
+  saveScene?: boolean;
+  theme?: boolean;
+};
+
+export type UIOptions = {
+  canvasActions?: CanvasActions;
+};
+
+export type AppProps = ExcalidrawProps & {
+  UIOptions: {
+    canvasActions: Required<CanvasActions>;
+  };
+  detectScroll: boolean;
+  handleKeyboardGlobally: boolean;
 };

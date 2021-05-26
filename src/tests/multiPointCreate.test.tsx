@@ -1,6 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { render, fireEvent } from "./test-utils";
+import {
+  render,
+  fireEvent,
+  mockBoundingClientRect,
+  restoreOriginalGetBoundingClientRect,
+} from "./test-utils";
 import ExcalidrawApp from "../excalidraw-app";
 import * as Renderer from "../renderer/renderScene";
 import { KEYS } from "../keys";
@@ -20,6 +25,14 @@ beforeEach(() => {
 const { h } = window;
 
 describe("remove shape in non linear elements", () => {
+  beforeAll(() => {
+    mockBoundingClientRect();
+  });
+
+  afterAll(() => {
+    restoreOriginalGetBoundingClientRect();
+  });
+
   it("rectangle", async () => {
     const { getByToolName, container } = await render(<ExcalidrawApp />);
     // select tool
@@ -86,9 +99,11 @@ describe("multi point mode in linear elements", () => {
     // done
     fireEvent.pointerDown(canvas);
     fireEvent.pointerUp(canvas);
-    fireEvent.keyDown(document, { key: KEYS.ENTER });
+    fireEvent.keyDown(document, {
+      key: KEYS.ENTER,
+    });
 
-    expect(renderScene).toHaveBeenCalledTimes(13);
+    expect(renderScene).toHaveBeenCalledTimes(14);
     expect(h.elements.length).toEqual(1);
 
     const element = h.elements[0] as ExcalidrawLinearElement;
@@ -127,9 +142,11 @@ describe("multi point mode in linear elements", () => {
     // done
     fireEvent.pointerDown(canvas);
     fireEvent.pointerUp(canvas);
-    fireEvent.keyDown(document, { key: KEYS.ENTER });
+    fireEvent.keyDown(document, {
+      key: KEYS.ENTER,
+    });
 
-    expect(renderScene).toHaveBeenCalledTimes(13);
+    expect(renderScene).toHaveBeenCalledTimes(14);
     expect(h.elements.length).toEqual(1);
 
     const element = h.elements[0] as ExcalidrawLinearElement;

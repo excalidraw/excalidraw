@@ -92,6 +92,8 @@
     "centerHorizontally": "အလျားလိုက်အလယ်ညှိ",
     "distributeHorizontally": "အလျားလိုက်",
     "distributeVertically": "ထောင်လိုက်",
+    "flipHorizontal": "",
+    "flipVertical": "",
     "viewMode": "",
     "toggleExportColorScheme": "",
     "share": ""
@@ -140,6 +142,8 @@
     "loadSceneOverridePrompt": "လက်ရှိရေးဆွဲထားသမျှအား ပြင်ပမှတင်သွင်းသောပုံနှင့်အစားထိုးပါမည်။ ဆက်လက်ဆောင်ရွက်လိုပါသလား။",
     "collabStopOverridePrompt": "",
     "errorLoadingLibrary": "ပြင်ပမှမှတ်တမ်းအားတင်သွင်းရာတွင်အမှားအယွင်းရှိနေသည်။",
+    "errorAddingToLibrary": "",
+    "errorRemovingFromLibrary": "",
     "confirmAddLibrary": "{{numShapes}} ခုသောပုံသဏ္ဌာန်အားမှတ်တမ်းတင်ပါမည်။ အတည်ပြုပါ။",
     "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "ဤပုံဖြင့်မြင်ကွင်းပြန်လည်မရယူနိုင်ပါ။",
@@ -148,7 +152,7 @@
   },
   "toolBar": {
     "selection": "ရွေးချယ်",
-    "draw": "အလွတ်ရေးဆွဲ",
+    "freedraw": "အလွတ်ရေးဆွဲ",
     "rectangle": "စတုဂံ",
     "diamond": "စိန်",
     "ellipse": "အဝိုင်း",
@@ -228,7 +232,8 @@
     "zoomToSelection": ""
   },
   "encrypted": {
-    "tooltip": "ရေးဆွဲထားသောပုံများအား နှစ်ဘက်စွန်းတိုင်လျှို့ဝှက်ထားသဖြင့် Excalidraw ၏ဆာဗာများပင်လျှင်မြင်တွေ့ရမည်မဟုတ်ပါ။"
+    "tooltip": "ရေးဆွဲထားသောပုံများအား နှစ်ဘက်စွန်းတိုင်လျှို့ဝှက်ထားသဖြင့် Excalidraw ၏ဆာဗာများပင်လျှင်မြင်တွေ့ရမည်မဟုတ်ပါ။",
+    "link": ""
   },
   "stats": {
     "angle": "ထောင့်",

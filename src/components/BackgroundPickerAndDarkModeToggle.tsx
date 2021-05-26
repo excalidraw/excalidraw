@@ -1,7 +1,6 @@
 import React from "react";
 import { ActionManager } from "../actions/manager";
 import { AppState } from "../types";
-import { DarkModeToggle } from "./DarkModeToggle";
 
 export const BackgroundPickerAndDarkModeToggle = ({
   appState,
@@ -16,14 +15,10 @@ export const BackgroundPickerAndDarkModeToggle = ({
 }) => (
   <div style={{ display: "flex" }}>
     {actionManager.renderAction("changeViewBackgroundColor")}
-    {showThemeBtn && (
+    {showThemeBtn && actionManager.renderAction("toggleTheme")}
+    {appState.fileHandle && (
       <div style={{ marginInlineStart: "0.25rem" }}>
-        <DarkModeToggle
-          value={appState.theme}
-          onChange={(theme) => {
-            setAppState({ theme });
-          }}
-        />
+        {actionManager.renderAction("saveScene")}
       </div>
     )}
   </div>

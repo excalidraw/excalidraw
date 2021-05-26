@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { close } from "../components/icons";
 import { MIME_TYPES } from "../constants";
 import { t } from "../i18n";
-import useIsMobile from "../is-mobile";
+import { useIsMobile } from "../components/App";
 import { exportToSvg } from "../scene/export";
 import { LibraryItem } from "../types";
 import "./LibraryUnit.scss";
@@ -39,7 +39,6 @@ export const LibraryUnit = ({
     const svg = exportToSvg(elementsToRender, {
       exportBackground: false,
       viewBackgroundColor: oc.white,
-      shouldAddWatermark: false,
     });
     for (const child of ref.current!.children) {
       if (child.tagName !== "svg") {

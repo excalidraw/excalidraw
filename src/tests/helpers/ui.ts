@@ -6,6 +6,7 @@ import {
 import { CODES } from "../../keys";
 import { ToolName } from "../queries/toolQueries";
 import { fireEvent, GlobalTestState } from "../test-utils";
+import { mutateElement } from "../../element/mutateElement";
 import { API } from "./api";
 
 const { h } = window;
@@ -121,6 +122,9 @@ export class Pointer {
     };
   }
 
+  // incremental (moving by deltas)
+  // ---------------------------------------------------------------------------
+
   move(dx: number, dy: number) {
     if (dx !== 0 || dy !== 0) {
       this.clientX += dx;
@@ -148,6 +152,39 @@ export class Pointer {
     this.move(dx, dy);
     fireEvent.doubleClick(GlobalTestState.canvas, this.getEvent());
   }
+
+  // absolute coords
+  // ---------------------------------------------------------------------------
+
+  moveTo(x: number, y: number) {
+    this.clientX = x;
+    this.clientY = y;
+    fireEvent.pointerMove(GlobalTestState.canvas, this.getEvent());
+  }
+
+  downAt(x = this.clientX, y = this.clientY) {
+    this.clientX = x;
+    this.clientY = y;
+    fireEvent.pointerDown(GlobalTestState.canvas, this.getEvent());
+  }
+
+  upAt(x = this.clientX, y = this.clientY) {
+    this.clientX = x;
+    this.clientY = y;
+    fireEvent.pointerUp(GlobalTestState.canvas, this.getEvent());
+  }
+
+  clickAt(x: number, y: number) {
+    this.downAt(x, y);
+    this.upAt();
+  }
+
+  doubleClickAt(x: number, y: number) {
+    this.moveTo(x, y);
+    fireEvent.doubleClick(GlobalTestState.canvas, this.getEvent());
+  }
+
+  // ---------------------------------------------------------------------------
 
   select(
     /** if multiple elements supplied, they're shift-selected */
@@ -202,6 +239,7 @@ export class UI {
       size = 10,
       width = size,
       height = width,
+      angle = 0,
     }: {
       position?: number;
       x?: number;
@@ -209,15 +247,16 @@ export class UI {
       size?: number;
       width?: number;
       height?: number;
+      angle?: number;
     } = {},
-  ): (T extends "arrow" | "line" | "draw"
+  ): (T extends "arrow" | "line" | "freedraw"
     ? ExcalidrawLinearElement
     : T extends "text"
     ? ExcalidrawTextElement
     : ExcalidrawElement) & {
     /** Returns the actual, current element from the elements array, instead
         of the proxy */
-    get(): T extends "arrow" | "line" | "draw"
+    get(): T extends "arrow" | "line" | "freedraw"
       ? ExcalidrawLinearElement
       : T extends "text"
       ? ExcalidrawTextElement
@@ -230,6 +269,10 @@ export class UI {
     mouse.up(x + (width ?? height ?? size), y + (height ?? size));
 
     const origElement = h.elements[h.elements.length - 1] as any;
+
+    if (angle !== 0) {
+      mutateElement(origElement, { angle });
+    }
 
     return new Proxy(
       {},

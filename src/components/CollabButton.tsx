@@ -2,7 +2,7 @@ import React from "react";
 import clsx from "clsx";
 import { ToolButton } from "./ToolButton";
 import { t } from "../i18n";
-import useIsMobile from "../is-mobile";
+import { useIsMobile } from "../components/App";
 import { users } from "./icons";
 
 import "./CollabButton.scss";

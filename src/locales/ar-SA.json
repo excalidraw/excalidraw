@@ -92,6 +92,8 @@
     "centerHorizontally": "توسيط أفقي",
     "distributeHorizontally": "التوزيع الأفقي",
     "distributeVertically": "التوزيع عمودياً",
+    "flipHorizontal": "",
+    "flipVertical": "",
     "viewMode": "نمط العرض",
     "toggleExportColorScheme": "",
     "share": "مشاركة"
@@ -140,6 +142,8 @@
     "loadSceneOverridePrompt": "تحميل الرسم الخارجي سيحل محل المحتوى الموجود لديك. هل ترغب في المتابعة؟",
     "collabStopOverridePrompt": "إيقاف الجلسة سيؤدي إلى الكتابة فوق رسومك السابقة المخزنة داخليا. هل أنت متأكد؟\n\n(إذا كنت ترغب في الاحتفاظ برسمك المخزن داخليا، ببساطة أغلق علامة تبويب المتصفح بدلاً من ذلك.)",
     "errorLoadingLibrary": "حصل خطأ أثناء تحميل مكتبة الطرف الثالث.",
+    "errorAddingToLibrary": "",
+    "errorRemovingFromLibrary": "",
     "confirmAddLibrary": "هذا سيضيف {{numShapes}} شكل إلى مكتبتك. هل أنت متأكد؟",
     "imageDoesNotContainScene": "استيراد الصور غير مدعوم في الوقت الراهن.\n\nهل تريد استيراد مشهد؟ لا يبدو أن هذه الصورة تحتوي على أي بيانات مشهد. هل قمت بسماح هذا أثناء التصدير؟",
     "cannotRestoreFromImage": "تعذر استعادة المشهد من ملف الصورة",
@@ -148,7 +152,7 @@
   },
   "toolBar": {
     "selection": "تحديد",
-    "draw": "الكتابة الحرة",
+    "freedraw": "الكتابة الحرة",
     "rectangle": "مستطيل",
     "diamond": "مضلع",
     "ellipse": "دائرة",
@@ -228,7 +232,8 @@
     "zoomToSelection": ""
   },
   "encrypted": {
-    "tooltip": "رسوماتك مشفرة من النهاية إلى النهاية حتى أن خوادم Excalidraw لن تراها أبدا."
+    "tooltip": "رسوماتك مشفرة من النهاية إلى النهاية حتى أن خوادم Excalidraw لن تراها أبدا.",
+    "link": ""
   },
   "stats": {
     "angle": "الزاوية",

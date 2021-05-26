@@ -8,7 +8,6 @@ import { ExcalidrawElement } from "../../element/types";
 import {
   getElementMap,
   getSceneVersion,
-  getSyncableElements,
 } from "../../packages/excalidraw/index";
 import { Collaborator, Gesture } from "../../types";
 import { resolvablePromise, withBatchedUpdates } from "../../utils";
@@ -38,9 +37,10 @@ import Portal from "./Portal";
 import RoomDialog from "./RoomDialog";
 import { createInverseContext } from "../../createInverseContext";
 import { t } from "../../i18n";
-import { UserIdleState } from "./types";
+import { UserIdleState } from "../../types";
 import { IDLE_THRESHOLD, ACTIVE_THRESHOLD } from "../../constants";
 import { trackEvent } from "../../analytics";
+import { isInvisiblySmallElement } from "../../element";
 
 interface CollabState {
   modalIsShown: boolean;
@@ -113,8 +113,8 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       process.env.NODE_ENV === ENV.TEST ||
       process.env.NODE_ENV === ENV.DEVELOPMENT
     ) {
-      window.h = window.h || ({} as Window["h"]);
-      Object.defineProperties(window.h, {
+      window.collab = window.collab || ({} as Window["collab"]);
+      Object.defineProperties(window, {
         collab: {
           configurable: true,
           value: this,
@@ -146,7 +146,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   };
 
   private beforeUnload = withBatchedUpdates((event: BeforeUnloadEvent) => {
-    const syncableElements = getSyncableElements(
+    const syncableElements = this.getSyncableElements(
       this.getSceneElementsIncludingDeleted(),
     );
 
@@ -177,7 +177,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   });
 
   saveCollabRoomToFirebase = async (
-    syncableElements: ExcalidrawElement[] = getSyncableElements(
+    syncableElements: ExcalidrawElement[] = this.getSyncableElements(
       this.excalidrawAPI.getSceneElementsIncludingDeleted(),
     ),
   ) => {
@@ -565,7 +565,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     ) {
       this.portal.broadcastScene(
         SCENE.UPDATE,
-        getSyncableElements(elements),
+        this.getSyncableElements(elements),
         false,
       );
       this.lastBroadcastedOrReceivedSceneVersion = getSceneVersion(elements);
@@ -576,7 +576,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   queueBroadcastAllElements = throttle(() => {
     this.portal.broadcastScene(
       SCENE.UPDATE,
-      getSyncableElements(
+      this.getSyncableElements(
         this.excalidrawAPI.getSceneElementsIncludingDeleted(),
       ),
       true,
@@ -591,8 +591,6 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
   handleClose = () => {
     this.setState({ modalIsShown: false });
-    const collabIcon = document.querySelector(".CollabButton") as HTMLElement;
-    collabIcon.focus();
   };
 
   onUsernameChange = (username: string) => {
@@ -605,6 +603,9 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       modalIsShown: true,
     });
   };
+
+  getSyncableElements = (elements: readonly ExcalidrawElement[]) =>
+    elements.filter((el) => el.isDeleted || !isInvisiblySmallElement(el));
 
   /** PRIVATE. Use `this.getContextValue()` instead. */
   private contextValue: CollabAPI | null = null;
@@ -640,6 +641,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
             setErrorMessage={(errorMessage) => {
               this.setState({ errorMessage });
             }}
+            theme={this.excalidrawAPI.getAppState().theme}
           />
         )}
         {errorMessage && (
@@ -656,6 +658,19 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       </>
     );
   }
+}
+
+declare global {
+  interface Window {
+    collab: InstanceType<typeof CollabWrapper>;
+  }
+}
+
+if (
+  process.env.NODE_ENV === ENV.TEST ||
+  process.env.NODE_ENV === ENV.DEVELOPMENT
+) {
+  window.collab = window.collab || ({} as Window["collab"]);
 }
 
 export default CollabWrapper;

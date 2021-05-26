@@ -1,4 +1,3 @@
-import React from "react";
 import clsx from "clsx";
 
 export const ButtonIconCycle = <T extends any>({
@@ -14,11 +13,11 @@ export const ButtonIconCycle = <T extends any>({
 }) => {
   const current = options.find((op) => op.value === value);
 
-  function cycle() {
+  const cycle = () => {
     const index = options.indexOf(current!);
     const next = (index + 1) % options.length;
     onChange(options[next].value);
-  }
+  };
 
   return (
     <label key={group} className={clsx({ active: current!.value !== null })}>
