@@ -42,8 +42,8 @@
     "fontSize": "Dimensione carattere",
     "fontFamily": "Carattere",
     "onlySelected": "Solo selezionati",
-    "withBackground": "",
-    "exportEmbedScene": "",
+    "withBackground": "Sfondo",
+    "exportEmbedScene": "Includi scena",
     "exportEmbedScene_details": "I dati della scena saranno salvati nel file PNG/SVG esportato in modo che la scena possa essere ripristinata da esso.\nQuesto aumenterà la dimensione del file esportato.",
     "addWatermark": "Aggiungi \"Creato con Excalidraw\"",
     "handDrawn": "A mano libera",
@@ -105,15 +105,15 @@
   },
   "buttons": {
     "clearReset": "Svuota la tela",
-    "exportJSON": "",
-    "exportImage": "",
+    "exportJSON": "Esporta su file",
+    "exportImage": "Salva come immagine",
     "export": "Esporta",
     "exportToPng": "Esporta come PNG",
     "exportToSvg": "Esporta come SVG",
     "copyToClipboard": "Copia negli appunti",
     "copyPngToClipboard": "Copia PNG negli appunti",
     "scale": "Scala",
-    "save": "",
+    "save": "Salva sul file corrente",
     "saveAs": "Salva con nome",
     "load": "Carica",
     "getShareableLink": "Ottieni link condivisibile",
@@ -218,12 +218,12 @@
     "title": "Errore"
   },
   "exportDialog": {
-    "disk_title": "",
-    "disk_details": "",
-    "disk_button": "",
-    "link_title": "",
-    "link_details": "",
-    "link_button": ""
+    "disk_title": "Salva su disco",
+    "disk_details": "Esporta i dati della scena su file, dal quale potrai importare in seguito.",
+    "disk_button": "Salva su file",
+    "link_title": "Link condivisibile",
+    "link_details": "Esporta come link di sola lettura.",
+    "link_button": "Esporta come Link"
   },
   "helpDialog": {
     "blog": "Leggi il nostro blog",
