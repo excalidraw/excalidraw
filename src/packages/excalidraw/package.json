@@ -60,7 +60,7 @@
     "babel-loader": "8.2.2",
     "babel-plugin-transform-class-properties": "6.24.1",
     "cross-env": "7.0.3",
-    "css-loader": "5.2.4",
+    "css-loader": "5.2.6",
     "file-loader": "6.2.0",
     "mini-css-extract-plugin": "1.6.0",
     "postcss-loader": "5.3.0",
