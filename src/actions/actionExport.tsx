@@ -71,8 +71,8 @@ export const actionChangeExportEmbedScene = register({
   ),
 });
 
-export const actionSaveScene = register({
-  name: "saveScene",
+export const actionSaveToActiveFile = register({
+  name: "saveToActiveFile",
   perform: async (elements, appState, value) => {
     const fileHandleExists = !!appState.fileHandle;
     try {

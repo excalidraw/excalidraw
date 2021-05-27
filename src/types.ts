@@ -222,7 +222,7 @@ type CanvasActions = {
   clearCanvas?: boolean;
   export?: false | ExportOpts;
   loadScene?: boolean;
-  saveScene?: boolean;
+  saveToActiveFile?: boolean;
   theme?: boolean;
 };
 
