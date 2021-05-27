@@ -574,7 +574,7 @@ This prop can be used to customise UI of Excalidraw. Currently we support custom
 | `export` | boolean | true | Implies whether to show `Export button` |
 | `loadScene` | boolean | true | Implies whether to show `Load button` |
 | `saveAsScene` | boolean | true | Implies whether to show `Save as button` |
-| `saveScene` | boolean | true | Implies whether to show `Save button` |
+| `saveToActiveFile` | boolean | true | Implies whether to show `Save button` to save to current file |
 | `theme` | boolean | true | Implies whether to show `Theme toggle` |
 
 #### `onPaste`

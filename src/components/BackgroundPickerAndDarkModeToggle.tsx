@@ -18,7 +18,7 @@ export const BackgroundPickerAndDarkModeToggle = ({
     {showThemeBtn && actionManager.renderAction("toggleTheme")}
     {appState.fileHandle && (
       <div style={{ marginInlineStart: "0.25rem" }}>
-        {actionManager.renderAction("saveScene")}
+        {actionManager.renderAction("saveToActiveFile")}
       </div>
     )}
   </div>
