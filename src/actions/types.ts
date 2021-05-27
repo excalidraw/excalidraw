@@ -67,7 +67,7 @@ export type ActionName =
   | "changeExportBackground"
   | "changeExportEmbedScene"
   | "saveScene"
-  | "saveAsScene"
+  | "saveFileToDisk"
   | "loadScene"
   | "duplicateSelection"
   | "deleteSelectedElements"

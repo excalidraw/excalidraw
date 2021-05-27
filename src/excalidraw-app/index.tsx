@@ -424,7 +424,11 @@ const ExcalidrawWrapper = () => {
         onCollabButtonClick={collabAPI?.onCollabButtonClick}
         isCollaborating={collabAPI?.isCollaborating()}
         onPointerUpdate={collabAPI?.onPointerUpdate}
-        onExportToBackend={onExportToBackend}
+        UIOptions={{
+          canvasActions: {
+            export: { onExportToBackend },
+          },
+        }}
         renderTopRightUI={renderTopRightUI}
         renderFooter={renderFooter}
         langCode={langCode}

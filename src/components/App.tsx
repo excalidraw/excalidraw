@@ -452,7 +452,6 @@ class App extends React.Component<AppProps, AppState> {
 
     const {
       onCollabButtonClick,
-      onExportToBackend,
       renderTopRightUI,
       renderFooter,
       renderCustomStats,
@@ -493,7 +492,6 @@ class App extends React.Component<AppProps, AppState> {
               toggleZenMode={this.toggleZenMode}
               langCode={getLanguage().code}
               isCollaborating={this.props.isCollaborating || false}
-              onExportToBackend={onExportToBackend}
               renderTopRightUI={renderTopRightUI}
               renderCustomFooter={renderFooter}
               viewModeEnabled={viewModeEnabled}

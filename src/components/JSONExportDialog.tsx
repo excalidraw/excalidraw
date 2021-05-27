@@ -7,7 +7,7 @@ import { AppState } from "../types";
 import { Dialog } from "./Dialog";
 import { exportFile, exportToFileIcon, link } from "./icons";
 import { ToolButton } from "./ToolButton";
-import { actionSaveAsScene } from "../actions/actionExport";
+import { actionSaveFileToDisk } from "../actions/actionExport";
 import { Card } from "./Card";
 
 import "./ExportDialog.scss";
@@ -47,7 +47,7 @@ const JSONExportModal = ({
             aria-label={t("exportDialog.disk_button")}
             showAriaLabel={true}
             onClick={() => {
-              actionManager.executeAction(actionSaveAsScene);
+              actionManager.executeAction(actionSaveFileToDisk);
             }}
           />
         </Card>

@@ -172,11 +172,6 @@ export interface ExcalidrawProps {
     button: "down" | "up";
     pointersMap: Gesture["pointers"];
   }) => void;
-  onExportToBackend?: (
-    exportedElements: readonly NonDeletedExcalidrawElement[],
-    appState: AppState,
-    canvas: HTMLCanvasElement | null,
-  ) => void;
   onPaste?: (
     data: ClipboardData,
     event: ClipboardEvent | null,
@@ -213,12 +208,20 @@ export enum UserIdleState {
   IDLE = "idle",
 }
 
+type ExportOpts = {
+  saveFileToDisk?: boolean;
+  onExportToBackend?: (
+    exportedElements: readonly NonDeletedExcalidrawElement[],
+    appState: AppState,
+    canvas: HTMLCanvasElement | null,
+  ) => void;
+};
+
 type CanvasActions = {
   changeViewBackgroundColor?: boolean;
   clearCanvas?: boolean;
-  export?: boolean;
+  export?: false | ExportOpts;
   loadScene?: boolean;
-  saveAsScene?: boolean;
   saveScene?: boolean;
   theme?: boolean;
 };

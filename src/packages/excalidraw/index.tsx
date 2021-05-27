@@ -19,7 +19,6 @@ const Excalidraw = (props: ExcalidrawProps) => {
     onCollabButtonClick,
     isCollaborating,
     onPointerUpdate,
-    onExportToBackend,
     renderTopRightUI,
     renderFooter,
     langCode = defaultLang.code,
@@ -72,7 +71,6 @@ const Excalidraw = (props: ExcalidrawProps) => {
         onCollabButtonClick={onCollabButtonClick}
         isCollaborating={isCollaborating}
         onPointerUpdate={onPointerUpdate}
-        onExportToBackend={onExportToBackend}
         renderTopRightUI={renderTopRightUI}
         renderFooter={renderFooter}
         langCode={langCode}
