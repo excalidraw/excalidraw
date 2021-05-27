@@ -208,7 +208,7 @@ export enum UserIdleState {
   IDLE = "idle",
 }
 
-type ExportOpts = {
+export type ExportOpts = {
   saveFileToDisk?: boolean;
   onExportToBackend?: (
     exportedElements: readonly NonDeletedExcalidrawElement[],
@@ -232,7 +232,7 @@ export type UIOptions = {
 
 export type AppProps = ExcalidrawProps & {
   UIOptions: {
-    canvasActions: Required<CanvasActions>;
+    canvasActions: Required<CanvasActions> & { export: ExportOpts };
   };
   detectScroll: boolean;
   handleKeyboardGlobally: boolean;

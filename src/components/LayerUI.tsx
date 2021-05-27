@@ -399,6 +399,7 @@ const LayerUI = ({
               }
             : undefined
         }
+        exportOpts={UIOptions.canvasActions.export}
       />
     );
   };

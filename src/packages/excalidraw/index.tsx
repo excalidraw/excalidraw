@@ -41,6 +41,10 @@ const Excalidraw = (props: ExcalidrawProps) => {
     canvasActions: {
       ...DEFAULT_UI_OPTIONS.canvasActions,
       ...canvasActions,
+      export: {
+        ...(DEFAULT_UI_OPTIONS.canvasActions.export as object),
+        ...canvasActions?.export,
+      },
     },
   };
 
