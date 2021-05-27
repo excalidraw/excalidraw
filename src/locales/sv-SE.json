@@ -43,7 +43,7 @@
     "fontFamily": "Teckensnitt",
     "onlySelected": "Endast markering",
     "withBackground": "Bakgrund",
-    "exportEmbedScene": "Bädda in scen",
+    "exportEmbedScene": "Bädda in skiss",
     "exportEmbedScene_details": "Skissdata kommer att sparas i den exporterade PNG/SVG-filen så att skissen kan återställas från den.\nKommer att öka exporterad filstorlek.",
     "addWatermark": "Lägg till \"Skapad med Excalidraw\"",
     "handDrawn": "Handritad",
@@ -219,7 +219,7 @@
   },
   "exportDialog": {
     "disk_title": "Spara till disk",
-    "disk_details": "Exportera scendata till en fil som du kan importera från senare.",
+    "disk_details": "Exportera skissdata till en fil som du kan importera från senare.",
     "disk_button": "Spara till fil",
     "link_title": "Delbar länk",
     "link_details": "Exportera som en skrivskyddad länk.",
