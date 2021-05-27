@@ -34,7 +34,7 @@ export { actionFinalize } from "./actionFinalize";
 export {
   actionChangeProjectName,
   actionChangeExportBackground,
-  actionSaveScene,
+  actionSaveToActiveFile,
   actionSaveAsScene,
   actionLoadScene,
 } from "./actionExport";
