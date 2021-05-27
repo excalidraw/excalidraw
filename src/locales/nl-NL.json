@@ -20,6 +20,10 @@
     "background": "Achtergrond",
     "fill": "Invulling",
     "strokeWidth": "Lijnbreedte",
+    "strokeShape": "Lijnstijl",
+    "strokeShape_gel": "Gel pen",
+    "strokeShape_fountain": "Vulpen",
+    "strokeShape_brush": "Penseel",
     "strokeStyle": "Lijnstijl",
     "strokeStyle_solid": "Ononderbroken",
     "strokeStyle_dashed": "Gestreept",
@@ -38,8 +42,8 @@
     "fontSize": "Tekstgrootte",
     "fontFamily": "Lettertype",
     "onlySelected": "Enkel geselecteerde",
-    "withBackground": "Met achtergrond",
-    "exportEmbedScene": "Scène in geëxporteerd bestand invoegen",
+    "withBackground": "Achtergrond",
+    "exportEmbedScene": "Scène insluiten",
     "exportEmbedScene_details": "Scènegegevens worden in het geëxporteerde PNG/SVG-bestand opgeslagen zodat de scène kan worden hersteld.\nDe grootte van de geëxporteerde bestanden zal toenemen.",
     "addWatermark": "Voeg \"Gemaakt met Excalidraw\" toe",
     "handDrawn": "Handgetekend",
@@ -96,17 +100,20 @@
     "flipVertical": "Verticaal spiegelen",
     "viewMode": "Weergavemodus",
     "toggleExportColorScheme": "Kleurenschema exporteren aan/uit",
-    "share": "Deel"
+    "share": "Deel",
+    "toggleTheme": "Thema aan/uit"
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
+    "exportJSON": "Exporteren naar bestand",
+    "exportImage": "Als afbeelding opslaan",
     "export": "Exporteren",
     "exportToPng": "Exporteren naar PNG",
     "exportToSvg": "Exporteren naar SVG",
     "copyToClipboard": "Kopieer",
     "copyPngToClipboard": "Kopieer als PNG",
     "scale": "Schaal",
-    "save": "Opslaan",
+    "save": "Opslaan naar huidige bestand",
     "saveAs": "Opslaan als",
     "load": "Open",
     "getShareableLink": "Maak een deelbare link",
@@ -152,12 +159,12 @@
   },
   "toolBar": {
     "selection": "Selectie",
-    "freedraw": "Vrij tekenen",
     "rectangle": "Rechthoek",
     "diamond": "Ruit",
     "ellipse": "Ovaal",
     "arrow": "Pijl",
     "line": "Lijn",
+    "freedraw": "Tekenen",
     "text": "Tekst",
     "library": "Bibliotheek",
     "lock": "Geselecteerde tool actief houden na tekenen"
@@ -209,6 +216,14 @@
   },
   "errorDialog": {
     "title": "Fout"
+  },
+  "exportDialog": {
+    "disk_title": "Opslaan op schijf",
+    "disk_details": "De scènegegevens exporteren naar een bestand waaruit u later kunt importeren.",
+    "disk_button": "Opslaan naar bestand",
+    "link_title": "Deelbare link",
+    "link_details": "Exporteren als een alleen-lezen link.",
+    "link_button": "Exporteer naar link"
   },
   "helpDialog": {
     "blog": "Lees onze blog",

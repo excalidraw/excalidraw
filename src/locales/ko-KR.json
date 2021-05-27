@@ -20,6 +20,10 @@
     "background": "배경색",
     "fill": "채우기",
     "strokeWidth": "선 굵기",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "선",
     "strokeStyle_solid": "실선",
     "strokeStyle_dashed": "파선",
@@ -38,8 +42,8 @@
     "fontSize": "글자 크기",
     "fontFamily": "글꼴",
     "onlySelected": "선택한 항목만",
-    "withBackground": "배경 포함",
-    "exportEmbedScene": "화면을 내보낸 파일에 담기",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "화면 정보가 내보내는 PNG/SVG 파일에 저장되어 이후에 파일에서 화면을 복구할 수 있습니다. 파일 크기가 증가합니다.",
     "addWatermark": "\"Made with Excalidraw\" 추가",
     "handDrawn": "손글씨",
@@ -96,17 +100,20 @@
     "flipVertical": "",
     "viewMode": "보기 모드",
     "toggleExportColorScheme": "",
-    "share": ""
+    "share": "",
+    "toggleTheme": ""
   },
   "buttons": {
     "clearReset": "캔버스 초기화",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "내보내기",
     "exportToPng": "PNG로 내보내기",
     "exportToSvg": "SVG로 내보내기",
     "copyToClipboard": "클립보드로 복사",
     "copyPngToClipboard": "클립보드로 PNG 이미지 복사",
     "scale": "크기",
-    "save": "저장",
+    "save": "",
     "saveAs": "다른 이름으로 저장",
     "load": "불러오기",
     "getShareableLink": "공유 가능한 링크 생성",
@@ -152,12 +159,12 @@
   },
   "toolBar": {
     "selection": "선택",
-    "freedraw": "자유롭게 그리기",
     "rectangle": "사각형",
     "diamond": "다이아몬드",
     "ellipse": "타원",
     "arrow": "화살표",
     "line": "선",
+    "freedraw": "",
     "text": "텍스트",
     "library": "라이브러리",
     "lock": "선택된 도구 유지하기"
@@ -209,6 +216,14 @@
   },
   "errorDialog": {
     "title": "오류"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "블로그 읽어보기",

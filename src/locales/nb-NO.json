@@ -20,6 +20,10 @@
     "background": "Bakgrunn",
     "fill": "Fyll",
     "strokeWidth": "Strektykkelse",
+    "strokeShape": "Strekstil",
+    "strokeShape_gel": "Gelepenn",
+    "strokeShape_fountain": "Fyllepenn",
+    "strokeShape_brush": "Pensel",
     "strokeStyle": "Strekstil",
     "strokeStyle_solid": "Heltrukket",
     "strokeStyle_dashed": "Stiplet",
@@ -38,8 +42,8 @@
     "fontSize": "Skriftstørrelse",
     "fontFamily": "Fontfamilie",
     "onlySelected": "Kun valgte",
-    "withBackground": "Med bakgrunn",
-    "exportEmbedScene": "Bygg inn scenen i den eksporterte filen",
+    "withBackground": "Bakgrunn",
+    "exportEmbedScene": "Bygg inn scene",
     "exportEmbedScene_details": "Scenedata vil bli lagret i den eksporterte PNG/SVG-filen, slik at scenen kan gjenopprettes fra den.\nDet vil øke den eksporterte filstørrelsen.",
     "addWatermark": "Legg til \"Laget med Excalidraw\"",
     "handDrawn": "Håndtegnet",
@@ -96,17 +100,20 @@
     "flipVertical": "Snu vertikalt",
     "viewMode": "Visningsmodus",
     "toggleExportColorScheme": "Veksle eksport av fargepalett",
-    "share": "Del"
+    "share": "Del",
+    "toggleTheme": "Veksle tema"
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
+    "exportJSON": "Eksporter til fil",
+    "exportImage": "Lagre som bilde",
     "export": "Eksporter",
     "exportToPng": "Eksporter til PNG",
     "exportToSvg": "Eksporter til SVG",
     "copyToClipboard": "Kopier til utklippstavle",
     "copyPngToClipboard": "Kopier PNG til utklippstavlen",
     "scale": "Skalering",
-    "save": "Lagre",
+    "save": "Lagre til aktiv fil",
     "saveAs": "Lagre som",
     "load": "Åpne",
     "getShareableLink": "Få delingslenke",
@@ -152,12 +159,12 @@
   },
   "toolBar": {
     "selection": "Velg",
-    "freedraw": "Frihåndstegning",
     "rectangle": "Rektangel",
     "diamond": "Diamant",
     "ellipse": "Ellipse",
     "arrow": "Pil",
     "line": "Linje",
+    "freedraw": "Tegn",
     "text": "Tekst",
     "library": "Bibliotek",
     "lock": "Behold merket verktøy som aktivt"
@@ -209,6 +216,14 @@
   },
   "errorDialog": {
     "title": "Feil"
+  },
+  "exportDialog": {
+    "disk_title": "Lagre til disk",
+    "disk_details": "Eksporter scene-dataene til en fil som du kan importere fra senere.",
+    "disk_button": "Lagre til fil",
+    "link_title": "Delbar lenke",
+    "link_details": "Eksporter som en skrivebeskyttet lenke.",
+    "link_button": "Eksporter til lenke"
   },
   "helpDialog": {
     "blog": "Les bloggen vår",
