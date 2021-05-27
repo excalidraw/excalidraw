@@ -322,6 +322,8 @@ class App extends React.Component<AppProps, AppState> {
   private id: string;
   private history: History;
 
+  private activeWysiwyg: null | { handleSubmit: () => void } = null;
+
   constructor(props: AppProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
@@ -1763,7 +1765,7 @@ class App extends React.Component<AppProps, AppState> {
       ]);
     };
 
-    textWysiwyg({
+    const { handleSubmit } = textWysiwyg({
       id: element.id,
       appState: this.state,
       canvas: this.canvas,
@@ -1787,6 +1789,7 @@ class App extends React.Component<AppProps, AppState> {
         }
       }),
       onSubmit: withBatchedUpdates(({ text, viaKeyboard }) => {
+        this.activeWysiwyg = null;
         const isDeleted = !text.trim();
         updateElement(text, isDeleted);
         // select the created text element only if submitting via keyboard
@@ -1828,6 +1831,8 @@ class App extends React.Component<AppProps, AppState> {
     // do an initial update to re-initialize element position since we were
     // modifying element's x/y for sake of editor (case: syncing to remote)
     updateElement(element.text);
+
+    this.activeWysiwyg = { handleSubmit };
   }
 
   private getTextElementAtPosition(
@@ -2284,6 +2289,10 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     event.persist();
+
+    if (this.activeWysiwyg) {
+      this.activeWysiwyg.handleSubmit();
+    }
 
     // remove any active selection when we start to interact with canvas
     // (mainly, we care about removing selection outside the component which
