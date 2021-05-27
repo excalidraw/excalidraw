@@ -20,6 +20,10 @@
     "background": "背景の色",
     "fill": "塗りつぶし",
     "strokeWidth": "線の幅",
+    "strokeShape": "ストロークの形状",
+    "strokeShape_gel": "ジェルペン",
+    "strokeShape_fountain": "噴水ペン",
+    "strokeShape_brush": "ブラシペン",
     "strokeStyle": "線の種類",
     "strokeStyle_solid": "実線",
     "strokeStyle_dashed": "破線",
@@ -38,8 +42,8 @@
     "fontSize": "フォントの大きさ",
     "fontFamily": "フォントの種類",
     "onlySelected": "選択中のみ",
-    "withBackground": "背景を含める",
-    "exportEmbedScene": "エクスポートされたファイルにシーンを埋め込みます",
+    "withBackground": "背景",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "シーンデータはエクスポートされたPNG/SVGファイルに保存され、シーンを復元することができます。\nエクスポートされたファイルのサイズは増加します。",
     "addWatermark": "\"Made with Excalidraw\"と表示",
     "handDrawn": "手描き風",
@@ -96,17 +100,20 @@
     "flipVertical": "垂直方向に反転",
     "viewMode": "閲覧モード",
     "toggleExportColorScheme": "",
-    "share": ""
+    "share": "共有",
+    "toggleTheme": "テーマの切り替え"
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",
+    "exportJSON": "ファイルへエクスポート",
+    "exportImage": "画像として保存",
     "export": "エクスポート",
     "exportToPng": "PNG にエクスポート",
     "exportToSvg": "SVG にエクスポート",
     "copyToClipboard": "クリップボードにコピー",
     "copyPngToClipboard": "クリップボードにPNGをコピー",
     "scale": "スケール",
-    "save": "保存",
+    "save": "現在のファイルに保存",
     "saveAs": "名前を付けて保存",
     "load": "読み込み...",
     "getShareableLink": "共有URLの取得",
@@ -142,22 +149,22 @@
     "loadSceneOverridePrompt": "外部図面を読み込むと、既存のコンテンツが置き換わります。続行しますか？",
     "collabStopOverridePrompt": "セッションを停止すると、ローカルに保存されている図が上書きされます。 本当によろしいですか？\n\n(ローカルの図を保持したい場合は、セッションを停止せずにブラウザタブを閉じてください。)",
     "errorLoadingLibrary": "サードパーティライブラリの読み込み中にエラーが発生しました。",
-    "errorAddingToLibrary": "",
-    "errorRemovingFromLibrary": "",
+    "errorAddingToLibrary": "アイテムをライブラリに追加できませんでした",
+    "errorRemovingFromLibrary": "ライブラリからアイテムを削除できませんでした",
     "confirmAddLibrary": "{{numShapes}} 個の図形をライブラリに追加します。よろしいですか？",
     "imageDoesNotContainScene": "現在、画像のインポートはサポートされていません。\n\nシーンをインポートしようとしましたか？この画像にはシーンデータが含まれていないようです。エクスポート中に有効にしていましたか？",
     "cannotRestoreFromImage": "このイメージファイルからシーンを復元できませんでした",
-    "invalidSceneUrl": "",
+    "invalidSceneUrl": "指定された URL からシーンをインポートできませんでした。不正な形式であるか、有効な Excalidraw JSON データが含まれていません。",
     "resetLibrary": "ライブラリを消去します。本当によろしいですか？"
   },
   "toolBar": {
     "selection": "選択",
-    "freedraw": "手書き",
     "rectangle": "矩形",
     "diamond": "ひし形",
     "ellipse": "楕円",
     "arrow": "矢印",
     "line": "直線",
+    "freedraw": "描画",
     "text": "テキスト",
     "library": "ライブラリ",
     "lock": "描画後も使用中のツールを選択したままにする"
@@ -210,6 +217,14 @@
   "errorDialog": {
     "title": "エラー"
   },
+  "exportDialog": {
+    "disk_title": "ディスクに保存",
+    "disk_details": "シーンデータを後からインポートできるファイルにエクスポートします。",
+    "disk_button": "ファイルへ保存",
+    "link_title": "共有可能なリンク",
+    "link_details": "読み取り専用リンクとしてエクスポート",
+    "link_button": "リンクとしてエクスポート"
+  },
   "helpDialog": {
     "blog": "公式ブログを読む",
     "click": "クリック",
@@ -253,10 +268,10 @@
   "toast": {
     "copyStyles": "スタイルをコピー",
     "copyToClipboard": "クリップボードにコピー",
-    "copyToClipboardAsPng": "",
+    "copyToClipboardAsPng": "{{exportSelection}} を PNG 形式でクリップボードにコピーしました\n({{exportColorScheme}})",
     "fileSaved": "ファイルを保存しました",
     "fileSavedToFilename": "{filename} に保存しました",
     "canvas": "キャンバス",
-    "selection": ""
+    "selection": "選択"
   }
 }

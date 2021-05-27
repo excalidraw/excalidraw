@@ -20,6 +20,10 @@
     "background": "רקע",
     "fill": "מילוי",
     "strokeWidth": "עובי קו מתאר",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "סגנון קו המתאר",
     "strokeStyle_solid": "מלא",
     "strokeStyle_dashed": "מקווקו",
@@ -38,8 +42,8 @@
     "fontSize": "גודל גופן",
     "fontFamily": "סוג הגופן",
     "onlySelected": "רק מה שנבחר",
-    "withBackground": "עם רקע",
-    "exportEmbedScene": "שלב את התצוגה בקובץ המיוצא",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "מידע התצוגה יישמר לקובץ המיוצא מסוג PNG/SVG כך שיהיה ניתן לשחזרה ממנו.\nהפעולה תגדיל את גודל הקובץ המיוצא.",
     "addWatermark": "הוסף \"נוצר באמצעות Excalidraw\"",
     "handDrawn": "כתב יד",
@@ -96,17 +100,20 @@
     "flipVertical": "",
     "viewMode": "מצב תצוגה",
     "toggleExportColorScheme": "",
-    "share": ""
+    "share": "",
+    "toggleTheme": ""
   },
   "buttons": {
     "clearReset": "אפס את הלוח",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "ייצא",
     "exportToPng": "יצא ל PNG",
     "exportToSvg": "יצא ל SVG",
     "copyToClipboard": "העתק ללוח",
     "copyPngToClipboard": "העתק PNG ללוח",
     "scale": "קנה מידה",
-    "save": "שמור",
+    "save": "",
     "saveAs": "שמירה בשם",
     "load": "טען",
     "getShareableLink": "קבל קישור לשיתוף",
@@ -152,12 +159,12 @@
   },
   "toolBar": {
     "selection": "בחירה",
-    "freedraw": "ציור חופשי",
     "rectangle": "מרובע",
     "diamond": "מעוין",
     "ellipse": "אליפסה",
     "arrow": "חץ",
     "line": "קו",
+    "freedraw": "",
     "text": "טקסט",
     "library": "ספריה",
     "lock": "השאר את הכלי הנבחר פעיל גם לאחר סיום הציור"
@@ -209,6 +216,14 @@
   },
   "errorDialog": {
     "title": "שגיאה"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "קרא את הבלוג שלנו",

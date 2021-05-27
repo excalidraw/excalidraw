@@ -20,6 +20,10 @@
     "background": "Sfondo",
     "fill": "Riempimento",
     "strokeWidth": "Spessore del tratto",
+    "strokeShape": "Forma del tratto",
+    "strokeShape_gel": "Penna gel",
+    "strokeShape_fountain": "Penna stilografica",
+    "strokeShape_brush": "Pennello",
     "strokeStyle": "Stile del tratto",
     "strokeStyle_solid": "Pieno",
     "strokeStyle_dashed": "Tratteggiato",
@@ -38,8 +42,8 @@
     "fontSize": "Dimensione carattere",
     "fontFamily": "Carattere",
     "onlySelected": "Solo selezionati",
-    "withBackground": "Con sfondo",
-    "exportEmbedScene": "Incorpora la scena nel file esportato",
+    "withBackground": "Sfondo",
+    "exportEmbedScene": "Includi scena",
     "exportEmbedScene_details": "I dati della scena saranno salvati nel file PNG/SVG esportato in modo che la scena possa essere ripristinata da esso.\nQuesto aumenterà la dimensione del file esportato.",
     "addWatermark": "Aggiungi \"Creato con Excalidraw\"",
     "handDrawn": "A mano libera",
@@ -96,17 +100,20 @@
     "flipVertical": "Capovolgi verticalmente",
     "viewMode": "Modalità visualizzazione",
     "toggleExportColorScheme": "Cambia lo schema di colori in esportazione",
-    "share": "Condividi"
+    "share": "Condividi",
+    "toggleTheme": "Cambia tema"
   },
   "buttons": {
     "clearReset": "Svuota la tela",
+    "exportJSON": "Esporta su file",
+    "exportImage": "Salva come immagine",
     "export": "Esporta",
     "exportToPng": "Esporta come PNG",
     "exportToSvg": "Esporta come SVG",
     "copyToClipboard": "Copia negli appunti",
     "copyPngToClipboard": "Copia PNG negli appunti",
     "scale": "Scala",
-    "save": "Salva",
+    "save": "Salva sul file corrente",
     "saveAs": "Salva con nome",
     "load": "Carica",
     "getShareableLink": "Ottieni link condivisibile",
@@ -152,12 +159,12 @@
   },
   "toolBar": {
     "selection": "Selezione",
-    "freedraw": "Disegno libero",
     "rectangle": "Rettangolo",
     "diamond": "Rombo",
     "ellipse": "Ellisse",
     "arrow": "Freccia",
     "line": "Linea",
+    "freedraw": "",
     "text": "Testo",
     "library": "Libreria",
     "lock": "Mantieni lo strumento selezionato attivo dopo aver disegnato"
@@ -209,6 +216,14 @@
   },
   "errorDialog": {
     "title": "Errore"
+  },
+  "exportDialog": {
+    "disk_title": "Salva su disco",
+    "disk_details": "Esporta i dati della scena su file, dal quale potrai importare in seguito.",
+    "disk_button": "Salva su file",
+    "link_title": "Link condivisibile",
+    "link_details": "Esporta come link di sola lettura.",
+    "link_button": "Esporta come Link"
   },
   "helpDialog": {
     "blog": "Leggi il nostro blog",

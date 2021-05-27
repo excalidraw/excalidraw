@@ -20,6 +20,10 @@
     "background": "Hintergrund",
     "fill": "Füllung",
     "strokeWidth": "Strichstärke",
+    "strokeShape": "Strichform",
+    "strokeShape_gel": "Gelschreiber",
+    "strokeShape_fountain": "Füllfederhalter",
+    "strokeShape_brush": "Pinselstift",
     "strokeStyle": "Konturstil",
     "strokeStyle_solid": "Durchgezogen",
     "strokeStyle_dashed": "Gestrichelt",
@@ -38,8 +42,8 @@
     "fontSize": "Schriftgröße",
     "fontFamily": "Schriftfamilie",
     "onlySelected": "Nur ausgewählte",
-    "withBackground": "Mit Hintergrund",
-    "exportEmbedScene": "Zeichnung in exportierte Datei einbetten",
+    "withBackground": "Hintergrund",
+    "exportEmbedScene": "Szene einbetten",
     "exportEmbedScene_details": "Die Zeichnungsdaten werden in der exportierten PNG/SVG-Datei gespeichert, sodass das Dokument später weiter bearbeitet werden kann. \nDieses wird die exportierte Datei vergrößern.",
     "addWatermark": "\"Made with Excalidraw\" hinzufügen",
     "handDrawn": "Handgezeichnet",
@@ -96,17 +100,20 @@
     "flipVertical": "Vertikal spiegeln",
     "viewMode": "Ansichtsmodus",
     "toggleExportColorScheme": "Exportfarbschema umschalten",
-    "share": "Teilen"
+    "share": "Teilen",
+    "toggleTheme": "Design umschalten"
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
+    "exportJSON": "In Datei exportieren",
+    "exportImage": "Als Bild speichern",
     "export": "Exportieren",
     "exportToPng": "Als PNG exportieren",
     "exportToSvg": "Als SVG exportieren",
     "copyToClipboard": "In Zwischenablage kopieren",
     "copyPngToClipboard": "PNG in die Zwischenablage kopieren",
     "scale": "Skalierung",
-    "save": "Speichern",
+    "save": "In aktueller Datei speichern",
     "saveAs": "Speichern unter",
     "load": "Laden",
     "getShareableLink": "Teilbaren Link erhalten",
@@ -152,12 +159,12 @@
   },
   "toolBar": {
     "selection": "Auswahl",
-    "freedraw": "Freies Zeichnen",
     "rectangle": "Rechteck",
     "diamond": "Raute",
     "ellipse": "Ellipse",
     "arrow": "Pfeil",
     "line": "Linie",
+    "freedraw": "Zeichnen",
     "text": "Text",
     "library": "Bibliothek",
     "lock": "Ausgewähltes Werkzeug nach Zeichnen aktiv lassen"
@@ -209,6 +216,14 @@
   },
   "errorDialog": {
     "title": "Fehler"
+  },
+  "exportDialog": {
+    "disk_title": "Auf Festplatte speichern",
+    "disk_details": "Exportiere die Zeichnungsdaten in eine Datei, die Du später importieren kannst.",
+    "disk_button": "In Datei speichern",
+    "link_title": "Teilbarer Link",
+    "link_details": "Als schreibgeschützten Link exportieren.",
+    "link_button": "Als Link exportieren"
   },
   "helpDialog": {
     "blog": "Lies unseren Blog",

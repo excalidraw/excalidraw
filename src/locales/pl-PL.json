@@ -20,6 +20,10 @@
     "background": "Kolor wypełnienia",
     "fill": "Wypełnienie",
     "strokeWidth": "Grubość obramowania",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "Styl obrysu",
     "strokeStyle_solid": "Pełny",
     "strokeStyle_dashed": "Kreskowany",
@@ -38,8 +42,8 @@
     "fontSize": "Rozmiar tekstu",
     "fontFamily": "Krój pisma",
     "onlySelected": "Tylko wybrane",
-    "withBackground": "Z tłem",
-    "exportEmbedScene": "Osadź scenę w eksportowanym pliku",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "Dane sceny zostaną zapisane w eksportowanym pliku PNG/SVG tak, aby scena mogła zostać z niego przywrócona.\nZwiększy to rozmiar eksportowanego pliku.",
     "addWatermark": "Dodaj \"Zrobione w Excalidraw\"",
     "handDrawn": "Odręczny",
@@ -96,17 +100,20 @@
     "flipVertical": "",
     "viewMode": "Tryb widoku",
     "toggleExportColorScheme": "",
-    "share": ""
+    "share": "",
+    "toggleTheme": ""
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "Zapisz jako",
     "exportToPng": "Zapisz jako PNG",
     "exportToSvg": "Zapisz jako SVG",
     "copyToClipboard": "Skopiuj do schowka",
     "copyPngToClipboard": "Skopiuj do schowka jako plik PNG",
     "scale": "Skala",
-    "save": "Zapisz",
+    "save": "",
     "saveAs": "Zapisz jako",
     "load": "Otwórz",
     "getShareableLink": "Udostępnij",
@@ -152,12 +159,12 @@
   },
   "toolBar": {
     "selection": "Zaznaczenie",
-    "freedraw": "Swobodne rysowanie",
     "rectangle": "Prostokąt",
     "diamond": "Romb",
     "ellipse": "Elipsa",
     "arrow": "Strzałka",
     "line": "Linia",
+    "freedraw": "",
     "text": "Tekst",
     "library": "Biblioteka",
     "lock": "Zablokuj wybrane narzędzie"
@@ -209,6 +216,14 @@
   },
   "errorDialog": {
     "title": "Wystąpił błąd"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "Przeczytaj na naszym blogu",

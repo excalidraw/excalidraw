@@ -20,6 +20,10 @@
     "background": "Φόντο",
     "fill": "Γέμισμα",
     "strokeWidth": "Πάχος μολυβιάς",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "Στυλ περιγράμματος",
     "strokeStyle_solid": "Συμπαγής",
     "strokeStyle_dashed": "Διακεκομμένη με παύλες",
@@ -38,8 +42,8 @@
     "fontSize": "Μέγεθος γραμματοσειράς",
     "fontFamily": "Γραμματοσειρά",
     "onlySelected": "Μόνο τα Επιλεγμένα",
-    "withBackground": "Με φόντο",
-    "exportEmbedScene": "Ενσωμάτωση της σκηνής στο αρχείο προς εξαγωγή",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "Τα δεδομένα σκηνής θα αποθηκευτούν στο αρχείο PNG/SVG προς εξαγωγή ώστε η σκηνή να είναι δυνατό να αποκατασταθεί από αυτό.\nΘα αυξήσει το μέγεθος του αρχείου προς εξαγωγή.",
     "addWatermark": "Προσθήκη \"Φτιαγμένο με Excalidraw\"",
     "handDrawn": "Σχεδιασμένο στο χέρι",
@@ -96,17 +100,20 @@
     "flipVertical": "Κατακόρυφη αναστροφή",
     "viewMode": "Λειτουργία προβολής",
     "toggleExportColorScheme": "Εναλλαγή εξαγωγής θέματος χρωμάτων",
-    "share": "Κοινοποίηση"
+    "share": "Κοινοποίηση",
+    "toggleTheme": ""
   },
   "buttons": {
     "clearReset": "Επαναφορά του καμβά",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "Εξαγωγή",
     "exportToPng": "Εξαγωγή σε PNG",
     "exportToSvg": "Εξαγωγή σε SVG",
     "copyToClipboard": "Αντιγραφή στο πρόχειρο",
     "copyPngToClipboard": "Αντιγραφή PNG στο πρόχειρο",
     "scale": "Κλίμακα",
-    "save": "Αποθήκευση",
+    "save": "",
     "saveAs": "Αποθήκευση ως",
     "load": "Άνοιγμα",
     "getShareableLink": "Δημόσιος σύνδεσμος",
@@ -152,12 +159,12 @@
   },
   "toolBar": {
     "selection": "Επιλογή",
-    "freedraw": "Ελεύθερο σχέδιο",
     "rectangle": "Ορθογώνιο",
     "diamond": "Ρόμβος",
     "ellipse": "Έλλειψη",
     "arrow": "Βέλος",
     "line": "Γραμμή",
+    "freedraw": "",
     "text": "Κείμενο",
     "library": "Βιβλιοθήκη",
     "lock": "Κράτησε επιλεγμένο το εργαλείο μετά το σχέδιο"
@@ -209,6 +216,14 @@
   },
   "errorDialog": {
     "title": "Σφάλμα"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "Διαβάστε το Blog μας",

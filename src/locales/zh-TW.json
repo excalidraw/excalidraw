@@ -20,6 +20,10 @@
     "background": "背景",
     "fill": "填充",
     "strokeWidth": "筆劃寬度",
+    "strokeShape": "筆畫形狀",
+    "strokeShape_gel": "中性筆",
+    "strokeShape_fountain": "鋼筆",
+    "strokeShape_brush": "毛筆",
     "strokeStyle": "筆畫樣式",
     "strokeStyle_solid": "實線",
     "strokeStyle_dashed": "虛線",
@@ -38,8 +42,8 @@
     "fontSize": "字型大小",
     "fontFamily": "字體",
     "onlySelected": "僅選取物件",
-    "withBackground": "包含背景",
-    "exportEmbedScene": "在輸出的檔案中嵌入場景",
+    "withBackground": "背景",
+    "exportEmbedScene": "嵌入場景",
     "exportEmbedScene_details": "用於回復場景的場景資料會被包含在輸出的 PNG/SVG 檔案中。\n會增加輸出的檔案大小。",
     "addWatermark": "加上 \"Made with Excalidraw\"",
     "handDrawn": "手寫",
@@ -96,17 +100,20 @@
     "flipVertical": "垂直翻轉",
     "viewMode": "檢視模式",
     "toggleExportColorScheme": "切換輸出配色",
-    "share": "共享"
+    "share": "共享",
+    "toggleTheme": "切換主題"
   },
   "buttons": {
     "clearReset": "重置 canvas",
+    "exportJSON": "匯出至檔案",
+    "exportImage": "另存為圖片",
     "export": "輸出",
     "exportToPng": "輸出成 PNG",
     "exportToSvg": "輸出成 SVG",
     "copyToClipboard": "複製至剪貼簿",
     "copyPngToClipboard": "複製 PNG 至剪貼簿",
     "scale": "縮放比例",
-    "save": "儲存",
+    "save": "儲存目前檔案",
     "saveAs": "儲存為",
     "load": "載入",
     "getShareableLink": "取得共享連結",
@@ -152,12 +159,12 @@
   },
   "toolBar": {
     "selection": "選取",
-    "freedraw": "繪圖",
     "rectangle": "長方形",
     "diamond": "菱形",
     "ellipse": "橢圓",
     "arrow": "箭頭",
     "line": "線條",
+    "freedraw": "繪圖",
     "text": "文字",
     "library": "資料庫",
     "lock": "可連續使用選取的工具"
@@ -209,6 +216,14 @@
   },
   "errorDialog": {
     "title": "錯誤"
+  },
+  "exportDialog": {
+    "disk_title": "儲存至硬碟",
+    "disk_details": "將場景匯出為可供匯入之檔案",
+    "disk_button": "儲存至檔案",
+    "link_title": "可共享連結",
+    "link_details": "匯出為唯讀連結",
+    "link_button": "匯出為連結"
   },
   "helpDialog": {
     "blog": "閱讀部落格",

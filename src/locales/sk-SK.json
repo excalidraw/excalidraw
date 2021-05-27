@@ -20,6 +20,10 @@
     "background": "Pozadie",
     "fill": "Výplň",
     "strokeWidth": "Hrúbka obrysu",
+    "strokeShape": "Tvar obrysu",
+    "strokeShape_gel": "Gélové pero",
+    "strokeShape_fountain": "Plniace pero",
+    "strokeShape_brush": "Fixka",
     "strokeStyle": "Štýl obrysu",
     "strokeStyle_solid": "Plný",
     "strokeStyle_dashed": "Čiarkovaný",
@@ -38,8 +42,8 @@
     "fontSize": "Veľkosť písma",
     "fontFamily": "Písmo",
     "onlySelected": "Iba vybrané",
-    "withBackground": "S pozadím",
-    "exportEmbedScene": "Uložiť scénu do exportovaného súboru",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "Údaje scény budú uložené do exportovaného PNG/SVG súboru, takže scéna z neho môže byť opäť obnovená.\nBude to mať za následok zvýšenie veľkosti súboru.",
     "addWatermark": "Pridať \"Vytvorené s Excalidraw\"",
     "handDrawn": "Ručne písané",
@@ -96,17 +100,20 @@
     "flipVertical": "Prevrátiť zvislo",
     "viewMode": "Režim zobrazenia",
     "toggleExportColorScheme": "Prepnúť exportovanie farebnej schémy",
-    "share": "Zdieľať"
+    "share": "Zdieľať",
+    "toggleTheme": "Prepnúť tému"
   },
   "buttons": {
     "clearReset": "Obnoviť plátno",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "Exportovať",
     "exportToPng": "Exportovať do PNG",
     "exportToSvg": "Exportovať do SVG",
     "copyToClipboard": "Kopírovať do schránky",
     "copyPngToClipboard": "Kopírovať PNG do schránky",
     "scale": "Mierka",
-    "save": "Uložiť",
+    "save": "",
     "saveAs": "Uložiť ako",
     "load": "Nahrať",
     "getShareableLink": "Získať odkaz na zdieľanie",
@@ -152,12 +159,12 @@
   },
   "toolBar": {
     "selection": "Výber",
-    "freedraw": "Voľné kreslenie",
     "rectangle": "Obdĺžnik",
     "diamond": "Diamant",
     "ellipse": "Elipsa",
     "arrow": "Šípka",
     "line": "Čiara",
+    "freedraw": "Kresliť",
     "text": "Text",
     "library": "Knižnica",
     "lock": "Nechať zvolený nástroj aktívny po skončení kreslenia"
@@ -209,6 +216,14 @@
   },
   "errorDialog": {
     "title": "Chyba"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "Prečítajte si náš blog",

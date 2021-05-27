@@ -20,6 +20,10 @@
     "background": "Agilal",
     "fill": "Taččart",
     "strokeWidth": "Tehri n yizirig",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "Amfezzu",
     "strokeStyle": "Aɣanib n tizirig",
     "strokeStyle_solid": "Aččuran",
     "strokeStyle_dashed": "S tjerriḍin",
@@ -38,8 +42,8 @@
     "fontSize": "Tiddi n tsefsit",
     "fontFamily": "Tawacult n tsefsiyin",
     "onlySelected": "Tafrayt kan",
-    "withBackground": "S ugilal",
-    "exportEmbedScene": "Seddu asayes deg ufaylu yettwasifḍen",
+    "withBackground": "Agilal",
+    "exportEmbedScene": "Sleɣ asayes",
     "exportEmbedScene_details": "Asayes ad yettwasekles deg ufaylu n usifeḍ PNG/SVG akken akken ad yili wamek ara d-yettwarr seg-s usayes. Ayagi ad isimɣur tiddi n ufaylu n usifeḍ.",
     "addWatermark": "Seddu \"Yettwaxdem s Excalidraw\"",
     "handDrawn": "Asuneɣ s ufus",
@@ -96,17 +100,20 @@
     "flipVertical": "Tuttya tubdidt",
     "viewMode": "Askar n tmuɣli",
     "toggleExportColorScheme": "Sermed/sens asifeḍ usentel n yini",
-    "share": "Bḍu"
+    "share": "Bḍu",
+    "toggleTheme": "Snifel asentel"
   },
   "buttons": {
     "clearReset": "Ales awennez n teɣzut n usuneɣ",
+    "exportJSON": "Sifeḍ afaylu",
+    "exportImage": "Sekles am tugna",
     "export": "Sifeḍ",
     "exportToPng": "Sifeḍ ɣer PNG",
     "exportToSvg": "Sifeḍ ɣer SVG",
     "copyToClipboard": "Nɣel ɣer tecfawit",
     "copyPngToClipboard": "Nɣel PNG ɣer tecfawit",
     "scale": "Taskala",
-    "save": "Sekles",
+    "save": "Sekles deg ufaylu amiran",
     "saveAs": "Sekles am",
     "load": "Sali-d",
     "getShareableLink": "Awi-d aseɣwen n beṭṭu",
@@ -152,12 +159,12 @@
   },
   "toolBar": {
     "selection": "Tafrayt",
-    "freedraw": "Unuɣ ilelli",
     "rectangle": "Asrem",
     "diamond": "Ameɣṛun",
     "ellipse": "Taglayt",
     "arrow": "Taneccabt",
     "line": "Izirig",
+    "freedraw": "Suneɣ",
     "text": "Aḍris",
     "library": "Tamkarḍit",
     "lock": "Eǧǧ afecku n tefrayt yermed mbaɛd asuneɣ"
@@ -209,6 +216,14 @@
   },
   "errorDialog": {
     "title": "Tuccḍa"
+  },
+  "exportDialog": {
+    "disk_title": "Sekles deg uḍebsi",
+    "disk_details": "Sekles isefka n usayes deg ufaylu ansi ara tizmireḍ ad d-tketreḍ areḍqal.",
+    "disk_button": "Sekles deg ufaylu",
+    "link_title": "Aseɣwen n beṭṭu",
+    "link_details": "Sifeḍ am useɣwen n tɣuri kan.",
+    "link_button": "Sifeḍ deg useɣwen"
   },
   "helpDialog": {
     "blog": "Ɣeṛ ablug-nneɣ",

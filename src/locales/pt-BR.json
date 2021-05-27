@@ -20,6 +20,10 @@
     "background": "Fundo",
     "fill": "Preenchimento",
     "strokeWidth": "Espessura do traço",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "Estilo de traço",
     "strokeStyle_solid": "Sólido",
     "strokeStyle_dashed": "Tracejado",
@@ -38,8 +42,8 @@
     "fontSize": "Tamanho da fonte",
     "fontFamily": "Família da fonte",
     "onlySelected": "Somente a seleção",
-    "withBackground": "Com fundo",
-    "exportEmbedScene": "Incorporar a cena no arquivo exportado",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "Os dados da cena serão salvos no arquivo PNG/SVG exportado para que a cena possa ser restaurada.\nIrá aumentar o tamanho do arquivo exportado.",
     "addWatermark": "Adicionar \"Feito com Excalidraw\"",
     "handDrawn": "Manuscrito",
@@ -96,17 +100,20 @@
     "flipVertical": "Inverter verticalmente",
     "viewMode": "Modo de visualização",
     "toggleExportColorScheme": "Alternar esquema de cores de exportação",
-    "share": "Compartilhar"
+    "share": "Compartilhar",
+    "toggleTheme": ""
   },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "Exportar",
     "exportToPng": "Exportar em PNG",
     "exportToSvg": "Exportar em SVG",
     "copyToClipboard": "Copiar para o clipboard",
     "copyPngToClipboard": "Copiar PNG para área de transferência",
     "scale": "Escala",
-    "save": "Salvar",
+    "save": "",
     "saveAs": "Salvar como",
     "load": "Carregar",
     "getShareableLink": "Obter um link de compartilhamento",
@@ -152,12 +159,12 @@
   },
   "toolBar": {
     "selection": "Seleção",
-    "freedraw": "Desenho livre",
     "rectangle": "Retângulo",
     "diamond": "Losango",
     "ellipse": "Elipse",
     "arrow": "Flecha",
     "line": "Linha",
+    "freedraw": "",
     "text": "Texto",
     "library": "Biblioteca",
     "lock": "Manter ativa a ferramenta selecionada após desenhar"
@@ -209,6 +216,14 @@
   },
   "errorDialog": {
     "title": "Erro"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "Leia o nosso blog",

@@ -20,6 +20,10 @@
     "background": "Tausta",
     "fill": "Täyttö",
     "strokeWidth": "Viivan leveys",
+    "strokeShape": "Viivan muoto",
+    "strokeShape_gel": "Geelikynä",
+    "strokeShape_fountain": "Sulkakynä",
+    "strokeShape_brush": "Sivellinkynä",
     "strokeStyle": "Viivan tyyli",
     "strokeStyle_solid": "Yhtenäinen",
     "strokeStyle_dashed": "Katkoviiva",
@@ -38,8 +42,8 @@
     "fontSize": "Kirjasinkoko",
     "fontFamily": "Kirjasintyyppi",
     "onlySelected": "Vain valitut",
-    "withBackground": "Sisällytä tausta",
-    "exportEmbedScene": "Upota teos tiedostoon",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "Teoksen tiedot tallennetaan PNG/SVG-tiedostoon, jolloin teoksen voi palauttaa siitä. Kasvattaa tallennetun tiedoston kokoa.",
     "addWatermark": "Lisää \"Tehty Excalidrawilla\"",
     "handDrawn": "Käsinkirjoitettu",
@@ -96,17 +100,20 @@
     "flipVertical": "Käännä pystysuunnassa",
     "viewMode": "Katselutila",
     "toggleExportColorScheme": "Vaihda viennin väriteema",
-    "share": "Jaa"
+    "share": "Jaa",
+    "toggleTheme": "Vaihda teema"
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "Vie",
     "exportToPng": "Vie PNG-tiedostona",
     "exportToSvg": "Vie SVG-tiedostona",
     "copyToClipboard": "Kopioi leikepöydälle",
     "copyPngToClipboard": "Kopioi PNG-tiedosto leikepöydälle",
     "scale": "Koko",
-    "save": "Tallenna",
+    "save": "",
     "saveAs": "Tallenna nimellä",
     "load": "Avaa",
     "getShareableLink": "Hae jaettava linkki",
@@ -152,12 +159,12 @@
   },
   "toolBar": {
     "selection": "Valinta",
-    "freedraw": "Vapaa piirto",
     "rectangle": "Suorakulmio",
     "diamond": "Vinoneliö",
     "ellipse": "Soikio",
     "arrow": "Nuoli",
     "line": "Viiva",
+    "freedraw": "Piirrä",
     "text": "Teksti",
     "library": "Kirjasto",
     "lock": "Pidä valittu työkalu aktiivisena piirron jälkeen"
@@ -209,6 +216,14 @@
   },
   "errorDialog": {
     "title": "Virhe"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "Lue blogiamme",

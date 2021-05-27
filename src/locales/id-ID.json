@@ -20,6 +20,10 @@
     "background": "Latar",
     "fill": "Isian",
     "strokeWidth": "Lebar guratan",
+    "strokeShape": "Bentuk guratan",
+    "strokeShape_gel": "Pena gel",
+    "strokeShape_fountain": "Pena gunung",
+    "strokeShape_brush": "Kuas",
     "strokeStyle": "Gaya guratan",
     "strokeStyle_solid": "Padat",
     "strokeStyle_dashed": "Putus-putus",
@@ -38,8 +42,8 @@
     "fontSize": "Ukuran font",
     "fontFamily": "Jenis font",
     "onlySelected": "Hanya yang Dipilih",
-    "withBackground": "Dengan latar",
-    "exportEmbedScene": "Sematkan pemandangan ke dalam file yang diekspor",
+    "withBackground": "Latar",
+    "exportEmbedScene": "Sematkan pemandangan",
     "exportEmbedScene_details": "Data pemandangan akan disimpan dalam file PNG/SVG yang diekspor, sehingga pemandangan itu dapat dipulihkan darinya.\nAkan membesarkan ukuran file yang diekspor.",
     "addWatermark": "Tambahkan \"Dibuat dengan Excalidraw\"",
     "handDrawn": "Tulisan tangan",
@@ -96,17 +100,20 @@
     "flipVertical": "Balikkan vertikal",
     "viewMode": "Mode tampilan",
     "toggleExportColorScheme": "Ubah skema warna ekspor",
-    "share": "Bagikan"
+    "share": "Bagikan",
+    "toggleTheme": "Ubah tema"
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
+    "exportJSON": "Ekspor ke file",
+    "exportImage": "Simpan gambar",
     "export": "Ekspor",
     "exportToPng": "Ekspor ke PNG",
     "exportToSvg": "Ekspor ke SVG",
     "copyToClipboard": "Salin ke Papan Klip",
     "copyPngToClipboard": "Salin PNG ke papan klip",
     "scale": "Skala",
-    "save": "Simpan",
+    "save": "Simpan ke file sekarang",
     "saveAs": "Simpan sebagai",
     "load": "Muat",
     "getShareableLink": "Buat Tautan yang Bisa Dibagian",
@@ -152,12 +159,12 @@
   },
   "toolBar": {
     "selection": "Pilihan",
-    "freedraw": "Menggambar bebas",
     "rectangle": "Persegi",
     "diamond": "Berlian",
     "ellipse": "Elips",
     "arrow": "Panah",
     "line": "Garis",
+    "freedraw": "Gambar",
     "text": "Teks",
     "library": "Pustaka",
     "lock": "Biarkan alat yang dipilih aktif setelah menggambar"
@@ -209,6 +216,14 @@
   },
   "errorDialog": {
     "title": "Kesalahan"
+  },
+  "exportDialog": {
+    "disk_title": "Simpan ke disk",
+    "disk_details": "Ekspor data pemandangan ke file yang mana Anda dapat impor nanti.",
+    "disk_button": "Simpan ke file",
+    "link_title": "Tautan",
+    "link_details": "Ekspor sebagai tautan yang hanya dibaca.",
+    "link_button": "Ekspor ke tautan"
   },
   "helpDialog": {
     "blog": "Baca blog kami",

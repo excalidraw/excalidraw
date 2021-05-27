@@ -20,6 +20,10 @@
     "background": "Háttér",
     "fill": "Kitöltés",
     "strokeWidth": "Körvonal vastagsága",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "Körvonal stílusa",
     "strokeStyle_solid": "Kitöltött",
     "strokeStyle_dashed": "Szaggatott",
@@ -38,8 +42,8 @@
     "fontSize": "Betűméret",
     "fontFamily": "Betűkészlet család",
     "onlySelected": "Csak a kijelölt",
-    "withBackground": "Háttérrel",
-    "exportEmbedScene": "Jelenet beágyazása az exportált fájlba",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "A jelenetet leíró adatok hozzá lesznek adva a PNG/SVG fájlhoz, így a jelenetet vissza lehet majd tölteni belőle. Ez megnöveli a fájl méretét.",
     "addWatermark": "Add hozzá, hogy \"Excalidraw-val készült\"",
     "handDrawn": "Kézzel rajzolt",
@@ -96,17 +100,20 @@
     "flipVertical": "",
     "viewMode": "",
     "toggleExportColorScheme": "",
-    "share": ""
+    "share": "",
+    "toggleTheme": ""
   },
   "buttons": {
     "clearReset": "Vászon törlése",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "Exportálás",
     "exportToPng": "Exportálás PNG-be",
     "exportToSvg": "Exportálás SVG-be",
     "copyToClipboard": "Vágólapra másolás",
     "copyPngToClipboard": "PNG másolása a vágólapra",
     "scale": "Nagyítás",
-    "save": "Mentés",
+    "save": "",
     "saveAs": "Mentés másként",
     "load": "Betöltés",
     "getShareableLink": "Megosztható link létrehozása",
@@ -152,12 +159,12 @@
   },
   "toolBar": {
     "selection": "Kijelölés",
-    "freedraw": "Szabadkézi rajz",
     "rectangle": "Téglalap",
     "diamond": "Rombusz",
     "ellipse": "Ellipszis",
     "arrow": "Nyíl",
     "line": "Vonal",
+    "freedraw": "",
     "text": "Szöveg",
     "library": "Könyvtár",
     "lock": "Rajzolás után az aktív eszközt tartsa kijelölve"
@@ -209,6 +216,14 @@
   },
   "errorDialog": {
     "title": "Hiba"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "",

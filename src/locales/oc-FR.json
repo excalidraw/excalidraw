@@ -20,6 +20,10 @@
     "background": "Rèireplan",
     "fill": "Empliment",
     "strokeWidth": "Largor de contorn",
+    "strokeShape": "Fòrma del trach",
+    "strokeShape_gel": "Estilo gèl",
+    "strokeShape_fountain": "Calam",
+    "strokeShape_brush": "Pincèl",
     "strokeStyle": "Estil de contorn",
     "strokeStyle_solid": "Solide",
     "strokeStyle_dashed": "Tiret",
@@ -38,8 +42,8 @@
     "fontSize": "Talha poliça",
     "fontFamily": "Familha de poliça",
     "onlySelected": "Seleccion sonque",
-    "withBackground": "Inclure lo rèireplan",
-    "exportEmbedScene": "Integrar la scèna al fichièr d’expo",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "Las donadas de scèna seràn enregistradas dins lo fichièr PNG/SVG exportat, per que la scèna pòsca èsser restaurada a partir d’aqueste fichièr.\nAumentarà la talha del fichièr exportat.",
     "addWatermark": "Apondre « Fabricat amb Excalidraw »",
     "handDrawn": "A la man levada",
@@ -96,17 +100,20 @@
     "flipVertical": "Virar verticalament",
     "viewMode": "Mòde de vista",
     "toggleExportColorScheme": "Alternar l’esquèma de color d’expòrt",
-    "share": "Partejar"
+    "share": "Partejar",
+    "toggleTheme": "Alternar tèma"
   },
   "buttons": {
     "clearReset": "Reïnicializar lo canabàs",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "Exportar",
     "exportToPng": "Exportar en PNG",
     "exportToSvg": "Exportar en SVG",
     "copyToClipboard": "Copiar al quichapapièrs",
     "copyPngToClipboard": "Copiar PNG al quichapapièrs",
     "scale": "Escala",
-    "save": "Enregistrar",
+    "save": "",
     "saveAs": "Enregistrar jos",
     "load": "Cargar",
     "getShareableLink": "Obténer lo ligam de partatge",
@@ -152,12 +159,12 @@
   },
   "toolBar": {
     "selection": "Seleccion",
-    "freedraw": "Dessenh liure",
     "rectangle": "Rectangle",
     "diamond": "Lausange",
     "ellipse": "Ellipsa",
     "arrow": "Sageta",
     "line": "Linha",
+    "freedraw": "Dessenhar",
     "text": "Tèxt",
     "library": "Bibliotèca",
     "lock": "Mantenir activa l’aisina aprèp dessenhar"
@@ -209,6 +216,14 @@
   },
   "errorDialog": {
     "title": "Error"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "Legir nòstre blog",
