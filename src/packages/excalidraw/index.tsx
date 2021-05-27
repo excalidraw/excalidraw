@@ -41,12 +41,15 @@ const Excalidraw = (props: ExcalidrawProps) => {
     canvasActions: {
       ...DEFAULT_UI_OPTIONS.canvasActions,
       ...canvasActions,
-      export: {
-        ...(DEFAULT_UI_OPTIONS.canvasActions.export as object),
-        ...canvasActions?.export,
-      },
     },
   };
+
+  if (UIOptions.canvasActions.export) {
+    UIOptions.canvasActions.export = {
+      ...(DEFAULT_UI_OPTIONS.canvasActions.export as object),
+      ...canvasActions?.export,
+    };
+  }
 
   useEffect(() => {
     // Block pinch-zooming on iOS outside of the content area
