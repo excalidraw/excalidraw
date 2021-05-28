@@ -101,6 +101,8 @@
     "viewMode": "Вид",
     "toggleExportColorScheme": "Экспортировать цветовую схему",
     "share": "Поделиться",
+    "showStroke": "",
+    "showBackground": "",
     "toggleTheme": ""
   },
   "buttons": {
