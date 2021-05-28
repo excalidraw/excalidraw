@@ -566,14 +566,14 @@ This prop can be used to customise UI of Excalidraw. Currently we support custom
 | --- | --- | --- | --- |
 | `changeViewBackgroundColor` | boolean | true | Implies whether to show `Background color picker` |
 | `clearCanvas` | boolean | true | Implies whether to show `Clear canvas button` |
-| `export` | false &#124; [exportOpts](#exportOpts) | <pre>{ saveFileToDisk: true }</pre> | This prop allows to customise the UI inside the export dialog. By default it shows the "saveFileToDisk". If this prop is false the export button will not be rendered. For more details visit [`exportOpts`](#exportOpts). |
+| `export` | false &#124; [exportOpts](#exportOpts) | <pre>{ saveFileToDisk: true }</pre> | This prop allows to customize the UI inside the export dialog. By default it shows the "saveFileToDisk". If this prop is `false` the export button will not be rendered. For more details visit [`exportOpts`](#exportOpts). |
 | `loadScene` | boolean | true | Implies whether to show `Load button` |
 | `saveToActiveFile` | boolean | true | Implies whether to show `Save button` to save to current file |
 | `theme` | boolean | true | Implies whether to show `Theme toggle` |
 
 #### `exportOpts`
 
-The below attributes can be passed in `UIOptions.canvasActions.export` to customise the export dialog. If `UIOptions.canvasActions.export` is `false` the export button will not be rendered.
+The below attributes can be set in `UIOptions.canvasActions.export` to customize the export dialog. If `UIOptions.canvasActions.export` is `false` the export button will not be rendered.
 
 | Attribute | Type | Default | Description |
 | --- | --- | --- | --- |
