@@ -101,6 +101,8 @@
     "viewMode": "Görünüm modu",
     "toggleExportColorScheme": "Renk şemasını dışa aktar/aktarma",
     "share": "Paylaş",
+    "showStroke": "",
+    "showBackground": "",
     "toggleTheme": "Temayı etkinleştir/devre dışı bırak"
   },
   "buttons": {
