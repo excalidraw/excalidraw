@@ -1204,10 +1204,12 @@ class App extends React.Component<AppProps, AppState> {
     // event.touches.length === 1 will also prevent inserting text when user's zooming
     if (didTapTwice && event.touches.length === 1) {
       const [touch] = event.touches;
-      // @ts-ignore
       this.handleCanvasDoubleClick({
         clientX: touch.clientX,
         clientY: touch.clientY,
+        ctrlKey: false,
+        metaKey: false,
+        altKey: false,
       });
       didTapTwice = false;
       clearTimeout(tappedTwiceTimer);
@@ -1961,7 +1963,10 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private handleCanvasDoubleClick = (
-    event: React.MouseEvent<HTMLCanvasElement>,
+    event: Pick<
+      React.PointerEvent<HTMLCanvasElement>,
+      "clientX" | "clientY" | "ctrlKey" | "metaKey" | "altKey"
+    >,
   ) => {
     // case: double-clicking with arrow/line tool selected would both create
     // text and enter multiElement mode
