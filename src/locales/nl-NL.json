@@ -101,8 +101,8 @@
     "viewMode": "Weergavemodus",
     "toggleExportColorScheme": "Kleurenschema exporteren aan/uit",
     "share": "Deel",
-    "showStroke": "",
-    "showBackground": "",
+    "showStroke": "Toon lijn kleur kiezer",
+    "showBackground": "Toon achtergrondkleur kiezer",
     "toggleTheme": "Thema aan/uit"
   },
   "buttons": {
