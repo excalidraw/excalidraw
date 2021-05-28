@@ -101,8 +101,8 @@
     "viewMode": "檢視模式",
     "toggleExportColorScheme": "切換輸出配色",
     "share": "共享",
-    "showStroke": "",
-    "showBackground": "",
+    "showStroke": "顯示線條檢色器",
+    "showBackground": "顯示背景檢色器",
     "toggleTheme": "切換主題"
   },
   "buttons": {
