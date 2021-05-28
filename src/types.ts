@@ -81,7 +81,13 @@ export type AppState = {
   isResizing: boolean;
   isRotating: boolean;
   zoom: Zoom;
-  openMenu: "canvas" | "shape" | null;
+  openMenu:
+    | "canvas"
+    | "shape"
+    | "canvasColorPicker"
+    | "backgroundColorPicker"
+    | "strokeColorPicker"
+    | null;
   lastPointerDownWith: PointerType;
   selectedElementIds: { [id: string]: boolean };
   previousSelectedElementIds: { [id: string]: boolean };
@@ -92,9 +98,6 @@ export type AppState = {
   theme: "light" | "dark";
   gridSize: number | null;
   viewModeEnabled: boolean;
-  showCanvasColorPicker: boolean;
-  showBackgroundColorPicker: boolean;
-  showStrokeColorPicker: boolean;
 
   /** top-most selected groups (i.e. does not include nested groups) */
   selectedGroupIds: { [groupId: string]: boolean };
