@@ -101,8 +101,8 @@
     "viewMode": "Modalità visualizzazione",
     "toggleExportColorScheme": "Cambia lo schema di colori in esportazione",
     "share": "Condividi",
-    "showStroke": "",
-    "showBackground": "",
+    "showStroke": "Mostra selettore colore del tratto",
+    "showBackground": "Mostra selettore colore di sfondo",
     "toggleTheme": "Cambia tema"
   },
   "buttons": {
