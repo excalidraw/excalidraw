@@ -178,9 +178,11 @@ describe("<Excalidraw/>", () => {
         expect(queryByTestId(container, "load-button")).toBeNull();
       });
 
-      it("should hide save as button when saveAsScene is false", async () => {
+      it("should hide save as button when saveFileToDisk is false", async () => {
         const { container } = await render(
-          <Excalidraw UIOptions={{ canvasActions: { saveAsScene: false } }} />,
+          <Excalidraw
+            UIOptions={{ canvasActions: { export: { saveFileToDisk: false } } }}
+          />,
         );
 
         expect(queryByTestId(container, "save-as-button")).toBeNull();

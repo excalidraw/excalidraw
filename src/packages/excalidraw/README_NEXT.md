@@ -363,7 +363,6 @@ To view the full example visit :point_down:
 | [`onCollabButtonClick`](#onCollabButtonClick) | Function |  | Callback to be triggered when the collab button is clicked |
 | [`isCollaborating`](#isCollaborating) | `boolean` |  | This implies if the app is in collaboration mode |
 | [`onPointerUpdate`](#onPointerUpdate) | Function |  | Callback triggered when mouse pointer is updated. |
-| [`onExportToBackend`](#onExportToBackend) | Function |  | Callback triggered when link button is clicked on export dialog |
 | [`langCode`](#langCode) | string | `en` | Language code string |
 | [`renderTopRightUI`](#renderTopRightUI) | Function |  | Function that renders custom UI in top right corner |
 | [`renderFooter `](#renderFooter) | Function |  | Function that renders custom UI footer |
@@ -488,10 +487,6 @@ This callback is triggered when mouse pointer is updated.
 
 3.`pointersMap`: [`pointers map`](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L131) of the scene
 
-#### `onExportToBackend`
-
-This callback is triggered when the shareable-link button is clicked in the export dialog. The link button will only be shown if this callback is passed.
-
 ```js
 (exportedElements, appState, canvas) => void
 ```
@@ -571,11 +566,19 @@ This prop can be used to customise UI of Excalidraw. Currently we support custom
 | --- | --- | --- | --- |
 | `changeViewBackgroundColor` | boolean | true | Implies whether to show `Background color picker` |
 | `clearCanvas` | boolean | true | Implies whether to show `Clear canvas button` |
-| `export` | boolean | true | Implies whether to show `Export button` |
+| `export` | false &#124; [exportOpts](#exportOpts) | <pre>{ saveFileToDisk: true }</pre> | This prop allows to customize the UI inside the export dialog. By default it shows the "saveFileToDisk". If this prop is `false` the export button will not be rendered. For more details visit [`exportOpts`](#exportOpts). |
 | `loadScene` | boolean | true | Implies whether to show `Load button` |
-| `saveAsScene` | boolean | true | Implies whether to show `Save as button` |
 | `saveToActiveFile` | boolean | true | Implies whether to show `Save button` to save to current file |
 | `theme` | boolean | true | Implies whether to show `Theme toggle` |
+
+#### `exportOpts`
+
+The below attributes can be set in `UIOptions.canvasActions.export` to customize the export dialog. If `UIOptions.canvasActions.export` is `false` the export button will not be rendered.
+
+| Attribute | Type | Default | Description |
+| --- | --- | --- | --- |
+| `saveFileToDisk` | boolean | true | Implies if save file to disk button should be shown |
+| `exportToBackend` | <pre> (exportedElements: readonly NonDeletedExcalidrawElement[],appState: AppState,canvas: HTMLCanvasElement &#124; null) => void </pre> |  | This callback is triggered when the shareable-link button is clicked in the export dialog. The link button will only be shown if this callback is passed. |
 
 #### `onPaste`
 

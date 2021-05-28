@@ -113,8 +113,8 @@ export const actionSaveToActiveFile = register({
   ),
 });
 
-export const actionSaveAsScene = register({
-  name: "saveAsScene",
+export const actionSaveFileToDisk = register({
+  name: "saveFileToDisk",
   perform: async (elements, appState, value) => {
     try {
       const { fileHandle } = await saveAsJSON(elements, {
