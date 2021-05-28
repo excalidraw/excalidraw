@@ -101,6 +101,8 @@
     "viewMode": "نمط العرض",
     "toggleExportColorScheme": "",
     "share": "مشاركة",
+    "showStroke": "",
+    "showBackground": "",
     "toggleTheme": "غير النمط"
   },
   "buttons": {
