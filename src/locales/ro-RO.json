@@ -101,6 +101,8 @@
     "viewMode": "Mod de vizualizare",
     "toggleExportColorScheme": "Comutare schemă de culori de export",
     "share": "Distribuie",
+    "showStroke": "",
+    "showBackground": "",
     "toggleTheme": "Comutare temă"
   },
   "buttons": {
