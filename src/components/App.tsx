@@ -3206,7 +3206,7 @@ class App extends React.Component<AppProps, AppState> {
         const selectedElements = getSelectedElements(
           this.scene.getElements(),
           this.state,
-        );
+        ).filter((element) => element.id !== this.state.editingElement?.id);
         // prevent dragging even if we're no longer holding cmd/ctrl otherwise
         // it would have weird results (stuff jumping all over the screen)
         if (selectedElements.length > 0 && !pointerDownState.withCmdOrCtrl) {
