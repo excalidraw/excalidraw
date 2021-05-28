@@ -101,6 +101,8 @@
     "viewMode": "Ansichtsmodus",
     "toggleExportColorScheme": "Exportfarbschema umschalten",
     "share": "Teilen",
+    "showStroke": "",
+    "showBackground": "",
     "toggleTheme": "Design umschalten"
   },
   "buttons": {
