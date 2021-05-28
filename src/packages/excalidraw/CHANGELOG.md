@@ -23,8 +23,8 @@ Please add the latest change on the top under the correct section.
 
 #### BREAKING CHANGE
 
-- `UIOptions.canvasActions.saveAsScene` is now renamed to `UiOptions.canvasActions.export.saveFileToDisk`, by default this prop is true hence the "save file to disk" button is rendered inside export dialog.
-- `exportToBackend` is now renamed to `UIOptions.canvasActions.export.exportToBackend`. If this prop is not passed, the shareable-link button will not be rendered as before.
+- `UIOptions.canvasActions.saveAsScene` is now renamed to `UiOptions.canvasActions.export.saveFileToDisk`, by default this prop is true hence the **save file to disk** button is rendered inside export dialog.
+- `exportToBackend` is now renamed to `UIOptions.canvasActions.export.exportToBackend`. If this prop is not passed, the **shareable-link** button will not be rendered as before.
 
 ### Refactor
 
