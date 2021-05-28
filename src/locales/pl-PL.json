@@ -101,6 +101,8 @@
     "viewMode": "Tryb widoku",
     "toggleExportColorScheme": "",
     "share": "",
+    "showStroke": "",
+    "showBackground": "",
     "toggleTheme": ""
   },
   "buttons": {
