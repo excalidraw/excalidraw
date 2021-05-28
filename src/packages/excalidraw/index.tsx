@@ -7,7 +7,7 @@ import App from "../../components/App";
 import "../../css/app.scss";
 import "../../css/styles.scss";
 
-import { ExcalidrawAPIRefValue, ExcalidrawProps } from "../../types";
+import { AppProps, ExcalidrawAPIRefValue, ExcalidrawProps } from "../../types";
 import { defaultLang } from "../../i18n";
 import { DEFAULT_UI_OPTIONS } from "../../constants";
 
@@ -37,18 +37,17 @@ const Excalidraw = (props: ExcalidrawProps) => {
 
   const canvasActions = props.UIOptions?.canvasActions;
 
-  const UIOptions = {
+  const UIOptions: AppProps["UIOptions"] = {
     canvasActions: {
       ...DEFAULT_UI_OPTIONS.canvasActions,
       ...canvasActions,
     },
   };
 
-  if (UIOptions.canvasActions.export) {
-    UIOptions.canvasActions.export = {
-      ...(DEFAULT_UI_OPTIONS.canvasActions.export as object),
-      ...canvasActions?.export,
-    };
+  if (canvasActions?.export) {
+    UIOptions.canvasActions.export.saveFileToDisk =
+      canvasActions.export?.saveFileToDisk ||
+      DEFAULT_UI_OPTIONS.canvasActions.export.saveFileToDisk;
   }
 
   useEffect(() => {
