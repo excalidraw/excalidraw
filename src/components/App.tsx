@@ -1204,13 +1204,16 @@ class App extends React.Component<AppProps, AppState> {
     // event.touches.length === 1 will also prevent inserting text when user's zooming
     if (didTapTwice && event.touches.length === 1) {
       const [touch] = event.touches;
-      this.handleCanvasDoubleClick({
-        clientX: touch.clientX,
-        clientY: touch.clientY,
-        ctrlKey: false,
-        metaKey: false,
-        altKey: false,
-      });
+      this.handleCanvasDoubleClick(
+        {
+          clientX: touch.clientX,
+          clientY: touch.clientY,
+          ctrlKey: false,
+          metaKey: false,
+          altKey: false,
+        },
+        false,
+      );
       didTapTwice = false;
       clearTimeout(tappedTwiceTimer);
     }
@@ -1882,6 +1885,7 @@ class App extends React.Component<AppProps, AppState> {
     sceneX,
     sceneY,
     insertAtParentCenter = true,
+    createTextIfNotExists = true,
   }: {
     /** X position to insert text at */
     sceneX: number;
@@ -1889,8 +1893,13 @@ class App extends React.Component<AppProps, AppState> {
     sceneY: number;
     /** whether to attempt to insert at element center if applicable */
     insertAtParentCenter?: boolean;
+    createTextIfNotExists?: boolean;
   }) => {
     const existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
+
+    if (!existingTextElement && !createTextIfNotExists) {
+      return;
+    }
 
     const parentCenterPosition =
       insertAtParentCenter &&
@@ -1967,6 +1976,7 @@ class App extends React.Component<AppProps, AppState> {
       React.PointerEvent<HTMLCanvasElement>,
       "clientX" | "clientY" | "ctrlKey" | "metaKey" | "altKey"
     >,
+    createTextIfNotExists = true,
   ) => {
     // case: double-clicking with arrow/line tool selected would both create
     // text and enter multiElement mode
@@ -2037,6 +2047,7 @@ class App extends React.Component<AppProps, AppState> {
         sceneX,
         sceneY,
         insertAtParentCenter: !event.altKey,
+        createTextIfNotExists,
       });
     }
   };
