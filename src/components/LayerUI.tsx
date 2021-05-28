@@ -387,17 +387,14 @@ const LayerUI = ({
         elements={elements}
         appState={appState}
         actionManager={actionManager}
-        onExportToBackend={
-          UIOptions?.canvasActions?.export?.onExportToBackend
-            ? (elements) => {
-                UIOptions.canvasActions.export.onExportToBackend!(
-                  elements,
-                  appState,
-                  canvas,
-                );
-              }
-            : undefined
-        }
+        onExportToBackend={(elements) => {
+          UIOptions.canvasActions.export.onExportToBackend &&
+            UIOptions.canvasActions.export.onExportToBackend(
+              elements,
+              appState,
+              canvas,
+            );
+        }}
         exportOpts={UIOptions.canvasActions.export}
       />
     );

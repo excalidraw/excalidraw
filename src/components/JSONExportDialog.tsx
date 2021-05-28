@@ -55,7 +55,7 @@ const JSONExportModal = ({
             />
           </Card>
         )}
-        {onExportToBackend && (
+        {exportOpts.onExportToBackend && (
           <Card color="pink">
             <div className="Card-icon">{link}</div>
             <h2>{t("exportDialog.link_title")}</h2>
@@ -66,7 +66,7 @@ const JSONExportModal = ({
               title={t("exportDialog.link_button")}
               aria-label={t("exportDialog.link_button")}
               showAriaLabel={true}
-              onClick={() => onExportToBackend(elements)}
+              onClick={() => onExportToBackend!(elements)}
             />
           </Card>
         )}
