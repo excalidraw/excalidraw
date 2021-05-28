@@ -101,6 +101,8 @@
     "viewMode": "查看模式",
     "toggleExportColorScheme": "切换导出配色方案",
     "share": "分享",
+    "showStroke": "",
+    "showBackground": "",
     "toggleTheme": "切换主题"
   },
   "buttons": {
