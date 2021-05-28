@@ -103,12 +103,58 @@ const areEqual = (
   prevProps: PublicExcalidrawProps,
   nextProps: PublicExcalidrawProps,
 ) => {
-  const { initialData: prevInitialData, ...prev } = prevProps;
-  const { initialData: nextInitialData, ...next } = nextProps;
+  const {
+    initialData: prevInitialData,
+    UIOptions: prevUIOptions = {},
+    ...prev
+  } = prevProps;
+  const {
+    initialData: nextInitialData,
+    UIOptions: nextUIOptions = {},
+    ...next
+  } = nextProps;
+
+  // comparing UIOptions
+  const prevUIOptionsKeys = Object.keys(prevUIOptions) as (keyof Partial<
+    typeof DEFAULT_UI_OPTIONS
+  >)[];
+  const nextUIOptionsKeys = Object.keys(nextUIOptions) as (keyof Partial<
+    typeof DEFAULT_UI_OPTIONS
+  >)[];
+
+  if (prevUIOptionsKeys.length !== nextUIOptionsKeys.length) {
+    return false;
+  }
+
+  const isUIOptionsSame = prevUIOptionsKeys.every((key) => {
+    if (key === "canvasActions") {
+      const canvasOptionKeys = Object.keys(
+        prevUIOptions.canvasActions!,
+      ) as (keyof Partial<typeof DEFAULT_UI_OPTIONS.canvasActions>)[];
+      canvasOptionKeys.every((key) => {
+        if (
+          key === "export" &&
+          prevUIOptions?.canvasActions?.export &&
+          nextUIOptions?.canvasActions?.export
+        ) {
+          return (
+            prevUIOptions.canvasActions.export.saveFileToDisk ===
+            nextUIOptions.canvasActions.export.saveFileToDisk
+          );
+        }
+        return (
+          prevUIOptions?.canvasActions?.[key] ===
+          nextUIOptions?.canvasActions?.[key]
+        );
+      });
+    }
+    return true;
+  });
 
   const prevKeys = Object.keys(prevProps) as (keyof typeof prev)[];
   const nextKeys = Object.keys(nextProps) as (keyof typeof next)[];
   return (
+    isUIOptionsSame &&
     prevKeys.length === nextKeys.length &&
     prevKeys.every((key) => prev[key] === next[key])
   );
