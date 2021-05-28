@@ -20,6 +20,10 @@
     "background": "背景",
     "fill": "填充",
     "strokeWidth": "描边宽度",
+    "strokeShape": "",
+    "strokeShape_gel": "中性笔",
+    "strokeShape_fountain": "钢笔",
+    "strokeShape_brush": "墨笔",
     "strokeStyle": "描边 (样式)",
     "strokeStyle_solid": "实线",
     "strokeStyle_dashed": "虚线",
@@ -38,8 +42,8 @@
     "fontSize": "字体大小",
     "fontFamily": "字体",
     "onlySelected": "仅被选中",
-    "withBackground": "包括背景",
-    "exportEmbedScene": "将画布数据嵌入到导出的文件",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "画布数据将被保存到导出的 PNG/SVG 文件，以便恢复。\n将会增加导出的文件大小。",
     "addWatermark": "添加 “使用 Excalidraw 创建” 水印",
     "handDrawn": "手写",
@@ -96,17 +100,20 @@
     "flipVertical": "垂直翻转",
     "viewMode": "查看模式",
     "toggleExportColorScheme": "切换导出配色方案",
-    "share": "分享"
+    "share": "分享",
+    "toggleTheme": "切换主题"
   },
   "buttons": {
     "clearReset": "重置画布",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "导出",
     "exportToPng": "导出为 PNG",
     "exportToSvg": "导出为 SVG",
     "copyToClipboard": "复制到剪贴板",
     "copyPngToClipboard": "复制 PNG 到剪切板",
     "scale": "缩放",
-    "save": "保存",
+    "save": "",
     "saveAs": "保存为",
     "load": "载入文件",
     "getShareableLink": "获取共享链接",
@@ -152,12 +159,12 @@
   },
   "toolBar": {
     "selection": "选择",
-    "freedraw": "自由书写",
     "rectangle": "矩形",
     "diamond": "菱形",
     "ellipse": "椭圆",
     "arrow": "箭头",
     "line": "线条",
+    "freedraw": "",
     "text": "文字",
     "library": "库",
     "lock": "绘制后保持所选的工具栏状态"
@@ -169,7 +176,7 @@
   },
   "hints": {
     "linearElement": "点击创建多个点 拖动创建直线",
-    "freeDraw": "点击并拖动，完成后发布",
+    "freeDraw": "点击并拖动，完成时松开",
     "text": "提示：您也可以使用选择工具双击任意位置来添加文字",
     "linearElementMulti": "点击最后一个点或按下 Esc/Enter 来完成",
     "lockAngle": "可以按住 Shift 来约束角度",
@@ -209,6 +216,14 @@
   },
   "errorDialog": {
     "title": "错误"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "浏览我们的博客",

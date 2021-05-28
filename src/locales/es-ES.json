@@ -20,6 +20,10 @@
     "background": "Fondo",
     "fill": "Rellenar",
     "strokeWidth": "Grosor del trazo",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "Estilo del trazo",
     "strokeStyle_solid": "Sólido",
     "strokeStyle_dashed": "Discontinua",
@@ -38,8 +42,8 @@
     "fontSize": "Tamaño de la fuente",
     "fontFamily": "Tipo de fuente",
     "onlySelected": "Sólo seleccionados",
-    "withBackground": "Con fondo",
-    "exportEmbedScene": "Insertar escena en el archivo exportado",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "Los datos de escena se guardarán en el archivo PNG/SVG exportado, así la escena puede ser restaurada de la misma.\nEsto aumentará el tamaño del archivo exportado.",
     "addWatermark": "Agregar \"Hecho con Excalidraw\"",
     "handDrawn": "Dibujado a mano",
@@ -96,17 +100,20 @@
     "flipVertical": "Girar verticalmente",
     "viewMode": "Modo presentación",
     "toggleExportColorScheme": "Cambiar el esquema de colores de exportación",
-    "share": "Compartir"
+    "share": "Compartir",
+    "toggleTheme": "Alternar tema"
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "Exportar",
     "exportToPng": "Exportar a PNG",
     "exportToSvg": "Exportar a SVG",
     "copyToClipboard": "Copiar al portapapeles",
     "copyPngToClipboard": "Copiar PNG al portapapeles",
     "scale": "Escalar",
-    "save": "Guardar",
+    "save": "",
     "saveAs": "Guardar como",
     "load": "Cargar",
     "getShareableLink": "Obtener enlace para compartir",
@@ -152,12 +159,12 @@
   },
   "toolBar": {
     "selection": "Selección",
-    "freedraw": "Dibujo libre",
     "rectangle": "Rectángulo",
     "diamond": "Diamante",
     "ellipse": "Elipse",
     "arrow": "Flecha",
     "line": "Línea",
+    "freedraw": "Dibujar",
     "text": "Texto",
     "library": "Biblioteca",
     "lock": "Mantener la herramienta seleccionada activa después de dibujar"
@@ -209,6 +216,14 @@
   },
   "errorDialog": {
     "title": "Error"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "Lee nuestro blog",
