@@ -101,6 +101,8 @@
     "viewMode": "Náhled",
     "toggleExportColorScheme": "",
     "share": "Sdílet",
+    "showStroke": "",
+    "showBackground": "",
     "toggleTheme": "Přepnout tmavý řežim"
   },
   "buttons": {
