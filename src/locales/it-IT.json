@@ -101,6 +101,8 @@
     "viewMode": "Modalità visualizzazione",
     "toggleExportColorScheme": "Cambia lo schema di colori in esportazione",
     "share": "Condividi",
+    "showStroke": "",
+    "showBackground": "",
     "toggleTheme": "Cambia tema"
   },
   "buttons": {
