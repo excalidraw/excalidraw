@@ -101,6 +101,8 @@
     "viewMode": "Λειτουργία προβολής",
     "toggleExportColorScheme": "Εναλλαγή εξαγωγής θέματος χρωμάτων",
     "share": "Κοινοποίηση",
+    "showStroke": "",
+    "showBackground": "",
     "toggleTheme": ""
   },
   "buttons": {
