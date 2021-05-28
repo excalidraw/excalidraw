@@ -101,6 +101,8 @@
     "viewMode": "Režim zobrazenia",
     "toggleExportColorScheme": "Prepnúť exportovanie farebnej schémy",
     "share": "Zdieľať",
+    "showStroke": "",
+    "showBackground": "",
     "toggleTheme": "Prepnúť tému"
   },
   "buttons": {
