@@ -101,6 +101,8 @@
     "viewMode": "閲覧モード",
     "toggleExportColorScheme": "",
     "share": "共有",
+    "showStroke": "",
+    "showBackground": "",
     "toggleTheme": "テーマの切り替え"
   },
   "buttons": {
