@@ -101,6 +101,8 @@
     "viewMode": "Mode tampilan",
     "toggleExportColorScheme": "Ubah skema warna ekspor",
     "share": "Bagikan",
+    "showStroke": "",
+    "showBackground": "",
     "toggleTheme": "Ubah tema"
   },
   "buttons": {
