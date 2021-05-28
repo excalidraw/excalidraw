@@ -101,6 +101,8 @@
     "viewMode": "Изглед",
     "toggleExportColorScheme": "",
     "share": "",
+    "showStroke": "",
+    "showBackground": "",
     "toggleTheme": ""
   },
   "buttons": {
