@@ -101,6 +101,8 @@
     "viewMode": "מצב תצוגה",
     "toggleExportColorScheme": "",
     "share": "",
+    "showStroke": "",
+    "showBackground": "",
     "toggleTheme": ""
   },
   "buttons": {
