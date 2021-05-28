@@ -1748,7 +1748,7 @@ Object {
   "name": "Untitled-201933152653",
   "offsetLeft": 20,
   "offsetTop": 10,
-  "openMenu": null,
+  "openMenu": "backgroundColorPicker",
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -2424,7 +2424,7 @@ Object {
 
 exports[`contextMenu element selecting 'Paste styles' in context menu pastes styles: [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element selecting 'Paste styles' in context menu pastes styles: [end of test] number of renders 1`] = `25`;
+exports[`contextMenu element selecting 'Paste styles' in context menu pastes styles: [end of test] number of renders 1`] = `27`;
 
 exports[`contextMenu element selecting 'Send backward' in context menu sends element backward: [end of test] appState 1`] = `
 Object {

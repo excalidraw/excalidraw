@@ -702,33 +702,36 @@ describe("regression tests", () => {
       "when clicking intersection between A and B " +
       "B should be selected on pointer up",
     () => {
-      UI.clickTool("rectangle");
-      // change background color since default is transparent
+      // set background color since default is transparent
       // and transparent elements can't be selected by clicking inside of them
-      clickLabeledElement("Background");
-      clickLabeledElement("#fa5252");
-      mouse.down();
-      mouse.up(1000, 1000);
+      const rect1 = API.createElement({
+        type: "rectangle",
+        backgroundColor: "red",
+        x: 0,
+        y: 0,
+        width: 1000,
+        height: 1000,
+      });
+      const rect2 = API.createElement({
+        type: "rectangle",
+        backgroundColor: "red",
+        x: 500,
+        y: 500,
+        width: 500,
+        height: 500,
+      });
+      h.elements = [rect1, rect2];
 
-      // draw ellipse partially over rectangle.
-      // since ellipse was created after rectangle it has an higher z-index.
-      // we don't need to change background color again since change above
-      // affects next drawn elements.
-      UI.clickTool("ellipse");
-      mouse.reset();
-      mouse.down(500, 500);
-      mouse.up(1000, 1000);
+      mouse.select(rect1);
 
-      // select rectangle
-      mouse.reset();
-      mouse.click();
-
-      // pointer down on intersection between ellipse and rectangle
+      // pointerdown on rect2 covering rect1 while rect1 is selected should
+      // retain rect1 selection
       mouse.down(900, 900);
-      expect(API.getSelectedElement().type).toBe("rectangle");
+      expect(API.getSelectedElement().id).toBe(rect1.id);
 
+      // pointerup should select rect2
       mouse.up();
-      expect(API.getSelectedElement().type).toBe("ellipse");
+      expect(API.getSelectedElement().id).toBe(rect2.id);
     },
   );
 
@@ -737,26 +740,27 @@ describe("regression tests", () => {
       "when dragging on intersection between A and B " +
       "A should be dragged and keep being selected",
     () => {
-      UI.clickTool("rectangle");
-      // change background color since default is transparent
-      // and transparent elements can't be selected by clicking inside of them
-      clickLabeledElement("Background");
-      clickLabeledElement("#fa5252");
-      mouse.down();
-      mouse.up(1000, 1000);
+      const rect1 = API.createElement({
+        type: "rectangle",
+        backgroundColor: "red",
+        x: 0,
+        y: 0,
+        width: 1000,
+        height: 1000,
+      });
+      const rect2 = API.createElement({
+        type: "rectangle",
+        backgroundColor: "red",
+        x: 500,
+        y: 500,
+        width: 500,
+        height: 500,
+      });
+      h.elements = [rect1, rect2];
 
-      // draw ellipse partially over rectangle.
-      // since ellipse was created after rectangle it has an higher z-index.
-      // we don't need to change background color again since change above
-      // affects next drawn elements.
-      UI.clickTool("ellipse");
-      mouse.reset();
-      mouse.down(500, 500);
-      mouse.up(1000, 1000);
+      mouse.select(rect1);
 
-      // select rectangle
-      mouse.reset();
-      mouse.click();
+      expect(API.getSelectedElement().id).toBe(rect1.id);
 
       const { x: prevX, y: prevY } = API.getSelectedElement();
 
@@ -764,7 +768,7 @@ describe("regression tests", () => {
       mouse.down(900, 900);
       mouse.up(100, 100);
 
-      expect(API.getSelectedElement().type).toBe("rectangle");
+      expect(API.getSelectedElement().id).toBe(rect1.id);
       expect(API.getSelectedElement().x).toEqual(prevX + 100);
       expect(API.getSelectedElement().y).toEqual(prevY + 100);
     },
