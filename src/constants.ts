@@ -131,9 +131,8 @@ export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
   canvasActions: {
     changeViewBackgroundColor: true,
     clearCanvas: true,
-    export: true,
+    export: { saveFileToDisk: true },
     loadScene: true,
-    saveAsScene: true,
     saveToActiveFile: true,
     theme: true,
   },
