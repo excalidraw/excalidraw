@@ -101,6 +101,8 @@
     "viewMode": "보기 모드",
     "toggleExportColorScheme": "",
     "share": "",
+    "showStroke": "",
+    "showBackground": "",
     "toggleTheme": ""
   },
   "buttons": {
