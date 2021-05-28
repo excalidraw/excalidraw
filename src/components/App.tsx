@@ -1645,6 +1645,21 @@ class App extends React.Component<AppProps, AppState> {
         isHoldingSpace = true;
         setCursor(this.canvas, CURSOR_TYPE.GRABBING);
       }
+
+      if (event.key === KEYS.G || event.key === KEYS.S) {
+        const selectedElements = getSelectedElements(
+          this.scene.getElements(),
+          this.state,
+        );
+        if (selectedElements.length) {
+          if (event.key === KEYS.G) {
+            this.setState({ openMenu: "backgroundColorPicker" });
+          }
+          if (event.key === KEYS.S) {
+            this.setState({ openMenu: "strokeColorPicker" });
+          }
+        }
+      }
     },
   );
 
