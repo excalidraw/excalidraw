@@ -101,8 +101,8 @@
     "viewMode": "Ansichtsmodus",
     "toggleExportColorScheme": "Exportfarbschema umschalten",
     "share": "Teilen",
-    "showStroke": "",
-    "showBackground": "",
+    "showStroke": "Auswahl für Strichfarbe anzeigen",
+    "showBackground": "Auswahl für Hintergrundfarbe anzeigen",
     "toggleTheme": "Design umschalten"
   },
   "buttons": {
