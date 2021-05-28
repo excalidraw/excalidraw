@@ -101,8 +101,8 @@
     "viewMode": "Katselutila",
     "toggleExportColorScheme": "Vaihda viennin väriteema",
     "share": "Jaa",
-    "showStroke": "",
-    "showBackground": "",
+    "showStroke": "Näytä viivan värin valitsin",
+    "showBackground": "Näytä taustavärin valitsin",
     "toggleTheme": "Vaihda teema"
   },
   "buttons": {
