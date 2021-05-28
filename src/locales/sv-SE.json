@@ -101,8 +101,8 @@
     "viewMode": "Visningsläge",
     "toggleExportColorScheme": "Växla färgschema för export",
     "share": "Dela",
-    "showStroke": "",
-    "showBackground": "",
+    "showStroke": "Visa färgväljare för linjefärg",
+    "showBackground": "Visa färgväljare för bakgrundsfärg",
     "toggleTheme": "Växla tema"
   },
   "buttons": {
