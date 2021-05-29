@@ -165,7 +165,7 @@ describe("contextMenu element", () => {
       backgroundColor: "red",
     });
     h.elements = [rect1, rect2];
-    h.setState({ selectedElementIds: { [rect1.id]: true } });
+    API.setSelectedElements([rect1]);
 
     // lower z-index
     fireEvent.contextMenu(GlobalTestState.canvas, {
@@ -177,7 +177,7 @@ describe("contextMenu element", () => {
     expect(API.getSelectedElement().id).toBe(rect1.id);
 
     // higher z-index
-    h.setState({ selectedElementIds: { [rect2.id]: true } });
+    API.setSelectedElements([rect2]);
     fireEvent.contextMenu(GlobalTestState.canvas, {
       button: 2,
       clientX: 100,
