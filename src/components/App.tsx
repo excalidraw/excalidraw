@@ -1862,6 +1862,7 @@ class App extends React.Component<AppProps, AppState> {
       /** if true, returns the first selected element (with highest z-index)
         of all hit elements */
       preferSelected?: boolean;
+      cycleElementsUnderCursor?: boolean;
     },
   ): NonDeleted<ExcalidrawElement> | null {
     const allHitElements = this.getElementsAtPosition(x, y);
@@ -1872,6 +1873,13 @@ class App extends React.Component<AppProps, AppState> {
             return allHitElements[index];
           }
         }
+      } else if (opts?.cycleElementsUnderCursor) {
+        const selectedIdx = allHitElements.findIndex(
+          (element) => this.state.selectedElementIds[element.id],
+        );
+        return selectedIdx > 0
+          ? allHitElements[selectedIdx - 1]
+          : allHitElements[allHitElements.length - 1];
       }
       const elementWithHighestZIndex =
         allHitElements[allHitElements.length - 1];
@@ -2746,10 +2754,13 @@ class App extends React.Component<AppProps, AppState> {
 
         // hitElement may already be set above, so check first
         pointerDownState.hit.element =
-          pointerDownState.hit.element ??
+          (!event[KEYS.CTRL_OR_CMD] ? pointerDownState.hit.element : null) ??
           this.getElementAtPosition(
             pointerDownState.origin.x,
             pointerDownState.origin.y,
+            {
+              cycleElementsUnderCursor: event[KEYS.CTRL_OR_CMD],
+            },
           );
 
         // For overlapped elements one position may hit
