@@ -63,11 +63,6 @@ interface LayerUIProps {
   toggleZenMode: () => void;
   langCode: Language["code"];
   isCollaborating: boolean;
-  onExportToBackend?: (
-    exportedElements: readonly NonDeletedExcalidrawElement[],
-    appState: AppState,
-    canvas: HTMLCanvasElement | null,
-  ) => void;
   renderTopRightUI?: (isMobile: boolean, appState: AppState) => JSX.Element;
   renderCustomFooter?: (isMobile: boolean, appState: AppState) => JSX.Element;
   viewModeEnabled: boolean;
@@ -371,7 +366,6 @@ const LayerUI = ({
   showThemeBtn,
   toggleZenMode,
   isCollaborating,
-  onExportToBackend,
   renderTopRightUI,
   renderCustomFooter,
   viewModeEnabled,
@@ -393,14 +387,15 @@ const LayerUI = ({
         elements={elements}
         appState={appState}
         actionManager={actionManager}
-        onExportToBackend={
-          onExportToBackend
-            ? (elements) => {
-                onExportToBackend &&
-                  onExportToBackend(elements, appState, canvas);
-              }
-            : undefined
-        }
+        onExportToBackend={(elements) => {
+          UIOptions.canvasActions.export.onExportToBackend &&
+            UIOptions.canvasActions.export.onExportToBackend(
+              elements,
+              appState,
+              canvas,
+            );
+        }}
+        exportOpts={UIOptions.canvasActions.export}
       />
     );
   };

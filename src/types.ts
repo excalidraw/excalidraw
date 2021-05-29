@@ -82,7 +82,13 @@ export type AppState = {
   isResizing: boolean;
   isRotating: boolean;
   zoom: Zoom;
-  openMenu: "canvas" | "shape" | null;
+  openMenu:
+    | "canvas"
+    | "shape"
+    | "canvasColorPicker"
+    | "backgroundColorPicker"
+    | "strokeColorPicker"
+    | null;
   lastPointerDownWith: PointerType;
   selectedElementIds: { [id: string]: boolean };
   previousSelectedElementIds: { [id: string]: boolean };
@@ -173,11 +179,6 @@ export interface ExcalidrawProps {
     button: "down" | "up";
     pointersMap: Gesture["pointers"];
   }) => void;
-  onExportToBackend?: (
-    exportedElements: readonly NonDeletedExcalidrawElement[],
-    appState: AppState,
-    canvas: HTMLCanvasElement | null,
-  ) => void;
   onPaste?: (
     data: ClipboardData,
     event: ClipboardEvent | null,
@@ -214,13 +215,21 @@ export enum UserIdleState {
   IDLE = "idle",
 }
 
+export type ExportOpts = {
+  saveFileToDisk?: boolean;
+  onExportToBackend?: (
+    exportedElements: readonly NonDeletedExcalidrawElement[],
+    appState: AppState,
+    canvas: HTMLCanvasElement | null,
+  ) => void;
+};
+
 type CanvasActions = {
   changeViewBackgroundColor?: boolean;
   clearCanvas?: boolean;
-  export?: boolean;
+  export?: false | ExportOpts;
   loadScene?: boolean;
-  saveAsScene?: boolean;
-  saveScene?: boolean;
+  saveToActiveFile?: boolean;
   theme?: boolean;
 };
 
@@ -230,7 +239,7 @@ export type UIOptions = {
 
 export type AppProps = ExcalidrawProps & {
   UIOptions: {
-    canvasActions: Required<CanvasActions>;
+    canvasActions: Required<CanvasActions> & { export: ExportOpts };
   };
   detectScroll: boolean;
   handleKeyboardGlobally: boolean;

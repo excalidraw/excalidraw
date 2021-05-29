@@ -20,6 +20,10 @@
     "background": "Arka plan",
     "fill": "Doldur",
     "strokeWidth": "Kontur genişliği",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "Kontur stili",
     "strokeStyle_solid": "Dolu",
     "strokeStyle_dashed": "Kesik çizgili",
@@ -30,7 +34,7 @@
     "edges": "Kenarlar",
     "sharp": "Keskin",
     "round": "Yuvarlak",
-    "arrowheads": "Ok başları",
+    "arrowheads": "Ok uçları",
     "arrowhead_none": "Yok",
     "arrowhead_arrow": "Ok",
     "arrowhead_bar": "Çizgi",
@@ -38,8 +42,8 @@
     "fontSize": "Yazı tipi boyutu",
     "fontFamily": "Yazı tipi ailesi",
     "onlySelected": "Sadece seçilen",
-    "withBackground": "Arka planla beraber",
-    "exportEmbedScene": "Sahneyi çıktı dosyasına dahil et",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "Sahne datası, daha sonra geri kullanılabilmesi için çıktı alınan PNG/SVG dosyasına dahil edicelek. Bu işlem dosya boyutunu arttıracaktır.",
     "addWatermark": "\"Excalidraw ile yapıldı\" yazısını ekle",
     "handDrawn": "El-yazısı",
@@ -96,17 +100,20 @@
     "flipVertical": "Dikey döndür",
     "viewMode": "Görünüm modu",
     "toggleExportColorScheme": "Renk şemasını dışa aktar/aktarma",
-    "share": "Paylaş"
+    "share": "Paylaş",
+    "toggleTheme": "Temayı etkinleştir/devre dışı bırak"
   },
   "buttons": {
     "clearReset": "Tuvali sıfırla",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "Dışa aktar",
     "exportToPng": "PNG olarak dışa aktar",
     "exportToSvg": "SVG olarak dışa aktar",
     "copyToClipboard": "Panoya kopyala",
     "copyPngToClipboard": "PNG'yi panoya kopyala",
     "scale": "Ölçek",
-    "save": "Kaydet",
+    "save": "",
     "saveAs": "Farklı kaydet",
     "load": "Yükle",
     "getShareableLink": "Paylaşılabilir bağlantı al",
@@ -152,12 +159,12 @@
   },
   "toolBar": {
     "selection": "Seçme",
-    "freedraw": "Serbest çizim",
     "rectangle": "Dikdörtgen",
     "diamond": "Elmas",
     "ellipse": "Elips",
     "arrow": "Ok",
     "line": "Çizgi",
+    "freedraw": "Çiz",
     "text": "Yazı",
     "library": "Kütüphane",
     "lock": "Seçilen aracı çizimden sonra aktif tut"
@@ -209,6 +216,14 @@
   },
   "errorDialog": {
     "title": "Hata"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "Blog'umuzu okuyun",

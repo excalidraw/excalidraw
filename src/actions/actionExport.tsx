@@ -123,8 +123,8 @@ export const actionChangeExportEmbedScene = register({
   ),
 });
 
-export const actionSaveScene = register({
-  name: "saveScene",
+export const actionSaveToActiveFile = register({
+  name: "saveToActiveFile",
   perform: async (elements, appState, value) => {
     const fileHandleExists = !!appState.fileHandle;
     try {
@@ -165,8 +165,8 @@ export const actionSaveScene = register({
   ),
 });
 
-export const actionSaveAsScene = register({
-  name: "saveAsScene",
+export const actionSaveFileToDisk = register({
+  name: "saveFileToDisk",
   perform: async (elements, appState, value) => {
     try {
       const { fileHandle } = await saveAsJSON(elements, {

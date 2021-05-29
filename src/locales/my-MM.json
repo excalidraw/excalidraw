@@ -20,6 +20,10 @@
     "background": "နောက်ခံ",
     "fill": "ဖြည့်",
     "strokeWidth": "မျဉ်းအထူ",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "မျဉ်းပုံစံ",
     "strokeStyle_solid": "အပြည့်",
     "strokeStyle_dashed": "မျဉ်းပြတ်",
@@ -39,7 +43,7 @@
     "fontFamily": "စာလုံးပုံစံ",
     "onlySelected": "ရွေးထားသလောက်",
     "withBackground": "",
-    "exportEmbedScene": "မြင်ကွင်းပါမြှုပ်နှံ၍ထုတ်ပါ",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "ထုတ်ယူလိုက်သော PNG/SVG ထဲမြင်ကွင်းအချက်အလက်များပါဝင်သဖြင့် ပြန်လည်ရယူနိုင်သော်လည်း ဖိုင်အရွယ်အစားကြီးပါမည်။",
     "addWatermark": "\"Excalidraw ဖြင့်ဖန်တီးသည်။\" စာသားထည့်",
     "handDrawn": "လက်ရေး",
@@ -96,17 +100,20 @@
     "flipVertical": "",
     "viewMode": "",
     "toggleExportColorScheme": "",
-    "share": ""
+    "share": "",
+    "toggleTheme": ""
   },
   "buttons": {
     "clearReset": "ကားချပ်ရှင်းလင်း",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "ထုတ်",
     "exportToPng": "PNG ထုတ်",
     "exportToSvg": "SVG ထုတ်",
     "copyToClipboard": "ကူးယူ",
     "copyPngToClipboard": "PNG ကူးယူ",
     "scale": "စကေး",
-    "save": "သိမ်း",
+    "save": "",
     "saveAs": "ပြောင်းသိမ်း",
     "load": "တင်သွင်း",
     "getShareableLink": "မျှဝေရန် လင့်ခ်ရယူ",
@@ -152,12 +159,12 @@
   },
   "toolBar": {
     "selection": "ရွေးချယ်",
-    "freedraw": "အလွတ်ရေးဆွဲ",
     "rectangle": "စတုဂံ",
     "diamond": "စိန်",
     "ellipse": "အဝိုင်း",
     "arrow": "မြှား",
     "line": "မျဉ်း",
+    "freedraw": "",
     "text": "စာသား",
     "library": "မှတ်တမ်း",
     "lock": "ရွေးချယ်ထားသောကိရိယာကိုသာဆက်သုံး"
@@ -209,6 +216,14 @@
   },
   "errorDialog": {
     "title": "ချို့ယွင်းချက်"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "",

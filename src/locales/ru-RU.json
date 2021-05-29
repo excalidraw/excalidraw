@@ -20,6 +20,10 @@
     "background": "Фон",
     "fill": "Заливка",
     "strokeWidth": "Толщина штриха",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "Стиль обводки",
     "strokeStyle_solid": "Сплошная",
     "strokeStyle_dashed": "Пунктирная",
@@ -38,8 +42,8 @@
     "fontSize": "Размер шрифта",
     "fontFamily": "Семейство шрифтов",
     "onlySelected": "Только выбранные",
-    "withBackground": "С фоном",
-    "exportEmbedScene": "Встроить информацию о сцене в экспортируемый файл",
+    "withBackground": "Фон",
+    "exportEmbedScene": "Встроить сцену",
     "exportEmbedScene_details": "Сцена будет сохранена в PNG/SVG файл так, чтобы всю сцену можно будет восстановить из этого файла. Это увеличит размер файла.",
     "addWatermark": "Добавить «Создано в Excalidraw»",
     "handDrawn": "От руки",
@@ -96,17 +100,20 @@
     "flipVertical": "",
     "viewMode": "Вид",
     "toggleExportColorScheme": "Экспортировать цветовую схему",
-    "share": "Поделиться"
+    "share": "Поделиться",
+    "toggleTheme": ""
   },
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",
+    "exportJSON": "Сохранить в",
+    "exportImage": "Сохранить как изображение",
     "export": "Экспортировать",
     "exportToPng": "Экспорт в PNG",
     "exportToSvg": "Экспорт в SVG",
     "copyToClipboard": "Скопировать в буфер обмена",
     "copyPngToClipboard": "Скопировать PNG в буфер обмена",
     "scale": "Масштаб",
-    "save": "Сохранить",
+    "save": "Сохранить в текущий файл",
     "saveAs": "Сохранить как",
     "load": "Загрузить",
     "getShareableLink": "Получить доступ по ссылке",
@@ -152,12 +159,12 @@
   },
   "toolBar": {
     "selection": "Выделение области",
-    "freedraw": "Свободное рисование",
     "rectangle": "Прямоугольник",
     "diamond": "Ромб",
     "ellipse": "Эллипс",
     "arrow": "Cтрелка",
     "line": "Линия",
+    "freedraw": "",
     "text": "Текст",
     "library": "Библиотека",
     "lock": "Сохранять выбранный инструмент активным после рисования"
@@ -209,6 +216,14 @@
   },
   "errorDialog": {
     "title": "Ошибка"
+  },
+  "exportDialog": {
+    "disk_title": "Сохранить на диск",
+    "disk_details": "Экспортировать данные сцены в файл, из которого можно импортировать позже.",
+    "disk_button": "Сохранить в файл",
+    "link_title": "Поделитесь ссылкой",
+    "link_details": "Экспорт ссылки только для чтения.",
+    "link_button": "Экспорт в ссылку"
   },
   "helpDialog": {
     "blog": "Прочитайте наш блог",
