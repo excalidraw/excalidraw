@@ -16,7 +16,7 @@
     "delete": "Supprimer",
     "copyStyles": "Copier les styles",
     "pasteStyles": "Coller les styles",
-    "stroke": "Contour",
+    "stroke": "Trait",
     "background": "Arrière-plan",
     "fill": "Remplissage",
     "strokeWidth": "Largeur du trait",
@@ -101,8 +101,8 @@
     "viewMode": "Mode présentation",
     "toggleExportColorScheme": "Activer/Désactiver l'export du thème de couleur",
     "share": "Partager",
-    "showStroke": "",
-    "showBackground": "",
+    "showStroke": "Afficher le sélecteur de couleur de trait",
+    "showBackground": "Afficher le sélecteur de couleur d'arrière-plan",
     "toggleTheme": "Changer le thème"
   },
   "buttons": {
