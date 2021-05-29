@@ -1,0 +1,17 @@
+.excalidraw {
+  .layer-ui__wrapper__footer-center {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .encrypted-icon {
+    border-radius: var(--space-factor);
+    color: var(--icon-green-fill-color);
+    margin-top: 13px;
+
+    svg {
+      width: 1.2rem;
+      height: 1.2rem;
+    }
+  }
+}

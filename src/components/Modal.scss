@@ -26,8 +26,7 @@
     right: 0;
     bottom: 0;
     z-index: 1;
-    background-color: transparentize($oc-black, 0.7);
-    backdrop-filter: blur(2px);
+    background-color: transparentize($oc-black, 0.3);
   }
 
   .Modal__content {
@@ -45,7 +44,6 @@
 
     // for modals, reset blurry bg
     background: var(--island-bg-color);
-    backdrop-filter: none;
 
     border: 1px solid var(--dialog-border-color);
     box-shadow: 0 2px 10px transparentize($oc-black, 0.75);

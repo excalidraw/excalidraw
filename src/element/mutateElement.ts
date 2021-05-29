@@ -114,3 +114,14 @@ export const newElementWith = <TElement extends ExcalidrawElement>(
     versionNonce: randomInteger(),
   };
 };
+
+/**
+ * Mutates element and updates `version` & `versionNonce`.
+ *
+ * NOTE: does not trigger re-render.
+ */
+export const bumpVersion = (element: Mutable<ExcalidrawElement>) => {
+  element.version = element.version + 1;
+  element.versionNonce = randomInteger();
+  return element;
+};

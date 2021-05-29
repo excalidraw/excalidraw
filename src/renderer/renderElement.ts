@@ -4,8 +4,13 @@ import {
   ExcalidrawTextElement,
   Arrowhead,
   NonDeletedExcalidrawElement,
+  ExcalidrawFreeDrawElement,
 } from "../element/types";
-import { isTextElement, isLinearElement } from "../element/typeChecks";
+import {
+  isTextElement,
+  isLinearElement,
+  isFreeDrawElement,
+} from "../element/typeChecks";
 import {
   getDiamondPoints,
   getElementAbsoluteCoords,
@@ -33,13 +38,17 @@ import {
   drawMathOnCanvas,
   isMathMode,
 } from "../mathmode";
+import getFreeDrawShape from "perfect-freehand";
+import { MAX_DECIMALS_FOR_SVG_EXPORT } from "../constants";
 
 const defaultAppState = getDefaultAppState();
 
-const CANVAS_PADDING = 20;
+const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 
-const DASHARRAY_DASHED = [12, 8];
-const DASHARRAY_DOTTED = [3, 6];
+const getDashArrayDotted = (strokeWidth: number) => [1.5, 6 + strokeWidth];
+
+const getCanvasPadding = (element: ExcalidrawElement) =>
+  element.type === "freedraw" ? element.strokeWidth * 12 : 20;
 
 export interface ExcalidrawElementWithCanvas {
   element: ExcalidrawElement | ExcalidrawTextElement;
@@ -57,18 +66,25 @@ const generateElementCanvas = (
 ): ExcalidrawElementWithCanvas => {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
+  const padding = getCanvasPadding(element);
 
   let canvasOffsetX = 0;
   let canvasOffsetY = 0;
 
-  if (isLinearElement(element)) {
-    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  if (isLinearElement(element) || isFreeDrawElement(element)) {
+    let [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+
+    x1 = Math.floor(x1);
+    x2 = Math.ceil(x2);
+    y1 = Math.floor(y1);
+    y2 = Math.ceil(y2);
+
     canvas.width =
       distance(x1, x2) * window.devicePixelRatio * zoom.value +
-      CANVAS_PADDING * zoom.value * 2;
+      padding * zoom.value * 2;
     canvas.height =
       distance(y1, y2) * window.devicePixelRatio * zoom.value +
-      CANVAS_PADDING * zoom.value * 2;
+      padding * zoom.value * 2;
 
     canvasOffsetX =
       element.x > x1
@@ -93,14 +109,12 @@ const generateElementCanvas = (
         ? scale * Math.max(window.devicePixelRatio, 1 / window.devicePixelRatio)
         : window.devicePixelRatio;
     canvas.width =
-      element.width * dprMultiplier * zoom.value +
-      CANVAS_PADDING * zoom.value * 2;
+      element.width * dprMultiplier * zoom.value + padding * zoom.value * 2;
     canvas.height =
-      element.height * dprMultiplier * zoom.value +
-      CANVAS_PADDING * zoom.value * 2;
+      element.height * dprMultiplier * zoom.value + padding * zoom.value * 2;
   }
 
-  context.translate(CANVAS_PADDING * zoom.value, CANVAS_PADDING * zoom.value);
+  context.translate(padding * zoom.value, padding * zoom.value);
 
   context.scale(
     window.devicePixelRatio * zoom.value,
@@ -108,15 +122,14 @@ const generateElementCanvas = (
   );
 
   const rc = rough.canvas(canvas);
+
   drawElementOnCanvas(element, rc, context, zoom, scale, refresh);
+
   context.scale(
     1 / (window.devicePixelRatio * zoom.value),
     1 / (window.devicePixelRatio * zoom.value),
   );
-  context.translate(
-    -(CANVAS_PADDING * zoom.value),
-    -(CANVAS_PADDING * zoom.value),
-  );
+  context.translate(-(padding * zoom.value), -(padding * zoom.value));
 
   return {
     element,
@@ -140,15 +153,32 @@ const drawElementOnCanvas = (
     case "rectangle":
     case "diamond":
     case "ellipse": {
+      context.lineJoin = "round";
+      context.lineCap = "round";
       rc.draw(getShapeForElement(element) as Drawable);
       break;
     }
     case "arrow":
-    case "draw":
     case "line": {
+      context.lineJoin = "round";
+      context.lineCap = "round";
+
       (getShapeForElement(element) as Drawable[]).forEach((shape) => {
         rc.draw(shape);
       });
+      break;
+    }
+    case "freedraw": {
+      // Draw directly to canvas
+      context.save();
+      context.fillStyle = element.strokeColor;
+
+      const path = getFreeDrawPath2D(element) as Path2D;
+
+      context.fillStyle = element.strokeColor;
+      context.fill(path);
+
+      context.restore();
       break;
     }
     default: {
@@ -164,7 +194,7 @@ const drawElementOnCanvas = (
           isMathMode(getFontString(element)) &&
           containsMath(element.text, element.useTex)
         ) {
-          const scaledPadding = CANVAS_PADDING * zoom.value;
+          const scaledPadding = getCanvasPadding(element) * zoom.value;
           drawMathOnCanvas(
             context,
             scaledPadding,
@@ -235,14 +265,17 @@ export const getShapeForElement = (element: ExcalidrawElement) =>
 export const invalidateShapeForElement = (element: ExcalidrawElement) =>
   shapeCache.delete(element);
 
-export const generateRoughOptions = (element: ExcalidrawElement): Options => {
+export const generateRoughOptions = (
+  element: ExcalidrawElement,
+  continuousPath = false,
+): Options => {
   const options: Options = {
     seed: element.seed,
     strokeLineDash:
       element.strokeStyle === "dashed"
-        ? DASHARRAY_DASHED
+        ? getDashArrayDashed(element.strokeWidth)
         : element.strokeStyle === "dotted"
-        ? DASHARRAY_DOTTED
+        ? getDashArrayDotted(element.strokeWidth)
         : undefined,
     // for non-solid strokes, disable multiStroke because it tends to make
     // dashes/dots overlay each other
@@ -260,6 +293,7 @@ export const generateRoughOptions = (element: ExcalidrawElement): Options => {
     hachureGap: element.strokeWidth * 4,
     roughness: element.roughness,
     stroke: element.strokeColor,
+    preserveVertices: continuousPath,
   };
 
   switch (element.type) {
@@ -276,10 +310,7 @@ export const generateRoughOptions = (element: ExcalidrawElement): Options => {
       }
       return options;
     }
-    case "line":
-    case "draw": {
-      // If shape is a line and is a closed shape,
-      // fill the shape if a color is set.
+    case "line": {
       if (isPathALoop(element.points)) {
         options.fillStyle = element.fillStyle;
         options.fill =
@@ -289,6 +320,7 @@ export const generateRoughOptions = (element: ExcalidrawElement): Options => {
       }
       return options;
     }
+    case "freedraw":
     case "arrow":
       return options;
     default: {
@@ -297,11 +329,17 @@ export const generateRoughOptions = (element: ExcalidrawElement): Options => {
   }
 };
 
+/**
+ * Generates the element's shape and puts it into the cache.
+ * @param element
+ * @param generator
+ */
 const generateElementShape = (
   element: NonDeletedExcalidrawElement,
   generator: RoughGenerator,
 ) => {
   let shape = shapeCache.get(element) || null;
+
   if (!shape) {
     elementWithCanvasCache.delete(element);
 
@@ -317,7 +355,7 @@ const generateElementShape = (
             } Q ${w} ${h}, ${w - r} ${h} L ${r} ${h} Q 0 ${h}, 0 ${
               h - r
             } L 0 ${r} Q 0 0, ${r} 0`,
-            generateRoughOptions(element),
+            generateRoughOptions(element, true),
           );
         } else {
           shape = generator.rectangle(
@@ -361,7 +399,6 @@ const generateElementShape = (
         );
         break;
       case "line":
-      case "draw":
       case "arrow": {
         const options = generateRoughOptions(element);
 
@@ -413,15 +450,18 @@ const generateElementShape = (
                   ...options,
                   fill: element.strokeColor,
                   fillStyle: "solid",
+                  stroke: "none",
                 }),
               ];
             }
 
             // Arrow arrowheads
             const [x2, y2, x3, y3, x4, y4] = arrowheadPoints;
+
             if (element.strokeStyle === "dotted") {
               // for dotted arrows caps, reduce gap to make it more legible
-              options.strokeLineDash = [3, 4];
+              const dash = getDashArrayDotted(element.strokeWidth - 1);
+              options.strokeLineDash = [dash[0], dash[1] - 1];
             } else {
               // for solid/dashed, keep solid arrow cap
               delete options.strokeLineDash;
@@ -456,6 +496,12 @@ const generateElementShape = (
             shape.push(...shapes);
           }
         }
+
+        break;
+      }
+      case "freedraw": {
+        generateFreeDrawShape(element);
+        shape = [];
         break;
       }
       case "text": {
@@ -487,7 +533,9 @@ const generateElementWithCanvas = (
       scale,
       refresh,
     );
+
     elementWithCanvasCache.set(element, elementWithCanvas);
+
     return elementWithCanvas;
   }
   return prevElementWithCanvas;
@@ -501,7 +549,17 @@ const drawElementFromCanvas = (
   scale: number,
 ) => {
   const element = elementWithCanvas.element;
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const padding = getCanvasPadding(element);
+  let [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+
+  // Free draw elements will otherwise "shuffle" as the min x and y change
+  if (isFreeDrawElement(element)) {
+    x1 = Math.floor(x1);
+    x2 = Math.ceil(x2);
+    y1 = Math.floor(y1);
+    y2 = Math.ceil(y2);
+  }
+
   const condScale =
     isTextElement(element) &&
     isMathMode(getFontString(element)) &&
@@ -515,14 +573,13 @@ const drawElementFromCanvas = (
   context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
   context.translate(cx, cy);
   context.rotate(element.angle);
+
   context.drawImage(
     elementWithCanvas.canvas!,
     (-(x2 - x1) / 2) * window.devicePixelRatio -
-      (CANVAS_PADDING * elementWithCanvas.canvasZoom) /
-        elementWithCanvas.canvasZoom,
+      (padding * elementWithCanvas.canvasZoom) / elementWithCanvas.canvasZoom,
     (-(y2 - y1) / 2) * window.devicePixelRatio -
-      (CANVAS_PADDING * elementWithCanvas.canvasZoom) /
-        elementWithCanvas.canvasZoom,
+      (padding * elementWithCanvas.canvasZoom) / elementWithCanvas.canvasZoom,
     elementWithCanvas.canvas!.width / elementWithCanvas.canvasZoom,
     elementWithCanvas.canvas!.height / elementWithCanvas.canvasZoom,
   );
@@ -559,11 +616,44 @@ export const renderElement = (
       );
       break;
     }
+    case "freedraw": {
+      generateElementShape(element, generator);
+
+      if (renderOptimizations) {
+        const elementWithCanvas = generateElementWithCanvas(
+          element,
+          scale,
+          sceneState,
+          refresh,
+        );
+        drawElementFromCanvas(
+          elementWithCanvas,
+          rc,
+          context,
+          sceneState,
+          scale,
+        );
+      } else {
+        const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+        const cx = (x1 + x2) / 2 + sceneState.scrollX;
+        const cy = (y1 + y2) / 2 + sceneState.scrollY;
+        const shiftX = (x2 - x1) / 2 - (element.x - x1);
+        const shiftY = (y2 - y1) / 2 - (element.y - y1);
+        context.translate(cx, cy);
+        context.rotate(element.angle);
+        context.translate(-shiftX, -shiftY);
+        drawElementOnCanvas(element, rc, context, sceneState.zoom, 1, refresh);
+        context.translate(shiftX, shiftY);
+        context.rotate(-element.angle);
+        context.translate(-cx, -cy);
+      }
+
+      break;
+    }
     case "rectangle":
     case "diamond":
     case "ellipse":
     case "line":
-    case "draw":
     case "arrow":
     case "text": {
       generateElementShape(element, generator);
@@ -604,6 +694,22 @@ export const renderElement = (
   }
 };
 
+const roughSVGDrawWithPrecision = (
+  rsvg: RoughSVG,
+  drawable: Drawable,
+  precision?: number,
+) => {
+  if (typeof precision === "undefined") {
+    return rsvg.draw(drawable);
+  }
+  const pshape: Drawable = {
+    sets: drawable.sets,
+    shape: drawable.shape,
+    options: { ...drawable.options, fixedDecimalPlaceDigits: precision },
+  };
+  return rsvg.draw(pshape);
+};
+
 export const renderElementToSvg = (
   element: NonDeletedExcalidrawElement,
   rsvg: RoughSVG,
@@ -626,12 +732,17 @@ export const renderElementToSvg = (
     case "diamond":
     case "ellipse": {
       generateElementShape(element, generator);
-      const node = rsvg.draw(getShapeForElement(element) as Drawable);
+      const node = roughSVGDrawWithPrecision(
+        rsvg,
+        getShapeForElement(element) as Drawable,
+        MAX_DECIMALS_FOR_SVG_EXPORT,
+      );
       const opacity = element.opacity / 100;
       if (opacity !== 1) {
         node.setAttribute("stroke-opacity", `${opacity}`);
         node.setAttribute("fill-opacity", `${opacity}`);
       }
+      node.setAttribute("stroke-linecap", "round");
       node.setAttribute(
         "transform",
         `translate(${offsetX || 0} ${
@@ -642,13 +753,18 @@ export const renderElementToSvg = (
       break;
     }
     case "line":
-    case "draw":
     case "arrow": {
       generateElementShape(element, generator);
       const group = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
       const opacity = element.opacity / 100;
+      group.setAttribute("stroke-linecap", "round");
+
       (getShapeForElement(element) as Drawable[]).forEach((shape) => {
-        const node = rsvg.draw(shape);
+        const node = roughSVGDrawWithPrecision(
+          rsvg,
+          shape,
+          MAX_DECIMALS_FOR_SVG_EXPORT,
+        );
         if (opacity !== 1) {
           node.setAttribute("stroke-opacity", `${opacity}`);
           node.setAttribute("fill-opacity", `${opacity}`);
@@ -660,7 +776,7 @@ export const renderElementToSvg = (
           }) rotate(${degree} ${cx} ${cy})`,
         );
         if (
-          (element.type === "line" || element.type === "draw") &&
+          element.type === "line" &&
           isPathALoop(element.points) &&
           element.backgroundColor !== "transparent"
         ) {
@@ -669,6 +785,28 @@ export const renderElementToSvg = (
         group.appendChild(node);
       });
       svgRoot.appendChild(group);
+      break;
+    }
+    case "freedraw": {
+      generateFreeDrawShape(element);
+      const opacity = element.opacity / 100;
+      const node = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
+      if (opacity !== 1) {
+        node.setAttribute("stroke-opacity", `${opacity}`);
+        node.setAttribute("fill-opacity", `${opacity}`);
+      }
+      node.setAttribute(
+        "transform",
+        `translate(${offsetX || 0} ${
+          offsetY || 0
+        }) rotate(${degree} ${cx} ${cy})`,
+      );
+      const path = svgRoot.ownerDocument!.createElementNS(SVG_NS, "path");
+      node.setAttribute("stroke", "none");
+      node.setAttribute("fill", element.strokeColor);
+      path.setAttribute("d", getFreeDrawSvgPath(element));
+      node.appendChild(path);
+      svgRoot.appendChild(node);
       break;
     }
     default: {
@@ -743,3 +881,55 @@ export const renderElementToSvg = (
     }
   }
 };
+
+export const pathsCache = new WeakMap<ExcalidrawFreeDrawElement, Path2D>([]);
+
+export function generateFreeDrawShape(element: ExcalidrawFreeDrawElement) {
+  const svgPathData = getFreeDrawSvgPath(element);
+  const path = new Path2D(svgPathData);
+  pathsCache.set(element, path);
+  return path;
+}
+
+export function getFreeDrawPath2D(element: ExcalidrawFreeDrawElement) {
+  return pathsCache.get(element);
+}
+
+export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
+  const inputPoints = element.simulatePressure
+    ? element.points
+    : element.points.length
+    ? element.points.map(([x, y], i) => [x, y, element.pressures[i]])
+    : [[0, 0, 0]];
+
+  // Consider changing the options for simulated pressure vs real pressure
+  const options = {
+    simulatePressure: element.simulatePressure,
+    size: element.strokeWidth * 6,
+    thinning: 0.5,
+    smoothing: 0.5,
+    streamline: 0.5,
+    easing: (t: number) => t * (2 - t),
+    last: true,
+  };
+
+  const points = getFreeDrawShape(inputPoints as number[][], options);
+  const d: (string | number)[] = [];
+
+  let [p0, p1] = points;
+
+  d.push("M", p0[0], p0[1], "Q");
+
+  for (let i = 0; i < points.length; i++) {
+    d.push(p0[0], p0[1], (p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2);
+    p0 = p1;
+    p1 = points[i];
+  }
+
+  p1 = points[0];
+  d.push(p0[0], p0[1], (p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2);
+
+  d.push("Z");
+
+  return d.join(" ");
+}

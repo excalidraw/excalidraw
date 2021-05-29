@@ -1,6 +1,7 @@
 import React from "react";
 import { ExcalidrawElement } from "../element/types";
 import { AppState, ExcalidrawProps } from "../types";
+import Library from "../data/library";
 
 /** if false, the action should be prevented */
 export type ActionResult =
@@ -15,7 +16,11 @@ export type ActionResult =
     }
   | false;
 
-type AppAPI = { canvas: HTMLCanvasElement | null; focusContainer(): void };
+type AppAPI = {
+  canvas: HTMLCanvasElement | null;
+  focusContainer(): void;
+  library: Library;
+};
 
 type ActionFn = (
   elements: readonly ExcalidrawElement[],
@@ -47,6 +52,7 @@ export type ActionName =
   | "changeBackgroundColor"
   | "changeFillStyle"
   | "changeStrokeWidth"
+  | "changeStrokeShape"
   | "changeSloppiness"
   | "changeStrokeStyle"
   | "changeArrowhead"
@@ -61,9 +67,8 @@ export type ActionName =
   | "changeProjectName"
   | "changeExportBackground"
   | "changeExportEmbedScene"
-  | "changeShouldAddWatermark"
-  | "saveScene"
-  | "saveAsScene"
+  | "saveToActiveFile"
+  | "saveFileToDisk"
   | "loadScene"
   | "duplicateSelection"
   | "deleteSelectedElements"
@@ -94,7 +99,8 @@ export type ActionName =
   | "flipHorizontal"
   | "flipVertical"
   | "viewMode"
-  | "exportWithDarkMode";
+  | "exportWithDarkMode"
+  | "toggleTheme";
 
 export interface Action {
   name: ActionName;
@@ -125,4 +131,5 @@ export interface ActionsManagerInterface {
   registerAction: (action: Action) => void;
   handleKeyDown: (event: React.KeyboardEvent | KeyboardEvent) => boolean;
   renderAction: (name: ActionName) => React.ReactElement | null;
+  executeAction: (action: Action) => void;
 }

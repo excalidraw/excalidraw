@@ -58,7 +58,7 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   ungroup: [getShortcutKey("CtrlOrCmd+Shift+G")],
   gridMode: [getShortcutKey("CtrlOrCmd+'")],
   zenMode: [getShortcutKey("Alt+Z")],
-  stats: [],
+  stats: [getShortcutKey("Alt+/")],
   addToLibrary: [],
   toggleUseTex: [getShortcutKey("CtrlOrCmd+Shift+M")],
   flipHorizontal: [getShortcutKey("Shift+H")],

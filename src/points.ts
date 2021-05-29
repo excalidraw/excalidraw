@@ -8,6 +8,7 @@ export const getSizeFromPoints = (points: readonly Point[]) => {
     height: Math.max(...ys) - Math.min(...ys),
   };
 };
+
 export const rescalePoints = (
   dimension: 0 | 1,
   nextDimensionSize: number,

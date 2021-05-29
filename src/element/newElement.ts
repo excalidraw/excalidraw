@@ -10,6 +10,7 @@ import {
   GroupId,
   VerticalAlign,
   Arrowhead,
+  ExcalidrawFreeDrawElement,
 } from "../element/types";
 import { measureMath } from "../mathmode";
 import { randomInteger, randomId } from "../random";
@@ -229,6 +230,22 @@ export const updateTextElement = (
     isDeleted: isDeleted ?? element.isDeleted,
     ...getAdjustedDimensions(element, text),
   });
+};
+
+export const newFreeDrawElement = (
+  opts: {
+    type: "freedraw";
+    points?: ExcalidrawFreeDrawElement["points"];
+    simulatePressure: boolean;
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawFreeDrawElement> => {
+  return {
+    ..._newElementBase<ExcalidrawFreeDrawElement>(opts.type, opts),
+    points: opts.points || [],
+    pressures: [],
+    simulatePressure: opts.simulatePressure,
+    lastCommittedPoint: null,
+  };
 };
 
 export const newLinearElement = (

@@ -44,6 +44,7 @@ export const textWysiwyg = ({
   getViewportCoords,
   element,
   canvas,
+  excalidrawContainer,
 }: {
   id: ExcalidrawElement["id"];
   appState: AppState;
@@ -52,6 +53,7 @@ export const textWysiwyg = ({
   getViewportCoords: (x: number, y: number) => [number, number];
   element: ExcalidrawElement;
   canvas: HTMLCanvasElement | null;
+  excalidrawContainer: HTMLDivElement | null;
 }) => {
   const updateWysiwygStyle = () => {
     const updatedElement = Scene.getScene(element)?.getElement(id);
@@ -83,7 +85,7 @@ export const textWysiwyg = ({
         // margin-right of parent if any
         Number(
           getComputedStyle(
-            document.querySelector(".excalidraw")!.parentNode as Element,
+            excalidrawContainer?.parentNode as Element,
           ).marginRight.slice(0, -2),
         );
 
@@ -375,7 +377,7 @@ export const textWysiwyg = ({
     passive: false,
     capture: true,
   });
-  document
-    .querySelector(".excalidraw-textEditorContainer")!
+  excalidrawContainer
+    ?.querySelector(".excalidraw-textEditorContainer")!
     .appendChild(editable);
 };

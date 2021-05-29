@@ -6,7 +6,6 @@ import {
 
 import CollabWrapper from "./CollabWrapper";
 
-import { getSyncableElements } from "../../packages/excalidraw/index";
 import { ExcalidrawElement } from "../../element/types";
 import { BROADCAST, SCENE } from "../app_constants";
 import { UserIdleState } from "../../types";
@@ -39,7 +38,9 @@ class Portal {
     this.socket.on("new-user", async (_socketId: string) => {
       this.broadcastScene(
         SCENE.INIT,
-        getSyncableElements(this.collab.getSceneElementsIncludingDeleted()),
+        this.collab.getSyncableElements(
+          this.collab.getSceneElementsIncludingDeleted(),
+        ),
         /* syncAll */ true,
       );
     });

@@ -107,15 +107,16 @@
 
     <!-- FIXME: remove this when we update CRA (fix SW caching) -->
     <style>
-      body {
+      body,
+      html {
         margin: 0;
         --ui-font: system-ui, BlinkMacSystemFont, -apple-system, Segoe UI,
           Roboto, Helvetica, Arial, sans-serif;
         font-family: var(--ui-font);
         -webkit-text-size-adjust: 100%;
 
-        width: 100vw;
-        height: 100vh;
+        width: 100%;
+        height: 100%;
       }
 
       .visually-hidden {
@@ -125,6 +126,7 @@
         overflow: hidden;
         clip: rect(1px, 1px, 1px, 1px);
         white-space: nowrap; /* added line */
+        user-select: none;
       }
 
       .LoadingMessage {
@@ -149,6 +151,21 @@
       }
       #root {
         height: 100%;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+
+        @media screen and (min-width: 1200px) {
+          -webkit-touch-callout: default;
+          -webkit-user-select: auto;
+          -khtml-user-select: auto;
+          -moz-user-select: auto;
+          -ms-user-select: auto;
+          user-select: auto;
+        }
       }
     </style>
   </head>
