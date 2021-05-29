@@ -563,7 +563,7 @@ const LayerUI = ({
           },
         )}
         title={`${capitalizeString(t("toolBar.library"))} — 9`}
-        style={{ marginLeft: "var(--space-factor)" }}
+        style={{ marginInlineStart: "var(--space-factor)" }}
       >
         <input
           className="ToolIcon_type_checkbox"
