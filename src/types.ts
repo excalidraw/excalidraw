@@ -221,6 +221,11 @@ export type ExportOpts = {
     appState: AppState,
     canvas: HTMLCanvasElement | null,
   ) => void;
+  renderCustomUI?: (
+    exportedElements: readonly NonDeletedExcalidrawElement[],
+    appState: AppState,
+    canvas: HTMLCanvasElement | null,
+  ) => JSX.Element;
 };
 
 type CanvasActions = {
