@@ -11,7 +11,8 @@ import { t } from "../i18n";
 import { useIsMobile } from "../components/App";
 import { KEYS } from "../keys";
 import { register } from "./register";
-import { supported } from "browser-fs-access";
+import { supported as fsSupported } from "browser-fs-access";
+import { CheckboxItem } from "../components/CheckboxItem";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -40,14 +41,12 @@ export const actionChangeExportBackground = register({
     };
   },
   PanelComponent: ({ appState, updateData }) => (
-    <label>
-      <input
-        type="checkbox"
-        checked={appState.exportBackground}
-        onChange={(event) => updateData(event.target.checked)}
-      />{" "}
+    <CheckboxItem
+      checked={appState.exportBackground}
+      onChange={(checked) => updateData(checked)}
+    >
       {t("labels.withBackground")}
-    </label>
+    </CheckboxItem>
   ),
 });
 
@@ -60,46 +59,20 @@ export const actionChangeExportEmbedScene = register({
     };
   },
   PanelComponent: ({ appState, updateData }) => (
-    <label style={{ display: "flex" }}>
-      <input
-        type="checkbox"
-        checked={appState.exportEmbedScene}
-        onChange={(event) => updateData(event.target.checked)}
-      />{" "}
+    <CheckboxItem
+      checked={appState.exportEmbedScene}
+      onChange={(checked) => updateData(checked)}
+    >
       {t("labels.exportEmbedScene")}
-      <Tooltip
-        label={t("labels.exportEmbedScene_details")}
-        position="above"
-        long={true}
-      >
-        <div className="TooltipIcon">{questionCircle}</div>
+      <Tooltip label={t("labels.exportEmbedScene_details")} long={true}>
+        <div className="Tooltip-icon">{questionCircle}</div>
       </Tooltip>
-    </label>
+    </CheckboxItem>
   ),
 });
 
-export const actionChangeShouldAddWatermark = register({
-  name: "changeShouldAddWatermark",
-  perform: (_elements, appState, value) => {
-    return {
-      appState: { ...appState, shouldAddWatermark: value },
-      commitToHistory: false,
-    };
-  },
-  PanelComponent: ({ appState, updateData }) => (
-    <label>
-      <input
-        type="checkbox"
-        checked={appState.shouldAddWatermark}
-        onChange={(event) => updateData(event.target.checked)}
-      />{" "}
-      {t("labels.addWatermark")}
-    </label>
-  ),
-});
-
-export const actionSaveScene = register({
-  name: "saveScene",
+export const actionSaveToActiveFile = register({
+  name: "saveToActiveFile",
   perform: async (elements, appState, value) => {
     const fileHandleExists = !!appState.fileHandle;
     try {
@@ -130,19 +103,18 @@ export const actionSaveScene = register({
     event.key === KEYS.S && event[KEYS.CTRL_OR_CMD] && !event.shiftKey,
   PanelComponent: ({ updateData }) => (
     <ToolButton
-      type="button"
+      type="icon"
       icon={save}
       title={t("buttons.save")}
       aria-label={t("buttons.save")}
-      showAriaLabel={useIsMobile()}
       onClick={() => updateData(null)}
       data-testid="save-button"
     />
   ),
 });
 
-export const actionSaveAsScene = register({
-  name: "saveAsScene",
+export const actionSaveFileToDisk = register({
+  name: "saveFileToDisk",
   perform: async (elements, appState, value) => {
     try {
       const { fileHandle } = await saveAsJSON(elements, {
@@ -166,7 +138,7 @@ export const actionSaveAsScene = register({
       title={t("buttons.saveAs")}
       aria-label={t("buttons.saveAs")}
       showAriaLabel={useIsMobile()}
-      hidden={!supported}
+      hidden={!fsSupported}
       onClick={() => updateData(null)}
       data-testid="save-as-button"
     />

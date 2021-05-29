@@ -55,7 +55,7 @@
     "@types/lodash.throttle": "4.1.6",
     "@types/pako": "1.0.1",
     "@types/resize-observer-browser": "0.1.5",
-    "eslint-config-prettier": "8.2.0",
+    "eslint-config-prettier": "8.3.0",
     "eslint-plugin-prettier": "3.3.1",
     "firebase-tools": "9.9.0",
     "husky": "4.3.8",
@@ -104,6 +104,7 @@
     "test:other": "yarn prettier --list-different",
     "test:typecheck": "tsc",
     "test:update": "yarn test:app --updateSnapshot --watchAll=false",
-    "test": "yarn test:app"
+    "test": "yarn test:app",
+    "autorelease": "node scripts/autorelease.js"
   }
 }

@@ -42,8 +42,8 @@
     "fontSize": "Font size",
     "fontFamily": "Font family",
     "onlySelected": "Only selected",
-    "withBackground": "With background",
-    "exportEmbedScene": "Embed scene into exported file",
+    "withBackground": "Background",
+    "exportEmbedScene": "Embed scene",
     "exportEmbedScene_details": "Scene data will be saved into the exported PNG/SVG file so that the scene can be restored from it.\nWill increase exported file size.",
     "addWatermark": "Add \"Made with Excalidraw\"",
     "handDrawn": "Hand-drawn",
@@ -101,17 +101,21 @@
     "viewMode": "View mode",
     "toggleExportColorScheme": "Toggle export color scheme",
     "share": "Share",
+    "showStroke": "Show stroke color picker",
+    "showBackground": "Show background color picker",
     "toggleTheme": "Toggle theme"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
+    "exportJSON": "Export to file",
+    "exportImage": "Save as image",
     "export": "Export",
     "exportToPng": "Export to PNG",
     "exportToSvg": "Export to SVG",
     "copyToClipboard": "Copy to clipboard",
     "copyPngToClipboard": "Copy PNG to clipboard",
     "scale": "Scale",
-    "save": "Save",
+    "save": "Save to current file",
     "saveAs": "Save as",
     "load": "Load",
     "getShareableLink": "Get shareable link",
@@ -214,6 +218,14 @@
   },
   "errorDialog": {
     "title": "Error"
+  },
+  "exportDialog": {
+    "disk_title": "Save to disk",
+    "disk_details": "Export the scene data to a file from which you can import later.",
+    "disk_button": "Save to file",
+    "link_title": "Shareable link",
+    "link_details": "Export as a read-only link.",
+    "link_button": "Export to Link"
   },
   "helpDialog": {
     "blog": "Read our blog",

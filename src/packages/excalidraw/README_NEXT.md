@@ -1,3 +1,13 @@
+<!-- stable-readme-start-->
+
+## Note
+
+**This is an unstable release and not recommended for production. If you don't want to wait for the stable release and try out the unreleased changes you can use this.**
+
+For stable release please use [@excalidraw/excalidraw](https://www.npmjs.com/package/@excalidraw/excalidraw).
+
+<!-- stable-readme-end-->
+
 ### Excalidraw
 
 Excalidraw exported as a component to directly embed in your projects.
@@ -7,20 +17,20 @@ Excalidraw exported as a component to directly embed in your projects.
 You can use npm
 
 ```
-npm install react react-dom @excalidraw/excalidraw
+npm install react react-dom @excalidraw/excalidraw-next
 ```
 
 or via yarn
 
 ```
-yarn add react react-dom @excalidraw/excalidraw
+yarn add react react-dom @excalidraw/excalidraw-next
 ```
 
 After installation you will see a folder `excalidraw-assets` and `excalidraw-assets-dev` in `dist` directory which contains the assets needed for this app in prod and dev mode respectively.
 
 Move the folder `excalidraw-assets` and `excalidraw-assets-dev` to the path where your assets are served.
 
-By default it will try to load the files from `https://unpkg.com/@excalidraw/excalidraw/{currentVersion}/dist/`
+By default it will try to load the files from `https://unpkg.com/@excalidraw/excalidraw-next/dist/`
 
 If you want to load assets from a different path you can set a variable `window.EXCALIDRAW_ASSET_PATH` depending on environment (for example if you have different URL's for dev and prod) to the url from where you want to load the assets.
 
@@ -38,7 +48,7 @@ If you are using a Web bundler (for instance, Webpack), you can import it as an 
 
 ```js
 import React, { useEffect, useState, useRef } from "react";
-import Excalidraw from "@excalidraw/excalidraw";
+import Excalidraw from "@excalidraw/excalidraw-next";
 import InitialData from "./initialData";
 
 import "./styles.scss";
@@ -156,13 +166,13 @@ import { useState, useEffect } from "react";
 export default function IndexPage() {
   const [Comp, setComp] = useState(null);
   useEffect(() => {
-    import("@excalidraw/excalidraw").then((comp) => setComp(comp.default));
+    import("@excalidraw/excalidraw-next").then((comp) => setComp(comp.default));
   });
   return <>{Comp && <Comp />}</>;
 }
 ```
 
-The `types` are available at `@excalidraw/excalidraw/types`, you can view [example for typescript](https://codesandbox.io/s/excalidraw-types-9h2dm)
+The `types` are available at `@excalidraw/excalidraw-next/types`, you can view [example for typescript](https://codesandbox.io/s/excalidraw-types-9h2dm)
 
 #### In Browser
 
@@ -173,7 +183,7 @@ For development use :point_down:
 ```js
 <script
   type="text/javascript"
-  src="https://unpkg.com/@excalidraw/excalidraw@0.8.0/dist/excalidraw.development.js"
+  src="https://unpkg.com/@excalidraw/excalidraw-next/dist/excalidraw.development.js"
 ></script>
 ```
 
@@ -182,7 +192,7 @@ For production use :point_down:
 ```js
 <script
   type="text/javascript"
-  src="https://unpkg.com/@excalidraw/excalidraw@0.8.0/dist/excalidraw.production.min.js"
+  src="https://unpkg.com/@excalidraw/excalidraw-next/dist/excalidraw.production.min.js"
 ></script>
 ```
 
@@ -201,7 +211,7 @@ You will need to make sure `react`, `react-dom` is available as shown in the bel
 
     <script
       type="text/javascript"
-      src="https://unpkg.com/@excalidraw/excalidraw@0.8.0/dist/excalidraw.development.js"
+      src="https://unpkg.com/@excalidraw/excalidraw-next/dist/excalidraw.development.js"
     ></script>
   </head>
 
@@ -353,7 +363,6 @@ To view the full example visit :point_down:
 | [`onCollabButtonClick`](#onCollabButtonClick) | Function |  | Callback to be triggered when the collab button is clicked |
 | [`isCollaborating`](#isCollaborating) | `boolean` |  | This implies if the app is in collaboration mode |
 | [`onPointerUpdate`](#onPointerUpdate) | Function |  | Callback triggered when mouse pointer is updated. |
-| [`onExportToBackend`](#onExportToBackend) | Function |  | Callback triggered when link button is clicked on export dialog |
 | [`langCode`](#langCode) | string | `en` | Language code string |
 | [`renderTopRightUI`](#renderTopRightUI) | Function |  | Function that renders custom UI in top right corner |
 | [`renderFooter `](#renderFooter) | Function |  | Function that renders custom UI footer |
@@ -478,10 +487,6 @@ This callback is triggered when mouse pointer is updated.
 
 3.`pointersMap`: [`pointers map`](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L131) of the scene
 
-#### `onExportToBackend`
-
-This callback is triggered when the shareable-link button is clicked in the export dialog. The link button will only be shown if this callback is passed.
-
 ```js
 (exportedElements, appState, canvas) => void
 ```
@@ -495,7 +500,7 @@ This callback is triggered when the shareable-link button is clicked in the expo
 Determines the language of the UI. It should be one of the [available language codes](https://github.com/excalidraw/excalidraw/blob/master/src/i18n.ts#L14). Defaults to `en` (English). We also export default language and supported languages which you can import as shown below.
 
 ```js
-import { defaultLang, languages } from "@excalidraw/excalidraw";
+import { defaultLang, languages } from "@excalidraw/excalidraw-next";
 ```
 
 | name | type |
@@ -561,11 +566,21 @@ This prop can be used to customise UI of Excalidraw. Currently we support custom
 | --- | --- | --- | --- |
 | `changeViewBackgroundColor` | boolean | true | Implies whether to show `Background color picker` |
 | `clearCanvas` | boolean | true | Implies whether to show `Clear canvas button` |
-| `export` | boolean | true | Implies whether to show `Export button` |
+| `export` | false &#124; [exportOpts](#exportOpts) | <pre>{ saveFileToDisk: true }</pre> | This prop allows to customize the UI inside the export dialog. By default it shows the "saveFileToDisk". If this prop is `false` the export button will not be rendered. For more details visit [`exportOpts`](#exportOpts). |
 | `loadScene` | boolean | true | Implies whether to show `Load button` |
-| `saveAsScene` | boolean | true | Implies whether to show `Save as button` |
-| `saveScene` | boolean | true | Implies whether to show `Save button` |
+| `saveToActiveFile` | boolean | true | Implies whether to show `Save button` to save to current file |
 | `theme` | boolean | true | Implies whether to show `Theme toggle` |
+| `saveAsImage` | boolean | true | Implies whether to show `Save as image button` |
+
+#### `exportOpts`
+
+The below attributes can be set in `UIOptions.canvasActions.export` to customize the export dialog. If `UIOptions.canvasActions.export` is `false` the export button will not be rendered.
+
+| Attribute | Type | Default | Description |
+| --- | --- | --- | --- |
+| `saveFileToDisk` | boolean | true | Implies if save file to disk button should be shown |
+| `exportToBackend` | <pre> (exportedElements: readonly NonDeletedExcalidrawElement[],appState: AppState,canvas: HTMLCanvasElement &#124; null) => void </pre> |  | This callback is triggered when the shareable-link button is clicked in the export dialog. The link button will only be shown if this callback is passed. |
+| `renderCustomUI` | <pre> (exportedElements: readonly NonDeletedExcalidrawElement[],appState: AppState,canvas: HTMLCanvasElement &#124; null) => void </pre> |  | This callback should be supplied if you want to render custom UI in the export dialog. |
 
 #### `onPaste`
 
@@ -636,7 +651,7 @@ The unique id of the excalidraw component. This can be used to identify the exca
 **How to use**
 
 <pre>
-import { getSceneVersion } from "@excalidraw/excalidraw";
+import { getSceneVersion } from "@excalidraw/excalidraw-next";
 getSceneVersion(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>)
 </pre>
 
@@ -653,7 +668,7 @@ isInvisiblySmallElement(element:  <a href="https://github.com/excalidraw/excalid
 **How to use**
 
 ```js
-import { isInvisiblySmallElement } from "@excalidraw/excalidraw";
+import { isInvisiblySmallElement } from "@excalidraw/excalidraw-next";
 ```
 
 Returns `true` if element is invisibly small (e.g. width & height are zero).
@@ -669,7 +684,7 @@ getElementsMap(elements:  <a href="https://github.com/excalidraw/excalidraw/blob
 **How to use**
 
 ```js
-import { getElementsMap } from "@excalidraw/excalidraw";
+import { getElementsMap } from "@excalidraw/excalidraw-next";
 ```
 
 This function returns an object where each element is mapped to its id.
@@ -687,7 +702,7 @@ restoreAppState(appState:  <a href="https://github.com/excalidraw/excalidraw/blo
 **_How to use_**
 
 ```js
-import { restoreAppState } from "@excalidraw/excalidraw";
+import { restoreAppState } from "@excalidraw/excalidraw-next";
 ```
 
 This function will make sure all the keys have appropriate values in [appState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L42) and if any key is missing, it will be set to default value. If you pass `localAppState`, `localAppState` value will be preferred over the `appState` passed in params.
@@ -703,7 +718,7 @@ restoreElements(elements:  <a href="https://github.com/excalidraw/excalidraw/blo
 **_How to use_**
 
 ```js
-import { restoreElements } from "@excalidraw/excalidraw";
+import { restoreElements } from "@excalidraw/excalidraw-next";
 ```
 
 This function will make sure all properties of element is correctly set and if any attribute is missing, it will be set to default value.
@@ -719,7 +734,7 @@ restoreElements(data:  <a href="https://github.com/excalidraw/excalidraw/blob/ma
 **_How to use_**
 
 ```js
-import { restore } from "@excalidraw/excalidraw";
+import { restore } from "@excalidraw/excalidraw-next";
 ```
 
 This function makes sure elements and state is set to appropriate values and set to default value if not present. It is combination of [restoreElements](#restoreElements) and [restoreAppState](#restoreAppState)
@@ -760,7 +775,7 @@ Takes the scene elements and state and returns a JSON string. Deleted `elements`
 **How to use**
 
 ```js
-import { exportToCanvas } from "@excalidraw/excalidraw";
+import { exportToCanvas } from "@excalidraw/excalidraw-next";
 ```
 
 This function returns the canvas with the exported elements, appState and dimensions.
@@ -786,7 +801,7 @@ exportToBlob(
 **How to use**
 
 ```js
-import { exportToBlob } from "@excalidraw/excalidraw";
+import { exportToBlob } from "@excalidraw/excalidraw-next";
 ```
 
 Returns a promise which resolves with a [blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob). It internally uses [canvas.ToBlob](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob).
@@ -819,5 +834,4 @@ This function returns a svg with the exported elements.
 | --- | --- | --- | --- |
 | exportBackground | boolean | true | Indicates whether background should be exported |
 | viewBackgroundColor | string | #fff | The default background color |
-| shouldAddWatermark | boolean | false | Indicates whether watermark should be exported |
 | exportWithDarkMode | boolean | false | Indicates whether to export with dark mode |

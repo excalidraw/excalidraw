@@ -340,7 +340,7 @@ const ExcalidrawWrapper = () => {
           rel="noopener noreferrer"
           aria-label={t("encrypted.link")}
         >
-          <Tooltip label={t("encrypted.tooltip")} position="above" long={true}>
+          <Tooltip label={t("encrypted.tooltip")} long={true}>
             {shield}
           </Tooltip>
         </a>
@@ -424,7 +424,13 @@ const ExcalidrawWrapper = () => {
         onCollabButtonClick={collabAPI?.onCollabButtonClick}
         isCollaborating={collabAPI?.isCollaborating()}
         onPointerUpdate={collabAPI?.onPointerUpdate}
-        onExportToBackend={onExportToBackend}
+        UIOptions={{
+          canvasActions: {
+            export: {
+              onExportToBackend,
+            },
+          },
+        }}
         renderTopRightUI={renderTopRightUI}
         renderFooter={renderFooter}
         langCode={langCode}

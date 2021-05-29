@@ -66,9 +66,8 @@ export type ActionName =
   | "changeProjectName"
   | "changeExportBackground"
   | "changeExportEmbedScene"
-  | "changeShouldAddWatermark"
-  | "saveScene"
-  | "saveAsScene"
+  | "saveToActiveFile"
+  | "saveFileToDisk"
   | "loadScene"
   | "duplicateSelection"
   | "deleteSelectedElements"
@@ -131,4 +130,5 @@ export interface ActionsManagerInterface {
   registerAction: (action: Action) => void;
   handleKeyDown: (event: React.KeyboardEvent | KeyboardEvent) => boolean;
   renderAction: (name: ActionName) => React.ReactElement | null;
+  executeAction: (action: Action) => void;
 }
