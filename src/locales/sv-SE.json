@@ -20,6 +20,10 @@
     "background": "Bakgrund",
     "fill": "Fyllnad",
     "strokeWidth": "Linjebredd",
+    "strokeShape": "Linjeform",
+    "strokeShape_gel": "Gelépenna",
+    "strokeShape_fountain": "Reservoarpenna",
+    "strokeShape_brush": "Penselpenna",
     "strokeStyle": "Linjestil",
     "strokeStyle_solid": "Solid",
     "strokeStyle_dashed": "Streckad",
@@ -38,8 +42,8 @@
     "fontSize": "Teckenstorlek",
     "fontFamily": "Teckensnitt",
     "onlySelected": "Endast markering",
-    "withBackground": "Med bakgrund",
-    "exportEmbedScene": "Bädda in skiss i exporterad fil",
+    "withBackground": "Bakgrund",
+    "exportEmbedScene": "Bädda in skiss",
     "exportEmbedScene_details": "Skissdata kommer att sparas i den exporterade PNG/SVG-filen så att skissen kan återställas från den.\nKommer att öka exporterad filstorlek.",
     "addWatermark": "Lägg till \"Skapad med Excalidraw\"",
     "handDrawn": "Handritad",
@@ -96,17 +100,20 @@
     "flipVertical": "Vänd vertikalt",
     "viewMode": "Visningsläge",
     "toggleExportColorScheme": "Växla färgschema för export",
-    "share": "Dela"
+    "share": "Dela",
+    "toggleTheme": "Växla tema"
   },
   "buttons": {
     "clearReset": "Återställ canvasen",
+    "exportJSON": "Exportera till fil",
+    "exportImage": "Spara som bild",
     "export": "Exportera",
     "exportToPng": "Exportera till PNG",
     "exportToSvg": "Exportera till SVG",
     "copyToClipboard": "Kopiera till urklipp",
     "copyPngToClipboard": "Kopiera PNG till urklipp",
     "scale": "Skala",
-    "save": "Spara",
+    "save": "Spara till aktuell fil",
     "saveAs": "Spara som",
     "load": "Öppna",
     "getShareableLink": "Hämta delbar länk",
@@ -152,12 +159,12 @@
   },
   "toolBar": {
     "selection": "Markering",
-    "freedraw": "Frihand",
     "rectangle": "Rektangel",
     "diamond": "Diamant",
     "ellipse": "Ellips",
     "arrow": "Pil",
     "line": "Linje",
+    "freedraw": "Rita",
     "text": "Text",
     "library": "Bibliotek",
     "lock": "Håll valt verktyg aktivt efter ritande"
@@ -209,6 +216,14 @@
   },
   "errorDialog": {
     "title": "Fel"
+  },
+  "exportDialog": {
+    "disk_title": "Spara till disk",
+    "disk_details": "Exportera skissdata till en fil som du kan importera från senare.",
+    "disk_button": "Spara till fil",
+    "link_title": "Delbar länk",
+    "link_details": "Exportera som en skrivskyddad länk.",
+    "link_button": "Exportera till länk"
   },
   "helpDialog": {
     "blog": "Läs vår blogg",

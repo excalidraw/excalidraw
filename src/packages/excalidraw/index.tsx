@@ -7,7 +7,7 @@ import App from "../../components/App";
 import "../../css/app.scss";
 import "../../css/styles.scss";
 
-import { ExcalidrawAPIRefValue, ExcalidrawProps } from "../../types";
+import { AppProps, ExcalidrawAPIRefValue, ExcalidrawProps } from "../../types";
 import { defaultLang } from "../../i18n";
 import { DEFAULT_UI_OPTIONS } from "../../constants";
 
@@ -19,7 +19,6 @@ const Excalidraw = (props: ExcalidrawProps) => {
     onCollabButtonClick,
     isCollaborating,
     onPointerUpdate,
-    onExportToBackend,
     renderTopRightUI,
     renderFooter,
     langCode = defaultLang.code,
@@ -38,12 +37,18 @@ const Excalidraw = (props: ExcalidrawProps) => {
 
   const canvasActions = props.UIOptions?.canvasActions;
 
-  const UIOptions = {
+  const UIOptions: AppProps["UIOptions"] = {
     canvasActions: {
       ...DEFAULT_UI_OPTIONS.canvasActions,
       ...canvasActions,
     },
   };
+
+  if (canvasActions?.export) {
+    UIOptions.canvasActions.export.saveFileToDisk =
+      canvasActions.export?.saveFileToDisk ||
+      DEFAULT_UI_OPTIONS.canvasActions.export.saveFileToDisk;
+  }
 
   useEffect(() => {
     // Block pinch-zooming on iOS outside of the content area
@@ -72,7 +77,6 @@ const Excalidraw = (props: ExcalidrawProps) => {
         onCollabButtonClick={onCollabButtonClick}
         isCollaborating={isCollaborating}
         onPointerUpdate={onPointerUpdate}
-        onExportToBackend={onExportToBackend}
         renderTopRightUI={renderTopRightUI}
         renderFooter={renderFooter}
         langCode={langCode}
@@ -99,12 +103,58 @@ const areEqual = (
   prevProps: PublicExcalidrawProps,
   nextProps: PublicExcalidrawProps,
 ) => {
-  const { initialData: prevInitialData, ...prev } = prevProps;
-  const { initialData: nextInitialData, ...next } = nextProps;
+  const {
+    initialData: prevInitialData,
+    UIOptions: prevUIOptions = {},
+    ...prev
+  } = prevProps;
+  const {
+    initialData: nextInitialData,
+    UIOptions: nextUIOptions = {},
+    ...next
+  } = nextProps;
+
+  // comparing UIOptions
+  const prevUIOptionsKeys = Object.keys(prevUIOptions) as (keyof Partial<
+    typeof DEFAULT_UI_OPTIONS
+  >)[];
+  const nextUIOptionsKeys = Object.keys(nextUIOptions) as (keyof Partial<
+    typeof DEFAULT_UI_OPTIONS
+  >)[];
+
+  if (prevUIOptionsKeys.length !== nextUIOptionsKeys.length) {
+    return false;
+  }
+
+  const isUIOptionsSame = prevUIOptionsKeys.every((key) => {
+    if (key === "canvasActions") {
+      const canvasOptionKeys = Object.keys(
+        prevUIOptions.canvasActions!,
+      ) as (keyof Partial<typeof DEFAULT_UI_OPTIONS.canvasActions>)[];
+      canvasOptionKeys.every((key) => {
+        if (
+          key === "export" &&
+          prevUIOptions?.canvasActions?.export &&
+          nextUIOptions?.canvasActions?.export
+        ) {
+          return (
+            prevUIOptions.canvasActions.export.saveFileToDisk ===
+            nextUIOptions.canvasActions.export.saveFileToDisk
+          );
+        }
+        return (
+          prevUIOptions?.canvasActions?.[key] ===
+          nextUIOptions?.canvasActions?.[key]
+        );
+      });
+    }
+    return true;
+  });
 
   const prevKeys = Object.keys(prevProps) as (keyof typeof prev)[];
   const nextKeys = Object.keys(nextProps) as (keyof typeof next)[];
   return (
+    isUIOptionsSame &&
     prevKeys.length === nextKeys.length &&
     prevKeys.every((key) => prev[key] === next[key])
   );

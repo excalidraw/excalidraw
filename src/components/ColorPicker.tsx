@@ -238,13 +238,16 @@ export const ColorPicker = ({
   color,
   onChange,
   label,
+  isActive,
+  setActive,
 }: {
   type: "canvasBackground" | "elementBackground" | "elementStroke";
   color: string | null;
   onChange: (color: string) => void;
   label: string;
+  isActive: boolean;
+  setActive: (active: boolean) => void;
 }) => {
-  const [isActive, setActive] = React.useState(false);
   const pickerButton = React.useRef<HTMLButtonElement>(null);
 
   return (

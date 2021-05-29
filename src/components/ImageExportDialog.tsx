@@ -6,15 +6,19 @@ import { canvasToBlob } from "../data/blob";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { CanvasError } from "../errors";
 import { t } from "../i18n";
-import { useIsMobile } from "../components/App";
+import { useIsMobile } from "./App";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { exportToCanvas, getExportSize } from "../scene/export";
 import { AppState } from "../types";
 import { Dialog } from "./Dialog";
-import "./ExportDialog.scss";
-import { clipboard, exportFile, link } from "./icons";
+import { clipboard, exportImage } from "./icons";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
+
+import "./ExportDialog.scss";
+import { supported as fsSupported } from "browser-fs-access";
+import OpenColor from "open-color";
+import { CheckboxItem } from "./CheckboxItem";
 
 const scales = [1, 2, 3];
 const defaultScale = scales.includes(devicePixelRatio) ? devicePixelRatio : 1;
@@ -52,7 +56,30 @@ export type ExportCB = (
   scale?: number,
 ) => void;
 
-const ExportModal = ({
+const ExportButton: React.FC<{
+  color: keyof OpenColor;
+  onClick: () => void;
+  title: string;
+  shade?: number;
+}> = ({ children, title, onClick, color, shade = 6 }) => {
+  return (
+    <button
+      className="ExportDialog-imageExportButton"
+      style={{
+        ["--button-color" as any]: OpenColor[color][shade],
+        ["--button-color-darker" as any]: OpenColor[color][shade + 1],
+        ["--button-color-darkest" as any]: OpenColor[color][shade + 2],
+      }}
+      title={title}
+      aria-label={title}
+      onClick={onClick}
+    >
+      {children}
+    </button>
+  );
+};
+
+const ImageExportModal = ({
   elements,
   appState,
   exportPadding = 10,
@@ -60,7 +87,6 @@ const ExportModal = ({
   onExportToPng,
   onExportToSvg,
   onExportToClipboard,
-  onExportToBackend,
 }: {
   appState: AppState;
   elements: readonly NonDeletedExcalidrawElement[];
@@ -69,18 +95,13 @@ const ExportModal = ({
   onExportToPng: ExportCB;
   onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
-  onExportToBackend?: ExportCB;
   onCloseRequest: () => void;
 }) => {
   const someElementIsSelected = isSomeElementSelected(elements, appState);
   const [scale, setScale] = useState(defaultScale);
   const [exportSelected, setExportSelected] = useState(someElementIsSelected);
   const previewRef = useRef<HTMLDivElement>(null);
-  const {
-    exportBackground,
-    viewBackgroundColor,
-    shouldAddWatermark,
-  } = appState;
+  const { exportBackground, viewBackgroundColor } = appState;
 
   const exportedElements = exportSelected
     ? getSelectedElements(elements, appState)
@@ -101,7 +122,6 @@ const ExportModal = ({
         viewBackgroundColor,
         exportPadding,
         scale,
-        shouldAddWatermark,
       });
 
       // if converting to blob fails, there's some problem that will
@@ -125,7 +145,6 @@ const ExportModal = ({
     exportPadding,
     viewBackgroundColor,
     scale,
-    shouldAddWatermark,
   ]);
 
   return (
@@ -133,98 +152,102 @@ const ExportModal = ({
       <div className="ExportDialog__preview" ref={previewRef} />
       {supportsContextFilters &&
         actionManager.renderAction("exportWithDarkMode")}
-      <Stack.Col gap={2} align="center">
-        <div className="ExportDialog__actions">
-          <Stack.Row gap={2}>
-            <ToolButton
-              type="button"
-              label="PNG"
-              title={t("buttons.exportToPng")}
-              aria-label={t("buttons.exportToPng")}
-              onClick={() => onExportToPng(exportedElements, scale)}
-            />
-            <ToolButton
-              type="button"
-              label="SVG"
-              title={t("buttons.exportToSvg")}
-              aria-label={t("buttons.exportToSvg")}
-              onClick={() => onExportToSvg(exportedElements, scale)}
-            />
-            {probablySupportsClipboardBlob && (
-              <ToolButton
-                type="button"
-                icon={clipboard}
-                title={t("buttons.copyPngToClipboard")}
-                aria-label={t("buttons.copyPngToClipboard")}
-                onClick={() => onExportToClipboard(exportedElements, scale)}
-              />
-            )}
-            {onExportToBackend && (
-              <ToolButton
-                type="button"
-                icon={link}
-                title={t("buttons.getShareableLink")}
-                aria-label={t("buttons.getShareableLink")}
-                onClick={() => onExportToBackend(exportedElements)}
-              />
-            )}
-          </Stack.Row>
-          <div className="ExportDialog__name">
-            {actionManager.renderAction("changeProjectName")}
-          </div>
-          <Stack.Row gap={2}>
-            {scales.map((s) => {
-              const [width, height] = getExportSize(
-                exportedElements,
-                exportPadding,
-                shouldAddWatermark,
-                s,
-              );
-
-              const scaleButtonTitle = `${t(
-                "buttons.scale",
-              )} ${s}x (${width}x${height})`;
-
-              return (
-                <ToolButton
-                  key={s}
-                  size="s"
-                  type="radio"
-                  icon={`${s}x`}
-                  name="export-canvas-scale"
-                  title={scaleButtonTitle}
-                  aria-label={scaleButtonTitle}
-                  id="export-canvas-scale"
-                  checked={s === scale}
-                  onChange={() => setScale(s)}
-                />
-              );
-            })}
-          </Stack.Row>
-        </div>
-        {actionManager.renderAction("changeExportBackground")}
-        {someElementIsSelected && (
-          <div>
-            <label>
-              <input
-                type="checkbox"
-                checked={exportSelected}
-                onChange={(event) =>
-                  setExportSelected(event.currentTarget.checked)
-                }
-              />{" "}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr" }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
+            // dunno why this is needed, but when the items wrap it creates
+            // an overflow
+            overflow: "hidden",
+          }}
+        >
+          {actionManager.renderAction("changeExportBackground")}
+          {someElementIsSelected && (
+            <CheckboxItem
+              checked={exportSelected}
+              onChange={(checked) => setExportSelected(checked)}
+            >
               {t("labels.onlySelected")}
-            </label>
-          </div>
+            </CheckboxItem>
+          )}
+          {actionManager.renderAction("changeExportEmbedScene")}
+        </div>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", marginTop: ".6em" }}>
+        <Stack.Row gap={2} justifyContent={"center"}>
+          {scales.map((_scale) => {
+            const [width, height] = getExportSize(
+              exportedElements,
+              exportPadding,
+              _scale,
+            );
+
+            const scaleButtonTitle = `${t(
+              "buttons.scale",
+            )} ${_scale}x (${width}x${height})`;
+
+            return (
+              <ToolButton
+                key={_scale}
+                size="s"
+                type="radio"
+                icon={`${_scale}x`}
+                name="export-canvas-scale"
+                title={scaleButtonTitle}
+                aria-label={scaleButtonTitle}
+                id="export-canvas-scale"
+                checked={_scale === scale}
+                onChange={() => setScale(_scale)}
+              />
+            );
+          })}
+        </Stack.Row>
+        <p style={{ marginLeft: "1em", userSelect: "none" }}>Scale</p>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          margin: ".6em 0",
+        }}
+      >
+        {!fsSupported && actionManager.renderAction("changeProjectName")}
+      </div>
+      <Stack.Row gap={2} justifyContent="center" style={{ margin: "2em 0" }}>
+        <ExportButton
+          color="indigo"
+          title={t("buttons.exportToPng")}
+          aria-label={t("buttons.exportToPng")}
+          onClick={() => onExportToPng(exportedElements, scale)}
+        >
+          PNG
+        </ExportButton>
+        <ExportButton
+          color="red"
+          title={t("buttons.exportToSvg")}
+          aria-label={t("buttons.exportToSvg")}
+          onClick={() => onExportToSvg(exportedElements, scale)}
+        >
+          SVG
+        </ExportButton>
+        {probablySupportsClipboardBlob && (
+          <ExportButton
+            title={t("buttons.copyPngToClipboard")}
+            onClick={() => onExportToClipboard(exportedElements, scale)}
+            color="gray"
+            shade={7}
+          >
+            {clipboard}
+          </ExportButton>
         )}
-        {actionManager.renderAction("changeExportEmbedScene")}
-        {actionManager.renderAction("changeShouldAddWatermark")}
-      </Stack.Col>
+      </Stack.Row>
     </div>
   );
 };
 
-export const ExportDialog = ({
+export const ImageExportDialog = ({
   elements,
   appState,
   exportPadding = 10,
@@ -232,7 +255,6 @@ export const ExportDialog = ({
   onExportToPng,
   onExportToSvg,
   onExportToClipboard,
-  onExportToBackend,
 }: {
   appState: AppState;
   elements: readonly NonDeletedExcalidrawElement[];
@@ -241,7 +263,6 @@ export const ExportDialog = ({
   onExportToPng: ExportCB;
   onExportToSvg: ExportCB;
   onExportToClipboard: ExportCB;
-  onExportToBackend?: ExportCB;
 }) => {
   const [modalIsShown, setModalIsShown] = useState(false);
 
@@ -255,16 +276,16 @@ export const ExportDialog = ({
         onClick={() => {
           setModalIsShown(true);
         }}
-        data-testid="export-button"
-        icon={exportFile}
+        data-testid="image-export-button"
+        icon={exportImage}
         type="button"
-        aria-label={t("buttons.export")}
+        aria-label={t("buttons.exportImage")}
         showAriaLabel={useIsMobile()}
-        title={t("buttons.export")}
+        title={t("buttons.exportImage")}
       />
       {modalIsShown && (
-        <Dialog onCloseRequest={handleClose} title={t("buttons.export")}>
-          <ExportModal
+        <Dialog onCloseRequest={handleClose} title={t("buttons.exportImage")}>
+          <ImageExportModal
             elements={elements}
             appState={appState}
             exportPadding={exportPadding}
@@ -272,7 +293,6 @@ export const ExportDialog = ({
             onExportToPng={onExportToPng}
             onExportToSvg={onExportToSvg}
             onExportToClipboard={onExportToClipboard}
-            onExportToBackend={onExportToBackend}
             onCloseRequest={handleClose}
           />
         </Dialog>

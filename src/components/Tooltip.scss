@@ -1,58 +1,39 @@
 @import "../css/variables.module";
+.excalidraw-tooltip {
+  position: absolute;
+  z-index: 1000;
+
+  padding: 8px;
+  border-radius: 6px;
+  box-sizing: border-box;
+  pointer-events: none;
+  word-wrap: break-word;
+
+  background: $oc-black;
+
+  line-height: 1.5;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: $oc-white;
+
+  display: none;
+
+  &.excalidraw-tooltip--visible {
+    display: block;
+  }
+}
+
 .excalidraw {
-  .Tooltip {
-    position: relative;
-  }
+  .Tooltip-icon {
+    width: 0.9em;
+    height: 0.9em;
+    margin-left: 5px;
+    margin-top: 1px;
+    display: flex;
 
-  .Tooltip__label {
-    --arrow-size: 4px;
-    visibility: hidden;
-    background: $oc-black;
-    color: $oc-white;
-    text-align: center;
-    border-radius: 6px;
-    padding: 8px;
-    position: absolute;
-    z-index: 10;
-    font-size: 13px;
-    line-height: 1.5;
-    font-weight: 500;
-    // extra pixel offset for unknown reasons
-    left: calc(50% + var(--arrow-size) / 2 - 1px);
-    transform: translateX(-50%);
-    word-wrap: break-word;
-
-    &::after {
-      content: "";
-      border: var(--arrow-size) solid transparent;
-      position: absolute;
-      left: calc(50% - var(--arrow-size));
+    @include isMobile {
+      display: none;
     }
-
-    &--above {
-      bottom: calc(100% + var(--arrow-size) + 3px);
-
-      &::after {
-        border-top-color: $oc-black;
-        top: 100%;
-      }
-    }
-
-    &--below {
-      top: calc(100% + var(--arrow-size) + 3px);
-
-      &::after {
-        border-bottom-color: $oc-black;
-        bottom: 100%;
-      }
-    }
-  }
-
-  .Tooltip:hover .Tooltip__label {
-    visibility: visible;
-  }
-
-  .Tooltip__label:hover {
-    visibility: visible;
   }
 }

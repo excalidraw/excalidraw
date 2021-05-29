@@ -24,14 +24,12 @@ export const exportCanvas = async (
     viewBackgroundColor,
     name,
     scale = 1,
-    shouldAddWatermark,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
     name: string;
     scale?: number;
-    shouldAddWatermark: boolean;
   },
 ) => {
   if (elements.length === 0) {
@@ -44,7 +42,6 @@ export const exportCanvas = async (
       viewBackgroundColor,
       exportPadding,
       scale,
-      shouldAddWatermark,
       metadata:
         appState.exportEmbedScene && type === "svg"
           ? await (
@@ -71,7 +68,6 @@ export const exportCanvas = async (
     viewBackgroundColor,
     exportPadding,
     scale,
-    shouldAddWatermark,
   });
   tempCanvas.style.display = "none";
   document.body.appendChild(tempCanvas);

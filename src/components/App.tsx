@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
 import clsx from "clsx";
-import { supported } from "browser-fs-access";
+import { supported as fsSupported } from "browser-fs-access";
 import { nanoid } from "nanoid";
 
 import {
@@ -452,7 +452,6 @@ class App extends React.Component<AppProps, AppState> {
 
     const {
       onCollabButtonClick,
-      onExportToBackend,
       renderTopRightUI,
       renderFooter,
       renderCustomStats,
@@ -493,7 +492,6 @@ class App extends React.Component<AppProps, AppState> {
               toggleZenMode={this.toggleZenMode}
               langCode={getLanguage().code}
               isCollaborating={this.props.isCollaborating || false}
-              onExportToBackend={onExportToBackend}
               renderTopRightUI={renderTopRightUI}
               renderCustomFooter={renderFooter}
               viewModeEnabled={viewModeEnabled}
@@ -1644,6 +1642,21 @@ class App extends React.Component<AppProps, AppState> {
       if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
         isHoldingSpace = true;
         setCursor(this.canvas, CURSOR_TYPE.GRABBING);
+      }
+
+      if (event.key === KEYS.G || event.key === KEYS.S) {
+        const selectedElements = getSelectedElements(
+          this.scene.getElements(),
+          this.state,
+        );
+        if (selectedElements.length) {
+          if (event.key === KEYS.G) {
+            this.setState({ openMenu: "backgroundColorPicker" });
+          }
+          if (event.key === KEYS.S) {
+            this.setState({ openMenu: "strokeColorPicker" });
+          }
+        }
       }
     },
   );
@@ -3885,7 +3898,7 @@ class App extends React.Component<AppProps, AppState> {
       // default: assume an Excalidraw file regardless of extension/MimeType
     } else {
       this.setState({ isLoading: true });
-      if (supported) {
+      if (fsSupported) {
         try {
           // This will only work as of Chrome 86,
           // but can be safely ignored on older releases.

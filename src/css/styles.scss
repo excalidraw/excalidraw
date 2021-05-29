@@ -358,10 +358,6 @@
     }
   }
 
-  .layer-ui__wrapper:not(.disable-pointerEvents) .App-menu_bottom > * {
-    pointer-events: all;
-  }
-
   .App-menu_bottom > *:first-child {
     justify-self: flex-start;
   }
