@@ -22,16 +22,17 @@ const JSONExportModal = ({
   elements,
   appState,
   actionManager,
-  onExportToBackend,
   exportOpts,
+  canvas,
 }: {
   appState: AppState;
   elements: readonly NonDeletedExcalidrawElement[];
   actionManager: ActionsManagerInterface;
-  onExportToBackend?: ExportCB;
   onCloseRequest: () => void;
   exportOpts: ExportOpts;
+  canvas: HTMLCanvasElement | null;
 }) => {
+  const { onExportToBackend } = exportOpts;
   return (
     <div className="ExportDialog ExportDialog--json">
       <div className="ExportDialog-cards">
@@ -55,7 +56,7 @@ const JSONExportModal = ({
             />
           </Card>
         )}
-        {exportOpts.onExportToBackend && (
+        {onExportToBackend && (
           <Card color="pink">
             <div className="Card-icon">{link}</div>
             <h2>{t("exportDialog.link_title")}</h2>
@@ -66,10 +67,12 @@ const JSONExportModal = ({
               title={t("exportDialog.link_button")}
               aria-label={t("exportDialog.link_button")}
               showAriaLabel={true}
-              onClick={() => onExportToBackend!(elements)}
+              onClick={() => onExportToBackend(elements, appState, canvas)}
             />
           </Card>
         )}
+        {exportOpts.renderCustomUI &&
+          exportOpts.renderCustomUI(elements, appState, canvas)}
       </div>
     </div>
   );
@@ -79,14 +82,14 @@ export const JSONExportDialog = ({
   elements,
   appState,
   actionManager,
-  onExportToBackend,
   exportOpts,
+  canvas,
 }: {
   appState: AppState;
   elements: readonly NonDeletedExcalidrawElement[];
   actionManager: ActionsManagerInterface;
-  onExportToBackend?: ExportCB;
   exportOpts: ExportOpts;
+  canvas: HTMLCanvasElement | null;
 }) => {
   const [modalIsShown, setModalIsShown] = useState(false);
 
@@ -113,9 +116,9 @@ export const JSONExportDialog = ({
             elements={elements}
             appState={appState}
             actionManager={actionManager}
-            onExportToBackend={onExportToBackend}
             onCloseRequest={handleClose}
             exportOpts={exportOpts}
+            canvas={canvas}
           />
         </Dialog>
       )}
