@@ -1858,9 +1858,21 @@ class App extends React.Component<AppProps, AppState> {
   private getElementAtPosition(
     x: number,
     y: number,
+    opts?: {
+      /** if true, returns the first selected element (with highest z-index)
+        of all hit elements */
+      preferSelected?: boolean;
+    },
   ): NonDeleted<ExcalidrawElement> | null {
     const allHitElements = this.getElementsAtPosition(x, y);
     if (allHitElements.length > 1) {
+      if (opts?.preferSelected) {
+        for (let index = allHitElements.length - 1; index > -1; index--) {
+          if (this.state.selectedElementIds[allHitElements[index].id]) {
+            return allHitElements[index];
+          }
+        }
+      }
       const elementWithHighestZIndex =
         allHitElements[allHitElements.length - 1];
       // If we're hitting element with highest z-index only on its bounding box
@@ -3935,7 +3947,7 @@ class App extends React.Component<AppProps, AppState> {
     event.preventDefault();
 
     const { x, y } = viewportCoordsToSceneCoords(event, this.state);
-    const element = this.getElementAtPosition(x, y);
+    const element = this.getElementAtPosition(x, y, { preferSelected: true });
 
     const type = element ? "element" : "canvas";
 

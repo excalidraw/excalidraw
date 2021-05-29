@@ -20,6 +20,15 @@ const readFile = util.promisify(fs.readFile);
 const { h } = window;
 
 export class API {
+  static setSelectedElements = (elements: ExcalidrawElement[]) => {
+    h.setState({
+      selectedElementIds: elements.reduce((acc, element) => {
+        acc[element.id] = true;
+        return acc;
+      }, {} as Record<ExcalidrawElement["id"], true>),
+    });
+  };
+
   static getSelectedElements = (): ExcalidrawElement[] => {
     return h.elements.filter(
       (element) => h.state.selectedElementIds[element.id],
