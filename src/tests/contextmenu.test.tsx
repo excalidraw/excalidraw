@@ -147,6 +147,46 @@ describe("contextMenu element", () => {
     });
   });
 
+  it("shows context menu for element", () => {
+    const rect1 = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      height: 200,
+      width: 200,
+      backgroundColor: "red",
+    });
+    const rect2 = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      height: 200,
+      width: 200,
+      backgroundColor: "red",
+    });
+    h.elements = [rect1, rect2];
+    h.setState({ selectedElementIds: { [rect1.id]: true } });
+
+    // lower z-index
+    fireEvent.contextMenu(GlobalTestState.canvas, {
+      button: 2,
+      clientX: 100,
+      clientY: 100,
+    });
+    expect(queryContextMenu()).not.toBeNull();
+    expect(API.getSelectedElement().id).toBe(rect1.id);
+
+    // higher z-index
+    h.setState({ selectedElementIds: { [rect2.id]: true } });
+    fireEvent.contextMenu(GlobalTestState.canvas, {
+      button: 2,
+      clientX: 100,
+      clientY: 100,
+    });
+    expect(queryContextMenu()).not.toBeNull();
+    expect(API.getSelectedElement().id).toBe(rect2.id);
+  });
+
   it("shows 'Group selection' in context menu for multiple selected elements", () => {
     UI.clickTool("rectangle");
     mouse.down(10, 10);
