@@ -7,20 +7,18 @@ import * as Renderer from "../renderer/renderScene";
 import { setDateTimeForTests } from "../utils";
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
-import { fireEvent, render, screen, waitFor } from "./test-utils";
+import {
+  assertSelectedElements,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "./test-utils";
 import { defaultLang } from "../i18n";
 
 const { h } = window;
 
 const renderScene = jest.spyOn(Renderer, "renderScene");
-
-const assertSelectedElements = (...elements: ExcalidrawElement[]) => {
-  expect(
-    API.getSelectedElements().map((element) => {
-      return element.id;
-    }),
-  ).toEqual(expect.arrayContaining(elements.map((element) => element.id)));
-};
 
 const mouse = new Pointer("mouse");
 const finger1 = new Pointer("touch", 1);

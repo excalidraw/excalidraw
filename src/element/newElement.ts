@@ -307,7 +307,19 @@ export const duplicateElement = <TElement extends Mutable<ExcalidrawElement>>(
   overrides?: Partial<TElement>,
 ): TElement => {
   let copy: TElement = deepCopyElement(element);
-  copy.id = process.env.NODE_ENV === "test" ? `${copy.id}_copy` : randomId();
+  if (process.env.NODE_ENV === "test") {
+    copy.id = `${copy.id}_copy`;
+    // `window.h` may not be defined in some unit tests
+    if (
+      window.h?.app
+        ?.getSceneElementsIncludingDeleted()
+        .find((el) => el.id === copy.id)
+    ) {
+      copy.id += "_copy";
+    }
+  } else {
+    copy.id = randomId();
+  }
   copy.seed = randomInteger();
   copy.groupIds = getNewGroupIdsForDuplication(
     copy.groupIds,
