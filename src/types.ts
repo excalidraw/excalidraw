@@ -230,6 +230,7 @@ type CanvasActions = {
   loadScene?: boolean;
   saveToActiveFile?: boolean;
   theme?: boolean;
+  saveAsImage?: boolean;
 };
 
 export type UIOptions = {
