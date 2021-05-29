@@ -4459,6 +4459,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
