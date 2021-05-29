@@ -570,6 +570,7 @@ This prop can be used to customise UI of Excalidraw. Currently we support custom
 | `loadScene` | boolean | true | Implies whether to show `Load button` |
 | `saveToActiveFile` | boolean | true | Implies whether to show `Save button` to save to current file |
 | `theme` | boolean | true | Implies whether to show `Theme toggle` |
+| `saveAsImage` | boolean | true | Implies whether to show `Save as image button` |
 
 #### `exportOpts`
 

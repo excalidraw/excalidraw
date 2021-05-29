@@ -167,6 +167,13 @@ describe("<Excalidraw/>", () => {
         );
 
         expect(queryByTestId(container, "json-export-button")).toBeNull();
+      });
+
+      it("should hide 'Save as image' button when 'saveAsImage' is false", async () => {
+        const { container } = await render(
+          <Excalidraw UIOptions={{ canvasActions: { saveAsImage: false } }} />,
+        );
+
         expect(queryByTestId(container, "image-export-button")).toBeNull();
       });
 
