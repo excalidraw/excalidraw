@@ -122,7 +122,7 @@ const APP_STATE_STORAGE_CONF = (<
   errorMessage: { browser: false, export: false },
   exportBackground: { browser: true, export: false },
   exportEmbedScene: { browser: true, export: false },
-  exportScale: { browser: true, export: true },
+  exportScale: { browser: true, export: false },
   exportWithDarkMode: { browser: true, export: false },
   fileHandle: { browser: false, export: false },
   gridSize: { browser: true, export: true },
