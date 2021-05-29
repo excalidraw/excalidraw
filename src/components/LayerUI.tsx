@@ -401,7 +401,7 @@ const LayerUI = ({
   };
 
   const renderImageExportDialog = () => {
-    if (!UIOptions.canvasActions.export) {
+    if (!UIOptions.canvasActions.saveAsImage) {
       return null;
     }
 
