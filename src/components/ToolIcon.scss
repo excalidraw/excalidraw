@@ -130,6 +130,14 @@
     }
 
     .ToolIcon__icon {
+      background-color: var(--button-gray-1);
+      &:hover {
+        background-color: var(--button-gray-2);
+      }
+      &:active {
+        background-color: var(--button-gray-3);
+      }
+
       width: 2rem;
       height: 2em;
     }
