@@ -32,6 +32,7 @@ const JSONExportModal = ({
   exportOpts: ExportOpts;
   canvas: HTMLCanvasElement | null;
 }) => {
+  const { onExportToBackend } = exportOpts;
   return (
     <div className="ExportDialog ExportDialog--json">
       <div className="ExportDialog-cards">
@@ -55,7 +56,7 @@ const JSONExportModal = ({
             />
           </Card>
         )}
-        {exportOpts.onExportToBackend && (
+        {onExportToBackend && (
           <Card color="pink">
             <div className="Card-icon">{link}</div>
             <h2>{t("exportDialog.link_title")}</h2>
@@ -66,9 +67,7 @@ const JSONExportModal = ({
               title={t("exportDialog.link_button")}
               aria-label={t("exportDialog.link_button")}
               showAriaLabel={true}
-              onClick={() =>
-                exportOpts.onExportToBackend!(elements, appState, canvas)
-              }
+              onClick={() => onExportToBackend(elements, appState, canvas)}
             />
           </Card>
         )}
