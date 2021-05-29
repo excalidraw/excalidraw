@@ -21,6 +21,7 @@ interface DehydratedHistoryEntry {
 const clearAppStatePropertiesForHistory = (appState: AppState) => {
   return {
     selectedElementIds: appState.selectedElementIds,
+    selectedGroupIds: appState.selectedGroupIds,
     viewBackgroundColor: appState.viewBackgroundColor,
     editingLinearElement: appState.editingLinearElement,
     editingGroupId: appState.editingGroupId,
@@ -169,7 +170,7 @@ class History {
           continue;
         }
       }
-      if (key === "selectedElementIds") {
+      if (key === "selectedElementIds" || key === "selectedGroupIds") {
         continue;
       }
       if (nextEntry.appState[key] !== lastEntry.appState[key]) {

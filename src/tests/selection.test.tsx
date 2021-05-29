@@ -5,6 +5,7 @@ import {
   fireEvent,
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
+  assertSelectedElements,
 } from "./test-utils";
 import ExcalidrawApp from "../excalidraw-app";
 import * as Renderer from "../renderer/renderScene";
@@ -12,7 +13,6 @@ import { KEYS } from "../keys";
 import { reseed } from "../random";
 import { API } from "./helpers/api";
 import { Keyboard, Pointer } from "./helpers/ui";
-import { getSelectedElements } from "../scene";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
@@ -27,12 +27,6 @@ beforeEach(() => {
 const { h } = window;
 
 const mouse = new Pointer("mouse");
-
-const assertSelectedIds = (ids: string[]) => {
-  expect(
-    getSelectedElements(h.app.getSceneElements(), h.state).map((el) => el.id),
-  ).toEqual(ids);
-};
 
 describe("inner box-selection", () => {
   beforeEach(async () => {
@@ -68,7 +62,7 @@ describe("inner box-selection", () => {
       mouse.moveTo(290, 290);
       mouse.up();
 
-      assertSelectedIds([rect2.id, rect3.id]);
+      assertSelectedElements([rect2.id, rect3.id]);
     });
   });
 
@@ -105,7 +99,7 @@ describe("inner box-selection", () => {
       mouse.moveTo(rect2.x + rect2.width + 10, rect2.y + rect2.height + 10);
       mouse.up();
 
-      assertSelectedIds([rect2.id, rect3.id]);
+      assertSelectedElements([rect2.id, rect3.id]);
       expect(h.state.selectedGroupIds).toEqual({ A: true });
     });
   });
@@ -140,10 +134,10 @@ describe("inner box-selection", () => {
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       mouse.downAt(rect2.x - 20, rect2.x - 20);
       mouse.moveTo(rect2.x + rect2.width + 10, rect2.y + rect2.height + 10);
-      assertSelectedIds([rect2.id, rect3.id]);
+      assertSelectedElements([rect2.id, rect3.id]);
       expect(h.state.selectedGroupIds).toEqual({ A: true });
       mouse.moveTo(rect2.x - 10, rect2.y - 10);
-      assertSelectedIds([rect1.id]);
+      assertSelectedElements([rect1.id]);
       expect(h.state.selectedGroupIds).toEqual({});
       mouse.up();
     });

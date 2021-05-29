@@ -13,6 +13,8 @@ import { ImportedDataState } from "../data/types";
 import { STORAGE_KEYS } from "../excalidraw-app/data/localStorage";
 
 import { SceneData } from "../types";
+import { getSelectedElements } from "../scene/selection";
+import { ExcalidrawElement } from "../element/types";
 
 const customQueries = {
   ...queries,
@@ -123,4 +125,23 @@ export const mockBoundingClientRect = () => {
 
 export const restoreOriginalGetBoundingClientRect = () => {
   global.window.HTMLDivElement.prototype.getBoundingClientRect = originalGetBoundingClientRect;
+};
+
+export const assertSelectedElements = (
+  ...elements: (
+    | (ExcalidrawElement["id"] | ExcalidrawElement)[]
+    | ExcalidrawElement["id"]
+    | ExcalidrawElement
+  )[]
+) => {
+  const { h } = window;
+  const selectedElementIds = getSelectedElements(
+    h.app.getSceneElements(),
+    h.state,
+  ).map((el) => el.id);
+  const ids = elements
+    .flat()
+    .map((item) => (typeof item === "string" ? item : item.id));
+  expect(selectedElementIds.length).toBe(ids.length);
+  expect(selectedElementIds).toEqual(expect.arrayContaining(ids));
 };
