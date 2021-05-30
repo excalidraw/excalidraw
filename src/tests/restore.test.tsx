@@ -29,19 +29,19 @@ beforeEach(async () => {
   await render(<ExcalidrawApp />);
 });
 
-describe("Test general behaviour of restoreElements", () => {
-  it("should return an empty array when array of elements is null", () => {
+describe("restoreElements", () => {
+  it("with null array of elements", () => {
     expect(restore.restoreElements(null)).toStrictEqual([]);
   });
 
-  it("should not restore selection element", () => {
+  it("should not call isInvisiblySmallElement when input element is a selection element", () => {
     UI.createElement("selection", { x: 0 });
     const restoreElements = restore.restoreElements(h.elements);
     expect(restoreElements.length).toBe(0);
     expect(sizeHelpers.isInvisiblySmallElement).toBeCalledTimes(0);
   });
 
-  it("should return an empty array if element type is not supported", () => {
+  it("when input element type is not supported", () => {
     const dummyNotSupportedElement = API.createElement({ type: "text" });
 
     Object.defineProperty(dummyNotSupportedElement, "type", {
@@ -51,16 +51,14 @@ describe("Test general behaviour of restoreElements", () => {
     expect(restore.restoreElements([dummyNotSupportedElement]).length).toBe(0);
   });
 
-  it("should return an array of none elements if element is isInvisiblySmallElement", () => {
+  it("when isInvisiblySmallElement is true", () => {
     UI.createElement("rectangle", { x: 0 });
     mockSizeHelper.mockImplementation(() => true);
 
     expect(restore.restoreElements(h.elements).length).toBe(0);
   });
-});
 
-describe("Test method restoreElements for text elements", () => {
-  it("should return restored text element", () => {
+  it("with text element type", () => {
     const textElement = API.createElement({
       type: "text",
       fontSize: 14,
@@ -97,7 +95,7 @@ describe("Test method restoreElements for text elements", () => {
     expect(gotRestoredTextElement).toMatchObject(expectedTextElement);
   });
 
-  it("should return restored text element in case of null text", () => {
+  it("when text element has null text", () => {
     const textElement = API.createElement({ type: "text" });
 
     Object.defineProperty(textElement, "text", {
@@ -110,7 +108,7 @@ describe("Test method restoreElements for text elements", () => {
     expect(restoredText.text).toBe("");
   });
 
-  it("should return restored text element with DEFAULT_TEXT_ALIGN and DEFAULT_VERTICAL_ALIGN when aligns are undefined", () => {
+  it("when text element has undefined alignment", () => {
     const textElement = API.createElement({
       type: "text",
       textAlign: undefined,
@@ -125,7 +123,7 @@ describe("Test method restoreElements for text elements", () => {
     expect(restoredText.verticalAlign).toBe(DEFAULT_VERTICAL_ALIGN);
   });
 
-  it("should return restored text element when it has font property", () => {
+  it("when text element has font property", () => {
     const textElement = API.createElement({
       type: "text",
       fontSize: 14,
@@ -146,7 +144,7 @@ describe("Test method restoreElements for text elements", () => {
     expect(restoredText.fontFamily).toBe(3);
   });
 
-  it("should return restored text element with DEFAULT_FONT_FAMILY when element has font property with unknown font family name", () => {
+  it("when text element has font property but unknown font family name", () => {
     const textElement = API.createElement({
       type: "text",
       fontSize: 14,
@@ -166,10 +164,8 @@ describe("Test method restoreElements for text elements", () => {
     expect(restoredText.fontSize).toBe(fontPx);
     expect(restoredText.fontFamily).toBe(DEFAULT_FONT_FAMILY);
   });
-});
 
-describe("Test method restoreElements for freedraw elements", () => {
-  it("should return restored freedraw element", () => {
+  it("with freedraw element", () => {
     const freedrawElement = API.createElement({ type: "freedraw" });
 
     const expectedFreedrawElement = {
@@ -194,10 +190,8 @@ describe("Test method restoreElements for freedraw elements", () => {
 
     expect(gotRestoredFreedrawElement).toMatchObject(expectedFreedrawElement);
   });
-});
 
-describe("Test method restoreElements for line, draw and arrow elements", () => {
-  it("should return restored line and draw elements", () => {
+  it("with line and draw elements", () => {
     const lineElement = API.createElement({ type: "line" });
 
     const drawElement = API.createElement({ type: "line" });
@@ -246,7 +240,7 @@ describe("Test method restoreElements for line, draw and arrow elements", () => 
     expect(gotRestoredDrawElement).toMatchObject(expectedRestoredDrawElement);
   });
 
-  it("should return restored arrow element", () => {
+  it("with arrow element", () => {
     const arrowElement = API.createElement({ type: "arrow" });
 
     const expectedRestoredArrowElement = {
@@ -272,7 +266,7 @@ describe("Test method restoreElements for line, draw and arrow elements", () => 
     expect(gotRestoredArrowElement).toMatchObject(expectedRestoredArrowElement);
   });
 
-  it("should return restored arrow element in the case endArrowHead is defined", () => {
+  it("when arrow element has defined endArrowHead", () => {
     const arrowElement = API.createElement({ type: "arrow" });
 
     const restoredElements = restore.restoreElements([arrowElement]);
@@ -282,7 +276,7 @@ describe("Test method restoreElements for line, draw and arrow elements", () => 
     expect(arrowElement.endArrowhead).toBe(restoredArrow.endArrowhead);
   });
 
-  it("should return restored arrow element in the case endArrowHead is undefined", () => {
+  it("when arrow element has undefined endArrowHead", () => {
     const arrowElement = API.createElement({ type: "arrow" });
     Object.defineProperty(arrowElement, "endArrowhead", {
       get: jest.fn(() => undefined),
@@ -295,7 +289,7 @@ describe("Test method restoreElements for line, draw and arrow elements", () => 
     expect(restoredArrow.endArrowhead).toBe("arrow");
   });
 
-  it("should restore line element points considering element width and height when element.points is not an array", () => {
+  it("when element.points of a line element is not an array", () => {
     UI.createElement("line", { width: 100, height: 200 });
     const lineElement = h.elements[0] as ExcalidrawLinearElement;
 
@@ -315,7 +309,7 @@ describe("Test method restoreElements for line, draw and arrow elements", () => 
     expect(restoredLine.points).toMatchObject(expectedLinePoints);
   });
 
-  it("should restore line element points when the number of points is greater or equal 2", () => {
+  it("when the number of points of a line is greater or equal 2", () => {
     UI.createElement("line", { width: 100, height: 200, x: 10, y: 20 });
     UI.createElement("line", { width: 200, height: 400, x: 30, y: 40 });
     const lineElement_0 = h.elements[0] as ExcalidrawLinearElement;
@@ -357,10 +351,8 @@ describe("Test method restoreElements for line, draw and arrow elements", () => 
     expect(restoredLine_1.x).toBe(lineElement_1.x + offsetX);
     expect(restoredLine_1.y).toBe(lineElement_1.y + offsetY);
   });
-});
 
-describe("Test method restoreElements for ellipse, rectangle and diamond elements", () => {
-  it("should return restored rectangle, ellipse and diamond", () => {
+  it("with rectangle, ellipse and diamond elements", () => {
     const types = ["rectangle", "ellipse", "diamond"];
 
     const elements: ExcalidrawElement[] = [];
@@ -433,7 +425,7 @@ describe("Test method restoreElements for ellipse, rectangle and diamond element
     expect(restoredElements[2]).toMatchObject(expectedRestoredDiamond);
   });
 
-  it("should return a restored rectangle", () => {
+  it("with rectangle element", () => {
     const rectElement = API.createElement({
       type: "rectangle",
       id: "1",
@@ -482,8 +474,8 @@ describe("Test method restoreElements for ellipse, rectangle and diamond element
   });
 });
 
-describe("Test restoreAppState method", () => {
-  it("should restore app state from imported data", () => {
+describe("restoreAppState", () => {
+  it("with imported data", () => {
     const stubImportedAppState = getDefaultAppState();
     stubImportedAppState.elementType = "selection";
     stubImportedAppState.cursorButton = "down";
@@ -501,7 +493,7 @@ describe("Test restoreAppState method", () => {
     );
   });
 
-  it("should restore local app state when imported data state is undefined", () => {
+  it("should return current app state when imported data state is undefined", () => {
     const stubImportedAppState = getDefaultAppState();
 
     Object.defineProperty(stubImportedAppState, "cursorButton", {
@@ -517,7 +509,7 @@ describe("Test restoreAppState method", () => {
     expect(restoredAppState.cursorButton).toBe(h.state.cursorButton);
   });
 
-  it("should restore imported data state when local app state is null", () => {
+  it("when imported data is supplied but local app state is null", () => {
     const stubImportedAppState = getDefaultAppState();
     stubImportedAppState.cursorButton = "down";
 
@@ -530,14 +522,14 @@ describe("Test restoreAppState method", () => {
     );
   });
 
-  it("should restore local app state when imported data state is null", () => {
+  it("when imported data state is null", () => {
     h.state.cursorButton = "down";
 
     const restoredAppState = restore.restoreAppState(null, h.state);
     expect(restoredAppState.cursorButton).toBe(h.state.cursorButton);
   });
 
-  it("should restore as defaultAppState when imported data state and local app state are undefined", () => {
+  it("should return default app state when imported data state and local app state are undefined", () => {
     const defaultAppState = getDefaultAppState();
 
     const stubImportedAppState = getDefaultAppState();
@@ -557,14 +549,14 @@ describe("Test restoreAppState method", () => {
     expect(restoredAppState.cursorButton).toBe(defaultAppState.cursorButton);
   });
 
-  it("should restore as defaultAppState when imported data state and local app state are null", () => {
+  it("should return default app state when imported data state and local app state are null", () => {
     const defaultAppState = getDefaultAppState();
 
     const restoredAppState = restore.restoreAppState(null, null);
     expect(restoredAppState.cursorButton).toBe(defaultAppState.cursorButton);
   });
 
-  it("should restore element type as selection when it is not an AllowedExcalidrawElementTypes", () => {
+  it("when imported data state has a not AllowedExcalidrawElementTypes", () => {
     const stubImportedAppState = getDefaultAppState();
 
     Object.defineProperty(stubImportedAppState, "elementType", {
@@ -578,7 +570,7 @@ describe("Test restoreAppState method", () => {
     expect(restoredAppState.elementType).toBe("selection");
   });
 
-  it("should restore zoom number when imported data state has zoom as a number", () => {
+  it("when imported data state has zoom as a number", () => {
     const stubImportedAppState = getDefaultAppState();
 
     Object.defineProperty(stubImportedAppState, "zoom", {
@@ -596,7 +588,7 @@ describe("Test restoreAppState method", () => {
     );
   });
 
-  it("should restore zoom of imported data state when zoom property is not a number type", () => {
+  it("when the zoom of imported data state is not a number", () => {
     const stubImportedAppState = getDefaultAppState();
 
     stubImportedAppState.zoom = {
@@ -613,7 +605,7 @@ describe("Test restoreAppState method", () => {
     expect(restoredAppState.zoom).toMatchObject(stubImportedAppState.zoom);
   });
 
-  it("should restore zoom of default app state when imported data state zoom is null", () => {
+  it("when the zoom of imported data state zoom is null", () => {
     const stubImportedAppState = getDefaultAppState();
 
     Object.defineProperty(stubImportedAppState, "zoom", {
@@ -629,13 +621,16 @@ describe("Test restoreAppState method", () => {
   });
 });
 
-describe("Test restore method", () => {
-  it("should return an empty array of elements when imported data state is null", () => {
+describe("restore", () => {
+  it("when imported data state is null", () => {
     const restoredData = restore.restore(null, h.state);
     expect(restoredData.elements.length).toBe(0);
+    expect(restoredData.appState.cursorButton).toBe(
+      getDefaultAppState().cursorButton,
+    );
   });
 
-  it("should return an array of restored elements when imported data state has elements", () => {
+  it("when imported data state has elements", () => {
     const textElement = API.createElement({ type: "text" });
     const rectElement = API.createElement({ type: "rectangle" });
     const elements = [textElement, rectElement];
@@ -647,14 +642,7 @@ describe("Test restore method", () => {
     expect(restoredData.elements.length).toBe(elements.length);
   });
 
-  it("should return default app state when imported data state is null", () => {
-    const restoredData = restore.restore(null, h.state);
-    expect(restoredData.appState.cursorButton).toBe(
-      getDefaultAppState().cursorButton,
-    );
-  });
-
-  it("should return imported app state when local app state is null", () => {
+  it("when local app state is null but imported app state is supplied", () => {
     const stubImportedAppState = getDefaultAppState();
     stubImportedAppState.cursorButton = "down";
 
