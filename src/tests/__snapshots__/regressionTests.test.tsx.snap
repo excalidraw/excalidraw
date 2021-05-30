@@ -43,6 +43,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -510,6 +511,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -983,6 +985,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -1771,6 +1774,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -1977,6 +1981,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -2441,6 +2446,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -2696,6 +2702,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -2861,6 +2868,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -3307,7 +3315,8 @@ Object {
   "name": "Untitled-201933152653",
   "offsetLeft": 0,
   "offsetTop": 0,
-  "openMenu": "strokeColorPicker",
+  "openMenu": null,
+  "openPopup": "strokeColorPicker",
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -3547,6 +3556,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -3753,6 +3763,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -4000,6 +4011,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -4254,6 +4266,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -4640,6 +4653,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -4937,6 +4951,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -5212,6 +5227,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -5421,6 +5437,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -5586,6 +5603,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -6045,6 +6063,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -6366,6 +6385,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -8422,6 +8442,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -8787,6 +8808,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -9042,6 +9064,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -9261,6 +9284,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -9543,6 +9567,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -9708,6 +9733,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -9873,6 +9899,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -10038,6 +10065,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -10233,6 +10261,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -10428,6 +10457,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -10635,6 +10665,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -10830,6 +10861,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -10995,6 +11027,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -11160,6 +11193,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -11355,6 +11389,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -11520,6 +11555,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -11727,6 +11763,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -12452,6 +12489,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -12707,6 +12745,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -12809,6 +12848,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -12909,6 +12949,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -13077,6 +13118,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -13401,6 +13443,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -13603,6 +13646,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -14437,6 +14481,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -14537,6 +14582,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -15304,6 +15350,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -15712,6 +15759,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -15987,6 +16035,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -16089,6 +16138,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -16591,6 +16641,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -16691,6 +16742,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,

@@ -34,9 +34,9 @@ export const actionChangeViewBackgroundColor = register({
           type="canvasBackground"
           color={appState.viewBackgroundColor}
           onChange={(color) => updateData({ viewBackgroundColor: color })}
-          isActive={appState.openMenu === "canvasColorPicker"}
+          isActive={appState.openPopup === "canvasColorPicker"}
           setActive={(active) =>
-            updateData({ openMenu: active ? "canvasColorPicker" : null })
+            updateData({ openPopup: active ? "canvasColorPicker" : null })
           }
           data-testid="canvas-background-picker"
         />

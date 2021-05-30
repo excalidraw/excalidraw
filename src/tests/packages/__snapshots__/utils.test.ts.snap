@@ -42,6 +42,7 @@ Object {
   "multiElement": null,
   "name": "name",
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
