@@ -25,26 +25,23 @@ export const exportToCanvas = (
     width: number,
     height: number,
   ) => { canvas: HTMLCanvasElement; scale: number } = (width, height) => {
-    const tempCanvas = document.createElement("canvas");
-    tempCanvas.width = width * appState.exportScale;
-    tempCanvas.height = height * appState.exportScale;
-    return { canvas: tempCanvas, scale: appState.exportScale };
+    const canvas = document.createElement("canvas");
+    canvas.width = width * appState.exportScale;
+    canvas.height = height * appState.exportScale;
+    return { canvas, scale: appState.exportScale };
   },
 ) => {
   const [minX, minY, width, height] = getCanvasSize(elements, exportPadding);
 
-  const {
-    canvas: tempCanvas,
-    scale: newScale = appState.exportScale,
-  } = createCanvas(width, height);
+  const { canvas, scale } = createCanvas(width, height);
 
   renderScene(
     elements,
     appState,
     null,
-    newScale,
-    rough.canvas(tempCanvas),
-    tempCanvas,
+    scale,
+    rough.canvas(canvas),
+    canvas,
     {
       viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
       exportWithDarkMode: appState.exportWithDarkMode,
@@ -65,7 +62,7 @@ export const exportToCanvas = (
     },
   );
 
-  return tempCanvas;
+  return canvas;
 };
 
 export const exportToSvg = (
