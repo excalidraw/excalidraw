@@ -108,7 +108,7 @@
   "buttons": {
     "clearReset": "重置画布",
     "exportJSON": "",
-    "exportImage": "",
+    "exportImage": "保存为图像",
     "export": "导出",
     "exportToPng": "导出为 PNG",
     "exportToSvg": "导出为 SVG",
@@ -220,12 +220,12 @@
     "title": "错误"
   },
   "exportDialog": {
-    "disk_title": "",
+    "disk_title": "保存到本地",
     "disk_details": "",
-    "disk_button": "",
-    "link_title": "",
-    "link_details": "",
-    "link_button": ""
+    "disk_button": "保存为文件",
+    "link_title": "分享链接",
+    "link_details": "导出为只读链接。",
+    "link_button": "导出链接"
   },
   "helpDialog": {
     "blog": "浏览我们的博客",
