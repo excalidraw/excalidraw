@@ -1,32 +1,26 @@
-import { render } from "./test-utils";
-import ExcalidrawApp from "../excalidraw-app";
-import * as restore from "../data/restore";
+import * as restore from "../../data/restore";
 import {
   ExcalidrawTextElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
   ExcalidrawElement,
-} from "../element/types";
-import * as sizeHelpers from "../element/sizeHelpers";
-import { UI } from "./helpers/ui";
-import { API } from "./helpers/api";
-import { getDefaultAppState } from "../appState";
-import { ImportedDataState } from "../data/types";
-import { NormalizedZoomValue } from "../types";
+} from "../../element/types";
+import * as sizeHelpers from "../../element/sizeHelpers";
+import { API } from "../helpers/api";
+import { getDefaultAppState } from "../../appState";
+import { ImportedDataState } from "../../data/types";
+import { NormalizedZoomValue } from "../../types";
 import {
   FONT_FAMILY,
   DEFAULT_FONT_FAMILY,
   DEFAULT_TEXT_ALIGN,
   DEFAULT_VERTICAL_ALIGN,
-} from "../constants";
-
-const { h } = window;
+} from "../../constants";
 
 const mockSizeHelper = jest.spyOn(sizeHelpers, "isInvisiblySmallElement");
 
-beforeEach(async () => {
+beforeEach(() => {
   mockSizeHelper.mockReset();
-  await render(<ExcalidrawApp />);
 });
 
 describe("restoreElements", () => {
@@ -35,8 +29,8 @@ describe("restoreElements", () => {
   });
 
   it("should not call isInvisiblySmallElement when input element is a selection element", () => {
-    UI.createElement("selection", { x: 0 });
-    const restoreElements = restore.restoreElements(h.elements);
+    const selectionEl = { type: "selection" } as ExcalidrawElement;
+    const restoreElements = restore.restoreElements([selectionEl]);
     expect(restoreElements.length).toBe(0);
     expect(sizeHelpers.isInvisiblySmallElement).toBeCalledTimes(0);
   });
@@ -52,10 +46,10 @@ describe("restoreElements", () => {
   });
 
   it("when isInvisiblySmallElement is true", () => {
-    UI.createElement("rectangle", { x: 0 });
+    const rectElement = API.createElement({ type: "rectangle" });
     mockSizeHelper.mockImplementation(() => true);
 
-    expect(restore.restoreElements(h.elements).length).toBe(0);
+    expect(restore.restoreElements([rectElement]).length).toBe(0);
   });
 
   it("with text element type", () => {
@@ -290,8 +284,11 @@ describe("restoreElements", () => {
   });
 
   it("when element.points of a line element is not an array", () => {
-    UI.createElement("line", { width: 100, height: 200 });
-    const lineElement = h.elements[0] as ExcalidrawLinearElement;
+    const lineElement = API.createElement({
+      type: "line",
+      width: 100,
+      height: 200,
+    });
 
     Object.defineProperty(lineElement, "points", {
       get: jest.fn(() => "not an array"),
@@ -310,10 +307,20 @@ describe("restoreElements", () => {
   });
 
   it("when the number of points of a line is greater or equal 2", () => {
-    UI.createElement("line", { width: 100, height: 200, x: 10, y: 20 });
-    UI.createElement("line", { width: 200, height: 400, x: 30, y: 40 });
-    const lineElement_0 = h.elements[0] as ExcalidrawLinearElement;
-    const lineElement_1 = h.elements[1] as ExcalidrawLinearElement;
+    const lineElement_0 = API.createElement({
+      type: "line",
+      width: 100,
+      height: 200,
+      x: 10,
+      y: 20,
+    });
+    const lineElement_1 = API.createElement({
+      type: "line",
+      width: 200,
+      height: 400,
+      x: 30,
+      y: 40,
+    });
 
     const pointsEl_0 = [
       [0, 0],
@@ -344,8 +351,8 @@ describe("restoreElements", () => {
     const offsetX = pointsEl_1[0][0];
     const offsetY = pointsEl_1[0][1];
     const restoredPointsEl1 = [
-      [3 - offsetX, 4 - offsetY],
-      [5 - offsetX, 6 - offsetY],
+      [pointsEl_1[0][0] - offsetX, pointsEl_1[0][1] - offsetY],
+      [pointsEl_1[1][0] - offsetX, pointsEl_1[1][1] - offsetY],
     ];
     expect(restoredLine_1.points).toMatchObject(restoredPointsEl1);
     expect(restoredLine_1.x).toBe(lineElement_1.x + offsetX);
@@ -479,18 +486,22 @@ describe("restoreAppState", () => {
     const stubImportedAppState = getDefaultAppState();
     stubImportedAppState.elementType = "selection";
     stubImportedAppState.cursorButton = "down";
+    stubImportedAppState.name = "imported app state";
 
-    h.state.elementType = "rectangle";
-    h.state.cursorButton = "up";
+    const stubLocalAppState = getDefaultAppState();
+    stubLocalAppState.elementType = "rectangle";
+    stubLocalAppState.cursorButton = "up";
+    stubLocalAppState.name = "local app state";
 
     const restoredAppState = restore.restoreAppState(
       stubImportedAppState,
-      h.state,
+      stubLocalAppState,
     );
     expect(restoredAppState.elementType).toBe(stubImportedAppState.elementType);
     expect(restoredAppState.cursorButton).toBe(
       stubImportedAppState.cursorButton,
     );
+    expect(restoredAppState.name).toBe(stubImportedAppState.name);
   });
 
   it("should return current app state when imported data state is undefined", () => {
@@ -500,18 +511,26 @@ describe("restoreAppState", () => {
       get: jest.fn(() => undefined),
     });
 
-    h.state.cursorButton = "down";
+    Object.defineProperty(stubImportedAppState, "name", {
+      get: jest.fn(() => undefined),
+    });
+
+    const stubLocalAppState = getDefaultAppState();
+    stubLocalAppState.cursorButton = "down";
+    stubLocalAppState.name = "local app state";
 
     const restoredAppState = restore.restoreAppState(
       stubImportedAppState,
-      h.state,
+      stubLocalAppState,
     );
-    expect(restoredAppState.cursorButton).toBe(h.state.cursorButton);
+    expect(restoredAppState.cursorButton).toBe(stubLocalAppState.cursorButton);
+    expect(restoredAppState.name).toBe(stubLocalAppState.name);
   });
 
   it("when imported data is supplied but local app state is null", () => {
     const stubImportedAppState = getDefaultAppState();
     stubImportedAppState.cursorButton = "down";
+    stubImportedAppState.name = "imported app state";
 
     const restoredAppState = restore.restoreAppState(
       stubImportedAppState,
@@ -520,40 +539,45 @@ describe("restoreAppState", () => {
     expect(restoredAppState.cursorButton).toBe(
       stubImportedAppState.cursorButton,
     );
+    expect(restoredAppState.name).toBe(stubImportedAppState.name);
   });
 
   it("when imported data state is null", () => {
-    h.state.cursorButton = "down";
+    const stubLocalAppState = getDefaultAppState();
+    stubLocalAppState.cursorButton = "down";
+    stubLocalAppState.name = "local app state";
 
-    const restoredAppState = restore.restoreAppState(null, h.state);
-    expect(restoredAppState.cursorButton).toBe(h.state.cursorButton);
+    const restoredAppState = restore.restoreAppState(null, stubLocalAppState);
+    expect(restoredAppState.cursorButton).toBe(stubLocalAppState.cursorButton);
+    expect(restoredAppState.name).toBe(stubLocalAppState.name);
   });
 
   it("should return default app state when imported data state and local app state are undefined", () => {
-    const defaultAppState = getDefaultAppState();
-
     const stubImportedAppState = getDefaultAppState();
 
     Object.defineProperty(stubImportedAppState, "cursorButton", {
       get: jest.fn(() => undefined),
     });
 
-    Object.defineProperty(h.state, "cursorButton", {
+    const stubLocalAppState = getDefaultAppState();
+    Object.defineProperty(stubLocalAppState, "cursorButton", {
       get: jest.fn(() => undefined),
     });
 
     const restoredAppState = restore.restoreAppState(
       stubImportedAppState,
-      h.state,
+      stubLocalAppState,
     );
-    expect(restoredAppState.cursorButton).toBe(defaultAppState.cursorButton);
+    expect(restoredAppState.cursorButton).toBe(
+      getDefaultAppState().cursorButton,
+    );
   });
 
   it("should return default app state when imported data state and local app state are null", () => {
-    const defaultAppState = getDefaultAppState();
-
     const restoredAppState = restore.restoreAppState(null, null);
-    expect(restoredAppState.cursorButton).toBe(defaultAppState.cursorButton);
+    expect(restoredAppState.cursorButton).toBe(
+      getDefaultAppState().cursorButton,
+    );
   });
 
   it("when imported data state has a not AllowedExcalidrawElementTypes", () => {
@@ -563,9 +587,11 @@ describe("restoreAppState", () => {
       get: jest.fn(() => "not Allowed element"),
     });
 
+    const stubLocalAppState = getDefaultAppState();
+
     const restoredAppState = restore.restoreAppState(
       stubImportedAppState,
-      h.state,
+      stubLocalAppState,
     );
     expect(restoredAppState.elementType).toBe("selection");
   });
@@ -577,9 +603,11 @@ describe("restoreAppState", () => {
       get: jest.fn(() => 10),
     });
 
+    const stubLocalAppState = getDefaultAppState();
+
     const restoredAppState = restore.restoreAppState(
       stubImportedAppState,
-      h.state,
+      stubLocalAppState,
     );
 
     expect(restoredAppState.zoom.value).toBe(10);
@@ -590,15 +618,16 @@ describe("restoreAppState", () => {
 
   it("when the zoom of imported data state is not a number", () => {
     const stubImportedAppState = getDefaultAppState();
-
     stubImportedAppState.zoom = {
       value: 10 as NormalizedZoomValue,
       translation: { x: 5, y: 3 },
     };
 
+    const stubLocalAppState = getDefaultAppState();
+
     const restoredAppState = restore.restoreAppState(
       stubImportedAppState,
-      h.state,
+      stubLocalAppState,
     );
 
     expect(restoredAppState.zoom.value).toBe(10);
@@ -612,9 +641,11 @@ describe("restoreAppState", () => {
       get: jest.fn(() => null),
     });
 
+    const stubLocalAppState = getDefaultAppState();
+
     const restoredAppState = restore.restoreAppState(
       stubImportedAppState,
-      h.state,
+      stubLocalAppState,
     );
 
     expect(restoredAppState.zoom).toMatchObject(getDefaultAppState().zoom);
@@ -622,15 +653,28 @@ describe("restoreAppState", () => {
 });
 
 describe("restore", () => {
-  it("when imported data state is null", () => {
-    const restoredData = restore.restore(null, h.state);
+  it("when imported data state is null it should return an empty array of elements", () => {
+    const stubLocalAppState = getDefaultAppState();
+
+    const restoredData = restore.restore(null, stubLocalAppState);
     expect(restoredData.elements.length).toBe(0);
+  });
+
+  it("when imported data state is null it should return the local app state property", () => {
+    const stubLocalAppState = getDefaultAppState();
+    stubLocalAppState.cursorButton = "down";
+    stubLocalAppState.name = "local app state";
+
+    const restoredData = restore.restore(null, stubLocalAppState);
     expect(restoredData.appState.cursorButton).toBe(
-      getDefaultAppState().cursorButton,
+      stubLocalAppState.cursorButton,
     );
+    expect(restoredData.appState.name).toBe(stubLocalAppState.name);
   });
 
   it("when imported data state has elements", () => {
+    const stubLocalAppState = getDefaultAppState();
+
     const textElement = API.createElement({ type: "text" });
     const rectElement = API.createElement({ type: "rectangle" });
     const elements = [textElement, rectElement];
@@ -638,13 +682,14 @@ describe("restore", () => {
     const importedDataState = {} as ImportedDataState;
     importedDataState.elements = elements;
 
-    const restoredData = restore.restore(importedDataState, h.state);
+    const restoredData = restore.restore(importedDataState, stubLocalAppState);
     expect(restoredData.elements.length).toBe(elements.length);
   });
 
   it("when local app state is null but imported app state is supplied", () => {
     const stubImportedAppState = getDefaultAppState();
     stubImportedAppState.cursorButton = "down";
+    stubImportedAppState.name = "imported app state";
 
     const importedDataState = {} as ImportedDataState;
     importedDataState.appState = stubImportedAppState;
@@ -653,5 +698,6 @@ describe("restore", () => {
     expect(restoredData.appState.cursorButton).toBe(
       stubImportedAppState.cursorButton,
     );
+    expect(restoredData.appState.name).toBe(stubImportedAppState.name);
   });
 });
