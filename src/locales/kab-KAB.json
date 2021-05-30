@@ -20,7 +20,7 @@
     "background": "Agilal",
     "fill": "Taččart",
     "strokeWidth": "Tehri n yizirig",
-    "strokeShape": "",
+    "strokeShape": "Talɣa n yizirig",
     "strokeShape_gel": "",
     "strokeShape_fountain": "",
     "strokeShape_brush": "Amfezzu",
@@ -101,8 +101,8 @@
     "viewMode": "Askar n tmuɣli",
     "toggleExportColorScheme": "Sermed/sens asifeḍ usentel n yini",
     "share": "Bḍu",
-    "showStroke": "",
-    "showBackground": "",
+    "showStroke": "Beqqeḍ amelqaḍ n yini n yizirig",
+    "showBackground": "Beqqeḍ amelqaḍ n yini n ugilal",
     "toggleTheme": "Snifel asentel"
   },
   "buttons": {
