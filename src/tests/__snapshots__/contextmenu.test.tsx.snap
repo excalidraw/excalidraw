@@ -4278,6 +4278,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
