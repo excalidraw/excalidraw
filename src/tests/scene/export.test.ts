@@ -69,7 +69,7 @@ describe("exportToSvg", () => {
     const svgElement = exportUtils.exportToSvg(ELEMENTS, {
       ...DEFAULT_OPTIONS,
       exportPadding: 0,
-      scale: SCALE,
+      exportScale: SCALE,
     });
 
     expect(svgElement).toHaveAttribute(
