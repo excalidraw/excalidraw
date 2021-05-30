@@ -33,7 +33,7 @@ export const exportToCanvas = (
 ) => {
   const [minX, minY, width, height] = getCanvasSize(elements, exportPadding);
 
-  const { canvas, scale } = createCanvas(width, height);
+  const { canvas, scale = 1 } = createCanvas(width, height);
 
   renderScene(
     elements,
