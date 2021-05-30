@@ -8,7 +8,6 @@ import React, {
 } from "react";
 import { trackEvent } from "../analytics";
 import { getDefaultAppState } from "../appState";
-import { ExcalidrawImperativeAPI } from "../components/App";
 import { ErrorDialog } from "../components/ErrorDialog";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
 import {
@@ -31,7 +30,7 @@ import Excalidraw, {
   defaultLang,
   languages,
 } from "../packages/excalidraw/index";
-import { AppState, LibraryItems } from "../types";
+import { AppState, LibraryItems, ExcalidrawImperativeAPI } from "../types";
 import {
   debounce,
   getVersion,
