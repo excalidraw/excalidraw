@@ -222,6 +222,11 @@ export type ExportOpts = {
     appState: AppState,
     canvas: HTMLCanvasElement | null,
   ) => void;
+  renderCustomUI?: (
+    exportedElements: readonly NonDeletedExcalidrawElement[],
+    appState: AppState,
+    canvas: HTMLCanvasElement | null,
+  ) => JSX.Element;
 };
 
 type CanvasActions = {
@@ -231,6 +236,7 @@ type CanvasActions = {
   loadScene?: boolean;
   saveToActiveFile?: boolean;
   theme?: boolean;
+  saveAsImage?: boolean;
 };
 
 export type UIOptions = {

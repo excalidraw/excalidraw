@@ -570,6 +570,7 @@ This prop can be used to customise UI of Excalidraw. Currently we support custom
 | `loadScene` | boolean | true | Implies whether to show `Load button` |
 | `saveToActiveFile` | boolean | true | Implies whether to show `Save button` to save to current file |
 | `theme` | boolean | true | Implies whether to show `Theme toggle` |
+| `saveAsImage` | boolean | true | Implies whether to show `Save as image button` |
 
 #### `exportOpts`
 
@@ -579,6 +580,7 @@ The below attributes can be set in `UIOptions.canvasActions.export` to customize
 | --- | --- | --- | --- |
 | `saveFileToDisk` | boolean | true | Implies if save file to disk button should be shown |
 | `exportToBackend` | <pre> (exportedElements: readonly NonDeletedExcalidrawElement[],appState: AppState,canvas: HTMLCanvasElement &#124; null) => void </pre> |  | This callback is triggered when the shareable-link button is clicked in the export dialog. The link button will only be shown if this callback is passed. |
+| `renderCustomUI` | <pre> (exportedElements: readonly NonDeletedExcalidrawElement[],appState: AppState,canvas: HTMLCanvasElement &#124; null) => void </pre> |  | This callback should be supplied if you want to render custom UI in the export dialog. |
 
 #### `onPaste`
 

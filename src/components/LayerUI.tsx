@@ -387,21 +387,14 @@ const LayerUI = ({
         elements={elements}
         appState={appState}
         actionManager={actionManager}
-        onExportToBackend={(elements) => {
-          UIOptions.canvasActions.export.onExportToBackend &&
-            UIOptions.canvasActions.export.onExportToBackend(
-              elements,
-              appState,
-              canvas,
-            );
-        }}
         exportOpts={UIOptions.canvasActions.export}
+        canvas={canvas}
       />
     );
   };
 
   const renderImageExportDialog = () => {
-    if (!UIOptions.canvasActions.export) {
+    if (!UIOptions.canvasActions.saveAsImage) {
       return null;
     }
 
