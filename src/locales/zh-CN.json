@@ -43,7 +43,7 @@
     "fontFamily": "字体",
     "onlySelected": "仅被选中",
     "withBackground": "",
-    "exportEmbedScene": "",
+    "exportEmbedScene": "包含画布数据",
     "exportEmbedScene_details": "画布数据将被保存到导出的 PNG/SVG 文件，以便恢复。\n将会增加导出的文件大小。",
     "addWatermark": "添加 “使用 Excalidraw 创建” 水印",
     "handDrawn": "手写",
@@ -221,7 +221,7 @@
   },
   "exportDialog": {
     "disk_title": "保存到本地",
-    "disk_details": "",
+    "disk_details": "将画布数据导出为文件，以便以后导入",
     "disk_button": "保存为文件",
     "link_title": "分享链接",
     "link_details": "导出为只读链接。",
