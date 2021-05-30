@@ -43,6 +43,7 @@ Object {
   "offsetLeft": 20,
   "offsetTop": 10,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -208,6 +209,7 @@ Object {
   "offsetLeft": 20,
   "offsetTop": 10,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -519,6 +521,7 @@ Object {
   "offsetLeft": 20,
   "offsetTop": 10,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -830,6 +833,7 @@ Object {
   "offsetLeft": 20,
   "offsetTop": 10,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -995,6 +999,7 @@ Object {
   "offsetLeft": 20,
   "offsetTop": 10,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -1193,6 +1198,7 @@ Object {
   "offsetLeft": 20,
   "offsetTop": 10,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -1444,6 +1450,7 @@ Object {
   "offsetLeft": 20,
   "offsetTop": 10,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -1772,7 +1779,8 @@ Object {
   "name": "Untitled-201933152653",
   "offsetLeft": 20,
   "offsetTop": 10,
-  "openMenu": "backgroundColorPicker",
+  "openMenu": null,
+  "openPopup": "backgroundColorPicker",
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -2504,6 +2512,7 @@ Object {
   "offsetLeft": 20,
   "offsetTop": 10,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -2815,6 +2824,7 @@ Object {
   "offsetLeft": 20,
   "offsetTop": 10,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -3126,6 +3136,7 @@ Object {
   "offsetLeft": 20,
   "offsetTop": 10,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -3511,6 +3522,7 @@ Object {
   "offsetLeft": 20,
   "offsetTop": 10,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -3768,6 +3780,7 @@ Object {
   "offsetLeft": 20,
   "offsetTop": 10,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -4100,6 +4113,7 @@ Object {
   "offsetLeft": 20,
   "offsetTop": 10,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -4200,6 +4214,7 @@ Object {
   "offsetLeft": 20,
   "offsetTop": 10,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -4278,6 +4293,7 @@ Object {
   "offsetLeft": 20,
   "offsetTop": 10,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,

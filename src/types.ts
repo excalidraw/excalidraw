@@ -81,9 +81,8 @@ export type AppState = {
   isResizing: boolean;
   isRotating: boolean;
   zoom: Zoom;
-  openMenu:
-    | "canvas"
-    | "shape"
+  openMenu: "canvas" | "shape" | null;
+  openPopup:
     | "canvasColorPicker"
     | "backgroundColorPicker"
     | "strokeColorPicker"
