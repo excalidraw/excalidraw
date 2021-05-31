@@ -4,7 +4,7 @@ import { getCommonBounds } from "../element/bounds";
 import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
 import { distance, SVG_NS } from "../utils";
 import { AppState } from "../types";
-import { THEME_FILTER } from "../constants";
+import { DEFAULT_EXPORT_PADDING, THEME_FILTER } from "../constants";
 import { getDefaultAppState } from "../appState";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
@@ -14,39 +14,34 @@ export const exportToCanvas = (
   appState: AppState,
   {
     exportBackground,
-    exportPadding = 10,
+    exportPadding = DEFAULT_EXPORT_PADDING,
     viewBackgroundColor,
-    scale = 1,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
-    scale?: number;
     viewBackgroundColor: string;
   },
   createCanvas: (
     width: number,
     height: number,
   ) => { canvas: HTMLCanvasElement; scale: number } = (width, height) => {
-    const tempCanvas = document.createElement("canvas");
-    tempCanvas.width = width * scale;
-    tempCanvas.height = height * scale;
-    return { canvas: tempCanvas, scale };
+    const canvas = document.createElement("canvas");
+    canvas.width = width * appState.exportScale;
+    canvas.height = height * appState.exportScale;
+    return { canvas, scale: appState.exportScale };
   },
 ) => {
   const [minX, minY, width, height] = getCanvasSize(elements, exportPadding);
 
-  const { canvas: tempCanvas, scale: newScale = scale } = createCanvas(
-    width,
-    height,
-  );
+  const { canvas, scale = 1 } = createCanvas(width, height);
 
   renderScene(
     elements,
     appState,
     null,
-    newScale,
-    rough.canvas(tempCanvas),
-    tempCanvas,
+    scale,
+    rough.canvas(canvas),
+    canvas,
     {
       viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
       exportWithDarkMode: appState.exportWithDarkMode,
@@ -67,22 +62,22 @@ export const exportToCanvas = (
     },
   );
 
-  return tempCanvas;
+  return canvas;
 };
 
 export const exportToSvg = (
   elements: readonly NonDeletedExcalidrawElement[],
   {
     exportBackground,
-    exportPadding = 10,
+    exportPadding = DEFAULT_EXPORT_PADDING,
     viewBackgroundColor,
     exportWithDarkMode,
-    scale = 1,
+    exportScale = 1,
     metadata = "",
   }: {
     exportBackground: boolean;
     exportPadding?: number;
-    scale?: number;
+    exportScale?: number;
     viewBackgroundColor: string;
     exportWithDarkMode?: boolean;
     metadata?: string;
@@ -95,8 +90,8 @@ export const exportToSvg = (
   svgRoot.setAttribute("version", "1.1");
   svgRoot.setAttribute("xmlns", SVG_NS);
   svgRoot.setAttribute("viewBox", `0 0 ${width} ${height}`);
-  svgRoot.setAttribute("width", `${width * scale}`);
-  svgRoot.setAttribute("height", `${height * scale}`);
+  svgRoot.setAttribute("width", `${width * exportScale}`);
+  svgRoot.setAttribute("height", `${height * exportScale}`);
   if (exportWithDarkMode) {
     svgRoot.setAttribute("filter", THEME_FILTER);
   }
