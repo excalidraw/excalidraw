@@ -10,12 +10,6 @@ import { API } from "../helpers/api";
 import { getDefaultAppState } from "../../appState";
 import { ImportedDataState } from "../../data/types";
 import { NormalizedZoomValue } from "../../types";
-import {
-  FONT_FAMILY,
-  DEFAULT_FONT_FAMILY,
-  DEFAULT_TEXT_ALIGN,
-  DEFAULT_VERTICAL_ALIGN,
-} from "../../constants";
 
 const mockSizeHelper = jest.spyOn(sizeHelpers, "isInvisiblySmallElement");
 
@@ -24,18 +18,18 @@ beforeEach(() => {
 });
 
 describe("restoreElements", () => {
-  it("with null array of elements", () => {
+  it("should return empty array when element is null", () => {
     expect(restore.restoreElements(null)).toStrictEqual([]);
   });
 
-  it("should not call isInvisiblySmallElement when input element is a selection element", () => {
+  it("should not call isInvisiblySmallElement when element is a selection element", () => {
     const selectionEl = { type: "selection" } as ExcalidrawElement;
     const restoreElements = restore.restoreElements([selectionEl]);
     expect(restoreElements.length).toBe(0);
     expect(sizeHelpers.isInvisiblySmallElement).toBeCalledTimes(0);
   });
 
-  it("when input element type is not supported", () => {
+  it("should return empty array when input type is not supported", () => {
     const dummyNotSupportedElement = API.createElement({ type: "text" });
 
     Object.defineProperty(dummyNotSupportedElement, "type", {
@@ -45,14 +39,14 @@ describe("restoreElements", () => {
     expect(restore.restoreElements([dummyNotSupportedElement]).length).toBe(0);
   });
 
-  it("when isInvisiblySmallElement is true", () => {
+  it("should return empty array when isInvisiblySmallElement is true", () => {
     const rectElement = API.createElement({ type: "rectangle" });
     mockSizeHelper.mockImplementation(() => true);
 
     expect(restore.restoreElements([rectElement]).length).toBe(0);
   });
 
-  it("with text element type", () => {
+  it("should restore text element correctly passing value for each attribute", () => {
     const textElement = API.createElement({
       type: "text",
       fontSize: 14,
@@ -60,103 +54,41 @@ describe("restoreElements", () => {
       text: "text",
       textAlign: "center",
       verticalAlign: "middle",
+      id: "id-text01",
     });
-
-    const expectedTextElement = {
-      type: textElement.type,
-      fontSize: textElement.fontSize,
-      fontFamily: textElement.fontFamily,
-      text: textElement.text,
-      baseline: textElement.baseline,
-      textAlign: textElement.textAlign,
-      verticalAlign: textElement.verticalAlign,
-    };
 
     const restoredText = restore.restoreElements([
       textElement,
     ])[0] as ExcalidrawTextElement;
 
-    const gotRestoredTextElement = {
-      type: restoredText.type,
-      fontSize: restoredText.fontSize,
-      fontFamily: restoredText.fontFamily,
-      text: restoredText.text,
-      baseline: restoredText.baseline,
-      textAlign: restoredText.textAlign,
-      verticalAlign: restoredText.verticalAlign,
-    };
-
-    expect(gotRestoredTextElement).toMatchObject(expectedTextElement);
+    expect(restoredText).toMatchSnapshot({
+      seed: expect.any(Number),
+    });
   });
 
-  it("when text element has null text", () => {
-    const textElement = API.createElement({ type: "text" });
+  it("should restore text element correctly with unknown font family, null text and undefined alignment", () => {
+    const textElement = API.createElement({
+      type: "text",
+      textAlign: undefined,
+      verticalAlign: undefined,
+      id: "id-text01",
+    });
 
     Object.defineProperty(textElement, "text", {
       get: jest.fn(() => null),
     });
 
-    const restoredText = restore.restoreElements([
-      textElement,
-    ])[0] as ExcalidrawTextElement;
-    expect(restoredText.text).toBe("");
-  });
-
-  it("when text element has undefined alignment", () => {
-    const textElement = API.createElement({
-      type: "text",
-      textAlign: undefined,
-      verticalAlign: undefined,
-    });
-
-    const restoredText = restore.restoreElements([
-      textElement,
-    ])[0] as ExcalidrawTextElement;
-
-    expect(restoredText.textAlign).toBe(DEFAULT_TEXT_ALIGN);
-    expect(restoredText.verticalAlign).toBe(DEFAULT_VERTICAL_ALIGN);
-  });
-
-  it("when text element has font property", () => {
-    const textElement = API.createElement({
-      type: "text",
-      fontSize: 14,
-      fontFamily: 1,
-    });
-
-    const fontPx = 10;
-    const fontFamilyName = FONT_FAMILY[3];
-
     Object.defineProperty(textElement, "font", {
-      get: jest.fn(() => `${fontPx} ${fontFamilyName}`),
+      get: jest.fn(() => "10 unknown"),
     });
 
     const restoredText = restore.restoreElements([
       textElement,
     ])[0] as ExcalidrawTextElement;
-    expect(restoredText.fontSize).toBe(fontPx);
-    expect(restoredText.fontFamily).toBe(3);
-  });
 
-  it("when text element has font property but unknown font family name", () => {
-    const textElement = API.createElement({
-      type: "text",
-      fontSize: 14,
-      fontFamily: 1,
+    expect(restoredText).toMatchSnapshot({
+      seed: expect.any(Number),
     });
-
-    const fontPx = 10;
-    const fontFamilyName = "unknown font family name";
-
-    Object.defineProperty(textElement, "font", {
-      get: jest.fn(() => `${fontPx} ${fontFamilyName}`),
-    });
-
-    const restoredText = restore.restoreElements([
-      textElement,
-    ])[0] as ExcalidrawTextElement;
-    expect(restoredText.fontSize).toBe(fontPx);
-    expect(restoredText.fontFamily).toBe(DEFAULT_FONT_FAMILY);
   });
 
   it("with freedraw element", () => {
@@ -186,23 +118,12 @@ describe("restoreElements", () => {
   });
 
   it("with line and draw elements", () => {
-    const lineElement = API.createElement({ type: "line" });
+    const lineElement = API.createElement({ type: "line", id: "id-line01" });
 
-    const drawElement = API.createElement({ type: "line" });
+    const drawElement = API.createElement({ type: "line", id: "id-draw01" });
     Object.defineProperty(drawElement, "type", {
       get: jest.fn(() => "draw"),
     });
-
-    const expectedRestoredLineElement = {
-      type: lineElement.type,
-      startBinding: lineElement.startBinding,
-      endBinding: lineElement.endBinding,
-      lastCommittedPoint: null,
-      startArrowhead: null,
-      endArrowhead: null,
-    };
-
-    const expectedRestoredDrawElement = expectedRestoredLineElement;
 
     const restoredElements = restore.restoreElements([
       lineElement,
@@ -212,52 +133,18 @@ describe("restoreElements", () => {
     const restoredLine = restoredElements[0] as ExcalidrawLinearElement;
     const restoredDraw = restoredElements[1] as ExcalidrawLinearElement;
 
-    const gotRestoredLineElement = {
-      type: restoredLine.type,
-      startBinding: restoredLine.startBinding,
-      endBinding: restoredLine.endBinding,
-      lastCommittedPoint: restoredLine.lastCommittedPoint,
-      startArrowhead: restoredLine.startArrowhead,
-      endArrowhead: restoredLine.endArrowhead,
-    };
-
-    const gotRestoredDrawElement = {
-      type: restoredDraw.type,
-      startBinding: restoredDraw.startBinding,
-      endBinding: restoredDraw.endBinding,
-      lastCommittedPoint: restoredDraw.lastCommittedPoint,
-      startArrowhead: restoredDraw.startArrowhead,
-      endArrowhead: restoredDraw.endArrowhead,
-    };
-
-    expect(gotRestoredLineElement).toMatchObject(expectedRestoredLineElement);
-    expect(gotRestoredDrawElement).toMatchObject(expectedRestoredDrawElement);
+    expect(restoredLine).toMatchSnapshot({ seed: expect.any(Number) });
+    expect(restoredDraw).toMatchSnapshot({ seed: expect.any(Number) });
   });
 
   it("with arrow element", () => {
-    const arrowElement = API.createElement({ type: "arrow" });
-
-    const expectedRestoredArrowElement = {
-      type: arrowElement.type,
-      startBinding: arrowElement.startBinding,
-      endBinding: arrowElement.endBinding,
-      lastCommittedPoint: null,
-      startArrowhead: null,
-    };
+    const arrowElement = API.createElement({ type: "arrow", id: "id-arrow01" });
 
     const restoredElements = restore.restoreElements([arrowElement]);
 
     const restoredArrow = restoredElements[0] as ExcalidrawLinearElement;
 
-    const gotRestoredArrowElement = {
-      type: restoredArrow.type,
-      startBinding: restoredArrow.startBinding,
-      endBinding: restoredArrow.endBinding,
-      lastCommittedPoint: restoredArrow.lastCommittedPoint,
-      startArrowhead: restoredArrow.startArrowhead,
-    };
-
-    expect(gotRestoredArrowElement).toMatchObject(expectedRestoredArrowElement);
+    expect(restoredArrow).toMatchSnapshot({ seed: expect.any(Number) });
   });
 
   it("when arrow element has defined endArrowHead", () => {
@@ -387,49 +274,11 @@ describe("restoreElements", () => {
       elements.push(element);
     });
 
-    const expectedRestoredElement = {
-      type: "",
-      id: "",
-      fillStyle: "cross-hatch",
-      strokeWidth: 2,
-      strokeStyle: "dashed",
-      roughness: 2,
-      opacity: 10,
-      angle: 0,
-      x: 10,
-      y: 20,
-      strokeColor: "red",
-      backgroundColor: "blue",
-      width: 100,
-      height: 200,
-      seed: 0,
-      groupIds: ["1", "2", "3"],
-      strokeSharpness: "round",
-      version: 1,
-      versionNonce: 0,
-      isDeleted: false,
-    };
-
-    const expectedRestoredRect = Object.assign({}, expectedRestoredElement);
-    expectedRestoredRect.type = elements[0].type;
-    expectedRestoredRect.id = elements[0].id;
-    expectedRestoredRect.seed = elements[0].seed;
-
-    const expectedRestoredEllipse = Object.assign({}, expectedRestoredElement);
-    expectedRestoredEllipse.type = elements[1].type;
-    expectedRestoredEllipse.id = elements[1].id;
-    expectedRestoredEllipse.seed = elements[1].seed;
-
-    const expectedRestoredDiamond = Object.assign({}, expectedRestoredElement);
-    expectedRestoredDiamond.type = elements[2].type;
-    expectedRestoredDiamond.id = elements[2].id;
-    expectedRestoredDiamond.seed = elements[2].seed;
-
     const restoredElements = restore.restoreElements(elements);
 
-    expect(restoredElements[0]).toMatchObject(expectedRestoredRect);
-    expect(restoredElements[1]).toMatchObject(expectedRestoredEllipse);
-    expect(restoredElements[2]).toMatchObject(expectedRestoredDiamond);
+    expect(restoredElements[0]).toMatchSnapshot({ seed: expect.any(Number) });
+    expect(restoredElements[1]).toMatchSnapshot({ seed: expect.any(Number) });
+    expect(restoredElements[2]).toMatchSnapshot({ seed: expect.any(Number) });
   });
 
   it("with rectangle element", () => {
@@ -452,32 +301,7 @@ describe("restoreElements", () => {
     });
 
     const restoredRect = restore.restoreElements([rectElement])[0];
-
-    const expectedRestoredRect = {
-      type: "rectangle",
-      id: "1",
-      fillStyle: "cross-hatch",
-      strokeWidth: 2,
-      strokeStyle: "dashed",
-      roughness: 2,
-      opacity: 10,
-      angle: 0,
-      x: 10,
-      y: 20,
-      strokeColor: "red",
-      backgroundColor: "blue",
-      width: 100,
-      height: 200,
-      seed: rectElement.seed,
-      groupIds: ["1", "2", "3"],
-      strokeSharpness: "round",
-      version: 1,
-      versionNonce: 0,
-      isDeleted: false,
-    };
-
-    expect(restoredRect.x).toBe(10);
-    expect(restoredRect).toMatchObject(expectedRestoredRect);
+    expect(restoredRect).toMatchSnapshot({ seed: expect.any(Number) });
   });
 });
 
