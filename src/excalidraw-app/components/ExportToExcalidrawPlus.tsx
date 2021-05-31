@@ -47,6 +47,37 @@ const encryptData = async (
   return { blob: new Blob([new Uint8Array(ciphertext)]), iv };
 };
 
+const exportToExcalidrawPlus = async (
+  elements: readonly NonDeletedExcalidrawElement[],
+  appState: AppState,
+) => {
+  const firebase = await loadFirebaseStorage();
+
+  const id = `${nanoid(12)}`;
+
+  const key = (await generateEncryptionKey())!;
+  const encryptedData = await encryptData(
+    key,
+    serializeAsJSON(elements, appState),
+  );
+
+  const blob = new Blob([encryptedData.iv, encryptedData.blob], {
+    type: "application/octet-stream",
+  });
+
+  await firebase
+    .storage()
+    .ref(`/migrations/scenes/${id}`)
+    .put(blob, {
+      customMetadata: {
+        data: JSON.stringify({ version: 1, name: appState.name }),
+        created: Date.now().toString(),
+      },
+    });
+
+  window.open(`https://plus.excalidraw.com/import?excalidraw=${id},${key}`);
+};
+
 export const ExportToExcalidrawPlus: React.FC<{
   elements: readonly NonDeletedExcalidrawElement[];
   appState: AppState;
@@ -64,35 +95,7 @@ export const ExportToExcalidrawPlus: React.FC<{
         title={t("exportDialog.excalidrawplus_button")}
         aria-label={t("exportDialog.excalidrawplus_button")}
         showAriaLabel={true}
-        onClick={async () => {
-          const firebase = await loadFirebaseStorage();
-
-          const id = `${nanoid(12)}`;
-
-          const key = (await generateEncryptionKey())!;
-          const encryptedData = await encryptData(
-            key,
-            serializeAsJSON(elements, appState),
-          );
-
-          const blob = new Blob([encryptedData.iv, encryptedData.blob], {
-            type: "application/octet-stream",
-          });
-
-          await firebase
-            .storage()
-            .ref(`/migrations/scenes/${id}`)
-            .put(blob, {
-              customMetadata: {
-                data: JSON.stringify({ version: 1, name: appState.name }),
-                created: Date.now().toString(),
-              },
-            });
-
-          window.open(
-            `https://plus.excalidraw.com/import?excalidraw=${id},${key}`,
-          );
-        }}
+        onClick={() => exportToExcalidrawPlus(elements, appState)}
       />
     </Card>
   );
