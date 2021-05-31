@@ -42,8 +42,8 @@
     "fontSize": "Tamaño de la fuente",
     "fontFamily": "Tipo de fuente",
     "onlySelected": "Sólo seleccionados",
-    "withBackground": "",
-    "exportEmbedScene": "",
+    "withBackground": "Fondo",
+    "exportEmbedScene": "Embeber escena",
     "exportEmbedScene_details": "Los datos de escena se guardarán en el archivo PNG/SVG exportado, así la escena puede ser restaurada de la misma.\nEsto aumentará el tamaño del archivo exportado.",
     "addWatermark": "Agregar \"Hecho con Excalidraw\"",
     "handDrawn": "Dibujado a mano",
@@ -107,15 +107,15 @@
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
-    "exportJSON": "",
-    "exportImage": "",
+    "exportJSON": "Exportar como archivo",
+    "exportImage": "Guardar como imagen",
     "export": "Exportar",
     "exportToPng": "Exportar a PNG",
     "exportToSvg": "Exportar a SVG",
     "copyToClipboard": "Copiar al portapapeles",
     "copyPngToClipboard": "Copiar PNG al portapapeles",
     "scale": "Escalar",
-    "save": "",
+    "save": "Guardal al archivo actual",
     "saveAs": "Guardar como",
     "load": "Cargar",
     "getShareableLink": "Obtener enlace para compartir",
@@ -220,12 +220,12 @@
     "title": "Error"
   },
   "exportDialog": {
-    "disk_title": "",
+    "disk_title": "Guardar en el disco",
     "disk_details": "",
-    "disk_button": "",
-    "link_title": "",
-    "link_details": "",
-    "link_button": ""
+    "disk_button": "Guardar en el archivo",
+    "link_title": "Enlace para compartir",
+    "link_details": "Exportar como enlace de sólo lectura.",
+    "link_button": "Exportar al link"
   },
   "helpDialog": {
     "blog": "Lee nuestro blog",
@@ -250,7 +250,7 @@
   },
   "encrypted": {
     "tooltip": "Tus dibujos están cifrados de punto a punto, por lo que los servidores de Excalidraw nunca los verán.",
-    "link": ""
+    "link": "Entrada en el blog sobre cifrado de extremo a extremo"
   },
   "stats": {
     "angle": "Ángulo",
