@@ -97,7 +97,8 @@
 
     border-radius: 1rem;
     background-color: var(--button-color);
-    box-shadow: 0 3px 5px -1px rgb(0 0 0 / 28%), 0 6px 10px 0 rgb(0 0 0 / 14%);
+    box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.28),
+      0 6px 10px 0 rgba(0, 0, 0, 0.14);
 
     font-family: Cascadia;
     font-size: 1.8em;
