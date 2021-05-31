@@ -434,6 +434,13 @@ const ExcalidrawWrapper = () => {
                   <ExportToExcalidrawPlus
                     elements={elements}
                     appState={appState}
+                    onError={(error) => {
+                      excalidrawAPI?.updateScene({
+                        appState: {
+                          errorMessage: error.message,
+                        },
+                      });
+                    }}
                   />
                 );
               },

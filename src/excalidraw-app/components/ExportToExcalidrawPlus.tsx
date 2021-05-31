@@ -63,7 +63,8 @@ const exportToExcalidrawPlus = async (
 export const ExportToExcalidrawPlus: React.FC<{
   elements: readonly NonDeletedExcalidrawElement[];
   appState: AppState;
-}> = ({ elements, appState }) => {
+  onError: (error: Error) => void;
+}> = ({ elements, appState, onError }) => {
   return (
     <Card color="indigo">
       <div className="Card-icon">{excalidrawPlusIcon}</div>
@@ -77,7 +78,14 @@ export const ExportToExcalidrawPlus: React.FC<{
         title={t("exportDialog.excalidrawplus_button")}
         aria-label={t("exportDialog.excalidrawplus_button")}
         showAriaLabel={true}
-        onClick={() => exportToExcalidrawPlus(elements, appState)}
+        onClick={async () => {
+          try {
+            await exportToExcalidrawPlus(elements, appState);
+          } catch (error) {
+            console.error(error);
+            onError(new Error(t("exportDialog.excalidrawplus_exportError")));
+          }
+        }}
       />
     </Card>
   );
