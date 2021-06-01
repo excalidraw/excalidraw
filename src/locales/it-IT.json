@@ -226,9 +226,9 @@
     "link_title": "Link condivisibile",
     "link_details": "Esporta come link di sola lettura.",
     "link_button": "Esporta come Link",
-    "excalidrawplus_description": "",
-    "excalidrawplus_button": "",
-    "excalidrawplus_exportError": ""
+    "excalidrawplus_description": "Salva la scena nel tuo spazio di lavoro Excalidraw+.",
+    "excalidrawplus_button": "Esporta",
+    "excalidrawplus_exportError": "Non è stato possibile esportare su Excalidraw+ al questo momento..."
   },
   "helpDialog": {
     "blog": "Leggi il nostro blog",
