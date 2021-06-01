@@ -225,7 +225,10 @@
     "disk_button": "保存为文件",
     "link_title": "分享链接",
     "link_details": "导出为只读链接。",
-    "link_button": "导出链接"
+    "link_button": "导出链接",
+    "excalidrawplus_description": "",
+    "excalidrawplus_button": "",
+    "excalidrawplus_exportError": ""
   },
   "helpDialog": {
     "blog": "浏览我们的博客",
