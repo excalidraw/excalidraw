@@ -534,7 +534,9 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   public focusContainer = () => {
-    this.excalidrawContainerRef.current?.focus();
+    if (this.props.autofocus) {
+      this.excalidrawContainerRef.current?.focus();
+    }
   };
 
   public getSceneElementsIncludingDeleted = () => {
