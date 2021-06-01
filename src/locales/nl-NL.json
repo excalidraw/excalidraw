@@ -225,7 +225,10 @@
     "disk_button": "Opslaan naar bestand",
     "link_title": "Deelbare link",
     "link_details": "Exporteren als een alleen-lezen link.",
-    "link_button": "Exporteer naar link"
+    "link_button": "Exporteer naar link",
+    "excalidrawplus_description": "",
+    "excalidrawplus_button": "",
+    "excalidrawplus_exportError": ""
   },
   "helpDialog": {
     "blog": "Lees onze blog",
