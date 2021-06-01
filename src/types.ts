@@ -16,7 +16,7 @@ import { Point as RoughPoint } from "roughjs/bin/geometry";
 import { LinearElementEditor } from "./element/linearElementEditor";
 import { SuggestedBinding } from "./element/binding";
 import { ImportedDataState } from "./data/types";
-import App from "./components/App";
+import type App from "./components/App";
 import type { ResolvablePromise } from "./utils";
 import { Spreadsheet } from "./charts";
 import { Language } from "./i18n";
