@@ -226,9 +226,9 @@
     "link_title": "URL partajabil",
     "link_details": "Exportă ca URL doar în citire.",
     "link_button": "Exportare în URL",
-    "excalidrawplus_description": "",
-    "excalidrawplus_button": "",
-    "excalidrawplus_exportError": ""
+    "excalidrawplus_description": "Salvează scena în spațiul de lucru Excalidraw+.",
+    "excalidrawplus_button": "Exportare",
+    "excalidrawplus_exportError": "Excalidraw+ nu a putut fi exportat în acest moment..."
   },
   "helpDialog": {
     "blog": "Citește blogul nostru",
