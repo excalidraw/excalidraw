@@ -225,7 +225,10 @@
     "disk_button": "Salvare în fișier",
     "link_title": "URL partajabil",
     "link_details": "Exportă ca URL doar în citire.",
-    "link_button": "Exportare în URL"
+    "link_button": "Exportare în URL",
+    "excalidrawplus_description": "",
+    "excalidrawplus_button": "",
+    "excalidrawplus_exportError": ""
   },
   "helpDialog": {
     "blog": "Citește blogul nostru",
