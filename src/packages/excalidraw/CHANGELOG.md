@@ -23,8 +23,6 @@ Please add the latest change on the top under the correct section.
 
 Note: Earlier Excalidraw component was focussed by default on page load, you need to enable `autofocus` prop to retain the same behaviour.
 
-Note: earlier the excalidraw component was focussed by default on page load, so you will have to enable this prop to retain the behaviour.
-
 - Added prop `UIOptions.canvasActions.export.renderCustomUI` to support Custom UI rendering inside export dialog [#3666](https://github.com/excalidraw/excalidraw/pull/3666).
 - Added prop `UIOptions.canvasActions.saveAsImage` to show/hide the **Save as image** button in the canvas actions. Defauls to `true` hence the **Save as Image** button is rendered [#3662](https://github.com/excalidraw/excalidraw/pull/3662).
 
