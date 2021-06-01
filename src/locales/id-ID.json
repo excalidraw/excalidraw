@@ -226,9 +226,9 @@
     "link_title": "Tautan",
     "link_details": "Ekspor sebagai tautan yang hanya dibaca.",
     "link_button": "Ekspor ke tautan",
-    "excalidrawplus_description": "",
-    "excalidrawplus_button": "",
-    "excalidrawplus_exportError": ""
+    "excalidrawplus_description": "Simpan pemandangan ke ruang kerja Excalidraw+ Anda.",
+    "excalidrawplus_button": "Ekspor",
+    "excalidrawplus_exportError": "Tidak dapat ekspor ke Excalidraw+ saat ini..."
   },
   "helpDialog": {
     "blog": "Baca blog kami",
