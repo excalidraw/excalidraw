@@ -225,7 +225,10 @@
     "disk_button": "Сохранить в файл",
     "link_title": "Поделитесь ссылкой",
     "link_details": "Экспорт ссылки только для чтения.",
-    "link_button": "Экспорт в ссылку"
+    "link_button": "Экспорт в ссылку",
+    "excalidrawplus_description": "",
+    "excalidrawplus_button": "",
+    "excalidrawplus_exportError": ""
   },
   "helpDialog": {
     "blog": "Прочитайте наш блог",
