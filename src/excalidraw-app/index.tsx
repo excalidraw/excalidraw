@@ -438,7 +438,7 @@ const ExcalidrawWrapper = () => {
         detectScroll={false}
         handleKeyboardGlobally={true}
         onLibraryChange={onLibraryChange}
-        autofocus
+        autofocus={true}
       />
       {excalidrawAPI && <CollabWrapper excalidrawAPI={excalidrawAPI} />}
       {errorMessage && (
