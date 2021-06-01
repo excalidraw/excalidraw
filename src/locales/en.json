@@ -225,7 +225,10 @@
     "disk_button": "Save to file",
     "link_title": "Shareable link",
     "link_details": "Export as a read-only link.",
-    "link_button": "Export to Link"
+    "link_button": "Export to Link",
+    "excalidrawplus_description": "Save the scene to your Excalidraw+ workspace.",
+    "excalidrawplus_button": "Export",
+    "excalidrawplus_exportError": "Couldn't export to Excalidraw+ at this moment..."
   },
   "helpDialog": {
     "blog": "Read our blog",

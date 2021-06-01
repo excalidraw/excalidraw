@@ -56,6 +56,7 @@ import { Tooltip } from "../components/Tooltip";
 import { shield } from "../components/icons";
 
 import "./index.scss";
+import { ExportToExcalidrawPlus } from "./components/ExportToExcalidrawPlus";
 
 const languageDetector = new LanguageDetector();
 languageDetector.init({
@@ -428,6 +429,21 @@ const ExcalidrawWrapper = () => {
           canvasActions: {
             export: {
               onExportToBackend,
+              renderCustomUI: (elements, appState) => {
+                return (
+                  <ExportToExcalidrawPlus
+                    elements={elements}
+                    appState={appState}
+                    onError={(error) => {
+                      excalidrawAPI?.updateScene({
+                        appState: {
+                          errorMessage: error.message,
+                        },
+                      });
+                    }}
+                  />
+                );
+              },
             },
           },
         }}
