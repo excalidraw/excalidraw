@@ -225,7 +225,10 @@
     "disk_button": "Enregistrer comme fichier",
     "link_title": "Lien partageable",
     "link_details": "Exporter comme un lien en lecture seule.",
-    "link_button": "Exporter comme lien"
+    "link_button": "Exporter comme lien",
+    "excalidrawplus_description": "",
+    "excalidrawplus_button": "",
+    "excalidrawplus_exportError": ""
   },
   "helpDialog": {
     "blog": "Lire notre blog",
