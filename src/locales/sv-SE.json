@@ -225,7 +225,10 @@
     "disk_button": "Spara till fil",
     "link_title": "Delbar länk",
     "link_details": "Exportera som en skrivskyddad länk.",
-    "link_button": "Exportera till länk"
+    "link_button": "Exportera till länk",
+    "excalidrawplus_description": "",
+    "excalidrawplus_button": "",
+    "excalidrawplus_exportError": ""
   },
   "helpDialog": {
     "blog": "Läs vår blogg",
