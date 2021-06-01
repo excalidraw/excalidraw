@@ -1,6 +1,6 @@
 import throttle from "lodash.throttle";
 import React, { PureComponent } from "react";
-import { ExcalidrawImperativeAPI } from "../../components/App";
+import { ExcalidrawImperativeAPI } from "../../types";
 import { ErrorDialog } from "../../components/ErrorDialog";
 import { APP_NAME, ENV, EVENT } from "../../constants";
 import { ImportedDataState } from "../../data/types";

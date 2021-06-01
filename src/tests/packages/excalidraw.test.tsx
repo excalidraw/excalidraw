@@ -1,9 +1,9 @@
 import React from "react";
-import { fireEvent, GlobalTestState, render } from "./test-utils";
-import Excalidraw from "../packages/excalidraw/index";
+import { fireEvent, GlobalTestState, render } from "../test-utils";
+import Excalidraw from "../../packages/excalidraw/index";
 import { queryByText, queryByTestId } from "@testing-library/react";
-import { GRID_SIZE } from "../constants";
-import { t } from "../i18n";
+import { GRID_SIZE } from "../../constants";
+import { t } from "../../i18n";
 
 const { h } = window;
 
