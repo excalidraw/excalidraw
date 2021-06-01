@@ -225,7 +225,10 @@
     "disk_button": "Tallenna tiedostoon",
     "link_title": "Jaettava linkki",
     "link_details": "Vie vain luku -linkkinä.",
-    "link_button": "Vie linkkinä"
+    "link_button": "Vie linkkinä",
+    "excalidrawplus_description": "",
+    "excalidrawplus_button": "",
+    "excalidrawplus_exportError": ""
   },
   "helpDialog": {
     "blog": "Lue blogiamme",
