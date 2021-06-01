@@ -226,9 +226,9 @@
     "link_title": "Teilbarer Link",
     "link_details": "Als schreibgeschützten Link exportieren.",
     "link_button": "Als Link exportieren",
-    "excalidrawplus_description": "",
-    "excalidrawplus_button": "",
-    "excalidrawplus_exportError": ""
+    "excalidrawplus_description": "Speichere die Szene in deinem Excalidraw+ Arbeitsbereich.",
+    "excalidrawplus_button": "Exportieren",
+    "excalidrawplus_exportError": "Konnte nicht nach Excalidraw+ exportieren..."
   },
   "helpDialog": {
     "blog": "Lies unseren Blog",
