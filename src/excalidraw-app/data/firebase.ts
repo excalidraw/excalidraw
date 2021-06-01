@@ -5,15 +5,19 @@ import { getSceneVersion } from "../../element";
 import Portal from "../collab/Portal";
 import { restoreElements } from "../../data/restore";
 
+// private
+// -----------------------------------------------------------------------------
+
 let firebasePromise: Promise<
   typeof import("firebase/app").default
 > | null = null;
+let firestorePromise: Promise<any> | null = null;
+let firebseStoragePromise: Promise<any> | null = null;
 
-const loadFirebase = async () => {
+const _loadFirebase = async () => {
   const firebase = (
     await import(/* webpackChunkName: "firebase" */ "firebase/app")
   ).default;
-  await import(/* webpackChunkName: "firestore" */ "firebase/firestore");
 
   const firebaseConfig = JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG);
   firebase.initializeApp(firebaseConfig);
@@ -21,13 +25,37 @@ const loadFirebase = async () => {
   return firebase;
 };
 
-const getFirebase = async (): Promise<
+const _getFirebase = async (): Promise<
   typeof import("firebase/app").default
 > => {
   if (!firebasePromise) {
-    firebasePromise = loadFirebase();
+    firebasePromise = _loadFirebase();
   }
-  return await firebasePromise!;
+  return firebasePromise;
+};
+
+// -----------------------------------------------------------------------------
+
+const loadFirestore = async () => {
+  const firebase = await _getFirebase();
+  if (!firestorePromise) {
+    firestorePromise = import(
+      /* webpackChunkName: "firestore" */ "firebase/firestore"
+    );
+    await firestorePromise;
+  }
+  return firebase;
+};
+
+export const loadFirebaseStorage = async () => {
+  const firebase = await _getFirebase();
+  if (!firebseStoragePromise) {
+    firebseStoragePromise = import(
+      /* webpackChunkName: "storage" */ "firebase/storage"
+    );
+    await firebseStoragePromise;
+  }
+  return firebase;
 };
 
 interface FirebaseStoredScene {
@@ -108,7 +136,7 @@ export const saveToFirebase = async (
     return true;
   }
 
-  const firebase = await getFirebase();
+  const firebase = await loadFirestore();
   const sceneVersion = getSceneVersion(elements);
   const { ciphertext, iv } = await encryptElements(roomKey, elements);
 
@@ -150,7 +178,7 @@ export const loadFromFirebase = async (
   roomKey: string,
   socket: SocketIOClient.Socket | null,
 ): Promise<readonly ExcalidrawElement[] | null> => {
-  const firebase = await getFirebase();
+  const firebase = await loadFirestore();
   const db = firebase.firestore();
 
   const docRef = db.collection("scenes").doc(roomId);

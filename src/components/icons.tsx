@@ -24,7 +24,10 @@ type Opts = {
   mirror?: true;
 } & React.SVGProps<SVGSVGElement>;
 
-const createIcon = (d: string | React.ReactNode, opts: number | Opts = 512) => {
+export const createIcon = (
+  d: string | React.ReactNode,
+  opts: number | Opts = 512,
+) => {
   const { width = 512, height = width, mirror, style } =
     typeof opts === "number" ? ({ width: opts } as Opts) : opts;
   return (

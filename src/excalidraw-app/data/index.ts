@@ -17,7 +17,7 @@ const generateRandomID = async () => {
   return Array.from(arr, byteToHex).join("");
 };
 
-const generateEncryptionKey = async () => {
+export const generateEncryptionKey = async () => {
   const key = await window.crypto.subtle.generateKey(
     {
       name: "AES-GCM",
@@ -176,7 +176,7 @@ export const getImportedKey = (key: string, usage: KeyUsage) =>
     [usage],
   );
 
-const decryptImported = async (
+export const decryptImported = async (
   iv: ArrayBuffer,
   encrypted: ArrayBuffer,
   privateKey: string,
