@@ -5,7 +5,7 @@ import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
 import Scene from "../scene/Scene";
 import { NonDeletedExcalidrawElement } from "./types";
-import { PointerDownState } from "../components/App";
+import { PointerDownState } from "../types";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
