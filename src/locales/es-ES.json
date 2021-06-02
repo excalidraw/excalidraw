@@ -124,7 +124,7 @@
     "scrollBackToContent": "Volver al contenido",
     "zoomIn": "Acercarse",
     "zoomOut": "Alejarse",
-    "resetZoom": "Restablecer acercamiento",
+    "resetZoom": "Restablecer zoom",
     "menu": "Menú",
     "done": "Hecho",
     "edit": "Editar",
@@ -221,14 +221,14 @@
   },
   "exportDialog": {
     "disk_title": "Guardar en el disco",
-    "disk_details": "",
+    "disk_details": "Exportar los datos de la escena a un archivo desde el cual se puede importar más tarde.",
     "disk_button": "Guardar en el archivo",
     "link_title": "Enlace para compartir",
     "link_details": "Exportar como enlace de sólo lectura.",
     "link_button": "Exportar al link",
-    "excalidrawplus_description": "",
-    "excalidrawplus_button": "",
-    "excalidrawplus_exportError": ""
+    "excalidrawplus_description": "Guarda la escena en tu espacio de trabajo de Excalidraw+.",
+    "excalidrawplus_button": "Exportar",
+    "excalidrawplus_exportError": "No se pudo exportar a Excalidraw+ en este momento..."
   },
   "helpDialog": {
     "blog": "Lee nuestro blog",
