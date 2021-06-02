@@ -750,6 +750,20 @@ export const ArrowheadDotIcon = React.memo(
     ),
 );
 
+export const ArrowheadOpenDotIcon = React.memo(
+  ({ theme, flip = false }: { theme: "light" | "dark"; flip?: boolean }) =>
+    createIcon(
+      <g
+        stroke={iconFillColor(theme)}
+        transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
+      >
+        <path d="M26 10L6 10" strokeWidth={2} />
+        <circle r="4" transform="matrix(-1 0 0 1 30 10)" fill="transparent" />
+      </g>,
+      { width: 40, height: 20 },
+    ),
+);
+
 export const ArrowheadBarIcon = React.memo(
   ({ theme, flip = false }: { theme: "light" | "dark"; flip?: boolean }) =>
     createIcon(

@@ -258,6 +258,7 @@ export const getArrowheadPoints = (
     arrow: 30,
     bar: 15,
     dot: 15,
+    opendot: 15,
   }[arrowhead]; // pixels (will differ for each arrowhead)
 
   let length = 0;
@@ -288,6 +289,10 @@ export const getArrowheadPoints = (
 
   if (arrowhead === "dot") {
     const r = Math.hypot(ys - y2, xs - x2) + element.strokeWidth;
+    return [x2, y2, r];
+  }
+  if (arrowhead === "opendot") {
+    const r = Math.hypot(ys - y2, xs - x2);
     return [x2, y2, r];
   }
 

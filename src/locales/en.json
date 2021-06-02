@@ -39,6 +39,7 @@
     "arrowhead_arrow": "Arrow",
     "arrowhead_bar": "Bar",
     "arrowhead_dot": "Dot",
+    "arrowhead_opendot": "OpenDot",
     "fontSize": "Font size",
     "fontFamily": "Font family",
     "onlySelected": "Only selected",
