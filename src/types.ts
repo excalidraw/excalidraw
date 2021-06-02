@@ -201,7 +201,7 @@ export interface ExcalidrawProps {
   detectScroll?: boolean;
   handleKeyboardGlobally?: boolean;
   onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
-  autofocus?: boolean;
+  autoFocus?: boolean;
 }
 
 export type SceneData = {

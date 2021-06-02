@@ -457,7 +457,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   public focusContainer = () => {
-    if (this.props.autofocus) {
+    if (this.props.autoFocus) {
       this.excalidrawContainerRef.current?.focus();
     }
   };

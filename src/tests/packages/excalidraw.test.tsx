@@ -225,8 +225,8 @@ describe("<Excalidraw/>", () => {
     });
   });
 
-  describe("Test autofocus prop", () => {
-    it("should not focus when autofocus is false", async () => {
+  describe("Test autoFocus prop", () => {
+    it("should not focus when autoFocus is false", async () => {
       const { container } = await render(<Excalidraw />);
 
       expect(
@@ -234,8 +234,8 @@ describe("<Excalidraw/>", () => {
       ).toBe(false);
     });
 
-    it("should focus when autofocus is true", async () => {
-      const { container } = await render(<Excalidraw autofocus />);
+    it("should focus when autoFocus is true", async () => {
+      const { container } = await render(<Excalidraw autoFocus={true} />);
 
       expect(
         container.querySelector(".excalidraw") === document.activeElement,
