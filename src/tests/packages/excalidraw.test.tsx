@@ -224,4 +224,22 @@ describe("<Excalidraw/>", () => {
       });
     });
   });
+
+  describe("Test autoFocus prop", () => {
+    it("should not focus when autoFocus is false", async () => {
+      const { container } = await render(<Excalidraw />);
+
+      expect(
+        container.querySelector(".excalidraw") === document.activeElement,
+      ).toBe(false);
+    });
+
+    it("should focus when autoFocus is true", async () => {
+      const { container } = await render(<Excalidraw autoFocus={true} />);
+
+      expect(
+        container.querySelector(".excalidraw") === document.activeElement,
+      ).toBe(true);
+    });
+  });
 });

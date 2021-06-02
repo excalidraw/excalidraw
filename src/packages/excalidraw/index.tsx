@@ -33,6 +33,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     detectScroll = true,
     handleKeyboardGlobally = false,
     onLibraryChange,
+    autoFocus = false,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -92,6 +93,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
         detectScroll={detectScroll}
         handleKeyboardGlobally={handleKeyboardGlobally}
         onLibraryChange={onLibraryChange}
+        autoFocus={autoFocus}
       />
     </InitializeApp>
   );
