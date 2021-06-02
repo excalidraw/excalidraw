@@ -226,9 +226,9 @@
     "link_title": "Aseɣwen n beṭṭu",
     "link_details": "Sifeḍ am useɣwen n tɣuri kan.",
     "link_button": "Sifeḍ deg useɣwen",
-    "excalidrawplus_description": "",
-    "excalidrawplus_button": "",
-    "excalidrawplus_exportError": ""
+    "excalidrawplus_description": "Sekles asayes-inek•inem di tallunt n umahil Excalidraw+.",
+    "excalidrawplus_button": "Sifeḍ",
+    "excalidrawplus_exportError": "Ulamek asifeḍ ɣer Excalidraw+ akka tura..."
   },
   "helpDialog": {
     "blog": "Ɣeṛ ablug-nneɣ",
