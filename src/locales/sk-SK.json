@@ -101,8 +101,8 @@
     "viewMode": "Režim zobrazenia",
     "toggleExportColorScheme": "Prepnúť exportovanie farebnej schémy",
     "share": "Zdieľať",
-    "showStroke": "",
-    "showBackground": "",
+    "showStroke": "Zobraziť výber farby pre obrys",
+    "showBackground": "Zobraziť výber farby pre pozadie",
     "toggleTheme": "Prepnúť tému"
   },
   "buttons": {
@@ -226,7 +226,7 @@
     "link_title": "Odkaz na zdieľanie",
     "link_details": "Exportovať ako odkaz iba na čítanie.",
     "link_button": "Exportovať ako odkaz",
-    "excalidrawplus_description": "",
+    "excalidrawplus_description": "Uložiť scénu do vášho Excalidraw+ pracovného priestoru.",
     "excalidrawplus_button": "Exportovať",
     "excalidrawplus_exportError": "Nepodarilo sa vykonať export do Excalidraw+..."
   },
