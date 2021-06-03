@@ -104,7 +104,7 @@ describe("restoreElements", () => {
     expect(restoredFreedraw).toMatchSnapshot({ seed: expect.any(Number) });
   });
 
-  it("with line and draw elements", () => {
+  it("should restore line and draw elements correctly", () => {
     const lineElement = API.createElement({ type: "line", id: "id-line01" });
 
     const drawElement = API.createElement({ type: "line", id: "id-draw01" });

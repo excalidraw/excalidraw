@@ -135,7 +135,7 @@ Object {
 }
 `;
 
-exports[`restoreElements with line and draw elements 1`] = `
+exports[`restoreElements should restore line and draw elements correctly 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -176,7 +176,7 @@ Object {
 }
 `;
 
-exports[`restoreElements with line and draw elements 2`] = `
+exports[`restoreElements should restore line and draw elements correctly 2`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",
