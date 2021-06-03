@@ -1,5 +1,35 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`restoreElements should restore freedraw element correctly 1`] = `
+Object {
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElementIds": Array [],
+  "fillStyle": "hachure",
+  "groupIds": Array [],
+  "height": 0,
+  "id": "id-freedraw01",
+  "isDeleted": false,
+  "lastCommittedPoint": null,
+  "opacity": 100,
+  "points": Array [],
+  "pressures": Array [],
+  "roughness": 1,
+  "seed": Any<Number>,
+  "simulatePressure": true,
+  "strokeColor": "#000000",
+  "strokeSharpness": "sharp",
+  "strokeStyle": "solid",
+  "strokeWidth": 1,
+  "type": "freedraw",
+  "version": 1,
+  "versionNonce": 0,
+  "width": 0,
+  "x": 0,
+  "y": 0,
+}
+`;
+
 exports[`restoreElements should restore text element correctly passing value for each attribute 1`] = `
 Object {
   "angle": 0,

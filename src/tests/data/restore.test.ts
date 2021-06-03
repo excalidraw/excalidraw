@@ -91,30 +91,17 @@ describe("restoreElements", () => {
     });
   });
 
-  it("with freedraw element", () => {
-    const freedrawElement = API.createElement({ type: "freedraw" });
-
-    const expectedFreedrawElement = {
-      type: freedrawElement.type,
-      points: freedrawElement.points,
-      lastCommittedPoint: null,
-      simulatePressure: freedrawElement.simulatePressure,
-      pressures: freedrawElement.pressures,
-    };
+  it("should restore freedraw element correctly", () => {
+    const freedrawElement = API.createElement({
+      type: "freedraw",
+      id: "id-freedraw01",
+    });
 
     const restoredFreedraw = restore.restoreElements([
       freedrawElement,
     ])[0] as ExcalidrawFreeDrawElement;
 
-    const gotRestoredFreedrawElement = {
-      type: restoredFreedraw.type,
-      points: restoredFreedraw.points,
-      lastCommittedPoint: null,
-      simulatePressure: restoredFreedraw.simulatePressure,
-      pressures: restoredFreedraw.pressures,
-    };
-
-    expect(gotRestoredFreedrawElement).toMatchObject(expectedFreedrawElement);
+    expect(restoredFreedraw).toMatchSnapshot({ seed: expect.any(Number) });
   });
 
   it("with line and draw elements", () => {
