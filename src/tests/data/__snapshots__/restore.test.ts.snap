@@ -94,7 +94,7 @@ Object {
 }
 `;
 
-exports[`restoreElements with arrow element 1`] = `
+exports[`restoreElements should restore arrow element correctly 1`] = `
 Object {
   "angle": 0,
   "backgroundColor": "transparent",

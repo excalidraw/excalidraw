@@ -124,7 +124,7 @@ describe("restoreElements", () => {
     expect(restoredDraw).toMatchSnapshot({ seed: expect.any(Number) });
   });
 
-  it("with arrow element", () => {
+  it("should restore arrow element correctly", () => {
     const arrowElement = API.createElement({ type: "arrow", id: "id-arrow01" });
 
     const restoredElements = restore.restoreElements([arrowElement]);
