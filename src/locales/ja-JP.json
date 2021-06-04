@@ -226,9 +226,9 @@
     "link_title": "共有可能なリンク",
     "link_details": "読み取り専用リンクとしてエクスポート",
     "link_button": "リンクとしてエクスポート",
-    "excalidrawplus_description": "",
-    "excalidrawplus_button": "",
-    "excalidrawplus_exportError": ""
+    "excalidrawplus_description": "Excalidraw+ ワークスペースにシーンを保存します。",
+    "excalidrawplus_button": "エクスポート",
+    "excalidrawplus_exportError": "Excalidraw+ にエクスポートできませんでした..."
   },
   "helpDialog": {
     "blog": "公式ブログを読む",
