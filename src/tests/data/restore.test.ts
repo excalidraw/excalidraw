@@ -316,15 +316,11 @@ describe("restoreAppState", () => {
   });
 
   it("should return current app state when imported data state is undefined", () => {
-    const stubImportedAppState = getDefaultAppState();
-
-    Object.defineProperty(stubImportedAppState, "cursorButton", {
-      get: jest.fn(() => undefined),
-    });
-
-    Object.defineProperty(stubImportedAppState, "name", {
-      get: jest.fn(() => undefined),
-    });
+    const stubImportedAppState = {
+      ...getDefaultAppState(),
+      cursorButton: undefined,
+      name: undefined,
+    };
 
     const stubLocalAppState = getDefaultAppState();
     stubLocalAppState.cursorButton = "down";
@@ -364,16 +360,15 @@ describe("restoreAppState", () => {
   });
 
   it("should return default app state when imported data state and local app state are undefined", () => {
-    const stubImportedAppState = getDefaultAppState();
+    const stubImportedAppState = {
+      ...getDefaultAppState(),
+      cursorButton: undefined,
+    };
 
-    Object.defineProperty(stubImportedAppState, "cursorButton", {
-      get: jest.fn(() => undefined),
-    });
-
-    const stubLocalAppState = getDefaultAppState();
-    Object.defineProperty(stubLocalAppState, "cursorButton", {
-      get: jest.fn(() => undefined),
-    });
+    const stubLocalAppState = {
+      ...getDefaultAppState(),
+      cursorButton: undefined,
+    };
 
     const restoredAppState = restore.restoreAppState(
       stubImportedAppState,
