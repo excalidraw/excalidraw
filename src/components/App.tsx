@@ -197,9 +197,10 @@ import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
-const ExcalidrawContainerContext = React.createContext<HTMLDivElement | null>(
-  null,
-);
+const ExcalidrawContainerContext = React.createContext<{
+  container: HTMLDivElement | null;
+  id: string | null;
+}>({ container: null, id: null });
 export const useExcalidrawContainer = () =>
   useContext(ExcalidrawContainerContext);
 
@@ -327,7 +328,6 @@ class App extends React.Component<AppProps, AppState> {
     if (viewModeEnabled) {
       return (
         <canvas
-          id="canvas"
           style={{
             width: canvasDOMWidth,
             height: canvasDOMHeight,
@@ -394,7 +394,10 @@ class App extends React.Component<AppProps, AppState> {
         }
       >
         <ExcalidrawContainerContext.Provider
-          value={this.excalidrawContainerRef.current}
+          value={{
+            container: this.excalidrawContainerRef.current,
+            id: this.id,
+          }}
         >
           <IsMobileContext.Provider value={this.isMobile}>
             <LayerUI

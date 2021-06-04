@@ -15,10 +15,12 @@ type Props = {
 type State = {
   fileName: string;
 };
+
 export class ProjectName extends Component<Props, State> {
   state = {
     fileName: this.props.value,
   };
+
   private handleBlur = (event: any) => {
     focusNearestParent(event.target);
     const value = event.target.value;
