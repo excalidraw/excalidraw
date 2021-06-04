@@ -16,7 +16,7 @@ describe("textWysiwyg", () => {
 
     const element = UI.createElement("text");
 
-    new Pointer("mouse").clickOn(element);
+    new Pointer("mouse").doubleClickOn(element);
     textarea = document.querySelector(
       ".excalidraw-textEditorContainer > textarea",
     )!;
