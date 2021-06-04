@@ -1,6 +1,6 @@
 import "./TextInput.scss";
 
-import React, { Component } from "react";
+import React, { useState } from "react";
 import { focusNearestParent } from "../utils";
 
 import "./ProjectName.scss";
@@ -12,22 +12,18 @@ type Props = {
   isNameEditable: boolean;
 };
 
-type State = {
-  fileName: string;
-};
-export class ProjectName extends Component<Props, State> {
-  state = {
-    fileName: this.props.value,
-  };
-  private handleBlur = (event: any) => {
+export const ProjectName = (props: Props) => {
+  const [fileName, setFileName] = useState<string>(props.value);
+
+  const handleBlur = (event: any) => {
     focusNearestParent(event.target);
     const value = event.target.value;
-    if (value !== this.props.value) {
-      this.props.onChange(value);
+    if (value !== props.value) {
+      props.onChange(value);
     }
   };
 
-  private handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
     if (event.key === "Enter") {
       event.preventDefault();
       if (event.nativeEvent.isComposing || event.keyCode === 229) {
@@ -37,29 +33,25 @@ export class ProjectName extends Component<Props, State> {
     }
   };
 
-  public render() {
-    return (
-      <div className="ProjectName">
-        <label className="ProjectName-label" htmlFor="filename">
-          {`${this.props.label}${this.props.isNameEditable ? "" : ":"}`}
-        </label>
-        {this.props.isNameEditable ? (
-          <input
-            className="TextInput"
-            onBlur={this.handleBlur}
-            onKeyDown={this.handleKeyDown}
-            id="filename"
-            value={this.state.fileName}
-            onChange={(event) =>
-              this.setState({ fileName: event.target.value })
-            }
-          />
-        ) : (
-          <span className="TextInput TextInput--readonly" id="filename">
-            {this.props.value}
-          </span>
-        )}
-      </div>
-    );
-  }
-}
+  return (
+    <div className="ProjectName">
+      <label className="ProjectName-label" htmlFor="filename">
+        {`${props.label}${props.isNameEditable ? "" : ":"}`}
+      </label>
+      {props.isNameEditable ? (
+        <input
+          className="TextInput"
+          onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
+          id="filename"
+          value={fileName}
+          onChange={(event) => setFileName(event.target.value)}
+        />
+      ) : (
+        <span className="TextInput TextInput--readonly" id="filename">
+          {props.value}
+        </span>
+      )}
+    </div>
+  );
+};
