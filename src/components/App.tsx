@@ -349,7 +349,6 @@ class App extends React.Component<AppProps, AppState> {
     }
     return (
       <canvas
-        id="canvas"
         style={{
           width: canvasDOMWidth,
           height: canvasDOMHeight,
