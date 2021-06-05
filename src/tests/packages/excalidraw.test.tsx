@@ -146,7 +146,7 @@ describe("<Excalidraw/>", () => {
       it('should not hide any UI element when canvasActions is "undefined"', async () => {
         await render(<Excalidraw UIOptions={{}} />);
         const canvasActions = document.querySelector(
-          `section[aria-labelledby="test-id-canvasActions-title"]`,
+          'section[aria-labelledby="test-id-canvasActions-title"]',
         );
         expect(canvasActions).toMatchSnapshot();
       });
