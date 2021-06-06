@@ -153,7 +153,7 @@ To view the full example visit :point_down:
 
 </details>
 
-Since Excalidraw doesn't support server side rendering yet so you will have to make sure the component is rendered once host is mounted.
+Since Excalidraw doesn't support server side rendering yet, you should render the component once the host is mounted.
 
 ```js
 import { useState, useEffect } from "react";
@@ -161,7 +161,7 @@ export default function IndexPage() {
   const [Comp, setComp] = useState(null);
   useEffect(() => {
     import("@excalidraw/excalidraw").then((comp) => setComp(comp.default));
-  });
+  }, []);
   return <>{Comp && <Comp />}</>;
 }
 ```
