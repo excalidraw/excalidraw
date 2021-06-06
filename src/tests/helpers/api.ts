@@ -157,7 +157,6 @@ export class API {
         });
         break;
     }
-
     if (id) {
       element.id = id;
     }
