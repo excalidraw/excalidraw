@@ -30,12 +30,11 @@ describe("restoreElements", () => {
   });
 
   it("should return empty array when input type is not supported", () => {
-    const dummyNotSupportedElement = API.createElement({ type: "text" });
-
-    Object.defineProperty(dummyNotSupportedElement, "type", {
-      get: jest.fn(() => "not supported element type"),
+    const dummyNotSupportedElement: any = API.createElement({
+      type: "text",
     });
 
+    dummyNotSupportedElement.type = "not supported";
     expect(restore.restoreElements([dummyNotSupportedElement]).length).toBe(0);
   });
 
@@ -67,25 +66,19 @@ describe("restoreElements", () => {
   });
 
   it("should restore text element correctly with unknown font family, null text and undefined alignment", () => {
-    const textElement = API.createElement({
+    const textElement: any = API.createElement({
       type: "text",
       textAlign: undefined,
       verticalAlign: undefined,
       id: "id-text01",
     });
 
-    Object.defineProperty(textElement, "text", {
-      get: jest.fn(() => null),
-    });
-
-    Object.defineProperty(textElement, "font", {
-      get: jest.fn(() => "10 unknown"),
-    });
+    textElement.text = null;
+    textElement.font = "10 unknown";
 
     const restoredText = restore.restoreElements([
       textElement,
     ])[0] as ExcalidrawTextElement;
-
     expect(restoredText).toMatchSnapshot({
       seed: expect.any(Number),
     });
@@ -107,10 +100,11 @@ describe("restoreElements", () => {
   it("should restore line and draw elements correctly", () => {
     const lineElement = API.createElement({ type: "line", id: "id-line01" });
 
-    const drawElement = API.createElement({ type: "line", id: "id-draw01" });
-    Object.defineProperty(drawElement, "type", {
-      get: jest.fn(() => "draw"),
+    const drawElement: any = API.createElement({
+      type: "line",
+      id: "id-draw01",
     });
+    drawElement.type = "draw";
 
     const restoredElements = restore.restoreElements([
       lineElement,
@@ -158,15 +152,13 @@ describe("restoreElements", () => {
   });
 
   it("when element.points of a line element is not an array", () => {
-    const lineElement = API.createElement({
+    const lineElement: any = API.createElement({
       type: "line",
       width: 100,
       height: 200,
     });
 
-    Object.defineProperty(lineElement, "points", {
-      get: jest.fn(() => "not an array"),
-    });
+    lineElement.points = "not an array";
 
     const expectedLinePoints = [
       [0, 0],
@@ -233,7 +225,7 @@ describe("restoreElements", () => {
     expect(restoredLine_1.y).toBe(lineElement_1.y + offsetY);
   });
 
-  it("with rectangle, ellipse and diamond elements", () => {
+  it("should restore correctly with rectangle, ellipse and diamond elements", () => {
     const types = ["rectangle", "ellipse", "diamond"];
 
     const elements: ExcalidrawElement[] = [];
@@ -267,33 +259,10 @@ describe("restoreElements", () => {
     expect(restoredElements[1]).toMatchSnapshot({ seed: expect.any(Number) });
     expect(restoredElements[2]).toMatchSnapshot({ seed: expect.any(Number) });
   });
-
-  it("with rectangle element", () => {
-    const rectElement = API.createElement({
-      type: "rectangle",
-      id: "1",
-      fillStyle: "cross-hatch",
-      strokeWidth: 2,
-      strokeStyle: "dashed",
-      roughness: 2,
-      opacity: 10,
-      x: 10,
-      y: 20,
-      strokeColor: "red",
-      backgroundColor: "blue",
-      width: 100,
-      height: 200,
-      groupIds: ["1", "2", "3"],
-      strokeSharpness: "round",
-    });
-
-    const restoredRect = restore.restoreElements([rectElement])[0];
-    expect(restoredRect).toMatchSnapshot({ seed: expect.any(Number) });
-  });
 });
 
 describe("restoreAppState", () => {
-  it("with imported data", () => {
+  it("should restore with imported data", () => {
     const stubImportedAppState = getDefaultAppState();
     stubImportedAppState.elementType = "selection";
     stubImportedAppState.cursorButton = "down";
@@ -315,7 +284,7 @@ describe("restoreAppState", () => {
     expect(restoredAppState.name).toBe(stubImportedAppState.name);
   });
 
-  it("should return current app state when imported data state is undefined", () => {
+  it("should restore with current app state when imported data state is undefined", () => {
     const stubImportedAppState = {
       ...getDefaultAppState(),
       cursorButton: undefined,
@@ -334,7 +303,7 @@ describe("restoreAppState", () => {
     expect(restoredAppState.name).toBe(stubLocalAppState.name);
   });
 
-  it("when imported data is supplied but local app state is null", () => {
+  it("should return imported data when local app state is null", () => {
     const stubImportedAppState = getDefaultAppState();
     stubImportedAppState.cursorButton = "down";
     stubImportedAppState.name = "imported app state";
@@ -349,7 +318,7 @@ describe("restoreAppState", () => {
     expect(restoredAppState.name).toBe(stubImportedAppState.name);
   });
 
-  it("when imported data state is null", () => {
+  it("should return local app state when imported data state is null", () => {
     const stubLocalAppState = getDefaultAppState();
     stubLocalAppState.cursorButton = "down";
     stubLocalAppState.name = "local app state";
@@ -386,13 +355,10 @@ describe("restoreAppState", () => {
     );
   });
 
-  it("when imported data state has a not AllowedExcalidrawElementTypes", () => {
-    const stubImportedAppState = getDefaultAppState();
+  it("when imported data state has a not allowed Excalidraw Element Types", () => {
+    const stubImportedAppState: any = getDefaultAppState();
 
-    Object.defineProperty(stubImportedAppState, "elementType", {
-      get: jest.fn(() => "not Allowed element"),
-    });
-
+    stubImportedAppState.elementType = "not allowed Excalidraw Element Types";
     const stubLocalAppState = getDefaultAppState();
 
     const restoredAppState = restore.restoreAppState(
@@ -402,59 +368,59 @@ describe("restoreAppState", () => {
     expect(restoredAppState.elementType).toBe("selection");
   });
 
-  it("when imported data state has zoom as a number", () => {
-    const stubImportedAppState = getDefaultAppState();
+  describe("with zoom in imported data state", () => {
+    it("when imported data state has zoom as a number", () => {
+      const stubImportedAppState: any = getDefaultAppState();
 
-    Object.defineProperty(stubImportedAppState, "zoom", {
-      get: jest.fn(() => 10),
+      stubImportedAppState.zoom = 10;
+
+      const stubLocalAppState = getDefaultAppState();
+
+      const restoredAppState = restore.restoreAppState(
+        stubImportedAppState,
+        stubLocalAppState,
+      );
+
+      expect(restoredAppState.zoom.value).toBe(10);
+      expect(restoredAppState.zoom.translation).toMatchObject(
+        getDefaultAppState().zoom.translation,
+      );
     });
 
-    const stubLocalAppState = getDefaultAppState();
+    it("when the zoom of imported data state is not a number", () => {
+      const stubImportedAppState = getDefaultAppState();
+      stubImportedAppState.zoom = {
+        value: 10 as NormalizedZoomValue,
+        translation: { x: 5, y: 3 },
+      };
 
-    const restoredAppState = restore.restoreAppState(
-      stubImportedAppState,
-      stubLocalAppState,
-    );
+      const stubLocalAppState = getDefaultAppState();
 
-    expect(restoredAppState.zoom.value).toBe(10);
-    expect(restoredAppState.zoom.translation).toMatchObject(
-      getDefaultAppState().zoom.translation,
-    );
-  });
+      const restoredAppState = restore.restoreAppState(
+        stubImportedAppState,
+        stubLocalAppState,
+      );
 
-  it("when the zoom of imported data state is not a number", () => {
-    const stubImportedAppState = getDefaultAppState();
-    stubImportedAppState.zoom = {
-      value: 10 as NormalizedZoomValue,
-      translation: { x: 5, y: 3 },
-    };
-
-    const stubLocalAppState = getDefaultAppState();
-
-    const restoredAppState = restore.restoreAppState(
-      stubImportedAppState,
-      stubLocalAppState,
-    );
-
-    expect(restoredAppState.zoom.value).toBe(10);
-    expect(restoredAppState.zoom).toMatchObject(stubImportedAppState.zoom);
-  });
-
-  it("when the zoom of imported data state zoom is null", () => {
-    const stubImportedAppState = getDefaultAppState();
-
-    Object.defineProperty(stubImportedAppState, "zoom", {
-      get: jest.fn(() => null),
+      expect(restoredAppState.zoom.value).toBe(10);
+      expect(restoredAppState.zoom).toMatchObject(stubImportedAppState.zoom);
     });
 
-    const stubLocalAppState = getDefaultAppState();
+    it("when the zoom of imported data state zoom is null", () => {
+      const stubImportedAppState = getDefaultAppState();
 
-    const restoredAppState = restore.restoreAppState(
-      stubImportedAppState,
-      stubLocalAppState,
-    );
+      Object.defineProperty(stubImportedAppState, "zoom", {
+        get: jest.fn(() => null),
+      });
 
-    expect(restoredAppState.zoom).toMatchObject(getDefaultAppState().zoom);
+      const stubLocalAppState = getDefaultAppState();
+
+      const restoredAppState = restore.restoreAppState(
+        stubImportedAppState,
+        stubLocalAppState,
+      );
+
+      expect(restoredAppState.zoom).toMatchObject(getDefaultAppState().zoom);
+    });
   });
 });
 
