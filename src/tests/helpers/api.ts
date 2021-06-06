@@ -157,9 +157,6 @@ export class API {
         });
         break;
     }
-    if (!element) {
-      return element;
-    }
 
     if (id) {
       element.id = id;
