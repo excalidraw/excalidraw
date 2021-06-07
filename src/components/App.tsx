@@ -2233,8 +2233,6 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
-    event.persist();
-
     // remove any active selection when we start to interact with canvas
     // (mainly, we care about removing selection outside the component which
     //  would prevent our copy handling otherwise)
