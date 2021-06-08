@@ -107,7 +107,7 @@ const LibraryMenuItems = ({
   onAddToLibrary,
   onInsertShape,
   pendingElements,
-  appState,
+  theme,
   setAppState,
   setLibraryItems,
   libraryReturnUrl,
@@ -120,7 +120,7 @@ const LibraryMenuItems = ({
   onRemoveFromLibrary: (index: number) => void;
   onInsertShape: (elements: LibraryItem) => void;
   onAddToLibrary: (elements: LibraryItem) => void;
-  appState: AppState;
+  theme: AppState["theme"];
   setAppState: React.Component<any, AppState>["setState"];
   setLibraryItems: (library: LibraryItems) => void;
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
@@ -194,9 +194,7 @@ const LibraryMenuItems = ({
       <a
         href={`https://libraries.excalidraw.com?target=${
           window.name || "_blank"
-        }&referrer=${referrer}&useHash=true&token=${id}&theme=${
-          appState.theme
-        }`}
+        }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}`}
         target="_excalidraw_libraries"
       >
         {t("labels.libraries")}
@@ -250,7 +248,7 @@ const LibraryMenu = ({
   onInsertShape,
   pendingElements,
   onAddToLibrary,
-  appState,
+  theme,
   setAppState,
   libraryReturnUrl,
   focusContainer,
@@ -261,7 +259,7 @@ const LibraryMenu = ({
   onClickOutside: (event: MouseEvent) => void;
   onInsertShape: (elements: LibraryItem) => void;
   onAddToLibrary: () => void;
-  appState: AppState;
+  theme: AppState["theme"];
   setAppState: React.Component<any, AppState>["setState"];
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   focusContainer: () => void;
@@ -351,7 +349,7 @@ const LibraryMenu = ({
           libraryReturnUrl={libraryReturnUrl}
           focusContainer={focusContainer}
           library={library}
-          appState={appState}
+          theme={theme}
           id={id}
         />
       )}
@@ -544,7 +542,7 @@ const LayerUI = ({
       libraryReturnUrl={libraryReturnUrl}
       focusContainer={focusContainer}
       library={library}
-      appState={appState}
+      theme={appState.theme}
       id={id}
     />
   ) : null;
