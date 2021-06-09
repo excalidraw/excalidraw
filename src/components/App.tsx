@@ -245,6 +245,10 @@ class App extends React.Component<AppProps, AppState> {
   public libraryItemsFromStorage: LibraryItems | undefined;
   private id: string;
   private history: History;
+  private excalidrawContainerValue: {
+    container: HTMLDivElement | null;
+    id: string;
+  };
 
   constructor(props: AppProps) {
     super(props);
@@ -301,6 +305,11 @@ class App extends React.Component<AppProps, AppState> {
       }
       readyPromise.resolve(api);
     }
+
+    this.excalidrawContainerValue = {
+      container: this.excalidrawContainerRef.current,
+      id: this.id,
+    };
     this.scene = new Scene();
     this.library = new Library(this);
     this.history = new History();
@@ -328,6 +337,7 @@ class App extends React.Component<AppProps, AppState> {
     if (viewModeEnabled) {
       return (
         <canvas
+          className="excalidraw__canvas"
           style={{
             width: canvasDOMWidth,
             height: canvasDOMHeight,
@@ -349,6 +359,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     return (
       <canvas
+        className="excalidraw__canvas"
         style={{
           width: canvasDOMWidth,
           height: canvasDOMHeight,
@@ -393,10 +404,7 @@ class App extends React.Component<AppProps, AppState> {
         }
       >
         <ExcalidrawContainerContext.Provider
-          value={{
-            container: this.excalidrawContainerRef.current,
-            id: this.id,
-          }}
+          value={this.excalidrawContainerValue}
         >
           <IsMobileContext.Provider value={this.isMobile}>
             <LayerUI
