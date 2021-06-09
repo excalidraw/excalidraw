@@ -2,6 +2,7 @@ import "./ToolIcon.scss";
 
 import React from "react";
 import clsx from "clsx";
+import { useExcalidrawContainer } from "./App";
 
 type ToolIconSize = "s" | "m";
 
@@ -43,6 +44,7 @@ type ToolButtonProps =
 const DEFAULT_SIZE: ToolIconSize = "m";
 
 export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
+  const { id: excalId } = useExcalidrawContainer();
   const innerRef = React.useRef(null);
   React.useImperativeHandle(ref, () => innerRef.current);
   const sizeCn = `ToolIcon_size_${props.size || DEFAULT_SIZE}`;
@@ -98,7 +100,7 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
         aria-label={props["aria-label"]}
         aria-keyshortcuts={props["aria-keyshortcuts"]}
         data-testid={props["data-testid"]}
-        id={props.id}
+        id={`${excalId}-${props.id}`}
         onChange={props.onChange}
         checked={props.checked}
         ref={innerRef}

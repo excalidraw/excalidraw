@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { focusNearestParent } from "../utils";
 
 import "./ProjectName.scss";
+import { useExcalidrawContainer } from "./App";
 
 type Props = {
   value: string;
@@ -13,6 +14,7 @@ type Props = {
 };
 
 export const ProjectName = (props: Props) => {
+  const { id } = useExcalidrawContainer();
   const [fileName, setFileName] = useState<string>(props.value);
 
   const handleBlur = (event: any) => {
@@ -43,12 +45,12 @@ export const ProjectName = (props: Props) => {
           className="TextInput"
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
-          id="filename"
+          id={`${id}-filename`}
           value={fileName}
           onChange={(event) => setFileName(event.target.value)}
         />
       ) : (
-        <span className="TextInput TextInput--readonly" id="filename">
+        <span className="TextInput TextInput--readonly" id={`${id}-filename`}>
           {props.value}
         </span>
       )}

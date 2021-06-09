@@ -197,9 +197,10 @@ import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
-const ExcalidrawContainerContext = React.createContext<HTMLDivElement | null>(
-  null,
-);
+const ExcalidrawContainerContext = React.createContext<{
+  container: HTMLDivElement | null;
+  id: string | null;
+}>({ container: null, id: null });
 export const useExcalidrawContainer = () =>
   useContext(ExcalidrawContainerContext);
 
@@ -244,6 +245,10 @@ class App extends React.Component<AppProps, AppState> {
   public libraryItemsFromStorage: LibraryItems | undefined;
   private id: string;
   private history: History;
+  private excalidrawContainerValue: {
+    container: HTMLDivElement | null;
+    id: string;
+  };
 
   constructor(props: AppProps) {
     super(props);
@@ -300,6 +305,12 @@ class App extends React.Component<AppProps, AppState> {
       }
       readyPromise.resolve(api);
     }
+
+    this.excalidrawContainerValue = {
+      container: this.excalidrawContainerRef.current,
+      id: this.id,
+    };
+
     this.scene = new Scene();
     this.library = new Library(this);
     this.history = new History();
@@ -327,7 +338,7 @@ class App extends React.Component<AppProps, AppState> {
     if (viewModeEnabled) {
       return (
         <canvas
-          id="canvas"
+          className="excalidraw__canvas"
           style={{
             width: canvasDOMWidth,
             height: canvasDOMHeight,
@@ -349,7 +360,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     return (
       <canvas
-        id="canvas"
+        className="excalidraw__canvas"
         style={{
           width: canvasDOMWidth,
           height: canvasDOMHeight,
@@ -394,7 +405,7 @@ class App extends React.Component<AppProps, AppState> {
         }
       >
         <ExcalidrawContainerContext.Provider
-          value={this.excalidrawContainerRef.current}
+          value={this.excalidrawContainerValue}
         >
           <IsMobileContext.Provider value={this.isMobile}>
             <LayerUI
@@ -725,6 +736,8 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   public async componentDidMount() {
+    this.excalidrawContainerValue.container = this.excalidrawContainerRef.current;
+
     if (
       process.env.NODE_ENV === ENV.TEST ||
       process.env.NODE_ENV === ENV.DEVELOPMENT

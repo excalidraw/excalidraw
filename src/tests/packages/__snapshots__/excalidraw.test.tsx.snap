@@ -2,12 +2,12 @@
 
 exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should not hide any UI element when canvasActions is "undefined" 1`] = `
 <section
-  aria-labelledby="canvasActions-title"
+  aria-labelledby="test-id-canvasActions-title"
   class="zen-mode-transition"
 >
   <h2
     class="visually-hidden"
-    id="canvasActions-title"
+    id="test-id-canvasActions-title"
   >
     Canvas actions
   </h2>
@@ -201,12 +201,12 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should not hide an
 
 exports[`<Excalidraw/> Test UIOptions prop should not hide any UI element when the UIOptions prop is "undefined" 1`] = `
 <section
-  aria-labelledby="canvasActions-title"
+  aria-labelledby="test-id-canvasActions-title"
   class="zen-mode-transition"
 >
   <h2
     class="visually-hidden"
-    id="canvasActions-title"
+    id="test-id-canvasActions-title"
   >
     Canvas actions
   </h2>
