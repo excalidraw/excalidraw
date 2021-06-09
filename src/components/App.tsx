@@ -310,6 +310,7 @@ class App extends React.Component<AppProps, AppState> {
       container: this.excalidrawContainerRef.current,
       id: this.id,
     };
+
     this.scene = new Scene();
     this.library = new Library(this);
     this.history = new History();
@@ -735,6 +736,8 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   public async componentDidMount() {
+    this.excalidrawContainerValue.container = this.excalidrawContainerRef.current;
+
     if (
       process.env.NODE_ENV === ENV.TEST ||
       process.env.NODE_ENV === ENV.DEVELOPMENT
