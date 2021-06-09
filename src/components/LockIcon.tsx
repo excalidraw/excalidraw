@@ -8,7 +8,6 @@ type LockIconSize = "s" | "m";
 type LockIconProps = {
   title?: string;
   name?: string;
-  id?: string;
   checked: boolean;
   onChange?(): void;
   size?: LockIconSize;
@@ -57,7 +56,6 @@ export const LockIcon = (props: LockIconProps) => {
         className="ToolIcon_type_checkbox"
         type="checkbox"
         name={props.name}
-        id={props.id}
         onChange={props.onChange}
         checked={props.checked}
         aria-label={props.title}
