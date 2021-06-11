@@ -20,6 +20,15 @@ const readFile = util.promisify(fs.readFile);
 const { h } = window;
 
 export class API {
+  static setSelectedElements = (elements: ExcalidrawElement[]) => {
+    h.setState({
+      selectedElementIds: elements.reduce((acc, element) => {
+        acc[element.id] = true;
+        return acc;
+      }, {} as Record<ExcalidrawElement["id"], true>),
+    });
+  };
+
   static getSelectedElements = (): ExcalidrawElement[] => {
     return h.elements.filter(
       (element) => h.state.selectedElementIds[element.id],
@@ -57,6 +66,7 @@ export class API {
     width = 100,
     height = width,
     isDeleted = false,
+    groupIds = [],
     ...rest
   }: {
     type: T;
@@ -66,6 +76,7 @@ export class API {
     width?: number;
     id?: string;
     isDeleted?: boolean;
+    groupIds?: string[];
     // generic element props
     strokeColor?: ExcalidrawGenericElement["strokeColor"];
     backgroundColor?: ExcalidrawGenericElement["backgroundColor"];
@@ -151,6 +162,9 @@ export class API {
     }
     if (isDeleted) {
       element.isDeleted = isDeleted;
+    }
+    if (groupIds) {
+      element.groupIds = groupIds;
     }
     return element as any;
   };

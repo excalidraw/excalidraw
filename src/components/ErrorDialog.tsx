@@ -12,7 +12,7 @@ export const ErrorDialog = ({
   onClose?: () => void;
 }) => {
   const [modalIsShown, setModalIsShown] = useState(!!message);
-  const excalidrawContainer = useExcalidrawContainer();
+  const { container: excalidrawContainer } = useExcalidrawContainer();
 
   const handleClose = React.useCallback(() => {
     setModalIsShown(false);

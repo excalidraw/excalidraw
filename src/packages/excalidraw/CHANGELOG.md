@@ -13,14 +13,87 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+**This changes are not yet released but you can still try it out in [@excalidraw/excalidraw-next](https://www.npmjs.com/package/@excalidraw/excalidraw-next).**
+
 ## Excalidraw API
 
 ### Features
 
+- Added prop [`autoFocus`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#autoFocus) to focus the excalidraw component on page load when enabled, defaults to false [#3691](https://github.com/excalidraw/excalidraw/pull/3691).
+
+  Note: Earlier Excalidraw component was focussed by default on page load, you need to enable `autoFocus` prop to retain the same behaviour.
+
+- Added prop `UIOptions.canvasActions.export.renderCustomUI` to support Custom UI rendering inside export dialog [#3666](https://github.com/excalidraw/excalidraw/pull/3666).
+- Added prop `UIOptions.canvasActions.saveAsImage` to show/hide the **Save as image** button in the canvas actions. Defauls to `true` hence the **Save as Image** button is rendered [#3662](https://github.com/excalidraw/excalidraw/pull/3662).
+
+- Export dialog can be customised with [`UiOptions.canvasActions.export`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#exportOpts) [#3658](https://github.com/excalidraw/excalidraw/pull/3658).
+
+  Also, [`UIOptions`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#UIOptions) is now memoized to avoid unnecessary rerenders.
+
+#### BREAKING CHANGE
+
+- `UIOptions.canvasActions.saveAsScene` is now renamed to `UiOptions.canvasActions.export.saveFileToDisk`. Defaults to `true` hence the **save file to disk** button is rendered inside the export dialog.
+- `exportToBackend` is now renamed to `UIOptions.canvasActions.export.exportToBackend`. If this prop is not passed, the **shareable-link** button will not be rendered, same as before.
+
+### Fixes
+
+- Use excalidraw Id in elements so every element has unique id [#3696](https://github.com/excalidraw/excalidraw/pull/3696).
+
+### Refactor
+
+- #### BREAKING CHANGE
+  - Rename `UIOptions.canvasActions.saveScene` to `UIOptions.canvasActions.saveToActiveFile`[#3657](https://github.com/excalidraw/excalidraw/pull/3657).
+  - Removed `shouldAddWatermark: boolean` attribute from options for [export](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#export-utilities) APIs [#3639](https://github.com/excalidraw/excalidraw/pull/3639).
+  - Removed `appState.shouldAddWatermark` so in case you were passing `shouldAddWatermark` in [initialData.AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L42) it will not work anymore.
+
+---
+
+## 0.8.0 (2021-05-15)
+
+## Excalidraw API
+
+**_These section lists the updates which may affect your integration, so it is recommended to go through this when upgrading the version._**
+
+### Features
+
+- Support updating any `appState` properties in [`updateScene`](https://github.com/excalidraw/excalidraw/blob/master/src/components/App.tsx#L282) API. Earlier only `appState.viewBackgroundColor` was supported, now any attribute can be updated with this API.
 - Expose [`serializeAsJSON`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#serializeAsJSON) helper that we use when saving Excalidraw scene to a file [#3538](https://github.com/excalidraw/excalidraw/pull/3538).
-- Add support to render custom UI in the top right corner via [`renderTopRight`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#renderTopRight) prop [#3539](https://github.com/excalidraw/excalidraw/pull/3539).
+- Add support to render custom UI in the top right corner via [`renderTopRightUI`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#renderTopRightUI) prop [#3539](https://github.com/excalidraw/excalidraw/pull/3539), [#3572](https://github.com/excalidraw/excalidraw/pull/3572) .
 
   This also removes the GitHub icon, keeping it local to the https://excalidraw.com app.
+
+### Fixes
+
+- The encryption shield icon is now removed from excalidraw package as it was specific to excalidraw app and is now rendered via [`renderFooter`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#renderFooter) prop. In case you were hiding this icon earlier, you need not do that anymore [#3577](https://github.com/excalidraw/excalidraw/pull/3577).
+
+  Now `appState` is also passed to [`renderFooter`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#renderFooter) prop.
+
+## Excalidraw Library
+
+**_These section lists the updates made to the excalidraw library and will not affect the integration._**
+
+### Features
+
+- Shortcut key for nerd stats [#3552](https://github.com/excalidraw/excalidraw/pull/3552).
+- Better rendering of curved rectangles [#3562](https://github.com/excalidraw/excalidraw/pull/3562).
+- Improved freedraw [#3512](https://github.com/excalidraw/excalidraw/pull/3512).
+- Add shortcut for dark mode [#3543](https://github.com/excalidraw/excalidraw/pull/3543).
+- Adds rounded icons, joins and caps.[#3521](https://github.com/excalidraw/excalidraw/pull/3521).
+
+### Fixes
+
+- Exporting freedraw with color to svg [#3565](https://github.com/excalidraw/excalidraw/pull/3565).
+- Handle render errors [#3557](https://github.com/excalidraw/excalidraw/pull/3557).
+- Restore on paste or lib import [#3558](https://github.com/excalidraw/excalidraw/pull/3558).
+- Improve mobile user experience [#3508](https://github.com/excalidraw/excalidraw/pull/3508).
+- Prevent selecting `.visually-hidden` elements [#3501](https://github.com/excalidraw/excalidraw/pull/3501).
+
+### Perf
+
+- Reduce SVG export size by more than half by reducing precision to 2 decimal places [#3567](https://github.com/excalidraw/excalidraw/pull/3567).
+- Remove `backdrop-filter` to improve perf [#3506](https://github.com/excalidraw/excalidraw/pull/3506)
+
+---
 
 ## 0.7.0 (2021-04-26)
 

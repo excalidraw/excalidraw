@@ -8,7 +8,6 @@ import React, {
 } from "react";
 import { trackEvent } from "../analytics";
 import { getDefaultAppState } from "../appState";
-import { ExcalidrawImperativeAPI } from "../components/App";
 import { ErrorDialog } from "../components/ErrorDialog";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
 import {
@@ -31,7 +30,7 @@ import Excalidraw, {
   defaultLang,
   /* languages, */
 } from "../packages/excalidraw/index";
-import { AppState, LibraryItems } from "../types";
+import { AppState, LibraryItems, ExcalidrawImperativeAPI } from "../types";
 import {
   debounce,
   getVersion,
@@ -51,7 +50,12 @@ import {
   saveToLocalStorage,
 } from "./data/localStorage";
 import CustomStats from "./CustomStats";
-import { RestoredDataState } from "../data/restore";
+import { restoreAppState, RestoredDataState } from "../data/restore";
+/* import { Tooltip } from "../components/Tooltip"; */
+/* import { shield } from "../components/icons"; */
+
+import "./index.scss";
+import { ExportToExcalidrawPlus } from "./components/ExportToExcalidrawPlus";
 
 const languageDetector = new LanguageDetector();
 languageDetector.init({
@@ -240,7 +244,10 @@ const ExcalidrawWrapper = () => {
       } else {
         initializeScene({ collabAPI }).then((scene) => {
           if (scene) {
-            excalidrawAPI.updateScene(scene);
+            excalidrawAPI.updateScene({
+              ...scene,
+              appState: restoreAppState(scene.appState, null),
+            });
           }
         });
       }
@@ -305,7 +312,7 @@ const ExcalidrawWrapper = () => {
     }
   };
 
-  const renderTopRight = useCallback(
+  const renderTopRightUI = useCallback(
     (isMobile: boolean, appState: AppState) => {
       return (
         <div
@@ -326,6 +333,20 @@ const ExcalidrawWrapper = () => {
 
   /*   const renderFooter = useCallback(
     (isMobile: boolean) => {
+      const renderEncryptedIcon = () => (
+        <a
+          className="encrypted-icon tooltip"
+          href="https://blog.excalidraw.com/end-to-end-encryption/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={t("encrypted.link")}
+        >
+          <Tooltip label={t("encrypted.tooltip")} long={true}>
+            {shield}
+          </Tooltip>
+        </a>
+      );
+
       const renderLanguageList = () => (
         <LanguageList
           onChange={(langCode) => {
@@ -367,7 +388,12 @@ const ExcalidrawWrapper = () => {
           </div>
         );
       }
-      return renderLanguageList();
+      return (
+        <>
+          {renderEncryptedIcon()}
+          {renderLanguageList()}
+        </>
+      );
     },
     [langCode],
   ); */
@@ -398,14 +424,36 @@ const ExcalidrawWrapper = () => {
         /* onCollabButtonClick={collabAPI?.onCollabButtonClick} */
         isCollaborating={collabAPI?.isCollaborating()}
         onPointerUpdate={collabAPI?.onPointerUpdate}
-        onExportToBackend={onExportToBackend}
-        renderTopRight={renderTopRight}
+        UIOptions={{
+          canvasActions: {
+            export: {
+              onExportToBackend,
+              renderCustomUI: (elements, appState) => {
+                return (
+                  <ExportToExcalidrawPlus
+                    elements={elements}
+                    appState={appState}
+                    onError={(error) => {
+                      excalidrawAPI?.updateScene({
+                        appState: {
+                          errorMessage: error.message,
+                        },
+                      });
+                    }}
+                  />
+                );
+              },
+            },
+          },
+        }}
+        renderTopRightUI={renderTopRightUI}
         /* renderFooter={renderFooter} */
         langCode={langCode}
         renderCustomStats={renderCustomStats}
         detectScroll={false}
         handleKeyboardGlobally={true}
         onLibraryChange={onLibraryChange}
+        autoFocus={true}
       />
       {excalidrawAPI && <CollabWrapper excalidrawAPI={excalidrawAPI} />}
       {errorMessage && (

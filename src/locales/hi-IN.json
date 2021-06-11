@@ -20,6 +20,10 @@
     "background": "पृष्ठभूमि",
     "fill": "भरें",
     "strokeWidth": "रेखा की चौड़ाई",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "स्ट्रोक का आकार",
     "strokeStyle_solid": "ठोस",
     "strokeStyle_dashed": "डैश",
@@ -38,8 +42,8 @@
     "fontSize": "फ़ॉन्ट का आकार",
     "fontFamily": "फ़ॉन्ट का परिवार",
     "onlySelected": "केवल चयनित",
-    "withBackground": "बैकग्राउंड के साथ",
-    "exportEmbedScene": "निर्यात एम्बेड दृश्य",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "निर्यात एम्बेड दृश्य विवरण",
     "addWatermark": "ऐड \"मेड विथ एक्सकैलिडराव\"",
     "handDrawn": "हाथ से बनाया हुआ",
@@ -96,17 +100,20 @@
     "flipVertical": "",
     "viewMode": "",
     "toggleExportColorScheme": "",
-    "share": ""
+    "share": "",
+    "toggleTheme": ""
   },
   "buttons": {
     "clearReset": "कैनवास रीसेट करें",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "निर्यात",
     "exportToPng": "पीएनजी के रूप में निर्यात करे",
     "exportToSvg": "Svg के रूप में निर्यात करे",
     "copyToClipboard": "क्लिपबोर्ड पर प्रतिलिपि बनाएँ",
     "copyPngToClipboard": "क्लिपबोर्ड पर कॉपी करें,पीएनजी के रूप में",
     "scale": "पैमाना",
-    "save": "सहेजें",
+    "save": "",
     "saveAs": "सेव करे इस तरह",
     "load": "लोड करें",
     "getShareableLink": "साझा करने योग्य लिंक प्राप्त करें",
@@ -152,12 +159,12 @@
   },
   "toolBar": {
     "selection": "चयन",
-    "freedraw": "मुफ्त ड्रा",
     "rectangle": "आयात",
     "diamond": "तिर्यग्वर्ग",
     "ellipse": "दीर्घवृत्त",
     "arrow": "तीर",
     "line": "रेखा",
+    "freedraw": "",
     "text": "पाठ",
     "library": "लाइब्रेरी",
     "lock": "ड्राइंग के बाद चयनित टूल को सक्रिय रखें"
@@ -209,6 +216,14 @@
   },
   "errorDialog": {
     "title": "गलती"
+  },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
   },
   "helpDialog": {
     "blog": "हमारा ब्लॉग पढे",

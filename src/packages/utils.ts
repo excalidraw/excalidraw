@@ -26,15 +26,11 @@ export const exportToCanvas = ({
     { elements, appState },
     null,
   );
-  const {
-    exportBackground,
-    viewBackgroundColor,
-    shouldAddWatermark,
-  } = restoredAppState;
+  const { exportBackground, viewBackgroundColor } = restoredAppState;
   return _exportToCanvas(
     getNonDeletedElements(restoredElements),
     { ...restoredAppState, offsetTop: 0, offsetLeft: 0, width: 0, height: 0 },
-    { exportBackground, viewBackgroundColor, shouldAddWatermark },
+    { exportBackground, viewBackgroundColor },
     (width: number, height: number) => {
       const canvas = document.createElement("canvas");
       const ret = getDimensions(width, height);

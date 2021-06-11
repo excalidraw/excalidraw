@@ -20,6 +20,10 @@
     "background": "ਬੈਕਗਰਾਉਂਡ",
     "fill": "ਭਰਨਾ",
     "strokeWidth": "ਰੇਖਾ ਦੀ ਚੌੜਾਈ",
+    "strokeShape": "",
+    "strokeShape_gel": "ਜੈੱਲ ਪੈੱਨ",
+    "strokeShape_fountain": "ਫਾਉਨਟੇਨ ਪੈੱਨ",
+    "strokeShape_brush": "ਬੁਰਸ਼ ਪੈੱਨ",
     "strokeStyle": "ਰੇਖਾ ਦਾ ਸਟਾਇਲ",
     "strokeStyle_solid": "ਠੋਸ",
     "strokeStyle_dashed": "ਡੈਸ਼ ਵਾਲੀ",
@@ -38,8 +42,8 @@
     "fontSize": "ਫੌਂਟ ਅਕਾਰ",
     "fontFamily": "ਫੌਂਟ ਪਰਿਵਾਰ",
     "onlySelected": "ਸਿਰਫ ਚੁਣੇ ਹੋਏ ਹੀ",
-    "withBackground": "ਬੈਕਗਰਾਉਂਂਡ ਨਾਲ",
-    "exportEmbedScene": "ਦ੍ਰਿਸ਼ ਨੂੰ ਨਿਰਯਾਤ ਕੀਤੀ ਫਾਈਲ ਵਿੱਚ ਮੜ੍ਹੋ",
+    "withBackground": "",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "ਦ੍ਰਿਸ਼ ਦਾ ਡਾਟਾ ਨਿਰਯਾਤ ਕੀਤੀ PNG/SVG ਫਾਈਲ ਵਿੱਚ ਸਾਂਭ ਦਿੱਤਾ ਜਾਵੇਗਾ ਤਾਂ ਜੋ ਇਸ ਵਿੱਚੋਂ ਦ੍ਰਿਸ਼ ਨੂੰ ਬਹਾਲ ਕੀਤਾ ਜਾ ਸਕੇ। ਇਹ ਨਿਰਯਾਤ ਕੀਤੀ ਜਾਣ ਵਾਲੀ ਫਾਈਲ ਦਾ ਅਕਾਰ ਵਧਾ ਦੇਵੇਗਾ।",
     "addWatermark": "\"Excalidraw ਨਾਲ ਬਣਾਇਆ\" ਜੋੜੋ",
     "handDrawn": "ਹੱਥਲਿਖਤ",
@@ -61,14 +65,14 @@
     "architect": "ਭਵਨ ਨਿਰਮਾਣਕਾਰੀ",
     "artist": "ਕਲਾਕਾਰ",
     "cartoonist": "ਕਾਰਟੂਨਿਸਟ",
-    "fileTitle": "",
+    "fileTitle": "ਫਾਈਲ ਦਾ ਨਾਂ",
     "colorPicker": "ਰੰਗ ਚੋਣਕਾਰ",
     "canvasBackground": "ਕੈਨਵਸ ਦਾ ਬੈਕਗਰਾਉਂਡ",
     "drawingCanvas": "ਡਰਾਇੰਗ ਕੈਨਵਸ",
     "layers": "ਪਰਤਾਂ",
     "actions": "ਕਾਰਵਾਈਆਂ",
     "language": "ਭਾਸ਼ਾ",
-    "liveCollaboration": "",
+    "liveCollaboration": "ਲਾਇਵ ਸਹਿਯੋਗ",
     "duplicateSelection": "ਡੁਪਲੀਕੇਟ ਬਣਾਓ",
     "untitled": "ਬੇ-ਸਿਰਨਾਵਾਂ",
     "name": "ਨਾਂ",
@@ -96,17 +100,20 @@
     "flipVertical": "",
     "viewMode": "ਦੇਖੋ ਮੋਡ",
     "toggleExportColorScheme": "",
-    "share": ""
+    "share": "ਸਾਂਝਾ ਕਰੋ",
+    "toggleTheme": "ਥੀਮ ਬਦਲੋ"
   },
   "buttons": {
     "clearReset": "ਕੈਨਵਸ ਰੀਸੈੱਟ ਕਰੋ",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "ਨਿਰਯਾਤ",
     "exportToPng": "PNG ਵਿੱਚ ਨਿਰਯਾਤ ਕਰੋ",
     "exportToSvg": "SVG ਵਿੱਚ ਨਿਰਯਾਤ ਕਰੋ",
     "copyToClipboard": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ ਕਾਪੀ ਕਰੋ",
     "copyPngToClipboard": "PNG ਨੂੰ ਕਲਿੱਪਬੋਰਡ 'ਤੇ ਕਾਪੀ ਕਰੋ",
     "scale": "ਪੈਮਾਇਸ਼",
-    "save": "ਸਾਂਭੋ",
+    "save": "",
     "saveAs": "ਇਸ ਵਜੋਂ ਸਾਂਭੋ",
     "load": "ਲੋਡ ਕਰੋ",
     "getShareableLink": "ਸਾਂਝੀ ਕਰਨ ਵਾਲੀ ਲਿੰਕ ਲਵੋ",
@@ -121,7 +128,7 @@
     "edit": "ਸੋਧੋ",
     "undo": "ਅਣਕੀਤਾ ਕਰੋ",
     "redo": "ਮੁੜ-ਕਰੋ",
-    "resetLibrary": "",
+    "resetLibrary": "ਲਾਇਬ੍ਰੇਰੀ ਰੀਸੈੱਟ ਕਰੋ",
     "createNewRoom": "ਨਵਾਂ ਕਮਰਾ ਬਣਾਓ",
     "fullScreen": "ਪੂਰੀ ਸਕਰੀਨ",
     "darkMode": "ਡਾਰਕ ਮੋਡ",
@@ -142,22 +149,22 @@
     "loadSceneOverridePrompt": "ਬਾਹਰੀ ਡਰਾਇੰਗ ਨੂੰ ਲੋਡ ਕਰਨਾ ਤੁਹਾਡੀ ਮੌਜੂਦਾ ਸਮੱਗਰੀ ਦੀ ਥਾਂ ਲੈ ਲਵੇਗਾ। ਕੀ ਤੁਸੀਂ ਜਾਰੀ ਰੱਖਣਾ ਚਾਹੁੰਦੇ ਹੋ?",
     "collabStopOverridePrompt": "ਇਜਲਾਸ ਨੂੰ ਰੋਕਣਾ ਪਿਛਲੀ ਲੋਕਲ ਸਾਂਭੀ ਡਰਾਇੰਗ ਦੀ ਥਾਂ ਲੈ ਲਵੇਗਾ। ਪੱਕਾ ਇੰਝ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?\n\n(ਜੇ ਤੁਸੀਂ ਆਪਣੀ ਲੋਕਲ ਡਰਾਇੰਗ ਨੂੰ ਬਰਕਰਾਰ ਰੱਖਣਾ ਚਾਹੁੰਦੇ ਹੋ ਤਾਂ ਇਹ ਕਰਨ ਦੀ ਬਜਾਏ ਬੱਸ ਆਪਣਾ ਟੈਬ ਬੰਦ ਕਰ ਦਿਉ।)",
     "errorLoadingLibrary": "ਤੀਜੀ ਧਿਰ ਦੀ ਲਾਇਬ੍ਰੇਰੀ ਨੂੰ ਲੋਡ ਕਰਨ ਵਿੱਚ ਗਲਤੀ ਹੋਈ ਸੀ।",
-    "errorAddingToLibrary": "",
-    "errorRemovingFromLibrary": "",
+    "errorAddingToLibrary": "ਲਾਇਬ੍ਰੇਰੀ ਵਿੱਚ ਸਮੱਗਰੀ ਨਹੀਂ ਜੋੜ ਸਕੇ",
+    "errorRemovingFromLibrary": "ਲਾਇਬ੍ਰੇਰੀ ਵਿੱਚੋਂ ਸਮੱਗਰੀ ਨਹੀਂ ਹਟਾ ਸਕੇ",
     "confirmAddLibrary": "ਇਹ ਤੁਹਾਡੀ ਲਾਇਬ੍ਰੇਰੀ ਵਿੱਚ {{numShapes}} ਆਕ੍ਰਿਤੀ(ਆਂ) ਨੂੰ ਜੋੜ ਦੇਵੇਗਾ। ਕੀ ਤੁਸੀਂ ਪੱਕਾ ਇੰਝ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?",
     "imageDoesNotContainScene": "ਫਿਲਹਾਲ ਤਸਵੀਰਾਂ ਨੂੰ ਆਯਾਤ ਕਰਨ ਦਾ ਸਮਰਥਨ ਨਹੀਂ ਕਰਦਾ।\n\nਕੀ ਤੁਸੀਂ ਦ੍ਰਿਸ਼ ਨੂੰ ਆਯਾਤ ਕਰਨਾ ਚਾਹੁੰਦੇ ਸੀ? ਇਸ ਤਸਵੀਰ ਵਿੱਚ ਦ੍ਰਿਸ਼ ਦਾ ਕੋਈ ਵੀ ਡਾਟਾ ਨਜ਼ਰ ਨਹੀਂ ਆ ਰਿਹਾ। ਕੀ ਨਿਰਯਾਤ ਦੌਰਾਨ ਤੁਸੀਂ ਇਹ ਸਮਰੱਥ ਕੀਤਾ ਸੀ?",
     "cannotRestoreFromImage": "ਇਸ ਤਸਵੀਰ ਫਾਈਲ ਤੋਂ ਦ੍ਰਿਸ਼ ਬਹਾਲ ਨਹੀਂ ਕੀਤਾ ਜਾ ਸਕਿਆ",
     "invalidSceneUrl": "",
-    "resetLibrary": ""
+    "resetLibrary": "ਇਹ ਤੁਹਾਡੀ ਲਾਇਬ੍ਰੇਰੀ ਨੂੰ ਸਾਫ ਕਰ ਦੇਵੇਗਾ। ਕੀ ਤੁਸੀਂ ਪੱਕਾ ਇੰਝ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?"
   },
   "toolBar": {
     "selection": "ਚੋਣਕਾਰ",
-    "freedraw": "ਖੁੱਲ੍ਹੀ ਵਾਹੀ",
     "rectangle": "ਆਇਤ",
     "diamond": "ਹੀਰਾ",
     "ellipse": "ਅੰਡਾਕਾਰ",
     "arrow": "ਤੀਰ",
     "line": "ਲਕੀਰ",
+    "freedraw": "",
     "text": "ਪਾਠ",
     "library": "ਲਾਇਬ੍ਰੇਰੀ",
     "lock": "ਡਰਾਇੰਗ ਤੋਂ ਬਾਅਦ ਵੀ ਚੁਣੇ ਹੋਏ ਸੰਦ ਨੂੰ ਸਰਗਰਮ ਰੱਖੋ "
@@ -210,6 +217,14 @@
   "errorDialog": {
     "title": "ਗਲਤੀ"
   },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": ""
+  },
   "helpDialog": {
     "blog": "ਸਾਡਾ ਬਲੌਗ ਪੜ੍ਹੋ",
     "click": "ਕਲਿੱਕ",
@@ -256,7 +271,7 @@
     "copyToClipboardAsPng": "",
     "fileSaved": "ਫਾਈਲ ਸਾਂਭੀ ਗਈ।",
     "fileSavedToFilename": "{filename} ਵਿੱਚ ਸਾਂਭੀ",
-    "canvas": "",
-    "selection": ""
+    "canvas": "ਕੈਨਵਸ",
+    "selection": "ਚੋਣ"
   }
 }

@@ -28,10 +28,10 @@ import { SelectedShapeActions, ShapesSwitcher, ZoomActions } from "./Actions";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 /* import CollabButton from "./CollabButton"; */
 import { ErrorDialog } from "./ErrorDialog";
-import { ExportCB, ExportDialog } from "./ExportDialog";
+import { ExportCB, ImageExportDialog } from "./ImageExportDialog";
 import { FixedSideContainer } from "./FixedSideContainer";
 import { HintViewer } from "./HintViewer";
-import { exportFile, load, shield, trash } from "./icons";
+import { exportFile, load, trash } from "./icons";
 import { Island } from "./Island";
 import "./LayerUI.scss";
 import { LibraryUnit } from "./LibraryUnit";
@@ -43,9 +43,10 @@ import { Section } from "./Section";
 import { HelpDialog } from "./HelpDialog";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
-import { Tooltip } from "./Tooltip";
+/* import { Tooltip } from "./Tooltip"; */
 /* import { UserList } from "./UserList"; */
 import Library from "../data/library";
+import { JSONExportDialog } from "./JSONExportDialog";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -62,13 +63,8 @@ interface LayerUIProps {
   toggleZenMode: () => void;
   langCode: Language["code"];
   isCollaborating: boolean;
-  onExportToBackend?: (
-    exportedElements: readonly NonDeletedExcalidrawElement[],
-    appState: AppState,
-    canvas: HTMLCanvasElement | null,
-  ) => void;
-  renderTopRight?: (isMobile: boolean, appState: AppState) => JSX.Element;
-  renderCustomFooter?: (isMobile: boolean) => JSX.Element;
+  renderTopRightUI?: (isMobile: boolean, appState: AppState) => JSX.Element;
+  renderCustomFooter?: (isMobile: boolean, appState: AppState) => JSX.Element;
   viewModeEnabled: boolean;
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   UIOptions: AppProps["UIOptions"];
@@ -111,6 +107,7 @@ const LibraryMenuItems = ({
   onAddToLibrary,
   onInsertShape,
   pendingElements,
+  theme,
   setAppState,
   setLibraryItems,
   libraryReturnUrl,
@@ -123,6 +120,7 @@ const LibraryMenuItems = ({
   onRemoveFromLibrary: (index: number) => void;
   onInsertShape: (elements: LibraryItem) => void;
   onAddToLibrary: (elements: LibraryItem) => void;
+  theme: AppState["theme"];
   setAppState: React.Component<any, AppState>["setState"];
   setLibraryItems: (library: LibraryItems) => void;
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
@@ -196,7 +194,7 @@ const LibraryMenuItems = ({
       <a
         href={`https://libraries.excalidraw.com?target=${
           window.name || "_blank"
-        }&referrer=${referrer}&useHash=true&token=${id}`}
+        }&referrer=${referrer}&useHash=true&token=${id}&theme=${theme}`}
         target="_excalidraw_libraries"
       >
         {t("labels.libraries")}
@@ -250,6 +248,7 @@ const LibraryMenu = ({
   onInsertShape,
   pendingElements,
   onAddToLibrary,
+  theme,
   setAppState,
   libraryReturnUrl,
   focusContainer,
@@ -260,6 +259,7 @@ const LibraryMenu = ({
   onClickOutside: (event: MouseEvent) => void;
   onInsertShape: (elements: LibraryItem) => void;
   onAddToLibrary: () => void;
+  theme: AppState["theme"];
   setAppState: React.Component<any, AppState>["setState"];
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   focusContainer: () => void;
@@ -349,6 +349,7 @@ const LibraryMenu = ({
           libraryReturnUrl={libraryReturnUrl}
           focusContainer={focusContainer}
           library={library}
+          theme={theme}
           id={id}
         />
       )}
@@ -370,8 +371,7 @@ const LayerUI = ({
   showThemeBtn,
   toggleZenMode,
   isCollaborating,
-  onExportToBackend,
-  renderTopRight,
+  renderTopRightUI,
   renderCustomFooter,
   viewModeEnabled,
   libraryReturnUrl,
@@ -382,65 +382,56 @@ const LayerUI = ({
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
-  const renderEncryptedIcon = () => (
-    <a
-      className={clsx("encrypted-icon tooltip zen-mode-visibility", {
-        "zen-mode-visibility--hidden": zenModeEnabled,
-      })}
-      href="https://blog.excalidraw.com/end-to-end-encryption/"
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label={t("encrypted.link")}
-    >
-      <Tooltip label={t("encrypted.tooltip")} position="above" long={true}>
-        {shield}
-      </Tooltip>
-    </a>
-  );
-
-  const renderExportDialog = () => {
+  const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
+      return null;
+    }
+
+    return (
+      <JSONExportDialog
+        elements={elements}
+        appState={appState}
+        actionManager={actionManager}
+        exportOpts={UIOptions.canvasActions.export}
+        canvas={canvas}
+      />
+    );
+  };
+
+  const renderImageExportDialog = () => {
+    if (!UIOptions.canvasActions.saveAsImage) {
       return null;
     }
 
     const createExporter = (type: ExportType): ExportCB => async (
       exportedElements,
-      scale,
     ) => {
-      if (canvas) {
-        await exportCanvas(type, exportedElements, appState, canvas, {
-          exportBackground: appState.exportBackground,
-          name: appState.name,
-          viewBackgroundColor: appState.viewBackgroundColor,
-          scale,
-          shouldAddWatermark: appState.shouldAddWatermark,
-        })
-          .catch(muteFSAbortError)
-          .catch((error) => {
-            console.error(error);
-            setAppState({ errorMessage: error.message });
-          });
-      }
+      await exportCanvas(type, exportedElements, appState, {
+        exportBackground: appState.exportBackground,
+        name: appState.name,
+        viewBackgroundColor: appState.viewBackgroundColor,
+      })
+        .catch(muteFSAbortError)
+        .catch((error) => {
+          console.error(error);
+          setAppState({ errorMessage: error.message });
+        });
     };
 
     return (
-      <ExportDialog
+      <ImageExportDialog
         elements={elements}
         appState={appState}
         actionManager={actionManager}
         onExportToPng={createExporter("png")}
         onExportToSvg={createExporter("svg")}
         onExportToClipboard={createExporter("clipboard")}
-        onExportToBackend={
-          onExportToBackend
-            ? (elements) => {
-                onExportToBackend &&
-                  onExportToBackend(elements, appState, canvas);
-              }
-            : undefined
-        }
       />
     );
+  };
+
+  const Separator = () => {
+    return <div style={{ width: ".625em" }} />;
   };
 
   const renderViewModeCanvasActions = () => {
@@ -456,9 +447,8 @@ const LayerUI = ({
         <Island padding={2} style={{ zIndex: 1 }}>
           <Stack.Col gap={4}>
             <Stack.Row gap={1} justifyContent="space-between">
-              {actionManager.renderAction("saveScene")}
-              {actionManager.renderAction("saveAsScene")}
-              {renderExportDialog()}
+              {renderJSONExportDialog()}
+              {renderImageExportDialog()}
             </Stack.Row>
           </Stack.Col>
         </Island>
@@ -477,11 +467,12 @@ const LayerUI = ({
       <Island padding={2} style={{ zIndex: 1 }}>
         <Stack.Col gap={4}>
           <Stack.Row gap={1} justifyContent="space-between">
-            {actionManager.renderAction("loadScene")}
-            {actionManager.renderAction("saveScene")}
-            {actionManager.renderAction("saveAsScene")}
-            {renderExportDialog()}
             {actionManager.renderAction("clearCanvas")}
+            <Separator />
+            {actionManager.renderAction("loadScene")}
+            {renderJSONExportDialog()}
+            {renderImageExportDialog()}
+            <Separator />
             {/* {onCollabButtonClick && (
               <CollabButton
                 isCollaborating={isCollaborating}
@@ -551,6 +542,7 @@ const LayerUI = ({
       libraryReturnUrl={libraryReturnUrl}
       focusContainer={focusContainer}
       library={library}
+      theme={appState.theme}
       id={id}
     />
   ) : null;
@@ -627,7 +619,7 @@ const LayerUI = ({
                     </Tooltip>
                   ))}
             </UserList> */}
-            {renderTopRight?.(isMobile, appState)}
+            {renderTopRightUI?.(isMobile, appState)}
           </div>
         </div>
       </FixedSideContainer>
@@ -636,46 +628,60 @@ const LayerUI = ({
 
   const renderBottomAppMenu = () => {
     return (
-      <div
-        className={clsx("App-menu App-menu_bottom zen-mode-transition", {
-          "App-menu_bottom--transition-left": zenModeEnabled,
-        })}
+      <footer
+        role="contentinfo"
+        className="layer-ui__wrapper__footer App-menu App-menu_bottom"
       >
-        <Stack.Col gap={2}>
-          <Section heading="canvasActions">
-            <Island padding={1}>
-              <ZoomActions
-                renderAction={actionManager.renderAction}
-                zoom={appState.zoom}
-              />
-            </Island>
-            {renderEncryptedIcon()}
-          </Section>
-        </Stack.Col>
-      </div>
+        <div
+          className={clsx(
+            "layer-ui__wrapper__footer-left zen-mode-transition",
+            {
+              "layer-ui__wrapper__footer-left--transition-left": zenModeEnabled,
+            },
+          )}
+        >
+          <Stack.Col gap={2}>
+            <Section heading="canvasActions">
+              <Island padding={1}>
+                <ZoomActions
+                  renderAction={actionManager.renderAction}
+                  zoom={appState.zoom}
+                />
+              </Island>
+            </Section>
+          </Stack.Col>
+        </div>
+        <div
+          className={clsx(
+            "layer-ui__wrapper__footer-center zen-mode-transition",
+            {
+              "layer-ui__wrapper__footer-left--transition-bottom": zenModeEnabled,
+            },
+          )}
+        >
+          {renderCustomFooter?.(false, appState)}
+        </div>
+        <div
+          className={clsx(
+            "layer-ui__wrapper__footer-right zen-mode-transition",
+            {
+              "transition-right disable-pointerEvents": zenModeEnabled,
+            },
+          )}
+        >
+          {actionManager.renderAction("toggleShortcuts")}
+        </div>
+        <button
+          className={clsx("disable-zen-mode", {
+            "disable-zen-mode--visible": showExitZenModeBtn,
+          })}
+          onClick={toggleZenMode}
+        >
+          {t("buttons.exitZenMode")}
+        </button>
+      </footer>
     );
   };
-
-  const renderFooter = () => (
-    <footer role="contentinfo" className="layer-ui__wrapper__footer">
-      <div
-        className={clsx("zen-mode-transition", {
-          "transition-right disable-pointerEvents": zenModeEnabled,
-        })}
-      >
-        {renderCustomFooter?.(false)}
-        {actionManager.renderAction("toggleShortcuts")}
-      </div>
-      <button
-        className={clsx("disable-zen-mode", {
-          "disable-zen-mode--visible": showExitZenModeBtn,
-        })}
-        onClick={toggleZenMode}
-      >
-        {t("buttons.exitZenMode")}
-      </button>
-    </footer>
-  );
 
   const dialogs = (
     <>
@@ -716,7 +722,8 @@ const LayerUI = ({
         elements={elements}
         actionManager={actionManager}
         libraryMenu={libraryMenu}
-        exportButton={renderExportDialog()}
+        renderJSONExportDialog={renderJSONExportDialog}
+        renderImageExportDialog={renderImageExportDialog}
         setAppState={setAppState}
         /* onCollabButtonClick={onCollabButtonClick} */
         onLockToggle={onLockToggle}
@@ -739,7 +746,6 @@ const LayerUI = ({
       {dialogs}
       {renderFixedSideContainer()}
       {renderBottomAppMenu()}
-      {renderFooter()}
       {appState.scrolledOutside && (
         <button
           className="scroll-back-to-content"

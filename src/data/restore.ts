@@ -15,6 +15,7 @@ import {
   DEFAULT_VERTICAL_ALIGN,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
+import { LinearElementEditor } from "../element/linearElementEditor";
 
 type RestoredAppState = Omit<
   AppState,
@@ -49,14 +50,18 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamily => {
   return DEFAULT_FONT_FAMILY;
 };
 
-const restoreElementWithProperties = <T extends ExcalidrawElement>(
+const restoreElementWithProperties = <
+  T extends ExcalidrawElement,
+  K extends keyof Omit<
+    Required<T>,
+    Exclude<keyof ExcalidrawElement, "type" | "x" | "y">
+  >
+>(
   element: Required<T>,
-  extra: Omit<Required<T>, keyof ExcalidrawElement> & {
-    type?: ExcalidrawElement["type"];
-  },
+  extra: Pick<T, K>,
 ): T => {
   const base: Pick<T, keyof ExcalidrawElement> = {
-    type: extra.type || element.type,
+    type: (extra as Partial<T>).type || element.type,
     // all elements must have version > 0 so getSceneVersion() will pick up
     // newly added elements
     version: element.version || 1,
@@ -69,8 +74,8 @@ const restoreElementWithProperties = <T extends ExcalidrawElement>(
     roughness: element.roughness ?? 1,
     opacity: element.opacity == null ? 100 : element.opacity,
     angle: element.angle || 0,
-    x: element.x || 0,
-    y: element.y || 0,
+    x: (extra as Partial<T>).x ?? element.x ?? 0,
+    y: (extra as Partial<T>).y ?? element.y ?? 0,
     strokeColor: element.strokeColor,
     backgroundColor: element.backgroundColor,
     width: element.width || 0,
@@ -131,6 +136,20 @@ const restoreElement = (
         endArrowhead = element.type === "arrow" ? "arrow" : null,
       } = element;
 
+      let x = element.x;
+      let y = element.y;
+      let points = // migrate old arrow model to new one
+        !Array.isArray(element.points) || element.points.length < 2
+          ? [
+              [0, 0],
+              [element.width, element.height],
+            ]
+          : element.points;
+
+      if (points[0][0] !== 0 || points[0][1] !== 0) {
+        ({ points, x, y } = LinearElementEditor.getNormalizedPoints(element));
+      }
+
       return restoreElementWithProperties(element, {
         type:
           (element.type as ExcalidrawElement["type"] | "draw") === "draw"
@@ -138,17 +157,12 @@ const restoreElement = (
             : element.type,
         startBinding: element.startBinding,
         endBinding: element.endBinding,
-        points:
-          // migrate old arrow model to new one
-          !Array.isArray(element.points) || element.points.length < 2
-            ? [
-                [0, 0],
-                [element.width, element.height],
-              ]
-            : element.points,
         lastCommittedPoint: null,
         startArrowhead,
         endArrowhead,
+        points,
+        x,
+        y,
       });
     }
     // generic elements
