@@ -101,6 +101,8 @@
     "viewMode": "閲覧モード",
     "toggleExportColorScheme": "",
     "share": "共有",
+    "showStroke": "",
+    "showBackground": "",
     "toggleTheme": "テーマの切り替え"
   },
   "buttons": {
@@ -223,7 +225,10 @@
     "disk_button": "ファイルへ保存",
     "link_title": "共有可能なリンク",
     "link_details": "読み取り専用リンクとしてエクスポート",
-    "link_button": "リンクとしてエクスポート"
+    "link_button": "リンクとしてエクスポート",
+    "excalidrawplus_description": "Excalidraw+ ワークスペースにシーンを保存します。",
+    "excalidrawplus_button": "エクスポート",
+    "excalidrawplus_exportError": "Excalidraw+ にエクスポートできませんでした..."
   },
   "helpDialog": {
     "blog": "公式ブログを読む",
