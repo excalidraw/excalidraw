@@ -13,7 +13,7 @@ import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { Section } from "./Section";
 import CollabButton from "./CollabButton";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
-import { LockIcon } from "./LockIcon";
+import { LockButton } from "./LockButton";
 import { UserList } from "./UserList";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 import { LibraryButton } from "./LibraryButton";
@@ -68,7 +68,7 @@ export const MobileMenu = ({
                     />
                   </Stack.Row>
                 </Island>
-                <LockIcon
+                <LockButton
                   checked={appState.elementLocked}
                   onChange={onLockToggle}
                   title={t("toolBar.lock")}

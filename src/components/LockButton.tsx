@@ -39,7 +39,7 @@ const ICONS = {
   ),
 };
 
-export const LockIcon = (props: LockIconProps) => {
+export const LockButton = (props: LockIconProps) => {
   return (
     <label
       className={clsx(

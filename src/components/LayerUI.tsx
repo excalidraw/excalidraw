@@ -36,7 +36,7 @@ import { Island } from "./Island";
 import "./LayerUI.scss";
 import { LibraryUnit } from "./LibraryUnit";
 import { LoadingMessage } from "./LoadingMessage";
-import { LockIcon } from "./LockIcon";
+import { LockButton } from "./LockButton";
 import { MobileMenu } from "./MobileMenu";
 import { PasteChartDialog } from "./PasteChartDialog";
 import { Section } from "./Section";
@@ -571,7 +571,7 @@ const LayerUI = ({
               {(heading) => (
                 <Stack.Col gap={4} align="start">
                   <Stack.Row gap={1}>
-                    <LockIcon
+                    <LockButton
                       zenModeEnabled={zenModeEnabled}
                       checked={appState.elementLocked}
                       onChange={onLockToggle}
