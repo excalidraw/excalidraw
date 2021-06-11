@@ -23,7 +23,7 @@ import {
   LibraryItem,
   LibraryItems,
 } from "../types";
-import { capitalizeString, muteFSAbortError } from "../utils";
+import { muteFSAbortError } from "../utils";
 import { SelectedShapeActions, ShapesSwitcher, ZoomActions } from "./Actions";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 import CollabButton from "./CollabButton";
