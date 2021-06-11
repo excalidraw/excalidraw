@@ -28,6 +28,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -43,6 +44,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -68,7 +70,6 @@ Object {
     "id5": true,
   },
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -183,6 +184,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -195,6 +197,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -231,6 +234,7 @@ Object {
         "selectedElementIds": Object {
           "id1": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -290,6 +294,7 @@ Object {
         "selectedElementIds": Object {
           "id2": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -374,6 +379,9 @@ Object {
           "id2": true,
           "id3": true,
           "id4": true,
+        },
+        "selectedGroupIds": Object {
+          "id5": true,
         },
         "viewBackgroundColor": "#ffffff",
       },
@@ -489,6 +497,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -504,6 +513,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -536,7 +546,6 @@ Object {
     "id5": true,
   },
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -651,6 +660,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -663,6 +673,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -699,6 +710,7 @@ Object {
         "selectedElementIds": Object {
           "id1": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -758,6 +770,7 @@ Object {
         "selectedElementIds": Object {
           "id2": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -841,6 +854,9 @@ Object {
           "id0": true,
           "id2": true,
           "id3": true,
+        },
+        "selectedGroupIds": Object {
+          "id4": true,
         },
         "viewBackgroundColor": "#ffffff",
       },
@@ -956,6 +972,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -971,6 +988,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -986,7 +1004,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -1105,6 +1122,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -1117,6 +1135,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -1153,6 +1172,7 @@ Object {
         "selectedElementIds": Object {
           "id1": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -1214,6 +1234,9 @@ Object {
           "id1": true,
           "id2": true,
           "id3": true,
+        },
+        "selectedGroupIds": Object {
+          "id4": true,
         },
         "viewBackgroundColor": "#ffffff",
       },
@@ -1279,6 +1302,7 @@ Object {
           "id0": true,
           "id5": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -1342,6 +1366,7 @@ Object {
         "selectedElementIds": Object {
           "id7": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -1431,6 +1456,9 @@ Object {
           "id7": true,
           "id8": true,
           "id9": true,
+        },
+        "selectedGroupIds": Object {
+          "id10": true,
         },
         "viewBackgroundColor": "#ffffff",
       },
@@ -1523,6 +1551,7 @@ Object {
           "id0": true,
           "id11": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -1614,6 +1643,7 @@ Object {
           "id12": true,
           "id7": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -1732,6 +1762,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -1747,6 +1778,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -1764,7 +1796,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -1823,6 +1854,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -1835,6 +1867,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -1872,6 +1905,7 @@ Object {
           "id0": true,
           "id1": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -1936,6 +1970,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -1951,6 +1986,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -1973,7 +2009,6 @@ Object {
     "id5": true,
   },
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -2088,6 +2123,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -2100,6 +2136,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -2136,6 +2173,7 @@ Object {
         "selectedElementIds": Object {
           "id1": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -2195,6 +2233,7 @@ Object {
         "selectedElementIds": Object {
           "id2": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -2279,6 +2318,9 @@ Object {
           "id2": true,
           "id3": true,
           "id4": true,
+        },
+        "selectedGroupIds": Object {
+          "id5": true,
         },
         "viewBackgroundColor": "#ffffff",
       },
@@ -2394,6 +2436,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -2409,6 +2452,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -2426,7 +2470,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -2511,6 +2554,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -2523,6 +2567,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -2560,6 +2605,7 @@ Object {
           "id0": true,
           "id1": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -2647,6 +2693,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -2662,6 +2709,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -2676,7 +2724,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -2735,6 +2782,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -2747,6 +2795,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -2811,6 +2860,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -2826,6 +2876,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -2843,7 +2894,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -2954,6 +3004,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -2966,6 +3017,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3002,6 +3054,7 @@ Object {
         "selectedElementIds": Object {
           "id1": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3061,6 +3114,7 @@ Object {
         "selectedElementIds": Object {
           "id2": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3144,6 +3198,7 @@ Object {
           "id1": true,
           "id3": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3254,6 +3309,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -3269,6 +3325,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": "strokeColorPicker",
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -3283,7 +3340,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -3342,6 +3398,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -3354,6 +3411,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3390,6 +3448,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3426,6 +3485,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3460,7 +3520,7 @@ Object {
 
 exports[`regression tests change the properties of a shape: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests change the properties of a shape: [end of test] number of renders 1`] = `12`;
+exports[`regression tests change the properties of a shape: [end of test] number of renders 1`] = `14`;
 
 exports[`regression tests click on an element and drag it: [dragged] appState 1`] = `
 Object {
@@ -3490,6 +3550,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -3505,6 +3566,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -3522,7 +3584,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -3581,6 +3642,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -3593,6 +3655,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3630,6 +3693,7 @@ Object {
           "id0": true,
           "id1": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3694,6 +3758,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -3709,6 +3774,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -3728,7 +3794,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -3787,6 +3852,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -3799,6 +3865,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3836,6 +3903,7 @@ Object {
           "id0": true,
           "id1": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3874,6 +3942,7 @@ Object {
           "id1": true,
           "id2": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -3938,6 +4007,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -3953,6 +4023,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -3970,7 +4041,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -4055,6 +4125,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -4067,6 +4138,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4103,6 +4175,7 @@ Object {
         "selectedElementIds": Object {
           "id1": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4190,6 +4263,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -4205,6 +4279,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -4223,7 +4298,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -4334,6 +4408,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -4346,6 +4421,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4382,6 +4458,7 @@ Object {
         "selectedElementIds": Object {
           "id1": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4441,6 +4518,7 @@ Object {
         "selectedElementIds": Object {
           "id2": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4573,6 +4651,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -4588,6 +4667,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -4626,7 +4706,6 @@ Object {
     "x": 500,
     "y": 500,
   },
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -4711,6 +4790,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -4723,6 +4803,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4759,6 +4840,7 @@ Object {
         "selectedElementIds": Object {
           "id1": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -4868,6 +4950,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -4883,6 +4966,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -4899,7 +4983,6 @@ Object {
   "selectedElementIds": Object {},
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -4984,6 +5067,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -4996,6 +5080,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5032,6 +5117,7 @@ Object {
         "selectedElementIds": Object {
           "id1": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5141,6 +5227,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -5156,6 +5243,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -5192,7 +5280,6 @@ Object {
     "x": 110,
     "y": 110,
   },
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -5251,6 +5338,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -5263,6 +5351,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5349,6 +5438,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -5364,6 +5454,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -5378,7 +5469,6 @@ Object {
   "selectedElementIds": Object {},
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -5437,6 +5527,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -5449,6 +5540,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5513,6 +5605,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -5528,6 +5621,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -5542,7 +5636,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -5659,6 +5752,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -5671,6 +5765,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5707,6 +5802,7 @@ Object {
         "selectedElementIds": Object {
           "id1": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5766,6 +5862,7 @@ Object {
         "selectedElementIds": Object {
           "id2": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -5849,6 +5946,9 @@ Object {
           "id0": true,
           "id1": true,
           "id2": true,
+        },
+        "selectedGroupIds": Object {
+          "id3": true,
         },
         "viewBackgroundColor": "#ffffff",
       },
@@ -5966,6 +6066,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -5981,6 +6082,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -6002,7 +6104,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -6087,6 +6188,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -6099,6 +6201,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6135,6 +6238,7 @@ Object {
         "selectedElementIds": Object {
           "id1": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6197,6 +6301,7 @@ Object {
           "id2": true,
           "id3": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6284,6 +6389,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -6299,6 +6405,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -6313,7 +6420,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -6649,6 +6755,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -6661,6 +6768,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6697,6 +6805,7 @@ Object {
         "selectedElementIds": Object {
           "id1": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6756,6 +6865,7 @@ Object {
         "selectedElementIds": Object {
           "id2": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6838,6 +6948,7 @@ Object {
         "selectedElementIds": Object {
           "id3": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -6958,6 +7069,7 @@ Object {
         "selectedElementIds": Object {
           "id4": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7116,6 +7228,7 @@ Object {
         "selectedElementIds": Object {
           "id5": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7315,6 +7428,7 @@ Object {
         "selectedElementIds": Object {
           "id5": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7518,6 +7632,7 @@ Object {
         "selectedElementIds": Object {
           "id6": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -7762,6 +7877,7 @@ Object {
         "selectedElementIds": Object {
           "id6": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8010,6 +8126,7 @@ Object {
         "selectedElementIds": Object {
           "id7": false,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8330,6 +8447,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -8345,6 +8463,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -8364,7 +8483,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -8475,6 +8593,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -8487,6 +8606,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8523,6 +8643,7 @@ Object {
         "selectedElementIds": Object {
           "id1": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8582,6 +8703,7 @@ Object {
         "selectedElementIds": Object {
           "id2": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8692,6 +8814,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -8707,6 +8830,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -8727,7 +8851,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -8756,7 +8879,7 @@ Object {
   "boundElementIds": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
-  "height": 1000,
+  "height": 0,
   "id": "id0",
   "isDeleted": false,
   "opacity": 100,
@@ -8767,9 +8890,9 @@ Object {
   "strokeStyle": "solid",
   "strokeWidth": 1,
   "type": "rectangle",
-  "version": 2,
-  "versionNonce": 1278240551,
-  "width": 1000,
+  "version": 1,
+  "versionNonce": 0,
+  "width": 0,
   "x": 0,
   "y": 0,
 }
@@ -8787,14 +8910,14 @@ Object {
   "isDeleted": false,
   "opacity": 100,
   "roughness": 1,
-  "seed": 449462985,
+  "seed": 1278240551,
   "strokeColor": "#000000",
   "strokeSharpness": "sharp",
   "strokeStyle": "solid",
   "strokeWidth": 1,
   "type": "ellipse",
   "version": 2,
-  "versionNonce": 453191,
+  "versionNonce": 449462985,
   "width": 1000,
   "x": 500,
   "y": 500,
@@ -8812,6 +8935,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -8821,9 +8945,8 @@ Object {
         "editingGroupId": null,
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
-          "id0": true,
-        },
+        "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8833,7 +8956,7 @@ Object {
           "boundElementIds": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
-          "height": 1000,
+          "height": 0,
           "id": "id0",
           "isDeleted": false,
           "opacity": 100,
@@ -8844,9 +8967,9 @@ Object {
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
-          "version": 2,
-          "versionNonce": 1278240551,
-          "width": 1000,
+          "version": 1,
+          "versionNonce": 0,
+          "width": 0,
           "x": 0,
           "y": 0,
         },
@@ -8860,6 +8983,7 @@ Object {
         "selectedElementIds": Object {
           "id1": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -8869,7 +8993,7 @@ Object {
           "boundElementIds": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
-          "height": 1000,
+          "height": 0,
           "id": "id0",
           "isDeleted": false,
           "opacity": 100,
@@ -8880,9 +9004,9 @@ Object {
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
-          "version": 2,
-          "versionNonce": 1278240551,
-          "width": 1000,
+          "version": 1,
+          "versionNonce": 0,
+          "width": 0,
           "x": 0,
           "y": 0,
         },
@@ -8897,14 +9021,14 @@ Object {
           "isDeleted": false,
           "opacity": 100,
           "roughness": 1,
-          "seed": 449462985,
+          "seed": 1278240551,
           "strokeColor": "#000000",
           "strokeSharpness": "sharp",
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "ellipse",
           "version": 2,
-          "versionNonce": 453191,
+          "versionNonce": 449462985,
           "width": 1000,
           "x": 500,
           "y": 500,
@@ -8923,7 +9047,7 @@ exports[`regression tests given selected element A with lower z-index than unsel
 Object {
   "collaborators": Map {},
   "currentChartType": "bar",
-  "currentItemBackgroundColor": "#fa5252",
+  "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -8947,6 +9071,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -8962,6 +9087,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -8980,7 +9106,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -9005,7 +9130,7 @@ Object {
 exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when clicking intersection between A and B B should be selected on pointer up: [end of test] element 0 1`] = `
 Object {
   "angle": 0,
-  "backgroundColor": "#fa5252",
+  "backgroundColor": "red",
   "boundElementIds": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
@@ -9020,8 +9145,8 @@ Object {
   "strokeStyle": "solid",
   "strokeWidth": 1,
   "type": "rectangle",
-  "version": 2,
-  "versionNonce": 1278240551,
+  "version": 1,
+  "versionNonce": 0,
   "width": 1000,
   "x": 0,
   "y": 0,
@@ -9031,24 +9156,24 @@ Object {
 exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when clicking intersection between A and B B should be selected on pointer up: [end of test] element 1 1`] = `
 Object {
   "angle": 0,
-  "backgroundColor": "#fa5252",
+  "backgroundColor": "red",
   "boundElementIds": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
-  "height": 1000,
+  "height": 500,
   "id": "id1",
   "isDeleted": false,
   "opacity": 100,
   "roughness": 1,
-  "seed": 449462985,
+  "seed": 1278240551,
   "strokeColor": "#000000",
   "strokeSharpness": "sharp",
   "strokeStyle": "solid",
   "strokeWidth": 1,
-  "type": "ellipse",
-  "version": 2,
-  "versionNonce": 453191,
-  "width": 1000,
+  "type": "rectangle",
+  "version": 1,
+  "versionNonce": 0,
+  "width": 500,
   "x": 500,
   "y": 500,
 }
@@ -9065,6 +9190,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -9076,13 +9202,15 @@ Object {
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
+          "id2": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
           "angle": 0,
-          "backgroundColor": "#fa5252",
+          "backgroundColor": "red",
           "boundElementIds": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -9097,68 +9225,32 @@ Object {
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
-          "version": 2,
-          "versionNonce": 1278240551,
-          "width": 1000,
-          "x": 0,
-          "y": 0,
-        },
-      ],
-    },
-    Object {
-      "appState": Object {
-        "editingGroupId": null,
-        "editingLinearElement": null,
-        "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
-          "id1": true,
-        },
-        "viewBackgroundColor": "#ffffff",
-      },
-      "elements": Array [
-        Object {
-          "angle": 0,
-          "backgroundColor": "#fa5252",
-          "boundElementIds": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [],
-          "height": 1000,
-          "id": "id0",
-          "isDeleted": false,
-          "opacity": 100,
-          "roughness": 1,
-          "seed": 337897,
-          "strokeColor": "#000000",
-          "strokeSharpness": "sharp",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "rectangle",
-          "version": 2,
-          "versionNonce": 1278240551,
+          "version": 1,
+          "versionNonce": 0,
           "width": 1000,
           "x": 0,
           "y": 0,
         },
         Object {
           "angle": 0,
-          "backgroundColor": "#fa5252",
+          "backgroundColor": "red",
           "boundElementIds": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
-          "height": 1000,
+          "height": 500,
           "id": "id1",
           "isDeleted": false,
           "opacity": 100,
           "roughness": 1,
-          "seed": 449462985,
+          "seed": 1278240551,
           "strokeColor": "#000000",
           "strokeSharpness": "sharp",
           "strokeStyle": "solid",
           "strokeWidth": 1,
-          "type": "ellipse",
-          "version": 2,
-          "versionNonce": 453191,
-          "width": 1000,
+          "type": "rectangle",
+          "version": 1,
+          "versionNonce": 0,
+          "width": 500,
           "x": 500,
           "y": 500,
         },
@@ -9170,13 +9262,13 @@ Object {
 
 exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when clicking intersection between A and B B should be selected on pointer up: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when clicking intersection between A and B B should be selected on pointer up: [end of test] number of renders 1`] = `18`;
+exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when clicking intersection between A and B B should be selected on pointer up: [end of test] number of renders 1`] = `11`;
 
 exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when dragging on intersection between A and B A should be dragged and keep being selected: [end of test] appState 1`] = `
 Object {
   "collaborators": Map {},
   "currentChartType": "bar",
-  "currentItemBackgroundColor": "#fa5252",
+  "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "hachure",
   "currentItemFontFamily": 1,
@@ -9200,6 +9292,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -9215,6 +9308,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -9234,7 +9328,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -9259,7 +9352,7 @@ Object {
 exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when dragging on intersection between A and B A should be dragged and keep being selected: [end of test] element 0 1`] = `
 Object {
   "angle": 0,
-  "backgroundColor": "#fa5252",
+  "backgroundColor": "red",
   "boundElementIds": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
@@ -9274,8 +9367,8 @@ Object {
   "strokeStyle": "solid",
   "strokeWidth": 1,
   "type": "rectangle",
-  "version": 3,
-  "versionNonce": 1150084233,
+  "version": 2,
+  "versionNonce": 401146281,
   "width": 1000,
   "x": 100,
   "y": 100,
@@ -9285,24 +9378,24 @@ Object {
 exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when dragging on intersection between A and B A should be dragged and keep being selected: [end of test] element 1 1`] = `
 Object {
   "angle": 0,
-  "backgroundColor": "#fa5252",
+  "backgroundColor": "red",
   "boundElementIds": null,
   "fillStyle": "hachure",
   "groupIds": Array [],
-  "height": 1000,
+  "height": 500,
   "id": "id1",
   "isDeleted": false,
   "opacity": 100,
   "roughness": 1,
-  "seed": 449462985,
+  "seed": 1278240551,
   "strokeColor": "#000000",
   "strokeSharpness": "sharp",
   "strokeStyle": "solid",
   "strokeWidth": 1,
-  "type": "ellipse",
-  "version": 2,
-  "versionNonce": 453191,
-  "width": 1000,
+  "type": "rectangle",
+  "version": 1,
+  "versionNonce": 0,
+  "width": 500,
   "x": 500,
   "y": 500,
 }
@@ -9319,6 +9412,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -9330,13 +9424,15 @@ Object {
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {
           "id0": true,
+          "id2": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
           "angle": 0,
-          "backgroundColor": "#fa5252",
+          "backgroundColor": "red",
           "boundElementIds": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -9351,68 +9447,32 @@ Object {
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
-          "version": 2,
-          "versionNonce": 1278240551,
-          "width": 1000,
-          "x": 0,
-          "y": 0,
-        },
-      ],
-    },
-    Object {
-      "appState": Object {
-        "editingGroupId": null,
-        "editingLinearElement": null,
-        "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
-          "id1": true,
-        },
-        "viewBackgroundColor": "#ffffff",
-      },
-      "elements": Array [
-        Object {
-          "angle": 0,
-          "backgroundColor": "#fa5252",
-          "boundElementIds": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [],
-          "height": 1000,
-          "id": "id0",
-          "isDeleted": false,
-          "opacity": 100,
-          "roughness": 1,
-          "seed": 337897,
-          "strokeColor": "#000000",
-          "strokeSharpness": "sharp",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "rectangle",
-          "version": 2,
-          "versionNonce": 1278240551,
+          "version": 1,
+          "versionNonce": 0,
           "width": 1000,
           "x": 0,
           "y": 0,
         },
         Object {
           "angle": 0,
-          "backgroundColor": "#fa5252",
+          "backgroundColor": "red",
           "boundElementIds": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
-          "height": 1000,
+          "height": 500,
           "id": "id1",
           "isDeleted": false,
           "opacity": 100,
           "roughness": 1,
-          "seed": 449462985,
+          "seed": 1278240551,
           "strokeColor": "#000000",
           "strokeSharpness": "sharp",
           "strokeStyle": "solid",
           "strokeWidth": 1,
-          "type": "ellipse",
-          "version": 2,
-          "versionNonce": 453191,
-          "width": 1000,
+          "type": "rectangle",
+          "version": 1,
+          "versionNonce": 0,
+          "width": 500,
           "x": 500,
           "y": 500,
         },
@@ -9428,12 +9488,13 @@ Object {
           "id2": true,
           "id3": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
         Object {
           "angle": 0,
-          "backgroundColor": "#fa5252",
+          "backgroundColor": "red",
           "boundElementIds": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
@@ -9448,32 +9509,32 @@ Object {
           "strokeStyle": "solid",
           "strokeWidth": 1,
           "type": "rectangle",
-          "version": 3,
-          "versionNonce": 1150084233,
+          "version": 2,
+          "versionNonce": 401146281,
           "width": 1000,
           "x": 100,
           "y": 100,
         },
         Object {
           "angle": 0,
-          "backgroundColor": "#fa5252",
+          "backgroundColor": "red",
           "boundElementIds": null,
           "fillStyle": "hachure",
           "groupIds": Array [],
-          "height": 1000,
+          "height": 500,
           "id": "id1",
           "isDeleted": false,
           "opacity": 100,
           "roughness": 1,
-          "seed": 449462985,
+          "seed": 1278240551,
           "strokeColor": "#000000",
           "strokeSharpness": "sharp",
           "strokeStyle": "solid",
           "strokeWidth": 1,
-          "type": "ellipse",
-          "version": 2,
-          "versionNonce": 453191,
-          "width": 1000,
+          "type": "rectangle",
+          "version": 1,
+          "versionNonce": 0,
+          "width": 500,
           "x": 500,
           "y": 500,
         },
@@ -9485,7 +9546,7 @@ Object {
 
 exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when dragging on intersection between A and B A should be dragged and keep being selected: [end of test] number of elements 1`] = `2`;
 
-exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when dragging on intersection between A and B A should be dragged and keep being selected: [end of test] number of renders 1`] = `19`;
+exports[`regression tests given selected element A with lower z-index than unselected element B and given B is partially over A when dragging on intersection between A and B A should be dragged and keep being selected: [end of test] number of renders 1`] = `12`;
 
 exports[`regression tests key 2 selects rectangle tool: [end of test] appState 1`] = `
 Object {
@@ -9515,6 +9576,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -9530,6 +9592,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -9544,7 +9607,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -9603,6 +9665,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -9615,6 +9678,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9679,6 +9743,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -9694,6 +9759,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -9708,7 +9774,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -9767,6 +9832,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -9779,6 +9845,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -9843,6 +9910,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -9858,6 +9926,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -9872,7 +9941,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -9931,6 +9999,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -9943,6 +10012,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10007,6 +10077,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -10022,6 +10093,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -10036,7 +10108,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -10110,6 +10181,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -10122,6 +10194,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10201,6 +10274,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -10216,6 +10290,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -10230,7 +10305,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -10304,6 +10378,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -10316,6 +10391,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10395,6 +10471,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -10410,6 +10487,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -10424,7 +10502,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -10504,6 +10581,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -10516,6 +10594,7 @@ Object {
         "selectedElementIds": Object {
           "id0": false,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10601,6 +10680,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -10616,6 +10696,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -10630,7 +10711,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -10704,6 +10784,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -10716,6 +10797,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10795,6 +10877,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -10810,6 +10893,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -10824,7 +10908,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -10883,6 +10966,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -10895,6 +10979,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -10959,6 +11044,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -10974,6 +11060,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -10988,7 +11075,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -11047,6 +11133,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -11059,6 +11146,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -11123,6 +11211,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -11138,6 +11227,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -11152,7 +11242,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -11226,6 +11315,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -11238,6 +11328,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -11317,6 +11408,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -11332,6 +11424,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -11346,7 +11439,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -11405,6 +11497,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -11417,6 +11510,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -11481,6 +11575,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -11496,6 +11591,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -11510,7 +11606,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -11590,6 +11685,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -11602,6 +11698,7 @@ Object {
         "selectedElementIds": Object {
           "id0": false,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -11687,6 +11784,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -11702,6 +11800,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -11727,7 +11826,6 @@ Object {
     "id4": true,
   },
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -11928,6 +12026,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -11940,6 +12039,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -11976,6 +12076,7 @@ Object {
         "selectedElementIds": Object {
           "id1": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -12035,6 +12136,7 @@ Object {
         "selectedElementIds": Object {
           "id2": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -12119,6 +12221,9 @@ Object {
           "id1": true,
           "id2": true,
           "id3": true,
+        },
+        "selectedGroupIds": Object {
+          "id4": true,
         },
         "viewBackgroundColor": "#ffffff",
       },
@@ -12211,6 +12316,9 @@ Object {
           "id2": true,
           "id3": true,
           "id5": true,
+        },
+        "selectedGroupIds": Object {
+          "id4": true,
         },
         "viewBackgroundColor": "#ffffff",
       },
@@ -12403,6 +12511,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -12418,6 +12527,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -12436,7 +12546,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -12521,6 +12630,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -12533,6 +12643,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -12569,6 +12680,7 @@ Object {
         "selectedElementIds": Object {
           "id1": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -12656,6 +12768,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -12671,6 +12784,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -12685,7 +12799,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": true,
   "showHelpDialog": false,
   "showStats": false,
@@ -12718,6 +12831,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -12758,6 +12872,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -12773,6 +12888,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -12785,7 +12901,6 @@ Object {
   "selectedElementIds": Object {},
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -12818,6 +12933,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -12858,6 +12974,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -12873,6 +12990,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -12890,7 +13008,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -12949,6 +13066,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -12961,6 +13079,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -13025,6 +13144,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -13040,6 +13160,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -13063,7 +13184,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -13148,6 +13268,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -13160,6 +13281,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -13196,6 +13318,7 @@ Object {
         "selectedElementIds": Object {
           "id1": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -13259,6 +13382,7 @@ Object {
           "id3": true,
           "id4": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -13346,6 +13470,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -13361,24 +13486,21 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
   },
-  "previousSelectedElementIds": Object {
-    "id0": true,
-  },
+  "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
   "selectedElementIds": Object {
     "id0": true,
-    "id1": true,
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -13437,6 +13559,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -13449,6 +13572,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -13485,6 +13609,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -13519,7 +13644,7 @@ Object {
 
 exports[`regression tests should show fill icons when element has non transparent background: [end of test] number of elements 1`] = `1`;
 
-exports[`regression tests should show fill icons when element has non transparent background: [end of test] number of renders 1`] = `12`;
+exports[`regression tests should show fill icons when element has non transparent background: [end of test] number of renders 1`] = `13`;
 
 exports[`regression tests single-clicking on a subgroup of a selected group should not alter selection: [end of test] appState 1`] = `
 Object {
@@ -13549,6 +13674,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -13564,6 +13690,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -13589,7 +13716,6 @@ Object {
     "id10": true,
   },
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -13738,6 +13864,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -13750,6 +13877,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -13786,6 +13914,7 @@ Object {
         "selectedElementIds": Object {
           "id1": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -13847,6 +13976,9 @@ Object {
           "id1": true,
           "id2": true,
           "id3": true,
+        },
+        "selectedGroupIds": Object {
+          "id4": true,
         },
         "viewBackgroundColor": "#ffffff",
       },
@@ -13911,6 +14043,7 @@ Object {
         "selectedElementIds": Object {
           "id5": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -13997,6 +14130,7 @@ Object {
         "selectedElementIds": Object {
           "id6": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -14108,6 +14242,9 @@ Object {
           "id6": true,
           "id7": true,
           "id8": true,
+        },
+        "selectedGroupIds": Object {
+          "id9": true,
         },
         "viewBackgroundColor": "#ffffff",
       },
@@ -14224,6 +14361,9 @@ Object {
           "id1": true,
           "id5": true,
           "id6": true,
+        },
+        "selectedGroupIds": Object {
+          "id10": true,
         },
         "viewBackgroundColor": "#ffffff",
       },
@@ -14370,6 +14510,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -14385,6 +14526,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -14397,7 +14539,6 @@ Object {
   "selectedElementIds": Object {},
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -14430,6 +14571,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -14470,6 +14612,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -14485,6 +14628,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -14501,7 +14645,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -14620,6 +14763,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -14632,6 +14776,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -14668,6 +14813,7 @@ Object {
         "selectedElementIds": Object {
           "id1": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -14727,6 +14873,7 @@ Object {
         "selectedElementIds": Object {
           "id2": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -14811,95 +14958,8 @@ Object {
           "id1": true,
           "id2": true,
         },
-        "viewBackgroundColor": "#ffffff",
-      },
-      "elements": Array [
-        Object {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElementIds": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [
-            "id3",
-          ],
-          "height": 50,
-          "id": "id0",
-          "isDeleted": false,
-          "opacity": 100,
-          "roughness": 1,
-          "seed": 337897,
-          "strokeColor": "#000000",
-          "strokeSharpness": "sharp",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "rectangle",
-          "version": 3,
-          "versionNonce": 1150084233,
-          "width": 50,
-          "x": 0,
-          "y": 0,
-        },
-        Object {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElementIds": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [
-            "id3",
-          ],
-          "height": 50,
-          "id": "id1",
-          "isDeleted": false,
-          "opacity": 100,
-          "roughness": 1,
-          "seed": 449462985,
-          "strokeColor": "#000000",
-          "strokeSharpness": "sharp",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "rectangle",
-          "version": 3,
-          "versionNonce": 1116226695,
-          "width": 50,
-          "x": 100,
-          "y": 100,
-        },
-        Object {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElementIds": null,
-          "fillStyle": "hachure",
-          "groupIds": Array [
-            "id3",
-          ],
-          "height": 50,
-          "id": "id2",
-          "isDeleted": false,
-          "opacity": 100,
-          "roughness": 1,
-          "seed": 401146281,
-          "strokeColor": "#000000",
-          "strokeSharpness": "sharp",
-          "strokeStyle": "solid",
-          "strokeWidth": 1,
-          "type": "rectangle",
-          "version": 3,
-          "versionNonce": 1014066025,
-          "width": 50,
-          "x": 200,
-          "y": 200,
-        },
-      ],
-    },
-    Object {
-      "appState": Object {
-        "editingGroupId": "id3",
-        "editingLinearElement": null,
-        "name": "Untitled-201933152653",
-        "selectedElementIds": Object {
-          "id0": true,
-          "id2": true,
-          "id4": true,
+        "selectedGroupIds": Object {
+          "id3": true,
         },
         "viewBackgroundColor": "#ffffff",
       },
@@ -14990,6 +15050,100 @@ Object {
           "id0": true,
           "id2": true,
           "id4": true,
+        },
+        "selectedGroupIds": Object {},
+        "viewBackgroundColor": "#ffffff",
+      },
+      "elements": Array [
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElementIds": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [
+            "id3",
+          ],
+          "height": 50,
+          "id": "id0",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 337897,
+          "strokeColor": "#000000",
+          "strokeSharpness": "sharp",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 1150084233,
+          "width": 50,
+          "x": 0,
+          "y": 0,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElementIds": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [
+            "id3",
+          ],
+          "height": 50,
+          "id": "id1",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 449462985,
+          "strokeColor": "#000000",
+          "strokeSharpness": "sharp",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 1116226695,
+          "width": 50,
+          "x": 100,
+          "y": 100,
+        },
+        Object {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElementIds": null,
+          "fillStyle": "hachure",
+          "groupIds": Array [
+            "id3",
+          ],
+          "height": 50,
+          "id": "id2",
+          "isDeleted": false,
+          "opacity": 100,
+          "roughness": 1,
+          "seed": 401146281,
+          "strokeColor": "#000000",
+          "strokeSharpness": "sharp",
+          "strokeStyle": "solid",
+          "strokeWidth": 1,
+          "type": "rectangle",
+          "version": 3,
+          "versionNonce": 1014066025,
+          "width": 50,
+          "x": 200,
+          "y": 200,
+        },
+      ],
+    },
+    Object {
+      "appState": Object {
+        "editingGroupId": "id3",
+        "editingLinearElement": null,
+        "name": "Untitled-201933152653",
+        "selectedElementIds": Object {
+          "id0": true,
+          "id2": true,
+          "id4": true,
+        },
+        "selectedGroupIds": Object {
+          "id5": true,
         },
         "viewBackgroundColor": "#ffffff",
       },
@@ -15083,6 +15237,9 @@ Object {
           "id1": true,
           "id2": true,
           "id7": true,
+        },
+        "selectedGroupIds": Object {
+          "id3": true,
         },
         "viewBackgroundColor": "#ffffff",
       },
@@ -15224,6 +15381,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -15239,6 +15397,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -15279,7 +15438,6 @@ Object {
     "x": 0,
     "y": 0,
   },
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -15390,6 +15548,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -15402,6 +15561,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -15438,6 +15598,7 @@ Object {
         "selectedElementIds": Object {
           "id1": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -15497,6 +15658,7 @@ Object {
         "selectedElementIds": Object {
           "id2": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -15629,6 +15791,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -15644,6 +15807,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -15682,7 +15846,6 @@ Object {
     "x": 0,
     "y": 0,
   },
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -15767,6 +15930,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -15779,6 +15943,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -15815,6 +15980,7 @@ Object {
         "selectedElementIds": Object {
           "id1": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -15902,6 +16068,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -15917,6 +16084,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -15931,7 +16099,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": true,
   "showHelpDialog": false,
   "showStats": false,
@@ -15964,6 +16131,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -16004,6 +16172,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -16019,6 +16188,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -16033,7 +16203,6 @@ Object {
   },
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -16163,6 +16332,7 @@ Object {
         "selectedElementIds": Object {
           "id2": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -16267,6 +16437,7 @@ Object {
         "selectedElementIds": Object {
           "id2": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -16367,6 +16538,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -16379,6 +16551,7 @@ Object {
         "selectedElementIds": Object {
           "id0": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -16415,6 +16588,7 @@ Object {
         "selectedElementIds": Object {
           "id1": true,
         },
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [
@@ -16502,6 +16676,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -16517,6 +16692,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -16529,7 +16705,6 @@ Object {
   "selectedElementIds": Object {},
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -16562,6 +16737,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],
@@ -16602,6 +16778,7 @@ Object {
   "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -16617,6 +16794,7 @@ Object {
   "offsetLeft": 0,
   "offsetTop": 0,
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,
@@ -16629,7 +16807,6 @@ Object {
   "selectedElementIds": Object {},
   "selectedGroupIds": Object {},
   "selectionElement": null,
-  "shouldAddWatermark": false,
   "shouldCacheIgnoreZoom": false,
   "showHelpDialog": false,
   "showStats": false,
@@ -16662,6 +16839,7 @@ Object {
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": Object {},
+        "selectedGroupIds": Object {},
         "viewBackgroundColor": "#ffffff",
       },
       "elements": Array [],

@@ -366,6 +366,14 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                   label={t("labels.flipVertical")}
                   shortcuts={[getShortcutKey("Shift+V")]}
                 />
+                <Shortcut
+                  label={t("labels.showStroke")}
+                  shortcuts={[getShortcutKey("S")]}
+                />
+                <Shortcut
+                  label={t("labels.showBackground")}
+                  shortcuts={[getShortcutKey("G")]}
+                />
               </ShortcutIsland>
             </Column>
           </Columns>

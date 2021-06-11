@@ -131,11 +131,11 @@ export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
   canvasActions: {
     changeViewBackgroundColor: true,
     clearCanvas: true,
-    export: true,
+    export: { saveFileToDisk: true },
     loadScene: true,
-    saveAsScene: true,
-    saveScene: true,
+    saveToActiveFile: true,
     theme: true,
+    saveAsImage: true,
   },
 };
 
@@ -144,3 +144,6 @@ export const MQ_MAX_WIDTH_LANDSCAPE = 1000;
 export const MQ_MAX_HEIGHT_LANDSCAPE = 500;
 
 export const MAX_DECIMALS_FOR_SVG_EXPORT = 2;
+
+export const EXPORT_SCALES = [1, 2, 3];
+export const DEFAULT_EXPORT_PADDING = 10; // px

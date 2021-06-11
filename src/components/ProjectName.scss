@@ -1,0 +1,25 @@
+.ProjectName {
+  margin: auto;
+  display: flex;
+  align-items: center;
+
+  .TextInput {
+    height: calc(1rem - 3px);
+    width: 200px;
+    overflow: hidden;
+    text-align: center;
+    margin-left: 8px;
+    text-overflow: ellipsis;
+
+    &--readonly {
+      background: none;
+      border: none;
+      &:hover {
+        background: none;
+      }
+      width: auto;
+      max-width: 200px;
+      padding-left: 2px;
+    }
+  }
+}

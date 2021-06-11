@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
 import clsx from "clsx";
-import { supported } from "browser-fs-access";
+import { supported as fsSupported } from "browser-fs-access";
 import { nanoid } from "nanoid";
 
 import {
@@ -111,7 +111,6 @@ import {
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { mutateElement } from "../element/mutateElement";
 import { deepCopyElement, newFreeDrawElement } from "../element/newElement";
-import { MaybeTransformHandleType } from "../element/transformHandles";
 import {
   isBindingElement,
   isBindingElementType,
@@ -167,9 +166,11 @@ import { findShapeByKey } from "../shapes";
 import {
   AppProps,
   AppState,
+  ExcalidrawImperativeAPI,
   Gesture,
   GestureEvent,
   LibraryItems,
+  PointerDownState,
   SceneData,
 } from "../types";
 import {
@@ -180,7 +181,6 @@ import {
   isToolIcon,
   isWritableElement,
   resetCursor,
-  ResolvablePromise,
   resolvablePromise,
   sceneCoordsToViewportCoords,
   setCursor,
@@ -197,9 +197,10 @@ import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
-const ExcalidrawContainerContext = React.createContext<HTMLDivElement | null>(
-  null,
-);
+const ExcalidrawContainerContext = React.createContext<{
+  container: HTMLDivElement | null;
+  id: string | null;
+}>({ container: null, id: null });
 export const useExcalidrawContainer = () =>
   useContext(ExcalidrawContainerContext);
 
@@ -220,82 +221,6 @@ const gesture: Gesture = {
   lastCenter: null,
   initialDistance: null,
   initialScale: null,
-};
-
-export type PointerDownState = Readonly<{
-  // The first position at which pointerDown happened
-  origin: Readonly<{ x: number; y: number }>;
-  // Same as "origin" but snapped to the grid, if grid is on
-  originInGrid: Readonly<{ x: number; y: number }>;
-  // Scrollbar checks
-  scrollbars: ReturnType<typeof isOverScrollBars>;
-  // The previous pointer position
-  lastCoords: { x: number; y: number };
-  // map of original elements data
-  originalElements: Map<string, NonDeleted<ExcalidrawElement>>;
-  resize: {
-    // Handle when resizing, might change during the pointer interaction
-    handleType: MaybeTransformHandleType;
-    // This is determined on the initial pointer down event
-    isResizing: boolean;
-    // This is determined on the initial pointer down event
-    offset: { x: number; y: number };
-    // This is determined on the initial pointer down event
-    arrowDirection: "origin" | "end";
-    // This is a center point of selected elements determined on the initial pointer down event (for rotation only)
-    center: { x: number; y: number };
-  };
-  hit: {
-    // The element the pointer is "hitting", is determined on the initial
-    // pointer down event
-    element: NonDeleted<ExcalidrawElement> | null;
-    // The elements the pointer is "hitting", is determined on the initial
-    // pointer down event
-    allHitElements: NonDeleted<ExcalidrawElement>[];
-    // This is determined on the initial pointer down event
-    wasAddedToSelection: boolean;
-    // Whether selected element(s) were duplicated, might change during the
-    // pointer interaction
-    hasBeenDuplicated: boolean;
-    hasHitCommonBoundingBoxOfSelectedElements: boolean;
-  };
-  drag: {
-    // Might change during the pointer interation
-    hasOccurred: boolean;
-    // Might change during the pointer interation
-    offset: { x: number; y: number } | null;
-  };
-  // We need to have these in the state so that we can unsubscribe them
-  eventListeners: {
-    // It's defined on the initial pointer down event
-    onMove: null | ((event: PointerEvent) => void);
-    // It's defined on the initial pointer down event
-    onUp: null | ((event: PointerEvent) => void);
-    // It's defined on the initial pointer down event
-    onKeyDown: null | ((event: KeyboardEvent) => void);
-    // It's defined on the initial pointer down event
-    onKeyUp: null | ((event: KeyboardEvent) => void);
-  };
-}>;
-
-export type ExcalidrawImperativeAPI = {
-  updateScene: InstanceType<typeof App>["updateScene"];
-  resetScene: InstanceType<typeof App>["resetScene"];
-  getSceneElementsIncludingDeleted: InstanceType<
-    typeof App
-  >["getSceneElementsIncludingDeleted"];
-  history: {
-    clear: InstanceType<typeof App>["resetHistory"];
-  };
-  scrollToContent: InstanceType<typeof App>["scrollToContent"];
-  getSceneElements: InstanceType<typeof App>["getSceneElements"];
-  getAppState: () => InstanceType<typeof App>["state"];
-  refresh: InstanceType<typeof App>["refresh"];
-  importLibrary: InstanceType<typeof App>["importLibraryFromUrl"];
-  setToastMessage: InstanceType<typeof App>["setToastMessage"];
-  readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
-  ready: true;
-  id: string;
 };
 
 class App extends React.Component<AppProps, AppState> {
@@ -320,6 +245,10 @@ class App extends React.Component<AppProps, AppState> {
   public libraryItemsFromStorage: LibraryItems | undefined;
   private id: string;
   private history: History;
+  private excalidrawContainerValue: {
+    container: HTMLDivElement | null;
+    id: string;
+  };
 
   constructor(props: AppProps) {
     super(props);
@@ -376,6 +305,12 @@ class App extends React.Component<AppProps, AppState> {
       }
       readyPromise.resolve(api);
     }
+
+    this.excalidrawContainerValue = {
+      container: this.excalidrawContainerRef.current,
+      id: this.id,
+    };
+
     this.scene = new Scene();
     this.library = new Library(this);
     this.history = new History();
@@ -403,7 +338,7 @@ class App extends React.Component<AppProps, AppState> {
     if (viewModeEnabled) {
       return (
         <canvas
-          id="canvas"
+          className="excalidraw__canvas"
           style={{
             width: canvasDOMWidth,
             height: canvasDOMHeight,
@@ -425,7 +360,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     return (
       <canvas
-        id="canvas"
+        className="excalidraw__canvas"
         style={{
           width: canvasDOMWidth,
           height: canvasDOMHeight,
@@ -450,9 +385,8 @@ class App extends React.Component<AppProps, AppState> {
     const { zenModeEnabled, viewModeEnabled } = this.state;
 
     const {
-      /* onCollabButtonClick, */
-      onExportToBackend,
-      renderTopRight,
+      // onCollabButtonClick,
+      renderTopRightUI,
       renderFooter,
       renderCustomStats,
     } = this.props;
@@ -471,7 +405,7 @@ class App extends React.Component<AppProps, AppState> {
         }
       >
         <ExcalidrawContainerContext.Provider
-          value={this.excalidrawContainerRef.current}
+          value={this.excalidrawContainerValue}
         >
           <IsMobileContext.Provider value={this.isMobile}>
             <LayerUI
@@ -492,8 +426,7 @@ class App extends React.Component<AppProps, AppState> {
               toggleZenMode={this.toggleZenMode}
               langCode={getLanguage().code}
               isCollaborating={this.props.isCollaborating || false}
-              onExportToBackend={onExportToBackend}
-              renderTopRight={renderTopRight}
+              renderTopRightUI={renderTopRightUI}
               renderCustomFooter={renderFooter}
               viewModeEnabled={viewModeEnabled}
               showExitZenModeBtn={
@@ -535,7 +468,9 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   public focusContainer = () => {
-    this.excalidrawContainerRef.current?.focus();
+    if (this.props.autoFocus) {
+      this.excalidrawContainerRef.current?.focus();
+    }
   };
 
   public getSceneElementsIncludingDeleted = () => {
@@ -801,6 +736,8 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   public async componentDidMount() {
+    this.excalidrawContainerValue.container = this.excalidrawContainerRef.current;
+
     if (
       process.env.NODE_ENV === ENV.TEST ||
       process.env.NODE_ENV === ENV.DEVELOPMENT
@@ -1458,26 +1395,30 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  public updateScene = withBatchedUpdates((sceneData: SceneData) => {
-    if (sceneData.commitToHistory) {
-      this.history.resumeRecording();
-    }
+  public updateScene = withBatchedUpdates(
+    <K extends keyof AppState>(sceneData: {
+      elements?: SceneData["elements"];
+      appState?: Pick<AppState, K> | null;
+      collaborators?: SceneData["collaborators"];
+      commitToHistory?: SceneData["commitToHistory"];
+    }) => {
+      if (sceneData.commitToHistory) {
+        this.history.resumeRecording();
+      }
 
-    // currently we only support syncing background color
-    if (sceneData.appState?.viewBackgroundColor) {
-      this.setState({
-        viewBackgroundColor: sceneData.appState.viewBackgroundColor,
-      });
-    }
+      if (sceneData.appState) {
+        this.setState(sceneData.appState);
+      }
 
-    if (sceneData.elements) {
-      this.scene.replaceAllElements(sceneData.elements);
-    }
+      if (sceneData.elements) {
+        this.scene.replaceAllElements(sceneData.elements);
+      }
 
-    if (sceneData.collaborators) {
-      this.setState({ collaborators: sceneData.collaborators });
-    }
-  });
+      if (sceneData.collaborators) {
+        this.setState({ collaborators: sceneData.collaborators });
+      }
+    },
+  );
 
   private onSceneUpdated = () => {
     this.setState({});
@@ -1639,6 +1580,21 @@ class App extends React.Component<AppProps, AppState> {
       if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
         isHoldingSpace = true;
         setCursor(this.canvas, CURSOR_TYPE.GRABBING);
+      }
+
+      if (event.key === KEYS.G || event.key === KEYS.S) {
+        const selectedElements = getSelectedElements(
+          this.scene.getElements(),
+          this.state,
+        );
+        if (selectedElements.length) {
+          if (event.key === KEYS.G) {
+            this.setState({ openPopup: "backgroundColorPicker" });
+          }
+          if (event.key === KEYS.S) {
+            this.setState({ openPopup: "strokeColorPicker" });
+          }
+        }
       }
     },
   );
@@ -1840,9 +1796,21 @@ class App extends React.Component<AppProps, AppState> {
   private getElementAtPosition(
     x: number,
     y: number,
+    opts?: {
+      /** if true, returns the first selected element (with highest z-index)
+        of all hit elements */
+      preferSelected?: boolean;
+    },
   ): NonDeleted<ExcalidrawElement> | null {
     const allHitElements = this.getElementsAtPosition(x, y);
     if (allHitElements.length > 1) {
+      if (opts?.preferSelected) {
+        for (let index = allHitElements.length - 1; index > -1; index--) {
+          if (this.state.selectedElementIds[allHitElements[index].id]) {
+            return allHitElements[index];
+          }
+        }
+      }
       const elementWithHighestZIndex =
         allHitElements[allHitElements.length - 1];
       // If we're hitting element with highest z-index only on its bounding box
@@ -2256,11 +2224,13 @@ class App extends React.Component<AppProps, AppState> {
     } else if (isOverScrollBar) {
       setCursor(this.canvas, CURSOR_TYPE.AUTO);
     } else if (
-      hitElement ||
-      this.isHittingCommonBoundingBoxOfSelectedElements(
-        scenePointer,
-        selectedElements,
-      )
+      // if using cmd/ctrl, we're not dragging
+      !event[KEYS.CTRL_OR_CMD] &&
+      (hitElement ||
+        this.isHittingCommonBoundingBoxOfSelectedElements(
+          scenePointer,
+          selectedElements,
+        ))
     ) {
       setCursor(this.canvas, CURSOR_TYPE.MOVE);
     } else {
@@ -2276,8 +2246,6 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
-    event.persist();
-
     // remove any active selection when we start to interact with canvas
     // (mainly, we care about removing selection outside the component which
     //  would prevent our copy handling otherwise)
@@ -2538,6 +2506,7 @@ class App extends React.Component<AppProps, AppState> {
 
     return {
       origin,
+      withCmdOrCtrl: event[KEYS.CTRL_OR_CMD],
       originInGrid: tupleToCoors(
         getGridPoint(origin.x, origin.y, this.state.gridSize),
       ),
@@ -2742,6 +2711,9 @@ class App extends React.Component<AppProps, AppState> {
         if (hitElement != null) {
           // on CMD/CTRL, drill down to hit element regardless of groups etc.
           if (event[KEYS.CTRL_OR_CMD]) {
+            if (!this.state.selectedElementIds[hitElement.id]) {
+              pointerDownState.hit.wasAddedToSelection = true;
+            }
             this.setState((prevState) => ({
               ...editGroupForSelectedElement(prevState, hitElement),
               previousSelectedElementIds: this.state.selectedElementIds,
@@ -3180,7 +3152,9 @@ class App extends React.Component<AppProps, AppState> {
           this.scene.getElements(),
           this.state,
         );
-        if (selectedElements.length > 0) {
+        // prevent dragging even if we're no longer holding cmd/ctrl otherwise
+        // it would have weird results (stuff jumping all over the screen)
+        if (selectedElements.length > 0 && !pointerDownState.withCmdOrCtrl) {
           const [dragX, dragY] = getGridPoint(
             pointerCoords.x - pointerDownState.drag.offset.x,
             pointerCoords.y - pointerDownState.drag.offset.y,
@@ -3322,11 +3296,25 @@ class App extends React.Component<AppProps, AppState> {
       if (this.state.elementType === "selection") {
         const elements = this.scene.getElements();
         if (!event.shiftKey && isSomeElementSelected(elements, this.state)) {
-          this.setState({
-            selectedElementIds: {},
-            selectedGroupIds: {},
-            editingGroupId: null,
-          });
+          if (pointerDownState.withCmdOrCtrl && pointerDownState.hit.element) {
+            this.setState((prevState) =>
+              selectGroupsForSelectedElements(
+                {
+                  ...prevState,
+                  selectedElementIds: {
+                    [pointerDownState.hit.element!.id]: true,
+                  },
+                },
+                this.scene.getElements(),
+              ),
+            );
+          } else {
+            this.setState({
+              selectedElementIds: {},
+              selectedGroupIds: {},
+              editingGroupId: null,
+            });
+          }
         }
         const elementsWithinSelection = getElementsWithinSelection(
           elements,
@@ -3342,6 +3330,14 @@ class App extends React.Component<AppProps, AppState> {
                   map[element.id] = true;
                   return map;
                 }, {} as any),
+                ...(pointerDownState.hit.element
+                  ? {
+                      // if using ctrl/cmd, select the hitElement only if we
+                      // haven't box-selected anything else
+                      [pointerDownState.hit.element
+                        .id]: !elementsWithinSelection.length,
+                    }
+                  : null),
               },
             },
             this.scene.getElements(),
@@ -3606,12 +3602,18 @@ class App extends React.Component<AppProps, AppState> {
             } else {
               // remove element from selection while
               // keeping prev elements selected
-              this.setState((prevState) => ({
-                selectedElementIds: {
-                  ...prevState.selectedElementIds,
-                  [hitElement!.id]: false,
-                },
-              }));
+              this.setState((prevState) =>
+                selectGroupsForSelectedElements(
+                  {
+                    ...prevState,
+                    selectedElementIds: {
+                      ...prevState.selectedElementIds,
+                      [hitElement!.id]: false,
+                    },
+                  },
+                  this.scene.getElements(),
+                ),
+              );
             }
           } else {
             // add element to selection while
@@ -3844,7 +3846,7 @@ class App extends React.Component<AppProps, AppState> {
       // default: assume an Excalidraw file regardless of extension/MimeType
     } else {
       this.setState({ isLoading: true });
-      if (supported) {
+      if (fsSupported) {
         try {
           // This will only work as of Chrome 86,
           // but can be safely ignored on older releases.
@@ -3881,7 +3883,7 @@ class App extends React.Component<AppProps, AppState> {
     event.preventDefault();
 
     const { x, y } = viewportCoordsToSceneCoords(event, this.state);
-    const element = this.getElementAtPosition(x, y);
+    const element = this.getElementAtPosition(x, y, { preferSelected: true });
 
     const type = element ? "element" : "canvas";
 

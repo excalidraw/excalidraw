@@ -2,7 +2,7 @@ import { loadLibraryFromBlob } from "./blob";
 import { LibraryItems, LibraryItem } from "../types";
 import { restoreElements } from "./restore";
 import { getNonDeletedElements } from "../element";
-import App from "../components/App";
+import type App from "../components/App";
 
 class Library {
   private libraryCache: LibraryItems | null = null;

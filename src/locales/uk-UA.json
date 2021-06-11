@@ -20,6 +20,10 @@
     "background": "Тло",
     "fill": "Заповнити",
     "strokeWidth": "Товщина контуру",
+    "strokeShape": "Форма обведення",
+    "strokeShape_gel": "Гельручка",
+    "strokeShape_fountain": "Перо",
+    "strokeShape_brush": "Пензель",
     "strokeStyle": "Стиль контуру",
     "strokeStyle_solid": "Суцільний",
     "strokeStyle_dashed": "Пунктир",
@@ -38,8 +42,8 @@
     "fontSize": "Розмір шрифту",
     "fontFamily": "Шрифт",
     "onlySelected": "Тільки вибране",
-    "withBackground": "З фоном",
-    "exportEmbedScene": "Вставити сцену в експортований файл",
+    "withBackground": "Фон",
+    "exportEmbedScene": "Вбудована сцена",
     "exportEmbedScene_details": "Дані сцени будуть збережені в експортований файл PNG/SVG. Ця сцена може бути відновленна з нього, однак це збільшить розмір експортованого файлу.",
     "addWatermark": "Додати «Накреслене в Excalidraw»",
     "handDrawn": "Рукописний",
@@ -96,17 +100,20 @@
     "flipVertical": "Віддзеркалити вертикально",
     "viewMode": "Режим перегляду",
     "toggleExportColorScheme": "Переключити колірну схему експорту",
-    "share": "Поділитися"
+    "share": "Поділитися",
+    "toggleTheme": "Перемкнути тему"
   },
   "buttons": {
     "clearReset": "Очистити полотно",
+    "exportJSON": "Експорт у файл",
+    "exportImage": "Зберегти як зображення",
     "export": "Експортувати",
     "exportToPng": "Експортувати в PNG",
     "exportToSvg": "Експортувати в SVG",
     "copyToClipboard": "Скопіювати до буферу обміну",
     "copyPngToClipboard": "Скопіювати PNG до буферу обміну",
     "scale": "Масштаб",
-    "save": "Зберегти",
+    "save": "Зберегти до поточного файлу",
     "saveAs": "Зберегти як",
     "load": "Завантажити",
     "getShareableLink": "Отримати посилання",
@@ -152,12 +159,12 @@
   },
   "toolBar": {
     "selection": "Виділення",
-    "freedraw": "Вільне креслення",
     "rectangle": "Прямокутник",
     "diamond": "Ромб",
     "ellipse": "Еліпс",
     "arrow": "Стрілка",
     "line": "Лінія",
+    "freedraw": "Малювати",
     "text": "Текст",
     "library": "Бібліотека",
     "lock": "Залишити обраний інструмент після креслення"
@@ -209,6 +216,14 @@
   },
   "errorDialog": {
     "title": "Помилка"
+  },
+  "exportDialog": {
+    "disk_title": "Зберегти на диск",
+    "disk_details": "Експорт даних сцени в файл, з якого можна імпортувати пізніше.",
+    "disk_button": "Зберегти до файлу",
+    "link_title": "Доступ за посиланням",
+    "link_details": "Експортувати як посилання тільки для читання.",
+    "link_button": "Експортувати у посилання"
   },
   "helpDialog": {
     "blog": "Наш блог",
