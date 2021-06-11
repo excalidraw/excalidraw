@@ -101,6 +101,8 @@
     "viewMode": "檢視模式",
     "toggleExportColorScheme": "切換輸出配色",
     "share": "共享",
+    "showStroke": "顯示線條檢色器",
+    "showBackground": "顯示背景檢色器",
     "toggleTheme": "切換主題"
   },
   "buttons": {
@@ -223,7 +225,10 @@
     "disk_button": "儲存至檔案",
     "link_title": "可共享連結",
     "link_details": "匯出為唯讀連結",
-    "link_button": "匯出為連結"
+    "link_button": "匯出為連結",
+    "excalidrawplus_description": "將此場景儲存至你的 Excalidraw+ 工作區",
+    "excalidrawplus_button": "輸出",
+    "excalidrawplus_exportError": "目前無法輸出至 Excalidraw+"
   },
   "helpDialog": {
     "blog": "閱讀部落格",

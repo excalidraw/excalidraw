@@ -101,6 +101,8 @@
     "viewMode": "Visningsmodus",
     "toggleExportColorScheme": "Veksle eksport av fargepalett",
     "share": "Del",
+    "showStroke": "Vis fargevelger for kantfarge",
+    "showBackground": "Vis fargevelger for bakgrunnsfarge",
     "toggleTheme": "Veksle tema"
   },
   "buttons": {
@@ -223,7 +225,10 @@
     "disk_button": "Lagre til fil",
     "link_title": "Delbar lenke",
     "link_details": "Eksporter som en skrivebeskyttet lenke.",
-    "link_button": "Eksporter til lenke"
+    "link_button": "Eksporter til lenke",
+    "excalidrawplus_description": "Lagre scenen til ditt Excalidraw+ arbeidsområde.",
+    "excalidrawplus_button": "Eksporter",
+    "excalidrawplus_exportError": "Kunne ikke eksportere til Excalidraw+ for øyeblikket..."
   },
   "helpDialog": {
     "blog": "Les bloggen vår",

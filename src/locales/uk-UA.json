@@ -101,6 +101,8 @@
     "viewMode": "Режим перегляду",
     "toggleExportColorScheme": "Переключити колірну схему експорту",
     "share": "Поділитися",
+    "showStroke": "",
+    "showBackground": "",
     "toggleTheme": "Перемкнути тему"
   },
   "buttons": {
@@ -223,7 +225,10 @@
     "disk_button": "Зберегти до файлу",
     "link_title": "Доступ за посиланням",
     "link_details": "Експортувати як посилання тільки для читання.",
-    "link_button": "Експортувати у посилання"
+    "link_button": "Експортувати у посилання",
+    "excalidrawplus_description": "",
+    "excalidrawplus_button": "",
+    "excalidrawplus_exportError": ""
   },
   "helpDialog": {
     "blog": "Наш блог",

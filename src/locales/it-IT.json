@@ -101,6 +101,8 @@
     "viewMode": "Modalità visualizzazione",
     "toggleExportColorScheme": "Cambia lo schema di colori in esportazione",
     "share": "Condividi",
+    "showStroke": "Mostra selettore colore del tratto",
+    "showBackground": "Mostra selettore colore di sfondo",
     "toggleTheme": "Cambia tema"
   },
   "buttons": {
@@ -223,7 +225,10 @@
     "disk_button": "Salva su file",
     "link_title": "Link condivisibile",
     "link_details": "Esporta come link di sola lettura.",
-    "link_button": "Esporta come Link"
+    "link_button": "Esporta come Link",
+    "excalidrawplus_description": "Salva la scena nel tuo spazio di lavoro Excalidraw+.",
+    "excalidrawplus_button": "Esporta",
+    "excalidrawplus_exportError": "Non è stato possibile esportare su Excalidraw+ al questo momento..."
   },
   "helpDialog": {
     "blog": "Leggi il nostro blog",

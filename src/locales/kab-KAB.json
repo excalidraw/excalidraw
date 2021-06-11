@@ -20,7 +20,7 @@
     "background": "Agilal",
     "fill": "Taččart",
     "strokeWidth": "Tehri n yizirig",
-    "strokeShape": "",
+    "strokeShape": "Talɣa n yizirig",
     "strokeShape_gel": "",
     "strokeShape_fountain": "",
     "strokeShape_brush": "Amfezzu",
@@ -101,6 +101,8 @@
     "viewMode": "Askar n tmuɣli",
     "toggleExportColorScheme": "Sermed/sens asifeḍ usentel n yini",
     "share": "Bḍu",
+    "showStroke": "Beqqeḍ amelqaḍ n yini n yizirig",
+    "showBackground": "Beqqeḍ amelqaḍ n yini n ugilal",
     "toggleTheme": "Snifel asentel"
   },
   "buttons": {
@@ -223,7 +225,10 @@
     "disk_button": "Sekles deg ufaylu",
     "link_title": "Aseɣwen n beṭṭu",
     "link_details": "Sifeḍ am useɣwen n tɣuri kan.",
-    "link_button": "Sifeḍ deg useɣwen"
+    "link_button": "Sifeḍ deg useɣwen",
+    "excalidrawplus_description": "Sekles asayes-inek•inem di tallunt n umahil Excalidraw+.",
+    "excalidrawplus_button": "Sifeḍ",
+    "excalidrawplus_exportError": "Ulamek asifeḍ ɣer Excalidraw+ akka tura..."
   },
   "helpDialog": {
     "blog": "Ɣeṛ ablug-nneɣ",

@@ -101,6 +101,8 @@
     "viewMode": "Modo de visualização",
     "toggleExportColorScheme": "Alternar esquema de cores de exportação",
     "share": "Compartilhar",
+    "showStroke": "",
+    "showBackground": "",
     "toggleTheme": ""
   },
   "buttons": {
@@ -223,7 +225,10 @@
     "disk_button": "",
     "link_title": "",
     "link_details": "",
-    "link_button": ""
+    "link_button": "",
+    "excalidrawplus_description": "",
+    "excalidrawplus_button": "",
+    "excalidrawplus_exportError": ""
   },
   "helpDialog": {
     "blog": "Leia o nosso blog",

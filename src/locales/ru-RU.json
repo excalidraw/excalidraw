@@ -20,10 +20,10 @@
     "background": "Фон",
     "fill": "Заливка",
     "strokeWidth": "Толщина штриха",
-    "strokeShape": "",
-    "strokeShape_gel": "",
-    "strokeShape_fountain": "",
-    "strokeShape_brush": "",
+    "strokeShape": "Стиль обводки",
+    "strokeShape_gel": "Гелевая ручка",
+    "strokeShape_fountain": "Фонтанная ручка",
+    "strokeShape_brush": "Кисть",
     "strokeStyle": "Стиль обводки",
     "strokeStyle_solid": "Сплошная",
     "strokeStyle_dashed": "Пунктирная",
@@ -96,11 +96,13 @@
     "centerHorizontally": "Центрировать по горизонтали",
     "distributeHorizontally": "Распределить по горизонтали",
     "distributeVertically": "Распределить по вертикали",
-    "flipHorizontal": "",
-    "flipVertical": "",
+    "flipHorizontal": "Переворот по горизонтали",
+    "flipVertical": "Переворот по вертикали",
     "viewMode": "Вид",
     "toggleExportColorScheme": "Экспортировать цветовую схему",
     "share": "Поделиться",
+    "showStroke": "",
+    "showBackground": "",
     "toggleTheme": ""
   },
   "buttons": {
@@ -223,7 +225,10 @@
     "disk_button": "Сохранить в файл",
     "link_title": "Поделитесь ссылкой",
     "link_details": "Экспорт ссылки только для чтения.",
-    "link_button": "Экспорт в ссылку"
+    "link_button": "Экспорт в ссылку",
+    "excalidrawplus_description": "",
+    "excalidrawplus_button": "Экспорт",
+    "excalidrawplus_exportError": "Не удалось экспортировать в Excalidraw+ на данный момент..."
   },
   "helpDialog": {
     "blog": "Прочитайте наш блог",
@@ -248,7 +253,7 @@
   },
   "encrypted": {
     "tooltip": "Ваши данные защищены сквозным (End-to-end) шифрованием. Серверы Excalidraw никогда не получат доступ к ним.",
-    "link": ""
+    "link": "Запись блога о сквозном шифровании в Excalidraw"
   },
   "stats": {
     "angle": "Угол",

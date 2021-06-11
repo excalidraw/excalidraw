@@ -101,6 +101,8 @@
     "viewMode": "Mod de vizualizare",
     "toggleExportColorScheme": "Comutare schemă de culori de export",
     "share": "Distribuie",
+    "showStroke": "Afișare selector culoare contur",
+    "showBackground": "Afișare selector culoare fundal",
     "toggleTheme": "Comutare temă"
   },
   "buttons": {
@@ -223,7 +225,10 @@
     "disk_button": "Salvare în fișier",
     "link_title": "URL partajabil",
     "link_details": "Exportă ca URL doar în citire.",
-    "link_button": "Exportare în URL"
+    "link_button": "Exportare în URL",
+    "excalidrawplus_description": "Salvează scena în spațiul de lucru Excalidraw+.",
+    "excalidrawplus_button": "Exportare",
+    "excalidrawplus_exportError": "Excalidraw+ nu a putut fi exportat în acest moment..."
   },
   "helpDialog": {
     "blog": "Citește blogul nostru",

@@ -101,6 +101,8 @@
     "viewMode": "نمط العرض",
     "toggleExportColorScheme": "",
     "share": "مشاركة",
+    "showStroke": "",
+    "showBackground": "",
     "toggleTheme": "غير النمط"
   },
   "buttons": {
@@ -223,7 +225,10 @@
     "disk_button": "إحفظ لملف",
     "link_title": "رابط قابل للمشاركة",
     "link_details": "صدر الملف للمشاهدة فقط.",
-    "link_button": "التصدير كرابط"
+    "link_button": "التصدير كرابط",
+    "excalidrawplus_description": "",
+    "excalidrawplus_button": "",
+    "excalidrawplus_exportError": ""
   },
   "helpDialog": {
     "blog": "اقرأ مدونتنا",

@@ -101,6 +101,8 @@
     "viewMode": "Weergavemodus",
     "toggleExportColorScheme": "Kleurenschema exporteren aan/uit",
     "share": "Deel",
+    "showStroke": "Toon lijn kleur kiezer",
+    "showBackground": "Toon achtergrondkleur kiezer",
     "toggleTheme": "Thema aan/uit"
   },
   "buttons": {
@@ -223,7 +225,10 @@
     "disk_button": "Opslaan naar bestand",
     "link_title": "Deelbare link",
     "link_details": "Exporteren als een alleen-lezen link.",
-    "link_button": "Exporteer naar link"
+    "link_button": "Exporteer naar link",
+    "excalidrawplus_description": "Sla de scène op in je Excalidraw+ werkruimte.",
+    "excalidrawplus_button": "Exporteren",
+    "excalidrawplus_exportError": "Kan op dit moment niet exporteren naar Excalidraw+..."
   },
   "helpDialog": {
     "blog": "Lees onze blog",
