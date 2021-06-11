@@ -51,7 +51,6 @@ export const LockIcon = (props: LockIconProps) => {
         },
       )}
       title={`${props.title} — Q`}
-      style={{ marginInlineEnd: "var(--space-factor)" }}
     >
       <input
         className="ToolIcon_type_checkbox"

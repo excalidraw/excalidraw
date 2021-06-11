@@ -16,6 +16,7 @@ import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 import { LockIcon } from "./LockIcon";
 import { UserList } from "./UserList";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
+import { LibraryButton } from "./LibraryButton";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -72,6 +73,7 @@ export const MobileMenu = ({
                   onChange={onLockToggle}
                   title={t("toolBar.lock")}
                 />
+                <LibraryButton appState={appState} setAppState={setAppState} />
               </Stack.Row>
               {libraryMenu}
             </Stack.Col>

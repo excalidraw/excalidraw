@@ -155,6 +155,7 @@
   }
 
   .ToolIcon.ToolIcon__lock {
+    margin-inline-end: var(--space-factor);
     &.ToolIcon_type_floating {
       margin-left: 0.1rem;
     }
@@ -185,10 +186,9 @@
   // move the lock button out of the way on small viewports
   // it begins to collide with the GitHub icon before we switch to mobile mode
   @media (max-width: 760px) {
-    .ToolIcon.ToolIcon__lock {
+    .ToolIcon.ToolIcon_type_floating {
       display: inline-block;
       position: absolute;
-      top: 60px;
       right: -8px;
 
       margin-left: 0;
@@ -212,6 +212,14 @@
       svg {
         position: static;
       }
+    }
+    .ToolIcon.ToolIcon__library {
+      top: 100px;
+    }
+
+    .ToolIcon.ToolIcon__lock {
+      margin-inline-end: 0;
+      top: 60px;
     }
   }
 
