@@ -101,6 +101,8 @@
     "viewMode": "Visningsmodus",
     "toggleExportColorScheme": "Veksle eksport av fargepalett",
     "share": "Del",
+    "showStroke": "",
+    "showBackground": "",
     "toggleTheme": ""
   },
   "buttons": {
@@ -223,7 +225,10 @@
     "disk_button": "",
     "link_title": "",
     "link_details": "",
-    "link_button": ""
+    "link_button": "",
+    "excalidrawplus_description": "",
+    "excalidrawplus_button": "",
+    "excalidrawplus_exportError": ""
   },
   "helpDialog": {
     "blog": "Les bloggen vår",

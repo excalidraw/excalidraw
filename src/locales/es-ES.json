@@ -42,8 +42,8 @@
     "fontSize": "Tamaño de la fuente",
     "fontFamily": "Tipo de fuente",
     "onlySelected": "Sólo seleccionados",
-    "withBackground": "",
-    "exportEmbedScene": "",
+    "withBackground": "Fondo",
+    "exportEmbedScene": "Embeber escena",
     "exportEmbedScene_details": "Los datos de escena se guardarán en el archivo PNG/SVG exportado, así la escena puede ser restaurada de la misma.\nEsto aumentará el tamaño del archivo exportado.",
     "addWatermark": "Agregar \"Hecho con Excalidraw\"",
     "handDrawn": "Dibujado a mano",
@@ -101,19 +101,21 @@
     "viewMode": "Modo presentación",
     "toggleExportColorScheme": "Cambiar el esquema de colores de exportación",
     "share": "Compartir",
+    "showStroke": "Mostrar el selector de color del trazo",
+    "showBackground": "Mostrar el selector de color de fondo",
     "toggleTheme": "Alternar tema"
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
-    "exportJSON": "",
-    "exportImage": "",
+    "exportJSON": "Exportar como archivo",
+    "exportImage": "Guardar como imagen",
     "export": "Exportar",
     "exportToPng": "Exportar a PNG",
     "exportToSvg": "Exportar a SVG",
     "copyToClipboard": "Copiar al portapapeles",
     "copyPngToClipboard": "Copiar PNG al portapapeles",
     "scale": "Escalar",
-    "save": "",
+    "save": "Guardal al archivo actual",
     "saveAs": "Guardar como",
     "load": "Cargar",
     "getShareableLink": "Obtener enlace para compartir",
@@ -122,7 +124,7 @@
     "scrollBackToContent": "Volver al contenido",
     "zoomIn": "Acercarse",
     "zoomOut": "Alejarse",
-    "resetZoom": "Restablecer acercamiento",
+    "resetZoom": "Restablecer zoom",
     "menu": "Menú",
     "done": "Hecho",
     "edit": "Editar",
@@ -218,12 +220,15 @@
     "title": "Error"
   },
   "exportDialog": {
-    "disk_title": "",
-    "disk_details": "",
-    "disk_button": "",
-    "link_title": "",
-    "link_details": "",
-    "link_button": ""
+    "disk_title": "Guardar en el disco",
+    "disk_details": "Exportar los datos de la escena a un archivo desde el cual se puede importar más tarde.",
+    "disk_button": "Guardar en el archivo",
+    "link_title": "Enlace para compartir",
+    "link_details": "Exportar como enlace de sólo lectura.",
+    "link_button": "Exportar al link",
+    "excalidrawplus_description": "Guarda la escena en tu espacio de trabajo de Excalidraw+.",
+    "excalidrawplus_button": "Exportar",
+    "excalidrawplus_exportError": "No se pudo exportar a Excalidraw+ en este momento..."
   },
   "helpDialog": {
     "blog": "Lee nuestro blog",
@@ -248,7 +253,7 @@
   },
   "encrypted": {
     "tooltip": "Tus dibujos están cifrados de punto a punto, por lo que los servidores de Excalidraw nunca los verán.",
-    "link": ""
+    "link": "Entrada en el blog sobre cifrado de extremo a extremo"
   },
   "stats": {
     "angle": "Ángulo",
