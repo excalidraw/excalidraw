@@ -13,9 +13,10 @@ import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { Section } from "./Section";
 import CollabButton from "./CollabButton";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
-import { LockIcon } from "./LockIcon";
+import { LockButton } from "./LockButton";
 import { UserList } from "./UserList";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
+import { LibraryButton } from "./LibraryButton";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -64,15 +65,15 @@ export const MobileMenu = ({
                       canvas={canvas}
                       elementType={appState.elementType}
                       setAppState={setAppState}
-                      isLibraryOpen={appState.isLibraryOpen}
                     />
                   </Stack.Row>
                 </Island>
-                <LockIcon
+                <LockButton
                   checked={appState.elementLocked}
                   onChange={onLockToggle}
                   title={t("toolBar.lock")}
                 />
+                <LibraryButton appState={appState} setAppState={setAppState} />
               </Stack.Row>
               {libraryMenu}
             </Stack.Col>

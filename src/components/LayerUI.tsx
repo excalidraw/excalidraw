@@ -36,7 +36,7 @@ import { Island } from "./Island";
 import "./LayerUI.scss";
 import { LibraryUnit } from "./LibraryUnit";
 import { LoadingMessage } from "./LoadingMessage";
-import { LockIcon } from "./LockIcon";
+import { LockButton } from "./LockButton";
 import { MobileMenu } from "./MobileMenu";
 import { PasteChartDialog } from "./PasteChartDialog";
 import { Section } from "./Section";
@@ -47,6 +47,7 @@ import { Tooltip } from "./Tooltip";
 import { UserList } from "./UserList";
 import Library from "../data/library";
 import { JSONExportDialog } from "./JSONExportDialog";
+import { LibraryButton } from "./LibraryButton";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -570,6 +571,12 @@ const LayerUI = ({
               {(heading) => (
                 <Stack.Col gap={4} align="start">
                   <Stack.Row gap={1}>
+                    <LockButton
+                      zenModeEnabled={zenModeEnabled}
+                      checked={appState.elementLocked}
+                      onChange={onLockToggle}
+                      title={t("toolBar.lock")}
+                    />
                     <Island
                       padding={1}
                       className={clsx({ "zen-mode": zenModeEnabled })}
@@ -581,15 +588,12 @@ const LayerUI = ({
                           canvas={canvas}
                           elementType={appState.elementType}
                           setAppState={setAppState}
-                          isLibraryOpen={appState.isLibraryOpen}
                         />
                       </Stack.Row>
                     </Island>
-                    <LockIcon
-                      zenModeEnabled={zenModeEnabled}
-                      checked={appState.elementLocked}
-                      onChange={onLockToggle}
-                      title={t("toolBar.lock")}
+                    <LibraryButton
+                      appState={appState}
+                      setAppState={setAppState}
                     />
                   </Stack.Row>
                   {libraryMenu}
