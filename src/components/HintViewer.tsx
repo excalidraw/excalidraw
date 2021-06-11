@@ -61,6 +61,10 @@ const getHints = ({ appState, elements }: Hint) => {
     return t("hints.text_selected");
   }
 
+  if (appState.editingElement && isTextElement(appState.editingElement)) {
+    return t("hints.text_editing");
+  }
+
   return null;
 };
 
