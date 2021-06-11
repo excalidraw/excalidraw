@@ -10,7 +10,6 @@ type LockIconProps = {
   name?: string;
   checked: boolean;
   onChange?(): void;
-  size?: LockIconSize;
   zenModeEnabled?: boolean;
 };
 
@@ -45,7 +44,7 @@ export const LockIcon = (props: LockIconProps) => {
     <label
       className={clsx(
         "ToolIcon ToolIcon__lock ToolIcon_type_floating zen-mode-visibility",
-        `ToolIcon_size_${props.size || DEFAULT_SIZE}`,
+        `ToolIcon_size_${DEFAULT_SIZE}`,
         {
           "zen-mode-visibility--hidden": props.zenModeEnabled,
         },
