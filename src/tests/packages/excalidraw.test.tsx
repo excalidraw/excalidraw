@@ -1,9 +1,9 @@
 import React from "react";
-import { fireEvent, GlobalTestState, render } from "./test-utils";
-import Excalidraw from "../packages/excalidraw/index";
+import { fireEvent, GlobalTestState, render } from "../test-utils";
+import Excalidraw from "../../packages/excalidraw/index";
 import { queryByText, queryByTestId } from "@testing-library/react";
-import { GRID_SIZE } from "../constants";
-import { t } from "../i18n";
+import { GRID_SIZE } from "../../constants";
+import { t } from "../../i18n";
 
 const { h } = window;
 
@@ -136,7 +136,7 @@ describe("<Excalidraw/>", () => {
       await render(<Excalidraw />);
 
       const canvasActions = document.querySelector(
-        'section[aria-labelledby="canvasActions-title"]',
+        'section[aria-labelledby="test-id-canvasActions-title"]',
       );
 
       expect(canvasActions).toMatchSnapshot();
@@ -145,11 +145,9 @@ describe("<Excalidraw/>", () => {
     describe("Test canvasActions", () => {
       it('should not hide any UI element when canvasActions is "undefined"', async () => {
         await render(<Excalidraw UIOptions={{}} />);
-
         const canvasActions = document.querySelector(
-          'section[aria-labelledby="canvasActions-title"]',
+          'section[aria-labelledby="test-id-canvasActions-title"]',
         );
-
         expect(canvasActions).toMatchSnapshot();
       });
 
@@ -222,6 +220,24 @@ describe("<Excalidraw/>", () => {
 
         expect(queryByTestId(container, "toggle-dark-mode")).toBeNull();
       });
+    });
+  });
+
+  describe("Test autoFocus prop", () => {
+    it("should not focus when autoFocus is false", async () => {
+      const { container } = await render(<Excalidraw />);
+
+      expect(
+        container.querySelector(".excalidraw") === document.activeElement,
+      ).toBe(false);
+    });
+
+    it("should focus when autoFocus is true", async () => {
+      const { container } = await render(<Excalidraw autoFocus={true} />);
+
+      expect(
+        container.querySelector(".excalidraw") === document.activeElement,
+      ).toBe(true);
     });
   });
 });

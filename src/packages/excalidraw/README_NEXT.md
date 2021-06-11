@@ -159,7 +159,7 @@ To view the full example visit :point_down:
 
 </details>
 
-Since Excalidraw doesn't support server side rendering yet so you will have to make sure the component is rendered once host is mounted.
+Since Excalidraw doesn't support server side rendering yet, you should render the component once the host is mounted.
 
 ```js
 import { useState, useEffect } from "react";
@@ -167,7 +167,7 @@ export default function IndexPage() {
   const [Comp, setComp] = useState(null);
   useEffect(() => {
     import("@excalidraw/excalidraw-next").then((comp) => setComp(comp.default));
-  });
+  }, []);
   return <>{Comp && <Comp />}</>;
 }
 ```
@@ -378,6 +378,7 @@ To view the full example visit :point_down:
 | [`detectScroll`](#detectScroll) | boolean | true | Indicates whether to update the offsets when nearest ancestor is scrolled. |
 | [`handleKeyboardGlobally`](#handleKeyboardGlobally) | boolean | false | Indicates whether to bind the keyboard events to document. |
 | [`onLibraryChange`](#onLibraryChange) | <pre>(items: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>) => void &#124; Promise&lt;any&gt; </pre> |  | The callback if supplied is triggered when the library is updated and receives the library items. |
+| [`autoFocus`](#autoFocus) | boolean | false | Implies whether to focus the Excalidraw component on page load |
 
 ### Dimensions of Excalidraw
 
@@ -643,6 +644,10 @@ It is invoked with empty items when user clears the library. You can use this ca
 ### id
 
 The unique id of the excalidraw component. This can be used to identify the excalidraw component, for example importing the library items to the excalidraw component from where it was initiated when you have multiple excalidraw components rendered on the same page as shown in [multiple excalidraw demo](https://codesandbox.io/s/multiple-excalidraw-k1xx5).
+
+### autoFocus
+
+This prop implies whether to focus the Excalidraw component on page load. Defaults to false.
 
 ### Extra API's
 
