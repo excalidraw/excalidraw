@@ -5,7 +5,6 @@ import {
   NonDeleted,
   TextAlign,
   ExcalidrawElement,
-  FontFamily,
   GroupId,
   ExcalidrawBindableElement,
   Arrowhead,
@@ -23,6 +22,7 @@ import { Language } from "./i18n";
 import { ClipboardData } from "./clipboard";
 import { isOverScrollBars } from "./scene";
 import { MaybeTransformHandleType } from "./element/transformHandles";
+import { FONT_FAMILY } from "./constants";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -68,7 +68,7 @@ export type AppState = {
   currentItemStrokeStyle: ExcalidrawElement["strokeStyle"];
   currentItemRoughness: number;
   currentItemOpacity: number;
-  currentItemFontFamily: FontFamily;
+  currentItemFontFamily: FONT_FAMILY;
   currentItemFontSize: number;
   currentItemTextAlign: TextAlign;
   currentItemStrokeSharpness: ExcalidrawElement["strokeSharpness"];

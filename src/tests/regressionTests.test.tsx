@@ -15,6 +15,7 @@ import {
   waitFor,
 } from "./test-utils";
 import { defaultLang } from "../i18n";
+import { FONT_FAMILY } from "../constants";
 
 const { h } = window;
 
@@ -606,9 +607,9 @@ describe("regression tests", () => {
 
   it("updates fontSize & fontFamily appState", () => {
     UI.clickTool("text");
-    expect(h.state.currentItemFontFamily).toEqual(1); // Virgil
+    expect(h.state.currentItemFontFamily).toEqual(FONT_FAMILY.Virgil);
     fireEvent.click(screen.getByTitle(/code/i));
-    expect(h.state.currentItemFontFamily).toEqual(3); // Cascadia
+    expect(h.state.currentItemFontFamily).toEqual(FONT_FAMILY.Cascadia);
   });
 
   it("deselects selected element, on pointer up, when click hits element bounding box but doesn't hit the element", () => {

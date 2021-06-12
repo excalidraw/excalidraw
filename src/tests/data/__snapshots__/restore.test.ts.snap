@@ -282,7 +282,7 @@ Object {
   "baseline": 0,
   "boundElementIds": Array [],
   "fillStyle": "hachure",
-  "fontFamily": 1,
+  "fontFamily": "1",
   "fontSize": 10,
   "groupIds": Array [],
   "height": 0,

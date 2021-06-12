@@ -3,7 +3,7 @@ import { FONT_FAMILY } from "../constants";
 
 export type ChartType = "bar" | "line";
 export type FillStyle = "hachure" | "cross-hatch" | "solid";
-export type FontFamily = keyof typeof FONT_FAMILY;
+export type FontFamily = typeof FONT_FAMILY[keyof typeof FONT_FAMILY];
 export type FontString = string & { _brand: "fontString" };
 export type GroupId = string;
 export type PointerType = "mouse" | "pen" | "touch";

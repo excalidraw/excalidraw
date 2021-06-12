@@ -1,18 +1,17 @@
 import {
   ExcalidrawElement,
-  FontFamily,
   ExcalidrawSelectionElement,
 } from "../element/types";
 import { AppState, NormalizedZoomValue } from "../types";
 import { ImportedDataState } from "./types";
-import { isInvisiblySmallElement, getNormalizedDimensions } from "../element";
+import { getNormalizedDimensions, isInvisiblySmallElement } from "../element";
 import { isLinearElementType } from "../element/typeChecks";
 import { randomId } from "../random";
 import {
-  FONT_FAMILY,
   DEFAULT_FONT_FAMILY,
   DEFAULT_TEXT_ALIGN,
   DEFAULT_VERTICAL_ALIGN,
+  FONT_FAMILY,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
 import { LinearElementEditor } from "../element/linearElementEditor";
@@ -41,11 +40,11 @@ export type RestoredDataState = {
   appState: RestoredAppState;
 };
 
-const getFontFamilyByName = (fontFamilyName: string): FontFamily => {
-  for (const [id, fontFamilyString] of Object.entries(FONT_FAMILY)) {
-    if (fontFamilyString.includes(fontFamilyName)) {
-      return parseInt(id) as FontFamily;
-    }
+const getFontFamilyByName = (fontFamilyName: string): FONT_FAMILY => {
+  if (Object.keys(FONT_FAMILY).includes(fontFamilyName)) {
+    return FONT_FAMILY[
+      fontFamilyName as keyof typeof FONT_FAMILY
+    ] as FONT_FAMILY;
   }
   return DEFAULT_FONT_FAMILY;
 };
