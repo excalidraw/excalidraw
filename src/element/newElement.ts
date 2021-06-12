@@ -5,7 +5,6 @@ import {
   ExcalidrawGenericElement,
   NonDeleted,
   TextAlign,
-  FontFamily,
   GroupId,
   VerticalAlign,
   Arrowhead,
@@ -19,6 +18,7 @@ import { AppState } from "../types";
 import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
+import { FONT_FAMILY } from "../constants";
 
 type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted">,
@@ -109,7 +109,7 @@ export const newTextElement = (
   opts: {
     text: string;
     fontSize: number;
-    fontFamily: FontFamily;
+    fontFamily: FONT_FAMILY;
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
   } & ElementConstructorOpts,
