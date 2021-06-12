@@ -52,6 +52,7 @@ import {
   ENV,
   EVENT,
   GRID_SIZE,
+  IDB_KEYS,
   LINE_CONFIRM_THRESHOLD,
   MIME_TYPES,
   MQ_MAX_HEIGHT_LANDSCAPE,
@@ -194,6 +195,7 @@ import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
+import * as idb from "idb-keyval";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
@@ -806,6 +808,15 @@ class App extends React.Component<AppProps, AppState> {
       this.restoreFileFromShare();
     } else {
       this.updateDOMRect(this.initializeScene);
+    }
+
+    try {
+      const fileHandle = await idb.get(IDB_KEYS.fileHandle);
+      if (fileHandle) {
+        this.setState({ fileHandle });
+      }
+    } catch (error) {
+      console.error(error);
     }
   }
 

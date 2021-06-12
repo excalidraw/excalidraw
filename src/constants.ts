@@ -97,6 +97,10 @@ export const STORAGE_KEYS = {
   LOCAL_STORAGE_LIBRARY: "excalidraw-library",
 } as const;
 
+export const IDB_KEYS = {
+  fileHandle: "fileHandle",
+} as const;
+
 // time in milliseconds
 export const TAP_TWICE_TIMEOUT = 300;
 export const TOUCH_CTX_MENU_TIMEOUT = 500;

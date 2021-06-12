@@ -1,4 +1,4 @@
-import { fileOpen, fileSave } from "browser-fs-access";
+import { fileOpen, fileSave, FileSystemHandle } from "browser-fs-access";
 import { cleanAppStateForExport } from "../appState";
 import { EXPORT_DATA_TYPES, EXPORT_SOURCE, MIME_TYPES } from "../constants";
 import { clearElementsForExport } from "../element";
@@ -12,6 +12,7 @@ import {
   ExportedLibraryData,
 } from "./types";
 import Library from "./library";
+import { AbortError } from "../errors";
 
 export const serializeAsJSON = (
   elements: readonly ExcalidrawElement[],
@@ -28,6 +29,26 @@ export const serializeAsJSON = (
   return JSON.stringify(data, null, 2);
 };
 
+// adapted from https://web.dev/file-system-access
+const verifyPermission = async (fileHandle: FileSystemHandle) => {
+  try {
+    const options = { mode: "readwrite" } as any;
+    // Check if permission was already granted. If so, return true.
+    if ((await fileHandle.queryPermission(options)) === "granted") {
+      return true;
+    }
+    // Request permission. If the user grants permission, return true.
+    if ((await fileHandle.requestPermission(options)) === "granted") {
+      return true;
+    }
+    // The user didn't grant permission, so return false.
+    return false;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+
 export const saveAsJSON = async (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
@@ -36,6 +57,12 @@ export const saveAsJSON = async (
   const blob = new Blob([serialized], {
     type: MIME_TYPES.excalidraw,
   });
+
+  if (appState.fileHandle) {
+    if (!(await verifyPermission(appState.fileHandle))) {
+      throw new AbortError();
+    }
+  }
 
   const fileHandle = await fileSave(
     blob,

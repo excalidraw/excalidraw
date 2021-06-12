@@ -14,10 +14,11 @@ import { register } from "./register";
 import { supported as fsSupported } from "browser-fs-access";
 import { CheckboxItem } from "../components/CheckboxItem";
 import { getExportSize } from "../scene/export";
-import { DEFAULT_EXPORT_PADDING, EXPORT_SCALES } from "../constants";
+import { DEFAULT_EXPORT_PADDING, EXPORT_SCALES, IDB_KEYS } from "../constants";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { getNonDeletedElements } from "../element";
 import { ActiveFile } from "../components/ActiveFile";
+import * as idb from "idb-keyval";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -149,7 +150,10 @@ export const actionSaveToActiveFile = register({
       if (error?.name !== "AbortError") {
         console.error(error);
       }
-      return { commitToHistory: false };
+      return {
+        commitToHistory: false,
+        appState: { ...appState, fileHandle: null },
+      };
     }
   },
   keyTest: (event) =>
@@ -170,6 +174,13 @@ export const actionSaveFileToDisk = register({
         ...appState,
         fileHandle: null,
       });
+      try {
+        if (fileHandle) {
+          await idb.set(IDB_KEYS.fileHandle, fileHandle);
+        }
+      } catch (error) {
+        console.error(error);
+      }
       return { commitToHistory: false, appState: { ...appState, fileHandle } };
     } catch (error) {
       if (error?.name !== "AbortError") {
