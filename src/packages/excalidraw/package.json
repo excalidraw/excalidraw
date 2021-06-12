@@ -68,7 +68,7 @@
     "terser-webpack-plugin": "5.1.2",
     "ts-loader": "8.1.0",
     "typescript": "4.2.4",
-    "webpack": "5.37.1",
+    "webpack": "5.38.1",
     "webpack-bundle-analyzer": "4.4.1",
     "webpack-cli": "4.7.0"
   },
