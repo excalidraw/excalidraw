@@ -7,7 +7,7 @@ Object {
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "hachure",
-  "currentItemFontFamily": "1",
+  "currentItemFontFamily": 1,
   "currentItemFontSize": 20,
   "currentItemLinearStrokeSharpness": "round",
   "currentItemOpacity": 100,
