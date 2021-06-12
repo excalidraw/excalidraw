@@ -150,9 +150,21 @@ export const actionSaveToActiveFile = register({
       if (error?.name !== "AbortError") {
         console.error(error);
       }
+
+      if (fileHandleExists && error.name === "AbortError") {
+        try {
+          await idb.del(IDB_KEYS.fileHandle);
+        } catch (error) {
+          console.error(error);
+        }
+        return {
+          commitToHistory: false,
+          appState: { ...appState, fileHandle: null },
+        };
+      }
+
       return {
         commitToHistory: false,
-        appState: { ...appState, fileHandle: null },
       };
     }
   },
