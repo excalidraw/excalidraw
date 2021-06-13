@@ -1,6 +1,6 @@
 import React from "react";
 import { trackEvent } from "../analytics";
-import { load, questionCircle, save, saveAs } from "../components/icons";
+import { load, questionCircle, saveAs } from "../components/icons";
 import { ProjectName } from "../components/ProjectName";
 import { ToolButton } from "../components/ToolButton";
 import "../components/ToolIcon.scss";
@@ -17,7 +17,7 @@ import { getExportSize } from "../scene/export";
 import { DEFAULT_EXPORT_PADDING, EXPORT_SCALES } from "../constants";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { getNonDeletedElements } from "../element";
-import Stack from "../components/Stack";
+import { ActiveFile } from "../components/ActiveFile";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -155,23 +155,10 @@ export const actionSaveToActiveFile = register({
   keyTest: (event) =>
     event.key === KEYS.S && event[KEYS.CTRL_OR_CMD] && !event.shiftKey,
   PanelComponent: ({ updateData, appState }) => (
-    <Stack.Row gap={1}>
-      <input
-        className="TextInput"
-        style={{ padding: "0 4px", textOverflow: "ellipsis", width: "12em" }}
-        type="text"
-        readOnly={true}
-        value={appState.fileHandle?.name}
-      />
-      <ToolButton
-        type="icon"
-        icon={save}
-        title={t("buttons.save")}
-        aria-label={t("buttons.save")}
-        onClick={() => updateData(null)}
-        data-testid="save-button"
-      />
-    </Stack.Row>
+    <ActiveFile
+      onClick={() => updateData(null)}
+      fileName={appState.fileHandle?.name}
+    />
   ),
 });
 

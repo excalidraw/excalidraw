@@ -509,7 +509,8 @@ const LayerUI = ({
         style={{
           // we want to make sure this doesn't overflow so substracting 200
           // which is approximately height of zoom footer and top left menu items with some buffer
-          maxHeight: `${appState.height - 200}px`,
+          // if active file name is displayed, subtracting 248 to account for its height
+          maxHeight: `${appState.height - (appState.fileHandle ? 248 : 200)}px`,
         }}
       >
         <SelectedShapeActions
