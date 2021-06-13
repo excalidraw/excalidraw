@@ -3,7 +3,8 @@ import { FONT_FAMILY } from "../constants";
 
 export type ChartType = "bar" | "line";
 export type FillStyle = "hachure" | "cross-hatch" | "solid";
-export type FontFamily = keyof typeof FONT_FAMILY;
+export type FontFamilyKeys = keyof typeof FONT_FAMILY;
+export type FontFamilyValues = typeof FONT_FAMILY[FontFamilyKeys];
 export type FontString = string & { _brand: "fontString" };
 export type GroupId = string;
 export type PointerType = "mouse" | "pen" | "touch";
@@ -91,7 +92,7 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
   Readonly<{
     type: "text";
     fontSize: number;
-    fontFamily: FontFamily;
+    fontFamily: FontFamilyValues;
     text: string;
     baseline: number;
     textAlign: TextAlign;
