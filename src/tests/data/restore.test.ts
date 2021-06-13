@@ -1,15 +1,16 @@
 import * as restore from "../../data/restore";
 import {
-  ExcalidrawTextElement,
+  ExcalidrawElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
-  ExcalidrawElement,
+  ExcalidrawTextElement,
 } from "../../element/types";
 import * as sizeHelpers from "../../element/sizeHelpers";
 import { API } from "../helpers/api";
 import { getDefaultAppState } from "../../appState";
 import { ImportedDataState } from "../../data/types";
 import { NormalizedZoomValue } from "../../types";
+import { FONT_FAMILY } from "../../constants";
 
 const mockSizeHelper = jest.spyOn(sizeHelpers, "isInvisiblySmallElement");
 
@@ -49,7 +50,7 @@ describe("restoreElements", () => {
     const textElement = API.createElement({
       type: "text",
       fontSize: 14,
-      fontFamily: 1,
+      fontFamily: FONT_FAMILY.Virgil,
       text: "text",
       textAlign: "center",
       verticalAlign: "middle",

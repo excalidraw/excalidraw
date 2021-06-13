@@ -1,6 +1,6 @@
-import { FontFamily } from "./element/types";
 import cssVariables from "./css/variables.module.scss";
 import { AppProps } from "./types";
+import { FontFamilyValues } from "./element/types";
 
 export const APP_NAME = "Excalidraw";
 
@@ -63,15 +63,15 @@ export const CLASSES = {
 
 // 1-based in case we ever do `if(element.fontFamily)`
 export const FONT_FAMILY = {
-  1: "Virgil",
-  2: "Helvetica",
-  3: "Cascadia",
-} as const;
+  Virgil: 1,
+  Helvetica: 2,
+  Cascadia: 3,
+};
 
 export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";
 
 export const DEFAULT_FONT_SIZE = 20;
-export const DEFAULT_FONT_FAMILY: FontFamily = 1;
+export const DEFAULT_FONT_FAMILY: FontFamilyValues = FONT_FAMILY.Virgil;
 export const DEFAULT_TEXT_ALIGN = "left";
 export const DEFAULT_VERTICAL_ALIGN = "top";
 export const DEFAULT_VERSION = "{version}";
