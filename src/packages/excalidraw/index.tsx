@@ -180,3 +180,4 @@ export {
   exportToSvg,
 } from "../../packages/utils";
 export { serializeAsJSON } from "../../data/json";
+export { FONT_FAMILY } from "../../constants";

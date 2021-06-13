@@ -5,11 +5,11 @@ import {
   ExcalidrawGenericElement,
   NonDeleted,
   TextAlign,
-  FontFamily,
   GroupId,
   VerticalAlign,
   Arrowhead,
   ExcalidrawFreeDrawElement,
+  FontFamilyValues,
 } from "../element/types";
 import { measureText, getFontString } from "../utils";
 import { randomInteger, randomId } from "../random";
@@ -109,7 +109,7 @@ export const newTextElement = (
   opts: {
     text: string;
     fontSize: number;
-    fontFamily: FontFamily;
+    fontFamily: FontFamilyValues;
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
   } & ElementConstructorOpts,

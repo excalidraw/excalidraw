@@ -840,3 +840,21 @@ This function returns a svg with the exported elements.
 | exportBackground | boolean | true | Indicates whether background should be exported |
 | viewBackgroundColor | string | #fff | The default background color |
 | exportWithDarkMode | boolean | false | Indicates whether to export with dark mode |
+
+### FONT_FAMILY
+
+**_Signature_**
+
+```js
+import { FONT_FAMILY } from "./constants";
+```
+
+`FONT_FAMILY` contains all the font families used in `Excalidraw` as explained below
+
+| Font Family | Description          |
+| ----------- | -------------------- |
+| Virgil      | The handwritten font |
+| Helvetica   | The Normal Font      |
+| Cacadia     | The Code Font        |
+
+Defaults to `FONT_FAMILY.Virgil` unless passed in `initialData.appState.currentItemFontFamily`.
