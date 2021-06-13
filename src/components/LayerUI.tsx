@@ -488,6 +488,9 @@ const LayerUI = ({
             setAppState={setAppState}
             showThemeBtn={showThemeBtn}
           />
+          {appState.fileHandle && (
+            <>{actionManager.renderAction("saveToActiveFile")}</>
+          )}
         </Stack.Col>
       </Island>
     </Section>
