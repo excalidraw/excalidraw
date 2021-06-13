@@ -1,6 +1,6 @@
 import React from "react";
 import { trackEvent } from "../analytics";
-import { load, questionCircle, save, saveAs } from "../components/icons";
+import { load, questionCircle, saveAs } from "../components/icons";
 import { ProjectName } from "../components/ProjectName";
 import { ToolButton } from "../components/ToolButton";
 import "../components/ToolIcon.scss";
@@ -17,6 +17,7 @@ import { getExportSize } from "../scene/export";
 import { DEFAULT_EXPORT_PADDING, EXPORT_SCALES } from "../constants";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { getNonDeletedElements } from "../element";
+import { ActiveFile } from "../components/ActiveFile";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -153,14 +154,10 @@ export const actionSaveToActiveFile = register({
   },
   keyTest: (event) =>
     event.key === KEYS.S && event[KEYS.CTRL_OR_CMD] && !event.shiftKey,
-  PanelComponent: ({ updateData }) => (
-    <ToolButton
-      type="icon"
-      icon={save}
-      title={t("buttons.save")}
-      aria-label={t("buttons.save")}
-      onClick={() => updateData(null)}
-      data-testid="save-button"
+  PanelComponent: ({ updateData, appState }) => (
+    <ActiveFile
+      onSave={() => updateData(null)}
+      fileName={appState.fileHandle?.name}
     />
   ),
 });
