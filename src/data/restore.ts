@@ -1,6 +1,7 @@
 import {
   ExcalidrawElement,
   ExcalidrawSelectionElement,
+  FontFamilyValues,
 } from "../element/types";
 import { AppState, NormalizedZoomValue } from "../types";
 import { ImportedDataState } from "./types";
@@ -40,11 +41,11 @@ export type RestoredDataState = {
   appState: RestoredAppState;
 };
 
-const getFontFamilyByName = (fontFamilyName: string): FONT_FAMILY => {
+const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
   if (Object.keys(FONT_FAMILY).includes(fontFamilyName)) {
     return FONT_FAMILY[
       fontFamilyName as keyof typeof FONT_FAMILY
-    ] as FONT_FAMILY;
+    ] as FontFamilyValues;
   }
   return DEFAULT_FONT_FAMILY;
 };

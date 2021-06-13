@@ -9,6 +9,7 @@ import {
   ExcalidrawBindableElement,
   Arrowhead,
   ChartType,
+  FontFamilyValues,
 } from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -22,7 +23,6 @@ import { Language } from "./i18n";
 import { ClipboardData } from "./clipboard";
 import { isOverScrollBars } from "./scene";
 import { MaybeTransformHandleType } from "./element/transformHandles";
-import { FONT_FAMILY } from "./constants";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -68,7 +68,7 @@ export type AppState = {
   currentItemStrokeStyle: ExcalidrawElement["strokeStyle"];
   currentItemRoughness: number;
   currentItemOpacity: number;
-  currentItemFontFamily: FONT_FAMILY;
+  currentItemFontFamily: FontFamilyValues;
   currentItemFontSize: number;
   currentItemTextAlign: TextAlign;
   currentItemStrokeSharpness: ExcalidrawElement["strokeSharpness"];
