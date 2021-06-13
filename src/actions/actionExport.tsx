@@ -156,7 +156,7 @@ export const actionSaveToActiveFile = register({
     event.key === KEYS.S && event[KEYS.CTRL_OR_CMD] && !event.shiftKey,
   PanelComponent: ({ updateData, appState }) => (
     <ActiveFile
-      onClick={() => updateData(null)}
+      onSave={() => updateData(null)}
       fileName={appState.fileHandle?.name}
     />
   ),
