@@ -1,6 +1,10 @@
+import { Codec } from "json-url";
+import { cleanAppStateForExport } from "../../appState";
+import { EXPORT_DATA_TYPES, EXPORT_SOURCE } from "../../constants";
 import { serializeAsJSON } from "../../data/json";
 import { restore } from "../../data/restore";
-import { ImportedDataState } from "../../data/types";
+import { ExportedDataState, ImportedDataState } from "../../data/types";
+import { clearElementsForExport } from "../../element";
 import { ExcalidrawElement } from "../../element/types";
 import { t } from "../../i18n";
 import { AppState, UserIdleState } from "../../types";
@@ -10,6 +14,9 @@ const byteToHex = (byte: number): string => `0${byte.toString(16)}`.slice(-2);
 const BACKEND_GET = process.env.REACT_APP_BACKEND_V1_GET_URL;
 const BACKEND_V2_GET = process.env.REACT_APP_BACKEND_V2_GET_URL;
 const BACKEND_V2_POST = process.env.REACT_APP_BACKEND_V2_POST_URL;
+const DEFAULT_STATIC_CODEC = "lzma";
+
+export const STATIC_DATA_MARKER = "#s=";
 
 const generateRandomID = async () => {
   const arr = new Uint8Array(10);
@@ -327,4 +334,46 @@ export const exportToBackend = async (
     console.error(error);
     window.alert(t("alerts.couldNotCreateShareableLink"));
   }
+};
+
+const loadUrlCodec = async (): Promise<Codec> => {
+  const { default: jsonUrlInit } = await import("json-url");
+  return jsonUrlInit(DEFAULT_STATIC_CODEC);
+};
+
+export const loadFromStaticUrl = async (
+  urlPart: string,
+): Promise<ImportedDataState> => {
+  const codec = await loadUrlCodec();
+  let data: ImportedDataState | {} = {};
+  try {
+    data = await codec.decompress(urlPart);
+  } catch (e) {
+    console.error("Failed to read from url part:", e);
+    window.alert(t("alerts.importBackendFailed"));
+  }
+  return data;
+};
+
+export const exportToStaticUrl = async (
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+) => {
+  const data: ExportedDataState = {
+    type: EXPORT_DATA_TYPES.excalidraw,
+    version: 2,
+    source: EXPORT_SOURCE,
+    elements: clearElementsForExport(elements),
+    appState: cleanAppStateForExport(appState),
+  };
+
+  const codec = await loadUrlCodec();
+  const compressed = await codec.compress(data);
+
+  const url = new URL(window.location.href);
+  url.hash = `${STATIC_DATA_MARKER}${compressed}`;
+  const urlString = url.toString();
+  await navigator.clipboard.writeText(urlString);
+
+  window.alert(`Copied to clipboard`);
 };

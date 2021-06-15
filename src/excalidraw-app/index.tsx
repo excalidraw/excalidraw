@@ -44,7 +44,13 @@ import CollabWrapper, {
   CollabContextConsumer,
 } from "./collab/CollabWrapper";
 import { LanguageList } from "./components/LanguageList";
-import { exportToBackend, getCollaborationLinkData, loadScene } from "./data";
+import {
+  exportToStaticUrl,
+  getCollaborationLinkData,
+  loadFromStaticUrl,
+  loadScene,
+  STATIC_DATA_MARKER,
+} from "./data";
 import {
   importFromLocalStorage,
   saveToLocalStorage,
@@ -86,6 +92,7 @@ const initializeScene = async (opts: {
     /^#json=([0-9]+),([a-zA-Z0-9_-]+)$/,
   );
   const externalUrlMatch = window.location.hash.match(/^#url=(.*)$/);
+  const staticDataMatch = window.location.hash.startsWith(STATIC_DATA_MARKER);
 
   const localDataState = importFromLocalStorage();
 
@@ -94,7 +101,12 @@ const initializeScene = async (opts: {
   } = await loadScene(null, null, localDataState);
 
   let roomLinkData = getCollaborationLinkData(window.location.href);
-  const isExternalScene = !!(id || jsonBackendMatch || roomLinkData);
+  const isExternalScene = !!(
+    id ||
+    jsonBackendMatch ||
+    roomLinkData ||
+    staticDataMatch
+  );
   if (isExternalScene) {
     if (
       // don't prompt if scene is empty
@@ -113,6 +125,11 @@ const initializeScene = async (opts: {
           jsonBackendMatch[2],
           localDataState,
         );
+      } else if (staticDataMatch) {
+        const data = await loadFromStaticUrl(
+          window.location.hash.substr(STATIC_DATA_MARKER.length),
+        );
+        scene = await loadScene(null, null, data);
       }
       scene.scrollToContent = true;
       if (!roomLinkData) {
@@ -295,7 +312,7 @@ const ExcalidrawWrapper = () => {
     }
     if (canvas) {
       try {
-        await exportToBackend(exportedElements, {
+        await exportToStaticUrl(exportedElements, {
           ...appState,
           viewBackgroundColor: appState.exportBackground
             ? appState.viewBackgroundColor
