@@ -1,0 +1,11 @@
+[build]
+  functions = "functions"
+
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["canvas", "lzma"]
+  included_files = [
+    "./functions/export-png/xhr-sync-worker.js",
+    "./public/Cascadia.ttf",
+    "./public/FG_Virgil.ttf",
+  ]
