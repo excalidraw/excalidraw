@@ -91,7 +91,6 @@ import {
   newElement,
   newLinearElement,
   newTextElement,
-  textWysiwyg,
   transformElements,
   updateTextElement,
 } from "../element";
@@ -194,6 +193,7 @@ import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
+import { textWysiwyg } from "../element/textWysiwyg";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);

@@ -1,4 +1,3 @@
-import cssVariables from "./css/variables.module.scss";
 import { AppProps } from "./types";
 import { FontFamilyValues } from "./element/types";
 
@@ -117,7 +116,7 @@ export const MODES = {
   GRID: "gridMode",
 };
 
-export const THEME_FILTER = cssVariables.themeFilter;
+export const THEME_FILTER = "invert(93%) hue-rotate(180deg)";
 
 export const URL_QUERY_KEYS = {
   addLibrary: "addLibrary",
