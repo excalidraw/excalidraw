@@ -224,16 +224,16 @@
   "exportDialog": {
     "disk_title": "",
     "disk_details": "Сахна деректерін кейін қайта импорттауға болатын файлға экспорттаңыз.",
-    "disk_button": "",
-    "link_title": "",
-    "link_details": "",
-    "link_button": "",
-    "excalidrawplus_description": "",
-    "excalidrawplus_button": "",
-    "excalidrawplus_exportError": ""
+    "disk_button": "Файлға сақтау",
+    "link_title": "Ортақ сілтеме",
+    "link_details": "Тек оқуға арналған сілтеме ретінде экспорттау.",
+    "link_button": "Сілтемеге экспорттау",
+    "excalidrawplus_description": "Сахнаны өзіңіздің Excalidraw+ жұмыс кеңістігінде сақтаңыз.",
+    "excalidrawplus_button": "Экспорт",
+    "excalidrawplus_exportError": "Қазіргі уақытта Excalidraw+ үшін экспорттау мүмкін емес..."
   },
   "helpDialog": {
-    "blog": "",
+    "blog": "Біздің блогты оқу",
     "click": "",
     "curvedArrow": "",
     "curvedLine": "",
