@@ -1,8 +1,8 @@
 {
   "labels": {
-    "paste": "",
-    "pasteCharts": "",
-    "selectAll": "",
+    "paste": "Қою",
+    "pasteCharts": "Диаграммаларды қою",
+    "selectAll": "Бәрін таңдау",
     "multiSelect": "",
     "moveCanvas": "",
     "cut": "",
@@ -271,16 +271,16 @@
     "total": "",
     "version": "",
     "versionCopy": "",
-    "versionNotAvailable": "",
-    "width": ""
+    "versionNotAvailable": "Бұл нұсқа қолжетімсіз",
+    "width": "Ені"
   },
   "toast": {
-    "copyStyles": "",
+    "copyStyles": "Стильдер көшірілді.",
     "copyToClipboard": "",
     "copyToClipboardAsPng": "",
-    "fileSaved": "",
-    "fileSavedToFilename": "",
+    "fileSaved": "Файл сақталды.",
+    "fileSavedToFilename": "{filename} сақталды",
     "canvas": "",
-    "selection": ""
+    "selection": "таңдау"
   }
 }
