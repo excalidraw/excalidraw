@@ -116,7 +116,8 @@
       }
     }
     .layer-ui__wrapper__footer-left,
-    .layer-ui__wrapper__footer-right {
+    .layer-ui__wrapper__footer-right,
+    .disable-zen-mode--visible {
       pointer-events: all;
     }
   }
