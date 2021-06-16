@@ -922,14 +922,12 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (prevProps.viewModeEnabled !== this.props.viewModeEnabled) {
-      this.setState(
-        { viewModeEnabled: !!this.props.viewModeEnabled },
-        this.addEventListeners,
-      );
+      this.setState({ viewModeEnabled: !!this.props.viewModeEnabled });
     }
 
     if (prevState.viewModeEnabled !== this.state.viewModeEnabled) {
       this.addEventListeners();
+      this.deselectElements();
     }
 
     if (prevProps.zenModeEnabled !== this.props.zenModeEnabled) {
@@ -1770,15 +1768,19 @@ class App extends React.Component<AppProps, AppState> {
       excalidrawContainer: this.excalidrawContainerRef.current,
     });
     // deselect all other elements when inserting text
+    this.deselectElements();
+
+    // do an initial update to re-initialize element position since we were
+    // modifying element's x/y for sake of editor (case: syncing to remote)
+    updateElement(element.text);
+  }
+
+  private deselectElements() {
     this.setState({
       selectedElementIds: {},
       selectedGroupIds: {},
       editingGroupId: null,
     });
-
-    // do an initial update to re-initialize element position since we were
-    // modifying element's x/y for sake of editor (case: syncing to remote)
-    updateElement(element.text);
   }
 
   private getTextElementAtPosition(
