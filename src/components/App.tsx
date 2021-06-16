@@ -920,19 +920,13 @@ class App extends React.Component<AppProps, AppState> {
     if (prevProps.langCode !== this.props.langCode) {
       this.updateLanguage();
     }
-    if (
-      prevProps.viewModeEnabled !== this.props.viewModeEnabled ||
-      prevState.viewModeEnabled !== this.state.viewModeEnabled
-    ) {
-      this.setState(
-        {
-          viewModeEnabled:
-            prevProps.viewModeEnabled !== this.props.viewModeEnabled
-              ? !!this.props.viewModeEnabled
-              : this.state.viewModeEnabled,
-        },
-        this.addEventListeners,
-      );
+
+    if (prevProps.viewModeEnabled !== this.props.viewModeEnabled) {
+      this.setState({ viewModeEnabled: !!this.props.viewModeEnabled });
+    }
+
+    if (prevState.viewModeEnabled !== this.state.viewModeEnabled) {
+      this.addEventListeners();
       this.deselectElements();
     }
 
