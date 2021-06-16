@@ -920,16 +920,20 @@ class App extends React.Component<AppProps, AppState> {
     if (prevProps.langCode !== this.props.langCode) {
       this.updateLanguage();
     }
-
-    if (prevProps.viewModeEnabled !== this.props.viewModeEnabled) {
+    if (
+      prevProps.viewModeEnabled !== this.props.viewModeEnabled ||
+      prevState.viewModeEnabled !== this.state.viewModeEnabled
+    ) {
       this.setState(
-        { viewModeEnabled: !!this.props.viewModeEnabled },
+        {
+          viewModeEnabled:
+            prevProps.viewModeEnabled !== this.props.viewModeEnabled
+              ? !!this.props.viewModeEnabled
+              : this.state.viewModeEnabled,
+        },
         this.addEventListeners,
       );
-    }
-
-    if (prevState.viewModeEnabled !== this.state.viewModeEnabled) {
-      this.addEventListeners();
+      this.deselectElements();
     }
 
     if (prevProps.zenModeEnabled !== this.props.zenModeEnabled) {
@@ -1770,15 +1774,19 @@ class App extends React.Component<AppProps, AppState> {
       excalidrawContainer: this.excalidrawContainerRef.current,
     });
     // deselect all other elements when inserting text
+    this.deselectElements();
+
+    // do an initial update to re-initialize element position since we were
+    // modifying element's x/y for sake of editor (case: syncing to remote)
+    updateElement(element.text);
+  }
+
+  private deselectElements() {
     this.setState({
       selectedElementIds: {},
       selectedGroupIds: {},
       editingGroupId: null,
     });
-
-    // do an initial update to re-initialize element position since we were
-    // modifying element's x/y for sake of editor (case: syncing to remote)
-    updateElement(element.text);
   }
 
   private getTextElementAtPosition(
