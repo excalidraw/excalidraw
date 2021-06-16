@@ -177,12 +177,12 @@
     "shapes": "Formes"
   },
   "hints": {
-    "linearElement": "Fer clic per dibuixar múltiples punts; arrossegar per una sola línea",
-    "freeDraw": "Fer clic i arrosegar, deixar anar al punt final",
-    "text": "Consell: també pots afegir text fent doble clic a qualsevol lloc amb l'eina de selecció",
+    "linearElement": "Feu clic per a dibuixar múltiples punts; arrossegueu per a una sola línia",
+    "freeDraw": "Feu clic i arrossegueu, deixeu anar per a finalitzar",
+    "text": "Consell: també podeu afegir text fent doble clic en qualsevol lloc amb l'eina de selecció",
     "text_selected": "",
     "text_editing": "",
-    "linearElementMulti": "Fer clic a l'ultim punt, o polsar Escape o Enter per acabar",
+    "linearElementMulti": "Feu clic a l'ultim punt, o pitgeu Esc o Retorn per a finalitzar",
     "lockAngle": "Per restringir els angles, mantenir premut el majúscul (SHIFT)",
     "resize": "Per restringir les proporcions mentres es canvia la mida, mantenir premut el majúscul (SHIFT); per canviar la mida des del centre, mantenir premut ALT",
     "rotate": "Per restringir els angles mentre gira, mantenir premut el majúscul (SHIFT)",
@@ -211,8 +211,8 @@
   "roomDialog": {
     "desc_intro": "Pots convidar persones a la teva escena actual a col·laborar amb tu.",
     "desc_privacy": "No et preocupis, la sessió utilitza el xifratge de punta a punta, de manera que qualsevol cosa que dibuixis quedarà privada. Ni tan sols el nostre servidor podrà veure el que fas.",
-    "button_startSession": "Iniciar sessió",
-    "button_stopSession": "Aturar sessió",
+    "button_startSession": "Inicia la sessió",
+    "button_stopSession": "Atura la sessió",
     "desc_inProgressIntro": "La sessió de col·laboració en directe està en marxa.",
     "desc_shareLink": "Comparteix aquest enllaç amb qualsevol persona amb qui vulguis col·laborar:",
     "desc_exitSession": "Si aturas la sessió, et desconectarás de la sala, però podrás continuar treballant amb el dibuix localment. Tingues en compte que això no afectarà a altres persones, i encara podran col·laborar en la seva versió.",
@@ -222,7 +222,7 @@
     "title": "Error"
   },
   "exportDialog": {
-    "disk_title": "Desa la disc",
+    "disk_title": "Desa al disc",
     "disk_details": "",
     "disk_button": "Desa en un fitxer",
     "link_title": "",
