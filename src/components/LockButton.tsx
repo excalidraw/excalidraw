@@ -8,10 +8,8 @@ type LockIconSize = "s" | "m";
 type LockIconProps = {
   title?: string;
   name?: string;
-  id?: string;
   checked: boolean;
   onChange?(): void;
-  size?: LockIconSize;
   zenModeEnabled?: boolean;
 };
 
@@ -41,12 +39,12 @@ const ICONS = {
   ),
 };
 
-export const LockIcon = (props: LockIconProps) => {
+export const LockButton = (props: LockIconProps) => {
   return (
     <label
       className={clsx(
         "ToolIcon ToolIcon__lock ToolIcon_type_floating zen-mode-visibility",
-        `ToolIcon_size_${props.size || DEFAULT_SIZE}`,
+        `ToolIcon_size_${DEFAULT_SIZE}`,
         {
           "zen-mode-visibility--hidden": props.zenModeEnabled,
         },
@@ -57,7 +55,6 @@ export const LockIcon = (props: LockIconProps) => {
         className="ToolIcon_type_checkbox"
         type="checkbox"
         name={props.name}
-        id={props.id}
         onChange={props.onChange}
         checked={props.checked}
         aria-label={props.title}

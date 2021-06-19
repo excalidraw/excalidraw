@@ -3,7 +3,8 @@ import { FONT_FAMILY } from "../constants";
 
 export type ChartType = "bar" | "line";
 export type FillStyle = "hachure" | "cross-hatch" | "solid";
-export type FontFamily = keyof typeof FONT_FAMILY;
+export type FontFamilyKeys = keyof typeof FONT_FAMILY;
+export type FontFamilyValues = typeof FONT_FAMILY[FontFamilyKeys];
 export type FontString = string & { _brand: "fontString" };
 export type GroupId = string;
 export type PointerType = "mouse" | "pen" | "touch";
@@ -86,6 +87,7 @@ export type ExcalidrawElement =
   | ExcalidrawGenericElement
   | ExcalidrawTextElement
   | ExcalidrawLinearElement
+  | ExcalidrawFreeDrawElement
   | ExcalidrawImageElement;
 
 export type NonDeleted<TElement extends ExcalidrawElement> = TElement & {
@@ -98,7 +100,7 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
   Readonly<{
     type: "text";
     fontSize: number;
-    fontFamily: FontFamily;
+    fontFamily: FontFamilyValues;
     text: string;
     baseline: number;
     textAlign: TextAlign;
@@ -122,11 +124,20 @@ export type Arrowhead = "arrow" | "bar" | "dot";
 
 export type ExcalidrawLinearElement = _ExcalidrawElementBase &
   Readonly<{
-    type: "line" | "draw" | "arrow";
+    type: "line" | "arrow";
     points: readonly Point[];
     lastCommittedPoint: Point | null;
     startBinding: PointBinding | null;
     endBinding: PointBinding | null;
     startArrowhead: Arrowhead | null;
     endArrowhead: Arrowhead | null;
+  }>;
+
+export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
+  Readonly<{
+    type: "freedraw";
+    points: readonly Point[];
+    pressures: readonly number[];
+    simulatePressure: boolean;
+    lastCommittedPoint: Point | null;
   }>;

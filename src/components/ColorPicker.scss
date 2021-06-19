@@ -160,7 +160,7 @@
   }
 
   .color-picker-input {
-    width: 12ch; /* length of `transparent` + 1 */
+    width: 11ch; /* length of `transparent` */
     margin: 0;
     font-size: 1rem;
     background-color: var(--input-bg-color);

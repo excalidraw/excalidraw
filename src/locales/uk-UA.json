@@ -20,6 +20,10 @@
     "background": "Тло",
     "fill": "Заповнити",
     "strokeWidth": "Товщина контуру",
+    "strokeShape": "Форма обведення",
+    "strokeShape_gel": "Гельручка",
+    "strokeShape_fountain": "Перо",
+    "strokeShape_brush": "Пензель",
     "strokeStyle": "Стиль контуру",
     "strokeStyle_solid": "Суцільний",
     "strokeStyle_dashed": "Пунктир",
@@ -38,8 +42,8 @@
     "fontSize": "Розмір шрифту",
     "fontFamily": "Шрифт",
     "onlySelected": "Тільки вибране",
-    "withBackground": "З фоном",
-    "exportEmbedScene": "Вставити сцену в експортований файл",
+    "withBackground": "Фон",
+    "exportEmbedScene": "Вбудована сцена",
     "exportEmbedScene_details": "Дані сцени будуть збережені в експортований файл PNG/SVG. Ця сцена може бути відновленна з нього, однак це збільшить розмір експортованого файлу.",
     "addWatermark": "Додати «Накреслене в Excalidraw»",
     "handDrawn": "Рукописний",
@@ -96,17 +100,22 @@
     "flipVertical": "Віддзеркалити вертикально",
     "viewMode": "Режим перегляду",
     "toggleExportColorScheme": "Переключити колірну схему експорту",
-    "share": "Поділитися"
+    "share": "Поділитися",
+    "showStroke": "",
+    "showBackground": "",
+    "toggleTheme": "Перемкнути тему"
   },
   "buttons": {
     "clearReset": "Очистити полотно",
+    "exportJSON": "Експорт у файл",
+    "exportImage": "Зберегти як зображення",
     "export": "Експортувати",
     "exportToPng": "Експортувати в PNG",
     "exportToSvg": "Експортувати в SVG",
     "copyToClipboard": "Скопіювати до буферу обміну",
     "copyPngToClipboard": "Скопіювати PNG до буферу обміну",
     "scale": "Масштаб",
-    "save": "Зберегти",
+    "save": "Зберегти до поточного файлу",
     "saveAs": "Зберегти як",
     "load": "Завантажити",
     "getShareableLink": "Отримати посилання",
@@ -142,6 +151,8 @@
     "loadSceneOverridePrompt": "Завантаження зовнішнього креслення замінить ваш наявний контент. Продовжити?",
     "collabStopOverridePrompt": "Зупинка сесії перезапише ваш попередній, локально збережений малюнок. Ви впевнені?\n\n(Якщо ви хочете зберегти локальний малюнок, просто закрийте замість нього вкладку браузера.)",
     "errorLoadingLibrary": "Помилка при завантаженні сторонньої бібліотеки.",
+    "errorAddingToLibrary": "Не вдалося додати елемент до бібліотеки",
+    "errorRemovingFromLibrary": "Не вдалося видалити елемент з бібліотеки",
     "confirmAddLibrary": "Це призведе до додавання {{numShapes}} фігур до вашої бібліотеки. Ви впевнені?",
     "imageDoesNotContainScene": "Імпортування зображень на даний момент не підтримується.\n\nЧи хочете ви імпортувати сцену? Це зображення не містить ніяких даних сцен. Ви увімкнули це під час експорту?",
     "cannotRestoreFromImage": "Сцена не може бути відновлена з цього файлу зображення",
@@ -150,12 +161,12 @@
   },
   "toolBar": {
     "selection": "Виділення",
-    "draw": "Вільне креслення",
     "rectangle": "Прямокутник",
     "diamond": "Ромб",
     "ellipse": "Еліпс",
     "arrow": "Стрілка",
     "line": "Лінія",
+    "freedraw": "Малювати",
     "text": "Текст",
     "library": "Бібліотека",
     "lock": "Залишити обраний інструмент після креслення"
@@ -208,6 +219,17 @@
   "errorDialog": {
     "title": "Помилка"
   },
+  "exportDialog": {
+    "disk_title": "Зберегти на диск",
+    "disk_details": "Експорт даних сцени в файл, з якого можна імпортувати пізніше.",
+    "disk_button": "Зберегти до файлу",
+    "link_title": "Доступ за посиланням",
+    "link_details": "Експортувати як посилання тільки для читання.",
+    "link_button": "Експортувати у посилання",
+    "excalidrawplus_description": "",
+    "excalidrawplus_button": "",
+    "excalidrawplus_exportError": ""
+  },
   "helpDialog": {
     "blog": "Наш блог",
     "click": "натиснути",
@@ -231,7 +253,7 @@
   },
   "encrypted": {
     "tooltip": "Ваші креслення захищені наскрізним шифруванням — сервери Excalidraw ніколи їх не побачать.",
-    "link": ""
+    "link": "Допис у блозі на наскрізному шифруванні в Excalidraw"
   },
   "stats": {
     "angle": "Кут",

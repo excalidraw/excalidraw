@@ -1,6 +1,7 @@
 import React from "react";
 import { ExcalidrawElement } from "../element/types";
 import { AppState, ExcalidrawProps } from "../types";
+import Library from "../data/library";
 
 /** if false, the action should be prevented */
 export type ActionResult =
@@ -15,11 +16,17 @@ export type ActionResult =
     }
   | false;
 
+type AppAPI = {
+  canvas: HTMLCanvasElement | null;
+  focusContainer(): void;
+  library: Library;
+};
+
 type ActionFn = (
   elements: readonly ExcalidrawElement[],
   appState: Readonly<AppState>,
   formData: any,
-  app: { canvas: HTMLCanvasElement | null },
+  app: AppAPI,
 ) => ActionResult | Promise<ActionResult>;
 
 export type UpdaterFn = (res: ActionResult) => void;
@@ -45,6 +52,7 @@ export type ActionName =
   | "changeBackgroundColor"
   | "changeFillStyle"
   | "changeStrokeWidth"
+  | "changeStrokeShape"
   | "changeSloppiness"
   | "changeStrokeStyle"
   | "changeArrowhead"
@@ -58,9 +66,9 @@ export type ActionName =
   | "changeProjectName"
   | "changeExportBackground"
   | "changeExportEmbedScene"
-  | "changeShouldAddWatermark"
-  | "saveScene"
-  | "saveAsScene"
+  | "changeExportScale"
+  | "saveToActiveFile"
+  | "saveFileToDisk"
   | "loadScene"
   | "duplicateSelection"
   | "deleteSelectedElements"
@@ -91,7 +99,8 @@ export type ActionName =
   | "flipHorizontal"
   | "flipVertical"
   | "viewMode"
-  | "exportWithDarkMode";
+  | "exportWithDarkMode"
+  | "toggleTheme";
 
 export interface Action {
   name: ActionName;
@@ -105,7 +114,7 @@ export interface Action {
   perform: ActionFn;
   keyPriority?: number;
   keyTest?: (
-    event: KeyboardEvent,
+    event: React.KeyboardEvent | KeyboardEvent,
     appState: AppState,
     elements: readonly ExcalidrawElement[],
   ) => boolean;
@@ -120,6 +129,7 @@ export interface Action {
 export interface ActionsManagerInterface {
   actions: Record<ActionName, Action>;
   registerAction: (action: Action) => void;
-  handleKeyDown: (event: KeyboardEvent) => boolean;
+  handleKeyDown: (event: React.KeyboardEvent | KeyboardEvent) => boolean;
   renderAction: (name: ActionName) => React.ReactElement | null;
+  executeAction: (action: Action) => void;
 }

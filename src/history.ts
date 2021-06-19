@@ -21,6 +21,7 @@ interface DehydratedHistoryEntry {
 const clearAppStatePropertiesForHistory = (appState: AppState) => {
   return {
     selectedElementIds: appState.selectedElementIds,
+    selectedGroupIds: appState.selectedGroupIds,
     viewBackgroundColor: appState.viewBackgroundColor,
     editingLinearElement: appState.editingLinearElement,
     editingGroupId: appState.editingGroupId,
@@ -28,7 +29,7 @@ const clearAppStatePropertiesForHistory = (appState: AppState) => {
   };
 };
 
-export class SceneHistory {
+class History {
   private elementCache = new Map<string, Map<number, ExcalidrawElement>>();
   private recording: boolean = true;
   private stateHistory: DehydratedHistoryEntry[] = [];
@@ -169,7 +170,7 @@ export class SceneHistory {
           continue;
         }
       }
-      if (key === "selectedElementIds") {
+      if (key === "selectedElementIds" || key === "selectedGroupIds") {
         continue;
       }
       if (nextEntry.appState[key] !== lastEntry.appState[key]) {
@@ -260,7 +261,4 @@ export class SceneHistory {
   }
 }
 
-export const createHistory: () => { history: SceneHistory } = () => {
-  const history = new SceneHistory();
-  return { history };
-};
+export default History;

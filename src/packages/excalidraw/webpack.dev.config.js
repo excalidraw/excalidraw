@@ -1,5 +1,6 @@
 const path = require("path");
 const webpack = require("webpack");
+const autoprefixer = require("autoprefixer");
 
 module.exports = {
   mode: "development",
@@ -27,7 +28,19 @@ module.exports = {
       {
         test: /\.(sa|sc|c)ss$/,
         exclude: /node_modules/,
-        use: ["style-loader", { loader: "css-loader" }, "sass-loader"],
+        use: [
+          "style-loader",
+          { loader: "css-loader" },
+          {
+            loader: "postcss-loader",
+            options: {
+              postcssOptions: {
+                plugins: [autoprefixer()],
+              },
+            },
+          },
+          "sass-loader",
+        ],
       },
       {
         test: /\.(ts|tsx|js|jsx|mjs)$/,

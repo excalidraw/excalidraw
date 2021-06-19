@@ -153,10 +153,17 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                 <Shortcut label={t("toolBar.arrow")} shortcuts={["A", "5"]} />
                 <Shortcut label={t("toolBar.line")} shortcuts={["P", "6"]} />
                 <Shortcut
-                  label={t("toolBar.draw")}
+                  label={t("toolBar.freedraw")}
                   shortcuts={["Shift+P", "7"]}
                 />
                 <Shortcut label={t("toolBar.text")} shortcuts={["T", "8"]} />
+                <Shortcut
+                  label={t("helpDialog.editSelectedShape")}
+                  shortcuts={[
+                    getShortcutKey("Enter"),
+                    t("helpDialog.doubleClick"),
+                  ]}
+                />
                 <Shortcut
                   label={t("helpDialog.textNewLine")}
                   shortcuts={[
@@ -230,6 +237,14 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                 <Shortcut
                   label={t("labels.viewMode")}
                   shortcuts={[getShortcutKey("Alt+R")]}
+                />
+                <Shortcut
+                  label={t("labels.toggleTheme")}
+                  shortcuts={[getShortcutKey("Alt+Shift+D")]}
+                />
+                <Shortcut
+                  label={t("stats.title")}
+                  shortcuts={[getShortcutKey("Alt+/")]}
                 />
               </ShortcutIsland>
             </Column>
@@ -356,6 +371,14 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                 <Shortcut
                   label={t("labels.flipVertical")}
                   shortcuts={[getShortcutKey("Shift+V")]}
+                />
+                <Shortcut
+                  label={t("labels.showStroke")}
+                  shortcuts={[getShortcutKey("S")]}
+                />
+                <Shortcut
+                  label={t("labels.showBackground")}
+                  shortcuts={[getShortcutKey("G")]}
                 />
               </ShortcutIsland>
             </Column>
