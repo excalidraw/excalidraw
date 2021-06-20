@@ -97,7 +97,6 @@ import {
 } from "../element";
 import {
   bindOrUnbindSelectedElements,
-  fixBindingsAfterDeletion,
   fixBindingsAfterDuplication,
   getEligibleElementsForBinding,
   getHoveredElementForBinding,
@@ -1747,9 +1746,7 @@ class App extends React.Component<AppProps, AppState> {
               [element.id]: true,
             },
           }));
-        } else {
-          fixBindingsAfterDeletion(this.scene.getElements(), [element]);
-        }
+        } 
         if (!isDeleted || isExistingElement) {
           this.history.resumeRecording();
         }
