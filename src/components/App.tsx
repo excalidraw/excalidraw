@@ -1746,7 +1746,7 @@ class App extends React.Component<AppProps, AppState> {
               [element.id]: true,
             },
           }));
-        } 
+        }
         if (!isDeleted || isExistingElement) {
           this.history.resumeRecording();
         }
