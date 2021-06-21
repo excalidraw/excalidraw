@@ -139,6 +139,8 @@ export class API {
           textAlign: rest.textAlign ?? appState.currentItemTextAlign,
           verticalAlign: rest.verticalAlign ?? DEFAULT_VERTICAL_ALIGN,
         });
+        element.width = width;
+        element.height = height;
         break;
       case "freedraw":
         element = newFreeDrawElement({
