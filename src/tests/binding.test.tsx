@@ -1,5 +1,5 @@
 import React from "react";
-import { render } from "./test-utils";
+import { fireEvent, render } from "./test-utils";
 import ExcalidrawApp from "../excalidraw-app";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { getTransformHandles } from "../element/transformHandles";
@@ -102,6 +102,27 @@ describe("element binding", () => {
     expect(arrow.endBinding?.elementId).toBe(rectangle.id);
 
     Keyboard.keyPress(KEYS.ARROW_LEFT);
+    expect(arrow.endBinding).toBe(null);
+  });
+
+  it("should unbind on bound element deletion", () => {
+    const rectangle = UI.createElement("rectangle", {
+      x: 60,
+      y: 0,
+      size: 100,
+    });
+
+    const arrow = UI.createElement("arrow", {
+      x: 0,
+      y: 0,
+      size: 50,
+    });
+
+    expect(arrow.endBinding?.elementId).toBe(rectangle.id);
+
+    mouse.select(rectangle);
+    expect(API.getSelectedElement().type).toBe("rectangle");
+    Keyboard.keyDown(KEYS.DELETE);
     expect(arrow.endBinding).toBe(null);
   });
 });
