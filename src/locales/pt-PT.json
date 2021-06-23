@@ -106,7 +106,7 @@
     "toggleTheme": "Alternar tema"
   },
   "buttons": {
-    "clearReset": "Limpar o canvas e redefinir a cor de fundo",
+    "clearReset": "Limpar a área de desenho e redefinir a cor de fundo",
     "exportJSON": "Exportar para ficheiro",
     "exportImage": "Guardar como imagem",
     "export": "Exportar",
