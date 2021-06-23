@@ -67,8 +67,8 @@
     "cartoonist": "Caricaturista",
     "fileTitle": "Nome do ficheiro",
     "colorPicker": "Seletor de cores",
-    "canvasBackground": "Fundo da tela",
-    "drawingCanvas": "Tela de desenho",
+    "canvasBackground": "Fundo da área de desenho",
+    "drawingCanvas": "Área de desenho",
     "layers": "Camadas",
     "actions": "Ações",
     "language": "Idioma",
@@ -139,12 +139,12 @@
     "exitZenMode": "Sair do modo zen"
   },
   "alerts": {
-    "clearReset": "Isto irá limpar toda a tela. Tem a certeza?",
+    "clearReset": "Isto irá limpar toda a área de desenho. Tem a certeza?",
     "couldNotCreateShareableLink": "Não foi possível criar um link partilhável.",
     "couldNotCreateShareableLinkTooBig": "Não foi possível criar um link partilhável: a cena é muito grande",
     "couldNotLoadInvalidFile": "Não foi possível carregar o ficheiro inválido",
     "importBackendFailed": "A importação do servidor falhou.",
-    "cannotExportEmptyCanvas": "Não é possível exportar uma tela vazia.",
+    "cannotExportEmptyCanvas": "Não é possível exportar uma área de desenho vazia.",
     "couldNotCopyToClipboard": "Não foi possível copiar para a área de transferência. Experimente no navegador Chrome.",
     "decryptFailed": "Não foi possível desencriptar os dados.",
     "uploadedSecurly": "O upload foi protegido com criptografia de ponta a ponta, o que significa que o servidor do Excalidraw e terceiros não podem ler o conteúdo.",
@@ -172,7 +172,7 @@
     "lock": "Manter a ferramenta selecionada ativa após desenhar"
   },
   "headings": {
-    "canvasActions": "Ações da tela",
+    "canvasActions": "Ações da área de desenho",
     "selectedShapeActions": "Ações das formas selecionadas",
     "shapes": "Formas"
   },
@@ -192,14 +192,14 @@
   },
   "canvasError": {
     "cannotShowPreview": "Não é possível mostrar uma pré-visualização",
-    "canvasTooBig": "A tela pode ser muito grande.",
+    "canvasTooBig": "A área de desenho pode ser muito grande.",
     "canvasTooBigTip": "Dica: tente aproximar um pouco os elementos mais distantes."
   },
   "errorSplash": {
     "headingMain_pre": "Foi encontrado um erro. Tente ",
     "headingMain_button": "recarregar a página.",
     "clearCanvasMessage": "Se a recarga não funcionar, tente ",
-    "clearCanvasMessage_button": "limpando a tela.",
+    "clearCanvasMessage_button": "a limpar a área de desenho.",
     "clearCanvasCaveat": " Isso resultará em perda de trabalho ",
     "trackedToSentry_pre": "O erro com o identificador ",
     "trackedToSentry_post": " foi rastreado no nosso sistema.",
@@ -214,7 +214,7 @@
     "button_startSession": "Iniciar sessão",
     "button_stopSession": "Parar sessão",
     "desc_inProgressIntro": "A sessão de colaboração ao vivo está agora em andamento.",
-    "desc_shareLink": "Compartilhe este link com qualquer pessoa com quem você queira colaborar:",
+    "desc_shareLink": "Partilhe este link com qualquer pessoa com quem queira colaborar:",
     "desc_exitSession": "Interrompendo a sessão irá desconectar-se da sala, mas poderá continuar a trabalhar com a cena localmente. Note que isso não afetará outras pessoas e elas ainda poderão colaborar nas versões deles.",
     "shareTitle": "Participe numa sessão de colaboração ao vivo no Excalidraw"
   },
@@ -277,7 +277,7 @@
   "toast": {
     "copyStyles": "Estilos copiados.",
     "copyToClipboard": "Copiado para a área de transferência.",
-    "copyToClipboardAsPng": "Copiado {{exportSelection}} para a área de transferência como PNG\n({{exportColorScheme}})",
+    "copyToClipboardAsPng": "{{exportSelection}} copiado para a área de transferência como PNG\n({{exportColorScheme}})",
     "fileSaved": "Ficheiro guardado.",
     "fileSavedToFilename": "Guardado como {filename}",
     "canvas": "área de desenho",
