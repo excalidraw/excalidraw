@@ -546,7 +546,6 @@ const drawElementFromCanvas = (
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   sceneState: SceneState,
-  scale: number,
 ) => {
   const element = elementWithCanvas.element;
   const padding = getCanvasPadding(element);
@@ -560,16 +559,8 @@ const drawElementFromCanvas = (
     y2 = Math.ceil(y2);
   }
 
-  const condScale =
-    isTextElement(element) &&
-    isMathMode(getFontString(element)) &&
-    containsMath(element.text, element.useTex)
-      ? scale
-      : 1;
-  const cx =
-    ((x1 + x2) / 2 + sceneState.scrollX) * window.devicePixelRatio * condScale;
-  const cy =
-    ((y1 + y2) / 2 + sceneState.scrollY) * window.devicePixelRatio * condScale;
+  const cx = ((x1 + x2) / 2 + sceneState.scrollX) * window.devicePixelRatio;
+  const cy = ((y1 + y2) / 2 + sceneState.scrollY) * window.devicePixelRatio;
   context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
   context.translate(cx, cy);
   context.rotate(element.angle);
@@ -626,13 +617,7 @@ export const renderElement = (
           sceneState,
           refresh,
         );
-        drawElementFromCanvas(
-          elementWithCanvas,
-          rc,
-          context,
-          sceneState,
-          scale,
-        );
+        drawElementFromCanvas(elementWithCanvas, rc, context, sceneState);
       } else {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
         const cx = (x1 + x2) / 2 + sceneState.scrollX;
@@ -664,13 +649,7 @@ export const renderElement = (
           sceneState,
           refresh,
         );
-        drawElementFromCanvas(
-          elementWithCanvas,
-          rc,
-          context,
-          sceneState,
-          scale,
-        );
+        drawElementFromCanvas(elementWithCanvas, rc, context, sceneState);
       } else {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
         const cx = (x1 + x2) / 2 + sceneState.scrollX;
