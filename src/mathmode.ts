@@ -1,5 +1,5 @@
 // Some imports
-import { FontFamily, FontString } from "./element/types";
+import { FontFamilyValues, FontString } from "./element/types";
 import {
   getFontString,
   getFontFamilyString,
@@ -115,7 +115,7 @@ const markupText = (text: string, useTex: boolean) => {
 
 const getCacheKey = (
   text: string,
-  fontFamily: FontFamily,
+  fontFamily: FontFamilyValues,
   strokeColor: String,
   textAlign: CanvasTextAlign,
   opacity: Number,
@@ -250,7 +250,7 @@ const fontSizePoT = 128;
 export const createSvg = (
   text: string,
   fontSize: number,
-  fontFamily: FontFamily,
+  fontFamily: FontFamilyValues,
   strokeColor: String,
   textAlign: CanvasTextAlign,
   opacity: Number,
@@ -375,7 +375,7 @@ export const drawMathOnCanvas = (
   y: number,
   text: string,
   fontSize: number,
-  fontFamily: FontFamily,
+  fontFamily: FontFamilyValues,
   strokeColor: String,
   textAlign: CanvasTextAlign,
   opacity: Number,
@@ -457,7 +457,7 @@ export const isMathMode = (fontString: FontString) => {
 export const measureMath = (
   text: string,
   fontSize: number,
-  fontFamily: FontFamily,
+  fontFamily: FontFamilyValues,
   useTex: boolean,
 ) => {
   const scale = fontSize / fontSizePoT;
