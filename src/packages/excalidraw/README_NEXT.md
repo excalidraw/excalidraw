@@ -843,10 +843,10 @@ This function returns a svg with the exported elements.
 
 ### FONT_FAMILY
 
-**_Signature_**
+**How to use**
 
 ```js
-import { FONT_FAMILY } from "./constants";
+import { FONT_FAMILY } from "@excalidraw/excalidraw-next";
 ```
 
 `FONT_FAMILY` contains all the font families used in `Excalidraw` as explained below
@@ -858,3 +858,49 @@ import { FONT_FAMILY } from "./constants";
 | Cacadia     | The Code Font        |
 
 Defaults to `FONT_FAMILY.Virgil` unless passed in `initialData.appState.currentItemFontFamily`.
+
+### loadLibraryFromBlob
+
+```js
+import { loadLibraryFromBlob } from "@excalidraw/excalidraw-next";
+```
+
+**_Signature_**
+
+<pre>
+loadLibraryFromBlob(blob: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a>)
+</pre>
+
+This function loads the library from the blob.
+
+### loadFromBlob
+
+**How to use**
+
+```js
+import { loadFromBlob } from "@excalidraw/excalidraw-next";
+```
+
+**Signature**
+
+<pre>
+loadFromBlob(blob: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a>, localAppState:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L42">AppState</a> | null)
+</pre>
+
+This function loads the scene data from the blob. If you pass `localAppState`, `localAppState` value will be preferred over the `appState` derived from `blob`
+
+### getFreeDrawSvgPath
+
+**How to use**
+
+```js
+import { getFreeDrawSvgPath } from "@excalidraw/excalidraw-next";
+```
+
+**Signature**
+
+<pre>
+getFreeDrawSvgPath(element: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L127">ExcalidrawFreeDrawElement</a>
+</pre>
+
+This function returns the free draw svg path for the element.
