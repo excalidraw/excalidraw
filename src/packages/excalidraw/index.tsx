@@ -181,6 +181,6 @@ export {
   serializeAsJSON,
   loadLibraryFromBlob,
   loadFromBlob,
+  getFreeDrawSvgPath,
 } from "../../packages/utils";
 export { FONT_FAMILY } from "../../constants";
-export { getFreeDrawSvgPath } from "../../renderer/renderElement";
