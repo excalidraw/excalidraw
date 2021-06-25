@@ -141,6 +141,7 @@ const measureOutputs = (outputs: string[][], fontString: FontString) => {
     for (let i = 0; i < outputs[index].length; i++) {
       key += outputs[index][i] === "" ? " " : outputs[index][i];
     }
+    key += "\n";
   }
   const cKey = key;
   if (metricsCache[cKey]) {
@@ -157,7 +158,11 @@ const measureOutputs = (outputs: string[][], fontString: FontString) => {
     height: number;
     baseline: number;
   }>[];
-  const lineMetrics = [];
+  const lineMetrics = [] as Array<{
+    width: number;
+    height: number;
+    baseline: number;
+  }>;
   let imageWidth = 0;
   let imageHeight = 0;
   let imageBaseline = 0;
@@ -333,7 +338,7 @@ export const createSvg = (
       childNode.setAttribute("x", `${x}`);
       // Don't offset x when we have an empty string.
       x +=
-        processed[index][i] === "" && processed[index].length > 0
+        processed[index].length > 0 && processed[index][i] === ""
           ? 0
           : childMetrics.width;
       const svgVerticalOffset = childIsSvg

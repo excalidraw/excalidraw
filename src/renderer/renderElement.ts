@@ -627,7 +627,14 @@ export const renderElement = (
         context.translate(cx, cy);
         context.rotate(element.angle);
         context.translate(-shiftX, -shiftY);
-        drawElementOnCanvas(element, rc, context, sceneState.zoom, 1, refresh);
+        drawElementOnCanvas(
+          element,
+          rc,
+          context,
+          sceneState.zoom,
+          window.devicePixelRatio,
+          refresh,
+        );
         context.translate(shiftX, shiftY);
         context.rotate(-element.angle);
         context.translate(-cx, -cy);
@@ -659,7 +666,14 @@ export const renderElement = (
         context.translate(cx, cy);
         context.rotate(element.angle);
         context.translate(-shiftX, -shiftY);
-        drawElementOnCanvas(element, rc, context, sceneState.zoom, 1, refresh);
+        drawElementOnCanvas(
+          element,
+          rc,
+          context,
+          sceneState.zoom,
+          window.devicePixelRatio,
+          refresh,
+        );
         context.translate(shiftX, shiftY);
         context.rotate(-element.angle);
         context.translate(-cx, -cy);
