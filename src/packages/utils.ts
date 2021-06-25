@@ -95,3 +95,5 @@ export const exportToSvg = ({
 };
 
 export { serializeAsJSON } from "../data/json";
+export { loadFromBlob, loadLibraryFromBlob } from "../data/blob";
+export { getFreeDrawSvgPath } from "../renderer/renderElement";
