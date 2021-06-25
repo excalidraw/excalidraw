@@ -1,6 +1,6 @@
 import React from "react";
 import { trackEvent } from "../analytics";
-import { load, questionCircle, save, saveAs } from "../components/icons";
+import { load, questionCircle, saveAs } from "../components/icons";
 import { ProjectName } from "../components/ProjectName";
 import { ToolButton } from "../components/ToolButton";
 import "../components/ToolIcon.scss";
@@ -13,6 +13,11 @@ import { KEYS } from "../keys";
 import { register } from "./register";
 import { supported as fsSupported } from "browser-fs-access";
 import { CheckboxItem } from "../components/CheckboxItem";
+import { getExportSize } from "../scene/export";
+import { DEFAULT_EXPORT_PADDING, EXPORT_SCALES } from "../constants";
+import { getSelectedElements, isSomeElementSelected } from "../scene";
+import { getNonDeletedElements } from "../element";
+import { ActiveFile } from "../components/ActiveFile";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -30,6 +35,54 @@ export const actionChangeProjectName = register({
       }
     />
   ),
+});
+
+export const actionChangeExportScale = register({
+  name: "changeExportScale",
+  perform: (_elements, appState, value) => {
+    return {
+      appState: { ...appState, exportScale: value },
+      commitToHistory: false,
+    };
+  },
+  PanelComponent: ({ elements: allElements, appState, updateData }) => {
+    const elements = getNonDeletedElements(allElements);
+    const exportSelected = isSomeElementSelected(elements, appState);
+    const exportedElements = exportSelected
+      ? getSelectedElements(elements, appState)
+      : elements;
+
+    return (
+      <>
+        {EXPORT_SCALES.map((s) => {
+          const [width, height] = getExportSize(
+            exportedElements,
+            DEFAULT_EXPORT_PADDING,
+            s,
+          );
+
+          const scaleButtonTitle = `${t(
+            "buttons.scale",
+          )} ${s}x (${width}x${height})`;
+
+          return (
+            <ToolButton
+              key={s}
+              size="s"
+              type="radio"
+              icon={`${s}x`}
+              name="export-canvas-scale"
+              title={scaleButtonTitle}
+              aria-label={scaleButtonTitle}
+              id="export-canvas-scale"
+              checked={s === appState.exportScale}
+              onChange={() => updateData(s)}
+            />
+          );
+        })}
+      </>
+    );
+  },
 });
 
 export const actionChangeExportBackground = register({
@@ -101,14 +154,10 @@ export const actionSaveToActiveFile = register({
   },
   keyTest: (event) =>
     event.key === KEYS.S && event[KEYS.CTRL_OR_CMD] && !event.shiftKey,
-  PanelComponent: ({ updateData }) => (
-    <ToolButton
-      type="icon"
-      icon={save}
-      title={t("buttons.save")}
-      aria-label={t("buttons.save")}
-      onClick={() => updateData(null)}
-      data-testid="save-button"
+  PanelComponent: ({ updateData, appState }) => (
+    <ActiveFile
+      onSave={() => updateData(null)}
+      fileName={appState.fileHandle?.name}
     />
   ),
 });

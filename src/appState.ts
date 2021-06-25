@@ -3,10 +3,15 @@ import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   DEFAULT_TEXT_ALIGN,
+  EXPORT_SCALES,
 } from "./constants";
 import { t } from "./i18n";
 import { AppState, NormalizedZoomValue } from "./types";
 import { getDateTime } from "./utils";
+
+const defaultExportScale = EXPORT_SCALES.includes(devicePixelRatio)
+  ? devicePixelRatio
+  : 1;
 
 export const getDefaultAppState = (): Omit<
   AppState,
@@ -39,6 +44,7 @@ export const getDefaultAppState = (): Omit<
     elementType: "selection",
     errorMessage: null,
     exportBackground: true,
+    exportScale: defaultExportScale,
     exportEmbedScene: false,
     exportWithDarkMode: false,
     fileHandle: null,
@@ -52,6 +58,7 @@ export const getDefaultAppState = (): Omit<
     multiElement: null,
     name: `${t("labels.untitled")}-${getDateTime()}`,
     openMenu: null,
+    openPopup: null,
     pasteDialog: { shown: false, data: null },
     previousSelectedElementIds: {},
     resizingElement: null,
@@ -116,6 +123,7 @@ const APP_STATE_STORAGE_CONF = (<
   errorMessage: { browser: false, export: false },
   exportBackground: { browser: true, export: false },
   exportEmbedScene: { browser: true, export: false },
+  exportScale: { browser: true, export: false },
   exportWithDarkMode: { browser: true, export: false },
   fileHandle: { browser: false, export: false },
   gridSize: { browser: true, export: true },
@@ -131,6 +139,7 @@ const APP_STATE_STORAGE_CONF = (<
   offsetLeft: { browser: false, export: false },
   offsetTop: { browser: false, export: false },
   openMenu: { browser: true, export: false },
+  openPopup: { browser: false, export: false },
   pasteDialog: { browser: false, export: false },
   previousSelectedElementIds: { browser: true, export: false },
   resizingElement: { browser: false, export: false },

@@ -13,6 +13,13 @@ import {
   FillCrossHatchIcon,
   FillHachureIcon,
   FillSolidIcon,
+  FontFamilyCodeIcon,
+  FontFamilyHandDrawnIcon,
+  FontFamilyNormalIcon,
+  FontSizeExtraLargeIcon,
+  FontSizeLargeIcon,
+  FontSizeMediumIcon,
+  FontSizeSmallIcon,
   SloppinessArchitectIcon,
   SloppinessArtistIcon,
   SloppinessCartoonistIcon,
@@ -20,18 +27,15 @@ import {
   StrokeStyleDottedIcon,
   StrokeStyleSolidIcon,
   StrokeWidthIcon,
-  FontSizeSmallIcon,
-  FontSizeMediumIcon,
-  FontSizeLargeIcon,
-  FontSizeExtraLargeIcon,
-  FontFamilyHandDrawnIcon,
-  FontFamilyNormalIcon,
-  FontFamilyCodeIcon,
-  TextAlignLeftIcon,
   TextAlignCenterIcon,
+  TextAlignLeftIcon,
   TextAlignRightIcon,
 } from "../components/icons";
-import { DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE } from "../constants";
+import {
+  DEFAULT_FONT_FAMILY,
+  DEFAULT_FONT_SIZE,
+  FONT_FAMILY,
+} from "../constants";
 import {
   getNonDeletedElements,
   isTextElement,
@@ -44,7 +48,7 @@ import {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
-  FontFamily,
+  FontFamilyValues,
   TextAlign,
 } from "../element/types";
 import { getLanguage, t } from "../i18n";
@@ -126,9 +130,9 @@ export const actionChangeStrokeColor = register({
           appState.currentItemStrokeColor,
         )}
         onChange={(color) => updateData({ currentItemStrokeColor: color })}
-        isActive={appState.openMenu === "strokeColorPicker"}
+        isActive={appState.openPopup === "strokeColorPicker"}
         setActive={(active) =>
-          updateData({ openMenu: active ? "strokeColorPicker" : null })
+          updateData({ openPopup: active ? "strokeColorPicker" : null })
         }
       />
     </>
@@ -166,9 +170,9 @@ export const actionChangeBackgroundColor = register({
           appState.currentItemBackgroundColor,
         )}
         onChange={(color) => updateData({ currentItemBackgroundColor: color })}
-        isActive={appState.openMenu === "backgroundColorPicker"}
+        isActive={appState.openPopup === "backgroundColorPicker"}
         setActive={(active) =>
-          updateData({ openMenu: active ? "backgroundColorPicker" : null })
+          updateData({ openPopup: active ? "backgroundColorPicker" : null })
         }
       />
     </>
@@ -499,19 +503,23 @@ export const actionChangeFontFamily = register({
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => {
-    const options: { value: FontFamily; text: string; icon: JSX.Element }[] = [
+    const options: {
+      value: FontFamilyValues;
+      text: string;
+      icon: JSX.Element;
+    }[] = [
       {
-        value: 1,
+        value: FONT_FAMILY.Virgil,
         text: t("labels.handDrawn"),
         icon: <FontFamilyHandDrawnIcon theme={appState.theme} />,
       },
       {
-        value: 2,
+        value: FONT_FAMILY.Helvetica,
         text: t("labels.normal"),
         icon: <FontFamilyNormalIcon theme={appState.theme} />,
       },
       {
-        value: 3,
+        value: FONT_FAMILY.Cascadia,
         text: t("labels.code"),
         icon: <FontFamilyCodeIcon theme={appState.theme} />,
       },
@@ -520,7 +528,7 @@ export const actionChangeFontFamily = register({
     return (
       <fieldset>
         <legend>{t("labels.fontFamily")}</legend>
-        <ButtonIconSelect<FontFamily | false>
+        <ButtonIconSelect<FontFamilyValues | false>
           group="font-family"
           options={options}
           value={getFormValue(

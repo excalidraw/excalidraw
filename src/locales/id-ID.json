@@ -101,6 +101,8 @@
     "viewMode": "Mode tampilan",
     "toggleExportColorScheme": "Ubah skema warna ekspor",
     "share": "Bagikan",
+    "showStroke": "Tampilkan garis pengambil warna",
+    "showBackground": "Tampilkan latar pengambil warna",
     "toggleTheme": "Ubah tema"
   },
   "buttons": {
@@ -223,7 +225,10 @@
     "disk_button": "Simpan ke file",
     "link_title": "Tautan",
     "link_details": "Ekspor sebagai tautan yang hanya dibaca.",
-    "link_button": "Ekspor ke tautan"
+    "link_button": "Ekspor ke tautan",
+    "excalidrawplus_description": "Simpan pemandangan ke ruang kerja Excalidraw+ Anda.",
+    "excalidrawplus_button": "Ekspor",
+    "excalidrawplus_exportError": "Tidak dapat ekspor ke Excalidraw+ saat ini..."
   },
   "helpDialog": {
     "blog": "Baca blog kami",

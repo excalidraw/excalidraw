@@ -101,6 +101,8 @@
     "viewMode": "Visningsläge",
     "toggleExportColorScheme": "Växla färgschema för export",
     "share": "Dela",
+    "showStroke": "Visa färgväljare för linjefärg",
+    "showBackground": "Visa färgväljare för bakgrundsfärg",
     "toggleTheme": "Växla tema"
   },
   "buttons": {
@@ -223,7 +225,10 @@
     "disk_button": "Spara till fil",
     "link_title": "Delbar länk",
     "link_details": "Exportera som en skrivskyddad länk.",
-    "link_button": "Exportera till länk"
+    "link_button": "Exportera till länk",
+    "excalidrawplus_description": "Spara skissen till din Excalidraw+ arbetsyta.",
+    "excalidrawplus_button": "Exportera",
+    "excalidrawplus_exportError": "Det gick inte att exportera till Excalidraw+ just nu..."
   },
   "helpDialog": {
     "blog": "Läs vår blogg",

@@ -32,8 +32,7 @@ import {
   MaybeTransformHandleType,
   TransformHandleDirection,
 } from "./transformHandles";
-import { PointerDownState } from "../components/App";
-import { Point } from "../types";
+import { Point, PointerDownState } from "../types";
 
 export const normalizeAngle = (angle: number): number => {
   if (angle >= 2 * Math.PI) {

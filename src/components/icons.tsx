@@ -24,7 +24,10 @@ type Opts = {
   mirror?: true;
 } & React.SVGProps<SVGSVGElement>;
 
-const createIcon = (d: string | React.ReactNode, opts: number | Opts = 512) => {
+export const createIcon = (
+  d: string | React.ReactNode,
+  opts: number | Opts = 512,
+) => {
   const { width = 512, height = width, mirror, style } =
     typeof opts === "number" ? ({ width: opts } as Opts) : opts;
   return (
@@ -472,6 +475,11 @@ export const clone = createIcon(
 export const shield = createIcon(
   "M11.553 22.894a.998.998 0 00.894 0s3.037-1.516 5.465-4.097C19.616 16.987 21 14.663 21 12V5a1 1 0 00-.649-.936l-8-3a.998.998 0 00-.702 0l-8 3A1 1 0 003 5v7c0 2.663 1.384 4.987 3.088 6.797 2.428 2.581 5.465 4.097 5.465 4.097zm-1.303-8.481l6.644-6.644a.856.856 0 111.212 1.212l-7.25 7.25a.856.856 0 01-1.212 0l-3.75-3.75a.856.856 0 111.212-1.212l3.144 3.144z",
   { width: 24 },
+);
+
+export const file = createIcon(
+  "M369.9 97.9L286 14C277 5 264.8-.1 252.1-.1H48C21.5 0 0 21.5 0 48v416c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48V131.9c0-12.7-5.1-25-14.1-34zM332.1 128H256V51.9l76.1 76.1zM48 464V48h160v104c0 13.3 10.7 24 24 24h104v288H48zm32-48h224V288l-23.5-23.5c-4.7-4.7-12.3-4.7-17 0L176 352l-39.5-39.5c-4.7-4.7-12.3-4.7-17 0L80 352v64zm48-240c-26.5 0-48 21.5-48 48s21.5 48 48 48 48-21.5 48-48-21.5-48-48-48z",
+  { width: 384, height: 512 },
 );
 
 export const GroupIcon = React.memo(({ theme }: { theme: "light" | "dark" }) =>

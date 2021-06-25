@@ -29,6 +29,7 @@ Object {
   "exportBackground": true,
   "exportEmbedScene": false,
   "exportPadding": undefined,
+  "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "gridSize": null,
@@ -42,6 +43,7 @@ Object {
   "multiElement": null,
   "name": "name",
   "openMenu": null,
+  "openPopup": null,
   "pasteDialog": Object {
     "data": null,
     "shown": false,

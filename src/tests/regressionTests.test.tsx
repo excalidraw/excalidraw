@@ -7,20 +7,19 @@ import * as Renderer from "../renderer/renderScene";
 import { setDateTimeForTests } from "../utils";
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
-import { fireEvent, render, screen, waitFor } from "./test-utils";
+import {
+  assertSelectedElements,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "./test-utils";
 import { defaultLang } from "../i18n";
+import { FONT_FAMILY } from "../constants";
 
 const { h } = window;
 
 const renderScene = jest.spyOn(Renderer, "renderScene");
-
-const assertSelectedElements = (...elements: ExcalidrawElement[]) => {
-  expect(
-    API.getSelectedElements().map((element) => {
-      return element.id;
-    }),
-  ).toEqual(expect.arrayContaining(elements.map((element) => element.id)));
-};
 
 const mouse = new Pointer("mouse");
 const finger1 = new Pointer("touch", 1);
@@ -608,9 +607,9 @@ describe("regression tests", () => {
 
   it("updates fontSize & fontFamily appState", () => {
     UI.clickTool("text");
-    expect(h.state.currentItemFontFamily).toEqual(1); // Virgil
+    expect(h.state.currentItemFontFamily).toEqual(FONT_FAMILY.Virgil);
     fireEvent.click(screen.getByTitle(/code/i));
-    expect(h.state.currentItemFontFamily).toEqual(3); // Cascadia
+    expect(h.state.currentItemFontFamily).toEqual(FONT_FAMILY.Cascadia);
   });
 
   it("deselects selected element, on pointer up, when click hits element bounding box but doesn't hit the element", () => {
