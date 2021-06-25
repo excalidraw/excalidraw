@@ -178,6 +178,9 @@ export {
   exportToCanvas,
   exportToBlob,
   exportToSvg,
+  serializeAsJSON,
+  loadLibraryFromBlob,
+  loadFromBlob,
 } from "../../packages/utils";
-export { serializeAsJSON } from "../../data/json";
 export { FONT_FAMILY } from "../../constants";
+export { getFreeDrawSvgPath } from "../../renderer/renderElement";
