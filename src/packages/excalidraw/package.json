@@ -65,7 +65,7 @@
     "mini-css-extract-plugin": "1.6.0",
     "postcss-loader": "6.1.0",
     "sass-loader": "12.1.0",
-    "terser-webpack-plugin": "5.1.3",
+    "terser-webpack-plugin": "5.1.4",
     "ts-loader": "9.2.3",
     "typescript": "4.3.4",
     "webpack": "5.40.0",
