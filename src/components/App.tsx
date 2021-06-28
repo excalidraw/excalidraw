@@ -1282,6 +1282,7 @@ class App extends React.Component<AppProps, AppState> {
         this.scene.getElements(),
       ),
     );
+    this.selectShapeTool("selection");
   };
 
   private addTextFromPaste(text: any) {

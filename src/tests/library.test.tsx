@@ -4,6 +4,7 @@ import ExcalidrawApp from "../excalidraw-app";
 import { API } from "./helpers/api";
 import { MIME_TYPES } from "../constants";
 import { LibraryItem } from "../types";
+import { UI } from "./helpers/ui";
 
 const { h } = window;
 
@@ -39,5 +40,22 @@ describe("library", () => {
     await waitFor(() => {
       expect(h.elements).toEqual([expect.objectContaining({ id: "A_copy" })]);
     });
+  });
+
+  it("inserting library item should revert to selection tool", async () => {
+    UI.clickTool("rectangle");
+    expect(h.elements).toEqual([]);
+    const libraryItems: LibraryItem = JSON.parse(
+      await API.readFile("./fixtures/fixture_library.excalidrawlib", "utf8"),
+    ).library[0];
+    await API.drop(
+      new Blob([JSON.stringify(libraryItems)], {
+        type: MIME_TYPES.excalidrawlib,
+      }),
+    );
+    await waitFor(() => {
+      expect(h.elements).toEqual([expect.objectContaining({ id: "A_copy" })]);
+    });
+    expect(h.state.elementType).toBe("selection");
   });
 });
