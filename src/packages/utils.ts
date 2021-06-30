@@ -79,7 +79,7 @@ export const exportToSvg = ({
   elements,
   appState = getDefaultAppState(),
   exportPadding,
-  metadata,
+  metadata = "",
   embedScene,
 }: Omit<ExportOpts, "getDimensions"> & {
   exportPadding?: number;
