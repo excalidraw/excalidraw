@@ -75,7 +75,7 @@ export const exportToBlob = (
   });
 };
 
-export const exportToSvg = ({
+export const exportToSvg = async ({
   elements,
   appState = getDefaultAppState(),
   exportPadding,
@@ -85,31 +85,23 @@ export const exportToSvg = ({
   exportPadding?: number;
   metadata?: string;
   embedScene?: boolean;
-}): SVGSVGElement => {
+}): Promise<SVGSVGElement> => {
   const { elements: restoredElements, appState: restoredAppState } = restore(
     { elements, appState },
     null,
   );
   if (embedScene) {
-    (async () => {
-      try {
-        const sceneMetaData = await (
-          await import(/* webpackChunkName: "image" */ "../../src/data/image")
-        ).encodeSvgMetadata({
-          text: serializeAsJSON(restoredElements, restoredAppState),
-        });
-        metadata += sceneMetaData;
-        return _exportToSvg(getNonDeletedElements(restoredElements), {
-          ...restoredAppState,
-          exportPadding,
-          metadata,
-        });
-      } catch (err) {
-        console.error(err);
-      }
-    })();
+    try {
+      const sceneMetaData = await (
+        await import(/* webpackChunkName: "image" */ "../../src/data/image")
+      ).encodeSvgMetadata({
+        text: serializeAsJSON(restoredElements, restoredAppState),
+      });
+      metadata += sceneMetaData;
+    } catch (err) {
+      console.error(err);
+    }
   }
-
   return _exportToSvg(getNonDeletedElements(restoredElements), {
     ...restoredAppState,
     exportPadding,
