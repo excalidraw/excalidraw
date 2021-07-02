@@ -48,14 +48,16 @@ export const LibraryUnit = ({
         if (child.tagName !== "svg") {
           continue;
         }
-        ref.current!.removeChild(child);
+        current!.removeChild(child);
       }
-      ref.current!.appendChild(svg);
+      current!.appendChild(svg);
     };
 
     getSvg();
     return () => {
-      current.removeChild(svg);
+      if (svg) {
+        current.removeChild(svg);
+      }
     };
   }, [elements, pendingElements]);
 
