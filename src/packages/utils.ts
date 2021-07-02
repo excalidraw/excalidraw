@@ -79,17 +79,15 @@ export const exportToSvg = async ({
   elements,
   appState = getDefaultAppState(),
   exportPadding,
-  embedScene,
 }: Omit<ExportOpts, "getDimensions"> & {
   exportPadding?: number;
-  embedScene?: boolean;
 }): Promise<SVGSVGElement> => {
   const { elements: restoredElements, appState: restoredAppState } = restore(
     { elements, appState },
     null,
   );
   let metadata = "";
-  if (embedScene) {
+  if (appState.exportEmbedScene) {
     try {
       metadata = await (
         await import(/* webpackChunkName: "image" */ "../../src/data/image")
