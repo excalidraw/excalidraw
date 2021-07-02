@@ -831,7 +831,7 @@ exportToSvg({
 | exportPadding | number | 10 | The padding to be added on canvas |
 | embedScene | boolean | false | Indicates whether scene data should be embeded in svg. This will increase the svg size. |
 
-This function returns a svg with the exported elements.
+This function returns a promise which resolves to svg of the exported drawing.
 
 ##### Additional attributes of appState for `export\*` APIs
 
