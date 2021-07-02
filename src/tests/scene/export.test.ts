@@ -15,16 +15,16 @@ describe("exportToSvg", () => {
     viewBackgroundColor: "#ffffff",
   };
 
-  it("with default arguments", () => {
-    const svgElement = exportUtils.exportToSvg(ELEMENTS, DEFAULT_OPTIONS);
+  it("with default arguments", async () => {
+    const svgElement = await exportUtils.exportToSvg(ELEMENTS, DEFAULT_OPTIONS);
 
     expect(svgElement).toMatchSnapshot();
   });
 
-  it("with background color", () => {
+  it("with background color", async () => {
     const BACKGROUND_COLOR = "#abcdef";
 
-    const svgElement = exportUtils.exportToSvg(ELEMENTS, {
+    const svgElement = await exportUtils.exportToSvg(ELEMENTS, {
       ...DEFAULT_OPTIONS,
       exportBackground: true,
       viewBackgroundColor: BACKGROUND_COLOR,
@@ -36,8 +36,8 @@ describe("exportToSvg", () => {
     );
   });
 
-  it("with dark mode", () => {
-    const svgElement = exportUtils.exportToSvg(ELEMENTS, {
+  it("with dark mode", async () => {
+    const svgElement = await exportUtils.exportToSvg(ELEMENTS, {
       ...DEFAULT_OPTIONS,
       exportWithDarkMode: true,
     });
@@ -47,14 +47,12 @@ describe("exportToSvg", () => {
     );
   });
 
-  it("with exportPadding, metadata", () => {
-    const svgElement = exportUtils.exportToSvg(ELEMENTS, {
+  it("with exportPadding", async () => {
+    const svgElement = await exportUtils.exportToSvg(ELEMENTS, {
       ...DEFAULT_OPTIONS,
       exportPadding: 0,
-      metadata: "some metadata",
     });
 
-    expect(svgElement.innerHTML).toMatch(/some metadata/);
     expect(svgElement).toHaveAttribute("height", ELEMENT_HEIGHT.toString());
     expect(svgElement).toHaveAttribute("width", ELEMENT_WIDTH.toString());
     expect(svgElement).toHaveAttribute(
@@ -63,10 +61,10 @@ describe("exportToSvg", () => {
     );
   });
 
-  it("with scale", () => {
+  it("with scale", async () => {
     const SCALE = 2;
 
-    const svgElement = exportUtils.exportToSvg(ELEMENTS, {
+    const svgElement = await exportUtils.exportToSvg(ELEMENTS, {
       ...DEFAULT_OPTIONS,
       exportPadding: 0,
       exportScale: SCALE,
@@ -80,5 +78,13 @@ describe("exportToSvg", () => {
       "width",
       (ELEMENT_WIDTH * SCALE).toString(),
     );
+  });
+
+  it("with exportEmbedScene", async () => {
+    const svgElement = await exportUtils.exportToSvg(ELEMENTS, {
+      ...DEFAULT_OPTIONS,
+      exportEmbedScene: true,
+    });
+    expect(svgElement.innerHTML).toMatchSnapshot();
   });
 });
