@@ -114,7 +114,7 @@ describe("exportToSvg", () => {
     );
   });
 
-  it("with embedScene", async () => {
+  it("with exportEmbedScene", async () => {
     await utils.exportToSvg({
       ...diagramFactory({
         overrides: {
