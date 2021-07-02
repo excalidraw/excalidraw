@@ -35,7 +35,7 @@ export const exportCanvas = async (
     throw new Error(t("alerts.cannotExportEmptyCanvas"));
   }
   if (type === "svg" || type === "clipboard-svg") {
-    const tempSvg = await await exportToSvg(elements, {
+    const tempSvg = await exportToSvg(elements, {
       exportBackground,
       exportWithDarkMode: appState.exportWithDarkMode,
       viewBackgroundColor,
