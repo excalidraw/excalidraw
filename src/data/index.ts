@@ -35,20 +35,13 @@ export const exportCanvas = async (
     throw new Error(t("alerts.cannotExportEmptyCanvas"));
   }
   if (type === "svg" || type === "clipboard-svg") {
-    const tempSvg = exportToSvg(elements, {
+    const tempSvg = await exportToSvg(elements, {
       exportBackground,
       exportWithDarkMode: appState.exportWithDarkMode,
       viewBackgroundColor,
       exportPadding,
       exportScale: appState.exportScale,
-      metadata:
-        appState.exportEmbedScene && type === "svg"
-          ? await (
-              await import(/* webpackChunkName: "image" */ "./image")
-            ).encodeSvgMetadata({
-              text: serializeAsJSON(elements, appState),
-            })
-          : undefined,
+      exportEmbedScene: appState.exportEmbedScene && type === "svg",
     });
     if (type === "svg") {
       await fileSave(new Blob([tempSvg.outerHTML], { type: "image/svg+xml" }), {
@@ -57,7 +50,7 @@ export const exportCanvas = async (
       });
       return;
     } else if (type === "clipboard-svg") {
-      copyTextToSystemClipboard(tempSvg.outerHTML);
+      await copyTextToSystemClipboard(tempSvg.outerHTML);
       return;
     }
   }

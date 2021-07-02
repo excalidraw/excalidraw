@@ -15,7 +15,7 @@ import Library from "./library";
 
 export const serializeAsJSON = (
   elements: readonly ExcalidrawElement[],
-  appState: AppState,
+  appState: Partial<AppState>,
 ): string => {
   const data: ExportedDataState = {
     type: EXPORT_DATA_TYPES.excalidraw,

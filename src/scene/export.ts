@@ -6,6 +6,7 @@ import { distance, SVG_NS } from "../utils";
 import { AppState } from "../types";
 import { DEFAULT_EXPORT_PADDING, THEME_FILTER } from "../constants";
 import { getDefaultAppState } from "../appState";
+import { serializeAsJSON } from "../data/json";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -65,24 +66,35 @@ export const exportToCanvas = (
   return canvas;
 };
 
-export const exportToSvg = (
+export const exportToSvg = async (
   elements: readonly NonDeletedExcalidrawElement[],
-  {
-    exportBackground,
-    exportPadding = DEFAULT_EXPORT_PADDING,
-    viewBackgroundColor,
-    exportWithDarkMode,
-    exportScale = 1,
-    metadata = "",
-  }: {
+  appState: {
     exportBackground: boolean;
     exportPadding?: number;
     exportScale?: number;
     viewBackgroundColor: string;
     exportWithDarkMode?: boolean;
-    metadata?: string;
+    exportEmbedScene?: boolean;
   },
-): SVGSVGElement => {
+): Promise<SVGSVGElement> => {
+  const {
+    exportPadding = DEFAULT_EXPORT_PADDING,
+    viewBackgroundColor,
+    exportScale = 1,
+    exportEmbedScene,
+  } = appState;
+  let metadata = "";
+  if (exportEmbedScene) {
+    try {
+      metadata = await (
+        await import(/* webpackChunkName: "image" */ "../../src/data/image")
+      ).encodeSvgMetadata({
+        text: serializeAsJSON(elements, appState),
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  }
   const [minX, minY, width, height] = getCanvasSize(elements, exportPadding);
 
   // initialze SVG root
@@ -92,7 +104,7 @@ export const exportToSvg = (
   svgRoot.setAttribute("viewBox", `0 0 ${width} ${height}`);
   svgRoot.setAttribute("width", `${width * exportScale}`);
   svgRoot.setAttribute("height", `${height * exportScale}`);
-  if (exportWithDarkMode) {
+  if (appState.exportWithDarkMode) {
     svgRoot.setAttribute("filter", THEME_FILTER);
   }
 
@@ -114,7 +126,7 @@ export const exportToSvg = (
   `;
 
   // render background rect
-  if (exportBackground && viewBackgroundColor) {
+  if (appState.exportBackground && viewBackgroundColor) {
     const rect = svgRoot.ownerDocument!.createElementNS(SVG_NS, "rect");
     rect.setAttribute("x", "0");
     rect.setAttribute("y", "0");

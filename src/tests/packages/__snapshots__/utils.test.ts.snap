@@ -39,7 +39,6 @@ Object {
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
-  "metadata": undefined,
   "multiElement": null,
   "name": "name",
   "openMenu": null,

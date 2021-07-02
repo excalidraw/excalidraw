@@ -73,11 +73,10 @@ describe("exportToSvg", () => {
   const mockedExportUtil = mockedSceneExportUtils.exportToSvg as jest.Mock;
   const passedElements = () => mockedExportUtil.mock.calls[0][0];
   const passedOptions = () => mockedExportUtil.mock.calls[0][1];
-
   afterEach(jest.resetAllMocks);
 
-  it("with default arguments", () => {
-    utils.exportToSvg({
+  it("with default arguments", async () => {
+    await utils.exportToSvg({
       ...diagramFactory({
         overrides: { appState: void 0 },
       }),
@@ -88,13 +87,12 @@ describe("exportToSvg", () => {
       // To avoid varying snapshots
       name: "name",
     };
-
     expect(passedElements().length).toBe(3);
     expect(passedOptionsWhenDefault).toMatchSnapshot();
   });
 
-  it("with deleted elements", () => {
-    utils.exportToSvg({
+  it("with deleted elements", async () => {
+    await utils.exportToSvg({
       ...diagramFactory({
         overrides: { appState: void 0 },
         elementOverrides: { isDeleted: true },
@@ -104,18 +102,28 @@ describe("exportToSvg", () => {
     expect(passedElements().length).toBe(0);
   });
 
-  it("with exportPadding and metadata", () => {
-    const METADATA = "some metada";
-
-    utils.exportToSvg({
+  it("with exportPadding", async () => {
+    await utils.exportToSvg({
       ...diagramFactory({ overrides: { appState: { name: "diagram name" } } }),
       exportPadding: 0,
-      metadata: METADATA,
     });
 
     expect(passedElements().length).toBe(3);
     expect(passedOptions()).toEqual(
-      expect.objectContaining({ exportPadding: 0, metadata: METADATA }),
+      expect.objectContaining({ exportPadding: 0 }),
     );
+  });
+
+  it("with exportEmbedScene", async () => {
+    await utils.exportToSvg({
+      ...diagramFactory({
+        overrides: {
+          appState: { name: "diagram name", exportEmbedScene: true },
+        },
+      }),
+    });
+
+    expect(passedElements().length).toBe(3);
+    expect(passedOptions().exportEmbedScene).toBe(true);
   });
 });

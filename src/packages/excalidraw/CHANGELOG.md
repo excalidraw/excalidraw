@@ -19,6 +19,13 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
+- Support `appState.exportEmbedScene` attribute in [`exportToSvg`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#exportToSvg) which allows to embed the scene data.
+
+  #### BREAKING CHANGE
+
+  - The attribute `metadata` is now removed as `metadata` was only used to embed scene data which is now supported with the `appState.exportEmbedScene` attribute.
+  - [`exportToSvg`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#exportToSvg) now resolves to a promise which resolves to `svg` of the exported drawing.
+
 - Expose [`loadLibraryFromBlob`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#loadLibraryFromBlobY), [`loadFromBlob`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#loadFromBlob), and [`getFreeDrawSvgPath`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#getFreeDrawSvgPath).
 
 - Expose [`FONT_FAMILY`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#FONT_FAMILY) so that consumer can use when passing `initialData.appState.currentItemFontFamily`.
