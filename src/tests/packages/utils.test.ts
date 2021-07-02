@@ -124,6 +124,6 @@ describe("exportToSvg", () => {
     });
 
     expect(passedElements().length).toBe(3);
-    expect(passedOptions().metadata).toMatchSnapshot();
+    expect(passedOptions().exportEmbedScene).toBe(true);
   });
 });

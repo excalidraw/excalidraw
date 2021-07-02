@@ -34,20 +34,23 @@ const ChartPreviewBtn = (props: {
       0,
     );
     setChartElements(elements);
-
-    const svg = exportToSvg(elements, {
-      exportBackground: false,
-      viewBackgroundColor: oc.white,
-    });
-
+    let svg: SVGSVGElement;
     const previewNode = previewRef.current!;
 
-    previewNode.appendChild(svg);
+    const getSvg = async () => {
+      svg = await exportToSvg(elements, {
+        exportBackground: false,
+        viewBackgroundColor: oc.white,
+      });
 
-    if (props.selected) {
-      (previewNode.parentNode as HTMLDivElement).focus();
-    }
+      previewNode.appendChild(svg);
 
+      if (props.selected) {
+        (previewNode.parentNode as HTMLDivElement).focus();
+      }
+    };
+
+    getSvg();
     return () => {
       previewNode.removeChild(svg);
     };

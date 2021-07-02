@@ -36,19 +36,24 @@ export const LibraryUnit = ({
     if (!elementsToRender) {
       return;
     }
-    const svg = exportToSvg(elementsToRender, {
-      exportBackground: false,
-      viewBackgroundColor: oc.white,
-    });
-    for (const child of ref.current!.children) {
-      if (child.tagName !== "svg") {
-        continue;
-      }
-      ref.current!.removeChild(child);
-    }
-    ref.current!.appendChild(svg);
-
+    let svg: Node;
     const current = ref.current!;
+
+    const getSvg = async () => {
+      svg = await exportToSvg(elementsToRender, {
+        exportBackground: false,
+        viewBackgroundColor: oc.white,
+      });
+      for (const child of ref.current!.children) {
+        if (child.tagName !== "svg") {
+          continue;
+        }
+        ref.current!.removeChild(child);
+      }
+      ref.current!.appendChild(svg);
+    };
+
+    getSvg();
     return () => {
       current.removeChild(svg);
     };

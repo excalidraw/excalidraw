@@ -7,7 +7,6 @@ import { AppState } from "../types";
 import { ExcalidrawElement } from "../element/types";
 import { getNonDeletedElements } from "../element";
 import { restore } from "../data/restore";
-import { serializeAsJSON } from "../data/json";
 
 type ExportOpts = {
   elements: readonly ExcalidrawElement[];
@@ -86,22 +85,9 @@ export const exportToSvg = async ({
     { elements, appState },
     null,
   );
-  let metadata = "";
-  if (appState.exportEmbedScene) {
-    try {
-      metadata = await (
-        await import(/* webpackChunkName: "image" */ "../../src/data/image")
-      ).encodeSvgMetadata({
-        text: serializeAsJSON(restoredElements, restoredAppState),
-      });
-    } catch (err) {
-      console.error(err);
-    }
-  }
   return _exportToSvg(getNonDeletedElements(restoredElements), {
     ...restoredAppState,
     exportPadding,
-    metadata,
   });
 };
 
