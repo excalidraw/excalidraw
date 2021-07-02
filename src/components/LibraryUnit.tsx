@@ -36,7 +36,7 @@ export const LibraryUnit = ({
     if (!elementsToRender) {
       return;
     }
-    let svg: Node;
+    let svg: SVGSVGElement;
     const current = ref.current!;
 
     const getSvg = async () => {
