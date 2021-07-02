@@ -208,7 +208,6 @@ export const actionLoadScene = register({
         commitToHistory: true,
       };
     } catch (error) {
-      console.warn(error);
       if (error?.name === "AbortError") {
         return false;
       }
