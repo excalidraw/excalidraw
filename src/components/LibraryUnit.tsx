@@ -39,7 +39,7 @@ export const LibraryUnit = ({
     let svg: SVGSVGElement;
     const current = ref.current!;
 
-    const getSvg = async () => {
+    (async () => {
       svg = await exportToSvg(elementsToRender, {
         exportBackground: false,
         viewBackgroundColor: oc.white,
@@ -51,9 +51,8 @@ export const LibraryUnit = ({
         current!.removeChild(child);
       }
       current!.appendChild(svg);
-    };
+    })();
 
-    getSvg();
     return () => {
       if (svg) {
         current.removeChild(svg);

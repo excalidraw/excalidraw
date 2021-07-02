@@ -37,7 +37,7 @@ const ChartPreviewBtn = (props: {
     let svg: SVGSVGElement;
     const previewNode = previewRef.current!;
 
-    const getSvg = async () => {
+    (async () => {
       svg = await exportToSvg(elements, {
         exportBackground: false,
         viewBackgroundColor: oc.white,
@@ -48,9 +48,8 @@ const ChartPreviewBtn = (props: {
       if (props.selected) {
         (previewNode.parentNode as HTMLDivElement).focus();
       }
-    };
+    })();
 
-    getSvg();
     return () => {
       previewNode.removeChild(svg);
     };
