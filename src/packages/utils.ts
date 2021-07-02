@@ -79,25 +79,23 @@ export const exportToSvg = async ({
   elements,
   appState = getDefaultAppState(),
   exportPadding,
-  metadata = "",
   embedScene,
 }: Omit<ExportOpts, "getDimensions"> & {
   exportPadding?: number;
-  metadata?: string;
   embedScene?: boolean;
 }): Promise<SVGSVGElement> => {
   const { elements: restoredElements, appState: restoredAppState } = restore(
     { elements, appState },
     null,
   );
+  let metadata = "";
   if (embedScene) {
     try {
-      const sceneMetaData = await (
+      metadata = await (
         await import(/* webpackChunkName: "image" */ "../../src/data/image")
       ).encodeSvgMetadata({
         text: serializeAsJSON(restoredElements, restoredAppState),
       });
-      metadata += sceneMetaData;
     } catch (err) {
       console.error(err);
     }

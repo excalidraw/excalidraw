@@ -829,7 +829,7 @@ exportToSvg({
 | elements | [Excalidraw Element []](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78) |  | The elements to exported as svg |
 | appState | [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L42) | [defaultAppState](https://github.com/excalidraw/excalidraw/blob/master/src/appState.ts#L11) | The app state of the scene |
 | exportPadding | number | 10 | The padding to be added on canvas |
-| metadata | string | '' | The metadata to be embedded in svg |
+| embedScene | boolean | false | Indicates whether scene data should be embeded in svg. This will increase the svg size. |
 
 This function returns a svg with the exported elements.
 
