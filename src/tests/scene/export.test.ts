@@ -15,8 +15,8 @@ describe("exportToSvg", () => {
     viewBackgroundColor: "#ffffff",
   };
 
-  it("with default arguments", () => {
-    const svgElement = exportUtils.exportToSvg(ELEMENTS, DEFAULT_OPTIONS);
+  it("with default arguments", async () => {
+    const svgElement = await exportUtils.exportToSvg(ELEMENTS, DEFAULT_OPTIONS);
 
     expect(svgElement).toMatchSnapshot();
   });
