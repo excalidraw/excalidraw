@@ -39,7 +39,7 @@ const getLibraryCommitsSinceLastRelease = async () => {
     `git log --pretty=format:%s ${commitHash}...master`,
   );
   // reversing so we traverse from oldest to newest commit
-  const commitsSinceLastRelease = stdout.split("\n").reverse();
+  const commitsSinceLastRelease = stdout.split("\n");
   const commitList = {};
   supportedTypes.forEach((type) => {
     commitList[type] = [];
