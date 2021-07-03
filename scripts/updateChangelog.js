@@ -38,7 +38,7 @@ const getLibraryCommitsSinceLastRelease = async () => {
   const { stdout } = await exec(
     `git log --pretty=format:%s ${commitHash}...master`,
   );
-  //reversing so we traverse from oldest to newest commit
+  // reversing so we traverse from oldest to newest commit
   const commitsSinceLastRelease = stdout.split("\n").reverse();
   const commitList = {};
   supportedTypes.forEach((type) => {
@@ -55,6 +55,8 @@ const getLibraryCommitsSinceLastRelease = async () => {
     const messageWithCapitalizeFirst =
       messageWithoutType.charAt(0).toUpperCase() + messageWithoutType.slice(1);
     const prNumber = commit.match(/\(#([0-9]*)\)/)[1];
+
+    // return if the changelog already contains the pr number which would happen for package updates
     if (existingChangeLog.includes(prNumber)) {
       return;
     }
