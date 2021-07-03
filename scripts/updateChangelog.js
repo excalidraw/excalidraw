@@ -60,7 +60,7 @@ const getLibraryCommitsSinceLastRelease = async () => {
     if (existingChangeLog.includes(prNumber)) {
       return;
     }
-    const prMarkdown = `[${prNumber}](https://github.com/excalidraw/excalidraw/pull/${prNumber})`;
+    const prMarkdown = `[#${prNumber}](https://github.com/excalidraw/excalidraw/pull/${prNumber})`;
     const messageWithPRLink = messageWithCapitalizeFirst.replace(
       /\(#[0-9]*\)/,
       prMarkdown,
