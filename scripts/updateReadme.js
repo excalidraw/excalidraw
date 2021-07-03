@@ -5,7 +5,7 @@ let data = fs.readFileSync(`${excalidrawDir}/README_NEXT.md`, "utf8");
 
 // remove note for unstable release
 data = data.replace(
-  /<!-- stable-readme-start-->[\s\S]*?<!-- stable-readme-end-->/,
+  /<!-- unstable-readme-start-->[\s\S]*?<!-- unstable-readme-end-->/,
   "",
 );
 
@@ -17,7 +17,7 @@ const demoIndex = data.indexOf("### Demo");
 const excalidrawNextNote =
   "#### Note\n\n**If you don't want to wait for the next stable release and try out the unreleased changes you can use [@excalidraw/excalidraw-next](https://www.npmjs.com/package/@excalidraw/excalidraw-next).**\n\n";
 // Add excalidraw next note to try out for unreleased changes
-data = data.substr(0, demoIndex) + excalidrawNextNote + data.substr(demoIndex);
+data = data.slice(0, demoIndex) + excalidrawNextNote + data.slice(demoIndex);
 
 // update readme
 fs.writeFileSync(`${excalidrawDir}/README.md`, data, "utf8");
