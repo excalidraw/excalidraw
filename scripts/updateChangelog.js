@@ -1,0 +1,92 @@
+const fs = require("fs");
+const util = require("util");
+const exec = util.promisify(require("child_process").exec);
+
+const excalidrawDir = `${__dirname}/../src/packages/excalidraw`;
+const excalidrawPackage = `${excalidrawDir}/package.json`;
+const pkg = require(excalidrawPackage);
+const lastVersion = pkg.version;
+const existingChangeLog = fs.readFileSync(
+  `${excalidrawDir}/CHANGELOG.md`,
+  "utf8",
+);
+
+const supportedTypes = ["feat", "fix", "style", "refactor", "perf", "build"];
+const headerForType = {
+  feat: "Features",
+  fix: "Fixes",
+  style: "Styles",
+  refactor: " Refactor",
+  perf: "Performance",
+  build: "Build",
+};
+
+const getCommitHashForLastVersion = async () => {
+  try {
+    const commitMessage = `"release @excalidraw/excalidraw@${lastVersion}"`;
+    const { stdout } = await exec(
+      `git log --format=format:"%H" --grep=${commitMessage}`,
+    );
+    return stdout;
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+const getLibraryCommitsSinceLastRelease = async () => {
+  const commitHash = await getCommitHashForLastVersion();
+  const { stdout } = await exec(
+    `git log --pretty=format:%s ${commitHash}...master`,
+  );
+  //reversing so we traverse from oldest to newest commit
+  const commitsSinceLastRelease = stdout.split("\n").reverse();
+  const commitList = {};
+  supportedTypes.forEach((type) => {
+    commitList[type] = [];
+  });
+
+  commitsSinceLastRelease.forEach((commit) => {
+    const indexOfColon = commit.indexOf(":");
+    const type = commit.slice(0, indexOfColon);
+    if (!supportedTypes.includes(type)) {
+      return;
+    }
+    const messageWithoutType = commit.slice(indexOfColon + 1).trim();
+    const messageWithCapitalizeFirst =
+      messageWithoutType.charAt(0).toUpperCase() + messageWithoutType.slice(1);
+    const prNumber = commit.match(/\(#([0-9]*)\)/)[1];
+    if (existingChangeLog.includes(prNumber)) {
+      return;
+    }
+    const prMarkdown = `[${prNumber}](https://github.com/excalidraw/excalidraw/pull/${prNumber})`;
+    const messageWithPRLink = messageWithCapitalizeFirst.replace(
+      /\(#[0-9]*\)/,
+      prMarkdown,
+    );
+    commitList[type].push(messageWithPRLink);
+  });
+  return commitList;
+};
+
+const updateChangelog = async () => {
+  const commitList = await getLibraryCommitsSinceLastRelease();
+  let changelogForLibrary = "## Excalidraw Library\n\n";
+  supportedTypes.forEach((type) => {
+    if (commitList[type].length) {
+      changelogForLibrary += `### ${headerForType[type]}\n\n`;
+      const commits = commitList[type];
+      commits.forEach((commit) => {
+        changelogForLibrary += `- ${commit}\n\n`;
+      });
+    }
+  });
+  changelogForLibrary += "---\n";
+  const lastVersionIndex = existingChangeLog.indexOf(`## ${lastVersion}`);
+  const updatedContent =
+    existingChangeLog.slice(0, lastVersionIndex) +
+    changelogForLibrary +
+    existingChangeLog.slice(lastVersionIndex + 1);
+  fs.writeFileSync(`${excalidrawDir}/CHANGELOG.md`, updatedContent, "utf8");
+};
+
+updateChangelog();
