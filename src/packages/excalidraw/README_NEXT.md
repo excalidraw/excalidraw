@@ -1,4 +1,4 @@
-<!-- stable-readme-start-->
+<!-- unstable-readme-start-->
 
 ## Note
 
@@ -6,7 +6,7 @@
 
 For stable release please use [@excalidraw/excalidraw](https://www.npmjs.com/package/@excalidraw/excalidraw).
 
-<!-- stable-readme-end-->
+<!-- unstable-readme-end-->
 
 ### Excalidraw
 
