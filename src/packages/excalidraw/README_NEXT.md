@@ -912,3 +912,7 @@ getFreeDrawSvgPath(element: <a href="https://github.com/excalidraw/excalidraw/bl
 </pre>
 
 This function returns the free draw svg path for the element.
+
+## Need help?
+
+Check out the existing [QnA's](https://github.com/excalidraw/excalidraw/discussions?discussions_q=label%3Apackage%3Aexcalidraw). If you have any queries or need any help, ask us [here](https://github.com/excalidraw/excalidraw/discussions?discussions_q=label%3Apackage%3Aexcalidraw).
