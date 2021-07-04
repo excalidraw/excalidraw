@@ -730,7 +730,7 @@ import { restoreElements } from "@excalidraw/excalidraw-next";
 
 This function will make sure all properties of element is correctly set and if any attribute is missing, it will be set to default value.
 
-When `localElements` are supplied, they are used to ensure that existing restored elements reuse `version` (and increment it), and regenerate `versionNonce`. Use this when you import the scene with elements which may include the ones already on the scene, to ensure that your reconciliation algorithm can detect them as newer. Required: supply `null`/`undefined` if not applicable.
+When `localElements` are supplied, they are used to ensure that existing restored elements reuse `version` (and increment it), and regenerate `versionNonce`. Use this when you import elements which may already be present in the scene to ensure that you do not disregard the newly imported elements if you're using element version to detect the updates.
 
 #### `restore`
 
