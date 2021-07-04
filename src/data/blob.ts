@@ -1,6 +1,7 @@
 import { cleanAppStateForExport } from "../appState";
 import { EXPORT_DATA_TYPES } from "../constants";
 import { clearElementsForExport } from "../element";
+import { ExcalidrawElement } from "../element/types";
 import { CanvasError } from "../errors";
 import { t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
@@ -83,6 +84,7 @@ export const loadFromBlob = async (
   blob: Blob,
   /** @see restore.localAppState */
   localAppState: AppState | null,
+  localElements: readonly ExcalidrawElement[] | null,
 ) => {
   const contents = await parseFileContents(blob);
   try {
@@ -103,6 +105,7 @@ export const loadFromBlob = async (
         },
       },
       localAppState,
+      localElements,
     );
 
     return result;

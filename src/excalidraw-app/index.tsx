@@ -141,7 +141,7 @@ const initializeScene = async (opts: {
     const url = externalUrlMatch[1];
     try {
       const request = await fetch(window.decodeURIComponent(url));
-      const data = await loadFromBlob(await request.blob(), null);
+      const data = await loadFromBlob(await request.blob(), null, null);
       if (
         !scene.elements.length ||
         window.confirm(t("alerts.loadSceneOverridePrompt"))
