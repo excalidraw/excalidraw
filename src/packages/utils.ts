@@ -75,15 +75,13 @@ export const exportToBlob = (
   });
 };
 
-export const exportToSvg = ({
+export const exportToSvg = async ({
   elements,
   appState = getDefaultAppState(),
   exportPadding,
-  metadata,
 }: Omit<ExportOpts, "getDimensions"> & {
   exportPadding?: number;
-  metadata?: string;
-}): SVGSVGElement => {
+}): Promise<SVGSVGElement> => {
   const { elements: restoredElements, appState: restoredAppState } = restore(
     { elements, appState },
     null,
@@ -92,7 +90,6 @@ export const exportToSvg = ({
   return _exportToSvg(getNonDeletedElements(restoredElements), {
     ...restoredAppState,
     exportPadding,
-    metadata,
   });
 };
 
