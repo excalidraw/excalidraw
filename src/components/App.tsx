@@ -156,6 +156,7 @@ import {
   getElementsWithinSelection,
   getNormalizedZoom,
   getSelectedElements,
+  hasBackground,
   isOverScrollBars,
   isSomeElementSelected,
 } from "../scene";
@@ -1585,7 +1586,15 @@ class App extends React.Component<AppProps, AppState> {
         if (this.state.elementType === "selection") {
           return;
         }
-        if (event.key === KEYS.G) {
+
+        if (
+          event.key === KEYS.G &&
+          (hasBackground(this.state.elementType) ||
+            getSelectedElements(
+              this.scene.getElements(),
+              this.state,
+            ).some((element) => hasBackground(element.type)))
+        ) {
           this.setState({ openPopup: "backgroundColorPicker" });
         }
         if (event.key === KEYS.S) {
