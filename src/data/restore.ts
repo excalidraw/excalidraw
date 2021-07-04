@@ -216,18 +216,18 @@ export const restoreAppState = (
   const defaultAppState = getDefaultAppState();
   const nextAppState = {} as typeof defaultAppState;
 
-  for (const [key, val] of Object.entries(defaultAppState) as [
+  for (const [key, defaultValue] of Object.entries(defaultAppState) as [
     keyof typeof defaultAppState,
     any,
   ][]) {
-    const restoredValue = appState[key];
+    const suppliedValue = appState[key];
     const localValue = localAppState ? localAppState[key] : undefined;
     (nextAppState as any)[key] =
-      restoredValue !== undefined
-        ? restoredValue
+      suppliedValue !== undefined
+        ? suppliedValue
         : localValue !== undefined
         ? localValue
-        : val;
+        : defaultValue;
   }
 
   return {
