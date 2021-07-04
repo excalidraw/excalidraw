@@ -267,6 +267,31 @@ describe("restoreElements", () => {
     expect(restoredElements[1]).toMatchSnapshot({ seed: expect.any(Number) });
     expect(restoredElements[2]).toMatchSnapshot({ seed: expect.any(Number) });
   });
+
+  it("bump versions of local duplicate elements when supplied", () => {
+    const rectangle = API.createElement({ type: "rectangle" });
+    const ellipse = API.createElement({ type: "ellipse" });
+    const rectangle_modified = newElementWith(rectangle, { isDeleted: true });
+
+    const restoredElements = restore.restoreElements(
+      [rectangle, ellipse],
+      [rectangle_modified],
+    );
+
+    expect(restoredElements[0].id).toBe(rectangle.id);
+    expect(restoredElements[0].versionNonce).not.toBe(rectangle.versionNonce);
+    expect(restoredElements).toEqual([
+      expect.objectContaining({
+        id: rectangle.id,
+        version: rectangle_modified.version + 1,
+      }),
+      expect.objectContaining({
+        id: ellipse.id,
+        version: ellipse.version,
+        versionNonce: ellipse.versionNonce,
+      }),
+    ]);
+  });
 });
 
 describe("restoreAppState", () => {
@@ -485,7 +510,7 @@ describe("restore", () => {
     expect(restoredData.appState.name).toBe(stubImportedAppState.name);
   });
 
-  it("bump versions of local duplicate elements when supplied (restore)", () => {
+  it("bump versions of local duplicate elements when supplied", () => {
     const rectangle = API.createElement({ type: "rectangle" });
     const ellipse = API.createElement({ type: "ellipse" });
 
@@ -503,31 +528,6 @@ describe("restore", () => {
     );
     expect(restoredData.elements).toEqual([
       expect.objectContaining({ version: rectangle_modified.version + 1 }),
-      expect.objectContaining({
-        id: ellipse.id,
-        version: ellipse.version,
-        versionNonce: ellipse.versionNonce,
-      }),
-    ]);
-  });
-
-  it("bump versions of local duplicate elements when supplied (restoreElements)", () => {
-    const rectangle = API.createElement({ type: "rectangle" });
-    const ellipse = API.createElement({ type: "ellipse" });
-    const rectangle_modified = newElementWith(rectangle, { isDeleted: true });
-
-    const restoredElements = restore.restoreElements(
-      [rectangle, ellipse],
-      [rectangle_modified],
-    );
-
-    expect(restoredElements[0].id).toBe(rectangle.id);
-    expect(restoredElements[0].versionNonce).not.toBe(rectangle.versionNonce);
-    expect(restoredElements).toEqual([
-      expect.objectContaining({
-        id: rectangle.id,
-        version: rectangle_modified.version + 1,
-      }),
       expect.objectContaining({
         id: ellipse.id,
         version: ellipse.version,
