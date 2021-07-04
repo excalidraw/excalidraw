@@ -359,7 +359,7 @@ To view the full example visit :point_down:
 | --- | --- | --- | --- |
 | [`onChange`](#onChange) | Function |  | This callback is triggered whenever the component updates due to any change. This callback will receive the excalidraw elements and the current app state. |
 | [`initialData`](#initialData) | <pre>{elements?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>, appState?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L42">AppState<a> } </pre> | null | The initial data with which app loads. |
-| [`ref`](#ref) | [`createRef`](https://reactjs.org/docs/refs-and-the-dom.html#creating-refs) or [`callbackRef`](https://reactjs.org/docs/refs-and-the-dom.html#callback-refs) or <pre>{ current: { readyPromise: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317">resolvablePromise</a> } }</pre> |  | Ref to be passed to Excalidraw |
+| [`ref`](#ref) | [`createRef`](https://reactjs.org/docs/refs-and-the-dom.html#creating-refs) &#124; [`useRef`](https://reactjs.org/docs/hooks-reference.html#useref) &#124; [`callbackRef`](https://reactjs.org/docs/refs-and-the-dom.html#callback-refs) &#124; <pre>{ current: { readyPromise: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317">resolvablePromise</a> } }</pre> |  | Ref to be passed to Excalidraw |
 | [`onCollabButtonClick`](#onCollabButtonClick) | Function |  | Callback to be triggered when the collab button is clicked |
 | [`isCollaborating`](#isCollaborating) | `boolean` |  | This implies if the app is in collaboration mode |
 | [`onPointerUpdate`](#onPointerUpdate) | Function |  | Callback triggered when mouse pointer is updated. |
@@ -465,6 +465,8 @@ You can pass a `ref` when you want to access some excalidraw APIs. We expose the
 <pre>
 const excalidrawRef = { current: { readyPromise: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317">resolvablePromise</a>}}
 </pre>
+
+Since plain javascript object is passed as a `ref` here so the `readyPromise` is resolved as soon as the component is mounted. Most of the time you will not need this unless you have a specific use case where you can't pass the `ref` in the react way and want to do some action on the host when this promise resolves. You can check the [example](https://codesandbox.io/s/eexcalidraw-resolvable-promise-d0qg3?file=/src/App.js) for the usage.
 
 #### `onCollabButtonClick`
 
@@ -597,7 +599,7 @@ In case you want to prevent the excalidraw paste action you must return `true`, 
 
 ### Does it support collaboration ?
 
-No Excalidraw package doesn't come with collaboration, since this would have different implementations on the consumer so we expose the API's which you can use to communicate with Excalidraw as mentioned above. If you are interested in understanding how Excalidraw does it you can check it [here](https://github.com/excalidraw/excalidraw/blob/master/src/excalidraw-app/index.tsx).
+No, Excalidraw package doesn't come with collaboration, since this would have different implementations on the consumer so we expose the API's which you can use to communicate with Excalidraw as mentioned above. If you are interested in understanding how Excalidraw does it you can check it [here](https://github.com/excalidraw/excalidraw/blob/master/src/excalidraw-app/index.tsx).
 
 ### importLibrary
 
