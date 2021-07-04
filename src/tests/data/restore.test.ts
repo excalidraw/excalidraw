@@ -11,6 +11,7 @@ import { getDefaultAppState } from "../../appState";
 import { ImportedDataState } from "../../data/types";
 import { NormalizedZoomValue } from "../../types";
 import { FONT_FAMILY } from "../../constants";
+import { mutateElement, newElementWith } from "../../element/mutateElement";
 
 const mockSizeHelper = jest.spyOn(sizeHelpers, "isInvisiblySmallElement");
 
@@ -482,5 +483,56 @@ describe("restore", () => {
       stubImportedAppState.cursorButton,
     );
     expect(restoredData.appState.name).toBe(stubImportedAppState.name);
+  });
+
+  it("bump versions of local duplicate elements when supplied (restore)", () => {
+    const rectangle = API.createElement({ type: "rectangle" });
+    const ellipse = API.createElement({ type: "ellipse" });
+
+    const rectangle_modified = newElementWith(rectangle, { isDeleted: true });
+
+    const restoredData = restore.restore(
+      { elements: [rectangle, ellipse] },
+      null,
+      [rectangle_modified],
+    );
+
+    expect(restoredData.elements[0].id).toBe(rectangle.id);
+    expect(restoredData.elements[0].versionNonce).not.toBe(
+      rectangle.versionNonce,
+    );
+    expect(restoredData.elements).toEqual([
+      expect.objectContaining({ version: rectangle_modified.version + 1 }),
+      expect.objectContaining({
+        id: ellipse.id,
+        version: ellipse.version,
+        versionNonce: ellipse.versionNonce,
+      }),
+    ]);
+  });
+
+  it("bump versions of local duplicate elements when supplied (restoreElements)", () => {
+    const rectangle = API.createElement({ type: "rectangle" });
+    const ellipse = API.createElement({ type: "ellipse" });
+    const rectangle_modified = newElementWith(rectangle, { isDeleted: true });
+
+    const restoredElements = restore.restoreElements(
+      [rectangle, ellipse],
+      [rectangle_modified],
+    );
+
+    expect(restoredElements[0].id).toBe(rectangle.id);
+    expect(restoredElements[0].versionNonce).not.toBe(rectangle.versionNonce);
+    expect(restoredElements).toEqual([
+      expect.objectContaining({
+        id: rectangle.id,
+        version: rectangle_modified.version + 1,
+      }),
+      expect.objectContaining({
+        id: ellipse.id,
+        version: ellipse.version,
+        versionNonce: ellipse.versionNonce,
+      }),
+    ]);
   });
 });
