@@ -25,6 +25,7 @@ export const exportToCanvas = ({
   const { elements: restoredElements, appState: restoredAppState } = restore(
     { elements, appState },
     null,
+    null,
   );
   const { exportBackground, viewBackgroundColor } = restoredAppState;
   return _exportToCanvas(
@@ -83,6 +84,7 @@ export const exportToSvg = async ({
 }): Promise<SVGSVGElement> => {
   const { elements: restoredElements, appState: restoredAppState } = restore(
     { elements, appState },
+    null,
     null,
   );
   return _exportToSvg(getNonDeletedElements(restoredElements), {

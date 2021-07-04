@@ -201,7 +201,7 @@ export const actionLoadScene = register({
       const {
         elements: loadedElements,
         appState: loadedAppState,
-      } = await loadFromJSON(appState);
+      } = await loadFromJSON(appState, elements);
       return {
         elements: loadedElements,
         appState: loadedAppState,

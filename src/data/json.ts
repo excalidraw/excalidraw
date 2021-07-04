@@ -49,7 +49,10 @@ export const saveAsJSON = async (
   return { fileHandle };
 };
 
-export const loadFromJSON = async (localAppState: AppState) => {
+export const loadFromJSON = async (
+  localAppState: AppState,
+  localElements: readonly ExcalidrawElement[] | null,
+) => {
   const blob = await fileOpen({
     description: "Excalidraw files",
     // ToDo: Be over-permissive until https://bugs.webkit.org/show_bug.cgi?id=34442
@@ -64,7 +67,7 @@ export const loadFromJSON = async (localAppState: AppState) => {
     ],
     */
   });
-  return loadFromBlob(blob, localAppState);
+  return loadFromBlob(blob, localAppState, localElements);
 };
 
 export const isValidExcalidrawData = (data?: {
