@@ -1582,6 +1582,9 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (event.key === KEYS.G || event.key === KEYS.S) {
+        if (this.state.elementType === "selection") {
+          return;
+        }
         if (event.key === KEYS.G) {
           this.setState({ openPopup: "backgroundColorPicker" });
         }
