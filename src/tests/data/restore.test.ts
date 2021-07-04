@@ -11,7 +11,7 @@ import { getDefaultAppState } from "../../appState";
 import { ImportedDataState } from "../../data/types";
 import { NormalizedZoomValue } from "../../types";
 import { FONT_FAMILY } from "../../constants";
-import { mutateElement, newElementWith } from "../../element/mutateElement";
+import { newElementWith } from "../../element/mutateElement";
 
 const mockSizeHelper = jest.spyOn(sizeHelpers, "isInvisiblySmallElement");
 
