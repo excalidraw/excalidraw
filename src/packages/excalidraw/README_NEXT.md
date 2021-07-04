@@ -746,11 +746,11 @@ restoreElements(data: <a href="https://github.com/excalidraw/excalidraw/blob/mas
 import { restore } from "@excalidraw/excalidraw-next";
 ```
 
-This function makes sure elements and state is set to appropriate values and set to default value if not present. It is combination of [restoreElements](#restoreElements) and [restoreAppState](#restoreAppState).
+This function makes sure elements and state is set to appropriate values and set to default value if not present. It is a combination of [restoreElements](#restoreElements) and [restoreAppState](#restoreAppState).
 
 When `localAppState` is supplied, it's used in place of values that are missing (`undefined`) in `appState` instead of defaults. Use this as a way to not override user's defaults if you persist them. Required: supply `null`/`undefined` if not applicable.
 
-When `localElements` are supplied, they are used to ensure that existing restored elements reuse `version` (and increment it), and regenerate `versionNonce`. Use this when you import the scene with elements which may include the ones already on the scene, to ensure that your reconciliation algorithm can detect them as newer.
+When `localElements` are supplied, they are used to ensure that existing restored elements reuse `version` (and increment it), and regenerate `versionNonce`. Use this when you import the scene with elements which may include the ones already on the scene, to ensure that your reconciliation algorithm can detect them as newer. Required: supply `null`/`undefined` if not applicable.
 
 #### `serializeAsJSON`
 
