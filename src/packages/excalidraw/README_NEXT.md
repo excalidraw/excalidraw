@@ -704,15 +704,15 @@ This function returns an object where each element is mapped to its id.
 restoreAppState(appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L17">ImportedDataState["appState"]</a>, localAppState: Partial<<a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L42">AppState</a>> | null): <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L42">AppState</a>
 </pre>
 
-See [`restore()`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#restore) about `localAppState`.
-
 **_How to use_**
 
 ```js
 import { restoreAppState } from "@excalidraw/excalidraw-next";
 ```
 
-This function will make sure all the keys have appropriate values in [appState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L42) and if any key is missing, it will be set to default value. If you pass `localAppState`, `localAppState` value will be preferred over the `appState` passed in params.
+This function will make sure all the keys have appropriate values in [appState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L42) and if any key is missing, it will be set to default value.
+
+When `localAppState` is supplied, it's used in place of values that are missing (`undefined`) in `appState` instead of defaults. Use this as a way to not override user's defaults if you persist them. Required: supply `null`/`undefined` if not applicable.
 
 #### `restoreElements`
 
@@ -722,8 +722,6 @@ This function will make sure all the keys have appropriate values in [appState](
 restoreElements(elements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L16">ImportedDataState["elements"]</a>, localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L16">ExcalidrawElement[]</a> | null | undefined): <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>
 </pre>
 
-See [`restore()`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#restore) about `localElements`.
-
 **_How to use_**
 
 ```js
@@ -731,6 +729,8 @@ import { restoreElements } from "@excalidraw/excalidraw-next";
 ```
 
 This function will make sure all properties of element is correctly set and if any attribute is missing, it will be set to default value.
+
+When `localElements` are supplied, they are used to ensure that existing restored elements reuse `version` (and increment it), and regenerate `versionNonce`. Use this when you import the scene with elements which may include the ones already on the scene, to ensure that your reconciliation algorithm can detect them as newer. Required: supply `null`/`undefined` if not applicable.
 
 #### `restore`
 
@@ -740,6 +740,8 @@ This function will make sure all properties of element is correctly set and if a
 restoreElements(data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L12">ImportedDataState</a>, localAppState: Partial<<a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L42">AppState</a>> | null | undefined, localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L16">ExcalidrawElement[]</a> | null | undefined): <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L4">DataState</a>
 </pre>
 
+See [`restoreAppState()`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#restoreAppState) about `localAppState`, and [`restoreElements()`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#restoreElements) about `localElements`.
+
 **_How to use_**
 
 ```js
@@ -747,10 +749,6 @@ import { restore } from "@excalidraw/excalidraw-next";
 ```
 
 This function makes sure elements and state is set to appropriate values and set to default value if not present. It is a combination of [restoreElements](#restoreElements) and [restoreAppState](#restoreAppState).
-
-When `localAppState` is supplied, it's used in place of values that are missing (`undefined`) in `appState` instead of defaults. Use this as a way to not override user's defaults if you persist them. Required: supply `null`/`undefined` if not applicable.
-
-When `localElements` are supplied, they are used to ensure that existing restored elements reuse `version` (and increment it), and regenerate `versionNonce`. Use this when you import the scene with elements which may include the ones already on the scene, to ensure that your reconciliation algorithm can detect them as newer. Required: supply `null`/`undefined` if not applicable.
 
 #### `serializeAsJSON`
 

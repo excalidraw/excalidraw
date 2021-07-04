@@ -209,7 +209,7 @@ export const restoreElements = (
 
 export const restoreAppState = (
   appState: ImportedDataState["appState"],
-  localAppState: Partial<AppState> | null,
+  localAppState: Partial<AppState> | null | undefined,
 ): RestoredAppState => {
   appState = appState || {};
 
