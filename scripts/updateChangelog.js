@@ -38,7 +38,6 @@ const getLibraryCommitsSinceLastRelease = async () => {
   const { stdout } = await exec(
     `git log --pretty=format:%s ${commitHash}...master`,
   );
-  // reversing so we traverse from oldest to newest commit
   const commitsSinceLastRelease = stdout.split("\n");
   const commitList = {};
   supportedTypes.forEach((type) => {
@@ -72,7 +71,8 @@ const getLibraryCommitsSinceLastRelease = async () => {
 
 const updateChangelog = async () => {
   const commitList = await getLibraryCommitsSinceLastRelease();
-  let changelogForLibrary = "## Excalidraw Library\n\n";
+  let changelogForLibrary =
+    "## Excalidraw Library\n\n**_These section lists the updates made to the excalidraw library and will not affect the integration._**\n\n";
   supportedTypes.forEach((type) => {
     if (commitList[type].length) {
       changelogForLibrary += `### ${headerForType[type]}\n\n`;
