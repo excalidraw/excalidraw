@@ -466,7 +466,7 @@ You can pass a `ref` when you want to access some excalidraw APIs. We expose the
 const excalidrawRef = { current: { readyPromise: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317">resolvablePromise</a>}}
 </pre>
 
-Since plain javascript object is passed as a `ref` here so the `readyPromise` is resolved as soon as the component is mounted. Most of the time you will not need this unless you have a specific use case where you can't pass the `ref` in the react way and want to do some action on the host when this promise resolves. You can check the [example](https://codesandbox.io/s/eexcalidraw-resolvable-promise-d0qg3?file=/src/App.js) for the usage.
+Since plain object is passed as a `ref`, the `readyPromise` is resolved as soon as the component is mounted. Most of the time you will not need this unless you have a specific use case where you can't pass the `ref` in the react way and want to do some action on the host when this promise resolves. You can check the [example](https://codesandbox.io/s/eexcalidraw-resolvable-promise-d0qg3?file=/src/App.js) for the usage.
 
 #### `onCollabButtonClick`
 
@@ -599,7 +599,7 @@ In case you want to prevent the excalidraw paste action you must return `true`, 
 
 ### Does it support collaboration ?
 
-No, Excalidraw package doesn't come with collaboration, since this would have different implementations on the consumer so we expose the API's which you can use to communicate with Excalidraw as mentioned above. If you are interested in understanding how Excalidraw does it you can check it [here](https://github.com/excalidraw/excalidraw/blob/master/src/excalidraw-app/index.tsx).
+No, Excalidraw package doesn't come with collaboration built in, since the implementation is specific to each host app. We expose APIs which you can use to communicate with Excalidraw which you can use to implement it. You can check our own implementation [here](https://github.com/excalidraw/excalidraw/blob/master/src/excalidraw-app/index.tsx).
 
 ### importLibrary
 
@@ -915,4 +915,4 @@ This function returns the free draw svg path for the element.
 
 ## Need help?
 
-Check out the existing [QnA's](https://github.com/excalidraw/excalidraw/discussions?discussions_q=label%3Apackage%3Aexcalidraw). If you have any queries or need any help, ask us [here](https://github.com/excalidraw/excalidraw/discussions?discussions_q=label%3Apackage%3Aexcalidraw).
+Check out the existing [Q&A](https://github.com/excalidraw/excalidraw/discussions?discussions_q=label%3Apackage%3Aexcalidraw). If you have any queries or need help, ask us [here](https://github.com/excalidraw/excalidraw/discussions?discussions_q=label%3Apackage%3Aexcalidraw).
