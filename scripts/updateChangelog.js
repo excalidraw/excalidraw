@@ -87,7 +87,7 @@ const updateChangelog = async () => {
   const updatedContent =
     existingChangeLog.slice(0, lastVersionIndex) +
     changelogForLibrary +
-    existingChangeLog.slice(lastVersionIndex + 1);
+    existingChangeLog.slice(lastVersionIndex);
   fs.writeFileSync(`${excalidrawDir}/CHANGELOG.md`, updatedContent, "utf8");
 };
 

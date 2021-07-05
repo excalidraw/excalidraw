@@ -18,11 +18,11 @@ const release = async (nextVersion) => {
   try {
     updateReadme();
     await updateChangelog(nextVersion);
-    updatePackageVersion();
+    updatePackageVersion(nextVersion);
     await exec(`git add -u`);
-    await exec(
-      `git commit -m "docs: release excalidraw@excalidraw@${nextVersion}  🎉"`,
-    );
+    // await exec(
+    //   `git commit -m "docs: release excalidraw@excalidraw@${nextVersion}  🎉"`,
+    // );
     /* eslint-disable no-console */
     console.log("Done!");
   } catch (e) {
