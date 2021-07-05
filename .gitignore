@@ -5,9 +5,11 @@
 .env.test.local
 .envrc
 .eslintcache
+.history
 .idea
 .vercel
 .vscode
+.yarn
 *.log
 *.tgz
 build

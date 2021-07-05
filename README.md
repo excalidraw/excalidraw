@@ -93,7 +93,7 @@ These instructions will get you a copy of the project up and running on your loc
 #### Requirements
 
 - [Node.js](https://nodejs.org/en/)
-- [Yarn](https://yarnpkg.com/getting-started/install)
+- [Yarn](https://yarnpkg.com/getting-started/install) (v1 or v2.4.2+)
 - [Git](https://git-scm.com/downloads)
 
 #### Clone the repo
