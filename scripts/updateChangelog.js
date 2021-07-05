@@ -69,7 +69,7 @@ const getLibraryCommitsSinceLastRelease = async () => {
   return commitList;
 };
 
-const updateChangelog = async () => {
+const updateChangelog = async (nextVersion) => {
   const commitList = await getLibraryCommitsSinceLastRelease();
   let changelogForLibrary =
     "## Excalidraw Library\n\n**_This section lists the updates made to the excalidraw library and will not affect the integration._**\n\n";
@@ -84,10 +84,13 @@ const updateChangelog = async () => {
   });
   changelogForLibrary += "---\n";
   const lastVersionIndex = existingChangeLog.indexOf(`## ${lastVersion}`);
-  const updatedContent =
+  let updatedContent =
     existingChangeLog.slice(0, lastVersionIndex) +
     changelogForLibrary +
-    existingChangeLog.slice(lastVersionIndex + 1);
+    existingChangeLog.slice(lastVersionIndex);
+  const currentDate = new Date().toISOString().slice(0, 10);
+  const newVersion = `## ${nextVersion} (${currentDate})`;
+  updatedContent = updatedContent.replace(`## Unreleased`, newVersion);
   fs.writeFileSync(`${excalidrawDir}/CHANGELOG.md`, updatedContent, "utf8");
 };
 
