@@ -91,4 +91,4 @@ const updateChangelog = async () => {
   fs.writeFileSync(`${excalidrawDir}/CHANGELOG.md`, updatedContent, "utf8");
 };
 
-updateChangelog();
+module.exports = updateChangelog;
