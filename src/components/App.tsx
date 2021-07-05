@@ -655,7 +655,11 @@ class App extends React.Component<AppProps, AppState> {
           const fileHandle = launchParams.files[0];
           const blob: Blob = await fileHandle.getFile();
           blob.handle = fileHandle;
-          loadFromBlob(blob, this.state, this.scene.getElements())
+          loadFromBlob(
+            blob,
+            this.state,
+            this.scene.getElementsIncludingDeleted(),
+          )
             .then(({ elements, appState }) =>
               this.syncActionResult({
                 elements,
@@ -3814,7 +3818,7 @@ class App extends React.Component<AppProps, AppState> {
         const { elements, appState } = await loadFromBlob(
           file,
           this.state,
-          this.scene.getElements(),
+          this.scene.getElementsIncludingDeleted(),
         );
         this.syncActionResult({
           elements,
@@ -3875,7 +3879,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   loadFileToCanvas = (file: Blob) => {
-    loadFromBlob(file, this.state, this.scene.getElements())
+    loadFromBlob(file, this.state, this.scene.getElementsIncludingDeleted())
       .then(({ elements, appState }) =>
         this.syncActionResult({
           elements,
