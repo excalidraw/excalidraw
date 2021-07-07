@@ -343,7 +343,7 @@ class App extends React.Component<AppProps, AppState> {
           style={{
             width: canvasDOMWidth,
             height: canvasDOMHeight,
-            cursor: "grabbing",
+            cursor: CURSOR_TYPE.POINTER,
           }}
           width={canvasWidth}
           height={canvasHeight}
@@ -2235,6 +2235,8 @@ class App extends React.Component<AppProps, AppState> {
         this.canvas,
         isTextElement(hitElement) ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR,
       );
+    } else if (this.state.viewModeEnabled) {
+      setCursor(this.canvas, CURSOR_TYPE.POINTER);
     } else if (isOverScrollBar) {
       setCursor(this.canvas, CURSOR_TYPE.AUTO);
     } else if (
