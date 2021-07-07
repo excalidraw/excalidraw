@@ -194,13 +194,7 @@ import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
-import {
-  actionToggleUseTex,
-  containsMath,
-  isMathMode,
-  getFontString,
-  getUseTex,
-} from "../mathmode";
+import { actionToggleUseTex, getUseTex } from "../mathmode";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
@@ -826,17 +820,9 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private onResize = withBatchedUpdates(() => {
-    this.scene.getElementsIncludingDeleted().forEach((element) => {
-      if (
-        !(
-          isTextElement(element) &&
-          isMathMode(getFontString(element)) &&
-          containsMath(element.text, element.useTex)
-        )
-      ) {
-        invalidateShapeForElement(element);
-      }
-    });
+    this.scene
+      .getElementsIncludingDeleted()
+      .forEach((element) => invalidateShapeForElement(element));
     this.setState({});
   });
 
