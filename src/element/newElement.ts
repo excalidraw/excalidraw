@@ -1,4 +1,3 @@
-import { getUseTex } from "../mathmode";
 import {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -12,7 +11,7 @@ import {
   ExcalidrawFreeDrawElement,
   FontFamilyValues,
 } from "../element/types";
-import { measureMath } from "../mathmode";
+import { applyTextOpts, measureTextElement, TextOpts } from "../textlike";
 import { randomInteger, randomId } from "../random";
 import { newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
@@ -113,16 +112,11 @@ export const newTextElement = (
     fontFamily: FontFamilyValues;
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
-    useTex?: boolean;
+    subtype: string;
+    textOpts?: TextOpts;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
-  const useTex = opts.useTex !== undefined ? opts.useTex : getUseTex();
-  const metrics = measureMath(
-    opts.text,
-    opts.fontSize,
-    opts.fontFamily,
-    useTex,
-  );
+  const metrics = measureTextElement(opts);
   const offsets = getTextElementPositionOffsets(opts, metrics);
   const textElement = newElementWith(
     {
@@ -137,11 +131,14 @@ export const newTextElement = (
       width: metrics.width,
       height: metrics.height,
       baseline: metrics.baseline,
-      useTex,
+      subtype: opts.subtype,
     },
     {},
   );
-  return textElement;
+  return applyTextOpts(
+    textElement,
+    opts.textOpts,
+  ) as NonDeleted<ExcalidrawTextElement>;
 };
 
 const getAdjustedDimensions = (
@@ -158,24 +155,14 @@ const getAdjustedDimensions = (
     width: nextWidth,
     height: nextHeight,
     baseline: nextBaseline,
-  } = measureMath(
-    nextText,
-    element.fontSize,
-    element.fontFamily,
-    element.useTex,
-  );
+  } = measureTextElement(element, { text: nextText });
   const { textAlign, verticalAlign } = element;
 
   let x: number;
   let y: number;
 
   if (textAlign === "center" && verticalAlign === "middle") {
-    const prevMetrics = measureMath(
-      element.text,
-      element.fontSize,
-      element.fontFamily,
-      element.useTex,
-    );
+    const prevMetrics = measureTextElement(element);
     const offsets = getTextElementPositionOffsets(element, {
       width: nextWidth - prevMetrics.width,
       height: nextHeight - prevMetrics.height,

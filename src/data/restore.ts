@@ -3,6 +3,7 @@ import {
   ExcalidrawSelectionElement,
   FontFamilyValues,
 } from "../element/types";
+import { restoreTextElement } from "../textlike";
 import { AppState, NormalizedZoomValue } from "../types";
 import { ImportedDataState } from "./types";
 import { getNormalizedDimensions, isInvisiblySmallElement } from "../element";
@@ -110,15 +111,19 @@ const restoreElement = (
         fontSize = parseInt(fontPx, 10);
         fontFamily = getFontFamilyByName(_fontFamily);
       }
-      return restoreElementWithProperties(element, {
+      const opts = {
         fontSize,
         fontFamily,
         text: element.text ?? "",
         baseline: element.baseline,
         textAlign: element.textAlign || DEFAULT_TEXT_ALIGN,
         verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,
-        useTex: element.useTex,
-      });
+        subtype: element.subtype,
+      };
+      return restoreTextElement(
+        element,
+        restoreElementWithProperties(element, opts),
+      );
     case "freedraw": {
       return restoreElementWithProperties(element, {
         points: element.points,

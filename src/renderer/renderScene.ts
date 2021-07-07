@@ -278,7 +278,6 @@ export const renderScene = (
         context,
         renderOptimizations,
         sceneState,
-        scale,
         refresh,
       );
     } catch (error) {
@@ -304,7 +303,6 @@ export const renderScene = (
         context,
         renderOptimizations,
         sceneState,
-        scale,
       );
     } catch (error) {
       console.error(error);

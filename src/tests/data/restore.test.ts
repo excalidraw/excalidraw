@@ -11,6 +11,9 @@ import { getDefaultAppState } from "../../appState";
 import { ImportedDataState } from "../../data/types";
 import { NormalizedZoomValue } from "../../types";
 import { FONT_FAMILY } from "../../constants";
+import { registerTextElementSubtypes } from "../../textlike";
+
+registerTextElementSubtypes();
 
 const mockSizeHelper = jest.spyOn(sizeHelpers, "isInvisiblySmallElement");
 
@@ -55,6 +58,7 @@ describe("restoreElements", () => {
       textAlign: "center",
       verticalAlign: "middle",
       id: "id-text01",
+      subtype: "none",
     });
 
     const restoredText = restore.restoreElements([
@@ -72,6 +76,7 @@ describe("restoreElements", () => {
       textAlign: undefined,
       verticalAlign: undefined,
       id: "id-text01",
+      subtype: "none",
     });
 
     textElement.text = null;

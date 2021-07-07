@@ -101,6 +101,7 @@
     "viewMode": "View mode",
     "toggleExportColorScheme": "Toggle export color scheme",
     "toggleUseTex": "Toggle using AsciiMath",
+    "showUseTex": "Show if AsciiMath",
     "share": "Share",
     "showStroke": "Show stroke color picker",
     "showBackground": "Show background color picker",

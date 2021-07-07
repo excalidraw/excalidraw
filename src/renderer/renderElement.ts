@@ -21,23 +21,12 @@ import { Drawable, Options } from "roughjs/bin/core";
 import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 import { SceneState } from "../scene/types";
-import {
-  SVG_NS,
-  distance,
-  getFontString,
-  getFontFamilyString,
-  isRTL,
-} from "../utils";
+import { SVG_NS, distance, isRTL } from "../utils";
 import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
 import { Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
-import {
-  createSvg,
-  containsMath,
-  drawMathOnCanvas,
-  isMathMode,
-} from "../mathmode";
+import { renderTextElement, renderSvgTextElement } from "../textlike";
 import getFreeDrawShape from "perfect-freehand";
 import { MAX_DECIMALS_FOR_SVG_EXPORT } from "../constants";
 
@@ -61,7 +50,6 @@ export interface ExcalidrawElementWithCanvas {
 const generateElementCanvas = (
   element: NonDeletedExcalidrawElement,
   zoom: Zoom,
-  scale: number,
   refresh?: () => void,
 ): ExcalidrawElementWithCanvas => {
   const canvas = document.createElement("canvas");
@@ -102,16 +90,12 @@ const generateElementCanvas = (
 
     context.translate(canvasOffsetX, canvasOffsetY);
   } else {
-    const dprMultiplier =
-      isTextElement(element) &&
-      isMathMode(getFontString(element)) &&
-      containsMath(element.text, element.useTex)
-        ? scale * Math.max(window.devicePixelRatio, 1 / window.devicePixelRatio)
-        : window.devicePixelRatio;
     canvas.width =
-      element.width * dprMultiplier * zoom.value + padding * zoom.value * 2;
+      element.width * window.devicePixelRatio * zoom.value +
+      padding * zoom.value * 2;
     canvas.height =
-      element.height * dprMultiplier * zoom.value + padding * zoom.value * 2;
+      element.height * window.devicePixelRatio * zoom.value +
+      padding * zoom.value * 2;
   }
 
   context.translate(padding * zoom.value, padding * zoom.value);
@@ -123,7 +107,7 @@ const generateElementCanvas = (
 
   const rc = rough.canvas(canvas);
 
-  drawElementOnCanvas(element, rc, context, zoom, scale, refresh);
+  drawElementOnCanvas(element, rc, context, refresh);
 
   context.scale(
     1 / (window.devicePixelRatio * zoom.value),
@@ -144,8 +128,6 @@ const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
-  zoom: Zoom,
-  scale: number,
   refresh?: () => void,
 ) => {
   context.globalAlpha = element.opacity / 100;
@@ -190,54 +172,7 @@ const drawElementOnCanvas = (
           // to the DOM
           document.body.appendChild(context.canvas);
         }
-        if (
-          isMathMode(getFontString(element)) &&
-          containsMath(element.text, element.useTex)
-        ) {
-          const scaledPadding = getCanvasPadding(element) * zoom.value;
-          drawMathOnCanvas(
-            context,
-            scaledPadding,
-            scaledPadding,
-            element.text,
-            element.fontSize * scale,
-            element.fontFamily,
-            element.strokeColor,
-            element.textAlign,
-            element.opacity / 100,
-            element.useTex,
-            refresh,
-          );
-        } else {
-          context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
-          const font = context.font;
-          context.font = getFontString(element);
-          const fillStyle = context.fillStyle;
-          context.fillStyle = element.strokeColor;
-          const textAlign = context.textAlign;
-          context.textAlign = element.textAlign as CanvasTextAlign;
-
-          // Canvas does not support multiline text by default
-          const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
-          const lineHeight = element.height / lines.length;
-          const verticalOffset = element.height - element.baseline;
-          const horizontalOffset =
-            element.textAlign === "center"
-              ? element.width / 2
-              : element.textAlign === "right"
-              ? element.width
-              : 0;
-          for (let index = 0; index < lines.length; index++) {
-            context.fillText(
-              lines[index],
-              horizontalOffset,
-              (index + 1) * lineHeight - verticalOffset,
-            );
-          }
-          context.fillStyle = fillStyle;
-          context.font = font;
-          context.textAlign = textAlign;
-        }
+        renderTextElement(element, context, refresh);
         if (shouldTemporarilyAttach) {
           context.canvas.remove();
         }
@@ -516,7 +451,6 @@ const generateElementShape = (
 
 const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,
-  scale: number,
   sceneState?: SceneState,
   refresh?: () => void,
 ) => {
@@ -527,12 +461,7 @@ const generateElementWithCanvas = (
     prevElementWithCanvas.canvasZoom !== zoom.value &&
     !sceneState?.shouldCacheIgnoreZoom;
   if (!prevElementWithCanvas || shouldRegenerateBecauseZoom) {
-    const elementWithCanvas = generateElementCanvas(
-      element,
-      zoom,
-      scale,
-      refresh,
-    );
+    const elementWithCanvas = generateElementCanvas(element, zoom, refresh);
 
     elementWithCanvasCache.set(element, elementWithCanvas);
 
@@ -587,7 +516,6 @@ export const renderElement = (
   context: CanvasRenderingContext2D,
   renderOptimizations: boolean,
   sceneState: SceneState,
-  scale: number,
   refresh?: () => void,
 ) => {
   const generator = rc.generator;
@@ -613,7 +541,6 @@ export const renderElement = (
       if (renderOptimizations) {
         const elementWithCanvas = generateElementWithCanvas(
           element,
-          scale,
           sceneState,
           refresh,
         );
@@ -627,14 +554,7 @@ export const renderElement = (
         context.translate(cx, cy);
         context.rotate(element.angle);
         context.translate(-shiftX, -shiftY);
-        drawElementOnCanvas(
-          element,
-          rc,
-          context,
-          sceneState.zoom,
-          window.devicePixelRatio,
-          refresh,
-        );
+        drawElementOnCanvas(element, rc, context, refresh);
         context.translate(shiftX, shiftY);
         context.rotate(-element.angle);
         context.translate(-cx, -cy);
@@ -652,7 +572,6 @@ export const renderElement = (
       if (renderOptimizations) {
         const elementWithCanvas = generateElementWithCanvas(
           element,
-          scale,
           sceneState,
           refresh,
         );
@@ -666,14 +585,7 @@ export const renderElement = (
         context.translate(cx, cy);
         context.rotate(element.angle);
         context.translate(-shiftX, -shiftY);
-        drawElementOnCanvas(
-          element,
-          rc,
-          context,
-          sceneState.zoom,
-          window.devicePixelRatio,
-          refresh,
-        );
+        drawElementOnCanvas(element, rc, context, refresh);
         context.translate(shiftX, shiftY);
         context.rotate(-element.angle);
         context.translate(-cx, -cy);
@@ -816,56 +728,7 @@ export const renderElementToSvg = (
             offsetY || 0
           }) rotate(${degree} ${cx} ${cy})`,
         );
-        if (
-          isMathMode(getFontString(element)) &&
-          containsMath(element.text, element.useTex)
-        ) {
-          const svg = createSvg(
-            element.text,
-            element.fontSize,
-            element.fontFamily,
-            element.strokeColor,
-            element.textAlign,
-            element.opacity / 100,
-            element.useTex,
-          );
-          const tempSvg = svgRoot.ownerDocument!.createElementNS(SVG_NS, "svg");
-          tempSvg.innerHTML = svg.innerHTML;
-          tempSvg.setAttribute("width", svg.getAttribute("width")!);
-          tempSvg.setAttribute("height", svg.getAttribute("height")!);
-          tempSvg.setAttribute("viewBox", svg.getAttribute("viewBox")!);
-          node.appendChild(tempSvg);
-        } else {
-          const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
-          const lineHeight = element.height / lines.length;
-          const verticalOffset = element.height - element.baseline;
-          const horizontalOffset =
-            element.textAlign === "center"
-              ? element.width / 2
-              : element.textAlign === "right"
-              ? element.width
-              : 0;
-          const direction = isRTL(element.text) ? "rtl" : "ltr";
-          const textAnchor =
-            element.textAlign === "center"
-              ? "middle"
-              : element.textAlign === "right" || direction === "rtl"
-              ? "end"
-              : "start";
-          for (let i = 0; i < lines.length; i++) {
-            const text = svgRoot.ownerDocument!.createElementNS(SVG_NS, "text");
-            text.textContent = lines[i];
-            text.setAttribute("x", `${horizontalOffset}`);
-            text.setAttribute("y", `${(i + 1) * lineHeight - verticalOffset}`);
-            text.setAttribute("font-family", getFontFamilyString(element));
-            text.setAttribute("font-size", `${element.fontSize}px`);
-            text.setAttribute("fill", element.strokeColor);
-            text.setAttribute("text-anchor", textAnchor);
-            text.setAttribute("style", "white-space: pre;");
-            text.setAttribute("direction", direction);
-            node.appendChild(text);
-          }
-        }
+        renderSvgTextElement(svgRoot, node, element);
         svgRoot.appendChild(node);
       } else {
         // @ts-ignore

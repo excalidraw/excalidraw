@@ -1,13 +1,20 @@
 // Some imports
-import { FontFamilyValues, FontString } from "./element/types";
+import { FontFamilyValues, FontString } from "../../element/types";
 import {
+  SVG_NS,
   getFontString,
   getFontFamilyString,
   isRTL,
   measureText,
-} from "./utils";
-import { ExcalidrawTextElement } from "./element/types";
-import { mutateElement } from "./element/mutateElement";
+} from "../../utils";
+import { isTextElement } from "../../element/typeChecks";
+import {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+  NonDeleted,
+} from "../../element/types";
+import { mutateElement, newElementWith } from "../../element/mutateElement";
+import { addTextLikeActions, registerTextLikeMethod } from "../";
 
 // MathJax components we use
 import { AsciiMath } from "mathjax-full/js/input/asciimath.js";
@@ -25,14 +32,41 @@ import { LiteAdaptor } from "mathjax-full/js/adaptors/liteAdaptor.js";
 // For caching the SVGs
 import { StringMap } from "mathjax-full/js/output/common/Wrapper";
 
-export { actionToggleUseTex } from "./actions/actionToggleUseTex";
+// Imports for actions
+import { t } from "../../i18n";
+import { Action } from "../../actions/types";
+import { AppState } from "../../types";
+import { getSelectedElements } from "../../scene";
+import { getElementMap, getNonDeletedElements } from "../../element";
+import { invalidateShapeForElement } from "../../renderer/renderElement";
+
+// Begin exports
+export type TextOptsMath = { useTex?: boolean };
+
+type ExcalidrawTextElementMath = ExcalidrawTextElement &
+  Readonly<{
+    subtype: "math";
+    useTex: boolean;
+    fontFamily: 2;
+  }>;
+
+const isMathElement = (
+  element: ExcalidrawElement | null,
+): element is ExcalidrawTextElementMath => {
+  return (
+    isTextElement(element) && "subtype" in element && element.subtype === "math"
+  );
+};
+
+export type MathActionName = "toggleUseTex" | "showUseTex";
+
 let _useTex = true;
 
-export const setUseTex = (useTex: boolean) => {
+const setUseTex = (useTex: boolean) => {
   _useTex = useTex;
 };
 
-export const getUseTex = (): boolean => {
+const getUseTex = (): boolean => {
   return _useTex;
 };
 
@@ -89,8 +123,6 @@ const math2Svg = (text: string, useTex: boolean) => {
     return text;
   }
 };
-
-export { getFontString } from "./utils";
 
 const markupText = (text: string, useTex: boolean) => {
   const lines = text.replace(/\r\n?/g, "\n").split("\n");
@@ -221,7 +253,7 @@ const measureOutputs = (outputs: string[][], fontString: FontString) => {
         outputMetrics[index].push(measureText(outputs[index][i], fontString));
       }
       lineWidth +=
-        outputs[index][i] === "" && outputs[index].length > 1
+        outputs[index].length > 0 && outputs[index][i] === ""
           ? 0
           : outputMetrics[index][i].width;
       lineHeight = Math.max(lineHeight, outputMetrics[index][i].height);
@@ -250,9 +282,9 @@ const measureOutputs = (outputs: string[][], fontString: FontString) => {
 const svgCache = {} as { [key: string]: SVGSVGElement };
 
 // Use a power-of-two font size to generate the SVG.
-const fontSizePoT = 128;
+const fontSizePoT = 256;
 
-export const createSvg = (
+const createSvg = (
   text: string,
   fontSize: number,
   fontFamily: FontFamilyValues,
@@ -341,9 +373,7 @@ export const createSvg = (
         processed[index].length > 0 && processed[index][i] === ""
           ? 0
           : childMetrics.width;
-      const svgVerticalOffset = childIsSvg
-        ? Math.min(childMetrics.height, childMetrics.baseline)
-        : 0;
+      const svgVerticalOffset = childIsSvg ? childMetrics.baseline : 0;
       const yOffset =
         lineMetrics.height - (lineMetrics.baseline - svgVerticalOffset);
       childNode.setAttribute("y", `${y - yOffset}`);
@@ -374,19 +404,105 @@ const getRenderDims = (width: number, height: number) => {
   return [width / window.devicePixelRatio, height / window.devicePixelRatio];
 };
 
-export const drawMathOnCanvas = (
-  context: CanvasRenderingContext2D,
-  x: number,
-  y: number,
+const containsMath = (text: string, useTex: boolean) => {
+  const delimiter = (useTex ? "\\$\\$" : "`") as string;
+  return text.search(delimiter) >= 0;
+};
+
+const isMathMode = (fontString: FontString) => {
+  return fontString.search("Helvetica") >= 0;
+};
+
+const measureMath = (
   text: string,
   fontSize: number,
   fontFamily: FontFamilyValues,
-  strokeColor: String,
-  textAlign: CanvasTextAlign,
-  opacity: Number,
   useTex: boolean,
+) => {
+  const scale = fontSize / fontSizePoT;
+  const fontStringPoT = getFontString({
+    fontSize: fontSizePoT,
+    fontFamily,
+  });
+  const fontString = getFontString({ fontSize, fontFamily });
+  const metrics = isMathMode(fontStringPoT)
+    ? measureOutputs(markupText(text, useTex), fontStringPoT).imageMetrics
+    : measureText(text, fontString);
+  if (isMathMode(fontStringPoT)) {
+    return {
+      width: metrics.width * scale,
+      height: metrics.height * scale,
+      baseline: metrics.baseline * scale,
+    };
+  }
+  return metrics;
+};
+
+const getSelectedMathElements = (
+  elements: readonly ExcalidrawElement[],
+  appState: Readonly<AppState>,
+): NonDeleted<ExcalidrawTextElementMath>[] => {
+  const selectedElements = getSelectedElements(
+    getNonDeletedElements(elements),
+    appState,
+  );
+  const eligibleElements = selectedElements.filter(
+    (element, index, eligibleElements) => {
+      return isMathElement(element);
+    },
+  ) as NonDeleted<ExcalidrawTextElementMath>[];
+  return eligibleElements;
+};
+
+const applyTextElementMathOpts = (
+  element: ExcalidrawTextElementMath,
+  textOpts?: TextOptsMath,
+): ExcalidrawTextElement => {
+  const useTex = textOpts?.useTex !== undefined ? textOpts.useTex : getUseTex();
+  return newElementWith(element, { useTex });
+};
+
+const measureTextElementMath = (
+  element: Omit<
+    ExcalidrawTextElementMath,
+    | "id"
+    | "isDeleted"
+    | "type"
+    | "baseline"
+    | "width"
+    | "height"
+    | "angle"
+    | "seed"
+    | "version"
+    | "versionNonce"
+    | "groupIds"
+    | "boundElementIds"
+  >,
+  next?: {
+    fontSize?: number;
+    text?: string;
+  },
+) => {
+  const fontSize =
+    next?.fontSize !== undefined ? next.fontSize : element.fontSize;
+  const text = next?.text !== undefined ? next.text : element.text;
+  const useTex = element.useTex !== undefined ? element.useTex : getUseTex();
+  return measureMath(text, fontSize, element.fontFamily, useTex);
+};
+
+const renderTextElementMath = (
+  element: NonDeleted<ExcalidrawTextElementMath>,
+  context: CanvasRenderingContext2D,
   refresh?: () => void,
 ) => {
+  const text = element.text;
+  const fontSize = element.fontSize * window.devicePixelRatio;
+  const fontFamily = element.fontFamily;
+  const strokeColor = element.strokeColor;
+  const textAlign = element.textAlign;
+  const opacity = context.globalAlpha;
+  const useTex = element.useTex;
+
   const key = getCacheKey(
     text,
     fontFamily,
@@ -450,41 +566,193 @@ export const drawMathOnCanvas = (
   }
 };
 
-export const containsMath = (text: string, useTex: boolean) => {
-  const delimiter = (useTex ? "\\$\\$" : "`") as string;
-  return text.search(delimiter) >= 0;
+const renderSvgTextElementMath = (
+  svgRoot: SVGElement,
+  node: SVGElement,
+  element: NonDeleted<ExcalidrawTextElementMath>,
+): void => {
+  const svg = createSvg(
+    element.text,
+    element.fontSize,
+    element.fontFamily,
+    element.strokeColor,
+    element.textAlign,
+    element.opacity / 100,
+    element.useTex,
+  );
+  const tempSvg = svgRoot.ownerDocument!.createElementNS(SVG_NS, "svg");
+  tempSvg.innerHTML = svg.innerHTML;
+  tempSvg.setAttribute("width", svg.getAttribute("width")!);
+  tempSvg.setAttribute("height", svg.getAttribute("height")!);
+  tempSvg.setAttribute("viewBox", svg.getAttribute("viewBox")!);
+  node.appendChild(tempSvg);
 };
 
-export const isMathMode = (fontString: FontString) => {
-  return fontString.search("Helvetica") >= 0;
-};
-
-export const measureMath = (
-  text: string,
-  fontSize: number,
-  fontFamily: FontFamilyValues,
-  useTex: boolean,
-) => {
-  const scale = fontSize / fontSizePoT;
-  const fontStringPoT = getFontString({
-    fontSize: fontSizePoT,
-    fontFamily,
+const restoreTextElementMath = (
+  element: ExcalidrawTextElementMath,
+  elementRestored: ExcalidrawTextElementMath,
+): ExcalidrawTextElement => {
+  const mathElement = element;
+  elementRestored = newElementWith(elementRestored, {
+    useTex: mathElement.useTex,
   });
-  const fontString = getFontString({ fontSize, fontFamily });
-  const metrics =
-    isMathMode(fontStringPoT) && containsMath(text, useTex)
-      ? measureOutputs(markupText(text, useTex), fontStringPoT).imageMetrics
-      : measureText(text, fontString);
-  if (isMathMode(fontStringPoT) && containsMath(text, useTex)) {
-    return {
-      width: metrics.width * scale,
-      height: metrics.height * scale,
-      baseline: metrics.baseline * scale,
-    };
-  }
-  return metrics;
+  return elementRestored;
 };
 
-export const toggleUseTex = (element: ExcalidrawTextElement) => {
-  mutateElement(element, { useTex: !element.useTex });
+export const registerTextElementSubtypeMath = () => {
+  registerTextLikeMethod("apply", {
+    subtype: "math",
+    method: applyTextElementMathOpts,
+  });
+  registerTextLikeMethod("measure", {
+    subtype: "math",
+    method: measureTextElementMath,
+  });
+  registerTextLikeMethod("render", {
+    subtype: "math",
+    method: renderTextElementMath,
+  });
+  registerTextLikeMethod("renderSvg", {
+    subtype: "math",
+    method: renderSvgTextElementMath,
+  });
+  registerTextLikeMethod("restore", {
+    subtype: "math",
+    method: restoreTextElementMath,
+  });
+  registerActionsMath();
+};
+
+const enableActionToggleUseTex = (
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+) => {
+  const eligibleElements = getSelectedMathElements(elements, appState);
+
+  let enabled = false;
+  eligibleElements.forEach((element) => {
+    // Only operate on selected elements which are text elements in
+    // math mode containing math content.
+    if (
+      isMathMode(getFontString(element)) &&
+      (containsMath(element.text, element.useTex) ||
+        containsMath(element.text, !element.useTex))
+    ) {
+      enabled = true;
+    }
+  });
+
+  return enabled;
+};
+
+const toggleUseTexForSelectedElements = (
+  elements: readonly ExcalidrawElement[],
+  appState: Readonly<AppState>,
+) => {
+  const selectedElements = getSelectedMathElements(elements, appState);
+
+  selectedElements.forEach((element) => {
+    // Only operate on selected elements which are text elements in
+    // math mode containing math content.
+    if (
+      isMathMode(getFontString(element)) &&
+      (containsMath(element.text, element.useTex) ||
+        containsMath(element.text, !element.useTex))
+    ) {
+      // Toggle the useTex field
+      mutateElement(element, { useTex: !element.useTex });
+      // Mark the element for re-rendering
+      invalidateShapeForElement(element);
+      // Update the width/height of the element
+      const metrics = measureMath(
+        element.text,
+        element.fontSize,
+        element.fontFamily,
+        element.useTex,
+      );
+      mutateElement(element, metrics);
+      // If only one element is selected, use the element's updated
+      // useTex value to set the default value for new text elements.
+      if (selectedElements.length === 1) {
+        setUseTex(element.useTex);
+      }
+    }
+  });
+  const updatedElementsMap = getElementMap(elements);
+
+  return elements.map((element) => updatedElementsMap[element.id] || element);
+};
+
+const enableActionShowUseTex = (
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+) => {
+  const selectedMathElements = getSelectedMathElements(elements, appState);
+  const selectedElements = getSelectedElements(
+    getNonDeletedElements(elements),
+    appState,
+  );
+  return selectedMathElements.length === 1 || selectedElements.length === 0;
+};
+
+const showUseTexForSelectedElements = (
+  elements: readonly ExcalidrawElement[],
+  appState: Readonly<AppState>,
+) => {
+  const selectedElements = getSelectedMathElements(elements, appState);
+
+  // Require the "Control" key to toggle Latex/AsciiMath so no one
+  // toggles by accidentally typing "Shift M" without
+  // being in text-editing/entry mode.
+  if (selectedElements.length < 2) {
+    // Only report anything if at most one element is selected, to avoid confusion.
+    // If only one element is selected and that element is a text element,
+    // then report that element's useTex value; otherwise report the default
+    // value for new text elements.
+    const usingTex =
+      selectedElements.length === 1 ? selectedElements[0].useTex : getUseTex();
+    if (usingTex) {
+      window.alert(t("alerts.useTexTrue"));
+    } else {
+      window.alert(t("alerts.useTexFalse"));
+    }
+  }
+};
+
+const registerActionsMath = () => {
+  const mathActions: Action[] = [];
+  const actionToggleUseTex: Action = {
+    name: "toggleUseTex",
+    perform: (elements, appState) => {
+      return {
+        elements: toggleUseTexForSelectedElements(elements, appState),
+        appState,
+        commitToHistory: true,
+      };
+    },
+    keyTest: (event) =>
+      event.ctrlKey && event.shiftKey && event.code === "KeyM",
+    contextItemLabel: "labels.toggleUseTex",
+    contextItemPredicate: (elements, appState) =>
+      enableActionToggleUseTex(elements, appState),
+  };
+
+  const actionShowUseTex: Action = {
+    name: "showUseTex",
+    perform: (elements, appState) => {
+      showUseTexForSelectedElements(elements, appState);
+      return {
+        appState,
+        commitToHistory: false,
+      };
+    },
+    keyTest: (event) =>
+      !event.ctrlKey && event.shiftKey && event.code === "KeyM",
+    contextItemLabel: "labels.showUseTex",
+    contextItemPredicate: (elements, appState) =>
+      enableActionShowUseTex(elements, appState),
+  };
+  mathActions.push(actionToggleUseTex);
+  mathActions.push(actionShowUseTex);
+  addTextLikeActions(mathActions);
 };
