@@ -1610,7 +1610,9 @@ class App extends React.Component<AppProps, AppState> {
 
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
     if (event.key === KEYS.SPACE) {
-      if (this.state.elementType === "selection") {
+      if (this.state.viewModeEnabled) {
+        setCursor(this.canvas, CURSOR_TYPE.POINTER);
+      } else if (this.state.elementType === "selection") {
         resetCursor(this.canvas);
       } else {
         setCursorForShape(this.canvas, this.state.elementType);
@@ -2474,7 +2476,11 @@ class App extends React.Component<AppProps, AppState> {
         lastPointerUp = null;
         isPanning = false;
         if (!isHoldingSpace) {
-          setCursorForShape(this.canvas, this.state.elementType);
+          if (this.state.viewModeEnabled) {
+            setCursor(this.canvas, CURSOR_TYPE.POINTER);
+          } else {
+            setCursorForShape(this.canvas, this.state.elementType);
+          }
         }
         this.setState({
           cursorButton: "up",
