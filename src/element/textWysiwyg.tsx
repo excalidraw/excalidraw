@@ -18,6 +18,7 @@ const normalizeText = (text: string) => {
 };
 
 const getTransform = (
+  offsetX: number,
   width: number,
   height: number,
   angle: number,
@@ -33,7 +34,7 @@ const getTransform = (
   if (width > maxWidth && zoom.value !== 1) {
     translateX = (maxWidth / 2) * (zoom.value - 1);
   }
-  return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
+  return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg) translate(${offsetX}px, 0px)`;
 };
 
 export const textWysiwyg = ({
@@ -76,7 +77,7 @@ export const textWysiwyg = ({
           ? (updatedElement.width - metrics.width) / 2
           : 0;
       const [viewportX, viewportY] = getViewportCoords(
-        updatedElement.x + offsetX,
+        updatedElement.x,
         updatedElement.y,
       );
       const maxWidth =
@@ -97,9 +98,12 @@ export const textWysiwyg = ({
         height: `${metrics.height}px`,
         left: `${viewportX}px`,
         top: `${viewportY}px`,
+        transformOrigin: `${updatedElement.width / 2}px
+          ${updatedElement.height / 2}px`,
         transform: getTransform(
-          metrics.width,
-          metrics.height,
+          offsetX,
+          updatedElement.width,
+          updatedElement.height,
           angle,
           appState,
           maxWidth,
