@@ -229,7 +229,7 @@
     "link_details": "导出为只读链接。",
     "link_button": "导出链接",
     "excalidrawplus_description": "",
-    "excalidrawplus_button": "",
+    "excalidrawplus_button": "导出",
     "excalidrawplus_exportError": ""
   },
   "helpDialog": {
