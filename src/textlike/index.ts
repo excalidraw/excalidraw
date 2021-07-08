@@ -1,4 +1,5 @@
-import { NonDeleted, ExcalidrawTextElement } from "../element/types";
+import { ExcalidrawTextElement, NonDeleted } from "../element/types";
+import { ElementUpdate } from "../element/mutateElement";
 import {
   MathActionName,
   TextOptsMath,
@@ -12,6 +13,7 @@ import { register } from "../actions/register";
 
 type TextLikeMethodName =
   | "apply"
+  | "clean"
   | "measure"
   | "render"
   | "renderSvg"
@@ -31,6 +33,9 @@ type TextLikeMethodArrays = {
 
 const applyMethodsA = [] as TextLikeMethods;
 const applyMethodsL = {} as TextLikeMethodArrays;
+
+const cleanMethodsA = [] as TextLikeMethods;
+const cleanMethodsL = {} as TextLikeMethodArrays;
 
 const measureMethodsA = [] as TextLikeMethods;
 const measureMethodsL = {} as TextLikeMethodArrays;
@@ -57,6 +62,10 @@ export const registerTextLikeMethod = (
     case "apply":
       methodsA = applyMethodsA;
       methodsL = applyMethodsL;
+      break;
+    case "clean":
+      methodsA = cleanMethodsA;
+      methodsL = cleanMethodsL;
       break;
     case "measure":
       methodsA = measureMethodsA;
@@ -104,20 +113,20 @@ export const applyTextOpts = (
     .method(element, textOpts);
 };
 
-export const restoreTextElement = (
+export const cleanTextOptUpdates = (
   element: ExcalidrawTextElement,
-  elementRestored: ExcalidrawTextElement,
-): ExcalidrawTextElement => {
-  for (let i = 0; i < restoreMethodsA.length; i++) {
-    if (restoreMethodsA[i].subtype === element.subtype) {
-      return restoreMethodsA[i].method(element, elementRestored);
+  opts: ElementUpdate<ExcalidrawTextElement>,
+): ElementUpdate<ExcalidrawTextElement> => {
+  for (let i = 0; i < cleanMethodsA.length; i++) {
+    if (cleanMethodsA[i].subtype === element.subtype) {
+      return cleanMethodsA[i].method(opts);
     }
   }
-  return restoreMethodsA
-    .find((value, index, restoreMethodsA) => {
+  return cleanMethodsA
+    .find((value, index, cleanMethodsA) => {
       return value.default !== undefined && value.default === true;
     })!
-    .method(element, elementRestored);
+    .method(opts);
 };
 
 export const measureTextElement = (
@@ -175,6 +184,22 @@ export const renderSvgTextElement = (
       renderSvgMethodsA[i].method(svgRoot, node, element);
     }
   }
+};
+
+export const restoreTextElement = (
+  element: ExcalidrawTextElement,
+  elementRestored: ExcalidrawTextElement,
+): ExcalidrawTextElement => {
+  for (let i = 0; i < restoreMethodsA.length; i++) {
+    if (restoreMethodsA[i].subtype === element.subtype) {
+      return restoreMethodsA[i].method(element, elementRestored);
+    }
+  }
+  return restoreMethodsA
+    .find((value, index, restoreMethodsA) => {
+      return value.default !== undefined && value.default === true;
+    })!
+    .method(element, elementRestored);
 };
 
 export const registerTextElementSubtypes = (

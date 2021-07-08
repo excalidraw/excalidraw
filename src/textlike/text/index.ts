@@ -6,6 +6,7 @@ import {
   isRTL,
 } from "../../utils";
 import { ExcalidrawTextElement, NonDeleted } from "../../element/types";
+import { ElementUpdate } from "../../element/mutateElement";
 import { registerTextLikeMethod } from "../";
 
 export type TextOptsText = {};
@@ -20,6 +21,12 @@ const applyTextElementTextOpts = (
   textOpts: TextOptsText | undefined,
 ): ExcalidrawTextElement => {
   return element;
+};
+
+const cleanTextOptUpdatesText = (
+  opts: ElementUpdate<ExcalidrawTextElementText>,
+): ElementUpdate<ExcalidrawTextElementText> => {
+  return opts;
 };
 
 const measureTextElementText = (
@@ -138,6 +145,11 @@ export const registerTextElementSubtypeText = (
   registerTextLikeMethod("apply", {
     subtype: "none",
     method: applyTextElementTextOpts,
+    default: true,
+  });
+  registerTextLikeMethod("clean", {
+    subtype: "none",
+    method: cleanTextOptUpdatesText,
     default: true,
   });
   registerTextLikeMethod("measure", {

@@ -13,7 +13,11 @@ import {
   ExcalidrawTextElement,
   NonDeleted,
 } from "../../element/types";
-import { mutateElement, newElementWith } from "../../element/mutateElement";
+import {
+  ElementUpdate,
+  mutateElement,
+  newElementWith,
+} from "../../element/mutateElement";
 import { addTextLikeActions, registerTextLikeMethod } from "../";
 
 // Imports for actions
@@ -510,6 +514,17 @@ const applyTextElementMathOpts = (
   return newElementWith(element, { useTex });
 };
 
+const cleanTextOptUpdatesMath = (
+  opts: ElementUpdate<ExcalidrawTextElementMath>,
+): ElementUpdate<ExcalidrawTextElementMath> => {
+  const newOpts = {};
+  for (const key in opts) {
+    const value = key === "fontFamily" ? 2 : (opts as any)[key];
+    (newOpts as any)[key] = value;
+  }
+  return newOpts;
+};
+
 const measureTextElementMath = (
   element: Omit<
     ExcalidrawTextElementMath,
@@ -688,6 +703,10 @@ export const registerTextElementSubtypeMath = (
   registerTextLikeMethod("apply", {
     subtype: "math",
     method: applyTextElementMathOpts,
+  });
+  registerTextLikeMethod("clean", {
+    subtype: "math",
+    method: cleanTextOptUpdatesMath,
   });
   registerTextLikeMethod("measure", {
     subtype: "math",
