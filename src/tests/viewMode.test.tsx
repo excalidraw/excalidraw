@@ -39,16 +39,26 @@ describe("view mode", () => {
   });
 
   it("cursor should stay as grabbing type when hovering over canvas elements", async () => {
-    // create a rectangle, then hover over it – cursor should be move type
+    // create a rectangle, then hover over it – cursor should be
+    // move type for mouse and grab for touch & pen
     // then switch to view-mode and cursor should be grabbing type
     UI.createElement("rectangle", { size: 100 });
 
     pointerTypes.forEach((pointerType) => {
-      const mouse = new Pointer("mouse");
-      mouse.moveTo(50, 50);
-      expect(GlobalTestState.canvas.style._values.cursor).toBe(
-        CURSOR_TYPE.MOVE,
-      );
+      const pointer = pointerType;
+
+      pointer.moveTo(50, 50);
+      // eslint-disable-next-line dot-notation
+      if (pointerType["pointerType"] === "mouse") {
+        expect(GlobalTestState.canvas.style._values.cursor).toBe(
+          CURSOR_TYPE.MOVE,
+        );
+      } else {
+        expect(GlobalTestState.canvas.style._values.cursor).toBe(
+          CURSOR_TYPE.GRABBING,
+        );
+      }
+
       h.setState({ viewModeEnabled: true });
       expect(GlobalTestState.canvas.style._values.cursor).toBe(
         CURSOR_TYPE.GRABBING,
