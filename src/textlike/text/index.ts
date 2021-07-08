@@ -132,7 +132,9 @@ const restoreTextElementText = (
   return elementRestored;
 };
 
-export const registerTextElementSubtypeText = () => {
+export const registerTextElementSubtypeText = (
+  onSubtypesLoaded?: (isTextElementSubtype: Function) => void,
+) => {
   registerTextLikeMethod("apply", {
     subtype: "none",
     method: applyTextElementTextOpts,

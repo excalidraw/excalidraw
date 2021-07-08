@@ -16,22 +16,6 @@ import {
 import { mutateElement, newElementWith } from "../../element/mutateElement";
 import { addTextLikeActions, registerTextLikeMethod } from "../";
 
-// MathJax components we use
-import { AsciiMath } from "mathjax-full/js/input/asciimath.js";
-import { TeX } from "mathjax-full/js/input/tex.js";
-import { SVG } from "mathjax-full/js/output/svg.js";
-import { liteAdaptor } from "mathjax-full/js/adaptors/liteAdaptor.js";
-import { HTMLDocument } from "mathjax-full/js/handlers/html/HTMLDocument.js";
-
-// Types needed to lazy-load MathJax
-import { LiteElement } from "mathjax-full/js/adaptors/lite/Element.js";
-import { LiteText } from "mathjax-full/js/adaptors/lite/Text.js";
-import { LiteDocument } from "mathjax-full/js/adaptors/lite/Document.js";
-import { LiteAdaptor } from "mathjax-full/js/adaptors/liteAdaptor.js";
-
-// For caching the SVGs
-import { StringMap } from "mathjax-full/js/output/common/Wrapper";
-
 // Imports for actions
 import { t } from "../../i18n";
 import { Action } from "../../actions/types";
@@ -71,52 +55,93 @@ const getUseTex = (): boolean => {
 };
 
 const mathJax = {} as {
-  adaptor: LiteAdaptor;
-  amHtml: HTMLDocument<LiteElement | LiteText, LiteText, LiteDocument>;
-  texHtml: HTMLDocument<LiteElement | LiteText, LiteText, LiteDocument>;
+  adaptor: any;
+  amHtml: any;
+  texHtml: any;
 };
 
-const loadMathJax = () => {
+let mathJaxLoaded = false;
+let mathJaxLoadedCallback:
+  | ((isTextElementSubtype: Function) => void)
+  | undefined;
+
+const loadMathJax = async () => {
   if (
-    mathJax.adaptor === undefined ||
-    mathJax.amHtml === undefined ||
-    mathJax.texHtml === undefined
+    !mathJaxLoaded &&
+    (mathJax.adaptor === undefined ||
+      mathJax.amHtml === undefined ||
+      mathJax.texHtml === undefined)
   ) {
-    const asciimath = new AsciiMath({ displaystyle: false });
-    const tex = new TeX({});
-    const svg = new SVG({ fontCache: "local" });
-    mathJax.adaptor = liteAdaptor();
-    mathJax.amHtml = new HTMLDocument("", mathJax.adaptor, {
+    // MathJax components we use
+    const AsciiMath = await import("mathjax-full/js/input/asciimath.js");
+    const TeX = await import("mathjax-full/js/input/tex.js");
+    const SVG = await import("mathjax-full/js/output/svg.js");
+    const liteAdaptor = await import("mathjax-full/js/adaptors/liteAdaptor.js");
+    const HTMLDocument = await import(
+      "mathjax-full/js/handlers/html/HTMLDocument.js"
+    );
+
+    // Types needed to lazy-load MathJax
+    const LiteElement = (
+      await import("mathjax-full/js/adaptors/lite/Element.js")
+    ).LiteElement;
+    const LiteText = (await import("mathjax-full/js/adaptors/lite/Text.js"))
+      .LiteText;
+    const LiteDocument = (
+      await import("mathjax-full/js/adaptors/lite/Document.js")
+    ).LiteDocument;
+
+    // Now set up MathJax
+    const asciimath = new AsciiMath.AsciiMath<
+      typeof LiteElement | typeof LiteText,
+      typeof LiteText,
+      typeof LiteDocument
+    >({ displaystyle: false });
+    const tex = new TeX.TeX({});
+    const svg = new SVG.SVG({ fontCache: "local" });
+    mathJax.adaptor = liteAdaptor.liteAdaptor();
+    mathJax.amHtml = new HTMLDocument.HTMLDocument("", mathJax.adaptor, {
       InputJax: asciimath,
       OutputJax: svg,
     });
-    mathJax.texHtml = new HTMLDocument("", mathJax.adaptor, {
+    mathJax.texHtml = new HTMLDocument.HTMLDocument("", mathJax.adaptor, {
       InputJax: tex,
       OutputJax: svg,
     });
+    mathJaxLoaded = true;
+    if (mathJaxLoadedCallback !== undefined) {
+      mathJaxLoadedCallback(isMathElement);
+    }
   }
 };
 
 // Cache the SVGs from MathJax
-const mathJaxSvgCacheAM = {} as StringMap;
-const mathJaxSvgCacheTex = {} as StringMap;
+const mathJaxSvgCacheAM = {} as { [key: string]: string };
+const mathJaxSvgCacheTex = {} as { [key: string]: string };
 
-const math2Svg = (text: string, useTex: boolean) => {
-  if (useTex ? mathJaxSvgCacheTex[text] : mathJaxSvgCacheAM[text]) {
+const math2Svg = (text: string, useTex: boolean, isMathJaxLoaded: boolean) => {
+  if (
+    isMathJaxLoaded &&
+    (useTex ? mathJaxSvgCacheTex[text] : mathJaxSvgCacheAM[text])
+  ) {
     return useTex ? mathJaxSvgCacheTex[text] : mathJaxSvgCacheAM[text];
   }
   loadMathJax();
   try {
     const userOptions = { display: false };
-    const htmlString = mathJax.adaptor.innerHTML(
-      useTex
-        ? mathJax.texHtml.convert(text, userOptions)
-        : mathJax.amHtml.convert(text, userOptions),
-    );
-    if (useTex) {
-      mathJaxSvgCacheTex[text] = htmlString;
-    } else {
-      mathJaxSvgCacheAM[text] = htmlString;
+    const htmlString = isMathJaxLoaded
+      ? mathJax.adaptor.innerHTML(
+          useTex
+            ? mathJax.texHtml.convert(text, userOptions)
+            : mathJax.amHtml.convert(text, userOptions),
+        )
+      : text;
+    if (isMathJaxLoaded) {
+      if (useTex) {
+        mathJaxSvgCacheTex[text] = htmlString;
+      } else {
+        mathJaxSvgCacheAM[text] = htmlString;
+      }
     }
     return htmlString;
   } catch {
@@ -124,15 +149,22 @@ const math2Svg = (text: string, useTex: boolean) => {
   }
 };
 
-const markupText = (text: string, useTex: boolean) => {
+const markupText = (
+  text: string,
+  useTex: boolean,
+  isMathJaxLoaded: boolean,
+) => {
   const lines = text.replace(/\r\n?/g, "\n").split("\n");
   const outputs = [] as Array<string>[];
   for (let index = 0; index < lines.length; index++) {
     outputs.push([]);
     const lineArray = lines[index].split(useTex ? "$$" : "`");
     for (let i = 0; i < lineArray.length; i++) {
+      // Don't guard the following as "isMathJaxLoaded && i % 2 === 1"
+      // in order to ensure math2Svg() actually gets called, and thus
+      // loadMathJax().
       if (i % 2 === 1) {
-        const svgString = math2Svg(lineArray[i], useTex);
+        const svgString = math2Svg(lineArray[i], useTex, isMathJaxLoaded);
         outputs[index].push(svgString);
       } else {
         outputs[index].push(lineArray[i]);
@@ -167,7 +199,11 @@ const metricsCache = {} as {
   };
 };
 
-const measureOutputs = (outputs: string[][], fontString: FontString) => {
+const measureOutputs = (
+  outputs: string[][],
+  fontString: FontString,
+  isMathJaxLoaded: boolean,
+) => {
   let key = fontString as string;
   for (let index = 0; index < outputs.length; index++) {
     for (let i = 0; i < outputs[index].length; i++) {
@@ -176,7 +212,7 @@ const measureOutputs = (outputs: string[][], fontString: FontString) => {
     key += "\n";
   }
   const cKey = key;
-  if (metricsCache[cKey]) {
+  if (isMathJaxLoaded && metricsCache[cKey]) {
     return metricsCache[cKey];
   }
   const tDiv = document.createElement("div");
@@ -204,7 +240,7 @@ const measureOutputs = (outputs: string[][], fontString: FontString) => {
     let lineHeight = 0;
     let lineBaseline = 0;
     for (let i = 0; i < outputs[index].length; i++) {
-      if (i % 2 === 1) {
+      if (isMathJaxLoaded && i % 2 === 1) {
         //svg
         tDiv.innerHTML = outputs[index][i];
         const cNode = tDiv.children[0];
@@ -275,8 +311,12 @@ const measureOutputs = (outputs: string[][], fontString: FontString) => {
     height: imageHeight,
     baseline: imageBaseline,
   };
-  metricsCache[cKey] = { outputMetrics, lineMetrics, imageMetrics };
-  return metricsCache[cKey];
+  const metrics = { outputMetrics, lineMetrics, imageMetrics };
+  if (isMathJaxLoaded) {
+    metricsCache[cKey] = metrics;
+    return metricsCache[cKey];
+  }
+  return metrics;
 };
 
 const svgCache = {} as { [key: string]: SVGSVGElement };
@@ -292,6 +332,7 @@ const createSvg = (
   textAlign: CanvasTextAlign,
   opacity: Number,
   useTex: boolean,
+  isMathJaxLoaded: boolean,
 ) => {
   const key = getCacheKey(
     text,
@@ -303,17 +344,17 @@ const createSvg = (
   );
 
   const mathLines = text.replace(/\r\n?/g, "\n").split("\n");
-  const processed = markupText(text, useTex);
+  const processed = markupText(text, useTex, isMathJaxLoaded);
 
   const scale = fontSize / fontSizePoT;
   const fontString = getFontString({
     fontSize: fontSizePoT,
     fontFamily,
   });
-  const metrics = measureOutputs(processed, fontString);
+  const metrics = measureOutputs(processed, fontString, isMathJaxLoaded);
   const imageMetrics = metrics.imageMetrics;
 
-  if (svgCache[key]) {
+  if (isMathJaxLoaded && svgCache[key]) {
     const svgRoot = svgCache[key];
     svgRoot.setAttribute("width", `${scale * imageMetrics.width}`);
     svgRoot.setAttribute("height", `${scale * imageMetrics.height}`);
@@ -349,7 +390,7 @@ const createSvg = (
     ) {
       let childNode = {} as SVGSVGElement | SVGTextElement;
       // If i % 2 === 0, then childNode is an SVGTextElement, not an SVGSVGElement.
-      const childIsSvg = i % 2 === 1;
+      const childIsSvg = isMathJaxLoaded && i % 2 === 1;
       if (childIsSvg) {
         const tempDiv = svgRoot.ownerDocument.createElement("div");
         tempDiv.innerHTML = processed[index][i];
@@ -388,7 +429,9 @@ const createSvg = (
   );
   svgRoot.setAttribute("width", `${imageMetrics.width}`);
   svgRoot.setAttribute("height", `${imageMetrics.height}`);
-  svgCache[key] = svgRoot;
+  if (isMathJaxLoaded) {
+    svgCache[key] = svgRoot;
+  }
   // Now that we have cached the base SVG, scale it appropriately.
   svgRoot.setAttribute("width", `${scale * imageMetrics.width}`);
   svgRoot.setAttribute("height", `${scale * imageMetrics.height}`);
@@ -418,6 +461,7 @@ const measureMath = (
   fontSize: number,
   fontFamily: FontFamilyValues,
   useTex: boolean,
+  isMathJaxLoaded: boolean,
 ) => {
   const scale = fontSize / fontSizePoT;
   const fontStringPoT = getFontString({
@@ -426,7 +470,11 @@ const measureMath = (
   });
   const fontString = getFontString({ fontSize, fontFamily });
   const metrics = isMathMode(fontStringPoT)
-    ? measureOutputs(markupText(text, useTex), fontStringPoT).imageMetrics
+    ? measureOutputs(
+        markupText(text, useTex, isMathJaxLoaded),
+        fontStringPoT,
+        isMathJaxLoaded,
+      ).imageMetrics
     : measureText(text, fontString);
   if (isMathMode(fontStringPoT)) {
     return {
@@ -483,11 +531,18 @@ const measureTextElementMath = (
     text?: string;
   },
 ) => {
+  const isMathJaxLoaded = mathJaxLoaded;
   const fontSize =
     next?.fontSize !== undefined ? next.fontSize : element.fontSize;
   const text = next?.text !== undefined ? next.text : element.text;
   const useTex = element.useTex !== undefined ? element.useTex : getUseTex();
-  return measureMath(text, fontSize, element.fontFamily, useTex);
+  return measureMath(
+    text,
+    fontSize,
+    element.fontFamily,
+    useTex,
+    isMathJaxLoaded,
+  );
 };
 
 const renderTextElementMath = (
@@ -495,6 +550,8 @@ const renderTextElementMath = (
   context: CanvasRenderingContext2D,
   refresh?: () => void,
 ) => {
+  const isMathJaxLoaded = mathJaxLoaded;
+
   const text = element.text;
   const fontSize = element.fontSize * window.devicePixelRatio;
   const fontFamily = element.fontFamily;
@@ -512,18 +569,36 @@ const renderTextElementMath = (
     useTex,
   );
 
-  if (!(imageMetricsCache[key] && imageMetricsCache[key] !== undefined)) {
+  if (
+    isMathJaxLoaded &&
+    imageMetricsCache[key] &&
+    imageMetricsCache[key] === undefined
+  ) {
     imageMetricsCache[key] = measureOutputs(
-      markupText(text, useTex),
+      markupText(text, useTex, isMathJaxLoaded),
       getFontString({ fontSize: fontSizePoT, fontFamily }),
+      isMathJaxLoaded,
     ).imageMetrics;
   }
-  const imageMetrics = imageMetricsCache[key];
+  const imageMetrics =
+    isMathJaxLoaded &&
+    imageMetricsCache[key] &&
+    imageMetricsCache[key] !== undefined
+      ? imageMetricsCache[key]
+      : measureOutputs(
+          markupText(text, useTex, isMathJaxLoaded),
+          getFontString({ fontSize: fontSizePoT, fontFamily }),
+          isMathJaxLoaded,
+        ).imageMetrics;
   const scale = fontSize / fontSizePoT;
   const imgKey = `${key}, ${scale * imageMetrics.width}, ${
     scale * imageMetrics.height
   }`;
-  if (imageCache[imgKey] && imageCache[imgKey] !== undefined) {
+  if (
+    isMathJaxLoaded &&
+    imageCache[imgKey] &&
+    imageCache[imgKey] !== undefined
+  ) {
     const img = imageCache[imgKey];
     const [width, height] = getRenderDims(img.naturalWidth, img.naturalHeight);
     context.drawImage(img, 0, 0, width, height);
@@ -537,6 +612,7 @@ const renderTextElementMath = (
       textAlign,
       opacity,
       useTex,
+      isMathJaxLoaded,
     ).outerHTML;
     const svg = new Blob([svgString], {
       type: "image/svg+xml;charset=utf-8",
@@ -553,7 +629,9 @@ const renderTextElementMath = (
           );
           context.setTransform(transformMatrix);
           context.drawImage(img, 0, 0, width, height);
-          imageCache[imgKey] = img;
+          if (isMathJaxLoaded) {
+            imageCache[imgKey] = img;
+          }
           if (refresh) {
             refresh();
           }
@@ -571,6 +649,7 @@ const renderSvgTextElementMath = (
   node: SVGElement,
   element: NonDeleted<ExcalidrawTextElementMath>,
 ): void => {
+  const isMathJaxLoaded = mathJaxLoaded;
   const svg = createSvg(
     element.text,
     element.fontSize,
@@ -579,6 +658,7 @@ const renderSvgTextElementMath = (
     element.textAlign,
     element.opacity / 100,
     element.useTex,
+    isMathJaxLoaded,
   );
   const tempSvg = svgRoot.ownerDocument!.createElementNS(SVG_NS, "svg");
   tempSvg.innerHTML = svg.innerHTML;
@@ -599,7 +679,12 @@ const restoreTextElementMath = (
   return elementRestored;
 };
 
-export const registerTextElementSubtypeMath = () => {
+export const registerTextElementSubtypeMath = (
+  onSubtypesLoaded?: (isTextElementSubtype: Function) => void,
+) => {
+  // Set the callback first just in case anything in this method
+  // calls loadMathJax().
+  mathJaxLoadedCallback = onSubtypesLoaded;
   registerTextLikeMethod("apply", {
     subtype: "math",
     method: applyTextElementMathOpts,
@@ -621,6 +706,7 @@ export const registerTextElementSubtypeMath = () => {
     method: restoreTextElementMath,
   });
   registerActionsMath();
+  // Call loadMathJax() here if we want to be sure it's loaded.
 };
 
 const enableActionToggleUseTex = (
@@ -652,6 +738,7 @@ const toggleUseTexForSelectedElements = (
   const selectedElements = getSelectedMathElements(elements, appState);
 
   selectedElements.forEach((element) => {
+    const isMathJaxLoaded = mathJaxLoaded;
     // Only operate on selected elements which are text elements in
     // math mode containing math content.
     if (
@@ -669,6 +756,7 @@ const toggleUseTexForSelectedElements = (
         element.fontSize,
         element.fontFamily,
         element.useTex,
+        isMathJaxLoaded,
       );
       mutateElement(element, metrics);
       // If only one element is selected, use the element's updated

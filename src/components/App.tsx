@@ -78,6 +78,7 @@ import {
   getCursorForResizingElement,
   getDragOffsetXY,
   getElementWithTransformHandleType,
+  getNonDeletedElements,
   getNormalizedDimensions,
   getPerfectElementSize,
   getResizeArrowDirection,
@@ -312,9 +313,23 @@ class App extends React.Component<AppProps, AppState> {
       id: this.id,
     };
 
-    registerTextElementSubtypes();
-
     this.scene = new Scene();
+
+    const refresh = (isTextElementSubtype: Function) => {
+      const elements = this.scene.getElementsIncludingDeleted();
+      let refreshNeeded = false;
+      getNonDeletedElements(elements).forEach((element) => {
+        if (isTextElementSubtype(element)) {
+          invalidateShapeForElement(element);
+          refreshNeeded = true;
+        }
+      });
+      if (refreshNeeded) {
+        this.setState({});
+      }
+    };
+    registerTextElementSubtypes(refresh);
+
     this.library = new Library(this);
     this.history = new History();
     this.actionManager = new ActionManager(

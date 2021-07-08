@@ -177,9 +177,11 @@ export const renderSvgTextElement = (
   }
 };
 
-export const registerTextElementSubtypes = () => {
-  registerTextElementSubtypeMath();
-  registerTextElementSubtypeText();
+export const registerTextElementSubtypes = (
+  onSubtypesLoaded?: (isTextElementSubtype: Function) => void,
+) => {
+  registerTextElementSubtypeMath(onSubtypesLoaded);
+  registerTextElementSubtypeText(onSubtypesLoaded);
 };
 
 const textLikeActions: Action[] = [];
