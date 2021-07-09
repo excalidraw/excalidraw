@@ -19,7 +19,7 @@ describe("view mode", () => {
   it("after switching to view mode – cursor type should be pointer", async () => {
     h.setState({ viewModeEnabled: true });
     expect(GlobalTestState.canvas.style._values.cursor).toBe(
-      CURSOR_TYPE.GRABBING,
+      CURSOR_TYPE.GRAB,
     );
   });
 
@@ -33,7 +33,7 @@ describe("view mode", () => {
       pointer.click();
       Keyboard.keyPress(KEYS.SPACE);
       expect(GlobalTestState.canvas.style._values.cursor).toBe(
-        CURSOR_TYPE.GRABBING,
+        CURSOR_TYPE.GRAB,
       );
     });
   });
@@ -55,13 +55,13 @@ describe("view mode", () => {
         );
       } else {
         expect(GlobalTestState.canvas.style._values.cursor).toBe(
-          CURSOR_TYPE.GRABBING,
+          CURSOR_TYPE.GRAB,
         );
       }
 
       h.setState({ viewModeEnabled: true });
       expect(GlobalTestState.canvas.style._values.cursor).toBe(
-        CURSOR_TYPE.GRABBING,
+        CURSOR_TYPE.GRAB,
       );
     });
   });

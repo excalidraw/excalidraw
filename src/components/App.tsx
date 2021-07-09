@@ -343,7 +343,7 @@ class App extends React.Component<AppProps, AppState> {
           style={{
             width: canvasDOMWidth,
             height: canvasDOMHeight,
-            cursor: CURSOR_TYPE.GRABBING,
+            cursor: CURSOR_TYPE.GRAB,
           }}
           width={canvasWidth}
           height={canvasHeight}
@@ -1611,7 +1611,7 @@ class App extends React.Component<AppProps, AppState> {
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
     if (event.key === KEYS.SPACE) {
       if (this.state.viewModeEnabled) {
-        setCursor(this.canvas, CURSOR_TYPE.GRABBING);
+        setCursor(this.canvas, CURSOR_TYPE.GRAB);
       } else if (this.state.elementType === "selection") {
         resetCursor(this.canvas);
       } else {
@@ -2238,7 +2238,7 @@ class App extends React.Component<AppProps, AppState> {
         isTextElement(hitElement) ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR,
       );
     } else if (this.state.viewModeEnabled) {
-      setCursor(this.canvas, CURSOR_TYPE.GRABBING);
+      setCursor(this.canvas, CURSOR_TYPE.GRAB);
     } else if (isOverScrollBar) {
       setCursor(this.canvas, CURSOR_TYPE.AUTO);
     } else if (
@@ -2477,7 +2477,7 @@ class App extends React.Component<AppProps, AppState> {
         isPanning = false;
         if (!isHoldingSpace) {
           if (this.state.viewModeEnabled) {
-            setCursor(this.canvas, CURSOR_TYPE.GRABBING);
+            setCursor(this.canvas, CURSOR_TYPE.GRAB);
           } else {
             setCursorForShape(this.canvas, this.state.elementType);
           }
