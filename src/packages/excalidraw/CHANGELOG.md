@@ -13,8 +13,6 @@ Please add the latest change on the top under the correct section.
 
 ## 0.9.0 (2021-07-09)
 
-**This changes are not yet released but you can still try it out in [@excalidraw/excalidraw-next](https://www.npmjs.com/package/@excalidraw/excalidraw-next).**
-
 ## Excalidraw API
 
 ### Features
