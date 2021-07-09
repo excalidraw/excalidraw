@@ -65,6 +65,7 @@ const mathJax = {} as {
 };
 
 let mathJaxLoaded = false;
+let mathJaxLoading = false;
 let mathJaxLoadedCallback:
   | ((isTextElementSubtype: Function) => void)
   | undefined;
@@ -72,10 +73,13 @@ let mathJaxLoadedCallback:
 const loadMathJax = async () => {
   if (
     !mathJaxLoaded &&
+    !mathJaxLoading &&
     (mathJax.adaptor === undefined ||
       mathJax.amHtml === undefined ||
       mathJax.texHtml === undefined)
   ) {
+    mathJaxLoading = true;
+
     // MathJax components we use
     const AsciiMath = await import("mathjax-full/js/input/asciimath.js");
     const TeX = await import("mathjax-full/js/input/tex.js");
@@ -162,6 +166,11 @@ const markupText = (
   const outputs = [] as Array<string>[];
   for (let index = 0; index < lines.length; index++) {
     outputs.push([]);
+    if (!isMathJaxLoaded) {
+      // Run lines[index] through math2Svg so loadMathJax() gets called
+      outputs[index].push(math2Svg(lines[index], useTex, isMathJaxLoaded));
+      continue;
+    }
     const lineArray = lines[index].split(useTex ? "$$" : "`");
     for (let i = 0; i < lineArray.length; i++) {
       // Don't guard the following as "isMathJaxLoaded && i % 2 === 1"
@@ -360,8 +369,11 @@ const createSvg = (
 
   if (isMathJaxLoaded && svgCache[key]) {
     const svgRoot = svgCache[key];
-    svgRoot.setAttribute("width", `${scale * imageMetrics.width}`);
-    svgRoot.setAttribute("height", `${scale * imageMetrics.height}`);
+    svgRoot.setAttribute("width", `${Math.max(scale * imageMetrics.width, 1)}`);
+    svgRoot.setAttribute(
+      "height",
+      `${Math.max(scale * imageMetrics.height, 1)}`,
+    );
     return svgRoot;
   }
   const svgRoot = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -437,8 +449,8 @@ const createSvg = (
     svgCache[key] = svgRoot;
   }
   // Now that we have cached the base SVG, scale it appropriately.
-  svgRoot.setAttribute("width", `${scale * imageMetrics.width}`);
-  svgRoot.setAttribute("height", `${scale * imageMetrics.height}`);
+  svgRoot.setAttribute("width", `${Math.max(scale * imageMetrics.width, 1)}`);
+  svgRoot.setAttribute("height", `${Math.max(scale * imageMetrics.height, 1)}`);
   return svgRoot;
 };
 

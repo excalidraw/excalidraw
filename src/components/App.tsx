@@ -196,6 +196,7 @@ import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import { getTextLikeActions, registerTextElementSubtypes } from "../textlike";
+import { redrawTextBoundingBox } from "../element/textElement";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
@@ -315,15 +316,24 @@ class App extends React.Component<AppProps, AppState> {
 
     this.scene = new Scene();
 
+    // Call this method after finishing any async loading for
+    // subtypes of ExcalidrawTextElement if the newly loaded code
+    // would change the rendering.
     const refresh = (isTextElementSubtype: Function) => {
       const elements = this.scene.getElementsIncludingDeleted();
       let refreshNeeded = false;
       getNonDeletedElements(elements).forEach((element) => {
+        // If the text element is of the subtype that was just
+        // registered, update the element's dimensions, mark the
+        // element for a re-render, and mark the scene for a refresh.
         if (isTextElementSubtype(element)) {
+          redrawTextBoundingBox(element as ExcalidrawTextElement);
           invalidateShapeForElement(element);
           refreshNeeded = true;
         }
       });
+      // If there are any text elements of the just-registered subtype,
+      // refresh the scene to re-render each such element.
       if (refreshNeeded) {
         this.setState({});
       }
