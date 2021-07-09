@@ -18,9 +18,7 @@ describe("view mode", () => {
 
   it("after switching to view mode – cursor type should be pointer", async () => {
     h.setState({ viewModeEnabled: true });
-    expect(GlobalTestState.canvas.style.cursor).toBe(
-      CURSOR_TYPE.GRAB,
-    );
+    expect(GlobalTestState.canvas.style.cursor).toBe(CURSOR_TYPE.GRAB);
   });
 
   it("after switching to view mode, moving, clicking, and pressing space key – cursor type should be pointer", async () => {
@@ -32,9 +30,7 @@ describe("view mode", () => {
       pointer.move(100, 100);
       pointer.click();
       Keyboard.keyPress(KEYS.SPACE);
-      expect(GlobalTestState.canvas.style.cursor).toBe(
-        CURSOR_TYPE.GRAB,
-      );
+      expect(GlobalTestState.canvas.style.cursor).toBe(CURSOR_TYPE.GRAB);
     });
   });
 
@@ -50,19 +46,13 @@ describe("view mode", () => {
       pointer.moveTo(50, 50);
       // eslint-disable-next-line dot-notation
       if (pointerType["pointerType"] === "mouse") {
-        expect(GlobalTestState.canvas.style.cursor).toBe(
-          CURSOR_TYPE.MOVE,
-        );
+        expect(GlobalTestState.canvas.style.cursor).toBe(CURSOR_TYPE.MOVE);
       } else {
-        expect(GlobalTestState.canvas.style.cursor).toBe(
-          CURSOR_TYPE.GRAB,
-        );
+        expect(GlobalTestState.canvas.style.cursor).toBe(CURSOR_TYPE.GRAB);
       }
 
       h.setState({ viewModeEnabled: true });
-      expect(GlobalTestState.canvas.style.cursor).toBe(
-        CURSOR_TYPE.GRAB,
-      );
+      expect(GlobalTestState.canvas.style.cursor).toBe(CURSOR_TYPE.GRAB);
     });
   });
 });
