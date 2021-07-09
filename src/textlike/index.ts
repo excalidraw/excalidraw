@@ -1,5 +1,5 @@
 import { ExcalidrawTextElement, NonDeleted } from "../element/types";
-import { ElementUpdate } from "../element/mutateElement";
+import { ElementUpdate, mutateElement } from "../element/mutateElement";
 import {
   MathActionName,
   TextOptsMath,
@@ -101,6 +101,7 @@ export const applyTextOpts = (
   element: ExcalidrawTextElement,
   textOpts?: TextOpts,
 ): ExcalidrawTextElement => {
+  mutateElement(element, cleanTextOptUpdates(element, element));
   for (let i = 0; i < applyMethodsA.length; i++) {
     if (applyMethodsA[i].subtype === element.subtype) {
       return applyMethodsA[i].method(element, textOpts);
