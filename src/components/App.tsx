@@ -1587,17 +1587,21 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (event.key === KEYS.G || event.key === KEYS.S) {
-        if (this.state.elementType === "selection") {
+        const selectedElements = getSelectedElements(
+          this.scene.getElements(),
+          this.state,
+        );
+        if (
+          this.state.elementType === "selection" &&
+          !selectedElements.length
+        ) {
           return;
         }
 
         if (
           event.key === KEYS.G &&
           (hasBackground(this.state.elementType) ||
-            getSelectedElements(
-              this.scene.getElements(),
-              this.state,
-            ).some((element) => hasBackground(element.type)))
+            selectedElements.some((element) => hasBackground(element.type)))
         ) {
           this.setState({ openPopup: "backgroundColorPicker" });
         }
