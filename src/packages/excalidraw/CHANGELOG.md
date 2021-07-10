@@ -11,9 +11,7 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
-## Unreleased
-
-**This changes are not yet released but you can still try it out in [@excalidraw/excalidraw-next](https://www.npmjs.com/package/@excalidraw/excalidraw-next).**
+## 0.9.0 (2021-07-10)
 
 ## Excalidraw API
 
@@ -62,6 +60,92 @@ Please add the latest change on the top under the correct section.
   - Rename `UIOptions.canvasActions.saveScene` to `UIOptions.canvasActions.saveToActiveFile`[#3657](https://github.com/excalidraw/excalidraw/pull/3657).
   - Removed `shouldAddWatermark: boolean` attribute from options for [export](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#export-utilities) APIs [#3639](https://github.com/excalidraw/excalidraw/pull/3639).
   - Removed `appState.shouldAddWatermark` so in case you were passing `shouldAddWatermark` in [initialData.AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L42) it will not work anymore.
+
+## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+### Features
+
+- Switch to selection tool on library item insert [#3773](https://github.com/excalidraw/excalidraw/pull/3773)
+
+- Show active file name when saving to current file [#3733](https://github.com/excalidraw/excalidraw/pull/3733)
+
+- Add hint around text editing [#3708](https://github.com/excalidraw/excalidraw/pull/3708)
+
+- Change library icon to be more clear [#3583](https://github.com/excalidraw/excalidraw/pull/3583)
+
+- Pass current `theme` when installing libraries [#3701](https://github.com/excalidraw/excalidraw/pull/3701)
+
+- Update virgil font [#3692](https://github.com/excalidraw/excalidraw/pull/3692)
+
+- Support exporting json to excalidraw plus [#3678](https://github.com/excalidraw/excalidraw/pull/3678)
+
+- Save exportScale in AppState [#3580](https://github.com/excalidraw/excalidraw/pull/3580)
+
+- Add shortcuts for stroke and background color picker [#3318](https://github.com/excalidraw/excalidraw/pull/3318)
+
+- Exporting redesign [#3613](https://github.com/excalidraw/excalidraw/pull/3613)
+
+- Auto-position tooltip and suport overflowing container [#3631](https://github.com/excalidraw/excalidraw/pull/3631)
+
+- Auto release @excalidraw/excalidraw-next on every change [#3614](https://github.com/excalidraw/excalidraw/pull/3614)
+
+- Allow inner-drag-selecting with cmd/ctrl [#3603](https://github.com/excalidraw/excalidraw/pull/3603)
+
+### Fixes
+
+- view mode cursor adjustments [#3809](https://github.com/excalidraw/excalidraw/pull/3809).
+
+- Pass next release to updatePackageVersion & replace ## unreleased with new version [#3806](https://github.com/excalidraw/excalidraw/pull/3806)
+
+- Include deleted elements when passing to restore [#3802](https://github.com/excalidraw/excalidraw/pull/3802)
+
+- Import React before using jsx [#3804](https://github.com/excalidraw/excalidraw/pull/3804)
+
+- Ensure `s` and `g` shortcuts work on no selection [#3800](https://github.com/excalidraw/excalidraw/pull/3800)
+
+- Keep binding for attached arrows after changing text [#3754](https://github.com/excalidraw/excalidraw/pull/3754)
+
+- Deselect elements on viewMode toggle [#3741](https://github.com/excalidraw/excalidraw/pull/3741)
+
+- Allow pointer events for disable zen mode button [#3743](https://github.com/excalidraw/excalidraw/pull/3743)
+
+- Use rgba instead of shorthand alpha [#3688](https://github.com/excalidraw/excalidraw/pull/3688)
+
+- Color pickers not opening on mobile [#3676](https://github.com/excalidraw/excalidraw/pull/3676)
+
+- On contextMenu, use selected element regardless of z-index [#3668](https://github.com/excalidraw/excalidraw/pull/3668)
+
+- SelectedGroupIds not being stored in history [#3630](https://github.com/excalidraw/excalidraw/pull/3630)
+
+- Overscroll on touch devices [#3663](https://github.com/excalidraw/excalidraw/pull/3663)
+
+- Small UI issues around image export dialog [#3642](https://github.com/excalidraw/excalidraw/pull/3642)
+
+- Normalize linear element points on restore [#3633](https://github.com/excalidraw/excalidraw/pull/3633)
+
+- Disable pointer-events on footer-center container [#3629](https://github.com/excalidraw/excalidraw/pull/3629)
+
+### Refactor
+
+- Delete React SyntheticEvent persist [#3700](https://github.com/excalidraw/excalidraw/pull/3700)
+
+- Code clean up [#3681](https://github.com/excalidraw/excalidraw/pull/3681)
+
+### Performance
+
+- Improve arrow head sizing [#3480](https://github.com/excalidraw/excalidraw/pull/3480)
+
+### Build
+
+- Add release script to update relevant files and commit for next release [#3805](https://github.com/excalidraw/excalidraw/pull/3805)
+
+- Add script to update changelog before a stable release [#3784](https://github.com/excalidraw/excalidraw/pull/3784)
+
+- Add script to update readme before stable release [#3781](https://github.com/excalidraw/excalidraw/pull/3781)
+
+---
 
 ## 0.8.0 (2021-05-15)
 
