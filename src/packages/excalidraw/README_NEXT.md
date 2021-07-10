@@ -878,7 +878,7 @@ import { FONT_FAMILY } from "@excalidraw/excalidraw-next";
 | ----------- | -------------------- |
 | Virgil      | The handwritten font |
 | Helvetica   | The Normal Font      |
-| Cacadia     | The Code Font        |
+| Cascadia    | The Code Font        |
 
 Defaults to `FONT_FAMILY.Virgil` unless passed in `initialData.appState.currentItemFontFamily`.
 
