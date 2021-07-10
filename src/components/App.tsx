@@ -1593,7 +1593,7 @@ class App extends React.Component<AppProps, AppState> {
         );
         if (
           this.state.elementType === "selection" &&
-          selectedElements.length === 0
+          !selectedElements.length
         ) {
           return;
         }
