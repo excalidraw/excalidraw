@@ -1,6 +1,6 @@
 {
   "name": "@excalidraw/excalidraw",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "main": "main.js",
   "types": "types/packages/excalidraw/index.d.ts",
   "files": [
@@ -11,11 +11,7 @@
     "access": "public"
   },
   "description": "Excalidraw as a React component",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/excalidraw/excalidraw.git",
-    "directory": "src/packages/excalidraw"
-  },
+  "repository": "https://github.com/excalidraw/excalidraw",
   "license": "MIT",
   "keywords": [
     "excalidraw",
@@ -73,7 +69,6 @@
     "webpack-cli": "4.7.2"
   },
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
-  "repository": "https://github.com/excalidraw/excalidraw",
   "homepage": "https://github.com/excalidraw/excalidraw/tree/master/src/packages/excalidraw",
   "scripts": {
     "gen:types": "tsc --project ../../../tsconfig-types.json",
