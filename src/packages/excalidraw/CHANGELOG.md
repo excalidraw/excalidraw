@@ -11,7 +11,7 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
-## 0.9.0 (2021-07-09)
+## 0.9.0 (2021-07-10)
 
 ## Excalidraw API
 
@@ -94,6 +94,8 @@ Please add the latest change on the top under the correct section.
 - Allow inner-drag-selecting with cmd/ctrl [#3603](https://github.com/excalidraw/excalidraw/pull/3603)
 
 ### Fixes
+
+- view mode cursor adjustments [#3809](https://github.com/excalidraw/excalidraw/pull/3809).
 
 - Pass next release to updatePackageVersion & replace ## unreleased with new version [#3806](https://github.com/excalidraw/excalidraw/pull/3806)
 
