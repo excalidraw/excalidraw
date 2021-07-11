@@ -120,21 +120,21 @@
     "load": "",
     "getShareableLink": "",
     "close": "",
-    "selectLanguage": "",
-    "scrollBackToContent": "",
-    "zoomIn": "",
-    "zoomOut": "",
-    "resetZoom": "",
+    "selectLanguage": "Vælg sprog",
+    "scrollBackToContent": "Scroll tilbage til indhold",
+    "zoomIn": "Zoom ind",
+    "zoomOut": "Zoom ud",
+    "resetZoom": "Nulstil zoom",
     "menu": "Menu",
-    "done": "",
-    "edit": "",
-    "undo": "",
-    "redo": "",
+    "done": "Færdig",
+    "edit": "Rediger",
+    "undo": "Fortryd",
+    "redo": "Gendan",
     "resetLibrary": "",
-    "createNewRoom": "",
-    "fullScreen": "",
-    "darkMode": "",
-    "lightMode": "",
+    "createNewRoom": "Opret nyt rum",
+    "fullScreen": "Fuld skærm",
+    "darkMode": "Mørk tilstand",
+    "lightMode": "Lys baggrund",
     "zenMode": "",
     "exitZenMode": ""
   },
@@ -219,10 +219,10 @@
     "shareTitle": ""
   },
   "errorDialog": {
-    "title": ""
+    "title": "Fejl"
   },
   "exportDialog": {
-    "disk_title": "",
+    "disk_title": "Gem til disk",
     "disk_details": "",
     "disk_button": "",
     "link_title": "",
@@ -233,7 +233,7 @@
     "excalidrawplus_exportError": ""
   },
   "helpDialog": {
-    "blog": "",
+    "blog": "Læs vores blog",
     "click": "",
     "curvedArrow": "",
     "curvedLine": "",
