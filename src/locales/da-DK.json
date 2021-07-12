@@ -206,10 +206,10 @@
     "openIssueMessage_pre": "",
     "openIssueMessage_button": "",
     "openIssueMessage_post": " Kopiere og indsæt venligst oplysningerne nedenfor i et GitHub problem.",
-    "sceneContent": ""
+    "sceneContent": "Scene indhold:"
   },
   "roomDialog": {
-    "desc_intro": "",
+    "desc_intro": "Du kan invitere folk til din nuværende scene, så de kan samarbejde med dig.",
     "desc_privacy": "",
     "button_startSession": "",
     "button_stopSession": "",
