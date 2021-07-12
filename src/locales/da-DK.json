@@ -13,14 +13,14 @@
     "sendToBack": "",
     "bringToFront": "",
     "sendBackward": "",
-    "delete": "",
+    "delete": "Fjern",
     "copyStyles": "",
     "pasteStyles": "",
-    "stroke": "",
-    "background": "",
+    "stroke": "Linje",
+    "background": "Baggrund",
     "fill": "",
-    "strokeWidth": "",
-    "strokeShape": "",
+    "strokeWidth": "Linjebredde",
+    "strokeShape": "Linjeform",
     "strokeShape_gel": "",
     "strokeShape_fountain": "",
     "strokeShape_brush": "",
@@ -205,7 +205,7 @@
     "trackedToSentry_post": "",
     "openIssueMessage_pre": "",
     "openIssueMessage_button": "",
-    "openIssueMessage_post": "",
+    "openIssueMessage_post": " Kopiere og indsæt venligst oplysningerne nedenfor i et GitHub problem.",
     "sceneContent": ""
   },
   "roomDialog": {
@@ -272,15 +272,15 @@
     "version": "",
     "versionCopy": "Klik for at kopiere",
     "versionNotAvailable": "",
-    "width": ""
+    "width": "Bredde"
   },
   "toast": {
     "copyStyles": "Kopieret stilarter.",
     "copyToClipboard": "Kopieret til klippebord.",
     "copyToClipboardAsPng": "Kopieret {{exportSelection}} til klippebord som PNG\n({{exportColorScheme}})",
-    "fileSaved": "",
-    "fileSavedToFilename": "",
-    "canvas": "",
-    "selection": ""
+    "fileSaved": "Fil gemt.",
+    "fileSavedToFilename": "Gemt som {filename}",
+    "canvas": "canvas",
+    "selection": "markering"
   }
 }
