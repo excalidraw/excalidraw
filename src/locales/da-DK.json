@@ -210,11 +210,11 @@
   },
   "roomDialog": {
     "desc_intro": "Du kan invitere folk til din nuværende scene, så de kan samarbejde med dig.",
-    "desc_privacy": "",
-    "button_startSession": "",
-    "button_stopSession": "",
-    "desc_inProgressIntro": "",
-    "desc_shareLink": "",
+    "desc_privacy": "Bare rolig, sessionen bruger end-to-end kryptering, så uanset hvad du tegner vil det forblive privat. Ikke engang vores server vil kunne se, hvad du kommer op med.",
+    "button_startSession": "Start session",
+    "button_stopSession": "Stop session",
+    "desc_inProgressIntro": "Live-samarbejde session er nu begyndt.",
+    "desc_shareLink": "Del dette link med enhver, du ønsker at samarbejde med:",
     "desc_exitSession": "",
     "shareTitle": ""
   },
