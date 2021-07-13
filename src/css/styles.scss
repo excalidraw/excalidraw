@@ -478,6 +478,13 @@
     }
   }
 
+  .reset-zoom-button {
+    padding: 0.2em;
+    background: transparent;
+    color: var(--text-primary-color);
+    font-family: var(--ui-font);
+  }
+
   .undo-redo-buttons {
     display: flex;
     gap: 0.4em;
