@@ -207,6 +207,7 @@ export const renderScene = (
 
   const context = canvas.getContext("2d")!;
 
+  context.setTransform(1, 0, 0, 1, 0, 0);
   context.scale(scale, scale);
 
   // When doing calculations based on canvas width we should used normalized one
