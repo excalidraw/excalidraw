@@ -74,6 +74,7 @@ export const Tooltip = ({ children, label, long = false }: TooltipProps) => {
 
   return (
     <div
+      style={{ display: "flex" }}
       onPointerEnter={(event) =>
         updateTooltip(
           event.currentTarget as HTMLDivElement,

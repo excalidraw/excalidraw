@@ -414,22 +414,6 @@
     &:active {
       background-color: var(--button-gray-2);
     }
-
-    &.dropdown-select--floating {
-      margin: 0.5em;
-    }
-  }
-
-  .dropdown-select__language.dropdown-select--floating {
-    bottom: 10px;
-
-    :root[dir="ltr"] & {
-      right: 44px;
-    }
-
-    :root[dir="rtl"] & {
-      left: 44px;
-    }
   }
 
   .zIndexButton {
@@ -456,25 +440,16 @@
   }
 
   .help-icon {
+    display: flex;
     cursor: pointer;
     fill: $oc-gray-6;
     width: 1.5rem;
     padding: 0;
     margin: 0;
-    margin-top: 5px;
     background: none;
     color: var(--icon-fill-color);
-
     &:hover {
       background: none;
-    }
-
-    :root[dir="ltr"] & {
-      margin-right: 14px;
-    }
-
-    :root[dir="rtl"] & {
-      margin-left: 14px;
     }
   }
 
