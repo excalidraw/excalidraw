@@ -11,6 +11,10 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
+### Fixes
+
+- Prevent gradual misalignment of the canvas due to floating point rounding errors by a) resetting to the identity transform between frames and b) using `context.save()` and `context.restore()` instead of inverse transforms [#3833](https://github.com/excalidraw/excalidraw/pull/3833).
+
 ## 0.9.0 (2021-07-10)
 
 ## Excalidraw API
