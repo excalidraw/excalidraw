@@ -623,7 +623,9 @@ const LayerUI = ({
                       label={client.username || "Unknown user"}
                       key={clientId}
                     >
-                      {actionManager.renderAction("goToCollaborator", clientId)}
+                      {actionManager.renderAction("goToCollaborator", {
+                        id: clientId,
+                      })}
                     </Tooltip>
                   ))}
             </UserList>
@@ -656,6 +658,10 @@ const LayerUI = ({
                   zoom={appState.zoom}
                 />
               </Island>
+              <div className="undo-redo-buttons">
+                {actionManager.renderAction("undo", { size: "s" })}
+                {actionManager.renderAction("redo", { size: "s" })}
+              </div>
             </Section>
           </Stack.Col>
         </div>

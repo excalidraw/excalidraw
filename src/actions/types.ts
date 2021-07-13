@@ -109,7 +109,7 @@ export interface Action {
     appState: AppState;
     updateData: (formData?: any) => void;
     appProps: ExcalidrawProps;
-    id?: string;
+    data?: Record<string, any>;
   }>;
   perform: ActionFn;
   keyPriority?: number;

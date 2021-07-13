@@ -107,11 +107,10 @@ export class ActionManager implements ActionsManagerInterface {
     );
   }
 
-  // Id is an attribute that we can use to pass in data like keys.
-  // This is needed for dynamically generated action components
-  // like the user list. We can use this key to extract more
-  // data from app state. This is an alternative to generic prop hell!
-  renderAction = (name: ActionName, id?: string) => {
+  /**
+   * @param data additional data sent to the PanelComponent
+   */
+  renderAction = (name: ActionName, data?: Record<string, any>) => {
     const canvasActions = this.app.props.UIOptions.canvasActions;
 
     if (
@@ -139,8 +138,8 @@ export class ActionManager implements ActionsManagerInterface {
           elements={this.getElementsIncludingDeleted()}
           appState={this.getAppState()}
           updateData={updateData}
-          id={id}
           appProps={this.app.props}
+          data={data}
         />
       );
     }
