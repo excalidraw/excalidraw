@@ -103,12 +103,12 @@
     "share": "اشتراک‌گذاری",
     "showStroke": "",
     "showBackground": "",
-    "toggleTheme": ""
+    "toggleTheme": "تغییر تم"
   },
   "buttons": {
     "clearReset": "پاکسازی بوم نقاشی",
     "exportJSON": "",
-    "exportImage": "",
+    "exportImage": "ذخیره به عنوان عکس",
     "export": "تبدیل",
     "exportToPng": "تبدیل به PNG",
     "exportToSvg": "تبدیل به SVG",
@@ -222,10 +222,10 @@
     "title": "خطا"
   },
   "exportDialog": {
-    "disk_title": "",
+    "disk_title": "ذخیره در دیسک",
     "disk_details": "",
-    "disk_button": "",
-    "link_title": "",
+    "disk_button": "ذخیره در فایل",
+    "link_title": "لینک قابل اشتراک‌گذاری",
     "link_details": "",
     "link_button": "",
     "excalidrawplus_description": "",
@@ -234,12 +234,12 @@
   },
   "helpDialog": {
     "blog": "بلاگ ما را بخوانید",
-    "click": "",
+    "click": "کلیک",
     "curvedArrow": "فلش خمیده",
     "curvedLine": "منحنی",
     "documentation": "مستندات",
-    "doubleClick": "",
-    "drag": "",
+    "doubleClick": "دابل کلیک",
+    "drag": "کشیدن",
     "editor": "ویرایشگر",
     "editSelectedShape": "",
     "github": "اشکالی می بینید؟ گزارش دهید",
@@ -269,18 +269,18 @@
     "storage": "حافظه",
     "title": "آمار برای نردها",
     "total": "مجموع",
-    "version": "",
-    "versionCopy": "",
+    "version": "نسخه",
+    "versionCopy": "برای کپی کردن کلیک کنید",
     "versionNotAvailable": "",
     "width": "عرض"
   },
   "toast": {
     "copyStyles": "کپی سبک.",
-    "copyToClipboard": "",
+    "copyToClipboard": "در کلیپ‌بورد کپی شد.",
     "copyToClipboardAsPng": "",
     "fileSaved": "فایل ذخیره شد.",
     "fileSavedToFilename": "",
-    "canvas": "",
-    "selection": ""
+    "canvas": "بوم",
+    "selection": "انتخاب"
   }
 }
