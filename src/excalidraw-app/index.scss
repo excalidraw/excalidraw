@@ -2,7 +2,9 @@
   .layer-ui__wrapper__footer-center {
     display: flex;
     justify-content: space-between;
-    margin: auto 0;
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-inline-start: auto;
   }
 
   .encrypted-icon {

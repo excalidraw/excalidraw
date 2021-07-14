@@ -658,10 +658,16 @@ const LayerUI = ({
                   zoom={appState.zoom}
                 />
               </Island>
-              <div className="undo-redo-buttons">
-                {actionManager.renderAction("undo", { size: "s" })}
-                {actionManager.renderAction("redo", { size: "s" })}
-              </div>
+              {!viewModeEnabled && (
+                <div
+                  className={clsx("undo-redo-buttons zen-mode-transition", {
+                    "layer-ui__wrapper__footer-left--transition-bottom": zenModeEnabled,
+                  })}
+                >
+                  {actionManager.renderAction("undo", { size: "s" })}
+                  {actionManager.renderAction("redo", { size: "s" })}
+                </div>
+              )}
             </Section>
           </Stack.Col>
         </div>
