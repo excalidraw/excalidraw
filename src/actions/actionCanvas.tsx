@@ -108,7 +108,7 @@ export const actionZoomIn = register({
       onClick={() => {
         updateData(null);
       }}
-      size="s"
+      size="small"
     />
   ),
   keyTest: (event) =>
@@ -143,7 +143,7 @@ export const actionZoomOut = register({
       onClick={() => {
         updateData(null);
       }}
-      size="s"
+      size="small"
     />
   ),
   keyTest: (event) =>
@@ -179,7 +179,7 @@ export const actionResetZoom = register({
       onClick={() => {
         updateData(null);
       }}
-      size="s"
+      size="small"
     >
       {(appState.zoom.value * 100).toFixed(0)}%
     </ToolButton>

@@ -664,8 +664,8 @@ const LayerUI = ({
                     "layer-ui__wrapper__footer-left--transition-bottom": zenModeEnabled,
                   })}
                 >
-                  {actionManager.renderAction("undo", { size: "s" })}
-                  {actionManager.renderAction("redo", { size: "s" })}
+                  {actionManager.renderAction("undo", { size: "small" })}
+                  {actionManager.renderAction("redo", { size: "small" })}
                 </div>
               )}
             </Section>

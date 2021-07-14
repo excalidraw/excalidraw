@@ -68,7 +68,7 @@ export const actionChangeExportScale = register({
           return (
             <ToolButton
               key={s}
-              size="s"
+              size="small"
               type="radio"
               icon={`${s}x`}
               name="export-canvas-scale"

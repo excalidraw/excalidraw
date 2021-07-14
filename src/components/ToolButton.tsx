@@ -4,7 +4,7 @@ import React from "react";
 import clsx from "clsx";
 import { useExcalidrawContainer } from "./App";
 
-type ToolIconSize = "s" | "m";
+export type ToolButtonSize = "small" | "medium";
 
 type ToolButtonBaseProps = {
   icon?: React.ReactNode;
@@ -15,7 +15,7 @@ type ToolButtonBaseProps = {
   title?: string;
   name?: string;
   id?: string;
-  size?: ToolIconSize;
+  size?: ToolButtonSize;
   keyBindingLabel?: string;
   showAriaLabel?: boolean;
   hidden?: boolean;
@@ -41,7 +41,7 @@ type ToolButtonProps =
       onChange?(): void;
     });
 
-const DEFAULT_SIZE: ToolIconSize = "m";
+const DEFAULT_SIZE: ToolButtonSize = "medium";
 
 export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
   const { id: excalId } = useExcalidrawContainer();

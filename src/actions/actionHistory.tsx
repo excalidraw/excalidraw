@@ -75,7 +75,7 @@ export const createUndoAction: ActionCreator = (history) => ({
       icon={undo}
       aria-label={t("buttons.undo")}
       onClick={updateData}
-      size={data?.size || "m"}
+      size={data?.size || "medium"}
     />
   ),
   commitToHistory: () => false,
@@ -96,7 +96,7 @@ export const createRedoAction: ActionCreator = (history) => ({
       icon={redo}
       aria-label={t("buttons.redo")}
       onClick={updateData}
-      size={data?.size || "m"}
+      size={data?.size || "medium"}
     />
   ),
   commitToHistory: () => false,

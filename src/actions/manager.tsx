@@ -5,6 +5,7 @@ import {
   UpdaterFn,
   ActionName,
   ActionResult,
+  PanelComponentProps,
 } from "./types";
 import { ExcalidrawElement } from "../element/types";
 import { AppProps, AppState } from "../types";
@@ -110,7 +111,7 @@ export class ActionManager implements ActionsManagerInterface {
   /**
    * @param data additional data sent to the PanelComponent
    */
-  renderAction = (name: ActionName, data?: Record<string, any>) => {
+  renderAction = (name: ActionName, data?: PanelComponentProps["data"]) => {
     const canvasActions = this.app.props.UIOptions.canvasActions;
 
     if (
