@@ -2,21 +2,19 @@ import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 import { exportCanvas } from ".";
 import { getNonDeletedElements } from "../element";
+import { getFileHandleType, isImageFileHandleType } from "./blob";
 
 export const resaveAsImageWithScene = async (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ) => {
-  const {
-    saveType,
-    exportBackground,
-    viewBackgroundColor,
-    name,
-    fileHandle,
-  } = appState;
-  if (!saveType || !fileHandle) {
+  const { exportBackground, viewBackgroundColor, name, fileHandle } = appState;
+
+  const fileHandleType = getFileHandleType(fileHandle);
+
+  if (!fileHandle || !isImageFileHandleType(fileHandleType)) {
     throw new Error(
-      "fileHandle should exist and saveType should be svg or png when resaving",
+      "fileHandle should exist and should be of type svg or png when resaving",
     );
   }
   appState = {
@@ -24,12 +22,17 @@ export const resaveAsImageWithScene = async (
     exportEmbedScene: true,
   };
 
-  await exportCanvas(saveType, getNonDeletedElements(elements), appState, {
-    exportBackground,
-    viewBackgroundColor,
-    name,
-    fileHandle,
-  });
+  await exportCanvas(
+    fileHandleType,
+    getNonDeletedElements(elements),
+    appState,
+    {
+      exportBackground,
+      viewBackgroundColor,
+      name,
+      fileHandle,
+    },
+  );
 
   return { fileHandle };
 };

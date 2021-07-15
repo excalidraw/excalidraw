@@ -25,8 +25,6 @@ export interface Scene {
   elements: ExcalidrawTextElement[];
 }
 
-export type SaveType = "png" | "svg";
-
 export type ExportType =
   | "png"
   | "clipboard"
