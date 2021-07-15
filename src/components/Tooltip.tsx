@@ -75,7 +75,6 @@ export const Tooltip = ({ children, label, long = false }: TooltipProps) => {
   return (
     <div
       className="excalidraw-tooltip-wrapper"
-      style={{ display: "flex" }}
       onPointerEnter={(event) =>
         updateTooltip(
           event.currentTarget as HTMLDivElement,
