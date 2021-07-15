@@ -118,7 +118,7 @@ export const actionChangeExportEmbedScene = register({
     >
       {t("labels.exportEmbedScene")}
       <Tooltip label={t("labels.exportEmbedScene_details")} long={true}>
-        <div className="Tooltip-icon">{questionCircle}</div>
+        <div className="excalidraw-tooltip-icon">{questionCircle}</div>
       </Tooltip>
     </CheckboxItem>
   ),
