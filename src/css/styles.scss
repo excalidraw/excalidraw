@@ -461,7 +461,8 @@
   }
 
   .undo-redo-buttons {
-    display: flex;
+    display: grid;
+    grid-auto-flow: column;
     gap: 0.4em;
     margin-top: auto;
     margin-bottom: auto;
