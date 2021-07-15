@@ -29,6 +29,7 @@
 // wraps the element we want to apply the tooltip to
 .excalidraw-tooltip-wrapper {
   display: flex;
+  height: 100%;
 }
 
 .excalidraw-tooltip-icon {
