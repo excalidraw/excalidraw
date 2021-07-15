@@ -41,13 +41,11 @@ type ToolButtonProps =
       onChange?(): void;
     });
 
-const DEFAULT_SIZE: ToolButtonSize = "medium";
-
 export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
   const { id: excalId } = useExcalidrawContainer();
   const innerRef = React.useRef(null);
   React.useImperativeHandle(ref, () => innerRef.current);
-  const sizeCn = `ToolIcon_size_${props.size || DEFAULT_SIZE}`;
+  const sizeCn = `ToolIcon_size_${props.size}`;
 
   if (props.type === "button" || props.type === "icon") {
     return (
@@ -118,4 +116,5 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
 ToolButton.defaultProps = {
   visible: true,
   className: "",
+  size: "medium",
 };
