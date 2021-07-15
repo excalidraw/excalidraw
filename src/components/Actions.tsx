@@ -207,9 +207,6 @@ export const ZoomActions = ({
       {renderAction("zoomIn")}
       {renderAction("zoomOut")}
       {renderAction("resetZoom")}
-      <div style={{ marginInlineStart: 4 }}>
-        {(zoom.value * 100).toFixed(0)}%
-      </div>
     </Stack.Row>
   </Stack.Col>
 );

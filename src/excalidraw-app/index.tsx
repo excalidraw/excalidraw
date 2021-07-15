@@ -348,11 +348,8 @@ const ExcalidrawWrapper = () => {
 
       const renderLanguageList = () => (
         <LanguageList
-          onChange={(langCode) => {
-            setLangCode(langCode);
-          }}
+          onChange={(langCode) => setLangCode(langCode)}
           languages={languages}
-          floating={!isMobile}
           currentLangCode={langCode}
         />
       );
