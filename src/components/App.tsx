@@ -59,7 +59,6 @@ import {
   MQ_MAX_WIDTH_PORTRAIT,
   POINTER_BUTTON,
   SCROLL_TIMEOUT,
-  TAP_TWICE_TIMEOUT,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
   TOUCH_CTX_MENU_TIMEOUT,
   URL_HASH_KEYS,
@@ -205,8 +204,6 @@ const ExcalidrawContainerContext = React.createContext<{
 export const useExcalidrawContainer = () =>
   useContext(ExcalidrawContainerContext);
 
-let didTapTwice: boolean = false;
-let tappedTwiceTimer = 0;
 let cursorX = 0;
 let cursorY = 0;
 let isHoldingSpace: boolean = false;
@@ -1125,32 +1122,7 @@ class App extends React.Component<AppProps, AppState> {
     copyToClipboard(this.scene.getElements(), this.state);
   };
 
-  private static resetTapTwice() {
-    didTapTwice = false;
-  }
-
   private onTapStart = (event: TouchEvent) => {
-    if (!didTapTwice) {
-      didTapTwice = true;
-      clearTimeout(tappedTwiceTimer);
-      tappedTwiceTimer = window.setTimeout(
-        App.resetTapTwice,
-        TAP_TWICE_TIMEOUT,
-      );
-      return;
-    }
-    // insert text only if we tapped twice with a single finger
-    // event.touches.length === 1 will also prevent inserting text when user's zooming
-    if (didTapTwice && event.touches.length === 1) {
-      const [touch] = event.touches;
-      // @ts-ignore
-      this.handleCanvasDoubleClick({
-        clientX: touch.clientX,
-        clientY: touch.clientY,
-      });
-      didTapTwice = false;
-      clearTimeout(tappedTwiceTimer);
-    }
     event.preventDefault();
     if (event.touches.length === 2) {
       this.setState({
@@ -1863,6 +1835,7 @@ class App extends React.Component<AppProps, AppState> {
     sceneX,
     sceneY,
     insertAtParentCenter = true,
+    createTextIfNotExists = true,
   }: {
     /** X position to insert text at */
     sceneX: number;
@@ -1870,8 +1843,13 @@ class App extends React.Component<AppProps, AppState> {
     sceneY: number;
     /** whether to attempt to insert at element center if applicable */
     insertAtParentCenter?: boolean;
+    createTextIfNotExists?: boolean;
   }) => {
     const existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
+
+    if (!existingTextElement && !createTextIfNotExists) {
+      return;
+    }
 
     const parentCenterPosition =
       insertAtParentCenter &&
@@ -1944,7 +1922,11 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private handleCanvasDoubleClick = (
-    event: React.MouseEvent<HTMLCanvasElement>,
+    event: Pick<
+      React.PointerEvent<HTMLCanvasElement>,
+      "clientX" | "clientY" | "ctrlKey" | "metaKey" | "altKey"
+    >,
+    createTextIfNotExists = true,
   ) => {
     // case: double-clicking with arrow/line tool selected would both create
     // text and enter multiElement mode
@@ -2015,6 +1997,7 @@ class App extends React.Component<AppProps, AppState> {
         sceneX,
         sceneY,
         insertAtParentCenter: !event.altKey,
+        createTextIfNotExists,
       });
     }
   };
@@ -2278,6 +2261,8 @@ class App extends React.Component<AppProps, AppState> {
 
     this.maybeOpenContextMenuAfterPointerDownOnTouchDevices(event);
     this.maybeCleanupAfterMissingPointerUp(event);
+
+    document.querySelector("textarea")?.blur();
 
     if (isPanning) {
       return;
@@ -3177,7 +3162,7 @@ class App extends React.Component<AppProps, AppState> {
         const selectedElements = getSelectedElements(
           this.scene.getElements(),
           this.state,
-        );
+        ).filter((element) => element.id !== this.state.editingElement?.id);
         // prevent dragging even if we're no longer holding cmd/ctrl otherwise
         // it would have weird results (stuff jumping all over the screen)
         if (selectedElements.length > 0 && !pointerDownState.withCmdOrCtrl) {
