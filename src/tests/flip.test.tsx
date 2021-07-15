@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { render } from "./test-utils";
 import App from "../components/App";
+import { defaultLang, setLanguage } from "../i18n";
 import { UI, Pointer } from "./helpers/ui";
 import { API } from "./helpers/api";
 import { actionFlipHorizontal, actionFlipVertical } from "../actions";
@@ -15,7 +16,7 @@ beforeEach(async () => {
   ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
   mouse.reset();
 
-  //await setLanguage(defaultLang);
+  await setLanguage(defaultLang);
   await render(<App />);
 });
 
