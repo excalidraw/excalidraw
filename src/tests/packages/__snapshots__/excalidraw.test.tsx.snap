@@ -25,7 +25,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should not hide an
       >
         <button
           aria-label="Reset the canvas"
-          class="ToolIcon_type_button ToolIcon_size_m ToolIcon_type_button--show ToolIcon"
+          class="ToolIcon_type_button ToolIcon_size_medium ToolIcon_type_button--show ToolIcon"
           data-testid="clear-canvas-button"
           title="Reset the canvas"
           type="button"
@@ -53,7 +53,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should not hide an
         />
         <button
           aria-label="Load"
-          class="ToolIcon_type_button ToolIcon_size_m ToolIcon_type_button--show ToolIcon"
+          class="ToolIcon_type_button ToolIcon_size_medium ToolIcon_type_button--show ToolIcon"
           data-testid="load-button"
           title="Load"
           type="button"
@@ -78,7 +78,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should not hide an
         </button>
         <button
           aria-label="Export"
-          class="ToolIcon_type_button ToolIcon_size_m ToolIcon_type_button--show ToolIcon"
+          class="ToolIcon_type_button ToolIcon_size_medium ToolIcon_type_button--show ToolIcon"
           data-testid="json-export-button"
           title="Export"
           type="button"
@@ -103,7 +103,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should not hide an
         </button>
         <button
           aria-label="Save as image"
-          class="ToolIcon_type_button ToolIcon_size_m ToolIcon_type_button--show ToolIcon"
+          class="ToolIcon_type_button ToolIcon_size_medium ToolIcon_type_button--show ToolIcon"
           data-testid="image-export-button"
           title="Save as image"
           type="button"
@@ -170,7 +170,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should not hide an
         >
           <button
             aria-label="Dark mode"
-            class="ToolIcon_type_button ToolIcon_size_m ToolIcon_type_button--show ToolIcon ToolIcon--plain"
+            class="ToolIcon_type_button ToolIcon_size_medium ToolIcon_type_button--show ToolIcon ToolIcon--plain"
             data-testid="toggle-dark-mode"
             title="Dark mode"
             type="button"
@@ -224,7 +224,7 @@ exports[`<Excalidraw/> Test UIOptions prop should not hide any UI element when t
       >
         <button
           aria-label="Reset the canvas"
-          class="ToolIcon_type_button ToolIcon_size_m ToolIcon_type_button--show ToolIcon"
+          class="ToolIcon_type_button ToolIcon_size_medium ToolIcon_type_button--show ToolIcon"
           data-testid="clear-canvas-button"
           title="Reset the canvas"
           type="button"
@@ -252,7 +252,7 @@ exports[`<Excalidraw/> Test UIOptions prop should not hide any UI element when t
         />
         <button
           aria-label="Load"
-          class="ToolIcon_type_button ToolIcon_size_m ToolIcon_type_button--show ToolIcon"
+          class="ToolIcon_type_button ToolIcon_size_medium ToolIcon_type_button--show ToolIcon"
           data-testid="load-button"
           title="Load"
           type="button"
@@ -277,7 +277,7 @@ exports[`<Excalidraw/> Test UIOptions prop should not hide any UI element when t
         </button>
         <button
           aria-label="Export"
-          class="ToolIcon_type_button ToolIcon_size_m ToolIcon_type_button--show ToolIcon"
+          class="ToolIcon_type_button ToolIcon_size_medium ToolIcon_type_button--show ToolIcon"
           data-testid="json-export-button"
           title="Export"
           type="button"
@@ -302,7 +302,7 @@ exports[`<Excalidraw/> Test UIOptions prop should not hide any UI element when t
         </button>
         <button
           aria-label="Save as image"
-          class="ToolIcon_type_button ToolIcon_size_m ToolIcon_type_button--show ToolIcon"
+          class="ToolIcon_type_button ToolIcon_size_medium ToolIcon_type_button--show ToolIcon"
           data-testid="image-export-button"
           title="Save as image"
           type="button"
@@ -369,7 +369,7 @@ exports[`<Excalidraw/> Test UIOptions prop should not hide any UI element when t
         >
           <button
             aria-label="Dark mode"
-            class="ToolIcon_type_button ToolIcon_size_m ToolIcon_type_button--show ToolIcon ToolIcon--plain"
+            class="ToolIcon_type_button ToolIcon_size_medium ToolIcon_type_button--show ToolIcon ToolIcon--plain"
             data-testid="toggle-dark-mode"
             title="Dark mode"
             type="button"

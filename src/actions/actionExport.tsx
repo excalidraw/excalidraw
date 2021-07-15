@@ -70,7 +70,7 @@ export const actionChangeExportScale = register({
           return (
             <ToolButton
               key={s}
-              size="s"
+              size="small"
               type="radio"
               icon={`${s}x`}
               name="export-canvas-scale"
@@ -120,7 +120,7 @@ export const actionChangeExportEmbedScene = register({
     >
       {t("labels.exportEmbedScene")}
       <Tooltip label={t("labels.exportEmbedScene_details")} long={true}>
-        <div className="Tooltip-icon">{questionCircle}</div>
+        <div className="excalidraw-tooltip-icon">{questionCircle}</div>
       </Tooltip>
     </CheckboxItem>
   ),

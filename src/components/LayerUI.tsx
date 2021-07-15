@@ -632,7 +632,9 @@ const LayerUI = ({
                       label={client.username || "Unknown user"}
                       key={clientId}
                     >
-                      {actionManager.renderAction("goToCollaborator", clientId)}
+                      {actionManager.renderAction("goToCollaborator", {
+                        id: clientId,
+                      })}
                     </Tooltip>
                   ))}
             </UserList>
@@ -665,6 +667,16 @@ const LayerUI = ({
                   zoom={appState.zoom}
                 />
               </Island>
+              {!viewModeEnabled && (
+                <div
+                  className={clsx("undo-redo-buttons zen-mode-transition", {
+                    "layer-ui__wrapper__footer-left--transition-bottom": zenModeEnabled,
+                  })}
+                >
+                  {actionManager.renderAction("undo", { size: "small" })}
+                  {actionManager.renderAction("redo", { size: "small" })}
+                </div>
+              )}
             </Section>
           </Stack.Col>
         </div>

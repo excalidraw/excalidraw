@@ -1,4 +1,6 @@
 @import "../css/variables.module";
+
+// container in body where the actual tooltip is appended to
 .excalidraw-tooltip {
   position: absolute;
   z-index: 1000;
@@ -24,16 +26,20 @@
   }
 }
 
-.excalidraw {
-  .Tooltip-icon {
-    width: 0.9em;
-    height: 0.9em;
-    margin-left: 5px;
-    margin-top: 1px;
-    display: flex;
+// wraps the element we want to apply the tooltip to
+.excalidraw-tooltip-wrapper {
+  display: flex;
+  height: 100%;
+}
 
-    @include isMobile {
-      display: none;
-    }
+.excalidraw-tooltip-icon {
+  width: 0.9em;
+  height: 0.9em;
+  margin-left: 5px;
+  margin-top: 1px;
+  display: flex;
+
+  @include isMobile {
+    display: none;
   }
 }

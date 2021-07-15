@@ -168,10 +168,9 @@ export const MobileMenu = ({
                           )
                           .map(([clientId, client]) => (
                             <React.Fragment key={clientId}>
-                              {actionManager.renderAction(
-                                "goToCollaborator",
-                                clientId,
-                              )}
+                              {actionManager.renderAction("goToCollaborator", {
+                                id: clientId,
+                              })}
                             </React.Fragment>
                           ))}
                       </UserList>
