@@ -17,6 +17,7 @@ import { getNewZoom } from "../scene/zoom";
 import { AppState, NormalizedZoomValue } from "../types";
 import { getShortcutKey } from "../utils";
 import { register } from "./register";
+import { Tooltip } from "../components/Tooltip";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -171,18 +172,20 @@ export const actionResetZoom = register({
     };
   },
   PanelComponent: ({ updateData, appState }) => (
-    <ToolButton
-      type="button"
-      className="reset-zoom-button"
-      title={t("buttons.resetZoom")}
-      aria-label={t("buttons.resetZoom")}
-      onClick={() => {
-        updateData(null);
-      }}
-      size="small"
-    >
-      {(appState.zoom.value * 100).toFixed(0)}%
-    </ToolButton>
+    <Tooltip label={t("buttons.resetZoom")}>
+      <ToolButton
+        type="button"
+        className="reset-zoom-button"
+        title={t("buttons.resetZoom")}
+        aria-label={t("buttons.resetZoom")}
+        onClick={() => {
+          updateData(null);
+        }}
+        size="small"
+      >
+        {(appState.zoom.value * 100).toFixed(0)}%
+      </ToolButton>
+    </Tooltip>
   ),
   keyTest: (event) =>
     (event.code === CODES.ZERO || event.code === CODES.NUM_ZERO) &&
