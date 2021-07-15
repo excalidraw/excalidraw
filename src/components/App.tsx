@@ -3827,6 +3827,17 @@ class App extends React.Component<AppProps, AppState> {
     try {
       const file = event.dataTransfer.files[0];
       if (file?.type === "image/png" || file?.type === "image/svg+xml") {
+        if (fsSupported) {
+          try {
+            // This will only work as of Chrome 86,
+            // but can be safely ignored on older releases.
+            const item = event.dataTransfer.items[0];
+            (file as any).handle = await (item as any).getAsFileSystemHandle();
+          } catch (error) {
+            console.warn(error.name, error.message);
+          }
+        }
+
         const { elements, appState } = await loadFromBlob(
           file,
           this.state,
