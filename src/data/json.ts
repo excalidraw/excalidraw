@@ -4,7 +4,7 @@ import { EXPORT_DATA_TYPES, EXPORT_SOURCE, MIME_TYPES } from "../constants";
 import { clearElementsForExport } from "../element";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
-import { loadFromBlob } from "./blob";
+import { isImageFileHandle, loadFromBlob } from "./blob";
 
 import {
   ExportedDataState,
@@ -44,7 +44,7 @@ export const saveAsJSON = async (
       description: "Excalidraw file",
       extensions: [".excalidraw"],
     },
-    appState.fileHandle,
+    isImageFileHandle(appState.fileHandle) ? null : appState.fileHandle,
   );
   return { fileHandle };
 };
