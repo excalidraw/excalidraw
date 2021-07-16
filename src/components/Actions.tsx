@@ -204,9 +204,9 @@ export const ZoomActions = ({
 }) => (
   <Stack.Col gap={1}>
     <Stack.Row gap={1} align="center">
-      {renderAction("zoomIn")}
       {renderAction("zoomOut")}
       {renderAction("resetZoom")}
+      {renderAction("zoomIn")}
     </Stack.Row>
   </Stack.Col>
 );

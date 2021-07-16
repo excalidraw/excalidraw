@@ -454,10 +454,12 @@
   }
 
   .reset-zoom-button {
-    padding: 0.2em;
+    min-width: 40px;
+    justify-content: center;
     background: transparent;
     color: var(--text-primary-color);
     font-family: var(--ui-font);
+    font-size: 0.9em;
   }
 
   .undo-redo-buttons {
