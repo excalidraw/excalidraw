@@ -5,11 +5,11 @@ import {
   NonDeleted,
   TextAlign,
   ExcalidrawElement,
-  FontFamily,
   GroupId,
   ExcalidrawBindableElement,
   Arrowhead,
   ChartType,
+  FontFamilyValues,
 } from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -68,7 +68,7 @@ export type AppState = {
   currentItemStrokeStyle: ExcalidrawElement["strokeStyle"];
   currentItemRoughness: number;
   currentItemOpacity: number;
-  currentItemFontFamily: FontFamily;
+  currentItemFontFamily: FontFamilyValues;
   currentItemFontSize: number;
   currentItemTextAlign: TextAlign;
   currentItemStrokeSharpness: ExcalidrawElement["strokeSharpness"];

@@ -1,21 +1,26 @@
 import {
   ExcalidrawElement,
-  FontFamily,
   ExcalidrawSelectionElement,
+  FontFamilyValues,
 } from "../element/types";
 import { AppState, NormalizedZoomValue } from "../types";
 import { ImportedDataState } from "./types";
-import { isInvisiblySmallElement, getNormalizedDimensions } from "../element";
+import {
+  getElementMap,
+  getNormalizedDimensions,
+  isInvisiblySmallElement,
+} from "../element";
 import { isLinearElementType } from "../element/typeChecks";
 import { randomId } from "../random";
 import {
-  FONT_FAMILY,
   DEFAULT_FONT_FAMILY,
   DEFAULT_TEXT_ALIGN,
   DEFAULT_VERTICAL_ALIGN,
+  FONT_FAMILY,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
 import { LinearElementEditor } from "../element/linearElementEditor";
+import { bumpVersion } from "../element/mutateElement";
 
 type RestoredAppState = Omit<
   AppState,
@@ -41,11 +46,11 @@ export type RestoredDataState = {
   appState: RestoredAppState;
 };
 
-const getFontFamilyByName = (fontFamilyName: string): FontFamily => {
-  for (const [id, fontFamilyString] of Object.entries(FONT_FAMILY)) {
-    if (fontFamilyString.includes(fontFamilyName)) {
-      return parseInt(id) as FontFamily;
-    }
+const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
+  if (Object.keys(FONT_FAMILY).includes(fontFamilyName)) {
+    return FONT_FAMILY[
+      fontFamilyName as keyof typeof FONT_FAMILY
+    ] as FontFamilyValues;
   }
   return DEFAULT_FONT_FAMILY;
 };
@@ -181,13 +186,20 @@ const restoreElement = (
 
 export const restoreElements = (
   elements: ImportedDataState["elements"],
+  /** NOTE doesn't serve for reconciliation */
+  localElements: readonly ExcalidrawElement[] | null | undefined,
 ): ExcalidrawElement[] => {
+  const localElementsMap = localElements ? getElementMap(localElements) : null;
   return (elements || []).reduce((elements, element) => {
     // filtering out selection, which is legacy, no longer kept in elements,
     // and causing issues if retained
     if (element.type !== "selection" && !isInvisiblySmallElement(element)) {
-      const migratedElement = restoreElement(element);
+      let migratedElement: ExcalidrawElement = restoreElement(element);
       if (migratedElement) {
+        const localElement = localElementsMap?.[element.id];
+        if (localElement && localElement.version > migratedElement.version) {
+          migratedElement = bumpVersion(migratedElement, localElement.version);
+        }
         elements.push(migratedElement);
       }
     }
@@ -197,25 +209,25 @@ export const restoreElements = (
 
 export const restoreAppState = (
   appState: ImportedDataState["appState"],
-  localAppState: Partial<AppState> | null,
+  localAppState: Partial<AppState> | null | undefined,
 ): RestoredAppState => {
   appState = appState || {};
 
   const defaultAppState = getDefaultAppState();
   const nextAppState = {} as typeof defaultAppState;
 
-  for (const [key, val] of Object.entries(defaultAppState) as [
+  for (const [key, defaultValue] of Object.entries(defaultAppState) as [
     keyof typeof defaultAppState,
     any,
   ][]) {
-    const restoredValue = appState[key];
+    const suppliedValue = appState[key];
     const localValue = localAppState ? localAppState[key] : undefined;
     (nextAppState as any)[key] =
-      restoredValue !== undefined
-        ? restoredValue
+      suppliedValue !== undefined
+        ? suppliedValue
         : localValue !== undefined
         ? localValue
-        : val;
+        : defaultValue;
   }
 
   return {
@@ -243,9 +255,10 @@ export const restore = (
    * Supply `null` if you can't get access to it.
    */
   localAppState: Partial<AppState> | null | undefined,
+  localElements: readonly ExcalidrawElement[] | null | undefined,
 ): RestoredDataState => {
   return {
-    elements: restoreElements(data?.elements),
+    elements: restoreElements(data?.elements, localElements),
     appState: restoreAppState(data?.appState, localAppState || null),
   };
 };

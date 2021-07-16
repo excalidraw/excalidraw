@@ -5,7 +5,7 @@ import {
   FONT_FAMILY,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
-import { FontFamily, FontString } from "./element/types";
+import { FontFamilyValues, FontString } from "./element/types";
 import { Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
 import { isDarwin } from "./keys";
@@ -71,9 +71,14 @@ export const isWritableElement = (
 export const getFontFamilyString = ({
   fontFamily,
 }: {
-  fontFamily: FontFamily;
+  fontFamily: FontFamilyValues;
 }) => {
-  return `${FONT_FAMILY[fontFamily]}, ${WINDOWS_EMOJI_FALLBACK_FONT}`;
+  for (const [fontFamilyString, id] of Object.entries(FONT_FAMILY)) {
+    if (id === fontFamily) {
+      return `${fontFamilyString}, ${WINDOWS_EMOJI_FALLBACK_FONT}`;
+    }
+  }
+  return WINDOWS_EMOJI_FALLBACK_FONT;
 };
 
 /** returns fontSize+fontFamily string for assignment to DOM elements */
@@ -82,7 +87,7 @@ export const getFontString = ({
   fontFamily,
 }: {
   fontSize: number;
-  fontFamily: FontFamily;
+  fontFamily: FontFamilyValues;
 }) => {
   return `${fontSize}px ${getFontFamilyString({ fontFamily })}` as FontString;
 };

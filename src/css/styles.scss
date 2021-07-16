@@ -414,22 +414,6 @@
     &:active {
       background-color: var(--button-gray-2);
     }
-
-    &.dropdown-select--floating {
-      margin: 0.5em;
-    }
-  }
-
-  .dropdown-select__language.dropdown-select--floating {
-    bottom: 10px;
-
-    :root[dir="ltr"] & {
-      right: 44px;
-    }
-
-    :root[dir="rtl"] & {
-      left: 44px;
-    }
   }
 
   .zIndexButton {
@@ -456,26 +440,33 @@
   }
 
   .help-icon {
+    display: flex;
     cursor: pointer;
     fill: $oc-gray-6;
     width: 1.5rem;
     padding: 0;
     margin: 0;
-    margin-top: 5px;
     background: none;
     color: var(--icon-fill-color);
-
     &:hover {
       background: none;
     }
+  }
 
-    :root[dir="ltr"] & {
-      margin-right: 14px;
-    }
+  .reset-zoom-button {
+    padding: 0.2em;
+    background: transparent;
+    color: var(--text-primary-color);
+    font-family: var(--ui-font);
+  }
 
-    :root[dir="rtl"] & {
-      margin-left: 14px;
-    }
+  .undo-redo-buttons {
+    display: grid;
+    grid-auto-flow: column;
+    gap: 0.4em;
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-inline-start: 0.6em;
   }
 
   @include isMobile {

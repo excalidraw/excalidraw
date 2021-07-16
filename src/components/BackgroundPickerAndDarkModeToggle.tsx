@@ -16,10 +16,5 @@ export const BackgroundPickerAndDarkModeToggle = ({
   <div style={{ display: "flex" }}>
     {actionManager.renderAction("changeViewBackgroundColor")}
     {showThemeBtn && actionManager.renderAction("toggleTheme")}
-    {appState.fileHandle && (
-      <div style={{ marginInlineStart: "0.25rem" }}>
-        {actionManager.renderAction("saveToActiveFile")}
-      </div>
-    )}
   </div>
 );

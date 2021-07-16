@@ -101,6 +101,8 @@
     "viewMode": "Náhled",
     "toggleExportColorScheme": "",
     "share": "Sdílet",
+    "showStroke": "",
+    "showBackground": "",
     "toggleTheme": "Přepnout tmavý řežim"
   },
   "buttons": {
@@ -178,6 +180,8 @@
     "linearElement": "",
     "freeDraw": "",
     "text": "",
+    "text_selected": "",
+    "text_editing": "",
     "linearElementMulti": "",
     "lockAngle": "",
     "resize": "",
@@ -223,7 +227,10 @@
     "disk_button": "",
     "link_title": "",
     "link_details": "",
-    "link_button": ""
+    "link_button": "",
+    "excalidrawplus_description": "",
+    "excalidrawplus_button": "",
+    "excalidrawplus_exportError": ""
   },
   "helpDialog": {
     "blog": "",
@@ -231,8 +238,10 @@
     "curvedArrow": "",
     "curvedLine": "",
     "documentation": "",
+    "doubleClick": "",
     "drag": "tažení",
     "editor": "",
+    "editSelectedShape": "",
     "github": "",
     "howto": "",
     "or": "nebo",

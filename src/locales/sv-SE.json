@@ -101,6 +101,8 @@
     "viewMode": "Visningsläge",
     "toggleExportColorScheme": "Växla färgschema för export",
     "share": "Dela",
+    "showStroke": "Visa färgväljare för linjefärg",
+    "showBackground": "Visa färgväljare för bakgrundsfärg",
     "toggleTheme": "Växla tema"
   },
   "buttons": {
@@ -178,6 +180,8 @@
     "linearElement": "Klicka för att starta flera punkter, dra för en linje",
     "freeDraw": "Klicka och dra, släpp när du är klar",
     "text": "Tips: du kan också lägga till text genom att dubbelklicka var som helst med markeringsverktyget",
+    "text_selected": "Dubbelklicka eller tryck ENTER för att redigera text",
+    "text_editing": "Tryck Escape eller CtrlOrCmd + ENTER för att slutföra redigeringen",
     "linearElementMulti": "Klicka på sista punkten eller tryck Escape eller Enter för att avsluta",
     "lockAngle": "Du kan begränsa vinkeln genom att hålla SKIFT",
     "resize": "Du kan behålla proportioner genom att hålla SHIFT medan du ändrar storlek,\nhåller du ALT ändras storlek relativt mitten",
@@ -223,7 +227,10 @@
     "disk_button": "Spara till fil",
     "link_title": "Delbar länk",
     "link_details": "Exportera som en skrivskyddad länk.",
-    "link_button": "Exportera till länk"
+    "link_button": "Exportera till länk",
+    "excalidrawplus_description": "Spara skissen till din Excalidraw+ arbetsyta.",
+    "excalidrawplus_button": "Exportera",
+    "excalidrawplus_exportError": "Det gick inte att exportera till Excalidraw+ just nu..."
   },
   "helpDialog": {
     "blog": "Läs vår blogg",
@@ -231,8 +238,10 @@
     "curvedArrow": "Böjd pil",
     "curvedLine": "Böjd linje",
     "documentation": "Dokumentation",
+    "doubleClick": "dubbelklicka",
     "drag": "dra",
     "editor": "Redigerare",
+    "editSelectedShape": "Redigera markerad form (text/pil/linje)",
     "github": "Hittat ett problem? Rapportera",
     "howto": "Följ våra guider",
     "or": "eller",
