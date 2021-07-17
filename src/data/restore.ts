@@ -19,6 +19,7 @@ import {
   FONT_FAMILY,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
+import { loadImage, convertStringToHash } from "../renderer/renderElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { bumpVersion } from "../element/mutateElement";
 
@@ -37,6 +38,7 @@ export const AllowedExcalidrawElementTypes: Record<
   diamond: true,
   ellipse: true,
   line: true,
+  image: true,
   arrow: true,
   freedraw: true,
 };
@@ -131,6 +133,16 @@ const restoreElement = (
         pressures: element.pressures,
       });
     }
+    case "image":
+      const imageData = element.imageData;
+      const imageId = convertStringToHash(imageData);
+
+      const result = restoreElementWithProperties(element, {
+        imageData,
+        imageId,
+      });
+      loadImage(result);
+      return result;
     case "line":
     // @ts-ignore LEGACY type
     // eslint-disable-next-line no-fallthrough

@@ -5,6 +5,7 @@ import {
   Arrowhead,
   NonDeletedExcalidrawElement,
   ExcalidrawFreeDrawElement,
+  ExcalidrawImageElement,
 } from "../element/types";
 import {
   isTextElement,
@@ -30,10 +31,12 @@ import {
 } from "../utils";
 import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
+import Scene from "../scene/Scene";
 import { Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
 import getFreeDrawShape from "perfect-freehand";
 import { MAX_DECIMALS_FOR_SVG_EXPORT } from "../constants";
+import * as crypto from "crypto";
 
 const defaultAppState = getDefaultAppState();
 
@@ -122,6 +125,43 @@ const generateElementCanvas = (
   };
 };
 
+const drawImagePlaceholder = (
+  element: NonDeletedExcalidrawElement,
+  rc: RoughCanvas,
+  context: CanvasRenderingContext2D,
+) => {
+  const opts = generateRoughOptions(element);
+  opts.fillStyle = "cross-hatch";
+  opts.fill = "#868e96";
+  const shape = rc.generator.rectangle(
+    0,
+    0,
+    element.width,
+    element.height,
+    opts,
+  );
+  rc.draw(shape);
+
+  //draw ??? in the middle
+  const text = "???";
+  const lineHeight = 20;
+  const lineWidth = 50;
+  context.canvas.setAttribute("dir", "ltr");
+  const font = context.font;
+  context.font = getFontString({ fontSize: 32, fontFamily: 2 });
+  const fillStyle = context.fillStyle;
+  context.fillStyle = "#FF0000";
+  context.fillText(
+    text,
+    (element.width - lineWidth) / 2,
+    (element.height + lineHeight) / 2,
+  );
+
+  //revert
+  context.fillStyle = fillStyle;
+  context.font = font;
+};
+
 const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
@@ -158,6 +198,21 @@ const drawElementOnCanvas = (
       context.fill(path);
 
       context.restore();
+      break;
+    }
+    case "image": {
+      const img = getImage(element);
+      if (img != null) {
+        context.drawImage(
+          img,
+          0 /* hardcoded for the selection box*/,
+          0,
+          element.width,
+          element.height,
+        );
+      } else {
+        drawImagePlaceholder(element, rc, context);
+      }
       break;
     }
     default: {
@@ -214,6 +269,30 @@ const shapeCache = new WeakMap<
   Drawable | Drawable[] | null
 >();
 
+const imageCache = new Map<string, HTMLImageElement | null>();
+
+export const convertStringToHash = (data: string) =>
+  crypto.createHash("md5").update(data).digest("hex");
+
+export const getImage = (element: ExcalidrawImageElement) =>
+  imageCache.get(element.imageId);
+
+export const loadImage = async (element: ExcalidrawImageElement) => {
+  const imageId = element.imageId;
+  const imageHTMLElement = imageCache.get(imageId);
+  if (imageHTMLElement == null) {
+    const image = new Image();
+    image.onload = () => {
+      //TODO: count how many images has been loaded
+      //TODO: limit the size of the imageCache
+      invalidateShapeForElement(element);
+      Scene.getScene(element)?.informMutation();
+    };
+    image.src = element.imageData;
+    imageCache.set(imageId, image);
+  }
+};
+
 export const getShapeForElement = (element: ExcalidrawElement) =>
   shapeCache.get(element);
 
@@ -254,6 +333,7 @@ export const generateRoughOptions = (
   switch (element.type) {
     case "rectangle":
     case "diamond":
+    case "image":
     case "ellipse": {
       options.fillStyle = element.fillStyle;
       options.fill =
@@ -300,6 +380,7 @@ const generateElementShape = (
 
     switch (element.type) {
       case "rectangle":
+        // case "image":
         if (element.strokeSharpness === "round") {
           const w = element.width;
           const h = element.height;
@@ -464,6 +545,11 @@ const generateElementShape = (
         shape = [];
         break;
       }
+      case "image": {
+        // just to ensure we don't regenerate element.canvas on rerenders
+        shape = [];
+        break;
+      }
     }
     shapeCache.set(element, shape);
   }
@@ -578,6 +664,7 @@ export const renderElement = (
     case "ellipse":
     case "line":
     case "arrow":
+    case "image":
     case "text": {
       generateElementShape(element, generator);
       if (renderOptimizations) {

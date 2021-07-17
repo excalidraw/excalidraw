@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
 import clsx from "clsx";
-import { supported as fsSupported } from "browser-fs-access";
+import { fileOpen, supported as fsSupported } from "browser-fs-access";
 import { nanoid } from "nanoid";
 
 import {
@@ -91,6 +91,7 @@ import {
   newElement,
   newLinearElement,
   newTextElement,
+  newImageElement,
   textWysiwyg,
   transformElements,
   updateTextElement,
@@ -123,6 +124,7 @@ import {
   ExcalidrawFreeDrawElement,
   ExcalidrawGenericElement,
   ExcalidrawLinearElement,
+  ExcalidrawImageElement,
   ExcalidrawTextElement,
   NonDeleted,
 } from "../element/types";
@@ -148,7 +150,11 @@ import {
 } from "../keys";
 import { distance2d, getGridPoint, isPathALoop } from "../math";
 import { renderScene } from "../renderer";
-import { invalidateShapeForElement } from "../renderer/renderElement";
+import {
+  invalidateShapeForElement,
+  convertStringToHash,
+  loadImage,
+} from "../renderer/renderElement";
 import {
   calculateScrollCenter,
   getElementContainingPosition,
@@ -2335,6 +2341,12 @@ class App extends React.Component<AppProps, AppState> {
         this.state.elementType,
         pointerDownState,
       );
+    } else if (this.state.elementType === "image") {
+      this.handleImageElementOnPointerDown(
+        event,
+        this.state.elementType,
+        pointerDownState,
+      );
     } else if (this.state.elementType === "freedraw") {
       this.handleFreeDrawElementOnPointerDown(
         event,
@@ -2904,6 +2916,41 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
+  private handleImageElementOnPointerDown = (
+    event: React.PointerEvent<HTMLCanvasElement>,
+    elementType: ExcalidrawImageElement["type"],
+    pointerDownState: PointerDownState,
+  ): void => {
+    const [gridX, gridY] = getGridPoint(
+      pointerDownState.origin.x,
+      pointerDownState.origin.y,
+      this.state.gridSize,
+    );
+
+    const element = newImageElement({
+      type: elementType,
+      x: gridX,
+      y: gridY,
+      strokeColor: this.state.currentItemStrokeColor,
+      backgroundColor: this.state.currentItemBackgroundColor,
+      fillStyle: this.state.currentItemFillStyle,
+      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeStyle: this.state.currentItemStrokeStyle,
+      roughness: this.state.currentItemRoughness,
+      opacity: this.state.currentItemOpacity,
+      strokeSharpness: this.state.currentItemLinearStrokeSharpness,
+    });
+    this.scene.replaceAllElements([
+      ...this.scene.getElementsIncludingDeleted(),
+      element,
+    ]);
+    this.setState({
+      draggingElement: element,
+      editingElement: element,
+      multiElement: null,
+    });
+  };
+
   private handleLinearElementOnPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
     elementType: ExcalidrawLinearElement["type"],
@@ -3403,7 +3450,7 @@ class App extends React.Component<AppProps, AppState> {
   private onPointerUpFromPointerDownHandler(
     pointerDownState: PointerDownState,
   ): (event: PointerEvent) => void {
-    return withBatchedUpdates((childEvent: PointerEvent) => {
+    return withBatchedUpdates(async (childEvent: PointerEvent) => {
       const {
         draggingElement,
         resizingElement,
@@ -3490,10 +3537,33 @@ class App extends React.Component<AppProps, AppState> {
           pressures,
         });
 
+
+
         this.actionManager.executeAction(actionFinalize);
 
         return;
       }
+if (draggingElement?.type === "image") {
+const selectedFile = await fileOpen({
+description: "Image",
+extensions: [".jpg", ".jpeg", ".png"],
+mimeTypes: ["image/jpeg", "image/png"],
+});
+
+const reader = new FileReader();
+reader.onload = () => {
+const imageData = reader.result as string;
+const imageId = convertStringToHash(imageData);
+mutateElement(draggingElement, {
+imageData,
+imageId,
+});
+loadImage(draggingElement);
+this.actionManager.executeAction(actionFinalize);
+};
+reader.readAsDataURL(selectedFile);
+return;
+}
 
       if (isLinearElement(draggingElement)) {
         if (draggingElement!.points.length > 1) {
