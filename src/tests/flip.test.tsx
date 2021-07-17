@@ -17,7 +17,7 @@ beforeEach(async () => {
   mouse.reset();
 
   await setLanguage(defaultLang);
-  render(<App />);
+  await render(<App />);
 });
 
 const createAndSelectOneRectangle = (angle: number = 0) => {

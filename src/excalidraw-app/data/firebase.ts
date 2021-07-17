@@ -196,5 +196,5 @@ export const loadFromFirebase = async (
     firebaseSceneVersionCache.set(socket, getSceneVersion(elements));
   }
 
-  return restoreElements(elements);
+  return restoreElements(elements, null);
 };

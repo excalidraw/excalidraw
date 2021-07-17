@@ -1,6 +1,8 @@
+import { FileSystemHandle } from "browser-fs-access";
 import { cleanAppStateForExport } from "../appState";
 import { EXPORT_DATA_TYPES } from "../constants";
 import { clearElementsForExport } from "../element";
+import { ExcalidrawElement } from "../element/types";
 import { CanvasError } from "../errors";
 import { t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
@@ -79,10 +81,30 @@ export const getMimeType = (blob: Blob | string): string => {
   return "";
 };
 
+export const getFileHandleType = (handle: FileSystemHandle | null) => {
+  if (!handle) {
+    return null;
+  }
+
+  return handle.name.match(/\.(json|excalidraw|png|svg)$/)?.[1] || null;
+};
+
+export const isImageFileHandleType = (
+  type: string | null,
+): type is "png" | "svg" => {
+  return type === "png" || type === "svg";
+};
+
+export const isImageFileHandle = (handle: FileSystemHandle | null) => {
+  const type = getFileHandleType(handle);
+  return type === "png" || type === "svg";
+};
+
 export const loadFromBlob = async (
   blob: Blob,
   /** @see restore.localAppState */
   localAppState: AppState | null,
+  localElements: readonly ExcalidrawElement[] | null,
 ) => {
   const contents = await parseFileContents(blob);
   try {
@@ -95,7 +117,7 @@ export const loadFromBlob = async (
         elements: clearElementsForExport(data.elements || []),
         appState: {
           theme: localAppState?.theme,
-          fileHandle: (!blob.type.startsWith("image/") && blob.handle) || null,
+          fileHandle: blob.handle || null,
           ...cleanAppStateForExport(data.appState || {}),
           ...(localAppState
             ? calculateScrollCenter(data.elements || [], localAppState, null)
@@ -103,6 +125,7 @@ export const loadFromBlob = async (
         },
       },
       localAppState,
+      localElements,
     );
 
     return result;

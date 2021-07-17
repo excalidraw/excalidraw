@@ -141,7 +141,7 @@ const initializeScene = async (opts: {
     const url = externalUrlMatch[1];
     try {
       const request = await fetch(window.decodeURIComponent(url));
-      const data = await loadFromBlob(await request.blob(), null);
+      const data = await loadFromBlob(await request.blob(), null, null);
       if (
         !scene.elements.length ||
         window.confirm(t("alerts.loadSceneOverridePrompt"))
@@ -348,11 +348,8 @@ const ExcalidrawWrapper = () => {
 
       const renderLanguageList = () => (
         <LanguageList
-          onChange={(langCode) => {
-            setLangCode(langCode);
-          }}
+          onChange={(langCode) => setLangCode(langCode)}
           languages={languages}
-          floating={!isMobile}
           currentLangCode={langCode}
         />
       );

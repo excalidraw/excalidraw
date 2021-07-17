@@ -1,3 +1,4 @@
+import React from "react";
 import clsx from "clsx";
 import { t } from "../i18n";
 import { AppState } from "../types";
@@ -20,7 +21,7 @@ export const LibraryButton: React.FC<{
     <label
       className={clsx(
         "ToolIcon ToolIcon_type_floating ToolIcon__library zen-mode-visibility",
-        `ToolIcon_size_m`,
+        `ToolIcon_size_medium`,
         {
           "zen-mode-visibility--hidden": appState.zenModeEnabled,
         },

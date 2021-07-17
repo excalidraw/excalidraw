@@ -1,4 +1,4 @@
-import { fileSave } from "browser-fs-access";
+import { fileSave, FileSystemHandle } from "browser-fs-access";
 import {
   copyBlobToClipboardAsPng,
   copyTextToSystemClipboard,
@@ -24,40 +24,38 @@ export const exportCanvas = async (
     exportPadding = DEFAULT_EXPORT_PADDING,
     viewBackgroundColor,
     name,
+    fileHandle = null,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
     name: string;
+    fileHandle?: FileSystemHandle | null;
   },
 ) => {
   if (elements.length === 0) {
     throw new Error(t("alerts.cannotExportEmptyCanvas"));
   }
   if (type === "svg" || type === "clipboard-svg") {
-    const tempSvg = exportToSvg(elements, {
+    const tempSvg = await exportToSvg(elements, {
       exportBackground,
       exportWithDarkMode: appState.exportWithDarkMode,
       viewBackgroundColor,
       exportPadding,
       exportScale: appState.exportScale,
-      metadata:
-        appState.exportEmbedScene && type === "svg"
-          ? await (
-              await import(/* webpackChunkName: "image" */ "./image")
-            ).encodeSvgMetadata({
-              text: serializeAsJSON(elements, appState),
-            })
-          : undefined,
+      exportEmbedScene: appState.exportEmbedScene && type === "svg",
     });
     if (type === "svg") {
-      await fileSave(new Blob([tempSvg.outerHTML], { type: "image/svg+xml" }), {
-        fileName: `${name}.svg`,
-        extensions: [".svg"],
-      });
-      return;
+      return await fileSave(
+        new Blob([tempSvg.outerHTML], { type: "image/svg+xml" }),
+        {
+          fileName: `${name}.svg`,
+          extensions: [".svg"],
+        },
+        fileHandle,
+      );
     } else if (type === "clipboard-svg") {
-      copyTextToSystemClipboard(tempSvg.outerHTML);
+      await copyTextToSystemClipboard(tempSvg.outerHTML);
       return;
     }
   }
@@ -83,10 +81,14 @@ export const exportCanvas = async (
       });
     }
 
-    await fileSave(blob, {
-      fileName,
-      extensions: [".png"],
-    });
+    return await fileSave(
+      blob,
+      {
+        fileName,
+        extensions: [".png"],
+      },
+      fileHandle,
+    );
   } else if (type === "clipboard") {
     try {
       await copyBlobToClipboardAsPng(blob);

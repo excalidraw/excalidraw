@@ -67,11 +67,9 @@ const renderTextElementText = (
 ) => {
   const rtl = isRTL(element.text);
   context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
-  const font = context.font;
+  context.save();
   context.font = getFontString(element);
-  const fillStyle = context.fillStyle;
   context.fillStyle = element.strokeColor;
-  const textAlign = context.textAlign;
   context.textAlign = element.textAlign as CanvasTextAlign;
 
   // Canvas does not support multiline text by default
@@ -91,9 +89,7 @@ const renderTextElementText = (
       (index + 1) * lineHeight - verticalOffset,
     );
   }
-  context.fillStyle = fillStyle;
-  context.font = font;
-  context.textAlign = textAlign;
+  context.restore();
 };
 
 const renderSvgTextElementText = (
