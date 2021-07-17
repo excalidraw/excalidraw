@@ -190,11 +190,13 @@ export const renderScene = (
     // doesn't guarantee pixel-perfect output.
     renderOptimizations = false,
     renderGrid = true,
+    refresh = () => {},
   }: {
     renderScrollbars?: boolean;
     renderSelection?: boolean;
     renderOptimizations?: boolean;
     renderGrid?: boolean;
+    refresh?: () => void;
   } = {},
 ) => {
   if (canvas === null) {
@@ -269,7 +271,14 @@ export const renderScene = (
 
   visibleElements.forEach((element) => {
     try {
-      renderElement(element, rc, context, renderOptimizations, sceneState);
+      renderElement(
+        element,
+        rc,
+        context,
+        renderOptimizations,
+        sceneState,
+        refresh,
+      );
     } catch (error) {
       console.error(error);
     }

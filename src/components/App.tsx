@@ -78,6 +78,7 @@ import {
   getCursorForResizingElement,
   getDragOffsetXY,
   getElementWithTransformHandleType,
+  getNonDeletedElements,
   getNormalizedDimensions,
   getPerfectElementSize,
   getResizeArrowDirection,
@@ -195,6 +196,8 @@ import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
+import { getTextLikeActions, registerTextElementSubtypes } from "../textlike";
+import { redrawTextBoundingBox } from "../element/textElement";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
@@ -313,6 +316,31 @@ class App extends React.Component<AppProps, AppState> {
     };
 
     this.scene = new Scene();
+
+    // Call this method after finishing any async loading for
+    // subtypes of ExcalidrawTextElement if the newly loaded code
+    // would change the rendering.
+    const refresh = (isTextElementSubtype: Function) => {
+      const elements = this.scene.getElementsIncludingDeleted();
+      let refreshNeeded = false;
+      getNonDeletedElements(elements).forEach((element) => {
+        // If the text element is of the subtype that was just
+        // registered, update the element's dimensions, mark the
+        // element for a re-render, and mark the scene for a refresh.
+        if (isTextElementSubtype(element)) {
+          redrawTextBoundingBox(element as ExcalidrawTextElement);
+          invalidateShapeForElement(element);
+          refreshNeeded = true;
+        }
+      });
+      // If there are any text elements of the just-registered subtype,
+      // refresh the scene to re-render each such element.
+      if (refreshNeeded) {
+        this.setState({});
+      }
+    };
+    registerTextElementSubtypes(refresh);
+
     this.library = new Library(this);
     this.history = new History();
     this.actionManager = new ActionManager(
@@ -1023,6 +1051,9 @@ class App extends React.Component<AppProps, AppState> {
       );
       cursorButton[socketId] = user.button;
     });
+    const refresh = () => {
+      this.setState({});
+    };
     const elements = this.scene.getElements();
     const { atLeastOneVisibleElement, scrollBars } = renderScene(
       elements.filter((element) => {
@@ -1054,6 +1085,7 @@ class App extends React.Component<AppProps, AppState> {
       {
         renderOptimizations: true,
         renderScrollbars: !this.isMobile,
+        refresh,
       },
     );
     if (scrollBars) {
@@ -1312,6 +1344,7 @@ class App extends React.Component<AppProps, AppState> {
       fontFamily: this.state.currentItemFontFamily,
       textAlign: this.state.currentItemTextAlign,
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
+      subtype: "math",
     });
 
     this.scene.replaceAllElements([
@@ -1909,6 +1942,7 @@ class App extends React.Component<AppProps, AppState> {
           verticalAlign: parentCenterPosition
             ? "middle"
             : DEFAULT_VERTICAL_ALIGN,
+          subtype: "math",
         });
 
     this.setState({ editingElement: element });
@@ -4063,6 +4097,16 @@ class App extends React.Component<AppProps, AppState> {
       this.actionManager.getAppState(),
     );
 
+    const maybeUse: boolean[] = [];
+    getTextLikeActions().forEach((action) => {
+      maybeUse.push(
+        action.contextItemPredicate!(
+          this.actionManager.getElementsIncludingDeleted(),
+          this.actionManager.getAppState(),
+        ),
+      );
+    });
+
     const separator = "separator";
 
     const elements = this.scene.getElements();
@@ -4151,6 +4195,17 @@ class App extends React.Component<AppProps, AppState> {
         container: this.excalidrawContainerRef.current!,
       });
       return;
+    }
+
+    let firstAdded = true;
+    for (let ind = 0; ind < maybeUse.length; ind++) {
+      if (maybeUse[ind]) {
+        if (firstAdded) {
+          options.push(separator);
+          firstAdded = false;
+        }
+        options.push(getTextLikeActions()[ind]);
+      }
     }
 
     ContextMenu.push({
