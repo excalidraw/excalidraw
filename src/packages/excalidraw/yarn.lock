@@ -1357,13 +1357,13 @@ ansi-styles@^4.1.0:
   dependencies:
     color-convert "^2.0.1"
 
-autoprefixer@10.2.6:
-  version "10.2.6"
-  resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-10.2.6.tgz#aadd9ec34e1c98d403e01950038049f0eb252949"
-  integrity sha512-8lChSmdU6dCNMCQopIf4Pe5kipkAGj/fvTMslCsih0uHpOrXOPUEVOmYMMqmw3cekQkSD7EhIeuYl5y0BLdKqg==
+autoprefixer@10.3.1:
+  version "10.3.1"
+  resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-10.3.1.tgz#954214821d3aa06692406c6a0a9e9d401eafbed2"
+  integrity sha512-L8AmtKzdiRyYg7BUXJTzigmhbQRCXFKz6SA1Lqo0+AR2FBbQ4aTAPFSDlOutnFkjhiz8my4agGXog1xlMjPJ6A==
   dependencies:
     browserslist "^4.16.6"
-    caniuse-lite "^1.0.30001230"
+    caniuse-lite "^1.0.30001243"
     colorette "^1.2.2"
     fraction.js "^4.1.1"
     normalize-range "^0.1.2"
@@ -1550,10 +1550,10 @@ callsites@^3.0.0:
   resolved "https://registry.yarnpkg.com/callsites/-/callsites-3.1.0.tgz#b3630abd8943432f54b3f0519238e33cd7df2f73"
   integrity sha512-P8BjAsXvZS+VIDUI11hHCQEv74YT67YUi5JJFNWIqL235sBmjX4+qx9Muvls5ivyNENctx46xQLQ3aTuE7ssaQ==
 
-caniuse-lite@^1.0.30001219, caniuse-lite@^1.0.30001230:
-  version "1.0.30001230"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001230.tgz#8135c57459854b2240b57a4a6786044bdc5a9f71"
-  integrity sha512-5yBd5nWCBS+jWKTcHOzXwo5xzcj4ePE/yjtkZyUV1BTUmrBaA9MRGC+e7mxnqXSA90CmCA8L3eKLaSUkt099IQ==
+caniuse-lite@^1.0.30001219, caniuse-lite@^1.0.30001243:
+  version "1.0.30001245"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001245.tgz#45b941bbd833cb0fa53861ff2bae746b3c6ca5d4"
+  integrity sha512-768fM9j1PKXpOCKws6eTo3RHmvTUsG9UrpT4WoREFeZgJBTi4/X9g565azS/rVUGtqb8nt7FjLeF5u4kukERnA==
 
 chalk@^1.1.3:
   version "1.1.3"
