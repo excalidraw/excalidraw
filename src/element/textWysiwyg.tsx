@@ -188,7 +188,12 @@ export const textWysiwyg = ({
   editable.onpaste = async (event) => {
     event.preventDefault();
     const pasted = await getSystemClipboard(event);
-    editable.value = sanitizeText(pasted);
+    const { selectionStart, selectionEnd } = editable;
+    const leftSubstr = editable.value.slice(0, selectionStart);
+    const rightSubstr = editable.value.slice(selectionEnd);
+    editable.value = leftSubstr
+      .concat(sanitizeText(pasted))
+      .concat(rightSubstr);
     editable.dispatchEvent(new Event("input"));
   };
 
