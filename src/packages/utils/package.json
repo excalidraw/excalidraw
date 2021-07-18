@@ -48,7 +48,7 @@
     "file-loader": "6.2.0",
     "sass-loader": "12.1.0",
     "ts-loader": "9.2.3",
-    "webpack": "5.40.0",
+    "webpack": "5.45.1",
     "webpack-bundle-analyzer": "4.4.2",
     "webpack-cli": "4.7.2"
   },
