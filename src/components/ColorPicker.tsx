@@ -1,5 +1,6 @@
 import React from "react";
 import { Popover } from "./Popover";
+import { PopoverModal } from "./PopoverModal";
 
 import "./ColorPicker.scss";
 import { isArrowKey, KEYS } from "../keys";
@@ -270,26 +271,38 @@ export const ColorPicker = ({
       </div>
       <React.Suspense fallback="">
         {isActive ? (
-          <Popover
-            onCloseRequest={(event) =>
-              event.target !== pickerButton.current && setActive(false)
-            }
-          >
-            <Picker
-              colors={colors[type]}
-              color={color || null}
-              onChange={(changedColor) => {
-                onChange(changedColor);
-              }}
-              onClose={() => {
-                setActive(false);
-                pickerButton.current?.focus();
-              }}
-              label={label}
-              showInput={false}
-              type={type}
-            />
-          </Popover>
+          <PopoverModal>
+            <Popover
+              onCloseRequest={(event) =>
+                event.target !== pickerButton.current && setActive(false)
+              }
+              top={
+                type === "canvasBackground"
+                  ? 102
+                  : type === "elementStroke"
+                  ? 190
+                  : type === "elementBackground"
+                  ? 250
+                  : undefined
+              }
+              left={10}
+            >
+              <Picker
+                colors={colors[type]}
+                color={color || null}
+                onChange={(changedColor) => {
+                  onChange(changedColor);
+                }}
+                onClose={() => {
+                  setActive(false);
+                  pickerButton.current?.focus();
+                }}
+                label={label}
+                showInput={false}
+                type={type}
+              />
+            </Popover>
+          </PopoverModal>
         ) : null}
       </React.Suspense>
     </div>
