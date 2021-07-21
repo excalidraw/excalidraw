@@ -171,8 +171,14 @@ export const renderTextElement = (
   for (let i = 0; i < renderMethodsA.length; i++) {
     if (renderMethodsA[i].subtype === element.subtype) {
       renderMethodsA[i].method(element, context, refresh);
+      return;
     }
   }
+  renderMethodsA
+    .find((value, index, renderMethodsA) => {
+      return value.default !== undefined && value.default === true;
+    })!
+    .method(element, context, refresh);
 };
 
 export const renderSvgTextElement = (
@@ -183,8 +189,14 @@ export const renderSvgTextElement = (
   for (let i = 0; i < renderSvgMethodsA.length; i++) {
     if (renderSvgMethodsA[i].subtype === element.subtype) {
       renderSvgMethodsA[i].method(svgRoot, node, element);
+      return;
     }
   }
+  renderSvgMethodsA
+    .find((value, index, renderSvgMethodsA) => {
+      return value.default !== undefined && value.default === true;
+    })!
+    .method(svgRoot, node, element);
 };
 
 export const restoreTextElement = (
