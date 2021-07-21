@@ -26,7 +26,7 @@
       }
     }
   ],
-  "capture_links": "new_client",
+  "capture_links": "new-client",
   "share_target": {
     "action": "/web-share-target",
     "method": "POST",
