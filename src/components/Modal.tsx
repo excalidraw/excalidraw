@@ -51,7 +51,7 @@ export const Modal = (props: {
   );
 };
 
-export const useBodyRoot = (theme: AppState["theme"]) => {
+const useBodyRoot = (theme: AppState["theme"]) => {
   const [div, setDiv] = useState<HTMLDivElement | null>(null);
 
   const isMobile = useIsMobile();

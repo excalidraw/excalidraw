@@ -24,11 +24,13 @@ export const SelectedShapeActions = ({
   elements,
   renderAction,
   elementType,
+  excalidrawContainer,
 }: {
   appState: AppState;
   elements: readonly ExcalidrawElement[];
   renderAction: ActionManager["renderAction"];
   elementType: ExcalidrawElement["type"];
+  excalidrawContainer: HTMLElement;
 }) => {
   const targetElements = getTargetElements(
     getNonDeletedElements(elements),
@@ -50,8 +52,9 @@ export const SelectedShapeActions = ({
 
   return (
     <div className="panelColumn">
-      {renderAction("changeStrokeColor")}
-      {showChangeBackgroundIcons && renderAction("changeBackgroundColor")}
+      {renderAction("changeStrokeColor", undefined, excalidrawContainer)}
+      {showChangeBackgroundIcons &&
+        renderAction("changeBackgroundColor", undefined, excalidrawContainer)}
       {showFillIcons && renderAction("changeFillStyle")}
 
       {(hasStrokeWidth(elementType) ||

@@ -33,6 +33,7 @@ type MobileMenuProps = {
   renderCustomFooter?: (isMobile: boolean, appState: AppState) => JSX.Element;
   viewModeEnabled: boolean;
   showThemeBtn: boolean;
+  excalidrawContainer: HTMLElement;
 };
 
 export const MobileMenu = ({
@@ -50,6 +51,7 @@ export const MobileMenu = ({
   renderCustomFooter,
   viewModeEnabled,
   showThemeBtn,
+  excalidrawContainer,
 }: MobileMenuProps) => {
   const renderToolbar = () => {
     return (
@@ -188,6 +190,7 @@ export const MobileMenu = ({
                 elements={elements}
                 renderAction={actionManager.renderAction}
                 elementType={appState.elementType}
+                excalidrawContainer={excalidrawContainer}
               />
             </Section>
           ) : null}

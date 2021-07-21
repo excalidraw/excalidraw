@@ -111,7 +111,11 @@ export class ActionManager implements ActionsManagerInterface {
   /**
    * @param data additional data sent to the PanelComponent
    */
-  renderAction = (name: ActionName, data?: PanelComponentProps["data"]) => {
+  renderAction = (
+    name: ActionName,
+    data?: PanelComponentProps["data"],
+    excalidrawContainer?: HTMLElement,
+  ) => {
     const canvasActions = this.app.props.UIOptions.canvasActions;
 
     if (
@@ -141,6 +145,7 @@ export class ActionManager implements ActionsManagerInterface {
           updateData={updateData}
           appProps={this.app.props}
           data={data}
+          excalidrawContainer={excalidrawContainer}
         />
       );
     }

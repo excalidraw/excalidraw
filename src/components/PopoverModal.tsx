@@ -2,18 +2,34 @@ import "./Modal.scss";
 
 import React from "react";
 import { createPortal } from "react-dom";
-import { useBodyRoot } from "./Modal";
-import { AppState } from "../types";
 
-export const PopoverModal = (props: {
-  theme?: AppState["theme"];
-  children: React.ReactNode;
-}) => {
-  const { theme = "light" } = props;
-  const modalRoot = useBodyRoot(theme);
+const popoverModalNodeByContainer = new WeakMap<HTMLElement, HTMLDivElement>();
 
-  if (!modalRoot) {
-    return null;
+const getPopoverModalNode = (container: HTMLElement): HTMLDivElement => {
+  let popoverModalNode = popoverModalNodeByContainer.get(container);
+  if (popoverModalNode) {
+    return popoverModalNode;
   }
-  return createPortal(<>{props.children}</>, modalRoot);
+  popoverModalNode = document.createElement("div");
+  container
+    .querySelector(".excalidraw-popoverContainer")!
+    .appendChild(popoverModalNode);
+  popoverModalNodeByContainer.set(container, popoverModalNode);
+  return popoverModalNode;
+};
+
+export const PopoverModal = ({
+  container,
+  children,
+  zenModeEnabled = false,
+}: {
+  container?: HTMLElement;
+  children: React.ReactNode;
+  zenModeEnabled?: boolean;
+}) => {
+  if (container === undefined || !zenModeEnabled) {
+    return <>{children}</>;
+  }
+
+  return createPortal(<>{children}</>, getPopoverModalNode(container));
 };

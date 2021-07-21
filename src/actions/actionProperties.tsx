@@ -117,7 +117,7 @@ export const actionChangeStrokeColor = register({
       commitToHistory: !!value.currentItemStrokeColor,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
+  PanelComponent: ({ elements, appState, updateData, excalidrawContainer }) => (
     <>
       <h3 aria-hidden="true">{t("labels.stroke")}</h3>
       <ColorPicker
@@ -134,6 +134,8 @@ export const actionChangeStrokeColor = register({
         setActive={(active) =>
           updateData({ openPopup: active ? "strokeColorPicker" : null })
         }
+        excalidrawContainer={excalidrawContainer}
+        zenModeEnabled={appState.zenModeEnabled}
       />
     </>
   ),
@@ -157,7 +159,7 @@ export const actionChangeBackgroundColor = register({
       commitToHistory: !!value.currentItemBackgroundColor,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
+  PanelComponent: ({ elements, appState, updateData, excalidrawContainer }) => (
     <>
       <h3 aria-hidden="true">{t("labels.background")}</h3>
       <ColorPicker
@@ -174,6 +176,8 @@ export const actionChangeBackgroundColor = register({
         setActive={(active) =>
           updateData({ openPopup: active ? "backgroundColorPicker" : null })
         }
+        excalidrawContainer={excalidrawContainer}
+        zenModeEnabled={appState.zenModeEnabled}
       />
     </>
   ),

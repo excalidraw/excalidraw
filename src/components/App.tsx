@@ -443,9 +443,11 @@ class App extends React.Component<AppProps, AppState> {
               focusContainer={this.focusContainer}
               library={this.library}
               id={this.id}
+              excalidrawContainer={this.excalidrawContainerRef.current!}
             />
             <div className="excalidraw-textEditorContainer" />
             <div className="excalidraw-contextMenuContainer" />
+            <div className="excalidraw-popoverContainer" />
             {this.state.showStats && (
               <Stats
                 appState={this.state}

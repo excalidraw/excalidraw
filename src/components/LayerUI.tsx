@@ -73,6 +73,7 @@ interface LayerUIProps {
   focusContainer: () => void;
   library: Library;
   id: string;
+  excalidrawContainer: HTMLElement;
 }
 
 const useOnClickOutside = (
@@ -381,6 +382,7 @@ const LayerUI = ({
   focusContainer,
   library,
   id,
+  excalidrawContainer,
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
@@ -527,6 +529,7 @@ const LayerUI = ({
           elements={elements}
           renderAction={actionManager.renderAction}
           elementType={appState.elementType}
+          excalidrawContainer={excalidrawContainer}
         />
       </Island>
     </Section>
@@ -761,6 +764,7 @@ const LayerUI = ({
         renderCustomFooter={renderCustomFooter}
         viewModeEnabled={viewModeEnabled}
         showThemeBtn={showThemeBtn}
+        excalidrawContainer={excalidrawContainer}
       />
     </>
   ) : (
