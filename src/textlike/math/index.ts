@@ -630,6 +630,10 @@ const renderTextElementMath = (
     const [width, height] = getRenderDims(img.naturalWidth, img.naturalHeight);
     context.drawImage(img, 0, 0, width, height);
   } else {
+    // Avoid creating and rendering an SVG until MathJax is loaded.
+    if (!isMathJaxLoaded) {
+      return;
+    }
     const img = new Image();
     const svgString = createSvg(
       text,

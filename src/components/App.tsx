@@ -208,6 +208,7 @@ const ExcalidrawContainerContext = React.createContext<{
 export const useExcalidrawContainer = () =>
   useContext(ExcalidrawContainerContext);
 
+let refreshTimer = 0;
 let didTapTwice: boolean = false;
 let tappedTwiceTimer = 0;
 let cursorX = 0;
@@ -1052,7 +1053,18 @@ class App extends React.Component<AppProps, AppState> {
       cursorButton[socketId] = user.button;
     });
     const refresh = () => {
-      this.setState({});
+      // If a scene refresh is cued, restart the countdown.
+      // This way we are not calling this.setState({}) once per
+      // ExcalidrawTextElement. The countdown improves performance
+      // when there are large numbers of ExcalidrawTextElements
+      // executing this refresh() callback.
+      if (refreshTimer !== 0) {
+        window.clearTimeout(refreshTimer);
+      }
+      refreshTimer = window.setTimeout(() => {
+        this.setState({});
+        window.clearTimeout(refreshTimer);
+      }, 50);
     };
     const elements = this.scene.getElements();
     const { atLeastOneVisibleElement, scrollBars } = renderScene(
