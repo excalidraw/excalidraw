@@ -2,8 +2,7 @@ import "./ToolIcon.scss";
 
 import React from "react";
 import clsx from "clsx";
-
-type LockIconSize = "s" | "m";
+import { ToolButtonSize } from "./ToolButton";
 
 type LockIconProps = {
   title?: string;
@@ -13,7 +12,7 @@ type LockIconProps = {
   zenModeEnabled?: boolean;
 };
 
-const DEFAULT_SIZE: LockIconSize = "m";
+const DEFAULT_SIZE: ToolButtonSize = "medium";
 
 const ICONS = {
   CHECKED: (

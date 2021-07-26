@@ -2,12 +2,18 @@
   .layer-ui__wrapper__footer-center {
     display: flex;
     justify-content: space-between;
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-inline-start: auto;
   }
 
   .encrypted-icon {
     border-radius: var(--space-factor);
     color: var(--icon-green-fill-color);
-    margin-top: 13px;
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-inline-start: auto;
+    margin-inline-end: 0.6em;
 
     svg {
       width: 1.2rem;

@@ -162,6 +162,7 @@ import {
   getElementsWithinSelection,
   getNormalizedZoom,
   getSelectedElements,
+  hasBackground,
   isOverScrollBars,
   isSomeElementSelected,
 } from "../scene";
@@ -348,7 +349,7 @@ class App extends React.Component<AppProps, AppState> {
           style={{
             width: canvasDOMWidth,
             height: canvasDOMHeight,
-            cursor: "grabbing",
+            cursor: CURSOR_TYPE.GRAB,
           }}
           width={canvasWidth}
           height={canvasHeight}
@@ -660,7 +661,11 @@ class App extends React.Component<AppProps, AppState> {
           const fileHandle = launchParams.files[0];
           const blob: Blob = await fileHandle.getFile();
           blob.handle = fileHandle;
-          loadFromBlob(blob, this.state)
+          loadFromBlob(
+            blob,
+            this.state,
+            this.scene.getElementsIncludingDeleted(),
+          )
             .then(({ elements, appState }) =>
               this.syncActionResult({
                 elements,
@@ -698,7 +703,7 @@ class App extends React.Component<AppProps, AppState> {
       };
     }
 
-    const scene = restore(initialData, null);
+    const scene = restore(initialData, null, null);
     scene.appState = {
       ...scene.appState,
       isLoading: false,
@@ -1207,7 +1212,7 @@ class App extends React.Component<AppProps, AppState> {
         });
       } else if (data.elements) {
         this.addElementsFromPasteOrLibrary({
-          elements: restoreElements(data.elements),
+          elements: data.elements,
           position: "cursor",
         });
       } else if (data.text) {
@@ -1222,7 +1227,7 @@ class App extends React.Component<AppProps, AppState> {
     elements: readonly ExcalidrawElement[];
     position: { clientX: number; clientY: number } | "cursor" | "center";
   }) => {
-    const elements = restoreElements(opts.elements);
+    const elements = restoreElements(opts.elements, null);
     const [minX, minY, maxX, maxY] = getCommonBounds(elements);
 
     const elementsCenterX = distance(minX, maxX) / 2;
@@ -1288,6 +1293,7 @@ class App extends React.Component<AppProps, AppState> {
         this.scene.getElements(),
       ),
     );
+    this.selectShapeTool("selection");
   };
 
   private addTextFromPaste(text: any) {
@@ -1591,13 +1597,22 @@ class App extends React.Component<AppProps, AppState> {
           this.scene.getElements(),
           this.state,
         );
-        if (selectedElements.length) {
-          if (event.key === KEYS.G) {
-            this.setState({ openPopup: "backgroundColorPicker" });
-          }
-          if (event.key === KEYS.S) {
-            this.setState({ openPopup: "strokeColorPicker" });
-          }
+        if (
+          this.state.elementType === "selection" &&
+          !selectedElements.length
+        ) {
+          return;
+        }
+
+        if (
+          event.key === KEYS.G &&
+          (hasBackground(this.state.elementType) ||
+            selectedElements.some((element) => hasBackground(element.type)))
+        ) {
+          this.setState({ openPopup: "backgroundColorPicker" });
+        }
+        if (event.key === KEYS.S) {
+          this.setState({ openPopup: "strokeColorPicker" });
         }
       }
     },
@@ -1605,7 +1620,9 @@ class App extends React.Component<AppProps, AppState> {
 
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
     if (event.key === KEYS.SPACE) {
-      if (this.state.elementType === "selection") {
+      if (this.state.viewModeEnabled) {
+        setCursor(this.canvas, CURSOR_TYPE.GRAB);
+      } else if (this.state.elementType === "selection") {
         resetCursor(this.canvas);
       } else {
         setCursorForShape(this.canvas, this.state.elementType);
@@ -1753,7 +1770,8 @@ class App extends React.Component<AppProps, AppState> {
               [element.id]: true,
             },
           }));
-        } else {
+        }
+        if (isDeleted) {
           fixBindingsAfterDeletion(this.scene.getElements(), [element]);
         }
         if (!isDeleted || isExistingElement) {
@@ -2229,6 +2247,8 @@ class App extends React.Component<AppProps, AppState> {
         this.canvas,
         isTextElement(hitElement) ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR,
       );
+    } else if (this.state.viewModeEnabled) {
+      setCursor(this.canvas, CURSOR_TYPE.GRAB);
     } else if (isOverScrollBar) {
       setCursor(this.canvas, CURSOR_TYPE.AUTO);
     } else if (
@@ -2472,7 +2492,11 @@ class App extends React.Component<AppProps, AppState> {
         lastPointerUp = null;
         isPanning = false;
         if (!isHoldingSpace) {
-          setCursorForShape(this.canvas, this.state.elementType);
+          if (this.state.viewModeEnabled) {
+            setCursor(this.canvas, CURSOR_TYPE.GRAB);
+          } else {
+            setCursorForShape(this.canvas, this.state.elementType);
+          }
         }
         this.setState({
           cursorButton: "up",
@@ -3873,7 +3897,22 @@ return;
     try {
       const file = event.dataTransfer.files[0];
       if (file?.type === "image/png" || file?.type === "image/svg+xml") {
-        const { elements, appState } = await loadFromBlob(file, this.state);
+        if (fsSupported) {
+          try {
+            // This will only work as of Chrome 86,
+            // but can be safely ignored on older releases.
+            const item = event.dataTransfer.items[0];
+            (file as any).handle = await (item as any).getAsFileSystemHandle();
+          } catch (error) {
+            console.warn(error.name, error.message);
+          }
+        }
+
+        const { elements, appState } = await loadFromBlob(
+          file,
+          this.state,
+          this.scene.getElementsIncludingDeleted(),
+        );
         this.syncActionResult({
           elements,
           appState: {
@@ -3933,7 +3972,7 @@ return;
   };
 
   loadFileToCanvas = (file: Blob) => {
-    loadFromBlob(file, this.state)
+    loadFromBlob(file, this.state, this.scene.getElementsIncludingDeleted())
       .then(({ elements, appState }) =>
         this.syncActionResult({
           elements,

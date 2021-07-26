@@ -48,6 +48,7 @@ import { UserList } from "./UserList";
 import Library from "../data/library";
 import { JSONExportDialog } from "./JSONExportDialog";
 import { LibraryButton } from "./LibraryButton";
+import { isImageFileHandle } from "../data/blob";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -407,7 +408,7 @@ const LayerUI = ({
     const createExporter = (type: ExportType): ExportCB => async (
       exportedElements,
     ) => {
-      await exportCanvas(type, exportedElements, appState, {
+      const fileHandle = await exportCanvas(type, exportedElements, appState, {
         exportBackground: appState.exportBackground,
         name: appState.name,
         viewBackgroundColor: appState.viewBackgroundColor,
@@ -417,6 +418,14 @@ const LayerUI = ({
           console.error(error);
           setAppState({ errorMessage: error.message });
         });
+
+      if (
+        appState.exportEmbedScene &&
+        fileHandle &&
+        isImageFileHandle(fileHandle)
+      ) {
+        setAppState({ fileHandle });
+      }
     };
 
     return (
@@ -623,7 +632,9 @@ const LayerUI = ({
                       label={client.username || "Unknown user"}
                       key={clientId}
                     >
-                      {actionManager.renderAction("goToCollaborator", clientId)}
+                      {actionManager.renderAction("goToCollaborator", {
+                        id: clientId,
+                      })}
                     </Tooltip>
                   ))}
             </UserList>
@@ -656,6 +667,16 @@ const LayerUI = ({
                   zoom={appState.zoom}
                 />
               </Island>
+              {!viewModeEnabled && (
+                <div
+                  className={clsx("undo-redo-buttons zen-mode-transition", {
+                    "layer-ui__wrapper__footer-left--transition-bottom": zenModeEnabled,
+                  })}
+                >
+                  {actionManager.renderAction("undo", { size: "small" })}
+                  {actionManager.renderAction("redo", { size: "small" })}
+                </div>
+              )}
             </Section>
           </Stack.Col>
         </div>
