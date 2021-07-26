@@ -49,8 +49,6 @@ const isElementDraggableFromInside = (
     return isDraggableFromInside && isPathALoop(element.points);
   }
   return isDraggableFromInside || element.type === "image";
-
-  return isDraggableFromInside;
 };
 
 export const hitTest = (
