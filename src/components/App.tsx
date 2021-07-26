@@ -3537,33 +3537,31 @@ class App extends React.Component<AppProps, AppState> {
           pressures,
         });
 
-
-
         this.actionManager.executeAction(actionFinalize);
 
         return;
       }
-if (draggingElement?.type === "image") {
-const selectedFile = await fileOpen({
-description: "Image",
-extensions: [".jpg", ".jpeg", ".png"],
-mimeTypes: ["image/jpeg", "image/png"],
-});
+      if (draggingElement?.type === "image") {
+        const selectedFile = await fileOpen({
+          description: "Image",
+          extensions: [".jpg", ".jpeg", ".png"],
+          mimeTypes: ["image/jpeg", "image/png"],
+        });
 
-const reader = new FileReader();
-reader.onload = () => {
-const imageData = reader.result as string;
-const imageId = convertStringToHash(imageData);
-mutateElement(draggingElement, {
-imageData,
-imageId,
-});
-loadImage(draggingElement);
-this.actionManager.executeAction(actionFinalize);
-};
-reader.readAsDataURL(selectedFile);
-return;
-}
+        const reader = new FileReader();
+        reader.onload = () => {
+          const imageData = reader.result as string;
+          const imageId = convertStringToHash(imageData);
+          mutateElement(draggingElement, {
+            imageData,
+            imageId,
+          });
+          loadImage(draggingElement);
+          this.actionManager.executeAction(actionFinalize);
+        };
+        reader.readAsDataURL(selectedFile);
+        return;
+      }
 
       if (isLinearElement(draggingElement)) {
         if (draggingElement!.points.length > 1) {
