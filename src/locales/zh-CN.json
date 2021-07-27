@@ -228,7 +228,7 @@
     "link_title": "分享链接",
     "link_details": "导出为只读链接。",
     "link_button": "导出链接",
-    "excalidrawplus_description": "",
+    "excalidrawplus_description": "将画布保存到您的 Excalidraw+ 工作区。",
     "excalidrawplus_button": "导出",
     "excalidrawplus_exportError": ""
   },
