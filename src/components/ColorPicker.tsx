@@ -144,8 +144,10 @@ const Picker = ({
               (event.currentTarget as HTMLButtonElement).focus();
               onChange(_color);
             }}
-            title={`${_color} — ${keyBindings[i].toUpperCase()}`}
-            aria-label={_color}
+            title={`${t(`colors.${_color.replace("#", "")}`)}${
+              _color !== "transparent" ? ` (${_color})` : ""
+            } — ${keyBindings[i].toUpperCase()}`}
+            aria-label={t(`colors.${_color.replace("#", "")}`)}
             aria-keyshortcuts={keyBindings[i]}
             style={{ color: _color }}
             key={_color}
