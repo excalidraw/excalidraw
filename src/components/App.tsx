@@ -20,6 +20,7 @@ import {
   actionFlipHorizontal,
   actionFlipVertical,
   actionGroup,
+  actionLinkToElement,
   actionPasteStyles,
   actionSelectAll,
   actionSendBackward,
@@ -28,6 +29,7 @@ import {
   actionToggleStats,
   actionToggleZenMode,
   actionUngroup,
+  actionUnlink,
 } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
@@ -195,6 +197,8 @@ import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
+import { ImportedDataState } from "../data/types";
+import { actionGenerateElementLink } from "../actions/actionGenerateElementLink";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
@@ -680,7 +684,7 @@ class App extends React.Component<AppProps, AppState> {
     if (!this.state.isLoading) {
       this.setState({ isLoading: true });
     }
-    let initialData = null;
+    let initialData: ImportedDataState | null;
     try {
       initialData = (await this.props.initialData) || null;
       if (initialData?.libraryItems) {
@@ -702,11 +706,31 @@ class App extends React.Component<AppProps, AppState> {
       ...scene.appState,
       isLoading: false,
     };
+
     if (initialData?.scrollToContent) {
       scene.appState = {
         ...scene.appState,
         ...calculateScrollCenter(
           scene.elements,
+          {
+            ...scene.appState,
+            width: this.state.width,
+            height: this.state.height,
+            offsetTop: this.state.offsetTop,
+            offsetLeft: this.state.offsetLeft,
+          },
+          null,
+        ),
+      };
+    }
+
+    if (initialData?.scrollToElement) {
+      scene.appState = {
+        ...scene.appState,
+        ...calculateScrollCenter(
+          scene.elements.filter(
+            ({ id }) => id === initialData?.scrollToElement,
+          ),
           {
             ...scene.appState,
             width: this.state.width,
@@ -1461,6 +1485,11 @@ class App extends React.Component<AppProps, AppState> {
               : value;
           },
         });
+      }
+
+      if (this.state.isLinking && event.key === KEYS.ESCAPE) {
+        this.setState({ isLinking: false });
+        return;
       }
 
       if (
@@ -4043,6 +4072,21 @@ class App extends React.Component<AppProps, AppState> {
     },
     type: "canvas" | "element",
   ) => {
+    const maybeGenerateElementLinkAction = actionGenerateElementLink.contextItemPredicate!(
+      this.actionManager.getElementsIncludingDeleted(),
+      this.actionManager.getAppState(),
+    );
+
+    const maybeLinkToElementAction = actionLinkToElement.contextItemPredicate!(
+      this.actionManager.getElementsIncludingDeleted(),
+      this.actionManager.getAppState(),
+    );
+
+    const maybeUnlinkAction = actionUnlink.contextItemPredicate!(
+      this.actionManager.getElementsIncludingDeleted(),
+      this.actionManager.getAppState(),
+    );
+
     const maybeGroupAction = actionGroup.contextItemPredicate!(
       this.actionManager.getElementsIncludingDeleted(),
       this.actionManager.getAppState(),
@@ -4177,6 +4221,11 @@ class App extends React.Component<AppProps, AppState> {
         maybeGroupAction && actionGroup,
         maybeUngroupAction && actionUngroup,
         (maybeGroupAction || maybeUngroupAction) && separator,
+        maybeLinkToElementAction && actionLinkToElement,
+        maybeUnlinkAction && actionUnlink,
+        (maybeLinkToElementAction || maybeUnlinkAction) && separator,
+        maybeGenerateElementLinkAction && actionGenerateElementLink,
+        maybeGenerateElementLinkAction && separator,
         actionAddToLibrary,
         separator,
         actionSendBackward,

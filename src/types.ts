@@ -82,6 +82,7 @@ export type AppState = {
   scrolledOutside: boolean;
   name: string;
   isResizing: boolean;
+  isLinking: boolean;
   isRotating: boolean;
   zoom: Zoom;
   openMenu: "canvas" | "shape" | null;

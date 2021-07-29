@@ -144,6 +144,8 @@ export const SelectedShapeActions = ({
             {renderAction("deleteSelectedElements")}
             {renderAction("group")}
             {renderAction("ungroup")}
+            {renderAction("link")}
+            {renderAction("unlink")}
           </div>
         </fieldset>
       )}
