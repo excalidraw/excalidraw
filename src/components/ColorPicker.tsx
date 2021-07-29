@@ -1,5 +1,6 @@
 import React from "react";
 import { Popover } from "./Popover";
+import { isTransparent } from "../../utils/color";
 
 import "./ColorPicker.scss";
 import { isArrowKey, KEYS } from "../keys";
@@ -14,7 +15,7 @@ const isValidColor = (color: string) => {
 };
 
 const getColor = (color: string): string | null => {
-  if (color === "transparent") {
+  if (isTransparent(color)) {
     return color;
   }
 
@@ -145,7 +146,7 @@ const Picker = ({
               onChange(_color);
             }}
             title={`${t(`colors.${_color.replace("#", "")}`)}${
-              _color !== "transparent" ? ` (${_color})` : ""
+              !isTransparent(_color) ? ` (${_color})` : ""
             } — ${keyBindings[i].toUpperCase()}`}
             aria-label={t(`colors.${_color.replace("#", "")}`)}
             aria-keyshortcuts={keyBindings[i]}
@@ -163,7 +164,7 @@ const Picker = ({
               onChange(_color);
             }}
           >
-            {_color === "transparent" ? (
+            {isTransparent(_color) ? (
               <div className="color-picker-transparent"></div>
             ) : undefined}
             <span className="color-picker-keybinding">{keyBindings[i]}</span>
