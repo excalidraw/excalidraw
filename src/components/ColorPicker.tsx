@@ -1,6 +1,6 @@
 import React from "react";
 import { Popover } from "./Popover";
-import { isTransparent } from "../../utils/color";
+import { isTransparent } from "../utils";
 
 import "./ColorPicker.scss";
 import { isArrowKey, KEYS } from "../keys";
