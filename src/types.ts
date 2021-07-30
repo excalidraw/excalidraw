@@ -10,6 +10,7 @@ import {
   Arrowhead,
   ChartType,
   FontFamilyValues,
+  ExcalidrawTextElement,
 } from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
