@@ -176,6 +176,7 @@ import {
 } from "../types";
 import {
   debounce,
+  DevicePixelRatio,
   distance,
   getNearestScrollableContainer,
   isInputLike,
@@ -328,7 +329,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private renderCanvas() {
-    const canvasScale = window.devicePixelRatio;
+    const canvasScale = DevicePixelRatio;
     const {
       width: canvasDOMWidth,
       height: canvasDOMHeight,
@@ -1036,7 +1037,7 @@ class App extends React.Component<AppProps, AppState> {
       }),
       this.state,
       this.state.selectionElement,
-      window.devicePixelRatio,
+      DevicePixelRatio,
       this.rc!,
       this.canvas!,
       {
@@ -1880,7 +1881,7 @@ class App extends React.Component<AppProps, AppState> {
         sceneY,
         this.state,
         this.canvas,
-        window.devicePixelRatio,
+        DevicePixelRatio,
       );
 
     const element = existingTextElement
