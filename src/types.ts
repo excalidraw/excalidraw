@@ -202,6 +202,8 @@ export interface ExcalidrawProps {
   handleKeyboardGlobally?: boolean;
   onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
   autoFocus?: boolean;
+  onBeforeTextEdit?: (textElement: ExcalidrawTextElement) => string;
+  onBeforeTextSubmit?: (textElement: ExcalidrawTextElement, textToSubmit:string) => string;
 }
 
 export type SceneData = {
