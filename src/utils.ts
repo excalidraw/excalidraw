@@ -171,13 +171,24 @@ export const removeSelection = () => {
 
 export const distance = (x: number, y: number) => Math.abs(x - y);
 
+export const isLinking = (canvas: HTMLCanvasElement | null) =>
+  canvas &&
+  ((canvas as any)?.isLinking || false) &&
+  !!(canvas.style.cursor = CURSOR_TYPE.CROSSHAIR);
+
 export const resetCursor = (canvas: HTMLCanvasElement | null) => {
-  if (canvas) {
-    canvas.style.cursor = "";
+  if (isLinking(canvas)) {
+    return;
   }
+
+  setCursor(canvas, "");
 };
 
 export const setCursor = (canvas: HTMLCanvasElement | null, cursor: string) => {
+  if (isLinking(canvas)) {
+    return;
+  }
+
   if (canvas) {
     canvas.style.cursor = cursor;
   }

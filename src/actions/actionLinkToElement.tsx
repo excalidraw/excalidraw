@@ -1,6 +1,7 @@
 import React from "react";
 import { LinkIcon, UnlinkIcon } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
+import { CURSOR_TYPE } from "../constants";
 import { getNonDeletedElements } from "../element";
 import { newElementWith } from "../element/mutateElement";
 import { ExcalidrawElement } from "../element/types";
@@ -13,7 +14,7 @@ import { t } from "../i18n";
 import { CODES, KEYS } from "../keys";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { AppState } from "../types";
-import { getShortcutKey } from "../utils";
+import { getShortcutKey, setCursor } from "../utils";
 import { register } from "./register";
 
 const allElementsAlreadyLinked = (elements: readonly ExcalidrawElement[]) => {
@@ -39,7 +40,7 @@ const enableActionLink = (
 
 export const actionLinkToElement = register({
   name: "link",
-  perform: (elements, appState) => {
+  perform: (elements, appState, _, app) => {
     const selectedElements = getSelectedElements(
       getNonDeletedElements(elements),
       appState,
@@ -49,6 +50,12 @@ export const actionLinkToElement = register({
       // nothing to link
       return { appState, elements, commitToHistory: false };
     }
+
+    if (app.canvas) {
+      (app.canvas as any).isLinking = true;
+    }
+
+    setCursor(app.canvas, CURSOR_TYPE.CROSSHAIR);
 
     return {
       appState: {

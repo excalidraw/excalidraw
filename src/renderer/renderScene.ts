@@ -47,7 +47,11 @@ import {
   TransformHandles,
   TransformHandleType,
 } from "../element/transformHandles";
-import { viewportCoordsToSceneCoords, supportsEmoji } from "../utils";
+import {
+  viewportCoordsToSceneCoords,
+  supportsEmoji,
+  isLinking,
+} from "../utils";
 import { UserIdleState } from "../types";
 import { THEME_FILTER } from "../constants";
 
@@ -587,6 +591,10 @@ const renderTransformHandles = (
   Object.keys(transformHandles).forEach((key) => {
     const transformHandle = transformHandles[key as TransformHandleType];
     if (transformHandle !== undefined) {
+      if (isLinking(context.canvas)) {
+        return;
+      }
+
       context.save();
       context.lineWidth = 1 / sceneState.zoom.value;
       if (key === "rotation") {
@@ -647,7 +655,10 @@ const renderSelectionBorder = (
 
   const count = selectionColors.length;
   for (let index = 0; index < count; ++index) {
-    context.strokeStyle = selectionColors[index];
+    context.strokeStyle = isLinking(context.canvas)
+      ? oc.blue[8]
+      : selectionColors[index];
+
     context.setLineDash([
       dashWidth,
       spaceWidth + (dashWidth + spaceWidth) * (count - 1),
