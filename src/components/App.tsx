@@ -1,10 +1,9 @@
+import { supported as fsSupported } from "browser-fs-access";
+import clsx from "clsx";
+import { nanoid } from "nanoid";
 import React, { useContext } from "react";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
-import clsx from "clsx";
-import { supported as fsSupported } from "browser-fs-access";
-import { nanoid } from "nanoid";
-
 import {
   actionAddToLibrary,
   actionBringForward,
@@ -31,7 +30,9 @@ import {
   actionUngroup,
   actionUnlink,
 } from "../actions";
+import { actionGenerateElementLink } from "../actions/actionGenerateElementLink";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
+import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
 import { ActionResult } from "../actions/types";
@@ -44,6 +45,7 @@ import {
   probablySupportsClipboardWriteText,
 } from "../clipboard";
 import {
+  APPEARENCE,
   APP_NAME,
   CURSOR_TYPE,
   DEFAULT_UI_OPTIONS,
@@ -72,6 +74,7 @@ import { loadFromBlob } from "../data";
 import { isValidLibrary } from "../data/json";
 import Library from "../data/library";
 import { restore, restoreElements } from "../data/restore";
+import { ImportedDataState } from "../data/types";
 import {
   dragNewElement,
   dragSelectedElements,
@@ -180,6 +183,7 @@ import {
   debounce,
   distance,
   getNearestScrollableContainer,
+  isDarkTheme,
   isInputLike,
   isLinking,
   isToolIcon,
@@ -197,9 +201,6 @@ import ContextMenu, { ContextMenuOption } from "./ContextMenu";
 import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
 import { Toast } from "./Toast";
-import { actionToggleViewMode } from "../actions/actionToggleViewMode";
-import { ImportedDataState } from "../data/types";
-import { actionGenerateElementLink } from "../actions/actionGenerateElementLink";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
@@ -518,7 +519,7 @@ class App extends React.Component<AppProps, AppState> {
         let viewModeEnabled = actionResult?.appState?.viewModeEnabled || false;
         let zenModeEnabled = actionResult?.appState?.zenModeEnabled || false;
         let gridSize = actionResult?.appState?.gridSize || null;
-        let theme = actionResult?.appState?.theme || "light";
+        let theme = actionResult?.appState?.theme || APPEARENCE.LIGHT;
         let name = actionResult?.appState?.name ?? this.state.name;
         if (typeof this.props.viewModeEnabled !== "undefined") {
           viewModeEnabled = this.props.viewModeEnabled;
@@ -982,7 +983,7 @@ class App extends React.Component<AppProps, AppState> {
 
     this.excalidrawContainerRef.current?.classList.toggle(
       "theme--dark",
-      this.state.theme === "dark",
+      isDarkTheme(this.state.theme),
     );
 
     if (

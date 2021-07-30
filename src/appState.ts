@@ -1,5 +1,6 @@
 import oc from "open-color";
 import {
+  APPEARENCE,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   DEFAULT_TEXT_ALIGN,
@@ -18,7 +19,7 @@ export const getDefaultAppState = (): Omit<
   "offsetTop" | "offsetLeft" | "width" | "height"
 > => {
   return {
-    theme: "light",
+    theme: APPEARENCE.LIGHT,
     collaborators: new Map(),
     currentChartType: "bar",
     currentItemBackgroundColor: "transparent",
