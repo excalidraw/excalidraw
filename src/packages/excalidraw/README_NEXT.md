@@ -670,7 +670,7 @@ This prop implies whether to focus the Excalidraw component on page load. Defaul
 
 ### onBeforeTextEdit
 
-Callback to be triggered when a text element is about to be edited. The string returned will replace the text element's text. Use this to pre-process text before editing.
+Callback to be triggered when a text element is about to be edited. The string returned will replace the element's text. If `null` is returned, the TextElement will not be changed. Use this to pre-process text before editing.
 
 <pre>
 (textElement: ExcalidrawTextElement) => string
@@ -678,7 +678,7 @@ Callback to be triggered when a text element is about to be edited. The string r
 
 ### onBeforeTextSubmit
 
-Callback to be triggered when the editing of a text element is finished, but right before the result is submitted. The string returned by this function will replace the text element's text. Use this to post process text after editing.
+Callback to be triggered when the editing of a TextElement is finished, but right before the result is submitted. The string returned will replace the text element's text. Use this to post-process text after editing has finished.
 
 <pre>
 (textElement: ExcalidrawTextElement, textToSubmit:string, isDeleted:boolean) => string
