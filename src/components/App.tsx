@@ -1729,10 +1729,24 @@ class App extends React.Component<AppProps, AppState> {
       ]);
     };
 
-    if(isExistingElement && this.props.onBeforeTextEdit) {
-      updateElement(this.props.onBeforeTextEdit(element));
-    }        
-        
+    if (isExistingElement && this.props.onBeforeTextEdit) {
+      const text = this.props.onBeforeTextEdit(element);
+      if (text) {
+        this.scene.replaceAllElements([
+          ...this.scene.getElementsIncludingDeleted().map((_element) => {
+            if (_element.id === element.id && isTextElement(_element)) {
+              element = updateTextElement(_element, {
+                text,
+                isDeleted: false,
+              });
+              return element;
+            }
+            return _element;
+          }),
+        ]);
+      }
+    }
+
     textWysiwyg({
       id: element.id,
       appState: this.state,
@@ -1758,9 +1772,9 @@ class App extends React.Component<AppProps, AppState> {
       }),
       onSubmit: withBatchedUpdates(({ text, viaKeyboard }) => {
         const isDeleted = !text.trim();
-        if(this.props.onBeforeTextSubmit){
-          text = this.props.onBeforeTextSubmit(element,text);
-        }        
+        if (this.props.onBeforeTextSubmit) {
+          text = this.props.onBeforeTextSubmit(element, text, isDeleted);
+        }
         updateElement(text, isDeleted);
         // select the created text element only if submitting via keyboard
         // (when submitting via click it should act as signal to deselect)

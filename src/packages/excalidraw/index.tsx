@@ -35,7 +35,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     onLibraryChange,
     autoFocus = false,
     onBeforeTextEdit,
-    onBeforeTextSubmit,    
+    onBeforeTextSubmit,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -97,7 +97,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
         onLibraryChange={onLibraryChange}
         autoFocus={autoFocus}
         onBeforeTextEdit={onBeforeTextEdit}
-        onBeforeTextSubmit={onBeforeTextSubmit}        
+        onBeforeTextSubmit={onBeforeTextSubmit}
       />
     </InitializeApp>
   );

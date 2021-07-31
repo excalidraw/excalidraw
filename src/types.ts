@@ -204,7 +204,11 @@ export interface ExcalidrawProps {
   onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
   autoFocus?: boolean;
   onBeforeTextEdit?: (textElement: ExcalidrawTextElement) => string;
-  onBeforeTextSubmit?: (textElement: ExcalidrawTextElement, textToSubmit:string) => string;
+  onBeforeTextSubmit?: (
+    textElement: ExcalidrawTextElement,
+    textToSubmit: string,
+    isDeleted: boolean,
+  ) => string;
 }
 
 export type SceneData = {
