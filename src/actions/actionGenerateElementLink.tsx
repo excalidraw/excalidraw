@@ -27,20 +27,13 @@ export const actionGenerateElementLink = register({
       appState,
     );
 
-    if (selectedElements.length !== 1) {
-      // nothing to link
-      return { appState, elements, commitToHistory: false };
+    if (selectedElements.length === 1) {
+      const elementLink = `${window.origin}/?#${URL_HASH_KEYS.elementRef}=${selectedElements[0].id}`;
+
+      await copyTextToSystemClipboard(elementLink);
     }
 
-    const elementLink = `${window.origin}/?#${URL_HASH_KEYS.elementRef}=${selectedElements[0].id}`;
-
-    await copyTextToSystemClipboard(elementLink);
-
-    return {
-      appState,
-      elements,
-      commitToHistory: false,
-    };
+    return { appState, elements, commitToHistory: false };
   },
   contextItemLabel: "labels.copyElementLink",
   contextItemPredicate: (elements, appState) =>
