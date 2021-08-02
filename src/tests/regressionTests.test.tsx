@@ -16,6 +16,7 @@ import {
 } from "./test-utils";
 import { defaultLang } from "../i18n";
 import { FONT_FAMILY } from "../constants";
+import { t } from "../i18n";
 
 const { h } = window;
 
@@ -168,9 +169,9 @@ describe("regression tests", () => {
     mouse.up(10, 10);
 
     clickLabeledElement("Background");
-    clickLabeledElement("#fa5252");
+    clickLabeledElement(t("colors.fa5252"));
     clickLabeledElement("Stroke");
-    clickLabeledElement("#5f3dc4");
+    clickLabeledElement(t("colors.5f3dc4"));
     expect(API.getSelectedElement().backgroundColor).toBe("#fa5252");
     expect(API.getSelectedElement().strokeColor).toBe("#5f3dc4");
   });
@@ -939,7 +940,7 @@ describe("regression tests", () => {
       // change background color since default is transparent
       // and transparent elements can't be selected by clicking inside of them
       clickLabeledElement("Background");
-      clickLabeledElement("#fa5252");
+      clickLabeledElement(t("colors.fa5252"));
       mouse.down();
       mouse.up(1000, 1000);
 
@@ -1046,7 +1047,7 @@ describe("regression tests", () => {
     expect(screen.queryByText(/fill/i)).toBeNull();
 
     clickLabeledElement("Background");
-    clickLabeledElement("#fa5252");
+    clickLabeledElement(t("colors.fa5252"));
     // select rectangle
     mouse.reset();
     mouse.click();
