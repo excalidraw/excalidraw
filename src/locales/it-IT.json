@@ -284,11 +284,11 @@
     "selection": "selezione"
   },
   "colors": {
-    "ffffff": "",
-    "f8f9fa": "",
-    "f1f3f5": "",
-    "fff5f5": "",
-    "fff0f6": "",
+    "ffffff": "Bianco",
+    "f8f9fa": "Grigio 0",
+    "f1f3f5": "Grigio 1",
+    "fff5f5": "Rosso 0",
+    "fff0f6": "Rosa 0",
     "f8f0fc": "",
     "f3f0ff": "",
     "edf2ff": "",
