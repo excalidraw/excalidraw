@@ -1667,8 +1667,7 @@ class App extends React.Component<AppProps, AppState> {
       textMatchSearch.addDocuments(textElements);
 
       const matchedText = textMatchSearch.search(searchMatchText);
-
-      console.log(matchedText);
+      console.info(matchedText);
     }
   });
 
