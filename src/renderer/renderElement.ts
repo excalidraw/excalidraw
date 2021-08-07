@@ -279,6 +279,9 @@ export const getImage = (element: ExcalidrawImageElement) =>
 
 export const loadImage = async (element: ExcalidrawImageElement) => {
   const imageId = element.imageId;
+  if (!imageId) {
+    return;
+  }
   const imageHTMLElement = imageCache.get(imageId);
   if (imageHTMLElement == null) {
     const image = new Image();

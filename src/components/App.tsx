@@ -3542,24 +3542,37 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
       if (draggingElement?.type === "image") {
-        const selectedFile = await fileOpen({
-          description: "Image",
-          extensions: [".jpg", ".jpeg", ".png"],
-          mimeTypes: ["image/jpeg", "image/png"],
-        });
-
-        const reader = new FileReader();
-        reader.onload = () => {
-          const imageData = reader.result as string;
-          const imageId = convertStringToHash(imageData);
-          mutateElement(draggingElement, {
-            imageData,
-            imageId,
+        try {
+          const selectedFile = await fileOpen({
+            description: "Image",
+            extensions: [".jpg", ".jpeg", ".png"],
+            mimeTypes: ["image/jpeg", "image/png"],
           });
-          loadImage(draggingElement);
-          this.actionManager.executeAction(actionFinalize);
-        };
-        reader.readAsDataURL(selectedFile);
+
+          const reader = new FileReader();
+          reader.onload = () => {
+            const imageData = reader.result as string;
+            const imageId = convertStringToHash(imageData);
+            mutateElement(draggingElement, {
+              imageData,
+              imageId,
+            });
+            loadImage(draggingElement);
+            this.actionManager.executeAction(actionFinalize);
+          };
+          reader.readAsDataURL(selectedFile);
+        } catch (error) {
+          this.setState({
+            draggingElement: null,
+            editingElement: null,
+            elementType: "selection",
+          });
+          this.scene.replaceAllElements(
+            this.scene
+              .getElementsIncludingDeleted()
+              .filter((el) => el.id !== draggingElement.id),
+          );
+        }
         return;
       }
 
