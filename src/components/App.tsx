@@ -1056,6 +1056,7 @@ class App extends React.Component<AppProps, AppState> {
         remotePointerUsernames: pointerUsernames,
         remotePointerUserStates: pointerUserStates,
         shouldCacheIgnoreZoom: this.state.shouldCacheIgnoreZoom,
+        theme: this.state.theme,
       },
       {
         renderOptimizations: true,

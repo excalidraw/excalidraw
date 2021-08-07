@@ -11,6 +11,7 @@ import {
   isTextElement,
   isLinearElement,
   isFreeDrawElement,
+  isLoadedImageElement,
 } from "../element/typeChecks";
 import {
   getDiamondPoints,
@@ -35,7 +36,11 @@ import Scene from "../scene/Scene";
 import { Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
 import getFreeDrawShape from "perfect-freehand";
-import { DRAGGING_THRESHOLD, MAX_DECIMALS_FOR_SVG_EXPORT } from "../constants";
+import {
+  DRAGGING_THRESHOLD,
+  MAX_DECIMALS_FOR_SVG_EXPORT,
+  THEME_FILTER,
+} from "../constants";
 import * as crypto from "crypto";
 import { mutateElement } from "../element/mutateElement";
 
@@ -612,6 +617,12 @@ const drawElementFromCanvas = (
   const cx = ((x1 + x2) / 2 + sceneState.scrollX) * window.devicePixelRatio;
   const cy = ((y1 + y2) / 2 + sceneState.scrollY) * window.devicePixelRatio;
   context.save();
+  if (
+    (sceneState.exportWithDarkMode || sceneState.theme === "dark") &&
+    isLoadedImageElement(element)
+  ) {
+    context.filter = THEME_FILTER;
+  }
   context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
   context.translate(cx, cy);
   context.rotate(element.angle);
@@ -696,6 +707,12 @@ export const renderElement = (
         const shiftX = (x2 - x1) / 2 - (element.x - x1);
         const shiftY = (y2 - y1) / 2 - (element.y - y1);
         context.save();
+        if (
+          (sceneState.exportWithDarkMode || sceneState.theme === "dark") &&
+          isLoadedImageElement(element)
+        ) {
+          context.filter = THEME_FILTER;
+        }
         context.translate(cx, cy);
         context.rotate(element.angle);
         context.translate(-shiftX, -shiftY);

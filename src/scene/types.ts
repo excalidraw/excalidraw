@@ -1,5 +1,5 @@
 import { ExcalidrawTextElement } from "../element/types";
-import { Zoom } from "../types";
+import { AppState, Zoom } from "../types";
 
 export type SceneState = {
   scrollX: number;
@@ -14,6 +14,7 @@ export type SceneState = {
   remoteSelectedElementIds: { [elementId: string]: string[] };
   remotePointerUsernames: { [id: string]: string };
   remotePointerUserStates: { [id: string]: string };
+  theme: AppState["theme"];
 };
 
 export type SceneScroll = {
