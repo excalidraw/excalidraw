@@ -35,8 +35,9 @@ import Scene from "../scene/Scene";
 import { Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
 import getFreeDrawShape from "perfect-freehand";
-import { MAX_DECIMALS_FOR_SVG_EXPORT } from "../constants";
+import { DRAGGING_THRESHOLD, MAX_DECIMALS_FOR_SVG_EXPORT } from "../constants";
 import * as crypto from "crypto";
+import { mutateElement } from "../element/mutateElement";
 
 const defaultAppState = getDefaultAppState();
 
@@ -289,6 +290,18 @@ export const loadImage = async (element: ExcalidrawImageElement) => {
       //TODO: count how many images has been loaded
       //TODO: limit the size of the imageCache
       invalidateShapeForElement(element);
+      // if user-created bounding box is below threshold, assume the
+      // intention was to click instead of drag, and use the
+      // image's intrinsic size
+      if (
+        element.width < DRAGGING_THRESHOLD &&
+        element.height < DRAGGING_THRESHOLD
+      ) {
+        mutateElement(element, {
+          width: image.naturalWidth,
+          height: image.naturalHeight,
+        });
+      }
       Scene.getScene(element)?.informMutation();
     };
     image.src = element.imageData;
