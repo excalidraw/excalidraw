@@ -19,6 +19,7 @@ import { ShortcutName } from "../actions/shortcuts";
 import { copiedStyles } from "../actions/actionStyles";
 import { API } from "./helpers/api";
 import { setDateTimeForTests } from "../utils";
+import { t } from "../i18n";
 
 const checkpoint = (name: string) => {
   expect(renderScene.mock.calls.length).toMatchSnapshot(
@@ -314,9 +315,9 @@ describe("contextMenu element", () => {
 
     // Change some styles of second rectangle
     clickLabeledElement("Stroke");
-    clickLabeledElement("#c92a2a");
+    clickLabeledElement(t("colors.c92a2a"));
     clickLabeledElement("Background");
-    clickLabeledElement("#e64980");
+    clickLabeledElement(t("colors.e64980"));
     // Fill style
     fireEvent.click(screen.getByTitle("Cross-hatch"));
     // Stroke width
