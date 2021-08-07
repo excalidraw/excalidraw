@@ -41,7 +41,6 @@ import {
   MAX_DECIMALS_FOR_SVG_EXPORT,
   THEME_FILTER,
 } from "../constants";
-import * as crypto from "crypto";
 import { mutateElement } from "../element/mutateElement";
 
 const defaultAppState = getDefaultAppState();
@@ -248,9 +247,6 @@ const shapeCache = new WeakMap<
 >();
 
 const imageCache = new Map<string, HTMLImageElement | null>();
-
-export const convertStringToHash = (data: string) =>
-  crypto.createHash("md5").update(data).digest("hex");
 
 export const getImage = (element: ExcalidrawImageElement) =>
   imageCache.get(element.imageId);

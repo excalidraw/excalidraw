@@ -19,7 +19,7 @@ import {
   FONT_FAMILY,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
-import { loadImage, convertStringToHash } from "../renderer/renderElement";
+import { loadImage } from "../renderer/renderElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { bumpVersion } from "../element/mutateElement";
 
@@ -104,7 +104,7 @@ const restoreElementWithProperties = <
 
 const restoreElement = (
   element: Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
-): typeof element => {
+): typeof element | null => {
   switch (element.type) {
     case "text":
       let fontSize = element.fontSize;
@@ -134,12 +134,12 @@ const restoreElement = (
       });
     }
     case "image":
-      const imageData = element.imageData;
-      const imageId = convertStringToHash(imageData);
-
+      if (!element.imageId) {
+        return null;
+      }
       const result = restoreElementWithProperties(element, {
-        imageData,
-        imageId,
+        imageData: element.imageData,
+        imageId: element.imageId,
       });
       loadImage(result);
       return result;
@@ -206,7 +206,7 @@ export const restoreElements = (
     // filtering out selection, which is legacy, no longer kept in elements,
     // and causing issues if retained
     if (element.type !== "selection" && !isInvisiblySmallElement(element)) {
-      let migratedElement: ExcalidrawElement = restoreElement(element);
+      let migratedElement: ExcalidrawElement | null = restoreElement(element);
       if (migratedElement) {
         const localElement = localElementsMap?.[element.id];
         if (localElement && localElement.version > migratedElement.version) {
