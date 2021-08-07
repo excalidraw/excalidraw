@@ -136,36 +136,8 @@ const drawImagePlaceholder = (
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
 ) => {
-  const opts = generateRoughOptions(element);
-  opts.fillStyle = "cross-hatch";
-  opts.fill = "#868e96";
-  const shape = rc.generator.rectangle(
-    0,
-    0,
-    element.width,
-    element.height,
-    opts,
-  );
-  rc.draw(shape);
-
-  //draw ??? in the middle
-  const text = "???";
-  const lineHeight = 20;
-  const lineWidth = 50;
-  context.canvas.setAttribute("dir", "ltr");
-  const font = context.font;
-  context.font = getFontString({ fontSize: 32, fontFamily: 2 });
-  const fillStyle = context.fillStyle;
-  context.fillStyle = "#FF0000";
-  context.fillText(
-    text,
-    (element.width - lineWidth) / 2,
-    (element.height + lineHeight) / 2,
-  );
-
-  //revert
-  context.fillStyle = fillStyle;
-  context.font = font;
+  context.fillStyle = "rgba(134, 134, 134, 0.199)";
+  context.fillRect(0, 0, element.width, element.height);
 };
 
 const drawElementOnCanvas = (
