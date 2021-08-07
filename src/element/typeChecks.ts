@@ -5,6 +5,7 @@ import {
   ExcalidrawBindableElement,
   ExcalidrawGenericElement,
   ExcalidrawFreeDrawElement,
+  ExcalidrawImageElement,
 } from "./types";
 
 export const isGenericElement = (
@@ -17,6 +18,12 @@ export const isGenericElement = (
       element.type === "diamond" ||
       element.type === "ellipse")
   );
+};
+
+export const isLoadedImageElement = (
+  element: ExcalidrawElement,
+): element is ExcalidrawImageElement => {
+  return element.type === "image" && !!element.imageId;
 };
 
 export const isTextElement = (

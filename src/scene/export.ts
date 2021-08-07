@@ -36,6 +36,7 @@ export const exportToCanvas = (
 
   const { canvas, scale = 1 } = createCanvas(width, height);
 
+  const defaultAppState = getDefaultAppState();
   renderScene(
     elements,
     appState,
@@ -48,12 +49,13 @@ export const exportToCanvas = (
       exportWithDarkMode: appState.exportWithDarkMode,
       scrollX: -minX + exportPadding,
       scrollY: -minY + exportPadding,
-      zoom: getDefaultAppState().zoom,
+      zoom: defaultAppState.zoom,
       remotePointerViewportCoords: {},
       remoteSelectedElementIds: {},
       shouldCacheIgnoreZoom: false,
       remotePointerUsernames: {},
       remotePointerUserStates: {},
+      theme: defaultAppState.theme,
     },
     {
       renderScrollbars: false,
