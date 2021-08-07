@@ -152,7 +152,6 @@ import { distance2d, getGridPoint, isPathALoop } from "../math";
 import { renderScene } from "../renderer";
 import {
   invalidateShapeForElement,
-  convertStringToHash,
   loadImage,
 } from "../renderer/renderElement";
 import {
@@ -3553,7 +3552,7 @@ class App extends React.Component<AppProps, AppState> {
           const reader = new FileReader();
           reader.onload = () => {
             const imageData = reader.result as string;
-            const imageId = convertStringToHash(imageData);
+            const imageId = nanoid(36);
             mutateElement(draggingElement, {
               imageData,
               imageId,
