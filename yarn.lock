@@ -9376,11 +9376,6 @@ points-on-path@^0.2.1:
     path-data-parser "0.1.0"
     points-on-curve "0.2.0"
 
-porter-stemmer@0.9.1:
-  version "0.9.1"
-  resolved "https://registry.yarnpkg.com/porter-stemmer/-/porter-stemmer-0.9.1.tgz#a16ecea3abe44724ac88c1480021ea36baa21f9b"
-  integrity sha1-oW7Oo6vkRySsiMFIACHqNrqiH5s=
-
 portfinder@^1.0.23, portfinder@^1.0.26:
   version "1.0.28"
   resolved "https://registry.npmjs.org/portfinder/-/portfinder-1.0.28.tgz"
