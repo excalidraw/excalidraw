@@ -3898,7 +3898,9 @@ class App extends React.Component<AppProps, AppState> {
         await this.updateImageCache(element, imageData.data);
       }
     }
-    this.scene.informMutation();
+    if (this.imageCache.size) {
+      this.scene.informMutation();
+    }
   };
 
   private updateBindingEnabledOnPointerMove = (
