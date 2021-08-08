@@ -125,11 +125,11 @@ import {
   ExcalidrawFreeDrawElement,
   ExcalidrawGenericElement,
   ExcalidrawLinearElement,
-  ExcalidrawImageElement,
   ExcalidrawTextElement,
   NonDeleted,
   ImageId,
   LoadedExcalidrawImageElement,
+  ExcalidrawImageElement,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -2354,11 +2354,10 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState,
       );
     } else if (this.state.elementType === "image") {
-      this.handleImageElementOnPointerDown(
-        event,
-        this.state.elementType,
-        pointerDownState,
-      );
+      this.createImageElement({
+        sceneX: pointerDownState.origin.x,
+        sceneY: pointerDownState.origin.y,
+      });
     } else if (this.state.elementType === "freedraw") {
       this.handleFreeDrawElementOnPointerDown(
         event,
@@ -2928,19 +2927,17 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  private handleImageElementOnPointerDown = (
-    event: React.PointerEvent<HTMLCanvasElement>,
-    elementType: ExcalidrawImageElement["type"],
-    pointerDownState: PointerDownState,
-  ): void => {
-    const [gridX, gridY] = getGridPoint(
-      pointerDownState.origin.x,
-      pointerDownState.origin.y,
-      this.state.gridSize,
-    );
+  private createImageElement = ({
+    sceneX,
+    sceneY,
+  }: {
+    sceneX: number;
+    sceneY: number;
+  }) => {
+    const [gridX, gridY] = getGridPoint(sceneX, sceneY, this.state.gridSize);
 
     const element = newImageElement({
-      type: elementType,
+      type: "image",
       x: gridX,
       y: gridY,
       strokeColor: this.state.currentItemStrokeColor,
@@ -2961,6 +2958,8 @@ class App extends React.Component<AppProps, AppState> {
       editingElement: element,
       multiElement: null,
     });
+
+    return element;
   };
 
   private handleLinearElementOnPointerDown = (
@@ -3556,55 +3555,13 @@ class App extends React.Component<AppProps, AppState> {
       if (draggingElement?.type === "image") {
         const imageElement = draggingElement;
         try {
-          const selectedFile = await fileOpen({
+          const imageFile = await fileOpen({
             description: "Image",
             extensions: [".jpg", ".jpeg", ".png"],
             mimeTypes: ["image/jpeg", "image/png"],
           });
 
-          const dataURL = await this.getImageData(selectedFile);
-
-          const imageId = nanoid(36) as ImageId;
-
-          this.setState(
-            (state) => ({
-              files: {
-                ...state.files,
-                [imageId]: {
-                  type: "image",
-                  id: imageId,
-                  data: dataURL,
-                },
-              },
-            }),
-            async () => {
-              mutateElement(imageElement, {
-                imageId,
-              });
-
-              const image = await this.updateImageCache(
-                imageElement as LoadedExcalidrawImageElement,
-                dataURL,
-              );
-
-              // if user-created bounding box is below threshold, assume the
-              // intention was to click instead of drag, and use the image's
-              // intrinsic size
-              if (
-                imageElement.width < DRAGGING_THRESHOLD &&
-                imageElement.height < DRAGGING_THRESHOLD
-              ) {
-                mutateElement(imageElement, {
-                  x: imageElement.x - image.width / 2,
-                  y: imageElement.y - image.height / 2,
-                  width: image.naturalWidth,
-                  height: image.naturalHeight,
-                });
-              }
-
-              this.scene.informMutation();
-            },
-          );
+          await this.initializeImage({ imageFile, imageElement });
         } catch (error) {
           console.error(error);
           this.scene.replaceAllElements(
@@ -3888,6 +3845,58 @@ class App extends React.Component<AppProps, AppState> {
     return image;
   };
 
+  private initializeImage = async ({
+    imageFile,
+    imageElement,
+  }: {
+    imageFile: File;
+    imageElement: ExcalidrawImageElement;
+  }) => {
+    const dataURL = await this.getImageData(imageFile);
+
+    const imageId = nanoid(36) as ImageId;
+
+    this.setState(
+      (state) => ({
+        files: {
+          ...state.files,
+          [imageId]: {
+            type: "image",
+            id: imageId,
+            data: dataURL,
+          },
+        },
+      }),
+      async () => {
+        mutateElement(imageElement, {
+          imageId,
+        });
+
+        const image = await this.updateImageCache(
+          imageElement as LoadedExcalidrawImageElement,
+          dataURL,
+        );
+
+        // if user-created bounding box is below threshold, assume the
+        // intention was to click instead of drag, and use the image's
+        // intrinsic size
+        if (
+          imageElement.width < DRAGGING_THRESHOLD &&
+          imageElement.height < DRAGGING_THRESHOLD
+        ) {
+          mutateElement(imageElement, {
+            x: imageElement.x - image.width / 2,
+            y: imageElement.y - image.height / 2,
+            width: image.naturalWidth,
+            height: image.naturalHeight,
+          });
+        }
+
+        this.scene.informMutation();
+      },
+    );
+  };
+
   private renderImages = async (
     imageElements: LoadedExcalidrawImageElement[],
     files: AppState["files"],
@@ -4001,31 +4010,61 @@ class App extends React.Component<AppProps, AppState> {
   private handleAppOnDrop = async (event: React.DragEvent<HTMLDivElement>) => {
     try {
       const file = event.dataTransfer.files[0];
-      if (file?.type === "image/png" || file?.type === "image/svg+xml") {
-        if (fsSupported) {
+
+      if (
+        file?.type === "image/jpeg" ||
+        file?.type === "image/png" ||
+        file?.type === "image/svg+xml"
+      ) {
+        // first attempt to decode scene from the image if it's embedded
+        // ---------------------------------------------------------------------
+
+        if (file?.type === "image/png" || file?.type === "image/svg+xml") {
           try {
-            // This will only work as of Chrome 86,
-            // but can be safely ignored on older releases.
-            const item = event.dataTransfer.items[0];
-            (file as any).handle = await (item as any).getAsFileSystemHandle();
+            if (fsSupported) {
+              try {
+                // This will only work as of Chrome 86,
+                // but can be safely ignored on older releases.
+                const item = event.dataTransfer.items[0];
+                (file as any).handle = await (item as any).getAsFileSystemHandle();
+              } catch (error) {
+                console.warn(error.name, error.message);
+              }
+            }
+
+            const { elements, appState } = await loadFromBlob(
+              file,
+              this.state,
+              this.scene.getElementsIncludingDeleted(),
+            );
+            this.syncActionResult({
+              elements,
+              appState: {
+                ...(appState || this.state),
+                isLoading: false,
+              },
+              commitToHistory: true,
+            });
+            return;
           } catch (error) {
-            console.warn(error.name, error.message);
+            if (error.name !== "EncodingError") {
+              throw error;
+            }
           }
         }
 
-        const { elements, appState } = await loadFromBlob(
-          file,
+        // if no scene is embedded or we fail for whatever reason, fall back
+        // to importing as regular image
+        // ---------------------------------------------------------------------
+
+        const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
+          event,
           this.state,
-          this.scene.getElementsIncludingDeleted(),
         );
-        this.syncActionResult({
-          elements,
-          appState: {
-            ...(appState || this.state),
-            isLoading: false,
-          },
-          commitToHistory: true,
-        });
+        const imageElement = this.createImageElement({ sceneX, sceneY });
+
+        await this.initializeImage({ imageFile: file, imageElement });
+
         return;
       }
     } catch (error) {
