@@ -201,6 +201,7 @@ import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
+import { isImageFile } from "../data/blob";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
@@ -1207,6 +1208,20 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         return;
       }
+
+      const file = event?.clipboardData?.files[0];
+      if (isImageFile(file)) {
+        const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
+          { clientX: cursorX, clientY: cursorY },
+          this.state,
+        );
+        const imageElement = this.createImageElement({ sceneX, sceneY });
+
+        await this.initializeImage({ imageFile: file, imageElement });
+
+        return;
+      }
+
       const data = await parseClipboard(event);
       if (this.props.onPaste) {
         if (await this.props.onPaste(data, event)) {
@@ -4011,11 +4026,7 @@ class App extends React.Component<AppProps, AppState> {
     try {
       const file = event.dataTransfer.files[0];
 
-      if (
-        file?.type === "image/jpeg" ||
-        file?.type === "image/png" ||
-        file?.type === "image/svg+xml"
-      ) {
+      if (isImageFile(file)) {
         // first attempt to decode scene from the image if it's embedded
         // ---------------------------------------------------------------------
 
