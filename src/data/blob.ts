@@ -118,7 +118,7 @@ export const loadFromBlob = async (
         appState: {
           theme: localAppState?.theme,
           fileHandle: blob.handle || null,
-          ...cleanAppStateForExport(data.appState || {}),
+          ...cleanAppStateForExport(data.appState || {}, data.elements || []),
           ...(localAppState
             ? calculateScrollCenter(data.elements || [], localAppState, null)
             : {}),
