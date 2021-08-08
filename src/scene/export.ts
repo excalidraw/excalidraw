@@ -56,6 +56,7 @@ export const exportToCanvas = (
       remotePointerUsernames: {},
       remotePointerUserStates: {},
       theme: defaultAppState.theme,
+      imageCache: new Map(),
     },
     {
       renderScrollbars: false,

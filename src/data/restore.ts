@@ -19,7 +19,6 @@ import {
   FONT_FAMILY,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
-import { loadImage } from "../renderer/renderElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { bumpVersion } from "../element/mutateElement";
 
@@ -134,15 +133,9 @@ const restoreElement = (
       });
     }
     case "image":
-      if (!element.imageId) {
-        return null;
-      }
-      const result = restoreElementWithProperties(element, {
-        imageData: element.imageData,
+      return restoreElementWithProperties(element, {
         imageId: element.imageId,
       });
-      loadImage(result);
-      return result;
     case "line":
     // @ts-ignore LEGACY type
     // eslint-disable-next-line no-fallthrough

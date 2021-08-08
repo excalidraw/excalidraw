@@ -5,7 +5,6 @@ import {
   Arrowhead,
   NonDeletedExcalidrawElement,
   ExcalidrawFreeDrawElement,
-  ExcalidrawImageElement,
 } from "../element/types";
 import {
   isTextElement,
@@ -32,16 +31,10 @@ import {
 } from "../utils";
 import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
-import Scene from "../scene/Scene";
 import { Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
 import getFreeDrawShape from "perfect-freehand";
-import {
-  DRAGGING_THRESHOLD,
-  MAX_DECIMALS_FOR_SVG_EXPORT,
-  THEME_FILTER,
-} from "../constants";
-import { mutateElement } from "../element/mutateElement";
+import { MAX_DECIMALS_FOR_SVG_EXPORT, THEME_FILTER } from "../constants";
 
 const defaultAppState = getDefaultAppState();
 
@@ -63,6 +56,7 @@ export interface ExcalidrawElementWithCanvas {
 const generateElementCanvas = (
   element: NonDeletedExcalidrawElement,
   zoom: Zoom,
+  sceneState: SceneState,
 ): ExcalidrawElementWithCanvas => {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
@@ -119,7 +113,7 @@ const generateElementCanvas = (
 
   const rc = rough.canvas(canvas);
 
-  drawElementOnCanvas(element, rc, context);
+  drawElementOnCanvas(element, rc, context, sceneState);
   context.restore();
   return {
     element,
@@ -143,6 +137,7 @@ const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
+  sceneState: SceneState,
 ) => {
   context.globalAlpha = element.opacity / 100;
   switch (element.type) {
@@ -178,7 +173,9 @@ const drawElementOnCanvas = (
       break;
     }
     case "image": {
-      const img = getImage(element);
+      const img = isLoadedImageElement(element)
+        ? sceneState.imageCache.get(element.imageId)
+        : undefined;
       if (img != null) {
         context.drawImage(
           img,
@@ -245,42 +242,6 @@ const shapeCache = new WeakMap<
   ExcalidrawElement,
   Drawable | Drawable[] | null
 >();
-
-const imageCache = new Map<string, HTMLImageElement | null>();
-
-export const getImage = (element: ExcalidrawImageElement) =>
-  imageCache.get(element.imageId);
-
-export const loadImage = async (element: ExcalidrawImageElement) => {
-  const imageId = element.imageId;
-  if (!imageId) {
-    return;
-  }
-  const imageHTMLElement = imageCache.get(imageId);
-  if (imageHTMLElement == null) {
-    const image = new Image();
-    image.onload = () => {
-      //TODO: count how many images has been loaded
-      //TODO: limit the size of the imageCache
-      invalidateShapeForElement(element);
-      // if user-created bounding box is below threshold, assume the
-      // intention was to click instead of drag, and use the
-      // image's intrinsic size
-      if (
-        element.width < DRAGGING_THRESHOLD &&
-        element.height < DRAGGING_THRESHOLD
-      ) {
-        mutateElement(element, {
-          width: image.naturalWidth,
-          height: image.naturalHeight,
-        });
-      }
-      Scene.getScene(element)?.informMutation();
-    };
-    image.src = element.imageData;
-    imageCache.set(imageId, image);
-  }
-};
 
 export const getShapeForElement = (element: ExcalidrawElement) =>
   shapeCache.get(element);
@@ -546,7 +507,7 @@ const generateElementShape = (
 
 const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,
-  sceneState?: SceneState,
+  sceneState: SceneState,
 ) => {
   const zoom: Zoom = sceneState ? sceneState.zoom : defaultAppState.zoom;
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
@@ -555,7 +516,7 @@ const generateElementWithCanvas = (
     prevElementWithCanvas.canvasZoom !== zoom.value &&
     !sceneState?.shouldCacheIgnoreZoom;
   if (!prevElementWithCanvas || shouldRegenerateBecauseZoom) {
-    const elementWithCanvas = generateElementCanvas(element, zoom);
+    const elementWithCanvas = generateElementCanvas(element, zoom, sceneState);
 
     elementWithCanvasCache.set(element, elementWithCanvas);
 
@@ -648,7 +609,7 @@ export const renderElement = (
         context.translate(cx, cy);
         context.rotate(element.angle);
         context.translate(-shiftX, -shiftY);
-        drawElementOnCanvas(element, rc, context);
+        drawElementOnCanvas(element, rc, context, sceneState);
         context.restore();
       }
 
@@ -684,7 +645,7 @@ export const renderElement = (
         context.translate(cx, cy);
         context.rotate(element.angle);
         context.translate(-shiftX, -shiftY);
-        drawElementOnCanvas(element, rc, context);
+        drawElementOnCanvas(element, rc, context, sceneState);
         context.restore();
       }
       break;
