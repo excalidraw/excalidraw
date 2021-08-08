@@ -48,6 +48,7 @@ const getCanvasPadding = (element: ExcalidrawElement) =>
 export interface ExcalidrawElementWithCanvas {
   element: ExcalidrawElement | ExcalidrawTextElement;
   canvas: HTMLCanvasElement;
+  theme: SceneState["theme"];
   canvasZoom: Zoom["value"];
   canvasOffsetX: number;
   canvasOffsetY: number;
@@ -113,11 +114,20 @@ const generateElementCanvas = (
 
   const rc = rough.canvas(canvas);
 
+  if (
+    (sceneState.exportWithDarkMode || sceneState.theme === "dark") &&
+    isLoadedImageElement(element)
+  ) {
+    context.filter = THEME_FILTER;
+  }
+
   drawElementOnCanvas(element, rc, context, sceneState);
   context.restore();
+
   return {
     element,
     canvas,
+    theme: sceneState.theme,
     canvasZoom: zoom.value,
     canvasOffsetX,
     canvasOffsetY,
@@ -515,7 +525,11 @@ const generateElementWithCanvas = (
     prevElementWithCanvas &&
     prevElementWithCanvas.canvasZoom !== zoom.value &&
     !sceneState?.shouldCacheIgnoreZoom;
-  if (!prevElementWithCanvas || shouldRegenerateBecauseZoom) {
+  if (
+    !prevElementWithCanvas ||
+    shouldRegenerateBecauseZoom ||
+    prevElementWithCanvas.theme !== sceneState.theme
+  ) {
     const elementWithCanvas = generateElementCanvas(element, zoom, sceneState);
 
     elementWithCanvasCache.set(element, elementWithCanvas);
@@ -546,12 +560,6 @@ const drawElementFromCanvas = (
   const cx = ((x1 + x2) / 2 + sceneState.scrollX) * window.devicePixelRatio;
   const cy = ((y1 + y2) / 2 + sceneState.scrollY) * window.devicePixelRatio;
   context.save();
-  if (
-    (sceneState.exportWithDarkMode || sceneState.theme === "dark") &&
-    isLoadedImageElement(element)
-  ) {
-    context.filter = THEME_FILTER;
-  }
   context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
   context.translate(cx, cy);
   context.rotate(element.angle);
@@ -636,12 +644,6 @@ export const renderElement = (
         const shiftX = (x2 - x1) / 2 - (element.x - x1);
         const shiftY = (y2 - y1) / 2 - (element.y - y1);
         context.save();
-        if (
-          (sceneState.exportWithDarkMode || sceneState.theme === "dark") &&
-          isLoadedImageElement(element)
-        ) {
-          context.filter = THEME_FILTER;
-        }
         context.translate(cx, cy);
         context.rotate(element.angle);
         context.translate(-shiftX, -shiftY);
