@@ -42,6 +42,10 @@ export type Collaborator = {
 };
 
 export type AppState = {
+  files: Record<
+    ExcalidrawElement["id"],
+    { type: "image"; id: string; data: string }
+  >;
   isLoading: boolean;
   errorMessage: string | null;
   draggingElement: NonDeletedExcalidrawElement | null;

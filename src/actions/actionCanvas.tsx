@@ -55,6 +55,7 @@ export const actionClearCanvas = register({
       ),
       appState: {
         ...getDefaultAppState(),
+        files: {},
         theme: appState.theme,
         elementLocked: appState.elementLocked,
         exportBackground: appState.exportBackground,

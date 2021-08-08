@@ -18,6 +18,7 @@ export const getDefaultAppState = (): Omit<
   "offsetTop" | "offsetLeft" | "width" | "height"
 > => {
   return {
+    files: {},
     theme: "light",
     collaborators: new Map(),
     currentChartType: "bar",
@@ -96,6 +97,7 @@ const APP_STATE_STORAGE_CONF = (<
 >(
   config: { [K in keyof T]: K extends keyof AppState ? T[K] : never },
 ) => config)({
+  files: { browser: true, export: true },
   theme: { browser: true, export: false },
   collaborators: { browser: false, export: false },
   currentChartType: { browser: true, export: false },

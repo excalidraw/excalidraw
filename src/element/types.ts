@@ -65,9 +65,13 @@ export type ExcalidrawEllipseElement = _ExcalidrawElementBase & {
 export type ExcalidrawImageElement = _ExcalidrawElementBase &
   Readonly<{
     type: "image";
-    imageData: string;
-    imageId: string;
+    imageId: ImageId | null;
   }>;
+
+export type LoadedExcalidrawImageElement = MarkNonNullable<
+  ExcalidrawImageElement,
+  "imageId"
+>;
 
 /**
  * These are elements that don't have any additional properties.
@@ -141,3 +145,5 @@ export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
     simulatePressure: boolean;
     lastCommittedPoint: Point | null;
   }>;
+
+export type ImageId = string & { _brand: "ImageId" };

@@ -117,6 +117,7 @@ import {
   isBindingElementType,
   isLinearElement,
   isLinearElementType,
+  isLoadedImageElement,
 } from "../element/typeChecks";
 import {
   ExcalidrawBindableElement,
@@ -127,6 +128,8 @@ import {
   ExcalidrawImageElement,
   ExcalidrawTextElement,
   NonDeleted,
+  ImageId,
+  LoadedExcalidrawImageElement,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -150,10 +153,7 @@ import {
 } from "../keys";
 import { distance2d, getGridPoint, isPathALoop } from "../math";
 import { renderScene } from "../renderer";
-import {
-  invalidateShapeForElement,
-  loadImage,
-} from "../renderer/renderElement";
+import { invalidateShapeForElement } from "../renderer/renderElement";
 import {
   calculateScrollCenter,
   getElementContainingPosition,
@@ -255,6 +255,8 @@ class App extends React.Component<AppProps, AppState> {
     container: HTMLDivElement | null;
     id: string;
   };
+
+  private imageCache = new Map<ImageId, HTMLImageElement>();
 
   constructor(props: AppProps) {
     super(props);
@@ -730,6 +732,13 @@ class App extends React.Component<AppProps, AppState> {
       commitToHistory: true,
     });
 
+    this.renderImages(
+      scene.elements.filter((element) =>
+        isLoadedImageElement(element),
+      ) as LoadedExcalidrawImageElement[],
+      scene.appState.files,
+    );
+
     const libraryUrl =
       // current
       new URLSearchParams(window.location.hash.slice(1)).get(
@@ -820,6 +829,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   public componentWillUnmount() {
+    this.imageCache = new Map();
     this.resizeObserver?.disconnect();
     this.unmounted = true;
     this.removeEventListeners();
@@ -1056,6 +1066,7 @@ class App extends React.Component<AppProps, AppState> {
         remotePointerUserStates: pointerUserStates,
         shouldCacheIgnoreZoom: this.state.shouldCacheIgnoreZoom,
         theme: this.state.theme,
+        imageCache: this.imageCache,
       },
       {
         renderOptimizations: true,
@@ -3542,6 +3553,7 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
       if (draggingElement?.type === "image") {
+        const imageElement = draggingElement;
         try {
           const selectedFile = await fileOpen({
             description: "Image",
@@ -3549,29 +3561,63 @@ class App extends React.Component<AppProps, AppState> {
             mimeTypes: ["image/jpeg", "image/png"],
           });
 
-          const reader = new FileReader();
-          reader.onload = () => {
-            const imageData = reader.result as string;
-            const imageId = nanoid(36);
-            mutateElement(draggingElement, {
-              imageData,
-              imageId,
-            });
-            loadImage(draggingElement);
-            this.actionManager.executeAction(actionFinalize);
-          };
-          reader.readAsDataURL(selectedFile);
+          const dataURL = await this.getImageData(selectedFile);
+
+          const imageId = nanoid(36) as ImageId;
+
+          this.setState(
+            (state) => ({
+              files: {
+                ...state.files,
+                [imageId]: {
+                  type: "image",
+                  id: imageId,
+                  data: dataURL,
+                },
+              },
+            }),
+            async () => {
+              mutateElement(imageElement, {
+                imageId,
+              });
+
+              const image = await this.updateImageCache(
+                imageElement as LoadedExcalidrawImageElement,
+                dataURL,
+              );
+
+              // if user-created bounding box is below threshold, assume the
+              // intention was to click instead of drag, and use the image's
+              // intrinsic size
+              if (
+                imageElement.width < DRAGGING_THRESHOLD &&
+                imageElement.height < DRAGGING_THRESHOLD
+              ) {
+                mutateElement(imageElement, {
+                  x: imageElement.x - image.width / 2,
+                  y: imageElement.y - image.height / 2,
+                  width: image.naturalWidth,
+                  height: image.naturalHeight,
+                });
+              }
+
+              this.scene.informMutation();
+            },
+          );
         } catch (error) {
+          console.error(error);
+          this.scene.replaceAllElements(
+            this.scene
+              .getElementsIncludingDeleted()
+              .filter((el) => el.id !== imageElement.id),
+          );
+        } finally {
           this.setState({
             draggingElement: null,
             editingElement: null,
             elementType: "selection",
           });
-          this.scene.replaceAllElements(
-            this.scene
-              .getElementsIncludingDeleted()
-              .filter((el) => el.id !== draggingElement.id),
-          );
+          this.actionManager.executeAction(actionFinalize);
         }
         return;
       }
@@ -3808,6 +3854,51 @@ class App extends React.Component<AppProps, AppState> {
       }
     });
   }
+
+  private getImageData = async (imageFile: File) => {
+    return new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const dataURL = reader.result as string;
+        resolve(dataURL);
+      };
+      reader.readAsDataURL(imageFile);
+    });
+  };
+
+  private updateImageCache = async (
+    element: LoadedExcalidrawImageElement,
+    /** dataURI */
+    imageData: string,
+  ) => {
+    const cached = this.imageCache.get(element.imageId);
+    const image = await (cached ||
+      new Promise<HTMLImageElement>((resolve) => {
+        const image = new Image();
+        image.onload = () => resolve(image);
+        image.src = imageData;
+      }));
+
+    //TODO: count how many images has been loaded
+    //TODO: limit the size of the imageCache
+    this.imageCache.set(element.imageId, image);
+    invalidateShapeForElement(element);
+
+    return image;
+  };
+
+  private renderImages = async (
+    imageElements: LoadedExcalidrawImageElement[],
+    files: AppState["files"],
+  ) => {
+    for (const element of imageElements) {
+      const imageData = files[element.imageId as string];
+      if (imageData) {
+        await this.updateImageCache(element, imageData.data);
+      }
+    }
+    this.scene.informMutation();
+  };
 
   private updateBindingEnabledOnPointerMove = (
     event: React.PointerEvent<HTMLCanvasElement>,
