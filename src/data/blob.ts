@@ -112,6 +112,13 @@ export const isImageFileHandle = (handle: FileSystemHandle | null) => {
   return type === "png" || type === "svg";
 };
 
+export const isImageFile = (blob: Blob | null | undefined): blob is File => {
+  const { type } = blob || {};
+  return (
+    type === "image/jpeg" || type === "image/png" || type === "image/svg+xml"
+  );
+};
+
 export const loadFromBlob = async (
   blob: Blob,
   /** @see restore.localAppState */
