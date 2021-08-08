@@ -48,7 +48,9 @@ export const actionChangeViewBackgroundColor = register({
 
 export const actionClearCanvas = register({
   name: "clearCanvas",
-  perform: (elements, appState: AppState) => {
+  perform: (elements, appState: AppState, _, app) => {
+    app.imageCache.clear();
+
     return {
       elements: elements.map((element) =>
         newElementWith(element, { isDeleted: true }),
