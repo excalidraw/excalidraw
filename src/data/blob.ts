@@ -21,9 +21,15 @@ const parseFileContents = async (blob: Blob | File) => {
       ).decodePngMetadata(blob);
     } catch (error) {
       if (error.message === "INVALID") {
-        throw new Error(t("alerts.imageDoesNotContainScene"));
+        throw new DOMException(
+          t("alerts.imageDoesNotContainScene"),
+          "EncodingError",
+        );
       } else {
-        throw new Error(t("alerts.cannotRestoreFromImage"));
+        throw new DOMException(
+          t("alerts.cannotRestoreFromImage"),
+          "EncodingError",
+        );
       }
     }
   } else {
@@ -49,9 +55,15 @@ const parseFileContents = async (blob: Blob | File) => {
         });
       } catch (error) {
         if (error.message === "INVALID") {
-          throw new Error(t("alerts.imageDoesNotContainScene"));
+          throw new DOMException(
+            t("alerts.imageDoesNotContainScene"),
+            "EncodingError",
+          );
         } else {
-          throw new Error(t("alerts.cannotRestoreFromImage"));
+          throw new DOMException(
+            t("alerts.cannotRestoreFromImage"),
+            "EncodingError",
+          );
         }
       }
     }
