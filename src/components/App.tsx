@@ -458,7 +458,8 @@ class App extends React.Component<AppProps, AppState> {
                 renderCustomStats={renderCustomStats}
               />
             )}
-            {this.state.textSearchActive && (
+            {this.state.textSearchActive && !this.state.textSearchActive && (
+              // TODO: remove second condition when search component is ready
               <TextSearch
                 appState={this.state}
                 setAppState={this.setAppState}
