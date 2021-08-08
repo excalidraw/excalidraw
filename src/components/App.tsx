@@ -3881,6 +3881,7 @@ class App extends React.Component<AppProps, AppState> {
             data: dataURL,
           },
         },
+        selectedElementIds: { [imageElement.id]: true },
       }),
       async () => {
         mutateElement(imageElement, {
