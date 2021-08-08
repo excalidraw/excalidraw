@@ -170,6 +170,7 @@ import { SceneState, ScrollBars } from "../scene/types";
 import { getNewZoom } from "../scene/zoom";
 import { findShapeByKey } from "../shapes";
 import {
+  AppClassProperties,
   AppProps,
   AppState,
   ExcalidrawImperativeAPI,
@@ -230,7 +231,7 @@ const gesture: Gesture = {
 };
 
 class App extends React.Component<AppProps, AppState> {
-  canvas: HTMLCanvasElement | null = null;
+  canvas: AppClassProperties["canvas"] = null;
   rc: RoughCanvas | null = null;
   unmounted: boolean = false;
   actionManager: ActionManager;
@@ -247,7 +248,7 @@ class App extends React.Component<AppProps, AppState> {
   private scene: Scene;
   private resizeObserver: ResizeObserver | undefined;
   private nearestScrollableContainer: HTMLElement | Document | undefined;
-  public library: Library;
+  public library: AppClassProperties["library"];
   public libraryItemsFromStorage: LibraryItems | undefined;
   private id: string;
   private history: History;
@@ -256,7 +257,7 @@ class App extends React.Component<AppProps, AppState> {
     id: string;
   };
 
-  private imageCache = new Map<ImageId, HTMLImageElement>();
+  public imageCache: AppClassProperties["imageCache"] = new Map();
 
   constructor(props: AppProps) {
     super(props);
@@ -475,7 +476,7 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
-  public focusContainer = () => {
+  public focusContainer: AppClassProperties["focusContainer"] = () => {
     if (this.props.autoFocus) {
       this.excalidrawContainerRef.current?.focus();
     }
@@ -829,7 +830,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   public componentWillUnmount() {
-    this.imageCache = new Map();
+    this.imageCache.clear();
     this.resizeObserver?.disconnect();
     this.unmounted = true;
     this.removeEventListeners();
