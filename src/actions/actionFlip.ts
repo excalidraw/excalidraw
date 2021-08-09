@@ -18,7 +18,11 @@ const enableActionFlipHorizontal = (
     getNonDeletedElements(elements),
     appState,
   );
-  return eligibleElements.length === 1 && eligibleElements[0].type !== "text";
+  return (
+    eligibleElements.length === 1 &&
+    eligibleElements[0].type !== "text" &&
+    eligibleElements[0].type !== "image"
+  );
 };
 
 const enableActionFlipVertical = (
@@ -29,7 +33,7 @@ const enableActionFlipVertical = (
     getNonDeletedElements(elements),
     appState,
   );
-  return eligibleElements.length === 1;
+  return eligibleElements.length === 1 && eligibleElements[0].type !== "image";
 };
 
 export const actionFlipHorizontal = register({
