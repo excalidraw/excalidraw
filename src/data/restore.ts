@@ -58,16 +58,19 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
 
 const restoreElementWithProperties = <
   T extends ExcalidrawElement,
-  K extends keyof Omit<
-    Required<T>,
-    Exclude<keyof ExcalidrawElement, "type" | "x" | "y">
-  >
+  K extends Pick<T, keyof Omit<Required<T>, keyof ExcalidrawElement>>
 >(
   element: Required<T>,
-  extra: Pick<T, K>,
+  extra: Pick<
+    T,
+    // This extra Pick<T, keyof K> ensure no excess properties are passed.
+    // @ts-ignore TS complains here but type checks the call sites fine.
+    keyof K
+  > &
+    Partial<Pick<ExcalidrawElement, "type" | "x" | "y">>,
 ): T => {
   const base: Pick<T, keyof ExcalidrawElement> = {
-    type: (extra as Partial<T>).type || element.type,
+    type: extra.type || element.type,
     // all elements must have version > 0 so getSceneVersion() will pick up
     // newly added elements
     version: element.version || 1,
@@ -80,8 +83,8 @@ const restoreElementWithProperties = <
     roughness: element.roughness ?? 1,
     opacity: element.opacity == null ? 100 : element.opacity,
     angle: element.angle || 0,
-    x: (extra as Partial<T>).x ?? element.x ?? 0,
-    y: (extra as Partial<T>).y ?? element.y ?? 0,
+    x: extra.x ?? element.x ?? 0,
+    y: extra.y ?? element.y ?? 0,
     strokeColor: element.strokeColor,
     backgroundColor: element.backgroundColor,
     width: element.width || 0,
