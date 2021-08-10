@@ -57,7 +57,6 @@ export const exportToCanvas = async (
     canvas,
     {
       viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
-      exportWithDarkMode: appState.exportWithDarkMode,
       scrollX: -minX + exportPadding,
       scrollY: -minY + exportPadding,
       zoom: defaultAppState.zoom,
@@ -74,6 +73,7 @@ export const exportToCanvas = async (
       renderSelection: false,
       renderOptimizations: true,
       renderGrid: false,
+      isExport: true,
     },
   );
 
