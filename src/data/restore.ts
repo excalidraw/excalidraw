@@ -135,6 +135,7 @@ const restoreElement = (
     case "image":
       return restoreElementWithProperties(element, {
         imageId: element.imageId,
+        scale: element.scale || [1, 1],
       });
     case "line":
     // @ts-ignore LEGACY type
