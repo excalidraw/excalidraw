@@ -117,7 +117,6 @@ import {
   isBindingElementType,
   isLinearElement,
   isLinearElementType,
-  isLoadedImageElement,
 } from "../element/typeChecks";
 import {
   ExcalidrawBindableElement,
@@ -128,7 +127,7 @@ import {
   ExcalidrawTextElement,
   NonDeleted,
   ImageId,
-  LoadedExcalidrawImageElement,
+  InitializedExcalidrawImageElement,
   ExcalidrawImageElement,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
@@ -202,6 +201,10 @@ import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import { isImageFile } from "../data/blob";
+import {
+  getInitializedImageElements,
+  updateImageCache,
+} from "../element/image";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
@@ -735,9 +738,7 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     this.renderImages(
-      scene.elements.filter((element) =>
-        isLoadedImageElement(element),
-      ) as LoadedExcalidrawImageElement[],
+      getInitializedImageElements(scene.elements),
       scene.appState.files,
     );
 
@@ -3839,27 +3840,6 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  private updateImageCache = async (
-    element: LoadedExcalidrawImageElement,
-    /** dataURI */
-    imageData: string,
-  ) => {
-    const cached = this.imageCache.get(element.imageId);
-    const image = await (cached ||
-      new Promise<HTMLImageElement>((resolve) => {
-        const image = new Image();
-        image.onload = () => resolve(image);
-        image.src = imageData;
-      }));
-
-    //TODO: count how many images has been loaded
-    //TODO: limit the size of the imageCache
-    this.imageCache.set(element.imageId, image);
-    invalidateShapeForElement(element);
-
-    return image;
-  };
-
   private initializeImage = async ({
     imageFile,
     imageElement,
@@ -3888,15 +3868,19 @@ class App extends React.Component<AppProps, AppState> {
           imageId,
         });
 
-        const image = await this.updateImageCache(
-          imageElement as LoadedExcalidrawImageElement,
-          dataURL,
-        );
+        await updateImageCache({
+          imageCache: this.imageCache,
+          imageElements: [imageElement as InitializedExcalidrawImageElement],
+          files: this.state.files,
+        });
+
+        const image = this.imageCache.get(imageId);
 
         // if user-created bounding box is below threshold, assume the
         // intention was to click instead of drag, and use the image's
         // intrinsic size
         if (
+          image &&
           imageElement.width < DRAGGING_THRESHOLD &&
           imageElement.height < DRAGGING_THRESHOLD
         ) {
@@ -3914,15 +3898,14 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private renderImages = async (
-    imageElements: LoadedExcalidrawImageElement[],
+    imageElements: InitializedExcalidrawImageElement[],
     files: AppState["files"],
   ) => {
-    for (const element of imageElements) {
-      const imageData = files[element.imageId as string];
-      if (imageData) {
-        await this.updateImageCache(element, imageData.data);
-      }
-    }
+    await updateImageCache({
+      imageCache: this.imageCache,
+      imageElements,
+      files,
+    });
     if (this.imageCache.size) {
       this.scene.informMutation();
     }

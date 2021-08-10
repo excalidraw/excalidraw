@@ -10,7 +10,7 @@ import {
   isTextElement,
   isLinearElement,
   isFreeDrawElement,
-  isLoadedImageElement,
+  isInitializedImageElement,
 } from "../element/typeChecks";
 import {
   getDiamondPoints,
@@ -114,10 +114,7 @@ const generateElementCanvas = (
 
   const rc = rough.canvas(canvas);
 
-  if (
-    (sceneState.exportWithDarkMode || sceneState.theme === "dark") &&
-    isLoadedImageElement(element)
-  ) {
+  if (sceneState.theme === "dark" && isInitializedImageElement(element)) {
     context.filter = THEME_FILTER;
   }
 
@@ -183,7 +180,7 @@ const drawElementOnCanvas = (
       break;
     }
     case "image": {
-      const img = isLoadedImageElement(element)
+      const img = isInitializedImageElement(element)
         ? sceneState.imageCache.get(element.imageId)
         : undefined;
       if (img != null) {
@@ -525,6 +522,7 @@ const generateElementWithCanvas = (
     prevElementWithCanvas &&
     prevElementWithCanvas.canvasZoom !== zoom.value &&
     !sceneState?.shouldCacheIgnoreZoom;
+
   if (
     !prevElementWithCanvas ||
     shouldRegenerateBecauseZoom ||
