@@ -557,10 +557,23 @@ const drawElementFromCanvas = (
 
   const cx = ((x1 + x2) / 2 + sceneState.scrollX) * window.devicePixelRatio;
   const cy = ((y1 + y2) / 2 + sceneState.scrollY) * window.devicePixelRatio;
+
+  const scaleXFactor =
+    "scale" in elementWithCanvas.element
+      ? elementWithCanvas.element.scale[0]
+      : 1;
+  const scaleYFactor =
+    "scale" in elementWithCanvas.element
+      ? elementWithCanvas.element.scale[1]
+      : 1;
+
   context.save();
-  context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
-  context.translate(cx, cy);
-  context.rotate(element.angle);
+  context.scale(
+    (1 / window.devicePixelRatio) * scaleXFactor,
+    (1 / window.devicePixelRatio) * scaleYFactor,
+  );
+  context.translate(cx * scaleXFactor, cy * scaleYFactor);
+  context.rotate(element.angle * scaleXFactor * scaleYFactor);
 
   context.drawImage(
     elementWithCanvas.canvas!,
