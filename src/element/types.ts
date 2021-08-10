@@ -68,7 +68,7 @@ export type ExcalidrawImageElement = _ExcalidrawElementBase &
     imageId: ImageId | null;
   }>;
 
-export type LoadedExcalidrawImageElement = MarkNonNullable<
+export type InitializedExcalidrawImageElement = MarkNonNullable<
   ExcalidrawImageElement,
   "imageId"
 >;
