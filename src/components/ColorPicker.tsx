@@ -1,5 +1,6 @@
 import React from "react";
 import { Popover } from "./Popover";
+import { isTransparent } from "../utils";
 
 import "./ColorPicker.scss";
 import { isArrowKey, KEYS } from "../keys";
@@ -14,7 +15,7 @@ const isValidColor = (color: string) => {
 };
 
 const getColor = (color: string): string | null => {
-  if (color === "transparent") {
+  if (isTransparent(color)) {
     return color;
   }
 
@@ -137,36 +138,41 @@ const Picker = ({
         }}
         tabIndex={0}
       >
-        {colors.map((_color, i) => (
-          <button
-            className="color-picker-swatch"
-            onClick={(event) => {
-              (event.currentTarget as HTMLButtonElement).focus();
-              onChange(_color);
-            }}
-            title={`${_color} — ${keyBindings[i].toUpperCase()}`}
-            aria-label={_color}
-            aria-keyshortcuts={keyBindings[i]}
-            style={{ color: _color }}
-            key={_color}
-            ref={(el) => {
-              if (el && i === 0) {
-                firstItem.current = el;
-              }
-              if (el && _color === color) {
-                activeItem.current = el;
-              }
-            }}
-            onFocus={() => {
-              onChange(_color);
-            }}
-          >
-            {_color === "transparent" ? (
-              <div className="color-picker-transparent"></div>
-            ) : undefined}
-            <span className="color-picker-keybinding">{keyBindings[i]}</span>
-          </button>
-        ))}
+        {colors.map((_color, i) => {
+          const _colorWithoutHash = _color.replace("#", "");
+          return (
+            <button
+              className="color-picker-swatch"
+              onClick={(event) => {
+                (event.currentTarget as HTMLButtonElement).focus();
+                onChange(_color);
+              }}
+              title={`${t(`colors.${_colorWithoutHash}`)}${
+                !isTransparent(_color) ? ` (${_color})` : ""
+              } — ${keyBindings[i].toUpperCase()}`}
+              aria-label={t(`colors.${_colorWithoutHash}`)}
+              aria-keyshortcuts={keyBindings[i]}
+              style={{ color: _color }}
+              key={_color}
+              ref={(el) => {
+                if (el && i === 0) {
+                  firstItem.current = el;
+                }
+                if (el && _color === color) {
+                  activeItem.current = el;
+                }
+              }}
+              onFocus={() => {
+                onChange(_color);
+              }}
+            >
+              {isTransparent(_color) ? (
+                <div className="color-picker-transparent"></div>
+              ) : undefined}
+              <span className="color-picker-keybinding">{keyBindings[i]}</span>
+            </button>
+          );
+        })}
         {showInput && (
           <ColorInput
             color={color}
