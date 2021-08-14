@@ -50,7 +50,7 @@ export interface ExcalidrawElementWithCanvas {
 const generateElementCanvas = (
   element: NonDeletedExcalidrawElement,
   zoom: Zoom,
-  refresh?: () => void,
+  renderCb?: () => void,
 ): ExcalidrawElementWithCanvas => {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
@@ -107,7 +107,7 @@ const generateElementCanvas = (
 
   const rc = rough.canvas(canvas);
 
-  drawElementOnCanvas(element, rc, context, refresh);
+  drawElementOnCanvas(element, rc, context, renderCb);
 
   context.restore();
 
@@ -124,7 +124,7 @@ const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
-  refresh?: () => void,
+  renderCb?: () => void,
 ) => {
   context.globalAlpha = element.opacity / 100;
   switch (element.type) {
@@ -168,7 +168,7 @@ const drawElementOnCanvas = (
           // to the DOM
           document.body.appendChild(context.canvas);
         }
-        renderTextElement(element, context, refresh);
+        renderTextElement(element, context, renderCb);
         if (shouldTemporarilyAttach) {
           context.canvas.remove();
         }
@@ -448,7 +448,7 @@ const generateElementShape = (
 const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,
   sceneState?: SceneState,
-  refresh?: () => void,
+  renderCb?: () => void,
 ) => {
   const zoom: Zoom = sceneState ? sceneState.zoom : defaultAppState.zoom;
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
@@ -457,7 +457,7 @@ const generateElementWithCanvas = (
     prevElementWithCanvas.canvasZoom !== zoom.value &&
     !sceneState?.shouldCacheIgnoreZoom;
   if (!prevElementWithCanvas || shouldRegenerateBecauseZoom) {
-    const elementWithCanvas = generateElementCanvas(element, zoom, refresh);
+    const elementWithCanvas = generateElementCanvas(element, zoom, renderCb);
 
     elementWithCanvasCache.set(element, elementWithCanvas);
 
@@ -511,7 +511,7 @@ export const renderElement = (
   context: CanvasRenderingContext2D,
   renderOptimizations: boolean,
   sceneState: SceneState,
-  refresh?: () => void,
+  renderCb?: () => void,
 ) => {
   const generator = rc.generator;
   switch (element.type) {
@@ -533,7 +533,7 @@ export const renderElement = (
         const elementWithCanvas = generateElementWithCanvas(
           element,
           sceneState,
-          refresh,
+          renderCb,
         );
         drawElementFromCanvas(elementWithCanvas, rc, context, sceneState);
       } else {
@@ -546,7 +546,7 @@ export const renderElement = (
         context.translate(cx, cy);
         context.rotate(element.angle);
         context.translate(-shiftX, -shiftY);
-        drawElementOnCanvas(element, rc, context, refresh);
+        drawElementOnCanvas(element, rc, context, renderCb);
         context.restore();
       }
 
@@ -563,7 +563,7 @@ export const renderElement = (
         const elementWithCanvas = generateElementWithCanvas(
           element,
           sceneState,
-          refresh,
+          renderCb,
         );
         drawElementFromCanvas(elementWithCanvas, rc, context, sceneState);
       } else {
@@ -576,7 +576,7 @@ export const renderElement = (
         context.translate(cx, cy);
         context.rotate(element.angle);
         context.translate(-shiftX, -shiftY);
-        drawElementOnCanvas(element, rc, context, refresh);
+        drawElementOnCanvas(element, rc, context, renderCb);
         context.restore();
       }
       break;

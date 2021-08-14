@@ -1,12 +1,17 @@
 import { ExcalidrawTextElement, NonDeleted } from "../element/types";
 import { ElementUpdate, mutateElement } from "../element/mutateElement";
+
 import {
-  MathActionName,
+  TextActionNameMath,
   TextOptsMath,
   registerTextElementSubtypeMath,
 } from "./math";
 
-import { TextOptsText, registerTextElementSubtypeText } from "./text";
+import {
+  TextActionNameText,
+  TextOptsText,
+  registerTextElementSubtypeText,
+} from "./text";
 
 import { Action } from "../actions/types";
 import { register } from "../actions/register";
@@ -49,8 +54,8 @@ const renderSvgMethodsL = {} as TextLikeMethodArrays;
 const restoreMethodsA = [] as TextLikeMethods;
 const restoreMethodsL = {} as TextLikeMethodArrays;
 
-export type TextOpts = TextOptsMath | TextOptsText;
-export type TextActionName = MathActionName;
+export type TextOpts = TextOptsText | TextOptsMath;
+export type TextActionName = TextActionNameText | TextActionNameMath;
 
 export const registerTextLikeMethod = (
   name: TextLikeMethodName,

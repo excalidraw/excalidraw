@@ -11,6 +11,8 @@ import { registerTextLikeMethod } from "../";
 
 export type TextOptsText = {};
 
+export type TextActionNameText = "";
+
 type ExcalidrawTextElementText = ExcalidrawTextElement &
   Readonly<{
     subtype: "none";
@@ -63,7 +65,7 @@ const measureTextElementText = (
 const renderTextElementText = (
   element: NonDeleted<ExcalidrawTextElementText>,
   context: CanvasRenderingContext2D,
-  refresh?: () => void,
+  renderCb?: () => void,
 ) => {
   const rtl = isRTL(element.text);
   context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");

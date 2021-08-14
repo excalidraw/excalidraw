@@ -190,13 +190,13 @@ export const renderScene = (
     // doesn't guarantee pixel-perfect output.
     renderOptimizations = false,
     renderGrid = true,
-    refresh = () => {},
+    renderCb = () => {},
   }: {
     renderScrollbars?: boolean;
     renderSelection?: boolean;
     renderOptimizations?: boolean;
     renderGrid?: boolean;
-    refresh?: () => void;
+    renderCb?: () => void;
   } = {},
 ) => {
   if (canvas === null) {
@@ -277,7 +277,7 @@ export const renderScene = (
         context,
         renderOptimizations,
         sceneState,
-        refresh,
+        renderCb,
       );
     } catch (error) {
       console.error(error);

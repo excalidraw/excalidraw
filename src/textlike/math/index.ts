@@ -46,7 +46,7 @@ const isMathElement = (
   );
 };
 
-export type MathActionName = "toggleUseTex" | "showUseTex";
+export type TextActionNameMath = "toggleUseTex" | "showUseTex";
 
 let _useTex = true;
 

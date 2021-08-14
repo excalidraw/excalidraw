@@ -1097,7 +1097,7 @@ class App extends React.Component<AppProps, AppState> {
       {
         renderOptimizations: true,
         renderScrollbars: !this.isMobile,
-        refresh,
+        renderCb: refresh,
       },
     );
     if (scrollBars) {
