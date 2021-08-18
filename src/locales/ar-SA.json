@@ -275,7 +275,7 @@
     "width": "العرض"
   },
   "toast": {
-    "copyStyles": "نسخ النمط.",
+    "copyStyles": "نسخت الانماط.",
     "copyToClipboard": "نسخ إلى الحافظة.",
     "copyToClipboardAsPng": "تم نسخ {{exportSelection}} إلى الحافظة بصيغة PNG\n({{exportColorScheme}})",
     "fileSaved": "تم حفظ الملف.",
