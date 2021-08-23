@@ -320,5 +320,4 @@ export const actionToggleAlign = register({
       />
     </div>
   ),
-  keyTest: (event) => event.altKey && event.shiftKey && event.code === CODES.D,
 });
