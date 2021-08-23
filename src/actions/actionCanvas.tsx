@@ -4,6 +4,7 @@ import { ColorPicker } from "../components/ColorPicker";
 import { trash, zoomIn, zoomOut } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { DarkModeToggle } from "../components/DarkModeToggle";
+import { AlignModeToggle } from "../components/AlignModeToggle";
 import { ZOOM_STEP } from "../constants";
 import { getCommonBounds, getNonDeletedElements } from "../element";
 import { newElementWith } from "../element/mutateElement";
@@ -288,6 +289,31 @@ export const actionToggleTheme = register({
     <div style={{ marginInlineStart: "0.25rem" }}>
       <DarkModeToggle
         value={appState.theme}
+        onChange={(theme) => {
+          updateData(theme);
+        }}
+      />
+    </div>
+  ),
+  keyTest: (event) => event.altKey && event.shiftKey && event.code === CODES.D,
+});
+
+export const actionToggleAlign = register({
+  name: "toggleAlign",
+  perform: (_, appState, value) => {
+    return {
+      appState: {
+        ...appState,
+        alignType:
+          value || (appState.alignType === "bounding" ? "anchor" : "bounding"),
+      },
+      commitToHistory: false,
+    };
+  },
+  PanelComponent: ({ appState, updateData }) => (
+    <div style={{ marginInlineStart: "0.25rem" }}>
+      <AlignModeToggle
+        value={appState.alignType}
         onChange={(theme) => {
           updateData(theme);
         }}
