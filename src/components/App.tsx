@@ -1897,9 +1897,9 @@ class App extends React.Component<AppProps, AppState> {
   }) => {
     const existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
 
-    if (!existingTextElement && !createTextIfNotExists) {
-      return;
-    }
+    // if (!existingTextElement && !createTextIfNotExists) {
+    //   return;
+    // }
 
     const parentCenterPosition =
       insertAtParentCenter &&
