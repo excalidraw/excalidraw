@@ -16,7 +16,8 @@ jobs:
         id: prep
         run: |
           DOCKER_IMAGE=${{ secrets.DOCKER_USERNAME }}/${GITHUB_REPOSITORY#*/}
-          TAGS="${DOCKER_IMAGE}:${github.sha},${DOCKER_IMAGE}:latest"
+          GITHUB_SHA=${{ github.sha }}
+          TAGS="${DOCKER_IMAGE}:${GITHUB_SHA},${DOCKER_IMAGE}:latest"
           # Set output parameters.
           echo ::set-output name=tags::${TAGS}
       
