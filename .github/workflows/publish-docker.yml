@@ -28,5 +28,6 @@ jobs:
           repository: ${{ secrets.DOCKER_USERNAME }}/excalidraw
           tag_with_ref: true
           tag_with_sha: true
+          push: true
           builder: ${{ steps.buildx.outputs.name }}
           platforms: linux/amd64,linux/arm,linux/arm64
