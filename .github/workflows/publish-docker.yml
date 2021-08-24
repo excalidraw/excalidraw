@@ -12,6 +12,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       
+      - name: Prepare
+        id: prep
+        run: |
+          DOCKER_IMAGE=${{ secrets.DOCKER_USERNAME }}/${GITHUB_REPOSITORY#*/}
+          TAGS="${DOCKER_IMAGE}:${github.sha},${DOCKER_IMAGE}:latest"
+          # Set output parameters.
+          echo ::set-output name=tags::${TAGS}
+      
       - name: Set up QEMU
         uses: docker/setup-qemu-action@master
         with:
@@ -31,3 +39,4 @@ jobs:
           push: true
           builder: ${{ steps.buildx.outputs.name }}
           platforms: linux/amd64,linux/arm,linux/arm64
+          tags: ${{ steps.prep.outputs.tags }}
