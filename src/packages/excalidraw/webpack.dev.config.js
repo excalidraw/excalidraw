@@ -1,6 +1,7 @@
 const path = require("path");
 const webpack = require("webpack");
 const autoprefixer = require("autoprefixer");
+require('dotenv').config({ path: '../../../.env' })
 
 module.exports = {
   mode: "development",
@@ -76,7 +77,10 @@ module.exports = {
       },
     },
   },
-  plugins: [new webpack.EvalSourceMapDevToolPlugin({ exclude: /vendor/ })],
+  plugins: [
+    new webpack.EvalSourceMapDevToolPlugin({ exclude: /vendor/ }),
+    new webpack.DefinePlugin({"process.env": JSON.stringify(process.env)})
+  ],
   externals: {
     react: {
       root: "React",

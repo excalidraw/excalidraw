@@ -11,6 +11,8 @@ import { AppProps, ExcalidrawAPIRefValue, ExcalidrawProps } from "../../types";
 import { defaultLang } from "../../i18n";
 import { DEFAULT_UI_OPTIONS } from "../../constants";
 
+// import ExcalidrawApp from "../../excalidraw-app";
+
 const Excalidraw = (props: ExcalidrawProps) => {
   const {
     onChange,
@@ -184,3 +186,5 @@ export {
   getFreeDrawSvgPath,
 } from "../../packages/utils";
 export { FONT_FAMILY } from "../../constants";
+
+// export { ExcalidrawApp };

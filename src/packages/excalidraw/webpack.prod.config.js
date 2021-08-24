@@ -1,8 +1,10 @@
 const path = require("path");
+const webpack = require("webpack");
 const TerserPlugin = require("terser-webpack-plugin");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
   .BundleAnalyzerPlugin;
 const autoprefixer = require("autoprefixer");
+require('dotenv').config({ path: '../../../.env' })
 
 module.exports = {
   mode: "production",
@@ -103,6 +105,7 @@ module.exports = {
     },
   },
   plugins: [
+    new webpack.DefinePlugin({"process.env": JSON.stringify(process.env)}),
     ...(process.env.ANALYZER === "true" ? [new BundleAnalyzerPlugin()] : []),
   ],
   externals: {

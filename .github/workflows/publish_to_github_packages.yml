@@ -1,0 +1,30 @@
+name: Publish package to github packages
+on:
+  release:
+    types: [created]
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      working-directory: ./src/packages/excalidraw/
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v2
+      # Setup .npmrc file to publish to GitHub Packages
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "12.x"
+          registry-url: "https://npm.pkg.github.com"
+          # Defaults to the user or organization that owns the workflow file
+          # scope: "@ayaankhan98"
+      - run: npm install
+        working-directory: ${{env.working-directory}}
+      - run: npm publish --access public
+        working-directory: ${{env.working-directory}}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
