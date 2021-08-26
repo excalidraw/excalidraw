@@ -3,11 +3,13 @@ const TerserPlugin = require("terser-webpack-plugin");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
   .BundleAnalyzerPlugin;
 const autoprefixer = require("autoprefixer");
+const webpack = require("webpack");
+const dotenv = require("dotenv");
 
 module.exports = {
   mode: "production",
   entry: {
-    "excalidraw.production.min": "./entry.js",
+    "excalidraw.production.min": "../../excalidraw-app/index.tsx",
   },
   output: {
     path: path.resolve(__dirname, "dist"),
@@ -104,6 +106,9 @@ module.exports = {
   },
   plugins: [
     ...(process.env.ANALYZER === "true" ? [new BundleAnalyzerPlugin()] : []),
+    new webpack.DefinePlugin({
+      "process.env": JSON.stringify(dotenv.config().parsed),
+    }),
   ],
   externals: {
     react: {

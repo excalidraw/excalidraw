@@ -1,4 +1,5 @@
 import LanguageDetector from "i18next-browser-languagedetector";
+import "../packages/excalidraw/publicPath";
 import React, {
   useCallback,
   useContext,
