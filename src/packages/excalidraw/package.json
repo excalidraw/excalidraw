@@ -1,6 +1,6 @@
 {
   "name": "@akashg3627/excalidraw-collab-test",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "main": "main.js",
   "types": "types/packages/excalidraw/index.d.ts",
   "files": [
