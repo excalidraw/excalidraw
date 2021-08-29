@@ -161,7 +161,7 @@
   },
   "toolBar": {
     "selection": "Selection",
-    "image": "Image",
+    "image": "Insert image",
     "rectangle": "Rectangle",
     "diamond": "Diamond",
     "ellipse": "Ellipse",

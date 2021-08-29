@@ -155,10 +155,12 @@ export const ShapesSwitcher = ({
   canvas,
   elementType,
   setAppState,
+  onImageAction,
 }: {
   canvas: HTMLCanvasElement | null;
   elementType: ExcalidrawElement["type"];
   setAppState: React.Component<any, AppState>["setState"];
+  onImageAction: () => void;
 }) => (
   <>
     {SHAPES.map(({ value, icon, key }, index) => {
@@ -187,7 +189,9 @@ export const ShapesSwitcher = ({
               selectedElementIds: {},
             });
             setCursorForShape(canvas, value);
-            setAppState({});
+            if (value === "image") {
+              onImageAction();
+            }
           }}
         />
       );
