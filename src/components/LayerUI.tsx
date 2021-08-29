@@ -73,6 +73,7 @@ interface LayerUIProps {
   focusContainer: () => void;
   library: Library;
   id: string;
+  onImageAction: () => void;
 }
 
 const useOnClickOutside = (
@@ -381,6 +382,7 @@ const LayerUI = ({
   focusContainer,
   library,
   id,
+  onImageAction,
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
@@ -601,6 +603,7 @@ const LayerUI = ({
                           canvas={canvas}
                           elementType={appState.elementType}
                           setAppState={setAppState}
+                          onImageAction={onImageAction}
                         />
                       </Stack.Row>
                     </Island>
@@ -761,6 +764,7 @@ const LayerUI = ({
         renderCustomFooter={renderCustomFooter}
         viewModeEnabled={viewModeEnabled}
         showThemeBtn={showThemeBtn}
+        onImageAction={onImageAction}
       />
     </>
   ) : (

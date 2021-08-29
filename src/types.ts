@@ -11,6 +11,7 @@ import {
   ChartType,
   FontFamilyValues,
   ImageId,
+  InitializedExcalidrawImageElement,
 } from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -131,6 +132,8 @@ export type AppState = {
         shown: true;
         data: Spreadsheet;
       };
+  /** imageElement waiting to be placed on canvas */
+  pendingImageElement: NonDeleted<InitializedExcalidrawImageElement> | null;
 };
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };

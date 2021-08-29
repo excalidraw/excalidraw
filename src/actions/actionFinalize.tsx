@@ -50,6 +50,13 @@ export const actionFinalize = register({
     }
 
     let newElements = elements;
+
+    if (appState.pendingImageElement) {
+      newElements = newElements.filter(
+        (element) => element.id !== appState.pendingImageElement?.id,
+      );
+    }
+
     if (window.document.activeElement instanceof HTMLElement) {
       focusContainer();
     }
@@ -153,6 +160,7 @@ export const actionFinalize = register({
                 [multiPointElement.id]: true,
               }
             : appState.selectedElementIds,
+        pendingImageElement: null,
       },
       commitToHistory: appState.elementType === "freedraw",
     };
