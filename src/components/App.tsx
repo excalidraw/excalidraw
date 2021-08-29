@@ -3869,7 +3869,22 @@ class App extends React.Component<AppProps, AppState> {
   }) => {
     const dataURL = await this.getImageData(imageFile);
 
-    const imageId = nanoid(36) as ImageId;
+    let imageId: ImageId;
+    try {
+      const hashBuffer = await window.crypto.subtle.digest(
+        "SHA-1",
+        await imageFile.arrayBuffer(),
+      );
+      imageId =
+        // buffer to byte array
+        Array.from(new Uint8Array(hashBuffer))
+          // bytes to hex string
+          .map((b) => b.toString(16).padStart(2, "0"))
+          .join("") as ImageId;
+    } catch (error) {
+      console.error(error);
+      imageId = nanoid(40) as ImageId;
+    }
 
     const imageElement = newElementWith(_imageElement, {
       imageId,
