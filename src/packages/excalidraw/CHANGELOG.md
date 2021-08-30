@@ -21,7 +21,7 @@ Please add the latest change on the top under the correct section.
 
 ### Docs
 
-- Correct exportToBackend in README to onExportToBackend
+- Correct exportToBackend in README to onExportToBackend [#3952](https://github.com/excalidraw/excalidraw/pull/3952)
 
 ## 0.9.0 (2021-07-10)
 
