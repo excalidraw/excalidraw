@@ -39,7 +39,13 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
         continue;
       }
 
-      if (key === "points") {
+      if (key === "scale") {
+        const prevScale = (element as any)[key];
+        const nextScale = value;
+        if (prevScale[0] === nextScale[0] && prevScale[1] === nextScale[1]) {
+          continue;
+        }
+      } else if (key === "points") {
         const prevPoints = (element as any)[key];
         const nextPoints = value;
         if (prevPoints.length === nextPoints.length) {

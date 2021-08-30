@@ -558,6 +558,18 @@ export const resizeSingleElement = (
     ...rescaledPoints,
   };
 
+  if ("scale" in element && "scale" in stateAtResizeStart) {
+    mutateElement(element, {
+      scale: [
+        // defaulting because scaleX/Y can be 0/-0
+        (Math.sign(scaleX) || stateAtResizeStart.scale[0]) *
+          stateAtResizeStart.scale[0],
+        (Math.sign(scaleY) || stateAtResizeStart.scale[1]) *
+          stateAtResizeStart.scale[1],
+      ],
+    });
+  }
+
   if (
     resizedElement.width !== 0 &&
     resizedElement.height !== 0 &&
