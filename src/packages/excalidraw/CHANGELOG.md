@@ -19,6 +19,10 @@ Please add the latest change on the top under the correct section.
 
 - Prevent gradual misalignment of the canvas due to floating point rounding errors [#3833](https://github.com/excalidraw/excalidraw/pull/3833).
 
+### Docs
+
+- Correct exportToBackend in README to onExportToBackend
+
 ## 0.9.0 (2021-07-10)
 
 ## Excalidraw API
