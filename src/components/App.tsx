@@ -4314,7 +4314,9 @@ class App extends React.Component<AppProps, AppState> {
         gridY,
         distance(pointerDownState.originInGrid.x, gridX),
         distance(pointerDownState.originInGrid.y, gridY),
-        shouldMaintainAspectRatio(event),
+        draggingElement.type === "image"
+          ? !shouldMaintainAspectRatio(event)
+          : shouldMaintainAspectRatio(event),
         shouldResizeFromCenter(event),
         aspectRatio,
       );
@@ -4353,7 +4355,9 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.resize.arrowDirection,
         shouldRotateWithDiscreteAngle(event),
         shouldResizeFromCenter(event),
-        shouldMaintainAspectRatio(event),
+        selectedElements.length === 1 && selectedElements[0].type === "image"
+          ? !shouldMaintainAspectRatio(event)
+          : shouldMaintainAspectRatio(event),
         resizeX,
         resizeY,
         pointerDownState.resize.center.x,
