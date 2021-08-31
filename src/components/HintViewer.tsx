@@ -41,7 +41,9 @@ const getHints = ({ appState, elements }: Hint) => {
     if (isLinearElement(targetElement) && targetElement.points.length === 2) {
       return t("hints.lockAngle");
     }
-    return t("hints.resize");
+    return selectedElements[0].type === "image"
+      ? t("hints.resizeImage")
+      : t("hints.resize");
   }
 
   if (isRotating && lastPointerDownWith === "mouse") {
