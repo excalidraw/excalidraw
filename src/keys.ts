@@ -67,13 +67,12 @@ export const isArrowKey = (key: string) =>
   key === KEYS.ARROW_DOWN ||
   key === KEYS.ARROW_UP;
 
-export const getResizeCenterPointKey = (event: MouseEvent | KeyboardEvent) =>
+export const shouldResizeFromCenter = (event: MouseEvent | KeyboardEvent) =>
   event.altKey;
 
-export const getResizeWithSidesSameLengthKey = (
-  event: MouseEvent | KeyboardEvent,
-) => event.shiftKey;
+export const shouldMaintainAspectRatio = (event: MouseEvent | KeyboardEvent) =>
+  event.shiftKey;
 
-export const getRotateWithDiscreteAngleKey = (
+export const shouldRotateWithDiscreteAngle = (
   event: MouseEvent | KeyboardEvent,
 ) => event.shiftKey;
