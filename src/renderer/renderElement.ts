@@ -38,6 +38,10 @@ import { MAX_DECIMALS_FOR_SVG_EXPORT, THEME_FILTER } from "../constants";
 
 const defaultAppState = getDefaultAppState();
 
+const isUnloadedImage = (element: ExcalidrawElement, sceneState: SceneState) =>
+  isInitializedImageElement(element) &&
+  !sceneState.imageCache.get(element.imageId);
+
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 
 const getDashArrayDotted = (strokeWidth: number) => [1.5, 6 + strokeWidth];
@@ -114,7 +118,11 @@ const generateElementCanvas = (
 
   const rc = rough.canvas(canvas);
 
-  if (sceneState.theme === "dark" && isInitializedImageElement(element)) {
+  if (
+    sceneState.theme === "dark" &&
+    isInitializedImageElement(element) &&
+    !isUnloadedImage(element, sceneState)
+  ) {
     context.filter = THEME_FILTER;
   }
 
@@ -131,13 +139,26 @@ const generateElementCanvas = (
   };
 };
 
+const IMAGE_PLACEHOLDER_IMG = document.createElement("img");
+IMAGE_PLACEHOLDER_IMG.src = `data:image/svg+xml,${encodeURIComponent(
+  `<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="image" class="svg-inline--fa fa-image fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="#888" d="M464 448H48c-26.51 0-48-21.49-48-48V112c0-26.51 21.49-48 48-48h416c26.51 0 48 21.49 48 48v288c0 26.51-21.49 48-48 48zM112 120c-30.928 0-56 25.072-56 56s25.072 56 56 56 56-25.072 56-56-25.072-56-56-56zM64 384h384V272l-87.515-87.515c-4.686-4.686-12.284-4.686-16.971 0L208 320l-55.515-55.515c-4.686-4.686-12.284-4.686-16.971 0L64 336v48z"></path></svg>`,
+)}`;
+
 const drawImagePlaceholder = (
   element: NonDeletedExcalidrawElement,
-  rc: RoughCanvas,
   context: CanvasRenderingContext2D,
 ) => {
-  context.fillStyle = "rgba(134, 134, 134, 0.199)";
+  context.fillStyle = "#E7E7E7";
   context.fillRect(0, 0, element.width, element.height);
+
+  const size = Math.min(element.width, element.height, 60);
+  context.drawImage(
+    IMAGE_PLACEHOLDER_IMG,
+    element.width / 2 - size / 2,
+    element.height / 2 - size / 2,
+    size,
+    size,
+  );
 };
 
 const drawElementOnCanvas = (
@@ -192,7 +213,7 @@ const drawElementOnCanvas = (
           element.height,
         );
       } else {
-        drawImagePlaceholder(element, rc, context);
+        drawImagePlaceholder(element, context);
       }
       break;
     }
@@ -337,7 +358,6 @@ const generateElementShape = (
 
     switch (element.type) {
       case "rectangle":
-        // case "image":
         if (element.strokeSharpness === "round") {
           const w = element.width;
           const h = element.height;
@@ -558,12 +578,14 @@ const drawElementFromCanvas = (
   const cx = ((x1 + x2) / 2 + sceneState.scrollX) * window.devicePixelRatio;
   const cy = ((y1 + y2) / 2 + sceneState.scrollY) * window.devicePixelRatio;
 
+  const _isUnloadedImage = isUnloadedImage(element, sceneState);
+
   const scaleXFactor =
-    "scale" in elementWithCanvas.element
+    "scale" in elementWithCanvas.element && !_isUnloadedImage
       ? elementWithCanvas.element.scale[0]
       : 1;
   const scaleYFactor =
-    "scale" in elementWithCanvas.element
+    "scale" in elementWithCanvas.element && !_isUnloadedImage
       ? elementWithCanvas.element.scale[1]
       : 1;
 
