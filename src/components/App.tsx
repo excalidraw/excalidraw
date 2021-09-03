@@ -299,6 +299,7 @@ class App extends React.Component<AppProps, AppState> {
         ready: true,
         readyPromise,
         updateScene: this.updateScene,
+        setFiles: this.setFiles,
         resetScene: this.resetScene,
         getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
         history: {
@@ -1448,6 +1449,30 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ errorMessage: error.message });
     }
   };
+
+  public setFiles: ExcalidrawImperativeAPI["setFiles"] = withBatchedUpdates(
+    (files) => {
+      this.setState(
+        (state) => ({
+          files: {
+            ...state.files,
+            ...files.reduce((acc, { id, type, dataURL }) => {
+              acc[id] = { type, id, dataURL };
+              return acc;
+            }, {} as Record<string, AppState["files"][number]>),
+          },
+        }),
+        () => {
+          this.renderImages(
+            getInitializedImageElements(
+              this.scene.getElementsIncludingDeleted(),
+            ),
+            this.state.files,
+          );
+        },
+      );
+    },
+  );
 
   public updateScene = withBatchedUpdates(
     <K extends keyof AppState>(sceneData: {
@@ -3901,7 +3926,7 @@ class App extends React.Component<AppProps, AppState> {
               [imageId]: {
                 type: "image",
                 id: imageId,
-                data: dataURL,
+                dataURL,
               },
             },
           }),
