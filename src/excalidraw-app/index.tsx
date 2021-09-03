@@ -1,35 +1,22 @@
-import LanguageDetector from "i18next-browser-languagedetector";
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import "../packages/excalidraw/publicPath";
+// import LanguageDetector from "i18next-browser-languagedetector";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { trackEvent } from "../analytics";
-import { getDefaultAppState } from "../appState";
+// import { getDefaultAppState } from "../appState";
 import { ErrorDialog } from "../components/ErrorDialog";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
 import {
-  APP_NAME,
   EVENT,
   STORAGE_KEYS,
-  TITLE_TIMEOUT,
-  URL_HASH_KEYS,
+  // URL_HASH_KEYS,
   VERSION_TIMEOUT,
 } from "../constants";
 import { loadFromBlob } from "../data/blob";
 import { ImportedDataState } from "../data/types";
-import {
-  ExcalidrawElement,
-  NonDeletedExcalidrawElement,
-} from "../element/types";
+import { ExcalidrawElement } from "../element/types";
 import { useCallbackRefState } from "../hooks/useCallbackRefState";
-import { Language, t } from "../i18n";
-import Excalidraw, {
-  defaultLang,
-  /* languages, */
-} from "../packages/excalidraw/index";
+import { t } from "../i18n";
+import Excalidraw from "../packages/excalidraw/index"; // defaultLang,
 import { AppState, LibraryItems, ExcalidrawImperativeAPI } from "../types";
 import {
   debounce,
@@ -44,27 +31,30 @@ import CollabWrapper, {
   CollabContextConsumer,
 } from "./collab/CollabWrapper";
 /* import { LanguageList } from "./components/LanguageList"; */
-import { exportToBackend, getCollaborationLinkData, loadScene } from "./data";
+import { getCollaborationLinkData, loadScene } from "./data";
 import {
   importFromLocalStorage,
   saveToLocalStorage,
 } from "./data/localStorage";
 import CustomStats from "./CustomStats";
-import { restoreAppState, RestoredDataState } from "../data/restore";
+import {
+  // restoreAppState,
+  RestoredDataState,
+} from "../data/restore";
 /* import { Tooltip } from "../components/Tooltip"; */
 /* import { shield } from "../components/icons"; */
 
 import "./index.scss";
-import { ExportToExcalidrawPlus } from "./components/ExportToExcalidrawPlus";
+// import { ExportToExcalidrawPlus } from "./components/ExportToExcalidrawPlus";
 
-const languageDetector = new LanguageDetector();
-languageDetector.init({
-  languageUtils: {
-    formatLanguageCode: (langCode: Language["code"]) => langCode,
-    isWhitelisted: () => true,
-  },
-  checkWhitelist: false,
-});
+// const languageDetector = new LanguageDetector();
+// languageDetector.init({
+//   languageUtils: {
+//     formatLanguageCode: (langCode: Language["code"]) => langCode,
+//     isWhitelisted: () => true,
+//   },
+//   checkWhitelist: false,
+// });
 
 const saveDebounced = debounce(
   (elements: readonly ExcalidrawElement[], state: AppState) => {
@@ -79,6 +69,7 @@ const onBlur = () => {
 
 const initializeScene = async (opts: {
   collabAPI: CollabAPI;
+  activeRoomLink: string;
 }): Promise<ImportedDataState | null> => {
   const searchParams = new URLSearchParams(window.location.search);
   const id = searchParams.get("id");
@@ -93,7 +84,7 @@ const initializeScene = async (opts: {
     scrollToContent?: boolean;
   } = await loadScene(null, null, localDataState);
 
-  let roomLinkData = getCollaborationLinkData(window.location.href);
+  let roomLinkData = getCollaborationLinkData(opts.activeRoomLink);
   const isExternalScene = !!(id || jsonBackendMatch || roomLinkData);
   if (isExternalScene) {
     if (
@@ -115,9 +106,9 @@ const initializeScene = async (opts: {
         );
       }
       scene.scrollToContent = true;
-      if (!roomLinkData) {
-        window.history.replaceState({}, APP_NAME, window.location.origin);
-      }
+      // if (!roomLinkData) {
+      //   window.history.replaceState({}, APP_NAME, window.location.origin);
+      // }
     } else {
       // https://github.com/excalidraw/excalidraw/issues/1919
       if (document.hidden) {
@@ -133,10 +124,10 @@ const initializeScene = async (opts: {
       }
 
       roomLinkData = null;
-      window.history.replaceState({}, APP_NAME, window.location.origin);
+      // window.history.replaceState({}, APP_NAME, window.location.origin);
     }
   } else if (externalUrlMatch) {
-    window.history.replaceState({}, APP_NAME, window.location.origin);
+    // window.history.replaceState({}, APP_NAME, window.location.origin);
 
     const url = externalUrlMatch[1];
     try {
@@ -164,10 +155,10 @@ const initializeScene = async (opts: {
   }
   return null;
 };
-
+/*
 const PlusLinkJSX = (
   <p></p>
-  /*  <p style={{ direction: "ltr", unicodeBidi: "embed" }}>
+   <p style={{ direction: "ltr", unicodeBidi: "embed" }}>
     Introducing Excalidraw+
     <br />
     <a
@@ -177,13 +168,15 @@ const PlusLinkJSX = (
     >
       Try out now!
     </a>
-  </p> */
+  </p>
 );
+*/
 
-const ExcalidrawWrapper = () => {
+const ExcalidrawWrapper = (props: any) => {
   const [errorMessage, setErrorMessage] = useState("");
-  const currentLangCode = languageDetector.detect() || defaultLang.code;
-  const [langCode /* , setLangCode */] = useState(currentLangCode);
+  /*const currentLangCode = languageDetector.detect() || defaultLang.code;
+  const [langCode  , setLangCode ] = useState(currentLangCode);
+  */
 
   // initial state
   // ---------------------------------------------------------------------------
@@ -208,13 +201,13 @@ const ExcalidrawWrapper = () => {
   ] = useCallbackRefState<ExcalidrawImperativeAPI>();
 
   const collabAPI = useContext(CollabContext)?.api;
-
+  const activeRoomLink = props.activeRoomLink;
   useEffect(() => {
     if (!collabAPI || !excalidrawAPI) {
       return;
     }
 
-    initializeScene({ collabAPI }).then((scene) => {
+    initializeScene({ collabAPI, activeRoomLink }).then((scene) => {
       if (scene) {
         try {
           scene.libraryItems =
@@ -229,7 +222,7 @@ const ExcalidrawWrapper = () => {
       }
       initialStatePromiseRef.current.promise.resolve(scene);
     });
-
+    /*
     const onHashChange = (event: HashChangeEvent) => {
       event.preventDefault();
       const hash = new URLSearchParams(window.location.hash.slice(1));
@@ -242,7 +235,7 @@ const ExcalidrawWrapper = () => {
         window.history.replaceState({}, "", event.oldURL);
         excalidrawAPI.importLibrary(libraryUrl, hash.get("token"));
       } else {
-        initializeScene({ collabAPI }).then((scene) => {
+        initializeScene({ collabAPI, activeRoomLink }).then((scene) => {
           if (scene) {
             excalidrawAPI.updateScene({
               ...scene,
@@ -251,27 +244,27 @@ const ExcalidrawWrapper = () => {
           }
         });
       }
-    };
+    };*/
 
-    const titleTimeout = setTimeout(
-      () => (document.title = APP_NAME),
-      TITLE_TIMEOUT,
-    );
-    window.addEventListener(EVENT.HASHCHANGE, onHashChange, false);
+    // const titleTimeout = setTimeout(
+    //   () => (document.title = APP_NAME),
+    //   TITLE_TIMEOUT,
+    // );
+    // window.addEventListener(EVENT.HASHCHANGE, onHashChange, false);
     window.addEventListener(EVENT.UNLOAD, onBlur, false);
     window.addEventListener(EVENT.BLUR, onBlur, false);
     return () => {
-      window.removeEventListener(EVENT.HASHCHANGE, onHashChange, false);
+      // window.removeEventListener(EVENT.HASHCHANGE, onHashChange, false);
       window.removeEventListener(EVENT.UNLOAD, onBlur, false);
       window.removeEventListener(EVENT.BLUR, onBlur, false);
-      clearTimeout(titleTimeout);
+      // clearTimeout(titleTimeout);
     };
-  }, [collabAPI, excalidrawAPI]);
-
+  }, [collabAPI, excalidrawAPI, activeRoomLink]);
+  /*
   useEffect(() => {
     languageDetector.cacheUserLanguage(langCode);
   }, [langCode]);
-
+*/
   const onChange = (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
@@ -286,7 +279,7 @@ const ExcalidrawWrapper = () => {
     }
   };
 
-  const onExportToBackend = async (
+  /*const onExportToBackend = async (
     exportedElements: readonly NonDeletedExcalidrawElement[],
     appState: AppState,
     canvas: HTMLCanvasElement | null,
@@ -311,7 +304,8 @@ const ExcalidrawWrapper = () => {
       }
     }
   };
-
+*/
+  /*
   const renderTopRightUI = useCallback(
     (isMobile: boolean, appState: AppState) => {
       return (
@@ -322,14 +316,15 @@ const ExcalidrawWrapper = () => {
             textAlign: "center",
           }}
         >
-          {/* <GitHubCorner theme={appState.theme} dir={document.dir} /> */}
-          {/* FIXME remove after 2021-05-20 */}
+          { <GitHubCorner theme={appState.theme} dir={document.dir} /> }
+          { FIXME remove after 2021-05-20 }
           {PlusLinkJSX}
         </div>
       );
     },
     [],
   );
+  */
 
   /*   const renderFooter = useCallback(
     (isMobile: boolean) => {
@@ -424,35 +419,41 @@ const ExcalidrawWrapper = () => {
         UIOptions={{
           canvasActions: {
             export: {
-              onExportToBackend,
-              renderCustomUI: (elements, appState) => {
-                return (
-                  <ExportToExcalidrawPlus
-                    elements={elements}
-                    appState={appState}
-                    onError={(error) => {
-                      excalidrawAPI?.updateScene({
-                        appState: {
-                          errorMessage: error.message,
-                        },
-                      });
-                    }}
-                  />
-                );
-              },
+              // onExportToBackend,
+              // renderCustomUI: (elements, appState) => {
+              //   return (
+              //     <ExportToExcalidrawPlus
+              //       elements={elements}
+              //       appState={appState}
+              //       onError={(error) => {
+              //         excalidrawAPI?.updateScene({
+              //           appState: {
+              //             errorMessage: error.message,
+              //           },
+              //         });
+              //       }}
+              //     />
+              //   );
+              // },
             },
           },
         }}
-        renderTopRightUI={renderTopRightUI}
+        // renderTopRightUI={renderTopRightUI}
         /* renderFooter={renderFooter} */
-        langCode={langCode}
+        // langCode={langCode}
         renderCustomStats={renderCustomStats}
         detectScroll={false}
         handleKeyboardGlobally={true}
         onLibraryChange={onLibraryChange}
         autoFocus={true}
       />
-      {excalidrawAPI && <CollabWrapper excalidrawAPI={excalidrawAPI} />}
+      {excalidrawAPI && (
+        <CollabWrapper
+          excalidrawAPI={excalidrawAPI}
+          isCollaborating={props.isCollaborating}
+          activeRoomLink={props.activeRoomLink}
+        />
+      )}
       {errorMessage && (
         <ErrorDialog
           message={errorMessage}
@@ -463,11 +464,16 @@ const ExcalidrawWrapper = () => {
   );
 };
 
-const ExcalidrawApp = () => {
+const ExcalidrawApp = (props: any) => {
+  const activeRoomLink = `https://meetcollab.com/${props.activeLinkData}`;
+  const isCollaborating = !!props.activeRoomLink;
   return (
     <TopErrorBoundary>
       <CollabContextConsumer>
-        <ExcalidrawWrapper />
+        <ExcalidrawWrapper
+          activeRoomLink={activeRoomLink}
+          isCollaborating={isCollaborating}
+        />
       </CollabContextConsumer>
     </TopErrorBoundary>
   );

@@ -1,12 +1,13 @@
 const path = require("path");
 const webpack = require("webpack");
 const autoprefixer = require("autoprefixer");
+const dotenv = require("dotenv");
 
 module.exports = {
   mode: "development",
   devtool: false,
   entry: {
-    "excalidraw.development": "./entry.js",
+    "excalidraw.development": "../../excalidraw-app/index.tsx",
   },
   output: {
     path: path.resolve(__dirname, "dist"),
@@ -76,7 +77,12 @@ module.exports = {
       },
     },
   },
-  plugins: [new webpack.EvalSourceMapDevToolPlugin({ exclude: /vendor/ })],
+  plugins: [
+    new webpack.EvalSourceMapDevToolPlugin({ exclude: /vendor/ }),
+    new webpack.DefinePlugin({
+      "process.env": JSON.stringify(dotenv.config().parsed),
+    }),
+  ],
   externals: {
     react: {
       root: "React",
