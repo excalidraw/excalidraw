@@ -57,6 +57,25 @@ import { shield } from "../components/icons";
 import "./index.scss";
 import { ExportToExcalidrawPlus } from "./components/ExportToExcalidrawPlus";
 
+import { getMany, set, del, createStore } from "idb-keyval";
+import { isInitializedImageElement } from "../element/typeChecks";
+
+const filesStore = createStore("files-db", "files-store");
+
+const saveFile = (id: string, data: string) => {
+  return set(id, data, filesStore);
+};
+
+const getFiles = (ids: string[]) => {
+  return getMany(ids, filesStore);
+};
+
+const deleteFile = (id: string) => {
+  del(id, filesStore);
+};
+
+let persistedFiles = new Map<string, string /* dataURL */>();
+
 const languageDetector = new LanguageDetector();
 languageDetector.init({
   languageUtils: {
@@ -69,6 +88,38 @@ languageDetector.init({
 const saveDebounced = debounce(
   (elements: readonly ExcalidrawElement[], state: AppState) => {
     saveToLocalStorage(elements, state);
+
+    const nextFiles = new Map<string, string /* dataURL */>();
+
+    for (const element of elements) {
+      if (isInitializedImageElement(element)) {
+        if (state.files[element.imageId]) {
+          if (
+            !persistedFiles.has(element.imageId) &&
+            // do not persist file twice (in case of it being multiple times
+            // in the elements array)
+            !nextFiles.has(element.imageId)
+          ) {
+            saveFile(element.imageId, state.files[element.imageId].dataURL);
+          }
+
+          if (!element.isDeleted) {
+            nextFiles.set(
+              element.imageId,
+              state.files[element.imageId].dataURL,
+            );
+            // remove from map so we can figure out which elements were removed
+            persistedFiles.delete(element.imageId);
+          }
+        }
+      }
+    }
+    // delete obsolete files
+    persistedFiles.forEach((data, id) => {
+      deleteFile(id);
+    });
+
+    persistedFiles = nextFiles;
   },
   SAVE_TO_LOCAL_STORAGE_TIMEOUT,
 );
@@ -215,6 +266,26 @@ const ExcalidrawWrapper = () => {
 
     initializeScene({ collabAPI }).then((scene) => {
       if (scene) {
+        const imageIds =
+          scene.elements?.reduce((acc, element) => {
+            if (element.type === "image" && element.imageId) {
+              return acc.concat(element.imageId);
+            }
+            return acc;
+          }, [] as string[]) || [];
+
+        getFiles(imageIds).then((filesData: (string | undefined)[]) => {
+          const files = filesData.reduce((acc, dataURL, index) => {
+            if (dataURL) {
+              const id = imageIds[index];
+              persistedFiles.set(id, dataURL);
+              return acc.concat({ id, dataURL, type: "image" } as const);
+            }
+            return acc;
+          }, [] as AppState["files"][number][]);
+          excalidrawAPI.setFiles(files);
+        });
+
         try {
           scene.libraryItems =
             JSON.parse(

@@ -99,7 +99,7 @@ const APP_STATE_STORAGE_CONF = (<
 >(
   config: { [K in keyof T]: K extends keyof AppState ? T[K] : never },
 ) => config)({
-  files: { browser: true, export: true },
+  files: { browser: false, export: true },
   theme: { browser: true, export: false },
   collaborators: { browser: false, export: false },
   currentChartType: { browser: true, export: false },

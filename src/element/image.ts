@@ -28,7 +28,7 @@ export const updateImageCache = async ({
         new Promise<HTMLImageElement>((resolve) => {
           const image = new Image();
           image.onload = () => resolve(image);
-          image.src = imageData.data;
+          image.src = imageData.dataURL;
         }));
 
       // TODO limit the size of the imageCache
