@@ -28,6 +28,7 @@ import {
   actionToggleStats,
   actionToggleZenMode,
   actionUngroup,
+  zoomToFitElements,
 } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
@@ -292,6 +293,7 @@ class App extends React.Component<AppProps, AppState> {
           clear: this.resetHistory,
         },
         scrollToContent: this.scrollToContent,
+        zoomToFit: this.zoomToFit,
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
         refresh: this.refresh,
@@ -1375,6 +1377,18 @@ class App extends React.Component<AppProps, AppState> {
         this.canvas,
       ),
     });
+  };
+
+  zoomToFit = (
+    target:
+      | ExcalidrawElement[]
+      | readonly ExcalidrawElement[] = this.scene.getElements(),
+    maxZoom: number = 1, //null will zoom to max based on viewport
+    margin: number = 0.03, //percentage of viewport width&height
+  ) => {
+    this.setState(
+      zoomToFitElements(target, this.state, false, maxZoom, margin).appState,
+    );
   };
 
   clearToast = () => {
