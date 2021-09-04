@@ -184,6 +184,9 @@ export interface ExcalidrawProps {
     data: ClipboardData,
     event: ClipboardEvent | null,
   ) => Promise<boolean> | boolean;
+  onDrop?: (
+    event: React.DragEvent<HTMLDivElement>,
+  ) => Promise<boolean> | boolean;
   renderTopRightUI?: (isMobile: boolean, appState: AppState) => JSX.Element;
   renderFooter?: (isMobile: boolean, appState: AppState) => JSX.Element;
   langCode?: Language["code"];
