@@ -1380,12 +1380,12 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   zoomToFit = (
-    target:
-      | ExcalidrawElement[]
-      | readonly ExcalidrawElement[] = this.scene.getElements(),
+    target: readonly ExcalidrawElement[] = this.scene.getElements(),
     maxZoom: number = 1, //null will zoom to max based on viewport
     margin: number = 0.03, //percentage of viewport width&height
   ) => {
+    if(!target) target = this.scene.getElements();
+    if(target.length==0) maxZoom = 1;
     this.setState(
       zoomToFitElements(target, this.state, false, maxZoom, margin).appState,
     );
