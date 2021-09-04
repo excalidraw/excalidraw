@@ -439,7 +439,7 @@ You might want to use this when you want to load excalidraw with some initial el
 You can pass a `ref` when you want to access some excalidraw APIs. We expose the below APIs:
 
 | API | signature | Usage |
-| --- | --- | --- |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | ready | `boolean` | This is set to true once Excalidraw is rendered |
 | readyPromise | [resolvablePromise](https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317) | This promise will be resolved with the api once excalidraw has rendered. This will be helpful when you want do some action on the host app once this promise resolves. For this to work you will have to pass ref as shown [here](#readyPromise) |
 | [updateScene](#updateScene) | <pre>(<a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L207">sceneData</a>)) => void </pre> | updates the scene with the sceneData |
@@ -449,9 +449,8 @@ You can pass a `ref` when you want to access some excalidraw APIs. We expose the
 | getAppState | <pre> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L42">AppState</a></pre> | Returns current appState |
 | history | `{ clear: () => void }` | This is the history API. `history.clear()` will clear the history |
 | scrollToContent | <pre> (target?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement</a> &#124; <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement</a>[]) => void </pre> | Scroll the nearest element out of the elements supplied to the center. Defaults to the elements on the scene. |
-| zoomToFit | <pre>( target?: ExcalidrawElement[], |
-
-maxZoom: number=1, margin: number=0.03 ) => void </pre> | Zoom to fit elements on viewport. If no elements are supplied, the function will zoom to fit all elements. `maxZoom` is the maximum zoom level allowed (default 100%). `margin` is understood in % of viewport width and height. Default value is a minimum of 1.5% margin around the image compared to viewport . | | refresh | `() => void` | Updates the offsets for the Excalidraw component so that the coordinates are computed correctly (for example the cursor position). You don't have to call this when the position is changed on page scroll or when the excalidraw container resizes (we handle that ourselves). For any other cases if the position of excalidraw is updated (example due to scroll on parent container and not page scroll) you should call this API. | | [importLibrary](#importlibrary) | `(url: string, token?: string) => void` | Imports library from given URL | | setToastMessage | `(message: string) => void` | This API can be used to show the toast with custom message. | | [id](#id) | string | Unique ID for the excalidraw component. |
+| zoomToFit | <pre>( target?: ExcalidrawElement[], maxZoom: number=1, margin: number=0.03 ) => void </pre> | Zoom to fit elements on viewport. If no elements are supplied, the function will zoom to fit all elements. `maxZoom` is the maximum zoom level allowed (default 100%). `margin` is understood in % of viewport width and height. Default value is a minimum of 1.5% margin around the image compared to viewport . |
+| refresh | `() => void` | Updates the offsets for the Excalidraw component so that the coordinates are computed correctly (for example the cursor position). You don't have to call this when the position is changed on page scroll or when the excalidraw container resizes (we handle that ourselves). For any other cases if the position of excalidraw is updated (example due to scroll on parent container and not page scroll) you should call this API. |  | [importLibrary](#importlibrary) | `(url: string, token?: string) => void` | Imports library from given URL |  | setToastMessage | `(message: string) => void` | This API can be used to show the toast with custom message. |  | [id](#id) | string | Unique ID for the excalidraw component. |
 
 #### `readyPromise`
 
