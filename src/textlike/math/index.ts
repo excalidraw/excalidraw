@@ -18,7 +18,12 @@ import {
   mutateElement,
   newElementWith,
 } from "../../element/mutateElement";
-import { addTextLikeActions, registerTextLikeMethod } from "../";
+import {
+  addTextLikeActions,
+  registerTextLikeMethod,
+  registerTextLikeSubtypeName,
+} from "../";
+import { registerAuxLangData } from "../../i18n";
 
 // Imports for actions
 import { t } from "../../i18n";
@@ -28,12 +33,14 @@ import { getSelectedElements } from "../../scene";
 import { getElementMap, getNonDeletedElements } from "../../element";
 import { invalidateShapeForElement } from "../../renderer/renderElement";
 
+const SUBTYPE_MATH = "math";
+
 // Begin exports
 export type TextOptsMath = { useTex?: boolean };
 
 type ExcalidrawTextElementMath = ExcalidrawTextElement &
   Readonly<{
-    subtype: "math";
+    subtype: typeof SUBTYPE_MATH;
     useTex: boolean;
     fontFamily: 2;
   }>;
@@ -42,7 +49,9 @@ const isMathElement = (
   element: ExcalidrawElement | null,
 ): element is ExcalidrawTextElementMath => {
   return (
-    isTextElement(element) && "subtype" in element && element.subtype === "math"
+    isTextElement(element) &&
+    "subtype" in element &&
+    element.subtype === SUBTYPE_MATH
   );
 };
 
@@ -713,34 +722,36 @@ const restoreTextElementMath = (
 export const registerTextElementSubtypeMath = (
   onSubtypesLoaded?: (isTextElementSubtype: Function) => void,
 ) => {
+  registerTextLikeSubtypeName(SUBTYPE_MATH);
   // Set the callback first just in case anything in this method
   // calls loadMathJax().
   mathJaxLoadedCallback = onSubtypesLoaded;
   registerTextLikeMethod("apply", {
-    subtype: "math",
+    subtype: SUBTYPE_MATH,
     method: applyTextElementMathOpts,
   });
   registerTextLikeMethod("clean", {
-    subtype: "math",
+    subtype: SUBTYPE_MATH,
     method: cleanTextOptUpdatesMath,
   });
   registerTextLikeMethod("measure", {
-    subtype: "math",
+    subtype: SUBTYPE_MATH,
     method: measureTextElementMath,
   });
   registerTextLikeMethod("render", {
-    subtype: "math",
+    subtype: SUBTYPE_MATH,
     method: renderTextElementMath,
   });
   registerTextLikeMethod("renderSvg", {
-    subtype: "math",
+    subtype: SUBTYPE_MATH,
     method: renderSvgTextElementMath,
   });
   registerTextLikeMethod("restore", {
-    subtype: "math",
+    subtype: SUBTYPE_MATH,
     method: restoreTextElementMath,
   });
   registerActionsMath();
+  registerAuxLangData(`./textlike/${SUBTYPE_MATH}`);
   // Call loadMathJax() here if we want to be sure it's loaded.
 };
 

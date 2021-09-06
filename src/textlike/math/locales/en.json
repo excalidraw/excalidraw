@@ -1,0 +1,10 @@
+{
+  "labels": {
+    "toggleUseTex": "Toggle using AsciiMath",
+    "showUseTex": "Show if AsciiMath"
+  },
+  "alerts": {
+    "useTexTrue": "Using Latex for math mode.",
+    "useTexFalse": "Using AsciiMath for math mode."
+  }
+}

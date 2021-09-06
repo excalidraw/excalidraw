@@ -24,8 +24,6 @@ export type ShortcutName =
   | "stats"
   | "addToLibrary"
   | "viewMode"
-  | "showUseTex"
-  | "toggleUseTex"
   | "flipHorizontal"
   | "flipVertical";
 
@@ -61,8 +59,6 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   zenMode: [getShortcutKey("Alt+Z")],
   stats: [getShortcutKey("Alt+/")],
   addToLibrary: [],
-  showUseTex: [getShortcutKey("Shift+M")],
-  toggleUseTex: [getShortcutKey("CtrlOrCmd+Shift+M")],
   flipHorizontal: [getShortcutKey("Shift+H")],
   flipVertical: [getShortcutKey("Shift+V")],
   viewMode: [getShortcutKey("Alt+R")],
