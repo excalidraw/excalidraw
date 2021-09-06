@@ -4,6 +4,7 @@ import { ElementUpdate, mutateElement } from "../element/mutateElement";
 import {
   TextActionNameText,
   TextOptsText,
+  TextShortcutNameText,
   registerTextElementSubtypeText,
 } from "./text";
 
@@ -35,8 +36,54 @@ const renderMethodsA = [] as TextLikeMethods;
 const renderSvgMethodsA = [] as TextLikeMethods;
 const restoreMethodsA = [] as TextLikeMethods;
 
+// Types to export, union over all ExcalidrawTextElement subtypes
 export type TextOpts = TextOptsText;
 export type TextActionName = TextActionNameText;
+export type TextShortcutName = TextShortcutNameText;
+
+// One element for each ExcalidrawTextElement subtype.
+// ShortcutMap arrays, then typeguards for these.
+type TextShortcutMapArray = Array<Record<string, string[]>>;
+const textShortcutMaps: TextShortcutMapArray = [];
+type TextShortcutNameChecks = Array<Function>;
+const textShortcutNameChecks: TextShortcutNameChecks = [];
+
+// Register shortcutMap and typeguard for subtype
+export const registerTextLikeShortcutNames = (
+  textShortcutMap: Record<string, string[]>,
+  isTextShortcutNameCheck: Function,
+): void => {
+  // If either textShortcutMap or isTextShortcutNameCheck is already registered, do nothing
+  if (
+    !textShortcutMaps.includes(textShortcutMap) &&
+    !textShortcutNameChecks.includes(isTextShortcutNameCheck)
+  ) {
+    textShortcutMaps.push(textShortcutMap);
+    textShortcutNameChecks.push(isTextShortcutNameCheck);
+  }
+};
+
+// Typeguard for TextShortcutName (including all subtypes)
+export const isTextShortcutName = (s: any): s is TextShortcutName => {
+  for (let i = 0; i < textShortcutNameChecks.length; i++) {
+    if (textShortcutNameChecks[i](s)) {
+      return true;
+    }
+  }
+  return false;
+};
+
+// Return the shortcut by TextShortcutName.
+// Assume textShortcutMaps and textShortcutNameChecks are matchingly sorted.
+export const getShortcutFromTextShortcutName = (name: TextShortcutName) => {
+  let shortcuts: string[] = [];
+  for (let i = 0; i < textShortcutMaps.length; i++) {
+    if (textShortcutNameChecks[i](name)) {
+      shortcuts = textShortcutMaps[i][name];
+    }
+  }
+  return shortcuts;
+};
 
 export const registerTextLikeMethod = (
   name: TextLikeMethodName,
