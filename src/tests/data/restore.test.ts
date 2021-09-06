@@ -12,7 +12,10 @@ import { ImportedDataState } from "../../data/types";
 import { NormalizedZoomValue } from "../../types";
 import { FONT_FAMILY } from "../../constants";
 import { newElementWith } from "../../element/mutateElement";
-import { registerTextElementSubtypes } from "../../textlike";
+import {
+  registerTextElementSubtypes,
+  TEXT_SUBTYPE_DEFAULT,
+} from "../../textlike";
 
 registerTextElementSubtypes();
 
@@ -61,7 +64,7 @@ describe("restoreElements", () => {
       textAlign: "center",
       verticalAlign: "middle",
       id: "id-text01",
-      subtype: "none",
+      subtype: TEXT_SUBTYPE_DEFAULT,
     });
 
     const restoredText = restore.restoreElements(
@@ -80,7 +83,7 @@ describe("restoreElements", () => {
       textAlign: undefined,
       verticalAlign: undefined,
       id: "id-text01",
-      subtype: "none",
+      subtype: TEXT_SUBTYPE_DEFAULT,
     });
 
     textElement.text = null;

@@ -3,6 +3,7 @@ import { DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE, ENV } from "./constants";
 import { newElement, newLinearElement, newTextElement } from "./element";
 import { NonDeletedExcalidrawElement } from "./element/types";
 import { randomId } from "./random";
+import { TEXT_SUBTYPE_DEFAULT } from "./textlike";
 
 export type ChartElements = readonly NonDeletedExcalidrawElement[];
 
@@ -192,7 +193,7 @@ const chartXLabels = (
         fontSize: 16,
         textAlign: "center",
         verticalAlign: "top",
-        subtype: "none",
+        subtype: TEXT_SUBTYPE_DEFAULT,
       });
     }) || []
   );
@@ -213,7 +214,7 @@ const chartYLabels = (
     y: y - BAR_GAP,
     text: "0",
     textAlign: "right",
-    subtype: "none",
+    subtype: TEXT_SUBTYPE_DEFAULT,
   });
 
   const maxYLabel = newTextElement({
@@ -224,7 +225,7 @@ const chartYLabels = (
     y: y - BAR_HEIGHT - minYLabel.height / 2,
     text: Math.max(...spreadsheet.values).toLocaleString(),
     textAlign: "right",
-    subtype: "none",
+    subtype: TEXT_SUBTYPE_DEFAULT,
   });
 
   return [minYLabel, maxYLabel];
@@ -313,7 +314,7 @@ const chartBaseElements = (
         strokeSharpness: "sharp",
         strokeStyle: "solid",
         textAlign: "center",
-        subtype: "none",
+        subtype: TEXT_SUBTYPE_DEFAULT,
       })
     : null;
 

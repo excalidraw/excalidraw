@@ -16,6 +16,8 @@ import {
 import { Action } from "../actions/types";
 import { register } from "../actions/register";
 
+export const TEXT_SUBTYPE_DEFAULT = "none";
+
 type TextLikeMethodName =
   | "apply"
   | "clean"
@@ -31,28 +33,13 @@ type TextLikeMethod = {
 };
 
 type TextLikeMethods = Array<TextLikeMethod>;
-type TextLikeMethodArrays = {
-  subtypes: Array<string>;
-  methods: Array<Function>;
-};
 
 const applyMethodsA = [] as TextLikeMethods;
-const applyMethodsL = {} as TextLikeMethodArrays;
-
 const cleanMethodsA = [] as TextLikeMethods;
-const cleanMethodsL = {} as TextLikeMethodArrays;
-
 const measureMethodsA = [] as TextLikeMethods;
-const measureMethodsL = {} as TextLikeMethodArrays;
-
 const renderMethodsA = [] as TextLikeMethods;
-const renderMethodsL = {} as TextLikeMethodArrays;
-
 const renderSvgMethodsA = [] as TextLikeMethods;
-const renderSvgMethodsL = {} as TextLikeMethodArrays;
-
 const restoreMethodsA = [] as TextLikeMethods;
-const restoreMethodsL = {} as TextLikeMethodArrays;
 
 export type TextOpts = TextOptsText | TextOptsMath;
 export type TextActionName = TextActionNameText | TextActionNameMath;
@@ -62,43 +49,41 @@ export const registerTextLikeMethod = (
   textLikeMethod: TextLikeMethod,
 ): void => {
   let methodsA: TextLikeMethods;
-  let methodsL: TextLikeMethodArrays;
   switch (name) {
     case "apply":
       methodsA = applyMethodsA;
-      methodsL = applyMethodsL;
       break;
     case "clean":
       methodsA = cleanMethodsA;
-      methodsL = cleanMethodsL;
       break;
     case "measure":
       methodsA = measureMethodsA;
-      methodsL = measureMethodsL;
       break;
     case "render":
       methodsA = renderMethodsA;
-      methodsL = renderMethodsL;
       break;
     case "restore":
       methodsA = restoreMethodsA;
-      methodsL = restoreMethodsL;
       break;
     case "renderSvg":
       methodsA = renderSvgMethodsA;
-      methodsL = renderSvgMethodsL;
       break;
-  }
-  if (methodsL.subtypes === undefined) {
-    methodsL.subtypes = Array<string>();
-  }
-  if (methodsL.methods === undefined) {
-    methodsL.methods = Array<Function>();
   }
   if (!methodsA.includes(textLikeMethod)) {
     methodsA.push(textLikeMethod);
-    methodsL.subtypes.push(textLikeMethod.subtype);
-    methodsL.methods.push(textLikeMethod.method);
+  }
+};
+
+const textLikeSubtypes = Array<string>();
+
+export const getTextElementSubtypes = (): string[] => {
+  return textLikeSubtypes;
+};
+
+export const registerTextLikeSubtypeName = (subtypeName: string) => {
+  // Only register a subtype name once
+  if (!textLikeSubtypes.includes(subtypeName)) {
+    textLikeSubtypes.push(subtypeName);
   }
 };
 
