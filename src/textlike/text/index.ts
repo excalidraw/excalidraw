@@ -7,7 +7,7 @@ import {
 } from "../../utils";
 import { ExcalidrawTextElement, NonDeleted } from "../../element/types";
 import { ElementUpdate } from "../../element/mutateElement";
-import { registerTextLikeMethod } from "../";
+import { registerTextLikeMethod, TEXT_SUBTYPE_DEFAULT } from "../";
 
 export type TextOptsText = {};
 
@@ -15,7 +15,7 @@ export type TextActionNameText = "";
 
 type ExcalidrawTextElementText = ExcalidrawTextElement &
   Readonly<{
-    subtype: "none";
+    subtype: typeof TEXT_SUBTYPE_DEFAULT;
   }>;
 
 const applyTextElementTextOpts = (
@@ -141,32 +141,32 @@ export const registerTextElementSubtypeText = (
   onSubtypesLoaded?: (isTextElementSubtype: Function) => void,
 ) => {
   registerTextLikeMethod("apply", {
-    subtype: "none",
+    subtype: TEXT_SUBTYPE_DEFAULT,
     method: applyTextElementTextOpts,
     default: true,
   });
   registerTextLikeMethod("clean", {
-    subtype: "none",
+    subtype: TEXT_SUBTYPE_DEFAULT,
     method: cleanTextOptUpdatesText,
     default: true,
   });
   registerTextLikeMethod("measure", {
-    subtype: "none",
+    subtype: TEXT_SUBTYPE_DEFAULT,
     method: measureTextElementText,
     default: true,
   });
   registerTextLikeMethod("render", {
-    subtype: "none",
+    subtype: TEXT_SUBTYPE_DEFAULT,
     method: renderTextElementText,
     default: true,
   });
   registerTextLikeMethod("renderSvg", {
-    subtype: "none",
+    subtype: TEXT_SUBTYPE_DEFAULT,
     method: renderSvgTextElementText,
     default: true,
   });
   registerTextLikeMethod("restore", {
-    subtype: "none",
+    subtype: TEXT_SUBTYPE_DEFAULT,
     method: restoreTextElementText,
     default: true,
   });

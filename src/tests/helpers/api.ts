@@ -14,6 +14,7 @@ import util from "util";
 import path from "path";
 import { getMimeType } from "../../data/blob";
 import { newFreeDrawElement } from "../../element/newElement";
+import { TEXT_SUBTYPE_DEFAULT } from "../../textlike";
 
 const readFile = util.promisify(fs.readFile);
 
@@ -139,7 +140,7 @@ export class API {
           fontFamily: rest.fontFamily ?? appState.currentItemFontFamily,
           textAlign: rest.textAlign ?? appState.currentItemTextAlign,
           verticalAlign: rest.verticalAlign ?? DEFAULT_VERTICAL_ALIGN,
-          subtype: rest.subtype ?? "none",
+          subtype: rest.subtype ?? TEXT_SUBTYPE_DEFAULT,
         });
         element.width = width;
         element.height = height;

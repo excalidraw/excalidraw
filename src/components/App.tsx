@@ -196,7 +196,11 @@ import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
-import { getTextLikeActions, registerTextElementSubtypes } from "../textlike";
+import {
+  getTextLikeActions,
+  registerTextElementSubtypes,
+  TEXT_SUBTYPE_DEFAULT,
+} from "../textlike";
 import { redrawTextBoundingBox } from "../element/textElement";
 
 const IsMobileContext = React.createContext(false);
@@ -1356,7 +1360,7 @@ class App extends React.Component<AppProps, AppState> {
       fontFamily: this.state.currentItemFontFamily,
       textAlign: this.state.currentItemTextAlign,
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
-      subtype: "none",
+      subtype: TEXT_SUBTYPE_DEFAULT,
     });
 
     this.scene.replaceAllElements([
@@ -1954,7 +1958,7 @@ class App extends React.Component<AppProps, AppState> {
           verticalAlign: parentCenterPosition
             ? "middle"
             : DEFAULT_VERTICAL_ALIGN,
-          subtype: "none",
+          subtype: TEXT_SUBTYPE_DEFAULT,
         });
 
     this.setState({ editingElement: element });

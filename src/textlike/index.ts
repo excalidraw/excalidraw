@@ -10,6 +10,8 @@ import {
 import { Action } from "../actions/types";
 import { register } from "../actions/register";
 
+export const TEXT_SUBTYPE_DEFAULT = "none";
+
 type TextLikeMethodName =
   | "apply"
   | "clean"
