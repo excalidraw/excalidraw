@@ -4,6 +4,7 @@ import {
   SVG_NS,
   getFontString,
   getFontFamilyString,
+  getShortcutKey,
   isRTL,
   measureText,
 } from "../../utils";
@@ -21,6 +22,7 @@ import {
 import {
   addTextLikeActions,
   registerTextLikeMethod,
+  registerTextLikeShortcutNames,
   registerTextLikeSubtypeName,
 } from "../";
 import { registerAuxLangData } from "../../i18n";
@@ -56,6 +58,17 @@ const isMathElement = (
 };
 
 export type TextActionNameMath = "toggleUseTex" | "showUseTex";
+
+const textShortcutNamesMath = ["toggleUseTex", "showUseTex"] as const;
+export type TextShortcutNameMath = typeof textShortcutNamesMath[number];
+
+const isTextShortcutNameMath = (s: any): s is TextShortcutNameMath =>
+  textShortcutNamesMath.includes(s);
+
+const textShortcutMap: Record<TextShortcutNameMath, string[]> = {
+  showUseTex: [getShortcutKey("Shift+M")],
+  toggleUseTex: [getShortcutKey("CtrlOrCmd+Shift+M")],
+};
 
 let _useTex = true;
 
@@ -722,6 +735,7 @@ const restoreTextElementMath = (
 export const registerTextElementSubtypeMath = (
   onSubtypesLoaded?: (isTextElementSubtype: Function) => void,
 ) => {
+  registerTextLikeShortcutNames(textShortcutMap, isTextShortcutNameMath);
   registerTextLikeSubtypeName(SUBTYPE_MATH);
   // Set the callback first just in case anything in this method
   // calls loadMathJax().

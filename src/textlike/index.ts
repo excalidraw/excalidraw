@@ -4,6 +4,7 @@ import { ElementUpdate, mutateElement } from "../element/mutateElement";
 import {
   TextActionNameMath,
   TextOptsMath,
+  TextShortcutNameMath,
   registerTextElementSubtypeMath,
 } from "./math";
 
@@ -45,7 +46,7 @@ const restoreMethodsA = [] as TextLikeMethods;
 // Types to export, union over all ExcalidrawTextElement subtypes
 export type TextOpts = TextOptsText | TextOptsMath;
 export type TextActionName = TextActionNameText | TextActionNameMath;
-export type TextShortcutName = TextShortcutNameText;
+export type TextShortcutName = TextShortcutNameText | TextShortcutNameMath;
 
 // One element for each ExcalidrawTextElement subtype.
 // ShortcutMap arrays, then typeguards for these.
