@@ -7,7 +7,11 @@ import {
 } from "../../utils";
 import { ExcalidrawTextElement, NonDeleted } from "../../element/types";
 import { ElementUpdate } from "../../element/mutateElement";
-import { registerTextLikeMethod, TEXT_SUBTYPE_DEFAULT } from "../";
+import {
+  registerTextLikeMethod,
+  registerTextLikeSubtypeName,
+  TEXT_SUBTYPE_DEFAULT,
+} from "../";
 
 export type TextOptsText = {};
 
@@ -140,6 +144,7 @@ const restoreTextElementText = (
 export const registerTextElementSubtypeText = (
   onSubtypesLoaded?: (isTextElementSubtype: Function) => void,
 ) => {
+  registerTextLikeSubtypeName(TEXT_SUBTYPE_DEFAULT);
   registerTextLikeMethod("apply", {
     subtype: TEXT_SUBTYPE_DEFAULT,
     method: applyTextElementTextOpts,

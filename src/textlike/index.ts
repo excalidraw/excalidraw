@@ -98,6 +98,19 @@ export const registerTextLikeMethod = (
   }
 };
 
+const textLikeSubtypes = Array<string>();
+
+export const getTextElementSubtypes = (): string[] => {
+  return textLikeSubtypes;
+};
+
+export const registerTextLikeSubtypeName = (subtypeName: string) => {
+  // Only register a subtype name once
+  if (!textLikeSubtypes.includes(subtypeName)) {
+    textLikeSubtypes.push(subtypeName);
+  }
+};
+
 export const applyTextOpts = (
   element: ExcalidrawTextElement,
   textOpts?: TextOpts,
