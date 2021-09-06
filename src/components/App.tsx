@@ -864,6 +864,7 @@ class App extends React.Component<AppProps, AppState> {
   });
 
   private removeEventListeners() {
+    document.removeEventListener(EVENT.POINTER_UP, this.removePointer);
     document.removeEventListener(EVENT.COPY, this.onCopy);
     document.removeEventListener(EVENT.PASTE, this.pasteFromClipboard);
     document.removeEventListener(EVENT.CUT, this.onCut);
@@ -905,6 +906,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private addEventListeners() {
     this.removeEventListeners();
+    document.addEventListener(EVENT.POINTER_UP, this.removePointer); // #3553
     document.addEventListener(EVENT.COPY, this.onCopy);
     if (this.props.handleKeyboardGlobally) {
       document.addEventListener(EVENT.KEYDOWN, this.onKeyDown, false);
@@ -1377,7 +1379,7 @@ class App extends React.Component<AppProps, AppState> {
     this.setState(obj);
   };
 
-  removePointer = (event: React.PointerEvent<HTMLElement>) => {
+  removePointer = (event: React.PointerEvent<HTMLElement> | PointerEvent) => {
     // remove touch handler for context menu on touch devices
     if (event.pointerType === "touch" && touchTimeout) {
       clearTimeout(touchTimeout);

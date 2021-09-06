@@ -591,7 +591,7 @@ The below attributes can be set in `UIOptions.canvasActions.export` to customize
 | Attribute | Type | Default | Description |
 | --- | --- | --- | --- |
 | `saveFileToDisk` | boolean | true | Implies if save file to disk button should be shown |
-| `exportToBackend` | <pre> (exportedElements: readonly NonDeletedExcalidrawElement[],appState: AppState,canvas: HTMLCanvasElement &#124; null) => void </pre> |  | This callback is triggered when the shareable-link button is clicked in the export dialog. The link button will only be shown if this callback is passed. |
+| `onExportToBackend` | <pre> (exportedElements: readonly NonDeletedExcalidrawElement[],appState: AppState,canvas: HTMLCanvasElement &#124; null) => void </pre> |  | This callback is triggered when the shareable-link button is clicked in the export dialog. The link button will only be shown if this callback is passed. |
 | `renderCustomUI` | <pre> (exportedElements: readonly NonDeletedExcalidrawElement[],appState: AppState,canvas: HTMLCanvasElement &#124; null) => void </pre> |  | This callback should be supplied if you want to render custom UI in the export dialog. |
 
 #### `onPaste`
