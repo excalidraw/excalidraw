@@ -1,6 +1,11 @@
 import { t } from "../i18n";
 import { isDarwin } from "../keys";
 import { getShortcutKey } from "../utils";
+import {
+  TextShortcutName,
+  getShortcutFromTextShortcutName,
+  isTextShortcutName,
+} from "../textlike";
 
 export type ShortcutName =
   | "cut"
@@ -64,8 +69,12 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   viewMode: [getShortcutKey("Alt+R")],
 };
 
-export const getShortcutFromShortcutName = (name: ShortcutName) => {
-  const shortcuts = shortcutMap[name];
+export const getShortcutFromShortcutName = (
+  name: ShortcutName | TextShortcutName,
+) => {
+  const shortcuts = isTextShortcutName(name)
+    ? getShortcutFromTextShortcutName(name)
+    : shortcutMap[name as ShortcutName];
   // if multiple shortcuts availiable, take the first one
   return shortcuts && shortcuts.length > 0 ? shortcuts[0] : "";
 };

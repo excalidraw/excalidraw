@@ -12,6 +12,7 @@ import {
 import { Action } from "../actions/types";
 import { ActionManager } from "../actions/manager";
 import { AppState } from "../types";
+import { TextShortcutName } from "../textlike";
 
 export type ContextMenuOption = "separator" | Action;
 
@@ -64,7 +65,9 @@ const ContextMenu = ({
                 <div className="context-menu-option__label">{label}</div>
                 <kbd className="context-menu-option__shortcut">
                   {actionName
-                    ? getShortcutFromShortcutName(actionName as ShortcutName)
+                    ? getShortcutFromShortcutName(
+                        actionName as ShortcutName | TextShortcutName,
+                      )
                     : ""}
                 </kbd>
               </button>
