@@ -3827,15 +3827,15 @@ class App extends React.Component<AppProps, AppState> {
 
   private handleAppOnDrop = async (event: React.DragEvent<HTMLDivElement>) => {
     try {
-      if (this.props.onDrop)) {
-         try {
-            await this.props.onDrop(event);
-            return;
-          }  
-          catch(e) {
-            console.error(e);
-          }
-       }
+      if (this.props.onDrop) {
+        try {
+          await this.props.onDrop(event);
+          return;
+        }  
+        catch(e) {
+          console.error(e);
+        }
+      }
       const file = event.dataTransfer.files[0];
       if (file?.type === "image/png" || file?.type === "image/svg+xml") {
         if (fsSupported) {
