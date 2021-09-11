@@ -3829,8 +3829,9 @@ class App extends React.Component<AppProps, AppState> {
     try {
       if (this.props.onDrop) {
         try {
-          await this.props.onDrop(event);
-          return;
+          if (await this.props.onDrop(event) === false) {
+            return;
+          };
         } catch (e) {
           console.error(e);
         }
