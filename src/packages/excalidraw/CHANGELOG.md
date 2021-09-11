@@ -21,7 +21,7 @@ Please add the latest change on the top under the correct section.
 
 ## Excalidraw API
 
-- Added `onDrop: (event: React.DragEvent<HTMLDivElement>) => Promise<boolean> | boolean` callback. This callback is triggered if passed when something is dropped into the scene. You can use this callback in case you want to do something additional when the drop event occurs. This callback must return a boolean value or a Promise<boolean> value. In case you want to prevent the excalidraw drop action you must return `true`, it will stop the native excalidraw onDrop flow (nothing will be added into the scene).
+- Added `onDrop: (event: React.DragEvent<HTMLDivElement>) => Promise<boolean> | boolean` callback. This callback is triggered if passed when something is dropped into the scene. You can use this callback in case you want to do something additional when the drop event occurs. This callback must return a boolean value or a Promise<boolean> value. In case you want to prevent the excalidraw drop action you must return `false`, it will stop the native excalidraw onDrop flow (nothing will be added into the scene).
 
 ### Docs
 
