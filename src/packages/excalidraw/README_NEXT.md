@@ -623,7 +623,7 @@ This callback is triggered if passed when something is dropped into the scene. Y
 
 This callback must return a `boolean` value or a [promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise) which resolves to a boolean value.
 
-In case you want to prevent the excalidraw drop action you must return `true`, it will stop the native excalidraw onDrop flow (nothing will be added into the scene).
+In case you want to prevent the excalidraw drop action you must return `false`, it will stop the native excalidraw onDrop flow (nothing will be added into the scene).
 
 ### Does it support collaboration ?
 
