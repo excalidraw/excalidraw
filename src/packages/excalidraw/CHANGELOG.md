@@ -21,6 +21,10 @@ Please add the latest change on the top under the correct section.
 
 ## Excalidraw API
 
+### BREAKING CHANGE
+
+- `onPaste` was changed. In case you want to prevent the excalidraw paste action you must return `false`, it will stop the native excalidraw clipboard management flow (nothing will be pasted into the scene). This is a change from the previous version requiring a `true` return value for the same effect. The change to `false` to stop the native action aligns onPaste with onDrop and makes the function semantically more correct.
+
 ### Docs
 
 - Correct exportToBackend in README to onExportToBackend [#3952](https://github.com/excalidraw/excalidraw/pull/3952)
