@@ -23,8 +23,7 @@ Please add the latest change on the top under the correct section.
 
 ### Fixes
 
-- [`onPaste`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onPaste) 
-prop should return false to prevent the native excalidraw paste action.
+- [`onPaste`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onPaste) prop should return false to prevent the native excalidraw paste action.
 
 #### BREAKING CHANGE
 
