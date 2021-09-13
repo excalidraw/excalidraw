@@ -21,6 +21,14 @@ Please add the latest change on the top under the correct section.
 
 ## Excalidraw API
 
+### Fixes
+
+- [`onPaste`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onPaste) prop should return false to prevent the native excalidraw paste action.
+
+#### BREAKING CHANGE
+
+- Earlier the paste action was prevented when the prop [`onPaste`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onPaste) returned true, but now it should return false to prevent the paste action. This was done to make it semantically more correct and intuitive.
+
 ### Docs
 
 - Correct exportToBackend in README to onExportToBackend [#3952](https://github.com/excalidraw/excalidraw/pull/3952)
