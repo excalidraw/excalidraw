@@ -823,11 +823,16 @@ function getSvgPathFromStroke(points: number[][]): string {
 
   return points
     .reduce(
-      (acc, point, i, arr) =>
-        i === max ? acc : acc.concat(point, med(point, arr[i + 1])),
+      (acc, point, i, arr) => {
+        if (i === max) {
+          acc.push("Z");
+        } else {
+          acc.push(point, med(point, arr[i + 1]));
+        }
+        return acc;
+      },
       ["M", points[0], "Q"],
     )
-    .concat("Z")
     .join(" ")
     .replaceAll(/(\s?[A-Z]?,?-?[0-9]*\.[0-9]{0,2})(([0-9]|e|-)*)/g, "$1");
 }
