@@ -3871,8 +3871,14 @@ class App extends React.Component<AppProps, AppState> {
 
   private handleAppOnDrop = async (event: React.DragEvent<HTMLDivElement>) => {
     try {
-      if (this.props.onDrop && (await this.props.onDrop(event))) {
-        return;
+      if (this.props.onDrop) {
+        try {
+          if ((await this.props.onDrop(event)) === false) {
+            return;
+          }
+        } catch (e) {
+          console.error(e);
+        }
       }
       const file = event.dataTransfer.files[0];
       if (file?.type === "image/png" || file?.type === "image/svg+xml") {
