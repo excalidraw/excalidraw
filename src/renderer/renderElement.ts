@@ -824,7 +824,9 @@ function getSvgPathFromStroke(points: number[][]): string {
   return points
     .reduce(
       (acc, point, i, arr) => {
-        if (i === max) {
+        if (i === 0) {
+          return acc;
+        } else if (i === max) {
           acc.push("Z");
         } else {
           acc.push(point, med(point, arr[i + 1]));

@@ -9260,10 +9260,10 @@ pepjs@0.5.3:
   version "0.5.3"
   resolved "https://registry.npmjs.org/pepjs/-/pepjs-0.5.3.tgz"
 
-perfect-freehand@1.0.4:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/perfect-freehand/-/perfect-freehand-1.0.4.tgz#1c5318164b10a74a4e6664b8519ff68799b8ab52"
-  integrity sha512-feJV7C2LSiz6czFZuexYzxh8GHzaQ32bU4Vx+Y4xdCZYxnPFFyCoMVbVL3797zmk0v5rzGJkVfMQRUkLb/uZIg==
+perfect-freehand@1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/perfect-freehand/-/perfect-freehand-1.0.5.tgz#aa98adea7dd28b0da42a4ca442b2956e7f772003"
+  integrity sha512-h20u+YYe3o7FwEYE9tFmShHjTHo3BmOG8iP09lgmISigsWAG/LZ8pGcOiTmtWKmxb8M3YOcctTf7EYRp+u3/vg==
 
 performance-now@^2.1.0:
   version "2.1.0"
