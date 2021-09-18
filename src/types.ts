@@ -10,6 +10,7 @@ import {
   Arrowhead,
   ChartType,
   FontFamilyValues,
+  ExcalidrawTextElement,
 } from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -205,6 +206,12 @@ export interface ExcalidrawProps {
   handleKeyboardGlobally?: boolean;
   onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
   autoFocus?: boolean;
+  onBeforeTextEdit?: (textElement: ExcalidrawTextElement) => string;
+  onBeforeTextSubmit?: (
+    textElement: ExcalidrawTextElement,
+    textToSubmit: string,
+    isDeleted: boolean,
+  ) => string;
 }
 
 export type SceneData = {
@@ -323,6 +330,7 @@ export type ExcalidrawImperativeAPI = {
     clear: InstanceType<typeof App>["resetHistory"];
   };
   scrollToContent: InstanceType<typeof App>["scrollToContent"];
+  zoomToFit: InstanceType<typeof App>["zoomToFit"];
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
   getAppState: () => InstanceType<typeof App>["state"];
   refresh: InstanceType<typeof App>["refresh"];

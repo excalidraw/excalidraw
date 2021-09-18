@@ -28,6 +28,7 @@ import {
   actionToggleStats,
   actionToggleZenMode,
   actionUngroup,
+  zoomToFitElements,
 } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
@@ -292,6 +293,7 @@ class App extends React.Component<AppProps, AppState> {
           clear: this.resetHistory,
         },
         scrollToContent: this.scrollToContent,
+        zoomToFit: this.zoomToFit,
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
         refresh: this.refresh,
@@ -1193,8 +1195,12 @@ class App extends React.Component<AppProps, AppState> {
       }
       const data = await parseClipboard(event);
       if (this.props.onPaste) {
-        if (await this.props.onPaste(data, event)) {
-          return;
+        try {
+          if ((await this.props.onPaste(data, event)) === false) {
+            return;
+          }
+        } catch (e) {
+          console.error(e);
         }
       }
       if (data.errorMessage) {
@@ -1375,6 +1381,18 @@ class App extends React.Component<AppProps, AppState> {
         this.canvas,
       ),
     });
+  };
+
+  zoomToFit = (
+    target: readonly ExcalidrawElement[] = this.scene.getElements(),
+    maxZoom: number = 1, //null will zoom to max based on viewport
+    margin: number = 0.03, //percentage of viewport width&height
+  ) => {
+    if(!target) target = this.scene.getElements();
+    if(target.length===0) maxZoom = 1;
+    this.setState(
+      zoomToFitElements(target, this.state, false, maxZoom, margin).appState,
+    );
   };
 
   clearToast = () => {
@@ -1731,6 +1749,24 @@ class App extends React.Component<AppProps, AppState> {
       ]);
     };
 
+    if (isExistingElement && this.props.onBeforeTextEdit) {
+      const text = this.props.onBeforeTextEdit(element);
+      if (text) {
+        this.scene.replaceAllElements([
+          ...this.scene.getElementsIncludingDeleted().map((_element) => {
+            if (_element.id === element.id && isTextElement(_element)) {
+              element = updateTextElement(_element, {
+                text,
+                isDeleted: false,
+              });
+              return element;
+            }
+            return _element;
+          }),
+        ]);
+      }
+    }
+
     textWysiwyg({
       id: element.id,
       appState: this.state,
@@ -1756,6 +1792,14 @@ class App extends React.Component<AppProps, AppState> {
       }),
       onSubmit: withBatchedUpdates(({ text, viaKeyboard }) => {
         const isDeleted = !text.trim();
+        if (this.props.onBeforeTextSubmit) {
+          const updatedText = this.props.onBeforeTextSubmit(
+            element,
+            text,
+            isDeleted,
+          );
+          text = updatedText ?? text;
+        }
         updateElement(text, isDeleted);
         // select the created text element only if submitting via keyboard
         // (when submitting via click it should act as signal to deselect)
