@@ -32,7 +32,7 @@ import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
 import { Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
-import getFreeDrawShape from "perfect-freehand";
+import { getStroke, StrokeOptions } from "perfect-freehand";
 import { MAX_DECIMALS_FOR_SVG_EXPORT } from "../constants";
 
 const defaultAppState = getDefaultAppState();
@@ -789,40 +789,45 @@ export function getFreeDrawPath2D(element: ExcalidrawFreeDrawElement) {
 }
 
 export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
+  // If input points are empty (should they ever be?) return a dot
   const inputPoints = element.simulatePressure
     ? element.points
     : element.points.length
     ? element.points.map(([x, y], i) => [x, y, element.pressures[i]])
-    : [[0, 0, 0]];
+    : [[0, 0, 0.5]];
 
   // Consider changing the options for simulated pressure vs real pressure
-  const options = {
+  const options: StrokeOptions = {
     simulatePressure: element.simulatePressure,
-    size: element.strokeWidth * 6,
-    thinning: 0.5,
+    size: element.strokeWidth * 4.25,
+    thinning: 0.6,
     smoothing: 0.5,
     streamline: 0.5,
-    easing: (t: number) => t * (2 - t),
-    last: true,
+    easing: (t) => Math.sin((t * Math.PI) / 2),
+    last: false,
   };
 
-  const points = getFreeDrawShape(inputPoints as number[][], options);
-  const d: (string | number)[] = [];
+  return getSvgPathFromStroke(getStroke(inputPoints as number[][], options));
+}
 
-  let [p0, p1] = points;
+function med(A: number[], B: number[]) {
+  return [(A[0] + B[0]) / 2, (A[1] + B[1]) / 2];
+}
 
-  d.push("M", p0[0], p0[1], "Q");
-
-  for (let i = 0; i < points.length; i++) {
-    d.push(p0[0], p0[1], (p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2);
-    p0 = p1;
-    p1 = points[i];
+function getSvgPathFromStroke(points: number[][]): string {
+  if (!points.length) {
+    return "";
   }
 
-  p1 = points[0];
-  d.push(p0[0], p0[1], (p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2);
+  const max = points.length - 1;
 
-  d.push("Z");
-
-  return d.join(" ");
+  return points
+    .reduce(
+      (acc, point, i, arr) =>
+        i === max ? acc : acc.concat(point, med(point, arr[i + 1])),
+      ["M", points[0], "Q"],
+    )
+    .concat("Z")
+    .join(" ")
+    .replaceAll(/(\s?[A-Z]?,?-?[0-9]*\.[0-9]{0,2})(([0-9]|e|-)*)/g, "$1");
 }
