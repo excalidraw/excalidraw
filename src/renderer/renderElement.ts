@@ -803,7 +803,7 @@ export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
     thinning: 0.6,
     smoothing: 0.5,
     streamline: 0.5,
-    easing: (t) => Math.sin((t * Math.PI) / 2),
+    easing: (t) => Math.sin((t * Math.PI) / 2), // https://easings.net/#easeOutSine
     last: false,
   };
 
@@ -821,20 +821,21 @@ function getSvgPathFromStroke(points: number[][]): string {
 
   const max = points.length - 1;
 
-  return points
-    .reduce(
-      (acc, point, i, arr) => {
-        if (i === 0) {
+  return (
+    points
+      .reduce(
+        (acc, point, i, arr) => {
+          if (i === max) {
+            acc.push(point, med(point, arr[0]), "L", arr[0], "Z");
+          } else {
+            acc.push(point, med(point, arr[i + 1]));
+          }
           return acc;
-        } else if (i === max) {
-          acc.push("Z");
-        } else {
-          acc.push(point, med(point, arr[i + 1]));
-        }
-        return acc;
-      },
-      ["M", points[0], "Q"],
-    )
-    .join(" ")
-    .replaceAll(/(\s?[A-Z]?,?-?[0-9]*\.[0-9]{0,2})(([0-9]|e|-)*)/g, "$1");
+        },
+        ["M", points[0], "Q"],
+      )
+      .join(" ")
+      // Trim all numbers to two decimal points to improve SVG export and prevent rendering errors on long decimals
+      .replaceAll(/(\s?[A-Z]?,?-?[0-9]*\.[0-9]{0,2})(([0-9]|e|-)*)/g, "$1")
+  );
 }
