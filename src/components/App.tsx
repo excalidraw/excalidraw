@@ -1798,7 +1798,7 @@ class App extends React.Component<AppProps, AppState> {
             text,
             isDeleted,
           );
-          text = updatedText ? updatedText : text;
+          text = updatedText ?? text;
         }
         updateElement(text, isDeleted);
         // select the created text element only if submitting via keyboard

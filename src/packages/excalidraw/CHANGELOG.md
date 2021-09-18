@@ -37,6 +37,10 @@ Please add the latest change on the top under the correct section.
 
 ## Excalidraw API
 
+- Added `onBeforeTextEdit` and `onBeforeTextSubmit` callback functions. 
+  - The `onBeforeTextEdit: (textElement: ExcalidrawTextElement) => string` callback is triggered when a text element is about to be edited. The string returned will replace the element's text. If null is returned, the TextElement will not be changed. Use this to pre-process text before editing. 
+  - The `onBeforeTextSubmit: (textElement: ExcalidrawTextElement, textToSubmit:string, isDeleted:boolean) => string` callback is triggered when the editing of a TextElement is finished, but right before the result is submitted. The string returned will replace the text element's text. Use this to post-process text after editing has finished.
+
 ### Features
 
 - [`restore(data, localAppState, localElements)`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#restore) and [`restoreElements(elements, localElements)`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#restoreElements) now take `localElements` argument which will be used to ensure existing elements' versions are used and incremented. This fixes an issue where importing the same file would resolve to elements with older versions, potentially causing issues when reconciling [#3797](https://github.com/excalidraw/excalidraw/pull/3797).
