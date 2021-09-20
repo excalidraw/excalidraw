@@ -32,7 +32,7 @@ import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
 import { Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
-import { getStroke, StrokeOptions } from "perfect-freehand";
+import getFreeDrawShape from "perfect-freehand";
 import { MAX_DECIMALS_FOR_SVG_EXPORT } from "../constants";
 
 const defaultAppState = getDefaultAppState();
@@ -789,55 +789,40 @@ export function getFreeDrawPath2D(element: ExcalidrawFreeDrawElement) {
 }
 
 export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
-  // If input points are empty (should they ever be?) return a dot
   const inputPoints = element.simulatePressure
     ? element.points
     : element.points.length
     ? element.points.map(([x, y], i) => [x, y, element.pressures[i]])
-    : [[0, 0, 0.5]];
+    : [[0, 0, 0]];
 
   // Consider changing the options for simulated pressure vs real pressure
-  const options: StrokeOptions = {
+  const options = {
     simulatePressure: element.simulatePressure,
-    size: element.strokeWidth * 4.25,
-    thinning: 0.6,
+    size: element.strokeWidth * 6,
+    thinning: 0.5,
     smoothing: 0.5,
     streamline: 0.5,
-    easing: (t) => Math.sin((t * Math.PI) / 2), // https://easings.net/#easeOutSine
-    last: false,
+    easing: (t: number) => t * (2 - t),
+    last: true,
   };
 
-  return getSvgPathFromStroke(getStroke(inputPoints as number[][], options));
-}
+  const points = getFreeDrawShape(inputPoints as number[][], options);
+  const d: (string | number)[] = [];
 
-function med(A: number[], B: number[]) {
-  return [(A[0] + B[0]) / 2, (A[1] + B[1]) / 2];
-}
+  let [p0, p1] = points;
 
-// Trim SVG path data so number are each two decimal points. This
-// improves SVG exports, and prevents rendering errors on points
-// with long decimals.
-const TO_FIXED_PRECISION = /(\s?[A-Z]?,?-?[0-9]*\.[0-9]{0,2})(([0-9]|e|-)*)/g;
+  d.push("M", p0[0], p0[1], "Q");
 
-function getSvgPathFromStroke(points: number[][]): string {
-  if (!points.length) {
-    return "";
+  for (let i = 0; i < points.length; i++) {
+    d.push(p0[0], p0[1], (p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2);
+    p0 = p1;
+    p1 = points[i];
   }
 
-  const max = points.length - 1;
+  p1 = points[0];
+  d.push(p0[0], p0[1], (p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2);
 
-  return points
-    .reduce(
-      (acc, point, i, arr) => {
-        if (i === max) {
-          acc.push(point, med(point, arr[0]), "L", arr[0], "Z");
-        } else {
-          acc.push(point, med(point, arr[i + 1]));
-        }
-        return acc;
-      },
-      ["M", points[0], "Q"],
-    )
-    .join(" ")
-    .replaceAll(TO_FIXED_PRECISION, "$1");
+  d.push("Z");
+
+  return d.join(" ");
 }

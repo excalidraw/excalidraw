@@ -380,8 +380,6 @@ To view the full example visit :point_down:
 | [`handleKeyboardGlobally`](#handleKeyboardGlobally) | boolean | false | Indicates whether to bind the keyboard events to document. |
 | [`onLibraryChange`](#onLibraryChange) | <pre>(items: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>) => void &#124; Promise&lt;any&gt; </pre> |  | The callback if supplied is triggered when the library is updated and receives the library items. |
 | [`autoFocus`](#autoFocus) | boolean | false | Implies whether to focus the Excalidraw component on page load |
-| [`onBeforeTextEdit`](#onBeforeTextEdit) | (textElement: ExcalidrawTextElement) => string |  | Callback to be triggered when a text element is about to be edited. |
-| [`onBeforeTextSubmit`](#onBeforeTextSubmit) | (textElement: ExcalidrawTextElement, textToSubmit:string, isDeleted:boolean) => string |  | Callback to be triggered when the editing of a text element is finished. |
 
 ### Dimensions of Excalidraw
 
@@ -458,7 +456,6 @@ You can pass a `ref` when you want to access some excalidraw APIs. We expose the
 | getAppState | <pre> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L42">AppState</a></pre> | Returns current appState |
 | history | `{ clear: () => void }` | This is the history API. `history.clear()` will clear the history |
 | scrollToContent | <pre> (target?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement</a> &#124; <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement</a>[]) => void </pre> | Scroll the nearest element out of the elements supplied to the center. Defaults to the elements on the scene. |
-| zoomToFit | `(target?:ExcalidrawElement[], maxZoom:number=1, margin:number=0.03) => void` | Zoom to fit elements on viewport. If no elements are supplied, the function will zoom to fit all elements. `maxZoom` is the maximum zoom level allowed (default 100%). `margin` is understood in % of viewport width and height. Default value is a minimum of 1.5% margin around the image compared to viewport . |
 | refresh | `() => void` | Updates the offsets for the Excalidraw component so that the coordinates are computed correctly (for example the cursor position). You don't have to call this when the position is changed on page scroll or when the excalidraw container resizes (we handle that ourselves). For any other cases if the position of excalidraw is updated (example due to scroll on parent container and not page scroll) you should call this API. |
 | [importLibrary](#importlibrary) | `(url: string, token?: string) => void` | Imports library from given URL |
 | setToastMessage | `(message: string) => void` | This API can be used to show the toast with custom message. |
@@ -614,7 +611,7 @@ This callback is triggered if passed when something is pasted into the scene. Yo
 
 This callback must return a `boolean` value or a [promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise) which resolves to a boolean value.
 
-In case you want to prevent the excalidraw paste action you must return `false`, it will stop the native excalidraw clipboard management flow (nothing will be pasted into the scene).
+In case you want to prevent the excalidraw paste action you must return `true`, it will stop the native excalidraw clipboard management flow (nothing will be pasted into the scene).
 
 #### `onDrop`
 
@@ -681,22 +678,6 @@ The unique id of the excalidraw component. This can be used to identify the exca
 ### autoFocus
 
 This prop implies whether to focus the Excalidraw component on page load. Defaults to false.
-
-### onBeforeTextEdit
-
-Callback to be triggered when a text element is about to be edited. The string returned will replace the element's text. If `null` is returned, the TextElement will not be changed. Use this to pre-process text before editing.
-
-<pre>
-(textElement: ExcalidrawTextElement) => string
-</pre>
-
-### onBeforeTextSubmit
-
-Callback to be triggered when the editing of a TextElement is finished, but right before the result is submitted. The string returned will replace the text element's text. Use this to post-process text after editing has finished.
-
-<pre>
-(textElement: ExcalidrawTextElement, textToSubmit:string, isDeleted:boolean) => string
-</pre>
 
 ### Extra API's
 
