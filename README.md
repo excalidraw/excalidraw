@@ -70,6 +70,8 @@ The first set of digits is the room. This is visible from the server that’s go
 
 The second set of digits is the encryption key. The Excalidraw server doesn’t know about it. This is what all the participants use to encrypt/decrypt the messages.
 
+> Note: Please ensure that the encryption key is 22 characters long.
+
 ## Shape libraries
 
 Find a growing list of libraries containing assets for your drawings at [libraries.excalidraw.com](https://libraries.excalidraw.com).
