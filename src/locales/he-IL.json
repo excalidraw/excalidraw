@@ -43,7 +43,7 @@
     "fontFamily": "סוג הגופן",
     "onlySelected": "רק מה שנבחר",
     "withBackground": "רקע",
-    "exportEmbedScene": "הטמעה של המפה",
+    "exportEmbedScene": "הטמעה של מידע הסצנה",
     "exportEmbedScene_details": "מידע התצוגה יישמר לקובץ המיוצא מסוג PNG/SVG כך שיהיה ניתן לשחזרה ממנו.\nהפעולה תגדיל את גודל הקובץ המיוצא.",
     "addWatermark": "הוסף \"נוצר באמצעות Excalidraw\"",
     "handDrawn": "כתב יד",
