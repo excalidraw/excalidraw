@@ -99,11 +99,11 @@
     "flipHorizontal": "סובב אופקית",
     "flipVertical": "סובב אנכית",
     "viewMode": "מצב תצוגה",
-    "toggleExportColorScheme": "",
+    "toggleExportColorScheme": "שנה את ערכת צבעי הייצוא",
     "share": "שתף",
     "showStroke": "הצג צבעי קו מתאר",
     "showBackground": "הצג צבעי רקע",
-    "toggleTheme": ""
+    "toggleTheme": "שינוי ערכת העיצוב"
   },
   "buttons": {
     "clearReset": "אפס את הלוח",
