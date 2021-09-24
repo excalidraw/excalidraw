@@ -158,7 +158,7 @@
     "cannotRestoreFromImage": "Scenen kunne ikke gjenopprettes fra denne bildefilen",
     "invalidSceneUrl": "Kunne ikke importere scene fra den oppgitte URL-en. Den er enten ødelagt, eller inneholder ikke gyldig Excalidraw JSON-data.",
     "resetLibrary": "Dette vil tømme biblioteket ditt. Er du sikker?",
-    "invalidEncryptionKey": ""
+    "invalidEncryptionKey": "Krypteringsnøkkel må ha 22 tegn. Live-samarbeid er deaktivert."
   },
   "toolBar": {
     "selection": "Velg",
