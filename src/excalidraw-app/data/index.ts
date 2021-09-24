@@ -137,6 +137,10 @@ export const decryptAESGEM = async (
 export const getCollaborationLinkData = (link: string) => {
   const hash = new URL(link).hash;
   const match = hash.match(/^#room=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/);
+  if (match && match[2].length !== 22) {
+    window.alert(t("alerts.invalidEncryptionKey"));
+    return null;
+  }
   return match ? { roomId: match[1], roomKey: match[2] } : null;
 };
 
