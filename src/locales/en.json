@@ -157,7 +157,8 @@
     "imageDoesNotContainScene": "Importing images isn't supported at the moment.\n\nDid you want to import a scene? This image does not seem to contain any scene data. Have you enabled this during export?",
     "cannotRestoreFromImage": "Scene couldn't be restored from this image file",
     "invalidSceneUrl": "Couldn't import scene from the supplied URL. It's either malformed, or doesn't contain valid Excalidraw JSON data.",
-    "resetLibrary": "This will clear your library. Are you sure?"
+    "resetLibrary": "This will clear your library. Are you sure?",
+    "invalidEncryptionKey": "Encryption key must be of 22 characters. Live collaboration is disabled."
   },
   "toolBar": {
     "selection": "Selection",
