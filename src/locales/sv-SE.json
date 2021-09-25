@@ -158,7 +158,7 @@
     "cannotRestoreFromImage": "Skiss kunde inte återställas från denna bildfil",
     "invalidSceneUrl": "Det gick inte att importera skiss från den angivna webbadressen. Antingen har den fel format, eller så innehåller den ingen giltig Excalidraw JSON data.",
     "resetLibrary": "Detta kommer att rensa ditt bibliotek. Är du säker?",
-    "invalidEncryptionKey": ""
+    "invalidEncryptionKey": "Krypteringsnyckeln måste vara 22 tecken. Livesamarbetet är inaktiverat."
   },
   "toolBar": {
     "selection": "Markering",
