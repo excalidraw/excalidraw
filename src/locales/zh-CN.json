@@ -158,7 +158,7 @@
     "cannotRestoreFromImage": "无法从此图像文件恢复画布",
     "invalidSceneUrl": "无法从提供的 URL 导入场景。它或者格式不正确，或者不包含有效的 Excalidraw JSON 数据。",
     "resetLibrary": "这将会清除你的资源库。你确定这么做吗？",
-    "invalidEncryptionKey": ""
+    "invalidEncryptionKey": "密钥必须包含22个字符。实时协作已被禁用。"
   },
   "toolBar": {
     "selection": "选择",
