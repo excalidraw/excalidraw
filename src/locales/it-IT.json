@@ -158,7 +158,7 @@
     "cannotRestoreFromImage": "Impossibile ripristinare la scena da questo file immagine",
     "invalidSceneUrl": "Impossibile importare la scena dall'URL fornito. Potrebbe essere malformato o non contenere dati JSON Excalidraw validi.",
     "resetLibrary": "Questa azione cancellerà l'intera libreria. Sei sicuro?",
-    "invalidEncryptionKey": ""
+    "invalidEncryptionKey": "La chiave di cifratura deve essere composta da 22 caratteri. La collaborazione live è disabilitata."
   },
   "toolBar": {
     "selection": "Selezione",
