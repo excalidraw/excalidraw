@@ -158,7 +158,7 @@
     "cannotRestoreFromImage": "Scena nu a putut fi restaurată din acest fișier de imagine",
     "invalidSceneUrl": "Scena nu a putut fi importată din URL-ul furnizat. Este fie incorect formată, fie nu conține date JSON Excalidraw valide.",
     "resetLibrary": "Această opțiune va elimina conținutul din bibliotecă. Confirmi?",
-    "invalidEncryptionKey": ""
+    "invalidEncryptionKey": "Cheia de criptare trebuie să aibă 22 de caractere. Colaborarea în direct este dezactivată."
   },
   "toolBar": {
     "selection": "Selecție",
