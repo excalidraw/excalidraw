@@ -158,7 +158,7 @@
     "cannotRestoreFromImage": "Teosta ei voitu palauttaa tästä kuvatiedostosta",
     "invalidSceneUrl": "Teosta ei voitu tuoda annetusta URL-osoitteesta. Tallenne on vioittunut, tai osoitteessa ei ole Excalidraw JSON-dataa.",
     "resetLibrary": "Tämä tyhjentää kirjastosi. Jatketaanko?",
-    "invalidEncryptionKey": ""
+    "invalidEncryptionKey": "Salausavaimen on oltava 22 merkkiä pitkä. Live-yhteistyö ei ole käytössä."
   },
   "toolBar": {
     "selection": "Valinta",
@@ -258,7 +258,7 @@
   },
   "encrypted": {
     "tooltip": "Piirroksesi ovat päästä-päähän-salattuja, joten Excalidrawin palvelimet eivät koskaan näe niitä.",
-    "link": ""
+    "link": "Blogiartikkeli päästä päähän -salauksesta Excalidraw:ssa"
   },
   "stats": {
     "angle": "Kulma",
@@ -285,12 +285,12 @@
     "selection": "valinta"
   },
   "colors": {
-    "ffffff": "",
-    "f8f9fa": "",
-    "f1f3f5": "",
-    "fff5f5": "",
-    "fff0f6": "",
-    "f8f0fc": "",
+    "ffffff": "Valkoinen",
+    "f8f9fa": "Harmaa 0",
+    "f1f3f5": "Harmaa 1",
+    "fff5f5": "Punainen 0",
+    "fff0f6": "Pinkki 0",
+    "f8f0fc": "Violetti 0",
     "f3f0ff": "",
     "edf2ff": "",
     "e7f5ff": "",
