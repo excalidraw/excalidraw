@@ -131,6 +131,7 @@ export const transformElements = (
         transformHandleType,
         pointerX,
         pointerY,
+        isResizeCenterPoint,
       );
       return true;
     }
@@ -576,6 +577,7 @@ const resizeMultipleElements = (
   transformHandleType: "nw" | "ne" | "sw" | "se",
   pointerX: number,
   pointerY: number,
+  isResizeFromCenter: boolean,
 ) => {
   const [x1, y1, x2, y2] = getCommonBounds(elements);
   let scale: number;
@@ -591,8 +593,15 @@ const resizeMultipleElements = (
         (pointerY - y1) / (y2 - y1),
       );
       getNextXY = (element, [origX1, origY1], [finalX1, finalY1]) => {
-        const x = element.x + (origX1 - x1) * (scale - 1) + origX1 - finalX1;
-        const y = element.y + (origY1 - y1) * (scale - 1) + origY1 - finalY1;
+        const factorX = isResizeFromCenter
+          ? origX1 - (x1 + x2) / 2
+          : origX1 - x1;
+        const factorY = isResizeFromCenter
+          ? origY1 - (y1 + y2) / 2
+          : origY1 - y1;
+
+        const x = element.x + factorX * (scale - 1) + origX1 - finalX1;
+        const y = element.y + factorY * (scale - 1) + origY1 - finalY1;
         return { x, y };
       };
       break;
@@ -602,8 +611,14 @@ const resizeMultipleElements = (
         (y2 - pointerY) / (y2 - y1),
       );
       getNextXY = (element, [, , origX2, origY2], [, , finalX2, finalY2]) => {
-        const x = element.x - (x2 - origX2) * (scale - 1) + origX2 - finalX2;
-        const y = element.y - (y2 - origY2) * (scale - 1) + origY2 - finalY2;
+        const factorX = isResizeFromCenter
+          ? (x1 + x2) / 2 - origX2
+          : x2 - origX2;
+        const factorY = isResizeFromCenter
+          ? (y1 + y2) / 2 - origY2
+          : y2 - origY2;
+        const x = element.x - factorX * (scale - 1) + origX2 - finalX2;
+        const y = element.y - factorY * (scale - 1) + origY2 - finalY2;
         return { x, y };
       };
       break;
@@ -613,8 +628,14 @@ const resizeMultipleElements = (
         (y2 - pointerY) / (y2 - y1),
       );
       getNextXY = (element, [origX1, , , origY2], [finalX1, , , finalY2]) => {
-        const x = element.x + (origX1 - x1) * (scale - 1) + origX1 - finalX1;
-        const y = element.y - (y2 - origY2) * (scale - 1) + origY2 - finalY2;
+        const factorX = isResizeFromCenter
+          ? origX1 - (x1 + x2) / 2
+          : origX1 - x1;
+        const factorY = isResizeFromCenter
+          ? (y1 + y2) / 2 - origY2
+          : y2 - origY2;
+        const x = element.x + factorX * (scale - 1) + origX1 - finalX1;
+        const y = element.y - factorY * (scale - 1) + origY2 - finalY2;
         return { x, y };
       };
       break;
@@ -624,8 +645,14 @@ const resizeMultipleElements = (
         (pointerY - y1) / (y2 - y1),
       );
       getNextXY = (element, [, origY1, origX2], [, finalY1, finalX2]) => {
-        const x = element.x - (x2 - origX2) * (scale - 1) + origX2 - finalX2;
-        const y = element.y + (origY1 - y1) * (scale - 1) + origY1 - finalY1;
+        const factorX = isResizeFromCenter
+          ? (x1 + x2) / 2 - origX2
+          : x2 - origX2;
+        const factorY = isResizeFromCenter
+          ? origY1 - (y1 + y2) / 2
+          : origY1 - y1;
+        const x = element.x - factorX * (scale - 1) + origX2 - finalX2;
+        const y = element.y + factorY * (scale - 1) + origY1 - finalY1;
         return { x, y };
       };
       break;
