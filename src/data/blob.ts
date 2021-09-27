@@ -1,8 +1,9 @@
 import { FileSystemHandle } from "browser-fs-access";
+import { nanoid } from "nanoid";
 import { cleanAppStateForExport } from "../appState";
 import { EXPORT_DATA_TYPES } from "../constants";
 import { clearElementsForExport } from "../element";
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, ImageId } from "../element/types";
 import { CanvasError } from "../errors";
 import { t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
@@ -183,4 +184,25 @@ export const canvasToBlob = async (
       reject(error);
     }
   });
+};
+
+export const generateIdFromFile = async (file: File) => {
+  let id: ImageId;
+  try {
+    const hashBuffer = await window.crypto.subtle.digest(
+      "SHA-1",
+      await file.arrayBuffer(),
+    );
+    id =
+      // convert buffer to byte array
+      Array.from(new Uint8Array(hashBuffer))
+        // convert to hex string
+        .map((byte) => byte.toString(16).padStart(2, "0"))
+        .join("") as ImageId;
+  } catch (error) {
+    console.error(error);
+    id = nanoid(40) as ImageId;
+  }
+
+  return id;
 };

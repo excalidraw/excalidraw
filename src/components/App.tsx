@@ -110,7 +110,7 @@ import {
   updateBoundElements,
 } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
-import { mutateElement, newElementWith } from "../element/mutateElement";
+import { mutateElement } from "../element/mutateElement";
 import { deepCopyElement, newFreeDrawElement } from "../element/newElement";
 import {
   isBindingElement,
@@ -127,7 +127,6 @@ import {
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
   NonDeleted,
-  ImageId,
   InitializedExcalidrawImageElement,
   ExcalidrawImageElement,
 } from "../element/types";
@@ -201,7 +200,7 @@ import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
-import { isImageFile } from "../data/blob";
+import { generateIdFromFile, isImageFile } from "../data/blob";
 import {
   getInitializedImageElements,
   updateImageCache,
@@ -1232,11 +1231,10 @@ class App extends React.Component<AppProps, AppState> {
           { clientX: cursorX, clientY: cursorY },
           this.state,
         );
-        const imageElement = await this.initializeImage({
-          imageFile: file,
-          imageElement: this.createImageElement({ sceneX, sceneY }),
-        });
-        this.insertImageElement(imageElement);
+
+        const imageElement = this.createImageElement({ sceneX, sceneY });
+        this.insertImageElement(imageElement, file);
+        this.initializeImageDimensions(imageElement);
         this.setState({ selectedElementIds: { [imageElement.id]: true } });
 
         return;
@@ -3526,7 +3524,7 @@ class App extends React.Component<AppProps, AppState> {
   private onPointerUpFromPointerDownHandler(
     pointerDownState: PointerDownState,
   ): (event: PointerEvent) => void {
-    return withBatchedUpdates(async (childEvent: PointerEvent) => {
+    return withBatchedUpdates((childEvent: PointerEvent) => {
       const {
         draggingElement,
         resizingElement,
@@ -3624,15 +3622,13 @@ class App extends React.Component<AppProps, AppState> {
       if (draggingElement?.type === "image") {
         const imageElement = draggingElement;
         try {
-          if (isInitializedImageElement(imageElement)) {
-            this.initImageDimensions(imageElement);
-            this.setState(
-              { selectedElementIds: { [imageElement.id]: true } },
-              () => {
-                this.actionManager.executeAction(actionFinalize);
-              },
-            );
-          }
+          this.initializeImageDimensions(imageElement);
+          this.setState(
+            { selectedElementIds: { [imageElement.id]: true } },
+            () => {
+              this.actionManager.executeAction(actionFinalize);
+            },
+          );
         } catch (error) {
           console.error(error);
           this.scene.replaceAllElements(
@@ -3896,28 +3892,19 @@ class App extends React.Component<AppProps, AppState> {
     imageFile: File;
     imageElement: ExcalidrawImageElement;
   }) => {
+    // generate image id (digest) before any resizing/compression takes place to
+    // keep it more portable
+    const imageId = await generateIdFromFile(imageFile);
+
     const dataURL = await this.getImageData(imageFile);
 
-    let imageId: ImageId;
-    try {
-      const hashBuffer = await window.crypto.subtle.digest(
-        "SHA-1",
-        await imageFile.arrayBuffer(),
-      );
-      imageId =
-        // buffer to byte array
-        Array.from(new Uint8Array(hashBuffer))
-          // bytes to hex string
-          .map((b) => b.toString(16).padStart(2, "0"))
-          .join("") as ImageId;
-    } catch (error) {
-      console.error(error);
-      imageId = nanoid(40) as ImageId;
-    }
-
-    const imageElement = newElementWith(_imageElement, {
-      imageId,
-    }) as NonDeleted<InitializedExcalidrawImageElement>;
+    const imageElement = mutateElement(
+      _imageElement,
+      {
+        imageId,
+      },
+      false,
+    ) as NonDeleted<InitializedExcalidrawImageElement>;
 
     return new Promise<NonDeleted<InitializedExcalidrawImageElement>>(
       (resolve, reject) => {
@@ -3939,6 +3926,12 @@ class App extends React.Component<AppProps, AppState> {
                 imageElements: [imageElement],
                 files: this.state.files,
               });
+              if (
+                this.state.pendingImageElement?.id !== imageElement.id &&
+                this.state.draggingElement?.id !== imageElement.id
+              ) {
+                this.initializeImageDimensions(imageElement, true);
+              }
               resolve(imageElement);
             } catch (error) {
               console.error(error);
@@ -3954,16 +3947,18 @@ class App extends React.Component<AppProps, AppState> {
    * inserts image into elements array and rerenders
    */
   private insertImageElement = (
-    imageElement: InitializedExcalidrawImageElement,
+    imageElement: ExcalidrawImageElement,
+    imageFile: File,
   ) => {
     this.scene.replaceAllElements([
       ...this.scene.getElementsIncludingDeleted(),
       imageElement,
     ]);
 
-    if (this.state.pendingImageElement?.id !== imageElement.id) {
-      this.initImageDimensions(imageElement);
-    }
+    this.initializeImage({
+      imageFile,
+      imageElement,
+    });
 
     this.scene.informMutation();
   };
@@ -3984,12 +3979,9 @@ class App extends React.Component<AppProps, AppState> {
         mimeTypes: ["image/jpeg", "image/png", "image/svg+xml"],
       });
 
-      const imageElement = await this.initializeImage({
-        imageFile,
-        imageElement: this.createImageElement({
-          sceneX: x,
-          sceneY: y,
-        }),
+      const imageElement = this.createImageElement({
+        sceneX: x,
+        sceneY: y,
       });
 
       this.setState(
@@ -3997,7 +3989,7 @@ class App extends React.Component<AppProps, AppState> {
           pendingImageElement: imageElement,
         },
         () => {
-          this.insertImageElement(imageElement);
+          this.insertImageElement(imageElement, imageFile);
         },
       );
     } catch (error) {
@@ -4017,25 +4009,55 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private initImageDimensions = (
-    imageElement: InitializedExcalidrawImageElement,
+  private initializeImageDimensions = (
+    imageElement: ExcalidrawImageElement,
+    forceNaturalSize = false,
   ) => {
-    const image = this.imageCache.get(imageElement.imageId);
+    const image =
+      isInitializedImageElement(imageElement) &&
+      this.imageCache.get(imageElement.imageId);
 
-    // if user-created bounding box is below threshold, assume the
-    // intention was to click instead of drag, and use the image's
-    // intrinsic size
+    if (!image) {
+      if (
+        imageElement.width < DRAGGING_THRESHOLD / this.state.zoom.value &&
+        imageElement.height < DRAGGING_THRESHOLD / this.state.zoom.value
+      ) {
+        const defaultSize = 100;
+        mutateElement(imageElement, {
+          x: imageElement.x - defaultSize / 2,
+          y: imageElement.y - defaultSize / 2,
+          width: defaultSize,
+          height: defaultSize,
+        });
+      }
+
+      return;
+    }
+
     if (
-      image &&
-      imageElement.width < DRAGGING_THRESHOLD / this.state.zoom.value &&
-      imageElement.height < DRAGGING_THRESHOLD / this.state.zoom.value
+      forceNaturalSize ||
+      // if user-created bounding box is below threshold, assume the
+      // intention was to click instead of drag, and use the image's
+      // intrinsic size
+      (imageElement.width < DRAGGING_THRESHOLD / this.state.zoom.value &&
+        imageElement.height < DRAGGING_THRESHOLD / this.state.zoom.value)
     ) {
-      mutateElement(imageElement, {
-        x: imageElement.x - image.width / 2,
-        y: imageElement.y - image.height / 2,
-        width: image.naturalWidth,
-        height: image.naturalHeight,
-      });
+      const buffer = 160;
+      let width = Math.min(
+        image.naturalWidth,
+        this.state.width / this.state.zoom.value - buffer,
+      );
+      let height = width * (image.naturalHeight / image.naturalWidth);
+
+      if (height > this.state.height / this.state.zoom.value - buffer) {
+        height = this.state.height / this.state.zoom.value - buffer;
+        width = height * (image.naturalWidth / image.naturalHeight);
+      }
+
+      const x = imageElement.x - width / 2;
+      const y = imageElement.y - height / 2;
+
+      mutateElement(imageElement, { x, y, width, height });
     }
   };
 
@@ -4199,11 +4221,9 @@ class App extends React.Component<AppProps, AppState> {
           this.state,
         );
 
-        const imageElement = await this.initializeImage({
-          imageFile: file,
-          imageElement: this.createImageElement({ sceneX, sceneY }),
-        });
-        this.insertImageElement(imageElement);
+        const imageElement = this.createImageElement({ sceneX, sceneY });
+        this.insertImageElement(imageElement, file);
+        this.initializeImageDimensions(imageElement);
         this.setState({ selectedElementIds: { [imageElement.id]: true } });
 
         return;

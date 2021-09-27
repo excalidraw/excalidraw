@@ -17,7 +17,8 @@ type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
 export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   element: TElement,
   updates: ElementUpdate<TElement>,
-) => {
+  informMutation = true,
+): TElement => {
   let didChange = false;
 
   // casting to any because can't use `in` operator
@@ -73,7 +74,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
     }
   }
   if (!didChange) {
-    return;
+    return element;
   }
 
   if (
@@ -88,7 +89,12 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
 
   element.version++;
   element.versionNonce = randomInteger();
-  Scene.getScene(element)?.informMutation();
+
+  if (informMutation) {
+    Scene.getScene(element)?.informMutation();
+  }
+
+  return element;
 };
 
 export const newElementWith = <TElement extends ExcalidrawElement>(
