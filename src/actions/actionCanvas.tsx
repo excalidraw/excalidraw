@@ -1,14 +1,15 @@
 import React from "react";
 import { getDefaultAppState } from "../appState";
 import { ColorPicker } from "../components/ColorPicker";
-import { resetZoom, trash, zoomIn, zoomOut } from "../components/icons";
+import { trash, zoomIn, zoomOut } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
+import { DarkModeToggle } from "../components/DarkModeToggle";
 import { ZOOM_STEP } from "../constants";
 import { getCommonBounds, getNonDeletedElements } from "../element";
 import { newElementWith } from "../element/mutateElement";
 import { ExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
-import { useIsMobile } from "../is-mobile";
+import { useIsMobile } from "../components/App";
 import { CODES, KEYS } from "../keys";
 import { getNormalizedZoom, getSelectedElements } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
@@ -16,13 +17,14 @@ import { getNewZoom } from "../scene/zoom";
 import { AppState, NormalizedZoomValue } from "../types";
 import { getShortcutKey } from "../utils";
 import { register } from "./register";
+import { Tooltip } from "../components/Tooltip";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
   perform: (_, appState, value) => {
     return {
-      appState: { ...appState, viewBackgroundColor: value },
-      commitToHistory: true,
+      appState: { ...appState, ...value },
+      commitToHistory: !!value.viewBackgroundColor,
     };
   },
   PanelComponent: ({ appState, updateData }) => {
@@ -32,7 +34,12 @@ export const actionChangeViewBackgroundColor = register({
           label={t("labels.canvasBackground")}
           type="canvasBackground"
           color={appState.viewBackgroundColor}
-          onChange={(color) => updateData(color)}
+          onChange={(color) => updateData({ viewBackgroundColor: color })}
+          isActive={appState.openPopup === "canvasColorPicker"}
+          setActive={(active) =>
+            updateData({ openPopup: active ? "canvasColorPicker" : null })
+          }
+          data-testid="canvas-background-picker"
         />
       </div>
     );
@@ -53,7 +60,6 @@ export const actionClearCanvas = register({
         exportBackground: appState.exportBackground,
         exportEmbedScene: appState.exportEmbedScene,
         gridSize: appState.gridSize,
-        shouldAddWatermark: appState.shouldAddWatermark,
         showStats: appState.showStats,
         pasteDialog: appState.pasteDialog,
       },
@@ -72,6 +78,7 @@ export const actionClearCanvas = register({
           updateData(null);
         }
       }}
+      data-testid="clear-canvas-button"
     />
   ),
 });
@@ -102,6 +109,7 @@ export const actionZoomIn = register({
       onClick={() => {
         updateData(null);
       }}
+      size="small"
     />
   ),
   keyTest: (event) =>
@@ -136,6 +144,7 @@ export const actionZoomOut = register({
       onClick={() => {
         updateData(null);
       }}
+      size="small"
     />
   ),
   keyTest: (event) =>
@@ -162,16 +171,21 @@ export const actionResetZoom = register({
       commitToHistory: false,
     };
   },
-  PanelComponent: ({ updateData }) => (
-    <ToolButton
-      type="button"
-      icon={resetZoom}
-      title={t("buttons.resetZoom")}
-      aria-label={t("buttons.resetZoom")}
-      onClick={() => {
-        updateData(null);
-      }}
-    />
+  PanelComponent: ({ updateData, appState }) => (
+    <Tooltip label={t("buttons.resetZoom")}>
+      <ToolButton
+        type="button"
+        className="reset-zoom-button"
+        title={t("buttons.resetZoom")}
+        aria-label={t("buttons.resetZoom")}
+        onClick={() => {
+          updateData(null);
+        }}
+        size="small"
+      >
+        {(appState.zoom.value * 100).toFixed(0)}%
+      </ToolButton>
+    </Tooltip>
   ),
   keyTest: (event) =>
     (event.code === CODES.ZERO || event.code === CODES.NUM_ZERO) &&
@@ -257,4 +271,28 @@ export const actionZoomToFit = register({
     event.shiftKey &&
     !event.altKey &&
     !event[KEYS.CTRL_OR_CMD],
+});
+
+export const actionToggleTheme = register({
+  name: "toggleTheme",
+  perform: (_, appState, value) => {
+    return {
+      appState: {
+        ...appState,
+        theme: value || (appState.theme === "light" ? "dark" : "light"),
+      },
+      commitToHistory: false,
+    };
+  },
+  PanelComponent: ({ appState, updateData }) => (
+    <div style={{ marginInlineStart: "0.25rem" }}>
+      <DarkModeToggle
+        value={appState.theme}
+        onChange={(theme) => {
+          updateData(theme);
+        }}
+      />
+    </div>
+  ),
+  keyTest: (event) => event.altKey && event.shiftKey && event.code === CODES.D,
 });

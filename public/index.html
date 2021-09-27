@@ -13,6 +13,18 @@
 
     <meta name="theme-color" content="#000" />
 
+    <!-- Declarative Link Capturing (https://web.dev/declarative-link-capturing/) -->
+    <meta
+      http-equiv="origin-trial"
+      content="Ak3VyzTheARtX2CnxBZ3ZKxImB0mNyvDakmMxeAChgxrWFMZ3IGN64VP+uj36VxM5OegsbLmrP258b1xvqp7+Q8AAABbeyJvcmlnaW4iOiJodHRwczovL2V4Y2FsaWRyYXcuY29tOjQ0MyIsImZlYXR1cmUiOiJXZWJBcHBMaW5rQ2FwdHVyaW5nIiwiZXhwaXJ5IjoxNjM0MDgzMTk5fQ=="
+    />
+
+    <!-- File Handling (https://web.dev/file-handling/) -->
+    <meta
+      http-equiv="origin-trial"
+      content="AkMQsAnFmKfRfPKQHNCv2WmZREqgwkqhyt2M7aOwQiCStB+hPYnGnv+mNbkPDAsGXrwsj/waFi76wPzTDUaEeQ0AAABUeyJvcmlnaW4iOiJodHRwczovL2V4Y2FsaWRyYXcuY29tOjQ0MyIsImZlYXR1cmUiOiJGaWxlSGFuZGxpbmciLCJleHBpcnkiOjE2MzQwODMxOTl9"
+    />
+
     <!-- General tags -->
     <meta
       name="description"
@@ -107,15 +119,17 @@
 
     <!-- FIXME: remove this when we update CRA (fix SW caching) -->
     <style>
-      body {
+      body,
+      html {
         margin: 0;
         --ui-font: system-ui, BlinkMacSystemFont, -apple-system, Segoe UI,
           Roboto, Helvetica, Arial, sans-serif;
         font-family: var(--ui-font);
         -webkit-text-size-adjust: 100%;
 
-        width: 100vw;
-        height: 100vh;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
       }
 
       .visually-hidden {
@@ -125,6 +139,7 @@
         overflow: hidden;
         clip: rect(1px, 1px, 1px, 1px);
         white-space: nowrap; /* added line */
+        user-select: none;
       }
 
       .LoadingMessage {
@@ -146,6 +161,24 @@
         padding: 0.8em 1.2em;
         color: var(--popup-text-color);
         font-size: 1.3em;
+      }
+      #root {
+        height: 100%;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+
+        @media screen and (min-width: 1200px) {
+          -webkit-touch-callout: default;
+          -webkit-user-select: auto;
+          -khtml-user-select: auto;
+          -moz-user-select: auto;
+          -ms-user-select: auto;
+          user-select: auto;
+        }
       }
     </style>
   </head>

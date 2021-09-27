@@ -20,6 +20,10 @@
     "background": "နောက်ခံ",
     "fill": "ဖြည့်",
     "strokeWidth": "မျဉ်းအထူ",
+    "strokeShape": "",
+    "strokeShape_gel": "",
+    "strokeShape_fountain": "",
+    "strokeShape_brush": "",
     "strokeStyle": "မျဉ်းပုံစံ",
     "strokeStyle_solid": "အပြည့်",
     "strokeStyle_dashed": "မျဉ်းပြတ်",
@@ -39,7 +43,7 @@
     "fontFamily": "စာလုံးပုံစံ",
     "onlySelected": "ရွေးထားသလောက်",
     "withBackground": "",
-    "exportEmbedScene": "မြင်ကွင်းပါမြှုပ်နှံ၍ထုတ်ပါ",
+    "exportEmbedScene": "",
     "exportEmbedScene_details": "ထုတ်ယူလိုက်သော PNG/SVG ထဲမြင်ကွင်းအချက်အလက်များပါဝင်သဖြင့် ပြန်လည်ရယူနိုင်သော်လည်း ဖိုင်အရွယ်အစားကြီးပါမည်။",
     "addWatermark": "\"Excalidraw ဖြင့်ဖန်တီးသည်။\" စာသားထည့်",
     "handDrawn": "လက်ရေး",
@@ -96,17 +100,22 @@
     "flipVertical": "",
     "viewMode": "",
     "toggleExportColorScheme": "",
-    "share": ""
+    "share": "",
+    "showStroke": "",
+    "showBackground": "",
+    "toggleTheme": ""
   },
   "buttons": {
     "clearReset": "ကားချပ်ရှင်းလင်း",
+    "exportJSON": "",
+    "exportImage": "",
     "export": "ထုတ်",
     "exportToPng": "PNG ထုတ်",
     "exportToSvg": "SVG ထုတ်",
     "copyToClipboard": "ကူးယူ",
     "copyPngToClipboard": "PNG ကူးယူ",
     "scale": "စကေး",
-    "save": "သိမ်း",
+    "save": "",
     "saveAs": "ပြောင်းသိမ်း",
     "load": "တင်သွင်း",
     "getShareableLink": "မျှဝေရန် လင့်ခ်ရယူ",
@@ -142,6 +151,8 @@
     "loadSceneOverridePrompt": "လက်ရှိရေးဆွဲထားသမျှအား ပြင်ပမှတင်သွင်းသောပုံနှင့်အစားထိုးပါမည်။ ဆက်လက်ဆောင်ရွက်လိုပါသလား။",
     "collabStopOverridePrompt": "",
     "errorLoadingLibrary": "ပြင်ပမှမှတ်တမ်းအားတင်သွင်းရာတွင်အမှားအယွင်းရှိနေသည်။",
+    "errorAddingToLibrary": "",
+    "errorRemovingFromLibrary": "",
     "confirmAddLibrary": "{{numShapes}} ခုသောပုံသဏ္ဌာန်အားမှတ်တမ်းတင်ပါမည်။ အတည်ပြုပါ။",
     "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "ဤပုံဖြင့်မြင်ကွင်းပြန်လည်မရယူနိုင်ပါ။",
@@ -150,12 +161,12 @@
   },
   "toolBar": {
     "selection": "ရွေးချယ်",
-    "draw": "အလွတ်ရေးဆွဲ",
     "rectangle": "စတုဂံ",
     "diamond": "စိန်",
     "ellipse": "အဝိုင်း",
     "arrow": "မြှား",
     "line": "မျဉ်း",
+    "freedraw": "",
     "text": "စာသား",
     "library": "မှတ်တမ်း",
     "lock": "ရွေးချယ်ထားသောကိရိယာကိုသာဆက်သုံး"
@@ -169,6 +180,8 @@
     "linearElement": "အမှတ်များချမှတ်ရေးဆွဲရန်ကလစ်နှိပ်ပါ၊ မျဉ်းတစ်ကြောင်းတည်းအတွက် တရွတ်ဆွဲပါ။",
     "freeDraw": "ကလစ်နှိပ်၍ တရွတ်ဆွဲပါ၊ ပြီးလျှင်လွှတ်ပါ။",
     "text": "မှတ်ချက်။ ။မည်သည့်ကိရိယာရွေးထားသည်ဖြစ်စေ ကလစ်နှစ်ချက်နှိပ်၍စာသားထည့်နိုင်သည်",
+    "text_selected": "",
+    "text_editing": "",
     "linearElementMulti": "နောက်ဆုံးအမှတ်ပေါ်တွင်ကလစ်နှိပ်ခြင်း၊ Escape (သို့) Enter နှိပ်ခြင်းတို့ဖြင့်အဆုံးသတ်နိုင်",
     "lockAngle": "",
     "resize": "အချိုးအစားကန့်သတ်ရန် Shift နှင့် ဗဟိုမှချိန်ညှိရန် Alt တို့ကိုနှိပ်ထားနိုင်သည်",
@@ -208,14 +221,27 @@
   "errorDialog": {
     "title": "ချို့ယွင်းချက်"
   },
+  "exportDialog": {
+    "disk_title": "",
+    "disk_details": "",
+    "disk_button": "",
+    "link_title": "",
+    "link_details": "",
+    "link_button": "",
+    "excalidrawplus_description": "",
+    "excalidrawplus_button": "",
+    "excalidrawplus_exportError": ""
+  },
   "helpDialog": {
     "blog": "",
     "click": "",
     "curvedArrow": "",
     "curvedLine": "",
     "documentation": "",
+    "doubleClick": "",
     "drag": "",
     "editor": "",
+    "editSelectedShape": "",
     "github": "",
     "howto": "",
     "or": "",
@@ -230,7 +256,8 @@
     "zoomToSelection": ""
   },
   "encrypted": {
-    "tooltip": "ရေးဆွဲထားသောပုံများအား နှစ်ဘက်စွန်းတိုင်လျှို့ဝှက်ထားသဖြင့် Excalidraw ၏ဆာဗာများပင်လျှင်မြင်တွေ့ရမည်မဟုတ်ပါ။"
+    "tooltip": "ရေးဆွဲထားသောပုံများအား နှစ်ဘက်စွန်းတိုင်လျှို့ဝှက်ထားသဖြင့် Excalidraw ၏ဆာဗာများပင်လျှင်မြင်တွေ့ရမည်မဟုတ်ပါ။",
+    "link": ""
   },
   "stats": {
     "angle": "ထောင့်",

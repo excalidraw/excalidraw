@@ -3,7 +3,7 @@ import React from "react";
 import { undo, redo } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
-import { SceneHistory, HistoryEntry } from "../history";
+import History, { HistoryEntry } from "../history";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 import { isWindows, KEYS } from "../keys";
@@ -59,7 +59,7 @@ const writeData = (
   return { commitToHistory };
 };
 
-type ActionCreator = (history: SceneHistory) => Action;
+type ActionCreator = (history: History) => Action;
 
 export const createUndoAction: ActionCreator = (history) => ({
   name: "undo",
@@ -69,12 +69,13 @@ export const createUndoAction: ActionCreator = (history) => ({
     event[KEYS.CTRL_OR_CMD] &&
     event.key.toLowerCase() === KEYS.Z &&
     !event.shiftKey,
-  PanelComponent: ({ updateData }) => (
+  PanelComponent: ({ updateData, data }) => (
     <ToolButton
       type="button"
       icon={undo}
       aria-label={t("buttons.undo")}
       onClick={updateData}
+      size={data?.size || "medium"}
     />
   ),
   commitToHistory: () => false,
@@ -89,12 +90,13 @@ export const createRedoAction: ActionCreator = (history) => ({
       event.shiftKey &&
       event.key.toLowerCase() === KEYS.Z) ||
     (isWindows && event.ctrlKey && !event.shiftKey && event.key === KEYS.Y),
-  PanelComponent: ({ updateData }) => (
+  PanelComponent: ({ updateData, data }) => (
     <ToolButton
       type="button"
       icon={redo}
       aria-label={t("buttons.redo")}
       onClick={updateData}
+      size={data?.size || "medium"}
     />
   ),
   commitToHistory: () => false,

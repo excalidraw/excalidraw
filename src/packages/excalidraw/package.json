@@ -1,6 +1,6 @@
 {
   "name": "@excalidraw/excalidraw",
-  "version": "0.5.0",
+  "version": "0.9.0",
   "main": "main.js",
   "types": "types/packages/excalidraw/index.d.ts",
   "files": [
@@ -11,6 +11,7 @@
     "access": "public"
   },
   "description": "Excalidraw as a React component",
+  "repository": "https://github.com/excalidraw/excalidraw",
   "license": "MIT",
   "keywords": [
     "excalidraw",
@@ -39,34 +40,35 @@
     ]
   },
   "peerDependencies": {
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1"
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
   },
   "devDependencies": {
-    "@babel/core": "7.13.13",
-    "@babel/plugin-transform-arrow-functions": "7.13.0",
-    "@babel/plugin-transform-async-to-generator": "7.13.0",
-    "@babel/plugin-transform-runtime": "7.13.10",
-    "@babel/plugin-transform-typescript": "7.13.0",
-    "@babel/preset-env": "7.13.12",
-    "@babel/preset-react": "7.13.13",
-    "@babel/preset-typescript": "7.13.0",
+    "@babel/core": "7.14.8",
+    "@babel/plugin-transform-arrow-functions": "7.14.5",
+    "@babel/plugin-transform-async-to-generator": "7.14.5",
+    "@babel/plugin-transform-runtime": "7.14.5",
+    "@babel/plugin-transform-typescript": "7.14.6",
+    "@babel/preset-env": "7.14.9",
+    "@babel/preset-react": "7.14.5",
+    "@babel/preset-typescript": "7.14.5",
+    "autoprefixer": "10.3.1",
     "babel-loader": "8.2.2",
     "babel-plugin-transform-class-properties": "6.24.1",
     "cross-env": "7.0.3",
-    "css-loader": "5.2.0",
+    "css-loader": "5.2.6",
     "file-loader": "6.2.0",
-    "mini-css-extract-plugin": "1.4.0",
-    "sass-loader": "11.0.1",
-    "terser-webpack-plugin": "5.1.1",
-    "ts-loader": "8.0.18",
-    "typescript": "4.2.3",
-    "webpack": "5.28.0",
-    "webpack-bundle-analyzer": "4.4.0",
-    "webpack-cli": "4.6.0"
+    "mini-css-extract-plugin": "1.6.1",
+    "postcss-loader": "6.1.1",
+    "sass-loader": "12.1.0",
+    "terser-webpack-plugin": "5.1.4",
+    "ts-loader": "9.2.4",
+    "typescript": "4.3.5",
+    "webpack": "5.47.1",
+    "webpack-bundle-analyzer": "4.4.2",
+    "webpack-cli": "4.7.2"
   },
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
-  "repository": "https://github.com/excalidraw/excalidraw",
   "homepage": "https://github.com/excalidraw/excalidraw/tree/master/src/packages/excalidraw",
   "scripts": {
     "gen:types": "tsc --project ../../../tsconfig-types.json",

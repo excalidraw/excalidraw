@@ -6,13 +6,19 @@ import { getSelectedElements } from "./scene";
 import { AppState } from "./types";
 import { SVG_EXPORT_TAG } from "./scene/export";
 import { tryParseSpreadsheet, Spreadsheet, VALID_SPREADSHEET } from "./charts";
-import { canvasToBlob } from "./data/blob";
 import { EXPORT_DATA_TYPES } from "./constants";
 
 type ElementsClipboard = {
   type: typeof EXPORT_DATA_TYPES.excalidrawClipboard;
   elements: ExcalidrawElement[];
 };
+
+export interface ClipboardData {
+  spreadsheet?: Spreadsheet;
+  elements?: readonly ExcalidrawElement[];
+  text?: string;
+  errorMessage?: string;
+}
 
 let CLIPBOARD = "";
 let PREFER_APP_CLIPBOARD = false;
@@ -110,12 +116,7 @@ const getSystemClipboard = async (
  */
 export const parseClipboard = async (
   event: ClipboardEvent | null,
-): Promise<{
-  spreadsheet?: Spreadsheet;
-  elements?: readonly ExcalidrawElement[];
-  text?: string;
-  errorMessage?: string;
-}> => {
+): Promise<ClipboardData> => {
   const systemClipboard = await getSystemClipboard(event);
 
   // if system clipboard empty, couldn't be resolved, or contains previously
@@ -150,8 +151,7 @@ export const parseClipboard = async (
   }
 };
 
-export const copyCanvasToClipboardAsPng = async (canvas: HTMLCanvasElement) => {
-  const blob = await canvasToBlob(canvas);
+export const copyBlobToClipboardAsPng = async (blob: Blob) => {
   await navigator.clipboard.write([
     new window.ClipboardItem({ "image/png": blob }),
   ]);

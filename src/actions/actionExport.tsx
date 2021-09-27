@@ -1,17 +1,25 @@
 import React from "react";
 import { trackEvent } from "../analytics";
-import { load, questionCircle, save, saveAs } from "../components/icons";
+import { load, questionCircle, saveAs } from "../components/icons";
 import { ProjectName } from "../components/ProjectName";
 import { ToolButton } from "../components/ToolButton";
 import "../components/ToolIcon.scss";
 import { Tooltip } from "../components/Tooltip";
 import { DarkModeToggle, Appearence } from "../components/DarkModeToggle";
 import { loadFromJSON, saveAsJSON } from "../data";
+import { resaveAsImageWithScene } from "../data/resave";
 import { t } from "../i18n";
-import { useIsMobile } from "../is-mobile";
+import { useIsMobile } from "../components/App";
 import { KEYS } from "../keys";
 import { register } from "./register";
-import { supported } from "browser-fs-access";
+import { supported as fsSupported } from "browser-fs-access";
+import { CheckboxItem } from "../components/CheckboxItem";
+import { getExportSize } from "../scene/export";
+import { DEFAULT_EXPORT_PADDING, EXPORT_SCALES } from "../constants";
+import { getSelectedElements, isSomeElementSelected } from "../scene";
+import { getNonDeletedElements } from "../element";
+import { ActiveFile } from "../components/ActiveFile";
+import { isImageFileHandle } from "../data/blob";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -31,6 +39,54 @@ export const actionChangeProjectName = register({
   ),
 });
 
+export const actionChangeExportScale = register({
+  name: "changeExportScale",
+  perform: (_elements, appState, value) => {
+    return {
+      appState: { ...appState, exportScale: value },
+      commitToHistory: false,
+    };
+  },
+  PanelComponent: ({ elements: allElements, appState, updateData }) => {
+    const elements = getNonDeletedElements(allElements);
+    const exportSelected = isSomeElementSelected(elements, appState);
+    const exportedElements = exportSelected
+      ? getSelectedElements(elements, appState)
+      : elements;
+
+    return (
+      <>
+        {EXPORT_SCALES.map((s) => {
+          const [width, height] = getExportSize(
+            exportedElements,
+            DEFAULT_EXPORT_PADDING,
+            s,
+          );
+
+          const scaleButtonTitle = `${t(
+            "buttons.scale",
+          )} ${s}x (${width}x${height})`;
+
+          return (
+            <ToolButton
+              key={s}
+              size="small"
+              type="radio"
+              icon={`${s}x`}
+              name="export-canvas-scale"
+              title={scaleButtonTitle}
+              aria-label={scaleButtonTitle}
+              id="export-canvas-scale"
+              checked={s === appState.exportScale}
+              onChange={() => updateData(s)}
+            />
+          );
+        })}
+      </>
+    );
+  },
+});
+
 export const actionChangeExportBackground = register({
   name: "changeExportBackground",
   perform: (_elements, appState, value) => {
@@ -40,14 +96,12 @@ export const actionChangeExportBackground = register({
     };
   },
   PanelComponent: ({ appState, updateData }) => (
-    <label>
-      <input
-        type="checkbox"
-        checked={appState.exportBackground}
-        onChange={(event) => updateData(event.target.checked)}
-      />{" "}
+    <CheckboxItem
+      checked={appState.exportBackground}
+      onChange={(checked) => updateData(checked)}
+    >
       {t("labels.withBackground")}
-    </label>
+    </CheckboxItem>
   ),
 });
 
@@ -60,50 +114,28 @@ export const actionChangeExportEmbedScene = register({
     };
   },
   PanelComponent: ({ appState, updateData }) => (
-    <label style={{ display: "flex" }}>
-      <input
-        type="checkbox"
-        checked={appState.exportEmbedScene}
-        onChange={(event) => updateData(event.target.checked)}
-      />{" "}
+    <CheckboxItem
+      checked={appState.exportEmbedScene}
+      onChange={(checked) => updateData(checked)}
+    >
       {t("labels.exportEmbedScene")}
-      <Tooltip
-        label={t("labels.exportEmbedScene_details")}
-        position="above"
-        long={true}
-      >
-        <div className="TooltipIcon">{questionCircle}</div>
+      <Tooltip label={t("labels.exportEmbedScene_details")} long={true}>
+        <div className="excalidraw-tooltip-icon">{questionCircle}</div>
       </Tooltip>
-    </label>
+    </CheckboxItem>
   ),
 });
 
-export const actionChangeShouldAddWatermark = register({
-  name: "changeShouldAddWatermark",
-  perform: (_elements, appState, value) => {
-    return {
-      appState: { ...appState, shouldAddWatermark: value },
-      commitToHistory: false,
-    };
-  },
-  PanelComponent: ({ appState, updateData }) => (
-    <label>
-      <input
-        type="checkbox"
-        checked={appState.shouldAddWatermark}
-        onChange={(event) => updateData(event.target.checked)}
-      />{" "}
-      {t("labels.addWatermark")}
-    </label>
-  ),
-});
-
-export const actionSaveScene = register({
-  name: "saveScene",
+export const actionSaveToActiveFile = register({
+  name: "saveToActiveFile",
   perform: async (elements, appState, value) => {
     const fileHandleExists = !!appState.fileHandle;
+
     try {
-      const { fileHandle } = await saveAsJSON(elements, appState);
+      const { fileHandle } = isImageFileHandle(appState.fileHandle)
+        ? await resaveAsImageWithScene(elements, appState)
+        : await saveAsJSON(elements, appState);
+
       return {
         commitToHistory: false,
         appState: {
@@ -128,20 +160,16 @@ export const actionSaveScene = register({
   },
   keyTest: (event) =>
     event.key === KEYS.S && event[KEYS.CTRL_OR_CMD] && !event.shiftKey,
-  PanelComponent: ({ updateData }) => (
-    <ToolButton
-      type="button"
-      icon={save}
-      title={t("buttons.save")}
-      aria-label={t("buttons.save")}
-      showAriaLabel={useIsMobile()}
-      onClick={() => updateData(null)}
+  PanelComponent: ({ updateData, appState }) => (
+    <ActiveFile
+      onSave={() => updateData(null)}
+      fileName={appState.fileHandle?.name}
     />
   ),
 });
 
-export const actionSaveAsScene = register({
-  name: "saveAsScene",
+export const actionSaveFileToDisk = register({
+  name: "saveFileToDisk",
   perform: async (elements, appState, value) => {
     try {
       const { fileHandle } = await saveAsJSON(elements, {
@@ -165,8 +193,9 @@ export const actionSaveAsScene = register({
       title={t("buttons.saveAs")}
       aria-label={t("buttons.saveAs")}
       showAriaLabel={useIsMobile()}
-      hidden={!supported}
+      hidden={!fsSupported}
       onClick={() => updateData(null)}
+      data-testid="save-as-button"
     />
   ),
 });
@@ -178,7 +207,7 @@ export const actionLoadScene = register({
       const {
         elements: loadedElements,
         appState: loadedAppState,
-      } = await loadFromJSON(appState);
+      } = await loadFromJSON(appState, elements);
       return {
         elements: loadedElements,
         appState: loadedAppState,
@@ -204,6 +233,7 @@ export const actionLoadScene = register({
       aria-label={t("buttons.load")}
       showAriaLabel={useIsMobile()}
       onClick={updateData}
+      data-testid="load-button"
     />
   ),
 });

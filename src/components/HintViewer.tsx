@@ -5,7 +5,7 @@ import { getSelectedElements } from "../scene";
 
 import "./HintViewer.scss";
 import { AppState } from "../types";
-import { isLinearElement } from "../element/typeChecks";
+import { isLinearElement, isTextElement } from "../element/typeChecks";
 import { getShortcutKey } from "../utils";
 
 interface Hint {
@@ -23,7 +23,7 @@ const getHints = ({ appState, elements }: Hint) => {
     return t("hints.linearElementMulti");
   }
 
-  if (elementType === "draw") {
+  if (elementType === "freedraw") {
     return t("hints.freeDraw");
   }
 
@@ -55,6 +55,14 @@ const getHints = ({ appState, elements }: Hint) => {
         : t("hints.lineEditor_nothingSelected");
     }
     return t("hints.lineEditor_info");
+  }
+
+  if (selectedElements.length === 1 && isTextElement(selectedElements[0])) {
+    return t("hints.text_selected");
+  }
+
+  if (appState.editingElement && isTextElement(appState.editingElement)) {
+    return t("hints.text_editing");
   }
 
   return null;

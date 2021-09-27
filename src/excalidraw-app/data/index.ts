@@ -17,7 +17,7 @@ const generateRandomID = async () => {
   return Array.from(arr, byteToHex).join("");
 };
 
-const generateEncryptionKey = async () => {
+export const generateEncryptionKey = async () => {
   const key = await window.crypto.subtle.generateKey(
     {
       name: "AES-GCM",
@@ -176,7 +176,7 @@ export const getImportedKey = (key: string, usage: KeyUsage) =>
     [usage],
   );
 
-const decryptImported = async (
+export const decryptImported = async (
   iv: ArrayBuffer,
   encrypted: ArrayBuffer,
   privateKey: string,
@@ -245,10 +245,10 @@ const importFromBackend = async (
 export const loadScene = async (
   id: string | null,
   privateKey: string | null,
-  // Supply initialData even if importing from backend to ensure we restore
+  // Supply local state even if importing from backend to ensure we restore
   // localStorage user settings which we do not persist on server.
   // Non-optional so we don't forget to pass it even if `undefined`.
-  initialData: ImportedDataState | undefined | null,
+  localDataState: ImportedDataState | undefined | null,
 ) => {
   let data;
   if (id != null) {
@@ -256,10 +256,11 @@ export const loadScene = async (
     // extra care not to leak it
     data = restore(
       await importFromBackend(id, privateKey),
-      initialData?.appState,
+      localDataState?.appState,
+      localDataState?.elements,
     );
   } else {
-    data = restore(initialData || null, null);
+    data = restore(localDataState || null, null, null);
   }
 
   return {

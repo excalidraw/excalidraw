@@ -1,0 +1,21 @@
+.excalidraw {
+  .ActiveFile {
+    .ActiveFile__fileName {
+      display: flex;
+      align-items: center;
+
+      span {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        width: 9.3em;
+      }
+
+      svg {
+        width: 1.15em;
+        margin-inline-end: 0.3em;
+        transform: scaleY(0.9);
+      }
+    }
+  }
+}

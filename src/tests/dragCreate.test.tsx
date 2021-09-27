@@ -3,7 +3,12 @@ import ReactDOM from "react-dom";
 import ExcalidrawApp from "../excalidraw-app";
 import * as Renderer from "../renderer/renderScene";
 import { KEYS } from "../keys";
-import { render, fireEvent } from "./test-utils";
+import {
+  render,
+  fireEvent,
+  mockBoundingClientRect,
+  restoreOriginalGetBoundingClientRect,
+} from "./test-utils";
 import { ExcalidrawLinearElement } from "../element/types";
 import { reseed } from "../random";
 
@@ -19,269 +24,282 @@ beforeEach(() => {
 
 const { h } = window;
 
-describe("add element to the scene when pointer dragging long enough", () => {
-  it("rectangle", async () => {
-    const { getByToolName, container } = await render(<ExcalidrawApp />);
-    // select tool
-    const tool = getByToolName("rectangle");
-    fireEvent.click(tool);
+describe("Test dragCreate", () => {
+  describe("add element to the scene when pointer dragging long enough", () => {
+    it("rectangle", async () => {
+      const { getByToolName, container } = await render(<ExcalidrawApp />);
+      // select tool
+      const tool = getByToolName("rectangle");
+      fireEvent.click(tool);
 
-    const canvas = container.querySelector("canvas")!;
+      const canvas = container.querySelector("canvas")!;
 
-    // start from (30, 20)
-    fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
+      // start from (30, 20)
+      fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
 
-    // move to (60,70)
-    fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
+      // move to (60,70)
+      fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
 
-    // finish (position does not matter)
-    fireEvent.pointerUp(canvas);
+      // finish (position does not matter)
+      fireEvent.pointerUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(7);
-    expect(h.state.selectionElement).toBeNull();
+      expect(renderScene).toHaveBeenCalledTimes(8);
+      expect(h.state.selectionElement).toBeNull();
 
-    expect(h.elements.length).toEqual(1);
-    expect(h.elements[0].type).toEqual("rectangle");
-    expect(h.elements[0].x).toEqual(30);
-    expect(h.elements[0].y).toEqual(20);
-    expect(h.elements[0].width).toEqual(30); // 60 - 30
-    expect(h.elements[0].height).toEqual(50); // 70 - 20
+      expect(h.elements.length).toEqual(1);
+      expect(h.elements[0].type).toEqual("rectangle");
+      expect(h.elements[0].x).toEqual(30);
+      expect(h.elements[0].y).toEqual(20);
+      expect(h.elements[0].width).toEqual(30); // 60 - 30
+      expect(h.elements[0].height).toEqual(50); // 70 - 20
 
-    expect(h.elements.length).toMatchSnapshot();
-    h.elements.forEach((element) => expect(element).toMatchSnapshot());
+      expect(h.elements.length).toMatchSnapshot();
+      h.elements.forEach((element) => expect(element).toMatchSnapshot());
+    });
+
+    it("ellipse", async () => {
+      const { getByToolName, container } = await render(<ExcalidrawApp />);
+      // select tool
+      const tool = getByToolName("ellipse");
+      fireEvent.click(tool);
+
+      const canvas = container.querySelector("canvas")!;
+
+      // start from (30, 20)
+      fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
+
+      // move to (60,70)
+      fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
+
+      // finish (position does not matter)
+      fireEvent.pointerUp(canvas);
+
+      expect(renderScene).toHaveBeenCalledTimes(8);
+      expect(h.state.selectionElement).toBeNull();
+
+      expect(h.elements.length).toEqual(1);
+      expect(h.elements[0].type).toEqual("ellipse");
+      expect(h.elements[0].x).toEqual(30);
+      expect(h.elements[0].y).toEqual(20);
+      expect(h.elements[0].width).toEqual(30); // 60 - 30
+      expect(h.elements[0].height).toEqual(50); // 70 - 20
+
+      expect(h.elements.length).toMatchSnapshot();
+      h.elements.forEach((element) => expect(element).toMatchSnapshot());
+    });
+
+    it("diamond", async () => {
+      const { getByToolName, container } = await render(<ExcalidrawApp />);
+      // select tool
+      const tool = getByToolName("diamond");
+      fireEvent.click(tool);
+
+      const canvas = container.querySelector("canvas")!;
+
+      // start from (30, 20)
+      fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
+
+      // move to (60,70)
+      fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
+
+      // finish (position does not matter)
+      fireEvent.pointerUp(canvas);
+
+      expect(renderScene).toHaveBeenCalledTimes(8);
+      expect(h.state.selectionElement).toBeNull();
+
+      expect(h.elements.length).toEqual(1);
+      expect(h.elements[0].type).toEqual("diamond");
+      expect(h.elements[0].x).toEqual(30);
+      expect(h.elements[0].y).toEqual(20);
+      expect(h.elements[0].width).toEqual(30); // 60 - 30
+      expect(h.elements[0].height).toEqual(50); // 70 - 20
+
+      expect(h.elements.length).toMatchSnapshot();
+      h.elements.forEach((element) => expect(element).toMatchSnapshot());
+    });
+
+    it("arrow", async () => {
+      const { getByToolName, container } = await render(<ExcalidrawApp />);
+      // select tool
+      const tool = getByToolName("arrow");
+      fireEvent.click(tool);
+
+      const canvas = container.querySelector("canvas")!;
+
+      // start from (30, 20)
+      fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
+
+      // move to (60,70)
+      fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
+
+      // finish (position does not matter)
+      fireEvent.pointerUp(canvas);
+
+      expect(renderScene).toHaveBeenCalledTimes(8);
+      expect(h.state.selectionElement).toBeNull();
+
+      expect(h.elements.length).toEqual(1);
+
+      const element = h.elements[0] as ExcalidrawLinearElement;
+
+      expect(element.type).toEqual("arrow");
+      expect(element.x).toEqual(30);
+      expect(element.y).toEqual(20);
+      expect(element.points.length).toEqual(2);
+      expect(element.points[0]).toEqual([0, 0]);
+      expect(element.points[1]).toEqual([30, 50]); // (60 - 30, 70 - 20)
+
+      expect(h.elements.length).toMatchSnapshot();
+      h.elements.forEach((element) => expect(element).toMatchSnapshot());
+    });
+
+    it("line", async () => {
+      const { getByToolName, container } = await render(<ExcalidrawApp />);
+      // select tool
+      const tool = getByToolName("line");
+      fireEvent.click(tool);
+
+      const canvas = container.querySelector("canvas")!;
+
+      // start from (30, 20)
+      fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
+
+      // move to (60,70)
+      fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
+
+      // finish (position does not matter)
+      fireEvent.pointerUp(canvas);
+
+      expect(renderScene).toHaveBeenCalledTimes(8);
+      expect(h.state.selectionElement).toBeNull();
+
+      expect(h.elements.length).toEqual(1);
+
+      const element = h.elements[0] as ExcalidrawLinearElement;
+
+      expect(element.type).toEqual("line");
+      expect(element.x).toEqual(30);
+      expect(element.y).toEqual(20);
+      expect(element.points.length).toEqual(2);
+      expect(element.points[0]).toEqual([0, 0]);
+      expect(element.points[1]).toEqual([30, 50]); // (60 - 30, 70 - 20)
+
+      h.elements.forEach((element) => expect(element).toMatchSnapshot());
+    });
   });
 
-  it("ellipse", async () => {
-    const { getByToolName, container } = await render(<ExcalidrawApp />);
-    // select tool
-    const tool = getByToolName("ellipse");
-    fireEvent.click(tool);
+  describe("do not add element to the scene if size is too small", () => {
+    beforeAll(() => {
+      mockBoundingClientRect();
+    });
+    afterAll(() => {
+      restoreOriginalGetBoundingClientRect();
+    });
 
-    const canvas = container.querySelector("canvas")!;
+    it("rectangle", async () => {
+      const { getByToolName, container } = await render(<ExcalidrawApp />);
+      // select tool
+      const tool = getByToolName("rectangle");
+      fireEvent.click(tool);
 
-    // start from (30, 20)
-    fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
+      const canvas = container.querySelector("canvas")!;
 
-    // move to (60,70)
-    fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
+      // start from (30, 20)
+      fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
 
-    // finish (position does not matter)
-    fireEvent.pointerUp(canvas);
+      // finish (position does not matter)
+      fireEvent.pointerUp(canvas);
 
-    expect(renderScene).toHaveBeenCalledTimes(7);
-    expect(h.state.selectionElement).toBeNull();
+      expect(renderScene).toHaveBeenCalledTimes(6);
+      expect(h.state.selectionElement).toBeNull();
+      expect(h.elements.length).toEqual(0);
+    });
 
-    expect(h.elements.length).toEqual(1);
-    expect(h.elements[0].type).toEqual("ellipse");
-    expect(h.elements[0].x).toEqual(30);
-    expect(h.elements[0].y).toEqual(20);
-    expect(h.elements[0].width).toEqual(30); // 60 - 30
-    expect(h.elements[0].height).toEqual(50); // 70 - 20
+    it("ellipse", async () => {
+      const { getByToolName, container } = await render(<ExcalidrawApp />);
+      // select tool
+      const tool = getByToolName("ellipse");
+      fireEvent.click(tool);
 
-    expect(h.elements.length).toMatchSnapshot();
-    h.elements.forEach((element) => expect(element).toMatchSnapshot());
-  });
+      const canvas = container.querySelector("canvas")!;
 
-  it("diamond", async () => {
-    const { getByToolName, container } = await render(<ExcalidrawApp />);
-    // select tool
-    const tool = getByToolName("diamond");
-    fireEvent.click(tool);
+      // start from (30, 20)
+      fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
 
-    const canvas = container.querySelector("canvas")!;
+      // finish (position does not matter)
+      fireEvent.pointerUp(canvas);
 
-    // start from (30, 20)
-    fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
+      expect(renderScene).toHaveBeenCalledTimes(6);
+      expect(h.state.selectionElement).toBeNull();
+      expect(h.elements.length).toEqual(0);
+    });
 
-    // move to (60,70)
-    fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
+    it("diamond", async () => {
+      const { getByToolName, container } = await render(<ExcalidrawApp />);
+      // select tool
+      const tool = getByToolName("diamond");
+      fireEvent.click(tool);
 
-    // finish (position does not matter)
-    fireEvent.pointerUp(canvas);
+      const canvas = container.querySelector("canvas")!;
 
-    expect(renderScene).toHaveBeenCalledTimes(7);
-    expect(h.state.selectionElement).toBeNull();
+      // start from (30, 20)
+      fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
 
-    expect(h.elements.length).toEqual(1);
-    expect(h.elements[0].type).toEqual("diamond");
-    expect(h.elements[0].x).toEqual(30);
-    expect(h.elements[0].y).toEqual(20);
-    expect(h.elements[0].width).toEqual(30); // 60 - 30
-    expect(h.elements[0].height).toEqual(50); // 70 - 20
+      // finish (position does not matter)
+      fireEvent.pointerUp(canvas);
 
-    expect(h.elements.length).toMatchSnapshot();
-    h.elements.forEach((element) => expect(element).toMatchSnapshot());
-  });
+      expect(renderScene).toHaveBeenCalledTimes(6);
+      expect(h.state.selectionElement).toBeNull();
+      expect(h.elements.length).toEqual(0);
+    });
 
-  it("arrow", async () => {
-    const { getByToolName, container } = await render(<ExcalidrawApp />);
-    // select tool
-    const tool = getByToolName("arrow");
-    fireEvent.click(tool);
+    it("arrow", async () => {
+      const { getByToolName, container } = await render(<ExcalidrawApp />);
+      // select tool
+      const tool = getByToolName("arrow");
+      fireEvent.click(tool);
 
-    const canvas = container.querySelector("canvas")!;
+      const canvas = container.querySelector("canvas")!;
 
-    // start from (30, 20)
-    fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
+      // start from (30, 20)
+      fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
 
-    // move to (60,70)
-    fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
+      // finish (position does not matter)
+      fireEvent.pointerUp(canvas);
 
-    // finish (position does not matter)
-    fireEvent.pointerUp(canvas);
+      // we need to finalize it because arrows and lines enter multi-mode
+      fireEvent.keyDown(document, {
+        key: KEYS.ENTER,
+      });
 
-    expect(renderScene).toHaveBeenCalledTimes(7);
-    expect(h.state.selectionElement).toBeNull();
+      expect(renderScene).toHaveBeenCalledTimes(7);
+      expect(h.state.selectionElement).toBeNull();
+      expect(h.elements.length).toEqual(0);
+    });
 
-    expect(h.elements.length).toEqual(1);
+    it("line", async () => {
+      const { getByToolName, container } = await render(<ExcalidrawApp />);
+      // select tool
+      const tool = getByToolName("line");
+      fireEvent.click(tool);
 
-    const element = h.elements[0] as ExcalidrawLinearElement;
+      const canvas = container.querySelector("canvas")!;
 
-    expect(element.type).toEqual("arrow");
-    expect(element.x).toEqual(30);
-    expect(element.y).toEqual(20);
-    expect(element.points.length).toEqual(2);
-    expect(element.points[0]).toEqual([0, 0]);
-    expect(element.points[1]).toEqual([30, 50]); // (60 - 30, 70 - 20)
+      // start from (30, 20)
+      fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
 
-    expect(h.elements.length).toMatchSnapshot();
-    h.elements.forEach((element) => expect(element).toMatchSnapshot());
-  });
+      // finish (position does not matter)
+      fireEvent.pointerUp(canvas);
 
-  it("line", async () => {
-    const { getByToolName, container } = await render(<ExcalidrawApp />);
-    // select tool
-    const tool = getByToolName("line");
-    fireEvent.click(tool);
+      // we need to finalize it because arrows and lines enter multi-mode
+      fireEvent.keyDown(document, {
+        key: KEYS.ENTER,
+      });
 
-    const canvas = container.querySelector("canvas")!;
-
-    // start from (30, 20)
-    fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
-
-    // move to (60,70)
-    fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
-
-    // finish (position does not matter)
-    fireEvent.pointerUp(canvas);
-
-    expect(renderScene).toHaveBeenCalledTimes(7);
-    expect(h.state.selectionElement).toBeNull();
-
-    expect(h.elements.length).toEqual(1);
-
-    const element = h.elements[0] as ExcalidrawLinearElement;
-
-    expect(element.type).toEqual("line");
-    expect(element.x).toEqual(30);
-    expect(element.y).toEqual(20);
-    expect(element.points.length).toEqual(2);
-    expect(element.points[0]).toEqual([0, 0]);
-    expect(element.points[1]).toEqual([30, 50]); // (60 - 30, 70 - 20)
-
-    h.elements.forEach((element) => expect(element).toMatchSnapshot());
-  });
-});
-
-describe("do not add element to the scene if size is too small", () => {
-  it("rectangle", async () => {
-    const { getByToolName, container } = await render(<ExcalidrawApp />);
-    // select tool
-    const tool = getByToolName("rectangle");
-    fireEvent.click(tool);
-
-    const canvas = container.querySelector("canvas")!;
-
-    // start from (30, 20)
-    fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
-
-    // finish (position does not matter)
-    fireEvent.pointerUp(canvas);
-
-    expect(renderScene).toHaveBeenCalledTimes(6);
-    expect(h.state.selectionElement).toBeNull();
-    expect(h.elements.length).toEqual(0);
-  });
-
-  it("ellipse", async () => {
-    const { getByToolName, container } = await render(<ExcalidrawApp />);
-    // select tool
-    const tool = getByToolName("ellipse");
-    fireEvent.click(tool);
-
-    const canvas = container.querySelector("canvas")!;
-
-    // start from (30, 20)
-    fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
-
-    // finish (position does not matter)
-    fireEvent.pointerUp(canvas);
-
-    expect(renderScene).toHaveBeenCalledTimes(6);
-    expect(h.state.selectionElement).toBeNull();
-    expect(h.elements.length).toEqual(0);
-  });
-
-  it("diamond", async () => {
-    const { getByToolName, container } = await render(<ExcalidrawApp />);
-    // select tool
-    const tool = getByToolName("diamond");
-    fireEvent.click(tool);
-
-    const canvas = container.querySelector("canvas")!;
-
-    // start from (30, 20)
-    fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
-
-    // finish (position does not matter)
-    fireEvent.pointerUp(canvas);
-
-    expect(renderScene).toHaveBeenCalledTimes(6);
-    expect(h.state.selectionElement).toBeNull();
-    expect(h.elements.length).toEqual(0);
-  });
-
-  it("arrow", async () => {
-    const { getByToolName, container } = await render(<ExcalidrawApp />);
-    // select tool
-    const tool = getByToolName("arrow");
-    fireEvent.click(tool);
-
-    const canvas = container.querySelector("canvas")!;
-
-    // start from (30, 20)
-    fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
-
-    // finish (position does not matter)
-    fireEvent.pointerUp(canvas);
-
-    // we need to finalize it because arrows and lines enter multi-mode
-    fireEvent.keyDown(document, { key: KEYS.ENTER });
-
-    expect(renderScene).toHaveBeenCalledTimes(7);
-    expect(h.state.selectionElement).toBeNull();
-    expect(h.elements.length).toEqual(0);
-  });
-
-  it("line", async () => {
-    const { getByToolName, container } = await render(<ExcalidrawApp />);
-    // select tool
-    const tool = getByToolName("line");
-    fireEvent.click(tool);
-
-    const canvas = container.querySelector("canvas")!;
-
-    // start from (30, 20)
-    fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
-
-    // finish (position does not matter)
-    fireEvent.pointerUp(canvas);
-
-    // we need to finalize it because arrows and lines enter multi-mode
-    fireEvent.keyDown(document, { key: KEYS.ENTER });
-
-    expect(renderScene).toHaveBeenCalledTimes(7);
-    expect(h.state.selectionElement).toBeNull();
-    expect(h.elements.length).toEqual(0);
+      expect(renderScene).toHaveBeenCalledTimes(7);
+      expect(h.state.selectionElement).toBeNull();
+      expect(h.elements.length).toEqual(0);
+    });
   });
 });

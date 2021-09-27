@@ -11,7 +11,7 @@ import { restore } from "../data/restore";
 type ExportOpts = {
   elements: readonly ExcalidrawElement[];
   appState?: Partial<Omit<AppState, "offsetTop" | "offsetLeft">>;
-  getDimensions: (
+  getDimensions?: (
     width: number,
     height: number,
   ) => { width: number; height: number; scale: number };
@@ -25,16 +25,13 @@ export const exportToCanvas = ({
   const { elements: restoredElements, appState: restoredAppState } = restore(
     { elements, appState },
     null,
+    null,
   );
-  const {
-    exportBackground,
-    viewBackgroundColor,
-    shouldAddWatermark,
-  } = restoredAppState;
+  const { exportBackground, viewBackgroundColor } = restoredAppState;
   return _exportToCanvas(
     getNonDeletedElements(restoredElements),
-    { ...restoredAppState, offsetTop: 0, offsetLeft: 0 },
-    { exportBackground, viewBackgroundColor, shouldAddWatermark },
+    { ...restoredAppState, offsetTop: 0, offsetLeft: 0, width: 0, height: 0 },
+    { exportBackground, viewBackgroundColor },
     (width: number, height: number) => {
       const canvas = document.createElement("canvas");
       const ret = getDimensions(width, height);
@@ -78,22 +75,24 @@ export const exportToBlob = (
   });
 };
 
-export const exportToSvg = ({
+export const exportToSvg = async ({
   elements,
   appState = getDefaultAppState(),
   exportPadding,
-  metadata,
-}: ExportOpts & {
+}: Omit<ExportOpts, "getDimensions"> & {
   exportPadding?: number;
-  metadata?: string;
-}): SVGSVGElement => {
+}): Promise<SVGSVGElement> => {
   const { elements: restoredElements, appState: restoredAppState } = restore(
     { elements, appState },
+    null,
     null,
   );
   return _exportToSvg(getNonDeletedElements(restoredElements), {
     ...restoredAppState,
     exportPadding,
-    metadata,
   });
 };
+
+export { serializeAsJSON } from "../data/json";
+export { loadFromBlob, loadLibraryFromBlob } from "../data/blob";
+export { getFreeDrawSvgPath } from "../renderer/renderElement";

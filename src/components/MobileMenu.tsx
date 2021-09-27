@@ -13,14 +13,16 @@ import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { Section } from "./Section";
 import CollabButton from "./CollabButton";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
-import { LockIcon } from "./LockIcon";
+import { LockButton } from "./LockButton";
 import { UserList } from "./UserList";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
+import { LibraryButton } from "./LibraryButton";
 
 type MobileMenuProps = {
   appState: AppState;
   actionManager: ActionManager;
-  exportButton: React.ReactNode;
+  renderJSONExportDialog: () => React.ReactNode;
+  renderImageExportDialog: () => React.ReactNode;
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
   libraryMenu: JSX.Element | null;
@@ -28,7 +30,7 @@ type MobileMenuProps = {
   onLockToggle: () => void;
   canvas: HTMLCanvasElement | null;
   isCollaborating: boolean;
-  renderCustomFooter?: (isMobile: boolean) => JSX.Element;
+  renderCustomFooter?: (isMobile: boolean, appState: AppState) => JSX.Element;
   viewModeEnabled: boolean;
   showThemeBtn: boolean;
 };
@@ -38,7 +40,8 @@ export const MobileMenu = ({
   elements,
   libraryMenu,
   actionManager,
-  exportButton,
+  renderJSONExportDialog,
+  renderImageExportDialog,
   setAppState,
   onCollabButtonClick,
   onLockToggle,
@@ -62,15 +65,15 @@ export const MobileMenu = ({
                       canvas={canvas}
                       elementType={appState.elementType}
                       setAppState={setAppState}
-                      isLibraryOpen={appState.isLibraryOpen}
                     />
                   </Stack.Row>
                 </Island>
-                <LockIcon
+                <LockButton
                   checked={appState.elementLocked}
                   onChange={onLockToggle}
                   title={t("toolBar.lock")}
                 />
+                <LibraryButton appState={appState} setAppState={setAppState} />
               </Stack.Row>
               {libraryMenu}
             </Stack.Col>
@@ -107,19 +110,17 @@ export const MobileMenu = ({
     if (viewModeEnabled) {
       return (
         <>
-          {actionManager.renderAction("saveScene")}
-          {actionManager.renderAction("saveAsScene")}
-          {exportButton}
+          {renderJSONExportDialog()}
+          {renderImageExportDialog()}
         </>
       );
     }
     return (
       <>
-        {actionManager.renderAction("loadScene")}
-        {actionManager.renderAction("saveScene")}
-        {actionManager.renderAction("saveAsScene")}
-        {exportButton}
         {actionManager.renderAction("clearCanvas")}
+        {actionManager.renderAction("loadScene")}
+        {renderJSONExportDialog()}
+        {renderImageExportDialog()}
         {onCollabButtonClick && (
           <CollabButton
             isCollaborating={isCollaborating}
@@ -155,7 +156,7 @@ export const MobileMenu = ({
               <div className="panelColumn">
                 <Stack.Col gap={4}>
                   {renderCanvasActions()}
-                  {renderCustomFooter?.(true)}
+                  {renderCustomFooter?.(true, appState)}
                   {appState.collaborators.size > 0 && (
                     <fieldset>
                       <legend>{t("labels.collaborators")}</legend>
@@ -167,10 +168,9 @@ export const MobileMenu = ({
                           )
                           .map(([clientId, client]) => (
                             <React.Fragment key={clientId}>
-                              {actionManager.renderAction(
-                                "goToCollaborator",
-                                clientId,
-                              )}
+                              {actionManager.renderAction("goToCollaborator", {
+                                id: clientId,
+                              })}
                             </React.Fragment>
                           ))}
                       </UserList>

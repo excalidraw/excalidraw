@@ -1,0 +1,399 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should not hide any UI element when canvasActions is "undefined" 1`] = `
+<section
+  aria-labelledby="test-id-canvasActions-title"
+  class="zen-mode-transition"
+>
+  <h2
+    class="visually-hidden"
+    id="test-id-canvasActions-title"
+  >
+    Canvas actions
+  </h2>
+  <div
+    class="Island"
+    style="--padding: 2; z-index: 1;"
+  >
+    <div
+      class="Stack Stack_vertical"
+      style="--gap: 4;"
+    >
+      <div
+        class="Stack Stack_horizontal"
+        style="--gap: 1; justify-content: space-between;"
+      >
+        <button
+          aria-label="Reset the canvas"
+          class="ToolIcon_type_button ToolIcon_size_medium ToolIcon_type_button--show ToolIcon"
+          data-testid="clear-canvas-button"
+          title="Reset the canvas"
+          type="button"
+        >
+          <div
+            aria-hidden="true"
+            class="ToolIcon__icon"
+          >
+            <svg
+              aria-hidden="true"
+              class=""
+              focusable="false"
+              role="img"
+              viewBox="0 0 448 512"
+            >
+              <path
+                d="M32 464a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zM432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z"
+                fill="currentColor"
+              />
+            </svg>
+          </div>
+        </button>
+        <div
+          style="width: .625em;"
+        />
+        <button
+          aria-label="Load"
+          class="ToolIcon_type_button ToolIcon_size_medium ToolIcon_type_button--show ToolIcon"
+          data-testid="load-button"
+          title="Load"
+          type="button"
+        >
+          <div
+            aria-hidden="true"
+            class="ToolIcon__icon"
+          >
+            <svg
+              aria-hidden="true"
+              class="rtl-mirror"
+              focusable="false"
+              role="img"
+              viewBox="0 0 576 512"
+            >
+              <path
+                d="M572.694 292.093L500.27 416.248A63.997 63.997 0 0 1 444.989 448H45.025c-18.523 0-30.064-20.093-20.731-36.093l72.424-124.155A64 64 0 0 1 152 256h399.964c18.523 0 30.064 20.093 20.73 36.093zM152 224h328v-48c0-26.51-21.49-48-48-48H272l-64-64H48C21.49 64 0 85.49 0 112v278.046l69.077-118.418C86.214 242.25 117.989 224 152 224z"
+                fill="currentColor"
+              />
+            </svg>
+          </div>
+        </button>
+        <button
+          aria-label="Export"
+          class="ToolIcon_type_button ToolIcon_size_medium ToolIcon_type_button--show ToolIcon"
+          data-testid="json-export-button"
+          title="Export"
+          type="button"
+        >
+          <div
+            aria-hidden="true"
+            class="ToolIcon__icon"
+          >
+            <svg
+              aria-hidden="true"
+              class="rtl-mirror"
+              focusable="false"
+              role="img"
+              viewBox="0 0 576 512"
+            >
+              <path
+                d="M384 121.9c0-6.3-2.5-12.4-7-16.9L279.1 7c-4.5-4.5-10.6-7-17-7H256v128h128zM571 308l-95.7-96.4c-10.1-10.1-27.4-3-27.4 11.3V288h-64v64h64v65.2c0 14.3 17.3 21.4 27.4 11.3L571 332c6.6-6.6 6.6-17.4 0-24zm-379 28v-32c0-8.8 7.2-16 16-16h176V160H248c-13.2 0-24-10.8-24-24V0H24C10.7 0 0 10.7 0 24v464c0 13.3 10.7 24 24 24h336c13.3 0 24-10.7 24-24V352H208c-8.8 0-16-7.2-16-16z"
+                fill="currentColor"
+              />
+            </svg>
+          </div>
+        </button>
+        <button
+          aria-label="Save as image"
+          class="ToolIcon_type_button ToolIcon_size_medium ToolIcon_type_button--show ToolIcon"
+          data-testid="image-export-button"
+          title="Save as image"
+          type="button"
+        >
+          <div
+            aria-hidden="true"
+            class="ToolIcon__icon"
+          >
+            <svg
+              aria-hidden="true"
+              class="rtl-mirror"
+              focusable="false"
+              role="img"
+              viewBox="0 0 576 512"
+            >
+              <path
+                d="M571 308l-95.7-96.4c-10.1-10.1-27.4-3-27.4 11.3V288h-64v64h64v65.2c0 14.3 17.3 21.4 27.4 11.3L571 332c6.6-6.6 6.6-17.4 0-24zm-187 44v-64 64z"
+              />
+              <path
+                d="M384 121.941V128H256V0h6.059c6.362 0 12.471 2.53 16.97 7.029l97.941 97.941a24.01 24.01 0 017.03 16.971zM248 160c-13.2 0-24-10.8-24-24V0H24C10.745 0 0 10.745 0 24v464c0 13.255 10.745 24 24 24h336c13.255 0 24-10.745 24-24V160H248zm-135.455 16c26.51 0 48 21.49 48 48s-21.49 48-48 48-48-21.49-48-48 21.491-48 48-48zm208 240h-256l.485-48.485L104.545 328c4.686-4.686 11.799-4.201 16.485.485L160.545 368 264.06 264.485c4.686-4.686 12.284-4.686 16.971 0L320.545 304v112z"
+              />
+            </svg>
+          </div>
+        </button>
+        <div
+          style="width: .625em;"
+        />
+      </div>
+      <div
+        style="display: flex;"
+      >
+        <div
+          style="position: relative;"
+        >
+          <div>
+            <div
+              class="color-picker-control-container"
+            >
+              <button
+                aria-label="Canvas background"
+                class="color-picker-label-swatch"
+                style="--swatch-color: #ffffff;"
+              />
+              <label
+                class="color-input-container"
+              >
+                <div
+                  class="color-picker-hash"
+                >
+                  #
+                </div>
+                <input
+                  aria-label="Canvas background"
+                  class="color-picker-input"
+                  spellcheck="false"
+                  value="ffffff"
+                />
+              </label>
+            </div>
+          </div>
+        </div>
+        <div
+          style="margin-inline-start: 0.25rem;"
+        >
+          <button
+            aria-label="Dark mode"
+            class="ToolIcon_type_button ToolIcon_size_medium ToolIcon_type_button--show ToolIcon ToolIcon--plain"
+            data-testid="toggle-dark-mode"
+            title="Dark mode"
+            type="button"
+          >
+            <div
+              aria-hidden="true"
+              class="ToolIcon__icon"
+            >
+              <svg
+                class="rtl-mirror"
+                height="512"
+                viewBox="0 0 512 512"
+                width="512"
+              >
+                <path
+                  d="M283.211 512c78.962 0 151.079-35.925 198.857-94.792 7.068-8.708-.639-21.43-11.562-19.35-124.203 23.654-238.262-71.576-238.262-196.954 0-72.222 38.662-138.635 101.498-174.394 9.686-5.512 7.25-20.197-3.756-22.23A258.156 258.156 0 0 0 283.211 0c-141.309 0-256 114.511-256 256 0 141.309 114.511 256 256 256z"
+                  fill="currentColor"
+                />
+              </svg>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+`;
+
+exports[`<Excalidraw/> Test UIOptions prop should not hide any UI element when the UIOptions prop is "undefined" 1`] = `
+<section
+  aria-labelledby="test-id-canvasActions-title"
+  class="zen-mode-transition"
+>
+  <h2
+    class="visually-hidden"
+    id="test-id-canvasActions-title"
+  >
+    Canvas actions
+  </h2>
+  <div
+    class="Island"
+    style="--padding: 2; z-index: 1;"
+  >
+    <div
+      class="Stack Stack_vertical"
+      style="--gap: 4;"
+    >
+      <div
+        class="Stack Stack_horizontal"
+        style="--gap: 1; justify-content: space-between;"
+      >
+        <button
+          aria-label="Reset the canvas"
+          class="ToolIcon_type_button ToolIcon_size_medium ToolIcon_type_button--show ToolIcon"
+          data-testid="clear-canvas-button"
+          title="Reset the canvas"
+          type="button"
+        >
+          <div
+            aria-hidden="true"
+            class="ToolIcon__icon"
+          >
+            <svg
+              aria-hidden="true"
+              class=""
+              focusable="false"
+              role="img"
+              viewBox="0 0 448 512"
+            >
+              <path
+                d="M32 464a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zM432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z"
+                fill="currentColor"
+              />
+            </svg>
+          </div>
+        </button>
+        <div
+          style="width: .625em;"
+        />
+        <button
+          aria-label="Load"
+          class="ToolIcon_type_button ToolIcon_size_medium ToolIcon_type_button--show ToolIcon"
+          data-testid="load-button"
+          title="Load"
+          type="button"
+        >
+          <div
+            aria-hidden="true"
+            class="ToolIcon__icon"
+          >
+            <svg
+              aria-hidden="true"
+              class="rtl-mirror"
+              focusable="false"
+              role="img"
+              viewBox="0 0 576 512"
+            >
+              <path
+                d="M572.694 292.093L500.27 416.248A63.997 63.997 0 0 1 444.989 448H45.025c-18.523 0-30.064-20.093-20.731-36.093l72.424-124.155A64 64 0 0 1 152 256h399.964c18.523 0 30.064 20.093 20.73 36.093zM152 224h328v-48c0-26.51-21.49-48-48-48H272l-64-64H48C21.49 64 0 85.49 0 112v278.046l69.077-118.418C86.214 242.25 117.989 224 152 224z"
+                fill="currentColor"
+              />
+            </svg>
+          </div>
+        </button>
+        <button
+          aria-label="Export"
+          class="ToolIcon_type_button ToolIcon_size_medium ToolIcon_type_button--show ToolIcon"
+          data-testid="json-export-button"
+          title="Export"
+          type="button"
+        >
+          <div
+            aria-hidden="true"
+            class="ToolIcon__icon"
+          >
+            <svg
+              aria-hidden="true"
+              class="rtl-mirror"
+              focusable="false"
+              role="img"
+              viewBox="0 0 576 512"
+            >
+              <path
+                d="M384 121.9c0-6.3-2.5-12.4-7-16.9L279.1 7c-4.5-4.5-10.6-7-17-7H256v128h128zM571 308l-95.7-96.4c-10.1-10.1-27.4-3-27.4 11.3V288h-64v64h64v65.2c0 14.3 17.3 21.4 27.4 11.3L571 332c6.6-6.6 6.6-17.4 0-24zm-379 28v-32c0-8.8 7.2-16 16-16h176V160H248c-13.2 0-24-10.8-24-24V0H24C10.7 0 0 10.7 0 24v464c0 13.3 10.7 24 24 24h336c13.3 0 24-10.7 24-24V352H208c-8.8 0-16-7.2-16-16z"
+                fill="currentColor"
+              />
+            </svg>
+          </div>
+        </button>
+        <button
+          aria-label="Save as image"
+          class="ToolIcon_type_button ToolIcon_size_medium ToolIcon_type_button--show ToolIcon"
+          data-testid="image-export-button"
+          title="Save as image"
+          type="button"
+        >
+          <div
+            aria-hidden="true"
+            class="ToolIcon__icon"
+          >
+            <svg
+              aria-hidden="true"
+              class="rtl-mirror"
+              focusable="false"
+              role="img"
+              viewBox="0 0 576 512"
+            >
+              <path
+                d="M571 308l-95.7-96.4c-10.1-10.1-27.4-3-27.4 11.3V288h-64v64h64v65.2c0 14.3 17.3 21.4 27.4 11.3L571 332c6.6-6.6 6.6-17.4 0-24zm-187 44v-64 64z"
+              />
+              <path
+                d="M384 121.941V128H256V0h6.059c6.362 0 12.471 2.53 16.97 7.029l97.941 97.941a24.01 24.01 0 017.03 16.971zM248 160c-13.2 0-24-10.8-24-24V0H24C10.745 0 0 10.745 0 24v464c0 13.255 10.745 24 24 24h336c13.255 0 24-10.745 24-24V160H248zm-135.455 16c26.51 0 48 21.49 48 48s-21.49 48-48 48-48-21.49-48-48 21.491-48 48-48zm208 240h-256l.485-48.485L104.545 328c4.686-4.686 11.799-4.201 16.485.485L160.545 368 264.06 264.485c4.686-4.686 12.284-4.686 16.971 0L320.545 304v112z"
+              />
+            </svg>
+          </div>
+        </button>
+        <div
+          style="width: .625em;"
+        />
+      </div>
+      <div
+        style="display: flex;"
+      >
+        <div
+          style="position: relative;"
+        >
+          <div>
+            <div
+              class="color-picker-control-container"
+            >
+              <button
+                aria-label="Canvas background"
+                class="color-picker-label-swatch"
+                style="--swatch-color: #ffffff;"
+              />
+              <label
+                class="color-input-container"
+              >
+                <div
+                  class="color-picker-hash"
+                >
+                  #
+                </div>
+                <input
+                  aria-label="Canvas background"
+                  class="color-picker-input"
+                  spellcheck="false"
+                  value="ffffff"
+                />
+              </label>
+            </div>
+          </div>
+        </div>
+        <div
+          style="margin-inline-start: 0.25rem;"
+        >
+          <button
+            aria-label="Dark mode"
+            class="ToolIcon_type_button ToolIcon_size_medium ToolIcon_type_button--show ToolIcon ToolIcon--plain"
+            data-testid="toggle-dark-mode"
+            title="Dark mode"
+            type="button"
+          >
+            <div
+              aria-hidden="true"
+              class="ToolIcon__icon"
+            >
+              <svg
+                class="rtl-mirror"
+                height="512"
+                viewBox="0 0 512 512"
+                width="512"
+              >
+                <path
+                  d="M283.211 512c78.962 0 151.079-35.925 198.857-94.792 7.068-8.708-.639-21.43-11.562-19.35-124.203 23.654-238.262-71.576-238.262-196.954 0-72.222 38.662-138.635 101.498-174.394 9.686-5.512 7.25-20.197-3.756-22.23A258.156 258.156 0 0 0 283.211 0c-141.309 0-256 114.511-256 256 0 141.309 114.511 256 256 256z"
+                  fill="currentColor"
+                />
+              </svg>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+`;

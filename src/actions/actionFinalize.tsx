@@ -18,7 +18,7 @@ import { isBindingElement } from "../element/typeChecks";
 
 export const actionFinalize = register({
   name: "finalize",
-  perform: (elements, appState, _, { canvas }) => {
+  perform: (elements, appState, _, { canvas, focusContainer }) => {
     if (appState.editingLinearElement) {
       const {
         elementId,
@@ -51,19 +51,19 @@ export const actionFinalize = register({
 
     let newElements = elements;
     if (window.document.activeElement instanceof HTMLElement) {
-      window.document.activeElement.blur();
+      focusContainer();
     }
 
     const multiPointElement = appState.multiElement
       ? appState.multiElement
-      : appState.editingElement?.type === "draw"
+      : appState.editingElement?.type === "freedraw"
       ? appState.editingElement
       : null;
 
     if (multiPointElement) {
       // pen and mouse have hover
       if (
-        multiPointElement.type !== "draw" &&
+        multiPointElement.type !== "freedraw" &&
         appState.lastPointerDownWith !== "touch"
       ) {
         const { points, lastCommittedPoint } = multiPointElement;
@@ -86,7 +86,7 @@ export const actionFinalize = register({
       const isLoop = isPathALoop(multiPointElement.points, appState.zoom.value);
       if (
         multiPointElement.type === "line" ||
-        multiPointElement.type === "draw"
+        multiPointElement.type === "freedraw"
       ) {
         if (isLoop) {
           const linePoints = multiPointElement.points;
@@ -118,22 +118,24 @@ export const actionFinalize = register({
         );
       }
 
-      if (!appState.elementLocked && appState.elementType !== "draw") {
+      if (!appState.elementLocked && appState.elementType !== "freedraw") {
         appState.selectedElementIds[multiPointElement.id] = true;
       }
     }
+
     if (
-      (!appState.elementLocked && appState.elementType !== "draw") ||
+      (!appState.elementLocked && appState.elementType !== "freedraw") ||
       !multiPointElement
     ) {
       resetCursor(canvas);
     }
+
     return {
       elements: newElements,
       appState: {
         ...appState,
         elementType:
-          (appState.elementLocked || appState.elementType === "draw") &&
+          (appState.elementLocked || appState.elementType === "freedraw") &&
           multiPointElement
             ? appState.elementType
             : "selection",
@@ -145,14 +147,14 @@ export const actionFinalize = register({
         selectedElementIds:
           multiPointElement &&
           !appState.elementLocked &&
-          appState.elementType !== "draw"
+          appState.elementType !== "freedraw"
             ? {
                 ...appState.selectedElementIds,
                 [multiPointElement.id]: true,
               }
             : appState.selectedElementIds,
       },
-      commitToHistory: appState.elementType === "draw",
+      commitToHistory: appState.elementType === "freedraw",
     };
   },
   keyTest: (event, appState) =>

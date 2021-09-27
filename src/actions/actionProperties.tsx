@@ -13,6 +13,13 @@ import {
   FillCrossHatchIcon,
   FillHachureIcon,
   FillSolidIcon,
+  FontFamilyCodeIcon,
+  FontFamilyHandDrawnIcon,
+  FontFamilyNormalIcon,
+  FontSizeExtraLargeIcon,
+  FontSizeLargeIcon,
+  FontSizeMediumIcon,
+  FontSizeSmallIcon,
   SloppinessArchitectIcon,
   SloppinessArtistIcon,
   SloppinessCartoonistIcon,
@@ -20,18 +27,15 @@ import {
   StrokeStyleDottedIcon,
   StrokeStyleSolidIcon,
   StrokeWidthIcon,
-  FontSizeSmallIcon,
-  FontSizeMediumIcon,
-  FontSizeLargeIcon,
-  FontSizeExtraLargeIcon,
-  FontFamilyHandDrawnIcon,
-  FontFamilyNormalIcon,
-  FontFamilyCodeIcon,
-  TextAlignLeftIcon,
   TextAlignCenterIcon,
+  TextAlignLeftIcon,
   TextAlignRightIcon,
 } from "../components/icons";
-import { DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE } from "../constants";
+import {
+  DEFAULT_FONT_FAMILY,
+  DEFAULT_FONT_SIZE,
+  FONT_FAMILY,
+} from "../constants";
 import {
   getNonDeletedElements,
   isTextElement,
@@ -44,7 +48,7 @@ import {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
-  FontFamily,
+  FontFamilyValues,
   TextAlign,
 } from "../element/types";
 import { getLanguage, t } from "../i18n";
@@ -99,13 +103,18 @@ export const actionChangeStrokeColor = register({
   name: "changeStrokeColor",
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, appState, (el) =>
-        newElementWith(el, {
-          strokeColor: value,
-        }),
-      ),
-      appState: { ...appState, currentItemStrokeColor: value },
-      commitToHistory: true,
+      ...(value.currentItemStrokeColor && {
+        elements: changeProperty(elements, appState, (el) =>
+          newElementWith(el, {
+            strokeColor: value.currentItemStrokeColor,
+          }),
+        ),
+      }),
+      appState: {
+        ...appState,
+        ...value,
+      },
+      commitToHistory: !!value.currentItemStrokeColor,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => (
@@ -120,7 +129,11 @@ export const actionChangeStrokeColor = register({
           (element) => element.strokeColor,
           appState.currentItemStrokeColor,
         )}
-        onChange={updateData}
+        onChange={(color) => updateData({ currentItemStrokeColor: color })}
+        isActive={appState.openPopup === "strokeColorPicker"}
+        setActive={(active) =>
+          updateData({ openPopup: active ? "strokeColorPicker" : null })
+        }
       />
     </>
   ),
@@ -130,13 +143,18 @@ export const actionChangeBackgroundColor = register({
   name: "changeBackgroundColor",
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, appState, (el) =>
-        newElementWith(el, {
-          backgroundColor: value,
-        }),
-      ),
-      appState: { ...appState, currentItemBackgroundColor: value },
-      commitToHistory: true,
+      ...(value.currentItemBackgroundColor && {
+        elements: changeProperty(elements, appState, (el) =>
+          newElementWith(el, {
+            backgroundColor: value.currentItemBackgroundColor,
+          }),
+        ),
+      }),
+      appState: {
+        ...appState,
+        ...value,
+      },
+      commitToHistory: !!value.currentItemBackgroundColor,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => (
@@ -151,7 +169,11 @@ export const actionChangeBackgroundColor = register({
           (element) => element.backgroundColor,
           appState.currentItemBackgroundColor,
         )}
-        onChange={updateData}
+        onChange={(color) => updateData({ currentItemBackgroundColor: color })}
+        isActive={appState.openPopup === "backgroundColorPicker"}
+        setActive={(active) =>
+          updateData({ openPopup: active ? "backgroundColorPicker" : null })
+        }
       />
     </>
   ),
@@ -481,19 +503,23 @@ export const actionChangeFontFamily = register({
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => {
-    const options: { value: FontFamily; text: string; icon: JSX.Element }[] = [
+    const options: {
+      value: FontFamilyValues;
+      text: string;
+      icon: JSX.Element;
+    }[] = [
       {
-        value: 1,
+        value: FONT_FAMILY.Virgil,
         text: t("labels.handDrawn"),
         icon: <FontFamilyHandDrawnIcon theme={appState.theme} />,
       },
       {
-        value: 2,
+        value: FONT_FAMILY.Helvetica,
         text: t("labels.normal"),
         icon: <FontFamilyNormalIcon theme={appState.theme} />,
       },
       {
-        value: 3,
+        value: FONT_FAMILY.Cascadia,
         text: t("labels.code"),
         icon: <FontFamilyCodeIcon theme={appState.theme} />,
       },
@@ -502,7 +528,7 @@ export const actionChangeFontFamily = register({
     return (
       <fieldset>
         <legend>{t("labels.fontFamily")}</legend>
-        <ButtonIconSelect<FontFamily | false>
+        <ButtonIconSelect<FontFamilyValues | false>
           group="font-family"
           options={options}
           value={getFormValue(

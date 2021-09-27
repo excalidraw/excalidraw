@@ -1,5 +1,6 @@
-import { FontFamily } from "./element/types";
 import cssVariables from "./css/variables.module.scss";
+import { AppProps } from "./types";
+import { FontFamilyValues } from "./element/types";
 
 export const APP_NAME = "Excalidraw";
 
@@ -13,6 +14,7 @@ export const CURSOR_TYPE = {
   TEXT: "text",
   CROSSHAIR: "crosshair",
   GRABBING: "grabbing",
+  GRAB: "grab",
   POINTER: "pointer",
   MOVE: "move",
   AUTO: "",
@@ -62,15 +64,15 @@ export const CLASSES = {
 
 // 1-based in case we ever do `if(element.fontFamily)`
 export const FONT_FAMILY = {
-  1: "Virgil",
-  2: "Helvetica",
-  3: "Cascadia",
-} as const;
+  Virgil: 1,
+  Helvetica: 2,
+  Cascadia: 3,
+};
 
 export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";
 
 export const DEFAULT_FONT_SIZE = 20;
-export const DEFAULT_FONT_FAMILY: FontFamily = 1;
+export const DEFAULT_FONT_FAMILY: FontFamilyValues = FONT_FAMILY.Virgil;
 export const DEFAULT_TEXT_ALIGN = "left";
 export const DEFAULT_VERTICAL_ALIGN = "top";
 export const DEFAULT_VERSION = "{version}";
@@ -90,6 +92,8 @@ export const EXPORT_DATA_TYPES = {
   excalidrawLibrary: "excalidrawlib",
 } as const;
 
+export const EXPORT_SOURCE = window.location.origin;
+
 export const STORAGE_KEYS = {
   LOCAL_STORAGE_LIBRARY: "excalidraw-library",
 } as const;
@@ -101,7 +105,6 @@ export const TITLE_TIMEOUT = 10000;
 export const TOAST_TIMEOUT = 5000;
 export const VERSION_TIMEOUT = 30000;
 export const SCROLL_TIMEOUT = 100;
-
 export const ZOOM_STEP = 0.1;
 
 // Report a user inactive after IDLE_THRESHOLD milliseconds
@@ -124,3 +127,24 @@ export const URL_QUERY_KEYS = {
 export const URL_HASH_KEYS = {
   addLibrary: "addLibrary",
 } as const;
+
+export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
+  canvasActions: {
+    changeViewBackgroundColor: true,
+    clearCanvas: true,
+    export: { saveFileToDisk: true },
+    loadScene: true,
+    saveToActiveFile: true,
+    theme: true,
+    saveAsImage: true,
+  },
+};
+
+export const MQ_MAX_WIDTH_PORTRAIT = 730;
+export const MQ_MAX_WIDTH_LANDSCAPE = 1000;
+export const MQ_MAX_HEIGHT_LANDSCAPE = 500;
+
+export const MAX_DECIMALS_FOR_SVG_EXPORT = 2;
+
+export const EXPORT_SCALES = [1, 2, 3];
+export const DEFAULT_EXPORT_PADDING = 10; // px

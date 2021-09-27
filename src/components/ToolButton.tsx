@@ -2,8 +2,9 @@ import "./ToolIcon.scss";
 
 import React from "react";
 import clsx from "clsx";
+import { useExcalidrawContainer } from "./App";
 
-type ToolIconSize = "s" | "m";
+export type ToolButtonSize = "small" | "medium";
 
 type ToolButtonBaseProps = {
   icon?: React.ReactNode;
@@ -14,7 +15,7 @@ type ToolButtonBaseProps = {
   title?: string;
   name?: string;
   id?: string;
-  size?: ToolIconSize;
+  size?: ToolButtonSize;
   keyBindingLabel?: string;
   showAriaLabel?: boolean;
   hidden?: boolean;
@@ -30,20 +31,23 @@ type ToolButtonProps =
       onClick?(): void;
     })
   | (ToolButtonBaseProps & {
+      type: "icon";
+      children?: React.ReactNode;
+      onClick?(): void;
+    })
+  | (ToolButtonBaseProps & {
       type: "radio";
-
       checked: boolean;
       onChange?(): void;
     });
 
-const DEFAULT_SIZE: ToolIconSize = "m";
-
 export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
+  const { id: excalId } = useExcalidrawContainer();
   const innerRef = React.useRef(null);
   React.useImperativeHandle(ref, () => innerRef.current);
-  const sizeCn = `ToolIcon_size_${props.size || DEFAULT_SIZE}`;
+  const sizeCn = `ToolIcon_size_${props.size}`;
 
-  if (props.type === "button") {
+  if (props.type === "button" || props.type === "icon") {
     return (
       <button
         className={clsx(
@@ -56,6 +60,7 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
           {
             ToolIcon: !props.hidden,
             "ToolIcon--selected": props.selected,
+            "ToolIcon--plain": props.type === "icon",
           },
         )}
         data-testid={props["data-testid"]}
@@ -66,14 +71,16 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
         onClick={props.onClick}
         ref={innerRef}
       >
-        <div className="ToolIcon__icon" aria-hidden="true">
-          {props.icon || props.label}
-          {props.keyBindingLabel && (
-            <span className="ToolIcon__keybinding">
-              {props.keyBindingLabel}
-            </span>
-          )}
-        </div>
+        {(props.icon || props.label) && (
+          <div className="ToolIcon__icon" aria-hidden="true">
+            {props.icon || props.label}
+            {props.keyBindingLabel && (
+              <span className="ToolIcon__keybinding">
+                {props.keyBindingLabel}
+              </span>
+            )}
+          </div>
+        )}
         {props.showAriaLabel && (
           <div className="ToolIcon__label">{props["aria-label"]}</div>
         )}
@@ -91,7 +98,7 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
         aria-label={props["aria-label"]}
         aria-keyshortcuts={props["aria-keyshortcuts"]}
         data-testid={props["data-testid"]}
-        id={props.id}
+        id={`${excalId}-${props.id}`}
         onChange={props.onChange}
         checked={props.checked}
         ref={innerRef}
@@ -109,4 +116,5 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
 ToolButton.defaultProps = {
   visible: true,
   className: "",
+  size: "medium",
 };

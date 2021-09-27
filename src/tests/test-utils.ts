@@ -13,6 +13,8 @@ import { ImportedDataState } from "../data/types";
 import { STORAGE_KEYS } from "../excalidraw-app/data/localStorage";
 
 import { SceneData } from "../types";
+import { getSelectedElements } from "../scene/selection";
+import { ExcalidrawElement } from "../element/types";
 
 const customQueries = {
   ...queries,
@@ -101,4 +103,45 @@ const initLocalStorage = (data: ImportedDataState) => {
 
 export const updateSceneData = (data: SceneData) => {
   (window.collab as any).excalidrawAPI.updateScene(data);
+};
+
+const originalGetBoundingClientRect =
+  global.window.HTMLDivElement.prototype.getBoundingClientRect;
+
+export const mockBoundingClientRect = () => {
+  // override getBoundingClientRect as by default it will always return all values as 0 even if customized in html
+  global.window.HTMLDivElement.prototype.getBoundingClientRect = () => ({
+    top: 10,
+    left: 20,
+    bottom: 10,
+    right: 10,
+    width: 200,
+    x: 10,
+    y: 20,
+    height: 100,
+    toJSON: () => {},
+  });
+};
+
+export const restoreOriginalGetBoundingClientRect = () => {
+  global.window.HTMLDivElement.prototype.getBoundingClientRect = originalGetBoundingClientRect;
+};
+
+export const assertSelectedElements = (
+  ...elements: (
+    | (ExcalidrawElement["id"] | ExcalidrawElement)[]
+    | ExcalidrawElement["id"]
+    | ExcalidrawElement
+  )[]
+) => {
+  const { h } = window;
+  const selectedElementIds = getSelectedElements(
+    h.app.getSceneElements(),
+    h.state,
+  ).map((el) => el.id);
+  const ids = elements
+    .flat()
+    .map((item) => (typeof item === "string" ? item : item.id));
+  expect(selectedElementIds.length).toBe(ids.length);
+  expect(selectedElementIds).toEqual(expect.arrayContaining(ids));
 };

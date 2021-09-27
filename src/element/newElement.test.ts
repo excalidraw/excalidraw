@@ -1,6 +1,7 @@
 import { duplicateElement } from "./newElement";
 import { mutateElement } from "./mutateElement";
 import { API } from "../tests/helpers/api";
+import { FONT_FAMILY } from "../constants";
 
 const isPrimitive = (val: any) => {
   const type = typeof val;
@@ -79,7 +80,7 @@ it("clones text element", () => {
     opacity: 100,
     text: "hello",
     fontSize: 20,
-    fontFamily: 1,
+    fontFamily: FONT_FAMILY.Virgil,
     textAlign: "left",
     verticalAlign: "top",
   });

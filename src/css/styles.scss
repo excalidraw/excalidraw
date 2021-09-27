@@ -16,6 +16,12 @@
   bottom: 0;
   left: 0;
   right: 0;
+  height: 100%;
+  width: 100%;
+
+  &:focus {
+    outline: none;
+  }
 
   // serves 2 purposes:
   // 1. prevent selecting text outside the component when double-clicking or
@@ -45,6 +51,13 @@
     image-rendering: -moz-crisp-edges; // FF
 
     z-index: var(--zIndex-canvas);
+
+    // Remove the main canvas from document flow to avoid resizeObserver
+    // feedback loop (see https://github.com/excalidraw/excalidraw/pull/3379)
+  }
+
+  &__canvas {
+    position: absolute;
   }
 
   &.theme--dark {
@@ -320,8 +333,8 @@
   .App-menu_bottom {
     position: absolute;
     bottom: 0;
-    grid-template-columns: 1fr auto 1fr;
-    grid-gap: 4px;
+    grid-template-columns: min-content auto min-content;
+    grid-gap: 15px;
     align-items: flex-start;
     cursor: default;
     pointer-events: none !important;
@@ -344,10 +357,6 @@
     section {
       display: flex;
     }
-  }
-
-  .layer-ui__wrapper:not(.disable-pointerEvents) .App-menu_bottom > * {
-    pointer-events: all;
   }
 
   .App-menu_bottom > *:first-child {
@@ -405,24 +414,6 @@
     &:active {
       background-color: var(--button-gray-2);
     }
-
-    &.dropdown-select--floating {
-      position: absolute;
-      margin: 0.5em;
-    }
-  }
-
-  .dropdown-select__language.dropdown-select--floating {
-    position: absolute;
-    bottom: 10px;
-
-    :root[dir="ltr"] & {
-      right: 44px;
-    }
-
-    :root[dir="rtl"] & {
-      left: 44px;
-    }
   }
 
   .zIndexButton {
@@ -449,30 +440,36 @@
   }
 
   .help-icon {
-    position: absolute;
+    display: flex;
     cursor: pointer;
     fill: $oc-gray-6;
-    bottom: 14px;
     width: 1.5rem;
     padding: 0;
     margin: 0;
     background: none;
     color: var(--icon-fill-color);
-
     &:hover {
       background: none;
     }
-
-    :root[dir="ltr"] & {
-      right: 14px;
-    }
-
-    :root[dir="rtl"] & {
-      left: 14px;
-    }
   }
 
-  @media #{$is-mobile-query} {
+  .reset-zoom-button {
+    padding: 0.2em;
+    background: transparent;
+    color: var(--text-primary-color);
+    font-family: var(--ui-font);
+  }
+
+  .undo-redo-buttons {
+    display: grid;
+    grid-auto-flow: column;
+    gap: 0.4em;
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-inline-start: 0.6em;
+  }
+
+  @include isMobile {
     aside {
       display: none;
     }
@@ -485,20 +482,6 @@
   .rtl-mirror {
     :root[dir="rtl"] & {
       transform: scaleX(-1);
-    }
-  }
-
-  .github-corner {
-    position: absolute;
-    top: 0;
-    z-index: 2;
-
-    :root[dir="ltr"] & {
-      right: 0;
-    }
-
-    :root[dir="rtl"] & {
-      left: 0;
     }
   }
 

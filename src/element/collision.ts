@@ -4,7 +4,13 @@ import * as GADirection from "../gadirections";
 import * as GALine from "../galines";
 import * as GATransform from "../gatransforms";
 
-import { isPathALoop, isPointInPolygon, rotate } from "../math";
+import {
+  distance2d,
+  rotatePoint,
+  isPathALoop,
+  isPointInPolygon,
+  rotate,
+} from "../math";
 import { pointsOnBezierCurves } from "points-on-curve";
 
 import {
@@ -16,6 +22,8 @@ import {
   ExcalidrawTextElement,
   ExcalidrawEllipseElement,
   NonDeleted,
+  ExcalidrawFreeDrawElement,
+  ExcalidrawImageElement,
 } from "./types";
 
 import { getElementAbsoluteCoords, getCurvePathOps, Bounds } from "./bounds";
@@ -30,11 +38,17 @@ const isElementDraggableFromInside = (
   if (element.type === "arrow") {
     return false;
   }
+
+  if (element.type === "freedraw") {
+    return true;
+  }
+
   const isDraggableFromInside = element.backgroundColor !== "transparent";
-  if (element.type === "line" || element.type === "draw") {
+
+  if (element.type === "line") {
     return isDraggableFromInside && isPathALoop(element.points);
   }
-  return isDraggableFromInside;
+  return isDraggableFromInside || element.type === "image";
 };
 
 export const hitTest = (
@@ -81,6 +95,7 @@ const isHittingElementNotConsideringBoundingBox = (
       : isElementDraggableFromInside(element)
       ? isInsideCheck
       : isNearCheck;
+
   return hitTestPointAgainstElement({ element, point, threshold, check });
 };
 
@@ -146,14 +161,26 @@ type HitTestArgs = {
 const hitTestPointAgainstElement = (args: HitTestArgs): boolean => {
   switch (args.element.type) {
     case "rectangle":
+    case "image":
     case "text":
     case "diamond":
     case "ellipse":
       const distance = distanceToBindableElement(args.element, args.point);
       return args.check(distance, args.threshold);
+    case "freedraw": {
+      if (
+        !args.check(
+          distanceToRectangle(args.element, args.point),
+          args.threshold,
+        )
+      ) {
+        return false;
+      }
+
+      return hitTestFreeDrawElement(args.element, args.point, args.threshold);
+    }
     case "arrow":
     case "line":
-    case "draw":
       return hitTestLinear(args);
     case "selection":
       console.warn(
@@ -169,6 +196,7 @@ export const distanceToBindableElement = (
 ): number => {
   switch (element.type) {
     case "rectangle":
+    case "image":
     case "text":
       return distanceToRectangle(element, point);
     case "diamond":
@@ -195,7 +223,11 @@ const isOutsideCheck = (distance: number, threshold: number): boolean => {
 };
 
 const distanceToRectangle = (
-  element: ExcalidrawRectangleElement | ExcalidrawTextElement,
+  element:
+    | ExcalidrawRectangleElement
+    | ExcalidrawTextElement
+    | ExcalidrawFreeDrawElement
+    | ExcalidrawImageElement,
   point: Point,
 ): number => {
   const [, pointRel, hwidth, hheight] = pointRelativeToElement(element, point);
@@ -265,6 +297,71 @@ const ellipseParamsForTest = (
 
   const tangent = GALine.orthogonalThrough(pointRel, closestPoint);
   return [pointRel, tangent];
+};
+
+const hitTestFreeDrawElement = (
+  element: ExcalidrawFreeDrawElement,
+  point: Point,
+  threshold: number,
+): boolean => {
+  // Check point-distance-to-line-segment for every segment in the
+  // element's points (its input points, not its outline points).
+  // This is... okay? It's plenty fast, but the GA library may
+  // have a faster option.
+
+  let x: number;
+  let y: number;
+
+  if (element.angle === 0) {
+    x = point[0] - element.x;
+    y = point[1] - element.y;
+  } else {
+    // Counter-rotate the point around center before testing
+    const [minX, minY, maxX, maxY] = getElementAbsoluteCoords(element);
+    const rotatedPoint = rotatePoint(
+      point,
+      [minX + (maxX - minX) / 2, minY + (maxY - minY) / 2],
+      -element.angle,
+    );
+    x = rotatedPoint[0] - element.x;
+    y = rotatedPoint[1] - element.y;
+  }
+
+  let [A, B] = element.points;
+  let P: readonly [number, number];
+
+  // For freedraw dots
+  if (element.points.length === 2) {
+    return (
+      distance2d(A[0], A[1], x, y) < threshold ||
+      distance2d(B[0], B[1], x, y) < threshold
+    );
+  }
+
+  // For freedraw lines
+  for (let i = 1; i < element.points.length - 1; i++) {
+    const delta = [B[0] - A[0], B[1] - A[1]];
+    const length = Math.hypot(delta[1], delta[0]);
+
+    const U = [delta[0] / length, delta[1] / length];
+    const C = [x - A[0], y - A[1]];
+    const d = (C[0] * U[0] + C[1] * U[1]) / Math.hypot(U[1], U[0]);
+    P = [A[0] + U[0] * d, A[1] + U[1] * d];
+
+    const da = distance2d(P[0], P[1], A[0], A[1]);
+    const db = distance2d(P[0], P[1], B[0], B[1]);
+
+    P = db < da && da > length ? B : da < db && db > length ? A : P;
+
+    if (Math.hypot(y - P[1], x - P[0]) < threshold) {
+      return true;
+    }
+
+    A = B;
+    B = element.points[i + 1];
+  }
+
+  return false;
 };
 
 const hitTestLinear = (args: HitTestArgs): boolean => {
@@ -392,6 +489,7 @@ export const determineFocusDistance = (
   const nabs = Math.abs(n);
   switch (element.type) {
     case "rectangle":
+    case "image":
     case "text":
       return c / (hwidth * (nabs + q * mabs));
     case "diamond":
@@ -422,6 +520,7 @@ export const determineFocusPoint = (
   let point;
   switch (element.type) {
     case "rectangle":
+    case "image":
     case "text":
     case "diamond":
       point = findFocusPointForRectangulars(element, focus, adjecentPointRel);
@@ -471,6 +570,7 @@ const getSortedElementLineIntersections = (
   let intersections: GA.Point[];
   switch (element.type) {
     case "rectangle":
+    case "image":
     case "text":
     case "diamond":
       const corners = getCorners(element);
@@ -504,6 +604,7 @@ const getSortedElementLineIntersections = (
 const getCorners = (
   element:
     | ExcalidrawRectangleElement
+    | ExcalidrawImageElement
     | ExcalidrawDiamondElement
     | ExcalidrawTextElement,
   scale: number = 1,
@@ -512,6 +613,7 @@ const getCorners = (
   const hy = (scale * element.height) / 2;
   switch (element.type) {
     case "rectangle":
+    case "image":
     case "text":
       return [
         GA.point(hx, hy),
@@ -653,6 +755,7 @@ export const findFocusPointForEllipse = (
 export const findFocusPointForRectangulars = (
   element:
     | ExcalidrawRectangleElement
+    | ExcalidrawImageElement
     | ExcalidrawDiamondElement
     | ExcalidrawTextElement,
   // Between -1 and 1 for how far away should the focus point be relative

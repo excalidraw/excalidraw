@@ -2,7 +2,7 @@ import React from "react";
 import { getCommonBounds } from "../element/bounds";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
-import { useIsMobile } from "../is-mobile";
+import { useIsMobile } from "../components/App";
 import { getTargetElements } from "../scene";
 import { AppState, ExcalidrawProps } from "../types";
 import { close } from "./icons";
