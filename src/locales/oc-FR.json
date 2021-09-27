@@ -158,7 +158,7 @@
     "cannotRestoreFromImage": "Restauracion impossibla de la scèna a partir del fichièr imatge",
     "invalidSceneUrl": "Importacion impossibla de la scèna a partir de l’URL provesida. Es siá mal formatada o siá conten pas cap de donada JSON Excalidraw valida.",
     "resetLibrary": "Aquò suprimirà vòstra bibliotèca. Ne sètz vertadièrament ?",
-    "invalidEncryptionKey": ""
+    "invalidEncryptionKey": "La clau de chiframent deu conténer 22 caractèrs. La collaboracion en dirèct es desactivada."
   },
   "toolBar": {
     "selection": "Seleccion",
