@@ -1,10 +1,13 @@
 import throttle from "lodash.throttle";
 import React, { PureComponent } from "react";
-import { ExcalidrawImperativeAPI } from "../../types";
+import { AppState, ExcalidrawImperativeAPI } from "../../types";
 import { ErrorDialog } from "../../components/ErrorDialog";
 import { APP_NAME, ENV, EVENT } from "../../constants";
 import { ImportedDataState } from "../../data/types";
-import { ExcalidrawElement } from "../../element/types";
+import {
+  ExcalidrawElement,
+  InitializedExcalidrawImageElement,
+} from "../../element/types";
 import {
   getElementMap,
   getSceneVersion,
@@ -12,7 +15,9 @@ import {
 import { Collaborator, Gesture } from "../../types";
 import { resolvablePromise, withBatchedUpdates } from "../../utils";
 import {
+  FILE_UPLOAD_MAX_BYTES,
   INITIAL_SCENE_UPDATE_TIMEOUT,
+  LOAD_IMAGES_TIMEOUT,
   SCENE,
   SYNC_FULL_SCENE_INTERVAL_MS,
 } from "../app_constants";
@@ -25,7 +30,9 @@ import {
 } from "../data";
 import {
   isSavedToFirebase,
+  loadFilesFromFirebase,
   loadFromFirebase,
+  saveFilesToFirebase,
   saveToFirebase,
 } from "../data/firebase";
 import {
@@ -41,6 +48,9 @@ import { UserIdleState } from "../../types";
 import { IDLE_THRESHOLD, ACTIVE_THRESHOLD } from "../../constants";
 import { trackEvent } from "../../analytics";
 import { isInvisiblySmallElement } from "../../element";
+import { FileSync } from "../data/FileSync";
+import { AbortError } from "../../errors";
+import { isInitializedImageElement } from "../../element/typeChecks";
 
 interface CollabState {
   modalIsShown: boolean;
@@ -61,6 +71,7 @@ export interface CollabAPI {
   initializeSocketClient: CollabInstance["initializeSocketClient"];
   onCollabButtonClick: CollabInstance["onCollabButtonClick"];
   broadcastElements: CollabInstance["broadcastElements"];
+  fetchImageFilesFromFirebase: CollabInstance["fetchImageFilesFromFirebase"];
 }
 
 type ReconciledElements = readonly ExcalidrawElement[] & {
@@ -81,6 +92,7 @@ export { CollabContext, CollabContextConsumer };
 
 class CollabWrapper extends PureComponent<Props, CollabState> {
   portal: Portal;
+  fileSync: FileSync;
   excalidrawAPI: Props["excalidrawAPI"];
   isCollaborating: boolean = false;
   activeIntervalId: number | null;
@@ -100,6 +112,30 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       activeRoomLink: "",
     };
     this.portal = new Portal(this);
+    this.fileSync = new FileSync({
+      getFiles: async (imageIds) => {
+        const { roomId, roomKey } = this.portal;
+        if (!roomId || !roomKey) {
+          throw new AbortError();
+        }
+
+        return loadFilesFromFirebase(roomId, roomKey, imageIds);
+      },
+      saveFiles: async ({ addedFiles }) => {
+        const { roomId, roomKey } = this.portal;
+        if (!roomId || !roomKey) {
+          throw new AbortError();
+        }
+
+        return saveFilesToFirebase({
+          roomId,
+          roomKey,
+          addedFiles,
+          maxBytes: FILE_UPLOAD_MAX_BYTES,
+          allowedTypes: ["image/png", "image/jpeg", "image/svg"],
+        });
+      },
+    });
     this.excalidrawAPI = props.excalidrawAPI;
     this.activeIntervalId = null;
     this.idleTimeoutId = null;
@@ -214,6 +250,39 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       this.isCollaborating = false;
     }
     this.portal.close();
+    this.fileSync.destroy();
+  };
+
+  private fetchImageFilesFromFirebase = async (scene: {
+    elements: readonly ExcalidrawElement[];
+    appState: Pick<AppState, "files">;
+  }) => {
+    const unfetchedImages = scene.elements
+      .filter((element) => {
+        return (
+          isInitializedImageElement(element) &&
+          !this.fileSync.isFileHandled(element.imageId) &&
+          !element.isDeleted &&
+          element.status === "saved"
+        );
+      })
+      .map((element) => (element as InitializedExcalidrawImageElement).imageId);
+
+    const { loadedFiles, erroredFiles } = await this.fileSync.getFiles(
+      unfetchedImages,
+    );
+    return {
+      loadedFiles: loadedFiles
+        .filter((file) => file.type === "image")
+        .map(
+          (file) =>
+            ({
+              ...file,
+              type: "image",
+            } as const),
+        ),
+      erroredFiles,
+    };
   };
 
   private initializeSocketClient = async (
@@ -230,6 +299,8 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       ({ roomId, roomKey } = existingRoomLinkData);
     } else {
       ({ roomId, roomKey } = await generateCollaborationLinkData());
+      roomId = "5f08678972010ce89c50";
+      roomKey = "u8x5c_6c--myu1ECtLadqw";
       window.history.pushState(
         {},
         APP_NAME,
@@ -277,6 +348,11 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
         elements,
         commitToHistory: true,
       });
+
+      this.broadcastElements(elements);
+
+      const syncableElements = this.getSyncableElements(elements);
+      this.saveCollabRoomToFirebase(syncableElements);
     }
 
     // fallback in case you're not alone in the room but still don't receive
@@ -446,6 +522,15 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     return newElements as ReconciledElements;
   };
 
+  private loadImageFiles = throttle(async () => {
+    const { loadedFiles } = await this.fetchImageFilesFromFirebase({
+      elements: this.excalidrawAPI.getSceneElementsIncludingDeleted(),
+      appState: this.excalidrawAPI.getAppState(),
+    });
+
+    this.excalidrawAPI.setFiles(loadedFiles);
+  }, LOAD_IMAGES_TIMEOUT);
+
   private handleRemoteSceneUpdate = (
     elements: ReconciledElements,
     { init = false }: { init?: boolean } = {},
@@ -460,6 +545,8 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     // undo, a user makes a change, and then try to redo, your element(s) will be lost. However,
     // right now we think this is the right tradeoff.
     this.excalidrawAPI.history.clear();
+
+    this.loadImageFiles();
   };
 
   private onPointerMove = () => {
@@ -622,6 +709,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     this.contextValue.initializeSocketClient = this.initializeSocketClient;
     this.contextValue.onCollabButtonClick = this.onCollabButtonClick;
     this.contextValue.broadcastElements = this.broadcastElements;
+    this.contextValue.fetchImageFilesFromFirebase = this.fetchImageFilesFromFirebase;
     return this.contextValue;
   };
 

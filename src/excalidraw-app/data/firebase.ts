@@ -1,26 +1,44 @@
-import { getImportedKey } from "../data";
+import {
+  arrayBufferToDataURL,
+  dataURLToBlob,
+  encryptData,
+  getImportedKey,
+} from "../data";
 import { createIV } from "./index";
-import { ExcalidrawElement } from "../../element/types";
+import { ExcalidrawElement, ImageId } from "../../element/types";
 import { getSceneVersion } from "../../element";
 import Portal from "../collab/Portal";
 import { restoreElements } from "../../data/restore";
+import { BinaryFileData } from "../../types";
+import { FILE_CACHE_MAX_AGE_SEC } from "../app_constants";
 
 // private
 // -----------------------------------------------------------------------------
 
+const FIREBASE_CONFIG = JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG);
+
 let firebasePromise: Promise<
   typeof import("firebase/app").default
 > | null = null;
-let firestorePromise: Promise<any> | null = null;
-let firebseStoragePromise: Promise<any> | null = null;
+let firestorePromise: Promise<any> | null | true = null;
+let firebseStoragePromise: Promise<any> | null | true = null;
+
+let isFirebaseInitialized = false;
 
 const _loadFirebase = async () => {
   const firebase = (
     await import(/* webpackChunkName: "firebase" */ "firebase/app")
   ).default;
 
-  const firebaseConfig = JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG);
-  firebase.initializeApp(firebaseConfig);
+  // due to dev HMR
+  if (!isFirebaseInitialized) {
+    isFirebaseInitialized = true;
+    try {
+      firebase.initializeApp(FIREBASE_CONFIG);
+    } catch (error) {
+      console.warn(error.name, error.code);
+    }
+  }
 
   return firebase;
 };
@@ -42,7 +60,10 @@ const loadFirestore = async () => {
     firestorePromise = import(
       /* webpackChunkName: "firestore" */ "firebase/firestore"
     );
+  }
+  if (firestorePromise !== true) {
     await firestorePromise;
+    firestorePromise = true;
   }
   return firebase;
 };
@@ -53,7 +74,10 @@ export const loadFirebaseStorage = async () => {
     firebseStoragePromise = import(
       /* webpackChunkName: "storage" */ "firebase/storage"
     );
+  }
+  if (firebseStoragePromise !== true) {
     await firebseStoragePromise;
+    firebseStoragePromise = true;
   }
   return firebase;
 };
@@ -113,11 +137,92 @@ export const isSavedToFirebase = (
 ): boolean => {
   if (portal.socket && portal.roomId && portal.roomKey) {
     const sceneVersion = getSceneVersion(elements);
+
     return firebaseSceneVersionCache.get(portal.socket) === sceneVersion;
   }
   // if no room exists, consider the room saved so that we don't unnecessarily
   // prevent unload (there's nothing we could do at that point anyway)
   return true;
+};
+
+export const saveFilesToFirebase = async ({
+  roomId,
+  roomKey,
+  addedFiles,
+  allowedTypes,
+  maxBytes,
+}: {
+  roomId: string;
+  roomKey: string;
+  addedFiles: Map<ImageId, /* dataURL */ string>;
+  allowedTypes: string[];
+  maxBytes: number;
+}) => {
+  const firebase = await loadFirebaseStorage();
+  const filesToUpload = [...addedFiles].map(([id, dataURL]) => {
+    const blob = dataURLToBlob(dataURL);
+
+    if (!allowedTypes.includes(blob.type)) {
+      throw new Error("Disallowed file type.");
+    }
+
+    if (blob.size > maxBytes) {
+      throw new Error(`File cannot be larger than ${maxBytes / 1024} kB.`);
+    }
+
+    return { blob, id };
+  });
+
+  const erroredFiles = new Map<ImageId, true>();
+  const savedFiles = new Map<ImageId, true>();
+
+  await Promise.all(
+    filesToUpload.map(async ({ blob, id }) => {
+      const encryptedData = await encryptData(roomKey, blob);
+      try {
+        await firebase
+          .storage()
+          .ref(`/files/rooms/${roomId}/${id}`)
+          .put(
+            new Blob([encryptedData.iv, encryptedData.blob], {
+              type: blob.type,
+            }),
+            {
+              cacheControl: `public, max-age=${FILE_CACHE_MAX_AGE_SEC}`,
+              customMetadata: {
+                data: JSON.stringify({
+                  version: 1,
+                  filename: id,
+                  type: blob.type,
+                }),
+                created: Date.now().toString(),
+              },
+            },
+          );
+        savedFiles.set(id, true);
+      } catch (error) {
+        erroredFiles.set(id, true);
+      }
+    }),
+  );
+
+  return { savedFiles, erroredFiles };
+};
+
+const decryptData = async (
+  iv: ArrayBuffer,
+  encrypted: ArrayBuffer,
+  privateKey: string,
+): Promise<ArrayBuffer> => {
+  const key = await getImportedKey(privateKey, "decrypt");
+  return window.crypto.subtle.decrypt(
+    {
+      name: "AES-GCM",
+      iv,
+    },
+    key,
+    encrypted,
+  );
 };
 
 export const saveToFirebase = async (
@@ -197,4 +302,53 @@ export const loadFromFirebase = async (
   }
 
   return restoreElements(elements, null);
+};
+
+export const loadFilesFromFirebase = async (
+  roomId: string,
+  roomKey: string,
+  filesIds: readonly ImageId[],
+): Promise<{
+  loadedFiles: BinaryFileData[];
+  erroredFiles: ImageId[];
+}> => {
+  const loadedFiles: BinaryFileData[] = [];
+  const erroredFiles: ImageId[] = [];
+
+  await Promise.all(
+    [...new Set(filesIds)].map(async (id) => {
+      try {
+        const url = `https://firebasestorage.googleapis.com/v0/b/${FIREBASE_CONFIG.storageBucket}/o/files%2Frooms%2F${roomId}%2F${id}`;
+        const response = await fetch(`${url}?alt=media`);
+        if (response.status < 400) {
+          const contentType =
+            response.headers.get("content-type") || "image/png";
+          const arrayBuffer = await response.arrayBuffer();
+
+          const KEY_LENGTH = 12;
+
+          const iv = arrayBuffer.slice(0, KEY_LENGTH);
+          const encrypted = arrayBuffer.slice(
+            KEY_LENGTH,
+            arrayBuffer.byteLength,
+          );
+
+          const decrypted = await decryptData(iv, encrypted, roomKey);
+
+          const dataURL = await arrayBufferToDataURL(decrypted, contentType);
+
+          loadedFiles.push({
+            type: contentType.includes("image/") ? "image" : "other",
+            id,
+            dataURL,
+          });
+        }
+      } catch (error) {
+        erroredFiles.push(id);
+        console.error(error);
+      }
+    }),
+  );
+
+  return { loadedFiles, erroredFiles };
 };

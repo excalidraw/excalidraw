@@ -44,11 +44,14 @@ export type Collaborator = {
   };
 };
 
+export type BinaryFileData = {
+  type: "image" | "other";
+  id: ImageId;
+  dataURL: string;
+};
+
 export type AppState = {
-  files: Record<
-    ExcalidrawElement["id"],
-    { type: "image"; id: string; dataURL: string }
-  >;
+  files: Record<ExcalidrawElement["id"], BinaryFileData>;
   isLoading: boolean;
   errorMessage: string | null;
   draggingElement: NonDeletedExcalidrawElement | null;

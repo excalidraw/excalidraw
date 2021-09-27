@@ -5,12 +5,14 @@ import { deflate, inflate } from "pako";
 // -----------------------------------------------------------------------------
 
 // fast, Buffer-compatible implem
-export const toByteString = (data: string | Uint8Array): Promise<string> => {
+export const toByteString = (
+  data: string | Uint8Array | ArrayBuffer,
+): Promise<string> => {
   return new Promise((resolve, reject) => {
     const blob =
       typeof data === "string"
         ? new Blob([new TextEncoder().encode(data)])
-        : new Blob([data]);
+        : new Blob([data instanceof Uint8Array ? data : new Uint8Array(data)]);
     const reader = new FileReader();
     reader.onload = (event) => {
       if (!event.target || typeof event.target.result !== "string") {
@@ -45,6 +47,10 @@ const byteStringToString = (byteString: string) => {
  */
 export const stringToBase64 = async (str: string, isByteString = false) => {
   return isByteString ? btoa(str) : btoa(await toByteString(str));
+};
+
+export const toBase64 = async (data: string | Uint8Array | ArrayBuffer) => {
+  return btoa(await toByteString(data));
 };
 
 // async to align with stringToBase64

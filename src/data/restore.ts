@@ -137,6 +137,7 @@ const restoreElement = (
     }
     case "image":
       return restoreElementWithProperties(element, {
+        status: element.status || "pending",
         imageId: element.imageId,
         scale: element.scale || [1, 1],
       });

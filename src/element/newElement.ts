@@ -256,6 +256,7 @@ export const newImageElement = (
 ): NonDeleted<ExcalidrawImageElement> => {
   return {
     ..._newElementBase<ExcalidrawImageElement>("image", opts),
+    status: "pending",
     imageId: null,
     scale: [1, 1],
   };

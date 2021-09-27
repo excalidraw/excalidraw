@@ -1,3 +1,4 @@
+import { toBase64 } from "../../data/encode";
 import { serializeAsJSON } from "../../data/json";
 import { restore } from "../../data/restore";
 import { ImportedDataState } from "../../data/types";
@@ -328,4 +329,47 @@ export const exportToBackend = async (
     console.error(error);
     window.alert(t("alerts.couldNotCreateShareableLink"));
   }
+};
+
+export const dataURLToBlob = (dataURL: string) => {
+  const byteString = atob(dataURL.split(",")[1]);
+  const mimeType = dataURL.split(",")[0].split(":")[1].split(";")[0];
+
+  const ab = new ArrayBuffer(byteString.length);
+  const ia = new Uint8Array(ab);
+  for (let i = 0; i < byteString.length; i++) {
+    ia[i] = byteString.charCodeAt(i);
+  }
+  return new Blob([ab], { type: mimeType });
+};
+
+export const arrayBufferToDataURL = async (
+  buffer: ArrayBuffer,
+  mimeType: string,
+) => {
+  const base64 = await toBase64(buffer);
+
+  return `data:${mimeType};base64,${base64}`;
+};
+
+export const encryptData = async (
+  key: string,
+  data: Blob | string,
+): Promise<{ blob: Blob; iv: Uint8Array }> => {
+  const importedKey = await getImportedKey(key, "encrypt");
+  const iv = createIV();
+  const ui =
+    typeof data === "string"
+      ? new TextEncoder().encode(data)
+      : new Uint8Array(await data.arrayBuffer());
+  const ciphertext = await window.crypto.subtle.encrypt(
+    {
+      name: "AES-GCM",
+      iv,
+    },
+    importedKey,
+    ui,
+  );
+
+  return { blob: new Blob([new Uint8Array(ciphertext)]), iv };
 };

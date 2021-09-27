@@ -22,6 +22,7 @@ import { loadFromBlob } from "../data/blob";
 import { ImportedDataState } from "../data/types";
 import {
   ExcalidrawElement,
+  ImageId,
   NonDeletedExcalidrawElement,
 } from "../element/types";
 import { useCallbackRefState } from "../hooks/useCallbackRefState";
@@ -30,7 +31,12 @@ import Excalidraw, {
   defaultLang,
   languages,
 } from "../packages/excalidraw/index";
-import { AppState, LibraryItems, ExcalidrawImperativeAPI } from "../types";
+import {
+  AppState,
+  LibraryItems,
+  ExcalidrawImperativeAPI,
+  BinaryFileData,
+} from "../types";
 import {
   debounce,
   getVersion,
@@ -58,23 +64,58 @@ import "./index.scss";
 import { ExportToExcalidrawPlus } from "./components/ExportToExcalidrawPlus";
 
 import { getMany, set, del, createStore } from "idb-keyval";
+import { FileSync } from "./data/FileSync";
+import { mutateElement } from "../element/mutateElement";
 import { isInitializedImageElement } from "../element/typeChecks";
 
 const filesStore = createStore("files-db", "files-store");
 
-const saveFile = (id: string, data: string) => {
-  return set(id, data, filesStore);
-};
+const localFileStorage = new FileSync({
+  getFiles(ids) {
+    return getMany(ids, filesStore).then(
+      (filesData: (ImageId | undefined)[]) => {
+        const loadedFiles: BinaryFileData[] = [];
+        const erroredFiles: ImageId[] = [];
+        filesData.forEach((dataURL, index) => {
+          const id = ids[index];
+          if (dataURL) {
+            loadedFiles.push({ id, dataURL, type: "image" } as const);
+          } else {
+            erroredFiles.push(id);
+          }
+        });
 
-const getFiles = (ids: string[]) => {
-  return getMany(ids, filesStore);
-};
+        return { loadedFiles, erroredFiles };
+      },
+    );
+  },
+  async saveFiles({ addedFiles, removedFiles }) {
+    const savedFiles = new Map<ImageId, true>();
+    const erroredFiles = new Map<ImageId, true>();
 
-const deleteFile = (id: string) => {
-  del(id, filesStore);
-};
+    for (const [id, dataURL] of addedFiles) {
+      try {
+        set(id, dataURL, filesStore);
+        savedFiles.set(id, true);
+      } catch (error) {
+        console.error(error);
+        erroredFiles.set(id, true);
+      }
+    }
 
-let persistedFiles = new Map<string, string /* dataURL */>();
+    // delete obsolete files
+    for (const [id] of removedFiles) {
+      try {
+        del(id, filesStore);
+      } catch (error) {
+        console.error(error);
+        erroredFiles.set(id, true);
+      }
+    }
+
+    return { savedFiles, erroredFiles };
+  },
+});
 
 const languageDetector = new LanguageDetector();
 languageDetector.init({
@@ -86,40 +127,21 @@ languageDetector.init({
 });
 
 const saveDebounced = debounce(
-  (elements: readonly ExcalidrawElement[], state: AppState) => {
-    saveToLocalStorage(elements, state);
+  async (
+    elements: readonly ExcalidrawElement[],
+    appState: AppState,
+    onFilesSaved: (savedFiles: Map<ImageId, true>) => void,
+  ) => {
+    saveToLocalStorage(elements, appState);
 
-    const nextFiles = new Map<string, string /* dataURL */>();
-
-    for (const element of elements) {
-      if (isInitializedImageElement(element)) {
-        if (state.files[element.imageId]) {
-          if (
-            !persistedFiles.has(element.imageId) &&
-            // do not persist file twice (in case of it being multiple times
-            // in the elements array)
-            !nextFiles.has(element.imageId)
-          ) {
-            saveFile(element.imageId, state.files[element.imageId].dataURL);
-          }
-
-          if (!element.isDeleted) {
-            nextFiles.set(
-              element.imageId,
-              state.files[element.imageId].dataURL,
-            );
-            // remove from map so we can figure out which elements were removed
-            persistedFiles.delete(element.imageId);
-          }
-        }
-      }
-    }
-    // delete obsolete files
-    persistedFiles.forEach((data, id) => {
-      deleteFile(id);
+    const { savedFiles } = await localFileStorage.saveFiles({
+      elements,
+      appState,
     });
 
-    persistedFiles = nextFiles;
+    if (savedFiles.size) {
+      onFilesSaved(savedFiles);
+    }
   },
   SAVE_TO_LOCAL_STORAGE_TIMEOUT,
 );
@@ -272,19 +294,24 @@ const ExcalidrawWrapper = () => {
               return acc.concat(element.imageId);
             }
             return acc;
-          }, [] as string[]) || [];
+          }, [] as ImageId[]) || [];
 
-        getFiles(imageIds).then((filesData: (string | undefined)[]) => {
-          const files = filesData.reduce((acc, dataURL, index) => {
-            if (dataURL) {
-              const id = imageIds[index];
-              persistedFiles.set(id, dataURL);
-              return acc.concat({ id, dataURL, type: "image" } as const);
-            }
-            return acc;
-          }, [] as AppState["files"][number][]);
-          excalidrawAPI.setFiles(files);
-        });
+        if (collabAPI.isCollaborating()) {
+          if (scene.elements) {
+            collabAPI
+              .fetchImageFilesFromFirebase({
+                elements: scene.elements,
+                appState: { files: scene.appState?.files || {} },
+              })
+              .then(({ loadedFiles }) => {
+                excalidrawAPI.setFiles(loadedFiles);
+              });
+          }
+        } else {
+          localFileStorage.getFiles(imageIds).then(({ loadedFiles }) => {
+            excalidrawAPI.setFiles(loadedFiles);
+          });
+        }
 
         try {
           scene.libraryItems =
@@ -349,10 +376,23 @@ const ExcalidrawWrapper = () => {
     if (collabAPI?.isCollaborating()) {
       collabAPI.broadcastElements(elements);
     } else {
-      // collab scenes are persisted to the server, so we don't have to persist
-      // them locally, which has the added benefit of not overwriting whatever
-      // the user was working on before joining
-      saveDebounced(elements, appState);
+      saveDebounced(elements, appState, (savedFiles) => {
+        if (excalidrawAPI) {
+          excalidrawAPI.updateScene({
+            elements: excalidrawAPI
+              .getSceneElementsIncludingDeleted()
+              .map((element) => {
+                if (
+                  isInitializedImageElement(element) &&
+                  savedFiles.has(element.imageId)
+                ) {
+                  return mutateElement(element, { status: "saved" }, false);
+                }
+                return element;
+              }),
+          });
+        }
+      });
     }
   };
 
