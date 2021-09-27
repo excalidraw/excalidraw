@@ -715,6 +715,10 @@ class App extends React.Component<AppProps, AppState> {
     const scene = restore(initialData, null, null);
     scene.appState = {
       ...scene.appState,
+      elementType:
+        scene.appState.elementType === "image"
+          ? "selection"
+          : scene.appState.elementType,
       isLoading: false,
     };
     if (initialData?.scrollToContent) {
