@@ -1736,12 +1736,17 @@ class App extends React.Component<AppProps, AppState> {
       isExistingElement?: boolean;
     },
   ) {
-    const updateElement = (text: string, isDeleted = false) => {
+    const updateElement = (
+      text: string,
+      rawText?: string,
+      isDeleted = false,
+    ) => {
       this.scene.replaceAllElements([
         ...this.scene.getElementsIncludingDeleted().map((_element) => {
           if (_element.id === element.id && isTextElement(_element)) {
             return updateTextElement(_element, {
               text,
+              rawText: rawText ? rawText : text,
               isDeleted,
             });
           }
@@ -1793,6 +1798,7 @@ class App extends React.Component<AppProps, AppState> {
       }),
       onSubmit: withBatchedUpdates(({ text, viaKeyboard }) => {
         const isDeleted = !text.trim();
+        const rawText = text;
         if (this.props.onBeforeTextSubmit) {
           const updatedText = this.props.onBeforeTextSubmit(
             element,
@@ -1801,7 +1807,7 @@ class App extends React.Component<AppProps, AppState> {
           );
           text = updatedText ?? text;
         }
-        updateElement(text, isDeleted);
+        updateElement(text, rawText, isDeleted);
         // select the created text element only if submitting via keyboard
         // (when submitting via click it should act as signal to deselect)
         if (!isDeleted && viaKeyboard) {
