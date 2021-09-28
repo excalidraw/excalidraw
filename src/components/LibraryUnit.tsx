@@ -34,33 +34,20 @@ export const LibraryUnit = ({
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
-    const elementsToRender = elements || pendingElements;
-    if (!elementsToRender) {
-      return;
-    }
-    let svg: SVGSVGElement;
-    const current = ref.current!;
-
     (async () => {
-      svg = await exportToSvg(elementsToRender, {
+      const elementsToRender = elements || pendingElements;
+      if (!elementsToRender) {
+        return;
+      }
+      const svg = await exportToSvg(elementsToRender, {
         exportBackground: false,
         viewBackgroundColor: oc.white,
         files,
       });
-      for (const child of ref.current!.children) {
-        if (child.tagName !== "svg") {
-          continue;
-        }
-        current!.removeChild(child);
+      if (ref.current) {
+        ref.current.innerHTML = svg.outerHTML;
       }
-      current!.appendChild(svg);
     })();
-
-    return () => {
-      if (svg) {
-        current.removeChild(svg);
-      }
-    };
   }, [elements, pendingElements, files]);
 
   const [isHovered, setIsHovered] = useState(false);
