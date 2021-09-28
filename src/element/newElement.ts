@@ -108,6 +108,7 @@ const getTextElementPositionOffsets = (
 export const newTextElement = (
   opts: {
     text: string;
+    rawText: string;
     fontSize: number;
     fontFamily: FontFamilyValues;
     textAlign: TextAlign;
@@ -120,6 +121,7 @@ export const newTextElement = (
     {
       ..._newElementBase<ExcalidrawTextElement>("text", opts),
       text: opts.text,
+      rawText: opts.rawText,
       fontSize: opts.fontSize,
       fontFamily: opts.fontFamily,
       textAlign: opts.textAlign,

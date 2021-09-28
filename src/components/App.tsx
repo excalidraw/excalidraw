@@ -1316,6 +1316,7 @@ class App extends React.Component<AppProps, AppState> {
       opacity: this.state.currentItemOpacity,
       strokeSharpness: this.state.currentItemStrokeSharpness,
       text,
+      rawText: text,
       fontSize: this.state.currentItemFontSize,
       fontFamily: this.state.currentItemFontFamily,
       textAlign: this.state.currentItemTextAlign,
@@ -1947,6 +1948,7 @@ class App extends React.Component<AppProps, AppState> {
           opacity: this.state.currentItemOpacity,
           strokeSharpness: this.state.currentItemStrokeSharpness,
           text: "",
+          rawText: "",
           fontSize: this.state.currentItemFontSize,
           fontFamily: this.state.currentItemFontFamily,
           textAlign: parentCenterPosition
