@@ -809,6 +809,7 @@ export const renderSceneToSvg = (
   elements: readonly NonDeletedExcalidrawElement[],
   rsvg: RoughSVG,
   svgRoot: SVGElement,
+  files: AppState["files"],
   {
     offsetX = 0,
     offsetY = 0,
@@ -828,6 +829,7 @@ export const renderSceneToSvg = (
           element,
           rsvg,
           svgRoot,
+          files,
           element.x + offsetX,
           element.y + offsetY,
         );

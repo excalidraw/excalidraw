@@ -89,6 +89,7 @@ export const exportToSvg = async (
     viewBackgroundColor: string;
     exportWithDarkMode?: boolean;
     exportEmbedScene?: boolean;
+    files: AppState["files"];
   },
 ): Promise<SVGSVGElement> => {
   const {
@@ -151,7 +152,7 @@ export const exportToSvg = async (
   }
 
   const rsvg = rough.svg(svgRoot);
-  renderSceneToSvg(elements, rsvg, svgRoot, {
+  renderSceneToSvg(elements, rsvg, svgRoot, appState.files, {
     offsetX: -minX + exportPadding,
     offsetY: -minY + exportPadding,
   });

@@ -116,6 +116,7 @@ const LibraryMenuItems = ({
   libraryReturnUrl,
   focusContainer,
   library,
+  files,
   id,
 }: {
   libraryItems: LibraryItems;
@@ -124,6 +125,7 @@ const LibraryMenuItems = ({
   onInsertShape: (elements: LibraryItem) => void;
   onAddToLibrary: (elements: LibraryItem) => void;
   theme: AppState["theme"];
+  files: AppState["files"];
   setAppState: React.Component<any, AppState>["setState"];
   setLibraryItems: (library: LibraryItems) => void;
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
@@ -219,6 +221,7 @@ const LibraryMenuItems = ({
         <Stack.Col key={x}>
           <LibraryUnit
             elements={libraryItems[y + x]}
+            files={files}
             pendingElements={
               shouldAddPendingElements ? pendingElements : undefined
             }
@@ -253,6 +256,7 @@ const LibraryMenu = ({
   onAddToLibrary,
   theme,
   setAppState,
+  files,
   libraryReturnUrl,
   focusContainer,
   library,
@@ -263,6 +267,7 @@ const LibraryMenu = ({
   onInsertShape: (elements: LibraryItem) => void;
   onAddToLibrary: () => void;
   theme: AppState["theme"];
+  files: AppState["files"];
   setAppState: React.Component<any, AppState>["setState"];
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   focusContainer: () => void;
@@ -353,6 +358,7 @@ const LibraryMenu = ({
           focusContainer={focusContainer}
           library={library}
           theme={theme}
+          files={files}
           id={id}
         />
       )}
@@ -559,6 +565,7 @@ const LayerUI = ({
       focusContainer={focusContainer}
       library={library}
       theme={appState.theme}
+      files={appState.files}
       id={id}
     />
   ) : null;

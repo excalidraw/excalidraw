@@ -41,6 +41,7 @@ const ChartPreviewBtn = (props: {
       svg = await exportToSvg(elements, {
         exportBackground: false,
         viewBackgroundColor: oc.white,
+        files: {},
       });
 
       previewNode.appendChild(svg);

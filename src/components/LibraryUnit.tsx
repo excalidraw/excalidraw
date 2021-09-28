@@ -6,7 +6,7 @@ import { MIME_TYPES } from "../constants";
 import { t } from "../i18n";
 import { useIsMobile } from "../components/App";
 import { exportToSvg } from "../scene/export";
-import { LibraryItem } from "../types";
+import { AppState, LibraryItem } from "../types";
 import "./LibraryUnit.scss";
 
 // fa-plus
@@ -21,11 +21,13 @@ const PLUS_ICON = (
 
 export const LibraryUnit = ({
   elements,
+  files,
   pendingElements,
   onRemoveFromLibrary,
   onClick,
 }: {
   elements?: LibraryItem;
+  files: AppState["files"];
   pendingElements?: LibraryItem;
   onRemoveFromLibrary: () => void;
   onClick: () => void;
@@ -43,6 +45,7 @@ export const LibraryUnit = ({
       svg = await exportToSvg(elementsToRender, {
         exportBackground: false,
         viewBackgroundColor: oc.white,
+        files,
       });
       for (const child of ref.current!.children) {
         if (child.tagName !== "svg") {
@@ -58,7 +61,7 @@ export const LibraryUnit = ({
         current.removeChild(svg);
       }
     };
-  }, [elements, pendingElements]);
+  }, [elements, pendingElements, files]);
 
   const [isHovered, setIsHovered] = useState(false);
   const isMobile = useIsMobile();

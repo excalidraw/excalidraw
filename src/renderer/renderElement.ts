@@ -31,7 +31,7 @@ import {
 } from "../utils";
 import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
-import { Zoom } from "../types";
+import { AppState, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
 import getFreeDrawShape from "perfect-freehand";
 import { MAX_DECIMALS_FOR_SVG_EXPORT, THEME_FILTER } from "../constants";
@@ -712,6 +712,7 @@ export const renderElementToSvg = (
   element: NonDeletedExcalidrawElement,
   rsvg: RoughSVG,
   svgRoot: SVGElement,
+  files: AppState["files"],
   offsetX?: number,
   offsetY?: number,
 ) => {
@@ -805,6 +806,27 @@ export const renderElementToSvg = (
       path.setAttribute("d", getFreeDrawSvgPath(element));
       node.appendChild(path);
       svgRoot.appendChild(node);
+      break;
+    }
+    case "image": {
+      const imageData =
+        isInitializedImageElement(element) && files[element.imageId];
+      if (imageData) {
+        const image = document.createElement("image");
+
+        image.setAttribute(
+          "transform",
+          `translate(${offsetX || 0} ${
+            offsetY || 0
+          }) rotate(${degree} ${cx} ${cy})`,
+        );
+
+        image.setAttribute("width", `${Math.round(element.width)}`);
+        image.setAttribute("height", `${Math.round(element.height)}`);
+        image.setAttribute("href", imageData.dataURL);
+
+        svgRoot.appendChild(image);
+      }
       break;
     }
     default: {
