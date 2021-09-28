@@ -206,10 +206,15 @@ const getAdjustedDimensions = (
 
 export const updateTextElement = (
   element: ExcalidrawTextElement,
-  { text, isDeleted }: { text: string; isDeleted?: boolean },
+  {
+    text,
+    rawText,
+    isDeleted,
+  }: { text: string; rawText?: string; isDeleted?: boolean },
 ): ExcalidrawTextElement => {
   return newElementWith(element, {
     text,
+    rawText: rawText ? rawText : text,
     isDeleted: isDeleted ?? element.isDeleted,
     ...getAdjustedDimensions(element, text),
   });
