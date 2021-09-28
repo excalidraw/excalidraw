@@ -327,6 +327,12 @@ const LibraryMenu = ({
 
   const addToLibrary = useCallback(
     async (elements: LibraryItem) => {
+      if (elements.some((element) => element.type === "image")) {
+        return setAppState({
+          errorMessage: "Support for adding images to the library coming soon!",
+        });
+      }
+
       const items = await library.loadLibrary();
       const nextItems = [...items, elements];
       onAddToLibrary();
