@@ -99,6 +99,7 @@ export const STORAGE_KEYS = {
 } as const;
 
 // time in milliseconds
+export const IMAGE_RENDER_TIMEOUT = 500;
 export const TAP_TWICE_TIMEOUT = 300;
 export const TOUCH_CTX_MENU_TIMEOUT = 500;
 export const TITLE_TIMEOUT = 10000;

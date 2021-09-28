@@ -11,6 +11,8 @@ import {
   InitializedExcalidrawImageElement,
 } from "./types";
 
+/** NOTE: updates cache even if already populated with given image. Thus,
+ * you should filter out the images upstream if you want to optimize this. */
 export const updateImageCache = async ({
   imageElements,
   files,
@@ -20,22 +22,27 @@ export const updateImageCache = async ({
   files: AppState["files"];
   imageCache: Map<ImageId, HTMLImageElement>;
 }) => {
-  for (const element of imageElements) {
-    const imageData = files[element.imageId as string];
-    if (imageData) {
-      const cached = imageCache.get(element.imageId);
-      const image = await (cached ||
-        new Promise<HTMLImageElement>((resolve) => {
-          const image = new Image();
-          image.onload = () => resolve(image);
-          image.src = imageData.dataURL;
-        }));
+  await Promise.all(
+    imageElements.reduce((promises, element) => {
+      const imageData = files[element.imageId as string];
+      if (imageData) {
+        return promises.concat(
+          (async () => {
+            const image = await new Promise<HTMLImageElement>((resolve) => {
+              const image = new Image();
+              image.onload = () => resolve(image);
+              image.src = imageData.dataURL;
+            });
 
-      // TODO limit the size of the imageCache
-      imageCache.set(element.imageId, image);
-      invalidateShapeForElement(element);
-    }
-  }
+            // TODO limit the size of the imageCache
+            imageCache.set(element.imageId, image);
+            invalidateShapeForElement(element);
+          })(),
+        );
+      }
+      return promises;
+    }, [] as Promise<any>[]),
+  );
 
   return imageCache;
 };

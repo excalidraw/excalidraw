@@ -52,6 +52,7 @@ import {
   ENV,
   EVENT,
   GRID_SIZE,
+  IMAGE_RENDER_TIMEOUT,
   LINE_CONFIRM_THRESHOLD,
   MIME_TYPES,
   MQ_MAX_HEIGHT_LANDSCAPE,
@@ -205,6 +206,7 @@ import {
   getInitializedImageElements,
   updateImageCache,
 } from "../element/image";
+import throttle from "lodash.throttle";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
@@ -743,7 +745,7 @@ class App extends React.Component<AppProps, AppState> {
       commitToHistory: true,
     });
 
-    this.renderImages(
+    this.refreshImages(
       getInitializedImageElements(scene.elements),
       scene.appState.files,
     );
@@ -1105,6 +1107,8 @@ class App extends React.Component<AppProps, AppState> {
 
     this.history.record(this.state, this.scene.getElementsIncludingDeleted());
 
+    this.scheduleImageRefresh();
+
     // Do not notify consumers if we're still loading the scene. Among other
     // potential issues, this fixes a case where the tab isn't focused during
     // init, which would trigger onChange with empty elements, which would then
@@ -1463,12 +1467,7 @@ class App extends React.Component<AppProps, AppState> {
           },
         }),
         () => {
-          this.renderImages(
-            getInitializedImageElements(
-              this.scene.getElementsIncludingDeleted(),
-            ),
-            this.state.files,
-          );
+          this.refreshImages();
         },
       );
     },
@@ -4061,19 +4060,34 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private renderImages = async (
-    imageElements: InitializedExcalidrawImageElement[],
-    files: AppState["files"],
+  /** populates image cache and re-renders if needed */
+  private refreshImages = async (
+    imageElements: InitializedExcalidrawImageElement[] = getInitializedImageElements(
+      this.scene.getElements(),
+    ),
+    files: AppState["files"] = this.state.files,
   ) => {
-    await updateImageCache({
-      imageCache: this.imageCache,
-      imageElements,
-      files,
-    });
-    if (this.imageCache.size) {
-      this.scene.informMutation();
+    const uncachedImages = imageElements.filter(
+      (element) => !element.isDeleted && !this.imageCache.has(element.imageId),
+    );
+
+    if (uncachedImages.length) {
+      await updateImageCache({
+        imageCache: this.imageCache,
+        imageElements: uncachedImages,
+        files,
+      });
+      if (this.imageCache.size) {
+        this.scene.informMutation();
+      }
     }
   };
+
+  /** generally you should use `renderImages()` directly if you need to render
+   * new images. This is just a failsafe  */
+  private scheduleImageRefresh = throttle(() => {
+    this.refreshImages();
+  }, IMAGE_RENDER_TIMEOUT);
 
   private updateBindingEnabledOnPointerMove = (
     event: React.PointerEvent<HTMLCanvasElement>,
