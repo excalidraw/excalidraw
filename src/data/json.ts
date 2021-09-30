@@ -1,7 +1,7 @@
 import { fileOpen, fileSave } from "browser-fs-access";
-import { cleanAppStateForExport } from "../appState";
+import { cleanAppStateForExport, clearAppStateForDatabase } from "../appState";
 import { EXPORT_DATA_TYPES, EXPORT_SOURCE, MIME_TYPES } from "../constants";
-import { clearElementsForExport } from "../element";
+import { clearElementsForDatabase, clearElementsForExport } from "../element";
 import { ExcalidrawElement } from "../element/types";
 import { AppState } from "../types";
 import { isImageFileHandle, loadFromBlob } from "./blob";
@@ -16,13 +16,20 @@ import Library from "./library";
 export const serializeAsJSON = (
   elements: readonly ExcalidrawElement[],
   appState: Partial<AppState>,
+  type: "local" | "database",
 ): string => {
   const data: ExportedDataState = {
     type: EXPORT_DATA_TYPES.excalidraw,
     version: 2,
     source: EXPORT_SOURCE,
-    elements: clearElementsForExport(elements),
-    appState: cleanAppStateForExport(appState, elements),
+    elements:
+      type === "local"
+        ? clearElementsForExport(elements)
+        : clearElementsForDatabase(elements),
+    appState:
+      type === "local"
+        ? cleanAppStateForExport(appState, elements)
+        : clearAppStateForDatabase(appState, elements),
   };
 
   return JSON.stringify(data, null, 2);
@@ -32,7 +39,7 @@ export const saveAsJSON = async (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ) => {
-  const serialized = serializeAsJSON(elements, appState);
+  const serialized = serializeAsJSON(elements, appState, "local");
   const blob = new Blob([serialized], {
     type: MIME_TYPES.excalidraw,
   });

@@ -275,7 +275,7 @@ export const exportToBackend = async (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ) => {
-  const json = serializeAsJSON(elements, appState);
+  const json = serializeAsJSON(elements, appState, "database");
   const encoded = new TextEncoder().encode(json);
 
   const key = await window.crypto.subtle.generateKey(

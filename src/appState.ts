@@ -230,3 +230,11 @@ export const cleanAppStateForExport = (
 ) => {
   return _clearAppStateForStorage(appState, elements, "export");
 };
+
+export const clearAppStateForDatabase = (
+  appState: Partial<AppState>,
+  elements: readonly ExcalidrawElement[],
+) => {
+  // currently "database" is identical to "browser" settings
+  return _clearAppStateForStorage(appState, elements, "browser");
+};
