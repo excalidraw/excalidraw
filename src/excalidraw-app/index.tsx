@@ -43,7 +43,10 @@ import {
   ResolvablePromise,
   resolvablePromise,
 } from "../utils";
-import { SAVE_TO_LOCAL_STORAGE_TIMEOUT } from "./app_constants";
+import {
+  FIREBASE_STORAGE_PREFIXES,
+  SAVE_TO_LOCAL_STORAGE_TIMEOUT,
+} from "./app_constants";
 import CollabWrapper, {
   CollabAPI,
   CollabContext,
@@ -67,6 +70,7 @@ import { getMany, set, del, createStore } from "idb-keyval";
 import { FileSync } from "./data/FileSync";
 import { mutateElement } from "../element/mutateElement";
 import { isInitializedImageElement } from "../element/typeChecks";
+import { loadFilesFromFirebase } from "./data/firebase";
 
 const filesStore = createStore("files-db", "files-store");
 
@@ -152,7 +156,12 @@ const onBlur = () => {
 
 const initializeScene = async (opts: {
   collabAPI: CollabAPI;
-}): Promise<ImportedDataState | null> => {
+}): Promise<
+  { scene: ImportedDataState | null } & (
+    | { isExternalScene: true; id: string; key: string }
+    | { isExternalScene: false; id?: null; key?: null }
+  )
+> => {
   const searchParams = new URLSearchParams(window.location.search);
   const id = searchParams.get("id");
   const jsonBackendMatch = window.location.hash.match(
@@ -189,7 +198,7 @@ const initializeScene = async (opts: {
       }
       scene.scrollToContent = true;
       if (!roomLinkData) {
-        window.history.replaceState({}, APP_NAME, window.location.origin);
+        // window.history.replaceState({}, APP_NAME, window.location.origin);
       }
     } else {
       // https://github.com/excalidraw/excalidraw/issues/1919
@@ -219,23 +228,38 @@ const initializeScene = async (opts: {
         !scene.elements.length ||
         window.confirm(t("alerts.loadSceneOverridePrompt"))
       ) {
-        return data;
+        return { scene: data, isExternalScene };
       }
     } catch (error) {
       return {
-        appState: {
-          errorMessage: t("alerts.invalidSceneUrl"),
+        scene: {
+          appState: {
+            errorMessage: t("alerts.invalidSceneUrl"),
+          },
         },
+        isExternalScene,
       };
     }
   }
 
   if (roomLinkData) {
-    return opts.collabAPI.initializeSocketClient(roomLinkData);
+    return {
+      scene: await opts.collabAPI.initializeSocketClient(roomLinkData),
+      isExternalScene: true,
+      id: roomLinkData.roomId,
+      key: roomLinkData.roomKey,
+    };
   } else if (scene) {
-    return scene;
+    return isExternalScene && jsonBackendMatch
+      ? {
+          scene,
+          isExternalScene,
+          id: jsonBackendMatch[1],
+          key: jsonBackendMatch[2],
+        }
+      : { scene, isExternalScene: false };
   }
-  return null;
+  return { scene: null, isExternalScene: false };
 };
 
 const PlusLinkJSX = (
@@ -286,35 +310,45 @@ const ExcalidrawWrapper = () => {
       return;
     }
 
-    initializeScene({ collabAPI }).then((scene) => {
-      if (scene) {
-        const imageIds =
-          scene.elements?.reduce((acc, element) => {
-            if (element.type === "image" && element.imageId) {
-              return acc.concat(element.imageId);
-            }
-            return acc;
-          }, [] as ImageId[]) || [];
-
+    initializeScene({ collabAPI }).then((data) => {
+      if (data.scene) {
         if (collabAPI.isCollaborating()) {
-          if (scene.elements) {
+          if (data.scene.elements) {
             collabAPI
               .fetchImageFilesFromFirebase({
-                elements: scene.elements,
-                appState: { files: scene.appState?.files || {} },
+                elements: data.scene.elements,
+                appState: { files: data.scene.appState?.files || {} },
               })
               .then(({ loadedFiles }) => {
                 excalidrawAPI.setFiles(loadedFiles);
               });
           }
         } else {
-          localFileStorage.getFiles(imageIds).then(({ loadedFiles }) => {
-            excalidrawAPI.setFiles(loadedFiles);
-          });
+          const imageIds =
+            data.scene.elements?.reduce((acc, element) => {
+              if (isInitializedImageElement(element)) {
+                return acc.concat(element.imageId);
+              }
+              return acc;
+            }, [] as ImageId[]) || [];
+
+          if (data.isExternalScene) {
+            loadFilesFromFirebase(
+              `${FIREBASE_STORAGE_PREFIXES.shareLinkFiles}/${data.id}`,
+              data.key,
+              imageIds,
+            ).then(({ loadedFiles }) => {
+              excalidrawAPI.setFiles(loadedFiles);
+            });
+          } else {
+            localFileStorage.getFiles(imageIds).then(({ loadedFiles }) => {
+              excalidrawAPI.setFiles(loadedFiles);
+            });
+          }
         }
 
         try {
-          scene.libraryItems =
+          data.scene.libraryItems =
             JSON.parse(
               localStorage.getItem(
                 STORAGE_KEYS.LOCAL_STORAGE_LIBRARY,
@@ -324,7 +358,7 @@ const ExcalidrawWrapper = () => {
           console.error(e);
         }
       }
-      initialStatePromiseRef.current.promise.resolve(scene);
+      initialStatePromiseRef.current.promise.resolve(data.scene);
     });
 
     const onHashChange = (event: HashChangeEvent) => {
@@ -339,7 +373,7 @@ const ExcalidrawWrapper = () => {
         window.history.replaceState({}, "", event.oldURL);
         excalidrawAPI.importLibrary(libraryUrl, hash.get("token"));
       } else {
-        initializeScene({ collabAPI }).then((scene) => {
+        initializeScene({ collabAPI }).then(({ scene }) => {
           if (scene) {
             excalidrawAPI.updateScene({
               ...scene,

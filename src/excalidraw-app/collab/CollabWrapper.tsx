@@ -16,6 +16,7 @@ import { Collaborator, Gesture } from "../../types";
 import { resolvablePromise, withBatchedUpdates } from "../../utils";
 import {
   FILE_UPLOAD_MAX_BYTES,
+  FIREBASE_STORAGE_PREFIXES,
   INITIAL_SCENE_UPDATE_TIMEOUT,
   LOAD_IMAGES_TIMEOUT,
   SCENE,
@@ -119,7 +120,11 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
           throw new AbortError();
         }
 
-        return loadFilesFromFirebase(roomId, roomKey, imageIds);
+        return loadFilesFromFirebase(
+          `files/rooms/${roomId}`,
+          roomKey,
+          imageIds,
+        );
       },
       saveFiles: async ({ addedFiles }) => {
         const { roomId, roomKey } = this.portal;
@@ -128,9 +133,9 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
         }
 
         return saveFilesToFirebase({
-          roomId,
-          roomKey,
-          addedFiles,
+          prefix: `${FIREBASE_STORAGE_PREFIXES.collabFiles}/${roomId}`,
+          decryptionKey: roomKey,
+          files: addedFiles,
           maxBytes: FILE_UPLOAD_MAX_BYTES,
           allowedTypes: ["image/png", "image/jpeg", "image/svg"],
         });

@@ -2,9 +2,12 @@ import { toBase64 } from "../../data/encode";
 import { serializeAsJSON } from "../../data/json";
 import { restore } from "../../data/restore";
 import { ImportedDataState } from "../../data/types";
-import { ExcalidrawElement } from "../../element/types";
+import { isInitializedImageElement } from "../../element/typeChecks";
+import { ExcalidrawElement, ImageId } from "../../element/types";
 import { t } from "../../i18n";
 import { AppState, UserIdleState } from "../../types";
+import { FILE_UPLOAD_MAX_BYTES } from "../app_constants";
+import { saveFilesToFirebase } from "./firebase";
 
 const byteToHex = (byte: number): string => `0${byte.toString(16)}`.slice(-2);
 
@@ -278,7 +281,7 @@ export const exportToBackend = async (
   const json = serializeAsJSON(elements, appState, "database");
   const encoded = new TextEncoder().encode(json);
 
-  const key = await window.crypto.subtle.generateKey(
+  const cryptoKey = await window.crypto.subtle.generateKey(
     {
       name: "AES-GCM",
       length: 128,
@@ -295,7 +298,7 @@ export const exportToBackend = async (
       name: "AES-GCM",
       iv,
     },
-    key,
+    cryptoKey,
     encoded,
   );
 
@@ -305,7 +308,7 @@ export const exportToBackend = async (
 
   // We use jwk encoding to be able to extract just the base64 encoded key.
   // We will hardcode the rest of the attributes when importing back the key.
-  const exportedKey = await window.crypto.subtle.exportKey("jwk", key);
+  const exportedKey = await window.crypto.subtle.exportKey("jwk", cryptoKey);
 
   try {
     const response = await fetch(BACKEND_V2_POST, {
@@ -314,11 +317,32 @@ export const exportToBackend = async (
     });
     const json = await response.json();
     if (json.id) {
+      const key = exportedKey.k!;
+
       const url = new URL(window.location.href);
       // We need to store the key (and less importantly the id) as hash instead
       // of queryParam in order to never send it to the server
-      url.hash = `json=${json.id},${exportedKey.k!}`;
+      url.hash = `json=${json.id},${key}`;
       const urlString = url.toString();
+
+      const files = new Map<ImageId, string>();
+      for (const element of elements) {
+        if (
+          isInitializedImageElement(element) &&
+          appState.files[element.imageId]
+        ) {
+          files.set(element.imageId, appState.files[element.imageId].dataURL);
+        }
+
+        await saveFilesToFirebase({
+          prefix: `/files/shareLinks/${json.id}`,
+          decryptionKey: key,
+          files,
+          maxBytes: FILE_UPLOAD_MAX_BYTES,
+          allowedTypes: ["image/png", "image/jpeg", "image/svg"],
+        });
+      }
+
       window.prompt(`🔒${t("alerts.uploadedSecurly")}`, urlString);
     } else if (json.error_class === "RequestTooLargeError") {
       window.alert(t("alerts.couldNotCreateShareableLinkTooBig"));

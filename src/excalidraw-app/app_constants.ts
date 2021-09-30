@@ -17,3 +17,8 @@ export enum SCENE {
   INIT = "SCENE_INIT",
   UPDATE = "SCENE_UPDATE",
 }
+
+export const FIREBASE_STORAGE_PREFIXES = {
+  shareLinkFiles: `/files/shareLinks`,
+  collabFiles: `/files/rooms`,
+};

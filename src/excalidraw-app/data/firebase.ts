@@ -146,20 +146,20 @@ export const isSavedToFirebase = (
 };
 
 export const saveFilesToFirebase = async ({
-  roomId,
-  roomKey,
-  addedFiles,
+  prefix,
+  decryptionKey,
+  files,
   allowedTypes,
   maxBytes,
 }: {
-  roomId: string;
-  roomKey: string;
-  addedFiles: Map<ImageId, /* dataURL */ string>;
+  prefix: string;
+  decryptionKey: string;
+  files: Map<ImageId, /* dataURL */ string>;
   allowedTypes: string[];
   maxBytes: number;
 }) => {
   const firebase = await loadFirebaseStorage();
-  const filesToUpload = [...addedFiles].map(([id, dataURL]) => {
+  const filesToUpload = [...files].map(([id, dataURL]) => {
     const blob = dataURLToBlob(dataURL);
 
     if (!allowedTypes.includes(blob.type)) {
@@ -178,11 +178,11 @@ export const saveFilesToFirebase = async ({
 
   await Promise.all(
     filesToUpload.map(async ({ blob, id }) => {
-      const encryptedData = await encryptData(roomKey, blob);
+      const encryptedData = await encryptData(decryptionKey, blob);
       try {
         await firebase
           .storage()
-          .ref(`/files/rooms/${roomId}/${id}`)
+          .ref(`${prefix}/${id}`)
           .put(
             new Blob([encryptedData.iv, encryptedData.blob], {
               type: blob.type,
@@ -305,8 +305,8 @@ export const loadFromFirebase = async (
 };
 
 export const loadFilesFromFirebase = async (
-  roomId: string,
-  roomKey: string,
+  prefix: string,
+  decryptionKey: string,
   filesIds: readonly ImageId[],
 ): Promise<{
   loadedFiles: BinaryFileData[];
@@ -318,7 +318,9 @@ export const loadFilesFromFirebase = async (
   await Promise.all(
     [...new Set(filesIds)].map(async (id) => {
       try {
-        const url = `https://firebasestorage.googleapis.com/v0/b/${FIREBASE_CONFIG.storageBucket}/o/files%2Frooms%2F${roomId}%2F${id}`;
+        const url = `https://firebasestorage.googleapis.com/v0/b/${
+          FIREBASE_CONFIG.storageBucket
+        }/o/${encodeURIComponent(prefix.replace(/^\//, ""))}%2F${id}`;
         const response = await fetch(`${url}?alt=media`);
         if (response.status < 400) {
           const contentType =
@@ -333,7 +335,7 @@ export const loadFilesFromFirebase = async (
             arrayBuffer.byteLength,
           );
 
-          const decrypted = await decryptData(iv, encrypted, roomKey);
+          const decrypted = await decryptData(iv, encrypted, decryptionKey);
 
           const dataURL = await arrayBufferToDataURL(decrypted, contentType);
 
