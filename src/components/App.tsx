@@ -173,7 +173,6 @@ import {
   AppClassProperties,
   AppProps,
   AppState,
-  DataURL,
   ExcalidrawImperativeAPI,
   Gesture,
   GestureEvent,
@@ -202,7 +201,7 @@ import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
-import { generateIdFromFile, isImageFile } from "../data/blob";
+import { generateIdFromFile, getDataURL, isImageFile } from "../data/blob";
 import {
   getInitializedImageElements,
   updateImageCache,
@@ -3877,17 +3876,6 @@ class App extends React.Component<AppProps, AppState> {
     });
   }
 
-  private getDataURL = async (imageFile: File): Promise<DataURL> => {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const dataURL = reader.result as DataURL;
-        resolve(dataURL);
-      };
-      reader.readAsDataURL(imageFile);
-    });
-  };
-
   private initializeImage = async ({
     imageFile,
     imageElement: _imageElement,
@@ -3899,7 +3887,7 @@ class App extends React.Component<AppProps, AppState> {
     // keep it more portable
     const imageId = await generateIdFromFile(imageFile);
 
-    const dataURL = await this.getDataURL(imageFile);
+    const dataURL = await getDataURL(imageFile);
 
     const imageElement = mutateElement(
       _imageElement,
@@ -3973,7 +3961,7 @@ class App extends React.Component<AppProps, AppState> {
       maxWidthOrHeight: 100,
       maxIteration: 1,
     });
-    const previewDataURL = await this.getDataURL(imagePreview);
+    const previewDataURL = await getDataURL(imagePreview);
     if (this.state.pendingImageElement) {
       setCursor(this.canvas, `url(${previewDataURL}) 4 4, auto`);
     }

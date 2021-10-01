@@ -7,7 +7,7 @@ import { ExcalidrawElement, ImageId } from "../element/types";
 import { CanvasError } from "../errors";
 import { t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
-import { AppState } from "../types";
+import { AppState, DataURL } from "../types";
 import { isValidExcalidrawData } from "./json";
 import { restore } from "./restore";
 import { ImportedLibraryData } from "./types";
@@ -205,4 +205,16 @@ export const generateIdFromFile = async (file: File) => {
   }
 
   return id;
+};
+
+export const getDataURL = async (file: File): Promise<DataURL> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataURL = reader.result as DataURL;
+      resolve(dataURL);
+    };
+    reader.onerror = (error) => reject(error);
+    reader.readAsDataURL(file);
+  });
 };
