@@ -1,7 +1,7 @@
 import React from "react";
 import { ActionManager } from "../actions/manager";
 import { getNonDeletedElements } from "../element";
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, PointerType } from "../element/types";
 import { t } from "../i18n";
 import { useIsMobile } from "../components/App";
 import {
@@ -160,7 +160,7 @@ export const ShapesSwitcher = ({
   canvas: HTMLCanvasElement | null;
   elementType: ExcalidrawElement["type"];
   setAppState: React.Component<any, AppState>["setState"];
-  onImageAction: () => void;
+  onImageAction: (data: { pointerType: PointerType | null }) => void;
 }) => (
   <>
     {SHAPES.map(({ value, icon, key }, index) => {
@@ -182,7 +182,7 @@ export const ShapesSwitcher = ({
           aria-label={capitalizeString(label)}
           aria-keyshortcuts={shortcut}
           data-testid={value}
-          onChange={() => {
+          onChange={({ pointerType }) => {
             setAppState({
               elementType: value,
               multiElement: null,
@@ -190,7 +190,7 @@ export const ShapesSwitcher = ({
             });
             setCursorForShape(canvas, value);
             if (value === "image") {
-              onImageAction();
+              onImageAction({ pointerType });
             }
           }}
         />

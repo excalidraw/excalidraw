@@ -73,7 +73,7 @@ interface LayerUIProps {
   focusContainer: () => void;
   library: Library;
   id: string;
-  onImageAction: () => void;
+  onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
 }
 
 const useOnClickOutside = (
@@ -616,7 +616,11 @@ const LayerUI = ({
                           canvas={canvas}
                           elementType={appState.elementType}
                           setAppState={setAppState}
-                          onImageAction={onImageAction}
+                          onImageAction={({ pointerType }) => {
+                            onImageAction({
+                              insertOnCanvasDirectly: pointerType !== "mouse",
+                            });
+                          }}
                         />
                       </Stack.Row>
                     </Island>

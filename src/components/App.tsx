@@ -3971,7 +3971,9 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private onImageAction = async () => {
+  private onImageAction = async (
+    { insertOnCanvasDirectly } = { insertOnCanvasDirectly: false },
+  ) => {
     try {
       const clientX = this.state.width / 2 + this.state.offsetLeft;
       const clientY = this.state.height / 2 + this.state.offsetTop;
@@ -3994,14 +3996,27 @@ class App extends React.Component<AppProps, AppState> {
         sceneY: y,
       });
 
-      this.setState(
-        {
-          pendingImageElement: imageElement,
-        },
-        () => {
-          this.insertImageElement(imageElement, imageFile);
-        },
-      );
+      if (insertOnCanvasDirectly) {
+        this.insertImageElement(imageElement, imageFile);
+        this.initializeImageDimensions(imageElement);
+        this.setState(
+          {
+            selectedElementIds: { [imageElement.id]: true },
+          },
+          () => {
+            this.actionManager.executeAction(actionFinalize);
+          },
+        );
+      } else {
+        this.setState(
+          {
+            pendingImageElement: imageElement,
+          },
+          () => {
+            this.insertImageElement(imageElement, imageFile);
+          },
+        );
+      }
     } catch (error) {
       if (error.name !== "AbortError") {
         console.error(error);

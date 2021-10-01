@@ -5,6 +5,7 @@ import clsx from "clsx";
 import { useExcalidrawContainer } from "./App";
 import { AbortError } from "../errors";
 import Spinner from "./Spinner";
+import { PointerType } from "../element/types";
 
 export type ToolButtonSize = "small" | "medium";
 
@@ -40,7 +41,7 @@ type ToolButtonProps =
   | (ToolButtonBaseProps & {
       type: "radio";
       checked: boolean;
-      onChange?(): void;
+      onChange?(data: { pointerType: PointerType | null }): void;
     });
 
 export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
@@ -78,6 +79,8 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
     },
     [],
   );
+
+  const lastPointerTypeRef = useRef<PointerType | null>(null);
 
   if (props.type === "button" || props.type === "icon") {
     return (
@@ -125,7 +128,18 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
   }
 
   return (
-    <label className={clsx("ToolIcon", props.className)} title={props.title}>
+    <label
+      className={clsx("ToolIcon", props.className)}
+      title={props.title}
+      onPointerDown={(event) => {
+        lastPointerTypeRef.current = event.pointerType || null;
+      }}
+      onPointerUp={() => {
+        requestAnimationFrame(() => {
+          lastPointerTypeRef.current = null;
+        });
+      }}
+    >
       <input
         className={`ToolIcon_type_radio ${sizeCn}`}
         type="radio"
@@ -134,7 +148,9 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
         aria-keyshortcuts={props["aria-keyshortcuts"]}
         data-testid={props["data-testid"]}
         id={`${excalId}-${props.id}`}
-        onChange={props.onChange}
+        onChange={() => {
+          props.onChange?.({ pointerType: lastPointerTypeRef.current });
+        }}
         checked={props.checked}
         ref={innerRef}
       />
