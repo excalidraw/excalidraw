@@ -36,6 +36,7 @@ import {
   LibraryItems,
   ExcalidrawImperativeAPI,
   BinaryFileData,
+  DataURL,
 } from "../types";
 import {
   debounce,
@@ -77,7 +78,7 @@ const filesStore = createStore("files-db", "files-store");
 const localFileStorage = new FileSync({
   getFiles(ids) {
     return getMany(ids, filesStore).then(
-      (filesData: (ImageId | undefined)[]) => {
+      (filesData: (DataURL | undefined)[]) => {
         const loadedFiles: BinaryFileData[] = [];
         const erroredFiles: ImageId[] = [];
         filesData.forEach((dataURL, index) => {

@@ -5,7 +5,7 @@ import { ImportedDataState } from "../../data/types";
 import { isInitializedImageElement } from "../../element/typeChecks";
 import { ExcalidrawElement, ImageId } from "../../element/types";
 import { t } from "../../i18n";
-import { AppState, UserIdleState } from "../../types";
+import { AppState, DataURL, UserIdleState } from "../../types";
 import { FILE_UPLOAD_MAX_BYTES } from "../app_constants";
 import { saveFilesToFirebase } from "./firebase";
 
@@ -325,7 +325,7 @@ export const exportToBackend = async (
       url.hash = `json=${json.id},${key}`;
       const urlString = url.toString();
 
-      const files = new Map<ImageId, string>();
+      const files = new Map<ImageId, DataURL>();
       for (const element of elements) {
         if (
           isInitializedImageElement(element) &&
@@ -355,7 +355,7 @@ export const exportToBackend = async (
   }
 };
 
-export const dataURLToBlob = (dataURL: string) => {
+export const dataURLToBlob = (dataURL: DataURL) => {
   const byteString = atob(dataURL.split(",")[1]);
   const mimeType = dataURL.split(",")[0].split(":")[1].split(";")[0];
 
@@ -373,7 +373,7 @@ export const arrayBufferToDataURL = async (
 ) => {
   const base64 = await toBase64(buffer);
 
-  return `data:${mimeType};base64,${base64}`;
+  return `data:${mimeType};base64,${base64}` as DataURL;
 };
 
 export const encryptData = async (

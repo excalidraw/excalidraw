@@ -44,10 +44,12 @@ export type Collaborator = {
   };
 };
 
+export type DataURL = string & { _brand: "DataURL" };
+
 export type BinaryFileData = {
   type: "image" | "other";
   id: ImageId;
-  dataURL: string;
+  dataURL: DataURL;
 };
 
 export type AppState = {

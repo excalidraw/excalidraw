@@ -4,7 +4,7 @@ import {
   ExcalidrawImageElement,
   ImageId,
 } from "../../element/types";
-import { AppState, BinaryFileData } from "../../types";
+import { AppState, BinaryFileData, DataURL } from "../../types";
 
 export class FileSync {
   /** files marked for uploading or fetching, and thus neither operation should
@@ -27,7 +27,7 @@ export class FileSync {
       erroredFiles: ImageId[];
     }>;
     saveFiles: (data: {
-      addedFiles: Map<ImageId, /* dataURL */ string>;
+      addedFiles: Map<ImageId, DataURL>;
       removedFiles: Map<ImageId, true>;
     }) => Promise<{
       savedFiles: Map<ImageId, true>;
@@ -45,7 +45,7 @@ export class FileSync {
     elements: readonly ExcalidrawElement[];
     appState: Pick<AppState, "files">;
   }) => {
-    const addedFiles: Map<ImageId, /* dataURL */ string> = new Map();
+    const addedFiles: Map<ImageId, DataURL> = new Map();
     const removedFiles = new Map<ImageId, true>();
 
     const nonDeletedFiles = new Map<ImageId, true>();

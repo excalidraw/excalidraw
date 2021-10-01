@@ -9,7 +9,7 @@ import { ExcalidrawElement, ImageId } from "../../element/types";
 import { getSceneVersion } from "../../element";
 import Portal from "../collab/Portal";
 import { restoreElements } from "../../data/restore";
-import { BinaryFileData } from "../../types";
+import { BinaryFileData, DataURL } from "../../types";
 import { FILE_CACHE_MAX_AGE_SEC } from "../app_constants";
 
 // private
@@ -154,7 +154,7 @@ export const saveFilesToFirebase = async ({
 }: {
   prefix: string;
   decryptionKey: string;
-  files: Map<ImageId, /* dataURL */ string>;
+  files: Map<ImageId, DataURL>;
   allowedTypes: string[];
   maxBytes: number;
 }) => {
