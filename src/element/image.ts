@@ -22,10 +22,13 @@ export const updateImageCache = async ({
   files: AppState["files"];
   imageCache: Map<ImageId, HTMLImageElement>;
 }) => {
+  let didUpdate = false;
+
   await Promise.all(
     imageElements.reduce((promises, element) => {
       const imageData = files[element.imageId as string];
       if (imageData) {
+        didUpdate = true;
         return promises.concat(
           (async () => {
             const image = await new Promise<HTMLImageElement>((resolve) => {
@@ -44,7 +47,7 @@ export const updateImageCache = async ({
     }, [] as Promise<any>[]),
   );
 
-  return imageCache;
+  return { imageCache, didUpdate };
 };
 
 export const getInitializedImageElements = (

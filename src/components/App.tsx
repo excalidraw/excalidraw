@@ -4102,12 +4102,12 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     if (uncachedImages.length) {
-      await updateImageCache({
+      const { didUpdate } = await updateImageCache({
         imageCache: this.imageCache,
         imageElements: uncachedImages,
         files,
       });
-      if (this.imageCache.size) {
+      if (didUpdate) {
         this.scene.informMutation();
       }
     }

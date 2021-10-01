@@ -42,7 +42,7 @@ export const exportToCanvas = async (
 
   const defaultAppState = getDefaultAppState();
 
-  const imageCache = await updateImageCache({
+  const { imageCache } = await updateImageCache({
     imageCache: new Map(),
     imageElements: getInitializedImageElements(elements),
     files: appState.files,
