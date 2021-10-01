@@ -3955,6 +3955,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private setImagePreviewCursor = async (imageFile: File) => {
+    setCursor(this.canvas, "wait");
     const imageCompression = (await import("browser-image-compression"))
       .default;
     const imagePreview = await imageCompression(imageFile, {
