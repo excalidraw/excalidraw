@@ -2413,6 +2413,9 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState,
       );
     } else if (this.state.elementType === "image") {
+      // reset image preview on pointerdown
+      setCursor(this.canvas, CURSOR_TYPE.CROSSHAIR);
+
       if (!this.state.pendingImageElement) {
         return;
       }
@@ -3873,7 +3876,7 @@ class App extends React.Component<AppProps, AppState> {
     });
   }
 
-  private getImageData = async (imageFile: File) => {
+  private getImageDataURL = async (imageFile: File) => {
     return new Promise<string>((resolve) => {
       const reader = new FileReader();
       reader.onload = () => {
@@ -3895,7 +3898,7 @@ class App extends React.Component<AppProps, AppState> {
     // keep it more portable
     const imageId = await generateIdFromFile(imageFile);
 
-    const dataURL = await this.getImageData(imageFile);
+    const dataURL = await this.getImageDataURL(imageFile);
 
     const imageElement = mutateElement(
       _imageElement,
@@ -3962,6 +3965,19 @@ class App extends React.Component<AppProps, AppState> {
     this.scene.informMutation();
   };
 
+  private setImagePreviewCursor = async (imageFile: File) => {
+    const imageCompression = (await import("browser-image-compression"))
+      .default;
+    const imagePreview = await imageCompression(imageFile, {
+      maxWidthOrHeight: 100,
+      maxIteration: 1,
+    });
+    const previewDataURL = await this.getImageDataURL(imagePreview);
+    if (this.state.pendingImageElement) {
+      setCursor(this.canvas, `url(${previewDataURL}) 4 4, auto`);
+    }
+  };
+
   private onImageAction = async () => {
     try {
       const clientX = this.state.width / 2 + this.state.offsetLeft;
@@ -3977,6 +3993,8 @@ class App extends React.Component<AppProps, AppState> {
         extensions: [".jpg", ".jpeg", ".png", ".svg"],
         mimeTypes: ["image/jpeg", "image/png", "image/svg+xml"],
       });
+
+      this.setImagePreviewCursor(imageFile);
 
       const imageElement = this.createImageElement({
         sceneX: x,
