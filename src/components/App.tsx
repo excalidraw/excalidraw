@@ -3887,7 +3887,8 @@ class App extends React.Component<AppProps, AppState> {
     // keep it more portable
     const imageId = await generateIdFromFile(imageFile);
 
-    const dataURL = await getDataURL(imageFile);
+    const dataURL =
+      this.state.files[imageId]?.dataURL || (await getDataURL(imageFile));
 
     const imageElement = mutateElement(
       _imageElement,
@@ -3912,11 +3913,13 @@ class App extends React.Component<AppProps, AppState> {
           }),
           async () => {
             try {
-              await updateImageCache({
-                imageCache: this.imageCache,
-                imageElements: [imageElement],
-                files: this.state.files,
-              });
+              if (!this.imageCache.has(imageId)) {
+                await updateImageCache({
+                  imageCache: this.imageCache,
+                  imageElements: [imageElement],
+                  files: this.state.files,
+                });
+              }
               if (
                 this.state.pendingImageElement?.id !== imageElement.id &&
                 this.state.draggingElement?.id !== imageElement.id
