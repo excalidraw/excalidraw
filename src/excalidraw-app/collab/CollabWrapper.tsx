@@ -99,7 +99,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   activeIntervalId: number | null;
   idleTimeoutId: number | null;
 
-  private socketInitializationTimer?: NodeJS.Timeout;
+  private socketInitializationTimer?: number;
   private lastBroadcastedOrReceivedSceneVersion: number = -1;
   private collaborators = new Map<string, Collaborator>();
 
@@ -362,7 +362,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
     // fallback in case you're not alone in the room but still don't receive
     // initial SCENE_UPDATE message
-    this.socketInitializationTimer = setTimeout(() => {
+    this.socketInitializationTimer = window.setTimeout(() => {
       this.initializeSocket();
       scenePromise.resolve(null);
     }, INITIAL_SCENE_UPDATE_TIMEOUT);

@@ -289,12 +289,12 @@ const LibraryMenu = ({
     "preloading" | "loading" | "ready"
   >("preloading");
 
-  const loadingTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const loadingTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     Promise.race([
       new Promise((resolve) => {
-        loadingTimerRef.current = setTimeout(() => {
+        loadingTimerRef.current = window.setTimeout(() => {
           resolve("loading");
         }, 100);
       }),
