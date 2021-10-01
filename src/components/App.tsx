@@ -4067,20 +4067,24 @@ class App extends React.Component<AppProps, AppState> {
       (imageElement.width < DRAGGING_THRESHOLD / this.state.zoom.value &&
         imageElement.height < DRAGGING_THRESHOLD / this.state.zoom.value)
     ) {
-      const buffer = 160;
+      // some offset to account for UI
+      const offset = 160;
+
       let width = Math.min(
         image.naturalWidth,
-        this.state.width / this.state.zoom.value - buffer,
+        this.state.width / this.state.zoom.value - offset,
       );
       let height = width * (image.naturalHeight / image.naturalWidth);
 
-      if (height > this.state.height / this.state.zoom.value - buffer) {
-        height = this.state.height / this.state.zoom.value - buffer;
+      if (height > this.state.height / this.state.zoom.value - offset) {
+        height = this.state.height / this.state.zoom.value - offset;
         width = height * (image.naturalWidth / image.naturalHeight);
       }
 
-      const x = imageElement.x - width / 2;
-      const y = imageElement.y - height / 2;
+      // add current imageElement width/height to account for previous centering
+      // of the placholder image
+      const x = imageElement.x + imageElement.width / 2 - width / 2;
+      const y = imageElement.y + imageElement.height / 2 - height / 2;
 
       mutateElement(imageElement, { x, y, width, height });
     }
