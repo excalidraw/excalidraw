@@ -1,4 +1,4 @@
-import { fileSave, FileSystemHandle } from "browser-fs-access";
+import { fileSave, FileSystemHandle } from "@dwelle/browser-fs-access";
 import {
   copyBlobToClipboardAsPng,
   copyTextToSystemClipboard,

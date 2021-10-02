@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
 import clsx from "clsx";
-import { fileOpen, supported as fsSupported } from "browser-fs-access";
+import { fileOpen, supported as fsSupported } from "@dwelle/browser-fs-access";
 import { nanoid } from "nanoid";
 
 import {
@@ -207,6 +207,7 @@ import {
   updateImageCache,
 } from "../element/image";
 import throttle from "lodash.throttle";
+import { AbortError } from "../errors";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
@@ -3993,6 +3994,31 @@ class App extends React.Component<AppProps, AppState> {
         description: "Image",
         extensions: [".jpg", ".jpeg", ".png", ".svg"],
         mimeTypes: ["image/jpeg", "image/png", "image/svg+xml"],
+        multiple: false,
+        legacySetup: (resolve, rejectHandler, input) => {
+          const abortHandler = () => {
+            rejectHandler();
+          };
+          requestAnimationFrame(() => {
+            document.addEventListener("keyup", abortHandler);
+            document.addEventListener("click", abortHandler);
+          });
+          const interval = window.setInterval(() => {
+            if (input.files?.length) {
+              resolve(input.files[0]);
+            }
+          }, 500);
+          return (reject) => {
+            clearInterval(interval);
+            document.removeEventListener("keyup", abortHandler);
+            document.removeEventListener("click", abortHandler);
+            if (reject) {
+              // so that something is shown in console if we need to debug this
+              console.warn("Opening the file was canceled (legacy-fs).");
+              reject(new AbortError());
+            }
+          };
+        },
       });
 
       this.setImagePreviewCursor(imageFile);

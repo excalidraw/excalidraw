@@ -1,4 +1,4 @@
-import { FileSystemHandle } from "browser-fs-access";
+import { FileSystemHandle } from "@dwelle/browser-fs-access";
 import { nanoid } from "nanoid";
 import { cleanAppStateForExport } from "../appState";
 import { EXPORT_DATA_TYPES } from "../constants";

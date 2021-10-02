@@ -1,4 +1,4 @@
-import { fileOpen, fileSave } from "browser-fs-access";
+import { fileOpen, fileSave } from "@dwelle/browser-fs-access";
 import { cleanAppStateForExport, clearAppStateForDatabase } from "../appState";
 import { EXPORT_DATA_TYPES, EXPORT_SOURCE, MIME_TYPES } from "../constants";
 import { clearElementsForDatabase, clearElementsForExport } from "../element";

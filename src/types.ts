@@ -124,7 +124,7 @@ export type AppState = {
   offsetLeft: number;
 
   isLibraryOpen: boolean;
-  fileHandle: import("browser-fs-access").FileSystemHandle | null;
+  fileHandle: import("@dwelle/browser-fs-access").FileSystemHandle | null;
   collaborators: Map<string, Collaborator>;
   showStats: boolean;
   currentChartType: ChartType;

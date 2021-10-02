@@ -12,7 +12,7 @@ import { t } from "../i18n";
 import { useIsMobile } from "../components/App";
 import { KEYS } from "../keys";
 import { register } from "./register";
-import { supported as fsSupported } from "browser-fs-access";
+import { supported as fsSupported } from "@dwelle/browser-fs-access";
 import { CheckboxItem } from "../components/CheckboxItem";
 import { getExportSize } from "../scene/export";
 import { DEFAULT_EXPORT_PADDING, EXPORT_SCALES } from "../constants";

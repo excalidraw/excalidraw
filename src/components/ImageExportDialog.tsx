@@ -15,7 +15,7 @@ import { clipboard, exportImage } from "./icons";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import "./ExportDialog.scss";
-import { supported as fsSupported } from "browser-fs-access";
+import { supported as fsSupported } from "@dwelle/browser-fs-access";
 import OpenColor from "open-color";
 import { CheckboxItem } from "./CheckboxItem";
 import { DEFAULT_EXPORT_PADDING } from "../constants";

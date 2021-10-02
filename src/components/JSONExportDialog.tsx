@@ -11,7 +11,7 @@ import { actionSaveFileToDisk } from "../actions/actionExport";
 import { Card } from "./Card";
 
 import "./ExportDialog.scss";
-import { supported as fsSupported } from "browser-fs-access";
+import { supported as fsSupported } from "@dwelle/browser-fs-access";
 
 export type ExportCB = (
   elements: readonly NonDeletedExcalidrawElement[],
