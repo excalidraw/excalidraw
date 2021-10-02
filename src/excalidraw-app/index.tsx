@@ -341,9 +341,11 @@ const ExcalidrawWrapper = () => {
             ).then(({ loadedFiles }) => {
               excalidrawAPI.setFiles(loadedFiles);
             });
-          } else {
+          } else if (imageIds.length) {
             localFileStorage.getFiles(imageIds).then(({ loadedFiles }) => {
-              excalidrawAPI.setFiles(loadedFiles);
+              if (loadedFiles.length) {
+                excalidrawAPI.setFiles(loadedFiles);
+              }
             });
           }
         }
