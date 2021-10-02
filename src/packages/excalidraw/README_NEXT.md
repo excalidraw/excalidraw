@@ -597,7 +597,7 @@ The below attributes can be set in `UIOptions.canvasActions.export` to customize
 | Attribute | Type | Default | Description |
 | --- | --- | --- | --- |
 | `saveFileToDisk` | boolean | true | Implies if save file to disk button should be shown |
-| `exportToBackend` | <pre> (exportedElements: readonly NonDeletedExcalidrawElement[],appState: AppState,canvas: HTMLCanvasElement &#124; null) => void </pre> |  | This callback is triggered when the shareable-link button is clicked in the export dialog. The link button will only be shown if this callback is passed. |
+| `onExportToBackend` | <pre> (exportedElements: readonly NonDeletedExcalidrawElement[],appState: AppState,canvas: HTMLCanvasElement &#124; null) => void </pre> |  | This callback is triggered when the shareable-link button is clicked in the export dialog. The link button will only be shown if this callback is passed. |
 | `renderCustomUI` | <pre> (exportedElements: readonly NonDeletedExcalidrawElement[],appState: AppState,canvas: HTMLCanvasElement &#124; null) => void </pre> |  | This callback should be supplied if you want to render custom UI in the export dialog. |
 
 #### `onPaste`
@@ -610,7 +610,7 @@ This callback is triggered if passed when something is pasted into the scene. Yo
 
 This callback must return a `boolean` value or a [promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise) which resolves to a boolean value.
 
-In case you want to prevent the excalidraw paste action you must return `true`, it will stop the native excalidraw clipboard management flow (nothing will be pasted into the scene).
+In case you want to prevent the excalidraw paste action you must return `false`, it will stop the native excalidraw clipboard management flow (nothing will be pasted into the scene).
 
 ### Does it support collaboration ?
 

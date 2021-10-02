@@ -3225,10 +3225,10 @@ brorand@^1.0.1, brorand@^1.1.0:
   version "1.1.0"
   resolved "https://registry.npmjs.org/brorand/-/brorand-1.1.0.tgz"
 
-browser-fs-access@0.18.0:
-  version "0.18.0"
-  resolved "https://registry.yarnpkg.com/browser-fs-access/-/browser-fs-access-0.18.0.tgz#d69758ff83ce6a16bb0ece2541742bc3cd86db65"
-  integrity sha512-1B6CTTpYl0kP5sP+rJ8osy4Yka8WqnrXHqChMZZVzlw7pQ2VJ+IiLEP7SxonHjtMMSLCnpd24mU08FIExXb2DQ==
+browser-fs-access@0.20.5:
+  version "0.20.5"
+  resolved "https://registry.yarnpkg.com/browser-fs-access/-/browser-fs-access-0.20.5.tgz#16bea029f6dc14787c8b394360f32f3b8cf06f50"
+  integrity sha512-ROPZ9ZYC4gptm0JRH/DgTm9dDLzUrOksBw8VMcUm7TINyaan5KUJPkklEurl0WTapfuy5T85GSP6bRmX/BpbnA==
 
 browser-image-compression@*, browser-image-compression@1.0.16:
   version "1.0.16"
@@ -9249,8 +9249,9 @@ path-key@^3.0.0, path-key@^3.1.0:
   resolved "https://registry.npmjs.org/path-key/-/path-key-3.1.1.tgz"
 
 path-parse@^1.0.6:
-  version "1.0.6"
-  resolved "https://registry.npmjs.org/path-parse/-/path-parse-1.0.6.tgz"
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/path-parse/-/path-parse-1.0.7.tgz#fbc114b60ca42b30d9daf5858e4bd68bbedb6735"
+  integrity sha512-LDJzPVEEEPR+y48z93A0Ed0yXb8pAByGWo/k5YYdYgpY2/2EsOsksJrq7lOHxryrVOn1ejG6oAp8ahvOIQD8sw==
 
 path-to-regexp@0.1.7:
   version "0.1.7"
@@ -9286,10 +9287,10 @@ pepjs@0.5.3:
   version "0.5.3"
   resolved "https://registry.npmjs.org/pepjs/-/pepjs-0.5.3.tgz"
 
-perfect-freehand@0.4.7:
-  version "0.4.7"
-  resolved "https://registry.yarnpkg.com/perfect-freehand/-/perfect-freehand-0.4.7.tgz#4d85fd64881ba81b2a4eaa6ac4e8983ccb21dd43"
-  integrity sha512-SSSFL8VzXiOHQdUTyNyOb0JC+btVZRy9bi6jos7Nb7PBTI0PHX5jM6RgCTSrubQ8Ul9qOYWmWgJBrwVGHwyJZQ==
+perfect-freehand@1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/perfect-freehand/-/perfect-freehand-1.0.6.tgz#feeb25450241f036ec13b43fa84bbb16f8e78e0f"
+  integrity sha512-wWkFwpgUirsfBDTb9nG6+VnFR0ge119QKU2Nu96vR4MHZMPGfOsQRD7cUk+9CK5P+TUmnrtX8yOEzUrQ6KHJoA==
 
 performance-now@^2.1.0:
   version "2.1.0"
