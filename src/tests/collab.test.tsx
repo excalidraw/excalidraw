@@ -20,11 +20,21 @@ jest.mock("../excalidraw-app/data/firebase.ts", () => {
   const loadFromFirebase = async () => null;
   const saveToFirebase = () => {};
   const isSavedToFirebase = () => true;
+  const loadFilesFromFirebase = async () => ({
+    loadedFiles: [],
+    erroredFiles: [],
+  });
+  const saveFilesToFirebase = async () => ({
+    savedFiles: new Map(),
+    erroredFiles: new Map(),
+  });
 
   return {
     loadFromFirebase,
     saveToFirebase,
     isSavedToFirebase,
+    loadFilesFromFirebase,
+    saveFilesToFirebase,
   };
 });
 

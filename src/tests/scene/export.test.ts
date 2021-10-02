@@ -13,6 +13,7 @@ describe("exportToSvg", () => {
   const DEFAULT_OPTIONS = {
     exportBackground: false,
     viewBackgroundColor: "#ffffff",
+    files: {},
   };
 
   it("with default arguments", async () => {
