@@ -34,6 +34,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     handleKeyboardGlobally = false,
     onLibraryChange,
     autoFocus = false,
+    generateIdForFile,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -94,6 +95,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
         handleKeyboardGlobally={handleKeyboardGlobally}
         onLibraryChange={onLibraryChange}
         autoFocus={autoFocus}
+        generateIdForFile={generateIdForFile}
       />
     </InitializeApp>
   );

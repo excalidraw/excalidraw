@@ -216,6 +216,7 @@ export interface ExcalidrawProps {
   handleKeyboardGlobally?: boolean;
   onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
   autoFocus?: boolean;
+  generateIdForFile?: (file: File) => string | Promise<string>;
 }
 
 export type SceneData = {

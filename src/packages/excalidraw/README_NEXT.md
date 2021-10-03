@@ -379,6 +379,7 @@ To view the full example visit :point_down:
 | [`handleKeyboardGlobally`](#handleKeyboardGlobally) | boolean | false | Indicates whether to bind the keyboard events to document. |
 | [`onLibraryChange`](#onLibraryChange) | <pre>(items: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>) => void &#124; Promise&lt;any&gt; </pre> |  | The callback if supplied is triggered when the library is updated and receives the library items. |
 | [`autoFocus`](#autoFocus) | boolean | false | Implies whether to focus the Excalidraw component on page load |
+| [`generateIdForFile`](#generateIdForFile) | `(file: File) => string | Promise<string>` | Allows you to override `id` generation for files added on canvas |
 
 ### Dimensions of Excalidraw
 
@@ -665,6 +666,14 @@ The unique id of the excalidraw component. This can be used to identify the exca
 ### autoFocus
 
 This prop implies whether to focus the Excalidraw component on page load. Defaults to false.
+
+### generateIdForFile
+
+Allows you to override `id` generation for files added on canvas (images). By default, an SHA-1 digest of the file is used.
+
+```
+(file: File) => string | Promise<string>
+```
 
 ### Extra API's
 
