@@ -343,6 +343,7 @@ export const loadFilesFromFirebase = async (
             type: contentType.includes("image/") ? "image" : "other",
             id,
             dataURL,
+            created: Date.now(), // FIXME temporary
           });
         }
       } catch (error) {

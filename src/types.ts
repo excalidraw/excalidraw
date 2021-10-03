@@ -50,6 +50,7 @@ export type BinaryFileData = {
   type: "image" | "other";
   id: ImageId;
   dataURL: DataURL;
+  created: number;
 };
 
 export type AppState = {

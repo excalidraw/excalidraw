@@ -1468,8 +1468,8 @@ class App extends React.Component<AppProps, AppState> {
         (state) => ({
           files: {
             ...state.files,
-            ...files.reduce((acc, { id, type, dataURL }) => {
-              acc[id] = { type, id, dataURL };
+            ...files.reduce((acc, fileData) => {
+              acc[fileData.id] = fileData;
               return acc;
             }, {} as Record<string, AppState["files"][number]>),
           },
@@ -3918,6 +3918,7 @@ class App extends React.Component<AppProps, AppState> {
                 type: "image",
                 id: imageId,
                 dataURL,
+                created: Date.now(),
               },
             },
           }),

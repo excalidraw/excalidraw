@@ -36,7 +36,6 @@ import {
   LibraryItems,
   ExcalidrawImperativeAPI,
   BinaryFileData,
-  DataURL,
 } from "../types";
 import {
   debounce,
@@ -89,13 +88,13 @@ const clearObsoleteFilesFromIndexedDB = async (opts: {
 const localFileStorage = new FileSync({
   getFiles(ids) {
     return getMany(ids, filesStore).then(
-      (filesData: (DataURL | undefined)[]) => {
+      (filesData: (BinaryFileData | undefined)[]) => {
         const loadedFiles: BinaryFileData[] = [];
         const erroredFiles: ImageId[] = [];
-        filesData.forEach((dataURL, index) => {
+        filesData.forEach((data, index) => {
           const id = ids[index];
-          if (dataURL) {
-            loadedFiles.push({ id, dataURL, type: "image" } as const);
+          if (data) {
+            loadedFiles.push(data);
           } else {
             erroredFiles.push(id);
           }
@@ -111,7 +110,13 @@ const localFileStorage = new FileSync({
 
     for (const [id, dataURL] of addedFiles) {
       try {
-        set(id, dataURL, filesStore);
+        const data: BinaryFileData = {
+          id,
+          dataURL,
+          type: "image",
+          created: Date.now(),
+        };
+        set(id, data, filesStore);
         savedFiles.set(id, true);
       } catch (error) {
         console.error(error);
