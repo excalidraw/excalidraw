@@ -158,7 +158,7 @@
     "cannotRestoreFromImage": "تعذر استعادة المشهد من ملف الصورة",
     "invalidSceneUrl": "تعذر استيراد المشهد من عنوان URL المتوفر. إما أنها مشوهة، أو لا تحتوي على بيانات Excalidraw JSON صالحة.",
     "resetLibrary": "هذا سوف يمسح مكتبتك. هل أنت متأكد؟",
-    "invalidEncryptionKey": ""
+    "invalidEncryptionKey": "مفتاح التشفير يجب أن يكون من 22 حرفاً. التعاون المباشر معطل."
   },
   "toolBar": {
     "selection": "تحديد",
