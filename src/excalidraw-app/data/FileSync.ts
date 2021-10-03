@@ -28,7 +28,6 @@ export class FileSync {
     }>;
     saveFiles: (data: {
       addedFiles: Map<ImageId, DataURL>;
-      removedFiles: Map<ImageId, true>;
     }) => Promise<{
       savedFiles: Map<ImageId, true>;
       erroredFiles: Map<ImageId, true>;
@@ -46,48 +45,25 @@ export class FileSync {
     appState: Pick<AppState, "files">;
   }) => {
     const addedFiles: Map<ImageId, DataURL> = new Map();
-    const removedFiles = new Map<ImageId, true>();
-
-    const nonDeletedFiles = new Map<ImageId, true>();
 
     for (const element of elements) {
-      if (isInitializedImageElement(element)) {
-        if (
-          appState.files[element.imageId] &&
-          !this.pendingFiles.has(element.imageId) &&
-          !this.savedFiles.has(element.imageId)
-        ) {
-          addedFiles.set(
-            element.imageId,
-            appState.files[element.imageId].dataURL,
-          );
-          this.pendingFiles.set(element.imageId, true);
-        } else if (
-          element.isDeleted &&
-          !nonDeletedFiles.has(element.imageId) &&
-          !addedFiles.has(element.imageId) &&
-          (this.savedFiles.has(element.imageId) ||
-            this.pendingFiles.has(element.imageId))
-        ) {
-          removedFiles.set(element.imageId, true);
-        }
-
-        // handle case where there are multiple elements referencing the same
-        // file, and only one some of them are deleted
-        if (!element.isDeleted) {
-          nonDeletedFiles.set(element.imageId, true);
-          removedFiles.delete(element.imageId);
-        }
+      if (
+        isInitializedImageElement(element) &&
+        appState.files[element.imageId] &&
+        !this.pendingFiles.has(element.imageId) &&
+        !this.savedFiles.has(element.imageId)
+      ) {
+        addedFiles.set(
+          element.imageId,
+          appState.files[element.imageId].dataURL,
+        );
+        this.pendingFiles.set(element.imageId, true);
       }
     }
 
     try {
-      for (const [imageId] of removedFiles) {
-        this.savedFiles.delete(imageId);
-      }
       const { savedFiles, erroredFiles } = await this._saveFiles({
         addedFiles,
-        removedFiles,
       });
 
       for (const [fileId] of savedFiles) {

@@ -67,13 +67,24 @@ import { shield } from "../components/icons";
 import "./index.scss";
 import { ExportToExcalidrawPlus } from "./components/ExportToExcalidrawPlus";
 
-import { getMany, set, del, createStore } from "idb-keyval";
+import { getMany, set, del, keys, createStore } from "idb-keyval";
 import { FileSync } from "./data/FileSync";
 import { mutateElement } from "../element/mutateElement";
 import { isInitializedImageElement } from "../element/typeChecks";
 import { loadFilesFromFirebase } from "./data/firebase";
 
 const filesStore = createStore("files-db", "files-store");
+
+const clearObsoleteFilesFromIndexedDB = async (opts: {
+  currentFileIds: ImageId[];
+}) => {
+  const allIds = await keys(filesStore);
+  for (const id of allIds) {
+    if (!opts.currentFileIds.includes(id as ImageId)) {
+      del(id, filesStore);
+    }
+  }
+};
 
 const localFileStorage = new FileSync({
   getFiles(ids) {
@@ -94,7 +105,7 @@ const localFileStorage = new FileSync({
       },
     );
   },
-  async saveFiles({ addedFiles, removedFiles }) {
+  async saveFiles({ addedFiles }) {
     const savedFiles = new Map<ImageId, true>();
     const erroredFiles = new Map<ImageId, true>();
 
@@ -102,16 +113,6 @@ const localFileStorage = new FileSync({
       try {
         set(id, dataURL, filesStore);
         savedFiles.set(id, true);
-      } catch (error) {
-        console.error(error);
-        erroredFiles.set(id, true);
-      }
-    }
-
-    // delete obsolete files
-    for (const [id] of removedFiles) {
-      try {
-        del(id, filesStore);
       } catch (error) {
         console.error(error);
         erroredFiles.set(id, true);
@@ -341,12 +342,17 @@ const ExcalidrawWrapper = () => {
             ).then(({ loadedFiles }) => {
               excalidrawAPI.setFiles(loadedFiles);
             });
-          } else if (imageIds.length) {
-            localFileStorage.getFiles(imageIds).then(({ loadedFiles }) => {
-              if (loadedFiles.length) {
-                excalidrawAPI.setFiles(loadedFiles);
-              }
-            });
+          } else {
+            if (imageIds.length) {
+              localFileStorage.getFiles(imageIds).then(({ loadedFiles }) => {
+                if (loadedFiles.length) {
+                  excalidrawAPI.setFiles(loadedFiles);
+                }
+              });
+            }
+            // on fresh load, clear unused files from IDB (from previous
+            // session)
+            clearObsoleteFilesFromIndexedDB({ currentFileIds: imageIds });
           }
         }
 
