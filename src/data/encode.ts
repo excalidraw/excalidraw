@@ -136,15 +136,71 @@ type FileEncodingInfo = {
 /** how many bytes we use to encode how many bytes the next chunk has.
  * Corresponds to DataView setter methods (setUint32, setUint16, etc).
  *
- * NOTE ! values must not be changed, which would be backwards incompat change !
+ * NOTE ! values must not be changed, which would be backwards incompatible !
  */
 const NEXT_CHUNK_SIZE_DATAVIEW_BYTES = 4;
-const CHUNKS_COUNT_DATAVIEW_BYTES = 1;
+const CHUNKS_COUNT_DATAVIEW_BYTES = 2;
+// -----------------------------------------------------------------------------
+
+// getter
+function dataView(buffer: Uint8Array, bytes: 1 | 2 | 4, offset: number): number;
+// setter
+function dataView(
+  buffer: Uint8Array,
+  bytes: 1 | 2 | 4,
+  offset: number,
+  value: number,
+): Uint8Array;
+/**
+ * abstraction over DataView that serves as a typed getter/setter in case
+ * you're using constants for the byte size and want to ensure there's no
+ * discrepenancy in the encoding across refactors.
+ *
+ * DataView serves for an endian-agnostic handling of numbers in ArrayBuffers.
+ */
+function dataView(
+  buffer: Uint8Array,
+  bytes: 1 | 2 | 4,
+  offset: number,
+  value?: number,
+): Uint8Array | number {
+  const bits = { 1: 8, 2: 16, 4: 32 } as const;
+  if (value != null) {
+    if (value > Math.pow(2, bits[bytes]) - 1) {
+      throw new Error(
+        `attempting to set value higher than the allocated bytes (value: ${value}, bytes: ${bytes})`,
+      );
+    }
+    const method = `setUint${bits[bytes]}` as const;
+    new DataView(buffer.buffer)[method](offset, value);
+    return buffer;
+  }
+  const method = `getUint${bits[bytes]}` as const;
+  return new DataView(buffer.buffer)[method](offset);
+}
+
 // -----------------------------------------------------------------------------
 
 /**
- * @param buffers each buffer must be at most 2^32 bytes large (~4MB), except
- * the last chunk which can be of any size
+ * Resulting concatenated buffer has this format:
+ *
+ * [
+ *   COUNT chunk (number of DATA chunks — i.e. excludes this and LENGTH chunks)
+ *   LENGTH chunk 1 (4 bytes)
+ *   DATA chunk 1 (up to by 2^32 bytes)
+ *   LENGTH chunk 2 (4 bytes)
+ *   DATA chunk 2 (up to by 2^32 bytes)
+ *   ...
+ *   LENGTH chunk N-1 (4 bytes)
+ *   DATA chunk N-1 (up to by 2^32 bytes)
+ *   DATA chunk N (any size)
+ * ]
+ *
+ * The last chunk doesn't need to have a length header because the COUNT chunk
+ * tells us whether we're reading the last chunk or not.
+ *
+ * @param buffers each buffer (chunk) must be at most 2^32 bytes large (~4MB),
+ * except the last chunk which can be of any size
  */
 const concatBuffers = (...buffers: Uint8Array[]) => {
   const bufferView = new Uint8Array(
@@ -155,16 +211,20 @@ const concatBuffers = (...buffers: Uint8Array[]) => {
 
   let cursor = 0;
 
-  // first byte will tell us how many chunks we should expect
-  new DataView(bufferView.buffer).setUint8(cursor, buffers.length);
+  // as the first chunk we'll encode how many chunks will follow
+  dataView(bufferView, CHUNKS_COUNT_DATAVIEW_BYTES, cursor, buffers.length);
   cursor += CHUNKS_COUNT_DATAVIEW_BYTES;
 
   let i = 0;
   for (const buffer of buffers) {
     i++;
     if (i < buffers.length) {
-      // must be Uint32 to correspond to the HEADER_SIZE_INFO_BYTES size of 4B
-      new DataView(bufferView.buffer).setUint32(cursor, buffer.byteLength);
+      dataView(
+        bufferView,
+        NEXT_CHUNK_SIZE_DATAVIEW_BYTES,
+        cursor,
+        buffer.byteLength,
+      );
       cursor += NEXT_CHUNK_SIZE_DATAVIEW_BYTES;
     }
 
@@ -181,14 +241,21 @@ const splitBuffers = (concatenatedBuffer: Uint8Array) => {
 
   let cursor = 0;
 
-  const bufferCount = new DataView(concatenatedBuffer.buffer).getUint8(cursor);
+  // first chunk tells us how many other chunks there are
+  const chunkCount = dataView(
+    concatenatedBuffer,
+    CHUNKS_COUNT_DATAVIEW_BYTES,
+    cursor,
+  );
   cursor += CHUNKS_COUNT_DATAVIEW_BYTES;
 
   let i = 0;
   while (true) {
     i++;
-    if (i < bufferCount) {
-      const chunkSize = new DataView(concatenatedBuffer.buffer).getUint32(
+    if (i < chunkCount) {
+      const chunkSize = dataView(
+        concatenatedBuffer,
+        NEXT_CHUNK_SIZE_DATAVIEW_BYTES,
         cursor,
       );
       cursor += NEXT_CHUNK_SIZE_DATAVIEW_BYTES;
@@ -221,6 +288,7 @@ const _compress = async <K extends string>(
   return deflated;
 };
 
+/** @returns concatenated chunk, see `concatBuffers()` */
 export const compressData = async <T extends Record<string, any> = never>(
   data: Uint8Array,
   options?: {
@@ -232,7 +300,6 @@ export const compressData = async <T extends Record<string, any> = never>(
         metadata?: T;
       }
     : {
-        /** ~4MB limit, but make it small (it won't be compressed)  */
         metadata: T;
       }),
 ): Promise<Uint8Array> => {
