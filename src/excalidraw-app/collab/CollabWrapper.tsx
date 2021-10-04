@@ -134,7 +134,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
         return saveFilesToFirebase({
           prefix: `${FIREBASE_STORAGE_PREFIXES.collabFiles}/${roomId}`,
-          decryptionKey: roomKey,
+          encryptionKey: roomKey,
           files: addedFiles,
           maxBytes: FILE_UPLOAD_MAX_BYTES,
           allowedTypes: ["image/png", "image/jpeg", "image/svg"],

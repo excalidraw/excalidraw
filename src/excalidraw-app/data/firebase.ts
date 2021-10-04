@@ -1,9 +1,4 @@
-import {
-  arrayBufferToDataURL,
-  dataURLToBlob,
-  encryptData,
-  getImportedKey,
-} from "../data";
+import { getImportedKey } from "../data";
 import { createIV } from "./index";
 import { ExcalidrawElement, ImageId } from "../../element/types";
 import { getSceneVersion } from "../../element";
@@ -11,6 +6,7 @@ import Portal from "../collab/Portal";
 import { restoreElements } from "../../data/restore";
 import { BinaryFileData, DataURL } from "../../types";
 import { FILE_CACHE_MAX_AGE_SEC } from "../app_constants";
+import { compressData, decompressData } from "../../data/encode";
 
 // private
 // -----------------------------------------------------------------------------
@@ -145,55 +141,76 @@ export const isSavedToFirebase = (
   return true;
 };
 
+const getDataURLMimeType = (dataURL: DataURL): string => {
+  return dataURL.split(",")[0].split(":")[1].split(";")[0];
+};
+
+const getFileTypeFromMimeType = (mimeType: string): BinaryFileData["type"] => {
+  return mimeType.includes("image/") ? "image" : "other";
+};
+
+type BinaryFileMetadata = Omit<BinaryFileData, "dataURL">;
+
 export const saveFilesToFirebase = async ({
   prefix,
-  decryptionKey,
+  encryptionKey,
   files,
   allowedTypes,
   maxBytes,
 }: {
   prefix: string;
-  decryptionKey: string;
+  encryptionKey: string;
   files: Map<ImageId, DataURL>;
   allowedTypes: string[];
   maxBytes: number;
 }) => {
   const firebase = await loadFirebaseStorage();
   const filesToUpload = [...files].map(([id, dataURL]) => {
-    const blob = dataURLToBlob(dataURL);
+    const mimeType = getDataURLMimeType(dataURL);
 
-    if (!allowedTypes.includes(blob.type)) {
+    if (!allowedTypes.includes(mimeType)) {
       throw new Error("Disallowed file type.");
     }
 
-    if (blob.size > maxBytes) {
+    const bufferView = new TextEncoder().encode(dataURL);
+
+    if (bufferView.byteLength > maxBytes) {
       throw new Error(`File cannot be larger than ${maxBytes / 1024} kB.`);
     }
 
-    return { blob, id };
+    return { bufferView, id, mimeType };
   });
 
   const erroredFiles = new Map<ImageId, true>();
   const savedFiles = new Map<ImageId, true>();
 
   await Promise.all(
-    filesToUpload.map(async ({ blob, id }) => {
-      const encryptedData = await encryptData(decryptionKey, blob);
+    filesToUpload.map(async ({ id, bufferView, mimeType }) => {
+      const encodedFile = await compressData<BinaryFileMetadata>(bufferView, {
+        encryptionKey,
+        metadata: {
+          id,
+          type: mimeType.includes("image/") ? "image" : "other",
+          created: Date.now(),
+        },
+      });
       try {
         await firebase
           .storage()
           .ref(`${prefix}/${id}`)
           .put(
-            new Blob([encryptedData.iv, encryptedData.blob], {
-              type: blob.type,
+            new Blob([new Uint8Array(encodedFile)], {
+              type: mimeType,
             }),
             {
               cacheControl: `public, max-age=${FILE_CACHE_MAX_AGE_SEC}`,
+              // this is Firebase Storage file metadata, not encoded into the
+              // file itself
               customMetadata: {
                 data: JSON.stringify({
                   version: 1,
                   filename: id,
-                  type: blob.type,
+                  type: mimeType,
                 }),
                 created: Date.now().toString(),
               },
@@ -207,22 +224,6 @@ export const saveFilesToFirebase = async ({
   );
 
   return { savedFiles, erroredFiles };
-};
-
-const decryptData = async (
-  iv: ArrayBuffer,
-  encrypted: ArrayBuffer,
-  privateKey: string,
-): Promise<ArrayBuffer> => {
-  const key = await getImportedKey(privateKey, "decrypt");
-  return window.crypto.subtle.decrypt(
-    {
-      name: "AES-GCM",
-      iv,
-    },
-    key,
-    encrypted,
-  );
 };
 
 export const saveToFirebase = async (
@@ -323,27 +324,27 @@ export const loadFilesFromFirebase = async (
         }/o/${encodeURIComponent(prefix.replace(/^\//, ""))}%2F${id}`;
         const response = await fetch(`${url}?alt=media`);
         if (response.status < 400) {
-          const contentType =
-            response.headers.get("content-type") || "image/png";
           const arrayBuffer = await response.arrayBuffer();
 
-          const KEY_LENGTH = 12;
-
-          const iv = arrayBuffer.slice(0, KEY_LENGTH);
-          const encrypted = arrayBuffer.slice(
-            KEY_LENGTH,
-            arrayBuffer.byteLength,
+          const { data, metadata } = await decompressData<BinaryFileMetadata>(
+            new Uint8Array(arrayBuffer),
+            {
+              decryptionKey,
+            },
           );
 
-          const decrypted = await decryptData(iv, encrypted, decryptionKey);
-
-          const dataURL = await arrayBufferToDataURL(decrypted, contentType);
+          const dataURL = new TextDecoder().decode(data) as DataURL;
 
           loadedFiles.push({
-            type: contentType.includes("image/") ? "image" : "other",
+            type:
+              metadata?.type ||
+              getFileTypeFromMimeType(
+                response.headers.get("content-type") ||
+                  getDataURLMimeType(dataURL),
+              ),
             id,
             dataURL,
-            created: Date.now(), // FIXME temporary
+            created: metadata?.created || Date.now(),
           });
         }
       } catch (error) {

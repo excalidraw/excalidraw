@@ -24,9 +24,12 @@ const exportToExcalidrawPlus = async (
     serializeAsJSON(elements, appState, "database"),
   );
 
-  const blob = new Blob([encryptedData.iv, encryptedData.blob], {
-    type: "application/octet-stream",
-  });
+  const blob = new Blob(
+    [encryptedData.iv, new Uint8Array(encryptedData.encryptedBuffer)],
+    {
+      type: "application/octet-stream",
+    },
+  );
 
   await firebase
     .storage()
