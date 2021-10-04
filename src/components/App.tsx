@@ -4092,116 +4092,112 @@ class App extends React.Component<AppProps, AppState> {
         actionToggleStats,
       ];
 
-      ContextMenu.push({
-        options: viewModeOptions,
-        top,
-        left,
-        actionManager: this.actionManager,
-        appState: this.state,
-        container: this.excalidrawContainerRef.current!,
-      });
-
       if (this.state.viewModeEnabled) {
-        return;
-      }
-
-      ContextMenu.push({
-        options: [
-          this.isMobile &&
-            navigator.clipboard && {
-              name: "paste",
-              perform: (elements, appStates) => {
-                this.pasteFromClipboard(null);
-                return {
-                  commitToHistory: false,
-                };
+        ContextMenu.push({
+          options: viewModeOptions,
+          top,
+          left,
+          actionManager: this.actionManager,
+          appState: this.state,
+          container: this.excalidrawContainerRef.current!,
+        });
+      } else {
+        ContextMenu.push({
+          options: [
+            this.isMobile &&
+              navigator.clipboard && {
+                name: "paste",
+                perform: (elements, appStates) => {
+                  this.pasteFromClipboard(null);
+                  return {
+                    commitToHistory: false,
+                  };
+                },
+                contextItemLabel: "labels.paste",
               },
-              contextItemLabel: "labels.paste",
-            },
-          this.isMobile && navigator.clipboard && separator,
-          probablySupportsClipboardBlob &&
-            elements.length > 0 &&
-            actionCopyAsPng,
-          probablySupportsClipboardWriteText &&
-            elements.length > 0 &&
-            actionCopyAsSvg,
-          ((probablySupportsClipboardBlob && elements.length > 0) ||
-            (probablySupportsClipboardWriteText && elements.length > 0)) &&
+            this.isMobile && navigator.clipboard && separator,
+            probablySupportsClipboardBlob &&
+              elements.length > 0 &&
+              actionCopyAsPng,
+            probablySupportsClipboardWriteText &&
+              elements.length > 0 &&
+              actionCopyAsSvg,
+            ((probablySupportsClipboardBlob && elements.length > 0) ||
+              (probablySupportsClipboardWriteText && elements.length > 0)) &&
+              separator,
+            actionSelectAll,
             separator,
-          actionSelectAll,
-          separator,
-          typeof this.props.gridModeEnabled === "undefined" &&
-            actionToggleGridMode,
-          typeof this.props.zenModeEnabled === "undefined" &&
-            actionToggleZenMode,
-          typeof this.props.viewModeEnabled === "undefined" &&
-            actionToggleViewMode,
-          actionToggleStats,
-        ],
-        top,
-        left,
-        actionManager: this.actionManager,
-        appState: this.state,
-        container: this.excalidrawContainerRef.current!,
-      });
-      return;
+            typeof this.props.gridModeEnabled === "undefined" &&
+              actionToggleGridMode,
+            typeof this.props.zenModeEnabled === "undefined" &&
+              actionToggleZenMode,
+            typeof this.props.viewModeEnabled === "undefined" &&
+              actionToggleViewMode,
+            actionToggleStats,
+          ],
+          top,
+          left,
+          actionManager: this.actionManager,
+          appState: this.state,
+          container: this.excalidrawContainerRef.current!,
+        });
+      }
+    } else if (type === "element") {
+      if (this.state.viewModeEnabled) {
+        ContextMenu.push({
+          options: [navigator.clipboard && actionCopy, ...options],
+          top,
+          left,
+          actionManager: this.actionManager,
+          appState: this.state,
+          container: this.excalidrawContainerRef.current!,
+        });
+      } else {
+        ContextMenu.push({
+          options: [
+            this.isMobile && actionCut,
+            this.isMobile && navigator.clipboard && actionCopy,
+            this.isMobile &&
+              navigator.clipboard && {
+                name: "paste",
+                perform: (elements, appStates) => {
+                  this.pasteFromClipboard(null);
+                  return {
+                    commitToHistory: false,
+                  };
+                },
+                contextItemLabel: "labels.paste",
+              },
+            this.isMobile && separator,
+            ...options,
+            separator,
+            actionCopyStyles,
+            actionPasteStyles,
+            separator,
+            maybeGroupAction && actionGroup,
+            maybeUngroupAction && actionUngroup,
+            (maybeGroupAction || maybeUngroupAction) && separator,
+            actionAddToLibrary,
+            separator,
+            actionSendBackward,
+            actionBringForward,
+            actionSendToBack,
+            actionBringToFront,
+            separator,
+            maybeFlipHorizontal && actionFlipHorizontal,
+            maybeFlipVertical && actionFlipVertical,
+            (maybeFlipHorizontal || maybeFlipVertical) && separator,
+            actionDuplicateSelection,
+            actionDeleteSelected,
+          ],
+          top,
+          left,
+          actionManager: this.actionManager,
+          appState: this.state,
+          container: this.excalidrawContainerRef.current!,
+        });
+      }
     }
-
-    if (this.state.viewModeEnabled) {
-      ContextMenu.push({
-        options: [navigator.clipboard && actionCopy, ...options],
-        top,
-        left,
-        actionManager: this.actionManager,
-        appState: this.state,
-        container: this.excalidrawContainerRef.current!,
-      });
-      return;
-    }
-
-    ContextMenu.push({
-      options: [
-        this.isMobile && actionCut,
-        this.isMobile && navigator.clipboard && actionCopy,
-        this.isMobile &&
-          navigator.clipboard && {
-            name: "paste",
-            perform: (elements, appStates) => {
-              this.pasteFromClipboard(null);
-              return {
-                commitToHistory: false,
-              };
-            },
-            contextItemLabel: "labels.paste",
-          },
-        this.isMobile && separator,
-        ...options,
-        separator,
-        actionCopyStyles,
-        actionPasteStyles,
-        separator,
-        maybeGroupAction && actionGroup,
-        maybeUngroupAction && actionUngroup,
-        (maybeGroupAction || maybeUngroupAction) && separator,
-        actionAddToLibrary,
-        separator,
-        actionSendBackward,
-        actionBringForward,
-        actionSendToBack,
-        actionBringToFront,
-        separator,
-        maybeFlipHorizontal && actionFlipHorizontal,
-        maybeFlipVertical && actionFlipVertical,
-        (maybeFlipHorizontal || maybeFlipVertical) && separator,
-        actionDuplicateSelection,
-        actionDeleteSelected,
-      ],
-      top,
-      left,
-      actionManager: this.actionManager,
-      appState: this.state,
-      container: this.excalidrawContainerRef.current!,
-    });
   };
 
   private handleWheel = withBatchedUpdates((event: WheelEvent) => {
