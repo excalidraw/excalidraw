@@ -2,13 +2,13 @@ import React from "react";
 import { Card } from "../../components/Card";
 import { ToolButton } from "../../components/ToolButton";
 import { serializeAsJSON } from "../../data/json";
-import { generateEncryptionKey, encryptData } from "../data";
 import { loadFirebaseStorage } from "../data/firebase";
 import { NonDeletedExcalidrawElement } from "../../element/types";
 import { AppState } from "../../types";
 import { nanoid } from "nanoid";
 import { t } from "../../i18n";
 import { excalidrawPlusIcon } from "./icons";
+import { encryptData, generateEncryptionKey } from "../../data/encryption";
 
 const exportToExcalidrawPlus = async (
   elements: readonly NonDeletedExcalidrawElement[],

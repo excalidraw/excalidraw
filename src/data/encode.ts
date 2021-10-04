@@ -1,5 +1,5 @@
 import { deflate, inflate } from "pako";
-import { decryptData, encryptData } from "../excalidraw-app/data";
+import { encryptData, decryptData } from "./encryption";
 
 // -----------------------------------------------------------------------------
 // byte (binary) strings

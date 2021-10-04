@@ -1,5 +1,3 @@
-import { getImportedKey } from "../data";
-import { createIV } from "./index";
 import { ExcalidrawElement, ImageId } from "../../element/types";
 import { getSceneVersion } from "../../element";
 import Portal from "../collab/Portal";
@@ -7,6 +5,7 @@ import { restoreElements } from "../../data/restore";
 import { BinaryFileData, DataURL } from "../../types";
 import { FILE_CACHE_MAX_AGE_SEC } from "../app_constants";
 import { compressData, decompressData } from "../../data/encode";
+import { getImportedKey, createIV } from "../../data/encryption";
 
 // private
 // -----------------------------------------------------------------------------
