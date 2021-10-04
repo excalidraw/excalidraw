@@ -1,5 +1,5 @@
-const path = require("path");
 const webpack = require("webpack");
+const path = require("path");
 const autoprefixer = require("autoprefixer");
 
 module.exports = {
@@ -26,7 +26,9 @@ module.exports = {
         exclude: /node_modules/,
         use: [
           "style-loader",
-          { loader: "css-loader" },
+          {
+            loader: "css-loader",
+          },
           {
             loader: "postcss-loader",
             options: {
@@ -49,19 +51,28 @@ module.exports = {
               configFile: path.resolve(__dirname, "../tsconfig.dev.json"),
             },
           },
+          {
+            loader: "babel-loader",
+            options: {
+              presets: [
+                "@babel/preset-env",
+                "@babel/preset-react",
+                "@babel/preset-typescript",
+              ],
+              plugins: [
+                "@babel/plugin-proposal-object-rest-spread",
+                "@babel/plugin-transform-arrow-functions",
+                "transform-class-properties",
+                "@babel/plugin-transform-async-to-generator",
+                "@babel/plugin-transform-runtime",
+              ],
+            },
+          },
         ],
       },
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/,
-        use: [
-          {
-            loader: "file-loader",
-            options: {
-              name: "[name].[ext]",
-              outputPath: "excalidraw-assets-dev",
-            },
-          },
-        ],
+        type: "asset/inline",
       },
     ],
   },
@@ -76,7 +87,10 @@ module.exports = {
       },
     },
   },
-  plugins: [new webpack.EvalSourceMapDevToolPlugin({ exclude: /vendor/ })],
+  plugins: [
+    new webpack.EvalSourceMapDevToolPlugin({ exclude: /vendor/ }),
+    /*new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 }),*/
+  ],
   externals: {
     react: {
       root: "React",
