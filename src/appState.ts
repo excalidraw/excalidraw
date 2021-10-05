@@ -5,6 +5,7 @@ import {
   DEFAULT_TEXT_ALIGN,
   EXPORT_SCALES,
 } from "./constants";
+import { isInitializedImageElement } from "./element/typeChecks";
 import { ExcalidrawElement } from "./element/types";
 import { t } from "./i18n";
 import { AppState, NormalizedZoomValue } from "./types";
@@ -197,9 +198,8 @@ const _clearAppStateForStorage = <ExportType extends "export" | "browser">(
         );
         for (const element of elements) {
           if (
-            element.type === "image" &&
             !element.isDeleted &&
-            element.imageId &&
+            isInitializedImageElement(element) &&
             currFiles[element.imageId]
           ) {
             nextFiles[element.imageId] = currFiles[element.imageId];

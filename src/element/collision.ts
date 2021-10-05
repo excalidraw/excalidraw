@@ -31,6 +31,7 @@ import { Point } from "../types";
 import { Drawable } from "roughjs/bin/core";
 import { AppState } from "../types";
 import { getShapeForElement } from "../renderer/renderElement";
+import { isImageElement } from "./typeChecks";
 
 const isElementDraggableFromInside = (
   element: NonDeletedExcalidrawElement,
@@ -48,7 +49,7 @@ const isElementDraggableFromInside = (
   if (element.type === "line") {
     return isDraggableFromInside && isPathALoop(element.points);
   }
-  return isDraggableFromInside || element.type === "image";
+  return isDraggableFromInside || isImageElement(element);
 };
 
 export const hitTest = (

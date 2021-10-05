@@ -5,7 +5,11 @@ import { getSelectedElements } from "../scene";
 
 import "./HintViewer.scss";
 import { AppState } from "../types";
-import { isLinearElement, isTextElement } from "../element/typeChecks";
+import {
+  isImageElement,
+  isLinearElement,
+  isTextElement,
+} from "../element/typeChecks";
 import { getShortcutKey } from "../utils";
 
 interface Hint {
@@ -41,7 +45,7 @@ const getHints = ({ appState, elements }: Hint) => {
     if (isLinearElement(targetElement) && targetElement.points.length === 2) {
       return t("hints.lockAngle");
     }
-    return selectedElements[0].type === "image"
+    return isImageElement(targetElement)
       ? t("hints.resizeImage")
       : t("hints.resize");
   }

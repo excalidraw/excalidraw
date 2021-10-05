@@ -116,6 +116,7 @@ import { deepCopyElement, newFreeDrawElement } from "../element/newElement";
 import {
   isBindingElement,
   isBindingElementType,
+  isImageElement,
   isInitializedImageElement,
   isLinearElement,
   isLinearElementType,
@@ -1054,7 +1055,7 @@ class App extends React.Component<AppProps, AppState> {
       cursorButton[socketId] = user.button;
     });
     const renderingElements = this.scene.getElements().filter((element) => {
-      if (element.type === "image") {
+      if (isImageElement(element)) {
         if (
           // not placed on canvas yet (but in elements array)
           this.state.pendingImageElement &&
@@ -3629,7 +3630,7 @@ class App extends React.Component<AppProps, AppState> {
 
         return;
       }
-      if (draggingElement?.type === "image") {
+      if (isImageElement(draggingElement)) {
         const imageElement = draggingElement;
         try {
           this.initializeImageDimensions(imageElement);
@@ -4443,7 +4444,7 @@ class App extends React.Component<AppProps, AppState> {
         gridY,
         distance(pointerDownState.originInGrid.x, gridX),
         distance(pointerDownState.originInGrid.y, gridY),
-        draggingElement.type === "image"
+        isImageElement(draggingElement)
           ? !shouldMaintainAspectRatio(event)
           : shouldMaintainAspectRatio(event),
         shouldResizeFromCenter(event),
@@ -4484,7 +4485,7 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.resize.arrowDirection,
         shouldRotateWithDiscreteAngle(event),
         shouldResizeFromCenter(event),
-        selectedElements.length === 1 && selectedElements[0].type === "image"
+        selectedElements.length === 1 && isImageElement(selectedElements[0])
           ? !shouldMaintainAspectRatio(event)
           : shouldMaintainAspectRatio(event),
         resizeX,
