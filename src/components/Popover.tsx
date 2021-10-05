@@ -24,13 +24,22 @@ export const Popover = ({
     if (fitInViewport && popoverRef.current) {
       const element = popoverRef.current;
       const { x, y, width, height } = element.getBoundingClientRect();
+      const { innerWidth: viewportWidth, innerHeight: viewportHeight } = window;
 
-      const viewportWidth = window.innerWidth;
-      if (x + width > viewportWidth) {
+      //Resize to fit viewport on smaller screens
+      if (height >= viewportHeight) {
+        element.style.height = `${viewportHeight}px`;
+        element.style.top = "0px";
+      }
+      if (width >= viewportWidth) {
+        element.style.width = `${viewportWidth}px`;
+        element.style.left = "0px";
+      }
+      //Position correctly when clicked on rightmost part or the bottom part of viewport
+      if (x + width > viewportWidth && width < viewportWidth) {
         element.style.left = `${viewportWidth - width}px`;
       }
-      const viewportHeight = window.innerHeight;
-      if (y + height > viewportHeight) {
+      if (y + height > viewportHeight && height < viewportHeight) {
         element.style.top = `${viewportHeight - height}px`;
       }
     }

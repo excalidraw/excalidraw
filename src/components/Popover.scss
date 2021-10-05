@@ -1,6 +1,7 @@
 .excalidraw {
   .popover {
     position: absolute;
+    overflow: auto;
     z-index: 10;
   }
 }
