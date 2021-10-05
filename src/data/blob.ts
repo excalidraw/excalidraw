@@ -201,6 +201,7 @@ export const generateIdFromFile = async (file: File) => {
         .join("") as ImageId;
   } catch (error) {
     console.error(error);
+    // length 40 to align with the HEX length of SHA-1 (which is 160 bit)
     id = nanoid(40) as ImageId;
   }
 
