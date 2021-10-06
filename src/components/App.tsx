@@ -686,7 +686,7 @@ class App extends React.Component<AppProps, AppState> {
       if (initialData?.libraryItems) {
         this.libraryItemsFromStorage = initialData.libraryItems;
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
       initialData = {
         appState: {
@@ -1400,7 +1400,7 @@ class App extends React.Component<AppProps, AppState> {
         await webShareTargetCache.delete("shared-file");
         window.history.replaceState(null, APP_NAME, window.location.pathname);
       }
-    } catch (error) {
+    } catch (error: any) {
       this.setState({ errorMessage: error.message });
     }
   };
@@ -3494,6 +3494,7 @@ class App extends React.Component<AppProps, AppState> {
         mutateElement(draggingElement, {
           points: [...points, [dx, dy]],
           pressures,
+          lastCommittedPoint: [dx, dy],
         });
 
         this.actionManager.executeAction(actionFinalize);
@@ -3839,7 +3840,7 @@ class App extends React.Component<AppProps, AppState> {
             // but can be safely ignored on older releases.
             const item = event.dataTransfer.items[0];
             (file as any).handle = await (item as any).getAsFileSystemHandle();
-          } catch (error) {
+          } catch (error: any) {
             console.warn(error.name, error.message);
           }
         }
@@ -3859,7 +3860,7 @@ class App extends React.Component<AppProps, AppState> {
         });
         return;
       }
-    } catch (error) {
+    } catch (error: any) {
       return this.setState({
         isLoading: false,
         errorMessage: error.message,
@@ -3899,7 +3900,7 @@ class App extends React.Component<AppProps, AppState> {
           // but can be safely ignored on older releases.
           const item = event.dataTransfer.items[0];
           (file as any).handle = await (item as any).getAsFileSystemHandle();
-        } catch (error) {
+        } catch (error: any) {
           console.warn(error.name, error.message);
         }
       }
