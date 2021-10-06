@@ -208,16 +208,6 @@ export const saveFilesToFirebase = async ({
             }),
             {
               cacheControl: `public, max-age=${FILE_CACHE_MAX_AGE_SEC}`,
-              // this is Firebase Storage file metadata, not encoded into the
-              // file itself
-              customMetadata: {
-                data: JSON.stringify({
-                  version: 1,
-                  filename: id,
-                  type: mimeType,
-                }),
-                created: Date.now().toString(),
-              },
             },
           );
         savedFiles.set(id, true);
