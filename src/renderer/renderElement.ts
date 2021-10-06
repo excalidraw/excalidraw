@@ -839,5 +839,5 @@ function getSvgPathFromStroke(points: number[][]): string {
       ["M", points[0], "Q"],
     )
     .join(" ")
-    .replaceAll(TO_FIXED_PRECISION, "$1");
+    .replace(TO_FIXED_PRECISION, "$1");
 }
