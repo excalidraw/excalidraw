@@ -25,14 +25,19 @@ const _loadFirebase = async () => {
     await import(/* webpackChunkName: "firebase" */ "firebase/app")
   ).default;
 
-  // due to dev HMR
   if (!isFirebaseInitialized) {
-    isFirebaseInitialized = true;
     try {
       firebase.initializeApp(FIREBASE_CONFIG);
     } catch (error) {
-      console.warn(error.name, error.code);
+      // trying initialize again throws. Usually this is harmless, and happens
+      // mainly in dev (HMR)
+      if (error.code === "app/duplicate-app") {
+        console.warn(error.name, error.code);
+      } else {
+        throw error;
+      }
     }
+    isFirebaseInitialized = true;
   }
 
   return firebase;
