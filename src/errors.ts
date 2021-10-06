@@ -13,6 +13,6 @@ export class CanvasError extends Error {
 
 export class AbortError extends DOMException {
   constructor(message: string = "Request Aborted") {
-    super(message);
+    super(message, "AbortError");
   }
 }
