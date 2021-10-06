@@ -38,7 +38,10 @@ import { getStroke, StrokeOptions } from "perfect-freehand";
 
 const defaultAppState = getDefaultAppState();
 
-const isUnloadedImage = (element: ExcalidrawElement, sceneState: SceneState) =>
+const isPendingImageElement = (
+  element: ExcalidrawElement,
+  sceneState: SceneState,
+) =>
   isInitializedImageElement(element) &&
   !sceneState.imageCache.get(element.imageId);
 
@@ -121,7 +124,7 @@ const generateElementCanvas = (
   if (
     sceneState.theme === "dark" &&
     isInitializedImageElement(element) &&
-    !isUnloadedImage(element, sceneState)
+    !isPendingImageElement(element, sceneState)
   ) {
     context.filter = THEME_FILTER;
   }
@@ -578,14 +581,14 @@ const drawElementFromCanvas = (
   const cx = ((x1 + x2) / 2 + sceneState.scrollX) * window.devicePixelRatio;
   const cy = ((y1 + y2) / 2 + sceneState.scrollY) * window.devicePixelRatio;
 
-  const _isUnloadedImage = isUnloadedImage(element, sceneState);
+  const _isPendingImageElement = isPendingImageElement(element, sceneState);
 
   const scaleXFactor =
-    "scale" in elementWithCanvas.element && !_isUnloadedImage
+    "scale" in elementWithCanvas.element && !_isPendingImageElement
       ? elementWithCanvas.element.scale[0]
       : 1;
   const scaleYFactor =
-    "scale" in elementWithCanvas.element && !_isUnloadedImage
+    "scale" in elementWithCanvas.element && !_isPendingImageElement
       ? elementWithCanvas.element.scale[1]
       : 1;
 
