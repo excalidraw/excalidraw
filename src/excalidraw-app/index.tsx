@@ -108,21 +108,23 @@ const localFileStorage = new FileSync({
     const savedFiles = new Map<ImageId, true>();
     const erroredFiles = new Map<ImageId, true>();
 
-    for (const [id, dataURL] of addedFiles) {
-      try {
-        const data: BinaryFileData = {
-          id,
-          dataURL,
-          type: "image",
-          created: Date.now(),
-        };
-        set(id, data, filesStore);
-        savedFiles.set(id, true);
-      } catch (error) {
-        console.error(error);
-        erroredFiles.set(id, true);
-      }
-    }
+    await Promise.all(
+      [...addedFiles].map(async ([id, dataURL]) => {
+        try {
+          const data: BinaryFileData = {
+            id,
+            dataURL,
+            type: "image",
+            created: Date.now(),
+          };
+          await set(id, data, filesStore);
+          savedFiles.set(id, true);
+        } catch (error) {
+          console.error(error);
+          erroredFiles.set(id, true);
+        }
+      }),
+    );
 
     return { savedFiles, erroredFiles };
   },
