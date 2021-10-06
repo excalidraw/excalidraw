@@ -288,7 +288,14 @@ const _compress = async <K extends string>(
   return deflated;
 };
 
-/** @returns concatenated chunk, see `concatBuffers()` */
+// Format of the returned Uint8Array buffer.
+// `[]` represents a buffer chunk. Some chunks are nested.
+//
+// [
+//   /* encodingMetadata */ [ data ]
+//   /* contentsMetadata */ [ [iv] [data] ]
+//   /* contents */         [ [iv] [data] ]
+// ]
 export const compressData = async <T extends Record<string, any> = never>(
   data: Uint8Array,
   options?: {
@@ -309,16 +316,22 @@ export const compressData = async <T extends Record<string, any> = never>(
     encryption: options?.encryptionKey ? "AES-GCM" : null,
   };
 
-  const bufferMetadata = new TextEncoder().encode(JSON.stringify(fileInfo));
+  const encodingMetadataBuffer = new TextEncoder().encode(
+    JSON.stringify(fileInfo),
+  );
 
-  const metadataBuffer = await _compress(
+  const contentsMetadataBuffer = await _compress(
     JSON.stringify(options?.metadata || null),
     options?.encryptionKey,
   );
 
   const contentsBuffer = await _compress(data, options?.encryptionKey);
 
-  return concatBuffers(bufferMetadata, metadataBuffer, contentsBuffer);
+  return concatBuffers(
+    encodingMetadataBuffer,
+    contentsMetadataBuffer,
+    contentsBuffer,
+  );
 };
 
 /** @private */
@@ -342,20 +355,22 @@ export const decompressData = async <T extends Record<string, any>>(
   bufferView: Uint8Array,
   options?: { decryptionKey: string },
 ) => {
-  let [metadataBuffer, contentsMetadataBuffer, contentsBuffer] = splitBuffers(
-    bufferView,
+  let [
+    encodingMetadataBuffer,
+    contentsMetadataBuffer,
+    contentsBuffer,
+  ] = splitBuffers(bufferView);
+
+  const encodingMetadata: FileEncodingInfo = JSON.parse(
+    new TextDecoder().decode(encodingMetadataBuffer),
   );
 
-  const metadata: FileEncodingInfo = JSON.parse(
-    new TextDecoder().decode(metadataBuffer),
-  );
-
-  if (options?.decryptionKey && !metadata.encryption) {
+  if (options?.decryptionKey && !encodingMetadata.encryption) {
     throw new Error(
       "`options.decryptionKey` was supplied but the data is not encrypted.",
     );
   }
-  if (metadata.encryption && !options?.decryptionKey) {
+  if (encodingMetadata.encryption && !options?.decryptionKey) {
     throw new Error(
       "The data is encrypted but `options.decryptionKey` was not supplied.",
     );
