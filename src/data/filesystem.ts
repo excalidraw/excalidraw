@@ -74,7 +74,7 @@ export const fileOpen = <M extends boolean | undefined = false>(opts: {
         }
       };
       requestAnimationFrame(() => {
-        document.addEventListener(EVENT.FOCUS, focusHandler);
+        window.addEventListener(EVENT.FOCUS, focusHandler);
       });
       const interval = window.setInterval(() => {
         checkForFile();
@@ -82,7 +82,7 @@ export const fileOpen = <M extends boolean | undefined = false>(opts: {
       return (rejectPromise) => {
         clearInterval(interval);
         scheduleRejection.cancel();
-        document.removeEventListener(EVENT.FOCUS, focusHandler);
+        window.removeEventListener(EVENT.FOCUS, focusHandler);
         document.removeEventListener(EVENT.KEYUP, scheduleRejection);
         document.removeEventListener(EVENT.POINTER_UP, scheduleRejection);
         if (rejectPromise) {
