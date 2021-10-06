@@ -9,7 +9,7 @@ import { EVENT, MIME_TYPES } from "../constants";
 import { AbortError } from "../errors";
 import { debounce } from "../utils";
 
-type FILE_TYPE =
+type FILE_EXTENSION =
   | "jpg"
   | "png"
   | "svg"
@@ -17,7 +17,7 @@ type FILE_TYPE =
   | "excalidraw"
   | "excalidrawlib";
 
-const FILE_TYPE_TO_MIME_TYPE: Record<FILE_TYPE, string> = {
+const FILE_TYPE_TO_MIME_TYPE: Record<FILE_EXTENSION, string> = {
   jpg: "image/jpeg",
   png: "image/png",
   svg: "image/svg+xml",
@@ -29,7 +29,7 @@ const FILE_TYPE_TO_MIME_TYPE: Record<FILE_TYPE, string> = {
 const INPUT_CHANGE_INTERVAL_MS = 500;
 
 export const fileOpen = <M extends boolean | undefined = false>(opts: {
-  extensions?: FILE_TYPE[];
+  extensions?: FILE_EXTENSION[];
   description?: string;
   multiple?: M;
 }): Promise<
@@ -101,7 +101,7 @@ export const fileSave = (
     /** supply without the extension */
     name: string;
     /** file extension */
-    fileType: FILE_TYPE;
+    extension: FILE_EXTENSION;
     description?: string;
     /** existing FileSystemHandle */
     fileHandle?: FileSystemHandle | null;
@@ -110,9 +110,9 @@ export const fileSave = (
   return _fileSave(
     blob,
     {
-      fileName: `${opts.name}.${opts.fileType}`,
+      fileName: `${opts.name}.${opts.extension}`,
       description: opts.description,
-      extensions: [`.${opts.fileType}`],
+      extensions: [`.${opts.extension}`],
     },
     opts.fileHandle,
   );

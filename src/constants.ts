@@ -85,7 +85,7 @@ export const GRID_SIZE = 20; // TODO make it configurable?
 export const MIME_TYPES = {
   excalidraw: "application/vnd.excalidraw+json",
   excalidrawlib: "application/vnd.excalidrawlib+json",
-};
+} as const;
 
 export const EXPORT_DATA_TYPES = {
   excalidraw: "excalidraw",

@@ -39,7 +39,7 @@ export const saveAsJSON = async (
 
   const fileHandle = await fileSave(blob, {
     name: appState.name,
-    fileType: "excalidraw",
+    extension: "excalidraw",
     description: "Excalidraw file",
     fileHandle: isImageFileHandle(appState.fileHandle)
       ? null
@@ -106,7 +106,7 @@ export const saveLibraryAsJSON = async (library: Library) => {
     }),
     {
       name: "library",
-      fileType: "excalidrawlib",
+      extension: "excalidrawlib",
       description: "Excalidraw library file",
     },
   );

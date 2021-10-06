@@ -50,7 +50,7 @@ export const exportCanvas = async (
         new Blob([tempSvg.outerHTML], { type: "image/svg+xml" }),
         {
           name,
-          fileType: "svg",
+          extension: "svg",
           fileHandle,
         },
       );
@@ -82,7 +82,7 @@ export const exportCanvas = async (
 
     return await fileSave(blob, {
       name,
-      fileType: "png",
+      extension: "png",
       fileHandle,
     });
   } else if (type === "clipboard") {
