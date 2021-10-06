@@ -7,6 +7,7 @@ import {
 } from "@dwelle/browser-fs-access";
 import { EVENT, MIME_TYPES } from "../constants";
 import { AbortError } from "../errors";
+import { debounce } from "../utils";
 
 type FILE_TYPE =
   | "jpg"
@@ -57,26 +58,37 @@ export const fileOpen = <M extends boolean | undefined = false>(opts: {
     extensions,
     mimeTypes,
     multiple: opts.multiple ?? false,
-    legacySetup: (resolve, rejectHandler, input) => {
-      requestAnimationFrame(() => {
-        document.addEventListener(EVENT.KEYUP, rejectHandler);
-        document.addEventListener(EVENT.POINTER_UP, rejectHandler);
-      });
-      const interval = window.setInterval(() => {
+    legacySetup: (resolve, reject, input) => {
+      const scheduleRejection = debounce(reject, INPUT_CHANGE_INTERVAL_MS);
+      const focusHandler = () => {
+        checkForFile();
+        document.addEventListener(EVENT.KEYUP, scheduleRejection);
+        document.addEventListener(EVENT.POINTER_UP, scheduleRejection);
+        scheduleRejection();
+      };
+      const checkForFile = () => {
         // this hack might not work when expecting multiple files
         if (input.files?.length) {
           const ret = opts.multiple ? [...input.files] : input.files[0];
           resolve(ret as RetType);
         }
+      };
+      requestAnimationFrame(() => {
+        document.addEventListener(EVENT.FOCUS, focusHandler);
+      });
+      const interval = window.setInterval(() => {
+        checkForFile();
       }, INPUT_CHANGE_INTERVAL_MS);
-      return (reject) => {
+      return (rejectPromise) => {
         clearInterval(interval);
-        document.removeEventListener(EVENT.KEYUP, rejectHandler);
-        document.removeEventListener(EVENT.POINTER_UP, rejectHandler);
-        if (reject) {
+        scheduleRejection.cancel();
+        document.removeEventListener(EVENT.FOCUS, focusHandler);
+        document.removeEventListener(EVENT.KEYUP, scheduleRejection);
+        document.removeEventListener(EVENT.POINTER_UP, scheduleRejection);
+        if (rejectPromise) {
           // so that something is shown in console if we need to debug this
           console.warn("Opening the file was canceled (legacy-fs).");
-          reject(new AbortError());
+          rejectPromise(new AbortError());
         }
       };
     },
