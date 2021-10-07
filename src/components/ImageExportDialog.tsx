@@ -15,10 +15,10 @@ import { clipboard, exportImage } from "./icons";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import "./ExportDialog.scss";
-import { supported as fsSupported } from "browser-fs-access";
 import OpenColor from "open-color";
 import { CheckboxItem } from "./CheckboxItem";
 import { DEFAULT_EXPORT_PADDING } from "../constants";
+import { nativeFileSystemSupported } from "../data/filesystem";
 
 const supportsContextFilters =
   "filter" in document.createElement("canvas").getContext("2d")!;
@@ -182,7 +182,8 @@ const ImageExportModal = ({
           margin: ".6em 0",
         }}
       >
-        {!fsSupported && actionManager.renderAction("changeProjectName")}
+        {!nativeFileSystemSupported &&
+          actionManager.renderAction("changeProjectName")}
       </div>
       <Stack.Row gap={2} justifyContent="center" style={{ margin: "2em 0" }}>
         <ExportButton

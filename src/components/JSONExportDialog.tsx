@@ -11,7 +11,7 @@ import { actionSaveFileToDisk } from "../actions/actionExport";
 import { Card } from "./Card";
 
 import "./ExportDialog.scss";
-import { supported as fsSupported } from "browser-fs-access";
+import { nativeFileSystemSupported } from "../data/filesystem";
 
 export type ExportCB = (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -42,7 +42,8 @@ const JSONExportModal = ({
             <h2>{t("exportDialog.disk_title")}</h2>
             <div className="Card-details">
               {t("exportDialog.disk_details")}
-              {!fsSupported && actionManager.renderAction("changeProjectName")}
+              {!nativeFileSystemSupported &&
+                actionManager.renderAction("changeProjectName")}
             </div>
             <ToolButton
               className="Card-button"

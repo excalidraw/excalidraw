@@ -12,7 +12,6 @@ import { t } from "../i18n";
 import { useIsMobile } from "../components/App";
 import { KEYS } from "../keys";
 import { register } from "./register";
-import { supported as fsSupported } from "browser-fs-access";
 import { CheckboxItem } from "../components/CheckboxItem";
 import { getExportSize } from "../scene/export";
 import { DEFAULT_EXPORT_PADDING, EXPORT_SCALES } from "../constants";
@@ -20,6 +19,7 @@ import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { getNonDeletedElements } from "../element";
 import { ActiveFile } from "../components/ActiveFile";
 import { isImageFileHandle } from "../data/blob";
+import { nativeFileSystemSupported } from "../data/filesystem";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -193,7 +193,7 @@ export const actionSaveFileToDisk = register({
       title={t("buttons.saveAs")}
       aria-label={t("buttons.saveAs")}
       showAriaLabel={useIsMobile()}
-      hidden={!fsSupported}
+      hidden={!nativeFileSystemSupported}
       onClick={() => updateData(null)}
       data-testid="save-as-button"
     />

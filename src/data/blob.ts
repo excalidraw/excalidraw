@@ -1,4 +1,3 @@
-import { FileSystemHandle } from "browser-fs-access";
 import { cleanAppStateForExport } from "../appState";
 import { EXPORT_DATA_TYPES } from "../constants";
 import { clearElementsForExport } from "../element";
@@ -7,6 +6,7 @@ import { CanvasError } from "../errors";
 import { t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
 import { AppState } from "../types";
+import { FileSystemHandle } from "./filesystem";
 import { isValidExcalidrawData } from "./json";
 import { restore } from "./restore";
 import { ImportedLibraryData } from "./types";

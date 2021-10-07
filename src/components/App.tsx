@@ -2,7 +2,6 @@ import React, { useContext } from "react";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
 import clsx from "clsx";
-import { supported as fsSupported } from "browser-fs-access";
 import { nanoid } from "nanoid";
 
 import {
@@ -195,6 +194,7 @@ import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
+import { nativeFileSystemSupported } from "../data/filesystem";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
@@ -3833,7 +3833,7 @@ class App extends React.Component<AppProps, AppState> {
     try {
       const file = event.dataTransfer.files[0];
       if (file?.type === "image/png" || file?.type === "image/svg+xml") {
-        if (fsSupported) {
+        if (nativeFileSystemSupported) {
           try {
             // This will only work as of Chrome 86,
             // but can be safely ignored on older releases.
@@ -3893,7 +3893,7 @@ class App extends React.Component<AppProps, AppState> {
       // default: assume an Excalidraw file regardless of extension/MimeType
     } else {
       this.setState({ isLoading: true });
-      if (fsSupported) {
+      if (nativeFileSystemSupported) {
         try {
           // This will only work as of Chrome 86,
           // but can be safely ignored on older releases.

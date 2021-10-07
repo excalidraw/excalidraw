@@ -1062,6 +1062,11 @@
     enabled "2.0.x"
     kuler "^2.0.0"
 
+"@dwelle/browser-fs-access@0.21.1":
+  version "0.21.1"
+  resolved "https://registry.yarnpkg.com/@dwelle/browser-fs-access/-/browser-fs-access-0.21.1.tgz#46a9c1c95a8b8da3887d95136dc8c1f65830cfa7"
+  integrity sha512-ryAWrTdFgB2IjUooBcKz2bSrVsAUqtjctLK6ByFGbqx7qxk+kqpjA4J54uiMcbvaJ17N/cYeserA6uxBIWIdsg==
+
 "@eslint/eslintrc@^0.4.0":
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/@eslint/eslintrc/-/eslintrc-0.4.0.tgz#99cc0a0584d72f1df38b900fb062ba995f395547"
@@ -3217,11 +3222,6 @@ braces@^3.0.1, braces@~3.0.2:
 brorand@^1.0.1, brorand@^1.1.0:
   version "1.1.0"
   resolved "https://registry.npmjs.org/brorand/-/brorand-1.1.0.tgz"
-
-browser-fs-access@0.20.5:
-  version "0.20.5"
-  resolved "https://registry.yarnpkg.com/browser-fs-access/-/browser-fs-access-0.20.5.tgz#16bea029f6dc14787c8b394360f32f3b8cf06f50"
-  integrity sha512-ROPZ9ZYC4gptm0JRH/DgTm9dDLzUrOksBw8VMcUm7TINyaan5KUJPkklEurl0WTapfuy5T85GSP6bRmX/BpbnA==
 
 browser-process-hrtime@^1.0.0:
   version "1.0.0"
