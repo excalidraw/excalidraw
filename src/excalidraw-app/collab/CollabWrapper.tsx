@@ -275,6 +275,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       });
       this.isCollaborating = false;
     }
+    this.lastBroadcastedOrReceivedSceneVersion = -1;
     this.portal.close();
     this.fileSync.reset();
   };
