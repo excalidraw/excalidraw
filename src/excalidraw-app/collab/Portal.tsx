@@ -12,7 +12,6 @@ import { UserIdleState } from "../../types";
 import { trackEvent } from "../../analytics";
 import { throttle } from "lodash";
 import { mutateElement } from "../../element/mutateElement";
-import { isInitializedImageElement } from "../../element/typeChecks";
 
 class Portal {
   collab: CollabWrapper;
@@ -91,7 +90,7 @@ class Portal {
   }
 
   queueFileUpload = throttle(async () => {
-    const { savedFiles } = await this.collab.fileSync.saveFiles({
+    await this.collab.fileSync.saveFiles({
       elements: this.collab.excalidrawAPI.getSceneElementsIncludingDeleted(),
       appState: this.collab.excalidrawAPI.getAppState(),
     });
@@ -100,10 +99,7 @@ class Portal {
       elements: this.collab.excalidrawAPI
         .getSceneElementsIncludingDeleted()
         .map((element) => {
-          if (
-            isInitializedImageElement(element) &&
-            savedFiles.has(element.imageId)
-          ) {
+          if (this.collab.fileSync.shouldUpdateImageElementStatus(element)) {
             // this will signal collaborators to pull image data from server
             // (using mutation instead of newElementWith otherwise it'd break
             // in-progress dragging)

@@ -15,6 +15,7 @@ import {
 import { Collaborator, Gesture } from "../../types";
 import { resolvablePromise, withBatchedUpdates } from "../../utils";
 import {
+  APP_EVENTS,
   FILE_UPLOAD_MAX_BYTES,
   FIREBASE_STORAGE_PREFIXES,
   INITIAL_SCENE_UPDATE_TIMEOUT,
@@ -51,7 +52,11 @@ import { trackEvent } from "../../analytics";
 import { isInvisiblySmallElement } from "../../element";
 import { FileSync } from "../data/FileSync";
 import { AbortError } from "../../errors";
-import { isInitializedImageElement } from "../../element/typeChecks";
+import {
+  isImageElement,
+  isInitializedImageElement,
+} from "../../element/typeChecks";
+import { mutateElement } from "../../element/mutateElement";
 
 interface CollabState {
   modalIsShown: boolean;
@@ -240,6 +245,22 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       window.history.pushState({}, APP_NAME, window.location.origin);
       this.destroySocketClient();
       trackEvent("share", "room closed");
+
+      window.dispatchEvent(new CustomEvent(APP_EVENTS.COLLAB_ROOM_CLOSE));
+
+      const elements = this.excalidrawAPI
+        .getSceneElementsIncludingDeleted()
+        .map((element) => {
+          if (isImageElement(element) && element.status !== "pending") {
+            return mutateElement(element, { status: "pending" }, false);
+          }
+          return element;
+        });
+
+      this.excalidrawAPI.updateScene({
+        elements,
+        commitToHistory: false,
+      });
     }
   };
 
@@ -255,7 +276,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       this.isCollaborating = false;
     }
     this.portal.close();
-    this.fileSync.destroy();
+    this.fileSync.reset();
   };
 
   private fetchImageFilesFromFirebase = async (scene: {
@@ -343,7 +364,12 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
         console.error(error);
       }
     } else {
-      const elements = this.excalidrawAPI.getSceneElements();
+      const elements = this.excalidrawAPI.getSceneElements().map((element) => {
+        if (isImageElement(element) && element.status !== "pending") {
+          return mutateElement(element, { status: "pending" }, false);
+        }
+        return element;
+      });
       // remove deleted elements from elements array & history to ensure we don't
       // expose potentially sensitive user data in case user manually deletes
       // existing elements (or clears scene), which would otherwise be persisted

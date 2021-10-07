@@ -3,15 +3,17 @@ import {
   ExcalidrawElement,
   ExcalidrawImageElement,
   ImageId,
+  InitializedExcalidrawImageElement,
 } from "../../element/types";
 import { AppState, BinaryFileData, DataURL } from "../../types";
 
 export class FileSync {
-  /** files marked for uploading or fetching, and thus neither operation should
-   *  be performed on them until finished */
-  pendingFiles = new Map<ExcalidrawImageElement["imageId"], true>();
-  /* files already saved to the server (either by this client or remote) */
-  savedFiles = new Map<ExcalidrawImageElement["imageId"], true>();
+  /** files being fetched */
+  private fetchingFiles = new Map<ExcalidrawImageElement["imageId"], true>();
+  /** files being saved */
+  private savingFiles = new Map<ExcalidrawImageElement["imageId"], true>();
+  /* files already saved to persistent storage */
+  private savedFiles = new Map<ExcalidrawImageElement["imageId"], true>();
 
   private _getFiles;
   private _saveFiles;
@@ -37,6 +39,21 @@ export class FileSync {
     this._saveFiles = saveFiles;
   }
 
+  /**
+   * returns whether file is already saved or being processed
+   */
+  isFileHandled = (id: ImageId) => {
+    return (
+      this.savedFiles.has(id) ||
+      this.fetchingFiles.has(id) ||
+      this.savingFiles.has(id)
+    );
+  };
+
+  isFileSaved = (id: ImageId) => {
+    return this.savedFiles.has(id);
+  };
+
   saveFiles = async ({
     elements,
     appState,
@@ -50,14 +67,13 @@ export class FileSync {
       if (
         isInitializedImageElement(element) &&
         appState.files[element.imageId] &&
-        !this.pendingFiles.has(element.imageId) &&
-        !this.savedFiles.has(element.imageId)
+        !this.isFileHandled(element.imageId)
       ) {
         addedFiles.set(
           element.imageId,
           appState.files[element.imageId].dataURL,
         );
-        this.pendingFiles.set(element.imageId, true);
+        this.savingFiles.set(element.imageId, true);
       }
     }
 
@@ -70,19 +86,15 @@ export class FileSync {
         this.savedFiles.set(fileId, true);
       }
 
-      return { savedFiles, erroredFiles };
+      return {
+        savedFiles,
+        erroredFiles,
+      };
     } finally {
       for (const [fileId] of addedFiles) {
-        this.pendingFiles.delete(fileId);
+        this.savingFiles.delete(fileId);
       }
     }
-  };
-
-  /**
-   * returns whether file is already saved or being processed
-   */
-  isFileHandled = (id: ImageId) => {
-    return this.pendingFiles.has(id) || this.savedFiles.has(id);
   };
 
   getFiles = async (ids: ImageId[]) => {
@@ -93,7 +105,7 @@ export class FileSync {
       };
     }
     for (const id of ids) {
-      this.pendingFiles.set(id, true);
+      this.fetchingFiles.set(id, true);
     }
 
     try {
@@ -106,13 +118,27 @@ export class FileSync {
       return { loadedFiles, erroredFiles };
     } finally {
       for (const id of ids) {
-        this.pendingFiles.delete(id);
+        this.fetchingFiles.delete(id);
       }
     }
   };
 
-  destroy() {
-    this.pendingFiles.clear();
+  /**
+   * helper to determine if image element status needs updating
+   */
+  shouldUpdateImageElementStatus = (
+    element: ExcalidrawElement,
+  ): element is InitializedExcalidrawImageElement => {
+    return (
+      isInitializedImageElement(element) &&
+      this.isFileSaved(element.imageId) &&
+      element.status === "pending"
+    );
+  };
+
+  reset() {
+    this.fetchingFiles.clear();
+    this.savingFiles.clear();
     this.savedFiles.clear();
   }
 }

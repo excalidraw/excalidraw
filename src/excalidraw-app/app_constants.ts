@@ -22,3 +22,7 @@ export const FIREBASE_STORAGE_PREFIXES = {
   shareLinkFiles: `/files/shareLinks`,
   collabFiles: `/files/rooms`,
 };
+
+export const APP_EVENTS = {
+  COLLAB_ROOM_CLOSE: "excalidraw:collabRoomClose",
+};

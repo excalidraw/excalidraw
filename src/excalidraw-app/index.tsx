@@ -44,6 +44,7 @@ import {
   resolvablePromise,
 } from "../utils";
 import {
+  APP_EVENTS,
   FIREBASE_STORAGE_PREFIXES,
   SAVE_TO_LOCAL_STORAGE_TIMEOUT,
 } from "./app_constants";
@@ -143,18 +144,16 @@ const saveDebounced = debounce(
   async (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
-    onFilesSaved: (savedFiles: Map<ImageId, true>) => void,
+    onFilesSaved: () => void,
   ) => {
     saveToLocalStorage(elements, appState);
 
-    const { savedFiles } = await localFileStorage.saveFiles({
+    await localFileStorage.saveFiles({
       elements,
       appState,
     });
 
-    if (savedFiles.size) {
-      onFilesSaved(savedFiles);
-    }
+    onFilesSaved();
   },
   SAVE_TO_LOCAL_STORAGE_TIMEOUT,
 );
@@ -305,6 +304,15 @@ const ExcalidrawWrapper = () => {
     setTimeout(() => {
       trackEvent("load", "version", getVersion());
     }, VERSION_TIMEOUT);
+
+    const onRoomCreate = (() => {
+      localFileStorage.reset();
+    }) as EventListener;
+
+    window.addEventListener(APP_EVENTS.COLLAB_ROOM_CLOSE, onRoomCreate);
+    return () => {
+      window.removeEventListener(APP_EVENTS.COLLAB_ROOM_CLOSE, onRoomCreate);
+    };
   }, []);
 
   const [
@@ -426,21 +434,25 @@ const ExcalidrawWrapper = () => {
     if (collabAPI?.isCollaborating()) {
       collabAPI.broadcastElements(elements);
     } else {
-      saveDebounced(elements, appState, (savedFiles) => {
+      saveDebounced(elements, appState, () => {
         if (excalidrawAPI) {
-          excalidrawAPI.updateScene({
-            elements: excalidrawAPI
-              .getSceneElementsIncludingDeleted()
-              .map((element) => {
-                if (
-                  isInitializedImageElement(element) &&
-                  savedFiles.has(element.imageId)
-                ) {
-                  return mutateElement(element, { status: "saved" }, false);
-                }
-                return element;
-              }),
-          });
+          let didChange = false;
+
+          const elements = excalidrawAPI
+            .getSceneElementsIncludingDeleted()
+            .map((element) => {
+              if (localFileStorage.shouldUpdateImageElementStatus(element)) {
+                didChange = true;
+                return mutateElement(element, { status: "saved" }, false);
+              }
+              return element;
+            });
+
+          if (didChange) {
+            excalidrawAPI.updateScene({
+              elements,
+            });
+          }
         }
       });
     }
