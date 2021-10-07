@@ -1,4 +1,3 @@
-import { fileSave, FileSystemHandle } from "@dwelle/browser-fs-access";
 import {
   copyBlobToClipboardAsPng,
   copyTextToSystemClipboard,
@@ -10,6 +9,7 @@ import { exportToCanvas, exportToSvg } from "../scene/export";
 import { ExportType } from "../scene/types";
 import { AppState } from "../types";
 import { canvasToBlob } from "./blob";
+import { fileSave, FileSystemHandle } from "./filesystem";
 import { serializeAsJSON } from "./json";
 
 export { loadFromBlob } from "./blob";
@@ -50,10 +50,10 @@ export const exportCanvas = async (
       return await fileSave(
         new Blob([tempSvg.outerHTML], { type: "image/svg+xml" }),
         {
-          fileName: `${name}.svg`,
-          extensions: [".svg"],
+          name,
+          extension: "svg",
+          fileHandle,
         },
-        fileHandle,
       );
     } else if (type === "clipboard-svg") {
       await copyTextToSystemClipboard(tempSvg.outerHTML);
@@ -72,7 +72,6 @@ export const exportCanvas = async (
   tempCanvas.remove();
 
   if (type === "png") {
-    const fileName = `${name}.png`;
     if (appState.exportEmbedScene) {
       blob = await (
         await import(/* webpackChunkName: "image" */ "./image")
@@ -82,14 +81,11 @@ export const exportCanvas = async (
       });
     }
 
-    return await fileSave(
-      blob,
-      {
-        fileName,
-        extensions: [".png"],
-      },
+    return await fileSave(blob, {
+      name,
+      extension: "png",
       fileHandle,
-    );
+    });
   } else if (type === "clipboard") {
     try {
       await copyBlobToClipboardAsPng(blob);

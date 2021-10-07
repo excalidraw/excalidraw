@@ -1,4 +1,4 @@
-import { fileOpen, fileSave } from "@dwelle/browser-fs-access";
+import { fileOpen, fileSave } from "./filesystem";
 import { cleanAppStateForExport, clearAppStateForDatabase } from "../appState";
 import { EXPORT_DATA_TYPES, EXPORT_SOURCE, MIME_TYPES } from "../constants";
 import { clearElementsForDatabase, clearElementsForExport } from "../element";
@@ -44,15 +44,14 @@ export const saveAsJSON = async (
     type: MIME_TYPES.excalidraw,
   });
 
-  const fileHandle = await fileSave(
-    blob,
-    {
-      fileName: `${appState.name}.excalidraw`,
-      description: "Excalidraw file",
-      extensions: [".excalidraw"],
-    },
-    isImageFileHandle(appState.fileHandle) ? null : appState.fileHandle,
-  );
+  const fileHandle = await fileSave(blob, {
+    name: appState.name,
+    extension: "excalidraw",
+    description: "Excalidraw file",
+    fileHandle: isImageFileHandle(appState.fileHandle)
+      ? null
+      : appState.fileHandle,
+  });
   return { fileHandle };
 };
 
@@ -108,15 +107,16 @@ export const saveLibraryAsJSON = async (library: Library) => {
     library: libraryItems,
   };
   const serialized = JSON.stringify(data, null, 2);
-  const fileName = "library.excalidrawlib";
-  const blob = new Blob([serialized], {
-    type: MIME_TYPES.excalidrawlib,
-  });
-  await fileSave(blob, {
-    fileName,
-    description: "Excalidraw library file",
-    extensions: [".excalidrawlib"],
-  });
+  await fileSave(
+    new Blob([serialized], {
+      type: MIME_TYPES.excalidrawlib,
+    }),
+    {
+      name: "library",
+      extension: "excalidrawlib",
+      description: "Excalidraw library file",
+    },
+  );
 };
 
 export const importLibraryFromJSON = async (library: Library) => {

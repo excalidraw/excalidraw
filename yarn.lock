@@ -1062,10 +1062,10 @@
     enabled "2.0.x"
     kuler "^2.0.0"
 
-"@dwelle/browser-fs-access@0.20.6":
-  version "0.20.6"
-  resolved "https://registry.yarnpkg.com/@dwelle/browser-fs-access/-/browser-fs-access-0.20.6.tgz#f423d077b6657ba9f0c3731d403101da9b7ea8ef"
-  integrity sha512-nBUkNHQ1eXBHyRMtMmyI55wKQNlInyoqT3SH90+BNHMlRzjA6v+8uThEyIwVfkNP73rqZMXZbsDeHmFzdPRSOQ==
+"@dwelle/browser-fs-access@0.21.1":
+  version "0.21.1"
+  resolved "https://registry.yarnpkg.com/@dwelle/browser-fs-access/-/browser-fs-access-0.21.1.tgz#46a9c1c95a8b8da3887d95136dc8c1f65830cfa7"
+  integrity sha512-ryAWrTdFgB2IjUooBcKz2bSrVsAUqtjctLK6ByFGbqx7qxk+kqpjA4J54uiMcbvaJ17N/cYeserA6uxBIWIdsg==
 
 "@eslint/eslintrc@^0.4.0":
   version "0.4.0"

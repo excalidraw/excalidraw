@@ -1,4 +1,3 @@
-import { FileSystemHandle } from "@dwelle/browser-fs-access";
 import { nanoid } from "nanoid";
 import { cleanAppStateForExport } from "../appState";
 import { EXPORT_DATA_TYPES } from "../constants";
@@ -8,6 +7,7 @@ import { CanvasError } from "../errors";
 import { t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
 import { AppState, DataURL } from "../types";
+import { FileSystemHandle } from "./filesystem";
 import { isValidExcalidrawData } from "./json";
 import { restore } from "./restore";
 import { ImportedLibraryData } from "./types";

@@ -2,7 +2,6 @@ import React, { useContext } from "react";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
 import clsx from "clsx";
-import { fileOpen, supported as fsSupported } from "@dwelle/browser-fs-access";
 import { nanoid } from "nanoid";
 
 import {
@@ -209,7 +208,7 @@ import {
   updateImageCache,
 } from "../element/image";
 import throttle from "lodash.throttle";
-import { AbortError } from "../errors";
+import { fileOpen, nativeFileSystemSupported } from "../data/filesystem";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
@@ -3997,33 +3996,7 @@ class App extends React.Component<AppProps, AppState> {
 
       const imageFile = await fileOpen({
         description: "Image",
-        extensions: [".jpg", ".jpeg", ".png", ".svg"],
-        mimeTypes: ["image/jpeg", "image/png", "image/svg+xml"],
-        multiple: false,
-        legacySetup: (resolve, rejectHandler, input) => {
-          const abortHandler = () => {
-            rejectHandler();
-          };
-          requestAnimationFrame(() => {
-            document.addEventListener("keyup", abortHandler);
-            document.addEventListener("click", abortHandler);
-          });
-          const interval = window.setInterval(() => {
-            if (input.files?.length) {
-              resolve(input.files[0]);
-            }
-          }, 500);
-          return (reject) => {
-            clearInterval(interval);
-            document.removeEventListener("keyup", abortHandler);
-            document.removeEventListener("click", abortHandler);
-            if (reject) {
-              // so that something is shown in console if we need to debug this
-              console.warn("Opening the file was canceled (legacy-fs).");
-              reject(new AbortError());
-            }
-          };
-        },
+        extensions: ["jpg", "png", "svg"],
       });
 
       this.setImagePreviewCursor(imageFile);
@@ -4261,7 +4234,7 @@ class App extends React.Component<AppProps, AppState> {
 
         if (file?.type === "image/png" || file?.type === "image/svg+xml") {
           try {
-            if (fsSupported) {
+            if (nativeFileSystemSupported) {
               try {
                 // This will only work as of Chrome 86,
                 // but can be safely ignored on older releases.
@@ -4343,7 +4316,7 @@ class App extends React.Component<AppProps, AppState> {
       // default: assume an Excalidraw file regardless of extension/MimeType
     } else {
       this.setState({ isLoading: true });
-      if (fsSupported) {
+      if (nativeFileSystemSupported) {
         try {
           // This will only work as of Chrome 86,
           // but can be safely ignored on older releases.
@@ -4554,116 +4527,112 @@ class App extends React.Component<AppProps, AppState> {
         actionToggleStats,
       ];
 
-      ContextMenu.push({
-        options: viewModeOptions,
-        top,
-        left,
-        actionManager: this.actionManager,
-        appState: this.state,
-        container: this.excalidrawContainerRef.current!,
-      });
-
       if (this.state.viewModeEnabled) {
-        return;
-      }
-
-      ContextMenu.push({
-        options: [
-          this.isMobile &&
-            navigator.clipboard && {
-              name: "paste",
-              perform: (elements, appStates) => {
-                this.pasteFromClipboard(null);
-                return {
-                  commitToHistory: false,
-                };
+        ContextMenu.push({
+          options: viewModeOptions,
+          top,
+          left,
+          actionManager: this.actionManager,
+          appState: this.state,
+          container: this.excalidrawContainerRef.current!,
+        });
+      } else {
+        ContextMenu.push({
+          options: [
+            this.isMobile &&
+              navigator.clipboard && {
+                name: "paste",
+                perform: (elements, appStates) => {
+                  this.pasteFromClipboard(null);
+                  return {
+                    commitToHistory: false,
+                  };
+                },
+                contextItemLabel: "labels.paste",
               },
-              contextItemLabel: "labels.paste",
-            },
-          this.isMobile && navigator.clipboard && separator,
-          probablySupportsClipboardBlob &&
-            elements.length > 0 &&
-            actionCopyAsPng,
-          probablySupportsClipboardWriteText &&
-            elements.length > 0 &&
-            actionCopyAsSvg,
-          ((probablySupportsClipboardBlob && elements.length > 0) ||
-            (probablySupportsClipboardWriteText && elements.length > 0)) &&
+            this.isMobile && navigator.clipboard && separator,
+            probablySupportsClipboardBlob &&
+              elements.length > 0 &&
+              actionCopyAsPng,
+            probablySupportsClipboardWriteText &&
+              elements.length > 0 &&
+              actionCopyAsSvg,
+            ((probablySupportsClipboardBlob && elements.length > 0) ||
+              (probablySupportsClipboardWriteText && elements.length > 0)) &&
+              separator,
+            actionSelectAll,
             separator,
-          actionSelectAll,
-          separator,
-          typeof this.props.gridModeEnabled === "undefined" &&
-            actionToggleGridMode,
-          typeof this.props.zenModeEnabled === "undefined" &&
-            actionToggleZenMode,
-          typeof this.props.viewModeEnabled === "undefined" &&
-            actionToggleViewMode,
-          actionToggleStats,
-        ],
-        top,
-        left,
-        actionManager: this.actionManager,
-        appState: this.state,
-        container: this.excalidrawContainerRef.current!,
-      });
-      return;
+            typeof this.props.gridModeEnabled === "undefined" &&
+              actionToggleGridMode,
+            typeof this.props.zenModeEnabled === "undefined" &&
+              actionToggleZenMode,
+            typeof this.props.viewModeEnabled === "undefined" &&
+              actionToggleViewMode,
+            actionToggleStats,
+          ],
+          top,
+          left,
+          actionManager: this.actionManager,
+          appState: this.state,
+          container: this.excalidrawContainerRef.current!,
+        });
+      }
+    } else if (type === "element") {
+      if (this.state.viewModeEnabled) {
+        ContextMenu.push({
+          options: [navigator.clipboard && actionCopy, ...options],
+          top,
+          left,
+          actionManager: this.actionManager,
+          appState: this.state,
+          container: this.excalidrawContainerRef.current!,
+        });
+      } else {
+        ContextMenu.push({
+          options: [
+            this.isMobile && actionCut,
+            this.isMobile && navigator.clipboard && actionCopy,
+            this.isMobile &&
+              navigator.clipboard && {
+                name: "paste",
+                perform: (elements, appStates) => {
+                  this.pasteFromClipboard(null);
+                  return {
+                    commitToHistory: false,
+                  };
+                },
+                contextItemLabel: "labels.paste",
+              },
+            this.isMobile && separator,
+            ...options,
+            separator,
+            actionCopyStyles,
+            actionPasteStyles,
+            separator,
+            maybeGroupAction && actionGroup,
+            maybeUngroupAction && actionUngroup,
+            (maybeGroupAction || maybeUngroupAction) && separator,
+            actionAddToLibrary,
+            separator,
+            actionSendBackward,
+            actionBringForward,
+            actionSendToBack,
+            actionBringToFront,
+            separator,
+            maybeFlipHorizontal && actionFlipHorizontal,
+            maybeFlipVertical && actionFlipVertical,
+            (maybeFlipHorizontal || maybeFlipVertical) && separator,
+            actionDuplicateSelection,
+            actionDeleteSelected,
+          ],
+          top,
+          left,
+          actionManager: this.actionManager,
+          appState: this.state,
+          container: this.excalidrawContainerRef.current!,
+        });
+      }
     }
-
-    if (this.state.viewModeEnabled) {
-      ContextMenu.push({
-        options: [navigator.clipboard && actionCopy, ...options],
-        top,
-        left,
-        actionManager: this.actionManager,
-        appState: this.state,
-        container: this.excalidrawContainerRef.current!,
-      });
-      return;
-    }
-
-    ContextMenu.push({
-      options: [
-        this.isMobile && actionCut,
-        this.isMobile && navigator.clipboard && actionCopy,
-        this.isMobile &&
-          navigator.clipboard && {
-            name: "paste",
-            perform: (elements, appStates) => {
-              this.pasteFromClipboard(null);
-              return {
-                commitToHistory: false,
-              };
-            },
-            contextItemLabel: "labels.paste",
-          },
-        this.isMobile && separator,
-        ...options,
-        separator,
-        actionCopyStyles,
-        actionPasteStyles,
-        separator,
-        maybeGroupAction && actionGroup,
-        maybeUngroupAction && actionUngroup,
-        (maybeGroupAction || maybeUngroupAction) && separator,
-        actionAddToLibrary,
-        separator,
-        actionSendBackward,
-        actionBringForward,
-        actionSendToBack,
-        actionBringToFront,
-        separator,
-        maybeFlipHorizontal && actionFlipHorizontal,
-        maybeFlipVertical && actionFlipVertical,
-        (maybeFlipHorizontal || maybeFlipVertical) && separator,
-        actionDuplicateSelection,
-        actionDeleteSelected,
-      ],
-      top,
-      left,
-      actionManager: this.actionManager,
-      appState: this.state,
-      container: this.excalidrawContainerRef.current!,
-    });
   };
 
   private handleWheel = withBatchedUpdates((event: WheelEvent) => {
