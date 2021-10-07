@@ -35,6 +35,10 @@ const getHints = ({ appState, elements }: Hint) => {
     return t("hints.text");
   }
 
+  if (appState.elementType === "image" && appState.pendingImageElement) {
+    return t("hints.placeImage");
+  }
+
   const selectedElements = getSelectedElements(elements, appState);
   if (
     isResizing &&
