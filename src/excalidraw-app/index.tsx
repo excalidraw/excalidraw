@@ -40,6 +40,7 @@ import {
 import {
   debounce,
   getVersion,
+  preventUnload,
   ResolvablePromise,
   resolvablePromise,
 } from "../utils";
@@ -111,6 +112,7 @@ const localFileStorage = new FileSync({
 
     await Promise.all(
       [...addedFiles].map(async ([id, dataURL]) => {
+        await new Promise((r) => setTimeout(r, 1500)); // FIXME
         try {
           const data: BinaryFileData = {
             id,
@@ -422,6 +424,28 @@ const ExcalidrawWrapper = () => {
       clearTimeout(titleTimeout);
     };
   }, [collabAPI, excalidrawAPI]);
+
+  useEffect(() => {
+    const unloadHandler = (event: BeforeUnloadEvent) => {
+      saveDebounced.flush();
+
+      if (
+        excalidrawAPI
+          ?.getSceneElements()
+          .some(
+            (element) =>
+              isInitializedImageElement(element) &&
+              element.status === "pending",
+          )
+      ) {
+        preventUnload(event);
+      }
+    };
+    window.addEventListener(EVENT.BEFORE_UNLOAD, unloadHandler);
+    return () => {
+      window.removeEventListener(EVENT.BEFORE_UNLOAD, unloadHandler);
+    };
+  }, [excalidrawAPI]);
 
   useEffect(() => {
     languageDetector.cacheUserLanguage(langCode);

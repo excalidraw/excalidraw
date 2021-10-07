@@ -445,3 +445,9 @@ export const focusNearestParent = (element: HTMLInputElement) => {
     parent = parent.parentElement;
   }
 };
+
+export const preventUnload = (event: BeforeUnloadEvent) => {
+  event.preventDefault();
+  // NOTE: modern browsers no longer allow showing a custom message here
+  event.returnValue = "";
+};

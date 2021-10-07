@@ -13,7 +13,11 @@ import {
   getSceneVersion,
 } from "../../packages/excalidraw/index";
 import { Collaborator, Gesture } from "../../types";
-import { resolvablePromise, withBatchedUpdates } from "../../utils";
+import {
+  preventUnload,
+  resolvablePromise,
+  withBatchedUpdates,
+} from "../../utils";
 import {
   APP_EVENTS,
   FILE_UPLOAD_MAX_BYTES,
@@ -198,15 +202,19 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
     if (
       this.isCollaborating &&
-      !isSavedToFirebase(this.portal, syncableElements)
+      (syncableElements.some(
+        (element) =>
+          isInitializedImageElement(element) &&
+          !element.isDeleted &&
+          element.status === "pending",
+      ) ||
+        !isSavedToFirebase(this.portal, syncableElements))
     ) {
       // this won't run in time if user decides to leave the site, but
       //  the purpose is to run in immediately after user decides to stay
       this.saveCollabRoomToFirebase(syncableElements);
 
-      event.preventDefault();
-      // NOTE: modern browsers no longer allow showing a custom message here
-      event.returnValue = "";
+      preventUnload(event);
     }
 
     if (this.isCollaborating || this.portal.roomId) {
