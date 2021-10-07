@@ -1270,6 +1270,7 @@ class App extends React.Component<AppProps, AppState> {
       } else if (data.elements) {
         this.addElementsFromPasteOrLibrary({
           elements: data.elements,
+          files: data.files,
           position: "cursor",
         });
       } else if (data.text) {
@@ -1282,6 +1283,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private addElementsFromPasteOrLibrary = (opts: {
     elements: readonly ExcalidrawElement[];
+    files?: AppState["files"];
     position: { clientX: number; clientY: number } | "cursor" | "center";
   }) => {
     const elements = restoreElements(opts.elements, null);
@@ -1345,10 +1347,18 @@ class App extends React.Component<AppProps, AppState> {
             map[element.id] = true;
             return map;
           }, {} as any),
+          files: opts.files
+            ? { ...this.state.files, ...opts.files }
+            : this.state.files,
           selectedGroupIds: {},
         },
         this.scene.getElements(),
       ),
+      () => {
+        if (opts.files) {
+          this.refreshImages();
+        }
+      },
     );
     this.selectShapeTool("selection");
   };

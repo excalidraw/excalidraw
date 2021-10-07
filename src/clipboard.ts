@@ -7,15 +7,18 @@ import { AppState } from "./types";
 import { SVG_EXPORT_TAG } from "./scene/export";
 import { tryParseSpreadsheet, Spreadsheet, VALID_SPREADSHEET } from "./charts";
 import { EXPORT_DATA_TYPES } from "./constants";
+import { isInitializedImageElement } from "./element/typeChecks";
 
 type ElementsClipboard = {
   type: typeof EXPORT_DATA_TYPES.excalidrawClipboard;
   elements: ExcalidrawElement[];
+  files: AppState["files"] | undefined;
 };
 
 export interface ClipboardData {
   spreadsheet?: Spreadsheet;
   elements?: readonly ExcalidrawElement[];
+  files?: AppState["files"];
   text?: string;
   errorMessage?: string;
 }
@@ -37,7 +40,7 @@ export const probablySupportsClipboardBlob =
 
 const clipboardContainsElements = (
   contents: any,
-): contents is { elements: ExcalidrawElement[] } => {
+): contents is { elements: ExcalidrawElement[]; files?: AppState["files"] } => {
   if (
     [
       EXPORT_DATA_TYPES.excalidraw,
@@ -54,9 +57,19 @@ export const copyToClipboard = async (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
 ) => {
+  const selectedElements = getSelectedElements(elements, appState);
   const contents: ElementsClipboard = {
     type: EXPORT_DATA_TYPES.excalidrawClipboard,
-    elements: getSelectedElements(elements, appState),
+    elements: selectedElements,
+    files: selectedElements.reduce((files, element) => {
+      if (
+        isInitializedImageElement(element) &&
+        appState.files[element.imageId]
+      ) {
+        files[element.imageId] = appState.files[element.imageId];
+      }
+      return files;
+    }, {} as AppState["files"]),
   };
   const json = JSON.stringify(contents);
   CLIPBOARD = json;
@@ -138,7 +151,10 @@ export const parseClipboard = async (
   try {
     const systemClipboardData = JSON.parse(systemClipboard);
     if (clipboardContainsElements(systemClipboardData)) {
-      return { elements: systemClipboardData.elements };
+      return {
+        elements: systemClipboardData.elements,
+        files: systemClipboardData.files,
+      };
     }
     return appClipboardData;
   } catch {
