@@ -5,7 +5,6 @@ import {
   DEFAULT_TEXT_ALIGN,
   EXPORT_SCALES,
 } from "./constants";
-import { isInitializedImageElement } from "./element/typeChecks";
 import { ExcalidrawElement } from "./element/types";
 import { t } from "./i18n";
 import { AppState, NormalizedZoomValue } from "./types";
@@ -168,6 +167,27 @@ const APP_STATE_STORAGE_CONF = (<
   pendingImageElement: { browser: false, export: false },
 });
 
+/**
+ * Strips out files which are only referenced by deleted elements
+ */
+const filterOutDeletedFiles = (
+  appState: Partial<AppState>,
+  elements: readonly ExcalidrawElement[],
+) => {
+  const nextFiles: AppState["files"] = {};
+  for (const element of elements) {
+    if (
+      !element.isDeleted &&
+      "imageId" in element &&
+      element.imageId &&
+      appState.files?.[element.imageId]
+    ) {
+      nextFiles[element.imageId] = appState.files[element.imageId];
+    }
+  }
+  return nextFiles;
+};
+
 const _clearAppStateForStorage = <ExportType extends "export" | "browser">(
   appState: Partial<AppState>,
   elements: readonly ExcalidrawElement[],
@@ -184,28 +204,8 @@ const _clearAppStateForStorage = <ExportType extends "export" | "browser">(
     if (propConfig?.[exportType]) {
       let nextValue;
 
-      // remove unused images from `appState.files`
       if (key === "files") {
-        const currFiles = appState.files || {};
-        const nextFiles = Object.values(appState.files || {}).reduce(
-          (acc, item) => {
-            if (item.type !== "image") {
-              acc[item.id] = item;
-            }
-            return acc;
-          },
-          {} as AppState["files"],
-        );
-        for (const element of elements) {
-          if (
-            !element.isDeleted &&
-            isInitializedImageElement(element) &&
-            currFiles[element.imageId]
-          ) {
-            nextFiles[element.imageId] = currFiles[element.imageId];
-          }
-        }
-        nextValue = nextFiles;
+        nextValue = filterOutDeletedFiles(appState, elements);
       } else {
         nextValue = appState[key];
       }
