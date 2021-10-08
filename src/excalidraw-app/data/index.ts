@@ -311,7 +311,6 @@ export const exportToBackend = async (
           encryptionKey: key,
           files,
           maxBytes: FILE_UPLOAD_MAX_BYTES,
-          allowedTypes: ["image/png", "image/jpeg", "image/svg"],
         });
       }
 

@@ -146,7 +146,6 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
           encryptionKey: roomKey,
           files: addedFiles,
           maxBytes: FILE_UPLOAD_MAX_BYTES,
-          allowedTypes: ["image/png", "image/jpeg", "image/svg"],
         });
       },
     });

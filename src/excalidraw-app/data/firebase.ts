@@ -159,22 +159,16 @@ export const saveFilesToFirebase = async ({
   prefix,
   encryptionKey,
   files,
-  allowedTypes,
   maxBytes,
 }: {
   prefix: string;
   encryptionKey: string;
   files: Map<ImageId, DataURL>;
-  allowedTypes: string[];
   maxBytes: number;
 }) => {
   const firebase = await loadFirebaseStorage();
   const filesToUpload = [...files].map(([id, dataURL]) => {
     const mimeType = getDataURLMimeType(dataURL);
-
-    if (!allowedTypes.includes(mimeType)) {
-      throw new Error("Disallowed file type.");
-    }
 
     const bufferView = new TextEncoder().encode(dataURL);
 
