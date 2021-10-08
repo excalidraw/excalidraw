@@ -190,15 +190,15 @@ export const saveFilesToFirebase = async ({
 
   await Promise.all(
     filesToUpload.map(async ({ id, bufferView, mimeType }) => {
-      const encodedFile = await compressData<BinaryFileMetadata>(bufferView, {
-        encryptionKey,
-        metadata: {
-          id,
-          type: mimeType.includes("image/") ? "image" : "other",
-          created: Date.now(),
-        },
-      });
       try {
+        const encodedFile = await compressData<BinaryFileMetadata>(bufferView, {
+          encryptionKey,
+          metadata: {
+            id,
+            type: mimeType.includes("image/") ? "image" : "other",
+            created: Date.now(),
+          },
+        });
         await firebase
           .storage()
           .ref(`${prefix}/${id}`)
