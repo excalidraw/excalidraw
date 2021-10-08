@@ -47,12 +47,14 @@ const byteStringToString = (byteString: string) => {
  *  due to reencoding
  */
 export const stringToBase64 = async (str: string, isByteString = false) => {
-  return isByteString ? btoa(str) : btoa(await toByteString(str));
+  return isByteString ? window.btoa(str) : window.btoa(await toByteString(str));
 };
 
 // async to align with stringToBase64
 export const base64ToString = async (base64: string, isByteString = false) => {
-  return isByteString ? atob(base64) : byteStringToString(atob(base64));
+  return isByteString
+    ? window.atob(base64)
+    : byteStringToString(window.atob(base64));
 };
 
 // -----------------------------------------------------------------------------
