@@ -123,17 +123,13 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     };
     this.portal = new Portal(this);
     this.fileSync = new FileSync({
-      getFiles: async (imageIds) => {
+      getFiles: async (fileIds) => {
         const { roomId, roomKey } = this.portal;
         if (!roomId || !roomKey) {
           throw new AbortError();
         }
 
-        return loadFilesFromFirebase(
-          `files/rooms/${roomId}`,
-          roomKey,
-          imageIds,
-        );
+        return loadFilesFromFirebase(`files/rooms/${roomId}`, roomKey, fileIds);
       },
       saveFiles: async ({ addedFiles }) => {
         const { roomId, roomKey } = this.portal;
@@ -295,12 +291,12 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       .filter((element) => {
         return (
           isInitializedImageElement(element) &&
-          !this.fileSync.isFileHandled(element.imageId) &&
+          !this.fileSync.isFileHandled(element.fileId) &&
           !element.isDeleted &&
           element.status === "saved"
         );
       })
-      .map((element) => (element as InitializedExcalidrawImageElement).imageId);
+      .map((element) => (element as InitializedExcalidrawImageElement).fileId);
 
     const { loadedFiles, erroredFiles } = await this.fileSync.getFiles(
       unfetchedImages,

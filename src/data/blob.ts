@@ -2,7 +2,7 @@ import { nanoid } from "nanoid";
 import { cleanAppStateForExport } from "../appState";
 import { EXPORT_DATA_TYPES } from "../constants";
 import { clearElementsForExport } from "../element";
-import { ExcalidrawElement, ImageId } from "../element/types";
+import { ExcalidrawElement, FileId } from "../element/types";
 import { CanvasError } from "../errors";
 import { t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
@@ -187,7 +187,7 @@ export const canvasToBlob = async (
 };
 
 export const generateIdFromFile = async (file: File) => {
-  let id: ImageId;
+  let id: FileId;
   try {
     const hashBuffer = await window.crypto.subtle.digest(
       "SHA-1",
@@ -198,11 +198,11 @@ export const generateIdFromFile = async (file: File) => {
       Array.from(new Uint8Array(hashBuffer))
         // convert to hex string
         .map((byte) => byte.toString(16).padStart(2, "0"))
-        .join("") as ImageId;
+        .join("") as FileId;
   } catch (error) {
     console.error(error);
     // length 40 to align with the HEX length of SHA-1 (which is 160 bit)
-    id = nanoid(40) as ImageId;
+    id = nanoid(40) as FileId;
   }
 
   return id;

@@ -65,7 +65,7 @@ export type ExcalidrawEllipseElement = _ExcalidrawElementBase & {
 export type ExcalidrawImageElement = _ExcalidrawElementBase &
   Readonly<{
     type: "image";
-    imageId: ImageId | null;
+    fileId: FileId | null;
     /** whether respective file is persisted */
     status: "pending" | "saved";
     /** X and Y scale factors <-1, 1>, used for image axis flipping */
@@ -74,7 +74,7 @@ export type ExcalidrawImageElement = _ExcalidrawElementBase &
 
 export type InitializedExcalidrawImageElement = MarkNonNullable<
   ExcalidrawImageElement,
-  "imageId"
+  "fileId"
 >;
 
 /**
@@ -150,4 +150,4 @@ export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
     lastCommittedPoint: Point | null;
   }>;
 
-export type ImageId = string & { _brand: "ImageId" };
+export type FileId = string & { _brand: "FileId" };

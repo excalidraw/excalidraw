@@ -64,9 +64,9 @@ export const copyToClipboard = async (
     files: selectedElements.reduce((files, element) => {
       if (
         isInitializedImageElement(element) &&
-        appState.files[element.imageId]
+        appState.files[element.fileId]
       ) {
-        files[element.imageId] = appState.files[element.imageId];
+        files[element.fileId] = appState.files[element.fileId];
       }
       return files;
     }, {} as AppState["files"]),

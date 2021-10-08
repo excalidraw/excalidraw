@@ -8,7 +8,7 @@ import { serializeAsJSON } from "../../data/json";
 import { restore } from "../../data/restore";
 import { ImportedDataState } from "../../data/types";
 import { isInitializedImageElement } from "../../element/typeChecks";
-import { ExcalidrawElement, ImageId } from "../../element/types";
+import { ExcalidrawElement, FileId } from "../../element/types";
 import { t } from "../../i18n";
 import { AppState, DataURL, UserIdleState } from "../../types";
 import { FILE_UPLOAD_MAX_BYTES } from "../app_constants";
@@ -297,13 +297,13 @@ export const exportToBackend = async (
       url.hash = `json=${json.id},${key}`;
       const urlString = url.toString();
 
-      const files = new Map<ImageId, DataURL>();
+      const files = new Map<FileId, DataURL>();
       for (const element of elements) {
         if (
           isInitializedImageElement(element) &&
-          appState.files[element.imageId]
+          appState.files[element.fileId]
         ) {
-          files.set(element.imageId, appState.files[element.imageId].dataURL);
+          files.set(element.fileId, appState.files[element.fileId].dataURL);
         }
 
         await saveFilesToFirebase({

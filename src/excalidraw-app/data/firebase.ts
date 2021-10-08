@@ -1,4 +1,4 @@
-import { ExcalidrawElement, ImageId } from "../../element/types";
+import { ExcalidrawElement, FileId } from "../../element/types";
 import { getSceneVersion } from "../../element";
 import Portal from "../collab/Portal";
 import { restoreElements } from "../../data/restore";
@@ -163,7 +163,7 @@ export const saveFilesToFirebase = async ({
 }: {
   prefix: string;
   encryptionKey: string;
-  files: Map<ImageId, DataURL>;
+  files: Map<FileId, DataURL>;
   maxBytes: number;
 }) => {
   const firebase = await loadFirebaseStorage();
@@ -179,8 +179,8 @@ export const saveFilesToFirebase = async ({
     return { bufferView, id, mimeType };
   });
 
-  const erroredFiles = new Map<ImageId, true>();
-  const savedFiles = new Map<ImageId, true>();
+  const erroredFiles = new Map<FileId, true>();
+  const savedFiles = new Map<FileId, true>();
 
   await Promise.all(
     filesToUpload.map(async ({ id, bufferView, mimeType }) => {
@@ -296,13 +296,13 @@ export const loadFromFirebase = async (
 export const loadFilesFromFirebase = async (
   prefix: string,
   decryptionKey: string,
-  filesIds: readonly ImageId[],
+  filesIds: readonly FileId[],
 ): Promise<{
   loadedFiles: BinaryFileData[];
-  erroredFiles: ImageId[];
+  erroredFiles: FileId[];
 }> => {
   const loadedFiles: BinaryFileData[] = [];
-  const erroredFiles: ImageId[] = [];
+  const erroredFiles: FileId[] = [];
 
   await Promise.all(
     [...new Set(filesIds)].map(async (id) => {

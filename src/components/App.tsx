@@ -130,7 +130,7 @@ import {
   NonDeleted,
   InitializedExcalidrawImageElement,
   ExcalidrawImageElement,
-  ImageId,
+  FileId,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -3903,17 +3903,17 @@ class App extends React.Component<AppProps, AppState> {
   }) => {
     // generate image id (by default the file digest) before any
     // resizing/compression takes place to keep it more portable
-    const imageId = await ((this.props.generateIdForFile?.(
+    const fileId = await ((this.props.generateIdForFile?.(
       imageFile,
-    ) as Promise<ImageId>) || generateIdFromFile(imageFile));
+    ) as Promise<FileId>) || generateIdFromFile(imageFile));
 
     const dataURL =
-      this.state.files[imageId]?.dataURL || (await getDataURL(imageFile));
+      this.state.files[fileId]?.dataURL || (await getDataURL(imageFile));
 
     const imageElement = mutateElement(
       _imageElement,
       {
-        imageId,
+        fileId,
       },
       false,
     ) as NonDeleted<InitializedExcalidrawImageElement>;
@@ -3924,9 +3924,9 @@ class App extends React.Component<AppProps, AppState> {
           (state) => ({
             files: {
               ...state.files,
-              [imageId]: {
+              [fileId]: {
                 type: "image",
-                id: imageId,
+                id: fileId,
                 dataURL,
                 created: Date.now(),
               },
@@ -3934,7 +3934,7 @@ class App extends React.Component<AppProps, AppState> {
           }),
           async () => {
             try {
-              if (!this.imageCache.has(imageId)) {
+              if (!this.imageCache.has(fileId)) {
                 await updateImageCache({
                   imageCache: this.imageCache,
                   imageElements: [imageElement],
@@ -4060,7 +4060,7 @@ class App extends React.Component<AppProps, AppState> {
   ) => {
     const image =
       isInitializedImageElement(imageElement) &&
-      this.imageCache.get(imageElement.imageId);
+      this.imageCache.get(imageElement.fileId);
 
     if (!image) {
       if (
@@ -4118,7 +4118,7 @@ class App extends React.Component<AppProps, AppState> {
     files: AppState["files"] = this.state.files,
   ) => {
     const uncachedImages = imageElements.filter(
-      (element) => !element.isDeleted && !this.imageCache.has(element.imageId),
+      (element) => !element.isDeleted && !this.imageCache.has(element.fileId),
     );
 
     if (uncachedImages.length) {
@@ -4415,7 +4415,7 @@ class App extends React.Component<AppProps, AppState> {
 
       const image =
         isInitializedImageElement(draggingElement) &&
-        this.imageCache.get(draggingElement.imageId);
+        this.imageCache.get(draggingElement.fileId);
       const aspectRatio = image ? image.width / image.height : null;
 
       dragNewElement(

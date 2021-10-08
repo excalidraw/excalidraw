@@ -10,7 +10,7 @@ import {
   Arrowhead,
   ChartType,
   FontFamilyValues,
-  ImageId,
+  FileId,
   ExcalidrawImageElement,
 } from "./element/types";
 import { SHAPES } from "./shapes";
@@ -49,7 +49,7 @@ export type DataURL = string & { _brand: "DataURL" };
 
 export type BinaryFileData = {
   type: "image" | "other";
-  id: ImageId;
+  id: FileId;
   dataURL: DataURL;
   created: number;
 };
@@ -277,7 +277,7 @@ export type AppClassProperties = {
   canvas: HTMLCanvasElement | null;
   focusContainer(): void;
   library: Library;
-  imageCache: Map<ImageId, HTMLImageElement>;
+  imageCache: Map<FileId, HTMLImageElement>;
 };
 
 export type PointerDownState = Readonly<{

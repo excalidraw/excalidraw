@@ -43,7 +43,7 @@ const isPendingImageElement = (
   sceneState: SceneState,
 ) =>
   isInitializedImageElement(element) &&
-  !sceneState.imageCache.get(element.imageId);
+  !sceneState.imageCache.get(element.fileId);
 
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 
@@ -205,7 +205,7 @@ const drawElementOnCanvas = (
     }
     case "image": {
       const img = isInitializedImageElement(element)
-        ? sceneState.imageCache.get(element.imageId)
+        ? sceneState.imageCache.get(element.fileId)
         : undefined;
       if (img != null) {
         context.drawImage(
@@ -812,9 +812,9 @@ export const renderElementToSvg = (
       break;
     }
     case "image": {
-      const imageData =
-        isInitializedImageElement(element) && files[element.imageId];
-      if (imageData) {
+      const fileData =
+        isInitializedImageElement(element) && files[element.fileId];
+      if (fileData) {
         const image = document.createElement("image");
 
         image.setAttribute(
@@ -826,7 +826,7 @@ export const renderElementToSvg = (
 
         image.setAttribute("width", `${Math.round(element.width)}`);
         image.setAttribute("height", `${Math.round(element.height)}`);
-        image.setAttribute("href", imageData.dataURL);
+        image.setAttribute("href", fileData.dataURL);
 
         svgRoot.appendChild(image);
       }

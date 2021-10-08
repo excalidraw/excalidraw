@@ -23,7 +23,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
 
   // casting to any because can't use `in` operator
   // (see https://github.com/microsoft/TypeScript/issues/21732)
-  const { points, imageData, imageId } = updates as any;
+  const { points, imageData, fileId } = updates as any;
 
   if (typeof points !== "undefined") {
     updates = { ...getSizeFromPoints(points), ...updates };
@@ -81,7 +81,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
     typeof updates.height !== "undefined" ||
     typeof updates.width !== "undefined" ||
     typeof imageData !== "undefined" ||
-    typeof imageId != "undefined" ||
+    typeof fileId != "undefined" ||
     typeof points !== "undefined"
   ) {
     invalidateShapeForElement(element);

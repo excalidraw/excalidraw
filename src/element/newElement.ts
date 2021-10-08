@@ -257,7 +257,7 @@ export const newImageElement = (
   return {
     ..._newElementBase<ExcalidrawImageElement>("image", opts),
     status: "pending",
-    imageId: null,
+    fileId: null,
     scale: [1, 1],
   };
 };

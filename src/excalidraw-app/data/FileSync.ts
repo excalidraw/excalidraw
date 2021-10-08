@@ -2,18 +2,18 @@ import { isInitializedImageElement } from "../../element/typeChecks";
 import {
   ExcalidrawElement,
   ExcalidrawImageElement,
-  ImageId,
+  FileId,
   InitializedExcalidrawImageElement,
 } from "../../element/types";
 import { AppState, BinaryFileData, DataURL } from "../../types";
 
 export class FileSync {
   /** files being fetched */
-  private fetchingFiles = new Map<ExcalidrawImageElement["imageId"], true>();
+  private fetchingFiles = new Map<ExcalidrawImageElement["fileId"], true>();
   /** files being saved */
-  private savingFiles = new Map<ExcalidrawImageElement["imageId"], true>();
+  private savingFiles = new Map<ExcalidrawImageElement["fileId"], true>();
   /* files already saved to persistent storage */
-  private savedFiles = new Map<ExcalidrawImageElement["imageId"], true>();
+  private savedFiles = new Map<ExcalidrawImageElement["fileId"], true>();
 
   private _getFiles;
   private _saveFiles;
@@ -23,16 +23,16 @@ export class FileSync {
     saveFiles,
   }: {
     getFiles: (
-      imageIds: ImageId[],
+      fileIds: FileId[],
     ) => Promise<{
       loadedFiles: BinaryFileData[];
-      erroredFiles: ImageId[];
+      erroredFiles: FileId[];
     }>;
     saveFiles: (data: {
-      addedFiles: Map<ImageId, DataURL>;
+      addedFiles: Map<FileId, DataURL>;
     }) => Promise<{
-      savedFiles: Map<ImageId, true>;
-      erroredFiles: Map<ImageId, true>;
+      savedFiles: Map<FileId, true>;
+      erroredFiles: Map<FileId, true>;
     }>;
   }) {
     this._getFiles = getFiles;
@@ -42,7 +42,7 @@ export class FileSync {
   /**
    * returns whether file is already saved or being processed
    */
-  isFileHandled = (id: ImageId) => {
+  isFileHandled = (id: FileId) => {
     return (
       this.savedFiles.has(id) ||
       this.fetchingFiles.has(id) ||
@@ -50,7 +50,7 @@ export class FileSync {
     );
   };
 
-  isFileSaved = (id: ImageId) => {
+  isFileSaved = (id: FileId) => {
     return this.savedFiles.has(id);
   };
 
@@ -61,19 +61,16 @@ export class FileSync {
     elements: readonly ExcalidrawElement[];
     appState: Pick<AppState, "files">;
   }) => {
-    const addedFiles: Map<ImageId, DataURL> = new Map();
+    const addedFiles: Map<FileId, DataURL> = new Map();
 
     for (const element of elements) {
       if (
         isInitializedImageElement(element) &&
-        appState.files[element.imageId] &&
-        !this.isFileHandled(element.imageId)
+        appState.files[element.fileId] &&
+        !this.isFileHandled(element.fileId)
       ) {
-        addedFiles.set(
-          element.imageId,
-          appState.files[element.imageId].dataURL,
-        );
-        this.savingFiles.set(element.imageId, true);
+        addedFiles.set(element.fileId, appState.files[element.fileId].dataURL);
+        this.savingFiles.set(element.fileId, true);
       }
     }
 
@@ -97,7 +94,7 @@ export class FileSync {
     }
   };
 
-  getFiles = async (ids: ImageId[]) => {
+  getFiles = async (ids: FileId[]) => {
     if (!ids.length) {
       return {
         loadedFiles: [],
@@ -131,7 +128,7 @@ export class FileSync {
   ): element is InitializedExcalidrawImageElement => {
     return (
       isInitializedImageElement(element) &&
-      this.isFileSaved(element.imageId) &&
+      this.isFileSaved(element.fileId) &&
       element.status === "pending"
     );
   };

@@ -7,7 +7,7 @@ import { AppState } from "../types";
 import { isInitializedImageElement } from "./typeChecks";
 import {
   ExcalidrawElement,
-  ImageId,
+  FileId,
   InitializedExcalidrawImageElement,
 } from "./types";
 
@@ -20,25 +20,25 @@ export const updateImageCache = async ({
 }: {
   imageElements: readonly InitializedExcalidrawImageElement[];
   files: AppState["files"];
-  imageCache: Map<ImageId, HTMLImageElement>;
+  imageCache: Map<FileId, HTMLImageElement>;
 }) => {
   let didUpdate = false;
 
   await Promise.all(
     imageElements.reduce((promises, element) => {
-      const imageData = files[element.imageId as string];
-      if (imageData) {
+      const fileData = files[element.fileId as string];
+      if (fileData) {
         didUpdate = true;
         return promises.concat(
           (async () => {
             const image = await new Promise<HTMLImageElement>((resolve) => {
               const image = new Image();
               image.onload = () => resolve(image);
-              image.src = imageData.dataURL;
+              image.src = fileData.dataURL;
             });
 
             // TODO limit the size of the imageCache
-            imageCache.set(element.imageId, image);
+            imageCache.set(element.fileId, image);
             invalidateShapeForElement(element);
           })(),
         );

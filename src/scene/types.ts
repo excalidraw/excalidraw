@@ -1,4 +1,4 @@
-import { ExcalidrawTextElement, ImageId } from "../element/types";
+import { ExcalidrawTextElement, FileId } from "../element/types";
 import { AppState, Zoom } from "../types";
 
 export type SceneState = {
@@ -14,7 +14,7 @@ export type SceneState = {
   remotePointerUsernames: { [id: string]: string };
   remotePointerUserStates: { [id: string]: string };
   theme: AppState["theme"];
-  imageCache: Map<ImageId, HTMLImageElement>;
+  imageCache: Map<FileId, HTMLImageElement>;
 };
 
 export type SceneScroll = {

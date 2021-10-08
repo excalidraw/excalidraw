@@ -184,11 +184,11 @@ const filterOutDeletedFiles = (
   for (const element of elements) {
     if (
       !element.isDeleted &&
-      "imageId" in element &&
-      element.imageId &&
-      appState.files?.[element.imageId]
+      "fileId" in element &&
+      element.fileId &&
+      appState.files?.[element.fileId]
     ) {
-      nextFiles[element.imageId] = appState.files[element.imageId];
+      nextFiles[element.fileId] = appState.files[element.fileId];
     }
   }
   return nextFiles;

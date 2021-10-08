@@ -22,7 +22,7 @@ import { loadFromBlob } from "../data/blob";
 import { ImportedDataState } from "../data/types";
 import {
   ExcalidrawElement,
-  ImageId,
+  FileId,
   NonDeletedExcalidrawElement,
 } from "../element/types";
 import { useCallbackRefState } from "../hooks/useCallbackRefState";
@@ -77,11 +77,11 @@ import { loadFilesFromFirebase } from "./data/firebase";
 const filesStore = createStore("files-db", "files-store");
 
 const clearObsoleteFilesFromIndexedDB = async (opts: {
-  currentFileIds: ImageId[];
+  currentFileIds: FileId[];
 }) => {
   const allIds = await keys(filesStore);
   for (const id of allIds) {
-    if (!opts.currentFileIds.includes(id as ImageId)) {
+    if (!opts.currentFileIds.includes(id as FileId)) {
       del(id, filesStore);
     }
   }
@@ -92,7 +92,7 @@ const localFileStorage = new FileSync({
     return getMany(ids, filesStore).then(
       (filesData: (BinaryFileData | undefined)[]) => {
         const loadedFiles: BinaryFileData[] = [];
-        const erroredFiles: ImageId[] = [];
+        const erroredFiles: FileId[] = [];
         filesData.forEach((data, index) => {
           const id = ids[index];
           if (data) {
@@ -107,8 +107,8 @@ const localFileStorage = new FileSync({
     );
   },
   async saveFiles({ addedFiles }) {
-    const savedFiles = new Map<ImageId, true>();
-    const erroredFiles = new Map<ImageId, true>();
+    const savedFiles = new Map<FileId, true>();
+    const erroredFiles = new Map<FileId, true>();
 
     await Promise.all(
       [...addedFiles].map(async ([id, dataURL]) => {
@@ -343,25 +343,25 @@ const ExcalidrawWrapper = () => {
               });
           }
         } else {
-          const imageIds =
+          const fileIds =
             data.scene.elements?.reduce((acc, element) => {
               if (isInitializedImageElement(element)) {
-                return acc.concat(element.imageId);
+                return acc.concat(element.fileId);
               }
               return acc;
-            }, [] as ImageId[]) || [];
+            }, [] as FileId[]) || [];
 
           if (data.isExternalScene) {
             loadFilesFromFirebase(
               `${FIREBASE_STORAGE_PREFIXES.shareLinkFiles}/${data.id}`,
               data.key,
-              imageIds,
+              fileIds,
             ).then(({ loadedFiles }) => {
               excalidrawAPI.setFiles(loadedFiles);
             });
           } else {
-            if (imageIds.length) {
-              localFileStorage.getFiles(imageIds).then(({ loadedFiles }) => {
+            if (fileIds.length) {
+              localFileStorage.getFiles(fileIds).then(({ loadedFiles }) => {
                 if (loadedFiles.length) {
                   excalidrawAPI.setFiles(loadedFiles);
                 }
@@ -369,7 +369,7 @@ const ExcalidrawWrapper = () => {
             }
             // on fresh load, clear unused files from IDB (from previous
             // session)
-            clearObsoleteFilesFromIndexedDB({ currentFileIds: imageIds });
+            clearObsoleteFilesFromIndexedDB({ currentFileIds: fileIds });
           }
         }
 
