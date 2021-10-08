@@ -10,6 +10,8 @@ $duration: 1.6s;
   margin-left: auto;
   margin-right: auto;
 
+  --spinner-color: var(--icon-fill-color);
+
   svg {
     animation: rotate $duration linear infinite;
     transform-origin: center center;
