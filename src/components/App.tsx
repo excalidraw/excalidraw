@@ -4133,7 +4133,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  /** generally you should use `renderImages()` directly if you need to render
+  /** generally you should use `refreshImages()` directly if you need to render
    * new images. This is just a failsafe  */
   private scheduleImageRefresh = throttle(() => {
     this.refreshImages();
