@@ -24,6 +24,7 @@ import { Language } from "./i18n";
 import { ClipboardData } from "./clipboard";
 import { isOverScrollBars } from "./scene";
 import { MaybeTransformHandleType } from "./element/transformHandles";
+import { FileSystemHandle } from "./data/filesystem";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -113,7 +114,7 @@ export type AppState = {
   offsetLeft: number;
 
   isLibraryOpen: boolean;
-  fileHandle: import("browser-fs-access").FileSystemHandle | null;
+  fileHandle: FileSystemHandle | null;
   collaborators: Map<string, Collaborator>;
   showStats: boolean;
   currentChartType: ChartType;
