@@ -50,10 +50,6 @@ export const stringToBase64 = async (str: string, isByteString = false) => {
   return isByteString ? btoa(str) : btoa(await toByteString(str));
 };
 
-export const toBase64 = async (data: string | Uint8Array | ArrayBuffer) => {
-  return btoa(await toByteString(data));
-};
-
 // async to align with stringToBase64
 export const base64ToString = async (base64: string, isByteString = false) => {
   return isByteString ? atob(base64) : byteStringToString(atob(base64));
