@@ -157,7 +157,8 @@
     "imageDoesNotContainScene": "Importarea imaginilor nu este acceptată în acest moment.\n\nVoiai să imporți o scenă? Această imagine nu pare să conțină date de scenă. Ai activat această opțiune pe durata exportării?",
     "cannotRestoreFromImage": "Scena nu a putut fi restaurată din acest fișier de imagine",
     "invalidSceneUrl": "Scena nu a putut fi importată din URL-ul furnizat. Este fie incorect formată, fie nu conține date JSON Excalidraw valide.",
-    "resetLibrary": "Această opțiune va elimina conținutul din bibliotecă. Confirmi?"
+    "resetLibrary": "Această opțiune va elimina conținutul din bibliotecă. Confirmi?",
+    "invalidEncryptionKey": "Cheia de criptare trebuie să aibă 22 de caractere. Colaborarea în direct este dezactivată."
   },
   "toolBar": {
     "selection": "Selecție",

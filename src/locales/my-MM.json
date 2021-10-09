@@ -157,7 +157,8 @@
     "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "ဤပုံဖြင့်မြင်ကွင်းပြန်လည်မရယူနိုင်ပါ။",
     "invalidSceneUrl": "",
-    "resetLibrary": ""
+    "resetLibrary": "",
+    "invalidEncryptionKey": ""
   },
   "toolBar": {
     "selection": "ရွေးချယ်",

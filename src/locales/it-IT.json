@@ -157,7 +157,8 @@
     "imageDoesNotContainScene": "L'importazione di immagini al momento non è supportata.\n\nVuoi importare una scena? Questa immagine non sembra contenere alcun dato di scena. Hai abilitato questa opzione durante l'esportazione?",
     "cannotRestoreFromImage": "Impossibile ripristinare la scena da questo file immagine",
     "invalidSceneUrl": "Impossibile importare la scena dall'URL fornito. Potrebbe essere malformato o non contenere dati JSON Excalidraw validi.",
-    "resetLibrary": "Questa azione cancellerà l'intera libreria. Sei sicuro?"
+    "resetLibrary": "Questa azione cancellerà l'intera libreria. Sei sicuro?",
+    "invalidEncryptionKey": "La chiave di cifratura deve essere composta da 22 caratteri. La collaborazione live è disabilitata."
   },
   "toolBar": {
     "selection": "Selezione",

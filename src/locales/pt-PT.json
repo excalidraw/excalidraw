@@ -157,7 +157,8 @@
     "imageDoesNotContainScene": "A importação de imagens não é suportada neste momento.\n\nQuer importar uma cena? Esta imagem parece não conter dados de cena. Ativou isto durante a exportação?",
     "cannotRestoreFromImage": "Não foi possível restaurar a cena deste ficheiro de imagem",
     "invalidSceneUrl": "Não foi possível importar a cena a partir do URL fornecido. Ou está mal formado ou não contém dados JSON do Excalidraw válidos.",
-    "resetLibrary": "Isto irá limpar a sua biblioteca. Tem a certeza?"
+    "resetLibrary": "Isto irá limpar a sua biblioteca. Tem a certeza?",
+    "invalidEncryptionKey": ""
   },
   "toolBar": {
     "selection": "Seleção",

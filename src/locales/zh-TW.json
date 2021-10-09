@@ -157,7 +157,8 @@
     "imageDoesNotContainScene": "目前尚不支援載入圖片。\n您是否要載入場景？此圖片中並無任何場景資料，輸出時是否有選擇包含？",
     "cannotRestoreFromImage": "無法由此檔案回復場景。",
     "invalidSceneUrl": "無法由提供的 URL 匯入場景。可能是發生異常，或未包含有效的 Excalidraw JSON 資料。",
-    "resetLibrary": "這會清除您的資料庫，是否確定？"
+    "resetLibrary": "這會清除您的資料庫，是否確定？",
+    "invalidEncryptionKey": "加密鍵必須為22字元。即時協作已停用。"
   },
   "toolBar": {
     "selection": "選取",
@@ -257,7 +258,7 @@
   },
   "encrypted": {
     "tooltip": "你的作品已使用 end-to-end 方式加密，Excalidraw 的伺服器也無法取得其內容。",
-    "link": ""
+    "link": "Excalidraw 端到端加密的相關部落格文章"
   },
   "stats": {
     "angle": "角度",

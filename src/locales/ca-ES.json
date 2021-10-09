@@ -157,7 +157,8 @@
     "imageDoesNotContainScene": "En aquest moment no s’admet la importació d’imatges.\n\nVolies importar una escena? Sembla que aquesta imatge no conté cap dada d’escena. Ho has activat durant l'exportació?",
     "cannotRestoreFromImage": "L’escena no s’ha pogut restaurar des d’aquest fitxer d’imatge",
     "invalidSceneUrl": "No s'ha pogut importar l'escena des de l'adreça URL proporcionada. Està malformada o no conté dades Excalidraw JSON vàlides.",
-    "resetLibrary": "Això buidarà la biblioteca. N'esteu segur?"
+    "resetLibrary": "Això buidarà la biblioteca. N'esteu segur?",
+    "invalidEncryptionKey": ""
   },
   "toolBar": {
     "selection": "Selecció",

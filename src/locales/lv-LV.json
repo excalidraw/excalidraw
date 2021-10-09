@@ -157,7 +157,8 @@
     "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "",
     "invalidSceneUrl": "",
-    "resetLibrary": ""
+    "resetLibrary": "",
+    "invalidEncryptionKey": ""
   },
   "toolBar": {
     "selection": "",
