@@ -157,7 +157,8 @@
     "imageDoesNotContainScene": "Importering av bilder støttes ikkje for p. t.\n\nVil du importere ein scene? Dette bildet ser ikkje ut til å inneholde noen scene-data. Har du aktivert dette under eksporten?",
     "cannotRestoreFromImage": "Scena kunne ikkje gjenopprettast frå denne biletfila",
     "invalidSceneUrl": "Kunne ikkje hente noko scene frå den URL-en. Ho er anten øydelagd eller inneheld ikkje gyldig Excalidraw JSON-data.",
-    "resetLibrary": "Dette vil fjerne alt innhald frå biblioteket. Er du sikker?"
+    "resetLibrary": "Dette vil fjerne alt innhald frå biblioteket. Er du sikker?",
+    "invalidEncryptionKey": ""
   },
   "toolBar": {
     "selection": "Vel",
