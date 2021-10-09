@@ -157,7 +157,8 @@
     "imageDoesNotContainScene": "Импортирането на картинки не се поддържва в момента.\n\nИскате да импортнете сцена? Тази картинка не съдържа данни от сцена. Разрешили ли сте последното при експортирането?",
     "cannotRestoreFromImage": "Не може да бъде възстановена сцена от този файл",
     "invalidSceneUrl": "",
-    "resetLibrary": ""
+    "resetLibrary": "",
+    "invalidEncryptionKey": ""
   },
   "toolBar": {
     "selection": "Селекция",
