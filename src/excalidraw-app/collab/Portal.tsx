@@ -103,7 +103,11 @@ class Portal {
             // this will signal collaborators to pull image data from server
             // (using mutation instead of newElementWith otherwise it'd break
             // in-progress dragging)
-            return mutateElement(element, { status: "saved" }, false);
+            return mutateElement(
+              element,
+              { status: "saved" },
+              /* informMutation */ false,
+            );
           }
           return element;
         }),

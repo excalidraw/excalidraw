@@ -370,7 +370,11 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     } else {
       const elements = this.excalidrawAPI.getSceneElements().map((element) => {
         if (isImageElement(element) && element.status !== "pending") {
-          return mutateElement(element, { status: "pending" }, false);
+          return mutateElement(
+            element,
+            { status: "pending" },
+            /* informMutation */ false,
+          );
         }
         return element;
       });

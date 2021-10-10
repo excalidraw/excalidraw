@@ -467,7 +467,11 @@ const ExcalidrawWrapper = () => {
             .map((element) => {
               if (localFileStorage.shouldUpdateImageElementStatus(element)) {
                 didChange = true;
-                return mutateElement(element, { status: "saved" }, false);
+                return mutateElement(
+                  element,
+                  { status: "saved" },
+                  /* informMutation */ false,
+                );
               }
               return element;
             });
