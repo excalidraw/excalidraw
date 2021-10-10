@@ -520,11 +520,7 @@ const generateElementShape = (
         shape = [];
         break;
       }
-      case "text": {
-        // just to ensure we don't regenerate element.canvas on rerenders
-        shape = [];
-        break;
-      }
+      case "text":
       case "image": {
         // just to ensure we don't regenerate element.canvas on rerenders
         shape = [];
