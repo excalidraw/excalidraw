@@ -146,7 +146,7 @@ export const isSavedToFirebase = (
 };
 
 const getDataURLMimeType = (dataURL: DataURL): string => {
-  return dataURL.split(",")[0].split(":")[1].split(";")[0];
+  return dataURL.match(/data:([^;]+);base64,/)?.[1] || "";
 };
 
 const getFileTypeFromMimeType = (mimeType: string): BinaryFileData["type"] => {
