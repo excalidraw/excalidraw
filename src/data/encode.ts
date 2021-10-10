@@ -185,14 +185,15 @@ function dataView(
  * Resulting concatenated buffer has this format:
  *
  * [
+ *   VERSION chunk (4 bytes)
  *   LENGTH chunk 1 (4 bytes)
- *   DATA chunk 1 (up to 2^32 bytes)
+ *   DATA chunk 1 (up to 2^32 bits)
  *   LENGTH chunk 2 (4 bytes)
- *   DATA chunk 2 (up to 2^32 bytes)
+ *   DATA chunk 2 (up to 2^32 bits)
  *   ...
  * ]
  *
- * @param buffers each buffer (chunk) must be at most 2^32 bytes large (~4GB)
+ * @param buffers each buffer (chunk) must be at most 2^32 bits large (~4GB)
  */
 const concatBuffers = (...buffers: Uint8Array[]) => {
   const bufferView = new Uint8Array(
