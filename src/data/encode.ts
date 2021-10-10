@@ -267,8 +267,21 @@ const _encryptAndCompress = async (
   return { iv, buffer: new Uint8Array(encryptedBuffer) };
 };
 
+/**
+ * The returned buffer has following format:
+ * `[]` refers to a buffers wrapper (see `concatBuffers`)
+ *
+ * [
+ *   encodingMetadataBuffer,
+ *   iv,
+ *   [
+ *      contentsMetadataBuffer
+ *      contentsBuffer
+ *   ]
+ * ]
+ */
 export const compressData = async <T extends Record<string, any> = never>(
-  data: Uint8Array,
+  dataBuffer: Uint8Array,
   options: {
     encryptionKey: string;
   } & ([T] extends [never]
@@ -289,26 +302,16 @@ export const compressData = async <T extends Record<string, any> = never>(
     JSON.stringify(fileInfo),
   );
 
-  const {
-    iv: contentsMetdataIv,
-    buffer: contentsMetadataBuffer,
-  } = await _encryptAndCompress(
-    JSON.stringify(options?.metadata || null),
+  const contentsMetadataBuffer = new TextEncoder().encode(
+    JSON.stringify(options.metadata || null),
+  );
+
+  const { iv, buffer } = await _encryptAndCompress(
+    concatBuffers(contentsMetadataBuffer, dataBuffer),
     options.encryptionKey,
   );
 
-  const { iv: contentsIv, buffer: contentsBuffer } = await _encryptAndCompress(
-    data,
-    options.encryptionKey,
-  );
-
-  return concatBuffers(
-    encodingMetadataBuffer,
-    contentsMetdataIv,
-    contentsMetadataBuffer,
-    contentsIv,
-    contentsBuffer,
-  );
+  return concatBuffers(encodingMetadataBuffer, iv, buffer);
 };
 
 /** @private */
@@ -318,12 +321,7 @@ const _decryptAndDecompress = async (
   decryptionKey: string,
 ) => {
   encryptedBuffer = new Uint8Array(
-    await decryptData(
-      // the iv was deserialized to array so we need convert it to typed array
-      iv,
-      encryptedBuffer,
-      decryptionKey,
-    ),
+    await decryptData(iv, encryptedBuffer, decryptionKey),
   );
 
   return inflate(encryptedBuffer);
@@ -334,24 +332,10 @@ export const decompressData = async <T extends Record<string, any>>(
   options: { decryptionKey: string },
 ) => {
   // first chunk is encoding metadata (ignored for now)
-  let [
-    ,
-    contentsMetdataIv,
-    contentsMetadataBuffer,
-    contentsIv,
-    contentsBuffer,
-  ] = splitBuffers(bufferView);
+  const [, iv, buffer] = splitBuffers(bufferView);
 
-  contentsMetadataBuffer = await _decryptAndDecompress(
-    contentsMetdataIv,
-    contentsMetadataBuffer,
-    options.decryptionKey,
-  );
-
-  contentsBuffer = await _decryptAndDecompress(
-    contentsIv,
-    contentsBuffer,
-    options.decryptionKey,
+  const [contentsMetadataBuffer, contentsBuffer] = splitBuffers(
+    await _decryptAndDecompress(iv, buffer, options.decryptionKey),
   );
 
   return {
