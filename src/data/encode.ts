@@ -250,34 +250,26 @@ const splitBuffers = (concatenatedBuffer: Uint8Array) => {
   return buffers;
 };
 
-/** @private */
-const _compress = async <K extends string>(
-  data: Uint8Array | string,
-  encryptionKey?: K,
-): Promise<Uint8Array> => {
-  const deflated = deflate(data);
-  if (encryptionKey) {
-    const { encryptedBuffer, iv } = await encryptData(encryptionKey, deflated);
+// helpers for (de)compressing data with JSON metadata including encryption
+// -----------------------------------------------------------------------------
 
-    return concatBuffers(iv, new Uint8Array(encryptedBuffer));
-  }
-  return deflated;
+/** @private */
+const _encryptAndCompress = async (
+  data: Uint8Array | string,
+  encryptionKey: string,
+) => {
+  const { encryptedBuffer, iv } = await encryptData(
+    encryptionKey,
+    deflate(data),
+  );
+
+  return { iv, buffer: new Uint8Array(encryptedBuffer) };
 };
 
-// Format of the returned Uint8Array buffer.
-// `[]` represents a buffer chunk. Some chunks are nested.
-//
-// [
-//   /* encodingMetadata */ [ data ]
-//   /* contentsMetadata */ [ [iv] [data] ]
-//   /* contents */         [ [iv] [data] ]
-// ]
 export const compressData = async <T extends Record<string, any> = never>(
   data: Uint8Array,
-  options?: {
-    /** if supplied, the data will be encrypted using (otherwise no
-     *  encryption will take place) */
-    encryptionKey?: string;
+  options: {
+    encryptionKey: string;
   } & ([T] extends [never]
     ? {
         metadata?: T;
@@ -289,75 +281,77 @@ export const compressData = async <T extends Record<string, any> = never>(
   const fileInfo: FileEncodingInfo = {
     version: 1,
     compression: "pako@1",
-    encryption: options?.encryptionKey ? "AES-GCM" : null,
+    encryption: "AES-GCM",
   };
 
   const encodingMetadataBuffer = new TextEncoder().encode(
     JSON.stringify(fileInfo),
   );
 
-  const contentsMetadataBuffer = await _compress(
+  const {
+    iv: contentsMetdataIv,
+    buffer: contentsMetadataBuffer,
+  } = await _encryptAndCompress(
     JSON.stringify(options?.metadata || null),
-    options?.encryptionKey,
+    options.encryptionKey,
   );
 
-  const contentsBuffer = await _compress(data, options?.encryptionKey);
+  const { iv: contentsIv, buffer: contentsBuffer } = await _encryptAndCompress(
+    data,
+    options.encryptionKey,
+  );
 
   return concatBuffers(
     encodingMetadataBuffer,
+    contentsMetdataIv,
     contentsMetadataBuffer,
+    contentsIv,
     contentsBuffer,
   );
 };
 
 /** @private */
-const _decompress = async (bufferView: Uint8Array, decryptionKey?: string) => {
-  if (decryptionKey) {
-    const [iv, encryptedBuffer] = splitBuffers(bufferView);
-    bufferView = new Uint8Array(
-      await decryptData(
-        // the iv was deserialized to array so we need convert it to typed array
-        iv,
-        encryptedBuffer,
-        decryptionKey,
-      ),
-    );
-  }
+const _decryptAndDecompress = async (
+  iv: Uint8Array,
+  encryptedBuffer: Uint8Array,
+  decryptionKey: string,
+) => {
+  encryptedBuffer = new Uint8Array(
+    await decryptData(
+      // the iv was deserialized to array so we need convert it to typed array
+      iv,
+      encryptedBuffer,
+      decryptionKey,
+    ),
+  );
 
-  return inflate(bufferView);
+  return inflate(encryptedBuffer);
 };
 
 export const decompressData = async <T extends Record<string, any>>(
   bufferView: Uint8Array,
-  options?: { decryptionKey: string },
+  options: { decryptionKey: string },
 ) => {
+  // first chunk is encoding metadata (ignored for now)
   let [
-    encodingMetadataBuffer,
+    ,
+    contentsMetdataIv,
     contentsMetadataBuffer,
+    contentsIv,
     contentsBuffer,
   ] = splitBuffers(bufferView);
 
-  const encodingMetadata: FileEncodingInfo = JSON.parse(
-    new TextDecoder().decode(encodingMetadataBuffer),
-  );
-
-  if (options?.decryptionKey && !encodingMetadata.encryption) {
-    throw new Error(
-      "`options.decryptionKey` was supplied but the data is not encrypted.",
-    );
-  }
-  if (encodingMetadata.encryption && !options?.decryptionKey) {
-    throw new Error(
-      "The data is encrypted but `options.decryptionKey` was not supplied.",
-    );
-  }
-
-  contentsMetadataBuffer = await _decompress(
+  contentsMetadataBuffer = await _decryptAndDecompress(
+    contentsMetdataIv,
     contentsMetadataBuffer,
-    options?.decryptionKey,
+    options.decryptionKey,
   );
 
-  contentsBuffer = await _decompress(contentsBuffer, options?.decryptionKey);
+  contentsBuffer = await _decryptAndDecompress(
+    contentsIv,
+    contentsBuffer,
+    options.decryptionKey,
+  );
 
   return {
     /** metadata source is always JSON so we can decode it here */
@@ -366,3 +360,5 @@ export const decompressData = async <T extends Record<string, any>>(
     data: contentsBuffer,
   };
 };
+
+// -----------------------------------------------------------------------------
