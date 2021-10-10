@@ -207,7 +207,7 @@ const drawElementOnCanvas = (
       const img = isInitializedImageElement(element)
         ? sceneState.imageCache.get(element.fileId)
         : undefined;
-      if (img != null) {
+      if (img != null && !(img instanceof Promise)) {
         context.drawImage(
           img,
           0 /* hardcoded for the selection box*/,

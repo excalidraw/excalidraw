@@ -44,7 +44,9 @@ export const exportToCanvas = async (
 
   const { imageCache } = await updateImageCache({
     imageCache: new Map(),
-    imageElements: getInitializedImageElements(elements),
+    fileIds: getInitializedImageElements(elements).map(
+      (element) => element.fileId,
+    ),
     files: appState.files,
   });
 

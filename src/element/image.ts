@@ -2,8 +2,7 @@
 // ExcalidrawImageElement helpers
 // -----------------------------------------------------------------------------
 
-import { invalidateShapeForElement } from "../renderer/renderElement";
-import { AppState } from "../types";
+import { AppClassProperties, AppState } from "../types";
 import { isInitializedImageElement } from "./typeChecks";
 import {
   ExcalidrawElement,
@@ -14,32 +13,35 @@ import {
 /** NOTE: updates cache even if already populated with given image. Thus,
  * you should filter out the images upstream if you want to optimize this. */
 export const updateImageCache = async ({
-  imageElements,
+  fileIds,
   files,
   imageCache,
 }: {
-  imageElements: readonly InitializedExcalidrawImageElement[];
+  fileIds: FileId[];
   files: AppState["files"];
-  imageCache: Map<FileId, HTMLImageElement>;
+  imageCache: AppClassProperties["imageCache"];
 }) => {
-  let didUpdate = false;
+  const updatedFiles = new Map<FileId, true>();
 
   await Promise.all(
-    imageElements.reduce((promises, element) => {
-      const fileData = files[element.fileId as string];
-      if (fileData) {
-        didUpdate = true;
+    fileIds.reduce((promises, fileId) => {
+      const fileData = files[fileId as string];
+      if (fileData && !updatedFiles.has(fileId)) {
+        updatedFiles.set(fileId, true);
         return promises.concat(
           (async () => {
-            const image = await new Promise<HTMLImageElement>((resolve) => {
+            const imagePromise = new Promise<HTMLImageElement>((resolve) => {
               const image = new Image();
-              image.onload = () => resolve(image);
+              image.onload = () => {
+                imageCache.set(fileId, image);
+                resolve(image);
+              };
               image.src = fileData.dataURL;
             });
 
             // TODO limit the size of the imageCache
-            imageCache.set(element.fileId, image);
-            invalidateShapeForElement(element);
+            imageCache.set(fileId, imagePromise);
+            await imagePromise;
           })(),
         );
       }
@@ -47,7 +49,7 @@ export const updateImageCache = async ({
     }, [] as Promise<any>[]),
   );
 
-  return { imageCache, didUpdate };
+  return { imageCache, updatedFiles };
 };
 
 export const getInitializedImageElements = (
