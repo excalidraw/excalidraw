@@ -140,6 +140,8 @@ const NEXT_CHUNK_SIZE_DATAVIEW_BYTES = 4;
 const CHUNKS_COUNT_DATAVIEW_BYTES = 2;
 // -----------------------------------------------------------------------------
 
+const DATA_VIEW_BITS_MAP = { 1: 8, 2: 16, 4: 32 } as const;
+
 // getter
 function dataView(buffer: Uint8Array, bytes: 1 | 2 | 4, offset: number): number;
 // setter
@@ -162,18 +164,17 @@ function dataView(
   offset: number,
   value?: number,
 ): Uint8Array | number {
-  const bits = { 1: 8, 2: 16, 4: 32 } as const;
   if (value != null) {
-    if (value > Math.pow(2, bits[bytes]) - 1) {
+    if (value > Math.pow(2, DATA_VIEW_BITS_MAP[bytes]) - 1) {
       throw new Error(
         `attempting to set value higher than the allocated bytes (value: ${value}, bytes: ${bytes})`,
       );
     }
-    const method = `setUint${bits[bytes]}` as const;
+    const method = `setUint${DATA_VIEW_BITS_MAP[bytes]}` as const;
     new DataView(buffer.buffer)[method](offset, value);
     return buffer;
   }
-  const method = `getUint${bits[bytes]}` as const;
+  const method = `getUint${DATA_VIEW_BITS_MAP[bytes]}` as const;
   return new DataView(buffer.buffer)[method](offset);
 }
 
