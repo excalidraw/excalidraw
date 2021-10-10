@@ -137,7 +137,6 @@ type FileEncodingInfo = {
  * NOTE ! values must not be changed, which would be backwards incompatible !
  */
 const NEXT_CHUNK_SIZE_DATAVIEW_BYTES = 4;
-const CHUNKS_COUNT_DATAVIEW_BYTES = 2;
 // -----------------------------------------------------------------------------
 
 const DATA_VIEW_BITS_MAP = { 1: 8, 2: 16, 4: 32 } as const;
@@ -184,48 +183,31 @@ function dataView(
  * Resulting concatenated buffer has this format:
  *
  * [
- *   COUNT chunk (number of DATA chunks — i.e. excludes this and LENGTH chunks)
  *   LENGTH chunk 1 (4 bytes)
- *   DATA chunk 1 (up to by 2^32 bytes)
+ *   DATA chunk 1 (up to 2^32 bytes)
  *   LENGTH chunk 2 (4 bytes)
- *   DATA chunk 2 (up to by 2^32 bytes)
+ *   DATA chunk 2 (up to 2^32 bytes)
  *   ...
- *   LENGTH chunk N-1 (4 bytes)
- *   DATA chunk N-1 (up to by 2^32 bytes)
- *   DATA chunk N (any size)
  * ]
  *
- * The last chunk doesn't need to have a length header because the COUNT chunk
- * tells us whether we're reading the last chunk or not.
- *
- * @param buffers each buffer (chunk) must be at most 2^32 bytes large (~4MB),
- * except the last chunk which can be of any size
+ * @param buffers each buffer (chunk) must be at most 2^32 bytes large (~4GB)
  */
 const concatBuffers = (...buffers: Uint8Array[]) => {
   const bufferView = new Uint8Array(
-    CHUNKS_COUNT_DATAVIEW_BYTES +
-      NEXT_CHUNK_SIZE_DATAVIEW_BYTES * Math.max(buffers.length - 1, 1) +
+    NEXT_CHUNK_SIZE_DATAVIEW_BYTES * buffers.length +
       buffers.reduce((acc, buffer) => acc + buffer.byteLength, 0),
   );
 
   let cursor = 0;
 
-  // as the first chunk we'll encode how many chunks will follow
-  dataView(bufferView, CHUNKS_COUNT_DATAVIEW_BYTES, cursor, buffers.length);
-  cursor += CHUNKS_COUNT_DATAVIEW_BYTES;
-
-  let i = 0;
   for (const buffer of buffers) {
-    i++;
-    if (i < buffers.length) {
-      dataView(
-        bufferView,
-        NEXT_CHUNK_SIZE_DATAVIEW_BYTES,
-        cursor,
-        buffer.byteLength,
-      );
-      cursor += NEXT_CHUNK_SIZE_DATAVIEW_BYTES;
-    }
+    dataView(
+      bufferView,
+      NEXT_CHUNK_SIZE_DATAVIEW_BYTES,
+      cursor,
+      buffer.byteLength,
+    );
+    cursor += NEXT_CHUNK_SIZE_DATAVIEW_BYTES;
 
     bufferView.set(buffer, cursor);
     cursor += buffer.byteLength;
@@ -240,32 +222,17 @@ const splitBuffers = (concatenatedBuffer: Uint8Array) => {
 
   let cursor = 0;
 
-  // first chunk tells us how many other chunks there are
-  const chunkCount = dataView(
-    concatenatedBuffer,
-    CHUNKS_COUNT_DATAVIEW_BYTES,
-    cursor,
-  );
-  cursor += CHUNKS_COUNT_DATAVIEW_BYTES;
-
-  let i = 0;
   while (true) {
-    i++;
-    if (i < chunkCount) {
-      const chunkSize = dataView(
-        concatenatedBuffer,
-        NEXT_CHUNK_SIZE_DATAVIEW_BYTES,
-        cursor,
-      );
-      cursor += NEXT_CHUNK_SIZE_DATAVIEW_BYTES;
+    const chunkSize = dataView(
+      concatenatedBuffer,
+      NEXT_CHUNK_SIZE_DATAVIEW_BYTES,
+      cursor,
+    );
+    cursor += NEXT_CHUNK_SIZE_DATAVIEW_BYTES;
 
-      buffers.push(concatenatedBuffer.slice(cursor, cursor + chunkSize));
-      cursor += chunkSize;
-      if (cursor >= concatenatedBuffer.byteLength) {
-        break;
-      }
-    } else {
-      buffers.push(concatenatedBuffer.slice(cursor));
+    buffers.push(concatenatedBuffer.slice(cursor, cursor + chunkSize));
+    cursor += chunkSize;
+    if (cursor >= concatenatedBuffer.byteLength) {
       break;
     }
   }
