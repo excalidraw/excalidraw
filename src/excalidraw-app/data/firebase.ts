@@ -124,7 +124,7 @@ const decryptElements = async (
   );
 
   const decodedData = new TextDecoder("utf-8").decode(
-    new Uint8Array(decrypted) as any,
+    new Uint8Array(decrypted),
   );
   return JSON.parse(decodedData);
 };
@@ -197,7 +197,7 @@ export const saveFilesToFirebase = async ({
           .storage()
           .ref(`${prefix}/${id}`)
           .put(
-            new Blob([new Uint8Array(encodedFile)], {
+            new Blob([encodedFile], {
               type: mimeType,
             }),
             {

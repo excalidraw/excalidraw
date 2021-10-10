@@ -278,7 +278,7 @@ const _compress = async <K extends string>(
   data: Uint8Array | string,
   encryptionKey?: K,
 ): Promise<Uint8Array> => {
-  const deflated = new Uint8Array(deflate(data));
+  const deflated = deflate(data);
   if (encryptionKey) {
     const { encryptedBuffer, iv } = await encryptData(encryptionKey, deflated);
 

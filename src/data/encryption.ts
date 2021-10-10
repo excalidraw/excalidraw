@@ -46,7 +46,9 @@ export const encryptData = async (
       ? new TextEncoder().encode(data)
       : data instanceof Uint8Array
       ? data
-      : new Uint8Array(await data.arrayBuffer());
+      : data instanceof Blob
+      ? await data.arrayBuffer()
+      : data;
 
   const encryptedBuffer = await window.crypto.subtle.encrypt(
     {
