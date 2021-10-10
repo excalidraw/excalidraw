@@ -16,7 +16,7 @@ let firebasePromise: Promise<
   typeof import("firebase/app").default
 > | null = null;
 let firestorePromise: Promise<any> | null | true = null;
-let firebseStoragePromise: Promise<any> | null | true = null;
+let firebaseStoragePromise: Promise<any> | null | true = null;
 
 let isFirebaseInitialized = false;
 
@@ -70,14 +70,14 @@ const loadFirestore = async () => {
 
 export const loadFirebaseStorage = async () => {
   const firebase = await _getFirebase();
-  if (!firebseStoragePromise) {
-    firebseStoragePromise = import(
+  if (!firebaseStoragePromise) {
+    firebaseStoragePromise = import(
       /* webpackChunkName: "storage" */ "firebase/storage"
     );
   }
-  if (firebseStoragePromise !== true) {
-    await firebseStoragePromise;
-    firebseStoragePromise = true;
+  if (firebaseStoragePromise !== true) {
+    await firebaseStoragePromise;
+    firebaseStoragePromise = true;
   }
   return firebase;
 };
