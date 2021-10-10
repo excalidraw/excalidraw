@@ -111,7 +111,7 @@ const encryptElements = async (
 const decryptElements = async (
   key: string,
   iv: Uint8Array,
-  ciphertext: ArrayBuffer,
+  ciphertext: ArrayBuffer | Uint8Array,
 ): Promise<readonly ExcalidrawElement[]> => {
   const importedKey = await getImportedKey(key, "decrypt");
   const decrypted = await window.crypto.subtle.decrypt(

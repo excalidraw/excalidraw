@@ -96,3 +96,14 @@ interface Blob {
 }
 
 declare module "*.scss";
+
+// ensure Uint8Array isn't assignable to ArrayBuffer
+// (due to TS structural typing)
+// https://github.com/microsoft/TypeScript/issues/31311#issuecomment-490690695
+interface ArrayBuffer {
+  private _brand?: "ArrayBuffer";
+}
+interface Uint8Array {
+  private _brand?: "Uint8Array";
+}
+// --------------------------------------------------------------------------—

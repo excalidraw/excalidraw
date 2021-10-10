@@ -112,7 +112,7 @@ export const decryptAESGEM = async (
     );
 
     const decodedData = new TextDecoder("utf-8").decode(
-      new Uint8Array(decrypted) as any,
+      new Uint8Array(decrypted),
     );
     return JSON.parse(decodedData);
   } catch (error) {
@@ -153,7 +153,7 @@ export const getCollaborationLink = (data: {
 };
 
 export const decryptImported = async (
-  iv: ArrayBuffer,
+  iv: ArrayBuffer | Uint8Array,
   encrypted: ArrayBuffer,
   privateKey: string,
 ): Promise<ArrayBuffer> => {
@@ -199,7 +199,7 @@ const importFromBackend = async (
 
       // We need to convert the decrypted array buffer to a string
       const string = new window.TextDecoder("utf-8").decode(
-        new Uint8Array(decrypted) as any,
+        new Uint8Array(decrypted),
       );
       data = JSON.parse(string);
     } else {
