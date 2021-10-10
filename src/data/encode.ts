@@ -131,11 +131,13 @@ type FileEncodingInfo = {
 };
 
 // -----------------------------------------------------------------------------
+const CONCAT_BUFFERS_VERSION = 1;
 /** how many bytes we use to encode how many bytes the next chunk has.
  * Corresponds to DataView setter methods (setUint32, setUint16, etc).
  *
  * NOTE ! values must not be changed, which would be backwards incompatible !
  */
+const VERSION_DATAVIEW_BYTES = 4;
 const NEXT_CHUNK_SIZE_DATAVIEW_BYTES = 4;
 // -----------------------------------------------------------------------------
 
@@ -194,11 +196,16 @@ function dataView(
  */
 const concatBuffers = (...buffers: Uint8Array[]) => {
   const bufferView = new Uint8Array(
-    NEXT_CHUNK_SIZE_DATAVIEW_BYTES * buffers.length +
+    VERSION_DATAVIEW_BYTES +
+      NEXT_CHUNK_SIZE_DATAVIEW_BYTES * buffers.length +
       buffers.reduce((acc, buffer) => acc + buffer.byteLength, 0),
   );
 
   let cursor = 0;
+
+  // as the first chunk we'll encode the version for backwards compatibility
+  dataView(bufferView, VERSION_DATAVIEW_BYTES, cursor, CONCAT_BUFFERS_VERSION);
+  cursor += VERSION_DATAVIEW_BYTES;
 
   for (const buffer of buffers) {
     dataView(
@@ -221,6 +228,9 @@ const splitBuffers = (concatenatedBuffer: Uint8Array) => {
   const buffers = [];
 
   let cursor = 0;
+
+  // first chunk is the version (ignored for now)
+  cursor += VERSION_DATAVIEW_BYTES;
 
   while (true) {
     const chunkSize = dataView(
