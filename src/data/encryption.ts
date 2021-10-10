@@ -41,7 +41,7 @@ export const encryptData = async (
 ): Promise<{ encryptedBuffer: ArrayBuffer; iv: Uint8Array }> => {
   const importedKey = await getImportedKey(key, "encrypt");
   const iv = createIV();
-  const ui =
+  const buffer =
     typeof data === "string"
       ? new TextEncoder().encode(data)
       : data instanceof Uint8Array
@@ -54,7 +54,7 @@ export const encryptData = async (
       iv,
     },
     importedKey,
-    ui,
+    buffer,
   );
 
   return { encryptedBuffer, iv };
