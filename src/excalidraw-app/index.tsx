@@ -45,7 +45,6 @@ import {
   resolvablePromise,
 } from "../utils";
 import {
-  APP_EVENTS,
   FIREBASE_STORAGE_PREFIXES,
   SAVE_TO_LOCAL_STORAGE_TIMEOUT,
 } from "./app_constants";
@@ -306,15 +305,6 @@ const ExcalidrawWrapper = () => {
     setTimeout(() => {
       trackEvent("load", "version", getVersion());
     }, VERSION_TIMEOUT);
-
-    const onRoomCreate = (() => {
-      localFileStorage.reset();
-    }) as EventListener;
-
-    window.addEventListener(APP_EVENTS.COLLAB_ROOM_CLOSE, onRoomCreate);
-    return () => {
-      window.removeEventListener(APP_EVENTS.COLLAB_ROOM_CLOSE, onRoomCreate);
-    };
   }, []);
 
   const [
@@ -613,6 +603,10 @@ const ExcalidrawWrapper = () => {
     localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY, serializedItems);
   };
 
+  const onRoomClose = useCallback(() => {
+    localFileStorage.reset();
+  }, []);
+
   return (
     <>
       <Excalidraw
@@ -653,7 +647,12 @@ const ExcalidrawWrapper = () => {
         onLibraryChange={onLibraryChange}
         autoFocus={true}
       />
-      {excalidrawAPI && <CollabWrapper excalidrawAPI={excalidrawAPI} />}
+      {excalidrawAPI && (
+        <CollabWrapper
+          excalidrawAPI={excalidrawAPI}
+          onRoomClose={onRoomClose}
+        />
+      )}
       {errorMessage && (
         <ErrorDialog
           message={errorMessage}

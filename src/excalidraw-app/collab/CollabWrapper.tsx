@@ -19,7 +19,6 @@ import {
   withBatchedUpdates,
 } from "../../utils";
 import {
-  APP_EVENTS,
   FILE_UPLOAD_MAX_BYTES,
   FIREBASE_STORAGE_PREFIXES,
   INITIAL_SCENE_UPDATE_TIMEOUT,
@@ -90,6 +89,7 @@ type ReconciledElements = readonly ExcalidrawElement[] & {
 
 interface Props {
   excalidrawAPI: ExcalidrawImperativeAPI;
+  onRoomClose?: () => void;
 }
 
 const {
@@ -249,7 +249,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       this.destroySocketClient();
       trackEvent("share", "room closed");
 
-      window.dispatchEvent(new CustomEvent(APP_EVENTS.COLLAB_ROOM_CLOSE));
+      this.props.onRoomClose?.();
 
       const elements = this.excalidrawAPI
         .getSceneElementsIncludingDeleted()
