@@ -4126,19 +4126,15 @@ class App extends React.Component<AppProps, AppState> {
       (imageElement.width < DRAGGING_THRESHOLD / this.state.zoom.value &&
         imageElement.height < DRAGGING_THRESHOLD / this.state.zoom.value)
     ) {
-      // some offset to account for UI
-      const offset = 160;
-
-      let width = Math.min(
-        image.naturalWidth,
-        this.state.width / this.state.zoom.value - offset,
+      const minHeight = Math.max(this.state.height - 120, 160);
+      // max 65% of canvas height, clamped to <300px, vh - 120px>
+      const maxHeight = Math.min(
+        minHeight,
+        Math.floor(this.state.height * 0.5) / this.state.zoom.value,
       );
-      let height = width * (image.naturalHeight / image.naturalWidth);
 
-      if (height > this.state.height / this.state.zoom.value - offset) {
-        height = this.state.height / this.state.zoom.value - offset;
-        width = height * (image.naturalWidth / image.naturalHeight);
-      }
+      const height = Math.min(image.naturalHeight, maxHeight);
+      const width = height * (image.naturalWidth / image.naturalHeight);
 
       // add current imageElement width/height to account for previous centering
       // of the placholder image
