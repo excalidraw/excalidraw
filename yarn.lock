@@ -1916,6 +1916,11 @@
     "@babel/runtime" "^7.12.5"
     "@testing-library/dom" "^7.28.1"
 
+"@tldraw/vec@0.0.106":
+  version "0.0.106"
+  resolved "https://registry.yarnpkg.com/@tldraw/vec/-/vec-0.0.106.tgz#34936176b314c7779a3ad897a07be7434cdbc655"
+  integrity sha512-sOI3/bEb0KbGTHb8s2lSnY+0uWEToehJXPjV9ItFEOPqRXKoKbWRUzN1OAP7AQa1FJA2/w/1oPO9Seycne6JRA==
+
 "@tootallnate/once@1":
   version "1.1.2"
   resolved "https://registry.npmjs.org/@tootallnate/once/-/once-1.1.2.tgz"
@@ -9260,10 +9265,10 @@ pepjs@0.5.3:
   version "0.5.3"
   resolved "https://registry.npmjs.org/pepjs/-/pepjs-0.5.3.tgz"
 
-perfect-freehand@1.0.6:
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/perfect-freehand/-/perfect-freehand-1.0.6.tgz#feeb25450241f036ec13b43fa84bbb16f8e78e0f"
-  integrity sha512-wWkFwpgUirsfBDTb9nG6+VnFR0ge119QKU2Nu96vR4MHZMPGfOsQRD7cUk+9CK5P+TUmnrtX8yOEzUrQ6KHJoA==
+perfect-freehand@1.0.15:
+  version "1.0.15"
+  resolved "https://registry.yarnpkg.com/perfect-freehand/-/perfect-freehand-1.0.15.tgz#d3e4769e0420c0d467c0147487a34793f0b421e7"
+  integrity sha512-uRglBAdRA/wzGTbI0F58fXOfNuDmUHq1S40u92d2oPGhO1YfEUGal7fT2g0N8gwkIwMD14ySeLroUVhs7aBBuw==
 
 performance-now@^2.1.0:
   version "2.1.0"

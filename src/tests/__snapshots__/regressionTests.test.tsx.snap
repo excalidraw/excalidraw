@@ -6707,7 +6707,10 @@ Object {
   "height": 10,
   "id": "id7",
   "isDeleted": false,
-  "lastCommittedPoint": null,
+  "lastCommittedPoint": Array [
+    50,
+    10,
+  ],
   "opacity": 100,
   "points": Array [
     Array [
@@ -8374,7 +8377,10 @@ Object {
           "height": 10,
           "id": "id7",
           "isDeleted": false,
-          "lastCommittedPoint": null,
+          "lastCommittedPoint": Array [
+            50,
+            10,
+          ],
           "opacity": 100,
           "points": Array [
             Array [
@@ -10533,7 +10539,10 @@ Object {
   "height": 10,
   "id": "id0",
   "isDeleted": false,
-  "lastCommittedPoint": null,
+  "lastCommittedPoint": Array [
+    10,
+    10,
+  ],
   "opacity": 100,
   "points": Array [
     Array [
@@ -10607,7 +10616,10 @@ Object {
           "height": 10,
           "id": "id0",
           "isDeleted": false,
-          "lastCommittedPoint": null,
+          "lastCommittedPoint": Array [
+            10,
+            10,
+          ],
           "opacity": 100,
           "points": Array [
             Array [
@@ -11637,7 +11649,10 @@ Object {
   "height": 10,
   "id": "id0",
   "isDeleted": false,
-  "lastCommittedPoint": null,
+  "lastCommittedPoint": Array [
+    10,
+    10,
+  ],
   "opacity": 100,
   "points": Array [
     Array [
@@ -11711,7 +11726,10 @@ Object {
           "height": 10,
           "id": "id0",
           "isDeleted": false,
-          "lastCommittedPoint": null,
+          "lastCommittedPoint": Array [
+            10,
+            10,
+          ],
           "opacity": 100,
           "points": Array [
             Array [

@@ -328,15 +328,15 @@ const hitTestFreeDrawElement = (
   let P: readonly [number, number];
 
   // For freedraw dots
-  if (element.points.length === 2) {
-    return (
-      distance2d(A[0], A[1], x, y) < threshold ||
-      distance2d(B[0], B[1], x, y) < threshold
-    );
+  if (
+    distance2d(A[0], A[1], x, y) < threshold ||
+    distance2d(B[0], B[1], x, y) < threshold
+  ) {
+    return true;
   }
 
   // For freedraw lines
-  for (let i = 1; i < element.points.length - 1; i++) {
+  for (let i = 0; i < element.points.length; i++) {
     const delta = [B[0] - A[0], B[1] - A[1]];
     const length = Math.hypot(delta[1], delta[0]);
 
