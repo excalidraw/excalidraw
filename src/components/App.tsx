@@ -3963,13 +3963,17 @@ class App extends React.Component<AppProps, AppState> {
           }),
           async () => {
             try {
-              if (!this.imageCache.has(fileId)) {
+              const cachedImage = this.imageCache.get(fileId);
+              if (!cachedImage) {
                 await updateImageCache({
                   imageCache: this.imageCache,
                   fileIds: [imageElement.fileId],
                   files: this.state.files,
                 });
                 invalidateShapeForElement(imageElement);
+              }
+              if (cachedImage instanceof Promise) {
+                await cachedImage;
               }
               if (
                 this.state.pendingImageElement?.id !== imageElement.id &&
