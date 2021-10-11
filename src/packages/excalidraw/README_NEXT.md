@@ -487,7 +487,7 @@ You can use this function to update the scene with the sceneData. It accepts the
 
 ### `addFiles`
 
-<pre>(files: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts">BinaryFileData</a>) => void </pre> 
+<pre>(files: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts">BinaryFileData</a>) => void </pre>
 
 Adds supplied files data to the `appState.files` cache, on top of existing files present in the cache.
 
