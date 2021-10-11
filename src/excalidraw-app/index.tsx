@@ -339,7 +339,7 @@ const ExcalidrawWrapper = () => {
                 appState: { files: data.scene.appState?.files || {} },
               })
               .then(({ loadedFiles }) => {
-                excalidrawAPI.setFiles(loadedFiles);
+                excalidrawAPI.addFiles(loadedFiles);
               });
           }
         } else {
@@ -357,13 +357,13 @@ const ExcalidrawWrapper = () => {
               data.key,
               fileIds,
             ).then(({ loadedFiles }) => {
-              excalidrawAPI.setFiles(loadedFiles);
+              excalidrawAPI.addFiles(loadedFiles);
             });
           } else {
             if (fileIds.length) {
               localFileStorage.getFiles(fileIds).then(({ loadedFiles }) => {
                 if (loadedFiles.length) {
-                  excalidrawAPI.setFiles(loadedFiles);
+                  excalidrawAPI.addFiles(loadedFiles);
                 }
               });
             }

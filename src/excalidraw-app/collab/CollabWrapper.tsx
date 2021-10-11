@@ -567,7 +567,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       appState: this.excalidrawAPI.getAppState(),
     });
 
-    this.excalidrawAPI.setFiles(loadedFiles);
+    this.excalidrawAPI.addFiles(loadedFiles);
   }, LOAD_IMAGES_TIMEOUT);
 
   private handleRemoteSceneUpdate = (

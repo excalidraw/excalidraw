@@ -302,7 +302,7 @@ class App extends React.Component<AppProps, AppState> {
         ready: true,
         readyPromise,
         updateScene: this.updateScene,
-        setFiles: this.setFiles,
+        addFiles: this.addFiles,
         resetScene: this.resetScene,
         getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
         history: {
@@ -1472,7 +1472,8 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  public setFiles: ExcalidrawImperativeAPI["setFiles"] = withBatchedUpdates(
+  /** adds supplied files to existing files in the appState */
+  public addFiles: ExcalidrawImperativeAPI["addFiles"] = withBatchedUpdates(
     (files) => {
       this.setState(
         (state) => ({
