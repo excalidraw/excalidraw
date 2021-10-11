@@ -1963,13 +1963,6 @@
   dependencies:
     "@babel/types" "^7.3.0"
 
-"@types/browser-image-compression@1.0.9":
-  version "1.0.9"
-  resolved "https://registry.yarnpkg.com/@types/browser-image-compression/-/browser-image-compression-1.0.9.tgz#eb27892eaf3a1bfbb2d3884946a6e52d0786693a"
-  integrity sha512-fuEfHm2aG4u8AY9BSSEt2L46x+j/mWk9D9jCJ2+lB+TtflzXwZ328QPKr6HQxJu0ynDpc7XttvSAnx+4AP6QXA==
-  dependencies:
-    browser-image-compression "*"
-
 "@types/duplexify@^3.6.0":
   version "3.6.0"
   resolved "https://registry.npmjs.org/@types/duplexify/-/duplexify-3.6.0.tgz"
@@ -2076,6 +2069,11 @@
 "@types/parse-json@^4.0.0":
   version "4.0.0"
   resolved "https://registry.npmjs.org/@types/parse-json/-/parse-json-4.0.0.tgz"
+
+"@types/pica@5.1.3":
+  version "5.1.3"
+  resolved "https://registry.yarnpkg.com/@types/pica/-/pica-5.1.3.tgz#5ef64529a1f83f7d6586a8bf75a8a00be32aca02"
+  integrity sha512-13SEyETRE5psd9bE0AmN+0M1tannde2fwHfLVaVIljkbL9V0OfFvKwCicyeDvVYLkmjQWEydbAlsDsmjrdyTOg==
 
 "@types/prettier@^2.0.0":
   version "2.2.3"
@@ -3235,14 +3233,6 @@ brorand@^1.0.1, brorand@^1.1.0:
   version "1.1.0"
   resolved "https://registry.npmjs.org/brorand/-/brorand-1.1.0.tgz"
 
-browser-image-compression@*, browser-image-compression@1.0.16:
-  version "1.0.16"
-  resolved "https://registry.yarnpkg.com/browser-image-compression/-/browser-image-compression-1.0.16.tgz#753dd245733971295014526293325dd9e39effb7"
-  integrity sha512-jQzclogfr0FX3+JupRtEkB4MWZqfImoLucS+IroAvY6w1Wkmu6nnx4PfKVEFQqk8pGXMTdDHORNDt4vwDO26AQ==
-  dependencies:
-    core-js "^3.16.1"
-    uzip "0.20201231.0"
-
 browser-process-hrtime@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/browser-process-hrtime/-/browser-process-hrtime-1.0.0.tgz"
@@ -4041,11 +4031,6 @@ core-js@3.6.5, core-js@^3.6.5:
 core-js@^2.4.0, core-js@^2.5.3:
   version "2.6.12"
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.6.12.tgz#d9333dfa7b065e347cc5682219d6f690859cc2ec"
-
-core-js@^3.16.1:
-  version "3.18.1"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.18.1.tgz#289d4be2ce0085d40fc1244c0b1a54c00454622f"
-  integrity sha512-vJlUi/7YdlCZeL6fXvWNaLUPh/id12WXj3MbkMw5uOyF0PfWPBNOCNbs53YqgrvtujLNlt9JQpruyIKkUZ+PKA==
 
 core-util-is@1.0.2, core-util-is@~1.0.0:
   version "1.0.2"
@@ -6162,6 +6147,11 @@ globby@^6.1.0:
     pify "^2.0.0"
     pinkie-promise "^2.0.0"
 
+glur@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/glur/-/glur-1.1.2.tgz#f20ea36db103bfc292343921f1f91e83c3467689"
+  integrity sha1-8g6jbbEDv8KSNDkh8fkeg8NGdok=
+
 google-auth-library@^6.1.1, google-auth-library@^6.1.2, google-auth-library@^6.1.3:
   version "6.1.6"
   resolved "https://registry.yarnpkg.com/google-auth-library/-/google-auth-library-6.1.6.tgz#deacdcdb883d9ed6bac78bb5d79a078877fdf572"
@@ -6612,6 +6602,13 @@ ignore@^4.0.6:
 ignore@^5.1.4:
   version "5.1.8"
   resolved "https://registry.npmjs.org/ignore/-/ignore-5.1.8.tgz"
+
+image-blob-reduce@3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/image-blob-reduce/-/image-blob-reduce-3.0.1.tgz#812be7655a552031635799ae64e846b106f7a489"
+  integrity sha512-/VmmWgIryG/wcn4TVrV7cC4mlfUC/oyiKIfSg5eVM3Ten/c1c34RJhMYKCWTnoSMHSqXLt3tsrBR4Q2HInvN+Q==
+  dependencies:
+    pica "^7.1.0"
 
 immediate@~3.0.5:
   version "3.0.6"
@@ -8578,6 +8575,14 @@ multicast-dns@^6.0.1:
     dns-packet "^1.3.1"
     thunky "^1.0.2"
 
+multimath@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/multimath/-/multimath-2.0.0.tgz#0d37acf67c328f30e3d8c6b0d3209e6082710302"
+  integrity sha512-toRx66cAMJ+Ccz7pMIg38xSIrtnbozk0dchXezwQDMgQmbGpfxjtv68H+L00iFL8hxDaVjrmwAFSb3I6bg8Q2g==
+  dependencies:
+    glur "^1.1.2"
+    object-assign "^4.1.1"
+
 mute-stream@0.0.7:
   version "0.0.7"
   resolved "https://registry.npmjs.org/mute-stream/-/mute-stream-0.0.7.tgz"
@@ -9315,6 +9320,17 @@ perfect-freehand@1.0.6:
 performance-now@^2.1.0:
   version "2.1.0"
   resolved "https://registry.npmjs.org/performance-now/-/performance-now-2.1.0.tgz"
+
+pica@^7.1.0:
+  version "7.1.0"
+  resolved "https://registry.yarnpkg.com/pica/-/pica-7.1.0.tgz#eb0b11abb3f2234ba8bdd0a839460f8fcd20e32a"
+  integrity sha512-4D1E1lssL/yJD4La23Kbh5CSJPeXMO8NgJTsR/VWtG7aV92fD2g2t/PABg/Abp8Ug3yJNw7y7x1ftkJuIPLpEw==
+  dependencies:
+    glur "^1.1.2"
+    inherits "^2.0.3"
+    multimath "^2.0.0"
+    object-assign "^4.1.1"
+    webworkify "^1.5.0"
 
 picomatch@^2.0.4, picomatch@^2.0.5, picomatch@^2.2.1, picomatch@^2.2.2:
   version "2.2.2"
@@ -12501,11 +12517,6 @@ uuid@^8.3.0:
   version "8.3.2"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.3.2.tgz#80d5b5ced271bb9af6c445f21a1a04c606cefbe2"
 
-uzip@0.20201231.0:
-  version "0.20201231.0"
-  resolved "https://registry.yarnpkg.com/uzip/-/uzip-0.20201231.0.tgz#9e64b065b9a8ebf26eb7583fe8e77e1d9a15ed14"
-  integrity sha512-OZeJfZP+R0z9D6TmBgLq2LHzSSptGMGDGigGiEe0pr8UBe/7fdflgHlHBNDASTXB5jnFuxHpNaJywSg8YFeGng==
-
 v8-compile-cache@^2.0.3:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/v8-compile-cache/-/v8-compile-cache-2.3.0.tgz#2de19618c66dc247dcfb6f99338035d8245a2cee"
@@ -12718,6 +12729,11 @@ websocket-driver@>=0.5.1, websocket-driver@^0.7.4:
 websocket-extensions@>=0.1.1:
   version "0.1.4"
   resolved "https://registry.npmjs.org/websocket-extensions/-/websocket-extensions-0.1.4.tgz"
+
+webworkify@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/webworkify/-/webworkify-1.5.0.tgz#734ad87a774de6ebdd546e1d3e027da5b8f4a42c"
+  integrity sha512-AMcUeyXAhbACL8S2hqqdqOLqvJ8ylmIbNwUIqQujRSouf4+eUFaXbG6F1Rbu+srlJMmxQWsiU7mOJi0nMBfM1g==
 
 whatwg-encoding@^1.0.5:
   version "1.0.5"

@@ -113,7 +113,7 @@ export const isImageFileHandle = (handle: FileSystemHandle | null) => {
   return type === "png" || type === "svg";
 };
 
-export const isImageFile = (blob: Blob | null | undefined): blob is File => {
+export const isImageFile = (blob: Blob | null | undefined): blob is Blob => {
   const { type } = blob || {};
   return (
     type === "image/jpeg" || type === "image/png" || type === "image/svg+xml"
@@ -208,7 +208,7 @@ export const generateIdFromFile = async (file: File) => {
   return id;
 };
 
-export const getDataURL = async (file: File): Promise<DataURL> => {
+export const getDataURL = async (file: Blob | File): Promise<DataURL> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
@@ -218,4 +218,39 @@ export const getDataURL = async (file: File): Promise<DataURL> => {
     reader.onerror = (error) => reject(error);
     reader.readAsDataURL(file);
   });
+};
+
+export const dataURLToFile = (dataURL: DataURL, filename = "") => {
+  const dataIndexStart = dataURL.indexOf(",");
+  const byteString = atob(dataURL.slice(dataIndexStart + 1));
+  const mimeType = dataURL.slice(0, dataIndexStart).split(":")[1].split(";")[0];
+
+  const ab = new ArrayBuffer(byteString.length);
+  const ia = new Uint8Array(ab);
+  for (let i = 0; i < byteString.length; i++) {
+    ia[i] = byteString.charCodeAt(i);
+  }
+  return new File([ab], filename, { type: mimeType });
+};
+
+export const resizeImageFile = async (
+  file: File,
+  maxWidthOrHeight: number,
+): Promise<File> => {
+  // a wrapper for pica (https://github.com/nodeca/pica)
+  const imageBlobReduce = (await import("image-blob-reduce")).default;
+
+  const reduce = imageBlobReduce();
+
+  const fileType = file.type;
+
+  if (!isImageFile(file)) {
+    throw new Error(`Unsupported image file type: "${fileType}"`);
+  }
+
+  return new File(
+    [await reduce.toBlob(file, { max: maxWidthOrHeight })],
+    file.name,
+    { type: fileType },
+  );
 };

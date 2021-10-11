@@ -97,6 +97,7 @@ interface Blob {
 
 declare module "*.scss";
 
+// --------------------------------------------------------------------------—
 // ensure Uint8Array isn't assignable to ArrayBuffer
 // (due to TS structural typing)
 // https://github.com/microsoft/TypeScript/issues/31311#issuecomment-490690695
@@ -107,3 +108,25 @@ interface Uint8Array {
   private _brand?: "Uint8Array";
 }
 // --------------------------------------------------------------------------—
+
+// https://github.com/nodeca/image-blob-reduce/issues/23#issuecomment-783271848
+declare module "image-blob-reduce" {
+  import { PicaResizeOptions } from "pica";
+  namespace ImageBlobReduce {
+    interface ImageBlobReduce {
+      toBlob(file: File, options: ImageBlobReduceOptions): Promise<Blob>;
+    }
+
+    interface ImageBlobReduceStatic {
+      new (options?: any): ImageBlobReduce;
+
+      (options?: any): ImageBlobReduce;
+    }
+
+    interface ImageBlobReduceOptions extends PicaResizeOptions {
+      max: number;
+    }
+  }
+  const reduce: ImageBlobReduce.ImageBlobReduceStatic;
+  export = reduce;
+}
