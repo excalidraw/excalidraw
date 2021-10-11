@@ -90,7 +90,7 @@ class Portal {
   }
 
   queueFileUpload = throttle(async () => {
-    await this.collab.fileSync.saveFiles({
+    await this.collab.fileManager.saveFiles({
       elements: this.collab.excalidrawAPI.getSceneElementsIncludingDeleted(),
       appState: this.collab.excalidrawAPI.getAppState(),
     });
@@ -99,7 +99,7 @@ class Portal {
       elements: this.collab.excalidrawAPI
         .getSceneElementsIncludingDeleted()
         .map((element) => {
-          if (this.collab.fileSync.shouldUpdateImageElementStatus(element)) {
+          if (this.collab.fileManager.shouldUpdateImageElementStatus(element)) {
             // this will signal collaborators to pull image data from server
             // (using mutation instead of newElementWith otherwise it'd break
             // in-progress dragging)

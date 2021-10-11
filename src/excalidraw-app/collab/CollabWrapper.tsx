@@ -54,7 +54,7 @@ import { UserIdleState } from "../../types";
 import { IDLE_THRESHOLD, ACTIVE_THRESHOLD } from "../../constants";
 import { trackEvent } from "../../analytics";
 import { isInvisiblySmallElement } from "../../element";
-import { FileSync } from "../data/FileSync";
+import { FileManager } from "../data/FileManager";
 import { AbortError } from "../../errors";
 import {
   isImageElement,
@@ -102,7 +102,7 @@ export { CollabContext, CollabContextConsumer };
 
 class CollabWrapper extends PureComponent<Props, CollabState> {
   portal: Portal;
-  fileSync: FileSync;
+  fileManager: FileManager;
   excalidrawAPI: Props["excalidrawAPI"];
   isCollaborating: boolean = false;
   activeIntervalId: number | null;
@@ -122,7 +122,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       activeRoomLink: "",
     };
     this.portal = new Portal(this);
-    this.fileSync = new FileSync({
+    this.fileManager = new FileManager({
       getFiles: async (fileIds) => {
         const { roomId, roomKey } = this.portal;
         if (!roomId || !roomKey) {
@@ -280,7 +280,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     }
     this.lastBroadcastedOrReceivedSceneVersion = -1;
     this.portal.close();
-    this.fileSync.reset();
+    this.fileManager.reset();
   };
 
   private fetchImageFilesFromFirebase = async (scene: {
@@ -291,14 +291,14 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       .filter((element) => {
         return (
           isInitializedImageElement(element) &&
-          !this.fileSync.isFileHandled(element.fileId) &&
+          !this.fileManager.isFileHandled(element.fileId) &&
           !element.isDeleted &&
           element.status === "saved"
         );
       })
       .map((element) => (element as InitializedExcalidrawImageElement).fileId);
 
-    const { loadedFiles, erroredFiles } = await this.fileSync.getFiles(
+    const { loadedFiles, erroredFiles } = await this.fileManager.getFiles(
       unfetchedImages,
     );
     return {

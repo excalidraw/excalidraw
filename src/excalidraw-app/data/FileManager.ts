@@ -7,7 +7,7 @@ import {
 } from "../../element/types";
 import { AppState, BinaryFileData, DataURL } from "../../types";
 
-export class FileSync {
+export class FileManager {
   /** files being fetched */
   private fetchingFiles = new Map<ExcalidrawImageElement["fileId"], true>();
   /** files being saved */

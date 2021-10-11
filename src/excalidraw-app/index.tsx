@@ -69,7 +69,7 @@ import "./index.scss";
 import { ExportToExcalidrawPlus } from "./components/ExportToExcalidrawPlus";
 
 import { getMany, set, del, keys, createStore } from "idb-keyval";
-import { FileSync } from "./data/FileSync";
+import { FileManager } from "./data/FileManager";
 import { mutateElement } from "../element/mutateElement";
 import { isInitializedImageElement } from "../element/typeChecks";
 import { loadFilesFromFirebase } from "./data/firebase";
@@ -87,7 +87,7 @@ const clearObsoleteFilesFromIndexedDB = async (opts: {
   }
 };
 
-const localFileStorage = new FileSync({
+const localFileStorage = new FileManager({
   getFiles(ids) {
     return getMany(ids, filesStore).then(
       (filesData: (BinaryFileData | undefined)[]) => {
