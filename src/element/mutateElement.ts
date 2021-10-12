@@ -34,8 +34,12 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
     if (typeof value !== "undefined") {
       if (
         (element as any)[key] === value &&
-        // if object, always update in case its deep prop was mutated
-        (typeof value !== "object" || value === null || key === "groupIds")
+        // if object, always update because its attrs could have changed
+        // (except for specific keys we handle below)
+        (typeof value !== "object" ||
+          value === null ||
+          key === "groupIds" ||
+          key === "scale")
       ) {
         continue;
       }
@@ -106,8 +110,8 @@ export const newElementWith = <TElement extends ExcalidrawElement>(
     if (typeof value !== "undefined") {
       if (
         (element as any)[key] === value &&
-        // if object, always update in case its deep prop was mutated
-        (typeof value !== "object" || value === null || key === "groupIds")
+        // if object, always update because its attrs could have changed
+        (typeof value !== "object" || value === null)
       ) {
         continue;
       }
