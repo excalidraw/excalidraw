@@ -17,15 +17,15 @@ Please add the latest change on the top under the correct section.
 
 ### Fixes
 
-- [`onPaste`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onPaste) prop should return false to prevent the native excalidraw paste action.
+- [`onPaste`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onPaste) prop should return false to prevent the native excalidraw paste action [#3974](https://github.com/excalidraw/excalidraw/pull/3974).
+
+  #### BREAKING CHANGE
+
+  - Earlier the paste action was prevented when the prop [`onPaste`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onPaste) returned true, but now it should return false to prevent the paste action. This was done to make it semantically more correct and intuitive.
 
 ### Build
 
 - Enable jsx transform in webpack [#4049](https://github.com/excalidraw/excalidraw/pull/4049)
-
-#### BREAKING CHANGE
-
-- Earlier the paste action was prevented when the prop [`onPaste`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onPaste) returned true, but now it should return false to prevent the paste action. This was done to make it semantically more correct and intuitive.
 
 ### Docs
 
