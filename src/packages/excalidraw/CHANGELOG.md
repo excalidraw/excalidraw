@@ -21,7 +21,7 @@ Please add the latest change on the top under the correct section.
 
 ### Build
 
-- Enable jsx transform in webpack[#4049](https://github.com/excalidraw/excalidraw/pull/4049)
+- Enable jsx transform in webpack [#4049](https://github.com/excalidraw/excalidraw/pull/4049)
 
 #### BREAKING CHANGE
 
