@@ -13,17 +13,15 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
-## Excalidraw Library
-
-### Fixes
-
-- Prevent gradual misalignment of the canvas due to floating point rounding errors [#3833](https://github.com/excalidraw/excalidraw/pull/3833).
-
 ## Excalidraw API
 
 ### Fixes
 
 - [`onPaste`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onPaste) prop should return false to prevent the native excalidraw paste action.
+
+### Build
+
+- Enable jsx transform in webpack[#4049](https://github.com/excalidraw/excalidraw/pull/4049)
 
 #### BREAKING CHANGE
 
