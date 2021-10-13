@@ -90,10 +90,18 @@ class Portal {
   }
 
   queueFileUpload = throttle(async () => {
-    await this.collab.fileManager.saveFiles({
-      elements: this.collab.excalidrawAPI.getSceneElementsIncludingDeleted(),
-      appState: this.collab.excalidrawAPI.getAppState(),
-    });
+    try {
+      await this.collab.fileManager.saveFiles({
+        elements: this.collab.excalidrawAPI.getSceneElementsIncludingDeleted(),
+        appState: this.collab.excalidrawAPI.getAppState(),
+      });
+    } catch (error) {
+      this.collab.excalidrawAPI.updateScene({
+        appState: {
+          errorMessage: error.message,
+        },
+      });
+    }
 
     this.collab.excalidrawAPI.updateScene({
       elements: this.collab.excalidrawAPI

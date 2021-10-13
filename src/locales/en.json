@@ -160,6 +160,11 @@
     "resetLibrary": "This will clear your library. Are you sure?",
     "invalidEncryptionKey": "Encryption key must be of 22 characters. Live collaboration is disabled."
   },
+  "errors": {
+    "unsupportedFileType": "Unsupported file type.",
+    "imageInsertError": "Couldn't insert image. Try again later...",
+    "fileTooBig": "File is too big. Maximum allowed size is {{maxSize}}."
+  },
   "toolBar": {
     "selection": "Selection",
     "image": "Insert image",

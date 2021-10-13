@@ -1,6 +1,6 @@
 import { nanoid } from "nanoid";
 import { cleanAppStateForExport } from "../appState";
-import { EXPORT_DATA_TYPES } from "../constants";
+import { ALLOWED_IMAGE_MIME_TYPES, EXPORT_DATA_TYPES } from "../constants";
 import { clearElementsForExport } from "../element";
 import { ExcalidrawElement, FileId } from "../element/types";
 import { CanvasError } from "../errors";
@@ -113,10 +113,12 @@ export const isImageFileHandle = (handle: FileSystemHandle | null) => {
   return type === "png" || type === "svg";
 };
 
-export const isImageFile = (blob: Blob | null | undefined): blob is Blob => {
+export const isSupportedImageFile = (
+  blob: Blob | null | undefined,
+): blob is Blob & { type: typeof ALLOWED_IMAGE_MIME_TYPES[number] } => {
   const { type } = blob || {};
   return (
-    type === "image/jpeg" || type === "image/png" || type === "image/svg+xml"
+    !!type && (ALLOWED_IMAGE_MIME_TYPES as readonly string[]).includes(type)
   );
 };
 
@@ -186,6 +188,8 @@ export const canvasToBlob = async (
   });
 };
 
+/** generates SHA-1 digest from supplied file (if not supported, falls back
+    to a 40-char base64 random id) */
 export const generateIdFromFile = async (file: File) => {
   let id: FileId;
   try {
@@ -244,8 +248,8 @@ export const resizeImageFile = async (
 
   const fileType = file.type;
 
-  if (!isImageFile(file)) {
-    throw new Error(`Unsupported image file type: "${fileType}"`);
+  if (!isSupportedImageFile(file)) {
+    throw new Error(t("errors.unsupportedFileType"));
   }
 
   return new File(
