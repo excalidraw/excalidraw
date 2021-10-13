@@ -11,27 +11,65 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
-## Unreleased
-
-## Excalidraw Library
-
-### Fixes
-
-- Prevent gradual misalignment of the canvas due to floating point rounding errors [#3833](https://github.com/excalidraw/excalidraw/pull/3833).
+## 0.10.0 (2021-10-13)
 
 ## Excalidraw API
 
 ### Fixes
 
-- [`onPaste`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onPaste) prop should return false to prevent the native excalidraw paste action.
+- [`onPaste`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onPaste) prop should return false to prevent the native excalidraw paste action [#3974](https://github.com/excalidraw/excalidraw/pull/3974).
 
-#### BREAKING CHANGE
+  #### BREAKING CHANGE
 
-- Earlier the paste action was prevented when the prop [`onPaste`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onPaste) returned true, but now it should return false to prevent the paste action. This was done to make it semantically more correct and intuitive.
+  - Earlier the paste action was prevented when the prop [`onPaste`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onPaste) returned true, but now it should return false to prevent the paste action. This was done to make it semantically more correct and intuitive.
+
+### Build
+
+- Enable jsx transform in webpack [#4049](https://github.com/excalidraw/excalidraw/pull/4049)
 
 ### Docs
 
 - Correct exportToBackend in README to onExportToBackend [#3952](https://github.com/excalidraw/excalidraw/pull/3952)
+
+## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+### Features
+
+- Improve freedraw shape [#3984](https://github.com/excalidraw/excalidraw/pull/3984)
+
+- Make color ARIA labels better [#3871](https://github.com/excalidraw/excalidraw/pull/3871)
+
+- Add origin trial tokens [#3853](https://github.com/excalidraw/excalidraw/pull/3853)
+
+- Re-order zoom buttons [#3837](https://github.com/excalidraw/excalidraw/pull/3837)
+
+- Add undo/redo buttons & tweak footer [#3832](https://github.com/excalidraw/excalidraw/pull/3832)
+
+- Resave to png/svg with metadata if you loaded your scene from a png/svg file [#3645](https://github.com/excalidraw/excalidraw/pull/3645)
+
+### Fixes
+
+- Abstract and fix legacy fs [#4032](https://github.com/excalidraw/excalidraw/pull/4032)
+
+- Context menu positioning [#4025](https://github.com/excalidraw/excalidraw/pull/4025)
+
+- Added alert for bad encryption key [#3998](https://github.com/excalidraw/excalidraw/pull/3998)
+
+- OnPaste should return false to prevent paste action [#3974](https://github.com/excalidraw/excalidraw/pull/3974)
+
+- Help-icon now visible on Safari [#3939](https://github.com/excalidraw/excalidraw/pull/3939)
+
+- Permanent zoom mode [#3931](https://github.com/excalidraw/excalidraw/pull/3931)
+
+- Undo/redo buttons gap in Safari [#3836](https://github.com/excalidraw/excalidraw/pull/3836)
+
+- Prevent gradual canvas misalignment [#3833](https://github.com/excalidraw/excalidraw/pull/3833)
+
+- Color picker shortcuts not working when elements selected [#3817](https://github.com/excalidraw/excalidraw/pull/3817)
+
+---
 
 ## 0.9.0 (2021-07-10)
 
