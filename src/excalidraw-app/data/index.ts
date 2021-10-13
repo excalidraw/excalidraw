@@ -1,3 +1,4 @@
+import { ALLOWED_IMAGE_MIME_TYPES } from "../../constants";
 import {
   createIV,
   generateEncryptionKey,
@@ -12,6 +13,7 @@ import { ExcalidrawElement, FileId } from "../../element/types";
 import { t } from "../../i18n";
 import { AppState, DataURL, UserIdleState } from "../../types";
 import { FILE_UPLOAD_MAX_BYTES } from "../app_constants";
+import { encodeFilesForUpload } from "./FileManager";
 import { saveFilesToFirebase } from "./firebase";
 
 const byteToHex = (byte: number): string => `0${byte.toString(16)}`.slice(-2);
@@ -283,36 +285,41 @@ export const exportToBackend = async (
   const exportedKey = await window.crypto.subtle.exportKey("jwk", cryptoKey);
 
   try {
+    const files = new Map<FileId, DataURL>();
+    for (const element of elements) {
+      if (
+        isInitializedImageElement(element) &&
+        appState.files[element.fileId]
+      ) {
+        files.set(element.fileId, appState.files[element.fileId].dataURL);
+      }
+    }
+
+    const encryptionKey = exportedKey.k!;
+
+    const filesToUpload = await encodeFilesForUpload({
+      files,
+      encryptionKey,
+      maxBytes: FILE_UPLOAD_MAX_BYTES,
+      allowedMimeTypes: ALLOWED_IMAGE_MIME_TYPES,
+    });
+
     const response = await fetch(BACKEND_V2_POST, {
       method: "POST",
       body: payload,
     });
     const json = await response.json();
     if (json.id) {
-      const key = exportedKey.k!;
-
       const url = new URL(window.location.href);
       // We need to store the key (and less importantly the id) as hash instead
       // of queryParam in order to never send it to the server
-      url.hash = `json=${json.id},${key}`;
+      url.hash = `json=${json.id},${encryptionKey}`;
       const urlString = url.toString();
 
-      const files = new Map<FileId, DataURL>();
-      for (const element of elements) {
-        if (
-          isInitializedImageElement(element) &&
-          appState.files[element.fileId]
-        ) {
-          files.set(element.fileId, appState.files[element.fileId].dataURL);
-        }
-
-        await saveFilesToFirebase({
-          prefix: `/files/shareLinks/${json.id}`,
-          encryptionKey: key,
-          files,
-          maxBytes: FILE_UPLOAD_MAX_BYTES,
-        });
-      }
+      await saveFilesToFirebase({
+        prefix: `/files/shareLinks/${json.id}`,
+        files: filesToUpload,
+      });
 
       window.prompt(`🔒${t("alerts.uploadedSecurly")}`, urlString);
     } else if (json.error_class === "RequestTooLargeError") {

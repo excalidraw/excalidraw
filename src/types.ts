@@ -54,6 +54,8 @@ export type BinaryFileData = {
   created: number;
 };
 
+export type BinaryFileMetadata = Omit<BinaryFileData, "dataURL">;
+
 export type AppState = {
   files: Record<ExcalidrawElement["id"], BinaryFileData>;
   isLoading: boolean;

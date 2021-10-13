@@ -258,3 +258,7 @@ export const resizeImageFile = async (
     { type: fileType },
   );
 };
+
+export const getDataURLMimeType = (dataURL: DataURL): string => {
+  return dataURL.match(/^data:([^;,]+);base64,/)?.[1] || "";
+};

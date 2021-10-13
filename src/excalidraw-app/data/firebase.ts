@@ -2,10 +2,11 @@ import { ExcalidrawElement, FileId } from "../../element/types";
 import { getSceneVersion } from "../../element";
 import Portal from "../collab/Portal";
 import { restoreElements } from "../../data/restore";
-import { BinaryFileData, DataURL } from "../../types";
+import { BinaryFileData, BinaryFileMetadata, DataURL } from "../../types";
 import { FILE_CACHE_MAX_AGE_SEC } from "../app_constants";
-import { compressData, decompressData } from "../../data/encode";
+import { decompressData } from "../../data/encode";
 import { getImportedKey, createIV } from "../../data/encryption";
+import { getDataURLMimeType } from "../../data/blob";
 
 // private
 // -----------------------------------------------------------------------------
@@ -145,59 +146,29 @@ export const isSavedToFirebase = (
   return true;
 };
 
-const getDataURLMimeType = (dataURL: DataURL): string => {
-  return dataURL.match(/^data:([^;,]+);base64,/)?.[1] || "";
-};
-
 const getFileTypeFromMimeType = (mimeType: string): BinaryFileData["type"] => {
   return mimeType.includes("image/") ? "image" : "other";
 };
-
-type BinaryFileMetadata = Omit<BinaryFileData, "dataURL">;
-
 export const saveFilesToFirebase = async ({
   prefix,
-  encryptionKey,
   files,
-  maxBytes,
 }: {
   prefix: string;
-  encryptionKey: string;
-  files: Map<FileId, DataURL>;
-  maxBytes: number;
+  files: { id: FileId; buffer: Uint8Array; mimeType: string }[];
 }) => {
   const firebase = await loadFirebaseStorage();
-  const filesToUpload = [...files].map(([id, dataURL]) => {
-    const mimeType = getDataURLMimeType(dataURL);
-
-    const bufferView = new TextEncoder().encode(dataURL);
-
-    if (bufferView.byteLength > maxBytes) {
-      throw new Error(`File cannot be larger than ${maxBytes / 1024} kB.`);
-    }
-
-    return { bufferView, id, mimeType };
-  });
 
   const erroredFiles = new Map<FileId, true>();
   const savedFiles = new Map<FileId, true>();
 
   await Promise.all(
-    filesToUpload.map(async ({ id, bufferView, mimeType }) => {
+    files.map(async ({ id, buffer, mimeType }) => {
       try {
-        const encodedFile = await compressData<BinaryFileMetadata>(bufferView, {
-          encryptionKey,
-          metadata: {
-            id,
-            type: mimeType.includes("image/") ? "image" : "other",
-            created: Date.now(),
-          },
-        });
         await firebase
           .storage()
           .ref(`${prefix}/${id}`)
           .put(
-            new Blob([encodedFile], {
+            new Blob([buffer], {
               type: mimeType,
             }),
             {

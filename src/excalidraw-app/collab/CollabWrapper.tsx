@@ -2,7 +2,12 @@ import throttle from "lodash.throttle";
 import React, { PureComponent } from "react";
 import { AppState, ExcalidrawImperativeAPI } from "../../types";
 import { ErrorDialog } from "../../components/ErrorDialog";
-import { APP_NAME, ENV, EVENT } from "../../constants";
+import {
+  ALLOWED_IMAGE_MIME_TYPES,
+  APP_NAME,
+  ENV,
+  EVENT,
+} from "../../constants";
 import { ImportedDataState } from "../../data/types";
 import {
   ExcalidrawElement,
@@ -53,7 +58,7 @@ import { UserIdleState } from "../../types";
 import { IDLE_THRESHOLD, ACTIVE_THRESHOLD } from "../../constants";
 import { trackEvent } from "../../analytics";
 import { isInvisiblySmallElement } from "../../element";
-import { FileManager } from "../data/FileManager";
+import { encodeFilesForUpload, FileManager } from "../data/FileManager";
 import { AbortError } from "../../errors";
 import {
   isImageElement,
@@ -139,9 +144,12 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
         return saveFilesToFirebase({
           prefix: `${FIREBASE_STORAGE_PREFIXES.collabFiles}/${roomId}`,
-          encryptionKey: roomKey,
-          files: addedFiles,
-          maxBytes: FILE_UPLOAD_MAX_BYTES,
+          files: await encodeFilesForUpload({
+            files: addedFiles,
+            encryptionKey: roomKey,
+            maxBytes: FILE_UPLOAD_MAX_BYTES,
+            allowedMimeTypes: ALLOWED_IMAGE_MIME_TYPES,
+          }),
         });
       },
     });

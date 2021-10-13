@@ -1,3 +1,5 @@
+import { getDataURLMimeType } from "../../data/blob";
+import { compressData } from "../../data/encode";
 import { isInitializedImageElement } from "../../element/typeChecks";
 import {
   ExcalidrawElement,
@@ -5,7 +7,13 @@ import {
   FileId,
   InitializedExcalidrawImageElement,
 } from "../../element/types";
-import { AppState, BinaryFileData, DataURL } from "../../types";
+import { t } from "../../i18n";
+import {
+  AppState,
+  BinaryFileData,
+  BinaryFileMetadata,
+  DataURL,
+} from "../../types";
 
 export class FileManager {
   /** files being fetched */
@@ -139,3 +147,56 @@ export class FileManager {
     this.savedFiles.clear();
   }
 }
+
+export const encodeFilesForUpload = async <M extends readonly string[]>({
+  files,
+  maxBytes,
+  encryptionKey,
+  allowedMimeTypes,
+}: {
+  files: Map<FileId, DataURL>;
+  maxBytes: number;
+  encryptionKey: string;
+  allowedMimeTypes: M;
+}) => {
+  const processedFiles: {
+    id: FileId;
+    mimeType: M[number];
+    buffer: Uint8Array;
+  }[] = [];
+
+  for (const [id, dataURL] of files) {
+    const mimeType = getDataURLMimeType(dataURL);
+
+    if (!allowedMimeTypes.includes(mimeType)) {
+      throw new Error(t("errors.unsupportedFileType"));
+    }
+
+    const buffer = new TextEncoder().encode(dataURL);
+
+    const encodedFile = await compressData<BinaryFileMetadata>(buffer, {
+      encryptionKey,
+      metadata: {
+        id,
+        type: mimeType.includes("image/") ? "image" : "other",
+        created: Date.now(),
+      },
+    });
+
+    if (buffer.byteLength > maxBytes) {
+      throw new Error(
+        t("errors.fileTooBig", {
+          maxSize: `${Math.trunc(maxBytes / 1024 / 1024)}MB`,
+        }),
+      );
+    }
+
+    processedFiles.push({
+      id,
+      mimeType,
+      buffer: encodedFile,
+    });
+  }
+
+  return processedFiles;
+};
