@@ -157,7 +157,8 @@
     "imageDoesNotContainScene": "当前不支持导入图片。\n\n您想要导入画布数据吗？此图像似乎不包含任何画布数据。您是否在导出过程中启用了嵌入画布的选项？",
     "cannotRestoreFromImage": "无法从此图像文件恢复画布",
     "invalidSceneUrl": "无法从提供的 URL 导入场景。它或者格式不正确，或者不包含有效的 Excalidraw JSON 数据。",
-    "resetLibrary": "这将会清除你的资源库。你确定这么做吗？"
+    "resetLibrary": "这将会清除你的资源库。你确定这么做吗？",
+    "invalidEncryptionKey": "密钥必须包含22个字符。实时协作已被禁用。"
   },
   "toolBar": {
     "selection": "选择",

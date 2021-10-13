@@ -157,7 +157,8 @@
     "imageDoesNotContainScene": "दृश्य में छवि नहीं है",
     "cannotRestoreFromImage": "छवि फ़ाइल बहाल दृश्य नहीं है",
     "invalidSceneUrl": "",
-    "resetLibrary": ""
+    "resetLibrary": "",
+    "invalidEncryptionKey": ""
   },
   "toolBar": {
     "selection": "चयन",

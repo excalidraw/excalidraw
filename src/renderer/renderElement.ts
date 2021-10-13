@@ -913,7 +913,7 @@ export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
     smoothing: 0.5,
     streamline: 0.5,
     easing: (t) => Math.sin((t * Math.PI) / 2), // https://easings.net/#easeOutSine
-    last: false,
+    last: !!element.lastCommittedPoint, // LastCommittedPoint is added on pointerup
   };
 
   return getSvgPathFromStroke(getStroke(inputPoints as number[][], options));
