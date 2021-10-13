@@ -33,7 +33,7 @@ import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
 import { AppState, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
-import { MAX_DECIMALS_FOR_SVG_EXPORT, THEME_FILTER } from "../constants";
+import { MAX_DECIMALS_FOR_SVG_EXPORT } from "../constants";
 import { getStroke, StrokeOptions } from "perfect-freehand";
 
 const defaultAppState = getDefaultAppState();
@@ -126,7 +126,11 @@ const generateElementCanvas = (
     isInitializedImageElement(element) &&
     !isPendingImageElement(element, sceneState)
   ) {
-    context.filter = THEME_FILTER;
+    // using a stronger invert (100% vs our regular 93%) and saturate
+    // as a temp hack to make images in dark theme look closer to original
+    // color scheme (it's still not quite there and the clors look slightly
+    // desaturing/black is not as black, but...)
+    context.filter = "invert(100%) hue-rotate(180deg) saturate(1.25)";
   }
 
   drawElementOnCanvas(element, rc, context, sceneState);
