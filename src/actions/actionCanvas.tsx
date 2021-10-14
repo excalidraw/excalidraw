@@ -4,7 +4,7 @@ import { ColorPicker } from "../components/ColorPicker";
 import { trash, zoomIn, zoomOut } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { DarkModeToggle } from "../components/DarkModeToggle";
-import { ZOOM_STEP } from "../constants";
+import { THEME, ZOOM_STEP } from "../constants";
 import { getCommonBounds, getNonDeletedElements } from "../element";
 import { newElementWith } from "../element/mutateElement";
 import { ExcalidrawElement } from "../element/types";
@@ -279,7 +279,8 @@ export const actionToggleTheme = register({
     return {
       appState: {
         ...appState,
-        theme: value || (appState.theme === "light" ? "dark" : "light"),
+        theme:
+          value || (appState.theme === THEME.LIGHT ? THEME.DARK : THEME.LIGHT),
       },
       commitToHistory: false,
     };

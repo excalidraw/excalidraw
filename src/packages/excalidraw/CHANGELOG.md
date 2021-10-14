@@ -11,6 +11,20 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
+## Unreleased
+
+## Excalidraw API
+
+### Features
+
+- Export `THEME` constant from the package so host can use this when passing the theme
+
+  #### BREAKING CHANGE
+
+  The `Appearance` type is now removed and renamed to `Theme` so `Theme` type needs to be used.
+
+---
+
 ## 0.10.0 (2021-10-13)
 
 ## Excalidraw API

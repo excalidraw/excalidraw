@@ -5,7 +5,7 @@ import { ProjectName } from "../components/ProjectName";
 import { ToolButton } from "../components/ToolButton";
 import "../components/ToolIcon.scss";
 import { Tooltip } from "../components/Tooltip";
-import { DarkModeToggle, Appearence } from "../components/DarkModeToggle";
+import { DarkModeToggle } from "../components/DarkModeToggle";
 import { loadFromJSON, saveAsJSON } from "../data";
 import { resaveAsImageWithScene } from "../data/resave";
 import { t } from "../i18n";
@@ -14,12 +14,13 @@ import { KEYS } from "../keys";
 import { register } from "./register";
 import { CheckboxItem } from "../components/CheckboxItem";
 import { getExportSize } from "../scene/export";
-import { DEFAULT_EXPORT_PADDING, EXPORT_SCALES } from "../constants";
+import { DEFAULT_EXPORT_PADDING, EXPORT_SCALES, THEME } from "../constants";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { getNonDeletedElements } from "../element";
 import { ActiveFile } from "../components/ActiveFile";
 import { isImageFileHandle } from "../data/blob";
 import { nativeFileSystemSupported } from "../data/filesystem";
+import { Theme } from "../element/types";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -256,9 +257,9 @@ export const actionExportWithDarkMode = register({
       }}
     >
       <DarkModeToggle
-        value={appState.exportWithDarkMode ? "dark" : "light"}
-        onChange={(theme: Appearence) => {
-          updateData(theme === "dark");
+        value={appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT}
+        onChange={(theme: Theme) => {
+          updateData(theme === THEME.DARK);
         }}
         title={t("labels.toggleExportColorScheme")}
       />
