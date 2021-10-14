@@ -1,4 +1,3 @@
-import React from "react";
 import { render, unmountComponentAtNode } from "react-dom";
 import clsx from "clsx";
 import { Popover } from "./Popover";

@@ -1,4 +1,3 @@
-import React from "react";
 import { KEYS } from "../keys";
 import { register } from "./register";
 import { ExcalidrawElement } from "../element/types";

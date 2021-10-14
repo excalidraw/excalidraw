@@ -1,7 +1,6 @@
 import { KEYS } from "../keys";
 import { isInvisiblySmallElement } from "../element";
 import { resetCursor } from "../utils";
-import React from "react";
 import { ToolButton } from "../components/ToolButton";
 import { done } from "../components/icons";
 import { t } from "../i18n";

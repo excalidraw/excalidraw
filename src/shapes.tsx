@@ -1,4 +1,3 @@
-import React from "react";
 import { KEYS } from "./keys";
 
 // We inline font-awesome icons in order to save on js size rather than including the font awesome react library

@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import oc from "open-color";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { close } from "../components/icons";
 import { MIME_TYPES } from "../constants";
 import { t } from "../i18n";

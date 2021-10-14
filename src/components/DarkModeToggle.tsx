@@ -1,6 +1,5 @@
 import "./ToolIcon.scss";
 
-import React from "react";
 import { t } from "../i18n";
 import { ToolButton } from "./ToolButton";
 import { THEME } from "../constants";

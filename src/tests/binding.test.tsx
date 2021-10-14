@@ -1,4 +1,3 @@
-import React from "react";
 import { fireEvent, render } from "./test-utils";
 import ExcalidrawApp from "../excalidraw-app";
 import { UI, Pointer, Keyboard } from "./helpers/ui";

@@ -1,4 +1,3 @@
-import React from "react";
 import { trackEvent } from "../analytics";
 import { load, questionCircle, saveAs } from "../components/icons";
 import { ProjectName } from "../components/ProjectName";
