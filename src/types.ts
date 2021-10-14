@@ -10,6 +10,7 @@ import {
   Arrowhead,
   ChartType,
   FontFamilyValues,
+  Theme,
 } from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -23,6 +24,7 @@ import { Language } from "./i18n";
 import { ClipboardData } from "./clipboard";
 import { isOverScrollBars } from "./scene";
 import { MaybeTransformHandleType } from "./element/transformHandles";
+import { FileSystemHandle } from "./data/filesystem";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -97,7 +99,7 @@ export type AppState = {
   showHelpDialog: boolean;
   toastMessage: string | null;
   zenModeEnabled: boolean;
-  theme: "light" | "dark";
+  theme: Theme;
   gridSize: number | null;
   viewModeEnabled: boolean;
 
@@ -112,7 +114,7 @@ export type AppState = {
   offsetLeft: number;
 
   isLibraryOpen: boolean;
-  fileHandle: import("browser-fs-access").FileSystemHandle | null;
+  fileHandle: FileSystemHandle | null;
   collaborators: Map<string, Collaborator>;
   showStats: boolean;
   currentChartType: ChartType;
@@ -191,7 +193,7 @@ export interface ExcalidrawProps {
   zenModeEnabled?: boolean;
   gridModeEnabled?: boolean;
   libraryReturnUrl?: string;
-  theme?: "dark" | "light";
+  theme?: Theme;
   name?: string;
   renderCustomStats?: (
     elements: readonly NonDeletedExcalidrawElement[],

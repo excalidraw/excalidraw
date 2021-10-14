@@ -35,6 +35,7 @@ export enum EVENT {
   MOUSE_MOVE = "mousemove",
   RESIZE = "resize",
   UNLOAD = "unload",
+  FOCUS = "focus",
   BLUR = "blur",
   DRAG_OVER = "dragover",
   DROP = "drop",
@@ -69,6 +70,11 @@ export const FONT_FAMILY = {
   Cascadia: 3,
 };
 
+export const THEME = {
+  LIGHT: "light",
+  DARK: "dark",
+};
+
 export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";
 
 export const DEFAULT_FONT_SIZE = 20;
@@ -84,7 +90,7 @@ export const GRID_SIZE = 20; // TODO make it configurable?
 export const MIME_TYPES = {
   excalidraw: "application/vnd.excalidraw+json",
   excalidrawlib: "application/vnd.excalidrawlib+json",
-};
+} as const;
 
 export const EXPORT_DATA_TYPES = {
   excalidraw: "excalidraw",
