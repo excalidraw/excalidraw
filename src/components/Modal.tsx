@@ -6,6 +6,7 @@ import clsx from "clsx";
 import { KEYS } from "../keys";
 import { useExcalidrawContainer, useIsMobile } from "./App";
 import { AppState } from "../types";
+import { THEME } from "../constants";
 
 export const Modal = (props: {
   className?: string;
@@ -15,7 +16,7 @@ export const Modal = (props: {
   labelledBy: string;
   theme?: AppState["theme"];
 }) => {
-  const { theme = "light" } = props;
+  const { theme = THEME.LIGHT } = props;
   const modalRoot = useBodyRoot(theme);
 
   if (!modalRoot) {
