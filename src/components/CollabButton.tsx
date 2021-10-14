@@ -1,4 +1,3 @@
-import React from "react";
 import clsx from "clsx";
 import { ToolButton } from "./ToolButton";
 import { t } from "../i18n";
