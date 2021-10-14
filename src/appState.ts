@@ -4,6 +4,7 @@ import {
   DEFAULT_FONT_SIZE,
   DEFAULT_TEXT_ALIGN,
   EXPORT_SCALES,
+  THEME,
 } from "./constants";
 import { ExcalidrawElement } from "./element/types";
 import { t } from "./i18n";
@@ -20,7 +21,7 @@ export const getDefaultAppState = (): Omit<
 > => {
   return {
     files: {},
-    theme: "light",
+    theme: THEME.LIGHT,
     collaborators: new Map(),
     currentChartType: "bar",
     currentItemBackgroundColor: "transparent",

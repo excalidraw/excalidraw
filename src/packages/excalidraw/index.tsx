@@ -185,4 +185,4 @@ export {
   loadFromBlob,
   getFreeDrawSvgPath,
 } from "../../packages/utils";
-export { FONT_FAMILY } from "../../constants";
+export { FONT_FAMILY, THEME } from "../../constants";
