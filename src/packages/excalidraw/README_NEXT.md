@@ -371,7 +371,7 @@ To view the full example visit :point_down:
 | [`zenModeEnabled`](#zenModeEnabled) | boolean |  | This implies if the zen mode is enabled |
 | [`gridModeEnabled`](#gridModeEnabled) | boolean |  | This implies if the grid mode is enabled |
 | [`libraryReturnUrl`](#libraryReturnUrl) | string |  | What URL should [libraries.excalidraw.com](https://libraries.excalidraw.com) be installed to |
-| [`theme`](#theme) | [THEME.LIGHT](#THEME) &#124; [THEME.LIGHT](#THEME) | [THEME.DARK](#THEME) | The theme of the Excalidraw component |
+| [`theme`](#theme) | [THEME.LIGHT](#THEME) &#124; [THEME.LIGHT](#THEME) | [THEME.LIGHT](#THEME) | The theme of the Excalidraw component |
 | [`name`](#name) | string |  | Name of the drawing |
 | [`UIOptions`](#UIOptions) | <pre>{ canvasActions: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L208"> CanvasActions<a/> }</pre> | [DEFAULT UI OPTIONS](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L129) | To customise UI options. Currently we support customising [`canvas actions`](#canvasActions) |
 | [`onPaste`](#onPaste) | <pre>(data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/clipboard.ts#L17">ClipboardData</a>, event: ClipboardEvent &#124; null) => boolean</pre> |  | Callback to be triggered if passed when the something is pasted in to the scene |
@@ -612,7 +612,7 @@ This callback must return a `boolean` value or a [promise](https://developer.moz
 
 In case you want to prevent the excalidraw paste action you must return `false`, it will stop the native excalidraw clipboard management flow (nothing will be pasted into the scene).
 
-#### importLibrary
+#### `importLibrary`
 
 Imports library from given URL. You should call this on `hashchange`, passing the `addLibrary` value if you detect it as shown below. Optionally pass a CSRF `token` to skip prompting during installation (retrievable via `token` key from the url coming from [https://libraries.excalidraw.com](https://libraries.excalidraw.com/)).
 
@@ -634,17 +634,17 @@ useEffect(() => {
 
 Try out the [Demo](#Demo) to see it in action.
 
-#### detectScroll
+#### `detectScroll`
 
 Indicates whether Excalidraw should listen for `scroll` event on the nearest scrollable container in the DOM tree and recompute the coordinates (e.g. to correctly handle the cursor) when the component's position changes. You can disable this when you either know this doesn't affect your app or you want to take care of it yourself (calling the [`refresh()`](#ref) method).
 
-#### handleKeyboardGlobally
+#### `handleKeyboardGlobally`
 
 Indicates whether to bind keyboard events to `document`. Disabled by default, meaning the keyboard events are bound to the Excalidraw component. This allows for multiple Excalidraw components to live on the same page, and ensures that Excalidraw keyboard handling doesn't collide with your app's (or the browser) when the component isn't focused.
 
 Enable this if you want Excalidraw to handle keyboard even if the component isn't focused (e.g. a user is interacting with the navbar, sidebar, or similar).
 
-#### onLibraryChange
+#### `onLibraryChange`
 
 Ths callback if supplied will get triggered when the library is updated and has the below signature.
 
@@ -654,11 +654,11 @@ Ths callback if supplied will get triggered when the library is updated and has 
 
 It is invoked with empty items when user clears the library. You can use this callback when you want to do something additional when library is updated for example persisting it to local storage.
 
-#### id
+#### `id`
 
 The unique id of the excalidraw component. This can be used to identify the excalidraw component, for example importing the library items to the excalidraw component from where it was initiated when you have multiple excalidraw components rendered on the same page as shown in [multiple excalidraw demo](https://codesandbox.io/s/multiple-excalidraw-k1xx5).
 
-#### autoFocus
+#### `autoFocus`
 
 This prop implies whether to focus the Excalidraw component on page load. Defaults to false.
 
@@ -864,7 +864,7 @@ import { getElementsMap } from "@excalidraw/excalidraw-next";
 
 This function returns an object where each element is mapped to its id.
 
-#### loadLibraryFromBlob
+#### `loadLibraryFromBlob`
 
 ```js
 import { loadLibraryFromBlob } from "@excalidraw/excalidraw-next";
@@ -878,7 +878,7 @@ loadLibraryFromBlob(blob: <a href="https://developer.mozilla.org/en-US/docs/Web/
 
 This function loads the library from the blob.
 
-#### loadFromBlob
+#### `loadFromBlob`
 
 **How to use**
 
@@ -894,7 +894,7 @@ loadFromBlob(blob: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blo
 
 This function loads the scene data from the blob. If you pass `localAppState`, `localAppState` value will be preferred over the `appState` derived from `blob`
 
-#### getFreeDrawSvgPath
+#### `getFreeDrawSvgPath`
 
 **How to use**
 
@@ -912,7 +912,7 @@ This function returns the free draw svg path for the element.
 
 ### Exported constants
 
-#### FONT_FAMILY
+#### `FONT_FAMILY`
 
 **How to use**
 
@@ -929,6 +929,23 @@ import { FONT_FAMILY } from "@excalidraw/excalidraw-next";
 | Cascadia    | The Code Font        |
 
 Defaults to `FONT_FAMILY.Virgil` unless passed in `initialData.appState.currentItemFontFamily`.
+
+#### `THEME`
+
+**How to use**
+
+```js
+import { THEME } from "@excalidraw/excalidraw-next";
+```
+
+`THEME` contains all the themes supported by `Excalidraw` as explained below
+
+| Theme | Description     |
+| ----- | --------------- |
+| LIGHT | The light theme |
+| DARK  | The Dark theme  |
+
+Defaults to `THEME.LIGHT` unless passed in `initialData.appState.theme`
 
 ## Need help?
 
