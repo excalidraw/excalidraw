@@ -2,7 +2,6 @@ import React, { useContext } from "react";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
 import clsx from "clsx";
-import { supported as fsSupported } from "browser-fs-access";
 import { nanoid } from "nanoid";
 
 import {
@@ -61,6 +60,7 @@ import {
   SCROLL_TIMEOUT,
   TAP_TWICE_TIMEOUT,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
+  THEME,
   TOUCH_CTX_MENU_TIMEOUT,
   URL_HASH_KEYS,
   URL_QUERY_KEYS,
@@ -198,6 +198,7 @@ import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import { getTextLikeActions, registerTextElementSubtypes } from "../textlike";
 import { redrawTextBoundingBox } from "../element/textElement";
+import { nativeFileSystemSupported } from "../data/filesystem";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
@@ -542,7 +543,7 @@ class App extends React.Component<AppProps, AppState> {
         let viewModeEnabled = actionResult?.appState?.viewModeEnabled || false;
         let zenModeEnabled = actionResult?.appState?.zenModeEnabled || false;
         let gridSize = actionResult?.appState?.gridSize || null;
-        let theme = actionResult?.appState?.theme || "light";
+        let theme = actionResult?.appState?.theme || THEME.LIGHT;
         let name = actionResult?.appState?.name ?? this.state.name;
         if (typeof this.props.viewModeEnabled !== "undefined") {
           viewModeEnabled = this.props.viewModeEnabled;
@@ -715,7 +716,7 @@ class App extends React.Component<AppProps, AppState> {
       if (initialData?.libraryItems) {
         this.libraryItemsFromStorage = initialData.libraryItems;
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
       initialData = {
         appState: {
@@ -1237,8 +1238,12 @@ class App extends React.Component<AppProps, AppState> {
       }
       const data = await parseClipboard(event);
       if (this.props.onPaste) {
-        if (await this.props.onPaste(data, event)) {
-          return;
+        try {
+          if ((await this.props.onPaste(data, event)) === false) {
+            return;
+          }
+        } catch (e) {
+          console.error(e);
         }
       }
       if (data.errorMessage) {
@@ -1441,7 +1446,7 @@ class App extends React.Component<AppProps, AppState> {
         await webShareTargetCache.delete("shared-file");
         window.history.replaceState(null, APP_NAME, window.location.pathname);
       }
-    } catch (error) {
+    } catch (error: any) {
       this.setState({ errorMessage: error.message });
     }
   };
@@ -3536,6 +3541,7 @@ class App extends React.Component<AppProps, AppState> {
         mutateElement(draggingElement, {
           points: [...points, [dx, dy]],
           pressures,
+          lastCommittedPoint: [dx, dy],
         });
 
         this.actionManager.executeAction(actionFinalize);
@@ -3875,13 +3881,13 @@ class App extends React.Component<AppProps, AppState> {
     try {
       const file = event.dataTransfer.files[0];
       if (file?.type === "image/png" || file?.type === "image/svg+xml") {
-        if (fsSupported) {
+        if (nativeFileSystemSupported) {
           try {
             // This will only work as of Chrome 86,
             // but can be safely ignored on older releases.
             const item = event.dataTransfer.items[0];
             (file as any).handle = await (item as any).getAsFileSystemHandle();
-          } catch (error) {
+          } catch (error: any) {
             console.warn(error.name, error.message);
           }
         }
@@ -3901,7 +3907,7 @@ class App extends React.Component<AppProps, AppState> {
         });
         return;
       }
-    } catch (error) {
+    } catch (error: any) {
       return this.setState({
         isLoading: false,
         errorMessage: error.message,
@@ -3935,13 +3941,13 @@ class App extends React.Component<AppProps, AppState> {
       // default: assume an Excalidraw file regardless of extension/MimeType
     } else {
       this.setState({ isLoading: true });
-      if (fsSupported) {
+      if (nativeFileSystemSupported) {
         try {
           // This will only work as of Chrome 86,
           // but can be safely ignored on older releases.
           const item = event.dataTransfer.items[0];
           (file as any).handle = await (item as any).getAsFileSystemHandle();
-        } catch (error) {
+        } catch (error: any) {
           console.warn(error.name, error.message);
         }
       }
@@ -4144,127 +4150,112 @@ class App extends React.Component<AppProps, AppState> {
         actionToggleStats,
       ];
 
-      ContextMenu.push({
-        options: viewModeOptions,
-        top,
-        left,
-        actionManager: this.actionManager,
-        appState: this.state,
-        container: this.excalidrawContainerRef.current!,
-      });
-
       if (this.state.viewModeEnabled) {
-        return;
-      }
-
-      ContextMenu.push({
-        options: [
-          this.isMobile &&
-            navigator.clipboard && {
-              name: "paste",
-              perform: (elements, appStates) => {
-                this.pasteFromClipboard(null);
-                return {
-                  commitToHistory: false,
-                };
+        ContextMenu.push({
+          options: viewModeOptions,
+          top,
+          left,
+          actionManager: this.actionManager,
+          appState: this.state,
+          container: this.excalidrawContainerRef.current!,
+        });
+      } else {
+        ContextMenu.push({
+          options: [
+            this.isMobile &&
+              navigator.clipboard && {
+                name: "paste",
+                perform: (elements, appStates) => {
+                  this.pasteFromClipboard(null);
+                  return {
+                    commitToHistory: false,
+                  };
+                },
+                contextItemLabel: "labels.paste",
               },
-              contextItemLabel: "labels.paste",
-            },
-          this.isMobile && navigator.clipboard && separator,
-          probablySupportsClipboardBlob &&
-            elements.length > 0 &&
-            actionCopyAsPng,
-          probablySupportsClipboardWriteText &&
-            elements.length > 0 &&
-            actionCopyAsSvg,
-          ((probablySupportsClipboardBlob && elements.length > 0) ||
-            (probablySupportsClipboardWriteText && elements.length > 0)) &&
+            this.isMobile && navigator.clipboard && separator,
+            probablySupportsClipboardBlob &&
+              elements.length > 0 &&
+              actionCopyAsPng,
+            probablySupportsClipboardWriteText &&
+              elements.length > 0 &&
+              actionCopyAsSvg,
+            ((probablySupportsClipboardBlob && elements.length > 0) ||
+              (probablySupportsClipboardWriteText && elements.length > 0)) &&
+              separator,
+            actionSelectAll,
             separator,
-          actionSelectAll,
-          separator,
-          typeof this.props.gridModeEnabled === "undefined" &&
-            actionToggleGridMode,
-          typeof this.props.zenModeEnabled === "undefined" &&
-            actionToggleZenMode,
-          typeof this.props.viewModeEnabled === "undefined" &&
-            actionToggleViewMode,
-          actionToggleStats,
-        ],
-        top,
-        left,
-        actionManager: this.actionManager,
-        appState: this.state,
-        container: this.excalidrawContainerRef.current!,
-      });
-      return;
-    }
-
-    if (this.state.viewModeEnabled) {
-      ContextMenu.push({
-        options: [navigator.clipboard && actionCopy, ...options],
-        top,
-        left,
-        actionManager: this.actionManager,
-        appState: this.state,
-        container: this.excalidrawContainerRef.current!,
-      });
-      return;
-    }
-
-    let firstAdded = true;
-    for (let ind = 0; ind < maybeUse.length; ind++) {
-      if (maybeUse[ind]) {
-        if (firstAdded) {
-          options.push(separator);
-          firstAdded = false;
-        }
-        options.push(getTextLikeActions()[ind]);
+            typeof this.props.gridModeEnabled === "undefined" &&
+              actionToggleGridMode,
+            typeof this.props.zenModeEnabled === "undefined" &&
+              actionToggleZenMode,
+            typeof this.props.viewModeEnabled === "undefined" &&
+              actionToggleViewMode,
+            actionToggleStats,
+          ],
+          top,
+          left,
+          actionManager: this.actionManager,
+          appState: this.state,
+          container: this.excalidrawContainerRef.current!,
+        });
+      }
+    } else if (type === "element") {
+      if (this.state.viewModeEnabled) {
+        ContextMenu.push({
+          options: [navigator.clipboard && actionCopy, ...options],
+          top,
+          left,
+          actionManager: this.actionManager,
+          appState: this.state,
+          container: this.excalidrawContainerRef.current!,
+        });
+      } else {
+        ContextMenu.push({
+          options: [
+            this.isMobile && actionCut,
+            this.isMobile && navigator.clipboard && actionCopy,
+            this.isMobile &&
+              navigator.clipboard && {
+                name: "paste",
+                perform: (elements, appStates) => {
+                  this.pasteFromClipboard(null);
+                  return {
+                    commitToHistory: false,
+                  };
+                },
+                contextItemLabel: "labels.paste",
+              },
+            this.isMobile && separator,
+            ...options,
+            separator,
+            actionCopyStyles,
+            actionPasteStyles,
+            separator,
+            maybeGroupAction && actionGroup,
+            maybeUngroupAction && actionUngroup,
+            (maybeGroupAction || maybeUngroupAction) && separator,
+            actionAddToLibrary,
+            separator,
+            actionSendBackward,
+            actionBringForward,
+            actionSendToBack,
+            actionBringToFront,
+            separator,
+            maybeFlipHorizontal && actionFlipHorizontal,
+            maybeFlipVertical && actionFlipVertical,
+            (maybeFlipHorizontal || maybeFlipVertical) && separator,
+            actionDuplicateSelection,
+            actionDeleteSelected,
+          ],
+          top,
+          left,
+          actionManager: this.actionManager,
+          appState: this.state,
+          container: this.excalidrawContainerRef.current!,
+        });
       }
     }
-
-    ContextMenu.push({
-      options: [
-        this.isMobile && actionCut,
-        this.isMobile && navigator.clipboard && actionCopy,
-        this.isMobile &&
-          navigator.clipboard && {
-            name: "paste",
-            perform: (elements, appStates) => {
-              this.pasteFromClipboard(null);
-              return {
-                commitToHistory: false,
-              };
-            },
-            contextItemLabel: "labels.paste",
-          },
-        this.isMobile && separator,
-        ...options,
-        separator,
-        actionCopyStyles,
-        actionPasteStyles,
-        separator,
-        maybeGroupAction && actionGroup,
-        maybeUngroupAction && actionUngroup,
-        (maybeGroupAction || maybeUngroupAction) && separator,
-        actionAddToLibrary,
-        separator,
-        actionSendBackward,
-        actionBringForward,
-        actionSendToBack,
-        actionBringToFront,
-        separator,
-        maybeFlipHorizontal && actionFlipHorizontal,
-        maybeFlipVertical && actionFlipVertical,
-        (maybeFlipHorizontal || maybeFlipVertical) && separator,
-        actionDuplicateSelection,
-        actionDeleteSelected,
-      ],
-      top,
-      left,
-      actionManager: this.actionManager,
-      appState: this.state,
-      container: this.excalidrawContainerRef.current!,
-    });
   };
 
   private handleWheel = withBatchedUpdates((event: WheelEvent) => {
