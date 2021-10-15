@@ -205,12 +205,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
     if (
       this.isCollaborating &&
-      (syncableElements.some(
-        (element) =>
-          isInitializedImageElement(element) &&
-          !element.isDeleted &&
-          element.status === "pending",
-      ) ||
+      (this.fileManager.shouldPreventUnload(syncableElements) ||
         !isSavedToFirebase(this.portal, syncableElements))
     ) {
       // this won't run in time if user decides to leave the site, but

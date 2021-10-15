@@ -420,13 +420,8 @@ const ExcalidrawWrapper = () => {
       saveDebounced.flush();
 
       if (
-        excalidrawAPI
-          ?.getSceneElements()
-          .some(
-            (element) =>
-              isInitializedImageElement(element) &&
-              element.status === "pending",
-          )
+        excalidrawAPI &&
+        localFileStorage.shouldPreventUnload(excalidrawAPI.getSceneElements())
       ) {
         preventUnload(event);
       }
