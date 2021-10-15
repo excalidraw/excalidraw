@@ -107,12 +107,14 @@ export const setLanguage = async (lang: Language) => {
     // Fill the auxCurrentLangData array with each locale file found in auxLangDataRoots for this language
     for (let i = 0; i < auxLangDataRoots.length; i++) {
       // Do not assume auxLangDataRoots[i] contains a locale file for this language
-      const condData = await import(
-        /* webpackChunkName: "i18n-[request]" */ `${auxLangDataRoots[i]}/locales/${currentLang.code}.json`
-      );
-      if (condData) {
-        auxCurrentLangData.push(condData);
-      }
+      try {
+        const condData = await import(
+          /* webpackChunkName: "i18n-[request]" */ `${auxLangDataRoots[i]}/locales/${currentLang.code}.json`
+        );
+        if (condData) {
+          auxCurrentLangData.push(condData);
+        }
+      } catch (e) {}
     }
   }
 };
