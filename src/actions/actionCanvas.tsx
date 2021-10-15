@@ -1,4 +1,3 @@
-import React from "react";
 import { getDefaultAppState } from "../appState";
 import { ColorPicker } from "../components/ColorPicker";
 import { trash, zoomIn, zoomOut } from "../components/icons";

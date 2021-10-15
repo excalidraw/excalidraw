@@ -1,4 +1,3 @@
-import React from "react";
 import { fireEvent, GlobalTestState, render } from "../test-utils";
 import Excalidraw from "../../packages/excalidraw/index";
 import { queryByText, queryByTestId } from "@testing-library/react";
