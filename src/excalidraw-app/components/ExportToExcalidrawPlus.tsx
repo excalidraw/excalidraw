@@ -2,13 +2,17 @@ import React from "react";
 import { Card } from "../../components/Card";
 import { ToolButton } from "../../components/ToolButton";
 import { serializeAsJSON } from "../../data/json";
-import { loadFirebaseStorage } from "../data/firebase";
-import { NonDeletedExcalidrawElement } from "../../element/types";
-import { AppState } from "../../types";
+import { loadFirebaseStorage, saveFilesToFirebase } from "../data/firebase";
+import { FileId, NonDeletedExcalidrawElement } from "../../element/types";
+import { AppState, DataURL } from "../../types";
 import { nanoid } from "nanoid";
 import { t } from "../../i18n";
 import { excalidrawPlusIcon } from "./icons";
 import { encryptData, generateEncryptionKey } from "../../data/encryption";
+import { ALLOWED_IMAGE_MIME_TYPES } from "../../constants";
+import { isInitializedImageElement } from "../../element/typeChecks";
+import { FILE_UPLOAD_MAX_BYTES } from "../app_constants";
+import { encodeFilesForUpload } from "../data/FileManager";
 
 const exportToExcalidrawPlus = async (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -18,9 +22,9 @@ const exportToExcalidrawPlus = async (
 
   const id = `${nanoid(12)}`;
 
-  const key = (await generateEncryptionKey())!;
+  const encryptionKey = (await generateEncryptionKey())!;
   const encryptedData = await encryptData(
-    key,
+    encryptionKey,
     serializeAsJSON(elements, appState, "database"),
   );
 
@@ -36,12 +40,35 @@ const exportToExcalidrawPlus = async (
     .ref(`/migrations/scenes/${id}`)
     .put(blob, {
       customMetadata: {
-        data: JSON.stringify({ version: 1, name: appState.name }),
+        data: JSON.stringify({ version: 2, name: appState.name }),
         created: Date.now().toString(),
       },
     });
 
-  window.open(`https://plus.excalidraw.com/import?excalidraw=${id},${key}`);
+  const files = new Map<FileId, DataURL>();
+  for (const element of elements) {
+    if (isInitializedImageElement(element) && appState.files[element.fileId]) {
+      files.set(element.fileId, appState.files[element.fileId].dataURL);
+    }
+  }
+
+  if (files.size) {
+    const filesToUpload = await encodeFilesForUpload({
+      files,
+      encryptionKey,
+      maxBytes: FILE_UPLOAD_MAX_BYTES,
+      allowedMimeTypes: ALLOWED_IMAGE_MIME_TYPES,
+    });
+
+    await saveFilesToFirebase({
+      prefix: `/migrations/files/scenes/${id}`,
+      files: filesToUpload,
+    });
+  }
+
+  window.open(
+    `https://plus.excalidraw.com/import?excalidraw=${id},${encryptionKey}`,
+  );
 };
 
 export const ExportToExcalidrawPlus: React.FC<{
