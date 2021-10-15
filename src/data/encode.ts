@@ -126,7 +126,7 @@ export const decode = async (data: EncodedData): Promise<string> => {
 
 type FileEncodingInfo = {
   version: 1;
-  compression: "pako@1";
+  compression: "pako@1" | null;
   encryption: "AES-GCM" | null;
 };
 
@@ -317,14 +317,19 @@ export const compressData = async <T extends Record<string, any> = never>(
 /** @private */
 const _decryptAndDecompress = async (
   iv: Uint8Array,
-  encryptedBuffer: Uint8Array,
+  decryptedBuffer: Uint8Array,
   decryptionKey: string,
+  isCompressed: boolean,
 ) => {
-  encryptedBuffer = new Uint8Array(
-    await decryptData(iv, encryptedBuffer, decryptionKey),
+  decryptedBuffer = new Uint8Array(
+    await decryptData(iv, decryptedBuffer, decryptionKey),
   );
 
-  return inflate(encryptedBuffer);
+  if (isCompressed) {
+    return inflate(decryptedBuffer);
+  }
+
+  return decryptedBuffer;
 };
 
 export const decompressData = async <T extends Record<string, any>>(
@@ -334,9 +339,18 @@ export const decompressData = async <T extends Record<string, any>>(
   // first chunk is encoding metadata (ignored for now)
   const [encodingMetadataBuffer, iv, buffer] = splitBuffers(bufferView);
 
+  const encodingMetadata: FileEncodingInfo = JSON.parse(
+    new TextDecoder().decode(encodingMetadataBuffer),
+  );
+
   try {
     const [contentsMetadataBuffer, contentsBuffer] = splitBuffers(
-      await _decryptAndDecompress(iv, buffer, options.decryptionKey),
+      await _decryptAndDecompress(
+        iv,
+        buffer,
+        options.decryptionKey,
+        !!encodingMetadata.compression,
+      ),
     );
 
     const metadata = JSON.parse(
@@ -350,9 +364,6 @@ export const decompressData = async <T extends Record<string, any>>(
       data: contentsBuffer,
     };
   } catch (error) {
-    const encodingMetadata = JSON.parse(
-      new TextDecoder().decode(encodingMetadataBuffer),
-    );
     console.error(
       `Error during decompressing and decrypting the file.`,
       encodingMetadata,
