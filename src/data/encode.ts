@@ -332,18 +332,33 @@ export const decompressData = async <T extends Record<string, any>>(
   options: { decryptionKey: string },
 ) => {
   // first chunk is encoding metadata (ignored for now)
-  const [, iv, buffer] = splitBuffers(bufferView);
+  const [encodingMetadataBuffer, iv, buffer] = splitBuffers(bufferView);
 
-  const [contentsMetadataBuffer, contentsBuffer] = splitBuffers(
-    await _decryptAndDecompress(iv, buffer, options.decryptionKey),
-  );
+  try {
+    const [contentsMetadataBuffer, contentsBuffer] = splitBuffers(
+      await _decryptAndDecompress(iv, buffer, options.decryptionKey),
+    );
 
-  return {
-    /** metadata source is always JSON so we can decode it here */
-    metadata: JSON.parse(new TextDecoder().decode(contentsMetadataBuffer)) as T,
-    /** data can be anything so the caller must decode it */
-    data: contentsBuffer,
-  };
+    const metadata = JSON.parse(
+      new TextDecoder().decode(contentsMetadataBuffer),
+    ) as T;
+
+    return {
+      /** metadata source is always JSON so we can decode it here */
+      metadata,
+      /** data can be anything so the caller must decode it */
+      data: contentsBuffer,
+    };
+  } catch (error) {
+    const encodingMetadata = JSON.parse(
+      new TextDecoder().decode(encodingMetadataBuffer),
+    );
+    console.error(
+      `Error during decompressing and decrypting the file.`,
+      encodingMetadata,
+    );
+    throw error;
+  }
 };
 
 // -----------------------------------------------------------------------------
