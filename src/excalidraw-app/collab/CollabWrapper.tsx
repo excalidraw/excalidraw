@@ -58,7 +58,11 @@ import { UserIdleState } from "../../types";
 import { IDLE_THRESHOLD, ACTIVE_THRESHOLD } from "../../constants";
 import { trackEvent } from "../../analytics";
 import { isInvisiblySmallElement } from "../../element";
-import { encodeFilesForUpload, FileManager } from "../data/FileManager";
+import {
+  encodeFilesForUpload,
+  FileManager,
+  updateStaleImageStatuses,
+} from "../data/FileManager";
 import { AbortError } from "../../errors";
 import {
   isImageElement,
@@ -257,7 +261,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       const elements = this.excalidrawAPI
         .getSceneElementsIncludingDeleted()
         .map((element) => {
-          if (isImageElement(element) && element.status !== "pending") {
+          if (isImageElement(element) && element.status === "saved") {
             return mutateElement(element, { status: "pending" }, false);
           }
           return element;
@@ -301,21 +305,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       })
       .map((element) => (element as InitializedExcalidrawImageElement).fileId);
 
-    const { loadedFiles, erroredFiles } = await this.fileManager.getFiles(
-      unfetchedImages,
-    );
-    return {
-      loadedFiles: loadedFiles
-        .filter((file) => file.type === "image")
-        .map(
-          (file) =>
-            ({
-              ...file,
-              type: "image",
-            } as const),
-        ),
-      erroredFiles,
-    };
+    return await this.fileManager.getFiles(unfetchedImages);
   };
 
   private initializeSocketClient = async (
@@ -372,7 +362,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       }
     } else {
       const elements = this.excalidrawAPI.getSceneElements().map((element) => {
-        if (isImageElement(element) && element.status !== "pending") {
+        if (isImageElement(element) && element.status === "saved") {
           return mutateElement(
             element,
             { status: "pending" },
@@ -565,12 +555,21 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   };
 
   private loadImageFiles = throttle(async () => {
-    const { loadedFiles } = await this.fetchImageFilesFromFirebase({
+    const {
+      loadedFiles,
+      erroredFiles,
+    } = await this.fetchImageFilesFromFirebase({
       elements: this.excalidrawAPI.getSceneElementsIncludingDeleted(),
       appState: this.excalidrawAPI.getAppState(),
     });
 
     this.excalidrawAPI.addFiles(loadedFiles);
+
+    updateStaleImageStatuses({
+      excalidrawAPI: this.excalidrawAPI,
+      erroredFiles,
+      elements: this.excalidrawAPI.getSceneElementsIncludingDeleted(),
+    });
   }, LOAD_IMAGES_TIMEOUT);
 
   private handleRemoteSceneUpdate = (

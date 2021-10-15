@@ -68,7 +68,7 @@ export type ExcalidrawImageElement = _ExcalidrawElementBase &
     type: "image";
     fileId: FileId | null;
     /** whether respective file is persisted */
-    status: "pending" | "saved";
+    status: "pending" | "saved" | "error";
     /** X and Y scale factors <-1, 1>, used for image axis flipping */
     scale: [number, number];
   }>;

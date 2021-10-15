@@ -268,12 +268,9 @@ export const loadFilesFromFirebase = async (
   prefix: string,
   decryptionKey: string,
   filesIds: readonly FileId[],
-): Promise<{
-  loadedFiles: BinaryFileData[];
-  erroredFiles: FileId[];
-}> => {
+) => {
   const loadedFiles: BinaryFileData[] = [];
-  const erroredFiles: FileId[] = [];
+  const erroredFiles = new Map<FileId, true>();
 
   await Promise.all(
     [...new Set(filesIds)].map(async (id) => {
@@ -307,7 +304,7 @@ export const loadFilesFromFirebase = async (
           });
         }
       } catch (error) {
-        erroredFiles.push(id);
+        erroredFiles.set(id, true);
         console.error(error);
       }
     }),

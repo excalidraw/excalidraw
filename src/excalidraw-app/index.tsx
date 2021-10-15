@@ -68,7 +68,7 @@ import "./index.scss";
 import { ExportToExcalidrawPlus } from "./components/ExportToExcalidrawPlus";
 
 import { getMany, set, del, keys, createStore } from "idb-keyval";
-import { FileManager } from "./data/FileManager";
+import { FileManager, updateStaleImageStatuses } from "./data/FileManager";
 import { mutateElement } from "../element/mutateElement";
 import { isInitializedImageElement } from "../element/typeChecks";
 import { loadFilesFromFirebase } from "./data/firebase";
@@ -91,13 +91,13 @@ const localFileStorage = new FileManager({
     return getMany(ids, filesStore).then(
       (filesData: (BinaryFileData | undefined)[]) => {
         const loadedFiles: BinaryFileData[] = [];
-        const erroredFiles: FileId[] = [];
+        const erroredFiles = new Map<FileId, true>();
         filesData.forEach((data, index) => {
           const id = ids[index];
           if (data) {
             loadedFiles.push(data);
           } else {
-            erroredFiles.push(id);
+            erroredFiles.set(id, true);
           }
         });
 
@@ -328,8 +328,13 @@ const ExcalidrawWrapper = () => {
                 elements: data.scene.elements,
                 appState: { files: data.scene.appState?.files || {} },
               })
-              .then(({ loadedFiles }) => {
+              .then(({ loadedFiles, erroredFiles }) => {
                 excalidrawAPI.addFiles(loadedFiles);
+                updateStaleImageStatuses({
+                  excalidrawAPI,
+                  erroredFiles,
+                  elements: excalidrawAPI.getSceneElementsIncludingDeleted(),
+                });
               });
           }
         } else {
@@ -346,16 +351,28 @@ const ExcalidrawWrapper = () => {
               `${FIREBASE_STORAGE_PREFIXES.shareLinkFiles}/${data.id}`,
               data.key,
               fileIds,
-            ).then(({ loadedFiles }) => {
+            ).then(({ loadedFiles, erroredFiles }) => {
               excalidrawAPI.addFiles(loadedFiles);
+              updateStaleImageStatuses({
+                excalidrawAPI,
+                erroredFiles,
+                elements: excalidrawAPI.getSceneElementsIncludingDeleted(),
+              });
             });
           } else {
             if (fileIds.length) {
-              localFileStorage.getFiles(fileIds).then(({ loadedFiles }) => {
-                if (loadedFiles.length) {
-                  excalidrawAPI.addFiles(loadedFiles);
-                }
-              });
+              localFileStorage
+                .getFiles(fileIds)
+                .then(({ loadedFiles, erroredFiles }) => {
+                  if (loadedFiles.length) {
+                    excalidrawAPI.addFiles(loadedFiles);
+                  }
+                  updateStaleImageStatuses({
+                    excalidrawAPI,
+                    erroredFiles,
+                    elements: excalidrawAPI.getSceneElementsIncludingDeleted(),
+                  });
+                });
             }
             // on fresh load, clear unused files from IDB (from previous
             // session)

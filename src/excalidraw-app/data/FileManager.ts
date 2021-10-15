@@ -1,5 +1,6 @@
 import { getDataURLMimeType } from "../../data/blob";
 import { compressData } from "../../data/encode";
+import { mutateElement } from "../../element/mutateElement";
 import { isInitializedImageElement } from "../../element/typeChecks";
 import {
   ExcalidrawElement,
@@ -13,6 +14,7 @@ import {
   BinaryFileData,
   BinaryFileMetadata,
   DataURL,
+  ExcalidrawImperativeAPI,
 } from "../../types";
 
 export class FileManager {
@@ -22,6 +24,7 @@ export class FileManager {
   private savingFiles = new Map<ExcalidrawImageElement["fileId"], true>();
   /* files already saved to persistent storage */
   private savedFiles = new Map<ExcalidrawImageElement["fileId"], true>();
+  private erroredFiles = new Map<ExcalidrawImageElement["fileId"], true>();
 
   private _getFiles;
   private _saveFiles;
@@ -34,7 +37,7 @@ export class FileManager {
       fileIds: FileId[],
     ) => Promise<{
       loadedFiles: BinaryFileData[];
-      erroredFiles: FileId[];
+      erroredFiles: Map<FileId, true>;
     }>;
     saveFiles: (data: {
       addedFiles: Map<FileId, DataURL>;
@@ -54,7 +57,8 @@ export class FileManager {
     return (
       this.savedFiles.has(id) ||
       this.fetchingFiles.has(id) ||
-      this.savingFiles.has(id)
+      this.savingFiles.has(id) ||
+      this.erroredFiles.has(id)
     );
   };
 
@@ -102,11 +106,16 @@ export class FileManager {
     }
   };
 
-  getFiles = async (ids: FileId[]) => {
+  getFiles = async (
+    ids: FileId[],
+  ): Promise<{
+    loadedFiles: BinaryFileData[];
+    erroredFiles: Map<FileId, true>;
+  }> => {
     if (!ids.length) {
       return {
         loadedFiles: [],
-        erroredFiles: [],
+        erroredFiles: new Map(),
       };
     }
     for (const id of ids) {
@@ -118,6 +127,9 @@ export class FileManager {
 
       for (const file of loadedFiles) {
         this.savedFiles.set(file.id, true);
+      }
+      for (const [fileId] of erroredFiles) {
+        this.erroredFiles.set(fileId, true);
       }
 
       return { loadedFiles, erroredFiles };
@@ -216,4 +228,33 @@ export const encodeFilesForUpload = async <M extends readonly string[]>({
   }
 
   return processedFiles;
+};
+
+export const updateStaleImageStatuses = (params: {
+  excalidrawAPI: ExcalidrawImperativeAPI;
+  erroredFiles: Map<FileId, true>;
+  elements: readonly ExcalidrawElement[];
+}) => {
+  if (!params.erroredFiles.size) {
+    return;
+  }
+  params.excalidrawAPI.updateScene({
+    elements: params.excalidrawAPI
+      .getSceneElementsIncludingDeleted()
+      .map((element) => {
+        if (
+          isInitializedImageElement(element) &&
+          params.erroredFiles.has(element.fileId)
+        ) {
+          return mutateElement(
+            element,
+            {
+              status: "error",
+            },
+            false,
+          );
+        }
+        return element;
+      }),
+  });
 };
