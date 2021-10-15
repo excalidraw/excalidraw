@@ -177,6 +177,7 @@ import {
   AppClassProperties,
   AppProps,
   AppState,
+  BinaryFileData,
   ExcalidrawImperativeAPI,
   Gesture,
   GestureEvent,
@@ -1491,7 +1492,7 @@ class App extends React.Component<AppProps, AppState> {
             ...files.reduce((acc, fileData) => {
               acc[fileData.id] = fileData;
               return acc;
-            }, {} as Record<string, AppState["files"][number]>),
+            }, {} as Record<string, BinaryFileData>),
           },
         }),
         () => {
