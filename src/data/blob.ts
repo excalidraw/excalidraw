@@ -241,6 +241,11 @@ export const resizeImageFile = async (
   file: File,
   maxWidthOrHeight: number,
 ): Promise<File> => {
+  // SVG files shouldn't a can't be resized
+  if (file.type === "image/svg+xml") {
+    return file;
+  }
+
   // a wrapper for pica (https://github.com/nodeca/pica)
   const imageBlobReduce = (await import("image-blob-reduce")).default;
 
