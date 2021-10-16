@@ -110,10 +110,6 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     window.addEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
     window.addEventListener(EVENT.UNLOAD, this.onUnload);
 
-    if (!this.state.username) {
-      this.updateUsername(getRandomUsername());
-    }
-
     if (
       process.env.NODE_ENV === ENV.TEST ||
       process.env.NODE_ENV === ENV.DEVELOPMENT
@@ -226,6 +222,10 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   ): Promise<ImportedDataState | null> => {
     if (this.portal.socket) {
       return null;
+    }
+
+    if (!this.state.username) {
+      this.updateUsername(getRandomUsername());
     }
 
     let roomId;
