@@ -4005,7 +4005,9 @@ class App extends React.Component<AppProps, AppState> {
               console.error(error);
               reject(new Error(t("errors.imageInsertError")));
             } finally {
-              resetCursor(this.canvas);
+              if (!showCursorImagePreview) {
+                resetCursor(this.canvas);
+              }
             }
           },
         );
