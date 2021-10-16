@@ -1,14 +1,24 @@
 // -----------------------------------------------------------------------------
-// ExcalidrawImageElement helpers
+// ExcalidrawImageElement & related helpers
 // -----------------------------------------------------------------------------
 
-import { AppClassProperties, AppState } from "../types";
+import { AppClassProperties, AppState, DataURL } from "../types";
 import { isInitializedImageElement } from "./typeChecks";
 import {
   ExcalidrawElement,
   FileId,
   InitializedExcalidrawImageElement,
 } from "./types";
+
+export const loadHTMLImageElement = (dataURL: DataURL) => {
+  return new Promise<HTMLImageElement>((resolve) => {
+    const image = new Image();
+    image.onload = () => {
+      resolve(image);
+    };
+    image.src = dataURL;
+  });
+};
 
 /** NOTE: updates cache even if already populated with given image. Thus,
  * you should filter out the images upstream if you want to optimize this. */
@@ -30,18 +40,15 @@ export const updateImageCache = async ({
         updatedFiles.set(fileId, true);
         return promises.concat(
           (async () => {
-            const imagePromise = new Promise<HTMLImageElement>((resolve) => {
-              const image = new Image();
-              image.onload = () => {
-                imageCache.set(fileId, image);
-                resolve(image);
-              };
-              image.src = fileData.dataURL;
-            });
+            const imagePromise = loadHTMLImageElement(fileData.dataURL);
 
-            // TODO limit the size of the imageCache
+            // store the promise immediately to indicate there's an in-progress
+            // initialization
             imageCache.set(fileId, imagePromise);
-            await imagePromise;
+
+            const img = await imagePromise;
+
+            imageCache.set(fileId, img);
           })(),
         );
       }

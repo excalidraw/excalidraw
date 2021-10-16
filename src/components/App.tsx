@@ -178,6 +178,7 @@ import {
   AppProps,
   AppState,
   BinaryFileData,
+  DataURL,
   ExcalidrawImperativeAPI,
   Gesture,
   GestureEvent,
@@ -215,6 +216,7 @@ import {
 } from "../data/blob";
 import {
   getInitializedImageElements,
+  loadHTMLImageElement,
   updateImageCache,
 } from "../element/image";
 import throttle from "lodash.throttle";
@@ -4052,7 +4054,31 @@ class App extends React.Component<AppProps, AppState> {
 
     const imagePreview = await resizeImageFile(imageFile, cursorImageSizePx);
 
-    const previewDataURL = await getDataURL(imagePreview);
+    let previewDataURL = await getDataURL(imagePreview);
+
+    // SVG cannot be resized via `resizeImageFile` so we resize by rendering to
+    // a small canvas
+    if (imageFile.type === "image/svg+xml") {
+      const img = await loadHTMLImageElement(previewDataURL);
+
+      let height = Math.min(img.height, cursorImageSizePx);
+      let width = height * (img.width / img.height);
+
+      if (width > cursorImageSizePx) {
+        width = cursorImageSizePx;
+        height = width * (img.height / img.width);
+      }
+
+      const canvas = document.createElement("canvas");
+      canvas.height = height;
+      canvas.width = width;
+      const context = canvas.getContext("2d")!;
+
+      context.drawImage(img, 0, 0, width, height);
+
+      previewDataURL = canvas.toDataURL("image/svg+xml") as DataURL;
+    }
+
     if (this.state.pendingImageElement) {
       setCursor(this.canvas, `url(${previewDataURL}) 4 4, auto`);
     }
