@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-  pull_request: null
+  pull_request:
 jobs:
   packages:
     runs-on: ubuntu-latest
