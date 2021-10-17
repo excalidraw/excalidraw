@@ -41,6 +41,7 @@ import { UserIdleState } from "../../types";
 import { IDLE_THRESHOLD, ACTIVE_THRESHOLD } from "../../constants";
 import { trackEvent } from "../../analytics";
 import { isInvisiblySmallElement } from "../../element";
+import { getRandomUsername } from "@excalidraw/random-username";
 
 interface CollabState {
   modalIsShown: boolean;
@@ -221,6 +222,10 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   ): Promise<ImportedDataState | null> => {
     if (this.portal.socket) {
       return null;
+    }
+
+    if (!this.state.username) {
+      this.updateUsername(getRandomUsername());
     }
 
     let roomId;
@@ -593,7 +598,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     this.setState({ modalIsShown: false });
   };
 
-  onUsernameChange = (username: string) => {
+  updateUsername = (username: string) => {
     this.setState({ username });
     saveUsernameToLocalStorage(username);
   };
@@ -635,7 +640,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
             handleClose={this.handleClose}
             activeRoomLink={activeRoomLink}
             username={username}
-            onUsernameChange={this.onUsernameChange}
+            onUsernameChange={this.updateUsername}
             onRoomCreate={this.openPortal}
             onRoomDestroy={this.closePortal}
             setErrorMessage={(errorMessage) => {

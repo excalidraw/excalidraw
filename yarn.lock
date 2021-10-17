@@ -1089,6 +1089,11 @@
   version "1.0.2"
   resolved "https://registry.npmjs.org/@excalidraw/prettier-config/-/prettier-config-1.0.2.tgz"
 
+"@excalidraw/random-username@1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@excalidraw/random-username/-/random-username-1.0.0.tgz#6d5293148aee6cd08dcdfcadc0c91276572f4499"
+  integrity sha512-pd4VapWahQ7PIyThGq32+C+JUS73mf3RSdC7BmQiXzhQsCTU4RHc8y9jBi+pb1CFV0iJXvjJRXnVdLCbTj3+HA==
+
 "@firebase/analytics-types@0.4.0":
   version "0.4.0"
   resolved "https://registry.npmjs.org/@firebase/analytics-types/-/analytics-types-0.4.0.tgz"

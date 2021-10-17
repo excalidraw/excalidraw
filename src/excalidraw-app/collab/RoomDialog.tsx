@@ -14,6 +14,7 @@ import { t } from "../../i18n";
 import "./RoomDialog.scss";
 import Stack from "../../components/Stack";
 import { AppState } from "../../types";
+import { getRandomUsername } from "@excalidraw/random-username";
 
 const getShareIcon = () => {
   const navigator = window.navigator as any;
@@ -137,9 +138,14 @@ const RoomDialog = ({
               </label>
               <input
                 id="username"
-                value={username || ""}
+                value={username}
                 className="RoomDialog-username TextInput"
                 onChange={(event) => onUsernameChange(event.target.value)}
+                onBlur={(event) => {
+                  if (!event.target.value.trim()) {
+                    onUsernameChange(getRandomUsername());
+                  }
+                }}
                 onKeyPress={(event) => event.key === "Enter" && handleClose()}
               />
             </div>
