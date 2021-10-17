@@ -33,6 +33,10 @@ type MobileMenuProps = {
   renderCustomFooter?: (isMobile: boolean, appState: AppState) => JSX.Element;
   viewModeEnabled: boolean;
   showThemeBtn: boolean;
+  renderTopRightUI?: (
+    isMobile: boolean,
+    appState: AppState,
+  ) => JSX.Element | null;
 };
 
 export const MobileMenu = ({
@@ -50,6 +54,7 @@ export const MobileMenu = ({
   renderCustomFooter,
   viewModeEnabled,
   showThemeBtn,
+  renderTopRightUI,
 }: MobileMenuProps) => {
   const renderToolbar = () => {
     return (
@@ -68,6 +73,7 @@ export const MobileMenu = ({
                     />
                   </Stack.Row>
                 </Island>
+                {renderTopRightUI && renderTopRightUI(true, appState)}
                 <LockButton
                   checked={appState.elementLocked}
                   onChange={onLockToggle}

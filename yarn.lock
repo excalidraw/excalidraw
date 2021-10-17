@@ -1062,6 +1062,11 @@
     enabled "2.0.x"
     kuler "^2.0.0"
 
+"@dwelle/browser-fs-access@0.21.1":
+  version "0.21.1"
+  resolved "https://registry.yarnpkg.com/@dwelle/browser-fs-access/-/browser-fs-access-0.21.1.tgz#46a9c1c95a8b8da3887d95136dc8c1f65830cfa7"
+  integrity sha512-ryAWrTdFgB2IjUooBcKz2bSrVsAUqtjctLK6ByFGbqx7qxk+kqpjA4J54uiMcbvaJ17N/cYeserA6uxBIWIdsg==
+
 "@eslint/eslintrc@^0.4.0":
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/@eslint/eslintrc/-/eslintrc-0.4.0.tgz#99cc0a0584d72f1df38b900fb062ba995f395547"
@@ -1910,6 +1915,11 @@
   dependencies:
     "@babel/runtime" "^7.12.5"
     "@testing-library/dom" "^7.28.1"
+
+"@tldraw/vec@0.0.106":
+  version "0.0.106"
+  resolved "https://registry.yarnpkg.com/@tldraw/vec/-/vec-0.0.106.tgz#34936176b314c7779a3ad897a07be7434cdbc655"
+  integrity sha512-sOI3/bEb0KbGTHb8s2lSnY+0uWEToehJXPjV9ItFEOPqRXKoKbWRUzN1OAP7AQa1FJA2/w/1oPO9Seycne6JRA==
 
 "@tootallnate/once@1":
   version "1.1.2"
@@ -3217,11 +3227,6 @@ braces@^3.0.1, braces@~3.0.2:
 brorand@^1.0.1, brorand@^1.1.0:
   version "1.1.0"
   resolved "https://registry.npmjs.org/brorand/-/brorand-1.1.0.tgz"
-
-browser-fs-access@0.18.0:
-  version "0.18.0"
-  resolved "https://registry.yarnpkg.com/browser-fs-access/-/browser-fs-access-0.18.0.tgz#d69758ff83ce6a16bb0ece2541742bc3cd86db65"
-  integrity sha512-1B6CTTpYl0kP5sP+rJ8osy4Yka8WqnrXHqChMZZVzlw7pQ2VJ+IiLEP7SxonHjtMMSLCnpd24mU08FIExXb2DQ==
 
 browser-process-hrtime@^1.0.0:
   version "1.0.0"
@@ -9260,10 +9265,10 @@ pepjs@0.5.3:
   version "0.5.3"
   resolved "https://registry.npmjs.org/pepjs/-/pepjs-0.5.3.tgz"
 
-perfect-freehand@1.0.6:
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/perfect-freehand/-/perfect-freehand-1.0.6.tgz#feeb25450241f036ec13b43fa84bbb16f8e78e0f"
-  integrity sha512-wWkFwpgUirsfBDTb9nG6+VnFR0ge119QKU2Nu96vR4MHZMPGfOsQRD7cUk+9CK5P+TUmnrtX8yOEzUrQ6KHJoA==
+perfect-freehand@1.0.15:
+  version "1.0.15"
+  resolved "https://registry.yarnpkg.com/perfect-freehand/-/perfect-freehand-1.0.15.tgz#d3e4769e0420c0d467c0147487a34793f0b421e7"
+  integrity sha512-uRglBAdRA/wzGTbI0F58fXOfNuDmUHq1S40u92d2oPGhO1YfEUGal7fT2g0N8gwkIwMD14ySeLroUVhs7aBBuw==
 
 performance-now@^2.1.0:
   version "2.1.0"
@@ -10213,7 +10218,8 @@ querystring@0.2.0, querystring@^0.2.0:
 
 querystringify@^2.1.1:
   version "2.2.0"
-  resolved "https://registry.npmjs.org/querystringify/-/querystringify-2.2.0.tgz"
+  resolved "https://registry.yarnpkg.com/querystringify/-/querystringify-2.2.0.tgz#3345941b4153cb9d082d8eee4cda2016a9aef7f6"
+  integrity sha512-FIqgj2EUvTa7R50u0rGsyTftzjYmv/a3hO345bZNrqabNqjtgiDMgmo4mkUjd+nzU5oF3dClKqFIPUKybUyqoQ==
 
 queue-microtask@^1.2.2:
   version "1.2.3"
@@ -10677,7 +10683,8 @@ require-main-filename@^2.0.0:
 
 requires-port@^1.0.0:
   version "1.0.0"
-  resolved "https://registry.npmjs.org/requires-port/-/requires-port-1.0.0.tgz"
+  resolved "https://registry.yarnpkg.com/requires-port/-/requires-port-1.0.0.tgz#925d2601d39ac485e091cf0da5c6e694dc3dcaff"
+  integrity sha1-kl0mAdOaxIXgkc8NpcbmlNw9yv8=
 
 resolve-cwd@^2.0.0:
   version "2.0.0"
@@ -11025,8 +11032,9 @@ semver-diff@^3.1.1:
     semver "^6.3.0"
 
 semver-regex@^3.1.2:
-  version "3.1.2"
-  resolved "https://registry.npmjs.org/semver-regex/-/semver-regex-3.1.2.tgz"
+  version "3.1.3"
+  resolved "https://registry.yarnpkg.com/semver-regex/-/semver-regex-3.1.3.tgz#b2bcc6f97f63269f286994e297e229b6245d0dc3"
+  integrity sha512-Aqi54Mk9uYTjVexLnR67rTyBusmwd04cLkHy9hNvk3+G3nT2Oyg7E0l4XVbOaNwIvQ3hHeYxGcyEy+mKreyBFQ==
 
 "semver@2 || 3 || 4 || 5", semver@^5.0.1, semver@^5.4.1, semver@^5.5.0, semver@^5.5.1, semver@^5.6.0, semver@^5.7.1:
   version "5.7.1"
@@ -11975,8 +11983,9 @@ tmp@0.0.33, tmp@^0.0.33:
     os-tmpdir "~1.0.2"
 
 tmpl@1.0.x:
-  version "1.0.4"
-  resolved "https://registry.npmjs.org/tmpl/-/tmpl-1.0.4.tgz"
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/tmpl/-/tmpl-1.0.5.tgz#8683e0b902bb9c20c4f726e3c0b69f36518c07cc"
+  integrity sha512-3f0uOEAQwIqGuWW2MVzYg8fV/QNnc/IpuJNG837rLuczAaLVHslWHZQj4IGiEl5Hs3kkbhwL9Ab7Hrsmuj+Smw==
 
 to-array@0.1.4:
   version "0.1.4"
@@ -12353,8 +12362,9 @@ url-parse-lax@^3.0.0:
     prepend-http "^2.0.0"
 
 url-parse@^1.4.3, url-parse@^1.4.7:
-  version "1.5.1"
-  resolved "https://registry.npmjs.org/url-parse/-/url-parse-1.5.1.tgz"
+  version "1.5.3"
+  resolved "https://registry.yarnpkg.com/url-parse/-/url-parse-1.5.3.tgz#71c1303d38fb6639ade183c2992c8cc0686df862"
+  integrity sha512-IIORyIQD9rvj0A4CLWsHkBBJuNqWpFQe224b6j9t/ABmquIS0qDU2pY6kl6AuOrL5OkCXHMCFNe1jBcuAggjvQ==
   dependencies:
     querystringify "^2.1.1"
     requires-port "^1.0.0"
