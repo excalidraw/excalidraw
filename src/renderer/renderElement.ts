@@ -154,11 +154,12 @@ IMAGE_ERROR_PLACEHOLDER_IMG.src = `data:image/svg+xml,${encodeURIComponent(
 const drawImagePlaceholder = (
   element: ExcalidrawImageElement,
   context: CanvasRenderingContext2D,
+  zoomValue: AppState["zoom"]["value"],
 ) => {
   context.fillStyle = "#E7E7E7";
   context.fillRect(0, 0, element.width, element.height);
 
-  const size = Math.min(element.width, element.height, 60);
+  const size = Math.min(element.width, element.height, 100 / zoomValue);
   context.drawImage(
     element.status === "error"
       ? IMAGE_ERROR_PLACEHOLDER_IMG
@@ -222,7 +223,7 @@ const drawElementOnCanvas = (
           element.height,
         );
       } else {
-        drawImagePlaceholder(element, context);
+        drawImagePlaceholder(element, context, sceneState.zoom.value);
       }
       break;
     }
