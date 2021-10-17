@@ -11,7 +11,7 @@ import { ImportedDataState } from "../../data/types";
 import { isInitializedImageElement } from "../../element/typeChecks";
 import { ExcalidrawElement, FileId } from "../../element/types";
 import { t } from "../../i18n";
-import { AppState, DataURL, UserIdleState } from "../../types";
+import { AppState, BinaryFileData, UserIdleState } from "../../types";
 import { FILE_UPLOAD_MAX_BYTES } from "../app_constants";
 import { encodeFilesForUpload } from "./FileManager";
 import { saveFilesToFirebase } from "./firebase";
@@ -285,13 +285,13 @@ export const exportToBackend = async (
   const exportedKey = await window.crypto.subtle.exportKey("jwk", cryptoKey);
 
   try {
-    const files = new Map<FileId, DataURL>();
+    const files = new Map<FileId, BinaryFileData>();
     for (const element of elements) {
       if (
         isInitializedImageElement(element) &&
         appState.files[element.fileId]
       ) {
-        files.set(element.fileId, appState.files[element.fileId].dataURL);
+        files.set(element.fileId, appState.files[element.fileId]);
       }
     }
 

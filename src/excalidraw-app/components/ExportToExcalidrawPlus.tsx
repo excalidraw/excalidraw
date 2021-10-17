@@ -4,7 +4,7 @@ import { ToolButton } from "../../components/ToolButton";
 import { serializeAsJSON } from "../../data/json";
 import { loadFirebaseStorage, saveFilesToFirebase } from "../data/firebase";
 import { FileId, NonDeletedExcalidrawElement } from "../../element/types";
-import { AppState, DataURL } from "../../types";
+import { AppState, BinaryFileData } from "../../types";
 import { nanoid } from "nanoid";
 import { t } from "../../i18n";
 import { excalidrawPlusIcon } from "./icons";
@@ -45,10 +45,10 @@ const exportToExcalidrawPlus = async (
       },
     });
 
-  const files = new Map<FileId, DataURL>();
+  const files = new Map<FileId, BinaryFileData>();
   for (const element of elements) {
     if (isInitializedImageElement(element) && appState.files[element.fileId]) {
-      files.set(element.fileId, appState.files[element.fileId].dataURL);
+      files.set(element.fileId, appState.files[element.fileId]);
     }
   }
 

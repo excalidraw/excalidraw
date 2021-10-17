@@ -28,6 +28,7 @@ import { isOverScrollBars } from "./scene";
 import { MaybeTransformHandleType } from "./element/transformHandles";
 import Library from "./data/library";
 import type { FileSystemHandle } from "./data/filesystem";
+import type { ALLOWED_IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -49,7 +50,10 @@ export type Collaborator = {
 export type DataURL = string & { _brand: "DataURL" };
 
 export type BinaryFileData = {
-  type: "image" | "other";
+  mimeType:
+    | typeof ALLOWED_IMAGE_MIME_TYPES[number]
+    // future user or unknown file type
+    | typeof MIME_TYPES.binary;
   id: FileId;
   dataURL: DataURL;
   created: number;

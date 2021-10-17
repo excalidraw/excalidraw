@@ -268,12 +268,8 @@ export const resizeImageFile = async (
   );
 };
 
-export const getDataURLMimeType = (dataURL: DataURL): string => {
-  return dataURL.match(/^data:([^;,]+);base64,/)?.[1] || "";
-};
-
 export const SVGStringToFile = (SVGString: string, filename: string = "") => {
   return new File([new TextEncoder().encode(SVGString)], filename, {
     type: MIME_TYPES.svg,
-  });
+  }) as File & { type: typeof MIME_TYPES.svg };
 };

@@ -94,6 +94,7 @@ export const MIME_TYPES = {
   svg: "image/svg+xml",
   png: "image/png",
   jpg: "image/jpeg",
+  binary: "application/octet-stream",
 } as const;
 
 export const EXPORT_DATA_TYPES = {

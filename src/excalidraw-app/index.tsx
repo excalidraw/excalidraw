@@ -104,16 +104,10 @@ const localFileStorage = new FileManager({
     const erroredFiles = new Map<FileId, true>();
 
     await Promise.all(
-      [...addedFiles].map(async ([id, dataURL]) => {
+      [...addedFiles].map(async ([id, fileData]) => {
         await new Promise((r) => setTimeout(r, 1500)); // FIXME
         try {
-          const data: BinaryFileData = {
-            id,
-            dataURL,
-            type: "image",
-            created: Date.now(),
-          };
-          await set(id, data, filesStore);
+          await set(id, fileData, filesStore);
           savedFiles.set(id, true);
         } catch (error) {
           console.error(error);

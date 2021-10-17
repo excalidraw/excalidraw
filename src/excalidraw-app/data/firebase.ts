@@ -6,7 +6,6 @@ import { BinaryFileData, BinaryFileMetadata, DataURL } from "../../types";
 import { FILE_CACHE_MAX_AGE_SEC } from "../app_constants";
 import { decompressData } from "../../data/encode";
 import { getImportedKey, createIV } from "../../data/encryption";
-import { getDataURLMimeType } from "../../data/blob";
 
 // private
 // -----------------------------------------------------------------------------
@@ -146,9 +145,6 @@ export const isSavedToFirebase = (
   return true;
 };
 
-const getFileTypeFromMimeType = (mimeType: string): BinaryFileData["type"] => {
-  return mimeType.includes("image/") ? "image" : "other";
-};
 export const saveFilesToFirebase = async ({
   prefix,
   files,
@@ -292,12 +288,7 @@ export const loadFilesFromFirebase = async (
           const dataURL = new TextDecoder().decode(data) as DataURL;
 
           loadedFiles.push({
-            type:
-              metadata?.type ||
-              getFileTypeFromMimeType(
-                response.headers.get("content-type") ||
-                  getDataURLMimeType(dataURL),
-              ),
+            mimeType: metadata.mimeType || "application/octet-stream",
             id,
             dataURL,
             created: metadata?.created || Date.now(),

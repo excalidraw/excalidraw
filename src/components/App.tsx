@@ -3930,9 +3930,16 @@ class App extends React.Component<AppProps, AppState> {
     imageElement: ExcalidrawImageElement;
     showCursorImagePreview?: boolean;
   }) => {
+    // at this point this should be guaranteed image file, but we do this check
+    // to satisfy TS down the line
+    if (!isSupportedImageFile(imageFile)) {
+      throw new Error(t("errors.unsupportedFileType"));
+    }
+    const mimeType = imageFile.type;
+
     setCursor(this.canvas, "wait");
 
-    if (imageFile.type === MIME_TYPES.svg) {
+    if (mimeType === MIME_TYPES.svg) {
       try {
         imageFile = SVGStringToFile(
           await normalizeSVG(await imageFile.text()),
@@ -4005,7 +4012,7 @@ class App extends React.Component<AppProps, AppState> {
             files: {
               ...state.files,
               [fileId]: {
-                type: "image",
+                mimeType,
                 id: fileId,
                 dataURL,
                 created: Date.now(),
