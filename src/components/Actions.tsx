@@ -18,6 +18,7 @@ import { AppState, Zoom } from "../types";
 import { capitalizeString, isTransparent, setCursorForShape } from "../utils";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
+import { hasStrokeColor } from "../scene/comparisons";
 
 export const SelectedShapeActions = ({
   appState,
@@ -50,7 +51,8 @@ export const SelectedShapeActions = ({
 
   return (
     <div className="panelColumn">
-      {renderAction("changeStrokeColor")}
+      {targetElements.some((element) => hasStrokeColor(element.type)) &&
+        renderAction("changeStrokeColor")}
       {showChangeBackgroundIcons && renderAction("changeBackgroundColor")}
       {showFillIcons && renderAction("changeFillStyle")}
 

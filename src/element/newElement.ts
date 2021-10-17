@@ -256,6 +256,9 @@ export const newImageElement = (
 ): NonDeleted<ExcalidrawImageElement> => {
   return {
     ..._newElementBase<ExcalidrawImageElement>("image", opts),
+    // in the future we'll support changing stroke color for some SVG elements,
+    // and `transparent` will likely mean "use original colors of the image"
+    strokeColor: "transparent",
     status: "pending",
     fileId: null,
     scale: [1, 1],
