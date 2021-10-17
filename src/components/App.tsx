@@ -3974,14 +3974,14 @@ class App extends React.Component<AppProps, AppState> {
       } catch (error) {
         console.error("error trying to resing image file on insertion", error);
       }
-    }
 
-    if (imageFile.size > MAX_ALLOWED_FILE_BYTES) {
-      throw new Error(
-        t("errors.fileTooBig", {
-          maxSize: `${Math.trunc(MAX_ALLOWED_FILE_BYTES / 1024 / 1024)}MB`,
-        }),
-      );
+      if (imageFile.size > MAX_ALLOWED_FILE_BYTES) {
+        throw new Error(
+          t("errors.fileTooBig", {
+            maxSize: `${Math.trunc(MAX_ALLOWED_FILE_BYTES / 1024 / 1024)}MB`,
+          }),
+        );
+      }
     }
 
     if (showCursorImagePreview) {
