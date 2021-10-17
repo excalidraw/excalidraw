@@ -175,28 +175,22 @@ export class FileManager {
   }
 }
 
-export const encodeFilesForUpload = async <M extends readonly string[]>({
+export const encodeFilesForUpload = async ({
   files,
   maxBytes,
   encryptionKey,
-  allowedMimeTypes,
 }: {
   files: Map<FileId, BinaryFileData>;
   maxBytes: number;
   encryptionKey: string;
-  allowedMimeTypes: M;
 }) => {
   const processedFiles: {
     id: FileId;
-    mimeType: M[number];
+    mimeType: BinaryFileData["mimeType"];
     buffer: Uint8Array;
   }[] = [];
 
   for (const [id, fileData] of files) {
-    if (!allowedMimeTypes.includes(fileData.mimeType)) {
-      throw new Error(t("errors.unsupportedFileType"));
-    }
-
     const buffer = new TextEncoder().encode(fileData.dataURL);
 
     const encodedFile = await compressData<BinaryFileMetadata>(buffer, {

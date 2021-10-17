@@ -2,12 +2,7 @@ import throttle from "lodash.throttle";
 import { PureComponent } from "react";
 import { AppState, ExcalidrawImperativeAPI } from "../../types";
 import { ErrorDialog } from "../../components/ErrorDialog";
-import {
-  ALLOWED_IMAGE_MIME_TYPES,
-  APP_NAME,
-  ENV,
-  EVENT,
-} from "../../constants";
+import { APP_NAME, ENV, EVENT } from "../../constants";
 import { ImportedDataState } from "../../data/types";
 import {
   ExcalidrawElement,
@@ -152,7 +147,6 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
             files: addedFiles,
             encryptionKey: roomKey,
             maxBytes: FILE_UPLOAD_MAX_BYTES,
-            allowedMimeTypes: ALLOWED_IMAGE_MIME_TYPES,
           }),
         });
       },

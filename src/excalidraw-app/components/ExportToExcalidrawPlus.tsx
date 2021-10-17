@@ -9,7 +9,6 @@ import { nanoid } from "nanoid";
 import { t } from "../../i18n";
 import { excalidrawPlusIcon } from "./icons";
 import { encryptData, generateEncryptionKey } from "../../data/encryption";
-import { ALLOWED_IMAGE_MIME_TYPES } from "../../constants";
 import { isInitializedImageElement } from "../../element/typeChecks";
 import { FILE_UPLOAD_MAX_BYTES } from "../app_constants";
 import { encodeFilesForUpload } from "../data/FileManager";
@@ -57,7 +56,6 @@ const exportToExcalidrawPlus = async (
       files,
       encryptionKey,
       maxBytes: FILE_UPLOAD_MAX_BYTES,
-      allowedMimeTypes: ALLOWED_IMAGE_MIME_TYPES,
     });
 
     await saveFilesToFirebase({
