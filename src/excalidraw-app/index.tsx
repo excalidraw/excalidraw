@@ -307,6 +307,9 @@ const ExcalidrawWrapper = () => {
 
   const renderTopRightUI = useCallback(
     (isMobile: boolean, appState: AppState) => {
+      if (isMobile) {
+        return null;
+      }
       return (
         <div
           style={{

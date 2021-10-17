@@ -17,7 +17,9 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
-- Export `THEME` constant from the package so host can use this when passing the theme
+- Support [`renderTopRightUI`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#renderTopRightUI) in mobile UI.
+
+- Export `THEME` constant from the package so host can use this when passing the theme.
 
   #### BREAKING CHANGE
 
