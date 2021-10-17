@@ -38,7 +38,7 @@ const isPendingImageElement = (
   sceneState: SceneState,
 ) =>
   isInitializedImageElement(element) &&
-  !sceneState.imageCache.get(element.fileId);
+  !sceneState.imageCache.has(element.fileId);
 
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 
@@ -119,7 +119,8 @@ const generateElementCanvas = (
   if (
     sceneState.theme === "dark" &&
     isInitializedImageElement(element) &&
-    !isPendingImageElement(element, sceneState)
+    !isPendingImageElement(element, sceneState) &&
+    sceneState.imageCache.get(element.fileId)?.mimeType !== MIME_TYPES.svg
   ) {
     // using a stronger invert (100% vs our regular 93%) and saturate
     // as a temp hack to make images in dark theme look closer to original
@@ -212,7 +213,7 @@ const drawElementOnCanvas = (
     }
     case "image": {
       const img = isInitializedImageElement(element)
-        ? sceneState.imageCache.get(element.fileId)
+        ? sceneState.imageCache.get(element.fileId)?.image
         : undefined;
       if (img != null && !(img instanceof Promise)) {
         context.drawImage(

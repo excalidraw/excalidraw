@@ -47,14 +47,22 @@ export const updateImageCache = async ({
         return promises.concat(
           (async () => {
             try {
+              if (fileData.mimeType === "application/octet-stream") {
+                throw new Error("Only images can be added to ImageCache");
+              }
+
               const imagePromise = loadHTMLImageElement(fileData.dataURL);
+              const data = {
+                image: imagePromise,
+                mimeType: fileData.mimeType,
+              } as const;
               // store the promise immediately to indicate there's an in-progress
               // initialization
-              imageCache.set(fileId, imagePromise);
+              imageCache.set(fileId, data);
 
-              const img = await imagePromise;
+              const image = await imagePromise;
 
-              imageCache.set(fileId, img);
+              imageCache.set(fileId, { ...data, image });
             } catch (error) {
               erroredFiles.set(fileId, true);
             }

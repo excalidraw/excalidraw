@@ -4021,13 +4021,13 @@ class App extends React.Component<AppProps, AppState> {
           }),
           async () => {
             try {
-              const cachedImage = this.imageCache.get(fileId);
-              if (!cachedImage) {
+              const cachedImageData = this.imageCache.get(fileId);
+              if (!cachedImageData) {
                 this.addNewImagesToImageCache();
                 await this.updateImageCache([imageElement]);
               }
-              if (cachedImage instanceof Promise) {
-                await cachedImage;
+              if (cachedImageData?.image instanceof Promise) {
+                await cachedImageData.image;
               }
               if (
                 this.state.pendingImageElement?.id !== imageElement.id &&
@@ -4187,7 +4187,7 @@ class App extends React.Component<AppProps, AppState> {
   ) => {
     const image =
       isInitializedImageElement(imageElement) &&
-      this.imageCache.get(imageElement.fileId);
+      this.imageCache.get(imageElement.fileId)?.image;
 
     if (!image || image instanceof Promise) {
       if (
@@ -4566,7 +4566,7 @@ class App extends React.Component<AppProps, AppState> {
 
       const image =
         isInitializedImageElement(draggingElement) &&
-        this.imageCache.get(draggingElement.fileId);
+        this.imageCache.get(draggingElement.fileId)?.image;
       const aspectRatio =
         image && !(image instanceof Promise)
           ? image.width / image.height

@@ -284,7 +284,13 @@ export type AppClassProperties = {
   canvas: HTMLCanvasElement | null;
   focusContainer(): void;
   library: Library;
-  imageCache: Map<FileId, HTMLImageElement | Promise<HTMLImageElement>>;
+  imageCache: Map<
+    FileId,
+    {
+      image: HTMLImageElement | Promise<HTMLImageElement>;
+      mimeType: typeof ALLOWED_IMAGE_MIME_TYPES[number];
+    }
+  >;
 };
 
 export type PointerDownState = Readonly<{
