@@ -13,10 +13,13 @@ import {
 } from "./types";
 
 export const loadHTMLImageElement = (dataURL: DataURL) => {
-  return new Promise<HTMLImageElement>((resolve) => {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
     const image = new Image();
     image.onload = () => {
       resolve(image);
+    };
+    image.onerror = (error) => {
+      reject(error);
     };
     image.src = dataURL;
   });
@@ -34,6 +37,7 @@ export const updateImageCache = async ({
   imageCache: AppClassProperties["imageCache"];
 }) => {
   const updatedFiles = new Map<FileId, true>();
+  const erroredFiles = new Map<FileId, true>();
 
   await Promise.all(
     fileIds.reduce((promises, fileId) => {
@@ -42,15 +46,18 @@ export const updateImageCache = async ({
         updatedFiles.set(fileId, true);
         return promises.concat(
           (async () => {
-            const imagePromise = loadHTMLImageElement(fileData.dataURL);
+            try {
+              const imagePromise = loadHTMLImageElement(fileData.dataURL);
+              // store the promise immediately to indicate there's an in-progress
+              // initialization
+              imageCache.set(fileId, imagePromise);
 
-            // store the promise immediately to indicate there's an in-progress
-            // initialization
-            imageCache.set(fileId, imagePromise);
+              const img = await imagePromise;
 
-            const img = await imagePromise;
-
-            imageCache.set(fileId, img);
+              imageCache.set(fileId, img);
+            } catch (error) {
+              erroredFiles.set(fileId, true);
+            }
           })(),
         );
       }
@@ -58,7 +65,13 @@ export const updateImageCache = async ({
     }, [] as Promise<any>[]),
   );
 
-  return { imageCache, updatedFiles };
+  return {
+    imageCache,
+    /** includes errored files because they cache was updated nonetheless */
+    updatedFiles,
+    /** files that failed when creating HTMLImageElement */
+    erroredFiles,
+  };
 };
 
 export const getInitializedImageElements = (

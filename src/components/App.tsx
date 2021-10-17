@@ -219,6 +219,7 @@ import {
   getInitializedImageElements,
   loadHTMLImageElement,
   normalizeSVG,
+  updateImageCache as _updateImageCache,
 } from "../element/image";
 import throttle from "lodash.throttle";
 import { fileOpen, nativeFileSystemSupported } from "../data/filesystem";
@@ -760,7 +761,7 @@ class App extends React.Component<AppProps, AppState> {
       commitToHistory: true,
     });
 
-    this.refreshImages(
+    this.addNewImagesToImageCache(
       getInitializedImageElements(scene.elements),
       scene.appState.files,
     );
@@ -1380,7 +1381,7 @@ class App extends React.Component<AppProps, AppState> {
       ),
       () => {
         if (opts.files) {
-          this.refreshImages();
+          this.addNewImagesToImageCache();
         }
       },
     );
@@ -1510,7 +1511,7 @@ class App extends React.Component<AppProps, AppState> {
           },
         }),
         () => {
-          this.refreshImages();
+          this.addNewImagesToImageCache();
         },
       );
     },
@@ -3956,11 +3957,16 @@ class App extends React.Component<AppProps, AppState> {
       throw new Error(t("errors.imageInsertError"));
     }
 
-    if (!this.state.files[fileId]?.dataURL) {
-      imageFile = await resizeImageFile(
-        imageFile,
-        DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
-      );
+    const existingFileData = this.state.files[fileId];
+    if (!existingFileData?.dataURL) {
+      try {
+        imageFile = await resizeImageFile(
+          imageFile,
+          DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
+        );
+      } catch (error) {
+        console.error("error trying to resing image file on insertion", error);
+      }
     }
 
     if (imageFile.size > MAX_ALLOWED_FILE_BYTES) {
@@ -4010,12 +4016,8 @@ class App extends React.Component<AppProps, AppState> {
             try {
               const cachedImage = this.imageCache.get(fileId);
               if (!cachedImage) {
-                await updateImageCache({
-                  imageCache: this.imageCache,
-                  fileIds: [imageElement.fileId],
-                  files: this.state.files,
-                });
-                invalidateShapeForElement(imageElement);
+                this.addNewImagesToImageCache();
+                await this.updateImageCache([imageElement]);
               }
               if (cachedImage instanceof Promise) {
                 await cachedImage;
@@ -4224,8 +4226,37 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  /** populates image cache and re-renders if needed */
-  private refreshImages = async (
+  /** updates image cache, refreshing updated elements and/or setting status
+      to error for images that fail during <img> element creation */
+  private updateImageCache = async (
+    elements: readonly InitializedExcalidrawImageElement[],
+    files = this.state.files,
+  ) => {
+    const { updatedFiles, erroredFiles } = await _updateImageCache({
+      imageCache: this.imageCache,
+      fileIds: elements.map((element) => element.fileId),
+      files,
+    });
+    if (updatedFiles.size || erroredFiles.size) {
+      for (const element of elements) {
+        if (updatedFiles.has(element.fileId)) {
+          invalidateShapeForElement(element);
+        }
+
+        if (erroredFiles.has(element.fileId)) {
+          mutateElement(
+            element,
+            { status: "error" },
+            /* informMutation */ false,
+          );
+        }
+      }
+    }
+    return { updatedFiles, erroredFiles };
+  };
+
+  /** adds new images to imageCache and re-renders if needed */
+  private addNewImagesToImageCache = async (
     imageElements: InitializedExcalidrawImageElement[] = getInitializedImageElements(
       this.scene.getElements(),
     ),
@@ -4236,26 +4267,20 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     if (uncachedImageElements.length) {
-      const { updatedFiles } = await updateImageCache({
-        imageCache: this.imageCache,
-        fileIds: uncachedImageElements.map((element) => element.fileId),
+      const { updatedFiles } = await this.updateImageCache(
+        uncachedImageElements,
         files,
-      });
+      );
       if (updatedFiles.size) {
-        for (const element of uncachedImageElements) {
-          if (updatedFiles.has(element.fileId)) {
-            invalidateShapeForElement(element);
-          }
-        }
         this.scene.informMutation();
       }
     }
   };
 
-  /** generally you should use `refreshImages()` directly if you need to render
-   * new images. This is just a failsafe  */
+  /** generally you should use `addNewImagesToImageCache()` directly if you need
+   *  to render new images. This is just a failsafe  */
   private scheduleImageRefresh = throttle(() => {
-    this.refreshImages();
+    this.addNewImagesToImageCache();
   }, IMAGE_RENDER_TIMEOUT);
 
   private updateBindingEnabledOnPointerMove = (
