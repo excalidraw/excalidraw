@@ -160,7 +160,13 @@ const drawImagePlaceholder = (
   context.fillStyle = "#E7E7E7";
   context.fillRect(0, 0, element.width, element.height);
 
-  const size = Math.min(element.width, element.height, 100 / zoomValue);
+  const imageMinWidthOrHeight = Math.min(element.width, element.height);
+
+  const size = Math.min(
+    imageMinWidthOrHeight,
+    Math.min(imageMinWidthOrHeight * 0.4, 100),
+  );
+
   context.drawImage(
     element.status === "error"
       ? IMAGE_ERROR_PLACEHOLDER_IMG

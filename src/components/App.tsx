@@ -4194,7 +4194,7 @@ class App extends React.Component<AppProps, AppState> {
         imageElement.width < DRAGGING_THRESHOLD / this.state.zoom.value &&
         imageElement.height < DRAGGING_THRESHOLD / this.state.zoom.value
       ) {
-        const placeholderSize = 100;
+        const placeholderSize = 100 / this.state.zoom.value;
         mutateElement(imageElement, {
           x: imageElement.x - placeholderSize / 2,
           y: imageElement.y - placeholderSize / 2,
