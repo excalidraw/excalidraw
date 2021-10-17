@@ -1,6 +1,10 @@
 import { nanoid } from "nanoid";
 import { cleanAppStateForExport } from "../appState";
-import { ALLOWED_IMAGE_MIME_TYPES, EXPORT_DATA_TYPES } from "../constants";
+import {
+  ALLOWED_IMAGE_MIME_TYPES,
+  EXPORT_DATA_TYPES,
+  MIME_TYPES,
+} from "../constants";
 import { clearElementsForExport } from "../element";
 import { ExcalidrawElement, FileId } from "../element/types";
 import { CanvasError } from "../errors";
@@ -15,7 +19,7 @@ import { ImportedLibraryData } from "./types";
 const parseFileContents = async (blob: Blob | File) => {
   let contents: string;
 
-  if (blob.type === "image/png") {
+  if (blob.type === MIME_TYPES.png) {
     try {
       return await (
         await import(/* webpackChunkName: "image" */ "./image")
@@ -47,7 +51,7 @@ const parseFileContents = async (blob: Blob | File) => {
         };
       });
     }
-    if (blob.type === "image/svg+xml") {
+    if (blob.type === MIME_TYPES.svg) {
       try {
         return await (
           await import(/* webpackChunkName: "image" */ "./image")
@@ -83,13 +87,13 @@ export const getMimeType = (blob: Blob | string): string => {
     name = blob.name || "";
   }
   if (/\.(excalidraw|json)$/.test(name)) {
-    return "application/json";
+    return MIME_TYPES.json;
   } else if (/\.png$/.test(name)) {
-    return "image/png";
+    return MIME_TYPES.png;
   } else if (/\.jpe?g$/.test(name)) {
-    return "image/jpeg";
+    return MIME_TYPES.jpg;
   } else if (/\.svg$/.test(name)) {
-    return "image/svg+xml";
+    return MIME_TYPES.svg;
   }
   return "";
 };
@@ -242,7 +246,7 @@ export const resizeImageFile = async (
   maxWidthOrHeight: number,
 ): Promise<File> => {
   // SVG files shouldn't a can't be resized
-  if (file.type === "image/svg+xml") {
+  if (file.type === MIME_TYPES.svg) {
     return file;
   }
 
@@ -270,6 +274,6 @@ export const getDataURLMimeType = (dataURL: DataURL): string => {
 
 export const SVGStringToFile = (SVGString: string, filename: string = "") => {
   return new File([new TextEncoder().encode(SVGString)], filename, {
-    type: "image/svg+xml",
+    type: MIME_TYPES.svg,
   });
 };

@@ -6,7 +6,7 @@ import { getSelectedElements } from "./scene";
 import { AppState } from "./types";
 import { SVG_EXPORT_TAG } from "./scene/export";
 import { tryParseSpreadsheet, Spreadsheet, VALID_SPREADSHEET } from "./charts";
-import { EXPORT_DATA_TYPES } from "./constants";
+import { EXPORT_DATA_TYPES, MIME_TYPES } from "./constants";
 import { isInitializedImageElement } from "./element/typeChecks";
 
 type ElementsClipboard = {
@@ -169,7 +169,7 @@ export const parseClipboard = async (
 
 export const copyBlobToClipboardAsPng = async (blob: Blob) => {
   await navigator.clipboard.write([
-    new window.ClipboardItem({ "image/png": blob }),
+    new window.ClipboardItem({ [MIME_TYPES.png]: blob }),
   ]);
 };
 

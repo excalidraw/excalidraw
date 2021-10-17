@@ -90,6 +90,10 @@ export const GRID_SIZE = 20; // TODO make it configurable?
 export const MIME_TYPES = {
   excalidraw: "application/vnd.excalidraw+json",
   excalidrawlib: "application/vnd.excalidrawlib+json",
+  json: "application/json",
+  svg: "image/svg+xml",
+  png: "image/png",
+  jpg: "image/jpeg",
 } as const;
 
 export const EXPORT_DATA_TYPES = {
@@ -159,9 +163,9 @@ export const DEFAULT_EXPORT_PADDING = 10; // px
 export const DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT = 1440;
 
 export const ALLOWED_IMAGE_MIME_TYPES = [
-  "image/png",
-  "image/jpeg",
-  "image/svg+xml",
+  MIME_TYPES.png,
+  MIME_TYPES.jpg,
+  MIME_TYPES.svg,
 ] as const;
 
 export const MAX_ALLOWED_FILE_BYTES = 2 * 1024 * 1024;

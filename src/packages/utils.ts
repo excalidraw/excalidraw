@@ -7,6 +7,7 @@ import { AppState } from "../types";
 import { ExcalidrawElement } from "../element/types";
 import { getNonDeletedElements } from "../element";
 import { restore } from "../data/restore";
+import { MIME_TYPES } from "../constants";
 
 type ExportOpts = {
   elements: readonly ExcalidrawElement[];
@@ -52,14 +53,15 @@ export const exportToBlob = async (
 ): Promise<Blob | null> => {
   const canvas = await exportToCanvas(opts);
 
-  let { mimeType = "image/png", quality } = opts;
+  let { mimeType = MIME_TYPES.png, quality } = opts;
 
-  if (mimeType === "image/png" && typeof quality === "number") {
-    console.warn(`"quality" will be ignored for "image/png" mimeType`);
+  if (mimeType === MIME_TYPES.png && typeof quality === "number") {
+    console.warn(`"quality" will be ignored for "${MIME_TYPES.png}" mimeType`);
   }
 
+  // typo in MIME type (should be "jpeg")
   if (mimeType === "image/jpg") {
-    mimeType = "image/jpeg";
+    mimeType = MIME_TYPES.jpg;
   }
 
   quality = quality ? quality : /image\/jpe?g/.test(mimeType) ? 0.92 : 0.8;

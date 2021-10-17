@@ -2,7 +2,7 @@
 // ExcalidrawImageElement & related helpers
 // -----------------------------------------------------------------------------
 
-import { SVG_NS } from "../constants";
+import { MIME_TYPES, SVG_NS } from "../constants";
 import { t } from "../i18n";
 import { AppClassProperties, AppState, DataURL } from "../types";
 import { isInitializedImageElement } from "./typeChecks";
@@ -88,7 +88,7 @@ export const isHTMLSVGElement = (node: Node | null): node is SVGElement => {
 };
 
 export const normalizeSVG = async (SVGString: string) => {
-  const doc = new DOMParser().parseFromString(SVGString, "image/svg+xml");
+  const doc = new DOMParser().parseFromString(SVGString, MIME_TYPES.svg);
   const svg = doc.querySelector("svg");
   const errorNode = doc.querySelector("parsererror");
   if (errorNode || !isHTMLSVGElement(svg)) {

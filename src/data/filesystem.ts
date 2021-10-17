@@ -17,15 +17,6 @@ type FILE_EXTENSION =
   | "excalidraw"
   | "excalidrawlib";
 
-const FILE_TYPE_TO_MIME_TYPE: Record<FILE_EXTENSION, string> = {
-  jpg: "image/jpeg",
-  png: "image/png",
-  svg: "image/svg+xml",
-  json: "application/json",
-  excalidraw: MIME_TYPES.excalidraw,
-  excalidrawlib: MIME_TYPES.excalidrawlib,
-};
-
 const INPUT_CHANGE_INTERVAL_MS = 500;
 
 export const fileOpen = <M extends boolean | undefined = false>(opts: {
@@ -41,7 +32,7 @@ export const fileOpen = <M extends boolean | undefined = false>(opts: {
     : FileWithHandle[];
 
   const mimeTypes = opts.extensions?.reduce((mimeTypes, type) => {
-    mimeTypes.push(FILE_TYPE_TO_MIME_TYPE[type]);
+    mimeTypes.push(MIME_TYPES[type]);
 
     return mimeTypes;
   }, [] as string[]);

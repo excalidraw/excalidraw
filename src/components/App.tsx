@@ -3932,7 +3932,7 @@ class App extends React.Component<AppProps, AppState> {
   }) => {
     setCursor(this.canvas, "wait");
 
-    if (imageFile.type === "image/svg+xml") {
+    if (imageFile.type === MIME_TYPES.svg) {
       try {
         imageFile = SVGStringToFile(
           await normalizeSVG(await imageFile.text()),
@@ -4084,7 +4084,7 @@ class App extends React.Component<AppProps, AppState> {
 
     // SVG cannot be resized via `resizeImageFile` so we resize by rendering to
     // a small canvas
-    if (imageFile.type === "image/svg+xml") {
+    if (imageFile.type === MIME_TYPES.svg) {
       const img = await loadHTMLImageElement(previewDataURL);
 
       let height = Math.min(img.height, cursorImageSizePx);
@@ -4102,7 +4102,7 @@ class App extends React.Component<AppProps, AppState> {
 
       context.drawImage(img, 0, 0, width, height);
 
-      previewDataURL = canvas.toDataURL("image/svg+xml") as DataURL;
+      previewDataURL = canvas.toDataURL(MIME_TYPES.svg) as DataURL;
     }
 
     if (this.state.pendingImageElement) {
@@ -4386,7 +4386,7 @@ class App extends React.Component<AppProps, AppState> {
         // first attempt to decode scene from the image if it's embedded
         // ---------------------------------------------------------------------
 
-        if (file?.type === "image/png" || file?.type === "image/svg+xml") {
+        if (file?.type === MIME_TYPES.png || file?.type === MIME_TYPES.svg) {
           try {
             if (nativeFileSystemSupported) {
               try {

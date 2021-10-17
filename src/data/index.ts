@@ -2,7 +2,7 @@ import {
   copyBlobToClipboardAsPng,
   copyTextToSystemClipboard,
 } from "../clipboard";
-import { DEFAULT_EXPORT_PADDING } from "../constants";
+import { DEFAULT_EXPORT_PADDING, MIME_TYPES } from "../constants";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { exportToCanvas, exportToSvg } from "../scene/export";
@@ -48,7 +48,7 @@ export const exportCanvas = async (
     });
     if (type === "svg") {
       return await fileSave(
-        new Blob([tempSvg.outerHTML], { type: "image/svg+xml" }),
+        new Blob([tempSvg.outerHTML], { type: MIME_TYPES.svg }),
         {
           name,
           extension: "svg",
