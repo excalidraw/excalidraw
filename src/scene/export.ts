@@ -2,9 +2,9 @@ import rough from "roughjs/bin/rough";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element/bounds";
 import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
-import { distance, SVG_NS } from "../utils";
+import { distance } from "../utils";
 import { AppState } from "../types";
-import { DEFAULT_EXPORT_PADDING, THEME_FILTER } from "../constants";
+import { DEFAULT_EXPORT_PADDING, SVG_NS, THEME_FILTER } from "../constants";
 import { getDefaultAppState } from "../appState";
 import { serializeAsJSON } from "../data/json";
 import {

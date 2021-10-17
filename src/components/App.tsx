@@ -213,11 +213,12 @@ import {
   getDataURL,
   isSupportedImageFile,
   resizeImageFile,
+  SVGStringToFile,
 } from "../data/blob";
 import {
   getInitializedImageElements,
   loadHTMLImageElement,
-  updateImageCache,
+  normalizeSVG,
 } from "../element/image";
 import throttle from "lodash.throttle";
 import { fileOpen, nativeFileSystemSupported } from "../data/filesystem";
@@ -1245,7 +1246,19 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      const file = event?.clipboardData?.files[0];
+      const data = await parseClipboard(event);
+
+      let file = event?.clipboardData?.files[0];
+
+      if (!file && data.text) {
+        const string = data.text.trim();
+        if (string.startsWith("<svg") && string.endsWith("</svg>")) {
+          // ignore SVG validation/normalization which will be done during image
+          // initialization
+          file = SVGStringToFile(string);
+        }
+      }
+
       if (isSupportedImageFile(file)) {
         const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
           { clientX: cursorX, clientY: cursorY },
@@ -1260,7 +1273,6 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      const data = await parseClipboard(event);
       if (this.props.onPaste) {
         try {
           if ((await this.props.onPaste(data, event)) === false) {
@@ -3918,6 +3930,18 @@ class App extends React.Component<AppProps, AppState> {
     showCursorImagePreview?: boolean;
   }) => {
     setCursor(this.canvas, "wait");
+
+    if (imageFile.type === "image/svg+xml") {
+      try {
+        imageFile = SVGStringToFile(
+          await normalizeSVG(await imageFile.text()),
+          imageFile.name,
+        );
+      } catch (error) {
+        console.warn(error);
+        throw new Error(t("errors.svgImageInsertError"));
+      }
+    }
 
     // generate image id (by default the file digest) before any
     // resizing/compression takes place to keep it more portable

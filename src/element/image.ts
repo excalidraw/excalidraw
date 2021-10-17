@@ -2,6 +2,8 @@
 // ExcalidrawImageElement & related helpers
 // -----------------------------------------------------------------------------
 
+import { SVG_NS } from "../constants";
+import { t } from "../i18n";
 import { AppClassProperties, AppState, DataURL } from "../types";
 import { isInitializedImageElement } from "./typeChecks";
 import {
@@ -65,3 +67,24 @@ export const getInitializedImageElements = (
   elements.filter((element) =>
     isInitializedImageElement(element),
   ) as InitializedExcalidrawImageElement[];
+
+export const isHTMLSVGElement = (node: Node | null): node is SVGElement => {
+  // lower-casing due to XML/HTML convention differences
+  // https://johnresig.com/blog/nodename-case-sensitivity
+  return node?.nodeName.toLowerCase() === "svg";
+};
+
+export const normalizeSVG = async (SVGString: string) => {
+  const doc = new DOMParser().parseFromString(SVGString, "image/svg+xml");
+  const svg = doc.querySelector("svg");
+  const errorNode = doc.querySelector("parsererror");
+  if (errorNode || !isHTMLSVGElement(svg)) {
+    throw new Error(t("errors.invalidSVGString"));
+  } else {
+    if (!svg.hasAttribute("xmlns")) {
+      svg.setAttribute("xmlns", SVG_NS);
+    }
+
+    return svg.outerHTML;
+  }
+};

@@ -165,3 +165,5 @@ export const ALLOWED_IMAGE_MIME_TYPES = [
 ] as const;
 
 export const MAX_ALLOWED_FILE_BYTES = 2 * 1024 * 1024;
+
+export const SVG_NS = "http://www.w3.org/2000/svg";

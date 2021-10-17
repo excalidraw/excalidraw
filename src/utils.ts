@@ -10,8 +10,6 @@ import { Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
 import { isDarwin } from "./keys";
 
-export const SVG_NS = "http://www.w3.org/2000/svg";
-
 let mockDateTime: string | null = null;
 
 export const setDateTimeForTests = (dateTime: string) => {

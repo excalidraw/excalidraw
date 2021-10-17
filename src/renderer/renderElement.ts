@@ -23,18 +23,12 @@ import { Drawable, Options } from "roughjs/bin/core";
 import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 import { SceneState } from "../scene/types";
-import {
-  SVG_NS,
-  distance,
-  getFontString,
-  getFontFamilyString,
-  isRTL,
-} from "../utils";
+import { distance, getFontString, getFontFamilyString, isRTL } from "../utils";
 import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
 import { AppState, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
-import { MAX_DECIMALS_FOR_SVG_EXPORT } from "../constants";
+import { MAX_DECIMALS_FOR_SVG_EXPORT, SVG_NS } from "../constants";
 import { getStroke, StrokeOptions } from "perfect-freehand";
 
 const defaultAppState = getDefaultAppState();
