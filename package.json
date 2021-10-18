@@ -19,7 +19,7 @@
     ]
   },
   "dependencies": {
-    "@dwelle/browser-fs-access": "0.21.1",
+    "@dwelle/browser-fs-access": "0.21.3",
     "@sentry/browser": "6.2.5",
     "@sentry/integrations": "6.2.5",
     "@testing-library/jest-dom": "5.11.10",
