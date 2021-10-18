@@ -6,6 +6,7 @@ import { BinaryFileData, BinaryFileMetadata, DataURL } from "../../types";
 import { FILE_CACHE_MAX_AGE_SEC } from "../app_constants";
 import { decompressData } from "../../data/encode";
 import { getImportedKey, createIV } from "../../data/encryption";
+import { MIME_TYPES } from "../../constants";
 
 // private
 // -----------------------------------------------------------------------------
@@ -150,7 +151,7 @@ export const saveFilesToFirebase = async ({
   files,
 }: {
   prefix: string;
-  files: { id: FileId; buffer: Uint8Array; mimeType: string }[];
+  files: { id: FileId; buffer: Uint8Array }[];
 }) => {
   const firebase = await loadFirebaseStorage();
 
@@ -158,14 +159,14 @@ export const saveFilesToFirebase = async ({
   const savedFiles = new Map<FileId, true>();
 
   await Promise.all(
-    files.map(async ({ id, buffer, mimeType }) => {
+    files.map(async ({ id, buffer }) => {
       try {
         await firebase
           .storage()
           .ref(`${prefix}/${id}`)
           .put(
             new Blob([buffer], {
-              type: mimeType,
+              type: MIME_TYPES.binary,
             }),
             {
               cacheControl: `public, max-age=${FILE_CACHE_MAX_AGE_SEC}`,

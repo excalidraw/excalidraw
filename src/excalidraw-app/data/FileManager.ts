@@ -186,7 +186,6 @@ export const encodeFilesForUpload = async ({
 }) => {
   const processedFiles: {
     id: FileId;
-    mimeType: BinaryFileData["mimeType"];
     buffer: Uint8Array;
   }[] = [];
 
@@ -212,7 +211,6 @@ export const encodeFilesForUpload = async ({
 
     processedFiles.push({
       id,
-      mimeType: fileData.mimeType,
       buffer: encodedFile,
     });
   }
