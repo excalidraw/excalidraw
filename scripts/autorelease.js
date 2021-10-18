@@ -31,9 +31,11 @@ exec(`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
   const filesToIgnoreRegex = /src\/excalidraw-app|packages\/utils/;
 
   const excalidrawPackageFiles = changedFiles.filter((file) => {
-    return file.indexOf("src") >= 0 && !filesToIgnoreRegex.test(file);
+    return (
+      (file.indexOf("src") >= 0 || file.indexOf("package.json")) >= 0 &&
+      !filesToIgnoreRegex.test(file)
+    );
   });
-
   if (!excalidrawPackageFiles.length) {
     process.exit(0);
   }
@@ -46,6 +48,5 @@ exec(`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
   // update readme
   const data = fs.readFileSync(`${excalidrawDir}/README_NEXT.md`, "utf8");
   fs.writeFileSync(`${excalidrawDir}/README.md`, data, "utf8");
-
   publish();
 });
