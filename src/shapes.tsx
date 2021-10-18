@@ -103,7 +103,7 @@ export const SHAPES = [
       </svg>
     ),
     value: "image",
-    key: KEYS.I,
+    key: null,
   },
 ] as const;
 
@@ -111,9 +111,10 @@ export const findShapeByKey = (key: string) => {
   const shape = SHAPES.find((shape, index) => {
     return (
       key === (index + 1).toString() ||
-      (typeof shape.key === "string"
-        ? shape.key === key
-        : (shape.key as readonly string[]).includes(key))
+      (shape.key &&
+        (typeof shape.key === "string"
+          ? shape.key === key
+          : (shape.key as readonly string[]).includes(key)))
     );
   });
   return shape?.value || null;

@@ -167,10 +167,10 @@ export const ShapesSwitcher = ({
   <>
     {SHAPES.map(({ value, icon, key }, index) => {
       const label = t(`toolBar.${value}`);
-      const letter = typeof key === "string" ? key : key[0];
-      const shortcut = `${capitalizeString(letter)} ${t("helpDialog.or")} ${
-        index + 1
-      }`;
+      const letter = key && (typeof key === "string" ? key : key[0]);
+      const shortcut = letter
+        ? `${capitalizeString(letter)} ${t("helpDialog.or")} ${index + 1}`
+        : `${index + 1}`;
       return (
         <ToolButton
           className="Shape"
