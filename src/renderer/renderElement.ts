@@ -825,20 +825,37 @@ export const renderElementToSvg = (
       const fileData =
         isInitializedImageElement(element) && files[element.fileId];
       if (fileData) {
-        const image = document.createElement("image");
+        const symbolId = `image-${fileData.id}`;
+        let symbol = svgRoot.querySelector(`#${symbolId}`);
+        if (!symbol) {
+          symbol = svgRoot.ownerDocument!.createElementNS(SVG_NS, "symbol");
+          symbol.id = symbolId;
 
-        image.setAttribute(
+          const image = svgRoot.ownerDocument!.createElementNS(SVG_NS, "image");
+
+          image.setAttribute("width", "100%");
+          image.setAttribute("height", "100%");
+          image.setAttribute("href", fileData.dataURL);
+
+          symbol.appendChild(image);
+
+          svgRoot.prepend(symbol);
+        }
+
+        const use = svgRoot.ownerDocument!.createElementNS(SVG_NS, "use");
+        use.setAttribute("href", `#${symbolId}`);
+
+        use.setAttribute("width", `${Math.round(element.width)}`);
+        use.setAttribute("height", `${Math.round(element.height)}`);
+
+        use.setAttribute(
           "transform",
           `translate(${offsetX || 0} ${
             offsetY || 0
           }) rotate(${degree} ${cx} ${cy})`,
         );
 
-        image.setAttribute("width", `${Math.round(element.width)}`);
-        image.setAttribute("height", `${Math.round(element.height)}`);
-        image.setAttribute("href", fileData.dataURL);
-
-        svgRoot.appendChild(image);
+        svgRoot.appendChild(use);
       }
       break;
     }
