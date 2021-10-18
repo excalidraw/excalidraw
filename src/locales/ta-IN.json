@@ -120,19 +120,19 @@
     "load": "ஏற்று",
     "getShareableLink": "பகிரக்கூடிய தொடுப்பைப் பெறு",
     "close": "மூடு",
-    "selectLanguage": "",
+    "selectLanguage": "மொழியைத் தேர்ந்தெடு",
     "scrollBackToContent": "",
-    "zoomIn": "",
-    "zoomOut": "",
+    "zoomIn": "பெரிதாக்கு",
+    "zoomOut": "சிறிதாக்கு",
     "resetZoom": "",
-    "menu": "",
-    "done": "",
-    "edit": "",
-    "undo": "",
+    "menu": "சிறுபட்டி",
+    "done": "முடிந்தது",
+    "edit": "திருத்து",
+    "undo": "செயல்தவிர்",
     "redo": "",
     "resetLibrary": "",
     "createNewRoom": "",
-    "fullScreen": "",
+    "fullScreen": "முழுத் திரை",
     "darkMode": "",
     "lightMode": "",
     "zenMode": "",
@@ -175,7 +175,7 @@
   "headings": {
     "canvasActions": "",
     "selectedShapeActions": "",
-    "shapes": ""
+    "shapes": "வடிவங்கள்"
   },
   "hints": {
     "linearElement": "",
@@ -192,7 +192,7 @@
     "lineEditor_nothingSelected": ""
   },
   "canvasError": {
-    "cannotShowPreview": "",
+    "cannotShowPreview": "முன்னோட்டம் காட்ட இயலவில்லை",
     "canvasTooBig": "",
     "canvasTooBigTip": ""
   },
@@ -212,8 +212,8 @@
   "roomDialog": {
     "desc_intro": "",
     "desc_privacy": "",
-    "button_startSession": "",
-    "button_stopSession": "",
+    "button_startSession": "அமர்வைத் துவக்கு",
+    "button_stopSession": "அமர்வை நிறுத்து",
     "desc_inProgressIntro": "",
     "desc_shareLink": "",
     "desc_exitSession": "",
