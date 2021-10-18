@@ -125,7 +125,11 @@ export const decode = async (data: EncodedData): Promise<string> => {
 // -----------------------------------------------------------------------------
 
 type FileEncodingInfo = {
-  version: 1;
+  /* version 2 is the version we're shipping the initial image support with.
+    version 1 was a PR version that a lot of people were using anyway.
+    Thus, if there are issues we can check whether they're not using the
+    unoffic version */
+  version: 1 | 2;
   compression: "pako@1" | null;
   encryption: "AES-GCM" | null;
 };
@@ -293,7 +297,7 @@ export const compressData = async <T extends Record<string, any> = never>(
       }),
 ): Promise<Uint8Array> => {
   const fileInfo: FileEncodingInfo = {
-    version: 1,
+    version: 2,
     compression: "pako@1",
     encryption: "AES-GCM",
   };

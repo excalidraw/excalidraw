@@ -105,7 +105,6 @@ const localFileStorage = new FileManager({
 
     await Promise.all(
       [...addedFiles].map(async ([id, fileData]) => {
-        await new Promise((r) => setTimeout(r, 1500)); // FIXME
         try {
           await set(id, fileData, filesStore);
           savedFiles.set(id, true);
@@ -195,7 +194,7 @@ const initializeScene = async (opts: {
       }
       scene.scrollToContent = true;
       if (!roomLinkData) {
-        // window.history.replaceState({}, APP_NAME, window.location.origin);
+        window.history.replaceState({}, APP_NAME, window.location.origin);
       }
     } else {
       // https://github.com/excalidraw/excalidraw/issues/1919

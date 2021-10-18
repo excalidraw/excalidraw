@@ -316,8 +316,6 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       ({ roomId, roomKey } = existingRoomLinkData);
     } else {
       ({ roomId, roomKey } = await generateCollaborationLinkData());
-      roomId = "5f08678972010ce89c50";
-      roomKey = "u8x5c_6c--myu1ECtLadqw";
       window.history.pushState(
         {},
         APP_NAME,
