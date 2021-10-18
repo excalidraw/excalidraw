@@ -11,7 +11,7 @@ import {
   ExcalidrawFreeDrawElement,
   FontFamilyValues,
 } from "../element/types";
-import { measureText, getFontString } from "../utils";
+import { measureText, getFontString, getUpdatedTimestamp } from "../utils";
 import { randomInteger, randomId } from "../random";
 import { newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
@@ -21,7 +21,7 @@ import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
 
 type ElementConstructorOpts = MarkOptional<
-  Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted">,
+  Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
   | "width"
   | "height"
   | "angle"
@@ -74,6 +74,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
   versionNonce: rest.versionNonce ?? 0,
   isDeleted: false as false,
   boundElementIds,
+  updated: getUpdatedTimestamp(),
 });
 
 export const newElement = (
@@ -320,6 +321,7 @@ export const duplicateElement = <TElement extends Mutable<ExcalidrawElement>>(
   } else {
     copy.id = randomId();
   }
+  copy.updated = getUpdatedTimestamp();
   copy.seed = randomInteger();
   copy.groupIds = getNewGroupIdsForDuplication(
     copy.groupIds,

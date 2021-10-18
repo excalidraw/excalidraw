@@ -443,3 +443,6 @@ export const focusNearestParent = (element: HTMLInputElement) => {
     parent = parent.parentElement;
   }
 };
+
+export const getUpdatedTimestamp = () =>
+  process.env.NODE_ENV === "test" ? 1 : Date.now();
