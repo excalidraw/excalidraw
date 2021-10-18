@@ -98,6 +98,8 @@ export type AppState = {
   shouldCacheIgnoreZoom: boolean;
   showHelpDialog: boolean;
   toastMessage: string | null;
+  textSearchActive: boolean;
+  searchMatchText: string;
   zenModeEnabled: boolean;
   theme: Theme;
   gridSize: number | null;
@@ -195,6 +197,8 @@ export interface ExcalidrawProps {
   viewModeEnabled?: boolean;
   zenModeEnabled?: boolean;
   gridModeEnabled?: boolean;
+  textSearchActive?: boolean;
+  searchMatchText?: string;
   libraryReturnUrl?: string;
   theme?: Theme;
   name?: string;
