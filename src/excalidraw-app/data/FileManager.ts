@@ -172,6 +172,7 @@ export class FileManager {
     this.fetchingFiles.clear();
     this.savingFiles.clear();
     this.savedFiles.clear();
+    this.erroredFiles.clear();
   }
 }
 
