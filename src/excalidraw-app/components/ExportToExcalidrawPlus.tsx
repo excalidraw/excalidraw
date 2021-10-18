@@ -12,6 +12,7 @@ import { encryptData, generateEncryptionKey } from "../../data/encryption";
 import { isInitializedImageElement } from "../../element/typeChecks";
 import { FILE_UPLOAD_MAX_BYTES } from "../app_constants";
 import { encodeFilesForUpload } from "../data/FileManager";
+import { MIME_TYPES } from "../../constants";
 
 const exportToExcalidrawPlus = async (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -30,7 +31,7 @@ const exportToExcalidrawPlus = async (
   const blob = new Blob(
     [encryptedData.iv, new Uint8Array(encryptedData.encryptedBuffer)],
     {
-      type: "application/octet-stream",
+      type: MIME_TYPES.binary,
     },
   );
 

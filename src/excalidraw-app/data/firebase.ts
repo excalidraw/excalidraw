@@ -289,7 +289,7 @@ export const loadFilesFromFirebase = async (
           const dataURL = new TextDecoder().decode(data) as DataURL;
 
           loadedFiles.push({
-            mimeType: metadata.mimeType || "application/octet-stream",
+            mimeType: metadata.mimeType || MIME_TYPES.binary,
             id,
             dataURL,
             created: metadata?.created || Date.now(),

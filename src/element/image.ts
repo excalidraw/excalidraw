@@ -47,7 +47,7 @@ export const updateImageCache = async ({
         return promises.concat(
           (async () => {
             try {
-              if (fileData.mimeType === "application/octet-stream") {
+              if (fileData.mimeType === MIME_TYPES.binary) {
                 throw new Error("Only images can be added to ImageCache");
               }
 
