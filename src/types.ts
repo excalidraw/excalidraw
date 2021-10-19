@@ -190,7 +190,6 @@ export interface ExcalidrawProps {
   onDrop?: (
     event: React.DragEvent<HTMLDivElement>,
   ) => Promise<boolean> | boolean;
-  renderTopRightUI?: (isMobile: boolean, appState: AppState) => JSX.Element;
   renderTopRightUI?: (
     isMobile: boolean,
     appState: AppState,
