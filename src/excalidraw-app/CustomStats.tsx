@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { debounce, getVersion, nFormatter } from "../utils";
 import {
   getElementsStorageSize,

@@ -1,4 +1,3 @@
-import React from "react";
 import { AppState } from "../../src/types";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
 import { ColorPicker } from "../components/ColorPicker";

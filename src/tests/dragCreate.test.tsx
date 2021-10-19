@@ -1,4 +1,3 @@
-import React from "react";
 import ReactDOM from "react-dom";
 import ExcalidrawApp from "../excalidraw-app";
 import * as Renderer from "../renderer/renderScene";

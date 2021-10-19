@@ -1,11 +1,5 @@
 import LanguageDetector from "i18next-browser-languagedetector";
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { trackEvent } from "../analytics";
 import { getDefaultAppState } from "../appState";
 import { ErrorDialog } from "../components/ErrorDialog";
@@ -313,6 +307,9 @@ const ExcalidrawWrapper = () => {
 
   const renderTopRightUI = useCallback(
     (isMobile: boolean, appState: AppState) => {
+      if (isMobile) {
+        return null;
+      }
       return (
         <div
           style={{
