@@ -910,6 +910,38 @@ getFreeDrawSvgPath(element: <a href="https://github.com/excalidraw/excalidraw/bl
 
 This function returns the free draw svg path for the element.
 
+#### `isLinearElement`
+
+**How to use**
+
+```js
+import { isLinearElement } from "@excalidraw/excalidraw-next";
+```
+
+**Signature**
+
+<pre>
+isLinearElement(elementType?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L80">ExcalidrawElement</a>): boolean
+</pre>
+
+This function returns true if the element is linear type (`arrow` |`line`) else returns false.
+
+#### `getNonDeletedElements`
+
+**How to use**
+
+```js
+import { getNonDeletedElements } from "@excalidraw/excalidraw-next";
+```
+
+**Signature**
+
+<pre>
+getNonDeletedElements(elements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L80"> readonly ExcalidrawElement[]</a>): as readonly <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L90">NonDeletedExcalidrawElement[]</a>
+</pre>
+
+This function returns an array of deleted elements.
+
 ### Exported constants
 
 #### `FONT_FAMILY`
