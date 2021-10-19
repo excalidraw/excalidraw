@@ -36,7 +36,7 @@ export const isFreeDrawElementType = (
 ): boolean => {
   return elementType === "freedraw";
 };
-//
+
 export const isLinearElement = (
   element?: ExcalidrawElement | null,
 ): element is ExcalidrawLinearElement => {
