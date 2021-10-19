@@ -94,6 +94,7 @@ export const MIME_TYPES = {
   svg: "image/svg+xml",
   png: "image/png",
   jpg: "image/jpeg",
+  gif: "image/gif",
   binary: "application/octet-stream",
 } as const;
 
@@ -167,6 +168,7 @@ export const ALLOWED_IMAGE_MIME_TYPES = [
   MIME_TYPES.png,
   MIME_TYPES.jpg,
   MIME_TYPES.svg,
+  MIME_TYPES.gif,
 ] as const;
 
 export const MAX_ALLOWED_FILE_BYTES = 2 * 1024 * 1024;

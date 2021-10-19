@@ -10,6 +10,7 @@ import { AbortError } from "../errors";
 import { debounce } from "../utils";
 
 type FILE_EXTENSION =
+  | "gif"
   | "jpg"
   | "png"
   | "svg"
