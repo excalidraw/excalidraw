@@ -61,6 +61,7 @@ import {
   SCROLL_TIMEOUT,
   TAP_TWICE_TIMEOUT,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
+  THEME,
   TOUCH_CTX_MENU_TIMEOUT,
   URL_HASH_KEYS,
   URL_QUERY_KEYS,
@@ -515,7 +516,7 @@ class App extends React.Component<AppProps, AppState> {
         let viewModeEnabled = actionResult?.appState?.viewModeEnabled || false;
         let zenModeEnabled = actionResult?.appState?.zenModeEnabled || false;
         let gridSize = actionResult?.appState?.gridSize || null;
-        let theme = actionResult?.appState?.theme || "light";
+        let theme = actionResult?.appState?.theme || THEME.LIGHT;
         let name = actionResult?.appState?.name ?? this.state.name;
         if (typeof this.props.viewModeEnabled !== "undefined") {
           viewModeEnabled = this.props.viewModeEnabled;
@@ -1389,8 +1390,12 @@ class App extends React.Component<AppProps, AppState> {
     maxZoom: number = 1, //null will zoom to max based on viewport
     margin: number = 0.03, //percentage of viewport width&height
   ) => {
-    if(!target) target = this.scene.getElements();
-    if(target.length===0) maxZoom = 1;
+    if (!target) {
+      target = this.scene.getElements();
+    }
+    if (target.length === 0) {
+      maxZoom = 1;
+    }
     this.setState(
       zoomToFitElements(target, this.state, false, maxZoom, margin).appState,
     );
