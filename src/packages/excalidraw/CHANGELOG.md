@@ -33,6 +33,8 @@ Please add the latest change on the top under the correct section.
 
 ### Fixes
 
+- Don't show save file to disk button in export dialog when `saveFileToDisk` passed as `false` in [`UIOptions.canvasActions.export`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#exportOpts).
+
 - [`onPaste`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onPaste) prop should return false to prevent the native excalidraw paste action [#3974](https://github.com/excalidraw/excalidraw/pull/3974).
 
   #### BREAKING CHANGE
