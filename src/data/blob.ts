@@ -250,10 +250,16 @@ export const resizeImageFile = async (
     return file;
   }
 
-  // a wrapper for pica (https://github.com/nodeca/pica)
+  const pica = (await import("pica")).default;
+  // a wrapper for pica for better API
   const imageBlobReduce = (await import("image-blob-reduce")).default;
 
-  const reduce = imageBlobReduce();
+  // CRA's minification settings break pica in WebWorkers, so let's disable
+  // them for now
+  // https://github.com/nodeca/image-blob-reduce/issues/21#issuecomment-757365513
+  const reduce = imageBlobReduce({
+    pica: pica({ features: ["js", "wasm"] }),
+  });
 
   const fileType = file.type;
 
