@@ -281,14 +281,14 @@
     "copyToClipboardAsPng": "",
     "fileSaved": "கோப்பு சேமிக்கப்பட்டது.",
     "fileSavedToFilename": "{filename}-க்கு சேமிக்கப்பட்டது",
-    "canvas": "",
-    "selection": ""
+    "canvas": "கித்தான்",
+    "selection": "தெரிவு"
   },
   "colors": {
-    "ffffff": "",
-    "f8f9fa": "",
-    "f1f3f5": "",
-    "fff5f5": "",
+    "ffffff": "வெள்ளை",
+    "f8f9fa": "சாம்பல்நிறம் 0",
+    "f1f3f5": "சாம்பல்நிறம் 1",
+    "fff5f5": "சிகப்பு 0",
     "fff0f6": "",
     "f8f0fc": "",
     "f3f0ff": "",
