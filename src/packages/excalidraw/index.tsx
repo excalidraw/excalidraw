@@ -47,7 +47,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
 
   if (canvasActions?.export) {
     UIOptions.canvasActions.export.saveFileToDisk =
-      canvasActions.export?.saveFileToDisk ||
+      canvasActions.export?.saveFileToDisk ??
       DEFAULT_UI_OPTIONS.canvasActions.export.saveFileToDisk;
   }
 
