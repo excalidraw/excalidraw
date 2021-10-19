@@ -250,9 +250,11 @@ export const resizeImageFile = async (
     return file;
   }
 
-  const pica = (await import("pica")).default;
-  // a wrapper for pica for better API
-  const imageBlobReduce = (await import("image-blob-reduce")).default;
+  const [pica, imageBlobReduce] = await Promise.all([
+    import("pica").then((res) => res.default),
+    // a wrapper for pica for better API
+    import("image-blob-reduce").then((res) => res.default),
+  ]);
 
   // CRA's minification settings break pica in WebWorkers, so let's disable
   // them for now
