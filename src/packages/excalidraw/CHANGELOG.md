@@ -17,6 +17,34 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
+- Image support.
+
+  NOTE: the unreleased API is highly unstable and may change significantly before the next stable release. As such it's largely undocumented at this point. You are encouraged to read through the [PR](https://github.com/excalidraw/excalidraw/pull/4011) description if you want to know more about the internals.
+
+  General notes:
+
+  - File data are encoded as DataURLs (base64) for portability reasons.
+
+  [ExcalidrawAPI](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onLibraryChange):
+
+  - added `getFiles()` to get current `BinaryFiles` (`Record<FileId, BinaryFileData>`). It may contain files that aren't referenced by any element, so if you're persisting the files to a storage, you should compare them against stored elements.
+
+  Excalidraw app props:
+
+  - added `generateIdForFile(file: File)` optional prop so you can generate your own ids for added files.
+  - `onChange(elements, appState, files)` prop callback is now passed `BinaryFiles` as third argument.
+  - `onPaste(data, event)` data prop should contain `data.files` (`BinaryFiles`) if the elements pasted are referencing new files.
+  - `initialData` object now supports additional `files` (`BinaryFiles`) attribute.
+
+  Other notes:
+
+  - `.excalidraw` files may now contain top-level `files` key in format of `Record<FileId, BinaryFileData>` when exporting any (image) elements.
+  - Changes were made to various export utilityies exported from the package so that they take `files`. For now, TypeScript should help you figure the changes out.
+
+## Excalidraw API
+
+### Features
+
 - Support [`renderTopRightUI`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#renderTopRightUI) in mobile UI.
 
 - Export `THEME` constant from the package so host can use this when passing the theme.
