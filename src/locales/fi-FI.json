@@ -136,7 +136,9 @@
     "darkMode": "Tumma tila",
     "lightMode": "Vaalea tila",
     "zenMode": "Zen-tila",
-    "exitZenMode": "Poistu zen-tilasta"
+    "exitZenMode": "Poistu zen-tilasta",
+    "cancel": "",
+    "clear": ""
   },
   "alerts": {
     "clearReset": "Tämä tyhjentää koko piirtoalueen. Jatketaanko?",
@@ -255,6 +257,9 @@
     "view": "Näkymä",
     "zoomToFit": "Näytä kaikki elementit",
     "zoomToSelection": "Näytä valinta"
+  },
+  "clearCanvasDialog": {
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Piirroksesi ovat päästä-päähän-salattuja, joten Excalidrawin palvelimet eivät koskaan näe niitä.",
