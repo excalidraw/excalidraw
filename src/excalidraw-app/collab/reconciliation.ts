@@ -32,7 +32,9 @@ const shouldDiscardRemoteElement = (
   return false;
 };
 
-const getElementsMap = <T extends ExcalidrawElement>(elements: readonly T[]) =>
+const getElementsMapWithIndex = <T extends ExcalidrawElement>(
+  elements: readonly T[],
+) =>
   elements.reduce(
     (
       acc: {
@@ -52,7 +54,9 @@ export const reconcileElements = (
   remoteElements: readonly BroadcastedExcalidrawElement[],
   localAppState: AppState,
 ): ReconciledElements => {
-  const localElementsData = getElementsMap<ExcalidrawElement>(localElements);
+  const localElementsData = getElementsMapWithIndex<ExcalidrawElement>(
+    localElements,
+  );
 
   const reconciledElements: ExcalidrawElement[] = localElements.slice();
 
