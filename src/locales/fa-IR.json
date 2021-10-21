@@ -136,7 +136,9 @@
     "darkMode": "حالت تیره",
     "lightMode": "حالت روشن",
     "zenMode": "حالت ذن",
-    "exitZenMode": "خروج از حالت تمرکز"
+    "exitZenMode": "خروج از حالت تمرکز",
+    "cancel": "",
+    "clear": ""
   },
   "alerts": {
     "clearReset": "این کار کل صفحه را پاک میکند. آیا مطمئنید؟",
@@ -255,6 +257,9 @@
     "view": "مشاهده",
     "zoomToFit": "بزرگنمایی برای دیدن تمام آیتم ها",
     "zoomToSelection": "بزرگنمایی قسمت انتخاب شده"
+  },
+  "clearCanvasDialog": {
+    "title": ""
   },
   "encrypted": {
     "tooltip": "شما در یک محیط رمزگزاری شده دو طرفه در حال طراحی هستید پس Excalidraw هرگز طرح های شما را نمیبند.",
