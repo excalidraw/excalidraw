@@ -137,8 +137,8 @@
     "lightMode": "Mod luminos",
     "zenMode": "Mod zen",
     "exitZenMode": "Ieșire din modul zen",
-    "cancel": "",
-    "clear": ""
+    "cancel": "Anulare",
+    "clear": "Ștergere"
   },
   "alerts": {
     "clearReset": "Această opțiune va șterge întreaga pânză. Confirmi?",
@@ -259,7 +259,7 @@
     "zoomToSelection": "Transfocare la selecție"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "Ștergere pânză"
   },
   "encrypted": {
     "tooltip": "Desenele tale sunt criptate integral, astfel că serverele Excalidraw nu le vor vedea niciodată.",
