@@ -136,7 +136,9 @@
     "darkMode": "Sötét mód",
     "lightMode": "Világos mód",
     "zenMode": "Letisztult mód",
-    "exitZenMode": "Kilépés a letisztult módból"
+    "exitZenMode": "Kilépés a letisztult módból",
+    "cancel": "",
+    "clear": ""
   },
   "alerts": {
     "clearReset": "Ez a művelet törli a vászont. Biztos benne?",
@@ -255,6 +257,9 @@
     "view": "",
     "zoomToFit": "",
     "zoomToSelection": ""
+  },
+  "clearCanvasDialog": {
+    "title": ""
   },
   "encrypted": {
     "tooltip": "A rajzaidat végpontok közötti titkosítással tároljuk, tehát az Excalidraw szervereiről se tud más belenézni.",
