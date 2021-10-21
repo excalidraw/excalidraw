@@ -136,7 +136,9 @@
     "darkMode": "Tema scuro",
     "lightMode": "Tema chiaro",
     "zenMode": "Modalità Zen",
-    "exitZenMode": "Uscire dalla modalità zen"
+    "exitZenMode": "Uscire dalla modalità zen",
+    "cancel": "",
+    "clear": ""
   },
   "alerts": {
     "clearReset": "Questa azione cancellerà l'intera tela. Sei sicuro?",
@@ -255,6 +257,9 @@
     "view": "Vista",
     "zoomToFit": "Adatta zoom per mostrare tutti gli elementi",
     "zoomToSelection": "Zoom alla selezione"
+  },
+  "clearCanvasDialog": {
+    "title": ""
   },
   "encrypted": {
     "tooltip": "I tuoi disegni sono crittografati end-to-end in modo che i server di Excalidraw non li possano mai vedere.",
