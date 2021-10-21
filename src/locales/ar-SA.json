@@ -136,7 +136,9 @@
     "darkMode": "الوضع المظلم",
     "lightMode": "الوضع المضيء",
     "zenMode": "وضع التأمل",
-    "exitZenMode": "إلغاء الوضع الليلى"
+    "exitZenMode": "إلغاء الوضع الليلى",
+    "cancel": "",
+    "clear": ""
   },
   "alerts": {
     "clearReset": "هذا سيُزيل كامل اللوحة. هل أنت متأكد؟",
@@ -255,6 +257,9 @@
     "view": "عرض",
     "zoomToFit": "تكبير للملائمة",
     "zoomToSelection": "تكبير للعنصر المحدد"
+  },
+  "clearCanvasDialog": {
+    "title": ""
   },
   "encrypted": {
     "tooltip": "رسوماتك مشفرة من النهاية إلى النهاية حتى أن خوادم Excalidraw لن تراها أبدا.",
