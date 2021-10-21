@@ -136,7 +136,9 @@
     "darkMode": "கருமை பயன்முறை",
     "lightMode": "வெளிர்ந்த பயன்முறை",
     "zenMode": "",
-    "exitZenMode": ""
+    "exitZenMode": "",
+    "cancel": "",
+    "clear": ""
   },
   "alerts": {
     "clearReset": "",
@@ -255,6 +257,9 @@
     "view": "பார்",
     "zoomToFit": "",
     "zoomToSelection": ""
+  },
+  "clearCanvasDialog": {
+    "title": ""
   },
   "encrypted": {
     "tooltip": "",
