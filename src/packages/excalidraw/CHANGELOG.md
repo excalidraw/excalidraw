@@ -13,10 +13,6 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
-## Excalidraw API
-
-### Features
-
 - Image support.
 
   NOTE: the unreleased API is highly unstable and may change significantly before the next stable release. As such it's largely undocumented at this point. You are encouraged to read through the [PR](https://github.com/excalidraw/excalidraw/pull/4011) description if you want to know more about the internals.
