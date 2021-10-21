@@ -137,8 +137,8 @@
     "lightMode": "淺色模式",
     "zenMode": "專注模式",
     "exitZenMode": "離開專注模式",
-    "cancel": "",
-    "clear": ""
+    "cancel": "取消",
+    "clear": "清除"
   },
   "alerts": {
     "clearReset": "這將會清除整個 canvas。你確定嗎？",
@@ -259,7 +259,7 @@
     "zoomToSelection": "縮放至選取區"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "清除畫布"
   },
   "encrypted": {
     "tooltip": "你的作品已使用 end-to-end 方式加密，Excalidraw 的伺服器也無法取得其內容。",
