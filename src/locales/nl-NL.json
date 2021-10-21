@@ -137,8 +137,8 @@
     "lightMode": "Lichte modus",
     "zenMode": "Zen modus",
     "exitZenMode": "Verlaat zen modus",
-    "cancel": "",
-    "clear": ""
+    "cancel": "Annuleren",
+    "clear": "Wissen"
   },
   "alerts": {
     "clearReset": "Dit zal het hele canvas verwijderen. Weet je het zeker?",
@@ -259,7 +259,7 @@
     "zoomToSelection": "Inzoomen op selectie"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "Canvas legen"
   },
   "encrypted": {
     "tooltip": "Je tekeningen zijn beveiligd met end-to-end encryptie, dus Excalidraw's servers zullen nooit zien wat je tekent.",
