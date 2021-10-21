@@ -136,7 +136,9 @@
     "darkMode": "Modo escuro",
     "lightMode": "Modo claro",
     "zenMode": "Modo zen",
-    "exitZenMode": "Sair do modo zen"
+    "exitZenMode": "Sair do modo zen",
+    "cancel": "",
+    "clear": ""
   },
   "alerts": {
     "clearReset": "Isto irá limpar toda a área de desenho. Tem a certeza?",
@@ -255,6 +257,9 @@
     "view": "Visualizar",
     "zoomToFit": "Ajustar para todos os elementos caberem",
     "zoomToSelection": "Ampliar a seleção"
+  },
+  "clearCanvasDialog": {
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Os seus desenhos são encriptados de ponta-a-ponta, por isso os servidores do Excalidraw nunca os verão.",
