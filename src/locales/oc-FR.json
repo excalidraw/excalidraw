@@ -136,7 +136,9 @@
     "darkMode": "Mòde escur",
     "lightMode": "Mòde clar",
     "zenMode": "Mòde escur",
-    "exitZenMode": "Sortir del mòde zen"
+    "exitZenMode": "Sortir del mòde zen",
+    "cancel": "",
+    "clear": ""
   },
   "alerts": {
     "clearReset": "Aquò suprimirà lo canabàs complèt. O volètz vertadièrament ?",
@@ -255,6 +257,9 @@
     "view": "Vista",
     "zoomToFit": "Zoomar per veire totes los elements",
     "zoomToSelection": "Zoomar la seleccion"
+  },
+  "clearCanvasDialog": {
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Vòstres dessenhs son chifrats del cap a la fin en consequéncia los servidors d’Excalidraw los veiràn pas jamai.",
