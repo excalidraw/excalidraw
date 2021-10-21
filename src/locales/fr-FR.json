@@ -136,7 +136,9 @@
     "darkMode": "Mode sombre",
     "lightMode": "Mode clair",
     "zenMode": "Mode zen",
-    "exitZenMode": "Quitter le mode zen"
+    "exitZenMode": "Quitter le mode zen",
+    "cancel": "",
+    "clear": ""
   },
   "alerts": {
     "clearReset": "L'intégralité du canevas va être effacée. Êtes-vous sûr ?",
@@ -255,6 +257,9 @@
     "view": "Affichage",
     "zoomToFit": "Zoomer pour voir tous les éléments",
     "zoomToSelection": "Zoomer sur la sélection"
+  },
+  "clearCanvasDialog": {
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Vos dessins sont chiffrés de bout en bout, les serveurs d'Excalidraw ne les verront jamais.",
