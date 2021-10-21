@@ -60,6 +60,7 @@ import {
   isSomeElementSelected,
 } from "../scene";
 import { register } from "./register";
+import { isPanelComponentDisabled } from "../textlike";
 
 const changeProperty = (
   elements: readonly ExcalidrawElement[],
@@ -440,6 +441,20 @@ export const actionChangeFontSize = register({
       commitToHistory: true,
     };
   },
+  PanelComponentPredicate: (
+    elements: readonly ExcalidrawElement[],
+    appState: AppState,
+  ) => {
+    let disabled = false;
+    getNonDeletedElements(elements).forEach((element) => {
+      if (isTextElement(element)) {
+        if (isPanelComponentDisabled(element.subtype, "changeFontSize")) {
+          disabled = true;
+        }
+      }
+    });
+    return !disabled;
+  },
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.fontSize")}</legend>
@@ -500,6 +515,20 @@ export const actionChangeFontFamily = register({
       },
       commitToHistory: true,
     };
+  },
+  PanelComponentPredicate: (
+    elements: readonly ExcalidrawElement[],
+    appState: AppState,
+  ) => {
+    let disabled = false;
+    getNonDeletedElements(elements).forEach((element) => {
+      if (isTextElement(element)) {
+        if (isPanelComponentDisabled(element.subtype, "changeFontFamily")) {
+          disabled = true;
+        }
+      }
+    });
+    return !disabled;
   },
   PanelComponent: ({ elements, appState, updateData }) => {
     const options: {
@@ -564,6 +593,20 @@ export const actionChangeTextAlign = register({
       },
       commitToHistory: true,
     };
+  },
+  PanelComponentPredicate: (
+    elements: readonly ExcalidrawElement[],
+    appState: AppState,
+  ) => {
+    let disabled = false;
+    getNonDeletedElements(elements).forEach((element) => {
+      if (isTextElement(element)) {
+        if (isPanelComponentDisabled(element.subtype, "changeTextAlign")) {
+          disabled = true;
+        }
+      }
+    });
+    return !disabled;
   },
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
