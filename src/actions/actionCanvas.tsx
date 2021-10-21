@@ -1,14 +1,11 @@
-import { getDefaultAppState } from "../appState";
 import { ColorPicker } from "../components/ColorPicker";
-import { trash, zoomIn, zoomOut } from "../components/icons";
+import { zoomIn, zoomOut } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { DarkModeToggle } from "../components/DarkModeToggle";
 import { THEME, ZOOM_STEP } from "../constants";
 import { getCommonBounds, getNonDeletedElements } from "../element";
-import { newElementWith } from "../element/mutateElement";
 import { ExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
-import { useIsMobile } from "../components/App";
 import { CODES, KEYS } from "../keys";
 import { getNormalizedZoom, getSelectedElements } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
@@ -43,43 +40,6 @@ export const actionChangeViewBackgroundColor = register({
       </div>
     );
   },
-});
-
-export const actionClearCanvas = register({
-  name: "clearCanvas",
-  perform: (elements, appState: AppState) => {
-    return {
-      elements: elements.map((element) =>
-        newElementWith(element, { isDeleted: true }),
-      ),
-      appState: {
-        ...getDefaultAppState(),
-        theme: appState.theme,
-        elementLocked: appState.elementLocked,
-        exportBackground: appState.exportBackground,
-        exportEmbedScene: appState.exportEmbedScene,
-        gridSize: appState.gridSize,
-        showStats: appState.showStats,
-        pasteDialog: appState.pasteDialog,
-      },
-      commitToHistory: true,
-    };
-  },
-  PanelComponent: ({ updateData }) => (
-    <ToolButton
-      type="button"
-      icon={trash}
-      title={t("buttons.clearReset")}
-      aria-label={t("buttons.clearReset")}
-      showAriaLabel={useIsMobile()}
-      onClick={() => {
-        if (window.confirm(t("alerts.clearReset"))) {
-          updateData(null);
-        }
-      }}
-      data-testid="clear-canvas-button"
-    />
-  ),
 });
 
 export const actionZoomIn = register({
