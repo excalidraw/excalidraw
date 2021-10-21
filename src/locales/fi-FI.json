@@ -156,14 +156,22 @@
     "errorAddingToLibrary": "Kohdetta ei voitu lisätä kirjastoon",
     "errorRemovingFromLibrary": "Kohdetta ei voitu poistaa kirjastosta",
     "confirmAddLibrary": "Tämä lisää {{numShapes}} muotoa kirjastoosi. Jatketaanko?",
-    "imageDoesNotContainScene": "Kuvien lisääminen ei ole tällä hetkellä mahdollista.\n\nHaluatko tuoda piirroksen? Tämä kuva ei näytä sisältävän tarvittavia tietoja. Oletko ottanut piirrostietojen tallennuksen käyttöön viennin aikana?",
+    "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "Teosta ei voitu palauttaa tästä kuvatiedostosta",
     "invalidSceneUrl": "Teosta ei voitu tuoda annetusta URL-osoitteesta. Tallenne on vioittunut, tai osoitteessa ei ole Excalidraw JSON-dataa.",
     "resetLibrary": "Tämä tyhjentää kirjastosi. Jatketaanko?",
     "invalidEncryptionKey": "Salausavaimen on oltava 22 merkkiä pitkä. Live-yhteistyö ei ole käytössä."
   },
+  "errors": {
+    "unsupportedFileType": "",
+    "imageInsertError": "",
+    "fileTooBig": "",
+    "svgImageInsertError": "",
+    "invalidSVGString": ""
+  },
   "toolBar": {
     "selection": "Valinta",
+    "image": "",
     "rectangle": "Suorakulmio",
     "diamond": "Vinoneliö",
     "ellipse": "Soikio",
@@ -188,10 +196,12 @@
     "linearElementMulti": "Lopeta klikkaamalla viimeistä pistettä, painamalla Escape- tai Enter-näppäintä",
     "lockAngle": "Voit rajoittaa kulmaa pitämällä SHIFT-näppäintä alaspainettuna",
     "resize": "Voit rajoittaa mittasuhteet pitämällä SHIFT-näppäintä alaspainettuna kun muutat kokoa, pidä ALT-näppäintä alaspainettuna muuttaaksesi kokoa keskipisteen suhteen",
+    "resizeImage": "",
     "rotate": "Voit rajoittaa kulman pitämällä SHIFT pohjassa pyörittäessäsi",
     "lineEditor_info": "Kaksoisnapauta tai paina Enter muokataksesi pisteitä",
     "lineEditor_pointSelected": "Paina Delete poistaaksesi pisteen, Ctrl tai Cmd+D monistaaksesi, tai raahaa liikuttaaksesi",
-    "lineEditor_nothingSelected": "Valitse liikutettava tai poistettava piste, tai pidä ALT-näppäintä alaspainettuna ja napsauta lisätäksesi uusia pisteitä"
+    "lineEditor_nothingSelected": "Valitse liikutettava tai poistettava piste, tai pidä ALT-näppäintä alaspainettuna ja napsauta lisätäksesi uusia pisteitä",
+    "placeImage": ""
   },
   "canvasError": {
     "cannotShowPreview": "Esikatselua ei voitu näyttää",
