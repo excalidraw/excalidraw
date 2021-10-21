@@ -137,8 +137,8 @@
     "lightMode": "Світлий режим",
     "zenMode": "Режим Дзен",
     "exitZenMode": "Вийти з дзен-режиму",
-    "cancel": "",
-    "clear": ""
+    "cancel": "Скасувати",
+    "clear": "Очистити"
   },
   "alerts": {
     "clearReset": "Це очистить все полотно. Впевнені?",
@@ -232,7 +232,7 @@
     "link_details": "Експортувати як посилання тільки для читання.",
     "link_button": "Експортувати у посилання",
     "excalidrawplus_description": "",
-    "excalidrawplus_button": "",
+    "excalidrawplus_button": "Експортувати",
     "excalidrawplus_exportError": ""
   },
   "helpDialog": {
@@ -251,15 +251,15 @@
     "preventBinding": "Запобігти зв'язування зі стрілками",
     "shapes": "Фігури",
     "shortcuts": "Гарячі клавіші",
-    "textFinish": "",
-    "textNewLine": "",
+    "textFinish": "Завершити редагування (текстовий редактор)",
+    "textNewLine": "Додати новий рядок (текстовий редактор)",
     "title": "Допомога",
     "view": "Вигляд",
     "zoomToFit": "Збільшити щоб умістити всі елементи",
     "zoomToSelection": "Наблизити вибране"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "Очистити полотно"
   },
   "encrypted": {
     "tooltip": "Ваші креслення захищені наскрізним шифруванням — сервери Excalidraw ніколи їх не побачать.",
@@ -290,11 +290,11 @@
     "selection": "виділення"
   },
   "colors": {
-    "ffffff": "",
-    "f8f9fa": "",
-    "f1f3f5": "",
-    "fff5f5": "",
-    "fff0f6": "",
+    "ffffff": "Білий",
+    "f8f9fa": "Сірий 0",
+    "f1f3f5": "Сірий 1",
+    "fff5f5": "Червоний 0",
+    "fff0f6": "Рожевий 0",
     "f8f0fc": "",
     "f3f0ff": "",
     "edf2ff": "",
