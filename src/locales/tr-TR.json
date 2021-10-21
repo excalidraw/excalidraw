@@ -136,7 +136,9 @@
     "darkMode": "Koyu tema",
     "lightMode": "Açık tema",
     "zenMode": "Zen modu",
-    "exitZenMode": "Zen modundan çık"
+    "exitZenMode": "Zen modundan çık",
+    "cancel": "",
+    "clear": ""
   },
   "alerts": {
     "clearReset": "Tuvalin tamamı temizlenecek. Emin misiniz?",
@@ -255,6 +257,9 @@
     "view": "Görünüm",
     "zoomToFit": "Tüm öğeleri sığdırmak için yakınlaştır",
     "zoomToSelection": "Seçime yakınlaş"
+  },
+  "clearCanvasDialog": {
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Çizimleriniz uçtan-uca şifrelenmiştir, Excalidraw'ın sunucuları bile onları göremez.",
