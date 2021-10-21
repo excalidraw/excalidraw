@@ -162,8 +162,16 @@
     "resetLibrary": "இது உங்கள் நுலகத்தைத் துடைக்கும். நீங்கள் உறுதியா?",
     "invalidEncryptionKey": "மறையாக்க விசை 22 வரியுருக்கள் கொண்டிருக்கவேண்டும். நேரடி கூட்டுப்பணி முடக்கப்பட்டது."
   },
+  "errors": {
+    "unsupportedFileType": "",
+    "imageInsertError": "",
+    "fileTooBig": "",
+    "svgImageInsertError": "",
+    "invalidSVGString": ""
+  },
   "toolBar": {
     "selection": "தெரிவு",
+    "image": "",
     "rectangle": "செவ்வகம்",
     "diamond": "வைரம்",
     "ellipse": "நீள்வட்டம்",
@@ -188,10 +196,12 @@
     "linearElementMulti": "",
     "lockAngle": "",
     "resize": "",
+    "resizeImage": "",
     "rotate": "",
     "lineEditor_info": "புள்ளிகளைத் திருத்த இரு-சொடுக்கு அ Enterஐ அழுத்து",
     "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": ""
+    "lineEditor_nothingSelected": "",
+    "placeImage": ""
   },
   "canvasError": {
     "cannotShowPreview": "முன்னோட்டம் காட்ட இயலவில்லை",
