@@ -164,14 +164,14 @@
   },
   "errors": {
     "unsupportedFileType": "",
-    "imageInsertError": "",
-    "fileTooBig": "",
+    "imageInsertError": "Суретті жүктеу мүмкін болмады. Кейінірек қайталап көріңіз...",
+    "fileTooBig": "Файл өте үлкен. Максималды рұқсат етілген көлем {{maxSize}}.",
     "svgImageInsertError": "",
     "invalidSVGString": ""
   },
   "toolBar": {
     "selection": "",
-    "image": "",
+    "image": "Суретті қою",
     "rectangle": "",
     "diamond": "",
     "ellipse": "",
