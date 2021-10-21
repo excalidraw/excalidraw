@@ -15,7 +15,7 @@ import {
   registerTextElementSubtypeText,
 } from "./text";
 
-import { Action } from "../actions/types";
+import { Action, ActionName } from "../actions/types";
 import { register } from "../actions/register";
 
 export const TEXT_SUBTYPE_DEFAULT = "none";
@@ -133,6 +133,40 @@ export const registerTextLikeSubtypeName = (subtypeName: string) => {
   if (!textLikeSubtypes.includes(subtypeName)) {
     textLikeSubtypes.push(subtypeName);
   }
+};
+
+type DisabledPanelComponents = {
+  subtype: string;
+  actions: ActionName[];
+};
+
+const textLikeDisabledPanelComponents = [] as DisabledPanelComponents[];
+
+export const registerTextLikeDisabledPanelComponents = (
+  subtypeName: string,
+  actions: ActionName[],
+) => {
+  if (textLikeSubtypes.includes(subtypeName)) {
+    textLikeDisabledPanelComponents.push({ subtype: subtypeName, actions });
+  }
+};
+
+export const isPanelComponentDisabled = (
+  subtypeName: string,
+  action: ActionName,
+) => {
+  if (textLikeSubtypes.includes(subtypeName)) {
+    if (
+      textLikeDisabledPanelComponents
+        .find((value, index, disabledComponent) => {
+          return value.subtype === subtypeName;
+        })!
+        .actions.includes(action)
+    ) {
+      return true;
+    }
+  }
+  return false;
 };
 
 export const applyTextOpts = (

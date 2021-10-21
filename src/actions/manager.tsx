@@ -66,6 +66,11 @@ export class ActionManager implements ActionsManagerInterface {
         (action) =>
           (action.name in canvasActions
             ? canvasActions[action.name as keyof typeof canvasActions]
+            : action.PanelComponentPredicate
+            ? action.PanelComponentPredicate(
+                this.getElementsIncludingDeleted(),
+                this.getAppState(),
+              )
             : true) &&
           action.keyTest &&
           action.keyTest(
@@ -119,6 +124,11 @@ export class ActionManager implements ActionsManagerInterface {
       "PanelComponent" in this.actions[name] &&
       (name in canvasActions
         ? canvasActions[name as keyof typeof canvasActions]
+        : "PanelComponentPredicate" in this.actions[name]
+        ? this.actions[name].PanelComponentPredicate!(
+            this.getElementsIncludingDeleted(),
+            this.getAppState(),
+          )
         : true)
     ) {
       const action = this.actions[name];
