@@ -166,12 +166,12 @@
     "unsupportedFileType": "Tipe de fichièr pas pres en carga.",
     "imageInsertError": "Insercion d’imatge impossibla. Tornatz ensajar mai tard...",
     "fileTooBig": "Fichièr tròp pesuc. La talha maximala autorizada es {{maxSize}}.",
-    "svgImageInsertError": "",
-    "invalidSVGString": ""
+    "svgImageInsertError": "Insercion d’imatge SVG impossibla. Las balisas SVG semblan invalidas.",
+    "invalidSVGString": "errors.invalidSVGString"
   },
   "toolBar": {
     "selection": "Seleccion",
-    "image": "",
+    "image": "Inserir imatge",
     "rectangle": "Rectangle",
     "diamond": "Lausange",
     "ellipse": "Ellipsa",
@@ -196,7 +196,7 @@
     "linearElementMulti": "Clicatz sul darrièr punt o quichatz Ecap o Entrada per acabar",
     "lockAngle": "Podètz restrénger l’angle en mantenent MAJ",
     "resize": "Podètz servar las proporcions en mantenent la tòca MAJ pendent lo redimensionament,\nmantenètz la tòca ALT per redimensionar a partir del centre",
-    "resizeImage": "",
+    "resizeImage": "Podètz retalhar liurament en quichant CTRL,\nquichatz ALT per retalhar a partir del centre",
     "rotate": "Podètz restrénger los angles en mantenent MAJ pendent la rotacion",
     "lineEditor_info": "Doble-clicatz o quichatz Entrada per modificar los punts",
     "lineEditor_pointSelected": "Quichatz Suprimir per suprimir lo punt, Ctrl o Cmd+D per lo duplicar, o fasètz lisar per lo desplaçar",
