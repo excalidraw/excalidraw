@@ -136,7 +136,9 @@
     "darkMode": "Mørk modus",
     "lightMode": "Lys modus",
     "zenMode": "Zen-modus",
-    "exitZenMode": "Avslutt zen-modus"
+    "exitZenMode": "Avslutt zen-modus",
+    "cancel": "",
+    "clear": ""
   },
   "alerts": {
     "clearReset": "Dette vil tømme lerretet. Er du sikker?",
@@ -255,6 +257,9 @@
     "view": "Vising",
     "zoomToFit": "Zoom for å sjå alle elementa",
     "zoomToSelection": "Zoom til utval"
+  },
+  "clearCanvasDialog": {
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Teikningane dine er ende-til-ende-krypterte slik at Excalidraw sine serverar aldri får sjå dei.",
