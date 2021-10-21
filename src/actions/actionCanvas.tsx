@@ -14,6 +14,9 @@ import { AppState, NormalizedZoomValue } from "../types";
 import { getShortcutKey } from "../utils";
 import { register } from "./register";
 import { Tooltip } from "../components/Tooltip";
+import { newElementWith } from "../element/mutateElement";
+import { getDefaultAppState } from "../appState";
+import ClearCanvas from "../components/ClearCanvas";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -40,6 +43,30 @@ export const actionChangeViewBackgroundColor = register({
       </div>
     );
   },
+});
+
+export const actionClearCanvas = register({
+  name: "clearCanvas",
+  perform: (elements, appState) => {
+    return {
+      elements: elements.map((element) =>
+        newElementWith(element, { isDeleted: true }),
+      ),
+      appState: {
+        ...getDefaultAppState(),
+        theme: appState.theme,
+        elementLocked: appState.elementLocked,
+        exportBackground: appState.exportBackground,
+        exportEmbedScene: appState.exportEmbedScene,
+        gridSize: appState.gridSize,
+        showStats: appState.showStats,
+        pasteDialog: appState.pasteDialog,
+      },
+      commitToHistory: true,
+    };
+  },
+
+  PanelComponent: ({ updateData }) => <ClearCanvas onConfirm={updateData} />,
 });
 
 export const actionZoomIn = register({

@@ -37,7 +37,6 @@ type MobileMenuProps = {
     isMobile: boolean,
     appState: AppState,
   ) => JSX.Element | null;
-  renderClearCanvas: () => React.ReactNode;
 };
 
 export const MobileMenu = ({
@@ -56,7 +55,6 @@ export const MobileMenu = ({
   viewModeEnabled,
   showThemeBtn,
   renderTopRightUI,
-  renderClearCanvas,
 }: MobileMenuProps) => {
   const renderToolbar = () => {
     return (
@@ -125,7 +123,7 @@ export const MobileMenu = ({
     }
     return (
       <>
-        {renderClearCanvas()}
+        {actionManager.renderAction("clearCanvas")}
         {actionManager.renderAction("loadScene")}
         {renderJSONExportDialog()}
         {renderImageExportDialog()}

@@ -49,7 +49,6 @@ import Library from "../data/library";
 import { JSONExportDialog } from "./JSONExportDialog";
 import { LibraryButton } from "./LibraryButton";
 import { isImageFileHandle } from "../data/blob";
-import ClearCanvas from "./ClearCanvas";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -470,17 +469,6 @@ const LayerUI = ({
     );
   };
 
-  const renderClearCanvas = () => {
-    if (UIOptions.canvasActions.clearCanvas) {
-      return (
-        <ClearCanvas
-          elements={elements}
-          appState={appState}
-          actionManager={actionManager}
-        />
-      );
-    }
-  };
   const renderCanvasActions = () => (
     <Section
       heading="canvasActions"
@@ -493,7 +481,7 @@ const LayerUI = ({
       <Island padding={2} style={{ zIndex: 1 }}>
         <Stack.Col gap={4}>
           <Stack.Row gap={1} justifyContent="space-between">
-            {renderClearCanvas()}
+            {actionManager.renderAction("clearCanvas")}
             <Separator />
             {actionManager.renderAction("loadScene")}
             {renderJSONExportDialog()}
@@ -778,7 +766,6 @@ const LayerUI = ({
         viewModeEnabled={viewModeEnabled}
         showThemeBtn={showThemeBtn}
         renderTopRightUI={renderTopRightUI}
-        renderClearCanvas={renderClearCanvas}
       />
     </>
   ) : (
