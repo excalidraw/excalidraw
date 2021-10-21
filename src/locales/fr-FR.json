@@ -259,7 +259,7 @@
     "zoomToSelection": "Zoomer sur la sélection"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "Effacer la zone de dessin"
   },
   "encrypted": {
     "tooltip": "Vos dessins sont chiffrés de bout en bout, les serveurs d'Excalidraw ne les verront jamais.",
