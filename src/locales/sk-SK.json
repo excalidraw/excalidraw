@@ -137,8 +137,8 @@
     "lightMode": "Svetlý režim",
     "zenMode": "Režim zen",
     "exitZenMode": "Zrušiť režim zen",
-    "cancel": "",
-    "clear": ""
+    "cancel": "Zrušiť",
+    "clear": "Vymazať"
   },
   "alerts": {
     "clearReset": "Týmto sa vyčistí celé plátno. Ste si istí?",
@@ -259,7 +259,7 @@
     "zoomToSelection": "Priblížiť na výber"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "Vyčistiť plátno"
   },
   "encrypted": {
     "tooltip": "Vaše kresby používajú end-to-end šifrovanie, takže ich Excalidraw server nedokáže prečítať.",
