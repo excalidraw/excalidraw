@@ -136,7 +136,9 @@
     "darkMode": "Dark mode",
     "lightMode": "Light mode",
     "zenMode": "Zen mode",
-    "exitZenMode": "Exit zen mode"
+    "exitZenMode": "Exit zen mode",
+    "cancel": "Cancel",
+    "clear": "Clear"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",
@@ -255,6 +257,9 @@
     "view": "View",
     "zoomToFit": "Zoom to fit all elements",
     "zoomToSelection": "Zoom to selection"
+  },
+  "clearCanvasDialog": {
+    "title": "Clear Canvas"
   },
   "encrypted": {
     "tooltip": "Your drawings are end-to-end encrypted so Excalidraw's servers will never see them.",
