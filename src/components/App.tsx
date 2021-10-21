@@ -864,6 +864,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   public componentWillUnmount() {
+    this.files = {};
     this.imageCache.clear();
     this.resizeObserver?.disconnect();
     this.unmounted = true;
