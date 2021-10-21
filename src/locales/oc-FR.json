@@ -201,7 +201,7 @@
     "lineEditor_info": "Doble-clicatz o quichatz Entrada per modificar los punts",
     "lineEditor_pointSelected": "Quichatz Suprimir per suprimir lo punt, Ctrl o Cmd+D per lo duplicar, o fasètz lisar per lo desplaçar",
     "lineEditor_nothingSelected": "Seleccionatz un punt de desplaçar o suprimir, o mantenètz Alt e clicatz per apondre punts novèls",
-    "placeImage": ""
+    "placeImage": "Clicatz per plaçar l’imatge, o clicatz e lisatz per definir sa talha manualament"
   },
   "canvasError": {
     "cannotShowPreview": "Afichatge impossible de l’apercebut",
@@ -269,7 +269,7 @@
     "zoomToSelection": "Zoomar la seleccion"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "Escafar canabàs"
   },
   "encrypted": {
     "tooltip": "Vòstres dessenhs son chifrats del cap a la fin en consequéncia los servidors d’Excalidraw los veiràn pas jamai.",
