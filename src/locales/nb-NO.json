@@ -137,8 +137,8 @@
     "lightMode": "Lys modus",
     "zenMode": "Zen-modus",
     "exitZenMode": "Avslutt zen-modus",
-    "cancel": "",
-    "clear": ""
+    "cancel": "Avbryt",
+    "clear": "Tøm"
   },
   "alerts": {
     "clearReset": "Dette vil tømme lerretet. Er du sikker?",
@@ -259,7 +259,7 @@
     "zoomToSelection": "Zoom til utvalg"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "Tøm lerret"
   },
   "encrypted": {
     "tooltip": "Dine tegninger er ende-til-ende-krypterte slik at Excalidraw sine servere aldri vil se dem.",
