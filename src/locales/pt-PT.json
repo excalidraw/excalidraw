@@ -156,14 +156,22 @@
     "errorAddingToLibrary": "Não foi possível adicionar o item à biblioteca",
     "errorRemovingFromLibrary": "Não foi possível remover o item da biblioteca",
     "confirmAddLibrary": "Isso adicionará {{numShapes}} forma(s) à sua biblioteca. Tem a certeza?",
-    "imageDoesNotContainScene": "A importação de imagens não é suportada neste momento.\n\nQuer importar uma cena? Esta imagem parece não conter dados de cena. Ativou isto durante a exportação?",
+    "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "Não foi possível restaurar a cena deste ficheiro de imagem",
     "invalidSceneUrl": "Não foi possível importar a cena a partir do URL fornecido. Ou está mal formado ou não contém dados JSON do Excalidraw válidos.",
     "resetLibrary": "Isto irá limpar a sua biblioteca. Tem a certeza?",
     "invalidEncryptionKey": ""
   },
+  "errors": {
+    "unsupportedFileType": "",
+    "imageInsertError": "",
+    "fileTooBig": "",
+    "svgImageInsertError": "",
+    "invalidSVGString": ""
+  },
   "toolBar": {
     "selection": "Seleção",
+    "image": "",
     "rectangle": "Retângulo",
     "diamond": "Losango",
     "ellipse": "Elipse",
@@ -188,10 +196,12 @@
     "linearElementMulti": "Clique no último ponto ou pressione Escape ou Enter para terminar",
     "lockAngle": "Pode restringir o ângulo mantendo premida a tecla SHIFT",
     "resize": "Pode restringir as proporções mantendo a tecla SHIFT premida enquanto redimensiona,\nmantenha a tecla ALT premida para redimensionar a partir do centro",
+    "resizeImage": "",
     "rotate": "Pode restringir os ângulos mantendo a tecla SHIFT premida enquanto roda",
     "lineEditor_info": "Clique duas vezes ou pressione a tecla Enter para editar os pontos",
     "lineEditor_pointSelected": "Pressione a tecla Delete para remover o ponto, CtrlOuCmd+D para duplicar ou arraste para mover",
-    "lineEditor_nothingSelected": "Selecione um ponto para mover ou remover, ou mantenha premida a tecla Alt e clique para adicionar novos pontos"
+    "lineEditor_nothingSelected": "Selecione um ponto para mover ou remover, ou mantenha premida a tecla Alt e clique para adicionar novos pontos",
+    "placeImage": ""
   },
   "canvasError": {
     "cannotShowPreview": "Não é possível mostrar uma pré-visualização",
