@@ -136,7 +136,9 @@
     "darkMode": "",
     "lightMode": "",
     "zenMode": "",
-    "exitZenMode": ""
+    "exitZenMode": "",
+    "cancel": "",
+    "clear": ""
   },
   "alerts": {
     "clearReset": "",
@@ -255,6 +257,9 @@
     "view": "",
     "zoomToFit": "",
     "zoomToSelection": ""
+  },
+  "clearCanvasDialog": {
+    "title": ""
   },
   "encrypted": {
     "tooltip": "",
