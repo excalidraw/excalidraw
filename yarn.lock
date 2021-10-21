@@ -2075,6 +2075,11 @@
   version "4.0.0"
   resolved "https://registry.npmjs.org/@types/parse-json/-/parse-json-4.0.0.tgz"
 
+"@types/pica@5.1.3":
+  version "5.1.3"
+  resolved "https://registry.yarnpkg.com/@types/pica/-/pica-5.1.3.tgz#5ef64529a1f83f7d6586a8bf75a8a00be32aca02"
+  integrity sha512-13SEyETRE5psd9bE0AmN+0M1tannde2fwHfLVaVIljkbL9V0OfFvKwCicyeDvVYLkmjQWEydbAlsDsmjrdyTOg==
+
 "@types/prettier@^2.0.0":
   version "2.2.3"
   resolved "https://registry.yarnpkg.com/@types/prettier/-/prettier-2.2.3.tgz#ef65165aea2924c9359205bf748865b8881753c0"
@@ -3034,6 +3039,11 @@ backo2@1.0.2:
 balanced-match@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.0.tgz"
+
+base64-arraybuffer-es6@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/base64-arraybuffer-es6/-/base64-arraybuffer-es6-0.7.0.tgz#dbe1e6c87b1bf1ca2875904461a7de40f21abc86"
+  integrity sha512-ESyU/U1CFZDJUdr+neHRhNozeCv72Y7Vm0m1DCbjX3KBjT6eYocvAJlSk6+8+HkVwXlT1FNxhGW6q3UKAlCvvw==
 
 base64-arraybuffer@0.1.4:
   version "0.1.4"
@@ -4023,7 +4033,7 @@ core-js@3.6.5, core-js@^3.6.5:
   version "3.6.5"
   resolved "https://registry.npmjs.org/core-js/-/core-js-3.6.5.tgz"
 
-core-js@^2.4.0:
+core-js@^2.4.0, core-js@^2.5.3:
   version "2.6.12"
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.6.12.tgz#d9333dfa7b065e347cc5682219d6f690859cc2ec"
 
@@ -4666,6 +4676,13 @@ domelementtype@1, domelementtype@^1.3.1:
 domelementtype@^2.0.1:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/domelementtype/-/domelementtype-2.1.0.tgz#a851c080a6d1c3d94344aed151d99f669edf585e"
+
+domexception@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/domexception/-/domexception-1.0.1.tgz#937442644ca6a31261ef36e3ec677fe805582c90"
+  integrity sha512-raigMkn7CJNNo6Ihro1fzG7wr3fHuYVytzquZKX5n0yizGsTcYgzdIUwj1X9pK0VvjeihV+XiclP+DjwbsSKug==
+  dependencies:
+    webidl-conversions "^4.0.2"
 
 domexception@^2.0.1:
   version "2.0.1"
@@ -5480,6 +5497,14 @@ extsprintf@1.3.0, extsprintf@^1.2.0:
   version "1.3.0"
   resolved "https://registry.npmjs.org/extsprintf/-/extsprintf-1.3.0.tgz"
 
+fake-indexeddb@3.1.3:
+  version "3.1.3"
+  resolved "https://registry.yarnpkg.com/fake-indexeddb/-/fake-indexeddb-3.1.3.tgz#76d59146a6b994b9bb50ac9949cbd96ad6cca760"
+  integrity sha512-kpWYPIUGmxW8Q7xG7ampGL63fU/kYNukrIyy9KFj3+KVlFbE/SmvWebzWXBiCMeR0cPK6ufDoGC7MFkPhPLH9w==
+  dependencies:
+    realistic-structured-clone "^2.0.1"
+    setimmediate "^1.0.5"
+
 fast-deep-equal@^3.1.1:
   version "3.1.3"
   resolved "https://registry.yarnpkg.com/fast-deep-equal/-/fast-deep-equal-3.1.3.tgz#3a7d56b559d6cbc3eb512325244e619a65c6c525"
@@ -6127,6 +6152,11 @@ globby@^6.1.0:
     pify "^2.0.0"
     pinkie-promise "^2.0.0"
 
+glur@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/glur/-/glur-1.1.2.tgz#f20ea36db103bfc292343921f1f91e83c3467689"
+  integrity sha1-8g6jbbEDv8KSNDkh8fkeg8NGdok=
+
 google-auth-library@^6.1.1, google-auth-library@^6.1.2, google-auth-library@^6.1.3:
   version "6.1.6"
   resolved "https://registry.yarnpkg.com/google-auth-library/-/google-auth-library-6.1.6.tgz#deacdcdb883d9ed6bac78bb5d79a078877fdf572"
@@ -6545,6 +6575,13 @@ icss-utils@^4.0.0, icss-utils@^4.1.1:
   dependencies:
     postcss "^7.0.14"
 
+idb-keyval@5.1.3:
+  version "5.1.3"
+  resolved "https://registry.yarnpkg.com/idb-keyval/-/idb-keyval-5.1.3.tgz#6ef5dff371897c23f144322dc6374eadd6a345d9"
+  integrity sha512-N9HbCK/FaXSRVI+k6Xq4QgWxbcZRUv+SfG1y7HJ28JdV8yEJu6k+C/YLea7npGckX2DQJeEVuMc4bKOBeU/2LQ==
+  dependencies:
+    safari-14-idb-fix "^1.0.4"
+
 idb@3.0.2:
   version "3.0.2"
   resolved "https://registry.npmjs.org/idb/-/idb-3.0.2.tgz"
@@ -6570,6 +6607,13 @@ ignore@^4.0.6:
 ignore@^5.1.4:
   version "5.1.8"
   resolved "https://registry.npmjs.org/ignore/-/ignore-5.1.8.tgz"
+
+image-blob-reduce@3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/image-blob-reduce/-/image-blob-reduce-3.0.1.tgz#812be7655a552031635799ae64e846b106f7a489"
+  integrity sha512-/VmmWgIryG/wcn4TVrV7cC4mlfUC/oyiKIfSg5eVM3Ten/c1c34RJhMYKCWTnoSMHSqXLt3tsrBR4Q2HInvN+Q==
+  dependencies:
+    pica "^7.1.0"
 
 immediate@~3.0.5:
   version "3.0.6"
@@ -8112,7 +8156,7 @@ lodash.values@^2.4.1:
   dependencies:
     lodash.keys "~2.4.1"
 
-"lodash@>=3.5 <5", lodash@^4.17.10, lodash@^4.17.11, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.19, lodash@^4.17.20, lodash@^4.17.21, lodash@^4.17.5:
+"lodash@>=3.5 <5", lodash@^4.17.10, lodash@^4.17.11, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.19, lodash@^4.17.20, lodash@^4.17.21, lodash@^4.17.5, lodash@^4.7.0:
   version "4.17.21"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
 
@@ -8535,6 +8579,14 @@ multicast-dns@^6.0.1:
   dependencies:
     dns-packet "^1.3.1"
     thunky "^1.0.2"
+
+multimath@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/multimath/-/multimath-2.0.0.tgz#0d37acf67c328f30e3d8c6b0d3209e6082710302"
+  integrity sha512-toRx66cAMJ+Ccz7pMIg38xSIrtnbozk0dchXezwQDMgQmbGpfxjtv68H+L00iFL8hxDaVjrmwAFSb3I6bg8Q2g==
+  dependencies:
+    glur "^1.1.2"
+    object-assign "^4.1.1"
 
 mute-stream@0.0.7:
   version "0.0.7"
@@ -9273,6 +9325,17 @@ perfect-freehand@1.0.15:
 performance-now@^2.1.0:
   version "2.1.0"
   resolved "https://registry.npmjs.org/performance-now/-/performance-now-2.1.0.tgz"
+
+pica@^7.1.0:
+  version "7.1.0"
+  resolved "https://registry.yarnpkg.com/pica/-/pica-7.1.0.tgz#eb0b11abb3f2234ba8bdd0a839460f8fcd20e32a"
+  integrity sha512-4D1E1lssL/yJD4La23Kbh5CSJPeXMO8NgJTsR/VWtG7aV92fD2g2t/PABg/Abp8Ug3yJNw7y7x1ftkJuIPLpEw==
+  dependencies:
+    glur "^1.1.2"
+    inherits "^2.0.3"
+    multimath "^2.0.0"
+    object-assign "^4.1.1"
+    webworkify "^1.5.0"
 
 picomatch@^2.0.4, picomatch@^2.0.5, picomatch@^2.2.1, picomatch@^2.2.2:
   version "2.2.2"
@@ -10502,6 +10565,16 @@ readdirp@~3.5.0:
   dependencies:
     picomatch "^2.2.1"
 
+realistic-structured-clone@^2.0.1:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/realistic-structured-clone/-/realistic-structured-clone-2.0.3.tgz#8a252a87db8278d92267ad7a168c4f43fa485795"
+  integrity sha512-XYTwWZi5+lU4Wf+rnsQ7pukN9hF2cbJJf/yruBr1w23WhGflM6WoTBkdMVAun+oHFW2mV7UquyYo5oOI7YLJrQ==
+  dependencies:
+    core-js "^2.5.3"
+    domexception "^1.0.1"
+    typeson "^6.1.0"
+    typeson-registry "^1.0.0-alpha.20"
+
 recursive-readdir@2.2.2:
   version "2.2.2"
   resolved "https://registry.npmjs.org/recursive-readdir/-/recursive-readdir-2.2.2.tgz"
@@ -10916,6 +10989,11 @@ rxjs@^6.4.0, rxjs@^6.6.0, rxjs@^6.6.6:
   dependencies:
     tslib "^1.9.0"
 
+safari-14-idb-fix@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/safari-14-idb-fix/-/safari-14-idb-fix-1.0.4.tgz#5c68ba63e2a8ae0d89a0aa1e13fe89e3aef7da19"
+  integrity sha512-4+Y2baQdgJpzu84d0QjySl70Kyygzf0pepVg8NVg4NnQEPpfC91fAn0baNvtStlCjUUxxiu0BOMiafa98fRRuA==
+
 safe-buffer@5.1.2, safe-buffer@~5.1.0, safe-buffer@~5.1.1:
   version "5.1.2"
   resolved "https://registry.npmjs.org/safe-buffer/-/safe-buffer-5.1.2.tgz"
@@ -11122,7 +11200,7 @@ set-value@^2.0.0, set-value@^2.0.1:
     is-plain-object "^2.0.3"
     split-string "^3.0.1"
 
-setimmediate@^1.0.4, setimmediate@~1.0.4:
+setimmediate@^1.0.4, setimmediate@^1.0.5, setimmediate@~1.0.4:
   version "1.0.5"
   resolved "https://registry.npmjs.org/setimmediate/-/setimmediate-1.0.5.tgz"
 
@@ -12062,6 +12140,13 @@ tr46@^2.0.2:
   dependencies:
     punycode "^2.1.1"
 
+tr46@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/tr46/-/tr46-2.1.0.tgz#fa87aa81ca5d5941da8cbf1f9b749dc969a4e240"
+  integrity sha512-15Ih7phfcdP5YxqiB+iDtLoaTz4Nd35+IiAv0kQ5FNKHzXgdWqPoTIqEDDJmXceQt4JZk6lVPT8lnDlPpGDppw==
+  dependencies:
+    punycode "^2.1.1"
+
 "traverse@>=0.3.0 <0.4":
   version "0.3.9"
   resolved "https://registry.npmjs.org/traverse/-/traverse-0.3.9.tgz"
@@ -12195,6 +12280,20 @@ typescript@4.2.4:
   version "4.2.4"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.2.4.tgz#8610b59747de028fda898a8aef0e103f156d0961"
   integrity sha512-V+evlYHZnQkaz8TRBuxTA92yZBPotr5H+WhQ7bD3hZUndx5tGOa1fuCgeSjxAzM1RiN5IzvadIXTVefuuwZCRg==
+
+typeson-registry@^1.0.0-alpha.20:
+  version "1.0.0-alpha.39"
+  resolved "https://registry.yarnpkg.com/typeson-registry/-/typeson-registry-1.0.0-alpha.39.tgz#9e0f5aabd5eebfcffd65a796487541196f4b1211"
+  integrity sha512-NeGDEquhw+yfwNhguLPcZ9Oj0fzbADiX4R0WxvoY8nGhy98IbzQy1sezjoEFWOywOboj/DWehI+/aUlRVrJnnw==
+  dependencies:
+    base64-arraybuffer-es6 "^0.7.0"
+    typeson "^6.0.0"
+    whatwg-url "^8.4.0"
+
+typeson@^6.0.0, typeson@^6.1.0:
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/typeson/-/typeson-6.1.0.tgz#5b2a53705a5f58ff4d6f82f965917cabd0d7448b"
+  integrity sha512-6FTtyGr8ldU0pfbvW/eOZrEtEkczHRUtduBnA90Jh9kMPCiFNnXIon3vF41N0S4tV1HHQt4Hk1j4srpESziCaA==
 
 unbox-primitive@^1.0.0:
   version "1.0.1"
@@ -12517,6 +12616,11 @@ wcwidth@^1.0.1:
   dependencies:
     defaults "^1.0.3"
 
+webidl-conversions@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/webidl-conversions/-/webidl-conversions-4.0.2.tgz#a855980b1f0b6b359ba1d5d9fb39ae941faa63ad"
+  integrity sha512-YQ+BmxuTgd6UXZW3+ICGfyqRyHXVlD5GtQr5+qjiNW7bF0cqrzX500HVXPBOvgXb5YnzDd+h0zqyv61KUD7+Sg==
+
 webidl-conversions@^5.0.0:
   version "5.0.0"
   resolved "https://registry.npmjs.org/webidl-conversions/-/webidl-conversions-5.0.0.tgz"
@@ -12636,6 +12740,11 @@ websocket-extensions@>=0.1.1:
   version "0.1.4"
   resolved "https://registry.npmjs.org/websocket-extensions/-/websocket-extensions-0.1.4.tgz"
 
+webworkify@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/webworkify/-/webworkify-1.5.0.tgz#734ad87a774de6ebdd546e1d3e027da5b8f4a42c"
+  integrity sha512-AMcUeyXAhbACL8S2hqqdqOLqvJ8ylmIbNwUIqQujRSouf4+eUFaXbG6F1Rbu+srlJMmxQWsiU7mOJi0nMBfM1g==
+
 whatwg-encoding@^1.0.5:
   version "1.0.5"
   resolved "https://registry.npmjs.org/whatwg-encoding/-/whatwg-encoding-1.0.5.tgz"
@@ -12660,6 +12769,15 @@ whatwg-url@^8.0.0:
   dependencies:
     lodash.sortby "^4.7.0"
     tr46 "^2.0.2"
+    webidl-conversions "^6.1.0"
+
+whatwg-url@^8.4.0:
+  version "8.7.0"
+  resolved "https://registry.yarnpkg.com/whatwg-url/-/whatwg-url-8.7.0.tgz#656a78e510ff8f3937bc0bcbe9f5c0ac35941b77"
+  integrity sha512-gAojqb/m9Q8a5IV96E3fHJM70AzCkgt4uXYX2O7EmuyOnLrViCQlsEBmF9UQIu3/aeAIp2U17rtbpZWNntQqdg==
+  dependencies:
+    lodash "^4.7.0"
+    tr46 "^2.1.0"
     webidl-conversions "^6.1.0"
 
 which-boxed-primitive@^1.0.2:

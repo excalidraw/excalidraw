@@ -1,7 +1,7 @@
 import React from "react";
 import { ActionManager } from "../actions/manager";
 import { getNonDeletedElements } from "../element";
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, PointerType } from "../element/types";
 import { t } from "../i18n";
 import { useIsMobile } from "../components/App";
 import {
@@ -18,6 +18,7 @@ import { AppState, Zoom } from "../types";
 import { capitalizeString, isTransparent, setCursorForShape } from "../utils";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
+import { hasStrokeColor } from "../scene/comparisons";
 
 export const SelectedShapeActions = ({
   appState,
@@ -48,9 +49,22 @@ export const SelectedShapeActions = ({
     hasBackground(elementType) ||
     targetElements.some((element) => hasBackground(element.type));
 
+  let commonSelectedType: string | null = targetElements[0]?.type || null;
+
+  for (const element of targetElements) {
+    if (element.type !== commonSelectedType) {
+      commonSelectedType = null;
+      break;
+    }
+  }
+
   return (
     <div className="panelColumn">
-      {renderAction("changeStrokeColor")}
+      {((hasStrokeColor(elementType) &&
+        elementType !== "image" &&
+        commonSelectedType !== "image") ||
+        targetElements.some((element) => hasStrokeColor(element.type))) &&
+        renderAction("changeStrokeColor")}
       {showChangeBackgroundIcons && renderAction("changeBackgroundColor")}
       {showFillIcons && renderAction("changeFillStyle")}
 
@@ -155,18 +169,20 @@ export const ShapesSwitcher = ({
   canvas,
   elementType,
   setAppState,
+  onImageAction,
 }: {
   canvas: HTMLCanvasElement | null;
   elementType: ExcalidrawElement["type"];
   setAppState: React.Component<any, AppState>["setState"];
+  onImageAction: (data: { pointerType: PointerType | null }) => void;
 }) => (
   <>
     {SHAPES.map(({ value, icon, key }, index) => {
       const label = t(`toolBar.${value}`);
-      const letter = typeof key === "string" ? key : key[0];
-      const shortcut = `${capitalizeString(letter)} ${t("helpDialog.or")} ${
-        index + 1
-      }`;
+      const letter = key && (typeof key === "string" ? key : key[0]);
+      const shortcut = letter
+        ? `${capitalizeString(letter)} ${t("helpDialog.or")} ${index + 1}`
+        : `${index + 1}`;
       return (
         <ToolButton
           className="Shape"
@@ -180,14 +196,16 @@ export const ShapesSwitcher = ({
           aria-label={capitalizeString(label)}
           aria-keyshortcuts={shortcut}
           data-testid={value}
-          onChange={() => {
+          onChange={({ pointerType }) => {
             setAppState({
               elementType: value,
               multiElement: null,
               selectedElementIds: {},
             });
             setCursorForShape(canvas, value);
-            setAppState({});
+            if (value === "image") {
+              onImageAction({ pointerType });
+            }
           }}
         />
       );

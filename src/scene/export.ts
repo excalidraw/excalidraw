@@ -2,17 +2,22 @@ import rough from "roughjs/bin/rough";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element/bounds";
 import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
-import { distance, SVG_NS } from "../utils";
-import { AppState } from "../types";
-import { DEFAULT_EXPORT_PADDING, THEME_FILTER } from "../constants";
+import { distance } from "../utils";
+import { AppState, BinaryFiles } from "../types";
+import { DEFAULT_EXPORT_PADDING, SVG_NS, THEME_FILTER } from "../constants";
 import { getDefaultAppState } from "../appState";
 import { serializeAsJSON } from "../data/json";
+import {
+  getInitializedImageElements,
+  updateImageCache,
+} from "../element/image";
 
 export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
-export const exportToCanvas = (
+export const exportToCanvas = async (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
+  files: BinaryFiles,
   {
     exportBackground,
     exportPadding = DEFAULT_EXPORT_PADDING,
@@ -36,6 +41,16 @@ export const exportToCanvas = (
 
   const { canvas, scale = 1 } = createCanvas(width, height);
 
+  const defaultAppState = getDefaultAppState();
+
+  const { imageCache } = await updateImageCache({
+    imageCache: new Map(),
+    fileIds: getInitializedImageElements(elements).map(
+      (element) => element.fileId,
+    ),
+    files,
+  });
+
   renderScene(
     elements,
     appState,
@@ -45,21 +60,23 @@ export const exportToCanvas = (
     canvas,
     {
       viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
-      exportWithDarkMode: appState.exportWithDarkMode,
       scrollX: -minX + exportPadding,
       scrollY: -minY + exportPadding,
-      zoom: getDefaultAppState().zoom,
+      zoom: defaultAppState.zoom,
       remotePointerViewportCoords: {},
       remoteSelectedElementIds: {},
       shouldCacheIgnoreZoom: false,
       remotePointerUsernames: {},
       remotePointerUserStates: {},
+      theme: appState.exportWithDarkMode ? "dark" : "light",
+      imageCache,
     },
     {
       renderScrollbars: false,
       renderSelection: false,
-      renderOptimizations: false,
+      renderOptimizations: true,
       renderGrid: false,
+      isExport: true,
     },
   );
 
@@ -76,6 +93,7 @@ export const exportToSvg = async (
     exportWithDarkMode?: boolean;
     exportEmbedScene?: boolean;
   },
+  files: BinaryFiles | null,
 ): Promise<SVGSVGElement> => {
   const {
     exportPadding = DEFAULT_EXPORT_PADDING,
@@ -89,7 +107,7 @@ export const exportToSvg = async (
       metadata = await (
         await import(/* webpackChunkName: "image" */ "../../src/data/image")
       ).encodeSvgMetadata({
-        text: serializeAsJSON(elements, appState),
+        text: serializeAsJSON(elements, appState, files || {}, "local"),
       });
     } catch (err) {
       console.error(err);
@@ -137,7 +155,7 @@ export const exportToSvg = async (
   }
 
   const rsvg = rough.svg(svgRoot);
-  renderSceneToSvg(elements, rsvg, svgRoot, {
+  renderSceneToSvg(elements, rsvg, svgRoot, files || {}, {
     offsetX: -minX + exportPadding,
     offsetY: -minY + exportPadding,
   });

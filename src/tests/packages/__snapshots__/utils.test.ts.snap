@@ -47,6 +47,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,

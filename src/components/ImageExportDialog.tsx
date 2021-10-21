@@ -9,7 +9,7 @@ import { t } from "../i18n";
 import { useIsMobile } from "./App";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { exportToCanvas } from "../scene/export";
-import { AppState } from "../types";
+import { AppState, BinaryFiles } from "../types";
 import { Dialog } from "./Dialog";
 import { clipboard, exportImage } from "./icons";
 import Stack from "./Stack";
@@ -79,6 +79,7 @@ const ExportButton: React.FC<{
 const ImageExportModal = ({
   elements,
   appState,
+  files,
   exportPadding = DEFAULT_EXPORT_PADDING,
   actionManager,
   onExportToPng,
@@ -87,6 +88,7 @@ const ImageExportModal = ({
 }: {
   appState: AppState;
   elements: readonly NonDeletedExcalidrawElement[];
+  files: BinaryFiles;
   exportPadding?: number;
   actionManager: ActionsManagerInterface;
   onExportToPng: ExportCB;
@@ -112,29 +114,25 @@ const ImageExportModal = ({
     if (!previewNode) {
       return;
     }
-    try {
-      const canvas = exportToCanvas(exportedElements, appState, {
-        exportBackground,
-        viewBackgroundColor,
-        exportPadding,
-      });
-
-      // if converting to blob fails, there's some problem that will
-      // likely prevent preview and export (e.g. canvas too big)
-      canvasToBlob(canvas)
-        .then(() => {
+    exportToCanvas(exportedElements, appState, files, {
+      exportBackground,
+      viewBackgroundColor,
+      exportPadding,
+    })
+      .then((canvas) => {
+        // if converting to blob fails, there's some problem that will
+        // likely prevent preview and export (e.g. canvas too big)
+        return canvasToBlob(canvas).then(() => {
           renderPreview(canvas, previewNode);
-        })
-        .catch((error) => {
-          console.error(error);
-          renderPreview(new CanvasError(), previewNode);
         });
-    } catch (error) {
-      console.error(error);
-      renderPreview(new CanvasError(), previewNode);
-    }
+      })
+      .catch((error) => {
+        console.error(error);
+        renderPreview(new CanvasError(), previewNode);
+      });
   }, [
     appState,
+    files,
     exportedElements,
     exportBackground,
     exportPadding,
@@ -220,6 +218,7 @@ const ImageExportModal = ({
 export const ImageExportDialog = ({
   elements,
   appState,
+  files,
   exportPadding = DEFAULT_EXPORT_PADDING,
   actionManager,
   onExportToPng,
@@ -228,6 +227,7 @@ export const ImageExportDialog = ({
 }: {
   appState: AppState;
   elements: readonly NonDeletedExcalidrawElement[];
+  files: BinaryFiles;
   exportPadding?: number;
   actionManager: ActionsManagerInterface;
   onExportToPng: ExportCB;
@@ -258,6 +258,7 @@ export const ImageExportDialog = ({
           <ImageExportModal
             elements={elements}
             appState={appState}
+            files={files}
             exportPadding={exportPadding}
             actionManager={actionManager}
             onExportToPng={onExportToPng}

@@ -13,6 +13,7 @@ export const diagramFixture = {
     viewBackgroundColor: "#ffffff",
     gridSize: null,
   },
+  files: {},
 };
 
 export const diagramFactory = ({

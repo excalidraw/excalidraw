@@ -47,6 +47,11 @@ type MarkOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 type MarkRequired<T, RK extends keyof T> = Exclude<T, RK> &
   Required<Pick<T, RK>>;
 
+type MarkNonNullable<T, K extends keyof T> = {
+  [P in K]-?: P extends K ? NonNullable<T[P]> : T[P];
+} &
+  { [P in keyof T]: T[P] };
+
 // PNG encoding/decoding
 // -----------------------------------------------------------------------------
 type TEXtChunk = { name: "tEXt"; data: Uint8Array };
@@ -91,3 +96,37 @@ interface Blob {
 }
 
 declare module "*.scss";
+
+// --------------------------------------------------------------------------—
+// ensure Uint8Array isn't assignable to ArrayBuffer
+// (due to TS structural typing)
+// https://github.com/microsoft/TypeScript/issues/31311#issuecomment-490690695
+interface ArrayBuffer {
+  private _brand?: "ArrayBuffer";
+}
+interface Uint8Array {
+  private _brand?: "Uint8Array";
+}
+// --------------------------------------------------------------------------—
+
+// https://github.com/nodeca/image-blob-reduce/issues/23#issuecomment-783271848
+declare module "image-blob-reduce" {
+  import { PicaResizeOptions } from "pica";
+  namespace ImageBlobReduce {
+    interface ImageBlobReduce {
+      toBlob(file: File, options: ImageBlobReduceOptions): Promise<Blob>;
+    }
+
+    interface ImageBlobReduceStatic {
+      new (options?: any): ImageBlobReduce;
+
+      (options?: any): ImageBlobReduce;
+    }
+
+    interface ImageBlobReduceOptions extends PicaResizeOptions {
+      max: number;
+    }
+  }
+  const reduce: ImageBlobReduce.ImageBlobReduceStatic;
+  export = reduce;
+}

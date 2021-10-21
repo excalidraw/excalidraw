@@ -54,10 +54,16 @@
   }
 
   .ToolIcon__label {
+    display: flex;
+    align-items: center;
     color: var(--icon-fill-color);
     font-family: var(--ui-font);
     margin: 0 0.8em;
     text-overflow: ellipsis;
+
+    .Spinner {
+      margin-left: 0.6em;
+    }
   }
 
   .ToolIcon_size_small .ToolIcon__icon {

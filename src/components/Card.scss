@@ -48,6 +48,10 @@
       .ToolIcon__label {
         color: $oc-white;
       }
+
+      .Spinner {
+        --spinner-color: #fff;
+      }
     }
   }
 }

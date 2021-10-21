@@ -10,8 +10,6 @@ import { Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
 import { isDarwin } from "./keys";
 
-export const SVG_NS = "http://www.w3.org/2000/svg";
-
 let mockDateTime: string | null = null;
 
 export const setDateTimeForTests = (dateTime: string) => {
@@ -192,7 +190,9 @@ export const setCursorForShape = (
   }
   if (shape === "selection") {
     resetCursor(canvas);
-  } else {
+    // do nothing if image tool is selected which suggests there's
+    // a image-preview set as the cursor
+  } else if (shape !== "image") {
     canvas.style.cursor = CURSOR_TYPE.CROSSHAIR;
   }
 };
@@ -442,4 +442,10 @@ export const focusNearestParent = (element: HTMLInputElement) => {
     }
     parent = parent.parentElement;
   }
+};
+
+export const preventUnload = (event: BeforeUnloadEvent) => {
+  event.preventDefault();
+  // NOTE: modern browsers no longer allow showing a custom message here
+  event.returnValue = "";
 };

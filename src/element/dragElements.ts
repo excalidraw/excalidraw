@@ -62,25 +62,32 @@ export const dragNewElement = (
   y: number,
   width: number,
   height: number,
-  isResizeWithSidesSameLength: boolean,
-  isResizeCenterPoint: boolean,
+  shouldMaintainAspectRatio: boolean,
+  shouldResizeFromCenter: boolean,
+  /** whether to keep given aspect ratio when `isResizeWithSidesSameLength` is
+      true */
+  widthAspectRatio?: number | null,
 ) => {
-  if (isResizeWithSidesSameLength) {
-    ({ width, height } = getPerfectElementSize(
-      elementType,
-      width,
-      y < originY ? -height : height,
-    ));
+  if (shouldMaintainAspectRatio) {
+    if (widthAspectRatio) {
+      height = width / widthAspectRatio;
+    } else {
+      ({ width, height } = getPerfectElementSize(
+        elementType,
+        width,
+        y < originY ? -height : height,
+      ));
 
-    if (height < 0) {
-      height = -height;
+      if (height < 0) {
+        height = -height;
+      }
     }
   }
 
   let newX = x < originX ? originX - width : originX;
   let newY = y < originY ? originY - height : originY;
 
-  if (isResizeCenterPoint) {
+  if (shouldResizeFromCenter) {
     width += width;
     height += height;
     newX = originX - width / 2;
