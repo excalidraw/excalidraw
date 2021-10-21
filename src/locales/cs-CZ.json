@@ -136,7 +136,9 @@
     "darkMode": "Tmavý režim",
     "lightMode": "Světlý režim",
     "zenMode": "Zen mód",
-    "exitZenMode": "Opustit zen mód"
+    "exitZenMode": "Opustit zen mód",
+    "cancel": "",
+    "clear": ""
   },
   "alerts": {
     "clearReset": "",
@@ -255,6 +257,9 @@
     "view": "",
     "zoomToFit": "",
     "zoomToSelection": ""
+  },
+  "clearCanvasDialog": {
+    "title": ""
   },
   "encrypted": {
     "tooltip": "",
