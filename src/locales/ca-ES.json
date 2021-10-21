@@ -136,7 +136,9 @@
     "darkMode": "Mode fosc",
     "lightMode": "Mode clar",
     "zenMode": "Mode zen",
-    "exitZenMode": "Surt de mode zen"
+    "exitZenMode": "Surt de mode zen",
+    "cancel": "",
+    "clear": ""
   },
   "alerts": {
     "clearReset": "S'esborrarà tot el llenç. N'esteu segur?",
@@ -255,6 +257,9 @@
     "view": "Visualització",
     "zoomToFit": "Zoom per veure tots els elements",
     "zoomToSelection": "Zoom per veure la selecció"
+  },
+  "clearCanvasDialog": {
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Els vostres dibuixos estan xifrats de punta a punta de manera que els servidors d’Excalidraw no els veuran mai.",
