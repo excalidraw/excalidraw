@@ -3,7 +3,7 @@ import { NonDeletedExcalidrawElement } from "../element/types";
 import { getCommonBounds } from "../element/bounds";
 import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
 import { distance } from "../utils";
-import { AppState } from "../types";
+import { AppState, BinaryFiles } from "../types";
 import { DEFAULT_EXPORT_PADDING, SVG_NS, THEME_FILTER } from "../constants";
 import { getDefaultAppState } from "../appState";
 import { serializeAsJSON } from "../data/json";
@@ -17,6 +17,7 @@ export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 export const exportToCanvas = async (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
+  files: BinaryFiles,
   {
     exportBackground,
     exportPadding = DEFAULT_EXPORT_PADDING,
@@ -47,7 +48,7 @@ export const exportToCanvas = async (
     fileIds: getInitializedImageElements(elements).map(
       (element) => element.fileId,
     ),
-    files: appState.files,
+    files,
   });
 
   renderScene(
@@ -91,8 +92,8 @@ export const exportToSvg = async (
     viewBackgroundColor: string;
     exportWithDarkMode?: boolean;
     exportEmbedScene?: boolean;
-    files: AppState["files"];
   },
+  files: BinaryFiles | null,
 ): Promise<SVGSVGElement> => {
   const {
     exportPadding = DEFAULT_EXPORT_PADDING,
@@ -106,7 +107,7 @@ export const exportToSvg = async (
       metadata = await (
         await import(/* webpackChunkName: "image" */ "../../src/data/image")
       ).encodeSvgMetadata({
-        text: serializeAsJSON(elements, appState, "local"),
+        text: serializeAsJSON(elements, appState, files || {}, "local"),
       });
     } catch (err) {
       console.error(err);
@@ -154,7 +155,7 @@ export const exportToSvg = async (
   }
 
   const rsvg = rough.svg(svgRoot);
-  renderSceneToSvg(elements, rsvg, svgRoot, appState.files, {
+  renderSceneToSvg(elements, rsvg, svgRoot, files || {}, {
     offsetX: -minX + exportPadding,
     offsetY: -minY + exportPadding,
   });

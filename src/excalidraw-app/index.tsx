@@ -30,6 +30,7 @@ import {
   LibraryItems,
   ExcalidrawImperativeAPI,
   BinaryFileData,
+  BinaryFiles,
 } from "../types";
 import {
   debounce,
@@ -132,13 +133,14 @@ const saveDebounced = debounce(
   async (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
+    files: BinaryFiles,
     onFilesSaved: () => void,
   ) => {
     saveToLocalStorage(elements, appState);
 
     await localFileStorage.saveFiles({
       elements,
-      appState,
+      files,
     });
 
     onFilesSaved();
@@ -318,7 +320,6 @@ const ExcalidrawWrapper = () => {
           collabAPI
             .fetchImageFilesFromFirebase({
               elements: data.scene.elements,
-              appState: { files: data.scene.appState?.files || {} },
             })
             .then(({ loadedFiles, erroredFiles }) => {
               excalidrawAPI.addFiles(loadedFiles);
@@ -450,11 +451,12 @@ const ExcalidrawWrapper = () => {
   const onChange = (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
+    files: BinaryFiles,
   ) => {
     if (collabAPI?.isCollaborating()) {
       collabAPI.broadcastElements(elements);
     } else {
-      saveDebounced(elements, appState, () => {
+      saveDebounced(elements, appState, files, () => {
         if (excalidrawAPI) {
           let didChange = false;
 
@@ -485,6 +487,7 @@ const ExcalidrawWrapper = () => {
   const onExportToBackend = async (
     exportedElements: readonly NonDeletedExcalidrawElement[],
     appState: AppState,
+    files: BinaryFiles,
     canvas: HTMLCanvasElement | null,
   ) => {
     if (exportedElements.length === 0) {
@@ -492,12 +495,16 @@ const ExcalidrawWrapper = () => {
     }
     if (canvas) {
       try {
-        await exportToBackend(exportedElements, {
-          ...appState,
-          viewBackgroundColor: appState.exportBackground
-            ? appState.viewBackgroundColor
-            : getDefaultAppState().viewBackgroundColor,
-        });
+        await exportToBackend(
+          exportedElements,
+          {
+            ...appState,
+            viewBackgroundColor: appState.exportBackground
+              ? appState.viewBackgroundColor
+              : getDefaultAppState().viewBackgroundColor,
+          },
+          files,
+        );
       } catch (error) {
         if (error.name !== "AbortError") {
           const { width, height } = canvas;
@@ -629,11 +636,12 @@ const ExcalidrawWrapper = () => {
           canvasActions: {
             export: {
               onExportToBackend,
-              renderCustomUI: (elements, appState) => {
+              renderCustomUI: (elements, appState, files) => {
                 return (
                   <ExportToExcalidrawPlus
                     elements={elements}
                     appState={appState}
+                    files={files}
                     onError={(error) => {
                       excalidrawAPI?.updateScene({
                         appState: {

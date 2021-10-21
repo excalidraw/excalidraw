@@ -93,7 +93,7 @@ class Portal {
     try {
       await this.collab.fileManager.saveFiles({
         elements: this.collab.excalidrawAPI.getSceneElementsIncludingDeleted(),
-        appState: this.collab.excalidrawAPI.getAppState(),
+        files: this.collab.excalidrawAPI.getFiles(),
       });
     } catch (error) {
       this.collab.excalidrawAPI.updateScene({

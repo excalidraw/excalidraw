@@ -3,7 +3,7 @@ import {
   ExcalidrawSelectionElement,
   FontFamilyValues,
 } from "../element/types";
-import { AppState, NormalizedZoomValue } from "../types";
+import { AppState, BinaryFiles, NormalizedZoomValue } from "../types";
 import { ImportedDataState } from "./types";
 import {
   getElementMap,
@@ -45,6 +45,7 @@ export const AllowedExcalidrawElementTypes: Record<
 export type RestoredDataState = {
   elements: ExcalidrawElement[];
   appState: RestoredAppState;
+  files: BinaryFiles;
 };
 
 const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
@@ -270,5 +271,6 @@ export const restore = (
   return {
     elements: restoreElements(data?.elements, localElements),
     appState: restoreAppState(data?.appState, localAppState || null),
+    files: data?.files || {},
   };
 };

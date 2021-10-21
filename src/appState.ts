@@ -6,7 +6,6 @@ import {
   EXPORT_SCALES,
   THEME,
 } from "./constants";
-import { ExcalidrawElement } from "./element/types";
 import { t } from "./i18n";
 import { AppState, NormalizedZoomValue } from "./types";
 import { getDateTime } from "./utils";
@@ -20,7 +19,6 @@ export const getDefaultAppState = (): Omit<
   "offsetTop" | "offsetLeft" | "width" | "height"
 > => {
   return {
-    files: {},
     theme: THEME.LIGHT,
     collaborators: new Map(),
     currentChartType: "bar",
@@ -102,7 +100,6 @@ const APP_STATE_STORAGE_CONF = (<
 >(
   config: { [K in keyof T]: K extends keyof AppState ? T[K] : never },
 ) => config)({
-  files: { browser: false, export: true, server: false },
   theme: { browser: true, export: false, server: false },
   collaborators: { browser: false, export: false, server: false },
   currentChartType: { browser: true, export: false, server: false },
@@ -174,32 +171,10 @@ const APP_STATE_STORAGE_CONF = (<
   pendingImageElement: { browser: false, export: false, server: false },
 });
 
-/**
- * Strips out files which are only referenced by deleted elements
- */
-const filterOutDeletedFiles = (
-  appState: Partial<AppState>,
-  elements: readonly ExcalidrawElement[],
-) => {
-  const nextFiles: AppState["files"] = {};
-  for (const element of elements) {
-    if (
-      !element.isDeleted &&
-      "fileId" in element &&
-      element.fileId &&
-      appState.files?.[element.fileId]
-    ) {
-      nextFiles[element.fileId] = appState.files[element.fileId];
-    }
-  }
-  return nextFiles;
-};
-
 const _clearAppStateForStorage = <
   ExportType extends "export" | "browser" | "server"
 >(
   appState: Partial<AppState>,
-  elements: readonly ExcalidrawElement[],
   exportType: ExportType,
 ) => {
   type ExportableKeys = {
@@ -211,13 +186,7 @@ const _clearAppStateForStorage = <
   for (const key of Object.keys(appState) as (keyof typeof appState)[]) {
     const propConfig = APP_STATE_STORAGE_CONF[key];
     if (propConfig?.[exportType]) {
-      let nextValue;
-
-      if (key === "files") {
-        nextValue = filterOutDeletedFiles(appState, elements);
-      } else {
-        nextValue = appState[key];
-      }
+      const nextValue = appState[key];
 
       // https://github.com/microsoft/TypeScript/issues/31445
       (stateForExport as any)[key] = nextValue;
@@ -226,23 +195,14 @@ const _clearAppStateForStorage = <
   return stateForExport;
 };
 
-export const clearAppStateForLocalStorage = (
-  appState: Partial<AppState>,
-  elements: readonly ExcalidrawElement[],
-) => {
-  return _clearAppStateForStorage(appState, elements, "browser");
+export const clearAppStateForLocalStorage = (appState: Partial<AppState>) => {
+  return _clearAppStateForStorage(appState, "browser");
 };
 
-export const cleanAppStateForExport = (
-  appState: Partial<AppState>,
-  elements: readonly ExcalidrawElement[],
-) => {
-  return _clearAppStateForStorage(appState, elements, "export");
+export const cleanAppStateForExport = (appState: Partial<AppState>) => {
+  return _clearAppStateForStorage(appState, "export");
 };
 
-export const clearAppStateForDatabase = (
-  appState: Partial<AppState>,
-  elements: readonly ExcalidrawElement[],
-) => {
-  return _clearAppStateForStorage(appState, elements, "server");
+export const clearAppStateForDatabase = (appState: Partial<AppState>) => {
+  return _clearAppStateForStorage(appState, "server");
 };

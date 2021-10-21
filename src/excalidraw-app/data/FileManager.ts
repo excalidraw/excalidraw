@@ -9,10 +9,10 @@ import {
 } from "../../element/types";
 import { t } from "../../i18n";
 import {
-  AppState,
   BinaryFileData,
   BinaryFileMetadata,
   ExcalidrawImperativeAPI,
+  BinaryFiles,
 } from "../../types";
 
 export class FileManager {
@@ -66,20 +66,20 @@ export class FileManager {
 
   saveFiles = async ({
     elements,
-    appState,
+    files,
   }: {
     elements: readonly ExcalidrawElement[];
-    appState: Pick<AppState, "files">;
+    files: BinaryFiles;
   }) => {
     const addedFiles: Map<FileId, BinaryFileData> = new Map();
 
     for (const element of elements) {
       if (
         isInitializedImageElement(element) &&
-        appState.files[element.fileId] &&
+        files[element.fileId] &&
         !this.isFileHandled(element.fileId)
       ) {
-        addedFiles.set(element.fileId, appState.files[element.fileId]);
+        addedFiles.set(element.fileId, files[element.fileId]);
         this.savingFiles.set(element.fileId, true);
       }
     }

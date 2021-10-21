@@ -20,6 +20,7 @@ import {
   AppProps,
   AppState,
   ExcalidrawProps,
+  BinaryFiles,
   LibraryItem,
   LibraryItems,
 } from "../types";
@@ -53,6 +54,7 @@ import { isImageFileHandle } from "../data/blob";
 interface LayerUIProps {
   actionManager: ActionManager;
   appState: AppState;
+  files: BinaryFiles;
   canvas: HTMLCanvasElement | null;
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
@@ -128,7 +130,7 @@ const LibraryMenuItems = ({
   onInsertShape: (elements: LibraryItem) => void;
   onAddToLibrary: (elements: LibraryItem) => void;
   theme: AppState["theme"];
-  files: AppState["files"];
+  files: BinaryFiles;
   setAppState: React.Component<any, AppState>["setState"];
   setLibraryItems: (library: LibraryItems) => void;
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
@@ -270,7 +272,7 @@ const LibraryMenu = ({
   onInsertShape: (elements: LibraryItem) => void;
   onAddToLibrary: () => void;
   theme: AppState["theme"];
-  files: AppState["files"];
+  files: BinaryFiles;
   setAppState: React.Component<any, AppState>["setState"];
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   focusContainer: () => void;
@@ -378,6 +380,7 @@ const LibraryMenu = ({
 const LayerUI = ({
   actionManager,
   appState,
+  files,
   setAppState,
   canvas,
   elements,
@@ -410,6 +413,7 @@ const LayerUI = ({
       <JSONExportDialog
         elements={elements}
         appState={appState}
+        files={files}
         actionManager={actionManager}
         exportOpts={UIOptions.canvasActions.export}
         canvas={canvas}
@@ -425,11 +429,17 @@ const LayerUI = ({
     const createExporter = (type: ExportType): ExportCB => async (
       exportedElements,
     ) => {
-      const fileHandle = await exportCanvas(type, exportedElements, appState, {
-        exportBackground: appState.exportBackground,
-        name: appState.name,
-        viewBackgroundColor: appState.viewBackgroundColor,
-      })
+      const fileHandle = await exportCanvas(
+        type,
+        exportedElements,
+        appState,
+        files,
+        {
+          exportBackground: appState.exportBackground,
+          name: appState.name,
+          viewBackgroundColor: appState.viewBackgroundColor,
+        },
+      )
         .catch(muteFSAbortError)
         .catch((error) => {
           console.error(error);
@@ -449,6 +459,7 @@ const LayerUI = ({
       <ImageExportDialog
         elements={elements}
         appState={appState}
+        files={files}
         actionManager={actionManager}
         onExportToPng={createExporter("png")}
         onExportToSvg={createExporter("svg")}
@@ -574,7 +585,7 @@ const LayerUI = ({
       focusContainer={focusContainer}
       library={library}
       theme={appState.theme}
-      files={appState.files}
+      files={files}
       id={id}
     />
   ) : null;

@@ -4,7 +4,7 @@ import { ToolButton } from "../../components/ToolButton";
 import { serializeAsJSON } from "../../data/json";
 import { loadFirebaseStorage, saveFilesToFirebase } from "../data/firebase";
 import { FileId, NonDeletedExcalidrawElement } from "../../element/types";
-import { AppState, BinaryFileData } from "../../types";
+import { AppState, BinaryFileData, BinaryFiles } from "../../types";
 import { nanoid } from "nanoid";
 import { t } from "../../i18n";
 import { excalidrawPlusIcon } from "./icons";
@@ -17,6 +17,7 @@ import { MIME_TYPES } from "../../constants";
 const exportToExcalidrawPlus = async (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
+  files: BinaryFiles,
 ) => {
   const firebase = await loadFirebaseStorage();
 
@@ -25,7 +26,7 @@ const exportToExcalidrawPlus = async (
   const encryptionKey = (await generateEncryptionKey())!;
   const encryptedData = await encryptData(
     encryptionKey,
-    serializeAsJSON(elements, appState, "database"),
+    serializeAsJSON(elements, appState, files, "database"),
   );
 
   const blob = new Blob(
@@ -45,16 +46,16 @@ const exportToExcalidrawPlus = async (
       },
     });
 
-  const files = new Map<FileId, BinaryFileData>();
+  const filesMap = new Map<FileId, BinaryFileData>();
   for (const element of elements) {
-    if (isInitializedImageElement(element) && appState.files[element.fileId]) {
-      files.set(element.fileId, appState.files[element.fileId]);
+    if (isInitializedImageElement(element) && files[element.fileId]) {
+      filesMap.set(element.fileId, files[element.fileId]);
     }
   }
 
-  if (files.size) {
+  if (filesMap.size) {
     const filesToUpload = await encodeFilesForUpload({
-      files,
+      files: filesMap,
       encryptionKey,
       maxBytes: FILE_UPLOAD_MAX_BYTES,
     });
@@ -73,8 +74,9 @@ const exportToExcalidrawPlus = async (
 export const ExportToExcalidrawPlus: React.FC<{
   elements: readonly NonDeletedExcalidrawElement[];
   appState: AppState;
+  files: BinaryFiles;
   onError: (error: Error) => void;
-}> = ({ elements, appState, onError }) => {
+}> = ({ elements, appState, files, onError }) => {
   return (
     <Card color="indigo">
       <div className="Card-icon">{excalidrawPlusIcon}</div>
@@ -90,7 +92,7 @@ export const ExportToExcalidrawPlus: React.FC<{
         showAriaLabel={true}
         onClick={async () => {
           try {
-            await exportToExcalidrawPlus(elements, appState);
+            await exportToExcalidrawPlus(elements, appState, files);
           } catch (error) {
             console.error(error);
             onError(new Error(t("exportDialog.excalidrawplus_exportError")));

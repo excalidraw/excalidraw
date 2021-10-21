@@ -17,7 +17,11 @@ describe("exportToSvg", () => {
   };
 
   it("with default arguments", async () => {
-    const svgElement = await exportUtils.exportToSvg(ELEMENTS, DEFAULT_OPTIONS);
+    const svgElement = await exportUtils.exportToSvg(
+      ELEMENTS,
+      DEFAULT_OPTIONS,
+      null,
+    );
 
     expect(svgElement).toMatchSnapshot();
   });
@@ -25,11 +29,15 @@ describe("exportToSvg", () => {
   it("with background color", async () => {
     const BACKGROUND_COLOR = "#abcdef";
 
-    const svgElement = await exportUtils.exportToSvg(ELEMENTS, {
-      ...DEFAULT_OPTIONS,
-      exportBackground: true,
-      viewBackgroundColor: BACKGROUND_COLOR,
-    });
+    const svgElement = await exportUtils.exportToSvg(
+      ELEMENTS,
+      {
+        ...DEFAULT_OPTIONS,
+        exportBackground: true,
+        viewBackgroundColor: BACKGROUND_COLOR,
+      },
+      null,
+    );
 
     expect(svgElement.querySelector("rect")).toHaveAttribute(
       "fill",
@@ -38,10 +46,14 @@ describe("exportToSvg", () => {
   });
 
   it("with dark mode", async () => {
-    const svgElement = await exportUtils.exportToSvg(ELEMENTS, {
-      ...DEFAULT_OPTIONS,
-      exportWithDarkMode: true,
-    });
+    const svgElement = await exportUtils.exportToSvg(
+      ELEMENTS,
+      {
+        ...DEFAULT_OPTIONS,
+        exportWithDarkMode: true,
+      },
+      null,
+    );
 
     expect(svgElement.getAttribute("filter")).toMatchInlineSnapshot(
       `"themeFilter"`,
@@ -49,10 +61,14 @@ describe("exportToSvg", () => {
   });
 
   it("with exportPadding", async () => {
-    const svgElement = await exportUtils.exportToSvg(ELEMENTS, {
-      ...DEFAULT_OPTIONS,
-      exportPadding: 0,
-    });
+    const svgElement = await exportUtils.exportToSvg(
+      ELEMENTS,
+      {
+        ...DEFAULT_OPTIONS,
+        exportPadding: 0,
+      },
+      null,
+    );
 
     expect(svgElement).toHaveAttribute("height", ELEMENT_HEIGHT.toString());
     expect(svgElement).toHaveAttribute("width", ELEMENT_WIDTH.toString());
@@ -65,11 +81,15 @@ describe("exportToSvg", () => {
   it("with scale", async () => {
     const SCALE = 2;
 
-    const svgElement = await exportUtils.exportToSvg(ELEMENTS, {
-      ...DEFAULT_OPTIONS,
-      exportPadding: 0,
-      exportScale: SCALE,
-    });
+    const svgElement = await exportUtils.exportToSvg(
+      ELEMENTS,
+      {
+        ...DEFAULT_OPTIONS,
+        exportPadding: 0,
+        exportScale: SCALE,
+      },
+      null,
+    );
 
     expect(svgElement).toHaveAttribute(
       "height",
@@ -82,10 +102,14 @@ describe("exportToSvg", () => {
   });
 
   it("with exportEmbedScene", async () => {
-    const svgElement = await exportUtils.exportToSvg(ELEMENTS, {
-      ...DEFAULT_OPTIONS,
-      exportEmbedScene: true,
-    });
+    const svgElement = await exportUtils.exportToSvg(
+      ELEMENTS,
+      {
+        ...DEFAULT_OPTIONS,
+        exportEmbedScene: true,
+      },
+      null,
+    );
     expect(svgElement.innerHTML).toMatchSnapshot();
   });
 });

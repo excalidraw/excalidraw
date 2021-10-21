@@ -6,7 +6,7 @@ import { MIME_TYPES } from "../constants";
 import { t } from "../i18n";
 import { useIsMobile } from "../components/App";
 import { exportToSvg } from "../scene/export";
-import { AppState, LibraryItem } from "../types";
+import { BinaryFiles, LibraryItem } from "../types";
 import "./LibraryUnit.scss";
 
 // fa-plus
@@ -27,7 +27,7 @@ export const LibraryUnit = ({
   onClick,
 }: {
   elements?: LibraryItem;
-  files: AppState["files"];
+  files: BinaryFiles;
   pendingElements?: LibraryItem;
   onRemoveFromLibrary: () => void;
   onClick: () => void;
@@ -39,11 +39,14 @@ export const LibraryUnit = ({
       if (!elementsToRender) {
         return;
       }
-      const svg = await exportToSvg(elementsToRender, {
-        exportBackground: false,
-        viewBackgroundColor: oc.white,
+      const svg = await exportToSvg(
+        elementsToRender,
+        {
+          exportBackground: false,
+          viewBackgroundColor: oc.white,
+        },
         files,
-      });
+      );
       if (ref.current) {
         ref.current.innerHTML = svg.outerHTML;
       }

@@ -4,7 +4,7 @@
 
 import { MIME_TYPES, SVG_NS } from "../constants";
 import { t } from "../i18n";
-import { AppClassProperties, AppState, DataURL } from "../types";
+import { AppClassProperties, DataURL, BinaryFiles } from "../types";
 import { isInitializedImageElement } from "./typeChecks";
 import {
   ExcalidrawElement,
@@ -33,7 +33,7 @@ export const updateImageCache = async ({
   imageCache,
 }: {
   fileIds: FileId[];
-  files: AppState["files"];
+  files: BinaryFiles;
   imageCache: AppClassProperties["imageCache"];
 }) => {
   const updatedFiles = new Map<FileId, true>();

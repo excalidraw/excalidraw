@@ -7,7 +7,7 @@ import { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { exportToCanvas, exportToSvg } from "../scene/export";
 import { ExportType } from "../scene/types";
-import { AppState } from "../types";
+import { AppState, BinaryFiles } from "../types";
 import { canvasToBlob } from "./blob";
 import { fileSave, FileSystemHandle } from "./filesystem";
 import { serializeAsJSON } from "./json";
@@ -19,6 +19,7 @@ export const exportCanvas = async (
   type: ExportType,
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
+  files: BinaryFiles,
   {
     exportBackground,
     exportPadding = DEFAULT_EXPORT_PADDING,
@@ -37,15 +38,18 @@ export const exportCanvas = async (
     throw new Error(t("alerts.cannotExportEmptyCanvas"));
   }
   if (type === "svg" || type === "clipboard-svg") {
-    const tempSvg = await exportToSvg(elements, {
-      exportBackground,
-      exportWithDarkMode: appState.exportWithDarkMode,
-      viewBackgroundColor,
-      exportPadding,
-      exportScale: appState.exportScale,
-      exportEmbedScene: appState.exportEmbedScene && type === "svg",
-      files: appState.files,
-    });
+    const tempSvg = await exportToSvg(
+      elements,
+      {
+        exportBackground,
+        exportWithDarkMode: appState.exportWithDarkMode,
+        viewBackgroundColor,
+        exportPadding,
+        exportScale: appState.exportScale,
+        exportEmbedScene: appState.exportEmbedScene && type === "svg",
+      },
+      files,
+    );
     if (type === "svg") {
       return await fileSave(
         new Blob([tempSvg.outerHTML], { type: MIME_TYPES.svg }),
@@ -61,7 +65,7 @@ export const exportCanvas = async (
     }
   }
 
-  const tempCanvas = await exportToCanvas(elements, appState, {
+  const tempCanvas = await exportToCanvas(elements, appState, files, {
     exportBackground,
     viewBackgroundColor,
     exportPadding,
@@ -77,7 +81,7 @@ export const exportCanvas = async (
         await import(/* webpackChunkName: "image" */ "./image")
       ).encodePngMetadata({
         blob,
-        metadata: serializeAsJSON(elements, appState, "local"),
+        metadata: serializeAsJSON(elements, appState, files, "local"),
       });
     }
 

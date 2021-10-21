@@ -113,7 +113,7 @@ import {
   updateBoundElements,
 } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
-import { mutateElement } from "../element/mutateElement";
+import { bumpVersion, mutateElement } from "../element/mutateElement";
 import { deepCopyElement, newFreeDrawElement } from "../element/newElement";
 import {
   isBindingElement,
@@ -180,6 +180,7 @@ import {
   BinaryFileData,
   DataURL,
   ExcalidrawImperativeAPI,
+  BinaryFiles,
   Gesture,
   GestureEvent,
   LibraryItems,
@@ -279,6 +280,7 @@ class App extends React.Component<AppProps, AppState> {
     id: string;
   };
 
+  public files: BinaryFiles = {};
   public imageCache: AppClassProperties["imageCache"] = new Map();
 
   constructor(props: AppProps) {
@@ -325,6 +327,7 @@ class App extends React.Component<AppProps, AppState> {
         scrollToContent: this.scrollToContent,
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
+        getFiles: () => this.files,
         refresh: this.refresh,
         importLibrary: this.importLibraryFromUrl,
         setToastMessage: this.setToastMessage,
@@ -443,6 +446,7 @@ class App extends React.Component<AppProps, AppState> {
             <LayerUI
               canvas={this.canvas}
               appState={this.state}
+              files={this.files}
               setAppState={this.setAppState}
               actionManager={this.actionManager}
               elements={this.scene.getElements()}
@@ -452,6 +456,7 @@ class App extends React.Component<AppProps, AppState> {
                 this.addElementsFromPasteOrLibrary({
                   elements,
                   position: "center",
+                  files: null,
                 })
               }
               zenModeEnabled={zenModeEnabled}
@@ -535,6 +540,13 @@ class App extends React.Component<AppProps, AppState> {
         if (actionResult.commitToHistory) {
           this.history.resumeRecording();
         }
+      }
+
+      if (actionResult.files) {
+        this.files = actionResult.replaceFiles
+          ? actionResult.files
+          : { ...this.files, ...actionResult.files };
+        this.addNewImagesToImageCache();
       }
 
       if (actionResult.appState || editingElement) {
@@ -692,16 +704,16 @@ class App extends React.Component<AppProps, AppState> {
             this.state,
             this.scene.getElementsIncludingDeleted(),
           )
-            .then(({ elements, appState }) =>
+            .then((scene) => {
               this.syncActionResult({
-                elements,
+                ...scene,
                 appState: {
-                  ...(appState || this.state),
+                  ...(scene.appState || this.state),
                   isLoading: false,
                 },
                 commitToHistory: true,
-              }),
-            )
+              });
+            })
             .catch((error) => {
               this.setState({ isLoading: false, errorMessage: error.message });
             });
@@ -730,6 +742,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const scene = restore(initialData, null, null);
+
     scene.appState = {
       ...scene.appState,
       elementType:
@@ -760,11 +773,6 @@ class App extends React.Component<AppProps, AppState> {
       ...scene,
       commitToHistory: true,
     });
-
-    this.addNewImagesToImageCache(
-      getInitializedImageElements(scene.elements),
-      scene.appState.files,
-    );
 
     const libraryUrl =
       // current
@@ -1135,6 +1143,7 @@ class App extends React.Component<AppProps, AppState> {
       this.props.onChange?.(
         this.scene.getElementsIncludingDeleted(),
         this.state,
+        this.files,
       );
     }
   }
@@ -1179,7 +1188,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private copyAll = () => {
-    copyToClipboard(this.scene.getElements(), this.state);
+    copyToClipboard(this.scene.getElements(), this.state, this.files);
   };
 
   private static resetTapTwice() {
@@ -1295,7 +1304,7 @@ class App extends React.Component<AppProps, AppState> {
       } else if (data.elements) {
         this.addElementsFromPasteOrLibrary({
           elements: data.elements,
-          files: data.files,
+          files: data.files || null,
           position: "cursor",
         });
       } else if (data.text) {
@@ -1308,7 +1317,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private addElementsFromPasteOrLibrary = (opts: {
     elements: readonly ExcalidrawElement[];
-    files?: AppState["files"];
+    files: BinaryFiles | null;
     position: { clientX: number; clientY: number } | "cursor" | "center";
   }) => {
     const elements = restoreElements(opts.elements, null);
@@ -1361,6 +1370,10 @@ class App extends React.Component<AppProps, AppState> {
     ];
     fixBindingsAfterDuplication(nextElements, elements, oldIdToDuplicatedId);
 
+    if (opts.files) {
+      this.files = { ...this.files, ...opts.files };
+    }
+
     this.scene.replaceAllElements(nextElements);
     this.history.resumeRecording();
     this.setState(
@@ -1372,9 +1385,6 @@ class App extends React.Component<AppProps, AppState> {
             map[element.id] = true;
             return map;
           }, {} as any),
-          files: opts.files
-            ? { ...this.state.files, ...opts.files }
-            : this.state.files,
           selectedGroupIds: {},
         },
         this.scene.getElements(),
@@ -1500,20 +1510,25 @@ class App extends React.Component<AppProps, AppState> {
   /** adds supplied files to existing files in the appState */
   public addFiles: ExcalidrawImperativeAPI["addFiles"] = withBatchedUpdates(
     (files) => {
-      this.setState(
-        (state) => ({
-          files: {
-            ...state.files,
-            ...files.reduce((acc, fileData) => {
-              acc[fileData.id] = fileData;
-              return acc;
-            }, {} as Record<string, BinaryFileData>),
-          },
-        }),
-        () => {
-          this.addNewImagesToImageCache();
-        },
-      );
+      const filesMap = files.reduce((acc, fileData) => {
+        acc.set(fileData.id, fileData);
+        return acc;
+      }, new Map<FileId, BinaryFileData>());
+
+      this.files = { ...this.files, ...Object.fromEntries(filesMap) };
+      this.addNewImagesToImageCache();
+
+      // bump versions for elements that reference added files so that
+      // we/host apps can detect the change
+      this.scene.getElements().forEach((element) => {
+        if (
+          isInitializedImageElement(element) &&
+          filesMap.has(element.fileId)
+        ) {
+          bumpVersion(element);
+        }
+      });
+      this.scene.informMutation();
     },
   );
 
@@ -3964,7 +3979,7 @@ class App extends React.Component<AppProps, AppState> {
       throw new Error(t("errors.imageInsertError"));
     }
 
-    const existingFileData = this.state.files[fileId];
+    const existingFileData = this.files[fileId];
     if (!existingFileData?.dataURL) {
       try {
         imageFile = await resizeImageFile(
@@ -3985,7 +4000,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (showCursorImagePreview) {
-      const dataURL = this.state.files[fileId]?.dataURL;
+      const dataURL = this.files[fileId]?.dataURL;
       // optimization so that we don't unnecessarily resize the original
       // full-size file for cursor preview
       // (it's much faster to convert the resized dataURL to File)
@@ -3995,7 +4010,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const dataURL =
-      this.state.files[fileId]?.dataURL || (await getDataURL(imageFile));
+      this.files[fileId]?.dataURL || (await getDataURL(imageFile));
 
     const imageElement = mutateElement(
       _imageElement,
@@ -4006,46 +4021,40 @@ class App extends React.Component<AppProps, AppState> {
     ) as NonDeleted<InitializedExcalidrawImageElement>;
 
     return new Promise<NonDeleted<InitializedExcalidrawImageElement>>(
-      (resolve, reject) => {
-        this.setState(
-          (state) => ({
-            files: {
-              ...state.files,
-              [fileId]: {
-                mimeType,
-                id: fileId,
-                dataURL,
-                created: Date.now(),
-              },
+      async (resolve, reject) => {
+        try {
+          this.files = {
+            ...this.files,
+            [fileId]: {
+              mimeType,
+              id: fileId,
+              dataURL,
+              created: Date.now(),
             },
-          }),
-          async () => {
-            try {
-              const cachedImageData = this.imageCache.get(fileId);
-              if (!cachedImageData) {
-                this.addNewImagesToImageCache();
-                await this.updateImageCache([imageElement]);
-              }
-              if (cachedImageData?.image instanceof Promise) {
-                await cachedImageData.image;
-              }
-              if (
-                this.state.pendingImageElement?.id !== imageElement.id &&
-                this.state.draggingElement?.id !== imageElement.id
-              ) {
-                this.initializeImageDimensions(imageElement, true);
-              }
-              resolve(imageElement);
-            } catch (error) {
-              console.error(error);
-              reject(new Error(t("errors.imageInsertError")));
-            } finally {
-              if (!showCursorImagePreview) {
-                resetCursor(this.canvas);
-              }
-            }
-          },
-        );
+          };
+          const cachedImageData = this.imageCache.get(fileId);
+          if (!cachedImageData) {
+            this.addNewImagesToImageCache();
+            await this.updateImageCache([imageElement]);
+          }
+          if (cachedImageData?.image instanceof Promise) {
+            await cachedImageData.image;
+          }
+          if (
+            this.state.pendingImageElement?.id !== imageElement.id &&
+            this.state.draggingElement?.id !== imageElement.id
+          ) {
+            this.initializeImageDimensions(imageElement, true);
+          }
+          resolve(imageElement);
+        } catch (error) {
+          console.error(error);
+          reject(new Error(t("errors.imageInsertError")));
+        } finally {
+          if (!showCursorImagePreview) {
+            resetCursor(this.canvas);
+          }
+        }
       },
     );
   };
@@ -4237,7 +4246,7 @@ class App extends React.Component<AppProps, AppState> {
       to error for images that fail during <img> element creation */
   private updateImageCache = async (
     elements: readonly InitializedExcalidrawImageElement[],
-    files = this.state.files,
+    files = this.files,
   ) => {
     const { updatedFiles, erroredFiles } = await _updateImageCache({
       imageCache: this.imageCache,
@@ -4267,7 +4276,7 @@ class App extends React.Component<AppProps, AppState> {
     imageElements: InitializedExcalidrawImageElement[] = getInitializedImageElements(
       this.scene.getElements(),
     ),
-    files: AppState["files"] = this.state.files,
+    files: BinaryFiles = this.files,
   ) => {
     const uncachedImageElements = imageElements.filter(
       (element) => !element.isDeleted && !this.imageCache.has(element.fileId),
@@ -4406,17 +4415,18 @@ class App extends React.Component<AppProps, AppState> {
               }
             }
 
-            const { elements, appState } = await loadFromBlob(
+            const scene = await loadFromBlob(
               file,
               this.state,
               this.scene.getElementsIncludingDeleted(),
             );
             this.syncActionResult({
-              elements,
+              ...scene,
               appState: {
-                ...(appState || this.state),
+                ...(scene.appState || this.state),
                 isLoading: false,
               },
+              replaceFiles: true,
               commitToHistory: true,
             });
             return;
@@ -4455,6 +4465,7 @@ class App extends React.Component<AppProps, AppState> {
       this.addElementsFromPasteOrLibrary({
         elements: JSON.parse(libraryShapes),
         position: event,
+        files: null,
       });
       return;
     }
@@ -4493,16 +4504,17 @@ class App extends React.Component<AppProps, AppState> {
 
   loadFileToCanvas = (file: Blob) => {
     loadFromBlob(file, this.state, this.scene.getElementsIncludingDeleted())
-      .then(({ elements, appState }) =>
+      .then((scene) => {
         this.syncActionResult({
-          elements,
+          ...scene,
           appState: {
-            ...(appState || this.state),
+            ...(scene.appState || this.state),
             isLoading: false,
           },
+          replaceFiles: true,
           commitToHistory: true,
-        }),
-      )
+        });
+      })
       .catch((error) => {
         this.setState({ isLoading: false, errorMessage: error.message });
       });

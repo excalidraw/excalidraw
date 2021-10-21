@@ -10,7 +10,12 @@ import { ImportedDataState } from "../../data/types";
 import { isInitializedImageElement } from "../../element/typeChecks";
 import { ExcalidrawElement, FileId } from "../../element/types";
 import { t } from "../../i18n";
-import { AppState, BinaryFileData, UserIdleState } from "../../types";
+import {
+  AppState,
+  BinaryFileData,
+  BinaryFiles,
+  UserIdleState,
+} from "../../types";
 import { FILE_UPLOAD_MAX_BYTES } from "../app_constants";
 import { encodeFilesForUpload } from "./FileManager";
 import { saveFilesToFirebase } from "./firebase";
@@ -243,6 +248,10 @@ export const loadScene = async (
   return {
     elements: data.elements,
     appState: data.appState,
+    // note: this will always be empty because we're not storing files
+    // in the scene database/localStorage, and instead fetch them async
+    // from a different database
+    files: data.files,
     commitToHistory: false,
   };
 };
@@ -250,8 +259,9 @@ export const loadScene = async (
 export const exportToBackend = async (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
+  files: BinaryFiles,
 ) => {
-  const json = serializeAsJSON(elements, appState, "database");
+  const json = serializeAsJSON(elements, appState, files, "database");
   const encoded = new TextEncoder().encode(json);
 
   const cryptoKey = await window.crypto.subtle.generateKey(
@@ -284,20 +294,17 @@ export const exportToBackend = async (
   const exportedKey = await window.crypto.subtle.exportKey("jwk", cryptoKey);
 
   try {
-    const files = new Map<FileId, BinaryFileData>();
+    const filesMap = new Map<FileId, BinaryFileData>();
     for (const element of elements) {
-      if (
-        isInitializedImageElement(element) &&
-        appState.files[element.fileId]
-      ) {
-        files.set(element.fileId, appState.files[element.fileId]);
+      if (isInitializedImageElement(element) && files[element.fileId]) {
+        filesMap.set(element.fileId, files[element.fileId]);
       }
     }
 
     const encryptionKey = exportedKey.k!;
 
     const filesToUpload = await encodeFilesForUpload({
-      files,
+      files: filesMap,
       encryptionKey,
       maxBytes: FILE_UPLOAD_MAX_BYTES,
     });

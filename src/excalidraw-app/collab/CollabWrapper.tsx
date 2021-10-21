@@ -1,6 +1,6 @@
 import throttle from "lodash.throttle";
 import { PureComponent } from "react";
-import { AppState, ExcalidrawImperativeAPI } from "../../types";
+import { ExcalidrawImperativeAPI } from "../../types";
 import { ErrorDialog } from "../../components/ErrorDialog";
 import { APP_NAME, ENV, EVENT } from "../../constants";
 import { ImportedDataState } from "../../data/types";
@@ -286,7 +286,6 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
   private fetchImageFilesFromFirebase = async (scene: {
     elements: readonly ExcalidrawElement[];
-    appState: Pick<AppState, "files">;
   }) => {
     const unfetchedImages = scene.elements
       .filter((element) => {
@@ -552,7 +551,6 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       erroredFiles,
     } = await this.fetchImageFilesFromFirebase({
       elements: this.excalidrawAPI.getSceneElementsIncludingDeleted(),
-      appState: this.excalidrawAPI.getAppState(),
     });
 
     this.excalidrawAPI.addFiles(loadedFiles);

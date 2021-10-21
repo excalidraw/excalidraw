@@ -3,7 +3,7 @@ import { cleanAppStateForExport, clearAppStateForDatabase } from "../appState";
 import { EXPORT_DATA_TYPES, EXPORT_SOURCE, MIME_TYPES } from "../constants";
 import { clearElementsForDatabase, clearElementsForExport } from "../element";
 import { ExcalidrawElement } from "../element/types";
-import { AppState } from "../types";
+import { AppState, BinaryFiles } from "../types";
 import { isImageFileHandle, loadFromBlob } from "./blob";
 
 import {
@@ -13,9 +13,31 @@ import {
 } from "./types";
 import Library from "./library";
 
+/**
+ * Strips out files which are only referenced by deleted elements
+ */
+const filterOutDeletedFiles = (
+  elements: readonly ExcalidrawElement[],
+  files: BinaryFiles,
+) => {
+  const nextFiles: BinaryFiles = {};
+  for (const element of elements) {
+    if (
+      !element.isDeleted &&
+      "fileId" in element &&
+      element.fileId &&
+      files[element.fileId]
+    ) {
+      nextFiles[element.fileId] = files[element.fileId];
+    }
+  }
+  return nextFiles;
+};
+
 export const serializeAsJSON = (
   elements: readonly ExcalidrawElement[],
   appState: Partial<AppState>,
+  files: BinaryFiles,
   type: "local" | "database",
 ): string => {
   const data: ExportedDataState = {
@@ -28,8 +50,13 @@ export const serializeAsJSON = (
         : clearElementsForDatabase(elements),
     appState:
       type === "local"
-        ? cleanAppStateForExport(appState, elements)
-        : clearAppStateForDatabase(appState, elements),
+        ? cleanAppStateForExport(appState)
+        : clearAppStateForDatabase(appState),
+    files:
+      type === "local"
+        ? filterOutDeletedFiles(elements, files)
+        : // will be stripped from JSON
+          undefined,
   };
 
   return JSON.stringify(data, null, 2);
@@ -38,8 +65,9 @@ export const serializeAsJSON = (
 export const saveAsJSON = async (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
+  files: BinaryFiles,
 ) => {
-  const serialized = serializeAsJSON(elements, appState, "local");
+  const serialized = serializeAsJSON(elements, appState, files, "local");
   const blob = new Blob([serialized], {
     type: MIME_TYPES.excalidraw,
   });

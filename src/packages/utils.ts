@@ -3,7 +3,7 @@ import {
   exportToSvg as _exportToSvg,
 } from "../scene/export";
 import { getDefaultAppState } from "../appState";
-import { AppState } from "../types";
+import { AppState, BinaryFiles } from "../types";
 import { ExcalidrawElement } from "../element/types";
 import { getNonDeletedElements } from "../element";
 import { restore } from "../data/restore";
@@ -12,6 +12,7 @@ import { MIME_TYPES } from "../constants";
 type ExportOpts = {
   elements: readonly ExcalidrawElement[];
   appState?: Partial<Omit<AppState, "offsetTop" | "offsetLeft">>;
+  files: BinaryFiles | null;
   getDimensions?: (
     width: number,
     height: number,
@@ -21,6 +22,7 @@ type ExportOpts = {
 export const exportToCanvas = ({
   elements,
   appState,
+  files,
   getDimensions = (width, height) => ({ width, height, scale: 1 }),
 }: ExportOpts) => {
   const { elements: restoredElements, appState: restoredAppState } = restore(
@@ -32,6 +34,7 @@ export const exportToCanvas = ({
   return _exportToCanvas(
     getNonDeletedElements(restoredElements),
     { ...restoredAppState, offsetTop: 0, offsetLeft: 0, width: 0, height: 0 },
+    files || {},
     { exportBackground, viewBackgroundColor },
     (width: number, height: number) => {
       const canvas = document.createElement("canvas");
@@ -80,6 +83,7 @@ export const exportToBlob = async (
 export const exportToSvg = async ({
   elements,
   appState = getDefaultAppState(),
+  files = {},
   exportPadding,
 }: Omit<ExportOpts, "getDimensions"> & {
   exportPadding?: number;
@@ -89,10 +93,14 @@ export const exportToSvg = async ({
     null,
     null,
   );
-  return _exportToSvg(getNonDeletedElements(restoredElements), {
-    ...restoredAppState,
-    exportPadding,
-  });
+  return _exportToSvg(
+    getNonDeletedElements(restoredElements),
+    {
+      ...restoredAppState,
+      exportPadding,
+    },
+    files,
+  );
 };
 
 export { serializeAsJSON } from "../data/json";

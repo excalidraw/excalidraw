@@ -2,7 +2,7 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 import { RoughSVG } from "roughjs/bin/svg";
 import oc from "open-color";
 
-import { AppState, Zoom } from "../types";
+import { AppState, BinaryFiles, Zoom } from "../types";
 import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -809,7 +809,7 @@ export const renderSceneToSvg = (
   elements: readonly NonDeletedExcalidrawElement[],
   rsvg: RoughSVG,
   svgRoot: SVGElement,
-  files: AppState["files"],
+  files: BinaryFiles,
   {
     offsetX = 0,
     offsetY = 0,

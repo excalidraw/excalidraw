@@ -3,7 +3,7 @@ import {
   NonDeletedExcalidrawElement,
 } from "./element/types";
 import { getSelectedElements } from "./scene";
-import { AppState } from "./types";
+import { AppState, BinaryFiles } from "./types";
 import { SVG_EXPORT_TAG } from "./scene/export";
 import { tryParseSpreadsheet, Spreadsheet, VALID_SPREADSHEET } from "./charts";
 import { EXPORT_DATA_TYPES, MIME_TYPES } from "./constants";
@@ -12,13 +12,13 @@ import { isInitializedImageElement } from "./element/typeChecks";
 type ElementsClipboard = {
   type: typeof EXPORT_DATA_TYPES.excalidrawClipboard;
   elements: ExcalidrawElement[];
-  files: AppState["files"] | undefined;
+  files: BinaryFiles | undefined;
 };
 
 export interface ClipboardData {
   spreadsheet?: Spreadsheet;
   elements?: readonly ExcalidrawElement[];
-  files?: AppState["files"];
+  files?: BinaryFiles;
   text?: string;
   errorMessage?: string;
 }
@@ -40,7 +40,7 @@ export const probablySupportsClipboardBlob =
 
 const clipboardContainsElements = (
   contents: any,
-): contents is { elements: ExcalidrawElement[]; files?: AppState["files"] } => {
+): contents is { elements: ExcalidrawElement[]; files?: BinaryFiles } => {
   if (
     [
       EXPORT_DATA_TYPES.excalidraw,
@@ -56,20 +56,18 @@ const clipboardContainsElements = (
 export const copyToClipboard = async (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
+  files: BinaryFiles,
 ) => {
   const selectedElements = getSelectedElements(elements, appState);
   const contents: ElementsClipboard = {
     type: EXPORT_DATA_TYPES.excalidrawClipboard,
     elements: selectedElements,
-    files: selectedElements.reduce((files, element) => {
-      if (
-        isInitializedImageElement(element) &&
-        appState.files[element.fileId]
-      ) {
-        files[element.fileId] = appState.files[element.fileId];
+    files: selectedElements.reduce((acc, element) => {
+      if (isInitializedImageElement(element) && files[element.fileId]) {
+        acc[element.fileId] = files[element.fileId];
       }
-      return files;
-    }, {} as AppState["files"]),
+      return acc;
+    }, {} as BinaryFiles),
   };
   const json = JSON.stringify(contents);
   CLIPBOARD = json;
