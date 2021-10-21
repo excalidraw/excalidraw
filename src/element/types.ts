@@ -100,7 +100,7 @@ export type ExcalidrawElement =
   | ExcalidrawImageElement;
 
 export type NonDeleted<TElement extends ExcalidrawElement> = TElement & {
-  isDeleted: false;
+  isDeleted: boolean;
 };
 
 export type NonDeletedExcalidrawElement = NonDeleted<ExcalidrawElement>;

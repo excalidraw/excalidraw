@@ -51,9 +51,7 @@ export const actionFinalize = register({
     let newElements = elements;
 
     if (appState.pendingImageElement) {
-      newElements = newElements.filter(
-        (element) => element.id !== appState.pendingImageElement?.id,
-      );
+      mutateElement(appState.pendingImageElement, { isDeleted: true }, false);
     }
 
     if (window.document.activeElement instanceof HTMLElement) {
