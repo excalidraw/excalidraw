@@ -156,22 +156,22 @@
     "errorAddingToLibrary": "Kunne ikke legge element i biblioteket",
     "errorRemovingFromLibrary": "Kunne ikke fjerne element fra biblioteket",
     "confirmAddLibrary": "Dette vil legge til {{numShapes}} figur(er) i biblioteket ditt. Er du sikker?",
-    "imageDoesNotContainScene": "",
+    "imageDoesNotContainScene": "Det ser ikke ut til at dette bildet inneholder noen scenedata. Har du aktivert innebygging av scene under eksporten?",
     "cannotRestoreFromImage": "Scenen kunne ikke gjenopprettes fra denne bildefilen",
     "invalidSceneUrl": "Kunne ikke importere scene fra den oppgitte URL-en. Den er enten ødelagt, eller inneholder ikke gyldig Excalidraw JSON-data.",
     "resetLibrary": "Dette vil tømme biblioteket ditt. Er du sikker?",
     "invalidEncryptionKey": "Krypteringsnøkkel må ha 22 tegn. Live-samarbeid er deaktivert."
   },
   "errors": {
-    "unsupportedFileType": "",
-    "imageInsertError": "",
-    "fileTooBig": "",
-    "svgImageInsertError": "",
-    "invalidSVGString": ""
+    "unsupportedFileType": "Filtypen støttes ikke.",
+    "imageInsertError": "Kunne ikke sette inn bildet. Prøv igjen senere...",
+    "fileTooBig": "Filen er for stor. Maksimal tillatt størrelse er {{maxSize}}.",
+    "svgImageInsertError": "Kunne ikke sette inn SVG-bilde. SVG-koden ser ugyldig ut.",
+    "invalidSVGString": "errors.invalidSVGString"
   },
   "toolBar": {
     "selection": "Velg",
-    "image": "",
+    "image": "Sett inn bilde",
     "rectangle": "Rektangel",
     "diamond": "Diamant",
     "ellipse": "Ellipse",
@@ -196,12 +196,12 @@
     "linearElementMulti": "Klikk på siste punkt eller trykk Escape eller Enter for å fullføre",
     "lockAngle": "Du kan låse vinkelen ved å holde nede SHIFT",
     "resize": "Du kan beholde forholdet ved å trykke SHIFT mens du endrer størrelse,\ntrykk ALT for å endre størrelsen fra midten",
-    "resizeImage": "",
+    "resizeImage": "Du kan endre størrelse fritt ved å holde SHIFT,\nhold ALT for å endre størrelse fra midten",
     "rotate": "Du kan låse vinklene ved å holde SHIFT mens du roterer",
     "lineEditor_info": "Dobbeltklikk eller trykk Enter for å redigere punkter",
     "lineEditor_pointSelected": "Trykk på Slett for å fjerne punktet, Ctrl / Cmd+D for å duplisere, eller dra for å flytte",
     "lineEditor_nothingSelected": "Velg et punkt å flytte eller fjerne, eller hold Alt og klikk for å legge til nye punkter",
-    "placeImage": ""
+    "placeImage": "Klikk for å plassere bildet, eller klikk og dra for å angi størrelsen manuelt"
   },
   "canvasError": {
     "cannotShowPreview": "Kan ikke vise forhåndsvisning",
