@@ -137,8 +137,8 @@
     "lightMode": "Mòde clar",
     "zenMode": "Mòde escur",
     "exitZenMode": "Sortir del mòde zen",
-    "cancel": "",
-    "clear": ""
+    "cancel": "Anullar",
+    "clear": "Escafar"
   },
   "alerts": {
     "clearReset": "Aquò suprimirà lo canabàs complèt. O volètz vertadièrament ?",
@@ -156,16 +156,16 @@
     "errorAddingToLibrary": "Apondon impossible de l’element a la bibliotèca",
     "errorRemovingFromLibrary": "Supression impossibla de l’element a la bibliotèca",
     "confirmAddLibrary": "Apondrà {{numShapes}} forma(s) a vòstra bibliotèca. Confirmatz ?",
-    "imageDoesNotContainScene": "",
+    "imageDoesNotContainScene": "Aqueste imatge sembla pas conténer cap de donadas de scèna. Avètz activat l’integracion de scèna pendent l’exportacion ?",
     "cannotRestoreFromImage": "Restauracion impossibla de la scèna a partir del fichièr imatge",
     "invalidSceneUrl": "Importacion impossibla de la scèna a partir de l’URL provesida. Es siá mal formatada o siá conten pas cap de donada JSON Excalidraw valida.",
     "resetLibrary": "Aquò suprimirà vòstra bibliotèca. O volètz vertadièrament ?",
     "invalidEncryptionKey": "La clau de chiframent deu conténer 22 caractèrs. La collaboracion en dirèct es desactivada."
   },
   "errors": {
-    "unsupportedFileType": "",
-    "imageInsertError": "",
-    "fileTooBig": "",
+    "unsupportedFileType": "Tipe de fichièr pas pres en carga.",
+    "imageInsertError": "Insercion d’imatge impossibla. Tornatz ensajar mai tard...",
+    "fileTooBig": "Fichièr tròp pesuc. La talha maximala autorizada es {{maxSize}}.",
     "svgImageInsertError": "",
     "invalidSVGString": ""
   },
