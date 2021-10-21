@@ -379,6 +379,7 @@ To view the full example visit :point_down:
 | [`handleKeyboardGlobally`](#handleKeyboardGlobally) | boolean | false | Indicates whether to bind the keyboard events to document. |
 | [`onLibraryChange`](#onLibraryChange) | <pre>(items: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>) => void &#124; Promise&lt;any&gt; </pre> |  | The callback if supplied is triggered when the library is updated and receives the library items. |
 | [`autoFocus`](#autoFocus) | boolean | false | Implies whether to focus the Excalidraw component on page load |
+| [`generateIdForFile`](#generateIdForFile) | `(file: File) => string | Promise<string>` | Allows you to override `id` generation for files added on canvas |
 
 ### Dimensions of Excalidraw
 
@@ -448,7 +449,8 @@ You can pass a `ref` when you want to access some excalidraw APIs. We expose the
 | --- | --- | --- |
 | ready | `boolean` | This is set to true once Excalidraw is rendered |
 | readyPromise | [resolvablePromise](https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317) | This promise will be resolved with the api once excalidraw has rendered. This will be helpful when you want do some action on the host app once this promise resolves. For this to work you will have to pass ref as shown [here](#readyPromise) |
-| [updateScene](#updateScene) | <pre>(<a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L207">sceneData</a>)) => void </pre> | updates the scene with the sceneData |
+| [updateScene](#updateScene) | <pre>(scene: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L207">sceneData</a>) => void </pre> | updates the scene with the sceneData |
+| [addFiles](#addFiles) | <pre>(files: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts">BinaryFileData</a>) => void </pre> | add files data to the appState |
 | resetScene | `({ resetLoadingState: boolean }) => void` | Resets the scene. If `resetLoadingState` is passed as true then it will also force set the loading state to false. |
 | getSceneElementsIncludingDeleted | <pre> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a></pre> | Returns all the elements including the deleted in the scene |
 | getSceneElements | <pre> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a></pre> | Returns all the elements excluding the deleted in the scene |
@@ -471,7 +473,7 @@ Since plain object is passed as a `ref`, the `readyPromise` is resolved as soon 
 ### `updateScene`
 
 <pre>
-(<a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L207">sceneData</a>)) => void
+(scene: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L207">sceneData</a>) => void
 </pre>
 
 You can use this function to update the scene with the sceneData. It accepts the below attributes.
@@ -482,6 +484,12 @@ You can use this function to update the scene with the sceneData. It accepts the
 | `appState` | [`ImportedDataState["appState"]`](https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L18) | The `appState` to be updated in the scene. |
 | `collaborators` | <pre>Map<string, <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L29">Collaborator></a></pre> | The list of collaborators to be updated in the scene. |
 | `commitToHistory` | `boolean` | Implies if the `history (undo/redo)` should be recorded. Defaults to `false`. |
+
+### `addFiles`
+
+<pre>(files: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts">BinaryFileData</a>) => void </pre>
+
+Adds supplied files data to the `appState.files` cache, on top of existing files present in the cache.
 
 #### `onCollabButtonClick`
 
@@ -661,6 +669,14 @@ The unique id of the excalidraw component. This can be used to identify the exca
 #### `autoFocus`
 
 This prop implies whether to focus the Excalidraw component on page load. Defaults to false.
+
+#### `generateIdForFile`
+
+Allows you to override `id` generation for files added on canvas (images). By default, an SHA-1 digest of the file is used.
+
+```
+(file: File) => string | Promise<string>
+```
 
 ### Does it support collaboration ?
 

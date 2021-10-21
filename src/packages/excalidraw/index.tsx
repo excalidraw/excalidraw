@@ -34,6 +34,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     handleKeyboardGlobally = false,
     onLibraryChange,
     autoFocus = false,
+    generateIdForFile,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -94,6 +95,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
         handleKeyboardGlobally={handleKeyboardGlobally}
         onLibraryChange={onLibraryChange}
         autoFocus={autoFocus}
+        generateIdForFile={generateIdForFile}
       />
     </InitializeApp>
   );
@@ -187,3 +189,9 @@ export {
 export { isLinearElement } from "../../element/typeChecks";
 
 export { FONT_FAMILY, THEME } from "../../constants";
+
+export {
+  mutateElement,
+  newElementWith,
+  bumpVersion,
+} from "../../element/mutateElement";

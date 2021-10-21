@@ -157,6 +157,8 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                   shortcuts={["Shift+P", "7"]}
                 />
                 <Shortcut label={t("toolBar.text")} shortcuts={["T", "8"]} />
+                <Shortcut label={t("toolBar.image")} shortcuts={["9"]} />
+                <Shortcut label={t("toolBar.library")} shortcuts={["0"]} />
                 <Shortcut
                   label={t("helpDialog.editSelectedShape")}
                   shortcuts={[
