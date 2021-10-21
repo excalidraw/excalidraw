@@ -156,14 +156,22 @@
     "errorAddingToLibrary": "No s'ha pogut afegir l'element a la biblioteca",
     "errorRemovingFromLibrary": "No s'ha pogut eliminar l'element de la biblioteca",
     "confirmAddLibrary": "Això afegirà {{numShapes}} forma(es) a la vostra biblioteca. Estàs segur?",
-    "imageDoesNotContainScene": "En aquest moment no s’admet la importació d’imatges.\n\nVolies importar una escena? Sembla que aquesta imatge no conté cap dada d’escena. Ho has activat durant l'exportació?",
+    "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "L’escena no s’ha pogut restaurar des d’aquest fitxer d’imatge",
     "invalidSceneUrl": "No s'ha pogut importar l'escena des de l'adreça URL proporcionada. Està malformada o no conté dades Excalidraw JSON vàlides.",
     "resetLibrary": "Això buidarà la biblioteca. N'esteu segur?",
     "invalidEncryptionKey": ""
   },
+  "errors": {
+    "unsupportedFileType": "",
+    "imageInsertError": "",
+    "fileTooBig": "",
+    "svgImageInsertError": "",
+    "invalidSVGString": ""
+  },
   "toolBar": {
     "selection": "Selecció",
+    "image": "",
     "rectangle": "Rectangle",
     "diamond": "Rombe",
     "ellipse": "El·lipse",
@@ -188,10 +196,12 @@
     "linearElementMulti": "Feu clic a l'ultim punt, o pitgeu Esc o Retorn per a finalitzar",
     "lockAngle": "Per restringir els angles, mantenir premut el majúscul (SHIFT)",
     "resize": "Per restringir les proporcions mentres es canvia la mida, mantenir premut el majúscul (SHIFT); per canviar la mida des del centre, mantenir premut ALT",
+    "resizeImage": "",
     "rotate": "Per restringir els angles mentre gira, mantenir premut el majúscul (SHIFT)",
     "lineEditor_info": "Fes doble clic o premi Enter per editar punts",
     "lineEditor_pointSelected": "Premeu Suprimir per a eliminar el punt, CtrlOrCmd+D per a duplicar-lo, o arrossegueu-lo per a moure'l",
-    "lineEditor_nothingSelected": "Selecciona un punt per moure o eliminar, o manté premut Alt i fes clic per afegir punts nous"
+    "lineEditor_nothingSelected": "Selecciona un punt per moure o eliminar, o manté premut Alt i fes clic per afegir punts nous",
+    "placeImage": ""
   },
   "canvasError": {
     "cannotShowPreview": "No es pot mostrar la previsualització",
