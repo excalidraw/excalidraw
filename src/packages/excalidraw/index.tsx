@@ -48,7 +48,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
 
   if (canvasActions?.export) {
     UIOptions.canvasActions.export.saveFileToDisk =
-      canvasActions.export?.saveFileToDisk ||
+      canvasActions.export?.saveFileToDisk ??
       DEFAULT_UI_OPTIONS.canvasActions.export.saveFileToDisk;
   }
 
@@ -173,6 +173,7 @@ export {
   getSceneVersion,
   getElementMap,
   isInvisiblySmallElement,
+  getNonDeletedElements,
 } from "../../element";
 export { defaultLang, languages } from "../../i18n";
 export { restore, restoreAppState, restoreElements } from "../../data/restore";
@@ -185,6 +186,8 @@ export {
   loadFromBlob,
   getFreeDrawSvgPath,
 } from "../../packages/utils";
+export { isLinearElement } from "../../element/typeChecks";
+
 export { FONT_FAMILY, THEME } from "../../constants";
 
 export {

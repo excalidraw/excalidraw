@@ -493,6 +493,7 @@ const LayerUI = ({
       </Section>
     );
   };
+
   const renderCanvasActions = () => (
     <Section
       heading="canvasActions"
