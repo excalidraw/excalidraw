@@ -136,7 +136,9 @@
     "darkMode": "Mörkt läge",
     "lightMode": "Ljust läge",
     "zenMode": "Zen-läge",
-    "exitZenMode": "Gå ur zen-läge"
+    "exitZenMode": "Gå ur zen-läge",
+    "cancel": "",
+    "clear": ""
   },
   "alerts": {
     "clearReset": "Detta rensar hela canvasen. Är du säker?",
@@ -255,6 +257,9 @@
     "view": "Visa",
     "zoomToFit": "Zooma för att rymma alla element",
     "zoomToSelection": "Zooma till markering"
+  },
+  "clearCanvasDialog": {
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Dina skisser är krypterade från ände till ände så Excalidraws servrar kommer aldrig att se dem.",
