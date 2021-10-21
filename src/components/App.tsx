@@ -4215,6 +4215,16 @@ class App extends React.Component<AppProps, AppState> {
           container: this.excalidrawContainerRef.current!,
         });
       } else {
+        let firstAdded = true;
+        for (let index = 0; index < maybeUse.length; index++) {
+          if (maybeUse[index]) {
+            if (firstAdded) {
+              options.push(separator);
+              firstAdded = false;
+            }
+            options.push(getTextLikeActions()[index]);
+          }
+        }
         ContextMenu.push({
           options: [
             this.isMobile && actionCut,
