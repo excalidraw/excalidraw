@@ -136,7 +136,9 @@
     "darkMode": "Mod întunecat",
     "lightMode": "Mod luminos",
     "zenMode": "Mod zen",
-    "exitZenMode": "Ieșire din modul zen"
+    "exitZenMode": "Ieșire din modul zen",
+    "cancel": "",
+    "clear": ""
   },
   "alerts": {
     "clearReset": "Această opțiune va șterge întreaga pânză. Confirmi?",
@@ -255,6 +257,9 @@
     "view": "Vizualizare",
     "zoomToFit": "Transfocare pentru a cuprinde totul",
     "zoomToSelection": "Transfocare la selecție"
+  },
+  "clearCanvasDialog": {
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Desenele tale sunt criptate integral, astfel că serverele Excalidraw nu le vor vedea niciodată.",
