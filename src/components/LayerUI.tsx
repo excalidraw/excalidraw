@@ -471,13 +471,15 @@ const LayerUI = ({
   };
 
   const renderClearCanvas = () => {
-    return (
-      <ClearCanvas
-        elements={elements}
-        appState={appState}
-        actionManager={actionManager}
-      />
-    );
+    if (UIOptions.canvasActions.clearCanvas) {
+      return (
+        <ClearCanvas
+          elements={elements}
+          appState={appState}
+          actionManager={actionManager}
+        />
+      );
+    }
   };
   const renderCanvasActions = () => (
     <Section
