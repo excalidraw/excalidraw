@@ -136,7 +136,9 @@
     "darkMode": "Askar imsulles",
     "lightMode": "Askar afaw",
     "zenMode": "Askar Zen",
-    "exitZenMode": "Ffeɣ seg uskar Zen"
+    "exitZenMode": "Ffeɣ seg uskar Zen",
+    "cancel": "",
+    "clear": ""
   },
   "alerts": {
     "clearReset": "Ayagi ad isfeḍ akk taɣzut n usuneɣ. Tetḥeqqeḍ?",
@@ -255,6 +257,9 @@
     "view": "Tamuɣli",
     "zoomToFit": "Simɣur akken ad twliḍ akk iferdisen",
     "zoomToSelection": "Simɣur ɣer tefrayt"
+  },
+  "clearCanvasDialog": {
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Unuɣen-inek (m) ttuwgelhnen seg yixef s ixef dɣa iqeddacen n Excalidraw werǧin ad ten-walin. ",
