@@ -136,7 +136,9 @@
     "darkMode": "",
     "lightMode": "",
     "zenMode": "",
-    "exitZenMode": ""
+    "exitZenMode": "",
+    "cancel": "",
+    "clear": ""
   },
   "alerts": {
     "clearReset": "",
@@ -255,6 +257,9 @@
     "view": "Көру",
     "zoomToFit": "Барлық элементтердің көлеміне сәйкес үлкейту",
     "zoomToSelection": "Таңдалғанды үлкейту"
+  },
+  "clearCanvasDialog": {
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Сіздің сызбаларыңыз өтпелі шифрлеу арқылы шифрланған, сондықтан Excalidraw серверлері оларды ешқашан көрмейді.",
