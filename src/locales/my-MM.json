@@ -136,7 +136,9 @@
     "darkMode": "",
     "lightMode": "",
     "zenMode": "",
-    "exitZenMode": "ဇင်မြင်ကွင်းမှထွက်"
+    "exitZenMode": "ဇင်မြင်ကွင်းမှထွက်",
+    "cancel": "",
+    "clear": ""
   },
   "alerts": {
     "clearReset": "ကားချပ်တစ်ခုလုံးရှင်းလင်းပါတော့မည်။ အတည်ပြုပါ။",
@@ -255,6 +257,9 @@
     "view": "",
     "zoomToFit": "",
     "zoomToSelection": ""
+  },
+  "clearCanvasDialog": {
+    "title": ""
   },
   "encrypted": {
     "tooltip": "ရေးဆွဲထားသောပုံများအား နှစ်ဘက်စွန်းတိုင်လျှို့ဝှက်ထားသဖြင့် Excalidraw ၏ဆာဗာများပင်လျှင်မြင်တွေ့ရမည်မဟုတ်ပါ။",
