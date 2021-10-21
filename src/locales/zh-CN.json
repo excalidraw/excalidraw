@@ -156,14 +156,22 @@
     "errorAddingToLibrary": "无法将项目添加到库中",
     "errorRemovingFromLibrary": "无法从库中移除项目",
     "confirmAddLibrary": "这将添加 {{numShapes}} 个形状到您的库。您确定吗？",
-    "imageDoesNotContainScene": "当前不支持导入图片。\n\n您想要导入画布数据吗？此图像似乎不包含任何画布数据。您是否在导出过程中启用了嵌入画布的选项？",
+    "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "无法从此图像文件恢复画布",
     "invalidSceneUrl": "无法从提供的 URL 导入场景。它或者格式不正确，或者不包含有效的 Excalidraw JSON 数据。",
     "resetLibrary": "这将会清除你的资源库。你确定这么做吗？",
     "invalidEncryptionKey": "密钥必须包含22个字符。实时协作已被禁用。"
   },
+  "errors": {
+    "unsupportedFileType": "",
+    "imageInsertError": "",
+    "fileTooBig": "",
+    "svgImageInsertError": "",
+    "invalidSVGString": ""
+  },
   "toolBar": {
     "selection": "选择",
+    "image": "",
     "rectangle": "矩形",
     "diamond": "菱形",
     "ellipse": "椭圆",
@@ -188,10 +196,12 @@
     "linearElementMulti": "点击最后一个点或按下 Esc/Enter 来完成",
     "lockAngle": "可以按住 Shift 来约束角度",
     "resize": "您可以按住SHIFT来限制比例大小，\n按住ALT来调整中心大小",
+    "resizeImage": "",
     "rotate": "旋转时可以按住 Shift 来约束角度",
     "lineEditor_info": "双击或按回车键编辑",
     "lineEditor_pointSelected": "按下 Delete 移除点，Ctrl 或 Cmd+D 以复制，或拖动以移动",
-    "lineEditor_nothingSelected": "选中要移动或移除的点，或按住 Alt 并点击添加新点"
+    "lineEditor_nothingSelected": "选中要移动或移除的点，或按住 Alt 并点击添加新点",
+    "placeImage": ""
   },
   "canvasError": {
     "cannotShowPreview": "无法显示预览",
