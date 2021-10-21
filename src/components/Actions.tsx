@@ -49,9 +49,21 @@ export const SelectedShapeActions = ({
     hasBackground(elementType) ||
     targetElements.some((element) => hasBackground(element.type));
 
+  let commonSelectedType: string | null = targetElements[0]?.type || null;
+
+  for (const element of targetElements) {
+    if (element.type !== commonSelectedType) {
+      commonSelectedType = null;
+      break;
+    }
+  }
+
   return (
     <div className="panelColumn">
-      {targetElements.some((element) => hasStrokeColor(element.type)) &&
+      {((hasStrokeColor(elementType) &&
+        elementType !== "image" &&
+        commonSelectedType !== "image") ||
+        targetElements.some((element) => hasStrokeColor(element.type))) &&
         renderAction("changeStrokeColor")}
       {showChangeBackgroundIcons && renderAction("changeBackgroundColor")}
       {showFillIcons && renderAction("changeFillStyle")}
