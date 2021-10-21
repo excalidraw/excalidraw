@@ -136,7 +136,9 @@
     "darkMode": "暗色主题",
     "lightMode": "浅色模式",
     "zenMode": "禅模式",
-    "exitZenMode": "退出禅模式"
+    "exitZenMode": "退出禅模式",
+    "cancel": "",
+    "clear": ""
   },
   "alerts": {
     "clearReset": "这将会清除整个画布。您是否要继续?",
@@ -255,6 +257,9 @@
     "view": "视图",
     "zoomToFit": "缩放以适应所有元素",
     "zoomToSelection": "缩放到选区"
+  },
+  "clearCanvasDialog": {
+    "title": ""
   },
   "encrypted": {
     "tooltip": "您的绘图采用的端到端加密，其内容对于Excalidraw服务器是不可见的。",
