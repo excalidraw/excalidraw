@@ -21,6 +21,7 @@ import {
 } from "../../element/mutateElement";
 import {
   addTextLikeActions,
+  registerTextLikeDisabledPanelComponents,
   registerTextLikeMethod,
   registerTextLikeShortcutNames,
   registerTextLikeSubtypeName,
@@ -737,6 +738,7 @@ export const registerTextElementSubtypeMath = (
 ) => {
   registerTextLikeShortcutNames(textShortcutMap, isTextShortcutNameMath);
   registerTextLikeSubtypeName(SUBTYPE_MATH);
+  registerTextLikeDisabledPanelComponents(SUBTYPE_MATH, ["changeFontFamily"]);
   // Set the callback first just in case anything in this method
   // calls loadMathJax().
   mathJaxLoadedCallback = onSubtypesLoaded;
