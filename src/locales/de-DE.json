@@ -137,8 +137,8 @@
     "lightMode": "Heller Modus",
     "zenMode": "Zen-Modus",
     "exitZenMode": "Zen-Modus verlassen",
-    "cancel": "",
-    "clear": ""
+    "cancel": "Abbrechen",
+    "clear": "Löschen"
   },
   "alerts": {
     "clearReset": "Dies wird die ganze Zeichenfläche löschen. Bist du dir sicher?",
