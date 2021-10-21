@@ -136,7 +136,9 @@
     "darkMode": "מצב כהה",
     "lightMode": "מצב בהיר",
     "zenMode": "מצב זן",
-    "exitZenMode": "צא ממצב תפריט מרחף"
+    "exitZenMode": "צא ממצב תפריט מרחף",
+    "cancel": "",
+    "clear": ""
   },
   "alerts": {
     "clearReset": "פעולה זו תנקה את כל הלוח. אתה בטוח?",
@@ -255,6 +257,9 @@
     "view": "תצוגה",
     "zoomToFit": "גלילה להצגת כל האלמנטים במסך",
     "zoomToSelection": "התמקד בבחירה"
+  },
+  "clearCanvasDialog": {
+    "title": ""
   },
   "encrypted": {
     "tooltip": "הרישומים שלך מוצפנים מקצה לקצה כך שהשרתים של Excalidraw לא יראו אותם לעולם.",
