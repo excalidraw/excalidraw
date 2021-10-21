@@ -136,7 +136,9 @@
     "darkMode": "Ciemny motyw",
     "lightMode": "Jasny motyw",
     "zenMode": "Tryb Zen",
-    "exitZenMode": "Wyjdź z trybu Zen"
+    "exitZenMode": "Wyjdź z trybu Zen",
+    "cancel": "",
+    "clear": ""
   },
   "alerts": {
     "clearReset": "To spowoduje usunięcie wszystkiego z dokumentu. Czy chcesz kontynuować?",
@@ -255,6 +257,9 @@
     "view": "Widok",
     "zoomToFit": "Powiększ, aby wyświetlić wszystkie elementy",
     "zoomToSelection": "Przybliż do zaznaczenia"
+  },
+  "clearCanvasDialog": {
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Twoje rysunki są zabezpieczone szyfrowaniem end-to-end, tak więc nawet w Excalidraw nie jesteśmy w stanie zobaczyć tego co tworzysz.",
