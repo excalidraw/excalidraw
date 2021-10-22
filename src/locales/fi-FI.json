@@ -156,22 +156,22 @@
     "errorAddingToLibrary": "Kohdetta ei voitu lisätä kirjastoon",
     "errorRemovingFromLibrary": "Kohdetta ei voitu poistaa kirjastosta",
     "confirmAddLibrary": "Tämä lisää {{numShapes}} muotoa kirjastoosi. Jatketaanko?",
-    "imageDoesNotContainScene": "",
+    "imageDoesNotContainScene": "Tämä kuva ei näytä sisältävän piirrostietoja. Oletko ottanut käyttöön piirroksen tallennuksen viennin aikana?",
     "cannotRestoreFromImage": "Teosta ei voitu palauttaa tästä kuvatiedostosta",
     "invalidSceneUrl": "Teosta ei voitu tuoda annetusta URL-osoitteesta. Tallenne on vioittunut, tai osoitteessa ei ole Excalidraw JSON-dataa.",
     "resetLibrary": "Tämä tyhjentää kirjastosi. Jatketaanko?",
     "invalidEncryptionKey": "Salausavaimen on oltava 22 merkkiä pitkä. Live-yhteistyö ei ole käytössä."
   },
   "errors": {
-    "unsupportedFileType": "",
-    "imageInsertError": "",
-    "fileTooBig": "",
-    "svgImageInsertError": "",
-    "invalidSVGString": ""
+    "unsupportedFileType": "Tiedostotyyppiä ei tueta.",
+    "imageInsertError": "Kuvan lisääminen epäonnistui. Yritä myöhemmin uudelleen...",
+    "fileTooBig": "Tiedosto on liian suuri. Suurin sallittu koko on {{maxSize}}.",
+    "svgImageInsertError": "SVG- kuvaa ei voitu lisätä. Tiedoston SVG-sisältö näyttää virheelliseltä.",
+    "invalidSVGString": "errors.invalidSVGString"
   },
   "toolBar": {
     "selection": "Valinta",
-    "image": "",
+    "image": "Lisää kuva",
     "rectangle": "Suorakulmio",
     "diamond": "Vinoneliö",
     "ellipse": "Soikio",
@@ -196,12 +196,12 @@
     "linearElementMulti": "Lopeta klikkaamalla viimeistä pistettä, painamalla Escape- tai Enter-näppäintä",
     "lockAngle": "Voit rajoittaa kulmaa pitämällä SHIFT-näppäintä alaspainettuna",
     "resize": "Voit rajoittaa mittasuhteet pitämällä SHIFT-näppäintä alaspainettuna kun muutat kokoa, pidä ALT-näppäintä alaspainettuna muuttaaksesi kokoa keskipisteen suhteen",
-    "resizeImage": "",
+    "resizeImage": "Voit muuttaa kokoa vapaasti pitämällä SHIFTiä pohjassa, pidä ALT pohjassa muuttaaksesi kokoa keskipisteen ympäri",
     "rotate": "Voit rajoittaa kulman pitämällä SHIFT pohjassa pyörittäessäsi",
     "lineEditor_info": "Kaksoisnapauta tai paina Enter muokataksesi pisteitä",
     "lineEditor_pointSelected": "Paina Delete poistaaksesi pisteen, Ctrl tai Cmd+D monistaaksesi, tai raahaa liikuttaaksesi",
     "lineEditor_nothingSelected": "Valitse liikutettava tai poistettava piste, tai pidä ALT-näppäintä alaspainettuna ja napsauta lisätäksesi uusia pisteitä",
-    "placeImage": ""
+    "placeImage": "Klikkaa asettaaksesi kuvan, tai klikkaa ja raahaa asettaaksesi sen koon manuaalisesti"
   },
   "canvasError": {
     "cannotShowPreview": "Esikatselua ei voitu näyttää",
