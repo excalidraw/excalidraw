@@ -1257,9 +1257,12 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      const data = await parseClipboard(event);
-
+      // must be called in the same frame (thus before any awaits) as the paste
+      // event else some browsers (FF...) will clear the clipboardData
+      // (something something security)
       let file = event?.clipboardData?.files[0];
+
+      const data = await parseClipboard(event);
 
       if (!file && data.text) {
         const string = data.text.trim();
