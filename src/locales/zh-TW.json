@@ -167,11 +167,11 @@
     "imageInsertError": "無法插入圖片。請稍後再試…",
     "fileTooBig": "檔案過大。可接受的最大尺寸為 {{maxSize}} 。",
     "svgImageInsertError": "無法插入 SVG 圖片。此 SVG 檔案有問題。",
-    "invalidSVGString": ""
+    "invalidSVGString": "errors.invalidSVGString"
   },
   "toolBar": {
     "selection": "選取",
-    "image": "",
+    "image": "插入圖片",
     "rectangle": "長方形",
     "diamond": "菱形",
     "ellipse": "橢圓",
@@ -196,12 +196,12 @@
     "linearElementMulti": "按下 Escape 或 Enter 以結束繪製",
     "lockAngle": "按住 SHIFT 可限制旋轉角度",
     "resize": "縮放時按住 Shift 可保持原比例縮放；\\n按住 Alt 可由中心點進行縮放",
-    "resizeImage": "",
+    "resizeImage": "按住 SHIFT 可任意縮放，按住 ALT 可由中央縮放。",
     "rotate": "旋轉時按住 Shift 可限制旋轉角度",
     "lineEditor_info": "雙擊滑鼠左鍵或按 Enter 來編輯控制點",
     "lineEditor_pointSelected": "按下 Delete 可移除錨點；Ctrl 或 Cmd + D 可複製；或可拖曳來移動",
     "lineEditor_nothingSelected": "點選想移動或刪除的控制點；或按住 Alt 再點擊以增加新控制點",
-    "placeImage": ""
+    "placeImage": "點擊以放置圖片，或點擊並拖曳以手動調整其尺寸。"
   },
   "canvasError": {
     "cannotShowPreview": "無法顯示預覽",
