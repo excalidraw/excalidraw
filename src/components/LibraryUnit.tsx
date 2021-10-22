@@ -34,6 +34,11 @@ export const LibraryUnit = ({
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
+    const node = ref.current;
+    if (!node) {
+      return;
+    }
+
     (async () => {
       const elementsToRender = elements || pendingElements;
       if (!elementsToRender) {
@@ -47,10 +52,12 @@ export const LibraryUnit = ({
         },
         files,
       );
-      if (ref.current) {
-        ref.current.innerHTML = svg.outerHTML;
-      }
+      node.innerHTML = svg.outerHTML;
     })();
+
+    return () => {
+      node.innerHTML = "";
+    };
   }, [elements, pendingElements, files]);
 
   const [isHovered, setIsHovered] = useState(false);
