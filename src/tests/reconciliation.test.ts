@@ -128,7 +128,74 @@ export const findIndex = <T>(
 
 describe("elements reconciliation", () => {
   it("reconcileElements()", () => {
+    // -------------------------------------------------------------------------
+    //
+    // in following tests, we pass:
+    //  (1) an array of local elements and their version (:1, :2...)
+    //  (2) an array of remote elements and their version (:1, :2...)
+    //  (3) expected reconciled elements
+    //
+    // in the reconciled array:
+    //  :L means local element was resolved
+    //  :R means remote element was resolved
+    //
+    // if a remote element is prefixed with parentheses, the enclosed string:
+    //  (^) means the element is the first element in the array
+    //  (<id>) means the element is preceded by <id> element
+    //
+    // if versions are missing, it defaults to version 0
+    // -------------------------------------------------------------------------
+
+    // non-annotated elements
+    // -------------------------------------------------------------------------
+    // usually when we sync elements they should always be annonated with
+    // their (preceding elements) parents, but let's test a couple of cases when
+    // they're not for whatever reason (remote clients are on older version...),
+    // in which case the first synced element either replaces existing element
+    // or is pushed at the end of the array
+
+    test(["A:1", "B:1", "C:1"], ["B:2"], ["A:L", "B:R", "C:L"]);
+    test(["A:1", "B:1", "C"], ["B:2", "A:2"], ["B:R", "A:R", "C:L"]);
+    test(["A:2", "B:1", "C"], ["B:2", "A:1"], ["A:L", "B:R", "C:L"]);
+    test(["A:1", "B:1"], ["C:1"], ["A:L", "B:L", "C:R"]);
+    test(["A", "B"], ["A:1"], ["A:R", "B:L"]);
+    test(["A"], ["A", "B"], ["A:L", "B:R"]);
+    test(["A"], ["A:1", "B"], ["A:R", "B:R"]);
+    test(["A:2"], ["A:1", "B"], ["A:L", "B:R"]);
+    test(["A:2"], ["B", "A:1"], ["A:L", "B:R"]);
+    test(["A:1"], ["B", "A:2"], ["B:R", "A:R"]);
+    test(["A"], ["A:1"], ["A:R"]);
+
+    // C isn't added to the end because it follows B (even if B was resolved
+    // to local version)
     test(["A", "B:1", "D"], ["B", "C:2", "A"], ["B:L", "C:R", "A:R", "D:L"]);
+
+    // some of the following tests are kinda arbitrary and they're less
+    // likely to happen in real-world cases
+
+    test(["A", "B"], ["B:1", "A:1"], ["B:R", "A:R"]);
+    test(["A:2", "B:2"], ["B:1", "A:1"], ["A:L", "B:L"]);
+    test(["A", "B", "C"], ["A", "B:2", "G", "C"], ["A:L", "B:R", "G:R", "C:L"]);
+    test(["A", "B", "C"], ["A", "B:2", "G"], ["A:L", "B:R", "G:R", "C:L"]);
+    test(["A", "B", "C"], ["A", "B:2", "G"], ["A:L", "B:R", "G:R", "C:L"]);
+    test(
+      ["A:2", "B:2", "C"],
+      ["D", "B:1", "A:3"],
+      ["B:L", "A:R", "C:L", "D:R"],
+    );
+    test(
+      ["A:2", "B:2", "C"],
+      ["D", "B:2", "A:3", "C"],
+      ["D:R", "B:L", "A:R", "C:L"],
+    );
+    test(
+      ["A", "B", "C", "D", "E", "F"],
+      ["A", "B:2", "X", "E:2", "F", "Y"],
+      ["A:L", "B:R", "X:R", "E:R", "F:L", "Y:R", "C:L", "D:L"],
+    );
+
+    // annotated elements
+    // -------------------------------------------------------------------------
 
     test(
       ["A", "B", "C"],
@@ -221,45 +288,17 @@ describe("elements reconciliation", () => {
       ["A:L", "C:R", "B:L", "D:R"],
     );
 
-    test(
-      ["A:2", "B:2", "C"],
-      ["D", "B:1", "A:3"],
-      ["D:R", "B:L", "A:R", "C:L"],
-    );
-    test(
-      ["A:2", "B:2", "C"],
-      ["D", "B:2", "A:3", "C"],
-      ["D:R", "B:L", "A:R", "C:L"],
-    );
-
-    test(["A"], ["A", "B"], ["A:L", "B:R"]);
-    test(["A"], ["A:1", "B"], ["A:R", "B:R"]);
-    test(["A:2"], ["A:1", "B"], ["A:L", "B:R"]);
-    test(["A:2"], ["B", "A:1"], ["B:R", "A:L"]);
-    test(["A:1"], ["B", "A:2"], ["B:R", "A:R"]);
+    test(["A:1", "B:1", "C"], ["B:2"], ["A:L", "B:R", "C:L"]);
+    test(["A:1", "B:1", "C"], ["B:2", "C:2"], ["A:L", "B:R", "C:R"]);
 
     test(["A", "B"], ["(A)C", "(B)D"], ["A:L", "C:R", "B:L", "D:R"]);
-
     test(["A", "B"], ["(X)C", "(X)D"], ["A:L", "B:L", "C:R", "D:R"]);
     test(["A", "B"], ["(X)C", "(A)D"], ["A:L", "D:R", "B:L", "C:R"]);
-    test(["A"], ["A:1"], ["A:R"]);
-    test(["A", "B"], ["A:1"], ["A:R", "B:L"]);
     test(["A", "B"], ["(A)B:1"], ["A:L", "B:R"]);
     test(["A:2", "B"], ["(A)B:1"], ["A:L", "B:R"]);
     test(["A:2", "B:2"], ["B:1"], ["A:L", "B:L"]);
     test(["A:2", "B:2"], ["B:1", "C"], ["A:L", "B:L", "C:R"]);
     test(["A:2", "B:2"], ["(A)C", "B:1"], ["A:L", "C:R", "B:L"]);
     test(["A:2", "B:2"], ["(A)C", "B:1"], ["A:L", "C:R", "B:L"]);
-    test(["A", "B"], ["B:1", "A:1"], ["B:R", "A:R"]);
-    test(["A:2", "B:2"], ["B:1", "A:1"], ["A:L", "B:L"]);
-
-    test(["A", "B", "C"], ["A", "B:2", "G", "C"], ["A:L", "B:R", "G:R", "C:L"]);
-    test(
-      ["A", "B", "C", "D", "E", "F"],
-      ["A", "B:2", "X", "E:2", "F", "Y"],
-      ["A:L", "B:R", "X:R", "E:R", "F:L", "Y:R", "C:L", "D:L"],
-    );
-    test(["A", "B", "C"], ["A", "B:2", "G"], ["A:L", "B:R", "G:R", "C:L"]);
-    test(["A", "B", "C"], ["A", "B:2", "G"], ["A:L", "B:R", "G:R", "C:L"]);
   });
 });

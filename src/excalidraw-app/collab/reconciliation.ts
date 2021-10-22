@@ -85,7 +85,7 @@ export const reconcileElements = (
     }
 
     const parent =
-      remoteElement.parent || remoteElements[remoteElementIdx - 1]?.id || "^";
+      remoteElement.parent || remoteElements[remoteElementIdx - 1]?.id || null;
 
     if (parent != null) {
       delete remoteElement.parent;
@@ -137,7 +137,11 @@ export const reconcileElements = (
           ];
         }
       }
-      // no parent z-index information → push at the end
+      // no parent z-index information, local element exists → replace in place
+    } else if (local) {
+      reconciledElements[local[1]] = remoteElement;
+      localElementsData[remoteElement.id] = [remoteElement, local[1]];
+      // otherwise push to the end
     } else {
       reconciledElements.push(remoteElement);
       localElementsData[remoteElement.id] = [
