@@ -156,15 +156,15 @@
     "errorAddingToLibrary": "Impossibile aggiungere l'elemento alla libreria",
     "errorRemovingFromLibrary": "Impossibile rimuovere l'elemento dalla libreria",
     "confirmAddLibrary": "Questo aggiungerà {{numShapes}} forma(e) alla tua libreria. Sei sicuro?",
-    "imageDoesNotContainScene": "",
+    "imageDoesNotContainScene": "Questa immagine pare non contenere alcuna scena. Avevi incluso la scena durante l'esportazione?",
     "cannotRestoreFromImage": "Impossibile ripristinare la scena da questo file immagine",
     "invalidSceneUrl": "Impossibile importare la scena dall'URL fornito. Potrebbe essere malformato o non contenere dati JSON Excalidraw validi.",
     "resetLibrary": "Questa azione cancellerà l'intera libreria. Sei sicuro?",
     "invalidEncryptionKey": "La chiave di cifratura deve essere composta da 22 caratteri. La collaborazione live è disabilitata."
   },
   "errors": {
-    "unsupportedFileType": "",
-    "imageInsertError": "",
+    "unsupportedFileType": "Tipo di file non supportato.",
+    "imageInsertError": "Non è stato possibile inserire l'immagine. Riprova più tardi...",
     "fileTooBig": "",
     "svgImageInsertError": "",
     "invalidSVGString": ""
