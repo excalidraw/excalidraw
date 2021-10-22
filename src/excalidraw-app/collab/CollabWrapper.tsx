@@ -64,7 +64,10 @@ import {
   isInitializedImageElement,
 } from "../../element/typeChecks";
 import { mutateElement } from "../../element/mutateElement";
-import { ReconciledElements, reconcileElements } from "./reconciliation";
+import {
+  ReconciledElements,
+  reconcileElements as _reconcileElements,
+} from "./reconciliation";
 
 interface CollabState {
   modalIsShown: boolean;
@@ -486,7 +489,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     const localElements = this.getSceneElementsIncludingDeleted();
     const appState = this.excalidrawAPI.getAppState();
 
-    const reconciledElements = reconcileElements(
+    const reconciledElements = _reconcileElements(
       localElements,
       remoteElements,
       appState,
