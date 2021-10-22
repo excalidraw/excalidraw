@@ -34,6 +34,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     handleKeyboardGlobally = false,
     onLibraryChange,
     autoFocus = false,
+    generateIdForFile,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -47,7 +48,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
 
   if (canvasActions?.export) {
     UIOptions.canvasActions.export.saveFileToDisk =
-      canvasActions.export?.saveFileToDisk ||
+      canvasActions.export?.saveFileToDisk ??
       DEFAULT_UI_OPTIONS.canvasActions.export.saveFileToDisk;
   }
 
@@ -94,6 +95,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
         handleKeyboardGlobally={handleKeyboardGlobally}
         onLibraryChange={onLibraryChange}
         autoFocus={autoFocus}
+        generateIdForFile={generateIdForFile}
       />
     </InitializeApp>
   );
@@ -171,6 +173,7 @@ export {
   getSceneVersion,
   getElementMap,
   isInvisiblySmallElement,
+  getNonDeletedElements,
 } from "../../element";
 export { defaultLang, languages } from "../../i18n";
 export { restore, restoreAppState, restoreElements } from "../../data/restore";
@@ -183,4 +186,12 @@ export {
   loadFromBlob,
   getFreeDrawSvgPath,
 } from "../../packages/utils";
-export { FONT_FAMILY } from "../../constants";
+export { isLinearElement } from "../../element/typeChecks";
+
+export { FONT_FAMILY, THEME } from "../../constants";
+
+export {
+  mutateElement,
+  newElementWith,
+  bumpVersion,
+} from "../../element/mutateElement";

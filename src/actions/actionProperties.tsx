@@ -1,4 +1,3 @@
-import React from "react";
 import { AppState } from "../../src/types";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
 import { ColorPicker } from "../components/ColorPicker";
@@ -61,6 +60,7 @@ import {
   getTargetElements,
   isSomeElementSelected,
 } from "../scene";
+import { hasStrokeColor } from "../scene/comparisons";
 import { register } from "./register";
 
 const changeProperty = (
@@ -105,11 +105,13 @@ export const actionChangeStrokeColor = register({
   perform: (elements, appState, value) => {
     return {
       ...(value.currentItemStrokeColor && {
-        elements: changeProperty(elements, appState, (el) =>
-          newElementWith(el, {
-            strokeColor: value.currentItemStrokeColor,
-          }),
-        ),
+        elements: changeProperty(elements, appState, (el) => {
+          return hasStrokeColor(el.type)
+            ? newElementWith(el, {
+                strokeColor: value.currentItemStrokeColor,
+              })
+            : el;
+        }),
       }),
       appState: {
         ...appState,

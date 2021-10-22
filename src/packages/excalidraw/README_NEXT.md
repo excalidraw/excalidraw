@@ -371,7 +371,7 @@ To view the full example visit :point_down:
 | [`zenModeEnabled`](#zenModeEnabled) | boolean |  | This implies if the zen mode is enabled |
 | [`gridModeEnabled`](#gridModeEnabled) | boolean |  | This implies if the grid mode is enabled |
 | [`libraryReturnUrl`](#libraryReturnUrl) | string |  | What URL should [libraries.excalidraw.com](https://libraries.excalidraw.com) be installed to |
-| [`theme`](#theme) | `light` or `dark` |  | The theme of the Excalidraw component |
+| [`theme`](#theme) | [THEME.LIGHT](#THEME-1) &#124; [THEME.LIGHT](#THEME-1) | [THEME.LIGHT](#THEME-1) | The theme of the Excalidraw component |
 | [`name`](#name) | string |  | Name of the drawing |
 | [`UIOptions`](#UIOptions) | <pre>{ canvasActions: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L208"> CanvasActions<a/> }</pre> | [DEFAULT UI OPTIONS](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L129) | To customise UI options. Currently we support customising [`canvas actions`](#canvasActions) |
 | [`onPaste`](#onPaste) | <pre>(data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/clipboard.ts#L17">ClipboardData</a>, event: ClipboardEvent &#124; null) => boolean</pre> |  | Callback to be triggered if passed when the something is pasted in to the scene |
@@ -379,6 +379,7 @@ To view the full example visit :point_down:
 | [`handleKeyboardGlobally`](#handleKeyboardGlobally) | boolean | false | Indicates whether to bind the keyboard events to document. |
 | [`onLibraryChange`](#onLibraryChange) | <pre>(items: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>) => void &#124; Promise&lt;any&gt; </pre> |  | The callback if supplied is triggered when the library is updated and receives the library items. |
 | [`autoFocus`](#autoFocus) | boolean | false | Implies whether to focus the Excalidraw component on page load |
+| [`generateIdForFile`](#generateIdForFile) | `(file: File) => string | Promise<string>` | Allows you to override `id` generation for files added on canvas |
 
 ### Dimensions of Excalidraw
 
@@ -448,7 +449,8 @@ You can pass a `ref` when you want to access some excalidraw APIs. We expose the
 | --- | --- | --- |
 | ready | `boolean` | This is set to true once Excalidraw is rendered |
 | readyPromise | [resolvablePromise](https://github.com/excalidraw/excalidraw/blob/master/src/utils.ts#L317) | This promise will be resolved with the api once excalidraw has rendered. This will be helpful when you want do some action on the host app once this promise resolves. For this to work you will have to pass ref as shown [here](#readyPromise) |
-| [updateScene](#updateScene) | <pre>(<a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L207">sceneData</a>)) => void </pre> | updates the scene with the sceneData |
+| [updateScene](#updateScene) | <pre>(scene: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L207">sceneData</a>) => void </pre> | updates the scene with the sceneData |
+| [addFiles](#addFiles) | <pre>(files: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts">BinaryFileData</a>) => void </pre> | add files data to the appState |
 | resetScene | `({ resetLoadingState: boolean }) => void` | Resets the scene. If `resetLoadingState` is passed as true then it will also force set the loading state to false. |
 | getSceneElementsIncludingDeleted | <pre> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a></pre> | Returns all the elements including the deleted in the scene |
 | getSceneElements | <pre> () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a></pre> | Returns all the elements excluding the deleted in the scene |
@@ -471,7 +473,7 @@ Since plain object is passed as a `ref`, the `readyPromise` is resolved as soon 
 ### `updateScene`
 
 <pre>
-(<a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L207">sceneData</a>)) => void
+(scene: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L207">sceneData</a>) => void
 </pre>
 
 You can use this function to update the scene with the sceneData. It accepts the below attributes.
@@ -482,6 +484,12 @@ You can use this function to update the scene with the sceneData. It accepts the
 | `appState` | [`ImportedDataState["appState"]`](https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L18) | The `appState` to be updated in the scene. |
 | `collaborators` | <pre>Map<string, <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L29">Collaborator></a></pre> | The list of collaborators to be updated in the scene. |
 | `commitToHistory` | `boolean` | Implies if the `history (undo/redo)` should be recorded. Defaults to `false`. |
+
+### `addFiles`
+
+<pre>(files: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts">BinaryFileData</a>) => void </pre>
+
+Adds supplied files data to the `appState.files` cache, on top of existing files present in the cache.
 
 #### `onCollabButtonClick`
 
@@ -564,7 +572,7 @@ If supplied, this URL will be used when user tries to install a library from [li
 
 #### `theme`
 
-This prop controls Excalidraw's theme. When supplied, the value takes precedence over `intialData.appState.theme`, the theme will be fully controlled by the host app, and users won't be able to toggle it from within the app.
+This prop controls Excalidraw's theme. When supplied, the value takes precedence over `intialData.appState.theme`, the theme will be fully controlled by the host app, and users won't be able to toggle it from within the app. You can use [`THEME`](#THEME-1) to specify the theme.
 
 #### `name`
 
@@ -612,11 +620,7 @@ This callback must return a `boolean` value or a [promise](https://developer.moz
 
 In case you want to prevent the excalidraw paste action you must return `false`, it will stop the native excalidraw clipboard management flow (nothing will be pasted into the scene).
 
-### Does it support collaboration ?
-
-No, Excalidraw package doesn't come with collaboration built in, since the implementation is specific to each host app. We expose APIs which you can use to communicate with Excalidraw which you can use to implement it. You can check our own implementation [here](https://github.com/excalidraw/excalidraw/blob/master/src/excalidraw-app/index.tsx).
-
-### importLibrary
+#### `importLibrary`
 
 Imports library from given URL. You should call this on `hashchange`, passing the `addLibrary` value if you detect it as shown below. Optionally pass a CSRF `token` to skip prompting during installation (retrievable via `token` key from the url coming from [https://libraries.excalidraw.com](https://libraries.excalidraw.com/)).
 
@@ -638,17 +642,17 @@ useEffect(() => {
 
 Try out the [Demo](#Demo) to see it in action.
 
-### detectScroll
+#### `detectScroll`
 
 Indicates whether Excalidraw should listen for `scroll` event on the nearest scrollable container in the DOM tree and recompute the coordinates (e.g. to correctly handle the cursor) when the component's position changes. You can disable this when you either know this doesn't affect your app or you want to take care of it yourself (calling the [`refresh()`](#ref) method).
 
-### handleKeyboardGlobally
+#### `handleKeyboardGlobally`
 
 Indicates whether to bind keyboard events to `document`. Disabled by default, meaning the keyboard events are bound to the Excalidraw component. This allows for multiple Excalidraw components to live on the same page, and ensures that Excalidraw keyboard handling doesn't collide with your app's (or the browser) when the component isn't focused.
 
 Enable this if you want Excalidraw to handle keyboard even if the component isn't focused (e.g. a user is interacting with the navbar, sidebar, or similar).
 
-### onLibraryChange
+#### `onLibraryChange`
 
 Ths callback if supplied will get triggered when the library is updated and has the below signature.
 
@@ -658,58 +662,25 @@ Ths callback if supplied will get triggered when the library is updated and has 
 
 It is invoked with empty items when user clears the library. You can use this callback when you want to do something additional when library is updated for example persisting it to local storage.
 
-### id
+#### `id`
 
 The unique id of the excalidraw component. This can be used to identify the excalidraw component, for example importing the library items to the excalidraw component from where it was initiated when you have multiple excalidraw components rendered on the same page as shown in [multiple excalidraw demo](https://codesandbox.io/s/multiple-excalidraw-k1xx5).
 
-### autoFocus
+#### `autoFocus`
 
 This prop implies whether to focus the Excalidraw component on page load. Defaults to false.
 
-### Extra API's
+#### `generateIdForFile`
 
-#### `getSceneVersion`
+Allows you to override `id` generation for files added on canvas (images). By default, an SHA-1 digest of the file is used.
 
-**How to use**
-
-<pre>
-import { getSceneVersion } from "@excalidraw/excalidraw-next";
-getSceneVersion(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>)
-</pre>
-
-This function returns the current scene version.
-
-#### `isInvisiblySmallElement`
-
-**_Signature_**
-
-<pre>
-isInvisiblySmallElement(element:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement</a>): boolean
-</pre>
-
-**How to use**
-
-```js
-import { isInvisiblySmallElement } from "@excalidraw/excalidraw-next";
+```
+(file: File) => string | Promise<string>
 ```
 
-Returns `true` if element is invisibly small (e.g. width & height are zero).
+### Does it support collaboration ?
 
-#### `getElementMap`
-
-**_Signature_**
-
-<pre>
-getElementsMap(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>): {[id: string]: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement</a>}
-</pre>
-
-**How to use**
-
-```js
-import { getElementsMap } from "@excalidraw/excalidraw-next";
-```
-
-This function returns an object where each element is mapped to its id.
+No, Excalidraw package doesn't come with collaboration built in, since the implementation is specific to each host app. We expose APIs which you can use to communicate with Excalidraw which you can use to implement it. You can check our own implementation [here](https://github.com/excalidraw/excalidraw/blob/master/src/excalidraw-app/index.tsx).
 
 ### Restore utilities
 
@@ -766,19 +737,6 @@ import { restore } from "@excalidraw/excalidraw-next";
 ```
 
 This function makes sure elements and state is set to appropriate values and set to default value if not present. It is a combination of [restoreElements](#restoreElements) and [restoreAppState](#restoreAppState).
-
-#### `serializeAsJSON`
-
-**_Signature_**
-
-<pre>
-serializeAsJSON({
-  elements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>,
-  appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L42">AppState</a>,
-}): string
-</pre>
-
-Takes the scene elements and state and returns a JSON string. Deleted `elements`as well as most properties from `AppState` are removed from the resulting JSON. (see [`serializeAsJSON()`](https://github.com/excalidraw/excalidraw/blob/master/src/data/json.ts#L16) source for details).
 
 ### Export utilities
 
@@ -864,7 +822,145 @@ This function returns a promise which resolves to svg of the exported drawing.
 | exportWithDarkMode | boolean | false | Indicates whether to export with dark mode |
 | exportEmbedScene | boolean | false | Indicates whether scene data should be embedded in svg. This will increase the svg size. |
 
-### FONT_FAMILY
+### Extra API's
+
+#### `serializeAsJSON`
+
+**_Signature_**
+
+<pre>
+serializeAsJSON({
+  elements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>,
+  appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L42">AppState</a>,
+}): string
+</pre>
+
+Takes the scene elements and state and returns a JSON string. Deleted `elements`as well as most properties from `AppState` are removed from the resulting JSON. (see [`serializeAsJSON()`](https://github.com/excalidraw/excalidraw/blob/master/src/data/json.ts#L16) source for details).
+
+#### `getSceneVersion`
+
+**How to use**
+
+<pre>
+import { getSceneVersion } from "@excalidraw/excalidraw-next";
+getSceneVersion(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>)
+</pre>
+
+This function returns the current scene version.
+
+#### `isInvisiblySmallElement`
+
+**_Signature_**
+
+<pre>
+isInvisiblySmallElement(element:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement</a>): boolean
+</pre>
+
+**How to use**
+
+```js
+import { isInvisiblySmallElement } from "@excalidraw/excalidraw-next";
+```
+
+Returns `true` if element is invisibly small (e.g. width & height are zero).
+
+#### `getElementMap`
+
+**_Signature_**
+
+<pre>
+getElementsMap(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement[]</a>): {[id: string]: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L78">ExcalidrawElement</a>}
+</pre>
+
+**How to use**
+
+```js
+import { getElementsMap } from "@excalidraw/excalidraw-next";
+```
+
+This function returns an object where each element is mapped to its id.
+
+#### `loadLibraryFromBlob`
+
+```js
+import { loadLibraryFromBlob } from "@excalidraw/excalidraw-next";
+```
+
+**_Signature_**
+
+<pre>
+loadLibraryFromBlob(blob: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a>)
+</pre>
+
+This function loads the library from the blob.
+
+#### `loadFromBlob`
+
+**How to use**
+
+```js
+import { loadFromBlob } from "@excalidraw/excalidraw-next";
+```
+
+**Signature**
+
+<pre>
+loadFromBlob(blob: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a>, localAppState:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L42">AppState</a> | null)
+</pre>
+
+This function loads the scene data from the blob. If you pass `localAppState`, `localAppState` value will be preferred over the `appState` derived from `blob`
+
+#### `getFreeDrawSvgPath`
+
+**How to use**
+
+```js
+import { getFreeDrawSvgPath } from "@excalidraw/excalidraw-next";
+```
+
+**Signature**
+
+<pre>
+getFreeDrawSvgPath(element: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L127">ExcalidrawFreeDrawElement</a>
+</pre>
+
+This function returns the free draw svg path for the element.
+
+#### `isLinearElement`
+
+**How to use**
+
+```js
+import { isLinearElement } from "@excalidraw/excalidraw-next";
+```
+
+**Signature**
+
+<pre>
+isLinearElement(elementType?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L80">ExcalidrawElement</a>): boolean
+</pre>
+
+This function returns true if the element is linear type (`arrow` |`line`) else returns false.
+
+#### `getNonDeletedElements`
+
+**How to use**
+
+```js
+import { getNonDeletedElements } from "@excalidraw/excalidraw-next";
+```
+
+**Signature**
+
+<pre>
+getNonDeletedElements(elements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L80"> readonly ExcalidrawElement[]</a>): as readonly <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L90">NonDeletedExcalidrawElement[]</a>
+</pre>
+
+This function returns an array of deleted elements.
+
+### Exported constants
+
+#### `FONT_FAMILY`
 
 **How to use**
 
@@ -882,51 +978,22 @@ import { FONT_FAMILY } from "@excalidraw/excalidraw-next";
 
 Defaults to `FONT_FAMILY.Virgil` unless passed in `initialData.appState.currentItemFontFamily`.
 
-### loadLibraryFromBlob
-
-```js
-import { loadLibraryFromBlob } from "@excalidraw/excalidraw-next";
-```
-
-**_Signature_**
-
-<pre>
-loadLibraryFromBlob(blob: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a>)
-</pre>
-
-This function loads the library from the blob.
-
-### loadFromBlob
+#### `THEME`
 
 **How to use**
 
 ```js
-import { loadFromBlob } from "@excalidraw/excalidraw-next";
+import { THEME } from "@excalidraw/excalidraw-next";
 ```
 
-**Signature**
+`THEME` contains all the themes supported by `Excalidraw` as explained below
 
-<pre>
-loadFromBlob(blob: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a>, localAppState:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L42">AppState</a> | null)
-</pre>
+| Theme | Description     |
+| ----- | --------------- |
+| LIGHT | The light theme |
+| DARK  | The Dark theme  |
 
-This function loads the scene data from the blob. If you pass `localAppState`, `localAppState` value will be preferred over the `appState` derived from `blob`
-
-### getFreeDrawSvgPath
-
-**How to use**
-
-```js
-import { getFreeDrawSvgPath } from "@excalidraw/excalidraw-next";
-```
-
-**Signature**
-
-<pre>
-getFreeDrawSvgPath(element: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L127">ExcalidrawFreeDrawElement</a>
-</pre>
-
-This function returns the free draw svg path for the element.
+Defaults to `THEME.LIGHT` unless passed in `initialData.appState.theme`
 
 ## Need help?
 

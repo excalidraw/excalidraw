@@ -2,7 +2,6 @@ import React, { useContext } from "react";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
 import clsx from "clsx";
-import { supported as fsSupported } from "browser-fs-access";
 import { nanoid } from "nanoid";
 
 import {
@@ -44,6 +43,7 @@ import {
 import {
   APP_NAME,
   CURSOR_TYPE,
+  DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
   DEFAULT_UI_OPTIONS,
   DEFAULT_VERTICAL_ALIGN,
   DRAGGING_THRESHOLD,
@@ -52,7 +52,9 @@ import {
   ENV,
   EVENT,
   GRID_SIZE,
+  IMAGE_RENDER_TIMEOUT,
   LINE_CONFIRM_THRESHOLD,
+  MAX_ALLOWED_FILE_BYTES,
   MIME_TYPES,
   MQ_MAX_HEIGHT_LANDSCAPE,
   MQ_MAX_WIDTH_LANDSCAPE,
@@ -61,6 +63,7 @@ import {
   SCROLL_TIMEOUT,
   TAP_TWICE_TIMEOUT,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
+  THEME,
   TOUCH_CTX_MENU_TIMEOUT,
   URL_HASH_KEYS,
   URL_QUERY_KEYS,
@@ -91,6 +94,7 @@ import {
   newElement,
   newLinearElement,
   newTextElement,
+  newImageElement,
   textWysiwyg,
   transformElements,
   updateTextElement,
@@ -109,11 +113,13 @@ import {
   updateBoundElements,
 } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
-import { mutateElement } from "../element/mutateElement";
+import { bumpVersion, mutateElement } from "../element/mutateElement";
 import { deepCopyElement, newFreeDrawElement } from "../element/newElement";
 import {
   isBindingElement,
   isBindingElementType,
+  isImageElement,
+  isInitializedImageElement,
   isLinearElement,
   isLinearElementType,
 } from "../element/typeChecks";
@@ -125,6 +131,9 @@ import {
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
   NonDeleted,
+  InitializedExcalidrawImageElement,
+  ExcalidrawImageElement,
+  FileId,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -140,9 +149,9 @@ import History from "../history";
 import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
 import {
   CODES,
-  getResizeCenterPointKey,
-  getResizeWithSidesSameLengthKey,
-  getRotateWithDiscreteAngleKey,
+  shouldResizeFromCenter,
+  shouldMaintainAspectRatio,
+  shouldRotateWithDiscreteAngle,
   isArrowKey,
   KEYS,
 } from "../keys";
@@ -165,9 +174,13 @@ import { SceneState, ScrollBars } from "../scene/types";
 import { getNewZoom } from "../scene/zoom";
 import { findShapeByKey } from "../shapes";
 import {
+  AppClassProperties,
   AppProps,
   AppState,
+  BinaryFileData,
+  DataURL,
   ExcalidrawImperativeAPI,
+  BinaryFiles,
   Gesture,
   GestureEvent,
   LibraryItems,
@@ -195,6 +208,22 @@ import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
+import {
+  dataURLToFile,
+  generateIdFromFile,
+  getDataURL,
+  isSupportedImageFile,
+  resizeImageFile,
+  SVGStringToFile,
+} from "../data/blob";
+import {
+  getInitializedImageElements,
+  loadHTMLImageElement,
+  normalizeSVG,
+  updateImageCache as _updateImageCache,
+} from "../element/image";
+import throttle from "lodash.throttle";
+import { fileOpen, nativeFileSystemSupported } from "../data/filesystem";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
@@ -225,7 +254,7 @@ const gesture: Gesture = {
 };
 
 class App extends React.Component<AppProps, AppState> {
-  canvas: HTMLCanvasElement | null = null;
+  canvas: AppClassProperties["canvas"] = null;
   rc: RoughCanvas | null = null;
   unmounted: boolean = false;
   actionManager: ActionManager;
@@ -242,7 +271,7 @@ class App extends React.Component<AppProps, AppState> {
   private scene: Scene;
   private resizeObserver: ResizeObserver | undefined;
   private nearestScrollableContainer: HTMLElement | Document | undefined;
-  public library: Library;
+  public library: AppClassProperties["library"];
   public libraryItemsFromStorage: LibraryItems | undefined;
   private id: string;
   private history: History;
@@ -250,6 +279,9 @@ class App extends React.Component<AppProps, AppState> {
     container: HTMLDivElement | null;
     id: string;
   };
+
+  public files: BinaryFiles = {};
+  public imageCache: AppClassProperties["imageCache"] = new Map();
 
   constructor(props: AppProps) {
     super(props);
@@ -286,6 +318,7 @@ class App extends React.Component<AppProps, AppState> {
         ready: true,
         readyPromise,
         updateScene: this.updateScene,
+        addFiles: this.addFiles,
         resetScene: this.resetScene,
         getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
         history: {
@@ -294,6 +327,7 @@ class App extends React.Component<AppProps, AppState> {
         scrollToContent: this.scrollToContent,
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
+        getFiles: () => this.files,
         refresh: this.refresh,
         importLibrary: this.importLibraryFromUrl,
         setToastMessage: this.setToastMessage,
@@ -412,6 +446,7 @@ class App extends React.Component<AppProps, AppState> {
             <LayerUI
               canvas={this.canvas}
               appState={this.state}
+              files={this.files}
               setAppState={this.setAppState}
               actionManager={this.actionManager}
               elements={this.scene.getElements()}
@@ -421,6 +456,7 @@ class App extends React.Component<AppProps, AppState> {
                 this.addElementsFromPasteOrLibrary({
                   elements,
                   position: "center",
+                  files: null,
                 })
               }
               zenModeEnabled={zenModeEnabled}
@@ -443,6 +479,7 @@ class App extends React.Component<AppProps, AppState> {
               focusContainer={this.focusContainer}
               library={this.library}
               id={this.id}
+              onImageAction={this.onImageAction}
             />
             <div className="excalidraw-textEditorContainer" />
             <div className="excalidraw-contextMenuContainer" />
@@ -468,7 +505,7 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
-  public focusContainer = () => {
+  public focusContainer: AppClassProperties["focusContainer"] = () => {
     if (this.props.autoFocus) {
       this.excalidrawContainerRef.current?.focus();
     }
@@ -505,6 +542,13 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
+      if (actionResult.files) {
+        this.files = actionResult.replaceFiles
+          ? actionResult.files
+          : { ...this.files, ...actionResult.files };
+        this.addNewImagesToImageCache();
+      }
+
       if (actionResult.appState || editingElement) {
         if (actionResult.commitToHistory) {
           this.history.resumeRecording();
@@ -513,7 +557,7 @@ class App extends React.Component<AppProps, AppState> {
         let viewModeEnabled = actionResult?.appState?.viewModeEnabled || false;
         let zenModeEnabled = actionResult?.appState?.zenModeEnabled || false;
         let gridSize = actionResult?.appState?.gridSize || null;
-        let theme = actionResult?.appState?.theme || "light";
+        let theme = actionResult?.appState?.theme || THEME.LIGHT;
         let name = actionResult?.appState?.name ?? this.state.name;
         if (typeof this.props.viewModeEnabled !== "undefined") {
           viewModeEnabled = this.props.viewModeEnabled;
@@ -660,16 +704,16 @@ class App extends React.Component<AppProps, AppState> {
             this.state,
             this.scene.getElementsIncludingDeleted(),
           )
-            .then(({ elements, appState }) =>
+            .then((scene) => {
               this.syncActionResult({
-                elements,
+                ...scene,
                 appState: {
-                  ...(appState || this.state),
+                  ...(scene.appState || this.state),
                   isLoading: false,
                 },
                 commitToHistory: true,
-              }),
-            )
+              });
+            })
             .catch((error) => {
               this.setState({ isLoading: false, errorMessage: error.message });
             });
@@ -686,7 +730,7 @@ class App extends React.Component<AppProps, AppState> {
       if (initialData?.libraryItems) {
         this.libraryItemsFromStorage = initialData.libraryItems;
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
       initialData = {
         appState: {
@@ -698,8 +742,13 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const scene = restore(initialData, null, null);
+
     scene.appState = {
       ...scene.appState,
+      elementType:
+        scene.appState.elementType === "image"
+          ? "selection"
+          : scene.appState.elementType,
       isLoading: false,
     };
     if (initialData?.scrollToContent) {
@@ -815,6 +864,8 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   public componentWillUnmount() {
+    this.files = {};
+    this.imageCache.clear();
     this.resizeObserver?.disconnect();
     this.unmounted = true;
     this.removeEventListeners();
@@ -1025,17 +1076,26 @@ class App extends React.Component<AppProps, AppState> {
       );
       cursorButton[socketId] = user.button;
     });
-    const elements = this.scene.getElements();
+    const renderingElements = this.scene.getElements().filter((element) => {
+      if (isImageElement(element)) {
+        if (
+          // not placed on canvas yet (but in elements array)
+          this.state.pendingImageElement &&
+          element.id === this.state.pendingImageElement.id
+        ) {
+          return false;
+        }
+      }
+      // don't render text element that's being currently edited (it's
+      // rendered on remote only)
+      return (
+        !this.state.editingElement ||
+        this.state.editingElement.type !== "text" ||
+        element.id !== this.state.editingElement.id
+      );
+    });
     const { atLeastOneVisibleElement, scrollBars } = renderScene(
-      elements.filter((element) => {
-        // don't render text element that's being currently edited (it's
-        // rendered on remote only)
-        return (
-          !this.state.editingElement ||
-          this.state.editingElement.type !== "text" ||
-          element.id !== this.state.editingElement.id
-        );
-      }),
+      renderingElements,
       this.state,
       this.state.selectionElement,
       window.devicePixelRatio,
@@ -1052,6 +1112,8 @@ class App extends React.Component<AppProps, AppState> {
         remotePointerUsernames: pointerUsernames,
         remotePointerUserStates: pointerUserStates,
         shouldCacheIgnoreZoom: this.state.shouldCacheIgnoreZoom,
+        theme: this.state.theme,
+        imageCache: this.imageCache,
       },
       {
         renderOptimizations: true,
@@ -1065,12 +1127,14 @@ class App extends React.Component<AppProps, AppState> {
       // hide when editing text
       this.state.editingElement?.type === "text"
         ? false
-        : !atLeastOneVisibleElement && elements.length > 0;
+        : !atLeastOneVisibleElement && renderingElements.length > 0;
     if (this.state.scrolledOutside !== scrolledOutside) {
       this.setState({ scrolledOutside });
     }
 
     this.history.record(this.state, this.scene.getElementsIncludingDeleted());
+
+    this.scheduleImageRefresh();
 
     // Do not notify consumers if we're still loading the scene. Among other
     // potential issues, this fixes a case where the tab isn't focused during
@@ -1080,6 +1144,7 @@ class App extends React.Component<AppProps, AppState> {
       this.props.onChange?.(
         this.scene.getElementsIncludingDeleted(),
         this.state,
+        this.files,
       );
     }
   }
@@ -1124,7 +1189,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private copyAll = () => {
-    copyToClipboard(this.scene.getElements(), this.state);
+    copyToClipboard(this.scene.getElements(), this.state, this.files);
   };
 
   private static resetTapTwice() {
@@ -1191,7 +1256,34 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         return;
       }
+
       const data = await parseClipboard(event);
+
+      let file = event?.clipboardData?.files[0];
+
+      if (!file && data.text) {
+        const string = data.text.trim();
+        if (string.startsWith("<svg") && string.endsWith("</svg>")) {
+          // ignore SVG validation/normalization which will be done during image
+          // initialization
+          file = SVGStringToFile(string);
+        }
+      }
+
+      if (isSupportedImageFile(file)) {
+        const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
+          { clientX: cursorX, clientY: cursorY },
+          this.state,
+        );
+
+        const imageElement = this.createImageElement({ sceneX, sceneY });
+        this.insertImageElement(imageElement, file);
+        this.initializeImageDimensions(imageElement);
+        this.setState({ selectedElementIds: { [imageElement.id]: true } });
+
+        return;
+      }
+
       if (this.props.onPaste) {
         try {
           if ((await this.props.onPaste(data, event)) === false) {
@@ -1213,6 +1305,7 @@ class App extends React.Component<AppProps, AppState> {
       } else if (data.elements) {
         this.addElementsFromPasteOrLibrary({
           elements: data.elements,
+          files: data.files || null,
           position: "cursor",
         });
       } else if (data.text) {
@@ -1225,6 +1318,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private addElementsFromPasteOrLibrary = (opts: {
     elements: readonly ExcalidrawElement[];
+    files: BinaryFiles | null;
     position: { clientX: number; clientY: number } | "cursor" | "center";
   }) => {
     const elements = restoreElements(opts.elements, null);
@@ -1277,6 +1371,10 @@ class App extends React.Component<AppProps, AppState> {
     ];
     fixBindingsAfterDuplication(nextElements, elements, oldIdToDuplicatedId);
 
+    if (opts.files) {
+      this.files = { ...this.files, ...opts.files };
+    }
+
     this.scene.replaceAllElements(nextElements);
     this.history.resumeRecording();
     this.setState(
@@ -1292,6 +1390,11 @@ class App extends React.Component<AppProps, AppState> {
         },
         this.scene.getElements(),
       ),
+      () => {
+        if (opts.files) {
+          this.addNewImagesToImageCache();
+        }
+      },
     );
     this.selectShapeTool("selection");
   };
@@ -1400,10 +1503,35 @@ class App extends React.Component<AppProps, AppState> {
         await webShareTargetCache.delete("shared-file");
         window.history.replaceState(null, APP_NAME, window.location.pathname);
       }
-    } catch (error) {
+    } catch (error: any) {
       this.setState({ errorMessage: error.message });
     }
   };
+
+  /** adds supplied files to existing files in the appState */
+  public addFiles: ExcalidrawImperativeAPI["addFiles"] = withBatchedUpdates(
+    (files) => {
+      const filesMap = files.reduce((acc, fileData) => {
+        acc.set(fileData.id, fileData);
+        return acc;
+      }, new Map<FileId, BinaryFileData>());
+
+      this.files = { ...this.files, ...Object.fromEntries(filesMap) };
+      this.addNewImagesToImageCache();
+
+      // bump versions for elements that reference added files so that
+      // we/host apps can detect the change
+      this.scene.getElements().forEach((element) => {
+        if (
+          isInitializedImageElement(element) &&
+          filesMap.has(element.fileId)
+        ) {
+          bumpVersion(element);
+        }
+      });
+      this.scene.informMutation();
+    },
+  );
 
   public updateScene = withBatchedUpdates(
     <K extends keyof AppState>(sceneData: {
@@ -1495,7 +1623,7 @@ class App extends React.Component<AppProps, AppState> {
         this.setState({ isBindingEnabled: false });
       }
 
-      if (event.code === CODES.NINE) {
+      if (event.code === CODES.ZERO) {
         this.setState({ isLibraryOpen: !this.state.isLibraryOpen });
       }
 
@@ -1658,6 +1786,9 @@ class App extends React.Component<AppProps, AppState> {
     }
     if (!isLinearElementType(elementType)) {
       this.setState({ suggestedBindings: [] });
+    }
+    if (elementType === "image") {
+      this.onImageAction();
     }
     if (elementType !== "selection") {
       this.setState({
@@ -2341,6 +2472,26 @@ class App extends React.Component<AppProps, AppState> {
         this.state.elementType,
         pointerDownState,
       );
+    } else if (this.state.elementType === "image") {
+      // reset image preview on pointerdown
+      setCursor(this.canvas, CURSOR_TYPE.CROSSHAIR);
+
+      if (!this.state.pendingImageElement) {
+        return;
+      }
+
+      this.setState({
+        draggingElement: this.state.pendingImageElement,
+        editingElement: this.state.pendingImageElement,
+        pendingImageElement: null,
+        multiElement: null,
+      });
+
+      const { x, y } = viewportCoordsToSceneCoords(event, this.state);
+      mutateElement(this.state.pendingImageElement, {
+        x,
+        y,
+      });
     } else if (this.state.elementType === "freedraw") {
       this.handleFreeDrawElementOnPointerDown(
         event,
@@ -2910,6 +3061,32 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
+  private createImageElement = ({
+    sceneX,
+    sceneY,
+  }: {
+    sceneX: number;
+    sceneY: number;
+  }) => {
+    const [gridX, gridY] = getGridPoint(sceneX, sceneY, this.state.gridSize);
+
+    const element = newImageElement({
+      type: "image",
+      x: gridX,
+      y: gridY,
+      strokeColor: this.state.currentItemStrokeColor,
+      backgroundColor: this.state.currentItemBackgroundColor,
+      fillStyle: this.state.currentItemFillStyle,
+      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeStyle: this.state.currentItemStrokeStyle,
+      roughness: this.state.currentItemRoughness,
+      opacity: this.state.currentItemOpacity,
+      strokeSharpness: this.state.currentItemLinearStrokeSharpness,
+    });
+
+    return element;
+  };
+
   private handleLinearElementOnPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
     elementType: ExcalidrawLinearElement["type"],
@@ -3294,7 +3471,7 @@ class App extends React.Component<AppProps, AppState> {
         let dx = gridX - draggingElement.x;
         let dy = gridY - draggingElement.y;
 
-        if (getRotateWithDiscreteAngleKey(event) && points.length === 2) {
+        if (shouldRotateWithDiscreteAngle(event) && points.length === 2) {
           ({ width: dx, height: dy } = getPerfectElementSize(
             this.state.elementType,
             dx,
@@ -3471,6 +3648,10 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.eventListeners.onKeyUp!,
       );
 
+      if (this.state.pendingImageElement) {
+        this.setState({ pendingImageElement: null });
+      }
+
       if (draggingElement?.type === "freedraw") {
         const pointerCoords = viewportCoordsToSceneCoords(
           childEvent,
@@ -3494,10 +3675,32 @@ class App extends React.Component<AppProps, AppState> {
         mutateElement(draggingElement, {
           points: [...points, [dx, dy]],
           pressures,
+          lastCommittedPoint: [dx, dy],
         });
 
         this.actionManager.executeAction(actionFinalize);
 
+        return;
+      }
+      if (isImageElement(draggingElement)) {
+        const imageElement = draggingElement;
+        try {
+          this.initializeImageDimensions(imageElement);
+          this.setState(
+            { selectedElementIds: { [imageElement.id]: true } },
+            () => {
+              this.actionManager.executeAction(actionFinalize);
+            },
+          );
+        } catch (error) {
+          console.error(error);
+          this.scene.replaceAllElements(
+            this.scene
+              .getElementsIncludingDeleted()
+              .filter((el) => el.id !== imageElement.id),
+          );
+          this.actionManager.executeAction(actionFinalize);
+        }
         return;
       }
 
@@ -3734,6 +3937,369 @@ class App extends React.Component<AppProps, AppState> {
     });
   }
 
+  private initializeImage = async ({
+    imageFile,
+    imageElement: _imageElement,
+    showCursorImagePreview = false,
+  }: {
+    imageFile: File;
+    imageElement: ExcalidrawImageElement;
+    showCursorImagePreview?: boolean;
+  }) => {
+    // at this point this should be guaranteed image file, but we do this check
+    // to satisfy TS down the line
+    if (!isSupportedImageFile(imageFile)) {
+      throw new Error(t("errors.unsupportedFileType"));
+    }
+    const mimeType = imageFile.type;
+
+    setCursor(this.canvas, "wait");
+
+    if (mimeType === MIME_TYPES.svg) {
+      try {
+        imageFile = SVGStringToFile(
+          await normalizeSVG(await imageFile.text()),
+          imageFile.name,
+        );
+      } catch (error) {
+        console.warn(error);
+        throw new Error(t("errors.svgImageInsertError"));
+      }
+    }
+
+    // generate image id (by default the file digest) before any
+    // resizing/compression takes place to keep it more portable
+    const fileId = await ((this.props.generateIdForFile?.(
+      imageFile,
+    ) as Promise<FileId>) || generateIdFromFile(imageFile));
+
+    if (!fileId) {
+      console.warn(
+        "Couldn't generate file id or the supplied `generateIdForFile` didn't resolve to one.",
+      );
+      throw new Error(t("errors.imageInsertError"));
+    }
+
+    const existingFileData = this.files[fileId];
+    if (!existingFileData?.dataURL) {
+      try {
+        imageFile = await resizeImageFile(
+          imageFile,
+          DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
+        );
+      } catch (error) {
+        console.error("error trying to resing image file on insertion", error);
+      }
+
+      if (imageFile.size > MAX_ALLOWED_FILE_BYTES) {
+        throw new Error(
+          t("errors.fileTooBig", {
+            maxSize: `${Math.trunc(MAX_ALLOWED_FILE_BYTES / 1024 / 1024)}MB`,
+          }),
+        );
+      }
+    }
+
+    if (showCursorImagePreview) {
+      const dataURL = this.files[fileId]?.dataURL;
+      // optimization so that we don't unnecessarily resize the original
+      // full-size file for cursor preview
+      // (it's much faster to convert the resized dataURL to File)
+      const resizedFile = dataURL && dataURLToFile(dataURL);
+
+      this.setImagePreviewCursor(resizedFile || imageFile);
+    }
+
+    const dataURL =
+      this.files[fileId]?.dataURL || (await getDataURL(imageFile));
+
+    const imageElement = mutateElement(
+      _imageElement,
+      {
+        fileId,
+      },
+      false,
+    ) as NonDeleted<InitializedExcalidrawImageElement>;
+
+    return new Promise<NonDeleted<InitializedExcalidrawImageElement>>(
+      async (resolve, reject) => {
+        try {
+          this.files = {
+            ...this.files,
+            [fileId]: {
+              mimeType,
+              id: fileId,
+              dataURL,
+              created: Date.now(),
+            },
+          };
+          const cachedImageData = this.imageCache.get(fileId);
+          if (!cachedImageData) {
+            this.addNewImagesToImageCache();
+            await this.updateImageCache([imageElement]);
+          }
+          if (cachedImageData?.image instanceof Promise) {
+            await cachedImageData.image;
+          }
+          if (
+            this.state.pendingImageElement?.id !== imageElement.id &&
+            this.state.draggingElement?.id !== imageElement.id
+          ) {
+            this.initializeImageDimensions(imageElement, true);
+          }
+          resolve(imageElement);
+        } catch (error) {
+          console.error(error);
+          reject(new Error(t("errors.imageInsertError")));
+        } finally {
+          if (!showCursorImagePreview) {
+            resetCursor(this.canvas);
+          }
+        }
+      },
+    );
+  };
+
+  /**
+   * inserts image into elements array and rerenders
+   */
+  private insertImageElement = async (
+    imageElement: ExcalidrawImageElement,
+    imageFile: File,
+    showCursorImagePreview?: boolean,
+  ) => {
+    this.scene.replaceAllElements([
+      ...this.scene.getElementsIncludingDeleted(),
+      imageElement,
+    ]);
+
+    try {
+      await this.initializeImage({
+        imageFile,
+        imageElement,
+        showCursorImagePreview,
+      });
+    } catch (error) {
+      mutateElement(imageElement, {
+        isDeleted: true,
+      });
+      this.actionManager.executeAction(actionFinalize);
+      this.setState({
+        errorMessage: error.message || t("errors.imageInsertError"),
+      });
+    }
+  };
+
+  private setImagePreviewCursor = async (imageFile: File) => {
+    // mustn't be larger than 128 px
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Basic_User_Interface/Using_URL_values_for_the_cursor_property
+    const cursorImageSizePx = 96;
+
+    const imagePreview = await resizeImageFile(imageFile, cursorImageSizePx);
+
+    let previewDataURL = await getDataURL(imagePreview);
+
+    // SVG cannot be resized via `resizeImageFile` so we resize by rendering to
+    // a small canvas
+    if (imageFile.type === MIME_TYPES.svg) {
+      const img = await loadHTMLImageElement(previewDataURL);
+
+      let height = Math.min(img.height, cursorImageSizePx);
+      let width = height * (img.width / img.height);
+
+      if (width > cursorImageSizePx) {
+        width = cursorImageSizePx;
+        height = width * (img.height / img.width);
+      }
+
+      const canvas = document.createElement("canvas");
+      canvas.height = height;
+      canvas.width = width;
+      const context = canvas.getContext("2d")!;
+
+      context.drawImage(img, 0, 0, width, height);
+
+      previewDataURL = canvas.toDataURL(MIME_TYPES.svg) as DataURL;
+    }
+
+    if (this.state.pendingImageElement) {
+      setCursor(this.canvas, `url(${previewDataURL}) 4 4, auto`);
+    }
+  };
+
+  private onImageAction = async (
+    { insertOnCanvasDirectly } = { insertOnCanvasDirectly: false },
+  ) => {
+    try {
+      const clientX = this.state.width / 2 + this.state.offsetLeft;
+      const clientY = this.state.height / 2 + this.state.offsetTop;
+
+      const { x, y } = viewportCoordsToSceneCoords(
+        { clientX, clientY },
+        this.state,
+      );
+
+      const imageFile = await fileOpen({
+        description: "Image",
+        extensions: ["jpg", "png", "svg", "gif"],
+      });
+
+      const imageElement = this.createImageElement({
+        sceneX: x,
+        sceneY: y,
+      });
+
+      if (insertOnCanvasDirectly) {
+        this.insertImageElement(imageElement, imageFile);
+        this.initializeImageDimensions(imageElement);
+        this.setState(
+          {
+            selectedElementIds: { [imageElement.id]: true },
+          },
+          () => {
+            this.actionManager.executeAction(actionFinalize);
+          },
+        );
+      } else {
+        this.setState(
+          {
+            pendingImageElement: imageElement,
+          },
+          () => {
+            this.insertImageElement(
+              imageElement,
+              imageFile,
+              /* showCursorImagePreview */ true,
+            );
+          },
+        );
+      }
+    } catch (error) {
+      if (error.name !== "AbortError") {
+        console.error(error);
+      }
+      this.setState(
+        {
+          pendingImageElement: null,
+          editingElement: null,
+          elementType: "selection",
+        },
+        () => {
+          this.actionManager.executeAction(actionFinalize);
+        },
+      );
+    }
+  };
+
+  private initializeImageDimensions = (
+    imageElement: ExcalidrawImageElement,
+    forceNaturalSize = false,
+  ) => {
+    const image =
+      isInitializedImageElement(imageElement) &&
+      this.imageCache.get(imageElement.fileId)?.image;
+
+    if (!image || image instanceof Promise) {
+      if (
+        imageElement.width < DRAGGING_THRESHOLD / this.state.zoom.value &&
+        imageElement.height < DRAGGING_THRESHOLD / this.state.zoom.value
+      ) {
+        const placeholderSize = 100 / this.state.zoom.value;
+        mutateElement(imageElement, {
+          x: imageElement.x - placeholderSize / 2,
+          y: imageElement.y - placeholderSize / 2,
+          width: placeholderSize,
+          height: placeholderSize,
+        });
+      }
+
+      return;
+    }
+
+    if (
+      forceNaturalSize ||
+      // if user-created bounding box is below threshold, assume the
+      // intention was to click instead of drag, and use the image's
+      // intrinsic size
+      (imageElement.width < DRAGGING_THRESHOLD / this.state.zoom.value &&
+        imageElement.height < DRAGGING_THRESHOLD / this.state.zoom.value)
+    ) {
+      const minHeight = Math.max(this.state.height - 120, 160);
+      // max 65% of canvas height, clamped to <300px, vh - 120px>
+      const maxHeight = Math.min(
+        minHeight,
+        Math.floor(this.state.height * 0.5) / this.state.zoom.value,
+      );
+
+      const height = Math.min(image.naturalHeight, maxHeight);
+      const width = height * (image.naturalWidth / image.naturalHeight);
+
+      // add current imageElement width/height to account for previous centering
+      // of the placholder image
+      const x = imageElement.x + imageElement.width / 2 - width / 2;
+      const y = imageElement.y + imageElement.height / 2 - height / 2;
+
+      mutateElement(imageElement, { x, y, width, height });
+    }
+  };
+
+  /** updates image cache, refreshing updated elements and/or setting status
+      to error for images that fail during <img> element creation */
+  private updateImageCache = async (
+    elements: readonly InitializedExcalidrawImageElement[],
+    files = this.files,
+  ) => {
+    const { updatedFiles, erroredFiles } = await _updateImageCache({
+      imageCache: this.imageCache,
+      fileIds: elements.map((element) => element.fileId),
+      files,
+    });
+    if (updatedFiles.size || erroredFiles.size) {
+      for (const element of elements) {
+        if (updatedFiles.has(element.fileId)) {
+          invalidateShapeForElement(element);
+        }
+
+        if (erroredFiles.has(element.fileId)) {
+          mutateElement(
+            element,
+            { status: "error" },
+            /* informMutation */ false,
+          );
+        }
+      }
+    }
+    return { updatedFiles, erroredFiles };
+  };
+
+  /** adds new images to imageCache and re-renders if needed */
+  private addNewImagesToImageCache = async (
+    imageElements: InitializedExcalidrawImageElement[] = getInitializedImageElements(
+      this.scene.getElements(),
+    ),
+    files: BinaryFiles = this.files,
+  ) => {
+    const uncachedImageElements = imageElements.filter(
+      (element) => !element.isDeleted && !this.imageCache.has(element.fileId),
+    );
+
+    if (uncachedImageElements.length) {
+      const { updatedFiles } = await this.updateImageCache(
+        uncachedImageElements,
+        files,
+      );
+      if (updatedFiles.size) {
+        this.scene.informMutation();
+      }
+    }
+  };
+
+  /** generally you should use `addNewImagesToImageCache()` directly if you need
+   *  to render new images. This is just a failsafe  */
+  private scheduleImageRefresh = throttle(() => {
+    this.addNewImagesToImageCache();
+  }, IMAGE_RENDER_TIMEOUT);
+
   private updateBindingEnabledOnPointerMove = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
@@ -3832,34 +4398,63 @@ class App extends React.Component<AppProps, AppState> {
   private handleAppOnDrop = async (event: React.DragEvent<HTMLDivElement>) => {
     try {
       const file = event.dataTransfer.files[0];
-      if (file?.type === "image/png" || file?.type === "image/svg+xml") {
-        if (fsSupported) {
+
+      if (isSupportedImageFile(file)) {
+        // first attempt to decode scene from the image if it's embedded
+        // ---------------------------------------------------------------------
+
+        if (file?.type === MIME_TYPES.png || file?.type === MIME_TYPES.svg) {
           try {
-            // This will only work as of Chrome 86,
-            // but can be safely ignored on older releases.
-            const item = event.dataTransfer.items[0];
-            (file as any).handle = await (item as any).getAsFileSystemHandle();
-          } catch (error) {
-            console.warn(error.name, error.message);
+            if (nativeFileSystemSupported) {
+              try {
+                // This will only work as of Chrome 86,
+                // but can be safely ignored on older releases.
+                const item = event.dataTransfer.items[0];
+                (file as any).handle = await (item as any).getAsFileSystemHandle();
+              } catch (error: any) {
+                console.warn(error.name, error.message);
+              }
+            }
+
+            const scene = await loadFromBlob(
+              file,
+              this.state,
+              this.scene.getElementsIncludingDeleted(),
+            );
+            this.syncActionResult({
+              ...scene,
+              appState: {
+                ...(scene.appState || this.state),
+                isLoading: false,
+              },
+              replaceFiles: true,
+              commitToHistory: true,
+            });
+            return;
+          } catch (error: any) {
+            if (error.name !== "EncodingError") {
+              throw error;
+            }
           }
         }
 
-        const { elements, appState } = await loadFromBlob(
-          file,
+        // if no scene is embedded or we fail for whatever reason, fall back
+        // to importing as regular image
+        // ---------------------------------------------------------------------
+
+        const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
+          event,
           this.state,
-          this.scene.getElementsIncludingDeleted(),
         );
-        this.syncActionResult({
-          elements,
-          appState: {
-            ...(appState || this.state),
-            isLoading: false,
-          },
-          commitToHistory: true,
-        });
+
+        const imageElement = this.createImageElement({ sceneX, sceneY });
+        this.insertImageElement(imageElement, file);
+        this.initializeImageDimensions(imageElement);
+        this.setState({ selectedElementIds: { [imageElement.id]: true } });
+
         return;
       }
-    } catch (error) {
+    } catch (error: any) {
       return this.setState({
         isLoading: false,
         errorMessage: error.message,
@@ -3871,6 +4466,7 @@ class App extends React.Component<AppProps, AppState> {
       this.addElementsFromPasteOrLibrary({
         elements: JSON.parse(libraryShapes),
         position: event,
+        files: null,
       });
       return;
     }
@@ -3893,13 +4489,13 @@ class App extends React.Component<AppProps, AppState> {
       // default: assume an Excalidraw file regardless of extension/MimeType
     } else {
       this.setState({ isLoading: true });
-      if (fsSupported) {
+      if (nativeFileSystemSupported) {
         try {
           // This will only work as of Chrome 86,
           // but can be safely ignored on older releases.
           const item = event.dataTransfer.items[0];
           (file as any).handle = await (item as any).getAsFileSystemHandle();
-        } catch (error) {
+        } catch (error: any) {
           console.warn(error.name, error.message);
         }
       }
@@ -3909,16 +4505,17 @@ class App extends React.Component<AppProps, AppState> {
 
   loadFileToCanvas = (file: Blob) => {
     loadFromBlob(file, this.state, this.scene.getElementsIncludingDeleted())
-      .then(({ elements, appState }) =>
+      .then((scene) => {
         this.syncActionResult({
-          elements,
+          ...scene,
           appState: {
-            ...(appState || this.state),
+            ...(scene.appState || this.state),
             isLoading: false,
           },
+          replaceFiles: true,
           commitToHistory: true,
-        }),
-      )
+        });
+      })
       .catch((error) => {
         this.setState({ isLoading: false, errorMessage: error.message });
       });
@@ -3970,8 +4567,8 @@ class App extends React.Component<AppProps, AppState> {
         pointerCoords.y,
         distance(pointerDownState.origin.x, pointerCoords.x),
         distance(pointerDownState.origin.y, pointerCoords.y),
-        getResizeWithSidesSameLengthKey(event),
-        getResizeCenterPointKey(event),
+        shouldMaintainAspectRatio(event),
+        shouldResizeFromCenter(event),
       );
     } else {
       const [gridX, gridY] = getGridPoint(
@@ -3979,6 +4576,15 @@ class App extends React.Component<AppProps, AppState> {
         pointerCoords.y,
         this.state.gridSize,
       );
+
+      const image =
+        isInitializedImageElement(draggingElement) &&
+        this.imageCache.get(draggingElement.fileId)?.image;
+      const aspectRatio =
+        image && !(image instanceof Promise)
+          ? image.width / image.height
+          : null;
+
       dragNewElement(
         draggingElement,
         this.state.elementType,
@@ -3988,9 +4594,13 @@ class App extends React.Component<AppProps, AppState> {
         gridY,
         distance(pointerDownState.originInGrid.x, gridX),
         distance(pointerDownState.originInGrid.y, gridY),
-        getResizeWithSidesSameLengthKey(event),
-        getResizeCenterPointKey(event),
+        isImageElement(draggingElement)
+          ? !shouldMaintainAspectRatio(event)
+          : shouldMaintainAspectRatio(event),
+        shouldResizeFromCenter(event),
+        aspectRatio,
       );
+
       this.maybeSuggestBindingForAll([draggingElement]);
     }
   };
@@ -4023,9 +4633,11 @@ class App extends React.Component<AppProps, AppState> {
         transformHandleType,
         selectedElements,
         pointerDownState.resize.arrowDirection,
-        getRotateWithDiscreteAngleKey(event),
-        getResizeCenterPointKey(event),
-        getResizeWithSidesSameLengthKey(event),
+        shouldRotateWithDiscreteAngle(event),
+        shouldResizeFromCenter(event),
+        selectedElements.length === 1 && isImageElement(selectedElements[0])
+          ? !shouldMaintainAspectRatio(event)
+          : shouldMaintainAspectRatio(event),
         resizeX,
         resizeY,
         pointerDownState.resize.center.x,
@@ -4092,116 +4704,112 @@ class App extends React.Component<AppProps, AppState> {
         actionToggleStats,
       ];
 
-      ContextMenu.push({
-        options: viewModeOptions,
-        top,
-        left,
-        actionManager: this.actionManager,
-        appState: this.state,
-        container: this.excalidrawContainerRef.current!,
-      });
-
       if (this.state.viewModeEnabled) {
-        return;
-      }
-
-      ContextMenu.push({
-        options: [
-          this.isMobile &&
-            navigator.clipboard && {
-              name: "paste",
-              perform: (elements, appStates) => {
-                this.pasteFromClipboard(null);
-                return {
-                  commitToHistory: false,
-                };
+        ContextMenu.push({
+          options: viewModeOptions,
+          top,
+          left,
+          actionManager: this.actionManager,
+          appState: this.state,
+          container: this.excalidrawContainerRef.current!,
+        });
+      } else {
+        ContextMenu.push({
+          options: [
+            this.isMobile &&
+              navigator.clipboard && {
+                name: "paste",
+                perform: (elements, appStates) => {
+                  this.pasteFromClipboard(null);
+                  return {
+                    commitToHistory: false,
+                  };
+                },
+                contextItemLabel: "labels.paste",
               },
-              contextItemLabel: "labels.paste",
-            },
-          this.isMobile && navigator.clipboard && separator,
-          probablySupportsClipboardBlob &&
-            elements.length > 0 &&
-            actionCopyAsPng,
-          probablySupportsClipboardWriteText &&
-            elements.length > 0 &&
-            actionCopyAsSvg,
-          ((probablySupportsClipboardBlob && elements.length > 0) ||
-            (probablySupportsClipboardWriteText && elements.length > 0)) &&
+            this.isMobile && navigator.clipboard && separator,
+            probablySupportsClipboardBlob &&
+              elements.length > 0 &&
+              actionCopyAsPng,
+            probablySupportsClipboardWriteText &&
+              elements.length > 0 &&
+              actionCopyAsSvg,
+            ((probablySupportsClipboardBlob && elements.length > 0) ||
+              (probablySupportsClipboardWriteText && elements.length > 0)) &&
+              separator,
+            actionSelectAll,
             separator,
-          actionSelectAll,
-          separator,
-          typeof this.props.gridModeEnabled === "undefined" &&
-            actionToggleGridMode,
-          typeof this.props.zenModeEnabled === "undefined" &&
-            actionToggleZenMode,
-          typeof this.props.viewModeEnabled === "undefined" &&
-            actionToggleViewMode,
-          actionToggleStats,
-        ],
-        top,
-        left,
-        actionManager: this.actionManager,
-        appState: this.state,
-        container: this.excalidrawContainerRef.current!,
-      });
-      return;
+            typeof this.props.gridModeEnabled === "undefined" &&
+              actionToggleGridMode,
+            typeof this.props.zenModeEnabled === "undefined" &&
+              actionToggleZenMode,
+            typeof this.props.viewModeEnabled === "undefined" &&
+              actionToggleViewMode,
+            actionToggleStats,
+          ],
+          top,
+          left,
+          actionManager: this.actionManager,
+          appState: this.state,
+          container: this.excalidrawContainerRef.current!,
+        });
+      }
+    } else if (type === "element") {
+      if (this.state.viewModeEnabled) {
+        ContextMenu.push({
+          options: [navigator.clipboard && actionCopy, ...options],
+          top,
+          left,
+          actionManager: this.actionManager,
+          appState: this.state,
+          container: this.excalidrawContainerRef.current!,
+        });
+      } else {
+        ContextMenu.push({
+          options: [
+            this.isMobile && actionCut,
+            this.isMobile && navigator.clipboard && actionCopy,
+            this.isMobile &&
+              navigator.clipboard && {
+                name: "paste",
+                perform: (elements, appStates) => {
+                  this.pasteFromClipboard(null);
+                  return {
+                    commitToHistory: false,
+                  };
+                },
+                contextItemLabel: "labels.paste",
+              },
+            this.isMobile && separator,
+            ...options,
+            separator,
+            actionCopyStyles,
+            actionPasteStyles,
+            separator,
+            maybeGroupAction && actionGroup,
+            maybeUngroupAction && actionUngroup,
+            (maybeGroupAction || maybeUngroupAction) && separator,
+            actionAddToLibrary,
+            separator,
+            actionSendBackward,
+            actionBringForward,
+            actionSendToBack,
+            actionBringToFront,
+            separator,
+            maybeFlipHorizontal && actionFlipHorizontal,
+            maybeFlipVertical && actionFlipVertical,
+            (maybeFlipHorizontal || maybeFlipVertical) && separator,
+            actionDuplicateSelection,
+            actionDeleteSelected,
+          ],
+          top,
+          left,
+          actionManager: this.actionManager,
+          appState: this.state,
+          container: this.excalidrawContainerRef.current!,
+        });
+      }
     }
-
-    if (this.state.viewModeEnabled) {
-      ContextMenu.push({
-        options: [navigator.clipboard && actionCopy, ...options],
-        top,
-        left,
-        actionManager: this.actionManager,
-        appState: this.state,
-        container: this.excalidrawContainerRef.current!,
-      });
-      return;
-    }
-
-    ContextMenu.push({
-      options: [
-        this.isMobile && actionCut,
-        this.isMobile && navigator.clipboard && actionCopy,
-        this.isMobile &&
-          navigator.clipboard && {
-            name: "paste",
-            perform: (elements, appStates) => {
-              this.pasteFromClipboard(null);
-              return {
-                commitToHistory: false,
-              };
-            },
-            contextItemLabel: "labels.paste",
-          },
-        this.isMobile && separator,
-        ...options,
-        separator,
-        actionCopyStyles,
-        actionPasteStyles,
-        separator,
-        maybeGroupAction && actionGroup,
-        maybeUngroupAction && actionUngroup,
-        (maybeGroupAction || maybeUngroupAction) && separator,
-        actionAddToLibrary,
-        separator,
-        actionSendBackward,
-        actionBringForward,
-        actionSendToBack,
-        actionBringToFront,
-        separator,
-        maybeFlipHorizontal && actionFlipHorizontal,
-        maybeFlipVertical && actionFlipVertical,
-        (maybeFlipHorizontal || maybeFlipVertical) && separator,
-        actionDuplicateSelection,
-        actionDeleteSelected,
-      ],
-      top,
-      left,
-      actionManager: this.actionManager,
-      appState: this.state,
-      container: this.excalidrawContainerRef.current!,
-    });
   };
 
   private handleWheel = withBatchedUpdates((event: WheelEvent) => {

@@ -33,6 +33,11 @@ type MobileMenuProps = {
   renderCustomFooter?: (isMobile: boolean, appState: AppState) => JSX.Element;
   viewModeEnabled: boolean;
   showThemeBtn: boolean;
+  onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
+  renderTopRightUI?: (
+    isMobile: boolean,
+    appState: AppState,
+  ) => JSX.Element | null;
 };
 
 export const MobileMenu = ({
@@ -50,6 +55,8 @@ export const MobileMenu = ({
   renderCustomFooter,
   viewModeEnabled,
   showThemeBtn,
+  onImageAction,
+  renderTopRightUI,
 }: MobileMenuProps) => {
   const renderToolbar = () => {
     return (
@@ -65,9 +72,15 @@ export const MobileMenu = ({
                       canvas={canvas}
                       elementType={appState.elementType}
                       setAppState={setAppState}
+                      onImageAction={({ pointerType }) => {
+                        onImageAction({
+                          insertOnCanvasDirectly: pointerType !== "mouse",
+                        });
+                      }}
                     />
                   </Stack.Row>
                 </Island>
+                {renderTopRightUI && renderTopRightUI(true, appState)}
                 <LockButton
                   checked={appState.elementLocked}
                   onChange={onLockToggle}

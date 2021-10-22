@@ -35,6 +35,7 @@ export enum EVENT {
   MOUSE_MOVE = "mousemove",
   RESIZE = "resize",
   UNLOAD = "unload",
+  FOCUS = "focus",
   BLUR = "blur",
   DRAG_OVER = "dragover",
   DROP = "drop",
@@ -69,6 +70,11 @@ export const FONT_FAMILY = {
   Cascadia: 3,
 };
 
+export const THEME = {
+  LIGHT: "light",
+  DARK: "dark",
+};
+
 export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";
 
 export const DEFAULT_FONT_SIZE = 20;
@@ -84,7 +90,13 @@ export const GRID_SIZE = 20; // TODO make it configurable?
 export const MIME_TYPES = {
   excalidraw: "application/vnd.excalidraw+json",
   excalidrawlib: "application/vnd.excalidrawlib+json",
-};
+  json: "application/json",
+  svg: "image/svg+xml",
+  png: "image/png",
+  jpg: "image/jpeg",
+  gif: "image/gif",
+  binary: "application/octet-stream",
+} as const;
 
 export const EXPORT_DATA_TYPES = {
   excalidraw: "excalidraw",
@@ -99,6 +111,7 @@ export const STORAGE_KEYS = {
 } as const;
 
 // time in milliseconds
+export const IMAGE_RENDER_TIMEOUT = 500;
 export const TAP_TWICE_TIMEOUT = 300;
 export const TOUCH_CTX_MENU_TIMEOUT = 500;
 export const TITLE_TIMEOUT = 10000;
@@ -148,3 +161,16 @@ export const MAX_DECIMALS_FOR_SVG_EXPORT = 2;
 
 export const EXPORT_SCALES = [1, 2, 3];
 export const DEFAULT_EXPORT_PADDING = 10; // px
+
+export const DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT = 1440;
+
+export const ALLOWED_IMAGE_MIME_TYPES = [
+  MIME_TYPES.png,
+  MIME_TYPES.jpg,
+  MIME_TYPES.svg,
+  MIME_TYPES.gif,
+] as const;
+
+export const MAX_ALLOWED_FILE_BYTES = 2 * 1024 * 1024;
+
+export const SVG_NS = "http://www.w3.org/2000/svg";

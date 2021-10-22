@@ -1,9 +1,8 @@
-import React from "react";
 import { render, waitFor } from "./test-utils";
 import ExcalidrawApp from "../excalidraw-app";
 import { API } from "./helpers/api";
 import { getDefaultAppState } from "../appState";
-import { EXPORT_DATA_TYPES } from "../constants";
+import { EXPORT_DATA_TYPES, MIME_TYPES } from "../constants";
 
 const { h } = window;
 
@@ -37,7 +36,7 @@ describe("appState", () => {
             elements: [API.createElement({ type: "rectangle", id: "A" })],
           }),
         ],
-        { type: "application/json" },
+        { type: MIME_TYPES.json },
       ),
     );
 

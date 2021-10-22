@@ -1,12 +1,17 @@
-import { FileSystemHandle } from "browser-fs-access";
+import { nanoid } from "nanoid";
 import { cleanAppStateForExport } from "../appState";
-import { EXPORT_DATA_TYPES } from "../constants";
+import {
+  ALLOWED_IMAGE_MIME_TYPES,
+  EXPORT_DATA_TYPES,
+  MIME_TYPES,
+} from "../constants";
 import { clearElementsForExport } from "../element";
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, FileId } from "../element/types";
 import { CanvasError } from "../errors";
 import { t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
-import { AppState } from "../types";
+import { AppState, DataURL } from "../types";
+import { FileSystemHandle } from "./filesystem";
 import { isValidExcalidrawData } from "./json";
 import { restore } from "./restore";
 import { ImportedLibraryData } from "./types";
@@ -14,16 +19,22 @@ import { ImportedLibraryData } from "./types";
 const parseFileContents = async (blob: Blob | File) => {
   let contents: string;
 
-  if (blob.type === "image/png") {
+  if (blob.type === MIME_TYPES.png) {
     try {
       return await (
         await import(/* webpackChunkName: "image" */ "./image")
       ).decodePngMetadata(blob);
     } catch (error) {
       if (error.message === "INVALID") {
-        throw new Error(t("alerts.imageDoesNotContainScene"));
+        throw new DOMException(
+          t("alerts.imageDoesNotContainScene"),
+          "EncodingError",
+        );
       } else {
-        throw new Error(t("alerts.cannotRestoreFromImage"));
+        throw new DOMException(
+          t("alerts.cannotRestoreFromImage"),
+          "EncodingError",
+        );
       }
     }
   } else {
@@ -40,7 +51,7 @@ const parseFileContents = async (blob: Blob | File) => {
         };
       });
     }
-    if (blob.type === "image/svg+xml") {
+    if (blob.type === MIME_TYPES.svg) {
       try {
         return await (
           await import(/* webpackChunkName: "image" */ "./image")
@@ -49,9 +60,15 @@ const parseFileContents = async (blob: Blob | File) => {
         });
       } catch (error) {
         if (error.message === "INVALID") {
-          throw new Error(t("alerts.imageDoesNotContainScene"));
+          throw new DOMException(
+            t("alerts.imageDoesNotContainScene"),
+            "EncodingError",
+          );
         } else {
-          throw new Error(t("alerts.cannotRestoreFromImage"));
+          throw new DOMException(
+            t("alerts.cannotRestoreFromImage"),
+            "EncodingError",
+          );
         }
       }
     }
@@ -70,13 +87,13 @@ export const getMimeType = (blob: Blob | string): string => {
     name = blob.name || "";
   }
   if (/\.(excalidraw|json)$/.test(name)) {
-    return "application/json";
+    return MIME_TYPES.json;
   } else if (/\.png$/.test(name)) {
-    return "image/png";
+    return MIME_TYPES.png;
   } else if (/\.jpe?g$/.test(name)) {
-    return "image/jpeg";
+    return MIME_TYPES.jpg;
   } else if (/\.svg$/.test(name)) {
-    return "image/svg+xml";
+    return MIME_TYPES.svg;
   }
   return "";
 };
@@ -98,6 +115,15 @@ export const isImageFileHandleType = (
 export const isImageFileHandle = (handle: FileSystemHandle | null) => {
   const type = getFileHandleType(handle);
   return type === "png" || type === "svg";
+};
+
+export const isSupportedImageFile = (
+  blob: Blob | null | undefined,
+): blob is Blob & { type: typeof ALLOWED_IMAGE_MIME_TYPES[number] } => {
+  const { type } = blob || {};
+  return (
+    !!type && (ALLOWED_IMAGE_MIME_TYPES as readonly string[]).includes(type)
+  );
 };
 
 export const loadFromBlob = async (
@@ -123,6 +149,7 @@ export const loadFromBlob = async (
             ? calculateScrollCenter(data.elements || [], localAppState, null)
             : {}),
         },
+        files: data.files,
       },
       localAppState,
       localElements,
@@ -164,4 +191,94 @@ export const canvasToBlob = async (
       reject(error);
     }
   });
+};
+
+/** generates SHA-1 digest from supplied file (if not supported, falls back
+    to a 40-char base64 random id) */
+export const generateIdFromFile = async (file: File) => {
+  let id: FileId;
+  try {
+    const hashBuffer = await window.crypto.subtle.digest(
+      "SHA-1",
+      await file.arrayBuffer(),
+    );
+    id =
+      // convert buffer to byte array
+      Array.from(new Uint8Array(hashBuffer))
+        // convert to hex string
+        .map((byte) => byte.toString(16).padStart(2, "0"))
+        .join("") as FileId;
+  } catch (error) {
+    console.error(error);
+    // length 40 to align with the HEX length of SHA-1 (which is 160 bit)
+    id = nanoid(40) as FileId;
+  }
+
+  return id;
+};
+
+export const getDataURL = async (file: Blob | File): Promise<DataURL> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataURL = reader.result as DataURL;
+      resolve(dataURL);
+    };
+    reader.onerror = (error) => reject(error);
+    reader.readAsDataURL(file);
+  });
+};
+
+export const dataURLToFile = (dataURL: DataURL, filename = "") => {
+  const dataIndexStart = dataURL.indexOf(",");
+  const byteString = atob(dataURL.slice(dataIndexStart + 1));
+  const mimeType = dataURL.slice(0, dataIndexStart).split(":")[1].split(";")[0];
+
+  const ab = new ArrayBuffer(byteString.length);
+  const ia = new Uint8Array(ab);
+  for (let i = 0; i < byteString.length; i++) {
+    ia[i] = byteString.charCodeAt(i);
+  }
+  return new File([ab], filename, { type: mimeType });
+};
+
+export const resizeImageFile = async (
+  file: File,
+  maxWidthOrHeight: number,
+): Promise<File> => {
+  // SVG files shouldn't a can't be resized
+  if (file.type === MIME_TYPES.svg) {
+    return file;
+  }
+
+  const [pica, imageBlobReduce] = await Promise.all([
+    import("pica").then((res) => res.default),
+    // a wrapper for pica for better API
+    import("image-blob-reduce").then((res) => res.default),
+  ]);
+
+  // CRA's minification settings break pica in WebWorkers, so let's disable
+  // them for now
+  // https://github.com/nodeca/image-blob-reduce/issues/21#issuecomment-757365513
+  const reduce = imageBlobReduce({
+    pica: pica({ features: ["js", "wasm"] }),
+  });
+
+  const fileType = file.type;
+
+  if (!isSupportedImageFile(file)) {
+    throw new Error(t("errors.unsupportedFileType"));
+  }
+
+  return new File(
+    [await reduce.toBlob(file, { max: maxWidthOrHeight })],
+    file.name,
+    { type: fileType },
+  );
+};
+
+export const SVGStringToFile = (SVGString: string, filename: string = "") => {
+  return new File([new TextEncoder().encode(SVGString)], filename, {
+    type: MIME_TYPES.svg,
+  }) as File & { type: typeof MIME_TYPES.svg };
 };
