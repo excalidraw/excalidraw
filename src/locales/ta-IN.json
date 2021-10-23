@@ -4,7 +4,7 @@
     "pasteCharts": "விளக்கப்படங்களை ஒட்டு",
     "selectAll": "Select all",
     "multiSelect": "உறுப்பைத் தெரிவில் சேர்",
-    "moveCanvas": "திரை நகர்த்து",
+    "moveCanvas": "கித்தானை நகர்த்து",
     "cut": "வெட்டு",
     "copy": "நகல்",
     "copyAsPng": "PNG ஆக நகலெடு",
@@ -236,12 +236,12 @@
   },
   "exportDialog": {
     "disk_title": "வட்டில் சேமி",
-    "disk_details": "",
+    "disk_details": "காட்சித் தரவை நீங்கள் பின்னர் இறக்குமதி செய்யக்கூடிய ஒரு கோப்பிற்கு ஏற்றுமதிசெய்க.",
     "disk_button": "கோப்பில் சேமி",
     "link_title": "பகிரக்கூடிய தொடுப்பு",
     "link_details": "வாசிக்க-மட்டும் தொடுப்பாக ஏற்றுமதிசெய்.",
     "link_button": "தொடுப்புக்கு ஏற்றுமதிசெய்",
-    "excalidrawplus_description": "",
+    "excalidrawplus_description": "காட்சியை உன் எக்ஸ்கேலிட்ரா பணியிடத்தில் சேமி.",
     "excalidrawplus_button": "ஏற்றுமதி",
     "excalidrawplus_exportError": "இத்தருணத்தில் எக்ஸ்கேலிட்ரா+ க்கு ஏற்றுமதிசெய்ய முடியவில்லை..."
   },
@@ -258,7 +258,7 @@
     "github": "சிக்கலைக் கண்டீரா? சமர்ப்பி",
     "howto": "எங்கள் கையேடுகளைப் பின்பற்றுக",
     "or": "அ",
-    "preventBinding": "",
+    "preventBinding": "அம்பு பிணைதலைத் தவிர்",
     "shapes": "வடிவங்கள்",
     "shortcuts": "விசைப்பலகை குறுக்குவழிகள்",
     "textFinish": "திருத்துதலை முடி (உரை திருத்தி)",
@@ -266,14 +266,14 @@
     "title": "உதவி",
     "view": "பார்",
     "zoomToFit": "",
-    "zoomToSelection": ""
+    "zoomToSelection": "தெரிவுக்கு விரிவாக்கு"
   },
   "clearCanvasDialog": {
     "title": "கித்தானைத் துடை"
   },
   "encrypted": {
     "tooltip": "",
-    "link": ""
+    "link": "எக்ஸ்கேலிட்ராவில் இருமுனை மறையாக்கம் மீதான வலைப்பூ இடுகை"
   },
   "stats": {
     "angle": "கோணம்",
