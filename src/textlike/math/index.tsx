@@ -32,9 +32,13 @@ import { registerAuxLangData } from "../../i18n";
 import { t } from "../../i18n";
 import { Action } from "../../actions/types";
 import { AppState } from "../../types";
-import { getSelectedElements } from "../../scene";
+import {
+  getCommonAttributeOfSelectedElements,
+  getSelectedElements,
+} from "../../scene";
 import { getElementMap, getNonDeletedElements } from "../../element";
 import { invalidateShapeForElement } from "../../renderer/renderElement";
+import { ButtonSelect } from "../../components/ButtonSelect";
 
 const SUBTYPE_MATH = "math";
 
@@ -58,17 +62,16 @@ const isMathElement = (
   );
 };
 
-export type TextActionNameMath = "toggleUseTex" | "showUseTex";
+export type TextActionNameMath = "changeUseTex";
 
-const textShortcutNamesMath = ["toggleUseTex", "showUseTex"] as const;
+const textShortcutNamesMath = ["changeUseTex"] as const;
 export type TextShortcutNameMath = typeof textShortcutNamesMath[number];
 
 const isTextShortcutNameMath = (s: any): s is TextShortcutNameMath =>
   textShortcutNamesMath.includes(s);
 
 const textShortcutMap: Record<TextShortcutNameMath, string[]> = {
-  showUseTex: [getShortcutKey("Shift+M")],
-  toggleUseTex: [getShortcutKey("CtrlOrCmd+Shift+M")],
+  changeUseTex: [getShortcutKey("CtrlOrCmd+Shift+M")],
 };
 
 let _useTex = true;
@@ -533,6 +536,9 @@ const getSelectedMathElements = (
     getNonDeletedElements(elements),
     appState,
   );
+  if (appState.editingElement) {
+    selectedElements.push(appState.editingElement);
+  }
   const eligibleElements = selectedElements.filter(
     (element, index, eligibleElements) => {
       return isMathElement(element);
@@ -771,7 +777,7 @@ export const registerTextElementSubtypeMath = (
   // Call loadMathJax() here if we want to be sure it's loaded.
 };
 
-const enableActionToggleUseTex = (
+const enableActionChangeUseTex = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ) => {
@@ -793,89 +799,71 @@ const enableActionToggleUseTex = (
   return enabled;
 };
 
-const toggleUseTexForSelectedElements = (
+const setUseTexForSelectedElements = (
   elements: readonly ExcalidrawElement[],
   appState: Readonly<AppState>,
+  useTex: boolean,
 ) => {
+  // Operate on the selected math elements only
   const selectedElements = getSelectedMathElements(elements, appState);
 
   selectedElements.forEach((element) => {
     const isMathJaxLoaded = mathJaxLoaded;
-    // Only operate on selected elements which are text elements in
-    // math mode containing math content.
-    if (
-      isMathMode(getFontString(element)) &&
-      (containsMath(element.text, element.useTex) ||
-        containsMath(element.text, !element.useTex))
-    ) {
-      // Toggle the useTex field
-      mutateElement(element, { useTex: !element.useTex });
-      // Mark the element for re-rendering
-      invalidateShapeForElement(element);
-      // Update the width/height of the element
-      const metrics = measureMath(
-        element.text,
-        element.fontSize,
-        element.fontFamily,
-        element.useTex,
-        isMathJaxLoaded,
-      );
-      mutateElement(element, metrics);
-      // If only one element is selected, use the element's updated
-      // useTex value to set the default value for new text elements.
-      if (selectedElements.length === 1) {
-        setUseTex(element.useTex);
-      }
-    }
+
+    // Set the useTex field
+    mutateElement(element, { useTex });
+    // Mark the element for re-rendering
+    invalidateShapeForElement(element);
+    // Update the width/height of the element
+    const metrics = measureMath(
+      element.text,
+      element.fontSize,
+      element.fontFamily,
+      element.useTex,
+      isMathJaxLoaded,
+    );
+    mutateElement(element, metrics);
   });
+  // Set the default value for new math-text elements.
+  setUseTex(useTex);
+
+  // Return an array of the elements which were updated
   const updatedElementsMap = getElementMap(elements);
 
   return elements.map((element) => updatedElementsMap[element.id] || element);
 };
 
-const enableActionShowUseTex = (
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-) => {
-  const selectedMathElements = getSelectedMathElements(elements, appState);
-  const selectedElements = getSelectedElements(
-    getNonDeletedElements(elements),
-    appState,
-  );
-  return selectedMathElements.length === 1 || selectedElements.length === 0;
-};
-
-const showUseTexForSelectedElements = (
+const getValueForMathElements = function <T>(
   elements: readonly ExcalidrawElement[],
   appState: Readonly<AppState>,
-) => {
+  getAttribute: (element: ExcalidrawElement) => T,
+): T | null {
   const selectedElements = getSelectedMathElements(elements, appState);
-
-  // Require the "Control" key to toggle Latex/AsciiMath so no one
-  // toggles by accidentally typing "Shift M" without
-  // being in text-editing/entry mode.
-  if (selectedElements.length < 2) {
-    // Only report anything if at most one element is selected, to avoid confusion.
-    // If only one element is selected and that element is a text element,
-    // then report that element's useTex value; otherwise report the default
-    // value for new text elements.
-    const usingTex =
-      selectedElements.length === 1 ? selectedElements[0].useTex : getUseTex();
-    if (usingTex) {
-      window.alert(t("alerts.useTexTrue"));
-    } else {
-      window.alert(t("alerts.useTexFalse"));
-    }
-  }
+  return getCommonAttributeOfSelectedElements(
+    selectedElements,
+    appState,
+    getAttribute,
+  );
 };
 
 const registerActionsMath = () => {
   const mathActions: Action[] = [];
-  const actionToggleUseTex: Action = {
-    name: "toggleUseTex",
-    perform: (elements, appState) => {
+  const actionChangeUseTex: Action = {
+    name: "changeUseTex",
+    perform: (elements, appState, useTex) => {
+      if (useTex === null) {
+        useTex = getValueForMathElements(
+          elements,
+          appState,
+          (element) => isMathElement(element) && element.useTex,
+        );
+        if (useTex === null) {
+          useTex = getUseTex();
+        }
+        useTex = !useTex;
+      }
       return {
-        elements: toggleUseTexForSelectedElements(elements, appState),
+        elements: setUseTexForSelectedElements(elements, appState, useTex),
         appState,
         commitToHistory: true,
       };
@@ -884,25 +872,32 @@ const registerActionsMath = () => {
       event.ctrlKey && event.shiftKey && event.code === "KeyM",
     contextItemLabel: "labels.toggleUseTex",
     contextItemPredicate: (elements, appState) =>
-      enableActionToggleUseTex(elements, appState),
+      enableActionChangeUseTex(elements, appState),
+    PanelComponent: ({ elements, appState, updateData }) => (
+      <fieldset>
+        <legend>{t("labels.changeUseTex")}</legend>
+        <ButtonSelect
+          group="useTex"
+          options={[
+            {
+              value: true,
+              text: t("labels.useTexTrue"),
+            },
+            {
+              value: false,
+              text: t("labels.useTexFalse"),
+            },
+          ]}
+          value={getValueForMathElements(
+            elements,
+            appState,
+            (element) => isMathElement(element) && element.useTex,
+          )}
+          onChange={(value) => updateData(value)}
+        />
+      </fieldset>
+    ),
   };
-
-  const actionShowUseTex: Action = {
-    name: "showUseTex",
-    perform: (elements, appState) => {
-      showUseTexForSelectedElements(elements, appState);
-      return {
-        appState,
-        commitToHistory: false,
-      };
-    },
-    keyTest: (event) =>
-      !event.ctrlKey && event.shiftKey && event.code === "KeyM",
-    contextItemLabel: "labels.showUseTex",
-    contextItemPredicate: (elements, appState) =>
-      enableActionShowUseTex(elements, appState),
-  };
-  mathActions.push(actionToggleUseTex);
-  mathActions.push(actionShowUseTex);
+  mathActions.push(actionChangeUseTex);
   addTextLikeActions(mathActions);
 };
