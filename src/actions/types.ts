@@ -136,7 +136,7 @@ export interface Action {
 }
 
 export interface ActionsManagerInterface {
-  actions: Record<ActionName, Action>;
+  actions: Record<ActionName | TextActionName, Action>;
   registerAction: (action: Action) => void;
   handleKeyDown: (event: React.KeyboardEvent | KeyboardEvent) => boolean;
   renderAction: (name: ActionName) => React.ReactElement | null;

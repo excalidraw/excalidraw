@@ -18,6 +18,7 @@ import { AppState, Zoom } from "../types";
 import { capitalizeString, isTransparent, setCursorForShape } from "../utils";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
+import { getTextLikeActions } from "../textlike";
 
 export const SelectedShapeActions = ({
   appState,
@@ -83,6 +84,10 @@ export const SelectedShapeActions = ({
           {renderAction("changeFontFamily")}
 
           {renderAction("changeTextAlign")}
+
+          {getTextLikeActions().map((action) => {
+            return renderAction(action.name);
+          })}
         </>
       )}
 

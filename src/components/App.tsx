@@ -4119,12 +4119,14 @@ class App extends React.Component<AppProps, AppState> {
 
     const maybeUse: boolean[] = [];
     getTextLikeActions().forEach((action) => {
-      maybeUse.push(
-        action.contextItemPredicate!(
-          this.actionManager.getElementsIncludingDeleted(),
-          this.actionManager.getAppState(),
-        ),
-      );
+      if (action.contextItemPredicate) {
+        maybeUse.push(
+          action.contextItemPredicate!(
+            this.actionManager.getElementsIncludingDeleted(),
+            this.actionManager.getAppState(),
+          ),
+        );
+      }
     });
 
     const separator = "separator";
