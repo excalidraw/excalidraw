@@ -137,8 +137,8 @@
     "lightMode": "வெளிர்ந்த பயன்முறை",
     "zenMode": "",
     "exitZenMode": "",
-    "cancel": "",
-    "clear": ""
+    "cancel": "ரத்துசெய்",
+    "clear": "துடை"
   },
   "alerts": {
     "clearReset": "",
@@ -163,15 +163,15 @@
     "invalidEncryptionKey": "மறையாக்க விசை 22 வரியுருக்கள் கொண்டிருக்கவேண்டும். நேரடி கூட்டுப்பணி முடக்கப்பட்டது."
   },
   "errors": {
-    "unsupportedFileType": "",
-    "imageInsertError": "",
-    "fileTooBig": "",
-    "svgImageInsertError": "",
+    "unsupportedFileType": "ஆதரிக்கப்படா கோப்பு வகை.",
+    "imageInsertError": "படத்தைச் செருக முடியவில்லை. பிறகு மீண்டும் முயலவும்...",
+    "fileTooBig": "கோப்பு மிகப்பெரிது. அனுமதிக்கப்பட்ட அதிகபட்ச அளவு {{maxSize}}.",
+    "svgImageInsertError": "எஸ்விஜி படத்தைச் செருக இயலா. எஸ்விஜியின் மார்க்அப் செல்லாததாக தெரிகிறது.",
     "invalidSVGString": ""
   },
   "toolBar": {
     "selection": "தெரிவு",
-    "image": "",
+    "image": "படத்தைச் செருகு",
     "rectangle": "செவ்வகம்",
     "diamond": "வைரம்",
     "ellipse": "நீள்வட்டம்",
@@ -196,12 +196,12 @@
     "linearElementMulti": "",
     "lockAngle": "",
     "resize": "",
-    "resizeImage": "",
+    "resizeImage": "SHIFTஐ நீண்டழுத்தி கட்டற்று அளவுமாற்றலாம்,\nமையத்திலிருந்து அளவுமாற்ற ALTஐ நீண்டழுத்துக",
     "rotate": "",
     "lineEditor_info": "புள்ளிகளைத் திருத்த இரு-சொடுக்கு அ Enterஐ அழுத்து",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
-    "placeImage": ""
+    "placeImage": "படத்தை வைக்கச் சொடுக்கு, அ கைமுறையாக அளவை அமைக்க சொடுக்கி நகரத்து"
   },
   "canvasError": {
     "cannotShowPreview": "முன்னோட்டம் காட்ட இயலவில்லை",
@@ -269,7 +269,7 @@
     "zoomToSelection": ""
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "கித்தானைத் துடை"
   },
   "encrypted": {
     "tooltip": "",
