@@ -11,6 +11,7 @@ import { ExcalidrawElement } from "../element/types";
 import { AppProps, AppState } from "../types";
 import { MODES } from "../constants";
 import Library from "../data/library";
+import { TextActionName } from "../textlike";
 
 // This is the <App> component, but for now we don't care about anything but its
 // `canvas` state.
@@ -116,7 +117,10 @@ export class ActionManager implements ActionsManagerInterface {
   /**
    * @param data additional data sent to the PanelComponent
    */
-  renderAction = (name: ActionName, data?: PanelComponentProps["data"]) => {
+  renderAction = (
+    name: ActionName | TextActionName,
+    data?: PanelComponentProps["data"],
+  ) => {
     const canvasActions = this.app.props.UIOptions.canvasActions;
 
     if (
