@@ -21,7 +21,7 @@ Please add the latest change on the top under the correct section.
 
   - File data are encoded as DataURLs (base64) for portability reasons.
 
-  [ExcalidrawAPI](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onLibraryChange):
+  [ExcalidrawAPI](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#ref):
 
   - added `getFiles()` to get current `BinaryFiles` (`Record<FileId, BinaryFileData>`). It may contain files that aren't referenced by any element, so if you're persisting the files to a storage, you should compare them against stored elements.
 
@@ -36,6 +36,8 @@ Please add the latest change on the top under the correct section.
 
   - `.excalidraw` files may now contain top-level `files` key in format of `Record<FileId, BinaryFileData>` when exporting any (image) elements.
   - Changes were made to various export utilityies exported from the package so that they take `files`. For now, TypeScript should help you figure the changes out.
+
+- Expose App instance from [ExcalidrawAPI](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#ref) [#4088](https://github.com/excalidraw/excalidraw/pull/4088).
 
 ## Excalidraw API
 
