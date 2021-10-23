@@ -1520,19 +1520,23 @@ class App extends React.Component<AppProps, AppState> {
       }, new Map<FileId, BinaryFileData>());
 
       this.files = { ...this.files, ...Object.fromEntries(filesMap) };
-      this.addNewImagesToImageCache();
 
       // bump versions for elements that reference added files so that
-      // we/host apps can detect the change
+      // we/host apps can detect the change, and invalidate the image & shape
+      // cache
       this.scene.getElements().forEach((element) => {
         if (
           isInitializedImageElement(element) &&
           filesMap.has(element.fileId)
         ) {
+          this.imageCache.delete(element.fileId);
+          invalidateShapeForElement(element);
           bumpVersion(element);
         }
       });
       this.scene.informMutation();
+
+      this.addNewImagesToImageCache();
     },
   );
 
