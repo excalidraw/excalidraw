@@ -30,6 +30,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     name,
     renderCustomStats,
     onPaste,
+    onDrop,
     detectScroll = true,
     handleKeyboardGlobally = false,
     onLibraryChange,
@@ -93,6 +94,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
         renderCustomStats={renderCustomStats}
         UIOptions={UIOptions}
         onPaste={onPaste}
+        onDrop={onDrop}
         detectScroll={detectScroll}
         handleKeyboardGlobally={handleKeyboardGlobally}
         onLibraryChange={onLibraryChange}

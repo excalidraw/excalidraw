@@ -3,6 +3,7 @@ const TerserPlugin = require("terser-webpack-plugin");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
   .BundleAnalyzerPlugin;
 const autoprefixer = require("autoprefixer");
+const webpack = require("webpack");
 
 module.exports = {
   mode: "production",
@@ -73,15 +74,7 @@ module.exports = {
       },
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/,
-        use: [
-          {
-            loader: "file-loader",
-            options: {
-              name: "[name].[ext]",
-              outputPath: "excalidraw-assets",
-            },
-          },
-        ],
+        type: "asset/inline",
       },
     ],
   },
@@ -104,6 +97,7 @@ module.exports = {
   },
   plugins: [
     ...(process.env.ANALYZER === "true" ? [new BundleAnalyzerPlugin()] : []),
+    new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 }),
   ],
   externals: {
     react: {

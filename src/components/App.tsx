@@ -27,6 +27,7 @@ import {
   actionToggleStats,
   actionToggleZenMode,
   actionUngroup,
+  zoomToFitElements,
 } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
@@ -325,6 +326,7 @@ class App extends React.Component<AppProps, AppState> {
           clear: this.resetHistory,
         },
         scrollToContent: this.scrollToContent,
+        zoomToFit: this.zoomToFit,
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
         getFiles: () => this.files,
@@ -1420,6 +1422,7 @@ class App extends React.Component<AppProps, AppState> {
       opacity: this.state.currentItemOpacity,
       strokeSharpness: this.state.currentItemStrokeSharpness,
       text,
+      rawText: text,
       fontSize: this.state.currentItemFontSize,
       fontFamily: this.state.currentItemFontFamily,
       textAlign: this.state.currentItemTextAlign,
@@ -1485,6 +1488,22 @@ class App extends React.Component<AppProps, AppState> {
         this.canvas,
       ),
     });
+  };
+
+  zoomToFit = (
+    target: readonly ExcalidrawElement[] = this.scene.getElements(),
+    maxZoom: number = 1, //null will zoom to max based on viewport
+    margin: number = 0.03, //percentage of viewport width&height
+  ) => {
+    if (!target) {
+      target = this.scene.getElements();
+    }
+    if (target.length === 0) {
+      maxZoom = 1;
+    }
+    this.setState(
+      zoomToFitElements(target, this.state, false, maxZoom, margin).appState,
+    );
   };
 
   clearToast = () => {
@@ -1859,12 +1878,17 @@ class App extends React.Component<AppProps, AppState> {
       isExistingElement?: boolean;
     },
   ) {
-    const updateElement = (text: string, isDeleted = false) => {
+    const updateElement = (
+      text: string,
+      rawText?: string,
+      isDeleted = false,
+    ) => {
       this.scene.replaceAllElements([
         ...this.scene.getElementsIncludingDeleted().map((_element) => {
           if (_element.id === element.id && isTextElement(_element)) {
             return updateTextElement(_element, {
               text,
+              rawText: rawText ? rawText : text,
               isDeleted,
             });
           }
@@ -1917,6 +1941,7 @@ class App extends React.Component<AppProps, AppState> {
       }),
       onSubmit: withBatchedUpdates(({ text, viaKeyboard }) => {
         const isDeleted = !text.trim();
+        const rawText = text;
         if (this.props.onBeforeTextSubmit) {
           const updatedText = this.props.onBeforeTextSubmit(
             element,
@@ -1925,7 +1950,7 @@ class App extends React.Component<AppProps, AppState> {
           );
           text = updatedText ?? text;
         }
-        updateElement(text, isDeleted);
+        updateElement(text, rawText, isDeleted);
         // select the created text element only if submitting via keyboard
         // (when submitting via click it should act as signal to deselect)
         if (!isDeleted && viaKeyboard) {
@@ -2072,6 +2097,7 @@ class App extends React.Component<AppProps, AppState> {
           opacity: this.state.currentItemOpacity,
           strokeSharpness: this.state.currentItemStrokeSharpness,
           text: "",
+          rawText: "",
           fontSize: this.state.currentItemFontSize,
           fontFamily: this.state.currentItemFontFamily,
           textAlign: parentCenterPosition
@@ -4431,6 +4457,15 @@ class App extends React.Component<AppProps, AppState> {
 
   private handleAppOnDrop = async (event: React.DragEvent<HTMLDivElement>) => {
     try {
+      if (this.props.onDrop) {
+        try {
+          if ((await this.props.onDrop(event)) === false) {
+            return;
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
       const file = event.dataTransfer.files[0];
 
       if (isSupportedImageFile(file)) {
