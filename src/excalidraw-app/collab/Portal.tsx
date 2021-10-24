@@ -7,9 +7,11 @@ import {
 import CollabWrapper from "./CollabWrapper";
 
 import { ExcalidrawElement } from "../../element/types";
-import { BROADCAST, SCENE } from "../app_constants";
+import { BROADCAST, FILE_UPLOAD_TIMEOUT, SCENE } from "../app_constants";
 import { UserIdleState } from "../../types";
 import { trackEvent } from "../../analytics";
+import { throttle } from "lodash";
+import { mutateElement } from "../../element/mutateElement";
 
 class Portal {
   collab: CollabWrapper;
@@ -87,6 +89,39 @@ class Portal {
     }
   }
 
+  queueFileUpload = throttle(async () => {
+    try {
+      await this.collab.fileManager.saveFiles({
+        elements: this.collab.excalidrawAPI.getSceneElementsIncludingDeleted(),
+        files: this.collab.excalidrawAPI.getFiles(),
+      });
+    } catch (error) {
+      this.collab.excalidrawAPI.updateScene({
+        appState: {
+          errorMessage: error.message,
+        },
+      });
+    }
+
+    this.collab.excalidrawAPI.updateScene({
+      elements: this.collab.excalidrawAPI
+        .getSceneElementsIncludingDeleted()
+        .map((element) => {
+          if (this.collab.fileManager.shouldUpdateImageElementStatus(element)) {
+            // this will signal collaborators to pull image data from server
+            // (using mutation instead of newElementWith otherwise it'd break
+            // in-progress dragging)
+            return mutateElement(
+              element,
+              { status: "saved" },
+              /* informMutation */ false,
+            );
+          }
+          return element;
+        }),
+    });
+  }, FILE_UPLOAD_TIMEOUT);
+
   broadcastScene = async (
     sceneType: SCENE.INIT | SCENE.UPDATE,
     syncableElements: ExcalidrawElement[],
@@ -125,6 +160,8 @@ class Portal {
     const broadcastPromise = this._broadcastSocketData(
       data as SocketUpdateData,
     );
+
+    this.queueFileUpload();
 
     if (syncAll && this.collab.isCollaborating) {
       await Promise.all([

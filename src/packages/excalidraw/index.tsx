@@ -37,6 +37,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
     autoFocus = false,
     onBeforeTextEdit,
     onBeforeTextSubmit,
+    generateIdForFile,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -100,6 +101,7 @@ const Excalidraw = (props: ExcalidrawProps) => {
         autoFocus={autoFocus}
         onBeforeTextEdit={onBeforeTextEdit}
         onBeforeTextSubmit={onBeforeTextSubmit}
+        generateIdForFile={generateIdForFile}
       />
     </InitializeApp>
   );
@@ -193,3 +195,9 @@ export {
 export { isLinearElement } from "../../element/typeChecks";
 
 export { FONT_FAMILY, THEME } from "../../constants";
+
+export {
+  mutateElement,
+  newElementWith,
+  bumpVersion,
+} from "../../element/mutateElement";

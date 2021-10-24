@@ -3,19 +3,22 @@ import {
   NonDeletedExcalidrawElement,
 } from "./element/types";
 import { getSelectedElements } from "./scene";
-import { AppState } from "./types";
+import { AppState, BinaryFiles } from "./types";
 import { SVG_EXPORT_TAG } from "./scene/export";
 import { tryParseSpreadsheet, Spreadsheet, VALID_SPREADSHEET } from "./charts";
-import { EXPORT_DATA_TYPES } from "./constants";
+import { EXPORT_DATA_TYPES, MIME_TYPES } from "./constants";
+import { isInitializedImageElement } from "./element/typeChecks";
 
 type ElementsClipboard = {
   type: typeof EXPORT_DATA_TYPES.excalidrawClipboard;
   elements: ExcalidrawElement[];
+  files: BinaryFiles | undefined;
 };
 
 export interface ClipboardData {
   spreadsheet?: Spreadsheet;
   elements?: readonly ExcalidrawElement[];
+  files?: BinaryFiles;
   text?: string;
   errorMessage?: string;
 }
@@ -37,7 +40,7 @@ export const probablySupportsClipboardBlob =
 
 const clipboardContainsElements = (
   contents: any,
-): contents is { elements: ExcalidrawElement[] } => {
+): contents is { elements: ExcalidrawElement[]; files?: BinaryFiles } => {
   if (
     [
       EXPORT_DATA_TYPES.excalidraw,
@@ -53,10 +56,18 @@ const clipboardContainsElements = (
 export const copyToClipboard = async (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
+  files: BinaryFiles,
 ) => {
+  const selectedElements = getSelectedElements(elements, appState);
   const contents: ElementsClipboard = {
     type: EXPORT_DATA_TYPES.excalidrawClipboard,
-    elements: getSelectedElements(elements, appState),
+    elements: selectedElements,
+    files: selectedElements.reduce((acc, element) => {
+      if (isInitializedImageElement(element) && files[element.fileId]) {
+        acc[element.fileId] = files[element.fileId];
+      }
+      return acc;
+    }, {} as BinaryFiles),
   };
   const json = JSON.stringify(contents);
   CLIPBOARD = json;
@@ -138,7 +149,10 @@ export const parseClipboard = async (
   try {
     const systemClipboardData = JSON.parse(systemClipboard);
     if (clipboardContainsElements(systemClipboardData)) {
-      return { elements: systemClipboardData.elements };
+      return {
+        elements: systemClipboardData.elements,
+        files: systemClipboardData.files,
+      };
     }
     return appClipboardData;
   } catch {
@@ -153,7 +167,7 @@ export const parseClipboard = async (
 
 export const copyBlobToClipboardAsPng = async (blob: Blob) => {
   await navigator.clipboard.write([
-    new window.ClipboardItem({ "image/png": blob }),
+    new window.ClipboardItem({ [MIME_TYPES.png]: blob }),
   ]);
 };
 

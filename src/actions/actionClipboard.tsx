@@ -9,8 +9,8 @@ import { t } from "../i18n";
 
 export const actionCopy = register({
   name: "copy",
-  perform: (elements, appState) => {
-    copyToClipboard(getNonDeletedElements(elements), appState);
+  perform: (elements, appState, _, app) => {
+    copyToClipboard(getNonDeletedElements(elements), appState, app.files);
 
     return {
       commitToHistory: false,
@@ -50,6 +50,7 @@ export const actionCopyAsSvg = register({
           ? selectedElements
           : getNonDeletedElements(elements),
         appState,
+        app.files,
         appState,
       );
       return {
@@ -88,6 +89,7 @@ export const actionCopyAsPng = register({
           ? selectedElements
           : getNonDeletedElements(elements),
         appState,
+        app.files,
         appState,
       );
       return {
