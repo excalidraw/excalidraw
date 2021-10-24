@@ -1912,6 +1912,7 @@ class App extends React.Component<AppProps, AppState> {
             return _element;
           }),
         ]);
+        invalidateShapeForElement(element);
       }
     }
 

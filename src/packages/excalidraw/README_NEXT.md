@@ -747,6 +747,8 @@ getElementsMap(elements:  <a href="https://github.com/excalidraw/excalidraw/blob
 
 ```js
 import { getElementsMap } from "@excalidraw/excalidraw-next";
+```
+
 #### `generateIdForFile`
 
 Allows you to override `id` generation for files added on canvas (images). By default, an SHA-1 digest of the file is used.
