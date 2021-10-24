@@ -20,6 +20,7 @@ import {
   AppProps,
   AppState,
   ExcalidrawProps,
+  BinaryFiles,
   LibraryItem,
   LibraryItems,
 } from "../types";
@@ -53,6 +54,7 @@ import { isImageFileHandle } from "../data/blob";
 interface LayerUIProps {
   actionManager: ActionManager;
   appState: AppState;
+  files: BinaryFiles;
   canvas: HTMLCanvasElement | null;
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
@@ -65,7 +67,10 @@ interface LayerUIProps {
   toggleZenMode: () => void;
   langCode: Language["code"];
   isCollaborating: boolean;
-  renderTopRightUI?: (isMobile: boolean, appState: AppState) => JSX.Element;
+  renderTopRightUI?: (
+    isMobile: boolean,
+    appState: AppState,
+  ) => JSX.Element | null;
   renderCustomFooter?: (isMobile: boolean, appState: AppState) => JSX.Element;
   viewModeEnabled: boolean;
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
@@ -73,6 +78,7 @@ interface LayerUIProps {
   focusContainer: () => void;
   library: Library;
   id: string;
+  onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
 }
 
 const useOnClickOutside = (
@@ -115,6 +121,7 @@ const LibraryMenuItems = ({
   libraryReturnUrl,
   focusContainer,
   library,
+  files,
   id,
 }: {
   libraryItems: LibraryItems;
@@ -123,6 +130,7 @@ const LibraryMenuItems = ({
   onInsertShape: (elements: LibraryItem) => void;
   onAddToLibrary: (elements: LibraryItem) => void;
   theme: AppState["theme"];
+  files: BinaryFiles;
   setAppState: React.Component<any, AppState>["setState"];
   setLibraryItems: (library: LibraryItems) => void;
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
@@ -218,6 +226,7 @@ const LibraryMenuItems = ({
         <Stack.Col key={x}>
           <LibraryUnit
             elements={libraryItems[y + x]}
+            files={files}
             pendingElements={
               shouldAddPendingElements ? pendingElements : undefined
             }
@@ -252,6 +261,7 @@ const LibraryMenu = ({
   onAddToLibrary,
   theme,
   setAppState,
+  files,
   libraryReturnUrl,
   focusContainer,
   library,
@@ -262,6 +272,7 @@ const LibraryMenu = ({
   onInsertShape: (elements: LibraryItem) => void;
   onAddToLibrary: () => void;
   theme: AppState["theme"];
+  files: BinaryFiles;
   setAppState: React.Component<any, AppState>["setState"];
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   focusContainer: () => void;
@@ -283,12 +294,12 @@ const LibraryMenu = ({
     "preloading" | "loading" | "ready"
   >("preloading");
 
-  const loadingTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const loadingTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     Promise.race([
       new Promise((resolve) => {
-        loadingTimerRef.current = setTimeout(() => {
+        loadingTimerRef.current = window.setTimeout(() => {
           resolve("loading");
         }, 100);
       }),
@@ -321,6 +332,12 @@ const LibraryMenu = ({
 
   const addToLibrary = useCallback(
     async (elements: LibraryItem) => {
+      if (elements.some((element) => element.type === "image")) {
+        return setAppState({
+          errorMessage: "Support for adding images to the library coming soon!",
+        });
+      }
+
       const items = await library.loadLibrary();
       const nextItems = [...items, elements];
       onAddToLibrary();
@@ -352,6 +369,7 @@ const LibraryMenu = ({
           focusContainer={focusContainer}
           library={library}
           theme={theme}
+          files={files}
           id={id}
         />
       )}
@@ -362,6 +380,7 @@ const LibraryMenu = ({
 const LayerUI = ({
   actionManager,
   appState,
+  files,
   setAppState,
   canvas,
   elements,
@@ -381,6 +400,7 @@ const LayerUI = ({
   focusContainer,
   library,
   id,
+  onImageAction,
 }: LayerUIProps) => {
   const isMobile = useIsMobile();
 
@@ -393,6 +413,7 @@ const LayerUI = ({
       <JSONExportDialog
         elements={elements}
         appState={appState}
+        files={files}
         actionManager={actionManager}
         exportOpts={UIOptions.canvasActions.export}
         canvas={canvas}
@@ -408,11 +429,17 @@ const LayerUI = ({
     const createExporter = (type: ExportType): ExportCB => async (
       exportedElements,
     ) => {
-      const fileHandle = await exportCanvas(type, exportedElements, appState, {
-        exportBackground: appState.exportBackground,
-        name: appState.name,
-        viewBackgroundColor: appState.viewBackgroundColor,
-      })
+      const fileHandle = await exportCanvas(
+        type,
+        exportedElements,
+        appState,
+        files,
+        {
+          exportBackground: appState.exportBackground,
+          name: appState.name,
+          viewBackgroundColor: appState.viewBackgroundColor,
+        },
+      )
         .catch(muteFSAbortError)
         .catch((error) => {
           console.error(error);
@@ -432,6 +459,7 @@ const LayerUI = ({
       <ImageExportDialog
         elements={elements}
         appState={appState}
+        files={files}
         actionManager={actionManager}
         onExportToPng={createExporter("png")}
         onExportToSvg={createExporter("svg")}
@@ -465,6 +493,7 @@ const LayerUI = ({
       </Section>
     );
   };
+
   const renderCanvasActions = () => (
     <Section
       heading="canvasActions"
@@ -557,6 +586,7 @@ const LayerUI = ({
       focusContainer={focusContainer}
       library={library}
       theme={appState.theme}
+      files={files}
       id={id}
     />
   ) : null;
@@ -601,6 +631,11 @@ const LayerUI = ({
                           canvas={canvas}
                           elementType={appState.elementType}
                           setAppState={setAppState}
+                          onImageAction={({ pointerType }) => {
+                            onImageAction({
+                              insertOnCanvasDirectly: pointerType !== "mouse",
+                            });
+                          }}
                         />
                       </Stack.Row>
                     </Island>
@@ -761,6 +796,8 @@ const LayerUI = ({
         renderCustomFooter={renderCustomFooter}
         viewModeEnabled={viewModeEnabled}
         showThemeBtn={showThemeBtn}
+        onImageAction={onImageAction}
+        renderTopRightUI={renderTopRightUI}
       />
     </>
   ) : (

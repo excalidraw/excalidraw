@@ -1,18 +1,28 @@
 import throttle from "lodash.throttle";
-import React, { PureComponent } from "react";
+import { PureComponent } from "react";
 import { ExcalidrawImperativeAPI } from "../../types";
 import { ErrorDialog } from "../../components/ErrorDialog";
 import { APP_NAME, ENV, EVENT } from "../../constants";
 import { ImportedDataState } from "../../data/types";
-import { ExcalidrawElement } from "../../element/types";
+import {
+  ExcalidrawElement,
+  InitializedExcalidrawImageElement,
+} from "../../element/types";
 import {
   getElementMap,
   getSceneVersion,
 } from "../../packages/excalidraw/index";
 import { Collaborator, Gesture } from "../../types";
-import { resolvablePromise, withBatchedUpdates } from "../../utils";
 import {
+  preventUnload,
+  resolvablePromise,
+  withBatchedUpdates,
+} from "../../utils";
+import {
+  FILE_UPLOAD_MAX_BYTES,
+  FIREBASE_STORAGE_PREFIXES,
   INITIAL_SCENE_UPDATE_TIMEOUT,
+  LOAD_IMAGES_TIMEOUT,
   SCENE,
   SYNC_FULL_SCENE_INTERVAL_MS,
 } from "../app_constants";
@@ -25,7 +35,9 @@ import {
 } from "../data";
 import {
   isSavedToFirebase,
+  loadFilesFromFirebase,
   loadFromFirebase,
+  saveFilesToFirebase,
   saveToFirebase,
 } from "../data/firebase";
 import {
@@ -41,6 +53,17 @@ import { UserIdleState } from "../../types";
 import { IDLE_THRESHOLD, ACTIVE_THRESHOLD } from "../../constants";
 import { trackEvent } from "../../analytics";
 import { isInvisiblySmallElement } from "../../element";
+import {
+  encodeFilesForUpload,
+  FileManager,
+  updateStaleImageStatuses,
+} from "../data/FileManager";
+import { AbortError } from "../../errors";
+import {
+  isImageElement,
+  isInitializedImageElement,
+} from "../../element/typeChecks";
+import { mutateElement } from "../../element/mutateElement";
 
 interface CollabState {
   modalIsShown: boolean;
@@ -61,6 +84,7 @@ export interface CollabAPI {
   initializeSocketClient: CollabInstance["initializeSocketClient"];
   onCollabButtonClick: CollabInstance["onCollabButtonClick"];
   broadcastElements: CollabInstance["broadcastElements"];
+  fetchImageFilesFromFirebase: CollabInstance["fetchImageFilesFromFirebase"];
 }
 
 type ReconciledElements = readonly ExcalidrawElement[] & {
@@ -69,6 +93,7 @@ type ReconciledElements = readonly ExcalidrawElement[] & {
 
 interface Props {
   excalidrawAPI: ExcalidrawImperativeAPI;
+  onRoomClose?: () => void;
 }
 
 const {
@@ -81,12 +106,13 @@ export { CollabContext, CollabContextConsumer };
 
 class CollabWrapper extends PureComponent<Props, CollabState> {
   portal: Portal;
+  fileManager: FileManager;
   excalidrawAPI: Props["excalidrawAPI"];
   isCollaborating: boolean = false;
   activeIntervalId: number | null;
   idleTimeoutId: number | null;
 
-  private socketInitializationTimer?: NodeJS.Timeout;
+  private socketInitializationTimer?: number;
   private lastBroadcastedOrReceivedSceneVersion: number = -1;
   private collaborators = new Map<string, Collaborator>();
 
@@ -100,6 +126,31 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       activeRoomLink: "",
     };
     this.portal = new Portal(this);
+    this.fileManager = new FileManager({
+      getFiles: async (fileIds) => {
+        const { roomId, roomKey } = this.portal;
+        if (!roomId || !roomKey) {
+          throw new AbortError();
+        }
+
+        return loadFilesFromFirebase(`files/rooms/${roomId}`, roomKey, fileIds);
+      },
+      saveFiles: async ({ addedFiles }) => {
+        const { roomId, roomKey } = this.portal;
+        if (!roomId || !roomKey) {
+          throw new AbortError();
+        }
+
+        return saveFilesToFirebase({
+          prefix: `${FIREBASE_STORAGE_PREFIXES.collabFiles}/${roomId}`,
+          files: await encodeFilesForUpload({
+            files: addedFiles,
+            encryptionKey: roomKey,
+            maxBytes: FILE_UPLOAD_MAX_BYTES,
+          }),
+        });
+      },
+    });
     this.excalidrawAPI = props.excalidrawAPI;
     this.activeIntervalId = null;
     this.idleTimeoutId = null;
@@ -152,15 +203,14 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
     if (
       this.isCollaborating &&
-      !isSavedToFirebase(this.portal, syncableElements)
+      (this.fileManager.shouldPreventUnload(syncableElements) ||
+        !isSavedToFirebase(this.portal, syncableElements))
     ) {
       // this won't run in time if user decides to leave the site, but
       //  the purpose is to run in immediately after user decides to stay
       this.saveCollabRoomToFirebase(syncableElements);
 
-      event.preventDefault();
-      // NOTE: modern browsers no longer allow showing a custom message here
-      event.returnValue = "";
+      preventUnload(event);
     }
 
     if (this.isCollaborating || this.portal.roomId) {
@@ -199,6 +249,22 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       window.history.pushState({}, APP_NAME, window.location.origin);
       this.destroySocketClient();
       trackEvent("share", "room closed");
+
+      this.props.onRoomClose?.();
+
+      const elements = this.excalidrawAPI
+        .getSceneElementsIncludingDeleted()
+        .map((element) => {
+          if (isImageElement(element) && element.status === "saved") {
+            return mutateElement(element, { status: "pending" }, false);
+          }
+          return element;
+        });
+
+      this.excalidrawAPI.updateScene({
+        elements,
+        commitToHistory: false,
+      });
     }
   };
 
@@ -213,7 +279,26 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       });
       this.isCollaborating = false;
     }
+    this.lastBroadcastedOrReceivedSceneVersion = -1;
     this.portal.close();
+    this.fileManager.reset();
+  };
+
+  private fetchImageFilesFromFirebase = async (scene: {
+    elements: readonly ExcalidrawElement[];
+  }) => {
+    const unfetchedImages = scene.elements
+      .filter((element) => {
+        return (
+          isInitializedImageElement(element) &&
+          !this.fileManager.isFileHandled(element.fileId) &&
+          !element.isDeleted &&
+          element.status === "saved"
+        );
+      })
+      .map((element) => (element as InitializedExcalidrawImageElement).fileId);
+
+    return await this.fileManager.getFiles(unfetchedImages);
   };
 
   private initializeSocketClient = async (
@@ -267,7 +352,16 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
         console.error(error);
       }
     } else {
-      const elements = this.excalidrawAPI.getSceneElements();
+      const elements = this.excalidrawAPI.getSceneElements().map((element) => {
+        if (isImageElement(element) && element.status === "saved") {
+          return mutateElement(
+            element,
+            { status: "pending" },
+            /* informMutation */ false,
+          );
+        }
+        return element;
+      });
       // remove deleted elements from elements array & history to ensure we don't
       // expose potentially sensitive user data in case user manually deletes
       // existing elements (or clears scene), which would otherwise be persisted
@@ -277,11 +371,16 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
         elements,
         commitToHistory: true,
       });
+
+      this.broadcastElements(elements);
+
+      const syncableElements = this.getSyncableElements(elements);
+      this.saveCollabRoomToFirebase(syncableElements);
     }
 
     // fallback in case you're not alone in the room but still don't receive
     // initial SCENE_UPDATE message
-    this.socketInitializationTimer = setTimeout(() => {
+    this.socketInitializationTimer = window.setTimeout(() => {
       this.initializeSocket();
       scenePromise.resolve(null);
     }, INITIAL_SCENE_UPDATE_TIMEOUT);
@@ -446,6 +545,23 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     return newElements as ReconciledElements;
   };
 
+  private loadImageFiles = throttle(async () => {
+    const {
+      loadedFiles,
+      erroredFiles,
+    } = await this.fetchImageFilesFromFirebase({
+      elements: this.excalidrawAPI.getSceneElementsIncludingDeleted(),
+    });
+
+    this.excalidrawAPI.addFiles(loadedFiles);
+
+    updateStaleImageStatuses({
+      excalidrawAPI: this.excalidrawAPI,
+      erroredFiles,
+      elements: this.excalidrawAPI.getSceneElementsIncludingDeleted(),
+    });
+  }, LOAD_IMAGES_TIMEOUT);
+
   private handleRemoteSceneUpdate = (
     elements: ReconciledElements,
     { init = false }: { init?: boolean } = {},
@@ -460,6 +576,8 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     // undo, a user makes a change, and then try to redo, your element(s) will be lost. However,
     // right now we think this is the right tradeoff.
     this.excalidrawAPI.history.clear();
+
+    this.loadImageFiles();
   };
 
   private onPointerMove = () => {
@@ -622,6 +740,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     this.contextValue.initializeSocketClient = this.initializeSocketClient;
     this.contextValue.onCollabButtonClick = this.onCollabButtonClick;
     this.contextValue.broadcastElements = this.broadcastElements;
+    this.contextValue.fetchImageFilesFromFirebase = this.fetchImageFilesFromFirebase;
     return this.contextValue;
   };
 
