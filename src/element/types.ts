@@ -1,10 +1,11 @@
 import { Point } from "../types";
-import { FONT_FAMILY } from "../constants";
+import { FONT_FAMILY, THEME } from "../constants";
 
 export type ChartType = "bar" | "line";
 export type FillStyle = "hachure" | "cross-hatch" | "solid";
 export type FontFamilyKeys = keyof typeof FONT_FAMILY;
 export type FontFamilyValues = typeof FONT_FAMILY[FontFamilyKeys];
+export type Theme = typeof THEME[keyof typeof THEME];
 export type FontString = string & { _brand: "fontString" };
 export type GroupId = string;
 export type PointerType = "mouse" | "pen" | "touch";
@@ -62,6 +63,21 @@ export type ExcalidrawEllipseElement = _ExcalidrawElementBase & {
   type: "ellipse";
 };
 
+export type ExcalidrawImageElement = _ExcalidrawElementBase &
+  Readonly<{
+    type: "image";
+    fileId: FileId | null;
+    /** whether respective file is persisted */
+    status: "pending" | "saved" | "error";
+    /** X and Y scale factors <-1, 1>, used for image axis flipping */
+    scale: [number, number];
+  }>;
+
+export type InitializedExcalidrawImageElement = MarkNonNullable<
+  ExcalidrawImageElement,
+  "fileId"
+>;
+
 /**
  * These are elements that don't have any additional properties.
  */
@@ -80,10 +96,11 @@ export type ExcalidrawElement =
   | ExcalidrawGenericElement
   | ExcalidrawTextElement
   | ExcalidrawLinearElement
-  | ExcalidrawFreeDrawElement;
+  | ExcalidrawFreeDrawElement
+  | ExcalidrawImageElement;
 
 export type NonDeleted<TElement extends ExcalidrawElement> = TElement & {
-  isDeleted: false;
+  isDeleted: boolean;
 };
 
 export type NonDeletedExcalidrawElement = NonDeleted<ExcalidrawElement>;
@@ -103,7 +120,8 @@ export type ExcalidrawBindableElement =
   | ExcalidrawRectangleElement
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement
-  | ExcalidrawTextElement;
+  | ExcalidrawTextElement
+  | ExcalidrawImageElement;
 
 export type PointBinding = {
   elementId: ExcalidrawBindableElement["id"];
@@ -132,3 +150,5 @@ export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
     simulatePressure: boolean;
     lastCommittedPoint: Point | null;
   }>;
+
+export type FileId = string & { _brand: "FileId" };

@@ -3,7 +3,7 @@ import { ActionsManagerInterface } from "../actions/types";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { useIsMobile } from "./App";
-import { AppState, ExportOpts } from "../types";
+import { AppState, ExportOpts, BinaryFiles } from "../types";
 import { Dialog } from "./Dialog";
 import { exportFile, exportToFileIcon, link } from "./icons";
 import { ToolButton } from "./ToolButton";
@@ -11,7 +11,7 @@ import { actionSaveFileToDisk } from "../actions/actionExport";
 import { Card } from "./Card";
 
 import "./ExportDialog.scss";
-import { supported as fsSupported } from "browser-fs-access";
+import { nativeFileSystemSupported } from "../data/filesystem";
 
 export type ExportCB = (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -21,11 +21,13 @@ export type ExportCB = (
 const JSONExportModal = ({
   elements,
   appState,
+  files,
   actionManager,
   exportOpts,
   canvas,
 }: {
   appState: AppState;
+  files: BinaryFiles;
   elements: readonly NonDeletedExcalidrawElement[];
   actionManager: ActionsManagerInterface;
   onCloseRequest: () => void;
@@ -42,7 +44,8 @@ const JSONExportModal = ({
             <h2>{t("exportDialog.disk_title")}</h2>
             <div className="Card-details">
               {t("exportDialog.disk_details")}
-              {!fsSupported && actionManager.renderAction("changeProjectName")}
+              {!nativeFileSystemSupported &&
+                actionManager.renderAction("changeProjectName")}
             </div>
             <ToolButton
               className="Card-button"
@@ -67,12 +70,14 @@ const JSONExportModal = ({
               title={t("exportDialog.link_button")}
               aria-label={t("exportDialog.link_button")}
               showAriaLabel={true}
-              onClick={() => onExportToBackend(elements, appState, canvas)}
+              onClick={() =>
+                onExportToBackend(elements, appState, files, canvas)
+              }
             />
           </Card>
         )}
         {exportOpts.renderCustomUI &&
-          exportOpts.renderCustomUI(elements, appState, canvas)}
+          exportOpts.renderCustomUI(elements, appState, files, canvas)}
       </div>
     </div>
   );
@@ -81,12 +86,14 @@ const JSONExportModal = ({
 export const JSONExportDialog = ({
   elements,
   appState,
+  files,
   actionManager,
   exportOpts,
   canvas,
 }: {
-  appState: AppState;
   elements: readonly NonDeletedExcalidrawElement[];
+  appState: AppState;
+  files: BinaryFiles;
   actionManager: ActionsManagerInterface;
   exportOpts: ExportOpts;
   canvas: HTMLCanvasElement | null;
@@ -115,6 +122,7 @@ export const JSONExportDialog = ({
           <JSONExportModal
             elements={elements}
             appState={appState}
+            files={files}
             actionManager={actionManager}
             onCloseRequest={handleClose}
             exportOpts={exportOpts}

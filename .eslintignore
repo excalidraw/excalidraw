@@ -5,3 +5,4 @@ package-lock.json
 firebase/
 dist/
 public/workbox
+src/packages/excalidraw/types

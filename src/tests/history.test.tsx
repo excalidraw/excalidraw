@@ -1,4 +1,3 @@
-import React from "react";
 import { assertSelectedElements, render } from "./test-utils";
 import ExcalidrawApp from "../excalidraw-app";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
@@ -6,7 +5,7 @@ import { API } from "./helpers/api";
 import { getDefaultAppState } from "../appState";
 import { waitFor } from "@testing-library/react";
 import { createUndoAction, createRedoAction } from "../actions/actionHistory";
-import { EXPORT_DATA_TYPES } from "../constants";
+import { EXPORT_DATA_TYPES, MIME_TYPES } from "../constants";
 
 const { h } = window;
 
@@ -87,7 +86,7 @@ describe("history", () => {
             elements: [API.createElement({ type: "rectangle", id: "B" })],
           }),
         ],
-        { type: "application/json" },
+        { type: MIME_TYPES.json },
       ),
     );
 

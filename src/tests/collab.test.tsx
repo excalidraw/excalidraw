@@ -1,4 +1,3 @@
-import React from "react";
 import { render, updateSceneData, waitFor } from "./test-utils";
 import ExcalidrawApp from "../excalidraw-app";
 import { API } from "./helpers/api";
@@ -20,11 +19,21 @@ jest.mock("../excalidraw-app/data/firebase.ts", () => {
   const loadFromFirebase = async () => null;
   const saveToFirebase = () => {};
   const isSavedToFirebase = () => true;
+  const loadFilesFromFirebase = async () => ({
+    loadedFiles: [],
+    erroredFiles: [],
+  });
+  const saveFilesToFirebase = async () => ({
+    savedFiles: new Map(),
+    erroredFiles: new Map(),
+  });
 
   return {
     loadFromFirebase,
     saveToFirebase,
     isSavedToFirebase,
+    loadFilesFromFirebase,
+    saveFilesToFirebase,
   };
 });
 

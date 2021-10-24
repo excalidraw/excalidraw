@@ -23,6 +23,7 @@ import {
   ExcalidrawEllipseElement,
   NonDeleted,
   ExcalidrawFreeDrawElement,
+  ExcalidrawImageElement,
 } from "./types";
 
 import { getElementAbsoluteCoords, getCurvePathOps, Bounds } from "./bounds";
@@ -30,6 +31,7 @@ import { Point } from "../types";
 import { Drawable } from "roughjs/bin/core";
 import { AppState } from "../types";
 import { getShapeForElement } from "../renderer/renderElement";
+import { isImageElement } from "./typeChecks";
 
 const isElementDraggableFromInside = (
   element: NonDeletedExcalidrawElement,
@@ -47,8 +49,7 @@ const isElementDraggableFromInside = (
   if (element.type === "line") {
     return isDraggableFromInside && isPathALoop(element.points);
   }
-
-  return isDraggableFromInside;
+  return isDraggableFromInside || isImageElement(element);
 };
 
 export const hitTest = (
@@ -161,6 +162,7 @@ type HitTestArgs = {
 const hitTestPointAgainstElement = (args: HitTestArgs): boolean => {
   switch (args.element.type) {
     case "rectangle":
+    case "image":
     case "text":
     case "diamond":
     case "ellipse":
@@ -195,6 +197,7 @@ export const distanceToBindableElement = (
 ): number => {
   switch (element.type) {
     case "rectangle":
+    case "image":
     case "text":
       return distanceToRectangle(element, point);
     case "diamond":
@@ -224,7 +227,8 @@ const distanceToRectangle = (
   element:
     | ExcalidrawRectangleElement
     | ExcalidrawTextElement
-    | ExcalidrawFreeDrawElement,
+    | ExcalidrawFreeDrawElement
+    | ExcalidrawImageElement,
   point: Point,
 ): number => {
   const [, pointRel, hwidth, hheight] = pointRelativeToElement(element, point);
@@ -328,15 +332,15 @@ const hitTestFreeDrawElement = (
   let P: readonly [number, number];
 
   // For freedraw dots
-  if (element.points.length === 2) {
-    return (
-      distance2d(A[0], A[1], x, y) < threshold ||
-      distance2d(B[0], B[1], x, y) < threshold
-    );
+  if (
+    distance2d(A[0], A[1], x, y) < threshold ||
+    distance2d(B[0], B[1], x, y) < threshold
+  ) {
+    return true;
   }
 
   // For freedraw lines
-  for (let i = 1; i < element.points.length - 1; i++) {
+  for (let i = 0; i < element.points.length; i++) {
     const delta = [B[0] - A[0], B[1] - A[1]];
     const length = Math.hypot(delta[1], delta[0]);
 
@@ -486,6 +490,7 @@ export const determineFocusDistance = (
   const nabs = Math.abs(n);
   switch (element.type) {
     case "rectangle":
+    case "image":
     case "text":
       return c / (hwidth * (nabs + q * mabs));
     case "diamond":
@@ -516,6 +521,7 @@ export const determineFocusPoint = (
   let point;
   switch (element.type) {
     case "rectangle":
+    case "image":
     case "text":
     case "diamond":
       point = findFocusPointForRectangulars(element, focus, adjecentPointRel);
@@ -565,6 +571,7 @@ const getSortedElementLineIntersections = (
   let intersections: GA.Point[];
   switch (element.type) {
     case "rectangle":
+    case "image":
     case "text":
     case "diamond":
       const corners = getCorners(element);
@@ -598,6 +605,7 @@ const getSortedElementLineIntersections = (
 const getCorners = (
   element:
     | ExcalidrawRectangleElement
+    | ExcalidrawImageElement
     | ExcalidrawDiamondElement
     | ExcalidrawTextElement,
   scale: number = 1,
@@ -606,6 +614,7 @@ const getCorners = (
   const hy = (scale * element.height) / 2;
   switch (element.type) {
     case "rectangle":
+    case "image":
     case "text":
       return [
         GA.point(hx, hy),
@@ -747,6 +756,7 @@ export const findFocusPointForEllipse = (
 export const findFocusPointForRectangulars = (
   element:
     | ExcalidrawRectangleElement
+    | ExcalidrawImageElement
     | ExcalidrawDiamondElement
     | ExcalidrawTextElement,
   // Between -1 and 1 for how far away should the focus point be relative

@@ -49,6 +49,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
     "id1": true,
@@ -518,6 +519,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
     "id1": true,
@@ -993,6 +995,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
@@ -1783,6 +1786,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
   },
@@ -1991,6 +1995,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
     "id3": true,
@@ -2457,6 +2462,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
   },
@@ -2714,6 +2720,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
@@ -2881,6 +2888,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id2": true,
   },
@@ -3330,6 +3338,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
@@ -3571,6 +3580,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
   },
@@ -3779,6 +3789,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
     "id1": true,
@@ -4028,6 +4039,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id1": true,
   },
@@ -4284,6 +4296,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id2": true,
   },
@@ -4672,6 +4685,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
     "id1": true,
@@ -4971,6 +4985,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
     "id1": true,
@@ -5248,6 +5263,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
   },
@@ -5459,6 +5475,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
   },
@@ -5626,6 +5643,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
@@ -6087,6 +6105,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
     "id1": true,
@@ -6410,6 +6429,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
@@ -6707,7 +6727,10 @@ Object {
   "height": 10,
   "id": "id7",
   "isDeleted": false,
-  "lastCommittedPoint": null,
+  "lastCommittedPoint": Array [
+    50,
+    10,
+  ],
   "opacity": 100,
   "points": Array [
     Array [
@@ -8374,7 +8397,10 @@ Object {
           "height": 10,
           "id": "id7",
           "isDeleted": false,
-          "lastCommittedPoint": null,
+          "lastCommittedPoint": Array [
+            50,
+            10,
+          ],
           "opacity": 100,
           "points": Array [
             Array [
@@ -8468,6 +8494,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
     "id2": true,
@@ -8835,6 +8862,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
     "id2": true,
@@ -9092,6 +9120,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
     "id2": true,
@@ -9313,6 +9342,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
     "id2": true,
@@ -9597,6 +9627,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
@@ -9764,6 +9795,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
@@ -9931,6 +9963,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
@@ -10098,6 +10131,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
@@ -10295,6 +10329,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
@@ -10492,6 +10527,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
@@ -10533,7 +10569,10 @@ Object {
   "height": 10,
   "id": "id0",
   "isDeleted": false,
-  "lastCommittedPoint": null,
+  "lastCommittedPoint": Array [
+    10,
+    10,
+  ],
   "opacity": 100,
   "points": Array [
     Array [
@@ -10607,7 +10646,10 @@ Object {
           "height": 10,
           "id": "id0",
           "isDeleted": false,
-          "lastCommittedPoint": null,
+          "lastCommittedPoint": Array [
+            10,
+            10,
+          ],
           "opacity": 100,
           "points": Array [
             Array [
@@ -10701,6 +10743,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
@@ -10898,6 +10941,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
@@ -11065,6 +11109,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
@@ -11232,6 +11277,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
@@ -11429,6 +11475,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
@@ -11596,6 +11643,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
@@ -11637,7 +11685,10 @@ Object {
   "height": 10,
   "id": "id0",
   "isDeleted": false,
-  "lastCommittedPoint": null,
+  "lastCommittedPoint": Array [
+    10,
+    10,
+  ],
   "opacity": 100,
   "points": Array [
     Array [
@@ -11711,7 +11762,10 @@ Object {
           "height": 10,
           "id": "id0",
           "isDeleted": false,
-          "lastCommittedPoint": null,
+          "lastCommittedPoint": Array [
+            10,
+            10,
+          ],
           "opacity": 100,
           "points": Array [
             Array [
@@ -11805,6 +11859,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
     "id1": true,
@@ -12532,6 +12587,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
     "id3": true,
@@ -12789,6 +12845,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": -5.416666666666667,
@@ -12893,6 +12950,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
@@ -12995,6 +13053,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
   },
@@ -13165,6 +13224,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
     "id1": true,
@@ -13491,6 +13551,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
@@ -13695,6 +13756,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
     "id1": true,
@@ -14531,6 +14593,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 60,
@@ -14633,6 +14696,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id0": true,
   },
@@ -15402,6 +15466,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id1": true,
     "id2": true,
@@ -15812,6 +15877,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {
     "id1": true,
   },
@@ -16089,6 +16155,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 11.046099290780141,
@@ -16193,6 +16260,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
@@ -16697,6 +16765,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
@@ -16799,6 +16868,7 @@ Object {
     "data": null,
     "shown": false,
   },
+  "pendingImageElement": null,
   "previousSelectedElementIds": Object {},
   "resizingElement": null,
   "scrollX": 0,
