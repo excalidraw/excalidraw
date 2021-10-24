@@ -11,6 +11,7 @@ export {
   newTextElement,
   updateTextElement,
   newLinearElement,
+  newImageElement,
   duplicateElement,
 } from "./newElement";
 export {
@@ -92,6 +93,10 @@ const _clearElements = (
       ? { ...element, lastCommittedPoint: null }
       : element,
   );
+
+export const clearElementsForDatabase = (
+  elements: readonly ExcalidrawElement[],
+) => _clearElements(elements);
 
 export const clearElementsForExport = (
   elements: readonly ExcalidrawElement[],
