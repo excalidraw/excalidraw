@@ -106,7 +106,7 @@
     "toggleTheme": ""
   },
   "buttons": {
-    "clearReset": "",
+    "clearReset": "清空畫布",
     "exportJSON": "",
     "exportImage": "",
     "export": "",
@@ -183,7 +183,7 @@
     "lock": ""
   },
   "headings": {
-    "canvasActions": "",
+    "canvasActions": "畫布動作",
     "selectedShapeActions": "",
     "shapes": ""
   },
@@ -205,14 +205,14 @@
   },
   "canvasError": {
     "cannotShowPreview": "",
-    "canvasTooBig": "",
+    "canvasTooBig": "塊畫布太大啦，縮細啲先啦？",
     "canvasTooBigTip": ""
   },
   "errorSplash": {
     "headingMain_pre": "",
     "headingMain_button": "",
     "clearCanvasMessage": "",
-    "clearCanvasMessage_button": "",
+    "clearCanvasMessage_button": "正在清空畫布...",
     "clearCanvasCaveat": "",
     "trackedToSentry_pre": "",
     "trackedToSentry_post": "",
@@ -269,7 +269,7 @@
     "zoomToSelection": ""
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "清空畫布"
   },
   "encrypted": {
     "tooltip": "",
@@ -296,7 +296,7 @@
     "copyToClipboardAsPng": "",
     "fileSaved": "",
     "fileSavedToFilename": "",
-    "canvas": "",
+    "canvas": "畫布",
     "selection": ""
   },
   "colors": {
