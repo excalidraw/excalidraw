@@ -196,11 +196,8 @@ import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
-import {
-  getTextLikeActions,
-  registerTextElementSubtypes,
-  TEXT_SUBTYPE_DEFAULT,
-} from "../textlike";
+import { getTextLikeActions, registerTextElementSubtypes } from "../textlike";
+import { TEXT_SUBTYPE_DEFAULT } from "../textlike/types";
 import { redrawTextBoundingBox } from "../element/textElement";
 import { nativeFileSystemSupported } from "../data/filesystem";
 

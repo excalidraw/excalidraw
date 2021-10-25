@@ -3,7 +3,7 @@ import { DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE, ENV } from "./constants";
 import { newElement, newLinearElement, newTextElement } from "./element";
 import { NonDeletedExcalidrawElement } from "./element/types";
 import { randomId } from "./random";
-import { TEXT_SUBTYPE_DEFAULT } from "./textlike";
+import { TEXT_SUBTYPE_DEFAULT } from "./textlike/types";
 
 export type ChartElements = readonly NonDeletedExcalidrawElement[];
 

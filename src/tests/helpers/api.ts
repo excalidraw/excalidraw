@@ -14,7 +14,7 @@ import util from "util";
 import path from "path";
 import { getMimeType } from "../../data/blob";
 import { newFreeDrawElement } from "../../element/newElement";
-import { TEXT_SUBTYPE_DEFAULT } from "../../textlike";
+import { TEXT_SUBTYPE_DEFAULT } from "../../textlike/types";
 
 const readFile = util.promisify(fs.readFile);
 

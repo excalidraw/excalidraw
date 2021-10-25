@@ -11,8 +11,9 @@ import {
   registerTextLikeMethod,
   registerTextLikeShortcutNames,
   registerTextLikeSubtypeName,
-  TEXT_SUBTYPE_DEFAULT,
 } from "../";
+
+import { TEXT_SUBTYPE_DEFAULT } from "../types";
 
 export type TextOptsText = {};
 

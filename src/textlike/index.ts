@@ -1,17 +1,12 @@
 import { ExcalidrawTextElement, NonDeleted } from "../element/types";
 import { ElementUpdate, mutateElement } from "../element/mutateElement";
 
-import {
-  TextActionNameText,
-  TextOptsText,
-  TextShortcutNameText,
-  registerTextElementSubtypeText,
-} from "./text";
+import { registerTextElementSubtypeText } from "./text";
+
+import { TextOpts, TextShortcutName } from "./types";
 
 import { Action, ActionName } from "../actions/types";
 import { register } from "../actions/register";
-
-export const TEXT_SUBTYPE_DEFAULT = "none";
 
 type TextLikeMethodName =
   | "apply"
@@ -35,11 +30,6 @@ const measureMethodsA = [] as TextLikeMethods;
 const renderMethodsA = [] as TextLikeMethods;
 const renderSvgMethodsA = [] as TextLikeMethods;
 const restoreMethodsA = [] as TextLikeMethods;
-
-// Types to export, union over all ExcalidrawTextElement subtypes
-export type TextOpts = TextOptsText;
-export type TextActionName = TextActionNameText;
-export type TextShortcutName = TextShortcutNameText;
 
 // One element for each ExcalidrawTextElement subtype.
 // ShortcutMap arrays, then typeguards for these.
