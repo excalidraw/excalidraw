@@ -1,9 +1,9 @@
 {
   "labels": {
-    "paste": "",
-    "pasteCharts": "",
-    "selectAll": "",
-    "multiSelect": "",
+    "paste": "අලවන්න",
+    "pasteCharts": "ප්‍රස්ථාරය",
+    "selectAll": "සියල්ලම",
+    "multiSelect": "තෝරා ගැනීමට අංගය එකතු කරන්න",
     "moveCanvas": "",
     "cut": "",
     "copy": "",
