@@ -445,15 +445,7 @@ export const actionChangeFontSize = register({
     elements: readonly ExcalidrawElement[],
     appState: AppState,
   ) => {
-    let disabled = false;
-    getNonDeletedElements(elements).forEach((element) => {
-      if (isTextElement(element)) {
-        if (isPanelComponentDisabled(element.subtype, "changeFontSize")) {
-          disabled = true;
-        }
-      }
-    });
-    return !disabled;
+    return isPanelComponentDisabled(elements, appState, "changeFontSize");
   },
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
@@ -520,15 +512,7 @@ export const actionChangeFontFamily = register({
     elements: readonly ExcalidrawElement[],
     appState: AppState,
   ) => {
-    let disabled = false;
-    getNonDeletedElements(elements).forEach((element) => {
-      if (isTextElement(element)) {
-        if (isPanelComponentDisabled(element.subtype, "changeFontFamily")) {
-          disabled = true;
-        }
-      }
-    });
-    return !disabled;
+    return isPanelComponentDisabled(elements, appState, "changeFontFamily");
   },
   PanelComponent: ({ elements, appState, updateData }) => {
     const options: {
@@ -598,15 +582,7 @@ export const actionChangeTextAlign = register({
     elements: readonly ExcalidrawElement[],
     appState: AppState,
   ) => {
-    let disabled = false;
-    getNonDeletedElements(elements).forEach((element) => {
-      if (isTextElement(element)) {
-        if (isPanelComponentDisabled(element.subtype, "changeTextAlign")) {
-          disabled = true;
-        }
-      }
-    });
-    return !disabled;
+    return isPanelComponentDisabled(elements, appState, "changeTextAlign");
   },
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>

@@ -8,6 +8,7 @@ import {
 import { ExcalidrawTextElement, NonDeleted } from "../../element/types";
 import { ElementUpdate } from "../../element/mutateElement";
 import {
+  registerTextLikeDisabledPanelComponents,
   registerTextLikeMethod,
   registerTextLikeShortcutNames,
   registerTextLikeSubtypeName,
@@ -152,6 +153,7 @@ export const registerTextElementSubtypeText = (
 ) => {
   registerTextLikeShortcutNames(textShortcutMap, isTextShortcutNameText);
   registerTextLikeSubtypeName(TEXT_SUBTYPE_DEFAULT);
+  registerTextLikeDisabledPanelComponents(TEXT_SUBTYPE_DEFAULT, []);
   registerTextLikeMethod("apply", {
     subtype: TEXT_SUBTYPE_DEFAULT,
     method: applyTextElementTextOpts,
