@@ -15,15 +15,11 @@ import {
 
 import { TEXT_SUBTYPE_DEFAULT } from "../types";
 
-export type TextOptsText = {};
-
-export type TextActionNameText = "";
-
-const textShortcutNamesText = [""] as const;
-export type TextShortcutNameText = typeof textShortcutNamesText[number];
-
-const isTextShortcutNameText = (s: any): s is TextShortcutNameText =>
-  textShortcutNamesText.includes(s);
+import {
+  isTextShortcutNameText,
+  TextOptsText,
+  TextShortcutNameText,
+} from "./types";
 
 const textShortcutMap: Record<TextShortcutNameText, string[]> = { "": [""] };
 
