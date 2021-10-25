@@ -141,7 +141,7 @@
     "clear": ""
   },
   "alerts": {
-    "clearReset": "",
+    "clearReset": "【‼️ 警告 ‼️ 無法復原的動作】你確定要清空呢塊畫布嗎？",
     "couldNotCreateShareableLink": "",
     "couldNotCreateShareableLinkTooBig": "",
     "couldNotLoadInvalidFile": "",
@@ -204,16 +204,16 @@
     "placeImage": ""
   },
   "canvasError": {
-    "cannotShowPreview": "",
+    "cannotShowPreview": "無法顯示預覽",
     "canvasTooBig": "塊畫布太大啦，縮細啲先啦？",
     "canvasTooBigTip": ""
   },
   "errorSplash": {
     "headingMain_pre": "",
     "headingMain_button": "",
-    "clearCanvasMessage": "",
-    "clearCanvasMessage_button": "正在清空畫布...",
-    "clearCanvasCaveat": "",
+    "clearCanvasMessage": "如果重新整理頁面都係睇唔到，你可以",
+    "clearCanvasMessage_button": "清空畫布",
+    "clearCanvasCaveat": "（注意：呢個動作會直接丟棄你嘅作品，並且無法復原）",
     "trackedToSentry_pre": "",
     "trackedToSentry_post": "",
     "openIssueMessage_pre": "",
