@@ -136,7 +136,9 @@
     "darkMode": "Dark mode",
     "lightMode": "Light mode",
     "zenMode": "Zen mode",
-    "exitZenMode": "Exit zen mode"
+    "exitZenMode": "Exit zen mode",
+    "cancel": "Cancel",
+    "clear": "Clear"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",
@@ -154,14 +156,22 @@
     "errorAddingToLibrary": "Couldn't add item to the library",
     "errorRemovingFromLibrary": "Couldn't remove item from the library",
     "confirmAddLibrary": "This will add {{numShapes}} shape(s) to your library. Are you sure?",
-    "imageDoesNotContainScene": "Importing images isn't supported at the moment.\n\nDid you want to import a scene? This image does not seem to contain any scene data. Have you enabled this during export?",
+    "imageDoesNotContainScene": "This image does not seem to contain any scene data. Have you enabled scene embedding during export?",
     "cannotRestoreFromImage": "Scene couldn't be restored from this image file",
     "invalidSceneUrl": "Couldn't import scene from the supplied URL. It's either malformed, or doesn't contain valid Excalidraw JSON data.",
     "resetLibrary": "This will clear your library. Are you sure?",
     "invalidEncryptionKey": "Encryption key must be of 22 characters. Live collaboration is disabled."
   },
+  "errors": {
+    "unsupportedFileType": "Unsupported file type.",
+    "imageInsertError": "Couldn't insert image. Try again later...",
+    "fileTooBig": "File is too big. Maximum allowed size is {{maxSize}}.",
+    "svgImageInsertError": "Couldn't insert SVG image. The SVG markup looks invalid.",
+    "invalidSVGString": "errors.invalidSVGString"
+  },
   "toolBar": {
     "selection": "Selection",
+    "image": "Insert image",
     "rectangle": "Rectangle",
     "diamond": "Diamond",
     "ellipse": "Ellipse",
@@ -186,10 +196,12 @@
     "linearElementMulti": "Click on last point or press Escape or Enter to finish",
     "lockAngle": "You can constrain angle by holding SHIFT",
     "resize": "You can constrain proportions by holding SHIFT while resizing,\nhold ALT to resize from the center",
+    "resizeImage": "You can resize freely by holding SHIFT,\nhold ALT to resize from the center",
     "rotate": "You can constrain angles by holding SHIFT while rotating",
     "lineEditor_info": "Double-click or press Enter to edit points",
     "lineEditor_pointSelected": "Press Delete to remove point, CtrlOrCmd+D to duplicate, or drag to move",
-    "lineEditor_nothingSelected": "Select a point to move or remove, or hold Alt and click to add new points"
+    "lineEditor_nothingSelected": "Select a point to move or remove, or hold Alt and click to add new points",
+    "placeImage": "Click to place the image, or click and drag to set its size manually"
   },
   "canvasError": {
     "cannotShowPreview": "Cannot show preview",
@@ -255,6 +267,9 @@
     "view": "View",
     "zoomToFit": "Zoom to fit all elements",
     "zoomToSelection": "Zoom to selection"
+  },
+  "clearCanvasDialog": {
+    "title": "Clear Canvas"
   },
   "encrypted": {
     "tooltip": "Your drawings are end-to-end encrypted so Excalidraw's servers will never see them.",

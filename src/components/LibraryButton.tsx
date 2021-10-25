@@ -26,7 +26,7 @@ export const LibraryButton: React.FC<{
           "zen-mode-visibility--hidden": appState.zenModeEnabled,
         },
       )}
-      title={`${capitalizeString(t("toolBar.library"))} — 9`}
+      title={`${capitalizeString(t("toolBar.library"))} — 0`}
       style={{ marginInlineStart: "var(--space-factor)" }}
     >
       <input
@@ -38,7 +38,7 @@ export const LibraryButton: React.FC<{
         }}
         checked={appState.isLibraryOpen}
         aria-label={capitalizeString(t("toolBar.library"))}
-        aria-keyshortcuts="9"
+        aria-keyshortcuts="0"
       />
       <div className="ToolIcon__icon">{LIBRARY_ICON}</div>
     </label>
