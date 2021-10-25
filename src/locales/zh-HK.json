@@ -146,7 +146,7 @@
     "couldNotCreateShareableLinkTooBig": "",
     "couldNotLoadInvalidFile": "",
     "importBackendFailed": "",
-    "cannotExportEmptyCanvas": "",
+    "cannotExportEmptyCanvas": "無嘢可以匯出喎～畫吓嘢先？",
     "couldNotCopyToClipboard": "",
     "decryptFailed": "",
     "uploadedSecurly": "",
