@@ -26,7 +26,7 @@
   "redirects": [
     {
       "source": "/webex/:match*",
-      "destination": "https://webex.excalidraw.com"
+      "destination": "https://for-webex.excalidraw.com"
     }
   ]
 }
