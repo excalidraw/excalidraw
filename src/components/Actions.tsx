@@ -79,6 +79,8 @@ export const SelectedShapeActions = ({
       {(hasText(elementType) ||
         targetElements.some((element) => hasText(element.type))) && (
         <>
+          {renderAction("changeTextSubtype")}
+
           {renderAction("changeFontSize")}
 
           {renderAction("changeFontFamily")}

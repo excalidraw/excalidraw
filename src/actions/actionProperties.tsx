@@ -60,7 +60,8 @@ import {
   isSomeElementSelected,
 } from "../scene";
 import { register } from "./register";
-import { isPanelComponentDisabled } from "../textlike";
+import { applyTextOpts, isPanelComponentDisabled } from "../textlike";
+import { TEXT_SUBTYPE_ICONS } from "../textlike/icons";
 
 const changeProperty = (
   elements: readonly ExcalidrawElement[],
@@ -98,6 +99,53 @@ const getFormValue = function <T>(
     null
   );
 };
+
+export const actionChangeTextElementSubtype = register({
+  name: "changeTextSubtype",
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(elements, appState, (el) => {
+        if (isTextElement(el)) {
+          const element: ExcalidrawTextElement = applyTextOpts(
+            newElementWith(el, {
+              subtype: value,
+            }),
+          );
+          redrawTextBoundingBox(element);
+          return element;
+        }
+
+        return el;
+      }),
+      appState: {
+        ...appState,
+        textElementSubtype: value,
+      },
+      commitToHistory: !!value,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData }) => (
+    <>
+      <h3 aria-hidden="true">{t("labels.textType")}</h3>
+      <ButtonIconSelect
+        group="subtype"
+        options={TEXT_SUBTYPE_ICONS.map(({ icon, value }) => {
+          return { value, icon, text: t(`toolBar.${value}`) };
+        })}
+        value={getFormValue(
+          elements,
+          appState,
+          (element) => isTextElement(element) && element.subtype,
+          appState.textElementSubtype,
+        )}
+        onChange={(value) => updateData(value)}
+      />
+    </>
+  ),
+  PanelComponentPredicate: (elements, appState) => {
+    return TEXT_SUBTYPE_ICONS.length > 1;
+  },
+});
 
 export const actionChangeStrokeColor = register({
   name: "changeStrokeColor",
