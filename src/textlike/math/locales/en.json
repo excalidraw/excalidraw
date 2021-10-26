@@ -8,5 +8,8 @@
   "alerts": {
     "useTexTrue": "Using LaTeX for math mode.",
     "useTexFalse": "Using AsciiMath for math mode."
+  },
+  "toolBar": {
+    "math": "Math"
   }
 }

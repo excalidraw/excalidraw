@@ -40,14 +40,17 @@ import { getElementMap, getNonDeletedElements } from "../../element";
 import { invalidateShapeForElement } from "../../renderer/renderElement";
 import { ButtonSelect } from "../../components/ButtonSelect";
 
-const SUBTYPE_MATH = "math";
+import {
+  isTextShortcutNameMath,
+  TextOptsMath,
+  TextShortcutNameMath,
+  TEXT_SUBTYPE_MATH,
+} from "./types";
 
 // Begin exports
-export type TextOptsMath = { useTex?: boolean };
-
 type ExcalidrawTextElementMath = ExcalidrawTextElement &
   Readonly<{
-    subtype: typeof SUBTYPE_MATH;
+    subtype: typeof TEXT_SUBTYPE_MATH;
     useTex: boolean;
     fontFamily: 2;
   }>;
@@ -58,17 +61,9 @@ const isMathElement = (
   return (
     isTextElement(element) &&
     "subtype" in element &&
-    element.subtype === SUBTYPE_MATH
+    element.subtype === TEXT_SUBTYPE_MATH
   );
 };
-
-export type TextActionNameMath = "changeUseTex";
-
-const textShortcutNamesMath = ["changeUseTex"] as const;
-export type TextShortcutNameMath = typeof textShortcutNamesMath[number];
-
-const isTextShortcutNameMath = (s: any): s is TextShortcutNameMath =>
-  textShortcutNamesMath.includes(s);
 
 const textShortcutMap: Record<TextShortcutNameMath, string[]> = {
   changeUseTex: [getShortcutKey("CtrlOrCmd+Shift+M")],
@@ -548,11 +543,11 @@ const getSelectedMathElements = (
 };
 
 const applyTextElementMathOpts = (
-  element: ExcalidrawTextElementMath,
+  element: NonDeleted<ExcalidrawTextElementMath>,
   textOpts?: TextOptsMath,
-): ExcalidrawTextElement => {
+): NonDeleted<ExcalidrawTextElement> => {
   const useTex = textOpts?.useTex !== undefined ? textOpts.useTex : getUseTex();
-  return newElementWith(element, { useTex });
+  return newElementWith(element, { useTex, fontFamily: 2 });
 };
 
 const cleanTextOptUpdatesMath = (
@@ -743,37 +738,39 @@ export const registerTextElementSubtypeMath = (
   onSubtypesLoaded?: (isTextElementSubtype: Function) => void,
 ) => {
   registerTextLikeShortcutNames(textShortcutMap, isTextShortcutNameMath);
-  registerTextLikeSubtypeName(SUBTYPE_MATH);
-  registerTextLikeDisabledPanelComponents(SUBTYPE_MATH, ["changeFontFamily"]);
+  registerTextLikeSubtypeName(TEXT_SUBTYPE_MATH);
+  registerTextLikeDisabledPanelComponents(TEXT_SUBTYPE_MATH, [
+    "changeFontFamily",
+  ]);
   // Set the callback first just in case anything in this method
   // calls loadMathJax().
   mathJaxLoadedCallback = onSubtypesLoaded;
   registerTextLikeMethod("apply", {
-    subtype: SUBTYPE_MATH,
+    subtype: TEXT_SUBTYPE_MATH,
     method: applyTextElementMathOpts,
   });
   registerTextLikeMethod("clean", {
-    subtype: SUBTYPE_MATH,
+    subtype: TEXT_SUBTYPE_MATH,
     method: cleanTextOptUpdatesMath,
   });
   registerTextLikeMethod("measure", {
-    subtype: SUBTYPE_MATH,
+    subtype: TEXT_SUBTYPE_MATH,
     method: measureTextElementMath,
   });
   registerTextLikeMethod("render", {
-    subtype: SUBTYPE_MATH,
+    subtype: TEXT_SUBTYPE_MATH,
     method: renderTextElementMath,
   });
   registerTextLikeMethod("renderSvg", {
-    subtype: SUBTYPE_MATH,
+    subtype: TEXT_SUBTYPE_MATH,
     method: renderSvgTextElementMath,
   });
   registerTextLikeMethod("restore", {
-    subtype: SUBTYPE_MATH,
+    subtype: TEXT_SUBTYPE_MATH,
     method: restoreTextElementMath,
   });
   registerActionsMath();
-  registerAuxLangData(`./textlike/${SUBTYPE_MATH}`);
+  registerAuxLangData(`./textlike/${TEXT_SUBTYPE_MATH}`);
   // Call loadMathJax() here if we want to be sure it's loaded.
 };
 
@@ -837,13 +834,18 @@ const getValueForMathElements = function <T>(
   elements: readonly ExcalidrawElement[],
   appState: Readonly<AppState>,
   getAttribute: (element: ExcalidrawElement) => T,
+  defaultValue?: T,
 ): T | null {
   const selectedElements = getSelectedMathElements(elements, appState);
-  return getCommonAttributeOfSelectedElements(
-    selectedElements,
-    appState,
-    getAttribute,
-  );
+  return appState.editingElement
+    ? getAttribute(appState.editingElement)
+    : selectedElements.length > 0
+    ? getCommonAttributeOfSelectedElements(
+        selectedElements,
+        appState,
+        getAttribute,
+      )
+    : defaultValue ?? null;
 };
 
 const registerActionsMath = () => {
@@ -873,6 +875,23 @@ const registerActionsMath = () => {
     contextItemLabel: "labels.toggleUseTex",
     contextItemPredicate: (elements, appState) =>
       enableActionChangeUseTex(elements, appState),
+    PanelComponentPredicate: (elements, appState) => {
+      let enabled = true;
+      getSelectedElements(getNonDeletedElements(elements), appState).forEach(
+        (element) => {
+          if (isTextElement(element) && element.subtype !== TEXT_SUBTYPE_MATH) {
+            enabled = false;
+          }
+        },
+      );
+      if (appState.editingElement && !isMathElement(appState.editingElement)) {
+        enabled = false;
+      }
+      if (appState.textElementSubtype !== TEXT_SUBTYPE_MATH) {
+        enabled = false;
+      }
+      return enabled;
+    },
     PanelComponent: ({ elements, appState, updateData }) => (
       <fieldset>
         <legend>{t("labels.changeUseTex")}</legend>
@@ -892,6 +911,7 @@ const registerActionsMath = () => {
             elements,
             appState,
             (element) => isMathElement(element) && element.useTex,
+            getUseTex(),
           )}
           onChange={(value) => updateData(value)}
         />
