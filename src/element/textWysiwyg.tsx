@@ -30,7 +30,7 @@ const getTransform = (
   let translateX = ((width - offsetLeft * 2) * (zoom.value - 1)) / 2;
   const translateY = ((height - offsetTop * 2) * (zoom.value - 1)) / 2;
   if (width > maxWidth && zoom.value !== 1) {
-    translateX = (maxWidth / 2) * (zoom.value - 1);
+    translateX = ((maxWidth - offsetLeft * 2) * (zoom.value - 1)) / 2;
   }
   return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
 };
@@ -68,7 +68,10 @@ export const textWysiwyg = ({
       const lines = updatedElement.text.replace(/\r\n?/g, "\n").split("\n");
       const lineHeight = updatedElement.height / lines.length;
       const maxWidth =
-        (appState.offsetLeft + appState.width - viewportX - 8) /
+        (appState.width -
+          8 -
+          ((appState.scrollX + updatedElement.x) * appState.zoom.value +
+            appState.zoom.translation.x)) /
           appState.zoom.value -
         // margin-right of parent if any
         Number(

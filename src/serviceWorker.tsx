@@ -37,6 +37,13 @@ export const register = (config?: Config) => {
     }
 
     window.addEventListener("load", () => {
+      const isWebexLP = window.location.pathname.startsWith("/webex");
+      if (isWebexLP) {
+        unregister(() => {
+          window.location.reload();
+        });
+        return false;
+      }
       const swUrl = `${process.env.PUBLIC_URL}/service-worker.js`;
 
       if (isLocalhost) {
@@ -135,11 +142,14 @@ const checkValidServiceWorker = (swUrl: string, config?: Config) => {
     });
 };
 
-export const unregister = () => {
+export const unregister = (callback?: () => void) => {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.ready
       .then((registration) => {
-        registration.unregister();
+        return registration.unregister();
+      })
+      .then(() => {
+        callback?.();
       })
       .catch((error) => {
         console.error(error.message);
