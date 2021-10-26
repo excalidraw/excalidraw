@@ -49,9 +49,6 @@ workbox.routing.registerRoute(
 );
 
 self.addEventListener("fetch", (event) => {
-  if (event.request.url.endsWith("/webex")) {
-    return false;
-  }
   if (
     event.request.method === "POST" &&
     event.request.url.endsWith("/web-share-target")
