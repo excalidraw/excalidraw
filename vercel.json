@@ -23,10 +23,10 @@
       ]
     }
   ],
-  "rewrites": [
+  "redirects": [
     {
       "source": "/webex/:match*",
-      "destination": "https://excalidraw-webex-lp.vercel.app/:match*"
+      "destination": "https://webex.excalidraw.com"
     }
   ]
 }
