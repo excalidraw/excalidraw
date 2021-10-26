@@ -197,7 +197,6 @@ import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import { getTextLikeActions, registerTextElementSubtypes } from "../textlike";
-import { TEXT_SUBTYPE_DEFAULT } from "../textlike/types";
 import { redrawTextBoundingBox } from "../element/textElement";
 import { nativeFileSystemSupported } from "../data/filesystem";
 
@@ -1364,7 +1363,7 @@ class App extends React.Component<AppProps, AppState> {
       fontFamily: this.state.currentItemFontFamily,
       textAlign: this.state.currentItemTextAlign,
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
-      subtype: TEXT_SUBTYPE_DEFAULT,
+      subtype: this.state.textElementSubtype,
     });
 
     this.scene.replaceAllElements([
@@ -1962,7 +1961,7 @@ class App extends React.Component<AppProps, AppState> {
           verticalAlign: parentCenterPosition
             ? "middle"
             : DEFAULT_VERTICAL_ALIGN,
-          subtype: TEXT_SUBTYPE_DEFAULT,
+          subtype: this.state.textElementSubtype,
         });
 
     this.setState({ editingElement: element });
