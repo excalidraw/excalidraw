@@ -35,7 +35,7 @@ workbox.precaching.precacheAndRoute(self.__WB_MANIFEST);
 workbox.routing.registerNavigationRoute(
   workbox.precaching.getCacheKeyForURL("./index.html"),
   {
-    blacklist: [/^\/_/, /\/[^/?]+\.[^/]+$/],
+    blacklist: [/^\/_/, /\/[^/?]+\.[^/]+$/, /^\webex/],
   },
 );
 
