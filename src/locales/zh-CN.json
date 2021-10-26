@@ -137,7 +137,7 @@
     "lightMode": "浅色模式",
     "zenMode": "禅模式",
     "exitZenMode": "退出禅模式",
-    "cancel": "",
+    "cancel": "取消",
     "clear": ""
   },
   "alerts": {
@@ -163,15 +163,15 @@
     "invalidEncryptionKey": "密钥必须包含22个字符。实时协作已被禁用。"
   },
   "errors": {
-    "unsupportedFileType": "",
-    "imageInsertError": "",
-    "fileTooBig": "",
+    "unsupportedFileType": "不支持的文件格式。",
+    "imageInsertError": "无法插入图像。请稍后再试……",
+    "fileTooBig": "文件过大。最大允许的大小为 {{maxSize}}。",
     "svgImageInsertError": "",
     "invalidSVGString": ""
   },
   "toolBar": {
     "selection": "选择",
-    "image": "",
+    "image": "插入图像",
     "rectangle": "矩形",
     "diamond": "菱形",
     "ellipse": "椭圆",
@@ -201,7 +201,7 @@
     "lineEditor_info": "双击或按回车键编辑",
     "lineEditor_pointSelected": "按下 Delete 移除点，Ctrl 或 Cmd+D 以复制，或拖动以移动",
     "lineEditor_nothingSelected": "选中要移动或移除的点，或按住 Alt 并点击添加新点",
-    "placeImage": ""
+    "placeImage": "点击放置图像，或者点击并拖动以手动设置图像大小"
   },
   "canvasError": {
     "cannotShowPreview": "无法显示预览",
@@ -269,7 +269,7 @@
     "zoomToSelection": "缩放到选区"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "清除画布"
   },
   "encrypted": {
     "tooltip": "您的绘图采用的端到端加密，其内容对于Excalidraw服务器是不可见的。",
