@@ -40,7 +40,6 @@ export const register = (config?: Config) => {
       const isWebexLP = window.location.pathname.startsWith("/webex");
       if (isWebexLP) {
         unregister();
-        console.log("reloading");
         window.location.reload();
         return false;
       }
