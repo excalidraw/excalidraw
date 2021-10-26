@@ -37,6 +37,13 @@ export const register = (config?: Config) => {
     }
 
     window.addEventListener("load", () => {
+      const isWebexLP = window.location.pathname.startsWith("/webex");
+      if (isWebexLP) {
+        unregister();
+        console.log("reloading");
+        window.location.reload();
+        return false;
+      }
       const swUrl = `${process.env.PUBLIC_URL}/service-worker.js`;
 
       if (isLocalhost) {
