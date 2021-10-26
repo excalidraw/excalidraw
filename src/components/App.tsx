@@ -1363,7 +1363,7 @@ class App extends React.Component<AppProps, AppState> {
       fontFamily: this.state.currentItemFontFamily,
       textAlign: this.state.currentItemTextAlign,
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
-      subtype: "math",
+      subtype: this.state.textElementSubtype,
     });
 
     this.scene.replaceAllElements([
@@ -1961,7 +1961,7 @@ class App extends React.Component<AppProps, AppState> {
           verticalAlign: parentCenterPosition
             ? "middle"
             : DEFAULT_VERTICAL_ALIGN,
-          subtype: "math",
+          subtype: this.state.textElementSubtype,
         });
 
     this.setState({ editingElement: element });

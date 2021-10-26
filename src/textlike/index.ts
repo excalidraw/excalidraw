@@ -1,24 +1,21 @@
-import { ExcalidrawTextElement, NonDeleted } from "../element/types";
+import {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+  NonDeleted,
+} from "../element/types";
 import { ElementUpdate, mutateElement } from "../element/mutateElement";
+import { getNonDeletedElements, isTextElement } from "../element";
+import { getSelectedElements } from "../scene";
+import { AppState } from "../types";
 
-import {
-  TextActionNameMath,
-  TextOptsMath,
-  TextShortcutNameMath,
-  registerTextElementSubtypeMath,
-} from "./math";
+import { registerTextElementSubtypeMath } from "./math";
 
-import {
-  TextActionNameText,
-  TextOptsText,
-  TextShortcutNameText,
-  registerTextElementSubtypeText,
-} from "./text";
+import { registerTextElementSubtypeText } from "./text";
+
+import { TextActionName, TextOpts, TextShortcutName } from "./types";
 
 import { Action, ActionName } from "../actions/types";
 import { register } from "../actions/register";
-
-export const TEXT_SUBTYPE_DEFAULT = "none";
 
 type TextLikeMethodName =
   | "apply"
@@ -42,11 +39,6 @@ const measureMethodsA = [] as TextLikeMethods;
 const renderMethodsA = [] as TextLikeMethods;
 const renderSvgMethodsA = [] as TextLikeMethods;
 const restoreMethodsA = [] as TextLikeMethods;
-
-// Types to export, union over all ExcalidrawTextElement subtypes
-export type TextOpts = TextOptsText | TextOptsMath;
-export type TextActionName = TextActionNameText | TextActionNameMath;
-export type TextShortcutName = TextShortcutNameText | TextShortcutNameMath;
 
 // One element for each ExcalidrawTextElement subtype.
 // ShortcutMap arrays, then typeguards for these.
@@ -147,11 +139,54 @@ export const registerTextLikeDisabledPanelComponents = (
   actions: ActionName[],
 ) => {
   if (textLikeSubtypes.includes(subtypeName)) {
-    textLikeDisabledPanelComponents.push({ subtype: subtypeName, actions });
+    textLikeDisabledPanelComponents.push({
+      subtype: subtypeName,
+      actions,
+    } as DisabledPanelComponents);
   }
 };
 
 export const isPanelComponentDisabled = (
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+  actionName: ActionName | TextActionName,
+) => {
+  let disabled = false;
+  const selectedElements = getSelectedElements(
+    getNonDeletedElements(elements),
+    appState,
+  );
+  selectedElements.forEach((element) => {
+    if (isTextElement(element)) {
+      if (isPanelComponentDisabledForSubtype(element.subtype, actionName)) {
+        disabled = true;
+      }
+    }
+  });
+  if (
+    selectedElements.length === 0 &&
+    isPanelComponentDisabledForSubtype(
+      appState.textElementSubtype,
+      actionName,
+    ) &&
+    !(appState.editingElement && isTextElement(appState.editingElement))
+  ) {
+    disabled = true;
+  }
+  if (
+    appState.editingElement &&
+    isTextElement(appState.editingElement) &&
+    isPanelComponentDisabledForSubtype(
+      appState.editingElement.subtype,
+      actionName,
+    )
+  ) {
+    disabled = true;
+  }
+  return !disabled;
+};
+
+const isPanelComponentDisabledForSubtype = (
   subtypeName: string,
   action: ActionName,
 ) => {
@@ -298,7 +333,11 @@ const textLikeActions: Action[] = [];
 
 export const addTextLikeActions = (actions: Action[]) => {
   actions.forEach((action) => {
-    if (!textLikeActions.includes(action)) {
+    if (
+      textLikeActions.every((value, index, actions) => {
+        return value.name !== action.name;
+      })
+    ) {
       textLikeActions.push(action);
       register(action);
     }

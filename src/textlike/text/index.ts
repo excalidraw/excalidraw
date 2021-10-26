@@ -8,21 +8,19 @@ import {
 import { ExcalidrawTextElement, NonDeleted } from "../../element/types";
 import { ElementUpdate } from "../../element/mutateElement";
 import {
+  registerTextLikeDisabledPanelComponents,
   registerTextLikeMethod,
   registerTextLikeShortcutNames,
   registerTextLikeSubtypeName,
-  TEXT_SUBTYPE_DEFAULT,
 } from "../";
 
-export type TextOptsText = {};
+import { TEXT_SUBTYPE_DEFAULT } from "../types";
 
-export type TextActionNameText = "";
-
-const textShortcutNamesText = [""] as const;
-export type TextShortcutNameText = typeof textShortcutNamesText[number];
-
-const isTextShortcutNameText = (s: any): s is TextShortcutNameText =>
-  textShortcutNamesText.includes(s);
+import {
+  isTextShortcutNameText,
+  TextOptsText,
+  TextShortcutNameText,
+} from "./types";
 
 const textShortcutMap: Record<TextShortcutNameText, string[]> = { "": [""] };
 
@@ -155,6 +153,7 @@ export const registerTextElementSubtypeText = (
 ) => {
   registerTextLikeShortcutNames(textShortcutMap, isTextShortcutNameText);
   registerTextLikeSubtypeName(TEXT_SUBTYPE_DEFAULT);
+  registerTextLikeDisabledPanelComponents(TEXT_SUBTYPE_DEFAULT, []);
   registerTextLikeMethod("apply", {
     subtype: TEXT_SUBTYPE_DEFAULT,
     method: applyTextElementTextOpts,

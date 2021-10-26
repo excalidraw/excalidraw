@@ -3,7 +3,7 @@ import { ExcalidrawElement } from "../element/types";
 import { AppState, ExcalidrawProps } from "../types";
 import Library from "../data/library";
 import { ToolButtonSize } from "../components/ToolButton";
-import { TextActionName } from "../textlike";
+import { TextActionName } from "../textlike/types";
 
 /** if false, the action should be prevented */
 export type ActionResult =
@@ -51,6 +51,7 @@ export type ActionName =
   | "gridMode"
   | "zenMode"
   | "stats"
+  | "changeTextSubtype"
   | "changeStrokeColor"
   | "changeBackgroundColor"
   | "changeFillStyle"

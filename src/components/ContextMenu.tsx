@@ -11,7 +11,7 @@ import {
 import { Action } from "../actions/types";
 import { ActionManager } from "../actions/manager";
 import { AppState } from "../types";
-import { TextShortcutName } from "../textlike";
+import { TextShortcutName } from "../textlike/types";
 
 export type ContextMenuOption = "separator" | Action;
 

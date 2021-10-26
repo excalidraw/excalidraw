@@ -9,6 +9,7 @@ import {
 import { t } from "./i18n";
 import { AppState, NormalizedZoomValue } from "./types";
 import { getDateTime } from "./utils";
+import { TEXT_SUBTYPE_DEFAULT } from "./textlike/types";
 
 const defaultExportScale = EXPORT_SCALES.includes(devicePixelRatio)
   ? devicePixelRatio
@@ -43,6 +44,7 @@ export const getDefaultAppState = (): Omit<
     editingLinearElement: null,
     elementLocked: false,
     elementType: "selection",
+    textElementSubtype: TEXT_SUBTYPE_DEFAULT,
     errorMessage: null,
     exportBackground: true,
     exportScale: defaultExportScale,
@@ -121,6 +123,7 @@ const APP_STATE_STORAGE_CONF = (<
   editingLinearElement: { browser: false, export: false },
   elementLocked: { browser: true, export: false },
   elementType: { browser: true, export: false },
+  textElementSubtype: { browser: true, export: false },
   errorMessage: { browser: false, export: false },
   exportBackground: { browser: true, export: false },
   exportEmbedScene: { browser: true, export: false },

@@ -11,7 +11,8 @@ import {
   ExcalidrawFreeDrawElement,
   FontFamilyValues,
 } from "../element/types";
-import { applyTextOpts, measureTextElement, TextOpts } from "../textlike";
+import { applyTextOpts, measureTextElement } from "../textlike";
+import { TextOpts } from "../textlike/types";
 import { randomInteger, randomId } from "../random";
 import { newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";

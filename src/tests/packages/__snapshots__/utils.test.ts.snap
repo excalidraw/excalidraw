@@ -60,6 +60,7 @@ Object {
   "showStats": false,
   "startBoundElement": null,
   "suggestedBindings": Array [],
+  "textElementSubtype": "text",
   "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",

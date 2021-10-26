@@ -11,7 +11,7 @@ import { ExcalidrawElement } from "../element/types";
 import { AppProps, AppState } from "../types";
 import { MODES } from "../constants";
 import Library from "../data/library";
-import { TextActionName } from "../textlike";
+import { TextActionName } from "../textlike/types";
 
 // This is the <App> component, but for now we don't care about anything but its
 // `canvas` state.

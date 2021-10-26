@@ -2,10 +2,10 @@ import { t } from "../i18n";
 import { isDarwin } from "../keys";
 import { getShortcutKey } from "../utils";
 import {
-  TextShortcutName,
   getShortcutFromTextShortcutName,
   isTextShortcutName,
 } from "../textlike";
+import { TextShortcutName } from "../textlike/types";
 
 export type ShortcutName =
   | "cut"
