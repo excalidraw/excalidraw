@@ -136,7 +136,9 @@
     "darkMode": "Mørk tilstand",
     "lightMode": "Lys baggrund",
     "zenMode": "",
-    "exitZenMode": ""
+    "exitZenMode": "",
+    "cancel": "",
+    "clear": ""
   },
   "alerts": {
     "clearReset": "",
@@ -160,8 +162,16 @@
     "resetLibrary": "",
     "invalidEncryptionKey": ""
   },
+  "errors": {
+    "unsupportedFileType": "",
+    "imageInsertError": "",
+    "fileTooBig": "",
+    "svgImageInsertError": "",
+    "invalidSVGString": ""
+  },
   "toolBar": {
     "selection": "",
+    "image": "",
     "rectangle": "",
     "diamond": "",
     "ellipse": "",
@@ -186,10 +196,12 @@
     "linearElementMulti": "",
     "lockAngle": "",
     "resize": "",
+    "resizeImage": "",
     "rotate": "",
     "lineEditor_info": "",
     "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": ""
+    "lineEditor_nothingSelected": "",
+    "placeImage": ""
   },
   "canvasError": {
     "cannotShowPreview": "",
@@ -255,6 +267,9 @@
     "view": "",
     "zoomToFit": "",
     "zoomToSelection": ""
+  },
+  "clearCanvasDialog": {
+    "title": ""
   },
   "encrypted": {
     "tooltip": "",

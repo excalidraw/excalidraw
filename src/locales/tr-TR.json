@@ -136,7 +136,9 @@
     "darkMode": "Koyu tema",
     "lightMode": "Açık tema",
     "zenMode": "Zen modu",
-    "exitZenMode": "Zen modundan çık"
+    "exitZenMode": "Zen modundan çık",
+    "cancel": "",
+    "clear": ""
   },
   "alerts": {
     "clearReset": "Tuvalin tamamı temizlenecek. Emin misiniz?",
@@ -154,14 +156,22 @@
     "errorAddingToLibrary": "Öğe kütüphaneye eklenemedi",
     "errorRemovingFromLibrary": "Öğe kütüphaneden silinemedi",
     "confirmAddLibrary": "Bu, kitaplığınıza {{numShapes}} tane şekil ekleyecek. Emin misiniz?",
-    "imageDoesNotContainScene": "Resim ekleme şuan için desteklenmiyor.\nBir sahneyi içeri aktarmak mı istediniz? Bu dosya herhangi bir sahne içeriyor gibi durmuyor. Çıktı alırken sahneyi dahil ettiniz mi?",
+    "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "Sahne bu dosyadan oluşturulamıyor",
     "invalidSceneUrl": "Verilen URL'den çalışma alanı yüklenemedi. Dosya bozuk olabilir veya geçerli bir Excalidraw JSON verisi bulundurmuyor olabilir.",
     "resetLibrary": "Bu işlem kütüphanenizi sıfırlayacak. Emin misiniz?",
     "invalidEncryptionKey": ""
   },
+  "errors": {
+    "unsupportedFileType": "",
+    "imageInsertError": "",
+    "fileTooBig": "",
+    "svgImageInsertError": "",
+    "invalidSVGString": ""
+  },
   "toolBar": {
     "selection": "Seçme",
+    "image": "",
     "rectangle": "Dikdörtgen",
     "diamond": "Elmas",
     "ellipse": "Elips",
@@ -186,10 +196,12 @@
     "linearElementMulti": "Tamamlamak için son noktayı seçin veya Escape ve Enter'dan birine basın",
     "lockAngle": "SHIFT tuşuna basılı tutarak açıyı koruyabilirsiniz",
     "resize": "Yeniden boyutlandırırken SHIFT'e basılı tutarak oranları kısıtlayabilirsiniz, merkezden yeniden boyutlandırmak için ALT'a basılı tutun",
+    "resizeImage": "",
     "rotate": "Döndürürken SHIFT tuşuna basılı tutarak açıları koruyabilirsiniz",
     "lineEditor_info": "Noktaları düzenlemek için çift-tıklayın veya Enter'a basın",
     "lineEditor_pointSelected": "Noktayı silmek için Delete'e, kopyalamak için CtrlVeyaCmd+D'ye, veya hareket ettirmek için sürükleyin",
-    "lineEditor_nothingSelected": "Kaldırmak veya oynatmak için bir nokta seç, veya yeni noktalar eklemek için Alt'a basılı tut"
+    "lineEditor_nothingSelected": "Kaldırmak veya oynatmak için bir nokta seç, veya yeni noktalar eklemek için Alt'a basılı tut",
+    "placeImage": ""
   },
   "canvasError": {
     "cannotShowPreview": "Önizleme gösterilemiyor",
@@ -255,6 +267,9 @@
     "view": "Görünüm",
     "zoomToFit": "Tüm öğeleri sığdırmak için yakınlaştır",
     "zoomToSelection": "Seçime yakınlaş"
+  },
+  "clearCanvasDialog": {
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Çizimleriniz uçtan-uca şifrelenmiştir, Excalidraw'ın sunucuları bile onları göremez.",

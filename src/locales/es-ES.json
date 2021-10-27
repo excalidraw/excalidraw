@@ -136,7 +136,9 @@
     "darkMode": "Modo oscuro",
     "lightMode": "Modo claro",
     "zenMode": "Modo Zen",
-    "exitZenMode": "Salir del modo Zen"
+    "exitZenMode": "Salir del modo Zen",
+    "cancel": "",
+    "clear": ""
   },
   "alerts": {
     "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",
@@ -154,14 +156,22 @@
     "errorAddingToLibrary": "No se pudo agregar elemento a la biblioteca",
     "errorRemovingFromLibrary": "No se pudo quitar el elemento de la biblioteca",
     "confirmAddLibrary": "Esto añadirá {{numShapes}} forma(s) a tu biblioteca. ¿Estás seguro?",
-    "imageDoesNotContainScene": "La importación de imágenes no está homologada en este momento.\n\n¿Deseas importar una escena? Esta imagen no parece contener ningún dato de escena. ¿Lo has activado durante la exportación?",
+    "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "No se pudo restaurar la escena desde este archivo de imagen",
     "invalidSceneUrl": "No se ha podido importar la escena desde la URL proporcionada. Está mal formada, o no contiene datos de Excalidraw JSON válidos.",
     "resetLibrary": "Esto eliminará tu librería. ¿Estás seguro?",
     "invalidEncryptionKey": "La clave de cifrado debe tener 22 caracteres. La colaboración en vivo está deshabilitada."
   },
+  "errors": {
+    "unsupportedFileType": "",
+    "imageInsertError": "",
+    "fileTooBig": "",
+    "svgImageInsertError": "",
+    "invalidSVGString": ""
+  },
   "toolBar": {
     "selection": "Selección",
+    "image": "",
     "rectangle": "Rectángulo",
     "diamond": "Diamante",
     "ellipse": "Elipse",
@@ -186,10 +196,12 @@
     "linearElementMulti": "Haz clic en el último punto o presiona Escape o Enter para finalizar",
     "lockAngle": "Puedes restringir el ángulo manteniendo presionado el botón SHIFT",
     "resize": "Para mantener las proporciones mantén SHIFT presionado mientras modificas el tamaño, \nmantén presionado ALT para modificar el tamaño desde el centro",
+    "resizeImage": "",
     "rotate": "Puedes restringir los ángulos manteniendo presionado SHIFT mientras giras",
     "lineEditor_info": "Doble clic o pulse Enter para editar puntos",
     "lineEditor_pointSelected": "Presione Suprimir para eliminar el punto, CtrlOrCmd+D para duplicarlo, o arrástrelo para moverlo",
-    "lineEditor_nothingSelected": "Selecciona un punto sea para mover o eliminar, o mantén pulsado Alt y haz clic para añadir nuevos puntos"
+    "lineEditor_nothingSelected": "Selecciona un punto sea para mover o eliminar, o mantén pulsado Alt y haz clic para añadir nuevos puntos",
+    "placeImage": ""
   },
   "canvasError": {
     "cannotShowPreview": "No se puede mostrar la vista previa",
@@ -255,6 +267,9 @@
     "view": "Vista",
     "zoomToFit": "Ajustar la vista para mostrar todos los elementos",
     "zoomToSelection": "Hacer zoom a la selección"
+  },
+  "clearCanvasDialog": {
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Tus dibujos están cifrados de punto a punto, por lo que los servidores de Excalidraw nunca los verán.",

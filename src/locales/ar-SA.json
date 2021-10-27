@@ -136,7 +136,9 @@
     "darkMode": "الوضع المظلم",
     "lightMode": "الوضع المضيء",
     "zenMode": "وضع التأمل",
-    "exitZenMode": "إلغاء الوضع الليلى"
+    "exitZenMode": "إلغاء الوضع الليلى",
+    "cancel": "",
+    "clear": ""
   },
   "alerts": {
     "clearReset": "هذا سيُزيل كامل اللوحة. هل أنت متأكد؟",
@@ -154,14 +156,22 @@
     "errorAddingToLibrary": "تعذر إضافة العنصر للمكتبة",
     "errorRemovingFromLibrary": "تعذر إزالة العنصر من المكتبة",
     "confirmAddLibrary": "هذا سيضيف {{numShapes}} شكل إلى مكتبتك. هل أنت متأكد؟",
-    "imageDoesNotContainScene": "استيراد الصور غير مدعوم في الوقت الراهن.\n\nهل تريد استيراد مشهد؟ لا يبدو أن هذه الصورة تحتوي على أي بيانات مشهد. هل قمت بسماح هذا أثناء التصدير؟",
+    "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "تعذر استعادة المشهد من ملف الصورة",
     "invalidSceneUrl": "تعذر استيراد المشهد من عنوان URL المتوفر. إما أنها مشوهة، أو لا تحتوي على بيانات Excalidraw JSON صالحة.",
     "resetLibrary": "هذا سوف يمسح مكتبتك. هل أنت متأكد؟",
     "invalidEncryptionKey": "مفتاح التشفير يجب أن يكون من 22 حرفاً. التعاون المباشر معطل."
   },
+  "errors": {
+    "unsupportedFileType": "",
+    "imageInsertError": "",
+    "fileTooBig": "",
+    "svgImageInsertError": "",
+    "invalidSVGString": ""
+  },
   "toolBar": {
     "selection": "تحديد",
+    "image": "",
     "rectangle": "مستطيل",
     "diamond": "مضلع",
     "ellipse": "دائرة",
@@ -186,10 +196,12 @@
     "linearElementMulti": "انقر فوق النقطة الأخيرة أو اضغط على Esc أو Enter للإنهاء",
     "lockAngle": "يمكنك تقييد الزاوية بالضغط على SHIFT",
     "resize": "يمكنك تقييد النسب بالضغط على SHIFT أثناء تغيير الحجم،\nاضغط على ALT لتغيير الحجم من المركز",
+    "resizeImage": "",
     "rotate": "يمكنك تقييد الزوايا من خلال الضغط على SHIFT أثناء الدوران",
     "lineEditor_info": "انقر نقراً مزدوجاً أو اضغط Enter لتعديل النقاط",
     "lineEditor_pointSelected": "اضغط على حذف لإزالة النقطة، Ctrl Or Cmd+D للتكرار، أو اسحب للانتقال",
-    "lineEditor_nothingSelected": "حدد نقطة لتحريك أو إزالتها، أو اضغط Alt ثم انقر لإضافة نقاط جديدة"
+    "lineEditor_nothingSelected": "حدد نقطة لتحريك أو إزالتها، أو اضغط Alt ثم انقر لإضافة نقاط جديدة",
+    "placeImage": ""
   },
   "canvasError": {
     "cannotShowPreview": "تعذر عرض المعاينة",
@@ -255,6 +267,9 @@
     "view": "عرض",
     "zoomToFit": "تكبير للملائمة",
     "zoomToSelection": "تكبير للعنصر المحدد"
+  },
+  "clearCanvasDialog": {
+    "title": ""
   },
   "encrypted": {
     "tooltip": "رسوماتك مشفرة من النهاية إلى النهاية حتى أن خوادم Excalidraw لن تراها أبدا.",
