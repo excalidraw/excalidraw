@@ -719,7 +719,14 @@ export const actionChangeArrowhead = register({
                 icon: <ArrowheadNoneIcon theme={appState.theme} />,
                 keyBinding: "q",
               },
-
+              {
+                value: "arrow",
+                text: t("labels.arrowhead_arrow"),
+                icon: (
+                  <ArrowheadArrowIcon theme={appState.theme} flip={!isRTL} />
+                ),
+                keyBinding: "w",
+              },
               {
                 value: "bar",
                 text: t("labels.arrowhead_bar"),
@@ -731,14 +738,6 @@ export const actionChangeArrowhead = register({
                 text: t("labels.arrowhead_dot"),
                 icon: <ArrowheadDotIcon theme={appState.theme} flip={!isRTL} />,
                 keyBinding: "r",
-              },
-              {
-                value: "arrow",
-                text: t("labels.arrowhead_arrow"),
-                icon: (
-                  <ArrowheadArrowIcon theme={appState.theme} flip={!isRTL} />
-                ),
-                keyBinding: "w",
               },
               {
                 value: "triangle",
@@ -770,7 +769,14 @@ export const actionChangeArrowhead = register({
                 keyBinding: "q",
                 icon: <ArrowheadNoneIcon theme={appState.theme} />,
               },
-
+              {
+                value: "arrow",
+                text: t("labels.arrowhead_arrow"),
+                keyBinding: "w",
+                icon: (
+                  <ArrowheadArrowIcon theme={appState.theme} flip={isRTL} />
+                ),
+              },
               {
                 value: "bar",
                 text: t("labels.arrowhead_bar"),
@@ -782,14 +788,6 @@ export const actionChangeArrowhead = register({
                 text: t("labels.arrowhead_dot"),
                 keyBinding: "r",
                 icon: <ArrowheadDotIcon theme={appState.theme} flip={isRTL} />,
-              },
-              {
-                value: "arrow",
-                text: t("labels.arrowhead_arrow"),
-                keyBinding: "w",
-                icon: (
-                  <ArrowheadArrowIcon theme={appState.theme} flip={isRTL} />
-                ),
               },
               {
                 value: "triangle",
