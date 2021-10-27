@@ -84,12 +84,15 @@ export const reconcileElements = (
       duplicates.set(local[0], true);
     }
 
+    // parent may not be defined in case the remote client is running an older
+    // excalidraw version
     const parent =
       remoteElement.parent || remoteElements[remoteElementIdx - 1]?.id || null;
 
     if (parent != null) {
       delete remoteElement.parent;
 
+      // ^ indicates the element is the first in elements array
       if (parent === "^") {
         offset++;
         if (cursor === 0) {
