@@ -167,7 +167,7 @@
     "imageInsertError": "படத்தைச் செருக முடியவில்லை. பிறகு மீண்டும் முயலவும்...",
     "fileTooBig": "கோப்பு மிகப்பெரிது. அனுமதிக்கப்பட்ட அதிகபட்ச அளவு {{maxSize}}.",
     "svgImageInsertError": "எஸ்விஜி படத்தைச் செருக இயலா. எஸ்விஜியின் மார்க்அப் செல்லாததாக தெரிகிறது.",
-    "invalidSVGString": ""
+    "invalidSVGString": "errors.invalidSVGString"
   },
   "toolBar": {
     "selection": "தெரிவு",
