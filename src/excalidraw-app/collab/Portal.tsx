@@ -12,6 +12,7 @@ import { UserIdleState } from "../../types";
 import { trackEvent } from "../../analytics";
 import { throttle } from "lodash";
 import { mutateElement } from "../../element/mutateElement";
+import { BroadcastedExcalidrawElement } from "./reconciliation";
 
 class Portal {
   collab: CollabWrapper;
@@ -40,9 +41,7 @@ class Portal {
     this.socket.on("new-user", async (_socketId: string) => {
       this.broadcastScene(
         SCENE.INIT,
-        this.collab.getSyncableElements(
-          this.collab.getSceneElementsIncludingDeleted(),
-        ),
+        this.collab.getSceneElementsIncludingDeleted(),
         /* syncAll */ true,
       );
     });
@@ -124,24 +123,35 @@ class Portal {
 
   broadcastScene = async (
     sceneType: SCENE.INIT | SCENE.UPDATE,
-    syncableElements: ExcalidrawElement[],
+    allElements: readonly ExcalidrawElement[],
     syncAll: boolean,
   ) => {
     if (sceneType === SCENE.INIT && !syncAll) {
       throw new Error("syncAll must be true when sending SCENE.INIT");
     }
 
-    if (!syncAll) {
-      // sync out only the elements we think we need to to save bandwidth.
-      // periodically we'll resync the whole thing to make sure no one diverges
-      // due to a dropped message (server goes down etc).
-      syncableElements = syncableElements.filter(
-        (syncableElement) =>
-          !this.broadcastedElementVersions.has(syncableElement.id) ||
-          syncableElement.version >
-            this.broadcastedElementVersions.get(syncableElement.id)!,
-      );
-    }
+    // sync out only the elements we think we need to to save bandwidth.
+    // periodically we'll resync the whole thing to make sure no one diverges
+    // due to a dropped message (server goes down etc).
+    const syncableElements = allElements.reduce(
+      (acc, element: BroadcastedExcalidrawElement, idx, elements) => {
+        if (
+          (syncAll ||
+            !this.broadcastedElementVersions.has(element.id) ||
+            element.version >
+              this.broadcastedElementVersions.get(element.id)!) &&
+          this.collab.isSyncableElement(element)
+        ) {
+          acc.push({
+            ...element,
+            // z-index info for the reconciler
+            parent: idx === 0 ? "^" : elements[idx - 1]?.id,
+          });
+        }
+        return acc;
+      },
+      [] as BroadcastedExcalidrawElement[],
+    );
 
     const data: SocketUpdateDataSource[typeof sceneType] = {
       type: sceneType,
