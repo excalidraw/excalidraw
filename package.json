@@ -19,7 +19,6 @@
     ]
   },
   "dependencies": {
-    "@dwelle/browser-fs-access": "0.21.3",
     "@sentry/browser": "6.2.5",
     "@sentry/integrations": "6.2.5",
     "@testing-library/jest-dom": "5.11.10",
@@ -30,6 +29,7 @@
     "@types/react": "17.0.3",
     "@types/react-dom": "17.0.3",
     "@types/socket.io-client": "1.4.36",
+    "browser-fs-access": "0.21.0",
     "clsx": "1.1.1",
     "fake-indexeddb": "3.1.3",
     "firebase": "8.3.3",
@@ -81,7 +81,7 @@
   },
   "jest": {
     "transformIgnorePatterns": [
-      "node_modules/(?!(roughjs|points-on-curve|path-data-parser|points-on-path|@dwelle/browser-fs-access)/)"
+      "node_modules/(?!(roughjs|points-on-curve|path-data-parser|points-on-path|browser-fs-access)/)"
     ],
     "resetMocks": false
   },
