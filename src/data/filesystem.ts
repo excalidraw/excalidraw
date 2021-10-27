@@ -4,7 +4,7 @@ import {
   fileSave as _fileSave,
   FileSystemHandle,
   supported as nativeFileSystemSupported,
-} from "@dwelle/browser-fs-access";
+} from "browser-fs-access";
 import { EVENT, MIME_TYPES } from "../constants";
 import { AbortError } from "../errors";
 import { debounce } from "../utils";
