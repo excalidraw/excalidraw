@@ -8,10 +8,7 @@ import {
   ExcalidrawElement,
   InitializedExcalidrawImageElement,
 } from "../../element/types";
-import {
-  getElementMap,
-  getSceneVersion,
-} from "../../packages/excalidraw/index";
+import { getSceneVersion } from "../../packages/excalidraw/index";
 import { Collaborator, Gesture } from "../../types";
 import {
   preventUnload,
@@ -64,6 +61,10 @@ import {
   isInitializedImageElement,
 } from "../../element/typeChecks";
 import { mutateElement } from "../../element/mutateElement";
+import {
+  ReconciledElements,
+  reconcileElements as _reconcileElements,
+} from "./reconciliation";
 
 interface CollabState {
   modalIsShown: boolean;
@@ -86,10 +87,6 @@ export interface CollabAPI {
   broadcastElements: CollabInstance["broadcastElements"];
   fetchImageFilesFromFirebase: CollabInstance["fetchImageFilesFromFirebase"];
 }
-
-type ReconciledElements = readonly ExcalidrawElement[] & {
-  _brand: "reconciledElements";
-};
 
 interface Props {
   excalidrawAPI: ExcalidrawImperativeAPI;
@@ -227,7 +224,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   });
 
   saveCollabRoomToFirebase = async (
-    syncableElements: ExcalidrawElement[] = this.getSyncableElements(
+    syncableElements: readonly ExcalidrawElement[] = this.getSyncableElements(
       this.excalidrawAPI.getSceneElementsIncludingDeleted(),
     ),
   ) => {
@@ -484,65 +481,26 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   };
 
   private reconcileElements = (
-    elements: readonly ExcalidrawElement[],
+    remoteElements: readonly ExcalidrawElement[],
   ): ReconciledElements => {
-    const currentElements = this.getSceneElementsIncludingDeleted();
-    // create a map of ids so we don't have to iterate
-    // over the array more than once.
-    const localElementMap = getElementMap(currentElements);
-
+    const localElements = this.getSceneElementsIncludingDeleted();
     const appState = this.excalidrawAPI.getAppState();
 
-    // Reconcile
-    const newElements: readonly ExcalidrawElement[] = elements
-      .reduce((elements, element) => {
-        // if the remote element references one that's currently
-        // edited on local, skip it (it'll be added in the next step)
-        if (
-          element.id === appState.editingElement?.id ||
-          element.id === appState.resizingElement?.id ||
-          element.id === appState.draggingElement?.id
-        ) {
-          return elements;
-        }
-
-        if (
-          localElementMap.hasOwnProperty(element.id) &&
-          localElementMap[element.id].version > element.version
-        ) {
-          elements.push(localElementMap[element.id]);
-          delete localElementMap[element.id];
-        } else if (
-          localElementMap.hasOwnProperty(element.id) &&
-          localElementMap[element.id].version === element.version &&
-          localElementMap[element.id].versionNonce !== element.versionNonce
-        ) {
-          // resolve conflicting edits deterministically by taking the one with the lowest versionNonce
-          if (localElementMap[element.id].versionNonce < element.versionNonce) {
-            elements.push(localElementMap[element.id]);
-          } else {
-            // it should be highly unlikely that the two versionNonces are the same. if we are
-            // really worried about this, we can replace the versionNonce with the socket id.
-            elements.push(element);
-          }
-          delete localElementMap[element.id];
-        } else {
-          elements.push(element);
-          delete localElementMap[element.id];
-        }
-
-        return elements;
-      }, [] as Mutable<typeof elements>)
-      // add local elements that weren't deleted or on remote
-      .concat(...Object.values(localElementMap));
+    const reconciledElements = _reconcileElements(
+      localElements,
+      remoteElements,
+      appState,
+    );
 
     // Avoid broadcasting to the rest of the collaborators the scene
     // we just received!
     // Note: this needs to be set before updating the scene as it
     // synchronously calls render.
-    this.setLastBroadcastedOrReceivedSceneVersion(getSceneVersion(newElements));
+    this.setLastBroadcastedOrReceivedSceneVersion(
+      getSceneVersion(reconciledElements),
+    );
 
-    return newElements as ReconciledElements;
+    return reconciledElements;
   };
 
   private loadImageFiles = throttle(async () => {
@@ -681,11 +639,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       getSceneVersion(elements) >
       this.getLastBroadcastedOrReceivedSceneVersion()
     ) {
-      this.portal.broadcastScene(
-        SCENE.UPDATE,
-        this.getSyncableElements(elements),
-        false,
-      );
+      this.portal.broadcastScene(SCENE.UPDATE, elements, false);
       this.lastBroadcastedOrReceivedSceneVersion = getSceneVersion(elements);
       this.queueBroadcastAllElements();
     }
@@ -694,9 +648,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   queueBroadcastAllElements = throttle(() => {
     this.portal.broadcastScene(
       SCENE.UPDATE,
-      this.getSyncableElements(
-        this.excalidrawAPI.getSceneElementsIncludingDeleted(),
-      ),
+      this.excalidrawAPI.getSceneElementsIncludingDeleted(),
       true,
     );
     const currentVersion = this.getLastBroadcastedOrReceivedSceneVersion();
@@ -722,8 +674,12 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     });
   };
 
+  isSyncableElement = (element: ExcalidrawElement) => {
+    return element.isDeleted || !isInvisiblySmallElement(element);
+  };
+
   getSyncableElements = (elements: readonly ExcalidrawElement[]) =>
-    elements.filter((el) => el.isDeleted || !isInvisiblySmallElement(el));
+    elements.filter((element) => this.isSyncableElement(element));
 
   /** PRIVATE. Use `this.getContextValue()` instead. */
   private contextValue: CollabAPI | null = null;
