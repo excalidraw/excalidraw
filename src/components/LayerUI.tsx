@@ -725,6 +725,7 @@ const LayerUI = ({
         >
           {renderCustomFooter?.(false, appState)}
         </div>
+
         <div
           className={clsx(
             "layer-ui__wrapper__footer-right zen-mode-transition",
