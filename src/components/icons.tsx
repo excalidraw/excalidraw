@@ -752,6 +752,21 @@ export const ArrowheadBarIcon = React.memo(
     ),
 );
 
+export const ArrowheadTriangleIcon = React.memo(
+  ({ theme, flip = false }: { theme: Theme; flip?: boolean }) =>
+    createIcon(
+      <g
+        stroke={iconFillColor(theme)}
+        fill={iconFillColor(theme)}
+        transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
+      >
+        <path d="M32 10L6 10" strokeWidth={2} />
+        <path d="M27.5 5.5L34.5 10L27.5 14.5L27.5 5.5" />
+      </g>,
+      { width: 40, height: 20 },
+    ),
+);
+
 export const FontSizeSmallIcon = React.memo(({ theme }: { theme: Theme }) =>
   createIcon(
     <path

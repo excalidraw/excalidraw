@@ -258,6 +258,7 @@ export const getArrowheadPoints = (
     arrow: 30,
     bar: 15,
     dot: 15,
+    triangle: 15,
   }[arrowhead]; // pixels (will differ for each arrowhead)
 
   let length = 0;
@@ -294,6 +295,7 @@ export const getArrowheadPoints = (
   const angle = {
     arrow: 20,
     bar: 90,
+    triangle: 25,
   }[arrowhead]; // degrees
 
   // Return points

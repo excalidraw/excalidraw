@@ -485,6 +485,29 @@ const generateElementShape = (
               ];
             }
 
+            if (arrowhead === "triangle") {
+              const [x, y, x2, y2, x3, y3] = arrowheadPoints;
+
+              // always use solid stroke for triangle arrowhead
+              delete options.strokeLineDash;
+
+              return [
+                generator.polygon(
+                  [
+                    [x, y],
+                    [x2, y2],
+                    [x3, y3],
+                    [x, y],
+                  ],
+                  {
+                    ...options,
+                    fill: element.strokeColor,
+                    fillStyle: "solid",
+                  },
+                ),
+              ];
+            }
+
             // Arrow arrowheads
             const [x2, y2, x3, y3, x4, y4] = arrowheadPoints;
 

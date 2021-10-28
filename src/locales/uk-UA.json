@@ -136,7 +136,9 @@
     "darkMode": "Темний режим",
     "lightMode": "Світлий режим",
     "zenMode": "Режим Дзен",
-    "exitZenMode": "Вийти з дзен-режиму"
+    "exitZenMode": "Вийти з дзен-режиму",
+    "cancel": "Скасувати",
+    "clear": "Очистити"
   },
   "alerts": {
     "clearReset": "Це очистить все полотно. Впевнені?",
@@ -154,14 +156,22 @@
     "errorAddingToLibrary": "Не вдалося додати елемент до бібліотеки",
     "errorRemovingFromLibrary": "Не вдалося видалити елемент з бібліотеки",
     "confirmAddLibrary": "Це призведе до додавання {{numShapes}} фігур до вашої бібліотеки. Ви впевнені?",
-    "imageDoesNotContainScene": "Імпортування зображень на даний момент не підтримується.\n\nЧи хочете ви імпортувати сцену? Це зображення не містить ніяких даних сцен. Ви увімкнули це під час експорту?",
+    "imageDoesNotContainScene": "",
     "cannotRestoreFromImage": "Сцена не може бути відновлена з цього файлу зображення",
     "invalidSceneUrl": "Не вдалося імпортувати сцену з наданого URL. Він або недоформований, або не містить дійсних даних Excalidraw JSON.",
     "resetLibrary": "Це призведе до очищення бібліотеки. Ви впевнені?",
     "invalidEncryptionKey": ""
   },
+  "errors": {
+    "unsupportedFileType": "",
+    "imageInsertError": "",
+    "fileTooBig": "",
+    "svgImageInsertError": "",
+    "invalidSVGString": ""
+  },
   "toolBar": {
     "selection": "Виділення",
+    "image": "",
     "rectangle": "Прямокутник",
     "diamond": "Ромб",
     "ellipse": "Еліпс",
@@ -186,10 +196,12 @@
     "linearElementMulti": "Натисніть на останню точку, клацніть Esc або Enter щоб завершити",
     "lockAngle": "Ви можете обмежити кут, утримуюючи SHIFT",
     "resize": "Ви можете зберегти пропорції, утримуючи SHIFT під час зміни розміру,\nутримуйте ALT для змінення розміру від центру",
+    "resizeImage": "",
     "rotate": "Ви можете обмежити кути, утримуючи SHIFT під час обертання",
     "lineEditor_info": "Двічі клацніть або натисніть Enter щоб редагувати точки",
     "lineEditor_pointSelected": "Натисніть Видалити, щоб видалити точку, CtrlOrCmd+D для дублювання, або перетягніть, щоб переміститися",
-    "lineEditor_nothingSelected": "Виберіть точку для переміщення чи видалення, або утримуйте Alt і натисніть, щоб додати нові точки"
+    "lineEditor_nothingSelected": "Виберіть точку для переміщення чи видалення, або утримуйте Alt і натисніть, щоб додати нові точки",
+    "placeImage": ""
   },
   "canvasError": {
     "cannotShowPreview": "Не вдається показати попередній перегляд",
@@ -230,7 +242,7 @@
     "link_details": "Експортувати як посилання тільки для читання.",
     "link_button": "Експортувати у посилання",
     "excalidrawplus_description": "",
-    "excalidrawplus_button": "",
+    "excalidrawplus_button": "Експортувати",
     "excalidrawplus_exportError": ""
   },
   "helpDialog": {
@@ -249,12 +261,15 @@
     "preventBinding": "Запобігти зв'язування зі стрілками",
     "shapes": "Фігури",
     "shortcuts": "Гарячі клавіші",
-    "textFinish": "",
-    "textNewLine": "",
+    "textFinish": "Завершити редагування (текстовий редактор)",
+    "textNewLine": "Додати новий рядок (текстовий редактор)",
     "title": "Допомога",
     "view": "Вигляд",
     "zoomToFit": "Збільшити щоб умістити всі елементи",
     "zoomToSelection": "Наблизити вибране"
+  },
+  "clearCanvasDialog": {
+    "title": "Очистити полотно"
   },
   "encrypted": {
     "tooltip": "Ваші креслення захищені наскрізним шифруванням — сервери Excalidraw ніколи їх не побачать.",
@@ -285,11 +300,11 @@
     "selection": "виділення"
   },
   "colors": {
-    "ffffff": "",
-    "f8f9fa": "",
-    "f1f3f5": "",
-    "fff5f5": "",
-    "fff0f6": "",
+    "ffffff": "Білий",
+    "f8f9fa": "Сірий 0",
+    "f1f3f5": "Сірий 1",
+    "fff5f5": "Червоний 0",
+    "fff0f6": "Рожевий 0",
     "f8f0fc": "",
     "f3f0ff": "",
     "edf2ff": "",
