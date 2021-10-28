@@ -70,6 +70,7 @@ export const FONT_FAMILY = {
   Cascadia: 3,
   REDACTED: 4,
   SCRIBBLE: 5,
+  BLOKK: 6,
 };
 
 export const THEME = {

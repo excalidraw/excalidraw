@@ -537,6 +537,11 @@ export const actionChangeFontFamily = register({
         text: t("labels.wireframe"),
         icon: <FontFamilyWireframeIcon theme={appState.theme} />,
       },
+      {
+        value: FONT_FAMILY.BLOKK,
+        text: t("labels.wireframe"),
+        icon: <FontFamilyWireframeIcon theme={appState.theme} />,
+      },
     ];
 
     return (
