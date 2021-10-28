@@ -39,7 +39,7 @@
     "arrowhead_arrow": "Flecha",
     "arrowhead_bar": "Barra",
     "arrowhead_dot": "Punto",
-    "arrowhead_triangle": "",
+    "arrowhead_triangle": "Triángulo",
     "fontSize": "Tamaño de la fuente",
     "fontFamily": "Tipo de fuente",
     "onlySelected": "Sólo seleccionados",
@@ -138,8 +138,8 @@
     "lightMode": "Modo claro",
     "zenMode": "Modo Zen",
     "exitZenMode": "Salir del modo Zen",
-    "cancel": "",
-    "clear": ""
+    "cancel": "Cancelar",
+    "clear": "Borrar"
   },
   "alerts": {
     "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",
@@ -157,22 +157,22 @@
     "errorAddingToLibrary": "No se pudo agregar elemento a la biblioteca",
     "errorRemovingFromLibrary": "No se pudo quitar el elemento de la biblioteca",
     "confirmAddLibrary": "Esto añadirá {{numShapes}} forma(s) a tu biblioteca. ¿Estás seguro?",
-    "imageDoesNotContainScene": "",
+    "imageDoesNotContainScene": "Esta imagen no parece contener datos de escena. ¿Ha habilitado la inserción de la escena durante la exportación?",
     "cannotRestoreFromImage": "No se pudo restaurar la escena desde este archivo de imagen",
     "invalidSceneUrl": "No se ha podido importar la escena desde la URL proporcionada. Está mal formada, o no contiene datos de Excalidraw JSON válidos.",
     "resetLibrary": "Esto eliminará tu librería. ¿Estás seguro?",
     "invalidEncryptionKey": "La clave de cifrado debe tener 22 caracteres. La colaboración en vivo está deshabilitada."
   },
   "errors": {
-    "unsupportedFileType": "",
-    "imageInsertError": "",
-    "fileTooBig": "",
-    "svgImageInsertError": "",
+    "unsupportedFileType": "Tipo de archivo no admitido.",
+    "imageInsertError": "No se pudo insertar la imagen. Inténtelo de nuevo más tarde...",
+    "fileTooBig": "Archivo demasiado grande. El tamaño máximo permitido es {{maxSize}}.",
+    "svgImageInsertError": "No se pudo insertar la imagen SVG. El código SVG parece inválido.",
     "invalidSVGString": ""
   },
   "toolBar": {
     "selection": "Selección",
-    "image": "",
+    "image": "Insertar imagen",
     "rectangle": "Rectángulo",
     "diamond": "Diamante",
     "ellipse": "Elipse",
@@ -197,12 +197,12 @@
     "linearElementMulti": "Haz clic en el último punto o presiona Escape o Enter para finalizar",
     "lockAngle": "Puedes restringir el ángulo manteniendo presionado el botón SHIFT",
     "resize": "Para mantener las proporciones mantén SHIFT presionado mientras modificas el tamaño, \nmantén presionado ALT para modificar el tamaño desde el centro",
-    "resizeImage": "",
+    "resizeImage": "Puede redimensionar libremente pulsando SHIFT,\npulse ALT para redimensionar desde el centro",
     "rotate": "Puedes restringir los ángulos manteniendo presionado SHIFT mientras giras",
     "lineEditor_info": "Doble clic o pulse Enter para editar puntos",
     "lineEditor_pointSelected": "Presione Suprimir para eliminar el punto, CtrlOrCmd+D para duplicarlo, o arrástrelo para moverlo",
     "lineEditor_nothingSelected": "Selecciona un punto sea para mover o eliminar, o mantén pulsado Alt y haz clic para añadir nuevos puntos",
-    "placeImage": ""
+    "placeImage": "Haga clic para colocar la imagen o haga clic y arrastre para establecer su tamaño manualmente"
   },
   "canvasError": {
     "cannotShowPreview": "No se puede mostrar la vista previa",
@@ -270,7 +270,7 @@
     "zoomToSelection": "Hacer zoom a la selección"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "Borrar Lienzo"
   },
   "encrypted": {
     "tooltip": "Tus dibujos están cifrados de punto a punto, por lo que los servidores de Excalidraw nunca los verán.",
