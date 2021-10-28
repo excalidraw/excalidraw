@@ -1919,6 +1919,10 @@ class App extends React.Component<AppProps, AppState> {
         this.setState({
           draggingElement: null,
           editingElement: null,
+          selectedElementIds: {
+            ...this.state.selectedElementIds,
+            [element.id]: true,
+          },
         });
         if (this.state.elementLocked) {
           setCursorForShape(this.canvas, this.state.elementType);
