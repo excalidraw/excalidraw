@@ -5,6 +5,7 @@ const THRESSHOLD = 85;
 const crowdinMap = {
   "ar-SA": "en-ar",
   "bg-BG": "en-bg",
+  "bn-BD": "en-bn",
   "ca-ES": "en-ca",
   "da-DK": "en-da",
   "de-DE": "en-de",
@@ -49,6 +50,7 @@ const crowdinMap = {
 const flags = {
   "ar-SA": "🇸🇦",
   "bg-BG": "🇧🇬",
+  "bn-BD": "🇧🇩",
   "ca-ES": "🏳",
   "cs-CZ": "🇨🇿",
   "da-DK": "🇩🇰",
@@ -93,6 +95,7 @@ const flags = {
 const languages = {
   "ar-SA": "العربية",
   "bg-BG": "Български",
+  "bn-BD": "Bengali",
   "ca-ES": "Català",
   "cs-CZ": "Česky",
   "da-DK": "Dansk",
