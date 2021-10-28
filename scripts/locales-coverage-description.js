@@ -38,6 +38,7 @@ const crowdinMap = {
   "tr-TR": "en-tr",
   "uk-UA": "en-uk",
   "zh-CN": "en-zhcn",
+  "zh-HK": "en-zhhk",
   "zh-TW": "en-zhtw",
   "lv-LV": "en-lv",
   "cs-CZ": "en-cs",
@@ -83,6 +84,7 @@ const flags = {
   "tr-TR": "🇹🇷",
   "uk-UA": "🇺🇦",
   "zh-CN": "🇨🇳",
+  "zh-HK": "🇭🇰",
   "zh-TW": "🇹🇼",
 };
 
@@ -125,6 +127,7 @@ const languages = {
   "tr-TR": "Türkçe",
   "uk-UA": "Українська",
   "zh-CN": "简体中文",
+  "zh-HK": "Chinese Traditional, Hong Kong",
   "zh-TW": "繁體中文",
 };
 
