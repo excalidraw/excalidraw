@@ -1,9 +1,11 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "module": "es2015",
+    "target": "es6",
+    "module": "esNext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "jsx": "react"
+    "jsx": "react-jsx",
+    "sourceMap": false,
+    "allowJs": true
   }
 }
