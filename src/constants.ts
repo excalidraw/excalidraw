@@ -69,6 +69,7 @@ export const FONT_FAMILY = {
   Helvetica: 2,
   Cascadia: 3,
   REDACTED: 4,
+  SCRIBBLE: 5,
 };
 
 export const THEME = {
