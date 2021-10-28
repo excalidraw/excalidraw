@@ -30,6 +30,7 @@ import {
   TextAlignCenterIcon,
   TextAlignLeftIcon,
   TextAlignRightIcon,
+  FontFamilyWireframeIcon,
 } from "../components/icons";
 import {
   DEFAULT_FONT_FAMILY,
@@ -525,6 +526,11 @@ export const actionChangeFontFamily = register({
         value: FONT_FAMILY.Cascadia,
         text: t("labels.code"),
         icon: <FontFamilyCodeIcon theme={appState.theme} />,
+      },
+      {
+        value: FONT_FAMILY.REDACTED,
+        text: t("labels.wireframe"),
+        icon: <FontFamilyWireframeIcon theme={appState.theme} />,
       },
     ];
 
