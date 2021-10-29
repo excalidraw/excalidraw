@@ -50,6 +50,7 @@ import Library from "../data/library";
 import { JSONExportDialog } from "./JSONExportDialog";
 import { LibraryButton } from "./LibraryButton";
 import { isImageFileHandle } from "../data/blob";
+import PublishLibrary from "./PublishLibrary";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -147,6 +148,9 @@ const LibraryMenuItems = ({
   const rows = [];
   let addedPendingElements = false;
   const [activeIndex, setActiveIndex] = useState(-1);
+  const [showPublishLibraryDialog, setShowPublishLibraryDialog] = useState(
+    false,
+  );
   const referrer =
     libraryReturnUrl || window.location.origin + window.location.pathname;
 
@@ -234,6 +238,7 @@ const LibraryMenuItems = ({
             aria-label={t("buttons.publishLibrary")}
             label={t("buttons.publishLibrary")}
             className="library-item-actions--publish"
+            onClick={() => setShowPublishLibraryDialog(true)}
           />
         )}
       </div>,
@@ -278,9 +283,14 @@ const LibraryMenuItems = ({
   }
 
   return (
-    <Stack.Col align="start" gap={1} className="layer-ui__library-items">
-      {rows}
-    </Stack.Col>
+    <>
+      {showPublishLibraryDialog && (
+        <PublishLibrary onClose={() => setShowPublishLibraryDialog(false)} />
+      )}
+      <Stack.Col align="start" gap={1} className="layer-ui__library-items">
+        {rows}
+      </Stack.Col>
+    </>
   );
 };
 
@@ -596,6 +606,10 @@ const LayerUI = ({
 
   const closeLibrary = useCallback(
     (event) => {
+      const isPublishDialogOpen = !!document.querySelector(".publish-library");
+      if (isPublishDialogOpen) {
+        return;
+      }
       setAppState({ isLibraryOpen: false });
     },
     [setAppState],

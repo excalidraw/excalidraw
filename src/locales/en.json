@@ -141,7 +141,8 @@
     "cancel": "Cancel",
     "clear": "Clear",
     "removeFromLibrary": "Remove",
-    "publishLibrary": "publish"
+    "publishLibrary": "publish",
+    "submit": "submit"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",

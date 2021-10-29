@@ -103,10 +103,16 @@
 
     &--remove {
       background-color: $oc-red-6;
+      &:hover {
+        background-color: $oc-red-8;
+      }
     }
 
     &--publish {
       background-color: $oc-blue-6;
+      &:hover {
+        background-color: $oc-blue-8;
+      }
     }
   }
 }

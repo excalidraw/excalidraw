@@ -1,0 +1,60 @@
+@import "../css/variables.module";
+
+.excalidraw {
+  .publish-library {
+    &__fields {
+      display: flex;
+      flex-direction: column;
+    }
+
+    &__buttons {
+      display: flex;
+      padding: 0.2rem 0;
+      justify-content: flex-end;
+
+      .ToolIcon__icon {
+        min-width: 2.5rem;
+        width: auto;
+        font-size: 1rem;
+      }
+
+      .ToolIcon_type_button {
+        margin-left: 1.5rem;
+        padding: 0 0.5rem;
+      }
+
+      &--confirm.ToolIcon_type_button {
+        background-color: $oc-blue-6;
+
+        &:hover {
+          background-color: $oc-blue-8;
+        }
+      }
+
+      &--cancel.ToolIcon_type_button {
+        background-color: $oc-gray-5;
+        &:hover {
+          background-color: $oc-gray-6;
+        }
+      }
+
+      .ToolIcon__icon {
+        color: $oc-white;
+      }
+    }
+    label {
+      padding: 1em;
+      display: flex;
+      justify-content: space-between;
+      span {
+        font-weight: bold;
+        font-size: 1rem;
+      }
+      input,
+      textarea {
+        width: 70%;
+        padding: 0.5em;
+      }
+    }
+  }
+}
