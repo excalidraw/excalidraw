@@ -82,7 +82,7 @@ export const PasteChartDialog = ({
   appState: AppState;
   onClose: () => void;
   setAppState: React.Component<any, AppState>["setState"];
-  onInsertChart: (elements: LibraryItem) => void;
+  onInsertChart: (elements: LibraryItem["items"]) => void;
 }) => {
   const handleClose = React.useCallback(() => {
     if (onClose) {

@@ -18,8 +18,10 @@ class Library {
   };
 
   restoreLibraryItem = (libraryItem: LibraryItem): LibraryItem | null => {
-    const elements = getNonDeletedElements(restoreElements(libraryItem, null));
-    return elements.length ? elements : null;
+    const elements = getNonDeletedElements(
+      restoreElements(libraryItem.items, null),
+    );
+    return elements.length ? { ...libraryItem, items: elements } : null;
   };
 
   /** imports library (currently merges, removing duplicates) */
@@ -37,17 +39,17 @@ class Library {
       targetLibraryItem: LibraryItem,
     ) => {
       return !existingLibraryItems.find((libraryItem) => {
-        if (libraryItem.length !== targetLibraryItem.length) {
+        if (libraryItem.items.length !== targetLibraryItem.items.length) {
           return false;
         }
 
         // detect z-index difference by checking the excalidraw elements
         // are in order
-        return libraryItem.every((libItemExcalidrawItem, idx) => {
+        return libraryItem.items.every((libItemExcalidrawItem, idx) => {
           return (
-            libItemExcalidrawItem.id === targetLibraryItem[idx].id &&
+            libItemExcalidrawItem.id === targetLibraryItem.items[idx].id &&
             libItemExcalidrawItem.versionNonce ===
-              targetLibraryItem[idx].versionNonce
+              targetLibraryItem.items[idx].versionNonce
           );
         });
       });
@@ -55,13 +57,20 @@ class Library {
 
     const existingLibraryItems = await this.loadLibrary();
 
-    const filtered = libraryFile.library!.reduce((acc, libraryItem) => {
-      const restoredItem = this.restoreLibraryItem(libraryItem);
-      if (restoredItem && isUniqueitem(existingLibraryItems, restoredItem)) {
-        acc.push(restoredItem);
-      }
-      return acc;
-    }, [] as Mutable<LibraryItems>);
+    const filtered = libraryFile.library!.reduce(
+      (acc, libraryItem: LibraryItem) => {
+        const restoredItem = this.restoreLibraryItem({
+          status: "published",
+          //@ts-ignore
+          items: libraryItem,
+        });
+        if (restoredItem && isUniqueitem(existingLibraryItems, restoredItem)) {
+          acc.push(restoredItem);
+        }
+        return acc;
+      },
+      [] as Mutable<LibraryItems>,
+    );
 
     await this.saveLibrary([...existingLibraryItems, ...filtered]);
   }

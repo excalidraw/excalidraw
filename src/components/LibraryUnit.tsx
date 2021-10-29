@@ -27,9 +27,9 @@ export const LibraryUnit = ({
   activeIndex,
   onSelect,
 }: {
-  elements?: LibraryItem;
+  elements?: LibraryItem["items"];
   files: BinaryFiles;
-  pendingElements?: LibraryItem;
+  pendingElements?: LibraryItem["items"];
   onRemoveFromLibrary: () => void;
   onClick: () => void;
   index: number;
@@ -66,7 +66,7 @@ export const LibraryUnit = ({
 
   const [isHovered, setIsHovered] = useState(false);
   const isMobile = useIsMobile();
-
+  const checked = index === activeIndex;
   const adder = (isHovered || isMobile) && pendingElements && (
     <div className="library-unit__adder">{PLUS_ICON}</div>
   );
@@ -96,13 +96,13 @@ export const LibraryUnit = ({
         }}
       />
       {adder}
-      {elements && (isHovered || isMobile) && (
+      {elements && (isHovered || isMobile || checked) && (
         <input
           type="checkbox"
           className="library-unit__actions"
-          checked={index === activeIndex}
+          checked={checked}
           onChange={() => {
-            if (index === activeIndex) {
+            if (checked) {
               onSelect(-1);
             } else {
               onSelect(index);

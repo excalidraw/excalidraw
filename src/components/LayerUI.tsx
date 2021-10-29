@@ -125,10 +125,10 @@ const LibraryMenuItems = ({
   id,
 }: {
   libraryItems: LibraryItems;
-  pendingElements: LibraryItem;
+  pendingElements: LibraryItem["items"];
   onRemoveFromLibrary: (index: number) => void;
-  onInsertShape: (elements: LibraryItem) => void;
-  onAddToLibrary: (elements: LibraryItem) => void;
+  onInsertShape: (elements: LibraryItem["items"]) => void;
+  onAddToLibrary: (elements: LibraryItem["items"]) => void;
   theme: AppState["theme"];
   files: BinaryFiles;
   setAppState: React.Component<any, AppState>["setState"];
@@ -139,7 +139,9 @@ const LibraryMenuItems = ({
   id: string;
 }) => {
   const isMobile = useIsMobile();
-  const numCells = libraryItems.length + (pendingElements.length > 0 ? 1 : 0);
+  const numCells =
+    Object.keys(libraryItems ?? []).length +
+    (pendingElements.length > 0 ? 1 : 0);
   const CELLS_PER_ROW = isMobile ? 4 : 6;
   const numRows = Math.max(1, Math.ceil(numCells / CELLS_PER_ROW));
   const rows = [];
@@ -169,7 +171,7 @@ const LibraryMenuItems = ({
             });
         }}
       />
-      {!!libraryItems.length && (
+      {!!libraryItems && (
         <>
           <ToolButton
             key="export"
@@ -212,6 +214,7 @@ const LibraryMenuItems = ({
     </div>,
   );
   if (activeIndex !== -1) {
+    const isPublished = libraryItems[activeIndex].status === "published";
     rows.push(
       <div className="library-item-actions">
         <ToolButton
@@ -223,14 +226,16 @@ const LibraryMenuItems = ({
           onClick={onRemoveFromLibrary.bind(null, activeIndex)}
           className="library-item-actions--remove"
         />
-        <ToolButton
-          key="publish"
-          type="button"
-          title={t("buttons.publishLibrary")}
-          aria-label={t("buttons.publishLibrary")}
-          label={t("buttons.publishLibrary")}
-          className="library-item-actions--publish"
-        />
+        {!isPublished && (
+          <ToolButton
+            key="publish"
+            type="button"
+            title={t("buttons.publishLibrary")}
+            aria-label={t("buttons.publishLibrary")}
+            label={t("buttons.publishLibrary")}
+            className="library-item-actions--publish"
+          />
+        )}
       </div>,
     );
   }
@@ -243,11 +248,11 @@ const LibraryMenuItems = ({
         !addedPendingElements &&
         y + x >= libraryItems.length;
       addedPendingElements = addedPendingElements || shouldAddPendingElements;
-
+      const elements = libraryItems[y + x]?.items;
       children.push(
         <Stack.Col key={x}>
           <LibraryUnit
-            elements={libraryItems[y + x]}
+            elements={elements}
             files={files}
             pendingElements={
               shouldAddPendingElements ? pendingElements : undefined
@@ -256,7 +261,7 @@ const LibraryMenuItems = ({
             onClick={
               shouldAddPendingElements
                 ? onAddToLibrary.bind(null, pendingElements)
-                : onInsertShape.bind(null, libraryItems[y + x])
+                : onInsertShape.bind(null, elements)
             }
             index={x + y}
             activeIndex={activeIndex}
@@ -292,9 +297,9 @@ const LibraryMenu = ({
   library,
   id,
 }: {
-  pendingElements: LibraryItem;
+  pendingElements: LibraryItem["items"];
   onClickOutside: (event: MouseEvent) => void;
-  onInsertShape: (elements: LibraryItem) => void;
+  onInsertShape: (elements: LibraryItem["items"]) => void;
   onAddToLibrary: () => void;
   theme: AppState["theme"];
   files: BinaryFiles;
@@ -357,15 +362,17 @@ const LibraryMenu = ({
   );
 
   const addToLibrary = useCallback(
-    async (elements: LibraryItem) => {
+    async (elements: LibraryItem["items"]) => {
       if (elements.some((element) => element.type === "image")) {
         return setAppState({
           errorMessage: "Support for adding images to the library coming soon!",
         });
       }
-
       const items = await library.loadLibrary();
-      const nextItems = [...items, elements];
+      const nextItems: LibraryItems = [
+        ...items,
+        { status: "unpublished", items: elements },
+      ];
       onAddToLibrary();
       library.saveLibrary(nextItems).catch((error) => {
         setLibraryItems(items);
