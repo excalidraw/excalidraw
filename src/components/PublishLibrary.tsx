@@ -46,7 +46,8 @@ const PublishLibrary = ({
       source: EXPORT_SOURCE,
       library: [libraryItem],
     };
-    const lib = JSON.stringify(libContent, null, 2);
+    const content = JSON.stringify(libContent, null, 2);
+    const lib = new Blob([content], { type: "application/json" });
 
     const formData = new FormData();
     formData.append("excalidrawLib", lib);
