@@ -1,9 +1,7 @@
 import clsx from "clsx";
 import oc from "open-color";
 import { useEffect, useRef, useState } from "react";
-import { close } from "../components/icons";
 import { MIME_TYPES } from "../constants";
-import { t } from "../i18n";
 import { useIsMobile } from "../components/App";
 import { exportToSvg } from "../scene/export";
 import { BinaryFiles, LibraryItem } from "../types";
@@ -25,12 +23,18 @@ export const LibraryUnit = ({
   pendingElements,
   onRemoveFromLibrary,
   onClick,
+  index,
+  activeIndex,
+  onSelect,
 }: {
   elements?: LibraryItem;
   files: BinaryFiles;
   pendingElements?: LibraryItem;
   onRemoveFromLibrary: () => void;
   onClick: () => void;
+  index: number;
+  activeIndex: number;
+  onSelect: (index: number) => void;
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
@@ -71,6 +75,7 @@ export const LibraryUnit = ({
     <div
       className={clsx("library-unit", {
         "library-unit__active": elements || pendingElements,
+        "library-unit--hover": elements && (isHovered || isMobile),
       })}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -92,13 +97,18 @@ export const LibraryUnit = ({
       />
       {adder}
       {elements && (isHovered || isMobile) && (
-        <button
-          className="library-unit__removeFromLibrary"
-          aria-label={t("labels.removeFromLibrary")}
-          onClick={onRemoveFromLibrary}
-        >
-          {close}
-        </button>
+        <input
+          type="checkbox"
+          className="library-unit__actions"
+          checked={index === activeIndex}
+          onChange={() => {
+            if (index === activeIndex) {
+              onSelect(-1);
+            } else {
+              onSelect(index);
+            }
+          }}
+        />
       )}
     </div>
   );

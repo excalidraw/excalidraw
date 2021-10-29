@@ -1,3 +1,5 @@
+@import "../css/variables.module";
+
 .excalidraw {
   .library-unit {
     align-items: center;
@@ -7,6 +9,14 @@
     position: relative;
     width: 63px;
     height: 63px; // match width
+
+    &--hover {
+      border: 3px solid $oc-cyan-3;
+    }
+
+    &--selected {
+      border: 3px solid $oc-cyan-7;
+    }
   }
 
   .library-unit__dragger {
@@ -22,9 +32,9 @@
     max-width: 100%;
   }
 
-  .library-unit__removeFromLibrary,
-  .library-unit__removeFromLibrary:hover,
-  .library-unit__removeFromLibrary:active {
+  .library-unit__actions,
+  .library-unit__actions:hover,
+  .library-unit__actions:active {
     align-items: center;
     background: none;
     border: none;
@@ -36,6 +46,7 @@
     position: absolute;
     right: 5px;
     top: 5px;
+    cursor: pointer;
   }
 
   .library-unit__removeFromLibrary > svg {
@@ -74,6 +85,28 @@
 
     100% {
       transform: scale(0.95);
+    }
+  }
+
+  .library-item-actions {
+    .ToolIcon__icon {
+      min-width: 2.5rem;
+      width: auto;
+      font-size: 1rem;
+      color: $oc-white;
+    }
+
+    .ToolIcon_type_button {
+      margin-right: 0.5rem;
+      padding: 0 0.5rem;
+    }
+
+    &--remove {
+      background-color: $oc-red-6;
+    }
+
+    &--publish {
+      background-color: $oc-blue-6;
     }
   }
 }

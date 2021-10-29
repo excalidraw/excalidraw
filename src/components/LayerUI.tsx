@@ -144,7 +144,7 @@ const LibraryMenuItems = ({
   const numRows = Math.max(1, Math.ceil(numCells / CELLS_PER_ROW));
   const rows = [];
   let addedPendingElements = false;
-
+  const [activeIndex, setActiveIndex] = useState(-1);
   const referrer =
     libraryReturnUrl || window.location.origin + window.location.pathname;
 
@@ -211,7 +211,29 @@ const LibraryMenuItems = ({
       </a>
     </div>,
   );
-
+  if (activeIndex !== -1) {
+    rows.push(
+      <div className="library-item-actions">
+        <ToolButton
+          key="remove"
+          type="button"
+          title={t("buttons.removeFromLibrary")}
+          aria-label={t("buttons.removeFromLibrary")}
+          label={t("buttons.removeFromLibrary")}
+          onClick={onRemoveFromLibrary.bind(null, activeIndex)}
+          className="library-item-actions--remove"
+        />
+        <ToolButton
+          key="publish"
+          type="button"
+          title={t("buttons.publishLibrary")}
+          aria-label={t("buttons.publishLibrary")}
+          label={t("buttons.publishLibrary")}
+          className="library-item-actions--publish"
+        />
+      </div>,
+    );
+  }
   for (let row = 0; row < numRows; row++) {
     const y = CELLS_PER_ROW * row;
     const children = [];
@@ -236,6 +258,9 @@ const LibraryMenuItems = ({
                 ? onAddToLibrary.bind(null, pendingElements)
                 : onInsertShape.bind(null, libraryItems[y + x])
             }
+            index={x + y}
+            activeIndex={activeIndex}
+            onSelect={(index) => setActiveIndex(index)}
           />
         </Stack.Col>,
       );
@@ -280,6 +305,7 @@ const LibraryMenu = ({
   id: string;
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
+
   useOnClickOutside(ref, (event) => {
     // If click on the library icon, do nothing.
     if ((event.target as Element).closest(".ToolIcon_type_button__library")) {
