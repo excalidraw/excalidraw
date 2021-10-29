@@ -124,6 +124,7 @@ const LibraryMenuItems = ({
   library,
   files,
   id,
+  appState,
 }: {
   libraryItems: LibraryItems;
   pendingElements: LibraryItem["items"];
@@ -138,6 +139,7 @@ const LibraryMenuItems = ({
   focusContainer: () => void;
   library: Library;
   id: string;
+  appState: AppState;
 }) => {
   const isMobile = useIsMobile();
   const numCells =
@@ -285,7 +287,11 @@ const LibraryMenuItems = ({
   return (
     <>
       {showPublishLibraryDialog && (
-        <PublishLibrary onClose={() => setShowPublishLibraryDialog(false)} />
+        <PublishLibrary
+          onClose={() => setShowPublishLibraryDialog(false)}
+          libraryItem={libraryItems[activeIndex]}
+          appState={appState}
+        />
       )}
       <Stack.Col align="start" gap={1} className="layer-ui__library-items">
         {rows}
@@ -306,6 +312,7 @@ const LibraryMenu = ({
   focusContainer,
   library,
   id,
+  appState,
 }: {
   pendingElements: LibraryItem["items"];
   onClickOutside: (event: MouseEvent) => void;
@@ -318,6 +325,7 @@ const LibraryMenu = ({
   focusContainer: () => void;
   library: Library;
   id: string;
+  appState: AppState;
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
 
@@ -414,6 +422,7 @@ const LibraryMenu = ({
           theme={theme}
           files={files}
           id={id}
+          appState={appState}
         />
       )}
     </Island>
@@ -635,6 +644,7 @@ const LayerUI = ({
       theme={appState.theme}
       files={files}
       id={id}
+      appState={appState}
     />
   ) : null;
 

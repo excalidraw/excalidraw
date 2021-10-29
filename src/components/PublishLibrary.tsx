@@ -5,7 +5,19 @@ import { ToolButton } from "./ToolButton";
 
 import "./PublishLibrary.scss";
 import { useState } from "react";
-const PublishLibrary = ({ onClose }: { onClose: () => void }) => {
+import { AppState, LibraryItem } from "../types";
+import { exportToBlob } from "../packages/utils";
+import { EXPORT_DATA_TYPES, EXPORT_SOURCE } from "../constants";
+import { ExportedLibraryData } from "../data/types";
+const PublishLibrary = ({
+  onClose,
+  libraryItem,
+  appState,
+}: {
+  onClose: () => void;
+  libraryItem: LibraryItem;
+  appState: AppState;
+}) => {
   const [libraryData, setLibraryData] = useState({
     authorName: "",
     githubHandle: "",
@@ -18,6 +30,43 @@ const PublishLibrary = ({ onClose }: { onClose: () => void }) => {
       ...libraryData,
       [event.target.name]: event.target.value,
     });
+  };
+
+  const onSubmit = async () => {
+    const png = await exportToBlob({
+      elements: libraryItem.items,
+      mimeType: "image/png",
+      appState,
+      files: null,
+    });
+
+    const libContent: ExportedLibraryData = {
+      type: EXPORT_DATA_TYPES.excalidrawLibrary,
+      version: 1,
+      source: EXPORT_SOURCE,
+      library: [libraryItem],
+    };
+    const lib = JSON.stringify(libContent, null, 2);
+
+    const formData = new FormData();
+    formData.append("excalidrawLib", lib);
+    formData.append("excalidrawPng", png!);
+    formData.append("title", `feat: Add ${libraryData.name}`);
+    formData.append("authorName", libraryData.authorName);
+    formData.append("githubHandle", libraryData.githubHandle);
+    formData.append("name", libraryData.name);
+    formData.append("description", libraryData.description);
+
+    fetch(
+      "https://us-central1-excalidraw-room-persistence.cloudfunctions.net/api/libraries/publish",
+      {
+        method: "post",
+        body: formData,
+      },
+    ).then(
+      (res) => console.info("res", res.body),
+      (err) => window.alert(err),
+    );
   };
   return (
     <Dialog
@@ -83,7 +132,7 @@ const PublishLibrary = ({ onClose }: { onClose: () => void }) => {
             title={t("buttons.submit")}
             aria-label={t("buttons.submit")}
             label={t("buttons.submit")}
-            onClick={() => {}}
+            onClick={onSubmit}
             className="publish-library__buttons--confirm"
           />
         </div>
