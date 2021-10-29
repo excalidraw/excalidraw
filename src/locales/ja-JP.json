@@ -229,8 +229,8 @@
     "button_stopSession": "セッションを終了する",
     "desc_inProgressIntro": "共同編集セッションが有効になっています。",
     "desc_shareLink": "下記URLを共同編集したい人に共有してください：",
-    "desc_exitSession": "セッションを終了すると部屋から切断されますが、手元の環境で編集を続けることができます。変更内容は他の人には反映されません。",
-    "shareTitle": "Excalidrawのライブコラボレーションセッションに参加する"
+    "desc_exitSession": "セッションを終了するとあなたはルームから切断されますが、ローカルで作業を続けることができます。セッションを終了しても他のメンバには影響はなく、引き続き共同作業を行うことができます。",
+    "shareTitle": "共同編集セッションに参加する"
   },
   "errorDialog": {
     "title": "エラー"
@@ -292,7 +292,7 @@
     "width": "幅"
   },
   "toast": {
-    "copyStyles": "スタイルをコピー",
+    "copyStyles": "スタイルをコピーしました",
     "copyToClipboard": "クリップボードにコピー",
     "copyToClipboardAsPng": "{{exportSelection}} を PNG 形式でクリップボードにコピーしました\n({{exportColorScheme}})",
     "fileSaved": "ファイルを保存しました",
