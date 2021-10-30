@@ -39,6 +39,7 @@
     "arrowhead_arrow": "Taneccabt",
     "arrowhead_bar": "Afeggag",
     "arrowhead_dot": "Tanqiḍt",
+    "arrowhead_triangle": "",
     "fontSize": "Tiddi n tsefsit",
     "fontFamily": "Tawacult n tsefsiyin",
     "onlySelected": "Tafrayt kan",
@@ -167,7 +168,7 @@
     "imageInsertError": "D awezɣi tugra n tugna. Eɛreḍ tikkelt-nniḍen ardeqqal...",
     "fileTooBig": "Afaylu meqqer aṭas. Tiddi tafellayt yurgen d {{maxSize}}.",
     "svgImageInsertError": "D awezɣi tugra n tugna SVG. Acraḍ SVG yettban-d d armeɣtu.",
-    "invalidSVGString": ""
+    "invalidSVGString": "errors.invalidSVGString"
   },
   "toolBar": {
     "selection": "Tafrayt",
