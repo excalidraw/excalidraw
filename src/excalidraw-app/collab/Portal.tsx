@@ -54,6 +54,7 @@ class Portal {
     if (!this.socket) {
       return;
     }
+    this.queueFileUpload.flush();
     this.socket.close();
     this.socket = null;
     this.roomId = null;

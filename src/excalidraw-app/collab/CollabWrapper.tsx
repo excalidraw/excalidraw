@@ -241,6 +241,9 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   };
 
   closePortal = () => {
+    this.queueBroadcastAllElements.cancel();
+    this.loadImageFiles.cancel();
+
     this.saveCollabRoomToFirebase();
     if (window.confirm(t("alerts.collabStopOverridePrompt"))) {
       window.history.pushState({}, APP_NAME, window.location.origin);
