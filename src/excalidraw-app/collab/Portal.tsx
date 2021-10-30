@@ -96,11 +96,13 @@ class Portal {
         files: this.collab.excalidrawAPI.getFiles(),
       });
     } catch (error) {
-      this.collab.excalidrawAPI.updateScene({
-        appState: {
-          errorMessage: error.message,
-        },
-      });
+      if (error.name !== "AbortError") {
+        this.collab.excalidrawAPI.updateScene({
+          appState: {
+            errorMessage: error.message,
+          },
+        });
+      }
     }
 
     this.collab.excalidrawAPI.updateScene({
