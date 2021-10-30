@@ -80,7 +80,7 @@ class Portal {
       const json = JSON.stringify(data);
       const encoded = new TextEncoder().encode(json);
       const encrypted = await encryptAESGEM(encoded, this.roomKey!);
-      this.socket!.emit(
+      this.socket?.emit(
         volatile ? BROADCAST.SERVER_VOLATILE : BROADCAST.SERVER,
         this.roomId,
         encrypted.data,
