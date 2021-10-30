@@ -1,5 +1,5 @@
 import { compressData } from "../../data/encode";
-import { mutateElement } from "../../element/mutateElement";
+import { newElementWith } from "../../element/mutateElement";
 import { isInitializedImageElement } from "../../element/typeChecks";
 import {
   ExcalidrawElement,
@@ -235,13 +235,9 @@ export const updateStaleImageStatuses = (params: {
           isInitializedImageElement(element) &&
           params.erroredFiles.has(element.fileId)
         ) {
-          return mutateElement(
-            element,
-            {
-              status: "error",
-            },
-            false,
-          );
+          return newElementWith(element, {
+            status: "error",
+          });
         }
         return element;
       }),
