@@ -159,7 +159,7 @@ const math2Svg = (text: string, useTex: boolean, isMathJaxLoaded: boolean) => {
   try {
     const userOptions = { display: false };
     const htmlString = isMathJaxLoaded
-      ? mathJax.adaptor.innerHTML(
+      ? mathJax.adaptor.outerHTML(
           useTex
             ? mathJax.texHtml.convert(text, userOptions)
             : mathJax.amHtml.convert(text, userOptions),
@@ -234,6 +234,47 @@ const metricsCache = {} as {
   };
 };
 
+const measureHTML = (text: string, font: FontString) => {
+  const line = document.createElement("div");
+  const body = document.body;
+  line.style.position = "absolute";
+  line.style.whiteSpace = "pre";
+  line.style.font = font;
+  body.appendChild(line);
+  line.innerHTML = text;
+  const width = line.offsetWidth;
+  const height = line.offsetHeight;
+  // Now creating 1px sized item that will be aligned to baseline
+  // to calculate baseline shift
+  const span = document.createElement("span");
+  span.style.display = "inline-block";
+  span.style.overflow = "hidden";
+  span.style.width = "1px";
+  span.style.height = "1px";
+  line.appendChild(span);
+  // Baseline is important for positioning text on canvas
+  const baseline = span.offsetTop + span.offsetHeight;
+
+  // Compute for each SVG child element of line (the last
+  // child is the span element for the baseline).
+  const childOffsets = [];
+  for (let i = 0; i < line.children.length - 1; i++) {
+    // The mji-container element
+    const child = line.children[i] as HTMLElement;
+    // The svg element
+    const grandchild = child.firstChild as HTMLElement;
+    // How far the svg element is offset from the top of the rendered text
+    const childOffsetHeight =
+      line.getBoundingClientRect().y - grandchild.getBoundingClientRect().y;
+    childOffsets.push({
+      width: child.offsetWidth,
+      height: childOffsetHeight,
+    });
+  }
+  document.body.removeChild(line);
+  return { width, height, baseline, childOffsets };
+};
+
 const measureOutputs = (
   outputs: string[][],
   fontString: FontString,
@@ -252,12 +293,10 @@ const measureOutputs = (
   if (isMathJaxLoaded && metricsCache[cKey]) {
     return metricsCache[cKey];
   }
-  const tDiv = document.createElement("div");
   const tCtx = document.createElement("canvas").getContext("2d");
   if (tCtx !== null) {
     tCtx.font = fontString;
   }
-  const exSize = tCtx ? tCtx.measureText("x").actualBoundingBoxAscent : 1;
   const outputMetrics = [] as Array<{
     width: number;
     height: number;
@@ -273,65 +312,34 @@ const measureOutputs = (
   let imageBaseline = 0;
   for (let index = 0; index < outputs.length; index++) {
     outputMetrics.push([]);
-    let lineWidth = 0;
-    let lineHeight = 0;
-    let lineBaseline = 0;
+    let html = "";
+    for (let i = 0; i < outputs[index].length; i++) {
+      html += outputs[index][i];
+    }
+    if (html === "") {
+      html += "\n";
+    }
+
+    // Use the browser's measurements by temporarily attaching
+    // the rendered line to the document.body.
+    const {
+      width: lineWidth,
+      height: lineHeight,
+      baseline: lineBaseline,
+      childOffsets: lineChildOffsets,
+    } = measureHTML(html, fontString);
+
     for (let i = 0; i < outputs[index].length; i++) {
       if (isMathJaxLoaded && i % 2 === 1) {
-        //svg
-        tDiv.innerHTML = outputs[index][i];
-        const cNode = tDiv.children[0];
-        // For some reason, the width/height/baseline metrics gotten from
-        // window.getComputedStyle() might not match the width and height
-        // of the MathJax SVG. So we calculate these directly from the SVG
-        // attributes, which are given in "ex" CSS units. If anything goes
-        // wrong, fall back to a value of 0.
-        let cWidth;
-        let cHeight;
-        let cBaseline;
-        if (cNode && cNode.hasAttribute("width")) {
-          cWidth = cNode.getAttribute("width");
-          if (cWidth === null) {
-            cWidth = "0";
-          }
-          cWidth = parseFloat(cWidth) * exSize;
-        } else {
-          cWidth = 0;
-        }
-        if (cNode && cNode.hasAttribute("height")) {
-          cHeight = cNode.getAttribute("height");
-          if (cHeight === null) {
-            cHeight = "0";
-          }
-          cHeight = parseFloat(cHeight) * exSize;
-        } else {
-          cHeight = 0;
-        }
-        if (cNode && cNode.hasAttribute("style")) {
-          cBaseline = cNode.getAttribute("style");
-          if (cBaseline === null) {
-            cBaseline = "vertical-align: 0ex;";
-          }
-          cBaseline =
-            parseFloat(cBaseline.split(":")[1].split(";")[0]) * exSize;
-        } else {
-          cBaseline = 0;
-        }
+        // svg
         outputMetrics[index].push({
-          width: cWidth,
-          height: cHeight,
-          baseline: cHeight + cBaseline,
+          width: lineChildOffsets[(i - 1) / 2].width,
+          height: lineChildOffsets[(i - 1) / 2].height,
+          baseline: 0,
         });
       } else {
+        // text
         outputMetrics[index].push(measureText(outputs[index][i], fontString));
-      }
-      lineWidth +=
-        outputs[index].length > 0 && outputs[index][i] === ""
-          ? 0
-          : outputMetrics[index][i].width;
-      lineHeight = Math.max(lineHeight, outputMetrics[index][i].height);
-      if (lineHeight === outputMetrics[index][i].height) {
-        lineBaseline = outputMetrics[index][i].baseline;
       }
     }
     imageWidth = Math.max(imageWidth, lineWidth);
@@ -428,7 +436,7 @@ const createSvg = (
       if (childIsSvg) {
         const tempDiv = svgRoot.ownerDocument.createElement("div");
         tempDiv.innerHTML = processed[index][i];
-        childNode = tempDiv.children[0] as SVGSVGElement;
+        childNode = tempDiv.children[0].children[0] as SVGSVGElement;
       } else {
         const text = svgRoot.ownerDocument.createElementNS(
           "http://www.w3.org/2000/svg",
@@ -448,9 +456,9 @@ const createSvg = (
         processed[index].length > 0 && processed[index][i] === ""
           ? 0
           : childMetrics.width;
-      const svgVerticalOffset = childIsSvg ? childMetrics.baseline : 0;
       const yOffset =
-        lineMetrics.height - (lineMetrics.baseline - svgVerticalOffset);
+        lineMetrics.height +
+        (childIsSvg ? childMetrics.height : -lineMetrics.baseline);
       childNode.setAttribute("y", `${y - yOffset}`);
       node.appendChild(childNode);
     }
