@@ -213,13 +213,14 @@ const markupText = (
 
 const getCacheKey = (
   text: string,
+  fontSize: number,
   fontFamily: FontFamilyValues,
   strokeColor: String,
   textAlign: CanvasTextAlign,
   opacity: Number,
   useTex: boolean,
 ) => {
-  const key = `${text}, ${getFontFamilyString({
+  const key = `${text}, ${fontSize}, ${getFontFamilyString({
     fontFamily,
   })}, ${strokeColor}, ${textAlign}, ${opacity}, ${useTex}`;
   return key;
@@ -243,7 +244,9 @@ const measureOutputs = (
     for (let i = 0; i < outputs[index].length; i++) {
       key += outputs[index][i] === "" ? " " : outputs[index][i];
     }
-    key += "\n";
+    if (index < outputs.length - 1) {
+      key += "\n";
+    }
   }
   const cKey = key;
   if (isMathJaxLoaded && metricsCache[cKey]) {
@@ -355,9 +358,6 @@ const measureOutputs = (
 
 const svgCache = {} as { [key: string]: SVGSVGElement };
 
-// Use a power-of-two font size to generate the SVG.
-const fontSizePoT = 256;
-
 const createSvg = (
   text: string,
   fontSize: number,
@@ -370,6 +370,7 @@ const createSvg = (
 ) => {
   const key = getCacheKey(
     text,
+    fontSize,
     fontFamily,
     strokeColor,
     textAlign,
@@ -380,9 +381,8 @@ const createSvg = (
   const mathLines = text.replace(/\r\n?/g, "\n").split("\n");
   const processed = markupText(text, useTex, isMathJaxLoaded);
 
-  const scale = fontSize / fontSizePoT;
   const fontString = getFontString({
-    fontSize: fontSizePoT,
+    fontSize,
     fontFamily,
   });
   const metrics = measureOutputs(processed, fontString, isMathJaxLoaded);
@@ -390,11 +390,8 @@ const createSvg = (
 
   if (isMathJaxLoaded && svgCache[key]) {
     const svgRoot = svgCache[key];
-    svgRoot.setAttribute("width", `${Math.max(scale * imageMetrics.width, 1)}`);
-    svgRoot.setAttribute(
-      "height",
-      `${Math.max(scale * imageMetrics.height, 1)}`,
-    );
+    svgRoot.setAttribute("width", `${imageMetrics.width}`);
+    svgRoot.setAttribute("height", `${imageMetrics.height}`);
     return svgRoot;
   }
   const svgRoot = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -403,7 +400,7 @@ const createSvg = (
     "g",
   );
   node.setAttribute("font-family", `${getFontFamilyString({ fontFamily })}`);
-  node.setAttribute("font-size", `${fontSizePoT}px`);
+  node.setAttribute("font-size", `${fontSize}px`);
   node.setAttribute("color", `${strokeColor}`);
   node.setAttribute("stroke-opacity", `${opacity}`);
   node.setAttribute("fill-opacity", `${opacity}`);
@@ -470,8 +467,8 @@ const createSvg = (
     svgCache[key] = svgRoot;
   }
   // Now that we have cached the base SVG, scale it appropriately.
-  svgRoot.setAttribute("width", `${Math.max(scale * imageMetrics.width, 1)}`);
-  svgRoot.setAttribute("height", `${Math.max(scale * imageMetrics.height, 1)}`);
+  svgRoot.setAttribute("width", `${imageMetrics.width}`);
+  svgRoot.setAttribute("height", `${imageMetrics.height}`);
   return svgRoot;
 };
 
@@ -500,24 +497,19 @@ const measureMath = (
   useTex: boolean,
   isMathJaxLoaded: boolean,
 ) => {
-  const scale = fontSize / fontSizePoT;
-  const fontStringPoT = getFontString({
-    fontSize: fontSizePoT,
-    fontFamily,
-  });
   const fontString = getFontString({ fontSize, fontFamily });
-  const metrics = isMathMode(fontStringPoT)
+  const metrics = isMathMode(fontString)
     ? measureOutputs(
         markupText(text, useTex, isMathJaxLoaded),
-        fontStringPoT,
+        fontString,
         isMathJaxLoaded,
       ).imageMetrics
     : measureText(text, fontString);
-  if (isMathMode(fontStringPoT)) {
+  if (isMathMode(fontString)) {
     return {
-      width: metrics.width * scale,
-      height: metrics.height * scale,
-      baseline: metrics.baseline * scale,
+      width: metrics.width,
+      height: metrics.height,
+      baseline: metrics.baseline,
     };
   }
   return metrics;
@@ -613,6 +605,7 @@ const renderTextElementMath = (
 
   const key = getCacheKey(
     text,
+    fontSize,
     fontFamily,
     strokeColor,
     textAlign,
@@ -627,7 +620,7 @@ const renderTextElementMath = (
   ) {
     imageMetricsCache[key] = measureOutputs(
       markupText(text, useTex, isMathJaxLoaded),
-      getFontString({ fontSize: fontSizePoT, fontFamily }),
+      getFontString({ fontSize, fontFamily }),
       isMathJaxLoaded,
     ).imageMetrics;
   }
@@ -638,13 +631,10 @@ const renderTextElementMath = (
       ? imageMetricsCache[key]
       : measureOutputs(
           markupText(text, useTex, isMathJaxLoaded),
-          getFontString({ fontSize: fontSizePoT, fontFamily }),
+          getFontString({ fontSize, fontFamily }),
           isMathJaxLoaded,
         ).imageMetrics;
-  const scale = fontSize / fontSizePoT;
-  const imgKey = `${key}, ${scale * imageMetrics.width}, ${
-    scale * imageMetrics.height
-  }`;
+  const imgKey = `${key}, ${imageMetrics.width}, ${imageMetrics.height}`;
   if (
     isMathJaxLoaded &&
     imageCache[imgKey] &&
