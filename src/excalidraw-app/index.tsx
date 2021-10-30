@@ -64,7 +64,7 @@ import { ExportToExcalidrawPlus } from "./components/ExportToExcalidrawPlus";
 
 import { getMany, set, del, keys, createStore } from "idb-keyval";
 import { FileManager, updateStaleImageStatuses } from "./data/FileManager";
-import { mutateElement } from "../element/mutateElement";
+import { newElementWith } from "../element/mutateElement";
 import { isInitializedImageElement } from "../element/typeChecks";
 import { loadFilesFromFirebase } from "./data/firebase";
 
@@ -465,11 +465,7 @@ const ExcalidrawWrapper = () => {
             .map((element) => {
               if (localFileStorage.shouldUpdateImageElementStatus(element)) {
                 didChange = true;
-                return mutateElement(
-                  element,
-                  { status: "saved" },
-                  /* informMutation */ false,
-                );
+                return newElementWith(element, { status: "saved" });
               }
               return element;
             });

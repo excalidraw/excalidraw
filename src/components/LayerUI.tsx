@@ -845,6 +845,7 @@ const areEqual = (prev: LayerUIProps, next: LayerUIProps) => {
     prev.renderCustomFooter === next.renderCustomFooter &&
     prev.langCode === next.langCode &&
     prev.elements === next.elements &&
+    prev.files === next.files &&
     keys.every((key) => prevAppState[key] === nextAppState[key])
   );
 };
