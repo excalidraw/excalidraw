@@ -11,7 +11,7 @@ import { BROADCAST, FILE_UPLOAD_TIMEOUT, SCENE } from "../app_constants";
 import { UserIdleState } from "../../types";
 import { trackEvent } from "../../analytics";
 import { throttle } from "lodash";
-import { mutateElement } from "../../element/mutateElement";
+import { newElementWith } from "../../element/mutateElement";
 import { BroadcastedExcalidrawElement } from "./reconciliation";
 
 class Portal {
@@ -111,11 +111,7 @@ class Portal {
             // this will signal collaborators to pull image data from server
             // (using mutation instead of newElementWith otherwise it'd break
             // in-progress dragging)
-            return mutateElement(
-              element,
-              { status: "saved" },
-              /* informMutation */ false,
-            );
+            return newElementWith(element, { status: "saved" });
           }
           return element;
         }),
