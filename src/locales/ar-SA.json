@@ -39,6 +39,7 @@
     "arrowhead_arrow": "سهم",
     "arrowhead_bar": "شريط",
     "arrowhead_dot": "نقطة",
+    "arrowhead_triangle": "مثلث",
     "fontSize": "حجم الخط",
     "fontFamily": "نوع الخط",
     "onlySelected": "المحدد فقط",
@@ -137,8 +138,8 @@
     "lightMode": "الوضع المضيء",
     "zenMode": "وضع التأمل",
     "exitZenMode": "إلغاء الوضع الليلى",
-    "cancel": "",
-    "clear": ""
+    "cancel": "إلغاء",
+    "clear": "مسح"
   },
   "alerts": {
     "clearReset": "هذا سيُزيل كامل اللوحة. هل أنت متأكد؟",
@@ -163,15 +164,15 @@
     "invalidEncryptionKey": "مفتاح التشفير يجب أن يكون من 22 حرفاً. التعاون المباشر معطل."
   },
   "errors": {
-    "unsupportedFileType": "",
-    "imageInsertError": "",
-    "fileTooBig": "",
-    "svgImageInsertError": "",
+    "unsupportedFileType": "نوع الملف غير مدعوم.",
+    "imageInsertError": "تعذر إدراج الصورة. حاول مرة أخرى لاحقاً...",
+    "fileTooBig": "الملف كبير جداً. الحد الأقصى المسموح به للحجم هو {{maxSize}}.",
+    "svgImageInsertError": "تعذر إدراج صورة SVG. يبدو أن ترميز SVG غير صحيح.",
     "invalidSVGString": ""
   },
   "toolBar": {
     "selection": "تحديد",
-    "image": "",
+    "image": "إدراج صورة",
     "rectangle": "مستطيل",
     "diamond": "مضلع",
     "ellipse": "دائرة",
@@ -196,7 +197,7 @@
     "linearElementMulti": "انقر فوق النقطة الأخيرة أو اضغط على Esc أو Enter للإنهاء",
     "lockAngle": "يمكنك تقييد الزاوية بالضغط على SHIFT",
     "resize": "يمكنك تقييد النسب بالضغط على SHIFT أثناء تغيير الحجم،\nاضغط على ALT لتغيير الحجم من المركز",
-    "resizeImage": "",
+    "resizeImage": "يمكنك تغيير الحجم بحرية بالضغط بأستمرار على SHIFT،\nاضغط بأستمرار على ALT أيضا لتغيير الحجم من المركز",
     "rotate": "يمكنك تقييد الزوايا من خلال الضغط على SHIFT أثناء الدوران",
     "lineEditor_info": "انقر نقراً مزدوجاً أو اضغط Enter لتعديل النقاط",
     "lineEditor_pointSelected": "اضغط على حذف لإزالة النقطة، Ctrl Or Cmd+D للتكرار، أو اسحب للانتقال",

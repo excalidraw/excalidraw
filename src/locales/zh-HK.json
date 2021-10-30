@@ -39,6 +39,7 @@
     "arrowhead_arrow": "普通箭嘴",
     "arrowhead_bar": "平頭條狀",
     "arrowhead_dot": "圓點",
+    "arrowhead_triangle": "",
     "fontSize": "字型大小",
     "fontFamily": "字體",
     "onlySelected": "只匯出已選取的物件",

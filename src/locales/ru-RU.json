@@ -39,6 +39,7 @@
     "arrowhead_arrow": "Cтрелка",
     "arrowhead_bar": "Черта",
     "arrowhead_dot": "Точка",
+    "arrowhead_triangle": "Треугольник",
     "fontSize": "Размер шрифта",
     "fontFamily": "Семейство шрифтов",
     "onlySelected": "Только выбранные",
@@ -137,8 +138,8 @@
     "lightMode": "Светлая тема",
     "zenMode": "Режим Дзен",
     "exitZenMode": "Выключить режим концентрации внимания",
-    "cancel": "",
-    "clear": ""
+    "cancel": "Отменить",
+    "clear": "Очистить"
   },
   "alerts": {
     "clearReset": "Это очистит весь холст. Вы уверены?",
@@ -163,15 +164,15 @@
     "invalidEncryptionKey": ""
   },
   "errors": {
-    "unsupportedFileType": "",
+    "unsupportedFileType": "Неподдерживаемый тип файла.",
     "imageInsertError": "",
-    "fileTooBig": "",
-    "svgImageInsertError": "",
+    "fileTooBig": "Очень большой файл. Максимально разрешенный размер {{maxSize}}.",
+    "svgImageInsertError": "Не удалось вставить изображение SVG. Разметка SVG выглядит недействительной.",
     "invalidSVGString": ""
   },
   "toolBar": {
     "selection": "Выделение области",
-    "image": "",
+    "image": "Вставить изображение",
     "rectangle": "Прямоугольник",
     "diamond": "Ромб",
     "ellipse": "Эллипс",
@@ -269,7 +270,7 @@
     "zoomToSelection": "Увеличить до выделенного"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "Очистить Холст"
   },
   "encrypted": {
     "tooltip": "Ваши данные защищены сквозным (End-to-end) шифрованием. Серверы Excalidraw никогда не получат доступ к ним.",
