@@ -35,7 +35,6 @@ export type UpdaterFn = (res: ActionResult) => void;
 export type ActionFilterFn = (action: Action) => void;
 
 export type ActionName =
-  | TextActionName
   | "copy"
   | "cut"
   | "paste"
@@ -115,7 +114,7 @@ export type PanelComponentProps = {
 };
 
 export interface Action {
-  name: ActionName;
+  name: ActionName | TextActionName;
   PanelComponent?: React.FC<PanelComponentProps>;
   PanelComponentPredicate?: (
     elements: readonly ExcalidrawElement[],
@@ -140,6 +139,8 @@ export interface ActionsManagerInterface {
   actions: Record<ActionName | TextActionName, Action>;
   registerAction: (action: Action) => void;
   handleKeyDown: (event: React.KeyboardEvent | KeyboardEvent) => boolean;
-  renderAction: (name: ActionName) => React.ReactElement | null;
+  renderAction: (
+    name: ActionName | TextActionName,
+  ) => React.ReactElement | null;
   executeAction: (action: Action) => void;
 }

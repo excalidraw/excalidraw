@@ -13,7 +13,7 @@ import {
   Theme,
 } from "./element/types";
 import { SHAPES } from "./shapes";
-import { TextSubtype } from "./textlike/types";
+import { TextOpts, TextSubtype } from "./textlike/types";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
 import { LinearElementEditor } from "./element/linearElementEditor";
 import { SuggestedBinding } from "./element/binding";
@@ -60,6 +60,7 @@ export type AppState = {
   editingLinearElement: LinearElementEditor | null;
   elementType: typeof SHAPES[number]["value"];
   textElementSubtype: TextSubtype;
+  textOpts: TextOpts;
   elementLocked: boolean;
   exportBackground: boolean;
   exportEmbedScene: boolean;

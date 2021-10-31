@@ -61,6 +61,7 @@ Object {
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "textElementSubtype": "text",
+  "textOpts": Object {},
   "theme": "light",
   "toastMessage": null,
   "viewBackgroundColor": "#ffffff",

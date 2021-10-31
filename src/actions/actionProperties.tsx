@@ -63,7 +63,7 @@ import { register } from "./register";
 import { applyTextOpts, isPanelComponentDisabled } from "../textlike";
 import { TEXT_SUBTYPE_ICONS } from "../textlike/icons";
 
-const changeProperty = (
+export const changeProperty = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   callback: (element: ExcalidrawElement) => ExcalidrawElement,
@@ -79,7 +79,7 @@ const changeProperty = (
   });
 };
 
-const getFormValue = function <T>(
+export const getFormValue = function <T>(
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   getAttribute: (element: ExcalidrawElement) => T,
@@ -110,6 +110,7 @@ export const actionChangeTextElementSubtype = register({
             newElementWith(el, {
               subtype: value,
             }),
+            appState.textOpts,
           );
           redrawTextBoundingBox(element);
           return element;

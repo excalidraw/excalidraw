@@ -14,7 +14,7 @@ import util from "util";
 import path from "path";
 import { getMimeType } from "../../data/blob";
 import { newFreeDrawElement } from "../../element/newElement";
-import { TEXT_SUBTYPE_DEFAULT } from "../../textlike/types";
+import { TextOpts, TEXT_SUBTYPE_DEFAULT } from "../../textlike/types";
 
 const readFile = util.promisify(fs.readFile);
 
@@ -96,6 +96,7 @@ export class API {
       ? ExcalidrawTextElement["verticalAlign"]
       : never;
     subtype?: T extends "text" ? ExcalidrawTextElement["subtype"] : never;
+    textOpts?: T extends "text" ? TextOpts : never;
   }): T extends "arrow" | "line"
     ? ExcalidrawLinearElement
     : T extends "freedraw"
@@ -141,6 +142,7 @@ export class API {
           textAlign: rest.textAlign ?? appState.currentItemTextAlign,
           verticalAlign: rest.verticalAlign ?? DEFAULT_VERTICAL_ALIGN,
           subtype: rest.subtype ?? TEXT_SUBTYPE_DEFAULT,
+          textOpts: rest.textOpts ?? {},
         });
         element.width = width;
         element.height = height;
