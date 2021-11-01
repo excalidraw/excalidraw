@@ -426,34 +426,34 @@ const LayerUI = ({
       return null;
     }
 
-    const createExporter = (type: ExportType): ExportCB => async (
-      exportedElements,
-    ) => {
-      const fileHandle = await exportCanvas(
-        type,
-        exportedElements,
-        appState,
-        files,
-        {
-          exportBackground: appState.exportBackground,
-          name: appState.name,
-          viewBackgroundColor: appState.viewBackgroundColor,
-        },
-      )
-        .catch(muteFSAbortError)
-        .catch((error) => {
-          console.error(error);
-          setAppState({ errorMessage: error.message });
-        });
+    const createExporter =
+      (type: ExportType): ExportCB =>
+      async (exportedElements) => {
+        const fileHandle = await exportCanvas(
+          type,
+          exportedElements,
+          appState,
+          files,
+          {
+            exportBackground: appState.exportBackground,
+            name: appState.name,
+            viewBackgroundColor: appState.viewBackgroundColor,
+          },
+        )
+          .catch(muteFSAbortError)
+          .catch((error) => {
+            console.error(error);
+            setAppState({ errorMessage: error.message });
+          });
 
-      if (
-        appState.exportEmbedScene &&
-        fileHandle &&
-        isImageFileHandle(fileHandle)
-      ) {
-        setAppState({ fileHandle });
-      }
-    };
+        if (
+          appState.exportEmbedScene &&
+          fileHandle &&
+          isImageFileHandle(fileHandle)
+        ) {
+          setAppState({ fileHandle });
+        }
+      };
 
     return (
       <ImageExportDialog
@@ -705,7 +705,8 @@ const LayerUI = ({
               {!viewModeEnabled && (
                 <div
                   className={clsx("undo-redo-buttons zen-mode-transition", {
-                    "layer-ui__wrapper__footer-left--transition-bottom": zenModeEnabled,
+                    "layer-ui__wrapper__footer-left--transition-bottom":
+                      zenModeEnabled,
                   })}
                 >
                   {actionManager.renderAction("undo", { size: "small" })}
@@ -719,7 +720,8 @@ const LayerUI = ({
           className={clsx(
             "layer-ui__wrapper__footer-center zen-mode-transition",
             {
-              "layer-ui__wrapper__footer-left--transition-bottom": zenModeEnabled,
+              "layer-ui__wrapper__footer-left--transition-bottom":
+                zenModeEnabled,
             },
           )}
         >

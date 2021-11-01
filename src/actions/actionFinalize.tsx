@@ -19,11 +19,8 @@ export const actionFinalize = register({
   name: "finalize",
   perform: (elements, appState, _, { canvas, focusContainer }) => {
     if (appState.editingLinearElement) {
-      const {
-        elementId,
-        startBindingElement,
-        endBindingElement,
-      } = appState.editingLinearElement;
+      const { elementId, startBindingElement, endBindingElement } =
+        appState.editingLinearElement;
       const element = LinearElementEditor.getElement(elementId);
 
       if (element) {
