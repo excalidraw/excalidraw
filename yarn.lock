@@ -6432,13 +6432,12 @@ extsprintf@1.3.0, extsprintf@^1.2.0:
   resolved "https://registry.npmjs.org/extsprintf/-/extsprintf-1.3.0.tgz"
   integrity sha1-lpGEQOMEGnpBT4xS48V06zw+HgU=
 
-fake-indexeddb@3.1.3:
-  version "3.1.3"
-  resolved "https://registry.npmjs.org/fake-indexeddb/-/fake-indexeddb-3.1.3.tgz"
-  integrity sha512-kpWYPIUGmxW8Q7xG7ampGL63fU/kYNukrIyy9KFj3+KVlFbE/SmvWebzWXBiCMeR0cPK6ufDoGC7MFkPhPLH9w==
+fake-indexeddb@3.1.7:
+  version "3.1.7"
+  resolved "https://registry.yarnpkg.com/fake-indexeddb/-/fake-indexeddb-3.1.7.tgz#d9efbeade113c15efbe862e4598a4b0a1797ed9f"
+  integrity sha512-CUGeCzCOVjmeKi2C0pcvSh6NDU6uQIaS+7YyR++tO/atJJujkBYVhDvfePdz/U8bD33BMVWirsr1MKczfAqbjA==
   dependencies:
     realistic-structured-clone "^2.0.1"
-    setimmediate "^1.0.5"
 
 fast-deep-equal@^3.1.1:
   version "3.1.3"
@@ -13073,7 +13072,7 @@ set-value@^2.0.0, set-value@^2.0.1:
     is-plain-object "^2.0.3"
     split-string "^3.0.1"
 
-setimmediate@^1.0.4, setimmediate@^1.0.5, setimmediate@~1.0.4:
+setimmediate@^1.0.4, setimmediate@~1.0.4:
   version "1.0.5"
   resolved "https://registry.npmjs.org/setimmediate/-/setimmediate-1.0.5.tgz"
   integrity sha1-KQy7Iy4waULX1+qbg3Mqt4VvgoU=
