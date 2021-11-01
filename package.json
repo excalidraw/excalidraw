@@ -59,7 +59,7 @@
     "@excalidraw/prettier-config": "1.0.2",
     "@types/chai": "4.2.22",
     "@types/lodash.throttle": "4.1.6",
-    "@types/pako": "1.0.1",
+    "@types/pako": "1.0.2",
     "@types/resize-observer-browser": "0.1.6",
     "chai": "4.3.4",
     "eslint-config-prettier": "8.3.0",
