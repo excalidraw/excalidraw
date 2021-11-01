@@ -90,7 +90,7 @@
   .picker-content {
     padding: 0.5rem;
     display: grid;
-    grid-auto-flow: column;
+    grid-template-columns: repeat(3, auto);
     grid-gap: 0.5rem;
     border-radius: 4px;
     :root[dir="rtl"] & {

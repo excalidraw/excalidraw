@@ -6,6 +6,7 @@ import {
   ArrowheadArrowIcon,
   ArrowheadBarIcon,
   ArrowheadDotIcon,
+  ArrowheadTriangleIcon,
   ArrowheadNoneIcon,
   EdgeRoundIcon,
   EdgeSharpIcon,
@@ -59,6 +60,7 @@ import {
   getTargetElements,
   isSomeElementSelected,
 } from "../scene";
+import { hasStrokeColor } from "../scene/comparisons";
 import { register } from "./register";
 import { applyTextOpts, isPanelComponentDisabled } from "../textlike";
 import { TEXT_SUBTYPE_ICONS } from "../textlike/icons";
@@ -153,11 +155,13 @@ export const actionChangeStrokeColor = register({
   perform: (elements, appState, value) => {
     return {
       ...(value.currentItemStrokeColor && {
-        elements: changeProperty(elements, appState, (el) =>
-          newElementWith(el, {
-            strokeColor: value.currentItemStrokeColor,
-          }),
-        ),
+        elements: changeProperty(elements, appState, (el) => {
+          return hasStrokeColor(el.type)
+            ? newElementWith(el, {
+                strokeColor: value.currentItemStrokeColor,
+              })
+            : el;
+        }),
       }),
       appState: {
         ...appState,
@@ -803,6 +807,14 @@ export const actionChangeArrowhead = register({
                 icon: <ArrowheadDotIcon theme={appState.theme} flip={!isRTL} />,
                 keyBinding: "r",
               },
+              {
+                value: "triangle",
+                text: t("labels.arrowhead_triangle"),
+                icon: (
+                  <ArrowheadTriangleIcon theme={appState.theme} flip={!isRTL} />
+                ),
+                keyBinding: "t",
+              },
             ]}
             value={getFormValue<Arrowhead | null>(
               elements,
@@ -844,6 +856,14 @@ export const actionChangeArrowhead = register({
                 text: t("labels.arrowhead_dot"),
                 keyBinding: "r",
                 icon: <ArrowheadDotIcon theme={appState.theme} flip={isRTL} />,
+              },
+              {
+                value: "triangle",
+                text: t("labels.arrowhead_triangle"),
+                icon: (
+                  <ArrowheadTriangleIcon theme={appState.theme} flip={isRTL} />
+                ),
+                keyBinding: "t",
               },
             ]}
             value={getFormValue<Arrowhead | null>(

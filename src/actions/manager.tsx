@@ -8,19 +8,9 @@ import {
   PanelComponentProps,
 } from "./types";
 import { ExcalidrawElement } from "../element/types";
-import { AppProps, AppState } from "../types";
+import { AppClassProperties, AppState } from "../types";
 import { MODES } from "../constants";
-import Library from "../data/library";
 import { TextActionName } from "../textlike/types";
-
-// This is the <App> component, but for now we don't care about anything but its
-// `canvas` state.
-type App = {
-  canvas: HTMLCanvasElement | null;
-  focusContainer: () => void;
-  props: AppProps;
-  library: Library;
-};
 
 export class ActionManager implements ActionsManagerInterface {
   actions = {} as ActionsManagerInterface["actions"];
@@ -29,13 +19,13 @@ export class ActionManager implements ActionsManagerInterface {
 
   getAppState: () => Readonly<AppState>;
   getElementsIncludingDeleted: () => readonly ExcalidrawElement[];
-  app: App;
+  app: AppClassProperties;
 
   constructor(
     updater: UpdaterFn,
     getAppState: () => AppState,
     getElementsIncludingDeleted: () => readonly ExcalidrawElement[],
-    app: App,
+    app: AppClassProperties,
   ) {
     this.updater = (actionResult) => {
       if (actionResult && "then" in actionResult) {

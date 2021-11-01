@@ -1,9 +1,24 @@
+import {
+  createIV,
+  generateEncryptionKey,
+  getImportedKey,
+  IV_LENGTH_BYTES,
+} from "../../data/encryption";
 import { serializeAsJSON } from "../../data/json";
 import { restore } from "../../data/restore";
 import { ImportedDataState } from "../../data/types";
-import { ExcalidrawElement } from "../../element/types";
+import { isInitializedImageElement } from "../../element/typeChecks";
+import { ExcalidrawElement, FileId } from "../../element/types";
 import { t } from "../../i18n";
-import { AppState, UserIdleState } from "../../types";
+import {
+  AppState,
+  BinaryFileData,
+  BinaryFiles,
+  UserIdleState,
+} from "../../types";
+import { FILE_UPLOAD_MAX_BYTES } from "../app_constants";
+import { encodeFilesForUpload } from "./FileManager";
+import { saveFilesToFirebase } from "./firebase";
 
 const byteToHex = (byte: number): string => `0${byte.toString(16)}`.slice(-2);
 
@@ -15,18 +30,6 @@ const generateRandomID = async () => {
   const arr = new Uint8Array(10);
   window.crypto.getRandomValues(arr);
   return Array.from(arr, byteToHex).join("");
-};
-
-export const generateEncryptionKey = async () => {
-  const key = await window.crypto.subtle.generateKey(
-    {
-      name: "AES-GCM",
-      length: 128,
-    },
-    true, // extractable
-    ["encrypt", "decrypt"],
-  );
-  return (await window.crypto.subtle.exportKey("jwk", key)).k;
 };
 
 export const SOCKET_SERVER = process.env.REACT_APP_SOCKET_SERVER_URL;
@@ -79,13 +82,6 @@ export type SocketUpdateData = SocketUpdateDataSource[keyof SocketUpdateDataSour
   _brand: "socketUpdateData";
 };
 
-const IV_LENGTH_BYTES = 12; // 96 bits
-
-export const createIV = () => {
-  const arr = new Uint8Array(IV_LENGTH_BYTES);
-  return window.crypto.getRandomValues(arr);
-};
-
 export const encryptAESGEM = async (
   data: Uint8Array,
   key: string,
@@ -122,7 +118,7 @@ export const decryptAESGEM = async (
     );
 
     const decodedData = new TextDecoder("utf-8").decode(
-      new Uint8Array(decrypted) as any,
+      new Uint8Array(decrypted),
     );
     return JSON.parse(decodedData);
   } catch (error) {
@@ -162,26 +158,8 @@ export const getCollaborationLink = (data: {
   return `${window.location.origin}${window.location.pathname}#room=${data.roomId},${data.roomKey}`;
 };
 
-export const getImportedKey = (key: string, usage: KeyUsage) =>
-  window.crypto.subtle.importKey(
-    "jwk",
-    {
-      alg: "A128GCM",
-      ext: true,
-      k: key,
-      key_ops: ["encrypt", "decrypt"],
-      kty: "oct",
-    },
-    {
-      name: "AES-GCM",
-      length: 128,
-    },
-    false, // extractable
-    [usage],
-  );
-
 export const decryptImported = async (
-  iv: ArrayBuffer,
+  iv: ArrayBuffer | Uint8Array,
   encrypted: ArrayBuffer,
   privateKey: string,
 ): Promise<ArrayBuffer> => {
@@ -227,7 +205,7 @@ const importFromBackend = async (
 
       // We need to convert the decrypted array buffer to a string
       const string = new window.TextDecoder("utf-8").decode(
-        new Uint8Array(decrypted) as any,
+        new Uint8Array(decrypted),
       );
       data = JSON.parse(string);
     } else {
@@ -270,6 +248,10 @@ export const loadScene = async (
   return {
     elements: data.elements,
     appState: data.appState,
+    // note: this will always be empty because we're not storing files
+    // in the scene database/localStorage, and instead fetch them async
+    // from a different database
+    files: data.files,
     commitToHistory: false,
   };
 };
@@ -277,11 +259,12 @@ export const loadScene = async (
 export const exportToBackend = async (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
+  files: BinaryFiles,
 ) => {
-  const json = serializeAsJSON(elements, appState);
+  const json = serializeAsJSON(elements, appState, files, "database");
   const encoded = new TextEncoder().encode(json);
 
-  const key = await window.crypto.subtle.generateKey(
+  const cryptoKey = await window.crypto.subtle.generateKey(
     {
       name: "AES-GCM",
       length: 128,
@@ -298,7 +281,7 @@ export const exportToBackend = async (
       name: "AES-GCM",
       iv,
     },
-    key,
+    cryptoKey,
     encoded,
   );
 
@@ -308,9 +291,24 @@ export const exportToBackend = async (
 
   // We use jwk encoding to be able to extract just the base64 encoded key.
   // We will hardcode the rest of the attributes when importing back the key.
-  const exportedKey = await window.crypto.subtle.exportKey("jwk", key);
+  const exportedKey = await window.crypto.subtle.exportKey("jwk", cryptoKey);
 
   try {
+    const filesMap = new Map<FileId, BinaryFileData>();
+    for (const element of elements) {
+      if (isInitializedImageElement(element) && files[element.fileId]) {
+        filesMap.set(element.fileId, files[element.fileId]);
+      }
+    }
+
+    const encryptionKey = exportedKey.k!;
+
+    const filesToUpload = await encodeFilesForUpload({
+      files: filesMap,
+      encryptionKey,
+      maxBytes: FILE_UPLOAD_MAX_BYTES,
+    });
+
     const response = await fetch(BACKEND_V2_POST, {
       method: "POST",
       body: payload,
@@ -320,8 +318,14 @@ export const exportToBackend = async (
       const url = new URL(window.location.href);
       // We need to store the key (and less importantly the id) as hash instead
       // of queryParam in order to never send it to the server
-      url.hash = `json=${json.id},${exportedKey.k!}`;
+      url.hash = `json=${json.id},${encryptionKey}`;
       const urlString = url.toString();
+
+      await saveFilesToFirebase({
+        prefix: `/files/shareLinks/${json.id}`,
+        files: filesToUpload,
+      });
+
       window.prompt(`🔒${t("alerts.uploadedSecurly")}`, urlString);
     } else if (json.error_class === "RequestTooLargeError") {
       window.alert(t("alerts.couldNotCreateShareableLinkTooBig"));

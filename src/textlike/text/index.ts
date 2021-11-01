@@ -1,5 +1,5 @@
+import { SVG_NS } from "../../constants";
 import {
-  SVG_NS,
   measureText,
   getFontFamilyString,
   getFontString,
