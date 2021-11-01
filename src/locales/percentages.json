@@ -5,13 +5,13 @@
   "ca-ES": 89,
   "cs-CZ": 28,
   "da-DK": 19,
-  "de-DE": 99,
+  "de-DE": 100,
   "el-GR": 73,
   "en": 100,
   "es-ES": 99,
   "fa-IR": 74,
   "fi-FI": 99,
-  "fr-FR": 99,
+  "fr-FR": 100,
   "he-IL": 95,
   "hi-IN": 64,
   "hu-HU": 57,
@@ -37,9 +37,9 @@
   "sk-SK": 99,
   "sv-SE": 99,
   "ta-IN": 91,
-  "tr-TR": 75,
+  "tr-TR": 77,
   "uk-UA": 80,
   "zh-CN": 99,
   "zh-HK": 33,
-  "zh-TW": 99
+  "zh-TW": 100
 }
