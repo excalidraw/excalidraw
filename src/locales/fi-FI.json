@@ -39,6 +39,7 @@
     "arrowhead_arrow": "Nuoli",
     "arrowhead_bar": "Tasapää",
     "arrowhead_dot": "Piste",
+    "arrowhead_triangle": "Kolmio",
     "fontSize": "Kirjasinkoko",
     "fontFamily": "Kirjasintyyppi",
     "onlySelected": "Vain valitut",
@@ -137,8 +138,8 @@
     "lightMode": "Vaalea tila",
     "zenMode": "Zen-tila",
     "exitZenMode": "Poistu zen-tilasta",
-    "cancel": "",
-    "clear": ""
+    "cancel": "Peruuta",
+    "clear": "Pyyhi"
   },
   "alerts": {
     "clearReset": "Tämä tyhjentää koko piirtoalueen. Jatketaanko?",
@@ -269,7 +270,7 @@
     "zoomToSelection": "Näytä valinta"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "Pyyhi piirtoalue"
   },
   "encrypted": {
     "tooltip": "Piirroksesi ovat päästä-päähän-salattuja, joten Excalidrawin palvelimet eivät koskaan näe niitä.",

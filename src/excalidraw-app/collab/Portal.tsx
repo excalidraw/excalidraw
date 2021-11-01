@@ -11,7 +11,7 @@ import { BROADCAST, FILE_UPLOAD_TIMEOUT, SCENE } from "../app_constants";
 import { UserIdleState } from "../../types";
 import { trackEvent } from "../../analytics";
 import { throttle } from "lodash";
-import { mutateElement } from "../../element/mutateElement";
+import { newElementWith } from "../../element/mutateElement";
 import { BroadcastedExcalidrawElement } from "./reconciliation";
 
 class Portal {
@@ -54,6 +54,7 @@ class Portal {
     if (!this.socket) {
       return;
     }
+    this.queueFileUpload.flush();
     this.socket.close();
     this.socket = null;
     this.roomId = null;
@@ -79,7 +80,7 @@ class Portal {
       const json = JSON.stringify(data);
       const encoded = new TextEncoder().encode(json);
       const encrypted = await encryptAESGEM(encoded, this.roomKey!);
-      this.socket!.emit(
+      this.socket?.emit(
         volatile ? BROADCAST.SERVER_VOLATILE : BROADCAST.SERVER,
         this.roomId,
         encrypted.data,
@@ -95,11 +96,13 @@ class Portal {
         files: this.collab.excalidrawAPI.getFiles(),
       });
     } catch (error) {
-      this.collab.excalidrawAPI.updateScene({
-        appState: {
-          errorMessage: error.message,
-        },
-      });
+      if (error.name !== "AbortError") {
+        this.collab.excalidrawAPI.updateScene({
+          appState: {
+            errorMessage: error.message,
+          },
+        });
+      }
     }
 
     this.collab.excalidrawAPI.updateScene({
@@ -110,11 +113,7 @@ class Portal {
             // this will signal collaborators to pull image data from server
             // (using mutation instead of newElementWith otherwise it'd break
             // in-progress dragging)
-            return mutateElement(
-              element,
-              { status: "saved" },
-              /* informMutation */ false,
-            );
+            return newElementWith(element, { status: "saved" });
           }
           return element;
         }),

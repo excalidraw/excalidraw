@@ -114,7 +114,11 @@ import {
   updateBoundElements,
 } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
-import { bumpVersion, mutateElement } from "../element/mutateElement";
+import {
+  bumpVersion,
+  mutateElement,
+  newElementWith,
+} from "../element/mutateElement";
 import { deepCopyElement, newFreeDrawElement } from "../element/newElement";
 import {
   isBindingElement,
@@ -4318,16 +4322,24 @@ class App extends React.Component<AppProps, AppState> {
         if (updatedFiles.has(element.fileId)) {
           invalidateShapeForElement(element);
         }
-
-        if (erroredFiles.has(element.fileId)) {
-          mutateElement(
-            element,
-            { status: "error" },
-            /* informMutation */ false,
-          );
-        }
       }
     }
+    if (erroredFiles.size) {
+      this.scene.replaceAllElements(
+        this.scene.getElementsIncludingDeleted().map((element) => {
+          if (
+            isInitializedImageElement(element) &&
+            erroredFiles.has(element.fileId)
+          ) {
+            return newElementWith(element, {
+              status: "error",
+            });
+          }
+          return element;
+        }),
+      );
+    }
+
     return { updatedFiles, erroredFiles };
   };
 
