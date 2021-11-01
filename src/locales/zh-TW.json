@@ -189,6 +189,7 @@
     "shapes": "形狀"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "點擊以繪製多點曲線；或拖曳以繪製直線",
     "freeDraw": "點擊並拖曳來繪圖，放開即結束",
     "text": "提示：亦可使用選取工具在任何地方雙擊來加入文字",
