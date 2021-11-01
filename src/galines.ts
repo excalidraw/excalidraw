@@ -36,7 +36,7 @@ export const orthogonalThrough = (against: Point, intersection: Point): Line =>
 export const parallel = (line: Line, distance: number): Line => {
   const result = line.slice();
   result[1] -= distance;
-  return (result as unknown) as Line;
+  return result as unknown as Line;
 };
 
 export const parallelThrough = (line: Line, point: Point): Line =>

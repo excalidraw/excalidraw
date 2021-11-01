@@ -17,9 +17,9 @@ export type TransformHandleDirection =
 export type TransformHandleType = TransformHandleDirection | "rotation";
 
 export type TransformHandle = [number, number, number, number];
-export type TransformHandles = Partial<
-  { [T in TransformHandleType]: TransformHandle }
->;
+export type TransformHandles = Partial<{
+  [T in TransformHandleType]: TransformHandle;
+}>;
 export type MaybeTransformHandleType = TransformHandleType | false;
 
 const transformHandleSizes: { [k in PointerType]: number } = {

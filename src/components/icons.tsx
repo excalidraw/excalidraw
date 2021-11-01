@@ -30,8 +30,12 @@ export const createIcon = (
   d: string | React.ReactNode,
   opts: number | Opts = 512,
 ) => {
-  const { width = 512, height = width, mirror, style } =
-    typeof opts === "number" ? ({ width: opts } as Opts) : opts;
+  const {
+    width = 512,
+    height = width,
+    mirror,
+    style,
+  } = typeof opts === "number" ? ({ width: opts } as Opts) : opts;
   return (
     <svg
       aria-hidden="true"

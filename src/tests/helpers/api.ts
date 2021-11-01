@@ -57,7 +57,7 @@ export class API {
   };
 
   static createElement = <
-    T extends Exclude<ExcalidrawElement["type"], "selection">
+    T extends Exclude<ExcalidrawElement["type"], "selection">,
   >({
     type,
     id,

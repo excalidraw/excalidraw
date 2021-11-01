@@ -398,16 +398,8 @@ const generateElementShape = (
         }
         break;
       case "diamond": {
-        const [
-          topX,
-          topY,
-          rightX,
-          rightY,
-          bottomX,
-          bottomY,
-          leftX,
-          leftY,
-        ] = getDiamondPoints(element);
+        const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
+          getDiamondPoints(element);
         shape = generator.polygon(
           [
             [topX, topY],

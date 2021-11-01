@@ -96,10 +96,9 @@ const APP_STATE_STORAGE_CONF = (<
     /** server (shareLink/collab/...) */
     server: boolean;
   },
-  T extends Record<keyof AppState, Values>
->(
-  config: { [K in keyof T]: K extends keyof AppState ? T[K] : never },
-) => config)({
+  T extends Record<keyof AppState, Values>,
+>(config: { [K in keyof T]: K extends keyof AppState ? T[K] : never }) =>
+  config)({
   theme: { browser: true, export: false, server: false },
   collaborators: { browser: false, export: false, server: false },
   currentChartType: { browser: true, export: false, server: false },
@@ -172,7 +171,7 @@ const APP_STATE_STORAGE_CONF = (<
 });
 
 const _clearAppStateForStorage = <
-  ExportType extends "export" | "browser" | "server"
+  ExportType extends "export" | "browser" | "server",
 >(
   appState: Partial<AppState>,
   exportType: ExportType,

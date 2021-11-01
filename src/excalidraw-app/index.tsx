@@ -286,7 +286,8 @@ const ExcalidrawWrapper = () => {
     promise: ResolvablePromise<ImportedDataState | null>;
   }>({ promise: null! });
   if (!initialStatePromiseRef.current.promise) {
-    initialStatePromiseRef.current.promise = resolvablePromise<ImportedDataState | null>();
+    initialStatePromiseRef.current.promise =
+      resolvablePromise<ImportedDataState | null>();
   }
 
   useEffect(() => {
@@ -296,10 +297,8 @@ const ExcalidrawWrapper = () => {
     }, VERSION_TIMEOUT);
   }, []);
 
-  const [
-    excalidrawAPI,
-    excalidrawRefCallback,
-  ] = useCallbackRefState<ExcalidrawImperativeAPI>();
+  const [excalidrawAPI, excalidrawRefCallback] =
+    useCallbackRefState<ExcalidrawImperativeAPI>();
 
   const collabAPI = useContext(CollabContext)?.api;
 

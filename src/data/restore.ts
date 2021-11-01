@@ -59,7 +59,7 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
 
 const restoreElementWithProperties = <
   T extends ExcalidrawElement,
-  K extends Pick<T, keyof Omit<Required<T>, keyof ExcalidrawElement>>
+  K extends Pick<T, keyof Omit<Required<T>, keyof ExcalidrawElement>>,
 >(
   element: Required<T>,
   extra: Pick<
@@ -98,11 +98,11 @@ const restoreElementWithProperties = <
     boundElementIds: element.boundElementIds ?? [],
   };
 
-  return ({
+  return {
     ...base,
     ...getNormalizedDimensions(base),
     ...extra,
-  } as unknown) as T;
+  } as unknown as T;
 };
 
 const restoreElement = (
@@ -113,10 +113,9 @@ const restoreElement = (
       let fontSize = element.fontSize;
       let fontFamily = element.fontFamily;
       if ("font" in element) {
-        const [fontPx, _fontFamily]: [
-          string,
-          string,
-        ] = (element as any).font.split(" ");
+        const [fontPx, _fontFamily]: [string, string] = (
+          element as any
+        ).font.split(" ");
         fontSize = parseInt(fontPx, 10);
         fontFamily = getFontFamilyByName(_fontFamily);
       }

@@ -78,9 +78,10 @@ export type SocketUpdateDataIncoming =
       type: "INVALID_RESPONSE";
     };
 
-export type SocketUpdateData = SocketUpdateDataSource[keyof SocketUpdateDataSource] & {
-  _brand: "socketUpdateData";
-};
+export type SocketUpdateData =
+  SocketUpdateDataSource[keyof SocketUpdateDataSource] & {
+    _brand: "socketUpdateData";
+  };
 
 export const encryptAESGEM = async (
   data: Uint8Array,

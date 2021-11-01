@@ -874,14 +874,10 @@ describe("regression tests", () => {
 
       expect(API.getSelectedElements().length).toBe(2);
 
-      const {
-        x: firstElementPrevX,
-        y: firstElementPrevY,
-      } = API.getSelectedElements()[0];
-      const {
-        x: secondElementPrevX,
-        y: secondElementPrevY,
-      } = API.getSelectedElements()[1];
+      const { x: firstElementPrevX, y: firstElementPrevY } =
+        API.getSelectedElements()[0];
+      const { x: secondElementPrevX, y: secondElementPrevY } =
+        API.getSelectedElements()[1];
 
       // drag elements from point on common bounding box that doesn't hit any of the elements
       mouse.reset();

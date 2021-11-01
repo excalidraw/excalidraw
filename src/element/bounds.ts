@@ -78,7 +78,7 @@ const getMinMaxXYFromCurvePathOps = (
       // move, bcurveTo, lineTo, and curveTo
       if (op === "move") {
         // change starting point
-        currentP = (data as unknown) as Point;
+        currentP = data as unknown as Point;
         // move operation does not draw anything; so, it always
         // returns false
       } else if (op === "bcurveTo") {
@@ -227,7 +227,7 @@ export const getArrowheadPoints = (
   const prevOp = ops[index - 1];
   let p0: Point = [0, 0];
   if (prevOp.op === "move") {
-    p0 = (prevOp.data as unknown) as Point;
+    p0 = prevOp.data as unknown as Point;
   } else if (prevOp.op === "bcurveTo") {
     p0 = [prevOp.data[4], prevOp.data[5]];
   }

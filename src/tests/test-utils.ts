@@ -126,7 +126,8 @@ export const mockBoundingClientRect = () => {
 };
 
 export const restoreOriginalGetBoundingClientRect = () => {
-  global.window.HTMLDivElement.prototype.getBoundingClientRect = originalGetBoundingClientRect;
+  global.window.HTMLDivElement.prototype.getBoundingClientRect =
+    originalGetBoundingClientRect;
 };
 
 export const assertSelectedElements = (

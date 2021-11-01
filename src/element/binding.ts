@@ -137,14 +137,13 @@ export const bindOrUnbindSelectedElements = (
 const maybeBindBindableElement = (
   bindableElement: NonDeleted<ExcalidrawBindableElement>,
 ): void => {
-  getElligibleElementsForBindableElementAndWhere(
-    bindableElement,
-  ).forEach(([linearElement, where]) =>
-    bindOrUnbindLinearElement(
-      linearElement,
-      where === "end" ? "keep" : bindableElement,
-      where === "start" ? "keep" : bindableElement,
-    ),
+  getElligibleElementsForBindableElementAndWhere(bindableElement).forEach(
+    ([linearElement, where]) =>
+      bindOrUnbindLinearElement(
+        linearElement,
+        where === "end" ? "keep" : bindableElement,
+        where === "start" ? "keep" : bindableElement,
+      ),
   );
 };
 
@@ -293,9 +292,11 @@ export const updateBoundElements = (
   const simultaneouslyUpdatedElementIds = getSimultaneouslyUpdatedElementIds(
     simultaneouslyUpdated,
   );
-  (Scene.getScene(changedElement)!.getNonDeletedElements(
-    boundElementIds,
-  ) as NonDeleted<ExcalidrawLinearElement>[]).forEach((linearElement) => {
+  (
+    Scene.getScene(changedElement)!.getNonDeletedElements(
+      boundElementIds,
+    ) as NonDeleted<ExcalidrawLinearElement>[]
+  ).forEach((linearElement) => {
     const bindableElement = changedElement as ExcalidrawBindableElement;
     // In case the boundElementIds are stale
     if (!doesNeedUpdate(linearElement, bindableElement)) {
@@ -580,9 +581,11 @@ export const fixBindingsAfterDuplication = (
   });
 
   // Update the linear elements
-  (sceneElements.filter(({ id }) =>
-    allBoundElementIds.has(id),
-  ) as ExcalidrawLinearElement[]).forEach((element) => {
+  (
+    sceneElements.filter(({ id }) =>
+      allBoundElementIds.has(id),
+    ) as ExcalidrawLinearElement[]
+  ).forEach((element) => {
     const { startBinding, endBinding } = element;
     mutateElement(element, {
       startBinding: newBindingAfterDuplication(
@@ -642,17 +645,17 @@ export const fixBindingsAfterDeletion = (
       });
     }
   });
-  (sceneElements.filter(({ id }) =>
-    boundElementIds.has(id),
-  ) as ExcalidrawLinearElement[]).forEach(
-    (element: ExcalidrawLinearElement) => {
-      const { startBinding, endBinding } = element;
-      mutateElement(element, {
-        startBinding: newBindingAfterDeletion(startBinding, deletedElementIds),
-        endBinding: newBindingAfterDeletion(endBinding, deletedElementIds),
-      });
-    },
-  );
+  (
+    sceneElements.filter(({ id }) =>
+      boundElementIds.has(id),
+    ) as ExcalidrawLinearElement[]
+  ).forEach((element: ExcalidrawLinearElement) => {
+    const { startBinding, endBinding } = element;
+    mutateElement(element, {
+      startBinding: newBindingAfterDeletion(startBinding, deletedElementIds),
+      endBinding: newBindingAfterDeletion(endBinding, deletedElementIds),
+    });
+  });
 };
 
 const newBindingAfterDeletion = (

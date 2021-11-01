@@ -34,10 +34,8 @@ const updateTooltip = (
     width: itemWidth,
   } = item.getBoundingClientRect();
 
-  const {
-    width: labelWidth,
-    height: labelHeight,
-  } = tooltip.getBoundingClientRect();
+  const { width: labelWidth, height: labelHeight } =
+    tooltip.getBoundingClientRect();
 
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;

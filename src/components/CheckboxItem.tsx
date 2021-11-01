@@ -13,9 +13,11 @@ export const CheckboxItem: React.FC<{
       className={clsx("Checkbox", { "is-checked": checked })}
       onClick={(event) => {
         onChange(!checked);
-        ((event.currentTarget as HTMLDivElement).querySelector(
-          ".Checkbox-box",
-        ) as HTMLButtonElement).focus();
+        (
+          (event.currentTarget as HTMLDivElement).querySelector(
+            ".Checkbox-box",
+          ) as HTMLButtonElement
+        ).focus();
       }}
     >
       <button className="Checkbox-box" role="checkbox" aria-checked={checked}>

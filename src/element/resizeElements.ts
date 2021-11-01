@@ -464,16 +464,12 @@ export const resizeSingleElement = (
     }
   }
 
-  const [
-    newBoundsX1,
-    newBoundsY1,
-    newBoundsX2,
-    newBoundsY2,
-  ] = getResizedElementAbsoluteCoords(
-    stateAtResizeStart,
-    eleNewWidth,
-    eleNewHeight,
-  );
+  const [newBoundsX1, newBoundsY1, newBoundsX2, newBoundsY2] =
+    getResizedElementAbsoluteCoords(
+      stateAtResizeStart,
+      eleNewWidth,
+      eleNewHeight,
+    );
   const newBoundsWidth = newBoundsX2 - newBoundsX1;
   const newBoundsHeight = newBoundsY2 - newBoundsY1;
 

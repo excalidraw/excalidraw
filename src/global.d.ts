@@ -49,8 +49,7 @@ type MarkRequired<T, RK extends keyof T> = Exclude<T, RK> &
 
 type MarkNonNullable<T, K extends keyof T> = {
   [P in K]-?: P extends K ? NonNullable<T[P]> : T[P];
-} &
-  { [P in keyof T]: T[P] };
+} & { [P in keyof T]: T[P] };
 
 // PNG encoding/decoding
 // -----------------------------------------------------------------------------
@@ -102,10 +101,10 @@ declare module "*.scss";
 // (due to TS structural typing)
 // https://github.com/microsoft/TypeScript/issues/31311#issuecomment-490690695
 interface ArrayBuffer {
-  private _brand?: "ArrayBuffer";
+  _brand?: "ArrayBuffer";
 }
 interface Uint8Array {
-  private _brand?: "Uint8Array";
+  _brand?: "Uint8Array";
 }
 // --------------------------------------------------------------------------—
 
