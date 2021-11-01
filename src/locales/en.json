@@ -203,7 +203,7 @@
     "lineEditor_pointSelected": "Press Delete to remove point, CtrlOrCmd+D to duplicate, or drag to move",
     "lineEditor_nothingSelected": "Select a point to move or remove, or hold Alt and click to add new points",
     "placeImage": "Click to place the image, or click and drag to set its size manually",
-    "canvasPanning": "To move canvas, hold mouse wheel or spacebar while dragging."
+    "canvasPanning": "To move canvas, hold mouse wheel or spacebar while dragging"
   },
   "canvasError": {
     "cannotShowPreview": "Cannot show preview",
