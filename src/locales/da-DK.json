@@ -189,6 +189,7 @@
     "shapes": ""
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "",
     "freeDraw": "Klik og træk, slip når du er færdig",
     "text": "",
