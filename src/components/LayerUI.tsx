@@ -51,6 +51,7 @@ import { JSONExportDialog } from "./JSONExportDialog";
 import { LibraryButton } from "./LibraryButton";
 import { isImageFileHandle } from "../data/blob";
 import PublishLibrary from "./PublishLibrary";
+import { Dialog } from "./Dialog";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -153,6 +154,10 @@ const LibraryMenuItems = ({
   const [showPublishLibraryDialog, setShowPublishLibraryDialog] = useState(
     false,
   );
+  const [publishLibSuccess, setPublishLibSuccess] = useState<null | {
+    url: string;
+    authorName: string;
+  }>(null);
   const referrer =
     libraryReturnUrl || window.location.origin + window.location.pathname;
 
@@ -284,6 +289,37 @@ const LibraryMenuItems = ({
     );
   }
 
+  const renderPublishSuccess = () => {
+    return (
+      <Dialog
+        onCloseRequest={() => setPublishLibSuccess(null)}
+        title="Library Publish Success"
+        className="publish-library-success"
+        small={true}
+      >
+        <p>
+          Thank you {publishLibSuccess?.authorName}. Your library has been
+          submitted for review, You can track the status{" "}
+          <a
+            href={publishLibSuccess?.url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            here
+          </a>
+        </p>
+        <ToolButton
+          type="button"
+          title={t("buttons.close")}
+          aria-label={t("buttons.close")}
+          label={t("buttons.close")}
+          onClick={() => setPublishLibSuccess(null)}
+          data-testid="publish-library-success-close"
+          className="publish-library-success-close"
+        />
+      </Dialog>
+    );
+  };
   return (
     <>
       {showPublishLibraryDialog && (
@@ -291,8 +327,14 @@ const LibraryMenuItems = ({
           onClose={() => setShowPublishLibraryDialog(false)}
           libraryItem={libraryItems[activeIndex]}
           appState={appState}
+          onSuccess={(data) => {
+            setShowPublishLibraryDialog(false);
+            setPublishLibSuccess(data);
+          }}
+          onError={(error) => window.alert(error)}
         />
       )}
+      {publishLibSuccess && renderPublishSuccess()}
       <Stack.Col align="start" gap={1} className="layer-ui__library-items">
         {rows}
       </Stack.Col>

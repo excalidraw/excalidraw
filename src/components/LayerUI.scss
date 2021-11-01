@@ -131,4 +131,25 @@
       margin-inline-end: 1em;
     }
   }
+
+  .publish-library-success {
+    .Dialog__content {
+      display: flex;
+      flex-direction: column;
+    }
+
+    &-close.ToolIcon_type_button {
+      background-color: $oc-blue-6;
+      align-self: flex-end;
+      &:hover {
+        background-color: $oc-blue-8;
+      }
+      .ToolIcon__icon {
+        width: auto;
+        font-size: 1rem;
+        color: $oc-white;
+        padding: 0 0.5rem;
+      }
+    }
+  }
 }

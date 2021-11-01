@@ -15,10 +15,14 @@ const PublishLibrary = ({
   onClose,
   libraryItem,
   appState,
+  onSuccess,
+  onError,
 }: {
   onClose: () => void;
   libraryItem: LibraryItem;
   appState: AppState;
+  onSuccess: (data: { url: string; authorName: string }) => void;
+  onError: (error: Error) => void;
 }) => {
   const [libraryData, setLibraryData] = useState({
     authorName: "",
@@ -70,19 +74,24 @@ const PublishLibrary = ({
       .then(
         (response) => {
           if (response.ok) {
-            //console.log(response.body);
+            response.json().then(({ url }) => {
+              onSuccess({
+                url,
+                authorName: libraryData.authorName,
+              });
+            });
           } else {
             throw new Error(response.statusText || "something went wrong");
           }
         },
         (err) => {
           console.error(err);
-          window.alert(err);
+          onError(err);
         },
       )
       .catch((err) => {
         console.error(err);
-        window.alert(err);
+        onError(err);
       });
   };
   return (
