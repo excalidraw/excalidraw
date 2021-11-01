@@ -22,7 +22,7 @@
     "@sentry/browser": "6.2.5",
     "@sentry/integrations": "6.2.5",
     "@testing-library/jest-dom": "5.14.1",
-    "@testing-library/react": "11.2.6",
+    "@testing-library/react": "12.1.2",
     "@tldraw/vec": "0.0.132",
     "@types/jest": "27.0.2",
     "@types/pica": "5.1.3",
