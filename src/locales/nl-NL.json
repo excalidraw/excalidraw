@@ -189,6 +189,7 @@
     "shapes": "Vormen"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "Klik om meerdere punten te starten, sleep voor één lijn",
     "freeDraw": "Klik en sleep, laat los als je klaar bent",
     "text": "Tip: je kunt tekst toevoegen door ergens dubbel te klikken met de selectietool",
