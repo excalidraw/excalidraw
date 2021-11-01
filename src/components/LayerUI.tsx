@@ -624,7 +624,11 @@ const LayerUI = ({
                       padding={1}
                       className={clsx({ "zen-mode": zenModeEnabled })}
                     >
-                      <HintViewer appState={appState} elements={elements} />
+                      <HintViewer
+                        appState={appState}
+                        elements={elements}
+                        isMobile={isMobile}
+                      />
                       {heading}
                       <Stack.Row gap={1}>
                         <ShapesSwitcher
@@ -845,6 +849,7 @@ const areEqual = (prev: LayerUIProps, next: LayerUIProps) => {
     prev.renderCustomFooter === next.renderCustomFooter &&
     prev.langCode === next.langCode &&
     prev.elements === next.elements &&
+    prev.files === next.files &&
     keys.every((key) => prevAppState[key] === nextAppState[key])
   );
 };

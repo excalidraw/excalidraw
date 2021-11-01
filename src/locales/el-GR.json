@@ -39,6 +39,7 @@
     "arrowhead_arrow": "Βέλος",
     "arrowhead_bar": "Μπάρα",
     "arrowhead_dot": "Τελεία",
+    "arrowhead_triangle": "",
     "fontSize": "Μέγεθος γραμματοσειράς",
     "fontFamily": "Γραμματοσειρά",
     "onlySelected": "Μόνο τα Επιλεγμένα",
@@ -107,15 +108,15 @@
   },
   "buttons": {
     "clearReset": "Επαναφορά του καμβά",
-    "exportJSON": "",
-    "exportImage": "",
+    "exportJSON": "Εξαγωγή σε αρχείο",
+    "exportImage": "Αποθήκευση ως εικόνα",
     "export": "Εξαγωγή",
     "exportToPng": "Εξαγωγή σε PNG",
     "exportToSvg": "Εξαγωγή σε SVG",
     "copyToClipboard": "Αντιγραφή στο πρόχειρο",
     "copyPngToClipboard": "Αντιγραφή PNG στο πρόχειρο",
     "scale": "Κλίμακα",
-    "save": "",
+    "save": "Αποθήκευση στο τρέχον αρχείο",
     "saveAs": "Αποθήκευση ως",
     "load": "Άνοιγμα",
     "getShareableLink": "Δημόσιος σύνδεσμος",
@@ -137,8 +138,8 @@
     "lightMode": "Φωτεινή λειτουργία",
     "zenMode": "Λειτουργία Zεν",
     "exitZenMode": "Έξοδος από την λειτουργία Zen",
-    "cancel": "",
-    "clear": ""
+    "cancel": "Ακύρωση",
+    "clear": "Καθαρισμός"
   },
   "alerts": {
     "clearReset": "Αυτό θα σβήσει ολόκληρο τον καμβά. Είσαι σίγουρος;",
@@ -163,9 +164,9 @@
     "invalidEncryptionKey": "Το κλειδί κρυπτογράφησης πρέπει να είναι 22 χαρακτήρες. Η ζωντανή συνεργασία είναι απενεργοποιημένη."
   },
   "errors": {
-    "unsupportedFileType": "",
-    "imageInsertError": "",
-    "fileTooBig": "",
+    "unsupportedFileType": "Μη υποστηριζόμενος τύπος αρχείου.",
+    "imageInsertError": "Αδυναμία εισαγωγής εικόνας. Προσπαθήστε ξανά αργότερα...",
+    "fileTooBig": "Το αρχείο είναι πολύ μεγάλο. Το μέγιστο επιτρεπόμενο μέγεθος είναι {{maxSize}}.",
     "svgImageInsertError": "",
     "invalidSVGString": ""
   },

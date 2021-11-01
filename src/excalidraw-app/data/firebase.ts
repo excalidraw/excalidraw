@@ -294,6 +294,8 @@ export const loadFilesFromFirebase = async (
             dataURL,
             created: metadata?.created || Date.now(),
           });
+        } else {
+          erroredFiles.set(id, true);
         }
       } catch (error) {
         erroredFiles.set(id, true);

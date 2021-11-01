@@ -60,7 +60,7 @@ import {
   isImageElement,
   isInitializedImageElement,
 } from "../../element/typeChecks";
-import { mutateElement } from "../../element/mutateElement";
+import { newElementWith } from "../../element/mutateElement";
 import {
   ReconciledElements,
   reconcileElements as _reconcileElements,
@@ -241,6 +241,9 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   };
 
   closePortal = () => {
+    this.queueBroadcastAllElements.cancel();
+    this.loadImageFiles.cancel();
+
     this.saveCollabRoomToFirebase();
     if (window.confirm(t("alerts.collabStopOverridePrompt"))) {
       window.history.pushState({}, APP_NAME, window.location.origin);
@@ -253,7 +256,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
         .getSceneElementsIncludingDeleted()
         .map((element) => {
           if (isImageElement(element) && element.status === "saved") {
-            return mutateElement(element, { status: "pending" }, false);
+            return newElementWith(element, { status: "pending" });
           }
           return element;
         });
@@ -351,11 +354,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     } else {
       const elements = this.excalidrawAPI.getSceneElements().map((element) => {
         if (isImageElement(element) && element.status === "saved") {
-          return mutateElement(
-            element,
-            { status: "pending" },
-            /* informMutation */ false,
-          );
+          return newElementWith(element, { status: "pending" });
         }
         return element;
       });
