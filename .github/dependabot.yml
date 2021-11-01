@@ -10,6 +10,7 @@ updates:
       - lipis
     assignees:
       - lipis
+    open-pull-requests-limit: 20
 
   - package-ecosystem: npm
     directory: /src/packages/excalidraw/
@@ -21,6 +22,7 @@ updates:
       - ad1992
     assignees:
       - ad1992
+    open-pull-requests-limit: 20
 
   - package-ecosystem: npm
     directory: /src/packages/utils/
@@ -32,3 +34,4 @@ updates:
       - ad1992
     assignees:
       - ad1992
+    open-pull-requests-limit: 20
