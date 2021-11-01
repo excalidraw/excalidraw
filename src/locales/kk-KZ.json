@@ -39,6 +39,7 @@
     "arrowhead_arrow": "Нұсқар",
     "arrowhead_bar": "Тосқауыл",
     "arrowhead_dot": "Нүкте",
+    "arrowhead_triangle": "",
     "fontSize": "Қаріп өлшемі",
     "fontFamily": "Қаріп тобы",
     "onlySelected": "",
@@ -136,7 +137,9 @@
     "darkMode": "",
     "lightMode": "",
     "zenMode": "",
-    "exitZenMode": ""
+    "exitZenMode": "",
+    "cancel": "",
+    "clear": ""
   },
   "alerts": {
     "clearReset": "",
@@ -160,8 +163,16 @@
     "resetLibrary": "",
     "invalidEncryptionKey": ""
   },
+  "errors": {
+    "unsupportedFileType": "",
+    "imageInsertError": "Суретті жүктеу мүмкін болмады. Кейінірек қайталап көріңіз...",
+    "fileTooBig": "Файл өте үлкен. Максималды рұқсат етілген көлем {{maxSize}}.",
+    "svgImageInsertError": "",
+    "invalidSVGString": ""
+  },
   "toolBar": {
     "selection": "",
+    "image": "Суретті қою",
     "rectangle": "",
     "diamond": "",
     "ellipse": "",
@@ -186,10 +197,12 @@
     "linearElementMulti": "",
     "lockAngle": "",
     "resize": "",
+    "resizeImage": "",
     "rotate": "",
     "lineEditor_info": "",
     "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": ""
+    "lineEditor_nothingSelected": "",
+    "placeImage": ""
   },
   "canvasError": {
     "cannotShowPreview": "",
@@ -255,6 +268,9 @@
     "view": "Көру",
     "zoomToFit": "Барлық элементтердің көлеміне сәйкес үлкейту",
     "zoomToSelection": "Таңдалғанды үлкейту"
+  },
+  "clearCanvasDialog": {
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Сіздің сызбаларыңыз өтпелі шифрлеу арқылы шифрланған, сондықтан Excalidraw серверлері оларды ешқашан көрмейді.",

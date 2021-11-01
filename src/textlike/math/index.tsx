@@ -1,7 +1,7 @@
 // Some imports
 import { FontFamilyValues, FontString } from "../../element/types";
+import { SVG_NS } from "../../constants";
 import {
-  SVG_NS,
   getFontString,
   getFontFamilyString,
   getShortcutKey,

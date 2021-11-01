@@ -129,14 +129,14 @@ export const registerTextLikeSubtypeName = (subtypeName: string) => {
 
 type DisabledPanelComponents = {
   subtype: string;
-  actions: ActionName[];
+  actions: (ActionName | TextActionName)[];
 };
 
 const textLikeDisabledPanelComponents = [] as DisabledPanelComponents[];
 
 export const registerTextLikeDisabledPanelComponents = (
   subtypeName: string,
-  actions: ActionName[],
+  actions: (ActionName | TextActionName)[],
 ) => {
   if (textLikeSubtypes.includes(subtypeName)) {
     textLikeDisabledPanelComponents.push({
@@ -188,7 +188,7 @@ export const isPanelComponentDisabled = (
 
 const isPanelComponentDisabledForSubtype = (
   subtypeName: string,
-  action: ActionName,
+  action: ActionName | TextActionName,
 ) => {
   if (textLikeSubtypes.includes(subtypeName)) {
     if (

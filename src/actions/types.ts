@@ -1,7 +1,11 @@
 import React from "react";
 import { ExcalidrawElement } from "../element/types";
-import { AppState, ExcalidrawProps } from "../types";
-import Library from "../data/library";
+import {
+  AppClassProperties,
+  AppState,
+  ExcalidrawProps,
+  BinaryFiles,
+} from "../types";
 import { ToolButtonSize } from "../components/ToolButton";
 import { TextActionName } from "../textlike/types";
 
@@ -13,29 +17,24 @@ export type ActionResult =
         AppState,
         "offsetTop" | "offsetLeft" | "width" | "height"
       > | null;
+      files?: BinaryFiles | null;
       commitToHistory: boolean;
       syncHistory?: boolean;
+      replaceFiles?: boolean;
     }
   | false;
-
-type AppAPI = {
-  canvas: HTMLCanvasElement | null;
-  focusContainer(): void;
-  library: Library;
-};
 
 type ActionFn = (
   elements: readonly ExcalidrawElement[],
   appState: Readonly<AppState>,
   formData: any,
-  app: AppAPI,
+  app: AppClassProperties,
 ) => ActionResult | Promise<ActionResult>;
 
 export type UpdaterFn = (res: ActionResult) => void;
 export type ActionFilterFn = (action: Action) => void;
 
 export type ActionName =
-  | TextActionName
   | "copy"
   | "cut"
   | "paste"
@@ -115,7 +114,7 @@ export type PanelComponentProps = {
 };
 
 export interface Action {
-  name: ActionName;
+  name: ActionName | TextActionName;
   PanelComponent?: React.FC<PanelComponentProps>;
   PanelComponentPredicate?: (
     elements: readonly ExcalidrawElement[],
@@ -140,6 +139,8 @@ export interface ActionsManagerInterface {
   actions: Record<ActionName | TextActionName, Action>;
   registerAction: (action: Action) => void;
   handleKeyDown: (event: React.KeyboardEvent | KeyboardEvent) => boolean;
-  renderAction: (name: ActionName) => React.ReactElement | null;
+  renderAction: (
+    name: ActionName | TextActionName,
+  ) => React.ReactElement | null;
   executeAction: (action: Action) => void;
 }

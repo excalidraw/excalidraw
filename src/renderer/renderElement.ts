@@ -5,11 +5,13 @@ import {
   Arrowhead,
   NonDeletedExcalidrawElement,
   ExcalidrawFreeDrawElement,
+  ExcalidrawImageElement,
 } from "../element/types";
 import {
   isTextElement,
   isLinearElement,
   isFreeDrawElement,
+  isInitializedImageElement,
 } from "../element/typeChecks";
 import {
   getDiamondPoints,
@@ -21,16 +23,23 @@ import { Drawable, Options } from "roughjs/bin/core";
 import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 import { SceneState } from "../scene/types";
-import { SVG_NS, distance, isRTL } from "../utils";
+import { distance, isRTL } from "../utils";
 import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
-import { Zoom } from "../types";
+import { AppState, BinaryFiles, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
 import { renderTextElement, renderSvgTextElement } from "../textlike";
+import { MAX_DECIMALS_FOR_SVG_EXPORT, MIME_TYPES, SVG_NS } from "../constants";
 import { getStroke, StrokeOptions } from "perfect-freehand";
-import { MAX_DECIMALS_FOR_SVG_EXPORT } from "../constants";
 
 const defaultAppState = getDefaultAppState();
+
+const isPendingImageElement = (
+  element: ExcalidrawElement,
+  sceneState: SceneState,
+) =>
+  isInitializedImageElement(element) &&
+  !sceneState.imageCache.has(element.fileId);
 
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 
@@ -42,6 +51,7 @@ const getCanvasPadding = (element: ExcalidrawElement) =>
 export interface ExcalidrawElementWithCanvas {
   element: ExcalidrawElement | ExcalidrawTextElement;
   canvas: HTMLCanvasElement;
+  theme: SceneState["theme"];
   canvasZoom: Zoom["value"];
   canvasOffsetX: number;
   canvasOffsetY: number;
@@ -50,6 +60,7 @@ export interface ExcalidrawElementWithCanvas {
 const generateElementCanvas = (
   element: NonDeletedExcalidrawElement,
   zoom: Zoom,
+  sceneState: SceneState,
   renderCb?: () => void,
 ): ExcalidrawElementWithCanvas => {
   const canvas = document.createElement("canvas");
@@ -107,23 +118,73 @@ const generateElementCanvas = (
 
   const rc = rough.canvas(canvas);
 
-  drawElementOnCanvas(element, rc, context, renderCb);
+  if (
+    sceneState.theme === "dark" &&
+    isInitializedImageElement(element) &&
+    !isPendingImageElement(element, sceneState) &&
+    sceneState.imageCache.get(element.fileId)?.mimeType !== MIME_TYPES.svg
+  ) {
+    // using a stronger invert (100% vs our regular 93%) and saturate
+    // as a temp hack to make images in dark theme look closer to original
+    // color scheme (it's still not quite there and the clors look slightly
+    // desaturing/black is not as black, but...)
+    context.filter = "invert(100%) hue-rotate(180deg) saturate(1.25)";
+  }
 
+  drawElementOnCanvas(element, rc, context, sceneState, renderCb);
   context.restore();
 
   return {
     element,
     canvas,
+    theme: sceneState.theme,
     canvasZoom: zoom.value,
     canvasOffsetX,
     canvasOffsetY,
   };
 };
 
+const IMAGE_PLACEHOLDER_IMG = document.createElement("img");
+IMAGE_PLACEHOLDER_IMG.src = `data:${MIME_TYPES.svg},${encodeURIComponent(
+  `<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="image" class="svg-inline--fa fa-image fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="#888" d="M464 448H48c-26.51 0-48-21.49-48-48V112c0-26.51 21.49-48 48-48h416c26.51 0 48 21.49 48 48v288c0 26.51-21.49 48-48 48zM112 120c-30.928 0-56 25.072-56 56s25.072 56 56 56 56-25.072 56-56-25.072-56-56-56zM64 384h384V272l-87.515-87.515c-4.686-4.686-12.284-4.686-16.971 0L208 320l-55.515-55.515c-4.686-4.686-12.284-4.686-16.971 0L64 336v48z"></path></svg>`,
+)}`;
+
+const IMAGE_ERROR_PLACEHOLDER_IMG = document.createElement("img");
+IMAGE_ERROR_PLACEHOLDER_IMG.src = `data:${MIME_TYPES.svg},${encodeURIComponent(
+  `<svg viewBox="0 0 668 668" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2"><path d="M464 448H48c-26.51 0-48-21.49-48-48V112c0-26.51 21.49-48 48-48h416c26.51 0 48 21.49 48 48v288c0 26.51-21.49 48-48 48ZM112 120c-30.928 0-56 25.072-56 56s25.072 56 56 56 56-25.072 56-56-25.072-56-56-56ZM64 384h384V272l-87.515-87.515c-4.686-4.686-12.284-4.686-16.971 0L208 320l-55.515-55.515c-4.686-4.686-12.284-4.686-16.971 0L64 336v48Z" style="fill:#888;fill-rule:nonzero" transform="matrix(.81709 0 0 .81709 124.825 145.825)"/><path d="M256 8C119.034 8 8 119.033 8 256c0 136.967 111.034 248 248 248s248-111.034 248-248S392.967 8 256 8Zm130.108 117.892c65.448 65.448 70 165.481 20.677 235.637L150.47 105.216c70.204-49.356 170.226-44.735 235.638 20.676ZM125.892 386.108c-65.448-65.448-70-165.481-20.677-235.637L361.53 406.784c-70.203 49.356-170.226 44.736-235.638-20.676Z" style="fill:#888;fill-rule:nonzero" transform="matrix(.30366 0 0 .30366 506.822 60.065)"/></svg>`,
+)}`;
+
+const drawImagePlaceholder = (
+  element: ExcalidrawImageElement,
+  context: CanvasRenderingContext2D,
+  zoomValue: AppState["zoom"]["value"],
+) => {
+  context.fillStyle = "#E7E7E7";
+  context.fillRect(0, 0, element.width, element.height);
+
+  const imageMinWidthOrHeight = Math.min(element.width, element.height);
+
+  const size = Math.min(
+    imageMinWidthOrHeight,
+    Math.min(imageMinWidthOrHeight * 0.4, 100),
+  );
+
+  context.drawImage(
+    element.status === "error"
+      ? IMAGE_ERROR_PLACEHOLDER_IMG
+      : IMAGE_PLACEHOLDER_IMG,
+    element.width / 2 - size / 2,
+    element.height / 2 - size / 2,
+    size,
+    size,
+  );
+};
+
 const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
+  sceneState: SceneState,
   renderCb?: () => void,
 ) => {
   context.globalAlpha = element.opacity / 100;
@@ -157,6 +218,23 @@ const drawElementOnCanvas = (
       context.fill(path);
 
       context.restore();
+      break;
+    }
+    case "image": {
+      const img = isInitializedImageElement(element)
+        ? sceneState.imageCache.get(element.fileId)?.image
+        : undefined;
+      if (img != null && !(img instanceof Promise)) {
+        context.drawImage(
+          img,
+          0 /* hardcoded for the selection box*/,
+          0,
+          element.width,
+          element.height,
+        );
+      } else {
+        drawImagePlaceholder(element, context, sceneState.zoom.value);
+      }
       break;
     }
     default: {
@@ -230,6 +308,7 @@ export const generateRoughOptions = (
   switch (element.type) {
     case "rectangle":
     case "diamond":
+    case "image":
     case "ellipse": {
       options.fillStyle = element.fillStyle;
       options.fill =
@@ -386,6 +465,29 @@ const generateElementShape = (
               ];
             }
 
+            if (arrowhead === "triangle") {
+              const [x, y, x2, y2, x3, y3] = arrowheadPoints;
+
+              // always use solid stroke for triangle arrowhead
+              delete options.strokeLineDash;
+
+              return [
+                generator.polygon(
+                  [
+                    [x, y],
+                    [x2, y2],
+                    [x3, y3],
+                    [x, y],
+                  ],
+                  {
+                    ...options,
+                    fill: element.strokeColor,
+                    fillStyle: "solid",
+                  },
+                ),
+              ];
+            }
+
             // Arrow arrowheads
             const [x2, y2, x3, y3, x4, y4] = arrowheadPoints;
 
@@ -435,7 +537,8 @@ const generateElementShape = (
         shape = [];
         break;
       }
-      case "text": {
+      case "text":
+      case "image": {
         // just to ensure we don't regenerate element.canvas on rerenders
         shape = [];
         break;
@@ -447,7 +550,7 @@ const generateElementShape = (
 
 const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,
-  sceneState?: SceneState,
+  sceneState: SceneState,
   renderCb?: () => void,
 ) => {
   const zoom: Zoom = sceneState ? sceneState.zoom : defaultAppState.zoom;
@@ -456,8 +559,18 @@ const generateElementWithCanvas = (
     prevElementWithCanvas &&
     prevElementWithCanvas.canvasZoom !== zoom.value &&
     !sceneState?.shouldCacheIgnoreZoom;
-  if (!prevElementWithCanvas || shouldRegenerateBecauseZoom) {
-    const elementWithCanvas = generateElementCanvas(element, zoom, renderCb);
+
+  if (
+    !prevElementWithCanvas ||
+    shouldRegenerateBecauseZoom ||
+    prevElementWithCanvas.theme !== sceneState.theme
+  ) {
+    const elementWithCanvas = generateElementCanvas(
+      element,
+      zoom,
+      sceneState,
+      renderCb,
+    );
 
     elementWithCanvasCache.set(element, elementWithCanvas);
 
@@ -486,10 +599,25 @@ const drawElementFromCanvas = (
 
   const cx = ((x1 + x2) / 2 + sceneState.scrollX) * window.devicePixelRatio;
   const cy = ((y1 + y2) / 2 + sceneState.scrollY) * window.devicePixelRatio;
+
+  const _isPendingImageElement = isPendingImageElement(element, sceneState);
+
+  const scaleXFactor =
+    "scale" in elementWithCanvas.element && !_isPendingImageElement
+      ? elementWithCanvas.element.scale[0]
+      : 1;
+  const scaleYFactor =
+    "scale" in elementWithCanvas.element && !_isPendingImageElement
+      ? elementWithCanvas.element.scale[1]
+      : 1;
+
   context.save();
-  context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
-  context.translate(cx, cy);
-  context.rotate(element.angle);
+  context.scale(
+    (1 / window.devicePixelRatio) * scaleXFactor,
+    (1 / window.devicePixelRatio) * scaleYFactor,
+  );
+  context.translate(cx * scaleXFactor, cy * scaleYFactor);
+  context.rotate(element.angle * scaleXFactor * scaleYFactor);
 
   context.drawImage(
     elementWithCanvas.canvas!,
@@ -546,7 +674,7 @@ export const renderElement = (
         context.translate(cx, cy);
         context.rotate(element.angle);
         context.translate(-shiftX, -shiftY);
-        drawElementOnCanvas(element, rc, context, renderCb);
+        drawElementOnCanvas(element, rc, context, sceneState, renderCb);
         context.restore();
       }
 
@@ -557,6 +685,7 @@ export const renderElement = (
     case "ellipse":
     case "line":
     case "arrow":
+    case "image":
     case "text": {
       generateElementShape(element, generator);
       if (renderOptimizations) {
@@ -576,7 +705,7 @@ export const renderElement = (
         context.translate(cx, cy);
         context.rotate(element.angle);
         context.translate(-shiftX, -shiftY);
-        drawElementOnCanvas(element, rc, context, renderCb);
+        drawElementOnCanvas(element, rc, context, sceneState, renderCb);
         context.restore();
       }
       break;
@@ -608,6 +737,7 @@ export const renderElementToSvg = (
   element: NonDeletedExcalidrawElement,
   rsvg: RoughSVG,
   svgRoot: SVGElement,
+  files: BinaryFiles,
   offsetX?: number,
   offsetY?: number,
 ) => {
@@ -701,6 +831,44 @@ export const renderElementToSvg = (
       path.setAttribute("d", getFreeDrawSvgPath(element));
       node.appendChild(path);
       svgRoot.appendChild(node);
+      break;
+    }
+    case "image": {
+      const fileData =
+        isInitializedImageElement(element) && files[element.fileId];
+      if (fileData) {
+        const symbolId = `image-${fileData.id}`;
+        let symbol = svgRoot.querySelector(`#${symbolId}`);
+        if (!symbol) {
+          symbol = svgRoot.ownerDocument!.createElementNS(SVG_NS, "symbol");
+          symbol.id = symbolId;
+
+          const image = svgRoot.ownerDocument!.createElementNS(SVG_NS, "image");
+
+          image.setAttribute("width", "100%");
+          image.setAttribute("height", "100%");
+          image.setAttribute("href", fileData.dataURL);
+
+          symbol.appendChild(image);
+
+          svgRoot.prepend(symbol);
+        }
+
+        const use = svgRoot.ownerDocument!.createElementNS(SVG_NS, "use");
+        use.setAttribute("href", `#${symbolId}`);
+
+        use.setAttribute("width", `${Math.round(element.width)}`);
+        use.setAttribute("height", `${Math.round(element.height)}`);
+
+        use.setAttribute(
+          "transform",
+          `translate(${offsetX || 0} ${
+            offsetY || 0
+          }) rotate(${degree} ${cx} ${cy})`,
+        );
+
+        svgRoot.appendChild(use);
+      }
       break;
     }
     default: {
