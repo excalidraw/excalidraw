@@ -3,12 +3,14 @@ import { t } from "../i18n";
 
 import { ToolButton } from "./ToolButton";
 
-import "./PublishLibrary.scss";
 import { useState } from "react";
 import { AppState, LibraryItem } from "../types";
 import { exportToBlob } from "../packages/utils";
 import { EXPORT_DATA_TYPES, EXPORT_SOURCE } from "../constants";
 import { ExportedLibraryData } from "../data/types";
+
+import "./PublishLibrary.scss";
+
 const PublishLibrary = ({
   onClose,
   libraryItem,
@@ -52,7 +54,7 @@ const PublishLibrary = ({
     const formData = new FormData();
     formData.append("excalidrawLib", lib);
     formData.append("excalidrawPng", png!);
-    formData.append("title", `feat: Add ${libraryData.name}`);
+    formData.append("title", libraryData.name);
     formData.append("authorName", libraryData.authorName);
     formData.append("githubHandle", libraryData.githubHandle);
     formData.append("name", libraryData.name);
@@ -64,10 +66,24 @@ const PublishLibrary = ({
         method: "post",
         body: formData,
       },
-    ).then(
-      (res) => console.info("res", res.body),
-      (err) => window.alert(err),
-    );
+    )
+      .then(
+        (response) => {
+          if (response.ok) {
+            //console.log(response.body);
+          } else {
+            throw new Error(response.statusText || "something went wrong");
+          }
+        },
+        (err) => {
+          console.error(err);
+          window.alert(err);
+        },
+      )
+      .catch((err) => {
+        console.error(err);
+        window.alert(err);
+      });
   };
   return (
     <Dialog
