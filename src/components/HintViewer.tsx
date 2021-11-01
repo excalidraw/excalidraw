@@ -11,14 +11,16 @@ import {
 } from "../element/typeChecks";
 import { getShortcutKey } from "../utils";
 
-interface Hint {
+interface HintViewerProps {
   appState: AppState;
   elements: readonly NonDeletedExcalidrawElement[];
+  isMobile: boolean;
 }
 
-const getHints = ({ appState, elements }: Hint) => {
+const getHints = ({ appState, elements, isMobile }: HintViewerProps) => {
   const { elementType, isResizing, isRotating, lastPointerDownWith } = appState;
   const multiMode = appState.multiElement !== null;
+
   if (elementType === "arrow" || elementType === "line") {
     if (!multiMode) {
       return t("hints.linearElement");
@@ -39,6 +41,7 @@ const getHints = ({ appState, elements }: Hint) => {
   }
 
   const selectedElements = getSelectedElements(elements, appState);
+
   if (
     isResizing &&
     lastPointerDownWith === "mouse" &&
@@ -74,13 +77,22 @@ const getHints = ({ appState, elements }: Hint) => {
     return t("hints.text_editing");
   }
 
+  if (elementType === "selection" && !selectedElements.length && !isMobile) {
+    return t("hints.canvasPanning");
+  }
+
   return null;
 };
 
-export const HintViewer = ({ appState, elements }: Hint) => {
+export const HintViewer = ({
+  appState,
+  elements,
+  isMobile,
+}: HintViewerProps) => {
   let hint = getHints({
     appState,
     elements,
+    isMobile,
   });
   if (!hint) {
     return null;
