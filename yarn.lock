@@ -2159,10 +2159,10 @@
     "@babel/runtime" "^7.12.5"
     "@testing-library/dom" "^7.28.1"
 
-"@tldraw/vec@0.0.106":
-  version "0.0.106"
-  resolved "https://registry.npmjs.org/@tldraw/vec/-/vec-0.0.106.tgz"
-  integrity sha512-sOI3/bEb0KbGTHb8s2lSnY+0uWEToehJXPjV9ItFEOPqRXKoKbWRUzN1OAP7AQa1FJA2/w/1oPO9Seycne6JRA==
+"@tldraw/vec@0.0.132":
+  version "0.0.132"
+  resolved "https://registry.yarnpkg.com/@tldraw/vec/-/vec-0.0.132.tgz#f5bc0c7820a45f2bfd1bd92934780b76c61f3f78"
+  integrity sha512-Ev333ffeRjRL67MsYJgNoZxt91Vve8Dawbd0cXcY6Rv2LQIz1oIQ8TOrT4CkoSM/I72q43c9qhSOCFh2BaiFEA==
 
 "@tootallnate/once@1":
   version "1.1.2"
