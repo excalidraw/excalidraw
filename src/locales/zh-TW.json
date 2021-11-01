@@ -189,7 +189,7 @@
     "shapes": "形狀"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "若要移動畫布，請在拖曳時按住滑鼠滾輪或空白鍵",
     "linearElement": "點擊以繪製多點曲線；或拖曳以繪製直線",
     "freeDraw": "點擊並拖曳來繪圖，放開即結束",
     "text": "提示：亦可使用選取工具在任何地方雙擊來加入文字",
