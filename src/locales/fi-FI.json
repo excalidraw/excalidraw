@@ -47,7 +47,7 @@
     "exportEmbedScene": "Upota työ",
     "exportEmbedScene_details": "Teoksen tiedot tallennetaan PNG/SVG-tiedostoon, jolloin teoksen voi palauttaa siitä. Kasvattaa tallennetun tiedoston kokoa.",
     "addWatermark": "Lisää \"Tehty Excalidrawilla\"",
-    "handDrawn": "Käsinkirjoitettu",
+    "handDrawn": "Käsinpiirretty",
     "normal": "Tavallinen",
     "code": "Koodi",
     "small": "Pieni",
@@ -189,7 +189,7 @@
     "shapes": "Muodot"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "Liikuttaaksesi piirtoaluetta, raahaa hiiren vieritysrulla tai välilyöntinäppäin alaspainettuna",
     "linearElement": "Klikkaa piirtääksesi useampi piste, raahaa piirtääksesi yksittäinen viiva",
     "freeDraw": "Paina ja raahaa, päästä irti kun olet valmis",
     "text": "Vinkki: voit myös lisätä tekstiä kaksoisnapsauttamalla mihin tahansa valintatyökalulla",
