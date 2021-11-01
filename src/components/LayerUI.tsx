@@ -624,7 +624,11 @@ const LayerUI = ({
                       padding={1}
                       className={clsx({ "zen-mode": zenModeEnabled })}
                     >
-                      <HintViewer appState={appState} elements={elements} />
+                      <HintViewer
+                        appState={appState}
+                        elements={elements}
+                        isMobile={isMobile}
+                      />
                       {heading}
                       <Stack.Row gap={1}>
                         <ShapesSwitcher
