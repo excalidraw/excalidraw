@@ -69,7 +69,7 @@
     "jest-canvas-mock": "2.3.1",
     "lint-staged": "11.2.6",
     "pepjs": "0.5.3",
-    "prettier": "2.2.1",
+    "prettier": "2.4.1",
     "rewire": "5.0.0"
   },
   "engines": {
