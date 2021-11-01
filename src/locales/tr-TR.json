@@ -39,7 +39,7 @@
     "arrowhead_arrow": "Ok",
     "arrowhead_bar": "Çizgi",
     "arrowhead_dot": "Nokta",
-    "arrowhead_triangle": "",
+    "arrowhead_triangle": "Üçgen",
     "fontSize": "Yazı tipi boyutu",
     "fontFamily": "Yazı tipi ailesi",
     "onlySelected": "Sadece seçilen",
@@ -138,8 +138,8 @@
     "lightMode": "Açık tema",
     "zenMode": "Zen modu",
     "exitZenMode": "Zen modundan çık",
-    "cancel": "",
-    "clear": ""
+    "cancel": "İptal",
+    "clear": "Temizle"
   },
   "alerts": {
     "clearReset": "Tuvalin tamamı temizlenecek. Emin misiniz?",
@@ -161,18 +161,18 @@
     "cannotRestoreFromImage": "Sahne bu dosyadan oluşturulamıyor",
     "invalidSceneUrl": "Verilen URL'den çalışma alanı yüklenemedi. Dosya bozuk olabilir veya geçerli bir Excalidraw JSON verisi bulundurmuyor olabilir.",
     "resetLibrary": "Bu işlem kütüphanenizi sıfırlayacak. Emin misiniz?",
-    "invalidEncryptionKey": ""
+    "invalidEncryptionKey": "Şifreleme anahtarı 22 karakter olmalı. Canlı işbirliği devre dışı bırakıldı."
   },
   "errors": {
-    "unsupportedFileType": "",
-    "imageInsertError": "",
+    "unsupportedFileType": "Desteklenmeyen dosya türü.",
+    "imageInsertError": "Görsel eklenemedi. Daha sonra tekrar deneyin...",
     "fileTooBig": "",
     "svgImageInsertError": "",
     "invalidSVGString": ""
   },
   "toolBar": {
     "selection": "Seçme",
-    "image": "",
+    "image": "Görsel ekle",
     "rectangle": "Dikdörtgen",
     "diamond": "Elmas",
     "ellipse": "Elips",
@@ -189,7 +189,7 @@
     "shapes": "Şekiller"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "Tuvali taşımak için, tuvali sürüklerken aynı zamanda fare tekerleğine veya boşluk tuşuna basılı tutun",
     "linearElement": "Birden fazla nokta için tıklayın, tek çizgi için sürükleyin",
     "freeDraw": "Tıkla ve sürükle, bitirdiğinde serbest bırak",
     "text": "İpucu: seçme aracıyla herhangi bir yere çift tıklayarak da yazı ekleyebilirsin",
@@ -271,7 +271,7 @@
     "zoomToSelection": "Seçime yakınlaş"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "Tuvali Temizle"
   },
   "encrypted": {
     "tooltip": "Çizimleriniz uçtan-uca şifrelenmiştir, Excalidraw'ın sunucuları bile onları göremez.",
