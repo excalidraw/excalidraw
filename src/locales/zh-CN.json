@@ -139,7 +139,7 @@
     "zenMode": "禅模式",
     "exitZenMode": "退出禅模式",
     "cancel": "取消",
-    "clear": ""
+    "clear": "清除"
   },
   "alerts": {
     "clearReset": "这将会清除整个画布。您是否要继续?",
@@ -197,7 +197,7 @@
     "linearElementMulti": "点击最后一个点或按下 Esc/Enter 来完成",
     "lockAngle": "可以按住 Shift 来约束角度",
     "resize": "您可以按住SHIFT来限制比例大小，\n按住ALT来调整中心大小",
-    "resizeImage": "",
+    "resizeImage": "按住SHIFT可以自由缩放，\n按住ALT可以从中间缩放",
     "rotate": "旋转时可以按住 Shift 来约束角度",
     "lineEditor_info": "双击或按回车键编辑",
     "lineEditor_pointSelected": "按下 Delete 移除点，Ctrl 或 Cmd+D 以复制，或拖动以移动",
