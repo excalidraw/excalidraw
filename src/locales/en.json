@@ -189,6 +189,7 @@
     "shapes": "Shapes"
   },
   "hints": {
+    "canvasPanning": "To move canvas, hold mouse wheel or spacebar while dragging",
     "linearElement": "Click to start multiple points, drag for single line",
     "freeDraw": "Click and drag, release when you're finished",
     "text": "Tip: you can also add text by double-clicking anywhere with the selection tool",
@@ -202,8 +203,7 @@
     "lineEditor_info": "Double-click or press Enter to edit points",
     "lineEditor_pointSelected": "Press Delete to remove point, CtrlOrCmd+D to duplicate, or drag to move",
     "lineEditor_nothingSelected": "Select a point to move or remove, or hold Alt and click to add new points",
-    "placeImage": "Click to place the image, or click and drag to set its size manually",
-    "canvasPanning": "To move canvas, hold mouse wheel or spacebar while dragging"
+    "placeImage": "Click to place the image, or click and drag to set its size manually"
   },
   "canvasError": {
     "cannotShowPreview": "Cannot show preview",
