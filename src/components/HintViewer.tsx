@@ -11,13 +11,13 @@ import {
 } from "../element/typeChecks";
 import { getShortcutKey } from "../utils";
 
-interface Hint {
+interface HintViewerProps {
   appState: AppState;
   elements: readonly NonDeletedExcalidrawElement[];
   isMobile: boolean;
 }
 
-const getHints = ({ appState, elements, isMobile }: Hint) => {
+const getHints = ({ appState, elements, isMobile }: HintViewerProps) => {
   const { elementType, isResizing, isRotating, lastPointerDownWith } = appState;
   const multiMode = appState.multiElement !== null;
 
@@ -84,7 +84,11 @@ const getHints = ({ appState, elements, isMobile }: Hint) => {
   return null;
 };
 
-export const HintViewer = ({ appState, elements, isMobile }: Hint) => {
+export const HintViewer = ({
+  appState,
+  elements,
+  isMobile,
+}: HintViewerProps) => {
   let hint = getHints({
     appState,
     elements,
