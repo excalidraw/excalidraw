@@ -189,6 +189,7 @@
     "shapes": "Former"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "Klicka för att starta flera punkter, dra för en linje",
     "freeDraw": "Klicka och dra, släpp när du är klar",
     "text": "Tips: du kan också lägga till text genom att dubbelklicka var som helst med markeringsverktyget",
