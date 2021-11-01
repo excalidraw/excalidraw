@@ -189,6 +189,7 @@
     "shapes": "Formas"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
     "freeDraw": "Clique e arraste, large quando terminar",
     "text": "Dica: também pode adicionar texto clicando duas vezes em qualquer lugar com a ferramenta de seleção",
