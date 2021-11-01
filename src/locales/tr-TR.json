@@ -189,6 +189,7 @@
     "shapes": "Şekiller"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "Birden fazla nokta için tıklayın, tek çizgi için sürükleyin",
     "freeDraw": "Tıkla ve sürükle, bitirdiğinde serbest bırak",
     "text": "İpucu: seçme aracıyla herhangi bir yere çift tıklayarak da yazı ekleyebilirsin",
