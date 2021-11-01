@@ -4270,12 +4270,24 @@ class App extends React.Component<AppProps, AppState> {
         if (updatedFiles.has(element.fileId)) {
           invalidateShapeForElement(element);
         }
-
-        if (erroredFiles.has(element.fileId)) {
-          newElementWith(element, { status: "error" });
-        }
       }
     }
+    if (erroredFiles.size) {
+      this.scene.replaceAllElements(
+        this.scene.getElementsIncludingDeleted().map((element) => {
+          if (
+            isInitializedImageElement(element) &&
+            erroredFiles.has(element.fileId)
+          ) {
+            return newElementWith(element, {
+              status: "error",
+            });
+          }
+          return element;
+        }),
+      );
+    }
+
     return { updatedFiles, erroredFiles };
   };
 
