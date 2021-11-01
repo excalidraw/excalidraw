@@ -39,6 +39,15 @@ const getHints = ({ appState, elements }: Hint) => {
   }
 
   const selectedElements = getSelectedElements(elements, appState);
+
+  if (
+    elementType === "selection" &&
+    appState.draggingElement?.type === "selection" &&
+    !selectedElements.length
+  ) {
+    return t("hints.canvasPanning");
+  }
+
   if (
     isResizing &&
     lastPointerDownWith === "mouse" &&
