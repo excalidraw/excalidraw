@@ -69,14 +69,10 @@ const textShortcutMap: Record<TextShortcutNameMath, string[]> = {
   changeUseTex: [getShortcutKey("CtrlOrCmd+Shift+M")],
 };
 
-let _useTex = true;
-
-const setUseTex = (useTex: boolean) => {
-  _useTex = useTex;
-};
-
-const getUseTex = (): boolean => {
-  return _useTex;
+const getUseTex = (appState: AppState): boolean => {
+  const textOptsMath = appState.textOpts as TextOptsMath;
+  const useTex = textOptsMath.useTex !== undefined ? textOptsMath.useTex : true;
+  return useTex;
 };
 
 const mathJax = {} as {
@@ -546,7 +542,7 @@ const applyTextElementMathOpts = (
   element: NonDeleted<ExcalidrawTextElementMath>,
   textOpts?: TextOptsMath,
 ): NonDeleted<ExcalidrawTextElement> => {
-  const useTex = textOpts?.useTex !== undefined ? textOpts.useTex : getUseTex();
+  const useTex = textOpts?.useTex !== undefined ? textOpts.useTex : true;
   return newElementWith(element, { useTex, fontFamily: 2 });
 };
 
@@ -586,7 +582,7 @@ const measureTextElementMath = (
   const fontSize =
     next?.fontSize !== undefined ? next.fontSize : element.fontSize;
   const text = next?.text !== undefined ? next.text : element.text;
-  const useTex = element.useTex !== undefined ? element.useTex : getUseTex();
+  const useTex = element.useTex !== undefined ? element.useTex : true;
   return measureMath(
     text,
     fontSize,
@@ -819,13 +815,17 @@ const setUseTexForSelectedElements = (
     );
     mutateElement(element, metrics);
   });
-  // Set the default value for new math-text elements.
-  setUseTex(useTex);
 
   // Return an array of the elements which were updated
   const updatedElementsMap = getElementMap(elements);
 
-  return elements.map((element) => updatedElementsMap[element.id] || element);
+  // Set the default value for new math-text elements.
+  return {
+    elements: elements.map(
+      (element) => updatedElementsMap[element.id] || element,
+    ),
+    appState: { ...appState, textOpts: { useTex } },
+  };
 };
 
 const getValueForMathElements = function <T>(
@@ -858,13 +858,18 @@ const registerActionsMath = () => {
           (element) => isMathElement(element) && element.useTex,
         );
         if (useTex === null) {
-          useTex = getUseTex();
+          useTex = getUseTex(appState);
         }
         useTex = !useTex;
       }
+      const {
+        elements: modElements,
+        appState: modAppState,
+      } = setUseTexForSelectedElements(elements, appState, useTex);
+
       return {
-        elements: setUseTexForSelectedElements(elements, appState, useTex),
-        appState,
+        elements: modElements,
+        appState: modAppState,
         commitToHistory: true,
       };
     },
@@ -877,7 +882,10 @@ const registerActionsMath = () => {
       let enabled = true;
       getSelectedElements(getNonDeletedElements(elements), appState).forEach(
         (element) => {
-          if (isTextElement(element) && element.subtype !== TEXT_SUBTYPE_MATH) {
+          if (
+            !isTextElement(element) ||
+            (isTextElement(element) && element.subtype !== TEXT_SUBTYPE_MATH)
+          ) {
             enabled = false;
           }
         },
@@ -885,7 +893,10 @@ const registerActionsMath = () => {
       if (appState.editingElement && !isMathElement(appState.editingElement)) {
         enabled = false;
       }
-      if (appState.textElementSubtype !== TEXT_SUBTYPE_MATH) {
+      if (
+        appState.elementType === "text" &&
+        appState.textElementSubtype !== TEXT_SUBTYPE_MATH
+      ) {
         enabled = false;
       }
       return enabled;
@@ -909,7 +920,7 @@ const registerActionsMath = () => {
             elements,
             appState,
             (element) => isMathElement(element) && element.useTex,
-            getUseTex(),
+            getUseTex(appState),
           )}
           onChange={(value) => updateData(value)}
         />
