@@ -57,20 +57,21 @@ class Library {
 
     const existingLibraryItems = await this.loadLibrary();
 
-    const filtered = libraryFile.library!.reduce(
-      (acc, libraryItem: LibraryItem) => {
-        const restoredItem = this.restoreLibraryItem({
-          status: "published",
-          //@ts-ignore
-          items: libraryItem,
-        });
-        if (restoredItem && isUniqueitem(existingLibraryItems, restoredItem)) {
-          acc.push(restoredItem);
-        }
-        return acc;
-      },
-      [] as Mutable<LibraryItems>,
-    );
+    const filtered = libraryFile.library!.reduce((acc, libraryItem) => {
+      const isOldLibrary = !!Array.isArray(libraryItem);
+      //@ts-ignore
+      const libItem: LibraryItem = isOldLibrary
+        ? {
+            status: "published",
+            items: libraryItem,
+          }
+        : libraryItem;
+      const restoredItem = this.restoreLibraryItem(libItem);
+      if (restoredItem && isUniqueitem(existingLibraryItems, restoredItem)) {
+        acc.push(restoredItem);
+      }
+      return acc;
+    }, [] as Mutable<LibraryItems>);
 
     await this.saveLibrary([...existingLibraryItems, ...filtered]);
   }
