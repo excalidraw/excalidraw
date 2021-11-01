@@ -189,6 +189,7 @@
     "shapes": "Bentuk"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "Klik untuk memulai banyak poin, seret untuk satu baris",
     "freeDraw": "Klik dan seret, lepaskan jika Anda selesai",
     "text": "Tip: Anda juga dapat menambahkan teks dengan klik ganda di mana saja dengan alat pemilihan",
