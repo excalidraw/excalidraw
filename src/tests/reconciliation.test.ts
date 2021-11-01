@@ -75,10 +75,10 @@ const test = <U extends `${string}:${"L" | "R"}`>(
   const cache: Cache = {};
   const _local = idsToElements(local, cache);
   const _remote = idsToElements(remote, cache);
-  const _target = (target.map((uid) => {
+  const _target = target.map((uid) => {
     const [, id, source] = uid.match(/^(\w+):([LR])$/)!;
     return (source === "L" ? _local : _remote).find((e) => e.id === id)!;
-  }) as any) as ReconciledElements;
+  }) as any as ReconciledElements;
   const remoteReconciled = reconcileElements(_local, _remote, {} as AppState);
   expect(cleanElements(remoteReconciled)).deep.equal(
     cleanElements(_target),

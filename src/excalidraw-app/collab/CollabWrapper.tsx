@@ -419,12 +419,8 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
             );
             break;
           case "MOUSE_LOCATION": {
-            const {
-              pointer,
-              button,
-              username,
-              selectedElementIds,
-            } = decryptedData.payload;
+            const { pointer, button, username, selectedElementIds } =
+              decryptedData.payload;
             const socketId: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["socketId"] =
               decryptedData.payload.socketId ||
               // @ts-ignore legacy, see #2094 (#2097)
@@ -503,12 +499,10 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
   };
 
   private loadImageFiles = throttle(async () => {
-    const {
-      loadedFiles,
-      erroredFiles,
-    } = await this.fetchImageFilesFromFirebase({
-      elements: this.excalidrawAPI.getSceneElementsIncludingDeleted(),
-    });
+    const { loadedFiles, erroredFiles } =
+      await this.fetchImageFilesFromFirebase({
+        elements: this.excalidrawAPI.getSceneElementsIncludingDeleted(),
+      });
 
     this.excalidrawAPI.addFiles(loadedFiles);
 
@@ -591,9 +585,8 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
 
   setCollaborators(sockets: string[]) {
     this.setState((state) => {
-      const collaborators: InstanceType<
-        typeof CollabWrapper
-      >["collaborators"] = new Map();
+      const collaborators: InstanceType<typeof CollabWrapper>["collaborators"] =
+        new Map();
       for (const socketId of sockets) {
         if (this.collaborators.has(socketId)) {
           collaborators.set(socketId, this.collaborators.get(socketId)!);
@@ -695,7 +688,8 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     this.contextValue.initializeSocketClient = this.initializeSocketClient;
     this.contextValue.onCollabButtonClick = this.onCollabButtonClick;
     this.contextValue.broadcastElements = this.broadcastElements;
-    this.contextValue.fetchImageFilesFromFirebase = this.fetchImageFilesFromFirebase;
+    this.contextValue.fetchImageFilesFromFirebase =
+      this.fetchImageFilesFromFirebase;
     return this.contextValue;
   };
 

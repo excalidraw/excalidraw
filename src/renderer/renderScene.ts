@@ -336,12 +336,8 @@ export const renderScene = (
         );
       }
       if (selectionColors.length) {
-        const [
-          elementX1,
-          elementY1,
-          elementX2,
-          elementY2,
-        ] = getElementAbsoluteCoords(element);
+        const [elementX1, elementY1, elementX2, elementY2] =
+          getElementAbsoluteCoords(element);
         acc.push({
           angle: element.angle,
           elementX1,
@@ -356,9 +352,8 @@ export const renderScene = (
 
     const addSelectionForGroupId = (groupId: GroupId) => {
       const groupElements = getElementsInGroup(elements, groupId);
-      const [elementX1, elementY1, elementX2, elementY2] = getCommonBounds(
-        groupElements,
-      );
+      const [elementX1, elementY1, elementX2, elementY2] =
+        getCommonBounds(groupElements);
       selections.push({
         angle: 0,
         elementX1,
@@ -630,14 +625,8 @@ const renderSelectionBorder = (
     selectionColors: string[];
   },
 ) => {
-  const {
-    angle,
-    elementX1,
-    elementY1,
-    elementX2,
-    elementY2,
-    selectionColors,
-  } = elementProperties;
+  const { angle, elementX1, elementY1, elementX2, elementY2, selectionColors } =
+    elementProperties;
   const elementWidth = elementX2 - elementX1;
   const elementHeight = elementY2 - elementY1;
 
