@@ -189,6 +189,7 @@
     "shapes": "Formes"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "Feu clic per a dibuixar múltiples punts; arrossegueu per a una sola línia",
     "freeDraw": "Feu clic i arrossegueu, deixeu anar per a finalitzar",
     "text": "Consell: també podeu afegir text fent doble clic en qualsevol lloc amb l'eina de selecció",
