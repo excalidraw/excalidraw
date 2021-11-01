@@ -14,9 +14,10 @@ import { getShortcutKey } from "../utils";
 interface Hint {
   appState: AppState;
   elements: readonly NonDeletedExcalidrawElement[];
+  isMobile: boolean;
 }
 
-const getHints = ({ appState, elements }: Hint) => {
+const getHints = ({ appState, elements, isMobile }: Hint) => {
   const { elementType, isResizing, isRotating, lastPointerDownWith } = appState;
   const multiMode = appState.multiElement !== null;
 
@@ -76,17 +77,18 @@ const getHints = ({ appState, elements }: Hint) => {
     return t("hints.text_editing");
   }
 
-  if (elementType === "selection" && !selectedElements.length) {
+  if (elementType === "selection" && !selectedElements.length && !isMobile) {
     return t("hints.canvasPanning");
   }
 
   return null;
 };
 
-export const HintViewer = ({ appState, elements }: Hint) => {
+export const HintViewer = ({ appState, elements, isMobile }: Hint) => {
   let hint = getHints({
     appState,
     elements,
+    isMobile,
   });
   if (!hint) {
     return null;
