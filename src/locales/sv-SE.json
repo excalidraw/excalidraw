@@ -189,7 +189,7 @@
     "shapes": "Former"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "För att flytta canvas, håll mushjulet eller mellanslagstangenten medan du drar",
     "linearElement": "Klicka för att starta flera punkter, dra för en linje",
     "freeDraw": "Klicka och dra, släpp när du är klar",
     "text": "Tips: du kan också lägga till text genom att dubbelklicka var som helst med markeringsverktyget",
