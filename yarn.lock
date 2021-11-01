@@ -2338,10 +2338,10 @@
   resolved "https://registry.npmjs.org/@types/normalize-package-data/-/normalize-package-data-2.4.0.tgz"
   integrity sha512-f5j5b/Gf71L+dbqxIpQ4Z2WlmI/mPJ0fOkGGmFgtb6sAu97EPczzbS3/tJKxmcYDj55OX6ssqwDAWOHIYDRDGA==
 
-"@types/pako@1.0.1":
-  version "1.0.1"
-  resolved "https://registry.npmjs.org/@types/pako/-/pako-1.0.1.tgz"
-  integrity sha512-GdZbRSJ3Cv5fiwT6I0SQ3ckeN2PWNqxd26W9Z2fCK1tGrrasGy4puvNFtnddqH9UJFMQYXxEuuB7B8UK+LLwSg==
+"@types/pako@1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@types/pako/-/pako-1.0.2.tgz#17c9b136877f33d9ecc8e73cd26944f1f6dd39a1"
+  integrity sha512-8UJl2MjkqqS6ncpLZqRZ5LmGiFBkbYxocD4e4jmBqGvfRG1RS23gKsBQbdtV9O9GvRyjFTiRHRByjSlKCLlmZw==
 
 "@types/parse-json@^4.0.0":
   version "4.0.0"
