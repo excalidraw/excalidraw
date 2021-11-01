@@ -19,6 +19,7 @@ interface Hint {
 const getHints = ({ appState, elements }: Hint) => {
   const { elementType, isResizing, isRotating, lastPointerDownWith } = appState;
   const multiMode = appState.multiElement !== null;
+
   if (elementType === "arrow" || elementType === "line") {
     if (!multiMode) {
       return t("hints.linearElement");
@@ -39,14 +40,6 @@ const getHints = ({ appState, elements }: Hint) => {
   }
 
   const selectedElements = getSelectedElements(elements, appState);
-
-  if (
-    elementType === "selection" &&
-    appState.draggingElement?.type === "selection" &&
-    !selectedElements.length
-  ) {
-    return t("hints.canvasPanning");
-  }
 
   if (
     isResizing &&
@@ -81,6 +74,10 @@ const getHints = ({ appState, elements }: Hint) => {
 
   if (appState.editingElement && isTextElement(appState.editingElement)) {
     return t("hints.text_editing");
+  }
+
+  if (elementType === "selection" && !selectedElements.length) {
+    return t("hints.canvasPanning");
   }
 
   return null;
