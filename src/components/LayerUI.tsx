@@ -658,7 +658,10 @@ const LayerUI = ({
   const closeLibrary = useCallback(
     (event) => {
       const isPublishDialogOpen = !!document.querySelector(".publish-library");
-      if (isPublishDialogOpen) {
+      const isPublishDialogSuccessOpen = !!document.querySelector(
+        ".publish-library-success",
+      );
+      if (isPublishDialogOpen || isPublishDialogSuccessOpen) {
         return;
       }
       setAppState({ isLibraryOpen: false });
