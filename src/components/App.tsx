@@ -1294,8 +1294,8 @@ class App extends React.Component<AppProps, AppState> {
           if ((await this.props.onPaste(data, event)) === false) {
             return;
           }
-        } catch (e) {
-          console.error(e);
+        } catch (error: any) {
+          console.error(error);
         }
       }
       if (data.errorMessage) {

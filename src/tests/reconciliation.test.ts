@@ -98,7 +98,7 @@ const test = <U extends `${string}:${"L" | "R"}`>(
           ),
         ),
       ).deep.equal(cleanElements(remoteReconciled), "local re-reconciliation");
-    } catch (error) {
+    } catch (error: any) {
       console.error("local original", __local);
       console.error("remote reconciled", __remote);
       throw error;

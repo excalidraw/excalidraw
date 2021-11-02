@@ -377,8 +377,8 @@ const ExcalidrawWrapper = () => {
           JSON.parse(
             localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY) as string,
           ) || [];
-      } catch (e) {
-        console.error(e);
+      } catch (error: any) {
+        console.error(error);
       }
     };
 

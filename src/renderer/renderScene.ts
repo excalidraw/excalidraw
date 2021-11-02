@@ -274,7 +274,7 @@ export const renderScene = (
   visibleElements.forEach((element) => {
     try {
       renderElement(element, rc, context, renderOptimizations, sceneState);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
     }
   });
@@ -298,7 +298,7 @@ export const renderScene = (
         renderOptimizations,
         sceneState,
       );
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
     }
   }
@@ -822,7 +822,7 @@ export const renderSceneToSvg = (
           element.x + offsetX,
           element.y + offsetY,
         );
-      } catch (error) {
+      } catch (error: any) {
         console.error(error);
       }
     }
