@@ -441,7 +441,7 @@ const ExcalidrawWrapper = () => {
   }, [excalidrawAPI]);
 
   useEffect(() => {
-    languageDetector.cacheUserLanguage(langCode);
+    languageDetector.cacheUserLanguage(langCode[0]);
   }, [langCode]);
 
   const onChange = (
@@ -557,7 +557,7 @@ const ExcalidrawWrapper = () => {
         <LanguageList
           onChange={(langCode) => setLangCode(langCode)}
           languages={languages}
-          currentLangCode={langCode}
+          currentLangCode={langCode[0]}
         />
       );
       if (isMobile) {
@@ -657,7 +657,7 @@ const ExcalidrawWrapper = () => {
         }}
         renderTopRightUI={renderTopRightUI}
         renderFooter={renderFooter}
-        langCode={langCode}
+        langCode={langCode[0]}
         renderCustomStats={renderCustomStats}
         detectScroll={false}
         handleKeyboardGlobally={true}
