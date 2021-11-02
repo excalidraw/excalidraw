@@ -189,7 +189,7 @@
     "shapes": "Forme"
   },
   "hints": {
-    "canvasPanning": "Per spostare la tela, tieni premuto la rotella del mouse o la barra spaziatrice mentre la trascini",
+    "canvasPanning": "Per spostare la tela, tieni premuta la rotella del mouse o la barra spaziatrice mentre la trascini",
     "linearElement": "Clicca per iniziare una linea in più punti, trascina per singola linea",
     "freeDraw": "Clicca e trascina, rilascia quando avrai finito",
     "text": "Suggerimento: puoi anche aggiungere del testo facendo doppio clic ovunque con lo strumento di selezione",
