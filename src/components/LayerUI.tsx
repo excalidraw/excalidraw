@@ -126,10 +126,13 @@ const LibraryMenuItems = ({
   files,
   id,
   appState,
+  activeIndexes,
+  onToggle,
+  onPublish,
 }: {
   libraryItems: LibraryItems;
   pendingElements: LibraryItem["items"];
-  onRemoveFromLibrary: (index: number) => void;
+  onRemoveFromLibrary: () => void;
   onInsertShape: (elements: LibraryItem["items"]) => void;
   onAddToLibrary: (elements: LibraryItem["items"]) => void;
   theme: AppState["theme"];
@@ -141,6 +144,9 @@ const LibraryMenuItems = ({
   library: Library;
   id: string;
   appState: AppState;
+  activeIndexes: Array<number>;
+  onToggle: (index: number) => void;
+  onPublish: () => void;
 }) => {
   const isMobile = useIsMobile();
   const numCells =
@@ -150,14 +156,7 @@ const LibraryMenuItems = ({
   const numRows = Math.max(1, Math.ceil(numCells / CELLS_PER_ROW));
   const rows = [];
   let addedPendingElements = false;
-  const [activeIndex, setActiveIndex] = useState(-1);
-  const [showPublishLibraryDialog, setShowPublishLibraryDialog] = useState(
-    false,
-  );
-  const [publishLibSuccess, setPublishLibSuccess] = useState<null | {
-    url: string;
-    authorName: string;
-  }>(null);
+
   const referrer =
     libraryReturnUrl || window.location.origin + window.location.pathname;
 
@@ -224,8 +223,10 @@ const LibraryMenuItems = ({
       </a>
     </div>,
   );
-  if (activeIndex !== -1) {
-    const isPublished = libraryItems[activeIndex].status === "published";
+  if (activeIndexes.length) {
+    const isPublished = activeIndexes.some(
+      (index) => libraryItems[index].status === "published",
+    );
     rows.push(
       <div className="library-item-actions">
         <ToolButton
@@ -234,7 +235,7 @@ const LibraryMenuItems = ({
           title={t("buttons.removeFromLibrary")}
           aria-label={t("buttons.removeFromLibrary")}
           label={t("buttons.removeFromLibrary")}
-          onClick={onRemoveFromLibrary.bind(null, activeIndex)}
+          onClick={onRemoveFromLibrary}
           className="library-item-actions--remove"
         />
         {!isPublished && (
@@ -245,7 +246,7 @@ const LibraryMenuItems = ({
             aria-label={t("buttons.publishLibrary")}
             label={t("buttons.publishLibrary")}
             className="library-item-actions--publish"
-            onClick={() => setShowPublishLibraryDialog(true)}
+            onClick={onPublish}
           />
         )}
       </div>,
@@ -269,15 +270,14 @@ const LibraryMenuItems = ({
             pendingElements={
               shouldAddPendingElements ? pendingElements : undefined
             }
-            onRemoveFromLibrary={onRemoveFromLibrary.bind(null, y + x)}
             onClick={
               shouldAddPendingElements
                 ? onAddToLibrary.bind(null, pendingElements)
                 : onInsertShape.bind(null, elements)
             }
             index={x + y}
-            activeIndex={activeIndex}
-            onSelect={(index) => setActiveIndex(index)}
+            activeIndexes={activeIndexes}
+            onToggle={onToggle.bind(null, x + y)}
           />
         </Stack.Col>,
       );
@@ -289,52 +289,8 @@ const LibraryMenuItems = ({
     );
   }
 
-  const renderPublishSuccess = () => {
-    return (
-      <Dialog
-        onCloseRequest={() => setPublishLibSuccess(null)}
-        title="Library Publish Success"
-        className="publish-library-success"
-        small={true}
-      >
-        <p>
-          Thank you {publishLibSuccess?.authorName}. Your library has been
-          submitted for review, You can track the status{" "}
-          <a
-            href={publishLibSuccess?.url}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            here
-          </a>
-        </p>
-        <ToolButton
-          type="button"
-          title={t("buttons.close")}
-          aria-label={t("buttons.close")}
-          label={t("buttons.close")}
-          onClick={() => setPublishLibSuccess(null)}
-          data-testid="publish-library-success-close"
-          className="publish-library-success-close"
-        />
-      </Dialog>
-    );
-  };
   return (
     <>
-      {showPublishLibraryDialog && (
-        <PublishLibrary
-          onClose={() => setShowPublishLibraryDialog(false)}
-          libraryItem={libraryItems[activeIndex]}
-          appState={appState}
-          onSuccess={(data) => {
-            setShowPublishLibraryDialog(false);
-            setPublishLibSuccess(data);
-          }}
-          onError={(error) => window.alert(error)}
-        />
-      )}
-      {publishLibSuccess && renderPublishSuccess()}
       <Stack.Col align="start" gap={1} className="layer-ui__library-items">
         {rows}
       </Stack.Col>
@@ -384,7 +340,14 @@ const LibraryMenu = ({
   const [loadingState, setIsLoading] = useState<
     "preloading" | "loading" | "ready"
   >("preloading");
-
+  const [activeIndexes, setActiveIndexes] = useState<Array<number>>([]);
+  const [showPublishLibraryDialog, setShowPublishLibraryDialog] = useState(
+    false,
+  );
+  const [publishLibSuccess, setPublishLibSuccess] = useState<null | {
+    url: string;
+    authorName: string;
+  }>(null);
   const loadingTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -408,18 +371,18 @@ const LibraryMenu = ({
     };
   }, [library]);
 
-  const removeFromLibrary = useCallback(
-    async (indexToRemove) => {
-      const items = await library.loadLibrary();
-      const nextItems = items.filter((_, index) => index !== indexToRemove);
-      library.saveLibrary(nextItems).catch((error) => {
-        setLibraryItems(items);
-        setAppState({ errorMessage: t("alerts.errorRemovingFromLibrary") });
-      });
-      setLibraryItems(nextItems);
-    },
-    [library, setAppState],
-  );
+  const removeFromLibrary = useCallback(async () => {
+    const items = await library.loadLibrary();
+    const nextItems = items.filter(
+      (_, index) => !activeIndexes.includes(index),
+    );
+    library.saveLibrary(nextItems).catch((error) => {
+      setLibraryItems(items);
+      setAppState({ errorMessage: t("alerts.errorRemovingFromLibrary") });
+    });
+    setActiveIndexes([]);
+    setLibraryItems(nextItems);
+  }, [library, setAppState, activeIndexes, setActiveIndexes]);
 
   const addToLibrary = useCallback(
     async (elements: LibraryItem["items"]) => {
@@ -443,8 +406,57 @@ const LibraryMenu = ({
     [onAddToLibrary, library, setAppState],
   );
 
+  const renderPublishSuccess = useCallback(() => {
+    return (
+      <Dialog
+        onCloseRequest={() => setPublishLibSuccess(null)}
+        title="Library Publish Success"
+        className="publish-library-success"
+        small={true}
+      >
+        <p>
+          Thank you {publishLibSuccess?.authorName}. Your library has been
+          submitted for review, You can track the status{" "}
+          <a
+            href={publishLibSuccess?.url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            here
+          </a>
+        </p>
+        <ToolButton
+          type="button"
+          title={t("buttons.close")}
+          aria-label={t("buttons.close")}
+          label={t("buttons.close")}
+          onClick={() => setPublishLibSuccess(null)}
+          data-testid="publish-library-success-close"
+          className="publish-library-success-close"
+        />
+      </Dialog>
+    );
+  }, [setPublishLibSuccess, publishLibSuccess]);
+
+  const getSelectedItems = () =>
+    libraryItems.filter((_, index) => activeIndexes.includes(index));
+
   return loadingState === "preloading" ? null : (
     <Island padding={1} ref={ref} className="layer-ui__library">
+      {showPublishLibraryDialog && (
+        <PublishLibrary
+          onClose={() => setShowPublishLibraryDialog(false)}
+          libraryItems={getSelectedItems()}
+          appState={appState}
+          onSuccess={(data) => {
+            setShowPublishLibraryDialog(false);
+            setPublishLibSuccess(data);
+          }}
+          onError={(error) => window.alert(error)}
+        />
+      )}
+      {publishLibSuccess && renderPublishSuccess()}
+
       {loadingState === "loading" ? (
         <div className="layer-ui__library-message">
           {t("labels.libraryLoadingMessage")}
@@ -465,6 +477,18 @@ const LibraryMenu = ({
           files={files}
           id={id}
           appState={appState}
+          activeIndexes={activeIndexes}
+          onToggle={(index) => {
+            const pos = activeIndexes.indexOf(index);
+            if (pos === -1) {
+              setActiveIndexes([...activeIndexes, index]);
+            } else {
+              const activeIndexesCopy = activeIndexes.slice();
+              activeIndexesCopy.splice(pos, 1);
+              setActiveIndexes(activeIndexesCopy);
+            }
+          }}
+          onPublish={() => setShowPublishLibraryDialog(true)}
         />
       )}
     </Island>

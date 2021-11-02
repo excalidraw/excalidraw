@@ -4,22 +4,23 @@ import { t } from "../i18n";
 import { ToolButton } from "./ToolButton";
 
 import { useState } from "react";
-import { AppState, LibraryItem } from "../types";
+import { AppState, LibraryItems } from "../types";
 import { exportToBlob } from "../packages/utils";
 import { EXPORT_DATA_TYPES, EXPORT_SOURCE } from "../constants";
 import { ExportedLibraryData } from "../data/types";
 
 import "./PublishLibrary.scss";
+import { ExcalidrawElement } from "../element/types";
 
 const PublishLibrary = ({
   onClose,
-  libraryItem,
+  libraryItems,
   appState,
   onSuccess,
   onError,
 }: {
   onClose: () => void;
-  libraryItem: LibraryItem;
+  libraryItems: LibraryItems;
   appState: AppState;
   onSuccess: (data: { url: string; authorName: string }) => void;
   onError: (error: Error) => void;
@@ -39,8 +40,12 @@ const PublishLibrary = ({
   };
 
   const onSubmit = async () => {
+    const elements: ExcalidrawElement[] = [];
+    libraryItems.forEach((libItem) => {
+      elements.push(...libItem.items);
+    });
     const png = await exportToBlob({
-      elements: libraryItem.items,
+      elements,
       mimeType: "image/png",
       appState,
       files: null,
@@ -50,7 +55,7 @@ const PublishLibrary = ({
       type: EXPORT_DATA_TYPES.excalidrawLibrary,
       version: 1,
       source: EXPORT_SOURCE,
-      library: [libraryItem],
+      library: libraryItems,
     };
     const content = JSON.stringify(libContent, null, 2);
     const lib = new Blob([content], { type: "application/json" });

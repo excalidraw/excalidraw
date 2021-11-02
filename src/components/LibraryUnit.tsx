@@ -21,20 +21,18 @@ export const LibraryUnit = ({
   elements,
   files,
   pendingElements,
-  onRemoveFromLibrary,
   onClick,
   index,
-  activeIndex,
-  onSelect,
+  activeIndexes,
+  onToggle,
 }: {
   elements?: LibraryItem["items"];
   files: BinaryFiles;
   pendingElements?: LibraryItem["items"];
-  onRemoveFromLibrary: () => void;
   onClick: () => void;
   index: number;
-  activeIndex: number;
-  onSelect: (index: number) => void;
+  activeIndexes: Array<number>;
+  onToggle: (index: number) => void;
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
@@ -66,7 +64,7 @@ export const LibraryUnit = ({
 
   const [isHovered, setIsHovered] = useState(false);
   const isMobile = useIsMobile();
-  const checked = index === activeIndex;
+  const checked = activeIndexes.includes(index);
   const adder = (isHovered || isMobile) && pendingElements && (
     <div className="library-unit__adder">{PLUS_ICON}</div>
   );
@@ -103,9 +101,9 @@ export const LibraryUnit = ({
           checked={checked}
           onChange={() => {
             if (checked) {
-              onSelect(-1);
+              onToggle(index);
             } else {
-              onSelect(index);
+              onToggle(index);
             }
           }}
         />
