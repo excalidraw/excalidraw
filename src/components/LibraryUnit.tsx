@@ -74,6 +74,7 @@ export const LibraryUnit = ({
       className={clsx("library-unit", {
         "library-unit__active": elements || pendingElements,
         "library-unit--hover": elements && (isHovered || isMobile),
+        "library-unit--selected": checked,
       })}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}

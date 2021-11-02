@@ -3,7 +3,7 @@
 .excalidraw {
   .library-unit {
     align-items: center;
-    border: 1px solid var(--button-gray-2);
+    border: 2px solid var(--button-gray-2);
     display: flex;
     justify-content: center;
     position: relative;
@@ -11,11 +11,11 @@
     height: 63px; // match width
 
     &--hover {
-      border: 3px solid $oc-cyan-3;
+      border: 2px solid $oc-cyan-6;
     }
 
     &--selected {
-      border: 3px solid $oc-cyan-7;
+      border: 2px solid $oc-cyan-7;
     }
   }
 
