@@ -230,7 +230,7 @@ const LibraryMenuItems = ({
     rows.push(
       <div className="library-item-actions">
         <ToolButton
-          key="remove"
+          key={`remove-${activeIndexes}`}
           type="button"
           title={t("buttons.removeFromLibrary")}
           aria-label={t("buttons.removeFromLibrary")}
@@ -240,7 +240,7 @@ const LibraryMenuItems = ({
         />
         {!isPublished && (
           <ToolButton
-            key="publish"
+            key={`publish-${activeIndexes}`}
             type="button"
             title={t("buttons.publishLibrary")}
             aria-label={t("buttons.publishLibrary")}
