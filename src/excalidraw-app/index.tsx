@@ -109,7 +109,7 @@ const localFileStorage = new FileManager({
         try {
           await set(id, fileData, filesStore);
           savedFiles.set(id, true);
-        } catch (error) {
+        } catch (error: any) {
           console.error(error);
           erroredFiles.set(id, true);
         }
@@ -228,7 +228,7 @@ const initializeScene = async (opts: {
       ) {
         return { scene: data, isExternalScene };
       }
-    } catch (error) {
+    } catch (error: any) {
       return {
         scene: {
           appState: {
@@ -508,7 +508,7 @@ const ExcalidrawWrapper = () => {
           },
           files,
         );
-      } catch (error) {
+      } catch (error: any) {
         if (error.name !== "AbortError") {
           const { width, height } = canvas;
           console.error(error, { width, height });
