@@ -22,7 +22,6 @@ import { saveFilesToFirebase } from "./firebase";
 
 const byteToHex = (byte: number): string => `0${byte.toString(16)}`.slice(-2);
 
-const BACKEND_GET = process.env.REACT_APP_BACKEND_V1_GET_URL;
 const BACKEND_V2_GET = process.env.REACT_APP_BACKEND_V2_GET_URL;
 const BACKEND_V2_POST = process.env.REACT_APP_BACKEND_V2_POST_URL;
 
@@ -176,13 +175,11 @@ export const decryptImported = async (
 };
 
 const importFromBackend = async (
-  id: string | null,
-  privateKey?: string | null,
+  id: string,
+  privateKey: string,
 ): Promise<ImportedDataState> => {
   try {
-    const response = await fetch(
-      privateKey ? `${BACKEND_V2_GET}${id}` : `${BACKEND_GET}${id}.json`,
-    );
+    const response = await fetch(`${BACKEND_V2_GET}${id}`);
 
     if (!response.ok) {
       window.alert(t("alerts.importBackendFailed"));
@@ -226,8 +223,8 @@ const importFromBackend = async (
 };
 
 export const loadScene = async (
-  id: string | null,
-  privateKey: string | null,
+  id: string,
+  privateKey: string,
   // Supply local state even if importing from backend to ensure we restore
   // localStorage user settings which we do not persist on server.
   // Non-optional so we don't forget to pass it even if `undefined`.
