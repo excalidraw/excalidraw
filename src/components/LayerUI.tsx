@@ -451,6 +451,7 @@ const LibraryMenu = ({
           libItem.status = "published";
         }
       });
+      library.saveLibrary(nextLibItems);
       setLibraryItems(nextLibItems);
     },
     [
@@ -459,6 +460,7 @@ const LibraryMenu = ({
       libraryItems,
       setLibraryItems,
       activeIndexes,
+      library,
     ],
   );
 
