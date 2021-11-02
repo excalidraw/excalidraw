@@ -95,7 +95,7 @@ class Portal {
         elements: this.collab.excalidrawAPI.getSceneElementsIncludingDeleted(),
         files: this.collab.excalidrawAPI.getFiles(),
       });
-    } catch (error) {
+    } catch (error: any) {
       if (error.name !== "AbortError") {
         this.collab.excalidrawAPI.updateScene({
           appState: {

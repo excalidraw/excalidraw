@@ -109,8 +109,8 @@ export const exportToSvg = async (
       ).encodeSvgMetadata({
         text: serializeAsJSON(elements, appState, files || {}, "local"),
       });
-    } catch (err) {
-      console.error(err);
+    } catch (error: any) {
+      console.error(error);
     }
   }
   const [minX, minY, width, height] = getCanvasSize(elements, exportPadding);

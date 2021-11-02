@@ -122,7 +122,7 @@ export const decryptAESGEM = async (
       new Uint8Array(decrypted),
     );
     return JSON.parse(decodedData);
-  } catch (error) {
+  } catch (error: any) {
     window.alert(t("alerts.decryptFailed"));
     console.error(error);
   }
@@ -198,7 +198,7 @@ const importFromBackend = async (
         const iv = buffer.slice(0, IV_LENGTH_BYTES);
         const encrypted = buffer.slice(IV_LENGTH_BYTES, buffer.byteLength);
         decrypted = await decryptImported(iv, encrypted, privateKey);
-      } catch (error) {
+      } catch (error: any) {
         // Fixed IV (old format, backward compatibility)
         const fixedIv = new Uint8Array(IV_LENGTH_BYTES);
         decrypted = await decryptImported(fixedIv, buffer, privateKey);
@@ -218,7 +218,7 @@ const importFromBackend = async (
       elements: data.elements || null,
       appState: data.appState || null,
     };
-  } catch (error) {
+  } catch (error: any) {
     window.alert(t("alerts.importBackendFailed"));
     console.error(error);
     return {};
@@ -333,7 +333,7 @@ export const exportToBackend = async (
     } else {
       window.alert(t("alerts.couldNotCreateShareableLink"));
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     window.alert(t("alerts.couldNotCreateShareableLink"));
   }
