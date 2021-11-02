@@ -184,7 +184,6 @@ const initializeScene = async (opts: {
       // otherwise, prompt whether user wants to override current scene
       window.confirm(t("alerts.loadSceneOverridePrompt"))
     ) {
-      // Backwards compatibility with legacy url format
       if (jsonBackendMatch) {
         scene = await loadScene(
           jsonBackendMatch[1],
