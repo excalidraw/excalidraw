@@ -2435,6 +2435,11 @@
   dependencies:
     source-map "^0.6.1"
 
+"@types/web@0.0.45":
+  version "0.0.45"
+  resolved "https://registry.yarnpkg.com/@types/web/-/web-0.0.45.tgz#835adbad37e3f6f13cb4708a93f9043af1345af4"
+  integrity sha512-VbDWJoWuxfnqbOU5BYQWY6hF4lT20WrcwcBKf/DrdLS2s1mEywhPgqGp6ZazZnBlHmoyZVeEyZx/+9KylQV1vg==
+
 "@types/webpack-sources@*":
   version "2.1.0"
   resolved "https://registry.npmjs.org/@types/webpack-sources/-/webpack-sources-2.1.0.tgz"
