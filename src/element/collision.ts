@@ -866,7 +866,7 @@ const hitTestRoughShape = (
     // move, bcurveTo, lineTo, and curveTo
     if (op === "move") {
       // change starting point
-      currentP = (data as unknown) as Point;
+      currentP = data as unknown as Point;
       // move operation does not draw anything; so, it always
       // returns false
     } else if (op === "bcurveTo") {

@@ -544,34 +544,34 @@ const LayerUI = ({
       return null;
     }
 
-    const createExporter = (type: ExportType): ExportCB => async (
-      exportedElements,
-    ) => {
-      const fileHandle = await exportCanvas(
-        type,
-        exportedElements,
-        appState,
-        files,
-        {
-          exportBackground: appState.exportBackground,
-          name: appState.name,
-          viewBackgroundColor: appState.viewBackgroundColor,
-        },
-      )
-        .catch(muteFSAbortError)
-        .catch((error) => {
-          console.error(error);
-          setAppState({ errorMessage: error.message });
-        });
+    const createExporter =
+      (type: ExportType): ExportCB =>
+      async (exportedElements) => {
+        const fileHandle = await exportCanvas(
+          type,
+          exportedElements,
+          appState,
+          files,
+          {
+            exportBackground: appState.exportBackground,
+            name: appState.name,
+            viewBackgroundColor: appState.viewBackgroundColor,
+          },
+        )
+          .catch(muteFSAbortError)
+          .catch((error) => {
+            console.error(error);
+            setAppState({ errorMessage: error.message });
+          });
 
-      if (
-        appState.exportEmbedScene &&
-        fileHandle &&
-        isImageFileHandle(fileHandle)
-      ) {
-        setAppState({ fileHandle });
-      }
-    };
+        if (
+          appState.exportEmbedScene &&
+          fileHandle &&
+          isImageFileHandle(fileHandle)
+        ) {
+          setAppState({ fileHandle });
+        }
+      };
 
     return (
       <ImageExportDialog
@@ -750,7 +750,11 @@ const LayerUI = ({
                       padding={1}
                       className={clsx({ "zen-mode": zenModeEnabled })}
                     >
-                      <HintViewer appState={appState} elements={elements} />
+                      <HintViewer
+                        appState={appState}
+                        elements={elements}
+                        isMobile={isMobile}
+                      />
                       {heading}
                       <Stack.Row gap={1}>
                         <ShapesSwitcher
@@ -831,7 +835,8 @@ const LayerUI = ({
               {!viewModeEnabled && (
                 <div
                   className={clsx("undo-redo-buttons zen-mode-transition", {
-                    "layer-ui__wrapper__footer-left--transition-bottom": zenModeEnabled,
+                    "layer-ui__wrapper__footer-left--transition-bottom":
+                      zenModeEnabled,
                   })}
                 >
                   {actionManager.renderAction("undo", { size: "small" })}
@@ -845,7 +850,8 @@ const LayerUI = ({
           className={clsx(
             "layer-ui__wrapper__footer-center zen-mode-transition",
             {
-              "layer-ui__wrapper__footer-left--transition-bottom": zenModeEnabled,
+              "layer-ui__wrapper__footer-left--transition-bottom":
+                zenModeEnabled,
             },
           )}
         >
@@ -971,6 +977,7 @@ const areEqual = (prev: LayerUIProps, next: LayerUIProps) => {
     prev.renderCustomFooter === next.renderCustomFooter &&
     prev.langCode === next.langCode &&
     prev.elements === next.elements &&
+    prev.files === next.files &&
     keys.every((key) => prevAppState[key] === nextAppState[key])
   );
 };

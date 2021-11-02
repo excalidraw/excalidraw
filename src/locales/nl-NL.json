@@ -39,6 +39,7 @@
     "arrowhead_arrow": "Pijl",
     "arrowhead_bar": "Balk",
     "arrowhead_dot": "Punt",
+    "arrowhead_triangle": "Driehoek",
     "fontSize": "Tekstgrootte",
     "fontFamily": "Lettertype",
     "onlySelected": "Enkel geselecteerde",
@@ -156,16 +157,16 @@
     "errorAddingToLibrary": "Kan item niet toevoegen aan de bibliotheek",
     "errorRemovingFromLibrary": "Kan item niet uit de bibliotheek verwijderen",
     "confirmAddLibrary": "Hiermee worden {{numShapes}} vorm(n) aan uw bibliotheek toegevoegd. Ben je het zeker?",
-    "imageDoesNotContainScene": "",
+    "imageDoesNotContainScene": "Deze afbeelding lijkt geen scène gegevens te bevatten. Heb je scène embedding tijdens het exporteren ingeschakeld?",
     "cannotRestoreFromImage": "Scène kan niet worden hersteld vanuit dit afbeeldingsbestand",
     "invalidSceneUrl": "Kan scène niet importeren vanuit de opgegeven URL. Het is onjuist of bevat geen geldige Excalidraw JSON-gegevens.",
     "resetLibrary": "Dit zal je bibliotheek wissen. Weet je het zeker?",
     "invalidEncryptionKey": "Encryptiesleutel moet 22 tekens zijn. Live samenwerking is uitgeschakeld."
   },
   "errors": {
-    "unsupportedFileType": "",
-    "imageInsertError": "",
-    "fileTooBig": "",
+    "unsupportedFileType": "Niet-ondersteund bestandstype.",
+    "imageInsertError": "Afbeelding invoegen mislukt. Probeer het later opnieuw...",
+    "fileTooBig": "Bestand is te groot. Maximale grootte is {{maxSize}}.",
     "svgImageInsertError": "",
     "invalidSVGString": ""
   },

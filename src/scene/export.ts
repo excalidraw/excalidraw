@@ -180,10 +180,9 @@ export const getExportSize = (
   exportPadding: number,
   scale: number,
 ): [number, number] => {
-  const [, , width, height] = getCanvasSize(
-    elements,
-    exportPadding,
-  ).map((dimension) => Math.trunc(dimension * scale));
+  const [, , width, height] = getCanvasSize(elements, exportPadding).map(
+    (dimension) => Math.trunc(dimension * scale),
+  );
 
   return [width, height];
 };

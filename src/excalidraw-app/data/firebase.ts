@@ -13,9 +13,8 @@ import { MIME_TYPES } from "../../constants";
 
 const FIREBASE_CONFIG = JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG);
 
-let firebasePromise: Promise<
-  typeof import("firebase/app").default
-> | null = null;
+let firebasePromise: Promise<typeof import("firebase/app").default> | null =
+  null;
 let firestorePromise: Promise<any> | null | true = null;
 let firebaseStoragePromise: Promise<any> | null | true = null;
 
@@ -294,6 +293,8 @@ export const loadFilesFromFirebase = async (
             dataURL,
             created: metadata?.created || Date.now(),
           });
+        } else {
+          erroredFiles.set(id, true);
         }
       } catch (error) {
         erroredFiles.set(id, true);
