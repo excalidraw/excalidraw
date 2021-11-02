@@ -341,9 +341,8 @@ const LibraryMenu = ({
     "preloading" | "loading" | "ready"
   >("preloading");
   const [activeIndexes, setActiveIndexes] = useState<Array<number>>([]);
-  const [showPublishLibraryDialog, setShowPublishLibraryDialog] = useState(
-    false,
-  );
+  const [showPublishLibraryDialog, setShowPublishLibraryDialog] =
+    useState(false);
   const [publishLibSuccess, setPublishLibSuccess] = useState<null | {
     url: string;
     authorName: string;
@@ -441,6 +440,28 @@ const LibraryMenu = ({
   const getSelectedItems = () =>
     libraryItems.filter((_, index) => activeIndexes.includes(index));
 
+  const onPublishLibSuccess = useCallback(
+    (data) => {
+      setShowPublishLibraryDialog(false);
+      setPublishLibSuccess(data);
+      const nextLibItems = libraryItems.slice();
+
+      nextLibItems.forEach((libItem, index) => {
+        if (activeIndexes.includes(index)) {
+          libItem.status = "published";
+        }
+      });
+      setLibraryItems(nextLibItems);
+    },
+    [
+      setShowPublishLibraryDialog,
+      setPublishLibSuccess,
+      libraryItems,
+      setLibraryItems,
+      activeIndexes,
+    ],
+  );
+
   return loadingState === "preloading" ? null : (
     <Island padding={1} ref={ref} className="layer-ui__library">
       {showPublishLibraryDialog && (
@@ -448,10 +469,7 @@ const LibraryMenu = ({
           onClose={() => setShowPublishLibraryDialog(false)}
           libraryItems={getSelectedItems()}
           appState={appState}
-          onSuccess={(data) => {
-            setShowPublishLibraryDialog(false);
-            setPublishLibSuccess(data);
-          }}
+          onSuccess={onPublishLibSuccess}
           onError={(error) => window.alert(error)}
         />
       )}
