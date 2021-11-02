@@ -189,7 +189,7 @@
     "shapes": "形状"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "要移动画布，请按住鼠标滚轮或空格键，再拖拽鼠标",
     "linearElement": "点击创建多个点 拖动创建直线",
     "freeDraw": "点击并拖动，完成时松开",
     "text": "提示：您也可以使用选择工具双击任意位置来添加文字",
