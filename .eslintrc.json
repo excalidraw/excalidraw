@@ -1,6 +1,7 @@
 {
   "extends": ["@excalidraw/eslint-config", "react-app"],
   "rules": {
-    "import/no-anonymous-default-export": "off"
+    "import/no-anonymous-default-export": "off",
+    "no-restricted-globals": "off"
   }
 }

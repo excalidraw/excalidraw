@@ -61,7 +61,7 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
       try {
         setIsLoading(true);
         await ret;
-      } catch (error) {
+      } catch (error: any) {
         if (!(error instanceof AbortError)) {
           throw error;
         }

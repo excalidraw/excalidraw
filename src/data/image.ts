@@ -76,7 +76,7 @@ export const decodePngMetadata = async (blob: Blob) => {
         throw new Error("FAILED");
       }
       return await decode(encodedData);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
       throw new Error("FAILED");
     }
@@ -127,7 +127,7 @@ export const decodeSvgMetadata = async ({ svg }: { svg: string }) => {
         throw new Error("FAILED");
       }
       return await decode(encodedData);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
       throw new Error("FAILED");
     }

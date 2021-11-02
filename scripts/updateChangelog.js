@@ -28,8 +28,8 @@ const getCommitHashForLastVersion = async () => {
       `git log --format=format:"%H" --grep=${commitMessage}`,
     );
     return stdout;
-  } catch (e) {
-    console.error(e);
+  } catch (error) {
+    console.error(error);
   }
 };
 

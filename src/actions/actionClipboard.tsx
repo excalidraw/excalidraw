@@ -56,7 +56,7 @@ export const actionCopyAsSvg = register({
       return {
         commitToHistory: false,
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
       return {
         appState: {
@@ -106,7 +106,7 @@ export const actionCopyAsPng = register({
         },
         commitToHistory: false,
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
       return {
         appState: {

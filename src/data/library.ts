@@ -90,7 +90,7 @@ class Library {
         this.libraryCache = JSON.parse(JSON.stringify(items));
 
         resolve(items);
-      } catch (error) {
+      } catch (error: any) {
         console.error(error);
         resolve([]);
       }
@@ -105,7 +105,7 @@ class Library {
       // immediately
       this.libraryCache = JSON.parse(serializedItems);
       await this.app.props.onLibraryChange?.(items);
-    } catch (error) {
+    } catch (error: any) {
       this.libraryCache = prevLibraryItems;
       throw error;
     }

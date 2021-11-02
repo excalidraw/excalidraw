@@ -52,7 +52,7 @@
     "roughjs": "4.4.1",
     "sass": "1.43.4",
     "socket.io-client": "2.3.1",
-    "typescript": "4.2.4"
+    "typescript": "4.4.4"
   },
   "devDependencies": {
     "@excalidraw/eslint-config": "1.0.0",
@@ -61,6 +61,7 @@
     "@types/lodash.throttle": "4.1.6",
     "@types/pako": "1.0.2",
     "@types/resize-observer-browser": "0.1.6",
+    "@types/web": "0.0.45",
     "chai": "4.3.4",
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-prettier": "3.3.1",
@@ -71,6 +72,9 @@
     "pepjs": "0.5.3",
     "prettier": "2.4.1",
     "rewire": "5.0.0"
+  },
+  "resolutions": {
+    "@typescript-eslint/typescript-estree": "5.3.0"
   },
   "engines": {
     "node": ">=14.0.0"

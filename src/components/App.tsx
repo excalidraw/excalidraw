@@ -621,7 +621,7 @@ class App extends React.Component<AppProps, AppState> {
     this.onBlur();
   };
 
-  private disableEvent: EventHandlerNonNull = (event) => {
+  private disableEvent: EventListener = (event) => {
     event.preventDefault();
   };
 
@@ -665,7 +665,7 @@ class App extends React.Component<AppProps, AppState> {
         }
         this.setState({ isLibraryOpen: true });
       }
-    } catch (error) {
+    } catch (error: any) {
       window.alert(t("alerts.errorLoadingLibrary"));
       console.error(error);
     } finally {
@@ -1294,8 +1294,8 @@ class App extends React.Component<AppProps, AppState> {
           if ((await this.props.onPaste(data, event)) === false) {
             return;
           }
-        } catch (e) {
-          console.error(e);
+        } catch (error: any) {
+          console.error(error);
         }
       }
       if (data.errorMessage) {
@@ -3705,7 +3705,7 @@ class App extends React.Component<AppProps, AppState> {
               this.actionManager.executeAction(actionFinalize);
             },
           );
-        } catch (error) {
+        } catch (error: any) {
           console.error(error);
           this.scene.replaceAllElements(
             this.scene
@@ -3974,7 +3974,7 @@ class App extends React.Component<AppProps, AppState> {
           await normalizeSVG(await imageFile.text()),
           imageFile.name,
         );
-      } catch (error) {
+      } catch (error: any) {
         console.warn(error);
         throw new Error(t("errors.svgImageInsertError"));
       }
@@ -4000,7 +4000,7 @@ class App extends React.Component<AppProps, AppState> {
           imageFile,
           DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
         );
-      } catch (error) {
+      } catch (error: any) {
         console.error("error trying to resing image file on insertion", error);
       }
 
@@ -4061,7 +4061,7 @@ class App extends React.Component<AppProps, AppState> {
             this.initializeImageDimensions(imageElement, true);
           }
           resolve(imageElement);
-        } catch (error) {
+        } catch (error: any) {
           console.error(error);
           reject(new Error(t("errors.imageInsertError")));
         } finally {
@@ -4092,7 +4092,7 @@ class App extends React.Component<AppProps, AppState> {
         imageElement,
         showCursorImagePreview,
       });
-    } catch (error) {
+    } catch (error: any) {
       mutateElement(imageElement, {
         isDeleted: true,
       });
@@ -4187,7 +4187,7 @@ class App extends React.Component<AppProps, AppState> {
           },
         );
       }
-    } catch (error) {
+    } catch (error: any) {
       if (error.name !== "AbortError") {
         console.error(error);
       }

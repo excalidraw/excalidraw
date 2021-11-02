@@ -25,8 +25,8 @@ const release = async (nextVersion) => {
     );
     /* eslint-disable no-console */
     console.log("Done!");
-  } catch (e) {
-    console.error(e);
+  } catch (error) {
+    console.error(error);
     process.exit(1);
   }
 };

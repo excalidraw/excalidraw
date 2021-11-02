@@ -15,8 +15,8 @@ const publish = () => {
     execSync(`yarn --frozen-lockfile`, { cwd: excalidrawDir });
     execSync(`yarn run build:umd`, { cwd: excalidrawDir });
     execSync(`yarn --cwd ${excalidrawDir} publish`);
-  } catch (e) {
-    console.error(e);
+  } catch (error) {
+    console.error(error);
   }
 };
 

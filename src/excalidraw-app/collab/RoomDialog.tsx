@@ -53,7 +53,7 @@ const RoomDialog = ({
   const copyRoomLink = async () => {
     try {
       await copyTextToSystemClipboard(activeRoomLink);
-    } catch (error) {
+    } catch (error: any) {
       setErrorMessage(error.message);
     }
     if (roomLinkInput.current) {
@@ -68,7 +68,7 @@ const RoomDialog = ({
         text: t("roomDialog.shareTitle"),
         url: activeRoomLink,
       });
-    } catch (error) {
+    } catch (error: any) {
       // Just ignore.
     }
   };
