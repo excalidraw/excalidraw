@@ -114,7 +114,7 @@
     "exportToPng": "PNGக்கு ஏற்றுமதிசெய்",
     "exportToSvg": "SVGக்கு ஏற்றுமதிசெய்",
     "copyToClipboard": "நகலகத்திற்கு நகலெடு",
-    "copyPngToClipboard": "PNGஐ நினைவகத்திற்கு நகலெடு",
+    "copyPngToClipboard": "PNGஐ நகலகத்திற்கு நகலெடு",
     "scale": "அளவு",
     "save": "தற்போதைய கோப்புக்குச் சேமி",
     "saveAs": "இப்படி சேமி",
@@ -202,7 +202,7 @@
     "rotate": "",
     "lineEditor_info": "புள்ளிகளைத் திருத்த இரு-சொடுக்கு அ Enterஐ அழுத்து",
     "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "lineEditor_nothingSelected": "நகர்த்தவோ நீக்கவோ புள்ளியைத் தேர், அ புதிய புள்ளிகளைச் சேர்க்க Altஐ அழுத்திப்பிடித்துச் சொடுக்கு",
     "placeImage": "படத்தை வைக்கச் சொடுக்கு, அ கைமுறையாக அளவை அமைக்க சொடுக்கி நகரத்து"
   },
   "canvasError": {
@@ -294,8 +294,8 @@
   },
   "toast": {
     "copyStyles": "ஒயில்கள் நகலெடுக்கப்பட்டன.",
-    "copyToClipboard": "நகலகத்திற்க்கு நகலெடுக்கப்பட்டது.",
-    "copyToClipboardAsPng": "",
+    "copyToClipboard": "நகலகத்திற்கு நகலெடுக்கப்பட்டது.",
+    "copyToClipboardAsPng": "{{exportSelection}}-ஐ நகலகத்திற்கு PNG ஆக நகலெடுத்தது\n({{exportColorScheme}})",
     "fileSaved": "கோப்பு சேமிக்கப்பட்டது.",
     "fileSavedToFilename": "{filename}-க்கு சேமிக்கப்பட்டது",
     "canvas": "கித்தான்",
