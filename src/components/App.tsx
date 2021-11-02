@@ -621,7 +621,7 @@ class App extends React.Component<AppProps, AppState> {
     this.onBlur();
   };
 
-  private disableEvent: EventHandlerNonNull = (event) => {
+  private disableEvent: EventListener = (event) => {
     event.preventDefault();
   };
 
