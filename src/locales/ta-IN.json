@@ -122,7 +122,7 @@
     "getShareableLink": "பகிரக்கூடிய தொடுப்பைப் பெறு",
     "close": "மூடு",
     "selectLanguage": "மொழியைத் தேர்ந்தெடு",
-    "scrollBackToContent": "",
+    "scrollBackToContent": "உருட்டி உள்ளடக்கத்துக்குத் திரும்பு",
     "zoomIn": "பெரிதாக்கு",
     "zoomOut": "சிறிதாக்கு",
     "resetZoom": "உருவளவை அகரமாக்கு",
@@ -151,7 +151,7 @@
     "couldNotCopyToClipboard": "நகலகத்திற்கு நகலெடுக்க முடியவில்லை. குரோம் உலாவி பயன்படுத்தி முயல்க.",
     "decryptFailed": "தரவை மறைநீக்க முடியவில்லை.",
     "uploadedSecurly": "பதிவேற்றம் இருமுனை மறையாகத்தால் பாதுகாக்கப்பட்டுள்ளது, எனவே எக்ஸ்கேலிட்ரா சேவையகமும் மூன்றாம் தரப்பினரும் உள்ளடக்கத்தை வாசிக்கமுடியாது.",
-    "loadSceneOverridePrompt": "",
+    "loadSceneOverridePrompt": "வெளிப்புறச்சித்திரமேற்றல் இருக்கிற உள்ளடக்கத்தை இடங்கொள்ளும். தொடர விருப்பமா?",
     "collabStopOverridePrompt": "",
     "errorLoadingLibrary": "மூன்றாம் தரப்பு நூலகத்தை ஏற்றுவதில் பிழை.",
     "errorAddingToLibrary": "உருப்படியை நூலகத்தில் சேர்க்க இயலா",
@@ -217,7 +217,7 @@
     "clearCanvasMessage_button": "கித்தானைத் துடைக்கிறது.",
     "clearCanvasCaveat": " இது வேலையை இழக்கக்கூடும் ",
     "trackedToSentry_pre": "இனங்காணியில் பிழை ",
-    "trackedToSentry_post": "",
+    "trackedToSentry_post": " எங்கள் இயங்குதளத்தில் தடமறியப்பட்டது.",
     "openIssueMessage_pre": "",
     "openIssueMessage_button": "பிழை தடமி.",
     "openIssueMessage_post": "",
@@ -274,7 +274,7 @@
     "title": "கித்தானைத் துடை"
   },
   "encrypted": {
-    "tooltip": "",
+    "tooltip": "உம் சித்திரங்கள் இருமுனை மறையாக்கம் செய்யப்பட்டவையாதலால் எக்ஸ்கேலிட்ராவின் சேவையகங்கள் அவற்றை ஒருபோதும் பார்க்கா.",
     "link": "எக்ஸ்கேலிட்ராவில் இருமுனை மறையாக்கம் மீதான வலைப்பூ இடுகை"
   },
   "stats": {
