@@ -20,10 +20,6 @@
     "background": "Hintergrund",
     "fill": "Füllung",
     "strokeWidth": "Strichstärke",
-    "strokeShape": "Strichform",
-    "strokeShape_gel": "Gelschreiber",
-    "strokeShape_fountain": "Füllfederhalter",
-    "strokeShape_brush": "Pinselstift",
     "strokeStyle": "Konturstil",
     "strokeStyle_solid": "Durchgezogen",
     "strokeStyle_dashed": "Gestrichelt",
@@ -271,7 +267,7 @@
     "zoomToSelection": "Auf Auswahl zoomen"
   },
   "clearCanvasDialog": {
-    "title": "Zeichenfläche löschen"
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Da deine Zeichnungen Ende-zu-Ende verschlüsselt werden, sehen auch unsere Excalidraw-Server sie niemals.",
