@@ -168,7 +168,7 @@
     "imageInsertError": "Kunde inte infoga bild. Försök igen senare...",
     "fileTooBig": "Filen är för stor. Maximal tillåten storlek är {{maxSize}}.",
     "svgImageInsertError": "Kunde inte infoga SVG-bild. SVG-koden ser ogiltig ut.",
-    "invalidSVGString": ""
+    "invalidSVGString": "Ogiltig SVG."
   },
   "toolBar": {
     "selection": "Markering",
