@@ -20,10 +20,6 @@
     "background": "Fundal",
     "fill": "Umplere",
     "strokeWidth": "Lățimea conturului",
-    "strokeShape": "Forma conturului",
-    "strokeShape_gel": "Pix cu gel",
-    "strokeShape_fountain": "Stilou",
-    "strokeShape_brush": "Pensulă tip stilou",
     "strokeStyle": "Stilul conturului",
     "strokeStyle_solid": "Neîntrerupt",
     "strokeStyle_dashed": "Liniuțe",
@@ -271,7 +267,7 @@
     "zoomToSelection": "Transfocare la selecție"
   },
   "clearCanvasDialog": {
-    "title": "Ștergere pânză"
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Desenele tale sunt criptate integral, astfel că serverele Excalidraw nu le vor vedea niciodată.",
