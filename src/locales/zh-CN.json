@@ -20,10 +20,6 @@
     "background": "背景",
     "fill": "填充",
     "strokeWidth": "描边宽度",
-    "strokeShape": "描边形状",
-    "strokeShape_gel": "中性笔",
-    "strokeShape_fountain": "钢笔",
-    "strokeShape_brush": "墨笔",
     "strokeStyle": "描边样式",
     "strokeStyle_solid": "实线",
     "strokeStyle_dashed": "虚线",
@@ -271,7 +267,7 @@
     "zoomToSelection": "缩放到选区"
   },
   "clearCanvasDialog": {
-    "title": "清除画布"
+    "title": ""
   },
   "encrypted": {
     "tooltip": "您的绘图采用的端到端加密，其内容对于Excalidraw服务器是不可见的。",
