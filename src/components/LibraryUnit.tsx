@@ -6,6 +6,7 @@ import { useIsMobile } from "../components/App";
 import { exportToSvg } from "../scene/export";
 import { BinaryFiles, LibraryItem } from "../types";
 import "./LibraryUnit.scss";
+import { CheckboxItem } from "./CheckboxItem";
 
 // fa-plus
 const PLUS_ICON = (
@@ -73,7 +74,7 @@ export const LibraryUnit = ({
     <div
       className={clsx("library-unit", {
         "library-unit__active": elements || pendingElements,
-        "library-unit--hover": elements && (isHovered || isMobile),
+        "library-unit--hover": elements && isHovered,
         "library-unit--selected": checked,
       })}
       onMouseEnter={() => setIsHovered(true)}
@@ -96,18 +97,19 @@ export const LibraryUnit = ({
       />
       {adder}
       {elements && (isHovered || isMobile || checked) && (
-        <input
-          type="checkbox"
-          className="library-unit__actions"
-          checked={checked}
-          onChange={() => {
-            if (checked) {
-              onToggle(index);
-            } else {
-              onToggle(index);
-            }
-          }}
-        />
+        <>
+          <CheckboxItem
+            checked={checked}
+            onChange={() => {
+              if (checked) {
+                onToggle(index);
+              } else {
+                onToggle(index);
+              }
+            }}
+            className="library-unit__checkbox"
+          />
+        </>
       )}
     </div>
   );

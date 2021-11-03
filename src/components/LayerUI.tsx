@@ -149,17 +149,50 @@ const LibraryMenuItems = ({
   onPublish: () => void;
 }) => {
   const isMobile = useIsMobile();
+
+  const getLibraryItemActions = () => {
+    if (!activeIndexes.length) {
+      return null;
+    }
+    return (
+      <div className="library-item-actions">
+        <ToolButton
+          key={`remove-${activeIndexes}`}
+          type="button"
+          title={t("buttons.removeFromLibrary")}
+          aria-label={t("buttons.removeFromLibrary")}
+          label={t("buttons.removeFromLibrary")}
+          onClick={onRemoveFromLibrary}
+          className="library-item-actions--remove"
+        />
+        {!isPublished && (
+          <ToolButton
+            key={`publish-${activeIndexes}`}
+            type="button"
+            title={t("buttons.publishLibrary")}
+            aria-label={t("buttons.publishLibrary")}
+            label={t("buttons.publishLibrary")}
+            className="library-item-actions--publish"
+            onClick={onPublish}
+          />
+        )}
+      </div>
+    );
+  };
+
   const numCells =
     Object.keys(libraryItems ?? []).length +
     (pendingElements.length > 0 ? 1 : 0);
-  const CELLS_PER_ROW = isMobile ? 4 : 6;
+  const CELLS_PER_ROW = isMobile ? 4 : 7;
   const numRows = Math.max(1, Math.ceil(numCells / CELLS_PER_ROW));
   const rows = [];
   let addedPendingElements = false;
 
   const referrer =
     libraryReturnUrl || window.location.origin + window.location.pathname;
-
+  const isPublished = activeIndexes.some(
+    (index) => libraryItems[index].status === "published",
+  );
   rows.push(
     <div className="layer-ui__library-header" key="library-header">
       <ToolButton
@@ -213,6 +246,7 @@ const LibraryMenuItems = ({
           />
         </>
       )}
+      {!isMobile && getLibraryItemActions()}
       <a
         href={`https://libraries.excalidraw.com?target=${
           window.name || "_blank"
@@ -223,35 +257,11 @@ const LibraryMenuItems = ({
       </a>
     </div>,
   );
-  if (activeIndexes.length) {
-    const isPublished = activeIndexes.some(
-      (index) => libraryItems[index].status === "published",
-    );
-    rows.push(
-      <div className="library-item-actions">
-        <ToolButton
-          key={`remove-${activeIndexes}`}
-          type="button"
-          title={t("buttons.removeFromLibrary")}
-          aria-label={t("buttons.removeFromLibrary")}
-          label={t("buttons.removeFromLibrary")}
-          onClick={onRemoveFromLibrary}
-          className="library-item-actions--remove"
-        />
-        {!isPublished && (
-          <ToolButton
-            key={`publish-${activeIndexes}`}
-            type="button"
-            title={t("buttons.publishLibrary")}
-            aria-label={t("buttons.publishLibrary")}
-            label={t("buttons.publishLibrary")}
-            className="library-item-actions--publish"
-            onClick={onPublish}
-          />
-        )}
-      </div>,
-    );
+
+  if (isMobile) {
+    rows.push(getLibraryItemActions());
   }
+
   for (let row = 0; row < numRows; row++) {
     const y = CELLS_PER_ROW * row;
     const children = [];

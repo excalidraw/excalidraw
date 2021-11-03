@@ -3,7 +3,7 @@
 .excalidraw {
   .library-unit {
     align-items: center;
-    border: 2px solid var(--button-gray-2);
+    border: 1px solid var(--button-gray-2);
     display: flex;
     justify-content: center;
     position: relative;
@@ -11,11 +11,11 @@
     height: 63px; // match width
 
     &--hover {
-      border: 2px solid $oc-cyan-6;
+      box-shadow: inset 0px 0px 1px 2px $oc-pink-5;
     }
 
     &--selected {
-      border: 2px solid $oc-cyan-7;
+      box-shadow: inset 0px 0px 1px 2px $oc-pink-8;
     }
   }
 
@@ -32,9 +32,9 @@
     max-width: 100%;
   }
 
-  .library-unit__actions,
-  .library-unit__actions:hover,
-  .library-unit__actions:active {
+  .library-unit__checkbox-container,
+  .library-unit__checkbox-container:hover,
+  .library-unit__checkbox-container:active {
     align-items: center;
     background: none;
     border: none;
@@ -42,11 +42,28 @@
     display: flex;
     justify-content: center;
     margin: 0;
-    padding: 0;
+    padding: 0.5rem;
     position: absolute;
-    right: 5px;
-    top: 5px;
+    left: 2rem;
+    bottom: 2rem;
     cursor: pointer;
+
+    input {
+      cursor: pointer;
+    }
+  }
+
+  .library-unit__checkbox {
+    position: absolute;
+    left: 1.5rem;
+    bottom: 1.5rem;
+
+    .Checkbox-box {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+      margin: 1em;
+    }
   }
 
   .library-unit__removeFromLibrary > svg {
@@ -89,6 +106,7 @@
   }
 
   .library-item-actions {
+    display: flex;
     .ToolIcon__icon {
       min-width: 2.5rem;
       width: auto;
