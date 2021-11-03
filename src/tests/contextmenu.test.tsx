@@ -392,8 +392,8 @@ describe("contextMenu element", () => {
     await waitFor(() => {
       const library = localStorage.getItem("excalidraw-library");
       expect(library).not.toBeNull();
-      const addedElement = JSON.parse(library!)[0][0];
-      expect(addedElement).toEqual(h.elements[0]);
+      const addedElement = JSON.parse(library!)[0];
+      expect(addedElement.items[0]).toEqual(h.elements[0]);
     });
   });
 
