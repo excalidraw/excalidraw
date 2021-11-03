@@ -20,10 +20,6 @@
     "background": "Tausta",
     "fill": "Täyttö",
     "strokeWidth": "Viivan leveys",
-    "strokeShape": "Viivan muoto",
-    "strokeShape_gel": "Geelikynä",
-    "strokeShape_fountain": "Sulkakynä",
-    "strokeShape_brush": "Sivellinkynä",
     "strokeStyle": "Viivan tyyli",
     "strokeStyle_solid": "Yhtenäinen",
     "strokeStyle_dashed": "Katkoviiva",
@@ -271,7 +267,7 @@
     "zoomToSelection": "Näytä valinta"
   },
   "clearCanvasDialog": {
-    "title": "Pyyhi piirtoalue"
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Piirroksesi ovat päästä-päähän-salattuja, joten Excalidrawin palvelimet eivät koskaan näe niitä.",
