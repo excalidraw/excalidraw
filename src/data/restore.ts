@@ -2,6 +2,7 @@ import {
   ExcalidrawElement,
   ExcalidrawSelectionElement,
   FontFamilyValues,
+  NonDeleted,
 } from "../element/types";
 import {
   AppState,
@@ -282,19 +283,21 @@ export const restore = (
 export const restoreLibraryItems = (
   libraryItems: ImportedDataState["libraryItems"],
 ) => {
-  const restoredLibItems =
-    libraryItems ||
-    [].reduce(
-      (acc: LibraryItem[], libItem: LibraryItem | ExcalidrawElement[]) => {
-        // migrate older libraries
-        if (Array.isArray(libItem)) {
-          acc.push({ status: "published", items: libItem });
-        } else {
-          acc.push(libItem);
-        }
-        return acc;
-      },
-      [],
-    );
+  //@ts-ignore
+  const restoredLibItems = libraryItems!.reduce(
+    (
+      acc: LibraryItem[],
+      libItem: LibraryItem | readonly NonDeleted<ExcalidrawElement>[],
+    ) => {
+      // migrate older libraries
+      if (Array.isArray(libItem)) {
+        acc.push({ status: "published", items: libItem });
+      } else {
+        acc.push(libItem as LibraryItem);
+      }
+      return acc;
+    },
+    [],
+  );
   return restoredLibItems;
 };
