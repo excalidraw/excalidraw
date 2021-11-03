@@ -20,10 +20,6 @@
     "background": "Fundo",
     "fill": "Preenchimento",
     "strokeWidth": "Espessura do traço",
-    "strokeShape": "Forma do traço",
-    "strokeShape_gel": "Caneta de gel",
-    "strokeShape_fountain": "Caneta de fonte",
-    "strokeShape_brush": "Caneta de pincel",
     "strokeStyle": "Estilo de traço",
     "strokeStyle_solid": "Sólido",
     "strokeStyle_dashed": "Tracejado",
@@ -271,7 +267,7 @@
     "zoomToSelection": "Ampliar a seleção"
   },
   "clearCanvasDialog": {
-    "title": "Limpar tela"
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Os seus desenhos são encriptados de ponta-a-ponta, por isso os servidores do Excalidraw nunca os verão.",
