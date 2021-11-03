@@ -69,7 +69,7 @@ const PublishLibrary = ({
     formData.append("githubHandle", libraryData.githubHandle);
     formData.append("name", libraryData.name);
     formData.append("description", libraryData.description);
-
+    formData.append("twitterHandle", libraryData.twitterHandle);
     fetch(
       "https://us-central1-excalidraw-room-persistence.cloudfunctions.net/api/libraries/publish",
       {
@@ -106,7 +106,7 @@ const PublishLibrary = ({
       title="Publish Library"
       className="publish-library"
     >
-      <form onSubmit={onSubmit}>
+      <form>
         <div className="publish-library__fields">
           <label>
             <div>
@@ -188,6 +188,7 @@ const PublishLibrary = ({
             aria-label={t("buttons.submit")}
             label={t("buttons.submit")}
             className="publish-library__buttons--confirm"
+            onClick={onSubmit}
           />
         </div>
       </form>
