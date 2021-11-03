@@ -20,10 +20,6 @@
     "background": "背景の色",
     "fill": "塗りつぶし",
     "strokeWidth": "線の幅",
-    "strokeShape": "ストロークの形状",
-    "strokeShape_gel": "ゲルペン",
-    "strokeShape_fountain": "万年筆",
-    "strokeShape_brush": "ブラシペン",
     "strokeStyle": "線の種類",
     "strokeStyle_solid": "実線",
     "strokeStyle_dashed": "破線",
@@ -271,7 +267,7 @@
     "zoomToSelection": "選択要素にズーム"
   },
   "clearCanvasDialog": {
-    "title": "キャンバスを消去"
+    "title": ""
   },
   "encrypted": {
     "tooltip": "描画内容はエンドツーエンド暗号化が施されており、Excalidrawサーバーが内容を見ることはできません。",
