@@ -20,10 +20,6 @@
     "background": "Bakgrund",
     "fill": "Fyllnad",
     "strokeWidth": "Linjebredd",
-    "strokeShape": "Linjeform",
-    "strokeShape_gel": "Gelépenna",
-    "strokeShape_fountain": "Reservoarpenna",
-    "strokeShape_brush": "Penselpenna",
     "strokeStyle": "Linjestil",
     "strokeStyle_solid": "Solid",
     "strokeStyle_dashed": "Streckad",
@@ -271,7 +267,7 @@
     "zoomToSelection": "Zooma till markering"
   },
   "clearCanvasDialog": {
-    "title": "Rensa Canvas"
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Dina skisser är krypterade från ände till ände så Excalidraws servrar kommer aldrig att se dem.",
