@@ -20,10 +20,6 @@
     "background": "背景",
     "fill": "填充",
     "strokeWidth": "筆劃寬度",
-    "strokeShape": "筆畫形狀",
-    "strokeShape_gel": "中性筆",
-    "strokeShape_fountain": "鋼筆",
-    "strokeShape_brush": "毛筆",
     "strokeStyle": "筆畫樣式",
     "strokeStyle_solid": "實線",
     "strokeStyle_dashed": "虛線",
@@ -271,7 +267,7 @@
     "zoomToSelection": "縮放至選取區"
   },
   "clearCanvasDialog": {
-    "title": "清除畫布"
+    "title": ""
   },
   "encrypted": {
     "tooltip": "你的作品已使用 end-to-end 方式加密，Excalidraw 的伺服器也無法取得其內容。",
