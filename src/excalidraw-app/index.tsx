@@ -273,7 +273,10 @@ const PlusLinkJSX = (
 
 const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
-  const currentLangCode = languageDetector.detect() || defaultLang.code;
+  let currentLangCode = languageDetector.detect() || defaultLang.code;
+  if (Array.isArray(currentLangCode)) {
+    currentLangCode = currentLangCode[0];
+  }
   const [langCode, setLangCode] = useState(currentLangCode);
 
   // initial state
