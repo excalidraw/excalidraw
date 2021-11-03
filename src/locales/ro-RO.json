@@ -168,7 +168,7 @@
     "imageInsertError": "Imaginea nu a putut fi introdusă. Reîncearcă mai târziu...",
     "fileTooBig": "Fișierul este prea mare. Dimensiunea maximă permisă este de {{maxSize}}.",
     "svgImageInsertError": "Imaginea SVG nu a putut fi introdus. Marcajul SVG pare invalid.",
-    "invalidSVGString": ""
+    "invalidSVGString": "SVG invalid."
   },
   "toolBar": {
     "selection": "Selecție",
