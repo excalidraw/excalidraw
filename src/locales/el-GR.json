@@ -20,10 +20,6 @@
     "background": "Φόντο",
     "fill": "Γέμισμα",
     "strokeWidth": "Πάχος μολυβιάς",
-    "strokeShape": "Σχήμα πινελιάς",
-    "strokeShape_gel": "",
-    "strokeShape_fountain": "",
-    "strokeShape_brush": "Πινέλο στυλό",
     "strokeStyle": "Στυλ περιγράμματος",
     "strokeStyle_solid": "Συμπαγής",
     "strokeStyle_dashed": "Διακεκομμένη με παύλες",
@@ -271,7 +267,7 @@
     "zoomToSelection": "Ζουμ στην επιλογή"
   },
   "clearCanvasDialog": {
-    "title": "Καθαρισμός Καμβά"
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Τα σχέδιά σου είναι κρυπτογραφημένα από άκρο σε άκρο, έτσι δεν θα είναι ποτέ ορατά μέσα από τους διακομιστές του Excalidraw.",
