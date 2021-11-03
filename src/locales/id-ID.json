@@ -20,10 +20,6 @@
     "background": "Latar",
     "fill": "Isian",
     "strokeWidth": "Lebar guratan",
-    "strokeShape": "Bentuk guratan",
-    "strokeShape_gel": "Pena gel",
-    "strokeShape_fountain": "Pena gunung",
-    "strokeShape_brush": "Kuas",
     "strokeStyle": "Gaya guratan",
     "strokeStyle_solid": "Padat",
     "strokeStyle_dashed": "Putus-putus",
@@ -271,7 +267,7 @@
     "zoomToSelection": "Perbesar ke seleksi"
   },
   "clearCanvasDialog": {
-    "title": "Hapus Kanvas"
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Gambar anda terenkripsi end-to-end sehingga server Excalidraw tidak akan pernah dapat melihatnya.",
