@@ -271,7 +271,7 @@
     "zoomToSelection": "Zoom to selection"
   },
   "clearCanvasDialog": {
-    "title": "Clear Canvas"
+    "title": "Clear canvas"
   },
   "encrypted": {
     "tooltip": "Your drawings are end-to-end encrypted so Excalidraw's servers will never see them.",
