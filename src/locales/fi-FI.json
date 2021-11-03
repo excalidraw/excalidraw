@@ -168,7 +168,7 @@
     "imageInsertError": "Kuvan lisääminen epäonnistui. Yritä myöhemmin uudelleen...",
     "fileTooBig": "Tiedosto on liian suuri. Suurin sallittu koko on {{maxSize}}.",
     "svgImageInsertError": "SVG- kuvaa ei voitu lisätä. Tiedoston SVG-sisältö näyttää virheelliseltä.",
-    "invalidSVGString": "errors.invalidSVGString"
+    "invalidSVGString": ""
   },
   "toolBar": {
     "selection": "Valinta",
