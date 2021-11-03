@@ -168,7 +168,7 @@
     "imageInsertError": "Αδυναμία εισαγωγής εικόνας. Προσπαθήστε ξανά αργότερα...",
     "fileTooBig": "Το αρχείο είναι πολύ μεγάλο. Το μέγιστο επιτρεπόμενο μέγεθος είναι {{maxSize}}.",
     "svgImageInsertError": "",
-    "invalidSVGString": ""
+    "invalidSVGString": "Μη έγκυρο SVG."
   },
   "toolBar": {
     "selection": "Επιλογή",
