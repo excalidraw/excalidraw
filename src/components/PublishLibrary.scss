@@ -55,6 +55,11 @@
         width: 70%;
         padding: 0.5em;
       }
+
+      .required {
+        color: $oc-red-8;
+        margin: 0.2rem;
+      }
     }
   }
 }

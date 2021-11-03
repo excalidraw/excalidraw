@@ -276,6 +276,13 @@
   "clearCanvasDialog": {
     "title": "Clear Canvas"
   },
+  "publishDialog": {
+    "authorName": "Author Name",
+    "githubUsername": "GitHub Username",
+    "twitterUsername": "Twitter Username",
+    "libraryName": "Library Name",
+    "libraryDesc": "Library Description"
+  },
   "publishSuccessDialog": {
     "title": "Library Publish Success",
     "content": "Thank you {{authorName}}. Your library has been submitted for review. You can track the status",

@@ -105,10 +105,15 @@ const PublishLibrary = ({
       title="Publish Library"
       className="publish-library"
     >
-      <form>
+      <form onSubmit={onSubmit}>
         <div className="publish-library__fields">
           <label>
-            <span>Author Name:</span>
+            <div>
+              <span>{t("publishDialog.authorName")}</span>
+              <span aria-hidden="true" className="required">
+                *
+              </span>
+            </div>
             <input
               type="text"
               name="authorName"
@@ -118,17 +123,30 @@ const PublishLibrary = ({
             />
           </label>
           <label>
-            <span>Github Handle:</span>
+            <span>{t("publishDialog.githubUsername")}</span>
             <input
               type="text"
               name="githubHandle"
-              required
               value={libraryData.githubHandle}
               onChange={onInputChange}
             />
           </label>
           <label>
-            <span>Library Name:</span>
+            <span>{t("publishDialog.twitterUsername")}</span>
+            <input
+              type="text"
+              name="githubHandle"
+              value={libraryData.githubHandle}
+              onChange={onInputChange}
+            />
+          </label>
+          <label>
+            <div>
+              <span>{t("publishDialog.libraryName")}</span>
+              <span aria-hidden="true" className="required">
+                *
+              </span>
+            </div>
             <input
               type="text"
               name="name"
@@ -138,7 +156,12 @@ const PublishLibrary = ({
             />
           </label>
           <label>
-            <span>Library Descripton:</span>
+            <div>
+              <span>{t("publishDialog.libraryDesc")}</span>
+              <span aria-hidden="true" className="required">
+                *
+              </span>
+            </div>
             <textarea
               name="description"
               rows={4}
@@ -159,11 +182,10 @@ const PublishLibrary = ({
             className="publish-library__buttons--cancel"
           />
           <ToolButton
-            type="button"
+            type="submit"
             title={t("buttons.submit")}
             aria-label={t("buttons.submit")}
             label={t("buttons.submit")}
-            onClick={onSubmit}
             className="publish-library__buttons--confirm"
           />
         </div>
