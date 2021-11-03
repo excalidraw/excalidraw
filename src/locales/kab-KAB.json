@@ -20,10 +20,6 @@
     "background": "Agilal",
     "fill": "Taččart",
     "strokeWidth": "Tehri n yizirig",
-    "strokeShape": "Talɣa n yizirig",
-    "strokeShape_gel": "",
-    "strokeShape_fountain": "",
-    "strokeShape_brush": "Amfezzu",
     "strokeStyle": "Aɣanib n tizirig",
     "strokeStyle_solid": "Aččuran",
     "strokeStyle_dashed": "S tjerriḍin",
@@ -271,7 +267,7 @@
     "zoomToSelection": "Simɣur ɣer tefrayt"
   },
   "clearCanvasDialog": {
-    "title": "Sfeḍ taɣzut n usuneɣ"
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Unuɣen-inek (m) ttuwgelhnen seg yixef s ixef dɣa iqeddacen n Excalidraw werǧin ad ten-walin. ",
