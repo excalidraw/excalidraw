@@ -20,10 +20,6 @@
     "background": "Pozadie",
     "fill": "Výplň",
     "strokeWidth": "Hrúbka obrysu",
-    "strokeShape": "Tvar obrysu",
-    "strokeShape_gel": "Gélové pero",
-    "strokeShape_fountain": "Plniace pero",
-    "strokeShape_brush": "Fixka",
     "strokeStyle": "Štýl obrysu",
     "strokeStyle_solid": "Plný",
     "strokeStyle_dashed": "Čiarkovaný",
@@ -271,7 +267,7 @@
     "zoomToSelection": "Priblížiť na výber"
   },
   "clearCanvasDialog": {
-    "title": "Vyčistiť plátno"
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Vaše kresby používajú end-to-end šifrovanie, takže ich Excalidraw server nedokáže prečítať.",
