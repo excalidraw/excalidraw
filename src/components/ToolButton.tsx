@@ -34,6 +34,11 @@ type ToolButtonProps =
       onClick?(event: React.MouseEvent): void;
     })
   | (ToolButtonBaseProps & {
+      type: "submit";
+      children?: React.ReactNode;
+      onClick?(event: React.MouseEvent): void;
+    })
+  | (ToolButtonBaseProps & {
       type: "icon";
       children?: React.ReactNode;
       onClick?(): void;
@@ -82,7 +87,14 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
 
   const lastPointerTypeRef = useRef<PointerType | null>(null);
 
-  if (props.type === "button" || props.type === "icon") {
+  if (
+    props.type === "button" ||
+    props.type === "icon" ||
+    props.type === "submit"
+  ) {
+    const type = (props.type === "icon" ? "button" : props.type) as
+      | "button"
+      | "submit";
     return (
       <button
         className={clsx(
@@ -102,7 +114,7 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
         hidden={props.hidden}
         title={props.title}
         aria-label={props["aria-label"]}
-        type="button"
+        type={type}
         onClick={onClick}
         ref={innerRef}
         disabled={isLoading}
