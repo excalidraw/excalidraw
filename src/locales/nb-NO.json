@@ -168,7 +168,7 @@
     "imageInsertError": "Kunne ikke sette inn bildet. Prøv igjen senere...",
     "fileTooBig": "Filen er for stor. Maksimal tillatt størrelse er {{maxSize}}.",
     "svgImageInsertError": "Kunne ikke sette inn SVG-bilde. SVG-koden ser ugyldig ut.",
-    "invalidSVGString": ""
+    "invalidSVGString": "Ugyldig SVG."
   },
   "toolBar": {
     "selection": "Velg",
