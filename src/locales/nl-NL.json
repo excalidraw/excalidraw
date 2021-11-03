@@ -20,10 +20,6 @@
     "background": "Achtergrond",
     "fill": "Invulling",
     "strokeWidth": "Lijnbreedte",
-    "strokeShape": "Lijnstijl",
-    "strokeShape_gel": "Gel pen",
-    "strokeShape_fountain": "Vulpen",
-    "strokeShape_brush": "Penseel",
     "strokeStyle": "Lijnstijl",
     "strokeStyle_solid": "Ononderbroken",
     "strokeStyle_dashed": "Gestreept",
@@ -271,7 +267,7 @@
     "zoomToSelection": "Inzoomen op selectie"
   },
   "clearCanvasDialog": {
-    "title": "Canvas wissen"
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Je tekeningen zijn beveiligd met end-to-end encryptie, dus Excalidraw's servers zullen nooit zien wat je tekent.",
