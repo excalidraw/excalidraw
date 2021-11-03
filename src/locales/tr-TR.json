@@ -168,7 +168,7 @@
     "imageInsertError": "Görsel eklenemedi. Daha sonra tekrar deneyin...",
     "fileTooBig": "",
     "svgImageInsertError": "",
-    "invalidSVGString": ""
+    "invalidSVGString": "Geçersiz SVG."
   },
   "toolBar": {
     "selection": "Seçme",
