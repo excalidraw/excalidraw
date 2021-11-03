@@ -19,10 +19,8 @@ for (let index = 0; index < locales.length; index++) {
 
   const allKeys = Object.keys(data);
   const translatedKeys = allKeys.filter((item) => data[item] !== "");
-
-  const percentage = (100 * translatedKeys.length) / allKeys.length;
-
-  percentages[currentLocale.replace(".json", "")] = Math.floor(percentage);
+  const percentage = Math.floor((100 * translatedKeys.length) / allKeys.length);
+  percentages[currentLocale.replace(".json", "")] = percentage;
 }
 
 writeFileSync(
