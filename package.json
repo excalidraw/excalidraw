@@ -55,7 +55,7 @@
     "typescript": "4.4.4"
   },
   "devDependencies": {
-    "@excalidraw/eslint-config": "1.0.2",
+    "@excalidraw/eslint-config": "1.0.3",
     "@excalidraw/prettier-config": "1.0.2",
     "@types/chai": "4.2.22",
     "@types/lodash.throttle": "4.1.6",
