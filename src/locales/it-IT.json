@@ -20,10 +20,6 @@
     "background": "Sfondo",
     "fill": "Riempimento",
     "strokeWidth": "Spessore del tratto",
-    "strokeShape": "Forma del tratto",
-    "strokeShape_gel": "Penna gel",
-    "strokeShape_fountain": "Penna stilografica",
-    "strokeShape_brush": "Pennello",
     "strokeStyle": "Stile del tratto",
     "strokeStyle_solid": "Pieno",
     "strokeStyle_dashed": "Tratteggiato",
@@ -271,7 +267,7 @@
     "zoomToSelection": "Zoom alla selezione"
   },
   "clearCanvasDialog": {
-    "title": "Svuota la tela"
+    "title": ""
   },
   "encrypted": {
     "tooltip": "I tuoi disegni sono crittografati end-to-end in modo che i server di Excalidraw non li possano mai vedere.",
