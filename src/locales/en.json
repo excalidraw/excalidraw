@@ -20,10 +20,6 @@
     "background": "Background",
     "fill": "Fill",
     "strokeWidth": "Stroke width",
-    "strokeShape": "Stroke shape",
-    "strokeShape_gel": "Gel pen",
-    "strokeShape_fountain": "Fountain pen",
-    "strokeShape_brush": "Brush pen",
     "strokeStyle": "Stroke style",
     "strokeStyle_solid": "Solid",
     "strokeStyle_dashed": "Dashed",
@@ -271,7 +267,7 @@
     "zoomToSelection": "Zoom to selection"
   },
   "clearCanvasDialog": {
-    "title": "Clear Canvas"
+    "title": "Clear canvas"
   },
   "encrypted": {
     "tooltip": "Your drawings are end-to-end encrypted so Excalidraw's servers will never see them.",
