@@ -20,10 +20,6 @@
     "background": "Arka plan",
     "fill": "Doldur",
     "strokeWidth": "Kontur genişliği",
-    "strokeShape": "",
-    "strokeShape_gel": "",
-    "strokeShape_fountain": "",
-    "strokeShape_brush": "",
     "strokeStyle": "Kontur stili",
     "strokeStyle_solid": "Dolu",
     "strokeStyle_dashed": "Kesik çizgili",
@@ -271,7 +267,7 @@
     "zoomToSelection": "Seçime yakınlaş"
   },
   "clearCanvasDialog": {
-    "title": "Tuvali Temizle"
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Çizimleriniz uçtan-uca şifrelenmiştir, Excalidraw'ın sunucuları bile onları göremez.",
