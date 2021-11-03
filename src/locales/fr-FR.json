@@ -20,10 +20,6 @@
     "background": "Arrière-plan",
     "fill": "Remplissage",
     "strokeWidth": "Largeur du trait",
-    "strokeShape": "Forme du trait",
-    "strokeShape_gel": "Stylo à bille",
-    "strokeShape_fountain": "Stylo-plume",
-    "strokeShape_brush": "Pinceau",
     "strokeStyle": "Style du trait",
     "strokeStyle_solid": "Plein",
     "strokeStyle_dashed": "Tirets",
@@ -271,7 +267,7 @@
     "zoomToSelection": "Zoomer sur la sélection"
   },
   "clearCanvasDialog": {
-    "title": "Effacer la zone de dessin"
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Vos dessins sont chiffrés de bout en bout, les serveurs d'Excalidraw ne les verront jamais.",
