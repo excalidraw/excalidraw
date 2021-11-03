@@ -168,7 +168,7 @@
     "imageInsertError": "Impossible d'insérer l'image. Réessayez plus tard...",
     "fileTooBig": "Le fichier est trop volumineux. La taille maximale autorisée est de {{maxSize}}.",
     "svgImageInsertError": "Impossible d'insérer l'image SVG. Le balisage SVG semble invalide.",
-    "invalidSVGString": "errors.invalidSVGString"
+    "invalidSVGString": ""
   },
   "toolBar": {
     "selection": "Sélection",
