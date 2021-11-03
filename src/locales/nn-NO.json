@@ -20,10 +20,6 @@
     "background": "Bakgrunn",
     "fill": "Fyll",
     "strokeWidth": "Strekbreidd",
-    "strokeShape": "Linjestil",
-    "strokeShape_gel": "Gelepenn",
-    "strokeShape_fountain": "Fyllepenn",
-    "strokeShape_brush": "Pensel",
     "strokeStyle": "Strekstil",
     "strokeStyle_solid": "Solid",
     "strokeStyle_dashed": "Stipla",
@@ -271,7 +267,7 @@
     "zoomToSelection": "Zoom til utval"
   },
   "clearCanvasDialog": {
-    "title": "Tøm lerret"
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Teikningane dine er ende-til-ende-krypterte slik at Excalidraw sine serverar aldri får sjå dei.",
