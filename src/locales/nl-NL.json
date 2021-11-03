@@ -168,7 +168,7 @@
     "imageInsertError": "Afbeelding invoegen mislukt. Probeer het later opnieuw...",
     "fileTooBig": "Bestand is te groot. Maximale grootte is {{maxSize}}.",
     "svgImageInsertError": "",
-    "invalidSVGString": ""
+    "invalidSVGString": "Ongeldige SVG."
   },
   "toolBar": {
     "selection": "Selectie",
