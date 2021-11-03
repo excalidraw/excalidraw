@@ -30,6 +30,7 @@ const PublishLibrary = ({
     githubHandle: "",
     name: "",
     description: "",
+    twitterHandle: "",
   });
 
   const onInputChange = (event: any) => {
@@ -135,8 +136,8 @@ const PublishLibrary = ({
             <span>{t("publishDialog.twitterUsername")}</span>
             <input
               type="text"
-              name="githubHandle"
-              value={libraryData.githubHandle}
+              name="twitterHandle"
+              value={libraryData.twitterHandle}
               onChange={onInputChange}
             />
           </label>
