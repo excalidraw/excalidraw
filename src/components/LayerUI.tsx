@@ -419,19 +419,20 @@ const LibraryMenu = ({
     return (
       <Dialog
         onCloseRequest={() => setPublishLibSuccess(null)}
-        title="Library Publish Success"
+        title={t("publishSuccessDialog.title")}
         className="publish-library-success"
         small={true}
       >
         <p>
-          Thank you {publishLibSuccess?.authorName}. Your library has been
-          submitted for review, You can track the status{" "}
+          {t("publishSuccessDialog.content", {
+            authorName: publishLibSuccess!.authorName,
+          })}{" "}
           <a
             href={publishLibSuccess?.url}
             target="_blank"
             rel="noopener noreferrer"
           >
-            here
+            {t("publishSuccessDialog.link")}
           </a>
         </p>
         <ToolButton
