@@ -3,7 +3,12 @@ import {
   ExcalidrawSelectionElement,
   FontFamilyValues,
 } from "../element/types";
-import { AppState, BinaryFiles, NormalizedZoomValue } from "../types";
+import {
+  AppState,
+  BinaryFiles,
+  LibraryItem,
+  NormalizedZoomValue,
+} from "../types";
 import { ImportedDataState } from "./types";
 import {
   getElementMap,
@@ -272,4 +277,24 @@ export const restore = (
     appState: restoreAppState(data?.appState, localAppState || null),
     files: data?.files || {},
   };
+};
+
+export const restoreLibraryItems = (
+  libraryItems: ImportedDataState["libraryItems"],
+) => {
+  const restoredLibItems =
+    libraryItems ||
+    [].reduce(
+      (acc: LibraryItem[], libItem: LibraryItem | ExcalidrawElement[]) => {
+        // migrate older libraries
+        if (Array.isArray(libItem)) {
+          acc.push({ status: "published", items: libItem });
+        } else {
+          acc.push(libItem);
+        }
+        return acc;
+      },
+      [],
+    );
+  return restoredLibItems;
 };

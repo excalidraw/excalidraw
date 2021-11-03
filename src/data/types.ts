@@ -18,7 +18,7 @@ export interface ImportedDataState {
   elements?: readonly ExcalidrawElement[] | null;
   appState?: Readonly<Partial<AppState>> | null;
   scrollToContent?: boolean;
-  libraryItems?: LibraryItems;
+  libraryItems?: LibraryItems | readonly (readonly ExcalidrawElement[])[];
   files?: BinaryFiles;
 }
 

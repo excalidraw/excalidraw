@@ -72,7 +72,7 @@ import {
 import { loadFromBlob } from "../data";
 import { isValidLibrary } from "../data/json";
 import Library from "../data/library";
-import { restore, restoreElements } from "../data/restore";
+import { restore, restoreElements, restoreLibraryItems } from "../data/restore";
 import {
   dragNewElement,
   dragSelectedElements,
@@ -732,7 +732,9 @@ class App extends React.Component<AppProps, AppState> {
     try {
       initialData = (await this.props.initialData) || null;
       if (initialData?.libraryItems) {
-        this.libraryItemsFromStorage = initialData.libraryItems;
+        this.libraryItemsFromStorage = restoreLibraryItems(
+          initialData.libraryItems,
+        ) as LibraryItems;
       }
     } catch (error: any) {
       console.error(error);
