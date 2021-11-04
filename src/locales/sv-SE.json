@@ -20,10 +20,6 @@
     "background": "Bakgrund",
     "fill": "Fyllnad",
     "strokeWidth": "Linjebredd",
-    "strokeShape": "Linjeform",
-    "strokeShape_gel": "Gelépenna",
-    "strokeShape_fountain": "Reservoarpenna",
-    "strokeShape_brush": "Penselpenna",
     "strokeStyle": "Linjestil",
     "strokeStyle_solid": "Solid",
     "strokeStyle_dashed": "Streckad",
@@ -168,7 +164,7 @@
     "imageInsertError": "Kunde inte infoga bild. Försök igen senare...",
     "fileTooBig": "Filen är för stor. Maximal tillåten storlek är {{maxSize}}.",
     "svgImageInsertError": "Kunde inte infoga SVG-bild. SVG-koden ser ogiltig ut.",
-    "invalidSVGString": ""
+    "invalidSVGString": "Ogiltig SVG."
   },
   "toolBar": {
     "selection": "Markering",
@@ -189,6 +185,7 @@
     "shapes": "Former"
   },
   "hints": {
+    "canvasPanning": "För att flytta canvas, håll mushjulet eller mellanslagstangenten medan du drar",
     "linearElement": "Klicka för att starta flera punkter, dra för en linje",
     "freeDraw": "Klicka och dra, släpp när du är klar",
     "text": "Tips: du kan också lägga till text genom att dubbelklicka var som helst med markeringsverktyget",
@@ -270,7 +267,7 @@
     "zoomToSelection": "Zooma till markering"
   },
   "clearCanvasDialog": {
-    "title": "Rensa Canvas"
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Dina skisser är krypterade från ände till ände så Excalidraws servrar kommer aldrig att se dem.",

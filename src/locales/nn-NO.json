@@ -20,10 +20,6 @@
     "background": "Bakgrunn",
     "fill": "Fyll",
     "strokeWidth": "Strekbreidd",
-    "strokeShape": "Linjestil",
-    "strokeShape_gel": "Gelepenn",
-    "strokeShape_fountain": "Fyllepenn",
-    "strokeShape_brush": "Pensel",
     "strokeStyle": "Strekstil",
     "strokeStyle_solid": "Solid",
     "strokeStyle_dashed": "Stipla",
@@ -168,7 +164,7 @@
     "imageInsertError": "Kunne ikkje sette inn biletet. Prøv igjen seinare...",
     "fileTooBig": "Fila er for stor. Maksimal tillate storleik er {{maxSize}}.",
     "svgImageInsertError": "Kunne ikkje sette inn SVG-biletet. SVG-koden ser ugyldig ut.",
-    "invalidSVGString": "errors.invalidSVGString"
+    "invalidSVGString": ""
   },
   "toolBar": {
     "selection": "Vel",
@@ -189,6 +185,7 @@
     "shapes": "Formar"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "Klikk for å starte linje med fleire punkt, eller drag for ei enkel linje",
     "freeDraw": "Klikk og drag, slepp når du er ferdig",
     "text": "Tips: du kan òg leggje til tekst ved å dobbeltklikke kor som helst med utvalgsverktyet",
@@ -270,7 +267,7 @@
     "zoomToSelection": "Zoom til utval"
   },
   "clearCanvasDialog": {
-    "title": "Tøm lerret"
+    "title": ""
   },
   "encrypted": {
     "tooltip": "Teikningane dine er ende-til-ende-krypterte slik at Excalidraw sine serverar aldri får sjå dei.",

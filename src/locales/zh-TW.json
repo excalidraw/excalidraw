@@ -20,10 +20,6 @@
     "background": "背景",
     "fill": "填充",
     "strokeWidth": "筆劃寬度",
-    "strokeShape": "筆畫形狀",
-    "strokeShape_gel": "中性筆",
-    "strokeShape_fountain": "鋼筆",
-    "strokeShape_brush": "毛筆",
     "strokeStyle": "筆畫樣式",
     "strokeStyle_solid": "實線",
     "strokeStyle_dashed": "虛線",
@@ -168,7 +164,7 @@
     "imageInsertError": "無法插入圖片。請稍後再試…",
     "fileTooBig": "檔案過大。可接受的最大尺寸為 {{maxSize}} 。",
     "svgImageInsertError": "無法插入 SVG 圖片。此 SVG 檔案有問題。",
-    "invalidSVGString": "errors.invalidSVGString"
+    "invalidSVGString": "無效的 SVG。"
   },
   "toolBar": {
     "selection": "選取",
@@ -189,6 +185,7 @@
     "shapes": "形狀"
   },
   "hints": {
+    "canvasPanning": "若要移動畫布，請在拖曳時按住滑鼠滾輪或空白鍵",
     "linearElement": "點擊以繪製多點曲線；或拖曳以繪製直線",
     "freeDraw": "點擊並拖曳來繪圖，放開即結束",
     "text": "提示：亦可使用選取工具在任何地方雙擊來加入文字",
@@ -270,7 +267,7 @@
     "zoomToSelection": "縮放至選取區"
   },
   "clearCanvasDialog": {
-    "title": "清除畫布"
+    "title": ""
   },
   "encrypted": {
     "tooltip": "你的作品已使用 end-to-end 方式加密，Excalidraw 的伺服器也無法取得其內容。",
