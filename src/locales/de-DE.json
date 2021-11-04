@@ -20,10 +20,6 @@
     "background": "Hintergrund",
     "fill": "Füllung",
     "strokeWidth": "Strichstärke",
-    "strokeShape": "Strichform",
-    "strokeShape_gel": "Gelschreiber",
-    "strokeShape_fountain": "Füllfederhalter",
-    "strokeShape_brush": "Pinselstift",
     "strokeStyle": "Konturstil",
     "strokeStyle_solid": "Durchgezogen",
     "strokeStyle_dashed": "Gestrichelt",
@@ -168,7 +164,7 @@
     "imageInsertError": "Das Bild konnte nicht eingefügt werden. Versuche es später erneut...",
     "fileTooBig": "Die Datei ist zu groß. Die maximal zulässige Größe ist {{maxSize}}.",
     "svgImageInsertError": "SVG-Bild konnte nicht eingefügt werden. Das SVG-Markup sieht ungültig aus.",
-    "invalidSVGString": "errors.invalidSVGString"
+    "invalidSVGString": "Ungültige SVG."
   },
   "toolBar": {
     "selection": "Auswahl",
@@ -189,6 +185,7 @@
     "shapes": "Formen"
   },
   "hints": {
+    "canvasPanning": "Um die Zeichenfläche zu verschieben, halte das Mausrad oder die Leertaste während des Ziehens",
     "linearElement": "Klicken für Linie mit mehreren Punkten, Ziehen für einzelne Linie",
     "freeDraw": "Klicke und ziehe. Lass los, wenn du fertig bist",
     "text": "Tipp: Du kannst auch Text hinzufügen, indem du mit dem Auswahlwerkzeug auf eine beliebige Stelle doppelklickst",
@@ -313,7 +310,7 @@
     "e3fafc": "Cyan 0",
     "e6fcf5": "Teal 0",
     "ebfbee": "Grün 0",
-    "f4fce3": "Limette 0",
+    "f4fce3": "Hellgrün 0",
     "fff9db": "Gelb 0",
     "fff4e6": "Orange 0",
     "transparent": "Transparent",
@@ -328,7 +325,7 @@
     "15aabf": "Cyan 6",
     "12b886": "Teal 6",
     "40c057": "Grün 6",
-    "82c91e": "Limette 6",
+    "82c91e": "Hellgrün 6",
     "fab005": "Gelb 6",
     "fd7e14": "Orange 6",
     "000000": "Schwarz",
@@ -343,7 +340,7 @@
     "0b7285": "Cyan 9",
     "087f5b": "Teal 9",
     "2b8a3e": "Grün 9",
-    "5c940d": "Limette 9",
+    "5c940d": "Hellgrün 9",
     "e67700": "Gelb 9",
     "d9480f": "Orange 9"
   }
