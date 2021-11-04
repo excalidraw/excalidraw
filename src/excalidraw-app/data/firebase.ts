@@ -13,9 +13,8 @@ import { MIME_TYPES } from "../../constants";
 
 const FIREBASE_CONFIG = JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG);
 
-let firebasePromise: Promise<
-  typeof import("firebase/app").default
-> | null = null;
+let firebasePromise: Promise<typeof import("firebase/app").default> | null =
+  null;
 let firestorePromise: Promise<any> | null | true = null;
 let firebaseStoragePromise: Promise<any> | null | true = null;
 
@@ -29,7 +28,7 @@ const _loadFirebase = async () => {
   if (!isFirebaseInitialized) {
     try {
       firebase.initializeApp(FIREBASE_CONFIG);
-    } catch (error) {
+    } catch (error: any) {
       // trying initialize again throws. Usually this is harmless, and happens
       // mainly in dev (HMR)
       if (error.code === "app/duplicate-app") {
@@ -173,7 +172,7 @@ export const saveFilesToFirebase = async ({
             },
           );
         savedFiles.set(id, true);
-      } catch (error) {
+      } catch (error: any) {
         erroredFiles.set(id, true);
       }
     }),
@@ -294,8 +293,10 @@ export const loadFilesFromFirebase = async (
             dataURL,
             created: metadata?.created || Date.now(),
           });
+        } else {
+          erroredFiles.set(id, true);
         }
-      } catch (error) {
+      } catch (error: any) {
         erroredFiles.set(id, true);
         console.error(error);
       }

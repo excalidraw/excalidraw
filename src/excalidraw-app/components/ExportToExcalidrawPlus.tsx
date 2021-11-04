@@ -93,7 +93,7 @@ export const ExportToExcalidrawPlus: React.FC<{
         onClick={async () => {
           try {
             await exportToExcalidrawPlus(elements, appState, files);
-          } catch (error) {
+          } catch (error: any) {
             console.error(error);
             if (error.name !== "AbortError") {
               onError(new Error(t("exportDialog.excalidrawplus_exportError")));

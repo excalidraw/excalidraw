@@ -14,9 +14,8 @@ export const GitHubCorner = React.memo(
       className="rtl-mirror"
       style={{
         marginTop: "calc(var(--space-factor) * -1)",
-        [dir === "rtl"
-          ? "marginLeft"
-          : "marginRight"]: "calc(var(--space-factor) * -1)",
+        [dir === "rtl" ? "marginLeft" : "marginRight"]:
+          "calc(var(--space-factor) * -1)",
       }}
     >
       <a

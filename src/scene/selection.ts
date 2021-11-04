@@ -9,16 +9,11 @@ export const getElementsWithinSelection = (
   elements: readonly NonDeletedExcalidrawElement[],
   selection: NonDeletedExcalidrawElement,
 ) => {
-  const [
-    selectionX1,
-    selectionY1,
-    selectionX2,
-    selectionY2,
-  ] = getElementAbsoluteCoords(selection);
+  const [selectionX1, selectionY1, selectionX2, selectionY2] =
+    getElementAbsoluteCoords(selection);
   return elements.filter((element) => {
-    const [elementX1, elementY1, elementX2, elementY2] = getElementBounds(
-      element,
-    );
+    const [elementX1, elementY1, elementX2, elementY2] =
+      getElementBounds(element);
 
     return (
       element.type !== "selection" &&
