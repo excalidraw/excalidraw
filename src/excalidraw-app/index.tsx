@@ -109,7 +109,7 @@ const localFileStorage = new FileManager({
         try {
           await set(id, fileData, filesStore);
           savedFiles.set(id, true);
-        } catch (error) {
+        } catch (error: any) {
           console.error(error);
           erroredFiles.set(id, true);
         }
@@ -184,10 +184,7 @@ const initializeScene = async (opts: {
       // otherwise, prompt whether user wants to override current scene
       window.confirm(t("alerts.loadSceneOverridePrompt"))
     ) {
-      // Backwards compatibility with legacy url format
-      if (id) {
-        scene = await loadScene(id, null, localDataState);
-      } else if (jsonBackendMatch) {
+      if (jsonBackendMatch) {
         scene = await loadScene(
           jsonBackendMatch[1],
           jsonBackendMatch[2],
@@ -228,7 +225,7 @@ const initializeScene = async (opts: {
       ) {
         return { scene: data, isExternalScene };
       }
-    } catch (error) {
+    } catch (error: any) {
       return {
         scene: {
           appState: {
@@ -276,7 +273,10 @@ const PlusLinkJSX = (
 
 const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
-  const currentLangCode = languageDetector.detect() || defaultLang.code;
+  let currentLangCode = languageDetector.detect() || defaultLang.code;
+  if (Array.isArray(currentLangCode)) {
+    currentLangCode = currentLangCode[0];
+  }
   const [langCode, setLangCode] = useState(currentLangCode);
 
   // initial state
@@ -377,8 +377,8 @@ const ExcalidrawWrapper = () => {
           JSON.parse(
             localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY) as string,
           ) || [];
-      } catch (e) {
-        console.error(e);
+      } catch (error: any) {
+        console.error(error);
       }
     };
 
@@ -508,7 +508,7 @@ const ExcalidrawWrapper = () => {
           },
           files,
         );
-      } catch (error) {
+      } catch (error: any) {
         if (error.name !== "AbortError") {
           const { width, height } = canvas;
           console.error(error, { width, height });

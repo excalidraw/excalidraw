@@ -20,10 +20,6 @@
     "background": "الخلفية",
     "fill": "التعبئة",
     "strokeWidth": "سُمك الخط",
-    "strokeShape": "شكل الخط",
-    "strokeShape_gel": "قلم جل",
-    "strokeShape_fountain": "قلم رش",
-    "strokeShape_brush": "فرشاه",
     "strokeStyle": "نمط الخط",
     "strokeStyle_solid": "كامل",
     "strokeStyle_dashed": "متقطع",
@@ -189,6 +185,7 @@
     "shapes": "الأشكال"
   },
   "hints": {
+    "canvasPanning": "",
     "linearElement": "انقر لبدء نقاط متعددة، اسحب لخط واحد",
     "freeDraw": "انقر واسحب، افرج عند الانتهاء",
     "text": "نصيحة: يمكنك أيضًا إضافة نص بالنقر المزدوج في أي مكان بأداة الاختيار",

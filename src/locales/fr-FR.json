@@ -20,10 +20,6 @@
     "background": "Arrière-plan",
     "fill": "Remplissage",
     "strokeWidth": "Largeur du trait",
-    "strokeShape": "Forme du trait",
-    "strokeShape_gel": "Stylo à bille",
-    "strokeShape_fountain": "Stylo-plume",
-    "strokeShape_brush": "Pinceau",
     "strokeStyle": "Style du trait",
     "strokeStyle_solid": "Plein",
     "strokeStyle_dashed": "Tirets",
@@ -168,7 +164,7 @@
     "imageInsertError": "Impossible d'insérer l'image. Réessayez plus tard...",
     "fileTooBig": "Le fichier est trop volumineux. La taille maximale autorisée est de {{maxSize}}.",
     "svgImageInsertError": "Impossible d'insérer l'image SVG. Le balisage SVG semble invalide.",
-    "invalidSVGString": "errors.invalidSVGString"
+    "invalidSVGString": "SVG invalide."
   },
   "toolBar": {
     "selection": "Sélection",
@@ -189,6 +185,7 @@
     "shapes": "Formes"
   },
   "hints": {
+    "canvasPanning": "Pour déplacer la zone de dessin, maintenez la molette de la souris enfoncée ou la barre d'espace tout en faisant glisser",
     "linearElement": "Cliquez pour démarrer plusieurs points, faites glisser pour une seule ligne",
     "freeDraw": "Cliquez et faites glissez, relâchez quand vous avez terminé",
     "text": "Astuce : vous pouvez aussi ajouter du texte en double-cliquant n'importe où avec l'outil de sélection",
